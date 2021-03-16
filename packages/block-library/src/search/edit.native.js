@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TextInput, Platform } from 'react-native';
+import { View } from 'react-native';
 import classnames from 'classnames';
 
 /**
@@ -9,8 +9,8 @@ import classnames from 'classnames';
  */
 import {
 	RichText,
+	PlainText,
 	BlockControls,
-	useBlockProps,
 	InspectorControls,
 } from '@wordpress/block-editor';
 import {
@@ -22,7 +22,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { Component } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -44,102 +44,58 @@ import {
  */
 const MIN_BUTTON_WIDTH = 100;
 
-export default function SearchEdit( {
-	onFocus,
-	isSelected,
-	attributes,
-	setAttributes,
-	className,
-} ) {
-	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
-	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
-	const [ isPlaceholderSelected, setIsPlaceholderSelected ] = useState(
-		false
-	);
+export default class SearchEdit extends Component {
+	constructor( props ) {
+		super( props );
 
-	const textInputRef = useRef( null );
-	const isAndroid = Platform.OS === 'android';
-
-	let timeoutRef = null;
-
-	const {
-		label,
-		showLabel,
-		buttonPosition,
-		buttonUseIcon,
-		placeholder,
-		buttonText,
-		width = 100,
-		widthUnit = '%',
-	} = attributes;
-
-	/*
-	 * Set the focus to the placeholder text when the block is first mounted (
-	 * if the block is selected).
-	 */
-	useEffect( () => {
-		if (
-			hasTextInput() &&
-			textInputRef.current.isFocused() === false &&
-			isSelected
-		) {
-			if ( isAndroid ) {
-				/*
-				 * There seems to be an issue in React Native where the keyboard doesn't show if called shortly after rendering.
-				 * As a common work around this delay is used.
-				 * https://github.com/facebook/react-native/issues/19366#issuecomment-400603928
-				 */
-				timeoutRef = setTimeout( () => {
-					textInputRef.current.focus();
-				}, 150 );
-			} else {
-				textInputRef.current.focus();
-			}
-		}
-		return () => {
-			// Clear the timeout when the component is unmounted
-			if ( isAndroid ) {
-				clearTimeout( timeoutRef );
-			}
+		this.state = {
+			isButtonSelected: false,
+			isLabelSelected: false,
+			isPlaceholderSelected: false,
 		};
-	}, [] );
 
-	/*
-	 * Called when the value of isSelected changes. Blurs the TextInput for the
-	 * placeholder when this block loses focus.
-	 */
-	useEffect( () => {
-		if ( hasTextInput() && isPlaceholderSelected && ! isSelected ) {
-			textInputRef.current.blur();
-		}
-	}, [ isSelected ] );
+		this.onChange = this.onChange.bind( this );
+		this.onChangeWidth = this.onChangeWidth.bind( this );
+		this.onChangeUnit = this.onChangeUnit.bind( this );
+	}
 
-	const hasTextInput = () => {
-		return textInputRef && textInputRef.current;
-	};
+	static getDerivedStateFromProps( props, state ) {
+		return {
+			isPlaceholderSelected:
+				props.isSelected && state.isPlaceholderSelected,
+			isButtonSelected: props.isSelected && state.isButtonSelected,
+			isLabelSelected: props.isSelected && state.isLabelSelected,
+		};
+	}
 
-	const onChange = ( nextWidth ) => {
+	onChange( nextWidth ) {
+		const { widthUnit } = this.props.attributes;
 		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
 			return;
 		}
-		onChangeWidth( nextWidth );
-	};
+		this.onChangeWidth( nextWidth );
+	}
 
-	const onChangeWidth = ( nextWidth ) => {
+	onChangeWidth( nextWidth ) {
+		const { setAttributes, attributes } = this.props;
+		const { widthUnit } = attributes;
 		setAttributes( {
 			width: nextWidth,
 			widthUnit,
 		} );
-	};
+	}
 
-	const onChangeUnit = ( nextUnit ) => {
-		setAttributes( {
+	onChangeUnit( nextUnit ) {
+		this.props.setAttributes( {
 			width: '%' === nextUnit ? PC_WIDTH_DEFAULT : PX_WIDTH_DEFAULT,
 			widthUnit: nextUnit,
 		} );
-	};
+	}
 
-	const getBlockClassNames = () => {
+	getBlockClassNames() {
+		const { className, attributes } = this.props;
+		const { buttonPosition, buttonUseIcon } = attributes;
+
 		return classnames(
 			className,
 			'button-inside' === buttonPosition
@@ -161,83 +117,94 @@ export default function SearchEdit( {
 				? 'wp-block-search__icon-button'
 				: undefined
 		);
-	};
+	}
 
-	const blockProps = useBlockProps( {
-		className: getBlockClassNames(),
-	} );
-
-	const controls = (
-		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton
-						title={ __( 'Toggle search label' ) }
-						icon={ toggleLabel }
-						onClick={ () => {
-							setAttributes( {
-								showLabel: ! showLabel,
-							} );
-						} }
-						isActive={ showLabel }
-					/>
-
-					<ButtonPositionDropdown
-						selectedOption={ buttonPosition }
-						onChange={ ( position ) => {
-							setAttributes( {
-								buttonPosition: position,
-							} );
-						} }
-					/>
-
-					{ 'no-button' !== buttonPosition && (
+	control() {
+		const { attributes, setAttributes } = this.props;
+		const {
+			showLabel,
+			buttonPosition,
+			buttonUseIcon,
+			widthUnit,
+			width,
+		} = attributes;
+		return (
+			<>
+				<BlockControls>
+					<ToolbarGroup>
 						<ToolbarButton
-							title={ __( 'Use button with icon' ) }
-							icon={ buttonWithIcon }
+							title={ __( 'Toggle search label' ) }
+							icon={ toggleLabel }
 							onClick={ () => {
 								setAttributes( {
-									buttonUseIcon: ! buttonUseIcon,
+									showLabel: ! showLabel,
 								} );
 							} }
-							isActive={ buttonUseIcon }
+							isActive={ showLabel }
 						/>
-					) }
-				</ToolbarGroup>
-			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Search Settings' ) }>
-					<UnitControl
-						label={ __( 'Width' ) }
-						min={ widthUnit === '%' ? 1 : MIN_WIDTH }
-						max={ isPercentageUnit( widthUnit ) ? 100 : undefined }
-						decimalNum={ 1 }
-						units={ CSS_UNITS }
-						unit={ widthUnit }
-						onChange={ onChange }
-						onComplete={ onChangeWidth }
-						onUnitChange={ onChangeUnit }
-						value={ parseFloat( width ) }
-					/>
-				</PanelBody>
-			</InspectorControls>
-		</>
-	);
 
-	const mergeWithBorderStyle = ( style ) => {
+						<ButtonPositionDropdown
+							selectedOption={ buttonPosition }
+							onChange={ ( position ) => {
+								setAttributes( {
+									buttonPosition: position,
+								} );
+							} }
+						/>
+
+						{ 'no-button' !== buttonPosition && (
+							<ToolbarButton
+								title={ __( 'Use button with icon' ) }
+								icon={ buttonWithIcon }
+								onClick={ () => {
+									setAttributes( {
+										buttonUseIcon: ! buttonUseIcon,
+									} );
+								} }
+								isActive={ buttonUseIcon }
+							/>
+						) }
+					</ToolbarGroup>
+				</BlockControls>
+				<InspectorControls>
+					<PanelBody title={ __( 'Search Settings' ) }>
+						<UnitControl
+							label={ __( 'Width' ) }
+							min={ widthUnit === '%' ? 1 : MIN_WIDTH }
+							max={
+								isPercentageUnit( widthUnit ) ? 100 : undefined
+							}
+							decimalNum={ 1 }
+							units={ CSS_UNITS }
+							unit={ widthUnit }
+							onChange={ this.onChange }
+							onComplete={ this.onChangeWidth }
+							onUnitChange={ this.onChangeUnit }
+							value={ parseFloat( width ) }
+						/>
+					</PanelBody>
+				</InspectorControls>
+			</>
+		);
+	}
+
+	mergeWithBorderStyle( style ) {
 		return { ...style, ...styles.border };
-	};
+	}
 
-	const renderTextField = () => {
+	renderTextField() {
+		const { attributes, setAttributes } = this.props;
+		const { buttonPosition, placeholder } = attributes;
+
 		const inputStyle =
 			buttonPosition === 'button-inside'
 				? styles.searchTextInput
-				: mergeWithBorderStyle( styles.searchTextInput );
+				: this.mergeWithBorderStyle( styles.searchTextInput );
 
 		return (
-			<TextInput
-				ref={ textInputRef }
+			<PlainText
 				className="wp-block-search__input"
+				isSelected={ this.state.isPlaceholderSelected }
 				style={ inputStyle }
 				numberOfLines={ 1 }
 				ellipsizeMode="tail" // currently only works on ios
@@ -246,26 +213,31 @@ export default function SearchEdit( {
 				placeholder={
 					placeholder ? undefined : __( 'Optional placeholder…' )
 				}
-				onChangeText={ ( newVal ) =>
+				onChange={ ( newVal ) =>
 					setAttributes( { placeholder: newVal } )
 				}
 				onFocus={ () => {
-					setIsPlaceholderSelected( true );
-					onFocus();
+					this.props.onFocus();
+					this.setState( { isPlaceholderSelected: true } );
 				} }
-				onBlur={ () => setIsPlaceholderSelected( false ) }
+				onBlur={ () => {
+					this.setState( { isPlaceholderSelected: false } );
+				} }
 			/>
 		);
-	};
+	}
 
-	const renderButton = () => {
+	renderButton() {
+		const { attributes, setAttributes } = this.props;
+		const { buttonText, buttonUseIcon } = attributes;
+
 		return (
 			<View style={ styles.buttonContainer }>
 				{ buttonUseIcon && (
 					<Button
 						className="wp-block-search__button"
 						icon={ search }
-						onFocus={ onFocus }
+						onFocus={ this.props.onFocus }
 					/>
 				) }
 
@@ -283,64 +255,78 @@ export default function SearchEdit( {
 						}
 						minWidth={ MIN_BUTTON_WIDTH }
 						textAlign="center"
-						isSelected={ isButtonSelected }
-						__unstableMobileNoFocusOnMount={ ! isSelected }
+						isSelected={ this.state.isButtonSelected }
+						__unstableMobileNoFocusOnMount={
+							! this.props.isSelected
+						}
 						unstableOnFocus={ () => {
-							setIsButtonSelected( true );
+							this.setState( { isButtonSelected: true } );
 						} }
 						onBlur={ () => {
-							setIsButtonSelected( false );
+							this.setState( { isButtonSelected: false } );
 						} }
 					/>
 				) }
 			</View>
 		);
-	};
+	}
 
-	const searchBarStyle =
-		buttonPosition === 'button-inside'
-			? mergeWithBorderStyle( styles.searchBarContainer )
+	getSearchBarStyle() {
+		const { buttonPosition } = this.props.attributes;
+
+		return buttonPosition === 'button-inside'
+			? this.mergeWithBorderStyle( styles.searchBarContainer )
 			: styles.searchBarContainer;
+	}
 
-	return (
-		<View { ...blockProps } style={ styles.searchBlockContainer }>
-			{ isSelected && controls }
+	render() {
+		const { attributes, setAttributes } = this.props;
+		const { showLabel, label, buttonPosition } = attributes;
 
-			{ showLabel && (
-				<RichText
-					className="wp-block-search__label"
-					identifier="text"
-					tagName="p"
-					style={ {
-						...styles.searchLabel,
-						...richTextStyles.searchLabel,
-					} }
-					aria-label={ __( 'Label text' ) }
-					placeholder={ __( 'Add label…' ) }
-					withoutInteractiveFormatting
-					value={ label }
-					onChange={ ( html ) => setAttributes( { label: html } ) }
-					isSelected={ isLabelSelected }
-					__unstableMobileNoFocusOnMount={ ! isSelected }
-					unstableOnFocus={ () => {
-						setIsLabelSelected( true );
-					} }
-					onBlur={ () => {
-						setIsLabelSelected( false );
-					} }
-				/>
-			) }
+		return (
+			<View style={ styles.searchBlockContainer }>
+				{ this.props.isSelected && this.controls }
 
-			{ ( 'button-inside' === buttonPosition ||
-				'button-outside' === buttonPosition ) && (
-				<View style={ searchBarStyle }>
-					{ renderTextField() }
-					{ renderButton() }
-				</View>
-			) }
+				{ showLabel && (
+					<RichText
+						className="wp-block-search__label"
+						identifier="text"
+						tagName="p"
+						style={ {
+							...styles.searchLabel,
+							...richTextStyles.searchLabel,
+						} }
+						aria-label={ __( 'Label text' ) }
+						placeholder={ __( 'Add label…' ) }
+						withoutInteractiveFormatting
+						value={ label }
+						onChange={ ( html ) =>
+							setAttributes( { label: html } )
+						}
+						isSelected={ this.state.isLabelSelected }
+						__unstableMobileNoFocusOnMount={
+							! this.props.isSelected
+						}
+						unstableOnFocus={ () => {
+							this.setState( { isLabelSelected: true } );
+						} }
+						onBlur={ () => {
+							this.setState( { isLabelSelected: false } );
+						} }
+					/>
+				) }
 
-			{ 'button-only' === buttonPosition && renderButton() }
-			{ 'no-button' === buttonPosition && renderTextField() }
-		</View>
-	);
+				{ ( 'button-inside' === buttonPosition ||
+					'button-outside' === buttonPosition ) && (
+					<View style={ this.getSearchBarStyle() }>
+						{ this.renderTextField() }
+						{ this.renderButton() }
+					</View>
+				) }
+
+				{ 'button-only' === buttonPosition && this.renderButton() }
+				{ 'no-button' === buttonPosition && this.renderTextField() }
+			</View>
+		);
+	}
 }
