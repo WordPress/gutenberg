@@ -9,7 +9,7 @@ import classnames from 'classnames';
  */
 import {
 	RichText,
-	BlockControls,
+	PlainText,
 	useBlockProps,
 	InspectorControls,
 } from '@wordpress/block-editor';
@@ -66,32 +66,6 @@ export default function SearchEdit( {
 	/*
 	 * Called when the value of isSelected changes. Blurs the PlainText component
 	 * used by the placeholder when this block loses focus.
-	 */
-	useEffect( () => {
-		if ( hasTextInput() && isPlaceholderSelected && ! isSelected ) {
-			textInputRef.current.blur();
-		}
-	}, [ isSelected ] );
-
-	const hasTextInput = () => {
-		return textInputRef && textInputRef.current;
-	};
-
-	const onChange = ( nextWidth ) => {
-		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
-			return;
-		}
-		return () => {
-			// Clear the timeout when the component is unmounted
-			if ( isAndroid ) {
-				clearTimeout( timeoutRef );
-			}
-		};
-	}, [] );
-
-	/*
-	 * Called when the value of isSelected changes. Blurs the TextInput for the
-	 * placeholder when this block loses focus.
 	 */
 	useEffect( () => {
 		if ( hasTextInput() && isPlaceholderSelected && ! isSelected ) {
