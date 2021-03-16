@@ -51,10 +51,12 @@ export function LayoutStyle( { selector, layout = {} } ) {
 	style += `
 		${ appendSelectors( selector, '> [data-align="left"]' ) } {
 			float: left;
+			margin-right: 2em;
 		}
 
 		${ appendSelectors( selector, '> [data-align="right"]' ) } {
 			float: right;
+			margin-left: 2em;
 		}
 	`;
 

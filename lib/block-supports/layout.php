@@ -84,10 +84,12 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	?>
 		<?php echo '.wp-container-' . $id; ?> .alignleft {
 			float: left;
+			margin-right: 2em;
 		}
 
 		<?php echo '.wp-container-' . $id; ?> .alignright {
 			float: right;
+			margin-left: 2em;
 		}
 	<?php
 	$style .= ob_get_clean();
