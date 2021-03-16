@@ -12,7 +12,12 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { isRTL } from '@wordpress/i18n';
+import { isRTL, _n } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
+import VisuallyHidden from '../visually-hidden';
 
 /**
  * Module Constants
@@ -27,6 +32,11 @@ function DatePickerDay( { day, events } ) {
 			} ) }
 		>
 			{ day.format( 'D' ) }
+			{ events?.length > 0 && (
+				<VisuallyHidden>
+					{ _n( 'has one post', 'has some posts', events.length ) }
+				</VisuallyHidden>
+			 ) }
 		</div>
 	);
 }
