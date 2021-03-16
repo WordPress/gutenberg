@@ -1,0 +1,20 @@
+{
+	"apiVersion": 2,
+	"name": "core/term-description",
+	"category": "design",
+	"attributes": {
+		"textAlign": {
+			"type": "string"
+		}
+	},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"html": false,
+		"fontSize": true,
+		"lineHeight": true,
+		"color": {
+			"link": true
+		}
+	},
+	"editorStyle": "wp-block-term-description-editor"
+}

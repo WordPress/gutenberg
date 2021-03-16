@@ -3,7 +3,7 @@
  */
 import { contextConnect, useContextSystem } from '@wp-g2/context';
 import { cx } from '@wp-g2/styles';
-import { noop } from 'lodash';
+import { noop, uniqueId } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,6 +15,7 @@ import { useCallback } from '@wordpress/element';
  */
 import { BaseButton } from '../base-button';
 import { useButtonGroupContext } from '../button-group';
+import { VisuallyHidden } from '../visually-hidden';
 import * as styles from './styles';
 
 /**
@@ -24,6 +25,7 @@ import * as styles from './styles';
 /**
  * @typedef OwnProps
  * @property {ButtonVariant} [variant='secondary'] Determinds the `Button` variant to render.
+ * @property {string} [describedBy] Text for element pointed to by aria-describedby (id is auto-generated if aria-describedby is not provided).
  */
 
 /**
@@ -46,6 +48,7 @@ function Button( props, forwardedRef ) {
 		onClick = noop,
 		size = 'medium',
 		variant = 'secondary',
+		describedBy,
 		...otherProps
 	} = useContextSystem( props, 'Button' );
 
@@ -56,6 +59,9 @@ function Button( props, forwardedRef ) {
 
 	const isActive = isActiveProp || isButtonGroupActive;
 	const isIconOnly = !! icon && ! children;
+
+	const descriptionId = describedBy ? uniqueId() : undefined;
+	const describedById = otherProps[ 'aria-describedby' ] || descriptionId;
 
 	const handleOnClickWithinButtonGroup = useCallback(
 		( event ) => {
@@ -100,16 +106,24 @@ function Button( props, forwardedRef ) {
 	);
 
 	return (
-		<BaseButton
-			className={ classes }
-			icon={ icon }
-			isActive={ isActive }
-			onClick={ handleOnClick }
-			ref={ forwardedRef }
-			{ ...otherProps }
-		>
-			{ children }
-		</BaseButton>
+		<>
+			<BaseButton
+				className={ classes }
+				icon={ icon }
+				isActive={ isActive }
+				onClick={ handleOnClick }
+				ref={ forwardedRef }
+				aria-describedby={ describedById }
+				{ ...otherProps }
+			>
+				{ children }
+			</BaseButton>
+			{ describedBy && (
+				<VisuallyHidden>
+					<span id={ descriptionId }>{ describedBy }</span>
+				</VisuallyHidden>
+			) }
+		</>
 	);
 }
 

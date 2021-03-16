@@ -11,8 +11,15 @@ import {
 	RichText,
 	BlockControls,
 	useBlockProps,
+	InspectorControls,
 } from '@wordpress/block-editor';
-import { ToolbarGroup, ToolbarButton, Button } from '@wordpress/components';
+import {
+	ToolbarGroup,
+	ToolbarButton,
+	Button,
+	PanelBody,
+	UnitControl,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
 
@@ -23,7 +30,17 @@ import { buttonWithIcon, toggleLabel } from './icons';
 import ButtonPositionDropdown from './button-position-dropdown';
 import styles from './style.scss';
 import richTextStyles from './rich-text.scss';
+import {
+	isPercentageUnit,
+	CSS_UNITS,
+	MIN_WIDTH,
+	PC_WIDTH_DEFAULT,
+	PX_WIDTH_DEFAULT,
+} from './utils.js';
 
+/**
+ * Constants
+ */
 const MIN_BUTTON_WIDTH = 100;
 
 export default function SearchEdit( { attributes, setAttributes, className } ) {
@@ -34,7 +51,30 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 		buttonUseIcon,
 		placeholder,
 		buttonText,
+		width = 100,
+		widthUnit = '%',
 	} = attributes;
+
+	const onChange = ( nextWidth ) => {
+		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
+			return;
+		}
+		onChangeWidth( nextWidth );
+	};
+
+	const onChangeWidth = ( nextWidth ) => {
+		setAttributes( {
+			width: nextWidth,
+			widthUnit,
+		} );
+	};
+
+	const onChangeUnit = ( nextUnit ) => {
+		setAttributes( {
+			width: '%' === nextUnit ? PC_WIDTH_DEFAULT : PX_WIDTH_DEFAULT,
+			widthUnit: nextUnit,
+		} );
+	};
 
 	const getBlockClassNames = () => {
 		return classnames(
@@ -65,42 +105,60 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 	} );
 
 	const controls = (
-		<BlockControls>
-			<ToolbarGroup>
-				<ToolbarButton
-					title={ __( 'Toggle search label' ) }
-					icon={ toggleLabel }
-					onClick={ () => {
-						setAttributes( {
-							showLabel: ! showLabel,
-						} );
-					} }
-					isActive={ showLabel }
-				/>
-
-				<ButtonPositionDropdown
-					selectedOption={ buttonPosition }
-					onChange={ ( position ) => {
-						setAttributes( {
-							buttonPosition: position,
-						} );
-					} }
-				/>
-
-				{ 'no-button' !== buttonPosition && (
+		<>
+			<BlockControls>
+				<ToolbarGroup>
 					<ToolbarButton
-						title={ __( 'Use button with icon' ) }
-						icon={ buttonWithIcon }
+						title={ __( 'Toggle search label' ) }
+						icon={ toggleLabel }
 						onClick={ () => {
 							setAttributes( {
-								buttonUseIcon: ! buttonUseIcon,
+								showLabel: ! showLabel,
 							} );
 						} }
-						isActive={ buttonUseIcon }
+						isActive={ showLabel }
 					/>
-				) }
-			</ToolbarGroup>
-		</BlockControls>
+
+					<ButtonPositionDropdown
+						selectedOption={ buttonPosition }
+						onChange={ ( position ) => {
+							setAttributes( {
+								buttonPosition: position,
+							} );
+						} }
+					/>
+
+					{ 'no-button' !== buttonPosition && (
+						<ToolbarButton
+							title={ __( 'Use button with icon' ) }
+							icon={ buttonWithIcon }
+							onClick={ () => {
+								setAttributes( {
+									buttonUseIcon: ! buttonUseIcon,
+								} );
+							} }
+							isActive={ buttonUseIcon }
+						/>
+					) }
+				</ToolbarGroup>
+			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ __( 'Search Settings' ) }>
+					<UnitControl
+						label={ __( 'Width' ) }
+						min={ widthUnit === '%' ? 1 : MIN_WIDTH }
+						max={ isPercentageUnit( widthUnit ) ? 100 : undefined }
+						decimalNum={ 1 }
+						units={ CSS_UNITS }
+						unit={ widthUnit }
+						onChange={ onChange }
+						onComplete={ onChangeWidth }
+						onUnitChange={ onChangeUnit }
+						value={ parseFloat( width ) }
+					/>
+				</PanelBody>
+			</InspectorControls>
+		</>
 	);
 
 	const mergeWithBorderStyle = ( style ) => {

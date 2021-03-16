@@ -28,6 +28,9 @@
 		},
 		"title": {
 			"type": "string"
+		},
+		"kind": {
+			"type": "string"
 		}
 	},
 	"usesContext": [
