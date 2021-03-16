@@ -76,10 +76,6 @@ if ( ! class_exists( 'WP_Widget_Block' ) ) {
 	require_once __DIR__ . '/class-wp-widget-block.php';
 }
 
-if ( ! class_exists( 'WP_Option_Capturer' ) ) {
-	require_once __DIR__ . '/class-wp-option-capturer.php';
-}
-
 require_once __DIR__ . '/widgets-page.php';
 
 require __DIR__ . '/compat.php';
