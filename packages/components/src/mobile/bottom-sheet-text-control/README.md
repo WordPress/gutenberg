@@ -12,9 +12,9 @@
     import { BottomSheetSelectControl } from '@wordpress/components';
     import { __ } from '@wordpress/i18n';
 
-	const MyTextControl = () => {
+    const MyTextControl = () => {
 
-		const {
+        const {
 			attributes: { alt },
 		} = this.props;
 
