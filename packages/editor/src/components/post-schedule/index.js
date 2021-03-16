@@ -30,7 +30,7 @@ export default function PostSchedule() {
 	const { editPost } = useDispatch( editorStore );
 	const onUpdateDate = ( postDate ) => editPost( { date: postDate } );
 
-	const [ currentMonth, setCurrentMonth ] = useState(
+	const [ previewedMonth, setPreviewedMonth ] = useState(
 		getDayOfTheMonth( date )
 	);
 
@@ -39,11 +39,11 @@ export default function PostSchedule() {
 		( select ) =>
 			select( coreStore ).getEntityRecords( 'postType', 'post', {
 				status: 'publish,future',
-				after: getDayOfTheMonth( currentMonth ),
-				before: getDayOfTheMonth( currentMonth, false ),
+				after: getDayOfTheMonth( previewedMonth ),
+				before: getDayOfTheMonth( previewedMonth, false ),
 				exclude: [ select( editorStore ).getCurrentPostId() ],
 			} ),
-		[ currentMonth ]
+		[ previewedMonth ]
 	);
 
 	const events = useMemo(
@@ -85,7 +85,7 @@ export default function PostSchedule() {
 			onChange={ onChange }
 			is12Hour={ is12HourTime }
 			events={ events }
-			onMonthChange={ setCurrentMonth }
+			onMonthPreviewed={ setPreviewedMonth }
 		/>
 	);
 }

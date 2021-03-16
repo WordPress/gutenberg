@@ -37,11 +37,11 @@ class DatePicker extends Component {
 
 		this.onChangeMoment = this.onChangeMoment.bind( this );
 		this.nodeRef = createRef();
-		this.onMonthChangeHandler = this.onMonthChangeHandler.bind( this );
+		this.onMonthPreviewedHandler = this.onMonthPreviewedHandler.bind( this );
 	}
 
-	onMonthChangeHandler( newMonthDate ) {
-		this.props?.onMonthChange( newMonthDate.toISOString() );
+	onMonthPreviewedHandler( newMonthDate ) {
+		this.props?.onMonthPreviewed( newMonthDate.toISOString() );
 		this.keepFocusInside();
 	}
 
@@ -142,8 +142,8 @@ class DatePicker extends Component {
 					isOutsideRange={ ( date ) => {
 						return isInvalidDate && isInvalidDate( date.toDate() );
 					} }
-					onPrevMonthClick={ this.onMonthChangeHandler }
-					onNextMonthClick={ this.onMonthChangeHandler }
+					onPrevMonthClick={ this.onMonthPreviewedHandler }
+					onNextMonthClick={ this.onMonthPreviewedHandler }
 					renderDayContents={ ( day ) => (
 						<DatePickerDay
 							day={ day }
