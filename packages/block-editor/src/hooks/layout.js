@@ -195,7 +195,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const supportLayout = hasBlockSupport( name, '__experimentalLayout' );
 		const id = useInstanceId( BlockListBlock );
 		const defaultLayout = useEditorFeature( 'layout' );
-		if ( ! supportLayout === undefined ) {
+		if ( ! supportLayout ) {
 			return <BlockListBlock { ...props } />;
 		}
 		const { layout = {} } = attributes;
