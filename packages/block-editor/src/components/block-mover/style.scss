@@ -36,6 +36,11 @@
 			width: $block-toolbar-height - $grid-unit-15 / 2;
 			padding-right: $grid-unit-15 - $border-width !important;
 			padding-left: $grid-unit-15 / 2 !important;
+
+			// Extra specificity to override standard toolbar button styles.
+			&.block-editor-block-mover-button {
+				min-width: $block-toolbar-height - $grid-unit-15 / 2;
+			}
 		}
 
 		// Focus style.

@@ -9,22 +9,16 @@ import useGrid from './hook';
  *
  * @example
  * ```jsx
- * import { Grid } from `@wordpress/components/ui`
+ * import { Grid, View } from `@wordpress/components/ui`;
  *
  * function Example() {
- *   return (
- *     <Grid columns={3}>
- *       <View>
- *         One
- *       </View>
- *       <View>
- *         Two
- *       </View>
- *       <View>
- *         Three
- *       </View>
- *     </Grid>
- *   );
+ * 	return (
+ * 		<Grid columns={ 3 }>
+ * 			<View>Code</View>
+ * 			<View>is</View>
+ * 			<View>Poetry</View>
+ * 		</Grid>
+ * 	);
  * }
  * ```
  */

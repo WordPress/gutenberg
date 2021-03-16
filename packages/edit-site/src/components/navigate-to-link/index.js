@@ -26,7 +26,7 @@ export default function NavigateToLink( {
 	const onClick = useMemo( () => {
 		if ( ! post?.link ) return null;
 		const path = getPathAndQueryString( post.link );
-		if ( path === activePage.path ) return null;
+		if ( path === activePage?.path ) return null;
 		return () =>
 			onActivePageChange( {
 				type,
@@ -37,7 +37,7 @@ export default function NavigateToLink( {
 					postId: post.id,
 				},
 			} );
-	}, [ post, activePage.path, onActivePageChange ] );
+	}, [ post, activePage?.path, onActivePageChange ] );
 
 	return (
 		onClick && (

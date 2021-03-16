@@ -109,7 +109,7 @@ original format string is returned.
 
 _Related_
 
--   <http://www.diveintojavascript.com/projects/javascript-sprintf>
+-   <https://www.npmjs.com/package/sprintf-js>
 
 _Parameters_
 

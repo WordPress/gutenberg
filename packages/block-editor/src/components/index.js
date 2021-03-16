@@ -7,15 +7,20 @@ export * from './gradients';
 export * from './font-sizes';
 export { default as AlignmentToolbar } from './alignment-toolbar';
 export { default as Autocomplete } from './autocomplete';
-export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
-export { default as __experimentalBlockFullHeightAligmentToolbar } from './block-full-height-alignment-toolbar';
-export { default as __experimentalBlockAlignmentMatrixToolbar } from './block-alignment-matrix-toolbar';
+export {
+	BlockAlignmentControl,
+	BlockAlignmentToolbar,
+} from './block-alignment-control';
+export { default as __experimentalBlockFullHeightAligmentControl } from './block-full-height-alignment-control';
+export { default as __experimentalBlockAlignmentMatrixControl } from './block-alignment-matrix-control';
 export { default as BlockBreadcrumb } from './block-breadcrumb';
 export { BlockContextProvider } from './block-context';
-export { default as BlockControls } from './block-controls';
+export {
+	default as BlockControls,
+	BlockFormatControls,
+} from './block-controls';
 export { default as BlockColorsStyleSelector } from './color-style-selector';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
-export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
 export { default as BlockNavigationDropdown } from './block-navigation/dropdown';
 export { BlockNavigationBlockFill as __experimentalBlockNavigationBlockFill } from './block-navigation/block-slot';

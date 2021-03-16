@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isFunction } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -70,7 +75,11 @@ const controls = {
 					oldBlock.attributes.ref
 				);
 
-			const newBlocks = parse( reusableBlock.content );
+			const newBlocks = parse(
+				isFunction( reusableBlock.content )
+					? reusableBlock.content( reusableBlock )
+					: reusableBlock.content
+			);
 			registry
 				.dispatch( 'core/block-editor' )
 				.replaceBlocks( oldBlock.clientId, newBlocks );
