@@ -293,7 +293,6 @@ function gutenberg_register_packages_styles( $styles ) {
 	// else (for development or test) default to use the current time.
 	$version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
 
-
 	// Editor Styles.
 	gutenberg_override_style(
 		$styles,
