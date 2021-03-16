@@ -30,20 +30,17 @@ function BlockListAppender( {
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
-	renderAppender: CustomAppender,
+	renderAppender,
 	className,
 	selectedBlockClientId,
 	tagName: TagName = 'div',
 } ) {
-	if ( isLocked || CustomAppender === false ) {
+	if ( isLocked || renderAppender === false ) {
 		return null;
 	}
 
 	let appender;
-	if ( CustomAppender ) {
-		// Prefer custom render prop if provided.
-		appender = <CustomAppender />;
-	} else {
+	if ( ! renderAppender ) {
 		const isDocumentAppender = ! rootClientId;
 		const isParentSelected = selectedBlockClientId === rootClientId;
 		const isAnotherDefaultAppenderAlreadyDisplayed =
@@ -96,7 +93,7 @@ function BlockListAppender( {
 			onFocus={ stopPropagation }
 			className={ classnames( 'block-list-appender', className ) }
 		>
-			{ appender }
+			{ renderAppender ? renderAppender() : appender }
 		</TagName>
 	);
 }
