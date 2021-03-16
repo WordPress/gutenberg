@@ -22,7 +22,6 @@ const rnPlatform = process.env.TEST_RN_PLATFORM || defaultPlatform;
 // Environment setup, local environment or Sauce Labs
 const defaultEnvironment = 'local';
 const testEnvironment = process.env.TEST_ENV || defaultEnvironment;
-const isCI = process.env.CI;
 
 // Local App Paths
 const defaultAndroidAppPath =
@@ -142,13 +141,7 @@ const setupDriver = async () => {
 			}
 
 			desiredCaps.app = path.resolve( localIOSAppPath );
-
-			if ( isCI ) {
-				desiredCaps.usePrebuiltWDA = true;
-				desiredCaps.derivedDataPath = path.resolve(
-					webDriverAgentPath
-				);
-			}
+			desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 		}
 	}
 
