@@ -9,12 +9,13 @@ import classnames from 'classnames';
 import { useEffect, createPortal } from '@wordpress/element';
 import { BlockInspector } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 
 export { default as BlockInspectorButton } from './block-inspector-button';
 
 const container = document.createElement( 'div' );
 
-function InspectorSectionMeta( { closeInspector } ) {
+function InspectorSectionMeta( { closeInspector, inspectorTitleId } ) {
 	return (
 		<div className="customize-section-description-container section-meta">
 			<div className="customize-section-title">
@@ -27,7 +28,7 @@ function InspectorSectionMeta( { closeInspector } ) {
 				>
 					<span className="screen-reader-text">Back</span>
 				</button>
-				<h3>
+				<h3 id={ inspectorTitleId }>
 					<span className="customize-action">
 						{ __( 'Customizing ▸ Widgets' ) }
 					</span>
@@ -44,6 +45,11 @@ export default function Inspector( {
 	close,
 	setIsAnimating,
 } ) {
+	const inspectorTitleId = useInstanceId(
+		Inspector,
+		'customize-widgets-block-settings'
+	);
+
 	useEffect( () => {
 		const parent = document.getElementById( 'customize-theme-controls' );
 
@@ -82,11 +88,15 @@ export default function Inspector( {
 
 	return createPortal(
 		<div
+			role="region"
+			aria-labelledby={ inspectorTitleId }
 			className={ classnames(
 				'customize-pane-child',
 				'accordion-section-content',
 				'accordion-section',
 				'customize-widgets-layout__inspector',
+				// Required for some CSS to work.
+				'interface-complementary-area',
 				{
 					open: isOpened,
 					// Needed to keep the inspector visible while closing.
@@ -97,7 +107,10 @@ export default function Inspector( {
 				setIsAnimating( false );
 			} }
 		>
-			<InspectorSectionMeta closeInspector={ close } />
+			<InspectorSectionMeta
+				closeInspector={ close }
+				inspectorTitleId={ inspectorTitleId }
+			/>
 
 			<BlockInspector />
 		</div>,
