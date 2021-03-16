@@ -36,6 +36,8 @@ function InserterMenu( {
 		insertDefaultBlock,
 	} = useDispatch( blockEditorStore );
 
+	const { addLastBlockInserted } = useDispatch( 'core/editor' );
+
 	const {
 		items,
 		destinationRootClientId,
@@ -109,6 +111,8 @@ function InserterMenu( {
 				initialAttributes,
 				innerBlocks
 			);
+
+			addLastBlockInserted( newBlock.clientId );
 
 			insertBlock( newBlock, insertionIndex, destinationRootClientId );
 		},

@@ -34,7 +34,7 @@ import {
 import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { useDispatch, withSelect } from '@wordpress/data';
+import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
 import { store as coreStore } from '@wordpress/core-data';
@@ -81,6 +81,7 @@ function GalleryEdit( props ) {
 		imageSizes,
 		resizedImages,
 		onFocus,
+		wasBlockJustInserted,
 	} = props;
 	const {
 		columns = defaultColumnsNumber( attributes ),
@@ -343,6 +344,9 @@ function GalleryEdit( props ) {
 			onError={ onUploadError }
 			notices={ hasImages ? undefined : noticeUI }
 			onFocus={ onFocus }
+			autoOpenMediaUpload={
+				! hasImages && isSelected && wasBlockJustInserted()
+			}
 		/>
 	);
 
@@ -464,6 +468,22 @@ export default compose( [
 			imageSizes,
 			mediaUpload,
 			resizedImages,
+		};
+	} ),
+	withDispatch( ( dispatch, { clientId }, { select } ) => {
+		return {
+			wasBlockJustInserted() {
+				const { clearLastBlockInserted } = dispatch( 'core/editor' );
+				const { wasBlockJustInserted } = select( 'core/editor' );
+
+				const result = wasBlockJustInserted( clientId );
+
+				if ( result ) {
+					clearLastBlockInserted();
+					return true;
+				}
+				return false;
+			},
 		};
 	} ),
 	withNotices,
