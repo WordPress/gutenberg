@@ -150,6 +150,7 @@ public class WPAndroidGlueCode {
         void onCancelUploadForMediaDueToDeletedBlock(int mediaId);
 
         void onSetFeaturedImageButtonClicked(int mediaId);
+        void onGetFeaturedImageId(int mediaId);
 
         ArrayList<MediaOption> onGetOtherMediaImageOptions();
         ArrayList<MediaOption> onGetOtherMediaFileOptions();
@@ -333,6 +334,11 @@ public class WPAndroidGlueCode {
             @Override
             public void setFeaturedImage(int mediaId) {
                 mOnMediaLibraryButtonListener.onSetFeaturedImageButtonClicked(mediaId);
+            }
+
+            @Override
+            public void getFeaturedImageId(int mediaId) {
+                mOnMediaLibraryButtonListener.onGetFeaturedImageId(mediaId);
             }
 
             @Override
@@ -574,7 +580,6 @@ public class WPAndroidGlueCode {
                                   OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
                                   ShowSuggestionsUtil showSuggestionsUtil,
                                   OnMediaFilesCollectionBasedBlockEditorListener onMediaFilesCollectionBasedBlockEditorListener,
-                                  OnFocalPointPickerTooltipShownEventListener onFocalPointPickerTooltipListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());

@@ -15,6 +15,7 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 	setFeaturedImage,
+	getFeaturedImageId,
 	subscribeFeaturedImageIdChange,
 } from '@wordpress/react-native-bridge';
 import {
@@ -100,6 +101,7 @@ export class ImageEdit extends Component {
 		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onSetFeatured = this.onSetFeatured.bind( this );
+		this.onGetFeatured = this.onGetFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
@@ -163,15 +165,9 @@ export class ImageEdit extends Component {
 			mediaUploadSync();
 		}
 
-		//  { getEditedPostAttribute } = select( 'core/editor' );
-
-		// const initialFeaturedImageId = getEditedPostAttribute(
-		//	'featured_media'
-		// );
-
-		// console.log(
-		//	'First logged featured image ID:' + initialFeaturedImageId
-		// );
+		if ( attributes.id ) {
+			this.onGetFeatured();
+		}
 
 		this.addFeaturedImageIdListener();
 	}
@@ -187,6 +183,7 @@ export class ImageEdit extends Component {
 				this.props.attributes.id
 			);
 		}
+
 		this.removeFeaturedImageIdListener();
 	}
 
@@ -195,6 +192,9 @@ export class ImageEdit extends Component {
 			const { image, attributes } = this.props;
 			const url = getUrlForSlug( image, attributes ) || image.source_url;
 			this.props.setAttributes( { url } );
+			if ( attributes.id ) {
+				this.onGetFeatured();
+			}
 		}
 	}
 
@@ -332,6 +332,11 @@ export class ImageEdit extends Component {
 	onSetFeatured() {
 		const { attributes } = this.props;
 		setFeaturedImage( attributes.id );
+	}
+
+	onGetFeatured() {
+		const { attributes } = this.props;
+		getFeaturedImageId( attributes.id );
 	}
 
 	onSetLinkDestination( href ) {
@@ -518,7 +523,6 @@ export class ImageEdit extends Component {
 					{ ! isFeaturedImage && (
 						<BottomSheet.Cell
 							label={ __( 'Set as Featured Image ' ) }
-							// label={ featuredImageId }
 							labelStyle={ styles.setFeaturedButton }
 							onPress={ this.onSetFeatured }
 						/>
@@ -635,15 +639,12 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( coreStore );
 		const { getSettings } = select( blockEditorStore );
-		// const { getEditedPostAttribute } = select( 'core/editor' );
 		const {
 			attributes: { id, url },
 			isSelected,
 		} = props;
 		const { imageSizes } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
-
-		// const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 		const shouldGetMedia =
 			( isSelected && isNotFileUrl ) ||
@@ -656,7 +657,6 @@ export default compose( [
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
-			//featuredImageId,
 		};
 	} ),
 	withPreferredColorScheme,

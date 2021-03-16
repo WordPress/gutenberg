@@ -117,6 +117,10 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
+            public void getFeaturedImageId(int mediaId) {
+            }
+
+            @Override
             public void editorDidMount(ReadableArray unsupportedBlockNames) {
             }
 
