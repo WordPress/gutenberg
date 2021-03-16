@@ -402,6 +402,15 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
+	 * Returns the page templates of the current theme.
+	 *
+	 * @return array
+	 */
+	public static function get_custom_templates() {
+		return WP_Theme_JSON_Resolver::get_theme_data()->get( array( 'customTemplates' ) );
+	}
+
+	/**
 	 * Returns the settings & styles from the theme.
 	 *
 	 * @param array $theme_support_data Existing block editor settings.

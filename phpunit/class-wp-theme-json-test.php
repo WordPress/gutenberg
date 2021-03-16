@@ -820,7 +820,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			)
 		);
 
-		$page_templates = $theme_json->get_custom_templates();
+		$page_templates = $theme_json->get( array( 'customTemplates' ) );
 
 		$this->assertEqualSetsWithIndex(
 			$page_templates,

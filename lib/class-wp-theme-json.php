@@ -1046,19 +1046,6 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Returns the page templates of the current theme.
-	 *
-	 * @return array
-	 */
-	public function get_custom_templates() {
-		if ( ! isset( $this->theme_json['customTemplates'] ) ) {
-			return array();
-		} else {
-			return $this->theme_json['customTemplates'];
-		}
-	}
-
-	/**
 	 * Helper to get the tree or any of its subtrees.
 	 *
 	 * @param array $path Array of keys to get.
