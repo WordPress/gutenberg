@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TextInput, Platform } from 'react-native';
+import { View } from 'react-native';
 import classnames from 'classnames';
 
 /**
@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import {
 	RichText,
+	BlockControls,
 	useBlockProps,
 	InspectorControls,
 } from '@wordpress/block-editor';
@@ -48,13 +49,10 @@ export default function SearchEdit( {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
 	const [ isPlaceholderSelected, setIsPlaceholderSelected ] = useState(
-		false
+		true
 	);
 
 	const textInputRef = useRef( null );
-	const isAndroid = Platform.OS === 'android';
-
-	let timeoutRef = null;
 
 	const {
 		label,
@@ -66,27 +64,22 @@ export default function SearchEdit( {
 	} = attributes;
 
 	/*
-	 * Set the focus to the placeholder text when the block is first mounted (
-	 * if the block is selected).
+	 * Called when the value of isSelected changes. Blurs the PlainText component
+	 * used by the placeholder when this block loses focus.
 	 */
 	useEffect( () => {
-		if (
-			hasTextInput() &&
-			textInputRef.current.isFocused() === false &&
-			isSelected
-		) {
-			if ( isAndroid ) {
-				/*
-				 * There seems to be an issue in React Native where the keyboard doesn't show if called shortly after rendering.
-				 * As a common work around this delay is used.
-				 * https://github.com/facebook/react-native/issues/19366#issuecomment-400603928
-				 */
-				timeoutRef = setTimeout( () => {
-					textInputRef.current.focus();
-				}, 150 );
-			} else {
-				textInputRef.current.focus();
-			}
+		if ( hasTextInput() && isPlaceholderSelected && ! isSelected ) {
+			textInputRef.current.blur();
+		}
+	}, [ isSelected ] );
+
+	const hasTextInput = () => {
+		return textInputRef && textInputRef.current;
+	};
+
+	const onChange = ( nextWidth ) => {
+		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
+			return;
 		}
 		return () => {
 			// Clear the timeout when the component is unmounted
@@ -196,8 +189,9 @@ export default function SearchEdit( {
 				: mergeWithBorderStyle( styles.searchTextInput );
 
 		return (
-			<TextInput
+			<PlainText
 				ref={ textInputRef }
+				isSelected={ isPlaceholderSelected }
 				className="wp-block-search__input"
 				style={ inputStyle }
 				numberOfLines={ 1 }
@@ -207,7 +201,7 @@ export default function SearchEdit( {
 				placeholder={
 					placeholder ? undefined : __( 'Optional placeholder…' )
 				}
-				onChangeText={ ( newVal ) =>
+				onChange={ ( newVal ) =>
 					setAttributes( { placeholder: newVal } )
 				}
 				onFocus={ () => {

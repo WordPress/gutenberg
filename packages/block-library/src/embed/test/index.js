@@ -56,19 +56,19 @@ describe( 'utils', () => {
 		} );
 	} );
 	describe( 'getClassNames', () => {
-		test( 'getClassNames returns aspect ratio class names for iframes with width and height', () => {
+		it( 'should return aspect ratio class names for iframes with width and height', () => {
 			const html = '<iframe height="9" width="16"></iframe>';
 			const expected = 'wp-embed-aspect-16-9 wp-has-aspect-ratio';
 			expect( getClassNames( html ) ).toEqual( expected );
 		} );
 
-		test( 'getClassNames does not return aspect ratio class names if we do not allow responsive', () => {
+		it( 'should not return aspect ratio class names if we do not allow responsive', () => {
 			const html = '<iframe height="9" width="16"></iframe>';
 			const expected = '';
 			expect( getClassNames( html, '', false ) ).toEqual( expected );
 		} );
 
-		test( 'getClassNames preserves exsiting class names when removing responsive classes', () => {
+		it( 'should preserve exsiting class names when removing responsive classes', () => {
 			const html = '<iframe height="9" width="16"></iframe>';
 			const expected = 'lovely';
 			expect(
@@ -79,6 +79,15 @@ describe( 'utils', () => {
 				)
 			).toEqual( expected );
 		} );
+
+		it( 'should return the same falsy value as passed for existing classes when no new classes are added', () => {
+			const html = '<iframe></iframe>';
+			const expected = undefined;
+			expect( getClassNames( html, undefined, false ) ).toEqual(
+				expected
+			);
+		} );
+
 		it( 'should preserve existing classes and replace aspect ratio related classes with the current embed preview', () => {
 			const html = '<iframe height="3" width="4"></iframe>';
 			const expected =
@@ -93,6 +102,12 @@ describe( 'utils', () => {
 		} );
 	} );
 	describe( 'removeAspectRatioClasses', () => {
+		it( 'should return the same falsy value as received', () => {
+			const existingClassNames = undefined;
+			expect( removeAspectRatioClasses( existingClassNames ) ).toEqual(
+				existingClassNames
+			);
+		} );
 		it( 'should preserve existing classes, if no aspect ratio classes exist', () => {
 			const existingClassNames = 'wp-block-embed is-type-video';
 			expect( removeAspectRatioClasses( existingClassNames ) ).toEqual(

@@ -35,7 +35,7 @@ const SELECTOR = [
  * Returns true if the specified element is visible (i.e. neither display: none
  * nor visibility: hidden).
  *
- * @param {Element} element DOM element to test.
+ * @param {HTMLElement} element DOM element to test.
  *
  * @return {boolean} Whether element is visible.
  */
@@ -67,16 +67,18 @@ function skipFocus( element ) {
  * false otherwise. Area is only focusable if within a map where a named map
  * referenced by an image somewhere in the document.
  *
- * @param {Element} element DOM area element to test.
+ * @param {HTMLAreaElement} element DOM area element to test.
  *
  * @return {boolean} Whether area element is valid for focus.
  */
 function isValidFocusableArea( element ) {
+	/** @type {HTMLMapElement | null} */
 	const map = element.closest( 'map[name]' );
 	if ( ! map ) {
 		return false;
 	}
 
+	/** @type {HTMLImageElement | null} */
 	const img = element.ownerDocument.querySelector(
 		'img[usemap="#' + map.name + '"]'
 	);
@@ -91,6 +93,9 @@ function isValidFocusableArea( element ) {
  * @return {Element[]} Focusable elements.
  */
 export function find( context ) {
+	/* eslint-disable jsdoc/no-undefined-types */
+	/** @type {NodeListOf<HTMLElement>} */
+	/* eslint-enable jsdoc/no-undefined-types */
 	const elements = context.querySelectorAll( SELECTOR );
 
 	return Array.from( elements ).filter( ( element ) => {
@@ -100,7 +105,9 @@ export function find( context ) {
 
 		const { nodeName } = element;
 		if ( 'AREA' === nodeName ) {
-			return isValidFocusableArea( element );
+			return isValidFocusableArea(
+				/** @type {HTMLAreaElement} */ ( element )
+			);
 		}
 
 		return true;

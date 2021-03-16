@@ -49,7 +49,7 @@ Let's confirm the plugin is loaded and working.
 
 -or-
 
-(3B) If you are using `wp-env`, see [Development Environment setup](/docs/getting-started/tutorials/devenv/readme.md), then you should now run from inside the `gutenpride` directory:
+(3B) If you are using `wp-env`, see [Development Environment setup](/docs/getting-started/tutorials/devenv/README.md), then you should now run from inside the `gutenpride` directory:
 
 ```sh
 wp-env start

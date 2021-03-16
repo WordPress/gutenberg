@@ -1,4 +1,4 @@
-# Developer Documentation
+# How-to Guides
 
 The new editor is highly flexible, like most of WordPress. You can build custom blocks, modify the editor's appearance, add special plugins, and much more.
 
@@ -6,7 +6,7 @@ The new editor is highly flexible, like most of WordPress. You can build custom 
 
 The editor is about blocks, and the main extensibility API is the Block API. It allows you to create your own static blocks, [Dynamic Blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) ( rendered on the server ) and also blocks capable of saving data to Post Meta for more structured content.
 
-If you want to learn more about block creation, see the [Create a Block tutorial](/docs/getting-started/tutorials/create-block/readme.md) for the best place to start.
+If you want to learn more about block creation, see the [Create a Block tutorial](/docs/getting-started/tutorials/create-block/README.md) for the best place to start.
 
 ## Extending Blocks
 
@@ -24,7 +24,7 @@ You can also filter certain aspects of the editor; this is documented on the [Ed
 
 ## Meta Boxes
 
-Porting PHP meta boxes to blocks or sidebar plugins is highly encouraged, learn how through these [meta data tutorials](/docs/how-to-guides/metabox/readme.md).
+Porting PHP meta boxes to blocks or sidebar plugins is highly encouraged, learn how through these [meta data tutorials](/docs/how-to-guides/metabox/README.md).
 
 See how the new editor [supports existing Meta Boxes](/docs/reference-guides/backward-compatibility/meta-box.md).
 
