@@ -9,7 +9,7 @@ import 'moment-timezone/moment-timezone-utils';
 /** @typedef {import('moment').LocaleSpecification} MomentLocaleSpecification */
 
 /**
- * @typedef MeridiumConfig
+ * @typedef MeridiemConfig
  * @property {string} am Lowercase AM.
  * @property {string} AM Uppercase AM.
  * @property {string} pm Lowercase PM.
@@ -27,7 +27,7 @@ import 'moment-timezone/moment-timezone-utils';
 /**
  * @typedef TimezoneConfig
  * @property {string} offset Offset setting.
- * @property {string} string ???
+ * @property {string} string The timezone as a string (e.g., `'America/Los_Angeles'`).
  * @property {string} abbr Abbreviation for the timezone.
  */
 
@@ -39,7 +39,7 @@ import 'moment-timezone/moment-timezone-utils';
  * @property {MomentLocaleSpecification['monthsShort']} monthsShort Locale months short.
  * @property {MomentLocaleSpecification['weekdays']} weekdays Locale weekdays.
  * @property {MomentLocaleSpecification['weekdaysShort']} weekdaysShort Locale weekdays short.
- * @property {MeridiumConfig} meridiem Meridiem config.
+ * @property {MeridiemConfig} meridiem Meridiem config.
  * @property {MomentLocaleSpecification['relativeTime']} relative Relative time config.
  */
 /* eslint-enable jsdoc/valid-types */
