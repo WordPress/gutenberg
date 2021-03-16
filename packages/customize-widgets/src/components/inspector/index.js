@@ -42,8 +42,7 @@ function InspectorSectionMeta( { closeInspector, inspectorTitleId } ) {
 export default function Inspector( {
 	isOpened,
 	isAnimating,
-	close,
-	setIsAnimating,
+	setInspectorOpenState,
 } ) {
 	const inspectorTitleId = useInstanceId(
 		Inspector,
@@ -61,8 +60,6 @@ export default function Inspector( {
 	}, [] );
 
 	useEffect( () => {
-		setIsAnimating( true );
-
 		const openedSidebarSection = document.querySelector(
 			'.control-section-sidebar.open'
 		);
@@ -77,14 +74,14 @@ export default function Inspector( {
 		// (Like when it's set to "display: none", or when the transition property is removed.)
 		// See https://github.com/w3c/csswg-drafts/issues/3043
 		const timer = setTimeout( () => {
-			setIsAnimating( false );
+			setInspectorOpenState( 'TRANSITION_END' );
 		}, 180 );
 
 		return () => {
 			openedSidebarSection.classList.remove( 'is-inspector-open' );
 			clearTimeout( timer );
 		};
-	}, [ isOpened ] );
+	}, [ isOpened, setInspectorOpenState ] );
 
 	return createPortal(
 		<div
@@ -104,11 +101,11 @@ export default function Inspector( {
 				}
 			) }
 			onTransitionEnd={ () => {
-				setIsAnimating( false );
+				setInspectorOpenState( 'TRANSITION_END' );
 			} }
 		>
 			<InspectorSectionMeta
-				closeInspector={ close }
+				closeInspector={ () => setInspectorOpenState( 'CLOSE' ) }
 				inspectorTitleId={ inspectorTitleId }
 			/>
 
