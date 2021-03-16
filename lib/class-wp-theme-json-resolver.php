@@ -205,7 +205,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON Entity that holds core data.
 	 */
-	public static function get_core_data() {
+	private static function get_core_data() {
 		if ( null !== self::$core ) {
 			return self::$core;
 		}
@@ -311,6 +311,88 @@ class WP_Theme_JSON_Resolver {
 	}
 
 	/**
+	 * Returns the editor settings.
+	 *
+	 * @param array $theme_support_data Existing block editor settings.
+	 *                                  Empty array by default.
+	 *
+	 * @return array
+	 */
+	public static function get_settings( $theme_support_data = array() ) {
+		$tree = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' );
+		return $tree->get_settings();
+	}
+
+	/**
+	 * Takes a tree adhering to the theme.json schema and generates
+	 * the corresponding stylesheet.
+	 *
+	 * @param WP_Theme_JSON $tree Input tree.
+	 * @param string        $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
+	 *
+	 * @return string Stylesheet.
+	 */
+	private static function tree_to_styles( $tree, $type = 'all' ) {
+		// Check if we can use cached.
+		$can_use_cached = (
+			( 'all' === $type ) &&
+			( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
+			( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
+			( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
+			! is_admin()
+		);
+
+		if ( $can_use_cached ) {
+			// Check if we have the styles already cached.
+			$cached = get_transient( 'global_styles' );
+			if ( $cached ) {
+				return $cached;
+			}
+		}
+
+		$stylesheet = $tree->get_stylesheet( $type );
+
+		if ( ( 'all' === $type || 'block_styles' === $type ) && WP_Theme_JSON_Resolver::theme_has_support() ) {
+			// To support all themes, we added in the block-library stylesheet
+			// a style rule such as .has-link-color a { color: var(--wp--style--color--link, #00e); }
+			// so that existing link colors themes used didn't break.
+			// We add this here to make it work for themes that opt-in to theme.json
+			// In the future, we may do this differently.
+			$stylesheet .= 'a{color:var(--wp--style--color--link, #00e);}';
+		}
+
+		if ( $can_use_cached ) {
+			// Cache for a minute.
+			// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
+			set_transient( 'global_styles', $stylesheet, MINUTE_IN_SECONDS );
+		}
+
+		return $stylesheet;
+	}
+
+	/**
+	 * Returs the stylesheet for global styles.
+	 *
+	 * @param array  $theme_support_data Existing block editor settings.
+	 *                                   Empty array by default.
+	 * @param string $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
+	 *
+	 * @return string
+	 */
+	public static function get_stylesheet( $theme_support_data = array(), $type = 'all' ) {
+		$origin = 'theme';
+		if (
+			WP_Theme_JSON_Resolver::theme_has_support() &&
+			gutenberg_is_fse_theme()
+		) {
+			// Only lookup for the user data if we need it.
+			$origin = 'user';
+		}
+		$tree = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, $origin );
+		return WP_Theme_JSON_Resolver::tree_to_styles( $tree, $type );
+	}
+
+	/**
 	 * Returns the CPT that contains the user's origin config
 	 * for the current theme or a void array if none found.
 	 *
@@ -361,7 +443,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return WP_Theme_JSON Entity that holds user data.
 	 */
-	public static function get_user_data() {
+	private static function get_user_data() {
 		if ( null !== self::$user ) {
 			return self::$user;
 		}

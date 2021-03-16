@@ -107,53 +107,6 @@ function gutenberg_experimental_global_styles_get_theme_support_settings( $setti
 }
 
 /**
- * Takes a tree adhering to the theme.json schema and generates
- * the corresponding stylesheet.
- *
- * @param WP_Theme_JSON $tree Input tree.
- * @param string        $type Type of stylesheet we want accepts 'all', 'block_styles', and 'css_variables'.
- *
- * @return string Stylesheet.
- */
-function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'all' ) {
-	// Check if we can use cached.
-	$can_use_cached = (
-		( 'all' === $type ) &&
-		( ! defined( 'WP_DEBUG' ) || ! WP_DEBUG ) &&
-		( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) &&
-		( ! defined( 'REST_REQUEST' ) || ! REST_REQUEST ) &&
-		! is_admin()
-	);
-
-	if ( $can_use_cached ) {
-		// Check if we have the styles already cached.
-		$cached = get_transient( 'global_styles' );
-		if ( $cached ) {
-			return $cached;
-		}
-	}
-
-	$stylesheet = $tree->get_stylesheet( $type );
-
-	if ( ( 'all' === $type || 'block_styles' === $type ) && WP_Theme_JSON_Resolver::theme_has_support() ) {
-		// To support all themes, we added in the block-library stylesheet
-		// a style rule such as .has-link-color a { color: var(--wp--style--color--link, #00e); }
-		// so that existing link colors themes used didn't break.
-		// We add this here to make it work for themes that opt-in to theme.json
-		// In the future, we may do this differently.
-		$stylesheet .= 'a{color:var(--wp--style--color--link, #00e);}';
-	}
-
-	if ( $can_use_cached ) {
-		// Cache for a minute.
-		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
-		set_transient( 'global_styles', $stylesheet, MINUTE_IN_SECONDS );
-	}
-
-	return $stylesheet;
-}
-
-/**
  * Fetches the preferences for each origin (core, theme, user)
  * and enqueues the resulting stylesheet.
  */
@@ -164,10 +117,7 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 
 	$settings           = gutenberg_get_common_block_editor_settings();
 	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
-
-	$all = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data );
-
-	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
+	$stylesheet         = WP_Theme_JSON_Resolver::get_stylesheet( $theme_support_data );
 	if ( empty( $stylesheet ) ) {
 		return;
 	}
@@ -195,23 +145,13 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['fontSizes'] );
 	unset( $settings['gradients'] );
 
-	$origin = 'theme';
-	if (
-		WP_Theme_JSON_Resolver::theme_has_support() &&
-		gutenberg_is_fse_theme()
-	) {
-		// Only lookup for the user data if we need it.
-		$origin = 'user';
-	}
-	$tree = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, $origin );
-
 	// STEP 1: ADD FEATURES
 	//
 	// These need to be always added to the editor settings,
 	// even for themes that don't support theme.json.
 	// An example of this is that the presets are configured
 	// from the theme support data.
-	$settings['__experimentalFeatures'] = $tree->get_settings();
+	$settings['__experimentalFeatures'] = WP_Theme_JSON_Resolver::get_settings( $theme_support_data );
 
 	// STEP 2 - IF EDIT-SITE, ADD DATA REQUIRED FOR GLOBAL STYLES SIDEBAR
 	//
@@ -239,11 +179,11 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		// some of these should be added the wrapper class,
 		// as if they were added via add_editor_styles.
 		$settings['styles'][] = array(
-			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $tree, 'css_variables' ),
+			'css'                     => WP_Theme_JSON_Resolver::get_stylesheet( $theme_support_data, 'css_variables' ),
 			'__experimentalNoWrapper' => true,
 		);
 		$settings['styles'][] = array(
-			'css' => gutenberg_experimental_global_styles_get_stylesheet( $tree, 'block_styles' ),
+			'css' => WP_Theme_JSON_Resolver::get_stylesheet( $theme_support_data, 'block_styles' ),
 		);
 	}
 
