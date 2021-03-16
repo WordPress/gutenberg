@@ -81,9 +81,14 @@ jest.mock( 'react-native-safe-area', () => {
 	};
 } );
 
-jest.mock( '@react-native-community/slider', () => () => 'Slider', {
-	virtual: true,
-} );
+jest.mock(
+	'@react-native-community/slider',
+	() => {
+		const { forwardRef } = require( 'react' );
+		return forwardRef( () => 'Slider' );
+	},
+	{ virtual: true }
+);
 
 if ( ! global.window.matchMedia ) {
 	global.window.matchMedia = () => ( {
