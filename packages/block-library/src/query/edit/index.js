@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, usePrevious } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
@@ -33,18 +33,26 @@ export function QueryContent( { attributes, setAttributes } ) {
 				+getSettings().postsPerPage || DEFAULTS_POSTS_PER_PAGE,
 		};
 	}, [] );
+
+	const previousQuery = usePrevious( query );
 	// Changes in query property (which is an object) need to be in the same callback,
 	// because updates are batched after the render and changes in different query properties
 	// would cause to overide previous wanted changes.
 	useEffect( () => {
 		const newQuery = {};
-		if ( ! query.perPage && postsPerPage ) {
+		if (
+			( ! query.perPage && postsPerPage ) ||
+			( ! query.inherit && previousQuery?.inherit )
+		) {
 			newQuery.perPage = postsPerPage;
+		}
+		if ( query.inherit ) {
+			newQuery.perPage = 1;
 		}
 		if ( !! Object.keys( newQuery ).length ) {
 			updateQuery( newQuery );
 		}
-	}, [ query.perPage, query.inherit ] );
+	}, [ query.perPage, query.inherit, previousQuery ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
