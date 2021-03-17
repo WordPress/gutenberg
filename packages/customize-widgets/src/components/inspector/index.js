@@ -6,14 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect, createPortal } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { BlockInspector } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 
 export { default as BlockInspectorButton } from './block-inspector-button';
-
-const container = document.createElement( 'div' );
 
 function InspectorSectionMeta( { closeInspector, inspectorTitleId } ) {
 	return (
@@ -50,16 +48,6 @@ export default function Inspector( {
 	);
 
 	useEffect( () => {
-		const parent = document.getElementById( 'customize-theme-controls' );
-
-		parent.appendChild( container );
-
-		return () => {
-			parent.removeChild( container );
-		};
-	}, [] );
-
-	useEffect( () => {
 		const openedSidebarSection = document.querySelector(
 			'.control-section-sidebar.open'
 		);
@@ -83,7 +71,7 @@ export default function Inspector( {
 		};
 	}, [ isOpened, setInspectorOpenState ] );
 
-	return createPortal(
+	return (
 		<div
 			role="region"
 			aria-labelledby={ inspectorTitleId }
@@ -110,7 +98,6 @@ export default function Inspector( {
 			/>
 
 			<BlockInspector />
-		</div>,
-		container
+		</div>
 	);
 }

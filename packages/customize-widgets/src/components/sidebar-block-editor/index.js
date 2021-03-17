@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useReducer, useMemo } from '@wordpress/element';
+import { useReducer, useMemo, createPortal } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockList,
@@ -67,6 +67,10 @@ export default function SidebarBlockEditor( { sidebar } ) {
 		[ inserter.setVisible ]
 	);
 
+	const parentContainer = document.getElementById(
+		'customize-theme-controls'
+	);
+
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
@@ -92,14 +96,16 @@ export default function SidebarBlockEditor( { sidebar } ) {
 						</BlockEditorProvider>
 
 						<Popover.Slot name="block-toolbar" />
-						<Popover.Slot />
 					</div>
 
-					<Inspector
-						isOpened={ isInspectorOpened }
-						isAnimating={ isInspectorAnimating }
-						setInspectorOpenState={ setInspectorOpenState }
-					/>
+					{ createPortal(
+						<Inspector
+							isOpened={ isInspectorOpened }
+							isAnimating={ isInspectorAnimating }
+							setInspectorOpenState={ setInspectorOpenState }
+						/>,
+						parentContainer
+					) }
 
 					<__experimentalBlockSettingsMenuFirstItem>
 						{ ( { onClose } ) => (
@@ -113,6 +119,8 @@ export default function SidebarBlockEditor( { sidebar } ) {
 							/>
 						) }
 					</__experimentalBlockSettingsMenuFirstItem>
+
+					{ createPortal( <Popover.Slot />, parentContainer ) }
 				</DropZoneProvider>
 			</SlotFillProvider>
 		</>
