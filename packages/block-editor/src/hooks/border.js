@@ -10,7 +10,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
+import { BorderColorEdit, useIsBorderColorDisabled } from './border-color';
 import { BorderRadiusEdit, useIsBorderRadiusDisabled } from './border-radius';
+import { BorderStyleEdit, useIsBorderStyleDisabled } from './border-style';
+import { BorderWidthEdit, useIsBorderWidthDisabled } from './border-width';
 
 export const BORDER_SUPPORT_KEY = '__experimentalBorder';
 
@@ -24,15 +27,18 @@ export function BorderPanel( props ) {
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Border settings' ) }>
+			<PanelBody title={ __( 'Border settings' ) } initialOpen={ false }>
+				<BorderStyleEdit { ...props } />
+				<BorderWidthEdit { ...props } />
 				<BorderRadiusEdit { ...props } />
+				<BorderColorEdit { ...props } />
 			</PanelBody>
 		</InspectorControls>
 	);
 }
 
 /**
- * Determine whether there is block support for borders.
+ * Determine whether there is block support for border properties.
  *
  * @param {string} blockName Block name.
  * @return {boolean}         Whether there is support.
@@ -44,9 +50,13 @@ export function hasBorderSupport( blockName ) {
 
 	const support = getBlockSupport( blockName, BORDER_SUPPORT_KEY );
 
-	// Further border properties to be added in future iterations.
-	// e.g. support && ( support.radius || support.width || support.style )
-	return !! ( true === support || support?.radius );
+	return !! (
+		true === support ||
+		support?.color ||
+		support?.radius ||
+		support?.width ||
+		support?.style
+	);
 }
 
 /**
@@ -57,11 +67,12 @@ export function hasBorderSupport( blockName ) {
  * @return {boolean}      If border support is completely disabled.
  */
 const useIsBorderDisabled = ( props = {} ) => {
-	// Further border properties to be added in future iterations.
-	// e.g. const configs = [
-	// 		useIsBorderRadiusDisabled( props ),
-	//		useIsBorderWidthDisabled( props ),
-	// ];
-	const configs = [ useIsBorderRadiusDisabled( props ) ];
+	const configs = [
+		useIsBorderColorDisabled( props ),
+		useIsBorderRadiusDisabled( props ),
+		useIsBorderStyleDisabled( props ),
+		useIsBorderWidthDisabled( props ),
+	];
+
 	return configs.every( Boolean );
 };
