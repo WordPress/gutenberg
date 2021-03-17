@@ -19,16 +19,23 @@ function render_block_core_loginout( $attributes ) {
 		? get_permalink( get_the_ID() )
 		: '';
 
+	// Build the classes for this block.
+	$classes  = 'wp-block-loginout';
+	$classes .= is_user_logged_in() ? ' logged-in' : ' logged-out';
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
+	$contents           = wp_loginout( $redirect_url, false );
 	// If logged-out and displayLoginAsForm is true, show the login form.
 	if ( ! is_user_logged_in() && ! empty( $attributes['displayLoginAsForm'] ) ) {
-		return wp_login_form(
+		$contents = wp_login_form(
 			array(
 				'echo'     => false,
 				'redirect' => $redirect_url,
 			)
 		);
 	}
-	return wp_loginout( $redirect_url, false );
+
+	return '<div ' . $wrapper_attributes . '>' . $contents . '</div>';
 }
 
 /**
