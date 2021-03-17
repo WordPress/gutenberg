@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+* [**] The media upload options of the Image, Video and Gallery block automatically opens when the respective block is inserted. [#29546]
 
 ## 1.48.0
 * [**] Buttons block: added width setting. [#28543]
