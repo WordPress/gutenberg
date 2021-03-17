@@ -22,6 +22,9 @@ function render_block_core_loginout( $attributes ) {
 	// Build the classes for this block.
 	$classes  = 'wp-block-loginout';
 	$classes .= is_user_logged_in() ? ' logged-in' : ' logged-out';
+	if ( ! empty( $attributes['displayLoginAsForm'] ) ) {
+		$classes .= ' has-login-form';
+	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 	$contents           = wp_loginout( $redirect_url, false );
