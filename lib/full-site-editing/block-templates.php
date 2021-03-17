@@ -360,15 +360,18 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	$posts                = $template_query->get_posts();
 
 	/**
-	 * Check that we have retrieved the correct post.
-	 * When a post doesn't exist that matches the above tax_query, the WP_Query can
-	 * return a post matching the other above parameters (slug, post_type, etc.).
-	 * This means if we have a template saved for "Theme-A", if we switch to "Theme-B"
-	 * the query will return "Theme-A"s template.  As noted in
-	 * https://github.com/WordPress/gutenberg/issues/28951, retrieving this incorrect
-	 * post can cause bugs with saving resulting in overwriting "Theme-A"s template
-	 * when actually trying to save the one for "Theme-B", while "Theme-B"s template
-	 * will remain dirty in the editor and make it appear as if save is unresponsive.
+	 * Ignore this change for now, its not a fully working solution and will be
+	 * adapted when we figure out the best way to move forward.
+	 *
+	 * Problem:  When we provide a 'name' field to the query, it gets marked as a
+	 * singular query and the taxonomy part of the query does not run.  Thus the
+	 * post with the corresponding name and post type is retrieved regardless of our
+	 * tax restriction.
+	 * As noted in https://github.com/WordPress/gutenberg/issues/28951, retrieving
+	 * this incorrect post can cause bugs with saving resulting in overwriting
+	 * "Theme-A"s template when actually trying to save the one for "Theme-B", while
+	 * "Theme-B"s template will remain dirty in the editor and make it appear as if
+	 * save is unresponsive.
 	 */
 	$foundCorrectPost = false;
 	if ( count( $posts ) > 0 ) {
