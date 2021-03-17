@@ -64,6 +64,10 @@ export default function PostTitle() {
 	} );
 
 	useEffect( () => {
+		if ( ! ref.current ) {
+			return;
+		}
+
 		const { ownerDocument } = ref.current;
 		const { activeElement, body } = ownerDocument;
 
