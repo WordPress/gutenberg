@@ -6,7 +6,7 @@ import { __ } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
 
-export default function ArchivesEdit( { attributes, setAttributes } ) {
+export default function LoginOutEdit( { attributes, setAttributes } ) {
 	const { displayLoginAsForm, redirectToCurrent } = attributes;
 
 	return (

@@ -19,17 +19,15 @@ function render_block_core_loginout( $attributes ) {
 		? get_permalink( get_the_ID() )
 		: '';
 
-	// Build the classes for this block.
-	$classes  = 'wp-block-loginout';
-	$classes .= is_user_logged_in() ? ' logged-in' : ' logged-out';
-	if ( ! empty( $attributes['displayLoginAsForm'] ) ) {
-		$classes .= ' has-login-form';
-	}
+	$classes  = is_user_logged_in() ? 'logged-in' : 'logged-out';
+	$contents = wp_loginout( $redirect_url, false );
 
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
-	$contents           = wp_loginout( $redirect_url, false );
 	// If logged-out and displayLoginAsForm is true, show the login form.
 	if ( ! is_user_logged_in() && ! empty( $attributes['displayLoginAsForm'] ) ) {
+		// Add a class.
+		$classes .= ' has-login-form';
+
+		// Get the form.
 		$contents = wp_login_form(
 			array(
 				'echo'     => false,
@@ -37,6 +35,8 @@ function render_block_core_loginout( $attributes ) {
 			)
 		);
 	}
+
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
 	return '<div ' . $wrapper_attributes . '>' . $contents . '</div>';
 }
