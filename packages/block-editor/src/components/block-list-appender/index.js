@@ -23,6 +23,7 @@ function BlockListAppender( {
 	canInsertDefaultBlock,
 	isLocked,
 	renderAppender,
+	renderAppenderAsFunction,
 	className,
 	selectedBlockClientId,
 	tagName: TagName = 'div',
@@ -32,7 +33,12 @@ function BlockListAppender( {
 	}
 
 	let appender;
-	if ( ! renderAppender ) {
+	if ( renderAppender ) {
+		if ( ! renderAppenderAsFunction ) {
+			const CustomAppender = renderAppender;
+			appender = <CustomAppender />;
+		}
+	} else {
 		const isDocumentAppender = ! rootClientId;
 		const isParentSelected = selectedBlockClientId === rootClientId;
 		const isAnotherDefaultAppenderAlreadyDisplayed =
@@ -85,7 +91,9 @@ function BlockListAppender( {
 				className
 			) }
 		>
-			{ renderAppender ? renderAppender() : appender }
+			{ renderAppender && renderAppenderAsFunction
+				? renderAppender()
+				: appender }
 		</TagName>
 	);
 }
