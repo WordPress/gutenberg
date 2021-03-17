@@ -86,12 +86,13 @@ supports: {
 - Default value: null
 - Subproperties:
   - `background`: type `boolean`, default value `true`
+  - `duotone`: type `boolean`, `string`, `string[]`, or `object` (see [color.duotone](#color.duotone) for details), default value `false`
   - `gradients`: type `boolean`, default value `false`
   - `text`: type `boolean`, default value `true`
 
-This value signals that a block supports some of the CSS style properties related to color. When it does, the block editor will show UI controls for the user to set their values.
+This value signals that a block supports some of the properties related to color. When it does, the block editor will show UI controls for the user to set their values.
 
-The controls for background and text will source their colors from the `editor-color-palette` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), while the gradient's from `editor-gradient-presets` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets).
+The controls for background and text will source their colors from the `editor-color-palette` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes). Gradients are sourced from `editor-gradient-presets` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets). Duotone presets are sourced from `color.duotone` in [theme.json](https://developer.wordpress.org/block-editor/developers/themes/theme-json/).
 
 Note that the `text` and `background` keys have a default value of `true`, so if the `color` property is present they'll also be considered enabled:
 
@@ -133,7 +134,9 @@ attributes: {
 }
 ```
 
-- When `background` support is declared: it'll be added a new `backgroundColor` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default background color by specifying its own attribute with a default e.g.:
+### color.background
+
+When `background` support is declared: it'll be added a new `backgroundColor` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default background color by specifying its own attribute with a default e.g.:
 
 ```js
 attributes: {
@@ -144,7 +147,70 @@ attributes: {
 }
 ```
 
-- When `gradients` support is declared: it'll be added a new `gradient` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default text color by specifying its own attribute with a default e.g.:
+### color.duotone
+
+When `duotone` support is declared: it'll be added a new `duotone` attribute of type `object` with no default assigned. It stores the preset values set by the user. The block can apply a default background color by specifying its own attribute with a default e.g.:
+
+```js
+attributes: {
+    duotone: {
+        type: 'object',
+        default: {
+            values: {
+                r: [0, 1],
+                g: [0, 1],
+                b: [0, 1],
+            }
+        },
+    },
+},
+```
+
+This property adds block controls which allow to apply a duotone filter to a block or part of a block.
+
+```js
+supports: {
+    color: {
+        // Declare support for duotone.
+        // This applies the duotone filter to the entire block in both edit and save.
+        duotone: true
+    }
+}
+```
+
+```js
+supports: {
+    color: {
+        // Apply the filter to the same selector in both edit and save.
+        duotone: '.duotone-img'
+    }
+}
+```
+
+```js
+supports: {
+    color: {
+        // Apply the filter to both images and videos
+        duotone: ['.duotone-img', '.duotone-video']
+    }
+}
+```
+
+```js
+supports: {
+    color: {
+        // Apply the filter to a specific inner element in edit and the whole block in save.
+        duotone: {
+            edit: '.duotone-img img'
+            save: true
+        }
+    }
+}
+```
+
+### color.gradients
+
+When `gradients` support is declared: it'll be added a new `gradient` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default text color by specifying its own attribute with a default e.g.:
 
 ```js
 attributes: {
@@ -155,7 +221,9 @@ attributes: {
 }
 ```
 
-- When `text` support is declared: it'll be added a new `textColor` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default text color by specifying its own attribute with a default e.g.:
+### color.text
+
+When `text` support is declared: it'll be added a new `textColor` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default text color by specifying its own attribute with a default e.g.:
 
 ```js
 attributes: {
@@ -191,45 +259,6 @@ When the style picker is shown, a dropdown is displayed so the user can select a
 supports: {
     // Remove the Default Style picker.
     defaultStylePicker: false
-}
-```
-
-## duotone
-
-- Type: `boolean`, `string`, `string[]`, or `object`
-- Default value: `false`
-
-This property adds block controls which allow to apply a duotone filter to a block or part of a block. _Important: It doesn't work with dynamic blocks yet._
-
-```js
-supports: {
-    // Declare support for duotone.
-    // This applies the duotone filter to the entire block in both edit and save.
-    duotone: true
-}
-```
-
-```js
-supports: {
-    // Apply the filter to the same selector in both edit and save.
-    duotone: 'img'
-}
-```
-
-```js
-supports: {
-    // Apply the filter to both images and videos
-    duotone: ['img', 'video']
-}
-```
-
-```js
-supports: {
-    // Apply the filter to a specific inner element in edit and the whole block in save.
-    duotone: {
-        edit: '.duotone-image img'
-        save: true
-    }
 }
 ```
 

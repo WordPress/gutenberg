@@ -57,10 +57,14 @@
 		"spacing": {
 			"padding": true
 		},
-		"duotone": [
-			".wp-block-cover__image-background",
-			".wp-block-cover__video-background"
-		]
+		"color": {
+			"duotone": [
+				".wp-block-cover__image-background",
+				".wp-block-cover__video-background"
+			],
+			"text": false,
+			"background": false
+		}
 	},
 	"editorStyle": "wp-block-cover-editor",
 	"style": "wp-block-cover"

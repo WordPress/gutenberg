@@ -6,11 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	getBlockDefaultClassName,
-	getBlockSupport,
-	hasBlockSupport,
-} from '@wordpress/blocks';
+import { getBlockDefaultClassName, getBlockSupport } from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
@@ -33,7 +29,7 @@ import {
  * @return {Object}          Filtered block settings
  */
 function addDuotoneAttributes( settings ) {
-	if ( ! hasBlockSupport( settings, 'duotone' ) ) {
+	if ( ! getBlockSupport( settings, 'color' )?.duotone ) {
 		return settings;
 	}
 
@@ -59,7 +55,7 @@ function addDuotoneAttributes( settings ) {
  */
 const withDuotoneToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const duotoneSupport = getBlockSupport( props.name, 'duotone' );
+		const duotoneSupport = getBlockSupport( props.name, 'color' )?.duotone;
 
 		if ( ! duotoneSupport ) {
 			return <BlockEdit { ...props } />;
@@ -140,9 +136,9 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
  * @return {Object}            Filtered props applied to save element
  */
 function addDuotoneFilterStyle( props, blockType, attributes ) {
-	const hasDuotoneSupport = hasBlockSupport( blockType, 'duotone' );
+	const duotoneSupport = getBlockSupport( blockType, 'color' )?.duotone;
 
-	if ( ! hasDuotoneSupport || ! attributes.duotone ) {
+	if ( ! duotoneSupport || ! attributes.duotone ) {
 		return props;
 	}
 
