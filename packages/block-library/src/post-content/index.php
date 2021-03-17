@@ -18,12 +18,41 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		return '';
 	}
 
+	$content            = '';
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
 
+	if ( is_attachment() ) {
+		if ( wp_attachment_is_image( $block->context['postId'] ) ) {
+			$content = '<figure class="wp-block-image size-large">' .
+			wp_get_attachment_image( $block->context['postId'], 'large' );
+			if ( wp_get_attachment_caption( $block->context['postId'] ) ) {
+				$content .= '<figcaption>' . wp_get_attachment_caption( $block->context['postId'] ) . '</figcaption>';
+			}
+			$content .= '</figure>';
+			// Retrieve image attachment metadata.
+			$metadata = wp_get_attachment_metadata( $block->context['postId'] );
+			if ( $metadata ) {
+				$content .= sprintf(
+					'<div class="wp-block-attachment-details full-size-link"><span class="screen-reader-text">%1$s </span><a href="%2$s">%3$s &times; %4$s</a></div>',
+					esc_html_x( 'Full size', 'Used before full size attachment link.' ),
+					esc_url( wp_get_attachment_url( $block->context['postId'] ) ),
+					absint( $metadata['width'] ),
+					absint( $metadata['height'] )
+				);
+			}
+		} else {
+			$content = sprintf(
+				'<div class="wp-block-attachment-details"><a href="%1$s">%2$s</a></div>',
+				esc_url( wp_get_attachment_url( $block->context['postId'] ) ),
+				get_the_title( $block->context['postId'] )
+			);
+		}
+	} else {
+		$content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', get_the_content( null, false, $block->context['postId'] ) ) );
+	}
+
 	return (
-		'<div ' . $wrapper_attributes . '>' .
-			apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', get_the_content( null, false, $block->context['postId'] ) ) ) .
-		'</div>'
+		'<div ' . $wrapper_attributes . '>' . $content . '</div>'
 	);
 }
 
