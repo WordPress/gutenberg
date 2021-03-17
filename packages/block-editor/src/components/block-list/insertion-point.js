@@ -200,9 +200,9 @@ function InsertionPointPopover( {
 		}
 	}
 
-	// Only show the inserter when there's a `nextElement`. At the end of the
-	// block list the trailing appender should serve the purpose of inserting
-	// blocks.
+	// Only show the inserter when there's a `nextElement` (a block after the
+	// insertion point). At the end of the block list the trailing appender
+	// should serve the purpose of inserting blocks.
 	const showInsertionPointInserter =
 		! isHidden && nextElement && ( isInserterShown || isInserterForced );
 
