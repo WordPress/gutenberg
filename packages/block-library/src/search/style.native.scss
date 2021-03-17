@@ -11,9 +11,12 @@
 }
 
 .border {
-	border: 1px solid $gray-600;
-	border-width: $border-width;
-	padding: $grid-unit-05;
+	border: $border-width solid $light-gray-500;
+	border-radius: 4px;
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-05;
+	padding-top: $grid-unit-05;
+	padding-bottom: $grid-unit-05;
 }
 
 .searchTextInput {
@@ -28,17 +31,18 @@
 }
 
 .buttonContainer {
-	background: #f7f7f7;
+	background: rgba( 89, 89, 89, 1 );
 	padding-left: $grid-unit-10;
 	padding-right: $grid-unit-10;
 	padding-top: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
-	border-width: $border-width;
-	border-color: #ccc;
-	border-style: solid;
-	margin-left: 10px;
+	border: $border-width solid #1a000000;
+	margin-left: 4px;
+	border-radius: 4px;
 	align-content: center;
 	align-items: center;
+	flex-shrink: 1;
+}
 
 .icon {
 	fill: #ffffff;
