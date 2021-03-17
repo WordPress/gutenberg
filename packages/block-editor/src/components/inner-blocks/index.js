@@ -45,6 +45,7 @@ function UncontrolledInnerBlocks( props ) {
 		__experimentalCaptureToolbars: captureToolbars,
 		__experimentalAppenderTagName,
 		renderAppender,
+		renderAppenderAsFunction,
 		orientation,
 		placeholder,
 		__experimentalLayout,
@@ -86,6 +87,7 @@ function UncontrolledInnerBlocks( props ) {
 			<BlockListItems
 				rootClientId={ clientId }
 				renderAppender={ renderAppender }
+				renderAppenderAsFunction={ renderAppenderAsFunction }
 				__experimentalAppenderTagName={ __experimentalAppenderTagName }
 				__experimentalLayout={ __experimentalLayout }
 				wrapperRef={ wrapperRef }
