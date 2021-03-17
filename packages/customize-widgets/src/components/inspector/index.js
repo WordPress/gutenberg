@@ -6,8 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
-import { BlockInspector } from '@wordpress/block-editor';
+import { useEffect, useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import {
+	BlockInspector,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 
@@ -42,6 +46,17 @@ export default function Inspector( {
 	isAnimating,
 	setInspectorOpenState,
 } ) {
+	const selectedBlockClientId = useSelect( ( select ) =>
+		select( blockEditorStore ).getSelectedBlockClientId()
+	);
+	const selectedBlockRef = useRef();
+
+	useEffect( () => {
+		selectedBlockRef.current = document.querySelector(
+			`[data-block="${ selectedBlockClientId }"]`
+		);
+	}, [ selectedBlockClientId ] );
+
 	const inspectorTitleId = useInstanceId(
 		Inspector,
 		'customize-widgets-block-settings'
@@ -93,7 +108,14 @@ export default function Inspector( {
 			} }
 		>
 			<InspectorSectionMeta
-				closeInspector={ () => setInspectorOpenState( 'CLOSE' ) }
+				closeInspector={ () => {
+					setInspectorOpenState( 'CLOSE' );
+
+					// Wait a tick so that the block editor can transition back from being hidden.
+					window.requestAnimationFrame( () => {
+						selectedBlockRef.current?.focus();
+					} );
+				} }
 				inspectorTitleId={ inspectorTitleId }
 			/>
 
