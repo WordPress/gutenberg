@@ -1,10 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { PanelBody, ToggleControl, Disabled } from '@wordpress/components';
+import { PanelBody, ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
-import ServerSideRender from '@wordpress/server-side-render';
 
 export default function LoginOutEdit( { attributes, setAttributes } ) {
 	const { displayLoginAsForm, redirectToCurrent } = attributes;
@@ -33,13 +32,12 @@ export default function LoginOutEdit( { attributes, setAttributes } ) {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...useBlockProps() }>
-				<Disabled>
-					<ServerSideRender
-						block="core/loginout"
-						attributes={ attributes }
-					/>
-				</Disabled>
+			<div
+				{ ...useBlockProps( {
+					className: 'logged-in',
+				} ) }
+			>
+				<a href="#login-pseudo-link">{ __( 'Log out' ) }</a>
 			</div>
 		</>
 	);
