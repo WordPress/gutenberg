@@ -120,7 +120,11 @@ export default function SidebarBlockEditor( { sidebar } ) {
 						) }
 					</__experimentalBlockSettingsMenuFirstItem>
 
-					{ createPortal( <Popover.Slot />, parentContainer ) }
+					{
+						// We have to portal this to the parent of both the editor and the inspector,
+						// so that the popovers will appear above both of them.
+						createPortal( <Popover.Slot />, parentContainer )
+					}
 				</DropZoneProvider>
 			</SlotFillProvider>
 		</>
