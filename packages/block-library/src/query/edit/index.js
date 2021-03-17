@@ -42,7 +42,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 		const newQuery = {};
 		if (
 			( ! query.perPage && postsPerPage ) ||
-			( ! query.inherit && previousQuery?.inherit )
+			( ! query.inherit && previousQuery?.inherit && postsPerPage )
 		) {
 			newQuery.perPage = postsPerPage;
 		}
