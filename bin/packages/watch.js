@@ -11,7 +11,6 @@ const chalk = require( 'chalk' );
  * Internal dependencies
  */
 const getPackages = require( './get-packages' );
-
 const BUILD_SCRIPT = path.resolve( __dirname, './build.js' );
 const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
 const modulePackages = getPackages();
