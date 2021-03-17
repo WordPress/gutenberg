@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
 import { Spinner, SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -10,9 +9,7 @@ import { __ } from '@wordpress/i18n';
  */
 import useMenuLocations from '../../hooks/use-menu-locations';
 
-export default function ManageLocations() {
-	const menus = useSelect( ( select ) => select( 'core' ).getMenus(), [] );
-
+export default function ManageLocations( { menus } ) {
 	const [ menuLocations, assignMenuToLocation ] = useMenuLocations();
 
 	if ( ! menus || ! menuLocations ) {
