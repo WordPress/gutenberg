@@ -4,13 +4,6 @@
 	.wp-block-page-list {
 		background-color: inherit;
 	}
-	// Make the dropdown background white if there's no background color set.
-	&:not(.has-background) {
-		.submenu-container {
-			color: $gray-900;
-			background-color: $white;
-		}
-	}
 }
 
 // Make links unclickable in the editor
