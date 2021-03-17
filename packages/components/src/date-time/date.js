@@ -12,7 +12,7 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
  * WordPress dependencies
  */
 import { Component, createRef } from '@wordpress/element';
-import { isRTL, _n } from '@wordpress/i18n';
+import { isRTL, _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -34,9 +34,13 @@ function DatePickerDay( { day, events } ) {
 			{ day.format( 'D' ) }
 			{ events?.length > 0 && (
 				<VisuallyHidden>
-					{ _n(
-						'has published/scheduled item',
-						'Has published/scheduled items',
+					{ sprintf(
+						/* translators: %d: number of calendar events. */
+						_n(
+							'There is %d event.',
+							'There are %d events.',
+							events.length
+						),
 						events.length
 					) }
 				</VisuallyHidden>
