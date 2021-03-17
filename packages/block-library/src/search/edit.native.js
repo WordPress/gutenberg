@@ -186,6 +186,15 @@ export default function SearchEdit( {
 		);
 	};
 
+	// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
+	// a `placeholder` as an empty string when `RichText` is focused,
+	// because `AztecView` is calculating a `minWidth` based on placeholder text.
+	const buttonPlaceholderText =
+		isButtonSelected ||
+		( ! isButtonSelected && buttonText && buttonText !== '' )
+			? ''
+			: __( 'Add button text' );
+
 	const renderButton = () => {
 		return (
 			<View style={ styles.buttonContainer }>
@@ -197,7 +206,7 @@ export default function SearchEdit( {
 						identifier="text"
 						tagName="p"
 						style={ styles.richTextButton }
-						placeholder={ __( 'Add button text' ) }
+						placeholder={ buttonPlaceholderText }
 						value={ buttonText }
 						withoutInteractiveFormatting
 						onChange={ ( html ) =>
