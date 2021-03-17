@@ -51,7 +51,9 @@ class DatePicker extends Component {
 
 		this.onChangeMoment = this.onChangeMoment.bind( this );
 		this.nodeRef = createRef();
-		this.onMonthPreviewedHandler = this.onMonthPreviewedHandler.bind( this );
+		this.onMonthPreviewedHandler = this.onMonthPreviewedHandler.bind(
+			this
+		);
 	}
 
 	onMonthPreviewedHandler( newMonthDate ) {
