@@ -70,7 +70,7 @@
 		"read-pkg-up": "^1.0.1",
 		"resolve-bin": "^0.4.0",
 		"sass": "^1.26.11",
-		"sass-loader": "^11.0.1",
+		"sass-loader": "^10.1.1",
 		"source-map-loader": "^0.2.4",
 		"stylelint": "^13.8.0",
 		"terser-webpack-plugin": "^3.0.3",
