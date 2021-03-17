@@ -380,22 +380,26 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 /**
  * Generates a unique slug for templates or template parts.
  *
- * @param string $slug          The resolved slug (post_name).
+ * @param string $_slug         The filtered value of the slug (starts as `null` from apply_filter).
+ * @param string $slug          The original/un-filtered slug (post_name).
  * @param int    $post_ID       Post ID.
  * @param string $post_status   No uniqueness checks are made if the post is still draft or pending.
  * @param string $post_type     Post type.
  * @return string The original, desired slug.
  */
-function gutenberg_filter_wp_template_unique_post_slug( $placeholder, $slug, $post_ID, $post_status, $post_type ) {
+function gutenberg_filter_wp_template_unique_post_slug( $_slug, $slug, $post_ID, $post_status, $post_type ) {
 	if ( 'wp_template' !== $post_type && 'wp_template_part' !== $post_type ) {
-		return $slug;
+		return $_slug;
 	}
 
+	if ( ! $_slug ) {
+		$_slug = $slug;
+	}
 	// Template slugs must be unique within the same theme.
 	$theme = wp_get_theme()->get_stylesheet();
 
 	$check_query_args = array(
-		'post_name__in'  => array( $slug ),
+		'post_name__in'  => array( $_slug ),
 		'post_type'      => $post_type,
 		'posts_per_page' => 1,
 		'no_found_rows'  => true,
@@ -415,14 +419,14 @@ function gutenberg_filter_wp_template_unique_post_slug( $placeholder, $slug, $po
 		$suffix = 2;
 		do {
 			$query_args                  = $check_query_args;
-			$alt_post_name               = _truncate_post_slug( $slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
+			$alt_post_name               = _truncate_post_slug( $_slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
 			$query_args['post_name__in'] = array( $alt_post_name );
 			$query                       = new WP_Query( $query_args );
 			$suffix++;
 		} while ( count( $query->get_posts() ) > 0 );
-		$slug = $alt_post_name;
+		$_slug = $alt_post_name;
 	}
 
-	return $slug;
+	return $_slug;
 }
 add_filter( 'pre_wp_unique_post_slug', 'gutenberg_filter_wp_template_unique_post_slug', 10, 5 );
