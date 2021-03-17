@@ -13,19 +13,17 @@ const JSDOMEnvironment = require( 'jest-environment-jsdom' );
 
 class CustomEnvironment extends JSDOMEnvironment {
 	async setup() {
-		await super.setup();
 		try {
+			await super.setup();
 			this.global.editorPage = await initializeEditorPage();
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
-			console.log( 'Cannot initialize environment: ', error );
+			console.error( 'E2E setup exception:', error );
 		}
 	}
 
 	async teardown() {
-		if ( this.global.editorPage ) {
-			await this.global.editorPage.stopDriver();
-		}
+		await this.global.editorPage.stopDriver();
 		await super.teardown();
 	}
 }

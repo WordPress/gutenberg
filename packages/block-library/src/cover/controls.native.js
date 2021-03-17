@@ -29,7 +29,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './style.scss';
 import OverlayColorSettings from './overlay-color-settings';
-import FocalPointSettings from './focal-point-settings';
+import FocalPointSettingsButton from './focal-point-settings-button';
 import {
 	ALLOWED_MEDIA_TYPES,
 	COVER_MIN_HEIGHT,
@@ -218,7 +218,7 @@ function Controls( {
 							{ displayPlaceholder ? null : focalPointHint }
 						</View>
 					</BottomSheet.Cell>
-					<FocalPointSettings
+					<FocalPointSettingsButton
 						disabled={ hasParallax }
 						focalPoint={ focalPoint || IMAGE_DEFAULT_FOCAL_POINT }
 						onFocalPointChange={ setFocalPoint }

@@ -103,9 +103,10 @@ const useIsDraggingWithin = ( elementRef ) => {
  * /wp/v2/search.
  *
  * @param {string} type Link block's type attribute.
+ * @param {string} kind Link block's entity of kind (post-type|taxonomy)
  * @return {{ type?: string, subtype?: string }} Search query params.
  */
-function getSuggestionsQuery( type ) {
+function getSuggestionsQuery( type, kind ) {
 	switch ( type ) {
 		case 'post':
 		case 'page':
@@ -115,6 +116,12 @@ function getSuggestionsQuery( type ) {
 		case 'tag':
 			return { type: 'term', subtype: 'post_tag' };
 		default:
+			if ( kind === 'taxonomy' ) {
+				return { type: 'term', subtype: type };
+			}
+			if ( kind === 'post-type' ) {
+				return { type: 'post', subtype: type };
+			}
 			return {};
 	}
 }
@@ -137,6 +144,7 @@ export default function NavigationLinkEdit( {
 		description,
 		rel,
 		title,
+		kind,
 	} = attributes;
 	const link = {
 		url,
@@ -420,7 +428,9 @@ export default function NavigationLinkEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
-				<div className={ classes }>
+				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
+				<a className={ classes }>
+					{ /* eslint-enable */ }
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
 							<KeyboardShortcuts
@@ -501,7 +511,10 @@ export default function NavigationLinkEdit( {
 								} }
 								noDirectEntry={ !! type }
 								noURLSuggestion={ !! type }
-								suggestionsQuery={ getSuggestionsQuery( type ) }
+								suggestionsQuery={ getSuggestionsQuery(
+									type,
+									kind
+								) }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
@@ -539,7 +552,7 @@ export default function NavigationLinkEdit( {
 							/>
 						</Popover>
 					) }
-				</div>
+				</a>
 				{ hasDescendants && showSubmenuIcon && (
 					<span className="wp-block-navigation-link__submenu-icon">
 						<ItemSubmenuIcon />

@@ -1,15 +1,15 @@
 /**
  * Internal dependencies
  */
-import BlockFormatControls from '../block-format-controls';
+import BlockControls from '../block-controls';
 import FormatToolbar from './format-toolbar';
 
 const FormatToolbarContainer = () => {
 	// Render regular toolbar
 	return (
-		<BlockFormatControls>
+		<BlockControls group="inline">
 			<FormatToolbar />
-		</BlockFormatControls>
+		</BlockControls>
 	);
 };
 

@@ -224,19 +224,23 @@
 	@if $property == "transition" {
 		@media (prefers-reduced-motion: reduce) {
 			transition-duration: 0s;
+			transition-delay: 0s;
 		}
 	}
 
 	@else if $property == "animation" {
 		@media (prefers-reduced-motion: reduce) {
 			animation-duration: 1ms;
+			animation-delay: 0s;
 		}
 	}
 
 	@else {
 		@media (prefers-reduced-motion: reduce) {
 			transition-duration: 0s;
+			transition-delay: 0s;
 			animation-duration: 1ms;
+			animation-delay: 0s;
 		}
 	}
 

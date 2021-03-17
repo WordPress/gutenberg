@@ -2,46 +2,28 @@
  * WordPress dependencies
  */
 import { MenuItem } from '@wordpress/components';
-import { withDispatch, withSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { useCopyOnClick, compose, ifCondition } from '@wordpress/compose';
-import { useRef, useEffect } from '@wordpress/element';
+import { useCopyToClipboard } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as editorStore } from '@wordpress/editor';
 
-function CopyContentMenuItem( { createNotice, editedPostContent } ) {
-	const ref = useRef();
-	const hasCopied = useCopyOnClick( ref, editedPostContent );
+export default function CopyContentMenuItem() {
+	const { createNotice } = useDispatch( noticesStore );
+	const getText = useSelect(
+		( select ) => () =>
+			select( editorStore ).getEditedPostAttribute( 'content' ),
+		[]
+	);
 
-	useEffect( () => {
-		if ( ! hasCopied ) {
-			return;
-		}
-
+	function onSuccess() {
 		createNotice( 'info', __( 'All content copied.' ), {
 			isDismissible: true,
 			type: 'snackbar',
 		} );
-	}, [ hasCopied ] );
+	}
 
-	return (
-		<MenuItem ref={ ref }>
-			{ hasCopied ? __( 'Copied!' ) : __( 'Copy all content' ) }
-		</MenuItem>
-	);
+	const ref = useCopyToClipboard( getText, onSuccess );
+
+	return <MenuItem ref={ ref }>{ __( 'Copy all content' ) }</MenuItem>;
 }
-
-export default compose(
-	withSelect( ( select ) => ( {
-		editedPostContent: select( 'core/editor' ).getEditedPostAttribute(
-			'content'
-		),
-	} ) ),
-	withDispatch( ( dispatch ) => {
-		const { createNotice } = dispatch( noticesStore );
-
-		return {
-			createNotice,
-		};
-	} ),
-	ifCondition( ( { editedPostContent } ) => editedPostContent.length > 0 )
-)( CopyContentMenuItem );
