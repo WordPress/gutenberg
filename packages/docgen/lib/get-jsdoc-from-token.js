@@ -25,10 +25,12 @@ module.exports = ( token ) => {
 			spacing: 'preserve',
 		} )[ 0 ];
 		if ( jsdoc ) {
+			let paramCount = 0;
 			jsdoc.tags = jsdoc.tags.map( ( tag ) => {
+				const index = tag.tag === 'param' ? paramCount++ : null;
 				return {
 					...tag,
-					type: getTypeAnnotation( tag, token ),
+					type: getTypeAnnotation( tag, token, index ),
 					description:
 						tag.description === '\n'
 							? tag.description.trim()
