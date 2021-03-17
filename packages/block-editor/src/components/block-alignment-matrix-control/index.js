@@ -10,11 +10,10 @@ import { DOWN } from '@wordpress/keycodes';
 import {
 	ToolbarButton,
 	Dropdown,
-	ToolbarGroup,
 	__experimentalAlignmentMatrixControl as AlignmentMatrixControl,
 } from '@wordpress/components';
 
-export function BlockAlignmentMatrixToolbar( props ) {
+function BlockAlignmentMatrixControl( props ) {
 	const {
 		label = __( 'Change matrix alignment' ),
 		onChange = noop,
@@ -23,7 +22,7 @@ export function BlockAlignmentMatrixToolbar( props ) {
 	} = props;
 
 	const icon = <AlignmentMatrixControl.Icon value={ value } />;
-	const className = 'block-editor-block-alignment-matrix-toolbar';
+	const className = 'block-editor-block-alignment-matrix-control';
 	const popoverClassName = `${ className }__popover`;
 	const isAlternate = true;
 
@@ -42,18 +41,16 @@ export function BlockAlignmentMatrixToolbar( props ) {
 				};
 
 				return (
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ onToggle }
-							aria-haspopup="true"
-							aria-expanded={ isOpen }
-							onKeyDown={ openOnArrowDown }
-							label={ label }
-							icon={ icon }
-							showTooltip
-							disabled={ isDisabled }
-						/>
-					</ToolbarGroup>
+					<ToolbarButton
+						onClick={ onToggle }
+						aria-haspopup="true"
+						aria-expanded={ isOpen }
+						onKeyDown={ openOnArrowDown }
+						label={ label }
+						icon={ icon }
+						showTooltip
+						disabled={ isDisabled }
+					/>
 				);
 			} }
 			renderContent={ () => (
@@ -67,4 +64,4 @@ export function BlockAlignmentMatrixToolbar( props ) {
 	);
 }
 
-export default BlockAlignmentMatrixToolbar;
+export default BlockAlignmentMatrixControl;

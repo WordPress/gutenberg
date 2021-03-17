@@ -40,20 +40,13 @@ function gutenberg_navigation_init( $hook ) {
 	);
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
 
-	wp_add_inline_script(
-		'wp-edit-navigation',
-		sprintf(
-			'wp.domReady( function() {
-				wp.editNavigation.initialize( "navigation-editor", %s );
-			} );',
-			wp_json_encode( $settings )
+	gutenberg_initialize_editor(
+		'navigation_editor',
+		'edit-navigation',
+		array(
+			'initializer_name' => 'initialize',
+			'editor_settings'  => $settings,
 		)
-	);
-
-	// Preload server-registered block schemas.
-	wp_add_inline_script(
-		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
 	);
 
 	wp_enqueue_script( 'wp-edit-navigation' );

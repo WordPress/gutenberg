@@ -71,6 +71,13 @@ describe( 'Guide', () => {
 		).toHaveLength( 1 );
 	} );
 
+	it( "doesn't display the page control if there is only one page", () => {
+		const wrapper = shallow(
+			<Guide pages={ [ { content: <p>Page 1</p> } ] } />
+		);
+		expect( wrapper.find( PageControl ).exists() ).toBeFalsy();
+	} );
+
 	it( 'calls onFinish when the finish button is clicked', () => {
 		const onFinish = jest.fn();
 		const wrapper = shallow(

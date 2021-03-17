@@ -16,8 +16,8 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
   color: var(--wp-g2-color-text);
   line-height: 1.2;
   line-height: var(--wp-g2-font-line-height-base);
-  font-size: calc(1 * 13px);
-  font-size: calc(1 * var(--wp-g2-font-size));
+  font-size: calc((13 / 13) * 13px);
+  font-size: calc((13 / 13) * var(--wp-g2-font-size));
   font-weight: normal;
   font-weight: var(--wp-g2-font-weight);
 }
@@ -71,8 +71,8 @@ exports[`Text snapshot tests should render correctly 1`] = `
   color: var(--wp-g2-color-text);
   line-height: 1.2;
   line-height: var(--wp-g2-font-line-height-base);
-  font-size: calc(1 * 13px);
-  font-size: calc(1 * var(--wp-g2-font-size));
+  font-size: calc((13 / 13) * 13px);
+  font-size: calc((13 / 13) * var(--wp-g2-font-size));
   font-weight: normal;
   font-weight: var(--wp-g2-font-weight);
 }
