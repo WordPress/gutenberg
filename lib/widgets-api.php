@@ -37,6 +37,18 @@ function gutenberg_assign_widget_to_sidebar( $widget_id, $sidebar_id ) {
 	wp_set_sidebars_widgets( $sidebars );
 }
 
+function gutenberg_find_widgets_sidebar( $widget_id ) {
+	foreach ( wp_get_sidebars_widgets() as $sidebar_id => $widget_ids ) {
+		foreach ( $widget_ids as $maybe_widget_id ) {
+			if ( $maybe_widget_id === $widget_id ) {
+				return (string) $sidebar_id;
+			}
+		}
+	}
+
+	return null;
+}
+
 /**
  * Converts a widget ID into its id_base and number components.
  *
