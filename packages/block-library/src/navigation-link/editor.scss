@@ -39,6 +39,10 @@
 		display: block;
 	}
 
+	.wp-block-navigation-link__content {
+		cursor: text;
+	}
+
 	&.is-editing,
 	&.is-selected {
 		min-width: 20px;
