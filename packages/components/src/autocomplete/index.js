@@ -451,9 +451,18 @@ function Autocomplete( {
 					return false;
 				}
 
-				return /^\S*$/.test(
-					text.slice( index + triggerPrefix.length )
+				const textWithoutTrigger = text.slice(
+					index + triggerPrefix.length
 				);
+
+				if (
+					/^\s/.test( textWithoutTrigger ) ||
+					/\s\s+$/.test( textWithoutTrigger )
+				) {
+					return false;
+				}
+
+				return /[\u0000-\uFFFF]*$/.test( textWithoutTrigger );
 			}
 		);
 
@@ -463,7 +472,9 @@ function Autocomplete( {
 		}
 
 		const safeTrigger = escapeRegExp( completer.triggerPrefix );
-		const match = text.match( new RegExp( `${ safeTrigger }(\\S*)$` ) );
+		const match = text.match(
+			new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` )
+		);
 		const query = match && match[ 1 ];
 
 		setAutocompleter( completer );
