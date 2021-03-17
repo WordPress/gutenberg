@@ -1,3 +1,6 @@
+/**
+ * @type {import('../types').ApiFetchMiddleware}
+ */
 const namespaceAndEndpointMiddleware = ( options, next ) => {
 	let path = options.path;
 	let namespaceTrimmed, endpointTrimmed;

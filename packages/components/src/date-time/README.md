@@ -85,9 +85,3 @@ This function will be called on each day, every time user browses into a differe
 - Type: `Function`
 - Required: No
 
-### keepOpen
-
-Whether focus should stay on the `DateTimePicker` after clicking on a date in the calendar.
-
-- Type: `bool`
-- Required: No
