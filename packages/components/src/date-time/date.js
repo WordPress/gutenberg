@@ -34,9 +34,13 @@ function DatePickerDay( { day, events } ) {
 			{ day.format( 'D' ) }
 			{ events?.length > 0 && (
 				<VisuallyHidden>
-					{ _n( 'has one post', 'has some posts', events.length ) }
+					{ _n(
+						'has published/scheduled item',
+						'Has published/scheduled items',
+						events.length
+					) }
 				</VisuallyHidden>
-			 ) }
+			) }
 		</div>
 	);
 }
