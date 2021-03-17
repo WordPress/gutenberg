@@ -13,7 +13,7 @@ import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
  */
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
-import { getBlockContent } from '../serializer';
+import { getBlockInnerHTML } from '../serializer';
 import { parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
@@ -232,7 +232,7 @@ export function pasteHandler( {
 			trimmedPlainText.indexOf( '\n' ) === -1
 		) {
 			return removeInvalidHTML(
-				getBlockContent( blocks[ 0 ] ),
+				getBlockInnerHTML( blocks[ 0 ] ),
 				phrasingContentSchema
 			);
 		}
