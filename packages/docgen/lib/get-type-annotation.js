@@ -404,20 +404,19 @@ function getFunctionNameForError( declarationToken ) {
 /**
  * @param {CommentTag} tag The documented parameter.
  * @param {ASTNode} declarationToken The function the parameter is documented on.
+ * @param {number | null} paramIndex The parameter index.
  * @return {null | string} The parameter's type annotation.
  */
-function getParamTypeAnnotation( tag, declarationToken ) {
+function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
+	if ( paramIndex === null ) {
+		throw new Error( '`paramIndex` must not be null' );
+	}
+
 	const functionToken = getFunctionToken( declarationToken );
 
 	// otherwise find the corresponding parameter token for the documented parameter
 	/** @type {babelTypes.Identifier} */
-	const paramToken = functionToken.params.reduce( ( found, pToken ) => {
-		if ( found ) return found;
-		const tokenName = babelTypes.isRestElement( pToken )
-			? pToken.argument.name
-			: pToken.name;
-		return tokenName === tag.name ? pToken : found;
-	}, null );
+	const paramToken = functionToken.params[ paramIndex ];
 
 	// This shouldn't happen due to our ESLint enforcing correctly documented parameter names but just in case
 	// we'll give a descriptive error so that it's easy to diagnose the issue.
@@ -464,9 +463,10 @@ module.exports =
 	/**
 	 * @param {CommentTag} tag A comment tag.
 	 * @param {ASTNode} token A function token.
+	 * @param {number | null} index The index of the parameter or `null` if not a param tag.
 	 * @return {null | string} The type annotation for the given tag or null if the tag has no type annotation.
 	 */
-	function ( tag, token ) {
+	function ( tag, token, index ) {
 		// If the file is using JSDoc type annotations, use the JSDoc.
 		if ( tag.type ) {
 			return tag.type;
@@ -474,7 +474,7 @@ module.exports =
 
 		switch ( tag.tag ) {
 			case 'param': {
-				return getParamTypeAnnotation( tag, token );
+				return getParamTypeAnnotation( tag, token, index );
 			}
 			case 'return': {
 				return getReturnTypeAnnotation( token );
