@@ -18,6 +18,5 @@ export const settings = {
 	description: __( 'Show login & logout links.' ),
 	icon,
 	keywords: [ __( 'login logout form' ) ],
-	example: {},
 	edit,
 };
