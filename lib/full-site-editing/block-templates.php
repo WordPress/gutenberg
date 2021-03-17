@@ -343,7 +343,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	}
 	list( $theme, $slug ) = $parts;
 	$wp_query_args        = array(
-		'name'           => $slug,
+		'post_name__in'  => array( $slug ),
 		'post_type'      => $template_type,
 		'post_status'    => array( 'auto-draft', 'draft', 'publish', 'trash' ),
 		'posts_per_page' => 1,
@@ -359,31 +359,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	$template_query       = new WP_Query( $wp_query_args );
 	$posts                = $template_query->get_posts();
 
-	/**
-	 * Ignore this change for now, its not a fully working solution and will be
-	 * adapted when we figure out the best way to move forward.
-	 *
-	 * Problem:  When we provide a 'name' field to the query, it gets marked as a
-	 * singular query and the taxonomy part of the query does not run.  Thus the
-	 * post with the corresponding name and post type is retrieved regardless of our
-	 * tax restriction.
-	 * As noted in https://github.com/WordPress/gutenberg/issues/28951, retrieving
-	 * this incorrect post can cause bugs with saving resulting in overwriting
-	 * "Theme-A"s template when actually trying to save the one for "Theme-B", while
-	 * "Theme-B"s template will remain dirty in the editor and make it appear as if
-	 * save is unresponsive.
-	 */
-	$foundCorrectPost = false;
 	if ( count( $posts ) > 0 ) {
-		$terms   = get_the_terms( $posts[0], 'wp_theme' );
-		$isFound = $terms && ! is_wp_error( $terms ) && count( $terms ) > 0;
-
-		if ( $isFound && $terms[0] === $theme ) {
-			$foundCorrectPost = true;
-		}
-	}
-
-	if ( $foundCorrectPost ) {
 		$template = _gutenberg_build_template_result_from_post( $posts[0] );
 
 		if ( ! is_wp_error( $template ) ) {
@@ -410,25 +386,27 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
  * @param string $post_type     Post type.
  * @return string The original, desired slug.
  */
-function gutenberg_filter_wp_template_unique_post_slug( $slug, $post_ID, $post_status, $post_type ) {
-	if ( 'wp_template' !== $post_type || 'wp_template_part' !== $post_type ) {
+function gutenberg_filter_wp_template_unique_post_slug( $placeholder, $slug, $post_ID, $post_status, $post_type ) {
+	if ( 'wp_template' !== $post_type && 'wp_template_part' !== $post_type ) {
 		return $slug;
 	}
 
 	// Template slugs must be unique within the same theme.
-	$theme = get_the_terms( $post_ID, 'wp_theme' )[0]->slug;
+	$theme = wp_get_theme()->get_stylesheet();
 
 	$check_query_args = array(
-		'post_name'      => $slug,
+		'post_name__in'  => array( $slug ),
 		'post_type'      => $post_type,
 		'posts_per_page' => 1,
+		'no_found_rows'  => true,
 		'post__not_in'   => $post_ID,
 		'tax_query'      => array(
-			'taxonomy' => 'wp_theme',
-			'field'    => 'name',
-			'terms'    => $theme,
+			array(
+				'taxonomy' => 'wp_theme',
+				'field'    => 'name',
+				'terms'    => $theme,
+			),
 		),
-		'no_found_rows'  => true,
 	);
 	$check_query      = new WP_Query( $check_query_args );
 	$posts            = $check_query->get_posts();
@@ -436,10 +414,10 @@ function gutenberg_filter_wp_template_unique_post_slug( $slug, $post_ID, $post_s
 	if ( count( $posts ) > 0 ) {
 		$suffix = 2;
 		do {
-			$query_args              = $check_query_args;
-			$alt_post_name           = _truncate_post_slug( $slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
-			$query_args['post_name'] = $alt_post_name;
-			$query                   = new WP_Query( $check_query_args );
+			$query_args                  = $check_query_args;
+			$alt_post_name               = _truncate_post_slug( $slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
+			$query_args['post_name__in'] = array( $alt_post_name );
+			$query                       = new WP_Query( $query_args );
 			$suffix++;
 		} while ( count( $query->get_posts() ) > 0 );
 		$slug = $alt_post_name;
@@ -447,4 +425,4 @@ function gutenberg_filter_wp_template_unique_post_slug( $slug, $post_ID, $post_s
 
 	return $slug;
 }
-add_filter( 'wp_unique_post_slug', 'gutenberg_filter_wp_template_unique_post_slug', 10, 4 );
+add_filter( 'pre_wp_unique_post_slug', 'gutenberg_filter_wp_template_unique_post_slug', 10, 5 );
