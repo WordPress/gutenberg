@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.27.0 (2021-03-17)
+
 ### New Features
 
 -   When the plugin renders a pinnable `PluginSidebar` component, then by default it also automatically renders a corresponding `PluginSidebarMenuItem`. It's respecting matching `PluginSidebarMenuItem` components registered by plugins and therefore is fully backward compatible ([#29081](https://github.com/WordPress/gutenberg/pull/29081)).

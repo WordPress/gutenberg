@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.1.0 (2021-03-17)
+
 ### Enhancement
 
 -   Scaffolded block is now registered from `block.json` with the `register_block_type_from_metadata` helper ([#28883](https://github.com/WordPress/gutenberg/pull/28883)).
