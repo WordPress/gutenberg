@@ -32,7 +32,7 @@ The Block Editor already allows the control of specific settings such as alignme
 Examples of what can be achieved are:
 
 - Use a particular preset for a block (e.g.: table) but the common one for the rest of blocks.
-- Enable font size UI controls for all blocks that support it but the headings block.
+- Enable font size UI controls for all blocks but the headings block.
 - etc.
 
 ### Some block styles are managed
@@ -315,7 +315,7 @@ Note that, the name of the variable is created by adding `--` in between each ne
 
 ### Styles
 
-Each block declares which style properties it exposes via the [block supports mechanism](../block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor, as well as being available through the `experimental-theme.json` file for themes to target.
+Each block declares which style properties it exposes via the [block supports mechanism](../block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor. Themes can use any style property via the `experimental-theme.json` for any block ― it's the theme's responsibility to verify that it works properly according the block markup, etc.
 
 ```json
 {
