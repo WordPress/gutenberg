@@ -27,7 +27,6 @@ import { useRef, useEffect, useState } from '@wordpress/element';
  * Internal dependencies
  */
 import styles from './style.scss';
-import richTextStyles from './rich-text.scss';
 
 /**
  * Constants
@@ -203,7 +202,7 @@ export default function SearchEdit( {
 						className="wp-block-search__button"
 						identifier="text"
 						tagName="p"
-						style={ richTextStyles.searchButton }
+						style={ styles.richTextButton }
 						placeholder={ __( 'Add button text' ) }
 						value={ buttonText }
 						withoutInteractiveFormatting
@@ -242,7 +241,7 @@ export default function SearchEdit( {
 					tagName="p"
 					style={ {
 						...styles.searchLabel,
-						...richTextStyles.searchLabel,
+						...styles.richTextLabel,
 					} }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }

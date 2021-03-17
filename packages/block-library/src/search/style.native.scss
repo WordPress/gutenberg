@@ -39,3 +39,25 @@
 	align-content: center;
 	align-items: center;
 }
+
+.richTextLabel {
+	background-color: transparent;
+	margin-top: $grid-unit-10;
+	margin-bottom: $grid-unit-10;
+	font-size: 16px;
+	font-weight: 400;
+	background-color: transparent;
+	font-family: $default-regular-font;
+}
+
+.richTextButton {
+	color: #ffffff;
+	font-size: 16px;
+	font-weight: 400;
+	background-color: transparent;
+	font-family: $default-regular-font;
+	padding: 0;
+	margin: 0;
+	text-align: center;
+	min-height: 24px;
+}
