@@ -20,6 +20,7 @@
 		"fontSize": true,
 		"lineHeight": true,
 		"__experimentalFontFamily": true,
+		"__experimentalSelector": ".wp-block-site-title, .wp-block-site-title > a",
 		"__experimentalTextTransform": true
 	}
 }
