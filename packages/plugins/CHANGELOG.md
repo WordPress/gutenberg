@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.25.0 (2021-03-17)
+
 ### New Features
 
 -   Add optional `settings.scope` field in the `registerPlugin` function ([#27438](https://github.com/WordPress/gutenberg/pull/27438)).

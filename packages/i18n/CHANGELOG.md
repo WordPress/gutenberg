@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.19.0 (2021-03-17)
+
 ### Enhancements
 
 - Export the default `I18n` instance as `defaultI18n`, in addition to already exported bound methods.

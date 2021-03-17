@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 5.1.0 (2021-03-17)
+
 ### New Features
 
 - Added `@babel/preset-typescript` so that the preset can by default transpile TypeScript files, too.
