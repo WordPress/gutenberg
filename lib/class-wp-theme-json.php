@@ -57,25 +57,6 @@ class WP_Theme_JSON {
 	const ROOT_BLOCK_SELECTOR = ':root';
 
 	/**
-	 * The supported properties of the root block.
-	 *
-	 * @var array
-	 */
-	const ROOT_BLOCK_SUPPORTS = array(
-		'--wp--style--color--link',
-		'background',
-		'backgroundColor',
-		'color',
-		'fontFamily',
-		'fontSize',
-		'fontStyle',
-		'fontWeight',
-		'lineHeight',
-		'textDecoration',
-		'textTransform',
-	);
-
-	/**
 	 * Data schema of each block within a theme.json.
 	 *
 	 * Example:
@@ -254,73 +235,56 @@ class WP_Theme_JSON {
 	 * Each property declares:
 	 *
 	 * - 'value': path to the value in theme.json and block attributes.
-	 * - 'support': path to the block support in block.json.
 	 */
 	const PROPERTIES_METADATA = array(
 		'--wp--style--color--link' => array(
 			'value'   => array( 'color', 'link' ),
-			'support' => array( 'color', 'link' ),
 		),
 		'background'               => array(
 			'value'   => array( 'color', 'gradient' ),
-			'support' => array( 'color', 'gradients' ),
 		),
 		'backgroundColor'          => array(
 			'value'   => array( 'color', 'background' ),
-			'support' => array( 'color' ),
 		),
 		'borderRadius'             => array(
 			'value'   => array( 'border', 'radius' ),
-			'support' => array( '__experimentalBorder', 'radius' ),
 		),
 		'borderColor'              => array(
 			'value'   => array( 'border', 'color' ),
-			'support' => array( '__experimentalBorder', 'color' ),
 		),
 		'borderWidth'              => array(
 			'value'   => array( 'border', 'width' ),
-			'support' => array( '__experimentalBorder', 'width' ),
 		),
 		'borderStyle'              => array(
 			'value'   => array( 'border', 'style' ),
-			'support' => array( '__experimentalBorder', 'style' ),
 		),
 		'color'                    => array(
 			'value'   => array( 'color', 'text' ),
-			'support' => array( 'color' ),
 		),
 		'fontFamily'               => array(
 			'value'   => array( 'typography', 'fontFamily' ),
-			'support' => array( '__experimentalFontFamily' ),
 		),
 		'fontSize'                 => array(
 			'value'   => array( 'typography', 'fontSize' ),
-			'support' => array( 'fontSize' ),
 		),
 		'fontStyle'                => array(
 			'value'   => array( 'typography', 'fontStyle' ),
-			'support' => array( '__experimentalFontStyle' ),
 		),
 		'fontWeight'               => array(
 			'value'   => array( 'typography', 'fontWeight' ),
-			'support' => array( '__experimentalFontWeight' ),
 		),
 		'lineHeight'               => array(
 			'value'   => array( 'typography', 'lineHeight' ),
-			'support' => array( 'lineHeight' ),
 		),
 		'padding'                  => array(
 			'value'      => array( 'spacing', 'padding' ),
-			'support'    => array( 'spacing', 'padding' ),
 			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
 		'textDecoration'           => array(
 			'value'   => array( 'typography', 'textDecoration' ),
-			'support' => array( '__experimentalTextDecoration' ),
 		),
 		'textTransform'            => array(
 			'value'   => array( 'typography', 'textTransform' ),
-			'support' => array( '__experimentalTextTransform' ),
 		),
 	);
 
@@ -360,14 +324,7 @@ class WP_Theme_JSON {
 					continue;
 				}
 
-				// Remove the properties the block doesn't support.
-				// This is a subset of the full styles schema.
 				$styles_schema = self::SCHEMA['styles'];
-				foreach ( self::PROPERTIES_METADATA as $prop_name => $prop_meta ) {
-					if ( ! in_array( $prop_name, $metadata['supports'], true ) ) {
-						unset( $styles_schema[ $prop_meta['value'][0] ][ $prop_meta['value'][1] ] );
-					}
-				}
 				$this->theme_json['styles'][ $block_selector ] = self::remove_keys_not_in_schema(
 					$this->theme_json['styles'][ $block_selector ],
 					$styles_schema
@@ -476,11 +433,9 @@ class WP_Theme_JSON {
 	 * {
 	 *   'root': {
 	 *     'selector': ':root'
-	 *     'supports': [ 'fontSize', 'backgroundColor' ],
 	 *   },
 	 *   'core/heading/h1': {
 	 *     'selector': 'h1'
-	 *     'supports': [ 'fontSize', 'backgroundColor' ],
 	 *   }
 	 * }
 	 *
@@ -494,31 +449,15 @@ class WP_Theme_JSON {
 		self::$blocks_metadata = array(
 			self::ROOT_BLOCK_NAME => array(
 				'selector' => self::ROOT_BLOCK_SELECTOR,
-				'supports' => self::ROOT_BLOCK_SUPPORTS,
 			),
-			// By make supports an empty array
-			// this won't have any styles associated
-			// but still allows adding settings
-			// and generate presets.
 			self::ALL_BLOCKS_NAME => array(
-				'selector' => self::ALL_BLOCKS_SELECTOR,
-				'supports' => array(),
+				'selector' => self::ALL_BLOCKS_SELECTOR
 			),
 		);
 
 		$registry = WP_Block_Type_Registry::get_instance();
 		$blocks   = $registry->get_all_registered();
 		foreach ( $blocks as $block_name => $block_type ) {
-			/*
-			 * Extract block support keys that are related to the style properties.
-			 */
-			$block_supports = array();
-			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
-				if ( _wp_array_get( $block_type->supports, $metadata['support'] ) ) {
-					$block_supports[] = $key;
-				}
-			}
-
 			/*
 			 * Assign the selector for the block.
 			 *
@@ -544,7 +483,6 @@ class WP_Theme_JSON {
 			) {
 				self::$blocks_metadata[ $block_name ] = array(
 					'selector' => $block_type->supports['__experimentalSelector'],
-					'supports' => $block_supports,
 				);
 			} elseif (
 				isset( $block_type->supports['__experimentalSelector'] ) &&
@@ -557,13 +495,11 @@ class WP_Theme_JSON {
 
 					self::$blocks_metadata[ $key ] = array(
 						'selector' => $selector_metadata['selector'],
-						'supports' => $block_supports,
 					);
 				}
 			} else {
 				self::$blocks_metadata[ $block_name ] = array(
 					'selector' => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
-					'supports' => $block_supports,
 				);
 			}
 		}
@@ -718,21 +654,16 @@ class WP_Theme_JSON {
 	 *
 	 * @param array $declarations Holds the existing declarations.
 	 * @param array $styles       Styles to process.
-	 * @param array $supports     Supports information for this block.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $declarations, $styles, $supports ) {
+	private static function compute_style_properties( $declarations, $styles ) {
 		if ( empty( $styles ) ) {
 			return $declarations;
 		}
 
 		$properties = array();
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
-			if ( ! in_array( $name, $supports, true ) ) {
-				continue;
-			}
-
 			// Some properties can be shorthand properties, meaning that
 			// they contain multiple values instead of a single one.
 			// An example of this is the padding property, see self::SCHEMA.
@@ -992,14 +923,12 @@ class WP_Theme_JSON {
 			}
 
 			$selector = $metadata['selector'];
-			$supports = $metadata['supports'];
 
 			$declarations = array();
 			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
 				$declarations = self::compute_style_properties(
 					$declarations,
-					$this->theme_json['styles'][ $block_selector ],
-					$supports
+					$this->theme_json['styles'][ $block_selector ]
 				);
 			}
 
@@ -1141,7 +1070,7 @@ class WP_Theme_JSON {
 
 			// Style escaping.
 			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				$declarations = self::compute_style_properties( array(), $this->theme_json['styles'][ $block_selector ], $metadata['supports'] );
+				$declarations = self::compute_style_properties( array(), $this->theme_json['styles'][ $block_selector ] );
 				foreach ( $declarations as $declaration ) {
 					$style_to_validate = $declaration['name'] . ': ' . $declaration['value'];
 					if ( esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate ) {
