@@ -14,10 +14,10 @@ import {
 	InspectorControls,
 } from '@wordpress/block-editor';
 import {
-	Button,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
+	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
@@ -31,7 +31,7 @@ import styles from './style.scss';
 /**
  * Constants
  */
-const MIN_BUTTON_WIDTH = 100;
+const MIN_BUTTON_WIDTH = 75;
 const BUTTON_OPTIONS = [
 	{ value: 'button-inside', label: __( 'Button inside' ) },
 	{ value: 'button-outside', label: __( 'Button outside' ) },
@@ -189,13 +189,7 @@ export default function SearchEdit( {
 	const renderButton = () => {
 		return (
 			<View style={ styles.buttonContainer }>
-				{ buttonUseIcon && (
-					<Button
-						className="wp-block-search__button"
-						icon={ search }
-						onFocus={ onFocus }
-					/>
-				) }
+				{ buttonUseIcon && <Icon icon={ search } { ...styles.icon } /> }
 
 				{ ! buttonUseIcon && (
 					<RichText
