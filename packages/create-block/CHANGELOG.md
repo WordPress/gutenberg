@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.1.0 (2021-03-17)
+
 ### New Features
 
 -   Add a way to provide a default value in the template for `attributes` and `supports` Block API fields ([#28883](https://github.com/WordPress/gutenberg/pull/28883)).
