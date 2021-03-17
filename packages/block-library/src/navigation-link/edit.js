@@ -428,9 +428,9 @@ export default function NavigationLinkEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
-				{/* eslint-disable jsx-a11y/anchor-is-valid */}
+				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
-				{/* eslint-enable */}
+					{ /* eslint-enable */ }
 					{ ! url ? (
 						<div className="wp-block-navigation-link__placeholder-text">
 							<KeyboardShortcuts
