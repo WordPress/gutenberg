@@ -52,7 +52,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 		if ( !! Object.keys( newQuery ).length ) {
 			updateQuery( newQuery );
 		}
-	}, [ query.perPage, query.inherit, previousQuery ] );
+	}, [ query.perPage, query.inherit ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
