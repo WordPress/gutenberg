@@ -7,6 +7,11 @@
 
 #customize-theme-controls .customize-pane-child.accordion-section-content.customize-widgets-layout__inspector {
 	background: $white;
+	box-sizing: border-box;
+
+	* {
+		box-sizing: inherit;
+	}
 
 	.block-editor-block-inspector {
 		margin: -$grid-unit-15;
