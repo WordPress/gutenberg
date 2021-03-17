@@ -21,11 +21,13 @@ import {
 	MediaReplaceFlow,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { useCopyOnClick } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -61,9 +63,10 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 	const { media, mediaUpload } = useSelect(
 		( select ) => ( {
 			media:
-				id === undefined ? undefined : select( 'core' ).getMedia( id ),
-			mediaUpload: select( 'core/block-editor' ).getSettings()
-				.mediaUpload,
+				id === undefined
+					? undefined
+					: select( coreStore ).getMedia( id ),
+			mediaUpload: select( blockEditorStore ).getSettings().mediaUpload,
 		} ),
 		[ id ]
 	);
@@ -86,9 +89,7 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 		}
 
 		if ( downloadButtonText === undefined ) {
-			setAttributes( {
-				downloadButtonText: _x( 'Download', 'button label' ),
-			} );
+			changeDownloadButtonText( _x( 'Download', 'button label' ) );
 		}
 	}, [] );
 
@@ -123,6 +124,13 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 
 	function changeShowDownloadButton( newValue ) {
 		setAttributes( { showDownloadButton: newValue } );
+	}
+
+	function changeDownloadButtonText( newValue ) {
+		// Remove anchor tags from button text content.
+		setAttributes( {
+			downloadButtonText: newValue.replace( /<\/?a[^>]*>/g, '' ),
+		} );
 	}
 
 	const attachmentPage = media && media.link;
@@ -211,9 +219,7 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }
 								onChange={ ( text ) =>
-									setAttributes( {
-										downloadButtonText: text,
-									} )
+									changeDownloadButtonText( text )
 								}
 							/>
 						</div>

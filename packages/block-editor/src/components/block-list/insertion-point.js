@@ -22,6 +22,7 @@ import { isRTL } from '@wordpress/i18n';
  */
 import Inserter from '../inserter';
 import { getBlockDOMNode } from '../../utils/dom';
+import { store as blockEditorStore } from '../../store';
 
 function InsertionPointInserter( {
 	clientId,
@@ -55,7 +56,7 @@ function InsertionPointPopover( {
 	containerRef,
 	showInsertionPoint,
 } ) {
-	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
 	const {
@@ -75,7 +76,7 @@ function InsertionPointPopover( {
 				getSelectedBlockClientId,
 				hasMultiSelection,
 				getSettings,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const { ownerDocument } = containerRef.current;
 			const targetRootClientId = clientId
 				? getBlockRootClientId( clientId )
@@ -259,7 +260,7 @@ export default function useInsertionPoint( ref ) {
 			getBlockInsertionPoint,
 			getBlockOrder,
 			getBlockListSettings: _getBlockListSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );

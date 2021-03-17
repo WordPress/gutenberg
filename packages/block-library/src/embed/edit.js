@@ -26,6 +26,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 function getResponsiveHelp( checked ) {
 	return checked
@@ -75,7 +76,7 @@ const EmbedEdit = ( props ) => {
 				isPreviewEmbedFallback,
 				isRequestingEmbedPreview,
 				getThemeSupports,
-			} = select( 'core' );
+			} = select( coreStore );
 			if ( ! attributesUrl ) {
 				return { fetching: false, cannotEmbed: false };
 			}

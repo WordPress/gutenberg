@@ -14,6 +14,7 @@ import { __ } from '@wordpress/i18n';
  */
 import TemplatePreview from './template-preview';
 import { NavigationPanelPreviewFill } from '../index';
+import { store as editSiteStore } from '../../../store';
 
 export default function TemplateNavigationItem( { item } ) {
 	const { title, description } = useSelect(
@@ -26,7 +27,7 @@ export default function TemplateNavigationItem( { item } ) {
 				  },
 		[]
 	);
-	const { setTemplate, setTemplatePart } = useDispatch( 'core/edit-site' );
+	const { setTemplate, setTemplatePart } = useDispatch( editSiteStore );
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );
 
 	if ( ! item ) {
@@ -49,15 +50,19 @@ export default function TemplateNavigationItem( { item } ) {
 				onMouseEnter={ () => setIsPreviewVisible( true ) }
 				onMouseLeave={ () => setIsPreviewVisible( false ) }
 			>
-				<div className="edit-site-navigation-panel__template-item-title">
-					{ 'draft' === item.status && <em>{ __( '[Draft]' ) }</em> }
-					{ title }
-				</div>
-				{ description && (
-					<div className="edit-site-navigation-panel__template-item-description">
-						{ description }
+				<span className="edit-site-navigation-panel__info-wrapper">
+					<div className="edit-site-navigation-panel__template-item-title">
+						{ 'draft' === item.status && (
+							<em>{ __( '[Draft]' ) }</em>
+						) }
+						{ title }
 					</div>
-				) }
+					{ description && (
+						<div className="edit-site-navigation-panel__template-item-description">
+							{ description }
+						</div>
+					) }
+				</span>
 			</Button>
 
 			{ isPreviewVisible && (

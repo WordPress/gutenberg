@@ -40,8 +40,8 @@ function gutenberg_reregister_core_block_types() {
 				'separator',
 				'social-links',
 				'spacer',
-				'subhead',
 				'table',
+				// 'table-of-contents',
 				'text-columns',
 				'verse',
 				'video',
@@ -63,6 +63,7 @@ function gutenberg_reregister_core_block_types() {
 					'shortcode.php'                 => 'core/shortcode',
 					'social-link.php'               => 'core/social-link',
 					'tag-cloud.php'                 => 'core/tag-cloud',
+					'page-list.php'                 => 'core/page-list',
 					'post-author.php'               => 'core/post-author',
 					'post-comment.php'              => 'core/post-comment',
 					'post-comment-author.php'       => 'core/post-comment-author',
@@ -76,6 +77,7 @@ function gutenberg_reregister_core_block_types() {
 					'post-excerpt.php'              => 'core/post-excerpt',
 					'post-featured-image.php'       => 'core/post-featured-image',
 					'post-hierarchical-terms.php'   => 'core/post-hierarchical-terms',
+					'post-navigation-link.php'      => 'core/post-navigation-link',
 					'post-tags.php'                 => 'core/post-tags',
 					'post-title.php'                => 'core/post-title',
 					'query.php'                     => 'core/query',
@@ -87,6 +89,7 @@ function gutenberg_reregister_core_block_types() {
 					'site-logo.php'                 => 'core/site-logo',
 					'site-tagline.php'              => 'core/site-tagline',
 					'site-title.php'                => 'core/site-title',
+					// 'table-of-contents.php'         => 'core/table-of-contents',
 					'template-part.php'             => 'core/template-part',
 				)
 			),
@@ -161,7 +164,7 @@ add_action( 'init', 'gutenberg_reregister_core_block_types' );
  * @return void
  */
 function gutenberg_register_core_block_styles( $block_name ) {
-	if ( ! gutenberg_should_load_separate_block_styles() ) {
+	if ( ! gutenberg_should_load_separate_block_assets() ) {
 		return;
 	}
 
@@ -178,6 +181,9 @@ function gutenberg_register_core_block_styles( $block_name ) {
 			filemtime( gutenberg_dir_path() . $style_path )
 		);
 		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
+
+		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
+		wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $style_path );
 	}
 
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
@@ -190,6 +196,77 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		wp_style_add_data( "wp-block-{$block_name}-editor", 'rtl', 'replace' );
 	}
 }
+
+/**
+ * Change the way styles get loaded depending on their size.
+ *
+ * Optimizes performance and sustainability of styles by inlining smaller stylesheets.
+ *
+ * @return void
+ */
+function gutenberg_maybe_inline_styles() {
+
+	$total_inline_limit = 20000;
+	/**
+	 * The maximum size of inlined styles in bytes.
+	 *
+	 * @param int $total_inline_limit The file-size threshold, in bytes. Defaults to 20000.
+	 * @return int                    The file-size threshold, in bytes.
+	 */
+	$total_inline_limit = apply_filters( 'styles_inline_size_limit', $total_inline_limit );
+
+	global $wp_styles;
+	$styles = array();
+
+	// Build an array of styles that have a path defined.
+	foreach ( $wp_styles->queue as $handle ) {
+		if ( wp_styles()->get_data( $handle, 'path' ) && file_exists( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
+			$styles[] = array(
+				'handle' => $handle,
+				'path'   => $wp_styles->registered[ $handle ]->extra['path'],
+				'size'   => filesize( $wp_styles->registered[ $handle ]->extra['path'] ),
+			);
+		}
+	}
+
+	if ( ! empty( $styles ) ) {
+		// Reorder styles array based on size.
+		usort(
+			$styles,
+			function( $a, $b ) {
+				return ( $a['size'] <= $b['size'] ) ? -1 : 1;
+			}
+		);
+
+		/**
+		 * The total inlined size.
+		 *
+		 * On each iteration of the loop, if a style gets added inline the value of this var increases
+		 * to reflect the total size of inlined styles.
+		 */
+		$total_inline_size = 0;
+
+		// Loop styles.
+		foreach ( $styles as $style ) {
+
+			// Size check. Since styles are ordered by size, we can break the loop.
+			if ( $total_inline_size + $style['size'] > $total_inline_limit ) {
+				break;
+			}
+
+			// Get the styles if we don't already have them.
+			$style['css'] = file_get_contents( $style['path'] );
+
+			// Set `src` to `false` and add styles inline.
+			$wp_styles->registered[ $style['handle'] ]->src              = false;
+			$wp_styles->registered[ $style['handle'] ]->extra['after'][] = $style['css'];
+
+			// Add the styles size to the $total_inline_size var.
+			$total_inline_size += (int) $style['size'];
+		}
+	}
+}
+add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it

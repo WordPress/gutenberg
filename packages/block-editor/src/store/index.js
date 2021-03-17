@@ -10,11 +10,7 @@ import reducer from './reducer';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import controls from './controls';
-
-/**
- * Module Constants
- */
-const STORE_NAME = 'core/block-editor';
+import { STORE_NAME } from './constants';
 
 /**
  * Block editor data store configuration.

@@ -163,14 +163,14 @@ const controls = {
 	RESOLVE_WIDGET_AREAS: createRegistryControl(
 		( registry ) => ( { query } ) => {
 			return registry
-				.__experimentalResolveSelect( 'core' )
+				.resolveSelect( 'core' )
 				.getEntityRecords( KIND, WIDGET_AREA_ENTITY_TYPE, query );
 		}
 	),
 
 	RESOLVE_WIDGETS: createRegistryControl( ( registry ) => ( { query } ) => {
 		return registry
-			.__experimentalResolveSelect( 'core' )
+			.resolveSelect( 'core' )
 			.getEntityRecords( 'root', 'widget', query );
 	} ),
 };

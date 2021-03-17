@@ -4,8 +4,8 @@
 import { SVG, Path } from '@wordpress/primitives';
 
 const textColor = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="-2 -2 24 24">
-		<Path d="M13.23 15h1.9L11 4H9L5 15h1.88l1.07-3h4.18zm-1.53-4.54H8.51L10 5.6z" />
+	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+		<Path d="M12.9 6h-2l-4 11h1.9l1.1-3h4.2l1.1 3h1.9L12.9 6zm-2.5 6.5l1.5-4.9 1.7 4.9h-3.2z" />
 	</SVG>
 );
 

@@ -188,9 +188,9 @@ Deletes a theme from the site, activating another theme if necessary.
 _Parameters_
 
 -   _slug_ `string`: Theme slug.
--   _settings_ `?Object`: Optional settings object.
--   _settings.newThemeSlug_ `?string`: A theme to switch to if the theme to delete is active. Required if the theme to delete is active.
--   _settings.newThemeSearchTerm_ `?string`: A search term to use if the new theme is not findable by its slug.
+-   _settings_ `Object?`: Optional settings object.
+-   _settings.newThemeSlug_ `string?`: A theme to switch to if the theme to delete is active. Required if the theme to delete is active.
+-   _settings.newThemeSearchTerm_ `string?`: A search term to use if the new theme is not findable by its slug.
 
 <a name="disableFocusLossObservation" href="#disableFocusLossObservation">#</a> **disableFocusLossObservation**
 
@@ -259,7 +259,7 @@ _Parameters_
 
 _Returns_
 
--   `Promise<(ElementHandle|undefined)>`: Object that represents an in-page DOM element.
+-   `Promise<ElementHandle|undefined>`: Object that represents an in-page DOM element.
 
 <a name="getAllBlockInserterItemTitles" href="#getAllBlockInserterItemTitles">#</a> **getAllBlockInserterItemTitles**
 
@@ -383,7 +383,7 @@ Installs a plugin from the WP.org repository.
 _Parameters_
 
 -   _slug_ `string`: Plugin slug.
--   _searchTerm_ `?string`: If the plugin is not findable by its slug use an alternative term to search.
+-   _searchTerm_ `string?`: If the plugin is not findable by its slug use an alternative term to search.
 
 <a name="installTheme" href="#installTheme">#</a> **installTheme**
 
@@ -392,8 +392,8 @@ Installs a theme from the WP.org repository.
 _Parameters_
 
 -   _slug_ `string`: Theme slug.
--   _settings_ `?Object`: Optional settings object.
--   _settings.searchTerm_ `?string`: Search term to use if the theme is not findable by its slug.
+-   _settings_ `Object?`: Optional settings object.
+-   _settings.searchTerm_ `string?`: Search term to use if the theme is not findable by its slug.
 
 <a name="isCurrentURL" href="#isCurrentURL">#</a> **isCurrentURL**
 
@@ -450,7 +450,7 @@ _Parameters_
 
 -   _mockCheck_ `Function`: function that returns true if the request should be mocked.
 -   _mock_ `Object`: A mock object to wrap in a JSON response, if the request should be mocked.
--   _responseObjectTransform_ `(Function|undefined)`: An optional function that transforms the response's object before the response is used.
+-   _responseObjectTransform_ `Function|undefined`: An optional function that transforms the response's object before the response is used.
 
 _Returns_
 
@@ -677,8 +677,8 @@ Navigates to the post listing screen and bulk-trashes any posts which exist.
 
 _Parameters_
 
--   _postType_ `string`: String slug for type of post to trash.
--   _postStatus_ `string`: String status of posts to trash.
+-   _postType_ `string`: - String slug for type of post to trash.
+-   _postStatus_ `string`: - String status of posts to trash.
 
 _Returns_
 

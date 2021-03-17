@@ -2,11 +2,12 @@
 
 ## Unreleased
 
-## 3.18.0 (2021-02-2)
-
 ### Enhancements
 
-- Allow the return values of i18n functions to be filtered ([#27966](https://github.com/WordPress/gutenberg/pull/27966))
+- Export the default `I18n` instance as `defaultI18n`, in addition to already exported bound methods.
+- Add new `getLocaleData` method to get the internal Tannin locale data object.
+- Add new `subscribe` method to subscribe to changes in the internal locale data.
+- Add new `hasTranslation` method to determine whether a translation for a string is available.
 
 ## 3.17.0 (2020-12-17)
 

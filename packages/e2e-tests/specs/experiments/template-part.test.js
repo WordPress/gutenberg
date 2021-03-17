@@ -18,6 +18,9 @@ import {
  */
 import { navigationPanel, siteEditor } from '../../experimental-features';
 
+const templatePartNameInput =
+	'.edit-site-template-part-converter__modal .components-text-control__input';
+
 describe( 'Template Part', () => {
 	beforeAll( async () => {
 		await activateTheme( 'tt1-blocks' );
@@ -35,12 +38,17 @@ describe( 'Template Part', () => {
 			await siteEditor.visit();
 		} );
 
-		async function updateHeader( content ) {
+		async function navigateToHeader() {
 			// Switch to editing the header template part.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
-			await navigationPanel.navigate( 'Template Parts' );
+			// TODO: Change General to Headers once TT1 blocks categorise the template parts
+			await navigationPanel.navigate( [ 'Template Parts', 'General' ] );
 			await navigationPanel.clickItemByText( 'header' );
+		}
+
+		async function updateHeader( content ) {
+			await navigateToHeader();
 
 			// Edit it.
 			await insertBlock( 'Paragraph' );
@@ -112,11 +120,6 @@ describe( 'Template Part', () => {
 			// Detach blocks from template part using ellipsis menu.
 			await triggerEllipsisMenuItem( 'Detach blocks from template part' );
 
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
-
 			// Verify there is one less template part on the page.
 			const finalTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
@@ -129,6 +132,36 @@ describe( 'Template Part', () => {
 			const [ expectedContent ] = await canvas().$x(
 				'//p[contains(text(), "Header Template Part 456")]'
 			);
+			expect( expectedContent ).not.toBeUndefined();
+		} );
+
+		it( 'Should load navigate-to-links properly', async () => {
+			await navigateToHeader();
+			await insertBlock( 'Paragraph' );
+			await page.keyboard.type( 'Header Template Part 789' );
+
+			// Select the paragraph block
+			const text = await canvas().waitForXPath(
+				'//p[contains(text(), "Header Template Part 789")]'
+			);
+
+			// Highlight all the text in the paragraph block
+			await text.click( { clickCount: 3 } );
+
+			// Click the convert to link toolbar button
+			await page.waitForSelector( 'button[aria-label="Link"]' );
+			await page.click( 'button[aria-label="Link"]' );
+
+			// Enter url for link
+			await page.keyboard.type( 'https://google.com' );
+			await page.keyboard.press( 'Enter' );
+
+			// Verify that there is no error
+			await canvas().click( 'p[data-type="core/paragraph"] a' );
+			const expectedContent = await canvas().$x(
+				'//p[contains(text(), "Header Template Part 789")]'
+			);
+
 			expect( expectedContent ).not.toBeUndefined();
 		} );
 
@@ -146,14 +179,20 @@ describe( 'Template Part', () => {
 
 			// Convert block to a template part.
 			await triggerEllipsisMenuItem( 'Make template part' );
+			const nameInput = await page.waitForSelector(
+				templatePartNameInput
+			);
+			await nameInput.click();
+			await page.keyboard.type( 'My template part' );
+			await page.keyboard.press( 'Enter' );
+
+			// Wait for creation to finish
+			await page.waitForXPath(
+				'//*[contains(@class, "components-snackbar")]/*[text()="Template part created."]'
+			);
 
 			// Verify new template part is created with expected content.
 			await assertParagraphInTemplatePart( 'Some block...' );
-
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
 
 			// Verify there is 1 more template part on the page than previously.
 			const finalTemplateParts = await canvas().$$(
@@ -189,15 +228,21 @@ describe( 'Template Part', () => {
 
 			// Convert block to a template part.
 			await triggerEllipsisMenuItem( 'Make template part' );
+			const nameInput = await page.waitForSelector(
+				templatePartNameInput
+			);
+			await nameInput.click();
+			await page.keyboard.type( 'My multi  template part' );
+			await page.keyboard.press( 'Enter' );
+
+			// Wait for creation to finish
+			await page.waitForXPath(
+				'//*[contains(@class, "components-snackbar")]/*[text()="Template part created."]'
+			);
 
 			// Verify new template part is created with expected content.
 			await assertParagraphInTemplatePart( 'Some block #1' );
 			await assertParagraphInTemplatePart( 'Some block #2' );
-
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
 
 			// Verify there is 1 more template part on the page than previously.
 			const finalTemplateParts = await canvas().$$(
@@ -247,11 +292,6 @@ describe( 'Template Part', () => {
 			await page.click( savePostSelector );
 			await page.click( entitiesSaveSelector );
 
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
-
 			await createNewPost();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
@@ -268,11 +308,6 @@ describe( 'Template Part', () => {
 				testContentSelector
 			);
 			expect( templatePartContent ).toBeTruthy();
-
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
 		} );
 	} );
 } );
