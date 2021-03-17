@@ -22,40 +22,43 @@ function getDayOfTheMonth( date = new Date(), firstDay = true ) {
 }
 
 export default function PostSchedule() {
-	const date = useSelect(
-		( select ) => select( editorStore ).getEditedPostAttribute( 'date' ),
+	const { postDate, postType } = useSelect(
+		( select ) => ( {
+			postDate: select( editorStore ).getEditedPostAttribute( 'date' ),
+			postType: select( editorStore ).getCurrentPostType(),
+		} ),
 		[]
 	);
 
 	const { editPost } = useDispatch( editorStore );
-	const onUpdateDate = ( postDate ) => editPost( { date: postDate } );
+	const onUpdateDate = ( date ) => editPost( { date } );
 
 	const [ previewedMonth, setPreviewedMonth ] = useState(
-		getDayOfTheMonth( date )
+		getDayOfTheMonth( postDate )
 	);
 
 	// Pick up published and schduled site posts.
-	const postsEvents = useSelect(
+	const eventsByPostType = useSelect(
 		( select ) =>
-			select( coreStore ).getEntityRecords( 'postType', 'post', {
+			select( coreStore ).getEntityRecords( 'postType', postType, {
 				status: 'publish,future',
 				after: getDayOfTheMonth( previewedMonth ),
 				before: getDayOfTheMonth( previewedMonth, false ),
 				exclude: [ select( editorStore ).getCurrentPostId() ],
 			} ),
-		[ previewedMonth ]
+		[ previewedMonth, postType ]
 	);
 
 	const events = useMemo(
 		() =>
-			( postsEvents || [] ).map(
+			( eventsByPostType || [] ).map(
 				( { title, type, date: eventDate } ) => ( {
 					title: title?.raw,
 					type,
 					date: new Date( eventDate ),
 				} )
 			),
-		[ postsEvents ]
+		[ eventsByPostType ]
 	);
 
 	const ref = useRef();
@@ -81,7 +84,7 @@ export default function PostSchedule() {
 	return (
 		<DateTimePicker
 			ref={ ref }
-			currentDate={ date }
+			currentDate={ postDate }
 			onChange={ onChange }
 			is12Hour={ is12HourTime }
 			events={ events }
