@@ -33,7 +33,11 @@ export default function useHierarchicalTermLinks( { postId, postType, term } ) {
 				}
 
 				return (
-					<a key={ itemId } href={ item.link }>
+					<a
+						key={ itemId }
+						href={ item.link }
+						onClick={ ( event ) => event.preventDefault() }
+					>
 						{ item.name }
 					</a>
 				);

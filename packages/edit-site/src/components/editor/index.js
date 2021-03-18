@@ -43,7 +43,6 @@ const interfaceLabels = {
 
 function Editor( { initialSettings } ) {
 	const {
-		isFullscreenActive,
 		isInserterOpen,
 		isListViewOpen,
 		sidebarIsOpened,
@@ -55,7 +54,6 @@ function Editor( { initialSettings } ) {
 		isNavigationOpen,
 	} = useSelect( ( select ) => {
 		const {
-			isFeatureActive,
 			isInserterOpened,
 			isListViewOpened,
 			getSettings,
@@ -71,7 +69,6 @@ function Editor( { initialSettings } ) {
 		return {
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
-			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			sidebarIsOpened: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( editSiteStore.name ),
@@ -165,7 +162,7 @@ function Editor( { initialSettings } ) {
 	return (
 		<>
 			<URLQueryController />
-			<FullscreenMode isActive={ isFullscreenActive } />
+			<FullscreenMode isActive />
 			<UnsavedChangesWarning />
 			<SlotFillProvider>
 				<DropZoneProvider>

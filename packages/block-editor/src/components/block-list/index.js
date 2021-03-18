@@ -20,11 +20,12 @@ import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
+import { LayoutProvider, defaultLayout } from './layout';
 
 export const BlockNodes = createContext();
 export const SetBlockNodes = createContext();
 
-export default function BlockList( { className } ) {
+export default function BlockList( { className, __experimentalLayout } ) {
 	const ref = useRef();
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
@@ -43,7 +44,10 @@ export default function BlockList( { className } ) {
 				) }
 			>
 				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems wrapperRef={ ref } />
+					<BlockListItems
+						wrapperRef={ ref }
+						__experimentalLayout={ __experimentalLayout }
+					/>
 				</SetBlockNodes.Provider>
 			</div>
 		</BlockNodes.Provider>
@@ -55,6 +59,7 @@ function Items( {
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
+	__experimentalLayout: layout = defaultLayout,
 	wrapperRef,
 } ) {
 	function selector( select ) {
@@ -90,7 +95,7 @@ function Items( {
 	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
 
 	return (
-		<>
+		<LayoutProvider value={ layout }>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
 					? multiSelectedBlockClientIds.includes( clientId )
@@ -131,7 +136,7 @@ function Items( {
 						isAppenderDropTarget && orientation === 'horizontal',
 				} ) }
 			/>
-		</>
+		</LayoutProvider>
 	);
 }
 

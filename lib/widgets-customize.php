@@ -58,6 +58,66 @@ function gutenberg_widgets_customize_register( $manager ) {
 	}
 }
 
+/**
+ * Our own implementation of WP_Customize_Widgets::sanitize_widget_instance
+ * which uses __unstable_instance if it exists.
+ *
+ * @param array $value Widget instance to sanitize.
+ * @return array|void Sanitized widget instance.
+ */
+function gutenberg_widgets_customize_sanitize_widget_instance( $value ) {
+	global $wp_customize;
+
+	if ( isset( $value['__unstable_instance'] ) ) {
+		return $value['__unstable_instance'];
+	}
+
+	return $wp_customize->widgets->sanitize_widget_instance( $value );
+}
+
+/**
+ * Our own implementation of WP_Customize_Widgets::sanitize_widget_js_instance
+ * which adds __unstable_instance.
+ *
+ * @param array $value Widget instance to convert to JSON.
+ * @return array JSON-converted widget instance.
+ */
+function gutenberg_widgets_customize_sanitize_widget_js_instance( $value ) {
+	global $wp_customize;
+
+	$sanitized_value = $wp_customize->widgets->sanitize_widget_js_instance( $value );
+
+	$sanitized_value['__unstable_instance'] = $value;
+
+	return $sanitized_value;
+}
+
+/**
+ * TEMPORARY HACK! \o/
+ *
+ * Swaps the customizer setting's sanitize_callback and sanitize_js_callback
+ * arguments with our own implementation that adds __unstable_instance to the
+ * sanitized value.
+ *
+ * This lets the block editor use __unstable_instance to create blocks.
+ *
+ * A proper fix would be to only add the raw instance when the widget is a block
+ * widget and to update the Legacy Widget block to work with encoded instance
+ * values. See https://github.com/WordPress/gutenberg/issues/28902.
+ *
+ * @param array  $args Array of Customizer setting arguments.
+ * @param string $id   Widget setting ID.
+ */
+function gutenberg_widgets_customize_add_unstable_instance( $args, $id ) {
+	if ( 0 === strpos( $id, 'widget_' ) ) {
+		$args['sanitize_callback']    = 'gutenberg_widgets_customize_sanitize_widget_instance';
+		$args['sanitize_js_callback'] = 'gutenberg_widgets_customize_sanitize_widget_js_instance';
+	}
+
+	return $args;
+}
+
 if ( gutenberg_is_experiment_enabled( 'gutenberg-widgets-in-customizer' ) ) {
 	add_action( 'customize_register', 'gutenberg_widgets_customize_register' );
+	add_filter( 'widget_customizer_setting_args', 'gutenberg_widgets_customize_add_unstable_instance', 10, 2 );
 }

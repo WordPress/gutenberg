@@ -363,9 +363,9 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 
 		if ( 'wp_template_part' === $this->post_type ) {
 			if ( isset( $request['area'] ) ) {
-				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area_type( $request['area'] );
+				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area( $request['area'] );
 			} elseif ( null !== $template && ! $template->is_custom && $template->area ) {
-				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area_type( $template->area );
+				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area( $template->area );
 			} elseif ( ! $template->area ) {
 				$changes->tax_input['wp_template_part_area'] = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 			}

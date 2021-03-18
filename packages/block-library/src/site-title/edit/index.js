@@ -23,13 +23,12 @@ import LevelToolbar from './level-toolbar';
 export default function SiteTitleEdit( { attributes, setAttributes } ) {
 	const { level, textAlign } = attributes;
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
-	const tagName = level === 0 ? 'p' : `h${ level }`;
+	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-
 	return (
 		<>
 			<BlockControls>
@@ -47,17 +46,17 @@ export default function SiteTitleEdit( { attributes, setAttributes } ) {
 					}
 				/>
 			</BlockControls>
-
-			<RichText
-				tagName={ tagName }
-				aria-label={ __( 'Site title text' ) }
-				placeholder={ __( 'Write site title…' ) }
-				value={ title }
-				onChange={ setTitle }
-				allowedFormats={ [] }
-				disableLineBreaks
-				{ ...blockProps }
-			/>
+			<TagName { ...blockProps }>
+				<RichText
+					tagName="a"
+					aria-label={ __( 'Site title text' ) }
+					placeholder={ __( 'Write site title…' ) }
+					value={ title }
+					onChange={ setTitle }
+					allowedFormats={ [] }
+					disableLineBreaks
+				/>
+			</TagName>
 		</>
 	);
 }

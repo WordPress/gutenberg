@@ -84,3 +84,4 @@ This function will be called on each day, every time user browses into a differe
 
 - Type: `Function`
 - Required: No
+
