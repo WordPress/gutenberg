@@ -179,3 +179,32 @@ register_block_pattern(
 							<!-- /wp:social-links -->',
 	)
 );
+
+$core_block_patterns = array(
+	'media-text-nature',
+	'two-images-gallery',
+	'cover-quote',
+	'cover-columns',
+	'three-columns-media-text',
+	'quote-portrait',
+	'hero-section',
+	'media-text-art',
+	'text-two-columns-title',
+	'three-columns-list',
+	'text-two-columns-title-2',
+	'heading',
+	'three-images-gallery',
+	'two-columns-list',
+	'media-text-arquitecture'
+);
+
+foreach ( $core_block_patterns as $core_block_pattern ) {
+	register_block_pattern(
+		'core/' . $core_block_pattern,
+		require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
+	);
+}
+
+register_block_pattern_category( 'nature', array( 'label' => _x( 'Nature', 'Block pattern category' ) ) );
+register_block_pattern_category( 'art', array( 'label' => _x( 'Art', 'Block pattern category' ) ) );
+register_block_pattern_category( 'arquitecture', array( 'label' => _x( 'Arquitecture', 'Block pattern category' ) ) );
