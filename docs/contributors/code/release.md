@@ -22,27 +22,26 @@ If critical bugs are discovered on stable versions of the plugin, patch versions
 
 > Note that at the time of writing, the tool doesn't support releasing consecutive RC releases. However, it is possible to use the tool for patch releases following the first stable release.
 
-The plugin release process is entirely automated. To release the RC version of the plugin, run the following command and follow the instructions:
+The plugin release process is entirely automated and happens solely on GitHub -- i.e. it doesn't require any steps to be run locally on your machine.
 
-```bash
-./bin/plugin/cli.js rc
-```
+For your convenience, here's an [11-minute video walkthrough](https://youtu.be/TnSgJd3zpJY) that demonstrates the release process. It's recommended to watch this if you're unfamiliar with it. The process is also documented in the following paragraphs.
 
-To release a stable version, run:
+In order to start the release process, go to Gutenberg's GitHub repository's Actions tab, and locate the ["Build Gutenberg Plugin Zip" action](https://github.com/WordPress/gutenberg/actions/workflows/build-plugin-zip.yml). Note the blue banner that says "This workflow has a `workflow_dispatch` event trigger.", and expand the "Run workflow" dropdown on its right hand side.
 
-```bash
-./bin/plugin/cli.js stable
-```
+![Run workflow dropdown](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/contributors/code/workflow-dispatch-banner.png)
 
-During the release process, you'll be asked to provide:
+To release a release candidate (RC) version of the plugin, enter `rc`. To release a stable version, enter `stable`. In each case, press the green "Run workflow" button.
 
--   A changelog: prepare one beforehand by following the instructions below.
--   A [personal access token](https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line): have one ready beforehand by visiting [this page](https://github.com/settings/tokens/new?scopes=repo,admin:org,write:packages), if you haven't got one yet.
--   User and password for your GitHub account: if 2FA is enabled for your account (it should), you need to provide a personal access token instead of password (you can use the one necessary for the release).
+This will trigger a GitHub Actions (GHA) workflow that bumps the plugin version, builds the Gutenberg plugin .zip file, creates a release draft, and attaches the plugin .zip file to it. This part of the process typically takes a little under six minutes. You'll see that workflow appear at the top of the list, right under the blue banner. Once it's finished, it'll change its status icon from a yellow dot to a green checkmark. You can follow along in a more detailed view by clicking on the workflow.
 
-The release script will create a `git` tag for the release and push it to GitHub. This triggers a GitHub workflow that builds the plugin, creates a release draft (based on the Changelog), and attaches the plugin zip. This will take a couple of minutes. You will then find the release draft at https://github.com/WordPress/gutenberg/releases. You can edit it further (but note that the changes won't be propagated to `changelog.txt`). Once you're happy with it, press the 'Publish' button.
+As soon as the workflow has finished, you'll find the release draft under https://github.com/WordPress/gutenberg/releases. The draft is pre-populated with changelog entries based on previous release candidates for this version, and any changes that have since been cherry-picked to the release branch. Thus, when releasing the first stable version of a series, make sure to delete any RC version headers (that are only there for your information), and to move the more recent changes to the corresponding sections below. Furthermore, take some time to edit the release notes into a more legible format, by grouping related entries under common bullet points. Don't rush this part -- it's important to bring the release notes into a nice shape. You don't have to do it all in one go -- you can save the draft and come back to it later.
 
-If you're releasing a stable version (rather than an RC), this will trigger a GitHub action that will upload the plugin to the WordPress.org plugin repository (SVN). This action needs approval by a member of the [`gutenberg-core` team](https://github.com/orgs/WordPress/teams/gutenberg-core). Locate the ["Upload Gutenberg plugin to WordPress.org plugin repo" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
+Only once you're happy with the shape of the release notes should you press the green "Publish release" button. This will create a `git` tag for the version, publish the release, and trigger [another GHA workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) that has a twofold purpose:
+
+1. Use the release notes that you just edited to update `changelog.txt`, and
+2. upload the new plugin version to the WordPress.org plugin repository (SVN) (only if you're releasing a stable version).
+
+The latter step needs approval by a member of the [`gutenberg-core` team](https://github.com/orgs/WordPress/teams/gutenberg-core). Locate the ["Upload Gutenberg plugin to WordPress.org plugin repo" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
 ### Manual Release Process
 
