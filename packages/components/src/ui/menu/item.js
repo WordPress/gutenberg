@@ -4,8 +4,6 @@
 import { contextConnect, useContextSystem } from '@wp-g2/context';
 import { cx } from '@wp-g2/styles';
 import { is, noop } from '@wp-g2/utils';
-// eslint-disable-next-line no-restricted-imports
-import { MenuItem as ReakitMenuItem } from 'reakit';
 
 /**
  * WordPress dependencies
@@ -19,20 +17,17 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { BaseButton } from '../base-button';
 import { Flex } from '../flex';
 import { Text } from '../text';
-import { useMenuContext } from './context';
 import * as styles from './styles';
 
 /**
  *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').MenuItemProps, 'div'>} props
+ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').MenuItemProps, 'button'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function MenuItem( props, forwardedRef ) {
 	const {
-		as,
 		children,
 		className,
-		closeOnClick = false,
 		isBack = false,
 		isOffset = false,
 		isSelected,
@@ -44,7 +39,6 @@ function MenuItem( props, forwardedRef ) {
 		...otherProps
 	} = useContextSystem( props, 'MenuItem' );
 
-	const { menu } = useMenuContext();
 	const shouldShowArrow = ! isBack && showArrow;
 
 	const classes = cx(
@@ -55,8 +49,6 @@ function MenuItem( props, forwardedRef ) {
 		isOffset && styles.offset,
 		className
 	);
-
-	const Component = as || ( menu ? ReakitMenuItem : 'button' );
 
 	const prevArrow = useMemo(
 		() =>
@@ -112,22 +104,19 @@ function MenuItem( props, forwardedRef ) {
 	}, [ nextArrow, selectedContent, suffix ] );
 
 	const handleOnClick = useCallback(
-		( /** @type {import('react').MouseEvent<HTMLDivElement>} */ event ) => {
+		(
+			/** @type {import('react').MouseEvent<HTMLButtonElement>} */ event
+		) => {
 			onClick( event );
-			if ( menu?.hide && closeOnClick ) {
-				menu.hide();
-			}
 		},
-		[ closeOnClick, menu, onClick ]
+		[ onClick ]
 	);
 
 	return (
 		<BaseButton
-			as={ Component }
 			isBlock
 			noWrap={ false }
 			{ ...otherProps }
-			{ ...menu }
 			className={ classes }
 			onClick={ handleOnClick }
 			pre={ prefixContent }
