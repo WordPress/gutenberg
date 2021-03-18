@@ -6,7 +6,7 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Units of measurements. `a11yLabel` is used by screenreaders.
@@ -14,10 +14,30 @@ import { __ } from '@wordpress/i18n';
 export const CSS_UNITS = [
 	{ value: 'px', label: 'px', default: 0, a11yLabel: __( 'pixels' ) },
 	{ value: '%', label: '%', default: 10, a11yLabel: __( 'percent' ) },
-	{ value: 'em', label: 'em', default: 0, a11yLabel: 'ems' },
-	{ value: 'rem', label: 'rem', default: 0, a11yLabel: 'rems' },
-	{ value: 'vw', label: 'vw', default: 10, a11yLabel: 'viewport widths' },
-	{ value: 'vh', label: 'vh', default: 10, a11yLabel: 'viewport heights' },
+	{
+		value: 'em',
+		label: 'em',
+		default: 0,
+		a11yLabel: _x( 'ems', 'Relative to parent font size (em)' ),
+	},
+	{
+		value: 'rem',
+		label: 'rem',
+		default: 0,
+		a11yLabel: _x( 'rems', 'Relative to root font size (rem)' ),
+	},
+	{
+		value: 'vw',
+		label: 'vw',
+		default: 10,
+		a11yLabel: __( 'viewport widths' ),
+	},
+	{
+		value: 'vh',
+		label: 'vh',
+		default: 10,
+		a11yLabel: __( 'viewport heights' ),
+	},
 ];
 
 export const DEFAULT_UNIT = CSS_UNITS[ 0 ];
