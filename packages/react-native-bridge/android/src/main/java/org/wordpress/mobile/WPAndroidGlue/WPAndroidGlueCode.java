@@ -580,6 +580,7 @@ public class WPAndroidGlueCode {
                                   OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
                                   ShowSuggestionsUtil showSuggestionsUtil,
                                   OnMediaFilesCollectionBasedBlockEditorListener onMediaFilesCollectionBasedBlockEditorListener,
+                                  OnFocalPointPickerTooltipShownEventListener onFocalPointPickerTooltipListener,
                                   boolean isDarkMode) {
         MutableContextWrapper contextWrapper = (MutableContextWrapper) mReactRootView.getContext();
         contextWrapper.setBaseContext(viewGroup.getContext());
