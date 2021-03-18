@@ -10,7 +10,7 @@ import { useEffect, useState } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	getBlockAttributes,
-	getBlockInnerHTML,
+	getBlockContent,
 	getBlockType,
 	isValidBlockContent,
 	getSaveContent,
@@ -55,7 +55,7 @@ function BlockHTML( { clientId } ) {
 	};
 
 	useEffect( () => {
-		setHtml( getBlockInnerHTML( block ) );
+		setHtml( getBlockContent( block ) );
 	}, [ block ] );
 
 	return (

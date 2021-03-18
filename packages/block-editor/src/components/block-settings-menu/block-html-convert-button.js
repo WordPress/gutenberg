@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { rawHandler, getBlockInnerHTML } from '@wordpress/blocks';
+import { rawHandler, getBlockContent } from '@wordpress/blocks';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -24,7 +24,7 @@ export default compose(
 		onClick: () =>
 			dispatch( blockEditorStore ).replaceBlocks(
 				block.clientId,
-				rawHandler( { HTML: getBlockInnerHTML( block ) } )
+				rawHandler( { HTML: getBlockContent( block ) } )
 			),
 	} ) )
 )( BlockConvertButton );

@@ -9,7 +9,7 @@ import path from 'path';
  */
 import {
 	createBlock,
-	getBlockInnerHTML,
+	getBlockContent,
 	pasteHandler,
 	rawHandler,
 	registerBlockType,
@@ -174,7 +174,7 @@ describe( 'Blocks raw handling', () => {
 			plainText: '* one\n* two\n* three',
 			mode: 'AUTO',
 		} )
-			.map( getBlockInnerHTML )
+			.map( getBlockContent )
 			.join( '' );
 
 		expect( filtered ).toBe(
@@ -212,7 +212,7 @@ describe( 'Blocks raw handling', () => {
 			plainText: '# Some <em>heading</em>\n\nA paragraph.',
 			mode: 'AUTO',
 		} )
-			.map( getBlockInnerHTML )
+			.map( getBlockContent )
 			.join( '' );
 
 		expect( filtered ).toBe(
@@ -281,7 +281,7 @@ describe( 'Blocks raw handling', () => {
 			plainText: 'One\nTwo\nThree\n',
 			mode: 'AUTO',
 		} )
-			.map( getBlockInnerHTML )
+			.map( getBlockContent )
 			.join( '' );
 
 		expect( filtered ).toBe(
@@ -295,7 +295,7 @@ describe( 'Blocks raw handling', () => {
 			HTML: '<blockquote><p>chicken</p></blockquote>',
 			mode: 'AUTO',
 		} )
-			.map( getBlockInnerHTML )
+			.map( getBlockContent )
 			.join( '' );
 
 		expect( filtered ).toBe(
@@ -308,7 +308,7 @@ describe( 'Blocks raw handling', () => {
 			HTML: '<blockquote><p>chicken</p><p>ribs</p></blockquote>',
 			mode: 'AUTO',
 		} )
-			.map( getBlockInnerHTML )
+			.map( getBlockContent )
 			.join( '' );
 
 		expect( filtered ).toBe(
@@ -322,7 +322,7 @@ describe( 'Blocks raw handling', () => {
 			HTML: '<blockquote><p>chicken</p><cite>ribs</cite></blockquote>',
 			mode: 'AUTO',
 		} )
-			.map( getBlockInnerHTML )
+			.map( getBlockContent )
 			.join( '' );
 
 		expect( filtered ).toBe(
@@ -336,7 +336,7 @@ describe( 'Blocks raw handling', () => {
 			HTML: '<blockquote><cite>ribs</cite><p>ribs</p></blockquote>',
 			mode: 'AUTO',
 		} )
-			.map( getBlockInnerHTML )
+			.map( getBlockContent )
 			.join( '' );
 
 		expect( filtered ).toBe(
@@ -351,7 +351,7 @@ describe( 'Blocks raw handling', () => {
 				'<blockquote><p>chicken</p><cite>ribs</cite><p>ribs</p></blockquote>',
 			mode: 'AUTO',
 		} )
-			.map( getBlockInnerHTML )
+			.map( getBlockContent )
 			.join( '' );
 
 		expect( filtered ).toBe(
@@ -365,7 +365,7 @@ describe( 'Blocks raw handling', () => {
 			HTML: '<blockquote><cite>ribs</cite></blockquote>',
 			mode: 'AUTO',
 		} )
-			.map( getBlockInnerHTML )
+			.map( getBlockContent )
 			.join( '' );
 
 		expect( filtered ).toBe(
@@ -379,7 +379,7 @@ describe( 'Blocks raw handling', () => {
 			HTML: '<blockquote><cite>ribs</cite><cite>ribs</cite></blockquote>',
 			mode: 'AUTO',
 		} )
-			.map( getBlockInnerHTML )
+			.map( getBlockContent )
 			.join( '' );
 
 		expect( filtered ).toBe( '<p>ribsribs</p>' );
@@ -392,7 +392,7 @@ describe( 'Blocks raw handling', () => {
 				'<blockquote><p>chicken</p><cite>ribs</cite><cite>ribs</cite></blockquote>',
 			mode: 'AUTO',
 		} )
-			.map( getBlockInnerHTML )
+			.map( getBlockContent )
 			.join( '' );
 
 		expect( filtered ).toBe( '<p>chickenribsribs</p>' );
@@ -416,7 +416,7 @@ describe( 'Blocks raw handling', () => {
 			HTML: '<p>P1 P2</p>',
 			plainText: 'P1 P2\n',
 		} )
-			.map( getBlockInnerHTML )
+			.map( getBlockContent )
 			.join( '' );
 
 		expect( transformed ).toBe( '<p>1</p><p>2</p>' );

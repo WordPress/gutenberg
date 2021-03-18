@@ -269,7 +269,7 @@ _Returns_
 
 -   `Object`: All block attributes.
 
-<a name="getBlockInnerHTML" href="#getBlockInnerHTML">#</a> **getBlockInnerHTML**
+<a name="getBlockContent" href="#getBlockContent">#</a> **getBlockContent**
 
 Given a block object, returns the Block's Inner HTML markup.
 
