@@ -134,7 +134,7 @@ function getIsLoading( { isBusy, isLoading } ) {
 
 function getIcon( { icon } ) {
 	if ( typeof icon === 'string' ) {
-		// We can't deprecate this strategy because block authors depend on it
+		// We can't deprecate this strategy because block authors depend on it but the new component is ignorant of Dashicon
 		return <Dashicon icon={ icon } />;
 	}
 	return icon;
