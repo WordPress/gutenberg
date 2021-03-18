@@ -136,18 +136,12 @@ function gutenberg_reregister_core_block_types() {
 				return;
 			}
 
-			if ( is_string( $sub_block_names ) ) {
-				if ( $registry->is_registered( $sub_block_names ) ) {
-					$registry->unregister( $sub_block_names );
+			$sub_block_names_normalized = is_string( $sub_block_names ) ? array( $sub_block_names ) : $sub_block_names;
+			foreach ( $sub_block_names_normalized as $block_name ) {
+				if ( $registry->is_registered( $block_name ) ) {
+					$registry->unregister( $block_name );
 				}
-				gutenberg_register_core_block_styles( $sub_block_names );
-			} elseif ( is_array( $sub_block_names ) ) {
-				foreach ( $sub_block_names as $block_name ) {
-					if ( $registry->is_registered( $block_name ) ) {
-						$registry->unregister( $block_name );
-					}
-					gutenberg_register_core_block_styles( $block_name );
-				}
+				gutenberg_register_core_block_styles( $block_name );
 			}
 
 			require $blocks_dir . $file;
