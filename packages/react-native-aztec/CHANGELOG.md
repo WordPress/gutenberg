@@ -9,3 +9,5 @@ For each user feature we should also add a importance categorization label  to i
 [*] → Minor enhancements and fixes that address annoyances — things our users can miss.
 -->
 
+## Unreleased
+* [*] Block split/merge fix for a (never shipped) regression (Android only) [#29683]
