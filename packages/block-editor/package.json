@@ -30,6 +30,7 @@
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
 		"@wordpress/a11y": "file:../a11y",
+		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",

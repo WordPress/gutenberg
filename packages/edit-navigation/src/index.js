@@ -6,11 +6,12 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render } from '@wordpress/element';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/block-editor';
+
 /**
  * Internal dependencies
  */
 import { addFilters } from './filters';
-import fetchLinkSuggestions from './utils/fetch-link-suggestions';
 
 /**
  * Internal dependencies
