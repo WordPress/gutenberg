@@ -38,7 +38,7 @@ async function waitForInserterPatternLoad() {
 	} );
 }
 
-describe( 'adding blocks', () => {
+describe( 'Inserting blocks', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
@@ -156,6 +156,19 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Second paragraph' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert block with the slash inserter when using multiple words', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/tag cloud' );
+		await page.waitForXPath(
+			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Tag Cloud')]`
+		);
+		await page.keyboard.press( 'Enter' );
+
+		expect(
+			await page.waitForSelector( '[data-type="core/tag-cloud"]' )
+		).not.toBeNull();
 	} );
 
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/9583
