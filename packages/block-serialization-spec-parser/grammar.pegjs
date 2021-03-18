@@ -50,15 +50,15 @@
 // The `maybeJSON` function is not needed in PHP because its return semantics
 // are the same as `json_decode`
 
-if ( ! function_exists( 'peg_empty_attrs' ) ) {
-     function peg_empty_attrs() {
-         static $empty_attrs = null;
+if ( ! function_exists( 'peg_empty_attributes' ) ) {
+     function peg_empty_attributes() {
+         static $empty_attributes = null;
 
-         if ( null === $empty_attrs ) {
-             $empty_attrs = json_decode( '{}', true );
+         if ( null === $empty_attributes ) {
+             $empty_attributes = json_decode( '{}', true );
          }
 
-         return $empty_attrs;
+         return $empty_attributes;
      }
 }
 
@@ -89,8 +89,8 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
         if ( ! empty( $pre ) ) {
             $blocks[] = array(
-                'blockName' => null,
-                'attrs' => peg_empty_attrs(),
+                'name' => null,
+                'attributes' => peg_empty_attributes(),
                 'innerBlocks' => array(),
                 'innerHTML' => $pre,
                 'innerContent' => array( $pre ),
@@ -104,8 +104,8 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
             if ( ! empty( $html ) ) {
                 $blocks[] = array(
-                    'blockName' => null,
-                    'attrs' => peg_empty_attrs(),
+                    'name' => null,
+                    'attributes' => peg_empty_attributes(),
                     'innerBlocks' => array(),
                     'innerHTML' => $html,
                     'innerContent' => array( $html ),
@@ -115,8 +115,8 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
         if ( ! empty( $post ) ) {
             $blocks[] = array(
-                'blockName' => null,
-                'attrs' => peg_empty_attrs(),
+                'name' => null,
+                'attributes' => peg_empty_attributes(),
                 'innerBlocks' => array(),
                 'innerHTML' => $post,
                 'innerContent' => array( $post ),
@@ -131,8 +131,8 @@ if ( ! function_exists( 'peg_join_blocks' ) ) {
 
 function freeform( s ) {
     return s.length && {
-        blockName: null,
-        attrs: {},
+        name: null,
+        attributes: {},
         innerBlocks: [],
         innerHTML: s,
         innerContent: [ s ],
@@ -216,15 +216,15 @@ Block
   / Block_Balanced
 
 Block_Void
-  = "<!--" __ "wp:" blockName:Block_Name __ attrs:(a:Block_Attributes __ {
+  = "<!--" __ "wp:" name:Block_Name __ attributes:(a:Block_Attributes __ {
     /** <?php return $a; ?> **/
     return a;
   })? "/-->"
   {
     /** <?php
     return array(
-      'blockName'    => $blockName,
-      'attrs'        => empty( $attrs ) ? peg_empty_attrs() : $attrs,
+      'name'    => $name,
+      'attributes'        => empty( $attributes ) ? peg_empty_attributes() : $attributes,
       'innerBlocks'  => array(),
       'innerHTML'    => '',
       'innerContent' => array(),
@@ -232,8 +232,8 @@ Block_Void
     ?> **/
 
     return {
-      blockName: blockName,
-      attrs: attrs || {},
+      name: name,
+      attributes: attributes || {},
       innerBlocks: [],
       innerHTML: '',
       innerContent: []
@@ -247,8 +247,8 @@ Block_Balanced
     list( $innerHTML, $innerBlocks, $innerContent ) = peg_process_inner_content( $children );
 
     return array(
-      'blockName'    => $s['blockName'],
-      'attrs'        => empty( $s['attrs'] ) ? peg_empty_attrs() : $s['attrs'],
+      'name'    => $s['name'],
+      'attributes'        => empty( $s['attributes'] ) ? peg_empty_attributes() : $s['attributes'],
       'innerBlocks'  => $innerBlocks,
       'innerHTML'    => $innerHTML,
       'innerContent' => $innerContent,
@@ -261,8 +261,8 @@ Block_Balanced
     var innerContent = innerParts[ 2 ];
 
     return {
-      blockName: s.blockName,
-      attrs: s.attrs,
+      name: s.name,
+      attributes: s.attributes,
       innerBlocks: innerBlocks,
       innerHTML: innerHTML,
       innerContent: innerContent,
@@ -270,35 +270,35 @@ Block_Balanced
   }
 
 Block_Start
-  = "<!--" __ "wp:" blockName:Block_Name __ attrs:(a:Block_Attributes __ {
+  = "<!--" __ "wp:" name:Block_Name __ attributes:(a:Block_Attributes __ {
     /** <?php return $a; ?> **/
     return a;
   })? "-->"
   {
     /** <?php
     return array(
-      'blockName' => $blockName,
-      'attrs'     => isset( $attrs ) ? $attrs : array(),
+      'name' => $name,
+      'attributes'     => isset( $attributes ) ? $attributes : array(),
     );
     ?> **/
 
     return {
-      blockName: blockName,
-      attrs: attrs || {}
+      name: name,
+      attributes: attributes || {}
     };
   }
 
 Block_End
-  = "<!--" __ "/wp:" blockName:Block_Name __ "-->"
+  = "<!--" __ "/wp:" name:Block_Name __ "-->"
   {
     /** <?php
     return array(
-      'blockName' => $blockName,
+      'name' => $name,
     );
     ?> **/
 
     return {
-      blockName: blockName
+      name: name
     };
   }
 
@@ -321,10 +321,10 @@ Block_Name_Part
 
 Block_Attributes
   "JSON-encoded attributes embedded in a block's opening comment"
-  = attrs:$("{" (!("}" __ """/"? "-->") .)* "}")
+  = attributes:$("{" (!("}" __ """/"? "-->") .)* "}")
   {
-    /** <?php return json_decode( $attrs, true ); ?> **/
-    return maybeJSON( attrs );
+    /** <?php return json_decode( $attributes, true ); ?> **/
+    return maybeJSON( attributes );
   }
 
 __

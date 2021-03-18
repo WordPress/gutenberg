@@ -241,6 +241,7 @@ export function getCommentAttributes( blockType, attributes ) {
  *
  * @return {string} Serialized attributes.
  */
+
 export function serializeAttributes( attributes ) {
 	return (
 		JSON.stringify( attributes )
@@ -267,7 +268,7 @@ export function serializeAttributes( attributes ) {
  *
  * @return {string} HTML.
  */
-export function getBlockContent( block ) {
+export function getBlockInnerHTML( block ) {
 	// @todo why not getBlockInnerHtml?
 
 	// If block was parsed as invalid or encounters an error while generating
@@ -298,7 +299,7 @@ export function getBlockContent( block ) {
  *
  * @return {string} Comment-delimited block content.
  */
-export function getCommentDelimitedContent(
+export function getCommentDelimitedBlockInnerHTML(
 	rawBlockName,
 	attributes,
 	content
@@ -336,7 +337,7 @@ export function getCommentDelimitedContent(
  */
 export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	const blockName = block.name;
-	const saveContent = getBlockContent( block );
+	const saveContent = getBlockInnerHTML( block );
 
 	if (
 		blockName === getUnregisteredTypeHandlerName() ||
@@ -347,7 +348,7 @@ export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 
 	const blockType = getBlockType( blockName );
 	const saveAttributes = getCommentAttributes( blockType, block.attributes );
-	return getCommentDelimitedContent( blockName, saveAttributes, saveContent );
+	return getCommentDelimitedBlockInnerHTML( blockName, saveAttributes, saveContent );
 }
 
 export function __unstableSerializeAndClean( blocks ) {

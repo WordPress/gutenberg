@@ -20,7 +20,7 @@ import {
 } from './registration';
 import { createBlock } from './factory';
 import { getBlockContentValidationResult } from './validation';
-import { getCommentDelimitedContent, getSaveContent } from './serializer';
+import { getCommentDelimitedBlockInnerHTML, getSaveContent } from './serializer';
 import { attr, html, text, query, node, children, prop } from './matchers';
 import { normalizeBlockType } from './utils';
 import { DEPRECATED_ENTRY_KEYS } from './constants';
@@ -650,7 +650,7 @@ export function serializeBlockNode( blockNode, options = {} ) {
 		.trim();
 
 	return isCommentDelimited
-		? getCommentDelimitedContent( blockName, attrs, content )
+		? getCommentDelimitedBlockInnerHTML( blockName, attrs, content )
 		: content;
 }
 
