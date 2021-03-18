@@ -2,13 +2,14 @@
  * WordPress dependencies
  */
 import {
-	createNewPost,
-	insertBlock,
-	getEditedPostContent,
-	pressKeyTimes,
-	setBrowserViewport,
 	closeGlobalBlockInserter,
+	createNewPost,
+	getEditedPostContent,
+	insertBlock,
+	openGlobalBlockInserter,
+	pressKeyTimes,
 	searchForBlock,
+	setBrowserViewport,
 	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
@@ -37,7 +38,7 @@ async function waitForInserterPatternLoad() {
 	} );
 }
 
-describe( 'adding blocks', () => {
+describe( 'Inserting blocks', () => {
 	beforeEach( async () => {
 		await createNewPost();
 	} );
@@ -155,6 +156,19 @@ describe( 'adding blocks', () => {
 		await page.keyboard.type( 'Second paragraph' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should insert block with the slash inserter when using multiple words', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '/tag cloud' );
+		await page.waitForXPath(
+			`//*[contains(@class, "components-autocomplete__result") and contains(@class, "is-selected") and contains(text(), 'Tag Cloud')]`
+		);
+		await page.keyboard.press( 'Enter' );
+
+		expect(
+			await page.waitForSelector( '[data-type="core/tag-cloud"]' )
+		).not.toBeNull();
 	} );
 
 	// Check for regression of https://github.com/WordPress/gutenberg/issues/9583
@@ -372,4 +386,39 @@ describe( 'adding blocks', () => {
 		);
 		expect( isFocusInBlock ).toBe( true );
 	} );
+
+	it( 'shows block preview when hovering over block in inserter', async () => {
+		await openGlobalBlockInserter();
+		await page.focus( '.editor-block-list-item-paragraph' );
+		const preview = await page.waitForSelector(
+			'.block-editor-inserter__preview',
+			{
+				visible: true,
+			}
+		);
+		const isPreviewVisible = await preview.isIntersectingViewport();
+		expect( isPreviewVisible ).toBe( true );
+	} );
+
+	it.each( [ 'large', 'small' ] )(
+		'last-inserted block should be given and keep the focus (%s viewport)',
+		async ( viewport ) => {
+			await setBrowserViewport( viewport );
+
+			await page.type(
+				'.block-editor-default-block-appender__content',
+				'Testing inserted block focus'
+			);
+
+			await insertBlock( 'Image' );
+
+			await page.waitForSelector( 'figure[data-type="core/image"]' );
+
+			const selectedBlock = await page.evaluate( () => {
+				return wp.data.select( 'core/block-editor' ).getSelectedBlock();
+			} );
+
+			expect( selectedBlock.name ).toBe( 'core/image' );
+		}
+	);
 } );

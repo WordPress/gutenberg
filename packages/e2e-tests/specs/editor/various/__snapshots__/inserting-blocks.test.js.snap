@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`adding blocks Should insert content using the placeholder and the regular inserter 1`] = `
+exports[`Inserting blocks Should insert content using the placeholder and the regular inserter 1`] = `
 "<!-- wp:paragraph -->
 <p>Paragraph block</p>
 <!-- /wp:paragraph -->
@@ -18,7 +18,7 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks Should insert content using the placeholder and the regular inserter 2`] = `
+exports[`Inserting blocks Should insert content using the placeholder and the regular inserter 2`] = `
 "<!-- wp:paragraph -->
 <p>Paragraph block</p>
 <!-- /wp:paragraph -->
@@ -28,7 +28,7 @@ exports[`adding blocks Should insert content using the placeholder and the regul
 <!-- /wp:quote -->"
 `;
 
-exports[`adding blocks Should insert content using the placeholder and the regular inserter 3`] = `
+exports[`Inserting blocks Should insert content using the placeholder and the regular inserter 3`] = `
 "<!-- wp:paragraph -->
 <p>Paragraph block</p>
 <!-- /wp:paragraph -->
@@ -53,7 +53,7 @@ lines preserved[/myshortcode]
 <!-- /wp:shortcode -->"
 `;
 
-exports[`adding blocks inserts a block in proper place after having clicked \`Browse All\` from block appender 1`] = `
+exports[`Inserting blocks inserts a block in proper place after having clicked \`Browse All\` from block appender 1`] = `
 "<!-- wp:group -->
 <div class=\\"wp-block-group\\"><!-- wp:paragraph -->
 <p>Paragraph inside group</p>
@@ -65,7 +65,7 @@ exports[`adding blocks inserts a block in proper place after having clicked \`Br
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks inserts a block in proper place after having clicked \`Browse All\` from inline inserter 1`] = `
+exports[`Inserting blocks inserts a block in proper place after having clicked \`Browse All\` from inline inserter 1`] = `
 "<!-- wp:paragraph -->
 <p>First paragraph</p>
 <!-- /wp:paragraph -->
@@ -83,7 +83,7 @@ exports[`adding blocks inserts a block in proper place after having clicked \`Br
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks inserts a block in proper place after having clicked \`Browse All\` from inline inserter 2`] = `
+exports[`Inserting blocks inserts a block in proper place after having clicked \`Browse All\` from inline inserter 2`] = `
 "<!-- wp:paragraph -->
 <p>First paragraph</p>
 <!-- /wp:paragraph -->
@@ -105,7 +105,7 @@ exports[`adding blocks inserts a block in proper place after having clicked \`Br
 <!-- /wp:paragraph -->"
 `;
 
-exports[`adding blocks inserts blocks at root level when using the root appender while selection is in an inner block 1`] = `
+exports[`Inserting blocks inserts blocks at root level when using the root appender while selection is in an inner block 1`] = `
 "<!-- wp:buttons -->
 <div class=\\"wp-block-buttons\\"><!-- wp:button -->
 <div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link\\">1.1</a></div>
