@@ -12,7 +12,7 @@ import {
 	useInstanceId,
 	useMergeRefs,
 } from '@wordpress/compose';
-import { AsyncModeProvider, useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { closeSmall } from '@wordpress/icons';
 import { ESCAPE } from '@wordpress/keycodes';
@@ -71,15 +71,13 @@ export default function ListViewSidebar() {
 				className="edit-site-editor__list-view-panel-content"
 				ref={ useMergeRefs( [ focusReturnRef, focusOnMountRef ] ) }
 			>
-				<AsyncModeProvider value="true">
-					<BlockNavigationTree
-						blocks={ clientIdsTree }
-						selectBlock={ selectEditorBlock }
-						selectedBlockClientId={ selectedBlockClientId }
-						showNestedBlocks
-						__experimentalPersistentListViewFeatures
-					/>
-				</AsyncModeProvider>
+				<BlockNavigationTree
+					blocks={ clientIdsTree }
+					selectBlock={ selectEditorBlock }
+					selectedBlockClientId={ selectedBlockClientId }
+					showNestedBlocks
+					__experimentalPersistentListViewFeatures
+				/>
 			</div>
 		</div>
 	);
