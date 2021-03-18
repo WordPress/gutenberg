@@ -46,7 +46,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 		) {
 			newQuery.perPage = postsPerPage;
 		}
-		if ( query.inherit ) {
+		if ( query.inherit && query.perPage !== 1 ) {
 			newQuery.perPage = 1;
 		}
 		if ( !! Object.keys( newQuery ).length ) {
