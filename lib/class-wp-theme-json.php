@@ -238,53 +238,53 @@ class WP_Theme_JSON {
 	 */
 	const PROPERTIES_METADATA = array(
 		'--wp--style--color--link' => array(
-			'value'   => array( 'color', 'link' ),
+			'value' => array( 'color', 'link' ),
 		),
 		'background'               => array(
-			'value'   => array( 'color', 'gradient' ),
+			'value' => array( 'color', 'gradient' ),
 		),
 		'backgroundColor'          => array(
-			'value'   => array( 'color', 'background' ),
+			'value' => array( 'color', 'background' ),
 		),
 		'borderRadius'             => array(
-			'value'   => array( 'border', 'radius' ),
+			'value' => array( 'border', 'radius' ),
 		),
 		'borderColor'              => array(
-			'value'   => array( 'border', 'color' ),
+			'value' => array( 'border', 'color' ),
 		),
 		'borderWidth'              => array(
-			'value'   => array( 'border', 'width' ),
+			'value' => array( 'border', 'width' ),
 		),
 		'borderStyle'              => array(
-			'value'   => array( 'border', 'style' ),
+			'value' => array( 'border', 'style' ),
 		),
 		'color'                    => array(
-			'value'   => array( 'color', 'text' ),
+			'value' => array( 'color', 'text' ),
 		),
 		'fontFamily'               => array(
-			'value'   => array( 'typography', 'fontFamily' ),
+			'value' => array( 'typography', 'fontFamily' ),
 		),
 		'fontSize'                 => array(
-			'value'   => array( 'typography', 'fontSize' ),
+			'value' => array( 'typography', 'fontSize' ),
 		),
 		'fontStyle'                => array(
-			'value'   => array( 'typography', 'fontStyle' ),
+			'value' => array( 'typography', 'fontStyle' ),
 		),
 		'fontWeight'               => array(
-			'value'   => array( 'typography', 'fontWeight' ),
+			'value' => array( 'typography', 'fontWeight' ),
 		),
 		'lineHeight'               => array(
-			'value'   => array( 'typography', 'lineHeight' ),
+			'value' => array( 'typography', 'lineHeight' ),
 		),
 		'padding'                  => array(
 			'value'      => array( 'spacing', 'padding' ),
 			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
 		'textDecoration'           => array(
-			'value'   => array( 'typography', 'textDecoration' ),
+			'value' => array( 'typography', 'textDecoration' ),
 		),
 		'textTransform'            => array(
-			'value'   => array( 'typography', 'textTransform' ),
+			'value' => array( 'typography', 'textTransform' ),
 		),
 	);
 
@@ -324,7 +324,7 @@ class WP_Theme_JSON {
 					continue;
 				}
 
-				$styles_schema = self::SCHEMA['styles'];
+				$styles_schema                                 = self::SCHEMA['styles'];
 				$this->theme_json['styles'][ $block_selector ] = self::remove_keys_not_in_schema(
 					$this->theme_json['styles'][ $block_selector ],
 					$styles_schema
@@ -451,7 +451,7 @@ class WP_Theme_JSON {
 				'selector' => self::ROOT_BLOCK_SELECTOR,
 			),
 			self::ALL_BLOCKS_NAME => array(
-				'selector' => self::ALL_BLOCKS_SELECTOR
+				'selector' => self::ALL_BLOCKS_SELECTOR,
 			),
 		);
 
