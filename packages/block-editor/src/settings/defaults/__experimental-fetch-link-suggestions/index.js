@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { map, flatten } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
@@ -77,17 +72,19 @@ const fetchLinkSuggestions = async (
 	}
 
 	return Promise.all( queries ).then( ( results ) => {
-		return map(
-			flatten( results )
-				.filter( ( result ) => !! result.id )
-				.slice( 0, perPage ),
-			( result ) => ( {
+		return results
+			.reduce(
+				( accumulator, current ) => accumulator.concat( current ),
+				[]
+			)
+			.filter( ( result ) => !! result.id )
+			.slice( 0, perPage )
+			.map( ( result ) => ( {
 				id: result.id,
 				url: result.url,
 				title: decodeEntities( result.title ) || __( '(no title)' ),
 				type: result.subtype || result.type,
-			} )
-		);
+			} ) );
 	} );
 };
 
