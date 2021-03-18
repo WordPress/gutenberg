@@ -12,6 +12,11 @@ import { useFlex } from '../flex';
 import * as styles from './styles';
 
 /**
+ * @type {('onMouseDown' | 'onClick')[]}
+ */
+const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
+
+/**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'button'>} props
  */
 export function useBaseButton( props ) {
@@ -33,6 +38,7 @@ export function useBaseButton( props ) {
 		isBlock = false,
 		isControl = false,
 		isDestructive = false,
+		isFocusable = true,
 		isLoading = false,
 		isNarrow = false,
 		isRounded = false,
@@ -77,12 +83,14 @@ export function useBaseButton( props ) {
 		className
 	);
 
-	return {
+	const trulyDisabled = disabled && ! isFocusable;
+
+	const returnProps = {
 		...flexProps,
 		as,
 		href,
 		children,
-		disabled,
+		disabled: trulyDisabled,
 		elevation,
 		className: classes,
 		elevationActive,
@@ -98,4 +106,21 @@ export function useBaseButton( props ) {
 		noWrap,
 		...otherProps,
 	};
+
+	if ( disabled && isFocusable ) {
+		// In this case, the button will be disabled, but still focusable and
+		// perceivable by screen reader users.
+		returnProps[ 'aria-disabled' ] = true;
+
+		for ( const disabledEvent of disabledEventsOnDisabledButton ) {
+			returnProps[ disabledEvent ] = (
+				/** @type {import('react').MouseEvent<any>} */ event
+			) => {
+				event.stopPropagation();
+				event.preventDefault();
+			};
+		}
+	}
+
+	return returnProps;
 }

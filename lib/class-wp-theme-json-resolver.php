@@ -178,7 +178,7 @@ class WP_Theme_JSON_Resolver {
 				$key     = $preset['key'];
 				$context = $preset['context'];
 
-				$array_to_translate = gutenberg_experimental_get( $theme_json['settings'][ $setting_key ], $path, null );
+				$array_to_translate = _wp_array_get( $theme_json['settings'][ $setting_key ], $path, null );
 				if ( null === $array_to_translate ) {
 					continue;
 				}

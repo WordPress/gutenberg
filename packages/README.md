@@ -89,7 +89,6 @@ _Example:_
                 "cross-spawn": "^5.1.0",
                 "eslint": "^7.1.0",
 -               "jest": "^26.6.3",
-                "jest-puppeteer": "^4.4.0",
                 "minimist": "^1.2.0",
                 "npm-package-json-lint": "^3.6.0",
 ```

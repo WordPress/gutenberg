@@ -38,6 +38,7 @@ function BaseButton( props, forwardedRef ) {
 		hasCaret = false,
 		href,
 		icon,
+		iconPosition = 'left',
 		iconSize = 16,
 		isActive = false,
 		isDestructive = false,
@@ -52,7 +53,7 @@ function BaseButton( props, forwardedRef ) {
 	const buttonGroupState = buttonGroup || {};
 
 	const BaseComponent = buttonGroup ? ReakitRadio : View;
-	const as = asProp || ( href ? 'a' : 'button' );
+	const as = asProp || ( href && ! disabled ? 'a' : 'button' );
 
 	return (
 		// @ts-ignore No idea why TS is confused about this but ReakitRadio and View are definitely renderable
@@ -82,7 +83,7 @@ function BaseButton( props, forwardedRef ) {
 					{ pre }
 				</FlexItem>
 			) }
-			{ icon && (
+			{ icon && iconPosition === 'left' && (
 				<FlexItem
 					as="span"
 					className={ cx(
@@ -106,6 +107,18 @@ function BaseButton( props, forwardedRef ) {
 					{ ...ui.$( 'ButtonContent' ) }
 				>
 					{ children }
+				</FlexItem>
+			) }
+			{ icon && iconPosition === 'right' && (
+				<FlexItem
+					as="span"
+					className={ cx(
+						styles.PrefixSuffix,
+						isLoading && styles.loading
+					) }
+					{ ...ui.$( 'ButtonIcon' ) }
+				>
+					<Icon icon={ icon } size={ iconSize } />
 				</FlexItem>
 			) }
 			{ suffix && (

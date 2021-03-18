@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { boolean, number, select } from '@storybook/addon-knobs';
+import { boolean, number, select, text } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
@@ -32,6 +32,7 @@ export const _default = () => {
 		createSelectProps( [ 'large', 'medium', 'small', 'xSmall' ] ),
 		'medium'
 	);
+	const describedBy = text( 'describedBy', undefined );
 
 	const variant = select(
 		'variant',
@@ -59,6 +60,7 @@ export const _default = () => {
 		isSubtle,
 		size,
 		variant,
+		describedBy,
 	};
 
 	return <Button { ...props }>Button</Button>;

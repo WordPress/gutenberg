@@ -77,11 +77,11 @@ describe( 'Settings sidebar', () => {
 			expect( templateCardBeforeNavigation ).toMatchObject( {
 				title: 'Index',
 				description:
-					'The default template which is used when no other template can be found',
+					'The default template used when no other template is available. This is a required template in WordPress.',
 			} );
 			expect( templateCardAfterNavigation ).toMatchObject( {
 				title: '404',
-				description: 'Used when the queried content cannot be found',
+				description: 'Template shown when no content is found.',
 			} );
 		} );
 	} );

@@ -21,7 +21,7 @@ export const NavigationUI = styled.div`
 	background-color: ${ G2.darkGray.primary };
 	box-sizing: border-box;
 	color: #f0f0f0;
-	padding: 0 ${ space( 1 ) };
+	padding: 0 ${ space( 2 ) };
 	overflow: hidden;
 `;
 
@@ -162,7 +162,7 @@ export const ItemBaseUI = styled.li`
 	a {
 		width: 100%;
 		color: ${ G2.lightGray.ui };
-		padding: ${ space( 0.75 ) } ${ space( 2 ) };
+		padding: ${ space( 1 ) } ${ space( 2 ) }; /* 8px 16px */
 
 		&:hover,
 		&:focus:not( [aria-disabled='true'] ):active,
@@ -190,7 +190,7 @@ export const ItemUI = styled.div`
 	display: flex;
 	align-items: center;
 	height: auto;
-	min-height: 32px;
+	min-height: 40px;
 	margin: 0;
 	padding: ${ space( 0.75 ) } ${ space( 2 ) };
 	font-weight: 400;
@@ -221,5 +221,6 @@ export const ItemBadgeUI = styled.span`
 
 export const ItemTitleUI = styled( Text )`
 	${ () => ( isRTL() ? 'margin-left: auto;' : 'margin-right: auto;' ) }
-	font-size: 13px;
+	font-size: 14px;
+	line-height: 20px;
 `;

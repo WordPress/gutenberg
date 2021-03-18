@@ -15,7 +15,7 @@ import {
 /**
  * Internal dependencies
  */
-import { useLayout } from '../inner-blocks/layout';
+import { useLayout } from '../block-list/layout';
 import { store as blockEditorStore } from '../../store';
 
 const BLOCK_ALIGNMENTS_CONTROLS = {
@@ -70,11 +70,12 @@ function BlockAlignmentUI( {
 	if ( ! supportsAlignments ) {
 		return null;
 	}
-
 	const { alignments: availableAlignments = DEFAULT_CONTROLS } = layout;
 	const enabledControls = controls.filter(
 		( control ) =>
-			( wideControlsEnabled || ! WIDE_CONTROLS.includes( control ) ) &&
+			( layout.alignments || // Ignore the global wideAlignment check if the layout explicitely defines alignments.
+				wideControlsEnabled ||
+				! WIDE_CONTROLS.includes( control ) ) &&
 			availableAlignments.includes( control )
 	);
 

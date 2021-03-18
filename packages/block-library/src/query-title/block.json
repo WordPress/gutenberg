@@ -1,0 +1,72 @@
+{
+	"apiVersion": 2,
+	"name": "core/query-title",
+	"category": "design",
+	"attributes": {
+		"type": {
+			"type": "string"
+		},
+		"textAlign": {
+			"type": "string"
+		},
+		"level": {
+			"type": "number",
+			"default": 1
+		}
+	},
+	"supports": {
+		"align": [ "wide", "full" ],
+		"html": false,
+		"color": {
+			"gradients": true
+		},
+		"fontSize": true,
+		"lineHeight": true,
+		"__experimentalFontFamily": true,
+		"__experimentalSelector": {
+			"core/query-title/h1": {
+				"title": "h1",
+				"selector": "h1.wp-block-query-title",
+				"attributes": {
+					"level": 1
+				}
+			},
+			"core/query-title/h2": {
+				"title": "h2",
+				"selector": "h2.wp-block-query-title",
+				"attributes": {
+					"level": 2
+				}
+			},
+			"core/query-title/h3": {
+				"title": "h3",
+				"selector": "h3.wp-block-query-title",
+				"attributes": {
+					"level": 3
+				}
+			},
+			"core/query-title/h4": {
+				"title": "h4",
+				"selector": "h4.wp-block-query-title",
+				"attributes": {
+					"level": 4
+				}
+			},
+			"core/query-title/h5": {
+				"title": "h5",
+				"selector": "h5.wp-block-query-title",
+				"attributes": {
+					"level": 5
+				}
+			},
+			"core/query-title/h6": {
+				"title": "h6",
+				"selector": "h6.wp-block-query-title",
+				"attributes": {
+					"level": 6
+				}
+			}
+		}
+	},
+	"editorStyle": "wp-block-query-title-editor"
+}
