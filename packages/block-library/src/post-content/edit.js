@@ -2,13 +2,28 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 import {
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	__experimentalUseEditorFeature as useEditorFeature,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 
-function Content( { postType, postId } ) {
+function Content( { attributes, postType, postId } ) {
+	const themeSupportsLayout = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings()?.supportsLayout;
+	} );
+	const defaultLayout = useEditorFeature( 'layout' );
+	const { layout = {} } = attributes;
+	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const { contentSize, wideSize } = usedLayout;
+	const alignments =
+		contentSize || wideSize
+			? [ 'wide', 'full' ]
+			: [ 'left', 'center', 'right' ];
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		postType,
@@ -20,6 +35,11 @@ function Content( { postType, postId } ) {
 			value: blocks,
 			onInput,
 			onChange,
+			__experimentalLayout: {
+				type: 'default',
+				// Find a way to inject this in the support flag code (hooks).
+				alignments: themeSupportsLayout ? alignments : undefined,
+			},
 		}
 	);
 	return <div { ...props } />;
