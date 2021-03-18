@@ -18,7 +18,6 @@ import {
 	SPACE,
 	ESCAPE,
 } from '@wordpress/keycodes';
-import deprecated from '@wordpress/deprecated';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 import { useMergeRefs } from '@wordpress/compose';
 
@@ -147,8 +146,6 @@ function RichText(
 		onSelectionChange,
 		onChange,
 		unstableOnFocus: onFocus,
-		setFocusedElement,
-		instanceId,
 		clientId,
 		identifier,
 		__unstableMultilineTag: multilineTag,
@@ -963,12 +960,6 @@ function RichText(
 	 * documented, as the current requirements where it is used are subject to
 	 * future refactoring following `isSelected` handling.
 	 *
-	 * In contrast with `setFocusedElement`, this is only triggered in response
-	 * to focus within the contenteditable field, whereas `setFocusedElement`
-	 * is triggered on focus within any `RichText` descendent element.
-	 *
-	 * @see setFocusedElement
-	 *
 	 * @private
 	 */
 	function handleFocus() {
@@ -1010,13 +1001,6 @@ function RichText(
 		rafId.current = getWin().requestAnimationFrame( handleSelectionChange );
 
 		getDoc().addEventListener( 'selectionchange', handleSelectionChange );
-
-		if ( setFocusedElement ) {
-			deprecated( 'wp.blockEditor.RichText setFocusedElement prop', {
-				alternative: 'selection state from the block editor store.',
-			} );
-			setFocusedElement( instanceId );
-		}
 	}
 
 	function handleBlur() {
