@@ -266,8 +266,8 @@ class WP_Theme_JSON_Resolver {
 			'blue-orange'        => __( 'Blue and orange', 'gutenberg' ),
 		);
 		if ( ! empty( $config['global']['settings']['color']['duotone'] ) ) {
-			foreach ( $config['global']['settings']['color']['duotone'] as &$gradient ) {
-				$gradient['name'] = $default_duotone_i18n[ $gradient['slug'] ];
+			foreach ( $config['global']['settings']['color']['duotone'] as &$duotone ) {
+				$duotone['name'] = $default_duotone_i18n[ $duotone['slug'] ];
 			}
 		}
 
