@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
+	BlockToolbar,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
 import {
@@ -58,6 +59,7 @@ const interfaceLabels = {
 
 export default function Layout( { blockEditorSettings } ) {
 	const contentAreaRef = useBlockSelectionClearer();
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
 		false
 	);
@@ -91,7 +93,7 @@ export default function Layout( { blockEditorSettings } ) {
 
 	const hasMenus = !! menus?.length;
 	const isBlockEditorReady = !! ( hasMenus && navigationPost );
-	const hasPermanentSidebar = useViewportMatch( 'medium' ) && hasMenus;
+	const hasPermanentSidebar = isLargeViewport && hasMenus;
 
 	return (
 		<ErrorBoundary>
@@ -148,25 +150,35 @@ export default function Layout( { blockEditorSettings } ) {
 												! hasMenus && <EmptyState /> }
 
 											{ isBlockEditorReady && (
-												<div
-													className="edit-navigation-layout__content-area"
-													ref={ contentAreaRef }
-												>
-													<Editor
-														isPending={
-															! hasLoadedMenus
-														}
-														blocks={ blocks }
-													/>
-													<InspectorAdditions
-														menuId={
-															selectedMenuId
-														}
-														onDeleteMenu={
-															deleteMenu
-														}
-													/>
-												</div>
+												<>
+													<Popover.Slot name="block-toolbar" />
+													{ ! isLargeViewport && (
+														<div className="edit-widgets-header__block-toolbar">
+															<BlockToolbar
+																hideDragHandle
+															/>
+														</div>
+													) }
+													<div
+														className="edit-navigation-layout__content-area"
+														ref={ contentAreaRef }
+													>
+														<Editor
+															isPending={
+																! hasLoadedMenus
+															}
+															blocks={ blocks }
+														/>
+														<InspectorAdditions
+															menuId={
+																selectedMenuId
+															}
+															onDeleteMenu={
+																deleteMenu
+															}
+														/>
+													</div>
+												</>
 											) }
 										</>
 									}
