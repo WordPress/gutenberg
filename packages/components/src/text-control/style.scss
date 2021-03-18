@@ -15,3 +15,7 @@
 	width: 100%;
 	@include input-control;
 }
+
+.components-text-control__input[type="color"] {
+	padding: 0 3px;
+}
