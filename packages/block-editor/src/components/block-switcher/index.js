@@ -105,7 +105,8 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	// Pattern transformation through the `Patterns` API.
 	const onPatternTransform = ( transformedBlocks ) => {
 		// If on replaceMode (currently single Template Part block selected)
-		// we replace the InnerBlocks of the selected block. That means
+		// we replace the InnerBlocks of the selected block.
+		// TODO probably rename this variable.
 		if ( replaceMode ) {
 			replaceInnerBlocks( clientIds[ 0 ], transformedBlocks );
 		} else {
