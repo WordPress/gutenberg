@@ -15,7 +15,7 @@ function Content( { attributes, postType, postId } ) {
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings()?.supportsLayout;
-	} );
+	}, [] );
 	const defaultLayout = useEditorFeature( 'layout' );
 	const { layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
