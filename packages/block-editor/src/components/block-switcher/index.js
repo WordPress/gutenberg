@@ -34,7 +34,9 @@ import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
 
 export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { replaceBlocks, replaceInnerBlocks } = useDispatch(
+		blockEditorStore
+	);
 	const blockInformation = useBlockDisplayInformation( blocks[ 0 ].clientId );
 	const {
 		possibleBlockTransformations,
@@ -84,7 +86,8 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				icon: _icon,
 				blockTitle: getBlockType( firstBlockName ).title,
 				patterns: _patterns,
-				// Need more thought here.
+				// TODO Need more thought here. We have the same check for template
+				// part in the `__experimentalGetPatternTransformItems` selector.
 				replaceMode:
 					_isSingleBlockSelected &&
 					firstBlockName === 'core/template-part',
@@ -96,17 +99,17 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
+	// Simple block tranformation based on the `Block Transforms` API.
 	const onBlockTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
-	// TODO comments (for the above too).
+	// Pattern transformation through the `Patterns` API.
 	const onPatternTransform = ( transformedBlocks ) => {
 		// If on replaceMode (currently single Template Part block selected)
-		// we probably have to create a new Template part.
-		// This is not implemented yet!!
-		if ( ! replaceMode ) {
-			replaceBlocks( clientIds, transformedBlocks );
+		// we replace the InnerBlocks of the selected block. That means
+		if ( replaceMode ) {
+			replaceInnerBlocks( clientIds[ 0 ], transformedBlocks );
 		} else {
-			// Handle Template Parts change/creation flow.
+			replaceBlocks( clientIds, transformedBlocks );
 		}
 	};
 	const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;

@@ -1,15 +1,11 @@
 /**
- * External dependencies
- */
-import { cloneDeep } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { chevronRight } from '@wordpress/icons';
+import { cloneBlock } from '@wordpress/blocks';
 import {
 	MenuGroup,
 	MenuItem,
@@ -80,23 +76,26 @@ function PatternTransformationsMenu( {
 		if ( replaceMode ) {
 			_patterns = statePatterns.map( ( statePattern ) => ( {
 				...statePattern,
-				// TODO check `cloneBlock` better and why was producing wrong results.
-				transformedBlocks: cloneDeep( statePattern.contentBlocks ), //  statePattern.contentBlocks.map( cloneBlock ),
+				transformedBlocks: statePattern.contentBlocks.map( ( block ) =>
+					cloneBlock( block )
+				),
 			} ) );
 		} else {
 			_patterns = statePatterns.reduce( ( accumulator, statePattern ) => {
-				// Clone deep the parsed pattern's block in `transformedBlocks`
+				// Clone the parsed pattern's block in `transformedBlocks`
 				// to mutate this prop.
 				const pattern = {
 					...statePattern,
-					transformedBlocks: cloneDeep( statePattern.contentBlocks ),
+					transformedBlocks: statePattern.contentBlocks.map(
+						( block ) => cloneBlock( block )
+					),
 				};
 				const { transformedBlocks: patternBlocks } = pattern;
 				const transformedBlocksSet = new Set();
 				blocks.forEach( ( block ) => {
 					// Recurse through every pattern block
 					// to find matches with each selected block,
-					// and transform these blocks (mutate).
+					// and transform these blocks (we mutate patternBlocks).
 					patternBlocks.forEach( ( patternBlock ) => {
 						const match = findMatchingBlockInPattern(
 							patternBlock,
@@ -109,11 +108,10 @@ function PatternTransformationsMenu( {
 							...match.attributes,
 							...block.attributes,
 						};
-						// TODO check innerBlocks handling :) - not sure yet.
-						// match.innerBlocks = [
-						// 	...match.innerBlocks,
-						// 	...block.innerBlocks,
-						// ];
+						// When we have a match with inner blocks keep only the
+						// blocks from the selected block and skip the inner blocks
+						// from the pattern.
+						match.innerBlocks = block.innerBlocks;
 					} );
 				} );
 				// If we haven't matched all the selected blocks, don't add
@@ -121,7 +119,7 @@ function PatternTransformationsMenu( {
 				if ( blocks.length !== transformedBlocksSet.size ) {
 					return accumulator;
 				}
-				// Maybe prioritize first matches with fewer tries to find a match?
+				// TODO Maybe prioritize first matches with fewer tries to find a match?
 				accumulator.push( pattern );
 				return accumulator;
 			}, [] );
@@ -130,6 +128,7 @@ function PatternTransformationsMenu( {
 	}, [ replaceMode, statePatterns ] );
 
 	if ( ! patterns.length ) return null;
+
 	return (
 		<MenuGroup className="block-editor-block-switcher__pattern__transforms__menugroup">
 			{ showTransforms && (

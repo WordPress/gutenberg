@@ -1855,22 +1855,31 @@ export const __experimentalGetAllowedPatterns = createSelector(
  * @param {Object} state Editor state.
  * @param {string} scope Block pattern scope.
  * @param {string} blockName Block's name.
+ * @param {?string} rootClientId Optional target root client ID.
  *
  * @return {Array} The list of matched block patterns based on provided scope and block name.
  */
 export const __experimentalGetScopedBlockPatterns = createSelector(
-	( state, scope, blockName ) => {
+	( state, scope, blockName, rootClientId ) => {
 		if ( ! scope && ! blockName ) return EMPTY_ARRAY;
-		const patterns = __experimentalGetAllowedPatterns( state );
+		const patterns = __experimentalGetAllowedPatterns(
+			state,
+			rootClientId
+		);
 		return patterns.filter( ( pattern ) =>
 			pattern.scope?.[ scope ]?.includes?.( blockName )
 		);
 	},
+	// TODO check deps.
 	( state ) => [ state.settings.__experimentalBlockPatterns ]
 );
 
 /**
  * Determines the items that appear in the available pattern transforms list.
+ * 1. fetch scoped ('transform')
+ * 2. check if pattern is allowed based on rootClientId
+ * 3. prioritize them (?) - not implemented yet.
+ *  		- Most matching blocks
  *
  * @param {Object}  state Editor state.
  * @param {Object[]} blocks The selected blocks.
@@ -1883,30 +1892,41 @@ export const __experimentalGetScopedBlockPatterns = createSelector(
 export const __experimentalGetPatternTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
 		if ( ! blocks ) return EMPTY_ARRAY;
-		// 1. fetch scoped ('transform')
-		// 2. check if pattern is allowed based on rootClientId
-		// 3. prioritize them (?) - not implemented yet.
-		// 		- Most matching blocks
+		// Create a Set of the selected block names that is used in patterns filtering.
+		const selectedBlockNames = blocks.reduce( ( accumulator, block ) => {
+			accumulator.add( block.name );
+			return accumulator;
+		}, new Set() );
 
 		// If a selected block is nested (with InnerBlocks like Group or Columns)
-		// return nothing, as it doesn't make sense to try to be too smart.
-		// In a Group/Column a user could have anything inside as content
-		// so don't show any transforms.
-		// In these blocks it only makes sense to show `block` scoped patterns,
-		// during insertion that no content exists.
+		// return an EMPTY_ARRAY, as it doesn't make sense to try to be too smart.
+		// In such blocks a user could have anything inside as content so don't show
+		// any transforms. In these blocks it only makes sense to show `block` scoped patterns
+		// during insertion, where no content exists yet.
+		const blocksToSkip = [ 'core/group', 'core/columns' ];
+		if (
+			blocksToSkip.some( ( blockName ) =>
+				selectedBlockNames.has( blockName )
+			)
+		) {
+			return EMPTY_ARRAY;
+		}
 
-		// An exception could be Template Parts that IMO makes sense to replace everything
-		// and maybe try to be a bit smart about it with some InnerBlocks transforms (?).
+		// An exception to the above is when we have a single `Template Part`
+		// selected, that makes sense to replace everything.
+		// TODO maybe try to be a bit smart about it with some InnerBlocks transforms (?).
 		const isSingleBlockSelected = blocks.length === 1;
-		const nestedSinglesToHandle = [ 'core/template-part' ];
+		// TODO do we need to handle other blocks like this??
+		const nestedSingleBlocksToHandle = [ 'core/template-part' ];
 		if (
 			isSingleBlockSelected &&
-			nestedSinglesToHandle.includes( blocks[ 0 ].name )
+			nestedSingleBlocksToHandle.includes( blocks[ 0 ].name )
 		) {
-			// Try to find an active block variation for `template-parts`,
-			// to show patterns with `scope` `core/template-part/{variation name}.
 			const [ selectedBlock ] = blocks;
 			let { name: blockName } = selectedBlock;
+			// Try to find an active block variation for `Template Part`,
+			// to show patterns with `scope` including the block variation
+			// name (ex. `core/template-part/{variation name}).
 			const variations = getBlockVariations( blockName );
 			if ( variations?.length ) {
 				const match = variations.find( ( variation ) =>
@@ -1919,46 +1939,23 @@ export const __experimentalGetPatternTransformItems = createSelector(
 					blockName = `${ blockName }/${ match.name }`;
 				}
 			}
-			// TODO Need to consolidate `__experimentalGetScopedBlockPatterns` with
-			// `__experimentalGetAllowedPatterns` that return the pattern's blocks parsed.
 			return __experimentalGetScopedBlockPatterns(
 				state,
 				'transform',
 				blockName
 			);
 		}
-		const selectedBlockNames = blocks.reduce( ( accumulator, block ) => {
-			accumulator.add( block.name );
-			return accumulator;
-		}, new Set() );
-		// TODO maybe skip blocks with InnerBlocks and have a whiteList and maybe a filter
-		// for that list?? We could check if the block has InnerBlocks.
-		// We have to be carefull with BlockSwitcher that uses the selector that
-		// doesn't fill the `controlled` InnerBlocks like Template Parts.
-		const blocksToSkip = [ 'core/group', 'core/columns' ];
 
-		// If we have a selected block that we don't want to handle (`blocksToSkip`)
-		// return nothing.
-		if (
-			blocksToSkip.some( ( blockToSkip ) =>
-				selectedBlockNames.has( blockToSkip )
-			)
-		) {
-			return EMPTY_ARRAY;
-		}
-
-		// Fetched patterns from `__experimentalGetAllowedPatterns`
-		// have parsed blocks in `contentBlocks` prop.
-		const allowedPatterns = __experimentalGetAllowedPatterns(
-			state,
-			rootClientId
-		);
 		// Here we will return first set of possible eligible
 		// block patterns, by checking the `scope` prop.
 		// We still have to recurse through block pattern's blocks
 		// and try to find matches from the selected blocks.
 		// Now this happens in the consumer to avoid heavy operations
 		// in the selector.
+		const allowedPatterns = __experimentalGetAllowedPatterns(
+			state,
+			rootClientId
+		);
 		return allowedPatterns.filter( ( pattern ) =>
 			pattern.scope?.transform?.some?.( ( blockName ) =>
 				selectedBlockNames.has( blockName )
@@ -1966,6 +1963,7 @@ export const __experimentalGetPatternTransformItems = createSelector(
 		);
 	},
 	// TODO check deps
+	// we need this updated when a template-part area is changed.
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId,
