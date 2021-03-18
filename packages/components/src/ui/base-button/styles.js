@@ -61,6 +61,11 @@ export const Button = css`
 	svg {
 		display: block;
 	}
+
+	&[data-active='true'] {
+		background: ${ ui.get( 'colorText' ) };
+		color: ${ ui.get( 'colorTextInverted' ) };
+	}
 `;
 
 export const destructive = css`
