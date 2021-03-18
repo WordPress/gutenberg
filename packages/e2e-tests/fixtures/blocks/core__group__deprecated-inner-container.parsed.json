@@ -10,28 +10,28 @@
                 "blockName": "core/paragraph",
                 "attrs": {},
                 "innerBlocks": [],
-                "innerHTML": "\n<p>This is a group block.</p>\n",
+                "innerHTML": "\n\t\t<p>This is a group block.</p>\n\t\t",
                 "innerContent": [
-                    "\n<p>This is a group block.</p>\n"
+                    "\n\t\t<p>This is a group block.</p>\n\t\t"
                 ]
             },
             {
                 "blockName": "core/paragraph",
                 "attrs": {},
                 "innerBlocks": [],
-                "innerHTML": "\n<p>Group block content.</p>\n",
+                "innerHTML": "\n\t\t<p>Group block content.</p>\n\t\t",
                 "innerContent": [
-                    "\n<p>Group block content.</p>\n"
+                    "\n\t\t<p>Group block content.</p>\n\t\t"
                 ]
             }
         ],
-        "innerHTML": "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\n</div>\n",
+        "innerHTML": "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t\n\n\t\t\n\t</div>\n</div>\n",
         "innerContent": [
-            "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">",
+            "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\t<div class=\"wp-block-group__inner-container\">\n\t\t",
             null,
-            "\n\n",
+            "\n\n\t\t",
             null,
-            "</div>\n"
+            "\n\t</div>\n</div>\n"
         ]
     },
     {

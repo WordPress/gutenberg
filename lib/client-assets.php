@@ -696,6 +696,10 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_wit
  */
 function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings ) {
 	$settings['isFSETheme'] = gutenberg_is_fse_theme();
+
+	// Enable the new layout options for themes with a theme.json file.
+	$settings['supportsLayout'] = WP_Theme_JSON_Resolver::theme_has_support();
+
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
