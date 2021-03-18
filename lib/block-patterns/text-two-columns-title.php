@@ -9,8 +9,8 @@ return array(
 	'title'       => __( 'Two columns text and title' ),
 	'categories'  => array( 'art' ),
 	'content'     => '<!-- wp:group {"align":"full","style":{"color":{"background":"#f2f0e9"}}} -->
-	<div class="wp-block-group alignfull"><div class="wp-block-group__inner-container"><!-- wp:columns {"align":"full","style":{"color":{"background":"#f2f0e9"}}} -->
-	<div class="wp-block-columns alignfull has-background" style="background-color:#f2f0e9"><!-- wp:column {"width":"60%"} -->
+	<div class="wp-block-group alignfull has-background" style="background-color:#f2f0e9"><!-- wp:columns {"align":"full"} -->
+	<div class="wp-block-columns alignfull"><!-- wp:column {"width":"60%"} -->
 	<div class="wp-block-column" style="flex-basis:60%"><!-- wp:spacer {"height":70} -->
 	<div style="height:70px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer -->
@@ -29,8 +29,10 @@ return array(
 	<hr class="wp-block-separator has-text-color has-background has-black-background-color has-black-color is-style-wide"/>
 	<!-- /wp:separator --></div>
 	<!-- /wp:column --></div>
-	<!-- /wp:columns --></div></div><!-- wp:columns {"align":"full","style":{"color":{"background":"#f2f0e9"}}} -->
-	<div class="wp-block-columns alignfull has-background" style="background-color:#f2f0e9"><!-- wp:column -->
+	<!-- /wp:columns -->
+	
+	<!-- wp:columns {"align":"full"} -->
+	<div class="wp-block-columns alignfull"><!-- wp:column -->
 	<div class="wp-block-column"><!-- wp:spacer {"height":350} -->
 	<div style="height:350px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer --></div>
@@ -47,7 +49,7 @@ return array(
 	<p class="has-black-color has-text-color has-extra-small-font-size">'. __("No darkness would ever settle upon those lamps, as no darkness had settled upon them for hundreds of years. It seemed dreadful that the town should blaze for ever in the same spot; dreadful at least to people going away to adventure upon the sea, and beholding it as a circumscribed mound, eternally burnt, eternally scarred. From the deck of the ship the great city appeared a crouched and cowardly figure, a sedentary miser.") .'</p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column --></div>
-	<!-- /wp:columns -->
+	<!-- /wp:columns --></div>
 	<!-- /wp:group -->',
 	'description' => _x( 'Two columns text and title', 'Block pattern description' ),
 );
