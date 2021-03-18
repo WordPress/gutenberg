@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 10.2.1 =
+
+### Bug Fixes
+
+- Button: Restore gradients support. ([29980](https://github.com/WordPress/gutenberg/pull/29980))
+
+
 = 10.2.0 =
 
 ### Features
