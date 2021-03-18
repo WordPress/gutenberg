@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TextInput, Text, Linking } from 'react-native';
+import { TextInput } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 /**
@@ -10,7 +10,11 @@ import { useNavigation } from '@react-navigation/native';
 import { useState } from '@wordpress/element';
 import { Icon, chevronRight } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { BottomSheet, PanelBody } from '@wordpress/components';
+import {
+	BottomSheet,
+	PanelBody,
+	SmallFooterMessageControl,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -24,8 +28,6 @@ const BottomSheetTextControl = ( {
 	label,
 	icon,
 	footerNote,
-	footerNoteLink,
-	footerNoteLinkText,
 } ) => {
 	const [ showSubSheet, setShowSubSheet ] = useState( false );
 	const navigation = useNavigation();
@@ -50,11 +52,6 @@ const BottomSheetTextControl = ( {
 	const textEditorStyle = usePreferredColorSchemeStyle(
 		styles.textEditor,
 		styles.textEditorDark
-	);
-
-	const textLinkStyle = usePreferredColorSchemeStyle(
-		styles.textLink,
-		styles.textLinkDark
 	);
 
 	return (
@@ -90,17 +87,13 @@ const BottomSheetTextControl = ( {
 						textAlignVertical={ 'top' }
 					/>
 				</PanelBody>
-
-				<Text style={ styles.textFootnote }>
-					{ footerNote }
-					<Text
-						style={ textLinkStyle }
-						onPress={ () => Linking.openURL( footerNoteLink ) }
-					>
-						{ footerNoteLinkText }
-					</Text>
-				</Text>
 			</>
+
+			<PanelBody style={ styles.textFooternote }>
+				<SmallFooterMessageControl
+					value={ footerNote }
+				></SmallFooterMessageControl>
+			</PanelBody>
 		</BottomSheet.SubSheet>
 	);
 };

@@ -25,6 +25,7 @@ import {
 	WIDE_ALIGNMENTS,
 	LinkSettingsNavigation,
 	BottomSheetTextControl,
+	SmallFooterMessageControlLink,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -404,13 +405,19 @@ export class ImageEdit extends Component {
 				placeholder={ __( 'Add alt text' ) }
 				label={ __( 'Alt Text' ) }
 				icon={ textColor }
-				footerNote={ __(
-					'Describe the purpose of the image. Leave empty if the image is purely decorative. '
-				) }
-				footerNoteLink={
-					'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+				footerNote={
+					<>
+						{ __(
+							'Describe the purpose of the image. Leave empty if the image is purely decorative. '
+						) }
+						<SmallFooterMessageControlLink
+							href={
+								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+							}
+							value={ __( 'What is alt text?' ) }
+						/>
+					</>
 				}
-				footerNoteLinkText={ __( 'What is alt text?' ) }
 			/>
 		);
 	}

@@ -77,6 +77,8 @@ export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
 export { default as FocalPointSettings } from './mobile/focal-point-settings';
 export { default as BottomSheetTextControl } from './mobile/bottom-sheet-text-control';
+export { default as SmallFooterMessageControl } from './mobile/bottom-sheet/small-footer-message-control';
+export { default as SmallFooterMessageControlLink } from './mobile/bottom-sheet/small-footer-message-control-link';
 export { LinkPicker } from './mobile/link-picker';
 export { default as LinkPickerScreen } from './mobile/link-picker/link-picker-screen';
 export { default as LinkSettings } from './mobile/link-settings';

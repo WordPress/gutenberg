@@ -154,6 +154,23 @@
 	flex: 1;
 }
 
+// Small Footer Message Cell
+
+.smallFooterMessageControl {
+	font-size: 12px;
+	color: $gray-text-min;
+}
+
+// Small Footer Message Cell Link
+
+.smallFooterMessageControlLink {
+	color: $blue-50;
+}
+
+.smallFooterMessageControlLinkDark {
+	color: $blue-30;
+}
+
 // Color Cell
 
 .colorCircle {

@@ -1,14 +1,17 @@
 # BottomSheetTextControl
 
-`BottomSheetTextControl` allows users to enter and edit text, similar to [`TextControl`](/packages/components/src/text-control/README.md).  
+`BottomSheetTextControl` allows users to enter and edit text, similar to [`TextControl`](/packages/components/src/text-control/README.md).
 
 `BottomSheetTextControl`'s main difference from `TextControl` is that it utilizes [`BottomSheetSubSheet`](/packages/components/src/mobile/bottom-sheet/sub-sheet/README.md). A user will tap to open a subsheet where they can enter their text into an editor. This is useful for cases where a larger text area is warranted for user input.
 
 ### Usage
 
 ```jsx
-    // This is a paraphrased example from the image block's edit.native.js file
-import { BottomSheetSelectControl } from '@wordpress/components';
+// This is a paraphrased example from the image block's edit.native.js file
+import {
+	BottomSheetSelectControl,
+	SmallFooterMessageControlLink,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 const MyTextControl = () => {
@@ -28,11 +31,15 @@ const MyTextControl = () => {
 				placeholder={ __( 'Generic placeholder text' ) }
 				label={ __( 'Generic label' ) }
 				icon={ textColor }
-				footerNote={ __(
-					'A small informative note in the footer area. '
-				) }
-				footerNoteLink={ 'https://wordpress.org' }
-				footerNoteLinkText={ __( 'Visit WordPress.org.' ) }
+				footerNote={
+					<>
+						{ __( 'A footer note to add to the component! ' ) }
+						<SmallFooterMessageControlLink
+							href={ 'https://wordpress.org/' }
+							value={ __( 'Visit WordPress.org' ) }
+						/>
+					</>
+				}
 			/>
 		</PanelBody>
 	);
@@ -79,20 +86,6 @@ The icon to display alongside the control.
 #### footerNote
 
 An optional note to display in the component's footer area.
-
--   Type: `String`
--   Required: No
-
-#### footerNoteLink
-
-A URL to add to the end of the footer note. If used, then the footerNoteLinkText prop will also be necessary.
-
--   Type: `String`
--   Required: No
-
-#### footerNoteLinkText
-
-Used in conjunction with the footerNoteLinkText to display a link at the end of the footer note.
 
 -   Type: `String`
 -   Required: No
