@@ -70,6 +70,9 @@ class DatePicker extends Component {
 		};
 
 		onChange( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );
+
+		// Keep focus on the date picker.
+		this.keepFocusInside();
 	}
 
 	/**

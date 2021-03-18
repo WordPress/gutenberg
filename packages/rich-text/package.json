@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "3.24.7",
+	"version": "3.25.0",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -29,7 +29,6 @@
 		"@babel/runtime": "^7.12.5",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",

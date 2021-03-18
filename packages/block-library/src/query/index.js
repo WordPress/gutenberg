@@ -23,5 +23,3 @@ export const settings = {
 	save,
 	variations,
 };
-
-export { useQueryContext } from './edit';

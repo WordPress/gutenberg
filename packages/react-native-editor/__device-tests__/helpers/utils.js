@@ -28,6 +28,7 @@ const defaultAndroidAppPath =
 	'./android/app/build/outputs/apk/debug/app-debug.apk';
 const defaultIOSAppPath =
 	'./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app';
+const webDriverAgentPath = process.env.WDA_PATH || './ios/build/WDA';
 
 const localAndroidAppPath =
 	process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
@@ -140,6 +141,7 @@ const setupDriver = async () => {
 			}
 
 			desiredCaps.app = path.resolve( localIOSAppPath );
+			desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 		}
 	}
 
