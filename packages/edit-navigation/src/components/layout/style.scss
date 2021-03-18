@@ -65,12 +65,25 @@
 }
 
 .edit-navigation-layout__block-toolbar {
-	background: $white;
-	border: $border-width solid $gray-900;
-	border-radius: $radius-block-ui;
-	height: 47px;
-	width: $navigation-editor-width;
-	margin: auto;
+	.block-editor-block-toolbar {
+		background: $white;
+		border: $border-width solid $gray-900;
+		border-radius: $radius-block-ui;
+		max-width: $navigation-editor-width;
+		margin: auto;
+	}
+
+	.components-toolbar,
+	.components-toolbar-group {
+		border-right-color: $gray-900;
+
+		.components-toolbar,
+		.components-toolbar-group {
+			border-width: 0;
+		}
+	}
+
+	height: $block-toolbar-height;
 }
 
 .edit-navigation-empty-state {
