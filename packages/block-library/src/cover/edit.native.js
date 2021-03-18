@@ -246,7 +246,7 @@ const Cover = ( {
 				customOverlayColor ||
 				overlayColor?.color ||
 				style?.color?.background ||
-				styles.overlay.color,
+				styles.overlay?.color,
 		},
 		// While we don't support theme colors we add a default bg color
 		! overlayColor.color && ! url ? backgroundColor : {},
@@ -400,7 +400,7 @@ const Cover = ( {
 							onSelectMediaUploadOption={ onSelectMedia }
 							openMediaOptions={ openMediaOptionsRef.current }
 							url={ url }
-							width={ styles.image.width }
+							width={ styles.image?.width }
 						/>
 					</View>
 				) }
@@ -430,7 +430,9 @@ const Cover = ( {
 			<View>
 				{ isCustomColorPickerShowing && colorPickerControls }
 				<MediaPlaceholder
-					height={ styles.mediaPlaceholderEmptyStateContainer.height }
+					height={
+						styles.mediaPlaceholderEmptyStateContainer?.height
+					}
 					backgroundColor={ customOverlayColor }
 					hideContent={
 						customOverlayColor !== '' &&

@@ -38,6 +38,8 @@ class BottomSheetCell extends Component {
 		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind(
 			this
 		);
+
+		this.isCurrent = false;
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -47,6 +49,7 @@ class BottomSheetCell extends Component {
 	}
 
 	componentDidMount() {
+		this.isCurrent = true;
 		AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
 			this.handleScreenReaderToggled
@@ -54,12 +57,15 @@ class BottomSheetCell extends Component {
 
 		AccessibilityInfo.isScreenReaderEnabled().then(
 			( isScreenReaderEnabled ) => {
-				this.setState( { isScreenReaderEnabled } );
+				if ( this.isCurrent ) {
+					this.setState( { isScreenReaderEnabled } );
+				}
 			}
 		);
 	}
 
 	componentWillUnmount() {
+		this.isCurrent = false;
 		AccessibilityInfo.removeEventListener(
 			'screenReaderChanged',
 			this.handleScreenReaderToggled

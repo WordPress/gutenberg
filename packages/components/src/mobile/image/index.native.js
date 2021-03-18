@@ -54,8 +54,12 @@ const ImageComponent = ( {
 	const [ containerSize, setContainerSize ] = useState( null );
 
 	useEffect( () => {
+		let isCurrent = true;
 		if ( url ) {
 			Image.getSize( url, ( imgWidth, imgHeight ) => {
+				if ( ! isCurrent ) {
+					return;
+				}
 				const metaData = {
 					aspectRatio: imgWidth / imgHeight,
 					width: imgWidth,
@@ -67,6 +71,7 @@ const ImageComponent = ( {
 				}
 			} );
 		}
+		return () => ( isCurrent = false );
 	}, [ url ] );
 
 	const onContainerLayout = ( event ) => {

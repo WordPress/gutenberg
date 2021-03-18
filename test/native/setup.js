@@ -14,7 +14,9 @@ jest.mock( '@wordpress/element', () => {
 jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
+		mediaUploadSync: jest.fn(),
 		removeEventListener: jest.fn(),
+		requestFocalPointPickerTooltipShown: jest.fn( () => true ),
 		subscribeParentGetHtml: jest.fn(),
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),
@@ -52,7 +54,9 @@ jest.mock( 'react-native-dark-mode', () => {
 	};
 } );
 
-jest.mock( 'react-native-modal', () => () => 'Modal' );
+jest.mock( 'react-native-modal', () => ( { children, isVisible } ) =>
+	isVisible ? children : null
+);
 
 jest.mock( 'react-native-hr', () => () => 'Hr' );
 
@@ -132,6 +136,10 @@ jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );
 // a React ref instead. We could then remove this internal mock.
 jest.mock( 'react-native/Libraries/Components/TextInput/TextInputState' );
 
+// Mock React Native native module
+jest.mock( 'react-native/Libraries/LayoutAnimation/LayoutAnimation' );
+
+// Mock React Native native module
 jest.doMock(
 	'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo',
 	() => {
