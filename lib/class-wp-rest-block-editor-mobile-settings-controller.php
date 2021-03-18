@@ -7,7 +7,7 @@
  */
 
 /**
- * Core class used to retrieve block editor settings via the REST API.
+ * Core class used to retrieve mobile block editor settings via the REST API.
  *
  * @see WP_REST_Controller
  */
@@ -33,6 +33,7 @@ class WP_REST_Block_Editor_Mobile_Settings_Controller extends WP_REST_Controller
 					'callback'            => array( $this, 'get_items' ),
 					'permission_callback' => array( $this, 'get_items_permissions_check' ),
 				),
+				'schema' => array( $this, 'get_public_item_schema' ),
 			)
 		);
 	}
@@ -40,7 +41,7 @@ class WP_REST_Block_Editor_Mobile_Settings_Controller extends WP_REST_Controller
 	/**
 	 * Checks whether a given request has permission to read block editor settings
 	 *
-	 * @since 5.6.0
+	 * @since 5.8.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
@@ -58,7 +59,7 @@ class WP_REST_Block_Editor_Mobile_Settings_Controller extends WP_REST_Controller
 	/**
 	 * Return all block editor settings
 	 *
-	 * @since 5.6.0
+	 * @since 5.8.0
 	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 *
@@ -68,5 +69,57 @@ class WP_REST_Block_Editor_Mobile_Settings_Controller extends WP_REST_Controller
 		$settings = apply_filters( 'block_editor_settings_mobile', array() );
 
 		return rest_ensure_response( $settings );
+	}
+
+	/**
+	 * Retrieves the pattern's schema, conforming to JSON Schema.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @return array Item schema data.
+	 */
+	public function get_item_schema() {
+		if ( $this->schema ) {
+			return $this->add_additional_fields_schema( $this->schema );
+		}
+
+		$this->schema = array(
+			'$schema'    => 'http://json-schema.org/draft-04/schema#',
+			'title'      => 'block_editor_settings_mobile-item',
+			'type'       => 'object',
+			'properties' => array(
+				'colors'                   => array(
+					'description' => __( 'Active theme colors.', 'gutenberg' ),
+					'type'        => 'array',
+					'context'     => array( 'view' ),
+				),
+
+				'gradients'                => array(
+					'description' => __( 'Active theme gradients.', 'gutenberg' ),
+					'type'        => 'array',
+					'context'     => array( 'view' ),
+				),
+
+				'globalStyles'             => array(
+					'description' => __( 'Theme support for global styles.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+				),
+
+				'globalStylesUserEntityId' => array(
+					'description' => __( 'User entity id for Global styles settings.', 'gutenberg' ),
+					'type'        => 'integer',
+					'context'     => array( 'view' ),
+				),
+
+				'globalStylesBaseStyles'   => array(
+					'description' => __( 'Global styles settings.', 'gutenberg' ),
+					'type'        => 'object',
+					'context'     => array( 'view' ),
+				),
+			),
+		);
+
+		return $this->add_additional_fields_schema( $this->schema );
 	}
 }

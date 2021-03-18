@@ -267,15 +267,16 @@ function gutenberg_global_styles_settings_mobile( $settings ) {
 		$settings['gradients'] = $gradient_presets;
 	}
 
+	$settings['globalStyles'] = WP_Theme_JSON_Resolver::theme_has_support();
+
 	if (
 		WP_Theme_JSON_Resolver::theme_has_support() &&
 		gutenberg_is_fse_theme()
 		) {
 		$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
-		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
-		$base_styles = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
+		$user_cpt_id        = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
+		$base_styles        = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
 
-		$settings['globalStyles']             = WP_Theme_JSON_Resolver::theme_has_support();
 		$settings['globalStylesUserEntityId'] = $user_cpt_id;
 		$settings['globalStylesBaseStyles']   = $base_styles;
 	}
