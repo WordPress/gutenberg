@@ -159,7 +159,9 @@ describe( 'cpt locking', () => {
 
 		it( 'should allow blocks to be inserted', async () => {
 			expect(
-				await page.$( '.edit-post-header [aria-label="Toggle block inserter"]' )
+				await page.$(
+					'.edit-post-header [aria-label="Toggle block inserter"]'
+				)
 			).not.toBeNull();
 			await insertBlock( 'List' );
 			await page.keyboard.type( 'List content' );
