@@ -38,14 +38,13 @@ import {
 	LINK_DESTINATION_MEDIA,
 	LINK_DESTINATION_NONE,
 	ALLOWED_MEDIA_TYPES,
-	DEFAULT_SIZE_SLUG,
 } from './constants';
 
-export const pickRelevantMediaFiles = ( image ) => {
+export const pickRelevantMediaFiles = ( image, size ) => {
 	const imageProps = pick( image, [ 'alt', 'id', 'link', 'caption' ] );
 	imageProps.url =
-		get( image, [ 'sizes', 'large', 'url' ] ) ||
-		get( image, [ 'media_details', 'sizes', 'large', 'source_url' ] ) ||
+		get( image, [ 'sizes', size, 'url' ] ) ||
+		get( image, [ 'media_details', 'sizes', size, 'source_url' ] ) ||
 		image.url;
 	return imageProps;
 };
@@ -104,9 +103,9 @@ export function ImageEdit( {
 	}, [ caption ] );
 
 	const ref = useRef();
-	const mediaUpload = useSelect( ( select ) => {
+	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
-		return getSettings().mediaUpload;
+		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
 	} );
 
 	function onUploadError( message ) {
@@ -126,7 +125,7 @@ export function ImageEdit( {
 			return;
 		}
 
-		let mediaAttributes = pickRelevantMediaFiles( media );
+		let mediaAttributes = pickRelevantMediaFiles( media, imageDefaultSize );
 
 		// If the current image is temporary but an alt text was meanwhile
 		// written by the user, make sure the text is not overwritten.
@@ -148,7 +147,7 @@ export function ImageEdit( {
 			additionalAttributes = {
 				width: undefined,
 				height: undefined,
-				sizeSlug: DEFAULT_SIZE_SLUG,
+				sizeSlug: imageDefaultSize,
 			};
 		} else {
 			// Keep the same url when selecting the same file, so "Image Size"
@@ -209,7 +208,7 @@ export function ImageEdit( {
 				id: undefined,
 				width: undefined,
 				height: undefined,
-				sizeSlug: DEFAULT_SIZE_SLUG,
+				sizeSlug: imageDefaultSize,
 			} );
 		}
 	}

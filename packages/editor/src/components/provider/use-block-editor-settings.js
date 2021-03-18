@@ -175,6 +175,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'gradients',
 				'hasFixedToolbar',
 				'hasReducedUI',
+				'imageDefaultSize',
 				'imageDimensions',
 				'imageEditing',
 				'imageSizes',
