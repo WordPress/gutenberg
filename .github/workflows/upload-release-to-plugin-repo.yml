@@ -61,6 +61,9 @@ jobs:
           cat <<- "EOF" >> new_changelog.txt
           ${{ github.event.release.body }}
           EOF
+          # Normalize empty lines: Trim them from beginning and end of file...
+          awk 'NF {p=1} p' <<< "$(< new_changelog.txt)" > new_changelog.txt
+          # ...then add two empty lines at the end.
           printf '\n\n' >> new_changelog.txt
           tail -n +"${AFTER}" changelog.txt >> new_changelog.txt
           mv new_changelog.txt changelog.txt
