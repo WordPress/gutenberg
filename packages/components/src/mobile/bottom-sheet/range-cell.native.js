@@ -24,8 +24,8 @@ const isIOS = Platform.OS === 'ios';
 class BottomSheetRangeCell extends Component {
 	constructor( props ) {
 		super( props );
-		this.onChangeValue = this.onChangeValue.bind( this );
-		this.onChange = this.onChange.bind( this );
+		this.onSliderChange = this.onSliderChange.bind( this );
+		this.onTextInputChange = this.onTextInputChange.bind( this );
 		this.a11yIncrementValue = this.a11yIncrementValue.bind( this );
 		this.a11yDecrementValue = this.a11yDecrementValue.bind( this );
 		this.a11yUpdateValue = this.a11yUpdateValue.bind( this );
@@ -43,14 +43,14 @@ class BottomSheetRangeCell extends Component {
 		clearTimeout( this.timeoutAnnounceValue );
 	}
 
-	onChangeValue( initialValue ) {
+	onSliderChange( initialValue ) {
 		const { decimalNum, onChange } = this.props;
 		initialValue = toFixed( initialValue, decimalNum );
 		this.setState( { inputValue: initialValue } );
 		onChange( initialValue );
 	}
 
-	onChange( nextValue ) {
+	onTextInputChange( nextValue ) {
 		const { onChange, onComplete } = this.props;
 		this.setState( {
 			sliderValue: nextValue,
@@ -231,7 +231,7 @@ class BottomSheetRangeCell extends Component {
 								minimumTrackTintColor={ minimumTrackTintColor }
 								maximumTrackTintColor={ maximumTrackTintColor }
 								thumbTintColor={ thumbTintColor }
-								onValueChange={ this.onChangeValue }
+								onValueChange={ this.onSliderChange }
 								onSlidingComplete={ onComplete }
 								ref={ ( slider ) => {
 									this.sliderRef = slider;
@@ -245,7 +245,7 @@ class BottomSheetRangeCell extends Component {
 							{ shouldDisplayTextInput && (
 								<RangeTextInput
 									label={ cellProps.label }
-									onChange={ this.onChange }
+									onChange={ this.onTextInputChange }
 									defaultValue={ `${ inputValue }` }
 									value={ inputValue }
 									min={ minimumValue }
