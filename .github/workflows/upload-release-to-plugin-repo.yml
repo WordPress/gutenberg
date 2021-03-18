@@ -57,6 +57,7 @@ jobs:
           # Okay, we have all we need to build the new Changelog.
           head -n $(( "${BEFORE}" - 1 )) changelog.txt > new_changelog.txt
           printf '= %s =\n\n' "${TAG#v}" >> new_changelog.txt
+          # Need to use a heredoc in order to preserve special characters.
           cat <<- "EOF" >> new_changelog.txt
           ${{ github.event.release.body }}
           EOF
