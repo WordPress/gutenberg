@@ -217,7 +217,8 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             // force a 2nd setText from JS side to Native, just set a high eventCount
             int eventCount = inputMap.getInt("eventCount");
 
-            if (view.mNativeEventCount < eventCount) {
+            if (view.getEventCounter() < eventCount) {
+                view.setEventCounterSyncFromJS(eventCount);
                 setTextfromJS(view, inputMap.getString("text"), inputMap.getMap("selection"));
             }
         }
