@@ -57,4 +57,4 @@ View <a href="https://developer.wordpress.org/block-editor/principles/versions-i
 
 == Changelog ==
 
-To read the changelog for Gutenberg 10.2.0, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v10.2.0">release page</a>.
+To read the changelog for Gutenberg 10.2.1, please navigate to the <a href="https://github.com/WordPress/gutenberg/releases/tag/v10.2.1">release page</a>.
