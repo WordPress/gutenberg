@@ -134,10 +134,7 @@ function getIsLoading( { isBusy, isLoading } ) {
 
 function getIcon( { icon } ) {
 	if ( typeof icon === 'string' ) {
-		deprecated( 'Button icon as string', {
-			alternative: 'Button icon as ReactElement',
-			hint: 'Use the icons from @wordpress/icons',
-		} );
+		// We can't deprecate this strategy because block authors depend on it
 		return <Dashicon icon={ icon } />;
 	}
 	return icon;
