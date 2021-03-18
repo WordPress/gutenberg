@@ -125,7 +125,8 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 			$actual->get_custom_templates(),
 			array(
 				'page-home' => array(
-					'title' => 'Szablon strony głównej',
+					'title'     => 'Szablon strony głównej',
+					'postTypes' => array( 'page' ),
 				),
 			)
 		);

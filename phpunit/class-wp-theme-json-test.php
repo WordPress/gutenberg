@@ -792,7 +792,8 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 			$page_templates,
 			array(
 				'page-home' => array(
-					'title' => 'Homepage template',
+					'title'     => 'Homepage template',
+					'postTypes' => array( 'page' ),
 				),
 			)
 		);
