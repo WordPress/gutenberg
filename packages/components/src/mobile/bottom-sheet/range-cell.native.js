@@ -151,16 +151,7 @@ class BottomSheetRangeCell extends Component {
 		const { inputValue, sliderValue } = this.state;
 
 		const getAccessibilityHint = () => {
-			if ( isIOS ) {
-				return openUnitPicker
-					? __(
-							'Swipe up or down to adjust, double-tap to change unit'
-					  )
-					: __( 'Swipe up or down to adjust' );
-			}
-			return openUnitPicker
-				? __( 'Use volume keys to adjust, double-tap to change unit' )
-				: __( 'Use volume keys to adjust' );
+			return openUnitPicker ? __( 'double-tap to change unit' ) : '';
 		};
 
 		const getAccessibilityLabel = () => {
