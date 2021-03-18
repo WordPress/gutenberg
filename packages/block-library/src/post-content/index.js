@@ -15,9 +15,7 @@ export { metadata, name };
 
 export const settings = {
 	title: _x( 'Post Content', 'block title' ),
-	description: __(
-		'Displays the contents of a post, without title or metadata like tags or categories.'
-	),
+	description: __( 'Displays the contents of a post or page.' ),
 	icon,
 	edit,
 };
