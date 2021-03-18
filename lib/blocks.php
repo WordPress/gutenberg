@@ -56,6 +56,7 @@ function gutenberg_reregister_core_block_types() {
 					'cover.php'                     => 'core/cover',
 					'latest-comments.php'           => 'core/latest-comments',
 					'latest-posts.php'              => 'core/latest-posts',
+					'loginout.php'                  => 'core/loginout',
 					'navigation.php'                => 'core/navigation',
 					'navigation-link.php'           => 'core/navigation-link',
 					'rss.php'                       => 'core/rss',
