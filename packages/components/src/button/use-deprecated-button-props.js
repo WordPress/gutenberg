@@ -116,10 +116,10 @@ function getSize( { isSmall, size } ) {
 	return size;
 }
 
-function getIsActive( { isBusy, isActive } ) {
-	if ( typeof isBusy !== 'undefined' ) {
-		deprecated( 'Button isBusy', { alternative: 'Button isActive' } );
-		return isBusy;
+function getIsActive( { isPressed, isActive } ) {
+	if ( typeof isPressed !== 'undefined' ) {
+		deprecated( 'Button isPressed', { alternative: 'Button isActive' } );
+		return isPressed;
 	}
 	return isActive;
 }
@@ -151,6 +151,7 @@ export function useDeprecatedButtonProps( {
 	isBusy,
 	isLoading,
 	isActive,
+	isPressed,
 	label,
 	'aria-label': ariaLabel,
 	describedBy,
@@ -175,7 +176,7 @@ export function useDeprecatedButtonProps( {
 			isLink,
 			isDefault,
 		} ),
-		isActive: getIsActive( { isActive, isBusy } ),
+		isActive: getIsActive( { isActive, isPressed } ),
 		isLoading: getIsLoading( { isLoading, isBusy } ),
 		size: getSize( { size, isSmall } ),
 		'aria-label': getAriaLabel( { ariaLabel, label } ),
