@@ -42,18 +42,16 @@
 	background-color: inherit;
 }
 
+// Only show the flyout on hover if the parent menu item is selected.
+.wp-block-navigation:not(.is-selected):not(.has-child-selected) .has-child:hover {
+	> .wp-block-navigation-link__container {
+		opacity: 0;
+		visibility: hidden;
+	}
+}
+
 // Styles for submenu flyout
 .has-child {
-	// Only show the flyout when the parent menu item is selected.
-	// Do not show it on hover.
-	&,
-	&:hover {
-		> .wp-block-navigation__container {
-			opacity: 0;
-			visibility: hidden;
-		}
-	}
-
 	&.is-selected,
 	&.has-child-selected,
 	// Show the submenu list when is dragging and drag enter the list item.
@@ -65,7 +63,7 @@
 	}
 }
 
-// IE fix for submenu visibility on parent focus
+// IE fix for submenu visibility on parent focus.
 .is-editing > .wp-block-navigation__container {
 	visibility: visible;
 	opacity: 1;
