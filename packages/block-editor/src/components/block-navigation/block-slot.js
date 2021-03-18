@@ -31,8 +31,9 @@ const getSlotName = ( clientId ) => `BlockNavigationBlock-${ clientId }`;
 
 function BlockNavigationBlockSlot( props, ref ) {
 	const { clientId } = props.block;
-	const { name } = useSelect( ( select ) =>
-		select( blockEditorStore ).getBlockName( clientId )
+	const { name } = useSelect(
+		( select ) => select( blockEditorStore ).getBlockName( clientId ),
+		[ clientId ]
 	);
 	const instanceId = useInstanceId( BlockNavigationBlockSlot );
 
