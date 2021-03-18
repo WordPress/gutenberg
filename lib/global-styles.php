@@ -251,12 +251,12 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 }
 
 /**
- * Adds the necessary data for the Global Styles mobile client UI to the block settings.
+ * Adds the necessary data of Global Styles for the REST API.
  *
  * @param array $settings Existing block editor settings.
  * @return array New block editor settings
  */
-function gutenberg_global_styles_settings_mobile( $settings ) {
+function gutenberg_global_styles_rest_settings( $settings ) {
 	$color_palette = current( (array) get_theme_support( 'editor-color-palette' ) );
 	if ( false !== $color_palette ) {
 		$settings['colors'] = $color_palette;
@@ -299,7 +299,7 @@ function gutenberg_experimental_global_styles_register_user_cpt() {
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
 add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
-add_filter( 'block_editor_settings_mobile', 'gutenberg_global_styles_settings_mobile', PHP_INT_MAX );
+add_filter( 'block_editor_global_styles_rest_settings', 'gutenberg_global_styles_rest_settings', PHP_INT_MAX );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 
 

@@ -1,23 +1,23 @@
 <?php
 /**
- * REST API: WP_REST_Block_Editor_Mobile_Settings_Controller class
+ * REST API: WP_REST_Block_Editor_Global_Styles_Settings_Controller class
  *
  * @package    WordPress
  * @subpackage REST_API
  */
 
 /**
- * Core class used to retrieve mobile block editor settings via the REST API.
+ * Core class used to retrieve the block editor global styles settings via the REST API.
  *
  * @see WP_REST_Controller
  */
-class WP_REST_Block_Editor_Mobile_Settings_Controller extends WP_REST_Controller {
+class WP_REST_Block_Editor_Global_Styles_Settings_Controller extends WP_REST_Controller {
 	/**
 	 * Constructs the controller.
 	 */
 	public function __construct() {
 		$this->namespace = 'wp/v2';
-		$this->rest_base = 'block-editor-mobile-settings';
+		$this->rest_base = 'block-editor-global-styles-settings';
 	}
 
 	/**
@@ -57,7 +57,7 @@ class WP_REST_Block_Editor_Mobile_Settings_Controller extends WP_REST_Controller
 	}
 
 	/**
-	 * Return all block editor settings
+	 * Returns the block editor's global styles settings
 	 *
 	 * @since 5.8.0
 	 *
@@ -66,13 +66,13 @@ class WP_REST_Block_Editor_Mobile_Settings_Controller extends WP_REST_Controller
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$settings = apply_filters( 'block_editor_settings_mobile', array() );
+		$settings = apply_filters( 'block_editor_global_styles_rest_settings', array() );
 
 		return rest_ensure_response( $settings );
 	}
 
 	/**
-	 * Retrieves the pattern's schema, conforming to JSON Schema.
+	 * Retrieves the block editor's global styles schema, conforming to JSON Schema.
 	 *
 	 * @since 5.8.0
 	 *
@@ -85,7 +85,7 @@ class WP_REST_Block_Editor_Mobile_Settings_Controller extends WP_REST_Controller
 
 		$this->schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'block_editor_settings_mobile-item',
+			'title'      => 'block-editor-global-styles-settings-item',
 			'type'       => 'object',
 			'properties' => array(
 				'colors'                   => array(

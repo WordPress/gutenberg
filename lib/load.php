@@ -61,8 +61,8 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Templates_Controller' ) ) {
 		require_once __DIR__ . '/full-site-editing/class-wp-rest-templates-controller.php';
 	}
-	if ( ! class_exists( 'WP_REST_Block_Editor_Mobile_Settings_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-block-editor-mobile-settings-controller.php';
+	if ( ! class_exists( 'WP_REST_Block_Editor_Global_Styles_Settings_Controller' ) ) {
+		require dirname( __FILE__ ) . '/class-wp-rest-block-editor-global-styles-settings-controller.php';
 	}
 	/**
 	* End: Include for phase 2
