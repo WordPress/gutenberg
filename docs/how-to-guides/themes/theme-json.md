@@ -39,7 +39,7 @@ For more granularity, these settings also work at the block level in `experiment
 Examples of what can be achieved are:
 
 - Use a particular preset for a block (e.g.: table) but the common one for the rest of blocks.
-- Enable font size UI controls for all blocks that support it but the headings block.
+- Enable font size UI controls for all blocks but the headings block.
 - etc.
 
 ### Some block styles are managed
@@ -326,7 +326,7 @@ Note that, the name of the variable is created by adding `--` in between each ne
 
 ### Styles
 
-Each block declares which style properties it exposes via the [block supports mechanism](../block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor, as well as being available through the `experimental-theme.json` file for themes to target.
+Each block declares which style properties it exposes via the [block supports mechanism](../block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor. Themes can use any style property via the `experimental-theme.json` for any block ― it's the theme's responsibility to verify that it works properly according to the block markup, etc.
 
 ```json
 {
@@ -411,78 +411,6 @@ h4 {
 {% end %}
 
 The `defaults` block selector can't be part of the `styles` section and will be ignored if it's present. The `root` block selector will generate a style rule with the `:root` CSS selector.
-
-#### Border Properties
-
-| Block | Color | Radius | Style | Width |
-| --- | --- | --- | --- | --- |
-| Group | Yes | Yes | Yes | Yes |
-| Image | Yes | - | - | - |
-
-#### Color Properties
-
-These are the current color properties supported by blocks:
-
-| Block | Background | Gradient | Link | Text |
-| --- | --- | --- | --- | --- |
-| Global | Yes | Yes | Yes | Yes |
-| Columns | Yes | Yes | Yes | Yes |
-| Group | Yes | Yes | Yes | Yes |
-| Heading [1] | Yes | - | Yes | Yes |
-| List | Yes | Yes | - | Yes |
-| Media & text | Yes | Yes | Yes | Yes |
-| Navigation | Yes | - | - | Yes |
-| Paragraph | Yes | - | Yes | Yes |
-| Post Author | Yes | Yes | Yes | Yes |
-| Post Comments | Yes | Yes | Yes | Yes |
-| Post Comments Count | Yes | Yes | - | Yes |
-| Post Comments Form | Yes | Yes | Yes | Yes |
-| Post Date | Yes | Yes | - | Yes |
-| Post Excerpt | Yes | Yes | Yes | Yes |
-| Post Hierarchical Terms | Yes | Yes | Yes | Yes |
-| Post Tags | Yes | Yes | Yes | Yes |
-| Post Title | Yes | Yes | - | Yes |
-| Site Tagline | Yes | Yes | - | Yes |
-| Site Title | Yes | Yes | Yes | - |
-| Template Part | Yes | Yes | Yes | Yes |
-
-[1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
-
-#### Spacing Properties
-
-| Block | Padding |
-| --- | --- |
-| Cover | Yes |
-| Group | Yes |
-
-#### Typography Properties
-
-These are the current typography properties supported by blocks:
-
-| Block | Font Family | Font Size | Font Style | Font Weight | Line Height | Text Decoration | Text Transform |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Global | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
-| Code | - | Yes | - | - | - | - | - |
-| Heading [1] | - | Yes | - | - | Yes | - | - |
-| List | - | Yes | - | - | - | - | - |
-| Navigation | Yes | Yes | Yes | Yes | - | Yes | Yes |
-| Paragraph | - | Yes | - | - | Yes | - | - |
-| Post Author | - | Yes | - | - | Yes | - | - |
-| Post Comments | - | Yes | - | - | Yes | - | - |
-| Post Comments Count | - | Yes | - | - | Yes | - | - |
-| Post Comments Form | - | Yes | - | - | Yes | - | - |
-| Post Date | - | Yes | - | - | Yes | - | - |
-| Post Excerpt | - | Yes | - | - | Yes | - | - |
-| Post Hierarchical Terms | - | Yes | - | - | Yes | - | - |
-| Post Tags | - | Yes | - | - | Yes | - | - |
-| Post Title | Yes | Yes | - | - | Yes | - | - |
-| Preformatted | - | Yes | - | - | - | - | - |
-| Site Tagline | Yes | Yes | - | - | Yes | - | - |
-| Site Title | Yes | Yes | - | - | Yes | - | Yes |
-| Verse | Yes | Yes | - | - | - | - | - |
-
-[1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
-
 
 ### Other theme metadata
 

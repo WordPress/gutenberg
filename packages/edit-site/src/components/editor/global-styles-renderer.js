@@ -99,19 +99,14 @@ function flattenTree( input = {}, prefix, token ) {
 /**
  * Transform given style tree into a set of style declarations.
  *
- * @param {Object} blockSupports What styles the block supports.
  * @param {Object} blockStyles   Block styles.
  *
  * @return {Array} An array of style declarations.
  */
-function getBlockStylesDeclarations( blockSupports, blockStyles = {} ) {
+function getBlockStylesDeclarations( blockStyles = {} ) {
 	return reduce(
 		STYLE_PROPERTY,
 		( declarations, { value, properties }, key ) => {
-			if ( ! blockSupports.includes( key ) ) {
-				return declarations;
-			}
-
 			if ( !! properties ) {
 				properties.forEach( ( prop ) => {
 					if ( ! get( blockStyles, [ ...value, prop ], false ) ) {
@@ -171,7 +166,6 @@ export default ( blockData, tree, type = 'all' ) => {
 			}
 			if ( type === 'all' || type === 'blockStyles' ) {
 				const blockStyleDeclarations = getBlockStylesDeclarations(
-					blockData[ context ].supports,
 					tree?.styles?.[ context ]
 				);
 
