@@ -76,7 +76,7 @@ If a bug is found in a release candidate and a fix is committed to `trunk`, we s
 2. Cherry-pick fix commits (in chronological order) with `git cherry-pick [SHA]`.
 3. When done, push the changes to GitHub: `git push`.
 
-If you decide that the fixes deserve another release candidate before the stable version is published, create one through by following the instructions above. Let other contributors know that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7).
+If you decide that the fixes deserve another release candidate before the stable version is published, create one by following the instructions above. Let other contributors know that a new release candidate has been released in the [`#core-editor` channel](https://wordpress.slack.com/messages/C02QB2JS7).
 ## Packages Releases to npm and WordPress Core Updates
 
 The Gutenberg repository mirrors the [WordPress SVN repository](https://make.wordpress.org/core/handbook/about/release-cycle/) in terms of branching for each SVN branch, a corresponding Gutenberg `wp/*` branch is created:
