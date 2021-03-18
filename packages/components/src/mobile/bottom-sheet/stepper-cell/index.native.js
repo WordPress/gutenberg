@@ -200,7 +200,6 @@ class BottomSheetStepperCell extends Component {
 			>
 				<View importantForAccessibility="no-hide-descendants">
 					<Cell
-						accessibilityRole="none"
 						accessible={ false }
 						cellContainerStyle={ [
 							styles.cellContainerStyle,

@@ -203,7 +203,6 @@ class BottomSheetRangeCell extends Component {
 							cellContainerStyle,
 						] }
 						cellRowContainerStyle={ containerStyle }
-						accessibilityRole={ 'adjustable' }
 						leftAlign
 						editable={ false }
 						activeOpacity={ 1 }
