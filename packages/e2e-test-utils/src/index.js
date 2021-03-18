@@ -52,6 +52,14 @@ export {
 } from './observe-focus-loss';
 export { openDocumentSettingsSidebar } from './open-document-settings-sidebar';
 export { openPublishPanel } from './open-publish-panel';
+export {
+	readFile,
+	deleteFile,
+	getTypingEventDurations,
+	getSelectionEventDurations,
+	getClickEventDurations,
+	getHoverEventDurations,
+} from './performance-tests-utils';
 export { trashAllPosts } from './posts';
 export { pressKeyTimes } from './press-key-times';
 export {
