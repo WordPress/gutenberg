@@ -32,7 +32,6 @@ Instead of the proliferation of theme support flags or alternative methods, the 
  - What customization options should be made available or hidden from the user.
  - What are the default colors, font sizes... available to the user.
  - Defines the default layout of the editor. (widths and available alignments).
- - ...
 ### Settings can be controlled per block
 
 For more granularity, these settings also work at the block level in `experimental-theme.json`.

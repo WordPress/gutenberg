@@ -73,8 +73,7 @@ function blockAttributesMatch( blockAttributes, attributes ) {
  * ```
  */
 export default function useEditorFeature( featurePath ) {
-	const blockEditContext = useBlockEditContext();
-	const { name: blockName, clientId } = blockEditContext;
+	const { name: blockName, clientId } = useBlockEditContext();
 
 	const setting = useSelect(
 		( select ) => {

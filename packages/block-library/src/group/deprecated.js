@@ -38,7 +38,7 @@ const migrateAttributes = ( attributes ) => {
 };
 
 const deprecated = [
-	// Version of the block with the double dif
+	// Version of the block with the double div.
 	{
 		attributes: {
 			tagName: {
@@ -47,9 +47,6 @@ const deprecated = [
 			},
 			templateLock: {
 				type: 'string',
-			},
-			layout: {
-				type: 'object',
 			},
 		},
 		supports: {
