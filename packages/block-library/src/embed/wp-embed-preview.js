@@ -11,7 +11,6 @@ export default function WpEmbedPreview( { html } ) {
 	useEffect( () => {
 		const { ownerDocument } = ref.current;
 		const { defaultView } = ownerDocument;
-		const { FocusEvent } = defaultView;
 
 		/**
 		 * Checks for WordPress embed events signaling the height change when iframe
@@ -58,8 +57,7 @@ export default function WpEmbedPreview( { html } ) {
 				return;
 			}
 
-			const focusEvent = new FocusEvent( 'focus', { bubbles: true } );
-			activeElement.dispatchEvent( focusEvent );
+			activeElement.focus();
 		}
 
 		defaultView.addEventListener( 'message', resizeWPembeds );
