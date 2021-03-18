@@ -26,7 +26,7 @@ describe( 'RichText', () => {
 		await insertBlock( 'Heading' );
 		await page.waitForSelector( '[aria-label="Change heading level"]' );
 		await page.click( '[aria-label="Change heading level"]' );
-		await page.click( '[aria-label="Heading 3"]' );
+		await page.click( '[aria-label^="Heading 3"]' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

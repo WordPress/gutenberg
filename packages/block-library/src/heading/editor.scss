@@ -10,8 +10,26 @@
 	}
 }
 
+// Gray the icons for heading level options that may be semantically invalid.
+.block-library-heading__heading-level-icon.is-discouraged:not(.is-pressed):not(:hover) {
+	fill: $gray-600;
+}
+
 // The dropdown already has a border, so we can remove the one on the heading
 // level toolbar.
 .block-library-heading-level-toolbar {
 	border: none;
+}
+
+.block-library-heading__heading-level-dropdown__help {
+	margin-left: $grid-unit-20;
+	margin-right: $grid-unit-20;
+
+	// Override default paragraph margin to optically balance spacing between it
+	// and the toolbar above.
+	margin-top: 0;
+}
+
+.block-library-heading__heading-level-warning {
+	margin: 0;
 }
