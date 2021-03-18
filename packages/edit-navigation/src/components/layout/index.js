@@ -153,7 +153,7 @@ export default function Layout( { blockEditorSettings } ) {
 												<>
 													<Popover.Slot name="block-toolbar" />
 													{ ! isLargeViewport && (
-														<div className="edit-widgets-header__block-toolbar">
+														<div className="edit-navigation-layout__block-toolbar">
 															<BlockToolbar
 																hideDragHandle
 															/>

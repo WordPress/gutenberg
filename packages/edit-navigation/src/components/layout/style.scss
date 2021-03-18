@@ -31,8 +31,12 @@
 	}
 
 	.edit-navigation-layout__content-area {
-		// Provide space for the floating block toolbar.
-		padding-top: $navigation-editor-spacing-top;
+		// Add some margin above the fixed mobile toolbar.
+		padding-top: $grid-unit-15;
+		@include break-medium() {
+			// Provide space for the floating block toolbar.
+			padding-top: $navigation-editor-spacing-top;
+		}
 
 		// Ensure the entire layout is full-height, the background
 		// of the editing canvas needs to be full-height for block
@@ -60,9 +64,21 @@
 	}
 }
 
-.edit-navigation-empty-state {
+.edit-navigation-layout__block-toolbar {
+	background: $white;
+	border: $border-width solid $gray-900;
+	border-radius: $radius-block-ui;
+	height: 47px;
 	width: $navigation-editor-width;
-	margin-top: $navigation-editor-spacing-top;
+	margin: auto;
+}
+
+.edit-navigation-empty-state {
+	max-width: $navigation-editor-width;
 	margin-left: auto;
 	margin-right: auto;
+	@include break-medium() {
+		// Match the padding top of the editor canvas.
+		margin-top: $navigation-editor-spacing-top;
+	}
 }
