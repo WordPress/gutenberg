@@ -210,7 +210,7 @@ function InsertionPointPopover( {
 	// the `showInsertionPoint` state is `true`. The latter is generally true
 	// when hovering blocks for insertion in the block library.
 	const showInsertionPointIndicator =
-		! isHidden && ( showInsertionPointInserter || showInsertionPoint );
+		showInsertionPointInserter || ( ! isHidden && showInsertionPoint );
 
 	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	// While ideally it would be enough to capture the
