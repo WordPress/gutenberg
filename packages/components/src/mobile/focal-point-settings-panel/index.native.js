@@ -17,7 +17,7 @@ import { BottomSheetContext, FocalPointPicker } from '@wordpress/components';
 import NavigationHeader from '../bottom-sheet/navigation-header';
 import styles from './styles.scss';
 
-const FocalPointSettingsMemo = memo(
+const FocalPointSettingsPanelMemo = memo(
 	( {
 		focalPoint,
 		onFocalPointChange,
@@ -62,12 +62,12 @@ const FocalPointSettingsMemo = memo(
 	}
 );
 
-function FocalPointSettings( props ) {
+function FocalPointSettingsPanel( props ) {
 	const route = useRoute();
 	const { shouldEnableBottomSheetScroll } = useContext( BottomSheetContext );
 
 	return (
-		<FocalPointSettingsMemo
+		<FocalPointSettingsPanelMemo
 			shouldEnableBottomSheetScroll={ shouldEnableBottomSheetScroll }
 			{ ...props }
 			{ ...route.params }
@@ -75,4 +75,4 @@ function FocalPointSettings( props ) {
 	);
 }
 
-export default FocalPointSettings;
+export default FocalPointSettingsPanel;

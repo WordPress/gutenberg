@@ -59,7 +59,7 @@ class DatePicker extends Component {
 	}
 
 	onChangeMoment( newDate ) {
-		const { currentDate, onChange, keepOpen } = this.props;
+		const { currentDate, onChange } = this.props;
 
 		// If currentDate is null, use now as momentTime to designate hours, minutes, seconds.
 		const momentDate = currentDate ? moment( currentDate ) : moment();
@@ -71,10 +71,8 @@ class DatePicker extends Component {
 
 		onChange( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );
 
-		// Keep focus on the date picker popover.
-		if ( keepOpen ) {
-			this.keepFocusInside();
-		}
+		// Keep focus on the date picker.
+		this.keepFocusInside();
 	}
 
 	/**

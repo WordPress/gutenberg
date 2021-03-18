@@ -306,9 +306,11 @@ export default function useInsertionPoint( ref ) {
 			const children = Array.from( event.target.children );
 			const nextElement = children.find( ( blockEl ) => {
 				return (
-					( orientation === 'vertical' &&
+					( blockEl.classList.contains( 'wp-block' ) &&
+						orientation === 'vertical' &&
 						blockEl.offsetTop > offsetTop ) ||
-					( orientation === 'horizontal' &&
+					( blockEl.classList.contains( 'wp-block' ) &&
+						orientation === 'horizontal' &&
 						blockEl.offsetLeft > offsetLeft )
 				);
 			} );

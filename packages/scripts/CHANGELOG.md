@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 14.0.0 (2021-03-17)
+
 ### Breaking Changes
 
 -   Lint TypeScript files as part of `lint-js`. [#27143](https://github.com/WordPress/gutenberg/pull/27143)
