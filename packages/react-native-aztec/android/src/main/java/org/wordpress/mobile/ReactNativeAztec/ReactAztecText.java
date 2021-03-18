@@ -390,7 +390,7 @@ public class ReactAztecText extends AztecText {
         if (mNativeEventCount < mEventCountSyncFromJS) {
             // need to sync up to the counter the JS side is expecting. Avoiding setting
             //   mNativeEventCount directly from the JS side to avoid race conditions, and instead
-            //   syncing just-in-time when we need the new incrementm
+            //   syncing just-in-time when we need the new increment
             mNativeEventCount = mEventCountSyncFromJS;
         }
 
