@@ -9,21 +9,30 @@ import { __ } from '@wordpress/i18n';
 /**
  * Fetches link suggestions from the API.
  *
+ * @callback ExperimentalFetchLinkSuggestions
  * @param {string} search
- * @param {Object} [searchArguments]
+ * @param {Object} [editorSettings]
  * @param {number} [searchArguments.isInitialSuggestions]
  * @param {number} [searchArguments.type]
  * @param {number} [searchArguments.subtype]
  * @param {number} [searchArguments.page]
- * @param {Object} [editorSettings]
- * @param {boolean} [editorSettings.disablePostFormats=false]
  * @return {Promise<Object[]>} List of suggestions
  */
 
-const fetchLinkSuggestions = async (
+/**
+ * Returns a function that when invoked, fetches link suggestions from the API.
+ *
+ * @param {Object}  [editorSettings]
+ * @param {boolean} [editorSettings.disablePostFormats=false]
+ *
+ * @return { ExperimentalFetchLinkSuggestions } Function that fetches link suggestions
+ *
+ */
+const createFetchLinkSuggestions = ( {
+	disablePostFormats = false,
+} = {} ) => async (
 	search,
-	{ isInitialSuggestions, type, subtype, page, perPage: perPageArg } = {},
-	{ disablePostFormats = false } = {}
+	{ isInitialSuggestions, type, subtype, page, perPage: perPageArg } = {}
 ) => {
 	const perPage = perPageArg || isInitialSuggestions ? 3 : 20;
 
@@ -88,4 +97,4 @@ const fetchLinkSuggestions = async (
 	} );
 };
 
-export default fetchLinkSuggestions;
+export default createFetchLinkSuggestions;

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { pick, defaultTo, partialRight } from 'lodash';
+import { pick, defaultTo } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -9,7 +9,7 @@ import { pick, defaultTo, partialRight } from 'lodash';
 import { Platform, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/block-editor';
+import { __experimentalFetchLinkSuggestions as createFetchLinkSuggestions } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -103,8 +103,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalFetchLinkSuggestions: partialRight(
-				fetchLinkSuggestions,
+			__experimentalFetchLinkSuggestions: createFetchLinkSuggestions(
 				settings
 			),
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,

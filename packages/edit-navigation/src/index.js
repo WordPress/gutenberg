@@ -6,7 +6,7 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render } from '@wordpress/element';
-import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/block-editor';
+import { __experimentalFetchLinkSuggestions as createFetchLinkSuggestions } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -27,10 +27,9 @@ export function initialize( id, settings ) {
 		__experimentalRegisterExperimentalCoreBlocks();
 	}
 
-	settings.__experimentalFetchLinkSuggestions = (
-		searchText,
-		searchOptions
-	) => fetchLinkSuggestions( searchText, searchOptions, settings );
+	settings.__experimentalFetchLinkSuggestions = createFetchLinkSuggestions(
+		settings
+	);
 
 	render(
 		<Layout blockEditorSettings={ settings } />,
