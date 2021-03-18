@@ -58,11 +58,11 @@ jobs:
           head -n $(( "${BEFORE}" - 1 )) changelog.txt > new_changelog.txt
           printf '= %s =\n\n' "${TAG#v}" >> new_changelog.txt
           # Need to use a heredoc in order to preserve special characters.
-          cat <<- "EOF" >> new_changelog.txt
+          cat <<- "EOF" > release_notes.txt
           ${{ github.event.release.body }}
           EOF
           # Normalize empty lines: Trim them from beginning and end of file...
-          awk 'NF {p=1} p' <<< "$(< new_changelog.txt)" > new_changelog.txt
+          awk 'NF {p=1} p' <<< "$(< release_notes.txt)" >> new_changelog.txt
           # ...then add two empty lines at the end.
           printf '\n\n' >> new_changelog.txt
           tail -n +"${AFTER}" changelog.txt >> new_changelog.txt
