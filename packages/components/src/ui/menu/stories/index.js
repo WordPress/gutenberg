@@ -20,7 +20,7 @@ const Example = () => {
 			<MenuHeader>WordPress.org</MenuHeader>
 			<MenuItem
 				isSelected={ isSelected }
-				onSelect={ () => setIsSelected( ! isSelected ) }
+				onClick={ () => setIsSelected( ! isSelected ) }
 			>
 				Code is Poetry
 			</MenuItem>

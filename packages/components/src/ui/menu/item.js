@@ -19,7 +19,6 @@ import { useCallback, useMemo } from '@wordpress/element';
 import { BaseButton } from '../base-button';
 import { Flex } from '../flex';
 import { Text } from '../text';
-import { View } from '../view';
 import { useMenuContext } from './context';
 import * as styles from './styles';
 
@@ -38,13 +37,10 @@ function MenuItem( props, forwardedRef ) {
 		isOffset = false,
 		isSelected,
 		onClick = noop,
-		onSelect = noop,
-		onKeyDown = noop,
 		prefix,
 		showArrow = false,
 		size,
 		suffix,
-		tabIndex: tabIndexProp,
 		...otherProps
 	} = useContextSystem( props, 'MenuItem' );
 
@@ -60,7 +56,7 @@ function MenuItem( props, forwardedRef ) {
 		className
 	);
 
-	const Component = as || ( menu ? ReakitMenuItem : View );
+	const Component = as || ( menu ? ReakitMenuItem : 'button' );
 
 	const prevArrow = useMemo(
 		() =>
@@ -120,32 +116,10 @@ function MenuItem( props, forwardedRef ) {
 			onClick( event );
 			if ( menu?.hide && closeOnClick ) {
 				menu.hide();
-			} else {
-				onSelect( event );
 			}
 		},
-		[ closeOnClick, menu, onClick, onSelect ]
+		[ closeOnClick, menu, onClick ]
 	);
-
-	const handleOnKeyDown = useCallback(
-		(
-			/** @type {import('react').KeyboardEvent<HTMLDivElement>} */ event
-		) => {
-			onKeyDown( event );
-			switch ( event.key ) {
-				case 'Enter':
-				case 'Space':
-				case ' ':
-					onSelect( event );
-					break;
-				default:
-					break;
-			}
-		},
-		[ onSelect, onKeyDown ]
-	);
-
-	const tabIndex = tabIndexProp || ( onSelect !== noop ? 0 : undefined );
 
 	return (
 		<BaseButton
@@ -156,13 +130,11 @@ function MenuItem( props, forwardedRef ) {
 			{ ...menu }
 			className={ classes }
 			onClick={ handleOnClick }
-			onKeyDown={ handleOnKeyDown }
 			pre={ prefixContent }
 			ref={ forwardedRef }
 			size={ size }
 			suffix={ suffixContent }
 			textAlign="left"
-			tabIndex={ tabIndex }
 		>
 			{ children }
 		</BaseButton>
