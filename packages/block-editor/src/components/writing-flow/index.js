@@ -358,31 +358,16 @@ export default function WritingFlow( { children } ) {
 		// Navigation mode (press Esc), to navigate through blocks.
 		if ( selectedBlockClientId ) {
 			if ( isTab ) {
-				const wrapper = getBlockDOMNode(
-					selectedBlockClientId,
-					ownerDocument
-				);
+				const next = isShift
+					? focusCaptureBeforeRef
+					: focusCaptureAfterRef;
 
-				if ( isShift ) {
-					if ( target === wrapper ) {
-						// Disable focus capturing on the focus capture element, so
-						// it doesn't refocus this block and so it allows default
-						// behaviour (moving focus to the next tabbable element).
-						noCapture.current = true;
-						focusCaptureBeforeRef.current.focus();
-						return;
-					}
-				} else {
-					const tabbables = focus.tabbable.find( wrapper );
-					const lastTabbable = last( tabbables ) || wrapper;
-
-					if ( target === lastTabbable ) {
-						// See comment above.
-						noCapture.current = true;
-						focusCaptureAfterRef.current.focus();
-						return;
-					}
-				}
+				// Disable focus capturing on the focus capture element, so
+				// it doesn't refocus this block and so it allows default
+				// behaviour (moving focus to the next tabbable element).
+				noCapture.current = true;
+				next.current.focus();
+				return;
 			} else if ( isEscape ) {
 				setNavigationMode( true );
 			}
