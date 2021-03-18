@@ -131,7 +131,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 				) }
 				<p className="block-editor-hooks__layout-controls-helptext">
 					{ __(
-						'The content and wide sizes determine the width of centered and wide columns inside.'
+						'Customize the width for all elements that are assigned to the center or wide columns.'
 					) }
 				</p>
 			</PanelBody>
