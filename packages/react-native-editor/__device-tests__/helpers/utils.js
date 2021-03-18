@@ -28,6 +28,7 @@ const defaultAndroidAppPath =
 	'./android/app/build/outputs/apk/debug/app-debug.apk';
 const defaultIOSAppPath =
 	'./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app';
+const webDriverAgentPath = process.env.WDA_PATH || './ios/build/WDA';
 
 const localAndroidAppPath =
 	process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
@@ -53,6 +54,18 @@ const isAndroid = () => {
 
 const isLocalEnvironment = () => {
 	return testEnvironment.toLowerCase() === 'local';
+};
+
+const getIOSPlatformVersions = () => {
+	const { runtimes = [] } = JSON.parse(
+		childProcess.execSync( 'xcrun simctl list runtimes --json' ).toString()
+	);
+
+	return runtimes
+		.reverse()
+		.filter(
+			( { name, isAvailable } ) => name.startsWith( 'iOS' ) && isAvailable
+		);
 };
 
 // Initialises the driver and desired capabilities for appium
@@ -105,7 +118,30 @@ const setupDriver = async () => {
 		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
 		if ( isLocalEnvironment() ) {
 			desiredCaps = _.clone( iosLocal );
+
+			const iosPlatformVersions = getIOSPlatformVersions();
+			if ( iosPlatformVersions.length === 0 ) {
+				throw new Error(
+					'No iOS simulators available! Please verify that you have iOS simulators installed.'
+				);
+			}
+			// eslint-disable-next-line no-console
+			console.log(
+				'Available iOS platform versions:',
+				iosPlatformVersions.map( ( { name } ) => name )
+			);
+
+			if ( ! desiredCaps.platformVersion ) {
+				desiredCaps.platformVersion = iosPlatformVersions[ 0 ].version;
+
+				// eslint-disable-next-line no-console
+				console.log(
+					`Using iOS ${ desiredCaps.platformVersion } platform version`
+				);
+			}
+
 			desiredCaps.app = path.resolve( localIOSAppPath );
+			desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 		}
 	}
 

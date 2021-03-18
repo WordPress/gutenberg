@@ -1,0 +1,19 @@
+{
+	"apiVersion": 2,
+	"name": "core/loginout",
+	"category": "design",
+	"attributes": {
+		"displayLoginAsForm": {
+			"type": "boolean",
+			"default": false
+		},
+		"redirectToCurrent": {
+			"type": "boolean",
+			"default": true
+		}
+	},
+	"supports": {
+		"className": true,
+		"fontSize": false
+	}
+}

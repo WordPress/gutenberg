@@ -38,21 +38,21 @@ exports[`cpt locking template_lock all should not error when deleting the cotent
 
 exports[`cpt locking template_lock all unlocked group should allow blocks to be moved 1`] = `
 "<!-- wp:group {\\"templateLock\\":false} -->
-<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph {\\"placeholder\\":\\"Add a description\\"} -->
 <p>p1</p>
 <!-- /wp:paragraph -->
 
 <!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
-<!-- /wp:quote --></div></div>
+<!-- /wp:quote --></div>
 <!-- /wp:group -->"
 `;
 
 exports[`cpt locking template_lock all unlocked group should allow blocks to be removed 1`] = `
 "<!-- wp:group {\\"templateLock\\":false} -->
-<div class=\\"wp-block-group\\"><div class=\\"wp-block-group__inner-container\\"><!-- wp:quote -->
+<div class=\\"wp-block-group\\"><!-- wp:quote -->
 <blockquote class=\\"wp-block-quote\\"><p></p></blockquote>
-<!-- /wp:quote --></div></div>
+<!-- /wp:quote --></div>
 <!-- /wp:group -->"
 `;
 

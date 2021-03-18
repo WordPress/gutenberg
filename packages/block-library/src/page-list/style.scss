@@ -13,12 +13,14 @@
 	}
 }
 
-// The Pages block should inherit navigation styles when nested within it
+// The Page List block should inherit navigation styles when nested within it
 .wp-block-navigation {
 	.wp-block-page-list {
 		display: flex;
 		flex-wrap: wrap;
+		background-color: inherit;
 	}
+
 	.wp-block-pages-list__item__link {
 		display: block;
 		color: inherit;
@@ -33,10 +35,9 @@
 		> a {
 			padding-right: 0.5em;
 		}
+
 		> .submenu-container {
 			border: $border-width solid rgba(0, 0, 0, 0.15);
-			background-color: inherit;
-			color: inherit;
 			position: absolute;
 			left: 0;
 			top: 100%;
@@ -89,6 +90,11 @@
 				opacity: 1;
 			}
 		}
+	}
+
+	&.has-background .wp-block-pages-list__item.has-child > .submenu-container {
+		background-color: inherit;
+		color: inherit;
 	}
 
 	.submenu-container {

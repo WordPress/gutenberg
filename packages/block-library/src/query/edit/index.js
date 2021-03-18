@@ -15,7 +15,6 @@ import {
  * Internal dependencies
  */
 import QueryToolbar from './query-toolbar';
-import QueryProvider from './query-provider';
 import QueryInspectorControls from './query-inspector-controls';
 import QueryBlockSetup from './query-block-setup';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
@@ -71,9 +70,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				<QueryProvider>
-					<div { ...innerBlocksProps } />
-				</QueryProvider>
+				<div { ...innerBlocksProps } />
 			</div>
 		</>
 	);
@@ -91,4 +88,3 @@ const QueryEdit = ( props ) => {
 };
 
 export default QueryEdit;
-export * from './query-provider';

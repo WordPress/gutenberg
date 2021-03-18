@@ -8,6 +8,7 @@ import {
 import {
 	WritingFlow,
 	BlockList,
+	store as blockEditorStore,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseClipboardHandler as useClipboardHandler,
@@ -16,6 +17,8 @@ import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
 	__unstableEditorStyles as EditorStyles,
+	__experimentalUseEditorFeature as useEditorFeature,
+	__experimentalLayoutStyle as LayoutStyle,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
@@ -44,6 +47,10 @@ export default function VisualEditor( { styles } ) {
 		( select ) => select( editPostStore ).hasMetaBoxes(),
 		[]
 	);
+	const themeSupportsLayout = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings().supportsLayout;
+	}, [] );
 	const desktopCanvasStyles = {
 		height: '100%',
 		// Add a constant padding for the typewritter effect. When typing at the
@@ -51,6 +58,12 @@ export default function VisualEditor( { styles } ) {
 		paddingBottom: hasMetaBoxes ? null : '40vh',
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType );
+	const defaultLayout = useEditorFeature( 'layout' );
+	const { contentSize, wideSize } = defaultLayout || {};
+	const alignments =
+		contentSize || wideSize
+			? [ 'wide', 'full' ]
+			: [ 'left', 'center', 'right' ];
 
 	const mergedRefs = useMergeRefs( [
 		ref,
@@ -63,6 +76,12 @@ export default function VisualEditor( { styles } ) {
 
 	return (
 		<div className="edit-post-visual-editor">
+			{ themeSupportsLayout && (
+				<LayoutStyle
+					selector=".edit-post-visual-editor__post-title-wrapper, .edit-post-visual-editor .block-editor-block-list__layout.is-root-container"
+					layout={ defaultLayout }
+				/>
+			) }
 			<EditorStyles styles={ styles } />
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
@@ -77,7 +96,19 @@ export default function VisualEditor( { styles } ) {
 							<PostTitle />
 						</div>
 					) }
-					<BlockList />
+					<BlockList
+						__experimentalLayout={
+							themeSupportsLayout
+								? {
+										type: 'default',
+										// Find a way to inject this in the support flag code (hooks).
+										alignments: themeSupportsLayout
+											? alignments
+											: undefined,
+								  }
+								: undefined
+						}
+					/>
 				</WritingFlow>
 			</div>
 			<__experimentalBlockSettingsMenuFirstItem>

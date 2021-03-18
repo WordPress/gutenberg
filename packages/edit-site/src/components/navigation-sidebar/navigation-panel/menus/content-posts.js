@@ -61,7 +61,6 @@ export default function ContentPostsMenu() {
 			type: 'page',
 			path: '/',
 			context: {
-				query: { categoryIds: [] },
 				queryContext: { page: 1 },
 			},
 		} );

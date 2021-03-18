@@ -25,9 +25,16 @@ The Block Editor API has evolved at different velocities and there are some grow
 
 This describes the current efforts to consolidate the various APIs related to styles into a single point – a `experimental-theme.json` file that should be located inside the root of the theme directory.
 
+### Global settings for the block editor
+
+Instead of the proliferation of theme support flags or alternative methods, the `experimental-theme.json` files provides a canonical way to define the settings of the block editor. These settings includes things like:
+
+ - What customization options should be made available or hidden from the user.
+ - What are the default colors, font sizes... available to the user.
+ - Defines the default layout of the editor. (widths and available alignments).
 ### Settings can be controlled per block
 
-The Block Editor already allows the control of specific settings such as alignment, drop cap, presets available, etc. All of these work at the block level. By using the `experimental-theme.json` we aim to allow themes to control these at a block level.
+For more granularity, these settings also work at the block level in `experimental-theme.json`.
 
 Examples of what can be achieved are:
 
@@ -156,7 +163,11 @@ The settings section has the following structure and default values:
 ```
 {
   "settings": {
-    "some/block": {
+    "defaults": {
+      "layout": { /* Default layout to be used in the post editor */
+        "contentSize": "800px",
+        "wideSize": "1000px",
+      }
       "border": {
         "customRadius": false /* true to opt-in */
       },
@@ -432,7 +443,7 @@ These are the current color properties supported by blocks:
 | Post Tags | Yes | Yes | Yes | Yes |
 | Post Title | Yes | Yes | - | Yes |
 | Site Tagline | Yes | Yes | - | Yes |
-| Site Title | Yes | Yes | - | Yes |
+| Site Title | Yes | Yes | Yes | - |
 | Template Part | Yes | Yes | Yes | Yes |
 
 [1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).

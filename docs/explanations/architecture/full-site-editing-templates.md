@@ -1,4 +1,6 @@
-### Template and template part flows
+# Full Site Editing Templates
+
+## Template and template part flows
 
 > This is the documentation for the current implementation of the block-based templates and template parts themes. This is part of the Full Site Editing project. These features are still experimental in the plugin. “Experimental” means this is just an early implementation that is subject to potential drastic and breaking changes in iterations based on feedback from users, contributors, and theme authors.
 
