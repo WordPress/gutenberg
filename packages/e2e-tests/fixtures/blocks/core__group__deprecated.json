@@ -4,10 +4,10 @@
         "name": "core/group",
         "isValid": true,
         "attributes": {
-            "backgroundColor": "lighter-blue",
+            "tagName": "div",
             "align": "full",
             "anchor": "test-id",
-            "tagName": "div"
+            "backgroundColor": "lighter-blue"
         },
         "innerBlocks": [
             {

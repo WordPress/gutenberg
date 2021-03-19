@@ -121,6 +121,10 @@ async function updatePackages(
 		}
 	);
 
+	const productionPackageNames = Object.keys(
+		require( '../../../package.json' ).dependencies
+	);
+
 	const processedPackages = await Promise.all(
 		changelogFilesPublicPackages.map( async ( changelogPath ) => {
 			const fileStream = fs.createReadStream( changelogPath );
@@ -133,13 +137,23 @@ async function updatePackages(
 				lines.push( line );
 			}
 
-			const versionBump = calculateVersionBumpFromChangelog(
+			let versionBump = calculateVersionBumpFromChangelog(
 				lines,
 				minimumVersionBump
 			);
 			const packageName = `@wordpress/${
 				changelogPath.split( '/' ).reverse()[ 1 ]
 			}`;
+			// Enforce version bump for production packages when
+			// the stable minor or major version bump requested.
+			if (
+				! versionBump &&
+				! isPrerelease &&
+				minimumVersionBump !== 'patch' &&
+				productionPackageNames.includes( packageName )
+			) {
+				versionBump = minimumVersionBump;
+			}
 			const packageJSONPath = changelogPath.replace(
 				'CHANGELOG.md',
 				'package.json'

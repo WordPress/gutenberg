@@ -20,7 +20,7 @@ import BlockList from '../block-list';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
-import { defaultLayout, LayoutProvider } from './layout';
+import { defaultLayout, LayoutProvider } from '../block-list/layout';
 import { store as blockEditorStore } from '../../store';
 
 /**

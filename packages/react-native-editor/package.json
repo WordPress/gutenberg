@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-editor",
-	"version": "1.48.1",
+	"version": "1.49.0",
 	"description": "Mobile WordPress gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -113,7 +113,8 @@
 		"test:e2e:android:local": "npm run test:e2e:bundle:android && npm run test:e2e:build-app:android && TEST_RN_PLATFORM=android npm run device-tests:local",
 		"test:e2e:bundle:ios": "mkdir -p ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app && npm run rn-bundle -- --reset-cache --platform=ios --dev=false --minify false --entry-file=index.js --bundle-output=./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle --assets-dest=./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app",
 		"test:e2e:build-app:ios": "npm run preios && SKIP_BUNDLING=true xcodebuild -workspace ios/GutenbergDemo.xcworkspace -configuration Release -scheme GutenbergDemo -destination 'platform=iOS Simulator,name=iPhone 11' -derivedDataPath ios/build/GutenbergDemo",
-		"test:e2e:ios:local": "npm run test:e2e:bundle:ios && npm run test:e2e:build-app:ios && TEST_RN_PLATFORM=ios npm run device-tests:local",
+		"test:e2e:build-wda": "xcodebuild -project ../../node_modules/appium/node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner -destination 'platform=iOS Simulator,name=iPhone 11' -derivedDataPath ios/build/WDA",
+		"test:e2e:ios:local": "npm run test:e2e:bundle:ios && npm run test:e2e:build-app:ios && npm run test:e2e:build-wda && TEST_RN_PLATFORM=ios npm run device-tests:local",
 		"build:gutenberg": "cd gutenberg && npm ci && npm run build",
 		"clean": "npm run clean:build-artifacts; npm run clean:aztec; npm run clean:haste; npm run clean:jest; npm run clean:metro; npm run clean:react; npm run clean:watchman",
 		"clean:runtime": "npm run clean:haste; npm run clean:react; npm run clean:metro; npm run clean:jest; npm run clean:watchman; npm run clean:babel-cache",
