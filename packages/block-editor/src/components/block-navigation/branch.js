@@ -18,7 +18,7 @@ export default function BlockNavigationBranch( props ) {
 	const {
 		blocks,
 		selectBlock,
-		selectedBlockClientId,
+		selectedBlockClientIds,
 		showAppender,
 		showBlockMovers,
 		showNestedBlocks,
@@ -35,7 +35,7 @@ export default function BlockNavigationBranch( props ) {
 	const itemHasAppender = ( parentClientId ) =>
 		showAppender &&
 		! isTreeRoot &&
-		isClientIdSelected( parentClientId, selectedBlockClientId );
+		isClientIdSelected( parentClientId, selectedBlockClientIds );
 	const hasAppender = itemHasAppender( parentBlockClientId );
 	// Add +1 to the rowCount to take the block appender into account.
 	const blockCount = filteredBlocks.length;
@@ -59,7 +59,7 @@ export default function BlockNavigationBranch( props ) {
 
 				const isSelected = isClientIdSelected(
 					clientId,
-					selectedBlockClientId
+					selectedBlockClientIds
 				);
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBranch );
@@ -90,7 +90,9 @@ export default function BlockNavigationBranch( props ) {
 						{ hasNestedBranch && (
 							<BlockNavigationBranch
 								blocks={ innerBlocks }
-								selectedBlockClientId={ selectedBlockClientId }
+								selectedBlockClientIds={
+									selectedBlockClientIds
+								}
 								selectBlock={ selectBlock }
 								isBranchSelected={ isSelectedBranch }
 								isLastOfBranch={ isLast }

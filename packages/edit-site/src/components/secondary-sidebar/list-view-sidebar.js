@@ -74,7 +74,7 @@ export default function ListViewSidebar() {
 				<BlockNavigationTree
 					blocks={ clientIdsTree }
 					selectBlock={ selectEditorBlock }
-					selectedBlockClientId={ selectedBlockClientIds }
+					selectedBlockClientIds={ selectedBlockClientIds }
 					showNestedBlocks
 					__experimentalPersistentListViewFeatures
 				/>

@@ -71,7 +71,7 @@ export default function BlockNavigation( {
 
 			<BlockNavigationTree
 				blocks={ hasHierarchy ? [ rootBlock ] : rootBlocks }
-				selectedBlockClientId={ selectedBlockClientId }
+				selectedBlockClientIds={ [ selectedBlockClientId ] }
 				selectBlock={ selectEditorBlock }
 				__experimentalFeatures={ __experimentalFeatures }
 				showNestedBlocks

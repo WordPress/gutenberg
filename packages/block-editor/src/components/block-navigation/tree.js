@@ -3,9 +3,9 @@
  */
 
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
+import deprecated from '@wordpress/deprecated';
 import { useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-
 /**
  * Internal dependencies
  */
@@ -21,10 +21,14 @@ import useBlockNavigationDropZone from './use-block-navigation-drop-zone';
  * @param {Object}  props                                          Components props.
  * @param {boolean} props.__experimentalFeatures                   Flag to enable experimental features.
  * @param {boolean} props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
+ * @param {string}  props.selectedBlockClientId                    Deprecated. See props.selectedBlockClientIds.
+ * @param {Array}   props.selectedBlockClientIds                   List of selected block client IDs.
  */
 export default function BlockNavigationTree( {
 	__experimentalFeatures,
 	__experimentalPersistentListViewFeatures,
+	selectedBlockClientId,
+	selectedBlockClientIds,
 	...props
 } ) {
 	const treeGridRef = useRef();
@@ -47,6 +51,26 @@ export default function BlockNavigationTree( {
 		]
 	);
 
+	// Deprecate selectedBlockClientId
+	if ( selectedBlockClientId ) {
+		deprecated(
+			'selectedBlockClientId (singular) prop of the BlockNavigationTree component',
+			{
+				alternative:
+					'selectedBlockClientIds (renamed to plural) of the BlockNavigationTree component',
+				hint: 'The renamed prop is an array',
+			}
+		);
+	}
+	// Convert selectedBlockClientId to selectedBlockClientIds for backward compatibility.
+	const updatedProps = {
+		...props,
+		selectedBlockClientIds:
+			selectedBlockClientId && ! selectedBlockClientIds
+				? [ selectedBlockClientId ]
+				: selectedBlockClientIds,
+	};
+
 	return (
 		<TreeGrid
 			className="block-editor-block-navigation-tree"
@@ -54,7 +78,7 @@ export default function BlockNavigationTree( {
 			ref={ treeGridRef }
 		>
 			<BlockNavigationContext.Provider value={ contextValue }>
-				<BlockNavigationBranch { ...props } />
+				<BlockNavigationBranch { ...updatedProps } />
 			</BlockNavigationContext.Provider>
 		</TreeGrid>
 	);
