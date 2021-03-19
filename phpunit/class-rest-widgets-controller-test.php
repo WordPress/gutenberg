@@ -179,14 +179,6 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			),
 			$attrs
 		);
-
-		// TODO: Is this needed?
-		global $wp_registered_widgets;
-		foreach ( $wp_registered_widgets as $wp_registered_widget ) {
-			if ( is_array( $wp_registered_widget['callback'] ) ) {
-				$wp_registered_widget['callback'][0]->_register();
-			}
-		}
 	}
 
 	/**
