@@ -30,6 +30,7 @@ import {
 	VIDEO_ASPECT_RATIO,
 	VideoPlayer,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
@@ -374,8 +375,8 @@ export default compose( [
 	withDispatch( ( dispatch, { clientId }, { select } ) => {
 		return {
 			wasBlockJustInserted() {
-				const { clearLastBlockInserted } = dispatch( 'core/editor' );
-				const { wasBlockJustInserted } = select( 'core/editor' );
+				const { clearLastBlockInserted } = dispatch( blockEditorStore );
+				const { wasBlockJustInserted } = select( blockEditorStore );
 
 				const result = wasBlockJustInserted( clientId );
 

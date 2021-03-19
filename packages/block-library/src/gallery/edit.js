@@ -473,8 +473,8 @@ export default compose( [
 	withDispatch( ( dispatch, { clientId }, { select } ) => {
 		return {
 			wasBlockJustInserted() {
-				const { clearLastBlockInserted } = dispatch( 'core/editor' );
-				const { wasBlockJustInserted } = select( 'core/editor' );
+				const { clearLastBlockInserted } = dispatch( blockEditorStore );
+				const { wasBlockJustInserted } = select( blockEditorStore );
 
 				const result = wasBlockJustInserted( clientId );
 
