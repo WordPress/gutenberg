@@ -344,3 +344,15 @@ function gutenberg_register_legacy_social_link_blocks() {
 }
 
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
+
+// todo: move to trac ticket
+function gutenberg_register_theme_block_category( $categories ) {
+	$categories[] = array(
+		'slug'  => 'theme',
+		'title' => _x( 'Theme', 'block category' ),
+		'icon'  => null,
+	);
+	return $categories;
+}
+
+add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
