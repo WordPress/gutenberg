@@ -176,7 +176,7 @@ export default class ColorPicker extends Component {
 
 	handleInputChange( data ) {
 		this.setState( { source: data.source } );
-		switch ( data.action ) {
+		switch ( data.state ) {
 			case 'reset':
 				this.resetDraftValues();
 				break;

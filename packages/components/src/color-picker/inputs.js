@@ -134,7 +134,7 @@ export class Inputs extends Component {
 
 	resetDraftValues() {
 		return this.props.onChange( {
-			action: 'reset',
+			state: 'reset',
 			source: this.state.view,
 		} );
 	}
