@@ -81,6 +81,7 @@ exports[`ColorPalette Dropdown .renderContent should render dropdown content 1`]
           "r": 255,
         }
       }
+      source="hex"
     />
   </div>
 </div>

@@ -15,13 +15,16 @@ import ColorPicker from '../';
 
 describe( 'ColorPicker', () => {
 	const color = '#FFF';
+	const source = 'hex';
 	let base;
 
 	beforeEach( () => {
 		base = TestRenderer.create(
 			<ColorPicker
 				color={ color }
+				source={ source }
 				onChangeComplete={ () => {} }
+				onSourceChangeComplete={ () => {} }
 				disableAlpha
 			/>
 		);
@@ -35,6 +38,8 @@ describe( 'ColorPicker', () => {
 		const testRenderer = TestRenderer.create(
 			<ColorPicker
 				color={ color }
+				source={ source }
+				onSourceChangeComplete={ () => {} }
 				onChangeComplete={ () => {} }
 				disableAlpha
 			/>
@@ -50,6 +55,8 @@ describe( 'ColorPicker', () => {
 		const testRenderer = TestRenderer.create(
 			<ColorPicker
 				color={ color }
+				source={ source }
+				onSourceChangeComplete={ () => {} }
 				onChangeComplete={ () => {} }
 				disableAlpha
 			/>
@@ -66,6 +73,8 @@ describe( 'ColorPicker', () => {
 		const testRenderer = TestRenderer.create(
 			<ColorPicker
 				color={ color }
+				source={ source }
+				onSourceChangeComplete={ () => {} }
 				onChangeComplete={ () => {} }
 				disableAlpha
 			/>
@@ -84,6 +93,8 @@ describe( 'ColorPicker', () => {
 		const testRenderer = TestRenderer.create(
 			<ColorPicker
 				color={ color }
+				source={ source }
+				onSourceChangeComplete={ () => {} }
 				onChangeComplete={ () => {} }
 				disableAlpha
 			/>
@@ -102,6 +113,8 @@ describe( 'ColorPicker', () => {
 		const testRenderer = TestRenderer.create(
 			<ColorPicker
 				color={ color }
+				source={ source }
+				onSourceChangeComplete={ () => {} }
 				onChangeComplete={ () => {} }
 				disableAlpha
 			/>
@@ -112,6 +125,26 @@ describe( 'ColorPicker', () => {
 		testRenderer.root
 			.findByType( 'input' )
 			.props.onKeyDown( { keyCode: ENTER } );
+
+		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
+	} );
+
+	test( 'should commit color source mode changes when switching between views', () => {
+		const testRenderer = TestRenderer.create(
+			<ColorPicker
+				color={ color }
+				source={ source }
+				onSourceChangeComplete={ () => {} }
+				onChangeComplete={ () => {} }
+				disableAlpha
+			/>
+		);
+
+		testRenderer.root
+			.findByProps( {
+				className: 'components-color-picker__inputs-toggle',
+			} )
+			.props.onClick();
 
 		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
 	} );

@@ -488,6 +488,167 @@ Snapshot Diff:
         <div
 `;
 
+exports[`ColorPicker should commit color source mode changes when switching between views 1`] = `
+Snapshot Diff:
+- First value
++ Second value
+
+@@ -22,11 +22,11 @@
+          />
+          <div
+            className="components-color-picker__saturation-black"
+          />
+          <button
+-           aria-describedby="color-picker-saturation-12"
++           aria-describedby="color-picker-saturation-11"
+            aria-label="Choose a shade"
+            className="components-button components-color-picker__saturation-pointer"
+            onKeyDown={[Function preventKeyEvents]}
+            style={
+              Object {
+@@ -36,11 +36,11 @@
+            }
+            type="button"
+          />
+          <div
+            className="components-visually-hidden"
+-           id="color-picker-saturation-12"
++           id="color-picker-saturation-11"
+          >
+            Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
+          </div>
+        </div>
+      </div>
+@@ -78,11 +78,11 @@
+                onMouseDown={[Function bound handleMouseDown]}
+                onTouchMove={[Function bound handleChange]}
+                onTouchStart={[Function bound handleChange]}
+              >
+                <div
+-                 aria-describedby="components-color-picker__hue-description-12"
++                 aria-describedby="components-color-picker__hue-description-11"
+                  aria-label="Hue value in degrees, from 0 to 359."
+                  aria-orientation="horizontal"
+                  aria-valuemax="1"
+                  aria-valuemin="359"
+                  aria-valuenow={0}
+@@ -96,11 +96,11 @@
+                  }
+                  tabIndex="0"
+                />
+                <p
+                  className="components-visually-hidden"
+-                 id="components-color-picker__hue-description-12"
++                 id="components-color-picker__hue-description-11"
+                >
+                  Move the arrow left or right to change hue.
+                </p>
+              </div>
+            </div>
+@@ -108,16 +108,10 @@
+        </div>
+      </div>
+      <div
+        className="components-color-picker__inputs-wrapper"
+      >
+-       <fieldset>
+-         <legend
+-           className="components-visually-hidden"
+-         >
+-           Color value in RGB
+-         </legend>
+        <div
+          className="components-color-picker__inputs-fields"
+        >
+          <div
+            className="components-base-control components-color-picker__inputs-field css-wdf2ti-Wrapper e1puf3u0"
+@@ -125,79 +119,26 @@
+            <div
+              className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+            >
+              <label
+                className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+-                 htmlFor="inspector-text-control-13"
+-               >
+-                 r
+-               </label>
+-               <input
+-                 className="components-text-control__input"
+-                 id="inspector-text-control-13"
+-                 max="255"
+-                 min="0"
+-                 onBlur={[Function bound handleBlur]}
+-                 onChange={[Function onChangeValue]}
+-                 onKeyDown={[Function bound handleKeyDown]}
+-                 type="number"
+-                 value={255}
+-               />
+-             </div>
+-           </div>
+-           <div
+-             className="components-base-control components-color-picker__inputs-field css-wdf2ti-Wrapper e1puf3u0"
+-           >
+-             <div
+-               className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+-             >
+-               <label
+-                 className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+-                 htmlFor="inspector-text-control-14"
++               htmlFor="inspector-text-control-11"
+              >
+-                 g
++               Color value in hexadecimal
+              </label>
+              <input
+                className="components-text-control__input"
+-                 id="inspector-text-control-14"
+-                 max="255"
+-                 min="0"
++               id="inspector-text-control-11"
+                onBlur={[Function bound handleBlur]}
+                onChange={[Function onChangeValue]}
+                onKeyDown={[Function bound handleKeyDown]}
+-                 type="number"
+-                 value={255}
+-               />
+-             </div>
+-           </div>
+-           <div
+-             className="components-base-control components-color-picker__inputs-field css-wdf2ti-Wrapper e1puf3u0"
+-           >
+-             <div
+-               className="components-base-control__field css-11vcxb9-StyledField e1puf3u1"
+-             >
+-               <label
+-                 className="components-base-control__label css-pezhm9-StyledLabel e1puf3u2"
+-                 htmlFor="inspector-text-control-15"
+-               >
+-                 b
+-               </label>
+-               <input
+-                 className="components-text-control__input"
+-                 id="inspector-text-control-15"
+-                 max="255"
+-                 min="0"
+-                 onBlur={[Function bound handleBlur]}
+-                 onChange={[Function onChangeValue]}
+-                 onKeyDown={[Function bound handleKeyDown]}
+-                 type="number"
+-                 value={255}
++               type="text"
++               value="#ffffff"
+              />
+            </div>
+          </div>
+        </div>
+-       </fieldset>
+        <div
+          className="components-color-picker__inputs-toggle-wrapper"
+        >
+          <button
+            aria-describedby={null}
+`;
+
 exports[`ColorPicker should only update input view for draft changes 1`] = `
 Snapshot Diff:
 - First value
