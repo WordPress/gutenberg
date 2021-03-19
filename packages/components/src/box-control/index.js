@@ -51,6 +51,7 @@ export default function BoxControl( {
 	label = __( 'Box Control' ),
 	values: valuesProp,
 	units,
+	sides,
 } ) {
 	const [ values, setValues ] = useControlledState( valuesProp, {
 		fallback: DEFAULT_VALUES,
@@ -107,6 +108,7 @@ export default function BoxControl( {
 		onHoverOff: handleOnHoverOff,
 		isLinked,
 		units,
+		sides,
 		values: inputValues,
 	};
 

@@ -5,49 +5,29 @@ import { __ } from '@wordpress/i18n';
 import { InspectorControls, PanelColorSettings } from '@wordpress/block-editor';
 import {
 	PanelBody,
-	__experimentalUnitControl as UnitControl,
+	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
-import { CSS_UNITS, MARGIN_CONSTRAINTS, parseUnit } from './shared';
+import { CSS_UNITS } from './shared';
 
 const SeparatorSettings = ( {
 	color,
 	setColor,
-	attributes,
+	attributes: { style },
 	setAttributes,
 } ) => {
-	const { style } = attributes;
-	const { top, bottom } = style?.spacing?.margin || {};
-
-	const topUnit = parseUnit( top );
-	const bottomUnit = parseUnit( bottom );
-
-	const updateMargins = ( margins ) => {
+	const updateMargins = ( { top, bottom } ) => {
 		setAttributes( {
 			style: {
 				...style,
 				spacing: {
 					...style?.spacing,
-					margin: margins,
+					margin: { top, bottom },
 				},
 			},
-		} );
-	};
-
-	const createHandleMarginChange = ( side ) => ( value ) => {
-		updateMargins( {
-			...style?.spacing?.margin,
-			[ side ]: value,
-		} );
-	};
-
-	const onUnitChange = ( unit ) => {
-		updateMargins( {
-			top: MARGIN_CONSTRAINTS[ unit ].default,
-			bottom: MARGIN_CONSTRAINTS[ unit ].default,
 		} );
 	};
 
@@ -64,26 +44,17 @@ const SeparatorSettings = ( {
 				] }
 			/>
 			<PanelBody title={ __( 'Separator settings' ) }>
-				<UnitControl
-					label={ __( 'Top margin' ) }
-					max={ MARGIN_CONSTRAINTS[ topUnit ].max }
-					min={ MARGIN_CONSTRAINTS[ topUnit ].min }
-					onChange={ createHandleMarginChange( 'top' ) }
-					onUnitChange={ onUnitChange }
-					step={ topUnit === 'px' ? '1' : '0.25' }
-					style={ { marginBottom: '8px' } }
+				<BoxControl
+					label={ __( 'Margin' ) }
+					onChange={ updateMargins }
+					sides={ {
+						top: true,
+						right: false,
+						bottom: true,
+						left: false,
+					} }
 					units={ CSS_UNITS }
-					value={ top }
-				/>
-				<UnitControl
-					label={ __( 'Bottom margin' ) }
-					max={ MARGIN_CONSTRAINTS[ bottomUnit ].max }
-					min={ MARGIN_CONSTRAINTS[ bottomUnit ].min }
-					onChange={ createHandleMarginChange( 'bottom' ) }
-					onUnitChange={ onUnitChange }
-					step={ bottomUnit === 'px' ? '1' : '0.25' }
-					units={ CSS_UNITS }
-					value={ bottom }
+					values={ style?.spacing?.margin || {} }
 				/>
 			</PanelBody>
 		</InspectorControls>
