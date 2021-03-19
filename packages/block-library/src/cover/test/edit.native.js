@@ -4,7 +4,6 @@
 import { Image } from 'react-native';
 import { render, fireEvent, waitFor } from '@testing-library/react-native';
 import { act } from 'react-test-renderer';
-import { useDarkModeContext, eventEmitter } from 'react-native-dark-mode';
 
 /**
  * WordPress dependencies
