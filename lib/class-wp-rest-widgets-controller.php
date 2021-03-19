@@ -428,7 +428,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 				$instance = $request['instance']['raw'];
 			} elseif ( isset( $request['instance']['encoded'], $request['instance']['hash'] ) ) {
 				$serialized_instance = base64_decode( $request['instance']['encoded'] );
-				if ( wp_hash( $serialized_instance ) !== $request['instance']['hash'] ) {
+				if ( ! hash_equals( wp_hash( $serialized_instance ), $request['instance']['hash'] ) ) {
 					return new WP_Error(
 						'rest_invalid_widget',
 						__( 'The provided instance is malformed.', 'gutenberg' ),
