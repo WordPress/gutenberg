@@ -104,7 +104,7 @@ describe( 'Toolbar roving tabindex', () => {
 		await page.click( '.blocks-table__placeholder-button' );
 		await testBlockToolbarKeyboardNavigation( 'Block: Table', 'Table' );
 		await wrapCurrentBlockWithGroup( 'Table' );
-		await testGroupKeyboardNavigation( 'Block: Table', 'Table' );
+		await testGroupKeyboardNavigation( 'Body cell text', 'Table' );
 	} );
 
 	it( 'ensures custom html block toolbar uses roving tabindex', async () => {
@@ -114,10 +114,7 @@ describe( 'Toolbar roving tabindex', () => {
 			'Custom HTML'
 		);
 		await wrapCurrentBlockWithGroup( 'Custom HTML' );
-		await testGroupKeyboardNavigation(
-			'Block: Custom HTML',
-			'Custom HTML'
-		);
+		await testGroupKeyboardNavigation( 'HTML', 'Custom HTML' );
 	} );
 
 	it( 'ensures block toolbar remembers the last focused item', async () => {

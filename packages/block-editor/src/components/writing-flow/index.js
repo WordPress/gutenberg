@@ -362,9 +362,9 @@ export default function WritingFlow( { children } ) {
 					? focusCaptureBeforeRef
 					: focusCaptureAfterRef;
 
-				// Disable focus capturing on the focus capture element, so
-				// it doesn't refocus this block and so it allows default
-				// behaviour (moving focus to the next tabbable element).
+				// Disable focus capturing on the focus capture element, so it
+				// doesn't refocus this block and so it allows default behaviour
+				// (moving focus to the next tabbable element).
 				noCapture.current = true;
 				next.current.focus();
 				return;
