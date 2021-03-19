@@ -23,6 +23,11 @@ export default function save( { attributes, className } ) {
 		url,
 		width,
 	} = attributes;
+
+	if ( ! text ) {
+		return null;
+	}
+
 	const colorProps = getColorAndStyleProps( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',

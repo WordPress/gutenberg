@@ -17,7 +17,7 @@ export default function useBlockNavigator( clientId, __experimentalFeatures ) {
 	const navigatorToolbarButton = (
 		<ToolbarButton
 			className="components-toolbar__control"
-			label={ __( 'Open block navigator' ) }
+			label={ __( 'Open block navigation' ) }
 			onClick={ () => setIsNavigationListOpen( true ) }
 			icon={ listView }
 		/>
@@ -25,7 +25,7 @@ export default function useBlockNavigator( clientId, __experimentalFeatures ) {
 
 	const navigatorModal = isNavigationListOpen && (
 		<Modal
-			title={ __( 'Block Navigator' ) }
+			title={ __( 'Navigation' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ () => {
 				setIsNavigationListOpen( false );

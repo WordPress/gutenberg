@@ -16,7 +16,6 @@ import {
 	RangeControl,
 	ResizableBox,
 	Spinner,
-	ToolbarGroup,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -284,19 +283,15 @@ export default function LogoEdit( {
 		setError( message[ 2 ] ? message[ 2 ] : null );
 	};
 
-	const controls = (
-		<BlockControls>
-			<ToolbarGroup>
-				{ logoUrl && (
-					<MediaReplaceFlow
-						mediaURL={ logoUrl }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept={ ACCEPT_MEDIA_STRING }
-						onSelect={ onSelectLogo }
-						onError={ onUploadError }
-					/>
-				) }
-			</ToolbarGroup>
+	const controls = logoUrl && (
+		<BlockControls group="other">
+			<MediaReplaceFlow
+				mediaURL={ logoUrl }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				accept={ ACCEPT_MEDIA_STRING }
+				onSelect={ onSelectLogo }
+				onError={ onUploadError }
+			/>
 		</BlockControls>
 	);
 

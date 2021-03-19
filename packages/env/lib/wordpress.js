@@ -48,6 +48,27 @@ async function makeContentDirectoriesWritable(
 }
 
 /**
+ * Makes wp-config.php owned by www-data so that WordPress can work with the
+ * file.
+ *
+ * @param {WPEnvironment} environment The environment to check. Either 'development' or 'tests'.
+ * @param {WPConfig}      config      The wp-env config object.
+ */
+async function makeConfigWritable(
+	environment,
+	{ dockerComposeConfigPath, debug }
+) {
+	await dockerCompose.exec(
+		environment === 'development' ? 'wordpress' : 'tests-wordpress',
+		'chown www-data:www-data wp-config.php',
+		{
+			config: dockerComposeConfigPath,
+			log: debug,
+		}
+	);
+}
+
+/**
  * Checks a WordPress database connection. An error is thrown if the test is
  * unsuccessful.
  *
@@ -260,6 +281,7 @@ async function copyCoreFiles( fromPath, toPath ) {
 module.exports = {
 	hasSameCoreSource,
 	makeContentDirectoriesWritable,
+	makeConfigWritable,
 	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,
