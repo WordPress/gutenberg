@@ -31,8 +31,8 @@ const mergeEvent = ( ...handlers ) =>
 /**
  * @typedef Props
  * @property {(value: string) => boolean} validate predicate
- * @property {Function} onWrongInput called when a validate predicate fails
- * @property {Function} onCommit called on enter/blur
+ * @property {( value: string ) => void} onWrongInput called when a validate predicate fails
+ * @property {( value: string ) => void} onCommit called on enter/blur
  * @property {string} value input value
  */
 
@@ -48,10 +48,10 @@ export default function useInlineEdit( {
 	const [ isInEditMode, setIsInEditMode ] = useState( false );
 	const [ editingValue, setEditingValue ] = useState( propValue );
 	const value = isInEditMode ? editingValue : propValue;
-	/** @type {import('react').MutableRefObject<HTMLInputElement | undefined>} */
-	const inputRef = useRef();
-	/** @type {import('react').MutableRefObject<HTMLInputElement | undefined>} */
-	const toggleRef = useRef();
+	/** @type {import('react').RefObject<HTMLInputElement>} */
+	const inputRef = useRef( null );
+	/** @type {import('react').RefObject<HTMLButtonElement>} */
+	const toggleRef = useRef( null );
 	const changeToEditMode = () => setIsInEditMode( true );
 	const changeToToggleMode = () => setIsInEditMode( false );
 
