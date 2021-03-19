@@ -28,7 +28,7 @@ export const logged = Object.create( null );
  * import deprecated from '@wordpress/deprecated';
  *
  * deprecated( 'Eating meat', {
- *  since: '2019.01.01'
+ * 	since: '2019.01.01'
  * 	version: '2020.01.01',
  * 	alternative: 'vegetables',
  * 	plugin: 'the earth',
@@ -63,7 +63,7 @@ export default function deprecated( feature, options = {} ) {
 	 *
 	 * @param {string}  feature             Name of the deprecated feature.
 	 * @param {?Object} options             Personalisation options
-	 * @param {string}  options.since      Version in which the feature was deprecated.
+	 * @param {string}  options.since       Version in which the feature was deprecated.
 	 * @param {?string} options.version     Version in which the feature will be removed.
 	 * @param {?string} options.alternative Feature to use instead
 	 * @param {?string} options.plugin      Plugin name if it's a plugin feature
