@@ -28,7 +28,10 @@ export { default as __experimentalBlockNavigationEditor } from './block-navigati
 export { default as __experimentalBlockNavigationTree } from './block-navigation/tree';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
 export { default as __experimentalBlockVariationTransforms } from './block-variation-transforms';
-export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
+export {
+	BlockVerticalAlignmentToolbar,
+	BlockVerticalAlignmentControl,
+} from './block-vertical-alignment-control';
 export { default as ButtonBlockerAppender } from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPaletteControl } from './color-palette/control';
