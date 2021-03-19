@@ -10,7 +10,10 @@ export {
 } from './block-controls';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockIcon } from './block-icon';
-export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
+export {
+	BlockVerticalAlignmentToolbar,
+	BlockVerticalAlignmentControl,
+} from './block-vertical-alignment-control';
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';

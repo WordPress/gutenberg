@@ -14,7 +14,6 @@ import {
 	Spinner,
 	TextareaControl,
 	TextControl,
-	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
@@ -281,52 +280,52 @@ export default function Image( {
 
 	const controls = (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<BlockAlignmentControl
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-					{ ! multiImageSelection && ! isEditingImage && (
-						<ImageURLInputUI
-							url={ href || '' }
-							onChangeUrl={ onSetHref }
-							linkDestination={ linkDestination }
-							mediaUrl={ ( image && image.source_url ) || url }
-							mediaLink={ image && image.link }
-							linkTarget={ linkTarget }
-							linkClass={ linkClass }
-							rel={ rel }
-						/>
-					) }
-					{ allowCrop && (
-						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
-							icon={ crop }
-							label={ __( 'Crop' ) }
-						/>
-					) }
-					{ externalBlob && (
-						<ToolbarButton
-							onClick={ uploadExternal }
-							icon={ upload }
-							label={ __( 'Upload external image' ) }
-						/>
-					) }
-					{ ! multiImageSelection && coverBlockExists && (
-						<ToolbarButton
-							icon={ overlayText }
-							label={ __( 'Add text over image' ) }
-							onClick={ () =>
-								replaceBlocks(
-									currentId,
-									switchToBlockType( block, 'core/cover' )
-								)
-							}
-						/>
-					) }
-				</ToolbarGroup>
+			<BlockControls group="block">
+				<BlockAlignmentControl
+					value={ align }
+					onChange={ updateAlignment }
+				/>
 				{ ! multiImageSelection && ! isEditingImage && (
+					<ImageURLInputUI
+						url={ href || '' }
+						onChangeUrl={ onSetHref }
+						linkDestination={ linkDestination }
+						mediaUrl={ ( image && image.source_url ) || url }
+						mediaLink={ image && image.link }
+						linkTarget={ linkTarget }
+						linkClass={ linkClass }
+						rel={ rel }
+					/>
+				) }
+				{ allowCrop && (
+					<ToolbarButton
+						onClick={ () => setIsEditingImage( true ) }
+						icon={ crop }
+						label={ __( 'Crop' ) }
+					/>
+				) }
+				{ externalBlob && (
+					<ToolbarButton
+						onClick={ uploadExternal }
+						icon={ upload }
+						label={ __( 'Upload external image' ) }
+					/>
+				) }
+				{ ! multiImageSelection && coverBlockExists && (
+					<ToolbarButton
+						icon={ overlayText }
+						label={ __( 'Add text over image' ) }
+						onClick={ () =>
+							replaceBlocks(
+								currentId,
+								switchToBlockType( block, 'core/cover' )
+							)
+						}
+					/>
+				) }
+			</BlockControls>
+			{ ! multiImageSelection && ! isEditingImage && (
+				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ id }
 						mediaURL={ url }
@@ -336,8 +335,8 @@ export default function Image( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 					/>
-				) }
-			</BlockControls>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
 					{ ! multiImageSelection && (
