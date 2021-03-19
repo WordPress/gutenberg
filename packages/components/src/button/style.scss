@@ -299,7 +299,7 @@
 			display: inline-block;
 			flex: 0 0 auto;
 			margin-left: 2px;
-			margin-right: 10px;
+			margin-right: 2px;
 		}
 
 		&.has-text {
@@ -308,6 +308,10 @@
 
 		&.has-text svg {
 			margin-right: 8px;
+		}
+
+		&.has-text .dashicon {
+			margin-right: 10px;
 		}
 	}
 

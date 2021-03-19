@@ -1,21 +1,33 @@
 /**
+ * External dependencies
+ */
+import { View } from 'react-native';
+/**
  * WordPress dependencies
  */
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	createBlock,
 	rawHandler,
 	store as blocksStore,
 } from '@wordpress/blocks';
-import { getClipboard } from '@wordpress/components';
+import {
+	BottomSheet,
+	BottomSheetConsumer,
+	getClipboard,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 
 import InserterSearchResults from './search-results';
+import InserterSearchForm from './search-form';
 import { store as blockEditorStore } from '../../store';
+import { searchItems } from './search-items';
+
+const MIN_ITEMS_FOR_SEARCH = 2;
 
 function InserterMenu( {
 	onSelect,
@@ -26,6 +38,11 @@ function InserterMenu( {
 	shouldReplaceBlock,
 	insertionIndex,
 } ) {
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ searchFormHeight, setSearchFormHeight ] = useState( 0 );
+	// eslint-disable-next-line no-undef
+	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
+
 	const {
 		showInsertionPoint,
 		hideInsertionPoint,
@@ -70,6 +87,7 @@ function InserterMenu( {
 	const { getBlockType } = useSelect( ( select ) => select( blocksStore ) );
 
 	useEffect( () => {
+		// Show/Hide insertion point on Mount/Dismount
 		if ( shouldReplaceBlock ) {
 			const count = getBlockCount();
 			// Check if there is a rootClientId because that means it is a nested replaceable block
@@ -86,14 +104,19 @@ function InserterMenu( {
 				removeBlock( blockToReplace, false );
 			}
 		}
-		// Show/Hide insertion point on Mount/Dismount
 		showInsertionPoint( destinationRootClientId, insertionIndex );
+
+		// Show search form if there are enough items to filter.
+		if ( getItems()?.length < MIN_ITEMS_FOR_SEARCH ) {
+			setShowSearchForm( false );
+		}
+
 		return hideInsertionPoint;
 	}, [] );
 
 	const onClose = useCallback( () => {
-		// If should replace but didn't insert any block
-		// re-insert default block.
+		// if should replace but didn't insert any block
+		// re-insert default block
 		if ( shouldReplaceBlock ) {
 			insertDefaultBlock( {}, destinationRootClientId, insertionIndex );
 		}
@@ -122,9 +145,11 @@ function InserterMenu( {
 	 */
 	function getItems() {
 		// Filter out reusable blocks (they will be added in another tab)
-		const itemsToDisplay = items.filter(
+		let itemsToDisplay = items.filter(
 			( { name } ) => name !== 'core/block'
 		);
+
+		itemsToDisplay = searchItems( itemsToDisplay, filterValue );
 
 		const clipboard = getClipboard();
 		let clipboardBlock = rawHandler( { HTML: clipboard } )[ 0 ];
@@ -153,14 +178,45 @@ function InserterMenu( {
 	}
 
 	return (
-		<InserterSearchResults
+		<BottomSheet
+			isVisible={ true }
 			onClose={ onClose }
-			items={ getItems() }
-			onSelect={ ( item ) => {
-				onInsert( item );
-				onSelect( item );
-			} }
-		/>
+			hideHeader
+			hasNavigation
+			setMinHeightToMaxHeight={ showSearchForm }
+		>
+			<BottomSheetConsumer>
+				{ ( { listProps, safeAreaBottomInset } ) => (
+					<View>
+						{ showSearchForm && (
+							<InserterSearchForm
+								onChange={ ( value ) => {
+									setFilterValue( value );
+								} }
+								value={ filterValue }
+								onLayout={ ( event ) => {
+									const { height } = event.nativeEvent.layout;
+									setSearchFormHeight( height );
+								} }
+							/>
+						) }
+
+						<InserterSearchResults
+							items={ getItems() }
+							onSelect={ ( item ) => {
+								onInsert( item );
+								onSelect( item );
+							} }
+							{ ...{
+								listProps,
+								safeAreaBottomInset,
+								searchFormHeight,
+							} }
+						/>
+					</View>
+				) }
+			</BottomSheetConsumer>
+		</BottomSheet>
 	);
 }
 

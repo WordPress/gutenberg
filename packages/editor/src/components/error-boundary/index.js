@@ -3,9 +3,19 @@
  */
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Button, ClipboardButton } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { select } from '@wordpress/data';
 import { Warning } from '@wordpress/block-editor';
+import { useCopyToClipboard } from '@wordpress/compose';
+
+function CopyButton( { text, children } ) {
+	const ref = useCopyToClipboard( text );
+	return (
+		<Button isSecondary ref={ ref }>
+			{ children }
+		</Button>
+	);
+}
 
 class ErrorBoundary extends Component {
 	constructor() {
@@ -52,20 +62,12 @@ class ErrorBoundary extends Component {
 					<Button key="recovery" onClick={ this.reboot } isSecondary>
 						{ __( 'Attempt Recovery' ) }
 					</Button>,
-					<ClipboardButton
-						key="copy-post"
-						text={ this.getContent }
-						isSecondary
-					>
+					<CopyButton key="copy-post" text={ this.getContent }>
 						{ __( 'Copy Post Text' ) }
-					</ClipboardButton>,
-					<ClipboardButton
-						key="copy-error"
-						text={ error.stack }
-						isSecondary
-					>
+					</CopyButton>,
+					<CopyButton key="copy-error" text={ error.stack }>
 						{ __( 'Copy Error' ) }
-					</ClipboardButton>,
+					</CopyButton>,
 				] }
 			>
 				{ __( 'The editor has encountered an unexpected error.' ) }

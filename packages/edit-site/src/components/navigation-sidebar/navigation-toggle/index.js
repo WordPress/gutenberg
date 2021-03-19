@@ -12,32 +12,23 @@ import { wordpress } from '@wordpress/icons';
 import { store as editSiteStore } from '../../../store';
 
 function NavigationToggle( { icon, isOpen } ) {
-	const { isActive, isRequestingSiteIcon, siteIconUrl } = useSelect(
-		( select ) => {
-			const { isFeatureActive } = select( editSiteStore );
-			const { getEntityRecord } = select( 'core' );
-			const { isResolving } = select( 'core/data' );
-			const siteData =
-				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+	const { isRequestingSiteIcon, siteIconUrl } = useSelect( ( select ) => {
+		const { getEntityRecord } = select( 'core' );
+		const { isResolving } = select( 'core/data' );
+		const siteData =
+			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
-			return {
-				isActive: isFeatureActive( 'fullscreenMode' ),
-				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
-					'root',
-					'__unstableBase',
-					undefined,
-				] ),
-				siteIconUrl: siteData.site_icon_url,
-			};
-		},
-		[]
-	);
+		return {
+			isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+				'root',
+				'__unstableBase',
+				undefined,
+			] ),
+			siteIconUrl: siteData.site_icon_url,
+		};
+	}, [] );
 
 	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
-
-	if ( ! isActive ) {
-		return null;
-	}
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 

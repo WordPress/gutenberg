@@ -37,6 +37,7 @@ export default function MenuItemsChoice( {
 				} }
 				onMouseEnter={ () => onHover( item.value ) }
 				onMouseLeave={ () => onHover( null ) }
+				aria-label={ item[ 'aria-label' ] }
 			>
 				{ item.label }
 			</MenuItem>
