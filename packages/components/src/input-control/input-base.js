@@ -63,7 +63,8 @@ export function InputBase(
 	ref
 ) {
 	const id = useUniqueId( idProp );
-	const hideLabel = hideLabelFromVision || ! label;
+	const hideLabelNextToInput =
+		hideLabelFromVision || labelPosition !== 'side' || ! label;
 
 	return (
 		<Root
@@ -90,7 +91,7 @@ export function InputBase(
 				__unstableInputWidth={ __unstableInputWidth }
 				className="components-input-control__container"
 				disabled={ disabled }
-				hideLabel={ hideLabel }
+				hideLabel={ hideLabelNextToInput }
 				isFocused={ isFocused }
 				labelPosition={ labelPosition }
 			>

@@ -42,13 +42,16 @@ const rootLabelPositionStyles = ( { labelPosition } ) => {
 	}
 };
 
+// &&&&&&& added to force application of label positioning styles
 export const Root = styled( Flex )`
-	position: relative;
-	border-radius: 2px;
+	&&&&&&& {
+		position: relative;
+		border-radius: 2px;
 
-	${ rootFloatLabelStyles }
-	${ rootFocusedStyles }
-	${ rootLabelPositionStyles }
+		${ rootFloatLabelStyles }
+		${ rootFocusedStyles }
+		${ rootLabelPositionStyles }
+	}
 `;
 
 const containerDisabledStyles = ( { disabled } ) => {
