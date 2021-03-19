@@ -415,7 +415,6 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 	const functionToken = getFunctionToken( declarationToken );
 
 	// otherwise find the corresponding parameter token for the documented parameter
-	/** @type {babelTypes.Identifier} */
 	const paramToken = functionToken.params[ paramIndex ];
 
 	// This shouldn't happen due to our ESLint enforcing correctly documented parameter names but just in case
@@ -428,9 +427,54 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 		);
 	}
 
+	/** @type {babelTypes.TSTypeAnnotation | undefined} */
+	let typeAnnotation;
+	if ( babelTypes.isIdentifier( paramToken ) ) {
+		typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
+	} else if ( babelTypes.isRestElement( paramToken ) ) {
+		typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
+	} else if ( babelTypes.isArrayPattern( paramToken ) ) {
+		if ( ! tag.name.includes( '.' ) ) {
+			// 1 unqualified name
+			typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
+		} else {
+			// 2 qualified name i.e., an element of the array being destructured
+			const position = parseInt(
+				tag.name.split( '.' ).slice( -1 )[ 0 ],
+				0
+			);
+			if (
+				babelTypes.isTSArrayType(
+					paramToken.typeAnnotation.typeAnnotation
+				)
+			) {
+				if (
+					babelTypes.isTSTypeReference(
+						paramToken.typeAnnotation.typeAnnotation.elementType
+					)
+				) {
+					return paramToken.typeAnnotation.typeAnnotation.elementType
+						.typeName.name;
+				}
+				typeAnnotation =
+					paramToken.typeAnnotation.typeAnnotation.elementType
+						.typeAnnotation;
+			} else if (
+				babelTypes.isTSTupleType(
+					paramToken.typeAnnotation.typeAnnotation
+				)
+			) {
+				typeAnnotation =
+					paramToken.typeAnnotation.typeAnnotation.elementTypes[
+						position
+					];
+			} else {
+				typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
+			}
+		}
+	}
+
 	try {
-		/** @type {babelTypes.TSTypeAnnotation} */
-		const typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
 		return getTypeAnnotation( typeAnnotation );
 	} catch ( e ) {
 		throw new Error(

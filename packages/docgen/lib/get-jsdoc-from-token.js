@@ -27,7 +27,10 @@ module.exports = ( token ) => {
 		if ( jsdoc ) {
 			let paramCount = 0;
 			jsdoc.tags = jsdoc.tags.map( ( tag ) => {
-				const index = tag.tag === 'param' ? paramCount++ : null;
+				const isUnqualifiedParam =
+					tag.tag === 'param' && ! tag.name.includes( '.' );
+				const index = isUnqualifiedParam ? paramCount++ : paramCount;
+
 				return {
 					...tag,
 					type: getTypeAnnotation( tag, token, index ),
