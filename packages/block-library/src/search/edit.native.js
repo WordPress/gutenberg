@@ -182,6 +182,7 @@ export default function SearchEdit( {
 					onFocus();
 				} }
 				onBlur={ () => setIsPlaceholderSelected( false ) }
+				placeholderTextColor="#919191"
 			/>
 		);
 	};
