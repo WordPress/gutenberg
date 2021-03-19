@@ -120,15 +120,6 @@ _Returns_
 Given a component returns the enhanced component augmented with a component
 only rerendering when its props/state change
 
-_Parameters_
-
--   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
--   _modifierName_ `string`: Seed name from which to generated display name.
-
-_Returns_
-
--   `WPComponent`: Component class with generated display name assigned.
-
 <a name="useAsyncList" href="#useAsyncList">#</a> **useAsyncList**
 
 React hook returns an array which items get asynchronously appended from a source array.
