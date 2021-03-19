@@ -2,30 +2,57 @@
  * WordPress dependencies
  */
 import { BlockInspector } from '@wordpress/block-editor';
-import { Platform } from '@wordpress/element';
-import { ComplementaryArea } from '@wordpress/interface';
+import { useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
+import {
+	ComplementaryArea,
+	store as interfaceStore,
+} from '@wordpress/interface';
 import { __ } from '@wordpress/i18n';
 import { cog } from '@wordpress/icons';
 
-const BLOCK_INSPECTOR_IDENTIFIER = 'edit-widgets/block-inspector';
+const BLOCK_INSPECTOR_SCOPE = 'core/edit-navigation';
+const BLOCK_INSPECTOR_IDENTIFIER = 'edit-navigation/block-inspector';
 
-const SIDEBAR_ACTIVE_BY_DEFAULT = Platform.select( {
-	web: true,
-	native: false,
-} );
+function useTogglePermanentSidebar( hasPermanentSidebar ) {
+	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
+		interfaceStore
+	);
 
-export default function Sidebar() {
+	useEffect( () => {
+		if ( hasPermanentSidebar ) {
+			enableComplementaryArea(
+				BLOCK_INSPECTOR_SCOPE,
+				BLOCK_INSPECTOR_IDENTIFIER
+			);
+		} else {
+			disableComplementaryArea(
+				BLOCK_INSPECTOR_SCOPE,
+				BLOCK_INSPECTOR_IDENTIFIER
+			);
+		}
+	}, [
+		hasPermanentSidebar,
+		enableComplementaryArea,
+		disableComplementaryArea,
+	] );
+}
+
+export default function Sidebar( { hasPermanentSidebar } ) {
+	useTogglePermanentSidebar( hasPermanentSidebar );
+
 	return (
 		<ComplementaryArea
 			className="edit-navigation-sidebar"
 			/* translators: button label text should, if possible, be under 16 characters. */
 			title={ __( 'Settings' ) }
 			closeLabel={ __( 'Close settings' ) }
-			scope="core/edit-navigation"
+			scope={ BLOCK_INSPECTOR_SCOPE }
 			identifier={ BLOCK_INSPECTOR_IDENTIFIER }
 			icon={ cog }
-			isActiveByDefault={ SIDEBAR_ACTIVE_BY_DEFAULT }
+			isActiveByDefault={ hasPermanentSidebar }
 			header={ <></> }
+			isPinnable={ ! hasPermanentSidebar }
 		>
 			<BlockInspector />
 		</ComplementaryArea>

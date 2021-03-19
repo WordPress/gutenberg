@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -12,6 +17,7 @@ import {
 	SlotFillProvider,
 	Spinner,
 } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo, useState } from '@wordpress/element';
 import {
@@ -51,6 +57,7 @@ const interfaceLabels = {
 };
 
 export default function Layout( { blockEditorSettings } ) {
+	const hasPermanentSidebar = useViewportMatch( 'medium' );
 	const contentAreaRef = useBlockSelectionClearer();
 	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
 		false
@@ -72,11 +79,14 @@ export default function Layout( { blockEditorSettings } ) {
 		navigationPost
 	);
 
-	const { hasSidebarEnabled } = useSelect( ( select ) => ( {
-		hasSidebarEnabled: !! select(
-			interfaceStore
-		).getActiveComplementaryArea( 'core/edit-navigation' ),
-	} ) );
+	const { hasSidebarEnabled } = useSelect(
+		( select ) => ( {
+			hasSidebarEnabled: !! select(
+				interfaceStore
+			).getActiveComplementaryArea( 'core/edit-navigation' ),
+		} ),
+		[]
+	);
 
 	useMenuNotifications( selectedMenuId );
 
@@ -112,7 +122,12 @@ export default function Layout( { blockEditorSettings } ) {
 								) }
 							>
 								<InterfaceSkeleton
-									className="edit-navigation-layout"
+									className={ classnames(
+										'edit-navigation-layout',
+										{
+											'has-permanent-sidebar': hasPermanentSidebar,
+										}
+									) }
 									labels={ interfaceLabels }
 									header={
 										<Header
@@ -156,12 +171,15 @@ export default function Layout( { blockEditorSettings } ) {
 										</>
 									}
 									sidebar={
-										hasSidebarEnabled && (
+										( hasPermanentSidebar ||
+											hasSidebarEnabled ) && (
 											<ComplementaryArea.Slot scope="core/edit-navigation" />
 										)
 									}
 								/>
-								<Sidebar />
+								<Sidebar
+									hasPermanentSidebar={ hasPermanentSidebar }
+								/>
 							</IsMenuNameControlFocusedContext.Provider>
 						</MenuIdContext.Provider>
 					</BlockEditorProvider>
