@@ -153,17 +153,21 @@ When `duotone` support is declared: it'll be added a new `duotone` attribute of 
 
 ```js
 attributes: {
-    duotone: {
+    style: {
         type: 'object',
         default: {
-            values: {
-                r: [0, 1],
-                g: [0, 1],
-                b: [0, 1],
+            color: {
+                duotone: {
+                    values: {
+                        r: [0, 1],
+                        g: [0, 1],
+                        b: [0, 1],
+                    }
+                }
             }
-        },
-    },
-},
+        }
+    }
+}
 ```
 
 This property adds block controls which allow to apply a duotone filter to a block or part of a block.

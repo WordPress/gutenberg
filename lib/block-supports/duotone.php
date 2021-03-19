@@ -21,8 +21,8 @@ function gutenberg_register_duotone_support( $block_type ) {
 			$block_type->attributes = array();
 		}
 
-		if ( ! array_key_exists( 'duotone', $block_type->attributes ) ) {
-			$block_type->attributes['duotone'] = array(
+		if ( ! array_key_exists( 'style', $block_type->attributes ) ) {
+			$block_type->attributes['style'] = array(
 				'type' => 'object',
 			);
 		}
@@ -46,10 +46,10 @@ function gutenberg_apply_duotone_support( $block_type, $block_attributes ) {
 		$has_duotone_support = gutenberg_experimental_get( $block_type->supports, array( 'color', 'duotone' ), false );
 	}
 	if ( $has_duotone_support ) {
-		$has_duotone_attribute = array_key_exists( 'duotone', $block_attributes );
+		$has_duotone_attribute = isset( $block_attributes['style']['color']['duotone'] );
 
 		if ( $has_duotone_attribute ) {
-			$attributes['class'] = $block_attributes['duotone']['id'];
+			$attributes['class'] = $block_attributes['style']['color']['duotone']['id'];
 		}
 	}
 
@@ -71,7 +71,7 @@ function gutenberg_render_duotone_support( $block_type, $block_attributes, $bloc
 		$duotone_support = gutenberg_experimental_get( $block_type->supports, array( 'color', 'duotone' ), false );
 	}
 
-	$has_duotone_attribute = array_key_exists( 'duotone', $block_attributes );
+	$has_duotone_attribute = isset( $block_attributes['style']['color']['duotone'] );
 
 	if (
 		! $duotone_support ||
@@ -80,8 +80,8 @@ function gutenberg_render_duotone_support( $block_type, $block_attributes, $bloc
 		return $block_content;
 	}
 
-	$duotone_id     = $block_attributes['duotone']['id'];
-	$duotone_values = $block_attributes['duotone']['values'];
+	$duotone_id     = $block_attributes['style']['color']['duotone']['id'];
+	$duotone_values = $block_attributes['style']['color']['duotone']['values'];
 
 	// Adding the block class as to not affect other blocks.
 	$block_class = gutenberg_get_block_default_classname( $block_type->name );

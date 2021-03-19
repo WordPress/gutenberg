@@ -14,12 +14,12 @@
  * @return string Rendered HTML of the referenced block.
  */
 function render_block_core_image( $attributes, $content ) {
-	if ( ! isset( $attributes['duotone'] ) ) {
+	if ( ! isset( $attributes['style']['color']['duotone'] ) ) {
 		return $content;
 	}
 
-	$id        = $attributes['duotone']['id'];
-	$values    = $attributes['duotone']['values'];
+	$id        = $attributes['style']['color']['duotone']['id'];
+	$values    = $attributes['style']['color']['duotone']['values'];
 	$selectors = array(
 		'div.wp-block-image .' . $id . ' img',
 		'figure.wp-block-image.' . $id . ' img',

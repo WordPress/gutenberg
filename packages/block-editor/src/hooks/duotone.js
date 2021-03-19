@@ -35,9 +35,9 @@ function addDuotoneAttributes( settings ) {
 
 	// Allow blocks to specify their own attribute definition with default
 	// values if needed.
-	if ( ! settings.attributes.duotone ) {
+	if ( ! settings.attributes.style ) {
 		Object.assign( settings.attributes, {
-			duotone: {
+			style: {
 				type: 'object',
 			},
 		} );
@@ -61,10 +61,9 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 			return <BlockEdit { ...props } />;
 		}
 
-		const {
-			attributes: { duotone },
-			setAttributes,
-		} = props;
+		const { attributes, setAttributes } = props;
+		const style = attributes?.style;
+		const duotone = style?.color?.duotone;
 
 		const duotonePalette = useEditorFeature( 'color.duotone' );
 		const colorPalette = useEditorFeature( 'color.palette' );
@@ -105,7 +104,14 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 							duotonePalette={ duotonePalette }
 							colorPalette={ colorPalette }
 							onChange={ ( newDuotone ) => {
-								setAttributes( { duotone: newDuotone } );
+								const newStyle = {
+									...style,
+									color: {
+										...style?.color,
+										duotone: newDuotone,
+									},
+								};
+								setAttributes( { style: newStyle } );
 							} }
 						/>
 					</ToolbarGroup>
@@ -138,13 +144,16 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 function addDuotoneFilterStyle( props, blockType, attributes ) {
 	const duotoneSupport = getBlockSupport( blockType, 'color.duotone' );
 
-	if ( ! duotoneSupport || ! attributes.duotone ) {
+	if ( ! duotoneSupport || ! attributes?.style?.color?.duotone ) {
 		return props;
 	}
 
 	return {
 		...props,
-		className: classnames( props.className, attributes.duotone.id ),
+		className: classnames(
+			props.className,
+			attributes.style.color.duotone.id
+		),
 	};
 }
 
