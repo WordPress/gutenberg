@@ -181,10 +181,6 @@ _Parameters_
 
 -   _slug_ `string`: Plugin slug.
 
-<a name="deleteFile" href="#deleteFile">#</a> **deleteFile**
-
-Undocumented declaration.
-
 <a name="deleteTheme" href="#deleteTheme">#</a> **deleteTheme**
 
 Deletes a theme from the site, activating another theme if necessary.
@@ -303,10 +299,6 @@ _Returns_
 
 -   `Promise`: Promise resolving with a string containing the block title.
 
-<a name="getClickEventDurations" href="#getClickEventDurations">#</a> **getClickEventDurations**
-
-Undocumented declaration.
-
 <a name="getCurrentPostContent" href="#getCurrentPostContent">#</a> **getCurrentPostContent**
 
 Returns a promise which resolves with the current post content (HTML string).
@@ -323,10 +315,6 @@ _Returns_
 
 -   `Promise`: Promise resolving with post content markup.
 
-<a name="getHoverEventDurations" href="#getHoverEventDurations">#</a> **getHoverEventDurations**
-
-Undocumented declaration.
-
 <a name="getPageError" href="#getPageError">#</a> **getPageError**
 
 Returns a promise resolving to one of either a string or null. A string will
@@ -341,14 +329,6 @@ _Related_
 _Returns_
 
 -   `Promise<?string>`: Promise resolving to a string or null, depending whether a page error is present.
-
-<a name="getSelectionEventDurations" href="#getSelectionEventDurations">#</a> **getSelectionEventDurations**
-
-Undocumented declaration.
-
-<a name="getTypingEventDurations" href="#getTypingEventDurations">#</a> **getTypingEventDurations**
-
-Undocumented declaration.
 
 <a name="hasBlockSwitcher" href="#hasBlockSwitcher">#</a> **hasBlockSwitcher**
 
@@ -536,10 +516,6 @@ resolving once the request is complete (once a notice is displayed).
 _Returns_
 
 -   `Promise`: Promise resolving when publish is complete.
-
-<a name="readFile" href="#readFile">#</a> **readFile**
-
-Undocumented declaration.
 
 <a name="saveDraft" href="#saveDraft">#</a> **saveDraft**
 

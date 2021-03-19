@@ -13,13 +13,19 @@ import {
 	insertBlock,
 	openGlobalBlockInserter,
 	closeGlobalBlockInserter,
+} from '@wordpress/e2e-test-utils';
+
+/**
+ * Internal dependencies
+ */
+import {
 	readFile,
 	deleteFile,
 	getTypingEventDurations,
 	getSelectionEventDurations,
 	getClickEventDurations,
 	getHoverEventDurations,
-} from '@wordpress/e2e-test-utils';
+} from './utils';
 
 jest.setTimeout( 1000000 );
 
