@@ -240,10 +240,15 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 
 			unset( $widget['callback'] );
 
-			// TODO: Should we be calling this?
-			if ( is_callable( $widget['classname'] ) ) {
-				unset( $widget['classname'] );
+			$classname = '';
+			foreach ( (array) $widget['classname'] as $cn ) {
+				if ( is_string( $cn ) ) {
+					$classname .= '_' . $cn;
+				} elseif ( is_object( $cn ) ) {
+					$classname .= '_' . get_class( $cn );
+				}
 			}
+			$widget['classname'] = ltrim( $classname, '_' );
 
 			// Backwards compatibility. TODO: Remove.
 			$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
