@@ -25,7 +25,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		},
 		[ clientId ]
 	);
-	const defaultLayout = useEditorFeature( 'layout' );
+	const defaultLayout = useEditorFeature( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 	const { contentSize, wideSize } = usedLayout;
