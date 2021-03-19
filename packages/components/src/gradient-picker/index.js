@@ -20,6 +20,8 @@ export default function GradientPicker( {
 	gradients,
 	onChange,
 	value,
+	colorPickerMode,
+	onSourceChange,
 	clearable = true,
 	disableCustomGradients = false,
 } ) {
@@ -68,7 +70,12 @@ export default function GradientPicker( {
 			}
 		>
 			{ ! disableCustomGradients && (
-				<CustomGradientPicker value={ value } onChange={ onChange } />
+				<CustomGradientPicker
+					value={ value }
+					colorPickerMode={ colorPickerMode }
+					onChange={ onChange }
+					onSourceChange={ onSourceChange }
+				/>
 			) }
 		</CircularOptionPicker>
 	);

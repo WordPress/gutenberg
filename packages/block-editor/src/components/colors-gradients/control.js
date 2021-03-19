@@ -86,6 +86,8 @@ function ColorGradientControlInner( {
 	label,
 	onColorChange,
 	onGradientChange,
+	colorPickerMode,
+	onSourceChange,
 	colorValue,
 	gradientValue,
 	clearable,
@@ -151,7 +153,12 @@ function ColorGradientControlInner( {
 								  }
 								: onColorChange
 						}
-						{ ...{ colors, disableCustomColors } }
+						{ ...{
+							colors,
+							disableCustomColors,
+							onSourceChange,
+							colorPickerMode,
+						} }
 						clearable={ clearable }
 					/>
 				) }
@@ -166,7 +173,12 @@ function ColorGradientControlInner( {
 								  }
 								: onGradientChange
 						}
-						{ ...{ gradients, disableCustomGradients } }
+						{ ...{
+							gradients,
+							disableCustomGradients,
+							onSourceChange,
+							colorPickerMode,
+						} }
 						clearable={ clearable }
 					/>
 				) }

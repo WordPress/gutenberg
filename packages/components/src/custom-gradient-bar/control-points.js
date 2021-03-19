@@ -115,6 +115,8 @@ function ControlPoints( {
 	onChange,
 	onStartControlPointChange,
 	onStopControlPointChange,
+	colorPickerMode: source,
+	onSourceChange,
 } ) {
 	const controlPointMoveState = useRef();
 
@@ -224,6 +226,8 @@ function ControlPoints( {
 						<>
 							<ColorPicker
 								color={ point.color }
+								source={ source }
+								onSourceChangeComplete={ onSourceChange }
 								onChangeComplete={ ( { color } ) => {
 									onChange(
 										updateControlPointColor(
@@ -264,6 +268,8 @@ function InsertPoint( {
 	onOpenInserter,
 	onCloseInserter,
 	insertPosition,
+	colorPickerMode: source,
+	onSourceChange,
 } ) {
 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
 	return (
@@ -317,6 +323,8 @@ function InsertPoint( {
 							);
 						}
 					} }
+					source={ source }
+					onSourceChangeComplete={ onSourceChange }
 				/>
 			) }
 			popoverProps={ COLOR_POPOVER_PROPS }

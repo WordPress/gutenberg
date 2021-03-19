@@ -76,6 +76,8 @@ export default function CustomGradientBar( {
 	hasGradient,
 	value: controlPoints,
 	onChange,
+	colorPickerMode,
+	onSourceChange,
 } ) {
 	const gradientPickerDomRef = useRef();
 
@@ -134,6 +136,8 @@ export default function CustomGradientBar( {
 						insertPosition={ gradientBarState.insertPosition }
 						value={ controlPoints }
 						onChange={ onChange }
+						colorPickerMode={ colorPickerMode }
+						onSourceChange={ onSourceChange }
 						onOpenInserter={ () => {
 							gradientBarStateDispatch( {
 								type: 'OPEN_INSERTER',
@@ -155,6 +159,8 @@ export default function CustomGradientBar( {
 					}
 					value={ controlPoints }
 					onChange={ onChange }
+					colorPickerMode={ colorPickerMode }
+					onSourceChange={ onSourceChange }
 					onStartControlPointChange={ () => {
 						gradientBarStateDispatch( {
 							type: 'START_CONTROL_CHANGE',
