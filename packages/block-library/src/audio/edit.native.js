@@ -198,6 +198,7 @@ function AudioEdit( {
 								{ value: 'metadata', label: __( 'Metadata' ) },
 								{ value: 'none', label: __( 'None' ) },
 							] }
+							hideCancelButton={ true }
 						/>
 					</PanelBody>
 				</InspectorControls>

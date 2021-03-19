@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TextInput } from 'react-native';
+import { View } from 'react-native';
 import classnames from 'classnames';
 
 /**
@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import {
 	RichText,
+	PlainText,
 	BlockControls,
 	useBlockProps,
 	InspectorControls,
@@ -22,6 +23,7 @@ import {
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
+import { useRef, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -43,7 +45,21 @@ import {
  */
 const MIN_BUTTON_WIDTH = 100;
 
-export default function SearchEdit( { attributes, setAttributes, className } ) {
+export default function SearchEdit( {
+	onFocus,
+	isSelected,
+	attributes,
+	setAttributes,
+	className,
+} ) {
+	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
+	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
+	const [ isPlaceholderSelected, setIsPlaceholderSelected ] = useState(
+		true
+	);
+
+	const textInputRef = useRef( null );
+
 	const {
 		label,
 		showLabel,
@@ -54,6 +70,20 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 		width = 100,
 		widthUnit = '%',
 	} = attributes;
+
+	/*
+	 * Called when the value of isSelected changes. Blurs the PlainText component
+	 * used by the placeholder when this block loses focus.
+	 */
+	useEffect( () => {
+		if ( hasTextInput() && isPlaceholderSelected && ! isSelected ) {
+			textInputRef.current.blur();
+		}
+	}, [ isSelected ] );
+
+	const hasTextInput = () => {
+		return textInputRef && textInputRef.current;
+	};
 
 	const onChange = ( nextWidth ) => {
 		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
@@ -172,7 +202,9 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 				: mergeWithBorderStyle( styles.searchTextInput );
 
 		return (
-			<TextInput
+			<PlainText
+				ref={ textInputRef }
+				isSelected={ isPlaceholderSelected }
 				className="wp-block-search__input"
 				style={ inputStyle }
 				numberOfLines={ 1 }
@@ -182,9 +214,14 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 				placeholder={
 					placeholder ? undefined : __( 'Optional placeholder…' )
 				}
-				onChangeText={ ( newVal ) =>
+				onChange={ ( newVal ) =>
 					setAttributes( { placeholder: newVal } )
 				}
+				onFocus={ () => {
+					setIsPlaceholderSelected( true );
+					onFocus();
+				} }
+				onBlur={ () => setIsPlaceholderSelected( false ) }
 			/>
 		);
 	};
@@ -196,22 +233,32 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 					<Button
 						className="wp-block-search__button"
 						icon={ search }
+						onFocus={ onFocus }
 					/>
 				) }
 
 				{ ! buttonUseIcon && (
 					<RichText
 						className="wp-block-search__button"
+						identifier="text"
+						tagName="p"
 						style={ richTextStyles.searchButton }
 						placeholder={ __( 'Add button text' ) }
 						value={ buttonText }
-						identifier="text"
 						withoutInteractiveFormatting
 						onChange={ ( html ) =>
 							setAttributes( { buttonText: html } )
 						}
 						minWidth={ MIN_BUTTON_WIDTH }
 						textAlign="center"
+						isSelected={ isButtonSelected }
+						__unstableMobileNoFocusOnMount={ ! isSelected }
+						unstableOnFocus={ () => {
+							setIsButtonSelected( true );
+						} }
+						onBlur={ () => {
+							setIsButtonSelected( false );
+						} }
 					/>
 				) }
 			</View>
@@ -225,11 +272,13 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 
 	return (
 		<View { ...blockProps } style={ styles.searchBlockContainer }>
-			{ controls }
+			{ isSelected && controls }
 
 			{ showLabel && (
 				<RichText
 					className="wp-block-search__label"
+					identifier="text"
+					tagName="p"
 					style={ {
 						...styles.searchLabel,
 						...richTextStyles.searchLabel,
@@ -239,6 +288,14 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 					withoutInteractiveFormatting
 					value={ label }
 					onChange={ ( html ) => setAttributes( { label: html } ) }
+					isSelected={ isLabelSelected }
+					__unstableMobileNoFocusOnMount={ ! isSelected }
+					unstableOnFocus={ () => {
+						setIsLabelSelected( true );
+					} }
+					onBlur={ () => {
+						setIsLabelSelected( false );
+					} }
 				/>
 			) }
 

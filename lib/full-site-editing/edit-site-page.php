@@ -109,42 +109,21 @@ function gutenberg_edit_site_init( $hook ) {
 	);
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
 
-	// Preload block editor paths.
-	// most of these are copied from edit-forms-blocks.php.
-	$preload_paths = array(
-		'/?context=edit',
-		'/wp/v2/types?context=edit',
-		'/wp/v2/taxonomies?context=edit',
-		'/wp/v2/pages?context=edit',
-		'/wp/v2/themes?status=active',
-		array( '/wp/v2/media', 'OPTIONS' ),
-	);
-	$preload_data  = array_reduce(
-		$preload_paths,
-		'rest_preload_api_request',
-		array()
-	);
-	wp_add_inline_script(
-		'wp-api-fetch',
-		sprintf( 'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );', wp_json_encode( $preload_data ) ),
-		'after'
-	);
-
-	// Initialize editor.
-	wp_add_inline_script(
-		'wp-edit-site',
-		sprintf(
-			'wp.domReady( function() {
-				wp.editSite.initialize( "edit-site-editor", %s );
-			} );',
-			wp_json_encode( $settings )
+	gutenberg_initialize_editor(
+		'edit_site_editor',
+		'edit-site',
+		array(
+			'preload_paths'    => array(
+				array( '/wp/v2/media', 'OPTIONS' ),
+				'/?context=edit',
+				'/wp/v2/types?context=edit',
+				'/wp/v2/taxonomies?context=edit',
+				'/wp/v2/pages?context=edit',
+				'/wp/v2/themes?status=active',
+			),
+			'initializer_name' => 'initialize',
+			'editor_settings'  => $settings,
 		)
-	);
-
-	wp_add_inline_script(
-		'wp-blocks',
-		sprintf( 'wp.blocks.unstable__bootstrapServerSideBlockDefinitions( %s );', wp_json_encode( get_block_editor_server_block_settings() ) ),
-		'after'
 	);
 
 	wp_add_inline_script(

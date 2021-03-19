@@ -13,15 +13,25 @@
 	}
 }
 
-.edit-site-navigation-panel.is-open {
-	width: $nav-sidebar-width;
-}
-
 .edit-site-navigation-panel__inner {
 	position: relative;
 	width: $nav-sidebar-width;
 	height: 100%;
 	overflow: hidden;
+	// Inner container is hidden to remove menu from the accessibility tree when not visible.
+	// Setting visibility here (rather than on the parent container) preserves the slide transition.
+	visibility: hidden;
+	// Transition settings should match parent container.
+	transition: visibility 100ms linear;
+	@include reduce-motion("transition");
+}
+
+.edit-site-navigation-panel.is-open {
+	width: $nav-sidebar-width;
+
+	.edit-site-navigation-panel__inner {
+		visibility: visible;
+	}
 }
 
 .edit-site-navigation-panel__site-title-container {
@@ -52,7 +62,6 @@
 }
 
 .edit-site-navigation-panel__back-to-dashboard.components-button.is-tertiary {
-	border-radius: 0;
 	height: $button-size;
 	margin-top: $grid-unit-30;
 	padding: $grid-unit $grid-unit-20 $grid-unit $grid-unit;

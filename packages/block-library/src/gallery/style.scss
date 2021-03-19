@@ -78,6 +78,8 @@
 	// Cropped
 	&.is-cropped .blocks-gallery-image,
 	&.is-cropped .blocks-gallery-item {
+		align-self: inherit;
+
 		a,
 		img {
 			// IE11 doesn't support object-fit, so just make sure images aren't skewed.

@@ -6,10 +6,29 @@
 	min-height: $button-size;
 }
 
+
+/**
+ * Submenus.
+ */
+
 // Show submenus above the sibling inserter.
-.has-child .wp-block-navigation-link__container {
-	z-index: z-index(".has-child .wp-block-navigation-link__container");
+.has-child {
+	cursor: pointer;
+
+	.wp-block-navigation-link__container {
+		z-index: z-index(".has-child .wp-block-navigation-link__container");
+	}
+
+	// Show on editor selected, even if on frontend it only stays open on focus-within.
+	&.is-selected,
+	&.has-child-selected {
+		> .wp-block-navigation-link__container {
+			visibility: visible;
+			opacity: 1;
+		}
+	}
 }
+
 
 /**
  * Navigation Items.
@@ -18,6 +37,10 @@
 .wp-block-navigation-link {
 	.wp-block-navigation-link__container {
 		display: block;
+	}
+
+	.wp-block-navigation-link__content {
+		cursor: text;
 	}
 
 	&.is-editing,

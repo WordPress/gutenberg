@@ -18,11 +18,6 @@ import {
 } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 
-/**
- * Internal dependencies
- */
-import { useQueryContext } from '../query';
-
 const TEMPLATE = [
 	[ 'core/post-title' ],
 	[ 'core/post-date' ],
@@ -45,12 +40,12 @@ export default function QueryLoopEdit( {
 			sticky,
 			inherit,
 		} = {},
-		queryContext = [ {} ],
+		queryContext = [ { page: 1 } ],
 		templateSlug,
 		layout: { type: layoutType = 'flex', columns = 1 } = {},
 	},
 } ) {
-	const [ { page } ] = useQueryContext() || queryContext;
+	const [ { page } ] = queryContext;
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
 
 	const { posts, blocks } = useSelect(
