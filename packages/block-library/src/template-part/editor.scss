@@ -62,6 +62,22 @@
 	}
 }
 
+.template-part-area-control {
+	.template-part-area-control__label {
+		display: block;
+		margin-bottom: $grid-unit-10;
+	}
+
+	.template-part-area-control__option {
+		box-shadow: none;
+		margin-right: $grid-unit-05;
+
+		&:not(.is-pressed) {
+			color: $gray-900;
+		}
+	}
+}
+
 // Ensures a border is present when a child block is selected.
 .block-editor-block-list__block[data-type="core/template-part"] {
 	&.has-child-selected {
