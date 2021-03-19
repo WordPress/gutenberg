@@ -51,9 +51,8 @@ function InserterMenu( {
 		removeBlock,
 		resetBlocks,
 		insertDefaultBlock,
+		addLastBlockInserted,
 	} = useDispatch( blockEditorStore );
-
-	const { addLastBlockInserted } = useDispatch( 'core/editor' );
 
 	const {
 		items,
