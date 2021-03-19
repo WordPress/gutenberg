@@ -4,6 +4,7 @@
 
 - Replace deprecated `doctrine` parser with simpler `comment-parser` to support a wider variety of types. This also de-normalizes types such that types will be transcribed exactly as they are declared in the doc comments.
 - Add support for TypeScript type annotations by using the TypeScript plugin for babel. This allows docgen to extract explicitly annotated types from exported functions and variables. It is _not_ able to consume inferred types.
+- Add support for TypeScript array destructuring and object destructuring in function arguments.
 
 ## 1.7.0 (2020-02-04)
 
