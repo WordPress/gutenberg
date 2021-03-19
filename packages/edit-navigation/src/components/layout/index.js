@@ -51,7 +51,7 @@ const interfaceLabels = {
 };
 
 export default function Layout( { blockEditorSettings } ) {
-	const canvasRef = useBlockSelectionClearer();
+	const contentAreaRef = useBlockSelectionClearer();
 	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
 		false
 	);
@@ -112,6 +112,7 @@ export default function Layout( { blockEditorSettings } ) {
 								) }
 							>
 								<InterfaceSkeleton
+									className="edit-navigation-layout"
 									labels={ interfaceLabels }
 									header={
 										<Header
@@ -138,8 +139,8 @@ export default function Layout( { blockEditorSettings } ) {
 														saveBlocks={ savePost }
 													/>
 													<div
-														className="edit-navigation-layout__canvas"
-														ref={ canvasRef }
+														className="edit-navigation-layout__content-area"
+														ref={ contentAreaRef }
 													>
 														<Editor
 															isPending={
