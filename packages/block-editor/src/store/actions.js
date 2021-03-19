@@ -1380,3 +1380,28 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+/**
+ * Returns an action object to track the last block that was inserted.
+ *
+ * @param {Object} clientId The client id of the block.
+ *
+ * @return {Object} Action object.
+ */
+ export function addLastBlockInserted( clientId ) {
+	return {
+		type: 'ADD_LAST_BLOCK_INSERTED',
+		clientId,
+	};
+}
+
+/**
+ * Returns an action object to clear the last block that was inserted.
+ *
+ * @return {Object} Action object.
+ */
+export function clearLastBlockInserted() {
+	return {
+		type: 'CLEAR_LAST_BLOCK_INSERTED',
+	};
+}
