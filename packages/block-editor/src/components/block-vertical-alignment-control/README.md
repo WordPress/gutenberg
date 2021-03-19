@@ -1,20 +1,20 @@
-BlockVerticalAlignmentToolbar
+BlockVerticalAlignmentControl
 =============================
 
-`BlockVerticalAlignmentToolbar` is a simple `Toolbar` component designed to provide _vertical_ alignment UI controls for use within the editor `BlockControls` toolbar.
+`BlockVerticalAlignmentControl` is a simple component designed to provide _vertical_ alignment UI controls for use within the editor `BlockControls` toolbar.
 
-This builds upon similar patterns to the [`BlockAlignmentToolbar`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/editor/src/components/block-alignment-toolbar) but is focused on vertical alignment only.
+This builds upon similar patterns to the [`BlockAlignmentControl`](https://github.com/WordPress/gutenberg/tree/HEAD/packages/editor/src/components/block-alignment-control) but is focused on vertical alignment only.
 
 ## Usage
 
-In a block's `edit` implementation, render a `<BlockControls />` component. Then inside of this add the `<BlockVerticalAlignmentToolbar />` where required. 
+In a block's `edit` implementation, render a `<BlockControls />` component. Then inside of this add the `<BlockVerticalAlignmentControl />` where required. 
 
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import {
 	BlockControls,
-	BlockVerticalAlignmentToolbar,
+	BlockVerticalAlignmentControl,
 	useBlockProps,
 } from '@wordpress/block-editor';
 
@@ -40,8 +40,8 @@ registerBlockType( 'my-plugin/my-block', {
 
 		return (
 			<>
-				<BlockControls>
-					<BlockVerticalAlignmentToolbar
+				<BlockControls group="block">
+					<BlockVerticalAlignmentControl
 						onChange={ onChange }
 						value={ verticalAlignment }
 					/>
@@ -68,12 +68,6 @@ _Note:_ the user can repeatedly click on the toolbar buttons to toggle the align
 
 The current value of the alignment setting. You may only choose from the `Options` listed above.
 
-### `isCollapsed`
-* **Type:** `Boolean`
-* **Default:** `true`
-
-Whether to display toolbar options in the dropdown menu. This toolbar is collapsed by default.
-
 ### `onChange`
 * **Type:** `Function`
 
@@ -87,4 +81,4 @@ const onChange = ( alignment ) => setAttributes( { verticalAlignment: alignment 
 
 ## Examples
 
-The [Core Columns](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/columns) Block utilises the `BlockVerticalAlignmentToolbar`.
+The [Core Columns](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/columns) Block utilises the `BlockVerticalAlignmentControl`.

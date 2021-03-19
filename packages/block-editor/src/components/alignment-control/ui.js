@@ -7,7 +7,7 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
-import { ToolbarGroup } from '@wordpress/components';
+import { DropdownMenu, ToolbarGroup } from '@wordpress/components';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 
 const DEFAULT_ALIGNMENT_CONTROLS = [
@@ -33,16 +33,16 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-export function AlignmentToolbar( props ) {
-	const {
-		value,
-		onChange,
-		alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
-		label = __( 'Align' ),
-		describedBy = __( 'Change text alignment' ),
-		isCollapsed = true,
-	} = props;
-
+function AlignmentUI( {
+	value,
+	onChange,
+	alignmentControls = DEFAULT_ALIGNMENT_CONTROLS,
+	label = __( 'Align' ),
+	describedBy = __( 'Change text alignment' ),
+	isCollapsed = true,
+	isToolbar,
+	isToolbarButton = true,
+} ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
 	}
@@ -57,9 +57,11 @@ export function AlignmentToolbar( props ) {
 		return isRTL() ? alignRight : alignLeft;
 	}
 
+	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
+	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
+
 	return (
-		<ToolbarGroup
-			isCollapsed={ isCollapsed }
+		<UIComponent
 			icon={ setIcon() }
 			label={ label }
 			toggleProps={ { describedBy } }
@@ -75,8 +77,9 @@ export function AlignmentToolbar( props ) {
 					onClick: applyOrUnset( align ),
 				};
 			} ) }
+			{ ...extraProps }
 		/>
 	);
 }
 
-export default AlignmentToolbar;
+export default AlignmentUI;

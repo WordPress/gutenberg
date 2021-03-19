@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { _x } from '@wordpress/i18n';
-import { ToolbarGroup } from '@wordpress/components';
+import { ToolbarGroup, DropdownMenu } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -31,11 +31,13 @@ const POPOVER_PROPS = {
 	isAlternate: true,
 };
 
-export function BlockVerticalAlignmentToolbar( {
+function BlockVerticalAlignmentUI( {
 	value,
 	onChange,
 	controls = DEFAULT_CONTROLS,
 	isCollapsed = true,
+	isToolbar,
+	isToolbarButton = true,
 } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
@@ -45,10 +47,12 @@ export function BlockVerticalAlignmentToolbar( {
 	const defaultAlignmentControl =
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
+	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
+	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
+
 	return (
-		<ToolbarGroup
+		<UIComponent
 			popoverProps={ POPOVER_PROPS }
-			isCollapsed={ isCollapsed }
 			icon={
 				activeAlignment
 					? activeAlignment.icon
@@ -66,6 +70,7 @@ export function BlockVerticalAlignmentToolbar( {
 					onClick: applyOrUnset( control ),
 				};
 			} ) }
+			{ ...extraProps }
 		/>
 	);
 }
@@ -73,4 +78,4 @@ export function BlockVerticalAlignmentToolbar( {
 /**
  * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-vertical-alignment-toolbar/README.md
  */
-export default BlockVerticalAlignmentToolbar;
+export default BlockVerticalAlignmentUI;
