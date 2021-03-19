@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { forwardRef } from '@wordpress/element';
+import { createPortal, forwardRef } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { NavigableToolbar } from '@wordpress/block-editor';
@@ -16,6 +16,7 @@ import { DialogDisclosure } from 'reakit/Dialog';
  * Internal dependencies
  */
 import Inserter from '../inserter';
+import { getContainer } from '../inserter/inserter-outer-section';
 
 const DialogDisclosureButton = forwardRef( ( props, ref ) => (
 	<DialogDisclosure as={ Button } { ...props } ref={ ref } />
@@ -42,13 +43,22 @@ function Header( { inserter } ) {
 								'Add block',
 								'Generic label for block inserter button'
 							) }
-							{ ...inserter }
+							onClick={ () => {
+								if ( inserter.expanded() ) {
+									inserter.collapse();
+								} else {
+									inserter.expand();
+								}
+							} }
 						/>
 					</NavigableToolbar>
 				</div>
 			</div>
 
-			<Inserter { ...inserter } />
+			{ createPortal(
+				<Inserter inserter={ inserter } />,
+				getContainer()
+			) }
 		</>
 	);
 }

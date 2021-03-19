@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useReducer, createPortal, useMemo } from '@wordpress/element';
+import { useReducer, createPortal, useMemo, useRef } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockList,
@@ -18,16 +18,22 @@ import {
 } from '@wordpress/components';
 
 /**
- * External dependencies
- */
-import { useDialogState } from 'reakit/Dialog';
-
-/**
  * Internal dependencies
  */
 import Inspector, { BlockInspectorButton } from '../inspector';
 import Header from '../header';
 import useSidebarBlockEditor from './use-sidebar-block-editor';
+import initializeInserterOuterSection from '../inserter/inserter-outer-section';
+
+function useInserter() {
+	const inserterRef = useRef();
+
+	if ( ! inserterRef.current ) {
+		inserterRef.current = initializeInserterOuterSection();
+	}
+
+	return inserterRef.current;
+}
 
 const inspectorOpenStateReducer = ( state, action ) => {
 	switch ( action ) {
@@ -60,15 +66,12 @@ export default function SidebarBlockEditor( { sidebar } ) {
 	const parentContainer = document.getElementById(
 		'customize-theme-controls'
 	);
-	const inserter = useDialogState( {
-		modal: false,
-		animated: 150,
-	} );
+	const inserter = useInserter();
 	const settings = useMemo(
 		() => ( {
-			__experimentalSetIsInserterOpened: inserter.setVisible,
+			__experimentalSetIsInserterOpened: () => inserter.expand(),
 		} ),
-		[ inserter.setVisible ]
+		[ inserter.expand ]
 	);
 
 	return (
