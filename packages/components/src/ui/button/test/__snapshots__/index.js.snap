@@ -34,12 +34,12 @@ Snapshot Diff:
     data-g2-component="Button"
     data-icon="false"
 -   href="#"
+    type="button"
   >
     <span
       class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1493c17"
       data-g2-c16t="true"
-      data-g2-component="ButtonContent"
-@@ -20,6 +19,6 @@
+@@ -21,6 +20,6 @@
       aria-hidden="true"
       class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-8abvx7"
       data-g2-c16t="true"
@@ -340,6 +340,7 @@ exports[`props should render correctly 1`] = `
   data-g2-c16t="true"
   data-g2-component="Button"
   data-icon="false"
+  type="button"
 >
   <span
     class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d emotion-0"
@@ -371,7 +372,7 @@ Snapshot Diff:
     data-destructive="false"
     data-focused="false"
     data-g2-c16t="true"
-@@ -12,11 +11,11 @@
+@@ -13,11 +12,11 @@
     <span
       class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1493c17"
       data-g2-c16t="true"
@@ -412,7 +413,7 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -14,29 +14,10 @@
+@@ -15,29 +15,10 @@
       data-g2-component="ButtonContent"
     >
       Lorem
@@ -449,20 +450,21 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -4,19 +4,12 @@
+@@ -4,20 +4,13 @@
     data-active="false"
     data-destructive="false"
     data-focused="false"
     data-g2-c16t="true"
     data-g2-component="Button"
 -   data-icon="true"
-- >
++   data-icon="false"
+    type="button"
+  >
 -   <span
 -     class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1dor7w6"
 -     data-g2-c16t="true"
 -     data-g2-component="ButtonIcon"
-+   data-icon="false"
-  >
+-   >
 -     <svg />
 -   </span>
     <span
@@ -582,10 +584,10 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -7,19 +7,10 @@
-    data-g2-c16t="true"
+@@ -8,19 +8,10 @@
     data-g2-component="Button"
     data-icon="false"
+    type="button"
   >
     <span
 -     class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1dor7w6"
@@ -635,7 +637,7 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -14,19 +14,10 @@
+@@ -15,19 +15,10 @@
       data-g2-component="ButtonContent"
     >
       Lorem

@@ -17,7 +17,7 @@ import { chevronRight } from '@wordpress/icons';
  */
 import styles from './style.scss';
 
-function FocalPointSettings( {
+function FocalPointSettingsButton( {
 	disabled,
 	focalPoint,
 	onFocalPointChange,
@@ -50,4 +50,4 @@ function FocalPointSettings( {
 	);
 }
 
-export default FocalPointSettings;
+export default FocalPointSettingsButton;

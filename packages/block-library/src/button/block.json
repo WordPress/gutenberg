@@ -62,7 +62,8 @@
 		"align": true,
 		"alignWide": false,
 		"color": {
-			"__experimentalSkipSerialization": true
+			"__experimentalSkipSerialization": true,
+			"gradients": true
 		},
 		"reusable": false,
 		"__experimentalSelector": ".wp-block-button__link"
