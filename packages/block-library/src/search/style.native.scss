@@ -11,7 +11,7 @@
 }
 
 .border {
-	border: $border-width solid $light-gray-500;
+	border: $border-width solid #e5e5e5;
 	border-radius: 4px;
 	padding-left: $grid-unit-10;
 	padding-right: $grid-unit-05;
@@ -19,11 +19,8 @@
 	padding-bottom: $grid-unit-05;
 }
 
-.searchTextInput {
-	flex-grow: 1;
-	flex-shrink: 1;
-	padding: $grid-unit-05;
-	min-height: 42px;
+.borderDark {
+	border: $border-width solid #373737;
 }
 
 .searchLabel {
@@ -31,12 +28,12 @@
 }
 
 .buttonContainer {
-	background: rgba( 89, 89, 89, 1 );
+	background: #595959;
 	padding-left: $grid-unit-10;
 	padding-right: $grid-unit-10;
 	padding-top: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
-	border: $border-width solid #1a000000;
+	border: $border-width solid #595959;
 	margin-left: 4px;
 	border-radius: 4px;
 	align-content: center;
@@ -45,7 +42,7 @@
 }
 
 .icon {
-	fill: #ffffff;
+	fill: $white;
 	background-color: transparent;
 }
 
@@ -55,12 +52,11 @@
 	margin-bottom: $grid-unit-10;
 	font-size: 16px;
 	font-weight: 400;
-	background-color: transparent;
 	font-family: $default-regular-font;
 }
 
 .richTextButton {
-	color: #ffffff;
+	color: $white;
 	font-size: 16px;
 	font-weight: 400;
 	background-color: transparent;
@@ -69,4 +65,42 @@
 	margin: 0;
 	text-align: center;
 	min-height: 24px;
+}
+
+.richTextButtonCursor {
+	color: #ddd;
+}
+
+.plainTextInput {
+	flex-grow: 1;
+	flex-shrink: 1;
+	min-height: 42px;
+	padding-left: 0;
+	padding-right: $grid-unit-05;
+	padding-top: $grid-unit-05;
+	padding-bottom: $grid-unit-05;
+	font-family: $default-regular-font;
+	box-shadow: none;
+	color: #212121;
+	background-color: transparent;
+}
+
+.plainTextInputDark {
+	color: #ddd;
+}
+
+.plainTextPlaceholder {
+	color: $gray;
+}
+
+.plainTextPlaceholderDark {
+	color: $gray-50;
+}
+
+.cursor {
+	color: $blue-50;
+}
+
+.cursorDark {
+	color: $blue-30;
 }

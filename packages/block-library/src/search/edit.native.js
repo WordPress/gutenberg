@@ -22,6 +22,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
 import { useRef, useEffect, useState } from '@wordpress/element';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -38,12 +39,13 @@ const BUTTON_OPTIONS = [
 	{ value: 'no-button', label: __( 'No button' ) },
 ];
 
-export default function SearchEdit( {
+function SearchEdit( {
 	onFocus,
 	isSelected,
 	attributes,
 	setAttributes,
 	className,
+	getStylesFromColorScheme,
 } ) {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
@@ -152,21 +154,40 @@ export default function SearchEdit( {
 	);
 
 	const mergeWithBorderStyle = ( style ) => {
-		return { ...style, ...styles.border };
+		const baseStyle = getStylesFromColorScheme(
+			styles.border,
+			styles.borderDark
+		);
+		return { ...style, ...baseStyle };
 	};
 
+	const selectionColorStyle = getStylesFromColorScheme(
+		styles.cursor,
+		styles.cursorDark
+	);
+
 	const renderTextField = () => {
-		const inputStyle =
-			buttonPosition === 'button-inside'
-				? styles.searchTextInput
-				: mergeWithBorderStyle( styles.searchTextInput );
+		const inputStyle = () => {
+			const baseStyle = getStylesFromColorScheme(
+				styles.plainTextInput,
+				styles.plainTextInputDark
+			);
+			return buttonPosition === 'button-inside'
+				? baseStyle
+				: mergeWithBorderStyle( baseStyle );
+		};
+
+		const placeholderStyle = getStylesFromColorScheme(
+			styles.plainTextPlaceholder,
+			styles.plainTextPlaceholderDark
+		);
 
 		return (
 			<PlainText
 				ref={ textInputRef }
 				isSelected={ isPlaceholderSelected }
 				className="wp-block-search__input"
-				style={ inputStyle }
+				style={ inputStyle() }
 				numberOfLines={ 1 }
 				ellipsizeMode="tail" // currently only works on ios
 				label={ null }
@@ -182,7 +203,8 @@ export default function SearchEdit( {
 					onFocus();
 				} }
 				onBlur={ () => setIsPlaceholderSelected( false ) }
-				placeholderTextColor="#919191"
+				placeholderTextColor={ placeholderStyle.color }
+				selectionColor={ selectionColorStyle.color }
 			/>
 		);
 	};
@@ -223,6 +245,7 @@ export default function SearchEdit( {
 						onBlur={ () => {
 							setIsButtonSelected( false );
 						} }
+						selectionColor={ styles.richTextButtonCursor.color }
 					/>
 				) }
 			</View>
@@ -276,3 +299,5 @@ export default function SearchEdit( {
 		</View>
 	);
 }
+
+export default withPreferredColorScheme( SearchEdit );
