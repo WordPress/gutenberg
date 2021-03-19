@@ -60,7 +60,7 @@ export default function BlockNavigation( {
 
 	const hasHierarchy =
 		rootBlock &&
-		( isClientIdSelected( rootBlock.clientId, selectedBlockClientId ) ||
+		( ! isClientIdSelected( rootBlock.clientId, selectedBlockClientId ) ||
 			( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 ) );
 
 	return (
