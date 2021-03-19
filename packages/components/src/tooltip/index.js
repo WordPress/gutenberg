@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { includes } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -50,11 +51,13 @@ const getRegularElement = ( { child, eventHandlers, childrenWithPopover } ) =>
 	} );
 
 const addPopoverToGrandchildren = ( {
+	className,
 	grandchildren,
 	isOver,
 	position,
 	text,
 	shortcut,
+	...popoverProps
 } ) =>
 	concatChildren(
 		grandchildren,
@@ -62,10 +65,11 @@ const addPopoverToGrandchildren = ( {
 			<Popover
 				focusOnMount={ false }
 				position={ position }
-				className="components-tooltip"
+				className={ classnames( className, 'components-tooltip' ) }
 				aria-hidden="true"
 				animate={ false }
 				noArrow={ true }
+				{ ...popoverProps }
 			>
 				{ text }
 				<Shortcut
@@ -87,7 +91,14 @@ const emitToChild = ( children, eventName, event ) => {
 	}
 };
 
-function Tooltip( { children, position, text, shortcut } ) {
+function Tooltip( {
+	children,
+	className,
+	position,
+	text,
+	shortcut,
+	...popoverProps
+} ) {
 	/**
 	 * Whether a mouse is currently pressed, used in determining whether
 	 * to handle a focus event as displaying the tooltip immediately.
@@ -201,13 +212,16 @@ function Tooltip( { children, position, text, shortcut } ) {
 
 	const popoverData = {
 		isOver,
+		className,
 		position,
 		text,
 		shortcut,
 	};
 	const childrenWithPopover = addPopoverToGrandchildren( {
 		grandchildren,
+		isOver,
 		...popoverData,
+		...popoverProps,
 	} );
 
 	return getElementWithPopover( {

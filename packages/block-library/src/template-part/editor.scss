@@ -72,9 +72,27 @@
 		box-shadow: none;
 		margin-right: $grid-unit-05;
 
+		&.has-icon svg {
+			// Remove icon margin, since inner text content is a tooltip.
+			margin-right: 0;
+		}
+
 		&:not(.is-pressed) {
 			color: $gray-900;
+
+			&:hover:not(:disabled) {
+				color: $gray-900;
+			}
 		}
+	}
+}
+
+// Override the popover styles to wrap the text
+.template-part-area-control__option-description.components-tooltip {
+	.components-popover__content {
+		min-width: calc(#{$sidebar-width} * 0.8);
+		margin-bottom: $grid-unit-15;
+		white-space: normal;
 	}
 }
 

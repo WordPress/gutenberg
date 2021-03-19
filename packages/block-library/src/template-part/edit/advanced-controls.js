@@ -3,10 +3,11 @@
  */
 import { useEntityProp } from '@wordpress/core-data';
 import {
+	BaseControl,
 	Button,
 	SelectControl,
 	TextControl,
-	BaseControl,
+	Tooltip,
 } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 import { InspectorAdvancedControls } from '@wordpress/block-editor';
@@ -90,18 +91,24 @@ export function TemplatePartAdvancedControls( {
 
 						<div>
 							{ AREA_OPTIONS.map(
-								( { description, icon, value } ) => (
-									<Button
-										className="template-part-area-control__option"
-										icon={ icon }
-										isSecondary
-										isPressed={ value === area }
+								( { description, icon, label, value } ) => (
+									<Tooltip
+										id={ `template-part-area-option-${ value }` }
+										className="template-part-area-control__option-description"
 										key={ value }
-										label={ description }
-										onClick={ () => setArea( value ) }
-										showTooltip={ true }
-										tooltipPosition="top right"
-									/>
+										position="top right"
+										text={ description }
+									>
+										<Button
+											aria-describedby={ `template-part-area-option-${ value }` }
+											className="template-part-area-control__option"
+											icon={ icon }
+											isSecondary
+											isPressed={ value === area }
+											label={ label }
+											onClick={ () => setArea( value ) }
+										/>
+									</Tooltip>
 								)
 							) }
 						</div>
