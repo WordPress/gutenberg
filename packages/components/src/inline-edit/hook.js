@@ -47,24 +47,20 @@ export default function useInlineEdit( {
 } ) {
 	const [ isInEditMode, setIsInEditMode ] = useState( false );
 	const [ editingValue, setEditingValue ] = useState( propValue );
+	const value = isInEditMode ? editingValue : propValue;
 	/** @type {import('react').MutableRefObject<HTMLInputElement | undefined>} */
 	const inputRef = useRef();
 	/** @type {import('react').MutableRefObject<HTMLInputElement | undefined>} */
 	const toggleRef = useRef();
-	const isInvalid = negate( validate );
 	const changeToEditMode = () => setIsInEditMode( true );
 	const changeToToggleMode = () => setIsInEditMode( false );
 
-	useEffect( () => {
-		setEditingValue( propValue );
-		if ( isInvalid( value ) ) onWrongInput( value );
-	}, [ propValue ] );
+
 
 	useEffect( () => {
 		if ( isInEditMode ) {
 			inputRef.current?.focus();
 			inputRef.current?.select();
-			setEditingValue( propValue );
 		} else {
 			toggleRef.current?.focus();
 		}
@@ -74,13 +70,13 @@ export default function useInlineEdit( {
 	 * @param {import("react").ChangeEvent<HTMLInputElement>} event
 	 */
 	const commit = ( event ) => {
-		const { value } = event.target;
+		const { value: _value } = event.target;
 		cancelEvent( event );
-		if ( validate( value ) ) {
+		if ( validate( _value ) ) {
 			changeToToggleMode();
-			onCommit( value );
+			onCommit( _value );
 		} else {
-			onWrongInput( value );
+			onWrongInput( _value );
 		}
 	};
 
@@ -96,8 +92,7 @@ export default function useInlineEdit( {
 			event.target.blur();
 			changeToToggleMode();
 		} else {
-			const { value } = event.target;
-			setEditingValue( value );
+			setEditingValue( event.target.value );
 		}
 	};
 
@@ -122,8 +117,6 @@ export default function useInlineEdit( {
 		onClick: mergeEvent( changeToEditMode, onClick ),
 		...toggleProps,
 	} );
-
-	const value = isInEditMode ? editingValue : propValue;
 
 	return {
 		isEdit: isInEditMode,
