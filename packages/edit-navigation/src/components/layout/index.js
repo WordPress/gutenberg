@@ -133,22 +133,16 @@ export default function Layout( { blockEditorSettings } ) {
 												! hasMenus && <EmptyState /> }
 
 											{ isBlockEditorReady && (
-												<>
-													<BlockEditorKeyboardShortcuts />
-													<NavigationEditorShortcuts
-														saveBlocks={ savePost }
+												<div
+													className="edit-navigation-layout__content-area"
+													ref={ contentAreaRef }
+												>
+													<Editor
+														isPending={
+															! hasLoadedMenus
+														}
+														blocks={ blocks }
 													/>
-													<div
-														className="edit-navigation-layout__content-area"
-														ref={ contentAreaRef }
-													>
-														<Editor
-															isPending={
-																! hasLoadedMenus
-															}
-															blocks={ blocks }
-														/>
-													</div>
 													<InspectorAdditions
 														menuId={
 															selectedMenuId
@@ -157,7 +151,7 @@ export default function Layout( { blockEditorSettings } ) {
 															deleteMenu
 														}
 													/>
-												</>
+												</div>
 											) }
 										</>
 									}
