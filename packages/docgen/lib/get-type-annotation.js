@@ -412,17 +412,22 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 		);
 	}
 
-	/** @type {babelTypes.TSTypeAnnotation | undefined} */
-	let typeAnnotation;
-	if ( babelTypes.isIdentifier( paramToken ) ) {
-		typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
-	} else if ( babelTypes.isRestElement( paramToken ) ) {
-		typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
-	} else if ( babelTypes.isArrayPattern( paramToken ) ) {
-		if ( ! tag.name.includes( '.' ) ) {
-			// 1 unqualified name
-			typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
-		} else {
+	try {
+		if ( babelTypes.isIdentifier( paramToken ) ) {
+			return getTypeAnnotation(
+				paramToken.typeAnnotation.typeAnnotation
+			);
+		} else if ( babelTypes.isRestElement( paramToken ) ) {
+			return getTypeAnnotation(
+				paramToken.typeAnnotation.typeAnnotation
+			);
+		} else if ( babelTypes.isArrayPattern( paramToken ) ) {
+			if ( ! tag.name.includes( '.' ) ) {
+				// 1 unqualified name
+				return getTypeAnnotation(
+					paramToken.typeAnnotation.typeAnnotation
+				);
+			}
 			// 2 qualified name i.e., an element of the array being destructured
 			const position = parseInt(
 				tag.name.split( '.' ).slice( -1 )[ 0 ],
@@ -441,26 +446,56 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 					return paramToken.typeAnnotation.typeAnnotation.elementType
 						.typeName.name;
 				}
-				typeAnnotation =
+				return getTypeAnnotation(
 					paramToken.typeAnnotation.typeAnnotation.elementType
-						.typeAnnotation;
+						.typeAnnotation
+				);
 			} else if (
 				babelTypes.isTSTupleType(
 					paramToken.typeAnnotation.typeAnnotation
 				)
 			) {
-				typeAnnotation =
+				return getTypeAnnotation(
 					paramToken.typeAnnotation.typeAnnotation.elementTypes[
 						position
-					];
-			} else {
-				typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
+					]
+				);
 			}
+			return getTypeAnnotation(
+				paramToken.typeAnnotation.typeAnnotation
+			);
+		} else if ( babelTypes.isObjectPattern( paramToken ) ) {
+			if ( ! tag.name.includes( '.' ) ) {
+				// 1 unqualified name
+				return getTypeAnnotation(
+					paramToken.typeAnnotation.typeAnnotation
+				);
+			}
+			// 2 qualified name i.e., an element of the array being destructured
+			const memberName = tag.name.split( '.' ).slice( -1 )[ 0 ];
+			if (
+				babelTypes.isTSTypeLiteral(
+					paramToken.typeAnnotation.typeAnnotation
+				)
+			) {
+				// if it's a type literal we can try to find the member on the type
+				const member = paramToken.typeAnnotation.typeAnnotation.members.find(
+					( m ) => m.key.name === memberName
+				);
+				if ( member !== undefined ) {
+					return getTypeAnnotation(
+						member.typeAnnotation.typeAnnotation
+					);
+				}
+			}
+			// If we couldn't find a specific member for the type then we'll just return something like `Type[ memberName ]` to indicate the parameter is a member of that type
+			const typeAnnotation = getTypeAnnotation(
+				paramToken.typeAnnotation.typeAnnotation
+			);
+			return `${ typeAnnotation }[ '${ memberName }' ]`;
 		}
-	}
 
-	try {
-		return getTypeAnnotation( typeAnnotation );
+		return getTypeAnnotation( paramToken.typeAnnotation.typeAnnotation );
 	} catch ( e ) {
 		throw new Error(
 			`Could not find type for parameter '${
