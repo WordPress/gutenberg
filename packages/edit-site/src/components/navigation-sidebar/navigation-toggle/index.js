@@ -19,7 +19,7 @@ import {
 function NavigationToggle( { icon, isOpen } ) {
 	const { isRequestingSiteIcon, templateType, siteIconUrl } = useSelect(
 		( select ) => {
-			const { getTemplateType } = select( editSiteStore );
+			const { getEditedPostType } = select( editSiteStore );
 			const { getEntityRecord, isResolving } = select( coreDataStore );
 			const siteData =
 				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
@@ -30,7 +30,7 @@ function NavigationToggle( { icon, isOpen } ) {
 					'__unstableBase',
 					undefined,
 				] ),
-				templateType: getTemplateType(),
+				templateType: getEditedPostType(),
 				siteIconUrl: siteData.site_icon_url,
 			};
 		},
