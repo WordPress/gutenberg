@@ -97,13 +97,23 @@ _Returns_
 Higher-order component creator, creating a new component which renders if
 the given condition is satisfied or with the given optional prop name.
 
+_Usage_
+
+```ts
+type Props = { foo: string };
+const Component = ( props: Props ) => <div>{ props.foo }</div>;
+const ConditionalComponent = ifCondition( ( props: Props ) => props.foo.length !== 0 )( Component );
+<ConditionalComponent foo="" />; // => null
+<ConditionalComponent foo="bar" />; // => <div>bar</div>;
+```
+
 _Parameters_
 
--   _predicate_ `Function`: Function to test condition.
+-   _predicate_ `( props: TProps ) => boolean`: Function to test condition.
 
 _Returns_
 
--   `Function`: Higher-order component.
+-   `HigherOrderComponent`: Higher-order component.
 
 <a name="pure" href="#pure">#</a> **pure**
 

@@ -4,5 +4,5 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"include": [ "src/utils/**/*" ]
+	"include": [ "src/higher-order/if-condition/**/*", "src/utils/**/*" ]
 }
