@@ -1388,7 +1388,7 @@ export function setHasControlledInnerBlocks(
  *
  * @return {Object} Action object.
  */
- export function addLastBlockInserted( clientId ) {
+export function addLastBlockInserted( clientId ) {
 	return {
 		type: 'ADD_LAST_BLOCK_INSERTED',
 		clientId,
