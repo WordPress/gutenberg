@@ -35,8 +35,8 @@ const AREA_OPTIONS = [
 		value: 'footer',
 	},
 	{
-		description: __( 
-			'General templates often perform a specific role like displaying post content, and are not tied to any particular area.' 
+		description: __(
+			'General templates often perform a specific role like displaying post content, and are not tied to any particular area.'
 		),
 		icon: layout,
 		label: __( 'General' ),
