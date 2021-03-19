@@ -8,6 +8,7 @@ import { find } from 'lodash';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Button, Dropdown, DropdownMenu, Popover } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 import { PinnedItems } from '@wordpress/interface';
 
 /**
@@ -26,6 +27,7 @@ export default function Header( {
 } ) {
 	const selectedMenu = find( menus, { id: selectedMenuId } );
 	const menuName = selectedMenu ? selectedMenu.name : undefined;
+	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	let actionHeaderText;
 
 	if ( menuName ) {
@@ -103,8 +105,9 @@ export default function Header( {
 					/>
 
 					<SaveButton navigationPost={ navigationPost } />
-
-					<PinnedItems.Slot scope="core/edit-navigation" />
+					{ isMobileViewport && (
+						<PinnedItems.Slot scope="core/edit-navigation" />
+					) }
 					<Popover.Slot name="block-toolbar" />
 				</div>
 			) }
