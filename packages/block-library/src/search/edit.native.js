@@ -161,11 +161,6 @@ function SearchEdit( {
 		return { ...style, ...baseStyle };
 	};
 
-	const selectionColorStyle = getStylesFromColorScheme(
-		styles.cursor,
-		styles.cursorDark
-	);
-
 	const renderTextField = () => {
 		const inputStyle = () => {
 			const baseStyle = getStylesFromColorScheme(
@@ -204,7 +199,6 @@ function SearchEdit( {
 				} }
 				onBlur={ () => setIsPlaceholderSelected( false ) }
 				placeholderTextColor={ placeholderStyle.color }
-				selectionColor={ selectionColorStyle.color }
 			/>
 		);
 	};
