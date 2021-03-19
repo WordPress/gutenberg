@@ -75,7 +75,7 @@ export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
-export { default as FocalPointSettings } from './mobile/focal-point-settings';
+export { default as FocalPointSettingsPanel } from './mobile/focal-point-settings-panel';
 export { LinkPicker } from './mobile/link-picker';
 export { default as LinkPickerScreen } from './mobile/link-picker/link-picker-screen';
 export { default as LinkSettings } from './mobile/link-settings';

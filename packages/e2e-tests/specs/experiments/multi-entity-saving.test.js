@@ -7,7 +7,6 @@ import {
 	publishPost,
 	trashAllPosts,
 	activateTheme,
-	canvas,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -189,9 +188,13 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.clickItemByText( 'Index' );
 			await navigationPanel.close();
 
-			// Click the first block so that the template part inserts in the right place.
-			const firstBlock = await canvas().$( '.wp-block' );
-			await firstBlock.click();
+			// Select the header template part via list view.
+			await page.click( 'button[aria-label="List View"]' );
+			const headerTemplatePartListViewButton = await page.waitForXPath(
+				'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
+			);
+			headerTemplatePartListViewButton.click();
+			await page.click( 'button[aria-label="Close list view sidebar"]' );
 
 			// Insert something to dirty the editor.
 			await insertBlock( 'Paragraph' );

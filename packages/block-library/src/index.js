@@ -38,6 +38,7 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
+import * as logInOut from './loginout';
 import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
@@ -227,6 +228,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								queryPaginationNext,
 								queryPaginationNumbers,
 								queryPaginationPrevious,
+								logInOut,
 								postTitle,
 								postContent,
 								postAuthor,

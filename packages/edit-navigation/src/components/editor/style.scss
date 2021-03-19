@@ -10,7 +10,7 @@
 		margin: $grid-unit-15 auto;
 	}
 
-	// Adapt the layout of the Navigation and Link blocks
+	// Adapt the layout of the Navigation and Link blocks.
 	// to work better in the context of the Navigation Screen.
 	.wp-block-navigation {
 		margin: 0;
@@ -21,11 +21,15 @@
 	.wp-block-navigation-link {
 		display: block;
 
-		&.has-child:hover > .wp-block-navigation-link__container {
+		// Show submenus on click.
+		> .wp-block-navigation-link__container {
+			// This unsets some styles inherited from the block, meant to only show submenus on click, not hover, when inside the editor.
+			opacity: 1;
+			visibility: visible;
 			display: none;
 		}
 
-		// Fix focus outlines
+		// Fix focus outlines.
 		&.is-selected > .wp-block-navigation-link__content,
 		&.is-selected:hover > .wp-block-navigation-link__content {
 			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);

@@ -1,7 +1,7 @@
 {
 	"apiVersion": 2,
 	"name": "core/template-part",
-	"category": "design",
+	"category": "theme",
 	"attributes": {
 		"slug": {
 			"type": "string"
