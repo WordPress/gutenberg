@@ -55,8 +55,6 @@ export default function useInlineEdit( {
 	const changeToEditMode = () => setIsInEditMode( true );
 	const changeToToggleMode = () => setIsInEditMode( false );
 
-
-
 	useEffect( () => {
 		if ( isInEditMode ) {
 			inputRef.current?.focus();
