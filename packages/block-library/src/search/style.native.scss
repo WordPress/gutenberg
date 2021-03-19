@@ -11,8 +11,8 @@
 }
 
 .border {
-	border: $border-width solid #e5e5e5;
-	border-radius: 4px;
+	border: $border-width solid $gray-5;
+	border-radius: $grid-unit-05;
 	padding-left: $grid-unit-10;
 	padding-right: $grid-unit-05;
 	padding-top: $grid-unit-05;
@@ -20,18 +20,18 @@
 }
 
 .borderDark {
-	border: $border-width solid #373737;
+	border: $border-width solid $gray-80;
 }
 
 .buttonContainer {
-	background: #595959;
+	background: $button-fallback-bg;
 	padding-left: $grid-unit-10;
 	padding-right: $grid-unit-10;
 	padding-top: $grid-unit-10;
 	padding-bottom: $grid-unit-10;
-	border: $border-width solid #595959;
-	margin-left: 4px;
-	border-radius: 4px;
+	border: $border-width solid $button-fallback-bg;
+	margin-left: $grid-unit-05;
+	border-radius: $grid-unit-05;
 	align-content: center;
 	align-items: center;
 	flex-shrink: 1;
@@ -46,7 +46,7 @@
 	background-color: transparent;
 	margin-top: $grid-unit-10;
 	margin-bottom: $grid-unit-10;
-	font-size: 16px;
+	font-size: $editor-font-size;
 	font-weight: 400;
 	font-family: $default-regular-font;
 	width: 100%;
@@ -54,7 +54,7 @@
 
 .richTextButton {
 	color: $white;
-	font-size: 16px;
+	font-size: $editor-font-size;
 	font-weight: 400;
 	background-color: transparent;
 	font-family: $default-regular-font;
@@ -77,11 +77,11 @@
 	padding-top: $grid-unit-05;
 	padding-bottom: $grid-unit-05;
 	font-family: $default-regular-font;
-	color: #212121;
+	color: $gray-90;
 }
 
 .plainTextInputDark {
-	color: #ddd;
+	color: $gray-10;
 }
 
 .plainTextPlaceholder {
