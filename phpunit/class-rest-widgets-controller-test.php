@@ -239,6 +239,10 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @ticket 51460
 	 */
 	public function test_get_items() {
+		global $wp_widget_factory;
+
+		$wp_widget_factory->widgets['WP_Widget_RSS']->show_instance_in_rest = false;
+
 		$this->setup_widget(
 			'rss',
 			1,
@@ -343,6 +347,8 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			),
 			$data
 		);
+
+		$wp_widget_factory->widgets['WP_Widget_RSS']->show_instance_in_rest = true;
 	}
 
 	/**
@@ -391,6 +397,9 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 									'text' => 'Custom text test',
 								)
 							)
+						),
+						'raw'     => array(
+							'text' => 'Custom text test',
 						),
 					),
 					'id_base'       => 'text',
@@ -465,6 +474,9 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 								'text' => 'Custom text test',
 							)
 						)
+					),
+					'raw'     => array(
+						'text' => 'Custom text test',
 					),
 				),
 				'id_base'      => 'text',
@@ -670,6 +682,10 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	 * @ticket 51460
 	 */
 	public function test_create_item_raw_instance_not_supported() {
+		global $wp_widget_factory;
+
+		$wp_widget_factory->widgets['WP_Widget_Text']->show_instance_in_rest = false;
+
 		$this->setup_sidebar(
 			'sidebar-1',
 			array(
@@ -691,6 +707,8 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		);
 		$response = rest_get_server()->dispatch( $request );
 		$this->assertErrorResponse( 'rest_invalid_widget', $response, 400 );
+
+		$wp_widget_factory->widgets['WP_Widget_Text']->show_instance_in_rest = true;
 	}
 
 	/**
@@ -1300,6 +1318,9 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 							)
 						)
 					),
+					'raw'     => array(
+						'text' => 'Custom text test',
+					),
 				),
 				'id_base'       => 'text',
 				'widget_class'  => 'WP_Widget_Text',
@@ -1363,6 +1384,9 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 									'text' => 'Custom text test',
 								)
 							)
+						),
+						'raw'     => array(
+							'text' => 'Custom text test',
 						),
 					),
 					'id_base'       => 'text',

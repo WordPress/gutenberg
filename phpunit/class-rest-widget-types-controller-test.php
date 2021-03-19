@@ -281,6 +281,7 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 			array(
 				'encoded' => base64_encode( serialize( array() ) ),
 				'hash'    => wp_hash( serialize( array() ) ),
+				'raw'     => new stdClass,
 			),
 			$data['instance']
 		);
@@ -309,6 +310,7 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 			array(
 				'encoded' => base64_encode( serialize( array( 'title' => 'Test title' ) ) ),
 				'hash'    => wp_hash( serialize( array( 'title' => 'Test title' ) ) ),
+				'raw'     => array( 'title' => 'Test title' ),
 			),
 			$data['instance']
 		);
@@ -331,10 +333,43 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 			array(
 				'encoded' => base64_encode( serialize( array( 'title' => 'Updated title' ) ) ),
 				'hash'    => wp_hash( serialize( array( 'title' => 'Updated title' ) ) ),
+				'raw'     => array( 'title' => 'Updated title' ),
 			),
 			$data['instance']
 		);
 	}
+
+	public function test_encode_form_data_no_raw() {
+		global $wp_widget_factory;
+		wp_set_current_user( self::$admin_id );
+		$wp_widget_factory->widgets['WP_Widget_Search']->show_instance_in_rest = false;
+		$request = new WP_REST_Request( 'POST', '/wp/v2/widget-types/search/encode' );
+		$request->set_param(
+			'instance',
+			array(
+				'encoded' => base64_encode( serialize( array( 'title' => 'Test title' ) ) ),
+				'hash'    => wp_hash( serialize( array( 'title' => 'Test title' ) ) ),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			"<p>\n" .
+			"\t\t\t<label for=\"widget-search-1-title\">Title:</label>\n" .
+			"\t\t\t<input class=\"widefat\" id=\"widget-search-1-title\" name=\"widget-search[1][title]\" type=\"text\" value=\"Test title\" />\n" .
+			"\t\t</p>",
+			$data['form']
+		);
+		$this->assertEqualSets(
+			array(
+				'encoded' => base64_encode( serialize( array( 'title' => 'Test title' ) ) ),
+				'hash'    => wp_hash( serialize( array( 'title' => 'Test title' ) ) ),
+			),
+			$data['instance']
+		);
+		$wp_widget_factory->widgets['WP_Widget_Search']->show_instance_in_rest = true;
+	}
+
 
 	/**
 	 * The test_create_item() method does not exist for widget types.

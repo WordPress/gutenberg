@@ -557,15 +557,28 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 
 		$serialized_instance = serialize( $instance );
 
-		return rest_ensure_response(
-			array(
-				'form'     => trim( $form ),
-				'instance' => array(
-					'encoded' => base64_encode( $serialized_instance ),
-					'hash'    => wp_hash( $serialized_instance ),
-				),
-			)
+		$response = array(
+			'form'     => trim( $form ),
+			'instance' => array(
+				'encoded' => base64_encode( $serialized_instance ),
+				'hash'    => wp_hash( $serialized_instance ),
+			),
 		);
+
+		if (
+			isset( $widget_object->show_instance_in_rest ) &&
+			$widget_object->show_instance_in_rest
+		) {
+			if ( empty( $instance ) ) {
+				// Use new stdClass() instead of array() so that endpoint
+				// returns {} and not [].
+				$response['instance']['raw'] = new stdClass;
+			} else {
+				$response['instance']['raw'] = $instance;
+			}
+		}
+
+		return rest_ensure_response( $response );
 	}
 
 	/**
