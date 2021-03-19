@@ -15,6 +15,7 @@ import { act } from 'react-test-renderer';
 import { BottomSheetSettings, BlockEdit } from '@wordpress/block-editor';
 import { SlotFillProvider } from '@wordpress/components';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
+import { requestMediaPicker } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -56,6 +57,7 @@ const attributes = {
 	hasParallax: false,
 	focalPoint: MOCK_FOCAL_POINT,
 	onFocalPointChange: jest.fn(),
+	overlayColor: { color: '#000000' },
 	url: MOCK_URL,
 };
 
@@ -87,7 +89,29 @@ afterAll( () => {
 	Image.getSize.mockRestore();
 } );
 
-describe( 'Cover block edit', () => {
+describe( 'when no media is attached', () => {
+	it( 'allows adding an image or video', async () => {
+		const { getByText, findByText, debug } = render( {
+			attributes: {
+				...attributes,
+				url: undefined,
+				backgroundType: undefined,
+			},
+			setAttributes,
+		} );
+		fireEvent.press( getByText( 'Add image or video' ) );
+
+		const mediaLibraryButton = await findByText(
+			'WordPress Media Library'
+		);
+		fireEvent.press( mediaLibraryButton );
+
+		expect( requestMediaPicker ).toHaveBeenCalled();
+		await act( () => imageSize );
+	} );
+} );
+
+describe( 'when media is attached', () => {
 	it( 'allow editing the focal point', async () => {
 		const { getByText } = render( {
 			attributes,
