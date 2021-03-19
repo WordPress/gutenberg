@@ -188,7 +188,7 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.clickItemByText( 'Index' );
 			await navigationPanel.close();
 
-			// Select the first template part via list view.
+			// Select the header template part via list view.
 			await page.click( 'button[aria-label="List View"]' );
 			const headerTemplatePartListViewButton = await page.waitForXPath(
 				'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
