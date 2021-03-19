@@ -98,7 +98,6 @@ export default function Layout( { blockEditorSettings } ) {
 						settings={ {
 							...blockEditorSettings,
 							templateLock: 'all',
-							hasFixedToolbar: true,
 						} }
 						useSubRegistry={ false }
 					>
@@ -133,16 +132,7 @@ export default function Layout( { blockEditorSettings } ) {
 												! hasMenus && <EmptyState /> }
 
 											{ isBlockEditorReady && (
-												<BlockEditorProvider
-													value={ blocks }
-													onInput={ onInput }
-													onChange={ onChange }
-													settings={ {
-														...blockEditorSettings,
-														templateLock: 'all',
-													} }
-													useSubRegistry={ false }
-												>
+												<>
 													<BlockEditorKeyboardShortcuts />
 													<NavigationEditorShortcuts
 														saveBlocks={ savePost }
@@ -166,7 +156,7 @@ export default function Layout( { blockEditorSettings } ) {
 															deleteMenu
 														}
 													/>
-												</BlockEditorProvider>
+												</>
 											) }
 										</>
 									}
