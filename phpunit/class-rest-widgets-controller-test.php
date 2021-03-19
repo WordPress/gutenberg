@@ -235,6 +235,8 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 
 		$wp_widget_factory->widgets['WP_Widget_RSS']->show_instance_in_rest = false;
 
+		$block_content = '<!-- wp:paragraph --><p>Block test</p><!-- /wp:paragraph -->';
+
 		$this->setup_widget(
 			'rss',
 			1,
@@ -246,7 +248,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			'block',
 			1,
 			array(
-				'content' => '<!-- wp:paragraph --><p>Block test</p><!-- /wp:paragraph -->',
+				'content' => $block_content,
 			)
 		);
 		$this->setup_sidebar(
@@ -267,25 +269,25 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'id'           => 'block-1',
 					'sidebar'      => 'sidebar-1',
 					'settings'     => array(
-						'content' => '<!-- wp:paragraph --><p>Block test</p><!-- /wp:paragraph -->',
+						'content' => $block_content,
 					),
 					'instance'     => array(
 						'encoded' => base64_encode(
 							serialize(
 								array(
-									'content' => '<!-- wp:paragraph --><p>Block test</p><!-- /wp:paragraph -->',
+									'content' => $block_content,
 								)
 							)
 						),
 						'hash'    => wp_hash(
 							serialize(
 								array(
-									'content' => '<!-- wp:paragraph --><p>Block test</p><!-- /wp:paragraph -->',
+									'content' => $block_content,
 								)
 							)
 						),
 						'raw'     => array(
-							'content' => '<!-- wp:paragraph --><p>Block test</p><!-- /wp:paragraph -->',
+							'content' => $block_content,
 						),
 					),
 					'id_base'      => 'block',
