@@ -2,7 +2,11 @@
  * External dependencies
  */
 import { Image } from 'react-native';
-import { render as rtlRender } from '@testing-library/react-native';
+import {
+	render as rtlRender,
+	fireEvent,
+	waitFor,
+} from '@testing-library/react-native';
 import { act } from 'react-test-renderer';
 
 /**
@@ -84,13 +88,16 @@ afterAll( () => {
 } );
 
 describe( 'Cover block edit', () => {
-	it( 'displays an edit focal point button', async () => {
+	it( 'allow editing the focal point', async () => {
 		const { getByText } = render( {
 			attributes,
 			setAttributes,
 		} );
+		fireEvent.press( getByText( 'Edit focal point' ) );
 
-		expect( getByText( 'Edit focal point' ) ).toBeTruthy();
+		await waitFor( () =>
+			expect( getByText( 'X-Axis Position' ) ).toBeTruthy()
+		);
 		await act( () => imageSize );
 	} );
 } );
