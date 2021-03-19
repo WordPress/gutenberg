@@ -102,17 +102,15 @@ describe( 'Toolbar roving tabindex', () => {
 		await page.keyboard.press( 'Home' );
 		await expectLabelToHaveFocus( 'Table' );
 		await page.click( '.blocks-table__placeholder-button' );
-		await testBlockToolbarKeyboardNavigation( 'Block: Table', 'Table' );
+		await page.keyboard.press( 'Tab' );
+		await testBlockToolbarKeyboardNavigation( 'Body cell text', 'Table' );
 		await wrapCurrentBlockWithGroup( 'Table' );
 		await testGroupKeyboardNavigation( 'Body cell text', 'Table' );
 	} );
 
 	it( 'ensures custom html block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'Custom HTML' );
-		await testBlockToolbarKeyboardNavigation(
-			'Block: Custom HTML',
-			'Custom HTML'
-		);
+		await testBlockToolbarKeyboardNavigation( 'HTML', 'Custom HTML' );
 		await wrapCurrentBlockWithGroup( 'Custom HTML' );
 		await testGroupKeyboardNavigation( 'HTML', 'Custom HTML' );
 	} );
