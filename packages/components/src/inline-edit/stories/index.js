@@ -5,7 +5,7 @@ import { text } from '@storybook/addon-knobs';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { pick } from 'lodash';
 
 /**
@@ -42,6 +42,10 @@ export const _default = () => {
 	const [ ocCommitCallbacks, setOnCommitCallbacks ] = useState( 0 );
 	const [ value, setValue ] = useState( initialValue );
 	const [ isInputValid, setIsInputValid ] = useState( true );
+
+	useEffect( () => {
+		setValue( initialValue );
+	}, [ initialValue ] );
 
 	const incrementOnClickCallbacks = () =>
 		setOnClickCallbacks( 1 + onClickCallbacks );
