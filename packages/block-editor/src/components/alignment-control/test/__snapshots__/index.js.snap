@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`AlignmentToolbar should allow custom alignment controls to be specified 1`] = `
+exports[`AlignmentUI should allow custom alignment controls to be specified 1`] = `
 <ToolbarGroup
   controls={
     Array [
@@ -62,7 +62,7 @@ exports[`AlignmentToolbar should allow custom alignment controls to be specified
 />
 `;
 
-exports[`AlignmentToolbar should match snapshot 1`] = `
+exports[`AlignmentUI should match snapshot 1`] = `
 <ToolbarGroup
   controls={
     Array [

@@ -5,7 +5,7 @@
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
-export { default as AlignmentToolbar } from './alignment-toolbar';
+export { AlignmentControl, AlignmentToolbar } from './alignment-control';
 export { default as Autocomplete } from './autocomplete';
 export {
 	BlockAlignmentControl,
@@ -47,7 +47,10 @@ export {
 } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
-export { default as JustifyToolbar } from './justify-toolbar';
+export {
+	JustifyToolbar,
+	JustifyContentControl,
+} from './justify-content-control';
 export { default as __experimentalLinkControl } from './link-control';
 export { default as __experimentalLinkControlSearchInput } from './link-control/search-input';
 export { default as __experimentalLinkControlSearchResults } from './link-control/search-results';

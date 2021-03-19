@@ -11,14 +11,14 @@ import { alignLeft, alignCenter } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { AlignmentToolbar } from '../';
+import AlignmentUI from '../ui';
 
-describe( 'AlignmentToolbar', () => {
+describe( 'AlignmentUI', () => {
 	const alignment = 'left';
 	const onChangeSpy = jest.fn();
 
 	const wrapper = shallow(
-		<AlignmentToolbar value={ alignment } onChange={ onChangeSpy } />
+		<AlignmentUI isToolbar value={ alignment } onChange={ onChangeSpy } />
 	);
 
 	const controls = wrapper.props().controls;
@@ -53,7 +53,8 @@ describe( 'AlignmentToolbar', () => {
 
 	test( 'should allow custom alignment controls to be specified', () => {
 		const wrapperCustomControls = shallow(
-			<AlignmentToolbar
+			<AlignmentUI
+				isToolbar
 				value={ 'custom-right' }
 				onChange={ onChangeSpy }
 				alignmentControls={ [
