@@ -53,11 +53,13 @@ const ColorPicker = ( { name, value, onChange } ) => {
 		return get( getSettings(), [ 'colors' ], [] );
 	} );
 	const { updateSettings } = useDispatch( blockEditorStore );
+	const onSourceChange = useCallback( ( source ) => {
+		if ( source ) {
+			updateSettings( { colorPickerMode: source } );
+		}
+	} );
 	const onColorChange = useCallback(
-		( color, source ) => {
-			if ( source ) {
-				updateSettings( { colorPickerMode: source } );
-			}
+		( color ) => {
 			if ( color ) {
 				const colorObject = getColorObjectByColorValue( colors, color );
 				onChange(
@@ -87,7 +89,13 @@ const ColorPicker = ( { name, value, onChange } ) => {
 		colors,
 	] );
 
-	return <ColorPalette value={ activeColor } onChange={ onColorChange } />;
+	return (
+		<ColorPalette
+			value={ activeColor }
+			onChange={ onColorChange }
+			onSourceChange={ onSourceChange }
+		/>
+	);
 };
 
 export default function InlineColorUI( {

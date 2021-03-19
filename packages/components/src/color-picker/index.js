@@ -130,7 +130,6 @@ export default class ColorPicker extends Component {
 
 		if ( isValidColor( data ) ) {
 			const colors = colorToState( data, data.h || oldHue );
-			const { source } = this.state;
 			this.setState(
 				{
 					...colors,
@@ -138,18 +137,9 @@ export default class ColorPicker extends Component {
 					draftHsl: colors.hsl,
 					draftRgb: colors.rgb,
 				},
-				debounce(
-					partial( onChangeComplete, { ...colors, source } ),
-					100
-				)
+				debounce( partial( onChangeComplete, colors ), 100 )
 			);
 		}
-	}
-
-	componentWillUnmount() {
-		const { onChangeComplete = noop } = this.props;
-		const { source } = this.state;
-		onChangeComplete( { hex: this.state.hex, source } );
 	}
 
 	resetDraftValues() {
@@ -174,8 +164,14 @@ export default class ColorPicker extends Component {
 		}
 	}
 
+	commitSourceChange() {
+		const { onSourceChangeComplete = noop } = this.props;
+		const { source } = this.state;
+		onSourceChangeComplete( source );
+	}
+
 	handleInputChange( data ) {
-		this.setState( { source: data.source } );
+		this.setState( { source: data.source }, this.commitSourceChange );
 		switch ( data.state ) {
 			case 'reset':
 				this.resetDraftValues();

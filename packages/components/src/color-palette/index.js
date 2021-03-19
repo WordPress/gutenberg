@@ -23,6 +23,7 @@ export default function ColorPalette( {
 	disableCustomColors = false,
 	colorPickerMode = 'hex',
 	onChange,
+	onSourceChange,
 	value,
 } ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
@@ -63,7 +64,8 @@ export default function ColorPalette( {
 		<ColorPicker
 			color={ value }
 			source={ colorPickerMode }
-			onChangeComplete={ ( { hex, source } ) => onChange( hex, source ) }
+			onChangeComplete={ ( color ) => onChange( color.hex ) }
+			onSourceChangeComplete={ ( source ) => onSourceChange( source ) }
 			disableAlpha
 		/>
 	);
