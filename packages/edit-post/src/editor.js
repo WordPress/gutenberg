@@ -120,7 +120,7 @@ function Editor( {
 
 	const editorSettings = useMemo( () => {
 		const result = {
-			...omit( settings, [ 'defaultEditorStyles', 'styles' ] ),
+			...omit( settings, [ 'styles' ] ),
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -167,7 +167,7 @@ function Editor( {
 	] );
 
 	const styles = useMemo( () => {
-		return hasThemeStyles ? settings.styles : settings.defaultEditorStyles;
+		return hasThemeStyles ? settings.styles : [];
 	}, [ settings, hasThemeStyles ] );
 
 	if ( ! post ) {
