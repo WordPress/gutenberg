@@ -29,7 +29,7 @@ import {
  * @return {Object}          Filtered block settings
  */
 function addDuotoneAttributes( settings ) {
-	if ( ! getBlockSupport( settings, 'color' )?.duotone ) {
+	if ( ! getBlockSupport( settings, 'color.duotone' ) ) {
 		return settings;
 	}
 
@@ -55,7 +55,7 @@ function addDuotoneAttributes( settings ) {
  */
 const withDuotoneToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const duotoneSupport = getBlockSupport( props.name, 'color' )?.duotone;
+		const duotoneSupport = getBlockSupport( props.name, 'color.duotone' );
 
 		if ( ! duotoneSupport ) {
 			return <BlockEdit { ...props } />;
@@ -136,7 +136,7 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
  * @return {Object}            Filtered props applied to save element
  */
 function addDuotoneFilterStyle( props, blockType, attributes ) {
-	const duotoneSupport = getBlockSupport( blockType, 'color' )?.duotone;
+	const duotoneSupport = getBlockSupport( blockType, 'color.duotone' );
 
 	if ( ! duotoneSupport || ! attributes.duotone ) {
 		return props;
