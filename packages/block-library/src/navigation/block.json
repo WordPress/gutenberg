@@ -30,6 +30,9 @@
 		"showSubmenuIcon": {
 			"type": "boolean",
 			"default": true
+		},
+		"anchor": {
+			"type": "string"
 		}
 	},
 	"providesContext": {

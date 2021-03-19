@@ -141,16 +141,20 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
 
-	$wrapper_attributes = get_block_wrapper_attributes(
-		array(
-			'class' => implode( ' ', $classes ),
-			'style' => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
-		)
+	$wrapper_attributes = array(
+		'class' => implode( ' ', $classes ),
+		'style' => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
 	);
+
+	if ( ! empty( $attributes['anchor'] ) ) {
+		$wrapper_attributes['id'] = $attributes['anchor'];
+	}
+
+	$rendered_wrapper_attributes = get_block_wrapper_attributes( $wrapper_attributes );
 
 	return sprintf(
 		'<nav %1$s><ul class="wp-block-navigation__container">%2$s</ul></nav>',
-		$wrapper_attributes,
+		$rendered_wrapper_attributes,
 		$inner_blocks_html
 	);
 }
