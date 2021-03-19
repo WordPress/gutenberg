@@ -8,6 +8,7 @@ import { Icon, check } from '@wordpress/icons';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+import { StyledHelp } from '../base-control/styles/base-control-styles';
 
 export default function CheckboxControl( {
 	label,
@@ -15,6 +16,7 @@ export default function CheckboxControl( {
 	heading,
 	checked,
 	help,
+	helpPosition = 'left',
 	onChange,
 	...props
 } ) {
@@ -26,7 +28,7 @@ export default function CheckboxControl( {
 		<BaseControl
 			label={ heading }
 			id={ id }
-			help={ help }
+			help={ helpPosition === 'left' ? help : '' }
 			className={ className }
 		>
 			<span className="components-checkbox-control__input-container">
@@ -48,12 +50,22 @@ export default function CheckboxControl( {
 					/>
 				) : null }
 			</span>
-			<label
-				className="components-checkbox-control__label"
-				htmlFor={ id }
-			>
-				{ label }
-			</label>
+			<span className="components-checkbox-control__label-container">
+				<label
+					className="components-checkbox-control__label"
+					htmlFor={ id }
+				>
+					{ label }
+				</label>
+				{ helpPosition === 'center' && (
+					<StyledHelp
+						id={ id + '__help' }
+						className="components-base-control__help"
+					>
+						{ help }
+					</StyledHelp>
+				) }
+			</span>
 		</BaseControl>
 	);
 }
