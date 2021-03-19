@@ -691,7 +691,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 					'default'     => null,
 				),
 				'form_data'     => array(
-					'description' => __( 'Serialized form data from the widget admin form. Used to update a widget that does not support instance. Write only.', 'gutenberg' ),
+					'description' => __( 'URL-encoded form data from the widget admin form. Used to update a widget that does not support instance. Write only.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array(),
 					'arg_options' => array(
