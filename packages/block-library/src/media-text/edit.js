@@ -293,6 +293,10 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		<>
 			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
 			<BlockControls group="block">
+				<BlockVerticalAlignmentControl
+					onChange={ onVerticalAlignmentChange }
+					value={ verticalAlignment }
+				/>
 				<ToolbarButton
 					icon={ pullLeft }
 					title={ __( 'Show media on left' ) }
@@ -306,10 +310,6 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					onClick={ () =>
 						setAttributes( { mediaPosition: 'right' } )
 					}
-				/>
-				<BlockVerticalAlignmentControl
-					onChange={ onVerticalAlignmentChange }
-					value={ verticalAlignment }
 				/>
 				{ mediaType === 'image' && (
 					<ImageURLInputUI
