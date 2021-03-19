@@ -57,7 +57,6 @@ const interfaceLabels = {
 };
 
 export default function Layout( { blockEditorSettings } ) {
-	const hasPermanentSidebar = useViewportMatch( 'medium' );
 	const contentAreaRef = useBlockSelectionClearer();
 	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
 		false
@@ -92,6 +91,7 @@ export default function Layout( { blockEditorSettings } ) {
 
 	const hasMenus = !! menus?.length;
 	const isBlockEditorReady = !! ( hasMenus && navigationPost );
+	const hasPermanentSidebar = useViewportMatch( 'medium' ) && hasMenus;
 
 	return (
 		<ErrorBoundary>
