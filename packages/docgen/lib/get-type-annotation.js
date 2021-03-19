@@ -263,7 +263,7 @@ function getTypeAnnotation( typeAnnotation ) {
 			return '';
 		}
 		case 'TSFunctionType': {
-			return getFunctionTypeAnnotation( typeAnnotation );
+			return getFunctionTypeAnnotation( typeAnnotation, ' => ' );
 		}
 		case 'TSImportType': {
 			return getImportTypeAnnotation( typeAnnotation );
