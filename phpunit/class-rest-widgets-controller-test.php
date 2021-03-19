@@ -660,7 +660,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				'sidebar'  => 'sidebar-1',
 				'instance' => array(
 					'raw' => array(
-						'content' => '<!-- wp:paragraph --><p>Bock test</p><!-- /wp:paragraph -->',
+						'content' => '<!-- wp:paragraph --><p>Block test</p><!-- /wp:paragraph -->',
 					),
 				),
 				'id_base'  => 'block',
@@ -672,7 +672,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		$this->assertEquals( 'sidebar-1', $data['sidebar'] );
 		$this->assertEqualSets(
 			array(
-				'content' => '<!-- wp:paragraph --><p>Bock test</p><!-- /wp:paragraph -->',
+				'content' => '<!-- wp:paragraph --><p>Block test</p><!-- /wp:paragraph -->',
 			),
 			get_option( 'widget_block' )[2]
 		);
