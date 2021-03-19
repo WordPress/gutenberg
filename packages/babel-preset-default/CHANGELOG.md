@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Enhancements
+
+-   The bundled `@babel/core` dependency has been updated from requiring `^7.12.9` to requiring `^7.13.10` ([#30018](https://github.com/WordPress/gutenberg/pull/30018)).
+-   The bundled `@babel/plugin-transform-runtime` dependency has been updated from requiring `^7.12.1` to requiring `^7.13.10` ([#30018](https://github.com/WordPress/gutenberg/pull/30018)).
+-   The bundled `@babel/preset-env` dependency has been updated from requiring `^7.12.7` to requiring `^7.13.10` ([#30018](https://github.com/WordPress/gutenberg/pull/30018)).
+-   The bundled `@babel/preset-typescript` dependency has been updated from requiring `^7.12.7` to requiring `^7.13.10` ([#30018](https://github.com/WordPress/gutenberg/pull/30018)).
+-   The bundled `@babel/runtime` dependency has been updated from requiring `^7.12.5` to requiring `^7.13.10` ([#30018](https://github.com/WordPress/gutenberg/pull/30018)).
+
 ## 5.1.0 (2021-03-17)
 
 ### New Features
