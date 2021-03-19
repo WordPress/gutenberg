@@ -10,7 +10,7 @@ import {
 } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 import { InspectorAdvancedControls } from '@wordpress/block-editor';
-import { footer, header } from '@wordpress/icons';
+import { footer, header, layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -35,8 +35,10 @@ const AREA_OPTIONS = [
 		value: 'footer',
 	},
 	{
-		description: __( 'The General template.' ),
-		icon: null,
+		description: __( 
+			'General templates often perform a specific role like displaying post content, and are not tied to any particular area.' 
+		),
+		icon: layout,
 		label: __( 'General' ),
 		value: 'uncategorized',
 	},
