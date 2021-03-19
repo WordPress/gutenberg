@@ -13,10 +13,11 @@ const { types: babelTypes } = require( '@babel/core' );
 
 /**
  * @param {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType} typeAnnotation
- * @param {' => ' | ': '} returnIndicator The return indicator to use. Allows using the same function for function annotations and object call properties.
+ * @param {' => ' | ': ' | null} returnIndicator The return indicator to use. Allows using the same function for function annotations and object call properties.
  */
 function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
-	const params = typeAnnotation.parameters
+	const nonRestParams = typeAnnotation.parameters
+		.filter( ( p ) => babelTypes.isIdentifier( p ) )
 		.map(
 			( p ) =>
 				`${ p.name }: ${ getTypeAnnotation(
@@ -24,11 +25,34 @@ function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 				) }`
 		)
 		.join( ', ' );
+	const restParam = typeAnnotation.parameters
+		.filter( ( p ) => babelTypes.isRestElement( p ) )
+		.map( ( p ) => {
+			if ( babelTypes.isIdentifier( p.argument ) ) {
+				return `...${ p.argument.name }: ${ getTypeAnnotation(
+					p.typeAnnotation.typeAnnotation
+				) }`;
+			}
+
+			// if it's not an identifier I'm not sure what we should do
+			return '';
+			// there's only ever one rest param
+		} )[ 0 ];
+
+	const params = `( ${ nonRestParams }${
+		restParam ? `, ${ restParam }` : ''
+	} )`;
+
+	if ( returnIndicator === null ) {
+		return params;
+	}
+
 	const returnType = getTypeAnnotation(
 		typeAnnotation.returnType ||
 			typeAnnotation.typeAnnotation.typeAnnotation
 	);
-	return `( ${ params } )${ returnIndicator }${ returnType }`;
+
+	return `${ params }${ returnIndicator }${ returnType }`;
 }
 
 /**
@@ -256,14 +280,14 @@ function getTypeAnnotation( typeAnnotation ) {
 			return '';
 		}
 		case 'TSConstructorType': {
-			return `new ${ getFunctionTypeAnnotation( typeAnnotation ) }`;
+			return `new ${ getFunctionTypeAnnotation( typeAnnotation, null ) }`;
 		}
 		case 'TSExpressionWithTypeArguments': {
 			// Unsure with this is
 			return '';
 		}
 		case 'TSFunctionType': {
-			return getFunctionTypeAnnotation( typeAnnotation );
+			return getFunctionTypeAnnotation( typeAnnotation, ' => ' );
 		}
 		case 'TSImportType': {
 			return getImportTypeAnnotation( typeAnnotation );
