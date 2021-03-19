@@ -11,13 +11,12 @@ import {
 } from '@wordpress/block-editor';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 
-function Content( { attributes, postType, postId } ) {
+function Content( { layout, postType, postId } ) {
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings()?.supportsLayout;
 	}, [] );
 	const defaultLayout = useEditorFeature( 'layout' );
-	const { layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 	const { contentSize, wideSize } = usedLayout;
 	const alignments =
@@ -58,9 +57,16 @@ function Placeholder() {
 
 export default function PostContentEdit( {
 	context: { postId: contextPostId, postType: contextPostType },
+	attributes,
 } ) {
+	const { layout = {} } = attributes;
+
 	return contextPostId && contextPostType ? (
-		<Content postType={ contextPostType } postId={ contextPostId } />
+		<Content
+			postType={ contextPostType }
+			postId={ contextPostId }
+			layout={ layout }
+		/>
 	) : (
 		<Placeholder />
 	);
