@@ -21,10 +21,7 @@
 
 .borderDark {
 	border: $border-width solid #373737;
-}
-
-.searchLabel {
-	width: 100%;
+	background-color: transparent;
 }
 
 .buttonContainer {
@@ -53,6 +50,7 @@
 	font-size: 16px;
 	font-weight: 400;
 	font-family: $default-regular-font;
+	width: 100%;
 }
 
 .richTextButton {

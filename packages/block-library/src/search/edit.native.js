@@ -162,7 +162,7 @@ function SearchEdit( {
 	};
 
 	const renderTextField = () => {
-		const inputStyle = () => {
+		const getInputStyle = () => {
 			const baseStyle = getStylesFromColorScheme(
 				styles.plainTextInput,
 				styles.plainTextInputDark
@@ -182,7 +182,7 @@ function SearchEdit( {
 				ref={ textInputRef }
 				isSelected={ isPlaceholderSelected }
 				className="wp-block-search__input"
-				style={ inputStyle() }
+				style={ getInputStyle() }
 				numberOfLines={ 1 }
 				ellipsizeMode="tail" // currently only works on ios
 				label={ null }
@@ -260,10 +260,7 @@ function SearchEdit( {
 					className="wp-block-search__label"
 					identifier="text"
 					tagName="p"
-					style={ {
-						...styles.searchLabel,
-						...styles.richTextLabel,
-					} }
+					style={ styles.richTextLabel }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }
 					withoutInteractiveFormatting
