@@ -24,6 +24,7 @@ function render_block_core_post_tags( $attributes, $content, $block ) {
 		if ( isset( $attributes['textAlign'] ) ) {
 			$classes .= 'has-text-align-' . $attributes['textAlign'];
 		}
+		$byline  = ! empty( $attributes['byline'] ) ? $attributes['byline'] : false;
 
 		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 		$output             = sprintf( '<div %1$s>', $wrapper_attributes );
@@ -33,7 +34,7 @@ function render_block_core_post_tags( $attributes, $content, $block ) {
 		}
 
 		$output  = trim( $output, ' | ' );
-		$output .= '</div>';
+		$output .= '</div>'.( ! empty( $byline ) ? '<p class="wp-block-post-author__byline">' . $byline . '</p>' : '' );
 
 		return $output;
 	}
