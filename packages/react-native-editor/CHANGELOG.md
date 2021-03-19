@@ -13,6 +13,10 @@ For each user feature we should also add a importance categorization label  to i
 
 -   [***] a11y: Screenreader improvements for the UnitControl component [#29741]
 
+## 1.49.0
+
+* [*] Remove the cancel button from settings options (Android only) [https://github.com/WordPress/gutenberg/pull/29599]
+
 ## 1.48.0
 
 -   [**] Buttons block: added width setting. [#28543]
