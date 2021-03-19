@@ -381,9 +381,14 @@ function hiddenCaretRangeFromPoint( doc, x, y, container ) {
 	const originalZIndex = container.style.zIndex;
 	const originalPosition = container.style.position;
 
+	const { position = 'static' } = getComputedStyle( container );
+
 	// A z-index only works if the element position is not static.
+	if ( position === 'static' ) {
+		container.style.position = 'relative';
+	}
+
 	container.style.zIndex = '10000';
-	container.style.position = 'relative';
 
 	const range = caretRangeFromPoint( doc, x, y );
 
