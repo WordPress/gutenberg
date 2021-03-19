@@ -17,6 +17,7 @@
 	padding-right: $grid-unit-05;
 	padding-top: $grid-unit-05;
 	padding-bottom: $grid-unit-05;
+	background-color: $white;
 }
 
 .borderDark {
@@ -80,7 +81,6 @@
 	font-family: $default-regular-font;
 	box-shadow: none;
 	color: #212121;
-	background-color: transparent;
 }
 
 .plainTextInputDark {
