@@ -73,6 +73,7 @@ const {
 	__experimentalGetParsedReusableBlock,
 	__experimentalGetAllowedPatterns,
 	__experimentalGetScopedBlockPatterns,
+	wasBlockJustInserted,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3447,6 +3448,35 @@ describe( 'selectors', () => {
 					title: 'pattern a',
 					scope: { block: [ 'test/block-a' ] },
 				} )
+			);
+		} );
+	} );
+
+	describe( 'wasBlockJustInserted', () => {
+		it( 'should return true if the client id passed to wasBlockJustInserted is found within the state', () => {
+			const expectedClientId = 1;
+			const state = {
+				lastBlockInserted: {
+					clientId: expectedClientId,
+				},
+			};
+
+			expect( wasBlockJustInserted( state, expectedClientId ) ).toBe(
+				true
+			);
+		} );
+
+		it( 'should return false if the client id passed to wasBlockJustInserted is not found within the state', () => {
+			const expectedClientId = 1;
+			const unexpectedClientId = 0;
+			const state = {
+				lastBlockInserted: {
+					clientId: unexpectedClientId,
+				},
+			};
+
+			expect( wasBlockJustInserted( state, expectedClientId ) ).toBe(
+				false
 			);
 		} );
 	} );
