@@ -80,25 +80,6 @@ export function notices( state = [], action ) {
 	return state;
 }
 
-/**
- * Reducer returning the block insertion event list state.
- *
- * @param {Object}  state  Current state.
- * @param {Object}  action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function lastBlockInserted( state = {}, action ) {
-	switch ( action.type ) {
-		case 'ADD_LAST_BLOCK_INSERTED':
-			return { ...state, clientId: action.clientId };
-
-		case 'CLEAR_LAST_BLOCK_INSERTED':
-			return {};
-	}
-	return state;
-}
-
 export default combineReducers( {
 	postId,
 	postType,
@@ -112,5 +93,4 @@ export default combineReducers( {
 	editorSettings,
 	clipboard,
 	notices,
-	lastBlockInserted,
 } );
