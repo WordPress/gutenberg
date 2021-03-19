@@ -13,7 +13,7 @@
  * @param WP_Block $block      Block instance.
  * @return string Returns the filtered post content of the current post.
  */
-function render_block_core_term_description( $attributes, $content, $block ) {
+function render_block_core_term_description( $attributes, $content, $block ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 
 	if ( ! is_category() && ! is_tag() && ! is_tax() ) {
 		return '';

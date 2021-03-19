@@ -14,7 +14,7 @@
  *
  * @return string Returns the next or previous post link that is adjacent to the current post.
  */
-function render_block_core_post_navigation_link( $attributes, $content, $block ) {
+function render_block_core_post_navigation_link( $attributes, $content, $block ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	if ( ! is_singular() ) {
 		return '';
 	}

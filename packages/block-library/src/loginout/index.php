@@ -15,7 +15,7 @@
 function render_block_core_loginout( $attributes ) {
 
 	// Build the redirect URL.
-	$current_url  = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
+	$current_url = ( is_ssl() ? 'https://' : 'http://' ) . $_SERVER['HTTP_HOST'] . $_SERVER['REQUEST_URI'];
 
 	$classes  = is_user_logged_in() ? 'logged-in' : 'logged-out';
 	$contents = wp_loginout(

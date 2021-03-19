@@ -16,7 +16,7 @@
  *
  * @return string Returns the query title based on the queried object.
  */
-function render_block_core_query_title( $attributes, $content, $block ) {
+function render_block_core_query_title( $attributes, $content, $block ) { // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 	$type       = isset( $attributes['type'] ) ? $attributes['type'] : null;
 	$is_archive = is_archive();
 	if ( ! $type || ( 'archive' === $type && ! $is_archive ) ) {
