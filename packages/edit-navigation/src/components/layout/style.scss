@@ -40,6 +40,10 @@
 		flex-grow: 1;
 	}
 
+	.interface-interface-skeleton__header {
+		border-bottom-color: transparent;
+	}
+
 	// Force the sidebar to the right side of the screen on larger
 	// breakpoints.
 	&.has-permanent-sidebar .interface-interface-skeleton__sidebar {
