@@ -219,7 +219,6 @@ function Tooltip( {
 	};
 	const childrenWithPopover = addPopoverToGrandchildren( {
 		grandchildren,
-		isOver,
 		...popoverData,
 		...popoverProps,
 	} );
