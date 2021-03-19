@@ -45,7 +45,7 @@ const interfaceLabels = {
 	/* translators: accessibility text for the navigation screen top bar landmark region. */
 	header: __( 'Navigation top bar' ),
 	/* translators: accessibility text for the navigation screen content landmark region. */
-	body: __( 'Menu blocks' ),
+	body: __( 'Navigation menu blocks' ),
 	/* translators: accessibility text for the widgets screen settings landmark region. */
 	sidebar: __( 'Navigation settings' ),
 };
