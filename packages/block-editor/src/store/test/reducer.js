@@ -33,6 +33,7 @@ import {
 	template,
 	blockListSettings,
 	lastBlockAttributesChange,
+	lastBlockInserted,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -2942,6 +2943,29 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'lastBlockInserted()', () => {
+		it( 'should return client id of last block inserted', () => {
+			const expectedClientId = 1;
+			const action = {
+				type: 'ADD_LAST_BLOCK_INSERTED',
+				clientId: expectedClientId,
+			};
+
+			expect(
+				lastBlockInserted( { clientId: expectedClientId }, action )
+					.clientId
+			).toBe( expectedClientId );
+		} );
+
+		it( 'should return empty state if last block has been cleared', () => {
+			const action = {
+				type: 'CLEAR_LAST_BLOCK_INSERTED',
+			};
+
+			expect( lastBlockInserted( {}, action ) ).toStrictEqual( {} );
 		} );
 	} );
 } );
