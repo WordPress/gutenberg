@@ -29,7 +29,7 @@ const variations = [
 		),
 		icon: header,
 		isActive: createIsActiveBasedOnArea( 'header' ),
-		scope: [],
+		scope: [ 'inserter' ],
 	},
 	{
 		name: 'footer',
@@ -39,7 +39,7 @@ const variations = [
 		),
 		icon: footer,
 		isActive: createIsActiveBasedOnArea( 'footer' ),
-		scope: [],
+		scope: [ 'inserter' ],
 	},
 ];
 

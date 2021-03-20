@@ -33,6 +33,7 @@ import styles from './style.scss';
  * Constants
  */
 const MIN_BUTTON_WIDTH = 75;
+
 const BUTTON_OPTIONS = [
 	{ value: 'button-inside', label: __( 'Button inside' ) },
 	{ value: 'button-outside', label: __( 'Button outside' ) },
@@ -140,15 +141,17 @@ function SearchEdit( {
 					options={ BUTTON_OPTIONS }
 					hideCancelButton={ true }
 				/>
-				<ToggleControl
-					label={ __( 'Use icon button' ) }
-					checked={ buttonUseIcon }
-					onChange={ () => {
-						setAttributes( {
-							buttonUseIcon: ! buttonUseIcon,
-						} );
-					} }
-				/>
+				{ buttonPosition !== 'no-button' && (
+					<ToggleControl
+						label={ __( 'Use icon button' ) }
+						checked={ buttonUseIcon }
+						onChange={ () => {
+							setAttributes( {
+								buttonUseIcon: ! buttonUseIcon,
+							} );
+						} }
+					/>
+				) }
 			</PanelBody>
 		</InspectorControls>
 	);
