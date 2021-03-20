@@ -60,6 +60,9 @@ function BlockPopover( {
 	capturingClientId,
 } ) {
 	const {
+		switchToolBar
+	} = useDispatch( blockEditorStore );
+	const {
 		isNavigationMode,
 		isMultiSelecting,
 		isTyping,
@@ -109,6 +112,7 @@ function BlockPopover( {
 		if ( ! shouldShowContextualToolbar ) {
 			setIsToolbarForced( false );
 		}
+		switchToolBar()
 	}, [ shouldShowContextualToolbar ] );
 
 	// Stores the active toolbar item index so the block toolbar can return focus
@@ -322,7 +326,6 @@ export default function WrappedBlockPopover() {
 	if ( ! name ) {
 		return null;
 	}
-
 	return (
 		<BlockPopover
 			clientId={ clientId }

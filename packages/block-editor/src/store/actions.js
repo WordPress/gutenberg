@@ -1058,6 +1058,12 @@ export function selectionChange(
 	};
 }
 
+export function switchToolBar() {
+	return {
+		type: 'TOOL_BAR_SWITCH',
+	};
+}
+
 /**
  * Returns an action object used in signalling that a new block of the default
  * type should be added to the block list.

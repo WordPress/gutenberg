@@ -20,7 +20,8 @@ import {
 	useMergeRefs,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
-
+import { useSelect } from '@wordpress/data';
+//import store ??
 /**
  * Internal dependencies
  */
@@ -261,6 +262,21 @@ const Popover = ( {
 	const isExpanded = expandOnMobile && isMobileViewport;
 	const [ containerResizeListener, contentSize ] = useResizeObserver();
 	noArrow = isExpanded || noArrow;
+
+/* 	function selector( select ) {
+		const {
+			x,
+		} = select( store );
+		return {
+			x: isToolBarActive(),
+		};
+	}
+
+	let {
+		x,
+	} = useSelect( selector, [] );
+	x = x || 12
+	console.log(x); */
 
 	useLayoutEffect( () => {
 		if ( isExpanded ) {
@@ -594,7 +610,9 @@ const Popover = ( {
 					/>
 				</div>
 			) }
-			<div ref={ contentRef } className="components-popover__content">
+			<div ref={ contentRef } className="components-popover__content"
+			// margin-left : 300px on tool bar showed
+			>
 				<div style={ { position: 'relative' } }>
 					{ containerResizeListener }
 					{ children }
