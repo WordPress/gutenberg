@@ -105,14 +105,17 @@ describe( 'Toolbar roving tabindex', () => {
 		await page.keyboard.press( 'Tab' );
 		await testBlockToolbarKeyboardNavigation( 'Body cell text', 'Table' );
 		await wrapCurrentBlockWithGroup( 'Table' );
-		await testGroupKeyboardNavigation( 'Body cell text', 'Table' );
+		await testGroupKeyboardNavigation( 'Block: Table', 'Table' );
 	} );
 
 	it( 'ensures custom html block toolbar uses roving tabindex', async () => {
 		await insertBlock( 'Custom HTML' );
 		await testBlockToolbarKeyboardNavigation( 'HTML', 'Custom HTML' );
 		await wrapCurrentBlockWithGroup( 'Custom HTML' );
-		await testGroupKeyboardNavigation( 'HTML', 'Custom HTML' );
+		await testGroupKeyboardNavigation(
+			'Block: Custom HTML',
+			'Custom HTML'
+		);
 	} );
 
 	it( 'ensures block toolbar remembers the last focused item', async () => {
