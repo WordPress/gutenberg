@@ -14,7 +14,6 @@ import {
 	Spinner,
 	TextareaControl,
 	TextControl,
-	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
@@ -41,7 +40,7 @@ import {
 	getBlockType,
 	switchToBlockType,
 } from '@wordpress/blocks';
-import { crop, textColor, upload } from '@wordpress/icons';
+import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -293,60 +292,60 @@ export default function Image( {
 
 	const controls = (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<BlockAlignmentControl
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-					{ ! multiImageSelection && ! isEditingImage && (
-						<ImageURLInputUI
-							url={ href || '' }
-							onChangeUrl={ onSetHref }
-							linkDestination={ linkDestination }
-							mediaUrl={ ( image && image.source_url ) || url }
-							mediaLink={ image && image.link }
-							linkTarget={ linkTarget }
-							linkClass={ linkClass }
-							rel={ rel }
-						/>
-					) }
-					{ allowCrop && (
-						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
-							icon={ crop }
-							label={ __( 'Crop' ) }
-						/>
-					) }
-					{ ! isEditingImage && (
-						<DuotoneToolbar
-							value={ duotone }
-							duotonePalette={ duotonePalette }
-							colorPalette={ colorPalette }
-							onChange={ onDuotoneChange }
-						/>
-					) }
-					{ externalBlob && (
-						<ToolbarButton
-							onClick={ uploadExternal }
-							icon={ upload }
-							label={ __( 'Upload external image' ) }
-						/>
-					) }
-					{ ! multiImageSelection && coverBlockExists && (
-						<ToolbarButton
-							icon={ textColor }
-							label={ __( 'Add text over image' ) }
-							onClick={ () =>
-								replaceBlocks(
-									currentId,
-									switchToBlockType( block, 'core/cover' )
-								)
-							}
-						/>
-					) }
-				</ToolbarGroup>
+			<BlockControls group="block">
+				<BlockAlignmentControl
+					value={ align }
+					onChange={ updateAlignment }
+				/>
 				{ ! multiImageSelection && ! isEditingImage && (
+					<ImageURLInputUI
+						url={ href || '' }
+						onChangeUrl={ onSetHref }
+						linkDestination={ linkDestination }
+						mediaUrl={ ( image && image.source_url ) || url }
+						mediaLink={ image && image.link }
+						linkTarget={ linkTarget }
+						linkClass={ linkClass }
+						rel={ rel }
+					/>
+				) }
+				{ allowCrop && (
+					<ToolbarButton
+						onClick={ () => setIsEditingImage( true ) }
+						icon={ crop }
+						label={ __( 'Crop' ) }
+					/>
+				) }
+				{ ! isEditingImage && (
+					<DuotoneToolbar
+						value={ duotone }
+						duotonePalette={ duotonePalette }
+						colorPalette={ colorPalette }
+						onChange={ onDuotoneChange }
+					/>
+				) }
+				{ externalBlob && (
+					<ToolbarButton
+						onClick={ uploadExternal }
+						icon={ upload }
+						label={ __( 'Upload external image' ) }
+					/>
+				) }
+				{ ! multiImageSelection && coverBlockExists && (
+					<ToolbarButton
+						icon={ overlayText }
+						label={ __( 'Add text over image' ) }
+						onClick={ () =>
+							replaceBlocks(
+								currentId,
+								switchToBlockType( block, 'core/cover' )
+							)
+						}
+					/>
+				) }
+			</BlockControls>
+			{ ! multiImageSelection && ! isEditingImage && (
+				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ id }
 						mediaURL={ url }
@@ -356,8 +355,8 @@ export default function Image( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 					/>
-				) }
-			</BlockControls>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
 					{ ! multiImageSelection && (

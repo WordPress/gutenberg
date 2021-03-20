@@ -20,15 +20,14 @@
 }
 
 .wp-block-embed {
+	margin: 0 0 1em 0;
+
 	// Supply caption styles to embeds, even if the theme hasn't opted in.
 	// Reason being: the new markup, figcaptions, are not likely to be styled in the majority of existing themes,
 	// so we supply the styles so as to not appear broken or unstyled in those.
 	figcaption {
 		@include caption-style();
 	}
-	// The embed block is in a `figure` element, and many themes zero this out.
-	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
-	margin-bottom: 1em;
 
 	// Don't allow iframe to overflow it's container.
 	iframe {

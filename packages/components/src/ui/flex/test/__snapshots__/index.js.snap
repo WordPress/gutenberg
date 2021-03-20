@@ -6,16 +6,16 @@ Snapshot Diff:
 + Second value
 
 @@ -7,14 +7,10 @@
-      class="components-flex-item wp-components-flex-item css-uyw6h0"
+      class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-uyw6h0"
       data-g2-c16t="true"
       data-g2-component="FlexItem"
     />
     <div
--     class="css-1nqjm19"
+-     class="ic-192yz5d css-1nqjm19"
 -   />
 -   <div />
 -   <div
-      class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block css-2e3tg1"
+      class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block ic-1e1meti ic-1p3tlc8 ic-192yz5d css-2e3tg1"
       data-g2-c16t="true"
       data-g2-component="FlexBlock"
     />
@@ -27,19 +27,30 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -7,11 +7,11 @@
-  	"margin-top": "0px",
-  	"margin-right": "0px",
-  	"margin-bottom": "0px",
-  	"margin-left": "0px",
-  	"--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 2)",
-- 	"align-items": "flex-start",
-+ 	"align-items": "center",
-  	"flex-direction": "row",
-  	"justify-content": "space-between",
-  	"width": "100%",
-  	"visibility": "visible"
-  }
+@@ -1,19 +1,19 @@
+  Array [
+    Object {
+      "--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 2)",
+      "-moz-osx-font-smoothing": "grayscale",
+-     "-ms-flex-align": "flex-start",
++     "-ms-flex-align": "center",
+      "-ms-flex-direction": "row",
+      "-ms-flex-pack": "justify",
+-     "-webkit-align-items": "flex-start",
+-     "-webkit-box-align": "flex-start",
++     "-webkit-align-items": "center",
++     "-webkit-box-align": "center",
+      "-webkit-box-pack": "justify",
+      "-webkit-flex-direction": "row",
+      "-webkit-font-smoothing": "antialiased",
+      "-webkit-justify-content": "space-between",
+-     "align-items": "flex-start",
++     "align-items": "center",
+      "box-sizing": "border-box",
+      "display": "flex",
+      "flex-direction": "row",
+      "font-family": "var(--wp-g2-font-family)",
+      "font-size": "var(--wp-g2-font-size)",
 `;
 
 exports[`props should render correctly 1`] = `
@@ -161,17 +172,17 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-flex wp-components-flex emotion-2"
+  class="components-flex wp-components-flex ic-17cs4ki ic-192yz5d emotion-2"
   data-g2-c16t="true"
   data-g2-component="Flex"
 >
   <div
-    class="components-flex-item wp-components-flex-item emotion-0"
+    class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d emotion-0"
     data-g2-c16t="true"
     data-g2-component="FlexItem"
   />
   <div
-    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-1"
+    class="components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block ic-1e1meti ic-1p3tlc8 ic-192yz5d emotion-1"
     data-g2-c16t="true"
     data-g2-component="FlexBlock"
   />
@@ -183,17 +194,35 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -9,9 +9,9 @@
-  	"margin-bottom": "0px",
-  	"margin-left": "0px",
-  	"--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 2)",
-  	"align-items": "center",
-  	"flex-direction": "row",
-- 	"justify-content": "flex-start",
-+ 	"justify-content": "space-between",
-  	"width": "100%",
-  	"visibility": "visible"
-  }
+@@ -2,24 +2,24 @@
+    Object {
+      "--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 2)",
+      "-moz-osx-font-smoothing": "grayscale",
+      "-ms-flex-align": "center",
+      "-ms-flex-direction": "row",
+-     "-ms-flex-pack": "start",
++     "-ms-flex-pack": "justify",
+      "-webkit-align-items": "center",
+      "-webkit-box-align": "center",
+-     "-webkit-box-pack": "start",
++     "-webkit-box-pack": "justify",
+      "-webkit-flex-direction": "row",
+      "-webkit-font-smoothing": "antialiased",
+-     "-webkit-justify-content": "flex-start",
++     "-webkit-justify-content": "space-between",
+      "align-items": "center",
+      "box-sizing": "border-box",
+      "display": "flex",
+      "flex-direction": "row",
+      "font-family": "var(--wp-g2-font-family)",
+      "font-size": "var(--wp-g2-font-size)",
+      "font-weight": "var(--wp-g2-font-weight)",
+-     "justify-content": "flex-start",
++     "justify-content": "space-between",
+      "margin": "0",
+      "width": "100%",
+    },
+  ]
 `;
 
 exports[`props should render spacing 1`] = `
@@ -201,17 +230,14 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -6,11 +6,11 @@
-  	"margin": "0px",
-  	"margin-top": "0px",
-  	"margin-right": "0px",
-  	"margin-bottom": "0px",
-  	"margin-left": "0px",
-- 	"--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 5)",
-+ 	"--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 2)",
-  	"align-items": "center",
-  	"flex-direction": "row",
-  	"justify-content": "space-between",
-  	"width": "100%",
-  	"visibility": "visible"
+@@ -1,8 +1,8 @@
+  Array [
+    Object {
+-     "--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 5)",
++     "--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 2)",
+      "-moz-osx-font-smoothing": "grayscale",
+      "-ms-flex-align": "center",
+      "-ms-flex-direction": "row",
+      "-ms-flex-pack": "justify",
+      "-webkit-align-items": "center",
 `;

@@ -9,3 +9,4 @@ import './style';
 import './color';
 import './duotone';
 import './font-size';
+import './layout';

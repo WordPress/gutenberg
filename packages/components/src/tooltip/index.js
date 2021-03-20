@@ -13,13 +13,14 @@ import {
 	useEffect,
 	useState,
 } from '@wordpress/element';
+import { useDebounce } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import Popover from '../popover';
 import Shortcut from '../shortcut';
-import { useDebounce } from '@wordpress/compose';
+import { withNextComponent } from './next';
 
 /**
  * Time over children to wait before showing tooltip
@@ -216,4 +217,4 @@ function Tooltip( { children, position, text, shortcut } ) {
 	} );
 }
 
-export default Tooltip;
+export default withNextComponent( Tooltip );

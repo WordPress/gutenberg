@@ -24,20 +24,22 @@ const variations = [
 	{
 		name: 'header',
 		title: __( 'Header' ),
-		description:
-			"The header template defines a page area that typically contains a title, logo, and main navigation. Since it's a global element it can be present across all pages and posts.",
+		description: __(
+			"The header template defines a page area that typically contains a title, logo, and main navigation. Since it's a global element it can be present across all pages and posts."
+		),
 		icon: header,
 		isActive: createIsActiveBasedOnArea( 'header' ),
-		scope: [],
+		scope: [ 'inserter' ],
 	},
 	{
 		name: 'footer',
 		title: __( 'Footer' ),
-		description:
-			"The footer template defines a page area that typically contains site credits, social links, or any other combination of blocks. Since it's a global element it can be present across all pages and posts.",
+		description: __(
+			"The footer template defines a page area that typically contains site credits, social links, or any other combination of blocks. Since it's a global element it can be present across all pages and posts."
+		),
 		icon: footer,
 		isActive: createIsActiveBasedOnArea( 'footer' ),
-		scope: [],
+		scope: [ 'inserter' ],
 	},
 ];
 

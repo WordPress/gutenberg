@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { capitalize, has, get, startsWith } from 'lodash';
+import { capitalize, get, has, omitBy, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
 import {
+	getBlockSupport,
 	hasBlockSupport,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 } from '@wordpress/blocks';
@@ -97,6 +98,22 @@ function addAttribute( settings ) {
 }
 
 /**
+ * Filters a style object returning only the keys
+ * that are serializable for a given block.
+ *
+ * @param {Object} style Input style object to filter.
+ * @param {Object} blockSupports Info about block supports.
+ * @return {Object} Filtered style.
+ */
+export function omitKeysNotToSerialize( style, blockSupports ) {
+	return omitBy(
+		style,
+		( value, key ) =>
+			!! blockSupports[ key ]?.__experimentalSkipSerialization
+	);
+}
+
+/**
  * Override props assigned to save component to inject the CSS variables definition.
  *
  * @param  {Object} props      Additional props applied to save element
@@ -110,8 +127,11 @@ export function addSaveProps( props, blockType, attributes ) {
 	}
 
 	const { style } = attributes;
+	const filteredStyle = omitKeysNotToSerialize( style, {
+		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
+	} );
 	props.style = {
-		...getInlineStyles( style ),
+		...getInlineStyles( filteredStyle ),
 		...props.style,
 	};
 

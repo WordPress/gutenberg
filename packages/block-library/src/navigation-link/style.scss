@@ -2,44 +2,33 @@
 	display: flex;
 	align-items: center;
 	position: relative;
-	margin: 0;
+	margin: 0 0.5em 0 0;
 
-	.wp-block-navigation__container:empty {
+	.wp-block-navigation-link__container:empty {
 		display: none;
 	}
 }
 
-.wp-block-navigation__container {
-	// Reset the default list styles
-	list-style: none;
-	margin: 0;
-	padding-left: 0;
-
-	// Horizontal layout
-	display: flex;
-	flex-wrap: wrap;
-
-	// Vertical layout
-
-	.is-vertical & {
-		display: block;
-	}
-}
-
-// Styles for submenu flyout
+// Styles for submenu flyout.
 .has-child {
 	> .wp-block-navigation-link__content {
 		padding-right: 0.5em;
 	}
-	.wp-block-navigation__container {
-		border: $border-width solid rgba(0, 0, 0, 0.15);
+
+	.wp-block-navigation-link__container {
+		border: 1px solid rgba(0, 0, 0, 0.15);
 		background-color: inherit;
 		color: inherit;
 		position: absolute;
 		left: 0;
 		top: 100%;
-		width: fit-content;
 		z-index: 2;
+		display: flex;
+		flex-direction: column;
+		align-items: normal;
+		min-width: 200px;
+
+		// Hide until hover or focus within.
 		opacity: 0;
 		transition: opacity 0.1s linear;
 		visibility: hidden;
@@ -57,7 +46,7 @@
 			left: 1.5em;
 
 			// Nested submenus sit to the left on large breakpoints
-			.wp-block-navigation__container {
+			.wp-block-navigation-link__container {
 				left: 100%;
 				top: -1px;
 
@@ -78,34 +67,39 @@
 			}
 		}
 	}
+
 	// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
 	// We will need to replace focus-within with a JS solution for IE keyboard support.
-	&:hover {
-		cursor: pointer;
 
-		> .wp-block-navigation__container {
-			visibility: visible;
-			opacity: 1;
-			display: flex;
-			flex-direction: column;
-		}
+	// Show submenus on hover.
+	&:hover > .wp-block-navigation-link__container {
+		visibility: visible;
+		opacity: 1;
 	}
 
-	&:focus-within {
-		cursor: pointer;
+	// Keep submenus open when focus is within.
+	&:focus-within > .wp-block-navigation-link__container {
+		visibility: visible;
+		opacity: 1;
+	}
+}
 
-		> .wp-block-navigation__container {
-			visibility: visible;
-			opacity: 1;
-			display: flex;
-			flex-direction: column;
-		}
+// Default background and font color.
+.wp-block-navigation:not(.has-background) {
+	.submenu-container, // This target items created by the Page List block.
+	.wp-block-navigation__container .wp-block-navigation-link__container {
+		// Set a background color for submenus so that they're not transparent.
+		// NOTE TO DEVS - if refactoring this code, please double-check that
+		// submenus have a default background color, this feature has regressed
+		// several times, so care needs to be taken.
+		background-color: #fff;
+		color: #000;
 	}
 }
 
 // Force links to inherit text decoration applied to navigation block.
 .wp-block-navigation[style*="text-decoration"] {
-	.wp-block-navigation__container,
+	.wp-block-navigation-link__container,
 	.wp-block-navigation-link {
 		text-decoration: inherit;
 	}
@@ -130,8 +124,9 @@
 	}
 }
 
-// All links
+// All links.
 .wp-block-navigation-link__content {
+	display: block;
 	color: inherit;
 	padding: 0.5em 1em;
 

@@ -86,7 +86,7 @@ export function linearToNestedHeadingList( headingList, index = 0 ) {
 		if ( heading.level === headingList[ 0 ].level ) {
 			// Check that the next iteration will return a value.
 			// If it does and the next level is greater than the current level,
-			// the next iteration becomes a child of the current interation.
+			// the next iteration becomes a child of the current iteration.
 			if (
 				headingList[ key + 1 ] !== undefined &&
 				headingList[ key + 1 ].level > heading.level

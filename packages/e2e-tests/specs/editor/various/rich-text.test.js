@@ -8,6 +8,7 @@ import {
 	clickBlockAppender,
 	pressKeyWithModifier,
 	showBlockToolbar,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'RichText', () => {
@@ -370,6 +371,46 @@ describe( 'RichText', () => {
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowLeft' );
 		await page.keyboard.press( 'ArrowLeft' );
+		await pressKeyWithModifier( 'primary', 'v' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should preserve internal formatting', async () => {
+		await clickBlockAppender();
+
+		// Add text and select to color.
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await clickBlockToolbarButton( 'More' );
+
+		const button = await page.waitForXPath(
+			`//button[contains(text(), 'Text color')]`
+		);
+		// Clicks may fail if the button is out of view. Assure it is before click.
+		await button.evaluate( ( element ) => element.scrollIntoView() );
+		await button.click();
+
+		// Select color other than black.
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Navigate to the block.
+		await page.keyboard.press( 'Tab' );
+		await pressKeyWithModifier( 'primary', 'a' );
+
+		// Copy the colored text.
+		await pressKeyWithModifier( 'primary', 'c' );
+
+		// Collapsed the selection to the end.
+		await page.keyboard.press( 'ArrowRight' );
+
+		// Create a new paragraph.
+		await page.keyboard.press( 'Enter' );
+
+		// Paste the colored text.
 		await pressKeyWithModifier( 'primary', 'v' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

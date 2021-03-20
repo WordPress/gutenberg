@@ -18,7 +18,6 @@ import {
 	SPACE,
 	ESCAPE,
 } from '@wordpress/keycodes';
-import deprecated from '@wordpress/deprecated';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 import { useMergeRefs } from '@wordpress/compose';
 
@@ -42,6 +41,8 @@ import { useFormatTypes } from './use-format-types';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useInlineWarning } from './use-inline-warning';
 import { insert } from '../insert';
+import { slice } from '../slice';
+import { getTextContent } from '../get-text-content';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -145,8 +146,6 @@ function RichText(
 		onSelectionChange,
 		onChange,
 		unstableOnFocus: onFocus,
-		setFocusedElement,
-		instanceId,
 		clientId,
 		identifier,
 		__unstableMultilineTag: multilineTag,
@@ -311,6 +310,24 @@ function RichText(
 		} );
 	}
 
+	function handleCopy( event ) {
+		if ( isCollapsed( record.current ) ) {
+			return;
+		}
+
+		const selectedRecord = slice( record.current );
+		const plainText = getTextContent( selectedRecord );
+		const html = toHTMLString( {
+			value: selectedRecord,
+			multilineTag,
+			preserveWhiteSpace,
+		} );
+		event.clipboardData.setData( 'text/plain', plainText );
+		event.clipboardData.setData( 'text/html', html );
+		event.clipboardData.setData( 'rich-text', 'true' );
+		event.preventDefault();
+	}
+
 	/**
 	 * Handles a paste event.
 	 *
@@ -379,12 +396,14 @@ function RichText(
 
 		if ( onPaste ) {
 			const files = getFilesFromDataTransfer( clipboardData );
+			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
 
 			onPaste( {
 				value: removeEditorOnlyFormats( record.current ),
 				onChange: handleChange,
 				html,
 				plainText,
+				isInternal,
 				files: [ ...files ],
 				activeFormats,
 			} );
@@ -941,12 +960,6 @@ function RichText(
 	 * documented, as the current requirements where it is used are subject to
 	 * future refactoring following `isSelected` handling.
 	 *
-	 * In contrast with `setFocusedElement`, this is only triggered in response
-	 * to focus within the contenteditable field, whereas `setFocusedElement`
-	 * is triggered on focus within any `RichText` descendent element.
-	 *
-	 * @see setFocusedElement
-	 *
 	 * @private
 	 */
 	function handleFocus() {
@@ -988,13 +1001,6 @@ function RichText(
 		rafId.current = getWin().requestAnimationFrame( handleSelectionChange );
 
 		getDoc().addEventListener( 'selectionchange', handleSelectionChange );
-
-		if ( setFocusedElement ) {
-			deprecated( 'wp.blockEditor.RichText setFocusedElement prop', {
-				alternative: 'selection state from the block editor store.',
-			} );
-			setFocusedElement( instanceId );
-		}
 	}
 
 	function handleBlur() {
@@ -1078,6 +1084,7 @@ function RichText(
 		ref: useMergeRefs( [ forwardedRef, ref ] ),
 		style: defaultStyle,
 		className: 'rich-text',
+		onCopy: handleCopy,
 		onPaste: handlePaste,
 		onInput: handleInput,
 		onCompositionStart: handleCompositionStart,

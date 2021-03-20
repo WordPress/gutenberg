@@ -2,11 +2,11 @@
  * WordPress dependencies
  */
 
-import { Toolbar, Slot } from '@wordpress/components';
+import { Slot } from '@wordpress/components';
 
 const FormatToolbar = () => {
 	return (
-		<Toolbar>
+		<>
 			{ [ 'bold', 'italic', 'link' ].map( ( format ) => (
 				<Slot
 					name={ `RichText.ToolbarControls.${ format }` }
@@ -14,7 +14,7 @@ const FormatToolbar = () => {
 				/>
 			) ) }
 			<Slot name="RichText.ToolbarControls" />
-		</Toolbar>
+		</>
 	);
 };
 

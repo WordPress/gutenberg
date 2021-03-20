@@ -18,11 +18,13 @@ import useBlockNavigationDropZone from './use-block-navigation-drop-zone';
  * recursive component (it renders itself), so this ensures TreeGrid is only
  * present at the very top of the navigation grid.
  *
- * @param {Object} props                        Components props.
- * @param {Object} props.__experimentalFeatures Object used in context provider.
+ * @param {Object}  props                                          Components props.
+ * @param {boolean} props.__experimentalFeatures                   Flag to enable experimental features.
+ * @param {boolean} props.__experimentalPersistentListViewFeatures Flag to enable features for the Persistent List View experiment.
  */
 export default function BlockNavigationTree( {
 	__experimentalFeatures,
+	__experimentalPersistentListViewFeatures,
 	...props
 } ) {
 	const treeGridRef = useRef();
@@ -35,9 +37,14 @@ export default function BlockNavigationTree( {
 	const contextValue = useMemo(
 		() => ( {
 			__experimentalFeatures,
+			__experimentalPersistentListViewFeatures,
 			blockDropTarget,
 		} ),
-		[ __experimentalFeatures, blockDropTarget ]
+		[
+			__experimentalFeatures,
+			__experimentalPersistentListViewFeatures,
+			blockDropTarget,
+		]
 	);
 
 	return (

@@ -5,7 +5,7 @@ import { InspectorControls } from '@wordpress/block-editor';
 import {
 	BottomSheet,
 	ColorSettings,
-	FocalPointSettings,
+	FocalPointSettingsPanel,
 	LinkPickerScreen,
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
@@ -45,6 +45,12 @@ function BottomSheetSettings( {
 					<InspectorControls.Slot />
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
+					name={ BottomSheet.SubSheet.screenName }
+				>
+					<BottomSheet.SubSheet.Slot />
+				</BottomSheet.NavigationScreen>
+
+				<BottomSheet.NavigationScreen
 					name={ blockSettingsScreens.color }
 				>
 					<ColorSettings defaultSettings={ settings } />
@@ -53,7 +59,7 @@ function BottomSheetSettings( {
 					name={ blockSettingsScreens.focalPoint }
 					fullScreen
 				>
-					<FocalPointSettings />
+					<FocalPointSettingsPanel />
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
 					name={ blockSettingsScreens.linkPicker }

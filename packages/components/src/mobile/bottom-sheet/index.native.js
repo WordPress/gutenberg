@@ -39,6 +39,8 @@ import RadioCell from './radio-cell';
 import NavigationScreen from './bottom-sheet-navigation/navigation-screen';
 import NavigationContainer from './bottom-sheet-navigation/navigation-container';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
+import BottomSheetSubSheet from './sub-sheet';
+import NavigationHeader from './navigation-header';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
 class BottomSheet extends Component {
@@ -486,6 +488,8 @@ const ThemedBottomSheet = withPreferredColorScheme( BottomSheet );
 ThemedBottomSheet.getWidth = getWidth;
 ThemedBottomSheet.Button = Button;
 ThemedBottomSheet.Cell = Cell;
+ThemedBottomSheet.SubSheet = BottomSheetSubSheet;
+ThemedBottomSheet.NavigationHeader = NavigationHeader;
 ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;

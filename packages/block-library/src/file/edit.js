@@ -10,10 +10,9 @@ import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	withNotices,
-	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	BlockIcon,
@@ -23,11 +22,12 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect, useState, useRef } from '@wordpress/element';
-import { useCopyOnClick } from '@wordpress/compose';
+import { useEffect, useState } from '@wordpress/element';
+import { useCopyToClipboard } from '@wordpress/compose';
 import { __, _x } from '@wordpress/i18n';
 import { file as icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -35,8 +35,13 @@ import { store as coreStore } from '@wordpress/core-data';
 import FileBlockInspector from './inspector';
 
 function ClipboardToolbarButton( { text, disabled } ) {
-	const ref = useRef();
-	const hasCopied = useCopyOnClick( ref, text );
+	const { createNotice } = useDispatch( noticesStore );
+	const ref = useCopyToClipboard( text, () => {
+		createNotice( 'info', __( 'Copied URL to clipboard.' ), {
+			isDismissible: true,
+			type: 'snackbar',
+		} );
+	} );
 
 	return (
 		<ToolbarButton
@@ -44,7 +49,7 @@ function ClipboardToolbarButton( { text, disabled } ) {
 			ref={ ref }
 			disabled={ disabled }
 		>
-			{ hasCopied ? __( 'Copied!' ) : __( 'Copy URL' ) }
+			{ __( 'Copy URL' ) }
 		</ToolbarButton>
 	);
 }
@@ -89,9 +94,7 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 		}
 
 		if ( downloadButtonText === undefined ) {
-			setAttributes( {
-				downloadButtonText: _x( 'Download', 'button label' ),
-			} );
+			changeDownloadButtonText( _x( 'Download', 'button label' ) );
 		}
 	}, [] );
 
@@ -126,6 +129,13 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 
 	function changeShowDownloadButton( newValue ) {
 		setAttributes( { showDownloadButton: newValue } );
+	}
+
+	function changeDownloadButtonText( newValue ) {
+		// Remove anchor tags from button text content.
+		setAttributes( {
+			downloadButtonText: newValue.replace( /<\/?a[^>]*>/g, '' ),
+		} );
 	}
 
 	const attachmentPage = media && media.link;
@@ -171,20 +181,18 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 					changeShowDownloadButton,
 				} }
 			/>
-			<BlockControls>
-				<ToolbarGroup>
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ href }
-						accept="*"
-						onSelect={ onSelectFile }
-						onError={ onUploadError }
-					/>
-					<ClipboardToolbarButton
-						text={ href }
-						disabled={ isBlobURL( href ) }
-					/>
-				</ToolbarGroup>
+			<BlockControls group="other">
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ href }
+					accept="*"
+					onSelect={ onSelectFile }
+					onError={ onUploadError }
+				/>
+				<ClipboardToolbarButton
+					text={ href }
+					disabled={ isBlobURL( href ) }
+				/>
 			</BlockControls>
 			<div { ...blockProps }>
 				<div className={ 'wp-block-file__content-wrapper' }>
@@ -214,9 +222,7 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }
 								onChange={ ( text ) =>
-									setAttributes( {
-										downloadButtonText: text,
-									} )
+									changeDownloadButtonText( text )
 								}
 							/>
 						</div>

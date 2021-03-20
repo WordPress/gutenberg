@@ -27,7 +27,6 @@ export function useBlockClassNames( clientId ) {
 	return useSelect(
 		( select ) => {
 			const {
-				isTyping,
 				isBlockBeingDragged,
 				isBlockHighlighted,
 				isBlockSelected,
@@ -60,11 +59,6 @@ export function useBlockClassNames( clientId ) {
 				'is-multi-selected': isBlockMultiSelected( clientId ),
 				'is-reusable': isReusableBlock( getBlockType( name ) ),
 				'is-dragging': isDragging,
-				// We only care about this prop when the block is selected
-				// Thus to avoid unnecessary rerenders we avoid updating the prop if
-				// the block is not selected.
-				'is-typing':
-					( isSelected || isAncestorOfSelectedBlock ) && isTyping(),
 				'is-focused':
 					focusMode &&
 					isLargeViewport &&

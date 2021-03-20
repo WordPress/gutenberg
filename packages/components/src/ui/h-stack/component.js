@@ -5,7 +5,7 @@ import { createComponent } from '../utils';
 import { useHStack } from './hook';
 
 /**
- *`HStack` (Horizontal Stack) arranges child elements in a horizontal line.
+ * `HStack` (Horizontal Stack) arranges child elements in a horizontal line.
  *
  * `HStack` can render anything inside.
  *
@@ -30,8 +30,10 @@ import { useHStack } from './hook';
  * }
  * ```
  */
-export default createComponent( {
+const HStack = createComponent( {
 	as: 'div',
 	useHook: useHStack,
 	name: 'HStack',
 } );
+
+export default HStack;

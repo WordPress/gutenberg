@@ -60,7 +60,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-scrollable wp-components-scrollable emotion-0"
+  class="components-scrollable wp-components-scrollable ic-y3p1xi ic-192yz5d emotion-0"
   data-g2-c16t="true"
   data-g2-component="Scrollable"
 >
@@ -73,15 +73,22 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -7,10 +7,9 @@
-  	"margin-top": "0px",
-  	"margin-right": "0px",
-  	"margin-bottom": "0px",
-  	"margin-left": "0px",
-  	"height": "100%",
-- 	"scroll-behavior": "smooth",
-  	"overflow-x": "hidden",
-  	"overflow-y": "auto",
-  	"visibility": "visible"
-  }
+  Array [
+    Object {
+      "-moz-osx-font-smoothing": "grayscale",
+-     "-moz-scroll-behavior": "smooth",
+-     "-ms-scroll-behavior": "smooth",
+      "-webkit-font-smoothing": "antialiased",
+-     "-webkit-scroll-behavior": "smooth",
+      "box-sizing": "border-box",
+      "font-family": "var(--wp-g2-font-family)",
+      "font-size": "var(--wp-g2-font-size)",
+      "font-weight": "var(--wp-g2-font-weight)",
+      "height": "100%",
+      "margin": "0",
+      "overflow-x": "hidden",
+      "overflow-y": "auto",
+-     "scroll-behavior": "smooth",
+    },
+  ]
 `;

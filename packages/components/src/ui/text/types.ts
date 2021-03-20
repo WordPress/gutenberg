@@ -1,4 +1,12 @@
+/**
+ * Internal dependencies
+ */
 import type { Props as TruncateProps } from '../truncate/types';
+
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
 import type { CSSProperties } from 'react';
 
 type TextAdjustLineHeightForInnerControls =

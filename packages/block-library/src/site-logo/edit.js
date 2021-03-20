@@ -16,8 +16,6 @@ import {
 	RangeControl,
 	ResizableBox,
 	Spinner,
-	ToolbarButton,
-	ToolbarGroup,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -30,7 +28,6 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { trash } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -282,35 +279,19 @@ export default function LogoEdit( {
 		setLogo( media.id.toString() );
 	};
 
-	const deleteLogo = () => {
-		setLogo( '' );
-		setLogoUrl( '' );
-	};
-
 	const onUploadError = ( message ) => {
 		setError( message[ 2 ] ? message[ 2 ] : null );
 	};
 
-	const controls = (
-		<BlockControls>
-			<ToolbarGroup>
-				{ logoUrl && (
-					<MediaReplaceFlow
-						mediaURL={ logoUrl }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept={ ACCEPT_MEDIA_STRING }
-						onSelect={ onSelectLogo }
-						onError={ onUploadError }
-					/>
-				) }
-				{ !! logoUrl && (
-					<ToolbarButton
-						icon={ trash }
-						onClick={ () => deleteLogo() }
-						label={ __( 'Delete Site Logo' ) }
-					/>
-				) }
-			</ToolbarGroup>
+	const controls = logoUrl && (
+		<BlockControls group="other">
+			<MediaReplaceFlow
+				mediaURL={ logoUrl }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				accept={ ACCEPT_MEDIA_STRING }
+				onSelect={ onSelectLogo }
+				onError={ onUploadError }
+			/>
 		</BlockControls>
 	);
 
@@ -364,12 +345,9 @@ export default function LogoEdit( {
 		'is-focused': isSelected,
 	} );
 
-	const key = !! logoUrl;
-
 	const blockProps = useBlockProps( {
 		ref,
 		className: classes,
-		key,
 	} );
 
 	return (

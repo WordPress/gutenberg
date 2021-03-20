@@ -72,6 +72,7 @@ const {
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 	__experimentalGetParsedReusableBlock,
 	__experimentalGetAllowedPatterns,
+	__experimentalGetScopedBlockPatterns,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3400,6 +3401,53 @@ describe( 'selectors', () => {
 			expect(
 				__experimentalGetAllowedPatterns( state, 'block2' )
 			).toHaveLength( 0 );
+		} );
+	} );
+	describe( '__experimentalGetScopedBlockPatterns', () => {
+		const state = {
+			blocks: {},
+			settings: {
+				__experimentalBlockPatterns: [
+					{
+						title: 'pattern a',
+						scope: { block: [ 'test/block-a' ] },
+					},
+					{
+						title: 'pattern b',
+						scope: { block: [ 'test/block-b' ] },
+					},
+				],
+			},
+		};
+		it( 'should return empty array if no scope and block name is provided', () => {
+			expect( __experimentalGetScopedBlockPatterns( state ) ).toEqual(
+				[]
+			);
+			expect(
+				__experimentalGetScopedBlockPatterns( state, 'block' )
+			).toEqual( [] );
+		} );
+		it( 'shoud return empty array if no match is found', () => {
+			const patterns = __experimentalGetScopedBlockPatterns(
+				state,
+				'block',
+				'test/block-not-exists'
+			);
+			expect( patterns ).toEqual( [] );
+		} );
+		it( 'should return proper results when there are matched block patterns', () => {
+			const patterns = __experimentalGetScopedBlockPatterns(
+				state,
+				'block',
+				'test/block-a'
+			);
+			expect( patterns ).toHaveLength( 1 );
+			expect( patterns[ 0 ] ).toEqual(
+				expect.objectContaining( {
+					title: 'pattern a',
+					scope: { block: [ 'test/block-a' ] },
+				} )
+			);
 		} );
 	} );
 } );
