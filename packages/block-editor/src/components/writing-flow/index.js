@@ -48,6 +48,16 @@ function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
 }
 
+function isFormElement( element ) {
+	const { tagName } = element;
+	return (
+		tagName === 'INPUT' ||
+		tagName === 'BUTTON' ||
+		tagName === 'SELECT' ||
+		tagName === 'TEXTAREA'
+	);
+}
+
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
  * event of the given directional key code, or false otherwise.
@@ -358,6 +368,19 @@ export default function WritingFlow( { children } ) {
 		// Navigation mode (press Esc), to navigate through blocks.
 		if ( selectedBlockClientId ) {
 			if ( isTab ) {
+				const direction = isShift ? 'findPrevious' : 'findNext';
+				// Allow tabbing between form elements rendered in a block,
+				// such as inside a placeholder. Form elements are generally
+				// meant to be UI rather than part of the content. Ideally
+				// these are not rendered in the content and perhaps in the
+				// future they can be rendered in an iframe or shadow DOM.
+				if (
+					isFormElement( target ) &&
+					isFormElement( focus.tabbable[ direction ]( target ) )
+				) {
+					return;
+				}
+
 				const next = isShift
 					? focusCaptureBeforeRef
 					: focusCaptureAfterRef;
