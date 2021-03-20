@@ -13,7 +13,7 @@
 function gutenberg_register_duotone_support( $block_type ) {
 	$has_duotone_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_duotone_support = gutenberg_experimental_get( $block_type->supports, array( 'color', 'duotone' ), false );
+		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'color', 'duotone' ), false );
 	}
 
 	if ( $has_duotone_support ) {
@@ -43,7 +43,7 @@ function gutenberg_apply_duotone_support( $block_type, $block_attributes ) {
 	$attributes          = array();
 	$has_duotone_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_duotone_support = gutenberg_experimental_get( $block_type->supports, array( 'color', 'duotone' ), false );
+		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'color', 'duotone' ), false );
 	}
 	if ( $has_duotone_support ) {
 		$has_duotone_attribute = isset( $block_attributes['style']['color']['duotone'] );
@@ -68,7 +68,7 @@ function gutenberg_apply_duotone_support( $block_type, $block_attributes ) {
 function gutenberg_render_duotone_support( $block_type, $block_attributes, $block_content ) {
 	$duotone_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$duotone_support = gutenberg_experimental_get( $block_type->supports, array( 'color', 'duotone' ), false );
+		$duotone_support = _wp_array_get( $block_type->supports, array( 'color', 'duotone' ), false );
 	}
 
 	$has_duotone_attribute = isset( $block_attributes['style']['color']['duotone'] );
