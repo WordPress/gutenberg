@@ -12,7 +12,6 @@ import {
 	computeCaretRect,
 	focus,
 	isHorizontalEdge,
-	isTextField,
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
@@ -34,9 +33,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	isBlockFocusStop,
 	isInSameBlock,
-	hasInnerBlocksContext,
 	isInsideRootBlock,
 	getBlockDOMNode,
 	getBlockClientId,
@@ -115,9 +112,14 @@ export function getClosestTabbable(
 		targetRect = target.getBoundingClientRect();
 	}
 
-	function isTabCandidate( node, i, array ) {
+	function isTabCandidate( node ) {
 		// Not a candidate if the node is not tabbable.
 		if ( ! focus.tabbable.isTabbableIndex( node ) ) {
+			return false;
+		}
+
+		// Skip focusable elements such as links within content editable nodes.
+		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
 			return false;
 		}
 
@@ -128,48 +130,6 @@ export function getClosestTabbable(
 				nodeRect.left >= targetRect.right ||
 				nodeRect.right <= targetRect.left
 			) {
-				return false;
-			}
-		}
-
-		// Prefer text fields...
-		if ( isTextField( node ) ) {
-			return true;
-		}
-
-		// ...but settle for block focus stop.
-		if ( ! isBlockFocusStop( node ) ) {
-			return false;
-		}
-
-		// If element contains inner blocks, stop immediately at its focus
-		// wrapper.
-		if ( hasInnerBlocksContext( node ) ) {
-			return true;
-		}
-
-		// If navigating out of a block (in reverse), don't consider its
-		// block focus stop.
-		if ( node.contains( target ) ) {
-			return false;
-		}
-
-		// In case of block focus stop, check to see if there's a better
-		// text field candidate within.
-		for (
-			let offset = 1, nextNode;
-			( nextNode = array[ i + offset ] );
-			offset++
-		) {
-			// Abort if no longer testing descendents of focus stop.
-			if ( ! node.contains( nextNode ) ) {
-				break;
-			}
-
-			// Apply same tests by recursion. This is important to consider
-			// nestable blocks where we don't want to settle for the inner
-			// block focus stop.
-			if ( isTabCandidate( nextNode, i + offset, array ) ) {
 				return false;
 			}
 		}
