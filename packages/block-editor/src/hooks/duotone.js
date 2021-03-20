@@ -43,7 +43,7 @@ function DuotonePanel( { attributes, setAttributes } ) {
 						const newStyle = {
 							...style,
 							color: {
-								...style.color,
+								...style?.color,
 								duotone: newDuotone,
 							},
 						};
