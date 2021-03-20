@@ -91,7 +91,6 @@ export function ImageEdit( {
 		width,
 		height,
 		sizeSlug,
-		duotone,
 	} = attributes;
 
 	const altRef = useRef();
@@ -276,7 +275,6 @@ export function ImageEdit( {
 	);
 
 	const classes = classnames( className, {
-		[ duotone?.id ]: duotone,
 		'is-transient': isBlobURL( url ),
 		'is-resized': !! width || !! height,
 		'is-focused': isSelected,
