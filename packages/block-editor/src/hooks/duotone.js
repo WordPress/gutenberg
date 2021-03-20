@@ -11,7 +11,6 @@ import {
 	getBlockSupport,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-import { ToolbarGroup } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
@@ -33,24 +32,22 @@ function DuotonePanel( { attributes, setAttributes } ) {
 	const colorPalette = useEditorFeature( 'color.palette' );
 
 	return (
-		<BlockControls>
-			<ToolbarGroup>
-				<DuotoneToolbar
-					duotonePalette={ duotonePalette }
-					colorPalette={ colorPalette }
-					value={ duotone }
-					onChange={ ( newDuotone ) => {
-						const newStyle = {
-							...style,
-							color: {
-								...style?.color,
-								duotone: newDuotone,
-							},
-						};
-						setAttributes( { style: newStyle } );
-					} }
-				/>
-			</ToolbarGroup>
+		<BlockControls group="block">
+			<DuotoneToolbar
+				duotonePalette={ duotonePalette }
+				colorPalette={ colorPalette }
+				value={ duotone }
+				onChange={ ( newDuotone ) => {
+					const newStyle = {
+						...style,
+						color: {
+							...style?.color,
+							duotone: newDuotone,
+						},
+					};
+					setAttributes( { style: newStyle } );
+				} }
+			/>
 		</BlockControls>
 	);
 }
@@ -96,8 +93,8 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 
 		return (
 			<>
-				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
 				<BlockEdit { ...props } />
+				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
 			</>
 		);
 	},
