@@ -84,9 +84,10 @@
 	}
 }
 
-// Default background and font color
-.wp-block-navigation:not(.has-background) .wp-block-navigation__container {
-	.wp-block-navigation-link__container {
+// Default background and font color.
+.wp-block-navigation:not(.has-background) {
+	.submenu-container, // This target items created by the Page List block.
+	.wp-block-navigation__container .wp-block-navigation-link__container {
 		// Set a background color for submenus so that they're not transparent.
 		// NOTE TO DEVS - if refactoring this code, please double-check that
 		// submenus have a default background color, this feature has regressed
@@ -125,6 +126,7 @@
 
 // All links.
 .wp-block-navigation-link__content {
+	display: block;
 	color: inherit;
 	padding: 0.5em 1em;
 

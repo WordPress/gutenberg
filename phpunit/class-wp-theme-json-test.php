@@ -145,41 +145,6 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
-	function test_schema_validation_subtree_is_removed_if_style_not_supported_by_block() {
-		$root_name  = WP_Theme_JSON::ROOT_BLOCK_NAME;
-		$theme_json = new WP_Theme_JSON(
-			array(
-				'styles' => array(
-					$root_name => array(
-						'color'   => array(
-							'text' => 'var:preset|color|dark-gray',
-						),
-						'spacing' => array(
-							'padding' => array(
-								'top'    => '1px',
-								'right'  => '1px',
-								'bottom' => '1px',
-								'left'   => '1px',
-							),
-						),
-					),
-				),
-			)
-		);
-
-		$actual   = $theme_json->get_raw_data();
-		$expected = array(
-			'styles' => array(
-				$root_name => array(
-					'color' => array(
-						'text' => 'var:preset|color|dark-gray',
-					),
-				),
-			),
-		);
-		$this->assertEqualSetsWithIndex( $expected, $actual );
-	}
-
 	function test_get_settings() {
 		$root_name = WP_Theme_JSON::ROOT_BLOCK_NAME;
 		// See schema at WP_Theme_JSON::SCHEMA.

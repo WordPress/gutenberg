@@ -11,7 +11,7 @@ import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { withNotices } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import {
-	BlockAlignmentToolbar,
+	BlockAlignmentControl,
 	BlockControls,
 	BlockIcon,
 	MediaPlaceholder,
@@ -302,8 +302,8 @@ export function ImageEdit( {
 				/>
 			) }
 			{ ! url && (
-				<BlockControls>
-					<BlockAlignmentToolbar
+				<BlockControls group="block">
+					<BlockAlignmentControl
 						value={ align }
 						onChange={ updateAlignment }
 					/>

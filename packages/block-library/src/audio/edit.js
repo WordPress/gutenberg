@@ -134,7 +134,7 @@ function AudioEdit( {
 
 	return (
 		<>
-			<BlockControls>
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ src }

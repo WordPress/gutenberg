@@ -58,7 +58,7 @@ const ResizableBoxContainer = forwardRef(
 
 function ToolbarEditButton( { mediaId, mediaUrl, onSelectMedia } ) {
 	return (
-		<BlockControls>
+		<BlockControls group="other">
 			<MediaReplaceFlow
 				mediaId={ mediaId }
 				mediaURL={ mediaUrl }

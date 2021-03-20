@@ -13,11 +13,7 @@ import {
  * WordPress dependencies
  */
 import { useState, useEffect } from '@wordpress/element';
-import {
-	BottomSheet,
-	BottomSheetConsumer,
-	InserterButton,
-} from '@wordpress/components';
+import { BottomSheet, InserterButton } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -26,7 +22,13 @@ import styles from './style.scss';
 
 const MIN_COL_NUM = 3;
 
-function InserterSearchResults( { items, onSelect, onClose } ) {
+function InserterSearchResults( {
+	items,
+	onSelect,
+	listProps,
+	safeAreaBottomInset,
+	searchFormHeight = 0,
+} ) {
 	const [ numberOfColumns, setNumberOfColumns ] = useState( MIN_COL_NUM );
 	const [ itemWidth, setItemWidth ] = useState();
 	const [ maxWidth, setMaxWidth ] = useState();
@@ -73,51 +75,41 @@ function InserterSearchResults( { items, onSelect, onClose } ) {
 	}
 
 	return (
-		<BottomSheet
-			isVisible={ true }
-			onClose={ onClose }
-			hideHeader
-			hasNavigation
-		>
-			<TouchableHighlight accessible={ false }>
-				<BottomSheetConsumer>
-					{ ( { listProps, safeAreaBottomInset } ) => (
-						<FlatList
-							onLayout={ onLayout }
-							key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
-							keyboardShouldPersistTaps="always"
-							numColumns={ numberOfColumns }
-							data={ items }
-							ItemSeparatorComponent={ () => (
-								<TouchableWithoutFeedback accessible={ false }>
-									<View style={ styles.rowSeparator } />
-								</TouchableWithoutFeedback>
-							) }
-							keyExtractor={ ( item ) => item.name }
-							renderItem={ ( { item } ) => (
-								<InserterButton
-									{ ...{
-										item,
-										itemWidth,
-										maxWidth,
-										onSelect,
-									} }
-								/>
-							) }
-							{ ...listProps }
-							contentContainerStyle={ [
-								...listProps.contentContainerStyle,
-								{
-									paddingBottom:
-										safeAreaBottomInset ||
-										styles.list.paddingBottom,
-								},
-							] }
-						/>
-					) }
-				</BottomSheetConsumer>
-			</TouchableHighlight>
-		</BottomSheet>
+		<TouchableHighlight accessible={ false }>
+			<FlatList
+				onLayout={ onLayout }
+				key={ `InserterUI-${ numberOfColumns }` } //re-render when numberOfColumns changes
+				keyboardShouldPersistTaps="always"
+				numColumns={ numberOfColumns }
+				data={ items }
+				initialNumToRender={ 3 }
+				ItemSeparatorComponent={ () => (
+					<TouchableWithoutFeedback accessible={ false }>
+						<View style={ styles.rowSeparator } />
+					</TouchableWithoutFeedback>
+				) }
+				keyExtractor={ ( item ) => item.name }
+				renderItem={ ( { item } ) => (
+					<InserterButton
+						{ ...{
+							item,
+							itemWidth,
+							maxWidth,
+							onSelect,
+						} }
+					/>
+				) }
+				{ ...listProps }
+				contentContainerStyle={ [
+					...listProps.contentContainerStyle,
+					{
+						paddingBottom:
+							( safeAreaBottomInset ||
+								styles.list.paddingBottom ) + searchFormHeight,
+					},
+				] }
+			/>
+		</TouchableHighlight>
 	);
 }
 
