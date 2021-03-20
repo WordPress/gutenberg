@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { getBlockDefaultClassName, getBlockSupport } from '@wordpress/blocks';
+import {
+	getBlockDefaultClassName,
+	getBlockSupport,
+	hasBlockSupport,
+} from '@wordpress/blocks';
 import { ToolbarGroup } from '@wordpress/components';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
@@ -21,6 +25,36 @@ import {
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '../components';
 
+function DuotonePanel( { attributes, setAttributes } ) {
+	const style = attributes?.style;
+	const duotone = style?.color?.duotone;
+
+	const duotonePalette = useEditorFeature( 'color.duotone' );
+	const colorPalette = useEditorFeature( 'color.palette' );
+
+	return (
+		<BlockControls>
+			<ToolbarGroup>
+				<DuotoneToolbar
+					duotonePalette={ duotonePalette }
+					colorPalette={ colorPalette }
+					value={ duotone }
+					onChange={ ( newDuotone ) => {
+						const newStyle = {
+							...style,
+							color: {
+								...style.color,
+								duotone: newDuotone,
+							},
+						};
+						setAttributes( { style: newStyle } );
+					} }
+				/>
+			</ToolbarGroup>
+		</BlockControls>
+	);
+}
+
 /**
  * Filters registered block settings, extending attributes to include
  * the `duotone` attribute.
@@ -29,7 +63,7 @@ import {
  * @return {Object}          Filtered block settings
  */
 function addDuotoneAttributes( settings ) {
-	if ( ! getBlockSupport( settings, 'color.duotone' ) ) {
+	if ( ! hasBlockSupport( settings, 'color.duotone' ) ) {
 		return settings;
 	}
 
@@ -55,26 +89,43 @@ function addDuotoneAttributes( settings ) {
  */
 const withDuotoneToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
+		const hasDuotoneSupport = hasBlockSupport(
+			props.name,
+			'color.duotone'
+		);
+
+		return (
+			<>
+				{ hasDuotoneSupport && <DuotonePanel { ...props } /> }
+				<BlockEdit { ...props } />
+			</>
+		);
+	},
+	'withDuotoneToolbarControls'
+);
+
+/**
+ * Override the default block element to include duotone styles.
+ *
+ * @param  {Function} BlockListBlock Original component
+ * @return {Function}                Wrapped component
+ */
+const withDuotoneStyles = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
 		const duotoneSupport = getBlockSupport( props.name, 'color.duotone' );
 
-		if ( ! duotoneSupport ) {
-			return <BlockEdit { ...props } />;
-		}
-
-		const { attributes, setAttributes } = props;
-		const style = attributes?.style;
+		const style = props?.attributes?.style;
 		const duotone = style?.color?.duotone;
 
-		const duotonePalette = useEditorFeature( 'color.duotone' );
-		const colorPalette = useEditorFeature( 'color.palette' );
+		if ( ! duotoneSupport || ! duotone ) {
+			return <BlockListBlock { ...props } />;
+		}
+
+		const className = classnames( props?.classname, duotone.id );
 
 		// Adding the block class as to not affect other blocks.
 		const blockClass = getBlockDefaultClassName( props.name );
-
-		// Wrapper div has the filter class, so it comes before blockClass.
-		const scope = duotone
-			? `.${ duotone.id } .${ blockClass }`
-			: `.${ blockClass }`;
+		const scope = `.${ blockClass }.${ duotone.id }`;
 
 		// Object | boolean | string | string[] -> boolean | string | string[]
 		const selectors =
@@ -97,43 +148,16 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 
 		return (
 			<>
-				<BlockControls>
-					<ToolbarGroup>
-						<DuotoneToolbar
-							value={ duotone }
-							duotonePalette={ duotonePalette }
-							colorPalette={ colorPalette }
-							onChange={ ( newDuotone ) => {
-								const newStyle = {
-									...style,
-									color: {
-										...style?.color,
-										duotone: newDuotone,
-									},
-								};
-								setAttributes( { style: newStyle } );
-							} }
-						/>
-					</ToolbarGroup>
-				</BlockControls>
-				<div className={ duotone?.id }>
-					<BlockEdit { ...props } />
-				</div>
-				{ duotone && (
-					<DuotoneFilter
-						selector={ selector }
-						id={ duotone.id }
-						values={ duotone.values }
-					/>
-				) }
+				<DuotoneFilter selector={ selector } { ...duotone } />
+				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
 	},
-	'withDuotoneToolbarControls'
+	'withDuotoneStyles'
 );
 
 /**
- * Override props assigned to save component to inject alignment class name if
+ * Override props assigned to save component to inject duotone classname if the
  * block supports it.
  *
  * @param  {Object} props      Additional props applied to save element
@@ -142,9 +166,9 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
  * @return {Object}            Filtered props applied to save element
  */
 function addDuotoneFilterStyle( props, blockType, attributes ) {
-	const duotoneSupport = getBlockSupport( blockType, 'color.duotone' );
+	const hasDuotoneSupport = hasBlockSupport( blockType, 'color.duotone' );
 
-	if ( ! duotoneSupport || ! attributes?.style?.color?.duotone ) {
+	if ( ! hasDuotoneSupport || ! attributes?.style?.color?.duotone ) {
 		return props;
 	}
 
@@ -158,14 +182,19 @@ function addDuotoneFilterStyle( props, blockType, attributes ) {
 }
 
 addFilter(
+	'blocks.registerBlockType',
+	'core/editor/duotone/add-attributes',
+	addDuotoneAttributes
+);
+addFilter(
 	'editor.BlockEdit',
 	'core/editor/duotone/with-editor-controls',
 	withDuotoneToolbarControls
 );
 addFilter(
-	'blocks.registerBlockType',
-	'core/editor/duotone/add-attributes',
-	addDuotoneAttributes
+	'editor.BlockListBlock',
+	'core/editor/duotone/with-styles',
+	withDuotoneStyles
 );
 addFilter(
 	'blocks.getSaveContent.extraProps',
