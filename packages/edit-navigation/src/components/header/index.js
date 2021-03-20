@@ -96,7 +96,9 @@ export default function Header( {
 								{ __( 'Manage locations' ) }
 							</Button>
 						) }
-						renderContent={ () => <ManageLocations /> }
+						renderContent={ () => (
+							<ManageLocations menus={ menus } />
+						) }
 					/>
 
 					<SaveButton navigationPost={ navigationPost } />
