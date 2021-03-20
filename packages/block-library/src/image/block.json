@@ -72,6 +72,11 @@
 	},
 	"supports": {
 		"anchor": true,
+		"color": {
+			"duotone": "img",
+			"text": false,
+			"background": false
+		},
 		"__experimentalBorder": {
 			"radius": true
 		}
