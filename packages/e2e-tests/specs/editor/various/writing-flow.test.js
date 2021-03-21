@@ -594,4 +594,22 @@ describe( 'Writing Flow', () => {
 
 		expect( type ).toBe( 'core/image' );
 	} );
+
+	it( 'should allow Alt+Tab to navigate content', async () => {
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'c' );
+		await page.keyboard.down( 'Alt' );
+		await page.keyboard.down( 'Shift' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.up( 'Shift' );
+		await page.keyboard.up( 'Alt' );
+		await page.keyboard.type( 'a' );
+		await page.keyboard.down( 'Alt' );
+		await page.keyboard.press( 'Tab' );
+		await page.keyboard.up( 'Alt' );
+		await page.keyboard.type( 'b' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

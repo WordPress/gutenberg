@@ -24,6 +24,16 @@ exports[`Writing Flow Should navigate inner blocks with arrow keys 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Writing Flow should allow Alt+Tab to navigate content 1`] = `
+"<!-- wp:paragraph -->
+<p>a</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>bc</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Writing Flow should allow selecting entire list with longer last item 1`] = `
 "<!-- wp:paragraph -->
 <p>a</p>

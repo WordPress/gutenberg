@@ -357,7 +357,10 @@ export default function WritingFlow( { children } ) {
 		// Arrow keys can be used, and Tab and arrow keys can be used in
 		// Navigation mode (press Esc), to navigate through blocks.
 		if ( selectedBlockClientId ) {
-			if ( isTab ) {
+			if (
+				isTab &&
+				! ( event.ctrlKey || event.altKey || event.metaKey )
+			) {
 				const wrapper = getBlockDOMNode(
 					selectedBlockClientId,
 					ownerDocument
