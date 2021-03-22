@@ -464,6 +464,19 @@ There's a growing need to add more theme metadata to the theme.json. This sectio
 }
 ```
 
+**templateParts**: within this field themes can list the template parts present in the `block-template-parts` folder. For example, for a template part named `my-template-part.html`, the `theme.json` can declare what area that template part is intended for to use the corresponding block variation in the editor.  Currently block variations exist for "header" and "footer" values of the area term, any other values and undefined template parts will default to the general template part block.
+
+```json
+{
+	"templateParts": [
+		{
+			"name": "my-template-part" /* Mandatory */,
+			"area": "header" /* Optional, will be set to 'uncategorized' by default and trigger no block variation */,
+		}
+	]
+}
+```
+
 ## Frequently Asked Questions
 
 ### The naming schema of CSS Custom Properties
