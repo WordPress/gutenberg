@@ -24,12 +24,13 @@ import { store as editSiteStore } from '../../store';
 
 export default function ListViewSidebar() {
 	const { clientIdsTree, selectedBlockClientIds } = useSelect( ( select ) => {
-		const { __unstableGetClientIdsTree, getSelectedBlockClientId } = select(
-			blockEditorStore
-		);
+		const {
+			__unstableGetClientIdsTree,
+			getSelectedBlockClientIds,
+		} = select( blockEditorStore );
 		return {
 			clientIdsTree: __unstableGetClientIdsTree(),
-			selectedBlockClientIds: getSelectedBlockClientId(),
+			selectedBlockClientIds: getSelectedBlockClientIds(),
 		};
 	} );
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
