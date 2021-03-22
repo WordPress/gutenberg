@@ -68,7 +68,6 @@ export function LayoutStyle( { selector, layout = {} } ) {
 			float: right;
 			margin-left: 2em;
 		}
-
 	`;
 
 	return <style>{ style }</style>;
