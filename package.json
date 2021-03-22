@@ -89,7 +89,7 @@
 		"@babel/plugin-syntax-jsx": "7.12.1",
 		"@babel/runtime-corejs3": "7.12.5",
 		"@babel/traverse": "7.12.9",
-		"@octokit/rest": "16.26.0",
+		"@octokit/rest": "18.3.3",
 		"@octokit/webhooks": "7.1.0",
 		"@storybook/addon-a11y": "6.1.11",
 		"@storybook/addon-docs": "6.1.11",

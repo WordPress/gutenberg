@@ -1,6 +1,10 @@
-/** @typedef {import('@octokit/rest')} GitHub */
-/** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
-/** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponseItem} OktokitIssuesListMilestonesForRepoResponseItem */
+/** @typedef {import('@octokit/rest').Octokit} GitHub */
+/** @typedef {import('@octokit/types').Endpoints} Endpoints */
+
+/* eslint-disable jsdoc/valid-types */
+/** @typedef {import('@octokit/openapi-types').components["schemas"]["issue"]} Issue */
+/** @typedef {import('@octokit/openapi-types').components["schemas"]["milestone"]} Milestone */
+/* eslint-enable jsdoc/valid-types */
 
 /**
  * @typedef {"open"|"closed"|"all"} IssueState
@@ -14,18 +18,13 @@
  * @param {string} repo    Repository name.
  * @param {string} title   Milestone title.
  *
- * @return {Promise<OktokitIssuesListMilestonesForRepoResponseItem|void>} Promise resolving to milestone, if exists.
+ * @return {Promise<Milestone|undefined>} Promise resolving to milestone, if exists.
  */
 async function getMilestoneByTitle( octokit, owner, repo, title ) {
-	const options = octokit.issues.listMilestonesForRepo.endpoint.merge( {
-		owner,
-		repo,
-	} );
-
-	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListMilestonesForRepoResponse>>}
-	 */
-	const responses = octokit.paginate.iterator( options );
+	const responses = octokit.paginate.iterator(
+		octokit.issues.listMilestones,
+		{ owner, repo }
+	);
 
 	for await ( const response of responses ) {
 		const milestones = response.data;
@@ -35,6 +34,7 @@ async function getMilestoneByTitle( octokit, owner, repo, title ) {
 			}
 		}
 	}
+	return undefined;
 }
 
 /**
@@ -47,9 +47,8 @@ async function getMilestoneByTitle( octokit, owner, repo, title ) {
  * @param {IssueState} [state]       Optional issue state.
  * @param {string}     [closedSince] Optional timestamp.
  *
- * @return {Promise<IssuesListForRepoResponseItem[]>} Promise resolving to pull
- *                                                    requests for the given
- *                                                    milestone.
+ * @return {Promise<Issue[]>} Promise resolving to pull requests for the given
+ *                          milestone.
  */
 async function getIssuesByMilestone(
 	octokit,
@@ -59,7 +58,7 @@ async function getIssuesByMilestone(
 	state,
 	closedSince
 ) {
-	const options = octokit.issues.listForRepo.endpoint.merge( {
+	const responses = octokit.paginate.iterator( octokit.issues.listForRepo, {
 		owner,
 		repo,
 		milestone,
@@ -70,12 +69,7 @@ async function getIssuesByMilestone(
 	} );
 
 	/**
-	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').IssuesListForRepoResponse>>}
-	 */
-	const responses = octokit.paginate.iterator( options );
-
-	/**
-	 * @type {import('@octokit/rest').IssuesListForRepoResponse}
+	 * @type {Issue[]}
 	 */
 	const pulls = [];
 
@@ -90,15 +84,7 @@ async function getIssuesByMilestone(
 		return pulls.filter(
 			( pull ) =>
 				pull.closed_at &&
-				closedSinceTimestamp <
-					new Date(
-						// The ugly `as unknown as string` cast is required because of
-						// https://github.com/octokit/plugin-rest-endpoint-methods.js/issues/64
-						// Fixed in Octokit v18.1.1, see https://github.com/WordPress/gutenberg/pull/29043
-						/** @type {string} */ (
-							/** @type {unknown} */ ( pull.closed_at )
-						)
-					)
+				closedSinceTimestamp < new Date( pull.closed_at )
 		);
 	}
 
