@@ -193,7 +193,7 @@
 		}
 	}
 
-	&.is-outline-mode.is-selected:not(.is-typing) {
+	.is-outline-mode:not(.is-typing) &.is-selected {
 		&::after {
 			box-shadow: 0 0 0 $border-width $gray-900; // Selected not focussed
 			top: $border-width;
@@ -210,7 +210,7 @@
 		}
 	}
 
-	&.is-outline-mode.is-hovered:not(.is-typing) {
+	.is-outline-mode:not(.is-typing) &.is-hovered {
 		cursor: default;
 
 		&::after {
@@ -223,7 +223,7 @@
 		}
 	}
 
-	&.is-outline-mode.is-selected.is-hovered {
+	.is-outline-mode &.is-selected.is-hovered {
 		cursor: unset;
 	}
 

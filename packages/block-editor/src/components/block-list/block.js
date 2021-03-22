@@ -15,12 +15,7 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import {
-	withDispatch,
-	withSelect,
-	useDispatch,
-	useSelect,
-} from '@wordpress/data';
+import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
 import { compose, pure, ifCondition } from '@wordpress/compose';
 
 /**
@@ -88,21 +83,6 @@ function BlockListBlock( {
 } ) {
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
-	const isTypingWithinBlock = useSelect(
-		( select ) => {
-			const { isTyping, hasSelectedInnerBlock } = select(
-				blockEditorStore
-			);
-			return (
-				// We only care about this prop when the block is selected
-				// Thus to avoid unnecessary rerenders we avoid updating the
-				// prop if the block is not selected.
-				( isSelected || hasSelectedInnerBlock( clientId, true ) ) &&
-				isTyping()
-			);
-		},
-		[ clientId, isSelected ]
-	);
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -183,10 +163,7 @@ function BlockListBlock( {
 		isSelected,
 		index,
 		// The wp-block className is important for editor styles.
-		className: classnames( className, {
-			'wp-block': ! isAligned,
-			'is-typing': isTypingWithinBlock,
-		} ),
+		className: classnames( className, { 'wp-block': ! isAligned } ),
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
