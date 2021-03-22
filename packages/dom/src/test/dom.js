@@ -90,6 +90,7 @@ describe( 'DOM', () => {
 		it( 'should place caret at the start of the input', () => {
 			const input = document.createElement( 'input' );
 			input.value = 'value';
+			input.selectionStart = 5;
 			placeCaretAtHorizontalEdge( input, true );
 			expect( isHorizontalEdge( input, false ) ).toBe( true );
 		} );
@@ -99,6 +100,14 @@ describe( 'DOM', () => {
 			input.value = 'value';
 			placeCaretAtHorizontalEdge( input, false );
 			expect( isHorizontalEdge( input, true ) ).toBe( true );
+		} );
+
+		it( 'should not move the caret if there is no selectionStart', () => {
+			const input = document.createElement( 'input' );
+			input.type = 'email';
+			input.value = 'user@example.com';
+			placeCaretAtHorizontalEdge( input, true );
+			expect( isHorizontalEdge( input, false ) ).toBe( false );
 		} );
 	} );
 
