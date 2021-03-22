@@ -354,7 +354,7 @@ add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
 function gutenberg_register_theme_block_category( $categories ) {
 	$categories[] = array(
 		'slug'  => 'theme',
-		'title' => _x( 'Theme', 'block category' ),
+		'title' => _x( 'Theme', 'block category', 'gutenberg' ),
 		'icon'  => null,
 	);
 	return $categories;
