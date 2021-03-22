@@ -5,7 +5,7 @@ import traverse from '../../traverse';
 import avoidEditorComponents from '../avoid-editor-components';
 
 describe( 'CSS selector wrap', () => {
-	it( 'should replace add editor classes to buttons', () => {
+	it( 'should add editor classes to buttons', () => {
 		const callback = avoidEditorComponents();
 		const input = `
 		button {
@@ -16,7 +16,7 @@ describe( 'CSS selector wrap', () => {
 		expect( output ).toMatchSnapshot();
 	} );
 
-	it( 'should replace add editor classes to inputs', () => {
+	it( 'should add editor classes to inputs', () => {
 		const callback = avoidEditorComponents();
 		const input = `
 		input {
