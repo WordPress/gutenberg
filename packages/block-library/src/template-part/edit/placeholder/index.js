@@ -22,16 +22,18 @@ export default function TemplatePartPlaceholder( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const onCreate = useCallback( async () => {
 		const title = __( 'Untitled Template Part' );
-		const record = {
-			title,
-			slug: 'template-part',
-			content: serialize( innerBlocks ),
-		};
 		// If we have `area` set from block attributes, means an exposed
 		// block variation was inserted. So add this prop to the template
 		// part entity on creation. Afterwards remove `area` value from
 		// block attributes.
-		if ( [ 'header', 'footer' ].includes( area ) ) record.area = area;
+		const record = {
+			title,
+			slug: 'template-part',
+			content: serialize( innerBlocks ),
+			// `area` is filterable on the server and defaults to `UNCATEGORIZED`
+			// if provided value is not allowed.
+			area,
+		};
 		const templatePart = await saveEntityRecord(
 			'postType',
 			'wp_template_part',
