@@ -205,7 +205,7 @@ export function SocialLinksEdit( props ) {
 									iconBackgroundColorValue: colorValue,
 								} );
 							},
-							label: __( 'Background color' ),
+							label: __( 'Icon background color' ),
 						},
 					] }
 				/>
