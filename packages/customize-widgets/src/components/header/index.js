@@ -16,7 +16,7 @@ import { DialogDisclosure } from 'reakit/Dialog';
  * Internal dependencies
  */
 import Inserter from '../inserter';
-import { inserterContainer } from '../inserter/inserter-outer-section';
+import { useInserterContainer } from '../inserter/use-inserter';
 
 const DialogDisclosureButton = forwardRef( ( props, ref ) => (
 	<DialogDisclosure as={ Button } { ...props } ref={ ref } />
@@ -53,7 +53,7 @@ function Header( { inserter } ) {
 
 			{ createPortal(
 				<Inserter inserter={ inserter } />,
-				inserterContainer
+				useInserterContainer()
 			) }
 		</>
 	);

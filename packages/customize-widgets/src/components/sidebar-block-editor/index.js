@@ -23,7 +23,7 @@ import {
 import Inspector, { BlockInspectorButton } from '../inspector';
 import Header from '../header';
 import useSidebarBlockEditor from './use-sidebar-block-editor';
-import inserter from '../inserter/inserter-outer-section';
+import useInserter from '../inserter/use-inserter';
 
 const inspectorOpenStateReducer = ( state, action ) => {
 	switch ( action ) {
@@ -56,6 +56,7 @@ export default function SidebarBlockEditor( { sidebar } ) {
 	const parentContainer = document.getElementById(
 		'customize-theme-controls'
 	);
+	const inserter = useInserter();
 	const settings = useMemo(
 		() => ( {
 			__experimentalSetIsInserterOpened: () => inserter.expand(),

@@ -29,12 +29,18 @@ customize.OuterSection = class extends OuterSection {
 // Handle constructor so that "params.type" can be correctly pointed to "outer".
 customize.sectionConstructor.outer = customize.OuterSection;
 
-const inserter = new customize.OuterSection( inserterId, {} );
+export const useInserterContainer = () =>
+	document.getElementById( `sub-accordion-section-${ inserterId }` );
 
-customize.section.add( inserter );
+export default function useInserter() {
+	const addedInserter = customize.section( inserterId );
+	if ( addedInserter ) {
+		return addedInserter;
+	}
 
-export const inserterContainer = document.getElementById(
-	`sub-accordion-section-${ inserterId }`
-);
+	const inserter = new customize.OuterSection( inserterId, {} );
 
-export default inserter;
+	customize.section.add( inserter );
+
+	return inserter;
+}

@@ -8,7 +8,7 @@ import { render, unmountComponentAtNode } from '@wordpress/element';
  */
 import SidebarBlockEditor from './components/sidebar-block-editor';
 import SidebarAdapter from './components/sidebar-block-editor/sidebar-adapter';
-import { inserterId } from './components/inserter/inserter-outer-section';
+import { inserterId } from './components/inserter/use-inserter';
 
 const {
 	wp: { customize },
