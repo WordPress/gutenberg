@@ -31,6 +31,17 @@ const SeparatorSettings = ( {
 		} );
 	};
 
+	const onChangeShowVisualizer = ( { top, bottom } ) => {
+		setAttributes( {
+			style: {
+				...style,
+				visualizers: {
+					margin: { top, bottom },
+				},
+			},
+		} );
+	};
+
 	return (
 		<InspectorControls>
 			<PanelColorSettings
@@ -55,6 +66,7 @@ const SeparatorSettings = ( {
 					} }
 					units={ CSS_UNITS }
 					values={ style?.spacing?.margin || {} }
+					onChangeShowVisualizer={ onChangeShowVisualizer }
 				/>
 			</PanelBody>
 		</InspectorControls>

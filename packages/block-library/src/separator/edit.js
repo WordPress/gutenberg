@@ -6,7 +6,10 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { HorizontalRule } from '@wordpress/components';
+import {
+	HorizontalRule,
+	__experimentalBoxControl as BoxControl,
+} from '@wordpress/components';
 import { View } from '@wordpress/primitives';
 import { withColors, useBlockProps } from '@wordpress/block-editor';
 
@@ -15,6 +18,8 @@ import { withColors, useBlockProps } from '@wordpress/block-editor';
  */
 import SeparatorSettings from './separator-settings';
 import { MARGIN_CONSTRAINTS, parseUnit } from './shared';
+
+const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 function SeparatorEdit( props ) {
 	const {
@@ -35,6 +40,10 @@ function SeparatorEdit( props ) {
 					'wp-block-separator-wrapper'
 				) }
 			>
+				<BoxControlVisualizer
+					values={ style?.spacing?.margin }
+					showValues={ style?.visualizers?.margin }
+				/>
 				<HorizontalRule
 					className={ classnames( blockProps.className, {
 						'has-background': color.color,
