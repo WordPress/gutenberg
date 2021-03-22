@@ -54,6 +54,7 @@ function gutenberg_navigation_init( $hook ) {
 	wp_enqueue_style( 'wp-block-library' );
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-format-library' );
+	do_action( 'enqueue_block_editor_assets' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_navigation_init' );
 
