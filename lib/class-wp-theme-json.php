@@ -244,47 +244,47 @@ class WP_Theme_JSON {
 		'background'               => array(
 			'value' => array( 'color', 'gradient' ),
 		),
-		'backgroundColor'          => array(
+		'background-color'         => array(
 			'value' => array( 'color', 'background' ),
 		),
-		'borderRadius'             => array(
+		'border-radius'            => array(
 			'value' => array( 'border', 'radius' ),
 		),
-		'borderColor'              => array(
+		'border-color'             => array(
 			'value' => array( 'border', 'color' ),
 		),
-		'borderWidth'              => array(
+		'border-width'             => array(
 			'value' => array( 'border', 'width' ),
 		),
-		'borderStyle'              => array(
+		'border-style'             => array(
 			'value' => array( 'border', 'style' ),
 		),
 		'color'                    => array(
 			'value' => array( 'color', 'text' ),
 		),
-		'fontFamily'               => array(
+		'font-family'              => array(
 			'value' => array( 'typography', 'fontFamily' ),
 		),
-		'fontSize'                 => array(
+		'font-size'                => array(
 			'value' => array( 'typography', 'fontSize' ),
 		),
-		'fontStyle'                => array(
+		'font-style'               => array(
 			'value' => array( 'typography', 'fontStyle' ),
 		),
-		'fontWeight'               => array(
+		'font-weight'              => array(
 			'value' => array( 'typography', 'fontWeight' ),
 		),
-		'lineHeight'               => array(
+		'line-height'              => array(
 			'value' => array( 'typography', 'lineHeight' ),
 		),
 		'padding'                  => array(
 			'value'      => array( 'spacing', 'padding' ),
 			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
-		'textDecoration'           => array(
+		'text-decoration'          => array(
 			'value' => array( 'typography', 'textDecoration' ),
 		),
-		'textTransform'            => array(
+		'text-transform'           => array(
 			'value' => array( 'typography', 'textTransform' ),
 		),
 	);
@@ -367,63 +367,26 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Returns the kebab-cased name of a given property.
+	 * Given a CSS property name, returns the property it belongs
+	 * within the self::PROPERTIES_METADATA map.
 	 *
-	 * @param string $property Property name to convert.
-	 * @return string kebab-cased name of the property
+	 * @param string $css_name The CSS property name.
+	 *
+	 * @return string The property name.
 	 */
-	private static function to_kebab_case( $property ) {
-		$mappings = self::get_case_mappings();
-		return $mappings['to_kebab_case'][ $property ];
-	}
-
-	/**
-	 * Returns the property name of a kebab-cased property.
-	 *
-	 * @param string $property Property name to convert in kebab-case.
-	 * @return string Name of the property
-	 */
-	private static function to_property( $property ) {
-		$mappings = self::get_case_mappings();
-		return $mappings['to_property'][ $property ];
-	}
-
-	/**
-	 * Returns a mapping on metadata properties to avoid having to constantly
-	 * transforms properties between camel case and kebab.
-	 *
-	 * @return array Containing two mappings:
-	 *
-	 *   - "to_kebab_case" mapping properties in camel case to
-	 *    properties in kebab case e.g: "paddingTop" to "padding-top".
-	 *
-	 *  - "to_property" mapping properties in kebab case to
-	 *    the main properties in camel case e.g: "padding-top" to "padding".
-	 */
-	private static function get_case_mappings() {
-		static $case_mappings;
-		if ( null === $case_mappings ) {
-			$case_mappings = array(
-				'to_kebab_case' => array(),
-				'to_property'   => array(),
-			);
+	private static function to_property( $css_name ) {
+		static $to_property;
+		if ( null === $to_property ) {
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
-				$kebab_case = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
-
-				$case_mappings['to_kebab_case'][ $key ]      = $kebab_case;
-				$case_mappings['to_property'][ $kebab_case ] = $key;
+				$to_property[ $key ] = $key;
 				if ( self::has_properties( $metadata ) ) {
 					foreach ( $metadata['properties'] as $property ) {
-						$camel_case = $key . ucfirst( $property );
-						$kebab_case = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $camel_case ) );
-
-						$case_mappings['to_kebab_case'][ $camel_case ] = $kebab_case;
-						$case_mappings['to_property'][ $kebab_case ]   = $key;
+						$to_property[ $key . '-' . $property ] = $key;
 					}
 				}
 			}
 		}
-		return $case_mappings;
+		return $to_property[ $css_name ];
 	}
 
 	/**
@@ -671,7 +634,7 @@ class WP_Theme_JSON {
 			if ( self::has_properties( $metadata ) ) {
 				foreach ( $metadata['properties'] as $property ) {
 					$properties[] = array(
-						'name'  => $name . ucfirst( $property ),
+						'name'  => $name . '-' . $property,
 						'value' => array_merge( $metadata['value'], array( $property ) ),
 					);
 				}
@@ -686,9 +649,8 @@ class WP_Theme_JSON {
 		foreach ( $properties as $prop ) {
 			$value = self::get_property_value( $styles, $prop['value'] );
 			if ( ! empty( $value ) ) {
-				$kebab_cased_name = self::to_kebab_case( $prop['name'] );
 				$declarations[]   = array(
-					'name'  => $kebab_cased_name,
+					'name'  => $prop['name'],
 					'value' => $value,
 				);
 			}
@@ -981,11 +943,20 @@ class WP_Theme_JSON {
 	 * @return array
 	 */
 	public function get_custom_templates() {
+		$custom_templates = array();
 		if ( ! isset( $this->theme_json['customTemplates'] ) ) {
-			return array();
-		} else {
-			return $this->theme_json['customTemplates'];
+			return $custom_templates;
 		}
+
+		foreach ( $this->theme_json['customTemplates'] as $item ) {
+			if ( isset( $item['name'] ) ) {
+				$custom_templates[ $item['name'] ] = array(
+					'title'     => isset( $item['title'] ) ? $item['title'] : '',
+					'postTypes' => isset( $item['postTypes'] ) ? $item['postTypes'] : array( 'page' ),
+				);
+			}
+		}
+		return $custom_templates;
 	}
 
 	/**
@@ -994,10 +965,19 @@ class WP_Theme_JSON {
 	 * @return array
 	 */
 	public function get_template_parts() {
+		$template_parts = array();
 		if ( ! isset( $this->theme_json['templateParts'] ) ) {
-			return array();
+			return $template_parts;
 		}
-		return $this->theme_json['templateParts'];
+
+		foreach ( $this->theme_json['templateParts'] as $item ) {
+			if ( isset( $item['name'] ) ) {
+				$template_parts[ $item['name'] ] = array(
+					'area' => isset( $item['area'] ) ? $item['area'] : '',
+				);
+			}
+		}
+		return $template_parts;
 	}
 
 	/**

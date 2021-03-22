@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
 	DropZoneProvider,
@@ -158,7 +158,11 @@ function Editor( { initialSettings } ) {
 			return <InserterSidebar />;
 		}
 		if ( isListViewOpen ) {
-			return <ListViewSidebar />;
+			return (
+				<AsyncModeProvider value="true">
+					<ListViewSidebar />
+				</AsyncModeProvider>
+			);
 		}
 		return null;
 	};

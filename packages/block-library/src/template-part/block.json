@@ -1,7 +1,7 @@
 {
 	"apiVersion": 2,
 	"name": "core/template-part",
-	"category": "design",
+	"category": "theme",
 	"attributes": {
 		"slug": {
 			"type": "string"
@@ -19,7 +19,8 @@
 		"color": {
 			"gradients": true,
 			"link": true
-		}
+		},
+		"__experimentalLayout": true
 	},
 	"editorStyle": "wp-block-template-part-editor"
 }
