@@ -102,7 +102,7 @@ function mapElementToObjectTabbable( element, index ) {
  * An array map callback, returning an element of the given mapped object's
  * element value.
  *
- * @param {{ element: Element }} object Mapped object with index.
+ * @param {{ element: Element }} object Mapped object with element.
  *
  * @return {Element} Mapped object element.
  */
