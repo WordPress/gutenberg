@@ -2,7 +2,7 @@ const {
 	wp: { customize },
 } = window;
 
-const inserterOuterSectionId = 'widgets-inserter';
+export const inserterOuterSectionId = 'widgets-inserter';
 
 const OuterSection = customize.OuterSection;
 // Override the OuterSection class to handle multiple outer sections.

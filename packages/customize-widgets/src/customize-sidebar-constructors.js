@@ -8,6 +8,7 @@ import { render, unmountComponentAtNode } from '@wordpress/element';
  */
 import SidebarBlockEditor from './components/sidebar-block-editor';
 import SidebarAdapter from './components/sidebar-block-editor/sidebar-adapter';
+import { inserterOuterSectionId } from './components/inserter/inserter-outer-section';
 
 const {
 	wp: { customize },
@@ -41,6 +42,16 @@ class SidebarControl extends customize.Control {
 			);
 		} else {
 			unmountComponentAtNode( this.container[ 0 ] );
+
+			// Close the inserter when the section collapses.
+			customize.section.each( ( section ) => {
+				if (
+					section.params.type === 'outer' &&
+					section.id === inserterOuterSectionId
+				) {
+					section.collapse();
+				}
+			} );
 		}
 	}
 	ready() {
