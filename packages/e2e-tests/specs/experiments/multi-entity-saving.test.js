@@ -186,7 +186,6 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( 'Index' );
-			await navigationPanel.close();
 
 			// Select the header template part via list view.
 			await page.click( 'button[aria-label="List View"]' );
