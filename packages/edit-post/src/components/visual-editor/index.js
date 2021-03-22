@@ -78,7 +78,7 @@ export default function VisualEditor( { styles } ) {
 		<div className="edit-post-visual-editor">
 			{ themeSupportsLayout && (
 				<LayoutStyle
-					selector=".edit-post-visual-editor__post-title-wrapper, .edit-post-visual-editor .block-editor-block-list__layout.is-root-container"
+					selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
 					layout={ defaultLayout }
 				/>
 			) }
