@@ -7,8 +7,18 @@ import createSelector from 'rememo';
 /**
  * WordPress dependencies
  */
+import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
+
+/**
+ * Internal dependencies
+ */
+import {
+	MENU_TEMPLATE_PARTS,
+	TEMPLATE_PARTS_SUB_MENUS,
+	MENU_TEMPLATES,
+} from '../components/navigation-sidebar/navigation-panel/constants';
 
 /**
  * Returns whether the given feature is enabled or not.
@@ -41,7 +51,7 @@ export function __experimentalGetPreviewDeviceType( state ) {
  * @return {Object} Whether the current user can create media or not.
  */
 export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
-	select( 'core' ).canUser( 'create', 'media' )
+	select( coreDataStore ).canUser( 'create', 'media' )
 );
 
 /**
@@ -138,6 +148,41 @@ export function getPage( state ) {
 export function getNavigationPanelActiveMenu( state ) {
 	return state.navigationPanel.menu;
 }
+
+/**
+ * Returns the current template or template part's corresponding
+ * navigation panel's sub menu, to be used with `openNavigationPanelToMenu`.
+ *
+ * Currently, while template parts return their sub menu,
+ * templates always return their main menu.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The current template or template part's sub menu.
+ */
+export const getCurrentTemplateNavigationPanelSubMenu = createRegistrySelector(
+	( select ) => ( state ) => {
+		const templateType = getEditedPostType( state );
+		if ( 'wp_template' === templateType ) {
+			return MENU_TEMPLATES;
+		}
+
+		const templateId = getEditedPostId( state );
+		const template = templateId
+			? select( coreDataStore ).getEntityRecord(
+					'postType',
+					templateType,
+					templateId
+			  )
+			: null;
+
+		return (
+			TEMPLATE_PARTS_SUB_MENUS.find(
+				( submenu ) => submenu.area === template?.area
+			)?.menu || MENU_TEMPLATE_PARTS
+		);
+	}
+);
 
 /**
  * Returns the current opened/closed state of the navigation panel.

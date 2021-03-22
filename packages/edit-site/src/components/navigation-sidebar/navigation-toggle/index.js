@@ -11,31 +11,30 @@ import { store as coreDataStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
-import {
-	MENU_TEMPLATE_PARTS,
-	MENU_TEMPLATES,
-} from '../navigation-panel/constants';
 
 function NavigationToggle( { icon, isOpen } ) {
-	const { isRequestingSiteIcon, templateType, siteIconUrl } = useSelect(
-		( select ) => {
-			const { getEditedPostType } = select( editSiteStore );
-			const { getEntityRecord, isResolving } = select( coreDataStore );
-			const siteData =
-				getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+	const {
+		isRequestingSiteIcon,
+		navigationPanelMenu,
+		siteIconUrl,
+	} = useSelect( ( select ) => {
+		const { getCurrentTemplateNavigationPanelSubMenu } = select(
+			editSiteStore
+		);
+		const { getEntityRecord, isResolving } = select( coreDataStore );
+		const siteData =
+			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
-			return {
-				isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
-					'root',
-					'__unstableBase',
-					undefined,
-				] ),
-				templateType: getEditedPostType(),
-				siteIconUrl: siteData.site_icon_url,
-			};
-		},
-		[]
-	);
+		return {
+			isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+				'root',
+				'__unstableBase',
+				undefined,
+			] ),
+			navigationPanelMenu: getCurrentTemplateNavigationPanelSubMenu(),
+			siteIconUrl: siteData.site_icon_url,
+		};
+	}, [] );
 
 	const {
 		openNavigationPanelToMenu,
@@ -47,11 +46,7 @@ function NavigationToggle( { icon, isOpen } ) {
 			setIsNavigationPanelOpened( ! isOpen );
 			return;
 		}
-		openNavigationPanelToMenu(
-			'wp_template' === templateType
-				? MENU_TEMPLATES
-				: MENU_TEMPLATE_PARTS
-		);
+		openNavigationPanelToMenu( navigationPanelMenu );
 	};
 
 	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
