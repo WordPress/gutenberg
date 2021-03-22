@@ -41,13 +41,7 @@ function gutenberg_get_editor_styles() {
 	global $editor_styles;
 
 	// Ideally the code is extracted into a reusable function.
-	$styles = array(
-		array(
-			'css' => file_get_contents(
-				ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
-			),
-		),
-	);
+	$styles = array();
 
 	if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {
 		foreach ( $editor_styles as $style ) {
@@ -132,6 +126,18 @@ function gutenberg_edit_site_init( $hook ) {
 		'after'
 	);
 
+	wp_enqueue_script( 'wp-edit-site' );
+	wp_enqueue_script( 'wp-format-library' );
+	wp_enqueue_style( 'wp-edit-site' );
+	wp_enqueue_style( 'wp-format-library' );
+
+	if (
+		current_theme_supports( 'wp-block-styles' ) ||
+		( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 )
+	) {
+		wp_enqueue_style( 'wp-block-library-theme' );
+	}
+
 	/**
 	 * Fires after block assets have been enqueued for the editing interface.
 	 *
@@ -144,18 +150,6 @@ function gutenberg_edit_site_init( $hook ) {
 	 */
 
 	do_action( 'enqueue_block_editor_assets' );
-
-	wp_enqueue_script( 'wp-edit-site' );
-	wp_enqueue_script( 'wp-format-library' );
-	wp_enqueue_style( 'wp-edit-site' );
-	wp_enqueue_style( 'wp-format-library' );
-
-	if (
-		current_theme_supports( 'wp-block-styles' ) ||
-		( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 )
-	) {
-		wp_enqueue_style( 'wp-block-library-theme' );
-	}
 
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
