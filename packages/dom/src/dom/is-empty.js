@@ -7,25 +7,20 @@
  * @return {boolean} Whether or not the element is empty.
  */
 export default function isEmpty( element ) {
-	if ( ! element.hasChildNodes() ) {
-		return true;
-	}
-
-	return Array.from( element.childNodes ).every( ( node ) => {
-		if ( node.nodeType === node.TEXT_NODE ) {
-			return ! node.nodeValue.trim();
-		}
-
-		if ( node.nodeType === node.ELEMENT_NODE ) {
-			if ( node.nodeName === 'BR' ) {
-				return true;
-			} else if ( node.hasAttributes() ) {
+	switch ( element.nodeType ) {
+		case element.TEXT_NODE:
+			// We cannot use \s since it includes special spaces which we want
+			// to preserve.
+			return /^[ \f\n\r\t\v\u00a0]*$/.test( element.nodeValue );
+		case element.ELEMENT_NODE:
+			if ( element.hasAttributes() ) {
 				return false;
+			} else if ( ! element.hasChildNodes() ) {
+				return true;
 			}
 
-			return isEmpty( node );
-		}
-
-		return true;
-	} );
+			return Array.from( element.childNodes ).every( isEmpty );
+		default:
+			return true;
+	}
 }
