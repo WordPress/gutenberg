@@ -14,6 +14,7 @@
  *
  * @return string Rendered HTML of the referenced block.
  */
+
 function render_block_core_social_link( $attributes, $content, $block ) {
 	$open_in_new_tab = isset( $block->context['openInNewTab'] ) ? $block->context['openInNewTab'] : false;
 
@@ -44,6 +45,14 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 			'style' => block_core_social_link_get_color_styles( $block->context ),
 		)
 	);
+
+	// Add defaul https if no protocol specified. Issue: #21699
+	// The following chunk of code is taken from esc_url that is hard-coded to http://
+	// See: https://developer.wordpress.org/reference/functions/esc_url/
+	if ( strpos( $url, ':' ) === false && ! in_array( $url[0], array( '/', '#', '?' ), true ) &&
+        ! preg_match( '/^[a-z0-9-]+?\.php/i', $url ) ) {
+        $url = 'https://' . $url;
+    }
 
 	return '<li ' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $attribute . ' class="wp-block-social-link-anchor"> ' . $icon . '</a></li>';
 }
