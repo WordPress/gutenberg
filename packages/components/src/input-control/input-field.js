@@ -155,6 +155,9 @@ function InputField(
 	const dragGestureProps = useDrag(
 		( dragProps ) => {
 			const { distance, dragging, event } = dragProps;
+			// The event is persisted to prevent errors in components using this
+			// to check if a modifier key was held while dragging.
+			event.persist();
 
 			if ( ! distance ) return;
 			event.stopPropagation();
