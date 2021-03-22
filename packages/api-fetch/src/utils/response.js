@@ -9,18 +9,18 @@ import { __ } from '@wordpress/i18n';
  * @param {Response} response
  * @param {boolean}  shouldParseResponse
  *
- * @return {Promise<Response | any | null>} Parsed response.
+ * @return {Promise<any> | null | Response} Parsed response.
  */
 const parseResponse = ( response, shouldParseResponse = true ) => {
 	if ( shouldParseResponse ) {
 		if ( response.status === 204 ) {
-			return Promise.resolve( null );
+			return null;
 		}
 
 		return response.json ? response.json() : Promise.reject( response );
 	}
 
-	return Promise.resolve( response );
+	return response;
 };
 
 /**
