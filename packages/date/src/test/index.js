@@ -4,6 +4,7 @@
 import {
 	__experimentalGetSettings,
 	date as dateNoI18n,
+	format,
 	dateI18n,
 	getDate,
 	gmdate,
@@ -239,6 +240,46 @@ describe( 'Function gmdate', () => {
 	} );
 } );
 
+describe( 'Function format', () => {
+	it( 'should not change a date at all the if it is already on the site timezone', () => {
+		const settings = __experimentalGetSettings();
+
+		// Simulate different timezone
+		setSettings( {
+			...settings,
+			timezone: { offset: -4, string: 'America/New_York' },
+		} );
+
+		// Check
+		const input = '2020-10-16T14:36:58-04:00';
+		const formattedDate = format( 'c', input );
+		// Currently output is "2020-10-16T23:36:58-04:00" which is wrong.
+		expect( formattedDate ).toBe( input );
+
+		// Restore default settings
+		setSettings( settings );
+	} );
+
+	it( 'should not change a date if it specifies its timezone', () => {
+		const settings = __experimentalGetSettings();
+
+		// Simulate different timezone
+		setSettings( {
+			...settings,
+			timezone: { offset: -4, string: 'America/New_York' },
+		} );
+
+		// Check
+		const input = '2020-10-16T22:36:58-04:00';
+		const formattedDate = format( 'c', input );
+		// Currently output is "2020-10-16T23:36:58-04:00" which is wrong.
+		expect( formattedDate ).toBe( input );
+
+		// Restore default settings
+		setSettings( settings );
+	} );
+} );
+
 describe( 'Function dateI18n', () => {
 	it( 'should format date using locale settings', () => {
 		const settings = __experimentalGetSettings();
@@ -415,6 +456,73 @@ describe( 'Function dateI18n', () => {
 			false
 		);
 		expect( formattedDate ).toBe( '2019-06-18 07:00' );
+
+		// Restore default settings
+		setSettings( settings );
+	} );
+
+	it( 'should format dates with site timezone output', () => {
+		const settings = __experimentalGetSettings();
+
+		// Simulate different timezone
+		setSettings( {
+			...settings,
+			timezone: { offset: -4, string: '' },
+		} );
+
+		const winterFormattedDateWithC = dateI18n(
+			'c',
+			'2019-01-18T11:00:00.000Z'
+		);
+		expect( winterFormattedDateWithC ).toBe( '2019-01-18T07:00:00-04:00' );
+
+		const summerFormattedDateWithC = dateI18n(
+			'c',
+			'2019-06-18T11:00:00.000Z'
+		);
+		expect( summerFormattedDateWithC ).toBe( '2019-01-18T07:00:00-04:00' );
+
+		// Restore default settings
+		setSettings( settings );
+	} );
+
+	it( 'should format dates with specific timezone output', () => {
+		const settings = __experimentalGetSettings();
+
+		// Simulate different timezone
+		setSettings( {
+			...settings,
+			timezone: { offset: -4, string: 'America/New_York' },
+		} );
+
+		// Check
+		const formattedDate = dateI18n(
+			'c',
+			'2019-06-18T11:00:00.000Z',
+			'Asia/Macau'
+		);
+		expect( formattedDate ).toBe( '2019-06-18T19:00:00+08:00' );
+
+		// Restore default settings
+		setSettings( settings );
+	} );
+
+	it( 'should format dates with specific utc offset output', () => {
+		const settings = __experimentalGetSettings();
+
+		// Simulate different timezone
+		setSettings( {
+			...settings,
+			timezone: { offset: -4, string: 'America/New_York' },
+		} );
+
+		// Check
+		const formattedDate = dateI18n(
+			'c',
+			'2019-06-18T11:00:00.000Z',
+			'+08:00'
+		);
+		expect( formattedDate ).toBe( '2019-06-18T19:00:00+08:00' );
 
 		// Restore default settings
 		setSettings( settings );
