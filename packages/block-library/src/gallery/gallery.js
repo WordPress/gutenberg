@@ -13,7 +13,7 @@ import {
 import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { useRef, useEffect, Fragment } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -57,7 +57,7 @@ export const Gallery = ( props ) => {
 	}, [ isSelected ] );
 
 	return (
-		<figure
+		<div
 			ref={ galleryRef }
 			{ ...blockProps }
 			className={ classnames( blockProps.className, {
@@ -66,26 +66,23 @@ export const Gallery = ( props ) => {
 				'is-cropped': imageCrop,
 			} ) }
 		>
-			<Fragment { ...innerBlocksProps } />
-			<div className="media-placeholder">
-				{ mediaPlaceholder }
-				<RichTextVisibilityHelper
-					isHidden={ ! isSelected && RichText.isEmpty( caption ) }
-					tagName="figcaption"
-					className="blocks-gallery-caption"
-					aria-label={ __( 'Gallery caption text' ) }
-					placeholder={ __( 'Write gallery caption…' ) }
-					value={ caption }
-					onChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
-					inlineToolbar
-					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter( createBlock( 'core/paragraph' ) )
-					}
-				/>
-			</div>
-		</figure>
+			<figure { ...innerBlocksProps } />
+
+			{ mediaPlaceholder }
+			<RichTextVisibilityHelper
+				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
+				tagName="figcaption"
+				className="blocks-gallery-caption"
+				aria-label={ __( 'Gallery caption text' ) }
+				placeholder={ __( 'Write gallery caption…' ) }
+				value={ caption }
+				onChange={ ( value ) => setAttributes( { caption: value } ) }
+				inlineToolbar
+				__unstableOnSplitAtEnd={ () =>
+					insertBlocksAfter( createBlock( 'core/paragraph' ) )
+				}
+			/>
+		</div>
 	);
 };
 
