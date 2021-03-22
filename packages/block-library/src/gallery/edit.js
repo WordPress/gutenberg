@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import classnames from 'classnames';
 import {
 	isEqual,
 	isEmpty,
@@ -78,6 +79,7 @@ function GalleryEdit( props ) {
 	const {
 		setAttributes,
 		attributes,
+		className,
 		clientId,
 		noticeOperations,
 		isSelected,
@@ -360,7 +362,9 @@ function GalleryEdit( props ) {
 		/>
 	);
 
-	const blockProps = useBlockProps();
+	const blockProps = useBlockProps( {
+		className: classnames( className, 'has-nested-images' ),
+	} );
 
 	if ( ! hasImages ) {
 		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
