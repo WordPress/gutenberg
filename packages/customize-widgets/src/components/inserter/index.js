@@ -7,7 +7,7 @@ import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { closeSmall } from '@wordpress/icons';
 
-function Inserter( { inserter } ) {
+function Inserter( { setIsOpened } ) {
 	const inserterTitleId = useInstanceId(
 		Inserter,
 		'customize-widget-layout__inserter-panel-title'
@@ -28,14 +28,14 @@ function Inserter( { inserter } ) {
 				<Button
 					className="customize-widgets-layout__inserter-panel-header-close-button"
 					icon={ closeSmall }
-					onClick={ () => inserter.collapse() }
+					onClick={ () => setIsOpened( false ) }
 					aria-label={ __( 'Close inserter' ) }
 				/>
 			</div>
 			<div className="customize-widgets-layout__inserter-panel-content">
 				<Library
 					showInserterHelpPanel
-					onSelect={ () => inserter.collapse() }
+					onSelect={ () => setIsOpened( false ) }
 				/>
 			</div>
 		</div>

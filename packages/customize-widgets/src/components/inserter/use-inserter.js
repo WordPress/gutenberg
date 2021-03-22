@@ -1,3 +1,9 @@
+/**
+ * WordPress dependencies
+ */
+import { useState, useEffect, useRef } from '@wordpress/element';
+import { focus } from '@wordpress/dom';
+
 const {
 	wp: { customize },
 } = window;
@@ -33,14 +39,89 @@ export const useInserterContainer = () =>
 	document.getElementById( `sub-accordion-section-${ inserterId }` );
 
 export default function useInserter() {
-	const addedInserter = customize.section( inserterId );
-	if ( addedInserter ) {
-		return addedInserter;
+	const [ isInserterOpened, setIsInserterOpened ] = useState( false );
+
+	const inserterRef = useRef( customize.section( inserterId ) );
+
+	if ( ! inserterRef.current ) {
+		inserterRef.current = new customize.OuterSection( inserterId, {} );
+
+		inserterRef.current.expanded.bind( ( expanded ) => {
+			setIsInserterOpened( expanded );
+		} );
+
+		customize.section.add( inserterRef.current );
 	}
 
-	const inserter = new customize.OuterSection( inserterId, {} );
+	// This is useful when the expanded state is controlled from outside React,
+	// like when handling multiple outer sections above.
+	useEffect( () => {
+		const inserter = inserterRef.current;
 
-	customize.section.add( inserter );
+		function syncExpandedStateToComponentState( expanded ) {
+			setIsInserterOpened( expanded );
+		}
 
-	return inserter;
+		inserter.expanded.bind( syncExpandedStateToComponentState );
+
+		return () => {
+			inserter.expanded.unbind( syncExpandedStateToComponentState );
+		};
+	}, [] );
+
+	useEffect(
+		function syncOpenedStateToOuterSectionExpandedState() {
+			const inserter = inserterRef.current;
+
+			if ( isInserterOpened ) {
+				const contentContainer = inserter.contentContainer[ 0 ];
+				const activeElementBeforeExpanded =
+					contentContainer.ownerDocument.activeElement;
+
+				inserter.expand( {
+					completeCallback() {
+						// We have to do this in a "completeCallback" or else the elements will not yet be visible/tabbable.
+						// The first one should be the close button,
+						// we want to skip it and choose the second one instead, which is the search box.
+						const searchBox = focus.tabbable.find(
+							contentContainer
+						)[ 1 ];
+						if ( searchBox ) {
+							searchBox.focus();
+						}
+					},
+				} );
+
+				return () => {
+					if ( inserter.expanded() ) {
+						const activeElement =
+							contentContainer.ownerDocument.activeElement;
+
+						// Return back the focus when closing the inserter.
+						// Only do this if the active element which triggers the action is inside the inserter,
+						// (the close button for instance). In that case the focus will be lost.
+						// Otherwise, we don't hijack the focus when the user is focusing on other elements
+						// (like the quick inserter).
+						if ( contentContainer.contains( activeElement ) ) {
+							inserter.collapse( {
+								completeCallback() {
+									// Return back the focus when closing the inserter.
+									if ( activeElementBeforeExpanded ) {
+										activeElementBeforeExpanded.focus();
+									}
+								},
+							} );
+						}
+					}
+				};
+			}
+
+			if ( inserter.expanded() ) {
+				inserter.collapse();
+			}
+		},
+		[ isInserterOpened ]
+	);
+
+	return [ isInserterOpened, setIsInserterOpened ];
 }

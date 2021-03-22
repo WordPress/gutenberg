@@ -56,12 +56,12 @@ export default function SidebarBlockEditor( { sidebar } ) {
 	const parentContainer = document.getElementById(
 		'customize-theme-controls'
 	);
-	const inserter = useInserter();
+	const [ isInserterOpened, setIsInserterOpened ] = useInserter();
 	const settings = useMemo(
 		() => ( {
-			__experimentalSetIsInserterOpened: () => inserter.expand(),
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
 		} ),
-		[ inserter.expand ]
+		[]
 	);
 
 	return (
@@ -79,7 +79,10 @@ export default function SidebarBlockEditor( { sidebar } ) {
 						>
 							<BlockEditorKeyboardShortcuts />
 
-							<Header inserter={ inserter } />
+							<Header
+								isInserterOpened={ isInserterOpened }
+								setIsInserterOpened={ setIsInserterOpened }
+							/>
 
 							<BlockSelectionClearer>
 								<WritingFlow>
