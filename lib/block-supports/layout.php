@@ -64,8 +64,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		ob_start();
 		?>
 			<?php echo '.wp-container-' . $id; ?> {
-				--wp--layout--content-size: <?php echo $content_size ? $content_size : 'var(--wp--layout--wide-size)'; ?>;
-				--wp--layout--wide-size: <?php echo $wide_size ? $wide_size : 'var(--wp--layout--content-size)'; ?>;
+				--wp--layout--content-size: <?php echo $content_size ? $content_size : $wide_size; ?>;
+				--wp--layout--wide-size: <?php echo $wide_size ? $wide_size : $content_size; ?>;
 			}
 			<?php echo '.wp-container-' . $id; ?> > * {
 				max-width: var(--wp--layout--content-size);
