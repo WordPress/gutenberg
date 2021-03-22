@@ -65,7 +65,7 @@ function PatternTransformationsMenu( {
 	blocks,
 	patterns: statePatterns,
 	onSelect,
-	replaceMode = false,
+	replaceInnerBlocksMode = false,
 } ) {
 	const [ showTransforms, setShowTransforms ] = useState( false );
 	// Replace mode is if we want to replace all contents of selected block
@@ -73,7 +73,7 @@ function PatternTransformationsMenu( {
 	// single block is selected and currently is a Template Part.
 	const patterns = useMemo( () => {
 		let _patterns;
-		if ( replaceMode ) {
+		if ( replaceInnerBlocksMode ) {
 			_patterns = statePatterns.map( ( statePattern ) => ( {
 				...statePattern,
 				transformedBlocks: statePattern.contentBlocks.map( ( block ) =>
@@ -125,7 +125,7 @@ function PatternTransformationsMenu( {
 			}, [] );
 		}
 		return _patterns;
-	}, [ replaceMode, statePatterns ] );
+	}, [ replaceInnerBlocksMode, statePatterns ] );
 
 	if ( ! patterns.length ) return null;
 

@@ -1870,16 +1870,27 @@ export const __experimentalGetScopedBlockPatterns = createSelector(
 			pattern.scope?.[ scope ]?.includes?.( blockName )
 		);
 	},
-	// TODO check deps.
-	( state ) => [ state.settings.__experimentalBlockPatterns ]
+	( state, rootClientId ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId[ rootClientId ],
+	]
 );
 
 /**
  * Determines the items that appear in the available pattern transforms list.
- * 1. fetch scoped ('transform')
- * 2. check if pattern is allowed based on rootClientId
- * 3. prioritize them (?) - not implemented yet.
- *  		- Most matching blocks
+ * There is special handling in two cases:
+ * 1. For some blocks (`blocksToSkip`) when multiple blocks are selected,
+ * don't show any transforms, as it doesn't make sense to try to be too smart.
+ * 2. There are some blocks (`nestedSingleBlocksToHandle`) that makes sense to
+ * replace everything when they are the only block selected.
+ *
+ * For the rest blocks we return a first set of possible eligible block patterns,
+ * by checking the `scope` Patterns API. We still have to recurse through block
+ * pattern's blocks and try to find matches from the selected blocks. Now this
+ * happens in the consumer to avoid heavy operations in the selector.
  *
  * @param {Object}  state Editor state.
  * @param {Object[]} blocks The selected blocks.
@@ -1887,36 +1898,13 @@ export const __experimentalGetScopedBlockPatterns = createSelector(
  *
  * @return {WPEditorTransformItem[]} Items that are eligible for a pattern transformation.
  */
-// TODO jsdoc
 // TODO tests
 export const __experimentalGetPatternTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
 		if ( ! blocks ) return EMPTY_ARRAY;
-		// Create a Set of the selected block names that is used in patterns filtering.
-		const selectedBlockNames = blocks.reduce( ( accumulator, block ) => {
-			accumulator.add( block.name );
-			return accumulator;
-		}, new Set() );
-
-		// If a selected block is nested (with InnerBlocks like Group or Columns)
-		// return an EMPTY_ARRAY, as it doesn't make sense to try to be too smart.
-		// In such blocks a user could have anything inside as content so don't show
-		// any transforms. In these blocks it only makes sense to show `block` scoped patterns
-		// during insertion, where no content exists yet.
-		const blocksToSkip = [ 'core/group', 'core/columns' ];
-		if (
-			blocksToSkip.some( ( blockName ) =>
-				selectedBlockNames.has( blockName )
-			)
-		) {
-			return EMPTY_ARRAY;
-		}
-
-		// An exception to the above is when we have a single `Template Part`
-		// selected, that makes sense to replace everything.
-		// TODO maybe try to be a bit smart about it with some InnerBlocks transforms (?).
+		// There are some blocks like `Template Part` that makes sense
+		// to replace everything when they are the only block selected.
 		const isSingleBlockSelected = blocks.length === 1;
-		// TODO do we need to handle other blocks like this??
 		const nestedSingleBlocksToHandle = [ 'core/template-part' ];
 		if (
 			isSingleBlockSelected &&
@@ -1926,7 +1914,9 @@ export const __experimentalGetPatternTransformItems = createSelector(
 			let { name: blockName } = selectedBlock;
 			// Try to find an active block variation for `Template Part`,
 			// to show patterns with `scope` including the block variation
-			// name (ex. `core/template-part/{variation name}).
+			// name (ex. `core/template-part/{variation name}). If no active
+			// block variation is found, we search for patterns for the base
+			// block.
 			const variations = getBlockVariations( blockName );
 			if ( variations?.length ) {
 				const match = variations.find( ( variation ) =>
@@ -1946,6 +1936,31 @@ export const __experimentalGetPatternTransformItems = createSelector(
 			);
 		}
 
+		// Create a Set of the selected block names that is used in patterns filtering.
+		const selectedBlockNames = blocks.reduce( ( accumulator, block ) => {
+			accumulator.add( block.name );
+			return accumulator;
+		}, new Set() );
+
+		// If a selected block is nested (with InnerBlocks like Group or Columns)
+		// return an EMPTY_ARRAY, as it doesn't make sense to try to be too smart.
+		// In such blocks a user could have anything inside as content, so don't show
+		// any transforms. In these blocks it only makes sense to show `block` scoped
+		// patterns during insertion, where no content exists yet.
+		const blocksToSkip = [
+			'core/group',
+			'core/columns',
+			'core/navigation',
+			'core/template-part',
+		];
+		if (
+			blocksToSkip.some( ( blockName ) =>
+				selectedBlockNames.has( blockName )
+			)
+		) {
+			return EMPTY_ARRAY;
+		}
+
 		// Here we will return first set of possible eligible
 		// block patterns, by checking the `scope` prop.
 		// We still have to recurse through block pattern's blocks
@@ -1962,9 +1977,9 @@ export const __experimentalGetPatternTransformItems = createSelector(
 			)
 		);
 	},
-	// TODO check deps
-	// we need this updated when a template-part area is changed.
+	// TODO we need this updated when a template-part area is changed.
 	( state, rootClientId ) => [
+		state.settings.__experimentalBlockPatterns,
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId,
 		state.settings.allowedBlockTypes,

@@ -33,6 +33,8 @@ import BlockTransformationsMenu from './block-transformations-menu';
 import BlockStylesMenu from './block-styles-menu';
 import PatternTransformationsMenu from './pattern-transformations-menu';
 
+const nestedSingleBlocksToHandle = [ 'core/template-part' ];
+
 export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const { replaceBlocks, replaceInnerBlocks } = useDispatch(
 		blockEditorStore
@@ -44,7 +46,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		icon,
 		blockTitle,
 		patterns,
-		replaceMode,
+		replaceInnerBlocksMode,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -88,9 +90,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				patterns: _patterns,
 				// TODO Need more thought here. We have the same check for template
 				// part in the `__experimentalGetPatternTransformItems` selector.
-				replaceMode:
+				replaceInnerBlocksMode:
 					_isSingleBlockSelected &&
-					firstBlockName === 'core/template-part',
+					nestedSingleBlocksToHandle.includes( firstBlockName ),
 			};
 		},
 		[ clientIds, blocks, blockInformation?.icon ]
@@ -104,10 +106,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
 	// Pattern transformation through the `Patterns` API.
 	const onPatternTransform = ( transformedBlocks ) => {
-		// If on replaceMode (currently single Template Part block selected)
-		// we replace the InnerBlocks of the selected block.
-		// TODO probably rename this variable.
-		if ( replaceMode ) {
+		// If on replaceInnerBlocksMode we replace the InnerBlocks of
+		// the selected block (currently single block selected and one
+		// of `nestedSingleBlocksToHandle`).
+		if ( replaceInnerBlocksMode ) {
 			replaceInnerBlocks( clientIds[ 0 ], transformedBlocks );
 		} else {
 			replaceBlocks( clientIds, transformedBlocks );
@@ -194,7 +196,9 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 												);
 												onClose();
 											} }
-											replaceMode={ replaceMode }
+											replaceInnerBlocksMode={
+												replaceInnerBlocksMode
+											}
 										/>
 									) }
 									{ hasPossibleBlockTransformations && (
