@@ -22,7 +22,8 @@
 	justify-content: space-between;
 	align-items: center;
 	padding: $grid-unit-20;
-	height: $customize-widgets-header-width;
+	// Match the "wp-full-overlay-header" height in core.
+	height: 45px;
 	box-sizing: border-box;
 
 	.customize-widgets-layout__inserter-panel-header-title {
