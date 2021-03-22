@@ -19,7 +19,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { BlockControls, BlockAlignmentToolbar } from '../components';
+import { BlockControls, BlockAlignmentControl } from '../components';
 import { store as blockEditorStore } from '../store';
 
 /**
@@ -138,8 +138,8 @@ export const withToolbarControls = createHigherOrderComponent(
 
 		return [
 			validAlignments.length > 0 && props.isSelected && (
-				<BlockControls key="align-controls">
-					<BlockAlignmentToolbar
+				<BlockControls key="align-controls" group="block">
+					<BlockAlignmentControl
 						value={ props.attributes.align }
 						onChange={ updateAlignment }
 						controls={ validAlignments }

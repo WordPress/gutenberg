@@ -4,5 +4,15 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"include": [ "src/types.ts", "src/middlewares/nonce.js" ]
+	"references": [
+		{ "path": "../url" }
+	],
+	"include": [
+		"src/middlewares/namespace-endpoint.js",
+		"src/middlewares/nonce.js",
+		"src/middlewares/preloading.js",
+		"src/middlewares/root-url.js",
+		"src/middlewares/user-locale.js",
+		"src/types.ts"
+	]
 }

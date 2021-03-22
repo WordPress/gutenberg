@@ -409,6 +409,7 @@ exports[`props should render correctly 1`] = `
     id="ButtonGroup-1"
     role="radio"
     tabindex="0"
+    type="button"
   >
     <span
       class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d emotion-0"
@@ -437,6 +438,7 @@ exports[`props should render correctly 1`] = `
     id="ButtonGroup-2"
     role="radio"
     tabindex="-1"
+    type="button"
   >
     <span
       class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d emotion-0"
@@ -465,6 +467,7 @@ exports[`props should render correctly 1`] = `
     id="ButtonGroup-3"
     role="radio"
     tabindex="-1"
+    type="button"
   >
     <span
       class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d emotion-0"

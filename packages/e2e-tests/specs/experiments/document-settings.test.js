@@ -1,11 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	canvas,
-	trashAllPosts,
-	activateTheme,
-} from '@wordpress/e2e-test-utils';
+import { trashAllPosts, activateTheme } from '@wordpress/e2e-test-utils';
 
 /**
  * Internal dependencies
@@ -58,9 +54,15 @@ describe( 'Document Settings', () => {
 
 		describe( 'and a template part is clicked in the template', () => {
 			it( "should display the selected template part's name in the document header", async () => {
-				// Click on a template part in the template
-				const header = await canvas().$( '.site-header' );
-				await header.click();
+				// Select the header template part via list view.
+				await page.click( 'button[aria-label="List View"]' );
+				const headerTemplatePartListViewButton = await page.waitForXPath(
+					'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
+				);
+				headerTemplatePartListViewButton.click();
+				await page.click(
+					'button[aria-label="Close list view sidebar"]'
+				);
 
 				// Evaluate the document settings secondary title
 				const actual = await getDocumentSettingsSecondaryTitle();

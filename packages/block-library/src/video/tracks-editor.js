@@ -7,7 +7,6 @@ import {
 	MenuItem,
 	FormFileUpload,
 	MenuGroup,
-	ToolbarGroup,
 	ToolbarButton,
 	Dropdown,
 	SVG,
@@ -201,16 +200,14 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 		<Dropdown
 			contentClassName="block-library-video-tracks-editor"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarGroup>
-					<ToolbarButton
-						label={ __( 'Text tracks' ) }
-						showTooltip
-						aria-expanded={ isOpen }
-						aria-haspopup="true"
-						onClick={ onToggle }
-						icon={ captionIcon }
-					/>
-				</ToolbarGroup>
+				<ToolbarButton
+					label={ __( 'Text tracks' ) }
+					showTooltip
+					aria-expanded={ isOpen }
+					aria-haspopup="true"
+					onClick={ onToggle }
+					icon={ captionIcon }
+				/>
 			) }
 			renderContent={ ( {} ) => {
 				if ( trackBeingEdited !== null ) {

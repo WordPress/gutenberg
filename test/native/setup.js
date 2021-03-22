@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { NativeModules } from 'react-native';
 import 'react-native-gesture-handler/jestSetup';
 
 jest.mock( '@wordpress/element', () => {
@@ -106,27 +105,6 @@ jest.mock( '@react-native-community/blur', () => () => 'BlurView', {
 	virtual: true,
 } );
 
-// Overwrite some native module mocks from `react-native` jest preset:
-// https://github.com/facebook/react-native/blob/HEAD/jest/setup.js
-// to fix issue "TypeError: Cannot read property 'Commands' of undefined"
-// raised when calling focus or blur on a native component
-const mockNativeModules = {
-	UIManager: {
-		...NativeModules.UIManager,
-		getViewManagerConfig: jest.fn( () => ( { Commands: {} } ) ),
-	},
-};
-
-Object.keys( mockNativeModules ).forEach( ( module ) => {
-	try {
-		jest.doMock( module, () => mockNativeModules[ module ] ); // needed by FacebookSDK-test
-	} catch ( error ) {
-		jest.doMock( module, () => mockNativeModules[ module ], {
-			virtual: true,
-		} );
-	}
-} );
-
 jest.mock( 'react-native-reanimated', () => {
 	const Reanimated = require( 'react-native-reanimated/mock' );
 
@@ -137,5 +115,14 @@ jest.mock( 'react-native-reanimated', () => {
 	return Reanimated;
 } );
 
-// Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
+// Silence the warning: Animated: `useNativeDriver` is not supported because the
+// native animated module is missing. This was added per React Navigation docs.
+// https://reactnavigation.org/docs/testing/#mocking-native-modules
 jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );
+
+// We currently reference TextStateInput (a private module) within
+// react-native-aztec/src/AztecView. Doing so requires that we mock it via its
+// internal path to avoid "TypeError: Cannot read property 'Commands' of
+// undefined." The private module referenced could possibly be replaced with
+// a React ref instead. We could then remove this internal mock.
+jest.mock( 'react-native/Libraries/Components/TextInput/TextInputState' );
