@@ -24,13 +24,15 @@ import BlockPreview from '../block-preview';
 /**
  * Find a selected block match in a pattern and return it.
  * We return a reference to the block object to mutate it.
- * We have first deep cloned the pattern from state.
+ * We have first cloned the pattern blocks in a new property
+ * `transformedBlocks` and we mutate this.
  *
- * @param {*} parsedBlock
- * @param {*} selectedBlockName
- * @param {*} transformedBlocks
+ * @param {WPBlock} parsedBlock The pattern's parsed block to try to find a match.
+ * @param {string} selectedBlockName The current selected block's name.
+ * @param {Set} transformedBlocks A set holding the previously matched blocks.
+ *
+ * @return {WPBlock|boolean} The matched block if found or `false`.
  */
-// TODO jsdoc
 // TODO tests
 function findMatchingBlockInPattern(
 	parsedBlock,
@@ -68,9 +70,9 @@ function PatternTransformationsMenu( {
 	replaceInnerBlocksMode = false,
 } ) {
 	const [ showTransforms, setShowTransforms ] = useState( false );
-	// Replace mode is if we want to replace all contents of selected block
-	// and not try to transform the selected blocks. This mode is set when a
-	// single block is selected and currently is a Template Part.
+	// `replaceInnerBlocksMode` is if we want to replace all contents of selected
+	// block and not try to transform the selected blocks. This mode is set when
+	// a single block is selected and currently is a Template Part.
 	const patterns = useMemo( () => {
 		let _patterns;
 		if ( replaceInnerBlocksMode ) {
@@ -157,7 +159,6 @@ function PreviewPatternsPopover( { patterns, onSelect } ) {
 				<Popover
 					className="block-editor-block-switcher__preview__popover"
 					position="bottom right"
-					focusOnMount={ false }
 				>
 					<div className="block-editor-block-switcher__preview">
 						<div className="block-editor-block-switcher__preview-title">
@@ -195,12 +196,10 @@ function BlockPatternsList( { patterns, onSelect } ) {
 	);
 }
 
-// This needs to be consolidated to probably be reused across: Patterns in Placeholder, Inserter and here.
+// TODO: This needs to be consolidated to probably be reused across: Patterns in Placeholder, Inserter and here.
 function BlockPattern( { pattern, onSelect, composite } ) {
 	const baseClassName =
 		'block-editor-block-switcher__preview-patterns-container';
-	// TODO check viewportWidth. From pattern? From resizeObserver to have current width
-	// and manipulate later??
 	const descriptionId = useInstanceId(
 		BlockPattern,
 		`${ baseClassName }-list__item-description`

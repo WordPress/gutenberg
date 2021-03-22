@@ -1977,7 +1977,6 @@ export const __experimentalGetPatternTransformItems = createSelector(
 			)
 		);
 	},
-	// TODO we need this updated when a template-part area is changed.
 	( state, rootClientId ) => [
 		state.settings.__experimentalBlockPatterns,
 		state.blockListSettings[ rootClientId ],
