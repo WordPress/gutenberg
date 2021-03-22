@@ -63,14 +63,18 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	if ( $content_size || $wide_size ) {
 		ob_start();
 		?>
+			<?php echo '.wp-container-' . $id; ?> {
+				--wp--layout--content-size: <?php echo $content_size ? $content_size : 'var(--wp--layout--wide-size)'; ?>;
+				--wp--layout--wide-size: <?php echo $wide_size ? $wide_size : 'var(--wp--layout--content-size)'; ?>;
+			}
 			<?php echo '.wp-container-' . $id; ?> > * {
-				max-width: <?php echo $content_size ? $content_size : $wide_size; ?>;
+				max-width: var(--wp--layout--content-size);
 				margin-left: auto;
 				margin-right: auto;
 			}
 
 			<?php echo '.wp-container-' . $id; ?> > .alignwide {
-				max-width: <?php echo $wide_size ? $wide_size : $content_size; ?>;
+				max-width: var(--wp-layout--wide-size);
 			}
 
 			<?php echo '.wp-container-' . $id; ?> .alignfull {
