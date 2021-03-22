@@ -2,7 +2,7 @@
  * This transform targets inputs and buttons and prevents css styles for the editor
  * from the theme to bleed into the editor's components. It is a bit hacky but
  * it is contained and prevents us from having to do make changes over multiple files.
- * 
+ *
  * @constant string IS_BUTTON_TAG Regex to check if the selector is a button tag selector.
  * @constant string IS_INPUT_TAG Regex to check if the selector is an input tag selector.
  */

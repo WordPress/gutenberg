@@ -30,7 +30,7 @@ const transformStyles = ( styles, wrapperClassName = '' ) => {
 			const transforms = [];
 			if ( wrapperClassName && ! __experimentalNoWrapper ) {
 				transforms.push( wrap( wrapperClassName ) );
-				transforms.push( avoidEditorComponents( ) );
+				transforms.push( avoidEditorComponents() );
 			}
 			if ( baseURL ) {
 				transforms.push( urlRewrite( baseURL ) );
