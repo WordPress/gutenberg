@@ -11,8 +11,15 @@ import { LABELS } from './utils';
 import { LayoutContainer, Layout } from './styles/box-control-styles';
 
 const getFirstLastAndOnlySides = ( sides ) => {
+	// Handle default config allowing all sides to be configured.
+	if ( ! sides ) {
+		return { first: 'top', last: 'left', only: undefined };
+	}
+
 	let first, last;
 
+	// Check which sides have been opted-into to determine which are first,
+	// last & only.
 	[ 'top', 'right', 'bottom', 'left' ].forEach( ( side ) => {
 		if ( sides && sides[ side ] ) {
 			if ( ! first ) {
