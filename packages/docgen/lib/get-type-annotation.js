@@ -25,23 +25,20 @@ function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 				) }`
 		)
 		.join( ', ' );
-	const restParam = typeAnnotation.parameters
-		.filter( ( p ) => babelTypes.isRestElement( p ) )
-		.map( ( p ) => {
-			if ( babelTypes.isIdentifier( p.argument ) ) {
-				return `...${ p.argument.name }: ${ getTypeAnnotation(
-					p.typeAnnotation.typeAnnotation
-				) }`;
-			}
 
-			// if it's not an identifier I'm not sure what we should do
-			return '';
-			// there's only ever one rest param
-		} )[ 0 ];
+	const {
+		argument: restParamArgument,
+		typeAnnotation: restParamTypeAnnotation,
+		// There's only every one rest param
+	} = typeAnnotation.parameters.find( babelTypes.isRestElement ) || {};
+	const restParam =
+		restParamArgument && restParamTypeAnnotation
+			? `, ...${ restParamArgument.name }: ${ getTypeAnnotation(
+					restParamTypeAnnotation.typeAnnotation
+			  ) }`
+			: '';
 
-	const params = `( ${ nonRestParams }${
-		restParam ? `, ${ restParam }` : ''
-	} )`;
+	const params = `( ${ nonRestParams }${ restParam } )`;
 
 	if ( returnIndicator === null ) {
 		return params;
