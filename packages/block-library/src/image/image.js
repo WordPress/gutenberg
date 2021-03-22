@@ -96,6 +96,7 @@ export default function Image( {
 		allowResize = true,
 		linkTo: parentLinkDestination,
 		sizeSlug: parentSizeSlug,
+		isGrouped,
 	} = context;
 	const { block, currentId, image, multiImageSelection } = useSelect(
 		( select ) => {
@@ -358,7 +359,7 @@ export default function Image( {
 						label={ __( 'Upload external image' ) }
 					/>
 				) }
-				{ ! multiImageSelection && coverBlockExists && (
+				{ ! isGrouped && ! multiImageSelection && coverBlockExists && (
 					<ToolbarButton
 						icon={ overlayText }
 						label={ __( 'Add text over image' ) }
