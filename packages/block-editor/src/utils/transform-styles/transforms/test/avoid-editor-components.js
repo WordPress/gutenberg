@@ -6,7 +6,7 @@ import avoidEditorComponents from '../avoid-editor-components';
 
 describe( 'CSS selector wrap', () => {
 	it( 'should replace add editor classes to buttons', () => {
-		const callback = avoidEditorComponents( );
+		const callback = avoidEditorComponents();
 		const input = `
 		button {
 			background-color: #ff0000;
@@ -17,7 +17,7 @@ describe( 'CSS selector wrap', () => {
 	} );
 
 	it( 'should replace add editor classes to inputs', () => {
-		const callback = avoidEditorComponents( );
+		const callback = avoidEditorComponents();
 		const input = `
 		input {
 			border-color: #ff0000;
@@ -27,4 +27,3 @@ describe( 'CSS selector wrap', () => {
 		expect( output ).toMatchSnapshot();
 	} );
 } );
- 
