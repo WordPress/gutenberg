@@ -500,7 +500,7 @@ function TableEdit( {
 						/>
 					</PanelBody>
 					<PanelColorSettings
-						title={ __( 'Color settings' ) }
+						title={ __( 'Color' ) }
 						initialOpen={ false }
 						colorSettings={ [
 							{
