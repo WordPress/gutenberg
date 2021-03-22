@@ -640,7 +640,6 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		}
 	}
 
-
 	// Substitute default styles if found. Otherwise, prepend to setting array.
 	if ( isset( $i ) && $i >= 0 ) {
 		unset( $settings['styles'][ $i ] );
