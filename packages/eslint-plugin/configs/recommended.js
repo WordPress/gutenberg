@@ -13,8 +13,17 @@ const defaultPrettierConfig = require( '@wordpress/prettier-config' );
  */
 const { isPackageInstalled } = require( '../utils' );
 
-const { config: localPrettierConfig } =
+let { config: localPrettierConfig } =
 	cosmiconfigSync( 'prettier' ).search() || {};
+
+// If the local config is a string, it's a file path, and we need to load it to
+// get the config object.
+if ( typeof localPrettierConfig === 'string' ) {
+	localPrettierConfig = (
+		cosmiconfigSync().load( localPrettierConfig ) || {}
+	).config;
+}
+
 const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
 
 const config = {
