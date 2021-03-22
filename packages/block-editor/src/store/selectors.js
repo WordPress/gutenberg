@@ -1860,8 +1860,8 @@ export const __experimentalGetAllowedPatterns = createSelector(
  * @return {Array} The list of matched block patterns based on provided scope and block name.
  */
 export const __experimentalGetScopedBlockPatterns = createSelector(
-	( state, scope, blockName, rootClientId ) => {
-		if ( ! scope && ! blockName ) return EMPTY_ARRAY;
+	( state, scope, blockName, rootClientId = null ) => {
+		if ( ! ( scope && blockName ) ) return EMPTY_ARRAY;
 		const patterns = __experimentalGetAllowedPatterns(
 			state,
 			rootClientId

@@ -3409,18 +3409,37 @@ describe( 'selectors', () => {
 	} );
 	describe( '__experimentalGetScopedBlockPatterns', () => {
 		const state = {
-			blocks: {},
+			blocks: {
+				byClientId: {
+					block1: { name: 'core/test-block-a' },
+				},
+			},
+			blockListSettings: {
+				block1: {
+					allowedBlocks: [ 'core/test-block-b' ],
+				},
+			},
 			settings: {
 				__experimentalBlockPatterns: [
 					{
 						name: 'pattern-a',
 						title: 'pattern a',
 						scope: { block: [ 'test/block-a' ] },
+						content:
+							'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
 					},
 					{
 						name: 'pattern-b',
 						title: 'pattern b',
 						scope: { block: [ 'test/block-b' ] },
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+					{
+						title: 'pattern c',
+						scope: { block: [ 'test/block-a' ] },
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
 					},
 				],
 			},
@@ -3447,10 +3466,31 @@ describe( 'selectors', () => {
 				'block',
 				'test/block-a'
 			);
+			expect( patterns ).toHaveLength( 2 );
+			expect( patterns ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( {
+						title: 'pattern a',
+						scope: { block: [ 'test/block-a' ] },
+					} ),
+					expect.objectContaining( {
+						title: 'pattern c',
+						scope: { block: [ 'test/block-a' ] },
+					} ),
+				] )
+			);
+		} );
+		it( 'should return proper result with matched patterns and allowed blocks from rootClientId', () => {
+			const patterns = __experimentalGetScopedBlockPatterns(
+				state,
+				'block',
+				'test/block-a',
+				'block1'
+			);
 			expect( patterns ).toHaveLength( 1 );
 			expect( patterns[ 0 ] ).toEqual(
 				expect.objectContaining( {
-					title: 'pattern a',
+					title: 'pattern c',
 					scope: { block: [ 'test/block-a' ] },
 				} )
 			);
