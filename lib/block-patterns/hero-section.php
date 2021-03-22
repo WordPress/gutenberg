@@ -9,8 +9,8 @@ return array(
 	'title'       => __( 'Hero section' ),
 	'categories'  => array( 'art' ),
 	'content'     => '<!-- wp:cover {"url":"https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/03/504382ldsdl-scaled.jpg","id":613,"hasParallax":true,"dimRatio":40,"overlayColor":"black","minHeight":100,"minHeightUnit":"vh","contentPosition":"center center","align":"full"} -->
-	<div class="wp-block-cover alignfull has-background-dim-40 has-black-background-color has-background-dim has-parallax" style="background-image:url(https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/03/504382ldsdl-scaled.jpg);min-height:100vh"><div class="wp-block-cover__inner-container"><!-- wp:heading {"style":{"typography":{"fontSize":"8vw"}},"className":"alignwide has-white-color has-text-color"} -->
-<h2 class="alignwide has-white-color has-text-color" style="font-size:8vw"><strong><em>'. __("Overseas: 1500 — 1960") .'</em></strong></h1>
+	<div class="wp-block-cover alignfull has-background-dim-40 has-black-background-color has-background-dim has-parallax" style="background-image:url(https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/03/504382ldsdl-scaled.jpg);min-height:100vh"><div class="wp-block-cover__inner-container"><!-- wp:heading {"style":{"typography":{"fontSize":"6vw"}},"className":"alignwide has-white-color has-text-color"} -->
+<h2 class="alignwide has-white-color has-text-color" style="font-size:6vw"><strong><em>'. __("Overseas: 1500 — 1960") .'</em></strong></h1>
 	<!-- /wp:heading -->
 	
 	<!-- wp:columns {"align":"wide"} -->
