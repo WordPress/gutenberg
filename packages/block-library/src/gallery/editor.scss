@@ -1,17 +1,22 @@
-.wp-block-gallery {
+figure.wp-block-gallery {
 	// Override the default list style type _only in the editor_
 	// to avoid :not() selector specificity issues.
 	// See https://github.com/WordPress/gutenberg/pull/10358
-	figure {
-		.components-drop-zone {
-			display: none;
-			pointer-events: none;
-		}
-		> .blocks-gallery-caption {
-			flex: 0 0 100%;
-		}
+
+	display: block;
+	margin: 0;
+
+	.components-drop-zone {
+		display: none;
+		pointer-events: none;
+	}
+	> .blocks-gallery-caption {
+		flex: 0 0 100%;
 	}
 
+	.components-form-file-upload {
+		flex-basis: 100%;
+	}
 	// @todo: this deserves a refactor, by being moved to the toolbar.
 	.block-editor-media-placeholder.is-appender {
 		.components-placeholder__label {
@@ -21,11 +26,6 @@
 			margin-bottom: 0;
 		}
 	}
-}
-
-figure.wp-block-gallery {
-	display: block;
-	margin: 0;
 }
 
 // Necessary to to override default editor ul styles.
