@@ -14,13 +14,11 @@ import {
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { BlockControls, BlockAlignmentControl } from '../components';
-import { store as blockEditorStore } from '../store';
 import useAvailableAlignments from '../components/block-alignment-control/use-available-alignments';
 
 /**
@@ -166,10 +164,6 @@ export const withDataAlign = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { align } = attributes;
-		const hasWideEnabled = useSelect(
-			( select ) => !! select( blockEditorStore ).getSettings().alignWide,
-			[]
-		);
 
 		// If an alignment is not assigned, there's no need to go through the
 		// effort to validate or assign its value.
@@ -179,8 +173,7 @@ export const withDataAlign = createHigherOrderComponent(
 
 		const validAlignments = getValidAlignments(
 			getBlockSupport( name, 'align' ),
-			hasBlockSupport( name, 'alignWide', true ),
-			hasWideEnabled
+			hasBlockSupport( name, 'alignWide', true )
 		);
 
 		let wrapperProps = props.wrapperProps;

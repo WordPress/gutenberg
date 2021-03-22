@@ -68,6 +68,10 @@ export function useFocusFirstElement( clientId ) {
 			return;
 		}
 
+		if ( ! ref.current ) {
+			return;
+		}
+
 		const { ownerDocument } = ref.current;
 
 		// Focus is captured by the wrapper node, so while focus transition
