@@ -3,26 +3,29 @@
  */
 import { ui, css } from '@wp-g2/styles';
 
+// @todo: Maybe abstract to a dedicated UnstyledButton component.
 export const unstyledButton = css`
-	border: none;
 	appearance: none;
+	border: 1px solid transparent;
+	cursor: pointer;
 	background: none;
 	text-align: left;
 
 	&:hover {
-		background-color: ${ ui.get( 'controlBackgroundColorActive' ) };
+		color: ${ ui.get( 'colorAdmin' ) };
+	}
+
+	&:focus {
+		background-color: transparent;
+		color: ${ ui.get( 'colorAdmin' ) };
+		border-color: ${ ui.get( 'colorAdmin' ) };
+		outline: 3px solid transparent;
 	}
 `;
 
 export const item = css`
 	width: 100%;
 	display: block;
-`;
-
-export const actionItem = css`
-	&:hover {
-		cursor: pointer;
-	}
 `;
 
 export const bordered = css`
@@ -34,12 +37,16 @@ export const separated = css`
 		${ ui.border.bottom }
 	}
 
-	> *:last-child {
-		border-bottom: none;
+	> *:last-child:not( :focus ) {
+		border-bottom-color: transparent;
 	}
 `;
 
 const borderRadius = ui.get( 'controlBorderRadius' );
+
+export const spacedAround = css`
+	${ ui.borderRadius( borderRadius ) }
+`;
 
 export const rounded = css`
 	${ ui.borderRadius( borderRadius ) }

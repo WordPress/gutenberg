@@ -3,16 +3,16 @@
 /**
  * External dependencies
  */
-import {
-	Collapsible,
-	CollapsibleContent,
-	CollapsibleTrigger,
-} from '@wp-g2/components';
+import { Avatar, Spacer } from '@wp-g2/components';
 
 /**
  * Internal dependencies
  */
 import { ItemGroup, Item } from '..';
+import { HStack } from '../../h-stack';
+import { View } from '../../view';
+import { VStack } from '../../v-stack';
+import { Text } from '../../text';
 import { Popover } from '../../popover';
 import { Button } from '../../button';
 
@@ -22,7 +22,7 @@ export default {
 };
 
 export const _default = () => (
-	<ItemGroup css={ { width: '350px' } } bordered rounded>
+	<ItemGroup css={ { width: '350px' } } bordered>
 		<Item action onClick={ () => alert( 'WordPress.org' ) }>
 			Code is Poetry — Click me!
 		</Item>
@@ -35,43 +35,33 @@ export const _default = () => (
 		<Item action onClick={ () => alert( 'WordPress.org' ) }>
 			Code is Poetry — Click me!
 		</Item>
-		<Collapsible>
-			<CollapsibleTrigger as={ Item } action>
-				Toggle
-			</CollapsibleTrigger>
-			<CollapsibleContent>
-				<ItemGroup separated rounded size="small">
-					<Item action onClick={ () => alert( 'WordPress.org' ) }>
-						Code is Poetry — Click me!
-					</Item>
-					<Item action onClick={ () => alert( 'WordPress.org' ) }>
-						Code is Poetry — Click me!
-					</Item>
-					<Item action onClick={ () => alert( 'WordPress.org' ) }>
-						Code is Poetry — Click me!
-					</Item>
-					<Item action onClick={ () => alert( 'WordPress.org' ) }>
-						Code is Poetry — Click me!
-					</Item>
-				</ItemGroup>
-			</CollapsibleContent>
-		</Collapsible>
 	</ItemGroup>
 );
 
+const ExampleItemContent = () => (
+	<HStack spacing={ 3 }>
+		<View>
+			<Avatar name="WordPress" />
+		</View>
+		<Spacer>
+			<VStack spacing={ 1 }>
+				<Text weight="bold">Title</Text>
+				<Text variant="muted">Description</Text>
+			</VStack>
+		</Spacer>
+	</HStack>
+);
+
 export const nonAction = () => (
-	<ItemGroup css={ { width: '350px' } } bordered rounded>
-		<Item onClick={ () => alert( 'WordPress.org' ) }>
-			Code is Poetry — Click me!
+	<ItemGroup css={ { width: '350px' } } bordered rounded size="large">
+		<Item>
+			<ExampleItemContent />
 		</Item>
-		<Item onClick={ () => alert( 'WordPress.org' ) }>
-			Code is Poetry — Click me!
+		<Item>
+			<ExampleItemContent />
 		</Item>
-		<Item onClick={ () => alert( 'WordPress.org' ) }>
-			Code is Poetry — Click me!
-		</Item>
-		<Item onClick={ () => alert( 'WordPress.org' ) }>
-			Code is Poetry — Click me!
+		<Item>
+			<ExampleItemContent />
 		</Item>
 	</ItemGroup>
 );
@@ -81,8 +71,7 @@ export const dropdownMenu = () => (
 		css={ { width: '350px' } }
 		trigger={ <Button>Open Popover</Button> }
 	>
-		<ItemGroup bordered={ false } rounded separated>
-			<Item>This is a heading.</Item>
+		<ItemGroup css={ { padding: 4 } }>
 			<Item action onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
@@ -95,7 +84,6 @@ export const dropdownMenu = () => (
 			<Item action onClick={ () => alert( 'WordPress.org' ) }>
 				Code is Poetry — Click me!
 			</Item>
-			<Item>This is a footer.</Item>
 		</ItemGroup>
 	</Popover>
 );

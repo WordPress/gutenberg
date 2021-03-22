@@ -35,8 +35,10 @@ export function useItemGroup( props: ViewOwnProps< Props, 'div' > ) {
 	);
 
 	return {
+		bordered,
 		className: classes,
 		role,
+		separated,
 		...otherProps,
 	};
 }

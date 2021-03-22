@@ -14,14 +14,22 @@ import { ItemGroupContext, useItemGroupContext } from './context';
 import { View } from '../view';
 
 function ItemGroup( props: ViewOwnProps< Props, 'div' > ) {
-	const { size: sizeProp, ...otherProps } = useItemGroup( props );
+	const { bordered, separated, size: sizeProp, ...otherProps } = useItemGroup(
+		props
+	);
 
 	const { size: contextSize } = useItemGroupContext();
 
+	const spacedAround = ! bordered && ! separated;
 	const size = sizeProp || contextSize;
 
+	const contextValue = {
+		spacedAround,
+		size,
+	};
+
 	return (
-		<ItemGroupContext.Provider value={ { size } }>
+		<ItemGroupContext.Provider value={ contextValue }>
 			<View { ...otherProps } />
 		</ItemGroupContext.Provider>
 	);

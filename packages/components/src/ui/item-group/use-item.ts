@@ -26,17 +26,17 @@ export function useItem( props: ViewOwnProps< Props, 'div' > ) {
 		...otherProps
 	} = useContextSystem( props, 'Item' );
 
-	const { size: contextSize } = useItemGroupContext();
+	const { spacedAround, size: contextSize } = useItemGroupContext();
 
 	const size = sizeProp || contextSize;
 
 	const as = asProp || action ? 'button' : 'div';
 
 	const classes = cx(
-		action && styles.actionItem,
 		action && styles.unstyledButton,
 		styles.itemSizes[ size ] || styles.itemSizes.medium,
 		styles.item,
+		spacedAround && styles.spacedAround,
 		className
 	);
 
