@@ -72,26 +72,4 @@ describe( 'CSS selector wrap', () => {
 
 		expect( output ).toMatchSnapshot();
 	} );
-
-	it( 'should replace add editor classes to buttons', () => {
-		const callback = wrap( '.my-namespace' );
-		const input = `
-		button {
-			background-color: #ff0000;
-		}`;
-		const output = traverse( input, callback );
-
-		expect( output ).toMatchSnapshot();
-	} );
-
-	it( 'should replace add editor classes to inputs', () => {
-		const callback = wrap( '.my-namespace' );
-		const input = `
-		input {
-			border-color: #ff0000;
-		}`;
-		const output = traverse( input, callback );
-
-		expect( output ).toMatchSnapshot();
-	} );
 } );

@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`CSS selector wrap should replace add editor classes to buttons 1`] = `
+"button:not(.components-button):not([id^=mceu_]) {
+background-color: #ff0000;
+}"
+`;
+
+exports[`CSS selector wrap should replace add editor classes to inputs 1`] = `
+"input:not(.components-text-control__input):not(.components-placeholder__input):not(.components-form-token-field__input) {
+border-color: #ff0000;
+}"
+`;
