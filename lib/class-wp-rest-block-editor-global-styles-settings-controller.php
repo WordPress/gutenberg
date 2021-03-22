@@ -16,8 +16,8 @@ class WP_REST_Block_Editor_Global_Styles_Settings_Controller extends WP_REST_Con
 	 * Constructs the controller.
 	 */
 	public function __construct() {
-		$this->namespace = 'wp/v2';
-		$this->rest_base = 'block-editor-global-styles-settings';
+		$this->namespace = 'wp-block-editor/v1';
+		$this->rest_base = 'global-styles';
 	}
 
 	/**
