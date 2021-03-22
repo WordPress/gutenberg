@@ -415,10 +415,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			}
 
 			if ( isset( $request['instance']['raw'] ) ) {
-				if (
-					! isset( $widget_object->show_instance_in_rest ) ||
-					! $widget_object->show_instance_in_rest
-				) {
+				if ( empty( $widget_object->show_instance_in_rest ) ) {
 					return new WP_Error(
 						'rest_invalid_widget',
 						__( 'Widget type does not support raw instances.', 'gutenberg' ),
@@ -553,10 +550,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 				$prepared['instance']['encoded'] = base64_encode( $serialized_instance );
 				$prepared['instance']['hash']    = wp_hash( $serialized_instance );
 
-				if (
-					isset( $widget_object->show_instance_in_rest ) &&
-					$widget_object->show_instance_in_rest
-				) {
+				if ( ! empty( $widget_object->show_instance_in_rest ) ) {
 					$prepared['instance']['raw'] = $instance;
 				}
 			}
