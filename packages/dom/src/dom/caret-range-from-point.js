@@ -8,7 +8,7 @@
  * @param {number}   x    Horizontal position within the current viewport.
  * @param {number}   y    Vertical position within the current viewport.
  *
- * @return {?Range} The best range for the given point.
+ * @return {Range | null} The best range for the given point.
  */
 export default function caretRangeFromPoint( doc, x, y ) {
 	if ( doc.caretRangeFromPoint ) {

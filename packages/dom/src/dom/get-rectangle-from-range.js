@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import { assertIsDefined } from '../utils/assert-is-defined';
+
+/**
  * Get the rectangle of a given Range.
  *
  * @param {Range} range The range.
@@ -15,13 +20,15 @@ export default function getRectangleFromRange( range ) {
 
 	const { startContainer } = range;
 	const { ownerDocument } = startContainer;
+	assertIsDefined( ownerDocument );
 
 	// Correct invalid "BR" ranges. The cannot contain any children.
 	if ( startContainer.nodeName === 'BR' ) {
 		const { parentNode } = startContainer;
-		const index = Array.from( parentNode.childNodes ).indexOf(
-			startContainer
-		);
+		assertIsDefined( parentNode );
+		const index = /** @type {Node[]} */ ( Array.from(
+			parentNode.childNodes
+		) ).indexOf( startContainer );
 
 		range = ownerDocument.createRange();
 		range.setStart( parentNode, index );
@@ -37,6 +44,7 @@ export default function getRectangleFromRange( range ) {
 	// See: https://stackoverflow.com/a/6847328/995445
 	if ( ! rect ) {
 		const padNode = ownerDocument.createTextNode( '\u200b' );
+		assertIsDefined( padNode.parentNode );
 		// Do not modify the live range.
 		range = range.cloneRange();
 		range.insertNode( padNode );
