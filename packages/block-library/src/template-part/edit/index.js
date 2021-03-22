@@ -28,10 +28,11 @@ import { TemplatePartAdvancedControls } from './advanced-controls';
 import { getTagBasedOnArea } from './get-tag-based-on-area';
 
 export default function TemplatePartEdit( {
-	attributes: { slug, theme, tagName, layout = {} },
+	attributes,
 	setAttributes,
 	clientId,
 } ) {
+	const { slug, theme, tagName, layout = {} } = attributes;
 	const templatePartId = theme && slug ? theme + '//' + slug : null;
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
@@ -116,6 +117,7 @@ export default function TemplatePartEdit( {
 			<TagName { ...blockProps }>
 				{ isPlaceholder && (
 					<TemplatePartPlaceholder
+						area={ attributes.area }
 						setAttributes={ setAttributes }
 						innerBlocks={ innerBlocks }
 					/>
