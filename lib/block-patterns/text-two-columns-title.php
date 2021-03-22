@@ -15,8 +15,8 @@ return array(
 	<div style="height:70px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer -->
 	
-	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"87px"}},"textColor":"black"} -->
-	<p class="has-black-color has-text-color" style="font-size:87px;line-height:1.1"><strong>'. __("Ancient Sea Representations") .'</strong></p>
+	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"5vw"}},"textColor":"black"} -->
+	<p class="has-black-color has-text-color" style="font-size:5vw;line-height:1.1"><strong>'. __("Ancient Sea Representations") .'</strong></p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column -->
 	

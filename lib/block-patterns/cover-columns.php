@@ -15,8 +15,8 @@ return array(
 	<hr class="wp-block-separator has-text-color has-background is-style-wide" style="background-color:#ffe074;color:#ffe074"/>
 	<!-- /wp:separator -->
 	
-	<!-- wp:heading {"style":{"color":{"text":"#ffe074"},"typography":{"fontSize":"200px"}}} -->
-	<h2 class="has-text-color" style="color:#ffe074;font-size:200px">'. __("80%*") . '</h2>
+	<!-- wp:heading {"style":{"color":{"text":"#ffe074"},"typography":{"fontSize":"16vw"}}} -->
+	<h2 class="has-text-color" style="color:#ffe074;font-size:16vw">'. __("80%*") . '</h2>
 	<!-- /wp:heading -->
 	
 	<!-- wp:paragraph {"style":{"typography":{"fontSize":"12px","lineHeight":"1.3"},"color":{"text":"#ffe074","link":"#ffe074"}}} -->

@@ -19,8 +19,8 @@ return array(
 	<h6 class="has-black-color has-text-color">ECOSYSTEM</h6>
 	<!-- /wp:heading -->
 	
-	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1"}},"textColor":"black","fontSize":"huge"} -->
-	<p class="has-black-color has-text-color has-huge-font-size" style="line-height:1.1"><strong>'. __("Positive growth.") . '</strong></p>
+	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"5vw"}},"textColor":"black"} -->
+	<p class="has-black-color has-text-color" style="font-size:5vw;line-height:1.1"><strong>'. __("Positive growth.") . '</strong></p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column -->
 	
