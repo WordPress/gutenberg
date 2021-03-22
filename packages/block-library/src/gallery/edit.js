@@ -231,6 +231,16 @@ function GalleryEdit( props ) {
 				return file;
 			} );
 
+		// Because we are reusing existing innerImage blocks any reordering
+		// done in the media libary will be lost so we need to reapply that ordering
+		// once the new image blocks are merged in with existing.
+		const newOrderMap = processedImages.reduce(
+			( result, image, index ) => (
+				( result[ image.id ] = index ), result
+			),
+			{}
+		);
+
 		const existingImageBlocks = ! newFileUploads
 			? innerBlockImages.filter( ( block ) =>
 					processedImages.find(
@@ -255,7 +265,11 @@ function GalleryEdit( props ) {
 
 		replaceInnerBlocks(
 			clientId,
-			concat( existingImageBlocks, newBlocks )
+			concat( existingImageBlocks, newBlocks ).sort(
+				( a, b ) =>
+					newOrderMap[ a.attributes.id ] -
+					newOrderMap[ b.attributes.id ]
+			)
 		);
 	}
 
