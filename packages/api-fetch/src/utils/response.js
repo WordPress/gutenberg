@@ -24,6 +24,9 @@ const parseResponse = ( response, shouldParseResponse = true ) => {
 };
 
 /**
+ * Calls the `json` function on the Response, throwing an error if the response
+ * doesn't have a json function or if parsing the json itself fails.
+ *
  * @param {Response} response
  * @return {Promise<any>} Parsed response.
  */
@@ -60,6 +63,7 @@ export const parseResponseAndNormalizeError = (
 };
 
 /**
+ * Parses a response, throwing an error if parsing the response fails.
  *
  * @param {Response} response
  * @param {boolean} shouldParseResponse
