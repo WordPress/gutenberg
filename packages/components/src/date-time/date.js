@@ -11,40 +11,55 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
 /**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
+import { Component, createRef, useEffect, useRef } from '@wordpress/element';
 import { isRTL, _n, sprintf } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import VisuallyHidden from '../visually-hidden';
 
 /**
  * Module Constants
  */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
-function DatePickerDay( { day, events } ) {
+function DatePickerDay( { day, events = [] } ) {
+	const ref = useRef();
+
+	// a11y hack to make the `There is/are n events` string
+	// available speaking for readers,
+	// re-defining the aria-label attribute.
+	// This attribute is handled by the react-dates component.
+	useEffect( () => {
+		if ( ! ref?.current?.parentNode ) {
+			return;
+		}
+
+		if ( ! events.length ) {
+			return;
+		}
+
+		const { parentNode } = ref.current;
+
+		const eventsString = sprintf(
+			/* translators: %d: number of calendar events. */
+			_n( 'There is %d event', 'There are %d events', events.length ),
+			events.length
+		);
+
+		const initAriaLabel =
+			parentNode
+				.getAttribute( 'aria-label' )
+				.replace( /\. There (?:are|is) \d+ event\s?/, '' ) +
+			`. ${ eventsString }`;
+
+		parentNode.setAttribute( 'aria-label', initAriaLabel );
+	}, [ ref, events.length ] );
+
 	return (
 		<div
+			ref={ ref }
 			className={ classnames( 'components-datetime__date__day', {
 				'has-events': events?.length,
 			} ) }
 		>
 			{ day.format( 'D' ) }
-			{ events?.length > 0 && (
-				<VisuallyHidden>
-					{ sprintf(
-						/* translators: %d: number of calendar events. */
-						_n(
-							'There is %d event.',
-							'There are %d events.',
-							events.length
-						),
-						events.length
-					) }
-				</VisuallyHidden>
-			) }
 		</div>
 	);
 }
