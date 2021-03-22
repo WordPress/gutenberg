@@ -61,7 +61,7 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 								'autofocus[panel]': 'widgets',
 								return: 'themes.php?page=gutenberg-widgets',
 							} ) }
-							isSecondary
+							isTertiary
 						>
 							{ __( 'Manage with live preview' ) }
 						</Button>
