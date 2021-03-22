@@ -745,13 +745,15 @@ class WP_Theme_JSON {
 	 * @return array Returns the modified $declarations.
 	 */
 	private static function compute_theme_vars( $declarations, $settings ) {
-		$custom_values = _wp_array_get( $settings, array( 'custom' ), array() );
-		$css_vars      = self::flatten_tree( $custom_values );
-		foreach ( $css_vars as $key => $value ) {
-			$declarations[] = array(
-				'name'  => '--wp--custom--' . $key,
-				'value' => $value,
-			);
+		foreach ( array( 'layout', 'custom' ) as $tree ) {
+			$values   = _wp_array_get( $settings, array( $tree ), array() );
+			$css_vars = self::flatten_tree( $values );
+			foreach ( $css_vars as $key => $value ) {
+				$declarations[] = array(
+					'name'  => '--wp--' . $tree . '--' . $key,
+					'value' => $value,
+				);
+			}
 		}
 
 		return $declarations;
