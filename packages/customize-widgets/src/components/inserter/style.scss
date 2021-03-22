@@ -22,17 +22,13 @@
 	justify-content: space-between;
 	align-items: center;
 	padding: $grid-unit-20;
-	// Match the "wp-full-overlay-header" height in core.
-	height: 45px;
+	// Match the "wp-full-overlay-header" height in core, plus the 1px border.
+	height: 46px;
 	box-sizing: border-box;
+	border-bottom: 1px solid $gray-300;
 
 	.customize-widgets-layout__inserter-panel-header-title {
 		margin: 0;
-	}
-
-	.customize-widgets-layout__inserter-panel-header-close-button {
-		text-decoration: none;
-		text-transform: uppercase;
 	}
 }
 
