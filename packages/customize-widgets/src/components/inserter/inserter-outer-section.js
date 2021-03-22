@@ -2,7 +2,7 @@ const {
 	wp: { customize },
 } = window;
 
-export const inserterOuterSectionId = 'widgets-inserter';
+export const inserterId = 'widgets-inserter';
 
 const OuterSection = customize.OuterSection;
 // Override the OuterSection class to handle multiple outer sections.
@@ -29,19 +29,12 @@ customize.OuterSection = class extends OuterSection {
 // Handle constructor so that "params.type" can be correctly pointed to "outer".
 customize.sectionConstructor.outer = customize.OuterSection;
 
-export function getContainer() {
-	return document.getElementById(
-		`sub-accordion-section-${ inserterOuterSectionId }`
-	);
-}
+const inserter = new customize.OuterSection( inserterId, {} );
 
-export default function initializeInserterOuterSection() {
-	const outerSection = new customize.OuterSection(
-		inserterOuterSectionId,
-		{}
-	);
+customize.section.add( inserter );
 
-	customize.section.add( outerSection );
+export const inserterContainer = document.getElementById(
+	`sub-accordion-section-${ inserterId }`
+);
 
-	return outerSection;
-}
+export default inserter;
