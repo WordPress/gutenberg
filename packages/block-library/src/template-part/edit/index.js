@@ -28,7 +28,7 @@ import { TemplatePartAdvancedControls } from './advanced-controls';
 import { getTagBasedOnArea } from './get-tag-based-on-area';
 
 export default function TemplatePartEdit( {
-	attributes: { slug, theme, tagName },
+	attributes: { slug, theme, tagName, layout = {} },
 	setAttributes,
 	clientId,
 } ) {
@@ -152,6 +152,7 @@ export default function TemplatePartEdit( {
 					<TemplatePartInnerBlocks
 						postId={ templatePartId }
 						hasInnerBlocks={ innerBlocks.length > 0 }
+						layout={ layout }
 					/>
 				) }
 				{ ! isPlaceholder && ! isResolved && <Spinner /> }

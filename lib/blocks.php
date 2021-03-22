@@ -344,3 +344,20 @@ function gutenberg_register_legacy_social_link_blocks() {
 }
 
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
+
+/**
+ * Filters the default block categories array to add a new one for themes.
+ * Should be removed and turned into a core.trac ticket for merge.
+ *
+ * @param array $categories The list of default block categories.
+ */
+function gutenberg_register_theme_block_category( $categories ) {
+	$categories[] = array(
+		'slug'  => 'theme',
+		'title' => _x( 'Theme', 'block category', 'gutenberg' ),
+		'icon'  => null,
+	);
+	return $categories;
+}
+
+add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
