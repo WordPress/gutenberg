@@ -2,14 +2,10 @@ name: End-to-End Tests
 
 on:
   pull_request:
-    paths-ignore:
-    - '**.md'
   push:
     branches:
       - trunk
       - 'wp/**'
-    paths-ignore:
-    - '**.md'
 
 jobs:
   admin:

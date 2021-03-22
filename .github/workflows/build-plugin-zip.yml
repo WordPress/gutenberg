@@ -2,12 +2,8 @@ name: Build Gutenberg Plugin Zip
 
 on:
   pull_request:
-    paths-ignore:
-    - '**.md'
   push:
     branches: [trunk]
-    paths-ignore:
-    - '**.md'
   workflow_dispatch:
     inputs:
       version:
