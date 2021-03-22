@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, map } from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -15,10 +15,15 @@ import { uploadMedia } from '@wordpress/media-utils';
  * Internal dependencies
  */
 import {
+	MENU_ROOT,
 	MENU_TEMPLATE_PARTS,
+	MENU_TEMPLATES_UNUSED,
 	TEMPLATE_PARTS_SUB_MENUS,
-	MENU_TEMPLATES,
 } from '../components/navigation-sidebar/navigation-panel/constants';
+import {
+	getTemplateLocation,
+	isTemplateSuperseded,
+} from '../components/navigation-sidebar/navigation-panel/template-hierarchy';
 
 /**
  * Returns whether the given feature is enabled or not.
@@ -153,9 +158,6 @@ export function getNavigationPanelActiveMenu( state ) {
  * Returns the current template or template part's corresponding
  * navigation panel's sub menu, to be used with `openNavigationPanelToMenu`.
  *
- * Currently, while template parts return their sub menu,
- * templates always return their main menu.
- *
  * @param {Object} state Global application state.
  *
  * @return {string} The current template or template part's sub menu.
@@ -163,10 +165,6 @@ export function getNavigationPanelActiveMenu( state ) {
 export const getCurrentTemplateNavigationPanelSubMenu = createRegistrySelector(
 	( select ) => ( state ) => {
 		const templateType = getEditedPostType( state );
-		if ( 'wp_template' === templateType ) {
-			return MENU_TEMPLATES;
-		}
-
 		const templateId = getEditedPostId( state );
 		const template = templateId
 			? select( coreDataStore ).getEntityRecord(
@@ -176,11 +174,41 @@ export const getCurrentTemplateNavigationPanelSubMenu = createRegistrySelector(
 			  )
 			: null;
 
-		return (
-			TEMPLATE_PARTS_SUB_MENUS.find(
-				( submenu ) => submenu.area === template?.area
-			)?.menu || MENU_TEMPLATE_PARTS
+		if ( ! template ) {
+			return MENU_ROOT;
+		}
+
+		if ( 'wp_template_part' === templateType ) {
+			return (
+				TEMPLATE_PARTS_SUB_MENUS.find(
+					( submenu ) => submenu.area === template?.area
+				)?.menu || MENU_TEMPLATE_PARTS
+			);
+		}
+
+		const templates = select( coreDataStore ).getEntityRecords(
+			'postType',
+			'wp_template',
+			{
+				per_page: -1,
+			}
 		);
+		const showOnFront = select( coreDataStore ).getEditedEntityRecord(
+			'root',
+			'site'
+		).show_on_front;
+
+		if (
+			isTemplateSuperseded(
+				template.slug,
+				map( templates, 'slug' ),
+				showOnFront
+			)
+		) {
+			return MENU_TEMPLATES_UNUSED;
+		}
+
+		return getTemplateLocation( template.slug );
 	}
 );
 
