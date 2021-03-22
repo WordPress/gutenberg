@@ -95,8 +95,6 @@ export default function Inspector( {
 				'accordion-section-content',
 				'accordion-section',
 				'customize-widgets-layout__inspector',
-				// Required for some CSS to work.
-				'interface-complementary-area',
 				{
 					open: isOpened,
 					// Needed to keep the inspector visible while closing.
