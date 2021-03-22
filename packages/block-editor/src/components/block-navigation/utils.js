@@ -21,12 +21,12 @@ export const getBlockPositionDescription = ( position, siblingCount, level ) =>
  * Returns true if the client ID occurs within the block selection or multi-selection,
  * or false otherwise.
  *
- * @param {string}          clientId              Block client ID.
- * @param {string|string[]} selectedBlockClientId Selected block client ID, or an array of multi-selected blocks client IDs.
+ * @param {string}          clientId               Block client ID.
+ * @param {string|string[]} selectedBlockClientIds Selected block client ID, or an array of multi-selected blocks client IDs.
  *
  * @return {boolean} Whether the block is in multi-selection set.
  */
-export const isClientIdSelected = ( clientId, selectedBlockClientId ) =>
-	isArray( selectedBlockClientId ) && selectedBlockClientId.length
-		? selectedBlockClientId.indexOf( clientId ) !== -1
-		: selectedBlockClientId === clientId;
+export const isClientIdSelected = ( clientId, selectedBlockClientIds ) =>
+	isArray( selectedBlockClientIds ) && selectedBlockClientIds.length
+		? selectedBlockClientIds.indexOf( clientId ) !== -1
+		: selectedBlockClientIds === clientId;
