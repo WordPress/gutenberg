@@ -6,14 +6,15 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { BlockVerticalAlignmentToolbar } from '../';
+import BlockVerticalAlignmentUI from '../ui';
 
-describe( 'BlockVerticalAlignmentToolbar', () => {
+describe( 'BlockVerticalAlignmentUI', () => {
 	const alignment = 'top';
 	const onChange = jest.fn();
 
 	const wrapper = shallow(
-		<BlockVerticalAlignmentToolbar
+		<BlockVerticalAlignmentUI
+			isToolbar
 			value={ alignment }
 			onChange={ onChange }
 		/>

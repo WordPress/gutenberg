@@ -43,6 +43,7 @@ body.is-navigation-sidebar-open {
 		padding-left: 0;
 		transition: padding-left 20ms linear;
 		transition-delay: 0ms;
+		@include reduce-motion("transition");
 	}
 }
 
