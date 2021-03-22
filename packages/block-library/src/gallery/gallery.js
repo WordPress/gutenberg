@@ -57,7 +57,7 @@ export const Gallery = ( props ) => {
 	}, [ isSelected ] );
 
 	return (
-		<figure
+		<div
 			ref={ galleryRef }
 			{ ...blockProps }
 			className={ classnames( blockProps.className, {
@@ -66,7 +66,7 @@ export const Gallery = ( props ) => {
 				'is-cropped': imageCrop,
 			} ) }
 		>
-			<ul { ...innerBlocksProps } />
+			<figure { ...innerBlocksProps } />
 
 			{ mediaPlaceholder }
 			<RichTextVisibilityHelper
@@ -82,7 +82,7 @@ export const Gallery = ( props ) => {
 					insertBlocksAfter( createBlock( 'core/paragraph' ) )
 				}
 			/>
-		</figure>
+		</div>
 	);
 };
 
