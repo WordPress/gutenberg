@@ -43,7 +43,7 @@ function NavigationToggle( { icon, isOpen } ) {
 
 	const toggleNavigationPanel = () => {
 		if ( isOpen ) {
-			setIsNavigationPanelOpened( ! isOpen );
+			setIsNavigationPanelOpened( false );
 			return;
 		}
 		openNavigationPanelToMenu( navigationPanelMenu );
