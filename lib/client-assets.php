@@ -645,12 +645,12 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		unset( $settings['styles'][ $i ] );
 	}
 
-	// Remove the default font editor styles.
-	// When Gutenberg is updated to have minimum version of WordPress 5.8
-	// This could be removed.
-	foreach ( $settings['styles'] as $j => $style ) {
-		if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {
-			unset( $settings['styles'][ $j ] );
+	// Remove the default font editor styles for FSE themes.
+	if ( gutenberg_is_fse_theme() ) {
+		foreach ( $settings['styles'] as $j => $style ) {
+			if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {
+				unset( $settings['styles'][ $j ] );
+			}
 		}
 	}
 
