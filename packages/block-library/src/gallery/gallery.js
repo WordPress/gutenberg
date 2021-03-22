@@ -14,7 +14,6 @@ import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { useRef, useEffect } from '@wordpress/element';
-import { View } from '@wordpress/primitives';
 
 /**
  * Internal dependencies
@@ -39,17 +38,12 @@ export const Gallery = ( props ) => {
 		imageCrop,
 	} = attributes;
 	const galleryRef = useRef();
-	const { children, ...innerBlocksProps } = useInnerBlocksProps(
-		{
-			className: 'blocks-gallery-grid',
-		},
-		{
-			allowedBlocks: [ 'core/image' ],
-			orientation: 'horizontal',
-			renderAppender: false,
-			__experimentalLayout: { type: 'default', alignments: [] },
-		}
-	);
+	const { children, ...innerBlocksProps } = useInnerBlocksProps( blockProps, {
+		allowedBlocks: [ 'core/image' ],
+		orientation: 'horizontal',
+		renderAppender: false,
+		__experimentalLayout: { type: 'default', alignments: [] },
+	} );
 
 	useEffect( () => {
 		if ( galleryRef.current && isSelected ) {
@@ -58,35 +52,35 @@ export const Gallery = ( props ) => {
 	}, [ isSelected ] );
 
 	return (
-		<View
+		<figure
 			ref={ galleryRef }
-			{ ...blockProps }
-			className={ classnames( blockProps.className, {
-				[ `align${ align }` ]: align,
-				[ `columns-${ columns }` ]: columns,
-				'is-cropped': imageCrop,
-			} ) }
+			{ ...innerBlocksProps }
+			className={ classnames(
+				blockProps.className,
+				'blocks-gallery-grid',
+				{
+					[ `align${ align }` ]: align,
+					[ `columns-${ columns }` ]: columns,
+					'is-cropped': imageCrop,
+				}
+			) }
 		>
-			<figure { ...innerBlocksProps }>
-				{ children }
-				<RichTextVisibilityHelper
-					isHidden={ ! isSelected && RichText.isEmpty( caption ) }
-					tagName="figcaption"
-					className="blocks-gallery-caption"
-					aria-label={ __( 'Gallery caption text' ) }
-					placeholder={ __( 'Write gallery caption…' ) }
-					value={ caption }
-					onChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
-					inlineToolbar
-					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter( createBlock( 'core/paragraph' ) )
-					}
-				/>
-			</figure>
+			{ children }
+			<RichTextVisibilityHelper
+				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
+				tagName="figcaption"
+				className="blocks-gallery-caption"
+				aria-label={ __( 'Gallery caption text' ) }
+				placeholder={ __( 'Write gallery caption…' ) }
+				value={ caption }
+				onChange={ ( value ) => setAttributes( { caption: value } ) }
+				inlineToolbar
+				__unstableOnSplitAtEnd={ () =>
+					insertBlocksAfter( createBlock( 'core/paragraph' ) )
+				}
+			/>
 			{ mediaPlaceholder }
-		</View>
+		</figure>
 	);
 };
 
