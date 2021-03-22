@@ -24,13 +24,13 @@ const relativeToAbsolute = ( basePath, relativePath ) => {
 	}
 
 	for ( const ext of extensions ) {
-		let targetFile = target + ext;
-		if ( fs.existsSync( targetFile ) ) {
-			return targetFile;
+		const targetFileWithExtension = target + ext;
+		if ( fs.existsSync( targetFileWithExtension ) ) {
+			return targetFileWithExtension;
 		}
-		targetFile = path.join( target, 'index' + ext );
-		if ( fs.existsSync( targetFile ) ) {
-			return targetFile;
+		const targetFileAsIndexModule = path.join( target, 'index' + ext );
+		if ( fs.existsSync( targetFileAsIndexModule ) ) {
+			return targetFileAsIndexModule;
 		}
 	}
 
