@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useReducer, useMemo, createPortal } from '@wordpress/element';
+import { useReducer, createPortal } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockList,
@@ -16,11 +16,6 @@ import {
 	SlotFillProvider,
 	Popover,
 } from '@wordpress/components';
-
-/**
- * External dependencies
- */
-import { useDialogState } from 'reakit/Dialog';
 
 /**
  * Internal dependencies
@@ -52,21 +47,10 @@ const inspectorOpenStateReducer = ( state, action ) => {
 
 export default function SidebarBlockEditor( { sidebar } ) {
 	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
-	const inserter = useDialogState( {
-		modal: false,
-		animated: 150,
-	} );
 	const [
 		{ open: isInspectorOpened, busy: isInspectorAnimating },
 		setInspectorOpenState,
 	] = useReducer( inspectorOpenStateReducer, { open: false, busy: false } );
-	const settings = useMemo(
-		() => ( {
-			__experimentalSetIsInserterOpened: inserter.setVisible,
-		} ),
-		[ inserter.setVisible ]
-	);
-
 	const parentContainer = document.getElementById(
 		'customize-theme-controls'
 	);
@@ -81,7 +65,6 @@ export default function SidebarBlockEditor( { sidebar } ) {
 							value={ blocks }
 							onInput={ onInput }
 							onChange={ onChange }
-							settings={ settings }
 							useSubRegistry={ false }
 						>
 							<BlockEditorKeyboardShortcuts />
