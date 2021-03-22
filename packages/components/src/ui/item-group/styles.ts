@@ -62,15 +62,26 @@ export const rounded = css`
 	}
 `;
 
-const paddingY = `calc((${ ui.get( 'controlHeight' ) } - ${ ui.get(
-	'fontSize'
-) }) / 2)`;
-const paddingYSmall = `calc((${ ui.get( 'controlHeightSmall' ) } - ${ ui.get(
-	'fontSize'
-) }) / 2)`;
-const paddingYLarge = `calc((${ ui.get( 'controlHeightLarge' ) } - ${ ui.get(
-	'fontSize'
-) }) / 2)`;
+const baseFontHeight = `calc(${ ui.get( 'fontSize' ) } * ${ ui.get(
+	'fontLineHeightBase'
+) })`;
+
+/*
+ * Math:
+ * - Use the desired height as the base value
+ * - Subtract the computed height of (default) text
+ * - Subtract the effects of border
+ * - Divide the calculated number by 2, in order to get an individual top/bottom padding
+ */
+const paddingY = `calc((${ ui.get(
+	'controlHeight'
+) } - ${ baseFontHeight } - 2px) / 2)`;
+const paddingYSmall = `calc((${ ui.get(
+	'controlHeightSmall'
+) } - ${ baseFontHeight } - 2px) / 2)`;
+const paddingYLarge = `calc((${ ui.get(
+	'controlHeightLarge'
+) } - ${ baseFontHeight } - 2px) / 2)`;
 
 export const itemSizes = {
 	small: css`
