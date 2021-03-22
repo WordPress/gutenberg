@@ -14,6 +14,7 @@ import { compose } from '@wordpress/compose';
 import traverse from './traverse';
 import urlRewrite from './transforms/url-rewrite';
 import wrap from './transforms/wrap';
+import avoidEditorComponents from './transforms/avoid-editor-components';
 
 /**
  * Applies a series of CSS rule transforms to wrap selectors inside a given class and/or rewrite URLs depending on the parameters passed.
@@ -29,6 +30,7 @@ const transformStyles = ( styles, wrapperClassName = '' ) => {
 			const transforms = [];
 			if ( wrapperClassName && ! __experimentalNoWrapper ) {
 				transforms.push( wrap( wrapperClassName ) );
+				transforms.push( avoidEditorComponents( ) );
 			}
 			if ( baseURL ) {
 				transforms.push( urlRewrite( baseURL ) );
