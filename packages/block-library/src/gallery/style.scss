@@ -102,7 +102,7 @@
 	// Cropped Images.
 	&.is-cropped ul.blocks-gallery-grid li.list-image:not(#individual-image) {
 		align-self: inherit;
-		figure > div,
+		figure > div:not(.components-drop-zone),
 		figure > a {
 			// Avoid applying flex styles to IE11.
 			@supports ( position: sticky ) {
