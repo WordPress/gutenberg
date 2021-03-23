@@ -2120,6 +2120,6 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 	]
 );
 
-export function __experimentalIsInsertionPointDisabled( state ) {
-	return state.insertionPointDisabledStatus;
+export function isInsertionPointPopoverHidden( state ) {
+	return state.insertionPointPopoverHiddenStatus;
 }

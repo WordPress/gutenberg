@@ -55,15 +55,16 @@ export default function TemplatePartInnerBlocks( {
 	} );
 
 	const [ isHovered, setIsHovered ] = useState( false );
-	const { disableInsertionPoint, enableInsertionPoint } = useDispatch(
-		blockEditorStore
-	);
+	const {
+		hideInsertionPointPopover,
+		showInsertionPointPopover,
+	} = useDispatch( blockEditorStore );
 
 	useEffect( () => {
 		if ( isHovered && ! isSelected ) {
-			disableInsertionPoint();
+			hideInsertionPointPopover();
 		} else {
-			enableInsertionPoint();
+			showInsertionPointPopover();
 		}
 	}, [ isSelected, isHovered ] );
 

@@ -1381,14 +1381,14 @@ export function setHasControlledInnerBlocks(
 	};
 }
 
-export function disableInsertionPoint() {
+export function hideInsertionPointPopover() {
 	return {
-		type: 'DISABLE_INSERTION_POINT',
+		type: 'HIDE_INSERTION_POINT_POPOVER',
 	};
 }
 
-export function enableInsertionPoint() {
+export function showInsertionPointPopover() {
 	return {
-		type: 'ENABLE_INSERTION_POINT',
+		type: 'SHOW_INSERTION_POINT_POPOVER',
 	};
 }

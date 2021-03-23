@@ -1727,11 +1727,11 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
-export function insertionPointDisabledStatus( state = false, action ) {
-	if ( action.type === 'DISABLE_INSERTION_POINT' ) {
+export function insertionPointPopoverHiddenStatus( state = false, action ) {
+	if ( action.type === 'HIDE_INSERTION_POINT_POPOVER' ) {
 		return true;
 	}
-	if ( action.type === 'ENABLE_INSERTION_POINT' ) {
+	if ( action.type === 'SHOW_INSERTION_POINT_POPOVER' ) {
 		return false;
 	}
 	return state;
@@ -1758,5 +1758,5 @@ export default combineReducers( {
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
-	insertionPointDisabledStatus,
+	insertionPointPopoverHiddenStatus,
 } );
