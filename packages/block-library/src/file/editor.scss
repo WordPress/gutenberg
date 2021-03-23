@@ -8,13 +8,8 @@
 		flex-grow: 1;
 	}
 
-	.wp-block-file__textlink {
-		display: inline-block;
+	a {
 		min-width: 1em;
-
-		&:focus {
-			box-shadow: none;
-		}
 	}
 
 	.wp-block-file__button-richtext-wrapper {
