@@ -70,7 +70,7 @@ export default function Header( {
 						popoverProps={ {
 							className:
 								'edit-navigation-header__menu-switcher-dropdown',
-							position: 'bottom left',
+							position: 'bottom center',
 						} }
 					>
 						{ ( { onClose } ) => (
