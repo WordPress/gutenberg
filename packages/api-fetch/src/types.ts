@@ -10,7 +10,6 @@ export interface ApiFetchRequestProps extends RequestInit {
 	data?: any;
 	namespace?: string;
 	endpoint?: string;
-	method?: string;
 }
 
 export type ApiFetchMiddleware = (
