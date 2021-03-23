@@ -9,7 +9,6 @@ import classnames from 'classnames';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
-	BlockToolbar,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
 import {
@@ -44,6 +43,7 @@ import NavigationEditorShortcuts from './shortcuts';
 import Sidebar from './sidebar';
 import Header from '../header';
 import Notices from '../notices';
+import BlockToolbar from './block-toolbar';
 import Editor from '../editor';
 import InspectorAdditions from '../inspector-additions';
 import { store as editNavigationStore } from '../../store';
@@ -151,14 +151,11 @@ export default function Layout( { blockEditorSettings } ) {
 
 											{ isBlockEditorReady && (
 												<>
-													<Popover.Slot name="block-toolbar" />
-													{ ! isLargeViewport && (
-														<div className="edit-navigation-layout__block-toolbar">
-															<BlockToolbar
-																hideDragHandle
-															/>
-														</div>
-													) }
+													<BlockToolbar
+														isFixed={
+															! isLargeViewport
+														}
+													/>
 													<div
 														className="edit-navigation-layout__content-area"
 														ref={ contentAreaRef }
