@@ -8,6 +8,7 @@
 		{ "path": "../url" }
 	],
 	"include": [
+		"src/middlewares/http-v1.js",
 		"src/middlewares/media-upload.js",
 		"src/middlewares/namespace-endpoint.js",
 		"src/middlewares/nonce.js",
