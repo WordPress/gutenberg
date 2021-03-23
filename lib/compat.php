@@ -13,7 +13,7 @@
  *
  * @return bool
  */
-function gutenberg_should_load_separate_block_styles() {
+function gutenberg_should_load_separate_block_assets() {
 	$load_separate_styles = gutenberg_is_fse_enabled();
 	/**
 	 * Determine if separate styles will be loaded for blocks on-render or not.
