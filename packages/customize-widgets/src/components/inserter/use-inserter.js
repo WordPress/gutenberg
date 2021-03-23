@@ -40,19 +40,17 @@ export const useInserterContainer = () =>
 	document.getElementById( `sub-accordion-section-${ inserterId }` );
 
 export default function useInserter() {
-	const [ isInserterOpened, setIsInserterOpened ] = useState( false );
-
 	const inserterRef = useRef( customize.section( inserterId ) );
 
 	if ( ! inserterRef.current ) {
 		inserterRef.current = new customize.OuterSection( inserterId, {} );
 
-		inserterRef.current.expanded.bind( ( expanded ) => {
-			setIsInserterOpened( expanded );
-		} );
-
 		customize.section.add( inserterRef.current );
 	}
+
+	const [ isInserterOpened, setIsInserterOpened ] = useState( () =>
+		inserterRef.current.expanded()
+	);
 
 	// This is useful when the expanded state is controlled from outside React,
 	// like when handling multiple outer sections above.
