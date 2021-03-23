@@ -84,7 +84,7 @@ public class WPAndroidGlueCode {
     private OnMediaLibraryButtonListener mOnMediaLibraryButtonListener;
     private OnReattachMediaUploadQueryListener mOnReattachMediaUploadQueryListener;
     private OnReattachMediaSavingQueryListener mOnReattachMediaSavingQueryListener;
-    // private OnSetFeaturedImageListener mOnSetFeaturedImageListener;
+    private OnSetFeaturedImageListener mOnSetFeaturedImageListener;
     private OnEditorMountListener mOnEditorMountListener;
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
@@ -149,8 +149,8 @@ public class WPAndroidGlueCode {
         void onCancelUploadForMediaClicked(int mediaId);
         void onCancelUploadForMediaDueToDeletedBlock(int mediaId);
 
-        void onSetFeaturedImageButtonClicked(int mediaId);
-        void onGetFeaturedImageId(int mediaId);
+       // void onSetFeaturedImageButtonClicked(int mediaId);
+       // void onGetFeaturedImageId(int mediaId);
 
         ArrayList<MediaOption> onGetOtherMediaImageOptions();
         ArrayList<MediaOption> onGetOtherMediaFileOptions();
@@ -178,9 +178,10 @@ public class WPAndroidGlueCode {
         void onQueryCurrentProgressForSavingMedia();
     }
 
-    /* public interface OnSetFeaturedImageListener {
+    public interface OnSetFeaturedImageListener {
         void onSetFeaturedImageButtonClicked(int mediaId);
-    } */
+        void onGetFeaturedImageId(int mediaId);
+    }
 
     public interface OnEditorMountListener {
         void onEditorDidMount(ArrayList<Object> unsupportedBlockNames);
@@ -333,12 +334,12 @@ public class WPAndroidGlueCode {
 
             @Override
             public void setFeaturedImage(int mediaId) {
-                mOnMediaLibraryButtonListener.onSetFeaturedImageButtonClicked(mediaId);
+                mOnSetFeaturedImageListener.onSetFeaturedImageButtonClicked(mediaId);
             }
 
             @Override
             public void getFeaturedImageId(int mediaId) {
-                mOnMediaLibraryButtonListener.onGetFeaturedImageId(mediaId);
+                mOnSetFeaturedImageListener.onGetFeaturedImageId(mediaId);
             }
 
             @Override
@@ -568,7 +569,7 @@ public class WPAndroidGlueCode {
                                   OnMediaLibraryButtonListener onMediaLibraryButtonListener,
                                   OnReattachMediaUploadQueryListener onReattachMediaUploadQueryListener,
                                   OnReattachMediaSavingQueryListener onReattachMediaSavingQueryListener,
-                                  // OnSetFeaturedImageListener onSetFeaturedImageListener,
+                                  OnSetFeaturedImageListener onSetFeaturedImageListener,
                                   OnEditorMountListener onEditorMountListener,
                                   OnEditorAutosaveListener onEditorAutosaveListener,
                                   OnAuthHeaderRequestedListener onAuthHeaderRequestedListener,
@@ -588,7 +589,7 @@ public class WPAndroidGlueCode {
         mOnMediaLibraryButtonListener = onMediaLibraryButtonListener;
         mOnReattachMediaUploadQueryListener = onReattachMediaUploadQueryListener;
         mOnReattachMediaSavingQueryListener = onReattachMediaSavingQueryListener;
-        // mOnSetFeaturedImageListener = onSetFeaturedImageListener;
+        mOnSetFeaturedImageListener = onSetFeaturedImageListener;
         mOnEditorMountListener = onEditorMountListener;
         mOnEditorAutosaveListener = onEditorAutosaveListener;
         mRequestExecutor = fetchExecutor;
@@ -991,7 +992,7 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaIdChanged(oldId, newId, oldUrl);
     }
 
-    public void featuredImageIdNotifier(int mediaId) {
+    public void onRequestFeaturedImageId(int mediaId) {
         mDeferredEventEmitter.onRequestFeaturedImageId(mediaId);
     }
 
