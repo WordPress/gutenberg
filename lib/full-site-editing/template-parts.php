@@ -163,12 +163,12 @@ function set_unique_slug_on_create_template_part( $post_id ) {
 add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template_part' );
 
 /**
- * Returns a filtered list of allowed area types for template parts.
+ * Returns a filtered list of allowed area values for template parts.
  *
- * @return array The supported template part area types.
+ * @return array The supported template part area values.
  */
-function gutenberg_get_allowed_template_part_area_types() {
-	$default_area_types = array(
+function gutenberg_get_allowed_template_part_areas() {
+	$default_area_values = array(
 		WP_TEMPLATE_PART_AREA_HEADER,
 		WP_TEMPLATE_PART_AREA_FOOTER,
 		WP_TEMPLATE_PART_AREA_SIDEBAR,
@@ -176,28 +176,28 @@ function gutenberg_get_allowed_template_part_area_types() {
 	);
 
 	/**
-	 * Filters the list of allowed template part area types.
+	 * Filters the list of allowed template part area values.
 	 *
-	 * @param array $default_area_types An array of supported area types.
+	 * @param array $default_area_values An array of supported area values.
 	 */
-	return apply_filters( 'default_wp_template_part_area_types', $default_area_types );
+	return apply_filters( 'default_wp_template_part_areas', $default_area_values );
 }
 
 /**
- * Checks whether the input 'type' is a supported area type.
- * Returns the input if supported, otherwise returns the 'other' type.
+ * Checks whether the input 'area' is a supported value.
+ * Returns the input if supported, otherwise returns the 'uncategorized' value.
  *
  * @param string $type Template part area name.
  *
- * @return string Input if supported, else 'other'.
+ * @return string Input if supported, else the uncategorized value.
  */
-function gutenberg_filter_template_part_area_type( $type ) {
-	if ( in_array( $type, gutenberg_get_allowed_template_part_area_types(), true ) ) {
+function gutenberg_filter_template_part_area( $type ) {
+	if ( in_array( $type, gutenberg_get_allowed_template_part_areas(), true ) ) {
 		return $type;
 	}
-	$warning_message  = '"' . $type . '"';
-	$warning_message .= __( ' is not a supported wp_template_part_area type and has been added as ', 'gutenberg' );
-	$warning_message .= '"' . WP_TEMPLATE_PART_AREA_UNCATEGORIZED . '".';
+
+	/* translators: %1$s: Template area type, %2$s: the uncategorized template area value. */
+	$warning_message = sprintf( __( '"%1$s" is not a supported wp_template_part area value and has been added as "%2$s".', 'gutenberg' ), $type, WP_TEMPLATE_PART_AREA_UNCATEGORIZED );
 	trigger_error( $warning_message, E_USER_NOTICE );
 	return WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 }

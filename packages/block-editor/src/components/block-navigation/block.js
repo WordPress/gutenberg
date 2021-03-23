@@ -33,6 +33,8 @@ import { store as blockEditorStore } from '../../store';
 export default function BlockNavigationBlock( {
 	block,
 	isSelected,
+	isBranchSelected,
+	isLastOfSelectedBranch,
 	onClick,
 	position,
 	level,
@@ -116,6 +118,12 @@ export default function BlockNavigationBlock( {
 		<BlockNavigationLeaf
 			className={ classnames( {
 				'is-selected': isSelected,
+				'is-branch-selected':
+					withExperimentalPersistentListViewFeatures &&
+					isBranchSelected,
+				'is-last-of-selected-branch':
+					withExperimentalPersistentListViewFeatures &&
+					isLastOfSelectedBranch,
 				'is-dragging': isDragging,
 			} ) }
 			onMouseEnter={ onMouseEnter }

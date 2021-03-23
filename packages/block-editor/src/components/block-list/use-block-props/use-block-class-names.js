@@ -27,7 +27,6 @@ export function useBlockClassNames( clientId ) {
 	return useSelect(
 		( select ) => {
 			const {
-				isTyping,
 				isBlockBeingDragged,
 				isBlockHighlighted,
 				isBlockSelected,
@@ -39,7 +38,6 @@ export function useBlockClassNames( clientId ) {
 			} = select( blockEditorStore );
 			const {
 				focusMode,
-				outlineMode,
 				__experimentalSpotlightEntityBlocks: spotlightEntityBlocks,
 			} = getSettings();
 			const isDragging = isBlockBeingDragged( clientId );
@@ -60,17 +58,11 @@ export function useBlockClassNames( clientId ) {
 				'is-multi-selected': isBlockMultiSelected( clientId ),
 				'is-reusable': isReusableBlock( getBlockType( name ) ),
 				'is-dragging': isDragging,
-				// We only care about this prop when the block is selected
-				// Thus to avoid unnecessary rerenders we avoid updating the prop if
-				// the block is not selected.
-				'is-typing':
-					( isSelected || isAncestorOfSelectedBlock ) && isTyping(),
 				'is-focused':
 					focusMode &&
 					isLargeViewport &&
 					( isSelected || isAncestorOfSelectedBlock ),
 				'is-focus-mode': focusMode && isLargeViewport,
-				'is-outline-mode': outlineMode,
 				'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
 				'has-active-entity': activeEntityBlockId,
 				// Determine if there is an active entity area to spotlight.

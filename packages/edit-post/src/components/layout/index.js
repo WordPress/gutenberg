@@ -36,7 +36,7 @@ import {
 	InterfaceSkeleton,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { close } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
@@ -94,7 +94,9 @@ function Layout( { styles } ) {
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
+		supportsLayout,
 	} = useSelect( ( select ) => {
+		const editorSettings = select( 'core/editor' ).getEditorSettings();
 		return {
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
@@ -112,8 +114,8 @@ function Layout( { styles } ) {
 			),
 			isInserterOpened: select( editPostStore ).isInserterOpened(),
 			mode: select( editPostStore ).getEditorMode(),
-			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
-				.richEditingEnabled,
+			isRichEditingEnabled: editorSettings.richEditingEnabled,
+			supportsLayout: editorSettings.supportsLayout,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
@@ -139,6 +141,7 @@ function Layout( { styles } ) {
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 		'show-icon-labels': showIconLabels,
+		'supports-layout': supportsLayout,
 	} );
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
@@ -172,9 +175,7 @@ function Layout( { styles } ) {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
-	const ref = useRef();
-
-	useDrop( ref );
+	const ref = useDrop( ref );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );

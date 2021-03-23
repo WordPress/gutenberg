@@ -24,6 +24,7 @@ const downloadSources = require( '../download-sources' );
 const {
 	checkDatabaseConnection,
 	makeContentDirectoriesWritable,
+	makeConfigWritable,
 	configureWordPress,
 	setupWordPressDirectories,
 } = require( '../wordpress' );
@@ -139,6 +140,11 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 			? [ '--build', '--force-recreate' ]
 			: [],
 	} );
+
+	await Promise.all( [
+		makeConfigWritable( 'development', config ),
+		makeConfigWritable( 'tests', config ),
+	] );
 
 	// Only run WordPress install/configuration when config has changed.
 	if ( shouldConfigureWp ) {

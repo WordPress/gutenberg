@@ -5,7 +5,10 @@
 }
 
 .searchButton {
-	margin-left: $grid-unit-10;
-	margin-right: $grid-unit-10;
+	padding: 0;
+	padding-left: $grid-unit-10;
+	padding-right: $grid-unit-10;
 	background-color: transparent;
+	margin-right: $grid-unit-10;
+	margin-left: $grid-unit-10;
 }

@@ -13,14 +13,23 @@
  * @return string The render.
  */
 function render_block_core_template_part( $attributes ) {
-	$content = null;
-	$area    = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+	static $seen_ids = array();
+
+	$template_part_id = null;
+	$content          = null;
+	$area             = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 
 	if ( ! empty( $attributes['postId'] ) && get_post_status( $attributes['postId'] ) ) {
+		$template_part_id = $attributes['postId'];
 		// If we have a post ID and the post exists, which means this template part
 		// is user-customized, render the corresponding post content.
 		$content = get_post( $attributes['postId'] )->post_content;
-	} elseif ( isset( $attributes['theme'] ) && wp_get_theme()->get_stylesheet() === $attributes['theme'] ) {
+	} elseif (
+		isset( $attributes['slug'] ) &&
+		isset( $attributes['theme'] ) &&
+		wp_get_theme()->get_stylesheet() === $attributes['theme']
+	) {
+		$template_part_id    = $attributes['theme'] . '//' . $attributes['slug'];
 		$template_part_query = new WP_Query(
 			array(
 				'post_type'      => 'wp_template_part',
@@ -56,12 +65,36 @@ function render_block_core_template_part( $attributes ) {
 		}
 	}
 
-	if ( is_null( $content ) ) {
-		return 'Template Part Not Found';
+	if ( ! $template_part_id || is_null( $content ) ) {
+		return __( 'Template Part not found.' );
+	}
+
+	if ( isset( $seen_ids[ $template_part_id ] ) ) {
+		if ( ! is_admin() ) {
+			trigger_error(
+				sprintf(
+					// translators: %s are the block attributes.
+					__( 'Could not render Template Part block with the attributes: <code>%s</code>. Block cannot be rendered inside itself.' ),
+					wp_json_encode( $attributes )
+				),
+				E_USER_WARNING
+			);
+		}
+
+		// WP_DEBUG_DISPLAY must only be honored when WP_DEBUG. This precedent
+		// is set in `wp_debug_mode()`.
+		$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
+			defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+		return $is_debug ?
+			// translators: Visible only in the front end, this warning takes the place of a faulty block.
+			__( '[block rendering halted]' ) :
+			'';
 	}
 
 	// Run through the actions that are typically taken on the_content.
-	$content = do_blocks( $content );
+	$seen_ids[ $template_part_id ] = true;
+	$content                       = do_blocks( $content );
+	unset( $seen_ids[ $template_part_id ] );
 	$content = wptexturize( $content );
 	$content = convert_smilies( $content );
 	$content = wpautop( $content );

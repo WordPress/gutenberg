@@ -57,25 +57,6 @@ class WP_Theme_JSON {
 	const ROOT_BLOCK_SELECTOR = ':root';
 
 	/**
-	 * The supported properties of the root block.
-	 *
-	 * @var array
-	 */
-	const ROOT_BLOCK_SUPPORTS = array(
-		'--wp--style--color--link',
-		'background',
-		'backgroundColor',
-		'color',
-		'fontFamily',
-		'fontSize',
-		'fontStyle',
-		'fontWeight',
-		'lineHeight',
-		'textDecoration',
-		'textTransform',
-	);
-
-	/**
 	 * Data schema of each block within a theme.json.
 	 *
 	 * Example:
@@ -166,6 +147,7 @@ class WP_Theme_JSON {
 				'customTextTransforms'  => null,
 			),
 			'custom'     => null,
+			'layout'     => null,
 		),
 	);
 
@@ -254,73 +236,56 @@ class WP_Theme_JSON {
 	 * Each property declares:
 	 *
 	 * - 'value': path to the value in theme.json and block attributes.
-	 * - 'support': path to the block support in block.json.
 	 */
 	const PROPERTIES_METADATA = array(
 		'--wp--style--color--link' => array(
-			'value'   => array( 'color', 'link' ),
-			'support' => array( 'color', 'link' ),
+			'value' => array( 'color', 'link' ),
 		),
 		'background'               => array(
-			'value'   => array( 'color', 'gradient' ),
-			'support' => array( 'color', 'gradients' ),
+			'value' => array( 'color', 'gradient' ),
 		),
-		'backgroundColor'          => array(
-			'value'   => array( 'color', 'background' ),
-			'support' => array( 'color' ),
+		'background-color'         => array(
+			'value' => array( 'color', 'background' ),
 		),
-		'borderRadius'             => array(
-			'value'   => array( 'border', 'radius' ),
-			'support' => array( '__experimentalBorder', 'radius' ),
+		'border-radius'            => array(
+			'value' => array( 'border', 'radius' ),
 		),
-		'borderColor'              => array(
-			'value'   => array( 'border', 'color' ),
-			'support' => array( '__experimentalBorder', 'color' ),
+		'border-color'             => array(
+			'value' => array( 'border', 'color' ),
 		),
-		'borderWidth'              => array(
-			'value'   => array( 'border', 'width' ),
-			'support' => array( '__experimentalBorder', 'width' ),
+		'border-width'             => array(
+			'value' => array( 'border', 'width' ),
 		),
-		'borderStyle'              => array(
-			'value'   => array( 'border', 'style' ),
-			'support' => array( '__experimentalBorder', 'style' ),
+		'border-style'             => array(
+			'value' => array( 'border', 'style' ),
 		),
 		'color'                    => array(
-			'value'   => array( 'color', 'text' ),
-			'support' => array( 'color' ),
+			'value' => array( 'color', 'text' ),
 		),
-		'fontFamily'               => array(
-			'value'   => array( 'typography', 'fontFamily' ),
-			'support' => array( '__experimentalFontFamily' ),
+		'font-family'              => array(
+			'value' => array( 'typography', 'fontFamily' ),
 		),
-		'fontSize'                 => array(
-			'value'   => array( 'typography', 'fontSize' ),
-			'support' => array( 'fontSize' ),
+		'font-size'                => array(
+			'value' => array( 'typography', 'fontSize' ),
 		),
-		'fontStyle'                => array(
-			'value'   => array( 'typography', 'fontStyle' ),
-			'support' => array( '__experimentalFontStyle' ),
+		'font-style'               => array(
+			'value' => array( 'typography', 'fontStyle' ),
 		),
-		'fontWeight'               => array(
-			'value'   => array( 'typography', 'fontWeight' ),
-			'support' => array( '__experimentalFontWeight' ),
+		'font-weight'              => array(
+			'value' => array( 'typography', 'fontWeight' ),
 		),
-		'lineHeight'               => array(
-			'value'   => array( 'typography', 'lineHeight' ),
-			'support' => array( 'lineHeight' ),
+		'line-height'              => array(
+			'value' => array( 'typography', 'lineHeight' ),
 		),
 		'padding'                  => array(
 			'value'      => array( 'spacing', 'padding' ),
-			'support'    => array( 'spacing', 'padding' ),
 			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
-		'textDecoration'           => array(
-			'value'   => array( 'typography', 'textDecoration' ),
-			'support' => array( '__experimentalTextDecoration' ),
+		'text-decoration'          => array(
+			'value' => array( 'typography', 'textDecoration' ),
 		),
-		'textTransform'            => array(
-			'value'   => array( 'typography', 'textTransform' ),
-			'support' => array( '__experimentalTextTransform' ),
+		'text-transform'           => array(
+			'value' => array( 'typography', 'textTransform' ),
 		),
 	);
 
@@ -360,14 +325,7 @@ class WP_Theme_JSON {
 					continue;
 				}
 
-				// Remove the properties the block doesn't support.
-				// This is a subset of the full styles schema.
-				$styles_schema = self::SCHEMA['styles'];
-				foreach ( self::PROPERTIES_METADATA as $prop_name => $prop_meta ) {
-					if ( ! in_array( $prop_name, $metadata['supports'], true ) ) {
-						unset( $styles_schema[ $prop_meta['value'][0] ][ $prop_meta['value'][1] ] );
-					}
-				}
+				$styles_schema                                 = self::SCHEMA['styles'];
 				$this->theme_json['styles'][ $block_selector ] = self::remove_keys_not_in_schema(
 					$this->theme_json['styles'][ $block_selector ],
 					$styles_schema
@@ -409,63 +367,26 @@ class WP_Theme_JSON {
 	}
 
 	/**
-	 * Returns the kebab-cased name of a given property.
+	 * Given a CSS property name, returns the property it belongs
+	 * within the self::PROPERTIES_METADATA map.
 	 *
-	 * @param string $property Property name to convert.
-	 * @return string kebab-cased name of the property
+	 * @param string $css_name The CSS property name.
+	 *
+	 * @return string The property name.
 	 */
-	private static function to_kebab_case( $property ) {
-		$mappings = self::get_case_mappings();
-		return $mappings['to_kebab_case'][ $property ];
-	}
-
-	/**
-	 * Returns the property name of a kebab-cased property.
-	 *
-	 * @param string $property Property name to convert in kebab-case.
-	 * @return string Name of the property
-	 */
-	private static function to_property( $property ) {
-		$mappings = self::get_case_mappings();
-		return $mappings['to_property'][ $property ];
-	}
-
-	/**
-	 * Returns a mapping on metadata properties to avoid having to constantly
-	 * transforms properties between camel case and kebab.
-	 *
-	 * @return array Containing two mappings:
-	 *
-	 *   - "to_kebab_case" mapping properties in camel case to
-	 *    properties in kebab case e.g: "paddingTop" to "padding-top".
-	 *
-	 *  - "to_property" mapping properties in kebab case to
-	 *    the main properties in camel case e.g: "padding-top" to "padding".
-	 */
-	private static function get_case_mappings() {
-		static $case_mappings;
-		if ( null === $case_mappings ) {
-			$case_mappings = array(
-				'to_kebab_case' => array(),
-				'to_property'   => array(),
-			);
+	private static function to_property( $css_name ) {
+		static $to_property;
+		if ( null === $to_property ) {
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
-				$kebab_case = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $key ) );
-
-				$case_mappings['to_kebab_case'][ $key ]      = $kebab_case;
-				$case_mappings['to_property'][ $kebab_case ] = $key;
+				$to_property[ $key ] = $key;
 				if ( self::has_properties( $metadata ) ) {
 					foreach ( $metadata['properties'] as $property ) {
-						$camel_case = $key . ucfirst( $property );
-						$kebab_case = strtolower( preg_replace( '/(?<!^)[A-Z]/', '-$0', $camel_case ) );
-
-						$case_mappings['to_kebab_case'][ $camel_case ] = $kebab_case;
-						$case_mappings['to_property'][ $kebab_case ]   = $key;
+						$to_property[ $key . '-' . $property ] = $key;
 					}
 				}
 			}
 		}
-		return $case_mappings;
+		return $to_property[ $css_name ];
 	}
 
 	/**
@@ -476,11 +397,9 @@ class WP_Theme_JSON {
 	 * {
 	 *   'root': {
 	 *     'selector': ':root'
-	 *     'supports': [ 'fontSize', 'backgroundColor' ],
 	 *   },
 	 *   'core/heading/h1': {
 	 *     'selector': 'h1'
-	 *     'supports': [ 'fontSize', 'backgroundColor' ],
 	 *   }
 	 * }
 	 *
@@ -494,50 +413,15 @@ class WP_Theme_JSON {
 		self::$blocks_metadata = array(
 			self::ROOT_BLOCK_NAME => array(
 				'selector' => self::ROOT_BLOCK_SELECTOR,
-				'supports' => self::ROOT_BLOCK_SUPPORTS,
 			),
-			// By make supports an empty array
-			// this won't have any styles associated
-			// but still allows adding settings
-			// and generate presets.
 			self::ALL_BLOCKS_NAME => array(
 				'selector' => self::ALL_BLOCKS_SELECTOR,
-				'supports' => array(),
 			),
 		);
 
 		$registry = WP_Block_Type_Registry::get_instance();
 		$blocks   = $registry->get_all_registered();
 		foreach ( $blocks as $block_name => $block_type ) {
-			/*
-			 * Skips blocks that don't declare support,
-			 * they don't generate styles.
-			 */
-			if (
-				! property_exists( $block_type, 'supports' ) ||
-				! is_array( $block_type->supports ) ||
-				empty( $block_type->supports )
-			) {
-				continue;
-			}
-
-			/*
-			 * Extract block support keys that are related to the style properties.
-			 */
-			$block_supports = array();
-			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
-				if ( gutenberg_experimental_get( $block_type->supports, $metadata['support'] ) ) {
-					$block_supports[] = $key;
-				}
-			}
-
-			/*
-			 * Skip blocks that don't support anything related to styles.
-			 */
-			if ( empty( $block_supports ) ) {
-				continue;
-			}
-
 			/*
 			 * Assign the selector for the block.
 			 *
@@ -563,7 +447,6 @@ class WP_Theme_JSON {
 			) {
 				self::$blocks_metadata[ $block_name ] = array(
 					'selector' => $block_type->supports['__experimentalSelector'],
-					'supports' => $block_supports,
 				);
 			} elseif (
 				isset( $block_type->supports['__experimentalSelector'] ) &&
@@ -576,13 +459,11 @@ class WP_Theme_JSON {
 
 					self::$blocks_metadata[ $key ] = array(
 						'selector' => $selector_metadata['selector'],
-						'supports' => $block_supports,
 					);
 				}
 			} else {
 				self::$blocks_metadata[ $block_name ] = array(
 					'selector' => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
-					'supports' => $block_supports,
 				);
 			}
 		}
@@ -687,7 +568,7 @@ class WP_Theme_JSON {
 	 * @return string Style property value.
 	 */
 	private static function get_property_value( $styles, $path ) {
-		$value = gutenberg_experimental_get( $styles, $path, '' );
+		$value = _wp_array_get( $styles, $path, '' );
 
 		if ( '' === $value ) {
 			return $value;
@@ -737,28 +618,23 @@ class WP_Theme_JSON {
 	 *
 	 * @param array $declarations Holds the existing declarations.
 	 * @param array $styles       Styles to process.
-	 * @param array $supports     Supports information for this block.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $declarations, $styles, $supports ) {
+	private static function compute_style_properties( $declarations, $styles ) {
 		if ( empty( $styles ) ) {
 			return $declarations;
 		}
 
 		$properties = array();
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
-			if ( ! in_array( $name, $supports, true ) ) {
-				continue;
-			}
-
 			// Some properties can be shorthand properties, meaning that
 			// they contain multiple values instead of a single one.
 			// An example of this is the padding property, see self::SCHEMA.
 			if ( self::has_properties( $metadata ) ) {
 				foreach ( $metadata['properties'] as $property ) {
 					$properties[] = array(
-						'name'  => $name . ucfirst( $property ),
+						'name'  => $name . '-' . $property,
 						'value' => array_merge( $metadata['value'], array( $property ) ),
 					);
 				}
@@ -773,9 +649,8 @@ class WP_Theme_JSON {
 		foreach ( $properties as $prop ) {
 			$value = self::get_property_value( $styles, $prop['value'] );
 			if ( ! empty( $value ) ) {
-				$kebab_cased_name = self::to_kebab_case( $prop['name'] );
-				$declarations[]   = array(
-					'name'  => $kebab_cased_name,
+				$declarations[] = array(
+					'name'  => $prop['name'],
 					'value' => $value,
 				);
 			}
@@ -802,7 +677,10 @@ class WP_Theme_JSON {
 
 		$stylesheet = '';
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = gutenberg_experimental_get( $settings, $preset['path'], array() );
+			$values = _wp_array_get( $settings, $preset['path'], array() );
+			if ( empty( $values ) ) {
+				continue;
+			}
 			foreach ( $values as $value ) {
 				foreach ( $preset['classes'] as $class ) {
 					$stylesheet .= self::to_ruleset(
@@ -810,7 +688,7 @@ class WP_Theme_JSON {
 						array(
 							array(
 								'name'  => $class['property_name'],
-								'value' => $value[ $preset['value_key'] ],
+								'value' => $value[ $preset['value_key'] ] . ' !important',
 							),
 						)
 					);
@@ -840,7 +718,10 @@ class WP_Theme_JSON {
 	 */
 	private static function compute_preset_vars( $declarations, $settings ) {
 		foreach ( self::PRESETS_METADATA as $preset ) {
-			$values = gutenberg_experimental_get( $settings, $preset['path'], array() );
+			$values = _wp_array_get( $settings, $preset['path'], array() );
+			if ( empty( $values ) ) {
+				continue;
+			}
 			foreach ( $values as $value ) {
 				$declarations[] = array(
 					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . $value['slug'],
@@ -870,7 +751,7 @@ class WP_Theme_JSON {
 	 * @return array Returns the modified $declarations.
 	 */
 	private static function compute_theme_vars( $declarations, $settings ) {
-		$custom_values = gutenberg_experimental_get( $settings, array( 'custom' ) );
+		$custom_values = _wp_array_get( $settings, array( 'custom' ), array() );
 		$css_vars      = self::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
 			$declarations[] = array(
@@ -1011,14 +892,12 @@ class WP_Theme_JSON {
 			}
 
 			$selector = $metadata['selector'];
-			$supports = $metadata['supports'];
 
 			$declarations = array();
 			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
 				$declarations = self::compute_style_properties(
 					$declarations,
-					$this->theme_json['styles'][ $block_selector ],
-					$supports
+					$this->theme_json['styles'][ $block_selector ]
 				);
 			}
 
@@ -1070,11 +949,20 @@ class WP_Theme_JSON {
 	 * @return array
 	 */
 	public function get_custom_templates() {
+		$custom_templates = array();
 		if ( ! isset( $this->theme_json['customTemplates'] ) ) {
-			return array();
-		} else {
-			return $this->theme_json['customTemplates'];
+			return $custom_templates;
 		}
+
+		foreach ( $this->theme_json['customTemplates'] as $item ) {
+			if ( isset( $item['name'] ) ) {
+				$custom_templates[ $item['name'] ] = array(
+					'title'     => isset( $item['title'] ) ? $item['title'] : '',
+					'postTypes' => isset( $item['postTypes'] ) ? $item['postTypes'] : array( 'page' ),
+				);
+			}
+		}
+		return $custom_templates;
 	}
 
 	/**
@@ -1083,10 +971,19 @@ class WP_Theme_JSON {
 	 * @return array
 	 */
 	public function get_template_parts() {
+		$template_parts = array();
 		if ( ! isset( $this->theme_json['templateParts'] ) ) {
-			return array();
+			return $template_parts;
 		}
-		return $this->theme_json['templateParts'];
+
+		foreach ( $this->theme_json['templateParts'] as $item ) {
+			if ( isset( $item['name'] ) ) {
+				$template_parts[ $item['name'] ] = array(
+					'area' => isset( $item['area'] ) ? $item['area'] : '',
+				);
+			}
+		}
+		return $template_parts;
 	}
 
 	/**
@@ -1160,7 +1057,7 @@ class WP_Theme_JSON {
 
 			// Style escaping.
 			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				$declarations = self::compute_style_properties( array(), $this->theme_json['styles'][ $block_selector ], $metadata['supports'] );
+				$declarations = self::compute_style_properties( array(), $this->theme_json['styles'][ $block_selector ] );
 				foreach ( $declarations as $declaration ) {
 					$style_to_validate = $declaration['name'] . ': ' . $declaration['value'];
 					if ( esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate ) {
@@ -1173,7 +1070,7 @@ class WP_Theme_JSON {
 						gutenberg_experimental_set(
 							$escaped_styles,
 							$path,
-							gutenberg_experimental_get( $this->theme_json['styles'][ $block_selector ], $path )
+							_wp_array_get( $this->theme_json['styles'][ $block_selector ], $path, array() )
 						);
 					}
 				}
@@ -1183,7 +1080,7 @@ class WP_Theme_JSON {
 			// For now the ony allowed settings are presets.
 			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
 				foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-					$current_preset = gutenberg_experimental_get(
+					$current_preset = _wp_array_get(
 						$this->theme_json['settings'][ $block_selector ],
 						$preset_metadata['path'],
 						null

@@ -147,13 +147,15 @@ function VideoEdit( {
 
 	return (
 		<>
-			<BlockControls>
+			<BlockControls group="block">
 				<TracksEditor
 					tracks={ tracks }
 					onChange={ ( newTracks ) => {
 						setAttributes( { tracks: newTracks } );
 					} }
 				/>
+			</BlockControls>
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ src }

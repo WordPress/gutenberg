@@ -7,6 +7,8 @@
 `HStack` can render anything inside.
 
 ```jsx
+import { HStack, Text, View } from '@wordpress/components/ui';
+
 function Example() {
 	return (
 		<HStack>

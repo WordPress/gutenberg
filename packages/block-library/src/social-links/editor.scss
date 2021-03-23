@@ -23,12 +23,8 @@
 	@include reduce-motion("transition");
 
 	.is-selected > & {
-		opacity: 0.1;
-	}
-
-	// Show more opaque in dark themes.
-	.is-dark-theme .is-selected & {
-		opacity: 0.4;
+		opacity: 0;
+		width: 0; // This allows the appender to sit on the left as it should.
 	}
 
 	// Use the first link to set the height.
@@ -57,6 +53,10 @@
 		}
 	}
 
+	& + .block-list-appender {
+		box-shadow: inset 0 0 0 $border-width $gray-700;
+	}
+
 	.wp-social-link::before {
 		content: "";
 		display: block;
@@ -71,30 +71,45 @@
 }
 
 // Polish the Appender.
-.wp-block-social-links .wp-block-social-links__social-placeholder + .block-list-appender {
-	position: absolute;
-}
-
 .wp-block-social-links .block-list-appender {
-	padding: 0;
+	// Match the overall silhouette of social links.
+	margin: 4px auto 4px 0;
+	border-radius: 9999px; // This works as both circular and pill shapes.
 
-	&::before {
-		content: "";
-		display: block;
+	// Treat just like a social icon.
+	.block-editor-inserter {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-size: inherit;
 		width: 1em;
 		height: 1em;
 	}
 
-	.block-editor-inserter {
-		position: absolute;
-		top: 0;
+	// Duplicate the font sizes from style.scss to size the appender.
+	.has-small-icon-size & {
+		font-size: 16px; // 16 makes for a quarter-padding that keeps the icon centered.
+	}
+
+	// Normal/default.
+	.has-normal-icon-size & {
+		font-size: 24px;
+	}
+
+	// Large.
+	.has-large-icon-size & {
+		font-size: 36px;
+	}
+
+	// Huge.
+	.has-huge-icon-size & {
+		font-size: 48px;
+	}
+
+	&::before {
+		content: none;
 	}
 }
-
-.wp-block-social-links.is-style-logos-only .block-list-appender {
-	padding: 4px;
-}
-
 
 // Center flex items. This has an equivalent in style.scss.
 .wp-block[data-align="center"] > .wp-block-social-links {

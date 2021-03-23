@@ -10,11 +10,16 @@
 	width: 100%;
 }
 
-.searchTextInput {
-	flex-grow: 1;
+.border {
 	border: 1px solid $gray-600;
 	border-width: $border-width;
-	padding: $grid-unit-10;
+	padding: $grid-unit-05;
+}
+
+.searchTextInput {
+	flex-grow: 1;
+	flex-shrink: 1;
+	padding: $grid-unit-05;
 }
 
 .searchLabel {

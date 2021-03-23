@@ -73,10 +73,10 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 function gutenberg_has_border_support( $block_type, $feature, $default = false ) {
 	$block_support = false;
 	if ( property_exists( $block_type, 'supports' ) ) {
-		$block_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalBorder' ), $default );
+		$block_support = _wp_array_get( $block_type->supports, array( '__experimentalBorder' ), $default );
 	}
 
-	return true === $block_support || ( is_array( $block_support ) && gutenberg_experimental_get( $block_support, array( $feature ), false ) );
+	return true === $block_support || ( is_array( $block_support ) && _wp_array_get( $block_support, array( $feature ), false ) );
 }
 
 // Register the block support.

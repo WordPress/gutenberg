@@ -16,6 +16,7 @@ import { forwardRef } from '@wordpress/element';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 import VisuallyHidden from '../visually-hidden';
+import { withNextComponent } from './next';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
@@ -162,4 +163,4 @@ export function Button( props, ref ) {
 	);
 }
 
-export default forwardRef( Button );
+export default withNextComponent( forwardRef( Button ) );

@@ -11,7 +11,10 @@ import {
 /**
  * Internal dependencies
  */
-import createSidebarControl from './create-sidebar-control';
+import {
+	SidebarSection,
+	SidebarControl,
+} from './customize-sidebar-constructors';
 
 const { wp } = window;
 
@@ -56,7 +59,8 @@ export function initialize() {
 		},
 	} );
 
-	wp.customize.controlConstructor.sidebar_block_editor = createSidebarControl();
+	wp.customize.sectionConstructor.sidebar = SidebarSection;
+	wp.customize.controlConstructor.sidebar_block_editor = SidebarControl;
 }
 
 wp.domReady( initialize );

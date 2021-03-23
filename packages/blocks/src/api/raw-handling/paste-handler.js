@@ -13,7 +13,7 @@ import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
  */
 import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
-import { getBlockContent } from '../serializer';
+import { getBlockInnerHTML } from '../serializer';
 import { parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
@@ -127,7 +127,12 @@ export function pasteHandler( {
 	// * There is a plain text version.
 	// * There is no HTML version, or it has no formatting.
 	if ( plainText && ( ! HTML || isPlain( HTML ) ) ) {
-		HTML = markdownConverter( plainText );
+		HTML = plainText;
+
+		// The markdown converter (Showdown) trims whitespace.
+		if ( ! /^\s+$/.test( plainText ) ) {
+			HTML = markdownConverter( HTML );
+		}
 
 		// Switch to inline mode if:
 		// * The current mode is AUTO.
@@ -211,22 +216,23 @@ export function pasteHandler( {
 		} )
 	);
 
-	// If we're allowed to return inline content, and there is only one inlineable block,
-	// and the original plain text content does not have any line breaks, then
-	// treat it as inline paste.
+	// If we're allowed to return inline content, and there is only one
+	// inlineable block, and the original plain text content does not have any
+	// line breaks, then treat it as inline paste.
 	if (
 		mode === 'AUTO' &&
 		blocks.length === 1 &&
 		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
 	) {
-		const trimmedPlainText = plainText.trim();
+		// Don't catch line breaks at the start or end.
+		const trimmedPlainText = plainText.replace( /^[\n]+|[\n]+$/g, '' );
 
 		if (
 			trimmedPlainText !== '' &&
 			trimmedPlainText.indexOf( '\n' ) === -1
 		) {
 			return removeInvalidHTML(
-				getBlockContent( blocks[ 0 ] ),
+				getBlockInnerHTML( blocks[ 0 ] ),
 				phrasingContentSchema
 			);
 		}
