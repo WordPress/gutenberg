@@ -7,7 +7,7 @@
 
 return array(
 	'title'       => __( 'Two columns of text' ),
-	'categories'  => array( 'text' ),
+	'categories'  => array( 'columns', 'text' ),
 	'content'     => '<!-- wp:columns {"align":"full"} -->
 	<div class="wp-block-columns alignfull"><!-- wp:column -->
 	<div class="wp-block-column"><!-- wp:spacer -->

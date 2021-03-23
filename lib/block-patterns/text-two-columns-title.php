@@ -7,7 +7,7 @@
 
 return array(
 	'title'       => __( 'Two columns text and title' ),
-	'categories'  => array( 'text' ),
+	'categories'  => array( 'columns', 'text' ),
 	'content'     => '<!-- wp:group -->
 	<div class="wp-block-group"><div class="wp-block-group__inner-container"><!-- wp:heading {"style":{"typography":{"fontSize":38}}} -->
 	<h2 style="font-size:38px"><strong>' . __( 'The voyage had begun, and had begun happily with a soft blue sky, and a calm sea.' ) . '</strong></h2>

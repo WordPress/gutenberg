@@ -7,7 +7,7 @@
 
 return array(
 	'title'       => __( 'Two columns of text with offset heading' ),
-	'categories'  => array( 'text' ),
+	'categories'  => array( 'columns', 'text' ),
 	'content'     => '<!-- wp:group {"align":"full","style":{"color":{"background":"#f2f0e9"}}} -->
 	<div class="wp-block-group alignfull has-background" style="background-color:#f2f0e9"><!-- wp:columns {"align":"full"} -->
 	<div class="wp-block-columns alignfull"><!-- wp:column {"width":"60%"} -->
