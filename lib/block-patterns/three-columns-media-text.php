@@ -7,7 +7,7 @@
 
 return array(
 	'title'       => __( 'Three columns with images and text' ),
-	'categories'  => array( 'nature' ),
+	'categories'  => array( 'gallery' ),
 	'content'     => '<!-- wp:group {"align":"full","style":{"color":{"background":"#f8f4e4"}}} -->
 	<div class="wp-block-group alignfull has-background" style="background-color:#f8f4e4"><div class="wp-block-group__inner-container"><!-- wp:columns {"align":"wide"} -->
 	<div class="wp-block-columns alignwide"><!-- wp:column -->

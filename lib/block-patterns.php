@@ -184,17 +184,17 @@ $core_block_patterns = array(
 	'media-text-nature',
 	'two-images-gallery',
 	'cover-quote',
-	'cover-columns',
+	'two-columns-header',
 	'three-columns-media-text',
-	'quote-portrait',
-	'hero-section',
+	'quote-2',
+	'large-header-text-button',
 	'media-text-art',
 	'text-two-columns-title',
-	'three-columns-list',
-	'text-two-columns-title-2',
+	'three-columns-text',
+	'text-two-columns-title-offset',
 	'heading',
 	'three-images-gallery',
-	'two-columns-list',
+	'text-two-columns-2',
 	'media-text-arquitecture'
 );
 
@@ -205,6 +205,6 @@ foreach ( $core_block_patterns as $core_block_pattern ) {
 	);
 }
 
-register_block_pattern_category( 'nature', array( 'label' => _x( 'Nature', 'Block pattern category' ) ) );
-register_block_pattern_category( 'art', array( 'label' => _x( 'Art', 'Block pattern category' ) ) );
-register_block_pattern_category( 'arquitecture', array( 'label' => _x( 'Arquitecture', 'Block pattern category' ) ) );
+register_block_pattern_category( 'header', array( 'label' => _x( 'Headers', 'Block pattern category' ) ) );
+register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category' ) ) );
+register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category' ) ) );

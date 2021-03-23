@@ -1,13 +1,13 @@
 <?php
 /**
- * Cover with two columns
+ * Large header with two columns
  *
  * @package WordPress
  */
 
 return array(
-	'title'       => __( 'Cover with two columns' ),
-	'categories'  => array( 'nature' ),
+	'title'       => __( 'Large header with two columns' ),
+	'categories'  => array( 'header' ),
 	'content'     => '<!-- wp:cover {"customOverlayColor":"#51503b","minHeight":800,"align":"full"} -->
 	<div class="wp-block-cover alignfull has-background-dim" style="background-color:#51503b;min-height:800px"><div class="wp-block-cover__inner-container"><!-- wp:columns {"align":"wide"} -->
 	<div class="wp-block-columns alignwide"><!-- wp:column -->

@@ -1,15 +1,15 @@
 <?php
 /**
- * Three Images gallery
+ * Three columns with offset images
  *
  * @package WordPress
  */
 
 return array(
-	'title'       => __( 'Three Images gallery' ),
-	'categories'  => array( 'arquitecture' ),
-	'content'     => '<!-- wp:columns {"align":"wide","backgroundColor":"white"} -->
-	<div class="wp-block-columns alignwide has-white-background-color has-background"><!-- wp:column {"width":"25%"} -->
+	'title'       => __( 'Three columns with offset images' ),
+	'categories'  => array( 'gallery' ),
+	'content'     => '<!-- wp:columns {"align":"wide"} -->
+	<div class="wp-block-columns alignwide"><!-- wp:column {"width":"25%"} -->
 	<div class="wp-block-column" style="flex-basis:25%"><!-- wp:image {"id":240,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
 	<figure class="wp-block-image size-large is-style-default"><img src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/wing-light-architecture-structure-wood-white-714046-pxhere.com_-576x1024.jpg" alt="" class="wp-image-240"/></figure>
 	<!-- /wp:image --></div>
@@ -39,5 +39,5 @@ return array(
 	<!-- /wp:spacer --></div>
 	<!-- /wp:column --></div>
 	<!-- /wp:columns -->',
-	'description' => _x( 'Three Images gallery', 'Block pattern description' ),
+	'description' => _x( 'Three columns with offset images', 'Block pattern description' ),
 );

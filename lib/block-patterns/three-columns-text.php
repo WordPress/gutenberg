@@ -1,13 +1,13 @@
 <?php
 /**
- * Three columns list
+ * Three columns of text
  *
  * @package WordPress
  */
 
 return array(
-	'title'       => __( 'Three columns list' ),
-	'categories'  => array( 'art' ),
+	'title'       => __( 'Three columns of text' ),
+	'categories'  => array( 'text' ),
 	'content'     => '<!-- wp:columns {"align":"full","backgroundColor":"white","textColor":"black"} -->
 	<div class="wp-block-columns alignfull has-black-color has-white-background-color has-text-color has-background"><!-- wp:column -->
 	<div class="wp-block-column"><!-- wp:heading {"level":3} -->
@@ -39,5 +39,5 @@ return array(
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column --></div>
 	<!-- /wp:columns -->',
-	'description' => _x( 'Three columns list', 'Block pattern description' ),
+	'description' => _x( 'Three columns of text', 'Block pattern description' ),
 );

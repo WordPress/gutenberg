@@ -6,8 +6,8 @@
  */
 
 return array(
-	'title'       => __( 'Quote' ),
-	'categories'  => array( 'nature' ),
+	'title'       => __( 'Large header with left-aligned text' ),
+	'categories'  => array( 'header' ),
 	'content'     => '<!-- wp:cover {"url":"https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/tree-forest-grass-wilderness-plant-wood-153393-pxhere.com_.jpg","id":261,"dimRatio":60,"minHeight":800,"align":"full"} -->
 	<div class="wp-block-cover alignfull has-background-dim-60 has-background-dim" style="min-height:800px"><img class="wp-block-cover__image-background wp-image-261" alt="" src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/tree-forest-grass-wilderness-plant-wood-153393-pxhere.com_.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container">
 	<!-- wp:heading {"align":"wide","style":{"typography":{"fontSize":"14vw"},"color":{"text":"#ffe074"}}} -->

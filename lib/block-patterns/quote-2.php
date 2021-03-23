@@ -1,13 +1,13 @@
 <?php
 /**
- * Quote with portrait
+ * Quote
  *
  * @package WordPress
  */
 
 return array(
-	'title'       => __( 'Quote with portrait' ),
-	'categories'  => array( 'nature' ),
+	'title'       => __( 'Quote' ),
+	'categories'  => array( 'text' ),
 	'content'     => '<!-- wp:group -->
 	<div class="wp-block-group"><div class="wp-block-group__inner-container"><!-- wp:separator {"className":"is-style-default"} -->
 	<hr class="wp-block-separator is-style-default"/>
