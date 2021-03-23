@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render active 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+.emotion-0 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -33,22 +33,22 @@ exports[`props should render active 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  .emotion-0 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
   -webkit-transition: none !important;
   transition: none !important;
 }
 
-*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:hover > .emotion-0 {
   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
 }
 
-*:active > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:active > .emotion-0 {
   box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
 }
 
@@ -61,7 +61,7 @@ exports[`props should render active 1`] = `
 `;
 
 exports[`props should render correctly 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+.emotion-0 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -93,13 +93,13 @@ exports[`props should render correctly 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  .emotion-0 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
   -webkit-transition: none !important;
   transition: none !important;
 }
@@ -113,7 +113,7 @@ exports[`props should render correctly 1`] = `
 `;
 
 exports[`props should render hover 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+.emotion-0 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -145,18 +145,18 @@ exports[`props should render hover 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  .emotion-0 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
   -webkit-transition: none !important;
   transition: none !important;
 }
 
-*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:hover > .emotion-0 {
   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
 }
 
@@ -169,7 +169,7 @@ exports[`props should render hover 1`] = `
 `;
 
 exports[`props should render isInteractive 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+.emotion-0 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -201,22 +201,22 @@ exports[`props should render isInteractive 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  .emotion-0 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
   -webkit-transition: none !important;
   transition: none !important;
 }
 
-*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:hover > .emotion-0 {
   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
 }
 
-*:active > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:active > .emotion-0 {
   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
 }
 
@@ -229,7 +229,7 @@ exports[`props should render isInteractive 1`] = `
 `;
 
 exports[`props should render offset 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+.emotion-0 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -261,22 +261,22 @@ exports[`props should render offset 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  .emotion-0 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
   -webkit-transition: none !important;
   transition: none !important;
 }
 
-*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:hover > .emotion-0 {
   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
 }
 
-*:active > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:active > .emotion-0 {
   box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
 }
 
@@ -289,7 +289,7 @@ exports[`props should render offset 1`] = `
 `;
 
 exports[`props should render value 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+.emotion-0 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -321,13 +321,13 @@ exports[`props should render value 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  .emotion-0 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
   -webkit-transition: none !important;
   transition: none !important;
 }

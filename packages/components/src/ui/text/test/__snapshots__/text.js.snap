@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Text should render highlighted words with highlightCaseSensitive 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+.emotion-0 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -23,18 +23,18 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  .emotion-0 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
   -webkit-transition: none !important;
   transition: none !important;
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 mark {
+.emotion-0 mark {
   background: rgba(255, 185, 0, 0.7);
   background: var(--wp-g2-yellow-rgba-70);
   border-radius: 2px;
@@ -56,7 +56,7 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
 `;
 
 exports[`Text snapshot tests should render correctly 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+.emotion-0 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
@@ -78,13 +78,13 @@ exports[`Text snapshot tests should render correctly 1`] = `
 }
 
 @media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+  .emotion-0 {
     -webkit-transition: none !important;
     transition: none !important;
   }
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+[data-system-ui-reduced-motion-mode="true"] .emotion-0 {
   -webkit-transition: none !important;
   transition: none !important;
 }
