@@ -73,8 +73,7 @@ const NavigationPanel = ( { isOpen } ) => {
 						templatesActiveMenu !== MENU_ROOT ) && (
 						<TemplatesNavigation />
 					) }
-					{ ( templatesActiveMenu === MENU_ROOT ||
-						contentActiveMenu !== MENU_ROOT ) && (
+					{ templatesActiveMenu === MENU_ROOT && (
 						<ContentNavigation
 							onActivateMenu={ setContentActiveMenu }
 						/>
