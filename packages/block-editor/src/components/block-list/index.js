@@ -30,6 +30,14 @@ export default function BlockList( { className, __experimentalLayout } ) {
 	const insertionPoint = useInsertionPoint( ref );
 	useScrollSelectionIntoView( ref );
 
+	const { isTyping, isOutlineMode } = useSelect( ( select ) => {
+		const { isTyping: _isTyping, getSettings } = select( blockEditorStore );
+		return {
+			isTyping: _isTyping(),
+			isOutlineMode: getSettings().outlineMode,
+		};
+	}, [] );
+
 	return (
 		<BlockNodes.Provider value={ blockNodes }>
 			{ insertionPoint }
@@ -38,7 +46,8 @@ export default function BlockList( { className, __experimentalLayout } ) {
 				ref={ ref }
 				className={ classnames(
 					'block-editor-block-list__layout is-root-container',
-					className
+					className,
+					{ 'is-typing': isTyping, 'is-outline-mode': isOutlineMode }
 				) }
 			>
 				<SetBlockNodes.Provider value={ setBlockNodes }>
