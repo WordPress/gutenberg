@@ -15,7 +15,7 @@ import {
 	ToolbarButton,
 	Spinner,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -88,8 +88,12 @@ export default function TemplatePartEdit( {
 		return (
 			<TagName { ...blockProps }>
 				<Warning>
-					{ __(
-						'Template part has been deleted or is unavailable.'
+					{ sprintf(
+						/* translators: %s: Template part slug */
+						__(
+							'Template part has been deleted or is unavailable: %s'
+						),
+						slug
 					) }
 				</Warning>
 			</TagName>
