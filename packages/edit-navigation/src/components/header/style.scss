@@ -25,8 +25,12 @@
 .edit-navigation-header__actions {
 	display: flex;
 
-	> .components-dropdown {
-		margin-right: $grid-unit-15;
+	> .components-dropdown,
+	> .components-button,
+	> .interface-pinned-items .components-button {
+		&:not(:last-child) {
+			margin-right: $grid-unit-15;
+		}
 	}
 }
 
