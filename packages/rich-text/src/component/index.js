@@ -327,21 +327,21 @@ function RichText(
 		} );
 
 		const isLi = /<li>.*<\/li>/gi;
-		const foundLi = html.match( isLi );
-		if ( foundLi ) {
+		const hasLi = html.match( isLi )?.length > 0;
+		if ( hasLi ) {
 			let liCopyString = html
 				.split( '<li>' )
 				.join( '' )
 				.split( '</li>' )
 				.filter( Boolean );
-			const liCopyStringLength = liCopyString.length - 1;
-			liCopyString = liCopyString.map( ( el, i ) => {
+			liCopyString = liCopyString.map( ( el, i, {length} ) => {
 				if ( el && i === 0 ) {
 					return '<ul><li>' + el + '</li>';
-				} else if ( el && i === liCopyStringLength ) {
-					return '<div style="clear:both"/><li>' + el + '</li></ul>';
+				} else if ( el && i === length ) {
+					return '<template style="clear:both"></template><li>' + el + '</li></ul>';
+				} else if ( el ) {
+					return '<template style="clear:both"></template><li>' + el + '</li>';
 				}
-				return '<div style="clear:both"/><li>' + el + '</li>';
 			} );
 			liCopyString = liCopyString.join( '' );
 			event.clipboardData.setData( 'text/plain', liCopyString );
