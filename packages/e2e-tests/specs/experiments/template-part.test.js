@@ -165,7 +165,9 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert selected block to template part', async () => {
-			await canvas().waitForSelector( '.wp-block-template-part' );
+			await canvas().waitForSelector(
+				'.wp-block-template-part.block-editor-block-list__layout'
+			);
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -203,7 +205,9 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert multiple selected blocks to template part', async () => {
-			await canvas().waitForSelector( '.wp-block-template-part' );
+			await canvas().waitForSelector(
+				'.wp-block-template-part.block-editor-block-list__layout'
+			);
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);

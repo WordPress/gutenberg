@@ -76,7 +76,7 @@ export default function TemplatePartEdit( {
 
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
-	const isEntityAvailable = ! isPlaceholder && ! isMissing;
+	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || getTagBasedOnArea( area );
 
 	// We don't want to render a missing state if we have any inner blocks.
