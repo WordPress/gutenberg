@@ -76,6 +76,7 @@
 		border-radius: $radius-block-ui;
 		max-width: $navigation-editor-width;
 		margin: auto;
+		overflow-y: hidden;
 	}
 
 	.components-toolbar,
