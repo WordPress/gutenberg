@@ -389,7 +389,7 @@ class WP_Theme_JSON_Resolver {
 			$json_decoding_error = json_last_error();
 			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
 				error_log( 'Error when decoding user schema: ' . json_last_error_msg() );
-				return $config;
+				return new WP_Theme_JSON( $config );
 			}
 
 			// Very important to verify if the flag isGlobalStylesUserThemeJSON is true.
