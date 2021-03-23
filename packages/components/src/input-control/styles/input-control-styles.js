@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/core';
-import styled from '@emotion/styled';
+import { styled, css } from '@wp-g2/styles';
 
 /**
  * Internal dependencies
  */
 import Flex, { FlexItem } from '../../flex';
-import Text from '../../text';
+import { Text } from '../../text';
 import { color, rtl } from '../../utils/style-mixins';
 
 const rootFloatLabelStyles = () => {

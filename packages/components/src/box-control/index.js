@@ -18,7 +18,7 @@ import { FlexItem, FlexBlock } from '../flex';
 import AllInputControl from './all-input-control';
 import InputControls from './input-controls';
 import BoxControlIcon from './icon';
-import Text from '../text';
+import { Text } from '../text';
 import LinkedButton from './linked-button';
 import Visualizer from './visualizer';
 import {

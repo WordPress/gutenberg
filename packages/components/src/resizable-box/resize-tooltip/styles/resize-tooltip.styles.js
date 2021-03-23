@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import styled from '@emotion/styled';
+import { styled } from '@wp-g2/styles';
 
 /**
  * Internal dependencies
  */
-import Text from '../../../text';
+import { Text } from '../../../text';
 import { text } from '../../../text/styles/text-mixins';
 import { color } from '../../../utils/style-mixins';
 
@@ -46,6 +46,7 @@ export const Tooltip = styled.div`
 export const LabelText = styled( Text )`
 	&&& {
 		${ text };
+		color: white;
 		display: block;
 		font-size: 13px;
 		line-height: 1.4;
