@@ -237,6 +237,12 @@ $color-control-label-height: 20px;
 	position: relative;
 	z-index: 1;
 
+	// If an ancestor has a text-decoration property applied, it is inherited regardless of
+	// the specificity of a child element. Only pulling the child out of the flow fixes it.
+	// See also https://www.w3.org/TR/CSS21/text.html#propdef-text-decoration.
+	float: left;
+	width: 100%;
+
 	// Show when selected.
 	.is-selected & {
 		display: flex;
