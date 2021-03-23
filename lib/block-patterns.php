@@ -196,6 +196,7 @@ $core_block_patterns = array(
 	'three-images-gallery',
 	'text-two-columns-2',
 	'media-text-arquitecture',
+	'two-buttons-2',
 );
 
 foreach ( $core_block_patterns as $core_block_pattern ) {
