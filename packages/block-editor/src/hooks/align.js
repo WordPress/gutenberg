@@ -21,6 +21,7 @@ import { useSelect } from '@wordpress/data';
  */
 import { BlockControls, BlockAlignmentControl } from '../components';
 import { store as blockEditorStore } from '../store';
+import useAvailableAlignments from '../components/block-alignment-control/use-available-alignments';
 
 /**
  * An array which includes all possible valid alignments,
@@ -116,13 +117,16 @@ export function addAttribute( settings ) {
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
-		// Compute valid alignments without taking into account,
+		// Compute the block allowed alignments without taking into account,
 		// if the theme supports wide alignments or not
 		// and without checking the layout for availble alignments.
 		// BlockAlignmentToolbar takes both of these into account.
-		const validAlignments = getValidAlignments(
+		const blockAllowedAlignments = getValidAlignments(
 			getBlockSupport( blockName, 'align' ),
 			hasBlockSupport( blockName, 'alignWide', true )
+		);
+		const validAlignments = useAvailableAlignments(
+			blockAllowedAlignments
 		);
 
 		const updateAlignment = ( nextAlign ) => {
