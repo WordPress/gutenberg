@@ -87,9 +87,7 @@ function TextColorEdit( {
 					onClose={ disableIsAddingColor }
 					activeAttributes={ activeAttributes }
 					value={ value }
-					onChange={ ( ...args ) => {
-						onChange( ...args );
-					} }
+					onChange={ onChange }
 					contentRef={ contentRef }
 				/>
 			) }
