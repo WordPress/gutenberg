@@ -408,7 +408,7 @@ function gutenberg_filter_wp_template_unique_post_slug( $_slug, $slug, $post_ID,
 		'post_type'      => $post_type,
 		'posts_per_page' => 1,
 		'no_found_rows'  => true,
-		'post__not_in'   => $post_ID,
+		'post__not_in'   => array( $post_ID ),
 		'tax_query'      => array(
 			array(
 				'taxonomy' => 'wp_theme',
