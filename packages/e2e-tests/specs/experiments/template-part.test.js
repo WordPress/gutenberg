@@ -262,7 +262,7 @@ describe( 'Template Part', () => {
 			'.editor-entities-saved-states__save-button';
 		const savePostSelector = '.editor-post-publish-button__button';
 		const templatePartSelector = '*[data-type="core/template-part"]';
-		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-block-list__layout`;
+		const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
 		const createNewButtonSelector =
 			'//button[contains(text(), "New template part")]';
