@@ -43,6 +43,7 @@ import NavigationEditorShortcuts from './shortcuts';
 import Sidebar from './sidebar';
 import Header from '../header';
 import Notices from '../notices';
+import BlockToolbar from './block-toolbar';
 import Editor from '../editor';
 import InspectorAdditions from '../inspector-additions';
 import { store as editNavigationStore } from '../../store';
@@ -58,6 +59,7 @@ const interfaceLabels = {
 
 export default function Layout( { blockEditorSettings } ) {
 	const contentAreaRef = useBlockSelectionClearer();
+	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
 		false
 	);
@@ -91,7 +93,7 @@ export default function Layout( { blockEditorSettings } ) {
 
 	const hasMenus = !! menus?.length;
 	const isBlockEditorReady = !! ( hasMenus && navigationPost );
-	const hasPermanentSidebar = useViewportMatch( 'medium' ) && hasMenus;
+	const hasPermanentSidebar = isLargeViewport && hasMenus;
 
 	return (
 		<ErrorBoundary>
@@ -148,25 +150,32 @@ export default function Layout( { blockEditorSettings } ) {
 												! hasMenus && <EmptyState /> }
 
 											{ isBlockEditorReady && (
-												<div
-													className="edit-navigation-layout__content-area"
-													ref={ contentAreaRef }
-												>
-													<Editor
-														isPending={
-															! hasLoadedMenus
-														}
-														blocks={ blocks }
-													/>
-													<InspectorAdditions
-														menuId={
-															selectedMenuId
-														}
-														onDeleteMenu={
-															deleteMenu
+												<>
+													<BlockToolbar
+														isFixed={
+															! isLargeViewport
 														}
 													/>
-												</div>
+													<div
+														className="edit-navigation-layout__content-area"
+														ref={ contentAreaRef }
+													>
+														<Editor
+															isPending={
+																! hasLoadedMenus
+															}
+															blocks={ blocks }
+														/>
+														<InspectorAdditions
+															menuId={
+																selectedMenuId
+															}
+															onDeleteMenu={
+																deleteMenu
+															}
+														/>
+													</div>
+												</>
 											) }
 										</>
 									}
