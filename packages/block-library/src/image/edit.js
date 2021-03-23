@@ -106,7 +106,7 @@ export function ImageEdit( {
 	const { imageDefaultSize, mediaUpload } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return pick( getSettings(), [ 'imageDefaultSize', 'mediaUpload' ] );
-	} );
+	}, [] );
 
 	function onUploadError( message ) {
 		noticeOperations.removeAllNotices();
