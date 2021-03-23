@@ -279,7 +279,6 @@ export function ImageEdit( {
 	const classes = classnames( className, {
 		'is-transient': isBlobURL( url ),
 		'is-resized': !! width || !! height,
-		'is-focused': isSelected,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
 
