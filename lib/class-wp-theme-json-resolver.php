@@ -313,7 +313,7 @@ class WP_Theme_JSON_Resolver {
 			if( is_child_theme() ) {
 				$parent_theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json', get_template_directory() ) );
 				$parent_theme_json_data = self::translate( $parent_theme_json_data, wp_get_theme( get_template() )->get( 'TextDomain' ) );
-				$theme_json_data = array_merge( $parent_theme_json_data, $theme_json_data );
+				$theme_json_data = array_replace_recursive( $parent_theme_json_data, $theme_json_data );
 			}
 
 			self::$theme = new WP_Theme_JSON( $theme_json_data );
