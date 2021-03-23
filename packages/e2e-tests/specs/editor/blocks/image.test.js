@@ -288,4 +288,49 @@ describe( 'Image', () => {
 		expect( initialImageDataURL ).not.toEqual( updatedImageDataURL );
 		expect( updatedImageDataURL ).toMatchSnapshot();
 	} );
+
+	it( 'Should reset dimensions on change URL', async () => {
+		const imageUrl = '/wp-includes/images/w-logo-blue.png';
+
+		await insertBlock( 'Image' );
+
+		// Upload an initial image.
+		const filename = await upload( '.wp-block-image input[type="file"]' );
+
+		// Resize the Uploaded Image.
+		await openDocumentSettingsSidebar();
+		await page.click(
+			'[aria-label="Image size presets"] button:first-child'
+		);
+
+		const regexBefore = new RegExp(
+			`<!-- wp:image {"id":\\d+,"width":3,"height":3,"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large is-resized"><img src="[^"]+\\/${ filename }\\.png" alt="" class="wp-image-\\d+" width="3" height="3"\\/><\\/figure>\\s*<!-- /wp:image -->`
+		);
+
+		// Check if dimensions are changed.
+		expect( await getEditedPostContent() ).toMatch( regexBefore );
+
+		// Replace uploaded image with an URL.
+		await clickButton( 'Replace' );
+		await clickButton( 'Edit' );
+
+		await page.waitForSelector( '.block-editor-url-input__input' );
+		await page.evaluate(
+			() =>
+				( document.querySelector(
+					'.block-editor-url-input__input'
+				).value = '' )
+		);
+
+		await page.focus( '.block-editor-url-input__input' );
+		await page.keyboard.type( imageUrl );
+		await page.click( '.block-editor-link-control__search-submit' );
+
+		const regexAfter = new RegExp(
+			`<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->\\s*<figure class="wp-block-image size-large"><img src="${ imageUrl }" alt=""/></figure>\\s*<!-- /wp:image -->`
+		);
+
+		// Check if dimensions are reset.
+		expect( await getEditedPostContent() ).toMatch( regexAfter );
+	} );
 } );

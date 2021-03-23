@@ -6,8 +6,9 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { Button, Dropdown, DropdownMenu } from '@wordpress/components';
+import { PinnedItems } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, Dropdown, DropdownMenu, Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -96,12 +97,13 @@ export default function Header( {
 								{ __( 'Manage locations' ) }
 							</Button>
 						) }
-						renderContent={ () => <ManageLocations /> }
+						renderContent={ () => (
+							<ManageLocations menus={ menus } />
+						) }
 					/>
 
 					<SaveButton navigationPost={ navigationPost } />
-
-					<Popover.Slot name="block-toolbar" />
+					<PinnedItems.Slot scope="core/edit-navigation" />
 				</div>
 			) }
 		</div>

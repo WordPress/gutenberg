@@ -66,7 +66,6 @@ describe( 'Template Part', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( 'Index' );
-			await navigationPanel.close();
 		}
 
 		async function triggerEllipsisMenuItem( textPrompt ) {

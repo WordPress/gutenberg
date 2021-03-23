@@ -66,7 +66,7 @@ const ModifiedWarning = ( { originalBlock, ...props } ) => {
 	let messageHTML = sprintf(
 		/* translators: %s: block name */
 		__(
-			'Your site doesn’t include support for the %s block. You can try installing the block or remove it entirely!'
+			'Your site doesn’t include support for the %s block. You can try installing the block or remove it entirely.'
 		),
 		originalBlock.title || originalName
 	);

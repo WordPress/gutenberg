@@ -105,8 +105,8 @@ $z-layers: (
 	// Show the navigation toggle above the skeleton header
 	".edit-site-navigation-toggle": 31,
 
-	// Show the FSE template previews above the editor (same z-index as the skeleton header)
-	".edit-site-navigation-panel__preview": 30,
+	// Show the FSE template previews above the editor and any open block toolbars
+	".edit-site-navigation-panel__preview": 32,
 
 	// Show notices below expanded editor bar
 	// .edit-post-header { z-index: 30 }

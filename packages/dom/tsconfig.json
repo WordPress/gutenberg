@@ -7,5 +7,6 @@
 	"include": [
 		"src/data-transfer.js",
 		"src/focusable.js",
+		"src/tabbable.js",
 	]
 }

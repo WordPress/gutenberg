@@ -5,7 +5,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { MENU_KIND, MENU_POST_TYPE } from '../utils/constants';
+import { MENU_KIND, MENU_POST_TYPE } from '../constants';
 
 import { untitledMenu } from './index';
 

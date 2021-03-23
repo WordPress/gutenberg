@@ -159,6 +159,8 @@ _Returns_
 
 <a name="useCopyOnClick" href="#useCopyOnClick">#</a> **useCopyOnClick**
 
+> **Deprecated** 
+
 Copies the text to the clipboard when the element is clicked.
 
 _Parameters_
@@ -170,6 +172,19 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether or not the text has been copied. Resets after the timeout.
+
+<a name="useCopyToClipboard" href="#useCopyToClipboard">#</a> **useCopyToClipboard**
+
+Copies the given text to the clipboard when the element is clicked.
+
+_Parameters_
+
+-   _text_ `text|Function`: The text to copy. Use a function if not already available and expensive to compute.
+-   _onSuccess_ `Function`: Called when to text is copied.
+
+_Returns_
+
+-   `RefObject`: A ref to assign to the target element.
 
 <a name="useDebounce" href="#useDebounce">#</a> **useDebounce**
 

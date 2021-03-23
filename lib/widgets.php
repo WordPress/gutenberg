@@ -284,3 +284,37 @@ function gutenberg_load_widget_preview_if_requested() {
 }
 add_filter( 'load-appearance_page_gutenberg-widgets', 'gutenberg_load_widget_preview_if_requested' );
 
+/**
+ * Sets show_instance_in_rest to true on all of the core WP_Widget subclasses.
+ * When merge dto Core, this property should be added to WP_Widget and set to
+ * true on each WP_Widget subclass.
+ */
+function gutenberg_set_show_instance_in_rest_on_core_widgets() {
+	global $wp_widget_factory;
+
+	$core_widgets = array(
+		'WP_Widget_Block',
+		'WP_Widget_Pages',
+		'WP_Widget_Calendar',
+		'WP_Widget_Archives',
+		'WP_Widget_Media_Audio',
+		'WP_Widget_Media_Image',
+		'WP_Widget_Media_Gallery',
+		'WP_Widget_Media_Video',
+		'WP_Widget_Meta',
+		'WP_Widget_Search',
+		'WP_Widget_Text',
+		'WP_Widget_Categories',
+		'WP_Widget_Recent_Posts',
+		'WP_Widget_Recent_Comments',
+		'WP_Widget_RSS',
+		'WP_Widget_Tag_Cloud',
+		'WP_Nav_Menu_Widget',
+		'WP_Widget_Custom_HTML',
+	);
+
+	foreach ( $core_widgets as $widget ) {
+		$wp_widget_factory->widgets[ $widget ]->show_instance_in_rest = true;
+	}
+}
+add_action( 'widgets_init', 'gutenberg_set_show_instance_in_rest_on_core_widgets' );

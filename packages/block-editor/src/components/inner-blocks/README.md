@@ -128,32 +128,33 @@ If locking is not set in an `InnerBlocks` area: the locking of the parent `Inner
 If the block is a top level block: the locking of the Custom Post Type is used.
 
 ### `renderAppender`
-* **Type:** `Function|false`
-* **Default:** - `undefined`. When `renderAppender` is not specific the `<DefaultBlockAppender>` component is as a default. It automatically inserts whichever block is configured as the default block via `wp.blocks.setDefaultBlockName` (typically `paragraph`). If a `false` value is provider, no appender is rendered.
+* **Type:** `Component|false`
+* **Default:** - `undefined`. When `renderAppender` is not specified, the default appender is shown. If a `false` value is provided, no appender is rendered.
 
-A 'render prop' function that can be used to customize the block's appender.
+A component to show as the trailing appender for the inner blocks list.
 
 #### Notes
-* For convenience two predefined appender components are exposed on `InnerBlocks` which can be consumed within the render function:
-	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon button that, when clicked, displays the block picker menu. No default Block is inserted.
-	- `<InnerBlocks.DefaultBlockAppender />` - display the default block appender as set by `wp.blocks.setDefaultBlockName`. Typically this is the `paragraph` block.
-* Consumers are also free to pass any valid render function. This provides the full flexibility to define a bespoke block appender.
+* For convenience two predefined appender components are exposed on `InnerBlocks` which can be used for the prop:
+	- `InnerBlocks.ButtonBlockAppender` -  display a `+` (plus) icon button as the appender.
+	- `InnerBlocks.DefaultBlockAppender` - display the default block appender, typically the paragraph style appender when the paragraph block is allowed.
+* Consumers are also free to pass any valid component. This provides the full flexibility to define a bespoke block appender.
 
 #### Example usage
 
 ```jsx
 // Utilise a predefined component
 <InnerBlocks
-	renderAppender={ () => (
-		<InnerBlocks.ButtonBlockAppender />
-	) }
+	renderAppender={ InnerBlocks.ButtonBlockAppender }
+/>
+
+// Don't display an appender
+<InnerBlocks
+	renderAppender={ false }
 />
 
 // Fully custom
 <InnerBlocks
-	renderAppender={ () => (
-		<button className="bespoke-appender" type="button">Some Special Appender</button>
-	) }
+	renderAppender={ MyAmazingAppender }
 />
 ```
 
@@ -164,7 +165,7 @@ A 'render prop' function that can be used to customize the block's appender.
 
 Determines whether the toolbars of _all_ child Blocks (applied deeply, recursive) should have their toolbars "captured" and shown on the Block which is consuming `InnerBlocks`.
 
-For example, a button block, deeply nested in several levels of block `X` that utilises this property will see the button block's toolbar displayed on block `X`'s toolbar area.
+For example, a button block, deeply nested in several levels of block `X` that utilizes this property will see the button block's toolbar displayed on block `X`'s toolbar area.
 
 ### `placeholder`
 
