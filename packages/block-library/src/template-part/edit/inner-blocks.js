@@ -19,14 +19,9 @@ export default function TemplatePartInnerBlocks( {
 	blockProps,
 	isSelected,
 } ) {
-	const { themeSupportsLayout } = useSelect( ( select ) => {
-		const { getSettings, getBlockInsertionPoint } = select(
-			blockEditorStore
-		);
-		return {
-			themeSupportsLayout: getSettings()?.supportsLayout,
-			insertionPoint: getBlockInsertionPoint(),
-		};
+	const themeSupportsLayout = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return getSettings()?.supportsLayout;
 	}, [] );
 	const defaultLayout = useEditorFeature( 'layout' ) || {};
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
