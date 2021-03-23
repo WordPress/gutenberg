@@ -1,28 +1,27 @@
 <?php
 /**
- * WP_REST_Widget_Types_Controller tests.
+ * WP_Test_REST_Widget_Types_Controller tests.
  *
  * @package WordPress
  * @subpackage REST_API
- * @since x.x.0
+ * @since 5.6.0
  */
 
 /**
  * Tests for WP_REST_Widget_Types_Controller.
  *
- * @since x.x.0
+ * @since 5.6.0
  *
  * @covers WP_REST_Widget_Types_Controller
  *
- * @group restapi-widgets
  * @group restapi
  */
-class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testcase {
 
 	/**
 	 * Admin user ID.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @var int $subscriber_id
 	 */
@@ -31,7 +30,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	/**
 	 * Subscriber user ID.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @var int $subscriber_id
 	 */
@@ -40,7 +39,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	/**
 	 * Create fake data before our tests run.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
@@ -63,20 +62,20 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey( '/wp/v2/widget-types', $routes );
 		$this->assertCount( 1, $routes['/wp/v2/widget-types'] );
-		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<name>[a-zA-Z0-9_-]+)', $routes );
-		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<name>[a-zA-Z0-9_-]+)'] );
-		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<name>[a-zA-Z0-9_-]+)/form-renderer', $routes );
-		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<name>[a-zA-Z0-9_-]+)/form-renderer'] );
+		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)', $routes );
+		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)'] );
+		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)/form-renderer', $routes );
+		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)/form-renderer'] );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_context_param() {
 		// Collection.
@@ -94,7 +93,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
@@ -111,7 +110,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item() {
 		$widget_name = 'calendar';
@@ -124,7 +123,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_widget_legacy() {
 		$widget_id = 'legacy';
@@ -142,7 +141,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_widget_invalid_name() {
 		$widget_type = 'fake';
@@ -154,7 +153,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item_schema() {
 		wp_set_current_user( self::$admin_id );
@@ -174,47 +173,47 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items_wrong_permission() {
 		wp_set_current_user( self::$subscriber_id );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 403 );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item_wrong_permission() {
 		wp_set_current_user( self::$subscriber_id );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types/calendar' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 403 );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items_no_permission() {
 		wp_set_current_user( 0 );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 401 );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item_no_permission() {
 		wp_set_current_user( 0 );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types/calendar' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 401 );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_prepare_item() {
 		$endpoint    = new WP_REST_Widget_Types_Controller;
@@ -228,7 +227,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	/**
 	 * Util check widget type object against.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @param WP_Widget_Type $widget_type Sample widget type.
 	 * @param array          $data Data to compare against.
@@ -243,7 +242,6 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 			'control_options',
 			'widget_options',
 			'widget_class',
-
 		);
 
 		foreach ( $extra_fields as $extra_field ) {
@@ -254,7 +252,6 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 
 		// Test links.
 		$this->assertSame( rest_url( 'wp/v2/widget-types' ), $links['collection'][0]['href'] );
-		// $this->assertSame( rest_url( 'wp/v2/widget-types/' . $widget_type->id_base ), $links['self'][0]['href'] );
 	}
 
 	public function test_get_widget_form() {

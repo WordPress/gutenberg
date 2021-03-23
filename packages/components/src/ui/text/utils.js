@@ -12,7 +12,7 @@ import { createElement } from '@wordpress/element';
 
 /**
  * Source:
- * https://github.com/bvaughn/react-highlight-words/blob/master/src/Highlighter.js
+ * https://github.com/bvaughn/react-highlight-words/blob/HEAD/src/Highlighter.js
  */
 
 /* eslint-disable jsdoc/valid-types */

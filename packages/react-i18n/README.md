@@ -38,6 +38,14 @@ ReactDom.render(
 You can also instantiate the provider without the `i18n` prop. In that case it will use the
 default `I18n` instance exported from `@wordpress/i18n`.
 
+_Parameters_
+
+-   _props_ ``: i18n provider props.
+
+_Returns_
+
+-   ``: Children wrapped in the I18nProvider.
+
 <a name="useI18n" href="#useI18n">#</a> **useI18n**
 
 React hook providing access to i18n functions. It exposes the `__`, `_x`, `_n`, `_nx`,

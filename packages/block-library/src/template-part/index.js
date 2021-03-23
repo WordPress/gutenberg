@@ -15,6 +15,7 @@ import { __, _x } from '@wordpress/i18n';
  */
 import metadata from './block.json';
 import edit from './edit';
+import variations from './variations';
 
 const { name } = metadata;
 export { metadata, name };
@@ -44,4 +45,5 @@ export const settings = {
 		return startCase( entity.title?.rendered || entity.slug );
 	},
 	edit,
+	variations,
 };

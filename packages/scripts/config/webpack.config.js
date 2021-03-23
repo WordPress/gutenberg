@@ -76,6 +76,12 @@ const getJsonpFunctionIdentifier = () => {
 	);
 };
 
+const getLiveReloadPort = ( inputPort ) => {
+	const parsedPort = parseInt( inputPort, 10 );
+
+	return Number.isInteger( parsedPort ) ? parsedPort : 35729;
+};
+
 const config = {
 	mode,
 	entry: {
@@ -221,7 +227,7 @@ const config = {
 		// works when running watch mode.
 		! isProduction &&
 			new LiveReloadPlugin( {
-				port: process.env.WP_LIVE_RELOAD_PORT || 35729,
+				port: getLiveReloadPort( process.env.WP_LIVE_RELOAD_PORT ),
 			} ),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 		// generated, and the default externals set.

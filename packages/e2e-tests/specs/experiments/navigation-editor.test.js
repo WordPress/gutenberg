@@ -208,8 +208,10 @@ describe( 'Navigation editor', () => {
 		} );
 		expect( submenuLinkVisible ).toBeDefined();
 
-		// Click the editor canvas.
-		await page.click( '.edit-navigation-layout__canvas' );
+		// click in the top left corner of the canvas.
+		const canvas = await page.$( '.edit-navigation-layout__canvas' );
+		const boundingBox = await canvas.boundingBox();
+		await page.mouse.click( boundingBox.x + 5, boundingBox.y + 5 );
 
 		// There should be a submenu in the DOM, but it should be hidden.
 		const submenuLinkHidden = await page.waitForXPath( submenuLinkXPath, {

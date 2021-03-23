@@ -31,7 +31,7 @@ const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 const layoutProp = { type: 'default', alignments: [] };
 
 export default function ButtonsEdit( {
-	attributes: { contentJustification, align },
+	attributes: { contentJustification, align, orientation },
 	clientId,
 	isSelected,
 	setAttributes,
@@ -73,15 +73,12 @@ export default function ButtonsEdit( {
 	);
 
 	useEffect( () => {
-		const margins = 2 * styles.parent.marginRight;
 		const { width } = sizes || {};
 		const { isFullWidth } = alignmentHelpers;
 
 		if ( width ) {
-			const base = width - margins;
 			const isFullWidthBlock = isFullWidth( align );
-
-			setMaxWidth( isFullWidthBlock ? base - 2 * spacing : base );
+			setMaxWidth( isFullWidthBlock ? blockWidth : width );
 		}
 	}, [ sizes, align ] );
 
@@ -114,6 +111,11 @@ export default function ButtonsEdit( {
 		</View>
 	) );
 
+	const justifyControls =
+		orientation === 'vertical'
+			? [ 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right', 'space-between' ];
+
 	const remove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 	return (
@@ -121,7 +123,7 @@ export default function ButtonsEdit( {
 			{ isSelected && (
 				<BlockControls>
 					<JustifyToolbar
-						allowedControls={ [ 'left', 'center', 'right' ] }
+						allowedControls={ justifyControls }
 						value={ contentJustification }
 						onChange={ ( value ) =>
 							setAttributes( { contentJustification: value } )
@@ -144,7 +146,7 @@ export default function ButtonsEdit( {
 				horizontalAlignment={ contentJustification }
 				onDeleteBlock={ shouldDelete ? remove : undefined }
 				onAddBlock={ onAddNextButton }
-				parentWidth={ maxWidth }
+				parentWidth={ maxWidth } // This value controls the width of that the buttons are able to expand to.
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
 				__experimentalLayout={ layoutProp }

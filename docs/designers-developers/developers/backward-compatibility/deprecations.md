@@ -2,6 +2,18 @@
 
 For features included in the Gutenberg plugin, the deprecation policy is intended to support backward compatibility for two minor plugin releases, when possible. Features and code included in a stable release of WordPress are not included in this deprecation timeline, and are instead subject to the [versioning policies of the WordPress project](https://make.wordpress.org/core/handbook/about/release-cycle/version-numbering/). The current deprecations are listed below and are grouped by _the version at which they will be removed completely_. If your plugin depends on these behaviors, you must update to the recommended alternative before the noted version.
 
+## 10.3.0
+
+-   Passing a tuple of components with `as` prop to `ActionItem.Slot` component is no longer supported. Please pass a component with `as` prop instead. Example:
+    ```diff
+    <ActionItem.Slot
+    	name="my/slot"
+    	label={ __( 'My slot' ) }
+    - 	as={ [ MenuGroup, MenuItem ] }
+    + 	as={ MenuGroup }
+    />
+    ```
+
 ## 9.7.0
 
 -   `leftSidebar` prop in `InterfaceSkeleton` component has been removed. Use `secondarySidebar` prop instead.

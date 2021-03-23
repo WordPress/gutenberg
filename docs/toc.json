@@ -149,8 +149,8 @@
 			{ "docs/designers-developers/developers/tutorials/format-api/2-toolbar-button.md": [] },
 			{ "docs/designers-developers/developers/tutorials/format-api/3-apply-format.md": [] }
 		] },
-		{ "docs/designers-developers/developers/tutorials/block-based-themes/README.md": [
-			{ "docs/designers-developers/developers/tutorials/block-based-themes/block-based-themes-2-adding-blocks.md": [] }
+		{ "docs/designers-developers/developers/tutorials/block-based-theme/README.md": [
+			{ "docs/designers-developers/developers/tutorials/block-based-theme/block-based-themes-2-adding-blocks.md": [] }
 		] }
 	] },
 	{ "packages/components/README.md": "{{components}}" },

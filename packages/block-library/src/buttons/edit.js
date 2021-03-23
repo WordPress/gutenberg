@@ -42,11 +42,16 @@ function ButtonsEdit( {
 		templateInsertUpdatesSelection: true,
 	} );
 
+	const justifyControls =
+		orientation === 'vertical'
+			? [ 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right', 'space-between' ];
+
 	return (
 		<>
 			<BlockControls>
 				<JustifyToolbar
-					allowedControls={ [ 'left', 'center', 'right' ] }
+					allowedControls={ justifyControls }
 					value={ contentJustification }
 					onChange={ ( value ) =>
 						setAttributes( { contentJustification: value } )

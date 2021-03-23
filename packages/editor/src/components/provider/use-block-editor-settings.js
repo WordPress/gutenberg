@@ -127,7 +127,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			reusableBlocks: select( 'core' ).getEntityRecords(
+			reusableBlocks: select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_block',
 				/**
@@ -151,11 +151,11 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		() => ( {
 			...pick( settings, [
 				'__experimentalBlockDirectory',
-				'__experimentalBlockPatterns',
 				'__experimentalBlockPatternCategories',
+				'__experimentalBlockPatterns',
 				'__experimentalFeatures',
-				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBaseStyles',
+				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
 				'alignWide',
@@ -167,16 +167,17 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'disableCustomColors',
 				'disableCustomFontSizes',
 				'disableCustomGradients',
-				'enableCustomUnits',
 				'enableCustomLineHeight',
+				'enableCustomSpacing',
+				'enableCustomUnits',
 				'focusMode',
 				'fontSizes',
 				'gradients',
 				'hasFixedToolbar',
 				'hasReducedUI',
+				'imageDimensions',
 				'imageEditing',
 				'imageSizes',
-				'imageDimensions',
 				'isRTL',
 				'keepCaretInsideBlock',
 				'maxWidth',

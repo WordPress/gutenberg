@@ -7,8 +7,8 @@ import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
 	useBlockProps,
-	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	store as blockEditorStore,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 } from '@wordpress/block-editor';
 
 /**
@@ -17,15 +17,11 @@ import {
 import QueryToolbar from './query-toolbar';
 import QueryProvider from './query-provider';
 import QueryInspectorControls from './query-inspector-controls';
-import QueryPlaceholder from './query-placeholder';
+import QueryBlockSetup from './query-block-setup';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
 const TEMPLATE = [ [ 'core/query-loop' ] ];
-export function QueryContent( {
-	attributes,
-	context: { postId },
-	setAttributes,
-} ) {
+export function QueryContent( { attributes, setAttributes } ) {
 	const { queryId, query, layout } = attributes;
 	const instanceId = useInstanceId( QueryContent );
 	const blockProps = useBlockProps();
@@ -42,16 +38,13 @@ export function QueryContent( {
 	// would cause to overide previous wanted changes.
 	useEffect( () => {
 		const newQuery = {};
-		if ( postId && ! query.exclude?.length ) {
-			newQuery.exclude = [ postId ];
-		}
 		if ( ! query.perPage && postsPerPage ) {
 			newQuery.perPage = postsPerPage;
 		}
 		if ( !! Object.keys( newQuery ).length ) {
 			updateQuery( newQuery );
 		}
-	}, [ query.perPage, query.exclude, query.inherit, postId ] );
+	}, [ query.perPage, query.inherit ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
@@ -93,8 +86,7 @@ const QueryEdit = ( props ) => {
 			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
-	const Component = hasInnerBlocks ? QueryContent : QueryPlaceholder;
-
+	const Component = hasInnerBlocks ? QueryContent : QueryBlockSetup;
 	return <Component { ...props } />;
 };
 

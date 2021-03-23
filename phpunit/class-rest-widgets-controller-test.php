@@ -89,9 +89,6 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		);
 	}
 
-	/**
-	 *
-	 */
 	public function setUp() {
 		parent::setUp();
 
@@ -144,7 +141,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
@@ -153,13 +150,13 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_context_param() {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items_no_widgets() {
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/widgets' );
@@ -170,7 +167,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items_no_permission() {
 		wp_set_current_user( 0 );
@@ -180,7 +177,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items_wrong_permission_author() {
 		wp_set_current_user( self::$author_id );
@@ -190,7 +187,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items() {
 		$this->setup_widget(
@@ -301,7 +298,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item() {
 		$this->setup_widget(
@@ -341,7 +338,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item_no_permission() {
 		wp_set_current_user( 0 );
@@ -367,7 +364,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item_wrong_permission_author() {
 		wp_set_current_user( self::$author_id );
@@ -391,7 +388,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_create_item() {
 		$this->setup_sidebar(
@@ -427,7 +424,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_create_item_multiple_in_a_row() {
 		$this->setup_sidebar(
@@ -487,7 +484,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_create_item_second_instance() {
 		$this->setup_widget(
@@ -530,7 +527,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_update_item() {
 		$this->setup_widget(
@@ -580,7 +577,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_update_item_reassign_sidebar() {
 		$this->setup_widget(
@@ -624,7 +621,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_update_item_shouldnt_require_id_base() {
 		$this->setup_widget(
@@ -739,21 +736,21 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_update_item_legacy_widget_1() {
 		$this->do_test_update_item_legacy_widget( 'testwidget-1' );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_update_item_legacy_widget_2() {
 		$this->do_test_update_item_legacy_widget( 'testwidget' );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function do_test_update_item_legacy_widget( $widget_id ) {
 		// @TODO: Use @dataProvider instead (it doesn't work with custom constructors like the one we have in this class)
@@ -826,21 +823,21 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_create_item_legacy_widget_1() {
 		$this->do_test_create_item_legacy_widget( 'testwidget-1' );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_create_item_legacy_widget_2() {
 		$this->do_test_create_item_legacy_widget( 'testwidget' );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function do_test_create_item_legacy_widget( $widget_id ) {
 		// @TODO: Use @dataProvider instead (it doesn't work with custom constructors like the one we have in this class)
@@ -914,7 +911,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_update_item_no_permission() {
 		wp_set_current_user( 0 );
@@ -926,11 +923,11 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 401 );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_update_item_wrong_permission_author() {
 		wp_set_current_user( self::$author_id );
@@ -942,7 +939,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			)
 		);
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 403 );
 	}
 
 	/**
@@ -986,7 +983,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_delete_item() {
 		$this->setup_widget(
@@ -1030,7 +1027,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_delete_item_force() {
 		$this->setup_widget(
@@ -1083,7 +1080,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_delete_item_logged_out() {
 		wp_set_current_user( 0 );
@@ -1110,7 +1107,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_delete_item_author() {
 		wp_set_current_user( self::$author_id );
@@ -1143,7 +1140,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item_schema() {
 		wp_set_current_user( self::$admin_id );

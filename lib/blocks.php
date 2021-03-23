@@ -42,6 +42,7 @@ function gutenberg_reregister_core_block_types() {
 				'spacer',
 				'subhead',
 				'table',
+				'table-of-contents',
 				'text-columns',
 				'verse',
 				'video',
@@ -89,6 +90,7 @@ function gutenberg_reregister_core_block_types() {
 					'site-logo.php'                 => 'core/site-logo',
 					'site-tagline.php'              => 'core/site-tagline',
 					'site-title.php'                => 'core/site-title',
+					'table-of-contents.php'         => 'core/table-of-contents',
 					'template-part.php'             => 'core/template-part',
 				)
 			),
@@ -180,6 +182,9 @@ function gutenberg_register_core_block_styles( $block_name ) {
 			filemtime( gutenberg_dir_path() . $style_path )
 		);
 		wp_style_add_data( "wp-block-{$block_name}", 'rtl', 'replace' );
+
+		// Add a reference to the stylesheet's path to allow calculations for inlining styles in `wp_head`.
+		wp_style_add_data( "wp-block-{$block_name}", 'path', gutenberg_dir_path() . $style_path );
 	}
 
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
@@ -191,6 +196,105 @@ function gutenberg_register_core_block_styles( $block_name ) {
 		);
 		wp_style_add_data( "wp-block-{$block_name}-editor", 'rtl', 'replace' );
 	}
+}
+
+/**
+ * Change the way styles get loaded depending on their size.
+ *
+ * Optimizes performance and sustainability of styles by inlining smaller stylesheets.
+ *
+ * @return void
+ */
+function gutenberg_maybe_inline_styles() {
+
+	$total_inline_limit = 20000;
+	/**
+	 * The maximum size of inlined styles in bytes.
+	 *
+	 * @param int $total_inline_limit The file-size threshold, in bytes. Defaults to 20000.
+	 * @return int                    The file-size threshold, in bytes.
+	 */
+	$total_inline_limit = apply_filters( 'styles_inline_size_limit', $total_inline_limit );
+
+	global $wp_styles;
+	$styles = array();
+
+	// Build an array of styles that have a path defined.
+	foreach ( $wp_styles->queue as $handle ) {
+		if ( wp_styles()->get_data( $handle, 'path' ) && file_exists( $wp_styles->registered[ $handle ]->extra['path'] ) ) {
+			$block_styles = false;
+			$styles_size  = filesize( $wp_styles->registered[ $handle ]->extra['path'] );
+
+			// Minify styles and get their minified size if SCRIPT_DEBUG is not enabled.
+			if ( ! defined( 'SCRIPT_DEBUG' ) || ! SCRIPT_DEBUG ) {
+				// Get the styles and minify them by removing comments & whitespace.
+				$block_styles = gutenberg_get_minified_styles( file_get_contents( $wp_styles->registered[ $handle ]->extra['path'] ) );
+				// Get the styles size.
+				$styles_size = strlen( $block_styles );
+			}
+
+			$styles[] = array(
+				'handle' => $handle,
+				'path'   => $wp_styles->registered[ $handle ]->extra['path'],
+				'size'   => $styles_size,
+				'css'    => $block_styles,
+			);
+		}
+	}
+
+	if ( ! empty( $styles ) ) {
+		// Reorder styles array based on size.
+		usort(
+			$styles,
+			function( $a, $b ) {
+				return ( $a['size'] <= $b['size'] ) ? -1 : 1;
+			}
+		);
+
+		/**
+		 * The total inlined size.
+		 *
+		 * On each iteration of the loop, if a style gets added inline the value of this var increases
+		 * to reflect the total size of inlined styles.
+		 */
+		$total_inline_size = 0;
+
+		// Loop styles.
+		foreach ( $styles as $style ) {
+
+			// Size check. Since styles are ordered by size, we can break the loop.
+			if ( $total_inline_size + $style['size'] > $total_inline_limit ) {
+				break;
+			}
+
+			// Get the styles if we don't already have them.
+			$style['css'] = $style['css'] ? $style['css'] : file_get_contents( $style['path'] );
+
+			// Set `src` to `false` and add styles inline.
+			$wp_styles->registered[ $style['handle'] ]->src              = false;
+			$wp_styles->registered[ $style['handle'] ]->extra['after'][] = $style['css'];
+
+			// Add the styles size to the $total_inline_size var.
+			$total_inline_size += (int) $style['size'];
+		}
+	}
+}
+add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
+
+/**
+ * Minify styles.
+ *
+ * Removes inline comments and whitespace.
+ *
+ * @param string $styles The styles to be minified.
+ * @return string
+ */
+function gutenberg_get_minified_styles( $styles ) {
+	$re1 = '(?sx)("(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')|/\\* (?> .*? \\*/ )';
+	$re2 = '(?six)("(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')|\\s*+ ; \\s*+ ( } ) \\s*+|\\s*+ ( [*$~^|]?+= | [{};,>~+-] | !important\\b ) \\s*+|( [[(:] ) \\s++|\\s++ ( [])] )|\\s++ ( : ) \\s*+(?!(?>[^{}"\']++|"(?:[^"\\\\]++|\\\\.)*+"|\'(?:[^\'\\\\]++|\\\\.)*+\')*+{)|^ \\s++ | \\s++ \\z|(\\s)\\s+';
+
+	$styles = preg_replace( "%$re1%", '$1', $styles );
+	return preg_replace( "%$re2%", '$1$2$3$4$5$6$7', $styles );
 }
 
 /**

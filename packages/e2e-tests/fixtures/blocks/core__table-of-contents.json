@@ -1,0 +1,12 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/table-of-contents",
+		"isValid": true,
+		"attributes": {
+			"onlyIncludeCurrentPage": false
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

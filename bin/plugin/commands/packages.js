@@ -275,14 +275,23 @@ async function publishPackagesToNpm(
 	} );
 
 	if ( isPrerelease ) {
-		log( '>> Publishing modified packages to npm.' );
+		log(
+			'>> Bumping version of public packages changed since the last release.'
+		);
+		const { stdout: sha } = await command( 'git rev-parse --short HEAD' );
 		await command(
-			`npx lerna publish --canary ${ minimumVersionBump } --preid next`,
+			`npx lerna version pre${ minimumVersionBump } --preid next.${ sha } --no-private`,
 			{
 				cwd: gitWorkingDirectoryPath,
 				stdio: 'inherit',
 			}
 		);
+
+		log( '>> Publishing modified packages to npm.' );
+		await command( 'npx lerna publish from-package --dist-tag next', {
+			cwd: gitWorkingDirectoryPath,
+			stdio: 'inherit',
+		} );
 	} else {
 		log(
 			'>> Bumping version of public packages changed since the last release.'

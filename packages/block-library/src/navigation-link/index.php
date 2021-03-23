@@ -214,9 +214,8 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 			$inner_blocks_html .= $inner_block->render();
 		}
 
-		// TODO - classname is wrong!
 		$html .= sprintf(
-			'<ul class="wp-block-navigation__container">%s</ul>',
+			'<ul class="wp-block-navigation-link__container">%s</ul>',
 			$inner_blocks_html
 		);
 	}

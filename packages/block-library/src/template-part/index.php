@@ -14,6 +14,7 @@
  */
 function render_block_core_template_part( $attributes ) {
 	$content = null;
+	$area    = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 
 	if ( ! empty( $attributes['postId'] ) && get_post_status( $attributes['postId'] ) ) {
 		// If we have a post ID and the post exists, which means this template part
@@ -40,7 +41,11 @@ function render_block_core_template_part( $attributes ) {
 		if ( $template_part_post ) {
 			// A published post might already exist if this template part was customized elsewhere
 			// or if it's part of a customized template.
-			$content = $template_part_post->post_content;
+			$content    = $template_part_post->post_content;
+			$area_terms = get_the_terms( $template_part_post, 'wp_template_part_area' );
+			if ( ! is_wp_error( $area_terms ) && false !== $area_terms ) {
+				$area = $area_terms[0]->name;
+			}
 		} else {
 			// Else, if the template part was provided by the active theme,
 			// render the corresponding file content.
@@ -66,8 +71,18 @@ function render_block_core_template_part( $attributes ) {
 	} else {
 		$content = wp_make_content_images_responsive( $content );
 	}
-	$content            = do_shortcode( $content );
-	$html_tag           = esc_attr( $attributes['tagName'] );
+	$content = do_shortcode( $content );
+
+	if ( empty( $attributes['tagName'] ) ) {
+		$area_tags = array(
+			WP_TEMPLATE_PART_AREA_HEADER        => 'header',
+			WP_TEMPLATE_PART_AREA_FOOTER        => 'footer',
+			WP_TEMPLATE_PART_AREA_UNCATEGORIZED => 'div',
+		);
+		$html_tag  = null !== $area && isset( $area_tags[ $area ] ) ? $area_tags[ $area ] : $area_tags[ WP_TEMPLATE_PART_AREA_UNCATEGORIZED ];
+	} else {
+		$html_tag = esc_attr( $attributes['tagName'] );
+	}
 	$wrapper_attributes = get_block_wrapper_attributes();
 
 	return "<$html_tag $wrapper_attributes>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";

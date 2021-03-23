@@ -46,20 +46,21 @@
 /bin                                            @ntwb @nerrad @ajitbohra
 /bin/api-docs                                   @ntwb @nerrad @ajitbohra @nosolosw
 /docs/tool                                      @chrisvanpatten @ajitbohra @nosolosw
-/packages/babel-plugin-import-jsx-pragma        @gziolo @ntwb @nerrad @ajitbohra
+/packages/babel-plugin-import-jsx-pragma        @ntwb @nerrad @ajitbohra
 /packages/babel-plugin-makepot                  @ntwb @nerrad @ajitbohra
 /packages/babel-preset-default                  @gziolo @ntwb @nerrad @ajitbohra
-/packages/browserslist-config                   @gziolo @ntwb @nerrad @ajitbohra
+/packages/browserslist-config                   @ntwb @nerrad @ajitbohra
 /packages/create-block                          @gziolo @mkaz
+/packages/create-block-tutorial-template        @gziolo
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
 /packages/docgen                                @nosolosw
-/packages/e2e-test-utils                        @gziolo @ntwb @nerrad @ajitbohra
+/packages/e2e-test-utils                        @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @ntwb @nerrad @ajitbohra
 /packages/eslint-plugin                         @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-console                          @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-preset-default                   @gziolo @ntwb @nerrad @ajitbohra
 /packages/jest-puppeteer-axe                    @gziolo @ntwb @nerrad @ajitbohra
-/packages/library-export-default-webpack-plugin @gziolo @ntwb @nerrad @ajitbohra
+/packages/library-export-default-webpack-plugin @ntwb @nerrad @ajitbohra
 /packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @ntwb @nerrad @ajitbohra
 /packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra
@@ -97,7 +98,7 @@
 /packages/keyboard-shortcuts
 
 # Extensibility
-/packages/hooks                                 @gziolo @adamsilverstein
+/packages/hooks                                 @adamsilverstein
 /packages/plugins                               @gziolo @adamsilverstein
 
 # Rich Text
@@ -106,7 +107,7 @@
 /packages/block-editor/src/components/rich-text @ellatrix @cameronvoell @guarani
 
 # Project Management
-/.github                                        @mapk @karmatosed
+/.github
 /packages/project-management-automation
 
 # wp-env

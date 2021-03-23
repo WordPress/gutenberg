@@ -86,6 +86,10 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/autocomplete/README.md>
 
+<a name="BlockAlignmentControl" href="#BlockAlignmentControl">#</a> **BlockAlignmentControl**
+
+Undocumented declaration.
+
 <a name="BlockAlignmentToolbar" href="#BlockAlignmentToolbar">#</a> **BlockAlignmentToolbar**
 
 Undocumented declaration.

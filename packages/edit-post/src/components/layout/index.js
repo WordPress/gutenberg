@@ -220,11 +220,7 @@ function Layout( { styles } ) {
 								<Library
 									showMostUsedBlocks={ showMostUsedBlocks }
 									showInserterHelpPanel
-									onSelect={ () => {
-										if ( isMobileViewport ) {
-											setIsInserterOpened( false );
-										}
-									} }
+									shouldFocusBlock={ isMobileViewport }
 								/>
 							</div>
 						</div>

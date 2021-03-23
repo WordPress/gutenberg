@@ -68,7 +68,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <label
-  class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label emotion-0"
+  class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label ic-k1x6d ic-7u3orf ic-1m45iq3 ic-192yz5d emotion-0"
   data-g2-c16t="true"
   data-g2-component="ControlLabel"
 >
@@ -140,7 +140,7 @@ exports[`props should render no truncate 1`] = `
 }
 
 <label
-  class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label emotion-0"
+  class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label ic-k1x6d ic-7u3orf ic-1m45iq3 ic-192yz5d emotion-0"
   data-g2-c16t="true"
   data-g2-component="ControlLabel"
 >
@@ -216,7 +216,7 @@ exports[`props should render size 1`] = `
 }
 
 <label
-  class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label emotion-0"
+  class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label ic-k1x6d ic-7u3orf ic-1m45iq3 ic-192yz5d emotion-0"
   data-g2-c16t="true"
   data-g2-component="ControlLabel"
 >

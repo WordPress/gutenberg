@@ -4,25 +4,8 @@
 	position: relative;
 	margin: 0;
 
-	.wp-block-navigation__container:empty {
+	.wp-block-navigation-link__container:empty {
 		display: none;
-	}
-}
-
-.wp-block-navigation__container {
-	// Reset the default list styles
-	list-style: none;
-	margin: 0;
-	padding-left: 0;
-
-	// Horizontal layout
-	display: flex;
-	flex-wrap: wrap;
-
-	// Vertical layout
-
-	.is-vertical & {
-		display: block;
 	}
 }
 
@@ -31,7 +14,7 @@
 	> .wp-block-navigation-link__content {
 		padding-right: 0.5em;
 	}
-	.wp-block-navigation__container {
+	.wp-block-navigation-link__container {
 		border: $border-width solid rgba(0, 0, 0, 0.15);
 		background-color: inherit;
 		color: inherit;
@@ -57,7 +40,7 @@
 			left: 1.5em;
 
 			// Nested submenus sit to the left on large breakpoints
-			.wp-block-navigation__container {
+			.wp-block-navigation-link__container {
 				left: 100%;
 				top: -1px;
 
@@ -83,7 +66,7 @@
 	&:hover {
 		cursor: pointer;
 
-		> .wp-block-navigation__container {
+		> .wp-block-navigation-link__container {
 			visibility: visible;
 			opacity: 1;
 			display: flex;
@@ -94,7 +77,7 @@
 	&:focus-within {
 		cursor: pointer;
 
-		> .wp-block-navigation__container {
+		> .wp-block-navigation-link__container {
 			visibility: visible;
 			opacity: 1;
 			display: flex;
@@ -103,9 +86,22 @@
 	}
 }
 
+// Default background and font color
+.wp-block-navigation:not(.has-background) .wp-block-navigation__container {
+	.wp-block-navigation-link__container {
+		// Set a background color for submenus so that they're not transparent.
+		// NOTE TO DEVS - if refactoring this code, please double-check that
+		// submenus have a default background color, this feature has regressed
+		// several times, so care needs to be taken.
+		background-color: $white;
+		color: $gray-900;
+	}
+}
+
+
 // Force links to inherit text decoration applied to navigation block.
 .wp-block-navigation[style*="text-decoration"] {
-	.wp-block-navigation__container,
+	.wp-block-navigation-link__container,
 	.wp-block-navigation-link {
 		text-decoration: inherit;
 	}

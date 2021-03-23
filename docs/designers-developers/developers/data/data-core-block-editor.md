@@ -1535,7 +1535,8 @@ attributes with the specified client IDs have been updated.
 _Parameters_
 
 -   _clientIds_ `string|string[]`: Block client IDs.
--   _attributes_ `Object`: Block attributes to be merged.
+-   _attributes_ `Object`: Block attributes to be merged. Should be keyed by clientIds if uniqueByBlock is true.
+-   _uniqueByBlock_ `boolean`: true if each block in clientIds array has a unique set of attributes
 
 _Returns_
 

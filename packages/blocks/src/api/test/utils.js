@@ -17,7 +17,7 @@ import {
 	isUnmodifiedDefaultBlock,
 	getAccessibleBlockLabel,
 	getBlockLabel,
-	sanitizeBlockAttributes,
+	__experimentalSanitizeBlockAttributes,
 } from '../utils';
 
 describe( 'block helpers', () => {
@@ -231,10 +231,13 @@ describe( 'sanitizeBlockAttributes', () => {
 			title: 'Test block',
 		} );
 
-		const attributes = sanitizeBlockAttributes( 'core/test-block', {
-			defined: 'defined-attribute',
-			notDefined: 'not-defined-attribute',
-		} );
+		const attributes = __experimentalSanitizeBlockAttributes(
+			'core/test-block',
+			{
+				defined: 'defined-attribute',
+				notDefined: 'not-defined-attribute',
+			}
+		);
 
 		expect( attributes ).toEqual( {
 			defined: 'defined-attribute',
@@ -243,7 +246,10 @@ describe( 'sanitizeBlockAttributes', () => {
 
 	it( 'throws error if the block is not registered', () => {
 		expect( () => {
-			sanitizeBlockAttributes( 'core/not-registered-test-block', {} );
+			__experimentalSanitizeBlockAttributes(
+				'core/not-registered-test-block',
+				{}
+			);
 		} ).toThrowErrorMatchingInlineSnapshot(
 			`"Block type 'core/not-registered-test-block' is not registered."`
 		);
@@ -263,7 +269,10 @@ describe( 'sanitizeBlockAttributes', () => {
 			title: 'Test block',
 		} );
 
-		const attributes = sanitizeBlockAttributes( 'core/test-block', {} );
+		const attributes = __experimentalSanitizeBlockAttributes(
+			'core/test-block',
+			{}
+		);
 
 		expect( attributes ).toEqual( {
 			hasDefaultValue: 'default-value',
@@ -287,9 +296,12 @@ describe( 'sanitizeBlockAttributes', () => {
 			title: 'Test block',
 		} );
 
-		const attributes = sanitizeBlockAttributes( 'core/test-block', {
-			nodeContent: [ 'test-1', 'test-2' ],
-		} );
+		const attributes = __experimentalSanitizeBlockAttributes(
+			'core/test-block',
+			{
+				nodeContent: [ 'test-1', 'test-2' ],
+			}
+		);
 
 		expect( attributes ).toEqual( {
 			nodeContent: [ 'test-1', 'test-2' ],

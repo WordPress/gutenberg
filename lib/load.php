@@ -41,7 +41,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-widgets-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Pattern_Directory_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-pattern-directory-controller.php';
+		require_once __DIR__ . '/class-wp-rest-pattern-directory-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Menus_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-menus-controller.php';
@@ -109,6 +109,7 @@ require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/full-site-editing/edit-site-export.php';
 
 require __DIR__ . '/blocks.php';
+require __DIR__ . '/block-patterns.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/widgets.php';

@@ -74,9 +74,9 @@ class WP_Widget_Block extends WP_Widget {
 	 *
 	 * Usually this is set to $this->widget_options['classname'] by
 	 * dynamic_sidebar(). In this case, however, we want to set the classname
-	 * dynamically depending on the block conatined by this block widget.
+	 * dynamically depending on the block contained by this block widget.
 	 *
-	 * If a block widget contains a block that has an equivelant legacy widget,
+	 * If a block widget contains a block that has an equivalent legacy widget,
 	 * we display that legacy widget's class name. This helps with theme
 	 * backwards compatibility.
 	 *

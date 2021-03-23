@@ -27,6 +27,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
+import { layout, header, footer } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -1678,18 +1679,18 @@ export const __experimentalGetDefaultTemplateType = createSelector(
 
 /**
  * Given a template entity, return information about it which is ready to be
- * rendered, such as the title and description.
+ * rendered, such as the title, description, and icon.
  *
  * @param {Object} state Global application state.
  * @param {Object} template The template for which we need information.
- * @return {Object} Information about the template, including title and description.
+ * @return {Object} Information about the template, including title, description, and icon.
  */
 export function __experimentalGetTemplateInfo( state, template ) {
 	if ( ! template ) {
 		return {};
 	}
 
-	const { excerpt, slug, title } = template;
+	const { excerpt, slug, title, area } = template;
 	const {
 		title: defaultTitle,
 		description: defaultDescription,
@@ -1697,6 +1698,11 @@ export function __experimentalGetTemplateInfo( state, template ) {
 
 	const templateTitle = isString( title ) ? title : title?.rendered;
 	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
+	const iconsByArea = {
+		footer,
+		header,
+	};
+	const templateIcon = iconsByArea[ area ] || layout;
 
 	return {
 		title:
@@ -1704,5 +1710,6 @@ export function __experimentalGetTemplateInfo( state, template ) {
 				? templateTitle
 				: defaultTitle || slug,
 		description: templateDescription || defaultDescription,
+		icon: templateIcon,
 	};
 }

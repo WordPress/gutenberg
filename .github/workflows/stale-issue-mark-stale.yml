@@ -1,0 +1,17 @@
+name: "Mark issues stale after needs testing for 30 days"
+on:
+  schedule:
+  - cron: "55 1 * * *"
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/stale@v3
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        days-before-stale: 30
+        days-before-close: -1
+        only-labels: 'Needs Testing'
+        skip-stale-issue-message: true
+        stale-issue-label: '[Status] Stale'

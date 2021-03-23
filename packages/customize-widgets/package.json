@@ -6,7 +6,7 @@
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [ "wordpress" ],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/customize-widgets/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/blob/HEAD/packages/customize-widgets/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

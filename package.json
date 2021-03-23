@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "10.0.0",
+	"version": "10.1.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -16,7 +16,7 @@
 	},
 	"engines": {
 		"node": ">=10.0.0",
-		"npm": ">=6.9.0"
+		"npm": ">=6.9.0 <7"
 	},
 	"config": {
 		"GUTENBERG_PHASE": 2,
@@ -292,14 +292,14 @@
 		"*.scss": [
 			"wp-scripts lint-style"
 		],
-		"*.js": [
+		"*.{js,ts,tsx}": [
 			"wp-scripts format-js",
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
 			"node ./docs/tool/index.js"
 		],
-		"packages/**/*.js": [
+		"packages/**/*.{js,ts,tsx}": [
 			"node ./bin/api-docs/update-api-docs.js",
 			"node ./bin/api-docs/are-api-docs-unstaged.js",
 			"node ./bin/packages/lint-staged-typecheck.js"
