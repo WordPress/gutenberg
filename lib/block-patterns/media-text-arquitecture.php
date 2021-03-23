@@ -14,7 +14,7 @@ return array(
 	<!-- /wp:heading -->
 	
 	<!-- wp:paragraph {"align":"center","fontSize":"extra-small"} -->
-	<p class="has-text-align-center has-extra-small-font-size"><a href="https://blockpatterndesigns.mystagingwebsite.com">' . __( 'See case study ↗' ) . '</a></p>
+	<p class="has-text-align-center has-extra-small-font-size"><a href="#">' . __( 'See case study ↗' ) . '</a></p>
 	<!-- /wp:paragraph --></div></div>
 	<!-- /wp:media-text -->',
 	'description' => _x( 'Media and text block with image to the left and text to the right', 'Block pattern description' ),
