@@ -328,8 +328,8 @@
 	}
 }
 
-// Spotlight mode.
-.is-focus-mode .block-editor-block-list__block {
+// Spotlight mode. Fade out blocks unless they contain a selected block.
+.is-focus-mode .block-editor-block-list__block:not(.has-child-selected) {
 	opacity: 0.5;
 	transition: opacity 0.1s linear;
 	@include reduce-motion("transition");
@@ -340,8 +340,7 @@
 	// including inner blocks, should be focused.
 	.block-editor-block-list__block,
 	&.is-selected,
-	&.is-multi-selected,
-	&.has-child-selected {
+	&.is-multi-selected {
 		opacity: 1;
 	}
 }
