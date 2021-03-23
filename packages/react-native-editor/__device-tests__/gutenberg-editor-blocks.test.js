@@ -19,6 +19,19 @@ describe( 'Gutenberg Editor Blocks test', () => {
 			lastBlockElement = await editorPage.getLastElementByXPath(
 				lastBlockAccessibilityLabel
 			);
+			if ( ! lastBlockElement ) {
+				const retryDelay = 5000;
+				// eslint-disable-next-line no-console
+				console.log(
+					`Warning: "lastBlockElement" was not found in the first attempt. Could be that all the blocks were not loaded yet.
+Will retry one more time after ${ retryDelay / 1000 } seconds.`,
+					lastBlockElement
+				);
+				await editorPage.driver.sleep( retryDelay );
+				lastBlockElement = await editorPage.getLastElementByXPath(
+					lastBlockAccessibilityLabel
+				);
+			}
 		}
 
 		expect( lastBlockElement ).toBeTruthy();
