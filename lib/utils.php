@@ -59,7 +59,7 @@ function gutenberg_experimental_set( &$array, $path, $value = null ) {
 		) {
 			$array[ $path_element ] = array();
 		}
-		$array = &$array[ $path_element ];
+		$array = &$array[ $path_element ]; // phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.VariableRedeclaration
 	}
 	$array[ $path[ $i ] ] = $value;
 }

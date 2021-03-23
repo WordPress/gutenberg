@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useRef, createContext, useState } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -30,6 +31,17 @@ export default function BlockList( { className, __experimentalLayout } ) {
 	const insertionPoint = useInsertionPoint( ref );
 	useScrollSelectionIntoView( ref );
 
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const { isTyping, isOutlineMode, isFocusMode } = useSelect( ( select ) => {
+		const { isTyping: _isTyping, getSettings } = select( blockEditorStore );
+		const { outlineMode, focusMode } = getSettings();
+		return {
+			isTyping: _isTyping(),
+			isOutlineMode: outlineMode,
+			isFocusMode: focusMode,
+		};
+	}, [] );
+
 	return (
 		<BlockNodes.Provider value={ blockNodes }>
 			{ insertionPoint }
@@ -38,7 +50,12 @@ export default function BlockList( { className, __experimentalLayout } ) {
 				ref={ ref }
 				className={ classnames(
 					'block-editor-block-list__layout is-root-container',
-					className
+					className,
+					{
+						'is-typing': isTyping,
+						'is-outline-mode': isOutlineMode,
+						'is-focus-mode': isFocusMode && isLargeViewport,
+					}
 				) }
 			>
 				<SetBlockNodes.Provider value={ setBlockNodes }>

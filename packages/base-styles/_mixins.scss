@@ -175,20 +175,6 @@
 		}
 	}
 
-	/* Mobile menu opened. */
-	@media (max-width: #{ ($break-medium + 1) }) {
-		.auto-fold .wp-responsive-open #{$selector} {
-			left: $admin-sidebar-width-big;
-		}
-	}
-
-	/* In small screens with responsive menu expanded there is small white space. */
-	@media (max-width: #{ ($break-small) }) {
-		.auto-fold .wp-responsive-open #{$selector} {
-			margin-left: -18px;
-		}
-	}
-
 	body.is-fullscreen-mode #{$selector} {
 		left: 0 !important;
 	}

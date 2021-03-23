@@ -6,8 +6,9 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { Button, Dropdown, DropdownMenu } from '@wordpress/components';
+import { PinnedItems } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, Dropdown, DropdownMenu, Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -69,7 +70,7 @@ export default function Header( {
 						popoverProps={ {
 							className:
 								'edit-navigation-header__menu-switcher-dropdown',
-							position: 'bottom left',
+							position: 'bottom center',
 						} }
 					>
 						{ ( { onClose } ) => (
@@ -102,8 +103,7 @@ export default function Header( {
 					/>
 
 					<SaveButton navigationPost={ navigationPost } />
-
-					<Popover.Slot name="block-toolbar" />
+					<PinnedItems.Slot scope="core/edit-navigation" />
 				</div>
 			) }
 		</div>

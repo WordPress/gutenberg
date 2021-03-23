@@ -25,3 +25,17 @@ export const NAVIGATION_POST_KIND = 'root';
  * @type {string}
  */
 export const NAVIGATION_POST_POST_TYPE = 'postType';
+
+/**
+ * The scope name of the editor's complementary area.
+ *
+ * @type {string}
+ */
+export const COMPLEMENTARY_AREA_SCOPE = 'core/edit-navigation';
+
+/**
+ * The identifier of the editor's complementary area.
+ *
+ * @type {string}
+ */
+export const COMPLEMENTARY_AREA_ID = 'edit-navigation/block-inspector';

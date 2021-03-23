@@ -207,6 +207,8 @@ export function ImageEdit( {
 			setAttributes( {
 				url: newURL,
 				id: undefined,
+				width: undefined,
+				height: undefined,
 				sizeSlug: DEFAULT_SIZE_SLUG,
 			} );
 		}
@@ -277,7 +279,6 @@ export function ImageEdit( {
 	const classes = classnames( className, {
 		'is-transient': isBlobURL( url ),
 		'is-resized': !! width || !! height,
-		'is-focused': isSelected,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
 
