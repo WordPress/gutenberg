@@ -468,10 +468,7 @@ class WP_Theme_JSON_Resolver {
 				'delete_others_posts'    => 'edit_theme_options',
 			),
 			'map_meta_cap' => true,
-			'supports'     => array(
-				'editor',
-				'revisions',
-			),
+			'supports'     => array( 'editor' ),
 		);
 		register_post_type( 'wp_global_styles', $args );
 	}
