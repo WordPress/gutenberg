@@ -308,7 +308,15 @@ class WP_Theme_JSON_Resolver {
 		if ( null === self::$theme ) {
 			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
 			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
-			self::$theme     = new WP_Theme_JSON( $theme_json_data );
+
+			// If the current theme is a child theme then lets add data from the parent theme.
+			if( is_child_theme() ) {
+				$parent_theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json', get_template_directory() ) );
+				$parent_theme_json_data = self::translate( $parent_theme_json_data, wp_get_theme( get_template() )->get( 'TextDomain' ) );
+				$theme_json_data = array_merge( $parent_theme_json_data, $theme_json_data );
+			}
+
+			self::$theme = new WP_Theme_JSON( $theme_json_data );
 		}
 
 		if ( empty( $theme_support_data ) ) {
@@ -516,9 +524,10 @@ class WP_Theme_JSON_Resolver {
 	 * otherwise returns the whole file path.
 	 *
 	 * @param string $file_name Name of the file.
+	 * @param string $directory The theme directory.
 	 * @return string The whole file path or empty if the file doesn't exist.
 	 */
-	private static function get_file_path_from_theme( $file_name ) {
+	private static function get_file_path_from_theme( $file_name, $directory = '' ) {
 		// This used to be a locate_template call.
 		// However, that method proved problematic
 		// due to its use of constants (STYLESHEETPATH)
@@ -528,11 +537,14 @@ class WP_Theme_JSON_Resolver {
 		// child themes, this should also fallback
 		// to the template path, as locate_template did.
 		$located   = '';
-		$candidate = get_stylesheet_directory() . '/' . $file_name;
+		if ( empty ( $directory ) ) {
+			$directory = get_stylesheet_directory();
+		}
+
+		$candidate = $directory . '/' . $file_name;
 		if ( is_readable( $candidate ) ) {
 			$located = $candidate;
 		}
 		return $located;
 	}
-
 }
