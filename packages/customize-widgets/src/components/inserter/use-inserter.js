@@ -3,6 +3,7 @@
  */
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
+import { ESCAPE } from '@wordpress/keycodes';
 
 const {
 	wp: { customize },
@@ -122,6 +123,37 @@ export default function useInserter() {
 		},
 		[ isInserterOpened ]
 	);
+
+	// Handle closing the inserter when pressing the Escape key.
+	useEffect( () => {
+		if ( isInserterOpened ) {
+			const ownerWindow =
+				inserterRef.current.contentContainer[ 0 ].ownerDocument
+					.defaultView;
+
+			function handlePressEscapeKey( event ) {
+				if ( event.keyCode === ESCAPE || event.code === 'Escape' ) {
+					event.stopPropagation();
+
+					setIsInserterOpened( false );
+				}
+			}
+
+			ownerWindow.addEventListener(
+				'keydown',
+				handlePressEscapeKey,
+				true
+			);
+
+			return () => {
+				ownerWindow.removeEventListener(
+					'keydown',
+					handlePressEscapeKey,
+					true
+				);
+			};
+		}
+	}, [ isInserterOpened ] );
 
 	return [ isInserterOpened, setIsInserterOpened ];
 }
