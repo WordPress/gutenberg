@@ -39,6 +39,8 @@
  * Cross-Block Selection
  */
 
+// Note to developers refactoring this, please test navigation mode, and
+// multi selection and hovering the block switcher to highlight the block.
 .block-editor-block-list__layout {
 	position: relative;
 
@@ -61,7 +63,7 @@
 			right: $border-width;
 
 			// Everything else.
-			box-shadow: 0 0 0 $border-width $gray-900;
+			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
 
 			// Windows High Contrast mode will show this outline.
@@ -85,6 +87,9 @@
 		box-shadow: 0 0 0 1px $gray-600;
 	}
 
+	.block-editor-block-list__block.is-highlighted::after,
+	.block-editor-block-list__block.is-multi-selected::after,
+	.is-navigate-mode & .block-editor-block-list__block.is-selected::after,
 	& .is-block-moving-mode.block-editor-block-list__block.has-child-selected {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		outline: var(--wp-admin-border-width-focus) solid transparent;
@@ -191,40 +196,6 @@
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) $dark-theme-focus;
 			}
 		}
-	}
-
-	&.is-outline-mode.is-selected:not(.is-typing) {
-		&::after {
-			box-shadow: 0 0 0 $border-width $gray-900; // Selected not focussed
-			top: $border-width;
-			left: $border-width;
-			right: $border-width;
-			bottom: $border-width;
-			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
-		}
-
-		&:focus {
-			&::after {
-				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-			}
-		}
-	}
-
-	&.is-outline-mode.is-hovered:not(.is-typing) {
-		cursor: default;
-
-		&::after {
-			top: $border-width;
-			left: $border-width;
-			right: $border-width;
-			bottom: $border-width;
-			box-shadow: 0 0 0 $border-width $gray-900;
-			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
-		}
-	}
-
-	&.is-outline-mode.is-selected.is-hovered {
-		cursor: unset;
 	}
 
 	// Spotlight mode.
@@ -336,6 +307,40 @@
 		.block-editor-default-block-appender .block-editor-inserter {
 			left: auto;
 			right: $grid-unit-10;
+		}
+	}
+}
+
+.is-outline-mode:not(.is-typing) .block-editor-block-list__block {
+	&.is-hovered {
+		cursor: default;
+
+		&::after {
+			top: $border-width;
+			left: $border-width;
+			right: $border-width;
+			bottom: $border-width;
+			box-shadow: 0 0 0 $border-width $gray-900;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
+		}
+	}
+
+	&.is-selected {
+		cursor: unset;
+
+		&::after {
+			box-shadow: 0 0 0 $border-width $gray-900; // Selected not focussed
+			top: $border-width;
+			left: $border-width;
+			right: $border-width;
+			bottom: $border-width;
+			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
+		}
+
+		&:focus {
+			&::after {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			}
 		}
 	}
 }

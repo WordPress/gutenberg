@@ -38,7 +38,6 @@ export function useBlockClassNames( clientId ) {
 			} = select( blockEditorStore );
 			const {
 				focusMode,
-				outlineMode,
 				__experimentalSpotlightEntityBlocks: spotlightEntityBlocks,
 			} = getSettings();
 			const isDragging = isBlockBeingDragged( clientId );
@@ -64,7 +63,6 @@ export function useBlockClassNames( clientId ) {
 					isLargeViewport &&
 					( isSelected || isAncestorOfSelectedBlock ),
 				'is-focus-mode': focusMode && isLargeViewport,
-				'is-outline-mode': outlineMode,
 				'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
 				'has-active-entity': activeEntityBlockId,
 				// Determine if there is an active entity area to spotlight.

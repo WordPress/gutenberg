@@ -5,6 +5,10 @@
 	max-width: $navigation-editor-width;
 	margin: auto;
 
+	.editor-styles-wrapper {
+		padding: 0;
+	}
+
 	.components-spinner {
 		display: block;
 		margin: $grid-unit-15 auto;

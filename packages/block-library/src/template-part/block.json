@@ -11,6 +11,9 @@
 		},
 		"tagName": {
 			"type": "string"
+		},
+		"area": {
+			"type": "string"
 		}
 	},
 	"supports": {

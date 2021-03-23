@@ -318,7 +318,7 @@ describe( 'Navigation editor', () => {
 		expect( submenuLinkVisible ).toBeDefined();
 
 		// click in the top left corner of the canvas.
-		const canvas = await page.$( '.edit-navigation-layout__canvas' );
+		const canvas = await page.$( '.edit-navigation-layout__content-area' );
 		const boundingBox = await canvas.boundingBox();
 		await page.mouse.click( boundingBox.x + 5, boundingBox.y + 5 );
 

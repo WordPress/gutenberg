@@ -144,9 +144,6 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 					value={ kind }
 					label={ __( 'Kind' ) }
 					onChange={ ( newKind ) => {
-						if ( newKind === DEFAULT_KIND ) {
-							newKind = undefined;
-						}
 						onChange( {
 							...track,
 							kind: newKind,
@@ -165,6 +162,10 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 							}
 							if ( srcLang === '' ) {
 								changes.srcLang = 'en';
+								hasChanges = true;
+							}
+							if ( track.kind === undefined ) {
+								changes.kind = DEFAULT_KIND;
 								hasChanges = true;
 							}
 							if ( hasChanges ) {
