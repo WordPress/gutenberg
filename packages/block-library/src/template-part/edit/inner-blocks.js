@@ -14,6 +14,8 @@ export default function TemplatePartInnerBlocks( {
 	postId: id,
 	hasInnerBlocks,
 	layout,
+	tagName: TagName,
+	blockProps,
 } ) {
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -31,21 +33,18 @@ export default function TemplatePartInnerBlocks( {
 		'wp_template_part',
 		{ id }
 	);
-	const innerBlocksProps = useInnerBlocksProps(
-		{},
-		{
-			value: blocks,
-			onInput,
-			onChange,
-			renderAppender: hasInnerBlocks
-				? undefined
-				: InnerBlocks.ButtonBlockAppender,
-			__experimentalLayout: {
-				type: 'default',
-				// Find a way to inject this in the support flag code (hooks).
-				alignments: themeSupportsLayout ? alignments : undefined,
-			},
-		}
-	);
-	return <div { ...innerBlocksProps } />;
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		value: blocks,
+		onInput,
+		onChange,
+		renderAppender: hasInnerBlocks
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
+		__experimentalLayout: {
+			type: 'default',
+			// Find a way to inject this in the support flag code (hooks).
+			alignments: themeSupportsLayout ? alignments : undefined,
+		},
+	} );
+	return <TagName { ...innerBlocksProps } />;
 }
