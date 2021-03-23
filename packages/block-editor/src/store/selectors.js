@@ -2119,3 +2119,7 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 		validBlockNames,
 	]
 );
+
+export function __experimentalIsInsertionPointDisabled( state ) {
+	return state.insertionPointDisabledStatus;
+}

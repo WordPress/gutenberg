@@ -1727,6 +1727,16 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
+export function insertionPointDisabledStatus( state = false, action ) {
+	if ( action.type === 'DISABLE_INSERTION_POINT' ) {
+		return true;
+	}
+	if ( action.type === 'ENABLE_INSERTION_POINT' ) {
+		return false;
+	}
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1748,4 +1758,5 @@ export default combineReducers( {
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
+	insertionPointDisabledStatus,
 } );

@@ -76,4 +76,14 @@
 			}
 		}
 	}
+
+	&:not(.has-child-selected):not(.is-selected):not(.is-placeholder) {
+		* {
+			pointer-events: none;
+		}
+		&:hover {
+			background-color: $alert-green;
+			cursor: pointer;
+		}
+	}
 }

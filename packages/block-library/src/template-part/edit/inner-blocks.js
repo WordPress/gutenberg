@@ -8,7 +8,8 @@ import {
 	__experimentalUseEditorFeature as useEditorFeature,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useState, useEffect } from '@wordpress/element';
 
 export default function TemplatePartInnerBlocks( {
 	postId: id,
@@ -16,10 +17,16 @@ export default function TemplatePartInnerBlocks( {
 	layout,
 	tagName: TagName,
 	blockProps,
+	isSelected,
 } ) {
-	const themeSupportsLayout = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
-		return getSettings()?.supportsLayout;
+	const { themeSupportsLayout } = useSelect( ( select ) => {
+		const { getSettings, getBlockInsertionPoint } = select(
+			blockEditorStore
+		);
+		return {
+			themeSupportsLayout: getSettings()?.supportsLayout,
+			insertionPoint: getBlockInsertionPoint(),
+		};
 	}, [] );
 	const defaultLayout = useEditorFeature( 'layout' ) || {};
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
@@ -46,5 +53,26 @@ export default function TemplatePartInnerBlocks( {
 			alignments: themeSupportsLayout ? alignments : undefined,
 		},
 	} );
-	return <TagName { ...innerBlocksProps } />;
+
+	const [ isHovered, setIsHovered ] = useState( false );
+	const { disableInsertionPoint, enableInsertionPoint } = useDispatch(
+		blockEditorStore
+	);
+
+	useEffect( () => {
+		if ( isHovered && ! isSelected ) {
+			disableInsertionPoint();
+		} else {
+			enableInsertionPoint();
+		}
+	}, [ isSelected, isHovered ] );
+
+	return (
+		<div
+			onMouseEnter={ () => setIsHovered( true ) }
+			onMouseLeave={ () => setIsHovered( false ) }
+		>
+			<TagName { ...innerBlocksProps } />
+		</div>
+	);
 }

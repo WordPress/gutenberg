@@ -262,6 +262,7 @@ export default function useInsertionPoint( ref ) {
 		selectedClientId,
 		selectedRootClientId,
 		getBlockListSettings,
+		isInsertionPointDisabled,
 	} = useSelect( ( select ) => {
 		const {
 			isMultiSelecting: _isMultiSelecting,
@@ -269,6 +270,7 @@ export default function useInsertionPoint( ref ) {
 			getBlockInsertionPoint,
 			getBlockOrder,
 			getBlockListSettings: _getBlockListSettings,
+			__experimentalIsInsertionPointDisabled,
 		} = select( blockEditorStore );
 
 		const insertionPoint = getBlockInsertionPoint();
@@ -280,6 +282,7 @@ export default function useInsertionPoint( ref ) {
 			isInserterVisible: isBlockInsertionPointVisible(),
 			selectedClientId: order[ insertionPoint.index - 1 ],
 			selectedRootClientId: insertionPoint.rootClientId,
+			isInsertionPointDisabled: __experimentalIsInsertionPointDisabled(),
 		};
 	}, [] );
 
@@ -388,7 +391,8 @@ export default function useInsertionPoint( ref ) {
 
 	return (
 		! isMultiSelecting &&
-		isVisible && (
+		isVisible &&
+		! isInsertionPointDisabled && (
 			<InsertionPointPopover
 				clientId={
 					isInserterVisible ? selectedClientId : inserterClientId

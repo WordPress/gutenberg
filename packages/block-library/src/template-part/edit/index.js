@@ -42,12 +42,16 @@ export default function TemplatePartEdit( {
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { isResolved, innerBlocks, isMissing, area } = useSelect(
+	const { isResolved, innerBlocks, isMissing, area, isSelected } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } = select(
 				coreStore
 			);
-			const { getBlocks } = select( blockEditorStore );
+			const {
+				getBlocks,
+				isBlockSelected,
+				hasSelectedInnerBlock,
+			} = select( blockEditorStore );
 
 			const getEntityArgs = [
 				'postType',
@@ -69,6 +73,9 @@ export default function TemplatePartEdit( {
 				isResolved: hasResolvedEntity,
 				isMissing: hasResolvedEntity && ! entityRecord,
 				area: entityRecord?.area,
+				isSelected:
+					isBlockSelected( clientId ) ||
+					hasSelectedInnerBlock( clientId, true ),
 			};
 		},
 		[ templatePartId, clientId ]
@@ -157,6 +164,7 @@ export default function TemplatePartEdit( {
 			) }
 			{ isEntityAvailable && (
 				<TemplatePartInnerBlocks
+					isSelected={ isSelected }
 					tagName={ TagName }
 					blockProps={ blockProps }
 					postId={ templatePartId }

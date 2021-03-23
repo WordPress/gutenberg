@@ -1380,3 +1380,15 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+export function disableInsertionPoint() {
+	return {
+		type: 'DISABLE_INSERTION_POINT',
+	};
+}
+
+export function enableInsertionPoint() {
+	return {
+		type: 'ENABLE_INSERTION_POINT',
+	};
+}
