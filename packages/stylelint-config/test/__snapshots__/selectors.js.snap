@@ -3,18 +3,18 @@
 exports[`flags warnings with invalid selectors css snapshot matches warnings 1`] = `
 Array [
   Object {
+    "column": 1,
+    "line": 25,
+    "rule": "@wordpress/selector-class-pattern-web-only",
+    "severity": "error",
+    "text": ".selectorA selector should use lowercase and separate words with hyphens (@wordpress/selector-class-pattern-web-only) (@wordpress/selector-class-pattern-web-only)",
+  },
+  Object {
     "column": 15,
     "line": 18,
     "rule": "declaration-property-unit-allowed-list",
     "severity": "error",
     "text": "Unexpected unit \\"%\\" for property \\"line-height\\" (declaration-property-unit-allowed-list)",
-  },
-  Object {
-    "column": 1,
-    "line": 25,
-    "rule": "selector-class-pattern",
-    "severity": "error",
-    "text": "Selector should use lowercase and separate words with hyphens (selector-class-pattern)",
   },
   Object {
     "column": 1,

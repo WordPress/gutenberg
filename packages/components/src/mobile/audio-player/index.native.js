@@ -28,7 +28,7 @@ import { useState } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import styles from './styles.scss';
+import styles from './style.scss';
 
 const isIOS = Platform.OS === 'ios';
 
