@@ -11,7 +11,7 @@ import {
 	getBlockSupport,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-import { createHigherOrderComponent } from '@wordpress/compose';
+import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -110,19 +110,22 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 const withDuotoneStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const duotoneSupport = getBlockSupport( props.name, 'color.duotone' );
+		const duotoneAttribute = props?.attributes?.style?.color?.duotone;
 
-		const style = props?.attributes?.style;
-		const duotone = style?.color?.duotone;
-
-		if ( ! duotoneSupport || ! duotone ) {
+		if ( ! duotoneSupport || ! duotoneAttribute ) {
 			return <BlockListBlock { ...props } />;
 		}
 
-		const className = classnames( props?.classname, duotone.id );
+		const { slug, values } = duotoneAttribute;
+		const id = `wp-duotone-filter-${
+			slug ?? useInstanceId( BlockListBlock )
+		}`;
+
+		const className = classnames( props?.classname, id );
 
 		// Adding the block class as to not affect other blocks.
 		const blockClass = getBlockDefaultClassName( props.name );
-		const scope = `.${ blockClass }.${ duotone.id }`;
+		const scope = `.${ blockClass }.${ id }`;
 
 		// Object | boolean | string | string[] -> boolean | string | string[]
 		const selectors =
@@ -145,38 +148,17 @@ const withDuotoneStyles = createHigherOrderComponent(
 
 		return (
 			<>
-				<DuotoneFilter selector={ selector } { ...duotone } />
+				<DuotoneFilter
+					selector={ selector }
+					id={ id }
+					values={ values }
+				/>
 				<BlockListBlock { ...props } className={ className } />
 			</>
 		);
 	},
 	'withDuotoneStyles'
 );
-
-/**
- * Override props assigned to save component to inject duotone classname if the
- * block supports it.
- *
- * @param  {Object} props      Additional props applied to save element
- * @param  {Object} blockType  Block type
- * @param  {Object} attributes Block attributes
- * @return {Object}            Filtered props applied to save element
- */
-function addDuotoneFilterStyle( props, blockType, attributes ) {
-	const hasDuotoneSupport = hasBlockSupport( blockType, 'color.duotone' );
-
-	if ( ! hasDuotoneSupport || ! attributes?.style?.color?.duotone ) {
-		return props;
-	}
-
-	return {
-		...props,
-		className: classnames(
-			props.className,
-			attributes.style.color.duotone.id
-		),
-	};
-}
 
 addFilter(
 	'blocks.registerBlockType',
@@ -192,9 +174,4 @@ addFilter(
 	'editor.BlockListBlock',
 	'core/editor/duotone/with-styles',
 	withDuotoneStyles
-);
-addFilter(
-	'blocks.getSaveContent.extraProps',
-	'core/editor/duotone/add-filter-style',
-	addDuotoneFilterStyle
 );

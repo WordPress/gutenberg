@@ -62,7 +62,7 @@ function DuotonePickerPopover( {
 										values: getValuesFromColors(
 											option.colors
 										),
-										id: `duotone-filter-${ option.slug }`,
+										slug: option.slug,
 									};
 									onChange(
 										isSelected ? undefined : newValue

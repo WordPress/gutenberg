@@ -11,7 +11,6 @@ import { swatch } from '@wordpress/icons';
  */
 import Swatch from './duotone-swatch';
 import {
-	getCustomDuotoneIdFromHexColors,
 	getDefaultColors,
 	getHexColorsFromValues,
 	getValuesFromColors,
@@ -90,18 +89,12 @@ function CustomDuotonePicker( { colorPalette, value, onChange } ) {
 		<CustomColorPicker
 			colors={ getHexColorsFromValues( value?.values ) }
 			palette={ colorPalette }
-			onChange={ ( newColors ) =>
-				onChange(
-					newColors.length >= 2
-						? {
-								values: getValuesFromColors( newColors ),
-								id: getCustomDuotoneIdFromHexColors(
-									newColors
-								),
-						  }
-						: undefined
-				)
-			}
+			onChange={ ( newColors ) => {
+				const newValue = {
+					values: getValuesFromColors( newColors ),
+				};
+				onChange( newColors.length >= 2 ? newValue : undefined );
+			} }
 		/>
 	);
 }

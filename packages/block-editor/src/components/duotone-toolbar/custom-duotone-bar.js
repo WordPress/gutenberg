@@ -8,7 +8,6 @@ import { __experimentalCustomGradientBar as CustomGradientBar } from '@wordpress
  */
 import {
 	getColorStopsFromValues,
-	getCustomDuotoneIdFromColorStops,
 	getGradientFromValues,
 	getValuesFromColorStops,
 } from './utils';
@@ -33,11 +32,10 @@ export default function CustomDuotoneBar( { value, onChange } ) {
 				hasGradient={ hasGradient }
 				value={ controlPoints }
 				onChange={ ( newColorStops ) => {
-					const newDuotone = {
-						id: getCustomDuotoneIdFromColorStops( newColorStops ),
+					const newValue = {
 						values: getValuesFromColorStops( newColorStops ),
 					};
-					onChange( newDuotone );
+					onChange( newValue );
 				} }
 			/>
 		</div>

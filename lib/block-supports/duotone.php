@@ -29,33 +29,6 @@ function gutenberg_register_duotone_support( $block_type ) {
 	}
 }
 
-
-/**
- * Add CSS classes and inline styles for colors to the incoming attributes array.
- * This will be applied to the block markup in the front-end.
- *
- * @param  WP_Block_Type $block_type       Block type.
- * @param  array         $block_attributes Block attributes.
- *
- * @return array Colors CSS classes and inline styles.
- */
-function gutenberg_apply_duotone_support( $block_type, $block_attributes ) {
-	$attributes          = array();
-	$has_duotone_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$has_duotone_support = _wp_array_get( $block_type->supports, array( 'color', 'duotone' ), false );
-	}
-	if ( $has_duotone_support ) {
-		$has_duotone_attribute = isset( $block_attributes['style']['color']['duotone'] );
-
-		if ( $has_duotone_attribute ) {
-			$attributes['class'] = $block_attributes['style']['color']['duotone']['id'];
-		}
-	}
-
-	return $attributes;
-}
-
 /**
  * Render out the duotone stylesheet and SVG.
  *
@@ -80,8 +53,12 @@ function gutenberg_render_duotone_support( $block_type, $block_attributes, $bloc
 		return $block_content;
 	}
 
-	$duotone_id     = $block_attributes['style']['color']['duotone']['id'];
-	$duotone_values = $block_attributes['style']['color']['duotone']['values'];
+	$duotone_attribute = $block_attributes['style']['color']['duotone'];
+
+	$slug_or_id = isset( $duotone_attribute['slug'] ) ? $duotone_attribute['slug'] : uniqid();
+
+	$duotone_values = $duotone_attribute['values'];
+	$duotone_id     = 'wp-duotone-filter-' . $slug_or_id;
 
 	// Adding the block class as to not affect other blocks.
 	$block_class = gutenberg_get_block_default_classname( $block_type->name );
@@ -113,7 +90,15 @@ function gutenberg_render_duotone_support( $block_type, $block_attributes, $bloc
 
 	$duotone = gutenberg_render_duotone_filter( $selector, $duotone_id, $duotone_values );
 
-	return $block_content . $duotone;
+	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
+	$content = preg_replace(
+		'/' . preg_quote( 'class="', '/' ) . '/',
+		'class="' . $duotone_id . ' ',
+		$block_content,
+		1
+	);
+
+	return $content . $duotone;
 }
 
 // Register the block support.
@@ -121,7 +106,6 @@ WP_Block_Supports::get_instance()->register(
 	'duotone',
 	array(
 		'register_attribute' => 'gutenberg_register_duotone_support',
-		'apply'              => 'gutenberg_apply_duotone_support',
 		'render_block'       => 'gutenberg_render_duotone_support',
 	)
 );

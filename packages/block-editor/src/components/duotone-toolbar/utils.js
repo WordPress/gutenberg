@@ -162,29 +162,3 @@ export function getHexColorsFromValues( values = { r: [], g: [], b: [] } ) {
 		tcolor.toHexString()
 	);
 }
-
-/**
- * Gets a duotone id from custom hex colors.
- *
- * @param {string[]} colors Hex color array.
- *
- * @return {string} Custom duotone id.
- */
-export function getCustomDuotoneIdFromHexColors( colors ) {
-	return `duotone-filter-custom-${ colors
-		.map( ( hex ) => hex.slice( 1 ).toLowerCase() )
-		.join( '-' ) }`;
-}
-
-/**
- * Convert a color stops array to a custom duotone id.
- *
- * @param {Object[]} colorStops Color stop information.
- *
- * @return {string} Custom duotone id.
- */
-export function getCustomDuotoneIdFromColorStops( colorStops = [] ) {
-	return getCustomDuotoneIdFromHexColors(
-		colorStops.map( ( { color } ) => tinycolor( color ).toHexString() )
-	);
-}
