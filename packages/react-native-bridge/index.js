@@ -21,7 +21,6 @@ export const mediaSources = {
 
 export const userEvents = {
 	editorSessionTemplateApply: 'editor_session_template_apply',
-	editorSessionTemplatePreview: 'editor_session_template_preview',
 };
 
 export const actionButtons = {
