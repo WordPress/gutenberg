@@ -221,6 +221,9 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 					blocks={ pattern.transformedBlocks }
 					viewportWidth={ 500 }
 				/>
+				<div className={ `${ baseClassName }-list__item-title` }>
+					{ pattern.title }
+				</div>
 			</CompositeItem>
 			{ !! pattern.description && (
 				<VisuallyHidden id={ descriptionId }>
