@@ -11,8 +11,13 @@ import {
 import { __ } from '@wordpress/i18n';
 import { cog } from '@wordpress/icons';
 
-const BLOCK_INSPECTOR_SCOPE = 'core/edit-navigation';
-const BLOCK_INSPECTOR_IDENTIFIER = 'edit-navigation/block-inspector';
+/**
+ * Internal dependencies
+ */
+import {
+	COMPLEMENTARY_AREA_SCOPE,
+	COMPLEMENTARY_AREA_ID,
+} from '../../constants';
 
 function useTogglePermanentSidebar( hasPermanentSidebar ) {
 	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
@@ -22,13 +27,13 @@ function useTogglePermanentSidebar( hasPermanentSidebar ) {
 	useEffect( () => {
 		if ( hasPermanentSidebar ) {
 			enableComplementaryArea(
-				BLOCK_INSPECTOR_SCOPE,
-				BLOCK_INSPECTOR_IDENTIFIER
+				COMPLEMENTARY_AREA_SCOPE,
+				COMPLEMENTARY_AREA_ID
 			);
 		} else {
 			disableComplementaryArea(
-				BLOCK_INSPECTOR_SCOPE,
-				BLOCK_INSPECTOR_IDENTIFIER
+				COMPLEMENTARY_AREA_SCOPE,
+				COMPLEMENTARY_AREA_ID
 			);
 		}
 	}, [
@@ -47,8 +52,8 @@ export default function Sidebar( { hasPermanentSidebar } ) {
 			/* translators: button label text should, if possible, be under 16 characters. */
 			title={ __( 'Settings' ) }
 			closeLabel={ __( 'Close settings' ) }
-			scope={ BLOCK_INSPECTOR_SCOPE }
-			identifier={ BLOCK_INSPECTOR_IDENTIFIER }
+			scope={ COMPLEMENTARY_AREA_SCOPE }
+			identifier={ COMPLEMENTARY_AREA_ID }
 			icon={ cog }
 			isActiveByDefault={ hasPermanentSidebar }
 			header={ <></> }
