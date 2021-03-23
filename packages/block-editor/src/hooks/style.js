@@ -128,7 +128,7 @@ export function addSaveProps( props, blockType, attributes ) {
 
 	const { style } = attributes;
 	const filteredStyle = omitKeysNotToSerialize( style, {
-		[ BORDER_SUPPORT_KEY ]: getBlockSupport(
+		'border': getBlockSupport(
 			blockType,
 			BORDER_SUPPORT_KEY
 		),
