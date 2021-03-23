@@ -137,7 +137,7 @@ export default function BoxControl( {
 			</Header>
 			<HeaderControlWrapper className="component-box-control__header-control-wrapper">
 				<FlexItem>
-					<BoxControlIcon side={ side } />
+					<BoxControlIcon side={ side } sides={ sides } />
 				</FlexItem>
 				{ isLinked && (
 					<FlexBlock>
