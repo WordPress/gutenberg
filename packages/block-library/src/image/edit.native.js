@@ -46,7 +46,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	image as placeholderIcon,
 	textColor,
@@ -192,40 +192,6 @@ export class ImageEdit extends Component {
 		}
 	}
 
-	featuredImageIdCurrent( payload ) {
-		const { attributes } = this.props;
-
-		const featuredImageId = payload.featuredImageId;
-
-		if ( featuredImageId === attributes.id ) {
-			this.setState( {
-				isFeaturedImage: true,
-			} );
-		} else {
-			this.setState( {
-				isFeaturedImage: false,
-			} );
-		}
-	}
-
-	addFeaturedImageIdListener() {
-		//if we already have a subscription not worth doing it again
-		if ( this.subscriptionParentFeaturedImageIdCurrent ) {
-			return;
-		}
-		this.subscriptionParentFeaturedImageIdCurrent = subscribeFeaturedImageIdCurrent(
-			( payload ) => {
-				this.featuredImageIdCurrent( payload );
-			}
-		);
-	}
-
-	removeFeaturedImageIdListener() {
-		if ( this.subscriptionParentFeaturedImageIdCurrent ) {
-			this.subscriptionParentFeaturedImageIdCurrent.remove();
-		}
-	}
-
 	static getDerivedStateFromProps( props, state ) {
 		// Avoid a UI flicker in the toolbar by insuring that isCaptionSelected
 		// is updated immediately any time the isSelected prop becomes false
@@ -324,13 +290,50 @@ export class ImageEdit extends Component {
 	}
 
 	onSetFeatured() {
-		const { attributes } = this.props;
+		const { attributes, closeSettingsBottomSheet } = this.props;
+
 		setFeaturedImage( attributes.id );
+
+		closeSettingsBottomSheet();
 	}
 
 	onGetFeatured() {
 		const { attributes } = this.props;
 		getFeaturedImageId( attributes.id );
+	}
+
+	featuredImageIdCurrent( payload ) {
+		const { attributes } = this.props;
+
+		const featuredImageId = payload.featuredImageId;
+
+		if ( featuredImageId === attributes.id ) {
+			this.setState( {
+				isFeaturedImage: true,
+			} );
+		} else {
+			this.setState( {
+				isFeaturedImage: false,
+			} );
+		}
+	}
+
+	addFeaturedImageIdListener() {
+		//if we already have a subscription not worth doing it again
+		if ( this.subscriptionParentFeaturedImageIdCurrent ) {
+			return;
+		}
+		this.subscriptionParentFeaturedImageIdCurrent = subscribeFeaturedImageIdCurrent(
+			( payload ) => {
+				this.featuredImageIdCurrent( payload );
+			}
+		);
+	}
+
+	removeFeaturedImageIdListener() {
+		if ( this.subscriptionParentFeaturedImageIdCurrent ) {
+			this.subscriptionParentFeaturedImageIdCurrent.remove();
+		}
 	}
 
 	onSetLinkDestination( href ) {
@@ -651,6 +654,13 @@ export default compose( [
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			closeSettingsBottomSheet() {
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+			},
 		};
 	} ),
 	withPreferredColorScheme,
