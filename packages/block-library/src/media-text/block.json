@@ -86,10 +86,10 @@
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
+			"duotone": [ "img", "video" ],
 			"gradients": true,
 			"link": true
-		},
-		"duotone": [ "img", "video" ]
+		}
 	},
 	"editorStyle": "wp-block-media-text-editor",
 	"style": "wp-block-media-text"
