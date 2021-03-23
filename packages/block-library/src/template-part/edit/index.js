@@ -14,7 +14,6 @@ import {
 	ToolbarGroup,
 	ToolbarButton,
 	Spinner,
-	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
@@ -29,10 +28,11 @@ import { TemplatePartAdvancedControls } from './advanced-controls';
 import { getTagBasedOnArea } from './get-tag-based-on-area';
 
 export default function TemplatePartEdit( {
-	attributes: { slug, theme, tagName, style },
+	attributes,
 	setAttributes,
 	clientId,
 } ) {
+	const { slug, theme, tagName, layout = {} } = attributes;
 	const templatePartId = theme && slug ? theme + '//' + slug : null;
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
@@ -78,7 +78,6 @@ export default function TemplatePartEdit( {
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing;
 	const TagName = tagName || getTagBasedOnArea( area );
-	const { __Visualizer: BoxControlVisualizer } = BoxControl;
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
@@ -116,12 +115,9 @@ export default function TemplatePartEdit( {
 				templatePartId={ templatePartId }
 			/>
 			<TagName { ...blockProps }>
-				<BoxControlVisualizer
-					values={ style?.spacing?.padding }
-					showValues={ style?.visualizers?.padding }
-				/>
 				{ isPlaceholder && (
 					<TemplatePartPlaceholder
+						area={ attributes.area }
 						setAttributes={ setAttributes }
 						innerBlocks={ innerBlocks }
 					/>
@@ -158,6 +154,7 @@ export default function TemplatePartEdit( {
 					<TemplatePartInnerBlocks
 						postId={ templatePartId }
 						hasInnerBlocks={ innerBlocks.length > 0 }
+						layout={ layout }
 					/>
 				) }
 				{ ! isPlaceholder && ! isResolved && <Spinner /> }

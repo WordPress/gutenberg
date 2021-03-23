@@ -18,6 +18,7 @@ function render_block_core_template_part( $attributes ) {
 	$template_part_id = null;
 	$content          = null;
 	$area             = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+	$style            = '';
 
 	if ( ! empty( $attributes['postId'] ) && get_post_status( $attributes['postId'] ) ) {
 		$template_part_id = $attributes['postId'];
@@ -120,10 +121,12 @@ function render_block_core_template_part( $attributes ) {
 	// Get custom padding values from the style attribute.
 	if ( isset( $attributes['style'] ) ) {
 		$padding = array_column( $attributes['style'], 'padding' );
-		$style   = '';
-		foreach ( $padding[0] as $direction => $value ) {
-			if ( isset( $padding[0][ $direction ] ) ) {
-				$style .= "padding-{$direction}:{$value};";
+
+		if ( isset( $padding[0] ) ) {
+			foreach ( $padding[0] as $direction => $value ) {
+				if ( isset( $padding[0][ $direction ] ) ) {
+					$style .= "padding-{$direction}:{$value};";
+				}
 			}
 		}
 	}
