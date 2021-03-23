@@ -67,9 +67,9 @@ export function subscribeUpdateHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'updateHtml', callback );
 }
 
-export function subscribeFeaturedImageIdChange( callback ) {
+export function subscribeFeaturedImageIdCurrent( callback ) {
 	return gutenbergBridgeEvents.addListener(
-		'featuredImageIdChange',
+		'featuredImageIdCurrent',
 		callback
 	);
 }

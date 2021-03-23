@@ -16,7 +16,7 @@ import {
 	requestImageFullscreenPreview,
 	setFeaturedImage,
 	getFeaturedImageId,
-	subscribeFeaturedImageIdChange,
+	subscribeFeaturedImageIdCurrent,
 } from '@wordpress/react-native-bridge';
 import {
 	CycleSelectControl,
@@ -87,7 +87,7 @@ export class ImageEdit extends Component {
 			this
 		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.featuredImageIdChange = this.featuredImageIdChange.bind( this );
+		this.featuredImageIdCurrent = this.featuredImageIdCurrent.bind( this );
 		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
@@ -192,7 +192,7 @@ export class ImageEdit extends Component {
 		}
 	}
 
-	featuredImageIdChange( payload ) {
+	featuredImageIdCurrent( payload ) {
 		const { attributes } = this.props;
 
 		const featuredImageId = payload.featuredImageId;
@@ -210,19 +210,19 @@ export class ImageEdit extends Component {
 
 	addFeaturedImageIdListener() {
 		//if we already have a subscription not worth doing it again
-		if ( this.subscriptionParentFeaturedImageIdChange ) {
+		if ( this.subscriptionParentFeaturedImageIdCurrent ) {
 			return;
 		}
-		this.subscriptionParentFeaturedImageIdChange = subscribeFeaturedImageIdChange(
+		this.subscriptionParentFeaturedImageIdCurrent = subscribeFeaturedImageIdCurrent(
 			( payload ) => {
-				this.featuredImageIdChange( payload );
+				this.featuredImageIdCurrent( payload );
 			}
 		);
 	}
 
 	removeFeaturedImageIdListener() {
-		if ( this.subscriptionParentFeaturedImageIdChange ) {
-			this.subscriptionParentFeaturedImageIdChange.remove();
+		if ( this.subscriptionParentFeaturedImageIdCurrent ) {
+			this.subscriptionParentFeaturedImageIdCurrent.remove();
 		}
 	}
 
