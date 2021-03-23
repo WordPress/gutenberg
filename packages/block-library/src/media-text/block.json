@@ -86,7 +86,7 @@
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
-			"duotone": [ "img", "video" ],
+			"duotone": "img, video",
 			"gradients": true,
 			"link": true
 		}

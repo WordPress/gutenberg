@@ -60,35 +60,16 @@ function gutenberg_render_duotone_support( $block_type, $block_attributes, $bloc
 	$duotone_values = $duotone_attribute['values'];
 	$duotone_id     = 'wp-duotone-filter-' . $slug_or_id;
 
-	// Adding the block class as to not affect other blocks.
-	$block_class = gutenberg_get_block_default_classname( $block_type->name );
-	$scope       = '.' . $block_class . '.' . $duotone_id;
-
-	// Object | boolean | string | string[] -> boolean | string | string[].
-	$selector =
-		! is_array( $duotone_support ) || ! array_key_exists( 'edit', $duotone_support )
-			? $duotone_support
-			: $duotone_support['edit'];
-
-	// boolean | string | string[] -> boolean[] | string[].
-	$selector = is_array( $selector )
-		? $selector
-		: array( $selector );
-
-	// boolean[] | string[] -> string[].
-	$selector = array_map(
-		function ( $selector ) use ( $scope ) {
-			return is_string( $selector )
-				? $scope . ' ' . $selector
-				: $scope;
+	$selectors        = explode( ',', $duotone_support );
+	$selectors_scoped = array_map(
+		function ( $selector ) use ( $duotone_id ) {
+			return '.' . $duotone_id . ' ' . trim( $selector );
 		},
-		$selector
+		$selectors
 	);
+	$selectors_group  = implode( ', ', $selectors_scoped );
 
-	// string[] -> string.
-	$selector = implode( ', ', $selector );
-
-	$duotone = gutenberg_render_duotone_filter( $selector, $duotone_id, $duotone_values );
+	$duotone = gutenberg_render_duotone_filter( $selectors_group, $duotone_id, $duotone_values );
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	$content = preg_replace(

@@ -121,35 +121,18 @@ const withDuotoneStyles = createHigherOrderComponent(
 			slug ?? useInstanceId( BlockListBlock )
 		}`;
 
-		const className = classnames( props?.classname, id );
-
-		// Adding the block class as to not affect other blocks.
-		const blockClass = getBlockDefaultClassName( props.name );
-		const scope = `.${ blockClass }.${ id }`;
-
-		// Object | boolean | string | string[] -> boolean | string | string[]
-		const selectors =
-			duotoneSupport.edit === undefined
-				? duotoneSupport
-				: duotoneSupport.edit;
-
-		// boolean | string | string[] -> boolean[] | string[]
-		const selectorsArray = Array.isArray( selectors )
-			? selectors
-			: [ selectors ];
-
-		// boolean[] | string[] -> string[]
-		const scopedSelectors = selectorsArray.map( ( selector ) =>
-			typeof selector === 'string' ? `${ scope } ${ selector }` : scope
+		const selectors = duotoneSupport.split( ',' );
+		const selectorsScoped = selectors.map(
+			( selector ) => `.${ id } ${ selector.trim() }`
 		);
+		const selectorsGroup = selectorsScoped.join( ', ' );
 
-		// string[] -> string
-		const selector = scopedSelectors.join( ', ' );
+		const className = classnames( props?.classname, id );
 
 		return (
 			<>
 				<DuotoneFilter
-					selector={ selector }
+					selector={ selectorsGroup }
 					id={ id }
 					values={ values }
 				/>

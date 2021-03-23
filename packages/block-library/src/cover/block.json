@@ -58,10 +58,7 @@
 			"padding": true
 		},
 		"color": {
-			"duotone": [
-				".wp-block-cover__image-background",
-				".wp-block-cover__video-background"
-			],
+			"duotone": ".wp-block-cover__image-background, .wp-block-cover__video-background",
 			"text": false,
 			"background": false
 		}
