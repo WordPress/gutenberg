@@ -992,7 +992,7 @@ public class WPAndroidGlueCode {
     }
 
     public void featuredImageIdNotifier(int mediaId) {
-        mDeferredEventEmitter.featuredImageIdNotifier(mediaId);
+        mDeferredEventEmitter.onRequestFeaturedImageId(mediaId);
     }
 
     public void replaceUnsupportedBlock(String content, String blockId) {

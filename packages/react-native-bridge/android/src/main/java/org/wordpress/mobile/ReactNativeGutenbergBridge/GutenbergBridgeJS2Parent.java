@@ -45,7 +45,7 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     }
 
     interface FeaturedImageEmitter {
-        void featuredImageIdNotifier(int mediaId);
+        void onRequestFeaturedImageId(int mediaId);
     }
 
     interface ReplaceUnsupportedBlockCallback {
