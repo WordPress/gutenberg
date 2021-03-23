@@ -18,7 +18,7 @@ return array(
 	<!-- /wp:image -->
 	
 	<!-- wp:quote {"align":"center","className":"is-style-large"} -->
-	<blockquote class="wp-block-quote has-text-align-center is-style-large"><p>'. __("\"Contributing makes me feel like I'm being useful to the planet.\"") .'</p><cite>'. __("— Anna Wong, <em>Volunteer</em>") .'</cite></blockquote>
+	<blockquote class="wp-block-quote has-text-align-center is-style-large"><p>' . __( "\"Contributing makes me feel like I'm being useful to the planet.\"" ) . '</p><cite>' . __( '— Anna Wong, <em>Volunteer</em>' ) . '</cite></blockquote>
 	<!-- /wp:quote -->
 	
 	<!-- wp:separator {"className":"is-style-default"} -->

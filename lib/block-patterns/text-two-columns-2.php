@@ -15,11 +15,11 @@ return array(
 	<!-- /wp:spacer -->
 	
 	<!-- wp:paragraph {"style":{"typography":{"fontSize":"21px"}},"textColor":"black"} -->
-	<p class="has-black-color has-text-color" style="font-size:21px"><strong>'. __("We have worked with:") .'</strong></p>
+	<p class="has-black-color has-text-color" style="font-size:21px"><strong>' . __( 'We have worked with:' ) . '</strong></p>
 	<!-- /wp:paragraph -->
 	
 	<!-- wp:paragraph {"style":{"typography":{"fontSize":"49px","lineHeight":"1.2"}}} -->
-	<p style="font-size:49px;line-height:1.2"><a href="https://wordpress.org">'. __("EARTHFUND™<br>ARCHWEEKLY<br>FUTURE ROADS<br>BUILDING NY") .'</a></p>
+	<p style="font-size:49px;line-height:1.2"><a href="https://wordpress.org">' . __( 'EARTHFUND™<br>ARCHWEEKLY<br>FUTURE ROADS<br>BUILDING NY' ) . '</a></p>
 	<!-- /wp:paragraph -->
 	
 	<!-- wp:spacer -->
@@ -33,7 +33,7 @@ return array(
 	<!-- /wp:spacer -->
 	
 	<!-- wp:paragraph {"style":{"typography":{"fontSize":"49px","lineHeight":"1.2"}}} -->
-	<p style="font-size:49px;line-height:1.2"><a href="https://wordpress.org">'. __("DUBAI ROOFS<br>MAY WATSON STUDIO<br>Y.O.L<br>RUDIMENTAR") .'</a></p>
+	<p style="font-size:49px;line-height:1.2"><a href="https://wordpress.org">' . __( 'DUBAI ROOFS<br>MAY WATSON STUDIO<br>Y.O.L<br>RUDIMENTAR' ) . '</a></p>
 	<!-- /wp:paragraph -->
 	
 	<!-- wp:spacer -->

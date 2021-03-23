@@ -16,7 +16,7 @@ return array(
 	<!-- /wp:spacer -->
 	
 	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"5vw"}},"textColor":"black"} -->
-	<p class="has-black-color has-text-color" style="font-size:5vw;line-height:1.1"><strong>'. __("Ancient Sea Representations") .'</strong></p>
+	<p class="has-black-color has-text-color" style="font-size:5vw;line-height:1.1"><strong>' . __( 'Ancient Sea Representations' ) . '</strong></p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column -->
 	
@@ -40,13 +40,13 @@ return array(
 	
 	<!-- wp:column -->
 	<div class="wp-block-column"><!-- wp:paragraph {"textColor":"black","fontSize":"extra-small"} -->
-	<p class="has-black-color has-text-color has-extra-small-font-size">'. __("Winding veils round their heads, the women walked on deck. They were now moving steadily down the river, passing the dark shapes of ships at anchor, and London was a swarm of lights with a pale yellow canopy drooping above it. There were the lights of the great theatres, the lights of the long streets, lights that indicated huge squares of domestic comfort, lights that hung high in air.") .'</p>
+	<p class="has-black-color has-text-color has-extra-small-font-size">' . __( 'Winding veils round their heads, the women walked on deck. They were now moving steadily down the river, passing the dark shapes of ships at anchor, and London was a swarm of lights with a pale yellow canopy drooping above it. There were the lights of the great theatres, the lights of the long streets, lights that indicated huge squares of domestic comfort, lights that hung high in air.' ) . '</p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column -->
 	
 	<!-- wp:column -->
 	<div class="wp-block-column"><!-- wp:paragraph {"textColor":"black","fontSize":"extra-small"} -->
-	<p class="has-black-color has-text-color has-extra-small-font-size">'. __("No darkness would ever settle upon those lamps, as no darkness had settled upon them for hundreds of years. It seemed dreadful that the town should blaze for ever in the same spot; dreadful at least to people going away to adventure upon the sea, and beholding it as a circumscribed mound, eternally burnt, eternally scarred. From the deck of the ship the great city appeared a crouched and cowardly figure, a sedentary miser.") .'</p>
+	<p class="has-black-color has-text-color has-extra-small-font-size">' . __( 'No darkness would ever settle upon those lamps, as no darkness had settled upon them for hundreds of years. It seemed dreadful that the town should blaze for ever in the same spot; dreadful at least to people going away to adventure upon the sea, and beholding it as a circumscribed mound, eternally burnt, eternally scarred. From the deck of the ship the great city appeared a crouched and cowardly figure, a sedentary miser.' ) . '</p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column --></div>
 	<!-- /wp:columns --></div>

@@ -16,11 +16,11 @@ return array(
 	<!-- /wp:separator -->
 	
 	<!-- wp:heading {"style":{"color":{"text":"#ffe074"},"typography":{"fontSize":"16vw"}}} -->
-	<h2 class="has-text-color" style="color:#ffe074;font-size:16vw">'. __("80%*") . '</h2>
+	<h2 class="has-text-color" style="color:#ffe074;font-size:16vw">' . __( '80%*' ) . '</h2>
 	<!-- /wp:heading -->
 	
 	<!-- wp:paragraph {"style":{"typography":{"fontSize":"12px","lineHeight":"1.3"},"color":{"text":"#ffe074","link":"#ffe074"}}} -->
-	<p class="has-text-color has-link-color" style="--wp--style--color--link:#ffe074;color:#ffe074;font-size:12px;line-height:1.3"><em>'. __("*Is how much industrial agriculture contributes to deforestation across the globe. Nature always wears the colors of the spirit. To a man laboring under calamity, the heat of his own fire hath sadness in it.") . '</em></p>
+	<p class="has-text-color has-link-color" style="--wp--style--color--link:#ffe074;color:#ffe074;font-size:12px;line-height:1.3"><em>' . __( '*Is how much industrial agriculture contributes to deforestation across the globe. Nature always wears the colors of the spirit. To a man laboring under calamity, the heat of his own fire hath sadness in it.' ) . '</em></p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column -->
 	
