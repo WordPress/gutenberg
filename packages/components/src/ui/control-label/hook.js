@@ -8,7 +8,7 @@ import { cx } from '@wp-g2/styles';
  * Internal dependencies
  */
 import { useFormGroupContextId } from '../form-group';
-import { useText } from '../text';
+import { useText } from '../../text';
 import * as styles from './styles';
 
 /**

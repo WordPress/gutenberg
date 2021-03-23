@@ -110,7 +110,7 @@ export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
 export { default as Spinner } from './spinner';
 export { default as TabPanel } from './tab-panel';
-export { default as __experimentalText } from './text';
+export { Text as __experimentalText } from './text';
 export { default as TextControl } from './text-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as TextHighlight } from './text-highlight';

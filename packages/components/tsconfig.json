@@ -26,6 +26,7 @@
 		"src/utils/**/*",
 		"src/visually-hidden/**/*",
 		"src/text/**/*",
+		"src/truncate/**/*",
 		"src/grid/**/*",
 		"src/__next/**/*"
 	],

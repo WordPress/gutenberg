@@ -8,8 +8,8 @@ import type { ViewOwnProps } from '@wp-g2/create-styles';
 /**
  * Internal dependencies
  */
-import type { Props as TextProps } from '../text/types';
-import { useText } from '../text';
+import type { Props as TextProps } from '../../text/types';
+import { useText } from '../../text';
 
 export type HeadingSize =
 	| 1

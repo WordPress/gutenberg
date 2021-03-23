@@ -14,7 +14,7 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
  * Internal dependencies
  */
 import { useTruncate } from '../truncate';
-import { getOptimalTextShade } from '../utils';
+import { getOptimalTextShade } from '../ui/utils';
 import * as styles from './styles';
 import { createHighlighterText } from './utils';
 
