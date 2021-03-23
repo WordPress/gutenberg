@@ -74,6 +74,9 @@ export default function Layout( { blockEditorSettings } ) {
 		navigationPost,
 		selectMenu,
 		deleteMenu,
+		openManageLocationsModal,
+		closeManageLocationsModal,
+		isManageLocationsModalOpen,
 	} = useNavigationEditor();
 
 	const [ blocks, onInput, onChange ] = useNavigationBlockEditor(
@@ -167,6 +170,18 @@ export default function Layout( { blockEditorSettings } ) {
 															blocks={ blocks }
 														/>
 														<InspectorAdditions
+															isManageLocationsModalOpen={
+																isManageLocationsModalOpen
+															}
+															openManageLocationsModal={
+																openManageLocationsModal
+															}
+															closeManageLocationsModal={
+																closeManageLocationsModal
+															}
+															onSelectMenu={
+																selectMenu
+															}
 															menuId={
 																selectedMenuId
 															}

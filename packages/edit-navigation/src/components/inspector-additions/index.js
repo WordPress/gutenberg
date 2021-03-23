@@ -9,11 +9,19 @@ import { InspectorControls } from '@wordpress/block-editor';
  */
 import AutoAddPagesPanel from './auto-add-pages-panel';
 import DeleteMenuPanel from './delete-menu-panel';
+import ManageLocations from './manage-locations';
 import { NameEditor } from '../name-editor';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function InspectorAdditions( { menuId, onDeleteMenu } ) {
+export default function InspectorAdditions( {
+	menuId,
+	onDeleteMenu,
+	onSelectMenu,
+	isManageLocationsModalOpen,
+	closeManageLocationsModal,
+	openManageLocationsModal,
+} ) {
 	const selectedBlock = useSelect(
 		( select ) => select( 'core/block-editor' ).getSelectedBlock(),
 		[]
@@ -25,7 +33,15 @@ export default function InspectorAdditions( { menuId, onDeleteMenu } ) {
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Menu Settings' ) }>
+			<PanelBody title={ __( 'Theme locations' ) }>
+				<ManageLocations
+					onSelectMenu={ onSelectMenu }
+					isModalOpen={ isManageLocationsModalOpen }
+					closeModal={ closeManageLocationsModal }
+					openModal={ openManageLocationsModal }
+				/>
+			</PanelBody>
+			<PanelBody title={ __( 'Menu settings' ) }>
 				<NameEditor />
 				<AutoAddPagesPanel menuId={ menuId } />
 				<DeleteMenuPanel onDeleteMenu={ onDeleteMenu } />

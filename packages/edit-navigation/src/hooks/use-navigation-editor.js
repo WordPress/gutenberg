@@ -19,6 +19,14 @@ const getMenusData = ( select ) => {
 	};
 };
 export default function useNavigationEditor() {
+	const [
+		isManageLocationsModalOpen,
+		setIsManageLocationsModalOpen,
+	] = useState( false );
+	const [ openManageLocationsModal, closeManageLocationsModal ] = [
+		true,
+		false,
+	].map( ( bool ) => () => setIsManageLocationsModalOpen( bool ) );
 	const { deleteMenu: _deleteMenu } = useDispatch( 'core' );
 	const [ selectedMenuId, setSelectedMenuId ] = useState( null );
 	const [ hasFinishedInitialLoad, setHasFinishedInitialLoad ] = useState(
@@ -67,5 +75,8 @@ export default function useNavigationEditor() {
 		deleteMenu,
 		hasFinishedInitialLoad,
 		hasLoadedMenus,
+		openManageLocationsModal,
+		closeManageLocationsModal,
+		isManageLocationsModalOpen,
 	};
 }
