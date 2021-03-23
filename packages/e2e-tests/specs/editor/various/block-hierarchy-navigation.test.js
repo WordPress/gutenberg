@@ -42,7 +42,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
-		await page.keyboard.press( 'Tab' ); // Tab to inserter.
+		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
@@ -78,7 +78,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await lastColumnsBlockMenuItem.click();
 
 		// Insert text in the last column block.
-		await page.keyboard.press( 'Tab' ); // Tab to inserter.
+		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
@@ -94,7 +94,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.click( '[aria-label="Two columns; equal split"]' );
 
 		// Add a paragraph in the first column.
-		await page.keyboard.press( 'Tab' ); // Tab to inserter.
+		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.
@@ -121,7 +121,7 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.waitForSelector( '.is-selected[data-type="core/column"]' );
 
 		// Insert text in the last column block
-		await page.keyboard.press( 'Tab' ); // Tab to inserter.
+		await page.keyboard.press( 'ArrowDown' ); // Navigate to inserter.
 		await page.keyboard.press( 'Enter' ); // Activate inserter.
 		await page.keyboard.type( 'Paragraph' );
 		await pressKeyTimes( 'Tab', 2 ); // Tab to paragraph result.

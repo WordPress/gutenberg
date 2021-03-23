@@ -48,6 +48,16 @@ function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
 }
 
+function isFormElement( element ) {
+	const { tagName } = element;
+	return (
+		tagName === 'INPUT' ||
+		tagName === 'BUTTON' ||
+		tagName === 'SELECT' ||
+		tagName === 'TEXTAREA'
+	);
+}
+
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
  * event of the given directional key code, or false otherwise.
@@ -358,31 +368,29 @@ export default function WritingFlow( { children } ) {
 		// Navigation mode (press Esc), to navigate through blocks.
 		if ( selectedBlockClientId ) {
 			if ( isTab ) {
-				const wrapper = getBlockDOMNode(
-					selectedBlockClientId,
-					ownerDocument
-				);
-
-				if ( isShift ) {
-					if ( target === wrapper ) {
-						// Disable focus capturing on the focus capture element, so
-						// it doesn't refocus this block and so it allows default
-						// behaviour (moving focus to the next tabbable element).
-						noCapture.current = true;
-						focusCaptureBeforeRef.current.focus();
-						return;
-					}
-				} else {
-					const tabbables = focus.tabbable.find( wrapper );
-					const lastTabbable = last( tabbables ) || wrapper;
-
-					if ( target === lastTabbable ) {
-						// See comment above.
-						noCapture.current = true;
-						focusCaptureAfterRef.current.focus();
-						return;
-					}
+				const direction = isShift ? 'findPrevious' : 'findNext';
+				// Allow tabbing between form elements rendered in a block,
+				// such as inside a placeholder. Form elements are generally
+				// meant to be UI rather than part of the content. Ideally
+				// these are not rendered in the content and perhaps in the
+				// future they can be rendered in an iframe or shadow DOM.
+				if (
+					isFormElement( target ) &&
+					isFormElement( focus.tabbable[ direction ]( target ) )
+				) {
+					return;
 				}
+
+				const next = isShift
+					? focusCaptureBeforeRef
+					: focusCaptureAfterRef;
+
+				// Disable focus capturing on the focus capture element, so it
+				// doesn't refocus this block and so it allows default behaviour
+				// (moving focus to the next tabbable element).
+				noCapture.current = true;
+				next.current.focus();
+				return;
 			} else if ( isEscape ) {
 				setNavigationMode( true );
 			}
@@ -533,6 +541,19 @@ export default function WritingFlow( { children } ) {
 		}
 	}, [ hasMultiSelection, isMultiSelecting ] );
 
+	const lastFocus = useRef();
+
+	useEffect( () => {
+		function onFocusOut( event ) {
+			lastFocus.current = event.target;
+		}
+
+		container.current.addEventListener( 'focusout', onFocusOut );
+		return () => {
+			container.current.removeEventListener( 'focusout', onFocusOut );
+		};
+	}, [] );
+
 	const className = classnames( 'block-editor-writing-flow', {
 		'is-navigate-mode': isNavigationMode,
 	} );
@@ -547,6 +568,7 @@ export default function WritingFlow( { children } ) {
 				selectedClientId={ selectedBlockClientId }
 				containerRef={ container }
 				noCapture={ noCapture }
+				lastFocus={ lastFocus }
 				hasMultiSelection={ hasMultiSelection }
 				multiSelectionContainer={ multiSelectionContainer }
 			/>
@@ -576,6 +598,7 @@ export default function WritingFlow( { children } ) {
 				selectedClientId={ selectedBlockClientId }
 				containerRef={ container }
 				noCapture={ noCapture }
+				lastFocus={ lastFocus }
 				hasMultiSelection={ hasMultiSelection }
 				multiSelectionContainer={ multiSelectionContainer }
 				isReverse
