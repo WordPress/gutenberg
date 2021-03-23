@@ -193,18 +193,6 @@
 		}
 	}
 
-	// Spotlight mode.
-	&.is-focus-mode:not(.is-multi-selected) {
-		opacity: 0.5;
-		transition: opacity 0.1s linear;
-		@include reduce-motion("transition");
-
-		&:not(.is-focused) .block-editor-block-list__block,
-		&.is-focused {
-			opacity: 1;
-		}
-	}
-
 	// Active entity spotlight.
 	&.has-active-entity:not(.is-focus-mode) {
 		opacity: 0.5;
@@ -337,6 +325,21 @@
 				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			}
 		}
+	}
+}
+
+// Spotlight mode.
+.is-focus-mode .block-editor-block-list__block {
+	opacity: 0.5;
+	transition: opacity 0.1s linear;
+	@include reduce-motion("transition");
+
+	&.is-selected,
+	&.is-selected .block-editor-block-list__block,
+	&.is-multi-selected,
+	&.is-multi-selected .block-editor-block-list__block,
+	&.has-child-selected {
+		opacity: 1;
 	}
 }
 
