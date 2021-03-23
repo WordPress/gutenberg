@@ -7,7 +7,7 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { MENU_POST_TYPE, MENU_KIND } from '../utils/constants';
+import { MENU_POST_TYPE, MENU_KIND } from '../constants';
 
 export default function useMenuNotifications( menuId ) {
 	const { lastSaveError, lastDeleteError } = useSelect(
