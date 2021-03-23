@@ -39,11 +39,13 @@ function getBlockPresetsDeclarations( blockPresets = {} ) {
 		PRESET_METADATA,
 		( declarations, { path, valueKey, cssVarInfix } ) => {
 			const preset = get( blockPresets, path, [] );
-			preset.forEach( ( value ) => {
-				declarations.push(
-					`--wp--preset--${ cssVarInfix }--${ value.slug }: ${ value[ valueKey ] }`
-				);
-			} );
+			if ( preset ) {
+				preset.forEach( ( value ) => {
+					declarations.push(
+						`--wp--preset--${ cssVarInfix }--${ value.slug }: ${ value[ valueKey ] }`
+					);
+				} );
+			}
 			return declarations;
 		},
 		[]
@@ -66,13 +68,15 @@ function getBlockPresetClasses( blockSelector, blockPresets = {} ) {
 			}
 			classes.forEach( ( { classSuffix, propertyName } ) => {
 				const presets = get( blockPresets, path, [] );
-				presets.forEach( ( preset ) => {
-					const slug = preset.slug;
-					const value = preset[ valueKey ];
-					const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
-					const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
-					declarations += `${ selectorToUse } {${ propertyName }: ${ value };}`;
-				} );
+				if ( presets ) {
+					presets.forEach( ( preset ) => {
+						const slug = preset.slug;
+						const value = preset[ valueKey ];
+						const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
+						const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
+						declarations += `${ selectorToUse } {${ propertyName }: ${ value };}`;
+					} );
+				}
 			} );
 			return declarations;
 		},
