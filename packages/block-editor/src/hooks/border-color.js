@@ -73,6 +73,8 @@ export function BorderColorEdit( props ) {
 		<ColorGradientControl
 			label={ __( 'Border color' ) }
 			value={ borderColor || style?.border?.color }
+			colors={ colors }
+			gradients={ undefined }
 			disableCustomColors={ disableCustomColors }
 			disableCustomGradients={ disableCustomGradients }
 			onColorChange={ onChangeColor }
