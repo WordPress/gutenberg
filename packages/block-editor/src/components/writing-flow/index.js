@@ -32,12 +32,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	isInSameBlock,
-	isInsideRootBlock,
-	getBlockDOMNode,
-	getBlockClientId,
-} from '../../utils/dom';
+import { isInSameBlock, getBlockClientId } from '../../utils/dom';
 import FocusCapture from './focus-capture';
 import useMultiSelection from './use-multi-selection';
 import { store as blockEditorStore } from '../../store';
@@ -243,20 +238,6 @@ export default function WritingFlow( { children } ) {
 
 	function onMouseDown( event ) {
 		verticalRect.current = null;
-
-		const { ownerDocument } = event.target;
-
-		// Clicking inside a selected block should exit navigation mode and block moving mode.
-		if (
-			isNavigationMode &&
-			selectedBlockClientId &&
-			isInsideRootBlock(
-				getBlockDOMNode( selectedBlockClientId, ownerDocument ),
-				event.target
-			)
-		) {
-			setNavigationMode( false );
-		}
 
 		// Multi-select blocks when Shift+clicking.
 		if (
