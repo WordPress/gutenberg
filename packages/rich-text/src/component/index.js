@@ -19,7 +19,7 @@ import {
 	ESCAPE,
 } from '@wordpress/keycodes';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -308,24 +308,6 @@ function RichText(
 			__unstableDomOnly: domOnly,
 			placeholder,
 		} );
-	}
-
-	function handleCopy( event ) {
-		if ( isCollapsed( record.current ) ) {
-			return;
-		}
-
-		const selectedRecord = slice( record.current );
-		const plainText = getTextContent( selectedRecord );
-		const html = toHTMLString( {
-			value: selectedRecord,
-			multilineTag,
-			preserveWhiteSpace,
-		} );
-		event.clipboardData.setData( 'text/plain', plainText );
-		event.clipboardData.setData( 'text/html', html );
-		event.clipboardData.setData( 'rich-text', 'true' );
-		event.preventDefault();
 	}
 
 	/**
@@ -1076,15 +1058,39 @@ function RichText(
 		applyRecord( record.current );
 	}
 
+	const copyHandler = useRefEffect( ( element ) => {
+		function onCopy( event ) {
+			if ( isCollapsed( record.current ) ) {
+				return;
+			}
+
+			const selectedRecord = slice( record.current );
+			const plainText = getTextContent( selectedRecord );
+			const html = toHTMLString( {
+				value: selectedRecord,
+				multilineTag,
+				preserveWhiteSpace,
+			} );
+			event.clipboardData.setData( 'text/plain', plainText );
+			event.clipboardData.setData( 'text/html', html );
+			event.clipboardData.setData( 'rich-text', 'true' );
+			event.preventDefault();
+		}
+
+		element.addEventListener( 'copy', onCopy );
+		return () => {
+			element.removeEventListener( 'copy', onCopy );
+		};
+	}, [] );
+
 	const editableProps = {
 		// Overridable props.
 		role: 'textbox',
 		'aria-multiline': true,
 		'aria-label': placeholder,
-		ref: useMergeRefs( [ forwardedRef, ref ] ),
+		ref: useMergeRefs( [ forwardedRef, ref, copyHandler ] ),
 		style: defaultStyle,
 		className: 'rich-text',
-		onCopy: handleCopy,
 		onPaste: handlePaste,
 		onInput: handleInput,
 		onCompositionStart: handleCompositionStart,
