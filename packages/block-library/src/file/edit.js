@@ -89,9 +89,7 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 		}
 
 		if ( downloadButtonText === undefined ) {
-			setAttributes( {
-				downloadButtonText: _x( 'Download', 'button label' ),
-			} );
+			changeDownloadButtonText( _x( 'Download', 'button label' ) );
 		}
 	}, [] );
 
@@ -126,6 +124,13 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 
 	function changeShowDownloadButton( newValue ) {
 		setAttributes( { showDownloadButton: newValue } );
+	}
+
+	function changeDownloadButtonText( newValue ) {
+		// Remove anchor tags from button text content.
+		setAttributes( {
+			downloadButtonText: newValue.replace( /<\/?a[^>]*>/g, '' ),
+		} );
 	}
 
 	const attachmentPage = media && media.link;
@@ -214,9 +219,7 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 								withoutInteractiveFormatting
 								placeholder={ __( 'Add text…' ) }
 								onChange={ ( text ) =>
-									setAttributes( {
-										downloadButtonText: text,
-									} )
+									changeDownloadButtonText( text )
 								}
 							/>
 						</div>

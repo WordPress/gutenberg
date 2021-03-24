@@ -138,7 +138,7 @@ The Gutenberg repository also includes [Storybook](https://storybook.js.org/) in
 
 You can launch Storybook by running `npm run storybook:dev` locally. It will open in your browser automatically.
 
-You can also test Storybook for the current `master` branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
+You can also test Storybook for the current `trunk` branch on GitHub Pages: [https://wordpress.github.io/gutenberg/](https://wordpress.github.io/gutenberg/)
 
 ## Developer Tools
 

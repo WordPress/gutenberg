@@ -27,7 +27,7 @@ exports[`props should render as another element 1`] = `
 }
 
 <p
-  class="emotion-0"
+  class="ic-192yz5d emotion-0"
 >
   <span />
 </p>
@@ -60,7 +60,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="emotion-0"
+  class="ic-192yz5d emotion-0"
 >
   <span />
 </div>
@@ -95,7 +95,7 @@ exports[`props should render with custom styles (Array) 1`] = `
 }
 
 <p
-  class="emotion-0"
+  class="ic-192yz5d emotion-0"
 >
   <span />
 </p>
@@ -129,7 +129,7 @@ exports[`props should render with custom styles (object) 1`] = `
 }
 
 <p
-  class="emotion-0"
+  class="ic-192yz5d emotion-0"
 >
   <span />
 </p>
@@ -163,7 +163,7 @@ exports[`props should render with custom styles (string) 1`] = `
 }
 
 <p
-  class="emotion-0"
+  class="ic-192yz5d emotion-0"
 >
   <span />
 </p>

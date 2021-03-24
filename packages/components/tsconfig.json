@@ -32,6 +32,7 @@
 		"src/**/react-native-*",
 		"src/**/stories",
 		"src/**/test",
+		"src/ui/__storybook-utils",
 		"src/ui/font-size-control"
 	]
 }

@@ -6,7 +6,7 @@ on:
   pull_request:
   push:
     branches:
-      - master
+      - trunk
       - 'wp/**'
 
 jobs:

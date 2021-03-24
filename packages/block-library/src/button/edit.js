@@ -230,6 +230,11 @@ function ButtonEdit( props ) {
 		[ rel, setAttributes ]
 	);
 
+	const setButtonText = ( newText ) => {
+		// Remove anchor tags from button text content.
+		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
+	};
+
 	const colorProps = getColorAndStyleProps( attributes, colors, true );
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
@@ -247,7 +252,7 @@ function ButtonEdit( props ) {
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
-					onChange={ ( value ) => setAttributes( { text: value } ) }
+					onChange={ ( value ) => setButtonText( value ) }
 					withoutInteractiveFormatting
 					className={ classnames(
 						className,

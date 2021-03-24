@@ -27,4 +27,8 @@
 	.components-resizable-box__handle::before {
 		content: none;
 	}
+
+	&.resize-horizontal {
+		margin-bottom: 0;
+	}
 }

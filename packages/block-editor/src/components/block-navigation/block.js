@@ -43,7 +43,6 @@ export default function BlockNavigationBlock( {
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
-	const [ isFocused, setIsFocused ] = useState( false );
 	const { clientId } = block;
 	const { isDragging, blockParents } = useSelect(
 		( select ) => {
@@ -63,27 +62,55 @@ export default function BlockNavigationBlock( {
 		[ clientId ]
 	);
 
-	const { selectBlock: selectEditorBlock } = useDispatch( blockEditorStore );
+	const {
+		selectBlock: selectEditorBlock,
+		toggleBlockHighlight,
+	} = useDispatch( blockEditorStore );
 
 	const hasSiblings = siblingBlockCount > 0;
 	const hasRenderedMovers = showBlockMovers && hasSiblings;
-	const hasVisibleMovers = isHovered || isFocused;
 	const moverCellClassName = classnames(
 		'block-editor-block-navigation-block__mover-cell',
-		{ 'is-visible': hasVisibleMovers }
+		{ 'is-visible': isHovered }
 	);
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
+		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
 	} = useBlockNavigationContext();
 	const blockNavigationBlockSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
-		{ 'is-visible': hasVisibleMovers }
+		{ 'is-visible': isHovered }
 	);
+
+	// If BlockNavigation has experimental features related to the Persistent List View,
+	// only focus the selected list item on mount; otherwise the list would always
+	// try to steal the focus from the editor canvas.
+	useEffect( () => {
+		if ( withExperimentalPersistentListViewFeatures && isSelected ) {
+			cellRef.current.focus();
+		}
+	}, [] );
+
+	// If BlockNavigation has experimental features (such as drag and drop) enabled,
+	// leave the focus handling as it was before, to avoid accidental regressions.
 	useEffect( () => {
 		if ( withExperimentalFeatures && isSelected ) {
 			cellRef.current.focus();
 		}
 	}, [ withExperimentalFeatures, isSelected ] );
+
+	const highlightBlock = withExperimentalPersistentListViewFeatures
+		? toggleBlockHighlight
+		: () => {};
+
+	const onMouseEnter = () => {
+		setIsHovered( true );
+		highlightBlock( clientId, true );
+	};
+	const onMouseLeave = () => {
+		setIsHovered( false );
+		highlightBlock( clientId, false );
+	};
 
 	return (
 		<BlockNavigationLeaf
@@ -91,10 +118,10 @@ export default function BlockNavigationBlock( {
 				'is-selected': isSelected,
 				'is-dragging': isDragging,
 			} ) }
-			onMouseEnter={ () => setIsHovered( true ) }
-			onMouseLeave={ () => setIsHovered( false ) }
-			onFocus={ () => setIsFocused( true ) }
-			onBlur={ () => setIsFocused( false ) }
+			onMouseEnter={ onMouseEnter }
+			onMouseLeave={ onMouseLeave }
+			onFocus={ onMouseEnter }
+			onBlur={ onMouseLeave }
 			level={ level }
 			position={ position }
 			rowCount={ rowCount }

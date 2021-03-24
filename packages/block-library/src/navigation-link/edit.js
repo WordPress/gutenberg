@@ -323,7 +323,7 @@ export default function NavigationLinkEdit( {
 			} ),
 		},
 		{
-			allowedBlocks: [ 'core/navigation-link' ],
+			allowedBlocks: [ 'core/navigation-link', 'core/spacer' ],
 			renderAppender:
 				( isSelected && hasDescendants ) ||
 				( isImmediateParentOfSelectedBlock &&

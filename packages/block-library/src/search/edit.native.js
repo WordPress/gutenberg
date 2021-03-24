@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Alert, TextInput } from 'react-native';
+import { View, TextInput } from 'react-native';
 import classnames from 'classnames';
 
 /**
@@ -35,12 +35,6 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 		placeholder,
 		buttonText,
 	} = attributes;
-
-	// Temporary. Will be removed when styling is implemented
-	// in a future PR.
-	const alert = ( message ) => {
-		Alert.alert( '', message, [ { text: 'OK' } ], { cancelable: true } );
-	};
 
 	const getBlockClassNames = () => {
 		return classnames(
@@ -90,10 +84,6 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 						setAttributes( {
 							buttonPosition: position,
 						} );
-
-						// Temporary. Will be removed when styling is implemented
-						// in a future PR.
-						alert( `Button position: ${ position }` );
 					} }
 				/>
 
@@ -113,11 +103,22 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 		</BlockControls>
 	);
 
+	const mergeWithBorderStyle = ( style ) => {
+		return { ...style, ...styles.border };
+	};
+
 	const renderTextField = () => {
+		const inputStyle =
+			buttonPosition === 'button-inside'
+				? styles.searchTextInput
+				: mergeWithBorderStyle( styles.searchTextInput );
+
 		return (
 			<TextInput
 				className="wp-block-search__input"
-				style={ styles.searchTextInput }
+				style={ inputStyle }
+				numberOfLines={ 1 }
+				ellipsizeMode="tail" // currently only works on ios
 				label={ null }
 				value={ placeholder }
 				placeholder={
@@ -159,6 +160,11 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 		);
 	};
 
+	const searchBarStyle =
+		buttonPosition === 'button-inside'
+			? mergeWithBorderStyle( styles.searchBarContainer )
+			: styles.searchBarContainer;
+
 	return (
 		<View { ...blockProps } style={ styles.searchBlockContainer }>
 			{ controls }
@@ -180,7 +186,7 @@ export default function SearchEdit( { attributes, setAttributes, className } ) {
 
 			{ ( 'button-inside' === buttonPosition ||
 				'button-outside' === buttonPosition ) && (
-				<View style={ styles.searchBarContainer }>
+				<View style={ searchBarStyle }>
 					{ renderTextField() }
 					{ renderButton() }
 				</View>
