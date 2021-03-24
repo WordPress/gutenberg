@@ -112,20 +112,25 @@ export function useIsBorderColorDisabled( { name: blockName } = {} ) {
  * @return {Object}          Updated block settings.
  */
 function addAttributes( settings ) {
-	if ( ! hasBlockSupport( settings, BORDER_COLOR_SUPPORT_KEY ) ) {
+	if ( ! hasBorderColorSupport( settings ) ) {
 		return settings;
 	}
 
 	// Allow blocks to specify default value if needed.
-	if ( ! settings.attributes.borderColor ) {
-		Object.assign( settings.attributes, {
+	if ( settings.attributes.borderColor ) {
+		return settings;
+	}
+
+	// Add new borderColor attribute to block settings.
+	return {
+		...settings,
+		attributes: {
+			...settings.attributes,
 			borderColor: {
 				type: 'string',
 			},
-		} );
-	}
-
-	return settings;
+		},
+	};
 }
 
 /**
