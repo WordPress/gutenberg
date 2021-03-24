@@ -234,7 +234,7 @@ function ButtonEdit( props ) {
 	const useEnterRef = useEnter( { content: text, clientId } );
 	const mergedRef = useMergeRefs( [ useEnterRef, richTextRef ] );
 
-	const { lockUrlControls = false } = useSelect(
+	const { lockUrlControls = false, isVisualEditMode } = useSelect(
 		( select ) => {
 			if ( ! isSelected ) {
 				return {};
@@ -243,6 +243,7 @@ function ButtonEdit( props ) {
 			const blockBindingsSource = unlock(
 				select( blocksStore )
 			).getBlockBindingsSource( metadata?.bindings?.url?.source );
+			const store = select( blockEditorStore );
 
 			return {
 				lockUrlControls:
@@ -252,9 +253,12 @@ function ButtonEdit( props ) {
 						context,
 						args: metadata?.bindings?.url?.args,
 					} ),
+				isVisualEditMode:
+					'visual' === store.getBlockMode( clientId ) &&
+					! store.isNavigationMode(),
 			};
 		},
-		[ isSelected, metadata?.bindings?.url ]
+		[ clientId, isSelected, metadata?.bindings?.url ]
 	);
 
 	return (
@@ -333,6 +337,7 @@ function ButtonEdit( props ) {
 			</BlockControls>
 			{ isLinkTag &&
 				isSelected &&
+				isVisualEditMode &&
 				( isEditingURL || isURLSet ) &&
 				! lockUrlControls && (
 					<Popover
