@@ -10,7 +10,11 @@ import {
 	Button,
 } from '@wordpress/components';
 import { EntityProvider } from '@wordpress/core-data';
-import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
+import {
+	BlockContextProvider,
+	BlockBreadcrumb,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import {
 	FullscreenMode,
 	InterfaceSkeleton,
@@ -67,7 +71,7 @@ function Editor( { initialSettings } ) {
 
 		// Prefetch and parse patterns. This ensures patterns are loaded and parsed when
 		// the editor is loaded rather than degrading the performance of the inserter.
-		select( 'core/block-editor' ).__experimentalGetAllowedPatterns();
+		select( blockEditorStore ).__experimentalGetAllowedPatterns();
 
 		// The currently selected entity to display. Typically template or template part.
 		return {
@@ -94,8 +98,10 @@ function Editor( { initialSettings } ) {
 	const { setPage, setIsInserterOpened, updateSettings } = useDispatch(
 		editSiteStore
 	);
+	const { setNavigationMode } = useDispatch( blockEditorStore );
 	useEffect( () => {
 		updateSettings( initialSettings );
+		setNavigationMode( true );
 	}, [] );
 
 	// Keep the defaultTemplateTypes in the core/editor settings too,
