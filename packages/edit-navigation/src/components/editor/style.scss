@@ -57,10 +57,13 @@
 		}
 	}
 
-	.wp-block-navigation-link__label {
+	.wp-block-navigation-link__label,
+	.wp-block-navigation-link__placeholder-text {
 		padding: $grid-unit-15;
 		padding-left: $grid-unit-30;
+	}
 
+	.wp-block-navigation-link__label {
 		// Without this Links with submenus display a pointer.
 		cursor: text;
 	}
