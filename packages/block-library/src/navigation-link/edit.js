@@ -196,7 +196,7 @@ export default function NavigationLinkEdit( {
 					selectedBlockId,
 				] )?.length,
 				numberOfDescendants: descendants,
-				isDraggingBlocks: _isDraggingBlocks(),
+				// isDraggingBlocks: _isDraggingBlocks(),
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
