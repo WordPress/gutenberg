@@ -289,7 +289,7 @@ export default function NavigationLinkEdit( {
 		return {
 			id: page.id,
 			postType,
-			title: page.title.rendered,
+			title: page.title?.raw,
 			url: page.link,
 		};
 	}
