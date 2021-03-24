@@ -19,7 +19,7 @@ import {
 	ESCAPE,
 } from '@wordpress/keycodes';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -41,8 +41,7 @@ import { useFormatTypes } from './use-format-types';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useInlineWarning } from './use-inline-warning';
 import { insert } from '../insert';
-import { slice } from '../slice';
-import { getTextContent } from '../get-text-content';
+import { useCopyHandler } from './use-copy-handler';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -1058,40 +1057,16 @@ function RichText(
 		applyRecord( record.current );
 	}
 
-	const copyHandler = useRefEffect( ( element ) => {
-		function onCopy( event ) {
-			if (
-				isCollapsed( record.current ) ||
-				! element.contains( element.ownerDocument.activeElement )
-			) {
-				return;
-			}
-
-			const selectedRecord = slice( record.current );
-			const plainText = getTextContent( selectedRecord );
-			const html = toHTMLString( {
-				value: selectedRecord,
-				multilineTag,
-				preserveWhiteSpace,
-			} );
-			event.clipboardData.setData( 'text/plain', plainText );
-			event.clipboardData.setData( 'text/html', html );
-			event.clipboardData.setData( 'rich-text', 'true' );
-			event.preventDefault();
-		}
-
-		element.addEventListener( 'copy', onCopy );
-		return () => {
-			element.removeEventListener( 'copy', onCopy );
-		};
-	}, [] );
-
 	const editableProps = {
 		// Overridable props.
 		role: 'textbox',
 		'aria-multiline': true,
 		'aria-label': placeholder,
-		ref: useMergeRefs( [ forwardedRef, ref, copyHandler ] ),
+		ref: useMergeRefs( [
+			forwardedRef,
+			ref,
+			useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
+		] ),
 		style: defaultStyle,
 		className: 'rich-text',
 		onPaste: handlePaste,
