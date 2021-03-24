@@ -83,7 +83,7 @@ function MediaPlaceholder( props ) {
 	let instructions = labels.instructions;
 	if ( instructions === undefined ) {
 		if ( isImage ) {
-			instructions = __( 'ADD IMAGE' );
+			instructions = __( 'ADD YOURSELF AN IMAGE' );
 		} else if ( isVideo ) {
 			instructions = __( 'ADD VIDEO' );
 		} else if ( isAudio ) {
