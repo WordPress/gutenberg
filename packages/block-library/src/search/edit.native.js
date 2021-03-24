@@ -155,38 +155,38 @@ export default function SearchEdit( {
 		</InspectorControls>
 	);
 
+	const isButtonInside = buttonPosition === 'button-inside';
+
 	const borderStyle = usePreferredColorSchemeStyle(
 		styles.border,
 		styles.borderDark
 	);
 
-	const txtInputStyle = usePreferredColorSchemeStyle(
-		styles.plainTextInput,
-		styles.plainTextInputDark
-	);
+	const inputStyle = [
+		usePreferredColorSchemeStyle(
+			styles.plainTextInput,
+			styles.plainTextInputDark
+		),
+		! isButtonInside && borderStyle,
+	];
 
 	const placeholderStyle = usePreferredColorSchemeStyle(
 		styles.plainTextPlaceholder,
 		styles.plainTextPlaceholderDark
 	);
 
-	const mergeWithBorderStyle = ( style ) => {
-		return { ...style, ...borderStyle };
-	};
+	const searchBarStyle = [
+		styles.searchBarContainer,
+		isButtonInside && borderStyle,
+	];
 
 	const renderTextField = () => {
-		const getInputStyle = () => {
-			return buttonPosition === 'button-inside'
-				? txtInputStyle
-				: mergeWithBorderStyle( txtInputStyle );
-		};
-
 		return (
 			<PlainText
 				ref={ textInputRef }
 				isSelected={ isPlaceholderSelected }
 				className="wp-block-search__input"
-				style={ getInputStyle() }
+				style={ inputStyle }
 				numberOfLines={ 1 }
 				ellipsizeMode="tail" // currently only works on ios
 				label={ null }
@@ -249,11 +249,6 @@ export default function SearchEdit( {
 			</View>
 		);
 	};
-
-	const searchBarStyle =
-		buttonPosition === 'button-inside'
-			? mergeWithBorderStyle( styles.searchBarContainer )
-			: styles.searchBarContainer;
 
 	return (
 		<View { ...blockProps } style={ styles.searchBlockContainer }>
