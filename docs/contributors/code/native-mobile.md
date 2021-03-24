@@ -4,7 +4,7 @@ Intertwined with the web codepaths, the Gutenberg repo also includes the [React 
 
 ## Running Gutenberg Mobile on Android and iOS
 
-For instructions on how to run the **Gutenberg Mobile Demo App** on Android or iOS, see [Getting Started for the React Native based Mobile Gutenberg](/docs/contributors/code/getting-started-with-code-contribution-native-mobile.md)
+For instructions on how to run the **Gutenberg Mobile Demo App** on Android or iOS, see [Getting Started for the React Native based Mobile Gutenberg](/docs/contributors/code/getting-started-native-mobile.md)
 
 Also, the mobile client is packaged and released via the [official WordPress apps](https://wordpress.org/mobile/). Even though the build pipeline is slightly different then the mobile demo apps and lives in its own repo for now ([here's the native mobile repo](https://github.com/wordpress-mobile/gutenberg-mobile)), the source code itself is taken directly from this repo and the "web" side codepaths.
 
