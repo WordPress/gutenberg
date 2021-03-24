@@ -9,7 +9,7 @@ return array(
 	'title'       => __( 'Large header with left-aligned text' ),
 	'categories'  => array( 'header' ),
 	'content'     => '<!-- wp:cover {"url":"https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/tree-forest-grass-wilderness-plant-wood-153393-pxhere.com_.jpg","id":261,"dimRatio":60,"minHeight":800,"align":"full"} -->
-	<div class="wp-block-cover alignfull has-background-dim-60 has-background-dim" style="min-height:800px"><img class="wp-block-cover__image-background wp-image-261" alt="" src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/tree-forest-grass-wilderness-plant-wood-153393-pxhere.com_.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container">
+	<div class="wp-block-cover alignfull has-background-dim-60 has-background-dim" style="min-height:800px"><img class="wp-block-cover__image-background wp-image-261" alt="' . __( 'A dense forest of tall, straight trees as seen from slightly above.' ) . '" src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/tree-forest-grass-wilderness-plant-wood-153393-pxhere.com_.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container">
 	<!-- wp:heading {"align":"wide","style":{"typography":{"fontSize":"14vw"},"color":{"text":"#ffe074"}}} -->
 	<h2 class="alignwide has-text-color" style="color:#ffe074;font-size:14vw">' . __( 'Forest.' ) . '</h2>
 	<!-- /wp:heading -->
