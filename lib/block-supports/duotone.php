@@ -38,13 +38,15 @@ function gutenberg_register_duotone_support( $block_type ) {
  *
  * @return string filtered block content.
  */
-function gutenberg_render_duotone_support( $block_type, $block_attributes, $block_content ) {
+function gutenberg_render_duotone_support( $block_content, $block ) {
+	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
+
 	$duotone_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
+	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
 		$duotone_support = _wp_array_get( $block_type->supports, array( 'color', 'duotone' ), false );
 	}
 
-	$has_duotone_attribute = isset( $block_attributes['style']['color']['duotone'] );
+	$has_duotone_attribute = isset( $block['attrs']['style']['color']['duotone'] );
 
 	if (
 		! $duotone_support ||
@@ -53,7 +55,7 @@ function gutenberg_render_duotone_support( $block_type, $block_attributes, $bloc
 		return $block_content;
 	}
 
-	$duotone_attribute = $block_attributes['style']['color']['duotone'];
+	$duotone_attribute = $block['attrs']['style']['color']['duotone'];
 
 	$slug_or_id = isset( $duotone_attribute['slug'] ) ? $duotone_attribute['slug'] : uniqid();
 
@@ -87,6 +89,6 @@ WP_Block_Supports::get_instance()->register(
 	'duotone',
 	array(
 		'register_attribute' => 'gutenberg_register_duotone_support',
-		'render_block'       => 'gutenberg_render_duotone_support',
 	)
 );
+add_filter( 'render_block', 'gutenberg_render_duotone_support', 10, 2 );
