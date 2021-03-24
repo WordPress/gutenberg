@@ -42,7 +42,7 @@ const CoverEdit = ( props ) => (
 const setAttributes = jest.fn();
 const attributes = {
 	backgroundType: IMAGE_BACKGROUND_TYPE,
-	focalPoint: { x: '0.5', y: '0.5' },
+	focalPoint: { x: '0.25', y: '0.75' },
 	hasParallax: false,
 	onFocalPointChange: jest.fn(),
 	overlayColor: { color: '#000000' },
@@ -113,17 +113,27 @@ describe( 'when no media is attached', () => {
 } );
 
 describe( 'when media is attached', () => {
-	it( 'allow editing the focal point', async () => {
-		const { getByText } = render(
+	it( 'allows editing the focal point with text input', async () => {
+		const { getByText, findByText, findByLabelText } = render(
 			<CoverEdit
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
 		);
 		fireEvent.press( getByText( 'Edit focal point' ) );
+		const xAxisCell = await findByText(
+			( attributes.focalPoint.x * 100 ).toString()
+		);
+		fireEvent.press( xAxisCell );
+		const xAxisInput = await findByLabelText( 'X-Axis Position' );
+		fireEvent.changeText( xAxisInput, '99' );
+		const applyButton = await findByLabelText( 'Apply' );
+		fireEvent.press( applyButton );
 
-		await waitFor( () =>
-			expect( getByText( 'X-Axis Position' ) ).toBeTruthy()
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				focalPoint: { ...attributes.focalPoint, x: '0.99' },
+			} )
 		);
 
 		await act( () => imageSize );

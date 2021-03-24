@@ -255,6 +255,9 @@ class BottomSheetCell extends Component {
 		};
 
 		const getAccessibilityLabel = () => {
+			if ( ! accessible ) {
+				return;
+			}
 			if ( accessibilityLabel || ! showValue ) {
 				return accessibilityLabel || label;
 			}
