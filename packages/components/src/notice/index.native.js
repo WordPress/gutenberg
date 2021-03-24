@@ -23,7 +23,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-const Notice = ( { onNoticeHidden, content, id } ) => {
+const Notice = ( { onNoticeHidden, content, id, status } ) => {
 	const [ width, setWidth ] = useState( Dimensions.get( 'window' ).width );
 	const [ visible, setVisible ] = useState( true );
 
@@ -77,10 +77,26 @@ const Notice = ( { onNoticeHidden, content, id } ) => {
 		styles.noticeSolidDark
 	);
 
-	const textStyles = usePreferredColorSchemeStyle(
-		styles.text,
-		styles.textDark
+	const successTextStyles = usePreferredColorSchemeStyle(
+		styles.successText,
+		styles.successTextDark
 	);
+
+	const errorTextStyles = usePreferredColorSchemeStyle(
+		styles.errorText,
+		styles.errorTextDark
+	);
+
+	const getTextStyles = () => {
+		switch ( status ) {
+			case 'success':
+				return successTextStyles;
+			case 'error':
+				return errorTextStyles;
+			default:
+				throw new Error( `${ status } text style is not implemented.` );
+		}
+	};
 
 	return (
 		<>
@@ -103,7 +119,7 @@ const Notice = ( { onNoticeHidden, content, id } ) => {
 			>
 				<TouchableWithoutFeedback onPress={ onHide }>
 					<View style={ styles.noticeContent }>
-						<Text style={ textStyles }>{ content }</Text>
+						<Text style={ getTextStyles() }>{ content }</Text>
 					</View>
 				</TouchableWithoutFeedback>
 				{ isIOS && (

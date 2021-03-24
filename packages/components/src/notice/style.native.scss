@@ -1,12 +1,23 @@
-.text {
+.successText {
 	color: #212121;
 	align-self: center;
 	background-color: transparent;
 	font-size: 12;
 }
 
-.textDark {
+.successTextDark {
 	color: $white;
+}
+
+.errorText {
+	color: $red-50;
+	align-self: center;
+	background-color: transparent;
+	font-size: 12;
+}
+
+.errorTextDark {
+	color: $red-30;
 }
 
 .list {
@@ -31,19 +42,11 @@
 	width: 100%;
 }
 
-.errorNoticeSolid {
-	background-color: $red-50;
-}
-
-.errorNoticeSolidDark {
-	background-color: $red-30;
-}
-
-.successNoticeSolid {
+.noticeSolid {
 	background-color: #f4f4f4;
 }
 
-.successNoticeSolidDark {
+.noticeSolidDark {
 	background-color: #2a2a2a;
 }
 
