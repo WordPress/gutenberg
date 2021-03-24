@@ -82,6 +82,8 @@ export default function QuoteEdit( {
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
 						identifier="citation"
+						tagName="cite"
+						display={ { style: 'inline-block' } }
 						value={ citation }
 						onChange={ ( nextCitation ) =>
 							setAttributes( {
