@@ -60,6 +60,18 @@ export function hasBorderSupport( blockName ) {
 }
 
 /**
+ * Determines if there a specific border feature is supported.
+ *
+ * @param {string}        feature   Name of the border feature e.g.`radius`
+ * @param {string|Object} blockType Block name or block type object.
+ * @return { boolean }              Whether the border feature is supported.
+ */
+export function hasBorderFeatureSupport( feature, blockType ) {
+	const support = getBlockSupport( blockType, BORDER_SUPPORT_KEY );
+	return !! ( true === support || ( support && support[ feature ] ) );
+}
+
+/**
  * Determines whether there is any block support for borders e.g. border radius,
  * style, width etc.
  *

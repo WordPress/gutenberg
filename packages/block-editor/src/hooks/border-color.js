@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
-import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -19,10 +18,9 @@ import {
 	getColorObjectByColorValue,
 } from '../components/colors';
 import useEditorFeature from '../components/use-editor-feature';
-import { BORDER_SUPPORT_KEY } from './border';
+import { hasBorderFeatureSupport } from './border';
 import { cleanEmptyObject } from './utils';
 
-const BORDER_COLOR_SUPPORT_KEY = 'color';
 const EMPTY_ARRAY = [];
 
 /**
@@ -83,17 +81,6 @@ export function BorderColorEdit( props ) {
 }
 
 /**
- * Determines if there is border color support.
- *
- * @param  {string|Object} blockType Block name or Block Type object.
- * @return {boolean}                 Whether there is support.
- */
-export function hasBorderColorSupport( blockType ) {
-	const support = getBlockSupport( blockType, BORDER_SUPPORT_KEY );
-	return !! ( true === support || support?.color );
-}
-
-/**
  * Custom hook that checks if border color settings have been disabled.
  *
  * @param  {string} name The name of the block.
@@ -101,7 +88,7 @@ export function hasBorderColorSupport( blockType ) {
  */
 export function useIsBorderColorDisabled( { name: blockName } = {} ) {
 	const isDisabled = ! useEditorFeature( 'border.customColor' );
-	return ! hasBorderColorSupport( blockName ) || isDisabled;
+	return ! hasBorderFeatureSupport( 'color', blockName ) || isDisabled;
 }
 
 /**
@@ -112,7 +99,7 @@ export function useIsBorderColorDisabled( { name: blockName } = {} ) {
  * @return {Object}          Updated block settings.
  */
 function addAttributes( settings ) {
-	if ( ! hasBorderColorSupport( settings ) ) {
+	if ( ! hasBorderFeatureSupport( 'color', settings ) ) {
 		return settings;
 	}
 
@@ -142,7 +129,7 @@ function addAttributes( settings ) {
  * @return {Object}            Filtered props to apply to save element.
  */
 function addSaveProps( props, blockType, attributes ) {
-	if ( ! hasBlockSupport( blockType, BORDER_COLOR_SUPPORT_KEY ) ) {
+	if ( ! hasBorderFeatureSupport( 'color', blockType ) ) {
 		return props;
 	}
 
@@ -167,7 +154,7 @@ function addSaveProps( props, blockType, attributes ) {
  * @return {Object}         Filtered block settings.
  */
 function addEditProps( settings ) {
-	if ( ! hasBlockSupport( settings, BORDER_COLOR_SUPPORT_KEY ) ) {
+	if ( ! hasBorderFeatureSupport( 'color', settings ) ) {
 		return settings;
 	}
 

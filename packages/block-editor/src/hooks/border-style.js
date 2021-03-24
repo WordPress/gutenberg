@@ -1,14 +1,9 @@
 /**
- * WordPress dependencies
- */
-import { getBlockSupport } from '@wordpress/blocks';
-
-/**
  * Internal dependencies
  */
 import BorderStyleControl from '../components/border-style-control';
 import useEditorFeature from '../components/use-editor-feature';
-import { BORDER_SUPPORT_KEY } from './border';
+import { hasBorderFeatureSupport } from './border';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -48,17 +43,6 @@ export const BorderStyleEdit = ( props ) => {
 };
 
 /**
- * Determines if there is border style support.
- *
- * @param  {string|Object} blockType Block name or block type object.
- * @return {boolean}                 Whether there is support.
- */
-export const hasBorderStyleSupport = ( blockType ) => {
-	const support = getBlockSupport( blockType, BORDER_SUPPORT_KEY );
-	return !! ( true === support || support?.style );
-};
-
-/**
  * Custom hook that checks if border style settings have been disabled.
  *
  * @param  {string} blockName The name of the block to determine support scope.
@@ -66,5 +50,5 @@ export const hasBorderStyleSupport = ( blockType ) => {
  */
 export const useIsBorderStyleDisabled = ( { name: blockName } = {} ) => {
 	const isDisabled = ! useEditorFeature( 'border.customStyle' );
-	return ! hasBorderStyleSupport( blockName ) || isDisabled;
+	return ! hasBorderFeatureSupport( 'style', blockName ) || isDisabled;
 };
