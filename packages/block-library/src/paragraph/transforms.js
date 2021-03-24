@@ -37,7 +37,6 @@ const transforms = {
 			},
 		},
 	],
-	to: [ { type: 'pattern', retainAttributes: [ 'content' ] } ],
 };
 
 export default transforms;

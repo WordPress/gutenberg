@@ -91,7 +91,6 @@ const transforms = {
 					} )
 				),
 		},
-		{ type: 'pattern', retainAttributes: [ 'content' ] },
 	],
 };
 

@@ -5,7 +5,10 @@ import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { chevronRight } from '@wordpress/icons';
-import { cloneBlock, getBlockTransforms } from '@wordpress/blocks';
+import {
+	cloneBlock,
+	__experimentalGetBlockAttributesNamesByRole as getBlockAttributesNamesByRole,
+} from '@wordpress/blocks';
 import {
 	MenuGroup,
 	MenuItem,
@@ -105,19 +108,17 @@ function PatternTransformationsMenu( {
 							transformedBlocksSet
 						);
 						if ( ! match ) return;
-						// Found a match, so get the `retainAttributes` from
-						// block type's transforms to retain these and keep
-						// everything else from the pattern's block.
-						// If `retainAttributes` are not set, update the match
-						// with all the selected block's attributes.
-						const retainAttributes = getBlockTransforms(
-							'to',
-							block.name
-						).find( ( { type } ) => type === 'pattern' )
-							?.retainAttributes;
+						// Found a match, so find and retain block attributes
+						// with `content` role. Everything else comes from the
+						// pattern's block. If no `content` attributes found,
+						// update the match with all the selected block's attributes.
+						const contentAttributes = getBlockAttributesNamesByRole(
+							block.name,
+							'content'
+						);
 						let retainedBlockAttributes = block.attributes;
-						if ( retainAttributes?.length ) {
-							retainedBlockAttributes = retainAttributes.reduce(
+						if ( contentAttributes?.length ) {
+							retainedBlockAttributes = contentAttributes.reduce(
 								( _accumulator, attribute ) => {
 									if ( block.attributes[ attribute ] )
 										_accumulator[ attribute ] =
