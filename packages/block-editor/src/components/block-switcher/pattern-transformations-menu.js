@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { chevronRight } from '@wordpress/icons';
-import { cloneBlock } from '@wordpress/blocks';
+import { cloneBlock, getBlockType } from '@wordpress/blocks';
 import {
 	MenuGroup,
 	MenuItem,
@@ -105,10 +105,29 @@ function PatternTransformationsMenu( {
 							transformedBlocksSet
 						);
 						if ( ! match ) return;
-						// Found a match so update it with the selected block's attributes.
+						// Found a match, so get the `retainAttributes` from
+						// block type's transforms to retain these and keep
+						// everything else from the pattern's block.
+						// If `retainAttributes` are not set, update the match
+						// with all the selected block's attributes.
+						const blockType = getBlockType( block.name );
+						const retainAttributes =
+							blockType.transforms?.retainAttributes;
+						let retainedBlockAttributes = block.attributes;
+						if ( retainAttributes?.length ) {
+							retainedBlockAttributes = retainAttributes.reduce(
+								( _accumulator, attribute ) => {
+									if ( block.attributes[ attribute ] )
+										_accumulator[ attribute ] =
+											block.attributes[ attribute ];
+									return _accumulator;
+								},
+								{}
+							);
+						}
 						match.attributes = {
 							...match.attributes,
-							...block.attributes,
+							...retainedBlockAttributes,
 						};
 						// When we have a match with inner blocks keep only the
 						// blocks from the selected block and skip the inner blocks
