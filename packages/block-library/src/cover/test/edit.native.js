@@ -89,7 +89,7 @@ afterAll( () => {
 
 describe( 'when no media is attached', () => {
 	it( 'allows adding an image or video', async () => {
-		const { getByText, findByText, debug } = render(
+		const { getByText, findByText } = render(
 			<CoverEdit
 				attributes={ {
 					...attributes,
