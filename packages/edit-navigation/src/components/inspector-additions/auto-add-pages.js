@@ -23,7 +23,7 @@ export default function AutoAddPages( { menuId } ) {
 
 	return (
 		<ToggleControl
-			label={ __( 'Automatically pages' ) }
+			label={ __( 'Add new pages' ) }
 			help={ __(
 				'Automatically add published top-level pages to this menu.'
 			) }
