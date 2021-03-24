@@ -1,21 +1,42 @@
+.block-editor-block-list__layout input.components-button,
+.block-editor-block-list__layout button.components-button,
 .components-button {
-	display: inline-flex;
-	text-decoration: none;
-	font-weight: normal;
-	font-size: $default-font-size;
-	margin: 0;
-	border: 0;
-	cursor: pointer;
-	-webkit-appearance: none;
+	align-items: center;
 	background: none;
+	border: 0;
+	border-radius: $radius-block-ui;
+	box-sizing: border-box;
+	box-shadow: revert;
+	color: $gray-900;
+	cursor: pointer;
+	display: inline-flex;
+	font-family: $default-font;
+	font-size: $default-font-size;
+	font-style: normal;
+	font-weight: normal;
+	height: $button-size;
+	letter-spacing: normal;
+	line-height: normal;
+	min-height: revert;
+	min-width: revert;
+	margin: 0;
+	max-height: revert;
+	max-width: revert;
+	opacity: 1;
+	padding: 6px 12px;
+	stroke: revert;
+	text-align: revert;
+	text-decoration: none;
+	text-indent: 0;
+	text-shadow: revert;
+	text-transform: revert;
 	transition: box-shadow 0.1s linear;
 	@include reduce-motion("transition");
-	height: $button-size;
-	align-items: center;
-	box-sizing: border-box;
-	padding: 6px 12px;
-	border-radius: $radius-block-ui;
-	color: $gray-900;
+	vertical-align: revert;
+	width: revert;
+	-webkit-appearance: none;
+	word-break: revert;
+	word-spacing: revert;
 
 	&[aria-expanded="true"],
 	&:hover {
