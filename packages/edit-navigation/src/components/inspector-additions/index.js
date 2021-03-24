@@ -34,6 +34,11 @@ export default function InspectorAdditions( {
 
 	return (
 		<InspectorControls>
+			<PanelBody title={ __( 'Menu settings' ) }>
+				<NameEditor />
+				<AutoAddPagesPanel menuId={ menuId } />
+				<DeleteMenuPanel onDeleteMenu={ onDeleteMenu } />
+			</PanelBody>
 			<PanelBody title={ __( 'Theme locations' ) }>
 				<ManageLocations
 					menus={ menus }
@@ -43,11 +48,6 @@ export default function InspectorAdditions( {
 					closeModal={ closeManageLocationsModal }
 					openModal={ openManageLocationsModal }
 				/>
-			</PanelBody>
-			<PanelBody title={ __( 'Menu settings' ) }>
-				<NameEditor />
-				<AutoAddPagesPanel menuId={ menuId } />
-				<DeleteMenuPanel onDeleteMenu={ onDeleteMenu } />
 			</PanelBody>
 		</InspectorControls>
 	);
