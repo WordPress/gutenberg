@@ -121,9 +121,12 @@ const withDuotoneStyles = createHigherOrderComponent(
 			slug ?? useInstanceId( BlockListBlock )
 		}`;
 
+		const blockClass = getBlockDefaultClassName( props.name );
+		const scope = `.${ blockClass }.${ id }`;
+
 		const selectors = duotoneSupport.split( ',' );
 		const selectorsScoped = selectors.map(
-			( selector ) => `.${ id } ${ selector.trim() }`
+			( selector ) => `${ scope } ${ selector.trim() }`
 		);
 		const selectorsGroup = selectorsScoped.join( ', ' );
 

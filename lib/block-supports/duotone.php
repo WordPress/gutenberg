@@ -62,10 +62,13 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	$duotone_values = $duotone_attribute['values'];
 	$duotone_id     = 'wp-duotone-filter-' . $slug_or_id;
 
+	$block_class = gutenberg_get_block_default_classname( $block_type->name );
+	$scope       = '.' . $block_class . '.' . $duotone_id;
+
 	$selectors        = explode( ',', $duotone_support );
 	$selectors_scoped = array_map(
-		function ( $selector ) use ( $duotone_id ) {
-			return '.' . $duotone_id . ' ' . trim( $selector );
+		function ( $selector ) use ( $scope ) {
+			return $scope . ' ' . trim( $selector );
 		},
 		$selectors
 	);
