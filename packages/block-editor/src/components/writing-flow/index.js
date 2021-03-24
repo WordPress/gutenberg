@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { find, reverse, first, last } from 'lodash';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -156,7 +155,6 @@ function selector( select ) {
 		getLastMultiSelectedBlockClientId,
 		hasMultiSelection,
 		getBlockOrder,
-		isNavigationMode,
 		isSelectionEnabled,
 		getBlockSelectionStart,
 		isMultiSelecting,
@@ -182,7 +180,6 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		firstBlock: first( blocks ),
 		lastBlock: last( blocks ),
-		isNavigationMode: isNavigationMode(),
 		isSelectionEnabled: isSelectionEnabled(),
 		blockSelectionStart: getBlockSelectionStart(),
 		isMultiSelecting: isMultiSelecting(),
@@ -226,7 +223,6 @@ export default function WritingFlow( { children } ) {
 		hasMultiSelection,
 		firstBlock,
 		lastBlock,
-		isNavigationMode,
 		isSelectionEnabled,
 		blockSelectionStart,
 		isMultiSelecting,
@@ -535,10 +531,6 @@ export default function WritingFlow( { children } ) {
 		};
 	}, [] );
 
-	const className = classnames( 'block-editor-writing-flow', {
-		'is-navigate-mode': isNavigationMode,
-	} );
-
 	// Disable reason: Wrapper itself is non-interactive, but must capture
 	// bubbling events from children to determine focus transition intents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
@@ -568,7 +560,7 @@ export default function WritingFlow( { children } ) {
 			/>
 			<div
 				ref={ container }
-				className={ className }
+				className="block-editor-writing-flow"
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
 			>
