@@ -28,7 +28,7 @@ import ToolbarContainer from './toolbar-container';
 function Toolbar( { className, label, ...props }, ref ) {
 	if ( ! label ) {
 		deprecated( 'Using Toolbar without label prop', {
-			since: '8.8',
+			since: '5.6',
 			alternative: 'ToolbarGroup component',
 			link:
 				'https://developer.wordpress.org/block-editor/components/toolbar/',

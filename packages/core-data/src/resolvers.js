@@ -294,7 +294,7 @@ export function* getEmbedPreview( url ) {
  */
 export function* hasUploadPermissions() {
 	deprecated( "select( 'core' ).hasUploadPermissions()", {
-		since: '5.0',
+		since: '5.2',
 		alternative: "select( 'core' ).canUser( 'create', 'media' )",
 	} );
 	yield* canUser( 'create', 'media' );

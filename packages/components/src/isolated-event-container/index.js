@@ -10,7 +10,7 @@ function stopPropagation( event ) {
 
 export default forwardRef( ( { children, ...props }, ref ) => {
 	deprecated( 'wp.components.IsolatedEventContainer', {
-		since: '9.6',
+		since: '5.7',
 	} );
 
 	// Disable reason: this stops certain events from propagating outside of the component.

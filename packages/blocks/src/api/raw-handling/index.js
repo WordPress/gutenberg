@@ -26,7 +26,7 @@ export { pasteHandler } from './paste-handler';
 
 export function deprecatedGetPhrasingContentSchema( context ) {
 	deprecated( 'wp.blocks.getPhrasingContentSchema', {
-		since: '8.9',
+		since: '5.6',
 		alternative: 'wp.dom.getPhrasingContentSchema',
 	} );
 	return getPhrasingContentSchema( context );

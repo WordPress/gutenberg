@@ -11,7 +11,7 @@ import BlockIcon from '../block-icon';
 function BlockCard( { title, icon, description, blockType } ) {
 	if ( blockType ) {
 		deprecated( '`blockType` property in `BlockCard component`', {
-			since: '9.7',
+			since: '5.7',
 			alternative: '`title, icon and description` properties',
 		} );
 		( { title, icon, description } = blockType );

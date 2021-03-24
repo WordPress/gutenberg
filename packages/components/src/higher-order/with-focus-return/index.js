@@ -54,7 +54,7 @@ export default createHigherOrderComponent( ( options ) => {
 
 export const Provider = ( { children } ) => {
 	deprecated( 'wp.components.FocusReturnProvider component', {
-		since: '9.6',
+		since: '5.7',
 		hint:
 			'This provider is not used anymore. You can just remove it from your codebase',
 	} );

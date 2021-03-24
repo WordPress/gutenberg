@@ -54,7 +54,7 @@ function DropdownMenu( {
 } ) {
 	if ( menuLabel ) {
 		deprecated( '`menuLabel` prop in `DropdownComponent`', {
-			since: '6.3',
+			since: '5.3',
 			alternative: '`menuProps` object and its `aria-label` property',
 			plugin: 'Gutenberg',
 		} );
@@ -62,7 +62,7 @@ function DropdownMenu( {
 
 	if ( position ) {
 		deprecated( '`position` prop in `DropdownComponent`', {
-			since: '6.3',
+			since: '5.3',
 			alternative: '`popoverProps` object and its `position` property',
 			plugin: 'Gutenberg',
 		} );

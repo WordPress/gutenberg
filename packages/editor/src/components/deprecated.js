@@ -65,7 +65,7 @@ export { default as ServerSideRender } from '@wordpress/server-side-render';
 function deprecateComponent( name, Wrapped, staticsToHoist = [] ) {
 	const Component = forwardRef( ( props, ref ) => {
 		deprecated( 'wp.editor.' + name, {
-			since: '5.9',
+			since: '5.3',
 			alternative: 'wp.blockEditor.' + name,
 		} );
 
@@ -85,7 +85,7 @@ function deprecateComponent( name, Wrapped, staticsToHoist = [] ) {
 function deprecateFunction( name, func ) {
 	return ( ...args ) => {
 		deprecated( 'wp.editor.' + name, {
-			since: '5.9',
+			since: '5.3',
 			alternative: 'wp.blockEditor.' + name,
 		} );
 

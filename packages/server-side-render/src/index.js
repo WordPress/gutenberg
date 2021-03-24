@@ -43,7 +43,7 @@ const ExportedServerSideRender = withSelect( ( select ) => {
 if ( window && window.wp && window.wp.components ) {
 	window.wp.components.ServerSideRender = forwardRef( ( props, ref ) => {
 		deprecated( 'wp.components.ServerSideRender', {
-			since: '6.3',
+			since: '5.3',
 			alternative: 'wp.serverSideRender',
 		} );
 		return <ExportedServerSideRender { ...props } ref={ ref } />;

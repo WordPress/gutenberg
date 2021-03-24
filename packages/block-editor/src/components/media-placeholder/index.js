@@ -391,7 +391,7 @@ export function MediaPlaceholder( {
 	if ( dropZoneUIOnly || disableMediaButtons ) {
 		if ( dropZoneUIOnly ) {
 			deprecated( 'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop', {
-				since: '6.6',
+				since: '5.4',
 				alternative: 'disableMediaButtons',
 			} );
 		}
