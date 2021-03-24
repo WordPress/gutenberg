@@ -3377,10 +3377,12 @@ describe( 'selectors', () => {
 			settings: {
 				__experimentalBlockPatterns: [
 					{
+						name: 'pattern-a',
 						title: 'pattern with a',
 						content: `<!-- wp:test-block-a --><!-- /wp:test-block-a -->`,
 					},
 					{
+						name: 'pattern-b',
 						title: 'pattern with b',
 						content:
 							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
@@ -3411,10 +3413,12 @@ describe( 'selectors', () => {
 			settings: {
 				__experimentalBlockPatterns: [
 					{
+						name: 'pattern-a',
 						title: 'pattern a',
 						scope: { block: [ 'test/block-a' ] },
 					},
 					{
+						name: 'pattern-b',
 						title: 'pattern b',
 						scope: { block: [ 'test/block-b' ] },
 					},
