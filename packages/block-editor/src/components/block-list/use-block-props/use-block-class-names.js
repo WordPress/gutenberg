@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
 import { isReusableBlock, getBlockType } from '@wordpress/blocks';
 
 /**
@@ -23,7 +22,6 @@ import { store as blockEditorStore } from '../../../store';
  * @return {string} The class names.
  */
 export function useBlockClassNames( clientId ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
 	return useSelect(
 		( select ) => {
 			const {
@@ -37,7 +35,6 @@ export function useBlockClassNames( clientId ) {
 				__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 			} = select( blockEditorStore );
 			const {
-				focusMode,
 				__experimentalSpotlightEntityBlocks: spotlightEntityBlocks,
 			} = getSettings();
 			const isDragging = isBlockBeingDragged( clientId );
@@ -58,17 +55,12 @@ export function useBlockClassNames( clientId ) {
 				'is-multi-selected': isBlockMultiSelected( clientId ),
 				'is-reusable': isReusableBlock( getBlockType( name ) ),
 				'is-dragging': isDragging,
-				'is-focused':
-					focusMode &&
-					isLargeViewport &&
-					( isSelected || isAncestorOfSelectedBlock ),
-				'is-focus-mode': focusMode && isLargeViewport,
 				'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
 				'has-active-entity': activeEntityBlockId,
 				// Determine if there is an active entity area to spotlight.
 				'is-active-entity': activeEntityBlockId === clientId,
 			} );
 		},
-		[ clientId, isLargeViewport ]
+		[ clientId ]
 	);
 }

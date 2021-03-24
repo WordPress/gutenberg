@@ -9,7 +9,9 @@ function stopPropagation( event ) {
 }
 
 export default forwardRef( ( { children, ...props }, ref ) => {
-	deprecated( 'wp.components.IsolatedEventContainer' );
+	deprecated( 'wp.components.IsolatedEventContainer', {
+		since: '5.7',
+	} );
 
 	// Disable reason: this stops certain events from propagating outside of the component.
 	//   - onMouseDown is disabled as this can cause interactions with other DOM elements

@@ -14,8 +14,14 @@ export default function placeCaretAtHorizontalEdge( container, isReverse ) {
 		return;
 	}
 
+	container.focus();
+
 	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
-		container.focus();
+		// The element may not support selection setting.
+		if ( typeof container.selectionStart !== 'number' ) {
+			return;
+		}
+
 		if ( isReverse ) {
 			container.selectionStart = container.value.length;
 			container.selectionEnd = container.value.length;
@@ -23,10 +29,9 @@ export default function placeCaretAtHorizontalEdge( container, isReverse ) {
 			container.selectionStart = 0;
 			container.selectionEnd = 0;
 		}
+
 		return;
 	}
-
-	container.focus();
 
 	if ( ! container.isContentEditable ) {
 		return;

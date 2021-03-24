@@ -114,18 +114,19 @@ export default function BlockNavigationBlock( {
 		highlightBlock( clientId, false );
 	};
 
+	const classes = classnames( {
+		'is-selected': isSelected,
+		'is-branch-selected':
+			withExperimentalPersistentListViewFeatures && isBranchSelected,
+		'is-last-of-selected-branch':
+			withExperimentalPersistentListViewFeatures &&
+			isLastOfSelectedBranch,
+		'is-dragging': isDragging,
+	} );
+
 	return (
 		<BlockNavigationLeaf
-			className={ classnames( {
-				'is-selected': isSelected,
-				'is-branch-selected':
-					withExperimentalPersistentListViewFeatures &&
-					isBranchSelected,
-				'is-last-of-selected-branch':
-					withExperimentalPersistentListViewFeatures &&
-					isLastOfSelectedBranch,
-				'is-dragging': isDragging,
-			} ) }
+			className={ classes }
 			onMouseEnter={ onMouseEnter }
 			onMouseLeave={ onMouseLeave }
 			onFocus={ onMouseEnter }

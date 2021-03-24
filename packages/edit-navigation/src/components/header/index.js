@@ -6,7 +6,7 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, Dropdown, DropdownMenu } from '@wordpress/components';
+import { DropdownMenu } from '@wordpress/components';
 import { PinnedItems } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
 
@@ -14,7 +14,6 @@ import { __, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import SaveButton from './save-button';
-import ManageLocations from './manage-locations';
 import MenuSwitcher from '../menu-switcher';
 
 export default function Header( {
@@ -84,23 +83,6 @@ export default function Header( {
 							/>
 						) }
 					</DropdownMenu>
-
-					<Dropdown
-						contentClassName="edit-navigation-header__manage-locations"
-						position="bottom left"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								isTertiary
-								aria-expanded={ isOpen }
-								onClick={ onToggle }
-							>
-								{ __( 'Manage locations' ) }
-							</Button>
-						) }
-						renderContent={ () => (
-							<ManageLocations menus={ menus } />
-						) }
-					/>
 
 					<SaveButton navigationPost={ navigationPost } />
 					<PinnedItems.Slot scope="core/edit-navigation" />

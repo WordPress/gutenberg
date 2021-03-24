@@ -649,7 +649,7 @@ class WP_Theme_JSON {
 		foreach ( $properties as $prop ) {
 			$value = self::get_property_value( $styles, $prop['value'] );
 			if ( ! empty( $value ) ) {
-				$declarations[] = array(
+				$declarations[]   = array(
 					'name'  => $prop['name'],
 					'value' => $value,
 				);
@@ -678,9 +678,6 @@ class WP_Theme_JSON {
 		$stylesheet = '';
 		foreach ( self::PRESETS_METADATA as $preset ) {
 			$values = _wp_array_get( $settings, $preset['path'], array() );
-			if ( empty( $values ) ) {
-				continue;
-			}
 			foreach ( $values as $value ) {
 				foreach ( $preset['classes'] as $class ) {
 					$stylesheet .= self::to_ruleset(
@@ -719,9 +716,6 @@ class WP_Theme_JSON {
 	private static function compute_preset_vars( $declarations, $settings ) {
 		foreach ( self::PRESETS_METADATA as $preset ) {
 			$values = _wp_array_get( $settings, $preset['path'], array() );
-			if ( empty( $values ) ) {
-				continue;
-			}
 			foreach ( $values as $value ) {
 				$declarations[] = array(
 					'name'  => '--wp--preset--' . $preset['css_var_infix'] . '--' . $value['slug'],

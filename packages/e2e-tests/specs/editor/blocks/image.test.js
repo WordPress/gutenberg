@@ -137,6 +137,24 @@ describe( 'Image', () => {
 		).toBe( '1<br data-rich-text-line-break="true">2' );
 	} );
 
+	it( 'should have keyboard navigable toolbar for caption', async () => {
+		await insertBlock( 'Image' );
+		const fileName = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( fileName );
+		// Navigate to More, Link, Italic and finally Bold.
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await pressKeyWithModifier( 'shift', 'Tab' );
+		await page.keyboard.press( 'Space' );
+		await page.keyboard.press( 'a' );
+		await page.keyboard.press( 'ArrowRight' );
+
+		expect(
+			await page.evaluate( () => document.activeElement.innerHTML )
+		).toBe( '<strong>a</strong>' );
+	} );
+
 	it( 'should drag and drop files into media placeholder', async () => {
 		await page.keyboard.press( 'Enter' );
 		await insertBlock( 'Image' );
