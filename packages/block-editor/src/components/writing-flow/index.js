@@ -214,8 +214,6 @@ export default function WritingFlow( { children } ) {
 	// browser behaviour across blocks.
 	const verticalRect = useRef();
 
-	const onSelectionStart = useMultiSelection( container );
-
 	const {
 		selectedBlockClientId,
 		selectionStartClientId,
@@ -521,6 +519,11 @@ export default function WritingFlow( { children } ) {
 			multiSelectionContainer.current.focus();
 		}
 	}, [ hasMultiSelection, isMultiSelecting ] );
+
+	// This hook sets the selection after the user makes a multi-selection. For
+	// some browsers, like Safari, it is important that this happens AFTER
+	// setting focus on the multi-selection container above.
+	const onSelectionStart = useMultiSelection( container );
 
 	const lastFocus = useRef();
 
