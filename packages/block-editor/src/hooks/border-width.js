@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { getBlockSupport } from '@wordpress/blocks';
 import { RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -9,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useEditorFeature from '../components/use-editor-feature';
-import { BORDER_SUPPORT_KEY } from './border';
+import { hasBorderFeatureSupport } from './border';
 import { cleanEmptyObject } from './utils';
 
 const MIN_BORDER_WIDTH = 0;
@@ -57,17 +56,6 @@ export const BorderWidthEdit = ( props ) => {
 };
 
 /**
- * Determines if there is border width support.
- *
- * @param  {string|Object} blockType Block name or block type object.
- * @return {boolean}                 Whether there is support.
- */
-export const hasBorderWidthSupport = ( blockType ) => {
-	const support = getBlockSupport( blockType, BORDER_SUPPORT_KEY );
-	return !! ( true === support || support?.width );
-};
-
-/**
  * Custom hook that checks if border width settings have been disabled.
  *
  * @param  {string} blockName The name of the block to determine support scope.
@@ -75,5 +63,5 @@ export const hasBorderWidthSupport = ( blockType ) => {
  */
 export const useIsBorderWidthDisabled = ( { name: blockName } = {} ) => {
 	const isDisabled = ! useEditorFeature( 'border.customWidth' );
-	return ! hasBorderWidthSupport( blockName ) || isDisabled;
+	return ! hasBorderFeatureSupport( 'width', blockName ) || isDisabled;
 };

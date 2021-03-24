@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { getBlockSupport } from '@wordpress/blocks';
 import { RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -9,7 +8,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useEditorFeature from '../components/use-editor-feature';
-import { BORDER_SUPPORT_KEY } from './border';
+import { hasBorderFeatureSupport } from './border';
 import { cleanEmptyObject } from './utils';
 
 const MIN_BORDER_RADIUS_VALUE = 0;
@@ -61,17 +60,6 @@ export function BorderRadiusEdit( props ) {
 }
 
 /**
- * Determines if there is border radius support.
- *
- * @param  {string|Object} blockType Block name or Block Type object.
- * @return {boolean}                 Whether there is support.
- */
-export function hasBorderRadiusSupport( blockType ) {
-	const support = getBlockSupport( blockType, BORDER_SUPPORT_KEY );
-	return !! ( true === support || support?.radius );
-}
-
-/**
  * Custom hook that checks if border radius settings have been disabled.
  *
  * @param  {string} name The name of the block.
@@ -79,5 +67,5 @@ export function hasBorderRadiusSupport( blockType ) {
  */
 export function useIsBorderRadiusDisabled( { name: blockName } = {} ) {
 	const isDisabled = ! useEditorFeature( 'border.customRadius' );
-	return ! hasBorderRadiusSupport( blockName ) || isDisabled;
+	return ! hasBorderFeatureSupport( 'radius', blockName ) || isDisabled;
 }
