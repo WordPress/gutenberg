@@ -1060,7 +1060,10 @@ function RichText(
 
 	const copyHandler = useRefEffect( ( element ) => {
 		function onCopy( event ) {
-			if ( isCollapsed( record.current ) ) {
+			if (
+				isCollapsed( record.current ) ||
+				! element.contains( element.ownerDocument.activeElement )
+			) {
 				return;
 			}
 
