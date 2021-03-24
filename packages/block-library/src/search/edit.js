@@ -121,6 +121,7 @@ export default function SearchEdit( {
 	const renderTextField = () => {
 		return (
 			<input
+				type="search"
 				className="wp-block-search__input"
 				aria-label={ __( 'Optional placeholder text' ) }
 				// We hide the placeholder field's placeholder when there is a value. This
@@ -148,16 +149,21 @@ export default function SearchEdit( {
 				) }
 
 				{ ! buttonUseIcon && (
-					<RichText
-						className="wp-block-search__button"
-						aria-label={ __( 'Button text' ) }
-						placeholder={ __( 'Add button text…' ) }
-						withoutInteractiveFormatting
-						value={ buttonText }
-						onChange={ ( html ) =>
-							setAttributes( { buttonText: html } )
-						}
-					/>
+					// This rule only makes sense for UI not blocks.
+					// eslint-disable-next-line react/forbid-elements
+					<button type="submit" className="wp-block-search__button">
+						<RichText
+							tagName="span"
+							style={ { display: 'inline-block' } }
+							aria-label={ __( 'Button text' ) }
+							placeholder={ __( 'Add button text…' ) }
+							withoutInteractiveFormatting
+							value={ buttonText }
+							onChange={ ( html ) =>
+								setAttributes( { buttonText: html } )
+							}
+						/>
+					</button>
 				) }
 			</>
 		);
