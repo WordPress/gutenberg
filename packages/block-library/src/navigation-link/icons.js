@@ -8,10 +8,13 @@ export const ItemSubmenuIcon = () => (
 		xmlns="http://www.w3.org/2000/svg"
 		width="12"
 		height="12"
-		viewBox="0 0 24 24"
-		transform="rotate(90)"
+		viewBox="0 0 12 12"
+		fill="none"
 	>
-		<Path d="M8 5v14l11-7z" />
-		<Path d="M0 0h24v24H0z" fill="none" />
+		<Path
+			d="M1.50002 4L6.00002 8L10.5 4"
+			stroke="#000000"
+			strokeWidth="1.5"
+		/>
 	</SVG>
 );
