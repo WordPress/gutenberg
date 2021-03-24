@@ -13,10 +13,8 @@
 .border {
 	border: $border-width solid $gray-5;
 	border-radius: $grid-unit-05;
+	padding: $grid-unit-05;
 	padding-left: $grid-unit-10;
-	padding-right: $grid-unit-05;
-	padding-top: $grid-unit-05;
-	padding-bottom: $grid-unit-05;
 }
 
 .borderDark {
@@ -25,10 +23,7 @@
 
 .buttonContainer {
 	background: $button-fallback-bg;
-	padding-left: $grid-unit-10;
-	padding-right: $grid-unit-10;
-	padding-top: $grid-unit-10;
-	padding-bottom: $grid-unit-10;
+	padding: $grid-unit-10;
 	border: $border-width solid $button-fallback-bg;
 	margin-left: $grid-unit-05;
 	border-radius: $grid-unit-05;
@@ -72,10 +67,8 @@
 	flex-grow: 1;
 	flex-shrink: 1;
 	min-height: 42px;
+	padding: $grid-unit-05;
 	padding-left: 0;
-	padding-right: $grid-unit-05;
-	padding-top: $grid-unit-05;
-	padding-bottom: $grid-unit-05;
 	font-family: $default-regular-font;
 	color: $gray-90;
 }
