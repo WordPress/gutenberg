@@ -31,6 +31,14 @@
 	width: 100%;
 }
 
+.errorNoticeSolid {
+	background-color: $red-50;
+}
+
+.errorNoticeSolidDark {
+	background-color: $red-30;
+}
+
 .noticeSolid {
 	background-color: #f4f4f4;
 }
