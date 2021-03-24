@@ -504,7 +504,7 @@ describe( 'Navigation editor', () => {
 			await saveButton.click();
 			await page.waitForSelector( '.components-snackbar' );
 			const menuNameButton = await page.waitForXPath(
-				'//button[contains(@aria-label, "Edit menu name: newName" ) ]'
+				'//button[contains(@aria-label, "Edit menu name" ) ]'
 			);
 			const menuNamebuttonText = await menuNameButton.evaluate(
 				( element ) => element.innerText
