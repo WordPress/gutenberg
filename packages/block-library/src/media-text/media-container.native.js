@@ -26,6 +26,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -44,8 +45,6 @@ const ICON_TYPE = {
 	PLACEHOLDER: 'placeholder',
 	RETRY: 'retry',
 };
-
-const { createErrorNotice } = useDispatch( noticesStore );
 
 export { imageFillStyles } from './media-container.js';
 
@@ -82,6 +81,7 @@ class MediaContainer extends Component {
 	}
 
 	onUploadError( message ) {
+		const { createErrorNotice } = this.props;
 		createErrorNotice( message );
 	}
 
@@ -384,4 +384,11 @@ class MediaContainer extends Component {
 	}
 }
 
-export default compose( withPreferredColorScheme )( MediaContainer );
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { createErrorNotice } = dispatch( noticesStore );
+
+		return { createErrorNotice };
+	} ),
+	withPreferredColorScheme,
+] )( MediaContainer );
