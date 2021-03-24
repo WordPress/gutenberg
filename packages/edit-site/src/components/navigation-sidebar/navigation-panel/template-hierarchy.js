@@ -65,14 +65,12 @@ export function getTemplateLocation( slug ) {
 }
 
 export function getUnusedTemplates( templates, showOnFront ) {
-	const unusedTemplates = [];
-
 	const templateSlugs = map( templates, 'slug' );
 	const supersededTemplates = templates.filter( ( { slug } ) =>
 		isTemplateSuperseded( slug, templateSlugs, showOnFront )
 	);
 
-	return [ ...supersededTemplates, ...unusedTemplates ];
+	return supersededTemplates;
 }
 
 export function getTemplatesLocationMap( templates ) {
