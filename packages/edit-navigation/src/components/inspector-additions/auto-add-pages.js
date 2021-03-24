@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
-import { CheckboxControl } from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 export default function AutoAddPages( { menuId } ) {
@@ -22,7 +22,7 @@ export default function AutoAddPages( { menuId } ) {
 	const { saveMenu } = useDispatch( 'core' );
 
 	return (
-		<CheckboxControl
+		<ToggleControl
 			label={ __( 'Automatically add new top-level pages' ) }
 			checked={ autoAddPages ?? false }
 			onChange={ ( newAutoAddPages ) => {
