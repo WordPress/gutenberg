@@ -575,6 +575,7 @@ export function* insertBlocks(
 		initialPosition = 0;
 		deprecated( "meta argument in wp.data.dispatch('core/block-editor')", {
 			since: '10.1',
+			plugin: 'Gutenberg',
 			hint: 'The meta argument is now the 6th argument of the function',
 		} );
 	}

@@ -22,6 +22,7 @@ function ActionItemSlot( {
 			'Passing a tuple of components with `as` prop to `ActionItem.Slot` component',
 			{
 				since: '10.2',
+				plugin: 'Gutenberg',
 				alternative: 'a component with `as` prop',
 				version: '10.3',
 			}

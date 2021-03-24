@@ -689,7 +689,6 @@ export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
 		since: '5.3',
 		alternative:
 			"`wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
-		plugin: 'Gutenberg',
 	} );
 
 	const postType = getCurrentPostType( state );
@@ -718,7 +717,6 @@ export const hasAutosave = createRegistrySelector( ( select ) => ( state ) => {
 		since: '5.3',
 		alternative:
 			"`!! wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
-		plugin: 'Gutenberg',
 	} );
 
 	const postType = getCurrentPostType( state );
@@ -957,7 +955,6 @@ export function getSuggestedPostFormat( state ) {
 export function getBlocksForSerialization( state ) {
 	deprecated( '`core/editor` getBlocksForSerialization selector', {
 		since: '5.3',
-		plugin: 'Gutenberg',
 		alternative: 'getEditorBlocks',
 		hint: 'Blocks serialization pre-processing occurs at save time',
 	} );
@@ -1240,6 +1237,7 @@ export function getEditorBlocks( state ) {
 export function getEditorSelectionStart( state ) {
 	deprecated( "select('core/editor').getEditorSelectionStart", {
 		since: '10.0',
+		plugin: 'Gutenberg',
 		alternative: "select('core/editor').getEditorSelection",
 	} );
 	return getEditedPostAttribute( state, 'selection' )?.selectionStart;
@@ -1256,6 +1254,7 @@ export function getEditorSelectionStart( state ) {
 export function getEditorSelectionEnd( state ) {
 	deprecated( "select('core/editor').getEditorSelectionStart", {
 		since: '10.0',
+		plugin: 'Gutenberg',
 		alternative: "select('core/editor').getEditorSelection",
 	} );
 	return getEditedPostAttribute( state, 'selection' )?.selectionEnd;

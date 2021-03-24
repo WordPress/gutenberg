@@ -116,7 +116,6 @@ export function* resetAutosave( newAutosave ) {
 	deprecated( 'resetAutosave action (`core/editor` store)', {
 		since: '5.3',
 		alternative: 'receiveAutosaves action (`core` store)',
-		plugin: 'Gutenberg',
 	} );
 
 	const postId = yield controls.select( STORE_NAME, 'getCurrentPostId' );
