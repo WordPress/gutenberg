@@ -29,6 +29,14 @@ export default function ManageLocations( {
 		toggleMenuLocationAssignment,
 	} = useMenuLocations();
 
+	if ( ! menuLocations ) {
+		return <Spinner />;
+	}
+
+	if ( ! menuLocations.length ) {
+		return <p>{ __( 'There are no available menu locations.' ) }</p>;
+	}
+
 	const themeLocationCountTextMain = sprintf(
 		// translators: Number of available theme locations.
 		__(
@@ -74,14 +82,6 @@ export default function ManageLocations( {
 			</li>
 		);
 	} );
-
-	if ( ! menus || ! menuLocations ) {
-		return <Spinner />;
-	}
-
-	if ( ! menuLocations.length ) {
-		return <p>{ __( 'There are no available menu locations.' ) }</p>;
-	}
 
 	const menuLocationCard = menuLocations.map( ( menuLocation ) => (
 		<div
