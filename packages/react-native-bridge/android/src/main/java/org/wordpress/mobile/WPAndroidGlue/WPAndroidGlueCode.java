@@ -47,7 +47,6 @@ import org.reactnative.maskedview.RNCMaskedViewPackage;
 import org.wordpress.android.util.AppLog;
 import org.wordpress.mobile.ReactNativeAztec.ReactAztecPackage;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent;
-import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.ReplaceUnsupportedBlockCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.RNMedia;
@@ -88,7 +87,6 @@ public class WPAndroidGlueCode {
     private OnEditorAutosaveListener mOnEditorAutosaveListener;
     private OnImageFullscreenPreviewListener mOnImageFullscreenPreviewListener;
     private OnMediaEditorListener mOnMediaEditorListener;
-    private OnLogGutenbergUserEventListener mOnLogGutenbergUserEventListener;
     private OnGutenbergDidRequestUnsupportedBlockFallbackListener mOnGutenbergDidRequestUnsupportedBlockFallbackListener;
     private OnGutenbergDidSendButtonPressedActionListener mOnGutenbergDidSendButtonPressedActionListener;
     private ReplaceUnsupportedBlockCallback mReplaceUnsupportedBlockCallback;
@@ -186,10 +184,6 @@ public class WPAndroidGlueCode {
 
     public interface OnMediaEditorListener {
         void onMediaEditorClicked(String mediaUrl);
-    }
-
-    public interface OnLogGutenbergUserEventListener {
-        void onGutenbergUserEvent(GutenbergUserEvent event, Map<String, Object> properties);
     }
 
     public interface OnGutenbergDidRequestUnsupportedBlockFallbackListener {
@@ -410,11 +404,6 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void logUserEvent(GutenbergUserEvent event, ReadableMap eventProperties) {
-                mOnLogGutenbergUserEventListener.onGutenbergUserEvent(event, eventProperties.toHashMap());
-            }
-
-            @Override
             public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
                                                                     String content,
                                                                     String blockId,
@@ -554,7 +543,6 @@ public class WPAndroidGlueCode {
                                   RequestExecutor fetchExecutor,
                                   OnImageFullscreenPreviewListener onImageFullscreenPreviewListener,
                                   OnMediaEditorListener onMediaEditorListener,
-                                  OnLogGutenbergUserEventListener onLogGutenbergUserEventListener,
                                   OnGutenbergDidRequestUnsupportedBlockFallbackListener onGutenbergDidRequestUnsupportedBlockFallbackListener,
                                   OnGutenbergDidSendButtonPressedActionListener onGutenbergDidSendButtonPressedActionListener,
                                   ShowSuggestionsUtil showSuggestionsUtil,
@@ -572,7 +560,6 @@ public class WPAndroidGlueCode {
         mRequestExecutor = fetchExecutor;
         mOnImageFullscreenPreviewListener = onImageFullscreenPreviewListener;
         mOnMediaEditorListener = onMediaEditorListener;
-        mOnLogGutenbergUserEventListener = onLogGutenbergUserEventListener;
         mOnGutenbergDidRequestUnsupportedBlockFallbackListener = onGutenbergDidRequestUnsupportedBlockFallbackListener;
         mOnGutenbergDidSendButtonPressedActionListener = onGutenbergDidSendButtonPressedActionListener;
         mShowSuggestionsUtil = showSuggestionsUtil;
