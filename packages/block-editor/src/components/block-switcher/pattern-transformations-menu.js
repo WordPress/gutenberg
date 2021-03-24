@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { useState, useMemo } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { chevronRight } from '@wordpress/icons';
-import { cloneBlock, getBlockType } from '@wordpress/blocks';
+import { cloneBlock, getBlockTransforms } from '@wordpress/blocks';
 import {
 	MenuGroup,
 	MenuItem,
@@ -110,9 +110,11 @@ function PatternTransformationsMenu( {
 						// everything else from the pattern's block.
 						// If `retainAttributes` are not set, update the match
 						// with all the selected block's attributes.
-						const blockType = getBlockType( block.name );
-						const retainAttributes =
-							blockType.transforms?.retainAttributes;
+						const retainAttributes = getBlockTransforms(
+							'to',
+							block.name
+						).find( ( { type } ) => type === 'pattern' )
+							?.retainAttributes;
 						let retainedBlockAttributes = block.attributes;
 						if ( retainAttributes?.length ) {
 							retainedBlockAttributes = retainAttributes.reduce(

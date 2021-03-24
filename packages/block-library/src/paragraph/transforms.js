@@ -9,7 +9,6 @@ import { createBlock, getBlockAttributes } from '@wordpress/blocks';
 import { name } from './block.json';
 
 const transforms = {
-	retainAttributes: [ 'content' ],
 	from: [
 		{
 			type: 'raw',
@@ -38,6 +37,7 @@ const transforms = {
 			},
 		},
 	],
+	to: [ { type: 'pattern', retainAttributes: [ 'content' ] } ],
 };
 
 export default transforms;

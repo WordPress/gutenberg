@@ -10,7 +10,6 @@ import { getLevelFromHeadingNodeName } from './shared';
 import { name } from './block.json';
 
 const transforms = {
-	retainAttributes: [ 'content' ],
 	from: [
 		{
 			type: 'block',
@@ -92,6 +91,7 @@ const transforms = {
 					} )
 				),
 		},
+		{ type: 'pattern', retainAttributes: [ 'content' ] },
 	],
 };
 
