@@ -7,7 +7,8 @@ import { __ } from '@wordpress/i18n';
 export default function DeleteMenu( { onDeleteMenu } ) {
 	return (
 		<Button
-			isLink
+			className="edit-navigation-inspector-additions__delete-menu-button"
+			isTertiary
 			isDestructive
 			onClick={ () => {
 				if (
