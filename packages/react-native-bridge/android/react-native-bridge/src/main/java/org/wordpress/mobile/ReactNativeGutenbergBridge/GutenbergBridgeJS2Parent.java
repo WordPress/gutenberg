@@ -100,28 +100,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         }
     }
 
-    enum GutenbergUserEvent {
-        EDITOR_SESSION_TEMPLATE_APPLY("editor_session_template_apply");
-
-        private static final Map<String, GutenbergUserEvent> MAP = new HashMap<>();
-
-        static {
-            for (GutenbergUserEvent event : values()) {
-                MAP.put(event.name, event);
-            }
-        }
-
-        String name;
-
-        GutenbergUserEvent(String name) {
-            this.name = name;
-        }
-
-        public static GutenbergUserEvent getEnum(String eventName) {
-            return MAP.get(eventName);
-        }
-    }
-
     void requestMediaPickFromMediaLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType);
 
     void requestMediaPickFromDeviceLibrary(MediaSelectedCallback mediaSelectedCallback, Boolean allowMultipleSelection, MediaType mediaType);
@@ -151,8 +129,6 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
     void requestImageFullscreenPreview(String mediaUrl);
 
     void requestMediaEditor(MediaSelectedCallback mediaSelectedCallback, String mediaUrl);
-
-    void logUserEvent(GutenbergUserEvent gutenbergUserEvent, ReadableMap eventProperties);
 
     void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,
                                                      String content,

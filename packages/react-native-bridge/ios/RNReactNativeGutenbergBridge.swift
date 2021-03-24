@@ -261,12 +261,6 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func logUserEvent(_ event: String, properties: [AnyHashable: Any]?) {
-        guard let logEvent = GutenbergUserEvent(event: event, properties: properties) else { return }
-        self.delegate?.gutenbergDidLogUserEvent(logEvent)
-    }
-
-    @objc
     func showUserSuggestions(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
         self.delegate?.gutenbergDidRequestMention(callback: { (result) in
             switch result {
