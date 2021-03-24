@@ -352,10 +352,8 @@ describe( 'Navigation editor', () => {
 		);
 		await appender.click();
 
-		// Must be an exact match to the word 'Link' as other
-		// variations also contain the word 'Link'.
 		const linkInserterItem = await page.waitForXPath(
-			'//button[@role="option"]//span[.="Link"]'
+			'//button[@role="option"]//span[.="Custom Link"]'
 		);
 		await linkInserterItem.click();
 
