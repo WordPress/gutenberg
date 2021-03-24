@@ -13,7 +13,7 @@ Object {
       "isActive": [Function],
       "isDefault": true,
       "name": "link",
-      "title": "Link",
+      "title": "Custom Link",
     },
     Object {
       "attributes": Object {
@@ -107,7 +107,7 @@ Object {
       </SVG>,
       "isActive": [Function],
       "name": "link",
-      "title": "Link",
+      "title": "Custom Link",
     },
     Object {
       "attributes": Object {
