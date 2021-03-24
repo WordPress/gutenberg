@@ -9,6 +9,6 @@ export default function isTemplateRevertable( template ) {
 		return false;
 	}
 	/* eslint-disable camelcase */
-	return template?.is_custom && template?.original_file_exists;
+	return template?.is_custom && template?.has_theme_file;
 	/* eslint-enable camelcase */
 }

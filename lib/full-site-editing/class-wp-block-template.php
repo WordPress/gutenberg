@@ -86,5 +86,5 @@ class WP_Block_Template {
 	 *
 	 * @var boolean
 	 */
-	public $original_file_exists;
+	public $has_theme_file;
 }

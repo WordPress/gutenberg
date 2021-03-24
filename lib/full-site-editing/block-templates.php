@@ -184,16 +184,16 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 	$template_content       = file_get_contents( $template_file['path'] );
 	$theme                  = wp_get_theme()->get_stylesheet();
 
-	$template                       = new WP_Block_Template();
-	$template->id                   = $theme . '//' . $template_file['slug'];
-	$template->theme                = $theme;
-	$template->content              = _inject_theme_attribute_in_content( $template_content );
-	$template->slug                 = $template_file['slug'];
-	$template->is_custom            = false;
-	$template->type                 = $template_type;
-	$template->title                = $template_file['slug'];
-	$template->status               = 'publish';
-	$template->original_file_exists = true;
+	$template                 = new WP_Block_Template();
+	$template->id             = $theme . '//' . $template_file['slug'];
+	$template->theme          = $theme;
+	$template->content        = _inject_theme_attribute_in_content( $template_content );
+	$template->slug           = $template_file['slug'];
+	$template->is_custom      = false;
+	$template->type           = $template_type;
+	$template->title          = $template_file['slug'];
+	$template->status         = 'publish';
+	$template->has_theme_file = true;
 
 	if ( 'wp_template' === $template_type && isset( $default_template_types[ $template_file['slug'] ] ) ) {
 		$template->description = $default_template_types[ $template_file['slug'] ]['description'];
@@ -225,22 +225,22 @@ function _gutenberg_build_template_result_from_post( $post ) {
 		return new WP_Error( 'template_missing_theme', __( 'No theme is defined for this template.', 'gutenberg' ) );
 	}
 
-	$theme                = $terms[0]->name;
-	$original_file_exists = wp_get_theme()->get_stylesheet() === $theme &&
+	$theme          = $terms[0]->name;
+	$has_theme_file = wp_get_theme()->get_stylesheet() === $theme &&
 		null !== _gutenberg_get_template_file( $post->post_type, $post->post_name );
 
-	$template                       = new WP_Block_Template();
-	$template->wp_id                = $post->ID;
-	$template->id                   = $theme . '//' . $post->post_name;
-	$template->theme                = $theme;
-	$template->content              = $post->post_content;
-	$template->slug                 = $post->post_name;
-	$template->is_custom            = true;
-	$template->type                 = $post->post_type;
-	$template->description          = $post->post_excerpt;
-	$template->title                = $post->post_title;
-	$template->status               = $post->post_status;
-	$template->original_file_exists = $original_file_exists;
+	$template                 = new WP_Block_Template();
+	$template->wp_id          = $post->ID;
+	$template->id             = $theme . '//' . $post->post_name;
+	$template->theme          = $theme;
+	$template->content        = $post->post_content;
+	$template->slug           = $post->post_name;
+	$template->is_custom      = true;
+	$template->type           = $post->post_type;
+	$template->description    = $post->post_excerpt;
+	$template->title          = $post->post_title;
+	$template->status         = $post->post_status;
+	$template->has_theme_file = $has_theme_file;
 
 	if ( 'wp_template_part' === $post->post_type ) {
 		$type_terms = get_the_terms( $post, 'wp_template_part_area' );
