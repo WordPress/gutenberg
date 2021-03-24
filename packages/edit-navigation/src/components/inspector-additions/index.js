@@ -16,6 +16,7 @@ import { __ } from '@wordpress/i18n';
 
 export default function InspectorAdditions( {
 	menuId,
+	menus,
 	onDeleteMenu,
 	onSelectMenu,
 	isManageLocationsModalOpen,
@@ -35,6 +36,8 @@ export default function InspectorAdditions( {
 		<InspectorControls>
 			<PanelBody title={ __( 'Theme locations' ) }>
 				<ManageLocations
+					menus={ menus }
+					selectedMenuId={ menuId }
 					onSelectMenu={ onSelectMenu }
 					isModalOpen={ isManageLocationsModalOpen }
 					closeModal={ closeManageLocationsModal }

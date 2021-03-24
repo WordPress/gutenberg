@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { useContext } from '@wordpress/element';
 import {
 	Spinner,
 	SelectControl,
@@ -15,18 +13,16 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useMenuLocations, MenuIdContext } from '../../hooks';
+import { useMenuLocations } from '../../hooks';
 
 export default function ManageLocations( {
 	onSelectMenu,
 	isModalOpen,
 	openModal,
 	closeModal,
+	menus,
+	selectedMenuId,
 } ) {
-	const menus = useSelect( ( select ) => select( 'core' ).getMenus(), [] );
-
-	const selectedMenuId = useContext( MenuIdContext );
-
 	const {
 		menuLocations,
 		assignMenuToLocation,

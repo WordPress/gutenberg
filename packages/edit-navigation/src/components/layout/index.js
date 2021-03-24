@@ -182,6 +182,7 @@ export default function Layout( { blockEditorSettings } ) {
 															onSelectMenu={
 																selectMenu
 															}
+															menus={ menus }
 															menuId={
 																selectedMenuId
 															}
