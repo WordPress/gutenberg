@@ -251,7 +251,14 @@ export default function SearchEdit( {
 	};
 
 	return (
-		<View { ...blockProps } style={ styles.searchBlockContainer }>
+		<View
+			{ ...blockProps }
+			style={ styles.searchBlockContainer }
+			importantForAccessibility={
+				isSelected ? 'yes' : 'no-hide-descendants'
+			}
+			accessibilityElementsHidden={ isSelected ? false : true }
+		>
 			{ isSelected && controls }
 
 			{ showLabel && (
