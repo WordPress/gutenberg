@@ -22,7 +22,7 @@ import {
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
 import { useRef, useEffect, useState } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -40,13 +40,12 @@ const BUTTON_OPTIONS = [
 	{ value: 'no-button', label: __( 'No button' ) },
 ];
 
-function SearchEdit( {
+export default function SearchEdit( {
 	onFocus,
 	isSelected,
 	attributes,
 	setAttributes,
 	className,
-	getStylesFromColorScheme,
 } ) {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
@@ -156,29 +155,31 @@ function SearchEdit( {
 		</InspectorControls>
 	);
 
+	const borderStyle = usePreferredColorSchemeStyle(
+		styles.border,
+		styles.borderDark
+	);
+
+	const txtInputStyle = usePreferredColorSchemeStyle(
+		styles.plainTextInput,
+		styles.plainTextInputDark
+	);
+
+	const placeholderStyle = usePreferredColorSchemeStyle(
+		styles.plainTextPlaceholder,
+		styles.plainTextPlaceholderDark
+	);
+
 	const mergeWithBorderStyle = ( style ) => {
-		const baseStyle = getStylesFromColorScheme(
-			styles.border,
-			styles.borderDark
-		);
-		return { ...style, ...baseStyle };
+		return { ...style, ...borderStyle };
 	};
 
 	const renderTextField = () => {
 		const getInputStyle = () => {
-			const baseStyle = getStylesFromColorScheme(
-				styles.plainTextInput,
-				styles.plainTextInputDark
-			);
 			return buttonPosition === 'button-inside'
-				? baseStyle
-				: mergeWithBorderStyle( baseStyle );
+				? txtInputStyle
+				: mergeWithBorderStyle( txtInputStyle );
 		};
-
-		const placeholderStyle = getStylesFromColorScheme(
-			styles.plainTextPlaceholder,
-			styles.plainTextPlaceholderDark
-		);
 
 		return (
 			<PlainText
@@ -293,5 +294,3 @@ function SearchEdit( {
 		</View>
 	);
 }
-
-export default withPreferredColorScheme( SearchEdit );
