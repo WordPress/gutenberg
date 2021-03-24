@@ -12,7 +12,6 @@ import {
 	computeCaretRect,
 	focus,
 	isHorizontalEdge,
-	isTextField,
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
@@ -34,9 +33,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import {
-	isBlockFocusStop,
 	isInSameBlock,
-	hasInnerBlocksContext,
 	isInsideRootBlock,
 	getBlockDOMNode,
 	getBlockClientId,
@@ -49,6 +46,16 @@ export const SelectionStart = createContext();
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
+
+function isFormElement( element ) {
+	const { tagName } = element;
+	return (
+		tagName === 'INPUT' ||
+		tagName === 'BUTTON' ||
+		tagName === 'SELECT' ||
+		tagName === 'TEXTAREA'
+	);
 }
 
 /**
@@ -115,9 +122,14 @@ export function getClosestTabbable(
 		targetRect = target.getBoundingClientRect();
 	}
 
-	function isTabCandidate( node, i, array ) {
+	function isTabCandidate( node ) {
 		// Not a candidate if the node is not tabbable.
 		if ( ! focus.tabbable.isTabbableIndex( node ) ) {
+			return false;
+		}
+
+		// Skip focusable elements such as links within content editable nodes.
+		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
 			return false;
 		}
 
@@ -128,48 +140,6 @@ export function getClosestTabbable(
 				nodeRect.left >= targetRect.right ||
 				nodeRect.right <= targetRect.left
 			) {
-				return false;
-			}
-		}
-
-		// Prefer text fields...
-		if ( isTextField( node ) ) {
-			return true;
-		}
-
-		// ...but settle for block focus stop.
-		if ( ! isBlockFocusStop( node ) ) {
-			return false;
-		}
-
-		// If element contains inner blocks, stop immediately at its focus
-		// wrapper.
-		if ( hasInnerBlocksContext( node ) ) {
-			return true;
-		}
-
-		// If navigating out of a block (in reverse), don't consider its
-		// block focus stop.
-		if ( node.contains( target ) ) {
-			return false;
-		}
-
-		// In case of block focus stop, check to see if there's a better
-		// text field candidate within.
-		for (
-			let offset = 1, nextNode;
-			( nextNode = array[ i + offset ] );
-			offset++
-		) {
-			// Abort if no longer testing descendents of focus stop.
-			if ( ! node.contains( nextNode ) ) {
-				break;
-			}
-
-			// Apply same tests by recursion. This is important to consider
-			// nestable blocks where we don't want to settle for the inner
-			// block focus stop.
-			if ( isTabCandidate( nextNode, i + offset, array ) ) {
 				return false;
 			}
 		}
@@ -398,31 +368,29 @@ export default function WritingFlow( { children } ) {
 		// Navigation mode (press Esc), to navigate through blocks.
 		if ( selectedBlockClientId ) {
 			if ( isTab ) {
-				const wrapper = getBlockDOMNode(
-					selectedBlockClientId,
-					ownerDocument
-				);
-
-				if ( isShift ) {
-					if ( target === wrapper ) {
-						// Disable focus capturing on the focus capture element, so
-						// it doesn't refocus this block and so it allows default
-						// behaviour (moving focus to the next tabbable element).
-						noCapture.current = true;
-						focusCaptureBeforeRef.current.focus();
-						return;
-					}
-				} else {
-					const tabbables = focus.tabbable.find( wrapper );
-					const lastTabbable = last( tabbables ) || wrapper;
-
-					if ( target === lastTabbable ) {
-						// See comment above.
-						noCapture.current = true;
-						focusCaptureAfterRef.current.focus();
-						return;
-					}
+				const direction = isShift ? 'findPrevious' : 'findNext';
+				// Allow tabbing between form elements rendered in a block,
+				// such as inside a placeholder. Form elements are generally
+				// meant to be UI rather than part of the content. Ideally
+				// these are not rendered in the content and perhaps in the
+				// future they can be rendered in an iframe or shadow DOM.
+				if (
+					isFormElement( target ) &&
+					isFormElement( focus.tabbable[ direction ]( target ) )
+				) {
+					return;
 				}
+
+				const next = isShift
+					? focusCaptureBeforeRef
+					: focusCaptureAfterRef;
+
+				// Disable focus capturing on the focus capture element, so it
+				// doesn't refocus this block and so it allows default behaviour
+				// (moving focus to the next tabbable element).
+				noCapture.current = true;
+				next.current.focus();
+				return;
 			} else if ( isEscape ) {
 				setNavigationMode( true );
 			}
@@ -573,6 +541,19 @@ export default function WritingFlow( { children } ) {
 		}
 	}, [ hasMultiSelection, isMultiSelecting ] );
 
+	const lastFocus = useRef();
+
+	useEffect( () => {
+		function onFocusOut( event ) {
+			lastFocus.current = event.target;
+		}
+
+		container.current.addEventListener( 'focusout', onFocusOut );
+		return () => {
+			container.current.removeEventListener( 'focusout', onFocusOut );
+		};
+	}, [] );
+
 	const className = classnames( 'block-editor-writing-flow', {
 		'is-navigate-mode': isNavigationMode,
 	} );
@@ -587,6 +568,7 @@ export default function WritingFlow( { children } ) {
 				selectedClientId={ selectedBlockClientId }
 				containerRef={ container }
 				noCapture={ noCapture }
+				lastFocus={ lastFocus }
 				hasMultiSelection={ hasMultiSelection }
 				multiSelectionContainer={ multiSelectionContainer }
 			/>
@@ -616,6 +598,7 @@ export default function WritingFlow( { children } ) {
 				selectedClientId={ selectedBlockClientId }
 				containerRef={ container }
 				noCapture={ noCapture }
+				lastFocus={ lastFocus }
 				hasMultiSelection={ hasMultiSelection }
 				multiSelectionContainer={ multiSelectionContainer }
 				isReverse

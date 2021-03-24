@@ -11,14 +11,15 @@ export default function BlockNavigationList( {
 	clientId,
 	__experimentalFeatures,
 } ) {
-	const { block, selectedBlockClientId } = useSelect(
+	const { blocks, selectedBlockClientId } = useSelect(
 		( select ) => {
-			const { getSelectedBlockClientId, getBlock } = select(
-				blockEditorStore
-			);
+			const {
+				getSelectedBlockClientId,
+				__unstableGetClientIdsTree,
+			} = select( blockEditorStore );
 
 			return {
-				block: getBlock( clientId ),
+				blocks: __unstableGetClientIdsTree( clientId ),
 				selectedBlockClientId: getSelectedBlockClientId(),
 			};
 		},
@@ -29,8 +30,8 @@ export default function BlockNavigationList( {
 
 	return (
 		<__experimentalBlockNavigationTree
-			blocks={ block.innerBlocks }
-			selectedBlockClientId={ selectedBlockClientId }
+			blocks={ blocks }
+			selectedBlockClientIds={ [ selectedBlockClientId ] }
 			selectBlock={ selectBlock }
 			__experimentalFeatures={ __experimentalFeatures }
 			showNestedBlocks

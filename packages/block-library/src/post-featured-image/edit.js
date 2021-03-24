@@ -100,7 +100,7 @@ function PostFeaturedImageDisplay( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<BlockControls>
+			<BlockControls group="other">
 				{ !! media && (
 					<MediaReplaceFlow
 						mediaId={ featuredImage }

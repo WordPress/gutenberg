@@ -4,7 +4,7 @@ This is a guide on how to test accessibility on Gutenberg. This is a living docu
 
 ## Getting Started
 
-Make sure you have set up your local environment following the instructions on [Getting Started](/docs/contributors/getting-started.md).
+Make sure you have set up your local environment following the instructions on [Getting Started](/docs/contributors/code/getting-started-with-code-contribution.md).
 
 ## Keyboard Testing
 

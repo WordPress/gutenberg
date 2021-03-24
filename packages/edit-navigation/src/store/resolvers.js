@@ -11,8 +11,9 @@ import { parse, createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
+import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 import { resolveMenuItems, dispatch } from './controls';
-import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
+import { buildNavigationPostId } from './utils';
 
 /**
  * Creates a "stub" navigation post reflecting the contents of menu with id=menuId. The
@@ -35,7 +36,11 @@ export function* getNavigationPostForMenu( menuId ) {
 
 	// Dispatch startResolution to skip the execution of the real getEntityRecord resolver - it would
 	// issue an http request and fail.
-	const args = [ KIND, POST_TYPE, stubPost.id ];
+	const args = [
+		NAVIGATION_POST_KIND,
+		NAVIGATION_POST_POST_TYPE,
+		stubPost.id,
+	];
 	yield dispatch( 'core', 'startResolution', 'getEntityRecord', args );
 
 	// Now let's create a proper one hydrated using actual menu items
@@ -73,8 +78,8 @@ const persistPost = ( post ) =>
 	dispatch(
 		'core',
 		'receiveEntityRecords',
-		KIND,
-		POST_TYPE,
+		NAVIGATION_POST_KIND,
+		NAVIGATION_POST_POST_TYPE,
 		post,
 		{ id: post.id },
 		false

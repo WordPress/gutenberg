@@ -286,6 +286,7 @@ export class FileEdit extends Component {
 						value={ textLinkHref }
 						onChange={ this.onChangeLinkDestinationOption }
 						options={ linkDestinationOptions }
+						hideCancelButton={ true }
 					/>
 					<ToggleControl
 						icon={ external }

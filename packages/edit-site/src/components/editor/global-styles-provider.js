@@ -143,7 +143,17 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 	const contexts = useMemo( () => getContexts( blockTypes ), [ blockTypes ] );
 
 	const { userStyles, mergedStyles } = useMemo( () => {
-		let newUserStyles = content ? JSON.parse( content ) : EMPTY_CONTENT;
+		let newUserStyles;
+		try {
+			newUserStyles = content ? JSON.parse( content ) : EMPTY_CONTENT;
+		} catch ( e ) {
+			/* eslint-disable no-console */
+			console.error( 'User data is not JSON' );
+			console.error( e );
+			/* eslint-enable no-console */
+			newUserStyles = EMPTY_CONTENT;
+		}
+
 		// It is very important to verify if the flag isGlobalStylesUserThemeJSON is true.
 		// If it is not true the content was not escaped and is not safe.
 		if ( ! newUserStyles.isGlobalStylesUserThemeJSON ) {

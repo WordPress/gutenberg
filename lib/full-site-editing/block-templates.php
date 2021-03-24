@@ -129,7 +129,7 @@ function _gutenberg_add_template_part_area_info( $template_info ) {
 	}
 
 	if ( isset( $theme_data[ $template_info['slug'] ]['area'] ) ) {
-		$template_info['area'] = gutenberg_filter_template_part_area_type( $theme_data[ $template_info['slug'] ]['area'] );
+		$template_info['area'] = gutenberg_filter_template_part_area( $theme_data[ $template_info['slug'] ]['area'] );
 	} else {
 		$template_info['area'] = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 	}
