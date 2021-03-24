@@ -192,7 +192,9 @@ export default function NavigationLinkEdit( {
 				.length;
 
 			return {
-				isAtMaxNesting : getBlockParentsByBlockName( clientId, name ).length >= MAX_NESTING,
+				isAtMaxNesting:
+					getBlockParentsByBlockName( clientId, name ).length >=
+					MAX_NESTING,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
