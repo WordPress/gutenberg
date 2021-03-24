@@ -503,11 +503,13 @@ describe( 'Navigation editor', () => {
 			);
 			await saveButton.click();
 			await page.waitForSelector( '.components-snackbar' );
-			const menuName = await page.$eval(
-				'.edit-navigation-name-display__menu-name-button',
-				( el ) => el.innerText
+			const menuNameButton = await page.waitForXPath(
+				'//button[contains(@aria-label, "Edit menu name: newName" ) ]'
 			);
-			expect( menuName ).toBe( oldName );
+			const menuNamebuttonText = await menuNameButton.evaluate(
+				( element ) => element.innerText
+			);
+			expect( menuNamebuttonText ).toBe( oldName );
 		} );
 	} );
 } );
