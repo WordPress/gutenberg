@@ -9,12 +9,8 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { store as editNavigationStore } from '../../store';
-import { useMenuEntity, MenuIdContext } from '../../hooks';
-import { useContext } from '@wordpress/element';
 
 export default function SaveButton( { navigationPost } ) {
-	const menuId = useContext( MenuIdContext );
-	const { saveMenuName } = useMenuEntity( menuId );
 	const { saveNavigationPost } = useDispatch( editNavigationStore );
 
 	return (
@@ -23,7 +19,6 @@ export default function SaveButton( { navigationPost } ) {
 			isPrimary
 			onClick={ () => {
 				saveNavigationPost( navigationPost );
-				saveMenuName();
 			} }
 			disabled={ ! navigationPost }
 		>
