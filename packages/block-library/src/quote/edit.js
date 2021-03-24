@@ -83,7 +83,7 @@ export default function QuoteEdit( {
 					<RichText
 						identifier="citation"
 						tagName="cite"
-						display={ { style: 'inline-block' } }
+						style={ { display: 'inline-block' } }
 						value={ citation }
 						onChange={ ( nextCitation ) =>
 							setAttributes( {
