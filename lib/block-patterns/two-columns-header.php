@@ -26,7 +26,7 @@ return array(
 	
 	<!-- wp:column -->
 	<div class="wp-block-column"><!-- wp:image {"id":265,"sizeSlug":"large","linkDestination":"none"} -->
-	<figure class="wp-block-image size-large"><img src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/tree-nature-forest-light-plant-sunshine-1100731-pxhere.com_-1024x681.jpg" alt="" class="wp-image-265"/></figure>
+	<figure class="wp-block-image size-large"><img src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/tree-nature-forest-light-plant-sunshine-1100731-pxhere.com_-1024x681.jpg" alt="' . __( 'Forest of bamboo trees, seen from the ground up. The sun shines through the canopy.' ) . '" class="wp-image-265"/></figure>
 	<!-- /wp:image --></div>
 	<!-- /wp:column --></div>
 	<!-- /wp:columns --></div></div>

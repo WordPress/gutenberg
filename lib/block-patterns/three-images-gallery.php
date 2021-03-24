@@ -11,7 +11,7 @@ return array(
 	'content'     => '<!-- wp:columns {"align":"wide"} -->
 	<div class="wp-block-columns alignwide"><!-- wp:column {"width":"25%"} -->
 	<div class="wp-block-column" style="flex-basis:25%"><!-- wp:image {"id":240,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
-	<figure class="wp-block-image size-large is-style-default"><img src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/wing-light-architecture-structure-wood-white-714046-pxhere.com_-576x1024.jpg" alt="" class="wp-image-240"/></figure>
+	<figure class="wp-block-image size-large is-style-default"><img src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/wing-light-architecture-structure-wood-white-714046-pxhere.com_-576x1024.jpg" alt="' . __( 'Close-up, abstract view of geometric architecture.' ) . '" class="wp-image-240"/></figure>
 	<!-- /wp:image --></div>
 	<!-- /wp:column -->
 	
@@ -25,13 +25,13 @@ return array(
 	<!-- /wp:spacer -->
 	
 	<!-- wp:image {"id":237,"sizeSlug":"large","linkDestination":"none"} -->
-	<figure class="wp-block-image size-large"><img src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/wing-architecture-structure-wood-white-house-997338-pxhere.com_-683x1024.jpg" alt="" class="wp-image-237"/></figure>
+	<figure class="wp-block-image size-large"><img src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/wing-architecture-structure-wood-white-house-997338-pxhere.com_-683x1024.jpg" alt="' . __( 'Close-up, angled view of a window on a white building.' ) . '" class="wp-image-237"/></figure>
 	<!-- /wp:image --></div>
 	<!-- /wp:column -->
 	
 	<!-- wp:column {"width":"45%"} -->
 	<div class="wp-block-column" style="flex-basis:45%"><!-- wp:image {"id":236,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
-	<figure class="wp-block-image size-large is-style-default"><img src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/wing-architecture-structure-building-ceiling-geometric-99094-pxhere.com_-1024x683.jpg" alt="" class="wp-image-236"/></figure>
+	<figure class="wp-block-image size-large is-style-default"><img src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/wing-architecture-structure-building-ceiling-geometric-99094-pxhere.com_-1024x683.jpg" alt="' . __( 'Close-up of the corner of a white, geometric building with both sharp points and round corners.' ) . '" class="wp-image-236"/></figure>
 	<!-- /wp:image -->
 	
 	<!-- wp:spacer {"height":285} -->
