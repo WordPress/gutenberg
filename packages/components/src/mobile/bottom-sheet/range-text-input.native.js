@@ -218,7 +218,7 @@ class RangeTextInput extends Component {
 							returnKeyType="done"
 							numberOfLines={ 1 }
 							defaultValue={ `${ inputValue }` }
-							value={ inputValue }
+							value={ inputValue.toString() }
 							pointerEvents={ hasFocus ? 'auto' : 'none' }
 						/>
 					) : (
