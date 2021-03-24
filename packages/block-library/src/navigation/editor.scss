@@ -54,9 +54,7 @@
 // Styles for submenu flyout.
 .has-child {
 	&.is-selected,
-	&.has-child-selected,
-	// Show the submenu list when is dragging and drag enter the list item.
-	.is-dragging-components-draggable &.is-dragging-within {
+	&.has-child-selected {
 		> .wp-block-navigation__container {
 			opacity: 1;
 			visibility: visible;
@@ -70,17 +68,6 @@
 	opacity: 1;
 	display: flex;
 	flex-direction: column;
-}
-
-.is-dragging-components-draggable .wp-block-navigation-link > .wp-block-navigation__container {
-	// Set opacity to 1 to still be able to show the draggable chip.
-	opacity: 1;
-	visibility: hidden;
-
-	// Show the chip but hide the submenu list.
-	.block-editor-block-draggable-chip-wrapper {
-		visibility: visible;
-	}
 }
 
 /**
@@ -122,7 +109,7 @@ $colors-selector-size: 22px;
 		min-width: $colors-selector-size;
 		height: $colors-selector-size;
 		min-height: $colors-selector-size;
-		line-height: ( $colors-selector-size - 2 );
+		line-height: ($colors-selector-size - 2);
 		padding: 2px;
 
 		> svg {
@@ -265,6 +252,7 @@ $color-control-label-height: 20px;
 		margin-right: $grid-unit-15;
 		height: $button-size; // Prevents jumpiness.
 	}
+
 }
 
 // When block is vertical.

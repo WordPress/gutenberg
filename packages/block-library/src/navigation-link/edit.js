@@ -48,57 +48,6 @@ import { store as coreStore } from '@wordpress/core-data';
 import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
 
 /**
- * A React hook to determine if it's dragging within the target element.
- *
- * @typedef {import('@wordpress/element').RefObject} RefObject
- *
- * @param {RefObject<HTMLElement>} elementRef The target elementRef object.
- *
- * @return {boolean} Is dragging within the target element.
- */
-const useIsDraggingWithin = ( elementRef ) => {
-	const [ isDraggingWithin, setIsDraggingWithin ] = useState( false );
-
-	useEffect( () => {
-		const { ownerDocument } = elementRef.current;
-
-		function handleDragStart( event ) {
-			// Check the first time when the dragging starts.
-			handleDragEnter( event );
-		}
-
-		// Set to false whenever the user cancel the drag event by either releasing the mouse or press Escape.
-		function handleDragEnd() {
-			setIsDraggingWithin( false );
-		}
-
-		function handleDragEnter( event ) {
-			// Check if the current target is inside the item element.
-			if ( elementRef.current.contains( event.target ) ) {
-				setIsDraggingWithin( true );
-			} else {
-				setIsDraggingWithin( false );
-			}
-		}
-
-		// Bind these events to the document to catch all drag events.
-		// Ideally, we can also use `event.relatedTarget`, but sadly that
-		// doesn't work in Safari.
-		ownerDocument.addEventListener( 'dragstart', handleDragStart );
-		ownerDocument.addEventListener( 'dragend', handleDragEnd );
-		ownerDocument.addEventListener( 'dragenter', handleDragEnter );
-
-		return () => {
-			ownerDocument.removeEventListener( 'dragstart', handleDragStart );
-			ownerDocument.removeEventListener( 'dragend', handleDragEnd );
-			ownerDocument.removeEventListener( 'dragenter', handleDragEnter );
-		};
-	}, [] );
-
-	return isDraggingWithin;
-};
-
-/**
  * Given the Link block's type attribute, return the query params to give to
  * /wp/v2/search.
  *
@@ -154,13 +103,11 @@ export default function NavigationLinkEdit( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
-	const listItemRef = useRef( null );
-	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
+	const listItemRef = useRef();
 
 	const {
-		isDraggingBlocks,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
@@ -174,7 +121,6 @@ export default function NavigationLinkEdit( {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
-				isDraggingBlocks: _isDraggingBlocks,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -196,7 +142,6 @@ export default function NavigationLinkEdit( {
 					selectedBlockId,
 				] )?.length,
 				numberOfDescendants: descendants,
-				isDraggingBlocks: _isDraggingBlocks(),
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
@@ -297,13 +242,8 @@ export default function NavigationLinkEdit( {
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
 		className: classnames( {
-			'is-editing':
-				( isSelected || isParentOfSelectedBlock ) &&
-				// Don't show the element as editing while dragging.
-				! isDraggingBlocks,
-			// Don't select the element while dragging.
-			'is-selected': isSelected && ! isDraggingBlocks,
-			'is-dragging-within': isDraggingWithin,
+			'is-editing': isSelected || isParentOfSelectedBlock,
+			'is-selected': isSelected,
 			'has-link': !! url,
 			'has-child': hasDescendants,
 			'has-text-color': !! textColor || !! style?.color?.text,
@@ -324,10 +264,7 @@ export default function NavigationLinkEdit( {
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: classnames( 'wp-block-navigation-link__container', {
-				'is-parent-of-selected-block':
-					isParentOfSelectedBlock &&
-					// Don't select as parent of selected block while dragging.
-					! isDraggingBlocks,
+				'is-parent-of-selected-block': isParentOfSelectedBlock,
 			} ),
 		},
 		{
@@ -335,9 +272,7 @@ export default function NavigationLinkEdit( {
 			renderAppender:
 				( isSelected && hasDescendants ) ||
 				( isImmediateParentOfSelectedBlock &&
-					! selectedBlockHasDescendants ) ||
-				// Show the appender while dragging to allow inserting element between item and the appender.
-				( isDraggingBlocks && hasDescendants )
+					! selectedBlockHasDescendants )
 					? InnerBlocks.DefaultAppender
 					: false,
 			__experimentalAppenderTagName: 'li',

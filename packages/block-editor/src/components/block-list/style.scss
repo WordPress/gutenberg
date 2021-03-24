@@ -682,19 +682,6 @@
 	}
 }
 
-// Hide the popover block editor list while dragging.
-// Using a hacky animation to delay hiding the element.
-// It's needed because if we hide the element immediately upon dragging,
-// the dragging will end immediately since there are no elements to be dragged anymore.
-// Fortunately, we only have to keep it visible for a frame immediately after dragging,
-// after that, we can safely hide it altogether.
-@keyframes hide-during-dragging {
-	to {
-		position: fixed;
-		transform: translate(9999px, 9999px);
-	}
-}
-
 .components-popover.block-editor-block-list__block-popover {
 	z-index: z-index(".block-editor-block-list__block-popover");
 	position: absolute;
@@ -724,9 +711,6 @@
 
 	.is-dragging-components-draggable & {
 		opacity: 0;
-		// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.
-		// It's essential to hide the toolbar/popover so that `dragEnter` events can pass through them to the underlying elements.
-		animation: hide-during-dragging 1ms linear forwards;
 	}
 }
 
