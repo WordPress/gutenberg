@@ -82,8 +82,11 @@
 			pointer-events: none;
 		}
 		&:hover {
-			background-color: $alert-green;
 			cursor: pointer;
 		}
+	}
+
+	&.is-selected:not(.is-placeholder) {
+		background: rgba($alert-green, 0.1);
 	}
 }
