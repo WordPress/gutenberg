@@ -12,12 +12,7 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 } from '@wordpress/react-native-bridge';
-import {
-	Icon,
-	Image,
-	IMAGE_DEFAULT_FOCAL_POINT,
-	withNotices,
-} from '@wordpress/components';
+import { Icon, Image, IMAGE_DEFAULT_FOCAL_POINT } from '@wordpress/components';
 import {
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
@@ -31,6 +26,7 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -48,6 +44,8 @@ const ICON_TYPE = {
 	PLACEHOLDER: 'placeholder',
 	RETRY: 'retry',
 };
+
+const { createErrorNotice } = useDispatch( noticesStore );
 
 export { imageFillStyles } from './media-container.js';
 
@@ -84,9 +82,7 @@ class MediaContainer extends Component {
 	}
 
 	onUploadError( message ) {
-		const { noticeOperations } = this.props;
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
+		createErrorNotice( message );
 	}
 
 	onSelectMediaUploadOption( params ) {
@@ -388,7 +384,4 @@ class MediaContainer extends Component {
 	}
 }
 
-export default compose(
-	withNotices,
-	withPreferredColorScheme
-)( MediaContainer );
+export default compose( withPreferredColorScheme )( MediaContainer );
