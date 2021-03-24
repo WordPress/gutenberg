@@ -6,7 +6,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { PanelBody, CheckboxControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function AutoAddPagesPanel( { menuId } ) {
+export default function AutoAddPages( { menuId } ) {
 	const menu = useSelect( ( select ) => select( 'core' ).getMenu( menuId ), [
 		menuId,
 	] );

@@ -4,7 +4,7 @@
 import { PanelBody, Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function DeleteMenuPanel( { onDeleteMenu } ) {
+export default function DeleteMenu( { onDeleteMenu } ) {
 	return (
 		<PanelBody className="edit-navigation-inspector-additions__delete-menu-panel">
 			<Button
