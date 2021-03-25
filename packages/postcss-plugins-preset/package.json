@@ -31,8 +31,8 @@
 	"dependencies": {
 		"@wordpress/base-styles": "file:../base-styles",
 		"@wordpress/postcss-themes": "file:../postcss-themes",
-		"autoprefixer": "^9.8.6",
-		"postcss-custom-properties": "^10.0.0"
+		"autoprefixer": "^10.2.5",
+		"postcss-custom-properties": "^11.0.0"
 	},
 	"publishConfig": {
 		"access": "public"

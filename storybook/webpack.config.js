@@ -23,8 +23,10 @@ module.exports = ( { config } ) => {
 				{
 					loader: 'postcss-loader',
 					options: {
-						ident: 'postcss',
-						plugins: postcssPlugins,
+						postcssOptions: {
+							ident: 'postcss',
+							plugins: postcssPlugins,
+						},
 					},
 				},
 				'sass-loader',
