@@ -14,25 +14,26 @@ import {
 	InspectorControls,
 } from '@wordpress/block-editor';
 import {
-	Button,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
+	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
 import { useRef, useEffect, useState } from '@wordpress/element';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import richTextStyles from './rich-text.scss';
 
 /**
  * Constants
  */
-const MIN_BUTTON_WIDTH = 100;
+const MIN_BUTTON_WIDTH = 75;
+
 const BUTTON_OPTIONS = [
 	{ value: 'button-inside', label: __( 'Button inside' ) },
 	{ value: 'button-outside', label: __( 'Button outside' ) },
@@ -154,16 +155,32 @@ export default function SearchEdit( {
 		</InspectorControls>
 	);
 
-	const mergeWithBorderStyle = ( style ) => {
-		return { ...style, ...styles.border };
-	};
+	const isButtonInside = buttonPosition === 'button-inside';
+
+	const borderStyle = usePreferredColorSchemeStyle(
+		styles.border,
+		styles.borderDark
+	);
+
+	const inputStyle = [
+		usePreferredColorSchemeStyle(
+			styles.plainTextInput,
+			styles.plainTextInputDark
+		),
+		! isButtonInside && borderStyle,
+	];
+
+	const placeholderStyle = usePreferredColorSchemeStyle(
+		styles.plainTextPlaceholder,
+		styles.plainTextPlaceholderDark
+	);
+
+	const searchBarStyle = [
+		styles.searchBarContainer,
+		isButtonInside && borderStyle,
+	];
 
 	const renderTextField = () => {
-		const inputStyle =
-			buttonPosition === 'button-inside'
-				? styles.searchTextInput
-				: mergeWithBorderStyle( styles.searchTextInput );
-
 		return (
 			<PlainText
 				ref={ textInputRef }
@@ -185,28 +202,32 @@ export default function SearchEdit( {
 					onFocus();
 				} }
 				onBlur={ () => setIsPlaceholderSelected( false ) }
+				placeholderTextColor={ placeholderStyle.color }
 			/>
 		);
 	};
 
+	// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
+	// a `placeholder` as an empty string when `RichText` is focused,
+	// because `AztecView` is calculating a `minWidth` based on placeholder text.
+	const buttonPlaceholderText =
+		isButtonSelected ||
+		( ! isButtonSelected && buttonText && buttonText !== '' )
+			? ''
+			: __( 'Add button text' );
+
 	const renderButton = () => {
 		return (
 			<View style={ styles.buttonContainer }>
-				{ buttonUseIcon && (
-					<Button
-						className="wp-block-search__button"
-						icon={ search }
-						onFocus={ onFocus }
-					/>
-				) }
+				{ buttonUseIcon && <Icon icon={ search } { ...styles.icon } /> }
 
 				{ ! buttonUseIcon && (
 					<RichText
 						className="wp-block-search__button"
 						identifier="text"
 						tagName="p"
-						style={ richTextStyles.searchButton }
-						placeholder={ __( 'Add button text' ) }
+						style={ styles.richTextButton }
+						placeholder={ buttonPlaceholderText }
 						value={ buttonText }
 						withoutInteractiveFormatting
 						onChange={ ( html ) =>
@@ -222,16 +243,12 @@ export default function SearchEdit( {
 						onBlur={ () => {
 							setIsButtonSelected( false );
 						} }
+						selectionColor={ styles.richTextButtonCursor.color }
 					/>
 				) }
 			</View>
 		);
 	};
-
-	const searchBarStyle =
-		buttonPosition === 'button-inside'
-			? mergeWithBorderStyle( styles.searchBarContainer )
-			: styles.searchBarContainer;
 
 	return (
 		<View { ...blockProps } style={ styles.searchBlockContainer }>
@@ -242,10 +259,7 @@ export default function SearchEdit( {
 					className="wp-block-search__label"
 					identifier="text"
 					tagName="p"
-					style={ {
-						...styles.searchLabel,
-						...richTextStyles.searchLabel,
-					} }
+					style={ styles.richTextLabel }
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }
 					withoutInteractiveFormatting
