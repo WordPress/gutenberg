@@ -9,7 +9,7 @@ Object {
   "variations": Array [
     Object {
       "attributes": Object {},
-      "description": "A link to a URL.",
+      "description": "A link to a custom URL.",
       "isActive": [Function],
       "isDefault": true,
       "name": "link",
@@ -96,7 +96,7 @@ Object {
   "variations": Array [
     Object {
       "attributes": Object {},
-      "description": "A link to a URL.",
+      "description": "A link to a custom URL.",
       "icon": <SVG
         viewBox="0 0 24 24"
         xmlns="http://www.w3.org/2000/svg"

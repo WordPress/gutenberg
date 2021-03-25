@@ -248,7 +248,7 @@ async function addLinkBlock() {
 	await page.click( '.wp-block-navigation .block-list-appender' );
 
 	const [ linkButton ] = await page.$x(
-		"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Link']"
+		"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Custom Link']"
 	);
 	await linkButton.click();
 }
