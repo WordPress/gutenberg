@@ -4,7 +4,7 @@ Intertwined with the web codepaths, the Gutenberg repo also includes the [React 
 
 ## Mind the mobile
 
-Our tooling isn't as good yet as we'd like to and it's hard to have a good awareness of those native mobile files. That means that contributors need to manually pay attention to update the native mobile files during code refactorings. For example, renaming a function or a prop should also be performed in the native modules too, otherwise, the mobile client will break. We have added some mobile specific CI tests as safeguards in place in PRs, but we're still far from done. Please bear with us and thank you in advance. ❤️🙇‍
+Contributors need to ensure that they update any affected native mobile files during code refactorings because we cannot yet rely on automated tooling to do this for us. For example, renaming a function or a prop should also be performed in the native modules too, otherwise, the mobile client will break. We have added some mobile specific CI tests as safeguards in place in PRs, but we're still far from done. Please bear with us and thank you in advance. ❤️🙇‍
 
 ## Running Gutenberg Mobile on Android and iOS
 
