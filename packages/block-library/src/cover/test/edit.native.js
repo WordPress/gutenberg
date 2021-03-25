@@ -159,4 +159,25 @@ describe( 'when media is attached', () => {
 			} )
 		);
 	} );
+
+	it( 'allows clearing the media', async () => {
+		const { getByText } = render(
+			<CoverEdit
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+			/>
+		);
+		// Await async update to component state to avoid act warning
+		await act( () => isScreenReaderEnabled );
+		fireEvent.press( getByText( 'Clear Media' ) );
+
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				focalPoint: undefined,
+				hasParallax: undefined,
+				id: undefined,
+				url: undefined,
+			} )
+		);
+	} );
 } );
