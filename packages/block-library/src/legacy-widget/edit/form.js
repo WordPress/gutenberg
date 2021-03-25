@@ -173,7 +173,7 @@ const ObservableForm = forwardRef( ( { onChange, ...props }, ref ) => {
 			ref.current.removeEventListener( 'change', handler );
 			ref.current.removeEventListener( 'input', handler );
 		};
-	}, [ ref, onChange ] );
+	}, [ onChange ] );
 
 	return <form ref={ ref } { ...props } />;
 } );
