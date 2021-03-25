@@ -57,7 +57,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return array Contents that adhere to the theme.json schema.
 	 */
-	private static function read_json_file( $file_path ) {
+	public static function read_json_file( $file_path ) {
 		$config = array();
 		if ( $file_path ) {
 			$decoded_file = json_decode(
@@ -309,6 +309,7 @@ class WP_Theme_JSON_Resolver {
 	public static function get_theme_data( $theme_support_data = array() ) {
 		if ( null === self::$theme ) {
 			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
+			$theme_json_data = apply_filters( 'theme_json_data', $theme_json_data );
 			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			self::$theme     = new WP_Theme_JSON( $theme_json_data );
 		}
