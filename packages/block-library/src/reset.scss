@@ -104,7 +104,18 @@
 	textarea,
 	button {
 		font-family: system-ui;
-		all: revert;
+		font-size: revert;
+		font-weight: revert;
+		border-radius: revert;
+		border: revert;
+		background: revert;
+		color: revert;
+		padding: revert;
+		margin: revert;
+		line-height: revert;
+		min-height: revert;
+		box-shadow: revert;
+		box-sizing: revert;
 	}
 
 	// For these I prefer to only override the WP-Admin defined styles and not "all"
@@ -132,6 +143,7 @@
 			border: revert;
 			box-shadow: revert;
 			outline: revert;
+			padding: revert;
 		}
 	}
 }

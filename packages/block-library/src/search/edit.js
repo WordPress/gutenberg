@@ -149,21 +149,19 @@ export default function SearchEdit( {
 				) }
 
 				{ ! buttonUseIcon && (
-					// This rule only makes sense for UI not blocks.
-					// eslint-disable-next-line react/forbid-elements
-					<button type="submit" className="wp-block-search__button">
-						<RichText
-							tagName="span"
-							style={ { display: 'inline-block' } }
-							aria-label={ __( 'Button text' ) }
-							placeholder={ __( 'Add button text…' ) }
-							withoutInteractiveFormatting
-							value={ buttonText }
-							onChange={ ( html ) =>
-								setAttributes( { buttonText: html } )
-							}
-						/>
-					</button>
+					<RichText
+						type="submit"
+						className="wp-block-search__button"
+						tagName="button"
+						style={ { display: 'inline-block' } }
+						aria-label={ __( 'Button text' ) }
+						placeholder={ __( 'Add button text…' ) }
+						withoutInteractiveFormatting
+						value={ buttonText }
+						onChange={ ( html ) =>
+							setAttributes( { buttonText: html } )
+						}
+					/>
 				) }
 			</>
 		);
