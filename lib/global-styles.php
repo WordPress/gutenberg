@@ -195,7 +195,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['fontSizes'] );
 	unset( $settings['gradients'] );
 
-	$origin = 'theme';
+	$is_rest_request = defined( 'REST_REQUEST' ) && REST_REQUEST;
+	$origin          = 'theme';
 	if (
 		WP_Theme_JSON_Resolver::theme_has_support() &&
 		gutenberg_is_fse_theme()
@@ -218,11 +219,12 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// In the site editor, the user can change styles, so the client
 	// needs the ability to create them. Hence, we pass it some data
 	// for this: base styles (core+theme) and the ID of the user CPT.
-	$screen = get_current_screen();
+	$screen = ! $is_rest_request ? get_current_screen() : null;
 	if (
-		! empty( $screen ) &&
+		( ( ! empty( $screen ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
-		gutenberg_is_edit_site_page( $screen->id ) &&
+		gutenberg_is_edit_site_page( $screen->id ) ||
+		$is_rest_request ) ) &&
 		WP_Theme_JSON_Resolver::theme_has_support() &&
 		gutenberg_is_fse_theme()
 	) {
@@ -251,40 +253,6 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 }
 
 /**
- * Adds the necessary data of Global Styles for the REST API.
- *
- * @param array $settings Existing block editor settings.
- * @return array New block editor settings
- */
-function gutenberg_global_styles_rest_settings( $settings ) {
-	$color_palette = current( (array) get_theme_support( 'editor-color-palette' ) );
-	if ( false !== $color_palette ) {
-		$settings['colors'] = $color_palette;
-	}
-
-	$gradient_presets = current( (array) get_theme_support( 'editor-gradient-presets' ) );
-	if ( false !== $gradient_presets ) {
-		$settings['gradients'] = $gradient_presets;
-	}
-
-	$settings['globalStyles'] = WP_Theme_JSON_Resolver::theme_has_support();
-
-	if (
-		WP_Theme_JSON_Resolver::theme_has_support() &&
-		gutenberg_is_fse_theme()
-		) {
-		$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
-		$user_cpt_id        = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
-		$base_styles        = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
-
-		$settings['globalStylesUserEntityId'] = $user_cpt_id;
-		$settings['globalStylesBaseStyles']   = $base_styles;
-	}
-
-	return $settings;
-}
-
-/**
  * Register CPT to store/access user data.
  *
  * @return array|undefined
@@ -299,7 +267,6 @@ function gutenberg_experimental_global_styles_register_user_cpt() {
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
 add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
-add_filter( 'block_editor_global_styles_rest_settings', 'gutenberg_global_styles_rest_settings', PHP_INT_MAX );
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 
 

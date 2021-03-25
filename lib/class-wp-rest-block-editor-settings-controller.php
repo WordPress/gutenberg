@@ -1,23 +1,23 @@
 <?php
 /**
- * REST API: WP_REST_Block_Editor_Global_Styles_Settings_Controller class
+ * REST API: WP_REST_Block_Editor_Settings_Controller class
  *
  * @package    WordPress
  * @subpackage REST_API
  */
 
 /**
- * Core class used to retrieve the block editor global styles settings via the REST API.
+ * Core class used to retrieve the block editor settings via the REST API.
  *
  * @see WP_REST_Controller
  */
-class WP_REST_Block_Editor_Global_Styles_Settings_Controller extends WP_REST_Controller {
+class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	/**
 	 * Constructs the controller.
 	 */
 	public function __construct() {
 		$this->namespace = 'wp-block-editor/v1';
-		$this->rest_base = 'global-styles';
+		$this->rest_base = 'settings';
 	}
 
 	/**
@@ -57,7 +57,7 @@ class WP_REST_Block_Editor_Global_Styles_Settings_Controller extends WP_REST_Con
 	}
 
 	/**
-	 * Returns the block editor's global styles settings
+	 * Returns the block editor's settings
 	 *
 	 * @since 5.8.0
 	 *
@@ -66,13 +66,18 @@ class WP_REST_Block_Editor_Global_Styles_Settings_Controller extends WP_REST_Con
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$settings = apply_filters( 'block_editor_global_styles_rest_settings', array() );
+		$settings = apply_filters( 'block_editor_settings', array() );
+		unset( $settings['styles'] );
+		unset( $settings['defaultEditorStyles'] );
+		unset( $settings['availableLegacyWidgets'] );
+		unset( $settings['__unstableEnableFullSiteEditingBlocks'] );
+		unset( $settings['__experimentalGlobalStylesUserEntityId'] );
 
 		return rest_ensure_response( $settings );
 	}
 
 	/**
-	 * Retrieves the block editor's global styles schema, conforming to JSON Schema.
+	 * Retrieves the block editor's settings schema, conforming to JSON Schema.
 	 *
 	 * @since 5.8.0
 	 *
@@ -85,34 +90,22 @@ class WP_REST_Block_Editor_Global_Styles_Settings_Controller extends WP_REST_Con
 
 		$this->schema = array(
 			'$schema'    => 'http://json-schema.org/draft-04/schema#',
-			'title'      => 'block-editor-global-styles-settings-item',
+			'title'      => 'block-editor-settings-item',
 			'type'       => 'object',
 			'properties' => array(
-				'colors'                   => array(
-					'description' => __( 'Active theme colors.', 'gutenberg' ),
-					'type'        => 'array',
+				'__experimentalFeatures'               => array(
+					'description' => __( 'Active theme settings and default values.', 'gutenberg' ),
+					'type'        => 'object',
 					'context'     => array( 'view' ),
 				),
 
-				'gradients'                => array(
-					'description' => __( 'Active theme gradients.', 'gutenberg' ),
-					'type'        => 'array',
-					'context'     => array( 'view' ),
-				),
-
-				'globalStyles'             => array(
-					'description' => __( 'Theme support for global styles.', 'gutenberg' ),
+				'isFSETheme'                           => array(
+					'description' => __( 'Theme support for full site editing.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'view' ),
 				),
 
-				'globalStylesUserEntityId' => array(
-					'description' => __( 'User entity id for Global styles settings.', 'gutenberg' ),
-					'type'        => 'integer',
-					'context'     => array( 'view' ),
-				),
-
-				'globalStylesBaseStyles'   => array(
+				'__experimentalGlobalStylesBaseStyles' => array(
 					'description' => __( 'Global styles settings.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'view' ),

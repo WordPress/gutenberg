@@ -74,13 +74,13 @@ function gutenberg_register_batch_endpoint() {
 add_action( 'rest_api_init', 'gutenberg_register_batch_endpoint' );
 
 /**
- * Registers the Block types REST API routes.
+ * Registers the Block editor settings REST API routes.
  */
-function gutenberg_register_block_editor_global_styles_settings() {
-	$editor_settings = new WP_REST_Block_Editor_Global_Styles_Settings_Controller();
+function gutenberg_register_block_editor_settings() {
+	$editor_settings = new WP_REST_Block_Editor_Settings_Controller();
 	$editor_settings->register_routes();
 }
-add_action( 'rest_api_init', 'gutenberg_register_block_editor_global_styles_settings' );
+add_action( 'rest_api_init', 'gutenberg_register_block_editor_settings' );
 
 /**
  * Hook in to the nav menu item post type and enable a post type rest endpoint.
