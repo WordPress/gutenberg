@@ -506,10 +506,10 @@ describe( 'Navigation editor', () => {
 			const menuNameButton = await page.waitForXPath(
 				'//button[contains(@aria-label, "Edit menu name" ) ]'
 			);
-			const menuNamerButtonText = await menuNameButton.evaluate(
+			const menuNameButtonText = await menuNameButton.evaluate(
 				( element ) => element.innerText
 			);
-			expect( menuNamerButtonText ).toBe( oldName );
+			expect( menuNameButtonText ).toBe( oldName );
 		} );
 	} );
 } );
