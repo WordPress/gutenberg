@@ -48,12 +48,18 @@ const attributes = {
 	url: 'mock-url',
 };
 
-let imageSize;
+let imageSize, isScreenReaderEnabled;
 beforeAll( () => {
 	// Mock Image.getSize to avoid failed attempt to size non-existant image
 	const getSizeSpy = jest.spyOn( Image, 'getSize' );
 	imageSize = Promise.resolve( 300, 200 );
 	getSizeSpy.mockReturnValue( imageSize );
+
+	// Mock async native module to avoid act warning
+	isScreenReaderEnabled = Promise.resolve( true );
+	AccessibilityInfo.isScreenReaderEnabled = jest.fn(
+		() => isScreenReaderEnabled
+	);
 
 	// Register required blocks
 	registerBlockType( name, {
@@ -110,13 +116,25 @@ describe( 'when no media is attached', () => {
 } );
 
 describe( 'when media is attached', () => {
-	it( 'allows editing the focal point with text input', async () => {
-		// Mock async native module to avoid act warning
-		const isScreenReaderEnabled = Promise.resolve( true );
-		AccessibilityInfo.isScreenReaderEnabled = jest.fn(
-			() => isScreenReaderEnabled
+	it( 'allows toggling a fixed background', async () => {
+		const { getByText } = render(
+			<CoverEdit
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+			/>
 		);
+		// Await async update to component state to avoid act warning
+		await act( () => isScreenReaderEnabled );
+		fireEvent.press( getByText( 'Fixed background' ) );
 
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				hasParallax: ! attributes.hasParallax,
+			} )
+		);
+	} );
+
+	it( 'allows editing the focal point with text input', async () => {
 		const { getByText, findByText, findByLabelText } = render(
 			<CoverEdit
 				attributes={ attributes }
