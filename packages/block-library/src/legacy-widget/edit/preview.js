@@ -15,7 +15,7 @@ export default function PreviewIframe( { idBase, instance, isVisible } ) {
 
 	const adjustHeight = useCallback( () => {
 		setHeight( ref.current.contentDocument.body.scrollHeight );
-	} );
+	}, [] );
 
 	useEffect( () => {
 		if ( isVisible ) {
