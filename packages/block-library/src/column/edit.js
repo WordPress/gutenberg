@@ -36,15 +36,18 @@ function ColumnEdit( {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	const { hasChildBlocks, rootClientId } = useSelect(
+	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
 		( select ) => {
 			const { getBlockOrder, getBlockRootClientId } = select(
 				blockEditorStore
 			);
 
+			const rootId = getBlockRootClientId( clientId );
+
 			return {
 				hasChildBlocks: getBlockOrder( clientId ).length > 0,
-				rootClientId: getBlockRootClientId( clientId ),
+				rootClientId: rootId,
+				columnsIds: getBlockOrder( rootId ),
 			};
 		},
 		[ clientId ]
@@ -73,6 +76,10 @@ function ColumnEdit( {
 			: InnerBlocks.ButtonBlockAppender,
 	} );
 
+	const columnsCount = columnsIds.length;
+	const currentColumnPosition = columnsIds.indexOf( clientId ) + 1;
+	const label = `${ innerBlocksProps[ 'aria-label' ] } (${ currentColumnPosition } of ${ columnsCount })`;
+
 	return (
 		<>
 			<BlockControls>
@@ -97,7 +104,7 @@ function ColumnEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<div { ...innerBlocksProps } />
+			<div { ...innerBlocksProps } aria-label={ label } />
 		</>
 	);
 }
