@@ -160,7 +160,6 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const {
-		isDraggingBlocks,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
@@ -174,7 +173,6 @@ export default function NavigationLinkEdit( {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
-				isDraggingBlocks: _isDraggingBlocks,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -196,7 +194,6 @@ export default function NavigationLinkEdit( {
 					selectedBlockId,
 				] )?.length,
 				numberOfDescendants: descendants,
-				isDraggingBlocks: _isDraggingBlocks(),
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
@@ -297,12 +294,7 @@ export default function NavigationLinkEdit( {
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
 		className: classnames( {
-			'is-editing':
-				( isSelected || isParentOfSelectedBlock ) &&
-				// Don't show the element as editing while dragging.
-				! isDraggingBlocks,
-			// Don't select the element while dragging.
-			'is-selected': isSelected && ! isDraggingBlocks,
+			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasDescendants,
@@ -324,10 +316,7 @@ export default function NavigationLinkEdit( {
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: classnames( 'wp-block-navigation-link__container', {
-				'is-parent-of-selected-block':
-					isParentOfSelectedBlock &&
-					// Don't select as parent of selected block while dragging.
-					! isDraggingBlocks,
+				'is-parent-of-selected-block': isParentOfSelectedBlock,
 			} ),
 		},
 		{
@@ -337,7 +326,7 @@ export default function NavigationLinkEdit( {
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
-				( isDraggingBlocks && hasDescendants )
+				hasDescendants
 					? InnerBlocks.DefaultAppender
 					: false,
 			__experimentalAppenderTagName: 'li',
