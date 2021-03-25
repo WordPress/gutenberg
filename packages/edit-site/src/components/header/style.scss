@@ -1,39 +1,25 @@
-$header-toolbar-min-width: 335px;
-
+// This CSS is largely copied for the post editor (.edit-post-header).
+// Please keep them in sync.
 .edit-site-header {
-	align-items: center;
+	min-height: $header-height;
 	background-color: $white;
 	display: flex;
-	height: $header-height;
-	box-sizing: border-box;
-	width: 100%;
-	justify-content: space-between;
+	justify-content: flex-start;
+	flex-direction: column;
+	// The header should never be wider than the viewport, or buttons might be hidden. Especially relevant at high zoom levels. Related to https://core.trac.wordpress.org/ticket/47603#ticket.
+	max-width: 100vw;
 
+	// Make toolbar sticky on larger breakpoints
+	@include break-zoomed-in {
+		flex-wrap: nowrap;
+	}
+
+	// Add transition for the menu.
 	body.is-fullscreen-mode & {
 		padding-left: 60px;
 		transition: padding-left 20ms linear;
 		transition-delay: 80ms;
 		@include reduce-motion("transition");
-	}
-
-	.edit-site-header_start,
-	.edit-site-header_end {
-		display: flex;
-	}
-
-	.edit-site-header_center {
-		display: flex;
-		align-items: center;
-		height: 100%;
-		// Flex items will, by default, refuse to shrink below a minimum
-		// intrinsic width. In order to shrink this flexbox item, and
-		// subsequently truncate child text, we set an explicit min-width.
-		// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
-		min-width: 0;
-	}
-
-	.edit-site-header_end {
-		justify-content: flex-end;
 	}
 }
 
@@ -60,7 +46,24 @@ body.is-navigation-sidebar-open {
 	}
 }
 
+// Make both the default header toolbar and the toggled top toolbar be full-width.
+.edit-site-header__toolbar,
+.edit-site-header__block-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+}
+
 .edit-site-header__toolbar {
+	height: $header-height;
+	justify-content: space-between;
+	border-bottom: $border-width solid $gray-300;
+}
+
+.edit-site-header__block-toolbar {
+	height: $block-toolbar-height;
+}
+
+.edit-site-header__toolbar-actions {
 	display: flex;
 	align-items: center;
 	padding-left: $grid-unit-10;
@@ -165,57 +168,17 @@ body.is-navigation-sidebar-open {
 
 // Block toolbar when fixed to the top of the screen.
 .edit-site-header-toolbar__block-toolbar {
-	// Stack toolbar below Editor Bar.
-	position: absolute;
-	top: $header-height + $border-width;
-	left: 0;
-	right: 0;
-	background: $white;
-	border-bottom: $border-width solid $gray-300;
-
-	&:empty {
-		display: none;
-	}
-
+	height: $block-toolbar-height;
 	.block-editor-block-toolbar .components-toolbar-group,
 	.block-editor-block-toolbar .components-toolbar {
 		border-top: none;
 		border-bottom: none;
 	}
 
-	.is-sidebar-opened & {
-		display: none;
-	}
-
 	@include break-medium {
 		.is-sidebar-opened & {
 			display: block;
 			right: $sidebar-width;
-		}
-	}
-
-	// Move toolbar into top Editor Bar.
-	@include break-wide {
-		padding-left: $grid-unit-10;
-		position: static;
-		left: auto;
-		right: auto;
-		background: none;
-		border-bottom: none;
-
-		.is-sidebar-opened & {
-			right: auto;
-		}
-
-		.block-editor-block-toolbar {
-			border-left: $border-width solid $gray-300;
-		}
-
-		.block-editor-block-toolbar .components-toolbar-group,
-		.block-editor-block-toolbar .components-toolbar {
-			$top-toolbar-padding: ( $header-height - $grid-unit-60 ) / 2;
-			height: $header-height;
-			padding: $top-toolbar-padding 0;
 		}
 	}
 }

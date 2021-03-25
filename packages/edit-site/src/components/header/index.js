@@ -88,8 +88,8 @@ export default function Header( { openEntitiesSavedStates } ) {
 
 	return (
 		<div className="edit-site-header">
-			<div className="edit-site-header_start">
-				<div className="edit-site-header__toolbar">
+			<div className="edit-site-header__toolbar">
+				<div className="edit-site-header__toolbar-actions">
 					<Button
 						ref={ inserterButton }
 						isPrimary
@@ -130,15 +130,8 @@ export default function Header( { openEntitiesSavedStates } ) {
 							/>
 						</>
 					) }
-					{ displayBlockToolbar && (
-						<div className="edit-site-header-toolbar__block-toolbar">
-							<BlockToolbar hideDragHandle />
-						</div>
-					) }
 				</div>
-			</div>
 
-			<div className="edit-site-header_center">
 				{ 'wp_template' === templateType && (
 					<DocumentActions
 						entityTitle={ entityTitle }
@@ -152,15 +145,14 @@ export default function Header( { openEntitiesSavedStates } ) {
 						) }
 					</DocumentActions>
 				) }
+
 				{ 'wp_template_part' === templateType && (
 					<DocumentActions
 						entityTitle={ entityTitle }
 						entityLabel="template part"
 					/>
 				) }
-			</div>
 
-			<div className="edit-site-header_end">
 				<div className="edit-site-header__actions">
 					<PreviewOptions
 						deviceType={ deviceType }
@@ -173,6 +165,12 @@ export default function Header( { openEntitiesSavedStates } ) {
 					<MoreMenu />
 				</div>
 			</div>
+
+			{ displayBlockToolbar && (
+				<div className="edit-site-header-toolbar__block-toolbar">
+					<BlockToolbar hideDragHandle />
+				</div>
+			) }
 		</div>
 	);
 }

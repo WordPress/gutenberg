@@ -94,10 +94,7 @@
 
 // Block toolbar when fixed to the top of the screen.
 .edit-post-header__block-toolbar {
-	&:empty {
-		display: none;
-	}
-
+	height: $block-toolbar-height;
 	.block-editor-block-toolbar .components-toolbar-group,
 	.block-editor-block-toolbar .components-toolbar {
 		border-top: none;

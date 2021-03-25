@@ -1,4 +1,7 @@
+// This CSS is largely copied for the site editor (.edit-site-header).
+// Please keep them in sync.
 .edit-post-header {
+	min-height: $header-height;
 	background: $white;
 	display: flex;
 	justify-content: flex-start;
@@ -9,12 +12,6 @@
 	// Make toolbar sticky on larger breakpoints
 	@include break-zoomed-in {
 		flex-wrap: nowrap;
-	}
-
-	// Set height of toolbar depending on fixed toolbar toggle.
-	height: $header-height;
-	.has-fixed-toolbar & {
-		height: $header-height + $block-toolbar-height;
 	}
 
 	// Some browsers, most notably IE11, honor an older version of the flexbox spec
@@ -45,6 +42,7 @@
 
 .edit-post-header__toolbar {
 	height: $header-height;
+	justify-content: space-between;
 	border-bottom: $border-width solid $gray-300;
 }
 
