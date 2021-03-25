@@ -16,6 +16,7 @@ import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
  * Internal dependencies
  */
 import ConvertToBlocksButton from './convert-to-blocks-button';
+import LazyLoadTinyMCE from './lazy';
 
 const { wp } = window;
 
@@ -35,7 +36,7 @@ function isTmceEmpty( editor ) {
 	return /^\n?$/.test( body.innerText || body.textContent );
 }
 
-export default function ClassicEdit( {
+function ClassicEdit( {
 	clientId,
 	attributes: { content },
 	setAttributes,
@@ -239,3 +240,11 @@ export default function ClassicEdit( {
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
+
+const LazyClassicEdit = ( props ) => (
+	<LazyLoadTinyMCE>
+		<ClassicEdit { ...props } />
+	</LazyLoadTinyMCE>
+);
+
+export default LazyClassicEdit;
