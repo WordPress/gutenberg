@@ -8,7 +8,7 @@ import { InspectorControls } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import AutoAddPages from './auto-add-pages';
-import DeleteMenu from './delete-menu';
+import DeleteMenuPanel from './delete-menu-panel';
 import ManageLocations from './manage-locations';
 import { NameEditor } from '../name-editor';
 import { PanelBody } from '@wordpress/components';
@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
 export default function InspectorAdditions( {
 	menuId,
 	menus,
+	isMenuBeingDeleted,
 	onDeleteMenu,
 	onSelectMenu,
 	isManageLocationsModalOpen,
@@ -37,7 +38,6 @@ export default function InspectorAdditions( {
 			<PanelBody title={ __( 'Menu settings' ) }>
 				<NameEditor />
 				<AutoAddPages menuId={ menuId } />
-				<DeleteMenu onDeleteMenu={ onDeleteMenu } />
 			</PanelBody>
 			<PanelBody title={ __( 'Theme locations' ) }>
 				<ManageLocations
@@ -47,6 +47,12 @@ export default function InspectorAdditions( {
 					isModalOpen={ isManageLocationsModalOpen }
 					closeModal={ closeManageLocationsModal }
 					openModal={ openManageLocationsModal }
+				/>
+			</PanelBody>
+			<PanelBody>
+				<DeleteMenuPanel
+					onDeleteMenu={ onDeleteMenu }
+					isMenuBeingDeleted={ isMenuBeingDeleted }
 				/>
 			</PanelBody>
 		</InspectorControls>
