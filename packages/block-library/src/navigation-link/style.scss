@@ -69,11 +69,7 @@
 		padding: 0.375em 1em 0.375em 0;
 
 		svg {
-			fill: currentColor;
-
-			@include break-medium {
-				transform: rotate(90deg);
-			}
+			stroke: currentColor;
 		}
 	}
 
@@ -105,6 +101,8 @@
 
 			> .wp-block-pages-list__item,
 			> .wp-block-navigation-link {
+				margin: 0;
+
 				> .wp-block-pages-list__item__link,
 				> .wp-block-navigation-link__content {
 					flex-grow: 1;
@@ -140,7 +138,7 @@
 				// Reset the submenu indicator for horizontal flyouts.
 				.wp-block-page-list__submenu-icon svg,
 				.wp-block-navigation-link__submenu-icon svg {
-					transform: rotate(0);
+					transform: rotate(-90deg);
 				}
 			}
 		}

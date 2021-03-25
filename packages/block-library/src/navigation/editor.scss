@@ -23,6 +23,10 @@
 		&.wp-block-navigation-link {
 			margin: 0 0.5em 0 0;
 		}
+
+		&.has-child .block-editor-block-list__block.wp-block-navigation-link {
+			margin: 0;
+		}
 	}
 }
 
