@@ -23,7 +23,7 @@ import {
  * Default set of header values which should be sent with every request unless
  * explicitly provided through apiFetch options.
  *
- * @type {Object}
+ * @type {Record<string, string>}
  */
 const DEFAULT_HEADERS = {
 	// The backend uses the Accept header as a condition for considering an
@@ -43,6 +43,9 @@ const DEFAULT_OPTIONS = {
 	credentials: 'include',
 };
 
+/**
+ * @type {import('./types').ApiFetchMiddleware[]}
+ */
 const middlewares = [
 	userLocaleMiddleware,
 	namespaceEndpointMiddleware,
@@ -50,10 +53,22 @@ const middlewares = [
 	fetchAllMiddleware,
 ];
 
+/**
+ * Register a middleware
+ *
+ * @param {import('./types').ApiFetchMiddleware} middleware
+ */
 function registerMiddleware( middleware ) {
 	middlewares.unshift( middleware );
 }
 
+/**
+ * Checks the status of a response, throwing the Response as an error if
+ * it is outside the 200 range.
+ *
+ * @param {Response} response
+ * @return {Response} The response if the status is in the 200 range.
+ */
 const checkStatus = ( response ) => {
 	if ( response.status >= 200 && response.status < 300 ) {
 		return response;
@@ -62,6 +77,11 @@ const checkStatus = ( response ) => {
 	throw response;
 };
 
+/** @typedef {(options: import('./types').ApiFetchRequestProps) => Promise<any>} FetchHandler*/
+
+/**
+ * @type {FetchHandler}
+ */
 const defaultFetchHandler = ( nextOptions ) => {
 	const { url, path, data, parse = true, ...remainingOptions } = nextOptions;
 	let { body, headers } = nextOptions;
@@ -75,12 +95,16 @@ const defaultFetchHandler = ( nextOptions ) => {
 		headers[ 'Content-Type' ] = 'application/json';
 	}
 
-	const responsePromise = window.fetch( url || path, {
-		...DEFAULT_OPTIONS,
-		...remainingOptions,
-		body,
-		headers,
-	} );
+	const responsePromise = window.fetch(
+		// fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed
+		url || path || window.location.href,
+		{
+			...DEFAULT_OPTIONS,
+			...remainingOptions,
+			body,
+			headers,
+		}
+	);
 
 	return (
 		responsePromise
@@ -107,25 +131,34 @@ const defaultFetchHandler = ( nextOptions ) => {
 	);
 };
 
+/** @type {FetchHandler} */
 let fetchHandler = defaultFetchHandler;
 
 /**
  * Defines a custom fetch handler for making the requests that will override
  * the default one using window.fetch
  *
- * @param {Function} newFetchHandler The new fetch handler
+ * @param {FetchHandler} newFetchHandler The new fetch handler
  */
 function setFetchHandler( newFetchHandler ) {
 	fetchHandler = newFetchHandler;
 }
 
+/**
+ * @template T
+ * @param {import('./types').ApiFetchRequestProps} options
+ * @return {Promise<T>} A promise representing the request processed via the registered middlewares.
+ */
 function apiFetch( options ) {
 	// creates a nested function chain that calls all middlewares and finally the `fetchHandler`,
 	// converting `middlewares = [ m1, m2, m3 ]` into:
 	// ```
 	// opts1 => m1( opts1, opts2 => m2( opts2, opts3 => m3( opts3, fetchHandler ) ) );
 	// ```
-	const enhancedHandler = middlewares.reduceRight( ( next, middleware ) => {
+	const enhancedHandler = middlewares.reduceRight( (
+		/** @type {FetchHandler} */ next,
+		middleware
+	) => {
 		return ( workingOptions ) => middleware( workingOptions, next );
 	}, fetchHandler );
 
@@ -135,14 +168,18 @@ function apiFetch( options ) {
 		}
 
 		// If the nonce is invalid, refresh it and try again.
-		return window
-			.fetch( apiFetch.nonceEndpoint )
-			.then( checkStatus )
-			.then( ( data ) => data.text() )
-			.then( ( text ) => {
-				apiFetch.nonceMiddleware.nonce = text;
-				return apiFetch( options );
-			} );
+		return (
+			window
+				// @ts-ignore
+				.fetch( apiFetch.nonceEndpoint )
+				.then( checkStatus )
+				.then( ( data ) => data.text() )
+				.then( ( text ) => {
+					// @ts-ignore
+					apiFetch.nonceMiddleware.nonce = text;
+					return apiFetch( options );
+				} )
+		);
 	} );
 }
 
