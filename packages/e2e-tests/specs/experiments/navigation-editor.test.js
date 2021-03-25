@@ -302,7 +302,7 @@ describe( 'Navigation editor', () => {
 
 		// Select a link block with nested links in a submenu.
 		const parentLinkXPath =
-			'//li[@aria-label="Block: Link" and contains(.,"WordPress.org")]';
+			'//li[@aria-label="Block: Custom Link" and contains(.,"WordPress.org")]';
 		const linkBlock = await page.waitForXPath( parentLinkXPath );
 		await linkBlock.click();
 
@@ -311,7 +311,7 @@ describe( 'Navigation editor', () => {
 		// Submenus are hidden using `visibility: hidden` and shown using
 		// `visibility: visible` so the visible/hidden options must be used
 		// when selecting the elements.
-		const submenuLinkXPath = `${ parentLinkXPath }//li[@aria-label="Block: Link"]`;
+		const submenuLinkXPath = `${ parentLinkXPath }//li[@aria-label="Block: Custom Link"]`;
 		const submenuLinkVisible = await page.waitForXPath( submenuLinkXPath, {
 			visible: true,
 		} );
@@ -352,10 +352,8 @@ describe( 'Navigation editor', () => {
 		);
 		await appender.click();
 
-		// Must be an exact match to the word 'Link' as other
-		// variations also contain the word 'Link'.
 		const linkInserterItem = await page.waitForXPath(
-			'//button[@role="option"]//span[.="Link"]'
+			'//button[@role="option"]//span[.="Custom Link"]'
 		);
 		await linkInserterItem.click();
 

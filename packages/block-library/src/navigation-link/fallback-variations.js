@@ -17,8 +17,8 @@ const fallbackVariations = [
 	{
 		name: 'link',
 		isDefault: true,
-		title: __( 'Link' ),
-		description: __( 'A link to a URL.' ),
+		title: __( 'Custom Link' ),
+		description: __( 'A link to a custom URL.' ),
 		attributes: {},
 	},
 	{

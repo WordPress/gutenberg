@@ -19,7 +19,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Link', 'block title' ),
+	title: _x( 'Custom Link', 'block title' ),
 
 	icon: linkIcon,
 
