@@ -233,7 +233,8 @@ Undocumented declaration.
 <a name="isTextField" href="#isTextField">#</a> **isTextField**
 
 Check whether the given element is a text field, where text field is defined
-by the ability to select within the input, or that it is contenteditable.
+by the ability to select within the input, or that it is contenteditable or
+within a contenteditable container.
 
 See: <https://html.spec.whatwg.org/#textFieldSelection>
 

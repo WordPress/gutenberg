@@ -98,6 +98,24 @@ export function useEventHandlers( clientId ) {
 					return;
 				}
 
+				// In Safari, when interactive content editable element is
+				// focused, the browser assign the block element as the target
+				// and active element in the document while the active element
+				// should be the content editable container. Check the selection
+				// to make sure it is not within a text field.
+				const {
+					ownerDocument: { defaultView },
+				} = target;
+				let { focusNode } = defaultView.getSelection();
+
+				if ( focusNode.nodeType !== focusNode.ELEMENT_NODE ) {
+					focusNode = focusNode.parentElement;
+				}
+
+				if ( isTextField( focusNode ) ) {
+					return;
+				}
+
 				event.preventDefault();
 
 				if ( keyCode === ENTER ) {

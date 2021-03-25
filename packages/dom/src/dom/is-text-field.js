@@ -1,6 +1,7 @@
 /**
  * Check whether the given element is a text field, where text field is defined
- * by the ability to select within the input, or that it is contenteditable.
+ * by the ability to select within the input, or that it is contenteditable or
+ * within a contenteditable container.
  *
  * See: https://html.spec.whatwg.org/#textFieldSelection
  *
@@ -9,7 +10,7 @@
  * @return {boolean} True if the element is an text field, false if not.
  */
 export default function isTextField( element ) {
-	const { nodeName, contentEditable } = element;
+	const { nodeName } = element;
 	const nonTextInputs = [
 		'button',
 		'checkbox',
@@ -25,6 +26,6 @@ export default function isTextField( element ) {
 	return (
 		( nodeName === 'INPUT' && ! nonTextInputs.includes( element.type ) ) ||
 		nodeName === 'TEXTAREA' ||
-		contentEditable === 'true'
+		!! element.closest( '[contenteditable]' )
 	);
 }
