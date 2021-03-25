@@ -21,6 +21,8 @@ import useEditorFeature from '../components/use-editor-feature';
 import { hasBorderFeatureSupport, shouldSkipSerialization } from './border';
 import { cleanEmptyObject } from './utils';
 
+// Defining empty array here instead of inline avoids unnecessary re-renders of
+// color control.
 const EMPTY_ARRAY = [];
 
 /**
