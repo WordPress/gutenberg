@@ -1,11 +1,12 @@
 # `docgen`
 
-`docgen` helps you to generate the _public API_ of your code. Given an entry point file, it outputs the ES6 export statements and their corresponding JSDoc comments in human-readable format.
+`docgen` helps you to generate the _public API_ of your code. Given an entry point file, it outputs the ES6 export statements and their corresponding JSDoc comments in human-readable format. It also supports TypeScript via the TypeScript babel plugin.
 
 Some characteristics:
 
 * If the export statement doesn't contain any JSDoc, it'll look up for JSDoc up to the declaration.
 * It can resolve relative dependencies, either files or directories. For example, `import default from './dependency'` will find `dependency.js` or `dependency/index.js`
+* For TypeScript support, all types must be explicity annotated as the TypeScript Babel plugin is unable to consume inferred types (it does not run the TS compiler, after all—it merely parses TypeScript). For example, all function return types must be explicitly annotated if they are to be documented by `docgen`.
 
 ## Installation
 
@@ -254,3 +255,41 @@ console.log( result ); // Will log 3
 ````
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
+
+### TypeScript support
+
+Entry point `index.ts`:
+
+```js
+/**
+ * Adds two numbers.
+ *
+ * @param term1 First number.
+ * @param term2 Second number.
+ * @return The result of adding the two numbers.
+ */
+export default function addition( term1: number, term2: number ): number {
+	// Implementation would go here.
+}
+```
+
+Output of `npx docgen index.ts` would be `index-api.js`:
+
+```markdown
+# API
+
+## default
+
+[example.js#L8-L10](example.js#L8-L10)
+
+Adds two numbers.
+
+**Parameters**
+
+- **term1** `number`: First number.
+- **term2** `number`: Second number.
+
+**Returns**
+
+`number` The result of adding the two numbers.
+```

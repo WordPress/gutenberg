@@ -1,16 +1,26 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useCallback, useEffect } from '@wordpress/element';
 import {
 	useShortcut,
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
+
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
 
 function KeyboardShortcuts() {
-	const { redo, undo } = useDispatch( 'core' );
+	const isListViewOpen = useSelect( ( select ) =>
+		select( editSiteStore ).isListViewOpened()
+	);
+	const { redo, undo } = useDispatch( coreStore );
+	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
 	useShortcut(
 		'core/edit-site/undo',
@@ -27,6 +37,18 @@ function KeyboardShortcuts() {
 			redo();
 			event.preventDefault();
 		},
+		{ bindGlobal: true }
+	);
+
+	useShortcut(
+		'core/edit-site/toggle-list-view',
+		useCallback( () => {
+			if ( isListViewOpen ) {
+				setIsListViewOpened( false );
+			} else {
+				setIsListViewOpened( true );
+			}
+		}, [ isListViewOpen, isListViewOpen ] ),
 		{ bindGlobal: true }
 	);
 
@@ -53,6 +75,16 @@ function KeyboardShortcutsRegister() {
 			keyCombination: {
 				modifier: 'primaryShift',
 				character: 'z',
+			},
+		} );
+
+		registerShortcut( {
+			name: 'core/edit-site/toggle-list-view',
+			category: 'global',
+			description: __( 'Open the block list view.' ),
+			keyCombination: {
+				modifier: 'access',
+				character: 'o',
 			},
 		} );
 	}, [ registerShortcut ] );

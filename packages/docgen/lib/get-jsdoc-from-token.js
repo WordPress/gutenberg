@@ -7,6 +7,7 @@ const commentParser = require( 'comment-parser' );
  * Internal dependencies
  */
 const getLeadingComments = require( './get-leading-comments' );
+const getTypeAnnotation = require( './get-type-annotation' );
 
 /**
  * Function that takes an Espree token and returns
@@ -27,6 +28,7 @@ module.exports = ( token ) => {
 			jsdoc.tags = jsdoc.tags.map( ( tag ) => {
 				return {
 					...tag,
+					type: getTypeAnnotation( tag, token ),
 					description:
 						tag.description === '\n'
 							? tag.description.trim()

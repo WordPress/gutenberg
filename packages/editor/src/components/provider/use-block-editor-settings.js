@@ -127,14 +127,14 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 
 		return {
 			canUseUnfilteredHTML: canUserUseUnfilteredHTML(),
-			reusableBlocks: select( 'core' ).getEntityRecords(
+			reusableBlocks: select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_block',
 				/**
-				 * Unbounded queries are not supported on native so as a workaround we set per_page with the maximum value.
+				 * Unbounded queries are not supported on native so as a workaround, we set per_page with the maximum value that native version can handle.
 				 * Related issue: https://github.com/wordpress-mobile/gutenberg-mobile/issues/2661
 				 */
-				{ per_page: Platform.select( { web: -1, native: 100 } ) }
+				{ per_page: Platform.select( { web: -1, native: 10 } ) }
 			),
 			hasUploadPermissions: defaultTo(
 				canUser( 'create', 'media' ),
@@ -151,32 +151,33 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 		() => ( {
 			...pick( settings, [
 				'__experimentalBlockDirectory',
-				'__experimentalBlockPatterns',
 				'__experimentalBlockPatternCategories',
+				'__experimentalBlockPatterns',
 				'__experimentalFeatures',
-				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalGlobalStylesBaseStyles',
+				'__experimentalGlobalStylesUserEntityId',
 				'__experimentalPreferredStyleVariations',
 				'__experimentalSetIsInserterOpened',
 				'alignWide',
 				'allowedBlockTypes',
-				'availableLegacyWidgets',
 				'bodyPlaceholder',
 				'codeEditingEnabled',
 				'colors',
 				'disableCustomColors',
 				'disableCustomFontSizes',
 				'disableCustomGradients',
-				'enableCustomUnits',
 				'enableCustomLineHeight',
+				'enableCustomSpacing',
+				'enableCustomUnits',
 				'focusMode',
 				'fontSizes',
 				'gradients',
 				'hasFixedToolbar',
 				'hasReducedUI',
+				'imageDefaultSize',
+				'imageDimensions',
 				'imageEditing',
 				'imageSizes',
-				'imageDimensions',
 				'isRTL',
 				'keepCaretInsideBlock',
 				'maxWidth',
@@ -185,6 +186,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'template',
 				'templateLock',
 				'titlePlaceholder',
+				'supportsLayout',
+				'widgetTypesToHideFromLegacyWidgetBlock',
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,

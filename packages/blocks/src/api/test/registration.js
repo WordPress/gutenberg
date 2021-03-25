@@ -385,6 +385,43 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		// This test can be removed once the polyfill for apiVersion gets removed.
+		it( 'should apply apiVersion on the client when not set on the server', () => {
+			const blockName = 'core/test-block-back-compat';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					category: 'widgets',
+				},
+			} );
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					apiVersion: 2,
+					category: 'ignored',
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				apiVersion: 2,
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				category: 'widgets',
+				icon: {
+					src: blockIcon,
+				},
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				keywords: [],
+				supports: {},
+				styles: [],
+			} );
+		} );
+
 		it( 'should validate the icon', () => {
 			const blockType = {
 				save: noop,

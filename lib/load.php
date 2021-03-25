@@ -41,7 +41,7 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-widgets-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Pattern_Directory_Controller' ) ) {
-		require dirname( __FILE__ ) . '/class-wp-rest-pattern-directory-controller.php';
+		require_once __DIR__ . '/class-wp-rest-pattern-directory-controller.php';
 	}
 	if ( ! class_exists( 'WP_REST_Menus_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-menus-controller.php';
@@ -54,12 +54,6 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	}
 	if ( ! class_exists( 'WP_Rest_Customizer_Nonces' ) ) {
 		require_once __DIR__ . '/class-wp-rest-customizer-nonces.php';
-	}
-	if ( ! class_exists( 'WP_REST_Post_Format_Search_Handler' ) ) {
-		require_once __DIR__ . '/class-wp-rest-post-format-search-handler.php';
-	}
-	if ( ! class_exists( 'WP_REST_Term_Search_Handler' ) ) {
-		require_once __DIR__ . '/class-wp-rest-term-search-handler.php';
 	}
 	if ( ! class_exists( 'WP_REST_Batch_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-batch-controller.php';
@@ -113,6 +107,7 @@ require __DIR__ . '/block-patterns.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/widgets.php';
+require __DIR__ . '/widgets-api.php';
 require __DIR__ . '/widgets-customize.php';
 require __DIR__ . '/navigation.php';
 require __DIR__ . '/navigation-page.php';
@@ -120,12 +115,10 @@ require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/global-styles.php';
 require __DIR__ . '/query-utils.php';
 
-if ( ! class_exists( 'WP_Block_Supports' ) ) {
-	require_once __DIR__ . '/class-wp-block-supports.php';
-}
 require __DIR__ . '/block-supports/generated-classname.php';
 require __DIR__ . '/block-supports/colors.php';
 require __DIR__ . '/block-supports/align.php';
 require __DIR__ . '/block-supports/typography.php';
 require __DIR__ . '/block-supports/custom-classname.php';
 require __DIR__ . '/block-supports/border.php';
+require __DIR__ . '/block-supports/layout.php';

@@ -36,8 +36,8 @@ const createTemplatePart = async (
 	await createNewButton.click();
 	await page.waitForSelector(
 		isNested
-			? '.wp-block-template-part .wp-block-template-part .block-editor-block-list__layout'
-			: '.wp-block-template-part .block-editor-block-list__layout'
+			? '.wp-block-template-part .wp-block-template-part.block-editor-block-list__layout'
+			: '.wp-block-template-part.block-editor-block-list__layout'
 	);
 	await openDocumentSettingsSidebar();
 
@@ -204,11 +204,14 @@ describe( 'Multi-entity editor states', () => {
 
 			// Wait for site editor to load.
 			await canvas().waitForSelector(
-				'.wp-block-template-part .block-editor-block-list__layout'
+				'.wp-block-template-part.block-editor-block-list__layout'
 			);
 
-			// Our custom template shows up in the " templates > all" menu; let's use it.
-			await clickTemplateItem( [ 'Templates', 'All' ], templateName );
+			// Our custom template shows up in the "Templates > General" menu; let's use it.
+			await clickTemplateItem(
+				[ 'Templates', 'General templates' ],
+				templateName
+			);
 			await page.waitForXPath(
 				`//h1[contains(@class, "edit-site-document-actions__title") and contains(text(), '${ templateName }')]`
 			);

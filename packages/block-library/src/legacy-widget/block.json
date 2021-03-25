@@ -1,0 +1,25 @@
+{
+	"apiVersion": 2,
+	"name": "core/legacy-widget",
+	"category": "widgets",
+	"attributes": {
+		"id": {
+			"type": "string",
+			"default": null
+		},
+		"idBase": {
+			"type": "string",
+			"default": null
+		},
+		"instance": {
+			"type": "object",
+			"default": null
+		}
+	},
+	"supports": {
+		"html": false,
+		"customClassName": false,
+		"reusable": false
+	},
+	"editorStyle": "wp-block-legacy-widget-editor"
+}

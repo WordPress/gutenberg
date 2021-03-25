@@ -139,6 +139,36 @@ export default function QueryInspectorControls( {
 		return onChangeDebounced.cancel;
 	}, [ querySearch, onChangeDebounced ] );
 
+	// Returns only the existing term ids (categories/tags) in proper
+	// format to be used in `FormTokenField`. This prevents the component
+	// from crashing in the editor, when non existing term ids were provided.
+	const getExistingTermsFormTokenValue = ( taxonomy ) => {
+		const termsMapper = {
+			category: {
+				queryProp: 'categoryIds',
+				terms: categories,
+			},
+			post_tag: {
+				queryProp: 'tagIds',
+				terms: tags,
+			},
+		};
+		const requestedTerm = termsMapper[ taxonomy ];
+		return ( query[ requestedTerm.queryProp ] || [] ).reduce(
+			( accumulator, termId ) => {
+				const term = requestedTerm.terms.mapById[ termId ];
+				if ( term ) {
+					accumulator.push( {
+						id: termId,
+						value: term.name,
+					} );
+				}
+				return accumulator;
+			},
+			[]
+		);
+	};
+
 	return (
 		<InspectorControls>
 			<CreateNewPostLink type={ postType } />
@@ -204,12 +234,8 @@ export default function QueryInspectorControls( {
 					{ showCategories && categories?.terms?.length > 0 && (
 						<FormTokenField
 							label={ __( 'Categories' ) }
-							value={ ( query.categoryIds || [] ).map(
-								( categoryId ) => ( {
-									id: categoryId,
-									value:
-										categories.mapById[ categoryId ].name,
-								} )
+							value={ getExistingTermsFormTokenValue(
+								'category'
 							) }
 							suggestions={ categories.names }
 							onChange={ onCategoriesChange }
@@ -218,10 +244,9 @@ export default function QueryInspectorControls( {
 					{ showTags && tags?.terms?.length > 0 && (
 						<FormTokenField
 							label={ __( 'Tags' ) }
-							value={ ( query.tagIds || [] ).map( ( tagId ) => ( {
-								id: tagId,
-								value: tags.mapById[ tagId ].name,
-							} ) ) }
+							value={ getExistingTermsFormTokenValue(
+								'post_tag'
+							) }
 							suggestions={ tags.names }
 							onChange={ onTagsChange }
 						/>

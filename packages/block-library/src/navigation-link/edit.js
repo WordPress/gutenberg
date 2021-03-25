@@ -39,13 +39,13 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { link as linkIcon } from '@wordpress/icons';
+import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
+import { ItemSubmenuIcon } from './icons';
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -103,9 +103,10 @@ const useIsDraggingWithin = ( elementRef ) => {
  * /wp/v2/search.
  *
  * @param {string} type Link block's type attribute.
+ * @param {string} kind Link block's entity of kind (post-type|taxonomy)
  * @return {{ type?: string, subtype?: string }} Search query params.
  */
-function getSuggestionsQuery( type ) {
+function getSuggestionsQuery( type, kind ) {
 	switch ( type ) {
 		case 'post':
 		case 'page':
@@ -115,6 +116,12 @@ function getSuggestionsQuery( type ) {
 		case 'tag':
 			return { type: 'term', subtype: 'post_tag' };
 		default:
+			if ( kind === 'taxonomy' ) {
+				return { type: 'term', subtype: type };
+			}
+			if ( kind === 'post-type' ) {
+				return { type: 'post', subtype: type };
+			}
 			return {};
 	}
 }
@@ -137,6 +144,7 @@ export default function NavigationLinkEdit( {
 		description,
 		rel,
 		title,
+		kind,
 	} = attributes;
 	const link = {
 		url,
@@ -152,7 +160,6 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const {
-		isDraggingBlocks,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
@@ -166,7 +173,6 @@ export default function NavigationLinkEdit( {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
-				isDraggingBlocks: _isDraggingBlocks,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -188,7 +194,6 @@ export default function NavigationLinkEdit( {
 					selectedBlockId,
 				] )?.length,
 				numberOfDescendants: descendants,
-				isDraggingBlocks: _isDraggingBlocks(),
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
@@ -289,12 +294,7 @@ export default function NavigationLinkEdit( {
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
 		className: classnames( {
-			'is-editing':
-				( isSelected || isParentOfSelectedBlock ) &&
-				// Don't show the element as editing while dragging.
-				! isDraggingBlocks,
-			// Don't select the element while dragging.
-			'is-selected': isSelected && ! isDraggingBlocks,
+			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasDescendants,
@@ -309,28 +309,56 @@ export default function NavigationLinkEdit( {
 		},
 	} );
 
+	if ( ! url ) {
+		blockProps.onClick = () => setIsLinkOpen( true );
+	}
+
 	const innerBlocksProps = useInnerBlocksProps(
 		{
-			className: classnames( 'wp-block-navigation__container', {
-				'is-parent-of-selected-block':
-					isParentOfSelectedBlock &&
-					// Don't select as parent of selected block while dragging.
-					! isDraggingBlocks,
+			className: classnames( 'wp-block-navigation-link__container', {
+				'is-parent-of-selected-block': isParentOfSelectedBlock,
 			} ),
 		},
 		{
-			allowedBlocks: [ 'core/navigation-link' ],
+			allowedBlocks: [ 'core/navigation-link', 'core/spacer' ],
 			renderAppender:
 				( isSelected && hasDescendants ) ||
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
-				( isDraggingBlocks && hasDescendants )
+				hasDescendants
 					? InnerBlocks.DefaultAppender
 					: false,
 			__experimentalAppenderTagName: 'li',
 		}
 	);
+
+	const classes = classnames( 'wp-block-navigation-link__content', {
+		'wp-block-navigation-link__placeholder': ! url,
+	} );
+
+	let missingText = '';
+	switch ( type ) {
+		case 'post':
+			/* translators: label for missing post in navigation link block */
+			missingText = __( 'Select a post' );
+			break;
+		case 'page':
+			/* translators: label for missing page in navigation link block */
+			missingText = __( 'Select a page' );
+			break;
+		case 'category':
+			/* translators: label for missing category in navigation link block */
+			missingText = __( 'Select a category' );
+			break;
+		case 'tag':
+			/* translators: label for missing tag in navigation link block */
+			missingText = __( 'Select a tag' );
+			break;
+		default:
+			/* translators: label for missing values in navigation link block */
+			missingText = __( 'Add a link' );
+	}
 
 	return (
 		<Fragment>
@@ -352,7 +380,7 @@ export default function NavigationLinkEdit( {
 					/>
 					<ToolbarButton
 						name="submenu"
-						icon={ <ToolbarSubmenuIcon /> }
+						icon={ addSubmenu }
 						title={ __( 'Add submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
@@ -389,38 +417,64 @@ export default function NavigationLinkEdit( {
 				</PanelBody>
 			</InspectorControls>
 			<li { ...blockProps }>
-				<div className="wp-block-navigation-link__content">
-					<RichText
-						ref={ ref }
-						identifier="label"
-						className="wp-block-navigation-link__label"
-						value={ label }
-						onChange={ ( labelValue ) =>
-							setAttributes( { label: labelValue } )
-						}
-						onMerge={ mergeBlocks }
-						onReplace={ onReplace }
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter(
-								createBlock( 'core/navigation-link' )
-							)
-						}
-						aria-label={ __( 'Navigation link text' ) }
-						placeholder={ itemLabelPlaceholder }
-						keepPlaceholderOnFocus
-						withoutInteractiveFormatting
-						allowedFormats={ [
-							'core/bold',
-							'core/italic',
-							'core/image',
-							'core/strikethrough',
-						] }
-					/>
+				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
+				<a className={ classes }>
+					{ /* eslint-enable */ }
+					{ ! url ? (
+						<div className="wp-block-navigation-link__placeholder-text">
+							<KeyboardShortcuts
+								shortcuts={ {
+									enter: () =>
+										isSelected && setIsLinkOpen( true ),
+								} }
+							/>
+							{ missingText }
+						</div>
+					) : (
+						<RichText
+							ref={ ref }
+							identifier="label"
+							className="wp-block-navigation-link__label"
+							value={ label }
+							onChange={ ( labelValue ) =>
+								setAttributes( { label: labelValue } )
+							}
+							onMerge={ mergeBlocks }
+							onReplace={ onReplace }
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( 'core/navigation-link' )
+								)
+							}
+							aria-label={ __( 'Navigation link text' ) }
+							placeholder={ itemLabelPlaceholder }
+							keepPlaceholderOnFocus
+							withoutInteractiveFormatting
+							allowedFormats={ [
+								'core/bold',
+								'core/italic',
+								'core/image',
+								'core/strikethrough',
+							] }
+							onClick={ () => {
+								if ( ! url ) {
+									setIsLinkOpen( true );
+								}
+							} }
+						/>
+					) }
 					{ isLinkOpen && (
 						<Popover
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
+							anchorRef={ listItemRef.current }
 						>
+							<KeyboardShortcuts
+								bindGlobal
+								shortcuts={ {
+									escape: () => setIsLinkOpen( false ),
+								} }
+							/>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
 								value={ link }
@@ -447,7 +501,10 @@ export default function NavigationLinkEdit( {
 								} }
 								noDirectEntry={ !! type }
 								noURLSuggestion={ !! type }
-								suggestionsQuery={ getSuggestionsQuery( type ) }
+								suggestionsQuery={ getSuggestionsQuery(
+									type,
+									kind
+								) }
 								onChange={ ( {
 									title: newTitle = '',
 									url: newURL = '',
@@ -485,7 +542,7 @@ export default function NavigationLinkEdit( {
 							/>
 						</Popover>
 					) }
-				</div>
+				</a>
 				{ hasDescendants && showSubmenuIcon && (
 					<span className="wp-block-navigation-link__submenu-icon">
 						<ItemSubmenuIcon />
