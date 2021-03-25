@@ -72,7 +72,7 @@ export default function Form( { id, idBase, instance, setInstance } ) {
 }
 
 function useForm( { id, idBase, instance, setInstance } ) {
-	const isStillMounted = useRef();
+	const isStillMounted = useRef( false );
 	const [ html, setHTML ] = useState( null );
 	const [ formData, setFormData ] = useState( null );
 
