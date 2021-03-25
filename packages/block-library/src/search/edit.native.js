@@ -182,28 +182,40 @@ export default function SearchEdit( {
 
 	const renderTextField = () => {
 		return (
-			<PlainText
-				ref={ textInputRef }
-				isSelected={ isPlaceholderSelected }
-				className="wp-block-search__input"
-				style={ inputStyle }
-				numberOfLines={ 1 }
-				ellipsizeMode="tail" // currently only works on ios
-				label={ null }
-				value={ placeholder }
-				placeholder={
-					placeholder ? undefined : __( 'Optional placeholder…' )
-				}
-				onChange={ ( newVal ) =>
-					setAttributes( { placeholder: newVal } )
-				}
-				onFocus={ () => {
-					setIsPlaceholderSelected( true );
-					onFocus();
-				} }
-				onBlur={ () => setIsPlaceholderSelected( false ) }
-				placeholderTextColor={ placeholderStyle.color }
-			/>
+			<View
+				style={ styles.searchInputContainer }
+				accessible={ true }
+				accessibilityRole="none"
+				accessibilityHint={ __(
+					'Double tap to edit placeholder text'
+				) }
+				accessibilityLabel={ `${ __(
+					'Search input field. Current placeholder value is'
+				) } ${ placeholder }` }
+			>
+				<PlainText
+					ref={ textInputRef }
+					isSelected={ isPlaceholderSelected }
+					className="wp-block-search__input"
+					style={ inputStyle }
+					numberOfLines={ 1 }
+					ellipsizeMode="tail" // currently only works on ios
+					label={ null }
+					value={ placeholder }
+					placeholder={
+						placeholder ? undefined : __( 'Optional placeholder…' )
+					}
+					onChange={ ( newVal ) =>
+						setAttributes( { placeholder: newVal } )
+					}
+					onFocus={ () => {
+						setIsPlaceholderSelected( true );
+						onFocus();
+					} }
+					onBlur={ () => setIsPlaceholderSelected( false ) }
+					placeholderTextColor={ placeholderStyle.color }
+				/>
+			</View>
 		);
 	};
 
