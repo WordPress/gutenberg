@@ -153,9 +153,9 @@ class VideoEdit extends Component {
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	onSelectMediaUploadOption( { id, url } ) {
+	onSelectMediaUploadOption( { id, url, caption } ) {
 		const { setAttributes } = this.props;
-		setAttributes( { id, src: url } );
+		setAttributes( { id, src: url, caption } );
 	}
 
 	onVideoContanerLayout( event ) {
