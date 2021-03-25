@@ -1,6 +1,6 @@
 <?php
 /**
- * Two columns of text with offset heading
+ * Two columns of text with offset heading.
  *
  * @package WordPress
  */
@@ -9,19 +9,19 @@ return array(
 	'title'       => __( 'Two columns of text with offset heading' ),
 	'categories'  => array( 'columns', 'text' ),
 	'content'     => '<!-- wp:group {"align":"full","style":{"color":{"background":"#f2f0e9"}}} -->
-	<div class="wp-block-group alignfull has-background" style="background-color:#f2f0e9"><!-- wp:columns {"align":"full"} -->
-	<div class="wp-block-columns alignfull"><!-- wp:column {"width":"60%"} -->
-	<div class="wp-block-column" style="flex-basis:60%"><!-- wp:spacer {"height":70} -->
+	<div class="wp-block-group alignfull has-background" style="background-color:#f2f0e9"><!-- wp:columns {"align":"wide"} -->
+	<div class="wp-block-columns alignwide"><!-- wp:column {"width":"50%"} -->
+	<div class="wp-block-column" style="flex-basis:50%"><!-- wp:spacer {"height":70} -->
 	<div style="height:70px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer -->
 	
-	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"5vw"}},"textColor":"black"} -->
-	<p class="has-black-color has-text-color" style="font-size:5vw;line-height:1.1"><strong>' . __( 'Ancient Sea Representations' ) . '</strong></p>
+	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"30px"}},"textColor":"black"} -->
+	<p class="has-black-color has-text-color" style="font-size:30px;line-height:1.1"><strong>' . __( 'Ancient Sea Representations' ) . '</strong></p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column -->
 	
-	<!-- wp:column -->
-	<div class="wp-block-column"><!-- wp:spacer {"height":95} -->
+	<!-- wp:column {"width":"50%"} -->
+	<div class="wp-block-column" style="flex-basis:50%"><!-- wp:spacer {"height":95} -->
 	<div style="height:95px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer -->
 	
@@ -31,8 +31,8 @@ return array(
 	<!-- /wp:column --></div>
 	<!-- /wp:columns -->
 	
-	<!-- wp:columns {"align":"full"} -->
-	<div class="wp-block-columns alignfull"><!-- wp:column -->
+	<!-- wp:columns {"align":"wide"} -->
+	<div class="wp-block-columns alignwide"><!-- wp:column -->
 	<div class="wp-block-column"><!-- wp:spacer {"height":350} -->
 	<div style="height:350px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer --></div>

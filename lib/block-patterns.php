@@ -183,10 +183,9 @@ register_block_pattern(
 $core_block_patterns = array(
 	'media-text-nature',
 	'two-images-gallery',
-	'cover-quote',
-	'two-columns-header',
 	'three-columns-media-text',
 	'quote-2',
+	'large-header-left',
 	'large-header-text-button',
 	'media-text-art',
 	'text-two-columns-title',

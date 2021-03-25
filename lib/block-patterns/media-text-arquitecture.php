@@ -1,6 +1,6 @@
 <?php
 /**
- * Media and text with image on the right
+ * Media and text with image on the right.
  *
  * @package WordPress
  */

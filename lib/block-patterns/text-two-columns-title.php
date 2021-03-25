@@ -1,6 +1,6 @@
 <?php
 /**
- * Two columns text and title
+ * Two columns text and title.
  *
  * @package WordPress
  */
@@ -9,13 +9,13 @@ return array(
 	'title'       => __( 'Two columns text and title' ),
 	'categories'  => array( 'columns', 'text' ),
 	'content'     => '<!-- wp:group -->
-	<div class="wp-block-group"><div class="wp-block-group__inner-container"><!-- wp:heading {"style":{"typography":{"fontSize":38}}} -->
-	<h2 style="font-size:38px"><strong>' . __( 'The voyage had begun, and had begun happily with a soft blue sky, and a calm sea.' ) . '</strong></h2>
+	<div class="wp-block-group"><div class="wp-block-group__inner-container"><!-- wp:heading {"style":{"typography":{"fontSize":38},"typography":{"lineHeight":"1.5"}}} -->
+	<h2 style="font-size:38px;line-height:1.5"><strong>' . __( 'The voyage had begun, and had begun happily with a soft blue sky, and a calm sea.' ) . '</strong></h2>
 	<!-- /wp:heading -->
 	
 	<!-- wp:columns -->
 	<div class="wp-block-columns"><!-- wp:column -->
-	<div class="wp-block-column"><!-- wp:paragraph {"fontSize":"small"} -->
+	<div class="wp-block-column"><!-- wp:paragraph {"style":{"typography":{"fontSize":18}}} -->
 	<p style="font-size:18px">' . __( 'They followed her on to the deck. All the smoke and the houses had disappeared, and the ship was out in a wide space of sea very fresh and clear though pale in the early light. They had left London sitting on its mud. A very thin line of shadow tapered on the horizon, scarcely thick enough to stand the burden of Paris, which nevertheless rested upon it. They were free of roads, free of mankind, and the same exhilaration at their freedom ran through them all.' ) . '</p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column -->

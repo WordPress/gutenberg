@@ -1,6 +1,6 @@
 <?php
 /**
- * Quote
+ * Quote.
  *
  * @package WordPress
  */

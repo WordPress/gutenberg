@@ -1,6 +1,6 @@
 <?php
 /**
- * Two images side by side
+ * Two images side by side.
  *
  * @package WordPress
  */

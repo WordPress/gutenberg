@@ -1,6 +1,6 @@
 <?php
 /**
- * Three columns with offset images
+ * Three columns with offset images.
  *
  * @package WordPress
  */

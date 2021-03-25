@@ -1,6 +1,6 @@
 <?php
 /**
- * Media & text with image on the right
+ * Media & text with image on the right.
  *
  * @package WordPress
  */
@@ -13,8 +13,8 @@ return array(
 	<h2 class="has-text-color" style="color:#000000"><strong>' . __( 'Shore with Blue Sea' ) . '</strong></h2>
 	<!-- /wp:heading -->
 	
-	<!-- wp:paragraph {"style":{"typography":{"fontSize":"17px"},"color":{"text":"#636363"}}} -->
-	<p class="has-text-color" style="color:#636363;font-size:17px">' . __( 'Eleanor Harris&nbsp;(American, 1901-1942)' ) . '</p>
+	<!-- wp:paragraph {"style":{"typography":{"fontSize":"17px"},"color":{"text":"#636363"},"typography":{"lineHeight":"1.1"}}} -->
+	<p class="has-text-color" style="color:#636363;font-size:17px;line-height:1.1">' . __( 'Eleanor Harris&nbsp;(American, 1901-1942)' ) . '</p>
 	<!-- /wp:paragraph --></div></div>
 	<!-- /wp:media-text -->',
 	'description' => _x( 'Media and text block with image to the right and text to the left', 'Block pattern description' ),

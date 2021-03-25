@@ -1,6 +1,6 @@
 <?php
 /**
- * Three columns with images and text
+ * Three columns with images and text.
  *
  * @package WordPress
  */
@@ -14,26 +14,14 @@ return array(
 	<div class="wp-block-column"><!-- wp:spacer -->
 	<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer -->
-	
+
 	<!-- wp:heading {"level":6,"textColor":"black"} -->
 	<h6 class="has-black-color has-text-color">ECOSYSTEM</h6>
 	<!-- /wp:heading -->
-	
+
 	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"5vw"}},"textColor":"black"} -->
-	<p class="has-black-color has-text-color" style="font-size:5vw;line-height:1.1"><strong>' . __( 'Positive growth.' ) . '</strong></p>
+	<p class="has-black-color has-text-color" style="font-size:5vw;line-height:1.1"><strong>Positive growth.</strong></p>
 	<!-- /wp:paragraph --></div>
-	<!-- /wp:column -->
-	
-	<!-- wp:column -->
-	<div class="wp-block-column"><!-- wp:spacer -->
-	<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
-	<!-- /wp:spacer --></div>
-	<!-- /wp:column -->
-	
-	<!-- wp:column -->
-	<div class="wp-block-column"><!-- wp:spacer -->
-	<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
-	<!-- /wp:spacer --></div>
 	<!-- /wp:column --></div>
 	<!-- /wp:columns -->
 	
