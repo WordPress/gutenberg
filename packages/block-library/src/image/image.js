@@ -62,6 +62,7 @@ function getFilename( url ) {
 }
 
 export default function Image( {
+	temporaryURL,
 	attributes: {
 		url = '',
 		alt,
@@ -414,7 +415,7 @@ export default function Image( {
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		<>
 			<img
-				src={ url }
+				src={ temporaryURL || url }
 				alt={ defaultedAlt }
 				onClick={ onImageClick }
 				onError={ () => onImageError() }
@@ -427,7 +428,7 @@ export default function Image( {
 					);
 				} }
 			/>
-			{ isBlobURL( url ) && <Spinner /> }
+			{ temporaryURL && <Spinner /> }
 		</>
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);

@@ -82,10 +82,6 @@ function Editor( {
 		const isFSETheme = getEditorSettings().isFSETheme;
 		const isViewable = getPostType( postType )?.viewable ?? false;
 
-		// Prefetch and parse patterns. This ensures patterns are loaded and parsed when
-		// the editor is loaded rather than degrading the performance of the inserter.
-		select( 'core/block-editor' ).__experimentalGetAllowedPatterns();
-
 		return {
 			hasFixedToolbar:
 				isFeatureActive( 'fixedToolbar' ) ||

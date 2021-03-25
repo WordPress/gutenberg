@@ -6,22 +6,22 @@ import { createBlock } from '@wordpress/blocks';
 const legacyWidgetTransforms = [
 	{
 		block: 'core/calendar',
-		widget: 'WP_Widget_Calendar',
+		widget: 'calendar',
 	},
 	{
 		block: 'core/search',
-		widget: 'WP_Widget_Search',
+		widget: 'search',
 	},
 	{
 		block: 'core/html',
-		widget: 'WP_Widget_Custom_HTML',
+		widget: 'html',
 		transform: ( { content } ) => ( {
 			content,
 		} ),
 	},
 	{
 		block: 'core/archives',
-		widget: 'WP_Widget_Archives',
+		widget: 'archives',
 		transform: ( { count, dropdown } ) => {
 			return {
 				displayAsDropdown: !! dropdown,
@@ -31,7 +31,7 @@ const legacyWidgetTransforms = [
 	},
 	{
 		block: 'core/latest-posts',
-		widget: 'WP_Widget_Recent_Posts',
+		widget: 'recent-posts',
 		transform: ( { show_date: displayPostDate, number } ) => {
 			return {
 				displayPostDate: !! displayPostDate,
@@ -41,7 +41,7 @@ const legacyWidgetTransforms = [
 	},
 	{
 		block: 'core/latest-comments',
-		widget: 'WP_Widget_Recent_Comments',
+		widget: 'recent-comments',
 		transform: ( { number } ) => {
 			return {
 				commentsToShow: number,
@@ -50,7 +50,7 @@ const legacyWidgetTransforms = [
 	},
 	{
 		block: 'core/tag-cloud',
-		widget: 'WP_Widget_Tag_Cloud',
+		widget: 'tag_cloud',
 		transform: ( { taxonomy, count } ) => {
 			return {
 				showTagCounts: !! count,
@@ -60,7 +60,7 @@ const legacyWidgetTransforms = [
 	},
 	{
 		block: 'core/categories',
-		widget: 'WP_Widget_Categories',
+		widget: 'categories',
 		transform: ( { count, dropdown, hierarchical } ) => {
 			return {
 				displayAsDropdown: !! dropdown,
@@ -71,7 +71,7 @@ const legacyWidgetTransforms = [
 	},
 	{
 		block: 'core/audio',
-		widget: 'WP_Widget_Media_Audio',
+		widget: 'media_audio',
 		transform: ( { url, preload, loop, attachment_id: id } ) => {
 			return {
 				src: url,
@@ -83,7 +83,7 @@ const legacyWidgetTransforms = [
 	},
 	{
 		block: 'core/video',
-		widget: 'WP_Widget_Media_Video',
+		widget: 'media_video',
 		transform: ( { url, preload, loop, attachment_id: id } ) => {
 			return {
 				src: url,
@@ -95,7 +95,7 @@ const legacyWidgetTransforms = [
 	},
 	{
 		block: 'core/image',
-		widget: 'WP_Widget_Media_Image',
+		widget: 'media_image',
 		transform: ( {
 			alt,
 			attachment_id: id,
@@ -128,7 +128,7 @@ const legacyWidgetTransforms = [
 	},
 	{
 		block: 'core/gallery',
-		widget: 'WP_Widget_Media_Gallery',
+		widget: 'media_gallery',
 		transform: ( { ids, link_type: linkTo, size, number } ) => {
 			return {
 				ids,
@@ -143,7 +143,7 @@ const legacyWidgetTransforms = [
 	},
 	{
 		block: 'core/rss',
-		widget: 'WP_Widget_RSS',
+		widget: 'rss',
 		transform: ( {
 			url,
 			show_author: displayAuthor,
@@ -164,20 +164,20 @@ const legacyWidgetTransforms = [
 	return {
 		type: 'block',
 		blocks: [ block ],
-		isMatch: ( { widgetClass } ) => {
-			return widgetClass === widget;
+		isMatch: ( { idBase, instance } ) => {
+			return idBase === widget && !! instance?.raw;
 		},
 		transform: ( { instance } ) => {
 			const transformedBlock = createBlock(
 				block,
-				transform ? transform( instance ) : undefined
+				transform ? transform( instance.raw ) : undefined
 			);
-			if ( ! instance || ! instance.title ) {
+			if ( ! instance.raw?.title ) {
 				return transformedBlock;
 			}
 			return [
 				createBlock( 'core/heading', {
-					content: instance.title,
+					content: instance.raw.title,
 				} ),
 				transformedBlock,
 			];

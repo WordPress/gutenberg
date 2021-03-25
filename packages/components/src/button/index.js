@@ -51,6 +51,7 @@ export function Button( props, ref ) {
 
 	if ( isDefault ) {
 		deprecated( 'Button isDefault prop', {
+			since: '5.4',
 			alternative: 'isSecondary',
 		} );
 	}
