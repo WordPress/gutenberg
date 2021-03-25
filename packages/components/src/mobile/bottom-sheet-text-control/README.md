@@ -10,7 +10,7 @@
 // This is a paraphrased example from the image block's edit.native.js file
 import {
 	BottomSheetSelectControl,
-	SmallFooterMessageControlLink,
+	FooterMessageLink,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -34,7 +34,7 @@ const MyTextControl = () => {
 				footerNote={
 					<>
 						{ __( 'A footer note to add to the component! ' ) }
-						<SmallFooterMessageControlLink
+						<FooterMessageLink
 							href={ 'https://wordpress.org/' }
 							value={ __( 'Visit WordPress.org' ) }
 						/>
