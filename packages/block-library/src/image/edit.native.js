@@ -567,7 +567,7 @@ export class ImageEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( coreStore );
-		const { getSettings, getLastBlockInserted } = select(
+		const { getSettings, wasBlockJustInserted } = select(
 			blockEditorStore
 		);
 		const {
@@ -587,15 +587,13 @@ export default compose( [
 				url &&
 				! hasQueryArg( url, 'w' ) );
 
-		const lastBlockInserted = getLastBlockInserted();
-		const wasBlockJustInserted =
-			lastBlockInserted.clientId === clientId &&
-			lastBlockInserted.source === 'inserter_menu';
-
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
-			wasBlockJustInserted,
+			wasBlockJustInserted: wasBlockJustInserted(
+				clientId,
+				'inserter_menu'
+			),
 		};
 	} ),
 	withPreferredColorScheme,

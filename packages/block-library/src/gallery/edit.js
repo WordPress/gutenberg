@@ -100,17 +100,14 @@ function GalleryEdit( props ) {
 		wasBlockJustInserted,
 	} = useSelect( ( select ) => {
 		const settings = select( blockEditorStore ).getSettings();
-		const lastBlockInserted = select(
-			blockEditorStore
-		).getLastBlockInserted();
 
 		return {
 			imageSizes: settings.imageSizes,
 			mediaUpload: settings.mediaUpload,
 			getMedia: select( coreStore ).getMedia,
-			wasBlockJustInserted:
-				lastBlockInserted.clientId === clientId &&
-				lastBlockInserted.source === 'inserter_menu',
+			wasBlockJustInserted: select(
+				blockEditorStore
+			).wasBlockJustInserted( clientId, 'inserter_menu' ),
 		};
 	} );
 

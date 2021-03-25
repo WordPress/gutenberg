@@ -43,15 +43,6 @@ import { Platform } from '@wordpress/element';
  *                                 text value. See `wp.richText.create`.
  */
 
-/**
- * Last block selected object.
- *
- * @typedef {Object} WPLastBlockInserted
- *
- * @property {string}   clientId	Block client ID.
- * @property {string}   source      The source from where it was inserted.
- */
-
 // Module constants
 const MILLISECONDS_PER_HOUR = 3600 * 1000;
 const MILLISECONDS_PER_DAY = 24 * 3600 * 1000;
@@ -2098,19 +2089,14 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
  * Tells if the block with the passed clientId was just inserted.
  *
  * @param {Object} state Global application state.
- * @param {Object} clientId client id of the block.
- * @return {boolean} If the client id exists within the lastBlockInserted state then the block was just inserted.
+ * @param {Object} clientId Client Id of the block.
+ * @param {boolean} source Insertion source of the block.
+ * @return {boolean} True if the block matches the last block inserted from the specified source.
  */
-export function wasBlockJustInserted( state, clientId ) {
-	return state.lastBlockInserted.clientId === clientId;
-}
-
-/**
- * Returns the last block inserted. If multiple blocks were inserted it returns the first item.
- *
- * @param {Object} state Global application state.
- * @return {?WPLastBlockInserted} Last inserted block.
- */
-export function getLastBlockInserted( state ) {
-	return state.lastBlockInserted;
+export function wasBlockJustInserted( state, clientId, source ) {
+	const { lastBlockInserted } = state;
+	return (
+		lastBlockInserted.clientId === clientId &&
+		lastBlockInserted.source === source
+	);
 }
