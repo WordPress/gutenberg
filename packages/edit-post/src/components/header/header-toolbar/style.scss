@@ -93,15 +93,7 @@
 }
 
 // Block toolbar when fixed to the top of the screen.
-.edit-post-header-toolbar__block-toolbar {
-	// Stack toolbar below Editor Bar.
-	position: absolute;
-	top: $header-height + $border-width;
-	left: 0;
-	right: 0;
-	background: $white;
-	border-bottom: $border-width solid $gray-300;
-
+.edit-post-header__block-toolbar {
 	&:empty {
 		display: none;
 	}
@@ -124,32 +116,6 @@
 		.is-sidebar-opened & {
 			display: block;
 			right: $sidebar-width;
-		}
-	}
-
-	// Move toolbar into top Editor Bar.
-	@include break-wide {
-		&:not(.is-pushed-down) {
-			position: static;
-			left: auto;
-			right: auto;
-			background: none;
-			border-bottom: none;
-
-			.is-sidebar-opened & {
-				right: auto;
-			}
-
-			.block-editor-block-toolbar {
-				border-left: $border-width solid $gray-300;
-			}
-
-			.block-editor-block-toolbar .components-toolbar-group,
-			.block-editor-block-toolbar .components-toolbar {
-				$top-toolbar-padding: ($header-height - $grid-unit-60) / 2;
-				height: $header-height;
-				padding: $top-toolbar-padding 0;
-			}
 		}
 	}
 }
@@ -176,24 +142,5 @@
 
 	.edit-post-header-toolbar__left > * + * {
 		margin-left: $grid-unit-10;
-	}
-
-	// Always display block toolbar under main toolbar when text labels are visible
-	.edit-post-header-toolbar__block-toolbar {
-		@include break-wide {
-			position: absolute;
-			top: $header-height + $border-width;
-			left: 0;
-			right: 0;
-			border-bottom: $border-width solid $gray-300;
-			padding: 0;
-			background-color: $white;
-
-			.block-editor-block-toolbar .components-toolbar-group,
-			.block-editor-block-toolbar .components-toolbar {
-				height: auto;
-				padding: 0;
-			}
-		}
 	}
 }

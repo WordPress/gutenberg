@@ -28,7 +28,7 @@
 }
 
 /* Move the block toolbar to the top */
-.edit-post-header-toolbar__block-toolbar {
+.edit-post-header__block-toolbar {
     top: 0px;
 }
 

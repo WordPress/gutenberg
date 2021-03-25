@@ -3,7 +3,7 @@
  */
 export async function openDocumentSettingsSidebar() {
 	const openButton = await page.$(
-		'.edit-post-header__settings button[aria-label="Settings"][aria-expanded="false"]'
+		'.edit-post-header__toolbar-settings button[aria-label="Settings"][aria-expanded="false"]'
 	);
 
 	if ( openButton ) {

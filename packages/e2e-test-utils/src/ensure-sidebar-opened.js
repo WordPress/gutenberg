@@ -11,7 +11,7 @@ export async function ensureSidebarOpened() {
 		return page.$eval( '.edit-post-sidebar', () => {} );
 	} catch ( error ) {
 		return page.click(
-			'.edit-post-header__settings [aria-label="Settings"]'
+			'.edit-post-header__toolbar-settings [aria-label="Settings"]'
 		);
 	}
 }
