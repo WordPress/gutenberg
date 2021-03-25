@@ -21,7 +21,7 @@ export default function PreviewIframe( { idBase, instance, isVisible } ) {
 		if ( isVisible ) {
 			adjustHeight();
 		}
-	}, [ isVisible ] );
+	}, [ isVisible, adjustHeight ] );
 
 	return (
 		<Disabled hidden={ ! isVisible }>
