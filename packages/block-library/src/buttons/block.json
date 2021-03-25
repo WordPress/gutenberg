@@ -14,5 +14,7 @@
 	"supports": {
 		"anchor": true,
 		"align": [ "wide", "full" ]
-	}
+	},
+	"editorStyle": "wp-block-buttons-editor",
+	"style": "wp-block-buttons"
 }

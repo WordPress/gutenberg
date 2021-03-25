@@ -27,17 +27,11 @@ export function TextTransformEdit( props ) {
 		attributes: { style },
 		setAttributes,
 	} = props;
-	const textTransforms = useEditorFeature( 'typography.textTransforms' );
 	const isDisabled = useIsTextTransformDisabled( props );
 
 	if ( isDisabled ) {
 		return null;
 	}
-
-	const textTransform = getTextTransformFromAttributeValue(
-		textTransforms,
-		style?.typography?.textTransform
-	);
 
 	function onChange( newTransform ) {
 		setAttributes( {
@@ -53,8 +47,7 @@ export function TextTransformEdit( props ) {
 
 	return (
 		<TextTransformControl
-			value={ textTransform }
-			textTransforms={ textTransforms }
+			value={ style?.typography?.textTransform }
 			onChange={ onChange }
 		/>
 	);
@@ -71,28 +64,8 @@ export function useIsTextTransformDisabled( { name: blockName } = {} ) {
 		blockName,
 		TEXT_TRANSFORM_SUPPORT_KEY
 	);
-	const textTransforms = useEditorFeature( 'typography.textTransforms' );
-	const hasTextTransforms = !! textTransforms?.length;
-
+	const hasTextTransforms = useEditorFeature(
+		'typography.customTextTransforms'
+	);
 	return notSupported || ! hasTextTransforms;
 }
-
-/**
- * Extracts the current text transform selection, if available, from the CSS
- * variable set as the `styles.typography.textTransform` attribute.
- *
- * @param  {Array}  textTransforms Available text transforms as defined in theme.json.
- * @param  {string} value          Attribute value in `styles.typography.textTransform`
- * @return {string}                Actual text transform value
- */
-const getTextTransformFromAttributeValue = ( textTransforms, value ) => {
-	const attributeParsed = /var:preset\|text-transform\|(.+)/.exec( value );
-
-	if ( attributeParsed && attributeParsed[ 1 ] ) {
-		return textTransforms.find(
-			( { slug } ) => slug === attributeParsed[ 1 ]
-		)?.slug;
-	}
-
-	return value;
-};

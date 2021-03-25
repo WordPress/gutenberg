@@ -114,7 +114,7 @@ describe( 'getColumnWidths', () => {
 
 describe( 'getRedistributedColumnWidths', () => {
 	describe( 'explicit width', () => {
-		const blocks = [
+		let blocks = [
 			{ clientId: 'a', attributes: { width: 30 } },
 			{ clientId: 'b', attributes: { width: 40 } },
 		];
@@ -123,8 +123,8 @@ describe( 'getRedistributedColumnWidths', () => {
 			const widths = getRedistributedColumnWidths( blocks, 60 );
 
 			expect( widths ).toEqual( {
-				a: 25,
-				b: 35,
+				a: 25.71,
+				b: 34.29,
 			} );
 		} );
 
@@ -132,8 +132,36 @@ describe( 'getRedistributedColumnWidths', () => {
 			const widths = getRedistributedColumnWidths( blocks, 80 );
 
 			expect( widths ).toEqual( {
-				a: 35,
-				b: 45,
+				a: 34.29,
+				b: 45.71,
+			} );
+		} );
+
+		it( 'should decrease proportionally for third column', () => {
+			blocks = [
+				{ clientId: 'a', attributes: { width: 99 } },
+				{ clientId: 'b', attributes: { width: 1 } },
+			];
+			const widths = getRedistributedColumnWidths( blocks, 66.67 );
+
+			expect( widths ).toEqual( {
+				a: 66,
+				b: 0.67,
+			} );
+		} );
+
+		it( 'should decrease proportionally for fourth column', () => {
+			blocks = [
+				{ clientId: 'a', attributes: { width: 98 } },
+				{ clientId: 'b', attributes: { width: 1 } },
+				{ clientId: 'c', attributes: { width: 1 } },
+			];
+			const widths = getRedistributedColumnWidths( blocks, 75 );
+
+			expect( widths ).toEqual( {
+				a: 73.5,
+				b: 0.75,
+				c: 0.75,
 			} );
 		} );
 	} );

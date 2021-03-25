@@ -22,7 +22,11 @@ import { withInstanceId, withSafeTimeout, compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { isURL } from '@wordpress/url';
 
-/* eslint-disable jsx-a11y/no-autofocus */
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 class URLInput extends Component {
 	constructor( props ) {
 		super( props );
@@ -96,6 +100,7 @@ class URLInput extends Component {
 	}
 
 	componentWillUnmount() {
+		this.suggestionsRequest?.cancel?.();
 		delete this.suggestionsRequest;
 	}
 
@@ -393,7 +398,6 @@ class URLInput extends Component {
 			placeholder = __( 'Paste URL or type to search' ),
 			__experimentalRenderControl: renderControl,
 			value = '',
-			autoFocus = true,
 		} = this.props;
 
 		const {
@@ -415,7 +419,6 @@ class URLInput extends Component {
 		const inputProps = {
 			value,
 			required: true,
-			autoFocus,
 			className: 'block-editor-url-input__input',
 			type: 'text',
 			onChange: this.onChange,
@@ -539,10 +542,9 @@ class URLInput extends Component {
 		return null;
 	}
 }
-/* eslint-enable jsx-a11y/no-autofocus */
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md
  */
 export default compose(
 	withSafeTimeout,
@@ -554,7 +556,7 @@ export default compose(
 		if ( isFunction( props.__experimentalFetchLinkSuggestions ) ) {
 			return;
 		}
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return {
 			__experimentalFetchLinkSuggestions: getSettings()
 				.__experimentalFetchLinkSuggestions,

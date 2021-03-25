@@ -7,6 +7,7 @@ import { share as icon } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import deprecated from './deprecated';
 import edit from './edit';
 import metadata from './block.json';
 import save from './save';
@@ -16,7 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Social Icons' ),
+	title: _x( 'Social Icons', 'block title' ),
 	description: __(
 		'Display icons linking to your social media profiles or websites.'
 	),
@@ -54,4 +55,5 @@ export const settings = {
 	icon,
 	edit,
 	save,
+	deprecated,
 };

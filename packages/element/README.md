@@ -180,7 +180,7 @@ _Related_
 
 _Parameters_
 
--   _child_ (unknown type): Any renderable child, such as an element, string, or fragment.
+-   _child_ `import('./react').WPElement`: Any renderable child, such as an element, string, or fragment.
 -   _container_ `HTMLElement`: DOM node into which element should be rendered.
 
 <a name="createRef" href="#createRef">#</a> **createRef**
@@ -199,7 +199,7 @@ Finds the dom node of a React component.
 
 _Parameters_
 
--   _component_ (unknown type): Component's instance.
+-   _component_ `import('./react').WPComponent`: Component's instance.
 
 <a name="forwardRef" href="#forwardRef">#</a> **forwardRef**
 
@@ -265,9 +265,7 @@ This is the same concept as the React Native implementation.
 
 _Related_
 
--   <https://facebook.github.io/react-native/docs/platform-specific-code#platform-module>
-
-Here is an example of how to use the select method:
+-   <https://facebook.github.io/react-native/docs/platform-specific-code#platform-module> Here is an example of how to use the select method:
 
 _Usage_
 
@@ -301,7 +299,7 @@ Renders a given element into the target DOM node.
 
 _Parameters_
 
--   _element_ (unknown type): Element to render.
+-   _element_ `import('./react').WPElement`: Element to render.
 -   _target_ `HTMLElement`: DOM node into which element should be rendered.
 
 <a name="renderToString" href="#renderToString">#</a> **renderToString**
@@ -310,7 +308,7 @@ Serializes a React element to string.
 
 _Parameters_
 
--   _element_ (unknown type): Element to serialize.
+-   _element_ `import('react').ReactNode`: Element to serialize.
 -   _context_ `[Object]`: Context object.
 -   _legacyContext_ `[Object]`: Legacy context object.
 

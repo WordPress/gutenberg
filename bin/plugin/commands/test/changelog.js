@@ -33,16 +33,7 @@ describe( 'getNormalizedTitle', () => {
 			undefined,
 			{
 				...DEFAULT_ISSUE,
-				labels: [ { name: 'Mobile App Compatibility' } ],
-			},
-		],
-		[
-			'omits project management',
-			'Add codeowner',
-			undefined,
-			{
-				...DEFAULT_ISSUE,
-				labels: [ { name: '[Type] Project Management' } ],
+				labels: [ { name: 'Mobile App Android/iOS' } ],
 			},
 		],
 		[

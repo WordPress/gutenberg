@@ -149,6 +149,14 @@ The rendered children. If the children is a `Function`, it will be called with a
 -   Type: `React.ReactNode | Function`
 -   Required: No
 
+###### buttonProps
+
+Props that are passed to the `Button` component in the `PanelBodyTitle` within the panel body.
+
+-   Type: `Object`
+-   Required: No
+-   Default: `{}`
+
 ---
 
 #### PanelRow

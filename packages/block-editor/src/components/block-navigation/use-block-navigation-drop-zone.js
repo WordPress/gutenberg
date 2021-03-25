@@ -10,6 +10,7 @@ import { useEffect, useRef, useState } from '@wordpress/element';
  */
 import { getDistanceToNearestEdge } from '../../utils/math';
 import useOnBlockDrop from '../use-on-block-drop';
+import { store as blockEditorStore } from '../../store';
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
 /** @typedef {import('@wordpress/element').RefObject} RefObject */
@@ -63,7 +64,7 @@ function useDropTargetBlocksData( ref, position, dragEventType ) {
 		getDraggedBlockClientIds,
 		canInsertBlocks,
 	} = useSelect( ( select ) => {
-		const selectors = select( 'core/block-editor' );
+		const selectors = select( blockEditorStore );
 		return {
 			canInsertBlocks: selectors.canInsertBlocks,
 			getBlockRootClientId: selectors.getBlockRootClientId,

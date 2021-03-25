@@ -36,8 +36,9 @@ import {
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
-	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
-	__experimentalBlockFullHeightAligmentToolbar as FullHeightAlignment,
+	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
+	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { withDispatch } from '@wordpress/data';
@@ -235,15 +236,51 @@ function useCoverIsDark( url, dimRatio = 50, overlayColor, elementRef ) {
 	return isDark;
 }
 
+function mediaPosition( { x, y } ) {
+	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
+}
+
+function CoverPlaceholder( {
+	hasBackground = false,
+	children,
+	noticeUI,
+	noticeOperations,
+	onSelectMedia,
+} ) {
+	const { removeAllNotices, createErrorNotice } = noticeOperations;
+	return (
+		<MediaPlaceholder
+			icon={ <BlockIcon icon={ icon } /> }
+			labels={ {
+				title: __( 'Cover' ),
+				instructions: __(
+					'Upload an image or video file, or pick one from your media library.'
+				),
+			} }
+			onSelect={ onSelectMedia }
+			accept="image/*,video/*"
+			allowedTypes={ ALLOWED_MEDIA_TYPES }
+			notices={ noticeUI }
+			disableMediaButtons={ hasBackground }
+			onError={ ( message ) => {
+				removeAllNotices();
+				createErrorNotice( message );
+			} }
+		>
+			{ children }
+		</MediaPlaceholder>
+	);
+}
+
 function CoverEdit( {
 	attributes,
-	setAttributes,
 	isSelected,
 	noticeUI,
+	noticeOperations,
 	overlayColor,
+	setAttributes,
 	setOverlayColor,
 	toggleSelection,
-	noticeOperations,
 } ) {
 	const {
 		contentPosition,
@@ -324,64 +361,70 @@ function CoverEdit( {
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
-	const { removeAllNotices, createErrorNotice } = noticeOperations;
 
 	const minHeightWithUnit = minHeightUnit
 		? `${ minHeight }${ minHeightUnit }`
 		: minHeight;
 
+	const isImgElement = ! ( hasParallax || isRepeated );
+
 	const style = {
-		...( isImageBackground ? backgroundImageStyles( url ) : {} ),
+		...( isImageBackground && ! isImgElement
+			? backgroundImageStyles( url )
+			: {
+					backgroundImage: gradientValue ? gradientValue : undefined,
+			  } ),
 		backgroundColor: overlayColor.color,
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
-	if ( gradientValue && ! url ) {
-		style.background = gradientValue;
-	}
-
-	let positionValue;
-
-	if ( focalPoint ) {
-		positionValue = `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`;
-		if ( isImageBackground ) {
-			style.backgroundPosition = positionValue;
-		}
-	}
+	const mediaStyle = {
+		objectPosition:
+			focalPoint && isImgElement
+				? mediaPosition( focalPoint )
+				: undefined,
+	};
 
 	const hasBackground = !! ( url || overlayColor.color || gradientValue );
 	const showFocalPointPicker =
 		isVideoBackground ||
 		( isImageBackground && ( ! hasParallax || isRepeated ) );
 
+	const imperativeFocalPointPreview = ( value ) => {
+		const [ styleOfRef, property ] = isDarkElement.current
+			? [ isDarkElement.current.style, 'objectPosition' ]
+			: [ ref.current.style, 'backgroundPosition' ];
+		styleOfRef[ property ] = mediaPosition( value );
+	};
+
 	const controls = (
 		<>
-			<BlockControls>
-				<FullHeightAlignment
+			<BlockControls group="block">
+				<BlockAlignmentMatrixControl
+					label={ __( 'Change content position' ) }
+					value={ contentPosition }
+					onChange={ ( nextPosition ) =>
+						setAttributes( {
+							contentPosition: nextPosition,
+						} )
+					}
+					isDisabled={ ! hasBackground }
+				/>
+				<FullHeightAlignmentControl
 					isActive={ isMinFullHeight }
 					onToggle={ toggleMinFullHeight }
+					isDisabled={ ! hasBackground }
 				/>
-				{ hasBackground && (
-					<>
-						<BlockAlignmentMatrixToolbar
-							label={ __( 'Change content position' ) }
-							value={ contentPosition }
-							onChange={ ( nextPosition ) =>
-								setAttributes( {
-									contentPosition: nextPosition,
-								} )
-							}
-						/>
-
-						<MediaReplaceFlow
-							mediaId={ id }
-							mediaURL={ url }
-							allowedTypes={ ALLOWED_MEDIA_TYPES }
-							accept="image/*,video/*"
-							onSelect={ onSelectMedia }
-						/>
-					</>
-				) }
+			</BlockControls>
+			<BlockControls group="other">
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ url }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					accept="image/*,video/*"
+					onSelect={ onSelectMedia }
+					name={ ! url ? __( 'Add Media' ) : __( 'Replace' ) }
+				/>
 			</BlockControls>
 			<InspectorControls>
 				{ !! url && (
@@ -406,6 +449,8 @@ function CoverEdit( {
 								label={ __( 'Focal point picker' ) }
 								url={ url }
 								value={ focalPoint }
+								onDragStart={ imperativeFocalPointPreview }
+								onDrag={ imperativeFocalPointPreview }
 								onChange={ ( newFocalPoint ) =>
 									setAttributes( {
 										focalPoint: newFocalPoint,
@@ -435,58 +480,55 @@ function CoverEdit( {
 						</PanelRow>
 					</PanelBody>
 				) }
-				{ hasBackground && (
-					<>
-						<PanelBody title={ __( 'Dimensions' ) }>
-							<CoverHeightInput
-								value={ temporaryMinHeight || minHeight }
-								unit={ minHeightUnit }
-								onChange={ ( newMinHeight ) =>
-									setAttributes( { minHeight: newMinHeight } )
-								}
-								onUnitChange={ ( nextUnit ) =>
-									setAttributes( {
-										minHeightUnit: nextUnit,
-									} )
-								}
-							/>
-						</PanelBody>
-						<PanelColorGradientSettings
-							title={ __( 'Overlay' ) }
-							initialOpen={ true }
-							settings={ [
-								{
-									colorValue: overlayColor.color,
-									gradientValue,
-									onColorChange: setOverlayColor,
-									onGradientChange: setGradient,
-									label: __( 'Color' ),
-								},
-							] }
-						>
-							{ !! url && (
-								<RangeControl
-									label={ __( 'Opacity' ) }
-									value={ dimRatio }
-									onChange={ ( newDimRation ) =>
-										setAttributes( {
-											dimRatio: newDimRation,
-										} )
-									}
-									min={ 0 }
-									max={ 100 }
-									step={ 10 }
-									required
-								/>
-							) }
-						</PanelColorGradientSettings>
-					</>
-				) }
+				<PanelBody title={ __( 'Dimensions' ) }>
+					<CoverHeightInput
+						value={ temporaryMinHeight || minHeight }
+						unit={ minHeightUnit }
+						onChange={ ( newMinHeight ) =>
+							setAttributes( { minHeight: newMinHeight } )
+						}
+						onUnitChange={ ( nextUnit ) =>
+							setAttributes( {
+								minHeightUnit: nextUnit,
+							} )
+						}
+					/>
+				</PanelBody>
+				<PanelColorGradientSettings
+					title={ __( 'Overlay' ) }
+					initialOpen={ true }
+					settings={ [
+						{
+							colorValue: overlayColor.color,
+							gradientValue,
+							onColorChange: setOverlayColor,
+							onGradientChange: setGradient,
+							label: __( 'Color' ),
+						},
+					] }
+				>
+					{ !! url && (
+						<RangeControl
+							label={ __( 'Opacity' ) }
+							value={ dimRatio }
+							onChange={ ( newDimRation ) =>
+								setAttributes( {
+									dimRatio: newDimRation,
+								} )
+							}
+							min={ 0 }
+							max={ 100 }
+							step={ 10 }
+							required
+						/>
+					) }
+				</PanelColorGradientSettings>
 			</InspectorControls>
 		</>
 	);
 
-	const blockProps = useBlockProps();
+	const ref = useRef();
+	const blockProps = useBlockProps( { ref } );
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',
@@ -498,9 +540,6 @@ function CoverEdit( {
 	);
 
 	if ( ! hasBackground ) {
-		const placeholderIcon = <BlockIcon icon={ icon } />;
-		const label = __( 'Cover' );
-
 		return (
 			<>
 				{ controls }
@@ -511,22 +550,10 @@ function CoverEdit( {
 						blockProps.className
 					) }
 				>
-					<MediaPlaceholder
-						icon={ placeholderIcon }
-						labels={ {
-							title: label,
-							instructions: __(
-								'Upload an image or video file, or pick one from your media library.'
-							),
-						} }
-						onSelect={ onSelectMedia }
-						accept="image/*,video/*"
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						notices={ noticeUI }
-						onError={ ( message ) => {
-							removeAllNotices();
-							createErrorNotice( message );
-						} }
+					<CoverPlaceholder
+						noticeUI={ noticeUI }
+						onSelectMedia={ onSelectMedia }
+						noticeOperations={ noticeOperations }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
@@ -536,7 +563,7 @@ function CoverEdit( {
 								clearable={ false }
 							/>
 						</div>
-					</MediaPlaceholder>
+					</CoverPlaceholder>
 				</div>
 			</>
 		);
@@ -587,18 +614,6 @@ function CoverEdit( {
 					} }
 					showHandle={ isSelected }
 				/>
-				{ isImageBackground && (
-					// Used only to programmatically check if the image is dark or not
-					<img
-						ref={ isDarkElement }
-						aria-hidden
-						alt=""
-						style={ {
-							display: 'none',
-						} }
-						src={ url }
-					/>
-				) }
 				{ url && gradientValue && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
@@ -606,10 +621,19 @@ function CoverEdit( {
 							'wp-block-cover__gradient-background',
 							gradientClass
 						) }
-						style={ { background: gradientValue } }
+						style={ { backgroundImage: gradientValue } }
 					/>
 				) }
-				{ isVideoBackground && (
+				{ url && isImageBackground && isImgElement && (
+					<img
+						ref={ isDarkElement }
+						className="wp-block-cover__image-background"
+						alt=""
+						src={ url }
+						style={ mediaStyle }
+					/>
+				) }
+				{ url && isVideoBackground && (
 					<video
 						ref={ isDarkElement }
 						className="wp-block-cover__video-background"
@@ -617,10 +641,16 @@ function CoverEdit( {
 						muted
 						loop
 						src={ url }
-						style={ { objectPosition: positionValue } }
+						style={ mediaStyle }
 					/>
 				) }
 				{ isBlogUrl && <Spinner /> }
+				<CoverPlaceholder
+					hasBackground={ hasBackground }
+					noticeUI={ noticeUI }
+					onSelectMedia={ onSelectMedia }
+					noticeOperations={ noticeOperations }
+				/>
 				<div { ...innerBlocksProps } />
 			</div>
 		</>
@@ -629,7 +659,7 @@ function CoverEdit( {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( 'core/block-editor' );
+		const { toggleSelection } = dispatch( blockEditorStore );
 
 		return {
 			toggleSelection,

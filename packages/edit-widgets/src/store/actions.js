@@ -1,19 +1,13 @@
 /**
- * External dependencies
- */
-import { invert } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { dispatch as dataDispatch } from '@wordpress/data';
-
+import { store as noticesStore } from '@wordpress/notices';
+import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import { STATE_SUCCESS } from './batch-processing/constants';
-import { dispatch, select, getWidgetToClientIdMapping } from './controls';
+import { dispatch, select } from './controls';
 import { transformBlockToWidget } from './transformers';
 import {
 	buildWidgetAreaPostId,
@@ -23,6 +17,7 @@ import {
 	POST_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
 } from './utils';
+import { STORE_NAME as editWidgetsStoreName } from './constants';
 
 /**
  * Persists a stub post with given ID to core data store. The post is meant to be in-memory only and
@@ -48,7 +43,7 @@ export const persistStubPost = function* ( id, blocks ) {
 
 export function* saveEditedWidgetAreas() {
 	const editedWidgetAreas = yield select(
-		'core/edit-widgets',
+		editWidgetsStoreName,
 		'getEditedWidgetAreas'
 	);
 	if ( ! editedWidgetAreas?.length ) {
@@ -57,7 +52,7 @@ export function* saveEditedWidgetAreas() {
 	try {
 		yield* saveWidgetAreas( editedWidgetAreas );
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createSuccessNotice',
 			__( 'Widgets saved.' ),
 			{
@@ -66,7 +61,7 @@ export function* saveEditedWidgetAreas() {
 		);
 	} catch ( e ) {
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
 			/* translators: %s: The error message. */
 			sprintf( __( 'There was an error. %s' ), e.message ),
@@ -96,9 +91,7 @@ export function* saveWidgetAreas( widgetAreas ) {
 }
 
 export function* saveWidgetArea( widgetAreaId ) {
-	const widgets = yield select( 'core/edit-widgets', 'getWidgets' );
-	const widgetIdToClientId = yield getWidgetToClientIdMapping();
-	const clientIdToWidgetId = invert( widgetIdToClientId );
+	const widgets = yield select( editWidgetsStoreName, 'getWidgets' );
 
 	const post = yield select(
 		'core',
@@ -110,23 +103,22 @@ export function* saveWidgetArea( widgetAreaId ) {
 
 	// Remove all duplicate reference widget instances
 	const usedReferenceWidgets = [];
-	const widgetsBlocks = post.blocks.filter(
-		( { attributes: { referenceWidgetName } } ) => {
-			if ( referenceWidgetName ) {
-				if ( usedReferenceWidgets.includes( referenceWidgetName ) ) {
-					return false;
-				}
-				usedReferenceWidgets.push( referenceWidgetName );
+	const widgetsBlocks = post.blocks.filter( ( { attributes: { id } } ) => {
+		if ( id ) {
+			if ( usedReferenceWidgets.includes( id ) ) {
+				return false;
 			}
-			return true;
+			usedReferenceWidgets.push( id );
 		}
-	);
+		return true;
+	} );
 
 	const batchMeta = [];
+	const batchTasks = [];
 	const sidebarWidgetsIds = [];
 	for ( let i = 0; i < widgetsBlocks.length; i++ ) {
 		const block = widgetsBlocks[ i ];
-		const widgetId = clientIdToWidgetId[ block.clientId ];
+		const widgetId = block.attributes.__internalWidgetId;
 		const oldWidget = widgets[ widgetId ];
 		const widget = transformBlockToWidget( block, oldWidget );
 		// We'll replace the null widgetId after save, but we track it here
@@ -158,18 +150,16 @@ export function* saveWidgetArea( widgetAreaId ) {
 				continue;
 			}
 
-			dataDispatch( 'core' ).saveEditedEntityRecord(
-				'root',
-				'widget',
-				widgetId,
-				widget
+			batchTasks.push( ( { saveEditedEntityRecord } ) =>
+				saveEditedEntityRecord( 'root', 'widget', widgetId )
 			);
 		} else {
-			// This is a new widget instance.
-			dataDispatch( 'core' ).saveEntityRecord( 'root', 'widget', {
-				...widget,
-				sidebar: widgetAreaId,
-			} );
+			batchTasks.push( ( { saveEntityRecord } ) =>
+				saveEntityRecord( 'root', 'widget', {
+					...widget,
+					sidebar: widgetAreaId,
+				} )
+			);
 		}
 
 		batchMeta.push( {
@@ -179,26 +169,31 @@ export function* saveWidgetArea( widgetAreaId ) {
 		} );
 	}
 
-	const batch = yield dispatch(
-		'core/__experimental-batch-processing',
-		'processBatch',
-		'WIDGETS_API_FETCH',
-		'default'
-	);
+	const records = yield dispatch( 'core', '__experimentalBatch', batchTasks );
 
-	if ( batch.state !== STATE_SUCCESS ) {
-		const errors = batch.sortedItemIds.map( ( id ) => batch.errors[ id ] );
-		const failedWidgetNames = [];
+	const failedWidgetNames = [];
 
-		for ( let i = 0; i < errors.length; i++ ) {
-			if ( ! errors[ i ] ) {
-				continue;
-			}
+	for ( let i = 0; i < records.length; i++ ) {
+		const widget = records[ i ];
+		const { block, position } = batchMeta[ i ];
 
-			const { block } = batchMeta[ i ];
+		const error = yield select(
+			'core',
+			'getLastEntitySaveError',
+			'root',
+			'widget',
+			widget.id
+		);
+		if ( error ) {
 			failedWidgetNames.push( block.attributes?.name || block?.name );
 		}
 
+		if ( ! sidebarWidgetsIds[ position ] ) {
+			sidebarWidgetsIds[ position ] = widget.id;
+		}
+	}
+
+	if ( failedWidgetNames.length ) {
 		throw new Error(
 			sprintf(
 				/* translators: %s: List of widget names */
@@ -206,18 +201,6 @@ export function* saveWidgetArea( widgetAreaId ) {
 				failedWidgetNames.join( ', ' )
 			)
 		);
-	}
-
-	for ( let i = 0; i < batch.sortedItemIds.length; i++ ) {
-		const itemId = batch.sortedItemIds[ i ];
-		const widget = batch.results[ itemId ];
-		const { clientId, position } = batchMeta[ i ];
-		if ( ! sidebarWidgetsIds[ position ] ) {
-			sidebarWidgetsIds[ position ] = widget.id;
-		}
-		if ( clientId !== widgetIdToClientId[ widget.id ] ) {
-			yield setWidgetIdForClientId( clientId, widget.id );
-		}
 	}
 
 	yield dispatch(
@@ -333,8 +316,8 @@ export function setIsInserterOpened( value ) {
  */
 export function* closeGeneralSidebar() {
 	yield dispatch(
-		'core/interface',
+		interfaceStore.name,
 		'disableComplementaryArea',
-		'core/edit-widgets'
+		editWidgetsStoreName
 	);
 }

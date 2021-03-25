@@ -1,6 +1,6 @@
 # Enforce adding translator comments (i18n-translator-comments)
 
-If using [translation functions](https://github.com/WordPress/gutenberg/blob/master/packages/i18n/README.md#api) with placeholders in them,
+If using [translation functions](https://github.com/WordPress/gutenberg/blob/HEAD/packages/i18n/README.md#api) with placeholders in them,
 they need accompanying translator comments.
 
 ## Rule details

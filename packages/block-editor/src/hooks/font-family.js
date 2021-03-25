@@ -20,9 +20,12 @@ export const FONT_FAMILY_SUPPORT_KEY = '__experimentalFontFamily';
 const getFontFamilyFromAttributeValue = ( fontFamilies, value ) => {
 	const attributeParsed = /var:preset\|font-family\|(.+)/.exec( value );
 	if ( attributeParsed && attributeParsed[ 1 ] ) {
-		return find( fontFamilies, ( { slug } ) => {
+		const fontFamilyObject = find( fontFamilies, ( { slug } ) => {
 			return slug === attributeParsed[ 1 ];
-		} ).fontFamily;
+		} );
+		if ( fontFamilyObject ) {
+			return fontFamilyObject.fontFamily;
+		}
 	}
 	return value;
 };

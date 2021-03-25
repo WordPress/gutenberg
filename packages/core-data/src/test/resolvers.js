@@ -316,7 +316,7 @@ describe( 'getAutosaves', () => {
 		);
 	} );
 
-	it( ' yields undefined if no autosaves exist for the post', async () => {
+	it( 'yields undefined if no autosaves exist for the post', async () => {
 		const postType = 'post';
 		const postId = 1;
 		const restBase = 'posts';

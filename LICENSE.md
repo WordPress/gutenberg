@@ -1,6 +1,6 @@
 ### WordPress - Web publishing software
 
-    Copyright 2011-2020 by the contributors
+    Copyright 2011-2021 by the contributors
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
@@ -34,14 +34,14 @@ and
     Copyright 2003-2010 by the contributors
 
     WordPress is released under the GPL
-  
+
 ---
 
 ### GNU GENERAL PUBLIC LICENSE
 
 Version 2, June 1991
 
-    Copyright (C) 1989, 1991 Free Software Foundation, Inc.  
+    Copyright (C) 1989, 1991 Free Software Foundation, Inc.
     51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 
     Everyone is permitted to copy and distribute verbatim copies
@@ -135,17 +135,17 @@ portion of it, thus forming a work based on the Program, and copy and
 distribute such modifications or work under the terms of Section 1
 above, provided that you also meet all of these conditions:
 
-  
+
 **a)** You must cause the modified files to carry prominent notices
 stating that you changed the files and the date of any change.
 
-  
+
 **b)** You must cause any work that you distribute or publish, that in
 whole or in part contains or is derived from the Program or any part
 thereof, to be licensed as a whole at no charge to all third parties
 under the terms of this License.
 
-  
+
 **c)** If the modified program normally reads commands interactively
 when run, you must cause it, when started running for such interactive
 use in the most ordinary way, to print or display an announcement
@@ -182,12 +182,12 @@ the scope of this License.
 under Section 2) in object code or executable form under the terms of
 Sections 1 and 2 above provided that you also do one of the following:
 
-  
+
 **a)** Accompany it with the complete corresponding machine-readable
 source code, which must be distributed under the terms of Sections 1
 and 2 above on a medium customarily used for software interchange; or,
 
-  
+
 **b)** Accompany it with a written offer, valid for at least three
 years, to give any third party, for a charge no more than your cost of
 physically performing source distribution, a complete machine-readable
@@ -195,7 +195,7 @@ copy of the corresponding source code, to be distributed under the
 terms of Sections 1 and 2 above on a medium customarily used for
 software interchange; or,
 
-  
+
 **c)** Accompany it with the information you received as to the offer
 to distribute corresponding source code. (This alternative is allowed
 only for noncommercial distribution and only if you received the
@@ -370,7 +370,7 @@ when it starts in an interactive mode:
     Gnomovision version 69, Copyright (C) year name of author
     Gnomovision comes with ABSOLUTELY NO WARRANTY; for details
     type `show w'.  This is free software, and you are welcome
-    to redistribute it under certain conditions; type `show c' 
+    to redistribute it under certain conditions; type `show c'
     for details.
 
 The hypothetical commands \`show w' and \`show c' should show the
@@ -385,7 +385,7 @@ if necessary. Here is a sample; alter the names:
 
     Yoyodyne, Inc., hereby disclaims all copyright
     interest in the program `Gnomovision'
-    (which makes passes at compilers) written 
+    (which makes passes at compilers) written
     by James Hacker.
 
     signature of Ty Coon, 1 April 1989

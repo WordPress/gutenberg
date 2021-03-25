@@ -6,11 +6,17 @@ import { get, find, forEach, camelCase, isString } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
 
 /* Supporting data */
-export const GLOBAL_CONTEXT_NAME = 'global';
-export const GLOBAL_CONTEXT_SELECTOR = ':root';
-export const GLOBAL_CONTEXT_SUPPORTS = [
+export const ALL_BLOCKS_NAME = 'defaults';
+export const ALL_BLOCKS_SELECTOR = ':root';
+export const ROOT_BLOCK_NAME = 'root';
+export const ROOT_BLOCK_SELECTOR = ':root';
+export const ROOT_BLOCK_SUPPORTS = [
 	'--wp--style--color--link',
 	'background',
 	'backgroundColor',
@@ -26,7 +32,7 @@ export const GLOBAL_CONTEXT_SUPPORTS = [
 
 export const PRESET_METADATA = [
 	{
-		path: [ 'settings', 'color', 'palette' ],
+		path: [ 'color', 'palette' ],
 		valueKey: 'color',
 		cssVarInfix: 'color',
 		classes: [
@@ -38,7 +44,7 @@ export const PRESET_METADATA = [
 		],
 	},
 	{
-		path: [ 'settings', 'color', 'gradients' ],
+		path: [ 'color', 'gradients' ],
 		valueKey: 'gradient',
 		cssVarInfix: 'gradient',
 		classes: [
@@ -49,49 +55,16 @@ export const PRESET_METADATA = [
 		],
 	},
 	{
-		path: [ 'settings', 'typography', 'fontSizes' ],
+		path: [ 'typography', 'fontSizes' ],
 		valueKey: 'size',
 		cssVarInfix: 'font-size',
 		classes: [ { classSuffix: 'font-size', propertyName: 'font-size' } ],
 	},
 	{
-		path: [ 'settings', 'typography', 'fontFamilies' ],
+		path: [ 'typography', 'fontFamilies' ],
 		valueKey: 'fontFamily',
 		cssVarInfix: 'font-family',
 		classes: [],
-	},
-	{
-		path: [ 'settings', 'typography', 'fontStyles' ],
-		valueKey: 'value',
-		cssVarInfix: 'font-style',
-		classes: [ { classSuffix: 'font-style', propertyName: 'font-style' } ],
-	},
-	{
-		path: [ 'settings', 'typography', 'fontWeights' ],
-		valueKey: 'value',
-		cssVarInfix: 'font-weight',
-		classes: [
-			{ classSuffix: 'font-weight', propertyName: 'font-weight' },
-		],
-	},
-	{
-		path: [ 'settings', 'typography', 'textDecorations' ],
-		valueKey: 'value',
-		cssVarInfix: 'text-decoration',
-		classes: [
-			{
-				classSuffix: 'text-decoration',
-				propertyName: 'text-decoration',
-			},
-		],
-	},
-	{
-		path: [ 'settings', 'typography', 'textTransforms' ],
-		valueKey: 'slug',
-		cssVarInfix: 'text-transform',
-		classes: [
-			{ classSuffix: 'text-transform', propertyName: 'text-transform' },
-		],
 	},
 ];
 
@@ -119,12 +92,9 @@ function getPresetMetadataFromStyleProperty( styleProperty ) {
 export const LINK_COLOR = '--wp--style--color--link';
 export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`;
 
-export function useEditorFeature(
-	featurePath,
-	blockName = GLOBAL_CONTEXT_NAME
-) {
+export function useEditorFeature( featurePath, blockName = ALL_BLOCKS_NAME ) {
 	const settings = useSelect( ( select ) => {
-		return select( 'core/edit-site' ).getSettings();
+		return select( editSiteStore ).getSettings();
 	} );
 	return (
 		get(
@@ -133,7 +103,7 @@ export function useEditorFeature(
 		) ??
 		get(
 			settings,
-			`__experimentalFeatures.${ GLOBAL_CONTEXT_NAME }.${ featurePath }`
+			`__experimentalFeatures.${ ALL_BLOCKS_NAME }.${ featurePath }`
 		)
 	);
 }
@@ -149,7 +119,7 @@ export function getPresetVariable( styles, blockName, propertyName, value ) {
 	const { valueKey, path, cssVarInfix } = presetData;
 	const presets =
 		get( styles, [ blockName, ...path ] ) ??
-		get( styles, [ GLOBAL_CONTEXT_NAME, ...path ] );
+		get( styles, [ ALL_BLOCKS_NAME, ...path ] );
 	const presetObject = find( presets, ( preset ) => {
 		return preset[ valueKey ] === value;
 	} );
@@ -172,7 +142,7 @@ function getValueFromPresetVariable(
 	}
 	const presets =
 		get( styles, [ blockName, ...presetData.path ] ) ??
-		get( styles, [ GLOBAL_CONTEXT_NAME, ...presetData.path ] );
+		get( styles, [ ALL_BLOCKS_NAME, ...presetData.path ] );
 	if ( ! presets ) {
 		return variable;
 	}
@@ -190,7 +160,7 @@ function getValueFromPresetVariable(
 function getValueFromCustomVariable( styles, blockName, variable, path ) {
 	const result =
 		get( styles, [ blockName, 'settings', 'custom', ...path ] ) ??
-		get( styles, [ GLOBAL_CONTEXT_NAME, 'settings', 'custom', ...path ] );
+		get( styles, [ ALL_BLOCKS_NAME, 'settings', 'custom', ...path ] );
 	if ( ! result ) {
 		return variable;
 	}

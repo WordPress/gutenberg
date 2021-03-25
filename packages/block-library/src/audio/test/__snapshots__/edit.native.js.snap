@@ -1,0 +1,376 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Audio block renders audio block error state without crashing 1`] = `
+<View
+  accessible={true}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+>
+  <View
+    pointerEvents="box-none"
+    style={
+      Array [
+        undefined,
+        undefined,
+      ]
+    }
+  >
+    <View
+      style={
+        Array [
+          undefined,
+          undefined,
+          undefined,
+        ]
+      }
+    />
+    Modal
+    <View
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "height": 44,
+        }
+      }
+    >
+      <View>
+        Svg
+      </View>
+      <View
+        style={Object {}}
+      >
+        <Text>
+          59IrU0WJtq
+        </Text>
+        <View>
+          Svg
+          <Text
+            style={Object {}}
+          >
+            Failed to insert audio file. Please tap for options.
+          </Text>
+        </View>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "height": 44,
+        },
+        false,
+      ]
+    }
+  >
+    <View
+      accessibilityLabel="Audio caption. Empty"
+      accessibilityRole="button"
+      accessible={true}
+      style={
+        Object {
+          "display": "none",
+          "flex": 1,
+        }
+      }
+    >
+      <View>
+        <RCTAztecView
+          accessible={true}
+          activeFormats={Array []}
+          blockType={
+            Object {
+              "tag": "p",
+            }
+          }
+          deleteEnter={true}
+          disableEditingMenu={false}
+          focusable={true}
+          fontFamily="serif"
+          fontSize={14}
+          isMultiline={false}
+          maxImagesWidth={200}
+          onBackspace={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onClick={[Function]}
+          onContentSizeChange={[Function]}
+          onEnter={[Function]}
+          onFocus={[Function]}
+          onHTMLContentWithCursor={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onSelectionChange={[Function]}
+          onStartShouldSetResponder={[Function]}
+          placeholder="Write caption…"
+          placeholderTextColor="gray"
+          style={
+            Object {
+              "backgroundColor": undefined,
+              "maxWidth": undefined,
+              "minHeight": 0,
+            }
+          }
+          text={
+            Object {
+              "eventCount": undefined,
+              "linkTextColor": undefined,
+              "selection": null,
+              "text": "",
+            }
+          }
+          textAlign="center"
+          triggerKeyCodes={Array []}
+        />
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Audio block renders audio file without crashing 1`] = `
+<View
+  accessible={true}
+  focusable={true}
+  onClick={[Function]}
+  onResponderGrant={[Function]}
+  onResponderMove={[Function]}
+  onResponderRelease={[Function]}
+  onResponderTerminate={[Function]}
+  onResponderTerminationRequest={[Function]}
+  onStartShouldSetResponder={[Function]}
+>
+  <View
+    pointerEvents="box-none"
+    style={
+      Array [
+        undefined,
+        undefined,
+      ]
+    }
+  >
+    <View
+      style={
+        Array [
+          undefined,
+          undefined,
+          undefined,
+        ]
+      }
+    />
+    Modal
+    <View
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Object {
+          "height": 44,
+        }
+      }
+    >
+      <View>
+        Svg
+      </View>
+      <View
+        style={Object {}}
+      >
+        <Text>
+          59IrU0WJtq
+        </Text>
+        <View>
+          <Text
+            style={Object {}}
+          >
+            MP3 audio file
+          </Text>
+        </View>
+      </View>
+      <View
+        accessibilityHint="Double tap to listen the audio file"
+        accessibilityLabel="Audio Player"
+        accessibilityRole="button"
+        accessible={true}
+        focusable={true}
+        onClick={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+      >
+        <Text
+          style={
+            Object {
+              "color": "white",
+            }
+          }
+        >
+          OPEN
+        </Text>
+      </View>
+    </View>
+  </View>
+  <View
+    style={
+      Array [
+        Object {
+          "height": 44,
+        },
+        false,
+      ]
+    }
+  >
+    <View
+      accessibilityLabel="Audio caption. Empty"
+      accessibilityRole="button"
+      accessible={true}
+      style={
+        Object {
+          "display": "none",
+          "flex": 1,
+        }
+      }
+    >
+      <View>
+        <RCTAztecView
+          accessible={true}
+          activeFormats={Array []}
+          blockType={
+            Object {
+              "tag": "p",
+            }
+          }
+          deleteEnter={true}
+          disableEditingMenu={false}
+          focusable={true}
+          fontFamily="serif"
+          fontSize={14}
+          isMultiline={false}
+          maxImagesWidth={200}
+          onBackspace={[Function]}
+          onBlur={[Function]}
+          onChange={[Function]}
+          onClick={[Function]}
+          onContentSizeChange={[Function]}
+          onEnter={[Function]}
+          onFocus={[Function]}
+          onHTMLContentWithCursor={[Function]}
+          onKeyDown={[Function]}
+          onPaste={[Function]}
+          onResponderGrant={[Function]}
+          onResponderMove={[Function]}
+          onResponderRelease={[Function]}
+          onResponderTerminate={[Function]}
+          onResponderTerminationRequest={[Function]}
+          onSelectionChange={[Function]}
+          onStartShouldSetResponder={[Function]}
+          placeholder="Write caption…"
+          placeholderTextColor="gray"
+          style={
+            Object {
+              "backgroundColor": undefined,
+              "maxWidth": undefined,
+              "minHeight": 0,
+            }
+          }
+          text={
+            Object {
+              "eventCount": undefined,
+              "linkTextColor": undefined,
+              "selection": null,
+              "text": "",
+            }
+          }
+          textAlign="center"
+          triggerKeyCodes={Array []}
+        />
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Audio block renders placeholder without crashing 1`] = `
+<View>
+  <View
+    style={
+      Object {
+        "flex": 1,
+      }
+    }
+  >
+    <View
+      accessibilityHint="Double tap to select an audio file"
+      accessibilityLabel="Audio block. Empty"
+      accessibilityRole="button"
+      accessible={true}
+      focusable={true}
+      onClick={[Function]}
+      onResponderGrant={[Function]}
+      onResponderMove={[Function]}
+      onResponderRelease={[Function]}
+      onResponderTerminate={[Function]}
+      onResponderTerminationRequest={[Function]}
+      onStartShouldSetResponder={[Function]}
+      style={
+        Array [
+          Array [
+            undefined,
+            undefined,
+            undefined,
+          ],
+          undefined,
+        ]
+      }
+    >
+      Modal
+      <View
+        style={
+          Object {
+            "fill": "gray",
+          }
+        }
+      >
+        <View
+          style={Object {}}
+        >
+          Svg
+        </View>
+      </View>
+      <Text>
+        Audio
+      </Text>
+      <Text>
+        ADD AUDIO
+      </Text>
+    </View>
+  </View>
+</View>
+`;

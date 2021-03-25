@@ -19,9 +19,9 @@ import {
  * @param  {Object}  $1.attributes             The format attributes.
  * @param  {Object}  $1.unregisteredAttributes The unregistered format
  *                                             attributes.
- * @param  {boolean} $1.object                 Wether or not it is an object
+ * @param  {boolean} $1.object                 Whether or not it is an object
  *                                             format.
- * @param  {boolean} $1.boundaryClass          Wether or not to apply a boundary
+ * @param  {boolean} $1.boundaryClass          Whether or not to apply a boundary
  *                                             class.
  * @return {Object}                            Information to be used for
  *                                             element creation.

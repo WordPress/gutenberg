@@ -80,6 +80,7 @@ describe( 'getNotificationArgumentsForSaveSuccess()', () => {
 			[ previousPostStatus, postStatus, isViewable ],
 			expectedValue,
 		] ) => {
+			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				previousPost.status = previousPostStatus;
 				post.status = postStatus;
@@ -147,6 +148,7 @@ describe( 'getNotificationArgumentsForSaveFail()', () => {
 			[ postStatus, editsStatus ],
 			expectedValue,
 		] ) => {
+			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				post.status = postStatus;
 				error.code = errorCode;
@@ -180,6 +182,7 @@ describe( 'getNotificationArgumentsForTrashFail()', () => {
 			'Trashing failed',
 		],
 	].forEach( ( [ description, error, message ] ) => {
+		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const expectedValue = [ message, { id: TRASH_POST_NOTICE_ID } ];
 			expect( getNotificationArgumentsForTrashFail( { error } ) ).toEqual(

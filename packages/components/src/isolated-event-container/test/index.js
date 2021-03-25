@@ -16,6 +16,7 @@ describe( 'IsolatedEventContainer', () => {
 
 		expect( isolated.hasClass( 'test' ) ).toBe( true );
 		expect( isolated.prop( 'onClick' ) ).toBe( 'click' );
+		expect( console ).toHaveWarned();
 	} );
 
 	it( 'should stop mousedown event propagation', () => {

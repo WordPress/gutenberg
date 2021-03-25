@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import React from 'react';
-import ReactNative, {
+import {
+	findNodeHandle,
 	requireNativeComponent,
 	UIManager,
 	TouchableWithoutFeedback,
@@ -12,11 +12,12 @@ import TextInputState from 'react-native/Libraries/Components/TextInput/TextInpu
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import { ENTER, BACKSPACE } from '@wordpress/keycodes';
 
 const AztecManager = UIManager.getViewManagerConfig( 'RCTAztecView' );
 
-class AztecView extends React.Component {
+class AztecView extends Component {
 	constructor() {
 		super( ...arguments );
 		this._onContentSizeChange = this._onContentSizeChange.bind( this );
@@ -39,7 +40,7 @@ class AztecView extends React.Component {
 	dispatch( command, params ) {
 		params = params || [];
 		UIManager.dispatchViewManagerCommand(
-			ReactNative.findNodeHandle( this ),
+			findNodeHandle( this ),
 			command,
 			params
 		);
@@ -125,7 +126,7 @@ class AztecView extends React.Component {
 
 	_onBlur( event ) {
 		this.selectionEndCaretY = null;
-		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
+		TextInputState.blurTextInput( findNodeHandle( this ) );
 
 		if ( ! this.props.onBlur ) {
 			return;
@@ -177,18 +178,16 @@ class AztecView extends React.Component {
 	}
 
 	blur() {
-		TextInputState.blurTextInput( ReactNative.findNodeHandle( this ) );
+		TextInputState.blurTextInput( findNodeHandle( this ) );
 	}
 
 	focus() {
-		TextInputState.focusTextInput( ReactNative.findNodeHandle( this ) );
+		TextInputState.focusTextInput( findNodeHandle( this ) );
 	}
 
 	isFocused() {
 		const focusedField = TextInputState.currentlyFocusedField();
-		return (
-			focusedField && focusedField === ReactNative.findNodeHandle( this )
-		);
+		return focusedField && focusedField === findNodeHandle( this );
 	}
 
 	_onPress( event ) {

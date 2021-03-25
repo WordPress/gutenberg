@@ -3,6 +3,11 @@
  */
 import { select, dispatch } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as richTextStore } from './store';
+
 /** @typedef {import('./register-format-type').RichTextFormatType} RichTextFormatType */
 
 /**
@@ -15,14 +20,14 @@ import { select, dispatch } from '@wordpress/data';
  *                                        otherwise `undefined`.
  */
 export function unregisterFormatType( name ) {
-	const oldFormat = select( 'core/rich-text' ).getFormatType( name );
+	const oldFormat = select( richTextStore ).getFormatType( name );
 
 	if ( ! oldFormat ) {
 		window.console.error( `Format ${ name } is not registered.` );
 		return;
 	}
 
-	dispatch( 'core/rich-text' ).removeFormatTypes( name );
+	dispatch( richTextStore ).removeFormatTypes( name );
 
 	return oldFormat;
 }

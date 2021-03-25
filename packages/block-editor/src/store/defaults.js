@@ -12,7 +12,7 @@ export const PREFERENCES_DEFAULTS = {
  *
  * @typedef {Object} SETTINGS_DEFAULT
  * @property {boolean} alignWide Enable/Disable Wide/Full Alignments
- * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
+ * @property {boolean} supportsLayout Enable/disable layouts support in container blocks.
  * @property {boolean} imageEditing Image Editing settings set to false to disable.
  * @property {Array} imageSizes Available image sizes
  * @property {number} maxWidth Max width to constraint resizing
@@ -20,7 +20,6 @@ export const PREFERENCES_DEFAULTS = {
  * @property {boolean} hasFixedToolbar Whether or not the editor toolbar is fixed
  * @property {boolean} focusMode Whether the focus mode is enabled or not
  * @property {Array} styles Editor Styles
- * @property {boolean} isRTL Whether the editor is in RTL mode
  * @property {boolean} keepCaretInsideBlock Whether caret should move between blocks in edit mode
  * @property {string} bodyPlaceholder Empty post placeholder
  * @property {string} titlePlaceholder Empty title placeholder
@@ -32,6 +31,8 @@ export const PREFERENCES_DEFAULTS = {
  */
 export const SETTINGS_DEFAULTS = {
 	alignWide: false,
+	supportsLayout: true,
+
 	// colors setting is not used anymore now defaults are passed from theme.json on the server and core has its own defaults.
 	// The setting is only kept for backward compatibility purposes.
 	colors: [
@@ -122,6 +123,9 @@ export const SETTINGS_DEFAULTS = {
 		},
 	],
 
+	// Image default size slug.
+	imageDefaultSize: 'large',
+
 	imageSizes: [
 		{ slug: 'thumbnail', name: __( 'Thumbnail' ) },
 		{ slug: 'medium', name: __( 'Medium' ) },
@@ -145,7 +149,6 @@ export const SETTINGS_DEFAULTS = {
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes: null,
 
-	availableLegacyWidgets: {},
 	__experimentalCanUserUseUnfilteredHTML: false,
 	__experimentalBlockDirectory: false,
 	__mobileEnablePageTemplates: false,

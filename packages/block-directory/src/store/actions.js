@@ -2,9 +2,10 @@
  * WordPress dependencies
  */
 import { store as blocksStore } from '@wordpress/blocks';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -95,6 +96,19 @@ export function* installBlockType( block ) {
 			);
 		}
 
+		yield controls.dispatch(
+			noticesStore,
+			'createInfoNotice',
+			sprintf(
+				// translators: %s is the block title.
+				__( 'Block %s installed and added.' ),
+				block.title
+			),
+			{
+				speak: true,
+				type: 'snackbar',
+			}
+		);
 		success = true;
 	} catch ( error ) {
 		let message = error.message || __( 'An error occurred.' );
@@ -118,6 +132,10 @@ export function* installBlockType( block ) {
 		}
 
 		yield setErrorNotice( id, message, isFatal );
+		yield controls.dispatch( noticesStore, 'createErrorNotice', message, {
+			speak: true,
+			isDismissible: true,
+		} );
 	}
 	yield setIsInstalling( block.id, false );
 	return success;
@@ -144,7 +162,7 @@ export function* uninstallBlockType( block ) {
 		yield removeInstalledBlockType( block );
 	} catch ( error ) {
 		yield controls.dispatch(
-			'core/notices',
+			noticesStore,
 			'createErrorNotice',
 			error.message || __( 'An error occurred.' )
 		);

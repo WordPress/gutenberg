@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { has, get, startsWith, mapValues } from 'lodash';
+import { capitalize, get, has, omitBy, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
 import {
+	getBlockSupport,
 	hasBlockSupport,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 } from '@wordpress/blocks';
@@ -16,6 +17,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
 import { SPACING_SUPPORT_KEY, PaddingEdit } from './padding';
@@ -23,6 +25,7 @@ import SpacingPanelControl from '../components/spacing-panel-control';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
+	BORDER_SUPPORT_KEY,
 	COLOR_SUPPORT_KEY,
 	SPACING_SUPPORT_KEY,
 ];
@@ -52,18 +55,21 @@ function compileStyleValue( uncompiledValue ) {
  */
 export function getInlineStyles( styles = {} ) {
 	const output = {};
-	const styleProperties = mapValues( STYLE_PROPERTY, ( prop ) => prop.value );
-	Object.entries( styleProperties ).forEach(
-		( [ styleKey, ...otherObjectKeys ] ) => {
-			const [ objectKeys ] = otherObjectKeys;
-
-			if ( has( styles, objectKeys ) ) {
-				output[ styleKey ] = compileStyleValue(
-					get( styles, objectKeys )
-				);
+	Object.keys( STYLE_PROPERTY ).forEach( ( propKey ) => {
+		const path = STYLE_PROPERTY[ propKey ].value;
+		const subPaths = STYLE_PROPERTY[ propKey ].properties;
+		if ( has( styles, path ) ) {
+			if ( !! subPaths ) {
+				subPaths.forEach( ( suffix ) => {
+					output[
+						propKey + capitalize( suffix )
+					] = compileStyleValue( get( styles, [ ...path, suffix ] ) );
+				} );
+			} else {
+				output[ propKey ] = compileStyleValue( get( styles, path ) );
 			}
 		}
-	);
+	} );
 
 	return output;
 }
@@ -92,6 +98,22 @@ function addAttribute( settings ) {
 }
 
 /**
+ * Filters a style object returning only the keys
+ * that are serializable for a given block.
+ *
+ * @param {Object} style Input style object to filter.
+ * @param {Object} blockSupports Info about block supports.
+ * @return {Object} Filtered style.
+ */
+export function omitKeysNotToSerialize( style, blockSupports ) {
+	return omitBy(
+		style,
+		( value, key ) =>
+			!! blockSupports[ key ]?.__experimentalSkipSerialization
+	);
+}
+
+/**
  * Override props assigned to save component to inject the CSS variables definition.
  *
  * @param  {Object} props      Additional props applied to save element
@@ -105,8 +127,12 @@ export function addSaveProps( props, blockType, attributes ) {
 	}
 
 	const { style } = attributes;
+	const filteredStyle = omitKeysNotToSerialize( style, {
+		border: getBlockSupport( blockType, BORDER_SUPPORT_KEY ),
+		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
+	} );
 	props.style = {
-		...getInlineStyles( style ),
+		...getInlineStyles( filteredStyle ),
 		...props.style,
 	};
 
@@ -156,6 +182,7 @@ export const withBlockControls = createHigherOrderComponent(
 
 		return [
 			<TypographyPanel key="typography" { ...props } />,
+			<BorderPanel key="border" { ...props } />,
 			<ColorEdit key="colors" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
 			hasSpacingSupport && (

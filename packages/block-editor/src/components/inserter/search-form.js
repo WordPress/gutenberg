@@ -12,14 +12,16 @@ import { VisuallyHidden, Button } from '@wordpress/components';
 import { Icon, search, closeSmall } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
-function InserterSearchForm( { className, onChange, value, placeholder } ) {
+function InserterSearchForm( {
+	className,
+	onChange,
+	value,
+	label,
+	placeholder,
+} ) {
 	const instanceId = useInstanceId( InserterSearchForm );
 	const searchInput = useRef();
 
-	// Disable reason (no-autofocus): The inserter menu is a modal display, not one which
-	// is always visible, and one which already incurs this behavior of autoFocus via
-	// Popover's focusOnMount.
-	/* eslint-disable jsx-a11y/no-autofocus */
 	return (
 		<div
 			className={ classnames(
@@ -31,7 +33,7 @@ function InserterSearchForm( { className, onChange, value, placeholder } ) {
 				as="label"
 				htmlFor={ `block-editor-inserter__search-${ instanceId }` }
 			>
-				{ placeholder }
+				{ label || placeholder }
 			</VisuallyHidden>
 			<input
 				ref={ searchInput }
@@ -39,7 +41,6 @@ function InserterSearchForm( { className, onChange, value, placeholder } ) {
 				id={ `block-editor-inserter__search-${ instanceId }` }
 				type="search"
 				placeholder={ placeholder }
-				autoFocus
 				onChange={ ( event ) => onChange( event.target.value ) }
 				autoComplete="off"
 				value={ value || '' }
@@ -59,7 +60,6 @@ function InserterSearchForm( { className, onChange, value, placeholder } ) {
 			</div>
 		</div>
 	);
-	/* eslint-enable jsx-a11y/no-autofocus */
 }
 
 export default InserterSearchForm;

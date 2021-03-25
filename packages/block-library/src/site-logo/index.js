@@ -1,22 +1,30 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
+import { siteLogo as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import metadata from './block.json';
-import icon from './icon';
 import edit from './edit';
 
 const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Site Logo' ),
+	title: _x( 'Site Logo', 'block title' ),
 	description: __( 'Show a site logo' ),
 	icon,
+	styles: [
+		{
+			name: 'default',
+			label: _x( 'Default', 'block style' ),
+			isDefault: true,
+		},
+		{ name: 'rounded', label: _x( 'Rounded', 'block style' ) },
+	],
 	supports: {
 		align: true,
 		alignWide: false,

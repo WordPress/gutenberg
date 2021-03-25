@@ -15,7 +15,7 @@ When creating a new package, you need to provide at least the following:
     	"author": "The WordPress Contributors",
     	"license": "GPL-2.0-or-later",
     	"keywords": [ "wordpress" ],
-    	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/package-name/README.md",
+    	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/package-name/README.md",
     	"repository": {
     		"type": "git",
     		"url": "https://github.com/WordPress/gutenberg.git"
@@ -27,7 +27,7 @@ When creating a new package, you need to provide at least the following:
     	"module": "build-module/index.js",
     	"react-native": "src/index",
     	"dependencies": {
-    		"@babel/runtime": "^7.12.5"
+    		"@babel/runtime": "^7.13.10"
     	},
     	"publishConfig": {
     		"access": "public"
@@ -47,12 +47,13 @@ When creating a new package, you need to provide at least the following:
     - API documentation, if applicable ([more info](#maintaining-api-documentation))
     - `Code is Poetry` logo (`<br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>`)
 4. `CHANGELOG.md` file containing at least:
+
     ```
-    <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+    <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
-	## Unreleased
+    ## Unreleased
 
-	Initial release.
+    Initial release.
     ```
 
 ## Managing Dependencies
@@ -65,7 +66,7 @@ Production dependencies are stored in the `dependencies` section of the packageâ
 
 #### Adding New Dependencies
 
-The simplest way to add a production dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/master/commands/add#readme) command from the root of the project.
+The simplest way to add a production dependency to one of the packages is to run a very convenient [lerna add](https://github.com/lerna/lerna/tree/HEAD/commands/add#readme) command from the root of the project.
 
 _Example:_
 
@@ -84,11 +85,10 @@ _Example:_
 ```diff
 +++ b/packages/scripts/package.json
 @@ -43,7 +43,6 @@
-                "check-node-version": "^3.1.1",
+                "check-node-version": "^4.1.0",
                 "cross-spawn": "^5.1.0",
                 "eslint": "^7.1.0",
--               "jest": "^25.3.0",
-                "jest-puppeteer": "^4.4.0",
+-               "jest": "^26.6.3",
                 "minimist": "^1.2.0",
                 "npm-package-json-lint": "^3.6.0",
 ```
@@ -98,8 +98,9 @@ Next, you need to run `npm install` in the root of the project to ensure that `p
 #### Updating Existing Dependencies
 
 This is the most confusing part of working with [lerna] which causes a lot of hassles for contributors. The most successful strategy so far is to do the following:
- 1. First, remove the existing dependency as described in the previous section.
- 2. Next, add the same dependency back as described in the first section of this chapter. This time it wil get the latest version applied unless you enforce a different version explicitly.
+
+1.  First, remove the existing dependency as described in the previous section.
+2.  Next, add the same dependency back as described in the first section of this chapter. This time it wil get the latest version applied unless you enforce a different version explicitly.
 
 ### Development Dependencies
 
@@ -150,7 +151,7 @@ For each pull request, you should always include relevant changes in a "Unreleas
 _Example:_
 
 ```md
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
 
@@ -171,7 +172,7 @@ While other section naming can be used when appropriate, it's important that are
 
 When in doubt, refer to [Semantic Versioning specification](https://semver.org/).
 
-If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](https://github.com/WordPress/gutenberg/blob/master/docs/contributors/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
+If you are publishing new versions of packages, note that there are versioning recommendations outlined in the [Gutenberg Release Process document](/docs/contributors/release.md) which prescribe _minimum_ version bumps for specific types of releases. The chosen version should be the greater of the two between the semantic versioning and Gutenberg release minimum version bumps.
 
 ## Releasing Packages
 
@@ -304,7 +305,10 @@ If your package includes a few files with side effects, you can list them instea
 ```json
 {
 	"name": "package",
-	"sideEffects": [ "file-with-side-effects.js", "another-file-with-side-effects.js" ]
+	"sideEffects": [
+		"file-with-side-effects.js",
+		"another-file-with-side-effects.js"
+	]
 }
 ```
 

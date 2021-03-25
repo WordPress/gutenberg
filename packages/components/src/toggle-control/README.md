@@ -48,6 +48,14 @@ If no value is passed the toggle will be unchecked.
 - Type: `Boolean`
 - Required: No
 
+### disabled
+
+If disabled is true the toggle will be disabled and apply the appropriate styles.
+
+- Type: `Boolean`
+- Required: No
+
+
 ### onChange
 
 A function that receives the checked state (boolean) as input.

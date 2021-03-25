@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -14,7 +14,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Post Hierarchical Terms' ),
+	title: _x( 'Post Hierarchical Terms', 'block title' ),
 	variations,
 	edit,
 };

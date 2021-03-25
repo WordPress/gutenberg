@@ -99,10 +99,7 @@ exports.imageShorteHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <p>rock music approaches at high velocity.</p>
 <!-- /wp:paragraph -->`;
 
-exports.unsupportedBlockHtml = `<!-- wp:audio -->
-<figure class="wp-block-audio"><audio controls src="https://www2.cs.uic.edu/~i101/SoundFiles/StarWars60.wav"></audio></figure>
-<!-- /wp:audio -->
-`;
+exports.unsupportedBlockHtml = `<!-- wp:jetpack/gif {"giphyUrl":"https://giphy.com/embed/3orieS4jfHJaKwkeli","searchText":"example"} /-->`;
 
 exports.columnsWithDifferentUnitsHtml = `<!-- wp:columns -->
 <div class="wp-block-columns"><!-- wp:column {"width":"35%"} -->
@@ -136,3 +133,7 @@ exports.coverHeightWithRemUnit = `<!-- wp:cover {"customOverlayColor":"#ffffff",
 exports.fileBlockPlaceholder = `<!-- wp:file {"id":3,"href":"https://wordpress.org/latest.zip"} -->
 <div class="wp-block-file"><a href="https://wordpress.org/latest.zip">WordPress.zip</a><a href="https://wordpress.org/latest.zip" class="wp-block-file__button" download>Download</a></div>
 <!-- /wp:file -->`;
+
+exports.audioBlockPlaceholder = `<!-- wp:audio {"id":5} -->
+<figure class="wp-block-audio"><audio controls src="https://cldup.com/59IrU0WJtq.mp3"></audio></figure>
+<!-- /wp:audio -->`;

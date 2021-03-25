@@ -74,5 +74,7 @@
 			}
 		},
 		"__unstablePasteTextInline": true
-	}
+	},
+	"editorStyle": "wp-block-heading-editor",
+	"style": "wp-block-heading"
 }

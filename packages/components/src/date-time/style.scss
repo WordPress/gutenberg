@@ -48,7 +48,9 @@
 
 	// Override external DatePicker styles.
 	.DayPickerNavigation_leftButton__horizontalDefault {
-		left: 0;
+		/*!rtl:begin:ignore*/
+		left: 13px;
+		/*!rtl:end:ignore*/
 	}
 
 	.CalendarMonth_caption {
@@ -68,7 +70,7 @@
 		text-align: center;
 
 		&:focus {
-			box-shadow: inset 0 0 0 $border-width-focus var(--wp-admin-theme-color), inset 0 0 0 #{ $border-width-focus + $border-width } $white;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 0 #{ $border-width-focus + $border-width } $white;
 			outline: 2px solid transparent; // Shown in Windows 10 high contrast mode.
 		}
 	}
@@ -98,7 +100,7 @@
 	.DayPicker_weekHeader {
 		top: 50px;
 		.DayPicker_weekHeader_ul {
-			margin: 1px 0;
+			margin: 1px;
 			padding-left: 0;
 			padding-right: 0;
 		}

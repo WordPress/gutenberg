@@ -1,22 +1,43 @@
-// Default background and font color
-.wp-block-navigation:not(.has-background) .wp-block-navigation__container {
-	.wp-block-navigation-link:not(.has-text-color) {
-		color: $gray-900;
+.wp-block-navigation {
+	// Normalize list styles.
+	ul,
+	ul li {
+		list-style: none;
+
+		// Overrides generic ".entry-content li" styles on the front end.
+		padding: 0;
 	}
-	.wp-block-navigation__container {
-		background-color: $white;
+}
+
+// Navigation block inner container.
+.wp-block-navigation__container {
+	// Vertically center child blocks, like Social Links or Search.
+	align-items: center;
+
+	// Reset the default list styles
+	list-style: none;
+	margin: 0;
+	padding-left: 0;
+
+	// Horizontal layout
+	display: flex;
+	flex-wrap: wrap;
+
+	// Vertical layout
+	.is-vertical & {
+		display: block;
 	}
 }
 
 // Justification.
-.items-justified-left > ul {
-	justify-content: flex-start;
-}
-
 .items-justified-center > ul {
 	justify-content: center;
 }
 
 .items-justified-right > ul {
 	justify-content: flex-end;
+}
+
+.items-justified-space-between > ul {
+	justify-content: space-between;
 }

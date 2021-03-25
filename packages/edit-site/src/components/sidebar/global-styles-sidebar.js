@@ -6,7 +6,12 @@ import { map, sortBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, PanelBody, TabPanel } from '@wordpress/components';
+import {
+	Button,
+	PanelBody,
+	TabPanel,
+	__unstableComponentSystemProvider as ComponentSystemProvider,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
@@ -19,47 +24,58 @@ import {
 	useGlobalStylesReset,
 } from '../editor/global-styles-provider';
 import DefaultSidebar from './default-sidebar';
-import { GLOBAL_CONTEXT_NAME } from '../editor/utils';
+import { ROOT_BLOCK_NAME } from '../editor/utils';
 import {
 	default as TypographyPanel,
 	useHasTypographyPanel,
 } from './typography-panel';
 import { default as ColorPanel, useHasColorPanel } from './color-panel';
+import { default as SpacingPanel, useHasSpacingPanel } from './spacing-panel';
 
 function GlobalStylesPanel( {
 	wrapperPanelTitle,
 	context,
-	getStyleProperty,
-	setStyleProperty,
+	getStyle,
+	setStyle,
 	getSetting,
 	setSetting,
 } ) {
 	const hasColorPanel = useHasColorPanel( context );
 	const hasTypographyPanel = useHasTypographyPanel( context );
+	const hasSpacingPanel = useHasSpacingPanel( context );
 
-	if ( ! hasColorPanel && ! hasTypographyPanel ) {
+	if ( ! hasColorPanel && ! hasTypographyPanel && ! hasSpacingPanel ) {
 		return null;
 	}
 
 	const content = (
-		<>
+		<ComponentSystemProvider
+			__unstableNextInclude={ [ 'WPComponentsFontSizePicker' ] }
+		>
 			{ hasTypographyPanel && (
 				<TypographyPanel
 					context={ context }
-					getStyleProperty={ getStyleProperty }
-					setStyleProperty={ setStyleProperty }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
 				/>
 			) }
 			{ hasColorPanel && (
 				<ColorPanel
 					context={ context }
-					getStyleProperty={ getStyleProperty }
-					setStyleProperty={ setStyleProperty }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
 					getSetting={ getSetting }
 					setSetting={ setSetting }
 				/>
 			) }
-		</>
+			{ hasSpacingPanel && (
+				<SpacingPanel
+					context={ context }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
+				/>
+			) }
+		</ComponentSystemProvider>
 	);
 	if ( ! wrapperPanelTitle ) {
 		return content;
@@ -91,7 +107,7 @@ function getPanelTitle( context ) {
 	}
 
 	let panelTitle = blockType.title;
-	if ( 'object' === typeof blockType?.supports?.__experimentalSelector ) {
+	if ( context?.title ) {
 		panelTitle += ` (${ context.title })`;
 	}
 	return panelTitle;
@@ -99,8 +115,8 @@ function getPanelTitle( context ) {
 
 function GlobalStylesBlockPanels( {
 	contexts,
-	getStyleProperty,
-	setStyleProperty,
+	getStyle,
+	setStyle,
 	getSetting,
 	setSetting,
 } ) {
@@ -120,7 +136,7 @@ function GlobalStylesBlockPanels( {
 	);
 
 	return map( panels, ( { context, name, wrapperPanelTitle } ) => {
-		if ( name === GLOBAL_CONTEXT_NAME ) {
+		if ( name === ROOT_BLOCK_NAME ) {
 			return null;
 		}
 		return (
@@ -128,8 +144,8 @@ function GlobalStylesBlockPanels( {
 				key={ 'panel-' + name }
 				wrapperPanelTitle={ wrapperPanelTitle }
 				context={ { ...context, name } }
-				getStyleProperty={ getStyleProperty }
-				setStyleProperty={ setStyleProperty }
+				getStyle={ getStyle }
+				setStyle={ setStyle }
 				getSetting={ getSetting }
 				setSetting={ setSetting }
 			/>
@@ -145,14 +161,14 @@ export default function GlobalStylesSidebar( {
 } ) {
 	const {
 		contexts,
-		getStyleProperty,
-		setStyleProperty,
+		getStyle,
+		setStyle,
 		getSetting,
 		setSetting,
 	} = useGlobalStylesContext();
 	const [ canRestart, onReset ] = useGlobalStylesReset();
 
-	if ( typeof contexts !== 'object' || ! contexts?.[ GLOBAL_CONTEXT_NAME ] ) {
+	if ( typeof contexts !== 'object' || ! contexts?.[ ROOT_BLOCK_NAME ] ) {
 		// No sidebar is shown.
 		return null;
 	}
@@ -181,7 +197,7 @@ export default function GlobalStylesSidebar( {
 		>
 			<TabPanel
 				tabs={ [
-					{ name: 'global', title: __( 'Global' ) },
+					{ name: 'root', title: __( 'Root' ) },
 					{ name: 'block', title: __( 'By Block Type' ) },
 				] }
 			>
@@ -191,8 +207,8 @@ export default function GlobalStylesSidebar( {
 						return (
 							<GlobalStylesBlockPanels
 								contexts={ contexts }
-								getStyleProperty={ getStyleProperty }
-								setStyleProperty={ setStyleProperty }
+								getStyle={ getStyle }
+								setStyle={ setStyle }
 								getSetting={ getSetting }
 								setSetting={ setSetting }
 							/>
@@ -202,11 +218,11 @@ export default function GlobalStylesSidebar( {
 						<GlobalStylesPanel
 							hasWrapper={ false }
 							context={ {
-								...contexts[ GLOBAL_CONTEXT_NAME ],
-								name: GLOBAL_CONTEXT_NAME,
+								...contexts[ ROOT_BLOCK_NAME ],
+								name: ROOT_BLOCK_NAME,
 							} }
-							getStyleProperty={ getStyleProperty }
-							setStyleProperty={ setStyleProperty }
+							getStyle={ getStyle }
+							setStyle={ setStyle }
 							getSetting={ getSetting }
 							setSetting={ setSetting }
 						/>

@@ -39,7 +39,7 @@ describe( 'cpt locking', () => {
 			'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 			'p1'
 		);
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		expect(
 			await page.$x( '//button/span[contains(text(), "Remove block")]' )
 		).toHaveLength( 0 );
@@ -171,7 +171,7 @@ describe( 'cpt locking', () => {
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 				'p1'
 			);
-			await clickBlockToolbarButton( 'More options' );
+			await clickBlockToolbarButton( 'Options' );
 			await clickMenuItem( 'Remove block' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );
@@ -191,7 +191,7 @@ describe( 'cpt locking', () => {
 				'.block-editor-rich-text__editable[data-type="core/paragraph"]',
 				'p1'
 			);
-			await clickBlockToolbarButton( 'More options' );
+			await clickBlockToolbarButton( 'Options' );
 			await clickMenuItem( 'Remove block' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();

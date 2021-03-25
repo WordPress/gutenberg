@@ -8,8 +8,8 @@ import classnames from 'classnames';
  */
 import { forwardRef, useEffect, useRef } from '@wordpress/element';
 import { __unstableUseNavigateRegions as useNavigateRegions } from '@wordpress/components';
-import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
+import { useMergeRefs } from '@wordpress/compose';
 
 function useHTMLClass( className ) {
 	useEffect( () => {
@@ -36,17 +36,12 @@ function InterfaceSkeleton(
 		actions,
 		labels,
 		className,
-		// Deprecated props.
-		leftSidebar,
 		shortcuts,
 	},
 	ref
 ) {
 	const fallbackRef = useRef();
-
-	ref = ref || fallbackRef;
-
-	const regionsClassName = useNavigateRegions( ref, shortcuts );
+	const regionsClassName = useNavigateRegions( fallbackRef, shortcuts );
 
 	useHTMLClass( 'interface-interface-skeleton__html-container' );
 
@@ -69,22 +64,14 @@ function InterfaceSkeleton(
 
 	const mergedLabels = { ...defaultLabels, ...labels };
 
-	if ( leftSidebar ) {
-		deprecated( 'leftSidebar prop in InterfaceSkeleton component', {
-			alternative: 'secondarySidebar prop',
-			version: '9.7.0',
-			plugin: 'Gutenberg',
-		} );
-		secondarySidebar = leftSidebar;
-	}
-
 	return (
 		<div
-			ref={ ref }
+			ref={ useMergeRefs( [ ref, fallbackRef ] ) }
 			className={ classnames(
 				className,
 				'interface-interface-skeleton',
-				regionsClassName
+				regionsClassName,
+				!! footer && 'has-footer'
 			) }
 		>
 			{ !! drawer && (

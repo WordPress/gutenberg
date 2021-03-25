@@ -1,4 +1,9 @@
 /**
+ * WordPress dependencies
+ */
+import { store as coreDataStore } from '@wordpress/core-data';
+
+/**
  * Internal dependencies
  */
 import {
@@ -6,13 +11,13 @@ import {
 	getCanUserCreateMedia,
 	getSettings,
 	getHomeTemplateId,
-	getTemplateId,
-	getTemplatePartId,
-	getTemplateType,
+	getEditedPostType,
+	getEditedPostId,
 	getPage,
 	getNavigationPanelActiveMenu,
 	isNavigationOpened,
 	isInserterOpened,
+	isListViewOpened,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -71,7 +76,7 @@ describe( 'selectors', () => {
 			expect( getCanUserCreateMedia() ).toBe( true );
 			expect(
 				getCanUserCreateMedia.registry.select
-			).toHaveBeenCalledWith( 'core' );
+			).toHaveBeenCalledWith( coreDataStore );
 			expect( canUser ).toHaveBeenCalledWith( 'create', 'media' );
 		} );
 	} );
@@ -119,31 +124,25 @@ describe( 'selectors', () => {
 		} );
 	} );
 
-	describe( 'getTemplateId', () => {
+	describe( 'getEditedPostId', () => {
 		it( 'returns the template ID', () => {
-			const state = { templateId: {} };
-			expect( getTemplateId( state ) ).toBe( state.templateId );
+			const state = { editedPost: { id: 10 } };
+			expect( getEditedPostId( state ) ).toBe( 10 );
 		} );
 	} );
 
-	describe( 'getTemplatePartId', () => {
-		it( 'returns the template part ID', () => {
-			const state = { templatePartId: {} };
-			expect( getTemplatePartId( state ) ).toBe( state.templatePartId );
-		} );
-	} );
-
-	describe( 'getTemplateType', () => {
+	describe( 'getEditedPostType', () => {
 		it( 'returns the template type', () => {
-			const state = { templateType: {} };
-			expect( getTemplateType( state ) ).toBe( state.templateType );
+			const state = { editedPost: { type: 'wp_template' } };
+			expect( getEditedPostType( state ) ).toBe( 'wp_template' );
 		} );
 	} );
 
 	describe( 'getPage', () => {
 		it( 'returns the page object', () => {
-			const state = { page: {} };
-			expect( getPage( state ) ).toBe( state.page );
+			const page = {};
+			const state = { editedPost: { page } };
+			expect( getPage( state ) ).toBe( page );
 		} );
 	} );
 
@@ -175,6 +174,17 @@ describe( 'selectors', () => {
 			expect( isInserterOpened( state ) ).toBe( true );
 			state.blockInserterPanel = false;
 			expect( isInserterOpened( state ) ).toBe( false );
+		} );
+	} );
+
+	describe( 'isListViewOpened', () => {
+		it( 'returns the list view panel isOpened state', () => {
+			const state = {
+				listViewPanel: true,
+			};
+			expect( isListViewOpened( state ) ).toBe( true );
+			state.listViewPanel = false;
+			expect( isListViewOpened( state ) ).toBe( false );
 		} );
 	} );
 } );

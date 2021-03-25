@@ -1,6 +1,7 @@
 .components-button {
 	display: inline-flex;
 	text-decoration: none;
+	font-weight: normal;
 	font-size: $default-font-size;
 	margin: 0;
 	border: 0;
@@ -29,7 +30,7 @@
 	// Focus.
 	// See https://github.com/WordPress/gutenberg/issues/13267 for more context on these selectors.
 	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 3px solid transparent;
@@ -61,7 +62,7 @@
 		}
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		}
 
 		&:disabled,
@@ -91,10 +92,10 @@
 			/* stylelint-disable */
 			background-image: linear-gradient(
 				-45deg,
-				var(--wp-admin-theme-color) 28%,
-				var(--wp-admin-theme-color-darker-20) 28%,
-				var(--wp-admin-theme-color-darker-20) 72%,
-				var(--wp-admin-theme-color)  72%
+				var(--wp-admin-theme-color) 33%,
+				var(--wp-admin-theme-color-darker-20) 33%,
+				var(--wp-admin-theme-color-darker-20) 70%,
+				var(--wp-admin-theme-color) 70%
 			);
 			/* stylelint-enable */
 			border-color: var(--wp-admin-theme-color);
@@ -183,6 +184,19 @@
 		}
 	}
 
+	&.is-destructive.is-primary {
+		color: #fff;
+		background: $alert-red;
+		box-shadow: inset 0 0 0 $border-width $alert-red;
+
+		&:hover:not(:disabled) {
+			color: #fff;
+			background: darken($alert-red, 20%);
+			box-shadow: inset 0 0 0 $border-width darken($alert-red, 20%);
+		}
+	}
+
+
 	/**
 	 * Link buttons.
 	 */
@@ -215,7 +229,7 @@
 			color: #124964;
 			box-shadow:
 				0 0 0 $border-width #5b9dd9,
-				0 0 $border-width-focus $border-width rgba(30, 140, 190, 0.8);
+				0 0 var(--wp-admin-border-width-focus) $border-width rgba(30, 140, 190, 0.8);
 		}
 
 		// Link buttons that are red to indicate destructive behavior.
@@ -255,10 +269,10 @@
 		/* stylelint-disable */
 		background-image: linear-gradient(
 			-45deg,
-			darken($white, 2%) 28%,
-			darken($white, 12%) 28%,
-			darken($white, 12%) 72%,
-			darken($white, 2%) 72%
+			darken($white, 2%) 33%,
+			darken($white, 12%) 33%,
+			darken($white, 12%) 70%,
+			darken($white, 2%) 70%
 		);
 		/* stylelint-enable */
 	}
@@ -285,6 +299,8 @@
 		.dashicon {
 			display: inline-block;
 			flex: 0 0 auto;
+			margin-left: 2px;
+			margin-right: 2px;
 		}
 
 		&.has-text {
@@ -294,6 +310,10 @@
 		&.has-text svg {
 			margin-right: 8px;
 		}
+
+		&.has-text .dashicon {
+			margin-right: 10px;
+		}
 	}
 
 	// Toggled style.
@@ -302,7 +322,7 @@
 		background: $gray-900;
 
 		&:focus:not(:disabled) {
-			box-shadow: inset 0 0 0 1px $white, 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+			box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 			// Windows High Contrast mode will show this outline, but not the box-shadow.
 			outline: 2px solid transparent;

@@ -188,6 +188,51 @@ wp-env start --debug
 	...
 ```
 
+## Using Xdebug
+
+Xdebug is installed in the wp-env environment, but it is turned off by default. To enable Xdebug, you can use the `--xdebug` flag with the `wp-env start` command. Here is a reference to how the flag works:
+
+```sh
+# Sets the Xdebug mode to "debug" (for step debugging):
+wp-env start --xdebug
+
+# Sets the Xdebug mode to "off":
+wp-env start
+
+# Enables each of the Xdebug modes listed:
+wp-env start --xdebug=profile,trace,debug
+```
+
+You can see a reference on each of the Xdebug modes and what they do in the [Xdebug documentation](https://xdebug.org/docs/all_settings#mode).
+
+### Xdebug IDE support
+
+To connect to Xdebug from your IDE, you can use these IDE settings. This bit of JSON was tested for VS Code's `launch.json` format (which you can [learn more about here](https://code.visualstudio.com/docs/editor/debugging#_launchjson-attributes)) along with [this PHP Debug extension](https://marketplace.visualstudio.com/items?itemName=felixfbecker.php-debug). Its path mapping also points to a specific plugin -- you should update this to point to the source you are working with inside of the wp-env instance.
+
+You should only have to translate `port` and `pathMappings` to the format used by your own IDE.
+
+```json
+{
+	"name": "Listen for XDebug",
+	"type": "php",
+	"request": "launch",
+	"port": 9003,
+	"pathMappings": {
+		"/var/www/html/wp-content/plugins/gutenberg": "${workspaceRoot}/"
+	}
+}
+```
+
+Once your IDEs Xdebug settings have been enabled, you should just have to launch the debugger, put a breakpoint on any line of PHP code, and then refresh your browser!
+
+Here is a summary:
+
+1. Start wp-env with xdebug enabled: `wp-env start --xdebug`
+2. Install a suitable Xdebug extension for your IDE if it does not include one already.
+3. Configure the IDE debugger to use port `9003` and the correct source files in wp-env.
+4. Launch the debugger and put a breakpoint on any line of PHP code.
+5. Refresh the URL wp-env is running at and the breakpoint should trigger.
+
 ## Command reference
 
 `wp-env` creates generated files in the `wp-env` home directory. By default, this is `~/.wp-env`. The exception is Linux, where files are placed at `~/wp-env` [for compatibility with Snap Packages](https://github.com/WordPress/gutenberg/issues/20180#issuecomment-587046325). The `wp-env` home directory contains a subdirectory for each project named `/$md5_of_project_path`. To change the `wp-env` home directory, set the `WP_ENV_HOME` environment variable. For example, running `WP_ENV_HOME="something" wp-env start` will download the project files to the directory `./something/$md5_of_project_path` (relative to the current directory).
@@ -202,12 +247,20 @@ wp-env start
 Starts WordPress for development on port 8888 (override with WP_ENV_PORT) and
 tests on port 8889 (override with WP_ENV_TESTS_PORT). The current working
 directory must be a WordPress installation, a plugin, a theme, or contain a
-.wp-env.json file. After first install, use the '--update' flag to download updates
-to mapped sources and to re-apply WordPress configuration options.
+.wp-env.json file. After first install, use the '--update' flag to download
+updates to mapped sources and to re-apply WordPress configuration options.
 
 Options:
+  --help     Show help                                                 [boolean]
+  --version  Show version number                                       [boolean]
+  --debug    Enable debug output.                     [boolean] [default: false]
   --update   Download source updates and apply WordPress configuration.
                                                       [boolean] [default: false]
+  --xdebug   Enables Xdebug. If not passed, Xdebug is turned off. If no modes
+             are set, uses "debug". You may set multiple Xdebug modes by passing
+             them in a comma-separated list: `--xdebug=develop,coverage`. See
+             https://xdebug.org/docs/all_settings#mode for information about
+             Xdebug modes.                                              [string]
 ```
 
 ### `wp-env stop`
@@ -346,7 +399,7 @@ Several types of strings can be passed into the `core`, `plugins`, `themes`, and
 | ----------------- | ----------------------------- | -------------------------------------------------------- |
 | Relative path     | `.<path>\|~<path>`            | `"./a/directory"`, `"../a/directory"`, `"~/a/directory"` |
 | Absolute path     | `/<path>\|<letter>:\<path>`   | `"/a/directory"`, `"C:\\a\\directory"`                   |
-| GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#master"`  |
+| GitHub repository | `<owner>/<repo>[#<ref>]`      | `"WordPress/WordPress"`, `"WordPress/gutenberg#trunk"`  |
 | ZIP File          | `http[s]://<host>/<path>.zip` | `"https://wordpress.org/wordpress-5.4-beta2.zip"`        |
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.

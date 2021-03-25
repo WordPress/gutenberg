@@ -9,6 +9,7 @@ import { useSelect } from '@wordpress/data';
  */
 import NavigationPanel from './navigation-panel';
 import NavigationToggle from './navigation-toggle';
+import { store as editSiteStore } from '../../store';
 
 export const {
 	Fill: NavigationPanelPreviewFill,
@@ -17,7 +18,7 @@ export const {
 
 export default function NavigationSidebar() {
 	const isNavigationOpen = useSelect( ( select ) => {
-		return select( 'core/edit-site' ).isNavigationOpened();
+		return select( editSiteStore ).isNavigationOpened();
 	} );
 
 	return (

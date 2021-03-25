@@ -1,21 +1,30 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { InnerBlocks } from '@wordpress/block-editor';
+import {
+	compose,
+	withPreferredColorScheme,
+	useResizeObserver,
+} from '@wordpress/compose';
+import {
+	InnerBlocks,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useCallback } from '@wordpress/element';
-import { WIDE_ALIGNMENTS } from '@wordpress/components';
+import { alignmentHelpers } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import styles from './editor.scss';
+
+const { isWider, isFullWidth } = alignmentHelpers;
 
 function GroupEdit( {
 	attributes,
@@ -24,21 +33,30 @@ function GroupEdit( {
 	isLastInnerBlockSelected,
 	getStylesFromColorScheme,
 	mergedStyle,
+	blockWidth,
 } ) {
 	const { align } = attributes;
-	const isFullWidth = align === WIDE_ALIGNMENTS.alignments.full;
+	const [ resizeObserver, sizes ] = useResizeObserver();
+	const { width } = sizes || { width: 0 };
+	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+	const isEqualWidth = width === screenWidth;
 
 	const renderAppender = useCallback(
 		() => (
 			<View
-				style={ [
-					isFullWidth && hasInnerBlocks && styles.fullWidthAppender,
-				] }
+				style={
+					( isWider( screenWidth, 'mobile' ) ||
+						isEqualWidth ||
+						isFullWidth( align ) ) &&
+					( hasInnerBlocks
+						? styles.groupAppender
+						: styles.wideGroupAppender )
+				}
 			>
 				<InnerBlocks.ButtonBlockAppender />
 			</View>
 		),
-		[ align, hasInnerBlocks ]
+		[ align, hasInnerBlocks, width ]
 	);
 
 	if ( ! isSelected && ! hasInnerBlocks ) {
@@ -62,10 +80,6 @@ function GroupEdit( {
 		<View
 			style={ [
 				isSelected && hasInnerBlocks && styles.innerBlocks,
-				isSelected &&
-					! hasInnerBlocks &&
-					isFullWidth &&
-					styles.fullWidth,
 				mergedStyle,
 				isSelected &&
 					hasInnerBlocks &&
@@ -76,7 +90,12 @@ function GroupEdit( {
 					styles.isLastInnerBlockSelected,
 			] }
 		>
-			<InnerBlocks renderAppender={ isSelected && renderAppender } />
+			{ resizeObserver }
+			<InnerBlocks
+				renderAppender={ isSelected && renderAppender }
+				parentWidth={ width }
+				blockWidth={ blockWidth }
+			/>
 		</View>
 	);
 }
@@ -87,8 +106,10 @@ export default compose( [
 			getBlock,
 			getBlockIndex,
 			hasSelectedInnerBlock,
+			getBlockRootClientId,
 			getSelectedBlockClientId,
-		} = select( 'core/block-editor' );
+			getBlockAttributes,
+		} = select( blockEditorStore );
 
 		const block = getBlock( clientId );
 		const hasInnerBlocks = !! ( block && block.innerBlocks.length );
@@ -104,9 +125,13 @@ export default compose( [
 			isLastInnerBlockSelected = totalInnerBlocks === blockIndex;
 		}
 
+		const parentId = getBlockRootClientId( clientId );
+		const parentBlockAlignment = getBlockAttributes( parentId )?.align;
+
 		return {
 			hasInnerBlocks,
 			isLastInnerBlockSelected,
+			parentBlockAlignment,
 		};
 	} ),
 	withPreferredColorScheme,

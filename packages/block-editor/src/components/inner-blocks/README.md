@@ -3,7 +3,7 @@ InnerBlocks
 
 InnerBlocks exports a pair of components which can be used in block implementations to enable nested block content.
 
-Refer to the [implementation of the Columns block](https://github.com/WordPress/gutenberg/tree/master/packages/block-library/src/columns) as an example resource.
+Refer to the [implementation of the Columns block](https://github.com/WordPress/gutenberg/tree/HEAD/packages/block-library/src/columns) as an example resource.
 
 ## Usage
 
@@ -11,22 +11,26 @@ In a block's `edit` implementation, render `InnerBlocks`. Then, in the `save` im
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
-import { InnerBlocks } from '@wordpress/block-editor';
+import { useBlockProps, InnerBlocks } from '@wordpress/block-editor';
 
 registerBlockType( 'my-plugin/my-block', {
 	// ...
 
-	edit( { className } ) {
+	edit() {
+		const blockProps = useBlockProps();
+
 		return (
-			<div className={ className }>
+			<div { ...blockProps }>
 				<InnerBlocks />
 			</div>
 		);
 	},
 
 	save() {
+		const blockProps = useBlockProps.save();
+
 		return (
-			<div>
+			<div { ...blockProps }>
 				<InnerBlocks.Content />
 			</div>
 		);
@@ -81,7 +85,7 @@ While this prop doesn't change any styles for the inner blocks themselves, it do
 * **Type:** `Array<Array<Object>>`
 
 The template is defined as a list of block items. Such blocks can have predefined attributes, placeholder, content, etc. Block templates allow specifying a default initial state for an InnerBlocks area.
-More information about templates can be found in [template docs](/docs/designers-developers/developers/block-api/block-templates.md).
+More information about templates can be found in [template docs](/docs/reference-guides/block-api/block-templates.md).
 
 ```jsx
 const TEMPLATE = [ [ 'core/columns', {}, [
@@ -110,7 +114,7 @@ If false the selection should not be updated when child blocks specified in the 
 ### `templateLock`
 * **Type:** `String|Boolean`
 
-Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/designers-developers/developers/block-api/block-templates.md#locking).
+Template locking of `InnerBlocks` is similar to [Custom Post Type templates locking](/docs/reference-guides/block-api/block-templates.md#locking).
 
 Template locking allows locking the `InnerBlocks` area for the current template.
 *Options:*
@@ -124,32 +128,33 @@ If locking is not set in an `InnerBlocks` area: the locking of the parent `Inner
 If the block is a top level block: the locking of the Custom Post Type is used.
 
 ### `renderAppender`
-* **Type:** `Function|false`
-* **Default:** - `undefined`. When `renderAppender` is not specific the `<DefaultBlockAppender>` component is as a default. It automatically inserts whichever block is configured as the default block via `wp.blocks.setDefaultBlockName` (typically `paragraph`). If a `false` value is provider, no appender is rendered.
+* **Type:** `Component|false`
+* **Default:** - `undefined`. When `renderAppender` is not specified, the default appender is shown. If a `false` value is provided, no appender is rendered.
 
-A 'render prop' function that can be used to customize the block's appender.
+A component to show as the trailing appender for the inner blocks list.
 
 #### Notes
-* For convenience two predefined appender components are exposed on `InnerBlocks` which can be consumed within the render function:
-	- `<InnerBlocks.ButtonBlockAppender />` -  display a `+` (plus) icon button that, when clicked, displays the block picker menu. No default Block is inserted.
-	- `<InnerBlocks.DefaultBlockAppender />` - display the default block appender as set by `wp.blocks.setDefaultBlockName`. Typically this is the `paragraph` block.
-* Consumers are also free to pass any valid render function. This provides the full flexibility to define a bespoke block appender.
+* For convenience two predefined appender components are exposed on `InnerBlocks` which can be used for the prop:
+	- `InnerBlocks.ButtonBlockAppender` -  display a `+` (plus) icon button as the appender.
+	- `InnerBlocks.DefaultBlockAppender` - display the default block appender, typically the paragraph style appender when the paragraph block is allowed.
+* Consumers are also free to pass any valid component. This provides the full flexibility to define a bespoke block appender.
 
 #### Example usage
 
 ```jsx
 // Utilise a predefined component
 <InnerBlocks
-	renderAppender={ () => (
-		<InnerBlocks.ButtonBlockAppender />
-	) }
+	renderAppender={ InnerBlocks.ButtonBlockAppender }
+/>
+
+// Don't display an appender
+<InnerBlocks
+	renderAppender={ false }
 />
 
 // Fully custom
 <InnerBlocks
-	renderAppender={ () => (
-		<button className="bespoke-appender" type="button">Some Special Appender</button>
-	) }
+	renderAppender={ MyAmazingAppender }
 />
 ```
 
@@ -160,7 +165,7 @@ A 'render prop' function that can be used to customize the block's appender.
 
 Determines whether the toolbars of _all_ child Blocks (applied deeply, recursive) should have their toolbars "captured" and shown on the Block which is consuming `InnerBlocks`.
 
-For example, a button block, deeply nested in several levels of block `X` that utilises this property will see the button block's toolbar displayed on block `X`'s toolbar area.
+For example, a button block, deeply nested in several levels of block `X` that utilizes this property will see the button block's toolbar displayed on block `X`'s toolbar area.
 
 ### `placeholder`
 

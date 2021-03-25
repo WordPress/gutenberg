@@ -4,11 +4,12 @@
 	"category": "design",
 	"usesContext": [
 		"queryId",
-		"query",
-		"queryContext"
+		"query"
 	],
 	"supports": {
 		"reusable": false,
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-query-pagination-editor",
+	"style": "wp-block-query-pagination"
 }

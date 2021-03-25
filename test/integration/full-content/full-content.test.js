@@ -69,11 +69,14 @@ describe( 'full post content fixture', () => {
 		require( '../../../packages/editor/src/hooks' );
 		registerCoreBlocks();
 		if ( process.env.GUTENBERG_PHASE === 2 ) {
-			__experimentalRegisterExperimentalCoreBlocks( true );
+			__experimentalRegisterExperimentalCoreBlocks( {
+				enableFSEBlocks: true,
+			} );
 		}
 	} );
 
 	blockBasenames.forEach( ( basename ) => {
+		// eslint-disable-next-line jest/valid-title
 		it( basename, () => {
 			const {
 				filename: htmlFixtureFileName,

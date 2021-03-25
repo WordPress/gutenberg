@@ -13,8 +13,9 @@ const ios = {
 
 exports.iosLocal = {
 	...ios,
-	platformVersion: '14.0',
 	deviceName: 'iPhone 11',
+	wdaLaunchTimeout: 240000,
+	usePrebuiltWDA: true,
 };
 
 exports.iosServer = {

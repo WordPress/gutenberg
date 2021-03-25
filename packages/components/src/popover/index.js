@@ -6,34 +6,29 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	useRef,
-	useState,
-	useEffect,
-	useLayoutEffect,
-} from '@wordpress/element';
-import { focus, getRectangleFromRange } from '@wordpress/dom';
+import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
-import { useViewportMatch, useResizeObserver } from '@wordpress/compose';
+import {
+	useViewportMatch,
+	useResizeObserver,
+	useFocusOnMount,
+	__experimentalUseFocusOutside as useFocusOutside,
+	useConstrainedTabbing,
+	useFocusReturn,
+	useMergeRefs,
+} from '@wordpress/compose';
 import { close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { computePopoverPosition } from './utils';
-import withFocusReturn from '../higher-order/with-focus-return';
-import withConstrainedTabbing from '../higher-order/with-constrained-tabbing';
-import PopoverDetectOutside from './detect-outside';
+import { computePopoverPosition, offsetIframe } from './utils';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
-import IsolatedEventContainer from '../isolated-event-container';
 import { Slot, Fill, useSlot } from '../slot-fill';
 import { getAnimateClassName } from '../animate';
-
-const FocusManaged = withConstrainedTabbing(
-	withFocusReturn( ( { children } ) => children )
-);
 
 /**
  * Name of slot in which popover should fill.
@@ -58,7 +53,10 @@ function computeAnchorRect(
 			return;
 		}
 
-		return getAnchorRect( anchorRefFallback.current );
+		return offsetIframe(
+			getAnchorRect( anchorRefFallback.current ),
+			anchorRefFallback.current.ownerDocument
+		);
 	}
 
 	if ( anchorRef !== false ) {
@@ -75,14 +73,20 @@ function computeAnchorRect(
 		// `anchorRef instanceof window.Range` checks will break across document boundaries
 		// such as in an iframe
 		if ( typeof anchorRef?.cloneRange === 'function' ) {
-			return getRectangleFromRange( anchorRef );
+			return offsetIframe(
+				getRectangleFromRange( anchorRef ),
+				anchorRef.endContainer.ownerDocument
+			);
 		}
 
 		// Duck-type to check if `anchorRef` is an instance of Element
 		// `anchorRef instanceof window.Element` checks will break across document boundaries
 		// such as in an iframe
 		if ( typeof anchorRef?.getBoundingClientRect === 'function' ) {
-			const rect = anchorRef.getBoundingClientRect();
+			const rect = offsetIframe(
+				anchorRef.getBoundingClientRect(),
+				anchorRef.ownerDocument
+			);
 
 			if ( shouldAnchorIncludePadding ) {
 				return rect;
@@ -94,11 +98,14 @@ function computeAnchorRect(
 		const { top, bottom } = anchorRef;
 		const topRect = top.getBoundingClientRect();
 		const bottomRect = bottom.getBoundingClientRect();
-		const rect = new window.DOMRect(
-			topRect.left,
-			topRect.top,
-			topRect.width,
-			bottomRect.bottom - topRect.top
+		const rect = offsetIframe(
+			new window.DOMRect(
+				topRect.left,
+				topRect.top,
+				topRect.width,
+				bottomRect.bottom - topRect.top
+			),
+			top.ownerDocument
 		);
 
 		if ( shouldAnchorIncludePadding ) {
@@ -151,53 +158,6 @@ function withoutPadding( rect, element ) {
 }
 
 /**
- * Hook used to focus the first tabbable element on mount.
- *
- * @param {boolean|string} focusOnMount Focus on mount mode.
- * @param {Object}         contentRef   Reference to the popover content element.
- */
-function useFocusContentOnMount( focusOnMount, contentRef ) {
-	// Focus handling
-	useEffect( () => {
-		/*
-		 * Without the setTimeout, the dom node is not being focused. Related:
-		 * https://stackoverflow.com/questions/35522220/react-ref-with-focus-doesnt-work-without-settimeout-my-example
-		 *
-		 * TODO: Treat the cause, not the symptom.
-		 */
-		const focusTimeout = setTimeout( () => {
-			if ( ! focusOnMount || ! contentRef.current ) {
-				return;
-			}
-
-			if ( focusOnMount === 'firstElement' ) {
-				// Find first tabbable node within content and shift focus, falling
-				// back to the popover panel itself.
-				const firstTabbable = focus.tabbable.find(
-					contentRef.current
-				)[ 0 ];
-
-				if ( firstTabbable ) {
-					firstTabbable.focus();
-				} else {
-					contentRef.current.focus();
-				}
-
-				return;
-			}
-
-			if ( focusOnMount === 'container' ) {
-				// Focus the popover panel itself so items in the popover are easily
-				// accessed via keyboard navigation.
-				contentRef.current.focus();
-			}
-		}, 0 );
-
-		return () => clearTimeout( focusTimeout );
-	}, [] );
-}
-
-/**
  * Sets or removes an element attribute.
  *
  * @param {Element} element The element to modify.
@@ -244,6 +204,22 @@ function setClass( element, name, toggle ) {
 	} else if ( element.classList.contains( name ) ) {
 		element.classList.remove( name );
 	}
+}
+
+function getAnchorDocument( anchor ) {
+	if ( ! anchor ) {
+		return;
+	}
+
+	if ( anchor.endContainer ) {
+		return anchor.endContainer.ownerDocument;
+	}
+
+	if ( anchor.top ) {
+		return anchor.top.ownerDocument;
+	}
+
+	return anchor.ownerDocument;
 }
 
 const Popover = ( {
@@ -410,6 +386,9 @@ const Popover = ( {
 
 		refresh();
 
+		const { ownerDocument } = containerRef.current;
+		const { defaultView } = ownerDocument;
+
 		/*
 		 * There are sometimes we need to reposition or resize the popover that
 		 * are not handled by the resize/scroll window events (i.e. CSS changes
@@ -417,35 +396,60 @@ const Popover = ( {
 		 *
 		 * For these situations, we refresh the popover every 0.5s
 		 */
-		const intervalHandle = window.setInterval( refresh, 500 );
+		const intervalHandle = defaultView.setInterval( refresh, 500 );
 
 		let rafId;
 
 		const refreshOnAnimationFrame = () => {
-			window.cancelAnimationFrame( rafId );
-			rafId = window.requestAnimationFrame( refresh );
+			defaultView.cancelAnimationFrame( rafId );
+			rafId = defaultView.requestAnimationFrame( refresh );
 		};
 
 		// Sometimes a click trigger a layout change that affects the popover
 		// position. This is an opportunity to immediately refresh rather than
 		// at the interval.
-		window.addEventListener( 'click', refreshOnAnimationFrame );
-		window.addEventListener( 'resize', refresh );
-		window.addEventListener( 'scroll', refresh, true );
+		defaultView.addEventListener( 'click', refreshOnAnimationFrame );
+		defaultView.addEventListener( 'resize', refresh );
+		defaultView.addEventListener( 'scroll', refresh, true );
+
+		const anchorDocument = getAnchorDocument( anchorRef );
+
+		// If the anchor is within an iframe, the popover position also needs
+		// to refrest when the iframe content is scrolled or resized.
+		if ( anchorDocument && anchorDocument !== ownerDocument ) {
+			anchorDocument.defaultView.addEventListener( 'resize', refresh );
+			anchorDocument.defaultView.addEventListener(
+				'scroll',
+				refresh,
+				true
+			);
+		}
 
 		let observer;
 
 		if ( __unstableObserveElement ) {
-			observer = new window.MutationObserver( refresh );
+			observer = new defaultView.MutationObserver( refresh );
 			observer.observe( __unstableObserveElement, { attributes: true } );
 		}
 
 		return () => {
-			window.clearInterval( intervalHandle );
-			window.removeEventListener( 'resize', refresh );
-			window.removeEventListener( 'scroll', refresh, true );
-			window.removeEventListener( 'click', refreshOnAnimationFrame );
-			window.cancelAnimationFrame( rafId );
+			defaultView.clearInterval( intervalHandle );
+			defaultView.removeEventListener( 'resize', refresh );
+			defaultView.removeEventListener( 'scroll', refresh, true );
+			defaultView.removeEventListener( 'click', refreshOnAnimationFrame );
+			defaultView.cancelAnimationFrame( rafId );
+
+			if ( anchorDocument && anchorDocument !== ownerDocument ) {
+				anchorDocument.defaultView.removeEventListener(
+					'resize',
+					refresh
+				);
+				anchorDocument.defaultView.removeEventListener(
+					'scroll',
+					refresh,
+					true
+				);
+			}
 
 			if ( observer ) {
 				observer.disconnect();
@@ -464,7 +468,16 @@ const Popover = ( {
 		__unstableBoundaryParent,
 	] );
 
-	useFocusContentOnMount( focusOnMount, contentRef );
+	const constrainedTabbingRef = useConstrainedTabbing();
+	const focusReturnRef = useFocusReturn();
+	const focusOnMountRef = useFocusOnMount( focusOnMount );
+	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
+	const mergedRefs = useMergeRefs( [
+		containerRef,
+		focusOnMount ? constrainedTabbingRef : null,
+		focusOnMount ? focusReturnRef : null,
+		focusOnMount ? focusOnMountRef : null,
+	] );
 
 	// Event handlers
 	const maybeClose = ( event ) => {
@@ -531,6 +544,7 @@ const Popover = ( {
 		} );
 
 		deprecated( 'Popover onClickOutside prop', {
+			since: '5.3',
 			alternative: 'onFocusOutside',
 		} );
 
@@ -549,54 +563,46 @@ const Popover = ( {
 	// within popover as inferring close intent.
 
 	let content = (
-		<PopoverDetectOutside onFocusOutside={ handleOnFocusOutside }>
-			<IsolatedEventContainer
-				className={ classnames(
-					'components-popover',
-					className,
-					animateClassName,
-					{
-						'is-expanded': isExpanded,
-						'is-without-arrow': noArrow,
-						'is-alternate': isAlternate,
-					}
-				) }
-				{ ...contentProps }
-				onKeyDown={ maybeClose }
-				ref={ containerRef }
-			>
-				{ isExpanded && <ScrollLock /> }
-				{ isExpanded && (
-					<div className="components-popover__header">
-						<span className="components-popover__header-title">
-							{ headerTitle }
-						</span>
-						<Button
-							className="components-popover__close"
-							icon={ close }
-							onClick={ onClose }
-						/>
-					</div>
-				) }
-				<div
-					ref={ contentRef }
-					className="components-popover__content"
-					tabIndex="-1"
-				>
-					<div style={ { position: 'relative' } }>
-						{ containerResizeListener }
-						{ children }
-					</div>
+		// eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
+		// eslint-disable-next-line jsx-a11y/no-static-element-interactions
+		<div
+			className={ classnames(
+				'components-popover',
+				className,
+				animateClassName,
+				{
+					'is-expanded': isExpanded,
+					'is-without-arrow': noArrow,
+					'is-alternate': isAlternate,
+				}
+			) }
+			{ ...contentProps }
+			onKeyDown={ maybeClose }
+			{ ...focusOutsideProps }
+			ref={ mergedRefs }
+			tabIndex="-1"
+		>
+			{ isExpanded && <ScrollLock /> }
+			{ isExpanded && (
+				<div className="components-popover__header">
+					<span className="components-popover__header-title">
+						{ headerTitle }
+					</span>
+					<Button
+						className="components-popover__close"
+						icon={ close }
+						onClick={ onClose }
+					/>
 				</div>
-			</IsolatedEventContainer>
-		</PopoverDetectOutside>
+			) }
+			<div ref={ contentRef } className="components-popover__content">
+				<div style={ { position: 'relative' } }>
+					{ containerResizeListener }
+					{ children }
+				</div>
+			</div>
+		</div>
 	);
-
-	// Apply focus to element as long as focusOnMount is truthy; false is
-	// the only "disabled" value.
-	if ( focusOnMount ) {
-		content = <FocusManaged>{ content }</FocusManaged>;
-	}
 
 	if ( slot.ref ) {
 		content = <Fill name={ __unstableSlotName }>{ content }</Fill>;

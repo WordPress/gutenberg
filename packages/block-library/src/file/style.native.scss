@@ -4,7 +4,7 @@
 
 .defaultButton {
 	border-radius: $border-width * 4;
-	padding: $block-spacing * 2;
+	padding: $grid-unit-10;
 	margin-top: $grid-unit-20;
 	background-color: $button-fallback-bg;
 }
@@ -38,6 +38,16 @@
 }
 
 .actionButtonDark {
+	color: $blue-30;
+}
+
+.dimmedActionButton {
+	color: $blue-50;
+	opacity: 0.45;
+}
+
+.dimmedActionButtonDark {
+	opacity: 0.45;
 	color: $blue-30;
 }
 

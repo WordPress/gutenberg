@@ -18,7 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Table' ),
+	title: _x( 'Table', 'block title' ),
 	description: __( 'Insert a table — perfect for sharing charts and data.' ),
 	icon,
 	example: {

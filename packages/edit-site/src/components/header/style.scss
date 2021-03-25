@@ -1,3 +1,5 @@
+$header-toolbar-min-width: 335px;
+
 .edit-site-header {
 	align-items: center;
 	background-color: $white;
@@ -7,14 +9,11 @@
 	width: 100%;
 	justify-content: space-between;
 
-	@include break-medium() {
-		body.is-fullscreen-mode & {
-			padding-left: 60px;
-			transition: padding-left 20ms linear;
-			transition-delay: 80ms;
-			@include reduce-motion("transition");
-		}
-
+	body.is-fullscreen-mode & {
+		padding-left: 60px;
+		transition: padding-left 20ms linear;
+		transition-delay: 80ms;
+		@include reduce-motion("transition");
 	}
 
 	.edit-site-header_start,
@@ -44,6 +43,7 @@ body.is-navigation-sidebar-open {
 		padding-left: 0;
 		transition: padding-left 20ms linear;
 		transition-delay: 0ms;
+		@include reduce-motion("transition");
 	}
 }
 
@@ -105,7 +105,7 @@ body.is-navigation-sidebar-open {
 		display: none;
 
 		@include break-medium() {
-			display: block;
+			display: inline-flex;
 		}
 	}
 

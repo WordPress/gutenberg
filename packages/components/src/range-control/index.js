@@ -7,7 +7,7 @@ import { clamp, isFinite, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { useRef, useState, forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
@@ -33,7 +33,6 @@ import {
 	Thumb,
 	Wrapper,
 } from './styles/range-control-styles';
-import { useRTL } from '../utils/rtl';
 
 function RangeControl(
 	{
@@ -69,8 +68,6 @@ function RangeControl(
 	},
 	ref
 ) {
-	const isRTL = useRTL();
-
 	const [ value, setValue ] = useControlledRangeValue( {
 		min,
 		max,
@@ -190,7 +187,7 @@ function RangeControl(
 	};
 
 	const offsetStyle = {
-		[ isRTL ? 'right' : 'left' ]: fillValueOffset,
+		[ isRTL() ? 'right' : 'left' ]: fillValueOffset,
 	};
 
 	return (
@@ -200,7 +197,7 @@ function RangeControl(
 			id={ id }
 			help={ help }
 		>
-			<Root className="components-range-control__root" isRTL={ isRTL }>
+			<Root className="components-range-control__root">
 				{ beforeIcon && (
 					<BeforeIconWrapper>
 						<Icon icon={ beforeIcon } />

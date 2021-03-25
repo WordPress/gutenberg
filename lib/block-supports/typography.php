@@ -15,12 +15,12 @@ function gutenberg_register_typography_support( $block_type ) {
 		return;
 	}
 
-	$has_font_size_support       = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
-	$has_font_style_support      = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontStyle' ), false );
-	$has_font_weight_support     = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontWeight' ), false );
-	$has_line_height_support     = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
-	$has_text_decoration_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
-	$has_text_transform_support  = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
+	$has_font_size_support       = _wp_array_get( $block_type->supports, array( 'fontSize' ), false );
+	$has_font_style_support      = _wp_array_get( $block_type->supports, array( '__experimentalFontStyle' ), false );
+	$has_font_weight_support     = _wp_array_get( $block_type->supports, array( '__experimentalFontWeight' ), false );
+	$has_line_height_support     = _wp_array_get( $block_type->supports, array( 'lineHeight' ), false );
+	$has_text_decoration_support = _wp_array_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
+	$has_text_transform_support  = _wp_array_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
 
 	$has_typography_support = $has_font_size_support
 		|| $has_font_weight_support
@@ -64,13 +64,13 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$classes = array();
 	$styles  = array();
 
-	$has_font_family_support     = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontFamily' ), false );
-	$has_font_style_support      = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontStyle' ), false );
-	$has_font_weight_support     = gutenberg_experimental_get( $block_type->supports, array( '__experimentalFontWeight' ), false );
-	$has_font_size_support       = gutenberg_experimental_get( $block_type->supports, array( 'fontSize' ), false );
-	$has_line_height_support     = gutenberg_experimental_get( $block_type->supports, array( 'lineHeight' ), false );
-	$has_text_decoration_support = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
-	$has_text_transform_support  = gutenberg_experimental_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
+	$has_font_family_support     = _wp_array_get( $block_type->supports, array( '__experimentalFontFamily' ), false );
+	$has_font_style_support      = _wp_array_get( $block_type->supports, array( '__experimentalFontStyle' ), false );
+	$has_font_weight_support     = _wp_array_get( $block_type->supports, array( '__experimentalFontWeight' ), false );
+	$has_font_size_support       = _wp_array_get( $block_type->supports, array( 'fontSize' ), false );
+	$has_line_height_support     = _wp_array_get( $block_type->supports, array( 'lineHeight' ), false );
+	$has_text_decoration_support = _wp_array_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
+	$has_text_transform_support  = _wp_array_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
 
 	// Font Size.
 	if ( $has_font_size_support ) {
@@ -168,7 +168,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
  */
 function gutenberg_typography_get_css_variable_inline_style( $attributes, $feature, $css_property ) {
 	// Retrieve current attribute value or skip if not found.
-	$style_value = gutenberg_experimental_get( $attributes, array( 'style', 'typography', $feature ), false );
+	$style_value = _wp_array_get( $attributes, array( 'style', 'typography', $feature ), false );
 	if ( ! $style_value ) {
 		return;
 	}

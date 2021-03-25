@@ -72,6 +72,13 @@ export const defaultEntities = [
 		label: __( 'Widgets' ),
 	},
 	{
+		name: 'widgetType',
+		kind: 'root',
+		baseURL: '/wp/v2/widget-types',
+		plural: 'widgetTypes',
+		label: __( 'Widget types' ),
+	},
+	{
 		label: __( 'User' ),
 		name: 'user',
 		kind: 'root',
@@ -115,47 +122,14 @@ export const kinds = [
 ];
 
 /**
- * Returns a function to be used to retrieve the title of a given post type record.
- *
- * @param {string} postTypeName PostType name.
- * @return {Function} getTitle.
- */
-export const getPostTypeTitle = ( postTypeName ) => ( record ) => {
-	if ( [ 'wp_template_part', 'wp_template' ].includes( postTypeName ) ) {
-		return (
-			record?.title?.rendered || record?.title || startCase( record.slug )
-		);
-	}
-	return record?.title?.rendered || record?.title || String( record.id );
-};
-
-/**
  * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
  *
- * @param {string} postTypeName PostType name.
- * @return {Function} prePersistHandler.
+ * @param {Object} persistedRecord Already persisted Post
+ * @param {Object} edits Edits.
+ * @return {Object} Updated edits.
  */
-export const getPostTypePrePersistHandler = ( postTypeName ) => (
-	persistedRecord,
-	edits
-) => {
+export const prePersistPostType = ( persistedRecord, edits ) => {
 	const newEdits = {};
-
-	// Fix template titles.
-	if (
-		[ 'wp_template', 'wp_template_part' ].includes( postTypeName ) &&
-		! edits.title &&
-		! persistedRecord.title
-	) {
-		newEdits.title = persistedRecord
-			? getPostTypeTitle( postTypeName )( persistedRecord )
-			: edits.slug;
-	}
-
-	// Templates and template parts can only be published.
-	if ( [ 'wp_template', 'wp_template_part' ].includes( postTypeName ) ) {
-		newEdits.status = 'publish';
-	}
 
 	if ( persistedRecord?.status === 'auto-draft' ) {
 		// Saving an auto-draft should create a draft by default.
@@ -185,6 +159,9 @@ export const getPostTypePrePersistHandler = ( postTypeName ) => (
 function* loadPostTypeEntities() {
 	const postTypes = yield apiFetch( { path: '/wp/v2/types?context=edit' } );
 	return map( postTypes, ( postType, name ) => {
+		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+			name
+		);
 		return {
 			kind: 'postType',
 			baseURL: '/wp/v2/' + postType.rest_base,
@@ -192,12 +169,14 @@ function* loadPostTypeEntities() {
 			label: postType.labels.singular_name,
 			transientEdits: {
 				blocks: true,
-				selectionStart: true,
-				selectionEnd: true,
+				selection: true,
 			},
 			mergedEdits: { meta: true },
-			getTitle: getPostTypeTitle( name ),
-			__unstablePrePersist: getPostTypePrePersistHandler( name ),
+			getTitle: ( record ) =>
+				record?.title?.rendered ||
+				record?.title ||
+				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
+			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 		};
 	} );
 }

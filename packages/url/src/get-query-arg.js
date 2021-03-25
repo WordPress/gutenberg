@@ -3,11 +3,9 @@
  */
 import { getQueryArgs } from './get-query-args';
 
-/* eslint-disable jsdoc/valid-types */
 /**
  * @typedef {{[key: string]: QueryArgParsed}} QueryArgObject
  */
-/* eslint-enable */
 
 /**
  * @typedef {string|string[]|QueryArgObject} QueryArgParsed

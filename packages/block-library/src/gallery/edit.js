@@ -29,13 +29,15 @@ import {
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Platform, useEffect, useState } from '@wordpress/element';
+import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { useDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -90,7 +92,7 @@ function GalleryEdit( props ) {
 	const [ selectedImage, setSelectedImage ] = useState();
 	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
 	function setAttributes( newAttrs ) {
@@ -281,7 +283,7 @@ function GalleryEdit( props ) {
 			};
 		} );
 
-		setAttributes( { images: updatedImages, newSizeSlug } );
+		setAttributes( { images: updatedImages, sizeSlug: newSizeSlug } );
 	}
 
 	useEffect( () => {
@@ -379,6 +381,7 @@ function GalleryEdit( props ) {
 						value={ linkTo }
 						onChange={ setLinkTo }
 						options={ linkOptions }
+						hideCancelButton={ true }
 					/>
 					{ shouldShowSizeOptions && (
 						<SelectControl
@@ -386,6 +389,7 @@ function GalleryEdit( props ) {
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
+							hideCancelButton={ true }
 						/>
 					) }
 				</PanelBody>
@@ -410,49 +414,51 @@ function GalleryEdit( props ) {
 
 export default compose( [
 	withSelect( ( select, { attributes: { ids }, isSelected } ) => {
-		const { getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
+		const { getMedia } = select( coreStore );
+		const { getSettings } = select( blockEditorStore );
 		const { imageSizes, mediaUpload } = getSettings();
 
-		let resizedImages = {};
-
-		if ( isSelected ) {
-			resizedImages = reduce(
-				ids,
-				( currentResizedImages, id ) => {
-					if ( ! id ) {
-						return currentResizedImages;
-					}
-					const image = getMedia( id );
-					const sizes = reduce(
-						imageSizes,
-						( currentSizes, size ) => {
-							const defaultUrl = get( image, [
-								'sizes',
-								size.slug,
-								'url',
-							] );
-							const mediaDetailsUrl = get( image, [
-								'media_details',
-								'sizes',
-								size.slug,
-								'source_url',
-							] );
-							return {
-								...currentSizes,
-								[ size.slug ]: defaultUrl || mediaDetailsUrl,
-							};
-						},
-						{}
-					);
-					return {
-						...currentResizedImages,
-						[ parseInt( id, 10 ) ]: sizes,
-					};
-				},
-				{}
-			);
-		}
+		const resizedImages = useMemo( () => {
+			if ( isSelected ) {
+				return reduce(
+					ids,
+					( currentResizedImages, id ) => {
+						if ( ! id ) {
+							return currentResizedImages;
+						}
+						const image = getMedia( id );
+						const sizes = reduce(
+							imageSizes,
+							( currentSizes, size ) => {
+								const defaultUrl = get( image, [
+									'sizes',
+									size.slug,
+									'url',
+								] );
+								const mediaDetailsUrl = get( image, [
+									'media_details',
+									'sizes',
+									size.slug,
+									'source_url',
+								] );
+								return {
+									...currentSizes,
+									[ size.slug ]:
+										defaultUrl || mediaDetailsUrl,
+								};
+							},
+							{}
+						);
+						return {
+							...currentResizedImages,
+							[ parseInt( id, 10 ) ]: sizes,
+						};
+					},
+					{}
+				);
+			}
+			return {};
+		}, [ isSelected, ids, imageSizes ] );
 
 		return {
 			imageSizes,

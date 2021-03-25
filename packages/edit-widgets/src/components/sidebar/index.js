@@ -8,7 +8,10 @@ import classnames from 'classnames';
  */
 import { useEffect, Platform } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { ComplementaryArea } from '@wordpress/interface';
+import {
+	ComplementaryArea,
+	store as interfaceStore,
+} from '@wordpress/interface';
 import { BlockInspector } from '@wordpress/block-editor';
 import { cog } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
@@ -29,13 +32,14 @@ const WIDGET_AREAS_IDENTIFIER = 'edit-widgets/block-areas';
  * Internal dependencies
  */
 import WidgetAreas from './widget-areas';
+import { store as editWidgetsStore } from '../../store';
 
 function ComplementaryAreaTab( { identifier, label, isActive } ) {
-	const { enableComplementaryArea } = useDispatch( 'core/interface' );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	return (
 		<Button
 			onClick={ () =>
-				enableComplementaryArea( 'core/edit-widgets', identifier )
+				enableComplementaryArea( editWidgetsStore.name, identifier )
 			}
 			className={ classnames( 'edit-widgets-sidebar__panel-tab', {
 				'is-active': isActive,
@@ -54,7 +58,7 @@ function ComplementaryAreaTab( { identifier, label, isActive } ) {
 }
 
 export default function Sidebar() {
-	const { enableComplementaryArea } = useDispatch( 'core/interface' );
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const {
 		currentArea,
 		hasSelectedNonAreaBlock,
@@ -66,11 +70,11 @@ export default function Sidebar() {
 			getBlock,
 			getBlockParentsByBlockName,
 		} = select( 'core/block-editor' );
-		const { getActiveComplementaryArea } = select( 'core/interface' );
+		const { getActiveComplementaryArea } = select( interfaceStore );
 
 		const selectedBlock = getSelectedBlock();
 
-		let activeArea = getActiveComplementaryArea( 'core/edit-widgets' );
+		let activeArea = getActiveComplementaryArea( editWidgetsStore.name );
 		if ( ! activeArea ) {
 			if ( selectedBlock ) {
 				activeArea = BLOCK_INSPECTOR_IDENTIFIER;
@@ -114,7 +118,7 @@ export default function Sidebar() {
 			isGeneralSidebarOpen
 		) {
 			enableComplementaryArea(
-				'core/edit-widgets',
+				editWidgetsStore,
 				BLOCK_INSPECTOR_IDENTIFIER
 			);
 		}
@@ -124,7 +128,7 @@ export default function Sidebar() {
 			isGeneralSidebarOpen
 		) {
 			enableComplementaryArea(
-				'core/edit-widgets',
+				editWidgetsStore,
 				WIDGET_AREAS_IDENTIFIER
 			);
 		}

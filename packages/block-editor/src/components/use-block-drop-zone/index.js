@@ -10,6 +10,7 @@ import { useEffect, useState } from '@wordpress/element';
  */
 import useOnBlockDrop from '../use-on-block-drop';
 import { getDistanceToNearestEdge } from '../../utils/math';
+import { store as blockEditorStore } from '../../store';
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
 
@@ -101,7 +102,7 @@ export default function useBlockDropZone( {
 	const { isLockedAll, orientation } = useSelect(
 		( select ) => {
 			const { getBlockListSettings, getTemplateLock } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 			return {
 				isLockedAll: getTemplateLock( targetRootClientId ) === 'all',

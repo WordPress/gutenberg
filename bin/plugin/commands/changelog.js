@@ -22,21 +22,24 @@ const manifest = require( '../../../package.json' );
 /** @typedef {import('@octokit/rest')} GitHub */
 /** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
 /** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponseItem} OktokitIssuesListMilestonesForRepoResponseItem */
+/** @typedef {import('@octokit/rest').ReposListReleasesResponseItem} ReposListReleasesResponseItem */
 
 /**
  * @typedef WPChangelogCommandOptions
  *
- * @property {string=} milestone Optional Milestone title.
- * @property {string=} token     Optional personal access token.
+ * @property {string=}  milestone   Optional Milestone title.
+ * @property {string=}  token       Optional personal access token.
+ * @property {boolean=} unreleased  Optional flag to only include issues that haven't been part of a release yet.
  */
 
 /**
  * @typedef WPChangelogSettings
  *
- * @property {string}  owner     Repository owner.
- * @property {string}  repo      Repository name.
- * @property {string=} token     Optional personal access token.
- * @property {string}  milestone Milestone title.
+ * @property {string}   owner       Repository owner.
+ * @property {string}   repo        Repository name.
+ * @property {string=}  token       Optional personal access token.
+ * @property {string}   milestone   Milestone title.
+ * @property {boolean=} unreleased  Only include issues that have been closed since the milestone's latest release.
  */
 
 /**
@@ -47,20 +50,51 @@ const manifest = require( '../../../package.json' );
  */
 
 /**
- * Mapping of label names to grouping heading text to be used in release notes,
- * intended to be more readable in the context of release notes. Also used in
- * merging multiple related groupings to a single heading.
+ * Mapping of label names to sections in the release notes.
+ *
+ * Labels are sorted by the priority they have when there are
+ * multiple candidates. For example, if an issue has the labels
+ * "[Block] Navigation" and "[Type] Bug", it'll be assigned the
+ * section declared by "[Block] Navigation".
  *
  * @type {Record<string,string>}
  */
 const LABEL_TYPE_MAPPING = {
-	Bug: 'Bug Fixes',
-	Regression: 'Bug Fixes',
-	Feature: 'Features',
-	Enhancement: 'Enhancements',
-	'New API': 'New APIs',
-	Experimental: 'Experiments',
-	Task: 'Various',
+	'[Block] Navigation': 'Experiments',
+	'[Block] Query': 'Experiments',
+	'[Block] Post Comments Count': 'Experiments',
+	'[Block] Post Comments Form': 'Experiments',
+	'[Block] Post Comments': 'Experiments',
+	'[Block] Post Featured Image': 'Experiments',
+	'[Block] Post Hierarchical Terms': 'Experiments',
+	'[Block] Post Title': 'Experiments',
+	'[Block] Site Logo': 'Experiments',
+	'[Feature] Full Site Editing': 'Experiments',
+	'Global Styles': 'Experiments',
+	'[Feature] Navigation Screen': 'Experiments',
+	'[Feature] Widgets Screen': 'Experiments',
+	'[Package] Dependency Extraction Webpack Plugin': 'Tools',
+	'[Package] Jest Puppeteer aXe': 'Tools',
+	'[Package] E2E Tests': 'Tools',
+	'[Package] E2E Test Utils': 'Tools',
+	'[Package] Env': 'Tools',
+	'[Package] ESLint plugin': 'Tools',
+	'[Package] stylelint config': 'Tools',
+	'[Package] Project management automation': 'Tools',
+	'[Type] Project Management': 'Tools',
+	'[Package] Scripts': 'Tools',
+	'[Type] Build Tooling': 'Tools',
+	'Automated Testing': 'Tools',
+	'[Type] Experimental': 'Experiments',
+	'[Type] Bug': 'Bug Fixes',
+	'[Type] Regression': 'Bug Fixes',
+	'[Type] Feature': 'Features',
+	'[Type] Enhancement': 'Enhancements',
+	'[Type] New API': 'New APIs',
+	'[Type] Performance': 'Performance',
+	'[Type] Documentation': 'Documentation',
+	'[Type] Code Quality': 'Code Quality',
+	'[Type] Security': 'Security',
 };
 
 /**
@@ -78,6 +112,7 @@ const GROUP_TITLE_ORDER = [
 	'Experiments',
 	'Documentation',
 	'Code Quality',
+	'Tools',
 	undefined,
 	'Various',
 ];
@@ -105,7 +140,8 @@ const REWORD_TERMS = {
 };
 
 /**
- * Returns type candidates based on given issue label names.
+ * Returns candidates based on whether the given labels
+ * are part of the allowed list.
  *
  * @param {string[]} labels Label names.
  *
@@ -114,13 +150,10 @@ const REWORD_TERMS = {
 function getTypesByLabels( labels ) {
 	return uniq(
 		labels
-			.filter( ( label ) => label.startsWith( '[Type] ' ) )
-			.map( ( label ) => label.slice( '[Type] '.length ) )
-			.map( ( label ) =>
-				LABEL_TYPE_MAPPING.hasOwnProperty( label )
-					? LABEL_TYPE_MAPPING[ label ]
-					: label
+			.filter( ( label ) =>
+				Object.keys( LABEL_TYPE_MAPPING ).includes( label )
 			)
+			.map( ( label ) => LABEL_TYPE_MAPPING[ label ] )
 	);
 }
 
@@ -151,12 +184,29 @@ function getTypesByTitle( title ) {
  * @return {string} Type label.
  */
 function getIssueType( issue ) {
+	const labels = issue.labels.map( ( { name } ) => name );
 	const candidates = [
-		...getTypesByLabels( issue.labels.map( ( { name } ) => name ) ),
+		...getTypesByLabels( labels ),
 		...getTypesByTitle( issue.title ),
 	];
 
-	return candidates.length ? candidates.sort( sortGroup )[ 0 ] : 'Various';
+	return candidates.length ? candidates.sort( sortType )[ 0 ] : 'Various';
+}
+
+/**
+ * Sort comparator, comparing two label candidates.
+ *
+ * @param {string} a First candidate.
+ * @param {string} b Second candidate.
+ *
+ * @return {number} Sort result.
+ */
+function sortType( a, b ) {
+	const [ aIndex, bIndex ] = [ a, b ].map( ( title ) => {
+		return Object.keys( LABEL_TYPE_MAPPING ).indexOf( title );
+	} );
+
+	return aIndex - bIndex;
 }
 
 /**
@@ -287,11 +337,8 @@ function removeRedundantTypePrefix( title, issue ) {
  * @type {Array<WPChangelogNormalization>}
  */
 const TITLE_NORMALIZATIONS = [
-	createOmitByTitlePrefix( [ '[rnmobile]' ] ),
-	createOmitByLabel( [
-		'Mobile App Compatibility',
-		'[Type] Project Management',
-	] ),
+	createOmitByLabel( [ 'Mobile App Android/iOS' ] ),
+	createOmitByTitlePrefix( [ '[rnmobile]', '[mobile]', 'Mobile Release' ] ),
 	removeRedundantTypePrefix,
 	reword,
 	capitalizeAfterColonSeparatedPrefix,
@@ -337,6 +384,43 @@ function getEntry( issue ) {
 }
 
 /**
+ * Returns the latest release for a given series
+ *
+ * @param {GitHub} octokit  Initialized Octokit REST client.
+ * @param {string} owner    Repository owner.
+ * @param {string} repo     Repository name.
+ * @param {string} series   Gutenberg release series (e.g. '6.7' or '9.8').
+ *
+ * @return {Promise<ReposListReleasesResponseItem|undefined>} Promise resolving to pull
+ *                                                            requests for the given
+ *                                                            milestone.
+ */
+async function getLatestReleaseInSeries( octokit, owner, repo, series ) {
+	const releaseOptions = await octokit.repos.listReleases.endpoint.merge( {
+		owner,
+		repo,
+	} );
+
+	let latestReleaseForMilestone;
+
+	/**
+	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').ReposListReleasesResponse>>}
+	 */
+	const releases = octokit.paginate.iterator( releaseOptions );
+
+	for await ( const releasesPage of releases ) {
+		latestReleaseForMilestone = releasesPage.data.find( ( release ) =>
+			release.name.startsWith( series )
+		);
+
+		if ( latestReleaseForMilestone ) {
+			return latestReleaseForMilestone;
+		}
+	}
+	return undefined;
+}
+
+/**
  * Returns a promise resolving to an array of pull requests associated with the
  * changelog settings object.
  *
@@ -347,7 +431,7 @@ function getEntry( issue ) {
  *                                            pull requests.
  */
 async function fetchAllPullRequests( octokit, settings ) {
-	const { owner, repo, milestone: milestoneTitle } = settings;
+	const { owner, repo, milestone: milestoneTitle, unreleased } = settings;
 	const milestone = await getMilestoneByTitle(
 		octokit,
 		owner,
@@ -361,13 +445,19 @@ async function fetchAllPullRequests( octokit, settings ) {
 		);
 	}
 
+	const series = milestoneTitle.replace( 'Gutenberg ', '' );
+	const latestReleaseInSeries = unreleased
+		? await getLatestReleaseInSeries( octokit, owner, repo, series )
+		: undefined;
+
 	const { number } = milestone;
 	const issues = await getIssuesByMilestone(
 		octokit,
 		owner,
 		repo,
 		number,
-		'closed'
+		'closed',
+		latestReleaseInSeries ? latestReleaseInSeries.published_at : undefined
 	);
 	return issues.filter( ( issue ) => issue.pull_request );
 }
@@ -386,9 +476,15 @@ async function getChangelog( settings ) {
 
 	const pullRequests = await fetchAllPullRequests( octokit, settings );
 	if ( ! pullRequests.length ) {
-		throw new Error(
-			'There are no pull requests associated with the milestone.'
-		);
+		if ( settings.unreleased ) {
+			throw new Error(
+				'There are no unreleased pull requests associated with the milestone.'
+			);
+		} else {
+			throw new Error(
+				'There are no pull requests associated with the milestone.'
+			);
+		}
 	}
 
 	let changelog = '';
@@ -458,6 +554,7 @@ async function getReleaseChangelog( options ) {
 						),
 				  } )
 				: options.milestone,
+		unreleased: options.unreleased,
 	} );
 }
 

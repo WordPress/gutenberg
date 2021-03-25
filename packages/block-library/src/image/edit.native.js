@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { View, TouchableWithoutFeedback } from 'react-native';
 import { isEmpty, get, find, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
+import { Component } from '@wordpress/element';
 import {
 	requestMediaImport,
 	mediaUploadSync,
@@ -20,11 +20,11 @@ import {
 	Icon,
 	PanelBody,
 	TextControl,
-	ToggleControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Image,
 	WIDE_ALIGNMENTS,
+	LinkSettingsNavigation,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -36,6 +36,7 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockStyles,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
@@ -43,13 +44,12 @@ import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import {
-	external,
-	link,
 	image as placeholderIcon,
 	textColor,
 	replace,
 	expand,
 } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -57,13 +57,13 @@ import {
 import styles from './styles.scss';
 import { getUpdatedLinkTargetSettings } from './utils';
 
-import { LINK_DESTINATION_CUSTOM, DEFAULT_SIZE_SLUG } from './constants';
+import { LINK_DESTINATION_CUSTOM } from './constants';
 
 const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
 };
 
-export class ImageEdit extends React.Component {
+export class ImageEdit extends Component {
 	constructor( props ) {
 		super( props );
 
@@ -93,6 +93,29 @@ export class ImageEdit extends React.Component {
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
 			this
 		);
+		this.setMappedAttributes = this.setMappedAttributes.bind( this );
+		this.onSizeChangeValue = this.onSizeChangeValue.bind( this );
+
+		this.linkSettingsOptions = {
+			url: {
+				label: __( 'Image Link URL' ),
+				placeholder: __( 'Add URL' ),
+				autoFocus: false,
+				autoFill: true,
+			},
+			openInNewTab: {
+				label: __( 'Open in new tab' ),
+			},
+			linkRel: {
+				label: __( 'Link Rel' ),
+				placeholder: __( 'None' ),
+			},
+		};
+
+		this.sizeOptions = map( this.props.imageSizes, ( { name, slug } ) => ( {
+			value: slug,
+			name,
+		} ) );
 	}
 
 	componentDidMount() {
@@ -279,7 +302,10 @@ export class ImageEdit extends React.Component {
 	}
 
 	onSelectMediaUploadOption( media ) {
-		const { id, url } = this.props.attributes;
+		const {
+			attributes: { id, url },
+			imageDefaultSize,
+		} = this.props;
 
 		const mediaAttributes = {
 			id: media.id,
@@ -293,7 +319,7 @@ export class ImageEdit extends React.Component {
 			additionalAttributes = {
 				width: undefined,
 				height: undefined,
-				sizeSlug: DEFAULT_SIZE_SLUG,
+				sizeSlug: imageDefaultSize,
 			};
 		} else {
 			// Keep the same url when selecting the same file, so "Image Size" option is not changed.
@@ -338,33 +364,56 @@ export class ImageEdit extends React.Component {
 			: width;
 	}
 
+	setMappedAttributes( { url: href, ...restAttributes } ) {
+		const { setAttributes } = this.props;
+		return href === undefined
+			? setAttributes( restAttributes )
+			: setAttributes( { ...restAttributes, href } );
+	}
+
+	getLinkSettings() {
+		const { isLinkSheetVisible } = this.state;
+		const {
+			attributes: { href: url, ...unMappedAttributes },
+		} = this.props;
+
+		const mappedAttributes = { ...unMappedAttributes, url };
+
+		return (
+			<LinkSettingsNavigation
+				isVisible={ isLinkSheetVisible }
+				url={ mappedAttributes.url }
+				rel={ mappedAttributes.rel }
+				label={ mappedAttributes.label }
+				linkTarget={ mappedAttributes.linkTarget }
+				onClose={ this.dismissSheet }
+				setAttributes={ this.setMappedAttributes }
+				withBottomSheet={ false }
+				hasPicker
+				options={ this.linkSettingsOptions }
+				showIcon={ false }
+			/>
+		);
+	}
+
+	onSizeChangeValue( newValue ) {
+		this.onSetSizeSlug( newValue );
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
 		const {
 			attributes,
 			isSelected,
 			image,
-			imageSizes,
 			clientId,
+			imageDefaultSize,
 		} = this.props;
-		const {
-			align,
-			url,
-			alt,
-			href,
-			id,
-			linkTarget,
-			sizeSlug,
-			className,
-		} = attributes;
+		const { align, url, alt, id, sizeSlug, className } = attributes;
 
-		const sizeOptions = map( imageSizes, ( { name, slug } ) => ( {
-			value: slug,
-			name,
-		} ) );
-		const sizeOptionsValid = find( sizeOptions, [
+		const sizeOptionsValid = find( this.sizeOptions, [
 			'value',
-			DEFAULT_SIZE_SLUG,
+			imageDefaultSize,
 		] );
 
 		const getToolbarEditButton = ( open ) => (
@@ -387,36 +436,16 @@ export class ImageEdit extends React.Component {
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) } />
 				<PanelBody style={ styles.panelBody }>
-					{ image && (
-						<BlockStyles clientId={ clientId } url={ url } />
-					) }
+					<BlockStyles clientId={ clientId } url={ url } />
 				</PanelBody>
 				<PanelBody>
-					<TextControl
-						icon={ link }
-						label={ __( 'Link To' ) }
-						value={ href || '' }
-						valuePlaceholder={ __( 'Add URL' ) }
-						onChange={ this.onSetLinkDestination }
-						autoCapitalize="none"
-						autoCorrect={ false }
-						keyboardType="url"
-					/>
-					<ToggleControl
-						icon={ external }
-						label={ __( 'Open in new tab' ) }
-						checked={ linkTarget === '_blank' }
-						onChange={ this.onSetNewTab }
-					/>
 					{ image && sizeOptionsValid && (
 						<CycleSelectControl
 							icon={ expand }
 							label={ __( 'Size' ) }
-							value={ sizeSlug || DEFAULT_SIZE_SLUG }
-							onChangeValue={ ( newValue ) =>
-								this.onSetSizeSlug( newValue )
-							}
-							options={ sizeOptions }
+							value={ sizeSlug || imageDefaultSize }
+							onChangeValue={ this.onSizeChangeValue }
+							options={ this.sizeOptions }
 						/>
 					) }
 					<TextControl
@@ -426,6 +455,9 @@ export class ImageEdit extends React.Component {
 						valuePlaceholder={ __( 'None' ) }
 						onChangeValue={ this.updateAlt }
 					/>
+				</PanelBody>
+				<PanelBody title={ __( 'Link Settings' ) }>
+					{ this.getLinkSettings( true ) }
 				</PanelBody>
 			</InspectorControls>
 		);
@@ -460,8 +492,8 @@ export class ImageEdit extends React.Component {
 					disabled={ ! isSelected }
 				>
 					<View style={ styles.content }>
-						{ getInspectorControls() }
-						{ getMediaOptions() }
+						{ isSelected && getInspectorControls() }
+						{ isSelected && getMediaOptions() }
 						{ ! this.state.isCaptionSelected &&
 							getToolbarEditButton( openMediaOptions ) }
 						<MediaUploadProgress
@@ -534,13 +566,13 @@ export class ImageEdit extends React.Component {
 
 export default compose( [
 	withSelect( ( select, props ) => {
-		const { getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
+		const { getMedia } = select( coreStore );
+		const { getSettings } = select( blockEditorStore );
 		const {
 			attributes: { id, url },
 			isSelected,
 		} = props;
-		const { imageSizes } = getSettings();
+		const { imageSizes, imageDefaultSize } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
 
 		const shouldGetMedia =
@@ -554,6 +586,7 @@ export default compose( [
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
+			imageDefaultSize,
 		};
 	} ),
 	withPreferredColorScheme,

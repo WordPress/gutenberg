@@ -48,19 +48,52 @@ function Snackbar(
 		actions = [],
 		onRemove = noop,
 		icon = null,
+		explicitDismiss = false,
+		// onDismiss is a callback executed when the snackbar is dismissed.
+		// It is distinct from onRemove, which _looks_ like a callback but is
+		// actually the function to call to remove the snackbar from the UI.
+		onDismiss = noop,
 	},
 	ref
 ) {
+	onDismiss = onDismiss || noop;
+
+	function dismissMe( event ) {
+		if ( event && event.preventDefault ) {
+			event.preventDefault();
+		}
+
+		onDismiss();
+		onRemove();
+	}
+
+	function onActionClick( event, onClick ) {
+		event.stopPropagation();
+
+		onRemove();
+
+		if ( onClick ) {
+			onClick( event );
+		}
+	}
+
 	useSpokenMessage( spokenMessage, politeness );
+
+	// Only set up the timeout dismiss if we're not explicitly dismissing.
 	useEffect( () => {
 		const timeoutHandle = setTimeout( () => {
-			onRemove();
+			if ( ! explicitDismiss ) {
+				onDismiss();
+				onRemove();
+			}
 		}, NOTICE_TIMEOUT );
 
 		return () => clearTimeout( timeoutHandle );
-	}, [] );
+	}, [ onDismiss, onRemove ] );
 
-	const classes = classnames( className, 'components-snackbar' );
+	const classes = classnames( className, 'components-snackbar', {
+		'components-snackbar-explicit-dismiss': !! explicitDismiss,
+	} );
 	if ( actions && actions.length > 1 ) {
 		// we need to inform developers that snackbar only accepts 1 action
 		warning(
@@ -81,11 +114,11 @@ function Snackbar(
 		<div
 			ref={ ref }
 			className={ classes }
-			onClick={ onRemove }
+			onClick={ ! explicitDismiss ? dismissMe : noop }
 			tabIndex="0"
-			role="button"
-			onKeyPress={ onRemove }
-			aria-label={ __( 'Dismiss this notice' ) }
+			role={ ! explicitDismiss ? 'button' : '' }
+			onKeyPress={ ! explicitDismiss ? dismissMe : noop }
+			aria-label={ ! explicitDismiss ? __( 'Dismiss this notice' ) : '' }
 		>
 			<div className={ snackbarContentClassnames }>
 				{ icon && (
@@ -98,18 +131,27 @@ function Snackbar(
 							key={ index }
 							href={ url }
 							isTertiary
-							onClick={ ( event ) => {
-								event.stopPropagation();
-								if ( onClick ) {
-									onClick( event );
-								}
-							} }
+							onClick={ ( event ) =>
+								onActionClick( event, onClick )
+							}
 							className="components-snackbar__action"
 						>
 							{ label }
 						</Button>
 					);
 				} ) }
+				{ explicitDismiss && (
+					<span
+						role="button"
+						aria-label="Dismiss this notice"
+						tabIndex="0"
+						className="components-snackbar__dismiss-button"
+						onClick={ dismissMe }
+						onKeyPress={ dismissMe }
+					>
+						&#x2715;
+					</span>
+				) }
 			</div>
 		</div>
 	);

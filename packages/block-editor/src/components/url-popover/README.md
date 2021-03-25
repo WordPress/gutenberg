@@ -16,7 +16,7 @@ class MyURLPopover extends Component {
 		super( ...arguments );
 
 		this.onChangeURL = this.onChangeURL.bind( this );
-		this.openURLPopover = this.closeURLPopover.bind( this );
+		this.openURLPopover = this.openURLPopover.bind( this );
 		this.closeURLPopover = this.closeURLPopover.bind( this );
 		this.submitURL = this.submitURL.bind( this );
 		this.setTarget = this.setTarget.bind( this );

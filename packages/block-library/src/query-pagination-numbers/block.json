@@ -1,0 +1,14 @@
+{
+	"apiVersion": 2,
+	"name": "core/query-pagination-numbers",
+	"category": "design",
+	"usesContext": [
+		"queryId",
+		"query"
+	],
+	"supports": {
+		"reusable": false,
+		"html": false
+	},
+	"editorStyle": "query-pagination-numbers-editor"
+}

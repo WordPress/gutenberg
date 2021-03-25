@@ -21,6 +21,7 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -36,14 +37,14 @@ export default function PostTitleEdit( {
 
 	const post = useSelect(
 		( select ) =>
-			select( 'core' ).getEditedEntityRecord(
+			select( coreStore ).getEditedEntityRecord(
 				'postType',
 				postType,
 				postId
 			),
 		[ postType, postId ]
 	);
-	const { editEntityRecord } = useDispatch( 'core' );
+	const { editEntityRecord } = useDispatch( coreStore );
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -58,31 +59,46 @@ export default function PostTitleEdit( {
 	const { title, link } = post;
 
 	let titleElement = (
-		<PlainText
-			tagName={ TagName }
-			placeholder={ __( 'No Title' ) }
-			value={ title }
-			onChange={ ( value ) =>
-				editEntityRecord( 'postType', postType, postId, {
-					title: value,
-				} )
-			}
-			__experimentalVersion={ 2 }
-			{ ...( isLink ? {} : blockProps ) }
-		/>
+		<TagName { ...( isLink ? {} : blockProps ) }>
+			{ __( 'An example title' ) }
+		</TagName>
 	);
+
+	if ( postType && postId ) {
+		titleElement = (
+			<PlainText
+				tagName={ TagName }
+				placeholder={ __( 'No Title' ) }
+				value={ title }
+				onChange={ ( value ) =>
+					editEntityRecord( 'postType', postType, postId, {
+						title: value,
+					} )
+				}
+				__experimentalVersion={ 2 }
+				{ ...( isLink ? {} : blockProps ) }
+			/>
+		);
+	}
 
 	if ( isLink ) {
 		titleElement = (
-			<a
-				href={ link }
-				target={ linkTarget }
-				rel={ rel }
-				onClick={ ( event ) => event.preventDefault() }
-				{ ...blockProps }
-			>
-				{ titleElement }
-			</a>
+			<TagName { ...blockProps }>
+				<PlainText
+					tagName="a"
+					href={ link }
+					target={ linkTarget }
+					rel={ rel }
+					placeholder={ title.length === 0 ? __( 'No Title' ) : null }
+					value={ title }
+					onChange={ ( value ) =>
+						editEntityRecord( 'postType', postType, postId, {
+							title: value,
+						} )
+					}
+					__experimentalVersion={ 2 }
+				/>
+			</TagName>
 		);
 	}
 

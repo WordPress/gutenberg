@@ -19,3 +19,34 @@
 .list {
 	padding-bottom: 20;
 }
+
+.searchForm {
+	height: 46px;
+	border-radius: 8px;
+	color: $gray-dark;
+	margin: $grid-unit-30;
+	background-color: $gray-light;
+	flex-direction: row;
+	justify-content: space-between;
+}
+
+.searchFormDark {
+	background-color: rgba($white, 0.07);
+}
+
+.searchFormInput {
+	color: $gray-dark;
+	flex: 2;
+}
+
+.searchFormInputDark {
+	color: $white;
+}
+
+.searchFormPlaceholder {
+	color: $gray;
+}
+
+.searchFormPlaceholderDark {
+	color: rgba($white, 0.8);
+}

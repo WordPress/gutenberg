@@ -28,6 +28,9 @@
 		},
 		"title": {
 			"type": "string"
+		},
+		"kind": {
+			"type": "string"
 		}
 	},
 	"usesContext": [
@@ -37,10 +40,13 @@
 		"customBackgroundColor",
 		"fontSize",
 		"customFontSize",
-		"showSubmenuIcon"
+		"showSubmenuIcon",
+		"style"
 	],
 	"supports": {
 		"reusable": false,
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-navigation-link-editor",
+	"style": "wp-block-navigation-link"
 }

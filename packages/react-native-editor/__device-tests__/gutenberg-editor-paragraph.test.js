@@ -1,50 +1,20 @@
 /**
  * Internal dependencies
  */
-import EditorPage from './pages/editor-page';
+import { blockNames } from './pages/editor-page';
 import {
 	backspace,
-	setupDriver,
-	isLocalEnvironment,
 	clickMiddleOfElement,
 	clickBeginningOfElement,
-	stopDriver,
 	isAndroid,
 } from './helpers/utils';
 import testData from './helpers/test-data';
 
-jest.setTimeout( 1000000 );
-
 describe( 'Gutenberg Editor tests for Paragraph Block', () => {
-	let driver;
-	let editorPage;
-	let allPassed = true;
-	const paragraphBlockName = 'Paragraph';
-
-	// Use reporter for setting status for saucelabs Job
-	if ( ! isLocalEnvironment() ) {
-		const reporter = {
-			specDone: async ( result ) => {
-				allPassed = allPassed && result.status !== 'failed';
-			},
-		};
-
-		jasmine.getEnv().addReporter( reporter );
-	}
-
-	beforeAll( async () => {
-		driver = await setupDriver();
-		editorPage = new EditorPage( driver );
-	} );
-
-	it( 'should be able to see visual editor', async () => {
-		await expect( editorPage.getBlockList() ).resolves.toBe( true );
-	} );
-
 	it( 'should be able to add a new Paragraph block', async () => {
-		await editorPage.addNewBlock( paragraphBlockName );
+		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName
+			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -54,13 +24,13 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			paragraphBlockElement,
 			testData.shortText
 		);
-		await editorPage.removeBlockAtPosition( paragraphBlockName );
+		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 
 	it( 'should be able to split one paragraph block into two', async () => {
-		await editorPage.addNewBlock( paragraphBlockName );
+		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName
+			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -73,15 +43,21 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		const textViewElement = await editorPage.getTextViewForParagraphBlock(
 			paragraphBlockElement
 		);
-		await clickMiddleOfElement( driver, textViewElement );
+		await clickMiddleOfElement( editorPage.driver, textViewElement );
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			'\n',
 			false
 		);
 		expect(
-			( await editorPage.hasBlockAtPosition( 1, paragraphBlockName ) ) &&
-				( await editorPage.hasBlockAtPosition( 2, paragraphBlockName ) )
+			( await editorPage.hasBlockAtPosition(
+				1,
+				blockNames.paragraph
+			) ) &&
+				( await editorPage.hasBlockAtPosition(
+					2,
+					blockNames.paragraph
+				) )
 		).toBe( true );
 
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
@@ -92,14 +68,14 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			new RegExp( `${ text0 + text1 }|${ text0 } ${ text1 }` )
 		);
 
-		await editorPage.removeBlockAtPosition( paragraphBlockName, 2 );
-		await editorPage.removeBlockAtPosition( paragraphBlockName );
+		await editorPage.removeBlockAtPosition( blockNames.paragraph, 2 );
+		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 
 	it( 'should be able to merge 2 paragraph blocks into 1', async () => {
-		await editorPage.addNewBlock( paragraphBlockName );
+		await editorPage.addNewBlock( blockNames.paragraph );
 		let paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName
+			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -112,20 +88,26 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		let textViewElement = await editorPage.getTextViewForParagraphBlock(
 			paragraphBlockElement
 		);
-		await clickMiddleOfElement( driver, textViewElement );
+		await clickMiddleOfElement( editorPage.driver, textViewElement );
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			'\n'
 		);
 		expect(
-			( await editorPage.hasBlockAtPosition( 1, paragraphBlockName ) ) &&
-				( await editorPage.hasBlockAtPosition( 2, paragraphBlockName ) )
+			( await editorPage.hasBlockAtPosition(
+				1,
+				blockNames.paragraph
+			) ) &&
+				( await editorPage.hasBlockAtPosition(
+					2,
+					blockNames.paragraph
+				) )
 		).toBe( true );
 
 		const text0 = await editorPage.getTextForParagraphBlockAtPosition( 1 );
 		const text1 = await editorPage.getTextForParagraphBlockAtPosition( 2 );
 		paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName,
+			blockNames.paragraph,
 			2
 		);
 		if ( isAndroid() ) {
@@ -135,7 +117,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		textViewElement = await editorPage.getTextViewForParagraphBlock(
 			paragraphBlockElement
 		);
-		await clickBeginningOfElement( driver, textViewElement );
+		await clickBeginningOfElement( editorPage.driver, textViewElement );
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
 			backspace
@@ -145,15 +127,15 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		expect( text0 + text1 ).toMatch( text );
 
 		expect(
-			await editorPage.hasBlockAtPosition( 2, paragraphBlockName )
+			await editorPage.hasBlockAtPosition( 2, blockNames.paragraph )
 		).toBe( false );
-		await editorPage.removeBlockAtPosition( paragraphBlockName );
+		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 
 	it( 'should be able to create a post with multiple paragraph blocks', async () => {
-		await editorPage.addNewBlock( paragraphBlockName );
+		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
-			paragraphBlockName
+			blockNames.paragraph
 		);
 		if ( isAndroid() ) {
 			await paragraphBlockElement.click();
@@ -162,7 +144,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 		await editorPage.sendTextToParagraphBlock( 1, testData.longText );
 
 		for ( let i = 3; i > 0; i-- ) {
-			await editorPage.removeBlockAtPosition( paragraphBlockName, i );
+			await editorPage.removeBlockAtPosition( blockNames.paragraph, i );
 		}
 	} );
 
@@ -180,11 +162,11 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 			// // Merge paragraphs
 			const secondParagraphBlockElement = await editorPage.getBlockAtPosition(
-				paragraphBlockName,
+				blockNames.paragraph,
 				2
 			);
 			await clickBeginningOfElement(
-				driver,
+				editorPage.driver,
 				secondParagraphBlockElement
 			);
 			await editorPage.typeTextToParagraphBlock(
@@ -198,7 +180,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			);
 			expect( text.length ).not.toEqual( 0 );
 
-			await editorPage.removeBlockAtPosition( paragraphBlockName );
+			await editorPage.removeBlockAtPosition( blockNames.paragraph );
 		} );
 
 		// Based on https://github.com/wordpress-mobile/gutenberg-mobile/pull/1507
@@ -214,11 +196,11 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 
 			// // Merge paragraphs
 			const secondParagraphBlockElement = await editorPage.getBlockAtPosition(
-				paragraphBlockName,
+				blockNames.paragraph,
 				2
 			);
 			await clickBeginningOfElement(
-				driver,
+				editorPage.driver,
 				secondParagraphBlockElement
 			);
 			await editorPage.typeTextToParagraphBlock(
@@ -232,14 +214,7 @@ describe( 'Gutenberg Editor tests for Paragraph Block', () => {
 			);
 			expect( text.length ).not.toEqual( 0 );
 
-			await editorPage.removeBlockAtPosition( paragraphBlockName );
+			await editorPage.removeBlockAtPosition( blockNames.paragraph );
 		} );
 	}
-
-	afterAll( async () => {
-		if ( ! isLocalEnvironment() ) {
-			driver.sauceJobStatus( allPassed );
-		}
-		await stopDriver( driver );
-	} );
 } );

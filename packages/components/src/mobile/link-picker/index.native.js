@@ -1,14 +1,13 @@
 /**
  * External dependencies
  */
-import { useState } from 'react';
 import { SafeAreaView, TouchableOpacity, View } from 'react-native';
 import { lowerCase, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { BottomSheet, Icon } from '@wordpress/components';
 import { getProtocol, prependHTTP } from '@wordpress/url';

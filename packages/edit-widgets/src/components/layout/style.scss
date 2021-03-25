@@ -1,15 +1,3 @@
-
-// Ideally  we don't need all these nested divs.
-// Removing these requires a refactoring of the different a11y HoCs.
-.edit-widgets-layout__inserter-panel-popover-wrapper {
-	&,
-	& > div,
-	& > div > div,
-	& > div > div > div {
-		height: 100%;
-	}
-}
-
 .edit-widgets-layout__inserter-panel {
 	height: 100%;
 	display: flex;

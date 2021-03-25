@@ -1,15 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { useCallback } from '@wordpress/element';
 import { TAB } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
+import { useCallback } from '@wordpress/element';
 
 /**
  * In Dialogs/modals, the tabbing must be constrained to the content of
  * the wrapper element. This hook adds the behavior to the returned ref.
  *
- * @return {Function} Element Ref.
+ * @return {Object|Function} Element Ref.
  *
  * @example
  * ```js

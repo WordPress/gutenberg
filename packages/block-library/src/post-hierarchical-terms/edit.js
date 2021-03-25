@@ -18,6 +18,7 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -54,7 +55,7 @@ export default function PostHierarchicalTermsEdit( {
 	const selectedTerm = useSelect(
 		( select ) => {
 			if ( ! term ) return {};
-			const taxonomies = select( 'core' ).getTaxonomies( {
+			const taxonomies = select( coreStore ).getTaxonomies( {
 				per_page: -1,
 			} );
 			return (

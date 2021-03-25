@@ -1,4 +1,4 @@
-/* eslint-disable jest/no-try-expect */
+/* eslint-disable jest/no-try-expect, jest/no-conditional-expect */
 /**
  * External dependencies
  */
@@ -364,8 +364,9 @@ describe( 'readConfig', () => {
 					JSON.stringify( {
 						plugins: [
 							'WordPress/gutenberg',
-							'WordPress/gutenberg#master',
+							'WordPress/gutenberg#trunk',
 							'WordPress/gutenberg#5.0',
+							'WordPress/theme-experiments/tt1-blocks#tt1-blocks@0.4.3',
 						],
 					} )
 				)
@@ -383,7 +384,7 @@ describe( 'readConfig', () => {
 					{
 						type: 'git',
 						url: 'https://github.com/WordPress/gutenberg.git',
-						ref: 'master',
+						ref: 'trunk',
 						path: expect.stringMatching( /^\/.*gutenberg$/ ),
 						basename: 'gutenberg',
 					},
@@ -393,6 +394,16 @@ describe( 'readConfig', () => {
 						ref: '5.0',
 						path: expect.stringMatching( /^\/.*gutenberg$/ ),
 						basename: 'gutenberg',
+					},
+					{
+						type: 'git',
+						url:
+							'https://github.com/WordPress/theme-experiments.git',
+						ref: 'tt1-blocks@0.4.3',
+						path: expect.stringMatching(
+							/^\/.*theme-experiments\/tt1-blocks$/
+						),
+						basename: 'tt1-blocks',
 					},
 				],
 			};
@@ -530,7 +541,7 @@ describe( 'readConfig', () => {
 					JSON.stringify( {
 						mappings: {
 							test: './relative',
-							test2: 'WordPress/gutenberg#master',
+							test2: 'WordPress/gutenberg#trunk',
 						},
 					} )
 				)
@@ -1115,4 +1126,4 @@ async function testPortNumberValidation( portName, value, envText = '' ) {
 	}
 	jest.clearAllMocks();
 }
-/* eslint-enable jest/no-try-expect */
+/* eslint-enable jest/no-try-expect, jest/no-conditional-expect */

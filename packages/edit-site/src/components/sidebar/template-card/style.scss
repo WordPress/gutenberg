@@ -1,0 +1,28 @@
+.edit-site-template-card {
+	display: flex;
+	align-items: flex-start;
+}
+
+.edit-site-template-card__content {
+	flex-grow: 1;
+}
+
+.edit-site-template-card__title {
+	font-weight: 500;
+	&.edit-site-template-card__title {
+		margin: 0 0 5px;
+	}
+}
+
+.edit-site-template-card__description {
+	font-size: $default-font-size;
+}
+
+.edit-site-template-card__icon {
+	flex: 0 0 $button-size;
+	margin-left: -2px;
+	margin-right: 10px;
+	padding: 0 3px;
+	width: $button-size;
+	height: $button-size-small;
+}

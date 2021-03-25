@@ -52,13 +52,12 @@ import * as search from './search';
 import * as separator from './separator';
 import * as shortcode from './shortcode';
 import * as spacer from './spacer';
-import * as subhead from './subhead';
 import * as table from './table';
 import * as textColumns from './text-columns';
 import * as verse from './verse';
 import * as video from './video';
 import * as tagCloud from './tag-cloud';
-import * as classic from './classic';
+import * as classic from './freeform';
 import * as group from './group';
 import * as buttons from './buttons';
 import * as socialLink from './social-link';
@@ -101,7 +100,6 @@ export const coreBlocks = [
 	separator,
 	reusableBlock,
 	spacer,
-	subhead,
 	table,
 	tagCloud,
 	textColumns,
@@ -224,6 +222,9 @@ export const registerCoreBlocks = () => {
 		socialLinks,
 		pullquote,
 		file,
+		audio,
+		devOnly( reusableBlock ),
+		devOnly( search ),
 	].forEach( registerBlock );
 
 	registerBlockVariations( socialLink );

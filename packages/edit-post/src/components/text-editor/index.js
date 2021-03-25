@@ -12,6 +12,11 @@ import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
 import { compose } from '@wordpress/compose';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
+
 function TextEditor( { onExit, isRichEditingEnabled } ) {
 	return (
 		<div className="edit-post-text-editor">
@@ -44,7 +49,7 @@ export default compose(
 	withDispatch( ( dispatch ) => {
 		return {
 			onExit() {
-				dispatch( 'core/edit-post' ).switchEditorMode( 'visual' );
+				dispatch( editPostStore ).switchEditorMode( 'visual' );
 			},
 		};
 	} )

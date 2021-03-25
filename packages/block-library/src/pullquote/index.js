@@ -19,7 +19,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Pullquote' ),
+	title: _x( 'Pullquote', 'block title' ),
 	description: __(
 		'Give special visual emphasis to a quote from your text.'
 	),

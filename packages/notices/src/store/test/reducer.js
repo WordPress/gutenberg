@@ -34,6 +34,8 @@ describe( 'reducer', () => {
 					actions: [],
 					type: 'default',
 					icon: null,
+					explicitDismiss: false,
+					onDismiss: null,
 				},
 			],
 		} );
@@ -57,6 +59,8 @@ describe( 'reducer', () => {
 					actions: [],
 					type: 'default',
 					icon: null,
+					explicitDismiss: false,
+					onDismiss: null,
 				},
 			],
 		} );
@@ -81,6 +85,8 @@ describe( 'reducer', () => {
 					actions: [],
 					type: 'default',
 					icon: null,
+					explicitDismiss: false,
+					onDismiss: null,
 				},
 				{
 					id: expect.any( String ),
@@ -92,6 +98,8 @@ describe( 'reducer', () => {
 					actions: [],
 					type: 'default',
 					icon: null,
+					explicitDismiss: false,
+					onDismiss: null,
 				},
 			],
 		} );
@@ -156,6 +164,8 @@ describe( 'reducer', () => {
 					actions: [],
 					type: 'default',
 					icon: null,
+					explicitDismiss: false,
+					onDismiss: null,
 				},
 			],
 		} );

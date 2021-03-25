@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/hooks",
-	"version": "2.10.0",
+	"version": "2.12.0",
 	"description": "WordPress hooks library.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"hooks"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/hooks/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/hooks/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -23,7 +23,7 @@
 	"react-native": "src/index",
 	"types": "build-types",
 	"dependencies": {
-		"@babel/runtime": "^7.12.5"
+		"@babel/runtime": "^7.13.10"
 	},
 	"publishConfig": {
 		"access": "public"

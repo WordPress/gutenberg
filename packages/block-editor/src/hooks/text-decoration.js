@@ -27,17 +27,11 @@ export function TextDecorationEdit( props ) {
 		attributes: { style },
 		setAttributes,
 	} = props;
-	const textDecorations = useEditorFeature( 'typography.textDecorations' );
 	const isDisabled = useIsTextDecorationDisabled( props );
 
 	if ( isDisabled ) {
 		return null;
 	}
-
-	const textDecoration = getTextDecorationFromAttributeValue(
-		textDecorations,
-		style?.typography?.textDecoration
-	);
 
 	function onChange( newDecoration ) {
 		setAttributes( {
@@ -53,8 +47,7 @@ export function TextDecorationEdit( props ) {
 
 	return (
 		<TextDecorationControl
-			value={ textDecoration }
-			textDecorations={ textDecorations }
+			value={ style?.typography?.textDecoration }
 			onChange={ onChange }
 		/>
 	);
@@ -71,28 +64,9 @@ export function useIsTextDecorationDisabled( { name: blockName } = {} ) {
 		blockName,
 		TEXT_DECORATION_SUPPORT_KEY
 	);
-	const textDecorations = useEditorFeature( 'typography.textDecorations' );
-	const hasTextDecorations = !! textDecorations?.length;
+	const hasTextDecoration = useEditorFeature(
+		'typography.customTextDecorations'
+	);
 
-	return notSupported || ! hasTextDecorations;
+	return notSupported || ! hasTextDecoration;
 }
-
-/**
- * Extracts the current text decoration selection, if available, from the CSS
- * variable set as the `styles.typography.textDecoration` attribute.
- *
- * @param  {Array}  textDecorations Available text decorations as defined in theme.json.
- * @param  {string} value           Attribute value in `styles.typography.textDecoration`
- * @return {string}                 Actual text decoration value
- */
-const getTextDecorationFromAttributeValue = ( textDecorations, value ) => {
-	const attributeParsed = /var:preset\|text-decoration\|(.+)/.exec( value );
-
-	if ( attributeParsed && attributeParsed[ 1 ] ) {
-		return textDecorations.find(
-			( { slug } ) => slug === attributeParsed[ 1 ]
-		)?.slug;
-	}
-
-	return value;
-};

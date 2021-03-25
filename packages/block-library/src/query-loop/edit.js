@@ -14,12 +14,9 @@ import {
 	BlockPreview,
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import { useQueryContext } from '../query';
+import { store as coreStore } from '@wordpress/core-data';
 
 const TEMPLATE = [
 	[ 'core/post-title' ],
@@ -41,18 +38,20 @@ export default function QueryLoopEdit( {
 			search,
 			exclude,
 			sticky,
+			inherit,
 		} = {},
-		queryContext,
+		queryContext = [ { page: 1 } ],
+		templateSlug,
 		layout: { type: layoutType = 'flex', columns = 1 } = {},
 	},
 } ) {
-	const [ { page } ] = useQueryContext() || queryContext || [ {} ];
+	const [ { page } ] = queryContext;
 	const [ activeBlockContext, setActiveBlockContext ] = useState();
 
 	const { posts, blocks } = useSelect(
 		( select ) => {
-			const { getEntityRecords } = select( 'core' );
-			const { getBlocks } = select( 'core/block-editor' );
+			const { getEntityRecords } = select( coreStore );
+			const { getBlocks } = select( blockEditorStore );
 			const query = {
 				offset: perPage ? perPage * ( page - 1 ) + offset : 0,
 				categories: categoryIds,
@@ -78,6 +77,14 @@ export default function QueryLoopEdit( {
 			if ( sticky ) {
 				query.sticky = sticky === 'only';
 			}
+			// If `inherit` is truthy, adjust conditionally the query to create a better preview.
+			if ( inherit ) {
+				// Change the post-type if needed.
+				if ( templateSlug?.startsWith( 'archive-' ) ) {
+					query.postType = templateSlug.replace( 'archive-', '' );
+					postType = query.postType;
+				}
+			}
 			return {
 				posts: getEntityRecords( 'postType', postType, query ),
 				blocks: getBlocks( clientId ),
@@ -97,6 +104,8 @@ export default function QueryLoopEdit( {
 			postType,
 			exclude,
 			sticky,
+			inherit,
+			templateSlug,
 		]
 	);
 

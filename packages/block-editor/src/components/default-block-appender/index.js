@@ -16,6 +16,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import Inserter from '../inserter';
+import { store as blockEditorStore } from '../../store';
 
 export function DefaultBlockAppender( {
 	isLocked,
@@ -79,7 +80,7 @@ export default compose(
 			isBlockValid,
 			getSettings,
 			getTemplateLock,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
 		const isLastBlockDefault =
@@ -97,7 +98,7 @@ export default compose(
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const { insertDefaultBlock, startTyping } = dispatch(
-			'core/block-editor'
+			blockEditorStore
 		);
 
 		return {

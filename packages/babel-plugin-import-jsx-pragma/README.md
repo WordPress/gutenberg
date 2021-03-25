@@ -14,6 +14,8 @@ Install the module to your project using [npm](https://www.npmjs.com/).
 npm install @wordpress/babel-plugin-import-jsx-pragma
 ```
 
+**Note**: This package requires Node.js 12.0.0 or later. It is not compatible with older versions.
+
 ## Usage
 
 Refer to the [Babel Plugins documentation](http://babeljs.io/docs/en/plugins) if you don't yet have experience working with Babel plugins.
@@ -30,7 +32,7 @@ module.exports = {
 };
 ```
 
-_Note:_ `@wordpress/babel-plugin-import-jsx-pragma` is included in `@wordpress/babel-preset-default` (default preset for WordPress development) starting from `v4.0.0`. If you are using this preset, you shouldn't include this plugin in your Babel config. 
+_Note:_ `@wordpress/babel-plugin-import-jsx-pragma` is included in `@wordpress/babel-preset-default` (default preset for WordPress development) starting from `v4.0.0`. If you are using this preset, you shouldn't include this plugin in your Babel config.
 
 ## Options
 
@@ -42,16 +44,22 @@ For example, if you are using the `@wordpress/element` package, you may want to 
 // .babelrc.js
 module.exports = {
 	plugins: [
-		[ '@wordpress/babel-plugin-import-jsx-pragma', {
-			scopeVariable: 'createElement',
-			scopeVariableFrag: 'Fragment',
-			source: '@wordpress/element',
-			isDefault: false,
-		} ],
-		[ '@babel/plugin-transform-react-jsx', {
-			pragma: 'createElement',
-			pragmaFrag: 'Fragment',
-		} ],
+		[
+			'@wordpress/babel-plugin-import-jsx-pragma',
+			{
+				scopeVariable: 'createElement',
+				scopeVariableFrag: 'Fragment',
+				source: '@wordpress/element',
+				isDefault: false,
+			},
+		],
+		[
+			'@babel/plugin-transform-react-jsx',
+			{
+				pragma: 'createElement',
+				pragmaFrag: 'Fragment',
+			},
+		],
 	],
 };
 ```

@@ -23,6 +23,7 @@ describe( 'recordToDom', () => {
 
 	spec.forEach(
 		( { description, multilineTag, record, startPath, endPath } ) => {
+			// eslint-disable-next-line jest/valid-title
 			it( description, () => {
 				const { body, selection } = toDom( {
 					value: record,
@@ -94,6 +95,7 @@ describe( 'applyValue', () => {
 	];
 
 	cases.forEach( ( { current, future, description, movedCount } ) => {
+		// eslint-disable-next-line jest/valid-title
 		it( description, () => {
 			const body = createElement( document, current ).cloneNode( true );
 			const futureBody = createElement( document, future ).cloneNode(

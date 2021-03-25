@@ -3,6 +3,9 @@
 	align-self: flex-start;
 }
 
+// Block spacing used to indicate the space between blocks in the editor.
+// The variable has been retired.
+$block-spacing: 4px;
 .outline {
 	// Border Width has to be spread since width is thicker
 	// on Android when border radius is decreased to 0
@@ -52,4 +55,16 @@
 .linkSettingsPanel {
 	padding-left: 0;
 	padding-right: 0;
+}
+
+.button75 {
+	margin: $solid-border-space - $block-selected-border-width;
+}
+
+.button50 {
+	margin: $solid-border-space * 2 - $block-selected-border-width * 2;
+}
+
+.button25 {
+	margin: $block-edge-to-content * 2 + $block-selected-border-width;
 }

@@ -17,9 +17,11 @@ import { store as viewportStore } from '@wordpress/viewport';
  * Internal dependencies
  */
 import ComplementaryAreaHeader from '../complementary-area-header';
+import ComplementaryAreaMoreMenuItem from '../complementary-area-more-menu-item';
 import ComplementaryAreaToggle from '../complementary-area-toggle';
 import withComplementaryAreaContext from '../complementary-area-context';
 import PinnedItems from '../pinned-items';
+import { store as interfaceStore } from '../../store';
 
 function ComplementaryAreaSlot( { scope, ...props } ) {
 	return <Slot name={ `ComplementaryArea/${ scope }` } { ...props } />;
@@ -43,7 +45,7 @@ function useAdjustComplementaryListener(
 	const previousIsSmall = useRef( false );
 	const shouldOpenWhenNotSmall = useRef( false );
 	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		'core/interface'
+		interfaceStore
 	);
 	useEffect( () => {
 		// If the complementary area is active and the editor is switching from a big to a small window size.
@@ -89,6 +91,7 @@ function ComplementaryArea( {
 	isPinnable = true,
 	panelClassName,
 	scope,
+	name,
 	smallScreenTitle,
 	title,
 	toggleShortcut,
@@ -98,7 +101,7 @@ function ComplementaryArea( {
 	const { isActive, isPinned, activeArea, isSmall, isLarge } = useSelect(
 		( select ) => {
 			const { getActiveComplementaryArea, isItemPinned } = select(
-				'core/interface'
+				interfaceStore
 			);
 			const _activeArea = getActiveComplementaryArea( scope );
 			return {
@@ -123,7 +126,7 @@ function ComplementaryArea( {
 		disableComplementaryArea,
 		pinItem,
 		unpinItem,
-	} = useDispatch( 'core/interface' );
+	} = useDispatch( interfaceStore );
 
 	useEffect( () => {
 		if ( isActiveByDefault && activeArea === undefined && ! isSmall ) {
@@ -133,21 +136,32 @@ function ComplementaryArea( {
 
 	return (
 		<>
-			{ isPinned && isPinnable && (
+			{ isPinnable && (
 				<PinnedItems scope={ scope }>
-					<ComplementaryAreaToggle
-						scope={ scope }
-						identifier={ identifier }
-						isPressed={
-							isActive && ( ! showIconLabels || isLarge )
-						}
-						aria-expanded={ isActive }
-						label={ title }
-						icon={ showIconLabels ? check : icon }
-						showTooltip={ ! showIconLabels }
-						isTertiary={ showIconLabels }
-					/>
+					{ isPinned && (
+						<ComplementaryAreaToggle
+							scope={ scope }
+							identifier={ identifier }
+							isPressed={
+								isActive && ( ! showIconLabels || isLarge )
+							}
+							aria-expanded={ isActive }
+							label={ title }
+							icon={ showIconLabels ? check : icon }
+							showTooltip={ ! showIconLabels }
+							isTertiary={ showIconLabels }
+						/>
+					) }
 				</PinnedItems>
+			) }
+			{ name && isPinnable && (
+				<ComplementaryAreaMoreMenuItem
+					target={ name }
+					scope={ scope }
+					icon={ icon }
+				>
+					{ title }
+				</ComplementaryAreaMoreMenuItem>
 			) }
 			{ isActive && (
 				<ComplementaryAreaFill

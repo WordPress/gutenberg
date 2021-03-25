@@ -106,15 +106,14 @@ export const select = defaultRegistry.select;
  *
  * @example
  * ```js
- * import { __experimentalResolveSelect } from '@wordpress/data';
+ * import { resolveSelect } from '@wordpress/data';
  *
- * __experimentalResolveSelect( 'my-shop' ).getPrice( 'hammer' ).then(console.log)
+ * resolveSelect( 'my-shop' ).getPrice( 'hammer' ).then(console.log)
  * ```
  *
  * @return {Object} Object containing the store's promise-wrapped selectors.
  */
-export const __experimentalResolveSelect =
-	defaultRegistry.__experimentalResolveSelect;
+export const resolveSelect = defaultRegistry.resolveSelect;
 
 /**
  * Given the name of a registered store, returns an object of the store's action creators.

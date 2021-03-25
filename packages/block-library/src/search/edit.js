@@ -40,18 +40,13 @@ import {
 	buttonWithIcon,
 	toggleLabel,
 } from './icons';
-
-/**
- * Constants
- */
-const MIN_WIDTH = 220;
-const MIN_WIDTH_UNIT = 'px';
-const PC_WIDTH_DEFAULT = 50;
-const PX_WIDTH_DEFAULT = 350;
-const CSS_UNITS = [
-	{ value: '%', label: '%', default: PC_WIDTH_DEFAULT },
-	{ value: 'px', label: 'px', default: PX_WIDTH_DEFAULT },
-];
+import {
+	CSS_UNITS,
+	PC_WIDTH_DEFAULT,
+	PX_WIDTH_DEFAULT,
+	MIN_WIDTH,
+	MIN_WIDTH_UNIT,
+} from './utils.js';
 
 export default function SearchEdit( {
 	className,

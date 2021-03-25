@@ -17,10 +17,13 @@
 		}
 	},
 	"usesContext": [
-		"openInNewTab"
+		"openInNewTab",
+		"iconColorValue",
+		"iconBackgroundColorValue"
 	],
 	"supports": {
 		"reusable": false,
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-social-link-editor"
 }

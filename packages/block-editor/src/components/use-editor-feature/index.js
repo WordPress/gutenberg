@@ -13,6 +13,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import { useBlockEditContext } from '../block-edit';
+import { store as blockEditorStore } from '../../store';
 
 const deprecatedFlags = {
 	'color.palette': ( settings ) =>
@@ -46,6 +47,7 @@ const deprecatedFlags = {
 
 		return settings.enableCustomUnits;
 	},
+	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
 };
 
 function blockAttributesMatch( blockAttributes, attributes ) {
@@ -61,7 +63,7 @@ function blockAttributesMatch( blockAttributes, attributes ) {
  * Hook that retrieves the setting for the given editor feature.
  * It works with nested objects using by finding the value at path.
  *
- * @param {string} featurePath  The path to the feature.
+ * @param {string} featurePath The path to the feature.
  *
  * @return {any} Returns the value defined for the setting.
  *
@@ -76,7 +78,7 @@ export default function useEditorFeature( featurePath ) {
 	const setting = useSelect(
 		( select ) => {
 			const { getBlockAttributes, getSettings } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 			const settings = getSettings();
 			const blockType = select( blocksStore ).getBlockType( blockName );
@@ -86,8 +88,8 @@ export default function useEditorFeature( featurePath ) {
 				'supports',
 				'__experimentalSelector',
 			] );
-			if ( isObject( selectors ) ) {
-				const blockAttributes = getBlockAttributes( clientId );
+			if ( clientId && isObject( selectors ) ) {
+				const blockAttributes = getBlockAttributes( clientId ) || {};
 				for ( const contextSelector in selectors ) {
 					const { attributes } = selectors[ contextSelector ];
 					if ( blockAttributesMatch( blockAttributes, attributes ) ) {
@@ -98,11 +100,11 @@ export default function useEditorFeature( featurePath ) {
 			}
 
 			// 1 - Use __experimental features, if available.
-			// We cascade to the global value if the block one is not available.
-			const globalPath = `__experimentalFeatures.global.${ featurePath }`;
+			// We cascade to the all value if the block one is not available.
+			const defaultsPath = `__experimentalFeatures.defaults.${ featurePath }`;
 			const blockPath = `__experimentalFeatures.${ context }.${ featurePath }`;
 			const experimentalFeaturesResult =
-				get( settings, blockPath ) ?? get( settings, globalPath );
+				get( settings, blockPath ) ?? get( settings, defaultsPath );
 			if ( experimentalFeaturesResult !== undefined ) {
 				return experimentalFeaturesResult;
 			}

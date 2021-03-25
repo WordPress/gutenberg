@@ -9,6 +9,11 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
+
 function KeyboardShortcuts() {
 	const {
 		getBlockSelectionStart,
@@ -21,8 +26,8 @@ function KeyboardShortcuts() {
 		return {
 			getBlockSelectionStart: select( 'core/block-editor' )
 				.getBlockSelectionStart,
-			getEditorMode: select( 'core/edit-post' ).getEditorMode,
-			isEditorSidebarOpened: select( 'core/edit-post' )
+			getEditorMode: select( editPostStore ).getEditorMode,
+			isEditorSidebarOpened: select( editPostStore )
 				.isEditorSidebarOpened,
 			richEditingEnabled: settings.richEditingEnabled,
 			codeEditingEnabled: settings.codeEditingEnabled,
@@ -34,7 +39,7 @@ function KeyboardShortcuts() {
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		toggleFeature,
-	} = useDispatch( 'core/edit-post' );
+	} = useDispatch( editPostStore );
 	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
 	useEffect( () => {

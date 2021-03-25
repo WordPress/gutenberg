@@ -32,7 +32,7 @@ describe( 'Test Custom Post Types', () => {
 		await deactivatePlugin( 'gutenberg-test-custom-post-types' );
 	} );
 
-	it( 'It should be able to create an hierarchical post without title support', async () => {
+	it( 'should be able to create an hierarchical post without title support', async () => {
 		const PARENT_PAGE_INPUT =
 			'.editor-page-attributes__parent input:not([disabled])';
 		const SUGGESTION =
@@ -63,8 +63,7 @@ describe( 'Test Custom Post Types', () => {
 		await page.waitForSelector( PARENT_PAGE_INPUT );
 		// Wait for the list of suggestions to fetch
 		// There should be a better way to do that.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor(
+		await page.waitForFunction(
 			( [ value, inputSelector ] ) =>
 				document.querySelector( inputSelector ).value === value,
 			{},

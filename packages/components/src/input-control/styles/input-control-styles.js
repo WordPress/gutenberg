@@ -59,6 +59,11 @@ const containerDisabledStyles = ( { disabled } ) => {
 	return css( { backgroundColor } );
 };
 
+// Normalizes the margins from the <Flex /> (components/ui/flex/) container.
+const containerMarginStyles = ( { hideLabel } ) => {
+	return hideLabel ? css( { margin: '0 !important' } ) : null;
+};
+
 const containerWidthStyles = ( { __unstableInputWidth, labelPosition } ) => {
 	if ( ! __unstableInputWidth ) return css( { width: '100%' } );
 
@@ -82,6 +87,7 @@ export const Container = styled.div`
 	position: relative;
 
 	${ containerDisabledStyles }
+	${ containerMarginStyles }
 	${ containerWidthStyles }
 `;
 

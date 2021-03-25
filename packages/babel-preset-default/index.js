@@ -54,7 +54,10 @@ module.exports = ( api ) => {
 	};
 
 	return {
-		presets: [ getPresetEnv() ],
+		presets: [
+			getPresetEnv(),
+			require.resolve( '@babel/preset-typescript' ),
+		],
 		plugins: [
 			require.resolve( '@wordpress/warning/babel-plugin' ),
 			[

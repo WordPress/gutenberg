@@ -19,20 +19,14 @@ import { useMemo } from '@wordpress/element';
 import { searchBlockItems } from '../components/inserter/search-items';
 import useBlockTypesState from '../components/inserter/hooks/use-block-types-state';
 import BlockIcon from '../components/block-icon';
+import { store as blockEditorStore } from '../store';
 
 const SHOWN_BLOCK_TYPES = 9;
-
-/** @typedef {import('@wordpress/block-editor').WPEditorInserterItem} WPEditorInserterItem */
 
 /** @typedef {import('@wordpress/components').WPCompleter} WPCompleter */
 
 /**
  * Creates a blocks repeater for replacing the current block with a selected block type.
- *
- * @param {Object} props                                   Component props.
- * @param {string} [props.getBlockInsertionParentClientId] Client ID of the parent.
- * @param {string} [props.getInserterItems]                Inserter items for parent.
- * @param {string} [props.getSelectedBlockName]            Name of selected block or null.
  *
  * @return {WPCompleter} A blocks completer.
  */
@@ -49,7 +43,7 @@ function createBlockCompleter() {
 						getSelectedBlockClientId,
 						getBlockName,
 						getBlockInsertionPoint,
-					} = select( 'core/block-editor' );
+					} = select( blockEditorStore );
 					const selectedBlockClientId = getSelectedBlockClientId();
 					return {
 						selectedBlockName: selectedBlockClientId

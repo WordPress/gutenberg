@@ -24,7 +24,7 @@ describe( 'Duplicating blocks', () => {
 		// When the selection was not collapsed
 		await pressKeyWithModifier( 'primary', 'a' );
 
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Duplicate' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

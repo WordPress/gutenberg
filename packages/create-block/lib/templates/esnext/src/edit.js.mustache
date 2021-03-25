@@ -6,6 +6,14 @@
 import { __ } from '@wordpress/i18n';
 
 /**
+ * React hook that is used to mark the block wrapper element.
+ * It provides all the necessary props like the class name.
+ *
+ * @see https://developer.wordpress.org/block-editor/packages/packages-block-editor/#useBlockProps
+ */
+import { useBlockProps } from '@wordpress/block-editor';
+
+/**
  * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.
  * Those files can contain any CSS code that gets applied to the editor.
  *
@@ -19,14 +27,11 @@ import './editor.scss';
  *
  * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#edit
  *
- * @param {Object} [props]           Properties passed from the editor.
- * @param {string} [props.className] Class name generated for the block.
- *
  * @return {WPElement} Element to render.
  */
-export default function Edit( { className } ) {
+export default function Edit() {
 	return (
-		<p className={ className }>
+		<p { ...useBlockProps() }>
 			{ __( '{{title}} – hello from the editor!', '{{textdomain}}' ) }
 		</p>
 	);

@@ -1,25 +1,27 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useState, useCallback } from '@wordpress/element';
 import {
 	InnerBlocks,
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
 	FooterMessageControl,
 	UnitControl,
 	getValueAndUnit,
+	alignmentHelpers,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -27,7 +29,14 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './editor.scss';
 import ColumnsPreview from './column-preview';
-import { getWidths, getWidthWithUnit, CSS_UNITS } from '../columns/utils';
+import {
+	getWidths,
+	getWidthWithUnit,
+	isPercentageUnit,
+	CSS_UNITS,
+} from '../columns/utils';
+
+const { isWider } = alignmentHelpers;
 
 function ColumnEdit( {
 	attributes,
@@ -40,11 +49,15 @@ function ColumnEdit( {
 	columns,
 	selectedColumnIndex,
 	parentAlignment,
+	clientId,
+	blockWidth,
 } ) {
 	const { verticalAlignment, width } = attributes;
 	const { valueUnit = '%' } = getValueAndUnit( width ) || {};
 
-	const [ widthUnit, setWidthUnit ] = useState( valueUnit );
+	const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+
+	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
 
 	const updateAlignment = ( alignment ) => {
 		setAttributes( { verticalAlignment: alignment } );
@@ -70,14 +83,43 @@ function ColumnEdit( {
 
 	const onChangeUnit = ( nextUnit ) => {
 		setWidthUnit( nextUnit );
-		const tempWidth = parseFloat(
+		const widthWithoutUnit = parseFloat(
 			width || getWidths( columns )[ selectedColumnIndex ]
 		);
 
 		setAttributes( {
-			width: getWidthWithUnit( tempWidth, nextUnit ),
+			width: getWidthWithUnit( widthWithoutUnit, nextUnit ),
 		} );
 	};
+
+	const onChange = ( nextWidth ) => {
+		if ( isPercentageUnit( widthUnit ) || ! widthUnit ) {
+			return;
+		}
+		onChangeWidth( nextWidth );
+	};
+
+	const renderAppender = useCallback( () => {
+		const { width: columnWidth } = contentStyle[ clientId ];
+		const isScreenWidthEqual = columnWidth === screenWidth;
+
+		if ( isSelected ) {
+			return (
+				<View
+					style={
+						( isWider( screenWidth, 'mobile' ) ||
+							isScreenWidthEqual ) &&
+						( hasChildren
+							? styles.columnAppender
+							: styles.wideColumnAppender )
+					}
+				>
+					<InnerBlocks.ButtonBlockAppender />
+				</View>
+			);
+		}
+		return null;
+	}, [ contentStyle[ clientId ], screenWidth, isSelected, hasChildren ] );
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
@@ -88,8 +130,8 @@ function ColumnEdit( {
 							styles.columnPlaceholder,
 							styles.columnPlaceholderDark
 						),
-					contentStyle,
 					styles.columnPlaceholderNotSelected,
+					contentStyle[ clientId ],
 				] }
 			/>
 		);
@@ -97,50 +139,66 @@ function ColumnEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<BlockVerticalAlignmentToolbar
-					onChange={ updateAlignment }
-					value={ verticalAlignment }
-				/>
-			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Column settings' ) }>
-					<UnitControl
-						label={ __( 'Width' ) }
-						min={ 1 }
-						max={ widthUnit === '%' ? 100 : undefined }
-						decimalNum={ 1 }
-						value={ getWidths( columns )[ selectedColumnIndex ] }
-						onChange={ onChangeWidth }
-						onUnitChange={ onChangeUnit }
-						unit={ widthUnit }
-						units={ CSS_UNITS }
-						preview={
-							<ColumnsPreview
-								columnWidths={ getWidths( columns, false ) }
-								selectedColumnIndex={ selectedColumnIndex }
+			{ isSelected && (
+				<>
+					<BlockControls>
+						<BlockVerticalAlignmentToolbar
+							onChange={ updateAlignment }
+							value={ verticalAlignment }
+						/>
+					</BlockControls>
+					<InspectorControls>
+						<PanelBody title={ __( 'Column settings' ) }>
+							<UnitControl
+								label={ __( 'Width' ) }
+								min={ 1 }
+								max={
+									isPercentageUnit( widthUnit )
+										? 100
+										: undefined
+								}
+								onChange={ onChange }
+								onComplete={ onChangeWidth }
+								onUnitChange={ onChangeUnit }
+								decimalNum={ 1 }
+								value={
+									getWidths( columns )[ selectedColumnIndex ]
+								}
+								unit={ widthUnit }
+								units={ CSS_UNITS }
+								preview={
+									<ColumnsPreview
+										columnWidths={ getWidths(
+											columns,
+											false
+										) }
+										selectedColumnIndex={
+											selectedColumnIndex
+										}
+									/>
+								}
 							/>
-						}
-					/>
-				</PanelBody>
-				<PanelBody>
-					<FooterMessageControl
-						label={ __(
-							'Note: Column layout may vary between themes and screen sizes'
-						) }
-					/>
-				</PanelBody>
-			</InspectorControls>
+						</PanelBody>
+						<PanelBody>
+							<FooterMessageControl
+								label={ __(
+									'Note: Column layout may vary between themes and screen sizes'
+								) }
+							/>
+						</PanelBody>
+					</InspectorControls>
+				</>
+			) }
 			<View
 				style={ [
-					contentStyle,
 					isSelected && hasChildren && styles.innerBlocksBottomSpace,
+					contentStyle[ clientId ],
 				] }
 			>
 				<InnerBlocks
-					renderAppender={
-						isSelected && InnerBlocks.ButtonBlockAppender
-					}
+					renderAppender={ renderAppender }
+					parentWidth={ contentStyle[ clientId ].width }
+					blockWidth={ blockWidth }
 				/>
 			</View>
 		</>
@@ -174,7 +232,7 @@ export default compose( [
 			getBlocks,
 			getBlockOrder,
 			getBlockAttributes,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const isSelected = selectedBlockClientId === clientId;

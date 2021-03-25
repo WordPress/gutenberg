@@ -5,8 +5,13 @@ import { Button } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
 const SettingsHeader = ( { sidebarName } ) => {
-	const { openGeneralSidebar } = useDispatch( 'core/edit-post' );
+	const { openGeneralSidebar } = useDispatch( editPostStore );
 	const openDocumentSettings = () =>
 		openGeneralSidebar( 'edit-post/document' );
 	const openBlockSettings = () => openGeneralSidebar( 'edit-post/block' );

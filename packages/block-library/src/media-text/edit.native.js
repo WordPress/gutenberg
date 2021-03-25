@@ -16,6 +16,7 @@ import {
 	withColors,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import {
@@ -254,6 +255,7 @@ class MediaTextEdit extends Component {
 			isSelected,
 			isRTL,
 			wrapperProps,
+			blockWidth,
 		} = this.props;
 		const {
 			isStackedOnMobile,
@@ -379,7 +381,10 @@ class MediaTextEdit extends Component {
 							...innerBlockContainerStyle,
 						} }
 					>
-						<InnerBlocks template={ TEMPLATE } />
+						<InnerBlocks
+							template={ TEMPLATE }
+							blockWidth={ blockWidth }
+						/>
 					</View>
 				</View>
 			</>
@@ -392,23 +397,18 @@ export default compose(
 	withSelect( ( select, { clientId } ) => {
 		const {
 			getSelectedBlockClientId,
-			getBlockRootClientId,
 			getBlockParents,
 			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const parents = getBlockParents( clientId, true );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
-		const isParentSelected =
-			selectedBlockClientId &&
-			selectedBlockClientId === getBlockRootClientId( clientId );
 		const isAncestorSelected =
 			selectedBlockClientId && parents.includes( selectedBlockClientId );
 
 		return {
 			isSelected: selectedBlockClientId === clientId,
-			isParentSelected,
 			isAncestorSelected,
 			isRTL: getSettings().isRTL,
 		};

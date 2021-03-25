@@ -20,11 +20,11 @@ const hasPaddingSupport = ( blockName ) => {
 };
 
 /**
- * Inspector control panel containing the line height related configuration
+ * Inspector control panel containing the padding related configuration
  *
  * @param {Object} props
  *
- * @return {WPElement} Line height edit element.
+ * @return {WPElement} Padding edit element.
  */
 export function PaddingEdit( props ) {
 	const {

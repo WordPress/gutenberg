@@ -139,7 +139,10 @@ export default function BoxControl( {
 				</FlexItem>
 				{ isLinked && (
 					<FlexBlock>
-						<AllInputControl { ...inputControlProps } />
+						<AllInputControl
+							aria-label={ label }
+							{ ...inputControlProps }
+						/>
 					</FlexBlock>
 				) }
 				<FlexItem>
