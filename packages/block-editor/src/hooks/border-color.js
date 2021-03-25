@@ -59,6 +59,7 @@ export function BorderColorEdit( props ) {
 			},
 		};
 
+		// If empty slug, ensure undefined to remove attribute.
 		const newNamedColor = colorObject?.slug ? colorObject.slug : undefined;
 
 		setAttributes( {
