@@ -38,13 +38,13 @@ return array(
 	<!-- /wp:spacer -->
 	
 	<!-- wp:image {"id":345,"sizeSlug":"large","linkDestination":"none"} -->
-	<figure class="wp-block-image size-large"><img src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/StockSnap_ZD6WAL4LGT-edited.jpg" alt="' . __( 'The sun setting through a dense forest of trees.' ) . '" class="wp-image-345"/></figure>
+	<figure class="wp-block-image size-large"><img src="https://cldup.com/1PbDC8HHhu.jpg" alt="' . __( 'The sun setting through a dense forest of trees.' ) . '" class="wp-image-345"/></figure>
 	<!-- /wp:image --></div>
 	<!-- /wp:column -->
 	
 	<!-- wp:column {"width":"33.62%"} -->
 	<div class="wp-block-column" style="flex-basis:33.62%"><!-- wp:image {"id":347,"sizeSlug":"large","linkDestination":"none"} -->
-	<figure class="wp-block-image size-large"><img src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/StockSnap_56RKHNDUQ2-edited-scaled.jpg" alt="' . __( 'Wind turbines standing on a grassy plain, against a blue sky.' ) . '" class="wp-image-347"/></figure>
+	<figure class="wp-block-image size-large"><img src="https://cldup.com/IPeC2jeViL.jpg" alt="' . __( 'Wind turbines standing on a grassy plain, against a blue sky.' ) . '" class="wp-image-347"/></figure>
 	<!-- /wp:image --></div>
 	<!-- /wp:column --></div>
 	<!-- /wp:columns -->
@@ -52,7 +52,7 @@ return array(
 	<!-- wp:columns {"align":"wide"} -->
 	<div class="wp-block-columns alignwide"><!-- wp:column {"width":"67%"} -->
 	<div class="wp-block-column" style="flex-basis:67%"><!-- wp:image {"align":"right","id":348,"sizeSlug":"large","linkDestination":"none"} -->
-	<div class="wp-block-image"><figure class="alignright size-large"><img src="https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/02/StockSnap_H17J2YTARL-1024x683.jpg" alt="' . __( 'The sun shining over a ridge leading down into the shore. In the distance, a car drives down a road.' ) . '" class="wp-image-348"/></figure></div>
+	<div class="wp-block-image"><figure class="alignright size-large"><img src="https://cldup.com/C6Ju0QAlrk.jpg" alt="' . __( 'The sun shining over a ridge leading down into the shore. In the distance, a car drives down a road.' ) . '" class="wp-image-348"/></figure></div>
 	<!-- /wp:image --></div>
 	<!-- /wp:column -->
 	

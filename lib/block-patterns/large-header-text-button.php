@@ -8,8 +8,8 @@
 return array(
 	'title'       => __( 'Large header with text and a button.' ),
 	'categories'  => array( 'header' ),
-	'content'     => '<!-- wp:cover {"url":"https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/03/504382ldsdl-scaled.jpg","id":613,"hasParallax":true,"dimRatio":40,"overlayColor":"black","minHeight":100,"minHeightUnit":"vh","contentPosition":"center center","align":"full"} -->
-	<div class="wp-block-cover alignfull has-background-dim-40 has-black-background-color has-background-dim has-parallax" style="background-image:url(https://blockpatterndesigns.mystagingwebsite.com/wp-content/uploads/2021/03/504382ldsdl-scaled.jpg);min-height:100vh"><div class="wp-block-cover__inner-container"><!-- wp:heading {"style":{"typography":{"fontSize":"48px","lineHeight":"1.2"}},"className":"alignwide has-white-color has-text-color"} -->
+	'content'     => '<!-- wp:cover {"url":"https://cldup.com/kRh-P5G84E.jpg","id":613,"hasParallax":true,"dimRatio":40,"overlayColor":"black","minHeight":100,"minHeightUnit":"vh","contentPosition":"center center","align":"full"} -->
+	<div class="wp-block-cover alignfull has-background-dim-40 has-black-background-color has-background-dim has-parallax" style="background-image:url(https://cldup.com/kRh-P5G84E.jpg);min-height:100vh"><div class="wp-block-cover__inner-container"><!-- wp:heading {"style":{"typography":{"fontSize":"48px","lineHeight":"1.2"}},"className":"alignwide has-white-color has-text-color"} -->
 	<h2 class="alignwide has-white-color has-text-color" style="font-size:48px;line-height:1.2"><strong><em>' . __( 'Overseas:' ) . '</em></strong><br><strong><em>' . __( '1500 — 1960' ) . '</em></strong></h2>
 	<!-- /wp:heading -->
 
