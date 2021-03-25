@@ -21,7 +21,7 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 		return <Spinner />;
 	}
 
-	if ( widgetTypes?.length === 0 ) {
+	if ( widgetTypes.length === 0 ) {
 		return __( 'There are no widgets available.' );
 	}
 
