@@ -36,15 +36,17 @@
 .components-site-card {
 	display: flex;
 	align-items: center;
-	margin: 16px 0;
+	margin: $grid-unit-20 0;
 }
 
 .components-site-icon {
 	border: none;
-	border-radius: 2px;
-	height: 42px;
-	width: 42px;
-	margin-right: 16px;
+	border-radius: $radius-block-ui;
+	margin-right: $grid-unit-15;
+
+	// Same size as in the Site menu.
+	height: 36px;
+	width: 36px;
 }
 
 .components-site-name {
@@ -54,6 +56,8 @@
 
 .components-site-home {
 	display: block;
+	color: $gray-700;
+	font-size: $helptext-font-size;
 }
 
 .editor-post-publish-panel__header-publish-button,

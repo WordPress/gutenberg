@@ -57,7 +57,9 @@ function PostPublishPanelPrepublish( { children } ) {
 		};
 	}, [] );
 
-	let siteIcon = <Icon size="36px" icon={ wordpress } />;
+	let siteIcon = (
+		<Icon className="components-site-icon" size="36px" icon={ wordpress } />
+	);
 
 	if ( siteIconUrl ) {
 		siteIcon = (
