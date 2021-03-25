@@ -107,6 +107,8 @@ const Cover = ( {
 	);
 
 	useEffect( () => {
+		let isCurrent = true;
+
 		// sync with local media store
 		mediaUploadSync();
 		AccessibilityInfo.addEventListener(
@@ -114,11 +116,14 @@ const Cover = ( {
 			setIsScreenReaderEnabled
 		);
 
-		AccessibilityInfo.isScreenReaderEnabled().then(
-			setIsScreenReaderEnabled
-		);
+		AccessibilityInfo.isScreenReaderEnabled().then( () => {
+			if ( isCurrent ) {
+				setIsScreenReaderEnabled();
+			}
+		} );
 
 		return () => {
+			isCurrent = false;
 			AccessibilityInfo.removeEventListener(
 				'screenReaderChanged',
 				setIsScreenReaderEnabled

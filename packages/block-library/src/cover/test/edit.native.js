@@ -1,8 +1,8 @@
 /**
  * External dependencies
  */
-import { Image } from 'react-native';
-import { render, fireEvent } from '@testing-library/react-native';
+import { AccessibilityInfo, Image } from 'react-native';
+import { act, render, fireEvent } from '@testing-library/react-native';
 
 /**
  * WordPress dependencies
@@ -111,12 +111,20 @@ describe( 'when no media is attached', () => {
 
 describe( 'when media is attached', () => {
 	it( 'allows editing the focal point with text input', async () => {
+		// Mock async native module to avoid act warning
+		const isScreenReaderEnabled = Promise.resolve( true );
+		AccessibilityInfo.isScreenReaderEnabled = jest.fn(
+			() => isScreenReaderEnabled
+		);
+
 		const { getByText, findByText, findByLabelText } = render(
 			<CoverEdit
 				attributes={ attributes }
 				setAttributes={ setAttributes }
 			/>
 		);
+		// Await async update to component state to avoid act warning
+		await act( () => isScreenReaderEnabled );
 		fireEvent.press( getByText( 'Edit focal point' ) );
 		const xAxisCell = await findByText(
 			( attributes.focalPoint.x * 100 ).toString()
