@@ -295,7 +295,6 @@ export default function NavigationLinkEdit( {
 		ref: listItemRef,
 		className: classnames( {
 			'is-editing': isSelected || isParentOfSelectedBlock,
-			'is-selected': isSelected,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasDescendants,
