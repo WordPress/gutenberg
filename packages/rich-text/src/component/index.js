@@ -322,8 +322,32 @@ function RichText(
 			multilineTag,
 			preserveWhiteSpace,
 		} );
-		event.clipboardData.setData( 'text/plain', plainText );
-		event.clipboardData.setData( 'text/html', html );
+
+		const isLi = /<li>.*<\/li>/gi;
+		const hasLi = html.match( isLi )?.length > 0;
+		if ( hasLi ) {
+			let liCopyString = html
+				.split( '<li>' )
+				.join( '' )
+				.split( '</li>' )
+				.filter( Boolean );
+			liCopyString = liCopyString.map( ( el, i, {length} ) => {
+				if ( el && i === 0 ) {
+					return '<ul><li>' + el + '</li>';
+				} else if ( el && i === length ) {
+					return '<template style="clear:both"></template><li>' + el + '</li></ul>';
+				} else if ( el ) {
+					return '<template style="clear:both"></template><li>' + el + '</li>';
+				}
+			} );
+			liCopyString = liCopyString.join( '' );
+			event.clipboardData.setData( 'text/plain', liCopyString );
+			event.clipboardData.setData( 'text/html', liCopyString );
+		} else {
+			event.clipboardData.setData( 'text/plain', plainText );
+			event.clipboardData.setData( 'text/html', html );
+		}
+
 		event.clipboardData.setData( 'rich-text', 'true' );
 		event.preventDefault();
 	}
