@@ -230,7 +230,15 @@ export default function SearchEdit( {
 
 	const renderButton = () => {
 		return (
-			<View style={ styles.buttonContainer }>
+			<View
+				style={ styles.buttonContainer }
+				accessible={ true }
+				accessibilityRole="none"
+				accessibilityHint={ __( 'Double tap to edit button text' ) }
+				accessibilityLabel={ `${ __(
+					'Search button. Current value is'
+				) } ${ buttonText }` }
+			>
 				{ buttonUseIcon && <Icon icon={ search } { ...styles.icon } /> }
 
 				{ ! buttonUseIcon && (
@@ -274,25 +282,35 @@ export default function SearchEdit( {
 			{ isSelected && controls }
 
 			{ showLabel && (
-				<RichText
-					className="wp-block-search__label"
-					identifier="text"
-					tagName="p"
-					style={ styles.richTextLabel }
-					aria-label={ __( 'Label text' ) }
-					placeholder={ __( 'Add label…' ) }
-					withoutInteractiveFormatting
-					value={ label }
-					onChange={ ( html ) => setAttributes( { label: html } ) }
-					isSelected={ isLabelSelected }
-					__unstableMobileNoFocusOnMount={ ! isSelected }
-					unstableOnFocus={ () => {
-						setIsLabelSelected( true );
-					} }
-					onBlur={ () => {
-						setIsLabelSelected( false );
-					} }
-				/>
+				<View
+					accessible={ true }
+					accessibilityRole="none"
+					accessibilityHint={ __( 'Double tap to edit label text' ) }
+					accessibilityLabel={ `${ __(
+						'Search block label. Current value is'
+					) } ${ label }` }
+				>
+					<RichText
+						className="wp-block-search__label"
+						identifier="text"
+						tagName="p"
+						style={ styles.richTextLabel }
+						placeholder={ __( 'Add label…' ) }
+						withoutInteractiveFormatting
+						value={ label }
+						onChange={ ( html ) =>
+							setAttributes( { label: html } )
+						}
+						isSelected={ isLabelSelected }
+						__unstableMobileNoFocusOnMount={ ! isSelected }
+						unstableOnFocus={ () => {
+							setIsLabelSelected( true );
+						} }
+						onBlur={ () => {
+							setIsLabelSelected( false );
+						} }
+					/>
+				</View>
 			) }
 
 			{ ( 'button-inside' === buttonPosition ||
