@@ -67,7 +67,7 @@ function registerMiddleware( middleware ) {
  * it is outside the 200 range.
  *
  * @param {Response} response
- * @return {Response} The response if the status is OK.
+ * @return {Response} The response if the status is in the 200 range.
  */
 const checkStatus = ( response ) => {
 	if ( response.status >= 200 && response.status < 300 ) {
@@ -97,7 +97,7 @@ const defaultFetchHandler = ( nextOptions ) => {
 
 	const responsePromise = window.fetch(
 		// fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed
-		url || path || window.location.toString(),
+		url || path || window.location.href,
 		{
 			...DEFAULT_OPTIONS,
 			...remainingOptions,

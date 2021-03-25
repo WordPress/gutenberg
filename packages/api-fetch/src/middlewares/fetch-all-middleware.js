@@ -48,7 +48,7 @@ const parseLinkHeader = ( linkHeader ) => {
 
 /**
  * @param {Response} response
- * @return {string | undefined} The next page Url.
+ * @return {string | undefined} The next page URL.
  */
 const getNextPageUrl = ( response ) => {
 	const { next } = parseLinkHeader( response.headers.get( 'link' ) );
