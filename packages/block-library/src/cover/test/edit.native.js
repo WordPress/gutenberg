@@ -160,6 +160,32 @@ describe( 'when media is attached', () => {
 		);
 	} );
 
+	it( 'discards canceled focal point changes', async () => {
+		const { getByText, findByText, findByLabelText } = render(
+			<CoverEdit
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+			/>
+		);
+		// Await async update to component state to avoid act warning
+		await act( () => isScreenReaderEnabled );
+		fireEvent.press( getByText( 'Edit focal point' ) );
+		const xAxisCell = await findByText(
+			( attributes.focalPoint.x * 100 ).toString()
+		);
+		fireEvent.press( xAxisCell );
+		const xAxisInput = await findByLabelText( 'X-Axis Position' );
+		fireEvent.changeText( xAxisInput, '80' );
+		const goBackButton = await findByLabelText( 'Go back' );
+		fireEvent.press( goBackButton );
+
+		expect( setAttributes ).not.toHaveBeenCalledWith(
+			expect.objectContaining( {
+				focalPoint: { ...attributes.focalPoint, x: '0.80' },
+			} )
+		);
+	} );
+
 	it( 'allows clearing the media', async () => {
 		const { getByText } = render(
 			<CoverEdit
