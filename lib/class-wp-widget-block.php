@@ -38,7 +38,7 @@ class WP_Widget_Block extends WP_Widget {
 	 */
 	public function __construct() {
 		$widget_ops  = array(
-			'classname'                   => '%s', // Set dynamically in widget().
+			'classname'                   => 'widget_block',
 			'description'                 => __( 'Gutenberg block.', 'gutenberg' ),
 			'customize_selective_refresh' => true,
 		);
@@ -64,7 +64,11 @@ class WP_Widget_Block extends WP_Widget {
 	public function widget( $args, $instance ) {
 		$instance = wp_parse_args( $instance, $this->default_instance );
 
-		echo sprintf( $args['before_widget'], $this->get_dynamic_classname( $instance['content'] ) );
+		echo str_replace(
+			'widget_block',
+			$this->get_dynamic_classname( $instance['content'] ),
+			$args['before_widget']
+		);
 
 		// Handle embeds for block widgets.
 		//
