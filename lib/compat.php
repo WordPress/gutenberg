@@ -8,6 +8,104 @@
  * @package gutenberg
  */
 
+if ( ! function_exists( 'get_default_block_editor_settings' ) ) {
+	/**
+	 * Gets the default block editor settings.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param WP_Post $post Global post object.
+	 *
+	 * @return array The default block editor settings.
+	 */
+	function get_default_block_editor_settings( $post = null ) {
+		/**
+		 * Filters the allowed block types for the editor, defaulting to true (all
+		 * block types supported).
+		 *
+		 * @since 5.0.0
+		 *
+		 * @param bool|array $allowed_block_types Array of block type slugs, or
+		 *                                        boolean to enable/disable all.
+		 * @param WP_Post    $post                The post resource data.
+		 */
+		$allowed_block_types = apply_filters( 'allowed_block_types', true, $post );
+
+		// Media settings.
+		$max_upload_size = wp_max_upload_size();
+		if ( ! $max_upload_size ) {
+			$max_upload_size = 0;
+		}
+
+		/** This filter is documented in wp-admin/includes/media.php */
+		$image_size_names = apply_filters(
+			'image_size_names_choose',
+			array(
+				'thumbnail' => __( 'Thumbnail' ),
+				'medium'    => __( 'Medium' ),
+				'large'     => __( 'Large' ),
+				'full'      => __( 'Full Size' ),
+			)
+		);
+
+		$available_image_sizes = array();
+		foreach ( $image_size_names as $image_size_slug => $image_size_name ) {
+			$available_image_sizes[] = array(
+				'slug' => $image_size_slug,
+				'name' => $image_size_name,
+			);
+		}
+
+		$default_size       = get_option( 'image_default_size', 'large' );
+		$image_default_size = in_array( $default_size, array_keys( $image_size_names ), true ) ? $image_default_size : 'large';
+
+		$image_dimensions = array();
+		$all_sizes        = wp_get_registered_image_subsizes();
+		foreach ( $available_image_sizes as $size ) {
+			$key = $size['slug'];
+			if ( isset( $all_sizes[ $key ] ) ) {
+				$image_dimensions[ $key ] = $all_sizes[ $key ];
+			}
+		}
+
+		$editor_settings = array(
+			'alignWide'              => get_theme_support( 'align-wide' ),
+			'allowedBlockTypes'      => $allowed_block_types,
+			'allowedMimeTypes'       => get_allowed_mime_types(),
+			'disableCustomColors'    => get_theme_support( 'disable-custom-colors' ),
+			'disableCustomFontSizes' => get_theme_support( 'disable-custom-font-sizes' ),
+			'disableCustomGradients' => get_theme_support( 'disable-custom-gradients' ),
+			'enableCustomLineHeight' => get_theme_support( 'custom-line-height' ),
+			'enableCustomSpacing'    => get_theme_support( 'custom-spacing' ),
+			'enableCustomUnits'      => get_theme_support( 'custom-units' ),
+			'isRTL'                  => is_rtl(),
+			'imageDefaultSize'       => $image_default_size,
+			'imageDimensions'        => $image_dimensions,
+			'imageEditing'           => true,
+			'imageSizes'             => $available_image_sizes,
+			'maxUploadFileSize'      => $max_upload_size,
+		);
+
+		// Theme settings.
+		$color_palette = current( (array) get_theme_support( 'editor-color-palette' ) );
+		if ( false !== $color_palette ) {
+			$editor_settings['colors'] = $color_palette;
+		}
+
+		$font_sizes = current( (array) get_theme_support( 'editor-font-sizes' ) );
+		if ( false !== $font_sizes ) {
+			$editor_settings['fontSizes'] = $font_sizes;
+		}
+
+		$gradient_presets = current( (array) get_theme_support( 'editor-gradient-presets' ) );
+		if ( false !== $gradient_presets ) {
+			$editor_settings['gradients'] = $gradient_presets;
+		}
+
+		return $editor_settings;
+	}
+}
+
 /**
  * Determine if the current theme needs to load separate block styles or not.
  *
