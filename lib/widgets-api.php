@@ -37,6 +37,16 @@ function gutenberg_assign_widget_to_sidebar( $widget_id, $sidebar_id ) {
 	wp_set_sidebars_widgets( $sidebars );
 }
 
+/**
+ * Finds the sidebar that a given widget belongs to.
+ *
+ * Belongs in wp-includes/widgets.php when merged to Core.
+ *
+ * @since 10.3.0
+ *
+ * @param string $widget_id The widget id to look for.
+ * @return string|null The found sidebar's id, or null if it was not found.
+ */
 function gutenberg_find_widgets_sidebar( $widget_id ) {
 	foreach ( wp_get_sidebars_widgets() as $sidebar_id => $widget_ids ) {
 		foreach ( $widget_ids as $maybe_widget_id ) {
