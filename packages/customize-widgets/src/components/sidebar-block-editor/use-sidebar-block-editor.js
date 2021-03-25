@@ -209,7 +209,8 @@ export default function useSidebarBlockEditor( sidebar ) {
 					}
 				} else {
 					const widget = blockToWidget( nextBlock );
-					sidebar.addWidget( widget, index );
+					const widgetId = sidebar.addWidget( widget, index );
+					nextBlock.attributes.__internalWidgetId = widgetId;
 				}
 			} );
 
