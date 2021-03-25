@@ -14,22 +14,27 @@ if ( ! function_exists( 'get_default_block_editor_settings' ) ) {
 	 *
 	 * @since 5.8.0
 	 *
-	 * @param WP_Post $post Global post object.
+	 * @global WP_Post $post Global post object.
 	 *
 	 * @return array The default block editor settings.
 	 */
-	function get_default_block_editor_settings( $post = null ) {
-		/**
-		 * Filters the allowed block types for the editor, defaulting to true (all
-		 * block types supported).
-		 *
-		 * @since 5.0.0
-		 *
-		 * @param bool|array $allowed_block_types Array of block type slugs, or
-		 *                                        boolean to enable/disable all.
-		 * @param WP_Post    $post                The post resource data.
-		 */
-		$allowed_block_types = apply_filters( 'allowed_block_types', true, $post );
+	function get_default_block_editor_settings() {
+		global $post;
+
+		$allowed_block_types = true;
+		if ( ! empty( $post ) ) {
+			/**
+			 * Filters the allowed block types for the editor, defaulting to true (all
+			 * block types supported).
+			 *
+			 * @since 5.0.0
+			 *
+			 * @param bool|array $allowed_block_types Array of block type slugs, or
+			 *                                        boolean to enable/disable all.
+			 * @param WP_Post    $post                The post resource data.
+			 */
+			$allowed_block_types = apply_filters( 'allowed_block_types', $allowed_block_types, $post );
+		}
 
 		// Media settings.
 		$max_upload_size = wp_max_upload_size();
@@ -41,10 +46,10 @@ if ( ! function_exists( 'get_default_block_editor_settings' ) ) {
 		$image_size_names = apply_filters(
 			'image_size_names_choose',
 			array(
-				'thumbnail' => __( 'Thumbnail' ),
-				'medium'    => __( 'Medium' ),
-				'large'     => __( 'Large' ),
-				'full'      => __( 'Full Size' ),
+				'thumbnail' => __( 'Thumbnail', 'gutenberg' ),
+				'medium'    => __( 'Medium', 'gutenberg' ),
+				'large'     => __( 'Large', 'gutenberg' ),
+				'full'      => __( 'Full Size', 'gutenberg' ),
 			)
 		);
 
