@@ -34,7 +34,7 @@ import {
 import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
-import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
 import { store as coreStore } from '@wordpress/core-data';
@@ -74,14 +74,11 @@ const MOBILE_CONTROL_PROPS_RANGE_CONTROL = Platform.select( {
 function GalleryEdit( props ) {
 	const {
 		attributes,
+		clientId,
 		isSelected,
 		noticeUI,
 		noticeOperations,
-		mediaUpload,
-		imageSizes,
-		resizedImages,
 		onFocus,
-		wasBlockJustInserted,
 	} = props;
 	const {
 		columns = defaultColumnsNumber( attributes ),
@@ -95,6 +92,69 @@ function GalleryEdit( props ) {
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
+
+	const {
+		imageSizes,
+		mediaUpload,
+		getMedia,
+		wasBlockJustInserted,
+	} = useSelect( ( select ) => {
+		const settings = select( blockEditorStore ).getSettings();
+		const lastBlockInserted = select(
+			blockEditorStore
+		).getLastBlockInserted();
+
+		return {
+			imageSizes: settings.imageSizes,
+			mediaUpload: settings.mediaUpload,
+			getMedia: select( coreStore ).getMedia,
+			wasBlockJustInserted:
+				!! lastBlockInserted &&
+				lastBlockInserted.clientId === clientId &&
+				lastBlockInserted.source === 'inserter_menu',
+		};
+	} );
+
+	const { resizedImages } = useMemo( () => {
+		if ( isSelected ) {
+			return reduce(
+				attributes.ids,
+				( currentResizedImages, id ) => {
+					if ( ! id ) {
+						return currentResizedImages;
+					}
+					const image = getMedia( id );
+					const sizes = reduce(
+						imageSizes,
+						( currentSizes, size ) => {
+							const defaultUrl = get( image, [
+								'sizes',
+								size.slug,
+								'url',
+							] );
+							const mediaDetailsUrl = get( image, [
+								'media_details',
+								'sizes',
+								size.slug,
+								'source_url',
+							] );
+							return {
+								...currentSizes,
+								[ size.slug ]: defaultUrl || mediaDetailsUrl,
+							};
+						},
+						{}
+					);
+					return {
+						...currentResizedImages,
+						[ parseInt( id, 10 ) ]: sizes,
+					};
+				},
+				{}
+			);
+		}
+		return {};
+	}, [ isSelected, attributes.ids, imageSizes ] );
 
 	function setAttributes( newAttrs ) {
 		if ( newAttrs.ids ) {
@@ -345,7 +405,7 @@ function GalleryEdit( props ) {
 			notices={ hasImages ? undefined : noticeUI }
 			onFocus={ onFocus }
 			autoOpenMediaUpload={
-				! hasImages && isSelected && wasBlockJustInserted()
+				! hasImages && isSelected && wasBlockJustInserted
 			}
 		/>
 	);
@@ -417,75 +477,6 @@ function GalleryEdit( props ) {
 }
 
 export default compose( [
-	withSelect( ( select, { attributes: { ids }, isSelected } ) => {
-		const { getMedia } = select( coreStore );
-		const { getSettings } = select( blockEditorStore );
-		const { imageSizes, mediaUpload } = getSettings();
-
-		const resizedImages = useMemo( () => {
-			if ( isSelected ) {
-				return reduce(
-					ids,
-					( currentResizedImages, id ) => {
-						if ( ! id ) {
-							return currentResizedImages;
-						}
-						const image = getMedia( id );
-						const sizes = reduce(
-							imageSizes,
-							( currentSizes, size ) => {
-								const defaultUrl = get( image, [
-									'sizes',
-									size.slug,
-									'url',
-								] );
-								const mediaDetailsUrl = get( image, [
-									'media_details',
-									'sizes',
-									size.slug,
-									'source_url',
-								] );
-								return {
-									...currentSizes,
-									[ size.slug ]:
-										defaultUrl || mediaDetailsUrl,
-								};
-							},
-							{}
-						);
-						return {
-							...currentResizedImages,
-							[ parseInt( id, 10 ) ]: sizes,
-						};
-					},
-					{}
-				);
-			}
-			return {};
-		}, [ isSelected, ids, imageSizes ] );
-
-		return {
-			imageSizes,
-			mediaUpload,
-			resizedImages,
-		};
-	} ),
-	withDispatch( ( dispatch, { clientId }, { select } ) => {
-		return {
-			wasBlockJustInserted() {
-				const { clearLastBlockInserted } = dispatch( blockEditorStore );
-				const { wasBlockJustInserted } = select( blockEditorStore );
-
-				const result = wasBlockJustInserted( clientId );
-
-				if ( result ) {
-					clearLastBlockInserted();
-					return true;
-				}
-				return false;
-			},
-		};
-	} ),
 	withNotices,
 	withViewportMatch( { isNarrow: '< small' } ),
 ] )( GalleryEdit );
