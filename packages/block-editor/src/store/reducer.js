@@ -1747,7 +1747,7 @@ export function lastBlockInserted( state = {}, action ) {
 
 			return { clientId, source };
 		case 'RESET_BLOCKS':
-			return null;
+			return {};
 	}
 	return state;
 }

@@ -109,7 +109,6 @@ function GalleryEdit( props ) {
 			mediaUpload: settings.mediaUpload,
 			getMedia: select( coreStore ).getMedia,
 			wasBlockJustInserted:
-				!! lastBlockInserted &&
 				lastBlockInserted.clientId === clientId &&
 				lastBlockInserted.source === 'inserter_menu',
 		};

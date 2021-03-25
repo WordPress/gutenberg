@@ -377,7 +377,6 @@ export default compose( [
 
 		const lastBlockInserted = getLastBlockInserted();
 		const wasBlockJustInserted =
-			!! lastBlockInserted &&
 			lastBlockInserted.clientId === clientId &&
 			lastBlockInserted.source === 'inserter_menu';
 
