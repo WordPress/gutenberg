@@ -54,13 +54,18 @@
 // Styles for submenu flyout.
 .has-child {
 	&.is-selected,
-	&.has-child-selected,
-	// Show the submenu list when is dragging and drag enter the list item.
-	&.is-dragging-within {
+	&.has-child-selected {
 		> .wp-block-navigation-link__container {
 			opacity: 1;
 			visibility: visible;
 		}
+	}
+}
+
+.is-dragging-components-draggable .has-child.is-dragging-within {
+	> .wp-block-navigation-link__container {
+		opacity: 1;
+		visibility: visible;
 	}
 }
 
