@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { Icon, PanelBody } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { wordpress } from '@wordpress/icons';
+import { filterURLForDisplay } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -28,6 +29,7 @@ function PostPublishPanelPrepublish( { children } ) {
 		hasPublishAction,
 		siteIconUrl,
 		siteTitle,
+		siteHome,
 	} = useSelect( ( select ) => {
 		const { isResolving } = select( 'core/data' );
 		const { getCurrentPost, isEditedPostBeingScheduled } = select(
@@ -51,6 +53,7 @@ function PostPublishPanelPrepublish( { children } ) {
 			] ),
 			siteIconUrl: siteData.site_icon_url,
 			siteTitle: siteData.name,
+			siteHome: filterURLForDisplay( siteData.home ),
 		};
 	}, [] );
 
@@ -97,7 +100,10 @@ function PostPublishPanelPrepublish( { children } ) {
 			<p>{ prePublishBodyText }</p>
 			<div className="components-site-card">
 				{ siteIcon }
-				<span className="components-site-name">{ siteTitle }</span>
+				<div className="components-site-info">
+					<span className="components-site-name">{ siteTitle }</span>
+					<span className="components-site-home">{ siteHome }</span>
+				</div>
 			</div>
 			{ hasPublishAction && (
 				<>

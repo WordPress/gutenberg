@@ -44,11 +44,16 @@
 	border-radius: 2px;
 	height: 42px;
 	width: 42px;
+	margin-right: 16px;
 }
 
 .components-site-name {
+	display: block;
 	font-size: 14px;
-	margin-left: 16px;
+}
+
+.components-site-home {
+	display: block;
 }
 
 .editor-post-publish-panel__header-publish-button,
