@@ -51,9 +51,9 @@ const attributes = {
 let imageSize;
 beforeAll( () => {
 	// Mock Image.getSize to avoid failed attempt to size non-existant image
-	const getSizemock = jest.spyOn( Image, 'getSize' );
+	const getSizeSpy = jest.spyOn( Image, 'getSize' );
 	imageSize = Promise.resolve( 300, 200 );
-	getSizemock.mockReturnValue( imageSize );
+	getSizeSpy.mockReturnValue( imageSize );
 
 	// Register required blocks
 	registerBlockType( name, {
