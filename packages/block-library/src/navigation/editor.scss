@@ -56,8 +56,8 @@
 	&.is-selected,
 	&.has-child-selected,
 	// Show the submenu list when is dragging and drag enter the list item.
-	.is-dragging-components-draggable &.is-dragging-within {
-		> .wp-block-navigation__container {
+	&.is-dragging-within {
+		> .wp-block-navigation-link__container {
 			opacity: 1;
 			visibility: visible;
 		}
