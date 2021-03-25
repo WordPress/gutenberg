@@ -230,41 +230,44 @@ export default function SearchEdit( {
 
 	const renderButton = () => {
 		return (
-			<View
-				style={ styles.buttonContainer }
-				accessible={ true }
-				accessibilityRole="none"
-				accessibilityHint={ __( 'Double tap to edit button text' ) }
-				accessibilityLabel={ `${ __(
-					'Search button. Current value is'
-				) } ${ buttonText }` }
-			>
+			<View style={ styles.buttonContainer }>
 				{ buttonUseIcon && <Icon icon={ search } { ...styles.icon } /> }
 
 				{ ! buttonUseIcon && (
-					<RichText
-						className="wp-block-search__button"
-						identifier="text"
-						tagName="p"
-						style={ styles.richTextButton }
-						placeholder={ buttonPlaceholderText }
-						value={ buttonText }
-						withoutInteractiveFormatting
-						onChange={ ( html ) =>
-							setAttributes( { buttonText: html } )
-						}
-						minWidth={ MIN_BUTTON_WIDTH }
-						textAlign="center"
-						isSelected={ isButtonSelected }
-						__unstableMobileNoFocusOnMount={ ! isSelected }
-						unstableOnFocus={ () => {
-							setIsButtonSelected( true );
-						} }
-						onBlur={ () => {
-							setIsButtonSelected( false );
-						} }
-						selectionColor={ styles.richTextButtonCursor.color }
-					/>
+					<View
+						accessible={ true }
+						accessibilityRole="none"
+						accessibilityHint={ __(
+							'Double tap to edit button text'
+						) }
+						accessibilityLabel={ `${ __(
+							'Search button. Current value is'
+						) } ${ buttonText }` }
+					>
+						<RichText
+							className="wp-block-search__button"
+							identifier="text"
+							tagName="p"
+							style={ styles.richTextButton }
+							placeholder={ buttonPlaceholderText }
+							value={ buttonText }
+							withoutInteractiveFormatting
+							onChange={ ( html ) =>
+								setAttributes( { buttonText: html } )
+							}
+							minWidth={ MIN_BUTTON_WIDTH }
+							textAlign="center"
+							isSelected={ isButtonSelected }
+							__unstableMobileNoFocusOnMount={ ! isSelected }
+							unstableOnFocus={ () => {
+								setIsButtonSelected( true );
+							} }
+							onBlur={ () => {
+								setIsButtonSelected( false );
+							} }
+							selectionColor={ styles.richTextButtonCursor.color }
+						/>
+					</View>
 				) }
 			</View>
 		);
