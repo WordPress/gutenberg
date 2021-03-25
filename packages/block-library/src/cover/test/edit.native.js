@@ -2,8 +2,7 @@
  * External dependencies
  */
 import { Image } from 'react-native';
-import { render, fireEvent, waitFor } from '@testing-library/react-native';
-import { act } from 'react-test-renderer';
+import { render, fireEvent } from '@testing-library/react-native';
 
 /**
  * WordPress dependencies
@@ -51,9 +50,9 @@ const attributes = {
 
 let imageSize;
 beforeAll( () => {
-	// Mock Image.getSize to avoid act warning for unhandled async callback
+	// Mock Image.getSize to avoid failed attempt to size non-existant image
 	const getSizemock = jest.spyOn( Image, 'getSize' );
-	imageSize = Promise.resolve();
+	imageSize = Promise.resolve( 300, 200 );
 	getSizemock.mockReturnValue( imageSize );
 
 	// Register required blocks
@@ -107,8 +106,6 @@ describe( 'when no media is attached', () => {
 		fireEvent.press( mediaLibraryButton );
 
 		expect( requestMediaPicker ).toHaveBeenCalled();
-
-		await act( () => imageSize );
 	} );
 } );
 
@@ -135,7 +132,5 @@ describe( 'when media is attached', () => {
 				focalPoint: { ...attributes.focalPoint, x: '0.99' },
 			} )
 		);
-
-		await act( () => imageSize );
 	} );
 } );
