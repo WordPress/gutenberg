@@ -5,17 +5,13 @@
 		"declarationDir": "build-types"
 	},
 	"references": [
+		{ "path": "../i18n" },
 		{ "path": "../url" }
 	],
 	"include": [
-		"src/middlewares/http-v1.js",
-		"src/middlewares/media-upload.js",
-		"src/middlewares/namespace-endpoint.js",
-		"src/middlewares/nonce.js",
-		"src/middlewares/preloading.js",
-		"src/middlewares/root-url.js",
-		"src/middlewares/user-locale.js",
-		"src/utils/**/*",
-		"src/types.ts"
+		"src/**/*",
+	],
+	"exclude": [
+		"**/test/**/*",
 	]
 }

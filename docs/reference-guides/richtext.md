@@ -110,7 +110,7 @@ While using the RichText component a number of common issues tend to appear.
 
 In some cases the placeholder content on RichText can appear separate from the input where you would write your content. This is likely due to one of two reasons:
 
-1. You can't use an [inline HTML element](https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements) as the RichText component. If your `tagName` property is using an inline element such as `span`, `a` or `code`, it needs to be changed to a [block-level element](https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements).
+1. You can't have an element with the CSS `display` property set to `inline`. You will need to set it to `inline-block` or any other value.
 2. The `position` CSS property value for the element must be set to `relative` or `absolute` within the admin. If the styles within style.css or editor.css modify the `position` property value for this element, you may see issues with how it displays.
 
 ### HTML Formatting Tags Display in the Content

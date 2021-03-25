@@ -1,24 +1,19 @@
 {
+	"apiVersion": 2,
 	"name": "core/legacy-widget",
 	"category": "widgets",
 	"attributes": {
-		"widgetClass": {
-			"type": "string"
-		},
-		"referenceWidgetName": {
-			"type": "string"
-		},
-		"name": {
-			"type": "string"
+		"id": {
+			"type": "string",
+			"default": null
 		},
 		"idBase": {
-			"type": "string"
-		},
-		"number": {
-			"type": "number"
+			"type": "string",
+			"default": null
 		},
 		"instance": {
-			"type": "object"
+			"type": "object",
+			"default": null
 		}
 	},
 	"supports": {
@@ -26,8 +21,5 @@
 		"customClassName": false,
 		"reusable": false
 	},
-	"parent": [
-		"core/widget-area"
-	],
 	"editorStyle": "wp-block-legacy-widget-editor"
 }
