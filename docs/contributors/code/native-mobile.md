@@ -6,15 +6,15 @@ Intertwined with the web codepaths, the Gutenberg repo also includes the [React 
 
 Contributors need to ensure that they update any affected native mobile files during code refactorings because we cannot yet rely on automated tooling to do this for us. For example, renaming a function or a prop should also be performed in the native modules too, otherwise, the mobile client will break. We have added some mobile specific CI tests as safeguards in place in PRs, but we're still far from done. Please bear with us and thank you in advance. ❤️🙇‍
 
+## Native mobile specific files
+
+The majority of the code shared with native mobile is in the very same JavaScript module and SASS style files. In the cases where the code paths need to diverge, a `.native.js` or `.native.scss` variant of the file is created. In some cases, platform specific files can be also found for Android (`.android.js`) or iOS (`.ios.js`).
+
 ## Running Gutenberg Mobile on Android and iOS
 
 For instructions on how to run the **Gutenberg Mobile Demo App** on Android or iOS, see [Getting Started for the React Native based Mobile Gutenberg](/docs/contributors/code/getting-started-native-mobile.md)
 
 Also, the mobile client is packaged and released via the [official WordPress apps](https://wordpress.org/mobile/). Even though the build pipeline is slightly different then the mobile demo apps and lives in its own repo for now ([here's the native mobile repo](https://github.com/wordpress-mobile/gutenberg-mobile)), the source code itself is taken directly from this repo and the "web" side codepaths.
-
-## Native mobile specific files
-
-The majority of the code shared with native mobile is in the very same JavaScript module and SASS style files. In the cases where the code paths need to diverge, a `.native.js` or `.native.scss` variant of the file is created. In some cases, platform specific files can be also found for Android (`.android.js`) or iOS (`.ios.js`).
 
 ## Native mobile E2E tests in Continuous Integration
 
