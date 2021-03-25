@@ -95,18 +95,16 @@ const defaultFetchHandler = ( nextOptions ) => {
 		headers[ 'Content-Type' ] = 'application/json';
 	}
 
-	const resolvedFetchUrl = url || path;
-
-	if ( typeof resolvedFetchUrl === 'undefined' ) {
-		throw new Error( 'Please specify either a `path` or `url`' );
-	}
-
-	const responsePromise = window.fetch( resolvedFetchUrl, {
-		...DEFAULT_OPTIONS,
-		...remainingOptions,
-		body,
-		headers,
-	} );
+	const responsePromise = window.fetch(
+		// fall back to explicitly passing `window.location` which is the behavior if `undefined` is passed
+		url || path || window.location.toString(),
+		{
+			...DEFAULT_OPTIONS,
+			...remainingOptions,
+			body,
+			headers,
+		}
+	);
 
 	return (
 		responsePromise
