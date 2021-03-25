@@ -173,6 +173,7 @@ export { default as search } from './library/search';
 export { default as separator } from './library/separator';
 export { default as settings } from './library/settings';
 export { default as share } from './library/share';
+export { default as siteLogo } from './library/site-logo';
 export { default as shortcode } from './library/shortcode';
 export { default as stack } from './library/stack';
 export { default as starEmpty } from './library/star-empty';
