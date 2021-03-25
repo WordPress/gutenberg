@@ -45,9 +45,10 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 		)
 	);
 
-	// Add defaul https if no protocol specified. Issue: #21699
-	// The following chunk of code is taken from esc_url that is hard-coded to http://
-	// See: https://developer.wordpress.org/reference/functions/esc_url/ for details.
+	// Add default https if no protocol specified. The following chunk of code
+	// is taken from esc_url which is hard-coded to use http. This can be
+	// changed to pass the parameter in esc_url after
+	// https://core.trac.wordpress.org/ticket/52886 is in core.
 	if ( strpos( $url, ':' ) === false && ! in_array( $url[0], array( '/', '#', '?' ), true ) &&
 		! preg_match( '/^[a-z0-9-]+?\.php/i', $url ) ) {
 		$url = 'https://' . $url;
