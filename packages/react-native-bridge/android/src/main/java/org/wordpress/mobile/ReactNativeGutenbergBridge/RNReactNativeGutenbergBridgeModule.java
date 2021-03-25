@@ -19,10 +19,12 @@ import com.facebook.react.bridge.WritableNativeMap;
 import com.facebook.react.modules.core.DeviceEventManagerModule;
 
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.GutenbergUserEvent;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSelectedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaType;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.OtherMediaOptionsReceivedCallback;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.FocalPointPickerTooltipShownCallback;
 import org.wordpress.mobile.WPAndroidGlue.DeferredEventEmitter;
+import org.wordpress.mobile.WPAndroidGlue.Media;
 import org.wordpress.mobile.WPAndroidGlue.MediaOption;
 
 import java.io.Serializable;
@@ -131,6 +133,17 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
         emitToJS(EVENT_NAME_MEDIA_APPEND, writableMap);
     }
 
+    public void appendNewGalleryBlock(List<Media> images) {
+        WritableMap writableMap = new WritableNativeMap();
+        WritableArray writableArray = new WritableNativeArray();
+        for (RNMedia image : images) {
+            writableArray.pushMap(image.toMap());
+        }
+        writableMap.putString(MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_TYPE, "gallery");
+        writableMap.putArray("images", writableArray);
+        emitToJS(EVENT_NAME_MEDIA_APPEND, writableMap);
+    }
+
     public void setPreferredColorScheme(boolean isDarkMode) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putBoolean(MAP_KEY_IS_PREFERRED_COLOR_SCHEME_DARK, isDarkMode);
@@ -168,14 +181,16 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     @ReactMethod
     public void requestMediaPickFrom(String mediaSource, ReadableArray filter, Boolean allowMultipleSelection, final Callback onMediaSelected) {
         MediaType mediaType = getMediaTypeFromFilter(filter);
+        MediaSelectedCallback mediaSelectedCallback = getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected);
+
         if (mediaSource.equals(MEDIA_SOURCE_MEDIA_LIBRARY)) {
-            mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), allowMultipleSelection, mediaType);
+            mGutenbergBridgeJS2Parent.requestMediaPickFromMediaLibrary(mediaSelectedCallback, allowMultipleSelection, mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_LIBRARY)) {
-            mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), allowMultipleSelection, mediaType);
+            mGutenbergBridgeJS2Parent.requestMediaPickFromDeviceLibrary(mediaSelectedCallback, allowMultipleSelection, mediaType);
         } else if (mediaSource.equals(MEDIA_SOURCE_DEVICE_CAMERA)) {
-            mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), mediaType);
+            mGutenbergBridgeJS2Parent.requestMediaPickerFromDeviceCamera(mediaSelectedCallback, mediaType);
         } else {
-            mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, getNewMediaSelectedCallback(allowMultipleSelection, onMediaSelected), allowMultipleSelection);
+            mGutenbergBridgeJS2Parent.requestMediaPickFrom(mediaSource, mediaSelectedCallback, allowMultipleSelection);
         }
     }
 
