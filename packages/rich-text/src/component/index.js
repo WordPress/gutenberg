@@ -853,6 +853,7 @@ function RichText(
 			// the right boundary position. If undefined, getActiveFormats will
 			// give the active formats according to the browser.
 			activeFormats: oldRecord._newActiveFormats,
+			_newActiveFormats: undefined,
 		};
 
 		const newActiveFormats = getActiveFormats(

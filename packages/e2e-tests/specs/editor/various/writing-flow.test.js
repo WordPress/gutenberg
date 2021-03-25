@@ -216,7 +216,6 @@ describe( 'Writing Flow', () => {
 		await page.keyboard.up( 'Shift' );
 		await pressKeyWithModifier( 'primary', 'i' );
 		await page.keyboard.press( 'ArrowLeft' );
-		await page.keyboard.press( 'ArrowLeft' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
