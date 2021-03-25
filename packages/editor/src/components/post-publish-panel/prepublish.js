@@ -7,8 +7,9 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
-import { withSelect } from '@wordpress/data';
+import { Icon, PanelBody } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
+import { wordpress } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -20,11 +21,55 @@ import PostScheduleLabel from '../post-schedule/label';
 import MaybeTagsPanel from './maybe-tags-panel';
 import MaybePostFormatPanel from './maybe-post-format-panel';
 
-function PostPublishPanelPrepublish( {
-	hasPublishAction,
-	isBeingScheduled,
-	children,
-} ) {
+function PostPublishPanelPrepublish( { children } ) {
+	const {
+		isBeingScheduled,
+		isRequestingSiteIcon,
+		hasPublishAction,
+		siteIconUrl,
+		siteTitle,
+	} = useSelect( ( select ) => {
+		const { isResolving } = select( 'core/data' );
+		const { getCurrentPost, isEditedPostBeingScheduled } = select(
+			'core/editor'
+		);
+		const { getEntityRecord } = select( 'core' );
+		const siteData =
+			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
+
+		return {
+			hasPublishAction: get(
+				getCurrentPost(),
+				[ '_links', 'wp:action-publish' ],
+				false
+			),
+			isBeingScheduled: isEditedPostBeingScheduled(),
+			isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
+				'root',
+				'__unstableBase',
+				undefined,
+			] ),
+			siteIconUrl: siteData.site_icon_url,
+			siteTitle: siteData.name,
+		};
+	}, [] );
+
+	let siteIcon = <Icon size="36px" icon={ wordpress } />;
+
+	if ( siteIconUrl ) {
+		siteIcon = (
+			<img
+				alt={ __( 'Site Icon' ) }
+				className="components-site-icon"
+				src={ siteIconUrl }
+			/>
+		);
+	}
+
+	if ( isRequestingSiteIcon ) {
+		siteIcon = null;
+	}
+
 	let prePublishTitle, prePublishBodyText;
 
 	if ( ! hasPublishAction ) {
@@ -50,6 +95,10 @@ function PostPublishPanelPrepublish( {
 				<strong>{ prePublishTitle }</strong>
 			</div>
 			<p>{ prePublishBodyText }</p>
+			<div className="components-site-card">
+				{ siteIcon }
+				<span className="components-site-name">{ siteTitle }</span>
+			</div>
 			{ hasPublishAction && (
 				<>
 					<PanelBody
@@ -89,16 +138,4 @@ function PostPublishPanelPrepublish( {
 	);
 }
 
-export default withSelect( ( select ) => {
-	const { getCurrentPost, isEditedPostBeingScheduled } = select(
-		'core/editor'
-	);
-	return {
-		hasPublishAction: get(
-			getCurrentPost(),
-			[ '_links', 'wp:action-publish' ],
-			false
-		),
-		isBeingScheduled: isEditedPostBeingScheduled(),
-	};
-} )( PostPublishPanelPrepublish );
+export default PostPublishPanelPrepublish;

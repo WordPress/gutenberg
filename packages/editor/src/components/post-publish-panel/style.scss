@@ -33,6 +33,24 @@
 	}
 }
 
+.components-site-card {
+	display: flex;
+	align-items: center;
+	margin: 16px 0;
+}
+
+.components-site-icon {
+	border: none;
+	border-radius: 2px;
+	height: 42px;
+	width: 42px;
+}
+
+.components-site-name {
+	font-size: 14px;
+	margin-left: 16px;
+}
+
 .editor-post-publish-panel__header-publish-button,
 .editor-post-publish-panel__header-cancel-button {
 	flex-grow: 1;
