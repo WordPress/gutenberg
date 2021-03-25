@@ -147,6 +147,8 @@ function addSaveProps( props, blockType, attributes ) {
 		[ borderColorClass ]: !! borderColorClass,
 	} );
 
+	// If we are clearing the last of the previous classes in `className`
+	// set it to `undefined` to avoid rendering empty DOM attributes.
 	props.className = newClassName ? newClassName : undefined;
 
 	return props;
