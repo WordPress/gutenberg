@@ -13,7 +13,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import {
 	BottomSheet,
 	PanelBody,
-	SmallFooterMessageControl,
+	FooterMessageControl,
 } from '@wordpress/components';
 
 /**
@@ -89,11 +89,14 @@ const BottomSheetTextControl = ( {
 				</PanelBody>
 			</>
 
-			<PanelBody style={ styles.textFooternote }>
-				<SmallFooterMessageControl
-					value={ footerNote }
-				></SmallFooterMessageControl>
-			</PanelBody>
+			{ footerNote && (
+				<PanelBody style={ styles.textFooternote }>
+					<FooterMessageControl
+						label={ footerNote }
+						textAlign="left"
+					></FooterMessageControl>
+				</PanelBody>
+			) }
 		</BottomSheet.SubSheet>
 	);
 };
