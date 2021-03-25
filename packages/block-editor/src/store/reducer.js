@@ -1737,11 +1737,17 @@ export function highlightedBlock( state, action ) {
  */
 export function lastBlockInserted( state = {}, action ) {
 	switch ( action.type ) {
-		case 'ADD_LAST_BLOCK_INSERTED':
-			return { ...state, clientId: action.clientId };
+		case 'INSERT_BLOCKS':
+			if ( ! action.updateSelection || ! action.blocks.length ) {
+				return state;
+			}
 
-		case 'CLEAR_LAST_BLOCK_INSERTED':
-			return {};
+			const clientId = action.blocks[ 0 ].clientId;
+			const source = action.meta?.source;
+
+			return { clientId, source };
+		case 'RESET_BLOCKS':
+			return null;
 	}
 	return state;
 }
