@@ -18,7 +18,7 @@ import {
 	getColorObjectByColorValue,
 } from '../components/colors';
 import useEditorFeature from '../components/use-editor-feature';
-import { hasBorderFeatureSupport } from './border';
+import { hasBorderFeatureSupport, shouldSkipSerialization } from './border';
 import { cleanEmptyObject } from './utils';
 
 const EMPTY_ARRAY = [];
@@ -129,7 +129,10 @@ function addAttributes( settings ) {
  * @return {Object}            Filtered props to apply to save element.
  */
 function addSaveProps( props, blockType, attributes ) {
-	if ( ! hasBorderFeatureSupport( 'color', blockType ) ) {
+	if (
+		! hasBorderFeatureSupport( 'color', blockType ) ||
+		shouldSkipSerialization( blockType )
+	) {
 		return props;
 	}
 
@@ -154,7 +157,10 @@ function addSaveProps( props, blockType, attributes ) {
  * @return {Object}         Filtered block settings.
  */
 function addEditProps( settings ) {
-	if ( ! hasBorderFeatureSupport( 'color', settings ) ) {
+	if (
+		! hasBorderFeatureSupport( 'color', settings ) ||
+		shouldSkipSerialization( settings )
+	) {
 		return settings;
 	}
 
