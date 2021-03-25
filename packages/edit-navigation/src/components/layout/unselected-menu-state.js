@@ -15,25 +15,29 @@ export default function UnselectedMenuState( {
 	onSelectMenu,
 	menus,
 } ) {
+	const showMenuSwitcher = menus?.length > 0;
 	return (
-		<Card className="edit-navigation-empty-state">
-			<CardBody>
-				{ menus?.length ? (
-					<MenuSwitcher
-						onSelectMenu={ onSelectMenu }
-						menus={ menus }
-					/>
-				) : (
-					<AddMenu
-						onCreate={ onCreate }
-						titleText={ __( 'Create your first menu' ) }
-						helpText={ __(
-							'A short descriptive name for your menu.'
-						) }
-						focusInputOnMount
-					/>
-				) }
-			</CardBody>
-		</Card>
+		<div className="edit-navigation-empty-state">
+			{ showMenuSwitcher && <h4>{ __( 'Choose a menu to edit:' ) }</h4> }
+			<Card>
+				<CardBody>
+					{ showMenuSwitcher ? (
+						<MenuSwitcher
+							onSelectMenu={ onSelectMenu }
+							menus={ menus }
+						/>
+					) : (
+						<AddMenu
+							onCreate={ onCreate }
+							titleText={ __( 'Create your first menu' ) }
+							helpText={ __(
+								'A short descriptive name for your menu.'
+							) }
+							focusInputOnMount
+						/>
+					) }
+				</CardBody>
+			</Card>
+		</div>
 	);
 }

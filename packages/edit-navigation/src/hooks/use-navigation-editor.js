@@ -8,7 +8,7 @@ import { useState, useEffect } from '@wordpress/element';
  */
 import { store as editNavigationStore } from '../store';
 import { store as noticesStore } from '@wordpress/notices';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 
 const getMenusData = ( select ) => {
 	const selectors = select( 'core' );
@@ -47,6 +47,9 @@ export default function useNavigationEditor() {
 			),
 		[ selectedMenuId ]
 	);
+	const selectedMenuName =
+		menus?.find( ( { id } ) => id === selectedMenuId )?.name || '';
+
 	useEffect( () => {
 		if ( hasLoadedMenus ) {
 			setHasFinishedInitialLoad( true );
@@ -71,10 +74,17 @@ export default function useNavigationEditor() {
 		} );
 		if ( didDeleteMenu ) {
 			setSelectedMenuId( null );
-			createInfoNotice( __( 'Menu deleted' ), {
-				type: 'snackbar',
-				isDismissible: true,
-			} );
+			createInfoNotice(
+				sprintf(
+					// translators: %s: the name of a menu.
+					__( '"%s" menu has been deleted' ),
+					selectedMenuName
+				),
+				{
+					type: 'snackbar',
+					isDismissible: true,
+				}
+			);
 		} else {
 			createErrorNotice( __( 'Menu deletion unsuccessful' ) );
 		}
