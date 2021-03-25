@@ -108,7 +108,7 @@ const fetchAllMiddleware = async ( options, next ) => {
 	}
 
 	// Iteratively fetch all remaining pages until no "next" header is found.
-	let mergedResults = [ ...results ];
+	let mergedResults = /** @type {any[]} */ ( [] ).concat( results );
 	while ( nextPage ) {
 		const nextResponse = await apiFetch( {
 			...options,
