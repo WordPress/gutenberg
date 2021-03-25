@@ -114,11 +114,11 @@ _Related_
 
 _Parameters_
 
--   _context_ `string`: Set to "paste" to exclude invisible elements and sensitive data.
+-   _context_ `[string]`: Set to "paste" to exclude invisible elements and sensitive data.
 
 _Returns_
 
--   `Object`: Schema.
+-   `Partial<ContentSchema>`: Schema.
 
 <a name="getRectangleFromRange" href="#getRectangleFromRange">#</a> **getRectangleFromRange**
 
@@ -220,7 +220,7 @@ _Related_
 
 _Parameters_
 
--   _node_ `Element`: The node to test.
+-   _node_ `Node`: The node to test.
 
 _Returns_
 
@@ -228,7 +228,13 @@ _Returns_
 
 <a name="isTextContent" href="#isTextContent">#</a> **isTextContent**
 
-Undocumented declaration.
+_Parameters_
+
+-   _node_ `Node`: 
+
+_Returns_
+
+-   `boolean`: Node is text content
 
 <a name="isTextField" href="#isTextField">#</a> **isTextField**
 
