@@ -1,6 +1,6 @@
 /**
  * @param {string} nonce
- * @return {import('../types').ApiFetchMiddleware} A middleware to enhance a request with a nonce.
+ * @return {import('../types').ApiFetchMiddleware & { nonce: string }} A middleware to enhance a request with a nonce.
  */
 function createNonceMiddleware( nonce ) {
 	/**
