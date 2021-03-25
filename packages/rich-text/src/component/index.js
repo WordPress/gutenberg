@@ -592,9 +592,6 @@ function RichText(
 			return;
 		}
 
-		// In all other cases, prevent default behaviour.
-		event.preventDefault();
-
 		const formatsBefore = formats[ start - 1 ] || EMPTY_ACTIVE_FORMATS;
 		const formatsAfter = formats[ start ] || EMPTY_ACTIVE_FORMATS;
 
@@ -637,30 +634,22 @@ function RichText(
 			}
 		}
 
-		if ( newActiveFormatsLength !== currentActiveFormats.length ) {
-			const newActiveFormats = source.slice( 0, newActiveFormatsLength );
-			const newValue = {
-				...record.current,
-				activeFormats: newActiveFormats,
-			};
-			record.current = newValue;
-			applyRecord( newValue );
-			setActiveFormats( newActiveFormats );
+		if ( newActiveFormatsLength === currentActiveFormats.length ) {
+			record.current._newActiveFormats = isReverse
+				? formatsBefore
+				: formatsAfter;
 			return;
 		}
 
-		const newPos = start + ( isReverse ? -1 : 1 );
-		const newActiveFormats = isReverse ? formatsBefore : formatsAfter;
+		event.preventDefault();
+
+		const newActiveFormats = source.slice( 0, newActiveFormatsLength );
 		const newValue = {
 			...record.current,
-			start: newPos,
-			end: newPos,
 			activeFormats: newActiveFormats,
 		};
-
 		record.current = newValue;
 		applyRecord( newValue );
-		onSelectionChange( newPos, newPos );
 		setActiveFormats( newActiveFormats );
 	}
 
@@ -847,8 +836,11 @@ function RichText(
 			...oldRecord,
 			start,
 			end,
-			// Allow `getActiveFormats` to get new `activeFormats`.
-			activeFormats: undefined,
+			// _newActiveFormats may be set on arrow key navigation to control
+			// the right boundary position. If undefined, getActiveFormats will
+			// give the active formats according to the browser.
+			activeFormats: oldRecord._newActiveFormats,
+			_newActiveFormats: undefined,
 		};
 
 		const newActiveFormats = getActiveFormats(
