@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 9.0.1-next.0 (2021-03-26)
+
 ### Bug Fix
 
 - Adds TypeScript as a peer dependency and makes it optional when not installed ([#29942](https://github.com/WordPress/gutenberg/pull/29942)).
