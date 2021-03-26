@@ -46,8 +46,8 @@ export function BlockInspectorButton( { onClick = noop, small = false } ) {
 	};
 
 	const label = areAdvancedSettingsOpened
-		? __( 'Hide More Settings' )
-		: __( 'Show More Settings' );
+		? __( 'Hide more settings' )
+		: __( 'Show more settings' );
 
 	return (
 		<MenuItem

@@ -39,6 +39,8 @@ import RadioCell from './radio-cell';
 import NavigationScreen from './bottom-sheet-navigation/navigation-screen';
 import NavigationContainer from './bottom-sheet-navigation/navigation-container';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
+import BottomSheetSubSheet from './sub-sheet';
+import NavigationHeader from './navigation-header';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
 class BottomSheet extends Component {
@@ -48,6 +50,7 @@ class BottomSheet extends Component {
 		this.onScroll = this.onScroll.bind( this );
 		this.isScrolling = this.isScrolling.bind( this );
 		this.onShouldEnableScroll = this.onShouldEnableScroll.bind( this );
+		this.onDismiss = this.onDismiss.bind( this );
 		this.onShouldSetBottomSheetMaxHeight = this.onShouldSetBottomSheetMaxHeight.bind(
 			this
 		);
@@ -211,6 +214,16 @@ class BottomSheet extends Component {
 		}
 	}
 
+	onDismiss() {
+		const { onDismiss } = this.props;
+
+		if ( onDismiss ) {
+			onDismiss();
+		}
+
+		this.onCloseBottomSheet();
+	}
+
 	onShouldEnableScroll( value ) {
 		this.setState( { scrollEnabled: value } );
 	}
@@ -236,6 +249,7 @@ class BottomSheet extends Component {
 		const { handleClosingBottomSheet } = this.state;
 		if ( handleClosingBottomSheet ) {
 			handleClosingBottomSheet();
+			this.onHandleClosingBottomSheet( null );
 		}
 		if ( onClose ) {
 			onClose();
@@ -279,12 +293,10 @@ class BottomSheet extends Component {
 			isVisible,
 			leftButton,
 			rightButton,
-			header,
 			hideHeader,
 			style = {},
 			contentStyle = {},
 			getStylesFromColorScheme,
-			onDismiss,
 			children,
 			withHeaderSeparator = false,
 			hasNavigation,
@@ -332,7 +344,14 @@ class BottomSheet extends Component {
 			listStyle = { flexGrow: 1 };
 		} else if ( isMaxHeightSet ) {
 			listStyle = { maxHeight };
+
+			// Allow setting a "static" height of the bottom sheet
+			// by settting the min height to the max height.
+			if ( this.props.setMinHeightToMaxHeight ) {
+				listStyle.minHeight = maxHeight;
+			}
 		}
+
 		const listProps = {
 			disableScrollViewPanResponder: true,
 			bounces,
@@ -354,24 +373,22 @@ class BottomSheet extends Component {
 
 		const WrapperView = hasNavigation ? View : ScrollView;
 
-		const getHeader = () =>
-			header || (
-				<>
-					<View style={ styles.bottomSheetHeader }>
-						<View style={ styles.flex }>{ leftButton }</View>
-						<Text
-							style={ bottomSheetHeaderTitleStyle }
-							maxFontSizeMultiplier={ 3 }
-						>
-							{ title }
-						</Text>
-						<View style={ styles.flex }>{ rightButton }</View>
-					</View>
-					{ withHeaderSeparator && (
-						<View style={ styles.separator } />
-					) }
-				</>
-			);
+		const getHeader = () => (
+			<>
+				<View style={ styles.bottomSheetHeader }>
+					<View style={ styles.flex }>{ leftButton }</View>
+					<Text
+						style={ bottomSheetHeaderTitleStyle }
+						maxFontSizeMultiplier={ 3 }
+					>
+						{ title }
+					</Text>
+					<View style={ styles.flex }>{ rightButton }</View>
+				</View>
+				{ withHeaderSeparator && <View style={ styles.separator } /> }
+			</>
+		);
+
 		return (
 			<Modal
 				isVisible={ isVisible }
@@ -384,9 +401,9 @@ class BottomSheet extends Component {
 				onBackdropPress={ this.onCloseBottomSheet }
 				onBackButtonPress={ this.onHardwareButtonPress }
 				onSwipe={ this.onCloseBottomSheet }
-				onDismiss={ Platform.OS === 'ios' ? onDismiss : undefined }
+				onDismiss={ Platform.OS === 'ios' ? this.onDismiss : undefined }
 				onModalHide={
-					Platform.OS === 'android' ? onDismiss : undefined
+					Platform.OS === 'android' ? this.onDismiss : undefined
 				}
 				swipeDirection="down"
 				onMoveShouldSetResponder={
@@ -478,6 +495,8 @@ const ThemedBottomSheet = withPreferredColorScheme( BottomSheet );
 ThemedBottomSheet.getWidth = getWidth;
 ThemedBottomSheet.Button = Button;
 ThemedBottomSheet.Cell = Cell;
+ThemedBottomSheet.SubSheet = BottomSheetSubSheet;
+ThemedBottomSheet.NavigationHeader = NavigationHeader;
 ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;

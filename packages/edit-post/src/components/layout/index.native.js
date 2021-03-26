@@ -76,7 +76,12 @@ class Layout extends Component {
 
 	setHeightState( event ) {
 		const { height } = event.nativeEvent.layout;
-		this.setState( { rootViewHeight: height }, sendNativeEditorDidLayout );
+		if ( height !== this.state.rootViewHeight ) {
+			this.setState(
+				{ rootViewHeight: height },
+				sendNativeEditorDidLayout
+			);
+		}
 	}
 
 	renderHTML() {

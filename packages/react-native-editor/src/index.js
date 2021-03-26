@@ -18,6 +18,7 @@ import {
 	validateThemeColors,
 	validateThemeGradients,
 } from '@wordpress/block-editor';
+import { dispatch } from '@wordpress/data';
 
 const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
@@ -97,6 +98,21 @@ const setupInitHooks = () => {
 				gradients,
 				editorMode: props.editorMode,
 			};
+		}
+	);
+
+	wpHooks.addAction(
+		'native.render',
+		'core/react-native-editor',
+		( props ) => {
+			const isAudioBlockEnabled =
+				props.capabilities && props.capabilities.audioBlock;
+
+			if ( isAudioBlockEnabled === true ) {
+				dispatch( 'core/edit-post' ).showBlockTypes( [ 'core/audio' ] );
+			} else {
+				dispatch( 'core/edit-post' ).hideBlockTypes( [ 'core/audio' ] );
+			}
 		}
 	);
 };

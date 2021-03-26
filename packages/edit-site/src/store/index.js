@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createReduxStore, registerStore } from '@wordpress/data';
 import { controls } from '@wordpress/data-controls';
 
 /**
@@ -12,15 +12,16 @@ import * as actions from './actions';
 import * as selectors from './selectors';
 import { STORE_NAME } from './constants';
 
-export default function registerEditSiteStore( initialState ) {
-	const store = registerStore( STORE_NAME, {
-		reducer,
-		actions,
-		selectors,
-		controls,
-		persist: [ 'preferences' ],
-		initialState,
-	} );
+export const storeConfig = {
+	reducer,
+	actions,
+	selectors,
+	controls,
+	persist: [ 'preferences' ],
+};
 
-	return store;
-}
+export const store = createReduxStore( STORE_NAME, storeConfig );
+
+// Once we build a more generic persistence plugin that works across types of stores
+// we'd be able to replace this with a register call.
+registerStore( STORE_NAME, storeConfig );

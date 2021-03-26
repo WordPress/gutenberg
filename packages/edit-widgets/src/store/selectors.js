@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { invert, keyBy } from 'lodash';
+import { keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -53,32 +53,26 @@ export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 	);
 } );
 
-export const getWidgetIdForClientId = ( state, clientId ) => {
-	const widgetIdToClientId = state.mapping;
-	const clientIdToWidgetId = invert( widgetIdToClientId );
-	return clientIdToWidgetId[ clientId ];
-};
-
 /**
- * Returns widgetArea containing a block identify by given clientId
+ * Returns widgetArea containing a block identify by given widgetId
  *
- * @param {string} clientId The ID of the block.
+ * @param {string} widgetId The ID of the widget.
  * @return {Object} Containing widget area.
  */
-export const getWidgetAreaForClientId = createRegistrySelector(
-	( select ) => ( state, clientId ) => {
+export const getWidgetAreaForWidgetId = createRegistrySelector(
+	( select ) => ( state, widgetId ) => {
 		const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
-		for ( const widgetArea of widgetAreas ) {
+		return widgetAreas.find( ( widgetArea ) => {
 			const post = select( 'core' ).getEditedEntityRecord(
 				KIND,
 				POST_TYPE,
 				buildWidgetAreaPostId( widgetArea.id )
 			);
-			const clientIds = post.blocks.map( ( block ) => block.clientId );
-			if ( clientIds.includes( clientId ) ) {
-				return widgetArea;
-			}
-		}
+			const blockWidgetIds = post.blocks.map(
+				( block ) => block.attributes.__internalWidgetId
+			);
+			return blockWidgetIds.includes( widgetId );
+		} );
 	}
 );
 

@@ -13,7 +13,8 @@ import {
 } from './styles/focal-point-picker-style';
 import { useUpdateEffect } from '../utils/hooks';
 
-const { clearTimeout, setTimeout } = window;
+const { clearTimeout, setTimeout } =
+	typeof window !== 'undefined' ? window : {};
 
 export default function FocalPointPickerGrid( {
 	bounds = {},

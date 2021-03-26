@@ -17,6 +17,7 @@ import { useSelect } from '@wordpress/data';
 import BlockNavigationLeaf from './leaf';
 import Indentation from './indentation';
 import Inserter from '../inserter';
+import { store as blockEditorStore } from '../../store';
 
 export default function BlockNavigationAppender( {
 	parentBlockClientId,
@@ -28,7 +29,7 @@ export default function BlockNavigationAppender( {
 	const isDragging = useSelect(
 		( select ) => {
 			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 
 			return (
@@ -66,7 +67,6 @@ export default function BlockNavigationAppender( {
 						<Inserter
 							rootClientId={ parentBlockClientId }
 							__experimentalIsQuick
-							__experimentalSelectBlockOnInsert={ false }
 							aria-describedby={ descriptionId }
 							toggleProps={ { ref, tabIndex, onFocus } }
 						/>

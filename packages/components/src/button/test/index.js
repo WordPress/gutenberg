@@ -13,6 +13,7 @@ import { plusCircle } from '@wordpress/icons';
  * Internal dependencies
  */
 import ButtonWithForwardedRef, { Button } from '../';
+import VisuallyHidden from '../../visually-hidden';
 
 describe( 'Button', () => {
 	describe( 'basic rendering', () => {
@@ -135,7 +136,7 @@ describe( 'Button', () => {
 			const buttonDescription = shallow(
 				<Button describedBy="Description text" />
 			)
-				.find( 'VisuallyHidden' )
+				.find( VisuallyHidden )
 				.shallow()
 				.text();
 			expect( buttonDescription ).toBe( 'Description text' );

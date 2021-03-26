@@ -16,11 +16,6 @@ export default function WidgetAreaInnerBlocks() {
 			onChange={ onChange }
 			templateLock={ false }
 			renderAppender={ InnerBlocks.DefaultBlockAppender }
-			// HACK: The widget editor relies on a mapping of block client IDs
-			// to widget IDs. We therefore instruct `useBlockSync` to not clone
-			// the blocks it receives which would change the block client IDs`.
-			// See https://github.com/WordPress/gutenberg/issues/27173.
-			__unstableCloneValue={ false }
 		/>
 	);
 }

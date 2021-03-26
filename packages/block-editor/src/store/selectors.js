@@ -265,6 +265,41 @@ export const __unstableGetBlockTree = createSelector(
 );
 
 /**
+ * Returns a stripped down block object containing only its client ID,
+ * and its inner blocks' client IDs.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Client ID of the block to get.
+ *
+ * @return {Object} Client IDs of the post blocks.
+ */
+export const __unstableGetClientIdWithClientIdsTree = createSelector(
+	( state, clientId ) => ( {
+		clientId,
+		innerBlocks: __unstableGetClientIdsTree( state, clientId ),
+	} ),
+	( state ) => [ state.blocks.order ]
+);
+
+/**
+ * Returns the block tree represented in the block-editor store from the
+ * given root, consisting of stripped down block objects containing only
+ * their client IDs, and their inner blocks' client IDs.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Object[]} Client IDs of the post blocks.
+ */
+export const __unstableGetClientIdsTree = createSelector(
+	( state, rootClientId = '' ) =>
+		map( getBlockOrder( state, rootClientId ), ( clientId ) =>
+			__unstableGetClientIdWithClientIdsTree( state, clientId )
+		),
+	( state ) => [ state.blocks.order ]
+);
+
+/**
  * Returns an array containing the clientIds of all descendants
  * of the blocks given.
  *
@@ -691,10 +726,11 @@ export function getNextBlockClientId( state, startClientId ) {
 /**
  * Returns the initial caret position for the selected block.
  * This position is to used to position the caret properly when the selected block changes.
+ * If the current block is not a RichText, having initial position set to 0 means "focus block"
  *
  * @param {Object} state Global application state.
  *
- * @return {?Object} Selected block.
+ * @return {0|-1|null} Initial position.
  */
 export function getSelectedBlocksInitialCaretPosition( state ) {
 	return state.initialPosition;
@@ -1393,26 +1429,33 @@ const canIncludeBlockTypeInInserter = ( state, blockType, rootClientId ) => {
 /**
  * Return a function to be used to tranform a block variation to an inserter item
  *
+ * @param {Object} state Global State
  * @param {Object} item Denormalized inserter item
  * @return {Function} Function to transform a block variation to inserter item
  */
-const getItemFromVariation = ( item ) => ( variation ) => ( {
-	...item,
-	id: `${ item.id }-${ variation.name }`,
-	icon: variation.icon || item.icon,
-	title: variation.title || item.title,
-	description: variation.description || item.description,
-	// If `example` is explicitly undefined for the variation, the preview will not be shown.
-	example: variation.hasOwnProperty( 'example' )
-		? variation.example
-		: item.example,
-	initialAttributes: {
-		...item.initialAttributes,
-		...variation.attributes,
-	},
-	innerBlocks: variation.innerBlocks,
-	keywords: variation.keywords || item.keywords,
-} );
+const getItemFromVariation = ( state, item ) => ( variation ) => {
+	const variationId = `${ item.id }/${ variation.name }`;
+	const { time, count = 0 } = getInsertUsage( state, variationId ) || {};
+	return {
+		...item,
+		id: variationId,
+		icon: variation.icon || item.icon,
+		title: variation.title || item.title,
+		description: variation.description || item.description,
+		category: variation.category || item.category,
+		// If `example` is explicitly undefined for the variation, the preview will not be shown.
+		example: variation.hasOwnProperty( 'example' )
+			? variation.example
+			: item.example,
+		initialAttributes: {
+			...item.initialAttributes,
+			...variation.attributes,
+		},
+		innerBlocks: variation.innerBlocks,
+		keywords: variation.keywords || item.keywords,
+		frecency: calculateFrecency( time, count ),
+	};
+};
 
 /**
  * Returns the calculated frecency.
@@ -1587,16 +1630,30 @@ export const getInserterItems = createSelector(
 		for ( const item of blockTypeInserterItems ) {
 			const { variations = [] } = item;
 			if ( variations.length ) {
-				const variationMapper = getItemFromVariation( item );
+				const variationMapper = getItemFromVariation( state, item );
 				blockVariations.push( ...variations.map( variationMapper ) );
 			}
 		}
-
-		return [
+		// Prioritize core blocks's display in inserter.
+		const prioritizeCoreBlocks = ( a, b ) => {
+			const coreBlockNamePrefix = 'core/';
+			const firstIsCoreBlock = a.name.startsWith( coreBlockNamePrefix );
+			const secondIsCoreBlock = b.name.startsWith( coreBlockNamePrefix );
+			if ( firstIsCoreBlock && secondIsCoreBlock ) {
+				return 0;
+			}
+			return firstIsCoreBlock && ! secondIsCoreBlock ? -1 : 1;
+		};
+		// Ensure core blocks are prioritized in the returned results,
+		// because third party blocks can be registered earlier than
+		// the core blocks (usually by using the `init` action),
+		// thus affecting the display order.
+		// We don't sort reusable blocks as they are handled differently.
+		const sortedBlockTypes = [
 			...visibleBlockTypeInserterItems,
 			...blockVariations,
-			...reusableBlockInserterItems,
-		];
+		].sort( prioritizeCoreBlocks );
+		return [ ...sortedBlockTypes, ...reusableBlockInserterItems ];
 	},
 	( state, rootClientId ) => [
 		state.blockListSettings[ rootClientId ],
@@ -1734,6 +1791,83 @@ export const __experimentalGetAllowedBlocks = createSelector(
 	]
 );
 
+export const __experimentalGetParsedPattern = createSelector(
+	( state, patternName ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		const pattern = patterns.find( ( { name } ) => name === patternName );
+		if ( ! pattern ) {
+			return null;
+		}
+
+		return {
+			...pattern,
+			blocks: parse( pattern.content ),
+		};
+	},
+	( state ) => [ state.settings.__experimentalBlockPatterns ]
+);
+
+/**
+ * Returns the list of allowed patterns for inner blocks children
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional target root client ID.
+ *
+ * @return {Array?} The list of allowed block types.
+ */
+export const __experimentalGetAllowedPatterns = createSelector(
+	( state, rootClientId = null ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		if ( ! rootClientId ) {
+			return patterns;
+		}
+
+		const parsedPatterns = patterns.map( ( { name } ) =>
+			__experimentalGetParsedPattern( state, name )
+		);
+		const patternsAllowed = filter( parsedPatterns, ( { blocks } ) =>
+			blocks.every( ( { name } ) =>
+				canInsertBlockType( state, name, rootClientId )
+			)
+		);
+
+		return patternsAllowed;
+	},
+	( state, rootClientId ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId[ rootClientId ],
+	]
+);
+
+/**
+ * Returns the list of patterns based on specific `scope` and
+ * a block's name.
+ * `inserter` scope should be handled differently, probably in
+ * combination with `__experimentalGetAllowedPatterns`.
+ * For now `__experimentalGetScopedBlockPatterns` handles properly
+ * all other scopes.
+ * Since both APIs are experimental we should revisit this.
+ *
+ * @param {Object} state Editor state.
+ * @param {string} scope Block pattern scope.
+ * @param {string} blockName Block's name.
+ *
+ * @return {Array} The list of matched block patterns based on provided scope and block name.
+ */
+export const __experimentalGetScopedBlockPatterns = createSelector(
+	( state, scope, blockName ) => {
+		if ( ! scope && ! blockName ) return EMPTY_ARRAY;
+		const patterns = state.settings.__experimentalBlockPatterns;
+		return patterns.filter( ( pattern ) =>
+			pattern.scope?.[ scope ]?.includes?.( blockName )
+		);
+	},
+	( state ) => [ state.settings.__experimentalBlockPatterns ]
+);
+
 /**
  * Returns the Block List settings of a block, if any exist.
  *
@@ -1771,18 +1905,26 @@ export function isLastBlockChangePersistent( state ) {
 }
 
 /**
- * Returns the Block List settings for an array of blocks, if any exist.
+ * Returns the block list settings for an array of blocks, if any exist.
  *
- * @param {Object}  state    Editor state.
- * @param {Array} clientIds Block client IDs.
+ * @param {Object} state     Editor state.
+ * @param {Array}  clientIds Block client IDs.
  *
- * @return {Array} Block List Settings for each of the found blocks
+ * @return {Object} An object where the keys are client ids and the values are
+ *                  a block list setting object.
  */
 export const __experimentalGetBlockListSettingsForBlocks = createSelector(
-	( state, clientIds ) => {
-		return filter( state.blockListSettings, ( value, key ) =>
-			clientIds.includes( key )
-		);
+	( state, clientIds = [] ) => {
+		return clientIds.reduce( ( blockListSettingsForBlocks, clientId ) => {
+			if ( ! state.blockListSettings[ clientId ] ) {
+				return blockListSettingsForBlocks;
+			}
+
+			return {
+				...blockListSettingsForBlocks,
+				[ clientId ]: state.blockListSettings[ clientId ],
+			};
+		}, {} );
 	},
 	( state ) => [ state.blockListSettings ]
 );
@@ -1812,6 +1954,29 @@ export const __experimentalGetParsedReusableBlock = createSelector(
 				? reusableBlock.content.raw
 				: reusableBlock.content
 		);
+	},
+	( state ) => [ getReusableBlocks( state ) ]
+);
+
+/**
+ * Returns the title of a given reusable block
+ *
+ * @param {Object}        state Global application state.
+ * @param {number|string} ref   The shared block's ID.
+ *
+ * @return {string} The reusable block saved title.
+ */
+export const __experimentalGetReusableBlockTitle = createSelector(
+	( state, ref ) => {
+		const reusableBlock = find(
+			getReusableBlocks( state ),
+			( block ) => block.id === ref
+		);
+		if ( ! reusableBlock ) {
+			return null;
+		}
+
+		return reusableBlock.title?.raw;
 	},
 	( state ) => [ getReusableBlocks( state ) ]
 );

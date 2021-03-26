@@ -158,6 +158,6 @@ export { default as withSpokenMessages } from './higher-order/with-spoken-messag
 
 // Component System
 export {
-	__unstableWithNext,
-	__unstableComponentSystemProvider,
-} from './__next/context';
+	withNext as __unstableWithNext,
+	ComponentSystemProvider as __unstableComponentSystemProvider,
+} from './ui/context';

@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { __ } from '@wordpress/i18n';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	RichText,
 	useBlockProps,
@@ -36,8 +36,8 @@ export default function QuoteEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					value={ align }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { align: nextAlign } );
@@ -82,6 +82,8 @@ export default function QuoteEdit( {
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
 						identifier="citation"
+						tagName="cite"
+						style={ { display: 'block' } }
 						value={ citation }
 						onChange={ ( nextCitation ) =>
 							setAttributes( {

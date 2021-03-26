@@ -31,19 +31,12 @@
 	&.block-list-appender__toggle {
 		display: flex;
 		flex-direction: row;
-		color: $gray-900;
 		box-shadow: none;
 		height: $icon-size;
 		width: $icon-size;
-		padding: 0;
-		margin-left: $grid-unit-10;
-
-		&:active {
-			color: $white;
-		}
 
 		& > svg {
-			width: 24px;
+			width: $icon-size;
 			background-color: $gray-900;
 			color: $white;
 			border-radius: $radius-block-ui;

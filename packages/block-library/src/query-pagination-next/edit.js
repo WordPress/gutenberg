@@ -2,29 +2,22 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useBlockProps, RichText } from '@wordpress/block-editor';
+import { useBlockProps, PlainText } from '@wordpress/block-editor';
 
 export default function QueryPaginationNextEdit( {
 	attributes: { label },
 	setAttributes,
 } ) {
-	const placeholder = __( 'Next Page' );
 	return (
-		<>
-			<div { ...useBlockProps() }>
-				{
-					<RichText
-						tagName="a"
-						aria-label={ __( 'Next page link' ) }
-						placeholder={ placeholder }
-						value={ label }
-						allowedFormats={ [ 'core/bold', 'core/italic' ] }
-						onChange={ ( newLabel ) =>
-							setAttributes( { label: newLabel } )
-						}
-					/>
-				}
-			</div>
-		</>
+		<PlainText
+			__experimentalVersion={ 2 }
+			tagName="a"
+			aria-label={ __( 'Next page link' ) }
+			placeholder={ __( 'Next Page' ) }
+			value={ label }
+			keepPlaceholderOnFocus
+			onChange={ ( newLabel ) => setAttributes( { label: newLabel } ) }
+			{ ...useBlockProps() }
+		/>
 	);
 }

@@ -18,8 +18,8 @@ import {
 	SPACE,
 	ESCAPE,
 } from '@wordpress/keycodes';
-import deprecated from '@wordpress/deprecated';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -41,6 +41,7 @@ import { useFormatTypes } from './use-format-types';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useInlineWarning } from './use-inline-warning';
 import { insert } from '../insert';
+import { useCopyHandler } from './use-copy-handler';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -82,11 +83,17 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 const whiteSpace = 'pre-wrap';
 
 /**
+ * A minimum width of 1px will prevent the rich text container from collapsing
+ * to 0 width and hiding the caret. This is useful for inline containers.
+ */
+const minWidth = '1px';
+
+/**
  * Default style object for the editable element.
  *
  * @type {Object<string,string>}
  */
-const defaultStyle = { whiteSpace };
+const defaultStyle = { whiteSpace, minWidth };
 
 const EMPTY_ACTIVE_FORMATS = [];
 
@@ -144,8 +151,6 @@ function RichText(
 		onSelectionChange,
 		onChange,
 		unstableOnFocus: onFocus,
-		setFocusedElement,
-		instanceId,
 		clientId,
 		identifier,
 		__unstableMultilineTag: multilineTag,
@@ -162,8 +167,9 @@ function RichText(
 		__unstableOnCreateUndoLevel: onCreateUndoLevel,
 		__unstableIsSelected: isSelected,
 	},
-	ref
+	forwardedRef
 ) {
+	const ref = useRef();
 	const [ activeFormats = [], setActiveFormats ] = useState();
 	const {
 		formatTypes,
@@ -377,12 +383,14 @@ function RichText(
 
 		if ( onPaste ) {
 			const files = getFilesFromDataTransfer( clipboardData );
+			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
 
 			onPaste( {
 				value: removeEditorOnlyFormats( record.current ),
 				onChange: handleChange,
 				html,
 				plainText,
+				isInternal,
 				files: [ ...files ],
 				activeFormats,
 			} );
@@ -584,9 +592,6 @@ function RichText(
 			return;
 		}
 
-		// In all other cases, prevent default behaviour.
-		event.preventDefault();
-
 		const formatsBefore = formats[ start - 1 ] || EMPTY_ACTIVE_FORMATS;
 		const formatsAfter = formats[ start ] || EMPTY_ACTIVE_FORMATS;
 
@@ -629,30 +634,22 @@ function RichText(
 			}
 		}
 
-		if ( newActiveFormatsLength !== currentActiveFormats.length ) {
-			const newActiveFormats = source.slice( 0, newActiveFormatsLength );
-			const newValue = {
-				...record.current,
-				activeFormats: newActiveFormats,
-			};
-			record.current = newValue;
-			applyRecord( newValue );
-			setActiveFormats( newActiveFormats );
+		if ( newActiveFormatsLength === currentActiveFormats.length ) {
+			record.current._newActiveFormats = isReverse
+				? formatsBefore
+				: formatsAfter;
 			return;
 		}
 
-		const newPos = start + ( isReverse ? -1 : 1 );
-		const newActiveFormats = isReverse ? formatsBefore : formatsAfter;
+		event.preventDefault();
+
+		const newActiveFormats = source.slice( 0, newActiveFormatsLength );
 		const newValue = {
 			...record.current,
-			start: newPos,
-			end: newPos,
 			activeFormats: newActiveFormats,
 		};
-
 		record.current = newValue;
 		applyRecord( newValue );
-		onSelectionChange( newPos, newPos );
 		setActiveFormats( newActiveFormats );
 	}
 
@@ -839,8 +836,11 @@ function RichText(
 			...oldRecord,
 			start,
 			end,
-			// Allow `getActiveFormats` to get new `activeFormats`.
-			activeFormats: undefined,
+			// _newActiveFormats may be set on arrow key navigation to control
+			// the right boundary position. If undefined, getActiveFormats will
+			// give the active formats according to the browser.
+			activeFormats: oldRecord._newActiveFormats,
+			_newActiveFormats: undefined,
 		};
 
 		const newActiveFormats = getActiveFormats(
@@ -939,12 +939,6 @@ function RichText(
 	 * documented, as the current requirements where it is used are subject to
 	 * future refactoring following `isSelected` handling.
 	 *
-	 * In contrast with `setFocusedElement`, this is only triggered in response
-	 * to focus within the contenteditable field, whereas `setFocusedElement`
-	 * is triggered on focus within any `RichText` descendent element.
-	 *
-	 * @see setFocusedElement
-	 *
 	 * @private
 	 */
 	function handleFocus() {
@@ -986,13 +980,6 @@ function RichText(
 		rafId.current = getWin().requestAnimationFrame( handleSelectionChange );
 
 		getDoc().addEventListener( 'selectionchange', handleSelectionChange );
-
-		if ( setFocusedElement ) {
-			deprecated( 'wp.blockEditor.RichText setFocusedElement prop', {
-				alternative: 'selection state from the block editor store.',
-			} );
-			setFocusedElement( instanceId );
-		}
 	}
 
 	function handleBlur() {
@@ -1073,7 +1060,11 @@ function RichText(
 		role: 'textbox',
 		'aria-multiline': true,
 		'aria-label': placeholder,
-		ref,
+		ref: useMergeRefs( [
+			forwardedRef,
+			ref,
+			useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
+		] ),
 		style: defaultStyle,
 		className: 'rich-text',
 		onPaste: handlePaste,

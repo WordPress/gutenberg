@@ -40,7 +40,6 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * @param {string}                [props.role]          The ARIA role for the menu item.
  *
  * @example
- * <caption>ES5</caption>
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -64,7 +63,6 @@ const shouldRenderItem = ( selectedBlocks, allowedBlocks ) =>
  * ```
  *
  * @example
- * <caption>ESNext</caption>
  * ```jsx
  * // Using ESNext syntax
  * import { __ } from '@wordpress/i18n';

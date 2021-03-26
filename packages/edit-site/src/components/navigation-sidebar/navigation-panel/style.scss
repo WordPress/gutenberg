@@ -13,15 +13,25 @@
 	}
 }
 
-.edit-site-navigation-panel.is-open {
-	width: $nav-sidebar-width;
-}
-
 .edit-site-navigation-panel__inner {
 	position: relative;
 	width: $nav-sidebar-width;
 	height: 100%;
 	overflow: hidden;
+	// Inner container is hidden to remove menu from the accessibility tree when not visible.
+	// Setting visibility here (rather than on the parent container) preserves the slide transition.
+	visibility: hidden;
+	// Transition settings should match parent container.
+	transition: visibility 100ms linear;
+	@include reduce-motion("transition");
+}
+
+.edit-site-navigation-panel.is-open {
+	width: $nav-sidebar-width;
+
+	.edit-site-navigation-panel__inner {
+		visibility: visible;
+	}
 }
 
 .edit-site-navigation-panel__site-title-container {
@@ -35,8 +45,8 @@
 .edit-site-navigation-panel__site-title {
 	font-style: normal;
 	font-weight: 600;
-	font-size: $default-font-size;
-	line-height: $default-line-height;
+	font-size: 14px; /* Matches menu items */
+	line-height: 20px;
 	color: $gray-300;
 
 	display: -webkit-box;
@@ -52,13 +62,9 @@
 }
 
 .edit-site-navigation-panel__back-to-dashboard.components-button.is-tertiary {
-	border-radius: 0;
-	border-bottom: $border-width solid $gray-700;
-	height: auto;
-	margin-left: -6px; // +2px to display the focus box-shadow
-	margin-top: 2px; // +2px to display the focus box-shadow
-	padding: $grid-unit $grid-unit-20;
-	width: calc(100% + #{$grid-unit-15});
+	height: $button-size;
+	margin-top: $grid-unit-30;
+	padding: $grid-unit $grid-unit-20 $grid-unit $grid-unit;
 
 	&:focus:not(:disabled) {
 		border-bottom-color: transparent;
@@ -97,18 +103,33 @@
 		text-align: left;
 		padding-left: $grid-unit-20;
 		padding-right: $grid-unit-20;
-		margin-bottom: $grid-unit-15;
 		color: inherit;
 	}
 }
 
 .edit-site-navigation-panel__template-item-title {
+	font-size: 14px;
+	line-height: 20px;
+
 	em {
 		margin-right: 1ch;
 	}
 }
+
+.components-navigation__item + .edit-site-navigation-panel__template-item {
+	margin-top: $grid-unit-20;
+}
+
+.edit-site-navigation-panel__template-item + .edit-site-navigation-panel__template-item {
+	margin-top: $grid-unit-10;
+}
+
+.edit-site-navigation-panel__info-wrapper {
+	padding: $grid-unit-05 0;
+}
+
 .edit-site-navigation-panel__template-item-description {
-	padding-top: $grid-unit-05;
+	padding-top: $grid-unit-10;
 	font-size: 12px;
 	line-height: 16px;
 }

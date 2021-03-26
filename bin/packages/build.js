@@ -194,7 +194,7 @@ if ( files.length ) {
 
 	stream = glob.stream(
 		[
-			`${ PACKAGES_DIR }/*/src/**/*.js`,
+			`${ PACKAGES_DIR }/*/src/**/*.{js,ts,tsx}`,
 			`${ PACKAGES_DIR }/*/src/*.scss`,
 			`${ PACKAGES_DIR }/block-library/src/**/*.js`,
 			`${ PACKAGES_DIR }/block-library/src/*/style.scss`,

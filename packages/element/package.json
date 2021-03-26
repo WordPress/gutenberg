@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/element",
-	"version": "2.19.0",
+	"version": "2.20.0",
 	"description": "Element React module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,7 +25,7 @@
 	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
+		"@babel/runtime": "^7.13.10",
 		"@types/react": "^16.9.0",
 		"@types/react-dom": "^16.9.0",
 		"@wordpress/escape-html": "file:../escape-html",

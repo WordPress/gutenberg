@@ -99,7 +99,7 @@ $block-inserter-tabs-height: 44px;
 	position: sticky;
 	top: 0;
 	background: $white;
-	z-index: 1;
+	z-index: z-index(".block-editor-inserter__search");
 
 	input[type="search"].block-editor-inserter__search-input {
 		@include input-control;
@@ -157,7 +157,7 @@ $block-inserter-tabs-height: 44px;
 		// Computed based off the search input height and paddings
 		top: $grid-unit-10 + $grid-unit-20 + $grid-unit-60;
 		background: $white;
-		z-index: 1;
+		z-index: z-index(".block-editor-inserter__tabs .components-tab-panel__tabs");
 		border-bottom: $border-width solid $gray-300;
 
 		.components-tab-panel__tabs-item {
@@ -170,7 +170,9 @@ $block-inserter-tabs-height: 44px;
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
+		// Make a stacking context that keeps all descendents behind the sticky tabs
 		position: relative;
+		z-index: z-index(".block-editor-inserter__tabs .components-tab-panel__tab-content");
 	}
 }
 
@@ -323,19 +325,17 @@ $block-inserter-tabs-height: 44px;
 	float: left;
 }
 
-.block-editor-inserter__quick-inserter .block-editor-inserter__panel-content {
-	padding: $grid-unit-10;
-}
-
 .block-editor-inserter__quick-inserter.has-search .block-editor-inserter__panel-content,
 .block-editor-inserter__quick-inserter.has-expand .block-editor-inserter__panel-content {
 	padding: $grid-unit-20;
 }
 
 .block-editor-inserter__quick-inserter-patterns {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	grid-gap: $grid-unit-10;
+	.block-editor-block-patterns-list {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		grid-gap: $grid-unit-10;
+	}
 }
 
 .block-editor-inserter__quick-inserter-separator {

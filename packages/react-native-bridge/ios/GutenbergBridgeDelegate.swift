@@ -16,11 +16,13 @@ public struct MediaInfo: Encodable {
 
 /// Definition of capabilities to enable in the Block Editor
 public enum Capabilities: String {
+    case contactInfoBlock
     case mediaFilesCollectionBlock
     case mentions
     case xposts
     case unsupportedBlockEditor
     case canEnableUnsupportedBlockEditor
+    case audioBlock
 }
 
 /// Wrapper for single block data
@@ -82,7 +84,7 @@ extension Gutenberg.MediaSource {
     }
 }
 
-/// Ref. https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
+/// Ref. https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
 public enum LogLevel: Int {
     case trace
     case info
@@ -229,6 +231,13 @@ public protocol GutenbergBridgeDelegate: class {
 	/// - Parameter callback: Completion handler to be called with an xpost or an error
 	func gutenbergDidRequestXpost(callback: @escaping (Swift.Result<String, NSError>) -> Void)
 
+    /// Tells the delegate that the editor requested to show the tooltip
+    func gutenbergDidRequestFocalPointPickerTooltipShown() -> Bool
+
+    /// Tells the delegate that the editor requested to set the tooltip's visibility
+    /// - Parameter tooltipShown: Tooltip's visibility value
+    func gutenbergDidRequestSetFocalPointPickerTooltipShown(_ tooltipShown: Bool)
+
     func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType)
 
     // Media Collection
@@ -237,13 +246,13 @@ public protocol GutenbergBridgeDelegate: class {
     ///
     func gutenbergDidRequestMediaSaveSync()
 
-    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String)
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String)
 
-    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String])
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]])
 
-    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String])
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
 
-    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String])
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
@@ -257,8 +266,9 @@ public extension GutenbergBridgeDelegate {
     // Media Collection
 
     func gutenbergDidRequestMediaSaveSync() {}
-    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) { }
-    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) { }
-    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) { }
-    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) { }
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String) { }
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]]) { }
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]]) { }
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]]) { }
+    func gutenbergDidRequestMediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {}
 }

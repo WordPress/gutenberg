@@ -80,7 +80,7 @@ function render_block_core_search( $attributes ) {
 		}
 
 		$button_markup = sprintf(
-			'<button type="submit"class="wp-block-search__button ' . $button_classes . '">%s</button>',
+			'<button type="submit" class="wp-block-search__button ' . $button_classes . '">%s</button>',
 			$button_internal_markup
 		);
 	}

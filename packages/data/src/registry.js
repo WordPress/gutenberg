@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { omit, without, mapValues, isObject } from 'lodash';
-import memize from 'memize';
+import { without, mapValues, isObject } from 'lodash';
 
 /**
  * Internal dependencies
@@ -102,47 +101,6 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		return result;
 	}
 
-	const getResolveSelectors = memize(
-		( selectors ) => {
-			return mapValues(
-				omit( selectors, [
-					'getIsResolving',
-					'hasStartedResolution',
-					'hasFinishedResolution',
-					'isResolving',
-					'getCachedResolvers',
-				] ),
-				( selector, selectorName ) => {
-					return ( ...args ) => {
-						return new Promise( ( resolve ) => {
-							const hasFinished = () =>
-								selectors.hasFinishedResolution(
-									selectorName,
-									args
-								);
-							const getResult = () =>
-								selector.apply( null, args );
-
-							// trigger the selector (to trigger the resolver)
-							const result = getResult();
-							if ( hasFinished() ) {
-								return resolve( result );
-							}
-
-							const unsubscribe = subscribe( () => {
-								if ( hasFinished() ) {
-									unsubscribe();
-									resolve( getResult() );
-								}
-							} );
-						} );
-					};
-				}
-			);
-		},
-		{ maxSize: 1 }
-	);
-
 	/**
 	 * Given the name of a registered store, returns an object containing the store's
 	 * selectors pre-bound to state so that you only need to supply additional arguments,
@@ -154,8 +112,17 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @return {Object} Each key of the object matches the name of a selector.
 	 */
-	function __experimentalResolveSelect( storeNameOrDefinition ) {
-		return getResolveSelectors( select( storeNameOrDefinition ) );
+	function resolveSelect( storeNameOrDefinition ) {
+		const storeName = isObject( storeNameOrDefinition )
+			? storeNameOrDefinition.name
+			: storeNameOrDefinition;
+		__experimentalListeningStores.add( storeName );
+		const store = stores[ storeName ];
+		if ( store ) {
+			return store.getResolveSelectors();
+		}
+
+		return parent && parent.resolveSelect( storeName );
 	}
 
 	/**
@@ -251,7 +218,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 		namespaces: stores, // TODO: Deprecate/remove this.
 		subscribe,
 		select,
-		__experimentalResolveSelect,
+		resolveSelect,
 		dispatch,
 		use,
 		register,

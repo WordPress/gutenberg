@@ -106,7 +106,7 @@ function gutenberg_menu_order( $menu_order ) {
 	}
 
 	$new_positions = array(
-		// Position the site editor before the appearnce menu.
+		// Position the site editor before the appearance menu.
 		'gutenberg-edit-site' => array_search( 'themes.php', $menu_order, true ),
 	);
 

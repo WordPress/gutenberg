@@ -11,8 +11,10 @@ import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
+	JustifyToolbar,
 	BlockControls,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
@@ -23,12 +25,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
-import {
-	justifyLeft,
-	justifyCenter,
-	justifyRight,
-	justifySpaceBetween,
-} from '@wordpress/icons';
+
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
 
@@ -44,20 +41,12 @@ function Navigation( {
 	className,
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = attributes.orientation === 'horizontal',
-	hasListViewModal = true,
 } ) {
-	const navIcons = {
-		left: justifyLeft,
-		center: justifyCenter,
-		right: justifyRight,
-		'space-between': justifySpaceBetween,
-	};
-
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
 	);
 
-	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const blockProps = useBlockProps( {
 		className: classnames( className, {
@@ -79,6 +68,8 @@ function Navigation( {
 				'core/navigation-link',
 				'core/search',
 				'core/social-links',
+				'core/page-list',
+				'core/spacer',
 			],
 			orientation: attributes.orientation || 'horizontal',
 			renderAppender:
@@ -117,74 +108,24 @@ function Navigation( {
 		);
 	}
 
-	function handleItemsAlignment( align ) {
-		return () => {
-			const itemsJustification =
-				attributes.itemsJustification === align ? undefined : align;
-			setAttributes( {
-				itemsJustification,
-			} );
-		};
-	}
-
-	const POPOVER_PROPS = {
-		position: 'bottom right',
-		isAlternate: true,
-	};
-
 	return (
 		<>
 			<BlockControls>
 				{ hasItemJustificationControls && (
-					<ToolbarGroup
-						icon={
-							attributes.itemsJustification
-								? navIcons[ attributes.itemsJustification ]
-								: navIcons.left
+					<JustifyToolbar
+						value={ attributes.itemsJustification }
+						onChange={ ( value ) =>
+							setAttributes( { itemsJustification: value } )
 						}
-						popoverProps={ POPOVER_PROPS }
-						label={ __( 'Change items justification' ) }
-						isCollapsed
-						controls={ [
-							{
-								icon: justifyLeft,
-								title: __( 'Justify items left' ),
-								isActive:
-									'left' === attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'left' ),
-							},
-							{
-								icon: justifyCenter,
-								title: __( 'Justify items center' ),
-								isActive:
-									'center' === attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'center' ),
-							},
-							{
-								icon: justifyRight,
-								title: __( 'Justify items right' ),
-								isActive:
-									'right' === attributes.itemsJustification,
-								onClick: handleItemsAlignment( 'right' ),
-							},
-							{
-								icon: justifySpaceBetween,
-								title: __( 'Space between items' ),
-								isActive:
-									'space-between' ===
-									attributes.itemsJustification,
-								onClick: handleItemsAlignment(
-									'space-between'
-								),
-							},
-						] }
+						popoverProps={ {
+							position: 'bottom right',
+							isAlternate: true,
+						} }
 					/>
 				) }
-				{ hasListViewModal && (
-					<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
-				) }
+				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
 			</BlockControls>
-			{ hasListViewModal && navigatorModal }
+			{ navigatorModal }
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display settings' ) }>
@@ -209,12 +150,12 @@ function Navigation( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
+		const innerBlocks = select( blockEditorStore ).getBlocks( clientId );
 		const {
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
 			getSelectedBlockClientId,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
 			clientId,
 			false
@@ -235,7 +176,7 @@ export default compose( [
 				if ( blocks?.length === 0 ) {
 					return false;
 				}
-				dispatch( 'core/block-editor' ).replaceInnerBlocks(
+				dispatch( blockEditorStore ).replaceInnerBlocks(
 					clientId,
 					blocks,
 					true

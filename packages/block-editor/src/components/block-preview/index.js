@@ -15,6 +15,7 @@ import { memo, useMemo } from '@wordpress/element';
 import BlockEditorProvider from '../provider';
 import LiveBlockPreview from './live';
 import AutoHeightBlockPreview from './auto';
+import { store as blockEditorStore } from '../../store';
 
 export function BlockPreview( {
 	blocks,
@@ -23,10 +24,15 @@ export function BlockPreview( {
 	__experimentalLive = false,
 	__experimentalOnClick,
 } ) {
-	const settings = useSelect(
-		( select ) => select( 'core/block-editor' ).getSettings(),
+	const originalSettings = useSelect(
+		( select ) => select( blockEditorStore ).getSettings(),
 		[]
 	);
+	const settings = useMemo( () => {
+		const _settings = { ...originalSettings };
+		_settings.__experimentalBlockPatterns = [];
+		return _settings;
+	}, [ originalSettings ] );
 	const renderedBlocks = useMemo( () => castArray( blocks ), [ blocks ] );
 	if ( ! blocks || blocks.length === 0 ) {
 		return null;

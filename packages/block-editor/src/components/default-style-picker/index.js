@@ -7,6 +7,11 @@ import { __ } from '@wordpress/i18n';
 import { SelectControl } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 export default function DefaultStylePicker( { blockName } ) {
 	const {
 		preferredStyle,
@@ -14,7 +19,7 @@ export default function DefaultStylePicker( { blockName } ) {
 		styles,
 	} = useSelect(
 		( select ) => {
-			const settings = select( 'core/block-editor' ).getSettings();
+			const settings = select( blockEditorStore ).getSettings();
 			const preferredStyleVariations =
 				settings.__experimentalPreferredStyleVariations;
 			return {

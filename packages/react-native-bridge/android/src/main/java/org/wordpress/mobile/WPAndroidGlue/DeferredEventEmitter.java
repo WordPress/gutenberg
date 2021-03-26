@@ -38,12 +38,15 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
 
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
     private static final String EVENT_NAME_MEDIA_SAVE = "mediaSave";
+    private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
 
     private static final String MAP_KEY_MEDIA_FILE_STATE = "state";
     private static final String MAP_KEY_MEDIA_FILE_MEDIA_ACTION_PROGRESS = "progress";
     private static final String MAP_KEY_MEDIA_FILE_MEDIA_SERVER_ID = "mediaServerId";
     private static final String MAP_KEY_UPDATE_CAPABILITIES = "updateCapabilities";
 
+    private static final String MAP_KEY_REPLACE_BLOCK_HTML = "html";
+    private static final String MAP_KEY_REPLACE_BLOCK_BLOCK_ID = "clientId";
 
     /**
      * Used for storing deferred actions prior to editor mounting
@@ -200,6 +203,14 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
         } else {
             emitOrDrop(EVENT_NAME_MEDIA_SAVE, writableMap);
         }
+    }
+
+    @Override public void onReplaceMediaFilesEditedBlock(String mediaFiles, String blockId) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putString(MAP_KEY_REPLACE_BLOCK_HTML, mediaFiles);
+        writableMap.putString(MAP_KEY_REPLACE_BLOCK_BLOCK_ID, blockId);
+        // this is a critical message so, always enqueue
+        queueActionToJS(EVENT_NAME_MEDIA_REPLACE_BLOCK, writableMap);
     }
 
     public void updateCapabilities(GutenbergProps gutenbergProps) {

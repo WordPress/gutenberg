@@ -1,21 +1,30 @@
 /**
  * WordPress dependencies
  */
-import { useMemo } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
-import { ENTER, SPACE } from '@wordpress/keycodes';
-import { VisuallyHidden } from '@wordpress/components';
+import {
+	VisuallyHidden,
+	__unstableComposite as Composite,
+	__unstableUseCompositeState as useCompositeState,
+	__unstableCompositeItem as CompositeItem,
+} from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
+import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
+import { store as blockEditorStore } from '../../store';
 
-function BlockPattern( { isDraggable, pattern, onClick } ) {
-	const { content, viewportWidth } = pattern;
-	const blocks = useMemo( () => parse( content ), [ content ] );
+function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
+	const { name, viewportWidth } = pattern;
+	const { blocks } = useSelect(
+		( select ) =>
+			select( blockEditorStore ).__experimentalGetParsedPattern( name ),
+		[ name ]
+	);
 	const instanceId = useInstanceId( BlockPattern );
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
 
@@ -23,18 +32,7 @@ function BlockPattern( { isDraggable, pattern, onClick } ) {
 		<InserterDraggableBlocks isEnabled={ isDraggable } blocks={ blocks }>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (
 				<div
-					className="block-editor-block-patterns-list__item"
-					role="button"
-					onClick={ () => onClick( pattern, blocks ) }
-					onKeyDown={ ( event ) => {
-						if (
-							ENTER === event.keyCode ||
-							SPACE === event.keyCode
-						) {
-							onClick( pattern, blocks );
-						}
-					} }
-					tabIndex={ 0 }
+					className="block-editor-block-patterns-list__list-item"
 					aria-label={ pattern.title }
 					aria-describedby={
 						pattern.description ? descriptionId : undefined
@@ -43,18 +41,26 @@ function BlockPattern( { isDraggable, pattern, onClick } ) {
 					onDragStart={ onDragStart }
 					onDragEnd={ onDragEnd }
 				>
-					<BlockPreview
-						blocks={ blocks }
-						viewportWidth={ viewportWidth }
-					/>
-					<div className="block-editor-block-patterns-list__item-title">
-						{ pattern.title }
-					</div>
-					{ !! pattern.description && (
-						<VisuallyHidden id={ descriptionId }>
-							{ pattern.description }
-						</VisuallyHidden>
-					) }
+					<CompositeItem
+						role="option"
+						as="div"
+						{ ...composite }
+						className="block-editor-block-patterns-list__item"
+						onClick={ () => onClick( pattern, blocks ) }
+					>
+						<BlockPreview
+							blocks={ blocks }
+							viewportWidth={ viewportWidth }
+						/>
+						<div className="block-editor-block-patterns-list__item-title">
+							{ pattern.title }
+						</div>
+						{ !! pattern.description && (
+							<VisuallyHidden id={ descriptionId }>
+								{ pattern.description }
+							</VisuallyHidden>
+						) }
+					</CompositeItem>
 				</div>
 			) }
 		</InserterDraggableBlocks>
@@ -72,20 +78,33 @@ function BlockPatternList( {
 	blockPatterns,
 	shownPatterns,
 	onClickPattern,
+	orientation,
+	label = __( 'Block Patterns' ),
 } ) {
-	return blockPatterns.map( ( pattern ) => {
-		const isShown = shownPatterns.includes( pattern );
-		return isShown ? (
-			<BlockPattern
-				key={ pattern.name }
-				pattern={ pattern }
-				onClick={ onClickPattern }
-				isDraggable={ isDraggable }
-			/>
-		) : (
-			<BlockPatternPlaceholder key={ pattern.name } />
-		);
-	} );
+	const composite = useCompositeState( { orientation } );
+	return (
+		<Composite
+			{ ...composite }
+			role="listbox"
+			className="block-editor-block-patterns-list"
+			aria-label={ label }
+		>
+			{ blockPatterns.map( ( pattern ) => {
+				const isShown = shownPatterns.includes( pattern );
+				return isShown ? (
+					<BlockPattern
+						key={ pattern.name }
+						pattern={ pattern }
+						onClick={ onClickPattern }
+						isDraggable={ isDraggable }
+						composite={ composite }
+					/>
+				) : (
+					<BlockPatternPlaceholder key={ pattern.name } />
+				);
+			} ) }
+		</Composite>
+	);
 }
 
 export default BlockPatternList;

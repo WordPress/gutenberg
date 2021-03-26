@@ -3,9 +3,14 @@
  */
 import { useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 export function MediaUploadCheck( { fallback = null, children } ) {
 	const hasUploadPermissions = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return !! getSettings().mediaUpload;
 	}, [] );
 	return hasUploadPermissions ? children : fallback;

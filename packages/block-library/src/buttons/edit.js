@@ -10,14 +10,13 @@ import {
 	BlockControls,
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	JustifyContentControl,
 } from '@wordpress/block-editor';
-import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { name as buttonBlockName } from '../button';
-import ContentJustificationDropdown from './content-justification-dropdown';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
@@ -42,24 +41,26 @@ function ButtonsEdit( {
 		},
 		templateInsertUpdatesSelection: true,
 	} );
+
+	const justifyControls =
+		orientation === 'vertical'
+			? [ 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right', 'space-between' ];
+
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<ContentJustificationDropdown
-								toggleProps={ toggleProps }
-								value={ contentJustification }
-								onChange={ ( updatedValue ) => {
-									setAttributes( {
-										contentJustification: updatedValue,
-									} );
-								} }
-							/>
-						) }
-					</ToolbarItem>
-				</ToolbarGroup>
+			<BlockControls group="block">
+				<JustifyContentControl
+					allowedControls={ justifyControls }
+					value={ contentJustification }
+					onChange={ ( value ) =>
+						setAttributes( { contentJustification: value } )
+					}
+					popoverProps={ {
+						position: 'bottom right',
+						isAlternate: true,
+					} }
+				/>
 			</BlockControls>
 			<div { ...innerBlocksProps } />
 		</>

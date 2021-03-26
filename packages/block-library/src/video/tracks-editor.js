@@ -7,7 +7,6 @@ import {
 	MenuItem,
 	FormFileUpload,
 	MenuGroup,
-	ToolbarGroup,
 	ToolbarButton,
 	Dropdown,
 	SVG,
@@ -17,7 +16,11 @@ import {
 	TextControl,
 	SelectControl,
 } from '@wordpress/components';
-import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
+import {
+	MediaUpload,
+	MediaUploadCheck,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { upload, media } from '@wordpress/icons';
 import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
@@ -141,9 +144,6 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 					value={ kind }
 					label={ __( 'Kind' ) }
 					onChange={ ( newKind ) => {
-						if ( newKind === DEFAULT_KIND ) {
-							newKind = undefined;
-						}
 						onChange( {
 							...track,
 							kind: newKind,
@@ -162,6 +162,10 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 							}
 							if ( srcLang === '' ) {
 								changes.srcLang = 'en';
+								hasChanges = true;
+							}
+							if ( track.kind === undefined ) {
+								changes.kind = DEFAULT_KIND;
 								hasChanges = true;
 							}
 							if ( hasChanges ) {
@@ -186,7 +190,7 @@ function SingleTrackEditor( { track, onChange, onClose, onRemove } ) {
 
 export default function TracksEditor( { tracks = [], onChange } ) {
 	const mediaUpload = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings().mediaUpload;
+		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
 	const [ trackBeingEdited, setTrackBeingEdited ] = useState( null );
 
@@ -197,16 +201,14 @@ export default function TracksEditor( { tracks = [], onChange } ) {
 		<Dropdown
 			contentClassName="block-library-video-tracks-editor"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarGroup>
-					<ToolbarButton
-						label={ __( 'Text tracks' ) }
-						showTooltip
-						aria-expanded={ isOpen }
-						aria-haspopup="true"
-						onClick={ onToggle }
-						icon={ captionIcon }
-					/>
-				</ToolbarGroup>
+				<ToolbarButton
+					label={ __( 'Text tracks' ) }
+					showTooltip
+					aria-expanded={ isOpen }
+					aria-haspopup="true"
+					onClick={ onToggle }
+					icon={ captionIcon }
+				/>
 			) }
 			renderContent={ ( {} ) => {
 				if ( trackBeingEdited !== null ) {

@@ -39,7 +39,9 @@
 		"customBackgroundColor": "customBackgroundColor",
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
-		"showSubmenuIcon": "showSubmenuIcon"
+		"showSubmenuIcon": "showSubmenuIcon",
+		"style": "style",
+		"orientation": "orientation"
 	},
 	"supports": {
 		"align": [
@@ -50,6 +52,7 @@
 		"html": false,
 		"inserter": true,
 		"fontSize": true,
+		"lineHeight": true,
 		"__experimentalFontStyle": true,
 		"__experimentalFontWeight": true,
 		"__experimentalTextTransform": true,

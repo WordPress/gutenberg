@@ -3,13 +3,41 @@
  */
 import { isEmpty } from 'lodash';
 
+/**
+ * WordPress dependencies
+ */
+import { __, _x } from '@wordpress/i18n';
+
+/**
+ * Units of measurements. `a11yLabel` is used by screenreaders.
+ */
 export const CSS_UNITS = [
-	{ value: 'px', label: 'px', default: 0 },
-	{ value: '%', label: '%', default: 10 },
-	{ value: 'em', label: 'em', default: 0 },
-	{ value: 'rem', label: 'rem', default: 0 },
-	{ value: 'vw', label: 'vw', default: 10 },
-	{ value: 'vh', label: 'vh', default: 10 },
+	{ value: 'px', label: 'px', default: 0, a11yLabel: __( 'pixels' ) },
+	{ value: '%', label: '%', default: 10, a11yLabel: __( 'percent' ) },
+	{
+		value: 'em',
+		label: 'em',
+		default: 0,
+		a11yLabel: _x( 'ems', 'Relative to parent font size (em)' ),
+	},
+	{
+		value: 'rem',
+		label: 'rem',
+		default: 0,
+		a11yLabel: _x( 'rems', 'Relative to root font size (rem)' ),
+	},
+	{
+		value: 'vw',
+		label: 'vw',
+		default: 10,
+		a11yLabel: __( 'viewport widths' ),
+	},
+	{
+		value: 'vh',
+		label: 'vh',
+		default: 10,
+		a11yLabel: __( 'viewport heights' ),
+	},
 ];
 
 export const DEFAULT_UNIT = CSS_UNITS[ 0 ];
@@ -100,4 +128,16 @@ export function getValidParsedUnit( next, units, fallbackValue, fallbackUnit ) {
 	}
 
 	return [ baseValue, baseUnit ];
+}
+
+/**
+ * Takes a unit value and finds the matching accessibility label for the
+ * unit abbreviation.
+ *
+ * @param {string} unit Unit value (example: px)
+ * @return {string} a11y label for the unit abbreviation
+ */
+export function parseA11yLabelForUnit( unit ) {
+	const match = CSS_UNITS.find( ( item ) => item.value === unit );
+	return match?.a11yLabel ? match?.a11yLabel : match?.value;
 }

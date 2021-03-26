@@ -41,10 +41,11 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 	}
 
 	function test_legacy_settings_blank() {
-		$input    = array();
-		$expected = array(
-			'global' => array(
-				'settings' => array(),
+		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
+		$input      = array();
+		$expected   = array(
+			'settings' => array(
+				$all_blocks => array(),
 			),
 		);
 
@@ -54,10 +55,11 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 	}
 
 	function test_legacy_settings_no_theme_support() {
-		$input    = $this->get_editor_settings_no_theme_support();
-		$expected = array(
-			'global' => array(
-				'settings' => array(
+		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
+		$input      = $this->get_editor_settings_no_theme_support();
+		$expected   = array(
+			'settings' => array(
+				$all_blocks => array(
 					'color'      => array(
 						'custom'         => true,
 						'customGradient' => true,
@@ -79,46 +81,53 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 	}
 
 	function test_legacy_settings_custom_units_can_be_disabled() {
+		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
 		add_theme_support( 'custom-units', array() );
 		$input = gutenberg_get_common_block_editor_settings();
 
 		$expected = array(
-			'units' => array( array() ),
+			'units'         => array( array() ),
+			'customPadding' => false,
 		);
 
 		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
 
-		$this->assertEqualSetsWithIndex( $expected, $actual['global']['settings']['spacing'] );
+		$this->assertEqualSetsWithIndex( $expected, $actual['settings'][ $all_blocks ]['spacing'] );
 	}
 
 	function test_legacy_settings_custom_units_can_be_enabled() {
+		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
 		add_theme_support( 'custom-units' );
 		$input = gutenberg_get_common_block_editor_settings();
 
 		$expected = array(
-			'units' => array( 'px', 'em', 'rem', 'vh', 'vw' ),
+			'units'         => array( 'px', 'em', 'rem', 'vh', 'vw' ),
+			'customPadding' => false,
 		);
 
 		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
 
-		$this->assertEqualSetsWithIndex( $expected, $actual['global']['settings']['spacing'] );
+		$this->assertEqualSetsWithIndex( $expected, $actual['settings'][ $all_blocks ]['spacing'] );
 	}
 
 	function test_legacy_settings_custom_units_can_be_filtered() {
+		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
 		add_theme_support( 'custom-units', 'rem', 'em' );
 		$input = gutenberg_get_common_block_editor_settings();
 
 		$expected = array(
-			'units' => array( 'rem', 'em' ),
+			'units'         => array( 'rem', 'em' ),
+			'customPadding' => false,
 		);
 
 		$actual = gutenberg_experimental_global_styles_get_theme_support_settings( $input );
 
-		$this->assertEqualSetsWithIndex( $expected, $actual['global']['settings']['spacing'] );
+		$this->assertEqualSetsWithIndex( $expected, $actual['settings'][ $all_blocks ]['spacing'] );
 	}
 
 	function test_legacy_settings_filled() {
-		$input = array(
+		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
+		$input      = array(
 			'disableCustomColors'    => true,
 			'disableCustomGradients' => true,
 			'disableCustomFontSizes' => true,
@@ -148,8 +157,8 @@ class Theme_JSON_Legacy_Settings_Test extends WP_UnitTestCase {
 		);
 
 		$expected = array(
-			'global' => array(
-				'settings' => array(
+			'settings' => array(
+				$all_blocks => array(
 					'color'      => array(
 						'custom'         => false,
 						'customGradient' => false,

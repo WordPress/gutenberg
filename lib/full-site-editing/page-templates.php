@@ -11,32 +11,26 @@
  * @param array    $templates Page templates.
  * @param WP_Theme $theme     WP_Theme instance.
  * @param WP_Post  $post      The post being edited, provided for context, or null.
+ * @param string   $post_type Post type to get the templates for.
  * @return array (Maybe) modified page templates array.
  */
-function gutenberg_load_block_page_templates( $templates, $theme, $post ) {
+function gutenberg_load_block_page_templates( $templates, $theme, $post, $post_type ) {
 	if ( ! gutenberg_is_fse_theme() ) {
 		return $templates;
 	}
-	$config_file = locate_template( 'experimental-theme.json' );
-	if ( ! file_exists( $config_file ) ) {
-		return $templates;
-	}
-	$data           = json_decode(
-		file_get_contents( $config_file ),
-		true
-	);
-	$page_templates = array();
-	if ( isset( $data['pageTemplates'] ) ) {
-		foreach ( $data['pageTemplates']  as $key => $page_template ) {
-			if ( ( ! isset( $page_template['postTypes'] ) && 'page' === $post->post_type ) ||
-				( isset( $page_template['postTypes'] ) && in_array( $post->post_type, $page_template['postTypes'], true ) )
+
+	$data             = WP_Theme_JSON_Resolver::get_theme_data()->get_custom_templates();
+	$custom_templates = array();
+	if ( isset( $data ) ) {
+		foreach ( $data  as $key => $template ) {
+			if ( ( ! isset( $template['postTypes'] ) && 'page' === $post_type ) ||
+				( isset( $template['postTypes'] ) && in_array( $post_type, $template['postTypes'], true ) )
 			) {
-				$page_templates[ $key ] = $page_template['title'];
+				$custom_templates[ $key ] = $template['title'];
 			}
 		}
 	}
 
-	return $page_templates;
+	return $custom_templates;
 }
-add_filter( 'theme_post_templates', 'gutenberg_load_block_page_templates', 10, 3 );
-add_filter( 'theme_page_templates', 'gutenberg_load_block_page_templates', 10, 3 );
+add_filter( 'theme_templates', 'gutenberg_load_block_page_templates', 10, 4 );

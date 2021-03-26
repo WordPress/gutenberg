@@ -6,6 +6,8 @@
 
 ### Breaking Changes
 
+-   `toggleScreenOption` util has been removed, since `Preferences` modal was redesigned. Use `togglePreferencesOption` instead ([#28329](https://github.com/WordPress/gutenberg/pull/28329)).
+
 -   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
 
 ## 4.16.0 (2020-12-17)

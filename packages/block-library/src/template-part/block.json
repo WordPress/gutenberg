@@ -1,7 +1,7 @@
 {
 	"apiVersion": 2,
 	"name": "core/template-part",
-	"category": "design",
+	"category": "theme",
 	"attributes": {
 		"slug": {
 			"type": "string"
@@ -10,8 +10,10 @@
 			"type": "string"
 		},
 		"tagName": {
-			"type": "string",
-			"default": "div"
+			"type": "string"
+		},
+		"area": {
+			"type": "string"
 		}
 	},
 	"supports": {
@@ -20,7 +22,8 @@
 		"color": {
 			"gradients": true,
 			"link": true
-		}
+		},
+		"__experimentalLayout": true
 	},
 	"editorStyle": "wp-block-template-part-editor"
 }

@@ -27,11 +27,12 @@ describe( 'Gutenberg Editor tests for List block', () => {
 
 		// switch to html and verify html
 		const html = await editorPage.getHtmlContent();
-		expect(
+
+		expect( html.toLowerCase() ).toBe(
 			`<!-- wp:list -->
 <ul><li>  a</li></ul>
 <!-- /wp:list -->`
-		).toBe( html.toLowerCase() );
+		);
 
 		// Remove list block to reset editor to clean state
 		listBlockElement = await editorPage.getBlockAtPosition(

@@ -15,9 +15,13 @@ import { Component } from '@wordpress/element';
  * @return {WPComponent} The bound ScrollLock component.
  */
 export function createScrollLockComponent( {
-	htmlDocument = document,
+	htmlDocument,
 	className = 'lockscroll',
 } = {} ) {
+	if ( ! htmlDocument && typeof document !== 'undefined' ) {
+		htmlDocument = document;
+	}
+
 	let lockCounter = 0;
 
 	/*

@@ -27,10 +27,18 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 			// Unset `offset` because if is set, $wp_query overrides/ignores the paged parameter and breaks pagination.
 			unset( $query['offset'] );
 			$query = wp_parse_args( $wp_query->query_vars, $query );
+
+			if ( empty( $query['post_type'] ) && is_singular() ) {
+				$query['post_type'] = get_post_type( get_the_ID() );
+			}
 		}
 	}
 
-	$posts      = get_posts( $query );
+	$posts = get_posts( $query );
+	if ( empty( $posts ) ) {
+		return '';
+	}
+
 	$classnames = '';
 	if ( isset( $block->context['layout'] ) && isset( $block->context['query'] ) ) {
 		if ( isset( $block->context['layout']['type'] ) && 'flex' === $block->context['layout']['type'] ) {
@@ -53,6 +61,7 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		)->render( array( 'dynamic' => false ) );
 		$content      .= "<li>{$block_content}</li>";
 	}
+
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',
 		$wrapper_attributes,

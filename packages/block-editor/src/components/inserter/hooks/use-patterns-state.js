@@ -13,23 +13,37 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../../store';
+
+/**
  * Retrieves the block patterns inserter state.
  *
- * @param {Function} onInsert function called when inserter a list of blocks.
+ * @param {Function} onInsert     function called when inserter a list of blocks.
+ * @param {string=}  rootClientId Insertion's root client ID.
  *
  * @return {Array} Returns the patterns state. (patterns, categories, onSelect handler)
  */
-const usePatternsState = ( onInsert ) => {
-	const { patternCategories, patterns } = useSelect( ( select ) => {
-		const {
-			__experimentalBlockPatterns,
-			__experimentalBlockPatternCategories,
-		} = select( 'core/block-editor' ).getSettings();
-		return {
-			patterns: __experimentalBlockPatterns,
-			patternCategories: __experimentalBlockPatternCategories,
-		};
-	}, [] );
+const usePatternsState = ( onInsert, rootClientId ) => {
+	const { patternCategories, patterns } = useSelect(
+		( select ) => {
+			const { __experimentalGetAllowedPatterns, getSettings } = select(
+				blockEditorStore
+			);
+			const inserterPatterns = __experimentalGetAllowedPatterns(
+				rootClientId
+			).filter(
+				( pattern ) => ! pattern.scope || pattern.scope.inserter
+			);
+			return {
+				patterns: inserterPatterns,
+				patternCategories: getSettings()
+					.__experimentalBlockPatternCategories,
+			};
+		},
+		[ rootClientId ]
+	);
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const onClickPattern = useCallback( ( pattern, blocks ) => {
 		onInsert(

@@ -15,7 +15,7 @@ import { render } from '@wordpress/element';
  */
 import './plugins';
 import './hooks';
-import registerEditSiteStore from './store';
+import './store';
 import Editor from './components/editor';
 
 const fetchLinkSuggestions = ( search, { perPage = 20 } = {} ) =>
@@ -54,14 +54,17 @@ export function initialize( id, settings ) {
 	settings.__experimentalFetchLinkSuggestions = fetchLinkSuggestions;
 	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
 
-	registerEditSiteStore( { settings } );
-
 	registerCoreBlocks();
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks( true );
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableFSEBlocks: true,
+		} );
 	}
 
-	render( <Editor />, document.getElementById( id ) );
+	render(
+		<Editor initialSettings={ settings } />,
+		document.getElementById( id )
+	);
 }
 
 export { default as __experimentalMainDashboardButton } from './components/main-dashboard-button';

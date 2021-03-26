@@ -25,8 +25,11 @@ import { __ } from '@wordpress/i18n';
 import styles from './style.scss';
 import BlockListAppender from '../block-list-appender';
 import BlockListItem from './block-list-item.native';
+import { store as blockEditorStore } from '../../store';
 
 const BlockListContext = createContext();
+
+export const OnCaretVerticalPositionChange = createContext();
 
 const stylesMemo = {};
 const getStyles = (
@@ -126,12 +129,14 @@ export class BlockList extends Component {
 			contentStyle,
 			renderAppender,
 		} = this.props;
+		const { blockWidth } = this.state;
 		if (
 			this.extraData.parentWidth !== parentWidth ||
 			this.extraData.renderFooterAppender !== renderFooterAppender ||
 			this.extraData.onDeleteBlock !== onDeleteBlock ||
 			this.extraData.contentStyle !== contentStyle ||
-			this.extraData.renderAppender !== renderAppender
+			this.extraData.renderAppender !== renderAppender ||
+			this.extraData.blockWidth !== blockWidth
 		) {
 			this.extraData = {
 				parentWidth,
@@ -139,6 +144,7 @@ export class BlockList extends Component {
 				onDeleteBlock,
 				contentStyle,
 				renderAppender,
+				blockWidth,
 			};
 		}
 		return this.extraData;
@@ -147,19 +153,22 @@ export class BlockList extends Component {
 	onLayout( { nativeEvent } ) {
 		const { layout } = nativeEvent;
 		const { blockWidth } = this.state;
-		const layoutWidth = Math.floor( layout.width );
+		const { isRootList, maxWidth } = this.props;
 
-		if ( blockWidth !== layoutWidth ) {
+		const layoutWidth = Math.floor( layout.width );
+		if ( isRootList && blockWidth !== layoutWidth ) {
 			this.setState( {
-				blockWidth: layoutWidth,
+				blockWidth: Math.min( layoutWidth, maxWidth ),
 			} );
+		} else if ( ! isRootList && ! blockWidth ) {
+			this.setState( { blockWidth: Math.min( layoutWidth, maxWidth ) } );
 		}
 	}
 
 	render() {
 		const { isRootList } = this.props;
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
-		return isRootList ? (
+		const blockList = isRootList ? (
 			<BlockListContext.Provider value={ this.scrollViewRef }>
 				{ this.renderList() }
 			</BlockListContext.Provider>
@@ -171,6 +180,14 @@ export class BlockList extends Component {
 					} )
 				}
 			</BlockListContext.Consumer>
+		);
+
+		return (
+			<OnCaretVerticalPositionChange.Provider
+				value={ this.onCaretVerticalPositionChange }
+			>
+				{ blockList }
+			</OnCaretVerticalPositionChange.Provider>
 		);
 	}
 
@@ -313,9 +330,6 @@ export class BlockList extends Component {
 				shouldShowInnerBlockAppender={
 					this.shouldShowInnerBlockAppender
 				}
-				onCaretVerticalPositionChange={
-					this.onCaretVerticalPositionChange
-				}
 				blockWidth={ blockWidth }
 			/>
 		);
@@ -359,8 +373,7 @@ export default compose( [
 				getSelectedBlockClientId,
 				isBlockInsertionPointVisible,
 				getSettings,
-				getBlockHierarchyRootClientId,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			const isStackedHorizontally = orientation === 'horizontal';
 
@@ -372,18 +385,14 @@ export default compose( [
 				blockClientIds = filterInnerBlocks( blockClientIds );
 			}
 
+			const { maxWidth } = getSettings();
 			const isReadOnly = getSettings().readOnly;
 
-			const blockCount = getBlockCount( rootBlockId );
-
-			const rootBlockId = getBlockHierarchyRootClientId(
-				selectedBlockClientId
-			);
+			const blockCount = getBlockCount();
 			const hasRootInnerBlocks = !! blockCount;
 
 			const isFloatingToolbarVisible =
 				!! selectedBlockClientId && hasRootInnerBlocks;
-
 			return {
 				blockClientIds,
 				blockCount,
@@ -393,12 +402,13 @@ export default compose( [
 				isRootList: rootClientId === undefined,
 				isFloatingToolbarVisible,
 				isStackedHorizontally,
+				maxWidth,
 			};
 		}
 	),
 	withDispatch( ( dispatch ) => {
 		const { insertBlock, replaceBlock, clearSelectedBlock } = dispatch(
-			'core/block-editor'
+			blockEditorStore
 		);
 
 		return {
@@ -449,7 +459,7 @@ const EmptyListComponentCompose = compose( [
 			getBlockOrder,
 			getBlockInsertionPoint,
 			isBlockInsertionPointVisible,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const isStackedHorizontally = orientation === 'horizontal';
 		const blockClientIds = getBlockOrder( rootClientId );

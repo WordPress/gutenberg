@@ -106,7 +106,7 @@ function dockerFileContents( image, xdebugMode ) {
 
 	return `FROM ${ image }
 
-RUN apt -qy install $PHPIZE_DEPS \\
+RUN apt-get -qy install $PHPIZE_DEPS \\
 	&& pecl install xdebug \\
 	&& docker-php-ext-enable xdebug
 

@@ -1,13 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useCallback } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
-import useCallbackRef from '../use-callback-ref';
 
 /**
  * Hook used to focus the first tabbable element on mount.
@@ -36,7 +31,7 @@ export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
 		focusOnMountRef.current = focusOnMount;
 	}, [ focusOnMount ] );
 
-	return useCallbackRef( ( node ) => {
+	return useCallback( ( node ) => {
 		if ( ! node || focusOnMountRef.current === false ) {
 			return;
 		}

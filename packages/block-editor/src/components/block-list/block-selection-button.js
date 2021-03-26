@@ -6,7 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { dragHandle } from '@wordpress/icons';
+import { Button, Flex, FlexItem } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
 import {
@@ -27,11 +28,16 @@ import {
 } from '@wordpress/blocks';
 import { speak } from '@wordpress/a11y';
 import { focus } from '@wordpress/dom';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+import BlockIcon from '../block-icon';
+import { store as blockEditorStore } from '../../store';
+import BlockDraggable from '../block-draggable';
+import useBlockDisplayInformation from '../use-block-display-information';
 
 /**
  * Returns true if the user is using windows.
@@ -54,7 +60,7 @@ function selector( select ) {
 		getClientIdsOfDescendants,
 		canInsertBlockType,
 		getBlockName,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 
 	const selectedBlockClientId = getSelectedBlockClientId();
 	const selectionEndClientId = getMultiSelectedBlocksEndClientId();
@@ -87,6 +93,7 @@ function selector( select ) {
  * @return {WPComponent} The component to be rendered.
  */
 function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
+	const blockInformation = useBlockDisplayInformation( clientId );
 	const selected = useSelect(
 		( select ) => {
 			const {
@@ -94,7 +101,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				getBlockIndex,
 				hasBlockMovingClientId,
 				getBlockListSettings,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const index = getBlockIndex( clientId, rootClientId );
 			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
 				clientId
@@ -111,9 +118,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		[ clientId, rootClientId ]
 	);
 	const { index, name, attributes, blockMovingMode, orientation } = selected;
-	const { setNavigationMode, removeBlock } = useDispatch(
-		'core/block-editor'
-	);
+	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
 	// Focus the breadcrumb in navigation mode.
@@ -142,7 +147,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		clearSelectedBlock,
 		setBlockMovingClientId,
 		moveBlockToPosition,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;
@@ -257,16 +262,45 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		}
 	);
 
+	const dragHandleLabel = __( 'Drag' );
+
 	return (
 		<div className={ classNames }>
-			<Button
-				ref={ ref }
-				onClick={ () => setNavigationMode( false ) }
-				onKeyDown={ onKeyDown }
-				label={ label }
+			<Flex
+				justify="center"
+				className="block-editor-block-list__block-selection-button__content"
 			>
-				<BlockTitle clientId={ clientId } />
-			</Button>
+				<FlexItem>
+					<BlockIcon icon={ blockInformation?.icon } showColors />
+				</FlexItem>
+				<FlexItem>
+					<BlockDraggable clientIds={ [ clientId ] }>
+						{ ( draggableProps ) => (
+							<Button
+								icon={ dragHandle }
+								className="block-selection-button_drag-handle"
+								aria-hidden="true"
+								label={ dragHandleLabel }
+								// Should not be able to tab to drag handle as this
+								// button can only be used with a pointer device.
+								tabIndex="-1"
+								{ ...draggableProps }
+							/>
+						) }
+					</BlockDraggable>
+				</FlexItem>
+				<FlexItem>
+					<Button
+						ref={ ref }
+						onClick={ () => setNavigationMode( false ) }
+						onKeyDown={ onKeyDown }
+						label={ label }
+						className="block-selection-button_select-button"
+					>
+						<BlockTitle clientId={ clientId } />
+					</Button>
+				</FlexItem>
+			</Flex>
 		</div>
 	);
 }

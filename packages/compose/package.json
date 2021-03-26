@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/compose",
-	"version": "3.24.0",
+	"version": "3.25.0",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -25,7 +25,7 @@
 	"react-native": "src/index",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
@@ -36,7 +36,6 @@
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
 		"mousetrap": "^1.6.5",
-		"react-merge-refs": "^1.0.0",
 		"react-resize-aware": "^3.1.0",
 		"use-memo-one": "^1.1.1"
 	},

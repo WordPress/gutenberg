@@ -5,17 +5,14 @@ import {
 	createNewPost,
 	insertBlock,
 	publishPost,
-	visitAdminPage,
 	trashAllPosts,
 	activateTheme,
-	canvas,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { navigationPanel } from '../../experimental-features';
+import { navigationPanel, siteEditor } from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -23,7 +20,7 @@ describe( 'Multi-entity save flow', () => {
 	const checkboxInputSelector = '.components-checkbox-control__input';
 	const entitiesSaveSelector = '.editor-entities-saved-states__save-button';
 	const templatePartSelector = '*[data-type="core/template-part"]';
-	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-block-list__layout`;
+	const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector =
 		'.editor-post-publish-panel__header-cancel-button button';
@@ -114,10 +111,6 @@ describe( 'Multi-entity save flow', () => {
 
 			// Should trigger multi-entity save button once template part edited.
 			await assertMultiSaveEnabled();
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
 
 			// Should only have save panel a11y button active after child entities edited.
 			await assertExistance( publishA11ySelector, false );
@@ -186,21 +179,21 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
-			const query = addQueryArgs( '', {
-				page: 'gutenberg-edit-site',
-			} ).slice( 1 );
-			await visitAdminPage( 'admin.php', query );
+			await siteEditor.visit();
 
-			// Ensure we are on 'front-page' demo template.
+			// Ensure we are on 'index' template.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front Page' );
-			await navigationPanel.close();
+			await navigationPanel.clickItemByText( 'Index' );
 
-			// Click the first block so that the template part inserts in the right place.
-			const firstBlock = await canvas().$( '.wp-block' );
-			await firstBlock.click();
+			// Select the header template part via list view.
+			await page.click( 'button[aria-label="List View"]' );
+			const headerTemplatePartListViewButton = await page.waitForXPath(
+				'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
+			);
+			headerTemplatePartListViewButton.click();
+			await page.click( 'button[aria-label="Close list view sidebar"]' );
 
 			// Insert something to dirty the editor.
 			await insertBlock( 'Paragraph' );

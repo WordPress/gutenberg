@@ -8,7 +8,7 @@ import { v4 as uuid } from 'uuid';
  * WordPress dependencies
  */
 import { controls } from '@wordpress/data';
-import { apiFetch } from '@wordpress/data-controls';
+import { apiFetch, __unstableAwaitPromise } from '@wordpress/data-controls';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -20,6 +20,8 @@ import {
 	__unstableAcquireStoreLock,
 	__unstableReleaseStoreLock,
 } from './locks';
+import { createBatch } from './batch';
+import { getDispatch } from './controls';
 
 /**
  * Returns an action object used in signalling that authors have been received.
@@ -154,12 +156,23 @@ export function receiveEmbedPreview( url, preview ) {
 /**
  * Action triggered to delete an entity record.
  *
- * @param {string}  kind              Kind of the deleted entity.
- * @param {string}  name              Name of the deleted entity.
- * @param {string}  recordId          Record ID of the deleted entity.
- * @param {?Object} query             Special query parameters for the DELETE API call.
+ * @param {string}   kind                      Kind of the deleted entity.
+ * @param {string}   name                      Name of the deleted entity.
+ * @param {string}   recordId                  Record ID of the deleted entity.
+ * @param {?Object}  query                     Special query parameters for the
+ *                                             DELETE API call.
+ * @param {Object}   [options]                 Delete options.
+ * @param {Function} [options.__unstableFetch] Internal use only. Function to
+ *                                             call instead of `apiFetch()`.
+ *                                             Must return a control descriptor.
  */
-export function* deleteEntityRecord( kind, name, recordId, query ) {
+export function* deleteEntityRecord(
+	kind,
+	name,
+	recordId,
+	query,
+	{ __unstableFetch = null } = {}
+) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
 	let error;
@@ -188,10 +201,17 @@ export function* deleteEntityRecord( kind, name, recordId, query ) {
 				path = addQueryArgs( path, query );
 			}
 
-			deletedRecord = yield apiFetch( {
+			const options = {
 				path,
 				method: 'DELETE',
-			} );
+			};
+			if ( __unstableFetch ) {
+				deletedRecord = yield __unstableAwaitPromise(
+					__unstableFetch( options )
+				);
+			} else {
+				deletedRecord = yield apiFetch( options );
+			}
 
 			yield removeItems( kind, name, recordId, true );
 		} catch ( _error ) {
@@ -329,17 +349,21 @@ export function __unstableCreateUndoLevel() {
 /**
  * Action triggered to save an entity record.
  *
- * @param {string}  kind                       Kind of the received entity.
- * @param {string}  name                       Name of the received entity.
- * @param {Object}  record                     Record to be saved.
- * @param {Object}  options                    Saving options.
- * @param {boolean} [options.isAutosave=false] Whether this is an autosave.
+ * @param {string}   kind                       Kind of the received entity.
+ * @param {string}   name                       Name of the received entity.
+ * @param {Object}   record                     Record to be saved.
+ * @param {Object}   options                    Saving options.
+ * @param {boolean}  [options.isAutosave=false] Whether this is an autosave.
+ * @param {Function} [options.__unstableFetch]  Internal use only. Function to
+ *                                              call instead of `apiFetch()`.
+ *                                              Must return a control
+ *                                              descriptor.
  */
 export function* saveEntityRecord(
 	kind,
 	name,
 	record,
-	{ isAutosave = false } = { isAutosave: false }
+	{ isAutosave = false, __unstableFetch = null } = {}
 ) {
 	const entities = yield getKindEntities( kind );
 	const entity = find( entities, { kind, name } );
@@ -441,11 +465,18 @@ export function* saveEntityRecord(
 								: data.status,
 					}
 				);
-				updatedRecord = yield apiFetch( {
+				const options = {
 					path: `${ path }/autosaves`,
 					method: 'POST',
 					data,
-				} );
+				};
+				if ( __unstableFetch ) {
+					updatedRecord = yield __unstableAwaitPromise(
+						__unstableFetch( options )
+					);
+				} else {
+					updatedRecord = yield apiFetch( options );
+				}
 				// An autosave may be processed by the server as a regular save
 				// when its update is requested by the author and the post had
 				// draft or auto-draft status.
@@ -510,12 +541,18 @@ export function* saveEntityRecord(
 						),
 					};
 				}
-
-				updatedRecord = yield apiFetch( {
+				const options = {
 					path,
 					method: recordId ? 'PUT' : 'POST',
 					data: edits,
-				} );
+				};
+				if ( __unstableFetch ) {
+					updatedRecord = yield __unstableAwaitPromise(
+						__unstableFetch( options )
+					);
+				} else {
+					updatedRecord = yield apiFetch( options );
+				}
 				yield receiveEntityRecords(
 					kind,
 					name,
@@ -541,6 +578,75 @@ export function* saveEntityRecord(
 	} finally {
 		yield* __unstableReleaseStoreLock( lock );
 	}
+}
+
+/**
+ * Runs multiple core-data actions at the same time using one API request.
+ *
+ * Example:
+ *
+ * ```
+ * const [ savedRecord, updatedRecord, deletedRecord ] =
+ *   await dispatch( 'core' ).__experimentalBatch( [
+ *     ( { saveEntityRecord } ) => saveEntityRecord( 'root', 'widget', widget ),
+ *     ( { saveEditedEntityRecord } ) => saveEntityRecord( 'root', 'widget', 123 ),
+ *     ( { deleteEntityRecord } ) => deleteEntityRecord( 'root', 'widget', 123, null ),
+ *   ] );
+ * ```
+ *
+ * @param {Array} requests Array of functions which are invoked simultaneously.
+ *                         Each function is passed an object containing
+ *                         `saveEntityRecord`, `saveEditedEntityRecord`, and
+ *                         `deleteEntityRecord`.
+ *
+ * @return {Promise} A promise that resolves to an array containing the return
+ *                   values of each function given in `requests`.
+ */
+export function* __experimentalBatch( requests ) {
+	const batch = createBatch();
+	const dispatch = yield getDispatch();
+	const api = {
+		saveEntityRecord( kind, name, record, options ) {
+			return batch.add( ( add ) =>
+				dispatch( 'core' ).saveEntityRecord( kind, name, record, {
+					...options,
+					__unstableFetch: add,
+				} )
+			);
+		},
+		saveEditedEntityRecord( kind, name, recordId, options ) {
+			return batch.add( ( add ) =>
+				dispatch( 'core' ).saveEditedEntityRecord(
+					kind,
+					name,
+					recordId,
+					{
+						...options,
+						__unstableFetch: add,
+					}
+				)
+			);
+		},
+		deleteEntityRecord( kind, name, recordId, query, options ) {
+			return batch.add( ( add ) =>
+				dispatch( 'core' ).deleteEntityRecord(
+					kind,
+					name,
+					recordId,
+					query,
+					{
+						...options,
+						__unstableFetch: add,
+					}
+				)
+			);
+		},
+	};
+	const resultPromises = requests.map( ( request ) => request( api ) );
+	const [ , ...results ] = yield __unstableAwaitPromise(
+		Promise.all( [ batch.run(), ...resultPromises ] )
+	);
+	return results;
 }
 
 /**
@@ -571,7 +677,7 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 		recordId
 	);
 	const record = { id: recordId, ...edits };
-	yield* saveEntityRecord( kind, name, record, options );
+	return yield* saveEntityRecord( kind, name, record, options );
 }
 
 /**

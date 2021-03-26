@@ -2,6 +2,37 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   The bundled `css-loader` dependency has been updated from requiring `^3.5.2` to requiring `^5.1.3` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `mini-css-extract-plugin` dependency has been updated from requiring `^0.9.0` to requiring `^1.3.9` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `postcss-loader` dependency has been updated from requiring `^3.0.0` to requiring `^4.2.0` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `sass-loader` dependency has been updated from requiring `^8.0.2` to requiring `^10.1.1` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `thread-loader` dependency has been updated from requiring `^2.1.3` to requiring `^3.0.1` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `url-loader` dependency has been updated from requiring `^3.0.0` to requiring `^4.1.1` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+
+### Enhancements
+
+-   The bundled `webpack` dependency has been updated from requiring `4.42.0` to requiring `^4.46.0` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `babel-loader` dependency has been updated from requiring `^8.1.0` to requiring `^8.2.2` ([#30018](https://github.com/WordPress/gutenberg/pull/30018)).
+
+## 14.0.0 (2021-03-17)
+
+### Breaking Changes
+
+-   Lint TypeScript files as part of `lint-js`. [#27143](https://github.com/WordPress/gutenberg/pull/27143)
+
+### New Features
+
+-   Default `check-engines` command to the `engines` config in `package.json` file of the current project ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).
+
+### Enhancements
+
+-   Make `check-licenses` command compatible with npm v7 ([#28909](https://github.com/WordPress/gutenberg/pull/28909)).
+-   Add `Python 2.0` to non-GPL compatible OSS licenses allowed for development in `check-licenses` command ([#29968](https://github.com/WordPress/gutenberg/pull/28968)).
+-   Updated `check-node-version` to version `^4.1.0` that no longer processes unrelated engines with `check-engines` command ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).
+-   Replace `jest-puppeteer` with the forked version of `jest-environment-puppeteer` to use `puppeteer-core` directly ([#29418](https://github.com/WordPress/gutenberg/pull/29418)).
+
 ## 13.0.0 (2021-01-21)
 
 ### Breaking Changes

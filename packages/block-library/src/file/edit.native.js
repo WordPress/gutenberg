@@ -27,7 +27,7 @@ import {
 	ToolbarGroup,
 	PanelBody,
 	ToggleControl,
-	BottomSheet,
+	TextControl,
 	SelectControl,
 	Icon,
 } from '@wordpress/components';
@@ -44,6 +44,7 @@ import { __, _x } from '@wordpress/i18n';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { getProtocol } from '@wordpress/url';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -263,12 +264,15 @@ export class FileEdit extends Component {
 		);
 
 		const isCopyUrlDisabled = isUploadFailed || isUploadInProgress;
-		const dimmedStyle = isCopyUrlDisabled && styles.disabledButton;
-		const finalButtonStyle = Object.assign(
-			{},
-			actionButtonStyle,
-			dimmedStyle
+
+		const dimmedActionButtonStyle = this.props.getStylesFromColorScheme(
+			styles.dimmedActionButton,
+			styles.dimmedActionButtonDark
 		);
+
+		const finalButtonStyle = isCopyUrlDisabled
+			? dimmedActionButtonStyle
+			: actionButtonStyle;
 
 		return (
 			<InspectorControls>
@@ -282,6 +286,7 @@ export class FileEdit extends Component {
 						value={ textLinkHref }
 						onChange={ this.onChangeLinkDestinationOption }
 						options={ linkDestinationOptions }
+						hideCancelButton={ true }
 					/>
 					<ToggleControl
 						icon={ external }
@@ -297,7 +302,7 @@ export class FileEdit extends Component {
 							onChange={ this.onChangeDownloadButtonVisibility }
 						/>
 					) }
-					<BottomSheet.Cell
+					<TextControl
 						disabled={ isCopyUrlDisabled }
 						label={
 							this.state.isUrlCopied
@@ -455,12 +460,13 @@ export class FileEdit extends Component {
 										openMediaOptions
 									) }
 								{ getMediaOptions() }
-								{ this.getInspectorControls(
-									attributes,
-									media,
-									isUploadInProgress,
-									isUploadFailed
-								) }
+								{ isSelected &&
+									this.getInspectorControls(
+										attributes,
+										media,
+										isUploadInProgress,
+										isUploadFailed
+									) }
 								<View style={ styles.container }>
 									<RichText
 										withoutInteractiveFormatting
@@ -579,13 +585,15 @@ export class FileEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, props ) => {
-		const { attributes } = props;
+		const { attributes, isSelected } = props;
 		const { id, href } = attributes;
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
 		const isNotFileHref = id && getProtocol( href ) !== 'file:';
 		return {
-			media: isNotFileHref ? select( 'core' ).getMedia( id ) : undefined,
-			isSidebarOpened: isEditorSidebarOpened(),
+			media: isNotFileHref
+				? select( coreStore ).getMedia( id )
+				: undefined,
+			isSidebarOpened: isSelected && isEditorSidebarOpened(),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

@@ -12,7 +12,6 @@ import * as resolvers from './resolvers';
 import * as selectors from './selectors';
 import * as actions from './actions';
 import controls from './controls';
-import './batch-support';
 import { STORE_NAME } from './constants';
 
 /**
