@@ -96,3 +96,11 @@ Horizontally aligns children components using the CSS [`justify-content`](https:
 -   Type: `String`
 -   Required: No
 -   Default: `space-between`
+
+### direction
+
+Determines the flex direction using the CSS [`flex-direction`](https://developer.mozilla.org/en-US/docs/Web/CSS/flex-direction) property.
+
+-   Type: `String`
+-   Required: No
+-   Default: `row`
