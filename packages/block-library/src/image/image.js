@@ -89,7 +89,6 @@ export default function Image( {
 	containerRef,
 } ) {
 	const captionRef = useRef();
-	const resizableBoxRef = useRef();
 	const prevUrl = usePrevious( url );
 	const { block, currentId, image, multiImageSelection } = useSelect(
 		( select ) => {
@@ -177,17 +176,6 @@ export default function Image( {
 			captionRef.current.focus();
 		}
 	}, [ url, prevUrl ] );
-
-	// Set resizable box dimensions to "auto" when we don't have width/height.
-	// This is done to reset inline styles after changing to a different image.
-	useEffect( () => {
-		if ( url && resizableBoxRef.current && ! width && ! height ) {
-			resizableBoxRef.current.updateSize( {
-				width: 'auto',
-				height: 'auto',
-			} );
-		}
-	}, [ url, width, height ] );
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -522,8 +510,10 @@ export default function Image( {
 
 		img = (
 			<ResizableBox
-				ref={ resizableBoxRef }
-				size={ { width, height } }
+				size={ {
+					width: width ?? 'auto',
+					height: height ?? 'auto',
+				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
