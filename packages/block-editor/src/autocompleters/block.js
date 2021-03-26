@@ -12,6 +12,7 @@ import {
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
