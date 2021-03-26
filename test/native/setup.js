@@ -63,8 +63,8 @@ jest.mock( 'react-native-dark-mode', () => {
 	};
 } );
 
-jest.mock( 'react-native-modal', () => ( { children, isVisible } ) =>
-	isVisible ? children : null
+jest.mock( 'react-native-modal', () => ( props ) =>
+	props.isVisible ? mockComponent( 'Modal' )( props ) : null
 );
 
 jest.mock( 'react-native-hr', () => () => 'Hr' );
