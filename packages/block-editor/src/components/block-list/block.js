@@ -15,12 +15,7 @@ import {
 	hasBlockSupport,
 } from '@wordpress/blocks';
 import { withFilters } from '@wordpress/components';
-import {
-	withDispatch,
-	withSelect,
-	useDispatch,
-	useSelect,
-} from '@wordpress/data';
+import { withDispatch, withSelect, useDispatch } from '@wordpress/data';
 import { compose, pure, ifCondition } from '@wordpress/compose';
 
 /**
@@ -88,21 +83,6 @@ function BlockListBlock( {
 } ) {
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
-	const isTypingWithinBlock = useSelect(
-		( select ) => {
-			const { isTyping, hasSelectedInnerBlock } = select(
-				blockEditorStore
-			);
-			return (
-				// We only care about this prop when the block is selected
-				// Thus to avoid unnecessary rerenders we avoid updating the
-				// prop if the block is not selected.
-				( isSelected || hasSelectedInnerBlock( clientId, true ) ) &&
-				isTyping()
-			);
-		},
-		[ clientId, isSelected ]
-	);
 
 	// We wrap the BlockEdit component in a div that hides it when editing in
 	// HTML mode. This allows us to render all of the ancillary pieces
@@ -183,10 +163,7 @@ function BlockListBlock( {
 		isSelected,
 		index,
 		// The wp-block className is important for editor styles.
-		className: classnames( className, {
-			'wp-block': ! isAligned,
-			'is-typing': isTypingWithinBlock,
-		} ),
+		className: classnames( className, { 'wp-block': ! isAligned } ),
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
@@ -209,12 +186,10 @@ function BlockListBlock( {
 const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	const {
 		isBlockSelected,
-		isFirstMultiSelectedBlock,
 		getBlockMode,
 		isSelectionEnabled,
 		getTemplateLock,
 		__unstableGetBlockWithoutInnerBlocks,
-		getMultiSelectedBlockClientIds,
 	} = select( blockEditorStore );
 	const block = __unstableGetBlockWithoutInnerBlocks( clientId );
 	const isSelected = isBlockSelected( clientId );
@@ -224,15 +199,10 @@ const applyWithSelect = withSelect( ( select, { clientId, rootClientId } ) => {
 	// the state. It happens now because the order in withSelect rendering
 	// is not correct.
 	const { name, attributes, isValid } = block || {};
-	const isFirstMultiSelected = isFirstMultiSelectedBlock( clientId );
 
 	// Do not add new properties here, use `useSelect` instead to avoid
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
-		isFirstMultiSelected,
-		multiSelectedClientIds: isFirstMultiSelected
-			? getMultiSelectedBlockClientIds()
-			: undefined,
 		mode: getBlockMode( clientId ),
 		isSelectionEnabled: isSelectionEnabled(),
 		isLocked: !! templateLock,
@@ -262,13 +232,13 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps, { select } ) => {
 	// leaking new props to the public API (editor.BlockListBlock filter).
 	return {
 		setAttributes( newAttributes ) {
-			const {
-				clientId,
-				isFirstMultiSelected,
-				multiSelectedClientIds,
-			} = ownProps;
-			const clientIds = isFirstMultiSelected
-				? multiSelectedClientIds
+			const { getMultiSelectedBlockClientIds } = select(
+				blockEditorStore
+			);
+			const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
+			const { clientId } = ownProps;
+			const clientIds = multiSelectedBlockClientIds.length
+				? multiSelectedBlockClientIds
 				: [ clientId ];
 
 			updateBlockAttributes( clientIds, newAttributes );

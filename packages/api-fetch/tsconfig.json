@@ -4,5 +4,14 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"include": [ "src/types.ts", "src/middlewares/nonce.js" ]
+	"references": [
+		{ "path": "../i18n" },
+		{ "path": "../url" }
+	],
+	"include": [
+		"src/**/*",
+	],
+	"exclude": [
+		"**/test/**/*",
+	]
 }

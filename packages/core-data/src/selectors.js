@@ -634,6 +634,7 @@ export function isPreviewEmbedFallback( state, url ) {
  */
 export function hasUploadPermissions( state ) {
 	deprecated( "select( 'core' ).hasUploadPermissions()", {
+		since: '5.2',
 		alternative: "select( 'core' ).canUser( 'create', 'media' )",
 	} );
 	return defaultTo( canUser( state, 'create', 'media' ), true );

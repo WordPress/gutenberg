@@ -38,6 +38,8 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
+import * as legacyWidget from './legacy-widget';
+import * as logInOut from './loginout';
 import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
@@ -208,10 +210,13 @@ export const registerCoreBlocks = (
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( enableFSEBlocks ) => {
+		? ( { enableLegacyWidgetBlock, enableFSEBlocks } = {} ) => {
 				[
 					navigation,
 					navigationLink,
+
+					// Register Legacy Widget block.
+					...( enableLegacyWidgetBlock ? [ legacyWidget ] : [] ),
 
 					// Register Full Site Editing Blocks.
 					...( enableFSEBlocks
@@ -227,6 +232,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								queryPaginationNext,
 								queryPaginationNumbers,
 								queryPaginationPrevious,
+								logInOut,
 								postTitle,
 								postContent,
 								postAuthor,

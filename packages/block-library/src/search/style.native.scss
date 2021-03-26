@@ -11,31 +11,76 @@
 }
 
 .border {
-	border: 1px solid $gray-600;
-	border-width: $border-width;
+	border: $border-width solid $gray-5;
+	border-radius: $grid-unit-05;
 	padding: $grid-unit-05;
+	padding-left: $grid-unit-10;
 }
 
-.searchTextInput {
-	flex-grow: 1;
-	flex-shrink: 1;
-	padding: $grid-unit-05;
-}
-
-.searchLabel {
-	width: 100%;
+.borderDark {
+	border: $border-width solid $gray-80;
 }
 
 .buttonContainer {
-	background: #f7f7f7;
-	padding-left: $grid-unit-10;
-	padding-right: $grid-unit-10;
-	padding-top: $grid-unit-10;
-	padding-bottom: $grid-unit-10;
-	border-width: $border-width;
-	border-color: #ccc;
-	border-style: solid;
-	margin-left: 10px;
+	background: $button-fallback-bg;
+	padding: $grid-unit-10;
+	border: $border-width solid $button-fallback-bg;
+	margin-left: $grid-unit-05;
+	border-radius: $grid-unit-05;
 	align-content: center;
 	align-items: center;
+	flex-shrink: 1;
+}
+
+.icon {
+	fill: $white;
+	background-color: transparent;
+}
+
+.richTextLabel {
+	background-color: transparent;
+	margin-top: $grid-unit-10;
+	margin-bottom: $grid-unit-10;
+	font-size: $editor-font-size;
+	font-weight: 400;
+	font-family: $default-regular-font;
+	width: 100%;
+}
+
+.richTextButton {
+	color: $white;
+	font-size: $editor-font-size;
+	font-weight: 400;
+	background-color: transparent;
+	font-family: $default-regular-font;
+	padding: 0;
+	margin: 0;
+	text-align: center;
+	min-height: 24px;
+}
+
+.richTextButtonCursor {
+	color: #ddd;
+}
+
+.plainTextInput {
+	flex-grow: 1;
+	flex-shrink: 1;
+	min-height: 42px;
+	padding: $grid-unit-05;
+	padding-left: 0;
+	font-family: $default-regular-font;
+	color: $gray-90;
+}
+
+.plainTextInputDark {
+	color: $gray-10;
+}
+
+.plainTextPlaceholder {
+	color: $gray;
+}
+
+.plainTextPlaceholderDark {
+	color: $gray-50;
 }

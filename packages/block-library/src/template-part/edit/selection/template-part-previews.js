@@ -49,7 +49,7 @@ function TemplatePartItem( {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const onClick = useCallback( () => {
-		setAttributes( { slug, theme } );
+		setAttributes( { slug, theme, area: undefined } );
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */

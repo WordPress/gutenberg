@@ -4,7 +4,6 @@
 import { Icon } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { getBlockType } from '@wordpress/blocks';
 
 /**
  * External dependencies
@@ -15,10 +14,12 @@ import { View, Text, TouchableOpacity } from 'react-native';
  * Internal dependencies
  */
 import BlockTitle from '../block-title';
+import useBlockDisplayInformation from '../use-block-display-information';
 import { store as blockEditorStore } from '../../store';
 import styles from './block-selection-button.scss';
 
-const BlockSelectionButton = ( { clientId, blockIcon, rootClientId } ) => {
+const BlockSelectionButton = ( { clientId, rootClientId } ) => {
+	const blockInformation = useBlockDisplayInformation( clientId );
 	return (
 		<View
 			style={ [
@@ -37,7 +38,7 @@ const BlockSelectionButton = ( { clientId, blockIcon, rootClientId } ) => {
 			>
 				<Icon
 					size={ 24 }
-					icon={ blockIcon.src }
+					icon={ blockInformation?.icon?.src }
 					fill={ styles.icon.color }
 				/>
 				<Text
@@ -55,32 +56,16 @@ const BlockSelectionButton = ( { clientId, blockIcon, rootClientId } ) => {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockRootClientId, getBlockName, getSettings } = select(
-			blockEditorStore
-		);
-
-		const blockName = getBlockName( clientId );
-		const blockType = getBlockType( blockName );
-		const blockIcon = blockType ? blockType.icon : {};
-
+		const { getBlockRootClientId } = select( blockEditorStore );
 		const rootClientId = getBlockRootClientId( clientId );
 
 		if ( ! rootClientId ) {
-			return {
-				clientId,
-				blockIcon,
-			};
+			return { clientId };
 		}
-		const rootBlockName = getBlockName( rootClientId );
-		const rootBlockType = getBlockType( rootBlockName );
-		const rootBlockIcon = rootBlockType ? rootBlockType.icon : {};
 
 		return {
 			clientId,
-			blockIcon,
 			rootClientId,
-			rootBlockIcon,
-			isRTL: getSettings().isRTL,
 		};
 	} ),
 ] )( BlockSelectionButton );

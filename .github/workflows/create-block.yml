@@ -2,16 +2,8 @@ name: Create Block
 
 on:
   pull_request:
-    paths:
-    - 'packages/**'
-    - '!packages/**/test/**'
-    - '!packages/**/*.md'
   push:
     branches: [trunk, wp/trunk]
-    paths:
-    - 'packages/**'
-    - '!packages/**/test/**'
-    - '!packages/**/*.md'
 
 jobs:
   checks:

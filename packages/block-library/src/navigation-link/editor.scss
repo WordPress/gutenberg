@@ -23,8 +23,9 @@
 	&.is-selected,
 	&.has-child-selected {
 		> .wp-block-navigation-link__container {
-			visibility: visible;
-			opacity: 1;
+			// We use important here because if the parent block is selected and submenus are present, they should always be visible.
+			visibility: visible !important;
+			opacity: 1 !important;
 		}
 	}
 }
@@ -37,6 +38,10 @@
 .wp-block-navigation-link {
 	.wp-block-navigation-link__container {
 		display: block;
+	}
+
+	.wp-block-navigation-link__content {
+		cursor: text;
 	}
 
 	&.is-editing,

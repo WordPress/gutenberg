@@ -60,6 +60,7 @@ The core provided categories are:
 -   media
 -   design
 -   widgets
+-   theme
 -   embed
 
 ```js
@@ -225,8 +226,6 @@ example: {
 -   **Type:** `Object[]`
 
 Similarly to how the block's style variations can be declared, a block type can define block variations that the user can pick from. The difference is that, rather than changing only the visual appearance, this field provides a way to apply initial custom attributes and inner blocks at the time when a block is inserted. See the [Block Variations API](/docs/reference-guides/block-api/block-variations.md) for more details.
-
-
 
 #### supports (optional)
 

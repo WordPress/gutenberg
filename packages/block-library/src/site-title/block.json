@@ -15,11 +15,14 @@
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
-			"gradients": true
+			"gradients": true,
+			"text": false,
+			"link": true
 		},
 		"fontSize": true,
 		"lineHeight": true,
 		"__experimentalFontFamily": true,
+		"__experimentalSelector": ".wp-block-site-title, .wp-block-site-title > a",
 		"__experimentalTextTransform": true
 	}
 }
