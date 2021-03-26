@@ -82,7 +82,6 @@
 
 		.submenu-container,
 		.wp-block-navigation-link__container {
-			border: 1px solid rgba(0, 0, 0, 0.15);
 			background-color: inherit;
 			color: inherit;
 			position: absolute;
@@ -115,13 +114,11 @@
 			}
 
 			@include break-medium {
-				left: 1.5em;
-
 				// Nested submenus sit to the left on large breakpoints.
 				.submenu-container,
 				.wp-block-navigation-link__container {
 					left: 100%;
-					top: -$border-width;
+					top: 0;
 
 					// Prevent the menu from disappearing when the mouse is over the gap
 					&::before {
@@ -190,5 +187,11 @@
 		// several times, so care needs to be taken.
 		background-color: #fff;
 		color: #000;
+		border: 1px solid rgba(0, 0, 0, 0.15);
+
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			top: -1px;
+		}
 	}
 }
