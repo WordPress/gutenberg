@@ -49,7 +49,6 @@ function FlexComponent(
 	ref
 ) {
 	const direction = useDirection( { isReversed, direction: directionProp } );
-
 	const classes = classnames( 'components-flex', className );
 
 	return (
