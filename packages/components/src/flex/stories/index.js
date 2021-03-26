@@ -3,7 +3,7 @@
  */
 import Flex from '../flex';
 import FlexItem from '../flex-item';
-import { View } from '../../view';
+import { View } from '../../ui/view';
 
 export default {
 	component: Flex,
