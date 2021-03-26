@@ -19,15 +19,17 @@ import InserterDraggableBlocks from '../inserter-draggable-blocks';
 import { store as blockEditorStore } from '../../store';
 
 function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
+	const instanceId = useInstanceId( BlockPattern );
 	const { name, viewportWidth } = pattern;
-	const { blocks } = useSelect(
+	const parsedPattern = useSelect(
 		( select ) =>
 			select( blockEditorStore ).__experimentalGetParsedPattern( name ),
 		[ name ]
 	);
-	const instanceId = useInstanceId( BlockPattern );
+	// If pattern is not found or containes not allowed blocks do not render it.
+	if ( ! parsedPattern ) return null;
+	const { blocks } = parsedPattern;
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
-
 	return (
 		<InserterDraggableBlocks isEnabled={ isDraggable } blocks={ blocks }>
 			{ ( { draggable, onDragStart, onDragEnd } ) => (

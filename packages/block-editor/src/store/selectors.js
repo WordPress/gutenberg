@@ -1798,13 +1798,27 @@ export const __experimentalGetParsedPattern = createSelector(
 		if ( ! pattern ) {
 			return null;
 		}
-
+		const parsedBlocks = parse( pattern.content );
+		// Check if pattern consists of `allowedBlockTypes`.
+		const { allowedBlockTypes } = state.settings;
+		if (
+			( typeof allowedBlockTypes === 'boolean' && ! allowedBlockTypes ) ||
+			( Array.isArray( allowedBlockTypes ) &&
+				parsedBlocks.some(
+					( { name } ) => ! allowedBlockTypes.includes( name )
+				) )
+		) {
+			return null;
+		}
 		return {
 			...pattern,
-			blocks: parse( pattern.content ),
+			blocks: parsedBlocks,
 		};
 	},
-	( state ) => [ state.settings.__experimentalBlockPatterns ]
+	( state ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.allowedBlockTypes,
+	]
 );
 
 /**
@@ -1822,9 +1836,12 @@ export const __experimentalGetAllowedPatterns = createSelector(
 			return patterns;
 		}
 
-		const parsedPatterns = patterns.map( ( { name } ) =>
-			__experimentalGetParsedPattern( state, name )
-		);
+		const parsedPatterns = patterns.reduce( ( accumulator, { name } ) => {
+			const parsedPattern = __experimentalGetParsedPattern( state, name );
+			if ( parsedPattern ) accumulator.push( parsedPattern );
+			return accumulator;
+		}, [] );
+
 		const patternsAllowed = filter( parsedPatterns, ( { blocks } ) =>
 			blocks.every( ( { name } ) =>
 				canInsertBlockType( state, name, rootClientId )
