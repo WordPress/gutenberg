@@ -42,7 +42,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import {
 	image as placeholderIcon,
 	textColor,
@@ -468,7 +468,7 @@ export class ImageEdit extends Component {
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
 						autoOpenMediaUpload={
-							isSelected && ! url && wasBlockJustInserted()
+							isSelected && ! url && wasBlockJustInserted
 						}
 					/>
 				</View>
@@ -567,10 +567,13 @@ export class ImageEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( coreStore );
-		const { getSettings } = select( blockEditorStore );
+		const { getSettings, wasBlockJustInserted } = select(
+			blockEditorStore
+		);
 		const {
 			attributes: { id, url },
 			isSelected,
+			clientId,
 		} = props;
 		const { imageSizes } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
@@ -583,25 +586,14 @@ export default compose( [
 				isNotFileUrl &&
 				url &&
 				! hasQueryArg( url, 'w' ) );
+
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
-		};
-	} ),
-	withDispatch( ( dispatch, { clientId }, { select } ) => {
-		return {
-			wasBlockJustInserted() {
-				const { clearLastBlockInserted } = dispatch( blockEditorStore );
-				const { wasBlockJustInserted } = select( blockEditorStore );
-
-				const result = wasBlockJustInserted( clientId );
-
-				if ( result ) {
-					clearLastBlockInserted();
-					return true;
-				}
-				return false;
-			},
+			wasBlockJustInserted: wasBlockJustInserted(
+				clientId,
+				'inserter_menu'
+			),
 		};
 	} ),
 	withPreferredColorScheme,

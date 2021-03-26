@@ -2089,9 +2089,14 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
  * Tells if the block with the passed clientId was just inserted.
  *
  * @param {Object} state Global application state.
- * @param {Object} clientId client id of the block.
- * @return {boolean} If the client id exists within the lastBlockInserted state then the block was just inserted.
+ * @param {Object} clientId Client Id of the block.
+ * @param {boolean} source Insertion source of the block.
+ * @return {boolean} True if the block matches the last block inserted from the specified source.
  */
-export function wasBlockJustInserted( state, clientId ) {
-	return state.lastBlockInserted.clientId === clientId;
+export function wasBlockJustInserted( state, clientId, source ) {
+	const { lastBlockInserted } = state;
+	return (
+		lastBlockInserted.clientId === clientId &&
+		lastBlockInserted.source === source
+	);
 }

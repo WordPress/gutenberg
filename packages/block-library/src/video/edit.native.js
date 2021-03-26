@@ -36,7 +36,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { isURL, getProtocol } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { video as SvgIcon, replace } from '@wordpress/icons';
-import { withDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -229,7 +229,7 @@ class VideoEdit extends Component {
 						icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 						onFocus={ this.props.onFocus }
 						autoOpenMediaUpload={
-							isSelected && ! src && wasBlockJustInserted()
+							isSelected && ! src && wasBlockJustInserted
 						}
 					/>
 				</View>
@@ -372,21 +372,11 @@ class VideoEdit extends Component {
 }
 
 export default compose( [
-	withDispatch( ( dispatch, { clientId }, { select } ) => {
-		return {
-			wasBlockJustInserted() {
-				const { clearLastBlockInserted } = dispatch( blockEditorStore );
-				const { wasBlockJustInserted } = select( blockEditorStore );
-
-				const result = wasBlockJustInserted( clientId );
-
-				if ( result ) {
-					clearLastBlockInserted();
-					return true;
-				}
-				return false;
-			},
-		};
-	} ),
+	withSelect( ( select, { clientId } ) => ( {
+		wasBlockJustInserted: select( blockEditorStore ).wasBlockJustInserted(
+			clientId,
+			'inserter_menu'
+		),
+	} ) ),
 	withPreferredColorScheme,
 ] )( VideoEdit );
