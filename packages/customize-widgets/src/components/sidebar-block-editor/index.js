@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useReducer, createPortal } from '@wordpress/element';
+import { useReducer, createPortal, useMemo } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockList,
@@ -21,7 +21,9 @@ import {
  * Internal dependencies
  */
 import Inspector, { BlockInspectorButton } from '../inspector';
+import Header from '../header';
 import useSidebarBlockEditor from './use-sidebar-block-editor';
+import useInserter from '../inserter/use-inserter';
 
 const inspectorOpenStateReducer = ( state, action ) => {
 	switch ( action ) {
@@ -45,7 +47,7 @@ const inspectorOpenStateReducer = ( state, action ) => {
 	}
 };
 
-export default function SidebarBlockEditor( { sidebar } ) {
+export default function SidebarBlockEditor( { sidebar, inserter } ) {
 	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
 	const [
 		{ open: isInspectorOpened, busy: isInspectorAnimating },
@@ -53,6 +55,13 @@ export default function SidebarBlockEditor( { sidebar } ) {
 	] = useReducer( inspectorOpenStateReducer, { open: false, busy: false } );
 	const parentContainer = document.getElementById(
 		'customize-theme-controls'
+	);
+	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
+	const settings = useMemo(
+		() => ( {
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
+		} ),
+		[]
 	);
 
 	return (
@@ -65,9 +74,16 @@ export default function SidebarBlockEditor( { sidebar } ) {
 							value={ blocks }
 							onInput={ onInput }
 							onChange={ onChange }
+							settings={ settings }
 							useSubRegistry={ false }
 						>
 							<BlockEditorKeyboardShortcuts />
+
+							<Header
+								inserter={ inserter }
+								isInserterOpened={ isInserterOpened }
+								setIsInserterOpened={ setIsInserterOpened }
+							/>
 
 							<BlockSelectionClearer>
 								<WritingFlow>
