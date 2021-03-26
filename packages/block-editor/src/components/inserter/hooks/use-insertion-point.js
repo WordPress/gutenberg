@@ -51,38 +51,24 @@ function useInsertionPoint( {
 			const {
 				getBlockIndex,
 				getBlockOrder,
-				getBlockInsertionPoint,
 			} = select( blockEditorStore );
 
-			let _destinationRootClientId, _destinationIndex;
+			const _destinationRootClientId = rootClientId;
+			let _destinationIndex;
 
-			if ( rootClientId || insertionIndex || clientId || isAppender ) {
-				// If any of these arguments are set, we're in "manual mode"
-				// meaning the insertion point is set by the caller.
-
-				_destinationRootClientId = rootClientId;
-
-				if ( insertionIndex ) {
-					// Insert into a specific index.
-					_destinationIndex = insertionIndex;
-				} else if ( clientId ) {
-					// Insert after a specific client ID.
-					_destinationIndex = getBlockIndex(
-						clientId,
-						_destinationRootClientId
-					);
-				} else {
-					// Insert at the end of the list.
-					_destinationIndex = getBlockOrder(
-						_destinationRootClientId
-					).length;
-				}
+			if ( insertionIndex ) {
+				// Insert into a specific index.
+				_destinationIndex = insertionIndex;
+			} else if ( clientId ) {
+				// Insert after a specific client ID.
+				_destinationIndex = getBlockIndex(
+					clientId,
+					_destinationRootClientId
+				);
 			} else {
-				// Otherwise, we're in "auto mode" where the insertion point is
-				// decided by getBlockInsertionPoint().
-				const insertionPoint = getBlockInsertionPoint();
-				_destinationRootClientId = insertionPoint.rootClientId;
-				_destinationIndex = insertionPoint.index;
+				// Insert at the end of the list.
+				_destinationIndex = getBlockOrder( _destinationRootClientId )
+					.length;
 			}
 
 			return {
