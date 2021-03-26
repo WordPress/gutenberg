@@ -8,8 +8,10 @@ import { pick, defaultTo } from 'lodash';
  */
 import { Platform, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalFetchLinkSuggestions as createFetchLinkSuggestions } from '@wordpress/block-editor';
+import {
+	store as coreStore,
+	__experimentalFetchLinkSuggestions as createFetchLinkSuggestions,
+} from '@wordpress/core-data';
 
 /**
  * Internal dependencies
