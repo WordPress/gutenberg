@@ -6,26 +6,15 @@ import { render, unmountComponentAtNode } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import SidebarBlockEditor from './components/sidebar-block-editor';
-import SidebarAdapter from './components/sidebar-block-editor/sidebar-adapter';
-import InserterOuterSection from './components/inserter/inserter-outer-section';
+import SidebarBlockEditor from '../components/sidebar-block-editor';
+import SidebarAdapter from '../components/sidebar-block-editor/sidebar-adapter';
+import InserterOuterSection from './inserter-outer-section';
 
 const {
 	wp: { customize },
 } = window;
 
 const inserterId = 'widgets-inserter';
-
-class SidebarSection extends customize.Section {
-	onChangeExpanded( expanded, args ) {
-		super.onChangeExpanded( expanded, args );
-
-		const controls = this.controls();
-		controls.forEach( ( control ) => {
-			control.onChangeExpanded( expanded, args );
-		} );
-	}
-}
 
 class SidebarControl extends customize.Control {
 	ready() {
@@ -57,4 +46,4 @@ class SidebarControl extends customize.Control {
 	}
 }
 
-export { SidebarSection, SidebarControl };
+export default SidebarControl;
