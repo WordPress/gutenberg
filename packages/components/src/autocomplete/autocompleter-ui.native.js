@@ -70,6 +70,11 @@ export function getAutoCompleterUI( autocompleter ) {
 			onChangeOptions( items );
 			scrollViewRef.current?.scrollTo( { x: 0, animated: false } );
 		}, [ items ] );
+		const activeItemStyles = usePreferredColorSchemeStyle(
+			styles.activeItem,
+			styles.activeItemDark
+		);
+
 		const iconStyles = usePreferredColorSchemeStyle(
 			styles.icon,
 			styles.iconDark
@@ -101,7 +106,10 @@ export function getAutoCompleterUI( autocompleter ) {
 					>
 						{ items.map( ( option, index ) => {
 							const isActive = index === selectedIndex;
-							const itemStyle = stylesCompose( styles.item );
+							const itemStyle = stylesCompose(
+								styles.item,
+								isActive && activeItemStyles
+							);
 							const textStyle = stylesCompose(
 								textStyles,
 								isActive && activeTextStyles

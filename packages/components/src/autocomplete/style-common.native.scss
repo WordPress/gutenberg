@@ -50,3 +50,12 @@
 	text-decoration: underline;
 	text-decoration-color: $gray-20;
 }
+
+.activeItem {
+	border-radius: 6px;
+	background-color: $gray-light;
+}
+
+.activeItemDark {
+	background-color: $dark-ultra-dim;
+}
