@@ -510,7 +510,10 @@ export default function Image( {
 
 		img = (
 			<ResizableBox
-				size={ { width, height } }
+				size={ {
+					width: width ?? 'auto',
+					height: height ?? 'auto',
+				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
