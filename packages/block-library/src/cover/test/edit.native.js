@@ -93,7 +93,7 @@ afterAll( () => {
 } );
 
 describe( 'when no media is attached', () => {
-	it( 'allows adding an image or video', async () => {
+	it( 'adds an image or video', async () => {
 		const { getByText, findByText } = render(
 			<CoverEdit
 				attributes={ {
@@ -115,8 +115,8 @@ describe( 'when no media is attached', () => {
 	} );
 } );
 
-describe( 'when media is attached', () => {
-	it( 'allows toggling a fixed background', async () => {
+describe( 'when an image is attached', () => {
+	it( 'toggles a fixed background', async () => {
 		const { getByText } = render(
 			<CoverEdit
 				attributes={ attributes }
@@ -134,7 +134,7 @@ describe( 'when media is attached', () => {
 		);
 	} );
 
-	it( 'allows editing the focal point with text input', async () => {
+	it( 'edits the focal point with a text input', async () => {
 		const { getByText, findByText, findByLabelText } = render(
 			<CoverEdit
 				attributes={ attributes }
@@ -186,7 +186,7 @@ describe( 'when media is attached', () => {
 		);
 	} );
 
-	it( 'allows clearing the media', async () => {
+	it( 'clears the media', async () => {
 		const { getByText } = render(
 			<CoverEdit
 				attributes={ attributes }
