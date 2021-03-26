@@ -237,22 +237,6 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print(#function)
     }
 
-    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [String], blockId: String) {
-        print(#function)
-    }
-
-    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [String]) {
-        print(#function)
-    }
-
-    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [String]) {
-        print(#function)
-    }
-
-    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [String]) {
-        print(#function)
-	}
-
     func gutenbergDidRequestFocalPointPickerTooltipShown() -> Bool {
         return false;
     }
