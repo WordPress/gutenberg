@@ -11,10 +11,8 @@ import {
 /**
  * Internal dependencies
  */
-import {
-	SidebarSection,
-	SidebarControl,
-} from './customize-sidebar-constructors';
+import SidebarSection from './controls/sidebar-section';
+import SidebarControl from './controls/sidebar-control';
 
 const { wp } = window;
 

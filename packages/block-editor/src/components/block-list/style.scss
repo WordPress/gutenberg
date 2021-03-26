@@ -44,10 +44,15 @@
 .block-editor-block-list__layout {
 	position: relative;
 
+	// Select tool/navigation mode shows the default cursor until an additional click edits.
+	&.is-navigate-mode {
+		cursor: default;
+	}
+
 	// The primary indicator of selection in text is the native selection marker.
 	// When selecting multiple blocks, we provide an additional selection indicator.
-	.is-navigate-mode & .block-editor-block-list__block.is-selected,
-	.is-navigate-mode & .block-editor-block-list__block.is-hovered,
+	&.is-navigate-mode .block-editor-block-list__block.is-selected,
+	&.is-navigate-mode .block-editor-block-list__block.is-hovered,
 	.block-editor-block-list__block.is-highlighted,
 	.block-editor-block-list__block.is-multi-selected {
 
@@ -83,13 +88,13 @@
 		}
 	}
 
-	.is-navigate-mode & .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
+	&.is-navigate-mode .block-editor-block-list__block.is-hovered:not(.is-selected)::after {
 		box-shadow: 0 0 0 1px $gray-600;
 	}
 
 	.block-editor-block-list__block.is-highlighted::after,
 	.block-editor-block-list__block.is-multi-selected::after,
-	.is-navigate-mode & .block-editor-block-list__block.is-selected::after,
+	&.is-navigate-mode .block-editor-block-list__block.is-selected::after,
 	& .is-block-moving-mode.block-editor-block-list__block.has-child-selected {
 		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 		outline: var(--wp-admin-border-width-focus) solid transparent;
@@ -262,11 +267,6 @@
 	// Reusable blocks parent borer.
 	&.is-reusable.has-child-selected::after {
 		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
-	}
-
-	// Select tool/navigation mode shows the default cursor until an additional click edits.
-	.is-navigate-mode & {
-		cursor: default;
 	}
 
 	// Clear floats.
@@ -556,7 +556,8 @@
 
 // Position mover arrows for both toolbars.
 .block-editor-block-contextual-toolbar,
-.edit-post-header-toolbar__block-toolbar {
+.edit-post-header-toolbar__block-toolbar,
+.edit-site-header-toolbar__block-toolbar {
 
 	.block-editor-block-mover:not(.is-horizontal) {
 		// Position SVGs.
@@ -568,12 +569,14 @@
 			}
 		}
 
-		.block-editor-block-mover-button.is-up-button svg {
-			top: 5px;
-		}
+		@include break-small() {
+			.block-editor-block-mover-button.is-up-button svg {
+				top: 5px;
+			}
 
-		.block-editor-block-mover-button.is-down-button svg {
-			bottom: 5px;
+			.block-editor-block-mover-button.is-down-button svg {
+				bottom: 5px;
+			}
 		}
 	}
 }

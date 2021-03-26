@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { find, reverse, first, last } from 'lodash';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -32,12 +31,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import {
-	isInSameBlock,
-	isInsideRootBlock,
-	getBlockDOMNode,
-	getBlockClientId,
-} from '../../utils/dom';
+import { isInSameBlock, getBlockClientId } from '../../utils/dom';
 import FocusCapture from './focus-capture';
 import useMultiSelection from './use-multi-selection';
 import { store as blockEditorStore } from '../../store';
@@ -161,7 +155,6 @@ function selector( select ) {
 		getLastMultiSelectedBlockClientId,
 		hasMultiSelection,
 		getBlockOrder,
-		isNavigationMode,
 		isSelectionEnabled,
 		getBlockSelectionStart,
 		isMultiSelecting,
@@ -187,7 +180,6 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		firstBlock: first( blocks ),
 		lastBlock: last( blocks ),
-		isNavigationMode: isNavigationMode(),
 		isSelectionEnabled: isSelectionEnabled(),
 		blockSelectionStart: getBlockSelectionStart(),
 		isMultiSelecting: isMultiSelecting(),
@@ -219,8 +211,6 @@ export default function WritingFlow( { children } ) {
 	// browser behaviour across blocks.
 	const verticalRect = useRef();
 
-	const onSelectionStart = useMultiSelection( container );
-
 	const {
 		selectedBlockClientId,
 		selectionStartClientId,
@@ -231,7 +221,6 @@ export default function WritingFlow( { children } ) {
 		hasMultiSelection,
 		firstBlock,
 		lastBlock,
-		isNavigationMode,
 		isSelectionEnabled,
 		blockSelectionStart,
 		isMultiSelecting,
@@ -243,20 +232,6 @@ export default function WritingFlow( { children } ) {
 
 	function onMouseDown( event ) {
 		verticalRect.current = null;
-
-		const { ownerDocument } = event.target;
-
-		// Clicking inside a selected block should exit navigation mode and block moving mode.
-		if (
-			isNavigationMode &&
-			selectedBlockClientId &&
-			isInsideRootBlock(
-				getBlockDOMNode( selectedBlockClientId, ownerDocument ),
-				event.target
-			)
-		) {
-			setNavigationMode( false );
-		}
 
 		// Multi-select blocks when Shift+clicking.
 		if (
@@ -541,6 +516,11 @@ export default function WritingFlow( { children } ) {
 		}
 	}, [ hasMultiSelection, isMultiSelecting ] );
 
+	// This hook sets the selection after the user makes a multi-selection. For
+	// some browsers, like Safari, it is important that this happens AFTER
+	// setting focus on the multi-selection container above.
+	const onSelectionStart = useMultiSelection( container );
+
 	const lastFocus = useRef();
 
 	useEffect( () => {
@@ -553,10 +533,6 @@ export default function WritingFlow( { children } ) {
 			container.current.removeEventListener( 'focusout', onFocusOut );
 		};
 	}, [] );
-
-	const className = classnames( 'block-editor-writing-flow', {
-		'is-navigate-mode': isNavigationMode,
-	} );
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture
 	// bubbling events from children to determine focus transition intents.
@@ -587,7 +563,7 @@ export default function WritingFlow( { children } ) {
 			/>
 			<div
 				ref={ container }
-				className={ className }
+				className="block-editor-writing-flow"
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
 			>

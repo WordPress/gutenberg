@@ -22,12 +22,6 @@ color: red;
 }"
 `;
 
-exports[`CSS selector wrap should replace :root selectors 1`] = `
-".my-namespace {
---my-color: #ff0000;
-}"
-`;
-
 exports[`CSS selector wrap should replace root tags 1`] = `
 ".my-namespace,
 .my-namespace h1 {
@@ -45,5 +39,11 @@ color: red;
 exports[`CSS selector wrap should wrap regular selectors 1`] = `
 ".my-namespace h1 {
 color: red;
+}"
+`;
+
+exports[`CSS selector wrap should replace :root selectors 1`] = `
+".my-namespace {
+--my-color: #ff0000;
 }"
 `;

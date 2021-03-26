@@ -351,4 +351,14 @@ describe( 'Image', () => {
 		// Check if dimensions are reset.
 		expect( await getEditedPostContent() ).toMatch( regexAfter );
 	} );
+
+	it( 'should undo without broken temporary state', async () => {
+		await insertBlock( 'Image' );
+		const fileName = await upload( '.wp-block-image input[type="file"]' );
+		await waitForImage( fileName );
+		await pressKeyWithModifier( 'primary', 'z' );
+		// Expect an empty image block (placeholder) rather than one with a
+		// broken temporary URL.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

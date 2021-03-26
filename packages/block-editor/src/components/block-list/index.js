@@ -20,6 +20,7 @@ import useInsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
+import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 
 export const BlockNodes = createContext();
@@ -30,15 +31,26 @@ export default function BlockList( { className, __experimentalLayout } ) {
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
 	useScrollSelectionIntoView( ref );
+	usePreParsePatterns();
 
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const { isTyping, isOutlineMode, isFocusMode } = useSelect( ( select ) => {
-		const { isTyping: _isTyping, getSettings } = select( blockEditorStore );
+	const {
+		isTyping,
+		isOutlineMode,
+		isFocusMode,
+		isNavigationMode,
+	} = useSelect( ( select ) => {
+		const {
+			isTyping: _isTyping,
+			getSettings,
+			isNavigationMode: _isNavigationMode,
+		} = select( blockEditorStore );
 		const { outlineMode, focusMode } = getSettings();
 		return {
 			isTyping: _isTyping(),
 			isOutlineMode: outlineMode,
 			isFocusMode: focusMode,
+			isNavigationMode: _isNavigationMode(),
 		};
 	}, [] );
 
@@ -55,6 +67,7 @@ export default function BlockList( { className, __experimentalLayout } ) {
 						'is-typing': isTyping,
 						'is-outline-mode': isOutlineMode,
 						'is-focus-mode': isFocusMode && isLargeViewport,
+						'is-navigate-mode': isNavigationMode,
 					}
 				) }
 			>
