@@ -36,15 +36,19 @@ export { default as FlexItem } from './item';
  * @param {Props} props
  * @param {import('react').Ref<HTMLDivElement>} ref
  */
-function FlexComponent( props, ref ) {
-	const direction = useDirection( props );
-	const {
+function FlexComponent(
+	{
 		align = 'center',
 		className,
 		gap = 2,
 		justify = 'space-between',
+		isReversed,
+		direction: directionProp,
 		...otherProps
-	} = props;
+	},
+	ref
+) {
+	const direction = useDirection( { isReversed, direction: directionProp } );
 
 	const classes = classnames( 'components-flex', className );
 
