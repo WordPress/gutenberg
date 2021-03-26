@@ -216,7 +216,7 @@ function Layout( { styles } ) {
 									rootClientId={
 										isInserterOpened?.rootClientId
 									}
-									index={ isInserterOpened?.index }
+									index={ isInserterOpened?.blockIndex }
 								/>
 							</div>
 						</div>
