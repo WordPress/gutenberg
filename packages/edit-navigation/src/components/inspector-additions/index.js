@@ -8,7 +8,7 @@ import { InspectorControls } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import AutoAddPages from './auto-add-pages';
-import DeleteMenuPanel from './delete-menu-panel';
+import DeleteMenu from './delete-menu';
 import ManageLocations from './manage-locations';
 import { NameEditor } from '../name-editor';
 import { PanelBody } from '@wordpress/components';
@@ -50,7 +50,7 @@ export default function InspectorAdditions( {
 				/>
 			</PanelBody>
 			<PanelBody>
-				<DeleteMenuPanel
+				<DeleteMenu
 					onDeleteMenu={ onDeleteMenu }
 					isMenuBeingDeleted={ isMenuBeingDeleted }
 				/>
