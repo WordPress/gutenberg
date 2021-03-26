@@ -3,6 +3,12 @@
  */
 import 'react-native-gesture-handler/jestSetup';
 
+const mockComponent = ( element ) => ( ...args ) => {
+	const [ props ] = args;
+	const React = require( 'react' );
+	return React.createElement( element, props, props.children );
+};
+
 jest.mock( '@wordpress/element', () => {
 	return {
 		__esModule: true,
@@ -89,7 +95,7 @@ jest.mock(
 	'@react-native-community/slider',
 	() => {
 		const { forwardRef } = require( 'react' );
-		return forwardRef( () => 'Slider' );
+		return forwardRef( mockComponent( 'Slider' ) );
 	},
 	{ virtual: true }
 );

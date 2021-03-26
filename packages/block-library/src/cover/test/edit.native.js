@@ -134,6 +134,28 @@ describe( 'when an image is attached', () => {
 		);
 	} );
 
+	it( 'edits the focal point with a slider', async () => {
+		const { getByText, findByLabelText, findByTestId } = render(
+			<CoverEdit
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+			/>
+		);
+		// Await async update to component state to avoid act warning
+		await act( () => isScreenReaderEnabled );
+		fireEvent.press( getByText( 'Edit focal point' ) );
+		const yAxisSlider = await findByTestId( 'Slider Y-Axis Position' );
+		fireEvent( yAxisSlider, 'valueChange', '52' );
+		const applyButton = await findByLabelText( 'Apply' );
+		fireEvent.press( applyButton );
+
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				focalPoint: { ...attributes.focalPoint, y: '0.52' },
+			} )
+		);
+	} );
+
 	it( 'edits the focal point with a text input', async () => {
 		const { getByText, findByText, findByLabelText } = render(
 			<CoverEdit
