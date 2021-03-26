@@ -305,10 +305,10 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 	] );
 
 	// Optimization. Each callback returned from useOnBlockDrop should be a
-	// stable reference so that upstream in the DropZoneProvider it isn't
-	// constantly unregistered and re-registered. These callbacks all primarily
-	// use the setter from `useState`, delegating the handling of the drop
-	// event to an effect.
+	// stable reference so that upstream in the useDropZone it isn't constantly
+	// unregistered and re-registered. These callbacks all primarily use the
+	// setter from `useState`, and delegate the handling of the drop event to
+	// an effect.
 	return {
 		onDrop: useCallback(
 			( event ) => {
