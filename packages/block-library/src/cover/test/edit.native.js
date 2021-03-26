@@ -135,7 +135,7 @@ describe( 'when an image is attached', () => {
 	} );
 
 	it( 'edits the focal point with a slider', async () => {
-		const { getByText, findByLabelText, findByTestId } = render(
+		const { getByText, getByLabelText, getByTestId } = render(
 			<CoverEdit
 				attributes={ attributes }
 				setAttributes={ setAttributes }
@@ -144,10 +144,12 @@ describe( 'when an image is attached', () => {
 		// Await async update to component state to avoid act warning
 		await act( () => isScreenReaderEnabled );
 		fireEvent.press( getByText( 'Edit focal point' ) );
-		const yAxisSlider = await findByTestId( 'Slider Y-Axis Position' );
-		fireEvent( yAxisSlider, 'valueChange', '52' );
-		const applyButton = await findByLabelText( 'Apply' );
-		fireEvent.press( applyButton );
+		fireEvent(
+			getByTestId( 'Slider Y-Axis Position' ),
+			'valueChange',
+			'52'
+		);
+		fireEvent.press( getByLabelText( 'Apply' ) );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
 			expect.objectContaining( {
@@ -157,7 +159,7 @@ describe( 'when an image is attached', () => {
 	} );
 
 	it( 'edits the focal point with a text input', async () => {
-		const { getByText, findByText, findByLabelText } = render(
+		const { getByText, getByLabelText } = render(
 			<CoverEdit
 				attributes={ attributes }
 				setAttributes={ setAttributes }
@@ -166,14 +168,11 @@ describe( 'when an image is attached', () => {
 		// Await async update to component state to avoid act warning
 		await act( () => isScreenReaderEnabled );
 		fireEvent.press( getByText( 'Edit focal point' ) );
-		const xAxisCell = await findByText(
-			( attributes.focalPoint.x * 100 ).toString()
+		fireEvent.press(
+			getByText( ( attributes.focalPoint.x * 100 ).toString() )
 		);
-		fireEvent.press( xAxisCell );
-		const xAxisInput = await findByLabelText( 'X-Axis Position' );
-		fireEvent.changeText( xAxisInput, '99' );
-		const applyButton = await findByLabelText( 'Apply' );
-		fireEvent.press( applyButton );
+		fireEvent.changeText( getByLabelText( 'X-Axis Position' ), '99' );
+		fireEvent.press( getByLabelText( 'Apply' ) );
 
 		expect( setAttributes ).toHaveBeenCalledWith(
 			expect.objectContaining( {
@@ -183,7 +182,7 @@ describe( 'when an image is attached', () => {
 	} );
 
 	it( 'discards canceled focal point changes', async () => {
-		const { getByText, findByText, findByLabelText } = render(
+		const { getByText, getByLabelText } = render(
 			<CoverEdit
 				attributes={ attributes }
 				setAttributes={ setAttributes }
@@ -192,14 +191,11 @@ describe( 'when an image is attached', () => {
 		// Await async update to component state to avoid act warning
 		await act( () => isScreenReaderEnabled );
 		fireEvent.press( getByText( 'Edit focal point' ) );
-		const xAxisCell = await findByText(
-			( attributes.focalPoint.x * 100 ).toString()
+		fireEvent.press(
+			getByText( ( attributes.focalPoint.x * 100 ).toString() )
 		);
-		fireEvent.press( xAxisCell );
-		const xAxisInput = await findByLabelText( 'X-Axis Position' );
-		fireEvent.changeText( xAxisInput, '80' );
-		const goBackButton = await findByLabelText( 'Go back' );
-		fireEvent.press( goBackButton );
+		fireEvent.changeText( getByLabelText( 'X-Axis Position' ), '80' );
+		fireEvent.press( getByLabelText( 'Go back' ) );
 
 		expect( setAttributes ).not.toHaveBeenCalledWith(
 			expect.objectContaining( {
