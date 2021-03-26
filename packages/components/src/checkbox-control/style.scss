@@ -1,6 +1,11 @@
 $checkbox-input-size: 20px;
 $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 
+
+.components-checkbox-control__header .components-base-control__label {
+	margin-right: 12px;
+}
+
 .components-checkbox-control__input[type="checkbox"] {
 	@include checkbox-control;
 	background: $white;
@@ -51,7 +56,7 @@ $checkbox-input-size-sm: 24px; // Width & height for small viewports.
 .components-checkbox-control__input-container {
 	position: relative;
 	display: inline-block;
-	margin: 0 12px;
+	margin-right: 12px;
 	vertical-align: middle;
 	width: $checkbox-input-size-sm;
 	height: $checkbox-input-size-sm;

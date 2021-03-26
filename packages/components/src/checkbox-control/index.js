@@ -8,6 +8,10 @@ import { Icon, check } from '@wordpress/icons';
  * Internal dependencies
  */
 import BaseControl from '../base-control';
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
 
 export default function CheckboxControl( {
 	label,
@@ -27,7 +31,10 @@ export default function CheckboxControl( {
 			label={ heading }
 			id={ id }
 			help={ help }
-			className={ className }
+			className={ classnames(
+				'components-checkbox-control__header',
+				className
+			) }
 		>
 			<span className="components-checkbox-control__input-container">
 				<input
