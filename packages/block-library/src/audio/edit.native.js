@@ -107,7 +107,6 @@ function AudioEdit( {
 					accept="audio/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
-					onError={ onUploadError }
 					onFocus={ onFocus }
 				/>
 			</View>
