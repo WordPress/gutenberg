@@ -556,7 +556,8 @@
 
 // Position mover arrows for both toolbars.
 .block-editor-block-contextual-toolbar,
-.edit-post-header-toolbar__block-toolbar {
+.edit-post-header-toolbar__block-toolbar,
+.edit-site-header-toolbar__block-toolbar {
 
 	.block-editor-block-mover:not(.is-horizontal) {
 		// Position SVGs.
@@ -568,12 +569,14 @@
 			}
 		}
 
-		.block-editor-block-mover-button.is-up-button svg {
-			top: 5px;
-		}
+		@include break-small() {
+			.block-editor-block-mover-button.is-up-button svg {
+				top: 5px;
+			}
 
-		.block-editor-block-mover-button.is-down-button svg {
-			bottom: 5px;
+			.block-editor-block-mover-button.is-down-button svg {
+				bottom: 5px;
+			}
 		}
 	}
 }
