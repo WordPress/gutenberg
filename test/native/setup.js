@@ -3,6 +3,9 @@
  */
 import 'react-native-gesture-handler/jestSetup';
 
+// Mock component to render with props rather than merely a string name so that
+// we may assert against it. ...args is used avoid warnings about ignoring
+// forwarded refs if React.forwardRef happens to be used.
 const mockComponent = ( element ) => ( ...args ) => {
 	const [ props ] = args;
 	const React = require( 'react' );
@@ -142,18 +145,14 @@ jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );
 // a React ref instead. We could then remove this internal mock.
 jest.mock( 'react-native/Libraries/Components/TextInput/TextInputState' );
 
-// Mock React Native native module
+// Mock native modules incompatible with testing environment
 jest.mock( 'react-native/Libraries/LayoutAnimation/LayoutAnimation' );
-
-// Mock React Native native module
-jest.doMock(
+jest.mock(
 	'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo',
-	() => {
-		return {
-			addEventListener: jest.fn(),
-			announceForAccessibility: jest.fn(),
-			removeEventListener: jest.fn(),
-			isScreenReaderEnabled: jest.fn( () => Promise.resolve() ),
-		};
-	}
+	() => ( {
+		addEventListener: jest.fn(),
+		announceForAccessibility: jest.fn(),
+		removeEventListener: jest.fn(),
+		isScreenReaderEnabled: jest.fn( () => Promise.resolve( false ) ),
+	} )
 );
