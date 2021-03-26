@@ -9,8 +9,8 @@ return array(
 	'title'       => __( 'Two columns text and title' ),
 	'categories'  => array( 'columns', 'text' ),
 	'content'     => '<!-- wp:group -->
-	<div class="wp-block-group"><div class="wp-block-group__inner-container"><!-- wp:heading {"style":{"typography":{"fontSize":38},"typography":{"lineHeight":"1.5"}}} -->
-	<h2 style="font-size:38px;line-height:1.5"><strong>' . __( 'The voyage had begun, and had begun happily with a soft blue sky, and a calm sea.' ) . '</strong></h2>
+	<div class="wp-block-group"><div class="wp-block-group__inner-container"><!-- wp:heading {"style":{"typography":{"fontSize":38,"lineHeight":"1.4"}}} -->
+	<h2 style="font-size:38px;line-height:1.4"><strong>' . __( 'The voyage had begun, and had begun happily with a soft blue sky, and a calm sea.' ) . '</strong></h2>
 	<!-- /wp:heading -->
 	
 	<!-- wp:columns -->
