@@ -10,7 +10,10 @@ import { act, render, fireEvent } from '@testing-library/react-native';
 import { BottomSheetSettings, BlockEdit } from '@wordpress/block-editor';
 import { SlotFillProvider } from '@wordpress/components';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import { requestMediaPicker } from '@wordpress/react-native-bridge';
+import {
+	requestMediaPicker,
+	requestMediaEditor,
+} from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -114,6 +117,71 @@ describe( 'when no media is attached', () => {
 } );
 
 describe( 'when an image is attached', () => {
+	// The below tests pass but are currently commented out because multiple async
+	// findBy* queries currently cause errors in test output https://git.io/JYYGE
+
+	// eslint-disable-next-line jest/no-disabled-tests
+	it.skip( 'edits the image', async () => {
+		const { getByLabelText, findByText } = render(
+			<CoverEdit
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+			/>
+		);
+		// Await async update to component state to avoid act warning
+		await act( () => isScreenReaderEnabled );
+		fireEvent.press( getByLabelText( 'Edit image' ) );
+		const editButton = await findByText( 'Edit' );
+		fireEvent.press( editButton );
+
+		expect( requestMediaEditor ).toHaveBeenCalled();
+	} );
+
+	// eslint-disable-next-line jest/no-disabled-tests
+	it.skip( 'replaces the image', async () => {
+		const { getByLabelText, findByText } = render(
+			<CoverEdit
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+			/>
+		);
+		// Await async update to component state to avoid act warning
+		await act( () => isScreenReaderEnabled );
+		fireEvent.press( getByLabelText( 'Edit image' ) );
+		const replaceButton = await findByText( 'Replace' );
+		fireEvent.press( replaceButton );
+		const mediaLibraryButton = await findByText(
+			'WordPress Media Library'
+		);
+		fireEvent.press( mediaLibraryButton );
+
+		expect( requestMediaPicker ).toHaveBeenCalled();
+	} );
+
+	// eslint-disable-next-line jest/no-disabled-tests
+	it.skip( 'clears the image within image edit button', async () => {
+		const { getByLabelText, findAllByText } = render(
+			<CoverEdit
+				attributes={ attributes }
+				setAttributes={ setAttributes }
+			/>
+		);
+		// Await async update to component state to avoid act warning
+		await act( () => isScreenReaderEnabled );
+		fireEvent.press( getByLabelText( 'Edit image' ) );
+		const clearMediaButton = await findAllByText( 'Clear Media' );
+		fireEvent.press( clearMediaButton[ 0 ] );
+
+		expect( setAttributes ).toHaveBeenCalledWith(
+			expect.objectContaining( {
+				focalPoint: undefined,
+				hasParallax: undefined,
+				id: undefined,
+				url: undefined,
+			} )
+		);
+	} );
+
 	it( 'toggles a fixed background', async () => {
 		const { getByText } = render(
 			<CoverEdit
@@ -202,7 +270,7 @@ describe( 'when an image is attached', () => {
 		);
 	} );
 
-	it( 'clears the media', async () => {
+	it( 'clears the media within cell button', async () => {
 		const { getByText } = render(
 			<CoverEdit
 				attributes={ attributes }
