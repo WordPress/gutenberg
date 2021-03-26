@@ -180,7 +180,7 @@ export default function useSidebarBlockEditor( sidebar ) {
 	}, [ sidebar ] );
 
 	const onChangeBlocks = useCallback(
-		( nextBlocks ) => {
+		( _nextBlocks ) => {
 			ignoreIncoming.current = true;
 
 			const blocksByWidgetId = keyBy(
@@ -188,7 +188,7 @@ export default function useSidebarBlockEditor( sidebar ) {
 				( block ) => block.attributes.__internalWidgetId
 			);
 
-			nextBlocks.forEach( ( nextBlock, index ) => {
+			const nextBlocks = _nextBlocks.map( ( nextBlock, index ) => {
 				if (
 					nextBlock.attributes.__internalWidgetId &&
 					nextBlock.attributes.__internalWidgetId in blocksByWidgetId
@@ -207,10 +207,18 @@ export default function useSidebarBlockEditor( sidebar ) {
 						);
 						sidebar.updateWidget( widget );
 					}
-				} else {
-					const widget = blockToWidget( nextBlock );
-					sidebar.addWidget( widget, index );
+					return nextBlock;
 				}
+
+				const widget = blockToWidget( nextBlock );
+				const widgetId = sidebar.addWidget( widget, index );
+				return {
+					...nextBlock,
+					attributes: {
+						...nextBlock.attributes,
+						__internalWidgetId: widgetId,
+					},
+				};
 			} );
 
 			const seen = nextBlocks.map(
