@@ -626,16 +626,17 @@ export function* insertBlocks(
  * @param {?string} rootClientId Optional root client ID of block list on
  *                               which to insert.
  * @param {?number} index        Index at which block should be inserted.
- * @param {boolean} withInserter Wether or not to show an inserter button.
+ * @param {Object}  __unstableOptions Wether or not to show an inserter button.
  *
  * @return {Object} Action object.
  */
-export function showInsertionPoint( rootClientId, index, withInserter ) {
+export function showInsertionPoint( rootClientId, index, __unstableOptions ) {
+	const { __unstableWithInserter } = __unstableOptions;
 	return {
 		type: 'SHOW_INSERTION_POINT',
 		rootClientId,
 		index,
-		withInserter,
+		__unstableWithInserter,
 	};
 }
 

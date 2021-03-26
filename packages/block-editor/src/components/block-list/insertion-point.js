@@ -271,13 +271,15 @@ export default function useInsertionPoint( ref ) {
 
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
+		const _isInserterVisible = isBlockInsertionPointVisible();
 
 		return {
 			isMultiSelecting: _isMultiSelecting(),
-			isInserterVisible: isBlockInsertionPointVisible(),
+			isInserterVisible: _isInserterVisible,
 			selectedClientId: order[ insertionPoint.index - 1 ],
 			selectedRootClientId: insertionPoint.rootClientId,
-			isInserterShown: insertionPoint.withInserter,
+			isInserterShown:
+				_isInserterVisible && insertionPoint.__unstableWithInserter,
 		};
 	}, [] );
 
