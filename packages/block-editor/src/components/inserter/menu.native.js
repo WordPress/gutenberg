@@ -181,26 +181,26 @@ function InserterMenu( {
 		<BottomSheet
 			isVisible={ true }
 			onClose={ onClose }
-			hideHeader
+			header={
+				showSearchForm && (
+					<InserterSearchForm
+						onChange={ ( value ) => {
+							setFilterValue( value );
+						} }
+						value={ filterValue }
+						onLayout={ ( event ) => {
+							const { height } = event.nativeEvent.layout;
+							setSearchFormHeight( height );
+						} }
+					/>
+				)
+			}
 			hasNavigation
 			setMinHeightToMaxHeight={ showSearchForm }
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps, safeAreaBottomInset } ) => (
 					<View>
-						{ showSearchForm && (
-							<InserterSearchForm
-								onChange={ ( value ) => {
-									setFilterValue( value );
-								} }
-								value={ filterValue }
-								onLayout={ ( event ) => {
-									const { height } = event.nativeEvent.layout;
-									setSearchFormHeight( height );
-								} }
-							/>
-						) }
-
 						<InserterSearchResults
 							items={ getItems() }
 							onSelect={ ( item ) => {
