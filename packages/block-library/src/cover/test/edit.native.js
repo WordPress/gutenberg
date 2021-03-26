@@ -48,12 +48,11 @@ const attributes = {
 	url: 'mock-url',
 };
 
-let imageSize, isScreenReaderEnabled;
+let isScreenReaderEnabled;
 beforeAll( () => {
 	// Mock Image.getSize to avoid failed attempt to size non-existant image
 	const getSizeSpy = jest.spyOn( Image, 'getSize' );
-	imageSize = Promise.resolve( 300, 200 );
-	getSizeSpy.mockReturnValue( imageSize );
+	getSizeSpy.mockImplementation( ( _url, callback ) => callback( 300, 200 ) );
 
 	// Mock async native module to avoid act warning
 	isScreenReaderEnabled = Promise.resolve( true );
@@ -105,7 +104,6 @@ describe( 'when no media is attached', () => {
 			/>
 		);
 		fireEvent.press( getByText( 'Add image or video' ) );
-
 		const mediaLibraryButton = await findByText(
 			'WordPress Media Library'
 		);
