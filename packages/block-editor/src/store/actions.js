@@ -630,7 +630,11 @@ export function* insertBlocks(
  *
  * @return {Object} Action object.
  */
-export function showInsertionPoint( rootClientId, index, __unstableOptions ) {
+export function showInsertionPoint(
+	rootClientId,
+	index,
+	__unstableOptions = {}
+) {
 	const { __unstableWithInserter } = __unstableOptions;
 	return {
 		type: 'SHOW_INSERTION_POINT',
