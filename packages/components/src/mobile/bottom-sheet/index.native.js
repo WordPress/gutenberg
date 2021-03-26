@@ -58,6 +58,7 @@ class BottomSheet extends Component {
 		this.setIsFullScreen = this.setIsFullScreen.bind( this );
 
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
+		this.onHeaderLayout = this.onHeaderLayout.bind( this );
 		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
 		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
 			this
@@ -69,12 +70,14 @@ class BottomSheet extends Component {
 		this.keyboardWillShow = this.keyboardWillShow.bind( this );
 		this.keyboardDidHide = this.keyboardDidHide.bind( this );
 
+		this.headerHeight = 0;
+		this.keyboardHeight = 0;
+
 		this.state = {
 			safeAreaBottomInset: 0,
 			safeAreaTopInset: 0,
 			bounces: false,
 			maxHeight: 0,
-			keyboardHeight: 0,
 			scrollEnabled: true,
 			isScrolling: false,
 			handleClosingBottomSheet: null,
@@ -92,13 +95,13 @@ class BottomSheet extends Component {
 	keyboardWillShow( e ) {
 		const { height } = e.endCoordinates;
 
-		this.setState( { keyboardHeight: height }, () =>
-			this.onSetMaxHeight()
-		);
+		this.keyboardHeight = height;
+		this.onSetMaxHeight();
 	}
 
 	keyboardDidHide() {
-		this.setState( { keyboardHeight: 0 }, () => this.onSetMaxHeight() );
+		this.keyboardHeight = 0;
+		this.onSetMaxHeight();
 	}
 
 	componentDidMount() {
@@ -163,7 +166,7 @@ class BottomSheet extends Component {
 
 	onSetMaxHeight() {
 		const { height, width } = Dimensions.get( 'window' );
-		const { safeAreaBottomInset, keyboardHeight } = this.state;
+		const { safeAreaBottomInset } = this.state;
 		const statusBarHeight =
 			Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
@@ -171,8 +174,9 @@ class BottomSheet extends Component {
 		const maxHeightWithOpenKeyboard =
 			0.95 *
 			( Dimensions.get( 'window' ).height -
-				keyboardHeight -
-				statusBarHeight );
+				this.keyboardHeight -
+				statusBarHeight -
+				this.headerHeight );
 
 		// On horizontal mode `maxHeight` has to be set on 90% of width
 		if ( width > height ) {
@@ -193,6 +197,12 @@ class BottomSheet extends Component {
 	onDimensionsChange() {
 		this.onSetMaxHeight();
 		this.setState( { bounces: false } );
+	}
+
+	onHeaderLayout( { nativeEvent } ) {
+		const { height } = nativeEvent.layout;
+		this.headerHeight = height;
+		this.onSetMaxHeight();
 	}
 
 	isCloseToBottom( { layoutMeasurement, contentOffset, contentSize } ) {
@@ -437,10 +447,12 @@ class BottomSheet extends Component {
 					} }
 					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
-					{ ! ( Platform.OS === 'android' && isFullScreen ) && (
-						<View style={ styles.dragIndicator } />
-					) }
-					{ ! hideHeader && getHeader() }
+					<View onLayout={ this.onHeaderLayout }>
+						{ ! ( Platform.OS === 'android' && isFullScreen ) && (
+							<View style={ styles.dragIndicator } />
+						) }
+						{ ! hideHeader && getHeader() }
+					</View>
 					<WrapperView
 						{ ...( hasNavigation
 							? { style: listProps.style }
