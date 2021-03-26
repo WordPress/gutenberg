@@ -47,7 +47,7 @@ const inspectorOpenStateReducer = ( state, action ) => {
 	}
 };
 
-export default function SidebarBlockEditor( { sidebar } ) {
+export default function SidebarBlockEditor( { sidebar, inserter } ) {
 	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
 	const [
 		{ open: isInspectorOpened, busy: isInspectorAnimating },
@@ -56,7 +56,7 @@ export default function SidebarBlockEditor( { sidebar } ) {
 	const parentContainer = document.getElementById(
 		'customize-theme-controls'
 	);
-	const [ isInserterOpened, setIsInserterOpened ] = useInserter();
+	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
 	const settings = useMemo(
 		() => ( {
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
@@ -80,6 +80,7 @@ export default function SidebarBlockEditor( { sidebar } ) {
 							<BlockEditorKeyboardShortcuts />
 
 							<Header
+								inserter={ inserter }
 								isInserterOpened={ isInserterOpened }
 								setIsInserterOpened={ setIsInserterOpened }
 							/>

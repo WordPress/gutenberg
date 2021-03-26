@@ -8,11 +8,13 @@ import { render, unmountComponentAtNode } from '@wordpress/element';
  */
 import SidebarBlockEditor from './components/sidebar-block-editor';
 import SidebarAdapter from './components/sidebar-block-editor/sidebar-adapter';
-import { inserterId } from './components/inserter/use-inserter';
+import InserterOuterSection from './components/inserter/inserter-outer-section';
 
 const {
 	wp: { customize },
 } = window;
+
+const inserterId = 'widgets-inserter';
 
 class SidebarSection extends customize.Section {
 	onChangeExpanded( expanded, args ) {
@@ -26,6 +28,11 @@ class SidebarSection extends customize.Section {
 }
 
 class SidebarControl extends customize.Control {
+	ready() {
+		this.inserter = new InserterOuterSection( inserterId, {} );
+		customize.section.add( this.inserter );
+		this.render();
+	}
 	onChangeExpanded() {
 		this.render();
 	}
@@ -37,6 +44,7 @@ class SidebarControl extends customize.Control {
 			render(
 				<SidebarBlockEditor
 					sidebar={ new SidebarAdapter( this.setting, customize ) }
+					inserter={ this.inserter }
 				/>,
 				this.container[ 0 ]
 			);
@@ -44,18 +52,8 @@ class SidebarControl extends customize.Control {
 			unmountComponentAtNode( this.container[ 0 ] );
 
 			// Close the inserter when the section collapses.
-			customize.section.each( ( section ) => {
-				if (
-					section.params.type === 'outer' &&
-					section.id === inserterId
-				) {
-					section.collapse();
-				}
-			} );
+			this.inserter.close();
 		}
-	}
-	ready() {
-		this.render();
 	}
 }
 

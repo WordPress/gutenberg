@@ -11,9 +11,8 @@ import { plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import Inserter from '../inserter';
-import { useInserterContainer } from '../inserter/use-inserter';
 
-function Header( { isInserterOpened, setIsInserterOpened } ) {
+function Header( { inserter, isInserterOpened, setIsInserterOpened } ) {
 	return (
 		<>
 			<div className="customize-widgets-header">
@@ -40,7 +39,7 @@ function Header( { isInserterOpened, setIsInserterOpened } ) {
 
 			{ createPortal(
 				<Inserter setIsOpened={ setIsInserterOpened } />,
-				useInserterContainer()
+				inserter.contentContainer[ 0 ]
 			) }
 		</>
 	);
