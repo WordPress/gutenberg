@@ -265,10 +265,10 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 
 	const blockType = getBlockType( name );
 	let parentTitle;
-	const blockInformation = useBlockDisplayInformation( passedRootClientId );
-	if ( blockInformation !== null ) {
-		parentTitle = blockInformation.title
-			? blockInformation.title
+	const blockInformationRoot = useBlockDisplayInformation( passedRootClientId );
+	if ( blockInformationRoot !== null ) {
+		parentTitle = blockInformationRoot.title
+			? blockInformationRoot.title
 			: undefined;
 	}
 	const label = getAccessibleBlockLabel(
