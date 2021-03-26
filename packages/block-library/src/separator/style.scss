@@ -1,4 +1,6 @@
 .wp-block-separator {
+	border-top: 1px solid currentColor;
+	border-bottom: 1px solid currentColor;
 	// Default, thin style, is stored in theme.scss so it can be opted out of
 
 	// Wide style
@@ -13,7 +15,7 @@
 		background: none !important;
 		border: none;
 		text-align: center;
-		max-width: none;
+		width: none;
 		line-height: 1;
 		height: auto;
 
