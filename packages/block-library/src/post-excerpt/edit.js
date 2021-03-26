@@ -63,6 +63,14 @@ function PostExcerptEditor( {
 		} ),
 	} );
 
+	if ( ! postType || ! postId ) {
+		return (
+			<div { ...blockProps}>
+				<Warning>{ __( 'Post excerpt block: no post found.' ) }</Warning>
+			</div>
+		);
+	}
+
 	return (
 		<>
 			<BlockControls>
@@ -146,11 +154,6 @@ export default function PostExcerptEdit( {
 	isSelected,
 	context,
 } ) {
-	if ( ! context.postType || ! context.postId ) {
-		return (
-			<Warning>{ __( 'Post excerpt block: no post found.' ) }</Warning>
-		);
-	}
 	return (
 		<PostExcerptEditor
 			attributes={ attributes }
