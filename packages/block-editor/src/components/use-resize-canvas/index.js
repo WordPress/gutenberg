@@ -52,7 +52,7 @@ export default function useResizeCanvas(
 		return deviceWidth < actualWidth ? deviceWidth : actualWidth;
 	};
 
-	const marginValue = () => ( window.innerHeight < 800 ? 36 : 72 );
+	const marginValue = () => ( window.innerHeight < 800 ? 18 : 36 );
 
 	const contentInlineStyles = ( device ) => {
 		const height = device === 'Mobile' ? '768px' : '1024px';
@@ -67,6 +67,7 @@ export default function useResizeCanvas(
 					minHeight: height,
 					maxHeight: height,
 					overflowY: 'auto',
+					boxShadow: '0 1px 6px rgba(0, 0, 0, 0.4)',
 				};
 			default:
 				return null;
