@@ -17,6 +17,7 @@ import { store as blockEditorStore } from '../../store';
 function InserterLibrary( {
 	rootClientId,
 	clientId,
+	index,
 	isAppender,
 	showInserterHelpPanel,
 	showMostUsedBlocks = false,
@@ -24,22 +25,27 @@ function InserterLibrary( {
 	onSelect = noop,
 	shouldFocusBlock = false,
 } ) {
-	const destinationRootClientId = useSelect(
+	const { destinationRootClientId, destinationClientId } = useSelect(
 		( select ) => {
-			const { getBlockRootClientId } = select( blockEditorStore );
-
-			return (
-				rootClientId || getBlockRootClientId( clientId ) || undefined
+			const { getBlockRootClientId, getBlockOrder } = select(
+				blockEditorStore
 			);
+			const _destinationRootClientId =
+				rootClientId || getBlockRootClientId( clientId ) || undefined;
+			const order = getBlockOrder( _destinationRootClientId );
+			return {
+				destinationRootClientId: _destinationRootClientId,
+				destinationClientId: clientId || order[ index ],
+			};
 		},
-		[ clientId, rootClientId ]
+		[ clientId, rootClientId, index ]
 	);
 
 	return (
 		<InserterMenu
 			onSelect={ onSelect }
 			rootClientId={ destinationRootClientId }
-			clientId={ clientId }
+			clientId={ destinationClientId }
 			isAppender={ isAppender }
 			showInserterHelpPanel={ showInserterHelpPanel }
 			showMostUsedBlocks={ showMostUsedBlocks }
