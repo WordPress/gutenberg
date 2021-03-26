@@ -32,10 +32,7 @@
 	// Don't allow iframe to overflow it's container.
 	iframe {
 		max-width: 100%;
-	}
-
-	&:not(.wp-has-aspect-ratio) iframe {
-		width: auto;
+		width: 100%;
 	}
 }
 
