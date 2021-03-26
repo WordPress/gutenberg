@@ -2,7 +2,8 @@
  * External dependencies
  */
 import { css } from '@emotion/core';
-import styled from '@emotion/styled';
+import { styled } from '@wp-g2/styles';
+
 /**
  * Internal dependencies
  */

@@ -8,6 +8,7 @@ import { css, cx, ui, useResponsiveValue } from '@wp-g2/styles';
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -17,7 +18,38 @@ import * as styles from './styles';
 /**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} props
  */
+function getDirection( { isReversed, direction } ) {
+	if ( typeof isReversed !== 'undefined' ) {
+		deprecated( 'Flex isReversed', {
+			alternative: 'Flex direction="row-reverse"',
+			since: '10.4',
+		} );
+		if ( isReversed ) {
+			return 'row-reverse';
+		}
+
+		return 'row';
+	}
+
+	return direction;
+}
+
+/**
+ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} props
+ * @return {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} Cleaned props
+ */
+function useDeprecatedProps( props ) {
+	return {
+		...props,
+		direction: getDirection( props ),
+	};
+}
+
+/**
+ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} props
+ */
 export function useFlex( props ) {
+	const cleanedProps = useDeprecatedProps( props );
 	const {
 		align = 'center',
 		className,
@@ -27,7 +59,7 @@ export function useFlex( props ) {
 		justify = 'space-between',
 		wrap = false,
 		...otherProps
-	} = useContextSystem( props, 'Flex' );
+	} = useContextSystem( cleanedProps, 'Flex' );
 
 	const directionAsArray = Array.isArray( directionProp )
 		? directionProp

@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react';
 /**
  * Internal dependencies
  */
-import type { ResponsiveCSSValue } from '../utils/types';
+import type { ResponsiveCSSValue } from '../ui/utils/types';
 
 export type FlexDirection = ResponsiveCSSValue<
 	CSSProperties[ 'flexDirection' ]
@@ -61,6 +61,10 @@ export type FlexProps = {
 	 * @default false
 	 */
 	wrap?: boolean;
+	/**
+	 * @deprecated Use `direction` instead
+	 */
+	isReversed?: boolean;
 };
 
 export type FlexItemProps = {

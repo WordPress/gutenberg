@@ -29,7 +29,8 @@ export function useFlexItem( props ) {
 		styles.Item,
 		sx.Base,
 		isBlock && styles.block,
-		className
+		// If a className is passed in (i.e., by `useFlexBlock` use that to override the `flex__item` className)
+		className || 'components-flex__item'
 	);
 
 	return {

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import styled from '@emotion/styled';
+import { styled } from '@wp-g2/styles';
 
 /**
  * WordPress dependencies
@@ -11,7 +11,7 @@ import { HorizontalRule } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
-import Flex from '../../flex';
+import { Flex } from '../../flex';
 import { color, space } from '../../utils/style-mixins';
 
 export const styleProps = {

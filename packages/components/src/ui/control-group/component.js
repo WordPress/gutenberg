@@ -6,7 +6,7 @@ import { contextConnect } from '@wp-g2/context';
 /**
  * Internal dependencies
  */
-import { Flex } from '../flex';
+import { Flex } from '../../flex';
 import { Grid } from '../grid';
 import { useControlGroup } from './hook';
 

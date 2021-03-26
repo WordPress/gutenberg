@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import styled from '@emotion/styled';
+import { styled } from '@wp-g2/styles';
 
 /**
  * Internal dependencies
  */
-import Flex from '../../flex';
+import { Flex } from '../../flex';
 import BaseUnitControl from '../../unit-control';
 import { color } from '../../utils/style-mixins';
 

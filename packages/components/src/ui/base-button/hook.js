@@ -8,7 +8,7 @@ import { css, cx } from '@wp-g2/styles';
  * Internal dependencies
  */
 import { useControlGroupContext } from '../control-group';
-import { useFlex } from '../flex';
+import { useFlex } from '../../flex';
 import * as styles from './styles';
 
 /**

@@ -16,7 +16,7 @@ import { Icon, chevronDown } from '@wordpress/icons';
  */
 import { useButtonGroupContext } from '../button-group';
 import { Elevation } from '../elevation';
-import { FlexItem } from '../flex';
+import { FlexItem } from '../../flex';
 import { View } from '../view';
 import * as styles from './styles';
 import LoadingOverlay from './loading-overlay';

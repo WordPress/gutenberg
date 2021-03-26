@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Flex } from '../flex';
+import { Flex } from '../../flex';
 import { Spinner } from '../spinner';
 import * as styles from './styles';
 

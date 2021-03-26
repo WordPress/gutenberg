@@ -8,7 +8,7 @@ import { getValidChildren } from '@wp-g2/utils';
 /**
  * Internal dependencies
  */
-import { FlexItem, useFlex } from '../flex';
+import { FlexItem, useFlex } from '../../flex';
 import { getAlignmentProps } from './utils';
 
 /**

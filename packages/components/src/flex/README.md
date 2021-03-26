@@ -1,98 +1,65 @@
 # Flex
 
-Flex is a layout-based component, which provides a convenient way to align user-interfaces.
+`Flex` is a primitive layout component that adaptively aligns child content horizontally or vertically. `Flex` powers components like `HStack` and `VStack`.
 
 ## Usage
 
-```jsx
-import { Flex, FlexItem, FlexBlock } from '@wordpress/components';
-import { Icon, wordpress } from '@wordpress/icons';
+`Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
 
-const Example = () => {
+```jsx
+import { Flex, FlexItem, FlexBlock, Text } from '@wordpress/components/ui';
+
+function Example() {
 	return (
 		<Flex>
 			<FlexItem>
-				<Icon icon={ wordpress } />
+				<Text>Code</Text>
 			</FlexItem>
 			<FlexBlock>
-				<h2>WordPress</h2>
+				<Text>Poetry</Text>
 			</FlexBlock>
 		</Flex>
 	);
-};
+}
 ```
-
-The most common use-case for `<Flex />` would be to automatically align two (or more) child items of varying sizes. By default, `<Flex />` would vertically center align them, and evenly spread the inner content horizontally, starting at the edges.
-
-Child items can be added directly. However, it is recommended that they are wrapped with `<FlexItem />` (which helps normalize layout styles).
-
-![Flex aligning and distributing 2 items of varying heights](https://make.wordpress.org/design/files/2020/06/flex-2-items.png)
-
-Adding more than 2 child items will spread them across with even gaps in between each item.
-
-![Flex aligning 3 items](https://make.wordpress.org/design/files/2020/06/flex-3-items.png)
-
-### Items and Blocks
-
-`<Flex />` provides 2 sub-components:
-
--   `<FlexItem />`
--   `<FlexBlock />`
-
-These components can be used in combination to achieve flexible adaptive layouts.
-
-`<FlexBlock />` components will grow their widths to take up the remaining space within the `<Flex />` wrapper.
-
-![Flex item with block](https://make.wordpress.org/design/files/2020/06/flex-item-block.png)
-
-`<Flex />` automatically provides "gap" spacing in-between all child items. This value can be adjusted using the `gap` component prop.
-
-`<FlexItem />` and `<FlexBlock />` can be used in combination.
-
-![Multiple Flex items with Flex block](https://make.wordpress.org/design/files/2020/06/flex-item-block-item.png)
-
-## Sub-Components
-
-This component provides a collection of sub-component that can be used to compose various interfaces.
-
-### `FlexBlock`
-
-A layout component that expands to fit the remaining space of `Flex`.
-
-### `FlexItem`
-
-A layout component to contain items of a fixed width within `Flex`.
 
 ## Props
 
-### align
+##### align
 
-Vertically aligns children components using the CSS [`align-items`](https://developer.mozilla.org/en-US/docs/Web/CSS/align-items) property.
+**Type**: `CSS['alignItems']`
 
--   Type: `String`
--   Required: No
--   Default: `center`
+Aligns children using CSS Flexbox `align-items`. Vertically aligns content if the `direction` is `row`, or horizontally aligns content if the `direction` is `column`.
 
-### gap
+In the example below, `flex-start` will align the children content to the top.
 
-Determines the spacing in between children components. The `gap` value is a multiplier to the base value of `4`.
+##### direction
 
--   Type: `Number`
--   Required: No
--   Default: `2`
+**Type**: `FlexDirection`
 
-### isReversed
+The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
 
-Reverses the render order of children components.
+##### expanded
 
--   Type: `Boolean`
--   Required: No
--   Default: `false`
+**Type**: `boolean`
 
-### justify
+Expands to the maximum available width (if horizontal) or height (if vertical).
 
-Horizontally aligns children components using the CSS [`justify-content`](https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content) property.
+##### gap
 
--   Type: `String`
--   Required: No
--   Default: `space-between`
+**Type**: `number`
+
+Spacing in between each child can be adjusted by using `gap`. The value of `gap` works as a multiplier to the library's grid system (base of `4px`).
+
+##### justify
+
+**Type**: `CSS['justifyContent']`
+
+Horizontally aligns content if the `direction` is `row`, or vertically aligns content if the `direction` is `column`.
+In the example below, `flex-start` will align the children content to the left.
+
+##### wrap
+
+**Type**: `boolean`
+
+Determines if children should wrap.
