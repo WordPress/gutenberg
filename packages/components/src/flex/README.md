@@ -81,14 +81,6 @@ Determines the spacing in between children components. The `gap` value is a mult
 -   Required: No
 -   Default: `2`
 
-### isReversed
-
-Reverses the render order of children components.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
 ### justify
 
 Horizontally aligns children components using the CSS [`justify-content`](https://developer.mozilla.org/en-US/docs/Web/CSS/justify-content) property.

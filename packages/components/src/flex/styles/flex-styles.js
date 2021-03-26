@@ -48,14 +48,10 @@ const justifyStyle = ( { justify, isReversed } ) => {
 /**
  * @param {import('..').OwnProps} Props
  */
-const gapStyle = ( { gap, isReversed, direction } ) => {
-	const isVertical = direction === 'column';
+const gapStyle = ( { gap, direction } ) => {
 	const base = 4;
 	const value = typeof gap === 'number' ? base * gap : base;
-	let dir = isReversed ? 'left' : 'right';
-	if ( isVertical ) {
-		dir = isReversed ? 'top' : 'bottom';
-	}
+	const dir = getMarginDirection( direction );
 	const margin = `margin-${ dir }`;
 
 	return css`
@@ -70,13 +66,24 @@ const gapStyle = ( { gap, isReversed, direction } ) => {
 };
 
 /**
+ * @param {import('..').FlexDirection} direction
+ * @return {string} margin direction
+ */
+function getMarginDirection( direction ) {
+	const isVertical = direction?.includes( 'column' );
+	const isReversed = direction?.includes( '-reverse' );
+	if ( isVertical ) {
+		return isReversed ? 'top' : 'bottom';
+	}
+	return isReversed ? 'left' : 'right';
+}
+
+/**
  * @param {import('..').OwnProps} props
  */
-const directionStyles = ( { direction, isReversed } ) => {
-	const directionValue = isReversed ? `${ direction }-reverse` : direction;
-
+const directionStyles = ( { direction } ) => {
 	return css`
-		flex-direction: ${ directionValue };
+		flex-direction: ${ direction };
 	`;
 };
 

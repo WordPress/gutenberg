@@ -18,10 +18,8 @@ const FlexItem =
  * @param {import('./index').Props} props Current props.
  * @return {import('../ui/flex/types').FlexProps} Next props.
  */
-const flexAdapter = ( { isReversed, ...restProps } ) => ( {
-	// There's no equivalent for `direction` on the original component so we can just translate `isReversed` to it
-	direction: isReversed ? 'row-reverse' : 'row',
-	...restProps,
+const flexAdapter = ( props ) => ( {
+	...props,
 	// There's an HTML attribute named `wrap` that will exist in `restProps` so we need to set it to undefined so the default behavior of the next component takes over
 	wrap: undefined,
 } );
