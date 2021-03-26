@@ -103,7 +103,7 @@ const BlockNavigationBlockContents = forwardRef(
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
-							draggable={ draggable && __experimentalFeatures }
+							draggable={ draggable }
 							onDragStart={ onDragStart }
 							onDragEnd={ onDragEnd }
 							{ ...props }
@@ -118,7 +118,7 @@ const BlockNavigationBlockContents = forwardRef(
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }
 							level={ level }
-							draggable={ draggable && __experimentalFeatures }
+							draggable={ draggable }
 							onDragStart={ onDragStart }
 							onDragEnd={ onDragEnd }
 							{ ...props }
