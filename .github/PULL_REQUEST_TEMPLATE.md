@@ -23,4 +23,4 @@
 - [ ] I've tested my changes with keyboard and screen readers. <!-- Instructions: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/accessibility-testing.md -->
 - [ ] My code has proper inline documentation. <!-- Guidelines: https://developer.wordpress.org/coding-standards/inline-documentation-standards/javascript/ -->
 - [ ] I've included developer documentation if appropriate. <!-- Handbook: https://developer.wordpress.org/block-editor/ -->
-- [ ] I've updated all React Native files affected by any refactorings/renamings in this PR. <!-- React Native mobile Gutenberg guidelines: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/native-mobile.md -->
+- [ ] I've updated all React Native files affected by any refactorings/renamings in this PR (please manually search all `*.native.js` files for terms that need renaming or removal). <!-- React Native mobile Gutenberg guidelines: https://github.com/WordPress/gutenberg/blob/HEAD/docs/contributors/code/native-mobile.md -->
