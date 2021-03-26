@@ -1,59 +1,34 @@
 /**
- * External dependencies
- */
-import { pick } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { rawHandler } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
-import { getClipboard } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import BlockTypesList from '../block-types-list';
+import useClipboardBlock from './hooks/use-clipboard-block';
+import { store as blockEditorStore } from '../../store';
 
 const NON_BLOCK_CATEGORIES = [ 'reusable' ];
 
 function BlocksTab( { onSelect, rootClientId, listProps } ) {
+	const clipboardBlock = useClipboardBlock( rootClientId );
+
 	const { items } = useSelect(
 		( select ) => {
-			const { getInserterItems, canInsertBlockType } = select(
-				'core/block-editor'
-			);
-			const { getBlockType } = select( 'core/blocks' );
-
-			const clipboard = getClipboard();
-			const clipboardBlock =
-				clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
-			const shouldAddClipboardBlock =
-				clipboardBlock &&
-				canInsertBlockType( clipboardBlock.name, rootClientId );
+			const { getInserterItems } = select( blockEditorStore );
 
 			const allItems = getInserterItems( rootClientId );
 			const blockItems = allItems.filter(
 				( { category } ) => ! NON_BLOCK_CATEGORIES.includes( category )
 			);
 
-			// Add copied blocks in the clipboard as extra items
-			const blockItemsWithClipboard = shouldAddClipboardBlock
-				? [
-						{
-							...pick( getBlockType( clipboardBlock.name ), [
-								'name',
-								'icon',
-							] ),
-							id: 'clipboard',
-							initialAttributes: clipboardBlock.attributes,
-							innerBlocks: clipboardBlock.innerBlocks,
-						},
-						...blockItems,
-				  ]
-				: blockItems;
-
-			return { items: blockItemsWithClipboard };
+			return {
+				items: clipboardBlock
+					? [ clipboardBlock, ...blockItems ]
+					: blockItems,
+			};
 		},
 		[ rootClientId ]
 	);
