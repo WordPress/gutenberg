@@ -419,7 +419,7 @@ describe( 'Multi-block selection', () => {
 				},
 				{
 					// Move a bit outside the paragraph.
-					x: rect2.x - 10,
+					x: rect2.x - 5,
 					y: rect2.y + rect2.height / 2,
 				},
 			];
