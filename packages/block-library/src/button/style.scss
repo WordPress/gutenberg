@@ -15,6 +15,7 @@ $blocks-block__margin: 0.5em;
 	text-align: center;
 	text-decoration: none;
 	overflow-wrap: break-word;
+	box-sizing: border-box;
 
 	&:hover,
 	&:focus,
