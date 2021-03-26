@@ -10,7 +10,7 @@ import { View } from 'react-native';
 import {
 	BlockControls,
 	InnerBlocks,
-	JustifyToolbar,
+	JustifyContentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
@@ -121,8 +121,8 @@ export default function ButtonsEdit( {
 	return (
 		<>
 			{ isSelected && (
-				<BlockControls>
-					<JustifyToolbar
+				<BlockControls group="block">
+					<JustifyContentControl
 						allowedControls={ justifyControls }
 						value={ contentJustification }
 						onChange={ ( value ) =>

@@ -68,16 +68,14 @@ export function useFocusFirstElement( clientId ) {
 			return;
 		}
 
+		if ( ! ref.current ) {
+			return;
+		}
+
 		const { ownerDocument } = ref.current;
 
-		// Focus is captured by the wrapper node, so while focus transition
-		// should only consider tabbables within editable display, since it
-		// may be the wrapper itself or a side control which triggered the
-		// focus event, don't unnecessary transition to an inner tabbable.
-		if (
-			ownerDocument.activeElement &&
-			isInsideRootBlock( ref.current, ownerDocument.activeElement )
-		) {
+		// Do not focus the block if it already contains the active element.
+		if ( ref.current.contains( ownerDocument.activeElement ) ) {
 			return;
 		}
 

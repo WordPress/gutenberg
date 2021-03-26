@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { getBlockType } from '@wordpress/blocks';
 import { Fill, Slot, VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import {
 	Children,
 	cloneElement,
@@ -24,12 +25,17 @@ import BlockIcon from '../block-icon';
 import { BlockListBlockContext } from '../block-list/block';
 import BlockNavigationBlockSelectButton from './block-select-button';
 import { getBlockPositionDescription } from './utils';
+import { store as blockEditorStore } from '../../store';
 
 const getSlotName = ( clientId ) => `BlockNavigationBlock-${ clientId }`;
 
 function BlockNavigationBlockSlot( props, ref ) {
-	const instanceId = useInstanceId( BlockNavigationBlockSlot );
 	const { clientId } = props.block;
+	const { name } = useSelect(
+		( select ) => select( blockEditorStore ).getBlockName( clientId ),
+		[ clientId ]
+	);
+	const instanceId = useInstanceId( BlockNavigationBlockSlot );
 
 	return (
 		<Slot name={ getSlotName( clientId ) }>
@@ -45,7 +51,6 @@ function BlockNavigationBlockSlot( props, ref ) {
 
 				const {
 					className,
-					block,
 					isSelected,
 					position,
 					siblingBlockCount,
@@ -54,7 +59,6 @@ function BlockNavigationBlockSlot( props, ref ) {
 					onFocus,
 				} = props;
 
-				const { name } = block;
 				const blockType = getBlockType( name );
 				const descriptionId = `block-navigation-block-slot__${ instanceId }`;
 				const blockPositionDescription = getBlockPositionDescription(

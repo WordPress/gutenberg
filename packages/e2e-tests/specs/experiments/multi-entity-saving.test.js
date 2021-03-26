@@ -7,7 +7,6 @@ import {
 	publishPost,
 	trashAllPosts,
 	activateTheme,
-	canvas,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -21,7 +20,7 @@ describe( 'Multi-entity save flow', () => {
 	const checkboxInputSelector = '.components-checkbox-control__input';
 	const entitiesSaveSelector = '.editor-entities-saved-states__save-button';
 	const templatePartSelector = '*[data-type="core/template-part"]';
-	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-block-list__layout`;
+	const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector =
 		'.editor-post-publish-panel__header-cancel-button button';
@@ -187,11 +186,14 @@ describe( 'Multi-entity save flow', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( 'Index' );
-			await navigationPanel.close();
 
-			// Click the first block so that the template part inserts in the right place.
-			const firstBlock = await canvas().$( '.wp-block' );
-			await firstBlock.click();
+			// Select the header template part via list view.
+			await page.click( 'button[aria-label="List View"]' );
+			const headerTemplatePartListViewButton = await page.waitForXPath(
+				'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
+			);
+			headerTemplatePartListViewButton.click();
+			await page.click( 'button[aria-label="Close list view sidebar"]' );
 
 			// Insert something to dirty the editor.
 			await insertBlock( 'Paragraph' );

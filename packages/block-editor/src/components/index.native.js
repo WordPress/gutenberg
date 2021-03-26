@@ -10,15 +10,21 @@ export {
 } from './block-controls';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
 export { default as BlockIcon } from './block-icon';
-export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
+export {
+	BlockVerticalAlignmentToolbar,
+	BlockVerticalAlignmentControl,
+} from './block-vertical-alignment-control';
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
-export { default as AlignmentToolbar } from './alignment-toolbar';
+export { AlignmentControl, AlignmentToolbar } from './alignment-control';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
-export { default as JustifyToolbar } from './justify-toolbar';
+export {
+	JustifyToolbar,
+	JustifyContentControl,
+} from './justify-content-control';
 export { default as LineHeightControl } from './line-height-control';
 export { default as PlainText } from './plain-text';
 export {

@@ -5,6 +5,21 @@ import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { useDispatch } from '@wordpress/data';
 
+/**
+ * External dependencies
+ */
+import { merge } from 'lodash';
+
+const locationsForMenuId = ( menuLocationsByName, id ) =>
+	Object.values( menuLocationsByName )
+		.filter( ( { menu } ) => menu === id )
+		.map( ( { name } ) => name );
+
+const withLocations = ( menuLocationsByName ) => ( id ) => ( {
+	id,
+	locations: locationsForMenuId( menuLocationsByName, id ),
+} );
+
 export default function useMenuLocations() {
 	const [ menuLocationsByName, setMenuLocationsByName ] = useState( null );
 
@@ -14,7 +29,7 @@ export default function useMenuLocations() {
 		const fetchMenuLocationsByName = async () => {
 			const newMenuLocationsByName = await apiFetch( {
 				method: 'GET',
-				path: '/__experimental/menu-locations',
+				path: '/__experimental/menu-locations/',
 			} );
 
 			if ( isMounted ) {
@@ -23,7 +38,6 @@ export default function useMenuLocations() {
 		};
 
 		fetchMenuLocationsByName();
-
 		return () => ( isMounted = false );
 	}, [] );
 
@@ -33,50 +47,36 @@ export default function useMenuLocations() {
 		async ( locationName, newMenuId ) => {
 			const oldMenuId = menuLocationsByName[ locationName ].menu;
 
-			const newMenuLocationsByName = {
-				...menuLocationsByName,
-				[ locationName ]: {
-					...menuLocationsByName[ locationName ],
-					menu: newMenuId,
-				},
-			};
+			const newMenuLocationsByName = merge( menuLocationsByName, {
+				[ locationName ]: { menu: newMenuId },
+			} );
 
 			setMenuLocationsByName( newMenuLocationsByName );
 
-			const promises = [];
-
-			if ( oldMenuId ) {
-				promises.push(
-					saveMenu( {
-						id: oldMenuId,
-						locations: Object.values( newMenuLocationsByName )
-							.filter( ( { menu } ) => menu === oldMenuId )
-							.map( ( { name } ) => name ),
-					} )
-				);
-			}
-
-			if ( newMenuId ) {
-				promises.push(
-					saveMenu( {
-						id: newMenuId,
-						locations: Object.values( newMenuLocationsByName )
-							.filter( ( { menu } ) => menu === newMenuId )
-							.map( ( { name } ) => name ),
-					} )
-				);
-			}
-
-			await Promise.all( promises );
+			[ oldMenuId, newMenuId ]
+				.filter( Boolean )
+				.map( withLocations( newMenuLocationsByName ) )
+				.forEach( saveMenu );
 		},
 		[ menuLocationsByName ]
 	);
 
+	const toggleMenuLocationAssignment = ( locationName, newMenuId ) => {
+		const idToSet =
+			menuLocationsByName[ locationName ].menu === newMenuId
+				? 0
+				: newMenuId;
+		assignMenuToLocation( locationName, idToSet );
+	};
+
 	const menuLocations = useMemo(
-		() =>
-			menuLocationsByName ? Object.values( menuLocationsByName ) : null,
+		() => Object.values( menuLocationsByName || {} ),
 		[ menuLocationsByName ]
 	);
 
-	return [ menuLocations, assignMenuToLocation ];
+	return {
+		menuLocations,
+		assignMenuToLocation,
+		toggleMenuLocationAssignment,
+	};
 }

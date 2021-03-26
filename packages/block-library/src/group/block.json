@@ -12,10 +12,7 @@
 		}
 	},
 	"supports": {
-		"align": [
-			"wide",
-			"full"
-		],
+		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,
 		"color": {
@@ -30,7 +27,8 @@
 			"radius": true,
 			"style": true,
 			"width": true
-		}
+		},
+		"__experimentalLayout": true
 	},
 	"editorStyle": "wp-block-group-editor",
 	"style": "wp-block-group"

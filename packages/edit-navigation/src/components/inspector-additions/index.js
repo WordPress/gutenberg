@@ -7,13 +7,22 @@ import { InspectorControls } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import AutoAddPagesPanel from './auto-add-pages-panel';
-import DeleteMenuPanel from './delete-menu-panel';
+import AutoAddPages from './auto-add-pages';
+import DeleteMenu from './delete-menu';
+import ManageLocations from './manage-locations';
 import { NameEditor } from '../name-editor';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function InspectorAdditions( { menuId, onDeleteMenu } ) {
+export default function InspectorAdditions( {
+	menuId,
+	menus,
+	onDeleteMenu,
+	onSelectMenu,
+	isManageLocationsModalOpen,
+	closeManageLocationsModal,
+	openManageLocationsModal,
+} ) {
 	const selectedBlock = useSelect(
 		( select ) => select( 'core/block-editor' ).getSelectedBlock(),
 		[]
@@ -25,10 +34,20 @@ export default function InspectorAdditions( { menuId, onDeleteMenu } ) {
 
 	return (
 		<InspectorControls>
-			<PanelBody title={ __( 'Menu Settings' ) }>
+			<PanelBody title={ __( 'Menu settings' ) }>
 				<NameEditor />
-				<AutoAddPagesPanel menuId={ menuId } />
-				<DeleteMenuPanel onDeleteMenu={ onDeleteMenu } />
+				<AutoAddPages menuId={ menuId } />
+				<DeleteMenu onDeleteMenu={ onDeleteMenu } />
+			</PanelBody>
+			<PanelBody title={ __( 'Theme locations' ) }>
+				<ManageLocations
+					menus={ menus }
+					selectedMenuId={ menuId }
+					onSelectMenu={ onSelectMenu }
+					isModalOpen={ isManageLocationsModalOpen }
+					closeModal={ closeManageLocationsModal }
+					openModal={ openManageLocationsModal }
+				/>
 			</PanelBody>
 		</InspectorControls>
 	);
