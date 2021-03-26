@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Card, CardBody } from '@wordpress/components';
+import { Card, CardBody, NavigableMenu } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -22,10 +22,12 @@ export default function UnselectedMenuState( {
 			<Card>
 				<CardBody>
 					{ showMenuSwitcher ? (
-						<MenuSwitcher
-							onSelectMenu={ onSelectMenu }
-							menus={ menus }
-						/>
+						<NavigableMenu>
+							<MenuSwitcher
+								onSelectMenu={ onSelectMenu }
+								menus={ menus }
+							/>
+						</NavigableMenu>
 					) : (
 						<AddMenu
 							onCreate={ onCreate }
