@@ -372,15 +372,11 @@ class VideoEdit extends Component {
 }
 
 export default compose( [
-	withSelect( ( select, { clientId } ) => {
-		const { wasBlockJustInserted } = select( blockEditorStore );
-
-		return {
-			wasBlockJustInserted: wasBlockJustInserted(
-				clientId,
-				'inserter_menu'
-			),
-		};
-	} ),
+	withSelect( ( select, { clientId } ) => ( {
+		wasBlockJustInserted: select( blockEditorStore ).wasBlockJustInserted(
+			clientId,
+			'inserter_menu'
+		),
+	} ) ),
 	withPreferredColorScheme,
 ] )( VideoEdit );
