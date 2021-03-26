@@ -17,6 +17,7 @@ import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import useBlockDropZone from '../use-block-drop-zone';
 import useInsertionPoint from './insertion-point';
+import { useInBetweenInserter } from './use-in-between-inserter';
 import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
@@ -53,7 +54,11 @@ export default function BlockList( { className, __experimentalLayout } ) {
 			{ insertionPoint }
 			<BlockPopover />
 			<div
-				ref={ useMergeRefs( [ ref, useBlockDropZone() ] ) }
+				ref={ useMergeRefs( [
+					ref,
+					useBlockDropZone(),
+					useInBetweenInserter(),
+				] ) }
 				className={ classnames(
 					'block-editor-block-list__layout is-root-container',
 					className,
