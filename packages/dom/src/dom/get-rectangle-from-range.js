@@ -20,7 +20,6 @@ export default function getRectangleFromRange( range ) {
 
 	const { startContainer } = range;
 	const { ownerDocument } = startContainer;
-	assertIsDefined( ownerDocument );
 
 	// Correct invalid "BR" ranges. The cannot contain any children.
 	if ( startContainer.nodeName === 'BR' ) {
@@ -30,6 +29,7 @@ export default function getRectangleFromRange( range ) {
 			parentNode.childNodes
 		) ).indexOf( startContainer );
 
+		assertIsDefined( ownerDocument );
 		range = ownerDocument.createRange();
 		range.setStart( parentNode, index );
 		range.setEnd( parentNode, index );
@@ -43,6 +43,7 @@ export default function getRectangleFromRange( range ) {
 	//
 	// See: https://stackoverflow.com/a/6847328/995445
 	if ( ! rect ) {
+		assertIsDefined( ownerDocument );
 		const padNode = ownerDocument.createTextNode( '\u200b' );
 		assertIsDefined( padNode.parentNode );
 		// Do not modify the live range.
