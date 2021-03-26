@@ -8,33 +8,6 @@
  * Notices & Block Selected/Hover Styles.
  */
 
-.block-editor-block-list__layout .block-editor-block-list__block,
-.block-editor-block-list__layout .block-list-appender {
-	position: relative;
-
-	// Between-blocks dropzone line indicator.
-	&.is-drop-target::before {
-		content: "";
-		position: absolute;
-		z-index: 0;
-		pointer-events: none;
-		transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
-		top: -$default-block-margin / 2;
-		right: 0;
-		left: 0;
-		border-top: 4px solid var(--wp-admin-theme-color);
-	}
-
-	&.is-drop-target.is-dropping-horizontally::before {
-		top: 0;
-		bottom: 0;
-		// Drop target border-width plus a couple of pixels so that the border looks between blocks.
-		left: -6px;
-		border-top: none;
-		border-left: 4px solid var(--wp-admin-theme-color);
-	}
-}
-
 /**
  * Cross-Block Selection
  */
