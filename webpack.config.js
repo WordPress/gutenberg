@@ -1,277 +1,130 @@
-/**
- * External dependencies
- */
-const { BundleAnalyzerPlugin } = require( 'webpack-bundle-analyzer' );
-const { DefinePlugin } = require( 'webpack' );
-const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
-const TerserPlugin = require( 'terser-webpack-plugin' );
-const postcss = require( 'postcss' );
-const { get, escapeRegExp, compact } = require( 'lodash' );
-const { basename, sep } = require( 'path' );
-
-/**
- * WordPress dependencies
- */
-const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-webpack-plugin' );
-const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
-const DependencyExtractionWebpackPlugin = require( '@wordpress/dependency-extraction-webpack-plugin' );
 const {
-	camelCaseDash,
-} = require( '@wordpress/dependency-extraction-webpack-plugin/lib/util' );
-
-/**
- * Internal dependencies
- */
-const { dependencies } = require( './package' );
-
-const {
-	NODE_ENV: mode = 'development',
-	WP_DEVTOOL: devtool = mode === 'production' ? false : 'source-map',
-} = process.env;
-
-const WORDPRESS_NAMESPACE = '@wordpress/';
-const BUNDLED_PACKAGES = [ '@wordpress/icons', '@wordpress/interface' ];
-
-const gutenbergPackages = Object.keys( dependencies )
-	.filter(
-		( packageName ) =>
-			! BUNDLED_PACKAGES.includes( packageName ) &&
-			packageName.startsWith( WORDPRESS_NAMESPACE ) &&
-			! packageName.startsWith( WORDPRESS_NAMESPACE + 'react-native' )
-	)
-	.map( ( packageName ) => packageName.replace( WORDPRESS_NAMESPACE, '' ) );
-
-const stylesTransform = ( content ) => {
-	if ( mode === 'production' ) {
-		return postcss( [
-			require( 'cssnano' )( {
-				preset: [
-					'default',
-					{
-						discardComments: {
-							removeAll: true,
-						},
-					},
-				],
-			} ),
-		] )
-			.process( content, {
-				from: 'src/app.css',
-				to: 'dest/app.css',
-			} )
-			.then( ( result ) => result.css );
-	}
-	return content;
-};
-
+    BundleAnalyzerPlugin: BundleAnalyzerPlugin
+} = require("webpack-bundle-analyzer"), {
+    DefinePlugin: DefinePlugin
+} = require("webpack"), CopyWebpackPlugin = require("copy-webpack-plugin"), TerserPlugin = require("terser-webpack-plugin"), postcss = require("postcss"), {
+    get: get,
+    escapeRegExp: escapeRegExp,
+    compact: compact
+} = require("lodash"), {
+    basename: basename,
+    sep: sep
+} = require("path"), CustomTemplatedPathPlugin = require("@wordpress/custom-templated-path-webpack-plugin"), LibraryExportDefaultPlugin = require("@wordpress/library-export-default-webpack-plugin"), DependencyExtractionWebpackPlugin = require("@wordpress/dependency-extraction-webpack-plugin"), {
+    camelCaseDash: camelCaseDash
+} = require("@wordpress/dependency-extraction-webpack-plugin/lib/util"), {
+    dependencies: dependencies
+} = require("./package"), {
+    NODE_ENV: mode = "development",
+    WP_DEVTOOL: devtool = "production" !== mode && "source-map"
+} = process.env, WORDPRESS_NAMESPACE = "@wordpress/", BUNDLED_PACKAGES = ["@wordpress/icons", "@wordpress/interface"], gutenbergPackages = Object.keys(dependencies).filter(e => !BUNDLED_PACKAGES.includes(e) && e.startsWith("@wordpress/") && !e.startsWith("@wordpress/react-native")).map(e => e.replace("@wordpress/", "")), stylesTransform = e => "production" === mode ? postcss([require("cssnano")({
+    preset: ["default", {
+        discardComments: {
+            removeAll: !0
+        }
+    }]
+})]).process(e, {
+    from: "src/app.css",
+    to: "dest/app.css"
+}).then(e => e.css) : e;
 module.exports = {
-	optimization: {
-		// Only concatenate modules in production, when not analyzing bundles.
-		concatenateModules:
-			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
-		minimizer: [
-			new TerserPlugin( {
-				cache: true,
-				parallel: true,
-				sourceMap: mode !== 'production',
-				terserOptions: {
-					output: {
-						comments: /translators:/i,
-					},
-					compress: {
-						passes: 2,
-					},
-					mangle: {
-						reserved: [ '__', '_n', '_nx', '_x' ],
-					},
-				},
-				extractComments: false,
-			} ),
-		],
-	},
-	mode,
-	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
-		const name = camelCaseDash( packageName );
-		memo[ name ] = `./packages/${ packageName }`;
-		return memo;
-	}, {} ),
-	output: {
-		devtoolNamespace: 'wp',
-		filename: './build/[basename]/index.js',
-		path: __dirname,
-		library: [ 'wp', '[name]' ],
-		libraryTarget: 'window',
-	},
-	module: {
-		rules: compact( [
-			mode !== 'production' && {
-				test: /\.js$/,
-				use: require.resolve( 'source-map-loader' ),
-				enforce: 'pre',
-			},
-		] ),
-	},
-	plugins: [
-		// The WP_BUNDLE_ANALYZER global variable enables a utility that represents bundle
-		// content as a convenient interactive zoomable treemap.
-		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
-		new DefinePlugin( {
-			// Inject the `GUTENBERG_PHASE` global, used for feature flagging.
-			'process.env.GUTENBERG_PHASE': JSON.stringify(
-				parseInt(
-					process.env.npm_package_config_GUTENBERG_PHASE,
-					10
-				) || 1
-			),
-			// Inject the `COMPONENT_SYSTEM_PHASE` global, used for controlling Component System roll-out.
-			'process.env.COMPONENT_SYSTEM_PHASE': JSON.stringify(
-				parseInt(
-					process.env.npm_package_config_COMPONENT_SYSTEM_PHASE,
-					10
-				) || 0
-			),
-			'process.env.FORCE_REDUCED_MOTION': JSON.stringify(
-				process.env.FORCE_REDUCED_MOTION
-			),
-		} ),
-		new CustomTemplatedPathPlugin( {
-			basename( path, data ) {
-				let rawRequest;
-
-				const entryModule = get( data, [ 'chunk', 'entryModule' ], {} );
-				switch ( entryModule.type ) {
-					case 'javascript/auto':
-						rawRequest = entryModule.rawRequest;
-						break;
-
-					case 'javascript/esm':
-						rawRequest = entryModule.rootModule.rawRequest;
-						break;
-				}
-
-				if ( rawRequest ) {
-					return basename( rawRequest );
-				}
-
-				return path;
-			},
-		} ),
-		new LibraryExportDefaultPlugin(
-			[
-				'api-fetch',
-				'deprecated',
-				'dom-ready',
-				'redux-routine',
-				'token-list',
-				'server-side-render',
-				'shortcode',
-				'warning',
-			].map( camelCaseDash )
-		),
-		new CopyWebpackPlugin(
-			gutenbergPackages.map( ( packageName ) => ( {
-				from: `./packages/${ packageName }/build-style/*.css`,
-				to: `./build/${ packageName }/`,
-				flatten: true,
-				transform: stylesTransform,
-			} ) )
-		),
-		new CopyWebpackPlugin( [
-			{
-				from: './packages/block-library/build-style/*/style.css',
-				test: new RegExp(
-					`([\\w-]+)${ escapeRegExp( sep ) }style\\.css$`
-				),
-				to: 'build/block-library/blocks/[1]/style.css',
-				transform: stylesTransform,
-			},
-			{
-				from: './packages/block-library/build-style/*/style-rtl.css',
-				test: new RegExp(
-					`([\\w-]+)${ escapeRegExp( sep ) }style-rtl\\.css$`
-				),
-				to: 'build/block-library/blocks/[1]/style-rtl.css',
-				transform: stylesTransform,
-			},
-			{
-				from: './packages/block-library/build-style/*/editor.css',
-				test: new RegExp(
-					`([\\w-]+)${ escapeRegExp( sep ) }editor\\.css$`
-				),
-				to: 'build/block-library/blocks/[1]/editor.css',
-				transform: stylesTransform,
-			},
-			{
-				from: './packages/block-library/build-style/*/editor-rtl.css',
-				test: new RegExp(
-					`([\\w-]+)${ escapeRegExp( sep ) }editor-rtl\\.css$`
-				),
-				to: 'build/block-library/blocks/[1]/editor-rtl.css',
-				transform: stylesTransform,
-			},
-		] ),
-		new CopyWebpackPlugin(
-			Object.entries( {
-				'./packages/block-library/src/': 'build/block-library/blocks/',
-				'./packages/edit-widgets/src/blocks/':
-					'build/edit-widgets/blocks/',
-			} ).flatMap( ( [ from, to ] ) => [
-				{
-					from: `${ from }/**/index.php`,
-					test: new RegExp(
-						`([\\w-]+)${ escapeRegExp( sep ) }index\\.php$`
-					),
-					to: `${ to }/[1].php`,
-					transform: ( content ) => {
-						content = content.toString();
-
-						// Within content, search for any function definitions. For
-						// each, replace every other reference to it in the file.
-						return (
-							content
-								.match( /^function [^\(]+/gm )
-								.reduce( ( result, functionName ) => {
-									// Trim leading "function " prefix from match.
-									functionName = functionName.slice( 9 );
-
-									// Prepend the Gutenberg prefix, substituting any
-									// other core prefix (e.g. "wp_").
-									return result.replace(
-										new RegExp( functionName, 'g' ),
-										( match ) =>
-											'gutenberg_' +
-											match.replace( /^wp_/, '' )
-									);
-								}, content )
-								// The core blocks override procedure takes place in
-								// the init action default priority to ensure that core
-								// blocks would have been registered already. Since the
-								// blocks implementations occur at the default priority
-								// and due to WordPress hooks behavior not considering
-								// mutations to the same priority during another's
-								// callback, the Gutenberg build blocks are modified
-								// to occur at a later priority.
-								.replace(
-									/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/,
-									'$1, 20'
-								)
-						);
-					},
-				},
-				{
-					from: `${ from }/*/block.json`,
-					test: new RegExp(
-						`([\\w-]+)${ escapeRegExp( sep ) }block\\.json$`
-					),
-					to: `${ to }/[1]/block.json`,
-				},
-			] )
-		),
-		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
-	].filter( Boolean ),
-	watchOptions: {
-		ignored: '!packages/*/!(src)/**/*',
-		aggregateTimeout: 500,
-	},
-	devtool,
+    optimization: {
+        concatenateModules: "production" === mode && !process.env.WP_BUNDLE_ANALYZER,
+        minimizer: [new TerserPlugin({
+            cache: !0,
+            parallel: !0,
+            sourceMap: "production" !== mode,
+            terserOptions: {
+                output: {
+                    comments: /translators:/i
+                },
+                compress: {
+                    passes: 2
+                },
+                mangle: {
+                    reserved: ["__", "_n", "_nx", "_x"]
+                }
+            },
+            extractComments: !1
+        })]
+    },
+    mode: mode,
+    entry: gutenbergPackages.reduce((e, s) => {
+        return e[camelCaseDash(s)] = `./packages/${s}`, e
+    }, {}),
+    output: {
+        devtoolNamespace: "wp",
+        filename: "./build/[basename]/index.js",
+        path: __dirname,
+        library: ["wp", "[name]"],
+        libraryTarget: "window"
+    },
+    module: {
+        rules: compact(["production" !== mode && {
+            test: /\.js$/,
+            use: require.resolve("source-map-loader"),
+            enforce: "pre"
+        }])
+    },
+    plugins: [process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin, new DefinePlugin({
+        "process.env.GUTENBERG_PHASE": JSON.stringify(parseInt(process.env.npm_package_config_GUTENBERG_PHASE, 10) || 1),
+        "process.env.COMPONENT_SYSTEM_PHASE": JSON.stringify(parseInt(process.env.npm_package_config_COMPONENT_SYSTEM_PHASE, 10) || 0),
+        "process.env.FORCE_REDUCED_MOTION": JSON.stringify(process.env.FORCE_REDUCED_MOTION)
+    }), new CustomTemplatedPathPlugin({
+        basename(e, s) {
+            let r;
+            const t = get(s, ["chunk", "entryModule"], {});
+            switch (t.type) {
+                case "javascript/auto":
+                    r = t.rawRequest;
+                    break;
+                case "javascript/esm":
+                    r = t.rootModule.rawRequest
+            }
+            return r ? basename(r) : e
+        }
+    }), new LibraryExportDefaultPlugin(["api-fetch", "deprecated", "dom-ready", "redux-routine", "token-list", "server-side-render", "shortcode", "warning"].map(camelCaseDash)), new CopyWebpackPlugin(gutenbergPackages.map(e => ({
+        from: `./packages/${e}/build-style/*.css`,
+        to: `./build/${e}/`,
+        flatten: !0,
+        transform: stylesTransform
+    }))), new CopyWebpackPlugin([{
+        from: "./packages/block-library/build-style/*/style.css",
+        test: new RegExp(`([\\w-]+)${escapeRegExp(sep)}style\\.css$`),
+        to: "build/block-library/blocks/[1]/style.css",
+        transform: stylesTransform
+    }, {
+        from: "./packages/block-library/build-style/*/style-rtl.css",
+        test: new RegExp(`([\\w-]+)${escapeRegExp(sep)}style-rtl\\.css$`),
+        to: "build/block-library/blocks/[1]/style-rtl.css",
+        transform: stylesTransform
+    }, {
+        from: "./packages/block-library/build-style/*/editor.css",
+        test: new RegExp(`([\\w-]+)${escapeRegExp(sep)}editor\\.css$`),
+        to: "build/block-library/blocks/[1]/editor.css",
+        transform: stylesTransform
+    }, {
+        from: "./packages/block-library/build-style/*/editor-rtl.css",
+        test: new RegExp(`([\\w-]+)${escapeRegExp(sep)}editor-rtl\\.css$`),
+        to: "build/block-library/blocks/[1]/editor-rtl.css",
+        transform: stylesTransform
+    }]), new CopyWebpackPlugin(Object.entries({
+        "./packages/block-library/src/": "build/block-library/blocks/",
+        "./packages/edit-widgets/src/blocks/": "build/edit-widgets/blocks/"
+    }).flatMap(([e, s]) => [{
+        from: `${e}/**/index.php`,
+        test: new RegExp(`([\\w-]+)${escapeRegExp(sep)}index\\.php$`),
+        to: `${s}/[1].php`,
+        transform: e => (e = e.toString()).match(/^function [^\(]+/gm).reduce((e, s) => (s = s.slice(9), e.replace(new RegExp(s, "g"), e => "gutenberg_" + e.replace(/^wp_/, ""))), e).replace(/(add_action\(\s*'init',\s*'gutenberg_register_block_[^']+'(?!,))/, "$1, 20")
+    }, {
+        from: `${e}/*/block.json`,
+        test: new RegExp(`([\\w-]+)${escapeRegExp(sep)}block\\.json$`),
+        to: `${s}/[1]/block.json`
+    }])), new DependencyExtractionWebpackPlugin({
+        injectPolyfill: !0
+    })].filter(Boolean),
+    watchOptions: {
+        ignored: "!packages/*/!(src)/**/*",
+        aggregateTimeout: 500
+    },
+    devtool: devtool
 };
