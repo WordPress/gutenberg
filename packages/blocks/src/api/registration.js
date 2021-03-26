@@ -311,6 +311,46 @@ export function registerBlockType( name, settings ) {
 }
 
 /**
+ * Registers a new block provided from metadata stored in `block.json` file.
+ * It uses `registerBlockType` internally.
+ *
+ * @see registerBlockType
+ *
+ * @param {Object} metadata           Block metadata loaded from `block.json`.
+ * @param {string} metadata.name      Block name.
+ * @param {Object} additionalSettings Additional block settings.
+ *
+ * @return {?WPBlock} The block, if it has been successfully registered;
+ *                    otherwise `undefined`.
+ */
+export function registerBlockTypeFromMetadata(
+	{ name, ...metadata },
+	additionalSettings
+) {
+	const allowedFields = [
+		'title',
+		'category',
+		'parent',
+		'icon',
+		'description',
+		'keywords',
+		'attributes',
+		'providesContext',
+		'usesContext',
+		'supports',
+		'styles',
+		'example',
+		'apiVersion',
+	];
+
+	unstable__bootstrapServerSideBlockDefinitions( {
+		[ name ]: pick( metadata, allowedFields ),
+	} );
+
+	return registerBlockType( name, additionalSettings );
+}
+
+/**
  * Registers a new block collection to group blocks in the same namespace in the inserter.
  *
  * @param {string} namespace       The namespace to group blocks by in the inserter; corresponds to the block namespace.
