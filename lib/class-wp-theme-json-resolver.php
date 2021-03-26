@@ -140,15 +140,38 @@ class WP_Theme_JSON_Resolver {
 	/**
 	 * Returns a data structure used in theme.json translation.
 	 *
-	 * @return array An array of theme.json paths that are translatable and the keys that are translatable
+	 * @return array An array of theme.json fields that are translatable and the keys that are translatable
 	 */
-	public static function get_presets_to_translate() {
+	public static function get_fields_to_translate() {
 		static $theme_json_i18n = null;
 		if ( null === $theme_json_i18n ) {
 			$file_structure  = self::read_json_file( __DIR__ . '/experimental-i18n-theme.json' );
 			$theme_json_i18n = self::extract_paths_to_translate( $file_structure );
 		}
 		return $theme_json_i18n;
+	}
+
+	/**
+	 * Translates a chunk of the loaded theme.json structure.
+	 *
+	 * @param array  $array_to_translate The chunk of theme.json to translate.
+	 * @param string $key                The key of the field that contains the string to translate.
+	 * @param string $context            The context to apply in the translation call.
+	 * @param string $domain             Text domain. Unique identifier for retrieving translated strings.
+	 *
+	 * @return array Returns the modified $theme_json chunk.
+	 */
+	private static function translate_theme_json_chunk( array $array_to_translate, $key, $context, $domain ) {
+		foreach ( $array_to_translate as $item_key => $item_to_translate ) {
+			if ( empty( $item_to_translate[ $key ] ) ) {
+				continue;
+			}
+
+			// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralContext,WordPress.WP.I18n.NonSingularStringLiteralDomain
+			$array_to_translate[ $item_key ][ $key ] = translate_with_gettext_context( $array_to_translate[ $item_key ][ $key ], $context, $domain );
+		}
+
+		return $array_to_translate;
 	}
 
 	/**
@@ -163,37 +186,31 @@ class WP_Theme_JSON_Resolver {
 	 * @return array Returns the modified $theme_json_structure.
 	 */
 	private static function translate( $theme_json, $domain = 'default' ) {
-		if ( ! isset( $theme_json['settings'] ) ) {
-			return $theme_json;
-		}
-
-		$presets = self::get_presets_to_translate();
-		foreach ( $theme_json['settings'] as $setting_key => $settings ) {
-			if ( empty( $settings ) ) {
-				continue;
-			}
-
-			foreach ( $presets as $preset ) {
-				$path    = array_slice( $preset['path'], 2 );
-				$key     = $preset['key'];
-				$context = $preset['context'];
-
-				$array_to_translate = _wp_array_get( $theme_json['settings'][ $setting_key ], $path, null );
-				if ( null === $array_to_translate ) {
+		$fields = self::get_fields_to_translate();
+		foreach ( $fields as $field ) {
+			$path    = $field['path'];
+			$key     = $field['key'];
+			$context = $field['context'];
+			if ( 'settings' === $path[0] ) {
+				if ( empty( $theme_json['settings'] ) ) {
 					continue;
 				}
-
-				foreach ( $array_to_translate as $item_key => $item_to_translate ) {
-					if ( empty( $item_to_translate[ $key ] ) ) {
+				$path = array_slice( $path, 2 );
+				foreach ( $theme_json['settings'] as $setting_key => $setting ) {
+					$array_to_translate = _wp_array_get( $setting, $path, null );
+					if ( is_null( $array_to_translate ) ) {
 						continue;
 					}
-
-					// phpcs:ignore WordPress.WP.I18n.LowLevelTranslationFunction,WordPress.WP.I18n.NonSingularStringLiteralText,WordPress.WP.I18n.NonSingularStringLiteralContext,WordPress.WP.I18n.NonSingularStringLiteralDomain
-					$array_to_translate[ $item_key ][ $key ] = translate_with_gettext_context( $array_to_translate[ $item_key ][ $key ], $context, $domain );
-					// phpcs:enable
+					$translated_array   = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
+					gutenberg_experimental_set( $theme_json['settings'][ $setting_key ], $path, $translated_array );
 				}
-
-				gutenberg_experimental_set( $theme_json['settings'][ $setting_key ], $path, $array_to_translate );
+			} else {
+				$array_to_translate = _wp_array_get( $theme_json, $path, null );
+				if ( is_null( $array_to_translate ) ) {
+					continue;
+				}
+				$translated_array   = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
+				gutenberg_experimental_set( $theme_json, $path, $translated_array );
 			}
 		}
 
@@ -374,7 +391,7 @@ class WP_Theme_JSON_Resolver {
 			$json_decoding_error = json_last_error();
 			if ( JSON_ERROR_NONE !== $json_decoding_error ) {
 				error_log( 'Error when decoding user schema: ' . json_last_error_msg() );
-				return $config;
+				return new WP_Theme_JSON( $config );
 			}
 
 			// Very important to verify if the flag isGlobalStylesUserThemeJSON is true.

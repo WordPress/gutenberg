@@ -25,64 +25,15 @@ import {
 	MENU_TEMPLATES_PAGES,
 	MENU_TEMPLATES_POSTS,
 	MENU_TEMPLATES_UNUSED,
-	TEMPLATES_GENERAL,
-	TEMPLATES_PAGES_PREFIXES,
-	TEMPLATES_POSTS_PREFIXES,
-	TEMPLATES_TOP_LEVEL,
 } from '../constants';
 import NewTemplateDropdown from '../new-template-dropdown';
 import TemplateNavigationItem from '../template-navigation-item';
 import SearchResults from '../search-results';
 import TemplatesSubMenu from './templates-sub';
-import { isTemplateSuperseded } from '../template-hierarchy';
-
-function getTemplateLocation( template ) {
-	const { slug } = template;
-
-	const isTopLevelTemplate = TEMPLATES_TOP_LEVEL.includes( slug );
-	if ( isTopLevelTemplate ) {
-		return MENU_TEMPLATES;
-	}
-
-	const isGeneralTemplate = TEMPLATES_GENERAL.includes( slug );
-	if ( isGeneralTemplate ) {
-		return MENU_TEMPLATES_GENERAL;
-	}
-
-	const isPostsTemplate = TEMPLATES_POSTS_PREFIXES.some( ( prefix ) =>
-		slug.startsWith( prefix )
-	);
-	if ( isPostsTemplate ) {
-		return MENU_TEMPLATES_POSTS;
-	}
-
-	const isPagesTemplate = TEMPLATES_PAGES_PREFIXES.some( ( prefix ) =>
-		slug.startsWith( prefix )
-	);
-	if ( isPagesTemplate ) {
-		return MENU_TEMPLATES_PAGES;
-	}
-
-	return MENU_TEMPLATES_GENERAL;
-}
-
-function getUnusedTemplates( templates, showOnFront ) {
-	const unusedTemplates = [];
-
-	const templateSlugs = map( templates, 'slug' );
-	const supersededTemplates = templates.filter( ( { slug } ) =>
-		isTemplateSuperseded( slug, templateSlugs, showOnFront )
-	);
-
-	return [ ...supersededTemplates, ...unusedTemplates ];
-}
-
-function getTemplatesLocationMap( templates ) {
-	return templates.reduce( ( obj, template ) => {
-		obj[ template.slug ] = getTemplateLocation( template );
-		return obj;
-	}, {} );
-}
+import {
+	getTemplatesLocationMap,
+	getUnusedTemplates,
+} from '../template-hierarchy';
 
 export default function TemplatesMenu() {
 	const [ search, setSearch ] = useState( '' );

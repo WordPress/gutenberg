@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-## 1.1.0-next.0 (2021-03-11)
+### Enhancement
+
+-   Scaffolded plugin requires WordPress 5.7 now ([#29757](https://github.com/WordPress/gutenberg/pull/29757).
+
+## 1.1.0 (2021-03-17)
 
 ### Enhancement
 

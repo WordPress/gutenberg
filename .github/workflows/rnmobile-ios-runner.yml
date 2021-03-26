@@ -2,12 +2,8 @@ name: React Native E2E Tests (iOS)
 
 on:
   pull_request:
-    paths-ignore:
-    - '**.md'
   push:
     branches: [trunk]
-    paths-ignore:
-    - '**.md'
 
 jobs:
   test:
@@ -38,7 +34,9 @@ jobs:
     - name: Restore build cache
       uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
       with:
-        path: packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app
+        path: |
+          packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app
+          packages/react-native-editor/ios/build/WDA
         key: ${{ runner.os }}-ios-build-${{ matrix.xcode }}-${{ hashFiles('ios-checksums.txt') }}
 
     - name: Restore pods cache
@@ -64,6 +62,9 @@ jobs:
 
     - name: Build (if needed)
       run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || npm run native test:e2e:build-app:ios
+
+    - name: Build Web Driver Agent (if needed)
+      run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
 
     - name: Run iOS Device Tests
       run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}

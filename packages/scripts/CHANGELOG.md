@@ -2,7 +2,11 @@
 
 ## Unreleased
 
-## 14.0.0-next.0 (2021-03-11)
+### Enhancements
+
+-   The bundled `babel-loader` dependency has been updated from requiring `^8.1.0` to requiring `^8.2.2` ([#30018](https://github.com/WordPress/gutenberg/pull/30018)).
+
+## 14.0.0 (2021-03-17)
 
 ### Breaking Changes
 

@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-## 13.0.0-next.0 (2021-03-11)
+## 13.0.0 (2021-03-17)
 
 ### Breaking Change
 - `onChange` prop of `FocalPointPicker` is called at the end of drag operations. Previously, it was called repetitively while dragging.

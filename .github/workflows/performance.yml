@@ -2,8 +2,6 @@ name: Performances Tests
 
 on:
   pull_request:
-    paths-ignore:
-    - '**.md'
   release:
     types: [created]
 

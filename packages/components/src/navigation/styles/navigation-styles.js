@@ -14,7 +14,7 @@ import { isRTL } from '@wordpress/i18n';
 import { G2, UI } from '../../utils/colors-values';
 import Button from '../../button';
 import Text from '../../text';
-import { reduceMotion, space } from '../../utils';
+import { reduceMotion, space, rtl } from '../../utils';
 
 export const NavigationUI = styled.div`
 	width: 100%;
@@ -163,6 +163,7 @@ export const ItemBaseUI = styled.li`
 		width: 100%;
 		color: ${ G2.lightGray.ui };
 		padding: ${ space( 1 ) } ${ space( 2 ) }; /* 8px 16px */
+		${ rtl( { textAlign: 'left' }, { textAlign: 'right' } ) }
 
 		&:hover,
 		&:focus:not( [aria-disabled='true'] ):active,
