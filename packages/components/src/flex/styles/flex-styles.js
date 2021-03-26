@@ -3,6 +3,7 @@
  */
 import { css } from '@emotion/core';
 import styled from '@emotion/styled';
+import isPropValid from '@emotion/is-prop-valid';
 
 /**
  * @param {import('..').OwnProps} props
@@ -87,7 +88,9 @@ const directionStyles = ( { direction } ) => {
 	`;
 };
 
-export const Flex = styled.div`
+export const Flex = styled( 'div', {
+	shouldForwardProp: ( prop ) => isPropValid( prop ) && prop !== 'direction',
+} )`
 	box-sizing: border-box;
 	display: flex;
 	width: 100%;
