@@ -220,15 +220,6 @@ function gutenberg_legacy_widget_settings( $settings ) {
 add_filter( 'block_editor_settings', 'gutenberg_legacy_widget_settings' );
 
 /**
- * Function to enqueue admin-widgets as part of the block editor assets.
- */
-function gutenberg_enqueue_widget_scripts() {
-	wp_enqueue_script( 'admin-widgets' );
-}
-
-add_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_widget_scripts' );
-
-/**
  * Overrides dynamic_sidebar_params to make sure Blocks are not wrapped in <form> tag.
  *
  * @param  array $arg Dynamic sidebar params.
