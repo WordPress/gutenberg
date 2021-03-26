@@ -1845,30 +1845,44 @@ export const __experimentalGetAllowedPatterns = createSelector(
 
 /**
  * Returns the list of patterns based on specific `scope` and
- * a block's name.
- * `inserter` scope should be handled differently, probably in
- * combination with `__experimentalGetAllowedPatterns`.
- * For now `__experimentalGetScopedBlockPatterns` handles properly
- * all other scopes.
- * Since both APIs are experimental we should revisit this.
+ * a block's name or array of block names to find matching pattens.
+ * Internally is used `__experimentalGetAllowedPatterns` to have a
+ * single entry point for getting allowed patterns based on the `rootClientId`.
+ * TODO Since both APIs are experimental we should probably revisit this.
  *
  * @param {Object} state Editor state.
  * @param {string} scope Block pattern scope.
- * @param {string} blockName Block's name.
+ * @param {string|string[]} blockNames Block's name or array of block names to find matching pattens.
  * @param {?string} rootClientId Optional target root client ID.
  *
  * @return {Array} The list of matched block patterns based on provided scope and block name.
  */
+// TODO add tests
 export const __experimentalGetScopedBlockPatterns = createSelector(
-	( state, scope, blockName, rootClientId = null ) => {
-		if ( ! ( scope && blockName ) ) return EMPTY_ARRAY;
+	( state, scope, blockNames, rootClientId = null ) => {
+		if ( ! ( scope && blockNames ) ) return EMPTY_ARRAY;
 		const patterns = __experimentalGetAllowedPatterns(
 			state,
 			rootClientId
 		);
-		return patterns.filter( ( pattern ) =>
-			pattern.scope?.[ scope ]?.includes?.( blockName )
-		);
+		const normalizedBlockNames = Array.isArray( blockNames )
+			? blockNames
+			: [ blockNames ];
+		return patterns.reduce( ( accumulator, pattern ) => {
+			const match = pattern?.scope?.[ scope ]?.some?.( ( blockName ) =>
+				normalizedBlockNames.includes( blockName )
+			);
+			if ( ! match ) return accumulator;
+			// If no `rootClientId` is provided, __experimentalGetAllowedPatterns are not
+			// filled with the `blocks` property that are the parsed blocks. In that case
+			// parse them.
+			accumulator.push(
+				rootClientId
+					? pattern
+					: __experimentalGetParsedPattern( state, pattern.name )
+			);
+			return accumulator;
+		}, [] );
 	},
 	( state, rootClientId ) => [
 		state.settings.__experimentalBlockPatterns,
@@ -1937,10 +1951,12 @@ export const __experimentalGetPatternTransformItems = createSelector(
 		}
 
 		// Create a Set of the selected block names that is used in patterns filtering.
-		const selectedBlockNames = blocks.reduce( ( accumulator, block ) => {
-			accumulator.add( block.name );
-			return accumulator;
-		}, new Set() );
+		const selectedBlockNames = Array.from(
+			blocks.reduce( ( accumulator, block ) => {
+				accumulator.add( block.name );
+				return accumulator;
+			}, new Set() )
+		);
 
 		// If a selected block is nested (with InnerBlocks like Group or Columns)
 		// return an EMPTY_ARRAY, as it doesn't make sense to try to be too smart.
@@ -1955,7 +1971,7 @@ export const __experimentalGetPatternTransformItems = createSelector(
 		];
 		if (
 			blocksToSkip.some( ( blockName ) =>
-				selectedBlockNames.has( blockName )
+				selectedBlockNames.includes( blockName )
 			)
 		) {
 			return EMPTY_ARRAY;
@@ -1967,14 +1983,11 @@ export const __experimentalGetPatternTransformItems = createSelector(
 		// and try to find matches from the selected blocks.
 		// Now this happens in the consumer to avoid heavy operations
 		// in the selector.
-		const allowedPatterns = __experimentalGetAllowedPatterns(
+		return __experimentalGetScopedBlockPatterns(
 			state,
+			'transform',
+			selectedBlockNames,
 			rootClientId
-		);
-		return allowedPatterns.filter( ( pattern ) =>
-			pattern.scope?.transform?.some?.( ( blockName ) =>
-				selectedBlockNames.has( blockName )
-			)
 		);
 	},
 	( state, rootClientId ) => [

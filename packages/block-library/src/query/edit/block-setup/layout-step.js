@@ -2,8 +2,8 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useState, useMemo } from '@wordpress/element';
-import { parse, store as blocksStore } from '@wordpress/blocks';
+import { useState } from '@wordpress/element';
+import { store as blocksStore } from '@wordpress/blocks';
 import { useInstanceId } from '@wordpress/compose';
 import {
 	BlockPreview,
@@ -126,8 +126,7 @@ const LayoutSetupStep = ( {
 };
 
 function BlockPattern( { pattern, onSelect, composite } ) {
-	const { content, viewportWidth } = pattern;
-	const blocks = useMemo( () => parse( content ), [ content ] );
+	const { viewportWidth, blocks } = pattern;
 	const descriptionId = useInstanceId(
 		BlockPattern,
 		'block-setup-block-layout-list__item-description'

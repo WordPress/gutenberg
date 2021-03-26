@@ -81,7 +81,7 @@ function PatternTransformationsMenu( {
 		if ( replaceInnerBlocksMode ) {
 			_patterns = statePatterns.map( ( statePattern ) => ( {
 				...statePattern,
-				transformedBlocks: statePattern.contentBlocks.map( ( block ) =>
+				transformedBlocks: statePattern.blocks.map( ( block ) =>
 					cloneBlock( block )
 				),
 			} ) );
@@ -91,8 +91,8 @@ function PatternTransformationsMenu( {
 				// to mutate this prop.
 				const pattern = {
 					...statePattern,
-					transformedBlocks: statePattern.contentBlocks.map(
-						( block ) => cloneBlock( block )
+					transformedBlocks: statePattern.blocks.map( ( block ) =>
+						cloneBlock( block )
 					),
 				};
 				const { transformedBlocks: patternBlocks } = pattern;
