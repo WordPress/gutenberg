@@ -122,3 +122,16 @@ If the HTML tags from text formatting such as `<strong>` or `<em>` are being esc
 Before moving forward, consider if using the RichText component makes sense at all. Would it be better to use a basic `input` or `textarea` element? If you don't think any formatting should be possible, these HTML tags may make more sense.
 
 If you'd still like to use RichText, you can eliminate all of the formatting options by specifying the `withoutInteractiveFormatting` property.
+
+If you want to limit the formats allowed, you can specify using `allowedFormats` property in your code, see the example above or [the component documentation](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md#allowedformats-array) for details.
+
+### Disable Specific Format Types in Editor
+
+The RichText component uses formats to display inline elements, for example images within the paragraph block.  If you just want to disable a format from the editor, you can use the `unregisterFormatType` function.  For example to disable inline images, use:
+
+```
+wp.richText.unregisterFormatType( 'core/image' );
+```
+
+To apply, you would need to enqueue the above script in your plugin or theme. See the JavaScript tutorial for [how to load JavaScript in WordPress](https://developer.wordpress.org/block-editor/tutorials/javascript/loading-javascript/).
+
