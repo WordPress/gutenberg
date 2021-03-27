@@ -5,6 +5,9 @@
 	"attributes": {
 		"textAlign": {
 			"type": "string"
+		},
+		"byline": {
+			"type": "string"
 		}
 	},
 	"usesContext": [ "postId", "postType" ],
