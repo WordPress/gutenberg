@@ -52,11 +52,7 @@ export {
 	default as DropZone,
 	useDropZone as __unstableUseDropZone,
 } from './drop-zone';
-export {
-	default as DropZoneProvider,
-	DropZoneContextProvider as __unstableDropZoneContextProvider,
-	useDrop as __unstableUseDrop,
-} from './drop-zone/provider';
+export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as ExternalLink } from './external-link';

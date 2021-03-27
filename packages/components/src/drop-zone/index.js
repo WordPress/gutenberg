@@ -127,7 +127,10 @@ export function useDropZone( {
 
 		function resetDragState( event ) {
 			throttledUpdateDragZones.cancel();
-			element.current.removeAttribute( 'data-is-dragging' );
+
+			if ( element.current ) {
+				element.current.removeAttribute( 'data-is-dragging' );
+			}
 
 			if ( onDragEndRef.current && isDraggingGlobally ) {
 				onDragEndRef.current( event );
