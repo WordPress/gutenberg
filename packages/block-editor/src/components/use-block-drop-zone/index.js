@@ -78,7 +78,6 @@ export function getNearestBlockIndex( elements, position, orientation ) {
 
 /**
  * @typedef  {Object} WPBlockDropZoneConfig
- * @property {Object} element      A React ref object pointing to the block list's DOM element.
  * @property {string} rootClientId The root client id for the block list.
  */
 
@@ -88,13 +87,12 @@ export function getNearestBlockIndex( elements, position, orientation ) {
  * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
  */
 export default function useBlockDropZone( {
-	element,
 	// An undefined value represents a top-level block. Default to an empty
 	// string for this so that `targetRootClientId` can be easily compared to
 	// values returned by the `getRootBlockClientId` selector, which also uses
 	// an empty string to represent top-level blocks.
 	rootClientId: targetRootClientId = '',
-} ) {
+} = {} ) {
 	const [ targetBlockIndex, setTargetBlockIndex ] = useState( null );
 
 	const { isLockedAll, orientation } = useSelect(
@@ -120,14 +118,13 @@ export default function useBlockDropZone( {
 		targetBlockIndex
 	);
 
-	useDropZone( {
-		element,
+	return useDropZone( {
 		isDisabled: isLockedAll,
 		withPosition: true,
 		...dropEventHandlers,
-		onDragOver( position ) {
+		onDragOver( event, position ) {
 			if ( position ) {
-				const blockElements = Array.from( element.current.children );
+				const blockElements = Array.from( event.target.children );
 
 				const targetIndex = getNearestBlockIndex(
 					blockElements,
@@ -148,6 +145,7 @@ export default function useBlockDropZone( {
 		},
 		onDragEnd() {
 			hideInsertionPoint();
+			setTargetBlockIndex( null );
 		},
 	} );
 }

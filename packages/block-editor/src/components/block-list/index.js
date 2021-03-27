@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useRef, createContext, useState } from '@wordpress/element';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -57,7 +57,7 @@ export default function BlockList( { className, __experimentalLayout } ) {
 			{ insertionPoint }
 			<BlockPopover />
 			<div
-				ref={ ref }
+				ref={ useMergeRefs( [ ref, useBlockDropZone() ] ) }
 				className={ classnames(
 					'block-editor-block-list__layout is-root-container',
 					className,
@@ -71,7 +71,6 @@ export default function BlockList( { className, __experimentalLayout } ) {
 			>
 				<SetBlockNodes.Provider value={ setBlockNodes }>
 					<BlockListItems
-						wrapperRef={ ref }
 						__experimentalLayout={ __experimentalLayout }
 					/>
 				</SetBlockNodes.Provider>
@@ -86,7 +85,6 @@ function Items( {
 	renderAppender,
 	__experimentalAppenderTagName,
 	__experimentalLayout: layout = defaultLayout,
-	wrapperRef,
 } ) {
 	function selector( select ) {
 		const {
@@ -109,11 +107,6 @@ function Items( {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 	} = useSelect( selector, [ rootClientId ] );
-
-	useBlockDropZone( {
-		element: wrapperRef,
-		rootClientId,
-	} );
 
 	return (
 		<LayoutProvider value={ layout }>
