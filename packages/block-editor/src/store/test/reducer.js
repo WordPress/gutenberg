@@ -2947,25 +2947,98 @@ describe( 'state', () => {
 	} );
 
 	describe( 'lastBlockInserted()', () => {
-		it( 'should return client id of last block inserted', () => {
-			const expectedClientId = 1;
+		it( 'should return client id if last block inserted is called with action INSERT_BLOCKS', () => {
+			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+
 			const action = {
-				type: 'ADD_LAST_BLOCK_INSERTED',
-				clientId: expectedClientId,
+				blocks: [
+					{
+						clientId: '62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
+					},
+				],
+				meta: {
+					source: 'inserter_menu',
+				},
+				type: 'INSERT_BLOCKS',
+				updateSelection: true,
 			};
 
-			expect(
-				lastBlockInserted( { clientId: expectedClientId }, action )
-					.clientId
-			).toBe( expectedClientId );
+			const state = lastBlockInserted(
+				{ clientId: expectedClientId },
+				action
+			);
+
+			expect( state.clientId ).toBe( expectedClientId );
 		} );
 
-		it( 'should return empty state if last block has been cleared', () => {
+		it( 'should return inserter_menu source if last block inserted is called with action INSERT_BLOCKS', () => {
+			const expectedSource = 'inserter_menu';
 			const action = {
-				type: 'CLEAR_LAST_BLOCK_INSERTED',
+				blocks: [
+					{
+						clientId: '62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
+					},
+				],
+				meta: {
+					source: 'inserter_menu',
+				},
+				type: 'INSERT_BLOCKS',
+				updateSelection: true,
 			};
 
-			expect( lastBlockInserted( {}, action ) ).toStrictEqual( {} );
+			const state = lastBlockInserted( {}, action );
+
+			expect( state.source ).toBe( expectedSource );
+		} );
+
+		it( 'should return empty state if last block inserted is called with action INSERT_BLOCKS that is not a updateSelection', () => {
+			const expectedState = {};
+
+			const action = {
+				blocks: [
+					{
+						clientId: '62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
+					},
+				],
+				meta: {
+					source: 'inserter_menu',
+				},
+				type: 'INSERT_BLOCKS',
+				updateSelection: false,
+			};
+
+			const state = lastBlockInserted( {}, action );
+
+			expect( state ).toEqual( expectedState );
+		} );
+
+		it( 'should return empty state if last block inserted is called with action INSERT_BLOCKS and actions.blocks = 0', () => {
+			const expectedState = {};
+
+			const action = {
+				blocks: [],
+				meta: {
+					source: 'inserter_menu',
+				},
+				type: 'INSERT_BLOCKS',
+				updateSelection: true,
+			};
+
+			const state = lastBlockInserted( {}, action );
+
+			expect( state ).toEqual( expectedState );
+		} );
+
+		it( 'should return empty state if last block inserted is called with action RESET_BLOCKS', () => {
+			const expectedState = {};
+
+			const action = {
+				type: 'RESET_BLOCKS',
+			};
+
+			const state = lastBlockInserted( {}, action );
+
+			expect( state ).toEqual( expectedState );
 		} );
 	} );
 } );
