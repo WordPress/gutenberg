@@ -263,21 +263,6 @@ const Popover = ( {
 	const [ containerResizeListener, contentSize ] = useResizeObserver();
 	noArrow = isExpanded || noArrow;
 
-/* 	function selector( select ) {
-		const {
-			x,
-		} = select( store );
-		return {
-			x: isToolBarActive(),
-		};
-	}
-
-	let {
-		x,
-	} = useSelect( selector, [] );
-	x = x || 12
-	console.log(x); */
-
 	useLayoutEffect( () => {
 		if ( isExpanded ) {
 			setClass( containerRef.current, 'is-without-arrow', noArrow );
