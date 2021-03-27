@@ -120,27 +120,19 @@ export default function useBlockDropZone( {
 
 	return useDropZone( {
 		isDisabled: isLockedAll,
-		withPosition: true,
 		...dropEventHandlers,
-		onDragOver( event, position ) {
-			if ( position ) {
-				const blockElements = Array.from( event.target.children );
+		onDragOver( event ) {
+			const blockElements = Array.from( event.target.children );
+			const targetIndex = getNearestBlockIndex(
+				blockElements,
+				{ x: event.clientX, y: event.clientY },
+				orientation
+			);
 
-				const targetIndex = getNearestBlockIndex(
-					blockElements,
-					position,
-					orientation
-				);
+			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
 
-				setTargetBlockIndex(
-					targetIndex === undefined ? 0 : targetIndex
-				);
-
-				if ( targetIndex !== null ) {
-					showInsertionPoint( targetRootClientId, targetIndex );
-				}
-			} else {
-				setTargetBlockIndex( null );
+			if ( targetIndex !== null ) {
+				showInsertionPoint( targetRootClientId, targetIndex );
 			}
 		},
 		onDragEnd() {

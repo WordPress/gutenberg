@@ -33,21 +33,6 @@ function getDragEventType( { dataTransfer } ) {
 	return 'default';
 }
 
-function getPosition( event ) {
-	// In some contexts, it may be necessary to capture and redirect the
-	// drag event (e.g. atop an `iframe`). To accommodate this, you can
-	// create an instance of CustomEvent with the original event specified
-	// as the `detail` property.
-	//
-	// See: https://developer.mozilla.org/en-US/docs/Web/Guide/Events/Creating_and_triggering_events
-	const detail =
-		window.CustomEvent && event instanceof window.CustomEvent
-			? event.detail
-			: event;
-
-	return { x: detail.clientX, y: detail.clientY };
-}
-
 function useFreshRef( value ) {
 	const ref = useRef();
 	ref.current = value;
@@ -82,14 +67,6 @@ export function useDropZone( {
 
 			let isDraggingGlobally = false;
 
-			function isTypeSupported( type ) {
-				return Boolean(
-					( type === 'file' && !! onFilesDropRef.current ) ||
-						( type === 'html' && !! onHTMLDropRef.current ) ||
-						( type === 'default' && !! onDropRef.current )
-				);
-			}
-
 			element.setAttribute( 'data-is-drop-target', 'true' );
 
 			const { ownerDocument } = element;
@@ -105,7 +82,7 @@ export function useDropZone( {
 
 			function updateDragZones( event ) {
 				if ( onDragOverRef.current ) {
-					onDragOverRef.current( event, getPosition( event ) );
+					onDragOverRef.current( event );
 				}
 			}
 
@@ -141,29 +118,18 @@ export function useDropZone( {
 				// where files dragged directly from the dock are not recognized
 				event.dataTransfer && event.dataTransfer.files.length; // eslint-disable-line no-unused-expressions
 
-				const dragEventType = getDragEventType( event );
+				const type = getDragEventType( event );
 
-				if ( ! isTypeSupported( dragEventType ) ) {
-					return;
-				}
-
-				const position = getPosition( event );
-
-				switch ( dragEventType ) {
-					case 'file':
-						onFilesDropRef.current(
-							getFilesFromDataTransfer( event.dataTransfer ),
-							position
-						);
-						break;
-					case 'html':
-						onHTMLDropRef.current(
-							event.dataTransfer.getData( 'text/html' ),
-							position
-						);
-						break;
-					case 'default':
-						onDropRef.current( event, position );
+				if ( type === 'file' && onFilesDropRef.current ) {
+					onFilesDropRef.current(
+						getFilesFromDataTransfer( event.dataTransfer )
+					);
+				} else if ( type === 'html' && onHTMLDropRef.current ) {
+					onHTMLDropRef.current(
+						event.dataTransfer.getData( 'text/html' )
+					);
+				} else if ( type === 'default' && onDropRef.current ) {
+					onDropRef.current( event );
 				}
 
 				resetDragState( event );
