@@ -180,6 +180,14 @@ export default function SearchEdit( {
 		isButtonInside && borderStyle,
 	];
 
+	const getPlaceholderAccessibilityLabel = () => {
+		const title = __( 'Search input field.' );
+		const description = placeholder
+			? `${ __( 'Current placeholder text is' ) } ${ placeholder }`
+			: __( 'No custom placeholder set' );
+		return `${ title } ${ description }`;
+	};
+
 	const renderTextField = () => {
 		return (
 			<View
@@ -189,9 +197,7 @@ export default function SearchEdit( {
 				accessibilityHint={ __(
 					'Double tap to edit placeholder text'
 				) }
-				accessibilityLabel={ `${ __(
-					'Search input field. Current placeholder value is'
-				) } ${ placeholder }` }
+				accessibilityLabel={ getPlaceholderAccessibilityLabel() }
 			>
 				<PlainText
 					ref={ textInputRef }
@@ -241,7 +247,7 @@ export default function SearchEdit( {
 							'Double tap to edit button text'
 						) }
 						accessibilityLabel={ `${ __(
-							'Search button. Current value is'
+							'Search button. Current button text is'
 						) } ${ buttonText }` }
 					>
 						<RichText
@@ -290,7 +296,7 @@ export default function SearchEdit( {
 					accessibilityRole="none"
 					accessibilityHint={ __( 'Double tap to edit label text' ) }
 					accessibilityLabel={ `${ __(
-						'Search block label. Current value is'
+						'Search block label. Current text is'
 					) } ${ label }` }
 				>
 					<RichText
