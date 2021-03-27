@@ -318,6 +318,7 @@ export default function SearchEdit( {
 						onBlur={ () => {
 							setIsLabelSelected( false );
 						} }
+						selectionColor={ styles.richTextButtonCursor.color }
 					/>
 				</View>
 			) }

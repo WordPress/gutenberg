@@ -14,7 +14,7 @@ Render a rich [`contenteditable` input](https://developer.mozilla.org/en-US/docs
 
 ### `tagName: String`
 
-*Default: `div`.* The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element. Elements that display inline are not supported.
+*Default: `div`.* The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element. Elements that display inline are not supported. Set to `inline-block` to use tag names that have `inline` as the default.
 
 ### `placeholder: String`
 

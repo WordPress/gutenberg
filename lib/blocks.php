@@ -55,6 +55,7 @@ function gutenberg_reregister_core_block_types() {
 				'cover.php'                     => 'core/cover',
 				'latest-comments.php'           => 'core/latest-comments',
 				'latest-posts.php'              => 'core/latest-posts',
+				'legacy-widget.php'             => 'core/legacy-widget',
 				'loginout.php'                  => 'core/loginout',
 				'navigation.php'                => 'core/navigation',
 				'navigation-link.php'           => 'core/navigation-link',
@@ -97,12 +98,10 @@ function gutenberg_reregister_core_block_types() {
 		),
 		__DIR__ . '/../build/edit-widgets/blocks/'  => array(
 			'block_folders' => array(
-				'legacy-widget',
 				'widget-area',
 			),
 			'block_names'   => array(
-				'legacy-widget.php' => 'core/legacy-widget',
-				'widget-area.php'   => 'core/widget-area',
+				'widget-area.php' => 'core/widget-area',
 			),
 		),
 	);
@@ -347,14 +346,29 @@ add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
 
 /**
  * Filters the default block categories array to add a new one for themes.
- * Should be removed and turned into a core.trac ticket for merge.
  *
- * @param array $categories The list of default block categories.
+ * This can be removed when plugin support requires WordPress 5.8.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/52883
+ *
+ * @param array[] $categories The list of default block categories.
+ *
+ * @return array[] Filtered block categories.
  */
 function gutenberg_register_theme_block_category( $categories ) {
+	foreach ( $categories as $category ) {
+		// Skip when the category is already set in WordPress core.
+		if (
+			isset( $category['slug'] ) &&
+			'theme' === $category['slug']
+		) {
+			return $categories;
+		}
+	}
+
 	$categories[] = array(
 		'slug'  => 'theme',
-		'title' => _x( 'Theme', 'block category' ),
+		'title' => _x( 'Theme', 'block category', 'gutenberg' ),
 		'icon'  => null,
 	);
 	return $categories;

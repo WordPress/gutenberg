@@ -20,11 +20,19 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/data": "file:../data",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/keycodes": "file:../keycodes",
+		"classnames": "^2.2.6",
 		"lodash": "^4.17.19"
 	},
 	"publishConfig": {

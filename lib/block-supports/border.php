@@ -38,6 +38,16 @@ function gutenberg_register_border_support( $block_type ) {
  * @return array Border CSS classes and inline styles.
  */
 function gutenberg_apply_border_support( $block_type, $block_attributes ) {
+	$border_support = _wp_array_get( $block_type->supports, array( '__experimentalBorder' ), false );
+
+	if (
+		is_array( $border_support ) &&
+		array_key_exists( '__experimentalSkipSerialization', $border_support ) &&
+		$border_support['__experimentalSkipSerialization']
+	) {
+		return array();
+	}
+
 	// Arrays used to ease addition of further border related features in future.
 	$styles = array();
 

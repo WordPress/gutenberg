@@ -128,16 +128,6 @@ html.interface-interface-skeleton__html-container {
 	border-bottom: $border-width solid $gray-200;
 	z-index: z-index(".interface-interface-skeleton__header");
 	color: $gray-900;
-
-	// On Mobile the header is sticky.
-	position: sticky;
-	top: 0;
-
-	// Cancel the fixed positioning used on Mobile.
-	@include break-small() {
-		position: initial;
-		top: 0;
-	}
 }
 
 .interface-interface-skeleton__footer {

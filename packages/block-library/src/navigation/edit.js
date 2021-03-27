@@ -41,7 +41,6 @@ function Navigation( {
 	className,
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = attributes.orientation === 'horizontal',
-	hasListViewModal = true,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -124,11 +123,9 @@ function Navigation( {
 						} }
 					/>
 				) }
-				{ hasListViewModal && (
-					<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
-				) }
+				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
 			</BlockControls>
-			{ hasListViewModal && navigatorModal }
+			{ navigatorModal }
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display settings' ) }>

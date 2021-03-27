@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { addFilter } from '@wordpress/hooks';
 import {
 	category,
 	page,
@@ -30,7 +29,7 @@ function getIcon( variationName ) {
 	}
 }
 
-function enhanceNavigationLinkVariations( settings, name ) {
+export function enhanceNavigationLinkVariations( settings, name ) {
 	if ( name !== 'core/navigation-link' ) {
 		return settings;
 	}
@@ -67,9 +66,3 @@ function enhanceNavigationLinkVariations( settings, name ) {
 	}
 	return settings;
 }
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/navigation-link',
-	enhanceNavigationLinkVariations
-);

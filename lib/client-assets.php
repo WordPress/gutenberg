@@ -353,6 +353,9 @@ function gutenberg_register_packages_styles( $styles ) {
 	$wp_edit_blocks_dependencies = array(
 		'wp-components',
 		'wp-editor',
+		// This need to be added before the block library styles,
+		// The block library styles override the "reset" styles.
+		'wp-reset-editor-styles',
 		'wp-block-library',
 		'wp-reusable-blocks',
 	);
@@ -362,6 +365,15 @@ function gutenberg_register_packages_styles( $styles ) {
 		// Include opinionated block styles if no $editor_styles are declared, so the editor never appears broken.
 		$wp_edit_blocks_dependencies[] = 'wp-block-library-theme';
 	}
+
+	gutenberg_override_style(
+		$styles,
+		'wp-reset-editor-styles',
+		gutenberg_url( 'build/block-library/reset.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-reset-editor-styles', 'rtl', 'replace' );
 
 	gutenberg_override_style(
 		$styles,
@@ -592,26 +604,13 @@ function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = arra
 }
 
 /**
- * Extends block editor settings to include Gutenberg's `editor-styles.css` as
- * taking precedent those styles shipped with core.
+ * Extends block editor settings to remove the Gutenberg's `editor-styles.css`;
  *
  * @param array $settings Default editor settings.
  *
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_styles( $settings ) {
-	$editor_styles_file = is_rtl() ?
-		gutenberg_dir_path() . 'build/editor/editor-styles-rtl.css' :
-		gutenberg_dir_path() . 'build/editor/editor-styles.css';
-
-	/*
-	 * If, for whatever reason, the built editor styles do not exist, avoid
-	 * override and fall back to the default.
-	 */
-	if ( ! file_exists( $editor_styles_file ) ) {
-		return $settings;
-	}
-
 	if ( empty( $settings['styles'] ) ) {
 		$settings['styles'] = array();
 	} else {
@@ -641,51 +640,23 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		}
 	}
 
-	$editor_styles = array(
-		'css' => file_get_contents( $editor_styles_file ),
-	);
-
 	// Substitute default styles if found. Otherwise, prepend to setting array.
 	if ( isset( $i ) && $i >= 0 ) {
-		$settings['styles'][ $i ] = $editor_styles;
-	} else {
-		array_unshift( $settings['styles'], $editor_styles );
+		unset( $settings['styles'][ $i ] );
 	}
 
-	// Remove the default font editor styles.
-	// When Gutenberg is updated to have minimum version of WordPress 5.8
-	// This could be removed.
-	foreach ( $settings['styles'] as $j => $style ) {
-		if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {
-			unset( $settings['styles'][ $j ] );
+	// Remove the default font editor styles for FSE themes.
+	if ( gutenberg_is_fse_theme() ) {
+		foreach ( $settings['styles'] as $j => $style ) {
+			if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {
+				unset( $settings['styles'][ $j ] );
+			}
 		}
 	}
 
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
-
-/**
- * Load the default editor styles.
- * These styles are used if the "no theme styles" options is triggered.
- *
- * @param array $settings Default editor settings.
- *
- * @return array Filtered editor settings.
- */
-function gutenberg_extend_block_editor_settings_with_default_editor_styles( $settings ) {
-	$editor_styles_file              = is_rtl() ?
-		gutenberg_dir_path() . 'build/editor/editor-styles-rtl.css' :
-		gutenberg_dir_path() . 'build/editor/editor-styles.css';
-	$settings['defaultEditorStyles'] = array(
-		array(
-			'css' => file_get_contents( $editor_styles_file ),
-		),
-	);
-
-	return $settings;
-}
-add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_default_editor_styles' );
 
 /**
  * Adds a flag to the editor settings to know whether we're in FSE theme or not.
