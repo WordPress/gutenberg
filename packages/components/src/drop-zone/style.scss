@@ -61,3 +61,11 @@
 .components-drop-zone__provider {
 	height: 100%;
 }
+
+[data-is-dragging] * {
+	pointer-events: none;
+}
+
+[data-is-drop-target] {
+	pointer-events: all;
+}

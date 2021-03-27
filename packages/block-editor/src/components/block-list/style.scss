@@ -372,6 +372,12 @@
 
 // This is the clickable plus.
 .block-editor-block-list__insertion-point-inserter {
+	pointer-events: all !important;
+
+	* {
+		pointer-events: all !important;
+	}
+
 	// Don't show on mobile.
 	display: none;
 	position: absolute;
@@ -650,6 +656,11 @@
 .block-editor-block-list__insertion-point-popover.is-without-arrow {
 	z-index: z-index(".block-editor-block-list__insertion-point-popover");
 	position: absolute;
+	pointer-events: none;
+
+	* {
+		pointer-events: none;
+	}
 
 	.components-popover__content.components-popover__content { // Needs specificity.
 		background: none;

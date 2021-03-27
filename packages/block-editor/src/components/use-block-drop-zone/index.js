@@ -3,7 +3,7 @@
  */
 import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -120,34 +120,34 @@ export default function useBlockDropZone( {
 		targetBlockIndex
 	);
 
-	const { position, isDraggingOverDocument } = useDropZone( {
+	useDropZone( {
 		element,
 		isDisabled: isLockedAll,
 		withPosition: true,
 		...dropEventHandlers,
-	} );
+		onDragOver( position ) {
+			if ( position ) {
+				const blockElements = Array.from( element.current.children );
 
-	useEffect( () => {
-		if ( position ) {
-			const blockElements = Array.from( element.current.children );
+				const targetIndex = getNearestBlockIndex(
+					blockElements,
+					position,
+					orientation
+				);
 
-			const targetIndex = getNearestBlockIndex(
-				blockElements,
-				position,
-				orientation
-			);
+				setTargetBlockIndex(
+					targetIndex === undefined ? 0 : targetIndex
+				);
 
-			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
-		} else {
-			setTargetBlockIndex( null );
-		}
-	}, [ position ] );
-
-	useEffect( () => {
-		if ( ! isDraggingOverDocument ) {
+				if ( targetIndex !== null ) {
+					showInsertionPoint( targetRootClientId, targetIndex );
+				}
+			} else {
+				setTargetBlockIndex( null );
+			}
+		},
+		onDragEnd() {
 			hideInsertionPoint();
-		} else if ( targetBlockIndex !== null ) {
-			showInsertionPoint( targetRootClientId, targetBlockIndex );
-		}
-	}, [ targetBlockIndex, isDraggingOverDocument ] );
+		},
+	} );
 }
