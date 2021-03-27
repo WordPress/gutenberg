@@ -70,31 +70,27 @@ export function useDropZone( {
 			element.setAttribute( 'data-is-drop-target', 'true' );
 
 			const { ownerDocument } = element;
-			const { defaultView } = ownerDocument;
 
 			function onDragEnter( event ) {
-				element.setAttribute( 'data-is-dragging', 'true' );
-
+				event.preventDefault();
 				if ( onDragEnterRef.current ) {
 					onDragEnterRef.current( event );
 				}
 			}
 
-			function updateDragZones( event ) {
+			const throttledOnDragOver = throttle( ( event ) => {
 				if ( onDragOverRef.current ) {
 					onDragOverRef.current( event );
 				}
-			}
-
-			const throttledUpdateDragZones = throttle( updateDragZones, 200 );
+			}, 200 );
 
 			function onDragOver( event ) {
-				if ( event.target !== element ) {
-					event.preventDefault();
-				} else {
-					throttledUpdateDragZones( event );
-					event.preventDefault();
+				// Only call onDragOver for the innermost hovered drag zones.
+				if ( ! event.defaultPrevented ) {
+					throttledOnDragOver( event );
 				}
+
+				event.preventDefault();
 			}
 
 			function onDragLeave( event ) {
@@ -104,12 +100,21 @@ export function useDropZone( {
 			}
 
 			function resetDragState( event ) {
-				throttledUpdateDragZones.cancel();
+				throttledOnDragOver.cancel();
 
-				element.removeAttribute( 'data-is-dragging' );
+				if ( isDraggingGlobally ) {
+					isDraggingGlobally = false;
 
-				if ( onDragEndRef.current && isDraggingGlobally ) {
-					onDragEndRef.current( event );
+					element.removeAttribute( 'data-is-dragging' );
+
+					ownerDocument.addEventListener(
+						'dragover',
+						onGlobalDragOver
+					);
+
+					if ( onDragEndRef.current ) {
+						onDragEndRef.current( event );
+					}
 				}
 			}
 
@@ -139,34 +144,44 @@ export function useDropZone( {
 			}
 
 			function onGlobalDragOver( event ) {
-				isDraggingGlobally = true;
-				if ( onDragStartRef.current ) {
-					onDragStartRef.current( event );
+				if ( ! isDraggingGlobally ) {
+					isDraggingGlobally = true;
+
+					element.setAttribute( 'data-is-dragging', 'true' );
+
+					ownerDocument.removeEventListener(
+						'dragover',
+						onGlobalDragOver
+					);
+
+					if ( onDragStartRef.current ) {
+						onDragStartRef.current( event );
+					}
 				}
-				defaultView.removeEventListener( 'dragover', onGlobalDragOver );
 			}
 
 			element.addEventListener( 'drop', onDrop );
 			element.addEventListener( 'dragenter', onDragEnter );
 			element.addEventListener( 'dragover', onDragOver );
 			element.addEventListener( 'dragleave', onDragLeave );
-			defaultView.addEventListener( 'mouseup', resetDragState );
+			ownerDocument.addEventListener( 'mouseup', resetDragState );
 			// Note that `dragend` doesn't fire consistently for file and HTML drag
 			// events where the drag origin is outside the browser window.
 			// In Firefox it may also not fire if the originating node is removed.
-			defaultView.addEventListener( 'dragend', resetDragState );
-			defaultView.addEventListener( 'dragover', onGlobalDragOver );
+			ownerDocument.addEventListener( 'dragend', resetDragState );
+			ownerDocument.addEventListener( 'dragover', onGlobalDragOver );
 
 			return () => {
+				element.removeAttribute( 'data-is-dragging' );
 				element.removeAttribute( 'data-is-drop-target' );
 				element.removeEventListener( 'drop', onDrop );
 				element.removeEventListener( 'dragenter', onDragEnter );
 				element.removeEventListener( 'dragover', onDragOver );
 				element.removeEventListener( 'dragleave', onDragLeave );
-				defaultView.removeEventListener( 'mouseup', resetDragState );
-				defaultView.removeEventListener( 'dragend', resetDragState );
-				defaultView.addEventListener( 'dragover', onGlobalDragOver );
-				throttledUpdateDragZones.cancel();
+				ownerDocument.removeEventListener( 'mouseup', resetDragState );
+				ownerDocument.removeEventListener( 'dragend', resetDragState );
+				ownerDocument.addEventListener( 'dragover', onGlobalDragOver );
+				throttledOnDragOver.cancel();
 			};
 		},
 		[ isDisabled ]
