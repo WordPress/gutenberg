@@ -47,3 +47,16 @@
 		color: $dark-gray-placeholder;
 	}
 }
+
+.show {
+	display: block;
+	box-shadow: inset 0 0 0 1px #cc1818;
+	padding: 6px;
+	h3 {
+		color: #cc1818;
+	}
+}
+
+.hide {
+	display: none;
+}

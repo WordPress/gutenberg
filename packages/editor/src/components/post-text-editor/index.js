@@ -24,6 +24,8 @@ export default function PostTextEditor() {
 
 	const [ value, setValue ] = useState( postContent );
 	const [ isDirty, setIsDirty ] = useState( false );
+	const [ isValid, setIsValid ] = useState( true );
+
 	const instanceId = useInstanceId( PostTextEditor );
 
 	if ( ! isDirty && value !== postContent ) {
@@ -32,7 +34,14 @@ export default function PostTextEditor() {
 
 	const saveText = () => {
 		const blocks = parse( value );
-		resetEditorBlocks( blocks );
+		const content = blocks[ 0 ]?.originalContent;
+		if ( checkHTML( content ) ) {
+			setIsValid( true );
+
+			resetEditorBlocks( blocks );
+		} else {
+			setIsValid( false );
+		}
 	};
 
 	useEffect( () => {
@@ -72,8 +81,19 @@ export default function PostTextEditor() {
 		}
 	};
 
+	//Function that checks if html is valid
+	const checkHTML = ( html ) => {
+		const doc = document.createElement( 'div' );
+		doc.innerHTML = html;
+		return doc.innerHTML === html;
+	};
 	return (
 		<>
+			<div className={ isValid ? 'hide' : 'show' }>
+				<h3>
+					Warning ! Your code is not valid and will be not saved !
+				</h3>
+			</div>
 			<VisuallyHidden
 				as="label"
 				htmlFor={ `post-content-${ instanceId }` }
