@@ -80,7 +80,7 @@ function gutenberg_extend_post_editor_settings( $settings ) {
 	$image_default_size = get_option( 'image_default_size', 'large' );
 	$image_sizes        = wp_list_pluck( $settings['imageSizes'], 'slug' );
 
-	$settings['imageDefaultSize'] = in_array( $image_default_size, $image_sizes, true ) ? $image_default_size : 'large';
+	$settings['imageDefaultSize']                      = in_array( $image_default_size, $image_sizes, true ) ? $image_default_size : 'large';
 	$settings['__unstableEnableFullSiteEditingBlocks'] = gutenberg_is_fse_theme();
 
 	return $settings;

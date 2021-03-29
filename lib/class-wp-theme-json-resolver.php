@@ -201,7 +201,7 @@ class WP_Theme_JSON_Resolver {
 					if ( is_null( $array_to_translate ) ) {
 						continue;
 					}
-					$translated_array   = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
+					$translated_array = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
 					gutenberg_experimental_set( $theme_json['settings'][ $setting_key ], $path, $translated_array );
 				}
 			} else {
@@ -209,7 +209,7 @@ class WP_Theme_JSON_Resolver {
 				if ( is_null( $array_to_translate ) ) {
 					continue;
 				}
-				$translated_array   = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
+				$translated_array = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
 				gutenberg_experimental_set( $theme_json, $path, $translated_array );
 			}
 		}
