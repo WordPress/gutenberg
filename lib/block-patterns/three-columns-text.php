@@ -21,7 +21,7 @@ return array(
 	
 	<!-- wp:column -->
 	<div class="wp-block-column"><!-- wp:heading {"level":3,"style":{"typography":{"fontSize":"24px"}}} -->
-	<h3 style="font-size:24px"><strong><a href="https://wordpress.org">' . __( 'Open Exhibitions ↗' ) . '</a></strong></h3>
+	<h3 style="font-size:24px"><strong><a href="https://wordpress.org">' . __( 'Current Shows ↗' ) . '</a></strong></h3>
 	<!-- /wp:heading -->
 	
 	<!-- wp:paragraph -->
