@@ -23,6 +23,15 @@ function gutenberg_register_url_details_routes() {
 add_action( 'rest_api_init', 'gutenberg_register_url_details_routes' );
 
 /**
+ * Registers the block transform REST API routes.
+ */
+function gutenberg_register_block_transform_routes() {
+	$block_transform_controller = new WP_REST_Block_Transform_Controller();
+	$block_transform_controller->register_routes();
+}
+add_filter( 'rest_api_init', 'gutenberg_register_block_transform_routes' );
+
+/**
  * Registers the block pattern directory.
  */
 function gutenberg_register_rest_pattern_directory() {

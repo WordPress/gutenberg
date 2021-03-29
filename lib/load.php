@@ -70,6 +70,10 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-url-details-controller.php';
 	}
 
+	if ( ! class_exists( 'WP_REST_Block_Transform_Controller' ) ) {
+		require_once __DIR__ . '/class-wp-rest-block-transform-controller.php';
+	}
+
 	require __DIR__ . '/rest-api.php';
 }
 

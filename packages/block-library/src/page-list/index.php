@@ -203,6 +203,51 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	);
 }
 
+/**
+ * Transforms the `core/page-list` block on server.
+ *
+ * @param string $to         The block to transform to.
+ * @param array  $attributes The block attributes.
+ * @param array  $content    The saved content.
+ * @param array  $block       The parsed block.
+ *
+ * @return array[] Returns the transformed blocks.
+ */
+function transform_block_core_page_list( $to, $attributes, $content, $block ) {
+
+	// TODO: a single callback, with a $to parameter OR a keyed array of transform callbacks?
+	// TODO: we need some create_block helpers, should be equivalent to what parse_block generates
+	// TODO: support sub-menus.
+
+	if ( 'core/navigation-link' === $to ) {
+
+		$all_pages = get_pages( array( 'sort_column' => 'menu_order' ) );
+
+		$top_level_pages = array();
+
+		foreach ( (array) $all_pages as $page ) {
+			if ( ! $page->post_parent ) {
+				$top_level_pages[] = array(
+					'blockName'    => 'core/navigation-link',
+					'attrs'        => array(
+						'label' => $page->post_title,
+						'url'   => get_permalink( $page->ID ),
+						'id'    => $page->ID,
+						'type'  => 'page',
+						'kind'  => 'post-type',
+					),
+					'innerBlocks'  => array(),
+					'innerHTML'    => '',
+					'innerContent' => array(),
+				);
+			}
+		}
+
+		return $top_level_pages;
+	}
+	return array();
+}
+
 	/**
 	 * Registers the `core/pages` block on server.
 	 */
@@ -210,7 +255,8 @@ function register_block_core_page_list() {
 	register_block_type_from_metadata(
 		__DIR__ . '/page-list',
 		array(
-			'render_callback' => 'render_block_core_page_list',
+			'render_callback'    => 'render_block_core_page_list',
+			'transform_callback' => 'transform_block_core_page_list',
 		)
 	);
 }
