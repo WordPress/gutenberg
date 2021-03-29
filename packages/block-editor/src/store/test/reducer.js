@@ -3005,7 +3005,7 @@ describe( 'state', () => {
 				updateSelection: false,
 			};
 
-			const state = lastBlockInserted( {}, action );
+			const state = lastBlockInserted( expectedState, action );
 
 			expect( state ).toEqual( expectedState );
 		} );
@@ -3022,7 +3022,7 @@ describe( 'state', () => {
 				updateSelection: true,
 			};
 
-			const state = lastBlockInserted( {}, action );
+			const state = lastBlockInserted( expectedState, action );
 
 			expect( state ).toEqual( expectedState );
 		} );
@@ -3034,7 +3034,7 @@ describe( 'state', () => {
 				type: 'RESET_BLOCKS',
 			};
 
-			const state = lastBlockInserted( {}, action );
+			const state = lastBlockInserted( expectedState, action );
 
 			expect( state ).toEqual( expectedState );
 		} );
