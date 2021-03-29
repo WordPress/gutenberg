@@ -2953,7 +2953,7 @@ describe( 'state', () => {
 			const action = {
 				blocks: [
 					{
-						clientId: '62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
+						clientId: expectedClientId,
 					},
 				],
 				meta: {
