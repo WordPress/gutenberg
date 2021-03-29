@@ -15,6 +15,12 @@
 		}
 	}
 
+	// Margin when justified right or space-between.
+	.wp-block-navigation__container > .wp-block-pages-list__item:last-child,
+	.wp-block-navigation__container > .wp-block-navigation-link:last-child {
+		margin-right: 0;
+	}
+
 	// Menu item link.
 	.wp-block-pages-list__item__link,
 	.wp-block-navigation-link__content {
