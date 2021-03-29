@@ -7,7 +7,7 @@
 
 return array(
 	'title'       => __( 'Three columns of text' ),
-	'categories'  => array( 'text' ),
+	'categories'  => array( 'columns,text' ),
 	'content'     => '<!-- wp:columns {"align":"full","backgroundColor":"white","textColor":"black"} -->
 	<div class="wp-block-columns alignfull has-black-color has-white-background-color has-text-color has-background"><!-- wp:column -->
 	<div class="wp-block-column"><!-- wp:heading {"level":3,"style":{"typography":{"fontSize":"24px"}}} -->
