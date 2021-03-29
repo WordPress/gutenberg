@@ -51,7 +51,6 @@ export { imageFillStyles } from './media-container.js';
 class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );
-		this.onUploadError = this.onUploadError.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
 			this
@@ -78,11 +77,6 @@ class MediaContainer extends Component {
 		if ( mediaId && mediaUrl && getProtocol( mediaUrl ) === 'file:' ) {
 			mediaUploadSync();
 		}
-	}
-
-	onUploadError( message ) {
-		const { createErrorNotice } = this.props;
-		createErrorNotice( message );
 	}
 
 	onSelectMediaUploadOption( params ) {
@@ -158,6 +152,12 @@ class MediaContainer extends Component {
 	}
 
 	finishMediaUploadWithFailure() {
+		const { createErrorNotice } = this.props;
+
+		createErrorNotice(
+			__( 'An unknown error occurred. Please try again.' )
+		);
+
 		this.setState( { isUploadInProgress: false } );
 	}
 
