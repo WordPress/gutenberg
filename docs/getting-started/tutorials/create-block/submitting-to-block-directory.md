@@ -60,6 +60,7 @@ The Block Editor allows you to indicate the category your block belongs in, maki
 -   media
 -   design
 -   widgets
+-   theme
 -   embed
 
 [Read more about categories.](/docs/reference-guides/block-api/block-metadata.md#category)

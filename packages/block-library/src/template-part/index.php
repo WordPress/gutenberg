@@ -65,8 +65,12 @@ function render_block_core_template_part( $attributes ) {
 		}
 	}
 
-	if ( ! $template_part_id || is_null( $content ) ) {
-		return __( 'Template Part not found.' );
+	if ( is_null( $content ) && is_user_logged_in() ) {
+		return sprintf(
+			/* translators: %s: Template part slug. */
+			__( 'Template part has been deleted or is unavailable: %s' ),
+			$attributes['slug']
+		);
 	}
 
 	if ( isset( $seen_ids[ $template_part_id ] ) ) {

@@ -176,7 +176,6 @@ module.exports = {
 					'error',
 					{
 						forbid: [
-							[ 'button', 'Button' ],
 							[ 'circle', 'Circle' ],
 							[ 'g', 'G' ],
 							[ 'path', 'Path' ],
