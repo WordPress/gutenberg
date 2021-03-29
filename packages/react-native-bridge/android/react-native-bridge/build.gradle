@@ -24,7 +24,7 @@ apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80
 // import the `readHashedVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/ceaf20a8e7d9b8404e4a5ff2e6c36650/raw/e1460a128e4b9863963410d719c7d44c3adefd02/readHashedVersion.gradle'
 
-group='com.github.wordpress-mobile.gutenberg-mobile'
+group='org.wordpress-mobile.gutenberg-mobile'
 
 def buildAssetsFolder = 'build/assets'
 
@@ -79,7 +79,7 @@ dependencies {
         def rnVersion = readReactNativeVersion('../../../../package.json', 'devDependencies')
         println "react-native version for react-native-bridge: $rnVersion"
         implementation "com.facebook.react:react-native:$rnVersion"
-        implementation "com.github.wordpress-mobile.gutenberg-mobile:react-native-aztec:$reactNativeAztecVersion"
+        implementation "org.wordpress-mobile.gutenberg-mobile:react-native-aztec:$reactNativeAztecVersion"
         implementation "com.github.wordpress-mobile:react-native-svg:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-svg', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-video:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-video', 'dependencies')}"
         implementation "com.github.wordpress-mobile:react-native-linear-gradient:${readHashedVersion('../../../react-native-editor/package.json', 'react-native-linear-gradient', 'dependencies')}"
@@ -126,7 +126,7 @@ if (willPublishReactNativeBridgeBinary) {
                 ReactNativeBridgePublication(MavenPublication) {
                     artifact bundleReleaseAar
 
-                    groupId 'com.github.wordpress-mobile.gutenberg-mobile'
+                    groupId 'org.wordpress-mobile.gutenberg-mobile'
                     artifactId 'react-native-gutenberg-bridge'
                     version publishReactNativeBridgeVersion
 

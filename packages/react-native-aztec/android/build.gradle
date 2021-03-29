@@ -35,7 +35,7 @@ apply plugin: 'maven-publish'
 // import the `readReactNativeVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
 
-group = 'com.github.wordpress-mobile.gutenberg-mobile'
+group = 'org.wordpress-mobile.gutenberg-mobile'
 
 // The sample build uses multiple directories to
 // keep boilerplate and common code separate from
@@ -123,7 +123,7 @@ if (willPublishReactNativeAztecBinary) {
                 ReactNativeAztecPublication(MavenPublication) {
                     artifact bundleReleaseAar
 
-                    groupId 'com.github.wordpress-mobile.gutenberg-mobile'
+                    groupId 'org.wordpress-mobile.gutenberg-mobile'
                     artifactId 'react-native-aztec'
                     version publishReactNativeAztecVersion
 
