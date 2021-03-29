@@ -23,17 +23,21 @@ function blockToWidget( block, existingWidget = null ) {
 	let widget;
 
 	if ( block.name === 'core/legacy-widget' ) {
-		const isReferenceWidget = !! block.attributes.referenceWidgetName;
-		if ( isReferenceWidget ) {
+		if ( block.attributes.id ) {
+			// Widget that does not extend WP_Widget.
 			widget = {
-				id: block.attributes.referenceWidgetName,
-				instance: block.attributes.instance,
+				id: block.attributes.id,
 			};
 		} else {
+			// Widget that extends WP_Widget.
 			widget = {
-				widgetClass: block.attributes.widgetClass,
 				idBase: block.attributes.idBase,
-				instance: block.attributes.instance,
+				instance: {
+					encoded_serialized_instance:
+						block.attributes.instance.encoded,
+					instance_hash_key: block.attributes.instance.hash,
+					__unstable_instance: block.attributes.instance.raw,
+				},
 			};
 		}
 	} else {
@@ -44,7 +48,6 @@ function blockToWidget( block, existingWidget = null ) {
 			idBase: 'block',
 			widgetClass: 'WP_Widget_Block',
 			instance: {
-				...instance,
 				__unstable_instance: instance,
 			},
 		};
@@ -66,23 +69,21 @@ function widgetToBlock( widget ) {
 		block = parsedBlocks.length
 			? parsedBlocks[ 0 ]
 			: createBlock( 'core/paragraph', {} );
-	} else {
-		const attributes = {
-			name: widget.name,
-			form: widget.form,
-			instance: widget.instance,
+	} else if ( widget.number ) {
+		// Widget that extends WP_Widget.
+		block = createBlock( 'core/legacy-widget', {
 			idBase: widget.idBase,
-			number: widget.number,
-		};
-
-		const isReferenceWidget = ! widget.widgetClass;
-		if ( isReferenceWidget ) {
-			attributes.referenceWidgetName = widget.id;
-		} else {
-			attributes.widgetClass = widget.widgetClass;
-		}
-
-		block = createBlock( 'core/legacy-widget', attributes, [] );
+			instance: {
+				encoded: widget.instance.encoded_serialized_instance,
+				hash: widget.instance.instance_hash_key,
+				raw: widget.instance.__unstable_instance,
+			},
+		} );
+	} else {
+		// Widget that does not extend WP_Widget.
+		block = createBlock( 'core/legacy-widget', {
+			id: widget.id,
+		} );
 	}
 
 	return addWidgetIdToBlock( block, widget.id );
