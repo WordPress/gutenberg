@@ -153,7 +153,7 @@
 		"chalk": "4.0.0",
 		"commander": "4.1.0",
 		"concurrently": "3.5.0",
-		"copy-webpack-plugin": "4.5.2",
+		"copy-webpack-plugin": "5.1.2",
 		"cross-env": "3.2.4",
 		"css-loader": "3.5.2",
 		"cssnano": "4.1.10",

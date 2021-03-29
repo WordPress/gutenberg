@@ -270,7 +270,7 @@ module.exports = {
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	].filter( Boolean ),
 	watchOptions: {
-		ignored: '!packages/*/!(src)/**/*',
+		ignored: '!packages/*/build-module/**/*',
 		aggregateTimeout: 500,
 	},
 	devtool,
