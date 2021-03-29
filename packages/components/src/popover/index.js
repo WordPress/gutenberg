@@ -6,7 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import {
+	useRef,
+	useState,
+	useLayoutEffect,
+	useEffect,
+	useCallback,
+} from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
@@ -242,6 +248,7 @@ const Popover = ( {
 	getAnchorRect,
 	expandOnMobile,
 	animate = true,
+	toggleRef,
 	onClickOutside,
 	onFocusOutside,
 	__unstableStickyBoundaryElement,
@@ -493,6 +500,36 @@ const Popover = ( {
 		}
 	};
 
+	const toggleFocusOutsideDelay = 50;
+	const toggleFocusOutsideTimeoutRef = useRef( null );
+	useEffect(
+		() => () => clearTimeout( toggleFocusOutsideTimeoutRef.current ),
+		[]
+	);
+	/**
+	 * We are using onFocusOutside to ensure we aren't
+	 * closing the popover here when clicking on the toggle button.
+	 * Using onClose would result in closing and reopening the popover.
+	 */
+	const handleToggleOnFocusOutside = useCallback( () => {
+		clearTimeout( toggleFocusOutsideTimeoutRef.current );
+		/**
+		 * Timeout is required to avoid bug in Firefox.
+		 * Without timeout the focused element in Firefox is the
+		 * popover content element. It takes a little bit of time
+		 * for the focus to move that's why we need timeout.
+		 */
+		toggleFocusOutsideTimeoutRef.current = setTimeout( () => {
+			const { ownerDocument } = toggleRef;
+			if (
+				! toggleRef.contains( ownerDocument.activeElement ) &&
+				! ownerDocument.activeElement.closest( '[role="dialog"]' )
+			) {
+				onClose();
+			}
+		}, toggleFocusOutsideDelay );
+	}, [ toggleFocusOutsideDelay, onClose ] );
+
 	/**
 	 * Shims an onFocusOutside callback to be compatible with a deprecated
 	 * onClickOutside prop function, if provided.
@@ -500,6 +537,11 @@ const Popover = ( {
 	 * @param {FocusEvent} event Focus event from onFocusOutside.
 	 */
 	function handleOnFocusOutside( event ) {
+		if ( toggleRef ) {
+			handleToggleOnFocusOutside( event );
+			return;
+		}
+
 		// Defer to given `onFocusOutside` if specified. Call `onClose` only if
 		// both `onFocusOutside` and `onClickOutside` are unspecified. Doing so
 		// assures backwards-compatibility for prior `onClickOutside` default.

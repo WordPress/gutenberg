@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback, useState, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -19,7 +19,6 @@ import {
 	ToolbarButton,
 	ToolbarGroup,
 	Popover,
-	__experimentalUsePopoverToggle as usePopoverToggle,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -109,33 +108,28 @@ function URLPicker( {
 	onToggleOpenInNewTab,
 	anchorRef,
 } ) {
-	const linkToolbarButtonRef = useRef( null );
-	const {
-		isOpen: isURLPickerOpen,
-		toggle: togglePicker,
-		close: closePicker,
-		onFocusOutside,
-		onClose,
-	} = usePopoverToggle( {
-		toggleRef: linkToolbarButtonRef,
-	} );
+	const linkToolbarButtonRef = useRef();
+	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const urlIsSet = !! url;
 	const urlIsSetandSelected = urlIsSet && isSelected;
+	const openLinkControl = () => {
+		setIsURLPickerOpen( ( s ) => ! s );
+		return false; // prevents default behaviour for event
+	};
 	const unlinkButton = () => {
 		setAttributes( {
 			url: undefined,
 			linkTarget: undefined,
 			rel: undefined,
 		} );
-		closePicker();
+		setIsURLPickerOpen( false );
 	};
-
 	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
 		<Popover
 			position="bottom center"
+			onClose={ () => setIsURLPickerOpen( false ) }
 			anchorRef={ anchorRef?.current }
-			onKeyDown={ onClose }
-			onFocusOutside={ onFocusOutside }
+			toggleRef={ linkToolbarButtonRef?.current }
 		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
@@ -163,7 +157,7 @@ function URLPicker( {
 							icon={ link }
 							title={ __( 'Link' ) }
 							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ togglePicker }
+							onClick={ openLinkControl }
 							ref={ linkToolbarButtonRef }
 						/>
 					) }
@@ -184,7 +178,7 @@ function URLPicker( {
 				<KeyboardShortcuts
 					bindGlobal
 					shortcuts={ {
-						[ rawShortcut.primary( 'k' ) ]: togglePicker,
+						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
 						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
 					} }
 				/>
