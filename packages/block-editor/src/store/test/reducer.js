@@ -2970,6 +2970,7 @@ describe( 'state', () => {
 
 		it( 'should return inserter_menu source if last block inserted is called with action INSERT_BLOCKS', () => {
 			const expectedSource = 'inserter_menu';
+
 			const action = {
 				blocks: [
 					{
@@ -2977,7 +2978,7 @@ describe( 'state', () => {
 					},
 				],
 				meta: {
-					source: 'inserter_menu',
+					source: expectedSource,
 				},
 				type: 'INSERT_BLOCKS',
 				updateSelection: true,
