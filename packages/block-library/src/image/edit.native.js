@@ -95,7 +95,7 @@ export class ImageEdit extends Component {
 		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onSetFeatured = this.onSetFeatured.bind( this );
-		this.onGetFeatured = this.onGetFeatured.bind( this );
+		this.onRemoveFeatured = this.onRemoveFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
@@ -160,7 +160,7 @@ export class ImageEdit extends Component {
 		}
 
 		if ( attributes.id ) {
-			this.onGetFeatured();
+			getFeaturedImageId( attributes.id );
 		}
 
 		this.addFeaturedImageIdListener();
@@ -187,7 +187,7 @@ export class ImageEdit extends Component {
 			const url = getUrlForSlug( image, attributes ) || image.source_url;
 			this.props.setAttributes( { url } );
 			if ( attributes.id ) {
-				this.onGetFeatured();
+				getFeaturedImageId( attributes.id );
 			}
 		}
 	}
@@ -291,15 +291,12 @@ export class ImageEdit extends Component {
 
 	onSetFeatured() {
 		const { attributes, closeSettingsBottomSheet } = this.props;
-
 		setFeaturedImage( attributes.id );
-
 		closeSettingsBottomSheet();
 	}
 
-	onGetFeatured() {
-		const { attributes } = this.props;
-		getFeaturedImageId( attributes.id );
+	onRemoveFeatured() {
+		setFeaturedImage( 0 );
 	}
 
 	featuredImageIdCurrent( payload ) {
@@ -522,6 +519,14 @@ export class ImageEdit extends Component {
 							label={ __( 'Set as Featured Image ' ) }
 							labelStyle={ styles.setFeaturedButton }
 							onPress={ this.onSetFeatured }
+						/>
+					) }
+
+					{ isFeaturedImage && (
+						<BottomSheet.Cell
+							label={ __( 'Remove as Featured Image ' ) }
+							labelStyle={ styles.removeFeaturedButton }
+							onPress={ this.onRemoveFeatured }
 						/>
 					) }
 				</PanelBody>

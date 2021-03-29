@@ -148,10 +148,6 @@ public class WPAndroidGlueCode {
         void onRetryUploadForMediaClicked(int mediaId);
         void onCancelUploadForMediaClicked(int mediaId);
         void onCancelUploadForMediaDueToDeletedBlock(int mediaId);
-
-       // void onSetFeaturedImageButtonClicked(int mediaId);
-       // void onGetFeaturedImageId(int mediaId);
-
         ArrayList<MediaOption> onGetOtherMediaImageOptions();
         ArrayList<MediaOption> onGetOtherMediaFileOptions();
         ArrayList<MediaOption> onGetOtherMediaAudioFileOptions();
@@ -180,7 +176,7 @@ public class WPAndroidGlueCode {
 
     public interface OnSetFeaturedImageListener {
         void onSetFeaturedImageButtonClicked(int mediaId);
-        void onGetFeaturedImageId(int mediaId);
+        void checkIfFeaturedImage(int mediaId);
     }
 
     public interface OnEditorMountListener {
@@ -339,7 +335,7 @@ public class WPAndroidGlueCode {
 
             @Override
             public void getFeaturedImageId(int mediaId) {
-                mOnSetFeaturedImageListener.onGetFeaturedImageId(mediaId);
+                mOnSetFeaturedImageListener.checkIfFeaturedImage(mediaId);
             }
 
             @Override
