@@ -2963,10 +2963,7 @@ describe( 'state', () => {
 				updateSelection: true,
 			};
 
-			const state = lastBlockInserted(
-				{ clientId: expectedClientId },
-				action
-			);
+			const state = lastBlockInserted( {}, action );
 
 			expect( state.clientId ).toBe( expectedClientId );
 		} );
