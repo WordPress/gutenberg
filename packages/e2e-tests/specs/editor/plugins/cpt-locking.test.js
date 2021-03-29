@@ -159,6 +159,8 @@ describe( 'cpt locking', () => {
 
 		it( 'should allow blocks to be inserted', async () => {
 			expect(
+				// "Add block" selector is required to make sure performance comparison
+				// doesn't fail on older branches where we still had "Add block" as label.
 				await page.$(
 					'.edit-post-header [aria-label="Add block"], .edit-post-header [aria-label="Toggle block inserter"]'
 				)
