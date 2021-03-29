@@ -12,9 +12,10 @@
  */
 
 // Show submenus above the sibling inserter.
-.has-child {
+.wp-block-navigation .has-child {
 	cursor: pointer;
 
+	.submenu-container,
 	.wp-block-navigation-link__container {
 		z-index: z-index(".has-child .wp-block-navigation-link__container");
 	}
