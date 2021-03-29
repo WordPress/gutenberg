@@ -74,7 +74,48 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	);
 	$selectors_group  = implode( ', ', $selectors_scoped );
 
-	$duotone = gutenberg_render_duotone_filter( $selectors_group, $duotone_id, $duotone_values );
+	ob_start();
+
+	?>
+
+	<style>
+		<?php echo $selectors_group; ?> {
+			filter: url( <?php echo esc_url( '#' . $duotone_id ); ?> );
+		}
+	</style>
+
+	<svg
+		xmlns:xlink="http://www.w3.org/1999/xlink"
+		viewBox="0 0 0 0"
+		width="0"
+		height="0"
+		focusable="false"
+		role="none"
+		style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;"
+	>
+		<defs>
+			<filter id="<?php echo esc_attr( $duotone_id ); ?>">
+				<feColorMatrix
+					type="matrix"
+					<?php // phpcs:disable Generic.WhiteSpace.DisallowSpaceIndent ?>
+					values=".299 .587 .114 0 0
+							.299 .587 .114 0 0
+							.299 .587 .114 0 0
+							0 0 0 1 0"
+					<?php // phpcs:enable Generic.WhiteSpace.DisallowSpaceIndent ?>
+				/>
+				<feComponentTransfer color-interpolation-filters="sRGB" >
+					<feFuncR type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['r'] ) ); ?>" />
+					<feFuncG type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['g'] ) ); ?>" />
+					<feFuncB type="table" tableValues="<?php echo esc_attr( implode( ' ', $duotone_values['b'] ) ); ?>" />
+				</feComponentTransfer>
+			</filter>
+		</defs>
+	</svg>
+
+	<?php
+
+	$duotone = ob_get_clean();
 
 	// Like the layout hook, this assumes the hook only applies to blocks with a single wrapper.
 	$content = preg_replace(

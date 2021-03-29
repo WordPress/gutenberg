@@ -113,7 +113,6 @@ require __DIR__ . '/navigation-page.php';
 require __DIR__ . '/experiments-page.php';
 require __DIR__ . '/global-styles.php';
 require __DIR__ . '/query-utils.php';
-require __DIR__ . '/duotone-filter.php';
 
 require __DIR__ . '/block-supports/generated-classname.php';
 require __DIR__ . '/block-supports/colors.php';
