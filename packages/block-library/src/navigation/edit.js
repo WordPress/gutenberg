@@ -96,6 +96,7 @@ function Navigation( {
 		return (
 			<div { ...blockProps }>
 				<NavigationPlaceholder
+					clientId={ clientId }
 					onCreate={ ( blocks, selectNavigationBlock ) => {
 						setIsPlaceholderShown( false );
 						updateInnerBlocks( blocks );

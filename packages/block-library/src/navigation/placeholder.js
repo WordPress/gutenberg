@@ -98,7 +98,7 @@ function convertMenuItemsToBlocks( menuItems ) {
 	return mapMenuItemsToBlocks( menuTree );
 }
 
-function NavigationPlaceholder( { onCreate }, ref ) {
+function NavigationPlaceholder( { onCreate, clientId }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
@@ -112,6 +112,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		hasResolvedMenus,
 		menuItems,
 		hasResolvedMenuItems,
+		canInsertPageList,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -121,6 +122,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 				isResolving,
 				hasFinishedResolution,
 			} = select( coreStore );
+			const { canInsertBlockType } = select( 'core/block-editor' );
 			const pagesParameters = [
 				'postType',
 				'page',
@@ -167,6 +169,10 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 							menuItemsParameters
 					  )
 					: false,
+				canInsertPageList: canInsertBlockType(
+					'core/page-list',
+					clientId
+				),
 			};
 		},
 		[ selectedMenu ]
@@ -255,7 +261,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 								) }
 							</DropdownMenu>
 						) : undefined }
-						{ hasPages ? (
+						{ canInsertPageList && hasPages ? (
 							<Button onClick={ onCreateAllPages }>
 								{ __( 'Add all pages' ) }
 							</Button>
