@@ -15,35 +15,34 @@ import { cleanEmptyObject } from './utils';
 import { useCustomUnits } from '../components/unit-control';
 
 /**
- * Determines if there is padding support.
+ * Determines if there is margin support.
  *
  * @param  {string|Object} blockType Block name or Block Type object.
  * @return {boolean}                 Whether there is support.
  */
-const hasPaddingSupport = ( blockType ) => {
+const hasMarginSupport = ( blockType ) => {
 	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
-	return !! ( true === support || support?.padding );
+	return !! ( true === support || support?.margin );
 };
 
 /**
- * Custom hook that checks if padding settings have been disabled.
+ * Custom hook that checks if margin settings have been disabled.
  *
  * @param  {string} name The name of the block.
- * @return {boolean}                 Whether padding setting is disabled.
+ * @return {boolean}     Whether margin setting is disabled.
  */
-export function useIsPaddingDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useEditorFeature( 'spacing.customPadding' );
-	return ! hasPaddingSupport( blockName ) || isDisabled;
+export function useIsMarginDisabled( { name: blockName } = {} ) {
+	const isDisabled = ! useEditorFeature( 'spacing.customMargin' );
+	return ! hasMarginSupport( blockName ) || isDisabled;
 }
 
 /**
- * Inspector control panel containing the padding related configuration
+ * Inspector control panel containing the margin related configuration
  *
- * @param {Object} props
- *
- * @return {WPElement} Padding edit element.
+ * @param  {Object} props Block props.
+ * @return {WPElement}    Margin edit element.
  */
-export function PaddingEdit( props ) {
+export function MarginEdit( props ) {
 	const {
 		name: blockName,
 		attributes: { style },
@@ -51,9 +50,9 @@ export function PaddingEdit( props ) {
 	} = props;
 
 	const units = useCustomUnits();
-	const sides = useCustomSides( blockName, 'padding' );
+	const sides = useCustomSides( blockName, 'margin' );
 
-	if ( ! hasPaddingSupport( blockName ) ) {
+	if ( ! hasMarginSupport( blockName ) ) {
 		return null;
 	}
 
@@ -62,7 +61,7 @@ export function PaddingEdit( props ) {
 			...style,
 			spacing: {
 				...style?.spacing,
-				padding: next,
+				margin: next,
 			},
 		};
 
@@ -75,7 +74,7 @@ export function PaddingEdit( props ) {
 		const newStyle = {
 			...style,
 			visualizers: {
-				padding: next,
+				margin: next,
 			},
 		};
 
@@ -88,10 +87,10 @@ export function PaddingEdit( props ) {
 		web: (
 			<>
 				<BoxControl
-					values={ style?.spacing?.padding }
+					values={ style?.spacing?.margin }
 					onChange={ onChange }
 					onChangeShowVisualizer={ onChangeShowVisualizer }
-					label={ __( 'Padding' ) }
+					label={ __( 'Margin' ) }
 					sides={ sides }
 					units={ units }
 				/>

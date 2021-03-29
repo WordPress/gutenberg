@@ -53,6 +53,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'typography', 'lineHeight' ],
 		support: [ 'lineHeight' ],
 	},
+	margin: {
+		value: [ 'spacing', 'margin' ],
+		support: [ 'spacing', 'margin' ],
+		properties: [ 'top', 'right', 'bottom', 'left' ],
+	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
 		support: [ 'spacing', 'padding' ],
