@@ -35,9 +35,7 @@ export function NameEditor() {
 				onBlur={ () => setIsMenuNameEditFocused( false ) }
 				className="edit-navigation-name-editor__text-control"
 				value={ editedMenuName }
-				onChange={ ( value ) => {
-					editMenuName( value );
-				} }
+				onChange={ editMenuName }
 			/>
 		</>
 	);

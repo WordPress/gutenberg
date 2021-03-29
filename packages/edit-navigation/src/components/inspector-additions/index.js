@@ -17,6 +17,7 @@ import { __ } from '@wordpress/i18n';
 export default function InspectorAdditions( {
 	menuId,
 	menus,
+	isMenuBeingDeleted,
 	onDeleteMenu,
 	onSelectMenu,
 	isManageLocationsModalOpen,
@@ -37,7 +38,10 @@ export default function InspectorAdditions( {
 			<PanelBody title={ __( 'Menu settings' ) }>
 				<NameEditor />
 				<AutoAddPages menuId={ menuId } />
-				<DeleteMenu onDeleteMenu={ onDeleteMenu } />
+				<DeleteMenu
+					onDeleteMenu={ onDeleteMenu }
+					isMenuBeingDeleted={ isMenuBeingDeleted }
+				/>
 			</PanelBody>
 			<PanelBody title={ __( 'Theme locations' ) }>
 				<ManageLocations
