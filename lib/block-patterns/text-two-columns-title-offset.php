@@ -9,23 +9,19 @@ return array(
 	'title'       => __( 'Two columns of text with offset heading' ),
 	'categories'  => array( 'columns', 'text' ),
 	'content'     => '<!-- wp:group {"align":"full","style":{"color":{"background":"#f2f0e9"}}} -->
-	<div class="wp-block-group alignfull has-background" style="background-color:#f2f0e9"><!-- wp:columns {"align":"wide"} -->
-	<div class="wp-block-columns alignwide"><!-- wp:column {"width":"50%"} -->
-	<div class="wp-block-column" style="flex-basis:50%"><!-- wp:spacer {"height":70} -->
+	<div class="wp-block-group alignfull has-background" style="background-color:#f2f0e9"><!-- wp:spacer {"height":70} -->
 	<div style="height:70px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer -->
 	
-	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"30px"}},"textColor":"black"} -->
+	<!-- wp:columns {"verticalAlignment":"center","align":"wide"} -->
+	<div class="wp-block-columns alignwide are-vertically-aligned-center"><!-- wp:column {"width":"50%"} -->
+	<div class="wp-block-column" style="flex-basis:50%"><!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"30px"}},"textColor":"black"} -->
 	<p class="has-black-color has-text-color" style="font-size:30px;line-height:1.1"><strong>' . __( 'Oceanic Inspiration' ) . '</strong></p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column -->
 	
 	<!-- wp:column {"width":"50%"} -->
-	<div class="wp-block-column" style="flex-basis:50%"><!-- wp:spacer {"height":95} -->
-	<div style="height:95px" aria-hidden="true" class="wp-block-spacer"></div>
-	<!-- /wp:spacer -->
-	
-	<!-- wp:separator {"color":"black","className":"is-style-wide"} -->
+	<div class="wp-block-column" style="flex-basis:50%"><!-- wp:separator {"color":"black","className":"is-style-wide"} -->
 	<hr class="wp-block-separator has-text-color has-background has-black-background-color has-black-color is-style-wide"/>
 	<!-- /wp:separator --></div>
 	<!-- /wp:column --></div>
@@ -33,9 +29,7 @@ return array(
 	
 	<!-- wp:columns {"align":"wide"} -->
 	<div class="wp-block-columns alignwide"><!-- wp:column -->
-	<div class="wp-block-column"><!-- wp:spacer {"height":350} -->
-	<div style="height:350px" aria-hidden="true" class="wp-block-spacer"></div>
-	<!-- /wp:spacer --></div>
+	<div class="wp-block-column"></div>
 	<!-- /wp:column -->
 	
 	<!-- wp:column -->
@@ -49,7 +43,11 @@ return array(
 	<p class="has-black-color has-text-color has-extra-small-font-size">' . __( 'No darkness would ever settle upon those lamps, as no darkness had settled upon them for hundreds of years. It seemed dreadful that the town should blaze for ever in the same spot; dreadful at least to people going away to adventure upon the sea, and beholding it as a circumscribed mound, eternally burnt, eternally scarred. From the deck of the ship the great city appeared a crouched and cowardly figure, a sedentary miser.' ) . '</p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column --></div>
-	<!-- /wp:columns --></div>
+	<!-- /wp:columns -->
+
+	<!-- wp:spacer {"height":40} -->
+	<div style="height:40px" aria-hidden="true" class="wp-block-spacer"></div>
+	<!-- /wp:spacer --></div>
 	<!-- /wp:group -->',
 	'description' => _x( 'Two columns of text with offset heading', 'Block pattern description' ),
 );
