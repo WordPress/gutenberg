@@ -1,0 +1,12 @@
+{
+	"title": "block title",
+	"description": "block description",
+	"keywords": [
+		"block keyword"
+	],
+	"styles": [
+		{
+			"label": "block style label"
+		}
+	]
+}
