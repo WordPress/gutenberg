@@ -16,7 +16,7 @@ return array(
 	<!-- /wp:spacer -->
 	
 	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"30px"}},"textColor":"black"} -->
-	<p class="has-black-color has-text-color" style="font-size:30px;line-height:1.1"><strong>' . __( 'Ancient Sea Representations' ) . '</strong></p>
+	<p class="has-black-color has-text-color" style="font-size:30px;line-height:1.1"><strong>' . __( 'Oceanic Inspiration' ) . '</strong></p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column -->
 	
