@@ -180,30 +180,48 @@ export default function SearchEdit( {
 		isButtonInside && borderStyle,
 	];
 
+	const getPlaceholderAccessibilityLabel = () => {
+		const title = __( 'Search input field.' );
+		const description = placeholder
+			? `${ __( 'Current placeholder text is' ) } ${ placeholder }`
+			: __( 'No custom placeholder set' );
+		return `${ title } ${ description }`;
+	};
+
 	const renderTextField = () => {
 		return (
-			<PlainText
-				ref={ textInputRef }
-				isSelected={ isPlaceholderSelected }
-				className="wp-block-search__input"
-				style={ inputStyle }
-				numberOfLines={ 1 }
-				ellipsizeMode="tail" // currently only works on ios
-				label={ null }
-				value={ placeholder }
-				placeholder={
-					placeholder ? undefined : __( 'Optional placeholder…' )
-				}
-				onChange={ ( newVal ) =>
-					setAttributes( { placeholder: newVal } )
-				}
-				onFocus={ () => {
-					setIsPlaceholderSelected( true );
-					onFocus();
-				} }
-				onBlur={ () => setIsPlaceholderSelected( false ) }
-				placeholderTextColor={ placeholderStyle.color }
-			/>
+			<View
+				style={ styles.searchInputContainer }
+				accessible={ true }
+				accessibilityRole="none"
+				accessibilityHint={ __(
+					'Double tap to edit placeholder text'
+				) }
+				accessibilityLabel={ getPlaceholderAccessibilityLabel() }
+			>
+				<PlainText
+					ref={ textInputRef }
+					isSelected={ isPlaceholderSelected }
+					className="wp-block-search__input"
+					style={ inputStyle }
+					numberOfLines={ 1 }
+					ellipsizeMode="tail" // currently only works on ios
+					label={ null }
+					value={ placeholder }
+					placeholder={
+						placeholder ? undefined : __( 'Optional placeholder…' )
+					}
+					onChange={ ( newVal ) =>
+						setAttributes( { placeholder: newVal } )
+					}
+					onFocus={ () => {
+						setIsPlaceholderSelected( true );
+						onFocus();
+					} }
+					onBlur={ () => setIsPlaceholderSelected( false ) }
+					placeholderTextColor={ placeholderStyle.color }
+				/>
+			</View>
 		);
 	};
 
@@ -222,58 +240,87 @@ export default function SearchEdit( {
 				{ buttonUseIcon && <Icon icon={ search } { ...styles.icon } /> }
 
 				{ ! buttonUseIcon && (
-					<RichText
-						className="wp-block-search__button"
-						identifier="text"
-						tagName="p"
-						style={ styles.richTextButton }
-						placeholder={ buttonPlaceholderText }
-						value={ buttonText }
-						withoutInteractiveFormatting
-						onChange={ ( html ) =>
-							setAttributes( { buttonText: html } )
-						}
-						minWidth={ MIN_BUTTON_WIDTH }
-						textAlign="center"
-						isSelected={ isButtonSelected }
-						__unstableMobileNoFocusOnMount={ ! isSelected }
-						unstableOnFocus={ () => {
-							setIsButtonSelected( true );
-						} }
-						onBlur={ () => {
-							setIsButtonSelected( false );
-						} }
-						selectionColor={ styles.richTextButtonCursor.color }
-					/>
+					<View
+						accessible={ true }
+						accessibilityRole="none"
+						accessibilityHint={ __(
+							'Double tap to edit button text'
+						) }
+						accessibilityLabel={ `${ __(
+							'Search button. Current button text is'
+						) } ${ buttonText }` }
+					>
+						<RichText
+							className="wp-block-search__button"
+							identifier="text"
+							tagName="p"
+							style={ styles.richTextButton }
+							placeholder={ buttonPlaceholderText }
+							value={ buttonText }
+							withoutInteractiveFormatting
+							onChange={ ( html ) =>
+								setAttributes( { buttonText: html } )
+							}
+							minWidth={ MIN_BUTTON_WIDTH }
+							textAlign="center"
+							isSelected={ isButtonSelected }
+							__unstableMobileNoFocusOnMount={ ! isSelected }
+							unstableOnFocus={ () => {
+								setIsButtonSelected( true );
+							} }
+							onBlur={ () => {
+								setIsButtonSelected( false );
+							} }
+							selectionColor={ styles.richTextButtonCursor.color }
+						/>
+					</View>
 				) }
 			</View>
 		);
 	};
 
 	return (
-		<View { ...blockProps } style={ styles.searchBlockContainer }>
+		<View
+			{ ...blockProps }
+			style={ styles.searchBlockContainer }
+			importantForAccessibility={
+				isSelected ? 'yes' : 'no-hide-descendants'
+			}
+			accessibilityElementsHidden={ isSelected ? false : true }
+		>
 			{ isSelected && controls }
 
 			{ showLabel && (
-				<RichText
-					className="wp-block-search__label"
-					identifier="text"
-					tagName="p"
-					style={ styles.richTextLabel }
-					aria-label={ __( 'Label text' ) }
-					placeholder={ __( 'Add label…' ) }
-					withoutInteractiveFormatting
-					value={ label }
-					onChange={ ( html ) => setAttributes( { label: html } ) }
-					isSelected={ isLabelSelected }
-					__unstableMobileNoFocusOnMount={ ! isSelected }
-					unstableOnFocus={ () => {
-						setIsLabelSelected( true );
-					} }
-					onBlur={ () => {
-						setIsLabelSelected( false );
-					} }
-				/>
+				<View
+					accessible={ true }
+					accessibilityRole="none"
+					accessibilityHint={ __( 'Double tap to edit label text' ) }
+					accessibilityLabel={ `${ __(
+						'Search block label. Current text is'
+					) } ${ label }` }
+				>
+					<RichText
+						className="wp-block-search__label"
+						identifier="text"
+						tagName="p"
+						style={ styles.richTextLabel }
+						placeholder={ __( 'Add label…' ) }
+						withoutInteractiveFormatting
+						value={ label }
+						onChange={ ( html ) =>
+							setAttributes( { label: html } )
+						}
+						isSelected={ isLabelSelected }
+						__unstableMobileNoFocusOnMount={ ! isSelected }
+						unstableOnFocus={ () => {
+							setIsLabelSelected( true );
+						} }
+						onBlur={ () => {
+							setIsLabelSelected( false );
+						} }
+						selectionColor={ styles.richTextButtonCursor.color }
+					/>
+				</View>
 			) }
 
 			{ ( 'button-inside' === buttonPosition ||
