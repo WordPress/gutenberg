@@ -468,50 +468,6 @@ There's a growing need to add more theme metadata to the theme.json. This sectio
 
 Currently block variations exist for "header" and "footer" values of the area term, any other values and template parts not defined in the json will default to the general template part block.  Variations will be denoted by specific icons within the editor's interface, will default to the corresponding semantic HTML element for the wrapper (this can also be overridden by the `tagName` attribute set on the template part block), and will contextualize the template part allowing more custom flows in future editor improvements.
 
-#### Spacing Properties
-
-| Block | Padding |
-| --- | --- |
-| Cover | Yes |
-| Group | Yes |
-
-#### Typography Properties
-
-These are the current typography properties supported by blocks:
-
-| Block | Font Family | Font Size | Font Style | Font Weight | Line Height | Text Decoration | Text Transform |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| Global | Yes | Yes | Yes | Yes | Yes | Yes | Yes |
-| Code | - | Yes | - | - | - | - | - |
-| Heading [1] | - | Yes | - | - | Yes | - | - |
-| List | - | Yes | - | - | - | - | - |
-| Navigation | Yes | Yes | Yes | Yes | - | Yes | Yes |
-| Paragraph | - | Yes | - | - | Yes | - | - |
-| Post Author | - | Yes | - | - | Yes | - | - |
-| Post Comments | - | Yes | - | - | Yes | - | - |
-| Post Comments Count | - | Yes | - | - | Yes | - | - |
-| Post Comments Form | - | Yes | - | - | Yes | - | - |
-| Post Date | - | Yes | - | - | Yes | - | - |
-| Post Excerpt | - | Yes | - | - | Yes | - | - |
-| Post Hierarchical Terms | - | Yes | - | - | Yes | - | - |
-| Post Tags | - | Yes | - | - | Yes | - | - |
-| Post Title | Yes | Yes | - | - | Yes | - | - |
-| Preformatted | - | Yes | - | - | - | - | - |
-| Site Tagline | Yes | Yes | - | - | Yes | - | - |
-| Site Title | Yes | Yes | - | - | Yes | - | Yes |
-| Verse | Yes | Yes | - | - | - | - | - |
-
-[1] The heading block represents 6 distinct HTML elements: H1-H6. It comes with selectors to target each individual element (ex: core/heading/h1 for H1, etc).
-
-
-### Other theme metadata
-
-There's a growing need to add more theme metadata to the theme.json. This section lists those other fields:
-
-#### `customTemplates`: 
-
-within this field themes can list the custom templates present in the `block-templates` folder, the keys should match the custom template name. For example, for a custom template named `my-custom-template.html`, the `theme.json` can declare what post types can use it and what's the title to show the user:
-
 ```json
 {
 	"templateParts": [
