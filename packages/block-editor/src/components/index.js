@@ -109,7 +109,6 @@ export {
 	useClipboardHandler as __unstableUseClipboardHandler,
 } from './copy-handler';
 export { default as DefaultBlockAppender } from './default-block-appender';
-export { default as __experimentalDuotoneFilter } from './duotone-filter';
 export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { default as __experimentalLibrary } from './inserter/library';
