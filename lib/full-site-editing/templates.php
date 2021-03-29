@@ -274,7 +274,7 @@ function gutenberg_the_skip_link() {
 		skipLink = document.createElement( 'a' );
 		skipLink.classList.add( 'skip-link', 'screen-reader-text' );
 		skipLink.href = '#' + skipLinkTargetID;
-		skipLink.innerHTML = label;
+		skipLink.innerHTML = '<?php esc_html_e( 'Skip to content' ); ?>';
 
 		// Inject the skip link.
 		parentEl.insertAdjacentElement( 'afterbegin', skipLink );
