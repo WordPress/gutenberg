@@ -43,10 +43,8 @@ const cssLoaders = [
 			// Provide a fallback configuration if there's not
 			// one explicitly available in the project.
 			...( ! hasPostCSSConfig() && {
-				postcssOptions: {
-					ident: 'postcss',
-					plugins: postcssPlugins,
-				},
+				ident: 'postcss',
+				plugins: postcssPlugins,
 			} ),
 		},
 	},
@@ -220,7 +218,7 @@ const config = {
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
-		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
+		new MiniCSSExtractPlugin( { esModule: false, filename: '[name].css' } ),
 		// MiniCSSExtractPlugin creates JavaScript assets for CSS that are
 		// obsolete and should be removed. Related webpack issue:
 		// https://github.com/webpack-contrib/mini-css-extract-plugin/issues/85
