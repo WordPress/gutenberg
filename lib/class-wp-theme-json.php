@@ -363,6 +363,7 @@ class WP_Theme_JSON {
 				unset( $this->theme_json[ $subtree ] );
 			}
 		}
+
 	}
 
 	/**
