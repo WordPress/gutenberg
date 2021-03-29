@@ -154,9 +154,7 @@ class MediaContainer extends Component {
 	finishMediaUploadWithFailure() {
 		const { createErrorNotice } = this.props;
 
-		createErrorNotice(
-			__( 'An unknown error occurred. Please try again.' )
-		);
+		createErrorNotice( __( 'Failed to insert media.' ) );
 
 		this.setState( { isUploadInProgress: false } );
 	}

@@ -58,8 +58,7 @@ function AudioEdit( {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	const onError = () => {
-		// TODO: Set up error state
-		onUploadError( __( 'Error' ) );
+		createErrorNotice( __( 'Failed to insert audio file.' ) );
 	};
 
 	function toggleAttribute( attribute ) {
@@ -72,9 +71,6 @@ function AudioEdit( {
 		// TODO: Set up add audio from URL flow
 	}
 
-	function onUploadError( message ) {
-		createErrorNotice( message );
-	}
 	function onSelectAudio( media ) {
 		if ( ! media || ! media.url ) {
 			// in this case there was an error and we should continue in the editing state
