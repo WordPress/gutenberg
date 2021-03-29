@@ -22,7 +22,8 @@ export default function UnselectedMenuState( {
 			<Card>
 				<CardBody>
 					{ showMenuSwitcher ? (
-						<NavigableMenu>
+						// class components-dropdown-menu__menu added to unify styles with MenuSwitcher in Header
+						<NavigableMenu className="components-dropdown-menu__menu">
 							<MenuSwitcher
 								onSelectMenu={ onSelectMenu }
 								menus={ menus }
