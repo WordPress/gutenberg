@@ -107,11 +107,11 @@ function URLPicker( {
 	onToggleOpenInNewTab,
 	anchorRef,
 } ) {
-	const linkToolbarButtonRef = useRef();
+	const linkToolbarButtonRef = useRef( null );
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const urlIsSet = !! url;
 	const urlIsSetandSelected = urlIsSet && isSelected;
-	const openLinkControl = () => {
+	const toggleLinkControl = () => {
 		setIsURLPickerOpen( ( isOpen ) => ! isOpen );
 		return false; // prevents default behaviour for event
 	};
@@ -155,7 +155,7 @@ function URLPicker( {
 						icon={ link }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
+						onClick={ toggleLinkControl }
 						ref={ linkToolbarButtonRef }
 					/>
 				) }
@@ -175,7 +175,7 @@ function URLPicker( {
 				<KeyboardShortcuts
 					bindGlobal
 					shortcuts={ {
-						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+						[ rawShortcut.primary( 'k' ) ]: toggleLinkControl,
 						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
 					} }
 				/>
