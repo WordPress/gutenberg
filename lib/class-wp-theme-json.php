@@ -149,11 +149,6 @@ class WP_Theme_JSON {
 			'custom'     => null,
 			'layout'     => null,
 		),
-		'skipLinks'       => array(
-			'links'  => null,
-			'auto'   => null,
-			'css'    => null,
-		),
 	);
 
 	/**
@@ -982,62 +977,6 @@ class WP_Theme_JSON {
 			}
 		}
 		return $template_parts;
-	}
-
-	/**
-	 * Return an array of skip-links.
-	 *
-	 * @return array
-	 */
-	public function get_skip_links() {
-
-		$fallback_elements = array(
-			'#skip-link-target',
-			'main',
-			'.wp-block-post-title',
-			'.wp-block-query-loop',
-			'.wp-block-post-content',
-			'.entry-content',
-			'h1',
-			'h2',
-		);
-
-		// If we don't have "skipLinks" defined return the defaults.
-		if ( ! isset( $this->theme_json['skipLinks'] ) ) {
-			return array(
-				array(
-					'target'       => $fallback_elements,
-					'label'        => __( 'Skip to content', 'gutenberg' ),
-					'useFallbacks' => false,
-				),
-			);
-		}
-
-		if ( isset( $this->theme_json['skipLinks']['auto'] ) && false === $this->theme_json['skipLinks']['auto'] ) {
-			return;
-		}
-
-		$links = array();
-		foreach ( $this->theme_json['skipLinks']['links'] as $link ) {
-			$selectors = isset( $link['target'] ) ? (array) $link['target'] : array();
-			if ( ! isset( $link['useFallbacks'] ) || $link['useFallbacks'] ) {
-				$selectors = array_unique( array_merge( $selectors, $fallback_elements ) );
-			}
-			$links[] = array(
-				'target' => array_values( $selectors ), // Use array_values to ensure there are no skipped keys in the array.
-				'label'  => isset( $link['label'] ) ? $link['label'] : __( 'Skip to content', 'gutenberg' ),
-			);
-		}
-		return $links;
-	}
-
-	/**
-	 * Whether the skip-link styles should be automatically added or not.
-	 *
-	 * @return string
-	 */
-	public function should_add_skip_link_styles() {
-		return ! isset( $this->theme_json['skipLinks'] ) || ! empty( $this->theme_json['skipLinks']['css'] );
 	}
 
 	/**

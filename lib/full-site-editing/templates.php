@@ -194,116 +194,92 @@ function set_unique_slug_on_create_template( $post_id ) {
 add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template' );
 
 /**
- * Inject the skip-link.
- */
-function gutenberg_inject_skip_link() {
-	global $template_html, $skip_links_via_script;
-
-	$skip_links_via_script = array();
-
-	// Add the skip-link styles if needed.
-	if ( WP_Theme_JSON_Resolver::get_theme_data()->should_add_skip_link_styles() ) {
-		echo '<style id="skip-link-styles">';
-		echo '.skip-link.screen-reader-text{border:0;clip:rect(1px,1px,1px,1px);clip-path:inset(50%);height:1px;margin:-1px;overflow:hidden;padding:0;position:absolute !important;width:1px;word-wrap:normal !important;}';
-		echo '.skip-link.screen-reader-text:focus{background-color:#eee;clip:auto !important;clip-path:none;color:#444;display:block;font-size:1em;height:auto;left:5px;line-height:normal;padding:15px 23px 14px;text-decoration:none;top:5px;width:auto;z-index:100000;}';
-		echo '</style>';
-	}
-
-	// Get the array of skip-links.
-	$links = WP_Theme_JSON_Resolver::get_theme_data()->get_skip_links();
-
-	// Sanity check.
-	if ( empty( $links ) || ! $template_html ) {
-		return;
-	}
-
-	// Loop links.
-	foreach ( $links as $link ) {
-		$element_found = false;
-		// Try to find the selector in $template_html and print the skip-link.
-		foreach ( $link['target'] as $selector ) {
-			if ( 0 === strpos( $selector, '#' ) ) {
-				$selector_no_hash = str_replace( '#', '', $selector );
-				if ( strpos( $template_html, 'id="' . $selector_no_hash . '"' ) || strpos( $template_html, "id='$selector_no_hash'" ) ) {
-					echo '<a id="wp--skip-link--' . esc_attr( $selector_no_hash ) . '" class="skip-link screen-reader-text" href="' . esc_attr( $selector ) . '">' . esc_html( $link['label'] ) . '</a>';
-					$element_found = true;
-					break;
-				}
-			}
-		}
-
-		if ( ! $element_found ) {
-			// Add the skip-link to the $skip_links_via_script global.
-			$skip_links_via_script[] = $link;
-		}
-	}
-
-	if ( ! empty( $skip_links_via_script ) ) {
-		// An element with the appropriate target ID was not located.
-		// Add a script to auto-generate the target and link based on the content we have.
-		add_action( 'wp_footer', 'gutenberg_the_skip_link_script' );
-	}
-}
-add_action( 'wp_body_open', 'gutenberg_inject_skip_link' );
-
-/**
- * Print the skip-link script.
+ * Print the skip-link script & styles.
  *
  * @return void
  */
-function gutenberg_the_skip_link_script() {
+function gutenberg_the_skip_link() {
 
-	// Get the links.
-	global $skip_links_via_script;
-
-	// Sanity check.
-	if ( empty( $skip_links_via_script ) ) {
+	// Early exit if not an FSE theme.
+	if ( ! gutenberg_is_fse_theme() ) {
 		return;
 	}
 	?>
-	<script>
-	( function() {
-		var links = <?php echo wp_json_encode( array_reverse( $skip_links_via_script ) ); // phpcs:ignore WordPress.Security.EscapeOutput ?>,
-			parentEl = document.querySelector( '.wp-site-blocks' ) || document.body,
-			generateLink = function( selectors, label, parent ) {
-				var contentEl, contentElID, skipLink, i;
 
-				// Find the content element.
-				for ( i = 0; i < selectors.length; i++ ) {
-					if ( ! contentEl ) {
-						contentEl = document.querySelector( selectors[ i ] );
-					}
-				}
-
-				// Early exit if no content element was found.
-				if ( ! contentEl ) {
-					return;
-				}
-
-				// Get the ID of the content element.
-				contentElID = contentEl.id;
-				if ( ! contentElID ) {
-					contentElID = 'auto-skip-link-target';
-					contentEl.id = contentElID;
-				}
-
-				// Create the skip link.
-				skipLink = document.createElement( 'a' );
-				skipLink.classList.add( 'skip-link', 'screen-reader-text' );
-				skipLink.href = '#' + contentElID;
-				skipLink.innerHTML = label;
-				skipLink.id = 'wp--skip-link--' + contentElID;
-
-				// Inject the skip link.
-				parent.insertAdjacentElement( 'afterbegin', skipLink );
-			},
-			i;
-
-		for ( i = 0; i < links.length; i++ ) {
-			generateLink( links[ i ]['target'], links[ i ]['label'], parentEl );
+	<?php
+	/**
+	 * Print the skip-link styles.
+	 */
+	?>
+	<style id="skip-link-styles">
+		.skip-link.screen-reader-text {
+			border: 0;
+			clip: rect(1px,1px,1px,1px);
+			clip-path: inset(50%);
+			height: 1px;
+			margin: -1px;
+			overflow: hidden;
+			padding: 0;
+			position: absolute !important;
+			width: 1px;
+			word-wrap: normal !important;
 		}
 
+		.skip-link.screen-reader-text:focus {
+			background-color: #eee;
+			clip: auto !important;
+			clip-path: none;
+			color: #444;
+			display: block;
+			font-size: 1em;
+			height: auto;
+			left: 5px;
+			line-height: normal;
+			padding: 15px 23px 14px;
+			text-decoration: none;
+			top: 5px;
+			width: auto;
+			z-index: 100000;
+		}
+	</style>
+	<?php
+	/**
+	 * Print the skip-link script.
+	 */
+	?>
+	<script>
+	( function() {
+		var skipLinkTarget = document.querySelector( 'main' ),
+			parentEl,
+			skipLinkTargetID,
+			skipLink;
+
+		// Early exit if a skip-link target can't be located.
+		if ( ! skipLinkTarget ) {
+			return;
+		}
+
+		// Get the site wrapper.
+		// The skip-link will be injected in the beginning of it.
+		parentEl = document.querySelector( '.wp-site-blocks' ) || document.body,
+
+		// Get the skip-link target's ID, and generate one if it doesn't exist.
+		skipLinkTargetID = skipLinkTarget.id;
+		if ( ! skipLinkTargetID ) {
+			skipLinkTargetID = 'wp--skip-link--target';
+			skipLinkTarget.id = skipLinkTargetID;
+		}
+
+		// Create the skip link.
+		skipLink = document.createElement( 'a' );
+		skipLink.classList.add( 'skip-link', 'screen-reader-text' );
+		skipLink.href = '#' + skipLinkTargetID;
+		skipLink.innerHTML = label;
+
+		// Inject the skip link.
+		parentEl.insertAdjacentElement( 'afterbegin', skipLink );
 	}() );
 	</script>
 	<?php
 }
+add_action( 'wp_footer', 'gutenberg_the_skip_link' );
