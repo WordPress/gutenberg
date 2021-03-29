@@ -530,7 +530,9 @@
 // Position mover arrows for both toolbars.
 .block-editor-block-contextual-toolbar,
 .edit-post-header-toolbar__block-toolbar,
-.edit-site-header-toolbar__block-toolbar {
+.edit-site-header-toolbar__block-toolbar,
+.edit-navigation-layout__block-toolbar,
+.edit-widgets-header__block-toolbar {
 
 	.block-editor-block-mover:not(.is-horizontal) {
 		// Position SVGs.
