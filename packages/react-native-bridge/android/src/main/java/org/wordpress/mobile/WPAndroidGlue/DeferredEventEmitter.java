@@ -210,7 +210,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
         }
     }
 
-    public void onRequestFeaturedImageId(int mediaId) {
+    public void sendToJSFeaturedImageId(int mediaId) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putInt(MAP_KEY_FEATURED_IMAGE_ID, mediaId);
         queueActionToJS(EVENT_FEATURED_IMAGE_ID_CURRENT, writableMap);

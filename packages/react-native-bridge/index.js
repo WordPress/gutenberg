@@ -253,8 +253,8 @@ export function setFeaturedImage( mediaId ) {
 	return RNReactNativeGutenbergBridge.setFeaturedImage( mediaId );
 }
 
-export function getFeaturedImageId( mediaId ) {
-	return RNReactNativeGutenbergBridge.getFeaturedImageId( mediaId );
+export function checkIfFeaturedImage( mediaId ) {
+	return RNReactNativeGutenbergBridge.checkIfFeaturedImage( mediaId );
 }
 
 export function getOtherMediaOptions( filter, callback ) {

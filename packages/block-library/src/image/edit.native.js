@@ -15,7 +15,7 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 	setFeaturedImage,
-	getFeaturedImageId,
+	checkIfFeaturedImage,
 	subscribeFeaturedImageIdCurrent,
 } from '@wordpress/react-native-bridge';
 import {
@@ -159,8 +159,9 @@ export class ImageEdit extends Component {
 			mediaUploadSync();
 		}
 
+		// Check whether an image is featured when the editor first loads.
 		if ( attributes.id ) {
-			getFeaturedImageId( attributes.id );
+			checkIfFeaturedImage( attributes.id );
 		}
 
 		this.addFeaturedImageIdListener();
@@ -186,9 +187,6 @@ export class ImageEdit extends Component {
 			const { image, attributes } = this.props;
 			const url = getUrlForSlug( image, attributes ) || image.source_url;
 			this.props.setAttributes( { url } );
-			if ( attributes.id ) {
-				getFeaturedImageId( attributes.id );
-			}
 		}
 	}
 
