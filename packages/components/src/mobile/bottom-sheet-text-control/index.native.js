@@ -94,7 +94,7 @@ const BottomSheetTextControl = ( {
 					<FooterMessageControl
 						label={ footerNote }
 						textAlign="left"
-					></FooterMessageControl>
+					/>
 				</PanelBody>
 			) }
 		</BottomSheet.SubSheet>

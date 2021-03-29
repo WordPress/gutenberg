@@ -149,19 +149,9 @@
 // Footer Message Cell
 
 .footerMessageCell {
-	font-size: $text-editor-font-size;
+	font-size: 12px;
 	color: $gray;
 	flex: 1;
-}
-
-// Footer Message Link
-
-.footerMessageLink {
-	color: $blue-50;
-}
-
-.footerMessageLinkDark {
-	color: $blue-30;
 }
 
 // Color Cell
