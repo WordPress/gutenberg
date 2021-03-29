@@ -15,7 +15,7 @@ fi
 # 2. Verify the version argument is passed. We use the same version for react-native-aztec and react-native-bridge libraries.
 VERSION=$1
 if [[ -z $VERSION ]]; then
-    echo "This script requires the Bintray version to be passed as an argument."
+    echo "This script requires the publish version to be passed as an argument."
     echo "Example usage: './publish-aztec-and-bridge.sh \$VERSION'"
     exit 1
 fi
@@ -30,9 +30,9 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-# 4. Publish 'react-native-aztec` library to Bintray
+# 4. Publish 'react-native-aztec` library to S3
 echo "Publishing 'react-native-aztec' version '$VERSION'"
-./gradlew :react-native-aztec:bintrayUpload -q -PpublishReactNativeAztecVersion=$VERSION
+./gradlew :react-native-aztec:publish -q -PpublishReactNativeAztecVersion=$VERSION
 
 if [ $? -eq 0 ]; then
     echo "Successfully published 'react-native-aztec' version '$VERSION'."
@@ -43,9 +43,9 @@ else
     echo "We'll still proceed to build and publish 'react-native-bridge' since this failure might be due to this version being published already, for example when the CI task is restarted."
 fi
 
-# 5. Publish 'react-native-bridge` library to Bintray
+# 5. Publish 'react-native-bridge` library to S3
 echo "Publishing react-native-bridge version '$VERSION'"
-./gradlew :react-native-bridge:bintrayUpload -q -PpublishReactNativeBridgeVersion=$VERSION -PreactNativeAztecVersion=$VERSION
+./gradlew :react-native-bridge:publish -q -PpublishReactNativeBridgeVersion=$VERSION -PreactNativeAztecVersion=$VERSION
 
 if [ $? -eq 0 ]; then
     echo "Successfully published 'react-native-bridge' version '$VERSION'."

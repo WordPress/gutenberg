@@ -27,14 +27,10 @@ buildscript {
     }
 }
 
-plugins {
-    id "com.jfrog.bintray"
-}
-
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'maven-publish' // this enables publishing via Bintray
+apply plugin: 'maven-publish'
 
 // import the `readReactNativeVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
@@ -120,24 +116,6 @@ dependencies {
 }
 
 if (willPublishReactNativeAztecBinary) {
-    bintray {
-        user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-        key = project.hasProperty('bintrayKey') ? project.property('bintrayKey') : System.getenv('BINTRAY_KEY')
-        publications = ['ReactNativeAztecPublication']
-        publish = true
-        pkg {
-            repo = 'maven'
-            name = 'react-native-aztec'
-            licenses = ['GPL-2.0']
-            userOrg = 'wordpress-mobile'
-            vcsUrl = 'https://github.com/wordpress-mobile/gutenberg-mobile.git'
-            version {
-                name = publishReactNativeAztecVersion
-                released  = new Date()
-            }
-        }
-    }
-
     project.afterEvaluate {
         publishing {
             publications {
@@ -149,6 +127,15 @@ if (willPublishReactNativeAztecBinary) {
                     version publishReactNativeAztecVersion
 
                     addDependenciesToPom(pom)
+                }
+            }
+            repositories {
+                maven {
+                    url "s3://a8c-libs.s3.amazonaws.com/android"
+                    credentials(AwsCredentials) {
+                        accessKey project.hasProperty('awsAccessKey') ? project.properties['awsAccessKey'] : System.getenv('AWS_ACCESS_KEY')
+                        secretKey project.hasProperty('awsSecretKey') ? project.properties['awsSecretKey'] : System.getenv('AWS_SECRET_KEY')
+                    }
                 }
             }
         }
