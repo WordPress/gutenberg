@@ -9,6 +9,7 @@ import { useEffect, useRef, useContext } from '@wordpress/element';
 import { TextControl } from '@wordpress/components';
 import {
 	IsMenuNameControlFocusedContext,
+	untitledMenu,
 	useMenuEntity,
 	useSelectedMenuData,
 } from '../../hooks';
@@ -19,7 +20,14 @@ export function NameEditor() {
 	);
 
 	const { menuId } = useSelectedMenuData();
-	const { editMenuName, editedMenuName } = useMenuEntity( menuId );
+	const { editedMenu, editMenuEntityRecord, menuEntityData } = useMenuEntity(
+		menuId
+	);
+	const editedMenuName = menuId && editedMenu.name;
+
+	const editMenuName = ( name = untitledMenu ) =>
+		editMenuEntityRecord( ...menuEntityData, { name } );
+
 	const inputRef = useRef();
 	useEffect( () => {
 		if ( isMenuNameEditFocused ) inputRef.current.focus();
