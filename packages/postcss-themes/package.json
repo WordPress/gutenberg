@@ -30,8 +30,8 @@
 		"index.js"
 	],
 	"main": "index.js",
-	"peerDependencies": {
-		"postcss": "^8.0.0"
+	"dependencies": {
+		"postcss": "^7.0.32"
 	},
 	"publishConfig": {
 		"access": "public"
