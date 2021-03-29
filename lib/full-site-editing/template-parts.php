@@ -201,3 +201,18 @@ function gutenberg_filter_template_part_area( $type ) {
 	trigger_error( $warning_message, E_USER_NOTICE );
 	return WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 }
+
+/**
+ * Print a template-part.
+ *
+ * @param string $part The template-part to print. Use "header" or "footer".
+ *
+ * @return void
+ */
+function gutenberg_do_block_template_part( $part ) {
+	$template_part = gutenberg_get_block_template( get_stylesheet() . '//' . $part, 'wp_template_part' );
+	if ( ! $template_part || empty( $template_part->content ) ) {
+		return;
+	}
+	echo do_blocks( $template_part->content );
+}
