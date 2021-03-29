@@ -46,7 +46,6 @@ const attributes = {
 	backgroundType: IMAGE_BACKGROUND_TYPE,
 	focalPoint: { x: '0.25', y: '0.75' },
 	hasParallax: false,
-	onFocalPointChange: jest.fn(),
 	overlayColor: { color: '#000000' },
 	url: 'mock-url',
 };
@@ -117,8 +116,9 @@ describe( 'when no media is attached', () => {
 } );
 
 describe( 'when an image is attached', () => {
-	// The below tests pass but are currently commented out because multiple async
-	// findBy* queries currently cause errors in test output https://git.io/JYYGE
+	// The skipped tests below pass but are currently skipped because multiple
+	// async findBy* queries currently cause errors in test output
+	// https://git.io/JYYGE
 
 	// eslint-disable-next-line jest/no-disabled-tests
 	it.skip( 'edits the image', async () => {
