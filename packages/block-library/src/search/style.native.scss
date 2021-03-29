@@ -10,6 +10,12 @@
 	width: 100%;
 }
 
+.searchInputContainer {
+	flex: 1;
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
 .border {
 	border: $border-width solid $gray-5;
 	border-radius: $grid-unit-05;
@@ -64,8 +70,6 @@
 }
 
 .plainTextInput {
-	flex-grow: 1;
-	flex-shrink: 1;
 	min-height: 42px;
 	padding: $grid-unit-05;
 	padding-left: 0;
