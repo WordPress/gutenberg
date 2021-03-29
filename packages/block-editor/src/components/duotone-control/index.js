@@ -14,7 +14,7 @@ import DuotonePickerPopover from './duotone-picker-popover';
 import Swatch from './duotone-swatch';
 import { getGradientFromValues } from './utils';
 
-function DuotoneToolbar( { value, onChange, duotonePalette, colorPalette } ) {
+function DuotoneControl( { value, onChange, duotonePalette, colorPalette } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const onToggle = () => {
 		setIsOpen( ( prev ) => ! prev );
@@ -61,4 +61,4 @@ function DuotoneToolbar( { value, onChange, duotonePalette, colorPalette } ) {
 	);
 }
 
-export default DuotoneToolbar;
+export default DuotoneControl;

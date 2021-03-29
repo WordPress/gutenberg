@@ -19,7 +19,7 @@ import { addFilter } from '@wordpress/hooks';
  */
 import {
 	BlockControls,
-	__experimentalDuotoneToolbar as DuotoneToolbar,
+	__experimentalDuotoneControl as DuotoneControl,
 	__experimentalDuotoneFilter as DuotoneFilter,
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '../components';
@@ -33,7 +33,7 @@ function DuotonePanel( { attributes, setAttributes } ) {
 
 	return (
 		<BlockControls group="block">
-			<DuotoneToolbar
+			<DuotoneControl
 				duotonePalette={ duotonePalette }
 				colorPalette={ colorPalette }
 				value={ duotone }
@@ -84,7 +84,7 @@ function addDuotoneAttributes( settings ) {
  * @param  {Function} BlockEdit Original component
  * @return {Function}           Wrapped component
  */
-const withDuotoneToolbarControls = createHigherOrderComponent(
+const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const hasDuotoneSupport = hasBlockSupport(
 			props.name,
@@ -98,7 +98,7 @@ const withDuotoneToolbarControls = createHigherOrderComponent(
 			</>
 		);
 	},
-	'withDuotoneToolbarControls'
+	'withDuotoneControls'
 );
 
 /**
@@ -154,7 +154,7 @@ addFilter(
 addFilter(
 	'editor.BlockEdit',
 	'core/editor/duotone/with-editor-controls',
-	withDuotoneToolbarControls
+	withDuotoneControls
 );
 addFilter(
 	'editor.BlockListBlock',

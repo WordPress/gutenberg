@@ -1,7 +1,7 @@
 function DuotoneSwatch( { fill } ) {
 	return (
 		<span
-			className="block-editor-duotone-toolbar__swatch"
+			className="block-editor-duotone-control__swatch"
 			style={ { background: fill } }
 		/>
 	);

@@ -24,7 +24,7 @@ function DuotonePickerPopover( {
 } ) {
 	return (
 		<Popover
-			className="block-editor-duotone-toolbar__popover"
+			className="block-editor-duotone-control__popover"
 			headerTitle={ __( 'Duotone' ) }
 			onFocusOutside={ onToggle }
 		>

@@ -22,7 +22,7 @@ function CustomColorOption( { label, value, colors, onChange } ) {
 	return (
 		<>
 			<Button
-				className="block-editor-duotone-toolbar__color-button"
+				className="block-editor-duotone-control__color-button"
 				icon={ icon }
 				onClick={ () => setIsOpen( ( prev ) => ! prev ) }
 			>
@@ -47,7 +47,7 @@ function CustomColorPicker( { colors, palette, onChange } ) {
 	);
 
 	return (
-		<div className="block-editor-duotone-toolbar__custom-colors">
+		<div className="block-editor-duotone-control__custom-colors">
 			<CustomColorOption
 				label={ __( 'Shadows' ) }
 				value={ colors[ 0 ] }
