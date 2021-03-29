@@ -41,7 +41,10 @@
 		border-radius: 2px 2px 0 0;
 	}
 	&.is-branch-selected:not(.is-selected) .block-editor-block-navigation-block-contents {
-		background: var(--wp-admin-theme-color-lighter-90);
+		// Lighten a CSS variable without introducing a new SASS variable
+		background:
+			linear-gradient(transparentize($white, 0.9), transparentize($white, 0.9)),
+			linear-gradient(var(--wp-admin-theme-color), var(--wp-admin-theme-color));
 		border-radius: 0;
 	}
 	&.is-branch-selected.is-last-of-selected-branch .block-editor-block-navigation-block-contents {

@@ -445,9 +445,6 @@
 	--wp-admin-theme-color-darker-10: #{darken($color-primary, 5%)};
 	--wp-admin-theme-color-darker-20: #{darken($color-primary, 10%)};
 
-	// Lighter shades.
-	--wp-admin-theme-color-lighter-90: #{scale-color($color-primary, $lightness: 90%)};
-
 	// Focus style width.
 	// Avoid rounding issues by showing a whole 2px for 1x screens, and 1.5px on high resolution screens.
 	--wp-admin-border-width-focus: 2px;
