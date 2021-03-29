@@ -522,6 +522,7 @@ const Popover = ( {
 		toggleFocusOutsideTimeoutRef.current = setTimeout( () => {
 			const { ownerDocument } = toggleRef;
 			if (
+				ownerDocument &&
 				! toggleRef.contains( ownerDocument.activeElement ) &&
 				! ownerDocument.activeElement.closest( '[role="dialog"]' )
 			) {
