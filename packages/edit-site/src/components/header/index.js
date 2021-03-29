@@ -14,6 +14,8 @@ import { _x, __ } from '@wordpress/i18n';
 import { listView, plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -46,15 +48,15 @@ export default function Header( { openEntitiesSavedStates } ) {
 			isInserterOpened,
 			isListViewOpened,
 		} = select( editSiteStore );
-		const { getEntityRecord } = select( 'core' );
+		const { getEditedEntityRecord } = select( coreStore );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
-			'core/editor'
+			editorStore
 		);
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
-		const record = getEntityRecord( 'postType', postType, postId );
+		const record = getEditedEntityRecord( 'postType', postType, postId );
 		const _entityTitle =
 			'wp_template' === postType
 				? getTemplateInfo( record ).title
