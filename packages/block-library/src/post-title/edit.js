@@ -56,7 +56,7 @@ export default function PostTitleEdit( {
 		return null;
 	}
 
-	const { title, link } = post;
+	const { title = '', link } = post;
 
 	let titleElement = (
 		<TagName { ...( isLink ? {} : blockProps ) }>

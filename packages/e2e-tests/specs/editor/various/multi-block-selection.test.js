@@ -419,7 +419,7 @@ describe( 'Multi-block selection', () => {
 				},
 				{
 					// Move a bit outside the paragraph.
-					x: rect2.x - 10,
+					x: rect2.x - 5,
 					y: rect2.y + rect2.height / 2,
 				},
 			];
@@ -571,6 +571,20 @@ describe( 'Multi-block selection', () => {
 		await pressKeyWithModifier( 'primary', 'a' );
 		await clickBlockToolbarButton( 'Align' );
 		await clickButton( 'Align text center' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should copy multiple blocks', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( '2' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'c' );
+		await page.keyboard.press( 'ArrowUp' );
+		await pressKeyWithModifier( 'primary', 'v' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

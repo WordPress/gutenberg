@@ -40,6 +40,7 @@ jobs:
         uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
         with:
           ref: ${{ matrix.branch }}
+          token: ${{ secrets.GUTENBERG_TOKEN }}
 
       - name: Update the Changelog to include the release notes
         run: |

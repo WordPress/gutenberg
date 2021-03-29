@@ -44,8 +44,8 @@ export default VisualEditorGlobalKeyboardShortcuts;
 
 export function EditorGlobalKeyboardShortcuts() {
 	deprecated( 'EditorGlobalKeyboardShortcuts', {
+		since: '5.2',
 		alternative: 'VisualEditorGlobalKeyboardShortcuts',
-		plugin: 'Gutenberg',
 	} );
 
 	return <VisualEditorGlobalKeyboardShortcuts />;

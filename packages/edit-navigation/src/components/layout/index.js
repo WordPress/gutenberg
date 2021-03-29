@@ -19,7 +19,7 @@ import {
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	InterfaceSkeleton,
 	ComplementaryArea,
@@ -30,7 +30,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import EmptyState from './empty-state';
+import UnselectedMenuState from './unselected-menu-state';
 import {
 	IsMenuNameControlFocusedContext,
 	MenuIdContext,
@@ -72,13 +72,27 @@ export default function Layout( { blockEditorSettings } ) {
 		hasFinishedInitialLoad,
 		selectedMenuId,
 		navigationPost,
+		isMenuBeingDeleted,
 		selectMenu,
 		deleteMenu,
+		openManageLocationsModal,
+		closeManageLocationsModal,
+		isManageLocationsModalOpen,
+		isMenuSelected,
 	} = useNavigationEditor();
 
 	const [ blocks, onInput, onChange ] = useNavigationBlockEditor(
 		navigationPost
 	);
+
+	const [ isMenuLoaded, setIsMenuLoaded ] = useState( false );
+
+	useEffect( () => {
+		if ( ! isMenuLoaded && menus?.length ) {
+			setIsMenuLoaded( true );
+			selectMenu( menus[ 0 ].id );
+		}
+	}, [ menus ] );
 
 	const { hasSidebarEnabled } = useSelect(
 		( select ) => ( {
@@ -89,14 +103,29 @@ export default function Layout( { blockEditorSettings } ) {
 		[]
 	);
 
+	useEffect( () => {
+		if ( ! selectedMenuId && menus?.length ) {
+			selectMenu( menus[ 0 ].id );
+		}
+	}, [] );
+
 	useMenuNotifications( selectedMenuId );
 
 	const hasMenus = !! menus?.length;
-	const isBlockEditorReady = !! ( hasMenus && navigationPost );
 	const hasPermanentSidebar = isLargeViewport && hasMenus;
+
+	const isBlockEditorReady = !! (
+		hasMenus &&
+		navigationPost &&
+		isMenuSelected
+	);
 
 	return (
 		<ErrorBoundary>
+			<div
+				hidden={ ! isMenuBeingDeleted }
+				className={ 'edit-navigation-layout__overlay' }
+			/>
 			<SlotFillProvider>
 				<DropZoneProvider>
 					<BlockEditorKeyboardShortcuts.Register />
@@ -133,6 +162,7 @@ export default function Layout( { blockEditorSettings } ) {
 									labels={ interfaceLabels }
 									header={
 										<Header
+											isMenuSelected={ isMenuSelected }
 											isPending={ ! hasLoadedMenus }
 											menus={ menus }
 											selectedMenuId={ selectedMenuId }
@@ -146,9 +176,16 @@ export default function Layout( { blockEditorSettings } ) {
 												<Spinner />
 											) }
 
-											{ hasFinishedInitialLoad &&
-												! hasMenus && <EmptyState /> }
-
+											{ ! isMenuSelected &&
+												hasFinishedInitialLoad && (
+													<UnselectedMenuState
+														onSelectMenu={
+															selectMenu
+														}
+														onCreate={ selectMenu }
+														menus={ menus }
+													/>
+												) }
 											{ isBlockEditorReady && (
 												<>
 													<BlockToolbar
@@ -167,11 +204,27 @@ export default function Layout( { blockEditorSettings } ) {
 															blocks={ blocks }
 														/>
 														<InspectorAdditions
+															isManageLocationsModalOpen={
+																isManageLocationsModalOpen
+															}
+															openManageLocationsModal={
+																openManageLocationsModal
+															}
+															closeManageLocationsModal={
+																closeManageLocationsModal
+															}
+															onSelectMenu={
+																selectMenu
+															}
+															menus={ menus }
 															menuId={
 																selectedMenuId
 															}
 															onDeleteMenu={
 																deleteMenu
+															}
+															isMenuBeingDeleted={
+																isMenuBeingDeleted
 															}
 														/>
 													</div>
