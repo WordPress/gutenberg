@@ -80,8 +80,7 @@
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
-		"@wordpress/wordcount": "file:packages/wordcount",
-		"npm": "6.14.12"
+		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
 		"@actions/core": "1.2.6",
