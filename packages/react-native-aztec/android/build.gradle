@@ -82,6 +82,7 @@ repositories {
     google()
 
     maven { url "https://jitpack.io" }
+    maven { url "https://a8c-libs.s3.amazonaws.com/android" }
 
     if (willPublishReactNativeAztecBinary) {
         maven { url "https://dl.bintray.com/wordpress-mobile/react-native-mirror/" }
