@@ -23,7 +23,8 @@
 	"react-native": "src/index",
 	"sideEffects": [
 		"build-style/**",
-		"src/**/*.scss"
+		"src/**/*.scss",
+		"src/navigation-link/index.js"
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",

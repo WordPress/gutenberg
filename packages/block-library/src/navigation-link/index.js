@@ -90,7 +90,7 @@ export const settings = {
 	],
 };
 
-// ensure that we import and use this from hooks.js, so code is not shaken out in final build.
+// importing this file includes side effects. This is whitelisted in block-library/package.json under sideEffects
 addFilter(
 	'blocks.registerBlockType',
 	'core/navigation-link',
