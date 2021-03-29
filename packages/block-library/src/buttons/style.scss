@@ -5,6 +5,7 @@ $blocks-block__margin: 0.5em;
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
+	column-gap: $blocks-block__margin;
 
 	&.is-vertical {
 		flex-direction: column;
