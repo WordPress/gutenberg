@@ -479,38 +479,6 @@ Currently block variations exist for "header" and "footer" values of the area te
 }
 ```
 
-#### `skipLinks`
-
-Within this field, themes can change the behavior of the automatic skip-link generation, or opt-out.
-
-```json
-{
-	"skipLinks": {
-		"auto": true,
-		"css": true,
-		"links": [
-			{
-				"target": "#skip-link-target",
-				"label": "Skip to Content"
-			},
-			{
-				"target": "#main-navigation",
-				"label": "Skip to Navigation",
-				"useFallbacks": false
-			}
-		]
-	}
-}
-```
-
-Arguments:
-* `auto`: (bool) Whether skip-links will be auto-generated or not. Defaults to `true`. To opt-out of the automatic skip-links, set to `false`.
-* `css:` (bool) Whether CSS for the skip-link should be automatically added or not. Defaults to `true`. To opt-out and manually handle CSS for skip-links, set to `false`.
-* `links`: (array) Can be used to define a custom skip-link (or multiple skip-links if needed). Each "link" can have the following:
-  * `target`: (string|array) The selector of the element that should be used as the target.
-  * `label`: (string) The skip-link's label. If omitted defaults to `Skip to content`.
-  * `useFallbacks`: (bool) Defaults to `true`. If a `target` is not defined, or the `target` element is not located, then the skip-link target will fallback to the 1st instance of these elements: `#skip-link-target, main, .wp-block-post-title, .wp-block-query-loop, .wp-block-post-content, .entry-content, h1, h2`. If set to false, then the fallbacks won't be added. Use in case of multiple skip-links.
-
 ## Frequently Asked Questions
 
 ### The naming schema of CSS Custom Properties
