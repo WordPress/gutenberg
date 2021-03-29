@@ -2,7 +2,7 @@
 
     Copyright 2011-2021 by the contributors
 
-**License for Contributions (on and after March __, 2021)**
+**License for Contributions (on and after April 15, 2021)**
 
 All code contributed to the Gutenberg project is dual-licensed, 
 and released under both of the following licenses: 
@@ -11,7 +11,7 @@ the GNU General Public License as published by the Free Software Foundation;
 either version 2 of the License or (at your option) any later version (the “GPL”)
 and the Mozilla Public License Version 2.0 (the “MPL”). 
 
-**Project License (as of March __, 2021)**
+**Project License (as of April 15, 2021)**
 
 The Gutenberg project is free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free
@@ -27,19 +27,19 @@ GPLv2 (or later) to a dual license: GPLv2 (or later) and MPLv2.**
 **This process involves two independent steps (1) obtaining permission for dual
 licensing from contributors of already contributed Gutenberg code and (2)
 dual licensing of all contributions to Gutenberg that are made on or after
-March XX, 2021.**
+April 15, 2021.**
 
 **For part (1): We’re reaching out to everyone who has contributed code, prior
-to March XX, 2021, and asking that they agree to dual license their
+to April 15, 2021, and asking that they agree to dual license their
 contribution to the project. We expect this process to be completed by
 mid-year, 2021.**
 
 **For part (2): We have changed the license for contributed code to this
-repository to make clear that all contributions on or after March XX, 2021
+repository to make clear that all contributions on or after April 15, 2021
 will be made under the dual-license.**
 
 **When we have received all necessary rights and permissions to dual license
-the pre-March 2021 code of the Gutenberg project (Part 1 above), you will
+the pre-April 15, 2021 code of the Gutenberg project (Part 1 above), you will
 have the option to use and distribute all of the Gutenberg project under
 either the GPL or MPL license. At this time we will change the “Project
 License” to the following:**
