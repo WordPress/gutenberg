@@ -8,20 +8,27 @@ $blocks-block__margin: 0.5em;
 
 .wp-block-buttons {
 	> .wp-block {
-		// Override editor auto block margins.
-		margin-left: 0;
-		margin-top: $blocks-block__margin;
-		margin-right: $blocks-block__margin;
+
+		&,
+		.edit-post-layout:not(.supports-layout) & {
+			// Override editor auto block margins.
+			margin-left: 0;
+			margin-top: $blocks-block__margin;
+			margin-right: $blocks-block__margin;
+		}
 	}
+
 	> .block-list-appender {
 		display: inline-flex;
 		align-items: center;
 	}
+
 	&.is-vertical {
 		> .block-list-appender .block-list-appender__toggle {
 			justify-content: flex-start;
 		}
 	}
+
 	> .wp-block-button {
 		&:focus {
 			box-shadow: none;
