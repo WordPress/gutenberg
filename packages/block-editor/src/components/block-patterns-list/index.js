@@ -9,26 +9,16 @@ import {
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockPreview from '../block-preview';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
-import { store as blockEditorStore } from '../../store';
 
 function BlockPattern( { isDraggable, pattern, onClick, composite } ) {
 	const instanceId = useInstanceId( BlockPattern );
-	const { name, viewportWidth } = pattern;
-	const parsedPattern = useSelect(
-		( select ) =>
-			select( blockEditorStore ).__experimentalGetParsedPattern( name ),
-		[ name ]
-	);
-	// If pattern is not found or containes not allowed blocks do not render it.
-	if ( ! parsedPattern ) return null;
-	const { blocks } = parsedPattern;
+	const { viewportWidth, blocks } = pattern;
 	const descriptionId = `block-editor-block-patterns-list__item-description-${ instanceId }`;
 	return (
 		<InserterDraggableBlocks isEnabled={ isDraggable } blocks={ blocks }>
