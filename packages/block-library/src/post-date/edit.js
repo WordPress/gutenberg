@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { useState } from '@wordpress/element';
+import { useRef, useState } from '@wordpress/element';
 import { __experimentalGetSettings, dateI18n } from '@wordpress/date';
 import {
 	AlignmentToolbar,
@@ -37,6 +37,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 		'date',
 		postId
 	);
+	const dateToggleRef = useRef( null );
 	const [ isPickerOpen, setIsPickerOpen ] = useState( false );
 	const settings = __experimentalGetSettings();
 	// To know if the current time format is a 12 hour time, look for "a".
@@ -82,6 +83,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 									( _isPickerOpen ) => ! _isPickerOpen
 								)
 							}
+							ref={ dateToggleRef }
 						/>
 					</ToolbarGroup>
 				) }
@@ -113,6 +115,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 						{ isPickerOpen && (
 							<Popover
 								onClose={ setIsPickerOpen.bind( null, false ) }
+								toggleRef={ dateToggleRef }
 							>
 								<DateTimePicker
 									currentDate={ date }
