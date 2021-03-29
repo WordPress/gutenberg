@@ -13,7 +13,7 @@ import { assertIsDefined } from '../utils/assert-is-defined';
  */
 export default function computeCaretRect( win ) {
 	const selection = win.getSelection();
-	assertIsDefined( selection );
+	assertIsDefined( selection, 'selection' );
 	const range = selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 
 	if ( ! range ) {

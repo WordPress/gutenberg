@@ -5,13 +5,13 @@ import { assertIsDefined } from '../utils/assert-is-defined';
 
 describe( 'assertIsDefined', () => {
 	it( 'should throw if the variable is null', () => {
-		expect( () => assertIsDefined( null ) ).toThrow(
+		expect( () => assertIsDefined( null, 'val' ) ).toThrow(
 			"Expected 'val' to be defined, but received null"
 		);
 	} );
 
 	it( 'should throw if the variable is undefined', () => {
-		expect( () => assertIsDefined( undefined ) ).toThrow(
+		expect( () => assertIsDefined( undefined, 'val' ) ).toThrow(
 			"Expected 'val' to be defined, but received undefined"
 		);
 	} );
@@ -19,7 +19,7 @@ describe( 'assertIsDefined', () => {
 	it.each( [ 0, '', NaN, -0, 1, new String(), {}, [], false, Infinity ] )(
 		'should not throw if the value is %s',
 		( val ) => {
-			expect( () => assertIsDefined( val ) ).not.toThrow();
+			expect( () => assertIsDefined( val, 'val' ) ).not.toThrow();
 		}
 	);
 } );
