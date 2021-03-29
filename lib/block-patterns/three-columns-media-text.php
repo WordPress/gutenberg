@@ -21,7 +21,9 @@ return array(
 
 	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"5vw"}},"textColor":"black"} -->
 	<p class="has-black-color has-text-color" style="font-size:5vw;line-height:1.1"><strong>Positive growth.</strong></p>
-	<!-- /wp:paragraph --></div>
+	<!-- /wp:paragraph --><!-- wp:spacer {"height":5} -->
+	<div style="height:5px" aria-hidden="true" class="wp-block-spacer"></div>
+	<!-- /wp:spacer --></div>
 	<!-- /wp:column --></div>
 	<!-- /wp:columns -->
 	
