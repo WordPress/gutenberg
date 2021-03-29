@@ -61,6 +61,8 @@
 	ol {
 		margin: revert;
 		padding: revert;
+		list-style-type: revert;
+		box-sizing: revert;
 
 		// Remove bottom margin from nested lists.
 		ul,
@@ -71,14 +73,6 @@
 		li {
 			margin: revert;
 		}
-	}
-
-	ul {
-		list-style-type: revert;
-	}
-
-	ol {
-		list-style-type: revert;
 	}
 
 	ul ul,
