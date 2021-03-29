@@ -18,13 +18,6 @@ describe( 'prPreviewLink', () => {
 
 	it( 'adds the adds a comment with a link to the gutenberg.run preview site', async () => {
 		const octokit = {
-			repos: {
-				listCommits: jest.fn( () =>
-					Promise.resolve( {
-						data: [],
-					} )
-				),
-			},
 			issues: {
 				createComment: jest.fn(),
 			},
