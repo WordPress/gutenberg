@@ -38,7 +38,7 @@ export function parseDropEvent( event ) {
 	try {
 		result = Object.assign(
 			result,
-			JSON.parse( event.dataTransfer.getData( 'text' ) )
+			JSON.parse( event.dataTransfer.getData( 'wp-blocks' ) )
 		);
 	} catch ( err ) {
 		return result;
