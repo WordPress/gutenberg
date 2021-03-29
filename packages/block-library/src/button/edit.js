@@ -113,7 +113,7 @@ function URLPicker( {
 	const urlIsSet = !! url;
 	const urlIsSetandSelected = urlIsSet && isSelected;
 	const openLinkControl = () => {
-		setIsURLPickerOpen( ( s ) => ! s );
+		setIsURLPickerOpen( ( isOpen ) => ! isOpen );
 		return false; // prevents default behaviour for event
 	};
 	const unlinkButton = () => {
