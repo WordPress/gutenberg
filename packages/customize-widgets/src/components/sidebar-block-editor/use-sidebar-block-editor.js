@@ -36,7 +36,7 @@ function blockToWidget( block, existingWidget = null ) {
 					encoded_serialized_instance:
 						block.attributes.instance.encoded,
 					instance_hash_key: block.attributes.instance.hash,
-					__unstable_instance: block.attributes.instance.raw,
+					raw_instance: block.attributes.instance.raw,
 				},
 			};
 		}
@@ -48,7 +48,7 @@ function blockToWidget( block, existingWidget = null ) {
 			idBase: 'block',
 			widgetClass: 'WP_Widget_Block',
 			instance: {
-				__unstable_instance: instance,
+				raw_instance: instance,
 			},
 		};
 	}
@@ -63,9 +63,7 @@ function widgetToBlock( widget ) {
 	let block;
 
 	if ( widget.idBase === 'block' ) {
-		const parsedBlocks = parse(
-			widget.instance.__unstable_instance.content
-		);
+		const parsedBlocks = parse( widget.instance.raw_instance.content );
 		block = parsedBlocks.length
 			? parsedBlocks[ 0 ]
 			: createBlock( 'core/paragraph', {} );
@@ -76,7 +74,7 @@ function widgetToBlock( widget ) {
 			instance: {
 				encoded: widget.instance.encoded_serialized_instance,
 				hash: widget.instance.instance_hash_key,
-				raw: widget.instance.__unstable_instance,
+				raw: widget.instance.raw_instance,
 			},
 		} );
 	} else {
