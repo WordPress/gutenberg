@@ -123,82 +123,86 @@ add_action( 'admin_footer-widgets.php', 'gutenberg_print_save_widgets_nonce' );
  * @return array Legacy widget settings.
  */
 function gutenberg_get_legacy_widget_settings() {
+	global $wp_widget_factory;
+
 	$settings = array();
 
-	/**
-	 * Filters the list of widget classes that should **not** be offered by the legacy widget block.
-	 *
-	 * Returning an empty array will make all the widgets available.
-	 *
-	 * @param array $widgets An array of excluded widgets classnames.
-	 *
-	 * @since 5.6.0
-	 */
-	$widgets_to_exclude_from_legacy_widget_block = apply_filters(
-		'widgets_to_exclude_from_legacy_widget_block',
+	$widget_types_to_hide_from_legacy_widget_block = apply_filters(
+		'widget_types_to_hide_from_legacy_widget_block',
 		array(
-			'WP_Widget_Block',
-			'WP_Widget_Pages',
-			'WP_Widget_Calendar',
-			'WP_Widget_Archives',
-			'WP_Widget_Media_Audio',
-			'WP_Widget_Media_Image',
-			'WP_Widget_Media_Gallery',
-			'WP_Widget_Media_Video',
-			'WP_Widget_Meta',
-			'WP_Widget_Search',
-			'WP_Widget_Text',
-			'WP_Widget_Categories',
-			'WP_Widget_Recent_Posts',
-			'WP_Widget_Recent_Comments',
-			'WP_Widget_RSS',
-			'WP_Widget_Tag_Cloud',
-			'WP_Nav_Menu_Widget',
-			'WP_Widget_Custom_HTML',
+			'pages',
+			'calendar',
+			'archives',
+			'media_audio',
+			'media_image',
+			'media_gallery',
+			'media_video',
+			'meta',
+			'search',
+			'text',
+			'categories',
+			'recent-posts',
+			'recent-comments',
+			'rss',
+			'tag_cloud',
+			'nav_menu',
+			'custom_html',
+			'block',
 		)
 	);
 
-	$available_legacy_widgets = array();
-	global $wp_widget_factory;
-	if ( ! empty( $wp_widget_factory ) ) {
-		foreach ( $wp_widget_factory->widgets as $class => $widget_obj ) {
-			$available_legacy_widgets[ $class ] = array(
-				'name'              => html_entity_decode( $widget_obj->name ),
-				'id_base'           => $widget_obj->id_base,
-				// wp_widget_description is not being used because its input parameter is a Widget Id.
-				// Widgets id's reference to a specific widget instance.
-				// Here we are iterating on all the available widget classes even if no widget instance exists for them.
-				'description'       => isset( $widget_obj->widget_options['description'] ) ?
-					html_entity_decode( $widget_obj->widget_options['description'] ) :
-					null,
-				'isReferenceWidget' => false,
-				'isHidden'          => in_array( $class, $widgets_to_exclude_from_legacy_widget_block, true ),
-			);
-		}
-	}
-	global $wp_registered_widgets;
-	if ( ! empty( $wp_registered_widgets ) ) {
-		foreach ( $wp_registered_widgets as $widget_id => $widget_obj ) {
+	// Backwards compatibility. Remove this in or after Gutenberg 10.5.
+	if ( has_filter( 'widgets_to_exclude_from_legacy_widget_block' ) ) {
+		/**
+		 * Filters the list of widget classes that should **not** be offered by the legacy widget block.
+		 *
+		 * Returning an empty array will make all the widgets available.
+		 *
+		 * @param array $widgets An array of excluded widgets classnames.
+		 *
+		 * @since 5.6.0
+		 */
+		$widgets_to_exclude_from_legacy_widget_block = apply_filters(
+			'widgets_to_exclude_from_legacy_widget_block',
+			array(
+				'WP_Widget_Block',
+				'WP_Widget_Pages',
+				'WP_Widget_Calendar',
+				'WP_Widget_Archives',
+				'WP_Widget_Media_Audio',
+				'WP_Widget_Media_Image',
+				'WP_Widget_Media_Gallery',
+				'WP_Widget_Media_Video',
+				'WP_Widget_Meta',
+				'WP_Widget_Search',
+				'WP_Widget_Text',
+				'WP_Widget_Categories',
+				'WP_Widget_Recent_Posts',
+				'WP_Widget_Recent_Comments',
+				'WP_Widget_RSS',
+				'WP_Widget_Tag_Cloud',
+				'WP_Nav_Menu_Widget',
+				'WP_Widget_Custom_HTML',
+			)
+		);
 
-			$block_widget_start = 'blocks-widget-';
+		_deprecated_hook(
+			'widgets_to_exclude_from_legacy_widget_block',
+			'10.3',
+			"wp.hooks.addFilter( 'legacyWidget.isWidgetTypeHidden', ... )"
+		);
+
+		foreach ( $wp_widget_factory->widgets as $widget ) {
 			if (
-				( is_array( $widget_obj['callback'] ) &&
-				isset( $widget_obj['callback'][0] ) &&
-				( $widget_obj['callback'][0] instanceof WP_Widget ) ) ||
-				// $widget_id starts with $block_widget_start.
-				strncmp( $widget_id, $block_widget_start, strlen( $block_widget_start ) ) === 0
+				in_array( get_class( $widget ), $widgets_to_exclude_from_legacy_widget_block, true ) &&
+				! in_array( $widget->id_base, $widget_types_to_hide_from_legacy_widget_block, true )
 			) {
-				continue;
+				$widget_types_to_hide_from_legacy_widget_block[] = $widget->id_base;
 			}
-			$available_legacy_widgets[ $widget_id ] = array(
-				'name'              => html_entity_decode( $widget_obj['name'] ),
-				'description'       => html_entity_decode( wp_widget_description( $widget_id ) ),
-				'isReferenceWidget' => true,
-			);
 		}
 	}
 
-	$settings['availableLegacyWidgets'] = $available_legacy_widgets;
+	$settings['widgetTypesToHideFromLegacyWidgetBlock'] = $widget_types_to_hide_from_legacy_widget_block;
 
 	return $settings;
 }
@@ -268,19 +272,36 @@ function gutenberg_register_widgets() {
 add_action( 'widgets_init', 'gutenberg_register_widgets' );
 
 /**
- * Hook into before the widgets editor screen is loaded and, if widget-preview
- * is set, render the requested preview of a legacy widget instead. This powers
- * the Preview option in the Legacy Widget block.
+ * Sets show_instance_in_rest to true on all of the core WP_Widget subclasses.
+ * When merge dto Core, this property should be added to WP_Widget and set to
+ * true on each WP_Widget subclass.
  */
-function gutenberg_load_widget_preview_if_requested() {
-	if (
-		isset( $_GET['widget-preview'] ) &&
-		current_user_can( 'edit_theme_options' )
-	) {
-		define( 'IFRAME_REQUEST', true );
-		require_once __DIR__ . '/widget-preview-template.php';
-		exit;
+function gutenberg_set_show_instance_in_rest_on_core_widgets() {
+	global $wp_widget_factory;
+
+	$core_widgets = array(
+		'WP_Widget_Block',
+		'WP_Widget_Pages',
+		'WP_Widget_Calendar',
+		'WP_Widget_Archives',
+		'WP_Widget_Media_Audio',
+		'WP_Widget_Media_Image',
+		'WP_Widget_Media_Gallery',
+		'WP_Widget_Media_Video',
+		'WP_Widget_Meta',
+		'WP_Widget_Search',
+		'WP_Widget_Text',
+		'WP_Widget_Categories',
+		'WP_Widget_Recent_Posts',
+		'WP_Widget_Recent_Comments',
+		'WP_Widget_RSS',
+		'WP_Widget_Tag_Cloud',
+		'WP_Nav_Menu_Widget',
+		'WP_Widget_Custom_HTML',
+	);
+
+	foreach ( $core_widgets as $widget ) {
+		$wp_widget_factory->widgets[ $widget ]->show_instance_in_rest = true;
 	}
 }
-add_filter( 'load-appearance_page_gutenberg-widgets', 'gutenberg_load_widget_preview_if_requested' );
-
+add_action( 'widgets_init', 'gutenberg_set_show_instance_in_rest_on_core_widgets' );

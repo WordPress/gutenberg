@@ -14,13 +14,12 @@ import {
 	getBlockType,
 	hasBlockSupport,
 } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
-import { BlockControls, BlockAlignmentToolbar } from '../components';
-import { store as blockEditorStore } from '../store';
+import { BlockControls, BlockAlignmentControl } from '../components';
+import useAvailableAlignments from '../components/block-alignment-control/use-available-alignments';
 
 /**
  * An array which includes all possible valid alignments,
@@ -116,13 +115,16 @@ export function addAttribute( settings ) {
 export const withToolbarControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { name: blockName } = props;
-		// Compute valid alignments without taking into account,
+		// Compute the block allowed alignments without taking into account,
 		// if the theme supports wide alignments or not
 		// and without checking the layout for availble alignments.
 		// BlockAlignmentToolbar takes both of these into account.
-		const validAlignments = getValidAlignments(
+		const blockAllowedAlignments = getValidAlignments(
 			getBlockSupport( blockName, 'align' ),
 			hasBlockSupport( blockName, 'alignWide', true )
+		);
+		const validAlignments = useAvailableAlignments(
+			blockAllowedAlignments
 		);
 
 		const updateAlignment = ( nextAlign ) => {
@@ -138,8 +140,8 @@ export const withToolbarControls = createHigherOrderComponent(
 
 		return [
 			validAlignments.length > 0 && props.isSelected && (
-				<BlockControls key="align-controls">
-					<BlockAlignmentToolbar
+				<BlockControls key="align-controls" group="block">
+					<BlockAlignmentControl
 						value={ props.attributes.align }
 						onChange={ updateAlignment }
 						controls={ validAlignments }
@@ -162,9 +164,12 @@ export const withDataAlign = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { align } = attributes;
-		const hasWideEnabled = useSelect(
-			( select ) => !! select( blockEditorStore ).getSettings().alignWide,
-			[]
+		const blockAllowedAlignments = getValidAlignments(
+			getBlockSupport( name, 'align' ),
+			hasBlockSupport( name, 'alignWide', true )
+		);
+		const validAlignments = useAvailableAlignments(
+			blockAllowedAlignments
 		);
 
 		// If an alignment is not assigned, there's no need to go through the
@@ -172,12 +177,6 @@ export const withDataAlign = createHigherOrderComponent(
 		if ( align === undefined ) {
 			return <BlockListBlock { ...props } />;
 		}
-
-		const validAlignments = getValidAlignments(
-			getBlockSupport( name, 'align' ),
-			hasBlockSupport( name, 'alignWide', true ),
-			hasWideEnabled
-		);
 
 		let wrapperProps = props.wrapperProps;
 		if ( validAlignments.includes( align ) ) {

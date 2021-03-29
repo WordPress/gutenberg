@@ -322,4 +322,36 @@ describe( 'Reusable blocks', () => {
 		// Check that there's only a paragraph.
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	// Test for regressions of https://github.com/WordPress/gutenberg/issues/27243.
+	it( 'should allow a block with styles to be converted to a reusable block', async () => {
+		// Insert a quote and reload the page.
+		insertBlock( 'Quote' );
+		await saveDraft();
+		await page.reload();
+
+		// The quote block should have a visible preview in the sidebar for this test to be valid.
+		const quoteBlock = await page.waitForSelector(
+			'.block-editor-block-list__block[aria-label="Block: Quote"]'
+		);
+		await quoteBlock.click();
+		await openDocumentSettingsSidebar();
+		await page.waitForXPath(
+			'//*[@role="region"][@aria-label="Editor settings"]//button[.="Styles"]'
+		);
+
+		// Convert to reusable.
+		await clickBlockToolbarButton( 'Options' );
+		await clickMenuItem( 'Add to Reusable blocks' );
+		const nameInput = await page.waitForSelector(
+			reusableBlockNameInputSelector
+		);
+		await nameInput.click();
+		await page.keyboard.type( 'Block with styles' );
+		await page.keyboard.press( 'Enter' );
+		const reusableBlock = await page.waitForSelector(
+			'.block-editor-block-list__block[aria-label="Block: Reusable block"]'
+		);
+		expect( reusableBlock ).toBeTruthy();
+	} );
 } );

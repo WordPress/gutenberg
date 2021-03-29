@@ -27,6 +27,7 @@ import { useBlockDefaultClassName } from './use-block-default-class-name';
 import { useBlockCustomClassName } from './use-block-custom-class-name';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
 import { useEventHandlers } from './use-event-handlers';
+import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockNodes } from './use-block-nodes';
 import { store as blockEditorStore } from '../../../store';
 
@@ -103,6 +104,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusFirstElement( clientId ),
 		useBlockNodes( clientId ),
 		useEventHandlers( clientId ),
+		useNavModeExit( clientId ),
 		useIsHovered(),
 		useMovingAnimation( {
 			isSelected: isPartOfSelection,

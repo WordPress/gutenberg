@@ -56,7 +56,7 @@ export {
 // attributes needed to operate with the block later on.
 export {
 	default as serialize,
-	getBlockContent,
+	getBlockInnerHTML as getBlockContent,
 	getBlockDefaultClassName,
 	getBlockMenuDefaultClassName,
 	getSaveElement,

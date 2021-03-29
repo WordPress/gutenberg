@@ -586,6 +586,7 @@ const Popover = ( {
 		} );
 
 		deprecated( 'Popover onClickOutside prop', {
+			since: '5.3',
 			alternative: 'onFocusOutside',
 		} );
 

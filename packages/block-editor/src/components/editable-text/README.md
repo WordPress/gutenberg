@@ -14,7 +14,7 @@ Renders an editable text input in which text formatting is not allowed.
 
 ### `tagName: String`
 
-*Default: `div`.* The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element. Elements that display inline are not supported.
+*Default: `div`.* The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element. Elements that display inline are not supported. Set to `inline-block` to use tag names that have `inline` as the default.
 
 ### `disableLineBreaks: Boolean`
 

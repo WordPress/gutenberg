@@ -306,6 +306,7 @@ export const getReferenceByDistinctEdits = createRegistrySelector(
 		deprecated(
 			"`wp.data.select( 'core/editor' ).getReferenceByDistinctEdits`",
 			{
+				since: '5.4',
 				alternative:
 					"`wp.data.select( 'core' ).getReferenceByDistinctEdits`",
 			}
@@ -685,9 +686,9 @@ export const isEditedPostAutosaveable = createRegistrySelector(
  */
 export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
 	deprecated( "`wp.data.select( 'core/editor' ).getAutosave()`", {
+		since: '5.3',
 		alternative:
 			"`wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
-		plugin: 'Gutenberg',
 	} );
 
 	const postType = getCurrentPostType( state );
@@ -713,9 +714,9 @@ export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
  */
 export const hasAutosave = createRegistrySelector( ( select ) => ( state ) => {
 	deprecated( "`wp.data.select( 'core/editor' ).hasAutosave()`", {
+		since: '5.3',
 		alternative:
 			"`!! wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
-		plugin: 'Gutenberg',
 	} );
 
 	const postType = getCurrentPostType( state );
@@ -953,7 +954,7 @@ export function getSuggestedPostFormat( state ) {
  */
 export function getBlocksForSerialization( state ) {
 	deprecated( '`core/editor` getBlocksForSerialization selector', {
-		plugin: 'Gutenberg',
+		since: '5.3',
 		alternative: 'getEditorBlocks',
 		hint: 'Blocks serialization pre-processing occurs at save time',
 	} );
@@ -1235,6 +1236,8 @@ export function getEditorBlocks( state ) {
  */
 export function getEditorSelectionStart( state ) {
 	deprecated( "select('core/editor').getEditorSelectionStart", {
+		since: '10.0',
+		plugin: 'Gutenberg',
 		alternative: "select('core/editor').getEditorSelection",
 	} );
 	return getEditedPostAttribute( state, 'selection' )?.selectionStart;
@@ -1250,6 +1253,8 @@ export function getEditorSelectionStart( state ) {
  */
 export function getEditorSelectionEnd( state ) {
 	deprecated( "select('core/editor').getEditorSelectionStart", {
+		since: '10.0',
+		plugin: 'Gutenberg',
 		alternative: "select('core/editor').getEditorSelection",
 	} );
 	return getEditedPostAttribute( state, 'selection' )?.selectionEnd;
@@ -1298,6 +1303,7 @@ export function getEditorSettings( state ) {
  */
 export function getStateBeforeOptimisticTransaction() {
 	deprecated( "select('core/editor').getStateBeforeOptimisticTransaction", {
+		since: '5.7',
 		hint: 'No state history is kept on this store anymore',
 	} );
 
@@ -1311,6 +1317,7 @@ export function getStateBeforeOptimisticTransaction() {
  */
 export function inSomeHistory() {
 	deprecated( "select('core/editor').inSomeHistory", {
+		since: '5.7',
 		hint: 'No state history is kept on this store anymore',
 	} );
 	return false;
@@ -1319,6 +1326,7 @@ export function inSomeHistory() {
 function getBlockEditorSelector( name ) {
 	return createRegistrySelector( ( select ) => ( state, ...args ) => {
 		deprecated( "`wp.data.select( 'core/editor' )." + name + '`', {
+			since: '5.3',
 			alternative: "`wp.data.select( 'core/block-editor' )." + name + '`',
 		} );
 
