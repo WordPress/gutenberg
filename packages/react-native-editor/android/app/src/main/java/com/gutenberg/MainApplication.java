@@ -157,10 +157,6 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void logUserEvent(GutenbergUserEvent gutenbergUserEvent, ReadableMap eventProperties) {
-            }
-
-            @Override
             public void setFocalPointPickerTooltipShown(boolean tooltipShown) {
             }
 

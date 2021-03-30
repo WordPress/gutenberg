@@ -28,7 +28,7 @@ const {
 	hasProjectFile,
 } = require( '../utils' );
 
-const result = spawn( 'node', [ require.resolve( 'puppeteer/install' ) ], {
+const result = spawn( 'node', [ require.resolve( 'puppeteer-core/install' ) ], {
 	stdio: 'inherit',
 } );
 

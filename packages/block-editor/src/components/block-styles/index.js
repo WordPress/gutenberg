@@ -25,17 +25,25 @@ import { getActiveStyle, replaceActiveStyle } from './utils';
 import BlockPreview from '../block-preview';
 import { store as blockEditorStore } from '../../store';
 
-const useGenericPreviewBlock = ( block, type ) =>
-	useMemo(
-		() =>
-			type.example
-				? getBlockFromExample( block.name, {
-						attributes: type.example.attributes,
-						innerBlocks: type.example.innerBlocks,
-				  } )
-				: cloneBlock( block ),
-		[ type.example ? block.name : block, type ]
-	);
+const EMPTY_OBJECT = {};
+
+function useGenericPreviewBlock( block, type ) {
+	return useMemo( () => {
+		const example = type?.example;
+		const blockName = type?.name;
+
+		if ( example && blockName ) {
+			return getBlockFromExample( blockName, {
+				attributes: example.attributes,
+				innerBlocks: example.innerBlocks,
+			} );
+		}
+
+		if ( block ) {
+			return cloneBlock( block );
+		}
+	}, [ type?.example ? block?.name : block, type ] );
+}
 
 function BlockStyles( {
 	clientId,
@@ -45,9 +53,14 @@ function BlockStyles( {
 } ) {
 	const selector = ( select ) => {
 		const { getBlock } = select( blockEditorStore );
-		const { getBlockStyles } = select( blocksStore );
 		const block = getBlock( clientId );
+
+		if ( ! block ) {
+			return EMPTY_OBJECT;
+		}
+
 		const blockType = getBlockType( block.name );
+		const { getBlockStyles } = select( blocksStore );
 		return {
 			block,
 			type: blockType,

@@ -17,9 +17,9 @@ import {
  */
 import './store';
 import './hooks';
-import { create as createLegacyWidget } from './blocks/legacy-widget';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
+import registerLegacyWidgetVariations from './register-legacy-widget-variations';
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -32,11 +32,12 @@ export function initialize( id, settings ) {
 		( block ) => ! [ 'core/more' ].includes( block.name )
 	);
 	registerCoreBlocks( coreBlocks );
-
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks();
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableLegacyWidgetBlock: true,
+		} );
 	}
-	registerBlock( createLegacyWidget( settings ) );
+	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );
 	render(
 		<Layout blockEditorSettings={ settings } />,

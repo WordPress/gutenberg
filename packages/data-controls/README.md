@@ -72,10 +72,6 @@ resolvers,
 } );
 ```
 
-_Parameters_
-
--   _paths_ ``: 
-
 _Returns_
 
 -   `Object`: An object for registering the default controls with the store.

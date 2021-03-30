@@ -96,8 +96,6 @@ public class Gutenberg: NSObject {
             initialProps["gradients"] = gradients
         }
 
-        initialProps["editorMode"] = dataSource.isPreview ? "preview" : "editor"
-
         return initialProps
     }
 
@@ -131,6 +129,10 @@ public class Gutenberg: NSObject {
 
     public func replace(block: Block) {
         sendEvent(.replaceBlock, body: ["html": block.content, "clientId": block.id])
+    }
+
+    public func replace(blockID: String, content: String) {
+        sendEvent(.replaceBlock, body: ["html": content, "clientId": blockID])
     }
 
     public func updateCapabilities() {

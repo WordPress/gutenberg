@@ -140,4 +140,16 @@ describe( 'props', () => {
 			base.container.firstChild
 		);
 	} );
+
+	test( 'should render describedBy', () => {
+		const { container } = render(
+			<Button describedBy="This is a helpful description">
+				WordPress.org
+			</Button>
+		);
+
+		expect( container.firstChild ).toMatchDiffSnapshot(
+			base.container.firstChild
+		);
+	} );
 } );

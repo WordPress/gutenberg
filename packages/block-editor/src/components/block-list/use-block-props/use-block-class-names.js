@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useViewportMatch } from '@wordpress/compose';
 import { isReusableBlock, getBlockType } from '@wordpress/blocks';
 
 /**
@@ -23,11 +22,9 @@ import { store as blockEditorStore } from '../../../store';
  * @return {string} The class names.
  */
 export function useBlockClassNames( clientId ) {
-	const isLargeViewport = useViewportMatch( 'medium' );
 	return useSelect(
 		( select ) => {
 			const {
-				isTyping,
 				isBlockBeingDragged,
 				isBlockHighlighted,
 				isBlockSelected,
@@ -38,8 +35,6 @@ export function useBlockClassNames( clientId ) {
 				__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 			} = select( blockEditorStore );
 			const {
-				focusMode,
-				outlineMode,
 				__experimentalSpotlightEntityBlocks: spotlightEntityBlocks,
 			} = getSettings();
 			const isDragging = isBlockBeingDragged( clientId );
@@ -55,28 +50,17 @@ export function useBlockClassNames( clientId ) {
 				spotlightEntityBlocks
 			);
 			return classnames( 'block-editor-block-list__block', {
-				'is-selected': isSelected && ! isDragging,
+				'is-selected': isSelected,
 				'is-highlighted': isBlockHighlighted( clientId ),
 				'is-multi-selected': isBlockMultiSelected( clientId ),
 				'is-reusable': isReusableBlock( getBlockType( name ) ),
 				'is-dragging': isDragging,
-				// We only care about this prop when the block is selected
-				// Thus to avoid unnecessary rerenders we avoid updating the prop if
-				// the block is not selected.
-				'is-typing':
-					( isSelected || isAncestorOfSelectedBlock ) && isTyping(),
-				'is-focused':
-					focusMode &&
-					isLargeViewport &&
-					( isSelected || isAncestorOfSelectedBlock ),
-				'is-focus-mode': focusMode && isLargeViewport,
-				'is-outline-mode': outlineMode,
-				'has-child-selected': isAncestorOfSelectedBlock && ! isDragging,
+				'has-child-selected': isAncestorOfSelectedBlock,
 				'has-active-entity': activeEntityBlockId,
 				// Determine if there is an active entity area to spotlight.
 				'is-active-entity': activeEntityBlockId === clientId,
 			} );
 		},
-		[ clientId, isLargeViewport ]
+		[ clientId ]
 	);
 }

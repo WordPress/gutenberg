@@ -101,6 +101,7 @@ function getAllowedFormats( {
 	}
 
 	deprecated( 'wp.blockEditor.RichText formattingControls prop', {
+		since: '5.4',
 		alternative: 'allowedFormats',
 	} );
 
@@ -716,6 +717,7 @@ function RichTextWrapper(
 	}
 
 	deprecated( 'wp.blockEditor.RichText wrapperClassName prop', {
+		since: '5.4',
 		alternative: 'className prop or create your own wrapper div',
 	} );
 

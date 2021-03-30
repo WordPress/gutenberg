@@ -103,7 +103,14 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				>
 					<DropZoneProvider>
 						<WritingFlow>
-							<BlockList className="edit-site-block-editor__block-list" />
+							<BlockList
+								className="edit-site-block-editor__block-list"
+								__experimentalLayout={ {
+									type: 'default',
+									// At the root level of the site editor, no alignments should be allowed.
+									alignments: [],
+								} }
+							/>
 						</WritingFlow>
 					</DropZoneProvider>
 				</Iframe>

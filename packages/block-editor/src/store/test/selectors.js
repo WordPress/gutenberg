@@ -73,6 +73,8 @@ const {
 	__experimentalGetParsedReusableBlock,
 	__experimentalGetAllowedPatterns,
 	__experimentalGetScopedBlockPatterns,
+	__unstableGetClientIdWithClientIdsTree,
+	__unstableGetClientIdsTree,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3375,10 +3377,12 @@ describe( 'selectors', () => {
 			settings: {
 				__experimentalBlockPatterns: [
 					{
+						name: 'pattern-a',
 						title: 'pattern with a',
 						content: `<!-- wp:test-block-a --><!-- /wp:test-block-a -->`,
 					},
 					{
+						name: 'pattern-b',
 						title: 'pattern with b',
 						content:
 							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
@@ -3409,10 +3413,12 @@ describe( 'selectors', () => {
 			settings: {
 				__experimentalBlockPatterns: [
 					{
+						name: 'pattern-a',
 						title: 'pattern a',
 						scope: { block: [ 'test/block-a' ] },
 					},
 					{
+						name: 'pattern-b',
 						title: 'pattern b',
 						scope: { block: [ 'test/block-b' ] },
 					},
@@ -3533,5 +3539,78 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			'another-plugin/block-b',
 		];
 		expect( items.map( ( { name } ) => name ) ).toEqual( expectedResult );
+	} );
+} );
+
+describe( '__unstableGetClientIdWithClientIdsTree', () => {
+	it( "should return a stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
+		const state = {
+			blocks: {
+				order: {
+					'': [ 'foo' ],
+					foo: [ 'bar', 'baz' ],
+					bar: [ 'qux' ],
+				},
+			},
+		};
+
+		expect(
+			__unstableGetClientIdWithClientIdsTree( state, 'foo' )
+		).toEqual( {
+			clientId: 'foo',
+			innerBlocks: [
+				{
+					clientId: 'bar',
+					innerBlocks: [ { clientId: 'qux', innerBlocks: [] } ],
+				},
+				{ clientId: 'baz', innerBlocks: [] },
+			],
+		} );
+	} );
+} );
+describe( '__unstableGetClientIdsTree', () => {
+	it( "should return the full content tree starting from the given root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
+		const state = {
+			blocks: {
+				order: {
+					'': [ 'foo' ],
+					foo: [ 'bar', 'baz' ],
+					bar: [ 'qux' ],
+				},
+			},
+		};
+
+		expect( __unstableGetClientIdsTree( state, 'foo' ) ).toEqual( [
+			{
+				clientId: 'bar',
+				innerBlocks: [ { clientId: 'qux', innerBlocks: [] } ],
+			},
+			{ clientId: 'baz', innerBlocks: [] },
+		] );
+	} );
+
+	it( "should return the full content tree starting from the root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
+		const state = {
+			blocks: {
+				order: {
+					'': [ 'foo' ],
+					foo: [ 'bar', 'baz' ],
+					bar: [ 'qux' ],
+				},
+			},
+		};
+
+		expect( __unstableGetClientIdsTree( state ) ).toEqual( [
+			{
+				clientId: 'foo',
+				innerBlocks: [
+					{
+						clientId: 'bar',
+						innerBlocks: [ { clientId: 'qux', innerBlocks: [] } ],
+					},
+					{ clientId: 'baz', innerBlocks: [] },
+				],
+			},
+		] );
 	} );
 } );

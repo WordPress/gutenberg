@@ -8,7 +8,7 @@ Simple interface to introduce animations to components.
 import { Animate } from '@wordpress/components';
 
 const MyAnimatedNotice = () => (
-	<Animate todo="Add missing props">
+	<Animate type="slide-in" options={{ origin: 'top' }}>
 		{ ( { className } ) => (
 			<Notice className={ className } status="success">
 				<p>Animation finished.</p>

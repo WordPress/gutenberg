@@ -56,10 +56,12 @@ export type Props = {
 	 * An HTML anchor link. Transforms the `Button` in a `<a>` element.
 	 */
 	href?: string;
+	target?: string;
 	/**
 	 * Renders an `Icon` within the `Button`.
 	 */
 	icon?: ReactElement;
+	iconPosition?: 'left' | 'right';
 	/**
 	 * Adjusts the size of the `Icon` within the `Button` (from the `icon` prop).
 	 */
@@ -90,6 +92,7 @@ export type Props = {
 	 * Passed to `data-focused`.
 	 */
 	isFocused?: boolean;
+	isFocusable?: boolean;
 	/**
 	 * Renders loading, disabling `Button` and renders a `Spinner`.
 	 *

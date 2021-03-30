@@ -398,6 +398,7 @@ class ButtonEdit extends Component {
 
 		const backgroundColor = this.getBackgroundColor();
 		const textColor = this.getTextColor();
+		const isFixedWidth = !! width;
 
 		return (
 			<View onLayout={ this.onLayout }>
@@ -426,6 +427,12 @@ class ButtonEdit extends Component {
 						onChange={ this.onChangeText }
 						style={ {
 							...richTextStyle.richText,
+							paddingLeft: isFixedWidth
+								? 0
+								: richTextStyle.richText.paddingLeft,
+							paddingRight: isFixedWidth
+								? 0
+								: richTextStyle.richText.paddingRight,
 							color: textColor,
 						} }
 						textAlign={ align }
@@ -435,7 +442,7 @@ class ButtonEdit extends Component {
 						identifier="text"
 						tagName="p"
 						minWidth={ minWidth } // The minimum Button size.
-						maxWidth={ maxWidth } // The width of the screen.
+						maxWidth={ isFixedWidth ? minWidth : maxWidth } // The width of the screen.
 						id={ clientId }
 						isSelected={ isButtonFocused }
 						withoutInteractiveFormatting
