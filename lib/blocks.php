@@ -387,7 +387,7 @@ add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
  */
 function gutenberg_block_has_support( $block_type, $feature, $default = false ) {
 	$block_support = $default;
-	if ( property_exists( $block_type, 'supports' ) ) {
+	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
 		$block_support = _wp_array_get( $block_type->supports, $feature, $default );
 	}
 
