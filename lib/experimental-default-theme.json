@@ -168,6 +168,7 @@
 			},
 			"spacing": {
 				"customPadding": false,
+				"customMargin": false,
 				"units": [ "px", "em", "rem", "vh", "vw" ]
 			},
 			"border": {

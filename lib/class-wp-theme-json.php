@@ -106,6 +106,12 @@ class WP_Theme_JSON {
 					'bottom' => null,
 					'left'   => null,
 				),
+				'margin' => array(
+					'top'    => null,
+					'right'  => null,
+					'bottom' => null,
+					'left'   => null,
+				),
 			),
 			'typography' => array(
 				'fontFamily'     => null,
@@ -133,6 +139,7 @@ class WP_Theme_JSON {
 			),
 			'spacing'    => array(
 				'customPadding' => null,
+				'customMargin'  => null,
 				'units'         => null,
 			),
 			'typography' => array(
@@ -279,6 +286,10 @@ class WP_Theme_JSON {
 		),
 		'padding'                  => array(
 			'value'      => array( 'spacing', 'padding' ),
+			'properties' => array( 'top', 'right', 'bottom', 'left' ),
+		),
+		'margin'                   => array(
+			'value'      => array( 'spacing', 'margin' ),
 			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
 		'text-decoration'          => array(

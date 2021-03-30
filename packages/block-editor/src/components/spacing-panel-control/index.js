@@ -11,9 +11,10 @@ import InspectorControls from '../inspector-controls';
 import useEditorFeature from '../use-editor-feature';
 
 export default function SpacingPanelControl( { children, ...props } ) {
-	const isSpacingEnabled = useEditorFeature( 'spacing.customPadding' );
+	const supportsPadding = useEditorFeature( 'spacing.customPadding' );
+	const supportsMargin = useEditorFeature( 'spacing.customMargin' );
 
-	if ( ! isSpacingEnabled ) return null;
+	if ( ! supportsMargin && ! supportsPadding ) return null;
 
 	return (
 		<InspectorControls { ...props }>

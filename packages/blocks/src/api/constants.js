@@ -70,6 +70,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		support: [ 'spacing', 'padding' ],
 		properties: [ 'top', 'right', 'bottom', 'left' ],
 	},
+	margin: {
+		value: [ 'spacing', 'margin' ],
+		support: [ 'spacing', 'margin' ],
+		properties: [ 'top', 'right', 'bottom', 'left' ],
+	},
 	textDecoration: {
 		value: [ 'typography', 'textDecoration' ],
 		support: [ '__experimentalTextDecoration' ],
