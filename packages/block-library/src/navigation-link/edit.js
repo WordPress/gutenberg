@@ -474,7 +474,7 @@ export default function NavigationLinkEdit( {
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
 							anchorRef={ listItemRef.current }
-							__experimentalToggleRef={ linkToggleRef }
+							__experimentalToggleRef={ linkToggleRef.current }
 						>
 							<KeyboardShortcuts
 								bindGlobal
