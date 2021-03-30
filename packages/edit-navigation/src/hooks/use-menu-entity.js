@@ -7,8 +7,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { MENU_KIND, MENU_POST_TYPE } from '../constants';
 
-import { untitledMenu } from './index';
-
 export default function useMenuEntity( menuId ) {
 	const { editEntityRecord } = useDispatch( 'core' );
 
@@ -20,13 +18,9 @@ export default function useMenuEntity( menuId ) {
 		[ menuId ]
 	);
 
-	const editedMenuName = menuId && editedMenu.name;
-
-	const editMenuName = ( name = untitledMenu ) =>
-		editEntityRecord( ...menuEntityData, { name } );
-
 	return {
-		editedMenuName,
-		editMenuName,
+		editedMenu,
+		menuEntityData,
+		editMenuEntityRecord: editEntityRecord,
 	};
 }
