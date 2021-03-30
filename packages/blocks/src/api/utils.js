@@ -190,8 +190,9 @@ export function getAccessibleBlockLabel(
 		if ( hasLabel ) {
 			if ( hasParentTitle ) {
 				return sprintf(
-					/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. 3: The parent block title. 4: The block label.. */
-					__( '%1$d of %2$d. Child of %3$s block. %4$s' ),
+					/* translators: accessibility text. 1: The block title. 2: The block row number. 3: The total number of blocks. 4: The parent block title. 5: The block label.. */
+					__( '%1$s Block. %2$d of %3$d. Child of %4$s Block. %5$s' ),
+					title,
 					position,
 					blocksTotal,
 					parentTitle,
@@ -199,8 +200,9 @@ export function getAccessibleBlockLabel(
 				);
 			}
 			return sprintf(
-				/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. 3: The block label.. */
-				__( '%1$d of %2$d. %3$s' ),
+				/* translators: accessibility text. 1: The block title. 2: The block row number. 3: The total number of blocks. 4: The block label.. */
+				__( '%1$s Block. %2$d of %3$d. %4$s' ),
+				title,
 				position,
 				blocksTotal,
 				label
@@ -209,16 +211,18 @@ export function getAccessibleBlockLabel(
 
 		if ( hasParentTitle ) {
 			return sprintf(
-				/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. 3: The parent block title. */
-				__( '%1$d of %2$d. Child of %3$s block.' ),
+				/* translators: accessibility text. 1: The block title. 2: The block row number. 3: The total number of blocks. 4: The parent block title. */
+				__( '%1$s Block. %2$d of %3$d. Child of %4$s Block.' ),
+				title,
 				position,
 				blocksTotal,
 				parentTitle
 			);
 		}
 		return sprintf(
-			/* translators: accessibility text. 1: The block row number. 2: The total number of blocks. */
-			__( '%1$d of %2$d.' ),
+			/* translators: accessibility text. 1: The block title. 2: The block row number. 3: The total number of blocks. */
+			__( '%1$s Block. %2$d of %3$d.' ),
+			title,
 			position,
 			blocksTotal
 		);
@@ -226,8 +230,9 @@ export function getAccessibleBlockLabel(
 		if ( hasLabel ) {
 			if ( hasParentTitle ) {
 				return sprintf(
-					/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block parent title. 4: The block label.. */
-					__( 'Column %1$d of %2$d. Child of %3$s block. %4$s' ),
+					/* translators: accessibility text. 1: The block title. 2: The block column number. 3: The total number of blocks. 4: The block parent title. 5: The block label.. */
+					__( '%1$s Block. Column %2$d of %3$d. Child of %4$s Block. %5$s' ),
+					title,
 					position,
 					blocksTotal,
 					parentTitle,
@@ -235,8 +240,9 @@ export function getAccessibleBlockLabel(
 				);
 			}
 			return sprintf(
-				/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block label.. */
-				__( 'Column %1$d of %2$d. %3$s' ),
+				/* translators: accessibility text. 1: The block title. 2: The block column number. 3: The total number of blocks. 4: The block label.. */
+				__( '%1$s Block. Column %2$d of %3$d. %4$s' ),
+				title,
 				position,
 				blocksTotal,
 				label
@@ -245,23 +251,30 @@ export function getAccessibleBlockLabel(
 
 		if ( hasParentTitle ) {
 			return sprintf(
-				/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. 3: The block parent title. */
-				__( 'Column %1$d of %2$d. Child of %3$s block.' ),
+				/* translators: accessibility text. 1: The block title. 2: The block column number. 3: The total number of blocks. 4: The block parent title. */
+				__( '%1$s Block. Column %2$d of %3$d. Child of %4$s Block.' ),
+				title,
 				position,
 				blocksTotal,
 				parentTitle
 			);
 		}
 		return sprintf(
-			/* translators: accessibility text. 1: The block column number. 2: The total number of blocks. */
-			__( 'Column %1$d of %2$d.' ),
+			/* translators: accessibility text. 1: The block title. 2: The block column number. 3: The total number of blocks. */
+			__( '%1$s Block. Column %2$d of %3$d.' ),
+			title,
 			position,
 			blocksTotal
 		);
 	}
 
 	if ( hasLabel ) {
-		return label;
+		return sprintf(
+			/* translators: 1: The block title. 2: The block label. */
+			__( '%1$s Block. %2$s' ),
+			title,
+			label
+		);
 	}
 }
 
