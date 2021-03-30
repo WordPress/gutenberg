@@ -390,6 +390,7 @@ You can customize the WordPress installation, plugins and themes that the develo
 | `"port"`       | `integer`      | `8888` (`8889` for the tests instance) | The primary port number to use for the installation. You'll access the instance through the port: 'http://localhost:8888'.       |
 | `"config"`     | `Object`       | See below.                             | Mapping of wp-config.php constants to their desired values.                                                                      |
 | `"mappings"`   | `Object`       | `"{}"`                                 | Mapping of WordPress directories to local directories to be mounted in the WordPress instance.                                   |
+| `"phpConfig"`  | `Object`       | See below.                             | PHP configuration directives.                                                                                                    |
 
 _Note: the port number environment variables (`WP_ENV_PORT` and `WP_ENV_TESTS_PORT`) take precedent over the .wp-env.json values._
 
@@ -404,7 +405,7 @@ Several types of strings can be passed into the `core`, `plugins`, `themes`, and
 
 Remote sources will be downloaded into a temporary directory located in `~/.wp-env`.
 
-Additionally, the key `env` is available to override any of the above options on an individual-environment basis. For example, take the following `.wp-env.json` file:
+Additionally, the key `env` is available to override any of the above options on an individual-environment basis (except `phpConfig`). For example, take the following `.wp-env.json` file:
 
 ```json
 {
@@ -423,7 +424,7 @@ Additionally, the key `env` is available to override any of the above options on
 			},
 			"port": 3000
 		}
-	}
+	}
 }
 ```
 
@@ -432,6 +433,28 @@ On the development instance, `cwd` will be mapped as a plugin, `one-theme` will 
 On the tests instance, `cwd` is still mapped as a plugin, but no theme is mapped. Additionally, while KEY_2 is still set to false, KEY_1 is overridden and set to false. 3000 overrides the default port as well.
 
 This gives you a lot of power to change the options applicable to each environment.
+
+Custom `php.ini` directives can be specified using `phpConfig`. For example this configuration:
+
+```json
+{
+	"phpConfig": {
+		"memory_limit": "512M",
+		"post_max_size": "512M",
+		"upload_max_filesize": "512M"
+	}
+}
+```
+
+Will become these `php.ini` directives:
+
+```
+memory_limit=512M
+post_max_size=512M
+upload_max_filesize=512M
+```
+
+By default, `phpConfig` defines the directives needed to increase the maximum size of files that can be uploaded.
 
 ## .wp-env.override.json
 
