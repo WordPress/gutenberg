@@ -22,6 +22,7 @@ import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
 import { useControlledState } from '../utils/hooks';
+// import { active } from '@wp-g2/styles/types';
 
 function UnitControl(
 	{
@@ -52,6 +53,8 @@ function UnitControl(
 
 	// Stores parsed value for hand-off in state reducer
 	const refParsedValue = useRef( null );
+
+	console.log("current unit: " + unit );
 
 	const classes = classnames( 'components-unit-control', className );
 
@@ -158,6 +161,12 @@ function UnitControl(
 		/>
 	) : null;
 
+	const activeUnit = units.find(
+		( option ) => option.value === unit
+	);
+
+	const unitStep = activeUnit?.step ? activeUnit.step : 1;
+
 	return (
 		<Root className="components-unit-control-wrapper" style={ style }>
 			<ValueInput
@@ -177,6 +186,7 @@ function UnitControl(
 				size={ size }
 				suffix={ inputSuffix }
 				value={ value }
+				step={ unitStep }
 				__unstableStateReducer={ composeStateReducers(
 					unitControlStateReducer,
 					stateReducer
