@@ -93,6 +93,13 @@ export const defaultEntities = [
 		label: __( 'Comment' ),
 	},
 	{
+		name: 'page',
+		kind: 'root',
+		baseURL: '/wp/v2/pages',
+		plural: 'pages',
+		label: __( 'Pages' ),
+	},
+	{
 		name: 'menu',
 		kind: 'root',
 		baseURL: '/__experimental/menus',

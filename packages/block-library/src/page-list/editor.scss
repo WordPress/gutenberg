@@ -20,3 +20,11 @@
 		margin: 0.5em;
 	}
 }
+
+.wp-block-page-list-modal-buttons {
+	display: flex;
+	justify-content: flex-end;
+	> button {
+		margin: $grid-unit-10;
+	}
+}
