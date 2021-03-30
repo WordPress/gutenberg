@@ -23,106 +23,130 @@
 
 		// This is the default font that is going to be used in the content of the areas (blocks).
 		font-family: $default-font;
-	}
 
-	// Increase specificity.
-	.wp-block-navigation .wp-block-navigation-link {
-		display: block;
-
-		// Show submenus on click.
-		> .wp-block-navigation-link__container {
-			// This unsets some styles inherited from the block, meant to only show submenus on click, not hover, when inside the editor.
-			opacity: 1;
-			visibility: visible;
-			display: none;
-		}
-
-		// Fix focus outlines.
-		&.is-selected > .wp-block-navigation-link__content,
-		&.is-selected:hover > .wp-block-navigation-link__content {
-			box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
-		}
-
-		&.block-editor-block-list__block:not([contenteditable]):focus::after {
-			display: none;
-		}
-	}
-
-	.wp-block-navigation-link__content {
-		margin-bottom: 6px;
-		border-radius: $radius-block-ui;
-
-		&:hover {
-			box-shadow: 0 0 0 $border-width $gray-300;
-		}
-	}
-
-	.wp-block-navigation-link__label,
-	.wp-block-navigation-link__placeholder-text {
-		padding: $grid-unit-05;
-		padding-left: $grid-unit-10;
-	}
-
-	.wp-block-navigation-link__label {
-		// Without this Links with submenus display a pointer.
-		cursor: text;
-	}
-
-	// Position the submenu icon so it appears to the left of
-	// the Link. All the extra specificity is help override the
-	// rotation on the SVG.
-	.wp-block-navigation .wp-block-navigation-link .wp-block-navigation-link__submenu-icon {
-		position: absolute;
-		top: 6px;
-		left: 2px;
-		padding: 6px;
-		pointer-events: none;
-
-		svg {
-			padding: 0;
-		}
-	}
-
-	// Submenus
-	// There's a bunch of stuff to override just to get submenus to
-	// as a normal block element.
-	.wp-block-navigation-link.has-child {
-		cursor: default;
-		border-radius: $radius-block-ui;
-	}
-
-	// Override Nav block styling for deeply nested submenus.
-	.has-child .wp-block-navigation__container .wp-block-navigation__container,
-	.has-child .wp-block-navigation__container .wp-block-navigation-link__container {
-		left: auto;
-	}
-
-	// When editing a link with children, highlight the parent
-	// and adjust the spacing and submenu icon.
-	.wp-block-navigation-link.has-child.is-editing {
-		> .wp-block-navigation__container,
-		> .wp-block-navigation-link__container {
-			opacity: 1;
-			visibility: visible;
-			position: relative;
-			background: transparent;
-			top: auto;
-			left: auto;
-			padding-left: $grid-unit-15;
-			min-width: auto;
-			width: 100%;
-			border: none;
+		// Increase specificity.
+		.wp-block-navigation-link {
 			display: block;
 
-			&::before {
+			// Show submenus on click.
+			> .wp-block-navigation-link__container {
+				// This unsets some styles inherited from the block, meant to only show submenus on click, not hover, when inside the editor.
+				opacity: 1;
+				visibility: visible;
 				display: none;
 			}
-		}
-	}
 
-	// Add Buttons
-	.block-editor-button-block-appender.block-list-appender__toggle {
-		margin: 0 0 0 $grid-unit-20;
-		padding: 0;
+			// Fix focus outlines.
+			&.is-selected > .wp-block-navigation-link__content,
+			&.is-selected:hover > .wp-block-navigation-link__content {
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+			}
+
+			&.block-editor-block-list__block:not([contenteditable]):focus::after {
+				display: none;
+			}
+
+			// Menu items.
+			.wp-block-navigation-link__content {
+				margin-bottom: 6px;
+				border-radius: $radius-block-ui;
+
+				&:hover {
+					box-shadow: 0 0 0 $border-width $gray-300;
+				}
+			}
+
+			.wp-block-navigation-link__label,
+			.wp-block-navigation-link__placeholder-text {
+				padding: $grid-unit-05;
+				padding-left: $grid-unit-10;
+			}
+
+			.wp-block-navigation-link__label {
+				// Without this Links with submenus display a pointer.
+				cursor: text;
+			}
+		}
+
+
+		// Basic Page List support.
+		ul.wp-block-page-list {
+			// Make it inert.
+			background: $gray-100;
+			border-radius: $radius-block-ui;
+			pointer-events: none;
+
+			.wp-block-pages-list__item {
+				color: $gray-700;
+				margin-bottom: 6px;
+				border-radius: $radius-block-ui;
+				padding: $grid-unit-05;
+				padding-left: $grid-unit-10;
+			}
+		}
+
+		// Submenu icon indicator.
+		.wp-block-navigation-link__submenu-icon {
+			position: absolute;
+			top: 6px;
+			left: 0;
+			padding: 6px;
+			pointer-events: none;
+
+			svg {
+				// Point rightwards.
+				transform: rotate(-90deg);
+
+				transition: transform 0.2s ease;
+				@include reduce-motion("transition");
+			}
+		}
+
+		// Point downwards when open.
+		.is-selected.has-child > .wp-block-navigation-link__submenu-icon svg,
+		.has-child-selected.has-child > .wp-block-navigation-link__submenu-icon svg {
+			transform: rotate(0deg);
+		}
+
+		// Override inherited values to optimize menu items for the screen context.
+		.wp-block-navigation-link.has-child {
+			cursor: default;
+			border-radius: $radius-block-ui;
+		}
+
+		// Override for deeply nested submenus.
+		.has-child .wp-block-navigation__container .wp-block-navigation__container,
+		.has-child .wp-block-navigation__container .wp-block-navigation-link__container {
+			left: auto;
+		}
+
+		// When editing a link with children, highlight the parent
+		// and adjust the spacing and submenu icon.
+		.wp-block-navigation-link.has-child.is-editing {
+			> .wp-block-navigation__container,
+			> .wp-block-navigation-link__container {
+				opacity: 1;
+				visibility: visible;
+				position: relative;
+				background: transparent;
+				top: auto;
+				left: auto;
+				padding-left: $grid-unit-15;
+				min-width: auto;
+				width: 100%;
+				border: none;
+				display: block;
+
+				&::before {
+					display: none;
+				}
+			}
+		}
+
+		// Add buttons
+		.block-editor-button-block-appender.block-list-appender__toggle {
+			margin: 0 0 0 $grid-unit-20;
+			padding: 0;
+		}
 	}
 }
