@@ -542,6 +542,9 @@ const Popover = ( {
 	function handleOnFocusOutside( event ) {
 		if ( __experimentalToggleRef ) {
 			handleToggleOnFocusOutside( event );
+			if ( onFocusOutside ) {
+				onFocusOutside( event );
+			}
 			return;
 		}
 
