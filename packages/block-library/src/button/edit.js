@@ -128,7 +128,7 @@ function URLPicker( {
 			position="bottom center"
 			onClose={ () => setIsURLPickerOpen( false ) }
 			anchorRef={ anchorRef?.current }
-			__experimentalToggleRef={ linkToolbarButtonRef?.current }
+			__experimentalToggleRef={ linkToolbarButtonRef.current }
 		>
 			<LinkControl
 				className="wp-block-navigation-link__inline-link-input"
