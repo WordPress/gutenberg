@@ -54,8 +54,6 @@ function UnitControl(
 	// Stores parsed value for hand-off in state reducer
 	const refParsedValue = useRef( null );
 
-	console.log("current unit: " + unit );
-
 	const classes = classnames( 'components-unit-control', className );
 
 	const handleOnChange = ( next, changeProps ) => {

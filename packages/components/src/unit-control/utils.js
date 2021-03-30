@@ -12,8 +12,8 @@ import { __, _x } from '@wordpress/i18n';
  * Units of measurements. `a11yLabel` is used by screenreaders.
  */
 export const CSS_UNITS = [
-	{ value: 'px', label: 'px', default: 0, step: 1, a11yLabel: __( 'pixels' ) },
-	{ value: '%', label: '%', default: 10, step: 1, a11yLabel: __( 'percent' ) },
+	{ value: 'px', label: 'px', default: 0, a11yLabel: __( 'pixels' ) },
+	{ value: '%', label: '%', default: 10, a11yLabel: __( 'percent' ) },
 	{
 		value: 'em',
 		label: 'em',
@@ -24,7 +24,6 @@ export const CSS_UNITS = [
 		value: 'rem',
 		label: 'rem',
 		default: 0,
-		step: 0.1,
 		a11yLabel: _x( 'rems', 'Relative to root font size (rem)' ),
 	},
 	{
