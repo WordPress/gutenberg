@@ -2090,7 +2090,7 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
  *
  * @param {Object} state Global application state.
  * @param {Object} clientId Client Id of the block.
- * @param {boolean} source Insertion source of the block.
+ * @param {?string} source Optional insertion source of the block.
  * @return {boolean} True if the block matches the last block inserted from the specified source.
  */
 export function wasBlockJustInserted( state, clientId, source ) {
