@@ -7,14 +7,11 @@ import { truncate } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { __, sprintf } from '@wordpress/i18n';
-import { createInterpolateElement } from '@wordpress/element';
 import {
 	getBlockType,
 	__experimentalGetBlockLabel as getBlockLabel,
 	isReusableBlock,
 } from '@wordpress/blocks';
-import { VisuallyHidden } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -76,14 +73,5 @@ export default function BlockTitle( { clientId } ) {
 	if ( label !== blockType.title ) {
 		return truncate( label, { length: 35 } );
 	}
-	return createInterpolateElement(
-		sprintf(
-			/* translators: 1: The block title. */
-			__( '%s <VisuallyHidden>Block.</VisuallyHidden>' ),
-			blockInformation.title
-		),
-		{
-			VisuallyHidden: <VisuallyHidden as="span" />,
-		}
-	);
+	return blockInformation.title;
 }

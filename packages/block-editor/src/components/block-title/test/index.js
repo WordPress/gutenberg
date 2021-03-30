@@ -92,7 +92,7 @@ describe( 'BlockTitle', () => {
 
 		const wrapper = shallow( <BlockTitle clientId="id-name-exists" /> );
 
-		expect( wrapper.text() ).toBe( 'Block Title Block.' );
+		expect( wrapper.text() ).toBe( 'Block Title' );
 	} );
 
 	it( 'renders label if it is set', () => {

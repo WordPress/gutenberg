@@ -265,7 +265,9 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 
 	const blockType = getBlockType( name );
 	let parentTitle;
-	const blockInformationRoot = useBlockDisplayInformation( passedRootClientId );
+	const blockInformationRoot = useBlockDisplayInformation(
+		passedRootClientId
+	);
 	if ( blockInformationRoot !== null ) {
 		parentTitle = blockInformationRoot.title
 			? blockInformationRoot.title
