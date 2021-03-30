@@ -59,32 +59,41 @@ function blockToWidget( block, existingWidget = null ) {
 	};
 }
 
-function widgetToBlock( widget ) {
+function widgetToBlock( {
+	id,
+	idBase,
+	number,
+	instance: {
+		encoded_serialized_instance: encoded,
+		instance_hash_key: hash,
+		raw_instance: raw,
+	},
+} ) {
 	let block;
 
-	if ( widget.idBase === 'block' ) {
-		const parsedBlocks = parse( widget.instance.raw_instance.content );
+	if ( idBase === 'block' ) {
+		const parsedBlocks = parse( raw.content );
 		block = parsedBlocks.length
 			? parsedBlocks[ 0 ]
 			: createBlock( 'core/paragraph', {} );
-	} else if ( widget.number ) {
+	} else if ( number ) {
 		// Widget that extends WP_Widget.
 		block = createBlock( 'core/legacy-widget', {
-			idBase: widget.idBase,
+			idBase,
 			instance: {
-				encoded: widget.instance.encoded_serialized_instance,
-				hash: widget.instance.instance_hash_key,
-				raw: widget.instance.raw_instance,
+				encoded,
+				hash,
+				raw,
 			},
 		} );
 	} else {
 		// Widget that does not extend WP_Widget.
 		block = createBlock( 'core/legacy-widget', {
-			id: widget.id,
+			id,
 		} );
 	}
 
-	return addWidgetIdToBlock( block, widget.id );
+	return addWidgetIdToBlock( block, id );
 }
 
 function initState( sidebar ) {
