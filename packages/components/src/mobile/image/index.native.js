@@ -7,7 +7,7 @@ import { Image, Text, View } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Icon } from '@wordpress/components';
+import { Icon, Badge } from '@wordpress/components';
 import { image as icon } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useEffect, useState } from '@wordpress/element';
@@ -19,7 +19,6 @@ import { getImageWithFocalPointStyles } from './utils';
 import styles from './style.scss';
 import SvgIconRetry from './icon-retry';
 import ImageEditingButton from './image-editing-button';
-import FeaturedBanner from './featured-banner';
 
 const ICON_TYPE = {
 	PLACEHOLDER: 'placeholder',
@@ -243,7 +242,7 @@ const ImageComponent = ( {
 				) }
 			</View>
 
-			{ isFeaturedImage && <FeaturedBanner /> }
+			{ isFeaturedImage && <Badge label={ __( 'Featured' ) } /> }
 
 			{ editButton && isSelected && ! isUploadInProgress && (
 				<ImageEditingButton
