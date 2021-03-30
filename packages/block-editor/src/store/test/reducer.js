@@ -3012,7 +3012,7 @@ describe( 'state', () => {
 			expect( state ).toEqual( expectedState );
 		} );
 
-		it( 'should return state if last block inserted is called with action INSERT_BLOCKS and actions.blocks = 0', () => {
+		it( 'should return state if last block inserted is called with action INSERT_BLOCKS and block list is empty', () => {
 			const expectedState = {
 				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			};
