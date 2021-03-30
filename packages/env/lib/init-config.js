@@ -84,7 +84,8 @@ module.exports = async function initConfig( {
 			path.resolve( config.workDirectoryPath, 'Dockerfile' ),
 			dockerFileContents(
 				dockerComposeConfig.services.wordpress.image,
-				xdebug
+				xdebug,
+				config
 			)
 		);
 	} else if ( ! existsSync( config.workDirectoryPath ) ) {
@@ -97,22 +98,39 @@ module.exports = async function initConfig( {
 	return config;
 };
 
-function dockerFileContents( image, xdebugMode ) {
+/**
+ * Get Dockerfile contents.
+ *
+ * @param {string} image Docker base image name.
+ * @param {string} xdebugMode xDebug mode.
+ * @param {WPConfig} config Configuration object.
+ * @return {string} Dockerfile contents.
+ */
+function dockerFileContents( image, xdebugMode, config ) {
 	const isLinux = os.type() === 'Linux';
 	// Discover client host does not appear to work on macOS with Docker.
 	const clientDetectSettings = isLinux
 		? 'xdebug.discover_client_host=true'
 		: 'xdebug.client_host="host.docker.internal"';
 
-	return `FROM ${ image }
+	// Converts object key-value pairs into a string of PHP directives
+	const buildPhpDirectives = ( phpConfig ) =>
+		Object.entries( phpConfig ).reduce(
+			( result, entry ) =>
+				result + String.raw`${ entry[ 0 ] }=${ entry[ 1 ] }\n`,
+			''
+		);
 
-RUN apt-get -qy install $PHPIZE_DEPS \\
-	&& pecl install xdebug \\
-	&& docker-php-ext-enable xdebug
+	return String.raw`FROM ${ image }
 
-RUN touch /usr/local/etc/php/php.ini
-RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
-RUN echo 'xdebug.mode=${ xdebugMode }' >> /usr/local/etc/php/php.ini
-RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini
+RUN apt-get -qy install $PHPIZE_DEPS \
+	&& pecl install xdebug \
+	&& docker-php-ext-enable xdebug \
+	&& touch /usr/local/etc/php/php.ini \
+	&& echo -e '\
+	xdebug.start_with_request=yes\n \
+	xdebug.mode=${ xdebugMode }\n \
+	${ clientDetectSettings }\n \
+	${ buildPhpDirectives( config.phpConfig ) }' >> /usr/local/etc/php/php.ini
 `;
 }

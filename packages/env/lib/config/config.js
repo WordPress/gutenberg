@@ -27,6 +27,7 @@ const md5 = require( '../md5' );
  * @property {Object.<string, WPServiceConfig>} env                     Specific config for different environments.
  * @property {boolean}                          debug                   True if debug mode is enabled.
  * @property {string}                           phpVersion              Version of PHP to use in the environments, of the format 0.0.
+ * @property {Object} phpConfig PHP configuration key value pairs.
  */
 
 /**
@@ -92,6 +93,10 @@ module.exports = async function readConfig( configPath ) {
 				port: 8889,
 			},
 		},
+		phpConfig: {
+			post_max_size: '500M',
+			upload_max_filesize: '500M',
+		},
 	};
 
 	// The specified base configuration from .wp-env.json or from the local
@@ -110,9 +115,7 @@ module.exports = async function readConfig( configPath ) {
 	const detectedLocalConfig =
 		Object.keys( { ...baseConfig, ...overrideConfig } ).length > 0;
 
-	// A quick validation before merging on a service by service level allows us
-	// to check the root configuration options and provide more helpful errors.
-	validateConfig(
+	const resolvedConfig = validateConfig(
 		mergeWpServiceConfigs( [
 			defaultConfiguration,
 			baseConfig,
@@ -174,6 +177,7 @@ module.exports = async function readConfig( configPath ) {
 		workDirectoryPath,
 		detectedLocalConfig,
 		env,
+		phpConfig: resolvedConfig.phpConfig,
 	} );
 };
 
