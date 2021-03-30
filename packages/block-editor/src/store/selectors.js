@@ -1796,6 +1796,10 @@ export const __experimentalGetParsedPattern = createSelector(
 
 		const blocks = parse( pattern.content );
 		const isAllowed = ( () => {
+			if ( isBoolean( allowedBlockTypes ) ) {
+				return allowedBlockTypes;
+			}
+
 			const blocksQueue = [ ...blocks ];
 			while ( blocksQueue.length > 0 ) {
 				const block = blocksQueue.shift();
