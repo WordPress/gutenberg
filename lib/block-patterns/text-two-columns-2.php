@@ -13,9 +13,8 @@ return array(
 	<div class="wp-block-column"><!-- wp:spacer -->
 	<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer -->
-	
-	<!-- wp:paragraph {"style":{"typography":{"fontSize":"21px"}},"textColor":"black"} -->
-	<p class="has-black-color has-text-color" style="font-size:21px"><strong>' . __( 'We have worked with:' ) . '</strong></p>
+	<!-- wp:paragraph {"style":{"typography":{"fontSize":"21px"}, "color":{"text":"#000000"}}} -->
+	<p class="has-text-color" style="font-size:21px;color:#000000;"><strong>' . __( 'We have worked with:' ) . '</strong></p>
 	<!-- /wp:paragraph -->
 	
 	<!-- wp:paragraph {"style":{"typography":{"fontSize":"24px","lineHeight":"1.2"}}} -->

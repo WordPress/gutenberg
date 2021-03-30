@@ -15,12 +15,12 @@ return array(
 	<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer -->
 
-	<!-- wp:heading {"level":6,"textColor":"black"} -->
-	<h6 class="has-black-color has-text-color">ECOSYSTEM</h6>
+	<!-- wp:heading {"level":6,"style":{"color":{"text":"#000000"}}} -->
+	<h6 class="has-text-color" style="color:#000000">' . __( 'ECOSYSTEM' ) . '</h6>
 	<!-- /wp:heading -->
 
-	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"5vw"}},"textColor":"black"} -->
-	<p class="has-black-color has-text-color" style="font-size:5vw;line-height:1.1"><strong>Positive growth.</strong></p>
+	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"5vw"},"color":{"text":"#000000"}}} -->
+	<p class="has-text-color" style="color:#000000;font-size:5vw;line-height:1.1"><strong>' . __( 'Positive growth.' ) . '</strong></p>
 	<!-- /wp:paragraph --><!-- wp:spacer {"height":5} -->
 	<div style="height:5px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer --></div>
@@ -29,8 +29,8 @@ return array(
 	
 	<!-- wp:columns {"align":"wide"} -->
 	<div class="wp-block-columns alignwide"><!-- wp:column {"width":"33.38%"} -->
-	<div class="wp-block-column" style="flex-basis:33.38%"><!-- wp:paragraph {"textColor":"black","fontSize":"extra-small"} -->
-	<p class="has-black-color has-text-color has-extra-small-font-size">' . __( '<em>Nature</em>, in the common sense, refers to essences unchanged by man; space, the air, the river, the leaf.&nbsp;<em>Art</em>&nbsp;is applied to the mixture of his will with the same things, as in a house, a canal, a statue, a picture. But his operations taken together are so insignificant, a little chipping, baking, patching, and washing, that in an impression so grand as that of the world on the human mind, they do not vary the result.' ) . '</p>
+	<div class="wp-block-column" style="flex-basis:33.38%"><!-- wp:paragraph {"style":{"color":{"text":"#000000"}},"fontSize":"extra-small"} -->
+	<p class="has-text-color has-extra-small-font-size" style="color:#000000">' . __( '<em>Nature</em>, in the common sense, refers to essences unchanged by man; space, the air, the river, the leaf.&nbsp;<em>Art</em>&nbsp;is applied to the mixture of his will with the same things, as in a house, a canal, a statue, a picture. But his operations taken together are so insignificant, a little chipping, baking, patching, and washing, that in an impression so grand as that of the world on the human mind, they do not vary the result.' ) . '</p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column -->
 	
@@ -59,8 +59,8 @@ return array(
 	<!-- /wp:column -->
 	
 	<!-- wp:column {"verticalAlignment":"center","width":"33%"} -->
-	<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33%"><!-- wp:paragraph {"textColor":"black","fontSize":"extra-small"} -->
-	<p class="has-black-color has-text-color has-extra-small-font-size">' . __( "Undoubtedly we have no questions to ask which are unanswerable. We must trust the perfection of the creation so far, as to believe that whatever curiosity the order of things has awakened in our minds, the order of things can satisfy. Every man's condition is a solution in hieroglyphic to those inquiries he would put." ) . '</p>
+	<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33%"><!-- wp:paragraph {"style":{"color":{"text":"#000000"}},"fontSize":"extra-small"} -->
+	<p class="has-text-color has-extra-small-font-size" style="color:#000000">' . __( "Undoubtedly we have no questions to ask which are unanswerable. We must trust the perfection of the creation so far, as to believe that whatever curiosity the order of things has awakened in our minds, the order of things can satisfy. Every man's condition is a solution in hieroglyphic to those inquiries he would put." ) . '</p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column --></div>
 	<!-- /wp:columns --></div></div>
