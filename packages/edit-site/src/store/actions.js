@@ -4,7 +4,7 @@
 import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
 import { controls, dispatch } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
-import { getPathAndQueryString } from '@wordpress/url';
+import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
 import { __ } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -320,16 +320,14 @@ export function* revertTemplate( template ) {
 	}
 
 	try {
-		// This will override the current template entity
-		// so we need to refetch after this call.
-		const fileTemplate = yield controls.resolveSelect(
-			coreStore,
-			'getEntityRecord',
-			'postType',
-			'wp_template',
-			template.id,
-			{ is_custom: false }
+		const fileTemplatePath = addQueryArgs(
+			`/wp/v2/templates/${ template.id }`,
+			{
+				is_custom: false,
+				context: 'edit',
+			}
 		);
+		const fileTemplate = yield apiFetch( { path: fileTemplatePath } );
 		if ( ! fileTemplate ) {
 			yield controls.dispatch(
 				noticesStore,
@@ -341,15 +339,6 @@ export function* revertTemplate( template ) {
 			);
 			return;
 		}
-		// Refetch the template entity
-		yield controls.resolveSelect(
-			coreStore,
-			'getEntityRecord',
-			'postType',
-			'wp_template',
-			template.id,
-			{ is_custom: true }
-		);
 
 		const serializeBlocks = ( { blocks: blocksForSerialization = [] } ) =>
 			__unstableSerializeAndClean( blocksForSerialization );
