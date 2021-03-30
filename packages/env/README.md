@@ -424,7 +424,7 @@ Additionally, the key `env` is available to override any of the above options on
 			},
 			"port": 3000
 		}
-	}
+	}
 }
 ```
 
