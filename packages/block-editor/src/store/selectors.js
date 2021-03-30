@@ -1792,31 +1792,21 @@ export const __experimentalGetParsedPattern = createSelector(
 			return null;
 		}
 
-		const { allowedBlockTypes } = getSettings( state );
-
 		const blocks = parse( pattern.content );
-		const isAllowed = ( () => {
-			if ( isBoolean( allowedBlockTypes ) ) {
-				return allowedBlockTypes;
-			}
-
-			const blocksQueue = [ ...blocks ];
-			while ( blocksQueue.length > 0 ) {
-				const block = blocksQueue.shift();
-				const isBlockAllowedInEditor = checkAllowList(
-					allowedBlockTypes,
-					block.name,
-					true
-				);
-				if ( ! isBlockAllowedInEditor ) {
-					return false;
-				}
+		const { allowedBlockTypes } = getSettings( state );
+		let isAllowed = isBoolean( allowedBlockTypes )
+			? allowedBlockTypes
+			: true;
+		const blocksQueue = [ ...blocks ];
+		while ( isAllowed && blocksQueue.length > 0 ) {
+			const block = blocksQueue.shift();
+			isAllowed = checkAllowList( allowedBlockTypes, block.name, true );
+			if ( isAllowed ) {
 				block.innerBlocks?.forEach( ( innerBlock ) => {
 					blocksQueue.push( innerBlock );
 				} );
 			}
-			return true;
-		} )();
+		}
 
 		return {
 			...pattern,
@@ -1836,7 +1826,7 @@ export const __experimentalGetAvailableParsedPatterns = createSelector(
 		const parsedPatterns = patterns.map( ( { name } ) =>
 			__experimentalGetParsedPattern( state, name )
 		);
-		return filter( parsedPatterns, 'isAllowed' );
+		return parsedPatterns.filter( ( { isAllowed } ) => isAllowed );
 	},
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
