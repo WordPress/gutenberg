@@ -17,6 +17,7 @@
 		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
+		"src/draggable/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
 		"src/shortcut/**/*",

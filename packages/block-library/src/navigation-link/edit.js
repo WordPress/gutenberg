@@ -39,13 +39,15 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { link as linkIcon } from '@wordpress/icons';
+import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
+import { ItemSubmenuIcon } from './icons';
+
+const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/spacer' ];
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -320,7 +322,7 @@ export default function NavigationLinkEdit( {
 			} ),
 		},
 		{
-			allowedBlocks: [ 'core/navigation-link', 'core/spacer' ],
+			allowedBlocks: ALLOWED_BLOCKS,
 			renderAppender:
 				( isSelected && hasDescendants ) ||
 				( isImmediateParentOfSelectedBlock &&
@@ -380,7 +382,7 @@ export default function NavigationLinkEdit( {
 					/>
 					<ToolbarButton
 						name="submenu"
-						icon={ <ToolbarSubmenuIcon /> }
+						icon={ addSubmenu }
 						title={ __( 'Add submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
