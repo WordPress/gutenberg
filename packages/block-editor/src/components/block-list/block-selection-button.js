@@ -37,6 +37,7 @@ import BlockTitle from '../block-title';
 import BlockIcon from '../block-icon';
 import { store as blockEditorStore } from '../../store';
 import BlockDraggable from '../block-draggable';
+import useBlockDisplayInformation from '../use-block-display-information';
 
 /**
  * Returns true if the user is using windows.
@@ -92,17 +93,15 @@ function selector( select ) {
  * @return {WPComponent} The component to be rendered.
  */
 function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
+	const blockInformation = useBlockDisplayInformation( clientId );
 	const selected = useSelect(
 		( select ) => {
 			const {
 				__unstableGetBlockWithoutInnerBlocks,
 				getBlockIndex,
-				getBlockName,
 				hasBlockMovingClientId,
 				getBlockListSettings,
 			} = select( blockEditorStore );
-			const blockName = getBlockName( clientId );
-			const blockType = getBlockType( blockName );
 			const index = getBlockIndex( clientId, rootClientId );
 			const { name, attributes } = __unstableGetBlockWithoutInnerBlocks(
 				clientId
@@ -114,19 +113,11 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				attributes,
 				blockMovingMode,
 				orientation: getBlockListSettings( rootClientId )?.orientation,
-				icon: blockType.icon,
 			};
 		},
 		[ clientId, rootClientId ]
 	);
-	const {
-		index,
-		name,
-		attributes,
-		blockMovingMode,
-		orientation,
-		icon,
-	} = selected;
+	const { index, name, attributes, blockMovingMode, orientation } = selected;
 	const { setNavigationMode, removeBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
 
@@ -280,7 +271,7 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 				className="block-editor-block-list__block-selection-button__content"
 			>
 				<FlexItem>
-					<BlockIcon icon={ icon } showColors />
+					<BlockIcon icon={ blockInformation?.icon } showColors />
 				</FlexItem>
 				<FlexItem>
 					<BlockDraggable clientIds={ [ clientId ] }>

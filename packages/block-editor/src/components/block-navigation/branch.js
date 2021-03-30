@@ -13,12 +13,12 @@ import { Fragment } from '@wordpress/element';
  */
 import BlockNavigationBlock from './block';
 import BlockNavigationAppender from './appender';
-
+import { isClientIdSelected } from './utils';
 export default function BlockNavigationBranch( props ) {
 	const {
 		blocks,
 		selectBlock,
-		selectedBlockClientId,
+		selectedBlockClientIds,
 		showAppender,
 		showBlockMovers,
 		showNestedBlocks,
@@ -35,7 +35,7 @@ export default function BlockNavigationBranch( props ) {
 	const itemHasAppender = ( parentClientId ) =>
 		showAppender &&
 		! isTreeRoot &&
-		selectedBlockClientId === parentClientId;
+		isClientIdSelected( parentClientId, selectedBlockClientIds );
 	const hasAppender = itemHasAppender( parentBlockClientId );
 	// Add +1 to the rowCount to take the block appender into account.
 	const blockCount = filteredBlocks.length;
@@ -57,7 +57,10 @@ export default function BlockNavigationBranch( props ) {
 				const hasNestedAppender = itemHasAppender( clientId );
 				const hasNestedBranch = hasNestedBlocks || hasNestedAppender;
 
-				const isSelected = selectedBlockClientId === clientId;
+				const isSelected = isClientIdSelected(
+					clientId,
+					selectedBlockClientIds
+				);
 				const isSelectedBranch =
 					isBranchSelected || ( isSelected && hasNestedBranch );
 
@@ -87,7 +90,9 @@ export default function BlockNavigationBranch( props ) {
 						{ hasNestedBranch && (
 							<BlockNavigationBranch
 								blocks={ innerBlocks }
-								selectedBlockClientId={ selectedBlockClientId }
+								selectedBlockClientIds={
+									selectedBlockClientIds
+								}
 								selectBlock={ selectBlock }
 								isBranchSelected={ isSelectedBranch }
 								isLastOfBranch={ isLast }

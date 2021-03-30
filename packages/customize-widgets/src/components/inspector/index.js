@@ -21,8 +21,7 @@ function InspectorSectionMeta( { closeInspector, inspectorTitleId } ) {
 	return (
 		<div className="customize-section-description-container section-meta">
 			<div className="customize-section-title">
-				{ /* Disable reason: We want to use the exiting style of the back button. */ }
-				<button // eslint-disable-line react/forbid-elements
+				<button
 					type="button"
 					className="customize-section-back"
 					tabIndex="0"
