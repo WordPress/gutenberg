@@ -65,8 +65,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 		?>
 			<?php echo '.wp-container-' . $id; ?> > * {
 				max-width: <?php echo $content_size ? $content_size : $wide_size; ?>;
-				margin-left: auto;
-				margin-right: auto;
+				margin-left: auto !important;
+				margin-right: auto !important;
 			}
 
 			<?php echo '.wp-container-' . $id; ?> > .alignwide {
