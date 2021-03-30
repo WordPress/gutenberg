@@ -13,12 +13,15 @@ import {
 } from '@wordpress/block-editor';
 import {
 	MenuItem,
+	Icon,
 	TextControl,
+	BaseControl,
 	Flex,
 	FlexItem,
 	Button,
 	Modal,
 } from '@wordpress/components';
+
 import { createBlock, serialize } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -31,6 +34,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const { replaceBlocks } = useDispatch( blockEditorStore );
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
+	const [ area, setArea ] = useState( 'uncategorized' );
 
 	const onConvert = async ( templatePartTitle ) => {
 		const defaultTitle = __( 'Untitled Template Part' );
@@ -41,6 +45,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 				slug: kebabCase( templatePartTitle || defaultTitle ),
 				title: templatePartTitle || defaultTitle,
 				content: serialize( blocks ),
+				area,
 			}
 		);
 		replaceBlocks(
@@ -90,6 +95,22 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 									value={ title }
 									onChange={ setTitle }
 								/>
+								<BaseControl className="edit-site-template-part-converter__area-control">
+									{ AREA_OPTIONS.map(
+										( { icon, label, value } ) => (
+											<Button
+												key={ label }
+												onClick={ () =>
+													setArea( value )
+												}
+												disabled={ area === value }
+											>
+												<Icon icon={ icon } />
+												{ label }
+											</Button>
+										)
+									) }
+								</BaseControl>
 								<Flex
 									className="edit-site-template-part-converter__convert-modal-actions"
 									justify="flex-end"
@@ -119,3 +140,31 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 		</BlockSettingsMenuControls>
 	);
 }
+
+import { footer, header, layout } from '@wordpress/icons';
+const AREA_OPTIONS = [
+	{
+		description: __(
+			'The Header template defines a page area that typically contains a title, logo, and main navigation.'
+		),
+		icon: header,
+		label: __( 'Header' ),
+		value: 'header',
+	},
+	{
+		description: __(
+			'The Footer template defines a page area that typically contains site credits, social links, or any other combination of blocks.'
+		),
+		icon: footer,
+		label: __( 'Footer' ),
+		value: 'footer',
+	},
+	{
+		description: __(
+			'General templates often perform a specific role like displaying post content, and are not tied to any particular area.'
+		),
+		icon: layout,
+		label: __( 'General' ),
+		value: 'uncategorized',
+	},
+];
