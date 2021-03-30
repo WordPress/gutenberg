@@ -123,6 +123,12 @@ function UnitControl( {
 		);
 	}, [ pickerRef, units, onUnitChange, getAnchor ] );
 
+	const activeUnit = units.find(
+		( option ) => option.value === unit
+	);
+
+	const unitStep = activeUnit?.step ? activeUnit.step : 1;
+	
 	return (
 		<>
 			{ unit !== '%' ? (
@@ -133,6 +139,7 @@ function UnitControl( {
 					onChange={ onChange }
 					separatorType={ separatorType }
 					value={ value }
+					step={unitStep}
 					defaultValue={ initialControlValue }
 					shouldDisplayTextInput
 					decimalNum={ unit === 'px' ? 0 : decimalNum }
