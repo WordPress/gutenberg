@@ -335,7 +335,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 /**
  * Retrieves a single unified template object using its id.
  *
- * @param string $id Template unique identifier (example: theme|slug).
+ * @param string $id Template unique identifier (example: theme_slug//template_slug).
  * @param array  $template_type wp_template or wp_template_part.
  *
  * @return WP_Block_Template|null Template.
@@ -378,7 +378,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
  * Retrieves a single unified template object using its id.
  * Retrieves the file template.
  *
- * @param string $id Template unique identifier (example: theme|slug).
+ * @param string $id Template unique identifier (example: theme_slug//template_slug).
  * @param array  $template_type wp_template or wp_template_part.
  *
  * @return WP_Block_Template|null File template.
