@@ -217,6 +217,18 @@ function GalleryEdit( props ) {
 			  } )
 			: selectedImages;
 
+		if (
+			imageArray.some(
+				( image ) => image.type?.indexOf( 'image/' ) !== 0
+			)
+		) {
+			noticeOperations.createErrorNotice(
+				__(
+					'If uploading to a gallery all files need to be image formats'
+				)
+			);
+		}
+
 		const processedImages = imageArray
 			.filter(
 				( file ) => file.url || file.type?.indexOf( 'image/' ) === 0

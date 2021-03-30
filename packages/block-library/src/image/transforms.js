@@ -141,15 +141,11 @@ const transforms = {
 						( file ) => file.type.indexOf( 'image/' ) !== 0
 					)
 				) {
-					const { createWarningNotice } = dispatch( noticesStore );
-					createWarningNotice(
+					const { createErrorNotice } = dispatch( noticesStore );
+					createErrorNotice(
 						__(
 							'If uploading to a gallery all files need to be image formats'
-						),
-						{
-							id: 'image-upload-format-warning',
-							type: 'snackbar',
-						}
+						)
 					);
 				}
 				return every(
