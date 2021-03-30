@@ -2946,7 +2946,7 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'lastBlockInserted()', () => {
+	describe( 'lastBlockInserted', () => {
 		it( 'should return client id if last block inserted is called with action INSERT_BLOCKS', () => {
 			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
 
