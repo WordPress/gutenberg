@@ -17,6 +17,7 @@ import { blockDefault as blockIcon } from '@wordpress/icons';
  */
 import {
 	registerBlockType,
+	registerBlockTypeFromMetadata,
 	registerBlockCollection,
 	unregisterBlockCollection,
 	unregisterBlockType,
@@ -798,6 +799,40 @@ describe( 'blocks', () => {
 				);
 				// Only attributes of block1 are supposed to be edited by the filter thus it must differ from block2.
 				expect( block1.attributes ).not.toEqual( block2.attributes );
+			} );
+		} );
+	} );
+
+	describe( 'registerBlockTypeFromMetadata', () => {
+		test( 'registers block from metadata', () => {
+			const Edit = () => 'test';
+			const block = registerBlockTypeFromMetadata(
+				{
+					name: 'test/block-from-metadata',
+					title: 'Block from metadata',
+					category: 'text',
+					icon: 'palmtree',
+				},
+				{
+					edit: Edit,
+					save: noop,
+				}
+			);
+			expect( block ).toEqual( {
+				name: 'test/block-from-metadata',
+				title: 'Block from metadata',
+				category: 'text',
+				icon: {
+					src: 'palmtree',
+				},
+				keywords: [],
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				supports: {},
+				styles: [],
+				edit: Edit,
+				save: noop,
 			} );
 		} );
 	} );
