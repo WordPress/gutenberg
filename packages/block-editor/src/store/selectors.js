@@ -1827,7 +1827,6 @@ export const __experimentalGetParsedPattern = createSelector(
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
 		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
 	]
 );
 
@@ -1842,7 +1841,6 @@ export const __experimentalGetAvailableParsedPatterns = createSelector(
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
 		state.settings.allowedBlockTypes,
-		state.settings.templateLock,
 	]
 );
 
