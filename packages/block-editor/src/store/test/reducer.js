@@ -2989,8 +2989,10 @@ describe( 'state', () => {
 			expect( state.source ).toBe( expectedSource );
 		} );
 
-		it( 'should return empty state if last block inserted is called with action INSERT_BLOCKS that is not a updateSelection', () => {
-			const expectedState = {};
+		it( 'should return state if last block inserted is called with action INSERT_BLOCKS that is not a updateSelection', () => {
+			const expectedState = {
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+			};
 
 			const action = {
 				blocks: [
@@ -3010,8 +3012,10 @@ describe( 'state', () => {
 			expect( state ).toEqual( expectedState );
 		} );
 
-		it( 'should return empty state if last block inserted is called with action INSERT_BLOCKS and actions.blocks = 0', () => {
-			const expectedState = {};
+		it( 'should return state if last block inserted is called with action INSERT_BLOCKS and actions.blocks = 0', () => {
+			const expectedState = {
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+			};
 
 			const action = {
 				blocks: [],
