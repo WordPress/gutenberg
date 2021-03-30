@@ -20,5 +20,6 @@
 			"link": true
 		},
 		"lineHeight": true
-	}
+	},
+	"style": "wp-block-post-comments"
 }
