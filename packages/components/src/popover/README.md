@@ -143,11 +143,11 @@ If you need the `DOMRect` object i.e., the position of popover to be calculated 
 - Type: `Function`
 - Required: No
 
-### toggleRef
+### __experimentalToggleRef
 
 Reference to the element that's used to toggle this popover. Used to prevent `onClose` firing if focus moves to the toggle. Which usually means we clicked on the toggle. Without this, popover would reopen everytime we click on the toggle.
 
-When `toggleRef` is provided, then `onFocusOutside` prop is ignored.
+When `__experimentalToggleRef` is provided, then `onFocusOutside` prop is ignored.
 
 - Type: `wp.element.Ref`
 - Required: No

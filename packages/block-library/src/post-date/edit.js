@@ -115,7 +115,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 						{ isPickerOpen && (
 							<Popover
 								onClose={ setIsPickerOpen.bind( null, false ) }
-								toggleRef={ dateToggleRef }
+								__experimentalToggleRef={ dateToggleRef }
 							>
 								<DateTimePicker
 									currentDate={ date }

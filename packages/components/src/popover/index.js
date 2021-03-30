@@ -248,7 +248,7 @@ const Popover = ( {
 	getAnchorRect,
 	expandOnMobile,
 	animate = true,
-	toggleRef,
+	__experimentalToggleRef,
 	onClickOutside,
 	onFocusOutside,
 	__unstableStickyBoundaryElement,
@@ -520,10 +520,12 @@ const Popover = ( {
 		 * for the focus to move that's why we need timeout.
 		 */
 		toggleFocusOutsideTimeoutRef.current = setTimeout( () => {
-			const { ownerDocument } = toggleRef;
+			const { ownerDocument } = __experimentalToggleRef;
 			if (
 				ownerDocument &&
-				! toggleRef.contains( ownerDocument.activeElement ) &&
+				! __experimentalToggleRef.contains(
+					ownerDocument.activeElement
+				) &&
 				! ownerDocument.activeElement.closest( '[role="dialog"]' )
 			) {
 				onClose();
@@ -538,7 +540,7 @@ const Popover = ( {
 	 * @param {FocusEvent} event Focus event from onFocusOutside.
 	 */
 	function handleOnFocusOutside( event ) {
-		if ( toggleRef ) {
+		if ( __experimentalToggleRef ) {
 			handleToggleOnFocusOutside( event );
 			return;
 		}
