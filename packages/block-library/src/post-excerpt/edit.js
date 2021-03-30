@@ -40,7 +40,7 @@ function usePostContentExcerpt( wordCount, postId, postType ) {
 	}, [ rawPostContent, wordCount ] );
 }
 
-function PostExcerptEditor( {
+export default function PostExcerptEditor( {
 	attributes: { textAlign, wordCount, moreText, showMoreOnNewLine },
 	setAttributes,
 	isSelected,
@@ -62,6 +62,16 @@ function PostExcerptEditor( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
+
+	if ( ! postType || ! postId ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Post excerpt block: no post found.' ) }
+				</Warning>
+			</div>
+		);
+	}
 
 	return (
 		<>
@@ -137,26 +147,5 @@ function PostExcerptEditor( {
 				) }
 			</div>
 		</>
-	);
-}
-
-export default function PostExcerptEdit( {
-	attributes,
-	setAttributes,
-	isSelected,
-	context,
-} ) {
-	if ( ! context.postType || ! context.postId ) {
-		return (
-			<Warning>{ __( 'Post excerpt block: no post found.' ) }</Warning>
-		);
-	}
-	return (
-		<PostExcerptEditor
-			attributes={ attributes }
-			setAttributes={ setAttributes }
-			isSelected={ isSelected }
-			context={ context }
-		/>
 	);
 }
