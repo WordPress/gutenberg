@@ -24,7 +24,7 @@ _Parameters_
 
 _Returns_
 
--   `?DOMRect`: The rectangle.
+-   `DOMRect | null`: The rectangle.
 
 <a name="documentHasSelection" href="#documentHasSelection">#</a> **documentHasSelection**
 

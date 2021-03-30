@@ -6,6 +6,10 @@
 	},
 	"include": [
 		"src/data-transfer.js",
+		"src/dom/caret-range-from-point.js",
+		"src/dom/compute-caret-rect.js",
+		"src/dom/get-rectangle-from-range.js",
+		"src/utils/**/*",
 		"src/focusable.js",
 		"src/phrasing-content.js",
 		"src/tabbable.js",
