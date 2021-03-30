@@ -1260,6 +1260,22 @@ export function getTemplateLock( state, rootClientId ) {
 	return blockListSettings.templateLock;
 }
 
+const checkAllowList = ( list, item, defaultResult = null ) => {
+	if ( isBoolean( list ) ) {
+		return list;
+	}
+	if ( isArray( list ) ) {
+		// TODO: when there is a canonical way to detect that we are editing a post
+		// the following check should be changed to something like:
+		// if ( list.includes( 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
+		if ( list.includes( 'core/post-content' ) && item === null ) {
+			return true;
+		}
+		return list.includes( item );
+	}
+	return defaultResult;
+};
+
 /**
  * Determines if the given block type is allowed to be inserted into the block list.
  * This function is not exported and not memoized because using a memoized selector
@@ -1278,22 +1294,6 @@ const canInsertBlockTypeUnmemoized = (
 	blockName,
 	rootClientId = null
 ) => {
-	const checkAllowList = ( list, item, defaultResult = null ) => {
-		if ( isBoolean( list ) ) {
-			return list;
-		}
-		if ( isArray( list ) ) {
-			// TODO: when there is a canonical way to detect that we are editing a post
-			// the following check should be changed to something like:
-			// if ( list.includes( 'core/post-content' ) && getEditorMode() === 'post-content' && item === null )
-			if ( list.includes( 'core/post-content' ) && item === null ) {
-				return true;
-			}
-			return list.includes( item );
-		}
-		return defaultResult;
-	};
-
 	let blockType;
 	if ( blockName && 'object' === typeof blockName ) {
 		blockType = blockName;
@@ -1791,12 +1791,51 @@ export const __experimentalGetParsedPattern = createSelector(
 		if ( ! pattern ) {
 			return null;
 		}
+
+		const { allowedBlockTypes } = getSettings( state );
+
+		const blocks = parse( pattern.content );
+		const isAllowed = ( () => {
+			const blocksQueue = [ ...blocks ];
+			while ( blocksQueue.length > 0 ) {
+				const block = blocksQueue.shift();
+				const isBlockAllowedInEditor = checkAllowList(
+					allowedBlockTypes,
+					block.name,
+					true
+				);
+				if ( ! isBlockAllowedInEditor ) {
+					return false;
+				}
+				block.blocks?.forEach( ( innerBlock ) => {
+					blocksQueue.push( innerBlock );
+				} );
+			}
+			return true;
+		} )();
+
 		return {
 			...pattern,
-			blocks: parse( pattern.content ),
+			blocks,
+			isAllowed,
 		};
 	},
 	( state ) => [ state.settings.__experimentalBlockPatterns ]
+);
+
+export const __experimentalGetAvailableParsedPatterns = createSelector(
+	( state ) => {
+		const patterns = state.settings.__experimentalBlockPatterns;
+		const parsedPatterns = patterns.map( ( { name } ) =>
+			__experimentalGetParsedPattern( state, name )
+		);
+		return filter( parsedPatterns, 'isAllowed' );
+	},
+	( state ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+	]
 );
 
 /**
@@ -1809,16 +1848,16 @@ export const __experimentalGetParsedPattern = createSelector(
  */
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
-		const patterns = state.settings.__experimentalBlockPatterns;
-		const parsedPatterns = patterns.map( ( { name } ) =>
-			__experimentalGetParsedPattern( state, name )
+		const availableParsedPatterns = __experimentalGetAvailableParsedPatterns(
+			state
 		);
-		const patternsAllowed = filter( parsedPatterns, ( { blocks } ) =>
-			blocks.every( ( { name } ) =>
-				canInsertBlockType( state, name, rootClientId )
-			)
+		const patternsAllowed = filter(
+			availableParsedPatterns,
+			( { blocks } ) =>
+				blocks.every( ( { name } ) =>
+					canInsertBlockType( state, name, rootClientId )
+				)
 		);
-
 		return patternsAllowed;
 	},
 	( state, rootClientId ) => [
