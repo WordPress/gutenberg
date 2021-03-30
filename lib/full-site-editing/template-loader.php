@@ -79,7 +79,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	}
 
 	if ( $current_template ) {
-		if ( empty( $current_template->content ) && isset( $current_template->title ) && is_user_logged_in() ) {
+		if ( empty( $current_template->content ) && is_user_logged_in() ) {
 			$_wp_current_template_content =
 			sprintf(
 				/* translators: %s: Template title */
