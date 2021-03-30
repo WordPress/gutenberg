@@ -198,6 +198,7 @@ function ButtonEdit( props ) {
 		text,
 		url,
 		width,
+		fontSize,
 	} = attributes;
 	const onSetLinkRel = useCallback(
 		( value ) => {
@@ -241,6 +242,7 @@ function ButtonEdit( props ) {
 				{ ...blockProps }
 				className={ classnames( blockProps.className, {
 					[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+					[ `has-custom-font-size` ]: fontSize,
 				} ) }
 			>
 				<RichText
