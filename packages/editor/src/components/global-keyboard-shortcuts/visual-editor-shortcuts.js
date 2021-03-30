@@ -3,7 +3,6 @@
  */
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 import { useDispatch } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 import { BlockEditorKeyboardShortcuts } from '@wordpress/block-editor';
 
 /**
@@ -41,12 +40,3 @@ function VisualEditorGlobalKeyboardShortcuts() {
 }
 
 export default VisualEditorGlobalKeyboardShortcuts;
-
-export function EditorGlobalKeyboardShortcuts() {
-	deprecated( 'EditorGlobalKeyboardShortcuts', {
-		since: '5.2',
-		alternative: 'VisualEditorGlobalKeyboardShortcuts',
-	} );
-
-	return <VisualEditorGlobalKeyboardShortcuts />;
-}
