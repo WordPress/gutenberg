@@ -87,16 +87,10 @@ const Notice = ( { onNoticeHidden, content, id, status } ) => {
 		styles.errorTextDark
 	);
 
-	const getTextStyles = () => {
-		switch ( status ) {
-			case 'success':
-				return successTextStyles;
-			case 'error':
-				return errorTextStyles;
-			default:
-				throw new Error( `${ status } text style is not implemented.` );
-		}
-	};
+	const textStyles = [
+		status === 'success' && successTextStyles,
+		status === 'error' && errorTextStyles,
+	];
 
 	return (
 		<>
@@ -119,7 +113,7 @@ const Notice = ( { onNoticeHidden, content, id, status } ) => {
 			>
 				<TouchableWithoutFeedback onPress={ onHide }>
 					<View style={ styles.noticeContent }>
-						<Text style={ getTextStyles() }>{ content }</Text>
+						<Text style={ textStyles }>{ content }</Text>
 					</View>
 				</TouchableWithoutFeedback>
 				{ isIOS && (
