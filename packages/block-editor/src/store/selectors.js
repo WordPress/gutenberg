@@ -1824,7 +1824,11 @@ export const __experimentalGetParsedPattern = createSelector(
 			isAllowed,
 		};
 	},
-	( state ) => [ state.settings.__experimentalBlockPatterns ]
+	( state ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+	]
 );
 
 export const __experimentalGetAvailableParsedPatterns = createSelector(
