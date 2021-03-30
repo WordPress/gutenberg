@@ -450,7 +450,6 @@ export default function NavigationLinkEdit( {
 							}
 							aria-label={ __( 'Navigation link text' ) }
 							placeholder={ itemLabelPlaceholder }
-							keepPlaceholderOnFocus
 							withoutInteractiveFormatting
 							allowedFormats={ [
 								'core/bold',
