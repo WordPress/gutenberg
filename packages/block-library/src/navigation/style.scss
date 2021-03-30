@@ -24,9 +24,9 @@
 	flex-wrap: wrap;
 
 	// Vertical layout
-	// TODO: What to todo here?
 	.is-vertical & {
-		display: block;
+		flex-direction: column;
+		align-items: flex-start;
 	}
 }
 
@@ -41,4 +41,13 @@
 
 .items-justified-space-between > ul {
 	justify-content: space-between;
+}
+
+// Vertical justification.
+.is-vertical.items-justified-center > ul {
+	align-items: center;
+}
+
+.is-vertical.items-justified-right > ul {
+	align-items: flex-end;
 }
