@@ -50,10 +50,6 @@
 		min-width: 20px;
 	}
 
-	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus)[data-rich-text-placeholder]::after {
-		display: inline-block;
-	}
-
 	.block-list-appender {
 		margin-top: $grid-unit-20;
 		// The right margin should be set to auto, so as to not shift layout in flex containers.

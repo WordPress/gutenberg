@@ -15,7 +15,6 @@ export default function QueryPaginationPreviousEdit( {
 			aria-label={ __( 'Previous page link' ) }
 			placeholder={ __( 'Previous Page' ) }
 			value={ label }
-			keepPlaceholderOnFocus
 			onChange={ ( newLabel ) => setAttributes( { label: newLabel } ) }
 			{ ...useBlockProps() }
 		/>

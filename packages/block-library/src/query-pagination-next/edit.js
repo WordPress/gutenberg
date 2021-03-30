@@ -15,7 +15,6 @@ export default function QueryPaginationNextEdit( {
 			aria-label={ __( 'Next page link' ) }
 			placeholder={ __( 'Next Page' ) }
 			value={ label }
-			keepPlaceholderOnFocus
 			onChange={ ( newLabel ) => setAttributes( { label: newLabel } ) }
 			{ ...useBlockProps() }
 		/>

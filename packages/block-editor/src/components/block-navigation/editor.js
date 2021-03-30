@@ -16,7 +16,6 @@ export default function BlockNavigationEditor( { value, onChange } ) {
 				value={ value }
 				onChange={ onChange }
 				placeholder={ __( 'Navigation item' ) }
-				keepPlaceholderOnFocus
 				withoutInteractiveFormatting
 				allowedFormats={ [
 					'core/bold',
