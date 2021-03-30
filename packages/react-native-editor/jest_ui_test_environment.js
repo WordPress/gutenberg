@@ -23,7 +23,7 @@ class CustomEnvironment extends JSDOMEnvironment {
 	}
 
 	async teardown() {
-		await this.global.editorPage.stopDriver();
+		await this.global.editorPage?.stopDriver();
 		await super.teardown();
 	}
 }
