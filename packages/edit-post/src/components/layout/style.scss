@@ -124,6 +124,11 @@
 		margin-left: auto;
 		margin-right: auto;
 
+		// Provide every block with a default base margin. This margin provides a consistent spacing
+		// between blocks in the editor.
+		margin-top: $default-block-margin;
+		margin-bottom: $default-block-margin;
+
 		&[data-align="wide"] {
 			max-width: $wide-content-width;
 		}
