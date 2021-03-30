@@ -37,7 +37,7 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 		'date',
 		postId
 	);
-	const dateToggleRef = useRef( null );
+	const dateToggleRef = useRef();
 	const [ isPickerOpen, setIsPickerOpen ] = useState( false );
 	const settings = __experimentalGetSettings();
 	// To know if the current time format is a 12 hour time, look for "a".

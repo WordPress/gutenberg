@@ -157,7 +157,7 @@ export default function NavigationLinkEdit( {
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
 	const listItemRef = useRef( null );
-	const linkToggleRef = useRef( null );
+	const linkToggleRef = useRef();
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
