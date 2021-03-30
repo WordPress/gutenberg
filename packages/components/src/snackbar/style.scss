@@ -10,6 +10,7 @@
 	max-width: 600px;
 	box-sizing: border-box;
 	cursor: pointer;
+	pointer-events: auto;
 
 	@include break-small() {
 		width: fit-content;
