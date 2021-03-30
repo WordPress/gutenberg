@@ -2,7 +2,7 @@
  * Check whether the given element is an input field of type number
  * and has a valueAsNumber
  *
- * @param {HTMLElement} element The HTML element.
+ * @param {Partial<HTMLInputElement>} element The HTML element.
  *
  * @return {boolean} True if the element is input and holds a number.
  */

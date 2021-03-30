@@ -4,7 +4,7 @@
  *
  * See: https://html.spec.whatwg.org/#textFieldSelection
  *
- * @param {HTMLElement} element The HTML element.
+ * @param {Partial<HTMLInputElement>} element The HTML element.
  *
  * @return {boolean} True if the element is an text field, false if not.
  */
@@ -23,7 +23,9 @@ export default function isTextField( element ) {
 		'number',
 	];
 	return (
-		( nodeName === 'INPUT' && ! nonTextInputs.includes( element.type ) ) ||
+		( nodeName === 'INPUT' &&
+			element.type &&
+			! nonTextInputs.includes( element.type ) ) ||
 		nodeName === 'TEXTAREA' ||
 		contentEditable === 'true'
 	);

@@ -204,7 +204,7 @@ and has a valueAsNumber
 
 _Parameters_
 
--   _element_ `HTMLElement`: The HTML element.
+-   _element_ `Partial<HTMLInputElement>`: The HTML element.
 
 _Returns_
 
@@ -245,7 +245,7 @@ See: <https://html.spec.whatwg.org/#textFieldSelection>
 
 _Parameters_
 
--   _element_ `HTMLElement`: The HTML element.
+-   _element_ `Partial<HTMLInputElement>`: The HTML element.
 
 _Returns_
 
