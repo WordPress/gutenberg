@@ -2,12 +2,12 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
+import { siteLogo as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import metadata from './block.json';
-import icon from './icon';
 import edit from './edit';
 
 const { name } = metadata;

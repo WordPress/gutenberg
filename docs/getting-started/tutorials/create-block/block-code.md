@@ -6,30 +6,29 @@ Note: The color may not work with all browsers until they support the proper col
 
 ## Load Font File
 
-Download and extract the font from the Type with Pride site, and copy it to your plugin directory naming it `gilbert-color.otf`. To load the font file, we need to add CSS using standard WordPress enqueue, [see Including CSS & JavaScript documentation](https://developer.wordpress.org/themes/basics/including-css-javascript/).
+Download and extract the font from the Type with Pride site, and copy it in the `src` directory of your plugin naming it `gilbert-color.otf`. To load the font file, we need to add CSS using standard WordPress enqueue, [see Including CSS & JavaScript documentation](https://developer.wordpress.org/themes/basics/including-css-javascript/).
 
-In the `gutenpride.php` file, the enqueue process is already setup from the generated script, so `editor.css` and `style.css` files are loaded using:
+In the `gutenpride.php` file, the enqueue process is already setup from the generated script, so `index.css` and `style-index.css` files are loaded using:
 
 ```php
-register_block_type( 'create-block/gutenpride', array(
-	'apiVersion' => 2,
-    'editor_script' => 'create-block-gutenpride-block-editor',
-    'editor_style'  => 'create-block-gutenpride-block-editor',
-    'style'         => 'create-block-gutenpride-block',
-) );
+function create_block_gutenpride_block_init() {
+	register_block_type_from_metadata( __DIR__ );
+}
+add_action( 'init', 'create_block_gutenpride_block_init' );
 ```
 
-The `editor_style` and `style` parameters refer to the files that match the handles in the `wp_register_style` functions.
+This function handles that all style en js files in the `build` folder get handles that are passed on to the `wp_register_style` function.
 
-Note: the `editor_style` loads only within the editor, and after the `style`. The `style` CSS loads in both the editor and front-end — published post view.
+The `build/index.css` is compiled from `src/editor.scss` and loads only within the editor, and after the `style-index.css`.
+The `build/style-index.css` is compiled from `src/style.scss` and loads in both the editor and front-end — published post view.
 
 ## Add CSS Style for Block
 
-We only need to add the style to `style.css` since it will show while editing and viewing the post. Edit the style.css to add the following.
+We only need to add the style to `build/style-index.css` since it will show while editing and viewing the post. Edit the `src/style.scss` to add the following.
 
 Note: the block classname is prefixed with `wp-block`. The `create-block/gutenpride` is converted to the classname `.wp-block-create-block-gutenpride`.
 
-```css
+```scss
 @font-face {
 	font-family: Gilbert;
 	src: url( gilbert-color.otf );
@@ -42,27 +41,6 @@ Note: the block classname is prefixed with `wp-block`. The `create-block/gutenpr
 }
 ```
 
-After updating, reload the post and refresh the browser. If you are using a browser that supports color fonts (Firefox) then you will see it styled.
-
-## Use Sass for Style (optional)
-
-The wp-scripts package provides support for using the Sass/Scss languages, to generate CSS, added in @wordpress/scripts v9.1.0. See the [Sass language site](https://sass-lang.com/) to learn more about Sass.
-
-To use Sass, you need to import a `editor.scss` or `style.scss` in the `index.js` JavaScript file and it will build and output the generated file in the build directory. Note: You need to update the enqueing functions in PHP to load from the correct location.
-
-Add the following imports to **index.js**:
-
-```js
-import '../editor.scss';
-
-import Edit from './edit';
-import save from './save';
-```
-
-Update **gutenpride.php** to enqueue from generated file location:
-
-```php
-$editor_css = "build/index.css";
-```
+After updating, rebuild the block using `npm run build` then reload the post and refresh the browser. If you are using a browser that supports color fonts (Firefox) then you will see it styled.
 
 Next Section: [Authoring Experience](/docs/getting-started/tutorials/create-block/author-experience.md)

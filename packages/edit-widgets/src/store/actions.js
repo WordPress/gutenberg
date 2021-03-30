@@ -103,17 +103,15 @@ export function* saveWidgetArea( widgetAreaId ) {
 
 	// Remove all duplicate reference widget instances
 	const usedReferenceWidgets = [];
-	const widgetsBlocks = post.blocks.filter(
-		( { attributes: { referenceWidgetName } } ) => {
-			if ( referenceWidgetName ) {
-				if ( usedReferenceWidgets.includes( referenceWidgetName ) ) {
-					return false;
-				}
-				usedReferenceWidgets.push( referenceWidgetName );
+	const widgetsBlocks = post.blocks.filter( ( { attributes: { id } } ) => {
+		if ( id ) {
+			if ( usedReferenceWidgets.includes( id ) ) {
+				return false;
 			}
-			return true;
+			usedReferenceWidgets.push( id );
 		}
-	);
+		return true;
+	} );
 
 	const batchMeta = [];
 	const batchTasks = [];

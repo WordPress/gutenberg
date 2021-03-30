@@ -39,13 +39,15 @@ import {
 	createInterpolateElement,
 } from '@wordpress/element';
 import { placeCaretAtHorizontalEdge } from '@wordpress/dom';
-import { link as linkIcon } from '@wordpress/icons';
+import { link as linkIcon, addSubmenu } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import { ToolbarSubmenuIcon, ItemSubmenuIcon } from './icons';
+import { ItemSubmenuIcon } from './icons';
+
+const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/spacer' ];
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -160,7 +162,6 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const {
-		isDraggingBlocks,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
@@ -174,7 +175,6 @@ export default function NavigationLinkEdit( {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
-				isDraggingBlocks: _isDraggingBlocks,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -196,7 +196,6 @@ export default function NavigationLinkEdit( {
 					selectedBlockId,
 				] )?.length,
 				numberOfDescendants: descendants,
-				isDraggingBlocks: _isDraggingBlocks(),
 				userCanCreatePages: select( coreStore ).canUser(
 					'create',
 					'pages'
@@ -297,12 +296,7 @@ export default function NavigationLinkEdit( {
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
 		className: classnames( {
-			'is-editing':
-				( isSelected || isParentOfSelectedBlock ) &&
-				// Don't show the element as editing while dragging.
-				! isDraggingBlocks,
-			// Don't select the element while dragging.
-			'is-selected': isSelected && ! isDraggingBlocks,
+			'is-editing': isSelected || isParentOfSelectedBlock,
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasDescendants,
@@ -324,20 +318,17 @@ export default function NavigationLinkEdit( {
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: classnames( 'wp-block-navigation-link__container', {
-				'is-parent-of-selected-block':
-					isParentOfSelectedBlock &&
-					// Don't select as parent of selected block while dragging.
-					! isDraggingBlocks,
+				'is-parent-of-selected-block': isParentOfSelectedBlock,
 			} ),
 		},
 		{
-			allowedBlocks: [ 'core/navigation-link', 'core/spacer' ],
+			allowedBlocks: ALLOWED_BLOCKS,
 			renderAppender:
 				( isSelected && hasDescendants ) ||
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
-				( isDraggingBlocks && hasDescendants )
+				hasDescendants
 					? InnerBlocks.DefaultAppender
 					: false,
 			__experimentalAppenderTagName: 'li',
@@ -391,7 +382,7 @@ export default function NavigationLinkEdit( {
 					/>
 					<ToolbarButton
 						name="submenu"
-						icon={ <ToolbarSubmenuIcon /> }
+						icon={ addSubmenu }
 						title={ __( 'Add submenu' ) }
 						onClick={ insertLinkBlock }
 					/>
@@ -478,6 +469,7 @@ export default function NavigationLinkEdit( {
 						<Popover
 							position="bottom center"
 							onClose={ () => setIsLinkOpen( false ) }
+							anchorRef={ listItemRef.current }
 						>
 							<KeyboardShortcuts
 								bindGlobal

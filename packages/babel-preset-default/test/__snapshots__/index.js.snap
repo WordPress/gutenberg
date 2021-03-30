@@ -2,9 +2,9 @@
 
 exports[`Babel preset default transpilation works properly 1`] = `
 "import _asyncToGenerator from \\"@babel/runtime/helpers/asyncToGenerator\\";
-import _regeneratorRuntime from \\"@babel/runtime/regenerator\\";
 import _awaitAsyncGenerator from \\"@babel/runtime/helpers/awaitAsyncGenerator\\";
 import _wrapAsyncGenerator from \\"@babel/runtime/helpers/wrapAsyncGenerator\\";
+import _regeneratorRuntime from \\"@babel/runtime/regenerator\\";
 describe('Babel preset default', function () {
   function foo() {
     return _foo.apply(this, arguments);
