@@ -14,7 +14,7 @@ return array(
 	<!-- /wp:separator -->
 	
 	<!-- wp:image {"align":"center","id":553,"width":150,"height":150,"sizeSlug":"large","linkDestination":"none","className":"is-style-rounded"} -->
-	<div class="wp-block-image is-style-rounded"><figure class="aligncenter size-large is-resized"><img src="https://cldup.com/W_ndYomxw0.jpg" alt="' . __( 'A side profile of a woman in a russet-colored turtleneck and white bag. She looks up with her eyes closed.' ) . '" class="wp-image-553" width="150" height="150"/></figure></div>
+	<div class="wp-block-image is-style-rounded"><figure class="aligncenter size-large is-resized"><img src="https://s.w.org/images/core/5.8/portrait.jpg" alt="' . __( 'A side profile of a woman in a russet-colored turtleneck and white bag. She looks up with her eyes closed.' ) . '" class="wp-image-553" width="150" height="150"/></figure></div>
 	<!-- /wp:image -->
 	
 	<!-- wp:quote {"align":"center","className":"is-style-large"} -->
