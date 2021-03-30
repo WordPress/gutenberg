@@ -415,4 +415,16 @@ describe( 'RichText', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	it( 'should navigate arround emoji', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '🍓' );
+		// Only one press on arrow left should be required to move in front of
+		// the emoji.
+		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.type( '1' );
+
+		// Expect '1🍓'.
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

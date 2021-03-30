@@ -51,8 +51,24 @@ function gutenberg_navigation_init( $hook ) {
 
 	wp_enqueue_script( 'wp-edit-navigation' );
 	wp_enqueue_style( 'wp-edit-navigation' );
-	wp_enqueue_style( 'wp-block-library' );
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-format-library' );
+	do_action( 'enqueue_block_editor_assets' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_navigation_init' );
+
+/**
+ * Tells the script loader to load the scripts and styles of custom block on navigation editor screen.
+ *
+ * @param bool $is_block_editor_screen Current decision about loading block assets.
+ * @return bool Filtered decision about loading block assets.
+ */
+function gutenberg_navigation_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
+	if ( is_callable( 'get_current_screen' ) && 'gutenberg_page_gutenberg-navigation' === get_current_screen()->base ) {
+		return true;
+	}
+
+	return $is_block_editor_screen;
+}
+
+add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_navigation_editor_load_block_editor_scripts_and_styles' );

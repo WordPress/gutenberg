@@ -267,9 +267,7 @@ export function serializeAttributes( attributes ) {
  *
  * @return {string} HTML.
  */
-export function getBlockContent( block ) {
-	// @todo why not getBlockInnerHtml?
-
+export function getBlockInnerHTML( block ) {
 	// If block was parsed as invalid or encounters an error while generating
 	// save content, use original content instead to avoid content loss. If a
 	// block contains nested content, exempt it from this condition because we
@@ -336,7 +334,7 @@ export function getCommentDelimitedContent(
  */
 export function serializeBlock( block, { isInnerBlocks = false } = {} ) {
 	const blockName = block.name;
-	const saveContent = getBlockContent( block );
+	const saveContent = getBlockInnerHTML( block );
 
 	if (
 		blockName === getUnregisteredTypeHandlerName() ||

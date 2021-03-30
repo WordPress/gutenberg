@@ -3,6 +3,9 @@
  */
 import { useEffect } from '@wordpress/element';
 
+const message =
+	'RichText cannot be used with an inline container. Please use a different display property.';
+
 export function useInlineWarning( { ref } ) {
 	useEffect( () => {
 		if ( process.env.NODE_ENV === 'development' ) {
@@ -12,9 +15,7 @@ export function useInlineWarning( { ref } ) {
 
 			if ( computedStyle.display === 'inline' ) {
 				// eslint-disable-next-line no-console
-				console.warn(
-					'RichText cannot be used with an inline container. Please use a different tagName.'
-				);
+				console.warn( message );
 			}
 		}
 	}, [] );

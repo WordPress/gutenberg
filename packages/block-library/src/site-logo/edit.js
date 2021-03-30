@@ -16,7 +16,6 @@ import {
 	RangeControl,
 	ResizableBox,
 	Spinner,
-	ToolbarGroup,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -30,11 +29,11 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { siteLogo as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import icon from './icon';
 import useClientWidth from '../image/use-client-width';
 
 /**
@@ -284,19 +283,15 @@ export default function LogoEdit( {
 		setError( message[ 2 ] ? message[ 2 ] : null );
 	};
 
-	const controls = (
-		<BlockControls>
-			<ToolbarGroup>
-				{ logoUrl && (
-					<MediaReplaceFlow
-						mediaURL={ logoUrl }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept={ ACCEPT_MEDIA_STRING }
-						onSelect={ onSelectLogo }
-						onError={ onUploadError }
-					/>
-				) }
-			</ToolbarGroup>
+	const controls = logoUrl && (
+		<BlockControls group="other">
+			<MediaReplaceFlow
+				mediaURL={ logoUrl }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				accept={ ACCEPT_MEDIA_STRING }
+				onSelect={ onSelectLogo }
+				onError={ onUploadError }
+			/>
 		</BlockControls>
 	);
 
@@ -347,7 +342,6 @@ export default function LogoEdit( {
 
 	const classes = classnames( className, {
 		'is-resized': !! width,
-		'is-focused': isSelected,
 	} );
 
 	const blockProps = useBlockProps( {

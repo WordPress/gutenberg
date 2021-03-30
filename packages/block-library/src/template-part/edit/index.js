@@ -15,7 +15,7 @@ import {
 	ToolbarButton,
 	Spinner,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -28,10 +28,11 @@ import { TemplatePartAdvancedControls } from './advanced-controls';
 import { getTagBasedOnArea } from './get-tag-based-on-area';
 
 export default function TemplatePartEdit( {
-	attributes: { slug, theme, tagName },
+	attributes,
 	setAttributes,
 	clientId,
 } ) {
+	const { slug, theme, tagName, layout = {} } = attributes;
 	const templatePartId = theme && slug ? theme + '//' + slug : null;
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
@@ -75,7 +76,7 @@ export default function TemplatePartEdit( {
 
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
-	const isEntityAvailable = ! isPlaceholder && ! isMissing;
+	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
 	const TagName = tagName || getTagBasedOnArea( area );
 
 	// We don't want to render a missing state if we have any inner blocks.
@@ -87,8 +88,12 @@ export default function TemplatePartEdit( {
 		return (
 			<TagName { ...blockProps }>
 				<Warning>
-					{ __(
-						'Template part has been deleted or is unavailable.'
+					{ sprintf(
+						/* translators: %s: Template part slug */
+						__(
+							'Template part has been deleted or is unavailable: %s'
+						),
+						slug
 					) }
 				</Warning>
 			</TagName>
@@ -113,49 +118,57 @@ export default function TemplatePartEdit( {
 				isEntityAvailable={ isEntityAvailable }
 				templatePartId={ templatePartId }
 			/>
-			<TagName { ...blockProps }>
-				{ isPlaceholder && (
+			{ isPlaceholder && (
+				<TagName { ...blockProps }>
 					<TemplatePartPlaceholder
+						area={ attributes.area }
 						setAttributes={ setAttributes }
 						innerBlocks={ innerBlocks }
 					/>
-				) }
-				{ isEntityAvailable && (
-					<BlockControls>
-						<ToolbarGroup className="wp-block-template-part__block-control-group">
-							<Dropdown
-								className="wp-block-template-part__preview-dropdown-button"
-								contentClassName="wp-block-template-part__preview-dropdown-content"
-								position="bottom right left"
-								renderToggle={ ( { isOpen, onToggle } ) => (
-									<ToolbarButton
-										aria-expanded={ isOpen }
-										onClick={ onToggle }
-										// Disable when open to prevent odd FireFox bug causing reopening.
-										// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
-										disabled={ isOpen }
-									>
-										{ __( 'Replace' ) }
-									</ToolbarButton>
-								) }
-								renderContent={ ( { onClose } ) => (
-									<TemplatePartSelection
-										setAttributes={ setAttributes }
-										onClose={ onClose }
-									/>
-								) }
-							/>
-						</ToolbarGroup>
-					</BlockControls>
-				) }
-				{ isEntityAvailable && (
-					<TemplatePartInnerBlocks
-						postId={ templatePartId }
-						hasInnerBlocks={ innerBlocks.length > 0 }
-					/>
-				) }
-				{ ! isPlaceholder && ! isResolved && <Spinner /> }
-			</TagName>
+				</TagName>
+			) }
+			{ isEntityAvailable && (
+				<BlockControls>
+					<ToolbarGroup className="wp-block-template-part__block-control-group">
+						<Dropdown
+							className="wp-block-template-part__preview-dropdown-button"
+							contentClassName="wp-block-template-part__preview-dropdown-content"
+							position="bottom right left"
+							renderToggle={ ( { isOpen, onToggle } ) => (
+								<ToolbarButton
+									aria-expanded={ isOpen }
+									onClick={ onToggle }
+									// Disable when open to prevent odd FireFox bug causing reopening.
+									// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
+									disabled={ isOpen }
+								>
+									{ __( 'Replace' ) }
+								</ToolbarButton>
+							) }
+							renderContent={ ( { onClose } ) => (
+								<TemplatePartSelection
+									setAttributes={ setAttributes }
+									onClose={ onClose }
+								/>
+							) }
+						/>
+					</ToolbarGroup>
+				</BlockControls>
+			) }
+			{ isEntityAvailable && (
+				<TemplatePartInnerBlocks
+					tagName={ TagName }
+					blockProps={ blockProps }
+					postId={ templatePartId }
+					hasInnerBlocks={ innerBlocks.length > 0 }
+					layout={ layout }
+				/>
+			) }
+			{ ! isPlaceholder && ! isResolved && (
+				<TagName { ...blockProps }>
+					<Spinner />
+				</TagName>
+			) }
 		</RecursionProvider>
 	);
 }

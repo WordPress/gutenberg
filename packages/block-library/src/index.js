@@ -38,6 +38,8 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
+import * as legacyWidget from './legacy-widget';
+import * as logInOut from './loginout';
 import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
@@ -69,6 +71,7 @@ import * as siteTitle from './site-title';
 import * as templatePart from './template-part';
 import * as query from './query';
 import * as queryLoop from './query-loop';
+import * as queryTitle from './query-title';
 import * as queryPagination from './query-pagination';
 import * as queryPaginationNext from './query-pagination-next';
 import * as queryPaginationNumbers from './query-pagination-numbers';
@@ -207,10 +210,13 @@ export const registerCoreBlocks = (
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( enableFSEBlocks ) => {
+		? ( { enableLegacyWidgetBlock, enableFSEBlocks } = {} ) => {
 				[
 					navigation,
 					navigationLink,
+
+					// Register Legacy Widget block.
+					...( enableLegacyWidgetBlock ? [ legacyWidget ] : [] ),
 
 					// Register Full Site Editing Blocks.
 					...( enableFSEBlocks
@@ -221,10 +227,12 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								templatePart,
 								query,
 								queryLoop,
+								queryTitle,
 								queryPagination,
 								queryPaginationNext,
 								queryPaginationNumbers,
 								queryPaginationPrevious,
+								logInOut,
 								postTitle,
 								postContent,
 								postAuthor,

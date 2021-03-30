@@ -16,10 +16,10 @@ import { __ } from '@wordpress/i18n';
 
 export default function Edit( { attributes, className, setAttributes } ) {
 	return (
-		<div className={ className }>
+		<div { ...useBlockProps() }>
 			<Placeholder
-				label="Gutenpride Block"
-				instructions="Add your message"
+				label={__( 'Gutenpride Block', 'gutenpride' )}
+				instructions={__( 'Add your message', 'gutenpride' )}
 			>
 				<TextControl
 					value={ attributes.message }
@@ -45,7 +45,7 @@ This can be used inside a block to control what shows when a parameter is set or
 
 ```jsx
 	return (
-		<div>
+		<div {...useBlockProps()}>
 			{ attributes.message ?
 				<div>Message: { attributes.message }</div> :
 				<div>
@@ -78,14 +78,9 @@ All so this combined together here's what the edit function looks like this:
 import { Placeholder, TextControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function Edit( {
-	attributes,
-	className,
-	isSelected,
-	setAttributes,
-} ) {
+export default function Edit( { attributes, isSelected, setAttributes } ) {
 	return (
-		<div className={ className }>
+			<div {...useBlockProps()}>
 			{ attributes.message && ! isSelected ? (
 				<div>{ attributes.message }</div>
 			) : (
@@ -112,29 +107,37 @@ With that in place, rebuild and reload and when you are not editing the message 
 
 The switching between a Placeholder and input control works well with a visual element like an image or video, but for the text example in this block we can do better.
 
-The simpler and better solution is to modify the `editor.css` to include the proper stylized text while typing.
+The simpler and better solution is to modify the `src/editor.scss` to include the proper stylized text while typing.
 
-Update `editor.css` to:
+Update `src/editor.scss` to:
 
-```css
+```scss
 .wp-block-create-block-gutenpride input[type='text'] {
 	font-family: Gilbert;
 	font-size: 64px;
+	color: inherit;
+	background: inherit;
+	border: 0;
 }
 ```
 
 The edit function can simply be:
 
 ```jsx
+import { useBlockProps } from '@wordpress/block-editor';
 import { TextControl } from '@wordpress/components';
 
-export default function Edit( { attributes, className, setAttributes } ) {
+import './editor.scss';
+
+export default function Edit( { attributes, setAttributes } ) {
 	return (
-		<TextControl
-			className={ className }
-			value={ attributes.message }
-			onChange={ ( val ) => setAttributes( { message: val } ) }
-		/>
+			<TextControl
+					{ ...useBlockProps() }
+					value={ attributes.message }
+					onChange={ ( val ) =>
+							setAttributes( { message: val } )
+					}
+			/>
 	);
 }
 ```

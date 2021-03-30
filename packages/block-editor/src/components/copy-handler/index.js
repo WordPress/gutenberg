@@ -115,7 +115,7 @@ export function useClipboardHandler() {
 				}
 			}
 
-			if ( ! node.contains( event.target ) ) {
+			if ( ! node.contains( event.target.ownerDocument.activeElement ) ) {
 				return;
 			}
 
@@ -156,14 +156,14 @@ export function useClipboardHandler() {
 			}
 		}
 
-		node.addEventListener( 'copy', handler );
-		node.addEventListener( 'cut', handler );
-		node.addEventListener( 'paste', handler );
+		node.ownerDocument.addEventListener( 'copy', handler );
+		node.ownerDocument.addEventListener( 'cut', handler );
+		node.ownerDocument.addEventListener( 'paste', handler );
 
 		return () => {
-			node.removeEventListener( 'copy', handler );
-			node.removeEventListener( 'cut', handler );
-			node.removeEventListener( 'paste', handler );
+			node.ownerDocument.removeEventListener( 'copy', handler );
+			node.ownerDocument.removeEventListener( 'cut', handler );
+			node.ownerDocument.removeEventListener( 'paste', handler );
 		};
 	}, [] );
 }
