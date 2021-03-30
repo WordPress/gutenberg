@@ -18,7 +18,6 @@ function render_block_core_template_part( $attributes ) {
 	$template_part_id = null;
 	$content          = null;
 	$area             = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
-	$style            = '';
 
 	if ( ! empty( $attributes['postId'] ) && get_post_status( $attributes['postId'] ) ) {
 		$template_part_id = $attributes['postId'];
@@ -66,8 +65,12 @@ function render_block_core_template_part( $attributes ) {
 		}
 	}
 
-	if ( ! $template_part_id || is_null( $content ) ) {
-		return __( 'Template Part not found.' );
+	if ( is_null( $content ) && is_user_logged_in() ) {
+		return sprintf(
+			/* translators: %s: Template part slug. */
+			__( 'Template part has been deleted or is unavailable: %s' ),
+			$attributes['slug']
+		);
 	}
 
 	if ( isset( $seen_ids[ $template_part_id ] ) ) {
@@ -117,27 +120,7 @@ function render_block_core_template_part( $attributes ) {
 	} else {
 		$html_tag = esc_attr( $attributes['tagName'] );
 	}
-
-	// Get custom padding values from the style attribute.
-	if ( isset( $attributes['style'] ) ) {
-		$padding = array_column( $attributes['style'], 'padding' );
-
-		if ( isset( $padding[0] ) ) {
-			foreach ( $padding[0] as $direction => $value ) {
-				if ( isset( $padding[0][ $direction ] ) ) {
-					$style .= "padding-{$direction}:{$value};";
-				}
-			}
-		}
-	}
-
-	$block_styles = isset( $style ) ? $style : '';
-
-	$wrapper_attributes = get_block_wrapper_attributes(
-		array(
-			'style' => $block_styles,
-		)
-	);
+	$wrapper_attributes = get_block_wrapper_attributes();
 
 	return "<$html_tag $wrapper_attributes>" . str_replace( ']]>', ']]&gt;', $content ) . "</$html_tag>";
 }
