@@ -159,10 +159,10 @@ function UnitControl(
 		/>
 	) : null;
 
-	const activeUnit = units.find(
-		( option ) => option.value === unit
-	);
+	// Get current unit type
+	const activeUnit = units.find( ( option ) => option.value === unit );
 
+	// Extract the step
 	const unitStep = activeUnit?.step ? activeUnit.step : 1;
 
 	return (

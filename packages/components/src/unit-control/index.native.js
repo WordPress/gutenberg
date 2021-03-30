@@ -123,12 +123,12 @@ function UnitControl( {
 		);
 	}, [ pickerRef, units, onUnitChange, getAnchor ] );
 
-	const activeUnit = units.find(
-		( option ) => option.value === unit
-	);
+	// Get current unit type
+	const activeUnit = units.find( ( option ) => option.value === unit );
 
+	// Extract the step
 	const unitStep = activeUnit?.step ? activeUnit.step : 1;
-	
+
 	return (
 		<>
 			{ unit !== '%' ? (
@@ -139,7 +139,7 @@ function UnitControl( {
 					onChange={ onChange }
 					separatorType={ separatorType }
 					value={ value }
-					step={unitStep}
+					step={ unitStep }
 					defaultValue={ initialControlValue }
 					shouldDisplayTextInput
 					decimalNum={ unit === 'px' ? 0 : decimalNum }
@@ -156,6 +156,7 @@ function UnitControl( {
 					minimumValue={ min }
 					maximumValue={ max }
 					value={ value }
+					step={ unitStep }
 					unit={ unit }
 					defaultValue={ initialControlValue }
 					separatorType={ separatorType }
