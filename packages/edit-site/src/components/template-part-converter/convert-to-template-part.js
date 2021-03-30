@@ -18,9 +18,11 @@ import {
 	BaseControl,
 	Flex,
 	FlexItem,
+	FlexBlock,
 	Button,
 	Modal,
 } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
 
 import { createBlock, serialize } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
@@ -29,6 +31,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
+	const instanceId = useInstanceId( ConvertToTemplatePart );
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
 	const { replaceBlocks } = useDispatch( blockEditorStore );
@@ -95,18 +98,45 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 									value={ title }
 									onChange={ setTitle }
 								/>
-								<BaseControl className="edit-site-template-part-converter__area-control">
+								<label
+									className="edit-site-template-part-converter__area-control-label"
+									htmlFor={ `edit-site-template-part-converter__area-control-${ instanceId }` }
+								>
+									{ __( 'Area' ) }
+								</label>
+								<BaseControl
+									className="edit-site-template-part-converter__area-control"
+									id={ `edit-site-template-part-converter__area-control-${ instanceId }` }
+								>
 									{ AREA_OPTIONS.map(
-										( { icon, label, value } ) => (
+										( {
+											icon,
+											label,
+											value,
+											description,
+										} ) => (
 											<Button
 												key={ label }
 												onClick={ () =>
 													setArea( value )
 												}
 												disabled={ area === value }
+												className="edit-site-template-part-converter__area-button"
 											>
-												<Icon icon={ icon } />
-												{ label }
+												<Flex
+													align="start"
+													justify="start"
+												>
+													<FlexItem>
+														<Icon icon={ icon } />
+													</FlexItem>
+													<FlexBlock>
+														{ label }
+														<div>
+															{ description }
+														</div>
+													</FlexBlock>
+												</Flex>
 											</Button>
 										)
 									) }

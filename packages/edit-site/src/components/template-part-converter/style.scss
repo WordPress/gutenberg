@@ -6,3 +6,59 @@
 .edit-site-template-part-converter__convert-modal-actions {
 	padding-top: $grid-unit-15;
 }
+
+.edit-site-template-part-converter__area-control-label {
+	display: block;
+	margin: $grid-unit-20 0 $grid-unit-10;
+}
+
+.edit-site-template-part-converter__area-control {
+	width: 100%;
+
+	.components-base-control__field {
+		border: $border-width solid $gray-700;
+		border-radius: 2px;
+	}
+
+	.edit-site-template-part-converter__area-button {
+		display: block;
+		width: 100%;
+		height: 100%;
+		text-align: left;
+		padding: $grid-unit-15;
+
+		border-bottom: $border-width solid $gray-500;
+		border-radius: 0;
+
+		&:last-of-type {
+			border: none;
+		}
+
+		&:disabled {
+			background: $gray-900;
+			color: $white;
+			opacity: 1;
+		}
+
+		.components-flex__block {
+			padding-top: $grid-unit-05;
+
+			@include break-small {
+				max-width: 320px;
+			}
+
+			div {
+				padding-top: $grid-unit-05;
+
+				font-size: $helptext-font-size;
+			}
+		}
+
+		&:not(:hover),
+		&:disabled {
+			.components-flex__block div {
+				color: $gray-600;
+			}
+		}
+	}
+}
