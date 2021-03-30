@@ -240,7 +240,8 @@ describe( 'Multi-block selection', () => {
 		expect( await getSelectedFlatIndices() ).toBe( 3 );
 	} );
 
-	it( 'should deselect with Escape', async () => {
+	// Flaky test.
+	it.skip( 'should deselect with Escape', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
