@@ -9,7 +9,7 @@ import { mount } from 'enzyme';
 import ScrollLock from '..';
 
 describe( 'scroll-lock', () => {
-	const lockingClassName = 'test-lock-scroll';
+	const lockingClassName = 'lockscroll';
 
 	// Use a separate document to reduce the risk of test side-effects.
 	let wrapper = null;
@@ -33,12 +33,12 @@ describe( 'scroll-lock', () => {
 
 	it( 'locks when mounted', () => {
 		expectLocked( false );
-		wrapper = mount( <ScrollLock className={ lockingClassName } /> );
+		wrapper = mount( <ScrollLock /> );
 		expectLocked( true );
 	} );
 
 	it( 'unlocks when unmounted', () => {
-		wrapper = mount( <ScrollLock className={ lockingClassName } /> );
+		wrapper = mount( <ScrollLock /> );
 		expectLocked( true );
 		wrapper.unmount();
 		expectLocked( false );

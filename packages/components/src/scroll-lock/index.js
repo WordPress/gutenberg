@@ -14,9 +14,8 @@ let previousScrollTop = 0;
 
 /**
  * @param {boolean} locked
- * @param {string} className
  */
-function setLocked( locked, className ) {
+function setLocked( locked ) {
 	const scrollingElement = document.scrollingElement || document.body;
 
 	if ( locked ) {
@@ -24,10 +23,10 @@ function setLocked( locked, className ) {
 	}
 
 	const methodName = locked ? 'add' : 'remove';
-	scrollingElement.classList[ methodName ]( className );
+	scrollingElement.classList[ methodName ]( 'lockscroll' );
 
 	// Adding the class to the document element seems to be necessary in iOS.
-	document.documentElement.classList[ methodName ]( className );
+	document.documentElement.classList[ methodName ]( 'lockscroll' );
 
 	if ( ! locked ) {
 		scrollingElement.scrollTop = previousScrollTop;
@@ -39,26 +38,24 @@ let lockCounter = 0;
 /**
  * A component that will lock scrolling when it is mounted and unlock scrolling when it is unmounted.
  *
- * @param {Object} props
- * @param {string} [props.className]
  * @return {null} Render nothing.
  */
-export default function ScrollLock( { className = 'lockscroll' } ) {
+export default function ScrollLock() {
 	useEffect( () => {
 		if ( lockCounter === 0 ) {
-			setLocked( true, className );
+			setLocked( true );
 		}
 
 		++lockCounter;
 
 		return () => {
 			if ( lockCounter === 1 ) {
-				setLocked( false, className );
+				setLocked( false );
 			}
 
 			--lockCounter;
 		};
-	}, [ className ] );
+	}, [] );
 
 	return null;
 }
