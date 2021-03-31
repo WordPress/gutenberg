@@ -21,6 +21,11 @@ const ExportedServerSideRender = withSelect( ( select ) => {
 		const currentPost = coreEditorSelect.getCurrentPost();
 		if ( currentPost ) {
 			return {
+				// For templates and template parts we use a custom ID format.
+				// To preserve the original ID that WordPress assigns to the post
+				// we save it to `wp_id` field. We want to make sure that we
+				// always use the original ID in this case. Since we
+				// expect a post database ID here.
 				currentPostId: currentPost.wp_id || currentPost.id,
 			};
 		}
