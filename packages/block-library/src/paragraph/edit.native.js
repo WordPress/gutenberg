@@ -71,6 +71,7 @@ function ParagraphBlock( {
 
 					if ( isOriginal ) {
 						block.clientId = clientId;
+						block.attributes = newAttributes;
 					}
 
 					return block;

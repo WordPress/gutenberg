@@ -76,15 +76,18 @@ export default class SidebarAdapter {
 		}
 
 		this.subscribers.add( callback );
-	}
 
-	unsubscribe( callback ) {
-		this.subscribers.delete( callback );
+		return () => {
+			this.subscribers.delete( callback );
 
-		if ( ! this.subscribers.size ) {
-			this.setting.unbind( this._handleSettingChange );
-			this.allSettings.unbind( 'change', this._handleAllSettingsChange );
-		}
+			if ( ! this.subscribers.size ) {
+				this.setting.unbind( this._handleSettingChange );
+				this.allSettings.unbind(
+					'change',
+					this._handleAllSettingsChange
+				);
+			}
+		};
 	}
 
 	getWidgets() {

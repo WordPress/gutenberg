@@ -60,19 +60,23 @@ function HeadingEdit( {
 				onChange={ ( value ) => setAttributes( { content: value } ) }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value, isOriginal ) => {
-					let block;
+					let newAttributes = {};
 
 					if ( isOriginal || value ) {
-						block = createBlock( 'core/heading', {
+						newAttributes = {
 							...attributes,
 							content: value,
-						} );
-					} else {
-						block = createBlock( 'core/paragraph' );
+						};
 					}
+
+					const block = createBlock(
+						'core/paragraph',
+						newAttributes
+					);
 
 					if ( isOriginal ) {
 						block.clientId = clientId;
+						block.attributes = newAttributes;
 					}
 
 					return block;
