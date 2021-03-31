@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.50.0
+
 -   [***] a11y: Screenreader improvements for the UnitControl component [#29741]
 
 ## 1.49.0
