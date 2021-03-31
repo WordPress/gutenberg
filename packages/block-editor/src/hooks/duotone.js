@@ -20,7 +20,7 @@ import { addFilter } from '@wordpress/hooks';
  */
 import {
 	BlockControls,
-	__experimentalDuotoneControl as DuotoneControl,
+	DuotoneControl,
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '../components';
 
