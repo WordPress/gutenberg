@@ -14,7 +14,7 @@
 function gutenberg_register_border_support( $block_type ) {
 	// Determine border related features supported.
 	// Border width, style etc can be added in the future.
-	$has_border_radius_support = gutenberg_has_border_support( $block_type, 'radius' );
+	$has_border_radius_support = gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'radius' ), false );
 
 	// Setup attributes and styles within that if needed.
 	if ( ! $block_type->attributes ) {
@@ -52,7 +52,8 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	$styles = array();
 
 	// Border Radius.
-	if ( gutenberg_has_border_support( $block_type, 'radius' ) ) {
+	$has_border_radius_support = gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'radius' ), false );
+	if ( $has_border_radius_support ) {
 		if ( isset( $block_attributes['style']['border']['radius'] ) ) {
 			$border_radius = intval( $block_attributes['style']['border']['radius'] );
 			$styles[]      = sprintf( 'border-radius: %dpx;', $border_radius );
@@ -69,24 +70,6 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	}
 
 	return $attributes;
-}
-
-/**
- * Checks whether the current block type supports the feature requested.
- *
- * @param WP_Block_Type $block_type Block type to check for support.
- * @param string        $feature    Name of the feature to check support for.
- * @param mixed         $default    Fallback value for feature support, defaults to false.
- *
- * @return boolean                  Whether or not the feature is supported.
- */
-function gutenberg_has_border_support( $block_type, $feature, $default = false ) {
-	$block_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$block_support = _wp_array_get( $block_type->supports, array( '__experimentalBorder' ), $default );
-	}
-
-	return true === $block_support || ( is_array( $block_support ) && _wp_array_get( $block_support, array( $feature ), false ) );
 }
 
 // Register the block support.

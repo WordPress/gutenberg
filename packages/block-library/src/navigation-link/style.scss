@@ -15,6 +15,12 @@
 		}
 	}
 
+	// Margin when justified right or space-between.
+	.wp-block-navigation__container > .wp-block-pages-list__item:last-child,
+	.wp-block-navigation__container > .wp-block-navigation-link:last-child {
+		margin-right: 0;
+	}
+
 	// Menu item link.
 	.wp-block-pages-list__item__link,
 	.wp-block-navigation-link__content {
@@ -82,7 +88,6 @@
 
 		.submenu-container,
 		.wp-block-navigation-link__container {
-			border: 1px solid rgba(0, 0, 0, 0.15);
 			background-color: inherit;
 			color: inherit;
 			position: absolute;
@@ -115,13 +120,11 @@
 			}
 
 			@include break-medium {
-				left: 1.5em;
-
 				// Nested submenus sit to the left on large breakpoints.
 				.submenu-container,
 				.wp-block-navigation-link__container {
 					left: 100%;
-					top: -$border-width;
+					top: 0;
 
 					// Prevent the menu from disappearing when the mouse is over the gap
 					&::before {
@@ -190,5 +193,11 @@
 		// several times, so care needs to be taken.
 		background-color: #fff;
 		color: #000;
+		border: 1px solid rgba(0, 0, 0, 0.15);
+
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			top: -1px;
+		}
 	}
 }

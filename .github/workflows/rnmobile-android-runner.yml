@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         native-test-name: [
-          gutenberg-editor-gallery
+          gutenberg-editor-initial-html
         ]
 
     steps:
@@ -35,7 +35,7 @@ jobs:
         key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
         restore-keys: ${{ runner.os }}-gradle
 
-    - uses: reactivecircus/android-emulator-runner@08b092e904025fada32a01b711af1e7ff7b7a4a3 # v2.14.3
+    - uses: reactivecircus/android-emulator-runner@d2799957d660add41c61a5103e2fbb9e2889eb73 # v2.15.0
       with:
         api-level: 28
         profile: pixel_xl

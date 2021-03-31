@@ -47,6 +47,8 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { ItemSubmenuIcon } from './icons';
 
+const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/spacer' ];
+
 /**
  * A React hook to determine if it's dragging within the target element.
  *
@@ -320,7 +322,7 @@ export default function NavigationLinkEdit( {
 			} ),
 		},
 		{
-			allowedBlocks: [ 'core/navigation-link', 'core/spacer' ],
+			allowedBlocks: ALLOWED_BLOCKS,
 			renderAppender:
 				( isSelected && hasDescendants ) ||
 				( isImmediateParentOfSelectedBlock &&
@@ -448,7 +450,6 @@ export default function NavigationLinkEdit( {
 							}
 							aria-label={ __( 'Navigation link text' ) }
 							placeholder={ itemLabelPlaceholder }
-							keepPlaceholderOnFocus
 							withoutInteractiveFormatting
 							allowedFormats={ [
 								'core/bold',
