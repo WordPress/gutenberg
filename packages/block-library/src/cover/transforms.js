@@ -34,7 +34,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/video' ],
-			transform: ( { caption, src, align, id, anchor, duotone } ) =>
+			transform: ( { caption, src, align, id, anchor } ) =>
 				createBlock(
 					'core/cover',
 					{
@@ -43,7 +43,6 @@ const transforms = {
 						id,
 						backgroundType: VIDEO_BACKGROUND_TYPE,
 						anchor,
-						duotone,
 					},
 					[
 						createBlock( 'core/paragraph', {
@@ -111,14 +110,13 @@ const transforms = {
 					! customGradient
 				);
 			},
-			transform: ( { title, url, align, id, anchor, duotone } ) =>
+			transform: ( { title, url, align, id, anchor } ) =>
 				createBlock( 'core/video', {
 					caption: title,
 					src: url,
 					id,
 					align,
 					anchor,
-					duotone,
 				} ),
 		},
 	],
