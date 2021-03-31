@@ -24,6 +24,8 @@ import deprecated from '@wordpress/deprecated';
  */
 export default function useCopyOnClick( ref, text, timeout = 4000 ) {
 	deprecated( 'wp.compose.useCopyOnClick', {
+		since: '10.3',
+		plugin: 'Gutenberg',
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 

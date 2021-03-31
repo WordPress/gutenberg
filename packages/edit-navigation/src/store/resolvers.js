@@ -11,10 +11,7 @@ import { parse, createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import {
-	NAVIGATION_POST_KIND,
-	NAVIGATION_POST_POST_TYPE,
-} from '../utils/constants';
+import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 import { resolveMenuItems, dispatch } from './controls';
 import { buildNavigationPostId } from './utils';
 

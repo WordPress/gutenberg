@@ -9,7 +9,7 @@ import {
 import {
 	NAVIGATION_POST_KIND,
 	NAVIGATION_POST_POST_TYPE,
-} from '../../utils/constants';
+} from '../../constants';
 
 import { buildNavigationPostId } from '../utils';
 

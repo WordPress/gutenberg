@@ -11,6 +11,9 @@
 		},
 		"tagName": {
 			"type": "string"
+		},
+		"area": {
+			"type": "string"
 		}
 	},
 	"supports": {
@@ -19,7 +22,8 @@
 		"color": {
 			"gradients": true,
 			"link": true
-		}
+		},
+		"__experimentalLayout": true
 	},
 	"editorStyle": "wp-block-template-part-editor"
 }

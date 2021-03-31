@@ -23,13 +23,14 @@ import { ESCAPE } from '@wordpress/keycodes';
 import { store as editSiteStore } from '../../store';
 
 export default function ListViewSidebar() {
-	const { rootBlocks, selectedBlockClientId } = useSelect( ( select ) => {
-		const { getSelectedBlockClientId, __unstableGetBlockTree } = select(
-			blockEditorStore
-		);
+	const { clientIdsTree, selectedBlockClientIds } = useSelect( ( select ) => {
+		const {
+			__unstableGetClientIdsTree,
+			getSelectedBlockClientIds,
+		} = select( blockEditorStore );
 		return {
-			rootBlocks: __unstableGetBlockTree(),
-			selectedBlockClientId: getSelectedBlockClientId(),
+			clientIdsTree: __unstableGetClientIdsTree(),
+			selectedBlockClientIds: getSelectedBlockClientIds(),
 		};
 	} );
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
@@ -72,9 +73,9 @@ export default function ListViewSidebar() {
 				ref={ useMergeRefs( [ focusReturnRef, focusOnMountRef ] ) }
 			>
 				<BlockNavigationTree
-					blocks={ rootBlocks }
+					blocks={ clientIdsTree }
 					selectBlock={ selectEditorBlock }
-					selectedBlockClientId={ selectedBlockClientId }
+					selectedBlockClientIds={ selectedBlockClientIds }
 					showNestedBlocks
 					__experimentalPersistentListViewFeatures
 				/>
