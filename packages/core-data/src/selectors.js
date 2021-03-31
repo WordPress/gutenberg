@@ -2,13 +2,12 @@
  * External dependencies
  */
 import createSelector from 'rememo';
-import { set, map, find, get, filter, compact, defaultTo } from 'lodash';
+import { set, map, find, get, filter, compact } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
-import deprecated from '@wordpress/deprecated';
 import { addQueryArgs } from '@wordpress/url';
 
 /**
@@ -614,30 +613,6 @@ export function isPreviewEmbedFallback( state, url ) {
 		return false;
 	}
 	return preview.html === oEmbedLinkCheck;
-}
-
-/**
- * Returns whether the current user can upload media.
- *
- * Calling this may trigger an OPTIONS request to the REST API via the
- * `canUser()` resolver.
- *
- * https://developer.wordpress.org/rest-api/reference/
- *
- * @deprecated since 5.0. Callers should use the more generic `canUser()` selector instead of
- *             `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
- *
- * @param {Object} state Data state.
- *
- * @return {boolean} Whether or not the user can upload media. Defaults to `true` if the OPTIONS
- *                   request is being made.
- */
-export function hasUploadPermissions( state ) {
-	deprecated( "select( 'core' ).hasUploadPermissions()", {
-		since: '5.2',
-		alternative: "select( 'core' ).canUser( 'create', 'media' )",
-	} );
-	return defaultTo( canUser( state, 'create', 'media' ), true );
 }
 
 /**

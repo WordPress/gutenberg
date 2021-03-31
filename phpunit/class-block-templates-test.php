@@ -20,6 +20,24 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		gutenberg_register_wp_theme_taxonomy();
 		gutenberg_register_wp_template_part_area_taxonomy();
 
+		// Set up a template post corresponding to a different theme.
+		// We do this to ensure resolution and slug creation works as expected,
+		// even with another post of that same name present for another theme.
+		$args       = array(
+			'post_type'    => 'wp_template',
+			'post_name'    => 'my_template',
+			'post_title'   => 'My Template',
+			'post_content' => 'Content',
+			'post_excerpt' => 'Description of my template',
+			'tax_input'    => array(
+				'wp_theme' => array(
+					'this-theme-should-not-resolve',
+				),
+			),
+		);
+		self::$post = self::factory()->post->create_and_get( $args );
+		wp_set_post_terms( self::$post->ID, 'this-theme-should-not-resolve', 'wp_theme' );
+
 		// Set up template post.
 		$args       = array(
 			'post_type'    => 'wp_template',

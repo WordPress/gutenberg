@@ -649,7 +649,7 @@ class WP_Theme_JSON {
 		foreach ( $properties as $prop ) {
 			$value = self::get_property_value( $styles, $prop['value'] );
 			if ( ! empty( $value ) ) {
-				$declarations[]   = array(
+				$declarations[] = array(
 					'name'  => $prop['name'],
 					'value' => $value,
 				);

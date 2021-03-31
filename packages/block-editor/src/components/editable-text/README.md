@@ -14,7 +14,7 @@ Renders an editable text input in which text formatting is not allowed.
 
 ### `tagName: String`
 
-*Default: `div`.* The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element. Elements that display inline are not supported.
+*Default: `div`.* The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element. Elements that display inline are not supported. Set to `inline-block` to use tag names that have `inline` as the default.
 
 ### `disableLineBreaks: Boolean`
 
@@ -24,10 +24,6 @@ Renders an editable text input in which text formatting is not allowed.
 
 *Optional.* Placeholder text to show when the field is empty, similar to the
   [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
-
-### `keepPlaceholderOnFocus: Boolean`
-
-*Optional.* Show placeholder even when selected/focused, as long as there is no content.
 
 ### `onSplit( value: String ): Function`
 

@@ -12,9 +12,10 @@
  */
 
 // Show submenus above the sibling inserter.
-.has-child {
+.wp-block-navigation .has-child {
 	cursor: pointer;
 
+	.submenu-container,
 	.wp-block-navigation-link__container {
 		z-index: z-index(".has-child .wp-block-navigation-link__container");
 	}
@@ -47,10 +48,6 @@
 	&.is-editing,
 	&.is-selected {
 		min-width: 20px;
-	}
-
-	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus)[data-rich-text-placeholder]::after {
-		display: inline-block;
 	}
 
 	.block-list-appender {
