@@ -1,5 +1,6 @@
 export { default as Icon } from './icon';
 
+export { default as addSubmenu } from './library/add-submenu';
 export { default as alignCenter } from './library/align-center';
 export { default as alignJustify } from './library/align-justify';
 export { default as alignLeft } from './library/align-left';
@@ -173,6 +174,7 @@ export { default as search } from './library/search';
 export { default as separator } from './library/separator';
 export { default as settings } from './library/settings';
 export { default as share } from './library/share';
+export { default as siteLogo } from './library/site-logo';
 export { default as shortcode } from './library/shortcode';
 export { default as stack } from './library/stack';
 export { default as starEmpty } from './library/star-empty';

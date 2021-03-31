@@ -19,9 +19,8 @@
 @import "./heading/editor.scss";
 @import "./html/editor.scss";
 @import "./image/editor.scss";
-@import "./latest-comments/editor.scss";
 @import "./latest-posts/editor.scss";
-@import "./list/editor.scss";
+@import "./legacy-widget/editor.scss";
 @import "./media-text/editor.scss";
 @import "./more/editor.scss";
 @import "./navigation/editor.scss";
@@ -33,7 +32,6 @@
 @import "./post-excerpt/editor.scss";
 @import "./post-author/editor.scss";
 @import "./pullquote/editor.scss";
-@import "./quote/editor.scss";
 @import "./rss/editor.scss";
 @import "./search/editor.scss";
 @import "./separator/editor.scss";

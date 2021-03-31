@@ -302,7 +302,7 @@ describe( 'Navigation editor', () => {
 
 		// Select a link block with nested links in a submenu.
 		const parentLinkXPath =
-			'//li[@aria-label="Block: Link" and contains(.,"WordPress.org")]';
+			'//li[@aria-label="Block: Custom Link" and contains(.,"WordPress.org")]';
 		const linkBlock = await page.waitForXPath( parentLinkXPath );
 		await linkBlock.click();
 
@@ -311,14 +311,14 @@ describe( 'Navigation editor', () => {
 		// Submenus are hidden using `visibility: hidden` and shown using
 		// `visibility: visible` so the visible/hidden options must be used
 		// when selecting the elements.
-		const submenuLinkXPath = `${ parentLinkXPath }//li[@aria-label="Block: Link"]`;
+		const submenuLinkXPath = `${ parentLinkXPath }//li[@aria-label="Block: Custom Link"]`;
 		const submenuLinkVisible = await page.waitForXPath( submenuLinkXPath, {
 			visible: true,
 		} );
 		expect( submenuLinkVisible ).toBeDefined();
 
 		// click in the top left corner of the canvas.
-		const canvas = await page.$( '.edit-navigation-layout__canvas' );
+		const canvas = await page.$( '.edit-navigation-layout__content-area' );
 		const boundingBox = await canvas.boundingBox();
 		await page.mouse.click( boundingBox.x + 5, boundingBox.y + 5 );
 
@@ -352,10 +352,8 @@ describe( 'Navigation editor', () => {
 		);
 		await appender.click();
 
-		// Must be an exact match to the word 'Link' as other
-		// variations also contain the word 'Link'.
 		const linkInserterItem = await page.waitForXPath(
-			'//button[@role="option"]//span[.="Link"]'
+			'//button[@role="option"]//span[.="Custom Link"]'
 		);
 		await linkInserterItem.click();
 
@@ -382,5 +380,134 @@ describe( 'Navigation editor', () => {
 			expect( suggestionURL ).toBeTruthy();
 			await pressKeyWithModifier( 'primary', 'A' );
 		}
+	} );
+	describe( 'Menu name editor', () => {
+		const initialMenuName = 'Main Menu';
+		const navigationNameEditorSelector =
+			'.block-editor-block-inspector .edit-navigation-name-editor__text-control';
+		const inputSelector = `${ navigationNameEditorSelector } input`;
+		let navigatorNameEditor, input;
+		beforeEach( async () => {
+			const menuPostResponse = {
+				id: 4,
+				description: '',
+				name: initialMenuName,
+				slug: 'main-menu',
+				meta: [],
+				auto_add: false,
+			};
+
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ menuPostResponse ],
+					POST: menuPostResponse,
+				} ),
+				...getMenuItemMocks( { GET: [] } ),
+			] );
+
+			await visitNavigationEditor();
+			const navBlock = await page.waitForSelector(
+				'div[aria-label="Block: Navigation"]'
+			);
+			const boundingBox = await navBlock.boundingBox();
+			// click on the navigation editor placeholder.
+			await page.mouse.click( boundingBox.x + 25, boundingBox.y + 25 );
+
+			navigatorNameEditor = await page.$( navigationNameEditorSelector );
+			input = await page.$( inputSelector );
+		} );
+
+		afterEach( async () => {
+			await setUpResponseMocking( [] );
+		} );
+
+		it( 'is displayed in inspector additions', async () => {
+			expect( navigatorNameEditor ).toBeDefined();
+		} );
+
+		it( 'saves menu name upon clicking save button', async () => {
+			const newName = 'newName';
+			const menuPostResponse = {
+				id: 4,
+				description: '',
+				name: newName,
+				slug: 'main-menu',
+				meta: [],
+				auto_add: false,
+			};
+
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ menuPostResponse ],
+					POST: menuPostResponse,
+				} ),
+				...getMenuItemMocks( { GET: [] } ),
+			] );
+
+			await input.focus();
+			// clear input
+			const oldName = await page.$eval(
+				inputSelector,
+				( el ) => el.value
+			);
+			for ( let i = 0; i < oldName.length; i++ ) {
+				await page.keyboard.press( 'Backspace' );
+			}
+			await input.type( newName );
+
+			const saveButton = await page.$(
+				'.edit-navigation-toolbar__save-button'
+			);
+			await saveButton.click();
+			await page.waitForSelector( '.components-snackbar' );
+			const menuNameButton = await page.waitForXPath(
+				'//button[contains(@aria-label, "Edit menu name: ' +
+					newName +
+					'" ) ]'
+			);
+			expect( menuNameButton ).toBeTruthy();
+			const menuNameButtonText = await menuNameButton.evaluate(
+				( element ) => element.innerText
+			);
+			expect( menuNameButtonText ).toBe( newName );
+		} );
+		it( 'does not save a menu name upon clicking save button when name is empty', async () => {
+			const menuPostResponse = {
+				id: 4,
+				description: '',
+				name: initialMenuName,
+				slug: 'main-menu',
+				meta: [],
+				auto_add: false,
+			};
+
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ menuPostResponse ],
+					POST: menuPostResponse,
+				} ),
+				...getMenuItemMocks( { GET: [] } ),
+			] );
+			await input.focus();
+			const oldName = await page.$eval(
+				inputSelector,
+				( el ) => el.value
+			);
+			for ( let i = 0; i < oldName.length; i++ ) {
+				await page.keyboard.press( 'Backspace' );
+			}
+			const saveButton = await page.$(
+				'.edit-navigation-toolbar__save-button'
+			);
+			await saveButton.click();
+			await page.waitForSelector( '.components-snackbar' );
+			const menuNameButton = await page.waitForXPath(
+				'//button[contains(@aria-label, "Edit menu name" ) ]'
+			);
+			const menuNameButtonText = await menuNameButton.evaluate(
+				( element ) => element.innerText
+			);
+			expect( menuNameButtonText ).toBe( oldName );
+		} );
 	} );
 } );

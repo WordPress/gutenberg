@@ -96,8 +96,6 @@ public class Gutenberg: NSObject {
             initialProps["gradients"] = gradients
         }
 
-        initialProps["editorMode"] = dataSource.isPreview ? "preview" : "editor"
-
         return initialProps
     }
 
