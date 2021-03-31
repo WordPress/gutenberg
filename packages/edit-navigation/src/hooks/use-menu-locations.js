@@ -49,9 +49,6 @@ export default function useMenuLocations() {
 			if ( isMounted ) {
 				setMenuLocationsByName( newMenuLocationsByName );
 				takeLocationsSnapshot( newMenuLocationsByName );
-				// flow( [ setMenuLocationsByName, takeLocationsSnapshot ] )(
-				// 	newMenuLocationsByName
-				// );
 			}
 		};
 
