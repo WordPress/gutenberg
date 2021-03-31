@@ -53,7 +53,6 @@ export function SidebarComplementaryAreaFills() {
 			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
 		}
 	}, [ hasBlockSelection, isEditorSidebarOpened ] );
-	// TODO check why this is needed (when we have GS sidebar selected)..
 	let sidebarName = sidebar;
 	if ( ! isEditorSidebarOpened ) {
 		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
