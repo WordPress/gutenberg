@@ -14,6 +14,10 @@
  * @return string Returns the filtered post content of the current post.
  */
 function render_block_core_post_content( $attributes, $content, $block ) {
+	if ( ! in_the_loop() ) {
+		the_post();
+	}
+
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
