@@ -36,15 +36,15 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 
 	$query = new WP_Query( $query_args );
 
+	if ( ! $query->have_posts() ) {
+		return '';
+	}
+
 	$classnames = '';
 	if ( isset( $block->context['layout'] ) && isset( $block->context['query'] ) ) {
 		if ( isset( $block->context['layout']['type'] ) && 'flex' === $block->context['layout']['type'] ) {
 			$classnames = "is-flex-container columns-{$block->context['layout']['columns']}";
 		}
-	}
-
-	if ( ! $query->have_posts() ) {
-		return '';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
