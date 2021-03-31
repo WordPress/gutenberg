@@ -12,7 +12,7 @@ jobs:
       matrix:
         xcode: [12.2]
         native-test-name: [
-          gutenberg-editor-gallery
+          gutenberg-editor-initial-html
         ]
 
     steps:

@@ -172,7 +172,7 @@ const stopDriver = async ( driver ) => {
 			.createHmac( 'md5', jobID )
 			.update( serverConfigs.sauce.auth )
 			.digest( 'hex' );
-		const jobURL = `https://saucelabs.com/jobs/${ jobID }?auth=${ hash }.`;
+		const jobURL = `https://saucelabs.com/jobs/${ jobID }?auth=${ hash }`;
 		// eslint-disable-next-line no-console
 		console.log( `You can view the video of this test run at ${ jobURL }` );
 	}
@@ -218,13 +218,17 @@ const clearTextBox = async ( driver, element ) => {
 	// We are double tapping on the text field and pressing backspace until all content is removed.
 	do {
 		originalText = await element.text();
-		const action = new wd.TouchAction( driver );
-		action.tap( { el: element, count: 2 } );
-		await action.perform();
+		await doubleTap( driver, element );
 		await element.type( '\b' );
 		text = await element.text();
 		// We compare with the original content and not empty because text always return any hint set on the element.
 	} while ( originalText !== text );
+};
+
+const doubleTap = async ( driver, element ) => {
+	const action = new wd.TouchAction( driver );
+	action.tap( { el: element, count: 2 } );
+	await action.perform();
 };
 
 const typeStringAndroid = async (
@@ -351,7 +355,12 @@ const tapPasteAboveElement = async ( driver, element ) => {
 
 // Starts from the middle of the screen or the element(if specified)
 // and swipes upwards
-const swipeUp = async ( driver, element = undefined ) => {
+const swipeUp = async (
+	driver,
+	element = undefined,
+	delay = 3000,
+	endYCoefficient = 0.5
+) => {
 	let size = await driver.getWindowSize();
 	let y = 0;
 	if ( element !== undefined ) {
@@ -363,27 +372,33 @@ const swipeUp = async ( driver, element = undefined ) => {
 	const startX = size.width / 2;
 	const startY = y + size.height / 3;
 	const endX = startX;
-	const endY = startY + startY * -1 * 0.5;
+	const endY = startY + startY * -1 * endYCoefficient;
 
-	await swipeFromTo( driver, { x: startX, y: startY }, { x: endX, y: endY } );
+	await swipeFromTo(
+		driver,
+		{ x: startX, y: startY },
+		{ x: endX, y: endY },
+		delay
+	);
 };
 
 const defaultCoordinates = { x: 0, y: 0 };
 const swipeFromTo = async (
 	driver,
 	from = defaultCoordinates,
-	to = defaultCoordinates
+	to = defaultCoordinates,
+	delay
 ) => {
 	const action = await new wd.TouchAction( driver );
 	action.press( from );
-	action.wait( 3000 );
+	action.wait( delay );
 	action.moveTo( to );
 	action.release();
 	await action.perform();
 };
 
 // Starts from the middle of the screen and swipes downwards
-const swipeDown = async ( driver ) => {
+const swipeDown = async ( driver, delay = 3000 ) => {
 	const size = await driver.getWindowSize();
 	const y = 0;
 
@@ -392,7 +407,12 @@ const swipeDown = async ( driver ) => {
 	const endX = startX;
 	const endY = startY - startY * -1 * 0.5;
 
-	await swipeFromTo( driver, { x: startX, y: startY }, { x: endX, y: endY } );
+	await swipeFromTo(
+		driver,
+		{ x: startX, y: startY },
+		{ x: endX, y: endY },
+		delay
+	);
 };
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
@@ -451,4 +471,5 @@ module.exports = {
 	stopDriver,
 	toggleHtmlMode,
 	toggleOrientation,
+	doubleTap,
 };
