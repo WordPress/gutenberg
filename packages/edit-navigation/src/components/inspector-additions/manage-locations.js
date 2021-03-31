@@ -13,7 +13,15 @@ import { __, sprintf } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useMenuLocations } from '../../hooks';
+/**
+ * External dependencies
+ */
+import { isEqual, unset } from 'lodash';
+import { UnsavedElementsContext, useMenuLocations } from '../../hooks';
+import UnsavedChangesIndicator from '../unsaved-changes-indicator';
+import { useContext, useEffect } from '@wordpress/element';
+
+const pluckMenu = ( arr ) => arr.map( ( { menu } ) => menu );
 
 export default function ManageLocations( {
 	onSelectMenu,
@@ -23,11 +31,32 @@ export default function ManageLocations( {
 	menus,
 	selectedMenuId,
 } ) {
+	const [ unsavedElements, setUnsavedElements ] = useContext(
+		UnsavedElementsContext
+	);
+
 	const {
 		menuLocations,
 		assignMenuToLocation,
 		toggleMenuLocationAssignment,
+		savedMenuLocations,
 	} = useMenuLocations();
+
+	const hasLocationChanged = ! isEqual(
+		...[ menuLocations, savedMenuLocations ].map( pluckMenu )
+	);
+
+	useEffect( () => {
+		if ( hasLocationChanged ) {
+			setUnsavedElements( {
+				...unsavedElements,
+				location: menuLocations,
+			} );
+		} else if ( unsavedElements.location ) {
+			unset( unsavedElements, 'location' );
+			setUnsavedElements( { ...unsavedElements } );
+		}
+	}, [ hasLocationChanged ] );
 
 	if ( ! menuLocations ) {
 		return <Spinner />;
@@ -126,9 +155,12 @@ export default function ManageLocations( {
 			<div className="edit-navigation-manage-locations__theme-location-text-main">
 				{ themeLocationCountTextMain }
 			</div>
-			<ul className="edit-navigation-manage-locations__checklist">
-				{ menusWithSelection }
-			</ul>
+
+			<UnsavedChangesIndicator hasUnsavedChanges={ hasLocationChanged }>
+				<ul className="edit-navigation-manage-locations__checklist">
+					{ menusWithSelection }
+				</ul>
+			</UnsavedChangesIndicator>
 			<Button
 				isSecondary
 				className="edit-navigation-manage-locations__open-menu-locations-modal-button"

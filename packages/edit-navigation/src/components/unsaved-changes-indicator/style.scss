@@ -1,0 +1,9 @@
+.edit-navigation-layout .dot-indicator {
+	position: relative;
+	.dot {
+		right: 10px;
+		position: absolute;
+		font-size: 30px;
+		color: var(--wp-admin-theme-color);
+	}
+}

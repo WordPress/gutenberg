@@ -7,7 +7,7 @@ import apiFetch from '@wordpress/api-fetch';
 /**
  * External dependencies
  */
-import { merge } from 'lodash';
+import { merge, cloneDeep, flow } from 'lodash';
 /**
  * Internal dependencies
  */
@@ -20,9 +20,23 @@ const locationsForMenuId = ( menuLocationsByName, id ) =>
 
 export default function useMenuLocations() {
 	const [ menuLocationsByName, setMenuLocationsByName ] = useState( null );
+	const [ savedMenuLocationsByName, setSavedMenuLocationsByName ] = useState(
+		null
+	);
+	const takeLocationsSnapshot = flow( [
+		cloneDeep,
+		setSavedMenuLocationsByName,
+	] );
 
 	const { menuId } = useSelectedMenuData();
-	const { editMenuEntityRecord, menuEntityData } = useMenuEntity( menuId );
+	const { editMenuEntityRecord, menuEntityData, savedMenu } = useMenuEntity(
+		menuId
+	);
+
+	useEffect( () => {
+		takeLocationsSnapshot( menuLocationsByName );
+	}, [ savedMenu ] );
+
 	useEffect( () => {
 		let isMounted = true;
 
@@ -34,6 +48,10 @@ export default function useMenuLocations() {
 
 			if ( isMounted ) {
 				setMenuLocationsByName( newMenuLocationsByName );
+				takeLocationsSnapshot( newMenuLocationsByName );
+				// flow( [ setMenuLocationsByName, takeLocationsSnapshot ] )(
+				// 	newMenuLocationsByName
+				// );
 			}
 		};
 
@@ -44,14 +62,12 @@ export default function useMenuLocations() {
 	const assignMenuToLocation = useCallback(
 		async ( locationName, newMenuId ) => {
 			const oldMenuId = menuLocationsByName[ locationName ].menu;
-
 			const newMenuLocationsByName = merge( menuLocationsByName, {
 				[ locationName ]: { menu: newMenuId },
 			} );
+			const activeMenuId = oldMenuId || newMenuId;
 
 			setMenuLocationsByName( newMenuLocationsByName );
-
-			const activeMenuId = oldMenuId || newMenuId;
 			editMenuEntityRecord( ...menuEntityData, {
 				locations: locationsForMenuId(
 					newMenuLocationsByName,
@@ -74,10 +90,15 @@ export default function useMenuLocations() {
 		() => Object.values( menuLocationsByName || {} ),
 		[ menuLocationsByName ]
 	);
+	const savedMenuLocations = useMemo(
+		() => Object.values( savedMenuLocationsByName || {} ),
+		[ savedMenuLocationsByName ]
+	);
 
 	return {
 		menuLocations,
 		assignMenuToLocation,
 		toggleMenuLocationAssignment,
+		savedMenuLocations,
 	};
 }

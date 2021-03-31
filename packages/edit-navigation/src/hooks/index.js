@@ -7,6 +7,7 @@ import { createContext } from '@wordpress/element';
 export const untitledMenu = __( '(untitled menu)' );
 export const MenuIdContext = createContext();
 export const IsMenuNameControlFocusedContext = createContext();
+export const UnsavedElementsContext = createContext();
 
 export { default as useMenuEntity } from './use-menu-entity';
 export { default as useNavigationEditor } from './use-navigation-editor';

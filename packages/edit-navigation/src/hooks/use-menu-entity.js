@@ -17,9 +17,15 @@ export default function useMenuEntity( menuId ) {
 			select( 'core' ).getEditedEntityRecord( ...menuEntityData ),
 		[ menuId ]
 	);
+	const savedMenu = useSelect(
+		( select ) =>
+			menuId && select( 'core' ).getEntityRecord( ...menuEntityData ),
+		[ menuId ]
+	);
 
 	return {
 		editedMenu,
+		savedMenu,
 		menuEntityData,
 		editMenuEntityRecord: editEntityRecord,
 	};
