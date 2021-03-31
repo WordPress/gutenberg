@@ -8,12 +8,12 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { Spinner } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import { MIN_ZOOM, MAX_ZOOM } from './constants';
-
 import { useImageEditingContext } from './context';
 
 export default function ImageCropper( {
@@ -53,6 +53,9 @@ export default function ImageCropper( {
 				height: editedHeight,
 			} }
 			onClick={ onClick }
+			onKeyDown={ onClick }
+			role="img"
+			aria-label={ __( 'Image editor cropping tool' ) }
 		>
 			<Cropper
 				image={ editedUrl || url }
