@@ -18,15 +18,14 @@ const EMPTY_OBJECT = {};
 const ExportedServerSideRender = withSelect( ( select ) => {
 	const coreEditorSelect = select( 'core/editor' );
 	if ( coreEditorSelect ) {
-		const currentPost = coreEditorSelect.getCurrentPost();
-		if ( currentPost ) {
+		const currentPostId = coreEditorSelect.getCurrentPostId();
+		// For templates and template parts we use a custom ID format.
+		// Since they aren't real posts, we don't want to use their ID
+		// for server-side rendering. Since they use a string based ID,
+		// we can assume real post IDs are numbers.
+		if ( currentPostId && typeof currentPostId.id === 'number' ) {
 			return {
-				// For templates and template parts we use a custom ID format.
-				// To preserve the original ID that WordPress assigns to the post
-				// we save it to `wp_id` field. We want to make sure that we
-				// always use the original ID in this case. Since we
-				// expect a post database ID here.
-				currentPostId: currentPost.wp_id || currentPost.id,
+				currentPostId,
 			};
 		}
 	}
