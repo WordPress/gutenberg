@@ -136,6 +136,11 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 															{ description }
 														</div>
 													</FlexBlock>
+													{ area === value && (
+														<FlexItem>
+															<Icon icon={ check } />
+														</FlexItem>
+													) }
 												</Flex>
 											</Button>
 										)
@@ -171,8 +176,16 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	);
 }
 
-import { footer, header, layout } from '@wordpress/icons';
+import { footer, header, layout, check } from '@wordpress/icons';
 const AREA_OPTIONS = [
+	{
+		description: __(
+			'General templates often perform a specific role like displaying post content, and are not tied to any particular area.'
+		),
+		icon: layout,
+		label: __( 'General' ),
+		value: 'uncategorized',
+	},
 	{
 		description: __(
 			'The Header template defines a page area that typically contains a title, logo, and main navigation.'
@@ -188,13 +201,5 @@ const AREA_OPTIONS = [
 		icon: footer,
 		label: __( 'Footer' ),
 		value: 'footer',
-	},
-	{
-		description: __(
-			'General templates often perform a specific role like displaying post content, and are not tied to any particular area.'
-		),
-		icon: layout,
-		label: __( 'General' ),
-		value: 'uncategorized',
 	},
 ];
