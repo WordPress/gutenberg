@@ -23,7 +23,7 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
     }
     readOnly={true}
     role="button"
-    value="Start writing or type / to choose a block"
+    value="Type / to choose a block"
   />
   <WithSelect(WithDispatch(IfCondition(Inserter)))
     __experimentalIsQuick={true}
@@ -44,7 +44,7 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
     onFocus={[MockFunction]}
     readOnly={true}
     role="button"
-    value="Start writing or type / to choose a block"
+    value="Type / to choose a block"
   />
   <WithSelect(WithDispatch(IfCondition(Inserter)))
     __experimentalIsQuick={true}
