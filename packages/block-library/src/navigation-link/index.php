@@ -233,15 +233,6 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
  * @return array
  */
 function build_variation_for_navigation_link( $entity, $kind ) {
-	$custom_variation_names = array(
-		'post_tag'    => 'tag',
-		'post_format' => 'format',
-	);
-
-	$name = array_key_exists( $entity->name, $custom_variation_names )
-		? $custom_variation_names[ $entity->name ]
-		: $entity->name;
-
 	$title       = '';
 	$description = '';
 
@@ -252,15 +243,46 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 		$description = $entity->labels->item_link_description;
 	}
 
-	return array(
-		'name'        => $name,
+	$variation = array(
+		'name'        => $entity->name,
 		'title'       => $title,
 		'description' => $description,
 		'attributes'  => array(
-			'type' => $name,
+			'type' => $entity->name,
 			'kind' => $kind,
 		),
 	);
+
+	// Tweak some value for the variations.
+	$variation_overrides = array(
+		'post_tag'    => array(
+			'name'       => 'tag',
+			'attributes' => array(
+				'type' => 'tag',
+				'kind' => $kind,
+			),
+		),
+		'post_format' => array(
+			'name'        => 'format',
+			// The item_link and item_link_description for post formats is the
+			// same as for tags, so need to be overriden.
+			'title'       => __( 'Post Format Link' ),
+			'description' => __( 'A link to a post format' ),
+			'attributes'  => array(
+				'type' => 'format',
+				'kind' => $kind,
+			),
+		),
+	);
+
+	if ( array_key_exists( $entity->name, $variation_overrides ) ) {
+		$variation = array_merge(
+			$variation,
+			$variation_overrides[ $entity->name ]
+		);
+	}
+
+	return $variation;
 }
 
 /**
