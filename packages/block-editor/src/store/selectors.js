@@ -1784,6 +1784,28 @@ export const __experimentalGetAllowedBlocks = createSelector(
 	]
 );
 
+const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
+	if ( isBoolean( allowedBlockTypes ) ) {
+		return allowedBlockTypes;
+	}
+
+	const blocksQueue = [ ...blocks ];
+	while ( blocksQueue.length > 0 ) {
+		const block = blocksQueue.shift();
+
+		const isAllowed = checkAllowList( allowedBlockTypes, block.name, true );
+		if ( ! isAllowed ) {
+			return false;
+		}
+
+		block.innerBlocks?.forEach( ( innerBlock ) => {
+			blocksQueue.push( innerBlock );
+		} );
+	}
+
+	return true;
+};
+
 export const __experimentalGetParsedPattern = createSelector(
 	( state, patternName ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
@@ -1794,19 +1816,7 @@ export const __experimentalGetParsedPattern = createSelector(
 
 		const blocks = parse( pattern.content );
 		const { allowedBlockTypes } = getSettings( state );
-		let isAllowed = isBoolean( allowedBlockTypes )
-			? allowedBlockTypes
-			: true;
-		const blocksQueue = [ ...blocks ];
-		while ( isAllowed && blocksQueue.length > 0 ) {
-			const block = blocksQueue.shift();
-			isAllowed = checkAllowList( allowedBlockTypes, block.name, true );
-			if ( isAllowed ) {
-				block.innerBlocks?.forEach( ( innerBlock ) => {
-					blocksQueue.push( innerBlock );
-				} );
-			}
-		}
+		const isAllowed = checkAllowListRecursive( blocks, allowedBlockTypes );
 
 		return {
 			...pattern,
