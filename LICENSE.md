@@ -9,7 +9,7 @@ and released under both of the following licenses:
 
 the GNU General Public License as published by the Free Software Foundation; 
 either version 2 of the License or (at your option) any later version (the “GPL”)
-and the Mozilla Public License Version 2.0 (the “MPL”). 
+and the Mozilla Public License, Version 2.0 (the “MPL”). 
 
 **Project License (as of April 15, 2021)**
 
@@ -22,7 +22,7 @@ later version (the “GPL”).
 ### Dual License 
 
 **We are currently in the process of changing Gutenberg’s software license from
-GPLv2 (or later) to a dual license: GPLv2 (or later) and MPLv2.**
+GPL (or later) to a dual license: GPL (or later) and MPL.**
 
 **This process involves two independent steps (1) obtaining permission for dual
 licensing from contributors of already contributed Gutenberg code and (2)
@@ -74,12 +74,12 @@ and
 
 ---
 
-## Referenced Licenses
+## Full Text of Referenced Licenses
 
 1. [GNU General Public License, Version 2](#gnu-general_public_license-version-2)
-2. [Mozilla Public License Version 2.0](#mozilla-public-license-version-20)
+2. [Mozilla Public License, Version 2.0](#mozilla-public-license-version-20)
 
-## GNU GENERAL PUBLIC LICENSE, VERSION 2
+## GNU General Public License, Version 2
 
 ### GNU GENERAL PUBLIC LICENSE
 
@@ -444,7 +444,7 @@ License](http://www.gnu.org/licenses/lgpl.html) instead of this
 License.
 
 ---
-## Mozilla Public License Version 2.0
+## Mozilla Public License, Version 2.0
 
 ### 1. Definitions
 
