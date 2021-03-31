@@ -32,11 +32,9 @@ function gutenberg_register_duotone_support( $block_type ) {
 /**
  * Render out the duotone stylesheet and SVG.
  *
- * @param  WP_Block_Type $block_type       Block type.
- * @param  array         $block_attributes Block attributes.
- * @param  string        $block_content    Rendered block content.
- *
- * @return string filtered block content.
+ * @param  string $block_content Rendered block content.
+ * @param  array  $block         Block object.
+ * @return string                Filtered block content.
  */
 function gutenberg_render_duotone_support( $block_content, $block ) {
 	$block_type = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );

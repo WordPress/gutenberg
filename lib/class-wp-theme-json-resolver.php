@@ -273,14 +273,14 @@ class WP_Theme_JSON_Resolver {
 		}
 
 		$default_duotone_i18n = array(
-			'dark-grayscale'     => __( 'Dark grayscale', 'gutenberg' ),
-			'grayscale'          => __( 'Grayscale', 'gutenberg' ),
-			'purple-yellow'      => __( 'Purple and yellow', 'gutenberg' ),
-			'blue-red'           => __( 'Blue and red', 'gutenberg' ),
-			'midnight'           => __( 'Midnight', 'gutenberg' ),
-			'magenta-yellow'     => __( 'Magenta and yellow', 'gutenberg' ),
-			'purple-green'       => __( 'Purple and green', 'gutenberg' ),
-			'blue-orange'        => __( 'Blue and orange', 'gutenberg' ),
+			'dark-grayscale' => __( 'Dark grayscale', 'gutenberg' ),
+			'grayscale'      => __( 'Grayscale', 'gutenberg' ),
+			'purple-yellow'  => __( 'Purple and yellow', 'gutenberg' ),
+			'blue-red'       => __( 'Blue and red', 'gutenberg' ),
+			'midnight'       => __( 'Midnight', 'gutenberg' ),
+			'magenta-yellow' => __( 'Magenta and yellow', 'gutenberg' ),
+			'purple-green'   => __( 'Purple and green', 'gutenberg' ),
+			'blue-orange'    => __( 'Blue and orange', 'gutenberg' ),
 		);
 		if ( ! empty( $config['global']['settings']['color']['duotone'] ) ) {
 			foreach ( $config['global']['settings']['color']['duotone'] as &$duotone ) {
