@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import isHTMLInputElement from './is-html-input-element';
+
+/**
  * Check whether the given element is a text field, where text field is defined
  * by the ability to select within the input, or that it is contenteditable.
  *
@@ -26,11 +31,9 @@ export default function isTextField( element ) {
 		'number',
 	];
 	return (
-		( element.nodeName === 'INPUT' &&
-			/** @type {HTMLInputElement} */ ( element ).type &&
-			! nonTextInputs.includes(
-				/** @type {HTMLInputElement} */ ( element ).type
-			) ) ||
+		( isHTMLInputElement( element ) &&
+			element.type &&
+			! nonTextInputs.includes( element.type ) ) ||
 		nodeName === 'TEXTAREA' ||
 		contentEditable === 'true'
 	);
