@@ -73,6 +73,7 @@ const {
 	__experimentalGetParsedReusableBlock,
 	__experimentalGetAllowedPatterns,
 	__experimentalGetScopedBlockPatterns,
+	wasBlockJustInserted,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3448,6 +3449,56 @@ describe( 'selectors', () => {
 					scope: { block: [ 'test/block-a' ] },
 				} )
 			);
+		} );
+	} );
+
+	describe( 'wasBlockJustInserted', () => {
+		it( 'should return true if the client id passed to wasBlockJustInserted is found within the state', () => {
+			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+			const source = 'inserter_menu';
+
+			const state = {
+				lastBlockInserted: {
+					clientId: expectedClientId,
+					source,
+				},
+			};
+
+			expect(
+				wasBlockJustInserted( state, expectedClientId, source )
+			).toBe( true );
+		} );
+
+		it( 'should return false if the client id passed to wasBlockJustInserted is not found within the state', () => {
+			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+			const unexpectedClientId = '62bfsed4-d5e9-43ba-b7f9-c77cf565756s';
+			const source = 'inserter_menu';
+
+			const state = {
+				lastBlockInserted: {
+					clientId: unexpectedClientId,
+					source,
+				},
+			};
+
+			expect(
+				wasBlockJustInserted( state, expectedClientId, source )
+			).toBe( false );
+		} );
+
+		it( 'should return false if the source passed to wasBlockJustInserted is not found within the state', () => {
+			const clientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+			const expectedSource = 'inserter_menu';
+
+			const state = {
+				lastBlockInserted: {
+					clientId,
+				},
+			};
+
+			expect(
+				wasBlockJustInserted( state, clientId, expectedSource )
+			).toBe( false );
 		} );
 	} );
 } );

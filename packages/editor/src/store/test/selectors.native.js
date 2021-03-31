@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { isPostTitleSelected, wasBlockJustInserted } from '../selectors';
+import { isPostTitleSelected } from '../selectors';
 
 describe( 'selectors native', () => {
 	describe( 'isPostTitleSelected', () => {
@@ -23,35 +23,6 @@ describe( 'selectors native', () => {
 			};
 
 			expect( isPostTitleSelected( state ) ).toBe( false );
-		} );
-	} );
-
-	describe( 'wasBlockJustInserted', () => {
-		it( 'should return true if the client id passed to wasBlockJustInserted is found within the state', () => {
-			const expectedClientId = 1;
-			const state = {
-				lastBlockInserted: {
-					clientId: expectedClientId,
-				},
-			};
-
-			expect( wasBlockJustInserted( state, expectedClientId ) ).toBe(
-				true
-			);
-		} );
-
-		it( 'should return false if the client id passed to wasBlockJustInserted is not found within the state', () => {
-			const expectedClientId = 1;
-			const unexpectedClientId = 0;
-			const state = {
-				lastBlockInserted: {
-					clientId: unexpectedClientId,
-				},
-			};
-
-			expect( wasBlockJustInserted( state, expectedClientId ) ).toBe(
-				false
-			);
 		} );
 	} );
 } );

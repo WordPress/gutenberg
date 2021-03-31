@@ -538,6 +538,7 @@ export function* moveBlockToPosition(
  * @param {?number} index            Index at which block should be inserted.
  * @param {?string} rootClientId     Optional root client ID of block list on which to insert.
  * @param {?boolean} updateSelection If true block selection will be updated. If false, block selection will not change. Defaults to true.
+ * @param {?Object} meta             Optional Meta values to be passed to the action object.
  *
  * @return {Object} Action object.
  */
@@ -545,9 +546,17 @@ export function insertBlock(
 	block,
 	index,
 	rootClientId,
-	updateSelection = true
+	updateSelection = true,
+	meta
 ) {
-	return insertBlocks( [ block ], index, rootClientId, updateSelection );
+	return insertBlocks(
+		[ block ],
+		index,
+		rootClientId,
+		updateSelection,
+		0,
+		meta
+	);
 }
 
 /**
