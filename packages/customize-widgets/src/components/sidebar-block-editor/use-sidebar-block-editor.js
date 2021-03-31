@@ -23,17 +23,21 @@ function blockToWidget( block, existingWidget = null ) {
 	let widget;
 
 	if ( block.name === 'core/legacy-widget' ) {
-		const isReferenceWidget = !! block.attributes.referenceWidgetName;
-		if ( isReferenceWidget ) {
+		if ( block.attributes.id ) {
+			// Widget that does not extend WP_Widget.
 			widget = {
-				id: block.attributes.referenceWidgetName,
-				instance: block.attributes.instance,
+				id: block.attributes.id,
 			};
 		} else {
+			// Widget that extends WP_Widget.
 			widget = {
-				widgetClass: block.attributes.widgetClass,
 				idBase: block.attributes.idBase,
-				instance: block.attributes.instance,
+				instance: {
+					encoded_serialized_instance:
+						block.attributes.instance.encoded,
+					instance_hash_key: block.attributes.instance.hash,
+					raw_instance: block.attributes.instance.raw,
+				},
 			};
 		}
 	} else {
@@ -44,8 +48,7 @@ function blockToWidget( block, existingWidget = null ) {
 			idBase: 'block',
 			widgetClass: 'WP_Widget_Block',
 			instance: {
-				...instance,
-				__unstable_instance: instance,
+				raw_instance: instance,
 			},
 		};
 	}
@@ -56,36 +59,41 @@ function blockToWidget( block, existingWidget = null ) {
 	};
 }
 
-function widgetToBlock( widget ) {
+function widgetToBlock( {
+	id,
+	idBase,
+	number,
+	instance: {
+		encoded_serialized_instance: encoded,
+		instance_hash_key: hash,
+		raw_instance: raw,
+	},
+} ) {
 	let block;
 
-	if ( widget.idBase === 'block' ) {
-		const parsedBlocks = parse(
-			widget.instance.__unstable_instance.content
-		);
+	if ( idBase === 'block' ) {
+		const parsedBlocks = parse( raw.content );
 		block = parsedBlocks.length
 			? parsedBlocks[ 0 ]
 			: createBlock( 'core/paragraph', {} );
+	} else if ( number ) {
+		// Widget that extends WP_Widget.
+		block = createBlock( 'core/legacy-widget', {
+			idBase,
+			instance: {
+				encoded,
+				hash,
+				raw,
+			},
+		} );
 	} else {
-		const attributes = {
-			name: widget.name,
-			form: widget.form,
-			instance: widget.instance,
-			idBase: widget.idBase,
-			number: widget.number,
-		};
-
-		const isReferenceWidget = ! widget.widgetClass;
-		if ( isReferenceWidget ) {
-			attributes.referenceWidgetName = widget.id;
-		} else {
-			attributes.widgetClass = widget.widgetClass;
-		}
-
-		block = createBlock( 'core/legacy-widget', attributes, [] );
+		// Widget that does not extend WP_Widget.
+		block = createBlock( 'core/legacy-widget', {
+			id,
+		} );
 	}
 
-	return addWidgetIdToBlock( block, widget.id );
+	return addWidgetIdToBlock( block, id );
 }
 
 function initState( sidebar ) {

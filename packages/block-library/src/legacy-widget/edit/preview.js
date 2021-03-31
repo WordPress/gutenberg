@@ -34,7 +34,8 @@ export default function PreviewIframe( { idBase, instance, isVisible } ) {
 			<iframe
 				ref={ ref }
 				className="wp-block-legacy-widget__edit-preview"
-				src={ addQueryArgs( '', {
+				src={ addQueryArgs( 'themes.php', {
+					page: 'gutenberg-widgets',
 					'legacy-widget-preview': {
 						idBase,
 						instance,
