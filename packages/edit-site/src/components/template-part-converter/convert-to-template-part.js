@@ -138,7 +138,9 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 													</FlexBlock>
 													{ area === value && (
 														<FlexItem>
-															<Icon icon={ check } />
+															<Icon
+																icon={ check }
+															/>
 														</FlexItem>
 													) }
 												</Flex>
