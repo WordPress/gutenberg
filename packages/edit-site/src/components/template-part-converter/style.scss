@@ -34,8 +34,14 @@
 			border: none;
 		}
 
+		&:not(:hover),
 		&:disabled {
 			opacity: 1;
+			color: $gray-900;
+
+			.components-flex__block div {
+				color: $gray-600;
+			}
 		}
 
 		.components-flex__block {
@@ -47,15 +53,7 @@
 
 			div {
 				padding-top: $grid-unit-05;
-
 				font-size: $helptext-font-size;
-			}
-		}
-
-		&:not(:hover),
-		&:disabled {
-			.components-flex__block div {
-				color: $gray-600;
 			}
 		}
 	}
