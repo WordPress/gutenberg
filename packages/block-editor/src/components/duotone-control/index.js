@@ -1,20 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { ToolbarButton } from '@wordpress/components';
+import { ToolbarButton, DuotoneSwatch } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { swatch } from '@wordpress/icons';
 import { DOWN } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import DuotonePickerPopover from './duotone-picker-popover';
-import Swatch from './duotone-swatch';
-import { getGradientFromValues } from './utils';
 
-function DuotoneControl( { value, onChange, duotonePalette, colorPalette } ) {
+function DuotoneControl( { colorPalette, duotonePalette, value, onChange } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	const onToggle = () => {
 		setIsOpen( ( prev ) => ! prev );
@@ -35,18 +32,7 @@ function DuotoneControl( { value, onChange, duotonePalette, colorPalette } ) {
 				aria-expanded={ isOpen }
 				onKeyDown={ openOnArrowDown }
 				label={ __( 'Apply duotone filter' ) }
-				icon={
-					value ? (
-						<Swatch
-							fill={ getGradientFromValues(
-								value.values,
-								'135deg'
-							) }
-						/>
-					) : (
-						swatch
-					)
-				}
+				icon={ <DuotoneSwatch values={ value?.values } /> }
 			/>
 			{ isOpen && (
 				<DuotonePickerPopover

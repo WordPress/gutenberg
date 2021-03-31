@@ -1,25 +1,3 @@
-.block-editor-duotone-control__swatch {
-	width: 18px;
-	height: 18px;
-	border-radius: 50%;
-	color: transparent;
-	background: transparent;
-
-	// Regular border doesn't seem to work in the toolbar button, but pseudo-selector border does.
-	&::after {
-		content: "";
-		display: block;
-		width: 100%;
-		height: 100%;
-		border: $border-width solid rgba(0, 0, 0, 0.2);
-		border-radius: 50%;
-	}
-}
-
-.components-button.has-icon.has-text .block-editor-duotone-control__swatch {
-	margin-right: $grid-unit;
-}
-
 .block-editor-duotone-control__popover {
 	.components-popover__content {
 		border: $border-width solid $gray-900;
@@ -34,9 +12,7 @@
 		padding: $grid-unit-15 $grid-unit-15 0 $grid-unit-15;
 	}
 
-	.components-menu-group__label,
-	.block-editor-duotone-control__custom-colors,
-	.block-editor-duotone-control__color-button {
+	.components-menu-group__label {
 		width: 100%;
 	}
 }

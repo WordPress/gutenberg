@@ -1,11 +1,8 @@
 /**
- * WordPress dependencies
- */
-import { __experimentalCustomGradientBar as CustomGradientBar } from '@wordpress/components';
-
-/**
  * Internal dependencies
  */
+import CustomGradientBar from '../custom-gradient-bar';
+
 import {
 	getColorStopsFromValues,
 	getGradientFromValues,
@@ -24,20 +21,18 @@ export default function CustomDuotoneBar( { value, onChange } ) {
 	const background = getGradientFromValues( values );
 	const controlPoints = getColorStopsFromValues( values );
 	return (
-		<div className="components-custom-duotone-picker">
-			<CustomGradientBar
-				disableInserter
-				disableAlpha
-				background={ background }
-				hasGradient={ hasGradient }
-				value={ controlPoints }
-				onChange={ ( newColorStops ) => {
-					const newValue = {
-						values: getValuesFromColorStops( newColorStops ),
-					};
-					onChange( newValue );
-				} }
-			/>
-		</div>
+		<CustomGradientBar
+			disableInserter
+			disableAlpha
+			background={ background }
+			hasGradient={ hasGradient }
+			value={ controlPoints }
+			onChange={ ( newColorStops ) => {
+				const newValue = {
+					values: getValuesFromColorStops( newColorStops ),
+				};
+				onChange( newValue );
+			} }
+		/>
 	);
 }
