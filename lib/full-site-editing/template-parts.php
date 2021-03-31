@@ -157,7 +157,7 @@ function set_unique_slug_on_create_template_part( $post_id ) {
 
 	$terms = get_the_terms( $post_id, 'wp_theme' );
 	if ( ! $terms || ! count( $terms ) ) {
-		wp_set_post_terms( $post_id, wp_get_theme()->get_stylesheet(), 'wp_theme' );
+		wp_set_post_terms( $post_id, gutenberg_get_theme_stylesheet(), 'wp_theme' );
 	}
 }
 add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template_part' );

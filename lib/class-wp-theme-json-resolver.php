@@ -343,7 +343,7 @@ class WP_Theme_JSON_Resolver {
 	private static function get_user_data_from_custom_post_type( $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
-		$post_name_filter = 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() );
+		$post_name_filter = 'wp-global-styles-' . urlencode( gutenberg_get_theme_stylesheet() );
 		$recent_posts     = wp_get_recent_posts(
 			array(
 				'numberposts' => 1,
