@@ -146,7 +146,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 
 	// Find all potential templates 'wp_template' post matching the hierarchy.
 	$query     = array(
-		'theme'    => wp_get_theme()->get_stylesheet(),
+		'theme'    => gutenberg_get_theme_stylesheet(),
 		'slug__in' => $slugs,
 	);
 	$templates = gutenberg_get_block_templates( $query );
