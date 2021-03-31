@@ -3,7 +3,7 @@
  */
 import { useDispatch } from '@wordpress/data';
 import { useContext } from '@wordpress/element';
-import { Button } from '@wordpress/components';
+import { Button, Tooltip } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -18,6 +18,7 @@ import { UnsavedElementsContext } from '../../hooks';
 import { isEmpty } from 'lodash';
 
 import { store as editNavigationStore } from '../../store';
+
 const saveText = __( 'Save' );
 const withUnsavedIndicator = (
 	<>
@@ -31,11 +32,9 @@ export default function SaveButton( { navigationPost } ) {
 	const [ unsavedElements ] = useContext( UnsavedElementsContext );
 	const isDisabled = isEmpty( unsavedElements );
 	const buttonText = isDisabled ? saveText : withUnsavedIndicator;
-
-	return (
+	const button = (
 		<Button
 			className="edit-navigation-toolbar__save-button"
-			isPrimary={ ! isDisabled }
 			onClick={ () => {
 				saveNavigationPost( navigationPost );
 			} }
@@ -43,5 +42,11 @@ export default function SaveButton( { navigationPost } ) {
 		>
 			{ buttonText }
 		</Button>
+	);
+
+	return isDisabled ? (
+		<Tooltip text={ __( 'No changes to save' ) }>{ button }</Tooltip>
+	) : (
+		button
 	);
 }
