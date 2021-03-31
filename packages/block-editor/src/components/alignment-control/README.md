@@ -1,6 +1,6 @@
 ## Alignment Control
 
-The `AlignmentControl` component renders a dropdown mmmenu that displays alignment options for the selected block.
+The `AlignmentControl` component renders a dropdown menu that displays alignment options for the selected block.
 
 This component is mostly used for blocks that display text, such as Heading, Paragraph, Post Author, Post Comments, Verse, Quote, Post Title, etc... And the available alignment options are `left`, `center` or `right` alignment.
 
