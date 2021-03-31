@@ -1,0 +1,40 @@
+#customize-sidebar-outer-content {
+	// To override the default style of width: 100%,
+	// so that the inspector won't be cropped.
+	width: auto;
+	min-width: 100%;
+}
+
+#customize-outer-theme-controls #sub-accordion-section-widgets-inserter {
+	padding: 0;
+
+	.customize-section-description-container {
+		display: none;
+	}
+}
+
+.customize-widgets-layout__inserter-panel {
+	background: $white;
+}
+
+.customize-widgets-layout__inserter-panel-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: $grid-unit-20;
+	// Match the "wp-full-overlay-header" height in core, plus the 1px border.
+	height: 46px;
+	box-sizing: border-box;
+	border-bottom: 1px solid $gray-300;
+
+	.customize-widgets-layout__inserter-panel-header-title {
+		margin: 0;
+	}
+}
+
+.block-editor-inserter__quick-inserter {
+	.block-editor-inserter__panel-content {
+		// To fix quick inserter doesn't have background.
+		background: $white;
+	}
+}

@@ -106,7 +106,7 @@ export function BlockTypesTab( {
 					);
 				} ) }
 
-				{ ! uncategorizedItems.length && (
+				{ uncategorizedItems.length > 0 && (
 					<InserterPanel
 						className="block-editor-inserter__uncategorized-blocks-panel"
 						title={ __( 'Uncategorized' ) }

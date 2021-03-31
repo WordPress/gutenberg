@@ -57,7 +57,7 @@ import { store as coreStore } from '@wordpress/core-data';
 import styles from './styles.scss';
 import { getUpdatedLinkTargetSettings } from './utils';
 
-import { LINK_DESTINATION_CUSTOM, DEFAULT_SIZE_SLUG } from './constants';
+import { LINK_DESTINATION_CUSTOM } from './constants';
 
 const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
@@ -302,7 +302,10 @@ export class ImageEdit extends Component {
 	}
 
 	onSelectMediaUploadOption( media ) {
-		const { id, url } = this.props.attributes;
+		const {
+			attributes: { id, url },
+			imageDefaultSize,
+		} = this.props;
 
 		const mediaAttributes = {
 			id: media.id,
@@ -316,7 +319,7 @@ export class ImageEdit extends Component {
 			additionalAttributes = {
 				width: undefined,
 				height: undefined,
-				sizeSlug: DEFAULT_SIZE_SLUG,
+				sizeSlug: imageDefaultSize,
 			};
 		} else {
 			// Keep the same url when selecting the same file, so "Image Size" option is not changed.
@@ -404,13 +407,14 @@ export class ImageEdit extends Component {
 			isSelected,
 			image,
 			clientId,
-			wasBlockJustInserted,
+			imageDefaultSize,
+            wasBlockJustInserted,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
 		const sizeOptionsValid = find( this.sizeOptions, [
 			'value',
-			DEFAULT_SIZE_SLUG,
+			imageDefaultSize,
 		] );
 
 		const getToolbarEditButton = ( open ) => (
@@ -440,7 +444,7 @@ export class ImageEdit extends Component {
 						<CycleSelectControl
 							icon={ expand }
 							label={ __( 'Size' ) }
-							value={ sizeSlug || DEFAULT_SIZE_SLUG }
+							value={ sizeSlug || imageDefaultSize }
 							onChangeValue={ this.onSizeChangeValue }
 							options={ this.sizeOptions }
 						/>
@@ -575,7 +579,7 @@ export default compose( [
 			isSelected,
 			clientId,
 		} = props;
-		const { imageSizes } = getSettings();
+		const { imageSizes, imageDefaultSize } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
 
 		const shouldGetMedia =
@@ -590,6 +594,7 @@ export default compose( [
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
+			imageDefaultSize,
 			wasBlockJustInserted: wasBlockJustInserted(
 				clientId,
 				'inserter_menu'

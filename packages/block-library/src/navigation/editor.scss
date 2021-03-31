@@ -6,6 +6,7 @@
 // These need extra specificity.
 .editor-styles-wrapper .wp-block-navigation {
 	ul {
+		margin-top: 0;
 		margin-bottom: 0;
 		margin-left: 0;
 		padding-left: 0;
@@ -21,6 +22,10 @@
 		// It matches a rule in style.scss exactly, but needs higher specificity due to the unsetting of inherited styles above.
 		&.wp-block-navigation-link {
 			margin: 0 0.5em 0 0;
+		}
+
+		&.has-child .block-editor-block-list__block.wp-block-navigation-link {
+			margin: 0;
 		}
 	}
 }
@@ -50,16 +55,23 @@
 	}
 }
 
-// Styles for submenu flyout
+// Styles for submenu flyout.
 .has-child {
 	&.is-selected,
-	&.has-child-selected,
-	// Show the submenu list when is dragging and drag enter the list item.
-	.is-dragging-components-draggable &.is-dragging-within {
-		> .wp-block-navigation__container {
+	&.has-child-selected {
+		> .wp-block-navigation-link__container {
 			opacity: 1;
 			visibility: visible;
 		}
+	}
+}
+
+// Show a submenu when generally dragging (is-dragging-components-draggable) if that
+// submenu has children (has-child) and is being dragged within (is-dragging-within).
+.is-dragging-components-draggable .has-child.is-dragging-within {
+	> .wp-block-navigation-link__container {
+		opacity: 1;
+		visibility: visible;
 	}
 }
 
@@ -236,6 +248,12 @@ $color-control-label-height: 20px;
 	display: none;
 	position: relative;
 	z-index: 1;
+
+	// If an ancestor has a text-decoration property applied, it is inherited regardless of
+	// the specificity of a child element. Only pulling the child out of the flow fixes it.
+	// See also https://www.w3.org/TR/CSS21/text.html#propdef-text-decoration.
+	float: left;
+	width: 100%;
 
 	// Show when selected.
 	.is-selected & {

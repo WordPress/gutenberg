@@ -1,6 +1,9 @@
 .edit-widgets-block-editor {
 	position: relative;
 
+	// This is the default font that is going to be used in the content of the areas (blocks).
+	font-family: $default-font;
+
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
 	// This is copied from edit-post/src/components/style.scss but without the padding.
