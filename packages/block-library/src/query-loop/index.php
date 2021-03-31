@@ -47,7 +47,8 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
 
 		$content = '';
-		while ( $query->have_posts() ) : $query->the_post();
+		while ( $query->have_posts() ) :
+			$query->the_post();
 			$block_content = (
 				new WP_Block(
 					$block->parsed_block,
