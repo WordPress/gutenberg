@@ -7,7 +7,7 @@ import {
 	page as pageIcon,
 	postTitle as postIcon,
 	tag as tagIcon,
-	blockDefault as formatIcon,
+	customPostType as formatIcon,
 } from '@wordpress/icons';
 
 // FALLBACK: this is only used when the server does not understand the variations property in the
