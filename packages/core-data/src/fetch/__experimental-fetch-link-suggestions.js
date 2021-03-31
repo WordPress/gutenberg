@@ -19,7 +19,7 @@ import { __ } from '@wordpress/i18n';
  * @property {WPLinkSearchType}    [type]                 Filters by search type.
  * @property {string}              [subtype]              Slug of the post-type or taxonomy.
  * @property {number}              [page]                 Which page of results to return.
- * @property {number}              [perPageArg]           Search results per page.
+ * @property {number}              [perPage]              Search results per page.
  */
 
 /**
@@ -32,44 +32,44 @@ import { __ } from '@wordpress/i18n';
  */
 
 /**
- * Fetches link suggestions from the API.
+ * @typedef WPEditorSettings
  *
- * @async
- * @typedef {( searchText: string, searchOptions: WPLinkSearchOptions ) => Promise< WPLinkSearchResult[] >} WPFetchLinkSuggestions
+ * @property {boolean} [ disablePostFormats ] Disables post formats, when true.
  */
 
 /**
- * Returns a function that when invoked, fetches link suggestions from the API.
+ * Fetches link suggestions from the API.
  *
- * @param {Object}   [editorSettings]
- * @param {boolean}  [editorSettings.disablePostFormats]
+ * @async
+ * @param {string}              search
+ * @param {WPLinkSearchOptions} [searchOptions]
+ * @param {WPEditorSettings}    [settings]
  *
  * @example
  * ```js
- * import { __experimentalFetchLinkSuggestions as createFetchLinkSuggestions } from '@wordpress/core-data';
+ * import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
  *
  * //...
  *
  * export function initialize( id, settings ) {
  *
- * settings.__experimentalFetchLinkSuggestions = createFetchLinkSuggestions(
-		settings
-	);
+ * settings.__experimentalFetchLinkSuggestions = (
+ *     search,
+ *     searchOptions
+ * ) => fetchLinkSuggestions( search, searchOptions, settings );
  * ```
- * @return { WPFetchLinkSuggestions } Function that fetches link suggestions
- *
+ * @return {Promise< WPLinkSearchResult[] >} List of search suggestions
  */
-const createFetchLinkSuggestions = ( {
-	disablePostFormats = false,
-} = {} ) => async ( search, searchOptions ) => {
+const fetchLinkSuggestions = async ( search, searchOptions, settings ) => {
 	const {
 		isInitialSuggestions = false,
 		type = undefined,
 		subtype = undefined,
 		page = undefined,
-		perPageArg = undefined,
+		perPage = isInitialSuggestions ? 3 : 20,
 	} = searchOptions;
-	const perPage = perPageArg || isInitialSuggestions ? 3 : 20;
+
+	const { disablePostFormats = false } = settings;
 
 	const queries = [];
 
@@ -148,4 +148,4 @@ const createFetchLinkSuggestions = ( {
 	} );
 };
 
-export default createFetchLinkSuggestions;
+export default fetchLinkSuggestions;

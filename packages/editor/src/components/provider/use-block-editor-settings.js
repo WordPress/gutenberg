@@ -10,7 +10,7 @@ import { Platform, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
-	__experimentalFetchLinkSuggestions as createFetchLinkSuggestions,
+	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
 } from '@wordpress/core-data';
 
 /**
@@ -105,9 +105,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			] ),
 			mediaUpload: hasUploadPermissions ? mediaUpload : undefined,
 			__experimentalReusableBlocks: reusableBlocks,
-			__experimentalFetchLinkSuggestions: createFetchLinkSuggestions(
-				settings
-			),
+			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
+				fetchLinkSuggestions( search, searchOptions, settings ),
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			__experimentalShouldInsertAtTheTop: isTitleSelected,
