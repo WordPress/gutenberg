@@ -42,8 +42,9 @@ export const getLocaleData = i18n.getLocaleData.bind( i18n );
  *
  * @see http://messageformat.github.io/Jed/
  *
- * @param {LocaleData} [data]   Locale data configuration.
- * @param {string}     [domain] Domain for which configuration applies.
+ * @param {LocaleData} [data]        Locale data configuration.
+ * @param {string}     [domain]      Domain for which configuration applies.
+ * @param {boolean}    [shouldMerge] Whether the locale data should be merged with or replace the existing locale data for the text domain.
  */
 export const setLocaleData = i18n.setLocaleData.bind( i18n );
 

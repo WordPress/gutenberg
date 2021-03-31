@@ -37,7 +37,7 @@ const I18N_HOOK_REGEXP = /^i18n\.(n?gettext|has_translation)(_|$)/;
  * @see http://messageformat.github.io/Jed/
  */
 /**
- * @typedef {(data?: LocaleData, domain?: string) => void} SetLocaleData
+ * @typedef {(data?: LocaleData, domain?: string, shouldMerge?: boolean) => void} SetLocaleData
  *
  * Merges locale data into the Tannin instance by domain. Accepts data in a
  * Jed-formatted JSON object shape.
@@ -158,9 +158,19 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 
 	/**
 	 * @param {LocaleData} [data]
-	 * @param {string} [domain]
+	 * @param {string}     [domain]
+	 * @param {boolean}    [shouldMerge]
 	 */
-	const doSetLocaleData = ( data, domain = 'default' ) => {
+	const doSetLocaleData = (
+		data,
+		domain = 'default',
+		shouldMerge = true
+	) => {
+		if ( ! shouldMerge ) {
+			// Remove the existing locale data for the specified domain.
+			delete tannin.data[ domain ];
+		}
+
 		tannin.data[ domain ] = {
 			...DEFAULT_LOCALE_DATA,
 			...tannin.data[ domain ],
@@ -176,8 +186,8 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	};
 
 	/** @type {SetLocaleData} */
-	const setLocaleData = ( data, domain ) => {
-		doSetLocaleData( data, domain );
+	const setLocaleData = ( data, domain, shouldMerge ) => {
+		doSetLocaleData( data, domain, shouldMerge );
 		notifyListeners();
 	};
 
@@ -415,7 +425,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 	};
 
 	if ( initialData ) {
-		setLocaleData( initialData, initialDomain );
+		setLocaleData( initialData, initialDomain, true );
 	}
 
 	if ( hooks ) {

@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add new argument to `setLocaleData` to specify whether the locale data should be merged with or replace the existing data for the text domain.
+
 ## 3.19.0 (2021-03-17)
 
 ### Enhancements

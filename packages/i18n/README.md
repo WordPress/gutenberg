@@ -101,6 +101,7 @@ _Parameters_
 
 -   _data_ `[LocaleData]`: Locale data configuration.
 -   _domain_ `[string]`: Domain for which configuration applies.
+-   _shouldMerge_ `[boolean]`: Whether the locale data should be merged with or replace the existing locale data for the text domain.
 
 <a name="sprintf" href="#sprintf">#</a> **sprintf**
 
