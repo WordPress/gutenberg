@@ -182,18 +182,18 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 
 Note that `BlockControls` is only visible when the block is currently selected and in visual editing mode. `BlockControls` are not shown when editing a block in HTML editing mode.
 
-## Sidebar Inspector
+## Settings Sidebar
 
 ![Screenshot of the inspector panel focused on the settings for a Paragraph block](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/inspector.png)
 
-The Sidebar Inspector is used to display less-often-used settings or settings that require more screen space. The Settings Sidebar should be used for **block-level settings only**.
+The Settings Sidebar is used to display less-often-used settings or settings that require more screen space. The Settings Sidebar should be used for **block-level settings only**.
 
 If you have settings that affects only selected content inside a block (example: the "bold" setting for selected text inside a paragraph): **do not place it inside the Settings Sidebar**. The Settings Sidebar is displayed even when editing a block in HTML mode, so it should only contain block-level settings.
 
 The Block Tab is shown in place of the Document Tab when a block is selected.
 
 Similar to rendering a toolbar, if you include an `InspectorControls` element in the return value of your block type's `edit` function, those controls will be shown in the Settings Sidebar region.
-The following example adds 2 color pallets to the Sidebar, one for the text color and one for the background color.
+The following example adds 2 color palettes to the sidebar, one for the text color and one for the background color.
 
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
