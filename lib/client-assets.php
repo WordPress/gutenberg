@@ -370,7 +370,7 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-reset-editor-styles',
 		gutenberg_url( 'build/block-library/reset.css' ),
-		array(),
+		array( 'common', 'forms' ), // Make sure the reset is loaded after the default WP Adminn styles.
 		$version
 	);
 	$styles->add_data( 'wp-reset-editor-styles', 'rtl', 'replace' );
