@@ -155,7 +155,7 @@ function _inject_theme_attribute_in_content( $template_content ) {
 			'core/template-part' === $block['blockName'] &&
 			! isset( $block['attrs']['theme'] )
 		) {
-			$template_blocks[ $key ]['attrs']['theme'] = wp_get_theme()->get_stylesheet();
+			$template_blocks[ $key ]['attrs']['theme'] = gutenberg_get_theme_stylesheet();
 			$has_updated_content                       = true;
 		}
 	}
@@ -182,7 +182,7 @@ function _inject_theme_attribute_in_content( $template_content ) {
 function _gutenberg_build_template_result_from_file( $template_file, $template_type ) {
 	$default_template_types = gutenberg_get_default_template_types();
 	$template_content       = file_get_contents( $template_file['path'] );
-	$theme                  = wp_get_theme()->get_stylesheet();
+	$theme                  = gutenberg_get_theme_stylesheet();
 
 	$template            = new WP_Block_Template();
 	$template->id        = $theme . '//' . $template_file['slug'];
@@ -271,7 +271,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 			array(
 				'taxonomy' => 'wp_theme',
 				'field'    => 'name',
-				'terms'    => wp_get_theme()->get_stylesheet(),
+				'terms'    => gutenberg_get_theme_stylesheet(),
 			),
 		),
 	);
@@ -310,7 +310,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		$template_files = _gutenberg_get_template_files( $template_type );
 		foreach ( $template_files as $template_file ) {
 			$is_not_custom   = false === array_search(
-				wp_get_theme()->get_stylesheet() . '//' . $template_file['slug'],
+				gutenberg_get_theme_stylesheet() . '//' . $template_file['slug'],
 				array_column( $query_result, 'id' ),
 				true
 			);
@@ -367,7 +367,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		}
 	}
 
-	if ( wp_get_theme()->get_stylesheet() === $theme ) {
+	if ( gutenberg_get_theme_stylesheet() === $theme ) {
 		$template_file = _gutenberg_get_template_file( $template_type, $slug );
 		if ( null !== $template_file ) {
 			return _gutenberg_build_template_result_from_file( $template_file, $template_type );
@@ -402,7 +402,7 @@ function gutenberg_filter_wp_template_unique_post_slug( $override_slug, $slug, $
 	// term does not work in the case of new entities since is too early in
 	// the process to have been saved to the entity.  So for now we use the
 	// currently activated theme for creation.
-	$theme = wp_get_theme()->get_stylesheet();
+	$theme = gutenberg_get_theme_stylesheet();
 	$terms = get_the_terms( $post_ID, 'wp_theme' );
 	if ( $terms && ! is_wp_error( $terms ) ) {
 		$theme = $terms[0]->name;

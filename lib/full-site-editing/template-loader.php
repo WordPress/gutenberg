@@ -166,6 +166,10 @@ function gutenberg_render_title_tag() {
 	echo '<title>' . wp_get_document_title() . '</title>' . "\n";
 }
 
+function gutenberg_get_theme_stylesheet() {
+	return apply_filters( 'gutenberg_get_theme_stylesheet', wp_get_theme()->get_stylesheet() );
+}
+
 /**
  * Returns the markup for the current template.
  */
