@@ -224,10 +224,12 @@ function GalleryEdit( props ) {
 			: selectedImages;
 
 		if ( ! imageArray.every( isValidFileType ) ) {
+			noticeOperations.removeAllNotices();
 			noticeOperations.createErrorNotice(
 				__(
 					'If uploading to a gallery all files need to be image formats'
-				)
+				),
+				{ id: 'gallery-upload-invalid-file' }
 			);
 		}
 
@@ -244,7 +246,7 @@ function GalleryEdit( props ) {
 			} );
 
 		// Because we are reusing existing innerImage blocks any reordering
-		// done in the media libary will be lost so we need to reapply that ordering
+		// done in the media library will be lost so we need to reapply that ordering
 		// once the new image blocks are merged in with existing.
 		const newOrderMap = processedImages.reduce(
 			( result, image, index ) => (

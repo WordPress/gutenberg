@@ -131,7 +131,7 @@ const transforms = {
 			},
 		},
 		{
-			// Note: when dragging and dropping multiple files onto a gallery this overrrides the
+			// Note: when dragging and dropping multiple files onto a gallery this overrides the
 			// gallery transform in order to add new images to the gallery instead of
 			// creating a new gallery.
 			type: 'files',
@@ -145,7 +145,8 @@ const transforms = {
 					createErrorNotice(
 						__(
 							'If uploading to a gallery all files need to be image formats'
-						)
+						),
+						{ id: 'gallery-transform-invalid-file' }
 					);
 				}
 				return every(
