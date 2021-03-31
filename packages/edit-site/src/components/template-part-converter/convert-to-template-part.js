@@ -15,6 +15,7 @@ import {
 import {
 	MenuItem,
 	Icon,
+	BaseControl,
 	TextControl,
 	Flex,
 	FlexItem,
@@ -102,66 +103,72 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 									value={ title }
 									onChange={ setTitle }
 								/>
-								<label
-									className="edit-site-template-part-converter__area-control-label"
-									htmlFor={ `edit-site-template-part-converter__area-control-${ instanceId }` }
+								<BaseControl
+									label={ __( 'Area' ) }
+									id={ `edit-site-template-part-converter__area-base-control-${ instanceId }` }
+									className="edit-site-template-part-converter__area-base-control"
 								>
-									{ __( 'Area' ) }
-								</label>
-								<Composite
-									className="edit-site-template-part-converter__area-control"
-									id={ `edit-site-template-part-converter__area-control-${ instanceId }` }
-									role="listbox"
-									{ ...composite }
-								>
-									{ AREA_OPTIONS.map(
-										( {
-											icon,
-											label,
-											value,
-											description,
-										} ) => (
-											<CompositeItem
-												role="option"
-												as={ Button }
-												key={ label }
-												onClick={ () =>
-													setArea( value )
-												}
-												className={ classnames(
-													'edit-site-template-part-converter__area-button',
-													{
-														'is-selected':
-															area === value,
+									<Composite
+										className="edit-site-template-part-converter__area-composite"
+										role="group"
+										{ ...composite }
+									>
+										{ AREA_OPTIONS.map(
+											( {
+												icon,
+												label,
+												value,
+												description,
+											} ) => (
+												<CompositeItem
+													role="radio"
+													as={ Button }
+													key={ label }
+													onClick={ () =>
+														setArea( value )
 													}
-												) }
-												{ ...composite }
-											>
-												<Flex
-													align="start"
-													justify="start"
+													className={ classnames(
+														'edit-site-template-part-converter__area-button',
+														{
+															'is-selected':
+																area === value,
+														}
+													) }
+													aria-checked={
+														area === value
+													}
+													{ ...composite }
 												>
-													<FlexItem>
-														<Icon icon={ icon } />
-													</FlexItem>
-													<FlexBlock>
-														{ label }
-														<div>
-															{ description }
-														</div>
-													</FlexBlock>
-													{ area === value && (
+													<Flex
+														align="start"
+														justify="start"
+													>
 														<FlexItem>
 															<Icon
-																icon={ check }
+																icon={ icon }
 															/>
 														</FlexItem>
-													) }
-												</Flex>
-											</CompositeItem>
-										)
-									) }
-								</Composite>
+														<FlexBlock>
+															{ label }
+															<div>
+																{ description }
+															</div>
+														</FlexBlock>
+														{ area === value && (
+															<FlexItem>
+																<Icon
+																	icon={
+																		check
+																	}
+																/>
+															</FlexItem>
+														) }
+													</Flex>
+												</CompositeItem>
+											)
+										) }
+									</Composite>
+								</BaseControl>
 								<Flex
 									className="edit-site-template-part-converter__convert-modal-actions"
 									justify="flex-end"

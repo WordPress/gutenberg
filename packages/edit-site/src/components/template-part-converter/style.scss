@@ -7,12 +7,12 @@
 	padding-top: $grid-unit-15;
 }
 
-.edit-site-template-part-converter__area-control-label {
-	display: block;
+.edit-site-template-part-converter__area-base-control .components-base-control__label {
 	margin: $grid-unit-20 0 $grid-unit-10;
+	cursor: auto;
 }
 
-.edit-site-template-part-converter__area-control {
+.edit-site-template-part-converter__area-composite {
 	width: 100%;
 	border: $border-width solid $gray-700;
 	border-radius: 2px;
