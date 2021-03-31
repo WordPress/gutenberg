@@ -60,7 +60,11 @@ import { __ } from '@wordpress/i18n';
  * ```
  * @return {Promise< WPLinkSearchResult[] >} List of search suggestions
  */
-const fetchLinkSuggestions = async ( search, searchOptions, settings ) => {
+const fetchLinkSuggestions = async (
+	search,
+	searchOptions = {},
+	settings = {}
+) => {
 	const {
 		isInitialSuggestions = false,
 		type = undefined,
