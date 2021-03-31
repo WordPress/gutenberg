@@ -408,7 +408,7 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
-            wasBlockJustInserted,
+			wasBlockJustInserted,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
