@@ -34,6 +34,7 @@ export default function SaveButton( { navigationPost } ) {
 	const buttonText = isDisabled ? saveText : withUnsavedIndicator;
 	const button = (
 		<Button
+			isPrimary
 			className="edit-navigation-toolbar__save-button"
 			onClick={ () => {
 				saveNavigationPost( navigationPost );
