@@ -62,10 +62,10 @@
 	height: 100%;
 }
 
-[data-is-dragging] * {
+[data-wp-is-dragging] * {
 	pointer-events: none;
 }
 
-[data-is-drop-target] {
+[data-wp-is-drop-target] {
 	pointer-events: all;
 }

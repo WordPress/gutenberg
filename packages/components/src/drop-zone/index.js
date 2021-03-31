@@ -67,7 +67,7 @@ export function useDropZone( {
 
 			let isDraggingGlobally = false;
 
-			element.setAttribute( 'data-is-drop-target', 'true' );
+			element.setAttribute( 'data-wp-is-drop-target', 'true' );
 
 			const { ownerDocument } = element;
 
@@ -105,7 +105,7 @@ export function useDropZone( {
 				if ( isDraggingGlobally ) {
 					isDraggingGlobally = false;
 
-					element.removeAttribute( 'data-is-dragging' );
+					element.removeAttribute( 'data-wp-is-dragging' );
 
 					ownerDocument.addEventListener(
 						'dragover',
@@ -147,7 +147,7 @@ export function useDropZone( {
 				if ( ! isDraggingGlobally ) {
 					isDraggingGlobally = true;
 
-					element.setAttribute( 'data-is-dragging', 'true' );
+					element.setAttribute( 'data-wp-is-dragging', 'true' );
 
 					ownerDocument.removeEventListener(
 						'dragover',
@@ -172,8 +172,8 @@ export function useDropZone( {
 			ownerDocument.addEventListener( 'dragover', onGlobalDragOver );
 
 			return () => {
-				element.removeAttribute( 'data-is-dragging' );
-				element.removeAttribute( 'data-is-drop-target' );
+				element.removeAttribute( 'data-wp-is-dragging' );
+				element.removeAttribute( 'data-wp-is-drop-target' );
 				element.removeEventListener( 'drop', onDrop );
 				element.removeEventListener( 'dragenter', onDragEnter );
 				element.removeEventListener( 'dragover', onDragOver );

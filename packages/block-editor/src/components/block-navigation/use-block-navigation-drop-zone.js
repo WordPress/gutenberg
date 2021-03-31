@@ -218,8 +218,6 @@ export default function useBlockNavigationDropZone() {
 	);
 
 	const ref = useDropZone( {
-		element: ref,
-		withPosition: true,
 		...dropEventHandlers,
 		onDragOver( event ) {
 			const position = { x: event.clientX, y: event.clientY };
