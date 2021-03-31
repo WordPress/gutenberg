@@ -160,3 +160,23 @@ def addDependenciesToPom(pom) {
     }
 }
 
+tasks.register('checkIfVersionIsAlreadyPublished') {
+    def pomUrl = "https://a8c-libs.s3.amazonaws.com/android/org/wordpress-mobile/gutenberg-mobile/react-native-aztec/${publishReactNativeAztecVersion}/react-native-aztec-${publishReactNativeAztecVersion}.pom"
+    def responseCode = new URL(pomUrl).openConnection().with { connection ->
+        requestMethod = 'HEAD'
+        connect()
+        responseCode
+    }
+
+    if (responseCode == 200) {
+        throw new GradleException("'$publishReactNativeAztecVersion' is already published, please use a different version name. If this happened in CI for a PR, a new commit is necessary. If this happened for a tag, the existing version needs to be manually removed from S3.")
+    } else if (responseCode == 403) {
+        // S3 returns 403 status code if a file doesn't exist, which is what we want. Proceed to publish..
+    } else {
+        throw new GradleException("An unexpected status code ($responseCode) was received while checking if the version ($publishReactNativeAztecVersion) is already published to S3. If this issue persists, please contact Platform 9 team for help.")
+    }
+}
+
+publish.dependsOn(tasks.named('checkIfVersionIsAlreadyPublished'))
+publish.doLast { println "Successfully published 'react-native-aztec' version '$publishReactNativeAztecVersion'" }
+

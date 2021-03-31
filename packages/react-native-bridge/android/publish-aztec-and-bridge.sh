@@ -35,21 +35,18 @@ echo "Publishing 'react-native-aztec' version '$VERSION'"
 ./gradlew :react-native-aztec:publish -q -PpublishReactNativeAztecVersion=$VERSION
 
 if [ $? -eq 0 ]; then
-    echo "Successfully published 'react-native-aztec' version '$VERSION'."
     echo "Wait 30 seconds for the new 'react-native-aztec' version to be available"
     sleep 30
 else
     echo "Failed to publish 'react-native-aztec' version '$VERSION'."
-    echo "We'll still proceed to build and publish 'react-native-bridge' since this failure might be due to this version being published already, for example when the CI task is restarted."
+    exit 1
 fi
 
 # 5. Publish 'react-native-bridge` library to S3
 echo "Publishing react-native-bridge version '$VERSION'"
 ./gradlew :react-native-bridge:publish -q -PpublishReactNativeBridgeVersion=$VERSION -PreactNativeAztecVersion=$VERSION
 
-if [ $? -eq 0 ]; then
-    echo "Successfully published 'react-native-bridge' version '$VERSION'."
-else
+if [ $? -ne 0 ]; then
     echo "Failed to publish 'react-native-bridge' version '$VERSION'."
     exit 1
 fi
