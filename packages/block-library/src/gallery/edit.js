@@ -200,6 +200,12 @@ function GalleryEdit( props ) {
 		};
 	}
 
+	function isValidFileType( file ) {
+		return ALLOWED_MEDIA_TYPES.some(
+			( mediaType ) => file.type?.indexOf( mediaType ) === 0
+		);
+	}
+
 	function updateImages( selectedImages ) {
 		const newFileUploads =
 			Object.prototype.toString.call( selectedImages ) ===
@@ -217,11 +223,7 @@ function GalleryEdit( props ) {
 			  } )
 			: selectedImages;
 
-		if (
-			imageArray.some(
-				( image ) => image.type?.indexOf( 'image/' ) !== 0
-			)
-		) {
+		if ( ! imageArray.every( isValidFileType ) ) {
 			noticeOperations.createErrorNotice(
 				__(
 					'If uploading to a gallery all files need to be image formats'
@@ -230,9 +232,7 @@ function GalleryEdit( props ) {
 		}
 
 		const processedImages = imageArray
-			.filter(
-				( file ) => file.url || file.type?.indexOf( 'image/' ) === 0
-			)
+			.filter( ( file ) => file.url || isValidFileType( file ) )
 			.map( ( file ) => {
 				if ( ! file.url ) {
 					return pickRelevantMediaFiles( {
