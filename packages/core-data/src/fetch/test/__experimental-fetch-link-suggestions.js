@@ -184,7 +184,11 @@ describe( 'fetchLinkSuggestions', () => {
 		);
 	} );
 	it( 'initial search suggestions limits results', () => {
-		return fetchLinkSuggestions( '', { type:'post', subtype:'page', isInitialSuggestions: true } ).then( ( suggestions ) =>
+		return fetchLinkSuggestions( '', {
+			type: 'post',
+			subtype: 'page',
+			isInitialSuggestions: true,
+		} ).then( ( suggestions ) =>
 			expect( suggestions ).toEqual( [
 				{
 					id: 11,
