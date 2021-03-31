@@ -3,16 +3,16 @@ name: Compressed Size
 on: [pull_request]
 
 jobs:
-  build:
-    name: Check
-    runs-on: ubuntu-latest
+    build:
+        name: Check
+        runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
-      with:
-        fetch-depth: 1
+        steps:
+            - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
+              with:
+                  fetch-depth: 1
 
-    - uses: preactjs/compressed-size-action@7d87f60a6b0c7d193b8183ce859ed00b356ea92f # v2.1.0
-      with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
-        pattern: "{build/**/*.js,build/**/*.css}"
+            - uses: preactjs/compressed-size-action@7d87f60a6b0c7d193b8183ce859ed00b356ea92f # v2.1.0
+              with:
+                  repo-token: '${{ secrets.GITHUB_TOKEN }}'
+                  pattern: '{build/**/*.js,build/**/*.css}'
