@@ -163,6 +163,17 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		);
 		$this->assertEquals( $expected, $template_content );
 
+		$content_without_theme_attribute_nested = '<!-- wp:group --><!-- wp:template-part {"slug":"header","align":"full", "tagName":"header","className":"site-header"} /--><!-- /wp:group -->';
+		$template_content                       = _inject_theme_attribute_in_content(
+			$content_without_theme_attribute_nested,
+			$theme
+		);
+		$expected                               = sprintf(
+			'<!-- wp:group --><!-- wp:template-part {"slug":"header","align":"full","tagName":"header","className":"site-header","theme":"%s"} /--><!-- /wp:group -->',
+			get_stylesheet()
+		);
+		$this->assertEquals( $expected, $template_content );
+
 		// Does not inject theme when there is an existing theme attribute.
 		$content_with_existing_theme_attribute = '<!-- wp:template-part {"slug":"header","theme":"fake-theme","align":"full", "tagName":"header","className":"site-header"} /-->';
 		$template_content                      = _inject_theme_attribute_in_content(
