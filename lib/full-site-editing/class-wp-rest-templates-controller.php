@@ -168,7 +168,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function get_item( $request ) {
-		if ( isset( $request['is_custom'] ) && 'false' === $request['is_custom'] ) {
+		if ( isset( $request['source'] ) && 'theme' === $request['source'] ) {
 			$template = gutenberg_get_block_file_template( $request['id'], $this->post_type );
 		} else {
 			$template = gutenberg_get_block_template( $request['id'], $this->post_type );
@@ -203,14 +203,14 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
 
-		if ( isset( $request['reverted_file_content'] ) && isset( $request['content'] ) && $request['reverted_file_content'] === $request['content'] ) {
+		if ( isset( $request['source'] ) && 'theme' === $request['source'] ) {
 			wp_delete_post( $template->wp_id, true );
 			return $this->prepare_item_for_response( gutenberg_get_block_file_template( $request['id'], $this->post_type ), $request );
 		}
 
 		$changes = $this->prepare_item_for_database( $request );
 
-		if ( $template->is_custom ) {
+		if ( 'custom' === $template->source  ) {
 			$result = wp_update_post( wp_slash( (array) $changes ), true );
 		} else {
 			$result = wp_insert_post( wp_slash( (array) $changes ), true );
@@ -292,7 +292,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		if ( ! $template ) {
 			return new WP_Error( 'rest_template_not_found', __( 'No templates exist with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 		}
-		if ( ! $template->is_custom ) {
+		if ( 'custom' !== $template->source ) {
 			return new WP_Error( 'rest_invalid_template', __( 'Templates based on theme files can\'t be removed.', 'gutenberg' ), array( 'status' => 400 ) );
 		}
 
@@ -344,7 +344,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			$changes->tax_input   = array(
 				'wp_theme' => isset( $request['theme'] ) ? $request['content'] : wp_get_theme()->get_stylesheet(),
 			);
-		} elseif ( ! $template->is_custom ) {
+		} elseif ( 'custom' !== $template->source ) {
 			$changes->post_type   = $this->post_type;
 			$changes->post_status = 'publish';
 			$changes->tax_input   = array(
@@ -356,24 +356,24 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		}
 		if ( isset( $request['content'] ) ) {
 			$changes->post_content = $request['content'];
-		} elseif ( null !== $template && ! $template->is_custom ) {
+		} elseif ( null !== $template && 'custom' !== $template->source) {
 			$changes->post_content = $template->content;
 		}
 		if ( isset( $request['title'] ) ) {
 			$changes->post_title = $request['title'];
-		} elseif ( null !== $template && ! $template->is_custom ) {
+		} elseif ( null !== $template && 'custom' !== $template->source ) {
 			$changes->post_title = $template->title;
 		}
 		if ( isset( $request['description'] ) ) {
 			$changes->post_excerpt = $request['description'];
-		} elseif ( null !== $template && ! $template->is_custom ) {
+		} elseif ( null !== $template && 'custom' !== $template->source ) {
 			$changes->post_excerpt = $template->description;
 		}
 
 		if ( 'wp_template_part' === $this->post_type ) {
 			if ( isset( $request['area'] ) ) {
 				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area( $request['area'] );
-			} elseif ( null !== $template && ! $template->is_custom && $template->area ) {
+			} elseif ( null !== $template && 'custom' !== $template->source && $template->area ) {
 				$changes->tax_input['wp_template_part_area'] = gutenberg_filter_template_part_area( $template->area );
 			} elseif ( ! $template->area ) {
 				$changes->tax_input['wp_template_part_area'] = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
@@ -397,7 +397,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			'theme'          => $template->theme,
 			'content'        => array( 'raw' => $template->content ),
 			'slug'           => $template->slug,
-			'is_custom'      => $template->is_custom,
+			'source'         => $template->source,
 			'type'           => $template->type,
 			'description'    => $template->description,
 			'title'          => array(
@@ -524,9 +524,9 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 				),
-				'is_custom'      => array(
-					'description' => __( 'Whether the template is customized.', 'gutenberg' ),
-					'type'        => 'bool',
+				'source'         => array(
+					'description' => __( 'Source of template', 'gutenberg' ),
+					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),

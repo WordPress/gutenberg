@@ -71,7 +71,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				),
 				'description'    => 'The default template used when no other template is available. This is a required template in WordPress.',
 				'status'         => 'publish',
-				'is_custom'      => false,
+				'source'         => 'theme',
 				'type'           => 'wp_template',
 				'wp_id'          => null,
 				'has_theme_file' => true,
@@ -95,7 +95,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				),
 				'description'    => '',
 				'status'         => 'publish',
-				'is_custom'      => false,
+				'source'         => 'theme',
 				'type'           => 'wp_template_part',
 				'wp_id'          => null,
 				// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
@@ -125,7 +125,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				),
 				'description'    => 'The default template used when no other template is available. This is a required template in WordPress.',
 				'status'         => 'publish',
-				'is_custom'      => false,
+				'source'         => 'theme',
 				'type'           => 'wp_template',
 				'wp_id'          => null,
 				'has_theme_file' => true,
@@ -150,7 +150,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				),
 				'description'    => '',
 				'status'         => 'publish',
-				'is_custom'      => false,
+				'source'         => 'theme',
 				'type'           => 'wp_template_part',
 				'wp_id'          => null,
 				// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
@@ -188,7 +188,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				),
 				'description'    => 'Just a description',
 				'status'         => 'publish',
-				'is_custom'      => true,
+				'source'         => 'custom',
 				'type'           => 'wp_template',
 				'content'        => array(
 					'raw' => 'Content',
@@ -225,7 +225,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				),
 				'description'    => 'Just a description of a template part',
 				'status'         => 'publish',
-				'is_custom'      => true,
+				'source'         => 'custom',
 				'type'           => 'wp_template_part',
 				'content'        => array(
 					'raw' => 'Content',
@@ -248,7 +248,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertEquals( 'My new Index Title', $data['title']['raw'] );
-		$this->assertEquals( true, $data['is_custom'] );
+		$this->assertEquals( 'custom', $data['source'] );
 
 		// Test template parts.
 		$request = new WP_REST_Request( 'PUT', '/wp/v2/template-parts/tt1-blocks//header' );
@@ -260,7 +260,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 		$this->assertEquals( WP_TEMPLATE_PART_AREA_UNCATEGORIZED, $data['area'] );
-		$this->assertEquals( true, $data['is_custom'] );
+		$this->assertEquals( 'custom', $data['source'] );
 	}
 
 	public function test_delete_item() {

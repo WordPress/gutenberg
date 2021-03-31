@@ -189,7 +189,7 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 	$template->theme          = $theme;
 	$template->content        = _inject_theme_attribute_in_content( $template_content );
 	$template->slug           = $template_file['slug'];
-	$template->is_custom      = false;
+	$template->source         = 'theme';
 	$template->type           = $template_type;
 	$template->title          = $template_file['slug'];
 	$template->status         = 'publish';
@@ -235,7 +235,7 @@ function _gutenberg_build_template_result_from_post( $post ) {
 	$template->theme          = $theme;
 	$template->content        = $post->post_content;
 	$template->slug           = $post->post_name;
-	$template->is_custom      = true;
+	$template->source         = 'custom';
 	$template->type           = $post->post_type;
 	$template->description    = $post->post_excerpt;
 	$template->title          = $post->post_title;

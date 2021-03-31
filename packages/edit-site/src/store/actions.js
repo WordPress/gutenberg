@@ -323,7 +323,7 @@ export function* revertTemplate( template ) {
 		const fileTemplatePath = addQueryArgs(
 			`/wp/v2/templates/${ template.id }`,
 			{
-				is_custom: false,
+				source: 'theme',
 				context: 'edit',
 			}
 		);
@@ -360,7 +360,7 @@ export function* revertTemplate( template ) {
 			{
 				content: serializeBlocks, // required to make the `undo` behave correctly
 				blocks: edited.blocks, // required to revert the blocks in the editor
-				is_custom: true, // required to avoid turning the editor into a dirty state
+				source: 'custom', // required to avoid turning the editor into a dirty state
 			},
 			{
 				undoIgnore: true, // required to merge this edit with the last undo level
@@ -368,9 +368,6 @@ export function* revertTemplate( template ) {
 		);
 
 		const blocks = parse( fileTemplate?.content?.raw );
-		// `reverted_file_content` is used on the server-side
-		// it is compared with the template's content
-		// if they match then the template is deleted (reverted to file)
 		yield controls.dispatch(
 			coreStore,
 			'editEntityRecord',
@@ -380,8 +377,7 @@ export function* revertTemplate( template ) {
 			{
 				content: serializeBlocks,
 				blocks,
-				is_custom: false,
-				reverted_file_content: __unstableSerializeAndClean( blocks ),
+				source: 'theme',
 			}
 		);
 
@@ -393,7 +389,7 @@ export function* revertTemplate( template ) {
 				{
 					content: serializeBlocks,
 					blocks: edited.blocks,
-					is_custom: true,
+					source: 'custom',
 				}
 			);
 		};
