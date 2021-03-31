@@ -14,16 +14,30 @@ import {
 	useSelectedMenuData,
 } from '../../hooks';
 
+function DotIndicator( { children, showDot = false } ) {
+	return showDot ? (
+		<div className="dot-indicator">{ children }</div>
+	) : (
+		{ children }
+	);
+}
+
 export function NameEditor() {
 	const [ isMenuNameEditFocused, setIsMenuNameEditFocused ] = useContext(
 		IsMenuNameControlFocusedContext
 	);
 
 	const { menuId } = useSelectedMenuData();
-	const { editedMenu, editMenuEntityRecord, menuEntityData } = useMenuEntity(
-		menuId
-	);
+	const {
+		editedMenu,
+		savedMenu,
+		editMenuEntityRecord,
+		menuEntityData,
+	} = useMenuEntity( menuId );
 	const editedMenuName = menuId && editedMenu.name;
+	const savedMenuName = menuId && savedMenu.name;
+
+	const hasMenuNameChanged = editedMenuName === savedMenuName;
 
 	const editMenuName = ( name = untitledMenu ) =>
 		editMenuEntityRecord( ...menuEntityData, { name } );
@@ -33,7 +47,7 @@ export function NameEditor() {
 		if ( isMenuNameEditFocused ) inputRef.current.focus();
 	}, [ isMenuNameEditFocused ] );
 	return (
-		<>
+		<DotIndicator showDot={ hasMenuNameChanged }>
 			<TextControl
 				ref={ inputRef }
 				help={ __(
@@ -45,6 +59,7 @@ export function NameEditor() {
 				value={ editedMenuName }
 				onChange={ editMenuName }
 			/>
-		</>
+			)
+		</DotIndicator>
 	);
 }
