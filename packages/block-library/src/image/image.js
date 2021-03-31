@@ -560,7 +560,7 @@ export default function Image( {
 					ref={ captionRef }
 					tagName="figcaption"
 					aria-label={ __( 'Image caption text' ) }
-					placeholder={ __( 'Write caption…' ) }
+					placeholder={ __( 'Add caption' ) }
 					value={ caption }
 					unstableOnFocus={ onFocusCaption }
 					onChange={ ( value ) =>
