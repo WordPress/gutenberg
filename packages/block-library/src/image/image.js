@@ -211,6 +211,7 @@ export default function Image( {
 
 	function onImageClick() {
 		if ( captionFocused ) {
+			captionRef.current.blur();
 			setCaptionFocused( false );
 		}
 	}
@@ -454,6 +455,7 @@ export default function Image( {
 				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
+				onClick={ onImageClick }
 			/>
 		);
 	} else if ( ! isResizable || ! imageWidthWithinContainer ) {

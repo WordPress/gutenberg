@@ -23,6 +23,7 @@ export default function ImageCropper( {
 	clientWidth,
 	naturalHeight,
 	naturalWidth,
+	onClick,
 } ) {
 	const {
 		isInProgress,
@@ -51,6 +52,7 @@ export default function ImageCropper( {
 				width: width || clientWidth,
 				height: editedHeight,
 			} }
+			onClick={ onClick }
 		>
 			<Cropper
 				image={ editedUrl || url }
