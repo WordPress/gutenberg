@@ -463,7 +463,6 @@ export class ImageEdit extends Component {
 
 	render() {
 		const { isCaptionSelected, isFeaturedImage } = this.state;
-		const { isCaptionSelected } = this.state;
 		const {
 			attributes,
 			isSelected,
