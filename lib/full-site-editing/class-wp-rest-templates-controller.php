@@ -210,7 +210,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 
 		$changes = $this->prepare_item_for_database( $request );
 
-		if ( 'custom' === $template->source  ) {
+		if ( 'custom' === $template->source ) {
 			$result = wp_update_post( wp_slash( (array) $changes ), true );
 		} else {
 			$result = wp_insert_post( wp_slash( (array) $changes ), true );
@@ -356,7 +356,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		}
 		if ( isset( $request['content'] ) ) {
 			$changes->post_content = $request['content'];
-		} elseif ( null !== $template && 'custom' !== $template->source) {
+		} elseif ( null !== $template && 'custom' !== $template->source ) {
 			$changes->post_content = $template->content;
 		}
 		if ( isset( $request['title'] ) ) {
