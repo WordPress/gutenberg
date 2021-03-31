@@ -6,11 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	getBlockDefaultClassName,
-	getBlockSupport,
-	hasBlockSupport,
-} from '@wordpress/blocks';
+import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { SVG } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
@@ -198,12 +194,9 @@ const withDuotoneStyles = createHigherOrderComponent(
 			slug ?? useInstanceId( BlockListBlock )
 		}`;
 
-		const blockClass = getBlockDefaultClassName( props.name );
-		const scope = `.${ blockClass }.${ id }`;
-
 		const selectors = duotoneSupport.split( ',' );
 		const selectorsScoped = selectors.map(
-			( selector ) => `${ scope } ${ selector.trim() }`
+			( selector ) => `.${ id } ${ selector.trim() }`
 		);
 		const selectorsGroup = selectorsScoped.join( ', ' );
 
