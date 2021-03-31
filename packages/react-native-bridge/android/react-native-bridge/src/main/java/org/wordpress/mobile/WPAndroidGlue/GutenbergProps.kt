@@ -15,8 +15,7 @@ data class GutenbergProps @JvmOverloads constructor(
     val editorTheme: Bundle?,
     val translations: Bundle,
     val isDarkMode: Boolean,
-    val htmlModeEnabled: Boolean,
-    val isPreview: Boolean = false
+    val htmlModeEnabled: Boolean
 ) {
 
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
@@ -26,9 +25,6 @@ data class GutenbergProps @JvmOverloads constructor(
         putString(PROP_POST_TYPE, postType)
         putBundle(PROP_TRANSLATIONS, translations)
         putBoolean(PROP_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled)
-
-        val editorMode = if (isPreview) PROP_EDITOR_MODE_PREVIEW else PROP_EDITOR_MODE_EDITOR
-        putString(PROP_EDITOR_MODE, editorMode)
 
         putBundle(PROP_CAPABILITIES, getUpdatedCapabilitiesProps())
 
@@ -64,10 +60,6 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_TRANSLATIONS = "translations"
         private const val PROP_COLORS = "colors"
         private const val PROP_GRADIENTS = "gradients"
-
-        private const val PROP_EDITOR_MODE = "editorMode"
-        private const val PROP_EDITOR_MODE_PREVIEW = "preview"
-        private const val PROP_EDITOR_MODE_EDITOR = "editor"
 
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"
