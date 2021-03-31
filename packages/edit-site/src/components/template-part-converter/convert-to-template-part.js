@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { kebabCase } from 'lodash';
+import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -15,12 +16,14 @@ import {
 	MenuItem,
 	Icon,
 	TextControl,
-	BaseControl,
 	Flex,
 	FlexItem,
 	FlexBlock,
 	Button,
 	Modal,
+	__unstableComposite as Composite,
+	__unstableCompositeItem as CompositeItem,
+	__unstableUseCompositeState as useCompositeState,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 
@@ -38,6 +41,7 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ area, setArea ] = useState( 'uncategorized' );
+	const composite = useCompositeState();
 
 	const onConvert = async ( templatePartTitle ) => {
 		const defaultTitle = __( 'Untitled Template Part' );
@@ -104,9 +108,11 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 								>
 									{ __( 'Area' ) }
 								</label>
-								<BaseControl
+								<Composite
 									className="edit-site-template-part-converter__area-control"
 									id={ `edit-site-template-part-converter__area-control-${ instanceId }` }
+									role="listbox"
+									{ ...composite }
 								>
 									{ AREA_OPTIONS.map(
 										( {
@@ -115,13 +121,21 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 											value,
 											description,
 										} ) => (
-											<Button
+											<CompositeItem
+												role="option"
+												as={ Button }
 												key={ label }
 												onClick={ () =>
 													setArea( value )
 												}
-												disabled={ area === value }
-												className="edit-site-template-part-converter__area-button"
+												className={ classnames(
+													'edit-site-template-part-converter__area-button',
+													{
+														'is-selected':
+															area === value,
+													}
+												) }
+												{ ...composite }
 											>
 												<Flex
 													align="start"
@@ -144,10 +158,10 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 														</FlexItem>
 													) }
 												</Flex>
-											</Button>
+											</CompositeItem>
 										)
 									) }
-								</BaseControl>
+								</Composite>
 								<Flex
 									className="edit-site-template-part-converter__convert-modal-actions"
 									justify="flex-end"

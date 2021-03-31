@@ -14,11 +14,8 @@
 
 .edit-site-template-part-converter__area-control {
 	width: 100%;
-
-	.components-base-control__field {
-		border: $border-width solid $gray-700;
-		border-radius: 2px;
-	}
+	border: $border-width solid $gray-700;
+	border-radius: 2px;
 
 	.edit-site-template-part-converter__area-button {
 		display: block;
@@ -30,14 +27,19 @@
 		border-bottom: $border-width solid $gray-700;
 		border-radius: 0;
 
+		&:focus {
+			border-bottom: $border-width solid $white;
+		}
+
 		&:last-of-type {
 			border: none;
 		}
 
 		&:not(:hover),
-		&:disabled {
+		&.is-selected {
 			opacity: 1;
 			color: $gray-900;
+			cursor: auto;
 
 			.components-flex__block div {
 				color: $gray-600;
