@@ -43,11 +43,13 @@ class EnterPressedWatcher(aztecText: AztecText, var enterDeleter: EnterDeleter) 
             // if new text length is longer than original text by 1
             if (textBefore?.length == newTextCopy.length - 1) {
                 // now check that the inserted character is actually a NEWLINE
-                if (newTextCopy[this.start] == Constants.NEWLINE) {
+                val enterPosition = newTextCopy.lastIndexOf(Constants.NEWLINE)
+                if (-1 < enterPosition) {
                     done = false
-                    aztecText.editableText.setSpan(EnterPressedUnderway(), 0, 0, Spanned.SPAN_USER)
+                    aztecText.editableText.setSpan(EnterPressedUnderway(), enterPosition,
+                            enterPosition, Spanned.SPAN_USER)
                     aztecKeyListener.onEnterKey(
-                            newTextCopy.replace(this.start, this.start + 1, ""),
+                            newTextCopy.replace(enterPosition, enterPosition + 1, ""),
                             true,
                             selStart,
                             selEnd
@@ -58,12 +60,15 @@ class EnterPressedWatcher(aztecText: AztecText, var enterDeleter: EnterDeleter) 
     }
 
     override fun afterTextChanged(text: Editable) {
-        aztecTextRef.get()?.editableText?.getSpans(0, 0, EnterPressedUnderway::class.java)?.forEach {
+        aztecTextRef.get()?.editableText?.getSpans(0, text.length,
+                EnterPressedUnderway::class.java)?.forEach { it ->
             if (!done) {
                 done = true
-                if (enterDeleter.shouldDeleteEnter())
-                    text.replace(start, start + 1, "")
+                if (enterDeleter.shouldDeleteEnter()) {
+                    val enterStart = text.getSpanStart(it)
+                    text.replace(enterStart, enterStart + 1, "")
                 }
+            }
             aztecTextRef.get()?.editableText?.removeSpan(it)
         }
     }
