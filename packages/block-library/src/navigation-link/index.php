@@ -233,7 +233,14 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
  * @return array
  */
 function build_variation_for_navigation_link( $entity, $kind ) {
-	$name = 'post_tag' === $entity->name ? 'tag' : $entity->name;
+	$custom_variation_names = array(
+		'post_tag'    => 'tag',
+		'post_format' => 'format',
+	);
+
+	$name = array_key_exists( $entity->name, $custom_variation_names )
+		? $custom_variation_names[ $entity->name ]
+		: $entity->name;
 
 	$title       = '';
 	$description = '';
@@ -263,7 +270,6 @@ function build_variation_for_navigation_link( $entity, $kind ) {
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation_link() {
-
 	$post_types = get_post_types( array( 'show_in_nav_menus' => true ), 'objects' );
 	$taxonomies = get_taxonomies( array( 'show_in_nav_menus' => true ), 'objects' );
 	$built_ins  = array();
@@ -272,7 +278,7 @@ function register_block_core_navigation_link() {
 	if ( $post_types ) {
 		foreach ( $post_types as $post_type ) {
 			$variation = build_variation_for_navigation_link( $post_type, 'post-type' );
-			if ( 'post' === $variation['name'] || 'page' === $variation['name'] ) {
+			if ( 'post' === $variation['name'] || 'page' === $variation['name'] || 'format' === $variation['name'] ) {
 				$built_ins[] = $variation;
 			} else {
 				$variations[] = $variation;
@@ -282,7 +288,7 @@ function register_block_core_navigation_link() {
 	if ( $taxonomies ) {
 		foreach ( $taxonomies as $taxonomy ) {
 			$variation = build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
-			if ( 'category' === $variation['name'] || 'tag' === $variation['name'] ) {
+			if ( 'category' === $variation['name'] || 'tag' === $variation['name'] || 'post_' ) {
 				$built_ins[] = $variation;
 			} else {
 				$variations[] = $variation;
