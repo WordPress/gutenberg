@@ -10,6 +10,7 @@ import { flatMap, isEmpty, isFunction } from 'lodash';
 import { DOWN } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
 import { menu } from '@wordpress/icons';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -42,7 +43,7 @@ function DropdownMenu( {
 	icon = menu,
 	label,
 	popoverProps,
-	toggleProps,
+	toggleProps: { ref: togglePropsRef, ...restOfToggleProps } = {},
 	menuProps,
 	disableOpenOnArrowDown = false,
 	text,
@@ -92,7 +93,12 @@ function DropdownMenu( {
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
 			popoverProps={ mergedPopoverProps }
-			renderToggle={ ( { isOpen, onToggle } ) => {
+			renderToggle={ function useDropdownMenuToggle( {
+				isOpen,
+				onToggle,
+				ref: toggleRef,
+			} ) {
+				const ref = useMergeRefs( [ togglePropsRef, toggleRef ] );
 				const openOnArrowDown = ( event ) => {
 					if ( disableOpenOnArrowDown ) {
 						return;
@@ -113,19 +119,15 @@ function DropdownMenu( {
 							}
 						),
 					},
-					toggleProps
+					restOfToggleProps
 				);
 
 				return (
 					<ButtonComponent
 						{ ...mergedToggleProps }
+						ref={ ref }
 						icon={ icon }
-						onClick={ ( event ) => {
-							onToggle( event );
-							if ( mergedToggleProps.onClick ) {
-								mergedToggleProps.onClick( event );
-							}
-						} }
+						onClick={ mergedToggleProps?.onClick }
 						onKeyDown={ ( event ) => {
 							openOnArrowDown( event );
 							if ( mergedToggleProps.onKeyDown ) {
@@ -136,7 +138,7 @@ function DropdownMenu( {
 						aria-expanded={ isOpen }
 						label={ label }
 						text={ text }
-						showTooltip={ toggleProps?.showTooltip ?? true }
+						showTooltip={ mergedToggleProps?.showTooltip ?? true }
 					>
 						{ mergedToggleProps.children }
 					</ButtonComponent>
