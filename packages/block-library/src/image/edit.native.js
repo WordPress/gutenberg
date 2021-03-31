@@ -183,10 +183,16 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( previousProps ) {
+		const { image, attributes } = this.props;
+
 		if ( ! previousProps.image && this.props.image ) {
-			const { image, attributes } = this.props;
 			const url = getUrlForSlug( image, attributes ) || image.source_url;
 			this.props.setAttributes( { url } );
+		}
+
+		// Check whether an image is featured when changes happen, such as when image is replaced within block.
+		if ( attributes.id ) {
+			checkIfFeaturedImage( attributes.id );
 		}
 	}
 
