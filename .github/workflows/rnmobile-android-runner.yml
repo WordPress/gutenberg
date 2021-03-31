@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         native-test-name: [
-          gutenberg-editor-blocks
+          gutenberg-editor-initial-html
         ]
 
     steps:
