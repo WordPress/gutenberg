@@ -21,9 +21,7 @@ import { store as editNavigationStore } from '../../store';
 const saveText = __( 'Save' );
 const withUnsavedIndicator = (
 	<>
-		<span className="edit-navigation-toolbar__save-button__dot-indicator">
-			○
-		</span>
+		<span className="dot" />
 		{ saveText }
 	</>
 );

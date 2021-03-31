@@ -4,7 +4,6 @@
 import { Tooltip } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const indicator = '\t•';
 const unsavedChangesText = __( 'This change is unsaved' );
 export default function UnsavedChangesIndicator( {
 	children,
@@ -14,7 +13,7 @@ export default function UnsavedChangesIndicator( {
 		<>
 			<div className="dot-indicator">
 				<Tooltip text={ unsavedChangesText }>
-					<span className="dot">{ indicator }</span>
+					<span className="dot" />
 				</Tooltip>
 			</div>
 

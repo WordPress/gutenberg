@@ -3,7 +3,12 @@
 	.dot {
 		right: 10px;
 		position: absolute;
-		font-size: 30px;
-		color: var(--wp-admin-theme-color);
 	}
+
+}
+.edit-navigation-layout .dot {
+	border-radius: 50%;
+	width: 10px;
+	height: 10px;
+	background-color: var(--wp-admin-theme-color);
 }
