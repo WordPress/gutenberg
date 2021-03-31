@@ -14,12 +14,13 @@
  * @return string Returns the filtered post content of the current post.
  */
 function render_block_core_post_content( $attributes, $content, $block ) {
-	if ( ! in_the_loop() ) {
-		the_post();
-	}
 
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
+	}
+
+	if ( ! in_the_loop() ) {
+		the_post();
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );

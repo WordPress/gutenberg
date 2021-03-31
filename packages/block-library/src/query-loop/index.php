@@ -43,34 +43,34 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 		}
 	}
 
-	if ( $query->have_posts() ) {
-		$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+	if ( ! $query->have_posts() ) {
+		return '';
+	}
 
-		$content = '';
-		while ( $query->have_posts() ) :
-			$query->the_post();
-			$block_content = (
-				new WP_Block(
-					$block->parsed_block,
-					array(
-						'postType' => get_post_type(),
-						'postId'   => get_the_ID(),
-					)
+	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+
+	$content = '';
+	while ( $query->have_posts() ) {
+		$query->the_post();
+		$block_content = (
+			new WP_Block(
+				$block->parsed_block,
+				array(
+					'postType' => get_post_type(),
+					'postId'   => get_the_ID(),
 				)
-			)->render( array( 'dynamic' => false ) );
-			$content      .= "<li>{$block_content}</li>";
-		endwhile;
-
-		return sprintf(
-			'<ul %1$s>%2$s</ul>',
-			$wrapper_attributes,
-			$content
-		);
+			)
+		)->render( array( 'dynamic' => false ) );
+		$content      .= "<li>{$block_content}</li>";
 	}
 
 	wp_reset_postdata();
 
-	return '';
+	return sprintf(
+		'<ul %1$s>%2$s</ul>',
+		$wrapper_attributes,
+		$content
+	);
 }
 
 /**
