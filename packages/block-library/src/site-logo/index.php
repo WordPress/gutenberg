@@ -74,7 +74,9 @@ function override_custom_logo_theme_mod( $custom_logo ) {
  * @return string The custom logo.
  */
 function sync_site_logo_to_theme_mod( $custom_logo ) {
-	if ( $custom_logo ) {
+	if ( empty( $custom_logo ) ) {
+		delete_option( 'sitelogo' );
+	} else {
 		update_option( 'sitelogo', $custom_logo );
 	}
 	return $custom_logo;
