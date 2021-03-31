@@ -320,12 +320,27 @@ export function* revertTemplate( template ) {
 	}
 
 	try {
+		const templateEntity = yield controls.select(
+			coreStore,
+			'getEntity',
+			'postType',
+			template.type
+		);
+		if ( ! templateEntity ) {
+			yield controls.dispatch(
+				noticesStore,
+				'createErrorNotice',
+				__(
+					'The editor has encountered an unexpected error. Please reload.'
+				),
+				{ type: 'snackbar' }
+			);
+			return;
+		}
+
 		const fileTemplatePath = addQueryArgs(
-			`/wp/v2/templates/${ template.id }`,
-			{
-				source: 'theme',
-				context: 'edit',
-			}
+			`${ templateEntity.baseURL }/${ template.id }`,
+			{ context: 'edit', source: 'theme' }
 		);
 		const fileTemplate = yield apiFetch( { path: fileTemplatePath } );
 		if ( ! fileTemplate ) {
