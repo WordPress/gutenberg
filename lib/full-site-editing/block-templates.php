@@ -137,6 +137,19 @@ function _gutenberg_add_template_part_area_info( $template_info ) {
 	return $template_info;
 }
 
+function get_inner_blocks_recursive( $blocks, $result = array() ) {
+	global $result;
+	foreach ( $blocks as $key => $block ) {
+		if ( $block['innerBlocks'] ) {
+			get_inner_blocks_recursive( $block['innerBlocks'], $result );
+		} else {
+			$result[] = $block;
+		}
+	}
+
+	return $result;
+}
+
 /**
  * Parses wp_template content and injects the current theme's
  * stylesheet as a theme attribute into each wp_template_part
@@ -148,9 +161,11 @@ function _gutenberg_add_template_part_area_info( $template_info ) {
 function _inject_theme_attribute_in_content( $template_content ) {
 	$has_updated_content = false;
 	$new_content         = '';
-	$template_blocks     = parse_blocks( $template_content );
+	$top_level_template_blocks = parse_blocks( $template_content );
+	$template_blocks = get_inner_blocks_recursive( $top_level_template_blocks );
 
 	foreach ( $template_blocks as $key => $block ) {
+
 		if (
 			'core/template-part' === $block['blockName'] &&
 			! isset( $block['attrs']['theme'] )
