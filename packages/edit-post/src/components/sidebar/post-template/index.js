@@ -14,48 +14,33 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '../../../store';
 
 function PostTemplate() {
-	const {
-		template,
-		isEditing,
-		supportsTemplateMode,
-		isResolvingTemplate,
-	} = useSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-			getCurrentPostType,
-			getCurrentPost,
-		} = select( editorStore );
-		const {
-			__experimentalGetTemplateForLink,
-			getPostType,
-			isResolving,
-		} = select( coreStore );
-		const { isEditingTemplate } = select( editPostStore );
-		const link = getEditedPostAttribute( 'link' );
-		const _supportsTemplateMode = select( editorStore ).getEditorSettings()
-			.supportsTemplateMode;
-		const isViewable =
-			getPostType( getCurrentPostType() )?.viewable ?? false;
+	const { template, isEditing, supportsTemplateMode } = useSelect(
+		( select ) => {
+			const { getCurrentPostType } = select( editorStore );
+			const { getPostType } = select( coreStore );
+			const { isEditingTemplate, getEditedPostTemplate } = select(
+				editPostStore
+			);
+			const _supportsTemplateMode = select(
+				editorStore
+			).getEditorSettings().supportsTemplateMode;
+			const isViewable =
+				getPostType( getCurrentPostType() )?.viewable ?? false;
 
-		return {
-			template:
-				supportsTemplateMode &&
-				isViewable &&
-				link &&
-				getCurrentPost().status !== 'auto-draft'
-					? __experimentalGetTemplateForLink( link )
-					: null,
-			isEditing: isEditingTemplate(),
-			supportsTemplateMode: _supportsTemplateMode,
-			isResolvingTemplate: isResolving(
-				'__experimentalGetTemplateForLink',
-				[ link ]
-			),
-		};
-	}, [] );
+			return {
+				template:
+					supportsTemplateMode &&
+					isViewable &&
+					getEditedPostTemplate(),
+				isEditing: isEditingTemplate(),
+				supportsTemplateMode: _supportsTemplateMode,
+			};
+		},
+		[]
+	);
 	const { __unstableSwitchToEditingMode } = useDispatch( editPostStore );
 
-	if ( ! supportsTemplateMode || isResolvingTemplate ) {
+	if ( ! supportsTemplateMode ) {
 		return null;
 	}
 
@@ -106,7 +91,7 @@ function PostTemplate() {
 			) }
 			{ isEditing && (
 				<span className="edit-post-post-template__value">
-					{ template.slug }
+					{ template?.slug }
 				</span>
 			) }
 		</PanelRow>

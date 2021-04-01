@@ -415,3 +415,12 @@ export function* __experimentalGetTemplateForLink( link ) {
 		} );
 	}
 }
+
+__experimentalGetTemplateForLink.shouldInvalidate = ( action ) => {
+	return (
+		( action.type === 'RECEIVE_ITEMS' || action.type === 'REMOVE_ITEMS' ) &&
+		action.invalidateCache &&
+		action.kind === 'postType' &&
+		action.name === 'wp_template'
+	);
+};
