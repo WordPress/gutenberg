@@ -19,8 +19,8 @@ import isElement from './is-element';
  * @property {string[]} [attributes] Attributes.
  * @property {(string | RegExp)[]} [classes] Classnames or RegExp to test against.
  * @property {'*' | { [tag: string]: SchemaItem }} [children] Child schemas.
- * @property {unknown[]} [require] ???
- * @property {boolean} allowEmpty Whether to allow empty ???.
+ * @property {string[]} [require] Selectors to test required children against. Leave empty or undefined if there are no requirements.
+ * @property {boolean} allowEmpty Whether to allow nodes without children.
  * @property {(node: Node) => boolean} [isMatch] Function to test whether a node is a match. If left undefined any node will be assumed to match.
  */
 
@@ -34,7 +34,7 @@ import isElement from './is-element';
  * @param {NodeList} nodeList The nodeList to filter.
  * @param {Document} doc      The document of the nodeList.
  * @param {Schema}   schema   An array of functions that can mutate with the provided node.
- * @param {boolean}   inline   Whether to clean for inline mode.
+ * @param {boolean}  inline   Whether to clean for inline mode.
  */
 export default function cleanNodeList( nodeList, doc, schema, inline ) {
 	Array.from( nodeList ).forEach( (
