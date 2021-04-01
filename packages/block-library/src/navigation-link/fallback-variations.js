@@ -7,7 +7,6 @@ import {
 	page as pageIcon,
 	postTitle as postIcon,
 	tag as tagIcon,
-	customPostType as formatIcon,
 } from '@wordpress/icons';
 
 // FALLBACK: this is only used when the server does not understand the variations property in the
@@ -49,13 +48,6 @@ const fallbackVariations = [
 		title: __( 'Tag Link' ),
 		description: __( 'A link to a tag.' ),
 		attributes: { type: 'tag' },
-	},
-	{
-		name: 'post_format',
-		icon: formatIcon,
-		title: __( 'Post Format Link' ),
-		description: __( 'A link to a post format.' ),
-		attributes: { type: 'format' },
 	},
 ];
 
