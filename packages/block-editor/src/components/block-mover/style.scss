@@ -30,6 +30,12 @@
 	}
 
 	.block-editor-block-mover-button {
+		&.block-editor-block-mover-button {
+			padding-right: 0;
+			padding-left: 0;
+			min-width: $button-size;
+		}
+
 		@include break-small() {
 			// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
 			height: $block-toolbar-height/2;

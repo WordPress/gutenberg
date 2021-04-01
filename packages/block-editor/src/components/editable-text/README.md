@@ -25,10 +25,6 @@ Renders an editable text input in which text formatting is not allowed.
 *Optional.* Placeholder text to show when the field is empty, similar to the
   [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
 
-### `keepPlaceholderOnFocus: Boolean`
-
-*Optional.* Show placeholder even when selected/focused, as long as there is no content.
-
 ### `onSplit( value: String ): Function`
 
 *Optional.* Called when the content can be split, where `value` is a piece of content being split off. Here you should create a new block with that content and return it. Note that you also need to provide `onReplace` in order for this to take any effect.

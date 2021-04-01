@@ -1798,7 +1798,6 @@ export const __experimentalGetParsedPattern = createSelector(
 		if ( ! pattern ) {
 			return null;
 		}
-
 		return {
 			...pattern,
 			blocks: parse( pattern.content ),
@@ -1818,10 +1817,6 @@ export const __experimentalGetParsedPattern = createSelector(
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
-		if ( ! rootClientId ) {
-			return patterns;
-		}
-
 		const parsedPatterns = patterns.map( ( { name } ) =>
 			__experimentalGetParsedPattern( state, name )
 		);

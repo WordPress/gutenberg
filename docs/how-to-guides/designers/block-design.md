@@ -158,7 +158,7 @@ The most basic unit of the editor. The Paragraph block is a simple input field.
 
 ### Placeholder:
 
-- Simple placeholder text that reads “Start writing or type / to choose a block”. The placeholder disappears when the block is selected.
+- Simple placeholder text that reads “Type / to choose a block”. The placeholder disappears when the block is selected.
 
 ### Selected state:
 

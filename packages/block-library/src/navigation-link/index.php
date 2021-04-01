@@ -91,7 +91,7 @@ function block_core_navigation_link_build_css_font_sizes( $context ) {
  * @return string
  */
 function block_core_navigation_link_render_submenu_icon() {
-	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke="#000000" stroke-width="1.5"></path></svg>';
+	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
 /**
@@ -233,8 +233,6 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
  * @return array
  */
 function build_variation_for_navigation_link( $entity, $kind ) {
-	$name = 'post_tag' === $entity->name ? 'tag' : $entity->name;
-
 	$title       = '';
 	$description = '';
 
@@ -245,15 +243,45 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 		$description = $entity->labels->item_link_description;
 	}
 
-	return array(
-		'name'        => $name,
+	$variation = array(
+		'name'        => $entity->name,
 		'title'       => $title,
 		'description' => $description,
 		'attributes'  => array(
-			'type' => $name,
+			'type' => $entity->name,
 			'kind' => $kind,
 		),
 	);
+
+	// Tweak some value for the variations.
+	$variation_overrides = array(
+		'post_tag'    => array(
+			'name'       => 'tag',
+			'attributes' => array(
+				'type' => 'tag',
+				'kind' => $kind,
+			),
+		),
+		'post_format' => array(
+			// The item_link and item_link_description for post formats is the
+			// same as for tags, so need to be overridden.
+			'title'       => __( 'Post Format Link' ),
+			'description' => __( 'A link to a post format' ),
+			'attributes'  => array(
+				'type' => 'post_format',
+				'kind' => $kind,
+			),
+		),
+	);
+
+	if ( array_key_exists( $entity->name, $variation_overrides ) ) {
+		$variation = array_merge(
+			$variation,
+			$variation_overrides[ $entity->name ]
+		);
+	}
+
+	return $variation;
 }
 
 /**
@@ -263,9 +291,13 @@ function build_variation_for_navigation_link( $entity, $kind ) {
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation_link() {
-
 	$post_types = get_post_types( array( 'show_in_nav_menus' => true ), 'objects' );
 	$taxonomies = get_taxonomies( array( 'show_in_nav_menus' => true ), 'objects' );
+
+	// Use two separate arrays as a way to order the variations in the UI.
+	// Known variations (like Post Link and Page Link) are added to the
+	// `built_ins` array. Variations for custom post types and taxonomies are
+	// added to the `variations` array and will always appear after `built-ins.
 	$built_ins  = array();
 	$variations = array();
 
@@ -282,7 +314,7 @@ function register_block_core_navigation_link() {
 	if ( $taxonomies ) {
 		foreach ( $taxonomies as $taxonomy ) {
 			$variation = build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
-			if ( 'category' === $variation['name'] || 'tag' === $variation['name'] ) {
+			if ( 'category' === $variation['name'] || 'tag' === $variation['name'] || 'post_format' === $variation['name'] ) {
 				$built_ins[] = $variation;
 			} else {
 				$variations[] = $variation;
