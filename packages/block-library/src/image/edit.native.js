@@ -475,6 +475,7 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
+			getStylesFromColorScheme,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
@@ -482,6 +483,16 @@ export class ImageEdit extends Component {
 			'value',
 			imageDefaultSize,
 		] );
+
+		const featuredButtonStyle = getStylesFromColorScheme(
+			styles.featuredButton,
+			styles.featuredButtonDark
+		);
+
+		const setFeaturedButtonStyle = getStylesFromColorScheme(
+			styles.setFeaturedButton,
+			styles.setFeaturedButtonDark
+		);
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -527,19 +538,23 @@ export class ImageEdit extends Component {
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
 				<PanelBody>
-					{ ! isFeaturedImage && (
-						<BottomSheet.Cell
-							label={ __( 'Set as Featured Image ' ) }
-							labelStyle={ styles.setFeaturedButton }
-							onPress={ this.onSetFeatured }
-						/>
-					) }
-
-					{ isFeaturedImage && (
+					{ isFeaturedImage ? (
 						<BottomSheet.Cell
 							label={ __( 'Remove as Featured Image ' ) }
-							labelStyle={ styles.removeFeaturedButton }
+							labelStyle={ [
+								featuredButtonStyle,
+								styles.removeFeaturedButton,
+							] }
 							onPress={ this.onRemoveFeatured }
+						/>
+					) : (
+						<BottomSheet.Cell
+							label={ __( 'Set as Featured Image ' ) }
+							labelStyle={ [
+								featuredButtonStyle,
+								setFeaturedButtonStyle,
+							] }
+							onPress={ this.onSetFeatured }
 						/>
 					) }
 				</PanelBody>
