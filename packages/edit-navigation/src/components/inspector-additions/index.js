@@ -23,6 +23,9 @@ export default function InspectorAdditions( {
 	isManageLocationsModalOpen,
 	closeManageLocationsModal,
 	openManageLocationsModal,
+	menuLocations,
+	assignMenuToLocation,
+	toggleMenuLocationAssignment,
 } ) {
 	const selectedBlock = useSelect(
 		( select ) => select( 'core/block-editor' ).getSelectedBlock(),
@@ -45,6 +48,11 @@ export default function InspectorAdditions( {
 			</PanelBody>
 			<PanelBody title={ __( 'Theme locations' ) }>
 				<ManageLocations
+					menuLocations={ menuLocations }
+					assignMenuToLocation={ assignMenuToLocation }
+					toggleMenuLocationAssignment={
+						toggleMenuLocationAssignment
+					}
 					menus={ menus }
 					selectedMenuId={ menuId }
 					onSelectMenu={ onSelectMenu }

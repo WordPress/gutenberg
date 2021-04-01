@@ -37,6 +37,7 @@ import {
 	useNavigationEditor,
 	useNavigationBlockEditor,
 	useMenuNotifications,
+	useMenuLocations,
 } from '../../hooks';
 import ErrorBoundary from '../error-boundary';
 import NavigationEditorShortcuts from './shortcuts';
@@ -110,6 +111,12 @@ export default function Layout( { blockEditorSettings } ) {
 	}, [] );
 
 	useMenuNotifications( selectedMenuId );
+
+	const {
+		menuLocations,
+		assignMenuToLocation,
+		toggleMenuLocationAssignment,
+	} = useMenuLocations();
 
 	const hasMenus = !! menus?.length;
 	const hasPermanentSidebar = isLargeViewport && hasMenus;
@@ -204,6 +211,15 @@ export default function Layout( { blockEditorSettings } ) {
 															blocks={ blocks }
 														/>
 														<InspectorAdditions
+															menuLocations={
+																menuLocations
+															}
+															assignMenuToLocation={
+																assignMenuToLocation
+															}
+															toggleMenuLocationAssignment={
+																toggleMenuLocationAssignment
+															}
 															isManageLocationsModalOpen={
 																isManageLocationsModalOpen
 															}

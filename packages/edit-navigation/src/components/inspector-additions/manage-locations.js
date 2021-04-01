@@ -10,11 +10,6 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import { useMenuLocations } from '../../hooks';
-
 export default function ManageLocations( {
 	onSelectMenu,
 	isModalOpen,
@@ -22,13 +17,10 @@ export default function ManageLocations( {
 	closeModal,
 	menus,
 	selectedMenuId,
+	menuLocations,
+	assignMenuToLocation,
+	toggleMenuLocationAssignment,
 } ) {
-	const {
-		menuLocations,
-		assignMenuToLocation,
-		toggleMenuLocationAssignment,
-	} = useMenuLocations();
-
 	if ( ! menuLocations ) {
 		return <Spinner />;
 	}
