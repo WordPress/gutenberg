@@ -129,7 +129,7 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$replace_regex   = '/(^\s*<div\b[^>]*wp-block-group[^>]*>)(.*)(<\/div>\s*$)/s';
+	$replace_regex   = '/(^\s*<div\b[^>]*wp-block-group[^>]*>)(.*)(<\/div>\s*$)/ms';
 	$updated_content = preg_replace_callback(
 		$replace_regex,
 		function( $matches ) {
