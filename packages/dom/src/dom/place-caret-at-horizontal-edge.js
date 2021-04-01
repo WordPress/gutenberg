@@ -4,6 +4,11 @@
 import { includes } from 'lodash';
 
 /**
+ * Internal dependencies
+ */
+import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
+
+/**
  * Places the caret at start or end of a given element.
  *
  * @param {Element} container Focusable element.
@@ -37,24 +42,15 @@ export default function placeCaretAtHorizontalEdge( container, isReverse ) {
 		return;
 	}
 
-	// Select on extent child of the container, not the container itself. This
-	// avoids the selection always being `endOffset` of 1 when placed at end,
-	// where `startContainer`, `endContainer` would always be container itself.
-	const rangeTarget = container[ isReverse ? 'lastChild' : 'firstChild' ];
-
-	// If no range target, it implies that the container is empty. Focusing is
-	// sufficient for caret to be placed correctly.
-	if ( ! rangeTarget ) {
-		return;
-	}
-
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
 	const selection = defaultView.getSelection();
-	const range = ownerDocument.createRange();
-
-	range.selectNodeContents( rangeTarget );
-	range.collapse( ! isReverse );
+	const containerRect = container.getBoundingClientRect();
+	// When placing at the end (isReverse), find the closest range to the bottom
+	// right corner. When placing at the start, to the top left corner.
+	const x = isReverse ? containerRect.right - 1 : containerRect.left + 1;
+	const y = isReverse ? containerRect.bottom - 1 : containerRect.top + 1;
+	const range = hiddenCaretRangeFromPoint( ownerDocument, x, y, container );
 
 	selection.removeAllRanges();
 	selection.addRange( range );
