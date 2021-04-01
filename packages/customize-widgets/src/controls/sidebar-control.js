@@ -14,11 +14,14 @@ const {
 	wp: { customize },
 } = window;
 
-const inserterId = 'widgets-inserter';
+const getInserterId = ( controlId ) => `widgets-inserter-${ controlId }`;
 
 class SidebarControl extends customize.Control {
 	ready() {
-		this.inserter = new InserterOuterSection( inserterId, {} );
+		this.inserter = new InserterOuterSection(
+			getInserterId( this.id ),
+			{}
+		);
 		customize.section.add( this.inserter );
 
 		this.sectionInstance = customize.section( this.section() );
