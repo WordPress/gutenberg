@@ -106,7 +106,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 						} }
 						icon={ plus }
 						label={ _x(
-							'Add block',
+							'Toggle block inserter',
 							'Generic label for block inserter button'
 						) }
 					/>

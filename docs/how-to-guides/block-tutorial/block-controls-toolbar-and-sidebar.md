@@ -44,26 +44,17 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 			alignment: 'right',
 		},
 	},
-	edit: ( props ) => {
-		const {
-			attributes: {
-				content,
-				alignment,
-			},
-		} = props;
-
-		const blockProps = useBlockProps();
-
+	edit: ( {attributes, setAttributes} ) => {
 		const onChangeContent = ( newContent ) => {
-			props.setAttributes( { content: newContent } );
+			setAttributes( { content: newContent } );
 		};
 
 		const onChangeAlignment = ( newAlignment ) => {
-			props.setAttributes( { alignment: newAlignment === undefined ? 'none' : newAlignment } );
+			setAttributes( { alignment: newAlignment === undefined ? 'none' : newAlignment } );
 		};
 
 		return (
-			<div {...blockProps}>
+			<div {...useBlockProps()}>
 				{
 					<BlockControls>
 						<AlignmentToolbar
@@ -88,9 +79,9 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 		return (
 			<div {...blockProps}>
 				<RichText.Content
-					className={ `gutenberg-examples-align-${ props.attributes.alignment }` }
+					className={ `gutenberg-examples-align-${ attributes.alignment }` }
 					tagName="p"
-					value={ props.attributes.content }
+					value={ attributes.content }
 				/>
 			</div>
 		);
@@ -131,7 +122,6 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 		edit: function( props ) {
 			var content = props.attributes.content;
 			var alignment = props.attributes.alignment;
-			var blockProps = useBlockProps();
 
 			function onChangeContent( newContent ) {
 				props.setAttributes( { content: newContent } );
@@ -142,8 +132,8 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 			}
 
 			return el( 
-				'div', 
-				blockProps, 
+				'div',
+				useBlockProps(), 
 				el(
 					BlockControls,
 					{ key: 'controls' },
@@ -192,7 +182,7 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 
 Note that `BlockControls` is only visible when the block is currently selected and in visual editing mode. `BlockControls` are not shown when editing a block in HTML editing mode.
 
-## Inspector
+## Settings Sidebar
 
 ![Screenshot of the inspector panel focused on the settings for a Paragraph block](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/inspector.png)
 
@@ -203,6 +193,89 @@ If you have settings that affects only selected content inside a block (example:
 The Block Tab is shown in place of the Document Tab when a block is selected.
 
 Similar to rendering a toolbar, if you include an `InspectorControls` element in the return value of your block type's `edit` function, those controls will be shown in the Settings Sidebar region.
+The following example adds 2 color palettes to the sidebar, one for the text color and one for the background color.
+
+```jsx
+import { registerBlockType } from '@wordpress/blocks';
+import { __ } from '@wordpress/i18n';
+import { TextControl } from '@wordpress/components';
+
+import {
+	useBlockProps,
+	ColorPalette,
+	InspectorControls,
+} from '@wordpress/block-editor';
+
+registerBlockType( 'create-block/gutenpride', {
+	apiVersion: 2,
+	attributes: {
+		message: {
+			type: 'string',
+			source: 'text',
+			selector: 'div',
+			default: '', // empty default
+		},
+		bg_color: { type: 'string', default: '#000000' },
+		text_color: { type: 'string', default: '#ffffff' },
+	},
+	edit: ( { attributes, setAttributes } ) => {
+		const onChangeBGColor = ( hexColor ) => {
+			setAttributes( { bg_color: hexColor } );
+		};
+
+		const onChangeTextColor = ( hexColor ) => {
+			setAttributes( { text_color: hexColor } );
+		};
+
+		return (
+			<div { ...useBlockProps() }>
+				<InspectorControls key="settting">
+					<div id="gutenpride-controlls">
+						<fieldset>
+							<legend className="blocks-base-control__label">
+								{ __( 'Background color', 'gutenpride' ) }
+							</legend>
+							<ColorPalette // Element Tag for Gutenberg standard colour selector
+								onChange={ onChangeBGColor } // onChange event callback
+							/>
+						</fieldset>
+						<fieldset>
+							<legend className="blocks-base-control__label">
+								{ __( 'Text color', 'gutenpride' ) }
+							</legend>
+							<ColorPalette // Element Tag for Gutenberg standard colour selector
+								onChange={ onChangeTextColor } // onChange event callback
+							/>
+						</fieldset>
+					</div>
+				</InspectorControls>
+				<TextControl
+					value={ attributes.message }
+					onChange={ ( val ) => setAttributes( { message: val } ) }
+					style={ {
+						backgroundColor: attributes.bg_color,
+						color: attributes.text_color,
+					} }
+				/>
+			</div>
+		);
+	},
+	save: ( { attributes } ) => {
+		return (
+			<div
+				{ ...useBlockProps.save() }
+				style={ {
+					backgroundColor: attributes.bg_color,
+					color: attributes.text_color,
+				} }
+			>
+				{ attributes.message }
+			</div>
+		);
+	},
+} );
+
+```
 
 Block controls rendered in both the toolbar and sidebar will also be used when
 multiple blocks of the same type are selected.
