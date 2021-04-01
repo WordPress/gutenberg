@@ -294,6 +294,11 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 function register_block_core_navigation_link() {
 	$post_types = get_post_types( array( 'show_in_nav_menus' => true ), 'objects' );
 	$taxonomies = get_taxonomies( array( 'show_in_nav_menus' => true ), 'objects' );
+
+	// Use two separate arrays as a way to order the variations in the UI.
+	// Known variations (like Post Link and Page Link) are added to the
+	// `built_ins` array. Variations for custom post types and taxonomies are
+	// added to the `variations` array and will always appear after `built-ins.
 	$built_ins  = array();
 	$variations = array();
 
