@@ -19,18 +19,17 @@ function gutenberg_load_block_page_templates( $templates, $theme, $post, $post_t
 		return $templates;
 	}
 
-	$data             = WP_Theme_JSON_Resolver::get_theme_data()->get_custom_templates();
-	$custom_templates = array();
+	$data = WP_Theme_JSON_Resolver::get_theme_data()->get_custom_templates();
 	if ( isset( $data ) ) {
 		foreach ( $data  as $key => $template ) {
 			if ( ( ! isset( $template['postTypes'] ) && 'page' === $post_type ) ||
 				( isset( $template['postTypes'] ) && in_array( $post_type, $template['postTypes'], true ) )
 			) {
-				$custom_templates[ $key ] = $template['title'];
+				$templates[ $key ] = $template['title'];
 			}
 		}
 	}
 
-	return $custom_templates;
+	return $templates;
 }
 add_filter( 'theme_templates', 'gutenberg_load_block_page_templates', 10, 4 );
