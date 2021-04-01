@@ -42,8 +42,7 @@ function KeyboardShortcuts() {
 		}
 		const [ selectedParentClientId ] = getBlockParentsByBlockName(
 			selectedClientId,
-			'core/widget-area',
-			false
+			'core/widget-area'
 		);
 		return {
 			rootBlocksClientIds: getBlockOrder( selectedParentClientId ),
