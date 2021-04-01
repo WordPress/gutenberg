@@ -239,7 +239,7 @@ function VideoEdit( {
 					<RichText
 						tagName="figcaption"
 						aria-label={ __( 'Video caption text' ) }
-						placeholder={ __( 'Write caption…' ) }
+						placeholder={ __( 'Add caption' ) }
 						value={ caption }
 						onChange={ ( value ) =>
 							setAttributes( { caption: value } )

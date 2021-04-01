@@ -40,8 +40,10 @@ export async function closeGlobalBlockInserter() {
 
 async function isGlobalInserterOpen() {
 	return await page.evaluate( () => {
+		// "Add block" selector is required to make sure performance comparison
+		// doesn't fail on older branches where we still had "Add block" as label.
 		return !! document.querySelector(
-			'.edit-post-header [aria-label="Add block"].is-pressed, .edit-site-header [aria-label="Add block"].is-pressed'
+			'.edit-post-header [aria-label="Add block"].is-pressed, .edit-site-header [aria-label="Add block"].is-pressed, .edit-post-header [aria-label="Toggle block inserter"].is-pressed, .edit-site-header [aria-label="Toggle block inserter"].is-pressed'
 		);
 	} );
 }
@@ -49,8 +51,10 @@ async function isGlobalInserterOpen() {
  * Toggles the global inserter.
  */
 export async function toggleGlobalBlockInserter() {
+	// "Add block" selector is required to make sure performance comparison
+	// doesn't fail on older branches where we still had "Add block" as label.
 	await page.click(
-		'.edit-post-header [aria-label="Add block"], .edit-site-header [aria-label="Add block"]'
+		'.edit-post-header [aria-label="Add block"], .edit-site-header [aria-label="Add block"], .edit-post-header [aria-label="Toggle block inserter"], .edit-site-header [aria-label="Toggle block inserter"]'
 	);
 }
 
