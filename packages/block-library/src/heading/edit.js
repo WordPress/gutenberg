@@ -80,7 +80,7 @@ function HeadingEdit( {
 				onReplace={ onReplace }
 				onRemove={ () => onReplace( [] ) }
 				aria-label={ __( 'Heading text' ) }
-				placeholder={ placeholder || __( 'Write heading…' ) }
+				placeholder={ placeholder || __( 'Heading' ) }
 				textAlign={ textAlign }
 				{ ...blockProps }
 			/>

@@ -65,7 +65,7 @@ export default function QuoteEdit( {
 					aria-label={ __( 'Quote text' ) }
 					placeholder={
 						// translators: placeholder text used for the quote
-						__( 'Write quote…' )
+						__( 'Add quote' )
 					}
 					onReplace={ onReplace }
 					onSplit={ ( piece ) =>
@@ -94,7 +94,7 @@ export default function QuoteEdit( {
 						aria-label={ __( 'Quote citation text' ) }
 						placeholder={
 							// translators: placeholder text used for the citation
-							__( 'Write citation…' )
+							__( 'Add citation' )
 						}
 						className="wp-block-quote__citation"
 						textAlign={ align }

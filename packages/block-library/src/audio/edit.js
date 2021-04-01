@@ -188,7 +188,7 @@ function AudioEdit( {
 					<RichText
 						tagName="figcaption"
 						aria-label={ __( 'Audio caption text' ) }
-						placeholder={ __( 'Write caption…' ) }
+						placeholder={ __( 'Add caption' ) }
 						value={ caption }
 						onChange={ ( value ) =>
 							setAttributes( { caption: value } )

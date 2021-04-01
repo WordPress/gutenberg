@@ -528,7 +528,7 @@ function TableEdit( {
 				<RichText
 					tagName="figcaption"
 					aria-label={ __( 'Table caption text' ) }
-					placeholder={ __( 'Write caption…' ) }
+					placeholder={ __( 'Add caption' ) }
 					value={ caption }
 					onChange={ ( value ) =>
 						setAttributes( { caption: value } )
