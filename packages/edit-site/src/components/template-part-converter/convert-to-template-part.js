@@ -113,12 +113,13 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 								/>
 								<BaseControl
 									label={ __( 'Area' ) }
-									id={ `edit-site-template-part-converter__area-base-control-${ instanceId }` }
+									id={ `edit-site-template-part-converter__area-selection-${ instanceId }` }
 									className="edit-site-template-part-converter__area-base-control"
 								>
 									<Composite
 										className="edit-site-template-part-converter__area-composite"
 										role="group"
+										id={ `edit-site-template-part-converter__area-selection-${ instanceId }` }
 										aria-label={ __( 'Area' ) }
 										{ ...composite }
 									>
