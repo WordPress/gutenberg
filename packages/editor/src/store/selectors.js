@@ -1672,6 +1672,24 @@ export function __experimentalGetDefaultTemplateTypes( state ) {
 }
 
 /**
+ * Returns the default template part areas.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} The template part areas.
+ */
+export const __experimentalGetDefaultTemplatePartAreas = createSelector(
+	( state ) => {
+		const areas = getEditorSettings( state )?.defaultTemplatePartAreas;
+		const areasWithIcons = areas?.map( ( item ) => {
+			return { ...item, icon: getIconByArea( item.area ) };
+		} );
+		return areasWithIcons;
+	},
+	( state ) => [ getEditorSettings( state )?.defaultTemplatePartAreas ]
+);
+
+/**
  * Returns a default template type searched by slug.
  *
  * @param {Object} state Global application state.
@@ -1706,11 +1724,7 @@ export function __experimentalGetTemplateInfo( state, template ) {
 
 	const templateTitle = isString( title ) ? title : title?.rendered;
 	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
-	const iconsByArea = {
-		footer,
-		header,
-	};
-	const templateIcon = iconsByArea[ area ] || layout;
+	const templateIcon = getIconByArea( area );
 
 	return {
 		title:
@@ -1720,4 +1734,12 @@ export function __experimentalGetTemplateInfo( state, template ) {
 		description: templateDescription || defaultDescription,
 		icon: templateIcon,
 	};
+}
+
+function getIconByArea( area ) {
+	const iconsByArea = {
+		footer,
+		header,
+	};
+	return iconsByArea[ area ] || layout;
 }

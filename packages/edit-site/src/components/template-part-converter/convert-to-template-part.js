@@ -7,7 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
 	store as blockEditorStore,
@@ -33,6 +33,8 @@ import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as editorStore } from '@wordpress/editor';
+import { check } from '@wordpress/icons';
 
 export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const instanceId = useInstanceId( ConvertToTemplatePart );
@@ -43,6 +45,12 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ area, setArea ] = useState( 'uncategorized' );
 	const composite = useCompositeState();
+
+	const templatePartAreas = useSelect(
+		( select ) =>
+			select( editorStore ).__experimentalGetDefaultTemplatePartAreas(),
+		[]
+	);
 
 	const onConvert = async ( templatePartTitle ) => {
 		const defaultTitle = __( 'Untitled Template Part' );
@@ -111,13 +119,14 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 									<Composite
 										className="edit-site-template-part-converter__area-composite"
 										role="group"
+										aria-label={ __( 'Area' ) }
 										{ ...composite }
 									>
-										{ AREA_OPTIONS.map(
+										{ templatePartAreas.map(
 											( {
 												icon,
 												label,
-												value,
+												area: value,
 												description,
 											} ) => (
 												<CompositeItem
@@ -198,31 +207,3 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 		</BlockSettingsMenuControls>
 	);
 }
-
-import { footer, header, layout, check } from '@wordpress/icons';
-const AREA_OPTIONS = [
-	{
-		description: __(
-			'General templates often perform a specific role like displaying post content, and are not tied to any particular area.'
-		),
-		icon: layout,
-		label: __( 'General' ),
-		value: 'uncategorized',
-	},
-	{
-		description: __(
-			'The Header template defines a page area that typically contains a title, logo, and main navigation.'
-		),
-		icon: header,
-		label: __( 'Header' ),
-		value: 'header',
-	},
-	{
-		description: __(
-			'The Footer template defines a page area that typically contains site credits, social links, or any other combination of blocks.'
-		),
-		icon: footer,
-		label: __( 'Footer' ),
-		value: 'footer',
-	},
-];
