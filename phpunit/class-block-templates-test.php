@@ -213,8 +213,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'publish', $template->status );
 		$this->assertEquals( 'theme', $template->source );
 		$this->assertEquals( 'wp_template_part', $template->type );
-		// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
-		$this->assertEquals( WP_TEMPLATE_PART_AREA_UNCATEGORIZED, $template->area );
+		$this->assertEquals( WP_TEMPLATE_PART_AREA_HEADER, $template->area );
 	}
 
 	/**
