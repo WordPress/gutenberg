@@ -51,7 +51,7 @@ const fallbackVariations = [
 		attributes: { type: 'tag' },
 	},
 	{
-		name: 'format',
+		name: 'post_format',
 		icon: formatIcon,
 		title: __( 'Post Format Link' ),
 		description: __( 'A link to a post format.' ),

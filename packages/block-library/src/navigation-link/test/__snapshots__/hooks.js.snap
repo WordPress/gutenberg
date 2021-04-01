@@ -99,7 +99,7 @@ Object {
         />
       </SVG>,
       "isActive": [Function],
-      "name": "format",
+      "name": "post_format",
       "title": "Post Format Link",
     },
   ],

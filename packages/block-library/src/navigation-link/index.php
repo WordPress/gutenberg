@@ -263,13 +263,12 @@ function build_variation_for_navigation_link( $entity, $kind ) {
 			),
 		),
 		'post_format' => array(
-			'name'        => 'format',
 			// The item_link and item_link_description for post formats is the
-			// same as for tags, so need to be overriden.
+			// same as for tags, so need to be overridden.
 			'title'       => __( 'Post Format Link' ),
 			'description' => __( 'A link to a post format' ),
 			'attributes'  => array(
-				'type' => 'format',
+				'type' => 'post_format',
 				'kind' => $kind,
 			),
 		),
@@ -315,7 +314,7 @@ function register_block_core_navigation_link() {
 	if ( $taxonomies ) {
 		foreach ( $taxonomies as $taxonomy ) {
 			$variation = build_variation_for_navigation_link( $taxonomy, 'taxonomy' );
-			if ( 'category' === $variation['name'] || 'tag' === $variation['name'] || 'format' === $variation['name'] ) {
+			if ( 'category' === $variation['name'] || 'tag' === $variation['name'] || 'post_format' === $variation['name'] ) {
 				$built_ins[] = $variation;
 			} else {
 				$variations[] = $variation;

@@ -117,7 +117,7 @@ function getSuggestionsQuery( type, kind ) {
 			return { type: 'term', subtype: 'category' };
 		case 'tag':
 			return { type: 'term', subtype: 'post_tag' };
-		case 'format':
+		case 'post_format':
 			return { type: 'post-format' };
 		default:
 			if ( kind === 'taxonomy' ) {
