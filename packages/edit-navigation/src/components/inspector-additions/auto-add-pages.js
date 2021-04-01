@@ -1,17 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 import { ToggleControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-export default function AutoAddPages( { menuId } ) {
+/**
+ * Internal dependencies
+ */
+import { useMenuEntity } from '../../hooks';
+
+export default function AutoAddPages( {
+	menuId,
+	autoAddPages,
+	setAutoAddPages,
+} ) {
 	const menu = useSelect( ( select ) => select( 'core' ).getMenu( menuId ), [
 		menuId,
 	] );
-
-	const [ autoAddPages, setAutoAddPages ] = useState( null );
 
 	useEffect( () => {
 		if ( autoAddPages === null && menu ) {
@@ -19,7 +26,7 @@ export default function AutoAddPages( { menuId } ) {
 		}
 	}, [ autoAddPages, menu ] );
 
-	const { saveMenu } = useDispatch( 'core' );
+	const { editMenuEntityRecord, menuEntityData } = useMenuEntity( menuId );
 
 	return (
 		<ToggleControl
@@ -30,8 +37,7 @@ export default function AutoAddPages( { menuId } ) {
 			checked={ autoAddPages ?? false }
 			onChange={ ( newAutoAddPages ) => {
 				setAutoAddPages( newAutoAddPages );
-				saveMenu( {
-					...menu,
+				editMenuEntityRecord( ...menuEntityData, {
 					auto_add: newAutoAddPages,
 				} );
 			} }

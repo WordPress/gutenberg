@@ -60,6 +60,7 @@ const interfaceLabels = {
 export default function Layout( { blockEditorSettings } ) {
 	const contentAreaRef = useBlockSelectionClearer();
 	const isLargeViewport = useViewportMatch( 'medium' );
+	const [ autoAddPages, setAutoAddPages ] = useState( null );
 	const [ isMenuNameControlFocused, setIsMenuNameControlFocused ] = useState(
 		false
 	);
@@ -204,6 +205,12 @@ export default function Layout( { blockEditorSettings } ) {
 															blocks={ blocks }
 														/>
 														<InspectorAdditions
+															autoAddPages={
+																autoAddPages
+															}
+															setAutoAddPages={
+																setAutoAddPages
+															}
 															isManageLocationsModalOpen={
 																isManageLocationsModalOpen
 															}
