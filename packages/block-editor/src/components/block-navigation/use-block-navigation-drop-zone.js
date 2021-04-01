@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
-import { useThrottle } from '@wordpress/compose';
+import {
+	useThrottle,
+	__experimentalUseDropZone as useDropZone,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -213,11 +215,7 @@ export default function useBlockNavigationDropZone() {
 	const { rootClientId: targetRootClientId, blockIndex: targetBlockIndex } =
 		target || {};
 
-	const dropEventHandlers = useOnBlockDrop(
-		targetRootClientId,
-		targetBlockIndex
-	);
-
+	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
 	const throttled = useThrottle(
 		useCallback( ( event, currentTarget ) => {
 			const position = { x: event.clientX, y: event.clientY };
@@ -266,7 +264,7 @@ export default function useBlockNavigationDropZone() {
 	);
 
 	const ref = useDropZone( {
-		...dropEventHandlers,
+		onDrop: onBlockDrop,
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
 			// handled, so get it now and pass it to the thottled function.

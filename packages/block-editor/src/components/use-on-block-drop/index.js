@@ -7,6 +7,7 @@ import {
 	pasteHandler,
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
+import { getFilesFromDataTransfer } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -239,28 +240,39 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 		clearSelectedBlock,
 	} = useDispatch( blockEditorStore );
 
-	return {
-		onDrop: onBlockDrop(
-			targetRootClientId,
-			targetBlockIndex,
-			getBlockIndex,
-			getClientIdsOfDescendants,
-			moveBlocksToPosition,
-			insertBlocks,
-			clearSelectedBlock
-		),
-		onFilesDrop: onFilesDrop(
-			targetRootClientId,
-			targetBlockIndex,
-			hasUploadPermissions,
-			updateBlockAttributes,
-			canInsertBlockType,
-			insertBlocks
-		),
-		onHTMLDrop: onHTMLDrop(
-			targetRootClientId,
-			targetBlockIndex,
-			insertBlocks
-		),
+	const _onDrop = onBlockDrop(
+		targetRootClientId,
+		targetBlockIndex,
+		getBlockIndex,
+		getClientIdsOfDescendants,
+		moveBlocksToPosition,
+		insertBlocks,
+		clearSelectedBlock
+	);
+	const _onFilesDrop = onFilesDrop(
+		targetRootClientId,
+		targetBlockIndex,
+		hasUploadPermissions,
+		updateBlockAttributes,
+		canInsertBlockType,
+		insertBlocks
+	);
+	const _onHTMLDrop = onHTMLDrop(
+		targetRootClientId,
+		targetBlockIndex,
+		insertBlocks
+	);
+
+	return ( event ) => {
+		const files = getFilesFromDataTransfer( event.dataTransfer );
+		const html = event.dataTransfer.getData( 'text/html' );
+
+		if ( files.length ) {
+			_onFilesDrop( files );
+		} else if ( html ) {
+			_onHTMLDrop( html );
+		} else {
+			_onDrop( event );
+		}
 	};
 }

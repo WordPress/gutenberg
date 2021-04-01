@@ -1,10 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useCallback, useState } from '@wordpress/element';
-import { useThrottle } from '@wordpress/compose';
+import {
+	useThrottle,
+	__experimentalUseDropZone as useDropZone,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -114,11 +116,7 @@ export default function useBlockDropZone( {
 		'core/block-editor'
 	);
 
-	const dropEventHandlers = useOnBlockDrop(
-		targetRootClientId,
-		targetBlockIndex
-	);
-
+	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
 	const throttled = useThrottle(
 		useCallback( ( event, currentTarget ) => {
 			const blockElements = Array.from( currentTarget.children );
@@ -139,7 +137,7 @@ export default function useBlockDropZone( {
 
 	return useDropZone( {
 		isDisabled: isLockedAll,
-		...dropEventHandlers,
+		onDrop: onBlockDrop,
 		onDragOver( event ) {
 			// `currentTarget` is only available while the event is being
 			// handled, so get it now and pass it to the thottled function.
