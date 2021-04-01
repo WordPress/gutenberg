@@ -58,6 +58,8 @@ The block editor allows themes to opt-in to slightly more opinionated styles for
 add_theme_support( 'wp-block-styles' );
 ```
 
+You can see the CSS that will be included in the [block library theme file](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/theme.scss).
+
 ### Wide Alignment:
 
 Some blocks such as the image block have the possibility to define a "wide" or "full" alignment by adding the corresponding classname to the block's wrapper ( `alignwide` or `alignfull` ). A theme can opt-in for this feature by calling:
