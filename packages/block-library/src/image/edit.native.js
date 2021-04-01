@@ -94,6 +94,7 @@ export class ImageEdit extends Component {
 		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
+		this.onCheckFeatured = this.onCheckFeatured.bind( this );
 		this.onSetFeatured = this.onSetFeatured.bind( this );
 		this.onRemoveFeatured = this.onRemoveFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
@@ -161,7 +162,7 @@ export class ImageEdit extends Component {
 
 		// Check whether an image is featured when the editor first loads.
 		if ( attributes.id ) {
-			checkIfFeaturedImage( attributes.id );
+			this.onCheckFeatured();
 		}
 
 		this.addFeaturedImageIdListener();
@@ -188,11 +189,8 @@ export class ImageEdit extends Component {
 		if ( ! previousProps.image && this.props.image ) {
 			const url = getUrlForSlug( image, attributes ) || image.source_url;
 			this.props.setAttributes( { url } );
-		}
-
-		// Check whether an image is featured when changes happen, such as when image is replaced within block.
-		if ( attributes.id ) {
-			checkIfFeaturedImage( attributes.id );
+			// Check whether an image is featured when changes happen, such as when image is replaced within block.
+			this.onCheckFeatured();
 		}
 	}
 
@@ -291,6 +289,11 @@ export class ImageEdit extends Component {
 			...extraUpdatedAttributes,
 			align: nextAlign,
 		} );
+	}
+
+	onCheckFeatured() {
+		const { attributes } = this.props;
+		checkIfFeaturedImage( attributes.id );
 	}
 
 	onSetFeatured() {
