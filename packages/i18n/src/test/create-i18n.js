@@ -194,6 +194,29 @@ describe( 'createI18n', () => {
 			} );
 		} );
 	} );
+
+	describe( 'resetLocaleData', () => {
+		it( 'reset the locale data', () => {
+			const locale = createTestLocale();
+			expect( locale.__( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
+
+			locale.resetLocaleData();
+			expect( locale.__( 'hello', 'test_domain' ) ).toBe( 'hello' );
+		} );
+
+		it( 'reset the current locale data and set new locale data for the specified domain', () => {
+			const locale = createTestLocale();
+			expect( locale.__( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
+
+			locale.resetLocaleData( additionalLocaleData );
+			expect( locale.__( 'cheeseburger' ) ).toBe(
+				'hamburger au fromage'
+			);
+
+			locale.resetLocaleData( additionalLocaleData, 'test_domain2' );
+			expect( locale.__( '%d cat', 'test_domain2' ) ).toBe( '%d chat' );
+		} );
+	} );
 } );
 
 describe( 'i18n filters', () => {
