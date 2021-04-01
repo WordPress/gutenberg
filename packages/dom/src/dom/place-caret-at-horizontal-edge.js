@@ -11,10 +11,15 @@ import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
 /**
  * Places the caret at start or end of a given element.
  *
- * @param {Element} container Focusable element.
- * @param {boolean} isReverse True for end, false for start.
+ * @param {Element} container    Focusable element.
+ * @param {boolean} isReverse    True for end, false for start.
+ * @param {boolean} mayUseScroll Whether to allow scrolling.
  */
-export default function placeCaretAtHorizontalEdge( container, isReverse ) {
+export default function placeCaretAtHorizontalEdge(
+	container,
+	isReverse,
+	mayUseScroll
+) {
 	if ( ! container ) {
 		return;
 	}
@@ -43,8 +48,6 @@ export default function placeCaretAtHorizontalEdge( container, isReverse ) {
 	}
 
 	const { ownerDocument } = container;
-	const { defaultView } = ownerDocument;
-	const selection = defaultView.getSelection();
 	const containerRect = container.getBoundingClientRect();
 	// When placing at the end (isReverse), find the closest range to the bottom
 	// right corner. When placing at the start, to the top left corner.
@@ -52,6 +55,26 @@ export default function placeCaretAtHorizontalEdge( container, isReverse ) {
 	const y = isReverse ? containerRect.bottom - 1 : containerRect.top + 1;
 	const range = hiddenCaretRangeFromPoint( ownerDocument, x, y, container );
 
+	// If no range range can be created or it is outside the container, the
+	// element may be out of view.
+	if (
+		! range ||
+		! range.startContainer ||
+		! container.contains( range.startContainer )
+	) {
+		if ( ! mayUseScroll ) {
+			return;
+		}
+
+		// Only try to scroll into view once to avoid an infinite loop.
+		mayUseScroll = false;
+		container.scrollIntoView( isReverse );
+		placeCaretAtHorizontalEdge( container, isReverse, mayUseScroll );
+		return;
+	}
+
+	const { defaultView } = ownerDocument;
+	const selection = defaultView.getSelection();
 	selection.removeAllRanges();
 	selection.addRange( range );
 }
