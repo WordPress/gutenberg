@@ -20,7 +20,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -78,7 +78,14 @@ function ColumnEdit( {
 
 	const columnsCount = columnsIds.length;
 	const currentColumnPosition = columnsIds.indexOf( clientId ) + 1;
-	const label = `${ innerBlocksProps[ 'aria-label' ] } (${ currentColumnPosition } of ${ columnsCount })`;
+
+	const label = sprintf(
+		/* translators: 1: Block label (i.e. "Block: Column"), 2: Position of the selected block, 3: Total number of sibling blocks of the same type */
+		__( '%1$s (%2$d of %3$d)' ),
+		innerBlocksProps[ 'aria-label' ],
+		currentColumnPosition,
+		columnsCount
+	);
 
 	return (
 		<>
