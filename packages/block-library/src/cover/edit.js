@@ -301,7 +301,7 @@ function CoverEdit( {
 		setGradient,
 	} = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes );
-	const isBlogUrl = isBlobURL( url );
+	const isTemporaryImage = isBlobURL( url );
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
 	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
@@ -574,7 +574,7 @@ function CoverEdit( {
 		{
 			'is-dark-theme': isDark,
 			'has-background-dim': dimRatio !== 0,
-			'is-transient': isBlogUrl,
+			'is-transient': isTemporaryImage,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 			[ overlayColor.class ]: overlayColor.class,
@@ -644,7 +644,7 @@ function CoverEdit( {
 						style={ mediaStyle }
 					/>
 				) }
-				{ isBlogUrl && <Spinner /> }
+				{ isTemporaryImage && <Spinner /> }
 				<CoverPlaceholder
 					hasBackground={ hasBackground }
 					noticeUI={ noticeUI }
