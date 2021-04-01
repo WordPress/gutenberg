@@ -139,44 +139,6 @@ describe( 'createI18n', () => {
 	} );
 
 	describe( 'setLocaleData', () => {
-		it( 'merge the new and the existing locale data as a default behavior', () => {
-			const locale = createTestLocale();
-			locale.setLocaleData(
-				{ 'new string': [ 'new string translated' ] },
-				'test_domain'
-			);
-			expect( locale.__( 'new string', 'test_domain' ) ).toBe(
-				'new string translated'
-			);
-			expect( locale.__( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
-		} );
-
-		it( 'replace the existing locale data for the specified text domain', () => {
-			const locale = createTestLocale();
-			locale.setLocaleData( additionalLocaleData, 'test_domain2' );
-
-			expect( locale.__( 'hello', 'test_domain' ) ).toBe( 'bonjour' );
-			expect( locale.__( 'cheeseburger', 'test_domain2' ) ).toBe(
-				'hamburger au fromage'
-			);
-
-			locale.setLocaleData(
-				{
-					'new string': [ 'new string translated' ],
-				},
-				'test_domain',
-				false
-			);
-
-			expect( locale.__( 'new string', 'test_domain' ) ).toBe(
-				'new string translated'
-			);
-			expect( locale.__( 'hello', 'test_domain' ) ).toBe( 'hello' );
-			expect( locale.__( 'cheeseburger', 'test_domain2' ) ).toBe(
-				'hamburger au fromage'
-			);
-		} );
-
 		it( 'supports omitted plural forms expression', () => {
 			const locale = createTestLocaleWithAdditionalData();
 			locale.setLocaleData(
