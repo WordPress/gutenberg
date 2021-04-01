@@ -14,6 +14,10 @@ npm install @wordpress/data --save
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
 
+## Tutorial
+
+There is also a more exhaustive [step-by-step tutorial available here](https://unfoldingneurons.com/2020/what-is-wordpress-data/).
+
 ## Registering a Store
 
 Use the `register` function to add your own store to the centralized data registry. This function accepts one argument – a store definition object that can be created with `createReduxStore` factory function. `createReduxStore` accepts two arguments: a name to identify the module, and an object with values describing how your state is represented, modified, and accessed. At a minimum, you must provide a reducer function describing the shape of your state and how it changes in response to actions dispatched to the store.
