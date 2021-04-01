@@ -61,11 +61,3 @@
 .components-drop-zone__provider {
 	height: 100%;
 }
-
-[data-wp-is-dragging] * {
-	pointer-events: none;
-}
-
-[data-wp-is-drop-target] {
-	pointer-events: all;
-}

@@ -3,7 +3,8 @@
  */
 import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useCallback, useState } from '@wordpress/element';
+import { useThrottle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -118,11 +119,9 @@ export default function useBlockDropZone( {
 		targetBlockIndex
 	);
 
-	return useDropZone( {
-		isDisabled: isLockedAll,
-		...dropEventHandlers,
-		onDragOver( event ) {
-			const blockElements = Array.from( event.target.children );
+	const throttled = useThrottle(
+		useCallback( ( event, currentTarget ) => {
+			const blockElements = Array.from( currentTarget.children );
 			const targetIndex = getNearestBlockIndex(
 				blockElements,
 				{ x: event.clientX, y: event.clientY },
@@ -134,8 +133,21 @@ export default function useBlockDropZone( {
 			if ( targetIndex !== null ) {
 				showInsertionPoint( targetRootClientId, targetIndex );
 			}
+		}, [] ),
+		200
+	);
+
+	return useDropZone( {
+		isDisabled: isLockedAll,
+		...dropEventHandlers,
+		onDragOver( event ) {
+			// `currentTarget` is only available while the event is being
+			// handled, so get it now and pass it to the thottled function.
+			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
+			throttled( event, event.currentTarget );
 		},
 		onDragEnd() {
+			throttled.cancel();
 			hideInsertionPoint();
 			setTargetBlockIndex( null );
 		},

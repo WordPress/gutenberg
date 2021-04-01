@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { includes, throttle } from 'lodash';
+import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -67,45 +67,53 @@ export function useDropZone( {
 
 			let isDraggingGlobally = false;
 
-			element.setAttribute( 'data-wp-is-drop-target', 'true' );
-
 			const { ownerDocument } = element;
 
 			function onDragEnter( event ) {
 				event.preventDefault();
+
+				// The `dragenter` event will also fire when entering child
+				// elements, but we only want to call `onDragEnter` when
+				// entering the drop zone, which means the `relatedTarget`
+				// (element that has been left) should be outside the drop zone.
+				if ( element.contains( event.relatedTarget ) ) {
+					return;
+				}
+
 				if ( onDragEnterRef.current ) {
 					onDragEnterRef.current( event );
 				}
 			}
 
-			const throttledOnDragOver = throttle( ( event ) => {
-				if ( onDragOverRef.current ) {
+			function onDragOver( event ) {
+				// Only call onDragOver for the innermost hovered drop zones.
+				if ( ! event.defaultPrevented && onDragOverRef.current ) {
 					onDragOverRef.current( event );
 				}
-			}, 200 );
 
-			function onDragOver( event ) {
-				// Only call onDragOver for the innermost hovered drag zones.
-				if ( ! event.defaultPrevented ) {
-					throttledOnDragOver( event );
-				}
-
+				// Prevent the browser default while also signalling to parent
+				// drop zones that `onDragOver` is already handled.
 				event.preventDefault();
 			}
 
 			function onDragLeave( event ) {
+				// The `dragleave` event will also fire when leaving child
+				// elements, but we only want to call `onDragLeave` when
+				// leaving the drop zone, which means the `relatedTarget`
+				// (element that has been entered) should be outside the drop
+				// zone.
+				if ( element.contains( event.relatedTarget ) ) {
+					return;
+				}
+
 				if ( onDragLeaveRef.current ) {
 					onDragLeaveRef.current( event );
 				}
 			}
 
 			function resetDragState( event ) {
-				throttledOnDragOver.cancel();
-
 				if ( isDraggingGlobally ) {
 					isDraggingGlobally = false;
-
-					element.removeAttribute( 'data-wp-is-dragging' );
 
 					ownerDocument.addEventListener(
 						'dragover',
@@ -147,8 +155,6 @@ export function useDropZone( {
 				if ( ! isDraggingGlobally ) {
 					isDraggingGlobally = true;
 
-					element.setAttribute( 'data-wp-is-dragging', 'true' );
-
 					ownerDocument.removeEventListener(
 						'dragover',
 						onGlobalDragOver
@@ -172,8 +178,6 @@ export function useDropZone( {
 			ownerDocument.addEventListener( 'dragover', onGlobalDragOver );
 
 			return () => {
-				element.removeAttribute( 'data-wp-is-dragging' );
-				element.removeAttribute( 'data-wp-is-drop-target' );
 				element.removeEventListener( 'drop', onDrop );
 				element.removeEventListener( 'dragenter', onDragEnter );
 				element.removeEventListener( 'dragover', onDragOver );
@@ -181,7 +185,6 @@ export function useDropZone( {
 				ownerDocument.removeEventListener( 'mouseup', resetDragState );
 				ownerDocument.removeEventListener( 'dragend', resetDragState );
 				ownerDocument.addEventListener( 'dragover', onGlobalDragOver );
-				throttledOnDragOver.cancel();
 			};
 		},
 		[ isDisabled ]

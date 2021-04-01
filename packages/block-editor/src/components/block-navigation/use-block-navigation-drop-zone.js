@@ -3,7 +3,8 @@
  */
 import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
+import { useThrottle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -217,9 +218,8 @@ export default function useBlockNavigationDropZone() {
 		targetBlockIndex
 	);
 
-	const ref = useDropZone( {
-		...dropEventHandlers,
-		onDragOver( event ) {
+	const throttled = useThrottle(
+		useCallback( ( event, currentTarget ) => {
 			const position = { x: event.clientX, y: event.clientY };
 			const isBlockDrag = !! event.dataTransfer.getData( 'wp-blocks' );
 
@@ -228,7 +228,7 @@ export default function useBlockNavigationDropZone() {
 				: undefined;
 
 			const blockElements = Array.from(
-				event.target.querySelectorAll( '[data-block]' )
+				currentTarget.querySelectorAll( '[data-block]' )
 			);
 
 			const blocksData = blockElements.map( ( blockElement ) => {
@@ -261,8 +261,20 @@ export default function useBlockNavigationDropZone() {
 			if ( newTarget ) {
 				setTarget( newTarget );
 			}
+		}, [] ),
+		200
+	);
+
+	const ref = useDropZone( {
+		...dropEventHandlers,
+		onDragOver( event ) {
+			// `currentTarget` is only available while the event is being
+			// handled, so get it now and pass it to the thottled function.
+			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
+			throttled( event, event.currentTarget );
 		},
 		onDragEnd() {
+			throttled.cancel();
 			setTarget( null );
 		},
 	} );
