@@ -40,23 +40,23 @@ function useFreshRef( value ) {
 }
 
 export function useDropZone( {
+	isDisabled,
 	onFilesDrop,
 	onHTMLDrop,
 	onDrop: _onDrop,
-	onDragStart,
+	onDragStart: _onDragStart,
 	onDragEnter: _onDragEnter,
 	onDragLeave: _onDragLeave,
-	onDragEnd,
-	isDisabled,
+	onDragEnd: _onDragEnd,
 	onDragOver: _onDragOver,
 } ) {
 	const onFilesDropRef = useFreshRef( onFilesDrop );
 	const onHTMLDropRef = useFreshRef( onHTMLDrop );
 	const onDropRef = useFreshRef( _onDrop );
-	const onDragStartRef = useFreshRef( onDragStart );
+	const onDragStartRef = useFreshRef( _onDragStart );
 	const onDragEnterRef = useFreshRef( _onDragEnter );
 	const onDragLeaveRef = useFreshRef( _onDragLeave );
-	const onDragEndRef = useFreshRef( onDragEnd );
+	const onDragEndRef = useFreshRef( _onDragEnd );
 	const onDragOverRef = useFreshRef( _onDragOver );
 
 	return useRefEffect(
@@ -65,9 +65,26 @@ export function useDropZone( {
 				return;
 			}
 
-			let isDraggingGlobally = false;
+			let isDragging = false;
 
 			const { ownerDocument } = element;
+
+			function maybeDragStart( event ) {
+				if ( isDragging ) {
+					return;
+				}
+
+				isDragging = true;
+
+				ownerDocument.removeEventListener(
+					'dragenter',
+					maybeDragStart
+				);
+
+				if ( onDragStartRef.current ) {
+					onDragStartRef.current( event );
+				}
+			}
 
 			function onDragEnter( event ) {
 				event.preventDefault();
@@ -111,21 +128,6 @@ export function useDropZone( {
 				}
 			}
 
-			function resetDragState( event ) {
-				if ( isDraggingGlobally ) {
-					isDraggingGlobally = false;
-
-					ownerDocument.addEventListener(
-						'dragover',
-						onGlobalDragOver
-					);
-
-					if ( onDragEndRef.current ) {
-						onDragEndRef.current( event );
-					}
-				}
-			}
-
 			function onDrop( event ) {
 				// This seemingly useless line has been shown to resolve a Safari issue
 				// where files dragged directly from the dock are not recognized
@@ -145,24 +147,23 @@ export function useDropZone( {
 					onDropRef.current( event );
 				}
 
-				resetDragState( event );
+				maybeDragEnd( event );
 
 				event.stopPropagation();
 				event.preventDefault();
 			}
 
-			function onGlobalDragOver( event ) {
-				if ( ! isDraggingGlobally ) {
-					isDraggingGlobally = true;
+			function maybeDragEnd( event ) {
+				if ( ! isDragging ) {
+					return;
+				}
 
-					ownerDocument.removeEventListener(
-						'dragover',
-						onGlobalDragOver
-					);
+				isDragging = false;
 
-					if ( onDragStartRef.current ) {
-						onDragStartRef.current( event );
-					}
+				ownerDocument.addEventListener( 'dragenter', maybeDragStart );
+
+				if ( onDragEndRef.current ) {
+					onDragEndRef.current( event );
 				}
 			}
 
@@ -170,21 +171,24 @@ export function useDropZone( {
 			element.addEventListener( 'dragenter', onDragEnter );
 			element.addEventListener( 'dragover', onDragOver );
 			element.addEventListener( 'dragleave', onDragLeave );
-			ownerDocument.addEventListener( 'mouseup', resetDragState );
-			// Note that `dragend` doesn't fire consistently for file and HTML drag
-			// events where the drag origin is outside the browser window.
-			// In Firefox it may also not fire if the originating node is removed.
-			ownerDocument.addEventListener( 'dragend', resetDragState );
-			ownerDocument.addEventListener( 'dragover', onGlobalDragOver );
+			// Note that `dragend` doesn't fire consistently for file and HTML
+			// drag  events where the drag origin is outside the browser window.
+			// In Firefox it may also not fire if the originating node is
+			// removed.
+			ownerDocument.addEventListener( 'dragend', maybeDragEnd );
+			ownerDocument.addEventListener( 'mouseup', maybeDragEnd );
+			// The `dragstart` event doesn't fire if the drag started outside
+			// the document.
+			ownerDocument.addEventListener( 'dragenter', maybeDragStart );
 
 			return () => {
 				element.removeEventListener( 'drop', onDrop );
 				element.removeEventListener( 'dragenter', onDragEnter );
 				element.removeEventListener( 'dragover', onDragOver );
 				element.removeEventListener( 'dragleave', onDragLeave );
-				ownerDocument.removeEventListener( 'mouseup', resetDragState );
-				ownerDocument.removeEventListener( 'dragend', resetDragState );
-				ownerDocument.addEventListener( 'dragover', onGlobalDragOver );
+				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
+				ownerDocument.removeEventListener( 'mouseup', maybeDragEnd );
+				ownerDocument.addEventListener( 'dragenter', maybeDragStart );
 			};
 		},
 		[ isDisabled ]
