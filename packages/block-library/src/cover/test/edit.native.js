@@ -50,14 +50,13 @@ const attributes = {
 	url: 'mock-url',
 };
 
-let isScreenReaderEnabled;
+const isScreenReaderEnabled = Promise.resolve( true );
 beforeAll( () => {
 	// Mock Image.getSize to avoid failed attempt to size non-existant image
 	const getSizeSpy = jest.spyOn( Image, 'getSize' );
 	getSizeSpy.mockImplementation( ( _url, callback ) => callback( 300, 200 ) );
 
 	// Mock async native module to avoid act warning
-	isScreenReaderEnabled = Promise.resolve( true );
 	AccessibilityInfo.isScreenReaderEnabled = jest.fn(
 		() => isScreenReaderEnabled
 	);
@@ -72,15 +71,6 @@ beforeAll( () => {
 		title: 'Paragraph',
 		edit: () => {},
 		save: () => {},
-		transforms: {
-			to: [
-				{
-					type: 'block',
-					blocks: [ 'core/heading' ],
-					transform: () => {},
-				},
-			],
-		},
 	} );
 } );
 
