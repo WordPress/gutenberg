@@ -79,7 +79,7 @@ function KeyboardShortcuts() {
 	);
 
 	useShortcut(
-		'core/block-editor/select-all',
+		'core/edit-widgets/select-all',
 		useCallback(
 			( event ) => {
 				event.preventDefault();
@@ -135,7 +135,7 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
-			name: 'core/block-editor/select-all',
+			name: 'core/edit-widgets/select-all',
 			category: 'selection',
 			description: __(
 				'Select all text when typing. Press again to select all blocks.'
