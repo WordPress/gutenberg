@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
@@ -15,7 +15,6 @@ import {
  * Internal dependencies
  */
 import QueryToolbar from './query-toolbar';
-import QueryProvider from './query-provider';
 import QueryInspectorControls from './query-inspector-controls';
 import QueryBlockSetup from './query-block-setup';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
@@ -23,6 +22,9 @@ import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 const TEMPLATE = [ [ 'core/query-loop' ] ];
 export function QueryContent( { attributes, setAttributes } ) {
 	const { queryId, query, layout } = attributes;
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
 	const instanceId = useInstanceId( QueryContent );
 	const blockProps = useBlockProps();
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
@@ -33,6 +35,12 @@ export function QueryContent( { attributes, setAttributes } ) {
 				+getSettings().postsPerPage || DEFAULTS_POSTS_PER_PAGE,
 		};
 	}, [] );
+	// There are some effects running where some initialization logic is
+	// happening and setting some values to some attributes (ex. queryId).
+	// These updates can cause an `undo trap` where undoing will result in
+	// resetting again, so we need to mark these changes as not persistent
+	// with `__unstableMarkNextChangeAsNotPersistent`.
+
 	// Changes in query property (which is an object) need to be in the same callback,
 	// because updates are batched after the render and changes in different query properties
 	// would cause to overide previous wanted changes.
@@ -42,13 +50,15 @@ export function QueryContent( { attributes, setAttributes } ) {
 			newQuery.perPage = postsPerPage;
 		}
 		if ( !! Object.keys( newQuery ).length ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			updateQuery( newQuery );
 		}
-	}, [ query.perPage, query.inherit ] );
+	}, [ query.perPage ] );
 	// We need this for multi-query block pagination.
 	// Query parameters for each block are scoped to their ID.
 	useEffect( () => {
 		if ( ! queryId ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { queryId: instanceId } );
 		}
 	}, [ queryId, instanceId ] );
@@ -71,9 +81,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				<QueryProvider>
-					<div { ...innerBlocksProps } />
-				</QueryProvider>
+				<div { ...innerBlocksProps } />
 			</div>
 		</>
 	);
@@ -91,4 +99,3 @@ const QueryEdit = ( props ) => {
 };
 
 export default QueryEdit;
-export * from './query-provider';

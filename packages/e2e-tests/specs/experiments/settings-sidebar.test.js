@@ -71,7 +71,6 @@ describe( 'Settings sidebar', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( '404' );
-			await navigationPanel.close();
 			const templateCardAfterNavigation = await getTemplateCard();
 
 			expect( templateCardBeforeNavigation ).toMatchObject( {

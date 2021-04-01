@@ -10,7 +10,6 @@ import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import {
 	__unstableGetAnimateClassName as getAnimateClassName,
 	withNotices,
-	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -182,34 +181,32 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 					changeShowDownloadButton,
 				} }
 			/>
-			<BlockControls>
-				<ToolbarGroup>
-					<MediaReplaceFlow
-						mediaId={ id }
-						mediaURL={ href }
-						accept="*"
-						onSelect={ onSelectFile }
-						onError={ onUploadError }
-					/>
-					<ClipboardToolbarButton
-						text={ href }
-						disabled={ isBlobURL( href ) }
-					/>
-				</ToolbarGroup>
+			<BlockControls group="other">
+				<MediaReplaceFlow
+					mediaId={ id }
+					mediaURL={ href }
+					accept="*"
+					onSelect={ onSelectFile }
+					onError={ onUploadError }
+				/>
+				<ClipboardToolbarButton
+					text={ href }
+					disabled={ isBlobURL( href ) }
+				/>
 			</BlockControls>
 			<div { ...blockProps }>
 				<div className={ 'wp-block-file__content-wrapper' }>
-					<div className="wp-block-file__textlink">
-						<RichText
-							tagName="div" // must be block-level or else cursor disappears
-							value={ fileName }
-							placeholder={ __( 'Write file name…' ) }
-							withoutInteractiveFormatting
-							onChange={ ( text ) =>
-								setAttributes( { fileName: text } )
-							}
-						/>
-					</div>
+					<RichText
+						style={ { display: 'inline-block' } }
+						tagName="a" // must be block-level or else cursor disappears
+						value={ fileName }
+						placeholder={ __( 'Write file name…' ) }
+						withoutInteractiveFormatting
+						onChange={ ( text ) =>
+							setAttributes( { fileName: text } )
+						}
+						href={ textLinkHref }
+					/>
 					{ showDownloadButton && (
 						<div
 							className={

@@ -42,19 +42,21 @@ _Usage_
 import deprecated from '@wordpress/deprecated';
 
 deprecated( 'Eating meat', {
-	version: 'the future',
+	since: '2019.01.01'
+	version: '2020.01.01',
 	alternative: 'vegetables',
 	plugin: 'the earth',
 	hint: 'You may find it beneficial to transition gradually.',
 } );
 
-// Logs: 'Eating meat is deprecated and will be removed from the earth in the future. Please use vegetables instead. Note: You may find it beneficial to transition gradually.'
+// Logs: 'Eating meat is deprecated since version 2019.01.01 and will be removed from the earth in version 2020.01.01. Please use vegetables instead. Note: You may find it beneficial to transition gradually.'
 ```
 
 _Parameters_
 
 -   _feature_ `string`: Name of the deprecated feature.
 -   _options_ `[Object]`: Personalisation options
+-   _options.since_ `[string]`: Version in which the feature was deprecated.
 -   _options.version_ `[string]`: Version in which the feature will be removed.
 -   _options.alternative_ `[string]`: Feature to use instead
 -   _options.plugin_ `[string]`: Plugin name if it's a plugin feature

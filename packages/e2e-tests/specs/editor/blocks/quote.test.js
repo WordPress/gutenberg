@@ -87,7 +87,7 @@ describe( 'Quote', () => {
 			await page.keyboard.type( 'one' );
 			await page.keyboard.press( 'Enter' );
 			await page.keyboard.type( 'two' );
-			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.type( 'cite' );
 			await transformBlockTo( 'Paragraph' );
 
@@ -96,7 +96,7 @@ describe( 'Quote', () => {
 
 		it( 'and renders only one paragraph for the cite, if the quote is void', async () => {
 			await insertBlock( 'Quote' );
-			await page.keyboard.press( 'Tab' );
+			await page.keyboard.press( 'ArrowRight' );
 			await page.keyboard.type( 'cite' );
 			await transformBlockTo( 'Paragraph' );
 
@@ -146,7 +146,7 @@ describe( 'Quote', () => {
 	it( 'is transformed to a heading and a quote if the quote contains a citation', async () => {
 		await insertBlock( 'Quote' );
 		await page.keyboard.type( 'one' );
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'cite' );
 		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -157,7 +157,7 @@ describe( 'Quote', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'cite' );
 		await transformBlockTo( 'Heading' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -174,7 +174,7 @@ describe( 'Quote', () => {
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'two' );
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'cite' );
 		await transformBlockTo( 'Pullquote' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
@@ -214,7 +214,7 @@ describe( 'Quote', () => {
 		await page.keyboard.type( '1' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '2' );
-		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'ArrowRight' );
 		await page.keyboard.type( 'c' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
@@ -235,6 +235,7 @@ describe( 'Quote', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		await page.keyboard.press( 'ArrowLeft' );
+		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );

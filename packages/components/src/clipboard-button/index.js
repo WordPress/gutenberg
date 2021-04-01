@@ -26,6 +26,8 @@ export default function ClipboardButton( {
 	...buttonProps
 } ) {
 	deprecated( 'wp.components.ClipboardButton', {
+		since: '10.3',
+		plugin: 'Gutenberg',
 		alternative: 'wp.compose.useCopyToClipboard',
 	} );
 

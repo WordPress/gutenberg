@@ -47,63 +47,61 @@ function gutenberg_reregister_core_block_types() {
 				'video',
 				'embed',
 			),
-			'block_names'   => array_merge(
-				array(
-					'archives.php'                  => 'core/archives',
-					'block.php'                     => 'core/block',
-					'calendar.php'                  => 'core/calendar',
-					'categories.php'                => 'core/categories',
-					'cover.php'                     => 'core/cover',
-					'latest-comments.php'           => 'core/latest-comments',
-					'latest-posts.php'              => 'core/latest-posts',
-					'navigation.php'                => 'core/navigation',
-					'navigation-link.php'           => 'core/navigation-link',
-					'rss.php'                       => 'core/rss',
-					'search.php'                    => 'core/search',
-					'shortcode.php'                 => 'core/shortcode',
-					'social-link.php'               => 'core/social-link',
-					'tag-cloud.php'                 => 'core/tag-cloud',
-					'page-list.php'                 => 'core/page-list',
-					'post-author.php'               => 'core/post-author',
-					'post-comment.php'              => 'core/post-comment',
-					'post-comment-author.php'       => 'core/post-comment-author',
-					'post-comment-content.php'      => 'core/post-comment-content',
-					'post-comment-date.php'         => 'core/post-comment-date',
-					'post-comments.php'             => 'core/post-comments',
-					'post-comments-count.php'       => 'core/post-comments-count',
-					'post-comments-form.php'        => 'core/post-comments-form',
-					'post-content.php'              => 'core/post-content',
-					'post-date.php'                 => 'core/post-date',
-					'post-excerpt.php'              => 'core/post-excerpt',
-					'post-featured-image.php'       => 'core/post-featured-image',
-					'post-hierarchical-terms.php'   => 'core/post-hierarchical-terms',
-					'post-navigation-link.php'      => 'core/post-navigation-link',
-					'post-tags.php'                 => 'core/post-tags',
-					'post-title.php'                => 'core/post-title',
-					'query.php'                     => 'core/query',
-					'query-loop.php'                => 'core/query-loop',
-					'query-title.php'               => 'core/query-title',
-					'query-pagination.php'          => 'core/query-pagination',
-					'query-pagination-next.php'     => 'core/query-pagination-next',
-					'query-pagination-numbers.php'  => 'core/query-pagination-numbers',
-					'query-pagination-previous.php' => 'core/query-pagination-previous',
-					'site-logo.php'                 => 'core/site-logo',
-					'site-tagline.php'              => 'core/site-tagline',
-					'site-title.php'                => 'core/site-title',
-					// 'table-of-contents.php'         => 'core/table-of-contents',
-					'template-part.php'             => 'core/template-part',
-					'term-description.php'          => 'core/term-description',
-				)
+			'block_names'   => array(
+				'archives.php'                  => 'core/archives',
+				'block.php'                     => 'core/block',
+				'calendar.php'                  => 'core/calendar',
+				'categories.php'                => 'core/categories',
+				'cover.php'                     => 'core/cover',
+				'latest-comments.php'           => 'core/latest-comments',
+				'latest-posts.php'              => 'core/latest-posts',
+				'legacy-widget.php'             => 'core/legacy-widget',
+				'loginout.php'                  => 'core/loginout',
+				'navigation.php'                => 'core/navigation',
+				'navigation-link.php'           => 'core/navigation-link',
+				'rss.php'                       => 'core/rss',
+				'search.php'                    => 'core/search',
+				'shortcode.php'                 => 'core/shortcode',
+				'social-link.php'               => 'core/social-link',
+				'tag-cloud.php'                 => 'core/tag-cloud',
+				'page-list.php'                 => 'core/page-list',
+				'post-author.php'               => 'core/post-author',
+				'post-comment.php'              => 'core/post-comment',
+				'post-comment-author.php'       => 'core/post-comment-author',
+				'post-comment-content.php'      => 'core/post-comment-content',
+				'post-comment-date.php'         => 'core/post-comment-date',
+				'post-comments.php'             => 'core/post-comments',
+				'post-comments-count.php'       => 'core/post-comments-count',
+				'post-comments-form.php'        => 'core/post-comments-form',
+				'post-content.php'              => 'core/post-content',
+				'post-date.php'                 => 'core/post-date',
+				'post-excerpt.php'              => 'core/post-excerpt',
+				'post-featured-image.php'       => 'core/post-featured-image',
+				'post-hierarchical-terms.php'   => 'core/post-hierarchical-terms',
+				'post-navigation-link.php'      => 'core/post-navigation-link',
+				'post-tags.php'                 => 'core/post-tags',
+				'post-title.php'                => 'core/post-title',
+				'query.php'                     => 'core/query',
+				'query-loop.php'                => 'core/query-loop',
+				'query-title.php'               => 'core/query-title',
+				'query-pagination.php'          => 'core/query-pagination',
+				'query-pagination-next.php'     => 'core/query-pagination-next',
+				'query-pagination-numbers.php'  => 'core/query-pagination-numbers',
+				'query-pagination-previous.php' => 'core/query-pagination-previous',
+				'site-logo.php'                 => 'core/site-logo',
+				'site-tagline.php'              => 'core/site-tagline',
+				'site-title.php'                => 'core/site-title',
+				// 'table-of-contents.php'         => 'core/table-of-contents',
+				'template-part.php'             => 'core/template-part',
+				'term-description.php'          => 'core/term-description',
 			),
 		),
 		__DIR__ . '/../build/edit-widgets/blocks/'  => array(
 			'block_folders' => array(
-				'legacy-widget',
 				'widget-area',
 			),
 			'block_names'   => array(
-				'legacy-widget.php' => 'core/legacy-widget',
-				'widget-area.php'   => 'core/widget-area',
+				'widget-area.php' => 'core/widget-area',
 			),
 		),
 	);
@@ -132,23 +130,17 @@ function gutenberg_reregister_core_block_types() {
 			register_block_type_from_metadata( $block_json_file );
 		}
 
-		foreach ( $block_names as $file => $block_names ) {
+		foreach ( $block_names as $file => $sub_block_names ) {
 			if ( ! file_exists( $blocks_dir . $file ) ) {
 				return;
 			}
 
-			if ( is_string( $block_names ) ) {
-				if ( $registry->is_registered( $block_names ) ) {
-					$registry->unregister( $block_names );
+			$sub_block_names_normalized = is_string( $sub_block_names ) ? array( $sub_block_names ) : $sub_block_names;
+			foreach ( $sub_block_names_normalized as $block_name ) {
+				if ( $registry->is_registered( $block_name ) ) {
+					$registry->unregister( $block_name );
 				}
-				gutenberg_register_core_block_styles( $block_names );
-			} elseif ( is_array( $block_names ) ) {
-				foreach ( $block_names as $block_name ) {
-					if ( $registry->is_registered( $block_name ) ) {
-						$registry->unregister( $block_name );
-					}
-					gutenberg_register_core_block_styles( $block_name );
-				}
+				gutenberg_register_core_block_styles( $block_name );
 			}
 
 			require $blocks_dir . $file;
@@ -351,3 +343,53 @@ function gutenberg_register_legacy_social_link_blocks() {
 }
 
 add_action( 'init', 'gutenberg_register_legacy_social_link_blocks' );
+
+/**
+ * Filters the default block categories array to add a new one for themes.
+ *
+ * This can be removed when plugin support requires WordPress 5.8.0+.
+ *
+ * @see https://core.trac.wordpress.org/ticket/52883
+ *
+ * @param array[] $categories The list of default block categories.
+ *
+ * @return array[] Filtered block categories.
+ */
+function gutenberg_register_theme_block_category( $categories ) {
+	foreach ( $categories as $category ) {
+		// Skip when the category is already set in WordPress core.
+		if (
+			isset( $category['slug'] ) &&
+			'theme' === $category['slug']
+		) {
+			return $categories;
+		}
+	}
+
+	$categories[] = array(
+		'slug'  => 'theme',
+		'title' => _x( 'Theme', 'block category', 'gutenberg' ),
+		'icon'  => null,
+	);
+	return $categories;
+}
+
+add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+
+/**
+ * Checks whether the current block type supports the feature requested.
+ *
+ * @param WP_Block_Type $block_type Block type to check for support.
+ * @param string        $feature    Name of the feature to check support for.
+ * @param mixed         $default    Fallback value for feature support, defaults to false.
+ *
+ * @return boolean                  Whether or not the feature is supported.
+ */
+function gutenberg_block_has_support( $block_type, $feature, $default = false ) {
+	$block_support = $default;
+	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
+		$block_support = _wp_array_get( $block_type->supports, $feature, $default );
+	}
+
+	return true === $block_support || is_array( $block_support );
+}
