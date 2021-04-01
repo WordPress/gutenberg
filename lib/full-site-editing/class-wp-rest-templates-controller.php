@@ -333,7 +333,7 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 			$changes->post_type   = $this->post_type;
 			$changes->post_status = 'publish';
 			$changes->tax_input   = array(
-				'wp_theme' => isset( $request['theme'] ) ? $request['content'] : gutenberg_get_theme_stylesheet(),
+				'wp_theme' => isset( $request['theme'] ) ? $request['content'] : gutenberg_get_canonical_theme_slug(),
 			);
 		} elseif ( ! $template->is_custom ) {
 			$changes->post_type   = $this->post_type;

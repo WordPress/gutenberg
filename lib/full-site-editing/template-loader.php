@@ -138,7 +138,7 @@ function gutenberg_resolve_template( $template_type, $template_hierarchy = array
 
 	// Find all potential templates 'wp_template' post matching the hierarchy.
 	$query     = array(
-		'theme'    => gutenberg_get_theme_stylesheet(),
+		'theme'    => gutenberg_get_canonical_theme_slug(),
 		'slug__in' => $slugs,
 	);
 	$templates = gutenberg_get_block_templates( $query );
@@ -166,8 +166,8 @@ function gutenberg_render_title_tag() {
 	echo '<title>' . wp_get_document_title() . '</title>' . "\n";
 }
 
-function gutenberg_get_theme_stylesheet() {
-	return apply_filters( 'gutenberg_get_theme_stylesheet', wp_get_theme()->get_stylesheet() );
+function gutenberg_get_canonical_theme_slug() {
+	return apply_filters( 'gutenberg_get_canonical_theme_slug', wp_get_theme()->get_stylesheet() );
 }
 
 /**
