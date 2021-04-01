@@ -3,8 +3,6 @@
  */
 import { Spinner } from '@wordpress/components';
 
-const EmbedLoading = () => (
-	<Spinner />
-);
+const EmbedLoading = () => <Spinner />;
 
 export default EmbedLoading;
