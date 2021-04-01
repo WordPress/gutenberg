@@ -57,11 +57,6 @@ If set to false the user will not be able to switch between visual and code edit
 The Block Directory enables installing new block plugins from [WordPress.org.](https://wordpress.org/plugins/browse/block/) It can be disabled by removing the actions that enqueue it. In WordPress core, the function is `wp_enqueue_editor_block_directory_assets`, and Gutenberg uses `gutenberg_enqueue_block_editor_assets_block_directory`. To remove the feature, use [`remove_action`,](https://developer.wordpress.org/reference/functions/remove_action/) like this:
 
 ```php
-add_action(
-	'plugins_loaded',
-	function() {
-		remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_editor_block_directory_assets' );
-		remove_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_block_editor_assets_block_directory' );
-	}
-);
+remove_action( 'enqueue_block_editor_assets', 'wp_enqueue_editor_block_directory_assets' );
+remove_action( 'enqueue_block_editor_assets', 'gutenberg_enqueue_block_editor_assets_block_directory' );
 ```
