@@ -27,7 +27,7 @@ function render_block_core_template_part( $attributes ) {
 	} elseif (
 		isset( $attributes['slug'] ) &&
 		isset( $attributes['theme'] ) &&
-		gutenberg_get_theme_stylesheet() === $attributes['theme']
+		gutenberg_get_canonical_theme_slug() === $attributes['theme']
 	) {
 		$template_part_id    = $attributes['theme'] . '//' . $attributes['slug'];
 		$template_part_query = new WP_Query(
