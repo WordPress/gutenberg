@@ -29,6 +29,19 @@ import useBlockNavigator from './use-block-navigator';
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
 
+const ALLOWED_BLOCKS = [
+	'core/navigation-link',
+	'core/search',
+	'core/social-links',
+	'core/page-list',
+	'core/spacer',
+];
+
+const LAYOUT = {
+	type: 'default',
+	alignments: [],
+};
+
 function Navigation( {
 	selectedBlockHasDescendants,
 	attributes,
@@ -64,13 +77,7 @@ function Navigation( {
 			className: 'wp-block-navigation__container',
 		},
 		{
-			allowedBlocks: [
-				'core/navigation-link',
-				'core/search',
-				'core/social-links',
-				'core/page-list',
-				'core/spacer',
-			],
+			allowedBlocks: ALLOWED_BLOCKS,
 			orientation: attributes.orientation || 'horizontal',
 			renderAppender:
 				( isImmediateParentOfSelectedBlock &&
@@ -84,10 +91,7 @@ function Navigation( {
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
-			__experimentalLayout: {
-				type: 'default',
-				alignments: [],
-			},
+			__experimentalLayout: LAYOUT,
 			placeholder: <PlaceholderPreview />,
 		}
 	);
