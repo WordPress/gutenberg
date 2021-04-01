@@ -48,6 +48,17 @@ As the project evolves, flaws of existing APIs are discovered, or updates are re
 
 To encourage third-party developers to adopt the new APIs instead, we can use the [**deprecated**](/packages/deprecated/README.md) helper to show a message explaining the deprecation and propose the alternative whenever the old API is used.
 
+Make it more clear when the feature was deprecated. Use the `since` and `plugin` options of the helper method.
+
+Example:
+```js
+deprecated( 'wp.components.ClipboardButton', {
+	since: '10.3',
+	plugin: 'Gutenberg',
+	alternative: 'wp.compose.useCopyToClipboard',
+} );
+```
+
 ## Dev Notes
 
 Dev notes are [posts published on the make/core site](https://make.wordpress.org/core/tag/dev-notes/) prior to WordPress releases to inform third-party developers about important changes to the developer APIs, these changes can include:
