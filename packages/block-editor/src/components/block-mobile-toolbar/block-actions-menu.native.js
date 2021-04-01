@@ -112,7 +112,7 @@ const BlockActionsMenu = ( {
 		},
 		transformButton: {
 			id: 'transformButtonOption',
-			label: __( 'Transform block' ),
+			label: __( 'Transform block…' ),
 			value: 'transformButtonOption',
 			onSelect: () => {
 				if ( blockTransformationMenuPickerRef.current ) {
