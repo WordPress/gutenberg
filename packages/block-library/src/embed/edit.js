@@ -13,6 +13,7 @@ import EmbedControls from './embed-controls';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
+import { EmbedWrapper } from './embed-wrapper';
 
 /**
  * External dependencies
@@ -179,9 +180,9 @@ const EmbedEdit = ( props ) => {
 
 	if ( fetching ) {
 		return (
-			<div { ...blockProps }>
+			<EmbedWrapper { ...blockProps }>
 				<EmbedLoading />
-			</div>
+			</EmbedWrapper>
 		);
 	}
 
@@ -192,7 +193,7 @@ const EmbedEdit = ( props ) => {
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
 	if ( showEmbedPlaceholder ) {
 		return (
-			<div { ...blockProps }>
+			<EmbedWrapper { ...blockProps }>
 				<EmbedPlaceholder
 					icon={ icon }
 					label={ label }
@@ -214,7 +215,7 @@ const EmbedEdit = ( props ) => {
 						] );
 					} }
 				/>
-			</div>
+			</EmbedWrapper>
 		);
 	}
 
@@ -244,7 +245,7 @@ const EmbedEdit = ( props ) => {
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>
-			<div { ...blockProps }>
+			<EmbedWrapper { ...blockProps }>
 				<EmbedPreview
 					preview={ preview }
 					previewable={ previewable }
@@ -260,7 +261,7 @@ const EmbedEdit = ( props ) => {
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
 				/>
-			</div>
+			</EmbedWrapper>
 		</>
 	);
 };
