@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 10.3.1 =
+
+### Bug Fixes
+
+- Restore color preset CSS variables for custom links for themes with the  `experimental-link-color` support flag enabled. ([30452](https://github.com/WordPress/gutenberg/pull/30452))
+- Restore the inner `<div />` of the Group block in the editor for classic themes. ([30453](https://github.com/WordPress/gutenberg/pull/30453))
+- Fix content loss for Group block when used with lots of nesting. ([30460](https://github.com/WordPress/gutenberg/pull/30460))
+
+
 = 10.3.0 =
 
 ### Enhancements
