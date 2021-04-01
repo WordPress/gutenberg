@@ -11,6 +11,7 @@ import {
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -39,6 +40,8 @@ export function initialize( id, settings ) {
 	}
 	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );
+	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
+		fetchLinkSuggestions( search, searchOptions, settings );
 	render(
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )
