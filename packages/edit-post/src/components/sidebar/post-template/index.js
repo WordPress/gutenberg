@@ -7,7 +7,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { createInterpolateElement } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -15,37 +14,48 @@ import { store as noticesStore } from '@wordpress/notices';
 import { store as editPostStore } from '../../../store';
 
 function PostTemplate() {
-	const { template, isEditing, isFSETheme } = useSelect( ( select ) => {
+	const {
+		template,
+		isEditing,
+		supportsTemplateMode,
+		isResolvingTemplate,
+	} = useSelect( ( select ) => {
 		const {
 			getEditedPostAttribute,
 			getCurrentPostType,
 			getCurrentPost,
 		} = select( editorStore );
-		const { __experimentalGetTemplateForLink, getPostType } = select(
-			coreStore
-		);
+		const {
+			__experimentalGetTemplateForLink,
+			getPostType,
+			isResolving,
+		} = select( coreStore );
 		const { isEditingTemplate } = select( editPostStore );
 		const link = getEditedPostAttribute( 'link' );
-		const isFSEEnabled = select( editorStore ).getEditorSettings()
-			.isFSETheme;
+		const _supportsTemplateMode = select( editorStore ).getEditorSettings()
+			.supportsTemplateMode;
 		const isViewable =
 			getPostType( getCurrentPostType() )?.viewable ?? false;
+
 		return {
 			template:
-				isFSEEnabled &&
+				supportsTemplateMode &&
 				isViewable &&
 				link &&
 				getCurrentPost().status !== 'auto-draft'
 					? __experimentalGetTemplateForLink( link )
 					: null,
 			isEditing: isEditingTemplate(),
-			isFSETheme: isFSEEnabled,
+			supportsTemplateMode: _supportsTemplateMode,
+			isResolvingTemplate: isResolving(
+				'__experimentalGetTemplateForLink',
+				[ link ]
+			),
 		};
 	}, [] );
-	const { setIsEditingTemplate } = useDispatch( editPostStore );
-	const { createSuccessNotice } = useDispatch( noticesStore );
+	const { __unstableSwitchToEditingMode } = useDispatch( editPostStore );
 
-	if ( ! isFSETheme || ! template ) {
+	if ( ! supportsTemplateMode || isResolvingTemplate ) {
 		return null;
 	}
 
@@ -54,33 +64,44 @@ function PostTemplate() {
 			<span>{ __( 'Template' ) }</span>
 			{ ! isEditing && (
 				<span className="edit-post-post-template__value">
-					{ createInterpolateElement(
-						sprintf(
-							/* translators: 1: Template name. */
-							__( '%s (<a>Edit</a>)' ),
-							template.slug
-						),
-						{
-							a: (
-								<Button
-									isLink
-									onClick={ () => {
-										setIsEditingTemplate( true );
-										createSuccessNotice(
-											__(
-												'Editing template. Changes made here affect all posts and pages that use the template.'
-											),
-											{
-												type: 'snackbar',
-											}
-										);
-									} }
-								>
-									{ __( 'Edit' ) }
-								</Button>
+					{ !! template &&
+						createInterpolateElement(
+							sprintf(
+								/* translators: 1: Template name. */
+								__( '%s (<a>Edit</a>)' ),
+								template.slug
 							),
-						}
-					) }
+							{
+								a: (
+									<Button
+										isLink
+										onClick={ () =>
+											__unstableSwitchToEditingMode()
+										}
+									>
+										{ __( 'Edit' ) }
+									</Button>
+								),
+							}
+						) }
+					{ ! template &&
+						createInterpolateElement(
+							__( 'Default (<create />)' ),
+							{
+								create: (
+									<Button
+										isLink
+										onClick={ () =>
+											__unstableSwitchToEditingMode(
+												true
+											)
+										}
+									>
+										{ __( 'Create custom template' ) }
+									</Button>
+								),
+							}
+						) }
 				</span>
 			) }
 			{ isEditing && (

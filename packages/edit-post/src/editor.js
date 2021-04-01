@@ -79,7 +79,7 @@ function Editor( {
 		} else {
 			postObject = getEntityRecord( 'postType', postType, postId );
 		}
-		const isFSETheme = getEditorSettings().isFSETheme;
+		const supportsTemplateMode = getEditorSettings().supportsTemplateMode;
 		const isViewable = getPostType( postType )?.viewable ?? false;
 
 		return {
@@ -100,7 +100,7 @@ function Editor( {
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 			isTemplateMode: isEditingTemplate(),
 			template:
-				isFSETheme &&
+				supportsTemplateMode &&
 				isViewable &&
 				postObject &&
 				getCurrentPost().status !== 'auto-draft'

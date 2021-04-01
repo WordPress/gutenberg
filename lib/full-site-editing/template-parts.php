@@ -9,9 +9,9 @@
  * Registers block editor 'wp_template_part' post type.
  */
 function gutenberg_register_template_part_post_type() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	/* if ( ! gutenberg_is_fse_theme() ) {
 		return;
-	}
+	} */
 
 	$labels = array(
 		'name'                  => __( 'Template Parts', 'gutenberg' ),
@@ -64,9 +64,9 @@ add_action( 'init', 'gutenberg_register_template_part_post_type' );
  * Registers the 'wp_template_part_area' taxonomy.
  */
 function gutenberg_register_wp_template_part_area_taxonomy() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	/* if ( ! gutenberg_is_fse_theme() ) {
 		return;
-	}
+	} */
 
 	register_taxonomy(
 		'wp_template_part_area',
@@ -107,9 +107,9 @@ if ( ! defined( 'WP_TEMPLATE_PART_AREA_UNCATEGORIZED' ) ) {
  * Fixes the label of the 'wp_template_part' admin menu entry.
  */
 function gutenberg_fix_template_part_admin_menu_entry() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	/* if ( ! gutenberg_is_fse_theme() ) {
 		return;
-	}
+	} */
 
 	global $submenu;
 	if ( ! isset( $submenu['themes.php'] ) ) {

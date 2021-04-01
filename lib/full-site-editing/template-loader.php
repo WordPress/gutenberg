@@ -9,9 +9,9 @@
  * Adds necessary filters to use 'wp_template' posts instead of theme template files.
  */
 function gutenberg_add_template_loader_filters() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	/* if ( ! gutenberg_is_fse_theme() ) {
 		return;
-	}
+	} */
 
 	foreach ( gutenberg_get_template_type_slugs() as $template_type ) {
 		if ( 'embed' === $template_type ) { // Skip 'embed' for now because it is not a regular template type.
@@ -66,7 +66,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	$current_template = gutenberg_resolve_template( $type, $templates );
 
 	// Allow falling back to a PHP template if it has a higher priority than the block template.
-	$current_template_slug       = basename( $template, '.php' );
+	/* $current_template_slug       = basename( $template, '.php' );
 	$current_block_template_slug = is_object( $current_template ) ? $current_template->slug : false;
 	foreach ( $templates as $template_item ) {
 		$template_item_slug = gutenberg_strip_php_suffix( $template_item );
@@ -76,7 +76,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 		if ( $current_template_slug !== $current_block_template_slug && $current_template_slug === $template_item_slug ) {
 			return $template;
 		}
-	}
+	} */
 
 	if ( $current_template ) {
 		if ( empty( $current_template->content ) && is_user_logged_in() ) {

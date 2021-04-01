@@ -666,7 +666,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings ) {
-	$settings['isFSETheme'] = gutenberg_is_fse_theme();
+	$settings['supportsTemplateMode'] = true; // gutenberg_is_fse_theme();
 
 	// Enable the new layout options for themes with a theme.json file.
 	$settings['supportsLayout'] = WP_Theme_JSON_Resolver::theme_has_support();
