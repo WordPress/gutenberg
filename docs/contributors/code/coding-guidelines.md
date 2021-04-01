@@ -225,7 +225,7 @@ Gutenberg follows the [WordPress JavaScript Documentation Standards](https://mak
 For additional guidance, consult the following resources:
 
 -   [JSDoc Official Documentation](https://jsdoc.app/index.html)
--   [TypeScript Supported JSDoc](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#supported-jsdoc)
+-   [TypeScript Supported JSDoc](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html)
 
 ### Custom Types
 
@@ -264,7 +264,7 @@ Note the use of quotes when defining a set of string literals. As in the [JavaSc
 
 ### Importing and Exporting Types
 
-Use the [TypeScript `import` function](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#import-types) to import type declarations from other files or third-party dependencies.
+Use the [TypeScript `import` function](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#import-types) to import type declarations from other files or third-party dependencies.
 
 Since an imported type declaration can occupy an excess of the available line length and become verbose when referenced multiple times, you are encouraged to create an alias of the external type using a `@typedef` declaration at the top of the file, immediately following [the `import` groupings](/docs/contributors/code/coding-guidelines.md#imports).
 
@@ -314,9 +314,9 @@ When documenting a generic type such as `Object`, `Function`, `Promise`, etc., a
 
 When an object is used as a dictionary, you can define its type in 2 ways: indexable interface (`{[setting:string]:any}`) or `Record`. When the name of the key for an object provides hints for developers what to do like `setting`, use indexable interface. If not, use `Record`.
 
-The function expression here uses TypeScript's syntax for function types, which can be useful in providing more detailed information about the names and types of the expected parameters. For more information, consult the [TypeScript `@type` tag function recommendations](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#type).
+The function expression here uses TypeScript's syntax for function types, which can be useful in providing more detailed information about the names and types of the expected parameters. For more information, consult the [TypeScript `@type` tag function recommendations](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#type).
 
-In more advanced cases, you may define your own custom types as a generic type using the [TypeScript `@template` tag](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html#template).
+In more advanced cases, you may define your own custom types as a generic type using the [TypeScript `@template` tag](https://www.typescriptlang.org/docs/handbook/jsdoc-supported-types.html#template).
 
 Similar to the "Custom Types" advice concerning type unions and with literal values, you can consider to create a custom type `@typedef` to better describe expected key values for object records, or to extract a complex function signature.
 
