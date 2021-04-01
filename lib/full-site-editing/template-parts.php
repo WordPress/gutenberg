@@ -222,7 +222,7 @@ function gutenberg_do_block_template_part( $part ) {
  *
  * @return void
  */
-function gutenberg_do_block_template_part_header() {
+function gutenberg_do_block_header_area() {
 	gutenberg_do_block_template_part( 'header' );
 }
 
@@ -231,6 +231,6 @@ function gutenberg_do_block_template_part_header() {
  *
  * @return void
  */
-function gutenberg_do_block_template_part_footer() {
+function gutenberg_do_block_footer_area() {
 	gutenberg_do_block_template_part( 'footer' );
 }
