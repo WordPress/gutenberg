@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
-import { visitAdminPage } from '@wordpress/e2e-test-utils';
+import { visitAdminPage, wpDataSelect } from '@wordpress/e2e-test-utils';
 
 async function setExperimentalFeaturesState( features, enable ) {
 	const query = addQueryArgs( '', {
@@ -128,5 +128,37 @@ export const siteEditor = {
 		 )[ 0 ];
 
 		await elementToClick.click();
+	},
+
+	async getEditedPostContent() {
+		const postId = await wpDataSelect(
+			'core/edit-site',
+			'getEditedPostId'
+		);
+		const postType = await wpDataSelect(
+			'core/edit-site',
+			'getEditedPostType'
+		);
+		const record = await wpDataSelect(
+			'core',
+			'getEditedEntityRecord',
+			'postType',
+			postType,
+			postId
+		);
+		if ( record ) {
+			if ( typeof record.content === 'function' ) {
+				return record.content( record );
+			} else if ( record.blocks ) {
+				return await page.evaluate(
+					( blocks ) =>
+						window.wp.blocks.__unstableSerializeAndClean( blocks ),
+					record.blocks
+				);
+			} else if ( record.content ) {
+				return record.content;
+			}
+		}
+		return '';
 	},
 };
