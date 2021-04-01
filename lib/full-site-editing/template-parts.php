@@ -216,3 +216,21 @@ function gutenberg_do_block_template_part( $part ) {
 	}
 	echo do_blocks( $template_part->content );
 }
+
+/**
+ * Print the header template-part.
+ *
+ * @return void
+ */
+function gutenberg_do_block_template_part_header() {
+	gutenberg_do_block_template_part( 'header' );
+}
+
+/**
+ * Print the footer template-part.
+ *
+ * @return void
+ */
+function gutenberg_do_block_template_part_footer() {
+	gutenberg_do_block_template_part( 'footer' );
+}
