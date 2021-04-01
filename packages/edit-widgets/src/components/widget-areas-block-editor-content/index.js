@@ -23,8 +23,8 @@ export default function WidgetAreasBlockEditorContent( {
 	return (
 		<div className="edit-widgets-block-editor editor-styles-wrapper">
 			<EditorStyles styles={ blockEditorSettings.styles } />
-			<KeyboardShortcuts />
 			<BlockEditorKeyboardShortcuts />
+			<KeyboardShortcuts />
 			<Notices />
 			<Popover.Slot name="block-toolbar" />
 			<BlockSelectionClearer>
