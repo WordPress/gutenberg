@@ -60,7 +60,7 @@
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: ($grid-unit-15 / 2);
+		padding: ($grid-unit-15 / 2) $grid-unit-15;
 		text-align: left;
 		color: $gray-900;
 		border-radius: 2px;
@@ -121,7 +121,8 @@
 
 	.block-editor-block-icon {
 		align-self: flex-start;
-		margin-right: 6px;
+		margin-right: ( $grid-unit-05 * 2.5 ); // 10px is off the 4px grid, but required for visual alignment between block name and subsequent nested icon
+		width: 20px;
 	}
 
 	.block-editor-block-navigation-block__menu-cell,
