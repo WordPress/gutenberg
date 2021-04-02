@@ -293,10 +293,7 @@ function LinkSettings( {
 			</PanelBody>
 			{ options.footer && (
 				<PanelBody style={ styles.linkSettingsPanel }>
-					<FooterMessageControl
-						label={ options.footer.label }
-						textAlign="left"
-					/>
+					<FooterMessageControl label={ options.footer.label } />
 				</PanelBody>
 			) }
 			{ actions && <PanelActions actions={ actions } /> }
