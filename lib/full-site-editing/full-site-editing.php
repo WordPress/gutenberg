@@ -15,6 +15,18 @@ function gutenberg_is_fse_theme() {
 }
 
 /**
+ * Returns whether the current theme is FSE-enabled or not.
+ *
+ * @return boolean Whether the current theme is FSE-enabled or not.
+ */
+function gutenberg_is_fse_enabled() {
+	return apply_filters(
+		'fse_enabled',
+		gutenberg_is_fse_enabled() || current_theme_supports( 'full-site-editing' );
+	)
+}
+
+/**
  * Show a notice when a Full Site Editing theme is used.
  */
 function gutenberg_full_site_editing_notice() {
