@@ -49,6 +49,7 @@ export default function SiteTitleEdit( { attributes, setAttributes } ) {
 			<TagName { ...blockProps }>
 				<RichText
 					tagName="a"
+					style={ { display: 'inline-block' } }
 					aria-label={ __( 'Site title text' ) }
 					placeholder={ __( 'Write site title…' ) }
 					value={ title }
