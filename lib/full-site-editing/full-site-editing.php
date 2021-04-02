@@ -20,10 +20,7 @@ function gutenberg_is_fse_theme() {
  * @return boolean Whether the current theme is FSE-enabled or not.
  */
 function gutenberg_is_fse_enabled() {
-	return apply_filters(
-		'full_site_editing_enabled',
-		gutenberg_is_fse_theme() || ! current_theme_supports( 'disable-full-site-editing' )
-	);
+	return gutenberg_is_fse_theme() || ! current_theme_supports( 'disable-full-site-editing' );
 }
 
 /**
