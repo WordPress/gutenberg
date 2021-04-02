@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { useState, useEffect, Children } from '@wordpress/element';
 import deprecated from '@wordpress/deprecated';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -94,7 +94,7 @@ export default function Guide( {
 							className="components-guide__inline-finish-button"
 							onClick={ onFinish }
 						>
-							{ finishButtonText || __( 'Finish' ) }
+							{ finishButtonText || _x( 'Finish', 'button label' ) }
 						</FinishButton>
 					) }
 				</div>
@@ -121,7 +121,7 @@ export default function Guide( {
 							className="components-guide__finish-button"
 							onClick={ onFinish }
 						>
-							{ finishButtonText || __( 'Finish' ) }
+							{ finishButtonText || _x( 'Finish', 'button label' ) }
 						</FinishButton>
 					) }
 				</div>

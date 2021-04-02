@@ -15,7 +15,7 @@ import { map, uniq } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
@@ -92,7 +92,7 @@ function ColorPalette( {
 	const accessibilityHint = isGradientSegment
 		? __( 'Navigates to customize the gradient' )
 		: __( 'Navigates to custom color picker' );
-	const customText = __( 'Custom' );
+	const customText = _x( 'Custom', 'color' );
 
 	useEffect( () => {
 		if ( scrollViewRef.current ) {

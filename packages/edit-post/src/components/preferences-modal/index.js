@@ -13,7 +13,7 @@ import {
 	Modal,
 	TabPanel,
 } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMemo, useCallback, useState } from '@wordpress/element';
@@ -224,7 +224,7 @@ export default function PreferencesModal() {
 							</PageAttributesCheck>
 						</Section>
 						<Section
-							title={ __( 'Additional' ) }
+							title={ _x( 'Additional', 'panels preferences title' ) }
 							description={ __(
 								'Add extra areas to the editor.'
 							) }

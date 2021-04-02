@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * External dependencies
@@ -47,12 +47,12 @@ export function getSelectOptions( {
 	if ( disableCustomFontSizes && ! options.length ) return null;
 
 	options = [
-		{ slug: DEFAULT_FONT_SIZE, name: __( 'Default' ), size: undefined },
+		{ slug: DEFAULT_FONT_SIZE, name: _x( 'Default', 'font size' ), size: undefined },
 		...options,
 	];
 
 	if ( ! hasCustomValue && ! disableCustomFontSizes ) {
-		options.push( { slug: CUSTOM_FONT_SIZE, name: __( 'Custom' ) } );
+		options.push( { slug: CUSTOM_FONT_SIZE, name: _x( 'Custom', 'font size' ) } );
 	}
 
 	return options.map( ( option ) => {

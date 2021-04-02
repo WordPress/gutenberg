@@ -9,7 +9,7 @@ import { debounce } from 'lodash';
 import { BlockControls, useBlockProps } from '@wordpress/block-editor';
 import { ToolbarGroup } from '@wordpress/components';
 import { useEffect, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { BACKSPACE, DELETE, F10, isKeyboardEvent } from '@wordpress/keycodes';
 
 /**
@@ -226,7 +226,7 @@ export default function ClassicEdit( {
 					id={ `toolbar-${ clientId }` }
 					className="block-library-classic__toolbar"
 					onClick={ focus }
-					data-placeholder={ __( 'Classic' ) }
+					data-placeholder={ _x( 'Classic', 'block title' ) }
 					onKeyDown={ onToolbarKeyDown }
 				/>
 				<div

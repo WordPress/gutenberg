@@ -6,7 +6,7 @@ import { contextConnect } from '@wp-g2/context';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -37,7 +37,7 @@ function FontSizeControl( props, forwardedRef ) {
 	if ( ! options ) return null;
 
 	const label = __( 'Font size' );
-	const customLabel = __( 'Custom' );
+	const customLabel = _x( 'Custom', 'font size' );
 	const max = 100;
 	const min = 1;
 
