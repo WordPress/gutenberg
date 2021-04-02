@@ -9,9 +9,9 @@
  * Adds necessary filters to use 'wp_template' posts instead of theme template files.
  */
 function gutenberg_add_template_loader_filters() {
-	/* if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return;
-	} */
+	}
 
 	foreach ( gutenberg_get_template_type_slugs() as $template_type ) {
 		if ( 'embed' === $template_type ) { // Skip 'embed' for now because it is not a regular template type.
