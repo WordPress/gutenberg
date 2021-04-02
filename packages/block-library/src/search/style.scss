@@ -59,5 +59,9 @@
 			padding: 0.125em 0.5em;
 		}
 	}
+
+	&.aligncenter .wp-block-search__inside-wrapper {
+		margin: auto;
+	}
 }
 
