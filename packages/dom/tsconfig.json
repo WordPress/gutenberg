@@ -4,5 +4,9 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"include": [ "src/data-transfer.js" ]
+	"include": [
+		"src/data-transfer.js",
+		"src/focusable.js",
+		"src/tabbable.js",
+	]
 }

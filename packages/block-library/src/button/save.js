@@ -23,6 +23,11 @@ export default function save( { attributes, className } ) {
 		url,
 		width,
 	} = attributes;
+
+	if ( ! text ) {
+		return null;
+	}
+
 	const colorProps = getColorAndStyleProps( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
@@ -45,19 +50,17 @@ export default function save( { attributes, className } ) {
 	} );
 
 	return (
-		text && (
-			<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
-				<RichText.Content
-					tagName="a"
-					className={ buttonClasses }
-					href={ url }
-					title={ title }
-					style={ buttonStyle }
-					value={ text }
-					target={ linkTarget }
-					rel={ rel }
-				/>
-			</div>
-		)
+		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
+			<RichText.Content
+				tagName="a"
+				className={ buttonClasses }
+				href={ url }
+				title={ title }
+				style={ buttonStyle }
+				value={ text }
+				target={ linkTarget }
+				rel={ rel }
+			/>
+		</div>
 	);
 }

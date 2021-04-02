@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useRef, createContext, useState } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -19,15 +20,39 @@ import useInsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
+import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
+import { LayoutProvider, defaultLayout } from './layout';
 
 export const BlockNodes = createContext();
 export const SetBlockNodes = createContext();
 
-export default function BlockList( { className } ) {
+export default function BlockList( { className, __experimentalLayout } ) {
 	const ref = useRef();
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
 	useScrollSelectionIntoView( ref );
+	usePreParsePatterns();
+
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const {
+		isTyping,
+		isOutlineMode,
+		isFocusMode,
+		isNavigationMode,
+	} = useSelect( ( select ) => {
+		const {
+			isTyping: _isTyping,
+			getSettings,
+			isNavigationMode: _isNavigationMode,
+		} = select( blockEditorStore );
+		const { outlineMode, focusMode } = getSettings();
+		return {
+			isTyping: _isTyping(),
+			isOutlineMode: outlineMode,
+			isFocusMode: focusMode,
+			isNavigationMode: _isNavigationMode(),
+		};
+	}, [] );
 
 	return (
 		<BlockNodes.Provider value={ blockNodes }>
@@ -37,11 +62,20 @@ export default function BlockList( { className } ) {
 				ref={ ref }
 				className={ classnames(
 					'block-editor-block-list__layout is-root-container',
-					className
+					className,
+					{
+						'is-typing': isTyping,
+						'is-outline-mode': isOutlineMode,
+						'is-focus-mode': isFocusMode && isLargeViewport,
+						'is-navigate-mode': isNavigationMode,
+					}
 				) }
 			>
 				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems wrapperRef={ ref } />
+					<BlockListItems
+						wrapperRef={ ref }
+						__experimentalLayout={ __experimentalLayout }
+					/>
 				</SetBlockNodes.Provider>
 			</div>
 		</BlockNodes.Provider>
@@ -53,6 +87,7 @@ function Items( {
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
+	__experimentalLayout: layout = defaultLayout,
 	wrapperRef,
 } ) {
 	function selector( select ) {
@@ -88,7 +123,7 @@ function Items( {
 	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
 
 	return (
-		<>
+		<LayoutProvider value={ layout }>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
 					? multiSelectedBlockClientIds.includes( clientId )
@@ -129,7 +164,7 @@ function Items( {
 						isAppenderDropTarget && orientation === 'horizontal',
 				} ) }
 			/>
-		</>
+		</LayoutProvider>
 	);
 }
 

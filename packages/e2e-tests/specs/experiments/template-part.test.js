@@ -66,7 +66,6 @@ describe( 'Template Part', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( 'Index' );
-			await navigationPanel.close();
 		}
 
 		async function triggerEllipsisMenuItem( textPrompt ) {
@@ -166,7 +165,9 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert selected block to template part', async () => {
-			await canvas().waitForSelector( '.wp-block-template-part' );
+			await canvas().waitForSelector(
+				'.wp-block-template-part.block-editor-block-list__layout'
+			);
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -204,7 +205,9 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert multiple selected blocks to template part', async () => {
-			await canvas().waitForSelector( '.wp-block-template-part' );
+			await canvas().waitForSelector(
+				'.wp-block-template-part.block-editor-block-list__layout'
+			);
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part'
 			);
@@ -263,7 +266,7 @@ describe( 'Template Part', () => {
 			'.editor-entities-saved-states__save-button';
 		const savePostSelector = '.editor-post-publish-button__button';
 		const templatePartSelector = '*[data-type="core/template-part"]';
-		const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-block-list__layout`;
+		const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
 		const createNewButtonSelector =
 			'//button[contains(text(), "New template part")]';

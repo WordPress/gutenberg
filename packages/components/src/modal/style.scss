@@ -23,9 +23,9 @@
 	left: 0;
 	box-sizing: border-box;
 	margin: 0;
-	border: $border-width solid $gray-300;
 	background: $white;
 	box-shadow: $shadow-modal;
+	border-radius: $radius-block-ui;
 	overflow: auto;
 
 	// Show a centered modal on bigger screens.
@@ -61,7 +61,7 @@
 .components-modal__header {
 	box-sizing: border-box;
 	border-bottom: $border-width solid $gray-300;
-	padding: 0 $grid-unit-30;
+	padding: 0 $grid-unit-40;
 	display: flex;
 	flex-direction: row;
 	justify-content: space-between;
@@ -75,7 +75,7 @@
 	position: relative;
 	position: sticky;
 	top: 0;
-	margin: 0 -#{$grid-unit-30} $grid-unit-30;
+	margin: 0 -#{$grid-unit-40} $grid-unit-30;
 
 	// Rules inside this query are only run by Microsoft Edge.
 	// Edge has bugs around position: sticky;, so it needs a separate top rule.
@@ -123,7 +123,7 @@
 .components-modal__content {
 	box-sizing: border-box;
 	height: 100%;
-	padding: 0 $grid-unit-30 $grid-unit-30;
+	padding: 0 $grid-unit-40 $grid-unit-30;
 
 	// Rules inside this query are only run by Microsoft Edge.
 	// This is a companion top padding to the fixed rule in line 77.

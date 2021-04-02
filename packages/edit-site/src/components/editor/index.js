@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
 	DropZoneProvider,
@@ -43,7 +43,6 @@ const interfaceLabels = {
 
 function Editor( { initialSettings } ) {
 	const {
-		isFullscreenActive,
 		isInserterOpen,
 		isListViewOpen,
 		sidebarIsOpened,
@@ -55,7 +54,6 @@ function Editor( { initialSettings } ) {
 		isNavigationOpen,
 	} = useSelect( ( select ) => {
 		const {
-			isFeatureActive,
 			isInserterOpened,
 			isListViewOpened,
 			getSettings,
@@ -67,15 +65,10 @@ function Editor( { initialSettings } ) {
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 
-		// Prefetch and parse patterns. This ensures patterns are loaded and parsed when
-		// the editor is loaded rather than degrading the performance of the inserter.
-		select( 'core/block-editor' ).__experimentalGetAllowedPatterns();
-
 		// The currently selected entity to display. Typically template or template part.
 		return {
 			isInserterOpen: isInserterOpened(),
 			isListViewOpen: isListViewOpened(),
-			isFullscreenActive: isFeatureActive( 'fullscreenMode' ),
 			sidebarIsOpened: !! select(
 				interfaceStore
 			).getActiveComplementaryArea( editSiteStore.name ),
@@ -161,7 +154,11 @@ function Editor( { initialSettings } ) {
 			return <InserterSidebar />;
 		}
 		if ( isListViewOpen ) {
-			return <ListViewSidebar />;
+			return (
+				<AsyncModeProvider value="true">
+					<ListViewSidebar />
+				</AsyncModeProvider>
+			);
 		}
 		return null;
 	};
@@ -169,7 +166,7 @@ function Editor( { initialSettings } ) {
 	return (
 		<>
 			<URLQueryController />
-			<FullscreenMode isActive={ isFullscreenActive } />
+			<FullscreenMode isActive />
 			<UnsavedChangesWarning />
 			<SlotFillProvider>
 				<DropZoneProvider>

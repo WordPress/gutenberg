@@ -1,14 +1,12 @@
 /**
  * @param {string} nonce
- * @return {import('../types').ApiFetchMiddleware} A middleware to enhance a request with a nonce.
+ * @return {import('../types').ApiFetchMiddleware & { nonce: string }} A middleware to enhance a request with a nonce.
  */
 function createNonceMiddleware( nonce ) {
 	/**
-	 * @param {import('../types').ApiFetchRequestProps} options
-	 * @param {(options: import('../types').ApiFetchRequestProps) => import('../types').ApiFetchRequestProps} next
-	 * @return {import('../types').ApiFetchRequestProps} The enhanced request.
+	 * @type {import('../types').ApiFetchMiddleware & { nonce: string }}
 	 */
-	function middleware( options, next ) {
+	const middleware = ( options, next ) => {
 		const { headers = {} } = options;
 
 		// If an 'X-WP-Nonce' header (or any case-insensitive variation
@@ -29,7 +27,7 @@ function createNonceMiddleware( nonce ) {
 				'X-WP-Nonce': middleware.nonce,
 			},
 		} );
-	}
+	};
 
 	middleware.nonce = nonce;
 
