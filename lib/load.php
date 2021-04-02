@@ -107,6 +107,7 @@ require __DIR__ . '/full-site-editing/edit-site-export.php';
 
 require __DIR__ . '/blocks.php';
 require __DIR__ . '/block-patterns.php';
+require __DIR__ . '/test-block-patterns.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
 require __DIR__ . '/widgets.php';
