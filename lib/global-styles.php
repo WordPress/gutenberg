@@ -198,7 +198,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	$origin = 'theme';
 	if (
 		WP_Theme_JSON_Resolver::theme_has_support() &&
-		gutenberg_is_fse_enabled()
+		gutenberg_supports_block_templates()
 	) {
 		// Only lookup for the user data if we need it.
 		$origin = 'user';
@@ -224,7 +224,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
 		gutenberg_is_edit_site_page( $screen->id ) &&
 		WP_Theme_JSON_Resolver::theme_has_support() &&
-		gutenberg_is_fse_enabled()
+		gutenberg_supports_block_templates()
 	) {
 		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
 		$base_styles = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
