@@ -49,6 +49,7 @@ function gutenberg_get_common_block_editor_settings() {
 		'imageSizes'                            => $available_image_sizes,
 		'isRTL'                                 => is_rtl(),
 		'maxUploadFileSize'                     => $max_upload_size,
+		'allowedMimeTypes'                      => get_allowed_mime_types(),
 	);
 
 	$color_palette = current( (array) get_theme_support( 'editor-color-palette' ) );
