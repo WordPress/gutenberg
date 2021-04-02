@@ -20,29 +20,33 @@ const QueryBlockSetup = ( {
 	name: blockName,
 } ) => {
 	const { postType, inherit } = query;
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	const { replaceBlocks, replaceInnerBlocks } = useDispatch(
+		blockEditorStore
+	);
 	const { postTypesSelectOptions } = usePostTypes();
 	const updateQuery = ( newQuery ) =>
 		setAttributes( { query: { ...query, ...newQuery } } );
-	const onFinish = ( innerBlocks ) => {
-		if ( innerBlocks ) {
-			replaceInnerBlocks(
-				clientId,
-				createBlocksFromInnerBlocksTemplate( innerBlocks ),
-				false
-			);
-		}
-	};
 	const onVariationSelect = ( nextVariation ) => {
 		if ( nextVariation.attributes ) {
 			setAttributes( nextVariation.attributes );
 		}
 		if ( nextVariation.innerBlocks ) {
-			onFinish( nextVariation.innerBlocks );
+			replaceInnerBlocks(
+				clientId,
+				createBlocksFromInnerBlocksTemplate(
+					nextVariation.innerBlocks
+				),
+				false
+			);
 		}
 	};
-	const onBlockPatternSelect = ( blocks ) => {
-		onFinish( [ [ 'core/query-loop', {}, blocks ] ] );
+	const onBlockPatternSelect = ( queryBlock ) => {
+		// We need to override the attributes that can be set in the Placeholder.
+		Object.assign( queryBlock[ 0 ].attributes.query, {
+			inherit: query.inherit,
+			postType: query.postType,
+		} );
+		replaceBlocks( clientId, queryBlock );
 	};
 	const inheritToggleHelp = !! inherit
 		? _x(
