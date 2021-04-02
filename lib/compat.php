@@ -196,6 +196,8 @@ add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post
 /**
  * Update allowed inline style attributes list.
  *
+ * Note: This should be removed when the minimum required WP version is >= 5.8.
+ *
  * @param string[] $attrs Array of allowed CSS attributes.
  * @return string[] CSS attributes.
  */
