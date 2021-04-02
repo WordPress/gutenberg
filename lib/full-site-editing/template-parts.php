@@ -209,7 +209,7 @@ function gutenberg_filter_template_part_area( $type ) {
  *
  * @return void
  */
-function gutenberg_do_block_template_part( $part ) {
+function gutenberg_block_template_part( $part ) {
 	$template_part = gutenberg_get_block_template( get_stylesheet() . '//' . $part, 'wp_template_part' );
 	if ( ! $template_part || empty( $template_part->content ) ) {
 		return;
@@ -222,8 +222,8 @@ function gutenberg_do_block_template_part( $part ) {
  *
  * @return void
  */
-function gutenberg_do_block_header_area() {
-	gutenberg_do_block_template_part( 'header' );
+function gutenberg_block_header_area() {
+	gutenberg_block_template_part( 'header' );
 }
 
 /**
@@ -231,6 +231,6 @@ function gutenberg_do_block_header_area() {
  *
  * @return void
  */
-function gutenberg_do_block_footer_area() {
-	gutenberg_do_block_template_part( 'footer' );
+function gutenberg_block_footer_area() {
+	gutenberg_block_template_part( 'footer' );
 }
