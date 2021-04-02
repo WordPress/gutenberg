@@ -31,7 +31,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @var boolean
 	 */
-	private static $theme_has_support = null;
+	private static $theme_has_support = array();
 
 	/**
 	 * Container for data coming from the user.
@@ -503,11 +503,12 @@ class WP_Theme_JSON_Resolver {
 	 * @return boolean
 	 */
 	public static function theme_has_support() {
-		if ( ! isset( self::$theme_has_support ) ) {
-			self::$theme_has_support = (bool) self::get_file_path_from_theme( 'experimental-theme.json' );
+		$theme_slug = get_stylesheet();
+		if ( ! isset( self::$theme_has_support[ $theme_slug ] ) ) {
+			self::$theme_has_support[ $theme_slug ] = (bool) self::get_file_path_from_theme( 'experimental-theme.json' );
 		}
 
-		return self::$theme_has_support;
+		return self::$theme_has_support[ $theme_slug ];
 	}
 
 	/**
