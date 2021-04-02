@@ -15,7 +15,7 @@ export function useInlineWarning( { ref } ) {
 
 			if ( computedStyle.display === 'inline' ) {
 				// eslint-disable-next-line no-console
-				console.warn( message );
+				console.error( message );
 			}
 		}
 	}, [] );
