@@ -448,7 +448,7 @@ export function* __unstableSwitchToEditingMode( shouldCreateTemplate = false ) {
 			createBlock( 'core/post-content' ),
 		];
 		const template = {
-			slug: 'custom-template-' + uuid(),
+			slug: 'wp-custom-template-' + uuid(),
 			content: serialize( templateContent ),
 			title: 'Custom Template',
 		};
