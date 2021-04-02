@@ -72,7 +72,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 		$template_item_slug = gutenberg_strip_php_suffix( $template_item );
 
 		// Is this a custom template?
-		$is_custom_template = 0 === strpos( $current_block_template_slug, 'custom-template-' );
+		$is_custom_template = 0 === strpos( $current_block_template_slug, 'wp-custom-template-' );
 
 		// Don't override the template if we find a template matching the slug we look for
 		// and which does not match a block template slug.
