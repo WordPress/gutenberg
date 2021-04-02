@@ -12,9 +12,11 @@ We recommend using the [Node Version Manager](https://github.com/nvm-sh/nvm) (nv
 - Git
 Gutenberg is using git for source control. Make sure you have an updated version of git installed on your computer, as well as a GitHub account. You can read the [Git Workflow](/docs/contributors/code/git-workflow.md) to learn more about using git and GitHub with Gutenberg
 
-- [Optional] Docker Desktop
+- [Recommended] Docker Desktop
 We recommend using the [wp-env package](/packages/env/README.md) for setting WordPress environment locally. You'll need to install Docker to use `wp-env`. See the [Development Environment tutorial for additional details](/docs/getting-started/tutorials/devenv/README.md).
 > Note: To install Docker on Windows 10 Home Edition, follow the [install instructions from Docker for Windows with WSL2](https://docs.docker.com/docker-for-windows/wsl/).
+
+As an alternative to Docker setup, you can use [Local by Flywheel](https://localbyflywheel.com/), [WampServer](http://www.wampserver.com/en/), or [MAMP](https://www.mamp.info/), or even use a remote server.
 
 ## Getting the Gutenberg code
 Fork the Gutenberg repository, clone it to your computer and add the WordPress repository as upstream.
@@ -40,17 +42,15 @@ Once built, Gutenberg is ready to be used as a WordPress plugin!
 
 ## Local WordPress Environment
 
-If you are familiar with WordPress and already have an environment setup, use the above build as a standard WordPress plugin by putting the gutenberg directory in your wp-content/plugins/ directory.
+To test a WordPress plugin, you need to have WordPress itself installed. If you already have a WordPress environment setup, use the above Gutenberg build as a standard WordPress plugin by putting the gutenberg directory in your wp-content/plugins/ directory.
 
 If you do not have a local WordPress environment setup, follow the steps in the rest of this section to create one.
 
 ### Using Docker and wp-env
 
-To test a WordPress plugin, you need to have WordPress itself installed. The [wp-env package](/packages/env/README.md) was developed with the Gutenberg project as a quick way to create a standard WordPress environment using Docker. It is also published as the `@wordpress/env` npm package.
+The [wp-env package](/packages/env/README.md) was developed with the Gutenberg project as a quick way to create a standard WordPress environment using Docker. It is also published as the `@wordpress/env` npm package.
 
 By default, `wp-env` can run in a plugin directory to create and run a WordPress environment, mounting and activating the plugin automatically. You can also configure `wp-env` to use existing installs, multiple plugins, or themes. See the [wp-env package](/packages/env/README.md#wp-envjson) for complete documentation.
-
-creates a Docker instance behind the scenes with the latest WordPress image and then maps the local theme or plugin to the environment as a Docker volume. This way, any changes you make to the code locally are reflected immediately in the WordPress instance.
 
 Make sure Docker is running, and start `wp-env` from within the gutenberg directory:
 
@@ -58,7 +58,7 @@ Make sure Docker is running, and start `wp-env` from within the gutenberg direct
 npm run wp-env start
 ```
 
-This script will download the necessary Docker images and run the Containers needed to run WordPress.
+This script will create a Docker instance behind the scenes with the latest WordPress Docker image, and then will map the Gutenberg plugin code from your local copy to the environment as a Docker volume. This way, any changes you make to the code locally are reflected immediately in the WordPress instance.
 
 > Note: `npm run` will use the `wp-env` / `WordPress`?? version specified within the Gutenberg project, making sure you are running the latest wp-env version.
 
@@ -67,6 +67,18 @@ To stop the running environment:
 ```bash
 npm run wp-env stop
 ```
+
+If everyting went well, you should see the following message in your terminal:
+```bash
+WordPress development site started at http://localhost:8888/
+WordPress test site started at http://localhost:8889/
+MySQL is listening on port 51220
+
+ ✔ Done! (in 261s 898ms)
+```
+And if you open Docker dashboard by rightclicking the icon in the menu bar(on Mac) or system tray (on Linux and Windows) and selecting 'Dashboard', you will see that the script has downloaded some Docker Images, and is running a Docker Container with fully functional WordPress installation:
+![Screenshot of the WordPress Docker Container Running](https://cldup.com/mt9cKES-YZ.png)
+![Screenshot of the Downloaded Docker Images for WordPress Development Environment](https://cldup.com/bNpgaRSkcG.png)
 
 To destroy the install completely:
 
@@ -86,15 +98,13 @@ You can access the Dashboard at: `http://localhost:8888/wp-admin/` using **Usern
 If you run into an issue, check the [troubleshooting section in `wp-env` documentation](/packages/env/README.md#troubleshooting-common-problems).
 ### Using Local or MAMP
 
-As an alternative to Docker and `wp-env` you can also use [Local by Flywheel](https://localbyflywheel.com/), [WampServer](http://www.wampserver.com/en/), or [MAMP](https://www.mamp.info/) to run a local WordPress environment. To do so clone and install Gutenberg as a regular plugin in your installation by creating a symlink or copying the directory to the proper `wp-content/plugins` directory.
+As an alternative to Docker and `wp-env`, you can also use [Local by Flywheel](https://localbyflywheel.com/), [WampServer](http://www.wampserver.com/en/), or [MAMP](https://www.mamp.info/) to run a local WordPress environment. To do so clone and install Gutenberg as a regular plugin in your installation by creating a symlink or copying the directory to the proper `wp-content/plugins` directory.
 
 You will also need some extra configuration to be able to run the e2e tests.
 
 Change the current directory to the plugins folder and symlink all e2e test plugins:
 
 ```bash
-<!-- @import "[TOC]" {cmd="toc" depthFrom=1 depthTo=6 orderedList=false} -->
-
 ln -s gutenberg/packages/e2e-tests/plugins/* .
 ```
 
