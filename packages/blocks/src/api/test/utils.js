@@ -18,6 +18,7 @@ import {
 	getAccessibleBlockLabel,
 	getBlockLabel,
 	__experimentalSanitizeBlockAttributes,
+	__experimentalGetBlockAttributesNamesByRole,
 } from '../utils';
 
 describe( 'block helpers', () => {
@@ -308,5 +309,94 @@ describe( 'sanitizeBlockAttributes', () => {
 			childrenContent: [],
 			withDefault: [ 'test' ],
 		} );
+	} );
+} );
+
+describe( '__experimentalGetBlockAttributesNamesByRole', () => {
+	beforeAll( () => {
+		registerBlockType( 'core/test-block-1', {
+			attributes: {
+				align: {
+					type: 'string',
+				},
+				content: {
+					type: 'boolean',
+					role: 'content',
+				},
+				level: {
+					type: 'number',
+					role: 'content',
+				},
+				color: {
+					type: 'string',
+					role: 'other',
+				},
+			},
+			save: noop,
+			category: 'text',
+			title: 'test block 1',
+		} );
+		registerBlockType( 'core/test-block-2', {
+			attributes: {
+				align: { type: 'string' },
+				content: { type: 'boolean' },
+				color: { type: 'string' },
+			},
+			save: noop,
+			category: 'text',
+			title: 'test block 2',
+		} );
+		registerBlockType( 'core/test-block-3', {
+			save: noop,
+			category: 'text',
+			title: 'test block 3',
+		} );
+	} );
+	afterAll( () => {
+		[
+			'core/test-block-1',
+			'core/test-block-2',
+			'core/test-block-3',
+		].forEach( unregisterBlockType );
+	} );
+	it( 'should return empty array if block has no attributes', () => {
+		expect(
+			__experimentalGetBlockAttributesNamesByRole( 'core/test-block-3' )
+		).toEqual( [] );
+	} );
+	it( 'should return all attribute names if no role is provided', () => {
+		const res = __experimentalGetBlockAttributesNamesByRole(
+			'core/test-block-1'
+		);
+		expect( res ).toEqual(
+			expect.arrayContaining( [ 'align', 'content', 'level', 'color' ] )
+		);
+	} );
+	it( 'should return proper results with existing attributes and provided role', () => {
+		expect(
+			__experimentalGetBlockAttributesNamesByRole(
+				'core/test-block-1',
+				'content'
+			)
+		).toEqual( expect.arrayContaining( [ 'content', 'level' ] ) );
+		expect(
+			__experimentalGetBlockAttributesNamesByRole(
+				'core/test-block-1',
+				'other'
+			)
+		).toEqual( [ 'color' ] );
+		expect(
+			__experimentalGetBlockAttributesNamesByRole(
+				'core/test-block-1',
+				'not-exists'
+			)
+		).toEqual( [] );
+		// A block with no `role` in any attributes.
+		expect(
+			__experimentalGetBlockAttributesNamesByRole(
+				'core/test-block-2',
+				'content'
+			)
+		).toEqual( [] );
 	} );
 } );
