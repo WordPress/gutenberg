@@ -4,7 +4,10 @@
 import { useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import { SelectControl, ToggleControl } from '@wordpress/components';
-import { createBlocksFromInnerBlocksTemplate } from '@wordpress/blocks';
+import {
+	cloneBlock,
+	createBlocksFromInnerBlocksTemplate,
+} from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
@@ -40,13 +43,15 @@ const QueryBlockSetup = ( {
 			);
 		}
 	};
-	const onBlockPatternSelect = ( queryBlock ) => {
+	const onBlockPatternSelect = ( blocks ) => {
+		const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 		// We need to override the attributes that can be set in the Placeholder.
-		Object.assign( queryBlock[ 0 ].attributes.query, {
+		Object.assign( clonedBlocks[ 0 ].attributes.query, {
 			inherit: query.inherit,
 			postType: query.postType,
+			perPage: null,
 		} );
-		replaceBlocks( clientId, queryBlock );
+		replaceBlocks( clientId, clonedBlocks );
 	};
 	const inheritToggleHelp = !! inherit
 		? _x(
