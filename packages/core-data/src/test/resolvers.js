@@ -40,7 +40,12 @@ describe( 'getEntityRecord', () => {
 
 	it( 'yields with requested post type', async () => {
 		const entities = [
-			{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
+			{
+				name: 'postType',
+				kind: 'root',
+				baseURL: '/wp/v2/types',
+				params: { context: 'edit' },
+			},
 		];
 		const fulfillment = getEntityRecord( 'root', 'postType', 'post' );
 		// Trigger generator

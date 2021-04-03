@@ -39,6 +39,7 @@ export const defaultEntities = [
 		kind: 'root',
 		key: 'slug',
 		baseURL: '/wp/v2/types',
+		params: { context: 'edit' },
 	},
 	{
 		name: 'media',
@@ -46,6 +47,7 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/media',
 		plural: 'mediaItems',
 		label: __( 'Media' ),
+		params: { context: 'edit' },
 	},
 	{
 		name: 'taxonomy',
@@ -54,6 +56,7 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/taxonomies',
 		plural: 'taxonomies',
 		label: __( 'Taxonomy' ),
+		params: { context: 'edit' },
 	},
 	{
 		name: 'sidebar',
@@ -70,6 +73,7 @@ export const defaultEntities = [
 		plural: 'widgets',
 		transientEdits: { blocks: true },
 		label: __( 'Widgets' ),
+		params: { context: 'edit' },
 	},
 	{
 		name: 'widgetType',
@@ -77,6 +81,7 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/widget-types',
 		plural: 'widgetTypes',
 		label: __( 'Widget types' ),
+		params: { context: 'edit' },
 	},
 	{
 		label: __( 'User' ),
@@ -84,6 +89,7 @@ export const defaultEntities = [
 		kind: 'root',
 		baseURL: '/wp/v2/users',
 		plural: 'users',
+		params: { context: 'edit' },
 	},
 	{
 		name: 'comment',
@@ -91,6 +97,7 @@ export const defaultEntities = [
 		baseURL: '/wp/v2/comments',
 		plural: 'comments',
 		label: __( 'Comment' ),
+		params: { context: 'edit' },
 	},
 	{
 		name: 'menu',
@@ -98,6 +105,7 @@ export const defaultEntities = [
 		baseURL: '/__experimental/menus',
 		plural: 'menus',
 		label: __( 'Menu' ),
+		params: { context: 'edit' },
 	},
 	{
 		name: 'menuItem',
@@ -105,6 +113,7 @@ export const defaultEntities = [
 		baseURL: '/__experimental/menu-items',
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
+		params: { context: 'edit' },
 	},
 	{
 		name: 'menuLocation',
@@ -113,6 +122,7 @@ export const defaultEntities = [
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
 		key: 'name',
+		params: { context: 'edit' },
 	},
 ];
 
@@ -176,6 +186,7 @@ function* loadPostTypeEntities() {
 				record?.title?.rendered ||
 				record?.title ||
 				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
+			params: { context: 'edit' },
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 		};
 	} );
@@ -196,6 +207,7 @@ function* loadTaxonomyEntities() {
 			baseURL: '/wp/v2/' + taxonomy.rest_base,
 			name,
 			label: taxonomy.labels.singular_name,
+			params: { context: 'edit' },
 		};
 	} );
 }
