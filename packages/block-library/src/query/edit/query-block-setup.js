@@ -53,9 +53,9 @@ const QueryBlockSetup = ( {
 			/**
 			 * TODO: this check will be revised with the ongoing work on block patterns.
 			 * For now we keep the value of posts per page (`query.perPage`) from Query patterns
-			 * so as to preview the pattern as intented, without possible big previews.
+			 * so as to preview the pattern as intended, without possible big previews.
 			 * During insertion, we need to override the Query's attributes that can be set in
-			 * the Placeholder and we unset the `perPage` value to be set appropriatelly by Query block.
+			 * the Placeholder and we unset the `perPage` value to be set appropriately by Query block.
 			 */
 			if ( block.name === 'core/query' ) {
 				/**
