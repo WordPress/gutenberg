@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "10.0.0",
+	"version": "10.3.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -16,7 +16,7 @@
 	},
 	"engines": {
 		"node": ">=10.0.0",
-		"npm": ">=6.9.0"
+		"npm": ">=6.9.0 <7"
 	},
 	"config": {
 		"GUTENBERG_PHASE": 2,
@@ -85,10 +85,10 @@
 	"devDependencies": {
 		"@actions/core": "1.2.6",
 		"@actions/github": "1.0.0",
-		"@babel/core": "7.12.9",
-		"@babel/plugin-syntax-jsx": "7.12.1",
-		"@babel/runtime-corejs3": "7.12.5",
-		"@babel/traverse": "7.12.9",
+		"@babel/core": "7.13.10",
+		"@babel/plugin-syntax-jsx": "7.12.13",
+		"@babel/runtime-corejs3": "7.13.10",
+		"@babel/traverse": "7.13.0",
 		"@octokit/rest": "16.26.0",
 		"@octokit/webhooks": "7.1.0",
 		"@storybook/addon-a11y": "6.1.11",
@@ -142,8 +142,8 @@
 		"@wordpress/stylelint-config": "file:packages/stylelint-config",
 		"appium": "1.20.2",
 		"babel-jest": "26.6.3",
-		"babel-loader": "8.1.0",
-		"babel-plugin-emotion": "10.0.33",
+		"babel-loader": "8.2.2",
+		"babel-plugin-emotion": "10.2.2",
 		"babel-plugin-inline-json-import": "0.3.2",
 		"babel-plugin-react-native-classname-to-style": "1.2.2",
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
@@ -153,7 +153,7 @@
 		"chalk": "4.0.0",
 		"commander": "4.1.0",
 		"concurrently": "3.5.0",
-		"copy-webpack-plugin": "4.5.2",
+		"copy-webpack-plugin": "5.1.2",
 		"cross-env": "3.2.4",
 		"css-loader": "3.5.2",
 		"cssnano": "4.1.10",
@@ -187,7 +187,6 @@
 		"postcss-loader": "3.0.0",
 		"prettier": "npm:wp-prettier@2.2.1-beta-1",
 		"progress": "2.0.3",
-		"puppeteer": "npm:puppeteer-core@5.5.0",
 		"react": "16.13.1",
 		"react-dom": "16.13.1",
 		"react-native": "0.61.5",
@@ -292,14 +291,14 @@
 		"*.scss": [
 			"wp-scripts lint-style"
 		],
-		"*.js": [
+		"*.{js,ts,tsx}": [
 			"wp-scripts format-js",
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
 			"node ./docs/tool/index.js"
 		],
-		"packages/**/*.js": [
+		"packages/**/*.{js,ts,tsx}": [
 			"node ./bin/api-docs/update-api-docs.js",
 			"node ./bin/api-docs/are-api-docs-unstaged.js",
 			"node ./bin/packages/lint-staged-typecheck.js"

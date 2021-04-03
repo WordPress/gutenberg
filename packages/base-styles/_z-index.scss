@@ -41,6 +41,9 @@ $z-layers: (
 	".wp-block-cover__video-background": 0, // Video background inside cover block.
 	".wp-block-template-part__placeholder-preview-filter-input": 1,
 
+	// Navigation menu dropdown.
+	".has-child .wp-block-navigation-link__container": 28,
+
 	// Active pill button
 	".components-button {:focus or .is-primary}": 1,
 
@@ -102,8 +105,8 @@ $z-layers: (
 	// Show the navigation toggle above the skeleton header
 	".edit-site-navigation-toggle": 31,
 
-	// Show the FSE template previews above the editor (same z-index as the skeleton header)
-	".edit-site-navigation-panel__preview": 30,
+	// Show the FSE template previews above the editor and any open block toolbars
+	".edit-site-navigation-panel__preview": 32,
 
 	// Show notices below expanded editor bar
 	// .edit-post-header { z-index: 30 }
@@ -127,6 +130,7 @@ $z-layers: (
 
 	// Should be above the popover (dropdown)
 	".reusable-blocks-menu-items__convert-modal": 1000001,
+	".edit-site-template-part-converter__modal": 1000001,
 
 	// ...Except for popovers immediately beneath wp-admin menu on large breakpoints
 	".components-popover.block-editor-inserter__popover": 99999,
@@ -136,6 +140,7 @@ $z-layers: (
 	".components-popover.edit-site-more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
 	".components-popover.block-editor-warning__dropdown": 99998,
+	".components-popover.edit-navigation-header__menu-switcher-dropdown": 99998,
 
 	".components-autocomplete__results": 1000000,
 
@@ -165,6 +170,7 @@ $z-layers: (
 	".components-circular-option-picker__option.is-pressed": 1,
 	// Needs to be higher than .components-circular-option-picker__option.is-pressed.
 	".components-circular-option-picker__option.is-pressed + svg": 2,
+	".edit-navigation-layout__overlay": 999,
 );
 
 @function z-index( $key ) {

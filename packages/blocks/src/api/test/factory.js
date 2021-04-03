@@ -11,6 +11,7 @@ import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
+	__experimentalCloneSanitizedBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
 	getBlockTransforms,
@@ -424,7 +425,9 @@ describe( 'block factory', () => {
 				block.innerBlocks[ 1 ].attributes
 			);
 		} );
+	} );
 
+	describe( '__experimentalCloneSanitizedBlock', () => {
 		it( 'should sanitize attributes not defined in the block type', () => {
 			registerBlockType( 'core/test-block', {
 				...defaultBlockSettings,
@@ -439,7 +442,7 @@ describe( 'block factory', () => {
 				notDefined: 'not-defined',
 			} );
 
-			const clonedBlock = cloneBlock( block, {
+			const clonedBlock = __experimentalCloneSanitizedBlock( block, {
 				notDefined2: 'not-defined-2',
 			} );
 

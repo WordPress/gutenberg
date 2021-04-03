@@ -123,11 +123,11 @@ A pull request can generally be merged once it is:
 - Vetted against all potential edge cases.
 - Changelog entries were properly added.
 - Reviewed by someone other than the original author.
-- [Rebased](/docs/contributors/git-workflow.md#keeping-your-branch-up-to-date) onto the latest version of the master branch.
+- [Rebased](/docs/contributors/code/git-workflow.md#keeping-your-branch-up-to-date) onto the latest version of the master branch.
 
 The final pull request merge decision is made by the **@wordpress/gutenberg-core** team.
 
-All members of the WordPress organization on GitHub have the ability to review and merge pull requests. If you have reviewed a PR and are confident in the code, approve the pull request and comment pinging **@wordpress/gutenberg-core** or a specific core member who has been involved in the PR. Once they confirm there are no objections, you are free to merge the PR into master.
+All members of the WordPress organization on GitHub have the ability to review and merge pull requests. If you have reviewed a PR and are confident in the code, approve the pull request and comment pinging **@wordpress/gutenberg-core** or a specific core member who has been involved in the PR. Once they confirm there are no objections, you are free to merge the PR into trunk.
 
 Most pull requests will be automatically assigned a release milestone, but please make sure your merged pull request was assigned one. Doing so creates the historical legacy of what code landed when, and makes it possible for all project contributors (even non-technical ones) to access this information.
 

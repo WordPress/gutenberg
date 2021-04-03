@@ -27,7 +27,7 @@ describe( 'cpt locking', () => {
 		expect(
 			await page.evaluate( () => {
 				const inserter = document.querySelector(
-					'.edit-post-header [aria-label="Add block"]'
+					'.edit-post-header [aria-label="Add block"], .edit-post-header [aria-label="Toggle block inserter"]'
 				);
 				return inserter.getAttribute( 'disabled' );
 			} )
@@ -159,7 +159,11 @@ describe( 'cpt locking', () => {
 
 		it( 'should allow blocks to be inserted', async () => {
 			expect(
-				await page.$( '.edit-post-header [aria-label="Add block"]' )
+				// "Add block" selector is required to make sure performance comparison
+				// doesn't fail on older branches where we still had "Add block" as label.
+				await page.$(
+					'.edit-post-header [aria-label="Add block"], .edit-post-header [aria-label="Toggle block inserter"]'
+				)
 			).not.toBeNull();
 			await insertBlock( 'List' );
 			await page.keyboard.type( 'List content' );

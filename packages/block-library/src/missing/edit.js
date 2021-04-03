@@ -43,7 +43,7 @@ function MissingBlockWarning( { attributes, convertToHTML } ) {
 	}
 
 	return (
-		<div { ...useBlockProps() }>
+		<div { ...useBlockProps( { className: 'has-warning' } ) }>
 			<Warning actions={ actions }>{ messageHTML }</Warning>
 			<RawHTML>{ originalUndelimitedContent }</RawHTML>
 		</div>

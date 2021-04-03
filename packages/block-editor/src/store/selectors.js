@@ -15,7 +15,6 @@ import {
 	filter,
 	mapKeys,
 	orderBy,
-	every,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -263,6 +262,41 @@ export const __unstableGetBlockTree = createSelector(
 		state.blocks.order,
 		state.blocks.attributes,
 	]
+);
+
+/**
+ * Returns a stripped down block object containing only its client ID,
+ * and its inner blocks' client IDs.
+ *
+ * @param {Object} state    Editor state.
+ * @param {string} clientId Client ID of the block to get.
+ *
+ * @return {Object} Client IDs of the post blocks.
+ */
+export const __unstableGetClientIdWithClientIdsTree = createSelector(
+	( state, clientId ) => ( {
+		clientId,
+		innerBlocks: __unstableGetClientIdsTree( state, clientId ),
+	} ),
+	( state ) => [ state.blocks.order ]
+);
+
+/**
+ * Returns the block tree represented in the block-editor store from the
+ * given root, consisting of stripped down block objects containing only
+ * their client IDs, and their inner blocks' client IDs.
+ *
+ * @param {Object}  state        Editor state.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {Object[]} Client IDs of the post blocks.
+ */
+export const __unstableGetClientIdsTree = createSelector(
+	( state, rootClientId = '' ) =>
+		map( getBlockOrder( state, rootClientId ), ( clientId ) =>
+			__unstableGetClientIdWithClientIdsTree( state, clientId )
+		),
+	( state ) => [ state.blocks.order ]
 );
 
 /**
@@ -1757,13 +1791,17 @@ export const __experimentalGetAllowedBlocks = createSelector(
 	]
 );
 
-const __experimentalGetParsedPatterns = createSelector(
-	( state ) => {
+export const __experimentalGetParsedPattern = createSelector(
+	( state, patternName ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
-		return map( patterns, ( pattern ) => ( {
+		const pattern = patterns.find( ( { name } ) => name === patternName );
+		if ( ! pattern ) {
+			return null;
+		}
+		return {
 			...pattern,
-			contentBlocks: parse( pattern.content ),
-		} ) );
+			blocks: parse( pattern.content ),
+		};
 	},
 	( state ) => [ state.settings.__experimentalBlockPatterns ]
 );
@@ -1778,17 +1816,15 @@ const __experimentalGetParsedPatterns = createSelector(
  */
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
-		const patterns = __experimentalGetParsedPatterns( state );
-
-		if ( ! rootClientId ) {
-			return patterns;
-		}
-
-		const patternsAllowed = filter( patterns, ( { contentBlocks } ) => {
-			return every( contentBlocks, ( { name } ) =>
+		const patterns = state.settings.__experimentalBlockPatterns;
+		const parsedPatterns = patterns.map( ( { name } ) =>
+			__experimentalGetParsedPattern( state, name )
+		);
+		const patternsAllowed = filter( parsedPatterns, ( { blocks } ) =>
+			blocks.every( ( { name } ) =>
 				canInsertBlockType( state, name, rootClientId )
-			);
-		} );
+			)
+		);
 
 		return patternsAllowed;
 	},
@@ -1799,6 +1835,32 @@ export const __experimentalGetAllowedPatterns = createSelector(
 		state.blockListSettings[ rootClientId ],
 		state.blocks.byClientId[ rootClientId ],
 	]
+);
+
+/**
+ * Returns the list of patterns based on specific `scope` and
+ * a block's name.
+ * `inserter` scope should be handled differently, probably in
+ * combination with `__experimentalGetAllowedPatterns`.
+ * For now `__experimentalGetScopedBlockPatterns` handles properly
+ * all other scopes.
+ * Since both APIs are experimental we should revisit this.
+ *
+ * @param {Object} state Editor state.
+ * @param {string} scope Block pattern scope.
+ * @param {string} blockName Block's name.
+ *
+ * @return {Array} The list of matched block patterns based on provided scope and block name.
+ */
+export const __experimentalGetScopedBlockPatterns = createSelector(
+	( state, scope, blockName ) => {
+		if ( ! scope && ! blockName ) return EMPTY_ARRAY;
+		const patterns = state.settings.__experimentalBlockPatterns;
+		return patterns.filter( ( pattern ) =>
+			pattern.scope?.[ scope ]?.includes?.( blockName )
+		);
+	},
+	( state ) => [ state.settings.__experimentalBlockPatterns ]
 );
 
 /**

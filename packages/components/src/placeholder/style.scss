@@ -51,6 +51,11 @@
 		fill: currentColor;
 		margin-right: 1ch;
 	}
+
+	// Don't take up space if the label is empty.
+	&:empty {
+		display: none;
+	}
 }
 
 .components-placeholder__fieldset,

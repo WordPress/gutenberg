@@ -287,9 +287,7 @@ class GalleryImage extends Component {
 									onChange={ this.onCaptionChange }
 									onFocus={ this.onSelectCaption }
 									placeholder={
-										isSelected
-											? __( 'Write caption…' )
-											: null
+										isSelected ? __( 'Add caption' ) : null
 									}
 									placeholderTextColor={
 										captionPlaceholderStyle.color

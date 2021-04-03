@@ -30,7 +30,10 @@ import {
 	getBlockTypes,
 	getGroupingBlockName,
 } from './registration';
-import { normalizeBlockType, sanitizeBlockAttributes } from './utils';
+import {
+	normalizeBlockType,
+	__experimentalSanitizeBlockAttributes,
+} from './utils';
 
 /**
  * Returns a block object given its type and attributes.
@@ -42,7 +45,10 @@ import { normalizeBlockType, sanitizeBlockAttributes } from './utils';
  * @return {Object} Block object.
  */
 export function createBlock( name, attributes = {}, innerBlocks = [] ) {
-	const sanitizedAttributes = sanitizeBlockAttributes( name, attributes );
+	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
+		name,
+		attributes
+	);
 
 	const clientId = uuid();
 
@@ -88,8 +94,45 @@ export function createBlocksFromInnerBlocksTemplate(
 }
 
 /**
- * Given a block object, returns a copy of the block object, optionally merging
- * new attributes and/or replacing its inner blocks.
+ * Given a block object, returns a copy of the block object while sanitizing its attributes,
+ * optionally merging new attributes and/or replacing its inner blocks.
+ *
+ * @param {Object} block              Block instance.
+ * @param {Object} mergeAttributes    Block attributes.
+ * @param {?Array} newInnerBlocks     Nested blocks.
+ *
+ * @return {Object} A cloned block.
+ */
+export function __experimentalCloneSanitizedBlock(
+	block,
+	mergeAttributes = {},
+	newInnerBlocks
+) {
+	const clientId = uuid();
+
+	const sanitizedAttributes = __experimentalSanitizeBlockAttributes(
+		block.name,
+		{
+			...block.attributes,
+			...mergeAttributes,
+		}
+	);
+
+	return {
+		...block,
+		clientId,
+		attributes: sanitizedAttributes,
+		innerBlocks:
+			newInnerBlocks ||
+			block.innerBlocks.map( ( innerBlock ) =>
+				__experimentalCloneSanitizedBlock( innerBlock )
+			),
+	};
+}
+
+/**
+ * Given a block object, returns a copy of the block object,
+ * optionally merging new attributes and/or replacing its inner blocks.
  *
  * @param {Object} block              Block instance.
  * @param {Object} mergeAttributes    Block attributes.
@@ -100,15 +143,13 @@ export function createBlocksFromInnerBlocksTemplate(
 export function cloneBlock( block, mergeAttributes = {}, newInnerBlocks ) {
 	const clientId = uuid();
 
-	const sanitizedAttributes = sanitizeBlockAttributes( block.name, {
-		...block.attributes,
-		...mergeAttributes,
-	} );
-
 	return {
 		...block,
 		clientId,
-		attributes: sanitizedAttributes,
+		attributes: {
+			...block.attributes,
+			...mergeAttributes,
+		},
 		innerBlocks:
 			newInnerBlocks ||
 			block.innerBlocks.map( ( innerBlock ) => cloneBlock( innerBlock ) ),

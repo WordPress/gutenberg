@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraping the Gutenberg Edit Site Page.
+ * Bootstrapping the Gutenberg Edit Site Page.
  *
  * @package gutenberg
  */
@@ -41,17 +41,7 @@ function gutenberg_get_editor_styles() {
 	global $editor_styles;
 
 	// Ideally the code is extracted into a reusable function.
-	$styles = array(
-		array(
-			'css' => file_get_contents(
-				ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
-			),
-		),
-	);
-
-	$styles[] = array(
-		'css' => 'body { font-family: -apple-system, BlinkMacSystemFont,"Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell,"Helvetica Neue", sans-serif }',
-	);
+	$styles = array();
 
 	if ( $editor_styles && current_theme_supports( 'editor-styles' ) ) {
 		foreach ( $editor_styles as $style ) {
@@ -85,7 +75,7 @@ function gutenberg_get_editor_styles() {
  * @param string $hook Page.
  */
 function gutenberg_edit_site_init( $hook ) {
-	global $current_screen, $post;
+	global $current_screen, $post, $editor_styles;
 
 	if ( ! gutenberg_is_edit_site_page( $hook ) ) {
 		return;
@@ -113,42 +103,21 @@ function gutenberg_edit_site_init( $hook ) {
 	);
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
 
-	// Preload block editor paths.
-	// most of these are copied from edit-forms-blocks.php.
-	$preload_paths = array(
-		'/?context=edit',
-		'/wp/v2/types?context=edit',
-		'/wp/v2/taxonomies?context=edit',
-		'/wp/v2/pages?context=edit',
-		'/wp/v2/themes?status=active',
-		array( '/wp/v2/media', 'OPTIONS' ),
-	);
-	$preload_data  = array_reduce(
-		$preload_paths,
-		'rest_preload_api_request',
-		array()
-	);
-	wp_add_inline_script(
-		'wp-api-fetch',
-		sprintf( 'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );', wp_json_encode( $preload_data ) ),
-		'after'
-	);
-
-	// Initialize editor.
-	wp_add_inline_script(
-		'wp-edit-site',
-		sprintf(
-			'wp.domReady( function() {
-				wp.editSite.initialize( "edit-site-editor", %s );
-			} );',
-			wp_json_encode( $settings )
+	gutenberg_initialize_editor(
+		'edit_site_editor',
+		'edit-site',
+		array(
+			'preload_paths'    => array(
+				array( '/wp/v2/media', 'OPTIONS' ),
+				'/?context=edit',
+				'/wp/v2/types?context=edit',
+				'/wp/v2/taxonomies?context=edit',
+				'/wp/v2/pages?context=edit',
+				'/wp/v2/themes?status=active',
+			),
+			'initializer_name' => 'initialize',
+			'editor_settings'  => $settings,
 		)
-	);
-
-	wp_add_inline_script(
-		'wp-blocks',
-		sprintf( 'wp.blocks.unstable__bootstrapServerSideBlockDefinitions( %s );', wp_json_encode( get_block_editor_server_block_settings() ) ),
-		'after'
 	);
 
 	wp_add_inline_script(
@@ -156,6 +125,18 @@ function gutenberg_edit_site_init( $hook ) {
 		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( $post ) ) ),
 		'after'
 	);
+
+	wp_enqueue_script( 'wp-edit-site' );
+	wp_enqueue_script( 'wp-format-library' );
+	wp_enqueue_style( 'wp-edit-site' );
+	wp_enqueue_style( 'wp-format-library' );
+
+	if (
+		current_theme_supports( 'wp-block-styles' ) ||
+		( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 )
+	) {
+		wp_enqueue_style( 'wp-block-library-theme' );
+	}
 
 	/**
 	 * Fires after block assets have been enqueued for the editing interface.
@@ -170,10 +151,6 @@ function gutenberg_edit_site_init( $hook ) {
 
 	do_action( 'enqueue_block_editor_assets' );
 
-	wp_enqueue_script( 'wp-edit-site' );
-	wp_enqueue_script( 'wp-format-library' );
-	wp_enqueue_style( 'wp-edit-site' );
-	wp_enqueue_style( 'wp-format-library' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_edit_site_init' );
 

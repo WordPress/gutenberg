@@ -183,8 +183,8 @@ In the random image block above, we've given the `alt` attribute of the image a 
 
 <a name="cloneBlock" href="#cloneBlock">#</a> **cloneBlock**
 
-Given a block object, returns a copy of the block object, optionally merging
-new attributes and/or replacing its inner blocks.
+Given a block object, returns a copy of the block object,
+optionally merging new attributes and/or replacing its inner blocks.
 
 _Parameters_
 
