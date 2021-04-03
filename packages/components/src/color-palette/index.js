@@ -23,6 +23,7 @@ export default function ColorPalette( {
 	disableCustomColors = false,
 	onChange,
 	value,
+	disableAlpha = true,
 } ) {
 	const clearColor = useCallback( () => onChange( undefined ), [ onChange ] );
 	const colorOptions = useMemo( () => {
@@ -61,8 +62,12 @@ export default function ColorPalette( {
 	const renderCustomColorPicker = () => (
 		<ColorPicker
 			color={ value }
-			onChangeComplete={ ( color ) => onChange( color.hex ) }
-			disableAlpha
+			onChangeComplete={ ( color ) =>
+				disableAlpha
+					? onChange( color.hex )
+					: onChange( tinycolor( color.rgb ).toRgbString() )
+			}
+			disableAlpha={ disableAlpha }
 		/>
 	);
 
