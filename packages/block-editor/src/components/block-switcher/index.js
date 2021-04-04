@@ -31,20 +31,29 @@ import BlockIcon from '../block-icon';
 import BlockTitle from '../block-title';
 import BlockTransformationsMenu from './block-transformations-menu';
 import BlockStylesMenu from './block-styles-menu';
+import PatternTransformationsMenu from './pattern-transformations-menu';
+
+const nestedSingleBlocksToHandle = [ 'core/template-part' ];
 
 export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
-	const { replaceBlocks } = useDispatch( blockEditorStore );
+	const { replaceBlocks, replaceInnerBlocks } = useDispatch(
+		blockEditorStore
+	);
 	const blockInformation = useBlockDisplayInformation( blocks[ 0 ].clientId );
 	const {
 		possibleBlockTransformations,
 		hasBlockStyles,
 		icon,
 		blockTitle,
+		patterns,
+		replaceInnerBlocksMode,
 	} = useSelect(
 		( select ) => {
-			const { getBlockRootClientId, getBlockTransformItems } = select(
-				blockEditorStore
-			);
+			const {
+				getBlockRootClientId,
+				getBlockTransformItems,
+				__experimentalGetPatternTransformItems,
+			} = select( blockEditorStore );
 
 			const { getBlockStyles, getBlockType } = select( blocksStore );
 			const rootClientId = getBlockRootClientId(
@@ -66,7 +75,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					? getBlockType( firstBlockName )?.icon
 					: stack;
 			}
-
+			const _patterns = __experimentalGetPatternTransformItems(
+				blocks,
+				rootClientId
+			);
 			return {
 				possibleBlockTransformations: getBlockTransformItems(
 					blocks,
@@ -75,6 +87,12 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
 				blockTitle: getBlockType( firstBlockName ).title,
+				patterns: _patterns,
+				// TODO Need more thought here. We have the same check for template
+				// part in the `__experimentalGetPatternTransformItems` selector.
+				replaceInnerBlocksMode:
+					_isSingleBlockSelected &&
+					nestedSingleBlocksToHandle.includes( firstBlockName ),
 			};
 		},
 		[ clientIds, blocks, blockInformation?.icon ]
@@ -83,9 +101,22 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 	const isReusable = blocks.length === 1 && isReusableBlock( blocks[ 0 ] );
 	const isTemplate = blocks.length === 1 && isTemplatePart( blocks[ 0 ] );
 
-	const onTransform = ( name ) =>
+	// Simple block tranformation based on the `Block Transforms` API.
+	const onBlockTransform = ( name ) =>
 		replaceBlocks( clientIds, switchToBlockType( blocks, name ) );
+	// Pattern transformation through the `Patterns` API.
+	const onPatternTransform = ( transformedBlocks ) => {
+		// If on replaceInnerBlocksMode we replace the InnerBlocks of
+		// the selected block (currently single block selected and one
+		// of `nestedSingleBlocksToHandle`).
+		if ( replaceInnerBlocksMode ) {
+			replaceInnerBlocks( clientIds[ 0 ], transformedBlocks );
+		} else {
+			replaceBlocks( clientIds, transformedBlocks );
+		}
+	};
 	const hasPossibleBlockTransformations = !! possibleBlockTransformations.length;
+	const hasPatternTransformation = !! patterns?.length;
 	if ( ! hasBlockStyles && ! hasPossibleBlockTransformations ) {
 		return (
 			<ToolbarGroup>
@@ -114,6 +145,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					blocks.length
 			  );
 
+	const showDropDown =
+		hasBlockStyles ||
+		hasPossibleBlockTransformations ||
+		hasPatternTransformation;
 	return (
 		<ToolbarGroup>
 			<ToolbarItem>
@@ -147,9 +182,25 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 						menuProps={ { orientation: 'both' } }
 					>
 						{ ( { onClose } ) =>
-							( hasBlockStyles ||
-								hasPossibleBlockTransformations ) && (
+							showDropDown && (
 								<div className="block-editor-block-switcher__container">
+									{ hasPatternTransformation && (
+										<PatternTransformationsMenu
+											blocks={ blocks }
+											patterns={ patterns }
+											onSelect={ (
+												transformedBlocks
+											) => {
+												onPatternTransform(
+													transformedBlocks
+												);
+												onClose();
+											} }
+											replaceInnerBlocksMode={
+												replaceInnerBlocksMode
+											}
+										/>
+									) }
 									{ hasPossibleBlockTransformations && (
 										<BlockTransformationsMenu
 											className="block-editor-block-switcher__transforms__menugroup"
@@ -158,7 +209,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 											}
 											blocks={ blocks }
 											onSelect={ ( name ) => {
-												onTransform( name );
+												onBlockTransform( name );
 												onClose();
 											} }
 										/>

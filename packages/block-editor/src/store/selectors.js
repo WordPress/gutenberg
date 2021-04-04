@@ -27,6 +27,7 @@ import {
 	hasBlockSupport,
 	getPossibleBlockTransformations,
 	parse,
+	getBlockVariations,
 } from '@wordpress/blocks';
 import { SVG, Rect, G, Path } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
@@ -1839,28 +1840,159 @@ export const __experimentalGetAllowedPatterns = createSelector(
 
 /**
  * Returns the list of patterns based on specific `scope` and
- * a block's name.
- * `inserter` scope should be handled differently, probably in
- * combination with `__experimentalGetAllowedPatterns`.
- * For now `__experimentalGetScopedBlockPatterns` handles properly
- * all other scopes.
- * Since both APIs are experimental we should revisit this.
+ * a block's name or array of block names to find matching pattens.
+ * Internally is used `__experimentalGetAllowedPatterns` to have a
+ * single entry point for getting allowed patterns based on the `rootClientId`.
+ * TODO Since both APIs are experimental we should probably revisit this.
  *
  * @param {Object} state Editor state.
  * @param {string} scope Block pattern scope.
- * @param {string} blockName Block's name.
+ * @param {string|string[]} blockNames Block's name or array of block names to find matching pattens.
+ * @param {?string} rootClientId Optional target root client ID.
  *
  * @return {Array} The list of matched block patterns based on provided scope and block name.
  */
+// TODO add tests
 export const __experimentalGetScopedBlockPatterns = createSelector(
-	( state, scope, blockName ) => {
-		if ( ! scope && ! blockName ) return EMPTY_ARRAY;
-		const patterns = state.settings.__experimentalBlockPatterns;
-		return patterns.filter( ( pattern ) =>
-			pattern.scope?.[ scope ]?.includes?.( blockName )
+	( state, scope, blockNames, rootClientId = null ) => {
+		if ( ! ( scope && blockNames ) ) return EMPTY_ARRAY;
+		const patterns = __experimentalGetAllowedPatterns(
+			state,
+			rootClientId
+		);
+		const normalizedBlockNames = Array.isArray( blockNames )
+			? blockNames
+			: [ blockNames ];
+		return patterns.reduce( ( accumulator, pattern ) => {
+			const match = pattern?.scope?.[ scope ]?.some?.( ( blockName ) =>
+				normalizedBlockNames.includes( blockName )
+			);
+			if ( ! match ) return accumulator;
+			// If no `rootClientId` is provided, __experimentalGetAllowedPatterns are not
+			// filled with the `blocks` property that are the parsed blocks. In that case
+			// parse them.
+			accumulator.push(
+				rootClientId
+					? pattern
+					: __experimentalGetParsedPattern( state, pattern.name )
+			);
+			return accumulator;
+		}, [] );
+	},
+	( state, rootClientId ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId[ rootClientId ],
+	]
+);
+
+/**
+ * Determines the items that appear in the available pattern transforms list.
+ * There is special handling in two cases:
+ * 1. For some blocks (`blocksToSkip`) when multiple blocks are selected,
+ * don't show any transforms, as it doesn't make sense to try to be too smart.
+ * 2. There are some blocks (`nestedSingleBlocksToHandle`) that makes sense to
+ * replace everything when they are the only block selected.
+ *
+ * For the rest blocks we return a first set of possible eligible block patterns,
+ * by checking the `scope` Patterns API. We still have to recurse through block
+ * pattern's blocks and try to find matches from the selected blocks. Now this
+ * happens in the consumer to avoid heavy operations in the selector.
+ *
+ * @param {Object}  state Editor state.
+ * @param {Object[]} blocks The selected blocks.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {WPEditorTransformItem[]} Items that are eligible for a pattern transformation.
+ */
+// TODO tests
+export const __experimentalGetPatternTransformItems = createSelector(
+	( state, blocks, rootClientId = null ) => {
+		if ( ! blocks ) return EMPTY_ARRAY;
+		// There are some blocks like `Template Part` that makes sense
+		// to replace everything when they are the only block selected.
+		const isSingleBlockSelected = blocks.length === 1;
+		const nestedSingleBlocksToHandle = [ 'core/template-part' ];
+		if (
+			isSingleBlockSelected &&
+			nestedSingleBlocksToHandle.includes( blocks[ 0 ].name )
+		) {
+			const [ selectedBlock ] = blocks;
+			let { name: blockName } = selectedBlock;
+			// Try to find an active block variation for `Template Part`,
+			// to show patterns with `scope` including the block variation
+			// name (ex. `core/template-part/{variation name}). If no active
+			// block variation is found, we search for patterns for the base
+			// block.
+			const variations = getBlockVariations( blockName );
+			if ( variations?.length ) {
+				const match = variations.find( ( variation ) =>
+					variation.isActive?.(
+						selectedBlock.attributes,
+						variation.attributes
+					)
+				);
+				if ( match ) {
+					blockName = `${ blockName }/${ match.name }`;
+				}
+			}
+			return __experimentalGetScopedBlockPatterns(
+				state,
+				'transform',
+				blockName
+			);
+		}
+
+		// Create a Set of the selected block names that is used in patterns filtering.
+		const selectedBlockNames = Array.from(
+			blocks.reduce( ( accumulator, block ) => {
+				accumulator.add( block.name );
+				return accumulator;
+			}, new Set() )
+		);
+
+		// If a selected block is nested (with InnerBlocks like Group or Columns)
+		// return an EMPTY_ARRAY, as it doesn't make sense to try to be too smart.
+		// In such blocks a user could have anything inside as content, so don't show
+		// any transforms. In these blocks it only makes sense to show `block` scoped
+		// patterns during insertion, where no content exists yet.
+		const blocksToSkip = [
+			'core/group',
+			'core/columns',
+			'core/navigation',
+			'core/template-part',
+		];
+		if (
+			blocksToSkip.some( ( blockName ) =>
+				selectedBlockNames.includes( blockName )
+			)
+		) {
+			return EMPTY_ARRAY;
+		}
+
+		// Here we will return first set of possible eligible
+		// block patterns, by checking the `scope` prop.
+		// We still have to recurse through block pattern's blocks
+		// and try to find matches from the selected blocks.
+		// Now this happens in the consumer to avoid heavy operations
+		// in the selector.
+		return __experimentalGetScopedBlockPatterns(
+			state,
+			'transform',
+			selectedBlockNames,
+			rootClientId
 		);
 	},
-	( state ) => [ state.settings.__experimentalBlockPatterns ]
+	( state, rootClientId ) => [
+		state.settings.__experimentalBlockPatterns,
+		state.blockListSettings[ rootClientId ],
+		state.blocks.byClientId,
+		state.settings.allowedBlockTypes,
+		state.settings.templateLock,
+		getBlockTypes(),
+	]
 );
 
 /**

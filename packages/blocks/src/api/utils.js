@@ -275,3 +275,24 @@ export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 		{}
 	);
 }
+
+/**
+ * I created this wrapper to hide the complexity for the consumer..
+ *
+ * @param {*} name
+ * @param {*} role
+ */
+// TODO jsdoc
+// TODO tests
+export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
+	const attributes = getBlockType( name )?.attributes;
+	if ( ! attributes ) return;
+	if ( ! role ) return Object.keys( attributes );
+	return Object.entries( attributes ).reduce(
+		( accumulator, [ attributeName, schema ] ) => {
+			if ( schema?.role === role ) accumulator.push( attributeName );
+			return accumulator;
+		},
+		[]
+	);
+}
