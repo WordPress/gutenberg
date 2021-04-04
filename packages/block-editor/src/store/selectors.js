@@ -1993,6 +1993,9 @@ export function isNavigationMode( state ) {
 	return state.isNavigationMode;
 }
 
+export function getClientId( state ) {
+	return state.selection.selectionEnd.clientId;
+}
 /**
  * Returns whether block moving mode is enabled.
  *
