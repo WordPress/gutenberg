@@ -191,7 +191,7 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 		notifyListeners();
 	};
 
-	/** @type {SetLocaleData} */
+	/** @type {ResetLocaleData} */
 	const resetLocaleData = ( data, domain ) => {
 		// Reset all current Tannin locale data .
 		tannin.data = {};
