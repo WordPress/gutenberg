@@ -119,17 +119,19 @@ function Navigation( {
 	return (
 		<>
 			<BlockControls>
-				<JustifyToolbar
-					value={ attributes.itemsJustification }
-					allowedControls={ justifyAllowedControls }
-					onChange={ ( value ) =>
-						setAttributes( { itemsJustification: value } )
-					}
-					popoverProps={ {
-						position: 'bottom right',
-						isAlternate: true,
-					} }
-				/>
+				{ attributes.showJustifyControls && (
+					<JustifyToolbar
+						value={ attributes.itemsJustification }
+						allowedControls={ justifyAllowedControls }
+						onChange={ ( value ) =>
+							setAttributes( { itemsJustification: value } )
+						}
+						popoverProps={ {
+							position: 'bottom right',
+							isAlternate: true,
+						} }
+					/>
+				) }
 				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
 			</BlockControls>
 			{ navigatorModal }
