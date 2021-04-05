@@ -3,7 +3,10 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ]
+		"types": [ "gutenberg-env" ],
+		"paths": {
+			"styled-griddie": [ "../../typings/styled-griddie" ]
+		}
 	},
 	"references": [
 		{ "path": "../deprecated" },
