@@ -1,17 +1,22 @@
 /**
+ * Internal dependencies
+ */
+import isHTMLInputElement from './is-html-input-element';
+
+/* eslint-disable jsdoc/valid-types */
+/**
  * Check whether the given element is an input field of type number
  * and has a valueAsNumber
  *
- * @param {Element} element The HTML element.
+ * @param {Node} node The HTML node.
  *
- * @return {boolean} True if the element is input and holds a number.
+ * @return {node is HTMLInputElement} True if the node is input and holds a number.
  */
-export default function isNumberInput( element ) {
-	const {
-		nodeName,
-		type,
-		valueAsNumber,
-	} = /** @type {HTMLInputElement} */ ( element );
-
-	return nodeName === 'INPUT' && type === 'number' && !! valueAsNumber;
+export default function isNumberInput( node ) {
+	/* eslint-enable jsdoc/valid-types */
+	return (
+		isHTMLInputElement( node ) &&
+		node.type === 'number' &&
+		!! node.valueAsNumber
+	);
 }

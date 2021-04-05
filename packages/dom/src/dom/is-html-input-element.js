@@ -1,9 +1,9 @@
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param {Element | null | undefined} element
- * @return {element is HTMLInputElement} Whether the element is an HTMLInputElement.
+ * @param {Node} node
+ * @return {node is HTMLInputElement} Whether the node is an HTMLInputElement.
  */
-export default function isHTMLInputElement( element ) {
+export default function isHTMLInputElement( node ) {
 	/* eslint-enable jsdoc/valid-types */
-	return !! element && element.nodeName === 'INPUT';
+	return !! node && node.nodeName === 'INPUT';
 }
