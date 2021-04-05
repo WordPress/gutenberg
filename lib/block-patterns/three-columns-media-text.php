@@ -30,7 +30,7 @@ return array(
 	<!-- wp:columns {"align":"wide"} -->
 	<div class="wp-block-columns alignwide"><!-- wp:column {"width":"33.38%"} -->
 	<div class="wp-block-column" style="flex-basis:33.38%"><!-- wp:paragraph {"style":{"color":{"text":"#000000"}},"fontSize":"extra-small"} -->
-	<p class="has-text-color has-extra-small-font-size" style="color:#000000">' . esc_html__( '<em>Nature</em>, in the common sense, refers to essences unchanged by man; space, the air, the river, the leaf.&nbsp;<em>Art</em>&nbsp;is applied to the mixture of his will with the same things, as in a house, a canal, a statue, a picture. But his operations taken together are so insignificant, a little chipping, baking, patching, and washing, that in an impression so grand as that of the world on the human mind, they do not vary the result.', 'default' ) . '</p>
+	<p class="has-text-color has-extra-small-font-size" style="color:#000000">' . wp_kses_post( __( '<em>Nature</em>, in the common sense, refers to essences unchanged by man; space, the air, the river, the leaf.&nbsp;<em>Art</em>&nbsp;is applied to the mixture of his will with the same things, as in a house, a canal, a statue, a picture. But his operations taken together are so insignificant, a little chipping, baking, patching, and washing, that in an impression so grand as that of the world on the human mind, they do not vary the result.', 'default' ) ) . '</p>
 	<!-- /wp:paragraph --></div>
 	<!-- /wp:column -->
 	

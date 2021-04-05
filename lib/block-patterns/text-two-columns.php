@@ -18,7 +18,7 @@ return array(
 	<!-- /wp:paragraph -->
 	
 	<!-- wp:paragraph {"style":{"typography":{"fontSize":"24px","lineHeight":"1.2"}}} -->
-	<p style="font-size:24px;line-height:1.2"><a href="https://wordpress.org">' . esc_html__( 'EARTHFUND™<br>ARCHWEEKLY<br>FUTURE ROADS<br>BUILDING NY', 'default' ) . '</a></p>
+	<p style="font-size:24px;line-height:1.2"><a href="https://wordpress.org">' . wp_kses_post( __( 'EARTHFUND™<br>ARCHWEEKLY<br>FUTURE ROADS<br>BUILDING NY', 'default' ) ). '</a></p>
 	<!-- /wp:paragraph -->
 	
 	<!-- wp:spacer -->
@@ -32,7 +32,7 @@ return array(
 	<!-- /wp:spacer -->
 	
 	<!-- wp:paragraph {"style":{"typography":{"fontSize":"24px","lineHeight":"1.2"}}} -->
-	<p style="font-size:24px;line-height:1.2"><a href="https://wordpress.org">' . esc_html__( 'DUBAI ROOFS<br>MAY WATSON STUDIO<br>Y.O.L<br>RUDIMENTAR', 'default' ) . '</a></p>
+	<p style="font-size:24px;line-height:1.2"><a href="https://wordpress.org">' . wp_kses_post( __( 'DUBAI ROOFS<br>MAY WATSON STUDIO<br>Y.O.L<br>RUDIMENTAR', 'default' ) ) . '</a></p>
 	<!-- /wp:paragraph -->
 	
 	<!-- wp:spacer -->

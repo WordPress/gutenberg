@@ -16,7 +16,7 @@ return array(
 	<!-- wp:columns {"align":"wide"} -->
 	<div class="wp-block-columns alignwide"><!-- wp:column {"width":"60%"} -->
 	<div class="wp-block-column" style="flex-basis:60%"><!-- wp:paragraph {"style":{"color":{"text":"#ffffff"}}} -->
-	<p class="has-text-color" style="color:#ffffff">' . esc_html__( 'An exhibition about the different representations of the ocean throughout time, between the sixteenth and the twentieth century. Taking place in our Open Room in <em>Floor 2</em>.', 'default' ) . '</p>
+	<p class="has-text-color" style="color:#ffffff">' . wp_kses_post( __( 'An exhibition about the different representations of the ocean throughout time, between the sixteenth and the twentieth century. Taking place in our Open Room in <em>Floor 2</em>.', 'default' ) ) . '</p>
 	<!-- /wp:paragraph -->
 
 	<!-- wp:buttons -->
