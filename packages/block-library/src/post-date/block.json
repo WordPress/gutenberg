@@ -8,6 +8,10 @@
 		},
 		"format": {
 			"type": "string"
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"usesContext": [
