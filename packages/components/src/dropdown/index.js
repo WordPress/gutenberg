@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect, useRef, useState } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -17,107 +17,69 @@ function useObservableState( initialState, onStateChange ) {
 	const [ state, setState ] = useState( initialState );
 	return [
 		state,
-		( valueOrSetter ) => {
-			let syncState;
-			if ( typeof valueOrSetter === 'function' ) {
-				setState( ( value ) => {
-					syncState = valueOrSetter( value );
-					return syncState;
-				} );
-			} else {
-				syncState = valueOrSetter;
-				setState( valueOrSetter );
-			}
+		( value ) => {
+			setState( value );
 			if ( onStateChange ) {
-				onStateChange( syncState );
+				onStateChange( value );
 			}
 		},
 	];
 }
 
 export default function Dropdown( {
-	autoClose = true,
+	renderContent,
+	renderToggle,
+	position = 'bottom right',
 	className,
 	contentClassName,
 	expandOnMobile,
-	focusOnMount,
 	headerTitle,
+	focusOnMount,
+	popoverProps,
 	onClose,
 	onToggle,
-	openOnMount = false,
-	popoverProps,
-	position = 'bottom right',
-	renderContent,
-	renderToggle,
 } ) {
 	const containerRef = useRef();
-	const toggleRef = useRef();
-	const isTogglePressed = useRef();
-	const [ isOpen, setIsOpen ] = useObservableState( openOnMount, onToggle );
+	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
 
-	useEffect( () => {
-		// If onToggle was provided on mount, calls it with false on unmount
-		if ( onToggle ) {
-			return () => onToggle( false );
-		}
-	}, [] );
+	useEffect(
+		() => () => {
+			if ( onToggle ) {
+				onToggle( false );
+			}
+		},
+		[]
+	);
 
 	function toggle() {
-		setIsOpen( ( value ) => ! value );
+		setIsOpen( ! isOpen );
 	}
 
 	/**
-	 * Handles focus outside of the Popover to determine whether to close it.
-	 * No action is taken in case autoClose is false or if pressing the toggle
-	 * was the cause of the focus loss. The latter avoids the toggle click
-	 * event handler changing the state back to open immediately after this.
+	 * Closes the dropdown if a focus leaves the dropdown wrapper. This is
+	 * intentionally distinct from `onClose` since focus loss from the popover
+	 * is expected to occur when using the Dropdown's toggle button, in which
+	 * case the correct behavior is to keep the dropdown closed. The same applies
+	 * in case when focus is moved to the modal dialog.
 	 */
-	function onFocusOutsidePopover() {
-		if ( toggleRef.current ) {
-			if ( ! autoClose || isTogglePressed.current ) {
-				return;
-			}
-			close();
-		}
-		// The rest is only for back-compat and could be removed at some point.
-		// Attempts determination that the active element is inside Dropdown.
-		// Prone to failure in UAs that do not focus pressed button elements
-		// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#clicking_and_focus
+	function closeIfFocusOutside() {
 		const { ownerDocument } = containerRef.current;
-		if ( ! containerRef.current.contains( ownerDocument.activeElement ) ) {
+		if (
+			! containerRef.current.contains( ownerDocument.activeElement ) &&
+			! ownerDocument.activeElement.closest( '[role="dialog"]' )
+		) {
 			close();
 		}
 	}
 
 	function close() {
-		// Allows the callback to return false to cancel closing
-		const willClose = onClose?.() ?? true;
-		if ( willClose ) {
-			setIsOpen( false );
+		if ( onClose ) {
+			onClose();
 		}
+		setIsOpen( false );
 	}
 
-	const setToggleRef = useCallback( ( node ) => {
-		if ( node ) {
-			toggleRef.current = node;
-			Object.keys( toggleHandlers ).forEach( ( event ) => {
-				node.addEventListener( event, toggleHandlers[ event ] );
-			} );
-		}
-	}, [] );
-
-	const toggleHandlers = {
-		click: toggle,
-		pointerdown: () => ( isTogglePressed.current = true ),
-		pointerup: () => ( isTogglePressed.current = false ),
-	};
-
-	const args = {
-		isOpen,
-		onToggle: toggle,
-		onClose: close,
-		ref: setToggleRef,
-	};
+	const args = { isOpen, onToggle: toggle, onClose: close };
 
 	return (
 		<div
@@ -129,7 +91,7 @@ export default function Dropdown( {
 				<Popover
 					position={ position }
 					onClose={ close }
-					onFocusOutside={ onFocusOutsidePopover }
+					onFocusOutside={ closeIfFocusOutside }
 					expandOnMobile={ expandOnMobile }
 					headerTitle={ headerTitle }
 					focusOnMount={ focusOnMount }

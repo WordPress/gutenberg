@@ -7,19 +7,17 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useRef } from '@wordpress/element';
+import { useCallback, useState, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
-	Dropdown,
 	KeyboardShortcuts,
 	PanelBody,
 	RangeControl,
 	TextControl,
 	ToolbarButton,
-	ToolbarItem,
+	Popover,
 } from '@wordpress/components';
-import { useMergeRefs } from '@wordpress/compose';
 import {
 	BlockControls,
 	InspectorControls,
@@ -109,87 +107,76 @@ function URLPicker( {
 	onToggleOpenInNewTab,
 	anchorRef,
 } ) {
+	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const urlIsSet = !! url;
 	const urlIsSetandSelected = urlIsSet && isSelected;
-
-	const renderToolbarItem = ( {
-		ref: toolbarItemRef,
-		...toolbarItemProps
-	} ) => {
-		const useToggle = ( { ref: toggleRef, onToggle, onClose } ) => {
-			const onRemove = ( { type } ) => {
-				setAttributes( {
-					url: undefined,
-					linkTarget: undefined,
-					rel: undefined,
-				} );
-				if ( type === 'keydown' ) {
-					onClose();
-				}
-			};
-			const ref = useMergeRefs( [ toolbarItemRef, toggleRef ] );
-			const toggleProps = {
-				ref,
-				name: 'link',
-				...toolbarItemProps,
-				...( ! urlIsSet
-					? {
-							icon: link,
-							title: __( 'Link' ),
-							shortcut: displayShortcut.primary( 'k' ),
-					  }
-					: {
-							icon: linkOff,
-							title: __( 'Unlink' ),
-							shortcut: displayShortcut.primaryShift( 'k' ),
-							isActive: true,
-							onClick: onRemove,
-					  } ),
-			};
-			return (
-				<>
-					<ToolbarButton name="link" { ...toggleProps } />
-					<KeyboardShortcuts
-						bindGlobal
-						shortcuts={ {
-							[ rawShortcut.primary( 'k' ) ]: onToggle,
-							[ rawShortcut.primaryShift( 'k' ) ]: onRemove,
-						} }
-					/>
-				</>
-			);
-		};
-		return (
-			<Dropdown
-				autoClose={ false }
-				openOnMount={ urlIsSetandSelected }
-				position="bottom center"
-				popoverProps={ { anchorRef: anchorRef?.current } }
-				renderToggle={ useToggle }
-				renderContent={ () => (
-					<LinkControl
-						className="wp-block-navigation-link__inline-link-input"
-						value={ { url, opensInNewTab } }
-						onChange={ ( {
-							url: newURL = '',
-							opensInNewTab: newOpensInNewTab,
-						} ) => {
-							setAttributes( { url: newURL } );
-
-							if ( opensInNewTab !== newOpensInNewTab ) {
-								onToggleOpenInNewTab( newOpensInNewTab );
-							}
-						} }
-					/>
-				) }
-			/>
-		);
+	const openLinkControl = () => {
+		setIsURLPickerOpen( true );
+		return false; // prevents default behaviour for event
 	};
+	const unlinkButton = () => {
+		setAttributes( {
+			url: undefined,
+			linkTarget: undefined,
+			rel: undefined,
+		} );
+		setIsURLPickerOpen( false );
+	};
+	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
+		<Popover
+			position="bottom center"
+			onClose={ () => setIsURLPickerOpen( false ) }
+			anchorRef={ anchorRef?.current }
+		>
+			<LinkControl
+				className="wp-block-navigation-link__inline-link-input"
+				value={ { url, opensInNewTab } }
+				onChange={ ( {
+					url: newURL = '',
+					opensInNewTab: newOpensInNewTab,
+				} ) => {
+					setAttributes( { url: newURL } );
+
+					if ( opensInNewTab !== newOpensInNewTab ) {
+						onToggleOpenInNewTab( newOpensInNewTab );
+					}
+				} }
+			/>
+		</Popover>
+	);
 	return (
 		<>
 			<BlockControls group="block">
-				<ToolbarItem>{ renderToolbarItem }</ToolbarItem>
+				{ ! urlIsSet && (
+					<ToolbarButton
+						name="link"
+						icon={ link }
+						title={ __( 'Link' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ openLinkControl }
+					/>
+				) }
+				{ urlIsSetandSelected && (
+					<ToolbarButton
+						name="link"
+						icon={ linkOff }
+						title={ __( 'Unlink' ) }
+						shortcut={ displayShortcut.primaryShift( 'k' ) }
+						onClick={ unlinkButton }
+						isActive={ true }
+					/>
+				) }
 			</BlockControls>
+			{ isSelected && (
+				<KeyboardShortcuts
+					bindGlobal
+					shortcuts={ {
+						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
+					} }
+				/>
+			) }
+			{ linkControl }
 		</>
 	);
 }
