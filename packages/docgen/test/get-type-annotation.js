@@ -11,6 +11,7 @@ const getNamedExportNode = require( './fixtures/type-annotations/named-export/ge
 const getExportedVariableDeclarationNode = require( './fixtures/type-annotations/exported-variable-declaration/get-node' );
 const getImportsParameterizedRestOperatorPredicateIndexerTypeNode = require( './fixtures/type-annotations/imports-parameterized-rest-operator-predicate-indexers/get-node' );
 const getMissingTypesNode = require( './fixtures/type-annotations/missing-types/get-node' );
+const getArrowFunctionNode = require( './fixtures/type-annotations/arrow-function/get-node' );
 
 describe( 'Type annotations', () => {
 	it( 'are taken from JSDoc if any', () => {
@@ -203,6 +204,16 @@ describe( 'Type annotations', () => {
 			).toThrow(
 				"Could not find corresponding parameter token for documented parameter 'notFoo' in function 'fn'."
 			);
+		} );
+	} );
+
+	describe( 'arrow function parameters', () => {
+		const node = getArrowFunctionNode();
+
+		it( 'should correctly format the arrow function', () => {
+			expect(
+				getTypeAnnotation( { ...paramTag, name: 'callback' }, node )
+			).toBe( '( foo: string, ...rest: any[] ) => GenericType< T >' );
 		} );
 	} );
 } );

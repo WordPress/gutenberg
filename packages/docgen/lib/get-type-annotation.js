@@ -12,11 +12,12 @@ const { types: babelTypes } = require( '@babel/core' );
 /* eslint-enable jsdoc/valid-types */
 
 /**
- * @param {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType} typeAnnotation
+ * @param {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType | babelTypes.TSConstructSignatureDeclaration} typeAnnotation
  * @param {' => ' | ': '} returnIndicator The return indicator to use. Allows using the same function for function annotations and object call properties.
  */
 function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
-	const params = typeAnnotation.parameters
+	const nonRestParams = typeAnnotation.parameters
+		.filter( ( p ) => babelTypes.isIdentifier( p ) )
 		.map(
 			( p ) =>
 				`${ p.name }: ${ getTypeAnnotation(
@@ -24,10 +25,24 @@ function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 				) }`
 		)
 		.join( ', ' );
+
+	let params = nonRestParams;
+	const restParam = typeAnnotation.parameters.find(
+		babelTypes.isRestElement
+	);
+	if ( restParam ) {
+		const paramName = restParam.argument.name;
+		const paramType = getTypeAnnotation(
+			restParam.typeAnnotation.typeAnnotation
+		);
+		params += `, ...${ paramName }: ${ paramType }`;
+	}
+
 	const returnType = getTypeAnnotation(
 		typeAnnotation.returnType ||
 			typeAnnotation.typeAnnotation.typeAnnotation
 	);
+
 	return `( ${ params } )${ returnIndicator }${ returnType }`;
 }
 
@@ -256,14 +271,14 @@ function getTypeAnnotation( typeAnnotation ) {
 			return '';
 		}
 		case 'TSConstructorType': {
-			return `new ${ getFunctionTypeAnnotation( typeAnnotation ) }`;
+			return `new ${ getFunctionTypeAnnotation( typeAnnotation, ': ' ) }`;
 		}
 		case 'TSExpressionWithTypeArguments': {
 			// Unsure with this is
 			return '';
 		}
 		case 'TSFunctionType': {
-			return getFunctionTypeAnnotation( typeAnnotation );
+			return getFunctionTypeAnnotation( typeAnnotation, ' => ' );
 		}
 		case 'TSImportType': {
 			return getImportTypeAnnotation( typeAnnotation );
