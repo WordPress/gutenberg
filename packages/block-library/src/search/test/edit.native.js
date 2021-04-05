@@ -146,6 +146,38 @@ describe( 'Search block', () => {
 		expect( rendered ).toMatchSnapshot();
 	} );
 
+	it( 'renders block with button inside option', () => {
+		const component = getTestComponent( {
+			label: 'Search',
+			buttonText: 'Search Button',
+			buttonPosition: 'button-inside',
+			showLabel: true,
+		} );
+		const instance = component.root;
+
+		// Verify the label element of the search block exists and
+		// label text is set.
+		const label = getLabel( instance );
+		expect( label ).toBeTruthy();
+		expect( label.props.value ).toBe( 'Search' );
+
+		// Verify the button element of the search block exists and
+		// button text is set.
+		const button = getButton( instance );
+		expect( button ).toBeTruthy();
+		expect( button.props.value ).toBe( 'Search Button' );
+
+		// Verify the search input element of the search block exists
+		// and the placeholder text is set.
+		const searchInput = getSearchInput( instance );
+		expect( searchInput ).toBeTruthy();
+		expect( searchInput.props.placeholder ).toBe( 'Optional placeholder…' );
+
+		// Verify toMatchSnapshot
+		const rendered = component.toJSON();
+		expect( rendered ).toMatchSnapshot();
+	} );
+
 	it( 'renders block with label hidden', () => {
 		const component = getTestComponent( {
 			label: 'Search',
