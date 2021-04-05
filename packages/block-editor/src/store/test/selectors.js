@@ -72,7 +72,7 @@ const {
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 	__experimentalGetParsedReusableBlock,
 	__experimentalGetAllowedPatterns,
-	__experimentalGetScopedBlockPatterns,
+	__experimentalGetPatternsByBlockTypes,
 	__unstableGetClientIdWithClientIdsTree,
 	__unstableGetClientIdsTree,
 } = selectors;
@@ -3407,52 +3407,77 @@ describe( 'selectors', () => {
 			).toHaveLength( 0 );
 		} );
 	} );
-	describe( '__experimentalGetScopedBlockPatterns', () => {
+	describe( '__experimentalGetPatternsByBlockTypes', () => {
 		const state = {
-			blocks: {},
+			blocks: {
+				byClientId: {
+					block1: { name: 'core/test-block-a' },
+				},
+			},
+			blockListSettings: {
+				block1: {
+					allowedBlocks: [ 'core/test-block-b' ],
+				},
+			},
 			settings: {
 				__experimentalBlockPatterns: [
 					{
 						name: 'pattern-a',
+						blockTypes: [ 'test/block-a' ],
 						title: 'pattern a',
-						scope: { block: [ 'test/block-a' ] },
+						content:
+							'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
 					},
 					{
 						name: 'pattern-b',
+						blockTypes: [ 'test/block-b' ],
 						title: 'pattern b',
-						scope: { block: [ 'test/block-b' ] },
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+					{
+						title: 'pattern c',
+						blockTypes: [ 'test/block-a' ],
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
 					},
 				],
 			},
 		};
-		it( 'should return empty array if no scope and block name is provided', () => {
-			expect( __experimentalGetScopedBlockPatterns( state ) ).toEqual(
+		it( 'should return empty array if no block name is provided', () => {
+			expect( __experimentalGetPatternsByBlockTypes( state ) ).toEqual(
 				[]
 			);
-			expect(
-				__experimentalGetScopedBlockPatterns( state, 'block' )
-			).toEqual( [] );
 		} );
 		it( 'shoud return empty array if no match is found', () => {
-			const patterns = __experimentalGetScopedBlockPatterns(
+			const patterns = __experimentalGetPatternsByBlockTypes(
 				state,
-				'block',
 				'test/block-not-exists'
 			);
 			expect( patterns ).toEqual( [] );
 		} );
 		it( 'should return proper results when there are matched block patterns', () => {
-			const patterns = __experimentalGetScopedBlockPatterns(
+			const patterns = __experimentalGetPatternsByBlockTypes(
 				state,
-				'block',
 				'test/block-a'
+			);
+			expect( patterns ).toHaveLength( 2 );
+			expect( patterns ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( { title: 'pattern a' } ),
+					expect.objectContaining( { title: 'pattern c' } ),
+				] )
+			);
+		} );
+		it( 'should return proper result with matched patterns and allowed blocks from rootClientId', () => {
+			const patterns = __experimentalGetPatternsByBlockTypes(
+				state,
+				'test/block-a',
+				'block1'
 			);
 			expect( patterns ).toHaveLength( 1 );
 			expect( patterns[ 0 ] ).toEqual(
-				expect.objectContaining( {
-					title: 'pattern a',
-					scope: { block: [ 'test/block-a' ] },
-				} )
+				expect.objectContaining( { title: 'pattern c' } )
 			);
 		} );
 	} );
