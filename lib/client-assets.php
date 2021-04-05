@@ -217,9 +217,9 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 	gutenberg_register_vendor_script(
 		$scripts,
 		'object-fit-polyfill',
-		'https://unpkg.com/objectFitPolyfill@2.3.0/dist/objectFitPolyfill.min.js',
+		'https://unpkg.com/objectFitPolyfill@2.3.5/dist/objectFitPolyfill.min.js',
 		array(),
-		'2.3.0'
+		'2.3.5'
 	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
