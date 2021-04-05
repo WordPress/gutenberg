@@ -52,150 +52,108 @@ const hasComponent = ( instance, className ) => {
 	return components.length !== 0;
 };
 
-describe( 'Search block options', () => {
-	it( 'renders block without crashing', () => {
+describe( 'Search Block', () => {
+	it( 'renders without crashing', () => {
 		const component = getTestComponent();
 		const rendered = component.toJSON();
 		expect( rendered ).toBeTruthy();
 	} );
 
-	it( 'renders default block configuration', () => {
+	describe( 'renders with default configuration', () => {
 		const component = getTestComponent();
 		const instance = component.root;
 
-		// Verify the label element of the search block exists and
-		// label text is set.
-		const label = getLabel( instance );
-		expect( label ).toBeTruthy();
-		expect( label.props.value ).toBe( 'Search' );
+		it( 'label is visible and text is properly set', () => {
+			// Verify the label element of the search block exists and
+			// label text is set.
+			const label = getLabel( instance );
+			expect( label ).toBeTruthy();
+			expect( label.props.value ).toBe( 'Search' );
+		} );
 
-		// Verify the button element of the search block exists and
-		// button text is set.
-		const button = getButton( instance );
-		expect( button ).toBeTruthy();
-		expect( button.props.value ).toBe( 'Search Button' );
+		it( 'button is visible and text is properly set', () => {
+			// Verify the button element of the search block exists and
+			// button text is set.
+			const button = getButton( instance );
+			expect( button ).toBeTruthy();
+			expect( button.props.value ).toBe( 'Search Button' );
+		} );
 
-		// Verify the search input element of the search block exists
-		// and the placeholder text is set.
-		const searchInput = getSearchInput( instance );
-		expect( searchInput ).toBeTruthy();
-		expect( searchInput.props.placeholder ).toBe( 'Optional placeholder…' );
+		it( 'search input is visible and placeholder text is properly set', () => {
+			// Verify the search input element of the search block exists
+			// and the placeholder text is set.
+			const searchInput = getSearchInput( instance );
+			expect( searchInput ).toBeTruthy();
+			expect( searchInput.props.placeholder ).toBe(
+				'Optional placeholder…'
+			);
+		} );
 
-		// Verify toMatchSnapshot
-		const rendered = component.toJSON();
-		expect( rendered ).toMatchSnapshot();
+		it( 'matches snapshot', () => {
+			const rendered = component.toJSON();
+			expect( rendered ).toMatchSnapshot();
+		} );
 	} );
 
-	it( 'renders block with no-button option', () => {
+	describe( 'renders with no-button option', () => {
 		const component = getTestComponent( {
 			buttonPosition: 'no-button',
 		} );
 		const instance = component.root;
 
-		// Verify the label element of the search block exists and
-		// label text is set.
-		const label = getLabel( instance );
-		expect( label ).toBeTruthy();
-		expect( label.props.value ).toBe( 'Search' );
+		it( 'verify button element has not been rendered', () => {
+			expect(
+				hasComponent( instance, 'wp-block-search__button' )
+			).toEqual( false );
+		} );
 
-		// Verify the button element has not been rendered.
-		expect( hasComponent( instance, 'wp-block-search__button' ) ).toEqual(
-			false
-		);
-
-		// Verify the search input element of the search block exists
-		// and the placeholder text is set.
-		const searchInput = getSearchInput( instance );
-		expect( searchInput ).toBeTruthy();
-		expect( searchInput.props.placeholder ).toBe( 'Optional placeholder…' );
-
-		// Verify toMatchSnapshot
-		const rendered = component.toJSON();
-		expect( rendered ).toMatchSnapshot();
+		it( 'matches snapshot', () => {
+			const rendered = component.toJSON();
+			expect( rendered ).toMatchSnapshot();
+		} );
 	} );
 
-	it( 'renders block with icon button option', () => {
+	describe( 'renders block with icon button option', () => {
 		const component = getTestComponent( {
 			buttonUseIcon: true,
 		} );
 		const instance = component.root;
 
-		// Verify the label element of the search block exists and
-		// label text is set.
-		const label = getLabel( instance );
-		expect( label ).toBeTruthy();
-		expect( label.props.value ).toBe( 'Search' );
+		it( 'search button uses icon', () => {
+			const button = instance.findByType( Icon );
+			expect( button ).toBeTruthy();
+		} );
 
-		// Verify the button element of the search block exists and
-		// is rendered with an icon.
-		const button = instance.findByType( Icon );
-		expect( button ).toBeTruthy();
-
-		// Verify the search input element of the search block exists
-		// and the placeholder text is set.
-		const searchInput = getSearchInput( instance );
-		expect( searchInput ).toBeTruthy();
-		expect( searchInput.props.placeholder ).toBe( 'Optional placeholder…' );
-
-		// Verify toMatchSnapshot
-		const rendered = component.toJSON();
-		expect( rendered ).toMatchSnapshot();
+		it( 'matches snapshot', () => {
+			const rendered = component.toJSON();
+			expect( rendered ).toMatchSnapshot();
+		} );
 	} );
 
 	it( 'renders block with button inside option', () => {
 		const component = getTestComponent( {
 			buttonPosition: 'button-inside',
 		} );
-		const instance = component.root;
 
-		// Verify the label element of the search block exists and
-		// label text is set.
-		const label = getLabel( instance );
-		expect( label ).toBeTruthy();
-		expect( label.props.value ).toBe( 'Search' );
-
-		// Verify the button element of the search block exists and
-		// button text is set.
-		const button = getButton( instance );
-		expect( button ).toBeTruthy();
-		expect( button.props.value ).toBe( 'Search Button' );
-
-		// Verify the search input element of the search block exists
-		// and the placeholder text is set.
-		const searchInput = getSearchInput( instance );
-		expect( searchInput ).toBeTruthy();
-		expect( searchInput.props.placeholder ).toBe( 'Optional placeholder…' );
-
-		// Verify toMatchSnapshot
 		const rendered = component.toJSON();
 		expect( rendered ).toMatchSnapshot();
 	} );
 
-	it( 'renders block with label hidden', () => {
+	describe( 'renders block with label hidden', () => {
 		const component = getTestComponent( {
 			showLabel: false,
 		} );
 		const instance = component.root;
 
-		// Verify the label has not been rendered.
-		expect( hasComponent( instance, 'wp-block-search__label' ) ).toEqual(
-			false
-		);
+		it( 'verify label has not been rendered', () => {
+			expect(
+				hasComponent( instance, 'wp-block-search__label' )
+			).toEqual( false );
+		} );
 
-		// Verify the button element of the search block exists and
-		// button text is set.
-		const button = getButton( instance );
-		expect( button ).toBeTruthy();
-		expect( button.props.value ).toBe( 'Search Button' );
-
-		// Verify the search input element of the search block exists
-		// and the placeholder text is set.
-		const searchInput = getSearchInput( instance );
-		expect( searchInput ).toBeTruthy();
-		expect( searchInput.props.placeholder ).toBe( 'Optional placeholder…' );
-
-		// Verify toMatchSnapshot
-		const rendered = component.toJSON();
-		expect( rendered ).toMatchSnapshot();
+		it( 'matches snapshot', () => {
+			const rendered = component.toJSON();
+			expect( rendered ).toMatchSnapshot();
+		} );
 	} );
 } );
