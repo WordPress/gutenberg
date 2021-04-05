@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { v4 as uuid } from 'uuid';
 import { castArray, reduce } from 'lodash';
 
 /**
@@ -13,7 +12,6 @@ import { store as interfaceStore } from '@wordpress/interface';
 import { controls, dispatch, select, subscribe } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
-import { createBlock, serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -441,17 +439,13 @@ export function setIsEditingTemplate( value ) {
 	};
 }
 
-export function* __unstableSwitchToEditingMode( shouldCreateTemplate = false ) {
-	if ( shouldCreateTemplate ) {
-		const templateContent = [
-			createBlock( 'core/post-title' ),
-			createBlock( 'core/post-content' ),
-		];
-		const template = {
-			slug: 'wp-custom-template-' + uuid(),
-			content: serialize( templateContent ),
-			title: 'Custom Template',
-		};
+/**
+ * Potentially create a block based template and switches to the template mode.
+ *
+ * @param {Object?} template template to create and assign before switching.
+ */
+export function* __unstableSwitchToTemplateMode( template ) {
+	if ( !! template ) {
 		const savedTemplate = yield controls.dispatch(
 			coreStore,
 			'saveEntityRecord',
@@ -475,7 +469,7 @@ export function* __unstableSwitchToEditingMode( shouldCreateTemplate = false ) {
 
 	yield setIsEditingTemplate( true );
 
-	const message = shouldCreateTemplate
+	const message = !! template
 		? __( "Custom template created. You're in template mode now." )
 		: __(
 				'Editing template. Changes made here affect all posts and pages that use the template.'
