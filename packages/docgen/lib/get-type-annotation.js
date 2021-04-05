@@ -12,8 +12,8 @@ const { types: babelTypes } = require( '@babel/core' );
 /* eslint-enable jsdoc/valid-types */
 
 /**
- * @param {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType} typeAnnotation
- * @param {' => ' | ': ' | null} returnIndicator The return indicator to use. Allows using the same function for function annotations and object call properties.
+ * @param {babelTypes.TSCallSignatureDeclaration | babelTypes.TSFunctionType | babelTypes.TSConstructSignatureDeclaration} typeAnnotation
+ * @param {' => ' | ': '} returnIndicator The return indicator to use. Allows using the same function for function annotations and object call properties.
  */
 function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 	const nonRestParams = typeAnnotation.parameters
@@ -39,10 +39,6 @@ function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 			: '';
 
 	const params = `( ${ nonRestParams }${ restParam } )`;
-
-	if ( returnIndicator === null ) {
-		return params;
-	}
 
 	const returnType = getTypeAnnotation(
 		typeAnnotation.returnType ||
@@ -277,7 +273,7 @@ function getTypeAnnotation( typeAnnotation ) {
 			return '';
 		}
 		case 'TSConstructorType': {
-			return `new ${ getFunctionTypeAnnotation( typeAnnotation, null ) }`;
+			return `new ${ getFunctionTypeAnnotation( typeAnnotation, ': ' ) }`;
 		}
 		case 'TSExpressionWithTypeArguments': {
 			// Unsure with this is
