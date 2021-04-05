@@ -162,6 +162,7 @@ export default function NavigationLinkEdit( {
 	const isDraggingWithin = useIsDraggingWithin( listItemRef );
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
+	const toggleButtonRef = useRef();
 
 	const {
 		isParentOfSelectedBlock,
@@ -372,7 +373,7 @@ export default function NavigationLinkEdit( {
 						bindGlobal
 						shortcuts={ {
 							[ rawShortcut.primary( 'k' ) ]: () =>
-								setIsLinkOpen( true ),
+								setIsLinkOpen( ( value ) => ! value ),
 						} }
 					/>
 					<ToolbarButton
@@ -380,7 +381,8 @@ export default function NavigationLinkEdit( {
 						icon={ linkIcon }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ () => setIsLinkOpen( true ) }
+						onClick={ () => setIsLinkOpen( ( value ) => ! value ) }
+						ref={ toggleButtonRef }
 					/>
 					<ToolbarButton
 						name="submenu"
@@ -469,7 +471,15 @@ export default function NavigationLinkEdit( {
 					{ isLinkOpen && (
 						<Popover
 							position="bottom center"
-							onClose={ () => setIsLinkOpen( false ) }
+							onClose={ () => {
+								if (
+									toggleButtonRef.current !==
+									toggleButtonRef.current.ownerDocument
+										.activeElement
+								) {
+									setIsLinkOpen( false );
+								}
+							} }
 							anchorRef={ listItemRef.current }
 						>
 							<KeyboardShortcuts

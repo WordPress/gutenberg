@@ -107,11 +107,12 @@ function URLPicker( {
 	onToggleOpenInNewTab,
 	anchorRef,
 } ) {
+	const toggleButtonRef = useRef();
 	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const urlIsSet = !! url;
 	const urlIsSetandSelected = urlIsSet && isSelected;
-	const openLinkControl = () => {
-		setIsURLPickerOpen( true );
+	const toggleLinkControl = () => {
+		setIsURLPickerOpen( ( value ) => ! value );
 		return false; // prevents default behaviour for event
 	};
 	const unlinkButton = () => {
@@ -125,7 +126,14 @@ function URLPicker( {
 	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
 		<Popover
 			position="bottom center"
-			onClose={ () => setIsURLPickerOpen( false ) }
+			onClose={ () => {
+				if (
+					toggleButtonRef.current !==
+					toggleButtonRef.current.ownerDocument.activeElement
+				) {
+					setIsURLPickerOpen( false );
+				}
+			} }
 			anchorRef={ anchorRef?.current }
 		>
 			<LinkControl
@@ -153,7 +161,8 @@ function URLPicker( {
 						icon={ link }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
+						onClick={ toggleLinkControl }
+						ref={ toggleButtonRef }
 					/>
 				) }
 				{ urlIsSetandSelected && (
@@ -171,7 +180,7 @@ function URLPicker( {
 				<KeyboardShortcuts
 					bindGlobal
 					shortcuts={ {
-						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+						[ rawShortcut.primary( 'k' ) ]: toggleLinkControl,
 						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
 					} }
 				/>
