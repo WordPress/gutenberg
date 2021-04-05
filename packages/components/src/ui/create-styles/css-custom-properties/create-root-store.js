@@ -10,15 +10,14 @@ import { hasVariable } from './utils';
  */
 export class RootStore {
 	/**
-	 * @type {Record<string, string>}
-	 */
-	state = {};
-
-	/**
 	 *
 	 * @param {Record<string, string>} initialState
 	 */
 	constructor( initialState = {} ) {
+		/**
+		 * @type {Record<string, string>}
+		 */
+		this.state = {};
 		this.setState( initialState );
 	}
 
@@ -28,14 +27,18 @@ export class RootStore {
 	 * @param {string} key The key to retrieve.
 	 * @return {string} The value.
 	 */
-	get = ( key ) => this.state[ key ];
+	get( key ) {
+		return this.state[ key ];
+	}
 
 	/**
 	 * Retrieves the current state.
 	 *
 	 * @return {Record<string, string>} The state.
 	 */
-	getState = () => this.state;
+	getState() {
+		return this.state;
+	}
 
 	/**
 	 * Sets the state.
@@ -43,26 +46,26 @@ export class RootStore {
 	 * @param {Record<string, string>} next The next state to merge into the current state.
 	 * @return {Record<string, string>} The state.
 	 */
-	setState = ( next = {} ) => {
+	setState( next = {} ) {
 		this._updateState( next );
 		this._resolveVariablesInStateValue();
 
 		return this.state;
-	};
+	}
 
 	/**
 	 * Updates the state.
 	 *
 	 * @param {Record<string, string>} next The next state to merge into the current state.
 	 */
-	_updateState = ( next = {} ) => {
+	_updateState( next = {} ) {
 		this.state = Object.freeze( { ...this.state, ...next } );
-	};
+	}
 
 	/**
 	 * Resolves potential CSS variables that may exist within the state's values.
 	 */
-	_resolveVariablesInStateValue = () => {
+	_resolveVariablesInStateValue() {
 		/** @type {Record<string, string>} */
 		const next = {};
 		/**
@@ -90,7 +93,7 @@ export class RootStore {
 		if ( entries.length ) {
 			this._resolveVariablesInStateValue();
 		}
-	};
+	}
 }
 
 /**
