@@ -6,6 +6,7 @@ import {
 	activateTheme,
 	getAllBlocks,
 	selectBlockByClientId,
+	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -93,6 +94,29 @@ describe( 'Settings sidebar', () => {
 			await toggleSidebar();
 
 			expect( await getActiveTabLabel() ).toEqual( 'Block (selected)' );
+		} );
+	} );
+
+	describe( 'Tab switch based on selection', () => {
+		it( 'should switch to block tab if we select a block, when Template is selected', async () => {
+			await toggleSidebar();
+			expect( await getActiveTabLabel() ).toEqual(
+				'Template (selected)'
+			);
+			// By inserting the block is also selected.
+			await insertBlock( 'Heading' );
+			expect( await getActiveTabLabel() ).toEqual( 'Block (selected)' );
+		} );
+		it( 'should switch to Template tab when a block was selected and we select the Template', async () => {
+			await insertBlock( 'Heading' );
+			await toggleSidebar();
+			expect( await getActiveTabLabel() ).toEqual( 'Block (selected)' );
+			await page.evaluate( () => {
+				wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+			} );
+			expect( await getActiveTabLabel() ).toEqual(
+				'Template (selected)'
+			);
 		} );
 	} );
 } );
