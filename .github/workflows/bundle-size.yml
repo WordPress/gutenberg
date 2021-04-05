@@ -3,21 +3,21 @@ name: Compressed Size
 on: [pull_request]
 
 jobs:
-  build:
-    name: Check
-    runs-on: ubuntu-latest
+    build:
+        name: Check
+        runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        fetch-depth: 1
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  fetch-depth: 1
 
-    - name: Use Node.js 14.x
-      uses: actions/setup-node@v2
-      with:
-        node-version: 14.x
+            - name: Use Node.js 14.x
+              uses: actions/setup-node@v2
+              with:
+                  node-version: 14.x
 
-    - uses: preactjs/compressed-size-action@v2
-      with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
-        pattern: "{build/**/*.js,build/**/*.css}"
+            - uses: preactjs/compressed-size-action@v2
+              with:
+                  repo-token: '${{ secrets.GITHUB_TOKEN }}'
+                  pattern: '{build/**/*.js,build/**/*.css}'
