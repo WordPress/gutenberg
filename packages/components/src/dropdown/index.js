@@ -6,25 +6,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { __experimentalUseToggler as useToggler } from '@wordpress/compose';
+import { useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Popover from '../popover';
-
-function useObservableState( initialState, onStateChange ) {
-	const [ state, setState ] = useState( initialState );
-	return [
-		state,
-		( value ) => {
-			setState( value );
-			if ( onStateChange ) {
-				onStateChange( value );
-			}
-		},
-	];
-}
 
 export default function Dropdown( {
 	renderContent,
@@ -40,7 +28,35 @@ export default function Dropdown( {
 	onToggle,
 } ) {
 	const containerRef = useRef();
-	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
+
+	const {
+		togglerHandlers: { onMouseDown: togglerMouseDown, ...togglerHandlers },
+		isOn: isOpen,
+		setIsOn,
+		offUnlessToggler,
+	} = useToggler();
+
+	const isUsingTogglerHook = useRef();
+	togglerHandlers.onMouseDown = () => {
+		// Notes the use of this codepath to obviate closeIfFocusOutside with
+		// offUnlessToggler from the Toggler hook.
+		if ( ! isUsingTogglerHook.current ) {
+			isUsingTogglerHook.current = true;
+		}
+		togglerMouseDown();
+	};
+
+	function setAndPropagateIsOpen( valueOrSetter ) {
+		let syncState;
+		if ( typeof valueOrSetter === 'function' ) {
+			setIsOn( ( current ) => ( syncState = valueOrSetter( current ) ) );
+		} else {
+			setIsOn( ( syncState = valueOrSetter ) );
+		}
+		// propagates updates synchronously
+		onToggle?.( syncState );
+		if ( ! syncState ) onClose?.( syncState );
+	}
 
 	useEffect(
 		() => () => {
@@ -52,31 +68,25 @@ export default function Dropdown( {
 	);
 
 	function toggle() {
-		setIsOpen( ! isOpen );
+		setAndPropagateIsOpen( ( current ) => ! current );
 	}
 
 	/**
-	 * Closes the dropdown if a focus leaves the dropdown wrapper. This is
-	 * intentionally distinct from `onClose` since focus loss from the popover
-	 * is expected to occur when using the Dropdown's toggle button, in which
-	 * case the correct behavior is to keep the dropdown closed. The same applies
-	 * in case when focus is moved to the modal dialog.
+	 * Closes the dropdown if focus leaves the popover other than the case that
+	 * the toggle button was focused. This is a legacy codepath as it fails for
+	 * UAs that don't focus button elements when pressed. Can be removed after
+	 * all Dropdown implementors have been updated to use the `togglerHandlers`
+	 * passed to the renderToggle callback.
 	 */
 	function closeIfFocusOutside() {
 		const { ownerDocument } = containerRef.current;
-		if (
-			! containerRef.current.contains( ownerDocument.activeElement ) &&
-			! ownerDocument.activeElement.closest( '[role="dialog"]' )
-		) {
+		if ( ! containerRef.current.contains( ownerDocument.activeElement ) ) {
 			close();
 		}
 	}
 
 	function close() {
-		if ( onClose ) {
-			onClose();
-		}
-		setIsOpen( false );
+		setAndPropagateIsOpen( false );
 	}
 
 	const args = { isOpen, onToggle: toggle, onClose: close };
@@ -86,12 +96,15 @@ export default function Dropdown( {
 			className={ classnames( 'components-dropdown', className ) }
 			ref={ containerRef }
 		>
-			{ renderToggle( args ) }
+			{ renderToggle( { ...args, togglerHandlers } ) }
 			{ isOpen && (
 				<Popover
 					position={ position }
-					onClose={ close }
-					onFocusOutside={ closeIfFocusOutside }
+					onClose={
+						isUsingTogglerHook.current
+							? offUnlessToggler
+							: closeIfFocusOutside
+					}
 					expandOnMobile={ expandOnMobile }
 					headerTitle={ headerTitle }
 					focusOnMount={ focusOnMount }
