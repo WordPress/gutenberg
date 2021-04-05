@@ -185,6 +185,19 @@ add_action(
 	function() {
 
 		$core_block_patterns = array(
+			'text-two-columns',
+			'two-buttons',
+			'two-images',
+			'text-two-columns-with-images',
+			'text-three-columns-buttons',
+			'large-header',
+			'large-header-button',
+			'three-buttons',
+			'heading-paragraph',
+			'quote',
+		);
+
+		$new_core_block_patterns = array(
 			'media-text-nature',
 			'two-images-gallery',
 			'three-columns-media-text',
@@ -206,16 +219,17 @@ add_action(
 			return;
 		}
 
-		unregister_block_pattern( 'core/two-buttons' );
-		unregister_block_pattern( 'core/quote' );
-		unregister_block_pattern( 'core/text-two-columns' );
+		foreach ( $core_block_patterns as $core_block_pattern ) {
+			unregister_block_pattern( 'core/' . $core_block_pattern );
+		}
 
+		register_block_pattern_category( 'buttons', array( 'label' => _x( 'Buttons', 'Block pattern category', 'default' ) ) );
 		register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category', 'default' ) ) );
 		register_block_pattern_category( 'header', array( 'label' => _x( 'Headers', 'Block pattern category', 'default' ) ) );
 		register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category', 'default' ) ) );
 		register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category', 'default' ) ) );
 
-		foreach ( $core_block_patterns as $core_block_pattern ) {
+		foreach ( $new_core_block_patterns as $core_block_pattern ) {
 			register_block_pattern(
 				'core/' . $core_block_pattern,
 				require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
