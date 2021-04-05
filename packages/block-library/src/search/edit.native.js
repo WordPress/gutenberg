@@ -219,7 +219,7 @@ export default function SearchEdit( {
 						onFocus();
 					} }
 					onBlur={ () => setIsPlaceholderSelected( false ) }
-					placeholderTextColor={ placeholderStyle.color }
+					placeholderTextColor={ placeholderStyle?.color }
 				/>
 			</View>
 		);
@@ -271,7 +271,9 @@ export default function SearchEdit( {
 							onBlur={ () => {
 								setIsButtonSelected( false );
 							} }
-							selectionColor={ styles.richTextButtonCursor.color }
+							selectionColor={
+								styles.richTextButtonCursor?.color
+							}
 						/>
 					</View>
 				) }
@@ -318,7 +320,7 @@ export default function SearchEdit( {
 						onBlur={ () => {
 							setIsLabelSelected( false );
 						} }
-						selectionColor={ styles.richTextButtonCursor.color }
+						selectionColor={ styles.richTextButtonCursor?.color }
 					/>
 				</View>
 			) }
