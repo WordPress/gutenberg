@@ -16,7 +16,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	 * Constructs the controller.
 	 */
 	public function __construct() {
-		$this->namespace = 'wp-block-editor/v1';
+		$this->namespace = '__experimental/wp-block-editor/v1';
 		$this->rest_base = 'settings';
 	}
 
@@ -66,12 +66,10 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		$settings = apply_filters( 'block_editor_settings', array() );
-		unset( $settings['styles'] );
-		unset( $settings['defaultEditorStyles'] );
-		unset( $settings['availableLegacyWidgets'] );
-		unset( $settings['__unstableEnableFullSiteEditingBlocks'] );
-		unset( $settings['__experimentalGlobalStylesUserEntityId'] );
+		$settings = array_merge(
+			apply_filters( 'block_editor_settings', array() ),
+			get_default_block_editor_settings()
+		);
 
 		return rest_ensure_response( $settings );
 	}
@@ -93,21 +91,159 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 			'title'      => 'block-editor-settings-item',
 			'type'       => 'object',
 			'properties' => array(
-				'__experimentalFeatures'               => array(
-					'description' => __( 'Active theme settings and default values.', 'gutenberg' ),
-					'type'        => 'object',
+				'__unstableEnableFullSiteEditingBlocks'  => array(
+					'description' => __( 'Enables Full site editing blocks', 'gutenberg' ),
+					'type'        => 'boolean',
 					'context'     => array( 'view' ),
 				),
 
-				'isFSETheme'                           => array(
+				'styles'                                 => array(
+					'description' => __( 'Editor styles', 'gutenberg' ),
+					'type'        => 'array',
+					'context'     => array( 'view' ),
+				),
+
+				'supportsLayout'                         => array(
+					'description' => __( 'Enable/disable layouts support in container blocks.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+				),
+
+				'isFSETheme'                             => array(
 					'description' => __( 'Theme support for full site editing.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'view' ),
 				),
 
-				'__experimentalGlobalStylesBaseStyles' => array(
+				'widgetTypesToHideFromLegacyWidgetBlock' => array(
+					'description' => __( 'Widget types to hide from legacy widget block.', 'gutenberg' ),
+					'type'        => 'array',
+					'context'     => array( 'view' ),
+				),
+
+				'__experimentalFeatures'                 => array(
+					'description' => __( 'Active theme settings and default values.', 'gutenberg' ),
+					'type'        => 'object',
+					'context'     => array( 'view' ),
+				),
+
+				'__experimentalGlobalStylesUserEntityId' => array(
+					'description' => __( 'Global styles user entity ID.', 'gutenberg' ),
+					'type'        => 'integer',
+					'context'     => array( 'view' ),
+				),
+
+				'__experimentalGlobalStylesBaseStyles'   => array(
 					'description' => __( 'Global styles settings.', 'gutenberg' ),
 					'type'        => 'object',
+					'context'     => array( 'view' ),
+				),
+
+				'alignWide'                              => array(
+					'description' => __( 'Enable/Disable Wide/Full Alignments.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+				),
+
+				'allowedBlockTypes'                      => array(
+					'description' => __( 'Enable/Disable Wide/Full Alignments.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+				),
+
+				'allowedMimeTypes'                       => array(
+					'description' => __( 'List of allowed mime types and file extensions.', 'gutenberg' ),
+					'type'        => 'object',
+					'context'     => array( 'view' ),
+				),
+
+				'disableCustomColors'                    => array(
+					'description' => __( 'Disables custom colors.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+				),
+
+				'disableCustomFontSizes'                 => array(
+					'description' => __( 'Disables custom font size.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+				),
+
+				'disableCustomGradients'                 => array(
+					'description' => __( 'Disables custom font size.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+				),
+
+				'enableCustomLineHeight'                 => array(
+					'description' => __( 'Enables custom line height.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+				),
+
+				'enableCustomSpacing'                    => array(
+					'description' => __( 'Enables custom spacing.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+				),
+
+				'enableCustomUnits'                      => array(
+					'description' => __( 'Enables custom units.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+				),
+
+				'isRTL'                                  => array(
+					'description' => __( 'Determines whether the current locale is right-to-left (RTL).', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+				),
+
+				'imageDefaultSize'                       => array(
+					'description' => __( 'Image default size slug.', 'gutenberg' ),
+					'type'        => 'string',
+					'context'     => array( 'view' ),
+				),
+
+				'imageDimensions'                        => array(
+					'description' => __( 'Available image dimensions.', 'gutenberg' ),
+					'type'        => 'object',
+					'context'     => array( 'view' ),
+				),
+
+				'imageEditing'                           => array(
+					'description' => __( 'Image Editing settings set to false to disable.', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view' ),
+				),
+
+				'imageSizes'                             => array(
+					'description' => __( 'Available image sizes.', 'gutenberg' ),
+					'type'        => 'array',
+					'context'     => array( 'view' ),
+				),
+
+				'maxUploadFileSize'                      => array(
+					'description' => __( 'Maximum upload size in bytes allowed for the site.', 'gutenberg' ),
+					'type'        => 'number',
+					'context'     => array( 'view' ),
+				),
+
+				'colors'                                 => array(
+					'description' => __( 'Active theme color palette.', 'gutenberg' ),
+					'type'        => 'array',
+					'context'     => array( 'view' ),
+				),
+
+				'fontSizes'                              => array(
+					'description' => __( 'Active theme font sizes.', 'gutenberg' ),
+					'type'        => 'array',
+					'context'     => array( 'view' ),
+				),
+
+				'gradients'                              => array(
+					'description' => __( 'Active theme gradients.', 'gutenberg' ),
+					'type'        => 'array',
 					'context'     => array( 'view' ),
 				),
 			),
