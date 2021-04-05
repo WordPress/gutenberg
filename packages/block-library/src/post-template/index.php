@@ -61,7 +61,7 @@ function render_block_core_post_template( $attributes, $content, $block ) {
 				)
 			)
 		)->render( array( 'dynamic' => false ) );
-		$content      .= "<li>{$block_content}</li>";
+		$content      .= '<li class="' . esc_attr( implode( ' ', get_post_class() ) ) . '">' . $block_content . '</li>';
 	}
 
 	wp_reset_postdata();
