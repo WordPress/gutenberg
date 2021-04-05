@@ -6,12 +6,12 @@
  */
 
 return array(
-	'title'       => __( 'Three columns with offset images' ),
+	'title'       => _x( 'Three columns with offset images', 'Block pattern title', 'default' ),
 	'categories'  => array( 'gallery' ),
 	'content'     => '<!-- wp:columns {"align":"wide"} -->
 	<div class="wp-block-columns alignwide"><!-- wp:column {"width":"25%"} -->
 	<div class="wp-block-column" style="flex-basis:25%"><!-- wp:image {"id":240,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
-	<figure class="wp-block-image size-large is-style-default"><img src="https://s.w.org/images/core/5.8/architecture-01.jpg" alt="' . __( 'Close-up, abstract view of geometric architecture.' ) . '" class="wp-image-240"/></figure>
+	<figure class="wp-block-image size-large is-style-default"><img src="https://s.w.org/images/core/5.8/architecture-01.jpg" alt="' . esc_html__( 'Close-up, abstract view of geometric architecture.', 'default' ) . '" class="wp-image-240"/></figure>
 	<!-- /wp:image --></div>
 	<!-- /wp:column -->
 	
@@ -25,13 +25,13 @@ return array(
 	<!-- /wp:spacer -->
 	
 	<!-- wp:image {"id":237,"sizeSlug":"large","linkDestination":"none"} -->
-	<figure class="wp-block-image size-large"><img src="https://s.w.org/images/core/5.8/architecture-02.jpg" alt="' . __( 'Close-up, angled view of a window on a white building.' ) . '" class="wp-image-237"/></figure>
+	<figure class="wp-block-image size-large"><img src="https://s.w.org/images/core/5.8/architecture-02.jpg" alt="' . esc_html__( 'Close-up, angled view of a window on a white building.', 'default' ) . '" class="wp-image-237"/></figure>
 	<!-- /wp:image --></div>
 	<!-- /wp:column -->
 	
 	<!-- wp:column {"width":"45%"} -->
 	<div class="wp-block-column" style="flex-basis:45%"><!-- wp:image {"id":236,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
-	<figure class="wp-block-image size-large is-style-default"><img src="https://s.w.org/images/core/5.8/architecture-03.jpg" alt="' . __( 'Close-up of the corner of a white, geometric building with both sharp points and round corners.' ) . '" class="wp-image-236"/></figure>
+	<figure class="wp-block-image size-large is-style-default"><img src="https://s.w.org/images/core/5.8/architecture-03.jpg" alt="' . esc_html__( 'Close-up of the corner of a white, geometric building with both sharp points and round corners.', 'default' ) . '" class="wp-image-236"/></figure>
 	<!-- /wp:image -->
 	
 	<!-- wp:spacer {"height":285} -->
@@ -39,5 +39,5 @@ return array(
 	<!-- /wp:spacer --></div>
 	<!-- /wp:column --></div>
 	<!-- /wp:columns -->',
-	'description' => _x( 'Three columns with offset images', 'Block pattern description' ),
+	'description' => _x( 'Three columns with offset images', 'Block pattern description', 'default' ),
 );

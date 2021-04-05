@@ -6,7 +6,7 @@
  */
 
 return array(
-	'title'       => __( 'Two columns of text' ),
+	'title'       => _x( 'Two columns of text', 'Block pattern title', 'default' ),
 	'categories'  => array( 'columns', 'text' ),
 	'content'     => '<!-- wp:columns {"align":"full"} -->
 	<div class="wp-block-columns"><!-- wp:column -->
@@ -14,11 +14,11 @@ return array(
 	<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer -->
 	<!-- wp:paragraph {"style":{"typography":{"fontSize":"21px"}, "color":{"text":"#000000"}}} -->
-	<p class="has-text-color" style="font-size:21px;color:#000000;"><strong>' . __( 'We have worked with:' ) . '</strong></p>
+	<p class="has-text-color" style="font-size:21px;color:#000000;"><strong>' . esc_html__( 'We have worked with:', 'default' ) . '</strong></p>
 	<!-- /wp:paragraph -->
 	
 	<!-- wp:paragraph {"style":{"typography":{"fontSize":"24px","lineHeight":"1.2"}}} -->
-	<p style="font-size:24px;line-height:1.2"><a href="https://wordpress.org">' . __( 'EARTHFUND™<br>ARCHWEEKLY<br>FUTURE ROADS<br>BUILDING NY' ) . '</a></p>
+	<p style="font-size:24px;line-height:1.2"><a href="https://wordpress.org">' . esc_html__( 'EARTHFUND™<br>ARCHWEEKLY<br>FUTURE ROADS<br>BUILDING NY', 'default' ) . '</a></p>
 	<!-- /wp:paragraph -->
 	
 	<!-- wp:spacer -->
@@ -32,7 +32,7 @@ return array(
 	<!-- /wp:spacer -->
 	
 	<!-- wp:paragraph {"style":{"typography":{"fontSize":"24px","lineHeight":"1.2"}}} -->
-	<p style="font-size:24px;line-height:1.2"><a href="https://wordpress.org">' . __( 'DUBAI ROOFS<br>MAY WATSON STUDIO<br>Y.O.L<br>RUDIMENTAR' ) . '</a></p>
+	<p style="font-size:24px;line-height:1.2"><a href="https://wordpress.org">' . esc_html__( 'DUBAI ROOFS<br>MAY WATSON STUDIO<br>Y.O.L<br>RUDIMENTAR', 'default' ) . '</a></p>
 	<!-- /wp:paragraph -->
 	
 	<!-- wp:spacer -->
@@ -40,5 +40,5 @@ return array(
 	<!-- /wp:spacer --></div>
 	<!-- /wp:column --></div>
 	<!-- /wp:columns -->',
-	'description' => _x( 'Two columns of text', 'Block pattern description' ),
+	'description' => _x( 'Two columns of text', 'Block pattern description', 'default' ),
 );
