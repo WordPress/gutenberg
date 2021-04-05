@@ -21,10 +21,16 @@
 	}
 }
 
+// Modal that shows conversion option.
+.wp-block-page-list-modal {
+	max-width: 400px;
+}
+
 .wp-block-page-list-modal-buttons {
 	display: flex;
 	justify-content: flex-end;
-	> button {
-		margin: $grid-unit-10;
+
+	.components-button {
+		margin-left: $grid-unit-15;
 	}
 }

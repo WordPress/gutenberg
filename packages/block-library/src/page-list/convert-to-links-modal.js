@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { Button, ButtonGroup, Modal } from '@wordpress/components';
+import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
@@ -75,7 +75,7 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 		<Modal
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ onClose }
-			title={ __( 'Convert to Links' ) }
+			title={ __( 'Convert to links' ) }
 			className={ 'wp-block-page-list-modal' }
 		>
 			<p>
@@ -88,8 +88,8 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 					"Note: if you add new pages to your site, you'll need to add them to your navigation menu."
 				) }
 			</p>
-			<ButtonGroup className={ 'wp-block-page-list-modal-buttons' }>
-				<Button isSecondary onClick={ onClose }>
+			<div className="wp-block-page-list-modal-buttons">
+				<Button isTertiary onClick={ onClose }>
 					{ __( 'Cancel' ) }
 				</Button>
 				<Button
@@ -103,7 +103,7 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 				>
 					{ __( 'Convert' ) }
 				</Button>
-			</ButtonGroup>
+			</div>
 		</Modal>
 	);
 }
