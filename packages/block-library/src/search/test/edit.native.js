@@ -13,11 +13,17 @@ import { Icon } from '@wordpress/components';
  */
 import SearchEdit from '../edit.native.js';
 
-const setAttributes = jest.fn();
+const defaultAttributes = {
+	label: 'Search',
+	buttonText: 'Search Button',
+	buttonPosition: 'button-outside',
+	showLabel: true,
+};
 
 const getTestComponent = ( attributes = {} ) => {
+	const finalAttrs = { ...defaultAttributes, ...attributes };
 	return renderer.create(
-		<SearchEdit attributes={ attributes } setAttributes={ jest.fn() } />
+		<SearchEdit attributes={ finalAttrs } setAttributes={ jest.fn() } />
 	);
 };
 
@@ -46,7 +52,7 @@ const hasComponent = ( instance, className ) => {
 	return components.length !== 0;
 };
 
-describe( 'Search block', () => {
+describe( 'Search block options', () => {
 	it( 'renders block without crashing', () => {
 		const component = getTestComponent();
 		const rendered = component.toJSON();
@@ -54,12 +60,7 @@ describe( 'Search block', () => {
 	} );
 
 	it( 'renders default block configuration', () => {
-		const component = getTestComponent( {
-			label: 'Search',
-			buttonText: 'Search Button',
-			buttonPosition: 'button-outside',
-			showLabel: true,
-		} );
+		const component = getTestComponent();
 		const instance = component.root;
 
 		// Verify the label element of the search block exists and
@@ -87,9 +88,7 @@ describe( 'Search block', () => {
 
 	it( 'renders block with no-button option', () => {
 		const component = getTestComponent( {
-			label: 'Search',
 			buttonPosition: 'no-button',
-			showLabel: true,
 		} );
 		const instance = component.root;
 
@@ -117,10 +116,7 @@ describe( 'Search block', () => {
 
 	it( 'renders block with icon button option', () => {
 		const component = getTestComponent( {
-			label: 'Search',
 			buttonUseIcon: true,
-			showLabel: true,
-			buttonPosition: 'button-outside',
 		} );
 		const instance = component.root;
 
@@ -148,10 +144,7 @@ describe( 'Search block', () => {
 
 	it( 'renders block with button inside option', () => {
 		const component = getTestComponent( {
-			label: 'Search',
-			buttonText: 'Search Button',
 			buttonPosition: 'button-inside',
-			showLabel: true,
 		} );
 		const instance = component.root;
 
@@ -180,9 +173,6 @@ describe( 'Search block', () => {
 
 	it( 'renders block with label hidden', () => {
 		const component = getTestComponent( {
-			label: 'Search',
-			buttonText: 'Search Button',
-			buttonPosition: 'button-outside',
 			showLabel: false,
 		} );
 		const instance = component.root;

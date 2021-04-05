@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`Search block renders block with button inside option 1`] = `
+exports[`Search block options renders block with button inside option 1`] = `
 <View
   accessibilityElementsHidden={true}
   className="wp-block-search__button-inside wp-block-search__text-button"
@@ -167,7 +167,7 @@ exports[`Search block renders block with button inside option 1`] = `
 </View>
 `;
 
-exports[`Search block renders block with icon button option 1`] = `
+exports[`Search block options renders block with icon button option 1`] = `
 <View
   accessibilityElementsHidden={true}
   className="wp-block-search__button-outside wp-block-search__icon-button"
@@ -275,7 +275,7 @@ exports[`Search block renders block with icon button option 1`] = `
 </View>
 `;
 
-exports[`Search block renders block with label hidden 1`] = `
+exports[`Search block options renders block with label hidden 1`] = `
 <View
   accessibilityElementsHidden={true}
   className="wp-block-search__button-outside wp-block-search__text-button"
@@ -384,7 +384,7 @@ exports[`Search block renders block with label hidden 1`] = `
 </View>
 `;
 
-exports[`Search block renders block with no-button option 1`] = `
+exports[`Search block options renders block with no-button option 1`] = `
 <View
   accessibilityElementsHidden={true}
   className="wp-block-search__no-button"
@@ -480,7 +480,7 @@ exports[`Search block renders block with no-button option 1`] = `
 </View>
 `;
 
-exports[`Search block renders default block configuration 1`] = `
+exports[`Search block options renders default block configuration 1`] = `
 <View
   accessibilityElementsHidden={true}
   className="wp-block-search__button-outside wp-block-search__text-button"
