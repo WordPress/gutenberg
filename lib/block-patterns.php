@@ -180,32 +180,47 @@ register_block_pattern(
 	)
 );
 
-$core_block_patterns = array(
-	'media-text-nature',
-	'two-images-gallery',
-	'three-columns-media-text',
-	'quote-2',
-	'large-header-left',
-	'large-header-text-button',
-	'media-text-art',
-	'text-two-columns-title',
-	'three-columns-text',
-	'text-two-columns-title-offset',
-	'heading',
-	'three-images-gallery',
-	'text-two-columns-2',
-	'media-text-arquitecture',
-	'two-buttons-2',
+add_action(
+	'init',
+	function() {
+
+		$core_block_patterns = array(
+			'media-text-nature',
+			'two-images-gallery',
+			'three-columns-media-text',
+			'quote',
+			'large-header-left',
+			'large-header-text-button',
+			'media-text-art',
+			'text-two-columns-title',
+			'three-columns-text',
+			'text-two-columns-title-offset',
+			'heading',
+			'three-images-gallery',
+			'text-two-columns',
+			'media-text-arquitecture',
+			'two-buttons',
+		);
+
+		if ( ! function_exists( 'unregister_block_pattern' ) ) {
+			return;
+		}
+
+		unregister_block_pattern( 'core/two-buttons' );
+		unregister_block_pattern( 'core/quote' );
+		unregister_block_pattern( 'core/text-two-columns' );
+
+		register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category', 'default' ) ) );
+		register_block_pattern_category( 'header', array( 'label' => _x( 'Headers', 'Block pattern category', 'default' ) ) );
+		register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category', 'default' ) ) );
+		register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category', 'default' ) ) );
+
+		foreach ( $core_block_patterns as $core_block_pattern ) {
+			register_block_pattern(
+				'core/' . $core_block_pattern,
+				require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
+			);
+		}
+
+	}
 );
-
-foreach ( $core_block_patterns as $core_block_pattern ) {
-	register_block_pattern(
-		'core/' . $core_block_pattern,
-		require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
-	);
-}
-
-register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category' ) ) );
-register_block_pattern_category( 'header', array( 'label' => _x( 'Headers', 'Block pattern category' ) ) );
-register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category' ) ) );
-register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category' ) ) );
