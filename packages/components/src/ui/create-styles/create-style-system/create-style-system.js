@@ -1,7 +1,6 @@
 /**
  * Internal dependencies
  */
-import { ThemeProvider as BaseThemeProvider } from '../components/theme-provider';
 import { createCompiler } from '../create-compiler';
 import { createRootStore } from '../css-custom-properties';
 import { createCoreElement } from './create-core-element';
@@ -11,8 +10,6 @@ import { generateTheme } from './generate-theme';
 import { createToken, DEFAULT_STYLE_SYSTEM_OPTIONS } from './utils';
 
 const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
-
-/** @typedef {Omit<import('../components/theme-provider/theme-provider').ThemeProviderProps, 'compiler' | 'globalStyles'>} WrappedThemeProviderProps */
 
 /* eslint-disable jsdoc/valid-types */
 /**
@@ -31,7 +28,6 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
  * @property {(value: keyof (TConfig & TDarkConfig & THCConfig & TDarkHCConfig) | TGeneratedTokens) => string} get The primary function to retrieve Style system variables.
  * @property {import('./polymorphic-component').CreateStyled} styled A set of styled components.
  * @property {import('react').ComponentType} View The base <View /> component.
- * @property {import('react').ComponentType<WrappedThemeProviderProps>} ThemeProvider The component (Provider) used to adjust design tokens.
  * @property {import('../css-custom-properties').RootStore} rootStore The root store.
  */
 
@@ -132,19 +128,6 @@ export function createStyleSystem( options = defaultOptions ) {
 
 	const View = core.div;
 
-	/**
-	 * An enhanced (base) ThemeProvider with injectGlobal from the custom Emotion instance.
-	 *
-	 * @param {WrappedThemeProviderProps} props
-	 */
-	const ThemeProvider = ( props ) => (
-		<BaseThemeProvider
-			{ ...props }
-			compiler={ compiler }
-			globalStyles={ globalStyles }
-		/>
-	);
-
 	const styleSystem = {
 		compiler,
 		core,
@@ -159,7 +142,6 @@ export function createStyleSystem( options = defaultOptions ) {
 		) => `var(${ createToken( key.toString() ) })`,
 		styled,
 		View,
-		ThemeProvider,
 		rootStore,
 	};
 

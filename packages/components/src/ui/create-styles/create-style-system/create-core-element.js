@@ -2,12 +2,12 @@
  * External dependencies
  */
 import isPropValid from '@emotion/is-prop-valid';
-import { mergeRefs } from '@wp-g2/utils';
 
 /**
  * WordPress dependencies
  */
-import { forwardRef, useMemo, createElement } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
+import { forwardRef, createElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -153,9 +153,7 @@ export const createCoreElement = ( tagName, options ) => {
 			}
 		}
 
-		const refs = useMemo( () => {
-			return forwardedRef ? mergeRefs( [ forwardedRef, ref ] ) : ref;
-		}, [ forwardedRef, ref ] );
+		const refs = useMergeRefs( [ forwardedRef, ref ] );
 
 		return createElement(
 			element,
