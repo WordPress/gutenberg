@@ -24,12 +24,12 @@ export function PostVisibility() {
 						<Dropdown
 							position="bottom left"
 							contentClassName="edit-post-post-visibility__dialog"
-							renderToggle={ ( { isOpen, onToggle } ) => (
+							renderToggle={ ( { isOpen, togglerHandlers } ) => (
 								<Button
 									aria-expanded={ isOpen }
 									className="edit-post-post-visibility__toggle"
-									onClick={ onToggle }
 									isTertiary
+									{ ...togglerHandlers }
 								>
 									<PostVisibilityLabel />
 								</Button>
