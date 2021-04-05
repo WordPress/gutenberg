@@ -114,7 +114,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'header', $template_part->title );
 		$this->assertEquals( '', $template_part->description );
 		$this->assertEquals( 'wp_template_part', $template_part->type );
-		$this->assertEquals( 'header', $template_part->area );
+		$this->assertEquals( WP_TEMPLATE_PART_AREA_HEADER, $template_part->area );
 	}
 
 	function test_gutenberg_build_template_result_from_post() {
