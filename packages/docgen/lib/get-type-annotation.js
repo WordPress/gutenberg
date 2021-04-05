@@ -26,26 +26,24 @@ function getFunctionTypeAnnotation( typeAnnotation, returnIndicator ) {
 		)
 		.join( ', ' );
 
-	const {
-		argument: restParamArgument,
-		typeAnnotation: restParamTypeAnnotation,
-		// There's only every one rest param
-	} = typeAnnotation.parameters.find( babelTypes.isRestElement ) || {};
-	const restParam =
-		restParamArgument && restParamTypeAnnotation
-			? `, ...${ restParamArgument.name }: ${ getTypeAnnotation(
-					restParamTypeAnnotation.typeAnnotation
-			  ) }`
-			: '';
-
-	const params = `( ${ nonRestParams }${ restParam } )`;
+	let params = nonRestParams;
+	const restParam = typeAnnotation.parameters.find(
+		babelTypes.isRestElement
+	);
+	if ( restParam ) {
+		const paramName = restParam.argument.name;
+		const paramType = getTypeAnnotation(
+			restParam.typeAnnotation.typeAnnotation
+		);
+		params += `, ...${ paramName }: ${ paramType }`;
+	}
 
 	const returnType = getTypeAnnotation(
 		typeAnnotation.returnType ||
 			typeAnnotation.typeAnnotation.typeAnnotation
 	);
 
-	return `${ params }${ returnIndicator }${ returnType }`;
+	return `( ${ params } )${ returnIndicator }${ returnType }`;
 }
 
 /**
