@@ -18,6 +18,25 @@ under the terms of the GNU General Public License as published by the Free
 Software Foundation; either version 2 of the License or (at your option) any
 later version (the “GPL”). 
 
+This program incorporates work covered by the following copyright and
+permission notices:
+
+    b2 is (c) 2001, 2002 Michel Valdrighi - m@tidakada.com -
+    http://tidakada.com
+
+    Wherever third party code has been used, credit has been given in the code's
+    comments.
+
+    b2 is released under the GPL
+
+and
+
+    WordPress - Web publishing software
+
+    Copyright 2003-2010 by the contributors
+
+    WordPress is released under the GPL
+
 
 ### Dual License 
 
@@ -52,25 +71,6 @@ License” to the following:**
            “GPL”) OR
        
         2. the Mozilla Public License Version 2.0 (the “MPL”).
-
-This program incorporates work covered by the following copyright and
-permission notices:
-
-    b2 is (c) 2001, 2002 Michel Valdrighi - m@tidakada.com -
-    http://tidakada.com
-
-    Wherever third party code has been used, credit has been given in the code's
-    comments.
-
-    b2 is released under the GPL
-
-and
-
-    WordPress - Web publishing software
-
-    Copyright 2003-2010 by the contributors
-
-    WordPress is released under the GPL
 
 ---
 
