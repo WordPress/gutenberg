@@ -1682,7 +1682,7 @@ export const __experimentalGetDefaultTemplatePartAreas = createSelector(
 	( state ) => {
 		const areas = getEditorSettings( state )?.defaultTemplatePartAreas;
 		const areasWithIcons = areas?.map( ( item ) => {
-			return { ...item, icon: getIconByArea( item.area ) };
+			return { ...item, icon: getTemplatePartIconByArea( item.area ) };
 		} );
 		return areasWithIcons;
 	},
@@ -1724,7 +1724,7 @@ export function __experimentalGetTemplateInfo( state, template ) {
 
 	const templateTitle = isString( title ) ? title : title?.rendered;
 	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
-	const templateIcon = getIconByArea( area );
+	const templateIcon = getTemplatePartIconByArea( area );
 
 	return {
 		title:
@@ -1736,7 +1736,14 @@ export function __experimentalGetTemplateInfo( state, template ) {
 	};
 }
 
-function getIconByArea( area ) {
+/**
+ * Helper function to find the corresponding icon for a template part's 'area'.
+ *
+ * @param {string} area The value of the template part 'area' tax term.
+ *
+ * @return {Object} The corresponding icon.
+ */
+function getTemplatePartIconByArea( area ) {
 	const iconsByArea = {
 		footer,
 		header,
