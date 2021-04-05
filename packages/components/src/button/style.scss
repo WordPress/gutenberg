@@ -1,5 +1,8 @@
-.block-editor-block-list__layout input.components-button,
-.block-editor-block-list__layout button.components-button,
+// These two first selectors shouldn't be needed ideally,
+// but they are useful in case theme styles conflict with Button styles
+// For example inside the image block placeholder.
+.editor-styles-wrapper input.components-button,
+.editor-styles-wrapper button.components-button,
 .components-button {
 	align-items: center;
 	background: none;

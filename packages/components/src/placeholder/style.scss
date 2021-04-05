@@ -96,7 +96,11 @@
 	width: 50%;
 }
 
-.block-editor-block-list__layout .components-placeholder__fieldset button.components-button {
+.components-placeholder__fieldset button.components-button,
+// This selector shouldn't be needed ideally,
+// but they are useful in case theme styles conflict with Button styles
+// For example inside the image block placeholder.
+.editor-styles-wrapper .components-placeholder__fieldset button.components-button {
 	margin-right: $grid-unit-15;
 	margin-bottom: $grid-unit-15; // If buttons wrap we need vertical space between.
 
