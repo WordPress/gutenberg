@@ -3,6 +3,7 @@
  */
 import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createBlock as create } from '@wordpress/blocks';
@@ -16,6 +17,7 @@ export const convertSelectedBlockToNavigationLinks = ( {
 	clientId,
 	replaceBlock,
 	createBlock,
+	setIsConverting,
 } ) => () => {
 	if ( ! pages ) {
 		return;
@@ -23,7 +25,7 @@ export const convertSelectedBlockToNavigationLinks = ( {
 
 	const linkMap = {};
 	const navigationLinks = [];
-
+	setIsConverting( true );
 	pages.forEach( ( { id, title, link: url, type, parent } ) => {
 		// See if a placeholder exists. This is created if children appear before parents in list
 		const innerBlocks = linkMap[ id ]?.innerBlocks ?? [];
@@ -52,9 +54,11 @@ export const convertSelectedBlockToNavigationLinks = ( {
 	} );
 
 	replaceBlock( clientId, navigationLinks );
+	setIsConverting( false );
 };
 
 export default function ConvertToLinksModal( { onClose, clientId } ) {
+	const [ isConverting, setIsConverting ] = useState( false );
 	const { pages, pagesFinished } = useSelect(
 		( select ) => {
 			const { getEntityRecords, hasFinishedResolution } = select(
@@ -104,12 +108,14 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 				</Button>
 				<Button
 					isPrimary
-					disabled={ ! pagesFinished }
+					isBusy={ isConverting }
+					disabled={ ! pagesFinished || isConverting }
 					onClick={ convertSelectedBlockToNavigationLinks( {
 						pages,
 						replaceBlock,
 						clientId,
 						createBlock: create,
+						setIsConverting,
 					} ) }
 				>
 					{ __( 'Convert' ) }

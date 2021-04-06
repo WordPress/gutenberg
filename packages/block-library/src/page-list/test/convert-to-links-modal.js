@@ -96,11 +96,13 @@ describe( 'page list convert to links', () => {
 					innerBlocks,
 				} )
 			);
+			const setIsConverting = jest.fn();
 			const convertLinks = convertSelectedBlockToNavigationLinks( {
 				pages,
 				clientId: 'testId',
 				replaceBlock,
 				createBlock,
+				setIsConverting,
 			} );
 			convertLinks();
 			expect( replaceBlock.mock.calls?.[ 0 ]?.[ 1 ] ).toEqual( [
@@ -291,11 +293,13 @@ describe( 'page list convert to links', () => {
 					innerBlocks,
 				} )
 			);
+			const setIsConverting = jest.fn();
 			const convertLinks = convertSelectedBlockToNavigationLinks( {
 				pages,
 				clientId: 'testId',
 				replaceBlock,
 				createBlock,
+				setIsConverting,
 			} );
 			convertLinks();
 			expect( replaceBlock.mock.calls?.[ 0 ]?.[ 1 ] ).toEqual( [
