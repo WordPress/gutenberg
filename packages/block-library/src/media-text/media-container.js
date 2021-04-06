@@ -118,6 +118,8 @@ function MediaContainer( props, ref ) {
 		onWidthChange,
 	} = props;
 
+	const isTemporaryMedia = ! mediaId && isBlobURL( mediaUrl );
+
 	const { toggleSelection } = useDispatch( blockEditorStore );
 
 	if ( mediaUrl ) {
@@ -152,7 +154,7 @@ function MediaContainer( props, ref ) {
 				className={ classnames(
 					className,
 					'editor-media-container__resizer',
-					{ 'is-transient': isBlobURL( mediaUrl ) }
+					{ 'is-transient': isTemporaryMedia }
 				) }
 				style={ backgroundStyles }
 				size={ { width: mediaWidth + '%' } }
@@ -173,7 +175,7 @@ function MediaContainer( props, ref ) {
 					mediaId={ mediaId }
 				/>
 				{ ( mediaTypeRenderers[ mediaType ] || noop )() }
-				{ isBlobURL( mediaUrl ) && <Spinner /> }
+				{ isTemporaryMedia && <Spinner /> }
 				<PlaceholderContainer { ...props } />
 			</ResizableBoxContainer>
 		);
