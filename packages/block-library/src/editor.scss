@@ -97,13 +97,6 @@
  * This allows us to create normalization styles that are easily overridden by editor styles.
  */
 
-// Provide every block with a default base margin. This margin provides a consistent spacing
-// between blocks in the editor.
-.block-editor-block-list__block {
-	margin-top: $default-block-margin;
-	margin-bottom: $default-block-margin;
-}
-
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {
 	display: none;

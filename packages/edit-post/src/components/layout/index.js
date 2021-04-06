@@ -94,7 +94,6 @@ function Layout( { styles } ) {
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
-		supportsLayout,
 	} = useSelect( ( select ) => {
 		const editorSettings = select( 'core/editor' ).getEditorSettings();
 		return {
@@ -115,7 +114,6 @@ function Layout( { styles } ) {
 			isInserterOpened: select( editPostStore ).isInserterOpened(),
 			mode: select( editPostStore ).getEditorMode(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
-			supportsLayout: editorSettings.supportsLayout,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
@@ -141,7 +139,6 @@ function Layout( { styles } ) {
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 		'show-icon-labels': showIconLabels,
-		'supports-layout': supportsLayout,
 	} );
 	const openSidebarPanel = () =>
 		openGeneralSidebar(

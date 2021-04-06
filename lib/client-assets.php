@@ -360,6 +360,11 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-reusable-blocks',
 	);
 
+	// Only load the default layout and margin styles for themes without theme.json file.
+	if ( ! WP_Theme_JSON_Resolver::theme_has_support() ) {
+		$wp_edit_blocks_dependencies[] = 'wp-editor-classic-layout-styles';
+	}
+
 	global $editor_styles;
 	if ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) {
 		// Include opinionated block styles if no $editor_styles are declared, so the editor never appears broken.
@@ -374,6 +379,15 @@ function gutenberg_register_packages_styles( $styles ) {
 		$version
 	);
 	$styles->add_data( 'wp-reset-editor-styles', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-editor-classic-layout-styles',
+		gutenberg_url( 'build/edit-post/classic.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-editor-classic-layout-styles', 'rtl', 'replace' );
 
 	gutenberg_override_style(
 		$styles,
