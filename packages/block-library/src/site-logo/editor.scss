@@ -5,9 +5,24 @@
 }
 
 .wp-block-site-logo {
+	// Make the block selectable.
+	a {
+		pointer-events: none;
+	}
+
 	&.is-resized {
 		display: table;
 	}
+
+	// Provide a sane starting point for the size.
+	&:not(.is-resized) {
+		width: 120px;
+
+		img {
+			width: 100%;
+		}
+	}
+
 
 	.custom-logo-link {
 		cursor: inherit;
