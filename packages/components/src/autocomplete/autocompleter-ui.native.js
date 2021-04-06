@@ -107,17 +107,20 @@ export function getAutoCompleterUI( autocompleter ) {
 			styles.activeTextDark
 		);
 
-		const startAnimation = useCallback( ( show ) => {
-			Animated.timing( animationValue, {
-				toValue: show ? 1 : 0,
-				duration: show ? 300 : 150,
-				useNativeDriver: true,
-			} ).start( ( { finished } ) => {
-				if ( finished && ! show && isVisible ) {
-					setIsVisible( false );
-				}
-			} );
-		}, [] );
+		const startAnimation = useCallback(
+			( show ) => {
+				Animated.timing( animationValue, {
+					toValue: show ? 1 : 0,
+					duration: show ? 300 : 150,
+					useNativeDriver: true,
+				} ).start( ( { finished } ) => {
+					if ( finished && ! show && isVisible ) {
+						setIsVisible( false );
+					}
+				} );
+			},
+			[ isVisible ]
+		);
 
 		const contentStyles = {
 			transform: [
