@@ -201,8 +201,10 @@ function GalleryEdit( props ) {
 	}
 
 	function isValidFileType( file ) {
-		return ALLOWED_MEDIA_TYPES.some(
-			( mediaType ) => file.type?.indexOf( mediaType ) === 0
+		return (
+			ALLOWED_MEDIA_TYPES.some(
+				( mediaType ) => file.type?.indexOf( mediaType ) === 0
+			) || file.url?.indexOf( 'blob:' ) === 0
 		);
 	}
 
