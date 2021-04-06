@@ -22,16 +22,20 @@ const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 function DatePickerDay( { day, events = [] } ) {
 	const ref = useRef();
 
-	// a11y hack to make the `There is/are n events` string
-	// available speaking for readers,
-	// re-defining the aria-label attribute.
-	// This attribute is handled by the react-dates component.
+	/*
+	 * a11y hack to make the `There is/are n events` string
+	 * available speaking for readers,
+	 * re-defining the aria-label attribute.
+	 * This attribute is handled by the react-dates component.
+	 */
 	useEffect( () => {
-		if ( ! ref?.current?.parentNode ) {
+		// Bail early when no events.
+		if ( ! events.length ) {
 			return;
 		}
 
-		if ( ! events.length ) {
+		// Bail when no parent node.
+		if ( ! ref?.current?.parentNode ) {
 			return;
 		}
 
