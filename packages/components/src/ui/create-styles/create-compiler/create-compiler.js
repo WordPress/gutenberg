@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { is } from '@wp-g2/utils';
 import createEmotion from 'create-emotion';
 import mitt from 'mitt';
 
@@ -61,7 +60,7 @@ export function createCompiler( options ) {
 				...defaultPlugins,
 				...options.stylisPlugins,
 			];
-		} else if ( is.defined( options.stylisPlugins ) ) {
+		} else if ( typeof options.stylisPlugins !== 'undefined' ) {
 			// just a single plugin was passed in, as is allowed by emotion
 			mergedOptions.stylisPlugins = [
 				...defaultPlugins,
