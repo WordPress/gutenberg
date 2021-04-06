@@ -11,9 +11,6 @@ register_block_pattern(
 	'test-allowed-patterns/lone-heading',
 	array(
 		'title'   => 'Test: Single heading',
-		'scope'   => array(
-			'inserter' => true,
-		),
 		'content' => '<!-- wp:heading --><h2>Hello!</h2><!-- /wp:heading -->',
 	)
 );
@@ -22,9 +19,6 @@ register_block_pattern(
 	'test-allowed-patterns/lone-paragraph',
 	array(
 		'title'   => 'Test: Single paragraph',
-		'scope'   => array(
-			'inserter' => true,
-		),
 		'content' => '<!-- wp:paragraph --><p>Hello!</p><!-- /wp:paragraph -->',
 	)
 );
@@ -33,9 +27,6 @@ register_block_pattern(
 	'test-allowed-patterns/paragraph-inside-group',
 	array(
 		'title'   => 'Test: Paragraph inside group',
-		'scope'   => array(
-			'inserter' => true,
-		),
 		'content' => '<!-- wp:group --><div class="wp-block-group"><!-- wp:paragraph --><p>Hello!</p><!-- /wp:paragraph --></div><!-- /wp:group -->',
 	)
 );
