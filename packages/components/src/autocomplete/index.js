@@ -251,9 +251,6 @@ function Autocomplete( {
 
 	useEffect( () => {
 		if ( ! textContent ) {
-			if ( AutocompleterUI ) {
-				reset();
-			}
 			return;
 		}
 

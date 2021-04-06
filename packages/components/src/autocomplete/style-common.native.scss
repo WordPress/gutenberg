@@ -1,3 +1,8 @@
+.wrapper {
+	width: 100%;
+	height: $mobile-header-toolbar-height;
+}
+
 .container {
 	height: $mobile-header-toolbar-height;
 	border-top-color: $gray-lighten-30;
@@ -53,7 +58,7 @@
 
 .activeItem {
 	border-radius: 6px;
-	background-color: $gray-lighten-30;
+	background-color: $light-ultra-dim;
 }
 
 .activeItemDark {
