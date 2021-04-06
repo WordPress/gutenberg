@@ -10,18 +10,11 @@ import { includes, pick } from 'lodash';
 import { isBlobURL } from '@wordpress/blob';
 import { useState, useRef } from '@wordpress/element';
 import { __, isRTL } from '@wordpress/i18n';
-import {
-	Notice,
-	PanelBody,
-	RangeControl,
-	ResizableBox,
-	Spinner,
-} from '@wordpress/components';
+import { Notice, ResizableBox, Spinner } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
 	BlockControls,
 	BlockIcon,
-	InspectorControls,
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
@@ -172,24 +165,6 @@ const SiteLogo = ( {
 
 	return (
 		<>
-			<InspectorControls>
-				<PanelBody title={ __( 'Site Logo Settings' ) }>
-					<RangeControl
-						label={ __( 'Image width' ) }
-						onChange={ ( newWidth ) =>
-							setAttributes( { width: newWidth } )
-						}
-						min={ minWidth }
-						max={ maxWidthBuffer }
-						initialPosition={ Math.min(
-							naturalWidth,
-							maxWidthBuffer
-						) }
-						value={ width || '' }
-						disabled={ ! isResizable }
-					/>
-				</PanelBody>
-			</InspectorControls>
 			<ResizableBox
 				size={ { width, height } }
 				showHandle={ isSelected }
