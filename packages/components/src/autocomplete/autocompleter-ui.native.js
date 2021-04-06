@@ -8,6 +8,7 @@ import {
 	Text,
 	TouchableOpacity,
 	ScrollView,
+	Platform,
 } from 'react-native';
 import { BlurView } from '@react-native-community/blur';
 
@@ -15,7 +16,6 @@ import { BlurView } from '@react-native-community/blur';
  * WordPress dependencies
  */
 import {
-	Platform,
 	useLayoutEffect,
 	useEffect,
 	useRef,
@@ -33,17 +33,22 @@ import styles from './style.scss';
 
 const { compose: stylesCompose } = StyleSheet;
 
-const BackgroundView = ( { children, containerStyles } ) => {
+const BackgroundView = ( { children } ) => {
+	const backgroundStyles = usePreferredColorSchemeStyle(
+		styles.background,
+		styles.backgroundDark
+	);
+
 	return Platform.OS === 'ios' ? (
 		<BlurView
-			style={ { height: 44 } }
+			style={ styles.backgroundBlur }
 			blurType="prominent"
 			blurAmount={ 10 }
 		>
 			{ children }
 		</BlurView>
 	) : (
-		<View style={ containerStyles }>{ children }</View>
+		<View style={ backgroundStyles }>{ children }</View>
 	);
 };
 
@@ -114,11 +119,6 @@ export function getAutoCompleterUI( autocompleter ) {
 			} );
 		}, [] );
 
-		const containerStyles = usePreferredColorSchemeStyle(
-			styles.container,
-			styles.containerDark
-		);
-
 		const contentStyles = {
 			transform: [
 				{
@@ -138,7 +138,7 @@ export function getAutoCompleterUI( autocompleter ) {
 			<AutocompletionItemsFill>
 				<View style={ styles.wrapper }>
 					<Animated.View style={ contentStyles }>
-						<BackgroundView containerStyles={ containerStyles }>
+						<BackgroundView>
 							<ScrollView
 								ref={ scrollViewRef }
 								horizontal

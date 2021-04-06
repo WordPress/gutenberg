@@ -3,16 +3,23 @@
 	height: $mobile-header-toolbar-height;
 }
 
-.container {
+.background {
 	height: $mobile-header-toolbar-height;
 	border-top-color: $gray-lighten-30;
 	border-top-width: 1px;
+	background-color: $app-background;
 }
 
-.containerDark {
+.backgroundDark {
 	border-top-color: $dark-quaternary;
 	border-bottom-width: 1px;
 	border-bottom-color: $dark-quaternary;
+	background-color: $app-background-dark-alt;
+}
+
+.backgroundBlur {
+	width: 100%;
+	height: $mobile-header-toolbar-height;
 }
 
 .content {
