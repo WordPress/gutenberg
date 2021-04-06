@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.0.0 (2021-04-06)
+
 ### Breaking Changes
 
 -   Passing a tuple of components with `as` prop to `ActionItem.Slot` component is no longer supported. Please pass a component with `as` prop instead ([#30417](https://github.com/WordPress/gutenberg/pull/30417)).
