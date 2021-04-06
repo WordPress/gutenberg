@@ -23,7 +23,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './style.scss';
 
-const Notice = ( { onNoticeHidden, content, id } ) => {
+const Notice = ( { onNoticeHidden, content, id, status } ) => {
 	const [ width, setWidth ] = useState( Dimensions.get( 'window' ).width );
 	const [ visible, setVisible ] = useState( true );
 
@@ -77,10 +77,20 @@ const Notice = ( { onNoticeHidden, content, id } ) => {
 		styles.noticeSolidDark
 	);
 
-	const textStyles = usePreferredColorSchemeStyle(
-		styles.text,
-		styles.textDark
+	const successTextStyles = usePreferredColorSchemeStyle(
+		styles.successText,
+		styles.successTextDark
 	);
+
+	const errorTextStyles = usePreferredColorSchemeStyle(
+		styles.errorText,
+		styles.errorTextDark
+	);
+
+	const textStyles = [
+		status === 'success' && successTextStyles,
+		status === 'error' && errorTextStyles,
+	];
 
 	return (
 		<>

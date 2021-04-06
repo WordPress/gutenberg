@@ -1,12 +1,23 @@
-.text {
+.successText {
 	color: #212121;
 	align-self: center;
 	background-color: transparent;
 	font-size: 12;
 }
 
-.textDark {
+.successTextDark {
 	color: $white;
+}
+
+.errorText {
+	color: $red-50;
+	align-self: center;
+	background-color: transparent;
+	font-size: 12;
+}
+
+.errorTextDark {
+	color: $red-30;
 }
 
 .list {
