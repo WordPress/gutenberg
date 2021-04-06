@@ -9,7 +9,7 @@ import { createBlock as create } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
 const PAGE_FIELDS = [ 'id', 'title', 'link', 'type', 'parent' ];
-const FETCH_ALL_PAGES = -1;
+const MAX_PAGE_COUNT = 100;
 
 export const convertSelectedBlockToNavigationLinks = ( {
 	pages,
@@ -17,9 +17,6 @@ export const convertSelectedBlockToNavigationLinks = ( {
 	replaceBlock,
 	createBlock,
 } ) => () => {
-	//TODO: handle resolving state
-	//TODO: test performance for lots of pages
-	//TODO: add related aria-labels
 	if ( ! pages ) {
 		return;
 	}
@@ -58,14 +55,27 @@ export const convertSelectedBlockToNavigationLinks = ( {
 };
 
 export default function ConvertToLinksModal( { onClose, clientId } ) {
-	const pages = useSelect(
+	const { pages, pagesFinished } = useSelect(
 		( select ) => {
-			const { getPages } = select( coreDataStore );
-			return getPages( {
-				per_page: FETCH_ALL_PAGES,
-				_fields: PAGE_FIELDS,
-				orderby: 'menu_order',
-			} );
+			const { getEntityRecords, hasFinishedResolution } = select(
+				coreDataStore
+			);
+			const query = [
+				'postType',
+				'page',
+				{
+					per_page: MAX_PAGE_COUNT,
+					_fields: PAGE_FIELDS,
+					orderby: 'menu_order',
+				},
+			];
+			return {
+				pages: getEntityRecords( ...query ),
+				pagesFinished: hasFinishedResolution(
+					'getEntityRecords',
+					query
+				),
+			};
 		},
 		[ clientId ]
 	);
@@ -94,6 +104,7 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 				</Button>
 				<Button
 					isPrimary
+					disabled={ ! pagesFinished }
 					onClick={ convertSelectedBlockToNavigationLinks( {
 						pages,
 						replaceBlock,

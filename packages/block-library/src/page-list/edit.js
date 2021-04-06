@@ -14,17 +14,25 @@ import {
 import ServerSideRender from '@wordpress/server-side-render';
 import { ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import apiFetch from '@wordpress/api-fetch';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
 import ConvertToLinksModal from './convert-to-links-modal';
 
+// We only show the edit option when page count is <= MAX_PAGE_COUNT
+// Performance of Navigation Links is not good past this value.
+const MAX_PAGE_COUNT = 100;
+
 export default function PageListEdit( { context, clientId } ) {
 	const { textColor, backgroundColor, showSubmenuIcon, style } =
 		context || {};
+
+	const [ allowConvertToLinks, setAllowConvertToLinks ] = useState( false );
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -37,7 +45,7 @@ export default function PageListEdit( { context, clientId } ) {
 		style: { ...style?.color },
 	} );
 
-	const allowConversionToLinks = useSelect(
+	const isParentNavigation = useSelect(
 		( select ) => {
 			const { getBlockParentsByBlockName } = select( blockEditorStore );
 			return (
@@ -48,20 +56,38 @@ export default function PageListEdit( { context, clientId } ) {
 		[ clientId ]
 	);
 
+	useEffect( () => {
+		if ( isParentNavigation ) {
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/pages', {
+					per_page: 1,
+					_fields: [ 'id' ],
+				} ),
+				parse: false,
+			} ).then( ( res ) => {
+				setAllowConvertToLinks(
+					res.headers.get( 'X-WP-Total' ) <= MAX_PAGE_COUNT
+				);
+			} );
+		} else {
+			setAllowConvertToLinks( false );
+		}
+	}, [ isParentNavigation ] );
+
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
 
 	return (
 		<>
-			{ allowConversionToLinks && (
+			{ allowConvertToLinks && (
 				<BlockControls group="other">
 					<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
 						{ __( 'Edit' ) }
 					</ToolbarButton>
 				</BlockControls>
 			) }
-			{ allowConversionToLinks && isOpen && (
+			{ allowConvertToLinks && isOpen && (
 				<ConvertToLinksModal
 					onClose={ closeModal }
 					clientId={ clientId }
