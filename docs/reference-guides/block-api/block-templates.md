@@ -61,6 +61,15 @@ registerBlockType( 'myplugin/template', {
 
 See the [Meta Block Tutorial](/docs/how-to-guides/metabox/meta-block-5-finishing.md) for a full example of a template in use.
 
+## Block Attributes
+
+To find a comprehensive list of all block attributes that you can define in a template, consult the block's `block.json` file, and look at the `attributes` and `supports` values.
+
+For example, [packages/block-library/src/heading/block.json](https://github.com/WordPress/gutenberg/blob/c62ccd80c7c6abb85740cf8745439029bf0f4d35/packages/block-library/src/heading/block.json#L5-L25) shows that the block has a `level` attribute, and supports the `anchor` parameter.
+
+If you don't have the Gutenberg plugin installed, you can find `block.json` files inside `wp-includes/blocks/heading/block.json`.
+
+
 ## Custom Post types
 
 A custom post type can register its own template during registration:

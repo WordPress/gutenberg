@@ -210,10 +210,6 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         callback([MediaInfo(id: 1, url: "https://cldup.com/Fz-ASbo2s3.jpg", type: "image")])
     }
 
-    func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent) {
-        print("Gutenberg loged user event")
-    }
-
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block) {
         print("Requesting Fallback for \(block)")
         let controller = try! WebViewController(block: block, userId: "0")
@@ -267,10 +263,6 @@ extension GutenbergViewController: GutenbergWebDelegate {
 }
 
 extension GutenbergViewController: GutenbergBridgeDataSource {
-    var isPreview: Bool {
-        return false
-    }
-
     func gutenbergLocale() -> String? {
         return Locale.preferredLanguages.first ?? "en"
     }

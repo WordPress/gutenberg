@@ -7,7 +7,6 @@ import { find, includes, get, hasIn, compact, uniq } from 'lodash';
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
-import deprecated from '@wordpress/deprecated';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 /**
@@ -284,20 +283,6 @@ export function* getEmbedPreview( url ) {
 		// Embed API 404s if the URL cannot be embedded, so we have to catch the error from the apiRequest here.
 		yield receiveEmbedPreview( url, false );
 	}
-}
-
-/**
- * Requests Upload Permissions from the REST API.
- *
- * @deprecated since 5.0. Callers should use the more generic `canUser()` selector instead of
- *            `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
- */
-export function* hasUploadPermissions() {
-	deprecated( "select( 'core' ).hasUploadPermissions()", {
-		since: '5.2',
-		alternative: "select( 'core' ).canUser( 'create', 'media' )",
-	} );
-	yield* canUser( 'create', 'media' );
 }
 
 /**

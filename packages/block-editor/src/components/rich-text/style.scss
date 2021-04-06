@@ -21,10 +21,6 @@
 		[data-rich-text-format-boundary] {
 			border-radius: 2px;
 		}
-
-		&:not(.keep-placeholder-on-focus) [data-rich-text-placeholder]::after {
-			display: none;
-		}
 	}
 }
 

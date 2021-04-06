@@ -11,10 +11,7 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_layout_support( $block_type ) {
-	$support_layout = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$support_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout' ), false );
-	}
+	$support_layout = gutenberg_block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	if ( $support_layout ) {
 		if ( ! $block_type->attributes ) {
 			$block_type->attributes = array();
@@ -37,10 +34,7 @@ function gutenberg_register_layout_support( $block_type ) {
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$support_layout = false;
-	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
-		$support_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout' ), false );
-	}
+	$support_layout = gutenberg_block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	if ( ! $support_layout || ! isset( $block['attrs']['layout'] ) ) {
 		return $block_content;
 	}
@@ -125,7 +119,7 @@ add_filter( 'render_block', 'gutenberg_render_layout_support_flag', 10, 2 );
  * @return string                Filtered block content.
  */
 function gutenberg_restore_group_inner_container( $block_content, $block ) {
-	$group_with_inner_container_regex = '/(^(\s|\S)*<div\b[^>]*wp-block-group(\s|")[^>]*>)(([\s]|\S)*<div\b[^>]*wp-block-group__inner-container(\s|")[^>]*>)((.|\S|\s)*)/';
+	$group_with_inner_container_regex = '/(^\s*<div\b[^>]*wp-block-group(\s|")[^>]*>)(\s*<div\b[^>]*wp-block-group__inner-container(\s|")[^>]*>)((.|\S|\s)*)/';
 
 	if (
 		'core/group' !== $block['blockName'] ||
@@ -135,15 +129,14 @@ function gutenberg_restore_group_inner_container( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$replace_regex   = '/(^(\s|\S)*<div\b[^>]*wp-block-group[^>]*>)((.|\S|\s)*)(<\/div>(\s|\S)*$)/m';
+	$replace_regex   = '/(^\s*<div\b[^>]*wp-block-group[^>]*>)(.*)(<\/div>\s*$)/ms';
 	$updated_content = preg_replace_callback(
 		$replace_regex,
 		function( $matches ) {
-			return $matches[1] . '<div class="wp-block-group__inner-container">' . $matches[3] . '</div>' . $matches[5];
+			return $matches[1] . '<div class="wp-block-group__inner-container">' . $matches[2] . '</div>' . $matches[3];
 		},
 		$block_content
 	);
-
 	return $updated_content;
 }
 
