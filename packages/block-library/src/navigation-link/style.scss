@@ -15,7 +15,7 @@
 		}
 	}
 
-	// Margin when justified right or space-between.
+	// Margin of right-most margin should be zero, for right aligned or justified items.
 	.wp-block-navigation__container > .wp-block-pages-list__item:last-child,
 	.wp-block-navigation__container > .wp-block-navigation-link:last-child {
 		margin-right: 0;
@@ -178,6 +178,27 @@
 			> .submenu-container {
 				visibility: visible;
 				opacity: 1;
+			}
+		}
+	}
+
+
+	// When justified space-between, open submenus leftward for last menu item.
+	// When justified right, open all submenus leftwards.
+	&.items-justified-space-between > .submenu-container > .has-child:last-child,
+	&.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
+	&.items-justified-right .has-child {
+		// First submenu.
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			left: auto;
+			right: 0;
+
+			// Nested submenus.
+			.submenu-container,
+			.wp-block-navigation-link__container {
+				left: auto;
+				right: 100%;
 			}
 		}
 	}
