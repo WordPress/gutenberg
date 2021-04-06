@@ -216,6 +216,7 @@ $arrow-size: 8px;
 
 	.components-popover:not([data-y-axis="middle"])[data-x-axis="left"] & {
 		margin-right: -($grid-unit-30 + $border-width);
+		width: 286px;
 	}
 }
 
