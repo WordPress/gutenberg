@@ -313,16 +313,16 @@ export default function SearchEdit( {
 	);
 
 	const getWrapperStyles = () => {
-		if ( 'button-inside' !== buttonPosition || ! style?.border?.radius ) {
-			return undefined;
+		if ( 'button-inside' === buttonPosition && style?.border?.radius ) {
+			// We have button inside wrapper and a border radius value to apply.
+			// Add default padding so we don't get "fat" corners.
+			const outerRadius =
+				parseInt( style?.border?.radius, 10 ) + DEFAULT_INNER_PADDING;
+
+			return { borderRadius: `${ outerRadius }px` };
 		}
 
-		// We have button inside wrapper and a border radius value to apply.
-		// Add default padding so we don't get "fat" corners.
-		const outerRadius =
-			parseInt( style?.border?.radius, 10 ) + DEFAULT_INNER_PADDING;
-
-		return { borderRadius: `${ outerRadius }px` };
+		return undefined;
 	};
 
 	const blockProps = useBlockProps( {
