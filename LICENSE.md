@@ -43,7 +43,7 @@ and
 ### Dual License 
 
 **We are currently in the process of changing Gutenberg’s software license from
-GPL (or later) to a dual license: GPL (or later) and MPL.**
+GPL to a dual license: GPL and MPL.**
 
 **This process involves two independent steps (1) obtaining permission for dual
 licensing from contributors of already contributed Gutenberg code and (2)
