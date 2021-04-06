@@ -17,10 +17,11 @@
 	line-height: initial;
 	color: initial;
 
-	// For full-wide blocks, we compensate for these 10px.
+	// For full-wide blocks, we compensate for the base padding.
+	// These margins should match the padding value above.
 	.block-editor-block-list__layout.is-root-container > .wp-block[data-align="full"] {
-		margin-left: -10px;
-		margin-right: -10px;
+		margin-left: -8px;
+		margin-right: -8px;
 	}
 
 	.wp-align-wrapper {
