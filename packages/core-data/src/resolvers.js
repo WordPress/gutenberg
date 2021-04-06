@@ -111,7 +111,7 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 
 		// eslint-disable-next-line @wordpress/no-unused-vars-before-return
 		const path = addQueryArgs( entity.baseURL + '/' + key, {
-			...entity.params,
+			...entity.URLparams,
 			...query,
 		} );
 

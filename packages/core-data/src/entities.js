@@ -39,24 +39,24 @@ export const defaultEntities = [
 		kind: 'root',
 		key: 'slug',
 		baseURL: '/wp/v2/types',
-		params: { context: 'edit' },
+		URLparams: { context: 'edit' },
 	},
 	{
 		name: 'media',
 		kind: 'root',
 		baseURL: '/wp/v2/media',
+		URLparams: { context: 'edit' },
 		plural: 'mediaItems',
 		label: __( 'Media' ),
-		params: { context: 'edit' },
 	},
 	{
 		name: 'taxonomy',
 		kind: 'root',
 		key: 'slug',
 		baseURL: '/wp/v2/taxonomies',
+		URLparams: { context: 'edit' },
 		plural: 'taxonomies',
 		label: __( 'Taxonomy' ),
-		params: { context: 'edit' },
 	},
 	{
 		name: 'sidebar',
@@ -70,59 +70,59 @@ export const defaultEntities = [
 		name: 'widget',
 		kind: 'root',
 		baseURL: '/wp/v2/widgets',
+		URLparams: { context: 'edit' },
 		plural: 'widgets',
 		transientEdits: { blocks: true },
 		label: __( 'Widgets' ),
-		params: { context: 'edit' },
 	},
 	{
 		name: 'widgetType',
 		kind: 'root',
 		baseURL: '/wp/v2/widget-types',
+		URLparams: { context: 'edit' },
 		plural: 'widgetTypes',
 		label: __( 'Widget types' ),
-		params: { context: 'edit' },
 	},
 	{
 		label: __( 'User' ),
 		name: 'user',
 		kind: 'root',
 		baseURL: '/wp/v2/users',
+		URLparams: { context: 'edit' },
 		plural: 'users',
-		params: { context: 'edit' },
 	},
 	{
 		name: 'comment',
 		kind: 'root',
 		baseURL: '/wp/v2/comments',
+		URLparams: { context: 'edit' },
 		plural: 'comments',
 		label: __( 'Comment' ),
-		params: { context: 'edit' },
 	},
 	{
 		name: 'menu',
 		kind: 'root',
 		baseURL: '/__experimental/menus',
+		URLparams: { context: 'edit' },
 		plural: 'menus',
 		label: __( 'Menu' ),
-		params: { context: 'edit' },
 	},
 	{
 		name: 'menuItem',
 		kind: 'root',
 		baseURL: '/__experimental/menu-items',
+		URLparams: { context: 'edit' },
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
-		params: { context: 'edit' },
 	},
 	{
 		name: 'menuLocation',
 		kind: 'root',
 		baseURL: '/__experimental/menu-locations',
+		URLparams: { context: 'edit' },
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
 		key: 'name',
-		params: { context: 'edit' },
 	},
 ];
 
@@ -175,6 +175,7 @@ function* loadPostTypeEntities() {
 		return {
 			kind: 'postType',
 			baseURL: '/wp/v2/' + postType.rest_base,
+			URLparams: { context: 'edit' },
 			name,
 			label: postType.labels.singular_name,
 			transientEdits: {
@@ -186,7 +187,6 @@ function* loadPostTypeEntities() {
 				record?.title?.rendered ||
 				record?.title ||
 				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
-			params: { context: 'edit' },
 			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 		};
 	} );
@@ -205,9 +205,9 @@ function* loadTaxonomyEntities() {
 		return {
 			kind: 'taxonomy',
 			baseURL: '/wp/v2/' + taxonomy.rest_base,
+			URLparams: { context: 'edit' },
 			name,
 			label: taxonomy.labels.singular_name,
-			params: { context: 'edit' },
 		};
 	} );
 }
