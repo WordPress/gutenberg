@@ -472,6 +472,7 @@ class WP_Theme_JSON_Resolver {
 			),
 			'map_meta_cap' => true,
 			'supports'     => array(
+				'title',
 				'editor',
 				'revisions',
 			),
