@@ -14,6 +14,7 @@ const minimumUsersForCombobox = 25;
 
 function PostAuthor() {
 	const showCombobox = useSelect( ( select ) => {
+		// Not using `getUsers()` because it requires `list_users` capability.
 		const authors = select( coreStore ).getAuthors();
 		return authors?.length >= minimumUsersForCombobox;
 	}, [] );
