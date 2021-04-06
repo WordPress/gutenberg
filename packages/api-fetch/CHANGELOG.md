@@ -2,8 +2,6 @@
 
 ## Unreleased
 
-## 3.23.0 (2021-04-02)
-
 ### New Feature
 
 - Publish TypeScript definitions.
