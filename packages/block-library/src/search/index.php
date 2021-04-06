@@ -56,11 +56,11 @@ function render_block_core_search( $attributes ) {
 
 	if ( $show_input ) {
 		$input_markup = sprintf(
-			'<input type="search" id="%s" class="wp-block-search__input"%s name="s" value="%s" placeholder="%s" required />',
+			'<input type="search" id="%s" class="wp-block-search__input" name="s" value="%s" placeholder="%s" %s required />',
 			$input_id,
-			$inline_styles['shared'],
 			esc_attr( get_search_query() ),
-			esc_attr( $attributes['placeholder'] )
+			esc_attr( $attributes['placeholder'] ),
+			$inline_styles['shared']
 		);
 	}
 
