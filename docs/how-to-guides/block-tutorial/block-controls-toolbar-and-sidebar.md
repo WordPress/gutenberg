@@ -229,8 +229,8 @@ registerBlockType( 'create-block/gutenpride', {
 
 		return (
 			<div { ...useBlockProps() }>
-				<InspectorControls key="settting">
-					<div id="gutenpride-controlls">
+				<InspectorControls key="setting">
+					<div id="gutenpride-controls">
 						<fieldset>
 							<legend className="blocks-base-control__label">
 								{ __( 'Background color', 'gutenpride' ) }
