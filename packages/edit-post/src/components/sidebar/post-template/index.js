@@ -6,7 +6,7 @@ import { kebabCase } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import {
 	PanelRow,
 	Button,
@@ -16,7 +16,7 @@ import {
 	FlexItem,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { createInterpolateElement, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { store as editorStore } from '@wordpress/editor';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -63,42 +63,30 @@ function PostTemplate() {
 		<PanelRow className="edit-post-post-template">
 			<span>{ __( 'Template' ) }</span>
 			{ ! isEditing && (
-				<span className="edit-post-post-template__value">
-					{ !! template &&
-						createInterpolateElement(
-							sprintf(
-								/* translators: 1: Template name. */
-								__( '%s (<a>Edit</a>)' ),
-								template.slug
-							),
-							{
-								a: (
-									<Button
-										isLink
-										onClick={ () =>
-											__unstableSwitchToTemplateMode()
-										}
-									>
-										{ __( 'Edit' ) }
-									</Button>
-								),
-							}
+				<div className="edit-post-post-template__value">
+					<div>
+						{ !! template && template?.title?.raw }
+						{ !! template &&
+							! template?.title?.raw &&
+							template.slug }
+						{ ! template && __( 'Default' ) }
+					</div>
+					<div className="edit-post-post-template__actions">
+						{ !! template && (
+							<Button
+								isLink
+								onClick={ () =>
+									__unstableSwitchToTemplateMode()
+								}
+							>
+								{ __( 'Edit' ) }
+							</Button>
 						) }
-					{ ! template &&
-						createInterpolateElement(
-							__( 'Default (<create />)' ),
-							{
-								create: (
-									<Button
-										isLink
-										onClick={ () => setIsModalOpen( true ) }
-									>
-										{ __( 'Create custom template' ) }
-									</Button>
-								),
-							}
-						) }
-				</span>
+						<Button isLink onClick={ () => setIsModalOpen( true ) }>
+							{ __( 'New' ) }
+						</Button>
+					</div>
+				</div>
 			) }
 			{ isEditing && (
 				<span className="edit-post-post-template__value">
