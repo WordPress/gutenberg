@@ -1,12 +1,3 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
--   [create-style-system](#create-style-system)
-    -   [styled](#styled)
-    -   [Polymorphic Component](#polymorphic-component)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # create-style-system
 
 This module creates the `styled` utility as well as the overall style system.
@@ -61,7 +52,7 @@ Now any child component `Text` of `Container` will be targeted with the `color: 
 
 ## Polymorphic Component
 
-This module also exposes the concept of the Polymorphic Component. This concept is not new to G2 but G2 uses it extensively and it is one of the more powerful aspects of G2's style system.
+This module also exposes the concept of the Polymorphic Component. This concept is not new to this style system but the style and component system use it extensively and it is one of the more powerful aspects of this style system.
 
 Poylmorphic components are able to accept an `as` prop that will accept any React component or JSX Element name. For example:
 
@@ -87,7 +78,7 @@ As you can see, the component polymorphism allows you to powerfully compose the 
 
 Component polymorphism is documented via the `PolymorphicComponent` type in `polymorphic-component.ts`.
 
-The same module also exposes a `ViewOwnProps` type which gives the `css` and `as` props to a regular `Props` interface:
+The same module also exposes a `ViewOwnProps` type which gives the `as` props to a regular `Props` interface:
 
 ```tsx
 interface Props {

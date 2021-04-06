@@ -1,15 +1,8 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
--   [plugins](#plugins)
-    -   [Extra Specificity](#extra-specificity)
-    -   [CSS Variable Fallback](#css-variable-fallback)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # plugins
 
-This foler contains all the applied plugins in G2.
+This foler contains all the applied plugins in the style system.
+
+**Nota bene**: All of the plugins can be removed once IE11 support is officially dropped.
 
 ## Extra Specificity
 

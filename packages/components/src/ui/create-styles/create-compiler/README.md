@@ -1,14 +1,3 @@
-<!-- START doctoc generated TOC please keep comment here to allow auto update -->
-<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-
--   [create-compiler](#create-compiler)
-    -   [Breakpoint values](#breakpoint-values)
-    -   [Plugins](#plugins)
-    -   [Custom iframe support](#custom-iframe-support)
-    -   [Interplated Components](#interplated-components)
-
-<!-- END doctoc generated TOC please keep comment here to allow auto update -->
-
 # create-compiler
 
 This module creates the Emotion instance that backs the style system. It integrates plugins and creates the core `css` function that wraps Emotion's `css` function adding support for breakpoint values on each property.
@@ -33,9 +22,7 @@ The individual plugins are documented in [`plugins/README.md`](./plugins/README.
 
 ## Custom iframe support
 
-Emotion by default does not support iframe styling. The G2 solves this by implementing a custom `sheet.insert` that exposes a `sheet.insert` event which can be listened to by style providers to receive styles from outside of the current iframe.
-
-(Q, please fill in some more of the implementation details to this).
+Emotion by default does not support iframe styling. This style system solves this by implementing a custom `sheet.insert` that exposes a `sheet.insert` event which can be listened to by style providers to receive styles from outside of the current iframe.
 
 ## Interplated Components
 
