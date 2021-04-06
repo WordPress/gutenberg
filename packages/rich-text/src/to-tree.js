@@ -305,6 +305,8 @@ export function toTree( {
 						// selection. The placeholder is also not editable after
 						// all.
 						contenteditable: 'false',
+						style:
+							'pointer-events:none;user-select:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;',
 					},
 				} );
 			}

@@ -32,6 +32,7 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/data-controls": "file:../data-controls",
 		"@wordpress/element": "file:../element",
+		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/url": "file:../url",
