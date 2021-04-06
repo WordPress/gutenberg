@@ -44,7 +44,7 @@ describe( 'getEntityRecord', () => {
 				name: 'postType',
 				kind: 'root',
 				baseURL: '/wp/v2/types',
-				params: { context: 'edit' },
+				baseURLParams: { context: 'edit' },
 			},
 		];
 		const fulfillment = getEntityRecord( 'root', 'postType', 'post' );
