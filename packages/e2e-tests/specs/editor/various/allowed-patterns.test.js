@@ -20,9 +20,9 @@ const isPatternAvailable = async ( name ) => {
 };
 
 const TEST_PATTERNS = [
-	[ 'Test: Single heading', false ],
-	[ 'Test: Single paragraph', true ],
-	[ 'Test: Paragraph inside group', true ],
+	[ 'Test: Single heading', true ],
+	[ 'Test: Single paragraph', false ],
+	[ 'Test: Paragraph inside group', false ],
 ];
 
 describe( 'Allowed Patterns', () => {
@@ -37,11 +37,11 @@ describe( 'Allowed Patterns', () => {
 	} );
 
 	describe( 'Disable blocks plugin disabled', () => {
-		it( 'should show test patterns', async () => {
-			for ( const [ patternName ] of TEST_PATTERNS ) {
+		for ( const [ patternName ] of TEST_PATTERNS ) {
+			it( `should show test pattern "${ patternName }"`, async () => {
 				expect( await isPatternAvailable( patternName ) ).toBe( true );
-			}
-		} );
+			} );
+		}
 	} );
 
 	describe( 'Disable blocks plugin enabled', () => {
@@ -56,12 +56,14 @@ describe( 'Allowed Patterns', () => {
 			);
 		} );
 
-		it( 'should not show test patterns', async () => {
-			for ( const [ patternName, shouldBeAvailable ] of TEST_PATTERNS ) {
+		for ( const [ patternName, shouldBeAvailable ] of TEST_PATTERNS ) {
+			it( `should${
+				shouldBeAvailable ? '' : ' not'
+			} show test "pattern ${ patternName }"`, async () => {
 				expect( await isPatternAvailable( patternName ) ).toBe(
 					shouldBeAvailable
 				);
-			}
-		} );
+			} );
+		}
 	} );
 } );
