@@ -145,7 +145,7 @@ function _gutenberg_add_template_part_area_info( $template_info ) {
  *
  * @return array block references to the passed blocks and their inner blocks.
  */
-function _get_blocks_recursive( &$blocks ) {
+function _flatten_blocks( &$blocks ) {
 	$all_blocks = array();
 	$queue      = array();
 	foreach ( $blocks as &$block ) {
@@ -179,7 +179,7 @@ function _inject_theme_attribute_in_content( $template_content ) {
 	$new_content         = '';
 	$template_blocks     = parse_blocks( $template_content );
 
-	$blocks = _get_blocks_recursive( $template_blocks );
+	$blocks = _flatten_blocks( $template_blocks );
 	foreach ( $blocks as &$block ) {
 		if (
 			'core/template-part' === $block['blockName'] &&
