@@ -72,7 +72,18 @@ export default function PostExcerptEditor( {
 			</div>
 		);
 	}
-
+	const readMoreLink = (
+		<RichText
+			className="wp-block-post-excerpt__more-link"
+			tagName="a"
+			aria-label={ __( 'Read more link text' ) }
+			placeholder={ __( 'Read more…' ) }
+			value={ moreText }
+			onChange={ ( newMoreText ) =>
+				setAttributes( { moreText: newMoreText } )
+			}
+		/>
+	);
 	return (
 		<>
 			<BlockControls>
@@ -124,26 +135,10 @@ export default function PostExcerptEditor( {
 				{ ! showMoreOnNewLine && ' ' }
 				{ showMoreOnNewLine ? (
 					<p className="wp-block-post-excerpt__more-text">
-						<RichText
-							tagName="a"
-							aria-label={ __( 'Read more link text' ) }
-							placeholder={ __( 'Read more…' ) }
-							value={ moreText }
-							onChange={ ( newMoreText ) =>
-								setAttributes( { moreText: newMoreText } )
-							}
-						/>
+						{ readMoreLink }
 					</p>
 				) : (
-					<RichText
-						tagName="a"
-						aria-label={ __( 'Read more link text' ) }
-						placeholder={ __( 'Read more…' ) }
-						value={ moreText }
-						onChange={ ( newMoreText ) =>
-							setAttributes( { moreText: newMoreText } )
-						}
-					/>
+					readMoreLink
 				) }
 			</div>
 		</>
