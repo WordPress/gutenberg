@@ -18,6 +18,7 @@ import { isRTL, _n, sprintf } from '@wordpress/i18n';
  * Module Constants
  */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
 
 function DatePickerDay( { day, events = [] } ) {
 	const ref = useRef();
@@ -29,17 +30,19 @@ function DatePickerDay( { day, events = [] } ) {
 	 * This attribute is handled by the react-dates component.
 	 */
 	useEffect( () => {
-		// Bail early when no events.
-		if ( ! events.length ) {
-			return;
-		}
-
 		// Bail when no parent node.
 		if ( ! ref?.current?.parentNode ) {
 			return;
 		}
 
 		const { parentNode } = ref.current;
+		const dayAriaLabel = moment( day ).format( ARIAL_LABEL_TIME_FORMAT );
+
+		if ( ! events.length ) {
+			// Set aria-label without event description.
+			parentNode.setAttribute( 'aria-label', dayAriaLabel );
+			return;
+		}
 
 		const eventsString = sprintf(
 			/* translators: %d: number of calendar events. */
@@ -47,13 +50,10 @@ function DatePickerDay( { day, events = [] } ) {
 			events.length
 		);
 
-		const initAriaLabel =
-			parentNode
-				.getAttribute( 'aria-label' )
-				.replace( /\. There (?:are|is) \d+ event\s?/, '' ) +
-			`. ${ eventsString }`;
-
-		parentNode.setAttribute( 'aria-label', initAriaLabel );
+		parentNode.setAttribute(
+			'aria-label',
+			`${ dayAriaLabel }. ${ eventsString }`
+		);
 	}, [ ref, events.length ] );
 
 	return (
@@ -177,6 +177,7 @@ class DatePicker extends Component {
 					onDateChange={ this.onChangeMoment }
 					transitionDuration={ 0 }
 					weekDayFormat="ddd"
+					dayAriaLabelFormat={ ARIAL_LABEL_TIME_FORMAT } // Friday, F j, 2021. There is 1 event
 					isRTL={ isRTL() }
 					isOutsideRange={ ( date ) => {
 						return isInvalidDate && isInvalidDate( date.toDate() );
