@@ -1,5 +1,11 @@
 .edit-site-template-part-converter__modal {
 	z-index: z-index(".edit-site-template-part-converter__modal");
+
+	.components-modal__frame {
+		@include break-small {
+			max-width: 500px;
+		}
+	}
 }
 
 
@@ -12,32 +18,41 @@
 	cursor: auto;
 }
 
-.edit-site-template-part-converter__area-composite {
+.edit-site-template-part-converter__area-radio-group {
 	width: 100%;
 	border: $border-width solid $gray-700;
 	border-radius: 2px;
 
-	.edit-site-template-part-converter__area-button {
+	.components-button.edit-site-template-part-converter__area-radio {
 		display: block;
 		width: 100%;
 		height: 100%;
 		text-align: left;
 		padding: $grid-unit-15;
 
-		border-bottom: $border-width solid $gray-700;
-		border-radius: 0;
+		&,
+		&.is-secondary:hover,
+		&.is-primary:hover {
+			margin: 0;
+			background-color: inherit;
+			border-bottom: $border-width solid $gray-700;
+			border-radius: 0;
 
-		&:focus {
-			border-bottom: $border-width solid $white;
-		}
+			&:not(:focus) {
+				box-shadow: none;
+			}
 
-		&:last-of-type {
-			border: none;
+			&:focus {
+				border-bottom: $border-width solid $white;
+			}
+
+			&:last-of-type {
+				border-bottom: none;
+			}
 		}
 
 		&:not(:hover),
-		&.is-selected {
-			opacity: 1;
+		&[aria-checked="true"] {
 			color: $gray-900;
 			cursor: auto;
 
@@ -48,15 +63,17 @@
 
 		.components-flex__block {
 			padding-top: $grid-unit-05;
-
-			@include break-small {
-				max-width: 320px;
-			}
+			white-space: normal;
 
 			div {
 				padding-top: $grid-unit-05;
 				font-size: $helptext-font-size;
 			}
+		}
+
+		.edit-site-template-part-converter__checkbox {
+			margin-left: auto;
+			min-width: $grid-unit-30;
 		}
 	}
 }

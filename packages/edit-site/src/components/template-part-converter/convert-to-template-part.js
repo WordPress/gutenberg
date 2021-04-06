@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { kebabCase } from 'lodash';
-import classnames from 'classnames';
 
 /**
  * WordPress dependencies
@@ -22,12 +21,10 @@ import {
 	FlexBlock,
 	Button,
 	Modal,
-	__unstableComposite as Composite,
-	__unstableCompositeItem as CompositeItem,
-	__unstableUseCompositeState as useCompositeState,
+	__experimentalRadioGroup as RadioGroup,
+	__experimentalRadio as Radio,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-
 import { createBlock, serialize } from '@wordpress/blocks';
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
@@ -44,7 +41,6 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 	const [ area, setArea ] = useState( 'uncategorized' );
-	const composite = useCompositeState();
 
 	const templatePartAreas = useSelect(
 		( select ) =>
@@ -116,12 +112,12 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 									id={ `edit-site-template-part-converter__area-selection-${ instanceId }` }
 									className="edit-site-template-part-converter__area-base-control"
 								>
-									<Composite
-										className="edit-site-template-part-converter__area-composite"
-										role="group"
+									<RadioGroup
+										label={ __( 'Area' ) }
+										className="edit-site-template-part-converter__area-radio-group"
 										id={ `edit-site-template-part-converter__area-selection-${ instanceId }` }
-										aria-label={ __( 'Area' ) }
-										{ ...composite }
+										onChange={ setArea }
+										checked={ area }
 									>
 										{ templatePartAreas.map(
 											( {
@@ -130,24 +126,10 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 												area: value,
 												description,
 											} ) => (
-												<CompositeItem
-													role="radio"
-													as={ Button }
+												<Radio
 													key={ label }
-													onClick={ () =>
-														setArea( value )
-													}
-													className={ classnames(
-														'edit-site-template-part-converter__area-button',
-														{
-															'is-selected':
-																area === value,
-														}
-													) }
-													aria-checked={
-														area === value
-													}
-													{ ...composite }
+													value={ value }
+													className="edit-site-template-part-converter__area-radio"
 												>
 													<Flex
 														align="start"
@@ -164,20 +146,22 @@ export default function ConvertToTemplatePart( { clientIds, blocks } ) {
 																{ description }
 															</div>
 														</FlexBlock>
-														{ area === value && (
-															<FlexItem>
+
+														<FlexItem className="edit-site-template-part-converter__checkbox">
+															{ area ===
+																value && (
 																<Icon
 																	icon={
 																		check
 																	}
 																/>
-															</FlexItem>
-														) }
+															) }
+														</FlexItem>
 													</Flex>
-												</CompositeItem>
+												</Radio>
 											)
 										) }
-									</Composite>
+									</RadioGroup>
 								</BaseControl>
 								<Flex
 									className="edit-site-template-part-converter__convert-modal-actions"
