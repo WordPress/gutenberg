@@ -11,6 +11,21 @@ import remove from './remove';
 import unwrap from './unwrap';
 import { isPhrasingContent } from '../phrasing-content';
 import insertAfter from './insert-after';
+import isElement from './is-element';
+
+/* eslint-disable jsdoc/valid-types */
+/**
+ * @typedef SchemaItem
+ * @property {string[]} [attributes] Attributes.
+ * @property {(string | RegExp)[]} [classes] Classnames or RegExp to test against.
+ * @property {'*' | { [tag: string]: SchemaItem }} [children] Child schemas.
+ * @property {string[]} [require] Selectors to test required children against. Leave empty or undefined if there are no requirements.
+ * @property {boolean} allowEmpty Whether to allow nodes without children.
+ * @property {(node: Node) => boolean} [isMatch] Function to test whether a node is a match. If left undefined any node will be assumed to match.
+ */
+
+/** @typedef {{ [tag: string]: SchemaItem }} Schema */
+/* eslint-enable jsdoc/valid-types */
 
 /**
  * Given a schema, unwraps or removes nodes, attributes and classes on a node
@@ -18,20 +33,22 @@ import insertAfter from './insert-after';
  *
  * @param {NodeList} nodeList The nodeList to filter.
  * @param {Document} doc      The document of the nodeList.
- * @param {Object}   schema   An array of functions that can mutate with the provided node.
- * @param {Object}   inline   Whether to clean for inline mode.
+ * @param {Schema}   schema   An array of functions that can mutate with the provided node.
+ * @param {boolean}  inline   Whether to clean for inline mode.
  */
 export default function cleanNodeList( nodeList, doc, schema, inline ) {
-	Array.from( nodeList ).forEach( ( node ) => {
+	Array.from( nodeList ).forEach( (
+		/** @type {Node & { nextElementSibling?: unknown }} */ node
+	) => {
 		const tag = node.nodeName.toLowerCase();
 
 		// It's a valid child, if the tag exists in the schema without an isMatch
 		// function, or with an isMatch function that matches the node.
 		if (
 			schema.hasOwnProperty( tag ) &&
-			( ! schema[ tag ].isMatch || schema[ tag ].isMatch( node ) )
+			( ! schema[ tag ].isMatch || schema[ tag ].isMatch?.( node ) )
 		) {
-			if ( node.nodeType === node.ELEMENT_NODE ) {
+			if ( isElement( node ) ) {
 				const {
 					attributes = [],
 					classes = [],
@@ -64,9 +81,11 @@ export default function cleanNodeList( nodeList, doc, schema, inline ) {
 					if ( node.classList && node.classList.length ) {
 						const mattchers = classes.map( ( item ) => {
 							if ( typeof item === 'string' ) {
-								return ( className ) => className === item;
+								return ( /** @type {string} */ className ) =>
+									className === item;
 							} else if ( item instanceof RegExp ) {
-								return ( className ) => item.test( className );
+								return ( /** @type {string} */ className ) =>
+									item.test( className );
 							}
 
 							return noop;
@@ -113,6 +132,7 @@ export default function cleanNodeList( nodeList, doc, schema, inline ) {
 							// contains children that are block content, unwrap
 							// the node because it is invalid.
 						} else if (
+							node.parentNode &&
 							node.parentNode.nodeName === 'BODY' &&
 							isPhrasingContent( node )
 						) {
