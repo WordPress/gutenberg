@@ -15,7 +15,7 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 	setFeaturedImage,
-	checkIfFeaturedImage,
+	// checkIfFeaturedImage,
 	subscribeFeaturedImageIdCurrent,
 } from '@wordpress/react-native-bridge';
 import {
@@ -162,7 +162,7 @@ export class ImageEdit extends Component {
 
 		// Check whether an image is featured when the editor first loads.
 		if ( attributes.id ) {
-			this.onCheckFeatured();
+			//	this.onCheckFeatured();
 		}
 
 		this.addFeaturedImageIdListener();
@@ -190,7 +190,7 @@ export class ImageEdit extends Component {
 			const url = getUrlForSlug( image, attributes ) || image.source_url;
 			this.props.setAttributes( { url } );
 			// Check whether an image is featured when changes happen, such as when image is replaced within block.
-			this.onCheckFeatured();
+			//		this.onCheckFeatured();
 		}
 	}
 
@@ -292,8 +292,8 @@ export class ImageEdit extends Component {
 	}
 
 	onCheckFeatured() {
-		const { attributes } = this.props;
-		checkIfFeaturedImage( attributes.id );
+		// const { attributes } = this.props;
+		// checkIfFeaturedImage( attributes.id );
 	}
 
 	onSetFeatured() {
@@ -672,12 +672,21 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( coreStore );
 		const { getSettings } = select( blockEditorStore );
+		const { getEditedPostAttribute } = select( 'core/editor' );
 		const {
 			attributes: { id, url },
 			isSelected,
 		} = props;
 		const { imageSizes, imageDefaultSize } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
+
+		const featuredImageId = getEditedPostAttribute( 'featured_media' );
+
+		// Temporary logging to check whether getEditedPostAttribute( 'featured_media' ) works as expected.
+		// The post's featured image ID should be returned when the editor loads.
+		// console.log(
+		//	'getEditedPostAttribute: Log from JS: ' + featuredImageId
+		// );
 
 		const shouldGetMedia =
 			( isSelected && isNotFileUrl ) ||
@@ -691,6 +700,7 @@ export default compose( [
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
 			imageDefaultSize,
+			featuredImageId,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {

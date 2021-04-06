@@ -107,6 +107,7 @@ class Editor extends Component {
 			post,
 			postId,
 			postType,
+			featuredMedia,
 			initialHtml,
 			...props
 		} = this.props;
@@ -124,6 +125,7 @@ class Editor extends Component {
 			title: {
 				raw: props.initialTitle || '',
 			},
+			featured_media: featuredMedia,
 			content: {
 				// make sure the post content is in sync with gutenberg store
 				// to avoid marking the post as modified when simply loaded
