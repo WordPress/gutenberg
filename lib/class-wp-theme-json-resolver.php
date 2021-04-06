@@ -362,6 +362,7 @@ class WP_Theme_JSON_Resolver {
 				array(
 					'post_content' => '{}',
 					'post_status'  => 'publish',
+					'post_title'   => __( 'Custom Styles' ),
 					'post_type'    => $post_type_filter,
 					'post_name'    => $post_name_filter,
 				),
