@@ -177,7 +177,7 @@ class DatePicker extends Component {
 					onDateChange={ this.onChangeMoment }
 					transitionDuration={ 0 }
 					weekDayFormat="ddd"
-					dayAriaLabelFormat={ ARIAL_LABEL_TIME_FORMAT } // Friday, F j, 2021. There is 1 event
+					dayAriaLabelFormat={ ARIAL_LABEL_TIME_FORMAT }
 					isRTL={ isRTL() }
 					isOutsideRange={ ( date ) => {
 						return isInvalidDate && isInvalidDate( date.toDate() );
