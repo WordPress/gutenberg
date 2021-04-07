@@ -91,8 +91,9 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 			onRequestClose={ onClose }
 			title={ __( 'Convert to links' ) }
 			className={ 'wp-block-page-list-modal' }
+			aria={ { describedby: 'wp-block-page-list-modal__description' } }
 		>
-			<p>
+			<p id={ 'wp-block-page-list-modal__description' }>
 				{ __(
 					'To edit this navigation menu, convert it to single page links. This allows you to add re-order, remove items, or edit their labels.'
 				) }
