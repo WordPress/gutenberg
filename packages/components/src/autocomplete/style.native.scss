@@ -5,15 +5,10 @@
 
 .background {
 	height: $mobile-header-toolbar-height;
-	border-top-color: $gray-lighten-30;
-	border-top-width: 1px;
-	background-color: $app-background;
+	background-color: $gray-0;
 }
 
 .backgroundDark {
-	border-top-color: $dark-quaternary;
-	border-bottom-width: 1px;
-	border-bottom-color: $dark-quaternary;
 	background-color: $app-background-dark-alt;
 }
 
@@ -60,15 +55,16 @@
 .activeText {
 	color: $gray-dark;
 	text-decoration: underline;
-	text-decoration-color: $toolbar-button;
+	text-decoration-color: $gray-darken-30;
 }
 
 .activeTextDark {
+	color: $gray-20;
 	text-decoration-color: $gray-20;
 }
 
 .activeItem {
-	border-radius: 6px;
+	border-radius: 22px;
 	background-color: transparentize($color: $gray-darken-20, $amount: 0.9);
 }
 
