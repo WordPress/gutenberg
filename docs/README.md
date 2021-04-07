@@ -33,7 +33,7 @@ Whether you want to extend the functionality of the block editor, or create a pl
 - [Creating Block Patterns](/docs/reference-guides/block-api/block-patterns.md)
 - [Theming for the Block Editor](/docs/how-to-guides/themes/README.md)
 - [Block API Reference](/docs/reference-guides/block-api/README.md)
-- [Block Editor Accessibility](/docs/reference-guides/accessibility.md)
+- [Block Editor Accessibility](/docs/how-to-guides/accessibility.md)
 - [Internationalization](/docs/how-to-guides/internationalization.md)
 
 ### Contribute to the block editor
