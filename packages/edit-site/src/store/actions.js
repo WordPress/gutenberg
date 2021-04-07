@@ -1,15 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { parse } from '@wordpress/blocks';
-import { controls } from '@wordpress/data';
+import { parse, __unstableSerializeAndClean } from '@wordpress/blocks';
+import { controls, dispatch } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
-import { getPathAndQueryString } from '@wordpress/url';
+import { addQueryArgs, getPathAndQueryString } from '@wordpress/url';
+import { __ } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { STORE_NAME as editSiteStoreName } from './constants';
+import isTemplateRevertable from '../utils/is-template-revertable';
 
 /**
  * Returns an action object used to toggle a feature flag.
@@ -297,4 +301,137 @@ export function setIsListViewOpened( isOpen ) {
 		type: 'SET_IS_LIST_VIEW_OPENED',
 		isOpen,
 	};
+}
+
+/**
+ * Reverts a template to its original theme-provided file.
+ *
+ * @param {Object} template The template to revert.
+ */
+export function* revertTemplate( template ) {
+	if ( ! isTemplateRevertable( template ) ) {
+		yield controls.dispatch(
+			noticesStore,
+			'createErrorNotice',
+			__( 'This template is not revertable.' ),
+			{ type: 'snackbar' }
+		);
+		return;
+	}
+
+	try {
+		const templateEntity = yield controls.select(
+			coreStore,
+			'getEntity',
+			'postType',
+			template.type
+		);
+		if ( ! templateEntity ) {
+			yield controls.dispatch(
+				noticesStore,
+				'createErrorNotice',
+				__(
+					'The editor has encountered an unexpected error. Please reload.'
+				),
+				{ type: 'snackbar' }
+			);
+			return;
+		}
+
+		const fileTemplatePath = addQueryArgs(
+			`${ templateEntity.baseURL }/${ template.id }`,
+			{ context: 'edit', source: 'theme' }
+		);
+		const fileTemplate = yield apiFetch( { path: fileTemplatePath } );
+		if ( ! fileTemplate ) {
+			yield controls.dispatch(
+				noticesStore,
+				'createErrorNotice',
+				__(
+					'The editor has encountered an unexpected error. Please reload.'
+				),
+				{ type: 'snackbar' }
+			);
+			return;
+		}
+
+		const serializeBlocks = ( { blocks: blocksForSerialization = [] } ) =>
+			__unstableSerializeAndClean( blocksForSerialization );
+		const edited = yield controls.select(
+			coreStore,
+			'getEditedEntityRecord',
+			'postType',
+			'wp_template',
+			template.id
+		);
+		// We are fixing up the undo level here to make sure we can undo
+		// the revert in the header toolbar correctly.
+		yield controls.dispatch(
+			coreStore,
+			'editEntityRecord',
+			'postType',
+			'wp_template',
+			template.id,
+			{
+				content: serializeBlocks, // required to make the `undo` behave correctly
+				blocks: edited.blocks, // required to revert the blocks in the editor
+				source: 'custom', // required to avoid turning the editor into a dirty state
+			},
+			{
+				undoIgnore: true, // required to merge this edit with the last undo level
+			}
+		);
+
+		const blocks = parse( fileTemplate?.content?.raw );
+		yield controls.dispatch(
+			coreStore,
+			'editEntityRecord',
+			'postType',
+			'wp_template',
+			fileTemplate.id,
+			{
+				content: serializeBlocks,
+				blocks,
+				source: 'theme',
+			}
+		);
+
+		const undoRevert = async () => {
+			await dispatch( coreStore ).editEntityRecord(
+				'postType',
+				'wp_template',
+				edited.id,
+				{
+					content: serializeBlocks,
+					blocks: edited.blocks,
+					source: 'custom',
+				}
+			);
+		};
+		yield controls.dispatch(
+			noticesStore,
+			'createSuccessNotice',
+			__( 'Template reverted.' ),
+			{
+				type: 'snackbar',
+				actions: [
+					{
+						label: __( 'Undo' ),
+						onClick: undoRevert,
+					},
+				],
+			}
+		);
+	} catch ( error ) {
+		const errorMessage =
+			error.message && error.code !== 'unknown_error'
+				? error.message
+				: __( 'Template revert failed. Please reload.' );
+		yield controls.dispatch(
+			noticesStore,
+			'createErrorNotice',
+			errorMessage,
+			{ type: 'snackbar' }
+		);
+	}
 }
