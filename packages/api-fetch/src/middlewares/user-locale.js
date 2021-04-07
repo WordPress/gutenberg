@@ -4,7 +4,7 @@
 import { addQueryArgs, hasQueryArg } from '@wordpress/url';
 
 /**
- * @type {import('../types').ApiFetchMiddleware}
+ * @type {import('../types').APIFetchMiddleware}
  */
 const userLocaleMiddleware = ( options, next ) => {
 	if (

@@ -5,7 +5,7 @@ import namespaceAndEndpointMiddleware from './namespace-endpoint';
 
 /**
  * @param {string} rootURL
- * @return {import('../types').ApiFetchMiddleware} Root URL middleware.
+ * @return {import('../types').APIFetchMiddleware} Root URL middleware.
  */
 const createRootURLMiddleware = ( rootURL ) => ( options, next ) => {
 	return namespaceAndEndpointMiddleware( options, ( optionsWithPath ) => {
