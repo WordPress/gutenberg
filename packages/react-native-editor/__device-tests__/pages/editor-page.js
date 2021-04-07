@@ -633,6 +633,7 @@ const blockNames = {
 	verse: 'Verse',
 	file: 'File',
 	audio: 'Audio',
+	search: 'Search',
 };
 
 module.exports = { initializeEditorPage, blockNames };
