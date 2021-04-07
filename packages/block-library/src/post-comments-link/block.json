@@ -15,7 +15,8 @@
 		"html": false,
 		"fontSize": true,
 		"color": {
-			"link": true
+			"link": true,
+			"text": false
 		},
 		"lineHeight": true
 	}

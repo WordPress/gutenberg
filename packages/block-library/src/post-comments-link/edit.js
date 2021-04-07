@@ -67,9 +67,9 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 
 	let commentsText;
 	if ( commentsCount !== undefined ) {
-		if ( commentsCount.length === 0 ) {
+		if ( commentsCount === '0' ) {
 			commentsText = __( 'No comments' );
-		} else if ( commentsCount.length === 1 ) {
+		} else if ( commentsCount === '1' ) {
 			commentsText = __( 'One comment' );
 		} else {
 			commentsText = sprintf(

@@ -14,10 +14,12 @@
  * @return string   Returns the rendered link.
  */
 function render_block_core_post_comments_link( $attributes, $content, $block ) {
-	if ( ! isset( $block->context['postId'] )
-		|| isset( $block->context['postId'] )
-		&& ! comments_open( $block->context['postId'] ) ) {
-			return '';
+	if (
+		! isset( $block->context['postId'] ) ||
+		isset( $block->context['postId'] ) &&
+		! comments_open( $block->context['postId'] )
+	) {
+		return '';
 	}
 
 	$align_class_name   = empty( $attributes['textAlign'] ) ? '' : "has-text-align-{$attributes['textAlign']}";
@@ -48,9 +50,7 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 		);
 	}
 
-	return sprintf( '<div %1$s>', $wrapper_attributes ) .
-		'<a href="' . $comments_link . '">' . $comment_text . '</a>' .
-		'</div>';
+	return "<div {$wrapper_attributes}><a href='{$comments_link}'>{$comment_text}</a></div>";
 }
 
 /**
