@@ -111,7 +111,7 @@ export function getAutoCompleterUI( autocompleter ) {
 			( show ) => {
 				Animated.timing( animationValue, {
 					toValue: show ? 1 : 0,
-					duration: show ? 300 : 150,
+					duration: show ? 200 : 100,
 					useNativeDriver: true,
 				} ).start( ( { finished } ) => {
 					if ( finished && ! show && isVisible ) {
