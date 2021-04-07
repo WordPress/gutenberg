@@ -3,26 +3,26 @@
  */
 import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
-import { useDispatch } from '@wordpress/data';
 
 /**
  * External dependencies
  */
 import { merge } from 'lodash';
+/**
+ * Internal dependencies
+ */
+import { useMenuEntity, useSelectedMenuData } from './index';
 
 const locationsForMenuId = ( menuLocationsByName, id ) =>
 	Object.values( menuLocationsByName )
 		.filter( ( { menu } ) => menu === id )
 		.map( ( { name } ) => name );
 
-const withLocations = ( menuLocationsByName ) => ( id ) => ( {
-	id,
-	locations: locationsForMenuId( menuLocationsByName, id ),
-} );
-
 export default function useMenuLocations() {
 	const [ menuLocationsByName, setMenuLocationsByName ] = useState( null );
 
+	const { menuId } = useSelectedMenuData();
+	const { editMenuEntityRecord, menuEntityData } = useMenuEntity( menuId );
 	useEffect( () => {
 		let isMounted = true;
 
@@ -41,8 +41,6 @@ export default function useMenuLocations() {
 		return () => ( isMounted = false );
 	}, [] );
 
-	const { saveMenu } = useDispatch( 'core' );
-
 	const assignMenuToLocation = useCallback(
 		async ( locationName, newMenuId ) => {
 			const oldMenuId = menuLocationsByName[ locationName ].menu;
@@ -53,10 +51,13 @@ export default function useMenuLocations() {
 
 			setMenuLocationsByName( newMenuLocationsByName );
 
-			[ oldMenuId, newMenuId ]
-				.filter( Boolean )
-				.map( withLocations( newMenuLocationsByName ) )
-				.forEach( saveMenu );
+			const activeMenuId = oldMenuId || newMenuId;
+			editMenuEntityRecord( ...menuEntityData, {
+				locations: locationsForMenuId(
+					newMenuLocationsByName,
+					activeMenuId
+				),
+			} );
 		},
 		[ menuLocationsByName ]
 	);

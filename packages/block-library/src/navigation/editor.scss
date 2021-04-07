@@ -27,6 +27,12 @@
 		&.has-child .block-editor-block-list__block.wp-block-navigation-link {
 			margin: 0;
 		}
+
+		// Margin of right-most margin should be zero, for right aligned or justified items.
+		&.wp-block-pages-list__item:last-child,
+		&.wp-block-navigation-link:last-child {
+			margin-right: 0;
+		}
 	}
 }
 
