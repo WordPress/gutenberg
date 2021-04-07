@@ -17,7 +17,7 @@ function create_block_gutenpride_block_init() {
 add_action( 'init', 'create_block_gutenpride_block_init' );
 ```
 
-This function handles that all style en js files in the `build` folder get handles that are passed on to the `wp_register_style` function.
+This function checks the `block.json` file for js and css files, and will pass them on to [enqueue](https://developer.wordpress.org/themes/basics/including-css-javascript/) these files, so they are loaded on the appropriate pages.
 
 The `build/index.css` is compiled from `src/editor.scss` and loads only within the editor, and after the `style-index.css`.
 The `build/style-index.css` is compiled from `src/style.scss` and loads in both the editor and front-end — published post view.
