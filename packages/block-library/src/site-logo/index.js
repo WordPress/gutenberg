@@ -15,9 +15,7 @@ export { metadata, name };
 
 export const settings = {
 	title: _x( 'Site Logo', 'block title' ),
-	description: __(
-		"Allows you to define a logo to be used across your site. Once defined, changing it in one template will change it in all places where it's used as well."
-	),
+	description: __( 'Displays and enables editing of the site logo.' ),
 	icon,
 	styles: [
 		{
