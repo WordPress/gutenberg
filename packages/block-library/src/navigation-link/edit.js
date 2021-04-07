@@ -46,8 +46,11 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { ItemSubmenuIcon } from './icons';
+import { name } from './block.json';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/spacer' ];
+
+const MAX_NESTING = 5;
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -164,6 +167,7 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const {
+		isAtMaxNesting,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
@@ -177,6 +181,7 @@ export default function NavigationLinkEdit( {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
+				getBlockParentsByBlockName,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -185,6 +190,9 @@ export default function NavigationLinkEdit( {
 				.length;
 
 			return {
+				isAtMaxNesting:
+					getBlockParentsByBlockName( clientId, name ).length >=
+					MAX_NESTING,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
@@ -382,12 +390,14 @@ export default function NavigationLinkEdit( {
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ () => setIsLinkOpen( true ) }
 					/>
-					<ToolbarButton
-						name="submenu"
-						icon={ addSubmenu }
-						title={ __( 'Add submenu' ) }
-						onClick={ insertLinkBlock }
-					/>
+					{ ! isAtMaxNesting && (
+						<ToolbarButton
+							name="submenu"
+							icon={ addSubmenu }
+							title={ __( 'Add submenu' ) }
+							onClick={ insertLinkBlock }
+						/>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
