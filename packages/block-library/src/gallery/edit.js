@@ -440,7 +440,6 @@ function GalleryEdit( props ) {
 		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
 	}
 
-	const shouldShowSizeOptions = imageSizeOptions?.length > 0;
 	const hasLinkTo = linkTo && linkTo !== 'none';
 
 	return (
@@ -478,7 +477,7 @@ function GalleryEdit( props ) {
 							onChange={ toggleOpenInNewTab }
 						/>
 					) }
-					{ shouldShowSizeOptions && (
+					{ imageSizeOptions?.length > 0 && (
 						<SelectControl
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
