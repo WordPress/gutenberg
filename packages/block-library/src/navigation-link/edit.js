@@ -168,7 +168,6 @@ export default function NavigationLinkEdit( {
 
 	const {
 		isAtMaxNesting,
-		isDraggingBlocks,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
@@ -182,7 +181,6 @@ export default function NavigationLinkEdit( {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
-				isDraggingBlocks: _isDraggingBlocks,
 				getBlockParentsByBlockName,
 			} = select( blockEditorStore );
 
@@ -394,11 +392,11 @@ export default function NavigationLinkEdit( {
 					/>
 					{ ! isAtMaxNesting && (
 						<ToolbarButton
-						name="submenu"
-						icon={ addSubmenu }
-						title={ __( 'Add submenu' ) }
-						onClick={ insertLinkBlock }
-					/>
+							name="submenu"
+							icon={ addSubmenu }
+							title={ __( 'Add submenu' ) }
+							onClick={ insertLinkBlock }
+						/>
 					) }
 				</ToolbarGroup>
 			</BlockControls>
