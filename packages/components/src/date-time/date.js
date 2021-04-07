@@ -44,16 +44,18 @@ function DatePickerDay( { day, events = [] } ) {
 			return;
 		}
 
-		const eventsString = sprintf(
-			/* translators: %d: number of calendar events. */
-			_n( 'There is %d event', 'There are %d events', events.length ),
+		const dayWithEventsDescription = sprintf(
+			// translators: 1: Calendar day format, 2: Calendar event number.
+			_n(
+				'%1$s. There is %2$d event.',
+				'%1$s. There are %2$d events.',
+				events.length
+			),
+			dayAriaLabel,
 			events.length
 		);
 
-		parentNode.setAttribute(
-			'aria-label',
-			`${ dayAriaLabel }. ${ eventsString }`
-		);
+		parentNode.setAttribute( 'aria-label', dayWithEventsDescription );
 	}, [ ref, events.length ] );
 
 	return (
