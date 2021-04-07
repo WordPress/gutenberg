@@ -41,7 +41,9 @@ export default function useGetNewImages( images, imageData ) {
 		const newImages = images.filter(
 			( image ) =>
 				! newCurrentImages.find(
-					( currentImage ) => image.id && currentImage.id === image.id
+					( currentImage ) =>
+						image.clientId &&
+						currentImage.clientId === image.clientId
 				) &&
 				imageData?.find( ( img ) => img.id === image.id ) &&
 				! image.fromSavedConent
