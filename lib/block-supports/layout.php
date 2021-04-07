@@ -88,8 +88,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	<?php
 	$style .= ob_get_clean();
 
-	// This assumes the hook only applys to blocks with a single wrapper.
-	// I think this is a reasonable limitation for that particular hoook.
+	// This assumes the hook only applies to blocks with a single wrapper.
+	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
 		'class="wp-container-' . $id . ' ',
