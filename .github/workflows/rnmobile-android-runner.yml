@@ -30,8 +30,6 @@ jobs:
               with:
                   path: ~/.npm
                   key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-npm-
 
             - run: npm ci
 
@@ -40,7 +38,6 @@ jobs:
               with:
                   path: ~/.gradle/caches
                   key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-                  restore-keys: ${{ runner.os }}-gradle
 
             - uses: reactivecircus/android-emulator-runner@08b092e904025fada32a01b711af1e7ff7b7a4a3 # v2.14.3
               with:
