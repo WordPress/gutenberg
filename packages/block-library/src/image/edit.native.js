@@ -128,7 +128,7 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes } = this.props;
+		const { attributes, setAttributes, featuredImageId } = this.props;
 		// This will warn when we have `id` defined, while `url` is undefined.
 		// This may help track this issue: https://github.com/wordpress-mobile/WordPress-Android/issues/9768
 		// where a cancelled image upload was resulting in a subsequent crash.
@@ -161,7 +161,10 @@ export class ImageEdit extends Component {
 		}
 
 		// Check whether an image is featured when the editor first loads.
-		if ( attributes.id ) {
+		if ( attributes.id === featuredImageId ) {
+			this.setState( {
+				isFeaturedImage: true,
+			} );
 			//	this.onCheckFeatured();
 		}
 
@@ -681,12 +684,6 @@ export default compose( [
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
 
 		const featuredImageId = getEditedPostAttribute( 'featured_media' );
-
-		// Temporary logging to check whether getEditedPostAttribute( 'featured_media' ) works as expected.
-		// The post's featured image ID should be returned when the editor loads.
-		// console.log(
-		//	'getEditedPostAttribute: Log from JS: ' + featuredImageId
-		// );
 
 		const shouldGetMedia =
 			( isSelected && isNotFileUrl ) ||
