@@ -43,6 +43,9 @@ const DEFAULT_OPTIONS = {
 	credentials: 'include',
 };
 
+/** @typedef {import('./types').ApiFetchMiddleware} ApiFetchMiddleware */
+/** @typedef {import('./types').ApiFetchRequestProps} ApiFetchRequestProps */
+
 /**
  * @type {import('./types').ApiFetchMiddleware[]}
  */
