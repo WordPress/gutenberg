@@ -404,14 +404,10 @@ function getFunctionNameForError( declarationToken ) {
 /**
  * @param {CommentTag} tag The documented parameter.
  * @param {ASTNode} declarationToken The function the parameter is documented on.
- * @param {number | null} paramIndex The parameter index.
+ * @param {number} paramIndex The parameter index.
  * @return {null | string} The parameter's type annotation.
  */
 function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
-	if ( paramIndex === null ) {
-		throw new Error( '`paramIndex` must not be null' );
-	}
-
 	const functionToken = getFunctionToken( declarationToken );
 
 	// otherwise find the corresponding parameter token for the documented parameter
