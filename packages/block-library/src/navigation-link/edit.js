@@ -297,9 +297,10 @@ export default function NavigationLinkEdit( {
 
 		return {
 			id: page.id,
-			postType,
+			type: postType,
 			title: page.title.rendered,
 			url: page.link,
+			kind: 'post-type',
 		};
 	}
 
@@ -523,6 +524,8 @@ export default function NavigationLinkEdit( {
 									url: newURL = '',
 									opensInNewTab: newOpensInNewTab,
 									id,
+									kind: newKind = '',
+									type: newType = '',
 								} = {} ) =>
 									setAttributes( {
 										url: encodeURI( newURL ),
@@ -550,6 +553,14 @@ export default function NavigationLinkEdit( {
 										} )(),
 										opensInNewTab: newOpensInNewTab,
 										id,
+										...( newKind && {
+											kind: newKind,
+										} ),
+										...( newType &&
+											newType !== 'URL' &&
+											newType !== 'post-format' && {
+												type: newType,
+											} ),
 									} )
 								}
 							/>

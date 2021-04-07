@@ -26,28 +26,28 @@ const fallbackVariations = [
 		icon: postIcon,
 		title: __( 'Post Link' ),
 		description: __( 'A link to a post.' ),
-		attributes: { type: 'post' },
+		attributes: { type: 'post', kind: 'post-type' },
 	},
 	{
 		name: 'page',
 		icon: pageIcon,
 		title: __( 'Page Link' ),
 		description: __( 'A link to a page.' ),
-		attributes: { type: 'page' },
+		attributes: { type: 'page', kind: 'post-type' },
 	},
 	{
 		name: 'category',
 		icon: categoryIcon,
 		title: __( 'Category Link' ),
 		description: __( 'A link to a category.' ),
-		attributes: { type: 'category' },
+		attributes: { type: 'category', kind: 'taxonomy' },
 	},
 	{
 		name: 'tag',
 		icon: tagIcon,
 		title: __( 'Tag Link' ),
 		description: __( 'A link to a tag.' ),
-		attributes: { type: 'tag' },
+		attributes: { type: 'tag', kind: 'taxonomy' },
 	},
 ];
 
