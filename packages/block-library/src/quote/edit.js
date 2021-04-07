@@ -83,6 +83,7 @@ export default function QuoteEdit( {
 					<RichText
 						identifier="citation"
 						tagName="cite"
+						rootTagsToEliminate={ [ 'p', 'cite' ] }
 						style={ { display: 'block' } }
 						value={ citation }
 						onChange={ ( nextCitation ) =>
