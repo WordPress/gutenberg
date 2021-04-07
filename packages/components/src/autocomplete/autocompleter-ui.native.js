@@ -97,6 +97,11 @@ export function getAutoCompleterUI( autocompleter ) {
 			styles.iconDark
 		);
 
+		const activeIconStyles = usePreferredColorSchemeStyle(
+			styles.activeIcon,
+			styles.iconDark
+		);
+
 		const textStyles = usePreferredColorSchemeStyle(
 			styles.text,
 			styles.textDark
@@ -159,6 +164,10 @@ export function getAutoCompleterUI( autocompleter ) {
 										textStyles,
 										isActive && activeTextStyles
 									);
+									const iconStyle = stylesCompose(
+										iconStyles,
+										isActive && activeIconStyles
+									);
 
 									return (
 										<TouchableOpacity
@@ -173,7 +182,7 @@ export function getAutoCompleterUI( autocompleter ) {
 														option?.value?.icon?.src
 													}
 													size={ 24 }
-													style={ iconStyles }
+													style={ iconStyle }
 												/>
 											</View>
 											<Text style={ textStyle }>

@@ -38,7 +38,11 @@
 
 .icon {
 	margin-right: 4px;
-	color: $toolbar-button;
+	color: $gray-darken-30;
+}
+
+.activeIcon {
+	color: $gray-dark;
 }
 
 .iconDark {
@@ -46,7 +50,7 @@
 }
 
 .text {
-	color: $toolbar-button;
+	color: $gray-darken-30;
 }
 
 .textDark {
@@ -54,6 +58,7 @@
 }
 
 .activeText {
+	color: $gray-dark;
 	text-decoration: underline;
 	text-decoration-color: $toolbar-button;
 }
@@ -64,7 +69,7 @@
 
 .activeItem {
 	border-radius: 6px;
-	background-color: $light-ultra-dim;
+	background-color: transparentize($color: $gray-darken-20, $amount: 0.9);
 }
 
 .activeItemDark {
