@@ -282,6 +282,31 @@ $color-control-label-height: 20px;
 		margin-right: $grid-unit-15;
 		height: $button-size; // Prevents jumpiness.
 	}
+
+	// Block title
+	.wp-block-navigation-placeholder__actions__indicator {
+		margin-right: $grid-unit-15;
+		padding: ($grid-unit-15 / 2) 0;
+		align-items: center;
+		justify-content: flex-start;
+		display: none;
+
+		// line up with the icon in the toolbar.
+		margin-left: $grid-unit-05 + $border-width;
+
+		svg {
+			margin-right: $grid-unit-05;
+		}
+
+		.is-vertical & {
+			margin-bottom: $grid-unit-05;
+			margin-left: 0;
+		}
+
+		@include break-small {
+			display: inline-flex;
+		}
+	}
 }
 
 // When block is vertical.
@@ -302,8 +327,14 @@ $color-control-label-height: 20px;
 	font-size: $default-font-size;
 
 	.components-button.components-dropdown-menu__toggle.has-icon {
-		padding: ($grid-unit-15 / 2) $grid-unit-15;
+		padding: ($grid-unit-15 / 2) $grid-unit-05 ($grid-unit-15 / 2) $grid-unit-15;
 		display: flex;
 		flex-direction: row-reverse; // This puts the chevron, which is hidden from screen readers, on the right.
+	}
+
+	// Margins.
+	.components-dropdown,
+	> .components-button {
+		margin-right: $grid-unit-15;
 	}
 }
