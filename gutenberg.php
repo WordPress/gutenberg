@@ -5,7 +5,7 @@
  * Description: Printing since 1440. This is the development plugin for the new block editor in core.
  * Requires at least: 5.6
  * Requires PHP: 5.6
- * Version: 10.3.1
+ * Version: 10.3.2
  * Author: Gutenberg Team
  * Text Domain: gutenberg
  *
