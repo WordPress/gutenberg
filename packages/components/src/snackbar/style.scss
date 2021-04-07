@@ -10,6 +10,9 @@
 	max-width: 600px;
 	box-sizing: border-box;
 	cursor: pointer;
+
+	// Re-enable pointer events, which are disabled by the
+	// .components-snackbar-list styles.
 	pointer-events: auto;
 
 	@include break-small() {
@@ -78,6 +81,11 @@
 	z-index: z-index(".components-snackbar-list");
 	width: 100%;
 	box-sizing: border-box;
+
+	// Disable pointer events, so that clicking this area
+	// outside of an individual notice still allows the UI
+	// underneath to be clicked.
+	pointer-events: none;
 }
 
 .components-snackbar-list__notice-container {
