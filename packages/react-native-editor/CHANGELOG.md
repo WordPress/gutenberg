@@ -11,6 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 * [**] The media upload options of the Image, Video and Gallery block automatically opens when the respective block is inserted. [#29546]
+* [*] Image block: Improve text entry for long alt text. [#29670]
+
+## 1.50.0
 
 -   [***] a11y: Screenreader improvements for the UnitControl component [#29741]
 

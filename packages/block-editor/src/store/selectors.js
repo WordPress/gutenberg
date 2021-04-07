@@ -1838,29 +1838,40 @@ export const __experimentalGetAllowedPatterns = createSelector(
 );
 
 /**
- * Returns the list of patterns based on specific `scope` and
- * a block's name.
- * `inserter` scope should be handled differently, probably in
- * combination with `__experimentalGetAllowedPatterns`.
- * For now `__experimentalGetScopedBlockPatterns` handles properly
- * all other scopes.
- * Since both APIs are experimental we should revisit this.
+ * Returns the list of patterns based on their declared `blockTypes`
+ * and a block's name.
+ * Patterns can use `blockTypes` to integrate in work flows like
+ * suggesting appropriate patterns in a Placeholder state(during insertion)
+ * or blocks transformations.
  *
  * @param {Object} state Editor state.
- * @param {string} scope Block pattern scope.
- * @param {string} blockName Block's name.
+ * @param {string|string[]} blockNames Block's name or array of block names to find matching pattens.
+ * @param {?string} rootClientId Optional target root client ID.
  *
- * @return {Array} The list of matched block patterns based on provided scope and block name.
+ * @return {Array} The list of matched block patterns based on declared `blockTypes` and block name.
  */
-export const __experimentalGetScopedBlockPatterns = createSelector(
-	( state, scope, blockName ) => {
-		if ( ! scope && ! blockName ) return EMPTY_ARRAY;
-		const patterns = state.settings.__experimentalBlockPatterns;
+export const __experimentalGetPatternsByBlockTypes = createSelector(
+	( state, blockNames, rootClientId = null ) => {
+		if ( ! blockNames ) return EMPTY_ARRAY;
+		const patterns = __experimentalGetAllowedPatterns(
+			state,
+			rootClientId
+		);
+		const normalizedBlockNames = Array.isArray( blockNames )
+			? blockNames
+			: [ blockNames ];
 		return patterns.filter( ( pattern ) =>
-			pattern.scope?.[ scope ]?.includes?.( blockName )
+			pattern?.blockTypes?.some?.( ( blockName ) =>
+				normalizedBlockNames.includes( blockName )
+			)
 		);
 	},
-	( state ) => [ state.settings.__experimentalBlockPatterns ]
+	( state, rootClientId ) => [
+		...__experimentalGetAllowedPatterns.getDependants(
+			state,
+			rootClientId
+		),
+	]
 );
 
 /**
