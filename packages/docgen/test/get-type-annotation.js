@@ -190,7 +190,7 @@ describe( 'Type annotations', () => {
 		} );
 	} );
 
-	describe.skip( 'missing types', () => {
+	describe( 'missing types', () => {
 		const node = getMissingTypesNode();
 
 		it( 'should throw an error if there is no return type', () => {
@@ -246,10 +246,10 @@ describe( 'Type annotations', () => {
 				);
 			} );
 
-			it( 'should get the full type name for the qualified name', () => {
+			it( 'should get the full type with a qualification for the qualified name', () => {
 				expect(
 					getTypeAnnotation( { ...paramTag, name: 'foo.1' }, node, 0 )
-				).toBe( '( T & S ) | V' );
+				).toBe( '( ( T & S ) | V )[ 1 ]' );
 			} );
 		} );
 	} );

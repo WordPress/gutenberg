@@ -427,55 +427,37 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 		);
 	}
 
-	/** @type {babelTypes.TSTypeAnnotation | undefined} */
-	let typeAnnotation;
-	if ( babelTypes.isIdentifier( paramToken ) ) {
-		typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
-	} else if ( babelTypes.isRestElement( paramToken ) ) {
-		typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
-	} else if ( babelTypes.isArrayPattern( paramToken ) ) {
-		if ( ! tag.name.includes( '.' ) ) {
-			// 1 unqualified name
-			typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
-		} else {
-			// 2 qualified name i.e., an element of the array being destructured
+	try {
+		const paramType = paramToken.typeAnnotation.typeAnnotation;
+		if ( babelTypes.isIdentifier( paramToken ) ) {
+			return getTypeAnnotation( paramType );
+		} else if ( babelTypes.isRestElement( paramToken ) ) {
+			return getTypeAnnotation( paramType );
+		} else if ( babelTypes.isArrayPattern( paramToken ) ) {
+			if ( ! tag.name.includes( '.' ) ) {
+				// unqualified name
+				return getTypeAnnotation( paramType );
+			}
+
+			// qualified name i.e., an element of the array being destructured
 			const position = parseInt(
 				tag.name.split( '.' ).slice( -1 )[ 0 ],
 				0
 			);
-			if (
-				babelTypes.isTSArrayType(
-					paramToken.typeAnnotation.typeAnnotation
-				)
-			) {
-				if (
-					babelTypes.isTSTypeReference(
-						paramToken.typeAnnotation.typeAnnotation.elementType
-					)
-				) {
-					return paramToken.typeAnnotation.typeAnnotation.elementType
-						.typeName.name;
+			if ( babelTypes.isTSArrayType( paramType ) ) {
+				if ( babelTypes.isTSTypeReference( paramType.elementType ) ) {
+					// just get the element type for the array
+					return paramType.elementType.typeName.name;
 				}
-				typeAnnotation =
-					paramToken.typeAnnotation.typeAnnotation.elementType
-						.typeAnnotation;
-			} else if (
-				babelTypes.isTSTupleType(
-					paramToken.typeAnnotation.typeAnnotation
-				)
-			) {
-				typeAnnotation =
-					paramToken.typeAnnotation.typeAnnotation.elementTypes[
-						position
-					];
-			} else {
-				typeAnnotation = paramToken.typeAnnotation.typeAnnotation;
+				return getTypeAnnotation(
+					paramType.elementType.typeAnnotation
+				);
+			} else if ( babelTypes.isTSTupleType( paramType ) ) {
+				return getTypeAnnotation( paramType.elementTypes[ position ] );
 			}
+			// anything else, `Alias[ position ]`
+			return `( ${ getTypeAnnotation( paramType ) } )[ ${ position } ]`;
 		}
-	}
-
-	try {
-		return getTypeAnnotation( typeAnnotation );
 	} catch ( e ) {
 		throw new Error(
 			`Could not find type for parameter '${
