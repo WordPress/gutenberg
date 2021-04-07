@@ -43,11 +43,11 @@ const DEFAULT_OPTIONS = {
 	credentials: 'include',
 };
 
-/** @typedef {import('./types').ApiFetchMiddleware} ApiFetchMiddleware */
-/** @typedef {import('./types').ApiFetchRequestProps} ApiFetchRequestProps */
+/** @typedef {import('./types').APIFetchMiddleware} APIFetchMiddleware */
+/** @typedef {import('./types').APIFetchOptions} APIFetchOptions */
 
 /**
- * @type {import('./types').ApiFetchMiddleware[]}
+ * @type {import('./types').APIFetchMiddleware[]}
  */
 const middlewares = [
 	userLocaleMiddleware,
@@ -59,7 +59,7 @@ const middlewares = [
 /**
  * Register a middleware
  *
- * @param {import('./types').ApiFetchMiddleware} middleware
+ * @param {import('./types').APIFetchMiddleware} middleware
  */
 function registerMiddleware( middleware ) {
 	middlewares.unshift( middleware );
@@ -80,7 +80,7 @@ const checkStatus = ( response ) => {
 	throw response;
 };
 
-/** @typedef {(options: import('./types').ApiFetchRequestProps) => Promise<any>} FetchHandler*/
+/** @typedef {(options: import('./types').APIFetchOptions) => Promise<any>} FetchHandler*/
 
 /**
  * @type {FetchHandler}
@@ -149,7 +149,7 @@ function setFetchHandler( newFetchHandler ) {
 
 /**
  * @template T
- * @param {import('./types').ApiFetchRequestProps} options
+ * @param {import('./types').APIFetchOptions} options
  * @return {Promise<T>} A promise representing the request processed via the registered middlewares.
  */
 function apiFetch( options ) {
