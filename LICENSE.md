@@ -78,7 +78,7 @@ License” to the following:**
 
 ## Full Text of Referenced Licenses
 
-1. [GNU General Public License, Version 2](#gnu-general_public_license-version-2)
+1. [GNU General Public License, Version 2](#gnu-general-public-license-version-2)
 2. [Mozilla Public License, Version 2.0](#mozilla-public-license-version-20)
 
 ## GNU General Public License, Version 2
