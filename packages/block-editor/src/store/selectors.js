@@ -1920,7 +1920,7 @@ export const __experimentalGetPatternTransformItems = createSelector(
 		);
 		/**
 		 * Here we will return first set of possible eligible block patterns,
-		 * by checking the `scope` property. We still have to recurse through
+		 * by checking the `blockTypes` property. We still have to recurse through
 		 * block pattern's blocks and try to find matches from the selected blocks.
 		 * Now this happens in the consumer to avoid heavy operations in the selector.
 		 */
