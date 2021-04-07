@@ -5,7 +5,7 @@ import { blockNames } from './pages/editor-page';
 import { isAndroid } from './helpers/utils';
 
 describe( 'Gutenberg Editor tests for slash inserter', () => {
-	it( 'should insert an image block with enter', async () => {
+	it( 'should insert an image block with "/img" + enter', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph
