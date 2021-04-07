@@ -146,6 +146,7 @@ function RichText(
 		preserveWhiteSpace,
 		onPaste,
 		format = 'string',
+		onBlur,
 		onDelete,
 		onEnter,
 		onSelectionChange,
@@ -987,6 +988,10 @@ function RichText(
 			'selectionchange',
 			handleSelectionChange
 		);
+
+		if ( onBlur ) {
+			onBlur();
+		}
 	}
 
 	function applyFromProps() {
