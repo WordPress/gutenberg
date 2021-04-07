@@ -23,7 +23,6 @@ export default function ImageCropper( {
 	clientWidth,
 	naturalHeight,
 	naturalWidth,
-	onClick,
 } ) {
 	const {
 		isInProgress,
@@ -52,8 +51,6 @@ export default function ImageCropper( {
 				width: width || clientWidth,
 				height: editedHeight,
 			} }
-			onClick={ onClick }
-			onKeyDown={ onClick }
 			role="img"
 			aria-label={ __( 'Image editor cropping tool' ) }
 		>

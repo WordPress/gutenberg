@@ -211,7 +211,6 @@ export default function Image( {
 
 	function onImageClick() {
 		if ( captionFocused ) {
-			captionRef.current.blur();
 			setCaptionFocused( false );
 		}
 	}
@@ -455,7 +454,6 @@ export default function Image( {
 				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
-				onClick={ onImageClick }
 			/>
 		);
 	} else if ( ! isResizable || ! imageWidthWithinContainer ) {
@@ -542,6 +540,13 @@ export default function Image( {
 		);
 	}
 
+	function onCaptionBlur() {
+		if ( captionFocused ) {
+			captionRef.current.blur();
+			setCaptionFocused( false );
+		}
+	}
+
 	return (
 		<ImageEditingProvider
 			id={ id }
@@ -559,6 +564,7 @@ export default function Image( {
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
+					onBlur={ onCaptionBlur }
 					ref={ captionRef }
 					tagName="figcaption"
 					aria-label={ __( 'Image caption text' ) }

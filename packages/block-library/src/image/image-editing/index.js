@@ -20,7 +20,6 @@ export default function ImageEditor( {
 	clientWidth,
 	naturalHeight,
 	naturalWidth,
-	onClick,
 } ) {
 	return (
 		<>
@@ -31,7 +30,6 @@ export default function ImageEditor( {
 				clientWidth={ clientWidth }
 				naturalHeight={ naturalHeight }
 				naturalWidth={ naturalWidth }
-				onClick={ onClick }
 			/>
 			<BlockControls>
 				<ToolbarGroup>
