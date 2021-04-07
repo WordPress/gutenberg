@@ -1,5 +1,21 @@
 == Changelog ==
 
+= 10.3.2 =
+
+### Enhancements
+
+- Remove the default block margins from themes with theme.json file. ([30375](https://github.com/WordPress/gutenberg/pull/30375))
+
+### Bug Fixes
+
+- Site title block: Remove custom theme.json selector. ([30558](https://github.com/WordPress/gutenberg/pull/30558))
+- Components: Query autocomplete by the term from last trigger prefix character. ([30540](https://github.com/WordPress/gutenberg/pull/30540))
+- Bug fixes backported in WordPress minor release. ([30528](https://github.com/WordPress/gutenberg/pull/30528))
+- Rich Text: Fix multi-select copy. ([30197](https://github.com/WordPress/gutenberg/pull/30197))
+
+
+
+
 = 10.3.1 =
 
 ### Bug Fixes
