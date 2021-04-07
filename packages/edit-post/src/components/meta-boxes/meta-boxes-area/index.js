@@ -17,7 +17,8 @@ import { store as editPostStore } from '../../../store';
 
 const MetaBoxesArea = ( { location } ) => {
 	const container = useRef( null );
-	const [ form, setForm ] = useState();
+	const [ form, setForm ] = useState( null );
+
 	useEffect( () => {
 		setForm( document.querySelector( '.metabox-location-' + location ) );
 
@@ -30,11 +31,11 @@ const MetaBoxesArea = ( { location } ) => {
 				document.querySelector( '#metaboxes' ).appendChild( form );
 			}
 		};
-	}, [ form ] );
+	}, [ form, location ] );
 
 	const isSaving = useSelect( ( select ) => {
 		return select( editPostStore ).isSavingMetaBoxes();
-	} );
+	}, [] );
 
 	const classes = classnames(
 		'edit-post-meta-boxes-area',
