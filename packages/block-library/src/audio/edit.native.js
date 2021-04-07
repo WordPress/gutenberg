@@ -12,7 +12,6 @@ import {
 	PanelBody,
 	SelectControl,
 	ToggleControl,
-	withNotices,
 	ToolbarButton,
 	ToolbarGroup,
 	AudioPlayer,
@@ -29,6 +28,8 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { audio as icon, replace } from '@wordpress/icons';
 import { useState } from '@wordpress/element';
+import { useDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 import { isURL } from '@wordpress/url';
 
 /**
@@ -40,10 +41,8 @@ const ALLOWED_MEDIA_TYPES = [ 'audio' ];
 
 function AudioEdit( {
 	attributes,
-	noticeOperations,
 	setAttributes,
 	isSelected,
-	noticeUI,
 	insertBlocksAfter,
 	onFocus,
 	onBlur,
@@ -57,9 +56,10 @@ function AudioEdit( {
 		setAttributes( { id: mediaId, src: mediaUrl } );
 	};
 
+	const { createErrorNotice } = useDispatch( noticesStore );
+
 	const onError = () => {
-		// TODO: Set up error state
-		createErrorNotice( __( 'Error' ) );
+		createErrorNotice( __( 'Failed to insert audio file.' ) );
 	};
 
 	function toggleAttribute( attribute ) {
@@ -76,11 +76,6 @@ function AudioEdit( {
 				createErrorNotice( __( 'Invalid URL. Audio file not found.' ) );
 			}
 		}
-	}
-
-	function createErrorNotice( message ) {
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
 	}
 
 	function onSelectAudio( media ) {
@@ -115,8 +110,6 @@ function AudioEdit( {
 					accept="audio/*"
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
 					value={ attributes }
-					notices={ noticeUI }
-					onError={ createErrorNotice }
 					onFocus={ onFocus }
 				/>
 			</View>
@@ -204,6 +197,7 @@ function AudioEdit( {
 								{ value: 'metadata', label: __( 'Metadata' ) },
 								{ value: 'none', label: __( 'None' ) },
 							] }
+							hideCancelButton={ true }
 						/>
 					</PanelBody>
 				</InspectorControls>
@@ -238,4 +232,4 @@ function AudioEdit( {
 		</TouchableWithoutFeedback>
 	);
 }
-export default withNotices( AudioEdit );
+export default AudioEdit;

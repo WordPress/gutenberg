@@ -6,6 +6,7 @@ import {
 	activateTheme,
 	getAllBlocks,
 	selectBlockByClientId,
+	insertBlock,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -71,17 +72,16 @@ describe( 'Settings sidebar', () => {
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
 			await navigationPanel.clickItemByText( '404' );
-			await navigationPanel.close();
 			const templateCardAfterNavigation = await getTemplateCard();
 
 			expect( templateCardBeforeNavigation ).toMatchObject( {
 				title: 'Index',
 				description:
-					'The default template which is used when no other template can be found',
+					'The default template used when no other template is available. This is a required template in WordPress.',
 			} );
 			expect( templateCardAfterNavigation ).toMatchObject( {
 				title: '404',
-				description: 'Used when the queried content cannot be found',
+				description: 'Template shown when no content is found.',
 			} );
 		} );
 	} );
@@ -94,6 +94,29 @@ describe( 'Settings sidebar', () => {
 			await toggleSidebar();
 
 			expect( await getActiveTabLabel() ).toEqual( 'Block (selected)' );
+		} );
+	} );
+
+	describe( 'Tab switch based on selection', () => {
+		it( 'should switch to block tab if we select a block, when Template is selected', async () => {
+			await toggleSidebar();
+			expect( await getActiveTabLabel() ).toEqual(
+				'Template (selected)'
+			);
+			// By inserting the block is also selected.
+			await insertBlock( 'Heading' );
+			expect( await getActiveTabLabel() ).toEqual( 'Block (selected)' );
+		} );
+		it( 'should switch to Template tab when a block was selected and we select the Template', async () => {
+			await insertBlock( 'Heading' );
+			await toggleSidebar();
+			expect( await getActiveTabLabel() ).toEqual( 'Block (selected)' );
+			await page.evaluate( () => {
+				wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+			} );
+			expect( await getActiveTabLabel() ).toEqual(
+				'Template (selected)'
+			);
 		} );
 	} );
 } );

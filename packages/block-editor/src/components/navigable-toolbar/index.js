@@ -61,6 +61,7 @@ function useIsAccessibleToolbar( ref ) {
 		const onlyToolbarItem = hasOnlyToolbarItem( tabbables );
 		if ( ! onlyToolbarItem ) {
 			deprecated( 'Using custom components as toolbar controls', {
+				since: '5.6',
 				alternative: 'ToolbarItem or ToolbarButton components',
 				link:
 					'https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols',

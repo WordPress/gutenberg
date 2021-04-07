@@ -66,6 +66,7 @@ export {
 	BottomSheetProvider,
 	BottomSheetContext,
 } from './mobile/bottom-sheet/bottom-sheet-context';
+export { default as BottomSheetSelectControl } from './mobile/bottom-sheet-select-control';
 export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
@@ -74,7 +75,9 @@ export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
-export { default as FocalPointSettings } from './mobile/focal-point-settings';
+export { default as FocalPointSettingsPanel } from './mobile/focal-point-settings-panel';
+export { default as BottomSheetTextControl } from './mobile/bottom-sheet-text-control';
+export { default as FooterMessageLink } from './mobile/bottom-sheet/footer-message-link/footer-message-link';
 export { LinkPicker } from './mobile/link-picker';
 export { default as LinkPickerScreen } from './mobile/link-picker/link-picker-screen';
 export { default as LinkSettings } from './mobile/link-settings';
@@ -84,7 +87,6 @@ export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
 export { default as InserterButton } from './mobile/inserter-button';
 export { setClipboard, getClipboard } from './mobile/clipboard';
-export { default as Preview } from './mobile/preview';
 export { default as AudioPlayer } from './mobile/audio-player';
 
 // Utils

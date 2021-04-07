@@ -155,15 +155,21 @@ export function receiveBlocks( blocks ) {
  * attributes with the specified client IDs have been updated.
  *
  * @param {string|string[]} clientIds  Block client IDs.
- * @param {Object}          attributes Block attributes to be merged.
- *
+ * @param {Object}          attributes Block attributes to be merged. Should be keyed by clientIds if
+ * uniqueByBlock is true.
+ * @param {boolean}          uniqueByBlock true if each block in clientIds array has a unique set of attributes
  * @return {Object} Action object.
  */
-export function updateBlockAttributes( clientIds, attributes ) {
+export function updateBlockAttributes(
+	clientIds,
+	attributes,
+	uniqueByBlock = false
+) {
 	return {
 		type: 'UPDATE_BLOCK_ATTRIBUTES',
 		clientIds: castArray( clientIds ),
 		attributes,
+		uniqueByBlock,
 	};
 }
 
@@ -568,6 +574,8 @@ export function* insertBlocks(
 		meta = initialPosition;
 		initialPosition = 0;
 		deprecated( "meta argument in wp.data.dispatch('core/block-editor')", {
+			since: '10.1',
+			plugin: 'Gutenberg',
 			hint: 'The meta argument is now the 6th argument of the function',
 		} );
 	}

@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useContext } from '@wordpress/element';
+import { useContext } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import {
 	__unstableGetBlockProps as getBlockProps,
@@ -22,8 +22,12 @@ import useMovingAnimation from '../../use-moving-animation';
 import { BlockListBlockContext } from '../block';
 import { useFocusFirstElement } from './use-focus-first-element';
 import { useIsHovered } from './use-is-hovered';
+import { useBlockClassNames } from './use-block-class-names';
+import { useBlockDefaultClassName } from './use-block-default-class-name';
+import { useBlockCustomClassName } from './use-block-custom-class-name';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
 import { useEventHandlers } from './use-event-handlers';
+import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockNodes } from './use-block-nodes';
 import { store as blockEditorStore } from '../../../store';
 
@@ -50,8 +54,6 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * @return {Object} Props to pass to the element to mark as a block.
  */
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
-	const fallbackRef = useRef();
-	const ref = props.ref || fallbackRef;
 	const { clientId, index, className, wrapperProps = {} } = useContext(
 		BlockListBlockContext
 	);
@@ -96,15 +98,13 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 
 	// translators: %s: Type of block (i.e. Text, Image etc)
 	const blockLabel = sprintf( __( 'Block: %s' ), blockTitle );
-
-	useFocusFirstElement( ref, clientId );
-
-	const blockMovingModeClassNames = useBlockMovingModeClassNames( clientId );
 	const htmlSuffix = mode === 'html' && ! __unstableIsHtml ? '-visual' : '';
 	const mergedRefs = useMergeRefs( [
-		ref,
+		props.ref,
+		useFocusFirstElement( clientId ),
 		useBlockNodes( clientId ),
 		useEventHandlers( clientId ),
+		useNavModeExit( clientId ),
 		useIsHovered(),
 		useMovingAnimation( {
 			isSelected: isPartOfSelection,
@@ -129,7 +129,10 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			className,
 			props.className,
 			wrapperProps.className,
-			blockMovingModeClassNames
+			useBlockClassNames( clientId ),
+			useBlockDefaultClassName( clientId ),
+			useBlockCustomClassName( clientId ),
+			useBlockMovingModeClassNames( clientId )
 		),
 		style: { ...wrapperProps.style, ...props.style },
 	};

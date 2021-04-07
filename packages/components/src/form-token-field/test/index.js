@@ -95,8 +95,10 @@ describe( 'FormTokenField', () => {
 		return selectedSuggestions[ 0 ] || null;
 	}
 
-	beforeEach( () => {
-		wrapper = TestUtils.renderIntoDocument( <TokenFieldWrapper /> );
+	function setUp( props ) {
+		wrapper = TestUtils.renderIntoDocument(
+			<TokenFieldWrapper { ...props } />
+		);
 		/* eslint-disable react/no-find-dom-node */
 		wrapperElement = () => ReactDOM.findDOMNode( wrapper );
 		textInputElement = () =>
@@ -108,10 +110,11 @@ describe( 'FormTokenField', () => {
 			TestUtils.findRenderedComponentWithType( wrapper, TokenInput );
 		/* eslint-enable react/no-find-dom-node */
 		TestUtils.Simulate.focus( textInputElement() );
-	} );
+	}
 
 	describe( 'displaying tokens', () => {
 		it( 'should render default tokens', () => {
+			setUp();
 			wrapper.setState( {
 				isExpanded: true,
 			} );
@@ -119,6 +122,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should display tokens with escaped special characters properly', () => {
+			setUp();
 			wrapper.setState( {
 				tokens: fixtures.specialTokens.textEscaped,
 				isExpanded: true,
@@ -129,6 +133,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should display tokens with special characters properly', () => {
+			setUp();
 			// This test is not as realistic as the previous one: if a WP site
 			// contains tag names with special characters, the API will always
 			// return the tag names already escaped.  However, this is still
@@ -147,6 +152,7 @@ describe( 'FormTokenField', () => {
 
 	describe( 'suggestions', () => {
 		it( 'should not render suggestions unless we type at least two characters', () => {
+			setUp();
 			wrapper.setState( {
 				isExpanded: true,
 			} );
@@ -157,7 +163,16 @@ describe( 'FormTokenField', () => {
 			);
 		} );
 
+		it( 'should show suggestions when when input is empty if expandOnFocus is set to true', () => {
+			setUp( { __experimentalExpandOnFocus: true } );
+			wrapper.setState( {
+				isExpanded: true,
+			} );
+			expect( getSuggestionsText() ).not.toEqual( [] );
+		} );
+
 		it( 'should remove already added tags from suggestions', () => {
+			setUp();
 			wrapper.setState( {
 				tokens: Object.freeze( [ 'of', 'and' ] ),
 			} );
@@ -165,6 +180,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'suggestions that begin with match are boosted', () => {
+			setUp();
 			wrapper.setState( {
 				isExpanded: true,
 			} );
@@ -175,6 +191,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should match against the unescaped values of suggestions with special characters', () => {
+			setUp();
 			wrapper.setState( {
 				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
 				isExpanded: true,
@@ -186,6 +203,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should match against the unescaped values of suggestions with special characters (including spaces)', () => {
+			setUp();
 			wrapper.setState( {
 				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
 				isExpanded: true,
@@ -197,6 +215,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should not match against the escaped values of suggestions with special characters', () => {
+			setUp();
 			setText( 'amp' );
 			wrapper.setState( {
 				tokenSuggestions: fixtures.specialSuggestions.textUnescaped,
@@ -208,6 +227,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should match suggestions even with trailing spaces', () => {
+			setUp();
 			wrapper.setState( {
 				isExpanded: true,
 			} );
@@ -218,6 +238,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should manage the selected suggestion based on both keyboard and mouse events', () => {
+			setUp();
 			wrapper.setState( {
 				isExpanded: true,
 			} );
@@ -255,6 +276,7 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should re-render when suggestions prop has changed', () => {
+			setUp();
 			wrapper.setState( {
 				tokenSuggestions: [],
 				isExpanded: true,
@@ -279,17 +301,20 @@ describe( 'FormTokenField', () => {
 
 	describe( 'adding tokens', () => {
 		it( 'should not allow adding blank tokens with Tab', () => {
+			setUp();
 			sendKeyDown( keyCodes.tab );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should not allow adding whitespace tokens with Tab', () => {
+			setUp();
 			setText( '   ' );
 			sendKeyDown( keyCodes.tab );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should add a token when Enter pressed', () => {
+			setUp();
 			setText( 'baz' );
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar', 'baz' ] );
@@ -298,37 +323,52 @@ describe( 'FormTokenField', () => {
 		} );
 
 		it( 'should not allow adding blank tokens with Enter', () => {
+			setUp();
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should not allow adding whitespace tokens with Enter', () => {
+			setUp();
 			setText( '   ' );
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should not allow adding whitespace tokens with comma', () => {
+			setUp();
 			setText( '   ' );
 			sendKeyPress( charCodes.comma );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 
 		it( 'should add a token when comma pressed', () => {
+			setUp();
 			setText( 'baz' );
 			sendKeyPress( charCodes.comma );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar', 'baz' ] );
 		} );
 
 		it( 'should trim token values when adding', () => {
+			setUp();
 			setText( '  baz  ' );
 			sendKeyDown( keyCodes.enter );
 			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar', 'baz' ] );
+		} );
+
+		it( "should not add values that don't pass the validation", () => {
+			setUp( {
+				__experimentalValidateInput: ( newValue ) => newValue !== 'baz',
+			} );
+			setText( 'baz' );
+			sendKeyDown( keyCodes.enter );
+			expect( wrapper.state.tokens ).toEqual( [ 'foo', 'bar' ] );
 		} );
 	} );
 
 	describe( 'removing tokens', () => {
 		it( 'should remove tokens when X icon clicked', () => {
+			setUp();
 			const forClickNode = wrapperElement().querySelector(
 				'.components-form-token-field__remove-token'
 			).firstChild;

@@ -65,9 +65,30 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	global $_wp_current_template_content;
 	$current_template = gutenberg_resolve_template( $type, $templates );
 
-	if ( $current_template ) {
-		$_wp_current_template_content = empty( $current_template->content ) ? __( 'Empty template.', 'gutenberg' ) : $current_template->content;
+	// Allow falling back to a PHP template if it has a higher priority than the block template.
+	$current_template_slug       = basename( $template, '.php' );
+	$current_block_template_slug = is_object( $current_template ) ? $current_template->slug : false;
+	foreach ( $templates as $template_item ) {
+		$template_item_slug = gutenberg_strip_php_suffix( $template_item );
 
+		// Don't override the template if we find a template matching the slug we look for
+		// and which does not match a block template slug.
+		if ( $current_template_slug !== $current_block_template_slug && $current_template_slug === $template_item_slug ) {
+			return $template;
+		}
+	}
+
+	if ( $current_template ) {
+		if ( empty( $current_template->content ) && is_user_logged_in() ) {
+			$_wp_current_template_content =
+			sprintf(
+				/* translators: %s: Template title */
+				__( 'Empty template: %s', 'gutenberg' ),
+				$current_template->title
+			);
+		} elseif ( ! empty( $current_template->content ) ) {
+			$_wp_current_template_content = $current_template->content;
+		}
 		if ( isset( $_GET['_wp-find-template'] ) ) {
 			wp_send_json_success( $current_template );
 		}
@@ -161,7 +182,10 @@ function gutenberg_get_the_template_html() {
 	global $wp_embed;
 
 	if ( ! $_wp_current_template_content ) {
-		return '<h1>' . esc_html__( 'No matching template found', 'gutenberg' ) . '</h1>';
+		if ( is_user_logged_in() ) {
+			return '<h1>' . esc_html__( 'No matching template found', 'gutenberg' ) . '</h1>';
+		}
+		return;
 	}
 
 	$content = $wp_embed->run_shortcode( $_wp_current_template_content );

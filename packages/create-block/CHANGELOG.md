@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 2.2.0 (2021-04-06)
+
+### Enhancement
+
+-   Scaffolded plugin requires WordPress 5.7 now ([#29757](https://github.com/WordPress/gutenberg/pull/29757)).
+
+### New Features
+
+-   Add new `theme` category to select for the block type ([#30089](https://github.com/WordPress/gutenberg/pull/30089)).
+
+## 2.1.0 (2021-03-17)
+
 ### New Features
 
 -   Add a way to provide a default value in the template for `attributes` and `supports` Block API fields ([#28883](https://github.com/WordPress/gutenberg/pull/28883)).
@@ -13,6 +25,7 @@
 ### Bug Fixes
 
 -   Updated `check-node-version` to version `^4.1.0` that no longer processes unrelated engines ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).
+-   Fixed the background color used in the CSS file that was invalid on the front-end.
 
 ## 2.0.1 (2021-02-01)
 

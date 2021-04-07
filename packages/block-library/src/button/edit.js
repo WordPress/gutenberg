@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState } from '@wordpress/element';
+import { useCallback, useState, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
@@ -15,14 +15,13 @@ import {
 	PanelBody,
 	RangeControl,
 	TextControl,
-	ToggleControl,
 	ToolbarButton,
-	ToolbarGroup,
 	Popover,
 } from '@wordpress/components';
 import {
 	BlockControls,
 	InspectorControls,
+	InspectorAdvancedControls,
 	RichText,
 	useBlockProps,
 	__experimentalLinkControl as LinkControl,
@@ -35,7 +34,6 @@ import { createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import ColorEdit from './color-edit';
 import getColorAndStyleProps from './color-props';
 
 const NEW_TAB_REL = 'noreferrer noopener';
@@ -148,28 +146,26 @@ function URLPicker( {
 	);
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					{ ! urlIsSet && (
-						<ToolbarButton
-							name="link"
-							icon={ link }
-							title={ __( 'Link' ) }
-							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ openLinkControl }
-						/>
-					) }
-					{ urlIsSetandSelected && (
-						<ToolbarButton
-							name="link"
-							icon={ linkOff }
-							title={ __( 'Unlink' ) }
-							shortcut={ displayShortcut.primaryShift( 'k' ) }
-							onClick={ unlinkButton }
-							isActive={ true }
-						/>
-					) }
-				</ToolbarGroup>
+			<BlockControls group="block">
+				{ ! urlIsSet && (
+					<ToolbarButton
+						name="link"
+						icon={ link }
+						title={ __( 'Link' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ openLinkControl }
+					/>
+				) }
+				{ urlIsSetandSelected && (
+					<ToolbarButton
+						name="link"
+						icon={ linkOff }
+						title={ __( 'Unlink' ) }
+						shortcut={ displayShortcut.primaryShift( 'k' ) }
+						onClick={ unlinkButton }
+						isActive={ true }
+					/>
+				) }
 			</BlockControls>
 			{ isSelected && (
 				<KeyboardShortcuts
@@ -230,12 +226,17 @@ function ButtonEdit( props ) {
 		[ rel, setAttributes ]
 	);
 
+	const setButtonText = ( newText ) => {
+		// Remove anchor tags from button text content.
+		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
+	};
+
 	const colorProps = getColorAndStyleProps( attributes, colors, true );
-	const blockProps = useBlockProps();
+	const ref = useRef();
+	const blockProps = useBlockProps( { ref } );
 
 	return (
 		<>
-			<ColorEdit { ...props } />
 			<div
 				{ ...blockProps }
 				className={ classnames( blockProps.className, {
@@ -246,7 +247,7 @@ function ButtonEdit( props ) {
 					aria-label={ __( 'Button text' ) }
 					placeholder={ placeholder || __( 'Add text…' ) }
 					value={ text }
-					onChange={ ( value ) => setAttributes( { text: value } ) }
+					onChange={ ( value ) => setButtonText( value ) }
 					withoutInteractiveFormatting
 					className={ classnames(
 						className,
@@ -279,7 +280,7 @@ function ButtonEdit( props ) {
 				isSelected={ isSelected }
 				opensInNewTab={ linkTarget === '_blank' }
 				onToggleOpenInNewTab={ onToggleOpenInNewTab }
-				anchorRef={ blockProps.ref }
+				anchorRef={ ref }
 			/>
 			<InspectorControls>
 				<BorderPanel
@@ -290,19 +291,14 @@ function ButtonEdit( props ) {
 					selectedWidth={ width }
 					setAttributes={ setAttributes }
 				/>
-				<PanelBody title={ __( 'Link settings' ) }>
-					<ToggleControl
-						label={ __( 'Open in new tab' ) }
-						onChange={ onToggleOpenInNewTab }
-						checked={ linkTarget === '_blank' }
-					/>
-					<TextControl
-						label={ __( 'Link rel' ) }
-						value={ rel || '' }
-						onChange={ onSetLinkRel }
-					/>
-				</PanelBody>
 			</InspectorControls>
+			<InspectorAdvancedControls>
+				<TextControl
+					label={ __( 'Link rel' ) }
+					value={ rel || '' }
+					onChange={ onSetLinkRel }
+				/>
+			</InspectorAdvancedControls>
 		</>
 	);
 }

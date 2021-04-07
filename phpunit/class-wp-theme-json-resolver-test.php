@@ -8,8 +8,40 @@
 
 class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 
-	function test_presets_are_extracted() {
-		$actual = WP_Theme_JSON_Resolver::get_presets_to_translate();
+	function setUp() {
+		parent::setUp();
+		$this->theme_root = realpath( __DIR__ . '/data/themedir1' );
+
+		$this->orig_theme_dir = $GLOBALS['wp_theme_directories'];
+
+		// /themes is necessary as theme.php functions assume /themes is the root if there is only one root.
+		$GLOBALS['wp_theme_directories'] = array( WP_CONTENT_DIR . '/themes', $this->theme_root );
+
+		add_filter( 'theme_root', array( $this, 'filter_set_theme_root' ) );
+		add_filter( 'stylesheet_root', array( $this, 'filter_set_theme_root' ) );
+		add_filter( 'template_root', array( $this, 'filter_set_theme_root' ) );
+		// Clear caches.
+		wp_clean_themes_cache();
+		unset( $GLOBALS['wp_themes'] );
+	}
+
+	function tearDown() {
+		$GLOBALS['wp_theme_directories'] = $this->orig_theme_dir;
+		wp_clean_themes_cache();
+		unset( $GLOBALS['wp_themes'] );
+		parent::tearDown();
+	}
+
+	function filter_set_theme_root() {
+		return $this->theme_root;
+	}
+
+	function filter_set_locale_to_polish() {
+		return 'pl_PL';
+	}
+
+	function test_fields_are_extracted() {
+		$actual = WP_Theme_JSON_Resolver::get_fields_to_translate();
 
 		$expected = array(
 			array(
@@ -52,8 +84,54 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 				'key'     => 'name',
 				'context' => 'Gradient name',
 			),
+			array(
+				'path'    => array( 'customTemplates' ),
+				'key'     => 'title',
+				'context' => 'Custom template name',
+			),
 		);
 
 		$this->assertEquals( $expected, $actual );
+	}
+
+	function test_translations_are_applied() {
+		add_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
+		load_textdomain( 'fse', realpath( __DIR__ . '/data/languages/themes/fse-pl_PL.mo' ) );
+
+		switch_theme( 'fse' );
+
+		$actual = WP_Theme_JSON_Resolver::get_theme_data();
+
+		unload_textdomain( 'fse' );
+		remove_filter( 'locale', array( $this, 'filter_set_locale_to_polish' ) );
+
+		$this->assertSame( wp_get_theme()->get( 'TextDomain' ), 'fse' );
+		$this->assertSame(
+			$actual->get_settings()['root']['color'],
+			array(
+				'palette' => array(
+					array(
+						'slug'  => 'light',
+						'name'  => 'Jasny',
+						'color' => '#f5f7f9',
+					),
+					array(
+						'slug'  => 'dark',
+						'name'  => 'Ciemny',
+						'color' => '#000',
+					),
+				),
+				'custom'  => false,
+			)
+		);
+		$this->assertSame(
+			$actual->get_custom_templates(),
+			array(
+				'page-home' => array(
+					'title'     => 'Szablon strony głównej',
+					'postTypes' => array( 'page' ),
+				),
+			)
+		);
 	}
 }

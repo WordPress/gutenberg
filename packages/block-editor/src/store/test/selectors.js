@@ -72,6 +72,9 @@ const {
 	__experimentalGetActiveBlockIdByBlockNames: getActiveBlockIdByBlockNames,
 	__experimentalGetParsedReusableBlock,
 	__experimentalGetAllowedPatterns,
+	__experimentalGetPatternsByBlockTypes,
+	__unstableGetClientIdWithClientIdsTree,
+	__unstableGetClientIdsTree,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -3374,10 +3377,12 @@ describe( 'selectors', () => {
 			settings: {
 				__experimentalBlockPatterns: [
 					{
+						name: 'pattern-a',
 						title: 'pattern with a',
 						content: `<!-- wp:test-block-a --><!-- /wp:test-block-a -->`,
 					},
 					{
+						name: 'pattern-b',
 						title: 'pattern with b',
 						content:
 							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
@@ -3400,6 +3405,80 @@ describe( 'selectors', () => {
 			expect(
 				__experimentalGetAllowedPatterns( state, 'block2' )
 			).toHaveLength( 0 );
+		} );
+	} );
+	describe( '__experimentalGetPatternsByBlockTypes', () => {
+		const state = {
+			blocks: {
+				byClientId: {
+					block1: { name: 'core/test-block-a' },
+				},
+			},
+			blockListSettings: {
+				block1: {
+					allowedBlocks: [ 'core/test-block-b' ],
+				},
+			},
+			settings: {
+				__experimentalBlockPatterns: [
+					{
+						name: 'pattern-a',
+						blockTypes: [ 'test/block-a' ],
+						title: 'pattern a',
+						content:
+							'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
+					},
+					{
+						name: 'pattern-b',
+						blockTypes: [ 'test/block-b' ],
+						title: 'pattern b',
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+					{
+						title: 'pattern c',
+						blockTypes: [ 'test/block-a' ],
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+				],
+			},
+		};
+		it( 'should return empty array if no block name is provided', () => {
+			expect( __experimentalGetPatternsByBlockTypes( state ) ).toEqual(
+				[]
+			);
+		} );
+		it( 'shoud return empty array if no match is found', () => {
+			const patterns = __experimentalGetPatternsByBlockTypes(
+				state,
+				'test/block-not-exists'
+			);
+			expect( patterns ).toEqual( [] );
+		} );
+		it( 'should return proper results when there are matched block patterns', () => {
+			const patterns = __experimentalGetPatternsByBlockTypes(
+				state,
+				'test/block-a'
+			);
+			expect( patterns ).toHaveLength( 2 );
+			expect( patterns ).toEqual(
+				expect.arrayContaining( [
+					expect.objectContaining( { title: 'pattern a' } ),
+					expect.objectContaining( { title: 'pattern c' } ),
+				] )
+			);
+		} );
+		it( 'should return proper result with matched patterns and allowed blocks from rootClientId', () => {
+			const patterns = __experimentalGetPatternsByBlockTypes(
+				state,
+				'test/block-a',
+				'block1'
+			);
+			expect( patterns ).toHaveLength( 1 );
+			expect( patterns[ 0 ] ).toEqual(
+				expect.objectContaining( { title: 'pattern c' } )
+			);
 		} );
 	} );
 } );
@@ -3485,5 +3564,78 @@ describe( 'getInserterItems with core blocks prioritization', () => {
 			'another-plugin/block-b',
 		];
 		expect( items.map( ( { name } ) => name ) ).toEqual( expectedResult );
+	} );
+} );
+
+describe( '__unstableGetClientIdWithClientIdsTree', () => {
+	it( "should return a stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
+		const state = {
+			blocks: {
+				order: {
+					'': [ 'foo' ],
+					foo: [ 'bar', 'baz' ],
+					bar: [ 'qux' ],
+				},
+			},
+		};
+
+		expect(
+			__unstableGetClientIdWithClientIdsTree( state, 'foo' )
+		).toEqual( {
+			clientId: 'foo',
+			innerBlocks: [
+				{
+					clientId: 'bar',
+					innerBlocks: [ { clientId: 'qux', innerBlocks: [] } ],
+				},
+				{ clientId: 'baz', innerBlocks: [] },
+			],
+		} );
+	} );
+} );
+describe( '__unstableGetClientIdsTree', () => {
+	it( "should return the full content tree starting from the given root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
+		const state = {
+			blocks: {
+				order: {
+					'': [ 'foo' ],
+					foo: [ 'bar', 'baz' ],
+					bar: [ 'qux' ],
+				},
+			},
+		};
+
+		expect( __unstableGetClientIdsTree( state, 'foo' ) ).toEqual( [
+			{
+				clientId: 'bar',
+				innerBlocks: [ { clientId: 'qux', innerBlocks: [] } ],
+			},
+			{ clientId: 'baz', innerBlocks: [] },
+		] );
+	} );
+
+	it( "should return the full content tree starting from the root, consisting of stripped down block object containing only its client ID and its inner blocks' client IDs", () => {
+		const state = {
+			blocks: {
+				order: {
+					'': [ 'foo' ],
+					foo: [ 'bar', 'baz' ],
+					bar: [ 'qux' ],
+				},
+			},
+		};
+
+		expect( __unstableGetClientIdsTree( state ) ).toEqual( [
+			{
+				clientId: 'foo',
+				innerBlocks: [
+					{
+						clientId: 'bar',
+						innerBlocks: [ { clientId: 'qux', innerBlocks: [] } ],
+					},
+					{ clientId: 'baz', innerBlocks: [] },
+				],
+			},
+		] );
 	} );
 } );

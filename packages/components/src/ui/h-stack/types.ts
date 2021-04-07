@@ -1,5 +1,13 @@
-import { CSSProperties } from 'react';
-import { FlexProps } from '../flex/types';
+/**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { CSSProperties } from 'react';
+
+/**
+ * Internal dependencies
+ */
+import type { FlexProps } from '../flex/types';
 
 export type HStackAlignment =
 	| 'bottom'

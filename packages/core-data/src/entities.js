@@ -72,6 +72,13 @@ export const defaultEntities = [
 		label: __( 'Widgets' ),
 	},
 	{
+		name: 'widgetType',
+		kind: 'root',
+		baseURL: '/wp/v2/widget-types',
+		plural: 'widgetTypes',
+		label: __( 'Widget types' ),
+	},
+	{
 		label: __( 'User' ),
 		name: 'user',
 		kind: 'root',

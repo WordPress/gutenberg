@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { registerBlockType } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
@@ -11,7 +10,8 @@ import {
 /**
  * Internal dependencies
  */
-import createSidebarControl from './create-sidebar-control';
+import SidebarSection from './controls/sidebar-section';
+import SidebarControl from './controls/sidebar-control';
 
 const { wp } = window;
 
@@ -25,38 +25,13 @@ export function initialize() {
 	registerCoreBlocks( coreBlocks );
 
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks();
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableLegacyWidgetBlock: true,
+		} );
 	}
 
-	// TODO: Register legacy widgets block
-	registerBlockType( 'core/legacy-widget', {
-		title: 'Legacy Widget',
-		attributes: {
-			widgetClass: {
-				type: 'string',
-			},
-			referenceWidgetName: {
-				type: 'string',
-			},
-			name: {
-				type: 'string',
-			},
-			idBase: {
-				type: 'string',
-			},
-			number: {
-				type: 'number',
-			},
-			instance: {
-				type: 'object',
-			},
-		},
-		edit( { attributes } ) {
-			return <div>{ JSON.stringify( attributes ) }</div>;
-		},
-	} );
-
-	wp.customize.controlConstructor.sidebar_block_editor = createSidebarControl();
+	wp.customize.sectionConstructor.sidebar = SidebarSection;
+	wp.customize.controlConstructor.sidebar_block_editor = SidebarControl;
 }
 
 wp.domReady( initialize );

@@ -18,20 +18,6 @@ import {
 } from './controls';
 
 /**
- * "Kind" of the navigation post.
- *
- * @type {string}
- */
-export const KIND = 'root';
-
-/**
- * "post type" of the navigation post.
- *
- * @type {string}
- */
-export const POST_TYPE = 'postType';
-
-/**
  * Builds an ID for a new navigation post.
  *
  * @param {number} menuId Menu id.

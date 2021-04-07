@@ -53,6 +53,10 @@ export default class PlainText extends Component {
 		this._input.focus();
 	}
 
+	blur() {
+		this._input.blur();
+	}
+
 	render() {
 		return (
 			<TextInput
