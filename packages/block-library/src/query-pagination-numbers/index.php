@@ -55,6 +55,9 @@ function render_block_core_query_pagination_numbers( $attributes, $content, $blo
 		wp_reset_postdata(); // Restore original Post Data.
 		$wp_query = $prev_wp_query;
 	}
+	if ( empty( $content ) ) {
+		return '';
+	}
 	return sprintf(
 		'<div %1$s>%2$s</div>',
 		$wrapper_attributes,
