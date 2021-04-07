@@ -63,6 +63,8 @@ import * as buttons from './buttons';
 import * as socialLink from './social-link';
 import * as socialLinks from './social-links';
 
+import { transformationCategory } from './transformationCategories';
+
 export const coreBlocks = [
 	// Common blocks are grouped at the top to prioritize their display
 	// in various contexts — like the inserter and auto-complete components.
@@ -173,6 +175,28 @@ addFilter(
 			settings.supports = {
 				...settings.supports,
 				inserter: false,
+			};
+		}
+
+		return settings;
+	}
+);
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/react-native-editor',
+	( settings, name ) => {
+		if ( ! settings.transforms ) {
+			return settings;
+		}
+
+		if ( ! settings.transforms.supportedMobileTransforms ) {
+			return {
+				...settings,
+				transforms: {
+					...settings.transforms,
+					supportedMobileTransforms: transformationCategory( name ),
+				},
 			};
 		}
 
