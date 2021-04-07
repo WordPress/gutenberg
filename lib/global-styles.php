@@ -6,107 +6,6 @@
  */
 
 /**
- * Returns the theme presets registered via add_theme_support, if any.
- *
- * @param array $settings Existing editor settings.
- *
- * @return array Config that adheres to the theme.json schema.
- */
-function gutenberg_experimental_global_styles_get_theme_support_settings( $settings ) {
-	$all_blocks                                = WP_Theme_JSON::ALL_BLOCKS_NAME;
-	$theme_settings                            = array();
-	$theme_settings['settings']                = array();
-	$theme_settings['settings'][ $all_blocks ] = array();
-
-	// Deprecated theme supports.
-	if ( isset( $settings['disableCustomColors'] ) ) {
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['color'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['color']['custom'] = ! $settings['disableCustomColors'];
-	}
-
-	if ( isset( $settings['disableCustomGradients'] ) ) {
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['color'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['color']['customGradient'] = ! $settings['disableCustomGradients'];
-	}
-
-	if ( isset( $settings['disableCustomFontSizes'] ) ) {
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['typography'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['typography'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['typography']['customFontSize'] = ! $settings['disableCustomFontSizes'];
-	}
-
-	if ( isset( $settings['enableCustomLineHeight'] ) ) {
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['typography'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['typography'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
-	}
-
-	if ( isset( $settings['enableCustomUnits'] ) ) {
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
-			array( 'px', 'em', 'rem', 'vh', 'vw' ) :
-			$settings['enableCustomUnits'];
-	}
-
-	if ( isset( $settings['colors'] ) ) {
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['color'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['color']['palette'] = $settings['colors'];
-	}
-
-	if ( isset( $settings['gradients'] ) ) {
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['color'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['color']['gradients'] = $settings['gradients'];
-	}
-
-	if ( isset( $settings['fontSizes'] ) ) {
-		$font_sizes = $settings['fontSizes'];
-		// Back-compatibility for presets without units.
-		foreach ( $font_sizes as $key => $font_size ) {
-			if ( is_numeric( $font_size['size'] ) ) {
-				$font_sizes[ $key ]['size'] = $font_size['size'] . 'px';
-			}
-		}
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['typography'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['typography'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['typography']['fontSizes'] = $font_sizes;
-	}
-
-	// This allows to make the plugin work with WordPress 5.7 beta
-	// as well as lower versions. The second check can be removed
-	// as soon as the minimum WordPress version for the plugin
-	// is bumped to 5.7.
-	if ( isset( $settings['enableCustomSpacing'] ) ) {
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['spacing'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['spacing'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['spacing']['customPadding'] = $settings['enableCustomSpacing'];
-	}
-
-	// Things that didn't land in core yet, so didn't have a setting assigned.
-	if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
-		if ( ! isset( $theme_settings['settings'][ $all_blocks ]['color'] ) ) {
-			$theme_settings['settings'][ $all_blocks ]['color'] = array();
-		}
-		$theme_settings['settings'][ $all_blocks ]['color']['link'] = true;
-	}
-
-	return $theme_settings;
-}
-
-/**
  * Takes a tree adhering to the theme.json schema and generates
  * the corresponding stylesheet.
  *
@@ -165,7 +64,7 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 	}
 
 	$settings           = gutenberg_get_common_block_editor_settings();
-	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
+	$theme_support_data = WP_Theme_JSON::get_from_editor_settings( $settings );
 
 	$all = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data );
 
@@ -186,7 +85,7 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	$theme_support_data = gutenberg_experimental_global_styles_get_theme_support_settings( $settings );
+	$theme_support_data = WP_Theme_JSON::get_from_editor_settings( $settings );
 	unset( $settings['colors'] );
 	unset( $settings['disableCustomColors'] );
 	unset( $settings['disableCustomFontSizes'] );
