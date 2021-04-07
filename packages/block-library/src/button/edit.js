@@ -241,6 +241,7 @@ function ButtonEdit( props ) {
 				{ ...blockProps }
 				className={ classnames( blockProps.className, {
 					[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+					[ `has-custom-font-size` ]: blockProps.style.fontSize,
 				} ) }
 			>
 				<RichText
