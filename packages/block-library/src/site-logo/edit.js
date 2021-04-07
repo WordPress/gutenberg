@@ -173,7 +173,7 @@ const SiteLogo = ( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Site Logo Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
 						label={ __( 'Image width' ) }
 						onChange={ ( newWidth ) =>
@@ -181,10 +181,6 @@ const SiteLogo = ( {
 						}
 						min={ minWidth }
 						max={ maxWidthBuffer }
-						initialPosition={ Math.min(
-							naturalWidth,
-							maxWidthBuffer
-						) }
 						value={ width || '' }
 						disabled={ ! isResizable }
 					/>

@@ -1,6 +1,15 @@
 .wp-block-site-logo {
 	line-height: 0;
 
+	a {
+		display: inline-block;
+	}
+
+	// Provide a sane starting point for the size.
+	&:not(.is-resized) img {
+		width: 120px;
+	}
+
 	.aligncenter {
 		display: table;
 	}
