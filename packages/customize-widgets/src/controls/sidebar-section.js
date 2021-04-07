@@ -34,7 +34,17 @@ class SidebarSection extends customize.Section {
 	hasSubSectionOpened() {
 		return this.inspector.expanded();
 	}
-	onChangeExpanded( expanded, args ) {
+	onChangeExpanded( expanded, _args ) {
+		const controls = this.controls();
+		const args = {
+			..._args,
+			completeCallback() {
+				controls.forEach( ( control ) => {
+					control.onChangeSectionExpanded( expanded, args );
+				} );
+			},
+		};
+
 		if ( args.manualTransition ) {
 			if ( expanded ) {
 				this.contentContainer.addClass( [ 'busy', 'open' ] );
@@ -44,7 +54,7 @@ class SidebarSection extends customize.Section {
 					.addClass( 'section-open' );
 				this.contentContainer.one( 'transitionend', () => {
 					this.contentContainer.removeClass( 'busy' );
-					args.completeCallback?.();
+					args.completeCallback();
 				} );
 			} else {
 				this.contentContainer.addClass( [
@@ -57,17 +67,12 @@ class SidebarSection extends customize.Section {
 				this.contentContainer.removeClass( 'open' );
 				this.contentContainer.one( 'transitionend', () => {
 					this.contentContainer.removeClass( 'busy' );
-					args.completeCallback?.();
+					args.completeCallback();
 				} );
 			}
 		} else {
 			super.onChangeExpanded( expanded, args );
 		}
-
-		const controls = this.controls();
-		controls.forEach( ( control ) => {
-			control.onChangeSectionExpanded( expanded, args );
-		} );
 	}
 }
 
