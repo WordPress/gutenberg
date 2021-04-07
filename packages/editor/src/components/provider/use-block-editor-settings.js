@@ -74,6 +74,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				'__experimentalSetIsInserterOpened',
 				'alignWide',
 				'allowedBlockTypes',
+				'allowedHtmlTags',
 				'bodyPlaceholder',
 				'codeEditingEnabled',
 				'colors',
