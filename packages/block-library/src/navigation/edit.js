@@ -167,15 +167,13 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<nav { ...blockProps }>
+			<nav { ...innerBlocksProps }>
 				<ResponsiveWrapper
 					id={ clientId }
 					onToggle={ setResponsiveMenuVisibility }
 					isOpen={ isResponsiveMenuOpen }
 					isResponsive={ attributes.isResponsive }
-				>
-					<ul { ...innerBlocksProps }></ul>
-				</ResponsiveWrapper>
+				></ResponsiveWrapper>
 			</nav>
 		</>
 	);

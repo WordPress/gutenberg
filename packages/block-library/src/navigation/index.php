@@ -174,7 +174,16 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	);
 
 	$inner_blocks_html = '';
+	$is_list_open = false;
 	foreach ( $block->inner_blocks as $inner_block ) {
+		if ($inner_block->name === "core/navigation-link" && $is_list_open === false) {
+			$is_list_open = true;
+			$inner_blocks_html .= '<ul class="wp-block-navigation__container">';
+		}
+		if ($inner_block->name !== "core/navigation-link" && $inner_block->name !== "core/spacer" && $is_list_open === true) {
+			$is_list_open = false;
+			$inner_blocks_html .= '</ul>';
+		}
 		$inner_blocks_html .= $inner_block->render();
 	}
 
