@@ -462,6 +462,17 @@ function Autocomplete( {
 					return false;
 				}
 
+				// Escape hatch for inline completer triggers. Allows up to 3 words to
+				// be matched and will bail out on the 4th word onwards. An example is
+				// the "user" completer. Its trigger char isn't removed when completing
+				// is done, so it's always present on the page. Without this hatch, the
+				// autocompleter will keep trying to match everything from the trigger
+				// onwards, up to infinity, slowing down the editor. This limit of words
+				// should work well with other completers.
+				if ( textWithoutTrigger.trim().split( /\s/ ).length >= 4 ) {
+					return false;
+				}
+
 				return /[\u0000-\uFFFF]*$/.test( textWithoutTrigger );
 			}
 		);
