@@ -405,6 +405,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 					'description' => __( 'Whether the widget supports multiple instances', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'view', 'edit', 'embed' ),
+					'readonly'    => true,
 				),
 				'classname'                   => array(
 					'description' => __( 'Class name', 'gutenberg' ),
