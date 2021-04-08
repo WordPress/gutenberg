@@ -1,4 +1,6 @@
-.editor-styles-wrapper .wp-block.wp-block-query-loop {
-  max-width: 100%;
+.wp-block.wp-block-query-loop {
+  padding-left: 0;
+  margin-left: 0;
+  list-style: none;
 }
 /*# sourceMappingURL=editor.css.map */

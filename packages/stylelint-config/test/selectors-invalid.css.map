@@ -1,0 +1,9 @@
+{
+    "version": 3,
+    "mappings": "AAAA,AAEC,IAFG,GAEC,IAAI,CAAC;EACR,MAAM,EAAE,CAAC;CACT;;AAGF,AAEC,CAFA,CAEE,CAAC,CAAC;EACH,MAAM,EAAE,CAAC;CACT;;AAGF,AAEC,GAFE,GAEE,CAAC,CAAC;EACL,MAAM,EAAE,CAAC;CACT;;AAGF,AAEC,CAFA,CAEE,MAAM,CAAC;EACR,MAAM,EAAE,CAAC;CACT;;AAGF,AAEC,IAFG,CAED,MAAM,AAAA,MAAM,CAAC;EACd,MAAM,EAAE,CAAC;CACT",
+    "sources": [
+        "selectors-invalid.scss"
+    ],
+    "names": [],
+    "file": "selectors-invalid.css"
+}

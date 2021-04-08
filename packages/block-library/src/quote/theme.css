@@ -5,10 +5,9 @@
 }
 
 .wp-block-quote cite,
-.wp-block-quote footer, .wp-block-quote__citation {
+.wp-block-quote footer {
   color: currentColor;
   font-size: 0.8125em;
-  margin-top: 1em;
   position: relative;
   font-style: normal;
 }

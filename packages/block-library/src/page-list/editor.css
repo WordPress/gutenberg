@@ -1,0 +1,19 @@
+.wp-block-navigation .wp-block-page-list > div,
+.wp-block-navigation .wp-block-page-list {
+  background-color: inherit;
+}
+
+.wp-block-pages-list__item__link {
+  pointer-events: none;
+}
+
+.wp-block-page-list .components-placeholder {
+  min-height: 0;
+  padding: 0;
+  background-color: inherit;
+}
+
+.wp-block-page-list .components-placeholder .components-spinner {
+  margin: 0.5em;
+}
+/*# sourceMappingURL=editor.css.map */

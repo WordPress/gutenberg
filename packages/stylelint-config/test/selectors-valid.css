@@ -1,19 +1,23 @@
-#comment-form {
-	margin: 1em 0;
+.foo > .bar {
+  margin: 0;
 }
 
-input[type="text"] {
-	line-height: 1.1;
+a.foo {
+  margin: 0;
 }
 
-.selector::after {
-	color: #000;
+.foo > div {
+  margin: 0;
 }
 
-.selector-class {
-	color: #000;
+p,
+p .foo,
+p .baz {
+  margin: 0;
 }
 
-#selector-id {
-	color: #000;
+span,
+span .foo::after {
+  color: #000;
 }
+/*# sourceMappingURL=selectors-valid.css.map */

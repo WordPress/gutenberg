@@ -1,0 +1,133 @@
+.wp-block-buttons {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: row;
+          flex-direction: row;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  /* stylelint-disable indentation */
+}
+
+.wp-block-buttons.is-vertical {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+}
+
+.wp-block-buttons.is-vertical > .wp-block-button {
+  /*rtl:ignore*/
+  margin-right: 0;
+}
+
+.wp-block-buttons.is-vertical > .wp-block-button:last-child {
+  margin-bottom: 0;
+}
+
+.wp-block-buttons > .wp-block-button {
+  display: inline-block;
+  /*rtl:ignore*/
+  margin-left: 0;
+  /*rtl:ignore*/
+  margin-right: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+.wp-block-buttons > .wp-block-button:last-child {
+  /*rtl:ignore*/
+  margin-right: 0;
+}
+
+.wp-block-buttons.is-content-justification-left {
+  -webkit-box-pack: start;
+      -ms-flex-pack: start;
+          justify-content: flex-start;
+}
+
+.wp-block-buttons.is-content-justification-left.is-vertical {
+  -webkit-box-align: start;
+      -ms-flex-align: start;
+          align-items: flex-start;
+}
+
+.wp-block-buttons.is-content-justification-center {
+  -webkit-box-pack: center;
+      -ms-flex-pack: center;
+          justify-content: center;
+}
+
+.wp-block-buttons.is-content-justification-center.is-vertical {
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.wp-block-buttons.is-content-justification-right {
+  -webkit-box-pack: end;
+      -ms-flex-pack: end;
+          justify-content: flex-end;
+}
+
+.wp-block-buttons.is-content-justification-right > .wp-block-button {
+  /*rtl:ignore*/
+  margin-left: 0.5em;
+  /*rtl:ignore*/
+  margin-right: 0;
+}
+
+.wp-block-buttons.is-content-justification-right > .wp-block-button:first-child {
+  /*rtl:ignore*/
+  margin-left: 0;
+}
+
+.wp-block-buttons.is-content-justification-right.is-vertical {
+  -webkit-box-align: end;
+      -ms-flex-align: end;
+          align-items: flex-end;
+}
+
+.wp-block-buttons.is-content-justification-space-between {
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+.wp-block-buttons.aligncenter {
+  text-align: center;
+}
+
+.wp-block-buttons.alignleft .wp-block-button {
+  /*rtl:ignore*/
+  margin-left: 0;
+  /*rtl:ignore*/
+  margin-right: 0.5em;
+}
+
+.wp-block-buttons.alignleft .wp-block-button:last-child {
+  /*rtl:ignore*/
+  margin-right: 0;
+}
+
+.wp-block-buttons.alignright .wp-block-button {
+  /*rtl:ignore*/
+  margin-right: 0;
+  /*rtl:ignore*/
+  margin-left: 0.5em;
+}
+
+.wp-block-buttons.alignright .wp-block-button:first-child {
+  /*rtl:ignore*/
+  margin-left: 0;
+}
+
+.wp-block-buttons .wp-block-button.aligncenter {
+  /* stylelint-enable indentation */
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 0.5em;
+  width: 100%;
+}
+/*# sourceMappingURL=style.css.map */

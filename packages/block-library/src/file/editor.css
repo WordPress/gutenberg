@@ -17,14 +17,8 @@
           flex-grow: 1;
 }
 
-.wp-block-file .wp-block-file__textlink {
-  display: inline-block;
+.wp-block-file a {
   min-width: 1em;
-}
-
-.wp-block-file .wp-block-file__textlink:focus {
-  -webkit-box-shadow: none;
-          box-shadow: none;
 }
 
 .wp-block-file .wp-block-file__button-richtext-wrapper {

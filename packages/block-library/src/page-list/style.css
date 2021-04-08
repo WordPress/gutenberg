@@ -1,0 +1,25 @@
+.wp-block-navigation .wp-block-page-list {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
+  background-color: inherit;
+}
+
+.wp-block-navigation .wp-block-pages-list__item {
+  background-color: inherit;
+}
+
+.wp-block-navigation .wp-block-page-list__submenu-icon {
+  display: none;
+}
+
+.wp-block-navigation .show-submenu-icons .wp-block-page-list__submenu-icon {
+  display: block;
+}
+
+.is-vertical .wp-block-navigation__container .wp-block-page-list {
+  display: block;
+}
+/*# sourceMappingURL=style.css.map */

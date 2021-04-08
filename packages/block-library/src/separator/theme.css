@@ -7,7 +7,7 @@
 }
 
 .wp-block-separator:not(.is-style-wide):not(.is-style-dots) {
-  max-width: 100px;
+  width: 100px;
 }
 
 .wp-block-separator.has-background:not(.is-style-dots) {
