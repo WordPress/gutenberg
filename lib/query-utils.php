@@ -7,7 +7,7 @@
  */
 
 /**
- * Helper function that constructs a WP_Query args object from
+ * Helper function that constructs a WP_Query args array from
  * a `Query` block properties.
  *
  * It's used in QueryLoop, QueryPaginationNumbers and QueryPaginationNext blocks.
