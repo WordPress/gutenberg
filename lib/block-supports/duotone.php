@@ -53,9 +53,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		return $block_content;
 	}
 
-	$duotone_attribute = $block['attrs']['style']['color']['duotone'];
-
-	$duotone_values = $duotone_attribute;
+	$duotone_values = $block['attrs']['style']['color']['duotone'];
 	$duotone_id     = 'wp-duotone-filter-' . uniqid();
 
 	$selectors        = explode( ',', $duotone_support );

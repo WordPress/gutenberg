@@ -190,13 +190,12 @@ const withDuotoneControls = createHigherOrderComponent(
 const withDuotoneStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const duotoneSupport = getBlockSupport( props.name, 'color.duotone' );
-		const duotoneAttribute = props?.attributes?.style?.color?.duotone;
+		const values = props?.attributes?.style?.color?.duotone;
 
-		if ( ! duotoneSupport || ! duotoneAttribute ) {
+		if ( ! duotoneSupport || ! values ) {
 			return <BlockListBlock { ...props } />;
 		}
 
-		const values = duotoneAttribute;
 		const id = `wp-duotone-filter-${ useInstanceId( BlockListBlock ) }`;
 
 		const selectors = duotoneSupport.split( ',' );
