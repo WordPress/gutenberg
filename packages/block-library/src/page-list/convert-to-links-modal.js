@@ -3,7 +3,6 @@
  */
 import { Button, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { createBlock as create } from '@wordpress/blocks';
@@ -17,7 +16,6 @@ export const convertSelectedBlockToNavigationLinks = ( {
 	clientId,
 	replaceBlock,
 	createBlock,
-	setIsConverting,
 } ) => () => {
 	if ( ! pages ) {
 		return;
@@ -25,7 +23,6 @@ export const convertSelectedBlockToNavigationLinks = ( {
 
 	const linkMap = {};
 	const navigationLinks = [];
-	setIsConverting( true );
 	pages.forEach( ( { id, title, link: url, type, parent } ) => {
 		// See if a placeholder exists. This is created if children appear before parents in list
 		const innerBlocks = linkMap[ id ]?.innerBlocks ?? [];
@@ -33,7 +30,7 @@ export const convertSelectedBlockToNavigationLinks = ( {
 			'core/navigation-link',
 			{
 				id,
-				label: title.rendered, //TODO: raw or rendered?
+				label: title.rendered,
 				url,
 				type,
 				kind: 'post-type',
@@ -54,11 +51,9 @@ export const convertSelectedBlockToNavigationLinks = ( {
 	} );
 
 	replaceBlock( clientId, navigationLinks );
-	setIsConverting( false );
 };
 
 export default function ConvertToLinksModal( { onClose, clientId } ) {
-	const [ isConverting, setIsConverting ] = useState( false );
 	const { pages, pagesFinished } = useSelect(
 		( select ) => {
 			const { getEntityRecords, hasFinishedResolution } = select(
@@ -70,7 +65,11 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 				{
 					per_page: MAX_PAGE_COUNT,
 					_fields: PAGE_FIELDS,
+					// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby
+					// values is resolved, update 'orderby' to [ 'menu_order', 'post_title' ] to provide a consistent
+					// sort.
 					orderby: 'menu_order',
+					order: 'asc',
 				},
 			];
 			return {
@@ -95,7 +94,7 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 		>
 			<p id={ 'wp-block-page-list-modal__description' }>
 				{ __(
-					'To edit this navigation menu, convert it to single page links. This allows you to add re-order, remove items, or edit their labels.'
+					'To edit this navigation menu, convert it to single page links. This allows you to add, re-order, remove items, or edit their labels.'
 				) }
 			</p>
 			<p>
@@ -109,14 +108,12 @@ export default function ConvertToLinksModal( { onClose, clientId } ) {
 				</Button>
 				<Button
 					isPrimary
-					isBusy={ isConverting }
-					disabled={ ! pagesFinished || isConverting }
+					disabled={ ! pagesFinished }
 					onClick={ convertSelectedBlockToNavigationLinks( {
 						pages,
 						replaceBlock,
 						clientId,
 						createBlock: create,
-						setIsConverting,
 					} ) }
 				>
 					{ __( 'Convert' ) }
