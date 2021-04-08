@@ -13,7 +13,7 @@ export default function useImageSizes( images, isSelected, getSettings ) {
 
 	function getImageSizing() {
 		if ( ! images || images.length === 0 ) {
-			return [];
+			return;
 		}
 		const { imageSizes } = getSettings();
 		let resizedImages = {};

@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isEmpty, concat, find } from 'lodash';
+import { concat, find } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -441,7 +441,6 @@ function GalleryEdit( props ) {
 		return <View { ...blockProps }>{ mediaPlaceholder }</View>;
 	}
 
-	const shouldShowSizeOptions = ! isEmpty( imageSizeOptions );
 	const hasLinkTo = linkTo && linkTo !== 'none';
 
 	return (
@@ -479,7 +478,7 @@ function GalleryEdit( props ) {
 							onChange={ toggleOpenInNewTab }
 						/>
 					) }
-					{ shouldShowSizeOptions ? (
+					{ imageSizeOptions?.length > 0 && (
 						<SelectControl
 							label={ __( 'Image size' ) }
 							value={ sizeSlug }
@@ -487,7 +486,8 @@ function GalleryEdit( props ) {
 							onChange={ updateImagesSize }
 							hideCancelButton={ true }
 						/>
-					) : (
+					) }
+					{ ! imageSizeOptions && (
 						<BaseControl className={ 'gallery-image-sizes' }>
 							<BaseControl.VisualLabel>
 								{ __( 'Image size' ) }
