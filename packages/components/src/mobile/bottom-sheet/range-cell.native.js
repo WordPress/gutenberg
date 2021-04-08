@@ -188,7 +188,9 @@ class BottomSheetRangeCell extends Component {
 							this.a11yDecrementValue();
 							break;
 						case 'activate':
-							openUnitPicker();
+							if ( openUnitPicker ) {
+								openUnitPicker();
+							}
 							break;
 					}
 				} }
