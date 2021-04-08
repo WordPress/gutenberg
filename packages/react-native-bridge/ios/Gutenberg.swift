@@ -1,4 +1,5 @@
 import UIKit
+import Network
 import Aztec
 
 // IMPORTANT: if you're seeing a warning with this import, keep in mind it's marked as a Swift
@@ -45,15 +46,6 @@ public class Gutenberg: NSObject {
         return !bridge.isLoading
     }
 
-    public var logThreshold: LogLevel {
-        get {
-            return LogLevel(RCTGetLogThreshold())
-        }
-        set {
-            RCTSetLogThreshold(RCTLogLevel(newValue))
-        }
-    }
-
     private let bridgeModule = RNReactNativeGutenbergBridge()
     private unowned let dataSource: GutenbergBridgeDataSource
 
@@ -96,8 +88,6 @@ public class Gutenberg: NSObject {
             initialProps["gradients"] = gradients
         }
 
-        initialProps["editorMode"] = dataSource.isPreview ? "preview" : "editor"
-
         return initialProps
     }
 
@@ -106,7 +96,6 @@ public class Gutenberg: NSObject {
         self.extraModules = extraModules
         super.init()
         bridgeModule.dataSource = dataSource
-        logThreshold = isPackagerRunning ? .trace : .error
     }
 
     public func invalidate() {
@@ -195,11 +184,6 @@ public class Gutenberg: NSObject {
         bridgeModule.sendEventIfNeeded(.setFocusOnTitle, body: nil)
     }
 
-    private var isPackagerRunning: Bool {
-        let url = sourceURL(for: bridge)
-        return !(url?.isFileURL ?? true)
-    }
-
     public func updateTheme(_ editorTheme: GutenbergEditorTheme?) {
 
         var themeUpdates = [String : Any]()
@@ -222,6 +206,22 @@ public class Gutenberg: NSObject {
 
 extension Gutenberg: RCTBridgeDelegate {
     public func sourceURL(for bridge: RCTBridge!) -> URL! {
+        #if DEBUG
+        var isOnCellularNetwork = false
+        let monitor = NWPathMonitor()
+        let semaphore = DispatchSemaphore(value: 0)
+        monitor.pathUpdateHandler = { path in
+            isOnCellularNetwork = path.isExpensive
+            semaphore.signal()
+        }
+        let monitorQueue = DispatchQueue(label: "org.wordpress.network-path-monitor")
+        monitor.start(queue: monitorQueue)
+        semaphore.wait(timeout: .distantFuture)
+        monitor.cancel()
+        if isOnCellularNetwork {
+            return Bundle.main.url(forResource: "main", withExtension: "jsbundle")
+        }
+        #endif
         return RCTBundleURLProvider.sharedSettings()?.jsBundleURL(forBundleRoot: "index", fallbackResource: "")
     }
 

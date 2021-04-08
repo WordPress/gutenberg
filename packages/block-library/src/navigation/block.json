@@ -52,6 +52,7 @@
 		"html": false,
 		"inserter": true,
 		"fontSize": true,
+		"lineHeight": true,
 		"__experimentalFontStyle": true,
 		"__experimentalFontWeight": true,
 		"__experimentalTextTransform": true,

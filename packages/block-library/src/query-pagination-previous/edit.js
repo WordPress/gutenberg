@@ -12,10 +12,10 @@ export default function QueryPaginationPreviousEdit( {
 		<PlainText
 			__experimentalVersion={ 2 }
 			tagName="a"
+			style={ { display: 'inline-block' } }
 			aria-label={ __( 'Previous page link' ) }
 			placeholder={ __( 'Previous Page' ) }
 			value={ label }
-			keepPlaceholderOnFocus
 			onChange={ ( newLabel ) => setAttributes( { label: newLabel } ) }
 			{ ...useBlockProps() }
 		/>

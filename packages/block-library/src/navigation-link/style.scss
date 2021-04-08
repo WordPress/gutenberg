@@ -15,6 +15,12 @@
 		}
 	}
 
+	// Margin of right-most margin should be zero, for right aligned or justified items.
+	.wp-block-navigation__container > .wp-block-pages-list__item:last-child,
+	.wp-block-navigation__container > .wp-block-navigation-link:last-child {
+		margin-right: 0;
+	}
+
 	// Menu item link.
 	.wp-block-pages-list__item__link,
 	.wp-block-navigation-link__content {
@@ -69,11 +75,7 @@
 		padding: 0.375em 1em 0.375em 0;
 
 		svg {
-			fill: currentColor;
-
-			@include break-medium {
-				transform: rotate(90deg);
-			}
+			stroke: currentColor;
 		}
 	}
 
@@ -86,7 +88,6 @@
 
 		.submenu-container,
 		.wp-block-navigation-link__container {
-			border: 1px solid rgba(0, 0, 0, 0.15);
 			background-color: inherit;
 			color: inherit;
 			position: absolute;
@@ -105,6 +106,8 @@
 
 			> .wp-block-pages-list__item,
 			> .wp-block-navigation-link {
+				margin: 0;
+
 				> .wp-block-pages-list__item__link,
 				> .wp-block-navigation-link__content {
 					flex-grow: 1;
@@ -117,13 +120,11 @@
 			}
 
 			@include break-medium {
-				left: 1.5em;
-
 				// Nested submenus sit to the left on large breakpoints.
 				.submenu-container,
 				.wp-block-navigation-link__container {
 					left: 100%;
-					top: -$border-width;
+					top: 0;
 
 					// Prevent the menu from disappearing when the mouse is over the gap
 					&::before {
@@ -140,7 +141,7 @@
 				// Reset the submenu indicator for horizontal flyouts.
 				.wp-block-page-list__submenu-icon svg,
 				.wp-block-navigation-link__submenu-icon svg {
-					transform: rotate(0);
+					transform: rotate(-90deg);
 				}
 			}
 		}
@@ -180,6 +181,27 @@
 			}
 		}
 	}
+
+
+	// When justified space-between, open submenus leftward for last menu item.
+	// When justified right, open all submenus leftwards.
+	&.items-justified-space-between > .submenu-container > .has-child:last-child,
+	&.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
+	&.items-justified-right .has-child {
+		// First submenu.
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			left: auto;
+			right: 0;
+
+			// Nested submenus.
+			.submenu-container,
+			.wp-block-navigation-link__container {
+				left: auto;
+				right: 100%;
+			}
+		}
+	}
 }
 
 // Default background and font color.
@@ -192,5 +214,11 @@
 		// several times, so care needs to be taken.
 		background-color: #fff;
 		color: #000;
+		border: 1px solid rgba(0, 0, 0, 0.15);
+
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			top: -1px;
+		}
 	}
 }

@@ -5,10 +5,7 @@ export * from './autocompleters';
 export { default as AutosaveMonitor } from './autosave-monitor';
 export { default as DocumentOutline } from './document-outline';
 export { default as DocumentOutlineCheck } from './document-outline/check';
-export {
-	default as VisualEditorGlobalKeyboardShortcuts,
-	EditorGlobalKeyboardShortcuts,
-} from './global-keyboard-shortcuts/visual-editor-shortcuts';
+export { default as VisualEditorGlobalKeyboardShortcuts } from './global-keyboard-shortcuts/visual-editor-shortcuts';
 export { default as TextEditorGlobalKeyboardShortcuts } from './global-keyboard-shortcuts/text-editor-shortcuts';
 export { default as EditorKeyboardShortcutsRegister } from './global-keyboard-shortcuts/register-shortcuts';
 export { default as EditorHistoryRedo } from './editor-history/redo';

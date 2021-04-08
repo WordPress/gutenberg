@@ -2,12 +2,17 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Button, __experimentalText as Text } from '@wordpress/components';
+import {
+	Button,
+	MenuItem,
+	__experimentalText as Text,
+} from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
+import isTemplateRevertable from '../../utils/is-template-revertable';
 import { MENU_TEMPLATES } from '../navigation-sidebar/navigation-panel/constants';
 import { store as editSiteStore } from '../../store';
 
@@ -17,7 +22,9 @@ export default function TemplateDetails( { template, onClose } ) {
 			select( 'core/editor' ).__experimentalGetTemplateInfo( template ),
 		[]
 	);
-	const { openNavigationPanelToMenu } = useDispatch( editSiteStore );
+	const { openNavigationPanelToMenu, revertTemplate } = useDispatch(
+		editSiteStore
+	);
 
 	if ( ! template ) {
 		return null;
@@ -26,6 +33,11 @@ export default function TemplateDetails( { template, onClose } ) {
 	const showTemplateInSidebar = () => {
 		onClose();
 		openNavigationPanelToMenu( MENU_TEMPLATES );
+	};
+
+	const revert = () => {
+		revertTemplate( template );
+		onClose();
 	};
 
 	return (
@@ -42,6 +54,17 @@ export default function TemplateDetails( { template, onClose } ) {
 					</Text>
 				) }
 			</div>
+
+			{ isTemplateRevertable( template ) && (
+				<div className="edit-site-template-details__revert">
+					<MenuItem
+						info={ __( 'Restore template to theme default' ) }
+						onClick={ revert }
+					>
+						{ __( 'Clear customizations' ) }
+					</MenuItem>
+				</div>
+			) }
 
 			<Button
 				className="edit-site-template-details__show-all-button"

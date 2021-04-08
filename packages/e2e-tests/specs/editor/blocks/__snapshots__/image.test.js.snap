@@ -17,3 +17,9 @@ exports[`Image should drag and drop files into media placeholder 1`] = `
 <figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
 <!-- /wp:image -->"
 `;
+
+exports[`Image should undo without broken temporary state 1`] = `
+"<!-- wp:image -->
+<figure class=\\"wp-block-image\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->"
+`;

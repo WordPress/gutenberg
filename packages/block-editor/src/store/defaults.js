@@ -13,7 +13,6 @@ export const PREFERENCES_DEFAULTS = {
  * @typedef {Object} SETTINGS_DEFAULT
  * @property {boolean} alignWide Enable/Disable Wide/Full Alignments
  * @property {boolean} supportsLayout Enable/disable layouts support in container blocks.
- * @property {Array} availableLegacyWidgets Array of objects representing the legacy widgets available.
  * @property {boolean} imageEditing Image Editing settings set to false to disable.
  * @property {Array} imageSizes Available image sizes
  * @property {number} maxWidth Max width to constraint resizing
@@ -124,6 +123,9 @@ export const SETTINGS_DEFAULTS = {
 		},
 	],
 
+	// Image default size slug.
+	imageDefaultSize: 'large',
+
 	imageSizes: [
 		{ slug: 'thumbnail', name: __( 'Thumbnail' ) },
 		{ slug: 'medium', name: __( 'Medium' ) },
@@ -147,7 +149,6 @@ export const SETTINGS_DEFAULTS = {
 	// List of allowed mime types and file extensions.
 	allowedMimeTypes: null,
 
-	availableLegacyWidgets: {},
 	__experimentalCanUserUseUnfilteredHTML: false,
 	__experimentalBlockDirectory: false,
 	__mobileEnablePageTemplates: false,

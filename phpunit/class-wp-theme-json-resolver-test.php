@@ -107,18 +107,21 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 
 		$this->assertSame( wp_get_theme()->get( 'TextDomain' ), 'fse' );
 		$this->assertSame(
-			$actual->get_settings()['root']['color']['palette'],
+			$actual->get_settings()['root']['color'],
 			array(
-				array(
-					'slug'  => 'light',
-					'name'  => 'Jasny',
-					'color' => '#f5f7f9',
+				'palette' => array(
+					array(
+						'slug'  => 'light',
+						'name'  => 'Jasny',
+						'color' => '#f5f7f9',
+					),
+					array(
+						'slug'  => 'dark',
+						'name'  => 'Ciemny',
+						'color' => '#000',
+					),
 				),
-				array(
-					'slug'  => 'dark',
-					'name'  => 'Ciemny',
-					'color' => '#000',
-				),
+				'custom'  => false,
 			)
 		);
 		$this->assertSame(

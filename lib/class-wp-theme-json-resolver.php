@@ -161,11 +161,7 @@ class WP_Theme_JSON_Resolver {
 	 *
 	 * @return array Returns the modified $theme_json chunk.
 	 */
-	private static function translate_theme_json_chunk( $array_to_translate, $key, $context, $domain ) {
-		if ( null === $array_to_translate ) {
-			return $array_to_translate;
-		}
-
+	private static function translate_theme_json_chunk( array $array_to_translate, $key, $context, $domain ) {
 		foreach ( $array_to_translate as $item_key => $item_to_translate ) {
 			if ( empty( $item_to_translate[ $key ] ) ) {
 				continue;
@@ -202,12 +198,18 @@ class WP_Theme_JSON_Resolver {
 				$path = array_slice( $path, 2 );
 				foreach ( $theme_json['settings'] as $setting_key => $setting ) {
 					$array_to_translate = _wp_array_get( $setting, $path, null );
-					$translated_array   = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
+					if ( is_null( $array_to_translate ) ) {
+						continue;
+					}
+					$translated_array = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
 					gutenberg_experimental_set( $theme_json['settings'][ $setting_key ], $path, $translated_array );
 				}
 			} else {
 				$array_to_translate = _wp_array_get( $theme_json, $path, null );
-				$translated_array   = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
+				if ( is_null( $array_to_translate ) ) {
+					continue;
+				}
+				$translated_array = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
 				gutenberg_experimental_set( $theme_json, $path, $translated_array );
 			}
 		}
@@ -360,6 +362,7 @@ class WP_Theme_JSON_Resolver {
 				array(
 					'post_content' => '{}',
 					'post_status'  => 'publish',
+					'post_title'   => __( 'Custom Styles' ),
 					'post_type'    => $post_type_filter,
 					'post_name'    => $post_name_filter,
 				),
@@ -469,6 +472,7 @@ class WP_Theme_JSON_Resolver {
 			),
 			'map_meta_cap' => true,
 			'supports'     => array(
+				'title',
 				'editor',
 				'revisions',
 			),

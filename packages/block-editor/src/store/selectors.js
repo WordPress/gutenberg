@@ -15,7 +15,6 @@ import {
 	filter,
 	mapKeys,
 	orderBy,
-	every,
 } from 'lodash';
 import createSelector from 'rememo';
 
@@ -1792,13 +1791,17 @@ export const __experimentalGetAllowedBlocks = createSelector(
 	]
 );
 
-const __experimentalGetParsedPatterns = createSelector(
-	( state ) => {
+export const __experimentalGetParsedPattern = createSelector(
+	( state, patternName ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
-		return map( patterns, ( pattern ) => ( {
+		const pattern = patterns.find( ( { name } ) => name === patternName );
+		if ( ! pattern ) {
+			return null;
+		}
+		return {
 			...pattern,
-			contentBlocks: parse( pattern.content ),
-		} ) );
+			blocks: parse( pattern.content ),
+		};
 	},
 	( state ) => [ state.settings.__experimentalBlockPatterns ]
 );
@@ -1813,17 +1816,15 @@ const __experimentalGetParsedPatterns = createSelector(
  */
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
-		const patterns = __experimentalGetParsedPatterns( state );
-
-		if ( ! rootClientId ) {
-			return patterns;
-		}
-
-		const patternsAllowed = filter( patterns, ( { contentBlocks } ) => {
-			return every( contentBlocks, ( { name } ) =>
+		const patterns = state.settings.__experimentalBlockPatterns;
+		const parsedPatterns = patterns.map( ( { name } ) =>
+			__experimentalGetParsedPattern( state, name )
+		);
+		const patternsAllowed = filter( parsedPatterns, ( { blocks } ) =>
+			blocks.every( ( { name } ) =>
 				canInsertBlockType( state, name, rootClientId )
-			);
-		} );
+			)
+		);
 
 		return patternsAllowed;
 	},
@@ -1837,29 +1838,40 @@ export const __experimentalGetAllowedPatterns = createSelector(
 );
 
 /**
- * Returns the list of patterns based on specific `scope` and
- * a block's name.
- * `inserter` scope should be handled differently, probably in
- * combination with `__experimentalGetAllowedPatterns`.
- * For now `__experimentalGetScopedBlockPatterns` handles properly
- * all other scopes.
- * Since both APIs are experimental we should revisit this.
+ * Returns the list of patterns based on their declared `blockTypes`
+ * and a block's name.
+ * Patterns can use `blockTypes` to integrate in work flows like
+ * suggesting appropriate patterns in a Placeholder state(during insertion)
+ * or blocks transformations.
  *
  * @param {Object} state Editor state.
- * @param {string} scope Block pattern scope.
- * @param {string} blockName Block's name.
+ * @param {string|string[]} blockNames Block's name or array of block names to find matching pattens.
+ * @param {?string} rootClientId Optional target root client ID.
  *
- * @return {Array} The list of matched block patterns based on provided scope and block name.
+ * @return {Array} The list of matched block patterns based on declared `blockTypes` and block name.
  */
-export const __experimentalGetScopedBlockPatterns = createSelector(
-	( state, scope, blockName ) => {
-		if ( ! scope && ! blockName ) return EMPTY_ARRAY;
-		const patterns = state.settings.__experimentalBlockPatterns;
+export const __experimentalGetPatternsByBlockTypes = createSelector(
+	( state, blockNames, rootClientId = null ) => {
+		if ( ! blockNames ) return EMPTY_ARRAY;
+		const patterns = __experimentalGetAllowedPatterns(
+			state,
+			rootClientId
+		);
+		const normalizedBlockNames = Array.isArray( blockNames )
+			? blockNames
+			: [ blockNames ];
 		return patterns.filter( ( pattern ) =>
-			pattern.scope?.[ scope ]?.includes?.( blockName )
+			pattern?.blockTypes?.some?.( ( blockName ) =>
+				normalizedBlockNames.includes( blockName )
+			)
 		);
 	},
-	( state ) => [ state.settings.__experimentalBlockPatterns ]
+	( state, rootClientId ) => [
+		...__experimentalGetAllowedPatterns.getDependants(
+			state,
+			rootClientId
+		),
+	]
 );
 
 /**
