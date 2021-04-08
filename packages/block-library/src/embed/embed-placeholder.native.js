@@ -28,7 +28,7 @@ const EmbedPlaceholder = ( { icon, label } ) => {
 	return (
 		<TouchableWithoutFeedback
 			accessibilityRole={ 'button' }
-			accessibilityHint={ __( 'Double tap to add an URL.' ) }
+			accessibilityHint={ __( 'Double tap to add a link.' ) }
 			onPress={ () => {} }
 		>
 			<View style={ emptyStateContainerStyle }>
