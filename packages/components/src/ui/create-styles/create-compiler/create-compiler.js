@@ -37,7 +37,7 @@ const defaultOptions = {
  * @param {CreateCompilerOptions} options
  * @return {Compiler} The compiler.
  */
-export function createCompiler( options ) {
+export function createCompiler( options = {} ) {
 	const mergedOptions = {
 		...defaultOptions,
 		...options,
