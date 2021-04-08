@@ -191,24 +191,39 @@ class WP_Theme_JSON_Resolver {
 			$path    = $field['path'];
 			$key     = $field['key'];
 			$context = $field['context'];
-			if ( 'settings' === $path[0] ) {
-				if ( empty( $theme_json['settings'] ) ) {
-					continue;
-				}
-				$path = array_slice( $path, 2 );
-				foreach ( $theme_json['settings'] as $setting_key => $setting ) {
-					$array_to_translate = _wp_array_get( $setting, $path, null );
+
+			/*
+			 * We need to process the paths that include '*' separately.
+			 * One example of such a path would be:
+			 * [ 'settings', '*', 'color', 'palette' ]
+			 */
+			$nodes_to_iterate = array_keys( $path, '*', true );
+			if ( ! empty( $nodes_to_iterate ) ) {
+				/*
+				 * At the moment, we only need to support one '*' in the path, so take it directly.
+				 * - base will be [ 'settings' ]
+				 * - data will be [ 'color', 'palette' ]
+				 */
+				$base_path = array_slice( $path, 0, $nodes_to_iterate[0] );
+				$data_path = array_slice( $path, $nodes_to_iterate[0] + 1 );
+				$base_tree = _wp_array_get( $theme_json, $base_path, array() );
+				foreach ( $base_tree as $node_name => $node_data ) {
+					$array_to_translate = _wp_array_get( $node_data, $data_path, null );
 					if ( is_null( $array_to_translate ) ) {
 						continue;
 					}
+
+					// Whole path will be [ 'settings', 'core/paragraph', 'color', 'palette' ].
+					$whole_path       = array_merge( $base_path, array( $node_name ), $data_path );
 					$translated_array = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
-					gutenberg_experimental_set( $theme_json['settings'][ $setting_key ], $path, $translated_array );
+					gutenberg_experimental_set( $theme_json, $whole_path, $translated_array );
 				}
 			} else {
 				$array_to_translate = _wp_array_get( $theme_json, $path, null );
 				if ( is_null( $array_to_translate ) ) {
 					continue;
 				}
+
 				$translated_array = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
 				gutenberg_experimental_set( $theme_json, $path, $translated_array );
 			}
@@ -362,7 +377,7 @@ class WP_Theme_JSON_Resolver {
 				array(
 					'post_content' => '{}',
 					'post_status'  => 'publish',
-					'post_title'   => __( 'Custom Styles' ),
+					'post_title'   => __( 'Custom Styles', 'default' ),
 					'post_type'    => $post_type_filter,
 					'post_name'    => $post_name_filter,
 				),
