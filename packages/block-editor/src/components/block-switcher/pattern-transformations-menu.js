@@ -96,7 +96,6 @@ function BlockPatternsList( { patterns, onSelect } ) {
 	);
 }
 
-// TODO: This needs to be consolidated to probably be reused across: Patterns in Placeholder, Inserter and here.
 function BlockPattern( { pattern, onSelect, composite } ) {
 	// TODO check pattern/preview width...
 	const baseClassName =

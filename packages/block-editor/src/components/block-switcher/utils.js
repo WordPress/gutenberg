@@ -2,36 +2,31 @@
  * WordPress dependencies
  */
 import { __experimentalGetBlockAttributesNamesByRole as getBlockAttributesNamesByRole } from '@wordpress/blocks';
+
 /**
- * Find a selected block match in a pattern and return it.
- * We return a reference to the block object to mutate it.
- * We have first cloned the pattern blocks in a new property
- * `transformedBlocks` and we mutate this.
+ * Try to find a matching block by a block's name in a provided
+ * block. We recurse through InnerBlocks and return the reference
+ * of the matched block (it could be an InnerBlock).
+ * If no match is found return nothing.
  *
- * @param {WPBlock} block The pattern's block to try to find a match.
- * @param {string} selectedBlockName The current selected block's name.
- * @param {Set} consumedBlocks A set holding the previously matched blocks.
+ * @param {WPBlock} block The block to try to find a match.
+ * @param {string} selectedBlockName The block's name to use for matching condition.
+ * @param {Set} consumedBlocks A set holding the previously matched/consumed blocks.
  *
- * @return {WPBlock?} The matched block if found or `false`.
+ * @return {WPBlock?} The matched block if found or nothing(`undefined`).
  */
-// TODO tests
-export const getMatchingBlockInPattern = (
+export const getMatchingBlockByName = (
 	block,
 	selectedBlockName,
-	consumedBlocks
+	consumedBlocks = new Set()
 ) => {
 	const { clientId, name, innerBlocks = [] } = block;
-	/**
-	 * Check if block has been transformed already.
-	 * This is needed because we loop the selected blocks
-	 * and for example we may have selected two paragraphs and
-	 * the patterns could have more `paragraphs`.
-	 */
+	// Check if block has been consumed already.
 	if ( consumedBlocks.has( clientId ) ) return;
 	if ( name === selectedBlockName ) return block;
-	// Try to find a matching block from InnerBlocks.
+	// Try to find a matching block from InnerBlocks recursively.
 	for ( const innerBlock of innerBlocks ) {
-		const match = getMatchingBlockInPattern(
+		const match = getMatchingBlockByName(
 			innerBlock,
 			selectedBlockName,
 			consumedBlocks
@@ -50,7 +45,7 @@ export const getMatchingBlockInPattern = (
  * @param {Object} attributes Selected block's attributes.
  * @return {Object} The block's attributes to retain.
  */
-export const getBlockRetainingAttributes = ( name, attributes ) => {
+export const getRetainedBlockAttributes = ( name, attributes ) => {
 	const contentAttributes = getBlockAttributesNamesByRole( name, 'content' );
 	if ( ! contentAttributes?.length ) return attributes;
 

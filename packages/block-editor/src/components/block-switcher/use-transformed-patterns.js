@@ -6,30 +6,52 @@ import { cloneBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import {
-	getMatchingBlockInPattern,
-	getBlockRetainingAttributes,
-} from './utils';
+import { getMatchingBlockByName, getRetainedBlockAttributes } from './utils';
+
+// here goes the mutation... :)
+// TODO jsdoc
+// TODO tests
+const transformMatchingBlock = ( match, selectedBlock ) => {
+	// Get the block attributes to retain through the transformation.
+	const retainedBlockAttributes = getRetainedBlockAttributes(
+		selectedBlock.name,
+		selectedBlock.attributes
+	);
+	match.attributes = {
+		...match.attributes,
+		...retainedBlockAttributes,
+	};
+};
 
 /**
+ * By providing the selected blocks and pattern's blocks
+ * find the matched blocks, transform them return them.
+ * If not all selected blocks are matched, return nothing.
  *
  * @param {WPBlock[]} selectedBlocks The selected blocks.
  * @param {WPBlock[]} patternBlocks The pattern's blocks.
  * @return {WPBlock[]|void} The transformed pattern's blocks or undefined if not all selected blocks have been matched.
  */
-// TODO jsdoc
 // TODO tests
-const getPatternTransformedBlocks = ( selectedBlocks, patternBlocks ) => {
-	// const eligiblePattern = getEligiblePattern()
-	// Clone Pattern's blocks in `transformedBlocks` prop, to mutate them.
+export const getPatternTransformedBlocks = (
+	selectedBlocks,
+	patternBlocks
+) => {
+	// Clone Pattern's blocks to produce new clientIds and be able to mutate the matches.
 	const _patternBlocks = patternBlocks.map( ( block ) =>
 		cloneBlock( block )
 	);
+	/**
+	 * Keep track of the consumed pattern blocks.
+	 * This is needed because we loop the selected blocks
+	 * and for example we may have selected two paragraphs and
+	 * the pattern's blocks could have more `paragraphs`.
+	 */
 	const consumedBlocks = new Set();
 	for ( const selectedBlock of selectedBlocks ) {
 		let isMatch = false;
 		for ( const patternBlock of _patternBlocks ) {
-			const match = getMatchingBlockInPattern(
+			const match = getMatchingBlockByName(
 				patternBlock,
 				selectedBlock.name,
 				consumedBlocks
@@ -39,24 +61,13 @@ const getPatternTransformedBlocks = ( selectedBlocks, patternBlocks ) => {
 			consumedBlocks.add( match.clientId );
 			// We update (mutate) the matching pattern block.
 			transformMatchingBlock( match, selectedBlock );
+			// No need to loop through other pattern's blocks.
 			break;
 		}
 		// Bail eary if a selected block has not been matched.
 		if ( ! isMatch ) return;
 	}
 	return _patternBlocks;
-};
-// here goes the mutation... :)
-const transformMatchingBlock = ( match, selectedBlock ) => {
-	// Get the block attributes to retain through the transformation.
-	const retainedBlockAttributes = getBlockRetainingAttributes(
-		selectedBlock.name,
-		selectedBlock.attributes
-	);
-	match.attributes = {
-		...match.attributes,
-		...retainedBlockAttributes,
-	};
 };
 
 /**
