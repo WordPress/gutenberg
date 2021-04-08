@@ -10,6 +10,7 @@ import { RichText } from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
+import { useState, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -42,6 +43,22 @@ export const Gallery = ( props ) => {
 		imageCrop,
 		images,
 	} = attributes;
+
+	const captionRef = useRef();
+	const [ captionFocused, setCaptionFocused ] = useState( false );
+	const onFocusCaption = () => {
+		if ( ! captionFocused ) {
+			setCaptionFocused( true );
+			onFocusGalleryCaption();
+		}
+	};
+
+	const onCaptionBlur = () => {
+		//captionRef.current.blur()
+		if ( captionFocused ) {
+			setCaptionFocused( false );
+		}
+	};
 
 	return (
 		<figure
@@ -93,13 +110,16 @@ export const Gallery = ( props ) => {
 			</ul>
 			{ mediaPlaceholder }
 			<RichTextVisibilityHelper
+				isSelected={ captionFocused }
+				ref={ captionRef }
+				onBlur={ onCaptionBlur }
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
 				tagName="figcaption"
 				className="blocks-gallery-caption"
 				aria-label={ __( 'Gallery caption text' ) }
 				placeholder={ __( 'Write gallery caption…' ) }
 				value={ caption }
-				unstableOnFocus={ onFocusGalleryCaption }
+				unstableOnFocus={ onFocusCaption }
 				onChange={ ( value ) => setAttributes( { caption: value } ) }
 				inlineToolbar
 				__unstableOnSplitAtEnd={ () =>
