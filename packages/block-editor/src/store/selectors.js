@@ -2141,7 +2141,7 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
  */
 export const getKsesSchema = createSelector(
 	( state ) => {
-		const allowedHtmlTags = getSettings( state ).allowedHtmlTags;
+		const allowedHtmlTags = getSettings( state ).allowedHtmlTags || {};
 		const schema = {
 			'#text': {},
 		};
