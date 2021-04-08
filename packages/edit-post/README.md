@@ -37,7 +37,7 @@ call initializeEditor(). This is due to metaBox timing.
 _Parameters_
 
 -   _id_ `string`: Unique identifier for editor instance.
--   _postType_ `Object`: Post type of the post to edit.
+-   _postType_ `string`: Post type of the post to edit.
 -   _postId_ `Object`: ID of the post to edit.
 -   _settings_ `?Object`: Editor settings object.
 -   _initialEdits_ `Object`: Programmatic edits to apply initially, to be considered as non-user-initiated (bypass for unsaved changes prompt).

@@ -35,6 +35,7 @@ function Editor( {
 	settings,
 	initialEdits,
 	onError,
+    markEditorReady,
 	...props
 } ) {
 	const {
@@ -50,6 +51,7 @@ function Editor( {
 		keepCaretInsideBlock,
 		isTemplateMode,
 		template,
+        isEditorReady
 	} = useSelect( ( select ) => {
 		const {
 			isFeatureActive,
@@ -63,7 +65,7 @@ function Editor( {
 			getPostType,
 			getEntityRecords,
 		} = select( 'core' );
-		const { getEditorSettings, getCurrentPost } = select( 'core/editor' );
+		const { getEditorSettings, getCurrentPost, __unstableIsEditorReady } = select( 'core/editor' );
 		const { getBlockTypes } = select( blocksStore );
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			postType
@@ -107,6 +109,7 @@ function Editor( {
 					? __experimentalGetTemplateForLink( postObject.link )
 					: null,
 			post: postObject,
+            isEditorReady: __unstableIsEditorReady()
 		};
 	} );
 
@@ -169,6 +172,15 @@ function Editor( {
 	if ( ! post ) {
 		return null;
 	}
+
+    /**
+     * markEditorReady is a Promise resolve callback. It is useful to mark
+	 * editor as ready because some features like admin metaboxes JavaScript
+	 * rely on it being ready.
+     */
+    if ( markEditorReady && isEditorReady ) {
+        markEditorReady();
+    }
 
 	return (
 		<StrictMode>
