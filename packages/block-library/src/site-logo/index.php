@@ -17,8 +17,8 @@ function render_block_core_site_logo( $attributes ) {
 		if ( empty( $attributes['width'] ) ) {
 			return $image;
 		}
-		$height = floatval( $attributes['width'] ) / ( floatval( $image[1] ) / floatval( $image[2] ) );
-		return array( $image[0], intval( $attributes['width'] ), intval( $height ) );
+		$height = (float) $attributes['width'] / ( (float) $image[1] / (float) $image[2] );
+		return array( $image[0], (int) $attributes['width'], (int) $height );
 	};
 
 	add_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );

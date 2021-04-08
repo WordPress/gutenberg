@@ -571,7 +571,7 @@ class WP_REST_Menu_Items_Controller extends WP_REST_Posts_Controller {
 
 		foreach ( array( 'menu-item-object-id', 'menu-item-parent-id' ) as $key ) {
 			// Note we need to allow negative-integer IDs for previewed objects not inserted yet.
-			$prepared_nav_item[ $key ] = intval( $prepared_nav_item[ $key ] );
+			$prepared_nav_item[ $key ] = (int) $prepared_nav_item[ $key ];
 		}
 
 		foreach ( array( 'menu-item-type', 'menu-item-object', 'menu-item-target' ) as $key ) {
