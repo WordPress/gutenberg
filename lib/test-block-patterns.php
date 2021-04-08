@@ -70,3 +70,35 @@ register_block_pattern(
 						<!-- /wp:group -->',
 	)
 );
+
+register_block_pattern(
+	'multi/v3',
+	array(
+		'title'      => __( 'Multi blocks v3', 'gutenberg' ),
+		'blockTypes' => array( 'core/list', 'core/paragraph' ),
+		'content'    => '<!-- wp:list -->
+						<ul><li>pattern list item 1</li><li>pattern list item 1</li></ul>
+						<!-- /wp:list -->
+						<!-- wp:paragraph {"dropCap":true,"backgroundColor":"orange"} -->
+						<p class="has-drop-cap has-orange-background-color has-background">These preliminaries settled, he did not care to put off any longer the execution of his design, urged on to it by the thought of all the world was losing by his delay, seeing what wrongs he intended to right, grievances to redress, injustices to repair, abuses to remove, and duties to discharge.</p>
+						<!-- /wp:paragraph -->',
+	)
+);
+
+register_block_pattern(
+	'Search',
+	array(
+		'title'      => __( 'Search v1', 'gutenberg' ),
+		'blockTypes' => array( 'core/search' ),
+		'content'    => '<!-- wp:group {"backgroundColor":"blue"} -->
+		<div class="wp-block-group has-blue-background-color has-background">
+		<!-- wp:heading {"textAlign":"center","level":3,"textColor":"gray"} -->
+		<h3 class="has-text-align-center has-gray-color has-text-color">Search something</h3>
+		<!-- /wp:heading -->
+		<!-- wp:separator {"className":"is-style-default"} -->
+		<hr class="wp-block-separator is-style-default"/>
+		<!-- /wp:separator -->
+		<!-- wp:search {"label":"Pattern search label","showLabel":false,"placeholder":"search here...","width":100,"widthUnit":"%","buttonText":"GO","buttonUseIcon":true} /--></div>
+		<!-- /wp:group -->',
+	)
+);

@@ -8,13 +8,15 @@
 			"source": "html",
 			"selector": "blockquote",
 			"multiline": "p",
-			"default": ""
+			"default": "",
+			"role": "content"
 		},
 		"citation": {
 			"type": "string",
 			"source": "html",
 			"selector": "cite",
-			"default": ""
+			"default": "",
+			"role": "content"
 		},
 		"align": {
 			"type": "string"
