@@ -7,15 +7,15 @@
  */
 
 /**
- * Helper function that constructs a WP_Query args object from
+ * Helper function that constructs a WP_Query args array from
  * a `Query` block properties.
  *
  * It's used in QueryLoop, QueryPaginationNumbers and QueryPaginationNext blocks.
  *
  * @param WP_Block $block Block instance.
- * @param int      $page  Curren query's page.
+ * @param int      $page  Current query's page.
  *
- * @return object Returns the constructed WP_Query object.
+ * @return array Returns the constructed WP_Query arguments.
  */
 function construct_wp_query_args( $block, $page ) {
 	$query = array(
