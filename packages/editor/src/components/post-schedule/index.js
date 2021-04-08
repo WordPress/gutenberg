@@ -33,7 +33,6 @@ export function PostSchedule( { date, onUpdateDate } ) {
 			currentDate={ date }
 			onChange={ onChange }
 			is12Hour={ is12HourTime }
-			keepOpen={ true }
 		/>
 	);
 }

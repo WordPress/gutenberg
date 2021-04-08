@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+### New Features
+
+-   `build` and `start` command now bundle files ending with `.module.css` as CSS modules and extracts `style.module.css` ([#29182](https://github.com/WordPress/gutenberg/pull/29182)).
+
+## 14.1.0 (2021-04-06)
+
+### Enhancements
+
+-   The bundled `babel-loader` dependency has been updated from requiring `^8.1.0` to requiring `^8.2.2` ([#30018](https://github.com/WordPress/gutenberg/pull/30018)).
+
+## 14.0.0 (2021-03-17)
+
 ### Breaking Changes
 
 -   Lint TypeScript files as part of `lint-js`. [#27143](https://github.com/WordPress/gutenberg/pull/27143)

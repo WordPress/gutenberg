@@ -147,13 +147,15 @@ function VideoEdit( {
 
 	return (
 		<>
-			<BlockControls>
+			<BlockControls group="block">
 				<TracksEditor
 					tracks={ tracks }
 					onChange={ ( newTracks ) => {
 						setAttributes( { tracks: newTracks } );
 					} }
 				/>
+			</BlockControls>
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ src }
@@ -237,7 +239,7 @@ function VideoEdit( {
 					<RichText
 						tagName="figcaption"
 						aria-label={ __( 'Video caption text' ) }
-						placeholder={ __( 'Write caption…' ) }
+						placeholder={ __( 'Add caption' ) }
 						value={ caption }
 						onChange={ ( value ) =>
 							setAttributes( { caption: value } )

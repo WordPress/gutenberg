@@ -248,4 +248,8 @@ else:
 <!-- wp:heading {"align":"left","level":4,"className":"has-primary-background-color has-background","style":{"typography":{"lineHeight":"2.5"}}} -->
 <h4 class="has-text-align-left has-primary-background-color has-background" style="line-height:2.5">Heading with line-height set</h4>
 <!-- /wp:heading -->
+
+<!-- wp:paragraph -->
+<p>This block is used in initial HTML e2e tests and should be kept as the last block.</p>
+<!-- /wp:paragraph -->
 `;

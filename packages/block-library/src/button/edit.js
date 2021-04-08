@@ -16,7 +16,6 @@ import {
 	RangeControl,
 	TextControl,
 	ToolbarButton,
-	ToolbarGroup,
 	Popover,
 } from '@wordpress/components';
 import {
@@ -147,28 +146,26 @@ function URLPicker( {
 	);
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					{ ! urlIsSet && (
-						<ToolbarButton
-							name="link"
-							icon={ link }
-							title={ __( 'Link' ) }
-							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ openLinkControl }
-						/>
-					) }
-					{ urlIsSetandSelected && (
-						<ToolbarButton
-							name="link"
-							icon={ linkOff }
-							title={ __( 'Unlink' ) }
-							shortcut={ displayShortcut.primaryShift( 'k' ) }
-							onClick={ unlinkButton }
-							isActive={ true }
-						/>
-					) }
-				</ToolbarGroup>
+			<BlockControls group="block">
+				{ ! urlIsSet && (
+					<ToolbarButton
+						name="link"
+						icon={ link }
+						title={ __( 'Link' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ openLinkControl }
+					/>
+				) }
+				{ urlIsSetandSelected && (
+					<ToolbarButton
+						name="link"
+						icon={ linkOff }
+						title={ __( 'Unlink' ) }
+						shortcut={ displayShortcut.primaryShift( 'k' ) }
+						onClick={ unlinkButton }
+						isActive={ true }
+					/>
+				) }
 			</BlockControls>
 			{ isSelected && (
 				<KeyboardShortcuts
@@ -244,6 +241,7 @@ function ButtonEdit( props ) {
 				{ ...blockProps }
 				className={ classnames( blockProps.className, {
 					[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+					[ `has-custom-font-size` ]: blockProps.style.fontSize,
 				} ) }
 			>
 				<RichText

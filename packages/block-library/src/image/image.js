@@ -14,7 +14,6 @@ import {
 	Spinner,
 	TextareaControl,
 	TextControl,
-	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
@@ -63,6 +62,7 @@ function getFilename( url ) {
 }
 
 export default function Image( {
+	temporaryURL,
 	attributes: {
 		url = '',
 		alt,
@@ -281,52 +281,52 @@ export default function Image( {
 
 	const controls = (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<BlockAlignmentControl
-						value={ align }
-						onChange={ updateAlignment }
-					/>
-					{ ! multiImageSelection && ! isEditingImage && (
-						<ImageURLInputUI
-							url={ href || '' }
-							onChangeUrl={ onSetHref }
-							linkDestination={ linkDestination }
-							mediaUrl={ ( image && image.source_url ) || url }
-							mediaLink={ image && image.link }
-							linkTarget={ linkTarget }
-							linkClass={ linkClass }
-							rel={ rel }
-						/>
-					) }
-					{ allowCrop && (
-						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
-							icon={ crop }
-							label={ __( 'Crop' ) }
-						/>
-					) }
-					{ externalBlob && (
-						<ToolbarButton
-							onClick={ uploadExternal }
-							icon={ upload }
-							label={ __( 'Upload external image' ) }
-						/>
-					) }
-					{ ! multiImageSelection && coverBlockExists && (
-						<ToolbarButton
-							icon={ overlayText }
-							label={ __( 'Add text over image' ) }
-							onClick={ () =>
-								replaceBlocks(
-									currentId,
-									switchToBlockType( block, 'core/cover' )
-								)
-							}
-						/>
-					) }
-				</ToolbarGroup>
+			<BlockControls group="block">
+				<BlockAlignmentControl
+					value={ align }
+					onChange={ updateAlignment }
+				/>
 				{ ! multiImageSelection && ! isEditingImage && (
+					<ImageURLInputUI
+						url={ href || '' }
+						onChangeUrl={ onSetHref }
+						linkDestination={ linkDestination }
+						mediaUrl={ ( image && image.source_url ) || url }
+						mediaLink={ image && image.link }
+						linkTarget={ linkTarget }
+						linkClass={ linkClass }
+						rel={ rel }
+					/>
+				) }
+				{ allowCrop && (
+					<ToolbarButton
+						onClick={ () => setIsEditingImage( true ) }
+						icon={ crop }
+						label={ __( 'Crop' ) }
+					/>
+				) }
+				{ externalBlob && (
+					<ToolbarButton
+						onClick={ uploadExternal }
+						icon={ upload }
+						label={ __( 'Upload external image' ) }
+					/>
+				) }
+				{ ! multiImageSelection && coverBlockExists && (
+					<ToolbarButton
+						icon={ overlayText }
+						label={ __( 'Add text over image' ) }
+						onClick={ () =>
+							replaceBlocks(
+								currentId,
+								switchToBlockType( block, 'core/cover' )
+							)
+						}
+					/>
+				) }
+			</BlockControls>
+			{ ! multiImageSelection && ! isEditingImage && (
+				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ id }
 						mediaURL={ url }
@@ -336,8 +336,8 @@ export default function Image( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 					/>
-				) }
-			</BlockControls>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
 					{ ! multiImageSelection && (
@@ -415,7 +415,7 @@ export default function Image( {
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		<>
 			<img
-				src={ url }
+				src={ temporaryURL || url }
 				alt={ defaultedAlt }
 				onClick={ onImageClick }
 				onError={ () => onImageError() }
@@ -428,7 +428,7 @@ export default function Image( {
 					);
 				} }
 			/>
-			{ isBlobURL( url ) && <Spinner /> }
+			{ temporaryURL && <Spinner /> }
 		</>
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
@@ -510,7 +510,10 @@ export default function Image( {
 
 		img = (
 			<ResizableBox
-				size={ { width, height } }
+				size={ {
+					width: width ?? 'auto',
+					height: height ?? 'auto',
+				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
@@ -557,7 +560,7 @@ export default function Image( {
 					ref={ captionRef }
 					tagName="figcaption"
 					aria-label={ __( 'Image caption text' ) }
-					placeholder={ __( 'Write caption…' ) }
+					placeholder={ __( 'Add caption' ) }
 					value={ caption }
 					unstableOnFocus={ onFocusCaption }
 					onChange={ ( value ) =>

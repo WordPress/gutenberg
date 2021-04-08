@@ -32,7 +32,7 @@
 @import "./components/contrast-checker/style.scss";
 @import "./components/default-block-appender/style.scss";
 @import "./components/font-appearance-control/style.scss";
-@import "./components/justify-toolbar/style.scss";
+@import "./components/justify-content-control/style.scss";
 @import "./components/link-control/style.scss";
 @import "./components/line-height-control/style.scss";
 @import "./components/image-size-control/style.scss";
@@ -53,6 +53,7 @@
 @import "./components/url-popover/style.scss";
 @import "./components/warning/style.scss";
 @import "./hooks/anchor.scss";
+@import "./hooks/layout.scss";
 
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {

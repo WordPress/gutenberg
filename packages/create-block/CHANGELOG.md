@@ -2,6 +2,18 @@
 
 ## Unreleased
 
+## 2.2.0 (2021-04-06)
+
+### Enhancement
+
+-   Scaffolded plugin requires WordPress 5.7 now ([#29757](https://github.com/WordPress/gutenberg/pull/29757)).
+
+### New Features
+
+-   Add new `theme` category to select for the block type ([#30089](https://github.com/WordPress/gutenberg/pull/30089)).
+
+## 2.1.0 (2021-03-17)
+
 ### New Features
 
 -   Add a way to provide a default value in the template for `attributes` and `supports` Block API fields ([#28883](https://github.com/WordPress/gutenberg/pull/28883)).
@@ -9,7 +21,6 @@
 ### Enhancement
 
 -   Block scaffolded with `esnext` template is now registered from `block.json` with the `register_block_type_from_metadata` helper ([#28883](https://github.com/WordPress/gutenberg/pull/28883)).
--   Scaffolded plugin requires WordPress 5.7 now ([#29757](https://github.com/WordPress/gutenberg/pull/29757)).
 
 ### Bug Fixes
 
