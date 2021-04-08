@@ -14,7 +14,7 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 
-const EmbedPlaceholder = ( { icon, label, onSubmit } ) => {
+const EmbedPlaceholder = ( { icon, label } ) => {
 	const emptyStateContainerStyle = usePreferredColorSchemeStyle(
 		styles.emptyStateContainer,
 		styles.emptyStateContainerDark
@@ -29,9 +29,7 @@ const EmbedPlaceholder = ( { icon, label, onSubmit } ) => {
 		<TouchableWithoutFeedback
 			accessibilityRole={ 'button' }
 			accessibilityHint={ __( 'Double tap to add an URL.' ) }
-			onPress={ ( event ) => {
-				onSubmit( event );
-			} }
+			onPress={ () => {} }
 		>
 			<View style={ emptyStateContainerStyle }>
 				<View style={ styles.modalIcon }>{ icon }</View>
