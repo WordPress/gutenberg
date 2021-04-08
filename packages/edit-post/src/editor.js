@@ -168,11 +168,10 @@ function Editor( {
 		return null;
 	}
 
-    /**
-     * markEditorReady is a Promise resolve callback. It is useful to mark
-	 * editor as ready because some features like admin metaboxes JavaScript
-	 * rely on it being ready.
-     */
+	/**
+	 * Some features like back compat metaboxes rely on editor notifying that
+	 * it's ready by calling markEditorReady.
+	 */
     if ( markEditorReady && isEditorReady ) {
         markEditorReady();
     }
