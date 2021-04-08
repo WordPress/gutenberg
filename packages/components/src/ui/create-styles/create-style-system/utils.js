@@ -44,7 +44,7 @@ export function createToken( key ) {
  *
  * @example
  * ```js
- * get('colorAdmin'); // var(--wp-g2-color-admin, 'blue');
+ * get('colorAdmin'); // var(--wp-color-admin, 'blue');
  * ```
  * @template {Record<string, string | number>} TConfig
  * @template {Record<string, string | number>} TDarkConfig

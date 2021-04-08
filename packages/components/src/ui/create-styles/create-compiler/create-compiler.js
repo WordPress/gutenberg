@@ -87,7 +87,7 @@ export function createCompiler( options ) {
 		breakpoints,
 		/**
 		 * An internal custom event emitter (pub/sub) for Emotion.
-		 * This is currently used in <StyleFrameProvider /> from `@wp-g2/styled`
+		 * This is currently used in <StyleFrameProvider />
 		 * to subscribe to and sync style injection.
 		 */
 		__events: mitt(),
