@@ -153,8 +153,13 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	// update 'sort_column' to 'menu_order, post_title'. Sorting by both menu_order and post_title ensures a stable sort.
 	// Otherwise with pages that have the same menu_order value, we can see different ordering depending on how DB
 	// queries are constructed internally. For example we might see a different order when a limit is set to <499
-	// versus >= 500
-	$all_pages = get_pages( array( 'sort_column' => 'menu_order', 'order' => 'asc' ) );
+	// versus >= 500.
+	$all_pages = get_pages(
+		array(
+			'sort_column' => 'menu_order',
+			'order'       => 'asc',
+		)
+	);
 
 	$top_level_pages = array();
 
