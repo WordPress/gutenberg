@@ -62,6 +62,8 @@ class InserterOuterSection extends customize.OuterSection {
 			// Use capture mode to make this run before other event listeners.
 			true
 		);
+
+		this.contentContainer.addClass( 'widgets-inserter' );
 	}
 	get isOpen() {
 		return this.expanded();
