@@ -15,7 +15,7 @@ export { metadata, name };
 
 export const settings = {
 	title: _x( 'Site Logo', 'block title' ),
-	description: __( 'Show a site logo' ),
+	description: __( 'Displays and enables editing of the site logo.' ),
 	icon,
 	styles: [
 		{
