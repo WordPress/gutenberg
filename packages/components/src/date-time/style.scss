@@ -111,6 +111,31 @@
 	}
 }
 
+.components-datetime__date .CalendarDay .components-datetime__date__day {
+	height: 100%;
+	display: flex;
+	justify-content: center;
+	align-content: center;
+	flex-direction: column;
+	position: relative;
+
+	&.has-events::before {
+		content: " ";
+		width: 4px;
+		height: 4px;
+		border-radius: 2px;
+		position: absolute;
+		left: 50%;
+		margin-left: -2px;
+		bottom: 0;
+		background-color: $white;
+	}
+}
+
+.components-datetime__date .CalendarDay:not(.CalendarDay__selected) .components-datetime__date__day.has-events::before {
+	background: var(--wp-admin-theme-color);
+}
+
 .components-datetime__time {
 	padding-bottom: $grid-unit-20;
 
