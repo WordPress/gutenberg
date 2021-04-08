@@ -111,10 +111,7 @@ export default function ButtonsEdit( {
 		</View>
 	) );
 
-	const justifyControls =
-		orientation === 'vertical'
-			? [ 'left', 'center', 'right' ]
-			: [ 'left', 'center', 'right', 'space-between' ];
+	const justifyControls = [ 'left', 'center', 'right' ];
 
 	const remove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
