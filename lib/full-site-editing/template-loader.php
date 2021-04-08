@@ -71,6 +71,11 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	foreach ( $templates as $template_item ) {
 		$template_item_slug = gutenberg_strip_php_suffix( $template_item );
 
+		// Break the loop if the block-template matches the template slug.
+		if ( $current_block_template_slug === $template_item_slug ) {
+			break;
+		}
+
 		// Is this a custom template?
 		// This check should be removed when merged in core.
 		// Instead, wp_templates should be considered valid in locate_template.
