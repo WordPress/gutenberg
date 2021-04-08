@@ -97,3 +97,42 @@ export function getOptimalTextShade( backgroundColor ) {
 
 	return result === '#000000' ? 'dark' : 'light';
 }
+
+/**
+ * Retrieves the computed text color. This is useful for getting the
+ * value of a CSS variable color.
+ *
+ * @param {string | unknown} color
+ *
+ * @return {string} The computed text color.
+ */
+function __getComputedColor( color ) {
+	if ( typeof color !== 'string' ) return '';
+
+	if ( isColor( color ) ) return color;
+
+	if ( ! color.includes( 'var(' ) ) return '';
+	if ( typeof document === 'undefined' ) return '';
+
+	// Attempts to gracefully handle CSS variables color values.
+	const el = getColorComputationNode();
+	if ( ! el ) return '';
+
+	el.style.color = color;
+	// Grab the style
+	const computedColor = window?.getComputedStyle( el ).color;
+	// Reset
+	el.style.color = '';
+
+	return computedColor || '';
+}
+
+/**
+ * Retrieves the computed text color. This is useful for getting the
+ * value of a CSS variable color.
+ *
+ * @param {string | unknown} color
+ *
+ * @return {string} The computed text color.
+ */
+export const getComputedColor = memoize( __getComputedColor );

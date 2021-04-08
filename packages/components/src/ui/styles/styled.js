@@ -1,0 +1,1 @@
+export { styled } from './system';

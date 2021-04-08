@@ -1,8 +1,17 @@
 /**
  * External dependencies
  */
-import { css, styled } from '@wp-g2/styles';
 import { render } from '@testing-library/react';
+
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import { css, styled } from '..';
 
 describe( 'basic', () => {
 	test( 'should create a styled component', () => {
@@ -16,7 +25,9 @@ describe( 'basic', () => {
 	} );
 
 	test( 'should style an existing component', () => {
-		const Previous = ( { className } ) => <div className={ className } />;
+		const Previous = forwardRef( ( { className }, ref ) => (
+			<div ref={ ref } className={ className } />
+		) );
 
 		const Component = styled( Previous )`
 			background: blue;
@@ -53,34 +64,6 @@ describe( 'css', () => {
 		`;
 
 		const { container } = render( <Component className={ style } /> );
-
-		expect( container.firstChild ).toHaveStyle( { background: 'blue' } );
-		expect( container.firstChild ).toHaveStyle( { color: 'red' } );
-	} );
-
-	test( 'should render styles with css prop (string)', () => {
-		const Component = styled.div`
-			background: blue;
-		`;
-
-		const { container } = render(
-			<Component
-				css={ `
-					color: red;
-				` }
-			/>
-		);
-
-		expect( container.firstChild ).toHaveStyle( { background: 'blue' } );
-		expect( container.firstChild ).toHaveStyle( { color: 'red' } );
-	} );
-
-	test( 'should render styles with css prop (object)', () => {
-		const Component = styled.div`
-			background: blue;
-		`;
-
-		const { container } = render( <Component css={ { color: 'red' } } /> );
 
 		expect( container.firstChild ).toHaveStyle( { background: 'blue' } );
 		expect( container.firstChild ).toHaveStyle( { color: 'red' } );

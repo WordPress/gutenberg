@@ -1,8 +1,12 @@
 /**
  * External dependencies
  */
-import { css } from '@wp-g2/styles';
 import { render } from '@testing-library/react';
+
+/**
+ * Internal dependencies
+ */
+import { css } from '..';
 
 describe( 'basic', () => {
 	test( 'should return a string', () => {
@@ -81,35 +85,5 @@ describe( 'plugins', () => {
 		const { container } = render( <div className={ `box ${ style }` } /> );
 
 		expect( container.firstChild ).toHaveStyle( `background: blue;` );
-	} );
-
-	test( 'should automatically render rtl styles', () => {
-		// Simulate an rtl environment
-		document.documentElement.setAttribute( 'dir', 'rtl' );
-		// Create the style
-		const style = css`
-			padding-right: 55px;
-			margin-right: 55px;
-			right: 55px;
-			transform: translateX( 55% );
-		`;
-
-		const { container } = render( <div className={ style } /> );
-
-		expect( container.firstChild ).toHaveStyle( `margin-left: 55px;` );
-		expect( container.firstChild ).toHaveStyle( `padding-left: 55px;` );
-		expect( container.firstChild ).toHaveStyle( `left: 55px;` );
-		expect( container.firstChild ).toHaveStyle(
-			`transform: translateX( -55% );`
-		);
-
-		expect( container.firstChild ).not.toHaveStyle( `margin-right: 55px;` );
-		expect( container.firstChild ).not.toHaveStyle(
-			`padding-right: 55px;`
-		);
-		expect( container.firstChild ).not.toHaveStyle( `right: 55px;` );
-		expect( container.firstChild ).not.toHaveStyle(
-			`transform: translateX( 55% );`
-		);
 	} );
 } );
