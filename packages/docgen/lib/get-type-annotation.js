@@ -391,7 +391,7 @@ function getFunctionToken( token ) {
 function getFunctionNameForError( declarationToken ) {
 	let namedFunctionToken = declarationToken;
 	if ( babelTypes.isExportNamedDeclaration( declarationToken ) ) {
-		namedFunctionToken = declarationToken;
+		namedFunctionToken = declarationToken.declaration;
 	}
 
 	if ( babelTypes.isVariableDeclaration( namedFunctionToken ) ) {

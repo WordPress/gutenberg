@@ -259,7 +259,7 @@ describe( 'Type annotations', () => {
 
 		it( 'should correctly format the arrow function', () => {
 			expect(
-				getTypeAnnotation( { ...paramTag, name: 'callback' }, node )
+				getTypeAnnotation( { ...paramTag, name: 'callback' }, node, 0 )
 			).toBe( '( foo: string, ...rest: any[] ) => GenericType< T >' );
 		} );
 	} );
