@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isEqual } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
@@ -25,41 +30,39 @@ function DuotonePicker( { colorPalette, duotonePalette, value, onChange } ) {
 	);
 	return (
 		<CircularOptionPicker
-			options={ duotonePalette.map( ( option ) => {
-				const isSelected = option.slug === value?.slug;
+			options={ duotonePalette.map( ( { colors, slug, name } ) => {
+				const optionValue = getValuesFromColors( colors );
 				const style = {
-					background: getGradientFromCSSColors(
-						option.colors,
-						'135deg'
-					),
+					background: getGradientFromCSSColors( colors, '135deg' ),
 					color: 'transparent',
 				};
-				const code = sprintf(
-					// translators: %s: duotone code e.g: "dark-grayscale" or "7f7f7f-ffffff".
-					__( 'Duotone code: %s' ),
-					option.slug
-				);
-				const label = sprintf(
-					// translators: %s: The name of the option e.g: "Dark grayscale".
-					__( 'Duotone: %s' ),
-					option.name
-				);
+				const tooltipText =
+					name ??
+					sprintf(
+						// translators: %s: duotone code e.g: "dark-grayscale" or "7f7f7f-ffffff".
+						__( 'Duotone code: %s' ),
+						slug
+					);
+				const label = name
+					? sprintf(
+							// translators: %s: The name of the option e.g: "Dark grayscale".
+							__( 'Duotone: %s' ),
+							name
+					  )
+					: tooltipText;
+				const isSelected = isEqual( optionValue, value );
 
 				return (
 					<CircularOptionPicker.Option
-						key={ option.slug }
-						value={ option.slug }
+						key={ slug }
+						value={ optionValue }
 						isSelected={ isSelected }
-						tooltipText={ option.name ?? code }
+						aria-label={ label }
+						tooltipText={ tooltipText }
 						style={ style }
 						onClick={ () => {
-							const newValue = {
-								values: getValuesFromColors( option.colors ),
-								slug: option.slug,
-							};
-							onChange( isSelected ? undefined : newValue );
+							onChange( isSelected ? undefined : optionValue );
 						} }
-						aria-label={ option.name ? label : code }
 					/>
 				);
 			} ) }
@@ -75,7 +78,7 @@ function DuotonePicker( { colorPalette, duotonePalette, value, onChange } ) {
 			<ColorListPicker
 				labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
 				colors={ colorPalette }
-				value={ getHexColorsFromValues( value?.values ) }
+				value={ getHexColorsFromValues( value ) }
 				onChange={ ( newColors ) => {
 					if ( ! newColors[ 0 ] ) {
 						newColors[ 0 ] = defaultDark;
@@ -85,9 +88,7 @@ function DuotonePicker( { colorPalette, duotonePalette, value, onChange } ) {
 					}
 					const newValue =
 						newColors.length >= 2
-							? {
-									values: getValuesFromColors( newColors ),
-							  }
+							? getValuesFromColors( newColors )
 							: undefined;
 					onChange( newValue );
 				} }

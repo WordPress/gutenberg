@@ -16,8 +16,8 @@ const PLACEHOLDER_VALUES = {
 };
 
 export default function CustomDuotoneBar( { value, onChange } ) {
-	const hasGradient = !! value?.values;
-	const values = hasGradient ? value.values : PLACEHOLDER_VALUES;
+	const hasGradient = !! value;
+	const values = hasGradient ? value : PLACEHOLDER_VALUES;
 	const background = getGradientFromValues( values );
 	const controlPoints = getColorStopsFromValues( values );
 	return (
@@ -28,9 +28,7 @@ export default function CustomDuotoneBar( { value, onChange } ) {
 			hasGradient={ hasGradient }
 			value={ controlPoints }
 			onChange={ ( newColorStops ) => {
-				const newValue = {
-					values: getValuesFromColorStops( newColorStops ),
-				};
+				const newValue = getValuesFromColorStops( newColorStops );
 				onChange( newValue );
 			} }
 		/>

@@ -196,10 +196,8 @@ const withDuotoneStyles = createHigherOrderComponent(
 			return <BlockListBlock { ...props } />;
 		}
 
-		const { slug, values } = duotoneAttribute;
-		const id = `wp-duotone-filter-${
-			slug ?? useInstanceId( BlockListBlock )
-		}`;
+		const values = duotoneAttribute;
+		const id = `wp-duotone-filter-${ useInstanceId( BlockListBlock ) }`;
 
 		const selectors = duotoneSupport.split( ',' );
 		const selectorsScoped = selectors.map(

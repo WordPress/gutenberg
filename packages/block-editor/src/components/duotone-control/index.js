@@ -32,7 +32,7 @@ function DuotoneControl( { colorPalette, duotonePalette, value, onChange } ) {
 				aria-expanded={ isOpen }
 				onKeyDown={ openOnArrowDown }
 				label={ __( 'Apply duotone filter' ) }
-				icon={ <DuotoneSwatch values={ value?.values } /> }
+				icon={ <DuotoneSwatch values={ value } /> }
 			/>
 			{ isOpen && (
 				<DuotonePickerPopover
