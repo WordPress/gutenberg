@@ -35,7 +35,7 @@ export function getStablePath( path ) {
 
 /**
  * @param {Record<string, any>} preloadedData
- * @return {import('../types').ApiFetchMiddleware} Preloading middleware.
+ * @return {import('../types').APIFetchMiddleware} Preloading middleware.
  */
 function createPreloadingMiddleware( preloadedData ) {
 	const cache = Object.keys( preloadedData ).reduce( ( result, path ) => {

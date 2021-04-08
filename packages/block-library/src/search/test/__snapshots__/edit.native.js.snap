@@ -1,0 +1,648 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Search Block renders block with button inside option 1`] = `
+<View
+  accessibilityElementsHidden={true}
+  className="wp-block-search__button-inside wp-block-search__text-button"
+  importantForAccessibility="no-hide-descendants"
+>
+  <View
+    accessibilityHint="Double tap to edit label text"
+    accessibilityLabel="Search block label. Current text is Search"
+    accessibilityRole="none"
+    accessible={true}
+  >
+    <View>
+      <RCTAztecView
+        accessible={true}
+        activeFormats={Array []}
+        blockType={
+          Object {
+            "tag": "p",
+          }
+        }
+        disableEditingMenu={false}
+        focusable={true}
+        fontFamily="serif"
+        isMultiline={false}
+        maxImagesWidth={200}
+        onBackspace={[Function]}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onClick={[Function]}
+        onContentSizeChange={[Function]}
+        onEnter={[Function]}
+        onFocus={[Function]}
+        onHTMLContentWithCursor={[Function]}
+        onKeyDown={[Function]}
+        onPaste={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onSelectionChange={[Function]}
+        onStartShouldSetResponder={[Function]}
+        placeholder="Add label…"
+        placeholderTextColor="gray"
+        style={
+          Object {
+            "backgroundColor": undefined,
+            "maxWidth": undefined,
+            "minHeight": 0,
+          }
+        }
+        text={
+          Object {
+            "eventCount": undefined,
+            "linkTextColor": undefined,
+            "selection": null,
+            "text": "<p >Search</p>",
+          }
+        }
+        triggerKeyCodes={Array []}
+      />
+    </View>
+  </View>
+  <View
+    style={
+      Array [
+        undefined,
+        undefined,
+      ]
+    }
+  >
+    <View
+      accessibilityHint="Double tap to edit placeholder text"
+      accessibilityLabel="Search input field. No custom placeholder set"
+      accessibilityRole="none"
+      accessible={true}
+    >
+      <TextInput
+        allowFontScaling={true}
+        className="wp-block-search__input"
+        ellipsizeMode="tail"
+        fontFamily="serif"
+        isSelected={true}
+        label={null}
+        numberOfLines={1}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onFocus={[Function]}
+        placeholder="Optional placeholder…"
+        rejectResponderTermination={true}
+        scrollEnabled={false}
+        style={
+          Array [
+            undefined,
+            false,
+          ]
+        }
+        underlineColorAndroid="transparent"
+      />
+    </View>
+    <View>
+      <View
+        accessibilityHint="Double tap to edit button text"
+        accessibilityLabel="Search button. Current button text is Search Button"
+        accessibilityRole="none"
+        accessible={true}
+      >
+        <View>
+          <RCTAztecView
+            accessible={true}
+            activeFormats={Array []}
+            blockType={
+              Object {
+                "tag": "p",
+              }
+            }
+            disableEditingMenu={false}
+            focusable={true}
+            fontFamily="serif"
+            isMultiline={false}
+            maxImagesWidth={200}
+            minWidth={75}
+            onBackspace={[Function]}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onClick={[Function]}
+            onContentSizeChange={[Function]}
+            onEnter={[Function]}
+            onFocus={[Function]}
+            onHTMLContentWithCursor={[Function]}
+            onKeyDown={[Function]}
+            onPaste={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onSelectionChange={[Function]}
+            onStartShouldSetResponder={[Function]}
+            placeholder=""
+            placeholderTextColor="gray"
+            style={
+              Object {
+                "backgroundColor": undefined,
+                "maxWidth": undefined,
+                "minHeight": 0,
+              }
+            }
+            text={
+              Object {
+                "eventCount": undefined,
+                "linkTextColor": undefined,
+                "selection": null,
+                "text": "<p >Search Button</p>",
+              }
+            }
+            textAlign="center"
+            triggerKeyCodes={Array []}
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Search Block renders block with icon button option matches snapshot 1`] = `
+<View
+  accessibilityElementsHidden={true}
+  className="wp-block-search__button-outside wp-block-search__icon-button"
+  importantForAccessibility="no-hide-descendants"
+>
+  <View
+    accessibilityHint="Double tap to edit label text"
+    accessibilityLabel="Search block label. Current text is Search"
+    accessibilityRole="none"
+    accessible={true}
+  >
+    <View>
+      <RCTAztecView
+        accessible={true}
+        activeFormats={Array []}
+        blockType={
+          Object {
+            "tag": "p",
+          }
+        }
+        disableEditingMenu={false}
+        focusable={true}
+        fontFamily="serif"
+        isMultiline={false}
+        maxImagesWidth={200}
+        onBackspace={[Function]}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onClick={[Function]}
+        onContentSizeChange={[Function]}
+        onEnter={[Function]}
+        onFocus={[Function]}
+        onHTMLContentWithCursor={[Function]}
+        onKeyDown={[Function]}
+        onPaste={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onSelectionChange={[Function]}
+        onStartShouldSetResponder={[Function]}
+        placeholder="Add label…"
+        placeholderTextColor="gray"
+        style={
+          Object {
+            "backgroundColor": undefined,
+            "maxWidth": undefined,
+            "minHeight": 0,
+          }
+        }
+        text={
+          Object {
+            "eventCount": undefined,
+            "linkTextColor": undefined,
+            "selection": null,
+            "text": "<p >Search</p>",
+          }
+        }
+        triggerKeyCodes={Array []}
+      />
+    </View>
+  </View>
+  <View
+    style={
+      Array [
+        undefined,
+        false,
+      ]
+    }
+  >
+    <View
+      accessibilityHint="Double tap to edit placeholder text"
+      accessibilityLabel="Search input field. No custom placeholder set"
+      accessibilityRole="none"
+      accessible={true}
+    >
+      <TextInput
+        allowFontScaling={true}
+        className="wp-block-search__input"
+        ellipsizeMode="tail"
+        fontFamily="serif"
+        isSelected={true}
+        label={null}
+        numberOfLines={1}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onFocus={[Function]}
+        placeholder="Optional placeholder…"
+        rejectResponderTermination={true}
+        scrollEnabled={false}
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+        underlineColorAndroid="transparent"
+      />
+    </View>
+    <View>
+      Svg
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Search Block renders block with label hidden matches snapshot 1`] = `
+<View
+  accessibilityElementsHidden={true}
+  className="wp-block-search__button-outside wp-block-search__text-button"
+  importantForAccessibility="no-hide-descendants"
+>
+  <View
+    style={
+      Array [
+        undefined,
+        false,
+      ]
+    }
+  >
+    <View
+      accessibilityHint="Double tap to edit placeholder text"
+      accessibilityLabel="Search input field. No custom placeholder set"
+      accessibilityRole="none"
+      accessible={true}
+    >
+      <TextInput
+        allowFontScaling={true}
+        className="wp-block-search__input"
+        ellipsizeMode="tail"
+        fontFamily="serif"
+        isSelected={true}
+        label={null}
+        numberOfLines={1}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onFocus={[Function]}
+        placeholder="Optional placeholder…"
+        rejectResponderTermination={true}
+        scrollEnabled={false}
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+        underlineColorAndroid="transparent"
+      />
+    </View>
+    <View>
+      <View
+        accessibilityHint="Double tap to edit button text"
+        accessibilityLabel="Search button. Current button text is Search Button"
+        accessibilityRole="none"
+        accessible={true}
+      >
+        <View>
+          <RCTAztecView
+            accessible={true}
+            activeFormats={Array []}
+            blockType={
+              Object {
+                "tag": "p",
+              }
+            }
+            disableEditingMenu={false}
+            focusable={true}
+            fontFamily="serif"
+            isMultiline={false}
+            maxImagesWidth={200}
+            minWidth={75}
+            onBackspace={[Function]}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onClick={[Function]}
+            onContentSizeChange={[Function]}
+            onEnter={[Function]}
+            onFocus={[Function]}
+            onHTMLContentWithCursor={[Function]}
+            onKeyDown={[Function]}
+            onPaste={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onSelectionChange={[Function]}
+            onStartShouldSetResponder={[Function]}
+            placeholder=""
+            placeholderTextColor="gray"
+            style={
+              Object {
+                "backgroundColor": undefined,
+                "maxWidth": undefined,
+                "minHeight": 0,
+              }
+            }
+            text={
+              Object {
+                "eventCount": undefined,
+                "linkTextColor": undefined,
+                "selection": null,
+                "text": "<p >Search Button</p>",
+              }
+            }
+            textAlign="center"
+            triggerKeyCodes={Array []}
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Search Block renders with default configuration matches snapshot 1`] = `
+<View
+  accessibilityElementsHidden={true}
+  className="wp-block-search__button-outside wp-block-search__text-button"
+  importantForAccessibility="no-hide-descendants"
+>
+  <View
+    accessibilityHint="Double tap to edit label text"
+    accessibilityLabel="Search block label. Current text is Search"
+    accessibilityRole="none"
+    accessible={true}
+  >
+    <View>
+      <RCTAztecView
+        accessible={true}
+        activeFormats={Array []}
+        blockType={
+          Object {
+            "tag": "p",
+          }
+        }
+        disableEditingMenu={false}
+        focusable={true}
+        fontFamily="serif"
+        isMultiline={false}
+        maxImagesWidth={200}
+        onBackspace={[Function]}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onClick={[Function]}
+        onContentSizeChange={[Function]}
+        onEnter={[Function]}
+        onFocus={[Function]}
+        onHTMLContentWithCursor={[Function]}
+        onKeyDown={[Function]}
+        onPaste={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onSelectionChange={[Function]}
+        onStartShouldSetResponder={[Function]}
+        placeholder="Add label…"
+        placeholderTextColor="gray"
+        style={
+          Object {
+            "backgroundColor": undefined,
+            "maxWidth": undefined,
+            "minHeight": 0,
+          }
+        }
+        text={
+          Object {
+            "eventCount": undefined,
+            "linkTextColor": undefined,
+            "selection": null,
+            "text": "<p >Search</p>",
+          }
+        }
+        triggerKeyCodes={Array []}
+      />
+    </View>
+  </View>
+  <View
+    style={
+      Array [
+        undefined,
+        false,
+      ]
+    }
+  >
+    <View
+      accessibilityHint="Double tap to edit placeholder text"
+      accessibilityLabel="Search input field. No custom placeholder set"
+      accessibilityRole="none"
+      accessible={true}
+    >
+      <TextInput
+        allowFontScaling={true}
+        className="wp-block-search__input"
+        ellipsizeMode="tail"
+        fontFamily="serif"
+        isSelected={true}
+        label={null}
+        numberOfLines={1}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onFocus={[Function]}
+        placeholder="Optional placeholder…"
+        rejectResponderTermination={true}
+        scrollEnabled={false}
+        style={
+          Array [
+            undefined,
+            undefined,
+          ]
+        }
+        underlineColorAndroid="transparent"
+      />
+    </View>
+    <View>
+      <View
+        accessibilityHint="Double tap to edit button text"
+        accessibilityLabel="Search button. Current button text is Search Button"
+        accessibilityRole="none"
+        accessible={true}
+      >
+        <View>
+          <RCTAztecView
+            accessible={true}
+            activeFormats={Array []}
+            blockType={
+              Object {
+                "tag": "p",
+              }
+            }
+            disableEditingMenu={false}
+            focusable={true}
+            fontFamily="serif"
+            isMultiline={false}
+            maxImagesWidth={200}
+            minWidth={75}
+            onBackspace={[Function]}
+            onBlur={[Function]}
+            onChange={[Function]}
+            onClick={[Function]}
+            onContentSizeChange={[Function]}
+            onEnter={[Function]}
+            onFocus={[Function]}
+            onHTMLContentWithCursor={[Function]}
+            onKeyDown={[Function]}
+            onPaste={[Function]}
+            onResponderGrant={[Function]}
+            onResponderMove={[Function]}
+            onResponderRelease={[Function]}
+            onResponderTerminate={[Function]}
+            onResponderTerminationRequest={[Function]}
+            onSelectionChange={[Function]}
+            onStartShouldSetResponder={[Function]}
+            placeholder=""
+            placeholderTextColor="gray"
+            style={
+              Object {
+                "backgroundColor": undefined,
+                "maxWidth": undefined,
+                "minHeight": 0,
+              }
+            }
+            text={
+              Object {
+                "eventCount": undefined,
+                "linkTextColor": undefined,
+                "selection": null,
+                "text": "<p >Search Button</p>",
+              }
+            }
+            textAlign="center"
+            triggerKeyCodes={Array []}
+          />
+        </View>
+      </View>
+    </View>
+  </View>
+</View>
+`;
+
+exports[`Search Block renders with no-button option matches snapshot 1`] = `
+<View
+  accessibilityElementsHidden={true}
+  className="wp-block-search__no-button"
+  importantForAccessibility="no-hide-descendants"
+>
+  <View
+    accessibilityHint="Double tap to edit label text"
+    accessibilityLabel="Search block label. Current text is Search"
+    accessibilityRole="none"
+    accessible={true}
+  >
+    <View>
+      <RCTAztecView
+        accessible={true}
+        activeFormats={Array []}
+        blockType={
+          Object {
+            "tag": "p",
+          }
+        }
+        disableEditingMenu={false}
+        focusable={true}
+        fontFamily="serif"
+        isMultiline={false}
+        maxImagesWidth={200}
+        onBackspace={[Function]}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onClick={[Function]}
+        onContentSizeChange={[Function]}
+        onEnter={[Function]}
+        onFocus={[Function]}
+        onHTMLContentWithCursor={[Function]}
+        onKeyDown={[Function]}
+        onPaste={[Function]}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onSelectionChange={[Function]}
+        onStartShouldSetResponder={[Function]}
+        placeholder="Add label…"
+        placeholderTextColor="gray"
+        style={
+          Object {
+            "backgroundColor": undefined,
+            "maxWidth": undefined,
+            "minHeight": 0,
+          }
+        }
+        text={
+          Object {
+            "eventCount": undefined,
+            "linkTextColor": undefined,
+            "selection": null,
+            "text": "<p >Search</p>",
+          }
+        }
+        triggerKeyCodes={Array []}
+      />
+    </View>
+  </View>
+  <View
+    accessibilityHint="Double tap to edit placeholder text"
+    accessibilityLabel="Search input field. No custom placeholder set"
+    accessibilityRole="none"
+    accessible={true}
+  >
+    <TextInput
+      allowFontScaling={true}
+      className="wp-block-search__input"
+      ellipsizeMode="tail"
+      fontFamily="serif"
+      isSelected={true}
+      label={null}
+      numberOfLines={1}
+      onBlur={[Function]}
+      onChange={[Function]}
+      onFocus={[Function]}
+      placeholder="Optional placeholder…"
+      rejectResponderTermination={true}
+      scrollEnabled={false}
+      style={
+        Array [
+          undefined,
+          undefined,
+        ]
+      }
+      underlineColorAndroid="transparent"
+    />
+  </View>
+</View>
+`;

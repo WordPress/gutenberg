@@ -15,6 +15,15 @@ function gutenberg_is_fse_theme() {
 }
 
 /**
+ * Returns whether the current theme is FSE-enabled or not.
+ *
+ * @return boolean Whether the current theme is FSE-enabled or not.
+ */
+function gutenberg_supports_block_templates() {
+	return gutenberg_is_fse_theme() || current_theme_supports( 'block-templates' );
+}
+
+/**
  * Show a notice when a Full Site Editing theme is used.
  */
 function gutenberg_full_site_editing_notice() {
@@ -121,3 +130,16 @@ function gutenberg_menu_order( $menu_order ) {
 	}
 	return $menu_order;
 }
+
+/**
+ * Tells the script loader to load the scripts and styles of custom block on site editor screen.
+ *
+ * @param bool $is_block_editor_screen Current decision about loading block assets.
+ * @return bool Filtered decision about loading block assets.
+ */
+function gutenberg_site_editor_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
+	return ( is_callable( 'get_current_screen' ) && 'toplevel_page_gutenberg-edit-site' === get_current_screen()->base )
+		? true
+		: $is_block_editor_screen;
+}
+add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_site_editor_load_block_editor_scripts_and_styles' );

@@ -31,31 +31,37 @@ import { store as noticesStore } from '@wordpress/notices';
  */
 import { getMoversSetup } from '../block-mover/mover-description';
 import { store as blockEditorStore } from '../../store';
+import BlockTransformationsMenu from '../block-switcher/block-transformations-menu';
 
 const BlockActionsMenu = ( {
-	onDelete,
-	isStackedHorizontally,
-	wrapBlockSettings,
-	wrapBlockMover,
-	openGeneralSidebar,
-	onMoveDown,
-	onMoveUp,
+	// Select
+	blockTitle,
+	canInsertBlockType,
+	getBlocksByClientId,
+	isEmptyDefaultBlock,
 	isFirst,
 	isLast,
-	blockTitle,
-	isEmptyDefaultBlock,
-	anchorNodeRef,
-	getBlocksByClientId,
+	rootClientId,
 	selectedBlockClientId,
+	selectedBlockPossibleTransformations,
+	// Dispatch
 	createSuccessNotice,
 	duplicateBlock,
-	removeBlocks,
+	onMoveDown,
+	onMoveUp,
+	openGeneralSidebar,
 	pasteBlock,
-	canInsertBlockType,
-	rootClientId,
+	removeBlocks,
+	// Passed in
+	anchorNodeRef,
+	isStackedHorizontally,
+	onDelete,
+	wrapBlockMover,
+	wrapBlockSettings,
 } ) => {
 	const [ clipboard, setCurrentClipboard ] = useState( getClipboard() );
-	const pickerRef = useRef();
+	const blockActionsMenuPickerRef = useRef();
+	const blockTransformationMenuPickerRef = useRef();
 	const moversOptions = { keys: [ 'icon', 'actionTitle' ] };
 	const clipboardBlock = clipboard && rawHandler( { HTML: clipboard } )[ 0 ];
 	const isPasteEnabled =
@@ -69,67 +75,119 @@ const BlockActionsMenu = ( {
 		},
 	} = getMoversSetup( isStackedHorizontally, moversOptions );
 
-	const deleteOption = {
-		id: 'deleteOption',
-		label: __( 'Remove block' ),
-		value: 'deleteOption',
-		separated: true,
-		disabled: isEmptyDefaultBlock,
-	};
-
-	const settingsOption = {
-		id: 'settingsOption',
-		label: __( 'Block settings' ),
-		value: 'settingsOption',
-	};
-
-	const backwardButtonOption = {
-		id: 'backwardButtonOption',
-		label: backwardButtonTitle,
-		value: 'backwardButtonOption',
-		disabled: isFirst,
-	};
-
-	const forwardButtonOption = {
-		id: 'forwardButtonOption',
-		label: forwardButtonTitle,
-		value: 'forwardButtonOption',
-		disabled: isLast,
-	};
-
-	const copyButtonOption = {
-		id: 'copyButtonOption',
-		label: __( 'Copy block' ),
-		value: 'copyButtonOption',
-	};
-
-	const cutButtonOption = {
-		id: 'cutButtonOption',
-		label: __( 'Cut block' ),
-		value: 'cutButtonOption',
-	};
-
-	const pasteButtonOption = {
-		id: 'pasteButtonOption',
-		label: __( 'Paste block after' ),
-		value: 'pasteButtonOption',
-	};
-
-	const duplicateButtonOption = {
-		id: 'duplicateButtonOption',
-		label: __( 'Duplicate block' ),
-		value: 'duplicateButtonOption',
+	const allOptions = {
+		settings: {
+			id: 'settingsOption',
+			label: __( 'Block settings' ),
+			value: 'settingsOption',
+			onSelect: openGeneralSidebar,
+		},
+		backwardButton: {
+			id: 'backwardButtonOption',
+			label: backwardButtonTitle,
+			value: 'backwardButtonOption',
+			disabled: isFirst,
+			onSelect: onMoveUp,
+		},
+		forwardButton: {
+			id: 'forwardButtonOption',
+			label: forwardButtonTitle,
+			value: 'forwardButtonOption',
+			disabled: isLast,
+			onSelect: onMoveDown,
+		},
+		delete: {
+			id: 'deleteOption',
+			label: __( 'Remove block' ),
+			value: 'deleteOption',
+			separated: true,
+			disabled: isEmptyDefaultBlock,
+			onSelect: () => {
+				onDelete();
+				createSuccessNotice(
+					// translators: displayed right after the block is removed.
+					__( 'Block removed' )
+				);
+			},
+		},
+		transformButton: {
+			id: 'transformButtonOption',
+			label: __( 'Transform block…' ),
+			value: 'transformButtonOption',
+			onSelect: () => {
+				if ( blockTransformationMenuPickerRef.current ) {
+					blockTransformationMenuPickerRef.current.presentPicker();
+				}
+			},
+		},
+		copyButton: {
+			id: 'copyButtonOption',
+			label: __( 'Copy block' ),
+			value: 'copyButtonOption',
+			onSelect: () => {
+				const serializedBlock = serialize(
+					getBlocksByClientId( selectedBlockClientId )
+				);
+				setCurrentClipboard( serializedBlock );
+				setClipboard( serializedBlock );
+				createSuccessNotice(
+					// translators: displayed right after the block is copied.
+					__( 'Block copied' )
+				);
+			},
+		},
+		cutButton: {
+			id: 'cutButtonOption',
+			label: __( 'Cut block' ),
+			value: 'cutButtonOption',
+			onSelect: () => {
+				setClipboard(
+					serialize( getBlocksByClientId( selectedBlockClientId ) )
+				);
+				removeBlocks( selectedBlockClientId );
+				createSuccessNotice(
+					// translators: displayed right after the block is cut.
+					__( 'Block cut' )
+				);
+			},
+		},
+		pasteButton: {
+			id: 'pasteButtonOption',
+			label: __( 'Paste block after' ),
+			value: 'pasteButtonOption',
+			onSelect: () => {
+				onPasteBlock();
+				createSuccessNotice(
+					// translators: displayed right after the block is pasted.
+					__( 'Block pasted' )
+				);
+			},
+		},
+		duplicateButton: {
+			id: 'duplicateButtonOption',
+			label: __( 'Duplicate block' ),
+			value: 'duplicateButtonOption',
+			onSelect: () => {
+				duplicateBlock();
+				createSuccessNotice(
+					// translators: displayed right after the block is duplicated.
+					__( 'Block duplicated' )
+				);
+			},
+		},
 	};
 
 	const options = compact( [
-		wrapBlockMover && backwardButtonOption,
-		wrapBlockMover && forwardButtonOption,
-		wrapBlockSettings && settingsOption,
-		copyButtonOption,
-		cutButtonOption,
-		isPasteEnabled && pasteButtonOption,
-		duplicateButtonOption,
-		deleteOption,
+		wrapBlockMover && allOptions.backwardButton,
+		wrapBlockMover && allOptions.forwardButton,
+		wrapBlockSettings && allOptions.settings,
+		selectedBlockPossibleTransformations.length &&
+			allOptions.transformButton,
+		allOptions.copyButton,
+		allOptions.cutButton,
+		isPasteEnabled && allOptions.pasteButton,
+		allOptions.duplicateButton,
+		allOptions.delete,
 	] );
 
 	function onPasteBlock() {
@@ -141,62 +199,13 @@ const BlockActionsMenu = ( {
 	}
 
 	function onPickerSelect( value ) {
-		switch ( value ) {
-			case deleteOption.value:
-				onDelete();
-				createSuccessNotice(
-					// translators: displayed right after the block is removed.
-					__( 'Block removed' )
-				);
-				break;
-			case settingsOption.value:
-				openGeneralSidebar();
-				break;
-			case forwardButtonOption.value:
-				onMoveDown();
-				break;
-			case backwardButtonOption.value:
-				onMoveUp();
-				break;
-			case copyButtonOption.value:
-				const copyBlock = getBlocksByClientId( selectedBlockClientId );
-				const serializedBlock = serialize( copyBlock );
-				setCurrentClipboard( serializedBlock );
-				setClipboard( serializedBlock );
-				createSuccessNotice(
-					// translators: displayed right after the block is copied.
-					__( 'Block copied' )
-				);
-				break;
-			case cutButtonOption.value:
-				const cutBlock = getBlocksByClientId( selectedBlockClientId );
-				setClipboard( serialize( cutBlock ) );
-				removeBlocks( selectedBlockClientId );
-				createSuccessNotice(
-					// translators: displayed right after the block is cut.
-					__( 'Block cut' )
-				);
-				break;
-			case pasteButtonOption.value:
-				onPasteBlock();
-				createSuccessNotice(
-					// translators: displayed right after the block is pasted.
-					__( 'Block pasted' )
-				);
-				break;
-			case duplicateButtonOption.value:
-				duplicateBlock();
-				createSuccessNotice(
-					// translators: displayed right after the block is duplicated.
-					__( 'Block duplicated' )
-				);
-				break;
-		}
+		const selectedItem = options.find( ( item ) => item.value === value );
+		selectedItem.onSelect();
 	}
 
 	function onPickerPresent() {
-		if ( pickerRef.current ) {
-			pickerRef.current.presentPicker();
+		if ( blockActionsMenuPickerRef.current ) {
+			blockActionsMenuPickerRef.current.presentPicker();
 		}
 	}
 
@@ -223,7 +232,7 @@ const BlockActionsMenu = ( {
 				} }
 			/>
 			<Picker
-				ref={ pickerRef }
+				ref={ blockActionsMenuPickerRef }
 				options={ options }
 				onChange={ onPickerSelect }
 				destructiveButtonIndex={ options.length }
@@ -233,6 +242,14 @@ const BlockActionsMenu = ( {
 				getAnchor={ getAnchor }
 				// translators: %s: block title e.g: "Paragraph".
 				title={ sprintf( __( '%s block options' ), blockTitle ) }
+			/>
+			<BlockTransformationsMenu
+				anchorNodeRef={ anchorNodeRef }
+				blockTitle={ blockTitle }
+				pickerRef={ blockTransformationMenuPickerRef }
+				possibleTransformations={ selectedBlockPossibleTransformations }
+				selectedBlock={ getBlocksByClientId( selectedBlockClientId ) }
+				selectedBlockClientId={ selectedBlockClientId }
 			/>
 		</>
 	);
@@ -245,6 +262,7 @@ export default compose(
 			getBlockRootClientId,
 			getBlockOrder,
 			getBlockName,
+			getBlockTransformItems,
 			getBlock,
 			getBlocksByClientId,
 			getSelectedBlockClientIds,
@@ -271,16 +289,24 @@ export default compose(
 		const isEmptyDefaultBlock =
 			isExactlyOneBlock && isDefaultBlock && isEmptyContent;
 
+		const selectedBlockClientId = getSelectedBlockClientIds();
+		const selectedBlock = getBlocksByClientId( selectedBlockClientId );
+		const selectedBlockPossibleTransformations = getBlockTransformItems(
+			selectedBlock,
+			rootClientId
+		);
+
 		return {
+			blockTitle,
+			canInsertBlockType,
+			currentIndex: firstIndex,
+			getBlocksByClientId,
+			isEmptyDefaultBlock,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 			rootClientId,
-			blockTitle,
-			isEmptyDefaultBlock,
-			getBlocksByClientId,
-			selectedBlockClientId: getSelectedBlockClientIds(),
-			currentIndex: firstIndex,
-			canInsertBlockType,
+			selectedBlockClientId,
+			selectedBlockPossibleTransformations,
 		};
 	} ),
 	withDispatch(
@@ -300,15 +326,14 @@ export default compose(
 			const { createSuccessNotice } = dispatch( noticesStore );
 
 			return {
-				onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
-				onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
-				openGeneralSidebar: () =>
-					openGeneralSidebar( 'edit-post/block' ),
 				createSuccessNotice,
 				duplicateBlock() {
 					return duplicateBlocks( clientIds );
 				},
-				removeBlocks,
+				onMoveDown: partial( moveBlocksDown, clientIds, rootClientId ),
+				onMoveUp: partial( moveBlocksUp, clientIds, rootClientId ),
+				openGeneralSidebar: () =>
+					openGeneralSidebar( 'edit-post/block' ),
 				pasteBlock: ( clipboardBlock ) => {
 					const canReplaceBlock = isUnmodifiedDefaultBlock(
 						getBlock( getBlockSelectionEnd() )
@@ -330,6 +355,7 @@ export default compose(
 						replaceBlocks( clientIds, clipboardBlock );
 					}
 				},
+				removeBlocks,
 			};
 		}
 	),
