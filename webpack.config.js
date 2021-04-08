@@ -6,8 +6,9 @@ const { DefinePlugin } = require( 'webpack' );
 const CopyWebpackPlugin = require( 'copy-webpack-plugin' );
 const TerserPlugin = require( 'terser-webpack-plugin' );
 const postcss = require( 'postcss' );
-const { get, escapeRegExp, compact } = require( 'lodash' );
-const { basename, sep } = require( 'path' );
+const { escapeRegExp, compact } = require( 'lodash' );
+const { sep } = require( 'path' );
+const fastGlob = require( 'fast-glob' );
 
 /**
  * WordPress dependencies
@@ -64,6 +65,35 @@ const stylesTransform = ( content ) => {
 	return content;
 };
 
+const blockNameRegex = new RegExp( /(?<=src\/).*(?=(\/frontend))/g );
+
+const createEntrypoints = () => {
+	const scriptPaths = fastGlob.sync(
+		'./packages/block-library/src/**/frontend.js',
+		{
+			ignore: [ '**/build*/**' ],
+		}
+	);
+
+	const scriptEntries = scriptPaths.reduce( ( entries, scriptPath ) => {
+		const [ blockName ] = scriptPath.match( blockNameRegex ) || [];
+
+		return {
+			...entries,
+			[ blockName ]: scriptPath,
+		};
+	}, {} );
+
+	const packageEntries = gutenbergPackages.reduce( ( memo, packageName ) => {
+		return {
+			...memo,
+			[ packageName ]: `./packages/${ packageName }`,
+		};
+	}, {} );
+
+	return { ...packageEntries, ...scriptEntries };
+};
+
 module.exports = {
 	optimization: {
 		// Only concatenate modules in production, when not analyzing bundles.
@@ -90,16 +120,26 @@ module.exports = {
 		],
 	},
 	mode,
-	entry: gutenbergPackages.reduce( ( memo, packageName ) => {
-		const name = camelCaseDash( packageName );
-		memo[ name ] = `./packages/${ packageName }`;
-		return memo;
-	}, {} ),
+	entry: createEntrypoints(),
 	output: {
 		devtoolNamespace: 'wp',
-		filename: './build/[basename]/index.js',
+		filename: ( data ) => {
+			const { chunk } = data;
+			const { entryModule } = chunk;
+			const { rawRequest } = entryModule;
+
+			/*
+			 * If the file being built is a Core Block's frontend file,
+			 * we build it in the block's directory.
+			 */
+			if ( rawRequest && rawRequest.includes( '/frontend.js' ) ) {
+				return `./build/block-library/blocks/[name]/frontend.js`;
+			}
+
+			return './build/[name]/index.js';
+		},
 		path: __dirname,
-		library: [ 'wp', '[name]' ],
+		library: [ 'wp', '[camelName]' ],
 		libraryTarget: 'window',
 	},
 	module: {
@@ -135,39 +175,20 @@ module.exports = {
 			),
 		} ),
 		new CustomTemplatedPathPlugin( {
-			basename( path, data ) {
-				let rawRequest;
-
-				const entryModule = get( data, [ 'chunk', 'entryModule' ], {} );
-				switch ( entryModule.type ) {
-					case 'javascript/auto':
-						rawRequest = entryModule.rawRequest;
-						break;
-
-					case 'javascript/esm':
-						rawRequest = entryModule.rootModule.rawRequest;
-						break;
-				}
-
-				if ( rawRequest ) {
-					return basename( rawRequest );
-				}
-
-				return path;
+			camelName( path, data ) {
+				return camelCaseDash( data.chunk.name );
 			},
 		} ),
-		new LibraryExportDefaultPlugin(
-			[
-				'api-fetch',
-				'deprecated',
-				'dom-ready',
-				'redux-routine',
-				'token-list',
-				'server-side-render',
-				'shortcode',
-				'warning',
-			].map( camelCaseDash )
-		),
+		new LibraryExportDefaultPlugin( [
+			'api-fetch',
+			'deprecated',
+			'dom-ready',
+			'redux-routine',
+			'token-list',
+			'server-side-render',
+			'shortcode',
+			'warning',
+		] ),
 		new CopyWebpackPlugin(
 			gutenbergPackages.map( ( packageName ) => ( {
 				from: `./packages/${ packageName }/build-style/*.css`,
