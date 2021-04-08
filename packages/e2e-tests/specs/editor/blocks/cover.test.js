@@ -1,18 +1,49 @@
 /**
+ * External dependencies
+ */
+import path from 'path';
+import fs from 'fs';
+import os from 'os';
+import { v4 as uuid } from 'uuid';
+
+/**
  * WordPress dependencies
  */
 import {
 	insertBlock,
 	createNewPost,
 	openDocumentSettingsSidebar,
+	openPreviewPage,
 } from '@wordpress/e2e-test-utils';
 
-describe( 'Cover', () => {
-	beforeEach( async () => {
-		await createNewPost();
-	} );
+// Copied from image.test.js. TODO: Extract into @wordpress/e2e-test-utils.
+async function upload( selector ) {
+	await page.waitForSelector( selector );
+	const inputElement = await page.$( selector );
+	const testImagePath = path.join(
+		__dirname,
+		'..',
+		'..',
+		'..',
+		'assets',
+		'1024x768_e2e_test_image_size.jpg'
+	);
+	const filename = uuid();
+	const tmpFileName = path.join( os.tmpdir(), filename + '.jpg' );
+	fs.copyFileSync( testImagePath, tmpFileName );
+	await inputElement.uploadFile( tmpFileName );
+	return filename;
+}
 
+async function waitForImage( filename ) {
+	await page.waitForSelector(
+		`.wp-block-cover img[src$="${ filename }.jpg"]`
+	);
+}
+
+describe( 'Cover', () => {
 	it( 'can be resized using drag & drop', async () => {
+		await createNewPost();
 		await insertBlock( 'Cover' );
 		// Close the inserter
 		await page.click( '.edit-post-header-toolbar__inserter-toggle' );
@@ -86,5 +117,34 @@ describe( 'Cover', () => {
 				heightInput
 			)
 		).toBeGreaterThan( 100 );
+	} );
+
+	it( 'renders correctly in the editor', async () => {
+		await createNewPost();
+		await insertBlock( 'Cover' );
+		const filename = await upload( '.wp-block-cover input[type="file"]' );
+		await waitForImage( filename );
+
+		await page.type(
+			'.wp-block-cover [data-type="core/paragraph"]',
+			'Cover Block'
+		);
+
+		// Unselect the cover block (to remove the 'selected' highlight frame).
+		await page.$eval(
+			'.wp-block-cover [data-type="core/paragraph"]',
+			( e ) => e.blur()
+		);
+
+		const coverBlockElement = await page.$( '.wp-block-cover' );
+		const screenshot = await coverBlockElement.screenshot();
+		expect( screenshot ).toMatchImageSnapshot();
+	} );
+
+	it( 'renders correctly on the frontend', async () => {
+		const previewPage = await openPreviewPage( page );
+		const coverBlockElement = await previewPage.$( '.wp-block-cover' );
+		const screenshot = await coverBlockElement.screenshot();
+		expect( screenshot ).toMatchImageSnapshot();
 	} );
 } );
