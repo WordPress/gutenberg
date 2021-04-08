@@ -175,7 +175,6 @@ public class WPAndroidGlueCode {
 
     public interface OnSetFeaturedImageListener {
         void onSetFeaturedImageButtonClicked(int mediaId);
-        void checkIfFeaturedImage(int mediaId);
     }
 
     public interface OnEditorMountListener {
@@ -326,11 +325,6 @@ public class WPAndroidGlueCode {
             @Override
             public void setFeaturedImage(int mediaId) {
                 mOnSetFeaturedImageListener.onSetFeaturedImageButtonClicked(mediaId);
-            }
-
-            @Override
-            public void checkIfFeaturedImage(int mediaId) {
-                mOnSetFeaturedImageListener.checkIfFeaturedImage(mediaId);
             }
 
             @Override
