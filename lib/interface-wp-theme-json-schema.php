@@ -5,6 +5,11 @@
  * @package gutenberg
  */
 
+/**
+ * Schema interface for theme.json structures.
+ *
+ * @package gutenberg
+ */
 interface WP_Theme_JSON_Schema {
 	/**
 	 * Parses an array that follows an old theme.json schema
