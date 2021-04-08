@@ -20,6 +20,7 @@ import {
 	image,
 	wordpress,
 	mobile,
+	globe,
 } from '@wordpress/icons';
 
 export const MEDIA_TYPE_IMAGE = 'image';
@@ -109,6 +110,7 @@ export class MediaUpload extends Component {
 			value: 'URL',
 			label: __( 'Insert from URL' ),
 			types: [ MEDIA_TYPE_AUDIO ],
+			icon: globe,
 		};
 
 		const internalSources = [
