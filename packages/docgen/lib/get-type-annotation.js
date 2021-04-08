@@ -425,16 +425,14 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 
 	try {
 		const paramType = paramToken.typeAnnotation.typeAnnotation;
-		if ( babelTypes.isIdentifier( paramToken ) ) {
-			return getTypeAnnotation( paramType );
-		} else if ( babelTypes.isRestElement( paramToken ) ) {
+		if (
+			babelTypes.isIdentifier( paramToken ) ||
+			babelTypes.isRestElement( paramToken ) ||
+			( babelTypes.isArrayPattern( paramToken ) &&
+				! tag.name.includes( '.' ) )
+		) {
 			return getTypeAnnotation( paramType );
 		} else if ( babelTypes.isArrayPattern( paramToken ) ) {
-			if ( ! tag.name.includes( '.' ) ) {
-				// unqualified name
-				return getTypeAnnotation( paramType );
-			}
-
 			// qualified name i.e., an element of the array being destructured
 			const position = parseInt(
 				tag.name.split( '.' ).slice( -1 )[ 0 ],
