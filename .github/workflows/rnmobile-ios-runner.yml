@@ -26,8 +26,6 @@ jobs:
               with:
                   path: ~/.npm
                   key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-npm-
 
             - run: npm ci
 
@@ -51,11 +49,6 @@ jobs:
                       ~/.cocoapods/repos/trunk
                       packages/react-native-editor/ios/vendor
                   key: ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-${{ hashFiles('package-lock.json') }}
-                  restore-keys: |
-                      ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-${{ hashFiles('package-lock.json') }}
-                      ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-
-                      ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-
-                      ${{ runner.os }}-pods-
 
             - name: Bundle iOS
               run: npm run native test:e2e:bundle:ios
