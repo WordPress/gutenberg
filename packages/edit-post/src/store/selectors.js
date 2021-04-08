@@ -9,6 +9,8 @@ import { get, includes, some, flatten, values } from 'lodash';
  */
 import { createRegistrySelector } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 /**
  * Returns the current editing mode.
  *
@@ -335,3 +337,30 @@ export function isInserterOpened( state ) {
 export function isEditingTemplate( state ) {
 	return state.isEditingTemplate;
 }
+
+/**
+ * Retrieves the template of the currently edited post.
+ *
+ * @return {Object?} Post Template.
+ */
+export const getEditedPostTemplate = createRegistrySelector(
+	( select ) => () => {
+		const currentTemplate = select( editorStore ).getEditedPostAttribute(
+			'template'
+		);
+		if ( currentTemplate ) {
+			return select( coreStore )
+				.getEntityRecords( 'postType', 'wp_template' )
+				?.find( ( template ) => template.slug === currentTemplate );
+		}
+
+		const post = select( editorStore ).getCurrentPost();
+		if ( post.link && post.status !== 'auto-draft' ) {
+			return select( coreStore ).__experimentalGetTemplateForLink(
+				post.link
+			);
+		}
+
+		return null;
+	}
+);

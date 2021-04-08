@@ -15,22 +15,16 @@
  * @return array (Maybe) modified page templates array.
  */
 function gutenberg_load_block_page_templates( $templates, $theme, $post, $post_type ) {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return $templates;
 	}
 
-	$data             = WP_Theme_JSON_Resolver::get_theme_data()->get_custom_templates();
-	$custom_templates = array();
-	if ( isset( $data ) ) {
-		foreach ( $data  as $key => $template ) {
-			if ( ( ! isset( $template['postTypes'] ) && 'page' === $post_type ) ||
-				( isset( $template['postTypes'] ) && in_array( $post_type, $template['postTypes'], true ) )
-			) {
-				$custom_templates[ $key ] = $template['title'];
-			}
-		}
+	$block_templates = gutenberg_get_block_templates( array(), 'wp_template' );
+	foreach ( $block_templates as $template ) {
+		// TODO: exclude templates that are not concerned by the current post type.
+		$templates[ $template->slug ] = $template->title;
 	}
 
-	return $custom_templates;
+	return $templates;
 }
 add_filter( 'theme_templates', 'gutenberg_load_block_page_templates', 10, 4 );

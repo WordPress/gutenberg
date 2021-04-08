@@ -28,7 +28,7 @@ function gutenberg_get_template_paths() {
  * Registers block editor 'wp_template' post type.
  */
 function gutenberg_register_template_post_type() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return;
 	}
 
@@ -84,7 +84,7 @@ add_action( 'init', 'gutenberg_register_template_post_type' );
  * Registers block editor 'wp_theme' taxonomy.
  */
 function gutenberg_register_wp_theme_taxonomy() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return;
 	}
 
@@ -139,7 +139,7 @@ add_filter( 'user_has_cap', 'gutenberg_grant_template_caps' );
  * Fixes the label of the 'wp_template' admin menu entry.
  */
 function gutenberg_fix_template_admin_menu_entry() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return;
 	}
 	global $submenu;

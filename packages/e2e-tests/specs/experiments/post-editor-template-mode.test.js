@@ -13,7 +13,6 @@ import {
 
 describe( 'Post Editor Template mode', () => {
 	beforeAll( async () => {
-		await activateTheme( 'tt1-blocks' );
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
 	} );
@@ -22,11 +21,9 @@ describe( 'Post Editor Template mode', () => {
 		await activateTheme( 'twentytwentyone' );
 	} );
 
-	beforeEach( async () => {
-		await createNewPost();
-	} );
-
 	it( 'Allow to switch to template mode, edit the template and check the result', async () => {
+		await activateTheme( 'tt1-blocks' );
+		await createNewPost();
 		// Create a random post.
 		await page.type( '.editor-post-title__input', 'Just an FSE Post' );
 		await page.keyboard.press( 'Enter' );
@@ -45,9 +42,9 @@ describe( 'Post Editor Template mode', () => {
 
 		// Switch to template mode.
 		await openDocumentSettingsSidebar();
-		const switchLink = await page.waitForSelector(
-			'.edit-post-post-template button'
-		);
+		const editTemplateXPath =
+			"//*[contains(@class, 'edit-post-post-template__actions')]//button[contains(text(), 'Edit')]";
+		const switchLink = await page.waitForXPath( editTemplateXPath );
 		await switchLink.click();
 
 		// Check that we switched properly to edit mode.
@@ -81,5 +78,69 @@ describe( 'Post Editor Template mode', () => {
 		await previewPage.waitForXPath(
 			'//p[contains(text(), "Just a random paragraph added to the template")]'
 		);
+	} );
+
+	it( 'Allow creating custom block templates in classic themes', async () => {
+		await activateTheme( 'twentytwentyone' );
+		await createNewPost();
+		// Create a random post.
+		await page.type( '.editor-post-title__input', 'Another FSE Post' );
+		await page.keyboard.press( 'Enter' );
+		await page.keyboard.type( 'Hello World' );
+
+		// Unselect the blocks.
+		await page.evaluate( () => {
+			wp.data.dispatch( 'core/block-editor' ).clearSelectedBlock();
+		} );
+
+		// Save the post
+		// Saving shouldn't be necessary but unfortunately,
+		// there's a template resolution bug forcing us to do so.
+		await saveDraft();
+		await page.reload();
+
+		// Create a new custom template.
+		await openDocumentSettingsSidebar();
+		const newTemplateXPath =
+			"//*[contains(@class, 'edit-post-post-template__actions')]//button[contains(text(), 'New')]";
+		const newButton = await page.waitForXPath( newTemplateXPath );
+		await newButton.click();
+
+		// Fill the template title and submit.
+		const templateNameInputSelector =
+			'.edit-post-post-template__modal .components-text-control__input';
+		await page.click( templateNameInputSelector );
+		await page.keyboard.type( 'Blank Template' );
+		await page.keyboard.press( 'Enter' );
+
+		// Check that we switched properly to edit mode.
+		await page.waitForXPath(
+			'//*[contains(@class, "components-snackbar")]/*[text()="Custom template created. You\'re in template mode now."]'
+		);
+
+		// Edit the template
+		await insertBlock( 'Paragraph' );
+		await page.keyboard.type(
+			'Just a random paragraph added to the template'
+		);
+
+		// Save changes
+		const doneButton = await page.waitForXPath(
+			`//button[contains(text(), 'Apply')]`
+		);
+		await doneButton.click();
+		const saveButton = await page.waitForXPath(
+			`//div[contains(@class, "entities-saved-states__panel-header")]/button[contains(text(), 'Save')]`
+		);
+		await saveButton.click();
+
+		// Preview changes
+		const previewPage = await openPreviewPage();
+		await previewPage.waitForSelector( '.wp-site-blocks' );
+		const content = await previewPage.evaluate(
+			() => document.querySelector( '.wp-site-blocks' ).innerHTML
+		);
+
+		expect( content ).toMatchSnapshot();
 	} );
 } );
