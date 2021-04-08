@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import isPropValid from '@emotion/is-prop-valid';
-
-/**
  * WordPress dependencies
  */
 import { useMergeRefs } from '@wordpress/compose';
@@ -22,8 +17,6 @@ import {
 	getInterpolatedClassName,
 } from './utils';
 
-const shouldForwardProp = isPropValid;
-
 const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
 
 /**
@@ -40,8 +33,7 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
  *
  * createCoreElement is a super light-weight higher-order wrapper that
  * enhances base elements (like `div`, `input`, or even Components) with
- * features provided by the Style system, such as direct CSS compiling via
- * the `css` prop.
+ * features provided by the Style system.
  *
  * A styled element also has built-in baseStyles (which can be adjusted using
  * the createStyleSystem factory).
@@ -91,16 +83,7 @@ export const createCoreElement = ( tagName, options ) => {
 	 * @param {import('react').Ref<any>} ref
 	 */
 	const Render = (
-		{
-			// Internal props
-			css: cssProp,
-			// External props
-			as,
-			children,
-			className: classNameProp,
-			forwardedRef,
-			...props
-		},
+		{ as, children, className: classNameProp, forwardedRef, ...props },
 		ref
 	) => {
 		/**
@@ -130,28 +113,8 @@ export const createCoreElement = ( tagName, options ) => {
 			styles.reduceMotion,
 			compiledBaseStyles,
 			className,
-			cssProp && css( cssProp ),
 			interpolationClassName
 		);
-
-		/**
-		 * A conventient feature to (attempt to) filter out non HTML-friendly
-		 * props for HTMLElements.
-		 */
-		const shouldFilterProps = typeof element === 'string';
-
-		/** @type {Record<string, any>} */
-		const newProps = {};
-
-		for ( const key in props ) {
-			if ( shouldFilterProps ) {
-				if ( shouldForwardProp( key ) ) {
-					newProps[ key ] = props[ key ];
-				}
-			} else {
-				newProps[ key ] = props[ key ];
-			}
-		}
 
 		const refs = useMergeRefs( [ forwardedRef, ref ] );
 
@@ -160,7 +123,7 @@ export const createCoreElement = ( tagName, options ) => {
 			{
 				className: classes,
 				ref: refs,
-				...newProps,
+				...props,
 			},
 			children
 		);
