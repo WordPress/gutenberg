@@ -9,7 +9,7 @@
  * Adds necessary filters to use 'wp_template' posts instead of theme template files.
  */
 function gutenberg_add_template_loader_filters() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return;
 	}
 
@@ -71,9 +71,18 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	foreach ( $templates as $template_item ) {
 		$template_item_slug = gutenberg_strip_php_suffix( $template_item );
 
+		// Is this a custom template?
+		// This check should be removed when merged in core.
+		// Instead, wp_templates should be considered valid in locate_template.
+		$is_custom_template = 0 === strpos( $current_block_template_slug, 'wp-custom-template-' );
+
 		// Don't override the template if we find a template matching the slug we look for
 		// and which does not match a block template slug.
-		if ( $current_template_slug !== $current_block_template_slug && $current_template_slug === $template_item_slug ) {
+		if (
+			! $is_custom_template &&
+			$current_template_slug !== $current_block_template_slug &&
+			$current_template_slug === $template_item_slug
+		) {
 			return $template;
 		}
 	}
