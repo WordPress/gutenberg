@@ -138,19 +138,19 @@ export function initializeEditor(
 		} );
 	}
 
-    return new Promise( ( resolve ) => {
-	    render(
-		    <Editor
-			  settings={ settings }
-			  onError={ reboot }
-			  postId={ postId }
-			  postType={ postType }
-			  initialEdits={ initialEdits }
-              markEditorReady={ resolve }
-		    />,
-		    target
-	    );
-    } );
+	return new Promise( ( resolve ) => {
+		render(
+			<Editor
+				settings={ settings }
+				onError={ reboot }
+				postId={ postId }
+				postType={ postType }
+				initialEdits={ initialEdits }
+				markEditorReady={ resolve }
+			/>,
+			target
+		);
+	} );
 }
 
 export { default as PluginBlockSettingsMenuItem } from './components/block-settings-menu/plugin-block-settings-menu-item';
