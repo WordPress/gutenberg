@@ -8,7 +8,7 @@
 
 class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 
-	function test_schema_to_v1() {
+	function test_parse() {
 		$theme_json_v0 = array(
 			'settings' => array(
 				'defaults'       => array(
@@ -85,7 +85,8 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		$theme_json_v1 = WP_Theme_JSON_Schema_V0::to_v1( $theme_json_v0 );
+
+		$actual = WP_Theme_JSON_Schema_V0::parse( $theme_json_v0 );
 
 		$expected = array(
 			'version'  => 1,
@@ -150,6 +151,6 @@ class WP_Theme_JSON_Schema_V0_Test extends WP_UnitTestCase {
 			),
 		);
 
-		$this->assertEqualSetsWithIndex( $expected, $theme_json_v1 );
+		$this->assertEqualSetsWithIndex( $expected, $actual );
 	}
 }

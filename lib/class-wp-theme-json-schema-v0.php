@@ -1,15 +1,16 @@
 <?php
 /**
- * Processes structures that adhere to the theme.json schema V0.
+ * Class that implements a WP_Theme_JSON_Schema to convert
+ * a given structure in v0 schema to the latest one.
  *
  * @package gutenberg
  */
 
 /**
- * Class that encapsulates the processing of
- * structures that adhere to the theme.json V0.
+ * Class that implements a WP_Theme_JSON_Schema to convert
+ * a given structure in v0 schema to the latest one.
  */
-class WP_Theme_JSON_Schema_V0 {
+class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 
 	/**
 	 * How to address all the blocks
@@ -121,13 +122,13 @@ class WP_Theme_JSON_Schema_V0 {
 	);
 
 	/**
-	 * Utility to convert v0 schemas into v1.
+	 * Converts a v0 schema into the latest.
 	 *
-	 * @param array $old A theme.json in v0 format.
+	 * @param array $old Data in v0 schema.
 	 *
-	 * @return array The new theme.json in the v1 format.
+	 * @return array Data in the latest schema.
 	 */
-	public static function to_v1( $old ) {
+	public static function parse( $old ) {
 		// Copy everything.
 		$new = $old;
 
