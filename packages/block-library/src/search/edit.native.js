@@ -220,6 +220,8 @@ export default function SearchEdit( {
 					} }
 					onBlur={ () => setIsPlaceholderSelected( false ) }
 					placeholderTextColor={ placeholderStyle?.color }
+					testID="searchInputField"
+					accessibilityLabel="searchInputField"
 				/>
 			</View>
 		);
@@ -274,6 +276,8 @@ export default function SearchEdit( {
 							selectionColor={
 								styles.richTextButtonCursor?.color
 							}
+							testID="searchButtonTextField"
+							accessibilityLabel="searchButtonTextField"
 						/>
 					</View>
 				) }
@@ -321,6 +325,8 @@ export default function SearchEdit( {
 							setIsLabelSelected( false );
 						} }
 						selectionColor={ styles.richTextButtonCursor?.color }
+						testID="searchLabelTextField"
+						accessibilityLabel="searchLabelTextField"
 					/>
 				</View>
 			) }

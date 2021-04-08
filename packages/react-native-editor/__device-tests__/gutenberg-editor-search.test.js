@@ -10,6 +10,15 @@ describe( 'Gutenberg Editor Search Block tests', () => {
 			blockNames.search
 		);
 
+		console.log( 'AMANDA-TEST' );
+
+		//TODO AMANDA -- testing
+		const placeholderTV = await editorPage.getPlaceholderTextViewForSearchBlock();
+		const placeholder = await placeholderTV.text();
+
+		console.log( `AMANDA-TEST > placeholder value is ${ placeholder }` );
+
 		expect( searchBlock ).toBeTruthy();
+		await editorPage.removeBlockAtPosition( blockNames.search );
 	} );
 } );
