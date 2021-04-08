@@ -191,24 +191,39 @@ class WP_Theme_JSON_Resolver {
 			$path    = $field['path'];
 			$key     = $field['key'];
 			$context = $field['context'];
-			if ( 'settings' === $path[0] ) {
-				if ( empty( $theme_json['settings'] ) ) {
-					continue;
-				}
-				$path = array_slice( $path, 2 );
-				foreach ( $theme_json['settings'] as $setting_key => $setting ) {
-					$array_to_translate = _wp_array_get( $setting, $path, null );
+
+			/*
+			 * We need to process the paths that include '*' separately.
+			 * One example of such a path would be:
+			 * [ 'settings', '*', 'color', 'palette' ]
+			 */
+			$nodes_to_iterate = array_keys( $path, '*', true );
+			if ( ! empty( $nodes_to_iterate ) ) {
+				/*
+				 * At the moment, we only need to support one '*' in the path, so take it directly.
+				 * - base will be [ 'settings' ]
+				 * - data will be [ 'color', 'palette' ]
+				 */
+				$base_path = array_slice( $path, 0, $nodes_to_iterate[0] );
+				$data_path = array_slice( $path, $nodes_to_iterate[0] + 1 );
+				$base_tree = _wp_array_get( $theme_json, $base_path, array() );
+				foreach ( $base_tree as $node_name => $node_data ) {
+					$array_to_translate = _wp_array_get( $node_data, $data_path, null );
 					if ( is_null( $array_to_translate ) ) {
 						continue;
 					}
+
+					// Whole path will be [ 'settings', 'core/paragraph', 'color', 'palette' ].
+					$whole_path       = array_merge( $base_path, array( $node_name ), $data_path );
 					$translated_array = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
-					gutenberg_experimental_set( $theme_json['settings'][ $setting_key ], $path, $translated_array );
+					gutenberg_experimental_set( $theme_json, $whole_path, $translated_array );
 				}
 			} else {
 				$array_to_translate = _wp_array_get( $theme_json, $path, null );
 				if ( is_null( $array_to_translate ) ) {
 					continue;
 				}
+
 				$translated_array = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
 				gutenberg_experimental_set( $theme_json, $path, $translated_array );
 			}
@@ -227,65 +242,8 @@ class WP_Theme_JSON_Resolver {
 			return self::$core;
 		}
 
-		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
 		$config     = self::read_json_file( __DIR__ . '/experimental-default-theme.json' );
 		$config     = self::translate( $config );
-
-		// Start i18n logic to remove when JSON i18 strings are extracted.
-		$default_colors_i18n = array(
-			'black'                 => __( 'Black', 'gutenberg' ),
-			'cyan-bluish-gray'      => __( 'Cyan bluish gray', 'gutenberg' ),
-			'white'                 => __( 'White', 'gutenberg' ),
-			'pale-pink'             => __( 'Pale pink', 'gutenberg' ),
-			'vivid-red'             => __( 'Vivid red', 'gutenberg' ),
-			'luminous-vivid-orange' => __( 'Luminous vivid orange', 'gutenberg' ),
-			'luminous-vivid-amber'  => __( 'Luminous vivid amber', 'gutenberg' ),
-			'light-green-cyan'      => __( 'Light green cyan', 'gutenberg' ),
-			'vivid-green-cyan'      => __( 'Vivid green cyan', 'gutenberg' ),
-			'pale-cyan-blue'        => __( 'Pale cyan blue', 'gutenberg' ),
-			'vivid-cyan-blue'       => __( 'Vivid cyan blue', 'gutenberg' ),
-			'vivid-purple'          => __( 'Vivid purple', 'gutenberg' ),
-		);
-		if ( ! empty( $config['settings'][ $all_blocks ]['color']['palette'] ) ) {
-			foreach ( $config['settings'][ $all_blocks ]['color']['palette'] as $color_key => $color ) {
-				$config['settings'][ $all_blocks ]['color']['palette'][ $color_key ]['name'] = $default_colors_i18n[ $color['slug'] ];
-			}
-		}
-
-		$default_gradients_i18n = array(
-			'vivid-cyan-blue-to-vivid-purple'      => __( 'Vivid cyan blue to vivid purple', 'gutenberg' ),
-			'light-green-cyan-to-vivid-green-cyan' => __( 'Light green cyan to vivid green cyan', 'gutenberg' ),
-			'luminous-vivid-amber-to-luminous-vivid-orange' => __( 'Luminous vivid amber to luminous vivid orange', 'gutenberg' ),
-			'luminous-vivid-orange-to-vivid-red'   => __( 'Luminous vivid orange to vivid red', 'gutenberg' ),
-			'very-light-gray-to-cyan-bluish-gray'  => __( 'Very light gray to cyan bluish gray', 'gutenberg' ),
-			'cool-to-warm-spectrum'                => __( 'Cool to warm spectrum', 'gutenberg' ),
-			'blush-light-purple'                   => __( 'Blush light purple', 'gutenberg' ),
-			'blush-bordeaux'                       => __( 'Blush bordeaux', 'gutenberg' ),
-			'luminous-dusk'                        => __( 'Luminous dusk', 'gutenberg' ),
-			'pale-ocean'                           => __( 'Pale ocean', 'gutenberg' ),
-			'electric-grass'                       => __( 'Electric grass', 'gutenberg' ),
-			'midnight'                             => __( 'Midnight', 'gutenberg' ),
-		);
-		if ( ! empty( $config['settings'][ $all_blocks ]['color']['gradients'] ) ) {
-			foreach ( $config['settings'][ $all_blocks ]['color']['gradients'] as $gradient_key => $gradient ) {
-				$config['settings'][ $all_blocks ]['color']['gradients'][ $gradient_key ]['name'] = $default_gradients_i18n[ $gradient['slug'] ];
-			}
-		}
-
-		$default_font_sizes_i18n = array(
-			'small'  => __( 'Small', 'gutenberg' ),
-			'normal' => __( 'Normal', 'gutenberg' ),
-			'medium' => __( 'Medium', 'gutenberg' ),
-			'large'  => __( 'Large', 'gutenberg' ),
-			'huge'   => __( 'Huge', 'gutenberg' ),
-		);
-		if ( ! empty( $config['settings'][ $all_blocks ]['typography']['fontSizes'] ) ) {
-			foreach ( $config['settings'][ $all_blocks ]['typography']['fontSizes'] as $font_size_key => $font_size ) {
-				$config['settings'][ $all_blocks ]['typography']['fontSizes'][ $font_size_key ]['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
-			}
-		}
-		// End i18n logic to remove when JSON i18 strings are extracted.
-
 		self::$core = new WP_Theme_JSON( $config );
 
 		return self::$core;
@@ -362,7 +320,7 @@ class WP_Theme_JSON_Resolver {
 				array(
 					'post_content' => '{}',
 					'post_status'  => 'publish',
-					'post_title'   => __( 'Custom Styles' ),
+					'post_title'   => __( 'Custom Styles', 'default' ),
 					'post_type'    => $post_type_filter,
 					'post_name'    => $post_name_filter,
 				),
@@ -436,17 +394,14 @@ class WP_Theme_JSON_Resolver {
 	 * @return WP_Theme_JSON
 	 */
 	public static function get_merged_data( $theme_support_data = array(), $origin = 'user' ) {
-		if ( 'theme' === $origin ) {
-			$result = new WP_Theme_JSON();
-			$result->merge( self::get_core_data() );
-			$result->merge( self::get_theme_data( $theme_support_data ) );
-			return $result;
-		}
-
 		$result = new WP_Theme_JSON();
 		$result->merge( self::get_core_data() );
 		$result->merge( self::get_theme_data( $theme_support_data ) );
-		$result->merge( self::get_user_data() );
+
+		if ( 'user' === $origin ) {
+			$result->merge( self::get_user_data() );
+		}
+
 		return $result;
 	}
 

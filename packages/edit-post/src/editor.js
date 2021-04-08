@@ -58,14 +58,12 @@ function Editor( {
 			getPreference,
 			__experimentalGetPreviewDeviceType,
 			isEditingTemplate,
+			getEditedPostTemplate,
 		} = select( editPostStore );
-		const {
-			getEntityRecord,
-			__experimentalGetTemplateForLink,
-			getPostType,
-			getEntityRecords,
-		} = select( 'core' );
-		const { getEditorSettings, getCurrentPost, __unstableIsEditorReady } = select( 'core/editor' );
+		const { getEntityRecord, getPostType, getEntityRecords } = select(
+			'core'
+		);
+		const { getEditorSettings, __unsableIsEditorReady } = select( 'core/editor' );
 		const { getBlockTypes } = select( blocksStore );
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			postType
@@ -81,7 +79,7 @@ function Editor( {
 		} else {
 			postObject = getEntityRecord( 'postType', postType, postId );
 		}
-		const isFSETheme = getEditorSettings().isFSETheme;
+		const supportsTemplateMode = getEditorSettings().supportsTemplateMode;
 		const isViewable = getPostType( postType )?.viewable ?? false;
 
 		return {
@@ -102,11 +100,8 @@ function Editor( {
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 			isTemplateMode: isEditingTemplate(),
 			template:
-				isFSETheme &&
-				isViewable &&
-				postObject &&
-				getCurrentPost().status !== 'auto-draft'
-					? __experimentalGetTemplateForLink( postObject.link )
+				supportsTemplateMode && isViewable
+					? getEditedPostTemplate()
 					: null,
 			post: postObject,
             isEditorReady: __unstableIsEditorReady()

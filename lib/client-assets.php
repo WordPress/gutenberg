@@ -660,7 +660,7 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 	}
 
 	// Remove the default font editor styles for FSE themes.
-	if ( gutenberg_is_fse_theme() ) {
+	if ( gutenberg_supports_block_templates() ) {
 		foreach ( $settings['styles'] as $j => $style ) {
 			if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {
 				unset( $settings['styles'][ $j ] );
@@ -680,7 +680,7 @@ add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings ) {
-	$settings['isFSETheme'] = gutenberg_is_fse_theme();
+	$settings['supportsTemplateMode'] = gutenberg_supports_block_templates();
 
 	// Enable the new layout options for themes with a theme.json file.
 	$settings['supportsLayout'] = WP_Theme_JSON_Resolver::theme_has_support();
