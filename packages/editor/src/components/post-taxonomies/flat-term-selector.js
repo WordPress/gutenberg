@@ -18,11 +18,22 @@ import {
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
-import { FormTokenField, withFilters } from '@wordpress/components';
-import { withSelect, withDispatch } from '@wordpress/data';
+import {
+	Button,
+	FormTokenField,
+	withFilters,
+	withSpokenMessages,
+} from '@wordpress/components';
+import { useSelect, withSelect, withDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 import { compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
+
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
 
 /**
  * Module constants
@@ -32,7 +43,7 @@ const DEFAULT_QUERY = {
 	per_page: MAX_TERMS_SUGGESTIONS,
 	orderby: 'count',
 	order: 'desc',
-	_fields: 'id,name',
+	_fields: 'id,name,count',
 };
 
 // Lodash unescape function handles &#39; but not &#039; which may be return in some API requests.
@@ -70,16 +81,63 @@ const unescapeTerms = ( terms ) => {
 	return map( terms, unescapeTerm );
 };
 
+const termNamesToIds = ( names, terms ) => {
+	return names.map(
+		( termName ) =>
+			find( terms, ( term ) => isSameTermName( term.name, termName ) ).id
+	);
+};
+
+function FlatTermSelectorMostUsed( { onSelect, taxonomy } ) {
+	const { terms, hasTerms } = useSelect( ( select ) => {
+		const mostUsedTerms = select( coreStore ).getEntityRecords(
+			'taxonomy',
+			taxonomy.slug,
+			DEFAULT_QUERY
+		);
+		return {
+			terms: mostUsedTerms,
+			hasTerms: mostUsedTerms?.length > 0,
+		};
+	}, [] );
+
+	const _terms = unescapeTerms( terms );
+
+	return (
+		<div className="flat-term-selector-most-used-container">
+			{ hasTerms && (
+				/*
+				 * Disable reason: The `list` ARIA role is redundant but
+				 * Safari+VoiceOver won't announce the list otherwise.
+				 */
+				/* eslint-disable jsx-a11y/no-redundant-roles */
+				<ul role="list" className="flat-term-selector-most-used">
+					{ _terms.map( ( term ) => (
+						<li key={ term.id }>
+							<Button isLink onClick={ () => onSelect( term ) }>
+								{ term.name }
+							</Button>
+						</li>
+					) ) }
+				</ul>
+				/* eslint-enable jsx-a11y/no-redundant-roles */
+			) }
+		</div>
+	);
+}
+
 class FlatTermSelector extends Component {
 	constructor() {
 		super( ...arguments );
 		this.onChange = this.onChange.bind( this );
 		this.searchTerms = throttle( this.searchTerms.bind( this ), 500 );
 		this.findOrCreateTerm = this.findOrCreateTerm.bind( this );
+		this.appendTerm = this.appendTerm.bind( this );
 		this.state = {
 			loading: ! isEmpty( this.props.terms ),
 			availableTerms: [],
 			selectedTerms: [],
+			showMostUsed: false,
 		};
 	}
 
@@ -197,14 +255,6 @@ class FlatTermSelector extends Component {
 					isSameTermName( term.name, termName )
 				)
 		);
-		const termNamesToIds = ( names, availableTerms ) => {
-			return names.map(
-				( termName ) =>
-					find( availableTerms, ( term ) =>
-						isSameTermName( term.name, termName )
-					).id
-			);
-		};
 
 		if ( newTermNames.length === 0 ) {
 			return this.props.onUpdateTerms(
@@ -233,6 +283,34 @@ class FlatTermSelector extends Component {
 		}
 	}
 
+	appendTerm( newTerm ) {
+		const { onUpdateTerms, taxonomy, terms = [], slug, speak } = this.props;
+
+		if ( terms.includes( newTerm.id ) ) {
+			return;
+		}
+
+		const newTerms = [ ...terms, newTerm.id ];
+
+		const termAddedMessage = sprintf(
+			/* translators: %s: term name. */
+			_x( '%s added', 'term' ),
+			get(
+				taxonomy,
+				[ 'labels', 'singular_name' ],
+				slug === 'post_tag' ? __( 'Tag' ) : __( 'Term' )
+			)
+		);
+
+		speak( termAddedMessage, 'assertive' );
+
+		this.setState( {
+			availableTerms: [ ...this.state.availableTerms, newTerm ],
+		} );
+
+		onUpdateTerms( newTerms, taxonomy.rest_base );
+	}
+
 	render() {
 		const { slug, taxonomy, hasAssignAction } = this.props;
 
@@ -240,7 +318,12 @@ class FlatTermSelector extends Component {
 			return null;
 		}
 
-		const { loading, availableTerms, selectedTerms } = this.state;
+		const {
+			loading,
+			availableTerms,
+			selectedTerms,
+			showMostUsed,
+		} = this.state;
 		const termNames = availableTerms.map( ( term ) => term.name );
 		const newTermLabel = get(
 			taxonomy,
@@ -268,29 +351,52 @@ class FlatTermSelector extends Component {
 			singularName
 		);
 
+		const mostUsedTermsLabel = sprintf(
+			/* translators: %s: term name. */
+			_x( 'Choose from the most used %s', 'terms' ),
+			get( taxonomy, [ 'labels', 'name' ] )
+		);
+
 		return (
-			<FormTokenField
-				value={ selectedTerms }
-				suggestions={ termNames }
-				onChange={ this.onChange }
-				onInputChange={ this.searchTerms }
-				maxSuggestions={ MAX_TERMS_SUGGESTIONS }
-				disabled={ loading }
-				label={ newTermLabel }
-				messages={ {
-					added: termAddedLabel,
-					removed: termRemovedLabel,
-					remove: removeTermLabel,
-				} }
-			/>
+			<>
+				<FormTokenField
+					value={ selectedTerms }
+					suggestions={ termNames }
+					onChange={ this.onChange }
+					onInputChange={ this.searchTerms }
+					maxSuggestions={ MAX_TERMS_SUGGESTIONS }
+					disabled={ loading }
+					label={ newTermLabel }
+					messages={ {
+						added: termAddedLabel,
+						removed: termRemovedLabel,
+						remove: removeTermLabel,
+					} }
+				/>
+				<Button
+					isLink
+					aria-expanded={ showMostUsed }
+					onClick={ () =>
+						this.setState( { showMostUsed: ! showMostUsed } )
+					}
+				>
+					{ mostUsedTermsLabel }
+				</Button>
+				{ showMostUsed && (
+					<FlatTermSelectorMostUsed
+						taxonomy={ taxonomy }
+						onSelect={ this.appendTerm }
+					/>
+				) }
+			</>
 		);
 	}
 }
 
 export default compose(
 	withSelect( ( select, { slug } ) => {
-		const { getCurrentPost } = select( 'core/editor' );
-		const { getTaxonomy } = select( 'core' );
+		const { getCurrentPost } = select( editorStore );
+		const { getTaxonomy } = select( coreStore );
 		const taxonomy = getTaxonomy( slug );
 		return {
 			hasCreateAction: taxonomy
@@ -308,7 +414,7 @@ export default compose(
 				  )
 				: false,
 			terms: taxonomy
-				? select( 'core/editor' ).getEditedPostAttribute(
+				? select( editorStore ).getEditedPostAttribute(
 						taxonomy.rest_base
 				  )
 				: [],
@@ -318,9 +424,10 @@ export default compose(
 	withDispatch( ( dispatch ) => {
 		return {
 			onUpdateTerms( terms, restBase ) {
-				dispatch( 'core/editor' ).editPost( { [ restBase ]: terms } );
+				dispatch( editorStore ).editPost( { [ restBase ]: terms } );
 			},
 		};
 	} ),
+	withSpokenMessages,
 	withFilters( 'editor.PostTaxonomyType' )
 )( FlatTermSelector );
