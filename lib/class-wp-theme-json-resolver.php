@@ -201,7 +201,7 @@ class WP_Theme_JSON_Resolver {
 					if ( is_null( $array_to_translate ) ) {
 						continue;
 					}
-					$translated_array   = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
+					$translated_array = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
 					gutenberg_experimental_set( $theme_json['settings'][ $setting_key ], $path, $translated_array );
 				}
 			} else {
@@ -209,7 +209,7 @@ class WP_Theme_JSON_Resolver {
 				if ( is_null( $array_to_translate ) ) {
 					continue;
 				}
-				$translated_array   = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
+				$translated_array = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
 				gutenberg_experimental_set( $theme_json, $path, $translated_array );
 			}
 		}
@@ -362,6 +362,7 @@ class WP_Theme_JSON_Resolver {
 				array(
 					'post_content' => '{}',
 					'post_status'  => 'publish',
+					'post_title'   => __( 'Custom Styles' ),
 					'post_type'    => $post_type_filter,
 					'post_name'    => $post_name_filter,
 				),
@@ -471,6 +472,7 @@ class WP_Theme_JSON_Resolver {
 			),
 			'map_meta_cap' => true,
 			'supports'     => array(
+				'title',
 				'editor',
 				'revisions',
 			),

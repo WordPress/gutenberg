@@ -23,6 +23,9 @@
 			"gradients": true,
 			"link": true
 		},
+		"spacing": {
+			"padding": true
+		},
 		"__experimentalLayout": true
 	},
 	"editorStyle": "wp-block-template-part-editor"

@@ -155,7 +155,7 @@ export default function ListEdit( {
 				}
 				value={ values }
 				aria-label={ __( 'List text' ) }
-				placeholder={ __( 'Write list…' ) }
+				placeholder={ __( 'List' ) }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value ) =>
 					createBlock( name, { ...attributes, values: value } )

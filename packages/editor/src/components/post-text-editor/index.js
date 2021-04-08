@@ -7,13 +7,12 @@ import Textarea from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 
-export const DEBOUNCE_TIME = 300;
 export default function PostTextEditor() {
 	const postContent = useSelect(
 		( select ) => select( 'core/editor' ).getEditedPostContent(),
@@ -29,18 +28,6 @@ export default function PostTextEditor() {
 	if ( ! isDirty && value !== postContent ) {
 		setValue( postContent );
 	}
-
-	const saveText = () => {
-		const blocks = parse( value );
-		resetEditorBlocks( blocks );
-	};
-
-	useEffect( () => {
-		const timeoutId = setTimeout( saveText, DEBOUNCE_TIME );
-		return () => {
-			clearTimeout( timeoutId );
-		};
-	}, [ value ] );
 
 	/**
 	 * Handles a textarea change event to notify the onChange prop callback and
@@ -67,7 +54,8 @@ export default function PostTextEditor() {
 	 */
 	const stopEditing = () => {
 		if ( isDirty ) {
-			saveText();
+			const blocks = parse( value );
+			resetEditorBlocks( blocks );
 			setIsDirty( false );
 		}
 	};

@@ -93,7 +93,6 @@ function Items( {
 	function selector( select ) {
 		const {
 			getBlockOrder,
-			getBlockListSettings,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
@@ -102,7 +101,6 @@ function Items( {
 			blockClientIds: getBlockOrder( rootClientId ),
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			orientation: getBlockListSettings( rootClientId )?.orientation,
 			hasMultiSelection: hasMultiSelection(),
 		};
 	}
@@ -111,16 +109,13 @@ function Items( {
 		blockClientIds,
 		selectedBlockClientId,
 		multiSelectedBlockClientIds,
-		orientation,
 		hasMultiSelection,
 	} = useSelect( selector, [ rootClientId ] );
 
-	const dropTargetIndex = useBlockDropZone( {
+	useBlockDropZone( {
 		element: wrapperRef,
 		rootClientId,
 	} );
-
-	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
 
 	return (
 		<LayoutProvider value={ layout }>
@@ -128,8 +123,6 @@ function Items( {
 				const isBlockInSelection = hasMultiSelection
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
-
-				const isDropTarget = dropTargetIndex === index;
 
 				return (
 					<AsyncModeProvider
@@ -143,12 +136,6 @@ function Items( {
 							// to avoid being impacted by the async mode
 							// otherwise there might be a small delay to trigger the animation.
 							index={ index }
-							className={ classnames( {
-								'is-drop-target': isDropTarget,
-								'is-dropping-horizontally':
-									isDropTarget &&
-									orientation === 'horizontal',
-							} ) }
 						/>
 					</AsyncModeProvider>
 				);
@@ -158,11 +145,6 @@ function Items( {
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
-				className={ classnames( {
-					'is-drop-target': isAppenderDropTarget,
-					'is-dropping-horizontally':
-						isAppenderDropTarget && orientation === 'horizontal',
-				} ) }
 			/>
 		</LayoutProvider>
 	);
