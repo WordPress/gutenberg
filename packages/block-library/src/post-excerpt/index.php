@@ -11,7 +11,7 @@
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
- * @return string Returns the filtered post excerpt for the current post wrapped inside "p" tags.
+ * @return string Returns the filtered post excerpt for the current post wrapped inside "p" tags, if there is an excerpt.
  */
 function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
