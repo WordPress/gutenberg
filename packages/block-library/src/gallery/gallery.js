@@ -10,7 +10,7 @@ import { RichText } from '@wordpress/block-editor';
 import { VisuallyHidden } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -44,7 +44,6 @@ export const Gallery = ( props ) => {
 		images,
 	} = attributes;
 
-	const captionRef = useRef();
 	const [ captionFocused, setCaptionFocused ] = useState( false );
 	const onFocusCaption = () => {
 		if ( ! captionFocused ) {
@@ -54,7 +53,6 @@ export const Gallery = ( props ) => {
 	};
 
 	const onCaptionBlur = () => {
-		//captionRef.current.blur()
 		if ( captionFocused ) {
 			setCaptionFocused( false );
 		}
@@ -111,7 +109,6 @@ export const Gallery = ( props ) => {
 			{ mediaPlaceholder }
 			<RichTextVisibilityHelper
 				isSelected={ captionFocused }
-				ref={ captionRef }
 				onBlur={ onCaptionBlur }
 				isHidden={ ! isSelected && RichText.isEmpty( caption ) }
 				tagName="figcaption"
