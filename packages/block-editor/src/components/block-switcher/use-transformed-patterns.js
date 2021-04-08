@@ -3,15 +3,22 @@
  */
 import { useMemo } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
+
 /**
  * Internal dependencies
  */
 import { getMatchingBlockByName, getRetainedBlockAttributes } from './utils';
 
-// here goes the mutation... :)
-// TODO jsdoc
-// TODO tests
-const transformMatchingBlock = ( match, selectedBlock ) => {
+/**
+ * Mutate the matched block's attributes by getting
+ * which block type's attributes to retain and prioritize
+ * them in the merging of the attributes.
+ *
+ * @param {WPBlock} match The matched block.
+ * @param {WPBlock} selectedBlock The selected block.
+ * @return {void}
+ */
+export const transformMatchingBlock = ( match, selectedBlock ) => {
 	// Get the block attributes to retain through the transformation.
 	const retainedBlockAttributes = getRetainedBlockAttributes(
 		selectedBlock.name,
@@ -25,14 +32,13 @@ const transformMatchingBlock = ( match, selectedBlock ) => {
 
 /**
  * By providing the selected blocks and pattern's blocks
- * find the matched blocks, transform them return them.
+ * find the matching blocks, transform them and return them.
  * If not all selected blocks are matched, return nothing.
  *
  * @param {WPBlock[]} selectedBlocks The selected blocks.
  * @param {WPBlock[]} patternBlocks The pattern's blocks.
  * @return {WPBlock[]|void} The transformed pattern's blocks or undefined if not all selected blocks have been matched.
  */
-// TODO tests
 export const getPatternTransformedBlocks = (
 	selectedBlocks,
 	patternBlocks
@@ -82,23 +88,25 @@ export const getPatternTransformedBlocks = (
  * @param {WPBlock[]} selectedBlocks The currently selected blocks.
  * @return {WPBlockPattern[]} Returns the eligible matched patterns with all the selected blocks.
  */
+// TODO tests
 const useTransformedPatterns = ( patterns, selectedBlocks ) => {
-	return useMemo( () => {
-		const _patterns = patterns.reduce( ( accumulator, _pattern ) => {
-			const transformedBlocks = getPatternTransformedBlocks(
-				selectedBlocks,
-				_pattern.blocks
-			);
-			if ( transformedBlocks ) {
-				accumulator.push( {
-					..._pattern,
-					transformedBlocks,
-				} );
-			}
-			return accumulator;
-		}, [] );
-		return _patterns;
-	}, [ patterns, selectedBlocks ] );
+	return useMemo(
+		() =>
+			patterns.reduce( ( accumulator, _pattern ) => {
+				const transformedBlocks = getPatternTransformedBlocks(
+					selectedBlocks,
+					_pattern.blocks
+				);
+				if ( transformedBlocks ) {
+					accumulator.push( {
+						..._pattern,
+						transformedBlocks,
+					} );
+				}
+				return accumulator;
+			}, [] ),
+		[ patterns, selectedBlocks ]
+	);
 };
 
 export default useTransformedPatterns;
