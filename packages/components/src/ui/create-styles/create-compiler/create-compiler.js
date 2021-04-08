@@ -7,7 +7,6 @@ import mitt from 'mitt';
 /**
  * Internal dependencies
  */
-import { RootStore } from '../css-custom-properties';
 import { createCSS } from './create-css';
 import { createPlugins } from './plugins';
 import { breakpoints, generateInterpolationName } from './utils';
@@ -15,7 +14,6 @@ import { breakpoints, generateInterpolationName } from './utils';
 const defaultOptions = {
 	key: 'css',
 	specificityLevel: 1,
-	rootStore: new RootStore(),
 };
 
 /* eslint-disable jsdoc/valid-types */
@@ -32,7 +30,6 @@ const defaultOptions = {
  * @typedef {import('create-emotion').Options & {
  *	key?: string,
  *	specificityLevel?: number,
- *	rootStore: import('../css-custom-properties').RootStore
  * }} CreateCompilerOptions
  */
 
@@ -46,12 +43,11 @@ export function createCompiler( options ) {
 		...options,
 	};
 
-	const { key, rootStore, specificityLevel } = mergedOptions;
+	const { key, specificityLevel } = mergedOptions;
 
 	const defaultPlugins = createPlugins( {
 		key,
 		specificityLevel,
-		rootStore,
 	} );
 
 	if ( options.stylisPlugins ) {

@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import { createCompiler } from '../create-compiler';
-import { createRootStore } from '../css-custom-properties';
 import { createCoreElement } from './create-core-element';
 import { createCoreElements } from './create-core-elements';
 import { createStyledComponents } from './create-styled-components';
@@ -28,7 +27,6 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
  * @property {(value: keyof (TConfig & TDarkConfig & THCConfig & TDarkHCConfig) | TGeneratedTokens) => string} get The primary function to retrieve Style system variables.
  * @property {import('./polymorphic-component').CreateStyled} styled A set of styled components.
  * @property {import('react').ComponentType} View The base <View /> component.
- * @property {import('../css-custom-properties').RootStore} rootStore The root store.
  */
 
 /**
@@ -84,16 +82,10 @@ export function createStyleSystem( options = defaultOptions ) {
 		highContrastModeConfig,
 	} );
 
-	const rootStore = createRootStore( globalStyles.globalVariables );
-	rootStore.setState( globalStyles.globalVariables );
-
 	/**
 	 * Compiler (Custom Emotion instance).
 	 */
-	const compiler = createCompiler( {
-		...compilerOptions,
-		rootStore,
-	} );
+	const compiler = createCompiler( compilerOptions );
 	const { css, cx } = compiler;
 
 	/**
@@ -142,7 +134,6 @@ export function createStyleSystem( options = defaultOptions ) {
 		) => `var(${ createToken( key.toString() ) })`,
 		styled,
 		View,
-		rootStore,
 	};
 
 	return styleSystem;
