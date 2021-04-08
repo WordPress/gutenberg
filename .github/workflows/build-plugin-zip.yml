@@ -92,6 +92,7 @@ jobs:
             - name: Cherry-pick to trunk
               run: |
                   git checkout trunk
+                  git pull
                   TRUNK_VERSION=$(jq --raw-output '.version' package.json)
                   if [[ ${{ steps.get_version.outputs.old_version }} == "$TRUNK_VERSION" ]]; then
                     git cherry-pick "${{ steps.get_version.outputs.release_branch }}"
@@ -112,7 +113,7 @@ jobs:
             - name: Use Node.js 14.x
               uses: actions/setup-node@46071b5c7a2e0c34e49c3cb8a0e792e86e18d5ea # v2.1.5
               with:
-                node-version: 14.x
+                  node-version: 14.x
 
             - name: Cache node modules
               uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
