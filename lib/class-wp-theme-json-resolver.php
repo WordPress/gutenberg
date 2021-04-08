@@ -245,62 +245,6 @@ class WP_Theme_JSON_Resolver {
 		$all_blocks = WP_Theme_JSON::ALL_BLOCKS_NAME;
 		$config     = self::read_json_file( __DIR__ . '/experimental-default-theme.json' );
 		$config     = self::translate( $config );
-
-		// Start i18n logic to remove when JSON i18 strings are extracted.
-		$default_colors_i18n = array(
-			'black'                 => __( 'Black', 'gutenberg' ),
-			'cyan-bluish-gray'      => __( 'Cyan bluish gray', 'gutenberg' ),
-			'white'                 => __( 'White', 'gutenberg' ),
-			'pale-pink'             => __( 'Pale pink', 'gutenberg' ),
-			'vivid-red'             => __( 'Vivid red', 'gutenberg' ),
-			'luminous-vivid-orange' => __( 'Luminous vivid orange', 'gutenberg' ),
-			'luminous-vivid-amber'  => __( 'Luminous vivid amber', 'gutenberg' ),
-			'light-green-cyan'      => __( 'Light green cyan', 'gutenberg' ),
-			'vivid-green-cyan'      => __( 'Vivid green cyan', 'gutenberg' ),
-			'pale-cyan-blue'        => __( 'Pale cyan blue', 'gutenberg' ),
-			'vivid-cyan-blue'       => __( 'Vivid cyan blue', 'gutenberg' ),
-			'vivid-purple'          => __( 'Vivid purple', 'gutenberg' ),
-		);
-		if ( ! empty( $config['settings'][ $all_blocks ]['color']['palette'] ) ) {
-			foreach ( $config['settings'][ $all_blocks ]['color']['palette'] as $color_key => $color ) {
-				$config['settings'][ $all_blocks ]['color']['palette'][ $color_key ]['name'] = $default_colors_i18n[ $color['slug'] ];
-			}
-		}
-
-		$default_gradients_i18n = array(
-			'vivid-cyan-blue-to-vivid-purple'      => __( 'Vivid cyan blue to vivid purple', 'gutenberg' ),
-			'light-green-cyan-to-vivid-green-cyan' => __( 'Light green cyan to vivid green cyan', 'gutenberg' ),
-			'luminous-vivid-amber-to-luminous-vivid-orange' => __( 'Luminous vivid amber to luminous vivid orange', 'gutenberg' ),
-			'luminous-vivid-orange-to-vivid-red'   => __( 'Luminous vivid orange to vivid red', 'gutenberg' ),
-			'very-light-gray-to-cyan-bluish-gray'  => __( 'Very light gray to cyan bluish gray', 'gutenberg' ),
-			'cool-to-warm-spectrum'                => __( 'Cool to warm spectrum', 'gutenberg' ),
-			'blush-light-purple'                   => __( 'Blush light purple', 'gutenberg' ),
-			'blush-bordeaux'                       => __( 'Blush bordeaux', 'gutenberg' ),
-			'luminous-dusk'                        => __( 'Luminous dusk', 'gutenberg' ),
-			'pale-ocean'                           => __( 'Pale ocean', 'gutenberg' ),
-			'electric-grass'                       => __( 'Electric grass', 'gutenberg' ),
-			'midnight'                             => __( 'Midnight', 'gutenberg' ),
-		);
-		if ( ! empty( $config['settings'][ $all_blocks ]['color']['gradients'] ) ) {
-			foreach ( $config['settings'][ $all_blocks ]['color']['gradients'] as $gradient_key => $gradient ) {
-				$config['settings'][ $all_blocks ]['color']['gradients'][ $gradient_key ]['name'] = $default_gradients_i18n[ $gradient['slug'] ];
-			}
-		}
-
-		$default_font_sizes_i18n = array(
-			'small'  => __( 'Small', 'gutenberg' ),
-			'normal' => __( 'Normal', 'gutenberg' ),
-			'medium' => __( 'Medium', 'gutenberg' ),
-			'large'  => __( 'Large', 'gutenberg' ),
-			'huge'   => __( 'Huge', 'gutenberg' ),
-		);
-		if ( ! empty( $config['settings'][ $all_blocks ]['typography']['fontSizes'] ) ) {
-			foreach ( $config['settings'][ $all_blocks ]['typography']['fontSizes'] as $font_size_key => $font_size ) {
-				$config['settings'][ $all_blocks ]['typography']['fontSizes'][ $font_size_key ]['name'] = $default_font_sizes_i18n[ $font_size['slug'] ];
-			}
-		}
-		// End i18n logic to remove when JSON i18 strings are extracted.
-
 		self::$core = new WP_Theme_JSON( $config );
 
 		return self::$core;
