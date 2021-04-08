@@ -104,14 +104,17 @@ function FlatTermSelectorMostUsed( { onSelect, taxonomy } ) {
 	const _terms = unescapeTerms( terms );
 
 	return (
-		<div className="flat-term-selector-most-used-container">
+		<div className="editor-post-taxonomies__flat-term-most-used">
 			{ hasTerms && (
 				/*
 				 * Disable reason: The `list` ARIA role is redundant but
 				 * Safari+VoiceOver won't announce the list otherwise.
 				 */
 				/* eslint-disable jsx-a11y/no-redundant-roles */
-				<ul role="list" className="flat-term-selector-most-used">
+				<ul
+					role="list"
+					className="editor-post-taxonomies__flat-term-most-used-list"
+				>
 					{ _terms.map( ( term ) => (
 						<li key={ term.id }>
 							<Button isLink onClick={ () => onSelect( term ) }>

@@ -36,3 +36,14 @@
 	margin-bottom: 8px;
 	width: 100%;
 }
+
+.editor-post-taxonomies__flat-term-most-used-list {
+	li {
+		display: inline;
+		padding-right: 6px;
+	}
+
+	.components-button {
+		font-size: 12px;
+	}
+}
