@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   `wp-env destroy` will now work in environments which don't include the `grep` or `awk` commands, such as Windows PowerShell.
+
 ## 4.0.0 (2021-03-17)
 
 ### Breaking Change
