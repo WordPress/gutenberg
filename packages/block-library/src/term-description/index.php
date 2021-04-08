@@ -10,12 +10,16 @@
  *
  * @param array $attributes Block attributes.
  *
- * @return string Returns the filtered post content of the current post.
+ * @return string Returns the description of the current taxonomy term, if available
  */
 function render_block_core_term_description( $attributes ) {
-	$term_description = term_description();
+	$term_description = '';
 
-	if ( ! is_category() && ! is_tag() && ! is_tax() || empty( $term_description ) ) {
+	if ( is_category() || is_tag() || is_tax() ) {
+		$term_description = term_description();
+	}
+
+	if ( empty( $term_description ) ) {
 		return '';
 	}
 
