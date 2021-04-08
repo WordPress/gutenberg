@@ -101,6 +101,7 @@ function PostTemplate() {
 						setIsModalOpen( false );
 						setTitle( '' );
 					} }
+					overlayClassName="edit-post-post-template__modal"
 				>
 					<form
 						onSubmit={ ( event ) => {
