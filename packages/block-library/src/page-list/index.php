@@ -149,7 +149,17 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 	static $block_id = 0;
 	$block_id++;
 
-	$all_pages = get_pages( array( 'sort_column' => 'menu_order' ) );
+	// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby values is resolved,
+	// update 'sort_column' to 'menu_order, post_title'. Sorting by both menu_order and post_title ensures a stable sort.
+	// Otherwise with pages that have the same menu_order value, we can see different ordering depending on how DB
+	// queries are constructed internally. For example we might see a different order when a limit is set to <499
+	// versus >= 500.
+	$all_pages = get_pages(
+		array(
+			'sort_column' => 'menu_order',
+			'order'       => 'asc',
+		)
+	);
 
 	$top_level_pages = array();
 
