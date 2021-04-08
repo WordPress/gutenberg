@@ -14,6 +14,7 @@ export default function AllInputControl( {
 	onHoverOn = noop,
 	onHoverOff = noop,
 	values,
+	sides,
 	...props
 } ) {
 	const allValue = getAllValue( values );
@@ -26,13 +27,15 @@ export default function AllInputControl( {
 		onFocus( event, { side: 'all' } );
 	};
 
+	const isSideDisabled = ( side ) => sides && sides[ side ] === false;
+
 	const handleOnChange = ( next ) => {
 		const nextValues = { ...values };
 
-		nextValues.top = next;
-		nextValues.bottom = next;
-		nextValues.left = next;
-		nextValues.right = next;
+		nextValues.top = isSideDisabled( 'top' ) ? values.top : next;
+		nextValues.right = isSideDisabled( 'right' ) ? values.right : next;
+		nextValues.bottom = isSideDisabled( 'bottom' ) ? values.bottom : next;
+		nextValues.left = isSideDisabled( 'left' ) ? values.left : next;
 
 		onChange( nextValues );
 	};
