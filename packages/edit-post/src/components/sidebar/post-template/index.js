@@ -108,6 +108,9 @@ function PostTemplate() {
 							event.preventDefault();
 							const defaultTitle = __( 'Custom Template' );
 							const templateContent = [
+								createBlock( 'core/site-title' ),
+								createBlock( 'core/site-tagline' ),
+								createBlock( 'core/separator' ),
 								createBlock( 'core/post-title' ),
 								createBlock( 'core/post-content' ),
 							];
