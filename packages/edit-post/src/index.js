@@ -9,7 +9,6 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render, unmountComponentAtNode } from '@wordpress/element';
-import { select, subscribe, dispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
