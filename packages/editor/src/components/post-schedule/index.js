@@ -53,7 +53,7 @@ export default function PostSchedule() {
 		() =>
 			( eventsByPostType || [] ).map(
 				( { title, type, date: eventDate } ) => ( {
-					title: title?.raw,
+					title: title?.rendered,
 					type,
 					date: new Date( eventDate ),
 				} )
