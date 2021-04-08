@@ -127,7 +127,7 @@ function PullQuoteEdit( {
 						aria-label={ __( 'Pullquote text' ) }
 						placeholder={
 							// translators: placeholder text used for the quote
-							__( 'Write quote…' )
+							__( 'Add quote' )
 						}
 						textAlign="center"
 					/>
@@ -138,7 +138,7 @@ function PullQuoteEdit( {
 							aria-label={ __( 'Pullquote citation text' ) }
 							placeholder={
 								// translators: placeholder text used for the citation
-								__( 'Write citation…' )
+								__( 'Add citation' )
 							}
 							onChange={ ( nextCitation ) =>
 								setAttributes( {

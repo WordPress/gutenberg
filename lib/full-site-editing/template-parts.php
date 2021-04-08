@@ -9,7 +9,7 @@
  * Registers block editor 'wp_template_part' post type.
  */
 function gutenberg_register_template_part_post_type() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return;
 	}
 
@@ -64,7 +64,7 @@ add_action( 'init', 'gutenberg_register_template_part_post_type' );
  * Registers the 'wp_template_part_area' taxonomy.
  */
 function gutenberg_register_wp_template_part_area_taxonomy() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return;
 	}
 
@@ -107,7 +107,7 @@ if ( ! defined( 'WP_TEMPLATE_PART_AREA_UNCATEGORIZED' ) ) {
  * Fixes the label of the 'wp_template_part' admin menu entry.
  */
 function gutenberg_fix_template_part_admin_menu_entry() {
-	if ( ! gutenberg_is_fse_theme() ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return;
 	}
 
@@ -200,4 +200,37 @@ function gutenberg_filter_template_part_area( $type ) {
 	$warning_message = sprintf( __( '"%1$s" is not a supported wp_template_part area value and has been added as "%2$s".', 'gutenberg' ), $type, WP_TEMPLATE_PART_AREA_UNCATEGORIZED );
 	trigger_error( $warning_message, E_USER_NOTICE );
 	return WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
+}
+
+/**
+ * Print a template-part.
+ *
+ * @param string $part The template-part to print. Use "header" or "footer".
+ *
+ * @return void
+ */
+function gutenberg_block_template_part( $part ) {
+	$template_part = gutenberg_get_block_template( get_stylesheet() . '//' . $part, 'wp_template_part' );
+	if ( ! $template_part || empty( $template_part->content ) ) {
+		return;
+	}
+	echo do_blocks( $template_part->content );
+}
+
+/**
+ * Print the header template-part.
+ *
+ * @return void
+ */
+function gutenberg_block_header_area() {
+	gutenberg_block_template_part( 'header' );
+}
+
+/**
+ * Print the footer template-part.
+ *
+ * @return void
+ */
+function gutenberg_block_footer_area() {
+	gutenberg_block_template_part( 'footer' );
 }

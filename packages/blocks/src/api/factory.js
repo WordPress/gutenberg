@@ -229,6 +229,14 @@ const isPossibleTransformForSource = ( transform, direction, blocks ) => {
 		}
 	}
 
+	if (
+		transform.usingMobileTransformations &&
+		isWildcardBlockTransform( transform ) &&
+		! isContainerGroupBlock( sourceBlock.name )
+	) {
+		return false;
+	}
+
 	return true;
 };
 
@@ -252,7 +260,6 @@ const getBlockTypesForPossibleFromTransforms = ( blocks ) => {
 		allBlockTypes,
 		( blockType ) => {
 			const fromTransforms = getBlockTransforms( 'from', blockType.name );
-
 			return !! findTransform( fromTransforms, ( transform ) => {
 				return isPossibleTransformForSource(
 					transform,
@@ -412,10 +419,32 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 		return [];
 	}
 
+	const usingMobileTransformations =
+		transforms.supportedMobileTransforms &&
+		Array.isArray( transforms.supportedMobileTransforms );
+	const filteredTransforms = usingMobileTransformations
+		? filter( transforms[ direction ], ( t ) => {
+				if ( ! t.blocks || ! t.blocks.length ) {
+					return false;
+				}
+
+				if ( isWildcardBlockTransform( t ) ) {
+					return true;
+				}
+
+				return every( t.blocks, ( transformBlockName ) =>
+					transforms.supportedMobileTransforms.includes(
+						transformBlockName
+					)
+				);
+		  } )
+		: transforms[ direction ];
+
 	// Map transforms to normal form.
-	return transforms[ direction ].map( ( transform ) => ( {
+	return filteredTransforms.map( ( transform ) => ( {
 		...transform,
 		blockName,
+		usingMobileTransformations,
 	} ) );
 }
 

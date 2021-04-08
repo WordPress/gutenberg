@@ -22,13 +22,14 @@ import {
 	CycleSelectControl,
 	Icon,
 	PanelBody,
-	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Image,
 	WIDE_ALIGNMENTS,
 	LinkSettingsNavigation,
 	BottomSheet,
+	BottomSheetTextControl,
+	FooterMessageLink,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -49,9 +50,9 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	image as placeholderIcon,
-	textColor,
 	replace,
 	expand,
+	textColor,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -88,7 +89,6 @@ export class ImageEdit extends Component {
 		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.featuredImageIdCurrent = this.featuredImageIdCurrent.bind( this );
-		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
@@ -268,10 +268,6 @@ export class ImageEdit extends Component {
 
 		setAttributes( { id: null, url: null } );
 		this.setState( { isUploadInProgress: false } );
-	}
-
-	updateAlt( newAlt ) {
-		this.props.setAttributes( { alt: newAlt } );
 	}
 
 	updateImageURL( url ) {
@@ -469,6 +465,39 @@ export class ImageEdit extends Component {
 		);
 	}
 
+	getAltTextSettings() {
+		const {
+			attributes: { alt },
+		} = this.props;
+
+		const updateAlt = ( newAlt ) => {
+			this.props.setAttributes( { alt: newAlt } );
+		};
+
+		return (
+			<BottomSheetTextControl
+				initialValue={ alt }
+				onChange={ updateAlt }
+				placeholder={ __( 'Add alt text' ) }
+				label={ __( 'Alt Text' ) }
+				icon={ textColor }
+				footerNote={
+					<>
+						{ __(
+							'Describe the purpose of the image. Leave empty if the image is purely decorative. '
+						) }
+						<FooterMessageLink
+							href={
+								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+							}
+							value={ __( 'What is alt text?' ) }
+						/>
+					</>
+				}
+			/>
+		);
+	}
+
 	onSizeChangeValue( newValue ) {
 		this.onSetSizeSlug( newValue );
 	}
@@ -532,13 +561,7 @@ export class ImageEdit extends Component {
 							options={ this.sizeOptions }
 						/>
 					) }
-					<TextControl
-						icon={ textColor }
-						label={ __( 'Alt Text' ) }
-						value={ alt || '' }
-						valuePlaceholder={ __( 'None' ) }
-						onChangeValue={ this.updateAlt }
-					/>
+					{ this.getAltTextSettings() }
 				</PanelBody>
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
