@@ -63,7 +63,7 @@ function Editor( {
 		const { getEntityRecord, getPostType, getEntityRecords } = select(
 			'core'
 		);
-		const { getEditorSettings, __unsableIsEditorReady } = select(
+		const { getEditorSettings, __unstableIsEditorReady } = select(
 			'core/editor'
 		);
 		const { getBlockTypes } = select( blocksStore );
