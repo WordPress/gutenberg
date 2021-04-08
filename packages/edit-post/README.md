@@ -42,6 +42,10 @@ _Parameters_
 -   _settings_ `?Object`: Editor settings object.
 -   _initialEdits_ `Object`: Programmatic edits to apply initially, to be considered as non-user-initiated (bypass for unsaved changes prompt).
 
+_Returns_
+
+-   `Promise`: Promise that resolves when editor is initialized.
+
 <a name="PluginBlockSettingsMenuItem" href="#PluginBlockSettingsMenuItem">#</a> **PluginBlockSettingsMenuItem**
 
 Renders a new item in the block settings menu.
