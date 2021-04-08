@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   `build` and `start` command now bundle files ending with `.module.css` as CSS modules and extracts `style.module.css` ([#29182](https://github.com/WordPress/gutenberg/pull/29182)).
+
 ## 14.1.0 (2021-04-06)
 
 ### Enhancements

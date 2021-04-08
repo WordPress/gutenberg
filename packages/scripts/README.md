@@ -540,6 +540,8 @@ If you do so, then CSS files generated will follow the names of the entry points
 
 Avoid using `style` keyword in an entry point name, this might break your build process.
 
+You can also bundle CSS modules by prefixing `.module` to the extension, e.g. `style.module.scss`. Otherwise, these files are handled like all other `style.scss`. They will also be extracted into `style-index.css`.
+
 #### Using fonts and images
 
 It is possible to reference font (`woff`, `woff2`, `eot`, `ttf` and `otf`) and image (`bmp`, `png`, `jpg`, `jpeg` and `gif`) files from CSS that is controlled by webpack as explained in the previous section.
