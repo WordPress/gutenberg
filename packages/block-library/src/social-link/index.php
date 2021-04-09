@@ -10,7 +10,7 @@
  *
  * @param Array  $attributes The block attributes.
  * @param String $content InnerBlocks content of the Block.
- * @param Object $block Block object.
+ * @param WP_Block $block Block object.
  *
  * @return string Rendered HTML of the referenced block.
  */
