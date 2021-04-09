@@ -35,19 +35,19 @@ function BlockHTML( { clientId } ) {
 	);
 	const { updateBlock } = useDispatch( blockEditorStore );
 	const onChange = () => {
-		const sanitizedHtml = sanitizeHTML( html );
+		const maybeSanitizedHtml = sanitizeHTML( html );
 		const blockType = getBlockType( block.name );
 		const attributes = getBlockAttributes(
 			blockType,
-			sanitizedHtml,
+			maybeSanitizedHtml,
 			block.attributes
 		);
 
 		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
-		const content = sanitizedHtml
-			? sanitizedHtml
+		const content = maybeSanitizedHtml
+			? maybeSanitizedHtml
 			: getSaveContent( blockType, attributes );
-		const isValid = sanitizedHtml
+		const isValid = maybeSanitizedHtml
 			? isValidBlockContent( blockType, attributes, content )
 			: true;
 		updateBlock( clientId, {
