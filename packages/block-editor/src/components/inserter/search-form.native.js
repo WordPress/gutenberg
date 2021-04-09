@@ -15,14 +15,14 @@ import {
 import { useState, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { ToolbarButton } from '@wordpress/components';
+import { ToolbarButton, Gridicons } from '@wordpress/components';
 import {
 	Icon,
 	cancelCircleFilled,
 	arrowLeft,
-	search as searchIcon,
 	close,
 } from '@wordpress/icons';
+
 
 /**
  * Internal dependencies
@@ -31,6 +31,7 @@ import styles from './style.scss';
 import platformStyles from './searchFormStyles.scss';
 
 function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
+
 	const [ isActive, setIsActive ] = useState( false );
 
 	const isIOS = Platform.OS === 'ios';
@@ -52,9 +53,6 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 			platformStyles[ 'inserter-search-form__container--active' ],
 			platformStyles[ 'inserter-search-form__container--active-dark' ]
 		),
-		...{
-			border: '1px blue',
-		},
 	};
 
 	const formStyle = {
@@ -132,7 +130,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 		return (
 			<ToolbarButton
 				title={ __( 'Search Blocks' ) }
-				icon={ searchIcon }
+				icon={ Gridicons.search }
 				onClick={ onActivate }
 			/>
 		);
