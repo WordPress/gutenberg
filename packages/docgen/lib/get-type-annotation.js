@@ -456,13 +456,9 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 			return `( ${ getTypeAnnotation( paramType ) } )[ ${ position } ]`;
 		} else if ( babelTypes.isObjectPattern( paramToken ) ) {
 			const memberName = tag.name.split( '.' ).slice( -1 )[ 0 ];
-			if (
-				babelTypes.isTSTypeLiteral(
-					paramToken.typeAnnotation.typeAnnotation
-				)
-			) {
+			if ( babelTypes.isTSTypeLiteral( paramType ) ) {
 				// if it's a type literal we can try to find the member on the type
-				const member = paramToken.typeAnnotation.typeAnnotation.members.find(
+				const member = paramType.members.find(
 					( m ) => m.key.name === memberName
 				);
 				if ( member !== undefined ) {
@@ -472,9 +468,7 @@ function getParamTypeAnnotation( tag, declarationToken, paramIndex ) {
 				}
 			}
 			// If we couldn't find a specific member for the type then we'll just return something like `Type[ memberName ]` to indicate the parameter is a member of that type
-			const typeAnnotation = getTypeAnnotation(
-				paramToken.typeAnnotation.typeAnnotation
-			);
+			const typeAnnotation = getTypeAnnotation( paramType );
 			return `${ typeAnnotation }[ '${ memberName }' ]`;
 		}
 	} catch ( e ) {
