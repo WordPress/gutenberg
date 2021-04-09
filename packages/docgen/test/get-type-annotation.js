@@ -16,6 +16,7 @@ const getArrayDestructuringArrayTypeNode = require( './fixtures/type-annotations
 const getArrayDestructuringTupleTypeNode = require( './fixtures/type-annotations/array-destructuring-tuple-type/get-node' );
 const getArrayDestructuringAnyOtherTypeNode = require( './fixtures/type-annotations/array-destructuring-any-other-type/get-node' );
 const getObjectDestructuringTypeLiteralNode = require( './fixtures/type-annotations/object-destructuring-object-literal-type/get-node' );
+const getAssignmentPatternNode = require( './fixtures/type-annotations/assignment-pattern/get-node' );
 
 describe( 'Type annotations', () => {
 	it( 'are taken from JSDoc if any', () => {
@@ -294,6 +295,20 @@ describe( 'Type annotations', () => {
 					)
 				).toBe( "{ foo: string; }[ 'notFoo' ]" );
 			} );
+		} );
+	} );
+
+	describe( 'assignment pattern', () => {
+		const node = getAssignmentPatternNode();
+
+		it( 'should get the type of the assignment pattern', () => {
+			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe( 'string' );
+		} );
+
+		it( 'should get the type of the assignment pattern for array destructuring', () => {
+			expect(
+				getTypeAnnotation( { ...paramTag, name: 'props.0' }, node, 0 )
+			).toBe( '( string )[ 0 ]' );
 		} );
 	} );
 } );
