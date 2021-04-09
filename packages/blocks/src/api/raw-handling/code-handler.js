@@ -9,17 +9,22 @@ import { mapValues } from 'lodash';
 import onFilter from './on-filter';
 import scriptRemover from './script-remover';
 import { deepFilterHTML } from './utils';
-import { getBlockType, getFreeformContentHandlerName } from '../registration';
+import {
+	getBlockType,
+	getFreeformContentHandlerName,
+	getUnregisteredTypeHandlerName,
+} from '../registration';
 import { parseWithGrammar } from '../parser';
 
 export function codeHandler( { HTML = '' } ) {
-	const freeform = getFreeformContentHandlerName();
+	const freeformName = getFreeformContentHandlerName();
+	const unregisteredName = getUnregisteredTypeHandlerName();
 
 	return parseWithGrammar( HTML ).map( ( block ) => {
 		const { name } = block;
 
 		// Let TinyMCE handle it
-		if ( name === freeform ) {
+		if ( name === freeformName ) {
 			return block;
 		}
 
@@ -29,7 +34,10 @@ export function codeHandler( { HTML = '' } ) {
 			attributes: mapValues( block.attributes, ( value, key ) => {
 				const attributeType = blockType.attributes[ key ];
 
-				if ( attributeType.source === 'html' ) {
+				if (
+					attributeType.source === 'html' ||
+					name === unregisteredName
+				) {
 					return deepFilterHTML( value, [ scriptRemover, onFilter ] );
 				}
 
