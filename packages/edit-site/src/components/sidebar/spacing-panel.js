@@ -98,21 +98,24 @@ function filterValuesBySides( values, sides ) {
 	return filteredValues;
 }
 
+function useThemeValues( name, feature ) {
+	return useSelect(
+		( select ) => {
+			const baseStyles = select( editSiteStore ).getSettings()
+				.__experimentalGlobalStylesBaseStyles;
+			return baseStyles?.styles?.[ name ]?.spacing?.[ feature ];
+		},
+		[ name, feature ]
+	);
+}
+
 export default function SpacingPanel( { context, getStyle, setStyle } ) {
 	const { name } = context;
 	const showPaddingControl = useHasPadding( context );
 	const units = useCustomUnits( { contextName: name, units: CSS_UNITS } );
 
 	const paddingValues = getStyle( name, 'padding' );
-	const themePaddingValues = useSelect(
-		( select ) => {
-			const baseStyles = select( editSiteStore ).getSettings()
-				.__experimentalGlobalStylesBaseStyles;
-			return baseStyles?.styles?.[ name ]?.spacing?.padding;
-		},
-		[ name ]
-	);
-
+	const themePaddingValues = useThemeValues( name, 'padding' );
 	const paddingSides = useCustomSides( name, 'padding' );
 
 	const setPaddingValues = ( newPaddingValues ) => {
