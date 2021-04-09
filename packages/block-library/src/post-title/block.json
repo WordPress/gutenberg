@@ -82,5 +82,6 @@
 				}
 			}
 		}
-	}
+	},
+	"style": "wp-block-post-title"
 }
