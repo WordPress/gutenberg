@@ -28,6 +28,7 @@ import useBlockNavigator from './use-block-navigator';
 
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
+import ResponsiveWrapper from './responsive-wrapper';
 
 const ALLOWED_BLOCKS = [
 	'core/navigation-link',
@@ -58,6 +59,9 @@ function Navigation( {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
 	);
+	const [ isResponsiveMenuOpen, setResponsiveMenuVisibility ] = useState(
+		false
+	);
 
 	const { selectBlock } = useDispatch( blockEditorStore );
 
@@ -65,6 +69,7 @@ function Navigation( {
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
+			'is-responsive': attributes.responsiveNavigation,
 		} ),
 	} );
 
@@ -148,11 +153,29 @@ function Navigation( {
 							} }
 							label={ __( 'Show submenu indicator icons' ) }
 						/>
+						<ToggleControl
+							checked={ attributes.responsiveNavigation }
+							onChange={ ( value ) => {
+								setAttributes( {
+									responsiveNavigation: value,
+								} );
+							} }
+							label={ __( 'Enable responsive menu' ) }
+						/>
 					</PanelBody>
 				) }
 			</InspectorControls>
 			<nav { ...blockProps }>
-				<ul { ...innerBlocksProps } />
+				<ResponsiveWrapper
+					id={ attributes.clientId }
+					onToggle={ ( value ) =>
+						setResponsiveMenuVisibility( value )
+					}
+					isOpen={ isResponsiveMenuOpen }
+					isResponsive={ attributes.responsiveNavigation }
+				>
+					<ul { ...innerBlocksProps }></ul>
+				</ResponsiveWrapper>
 			</nav>
 		</>
 	);
