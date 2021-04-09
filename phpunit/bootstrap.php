@@ -75,6 +75,8 @@ $GLOBALS['wp_tests_options'] = array(
 		'gutenberg-widget-experiments' => '1',
 		'gutenberg-full-site-editing'  => 1,
 	),
+	'stylesheet' => 'tt1-blocks',
+	'template'   => 'tt1-blocks'
 );
 
 // Enable the widget block editor.
