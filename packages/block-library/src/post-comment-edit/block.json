@@ -1,0 +1,24 @@
+{
+	"apiVersion": 2,
+	"name": "core/post-comment-edit",
+	"category": "design",
+	"usesContext": [ "commentId" ],
+	"parent": [
+		"core/post-comment"
+	],
+	"attributes": {
+		"openInNewTab": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"html": false,
+		"color": {
+			"link": true,
+			"text": false
+        },
+		"fontSize": true,
+		"lineHeight": true
+	}
+}
