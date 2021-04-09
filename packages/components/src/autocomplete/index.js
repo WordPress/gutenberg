@@ -301,6 +301,7 @@ function Autocomplete( {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
+	const [ backspacing, setBackspacing ] = useState( false );
 
 	let textContent, text;
 	if ( isCollapsed( record ) ) {
@@ -330,16 +331,33 @@ function Autocomplete( {
 				return false;
 			}
 
+			const textWithoutTrigger = text.slice(
+				index + triggerPrefix.length
+			);
+
+			console.log( 'filteredOptions: ', filteredOptions );
+			// If we don't have any matching filteredOptions
+			// we didn't have a new trigger typed, then we should not continue with this effect.
+			const mismatch = filteredOptions.length === 0;
+			const atTrigger = text.slice( -1 ) === triggerPrefix;
+			const tooDistantFromTrigger = textWithoutTrigger.length > 60; // 60 chars seem to be a good limit
+
+			console.log( `atTrigger: `, atTrigger );
+			console.log( 'mismatch: ', mismatch );
+			console.log( 'tooDistant: ', tooDistantFromTrigger );
+
+			if ( tooDistantFromTrigger ) return false;
+			if ( mismatch && ! atTrigger && ! backspacing ) {
+				console.log( 'here lies a mismatch!' );
+				return false;
+			}
+
 			if (
 				allowContext &&
 				! allowContext( text.slice( 0, index ), textAfterSelection )
 			) {
 				return false;
 			}
-
-			const textWithoutTrigger = text.slice(
-				index + triggerPrefix.length
-			);
 
 			if (
 				/^\s/.test( textWithoutTrigger ) ||
@@ -360,6 +378,7 @@ function Autocomplete( {
 				? getAutoCompleterUI( completer )
 				: AutocompleterUI
 		);
+		setBackspacing( false );
 	}
 
 	function insertCompletion( replacement ) {
@@ -443,14 +462,8 @@ function Autocomplete( {
 	}
 
 	function handleKeyDown( event ) {
-		console.log( 'keypress!!' );
 		if ( event.keyCode === BACKSPACE ) {
-			const completer = getCompleterFromTextContext();
-			console.log( 'completer: ', completer );
-			if ( completer ) {
-				setupAutocompleter( completer );
-			}
-			console.log( 'backspacze!' );
+			setBackspacing( true );
 		}
 		if ( ! autocompleter ) {
 			return;
@@ -504,15 +517,6 @@ function Autocomplete( {
 		const completer = getCompleterFromTextContext();
 		if ( ! completer ) {
 			reset();
-			return;
-		}
-
-		console.log( 'filteredOptions: ', filteredOptions );
-		// If we don't have any matching filteredOptions
-		// we didn't have a new trigger typed, then we should not continue with this effect.
-		const mismatch = filteredOptions.length === 0;
-		if ( mismatch && text.slice( -1 ) !== completer.triggerPrefix ) {
-			console.log( 'mismatch' );
 			return;
 		}
 
