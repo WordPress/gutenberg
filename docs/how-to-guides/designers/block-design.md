@@ -15,6 +15,12 @@ Since the block itself represents what will actually appear on the site, interac
 
 Basic block settings won’t always make sense in the context of the placeholder/content UI. As a secondary option, options that are critical to the functionality of a block can live in the block toolbar. The Block Toolbar is still highly contextual and visible on all screen sizes. One notable constraint with the Block Toolbar is that it is icon-based UI, so any controls that live in the Block Toolbar need to be ones that can effectively be communicated via an icon or icon group.
 
+### Group Block Toolbar controls with related items
+
+The Block Toolbar groups controls in segments, hierarchically. The first segment contains block type controls, such as the block switcher, the drag handle, and the mover control. The second group contains common and specific block tools that affect the entire block, followed by inline formatting, and the "More" menu. Optionally "Meta" or "Other" groups can separate some tools in their own segment.
+
+![A screenshot showing examples of block toolbar segment groupings.](https://make.wordpress.org/design/files/2021/03/docs_block-toolbar-structure.png)
+
 ### The Settings Sidebar should only be used for advanced, tertiary controls
 
 The Settings Sidebar is not visible by default on a small / mobile screen, and may also be collapsed in a desktop view. Therefore, it should not be relied on for anything that is necessary for the basic operation of the block. Pick good defaults, make important actions available in the block toolbar, and think of the Settings Sidebar as something that most users should not need to open.
@@ -27,7 +33,7 @@ Each Settings Sidebar comes with an "Advanced" section by default. This area hou
 
 Setup states, sometimes referred to as "placeholders", can be used to walk users through an initial process before showing the live preview state of the block. The setup process gathers information from the user that is needed to render the block. A block’s setup state is indicated with a grey background to provide clear differentiation for the user. Not all blocks have setup states — for example, the Paragraph block.
 
-![An example of a gallery block’s setup state on a grey background](https://make.wordpress.org/design/files/2018/12/gallery-setup.png)
+![An example of an image block’s setup state on a grey background](https://make.wordpress.org/design/files/2021/03/docs__gallery-setup-state.png)
 
 A setup state is **not** necessary if:
 
@@ -51,6 +57,12 @@ When the block is selected, additional controls may be revealed to customize the
 In most cases, a block’s setup state is only shown once and then further customization is done via the live preview state. However, in some cases it might be desirable to allow the user to return to the setup state — for example, if all the block content has been deleted or via a link from the block’s toolbar or sidebar.
 
 ## Do's and Don'ts
+
+### Block Toolbar
+
+Group toolbar controls in logical segments. Don't add a segment for each.
+
+![A screenshot comparing a block toolbar with good vs. bad toolbar segment groupings.](https://make.wordpress.org/design/files/2021/03/docs__block-toolbar-do-dont.png)
 
 ### Block Identification
 
@@ -146,7 +158,7 @@ The most basic unit of the editor. The Paragraph block is a simple input field.
 
 ### Placeholder:
 
-- Simple placeholder text that reads “Start writing or type / to choose a block”. The placeholder disappears when the block is selected.
+- Simple placeholder text that reads “Type / to choose a block”. The placeholder disappears when the block is selected.
 
 ### Selected state:
 

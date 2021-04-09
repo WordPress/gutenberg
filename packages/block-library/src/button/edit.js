@@ -15,14 +15,13 @@ import {
 	PanelBody,
 	RangeControl,
 	TextControl,
-	ToggleControl,
 	ToolbarButton,
-	ToolbarGroup,
 	Popover,
 } from '@wordpress/components';
 import {
 	BlockControls,
 	InspectorControls,
+	InspectorAdvancedControls,
 	RichText,
 	useBlockProps,
 	__experimentalLinkControl as LinkControl,
@@ -147,28 +146,26 @@ function URLPicker( {
 	);
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					{ ! urlIsSet && (
-						<ToolbarButton
-							name="link"
-							icon={ link }
-							title={ __( 'Link' ) }
-							shortcut={ displayShortcut.primary( 'k' ) }
-							onClick={ openLinkControl }
-						/>
-					) }
-					{ urlIsSetandSelected && (
-						<ToolbarButton
-							name="link"
-							icon={ linkOff }
-							title={ __( 'Unlink' ) }
-							shortcut={ displayShortcut.primaryShift( 'k' ) }
-							onClick={ unlinkButton }
-							isActive={ true }
-						/>
-					) }
-				</ToolbarGroup>
+			<BlockControls group="block">
+				{ ! urlIsSet && (
+					<ToolbarButton
+						name="link"
+						icon={ link }
+						title={ __( 'Link' ) }
+						shortcut={ displayShortcut.primary( 'k' ) }
+						onClick={ openLinkControl }
+					/>
+				) }
+				{ urlIsSetandSelected && (
+					<ToolbarButton
+						name="link"
+						icon={ linkOff }
+						title={ __( 'Unlink' ) }
+						shortcut={ displayShortcut.primaryShift( 'k' ) }
+						onClick={ unlinkButton }
+						isActive={ true }
+					/>
+				) }
 			</BlockControls>
 			{ isSelected && (
 				<KeyboardShortcuts
@@ -244,6 +241,7 @@ function ButtonEdit( props ) {
 				{ ...blockProps }
 				className={ classnames( blockProps.className, {
 					[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+					[ `has-custom-font-size` ]: blockProps.style.fontSize,
 				} ) }
 			>
 				<RichText
@@ -294,19 +292,14 @@ function ButtonEdit( props ) {
 					selectedWidth={ width }
 					setAttributes={ setAttributes }
 				/>
-				<PanelBody title={ __( 'Link settings' ) }>
-					<ToggleControl
-						label={ __( 'Open in new tab' ) }
-						onChange={ onToggleOpenInNewTab }
-						checked={ linkTarget === '_blank' }
-					/>
-					<TextControl
-						label={ __( 'Link rel' ) }
-						value={ rel || '' }
-						onChange={ onSetLinkRel }
-					/>
-				</PanelBody>
 			</InspectorControls>
+			<InspectorAdvancedControls>
+				<TextControl
+					label={ __( 'Link rel' ) }
+					value={ rel || '' }
+					onChange={ onSetLinkRel }
+				/>
+			</InspectorAdvancedControls>
 		</>
 	);
 }

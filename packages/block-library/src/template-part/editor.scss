@@ -64,15 +64,16 @@
 
 // Ensures a border is present when a child block is selected.
 .block-editor-block-list__block[data-type="core/template-part"] {
-	&.is-selected,
 	&.has-child-selected {
 		&::after {
-			top: $border-width;
-			bottom: $border-width;
-			left: $border-width;
-			right: $border-width;
-			border-radius: $radius-block-ui - $border-width; // Border is outset, so so subtract the width to achieve correct radius.
-			box-shadow: 0 0 0 $border-width $gray-900;
+			border: $border-width dotted $gray-900;
+		}
+
+		&.is-hovered,
+		&.is-highlighted {
+			&::after {
+				border: none;
+			}
 		}
 	}
 }

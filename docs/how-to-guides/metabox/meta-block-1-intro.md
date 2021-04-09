@@ -4,9 +4,9 @@ Typically, blocks store their attribute values in the serialised block HTML. How
 
 In this short tutorial you will create one of these blocks, which will prompt a user for a single value, and save it as post meta.
 
-For background around the thinking of blocks as the interface, please see the [key concepts section](/docs/architecture/key-concepts.md) of the handbook.
+For background around the thinking of blocks as the interface, please see the [key concepts section](/docs/explanations/architecture/key-concepts.md) of the handbook.
 
-Before starting this tutorial, you will need a plugin to hold your code. Please take a look at the first two steps of [the JavaScript tutorial](/docs/how-to-guides/javascript/readme.md) for information setting up a plugin.
+Before starting this tutorial, you will need a plugin to hold your code. Please take a look at the first two steps of [the JavaScript tutorial](/docs/how-to-guides/javascript/README.md) for information setting up a plugin.
 
 ## Table of Contents
 

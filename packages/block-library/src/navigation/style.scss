@@ -1,12 +1,17 @@
-.wp-block-navigation .wp-block-navigation__container {
-	.wp-block-navigation__container {
-		align-items: normal;
-		min-width: 200px;
+.wp-block-navigation {
+	// Normalize list styles.
+	ul,
+	ul li {
+		list-style: none;
+
+		// Overrides generic ".entry-content li" styles on the front end.
+		padding: 0;
 	}
 }
 
+// Navigation block inner container.
 .wp-block-navigation__container {
-	// Vertically align child blocks, like Social Links or Search.
+	// Vertically center child blocks, like Social Links or Search.
 	align-items: center;
 
 	// Reset the default list styles
@@ -19,13 +24,12 @@
 	flex-wrap: wrap;
 
 	// Vertical layout
-
 	.is-vertical & {
 		display: block;
 	}
-
 }
 
+// Justification.
 .items-justified-center > ul {
 	justify-content: center;
 }

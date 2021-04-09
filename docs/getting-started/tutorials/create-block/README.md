@@ -6,7 +6,7 @@ The tutorial includes setting up your development environment, tools, and gettin
 
 ## Prerequisites
 
-The first thing you need is a development environment and tools. This includes setting up your WordPress environment, Node, NPM, and your code editor. If you need help, see the [setting up your development environment documentation](/docs/getting-started/tutorials/devenv/readme.md).
+The first thing you need is a development environment and tools. This includes setting up your WordPress environment, Node, NPM, and your code editor. If you need help, see the [setting up your development environment documentation](/docs/getting-started/tutorials/devenv/README.md).
 
 ## Quick Start
 

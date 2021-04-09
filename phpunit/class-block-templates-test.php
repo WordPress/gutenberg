@@ -20,6 +20,24 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		gutenberg_register_wp_theme_taxonomy();
 		gutenberg_register_wp_template_part_area_taxonomy();
 
+		// Set up a template post corresponding to a different theme.
+		// We do this to ensure resolution and slug creation works as expected,
+		// even with another post of that same name present for another theme.
+		$args       = array(
+			'post_type'    => 'wp_template',
+			'post_name'    => 'my_template',
+			'post_title'   => 'My Template',
+			'post_content' => 'Content',
+			'post_excerpt' => 'Description of my template',
+			'tax_input'    => array(
+				'wp_theme' => array(
+					'this-theme-should-not-resolve',
+				),
+			),
+		);
+		self::$post = self::factory()->post->create_and_get( $args );
+		wp_set_post_terms( self::$post->ID, 'this-theme-should-not-resolve', 'wp_theme' );
+
 		// Set up template post.
 		$args       = array(
 			'post_type'    => 'wp_template',
@@ -74,7 +92,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( get_stylesheet(), $template->theme );
 		$this->assertEquals( 'single', $template->slug );
 		$this->assertEquals( 'publish', $template->status );
-		$this->assertEquals( false, $template->is_custom );
+		$this->assertEquals( 'theme', $template->source );
 		$this->assertEquals( 'Single Post', $template->title );
 		$this->assertEquals( 'Template used to display a single blog post.', $template->description );
 		$this->assertEquals( 'wp_template', $template->type );
@@ -92,7 +110,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( get_stylesheet(), $template_part->theme );
 		$this->assertEquals( 'header', $template_part->slug );
 		$this->assertEquals( 'publish', $template_part->status );
-		$this->assertEquals( false, $template_part->is_custom );
+		$this->assertEquals( 'theme', $template_part->source );
 		$this->assertEquals( 'header', $template_part->title );
 		$this->assertEquals( '', $template_part->description );
 		$this->assertEquals( 'wp_template_part', $template_part->type );
@@ -110,7 +128,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( get_stylesheet(), $template->theme );
 		$this->assertEquals( 'my_template', $template->slug );
 		$this->assertEquals( 'publish', $template->status );
-		$this->assertEquals( true, $template->is_custom );
+		$this->assertEquals( 'custom', $template->source );
 		$this->assertEquals( 'My Template', $template->title );
 		$this->assertEquals( 'Description of my template', $template->description );
 		$this->assertEquals( 'wp_template', $template->type );
@@ -125,7 +143,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( get_stylesheet(), $template_part->theme );
 		$this->assertEquals( 'my_template_part', $template_part->slug );
 		$this->assertEquals( 'publish', $template_part->status );
-		$this->assertEquals( true, $template_part->is_custom );
+		$this->assertEquals( 'custom', $template_part->source );
 		$this->assertEquals( 'My Template Part', $template_part->title );
 		$this->assertEquals( 'Description of my template part', $template_part->description );
 		$this->assertEquals( 'wp_template_part', $template_part->type );
@@ -172,7 +190,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( get_stylesheet(), $template->theme );
 		$this->assertEquals( 'index', $template->slug );
 		$this->assertEquals( 'publish', $template->status );
-		$this->assertEquals( false, $template->is_custom );
+		$this->assertEquals( 'theme', $template->source );
 		$this->assertEquals( 'wp_template', $template->type );
 
 		// Test template parts.
@@ -182,7 +200,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( get_stylesheet(), $template->theme );
 		$this->assertEquals( 'header', $template->slug );
 		$this->assertEquals( 'publish', $template->status );
-		$this->assertEquals( false, $template->is_custom );
+		$this->assertEquals( 'theme', $template->source );
 		$this->assertEquals( 'wp_template_part', $template->type );
 		// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
 		$this->assertEquals( WP_TEMPLATE_PART_AREA_UNCATEGORIZED, $template->area );
@@ -198,7 +216,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( get_stylesheet(), $template->theme );
 		$this->assertEquals( 'my_template', $template->slug );
 		$this->assertEquals( 'publish', $template->status );
-		$this->assertEquals( true, $template->is_custom );
+		$this->assertEquals( 'custom', $template->source );
 		$this->assertEquals( 'wp_template', $template->type );
 
 		// Test template parts.
@@ -208,7 +226,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( get_stylesheet(), $template->theme );
 		$this->assertEquals( 'my_template_part', $template->slug );
 		$this->assertEquals( 'publish', $template->status );
-		$this->assertEquals( true, $template->is_custom );
+		$this->assertEquals( 'custom', $template->source );
 		$this->assertEquals( 'wp_template_part', $template->type );
 		$this->assertEquals( WP_TEMPLATE_PART_AREA_SIDEBAR, $template->area );
 	}

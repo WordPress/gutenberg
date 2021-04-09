@@ -56,14 +56,12 @@ function Editor( {
 			getPreference,
 			__experimentalGetPreviewDeviceType,
 			isEditingTemplate,
+			getEditedPostTemplate,
 		} = select( editPostStore );
-		const {
-			getEntityRecord,
-			__experimentalGetTemplateForLink,
-			getPostType,
-			getEntityRecords,
-		} = select( 'core' );
-		const { getEditorSettings, getCurrentPost } = select( 'core/editor' );
+		const { getEntityRecord, getPostType, getEntityRecords } = select(
+			'core'
+		);
+		const { getEditorSettings } = select( 'core/editor' );
 		const { getBlockTypes } = select( blocksStore );
 		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
 			postType
@@ -79,12 +77,8 @@ function Editor( {
 		} else {
 			postObject = getEntityRecord( 'postType', postType, postId );
 		}
-		const isFSETheme = getEditorSettings().isFSETheme;
+		const supportsTemplateMode = getEditorSettings().supportsTemplateMode;
 		const isViewable = getPostType( postType )?.viewable ?? false;
-
-		// Prefetch and parse patterns. This ensures patterns are loaded and parsed when
-		// the editor is loaded rather than degrading the performance of the inserter.
-		select( 'core/block-editor' ).__experimentalGetAllowedPatterns();
 
 		return {
 			hasFixedToolbar:
@@ -104,11 +98,8 @@ function Editor( {
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 			isTemplateMode: isEditingTemplate(),
 			template:
-				isFSETheme &&
-				isViewable &&
-				postObject &&
-				getCurrentPost().status !== 'auto-draft'
-					? __experimentalGetTemplateForLink( postObject.link )
+				supportsTemplateMode && isViewable
+					? getEditedPostTemplate()
 					: null,
 			post: postObject,
 		};
@@ -120,7 +111,7 @@ function Editor( {
 
 	const editorSettings = useMemo( () => {
 		const result = {
-			...omit( settings, [ 'defaultEditorStyles', 'styles' ] ),
+			...omit( settings, [ 'styles' ] ),
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -167,7 +158,7 @@ function Editor( {
 	] );
 
 	const styles = useMemo( () => {
-		return hasThemeStyles ? settings.styles : settings.defaultEditorStyles;
+		return hasThemeStyles ? settings.styles : [];
 	}, [ settings, hasThemeStyles ] );
 
 	if ( ! post ) {

@@ -23,7 +23,7 @@ Tests for JavaScript use [Jest](https://jestjs.io/) as the test runner and its A
 
 It should be noted that in the past, React components were unit tested with [Enzyme](https://github.com/airbnb/enzyme). However, for new tests, it is preferred to use React Testing Library (RTL) and over time old tests should be refactored to use RTL too (typically when working on code that touches an old test).
 
-Assuming you've followed the [instructions](/docs/contributors/code/getting-started.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
+Assuming you've followed the [instructions](/docs/contributors/code/getting-started-with-code-contribution.md) to install Node and project dependencies, tests can be run from the command-line with NPM:
 
 ```
 npm test
@@ -31,7 +31,7 @@ npm test
 
 Linting is static code analysis used to enforce coding standards and to avoid potential errors. This project uses [ESLint](http://eslint.org/) and [TypeScript's JavaScript type-checking](https://www.typescriptlang.org/docs/handbook/type-checking-javascript-files.html) to capture these issues. While the above `npm test` will execute both unit tests and code linting, code linting can be verified independently by running `npm run lint`. Some JavaScript issues can be fixed automatically by running `npm run lint-js:fix`.
 
-To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/code/getting-started.md) for additional information.
+To improve your developer workflow, you should setup an editor linting integration. See the [getting started documentation](/docs/contributors/code/getting-started-with-code-contribution.md) for additional information.
 
 To run unit tests only, without the linter, use `npm run test-unit` instead.
 
@@ -386,7 +386,7 @@ Contributors to Gutenberg will note that PRs include continuous integration E2E 
 
 End-to-end tests use [Puppeteer](https://github.com/puppeteer/puppeteer) as a headless Chromium driver, and are otherwise still run by a [Jest](https://jestjs.io/) test runner.
 
-If you're using the built-in [local environment](/docs/contributors/code/getting-started.md#local-environment), you can run the e2e tests locally using this command:
+If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the e2e tests locally using this command:
 
 ```bash
 npm run test-e2e
@@ -454,7 +454,7 @@ Every core block is required to have at least one set of fixture files for its m
 
 ## PHP Testing
 
-Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/code/getting-started.md#local-environment), you can run the PHP tests locally using this command:
+Tests for PHP use [PHPUnit](https://phpunit.de/) as the testing framework. If you're using the built-in [local environment](/docs/contributors/code/getting-started-with-code-contribution.md#local-environment), you can run the PHP tests locally using this command:
 
 ```bash
 npm run test-php

@@ -2,6 +2,8 @@
  * External dependencies
  */
 import moment from 'moment';
+import classnames from 'classnames';
+
 // react-dates doesn't tree-shake correctly, so we import from the individual
 // component here, to avoid including too much of the library
 import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerSingleDateController';
@@ -9,13 +11,64 @@ import DayPickerSingleDateController from 'react-dates/lib/components/DayPickerS
 /**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
-import { isRTL } from '@wordpress/i18n';
+import { Component, createRef, useEffect, useRef } from '@wordpress/element';
+import { isRTL, _n, sprintf } from '@wordpress/i18n';
 
 /**
  * Module Constants
  */
 const TIMEZONELESS_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
+const ARIAL_LABEL_TIME_FORMAT = 'dddd, LL';
+
+function DatePickerDay( { day, events = [] } ) {
+	const ref = useRef();
+
+	/*
+	 * a11y hack to make the `There is/are n events` string
+	 * available speaking for readers,
+	 * re-defining the aria-label attribute.
+	 * This attribute is handled by the react-dates component.
+	 */
+	useEffect( () => {
+		// Bail when no parent node.
+		if ( ! ref?.current?.parentNode ) {
+			return;
+		}
+
+		const { parentNode } = ref.current;
+		const dayAriaLabel = moment( day ).format( ARIAL_LABEL_TIME_FORMAT );
+
+		if ( ! events.length ) {
+			// Set aria-label without event description.
+			parentNode.setAttribute( 'aria-label', dayAriaLabel );
+			return;
+		}
+
+		const dayWithEventsDescription = sprintf(
+			// translators: 1: Calendar day format, 2: Calendar event number.
+			_n(
+				'%1$s. There is %2$d event.',
+				'%1$s. There are %2$d events.',
+				events.length
+			),
+			dayAriaLabel,
+			events.length
+		);
+
+		parentNode.setAttribute( 'aria-label', dayWithEventsDescription );
+	}, [ events.length ] );
+
+	return (
+		<div
+			ref={ ref }
+			className={ classnames( 'components-datetime__date__day', {
+				'has-events': events?.length,
+			} ) }
+		>
+			{ day.format( 'D' ) }
+		</div>
+	);
+}
 
 class DatePicker extends Component {
 	constructor() {
@@ -23,8 +76,14 @@ class DatePicker extends Component {
 
 		this.onChangeMoment = this.onChangeMoment.bind( this );
 		this.nodeRef = createRef();
-		this.keepFocusInside = this.keepFocusInside.bind( this );
-		this.isDayHighlighted = this.isDayHighlighted.bind( this );
+		this.onMonthPreviewedHandler = this.onMonthPreviewedHandler.bind(
+			this
+		);
+	}
+
+	onMonthPreviewedHandler( newMonthDate ) {
+		this.props?.onMonthPreviewed( newMonthDate.toISOString() );
+		this.keepFocusInside();
 	}
 
 	/*
@@ -70,6 +129,9 @@ class DatePicker extends Component {
 		};
 
 		onChange( newDate.set( momentTime ).format( TIMEZONELESS_FORMAT ) );
+
+		// Keep focus on the date picker.
+		this.keepFocusInside();
 	}
 
 	/**
@@ -86,19 +148,13 @@ class DatePicker extends Component {
 		return currentDate ? moment( currentDate ) : moment();
 	}
 
-	// todo change reference to `isDayHighlighted` every time, `events` prop change
-	isDayHighlighted( date ) {
-		// Do not highlight when no events.
+	getEventsPerDay( day ) {
 		if ( ! this.props.events?.length ) {
-			return false;
-		}
-		if ( this.props.onMonthPreviewed ) {
-			this.props.onMonthPreviewed( date.toDate() );
+			return [];
 		}
 
-		// Compare date against highlighted events.
-		return this.props.events.some( ( highlighted ) =>
-			date.isSame( highlighted.date, 'day' )
+		return this.props.events.filter( ( eventDay ) =>
+			day.isSame( eventDay.date, 'day' )
 		);
 	}
 
@@ -123,13 +179,19 @@ class DatePicker extends Component {
 					onDateChange={ this.onChangeMoment }
 					transitionDuration={ 0 }
 					weekDayFormat="ddd"
+					dayAriaLabelFormat={ ARIAL_LABEL_TIME_FORMAT }
 					isRTL={ isRTL() }
 					isOutsideRange={ ( date ) => {
 						return isInvalidDate && isInvalidDate( date.toDate() );
 					} }
-					isDayHighlighted={ this.isDayHighlighted }
-					onPrevMonthClick={ this.keepFocusInside }
-					onNextMonthClick={ this.keepFocusInside }
+					onPrevMonthClick={ this.onMonthPreviewedHandler }
+					onNextMonthClick={ this.onMonthPreviewedHandler }
+					renderDayContents={ ( day ) => (
+						<DatePickerDay
+							day={ day }
+							events={ this.getEventsPerDay( day ) }
+						/>
+					) }
 				/>
 			</div>
 		);

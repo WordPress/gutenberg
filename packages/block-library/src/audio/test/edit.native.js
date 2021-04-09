@@ -6,12 +6,17 @@ import { act, create } from 'react-test-renderer';
 /**
  * WordPress dependencies
  */
-import { MediaUploadProgress } from '@wordpress/block-editor';
+import { MediaUploadProgress, BlockEdit } from '@wordpress/block-editor';
+import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import AudioEdit from '../edit.native.js';
+import { metadata, settings, name } from '../index';
+
+const AudioEdit = ( { clientId, ...props } ) => (
+	<BlockEdit name={ name } clientId={ clientId || 0 } { ...props } />
+);
 
 const getTestComponentWithContent = ( attributes = {} ) => {
 	return create(
@@ -20,6 +25,17 @@ const getTestComponentWithContent = ( attributes = {} ) => {
 };
 
 describe( 'Audio block', () => {
+	beforeAll( () => {
+		registerBlockType( name, {
+			...metadata,
+			...settings,
+		} );
+	} );
+
+	afterAll( () => {
+		unregisterBlockType( name );
+	} );
+
 	it( 'renders placeholder without crashing', () => {
 		const component = getTestComponentWithContent();
 		const rendered = component.toJSON();

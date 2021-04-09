@@ -49,7 +49,7 @@ Let's confirm the plugin is loaded and working.
 
 -or-
 
-(3B) If you are using `wp-env`, see [Development Environment setup](/docs/getting-started/tutorials/devenv/readme.md), then you should now run from inside the `gutenpride` directory:
+(3B) If you are using `wp-env`, see [Development Environment setup](/docs/getting-started/tutorials/devenv/README.md), then you should now run from inside the `gutenpride` directory:
 
 ```sh
 wp-env start
@@ -104,7 +104,16 @@ The `register_block_type_from_metadata` function registers the block we are goin
 	"apiVersion": 2,
 	"name": "create-block/gutenpride",
 	"title": "Gutenpride",
-	"editorScript": "file:./build/index.js"
+	"category": "widgets",
+	"icon": "smiley",
+	"description": "Example block written with ESNext standard and JSX support – build step required.",
+	"supports": {
+		"html": false
+	},
+	"textdomain": "gutenpride",
+	"editorScript": "file:./build/index.js",
+	"editorStyle": "file:./build/index.css",
+	"style": "file:./build/style-index.css"
 }
 ```
 

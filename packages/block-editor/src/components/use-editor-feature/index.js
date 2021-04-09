@@ -63,7 +63,7 @@ function blockAttributesMatch( blockAttributes, attributes ) {
  * Hook that retrieves the setting for the given editor feature.
  * It works with nested objects using by finding the value at path.
  *
- * @param {string} featurePath  The path to the feature.
+ * @param {string} featurePath The path to the feature.
  *
  * @return {any} Returns the value defined for the setting.
  *
@@ -88,7 +88,7 @@ export default function useEditorFeature( featurePath ) {
 				'supports',
 				'__experimentalSelector',
 			] );
-			if ( isObject( selectors ) ) {
+			if ( clientId && isObject( selectors ) ) {
 				const blockAttributes = getBlockAttributes( clientId ) || {};
 				for ( const contextSelector in selectors ) {
 					const { attributes } = selectors[ contextSelector ];

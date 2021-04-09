@@ -12,7 +12,7 @@ import { useSelect } from '@wordpress/data';
 import { useState, useRef } from '@wordpress/element';
 import {
 	BlockControls,
-	BlockVerticalAlignmentToolbar,
+	BlockVerticalAlignmentControl,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
 	useBlockProps,
@@ -24,7 +24,7 @@ import {
 	PanelBody,
 	TextareaControl,
 	ToggleControl,
-	ToolbarGroup,
+	ToolbarButton,
 	ExternalLink,
 	FocalPointPicker,
 } from '@wordpress/components';
@@ -187,20 +187,6 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 		gridTemplateColumns,
 		msGridColumns: gridTemplateColumns,
 	};
-	const toolbarControls = [
-		{
-			icon: pullLeft,
-			title: __( 'Show media on left' ),
-			isActive: mediaPosition === 'left',
-			onClick: () => setAttributes( { mediaPosition: 'left' } ),
-		},
-		{
-			icon: pullRight,
-			title: __( 'Show media on right' ),
-			isActive: mediaPosition === 'right',
-			onClick: () => setAttributes( { mediaPosition: 'right' } ),
-		},
-	];
 	const onMediaAltChange = ( newMediaAlt ) => {
 		setAttributes( { mediaAlt: newMediaAlt } );
 	};
@@ -306,26 +292,37 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 	return (
 		<>
 			<InspectorControls>{ mediaTextGeneralSettings }</InspectorControls>
-			<BlockControls>
-				<ToolbarGroup controls={ toolbarControls } />
-				<BlockVerticalAlignmentToolbar
+			<BlockControls group="block">
+				<BlockVerticalAlignmentControl
 					onChange={ onVerticalAlignmentChange }
 					value={ verticalAlignment }
 				/>
+				<ToolbarButton
+					icon={ pullLeft }
+					title={ __( 'Show media on left' ) }
+					isActive={ mediaPosition === 'left' }
+					onClick={ () => setAttributes( { mediaPosition: 'left' } ) }
+				/>
+				<ToolbarButton
+					icon={ pullRight }
+					title={ __( 'Show media on right' ) }
+					isActive={ mediaPosition === 'right' }
+					onClick={ () =>
+						setAttributes( { mediaPosition: 'right' } )
+					}
+				/>
 				{ mediaType === 'image' && (
-					<ToolbarGroup>
-						<ImageURLInputUI
-							url={ href || '' }
-							onChangeUrl={ onSetHref }
-							linkDestination={ linkDestination }
-							mediaType={ mediaType }
-							mediaUrl={ image && image.source_url }
-							mediaLink={ image && image.link }
-							linkTarget={ linkTarget }
-							linkClass={ linkClass }
-							rel={ rel }
-						/>
-					</ToolbarGroup>
+					<ImageURLInputUI
+						url={ href || '' }
+						onChangeUrl={ onSetHref }
+						linkDestination={ linkDestination }
+						mediaType={ mediaType }
+						mediaUrl={ image && image.source_url }
+						mediaLink={ image && image.link }
+						linkTarget={ linkTarget }
+						linkClass={ linkClass }
+						rel={ rel }
+					/>
 				) }
 			</BlockControls>
 			<div { ...blockProps }>

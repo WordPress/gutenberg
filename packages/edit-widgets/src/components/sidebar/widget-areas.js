@@ -5,7 +5,9 @@ import { useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
 import { blockDefault } from '@wordpress/icons';
 import { BlockIcon } from '@wordpress/block-editor';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
@@ -52,6 +54,17 @@ export default function WidgetAreas( { selectedWidgetAreaId } ) {
 								'Your theme does not contain any Widget Areas.'
 							) }
 						</p>
+					) }
+					{ ! selectedWidgetArea && (
+						<Button
+							href={ addQueryArgs( 'customize.php', {
+								'autofocus[panel]': 'widgets',
+								return: 'themes.php?page=gutenberg-widgets',
+							} ) }
+							isTertiary
+						>
+							{ __( 'Manage with live preview' ) }
+						</Button>
 					) }
 				</div>
 			</div>

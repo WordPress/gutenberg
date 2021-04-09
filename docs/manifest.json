@@ -6,16 +6,10 @@
 		"parent": null
 	},
 	{
-		"title": "Getting Started",
-		"slug": "getting-started",
-		"markdown_source": "../docs/getting-started/README.md",
-		"parent": "handbook"
-	},
-	{
 		"title": "Tutorials",
 		"slug": "tutorials",
 		"markdown_source": "../docs/getting-started/tutorials/README.md",
-		"parent": "getting-started"
+		"parent": "handbook"
 	},
 	{
 		"title": "Development Environment",
@@ -81,28 +75,28 @@
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/getting-started/glossary.md",
-		"parent": "getting-started"
+		"parent": "handbook"
 	},
 	{
 		"title": "Frequently Asked Questions",
 		"slug": "faq",
 		"markdown_source": "../docs/getting-started/faq.md",
-		"parent": "getting-started"
+		"parent": "handbook"
 	},
 	{
 		"title": "History",
 		"slug": "history",
 		"markdown_source": "../docs/getting-started/history.md",
-		"parent": "getting-started"
+		"parent": "handbook"
 	},
 	{
 		"title": "Outreach",
 		"slug": "outreach",
 		"markdown_source": "../docs/getting-started/outreach.md",
-		"parent": "getting-started"
+		"parent": "handbook"
 	},
 	{
-		"title": "Developer Documentation",
+		"title": "How-to Guides",
 		"slug": "how-to-guides",
 		"markdown_source": "../docs/how-to-guides/README.md",
 		"parent": null
@@ -495,6 +489,12 @@
 		"title": "Block Type Metadata",
 		"slug": "block-metadata",
 		"markdown_source": "../docs/reference-guides/block-api/block-metadata.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Block Variations",
+		"slug": "block-variations",
+		"markdown_source": "../docs/reference-guides/block-api/block-variations.md",
 		"parent": "block-api"
 	},
 	{
@@ -1740,7 +1740,7 @@
 		"parent": "architecture"
 	},
 	{
-		"title": "FullSiteEditingTemplates",
+		"title": "Full Site Editing Templates",
 		"slug": "full-site-editing-templates",
 		"markdown_source": "../docs/explanations/architecture/full-site-editing-templates.md",
 		"parent": "architecture"
@@ -1753,74 +1753,74 @@
 	},
 	{
 		"title": "Code Contributions",
-		"slug": "develop",
-		"markdown_source": "../docs/contributors/code/develop.md",
+		"slug": "code",
+		"markdown_source": "../docs/contributors/code/README.md",
 		"parent": "contributors"
 	},
 	{
-		"title": "Getting Started",
-		"slug": "getting-started",
-		"markdown_source": "../docs/contributors/code/getting-started.md",
-		"parent": "develop"
+		"title": "Getting Started With Code Contribution",
+		"slug": "getting-started-with-code-contribution",
+		"markdown_source": "../docs/contributors/code/getting-started-with-code-contribution.md",
+		"parent": "code"
 	},
 	{
 		"title": "Git Workflow",
 		"slug": "git-workflow",
 		"markdown_source": "../docs/contributors/code/git-workflow.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Coding Guidelines",
 		"slug": "coding-guidelines",
 		"markdown_source": "../docs/contributors/code/coding-guidelines.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Testing Overview",
 		"slug": "testing-overview",
 		"markdown_source": "../docs/contributors/code/testing-overview.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Block Grammar",
 		"slug": "grammar",
 		"markdown_source": "../docs/contributors/code/grammar.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Scripts",
 		"slug": "scripts",
 		"markdown_source": "../docs/contributors/code/scripts.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Managing Packages",
 		"slug": "managing-packages",
 		"markdown_source": "../docs/contributors/code/managing-packages.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Gutenberg Release Process",
 		"slug": "release",
 		"markdown_source": "../docs/contributors/code/release.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "React Native based mobile Gutenberg",
 		"slug": "native-mobile",
 		"markdown_source": "../docs/contributors/code/native-mobile.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Getting Started for the React Native based Mobile Gutenberg",
 		"slug": "getting-started-native-mobile",
 		"markdown_source": "../docs/contributors/code/getting-started-native-mobile.md",
-		"parent": "develop"
+		"parent": "code"
 	},
 	{
 		"title": "Design Contributions",
 		"slug": "design",
-		"markdown_source": "../docs/contributors/design/design.md",
+		"markdown_source": "../docs/contributors/design/README.md",
 		"parent": "contributors"
 	},
 	{
@@ -1837,15 +1837,15 @@
 	},
 	{
 		"title": "Documentation Contributions",
-		"slug": "document",
-		"markdown_source": "../docs/contributors/documentation/document.md",
+		"slug": "documentation",
+		"markdown_source": "../docs/contributors/documentation/README.md",
 		"parent": "contributors"
 	},
 	{
 		"title": "Copy Guidelines",
 		"slug": "copy-guide",
 		"markdown_source": "../docs/contributors/documentation/copy-guide.md",
-		"parent": "document"
+		"parent": "documentation"
 	},
 	{
 		"title": "Triage",
