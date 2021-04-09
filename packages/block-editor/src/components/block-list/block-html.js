@@ -26,6 +26,8 @@ function BlockHTML( { clientId } ) {
 	const allowedHtmlTags = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().allowedHtmlTags
 	);
+
+	// FIXME: Use `codeHandler` here too
 	const sanitizeHTML = useKsesSanitization( allowedHtmlTags );
 
 	const [ html, setHtml ] = useState( '' );

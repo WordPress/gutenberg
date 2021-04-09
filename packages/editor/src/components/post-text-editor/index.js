@@ -1,15 +1,15 @@
 /**
  * External dependencies
  */
+import { map } from 'lodash';
 import Textarea from 'react-autosize-textarea';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
-import { useKsesSanitization } from '@wordpress/block-editor';
+import { useMemo, useState } from '@wordpress/element';
+import { __unstableCodeHandler as codeHandler } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
@@ -18,6 +18,28 @@ import { VisuallyHidden } from '@wordpress/components';
  * Internal dependencies
  */
 import { store } from '../../store';
+
+// Copied from block-editor/src/hooks/utils
+function allowedTagsToKsesSchema( allowedHtmlTags ) {
+	const schema = {
+		'#text': {},
+	};
+	for ( const tagName of Object.keys( allowedHtmlTags || {} ) ) {
+		schema[ tagName ] = {
+			attributes: map( allowedHtmlTags[ tagName ], ( enabled, attr ) => [
+				attr,
+				enabled,
+			] )
+				.filter( ( [ , enabled ] ) => enabled )
+				.map( ( [ attr ] ) => attr ),
+		};
+		if ( ! [ '#text', 'br' ].includes( tagName ) ) {
+			schema[ tagName ].children = schema;
+		}
+	}
+
+	return schema;
+}
 
 export default function PostTextEditor() {
 	const postContent = useSelect(
@@ -33,7 +55,9 @@ export default function PostTextEditor() {
 	const allowedHtmlTags = useSelect(
 		( select ) => select( store ).getEditorSettings().allowedHtmlTags
 	);
-	const sanitize = useKsesSanitization( allowedHtmlTags );
+	const schema = useMemo( () => allowedTagsToKsesSchema( allowedHtmlTags ), [
+		allowedHtmlTags,
+	] );
 
 	if ( ! isDirty && value !== postContent ) {
 		setValue( postContent );
@@ -58,31 +82,13 @@ export default function PostTextEditor() {
 	};
 
 	/**
-	 * Ensures no unwanted HTML ends up in the list of parsed blocks.
-	 */
-	const cleanBlocks = useCallback( function ( blocks ) {
-		return blocks.map( ( block ) => ( {
-			...block,
-			originalContent: block.originalContent
-				? sanitize( block.originalContent )
-				: undefined,
-			attributes: {
-				...block.attributes,
-				content: block.attributes?.content
-					? sanitize( block.attributes.content )
-					: undefined,
-			},
-		} ) );
-	}, [] );
-
-	/**
 	 * Function called when the user has completed their edits, responsible for
 	 * ensuring that changes, if made, are surfaced to the onPersist prop
 	 * callback and resetting dirty state.
 	 */
 	const stopEditing = () => {
 		if ( isDirty ) {
-			const blocks = cleanBlocks( parse( value ) );
+			const blocks = codeHandler( { HTML: value }, schema );
 			resetEditorBlocks( blocks );
 			setIsDirty( false );
 		}
