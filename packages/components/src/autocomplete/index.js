@@ -20,6 +20,7 @@ import {
 	DOWN,
 	LEFT,
 	RIGHT,
+	BACKSPACE,
 } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
@@ -301,6 +302,66 @@ function Autocomplete( {
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
 
+	let textContent, text;
+	if ( isCollapsed( record ) ) {
+		textContent = getTextContent( slice( record, 0 ) );
+		text = deburr( textContent );
+	}
+
+	function getQuery( triggerPrefix ) {
+		const safeTrigger = escapeRegExp( triggerPrefix );
+		const match = text
+			.slice( text.lastIndexOf( triggerPrefix ) )
+			.match( new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` ) );
+		const query = match && match[ 1 ];
+		console.log( 'query: ', query );
+		return query;
+	}
+
+	function getCompleterFromTextContext() {
+		const textAfterSelection = getTextContent(
+			slice( record, undefined, getTextContent( record ).length )
+		);
+
+		return find( completers, ( { triggerPrefix, allowContext } ) => {
+			const index = text.lastIndexOf( triggerPrefix );
+
+			if ( index === -1 ) {
+				return false;
+			}
+
+			if (
+				allowContext &&
+				! allowContext( text.slice( 0, index ), textAfterSelection )
+			) {
+				return false;
+			}
+
+			const textWithoutTrigger = text.slice(
+				index + triggerPrefix.length
+			);
+
+			if (
+				/^\s/.test( textWithoutTrigger ) ||
+				/\s\s+$/.test( textWithoutTrigger )
+			) {
+				return false;
+			}
+
+			return /[\u0000-\uFFFF]*$/.test( textWithoutTrigger );
+		} );
+	}
+
+	function setupAutocompleter( completer ) {
+		setFilterValue( getQuery( completer.triggerPrefix ) );
+		setAutocompleter( completer );
+		setAutocompleterUI( () =>
+			completer !== autocompleter
+				? getAutoCompleterUI( completer )
+				: AutocompleterUI
+		);
+	}
+
 	function insertCompletion( replacement ) {
 		const end = record.start;
 		const start =
@@ -382,6 +443,15 @@ function Autocomplete( {
 	}
 
 	function handleKeyDown( event ) {
+		console.log( 'keypress!!' );
+		if ( event.keyCode === BACKSPACE ) {
+			const completer = getCompleterFromTextContext();
+			console.log( 'completer: ', completer );
+			if ( completer ) {
+				setupAutocompleter( completer );
+			}
+			console.log( 'backspacze!' );
+		}
 		if ( ! autocompleter ) {
 			return;
 		}
@@ -426,79 +496,29 @@ function Autocomplete( {
 		event.stopPropagation();
 	}
 
-	let textContent;
-
-	if ( isCollapsed( record ) ) {
-		textContent = getTextContent( slice( record, 0 ) );
-	}
-
 	useEffect( () => {
 		if ( ! textContent ) {
 			return;
 		}
 
-		const text = deburr( textContent );
-		const textAfterSelection = getTextContent(
-			slice( record, undefined, getTextContent( record ).length )
-		);
-		const completer = find(
-			completers,
-			( { triggerPrefix, allowContext } ) => {
-				// If we don't have any matching filteredOptions from the last render iteration +
-				// we didn't have a new trigger typed, then we should not continue with this effect.
-				const mismatch = filteredOptions.length === 0;
-				if ( mismatch && text.slice( -1 ) !== triggerPrefix ) {
-					return false;
-				}
-
-				const index = text.lastIndexOf( triggerPrefix );
-
-				if ( index === -1 ) {
-					return false;
-				}
-
-				if (
-					allowContext &&
-					! allowContext( text.slice( 0, index ), textAfterSelection )
-				) {
-					return false;
-				}
-
-				const textWithoutTrigger = text.slice(
-					index + triggerPrefix.length
-				);
-
-				if (
-					/^\s/.test( textWithoutTrigger ) ||
-					/\s\s+$/.test( textWithoutTrigger )
-				) {
-					return false;
-				}
-
-				return /[\u0000-\uFFFF]*$/.test( textWithoutTrigger );
-			}
-		);
-
+		const completer = getCompleterFromTextContext();
 		if ( ! completer ) {
 			reset();
 			return;
 		}
 
-		const safeTrigger = escapeRegExp( completer.triggerPrefix );
-		const match = text
-			.slice( text.lastIndexOf( completer.triggerPrefix ) )
-			.match( new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` ) );
-		const query = match && match[ 1 ];
+		console.log( 'filteredOptions: ', filteredOptions );
+		// If we don't have any matching filteredOptions
+		// we didn't have a new trigger typed, then we should not continue with this effect.
+		const mismatch = filteredOptions.length === 0;
+		if ( mismatch && text.slice( -1 ) !== completer.triggerPrefix ) {
+			console.log( 'mismatch' );
+			return;
+		}
 
-		//console.log( match ); // uncomment this to make this easier to test
+		console.log( getQuery( completer.triggerPrefix ) ); // uncomment this to make this easier to test
 
-		setAutocompleter( completer );
-		setAutocompleterUI( () =>
-			completer !== autocompleter
-				? getAutoCompleterUI( completer )
-				: AutocompleterUI
-		);
-		setFilterValue( query );
+		setupAutocompleter( completer );
 	}, [ textContent ] );
 
 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
