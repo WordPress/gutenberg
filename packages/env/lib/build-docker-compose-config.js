@@ -257,8 +257,8 @@ module.exports = function buildDockerComposeConfig( config ) {
 			},
 		},
 		volumes: {
-			...( ! config.coreSource && { wordpress: {} } ),
-			...( ! config.coreSource && { 'tests-wordpress': {} } ),
+			...( ! config.env.development.coreSource && { wordpress: {} } ),
+			...( ! config.env.tests.coreSource && { 'tests-wordpress': {} } ),
 			mysql: {},
 			'mysql-test': {},
 			'phpunit-uploads': {},
