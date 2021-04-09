@@ -110,6 +110,17 @@ export default function useSidebarBlockEditor( sidebar ) {
 		widgetsToBlocks( sidebar.getWidgets() )
 	);
 
+	// Get the blocks from the store and save it back to component's states once mounted.
+	// This is necessary since that after the first onChangeBlocks fired,
+	// all the blocks in the callback are transformed once via getBlocks internally.
+	// In order to only perform referential equality check in the callback,
+	// we have to make sure the references are the same between state and store.
+	useEffect( () => {
+		const storedBlocks = select( blockEditorStore ).getBlocks( null );
+
+		setBlocks( storedBlocks );
+	}, [] );
+
 	useEffect( () => {
 		return sidebar.subscribe( ( prevWidgets, nextWidgets ) => {
 			setBlocks( ( prevBlocks ) => {
