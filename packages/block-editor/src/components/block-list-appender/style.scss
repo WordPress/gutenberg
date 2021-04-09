@@ -53,3 +53,26 @@
 		transform: scale(0);
 	}
 }
+
+// This targets the appender on new posts, when it is technically a button.
+p.block-list-appender.wp-block {
+	display: flex;
+
+	// This overrides some properties as this appender is also assigned a .wp-block class.
+	.block-editor-default-block-appender {
+		width: 100%;
+		margin-left: 0;
+		margin-right: 0;
+
+		.block-editor-default-block-appender__content {
+			line-height: inherit;
+		}
+	}
+
+	// Make the appender as tall as one paragraph, to match the height of the actual paragraph appenders.
+	&::after {
+		content: "\200B";
+		display: inline-block;
+		width: 0;
+	}
+}
