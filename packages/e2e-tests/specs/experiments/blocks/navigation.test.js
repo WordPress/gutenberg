@@ -526,9 +526,7 @@ describe( 'Navigation', () => {
 			},
 		] );
 
-		let isScriptLoaded;
-
-		isScriptLoaded = await page.evaluate(
+		const isScriptLoaded = await page.evaluate(
 			() =>
 				null !== document.querySelector( 'script[src*="frontend.js"]' )
 		);
@@ -542,11 +540,13 @@ describe( 'Navigation', () => {
 			waitFor: [ 'networkidle0', 'domcontentloaded' ],
 		} );
 
-		isScriptLoaded = await page.evaluate(
+		const tagCount = await page.evaluate(
 			() =>
-				null !== document.querySelector( 'script[src*="frontend.js"]' )
+				Array.from(
+					document.querySelectorAll( 'script[src*="frontend.js"]' )
+				).length
 		);
 
-		expect( isScriptLoaded ).toBe( true );
+		expect( tagCount ).toBe( 1 );
 	} );
 } );
