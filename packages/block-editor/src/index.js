@@ -7,6 +7,7 @@ import '@wordpress/rich-text';
  * Internal dependencies
  */
 import './hooks';
+export { useKsesSanitization } from './hooks/utils';
 export * from './components';
 export * from './utils';
 export { storeConfig, store } from './store';

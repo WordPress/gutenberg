@@ -1,13 +1,13 @@
 /**
  * External dependencies
  */
-import { pickBy, isEqual, isObject, identity, mapValues } from 'lodash';
+import { pickBy, isEqual, isObject, identity, mapValues, map } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { removeInvalidHTML } from '@wordpress/dom';
 
 /**
@@ -34,15 +34,15 @@ export const cleanEmptyObject = ( object ) => {
 		: cleanedNestedObjects;
 };
 
-export const useKsesSanitization = () => {
-	const { canUserUseUnfilteredHTML, schema } = useSelect( ( select ) => {
-		const { getSettings, getKsesSchema } = select( blockEditorStore );
-		return {
-			canUserUseUnfilteredHTML: getSettings()
-				.__experimentalCanUserUseUnfilteredHTML,
-			schema: getKsesSchema(),
-		};
-	} );
+export const useKsesSanitization = ( allowedHtmlTags ) => {
+	const canUserUseUnfilteredHTML = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getSettings()
+				.__experimentalCanUserUseUnfilteredHTML
+	);
+	const schema = useMemo( () => allowedTagsToKsesSchema( allowedHtmlTags ), [
+		allowedHtmlTags,
+	] );
 
 	return useCallback(
 		function ( unfilteredHTML ) {
@@ -55,4 +55,31 @@ export const useKsesSanitization = () => {
 		},
 		[ canUserUseUnfilteredHTML, schema ]
 	);
+};
+
+/**
+ * Returns all the available block types.
+ *
+ * @param {string} allowedHtmlTags Allowed HTML Tags.
+ * @return {Array} Block Types.
+ */
+export const allowedTagsToKsesSchema = ( allowedHtmlTags ) => {
+	const schema = {
+		'#text': {},
+	};
+	for ( const tagName of Object.keys( allowedHtmlTags ) ) {
+		schema[ tagName ] = {
+			attributes: map( allowedHtmlTags[ tagName ], ( enabled, attr ) => [
+				attr,
+				enabled,
+			] )
+				.filter( ( [ , enabled ] ) => enabled )
+				.map( ( [ attr ] ) => attr ),
+		};
+		if ( ! [ '#text', 'br' ].includes( tagName ) ) {
+			schema[ tagName ].children = schema;
+		}
+	}
+
+	return schema;
 };

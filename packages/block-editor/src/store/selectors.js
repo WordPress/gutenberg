@@ -2131,35 +2131,3 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 		validBlockNames,
 	]
 );
-
-/**
- * Returns all the available block types.
- *
- * @param {Object} state Data state.
- *
- * @return {Array} Block Types.
- */
-export const getKsesSchema = createSelector(
-	( state ) => {
-		const allowedHtmlTags = getSettings( state ).allowedHtmlTags;
-		const schema = {
-			'#text': {},
-		};
-		for ( const tagName of Object.keys( allowedHtmlTags ) ) {
-			schema[ tagName ] = {
-				attributes: map(
-					allowedHtmlTags[ tagName ],
-					( enabled, attr ) => [ attr, enabled ]
-				)
-					.filter( ( [ , enabled ] ) => enabled )
-					.map( ( [ attr ] ) => attr ),
-			};
-			if ( ! [ '#text', 'br' ].includes( tagName ) ) {
-				schema[ tagName ].children = schema;
-			}
-		}
-
-		return schema;
-	},
-	( state ) => [ getSettings( state ).allowedHtmlTags ]
-);

@@ -23,7 +23,11 @@ import { store as blockEditorStore } from '../../store';
 import { useKsesSanitization } from '../../hooks/utils';
 
 function BlockHTML( { clientId } ) {
-	const sanitizeHTML = useKsesSanitization();
+	const allowedHtmlTags = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().allowedHtmlTags
+	);
+	const sanitizeHTML = useKsesSanitization( allowedHtmlTags );
+
 	const [ html, setHtml ] = useState( '' );
 	const block = useSelect(
 		( select ) => select( blockEditorStore ).getBlock( clientId ),
