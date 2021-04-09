@@ -14,15 +14,15 @@ import {
 	useRef,
 	useState,
 	useCallback,
-	forwardRef,
 	RawHTML,
 } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { Button } from '@wordpress/components';
+import { useInstanceId } from '@wordpress/compose';
+
+const $ = window.jQuery;
 
 export default function Form( { id, idBase, instance, setInstance } ) {
-	const ref = useRef();
-
 	const { html, setFormData } = useForm( {
 		id,
 		idBase,
@@ -30,44 +30,19 @@ export default function Form( { id, idBase, instance, setInstance } ) {
 		setInstance,
 	} );
 
-	const onSubmit = useCallback(
-		( event ) => {
-			event.preventDefault();
-			if ( id ) {
-				setFormData( serializeForm( ref.current ) );
-			}
-		},
-		[ id ]
-	);
-
-	const onChange = useCallback(
-		debounce( () => {
-			if ( idBase ) {
-				setFormData( serializeForm( ref.current ) );
-			}
-		}, 300 ),
-		[ idBase ]
+	const setFormDataDebounced = useCallback(
+		debounce( setFormData, 300 ),
+		[]
 	);
 
 	return (
-		<div className="widget open">
-			<div className="widget-inside">
-				<ObservableForm
-					ref={ ref }
-					className="form"
-					method="post"
-					onSubmit={ onSubmit }
-					onChange={ onChange }
-				>
-					<RawHTML className="widget-content">{ html }</RawHTML>
-					{ id && (
-						<Button type="submit" isPrimary>
-							{ __( 'Save' ) }
-						</Button>
-					) }
-				</ObservableForm>
-			</div>
-		</div>
+		<Control
+			id={ id }
+			idBase={ idBase }
+			html={ html }
+			onChange={ setFormDataDebounced }
+			onSave={ setFormData }
+		/>
 	);
 }
 
@@ -154,26 +129,104 @@ function useForm( { id, idBase, instance, setInstance } ) {
 	return { html, setFormData };
 }
 
+function Control( { id, idBase, html, onChange, onSave } ) {
+	const ref = useRef();
+
+	// Trigger widget-added when widget is ready and widget-updated when widget
+	// changes. This event is what widgets' scripts use to initialize, attach
+	// events, etc.
+	const hasBeenAdded = useRef( false );
+	useEffect( () => {
+		if ( html ) {
+			$( document ).trigger(
+				hasBeenAdded.current ? 'widget-updated' : 'widget-added',
+				[ $( ref.current ) ]
+			);
+			hasBeenAdded.current = true;
+		}
+	}, [
+		html,
+		// Include id and idBase in the deps so that widget-updated is triggered
+		// if they change.
+		id,
+		idBase,
+	] );
+
+	// Use jQuery change event instead of the native change event because many
+	// widgets use jQuery's trigger() to trigger an update.
+	useEffect( () => {
+		const form = ref.current.querySelector( 'form' );
+		const handler = () => onChange( serializeForm( form ) );
+		$( form ).on( 'change', null, handler );
+		return () => $( form ).off( 'change', null, handler );
+	}, [ onChange ] );
+
+	// Non-multi widgets can be saved via a Save button.
+	const handleSubmit = useCallback( ( event ) => {
+		event.preventDefault();
+		onSave( serializeForm( event.target ) );
+	}, [] );
+
+	// We can't use the real widget number as this is calculated by the server
+	// and we may not ever *actually* save this widget. Instead, use a fake but
+	// unique number.
+	const number = useInstanceId( Control );
+
+	return (
+		<div ref={ ref } className="widget open">
+			<div className="widget-inside">
+				<form className="form" method="post" onSubmit={ handleSubmit }>
+					{ /* Many widgets expect these hidden inputs to exist in the DOM. */ }
+					<input
+						type="hidden"
+						name="widget-id"
+						className="widget-id"
+						value={ id ?? `${ idBase }-${ number }` }
+					/>
+					<input
+						type="hidden"
+						name="id_base"
+						className="id_base"
+						value={ idBase ?? id }
+					/>
+					<input
+						type="hidden"
+						name="widget-width"
+						className="widget-width"
+						value="250"
+					/>
+					<input
+						type="hidden"
+						name="widget-height"
+						className="widget-height"
+						value="200"
+					/>
+					<input
+						type="hidden"
+						name="widget_number"
+						className="widget_number"
+						value={ idBase ? number : '' }
+					/>
+					<input
+						type="hidden"
+						name="add_new"
+						className="add_new"
+						value=""
+					/>
+					<RawHTML className="widget-content">{ html }</RawHTML>
+					{ id && (
+						<Button type="submit" isPrimary>
+							{ __( 'Save' ) }
+						</Button>
+					) }
+				</form>
+			</div>
+		</div>
+	);
+}
+
 function serializeForm( form ) {
 	return new window.URLSearchParams(
 		Array.from( new window.FormData( form ) )
 	).toString();
 }
-
-const ObservableForm = forwardRef( ( { onChange, ...props }, ref ) => {
-	// React won't call the form's onChange handler because it doesn't know
-	// about the <input>s that we add using dangerouslySetInnerHTML. We work
-	// around this by not using React's event system.
-
-	useEffect( () => {
-		const handler = () => onChange( ref.current );
-		ref.current.addEventListener( 'change', handler );
-		ref.current.addEventListener( 'input', handler );
-		return () => {
-			ref.current.removeEventListener( 'change', handler );
-			ref.current.removeEventListener( 'input', handler );
-		};
-	}, [ onChange ] );
-
-	return <form ref={ ref } { ...props } />;
-} );
