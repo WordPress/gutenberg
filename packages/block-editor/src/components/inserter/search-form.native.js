@@ -28,7 +28,7 @@ import {
  * Internal dependencies
  */
 import styles from './style.scss';
-import platformStyles from './searchFormStyles';
+import platformStyles from './searchFormStyles.scss';
 
 function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	const [ isActive, setIsActive ] = useState( false );
