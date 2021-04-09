@@ -353,7 +353,13 @@ $color-control-label-height: 20px;
  */
 
 // These needs extra specificity in the editor.
-.components-button.wp-block-navigation__responsive-container-close,
+.wp-block-navigation__responsive-container:not(.is-menu-open) {
+	.components-button.wp-block-navigation__responsive-container-close {
+		@include break-small {
+			display: none;
+		}
+	}
+}
 .components-button.wp-block-navigation__responsive-container-open {
 	@include break-small {
 		display: none;
