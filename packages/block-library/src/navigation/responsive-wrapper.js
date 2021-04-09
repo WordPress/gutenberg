@@ -36,7 +36,7 @@ export default function ResponsiveWrapper( props ) {
 	return (
 		<>
 			<Button
-				className="wp-block-navigation__responsive-container-open "
+				className="wp-block-navigation__responsive-container-open"
 				aria-label="Close menu"
 				data-micromodal-trigger={ modalId }
 				onClick={ () => props.onToggle( true ) }
