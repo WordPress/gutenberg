@@ -8,6 +8,8 @@ import { omit, keyBy } from 'lodash';
  */
 import { serialize, parse, createBlock } from '@wordpress/blocks';
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
+import { select } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function addWidgetIdToBlock( block, widgetId ) {
 	return {
@@ -117,6 +119,17 @@ export default function useSidebarBlockEditor( sidebar ) {
 
 	const ignoreIncoming = useRef( false );
 
+	// Get the blocks from the store and save it back to component's states once mounted.
+	// This is necessary since that after the first onChangeBlocks fired,
+	// all the blocks in the callback are transformed once via getBlocks internally.
+	// In order to only perform referential equality check in the callback,
+	// we have to make sure the references are the same between state and store.
+	useEffect( () => {
+		const storedBlocks = select( blockEditorStore ).getBlocks( null );
+
+		setBlocks( storedBlocks );
+	}, [] );
+
 	useEffect( () => {
 		const handler = ( event ) => {
 			if ( ignoreIncoming.current ) {
@@ -202,6 +215,8 @@ export default function useSidebarBlockEditor( sidebar ) {
 						// Update existing widgets.
 						const prevBlock = prevBlocksMap.get( widgetId );
 
+						// We can do referential equality check rather than isEqual here
+						// because the block editor store makes sure to cache the blocks for us.
 						if ( nextBlock !== prevBlock ) {
 							const widgetToUpdate = sidebar.getWidget(
 								widgetId
