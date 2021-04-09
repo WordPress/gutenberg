@@ -14,9 +14,9 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Post Comment Edit Link', 'block title' ),
+	title: _x( 'Edit Comment Link', 'block title' ),
 	description: __(
-		'Displays a link to edit the comment in the WordPress Dashboard. This link is only visible to users with the edit comment capability.'
+		'Displays a link to edit the comment in the WordPress Dashboard. This link is only visible to Administrators and Editors.'
 	),
 	icon,
 	edit,

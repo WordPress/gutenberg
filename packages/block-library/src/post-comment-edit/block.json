@@ -3,9 +3,7 @@
 	"name": "core/post-comment-edit",
 	"category": "design",
 	"usesContext": [ "commentId" ],
-	"parent": [
-		"core/post-comment"
-	],
+	"parent": [ "core/post-comment" ],
 	"attributes": {
 		"openInNewTab": {
 			"type": "boolean",

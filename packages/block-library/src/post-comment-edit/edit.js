@@ -13,7 +13,7 @@ export default function Edit( { attributes, setAttributes } ) {
 			<InspectorControls>
 				<PanelBody title={ __( 'Link settings' ) }>
 					<ToggleControl
-						label={ __( 'Open in new tab' ) }
+						label={ __( 'Open in a new tab' ) }
 						checked={ openInNewTab }
 						onChange={ () =>
 							setAttributes( {
