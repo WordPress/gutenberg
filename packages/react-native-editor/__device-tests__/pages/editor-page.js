@@ -571,6 +571,61 @@ class EditorPage {
 	}
 
 	// =============================
+	// Search Block functions
+	// =============================
+
+	async findTextViewForSearchBlock( searchTerm ) {
+		let textViewElementName = 'XCUIElementTypeButton';
+		if ( isAndroid() ) {
+			textViewElementName = 'android.view.View';
+		}
+
+		const locator = `//${ textViewElementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "${ searchTerm }")]`;
+
+		console.log( `AMANDA-TEST > locator: ${ locator }` );
+
+		// TODO AMANDA - do I need to use await here?
+		return await this.driver.elementByXPath( locator );
+	}
+
+	async getPlaceholderTextViewForSearchBlock() {
+		let textViewElementName = 'XCUIElementTypeTextView';
+		if ( isAndroid() ) {
+			textViewElementName = 'android.widget.EditText';
+		}
+
+		const locator = `//${ textViewElementName }[@${ this.accessibilityIdXPathAttrib }="searchInputField"]`;
+
+		// TODO AMANDA - do I need to use await here?
+		return await this.driver.elementByXPath( locator );
+	}
+
+	async getLabelTextViewForSearchBlock( block ) {
+		let textViewElementName = 'XCUIElementTypeTextView';
+		if ( isAndroid() ) {
+			textViewElementName = 'android.widget.EditText';
+		}
+
+		// const accessibilityId = await block.getAttribute(
+		// 	this.accessibilityIdKey
+		// );
+		// const blockLocator = `//*[@${
+		// 	this.accessibilityIdXPathAttrib
+		// }=${ JSON.stringify( accessibilityId ) }]//${ textViewElementName }`;
+		// const locator = `//android.view.View[starts-with(@content-desc, "Search block label")]/android.widget.EditText[1]`;
+		const locator = `//XCUIElementTypeButton[starts-with(@content-desc, "Search block label")]/XCUIElementTypeTextView[1]`;
+		return await this.driver.elementByXPath( locator );
+	}
+
+	// async getLabelTextViewForSearchBlock() {
+	// 	return await this.findTextViewForSearchBlock( 'Search block label' );
+	// }
+
+	async getButtonTextViewForSearchBlock() {
+		return await this.findTextViewForSearchBlock( 'Search button' );
+	}
+
+	// =============================
 	// Unsupported Block functions
 	// =============================
 
