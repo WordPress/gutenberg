@@ -78,6 +78,7 @@ module.exports = async function readConfig( configPath ) {
 		config: {
 			WP_DEBUG: true,
 			SCRIPT_DEBUG: true,
+			WP_ENVIRONMENT_TYPE: 'local',
 			WP_PHP_BINARY: 'php',
 			WP_TESTS_EMAIL: 'admin@example.org',
 			WP_TESTS_TITLE: 'Test Blog',
