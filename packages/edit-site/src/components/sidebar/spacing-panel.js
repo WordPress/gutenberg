@@ -8,11 +8,13 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { getBlockSupport } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useEditorFeature } from '../editor/utils';
+import { store as editSiteStore } from '../../store';
 
 const isWeb = Platform.OS === 'web';
 const CSS_UNITS = [
@@ -75,28 +77,25 @@ function useCustomUnits( { units, contextName } ) {
 function useCustomSides( blockName, feature ) {
 	const support = getBlockSupport( blockName, 'spacing' );
 
-	// Return empty config when setting is boolean as theme isn't setting
-	// arbitrary sides.
+	// Skip when setting is boolean as theme isn't setting arbitrary sides.
 	if ( typeof support[ feature ] === 'boolean' ) {
-		return {};
+		return;
 	}
 
 	return support[ feature ];
 }
 
 function filterValuesBySides( values, sides ) {
-	if ( Object.entries( sides ).length === 0 ) {
+	if ( ! sides ) {
 		// If no custom side configuration all sides are opted into by default.
 		return values;
 	}
 
 	// Only include sides opted into within filtered values.
-	return Object.keys( sides )
-		.filter( ( side ) => sides[ side ] )
-		.reduce(
-			( filtered, side ) => ( { ...filtered, [ side ]: values[ side ] } ),
-			{}
-		);
+	const filteredValues = {};
+	sides.forEach( ( side ) => ( filteredValues[ side ] = values[ side ] ) );
+
+	return filteredValues;
 }
 
 export default function SpacingPanel( { context, getStyle, setStyle } ) {
@@ -105,6 +104,15 @@ export default function SpacingPanel( { context, getStyle, setStyle } ) {
 	const units = useCustomUnits( { contextName: name, units: CSS_UNITS } );
 
 	const paddingValues = getStyle( name, 'padding' );
+	const themePaddingValues = useSelect(
+		( select ) => {
+			const baseStyles = select( editSiteStore ).getSettings()
+				.__experimentalGlobalStylesBaseStyles;
+			return baseStyles?.styles?.[ name ]?.spacing?.padding;
+		},
+		[ name ]
+	);
+
 	const paddingSides = useCustomSides( name, 'padding' );
 
 	const setPaddingValues = ( newPaddingValues ) => {
@@ -121,7 +129,7 @@ export default function SpacingPanel( { context, getStyle, setStyle } ) {
 					label={ __( 'Padding' ) }
 					sides={ paddingSides }
 					units={ units }
-					resetToInitialValues
+					resetValues={ themePaddingValues }
 				/>
 			) }
 		</PanelBody>

@@ -75,10 +75,9 @@ const useIsSpacingDisabled = ( props = {} ) => {
 export function useCustomSides( blockName, feature ) {
 	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
 
-	// Return empty config when setting is boolean as theme isn't setting
-	// arbitrary sides.
+	// Skip when setting is boolean as theme isn't setting arbitrary sides.
 	if ( typeof support[ feature ] === 'boolean' ) {
-		return {};
+		return;
 	}
 
 	return support[ feature ];
