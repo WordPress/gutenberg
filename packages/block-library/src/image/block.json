@@ -73,7 +73,7 @@
 	"supports": {
 		"anchor": true,
 		"color": {
-			"duotone": "img",
+			"__experimentalDuotone": "img",
 			"text": false,
 			"background": false
 		},

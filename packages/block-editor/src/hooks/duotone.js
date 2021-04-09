@@ -133,7 +133,7 @@ function DuotonePanel( { attributes, setAttributes } ) {
  * @return {Object}          Filtered block settings
  */
 function addDuotoneAttributes( settings ) {
-	if ( ! hasBlockSupport( settings, 'color.duotone' ) ) {
+	if ( ! hasBlockSupport( settings, 'color.__experimentalDuotone' ) ) {
 		return settings;
 	}
 
@@ -161,7 +161,7 @@ const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const hasDuotoneSupport = hasBlockSupport(
 			props.name,
-			'color.duotone'
+			'color.__experimentalDuotone'
 		);
 
 		return (
@@ -182,7 +182,10 @@ const withDuotoneControls = createHigherOrderComponent(
  */
 const withDuotoneStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
-		const duotoneSupport = getBlockSupport( props.name, 'color.duotone' );
+		const duotoneSupport = getBlockSupport(
+			props.name,
+			'color.__experimentalDuotone'
+		);
 		const values = props?.attributes?.style?.color?.duotone;
 
 		if ( ! duotoneSupport || ! values ) {
