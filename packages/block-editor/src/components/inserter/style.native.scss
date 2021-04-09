@@ -23,7 +23,6 @@
 .inserter-search-form__container {
 	height: 46px;
 	margin: 0 $grid-unit-30 $grid-unit-10;
-	margin-right: $grid-unit-30;
 	flex-direction: row;
 	justify-content: space-between;
 }
@@ -43,7 +42,6 @@
 .inserter-search-form__form-input {
 	color: $gray-dark;
 	text-align: left;
-	flex: 1;
 }
 
 .inserter-search-form__form-input--dark {

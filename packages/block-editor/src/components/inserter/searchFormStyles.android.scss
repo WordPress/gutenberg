@@ -1,7 +1,16 @@
 .inserter-search-form__form {
 	border: 1px $gray-light;
 }
-
+.inserter-search-form__form-input {
+	flex: 1;
+}
 .inserter-search-form__form--active {
 	border: none;
+}
+
+.inserter-search-form__container--active {
+	border-bottom-color: $gray-light;
+	border-bottom-width: 2px;
+	margin-left: 0;
+	margin-right: 0;
 }

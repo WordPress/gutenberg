@@ -52,6 +52,9 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 			platformStyles[ 'inserter-search-form__container--active' ],
 			platformStyles[ 'inserter-search-form__container--active-dark' ]
 		),
+		...{
+			border: '1px blue',
+		},
 	};
 
 	const formStyle = {
@@ -72,10 +75,17 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 			platformStyles[ 'inserter-search-form__form--active-dark' ]
 		),
 	};
-	const formInputStyle = usePreferredColorSchemeStyle(
-		styles[ 'inserter-search-form__form-input' ],
-		styles[ 'inserter-search-form__form-input--dark' ]
-	);
+
+	const formInputStyle = {
+		...usePreferredColorSchemeStyle(
+			styles[ 'inserter-search-form__form-input' ],
+			styles[ 'inserter-search-form__form-input--dark' ]
+		),
+		...usePreferredColorSchemeStyle(
+			platformStyles[ 'inserter-search-form__form-input' ],
+			platformStyles[ 'inserter-search-form__form-input--dark' ]
+		),
+	};
 
 	const formInputActiveStyle = {
 		...formInputStyle,
