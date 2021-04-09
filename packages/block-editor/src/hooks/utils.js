@@ -60,14 +60,14 @@ export const useKsesSanitization = ( allowedHtmlTags ) => {
 /**
  * Returns all the available block types.
  *
- * @param {string} allowedHtmlTags Allowed HTML Tags.
+ * @param {Object} allowedHtmlTags Allowed HTML Tags.
  * @return {Array} Block Types.
  */
 export const allowedTagsToKsesSchema = ( allowedHtmlTags ) => {
 	const schema = {
 		'#text': {},
 	};
-	for ( const tagName of Object.keys( allowedHtmlTags ) ) {
+	for ( const tagName of Object.keys( allowedHtmlTags || {} ) ) {
 		schema[ tagName ] = {
 			attributes: map( allowedHtmlTags[ tagName ], ( enabled, attr ) => [
 				attr,
