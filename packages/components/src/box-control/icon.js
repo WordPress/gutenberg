@@ -18,7 +18,8 @@ export default function BoxControlIcon( {
 	sides,
 	...props
 } ) {
-	const isSideDisabled = ( value ) => sides && sides[ value ] === false;
+	const isSideDisabled = ( value ) => sides && ! sides.includes( value );
+
 	const getSide = ( value ) => {
 		if ( isSideDisabled( value ) ) {
 			return false;
