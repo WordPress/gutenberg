@@ -31,7 +31,7 @@ const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 const layoutProp = { type: 'default', alignments: [] };
 
 export default function ButtonsEdit( {
-	attributes: { contentJustification, align, orientation },
+	attributes: { contentJustification, align },
 	clientId,
 	isSelected,
 	setAttributes,
