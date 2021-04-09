@@ -346,10 +346,14 @@ $color-control-label-height: 20px;
 	// And in that view we also know that the toolbar is stacked.
 	body.admin-bar & {
 		top: $admin-bar-height-big + $header-height + $block-toolbar-height;
+
+		@include break-medium() {
+			top: $header-height;
+		}
 	}
 }
 
-// Without this, the focus style isn't applied correctly.
+// Without this, the block cannot be selected, nor does the right container get focus.
 // @todo: this is disruptive. Ideally we can retire a few of the containers,
 // so focus is applied naturally on the block container.
 // It's important the right container has focus, otherwise you can't press
@@ -358,6 +362,7 @@ $color-control-label-height: 20px;
 	@include break-small() {
 		pointer-events: none;
 
+		.wp-block-navigation__responsive-container-close,
 		.block-editor-block-list__layout * {
 			pointer-events: all;
 		}
