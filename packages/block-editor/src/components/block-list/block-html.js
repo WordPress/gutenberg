@@ -14,6 +14,7 @@ import {
 	getBlockType,
 	isValidBlockContent,
 	getSaveContent,
+	__unstableCodeHandler as codeHandler,
 } from '@wordpress/blocks';
 
 /**
@@ -29,19 +30,21 @@ function BlockHTML( { clientId } ) {
 	);
 	const { updateBlock } = useDispatch( blockEditorStore );
 	const onChange = () => {
+		const sanitizedHtml = codeHandler( { HTML: html } );
 		const blockType = getBlockType( block.name );
 		const attributes = getBlockAttributes(
 			blockType,
-			html,
+			sanitizedHtml,
 			block.attributes
 		);
 
 		// If html is empty  we reset the block to the default HTML and mark it as valid to avoid triggering an error
-		const content = html ? html : getSaveContent( blockType, attributes );
-		const isValid = html
+		const content = sanitizedHtml
+			? sanitizedHtml
+			: getSaveContent( blockType, attributes );
+		const isValid = sanitizedHtml
 			? isValidBlockContent( blockType, attributes, content )
 			: true;
-
 		updateBlock( clientId, {
 			attributes,
 			originalContent: content,

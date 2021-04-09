@@ -46,6 +46,7 @@ export {
 export {
 	pasteHandler,
 	rawHandler,
+	codeHandler as __unstableCodeHandler,
 	deprecatedGetPhrasingContentSchema as getPhrasingContentSchema,
 } from './raw-handling';
 

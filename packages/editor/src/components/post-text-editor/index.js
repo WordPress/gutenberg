@@ -8,7 +8,7 @@ import Textarea from 'react-autosize-textarea';
  */
 import { __ } from '@wordpress/i18n';
 import { useState } from '@wordpress/element';
-import { parse } from '@wordpress/blocks';
+import { __unstableCodeHandler as codeHandler } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
@@ -54,7 +54,7 @@ export default function PostTextEditor() {
 	 */
 	const stopEditing = () => {
 		if ( isDirty ) {
-			const blocks = parse( value );
+			const blocks = codeHandler( { HTML: value } );
 			resetEditorBlocks( blocks );
 			setIsDirty( false );
 		}
