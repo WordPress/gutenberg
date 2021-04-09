@@ -65,18 +65,30 @@ const stylesTransform = ( content ) => {
 	return content;
 };
 
+/*
+ * Matches a block's name in paths in the form
+ * src/<blockName>/frontend.js
+ */
 const blockNameRegex = new RegExp( /(?<=src\/).*(?=(\/frontend))/g );
 
 const createEntrypoints = () => {
+	/*
+	 * Returns an array of paths to frontend.js files within the block-directory package.
+	 * These paths can be matched by the regex `blockNameRegex` in order to extract
+	 * the block's name.
+	 *
+	 * Returns an empty array if no files were found.
+	 */
 	const scriptPaths = fastGlob.sync(
-		'./packages/block-library/src/**/frontend.js',
-		{
-			ignore: [ '**/build*/**' ],
-		}
+		'./packages/block-library/src/**/frontend.js'
 	);
 
+	/*
+	 * Go through the paths found above, in order to define webpack entry points for
+	 * each block's frontend.js file.
+	 */
 	const scriptEntries = scriptPaths.reduce( ( entries, scriptPath ) => {
-		const [ blockName ] = scriptPath.match( blockNameRegex ) || [];
+		const [ blockName ] = scriptPath.match( blockNameRegex );
 
 		return {
 			...entries,
