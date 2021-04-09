@@ -7,7 +7,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
-import { useRef, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -52,20 +52,13 @@ export default function BoxControl( {
 	values: valuesProp,
 	units,
 	sides,
-	resetToInitialValues = false,
+	resetValues = DEFAULT_VALUES,
 } ) {
 	const [ values, setValues ] = useControlledState( valuesProp, {
 		fallback: DEFAULT_VALUES,
 	} );
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( valuesProp );
-
-	// Determine which values the reset button should apply.
-	// Global styles generally prefer to reset to the initial value likely
-	// coming from a theme.
-	const resetValues = useRef(
-		resetToInitialValues && valuesProp ? valuesProp : DEFAULT_VALUES
-	);
 
 	const [ isDirty, setIsDirty ] = useState( hasInitialValue );
 	const [ isLinked, setIsLinked ] = useState(
@@ -101,8 +94,8 @@ export default function BoxControl( {
 	};
 
 	const handleOnReset = () => {
-		onChange( resetValues.current );
-		setValues( resetValues.current );
+		onChange( resetValues );
+		setValues( resetValues );
 		setIsDirty( false );
 	};
 
