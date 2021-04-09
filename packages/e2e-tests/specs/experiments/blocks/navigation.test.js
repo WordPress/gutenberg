@@ -8,6 +8,7 @@ import {
 	insertBlock,
 	setUpResponseMocking,
 	pressKeyWithModifier,
+	saveDraft,
 	showBlockToolbar,
 } from '@wordpress/e2e-test-utils';
 
@@ -505,5 +506,47 @@ describe( 'Navigation', () => {
 
 		// Expect a Navigation Block with a link for "A really long page name that will not exist".
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'loads frontend code only if the block is present', async () => {
+		// Mock the response from the Pages endpoint. This is done so that the pages returned are always
+		// consistent and to test the feature more rigorously than the single default sample page.
+		await mockPagesResponse( [
+			{
+				title: 'Home',
+				slug: 'home',
+			},
+			{
+				title: 'About',
+				slug: 'about',
+			},
+			{
+				title: 'Contact Us',
+				slug: 'contact',
+			},
+		] );
+
+		let isScriptLoaded;
+
+		isScriptLoaded = await page.evaluate(
+			() =>
+				null !== document.querySelector( 'script[src*="frontend.js"]' )
+		);
+
+		expect( isScriptLoaded ).toBe( false );
+
+		await insertBlock( 'Navigation' );
+		await createNavBlockWithAllPages();
+		await saveDraft();
+		await page.reload( {
+			waitFor: [ 'networkidle0', 'domcontentloaded' ],
+		} );
+
+		isScriptLoaded = await page.evaluate(
+			() =>
+				null !== document.querySelector( 'script[src*="frontend.js"]' )
+		);
+
+		expect( isScriptLoaded ).toBe( true );
 	} );
 } );
