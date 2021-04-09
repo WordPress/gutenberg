@@ -6,7 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetInlineStyles as getInlineStyles,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -15,7 +19,6 @@ import getColorAndStyleProps from './color-props';
 
 export default function save( { attributes, className } ) {
 	const {
-		borderRadius,
 		fontSize,
 		linkTarget,
 		rel,
@@ -35,13 +38,9 @@ export default function save( { attributes, className } ) {
 		'wp-block-button__link',
 		colorProps.className,
 		{
-			'no-border-radius': borderRadius === 0,
+			'no-border-radius': style?.border?.radius === 0,
 		}
 	);
-	const buttonStyle = {
-		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
-		...colorProps.style,
-	};
 
 	// The use of a `title` attribute here is soft-deprecated, but still applied
 	// if it had already been assigned, for the sake of backward-compatibility.
@@ -59,7 +58,10 @@ export default function save( { attributes, className } ) {
 				className={ buttonClasses }
 				href={ url }
 				title={ title }
-				style={ buttonStyle }
+				style={ {
+					...getInlineStyles( style ),
+					...colorProps.style,
+				} }
 				value={ text }
 				target={ linkTarget }
 				rel={ rel }

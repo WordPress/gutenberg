@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-   Export `__experimentalGetInlineStyles` to enable blocks to flatten nested style attributes into CSS properties ([#26655](https://github.com/WordPress/gutenberg/pull/30194)).
+
 ## 5.3.0 (2021-03-17)
 
 -   Add `JustifyToolbar` component abstracted out of the Navigation block so can be used elsewhere.
