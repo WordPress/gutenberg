@@ -35,7 +35,7 @@ function BlockHTML( { clientId } ) {
 		const blockType = getBlockType( block.name );
 		const attributes = getBlockAttributes(
 			blockType,
-			html,
+			sanitizedHtml,
 			block.attributes
 		);
 
@@ -43,16 +43,12 @@ function BlockHTML( { clientId } ) {
 		const content = sanitizedHtml
 			? sanitizedHtml
 			: getSaveContent( blockType, attributes );
-		const originalContent = html
-			? html
-			: getSaveContent( blockType, attributes );
 		const isValid = sanitizedHtml
 			? isValidBlockContent( blockType, attributes, content )
 			: true;
-
 		updateBlock( clientId, {
 			attributes,
-			originalContent,
+			originalContent: content,
 			isValid,
 		} );
 
