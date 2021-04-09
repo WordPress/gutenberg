@@ -101,7 +101,6 @@ function render_block_core_template_part( $attributes ) {
 	unset( $seen_ids[ $template_part_id ] );
 	$content = wptexturize( $content );
 	$content = convert_smilies( $content );
-	$content = wpautop( $content );
 	$content = shortcode_unautop( $content );
 	if ( function_exists( 'wp_filter_content_tags' ) ) {
 		$content = wp_filter_content_tags( $content );
