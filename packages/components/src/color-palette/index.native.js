@@ -12,12 +12,15 @@ import {
 	Text,
 } from 'react-native';
 import { map, uniq } from 'lodash';
+
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
 import { useRef, useEffect, useState } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { __experimentalUseEditorFeature as useEditorFeature } from '@wordpress/block-editor';
+
 /**
  * Internal dependencies
  */
@@ -68,9 +71,17 @@ function ColorPalette( {
 	const scale = useRef( new Animated.Value( 1 ) ).current;
 	const opacity = useRef( new Animated.Value( 1 ) ).current;
 
-	const defaultColors = uniq( map( defaultSettings.colors, 'color' ) );
+	const defaultColors = uniq(
+		map(
+			useEditorFeature( 'color.palette' ) || defaultSettings.colors,
+			'color'
+		)
+	);
 	const defaultGradientColors = uniq(
-		map( defaultSettings.gradients, 'gradient' )
+		map(
+			useEditorFeature( 'color.gradients' ) || defaultSettings.gradients,
+			'gradient'
+		)
 	);
 	const colors = isGradientSegment ? defaultGradientColors : defaultColors;
 

@@ -1,7 +1,4 @@
 /**
- * External dependencies
- */
-/**
  * WordPress dependencies
  */
 import RNReactNativeGutenbergBridge, {
@@ -15,10 +12,6 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
 } from '@wordpress/react-native-bridge';
-
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
 import {
@@ -34,6 +27,7 @@ import {
 	validateThemeColors,
 	validateThemeGradients,
 } from '@wordpress/block-editor';
+import { getGlobalStyles } from '@wordpress/components';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -56,6 +50,7 @@ const postTypeEntities = [
  * Internal dependencies
  */
 import EditorProvider from './index.js';
+import GLOBAL_STYLES_DATA from './theme_data';
 
 class NativeEditorProvider extends Component {
 	constructor() {
@@ -73,12 +68,18 @@ class NativeEditorProvider extends Component {
 
 	componentDidMount() {
 		const { capabilities, colors, gradients } = this.props;
+		const isFSETheme = GLOBAL_STYLES_DATA?.isFSETheme;
 
 		this.props.updateSettings( {
 			...capabilities,
 			// Set theme colors for the editor
 			...( colors ? { colors } : {} ),
 			...( gradients ? { gradients } : {} ),
+			...( isFSETheme
+				? getGlobalStyles(
+						GLOBAL_STYLES_DATA?.__experimentalGlobalStylesBaseStyles
+				  )
+				: {} ),
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
