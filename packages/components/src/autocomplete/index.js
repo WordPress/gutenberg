@@ -20,7 +20,6 @@ import {
 	DOWN,
 	LEFT,
 	RIGHT,
-	BACKSPACE,
 } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
@@ -301,7 +300,6 @@ function Autocomplete( {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
-	const [ mismatch, setMismatch ] = useState( false );
 
 	function insertCompletion( replacement ) {
 		const end = record.start;
@@ -384,11 +382,10 @@ function Autocomplete( {
 	}
 
 	function handleKeyDown( event ) {
-		if ( ! autocompleter && event.keyCode !== BACKSPACE ) {
+		if ( ! autocompleter ) {
 			return;
 		}
-		if ( filteredOptions.length === 0 && event.keyCode !== BACKSPACE ) {
-			setMismatch( true );
+		if ( filteredOptions.length === 0 ) {
 			return;
 		}
 
@@ -415,9 +412,6 @@ function Autocomplete( {
 			case ENTER:
 				select( filteredOptions[ selectedIndex ] );
 				break;
-			case BACKSPACE:
-				setMismatch( false );
-				return;
 			case LEFT:
 			case RIGHT:
 				reset();
@@ -450,12 +444,6 @@ function Autocomplete( {
 		const completer = find(
 			completers,
 			( { triggerPrefix, allowContext } ) => {
-				// If we don't have any matching filteredOptions from the last render iteration +
-				// we didn't have a new trigger typed, then we should not continue with this effect.
-				if ( mismatch && text.slice( -1 ) !== triggerPrefix ) {
-					return false;
-				}
-
 				const index = text.lastIndexOf( triggerPrefix );
 
 				if ( index === -1 ) {
@@ -489,13 +477,20 @@ function Autocomplete( {
 			return;
 		}
 
+		// If we don't have any matching filteredOptions from the last render iteration +
+		// we didn't have a new trigger typed, then we should not continue with this effect.
+		const mismatch = filteredOptions.length === 0;
+		if (mismatch && text.slice(-1) !== completer.triggerPrefix) {
+			return;
+		}
+
 		const safeTrigger = escapeRegExp( completer.triggerPrefix );
 		const match = text
 			.slice( text.lastIndexOf( completer.triggerPrefix ) )
 			.match( new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` ) );
 		const query = match && match[ 1 ];
 
-		// console.log( match ); // uncomment this to make this easier to test
+		//console.log( match ); // uncomment this to make this easier to test
 
 		setAutocompleter( completer );
 		setAutocompleterUI( () =>
