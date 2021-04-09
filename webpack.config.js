@@ -291,7 +291,7 @@ module.exports = {
 		new DependencyExtractionWebpackPlugin( { injectPolyfill: true } ),
 	].filter( Boolean ),
 	watchOptions: {
-		ignored: '!packages/*/build-module/**/*',
+		ignored: [ '**/node_modules', '**/packages/*/src' ],
 		aggregateTimeout: 500,
 	},
 	devtool,
