@@ -454,7 +454,11 @@ function Autocomplete( {
 				const textFromLastTrigger = text.slice(
 					text.lastIndexOf( triggerPrefix )
 				);
-				const triggerMatchHint = textFromLastTrigger.split( /\s/ )[ 0 ];
+
+				const lastTriggerHintParts = textFromLastTrigger.split( /\s/ );
+				const triggerMatchHint =
+					lastTriggerHintParts.length === 1 &&
+					lastTriggerHintParts[ 0 ];
 				const tooDistantFromTrigger = textFromLastTrigger.length > 50; // 50 chars seem to be a good limit
 
 				console.log( '------------------------' );
@@ -467,7 +471,7 @@ function Autocomplete( {
 				console.log( '------------------------' );
 
 				if ( mismatch && ! triggerMatchHint ) {
-					console.log( 'Mismatch!' );
+					console.log( 'Mismatch, bailing out!' );
 					return false;
 				}
 
@@ -504,7 +508,7 @@ function Autocomplete( {
 
 		// We're trying to avoid reaching this part when there's no match in the
 		// autocompleter UI, so uncomment this to make this easier to test:
-		console.log( match[ 1 ] );
+		console.log( 'Query: ', query );
 
 		setFilterValue( query );
 		setAutocompleter( completer );
