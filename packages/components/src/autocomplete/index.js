@@ -13,15 +13,7 @@ import {
 	useLayoutEffect,
 	useState,
 } from '@wordpress/element';
-import {
-	ENTER,
-	ESCAPE,
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	BACKSPACE,
-} from '@wordpress/keycodes';
+import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import {
@@ -301,7 +293,6 @@ function Autocomplete( {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
-	const [ backspacing, setBackspacing ] = useState( false );
 
 	function insertCompletion( replacement ) {
 		const end = record.start;
@@ -384,8 +375,6 @@ function Autocomplete( {
 	}
 
 	function handleKeyDown( event ) {
-		setBackspacing( event.keyCode === BACKSPACE );
-
 		if ( ! autocompleter ) {
 			return;
 		}
@@ -472,7 +461,6 @@ function Autocomplete( {
 				//				console.log( 'atTrigger: ', atTrigger );
 				console.log( 'mismatch: ', mismatch );
 				console.log( 'tooDistantFromTrigger: ', tooDistantFromTrigger );
-				console.log( 'backspacing: ', backspacing );
 				console.log( 'textAfterSelection: ', textAfterSelection );
 				console.log( 'textFromLastTrigger: ', textFromLastTrigger );
 				console.log( 'triggerMatch: ', triggerMatch );
@@ -480,7 +468,7 @@ function Autocomplete( {
 
 				if ( tooDistantFromTrigger ) return false;
 
-				if ( mismatch && ! triggerMatch && ! backspacing ) {
+				if ( mismatch && ! triggerMatch ) {
 					console.log( 'Mismatch!' );
 					return false;
 				}
