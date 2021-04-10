@@ -73,7 +73,6 @@ export class ImageEdit extends Component {
 
 		this.state = {
 			isCaptionSelected: false,
-			isFeaturedImage: false,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
@@ -88,7 +87,6 @@ export class ImageEdit extends Component {
 		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
 		this.featuredImageIdCurrent = this.featuredImageIdCurrent.bind( this );
-		this.setFeaturedImageState = this.setFeaturedImageState.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
@@ -127,11 +125,7 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const {
-			attributes,
-			setAttributes,
-			initialFeaturedImageId,
-		} = this.props;
+		const { attributes, setAttributes } = this.props;
 		// This will warn when we have `id` defined, while `url` is undefined.
 		// This may help track this issue: https://github.com/wordpress-mobile/WordPress-Android/issues/9768
 		// where a cancelled image upload was resulting in a subsequent crash.
@@ -163,11 +157,6 @@ export class ImageEdit extends Component {
 			mediaUploadSync();
 		}
 
-		// Check whether an image is featured when the editor first loads.
-		if ( initialFeaturedImageId === attributes.id ) {
-			this.setFeaturedImageState( initialFeaturedImageId );
-		}
-
 		this.addFeaturedImageIdListener();
 	}
 
@@ -187,17 +176,10 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( previousProps ) {
-		const { image, attributes } = this.props;
-
 		if ( ! previousProps.image && this.props.image ) {
+			const { image, attributes } = this.props;
 			const url = getUrlForSlug( image, attributes ) || image.source_url;
 			this.props.setAttributes( { url } );
-		}
-
-		// When an image is replaced directly within the block, we need to check
-		// whether it's featured.
-		if ( previousProps.attributes.id !== this.props.attributes.id ) {
-			this.setFeaturedImageState( attributes.currentFeaturedImageId );
 		}
 	}
 
@@ -306,22 +288,9 @@ export class ImageEdit extends Component {
 		closeSettingsBottomSheet();
 	}
 
-	setFeaturedImageState( featuredImageId ) {
-		const { attributes } = this.props;
-
-		return featuredImageId === attributes.id
-			? this.setState( {
-					isFeaturedImage: true,
-			  } )
-			: this.setState( {
-					isFeaturedImage: false,
-			  } );
-	}
-
 	featuredImageIdCurrent( payload ) {
 		const { setAttributes } = this.props;
-		this.setFeaturedImageState( payload.featuredImageId );
-		setAttributes( { currentFeaturedImageId: payload.featuredImageId } );
+		setAttributes( { featuredImageId: payload.featuredImageId } );
 	}
 
 	addFeaturedImageIdListener() {
@@ -506,7 +475,7 @@ export class ImageEdit extends Component {
 	}
 
 	render() {
-		const { isCaptionSelected, isFeaturedImage } = this.state;
+		const { isCaptionSelected } = this.state;
 		const {
 			attributes,
 			isSelected,
@@ -516,6 +485,9 @@ export class ImageEdit extends Component {
 			getStylesFromColorScheme,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
+
+		const isFeaturedImage =
+			attributes.featuredImageId === attributes.id ? true : false;
 
 		const sizeOptionsValid = find( this.sizeOptions, [
 			'value',
@@ -627,7 +599,7 @@ export class ImageEdit extends Component {
 						{ isSelected && getMediaOptions() }
 						{ ! this.state.isCaptionSelected &&
 							getToolbarEditButton( openMediaOptions ) }
-						{ this.state.isFeaturedImage }
+						{ isFeaturedImage }
 						<MediaUploadProgress
 							coverUrl={ url }
 							mediaId={ id }
@@ -708,9 +680,7 @@ export default compose( [
 		} = props;
 		const { imageSizes, imageDefaultSize } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
-		const initialFeaturedImageId = getEditedPostAttribute(
-			'featured_media'
-		);
+		const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 		const shouldGetMedia =
 			( isSelected && isNotFileUrl ) ||
@@ -724,7 +694,7 @@ export default compose( [
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
 			imageDefaultSize,
-			initialFeaturedImageId,
+			featuredImageId,
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
