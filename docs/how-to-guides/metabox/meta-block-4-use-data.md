@@ -40,4 +40,3 @@ register_block_type( 'core/paragraph', array(
 	'render_callback' => 'myguten_render_paragraph',
 ) );
 ```
-
