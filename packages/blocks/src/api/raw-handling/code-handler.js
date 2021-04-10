@@ -16,7 +16,11 @@ import {
 } from '../registration';
 import { parseWithGrammar } from '../parser';
 
-export function codeHandler( { HTML = '' } ) {
+export function codeHandler( { HTML = '', mode = 'BLOCKS' } ) {
+	if ( mode === 'INLINE' ) {
+		return deepFilterHTML( HTML, [ scriptRemover, onFilter ] );
+	}
+
 	const freeformName = getFreeformContentHandlerName();
 	const unregisteredName = getUnregisteredTypeHandlerName();
 

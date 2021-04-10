@@ -30,7 +30,7 @@ function BlockHTML( { clientId } ) {
 	);
 	const { updateBlock } = useDispatch( blockEditorStore );
 	const onChange = () => {
-		const sanitizedHtml = codeHandler( { HTML: html } );
+		const sanitizedHtml = codeHandler( { HTML: html, mode: 'INLINE' } );
 		const blockType = getBlockType( block.name );
 		const attributes = getBlockAttributes(
 			blockType,
