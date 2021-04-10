@@ -3,13 +3,17 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ]
+		"types": [ "gutenberg-env" ],
+		"paths": {
+			"styled-griddie": [ "../../typings/styled-griddie" ]
+		}
 	},
 	"references": [
 		{ "path": "../deprecated" },
 		{ "path": "../element" },
 		{ "path": "../hooks" },
 		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" },
 		{ "path": "../primitives" },
 		{ "path": "../react-i18n" }
 	],

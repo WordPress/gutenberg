@@ -67,7 +67,7 @@ apiFetch.use( ( options, next ) => {
 	const start = Date.now();
 	const result = next( options );
 	result.then( () => {
-		console.log( 'The request took ' + Date.now() - start );
+		console.log( 'The request took ' + ( Date.now() - start ) + 'ms' );
 	} );
 	return result;
 } );

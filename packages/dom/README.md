@@ -151,8 +151,8 @@ the latter.
 
 _Parameters_
 
--   _newNode_ `Element`: Node to be inserted.
--   _referenceNode_ `Element`: Node after which to perform the insertion.
+-   _newNode_ `Node`: Node to be inserted.
+-   _referenceNode_ `Node`: Node after which to perform the insertion.
 
 _Returns_
 
@@ -291,7 +291,7 @@ Given a DOM node, removes it from the DOM.
 
 _Parameters_
 
--   _node_ `Element`: Node to be removed.
+-   _node_ `Node`: Node to be removed.
 
 _Returns_
 

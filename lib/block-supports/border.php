@@ -55,7 +55,7 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	$has_border_radius_support = gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'radius' ), false );
 	if ( $has_border_radius_support ) {
 		if ( isset( $block_attributes['style']['border']['radius'] ) ) {
-			$border_radius = intval( $block_attributes['style']['border']['radius'] );
+			$border_radius = (int) $block_attributes['style']['border']['radius'];
 			$styles[]      = sprintf( 'border-radius: %dpx;', $border_radius );
 		}
 	}
