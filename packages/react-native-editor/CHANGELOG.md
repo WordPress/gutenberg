@@ -10,6 +10,9 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+* [*] Image block: Improve text entry for long alt text. [#29670]
+
+## 1.50.0
 
 ## 1.50.1
 
