@@ -459,12 +459,19 @@ function Autocomplete( {
 				const triggerMatchHint =
 					lastTriggerHintParts.length === 1 &&
 					lastTriggerHintParts[ 0 ];
+				const tooDistantFromTrigger = textFromLastTrigger.length > 50; // 50 chars seem to be a good limit
 
 				console.log( '------------------------' );
 				console.log( 'mismatch: ', mismatch );
+				console.log( 'tooDistantFromTrigger: ', tooDistantFromTrigger );
 				console.log( 'textFromLastTrigger: ', textFromLastTrigger );
 				console.log( 'triggerMatchHint: ', triggerMatchHint );
 				console.log( '------------------------' );
+
+				// Safe-hatch, sometimes when typing too fast after a completion
+				// filteredOptions is still not set to empty. Might be removed after
+				// we better understand why that happens and address that.
+				if ( tooDistantFromTrigger ) return false;
 
 				if ( mismatch && ! triggerMatchHint ) {
 					console.log( 'Mismatch, bailing out!' );
@@ -504,13 +511,13 @@ function Autocomplete( {
 		// autocompleter UI, so uncomment this to make this easier to test:
 		console.log( 'Query: ', query );
 
-		setFilterValue( query );
 		setAutocompleter( completer );
 		setAutocompleterUI( () =>
 			completer !== autocompleter
 				? getAutoCompleterUI( completer )
 				: AutocompleterUI
 		);
+		setFilterValue( query );
 	}, [ textContent ] );
 
 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
