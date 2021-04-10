@@ -20,6 +20,7 @@ import {
 	DOWN,
 	LEFT,
 	RIGHT,
+	BACKSPACE,
 } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
@@ -300,6 +301,7 @@ function Autocomplete( {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
+	const [ backspacing, setBackspacing ] = useState( false );
 
 	function insertCompletion( replacement ) {
 		const end = record.start;
@@ -382,6 +384,8 @@ function Autocomplete( {
 	}
 
 	function handleKeyDown( event ) {
+		setBackspacing( event.keyCode === BACKSPACE );
+
 		if ( ! autocompleter ) {
 			return;
 		}
@@ -441,6 +445,7 @@ function Autocomplete( {
 		const textAfterSelection = getTextContent(
 			slice( record, undefined, getTextContent( record ).length )
 		);
+
 		const completer = find(
 			completers,
 			( { triggerPrefix, allowContext } ) => {
@@ -450,16 +455,42 @@ function Autocomplete( {
 					return false;
 				}
 
+				const textWithoutTrigger = text.slice(
+					index + triggerPrefix.length
+				);
+
+				// If we don't have any matching filteredOptions
+				// we didn't have a new trigger typed, then we should not continue with this effect.
+				const mismatch = filteredOptions.length === 0;
+				const textFromLastTrigger = text.slice(
+					text.lastIndexOf( triggerPrefix )
+				);
+				const triggerMatch = textFromLastTrigger.split( /\s/ )[ 0 ];
+				const tooDistantFromTrigger = textFromLastTrigger.length > 50; // 50 chars seem to be a good limit
+
+				console.log( '------------------------' );
+				//				console.log( 'atTrigger: ', atTrigger );
+				console.log( 'mismatch: ', mismatch );
+				console.log( 'tooDistantFromTrigger: ', tooDistantFromTrigger );
+				console.log( 'backspacing: ', backspacing );
+				console.log( 'textAfterSelection: ', textAfterSelection );
+				console.log( 'textFromLastTrigger: ', textFromLastTrigger );
+				console.log( 'triggerMatch: ', triggerMatch );
+				console.log( '------------------------' );
+
+				if ( tooDistantFromTrigger ) return false;
+
+				if ( mismatch && ! triggerMatch && ! backspacing ) {
+					console.log( 'Mismatch!' );
+					return false;
+				}
+
 				if (
 					allowContext &&
 					! allowContext( text.slice( 0, index ), textAfterSelection )
 				) {
 					return false;
 				}
-
-				const textWithoutTrigger = text.slice(
-					index + triggerPrefix.length
-				);
 
 				if (
 					/^\s/.test( textWithoutTrigger ) ||
@@ -477,28 +508,23 @@ function Autocomplete( {
 			return;
 		}
 
-		// If we don't have any matching filteredOptions from the last render iteration +
-		// we didn't have a new trigger typed, then we should not continue with this effect.
-		const mismatch = filteredOptions.length === 0;
-		if (mismatch && text.slice(-1) !== completer.triggerPrefix) {
-			return;
-		}
-
 		const safeTrigger = escapeRegExp( completer.triggerPrefix );
 		const match = text
 			.slice( text.lastIndexOf( completer.triggerPrefix ) )
 			.match( new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` ) );
 		const query = match && match[ 1 ];
 
-		//console.log( match ); // uncomment this to make this easier to test
+		// We're trying to avoid reaching this part when there's no match in the
+		// autocompleter UI, so uncomment this to make this easier to test:
+		console.log( match[ 1 ] );
 
+		setFilterValue( query );
 		setAutocompleter( completer );
 		setAutocompleterUI( () =>
 			completer !== autocompleter
 				? getAutoCompleterUI( completer )
 				: AutocompleterUI
 		);
-		setFilterValue( query );
 	}, [ textContent ] );
 
 	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
