@@ -198,6 +198,7 @@ export default function SearchEdit( {
 					'Double tap to edit placeholder text'
 				) }
 				accessibilityLabel={ getPlaceholderAccessibilityLabel() }
+				testID="search-block-input"
 			>
 				<PlainText
 					ref={ textInputRef }
@@ -220,8 +221,6 @@ export default function SearchEdit( {
 					} }
 					onBlur={ () => setIsPlaceholderSelected( false ) }
 					placeholderTextColor={ placeholderStyle?.color }
-					testID="searchInputField"
-					accessibilityLabel="searchInputField"
 				/>
 			</View>
 		);
@@ -251,6 +250,7 @@ export default function SearchEdit( {
 						accessibilityLabel={ `${ __(
 							'Search button. Current button text is'
 						) } ${ buttonText }` }
+						testID="search-block-button"
 					>
 						<RichText
 							className="wp-block-search__button"
@@ -276,8 +276,6 @@ export default function SearchEdit( {
 							selectionColor={
 								styles.richTextButtonCursor?.color
 							}
-							testID="searchButtonTextField"
-							accessibilityLabel="searchButtonTextField"
 						/>
 					</View>
 				) }
@@ -304,6 +302,7 @@ export default function SearchEdit( {
 					accessibilityLabel={ `${ __(
 						'Search block label. Current text is'
 					) } ${ label }` }
+					testID="search-block-label"
 				>
 					<RichText
 						className="wp-block-search__label"
@@ -325,8 +324,6 @@ export default function SearchEdit( {
 							setIsLabelSelected( false );
 						} }
 						selectionColor={ styles.richTextButtonCursor?.color }
-						testID="searchLabelTextField"
-						accessibilityLabel="searchLabelTextField"
 					/>
 				</View>
 			) }
