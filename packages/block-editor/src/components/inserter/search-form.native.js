@@ -5,7 +5,6 @@ import {
 	TextInput,
 	Text,
 	View,
-	TouchableHighlight,
 	Platform,
 } from 'react-native';
 
@@ -16,13 +15,7 @@ import { useState, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton, Gridicons } from '@wordpress/components';
-import {
-	Icon,
-	cancelCircleFilled,
-	arrowLeft,
-	close,
-} from '@wordpress/icons';
-
+import { Icon, cancelCircleFilled, arrowLeft, close } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -31,7 +24,6 @@ import styles from './style.scss';
 import platformStyles from './searchFormStyles.scss';
 
 function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
-
 	const [ isActive, setIsActive ] = useState( false );
 
 	const isIOS = Platform.OS === 'ios';
@@ -162,35 +154,31 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	}
 
 	return (
-		<TouchableHighlight accessible={ false } onLayout={ onLayout }>
-			<View style={ isActive ? containerActiveStyle : containerStyle }>
-				<View style={ isActive ? formActiveStyle : formStyle }>
-					{ renderLeftButton() }
-					<TextInput
-						ref={ inputRef }
-						style={
-							isActive ? formInputActiveStyle : formInputStyle
-						}
-						placeholderTextColor={ placeholderStyle.color }
-						onChangeText={ onChange }
-						onFocus={ () => setIsActive( true ) }
-						value={ value }
-						placeholder={ __( 'Search blocks' ) }
-					/>
-					{ renderRightButton() }
-				</View>
-				{ isActive && isIOS && (
-					<View style={ cancelButtonStyle }>
-						<Text
-							onPress={ onCancel }
-							style={ cancelButtonTextStyle }
-						>
-							{ __( 'Cancel' ) }
-						</Text>
-					</View>
-				) }
+		<View
+			style={ isActive ? containerActiveStyle : containerStyle }
+			onLayout={ onLayout }
+		>
+			<View style={ isActive ? formActiveStyle : formStyle }>
+				{ renderLeftButton() }
+				<TextInput
+					ref={ inputRef }
+					style={ isActive ? formInputActiveStyle : formInputStyle }
+					placeholderTextColor={ placeholderStyle.color }
+					onChangeText={ onChange }
+					onFocus={ () => setIsActive( true ) }
+					value={ value }
+					placeholder={ __( 'Search blocks' ) }
+				/>
+				{ renderRightButton() }
 			</View>
-		</TouchableHighlight>
+			{ isActive && isIOS && (
+				<View style={ cancelButtonStyle }>
+					<Text onPress={ onCancel } style={ cancelButtonTextStyle }>
+						{ __( 'Cancel' ) }
+					</Text>
+				</View>
+			) }
+		</View>
 	);
 }
 
