@@ -381,7 +381,6 @@ function Autocomplete( {
 		if ( filteredOptions.length === 0 ) {
 			return;
 		}
-
 		switch ( event.keyCode ) {
 			case UP:
 				setSelectedIndex(
@@ -405,10 +404,12 @@ function Autocomplete( {
 			case ENTER:
 				select( filteredOptions[ selectedIndex ] );
 				break;
+
 			case LEFT:
 			case RIGHT:
 				reset();
 				return;
+
 			default:
 				return;
 		}
