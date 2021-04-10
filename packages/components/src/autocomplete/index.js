@@ -435,7 +435,6 @@ function Autocomplete( {
 		const textAfterSelection = getTextContent(
 			slice( record, undefined, getTextContent( record ).length )
 		);
-
 		const completer = find(
 			completers,
 			( { triggerPrefix, allowContext } ) => {
@@ -463,7 +462,6 @@ function Autocomplete( {
 				const tooDistantFromTrigger = textFromLastTrigger.length > 50; // 50 chars seem to be a good limit
 
 				console.log( '------------------------' );
-				//				console.log( 'atTrigger: ', atTrigger );
 				console.log( 'mismatch: ', mismatch );
 				console.log( 'tooDistantFromTrigger: ', tooDistantFromTrigger );
 				console.log( 'textAfterSelection: ', textAfterSelection );
