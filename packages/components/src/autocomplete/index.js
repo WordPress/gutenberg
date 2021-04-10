@@ -459,12 +459,9 @@ function Autocomplete( {
 				const triggerMatchHint =
 					lastTriggerHintParts.length === 1 &&
 					lastTriggerHintParts[ 0 ];
-				const tooDistantFromTrigger = textFromLastTrigger.length > 50; // 50 chars seem to be a good limit
 
 				console.log( '------------------------' );
 				console.log( 'mismatch: ', mismatch );
-				console.log( 'tooDistantFromTrigger: ', tooDistantFromTrigger );
-				console.log( 'textAfterSelection: ', textAfterSelection );
 				console.log( 'textFromLastTrigger: ', textFromLastTrigger );
 				console.log( 'triggerMatchHint: ', triggerMatchHint );
 				console.log( '------------------------' );
@@ -473,8 +470,6 @@ function Autocomplete( {
 					console.log( 'Mismatch, bailing out!' );
 					return false;
 				}
-
-				if ( tooDistantFromTrigger ) return false;
 
 				if (
 					allowContext &&
