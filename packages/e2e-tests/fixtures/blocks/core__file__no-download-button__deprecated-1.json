@@ -4,7 +4,6 @@
         "name": "core/file",
         "isValid": true,
         "attributes": {
-            "id": 72,
             "href": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
             "fileName": "lkjfijwef",
             "textLinkHref": "http://localhost:8888/wp-content/uploads/2018/05/keycodes.js",
@@ -12,6 +11,6 @@
             "downloadButtonText": ""
         },
         "innerBlocks": [],
-        "originalContent": "<div class=\"wp-block-file\"><a id=\"wp-block-file--media-72\" href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\">lkjfijwef</a></div>"
+        "originalContent": "<div class=\"wp-block-file\"><a href=\"http://localhost:8888/wp-content/uploads/2018/05/keycodes.js\">lkjfijwef</a></div>"
     }
 ]
