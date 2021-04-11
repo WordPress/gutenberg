@@ -87,6 +87,7 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
+	allowResize,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
@@ -136,7 +137,7 @@ export default function Image( {
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
 	const [ externalBlob, setExternalBlob ] = useState();
 	const clientWidth = useClientWidth( containerRef, [ align ] );
-	const isResizable = ! isWideAligned && isLargeViewport;
+	const isResizable = allowResize && ! ( isWideAligned && isLargeViewport );
 	const imageSizeOptions = map(
 		filter( imageSizes, ( { slug } ) =>
 			get( image, [ 'media_details', 'sizes', slug, 'source_url' ] )

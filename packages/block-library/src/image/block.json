@@ -2,6 +2,7 @@
 	"apiVersion": 2,
 	"name": "core/image",
 	"category": "media",
+	"usesContext": [ "allowResize", "isListItem" ],
 	"attributes": {
 		"align": {
 			"type": "string"
@@ -68,6 +69,10 @@
 			"source": "attribute",
 			"selector": "figure > a",
 			"attribute": "target"
+		},
+		"isListItem": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

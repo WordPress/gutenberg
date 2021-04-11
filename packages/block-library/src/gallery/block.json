@@ -3,56 +3,12 @@
 	"name": "core/gallery",
 	"category": "media",
 	"attributes": {
-		"images": {
+		"imageUploads": {
 			"type": "array",
 			"default": [],
-			"source": "query",
-			"selector": ".blocks-gallery-item",
-			"query": {
-				"url": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "src"
-				},
-				"fullUrl": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "data-full-url"
-				},
-				"link": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "data-link"
-				},
-				"alt": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "alt",
-					"default": ""
-				},
-				"id": {
-					"type": "string",
-					"source": "attribute",
-					"selector": "img",
-					"attribute": "data-id"
-				},
-				"caption": {
-					"type": "string",
-					"source": "html",
-					"selector": ".blocks-gallery-item__caption"
-				}
-			}
-		},
-		"ids": {
-			"type": "array",
 			"items": {
-				"type": "number"
-			},
-			"default": []
+				"type": "object"
+			}
 		},
 		"columns": {
 			"type": "number",
@@ -68,13 +24,28 @@
 			"type": "boolean",
 			"default": true
 		},
+		"linkTarget": {
+			"type": "string"
+		},
 		"linkTo": {
 			"type": "string"
 		},
 		"sizeSlug": {
 			"type": "string",
 			"default": "large"
+		},
+		"allowResize": {
+			"type": "boolean",
+			"default": false
+		},
+		"isListItem": {
+			"type": "boolean",
+			"default": true
 		}
+	},
+	"providesContext": {
+		"allowResize": "allowResize",
+		"isListItem": "isListItem"
 	},
 	"supports": {
 		"anchor": true,
