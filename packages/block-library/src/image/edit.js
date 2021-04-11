@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { get, omit, pick } from 'lodash';
+import { get, omit, pick, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -95,7 +95,7 @@ export function ImageEdit( {
 		inhertedAttributes,
 	} = attributes;
 	const [ temporaryURL, setTemporaryURL ] = useState();
-	const { isGrouped } = context;
+
 	const altRef = useRef();
 	useEffect( () => {
 		altRef.current = alt;
@@ -160,10 +160,9 @@ export function ImageEdit( {
 		}
 
 		// Check if default link setting, or the one inherited from parent block should be used.
-		let linkDestination =
-			isGrouped && context.linkTo
-				? context.linkTo
-				: attributes.linkDestination;
+		let linkDestination = context.linkTo
+			? context.linkTo
+			: attributes.linkDestination;
 
 		if ( ! linkDestination ) {
 			// Use the WordPress option to determine the proper default.
@@ -202,7 +201,7 @@ export function ImageEdit( {
 		}
 		mediaAttributes.href = href;
 
-		if ( isGrouped ) {
+		if ( ! isEmpty( context ) ) {
 			const parentSizeAttributes = getImageSizeAttributes(
 				media,
 				context.sizeSlug
