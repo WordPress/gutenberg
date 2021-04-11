@@ -18,8 +18,8 @@
 	},
 	"usesContext": [
 		"openInNewTab",
-		"iconColorValue",
-		"iconBackgroundColorValue"
+		"textColor",
+		"backgroundColor"
 	],
 	"supports": {
 		"reusable": false,

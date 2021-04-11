@@ -16,7 +16,6 @@ import {
 	InspectorControls,
 	JustifyToolbar,
 	ContrastChecker,
-	PanelColorSettings,
 	withColors,
 } from '@wordpress/block-editor';
 import {
@@ -41,14 +40,7 @@ const sizeOptions = [
 ];
 
 export function SocialLinksEdit( props ) {
-	const {
-		attributes,
-		iconBackgroundColor,
-		iconColor,
-		setAttributes,
-		setIconBackgroundColor,
-		setIconColor,
-	} = props;
+	const { attributes, iconBackgroundColor, iconColor, setAttributes } = props;
 
 	const {
 		iconBackgroundColorValue,
@@ -180,35 +172,6 @@ export function SocialLinksEdit( props ) {
 						}
 					/>
 				</PanelBody>
-				<PanelColorSettings
-					title={ __( 'Color settings' ) }
-					colorSettings={ [
-						{
-							// Use custom attribute as fallback to prevent loss of named color selection when
-							// switching themes to a new theme that does not have a matching named color.
-							value: iconColor.color || iconColorValue,
-							onChange: ( colorValue ) => {
-								setIconColor( colorValue );
-								setAttributes( { iconColorValue: colorValue } );
-							},
-							label: __( 'Icon color' ),
-						},
-						! logosOnly && {
-							// Use custom attribute as fallback to prevent loss of named color selection when
-							// switching themes to a new theme that does not have a matching named color.
-							value:
-								iconBackgroundColor.color ||
-								iconBackgroundColorValue,
-							onChange: ( colorValue ) => {
-								setIconBackgroundColor( colorValue );
-								setAttributes( {
-									iconBackgroundColorValue: colorValue,
-								} );
-							},
-							label: __( 'Icon background color' ),
-						},
-					] }
-				/>
 				{ ! logosOnly && (
 					<ContrastChecker
 						{ ...{

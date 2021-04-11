@@ -34,7 +34,7 @@ const SocialLinkEdit = ( {
 	setAttributes,
 } ) => {
 	const { url, service, label } = attributes;
-	const { iconColorValue, iconBackgroundColorValue } = context;
+	const { textColor, backgroundColor } = context;
 	const [ showURLPopover, setPopover ] = useState( false );
 	const classes = classNames( 'wp-social-link', 'wp-social-link-' + service, {
 		'wp-social-link__is-incomplete': ! url,
@@ -45,8 +45,8 @@ const SocialLinkEdit = ( {
 	const blockProps = useBlockProps( {
 		className: classes,
 		style: {
-			color: iconColorValue,
-			backgroundColor: iconBackgroundColorValue,
+			color: textColor,
+			backgroundColor,
 		},
 	} );
 
