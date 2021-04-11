@@ -64,6 +64,7 @@ Position the label centered over the select, or right aligned against the side o
 - Menu items should be short — ideally, single words — and use sentence capitalization.
 - Do not use full sentences inside menu items.
 - Ensure that menu items are ordered in a way that is most useful to users. Alphabetical or recency ordering is preferred.
+- Menu items can optionally be grouped into option groups if this results in a more understandable presentation of options.
 
 ![](https://wordpress.org/gutenberg/files/2018/12/select-do-options.png)
 
@@ -118,6 +119,35 @@ Render a user interface to select multiple users from a list.
 />
 ```
 
+Render a user interface to select users from a list grouped by role.
+
+```jsx
+<SelectControl
+    multiple
+    label={ __( 'Select some users:' ) }
+    value={ this.state.users } // e.g: value = [ 'a', 'c' ]
+    onChange={ ( users ) => { this.setState( { users } ) } }
+    options={ [
+        { label: 'Select a User', value: null, disabled: true },
+        { label: 'Admins', value: [
+			{ label: 'User A', value: 'a' },
+			{ label: 'User B', value: 'b' },
+			{ label: 'User C', value: 'c' },
+		] },
+        { label: 'Editors', value: [
+			{ label: 'User D', value: 'd' },
+			{ label: 'User E', value: 'e' },
+			{ label: 'User F', value: 'f' },
+		] },
+        { label: 'Subscribers', value: [
+			{ label: 'User G', value: 'g' },
+			{ label: 'User H', value: 'h' },
+			{ label: 'User I', value: 'i' },
+		] }
+    ] }
+/>
+```
+
 ### Props
 
 - The set of props accepted by the component will be specified below.
@@ -158,8 +188,8 @@ If this property is added, multiple values can be selected. The value passed sho
 #### options
 
 An array of objects containing the following properties:
-- `label`: (string) The label to be shown to the user.
-- `value`: (Object) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected.
+- `label`: (string) The label to be shown to the user. (If the `value` property contains an array rather than a scalar, this will be the label for the option group.)
+- `value`: (Object) The internal value used to choose the selected value. This is also the value passed to onChange when the option is selected. If this is an array rather than a scalar, an option group will be created with the options contained in the array.
 - `disabled`: (boolean) Whether or not the option should have the disabled attribute.
 - Type: `Array`
 - Required: No

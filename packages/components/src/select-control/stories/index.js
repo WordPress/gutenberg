@@ -51,6 +51,8 @@ export const _default = () => {
 			{ value: 'a', label: 'Option A' },
 			{ value: 'b', label: 'Option B' },
 			{ value: 'c', label: 'Option C' },
+			{ value: [ { value: 'd', label: 'Option D'}, { value: 'e', label: 'Option E' } ], label: 'Group A' },
+			{ value: [ { value: 'f', label: 'Option F'}, { value: 'g', label: 'Option G' } ], label: 'Group B' },
 		] ),
 		size: select(
 			'size',

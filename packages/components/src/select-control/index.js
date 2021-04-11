@@ -111,19 +111,47 @@ function SelectControl(
 					value={ valueProp }
 				>
 					{ options.map( ( option, index ) => {
-						const key =
-							option.id ||
-							`${ option.label }-${ option.value }-${ index }`;
-
-						return (
-							<option
-								key={ key }
-								value={ option.value }
-								disabled={ option.disabled }
-							>
-								{ option.label }
-							</option>
-						);
+						//if the option.value is an array rather than a scalar, we're dealing with an optgroup
+						if ( Array.isArray( option.value ) ) {
+							const optgroupkey =
+								option.id ||
+								`${ option.label }-${ index }`;
+							return (
+								<optgroup
+									key={ optgroupkey }
+									label={ option.label }
+									disabled={ option.disabled }
+								>
+									{ option.value.map( ( groupedOption, groupedOptionIndex ) => {
+										const key =
+											groupedOption.id ||
+											`${ groupedOption.label }-${ groupedOption.value }-${ groupedOptionIndex }`;
+										return (
+											<option
+												key={ key }
+												value={ groupedOption.value }
+												disabled={ groupedOption.disabled }
+											>
+												{ groupedOption.label }
+											</option>
+										);
+									} ) }
+								</optgroup>
+							);
+						} else {
+							const key =
+								option.id ||
+								`${ option.label }-${ option.value }-${ index }`;
+							return (
+								<option
+									key={ key }
+									value={ option.value }
+									disabled={ option.disabled }
+								>
+									{ option.label }
+								</option>
+							);
+						}
 					} ) }
 				</Select>
 			</InputBase>
