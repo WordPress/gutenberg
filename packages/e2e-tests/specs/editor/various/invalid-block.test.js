@@ -46,8 +46,9 @@ describe( 'invalid blocks', () => {
 			'.block-editor-block-compare__html',
 			( node ) => node.textContent
 		);
+		// The parser will have closed the P tag for us
 		expect( htmlBlockContent ).toEqual(
-			'<p>hello</p><p>invalid paragraph'
+			'<p>hello</p><p>invalid paragraph</p>'
 		);
 	} );
 } );
