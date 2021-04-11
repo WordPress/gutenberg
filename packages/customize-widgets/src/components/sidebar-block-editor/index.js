@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { createPortal, useMemo } from '@wordpress/element';
+import { createPortal } from '@wordpress/element';
 import {
-	BlockEditorProvider,
 	BlockList,
 	BlockSelectionClearer,
 	BlockInspector,
@@ -22,21 +21,11 @@ import {
  * Internal dependencies
  */
 import BlockInspectorButton from '../block-inspector-button';
-import Header from '../header';
-import useSidebarBlockEditor from './use-sidebar-block-editor';
-import useInserter from '../inserter/use-inserter';
+import SidebarEditorProvider from './sidebar-editor-provider';
 
 export default function SidebarBlockEditor( { sidebar, inserter, inspector } ) {
-	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
 	const parentContainer = document.getElementById(
 		'customize-theme-controls'
-	);
-	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
-	const settings = useMemo(
-		() => ( {
-			__experimentalSetIsInserterOpened: setIsInserterOpened,
-		} ),
-		[]
 	);
 
 	return (
@@ -44,21 +33,10 @@ export default function SidebarBlockEditor( { sidebar, inserter, inspector } ) {
 			<BlockEditorKeyboardShortcuts.Register />
 			<SlotFillProvider>
 				<DropZoneProvider>
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ onInput }
-						onChange={ onChange }
-						settings={ settings }
-						useSubRegistry={ false }
+					<SidebarEditorProvider
+						sidebar={ sidebar }
+						inserter={ inserter }
 					>
-						<BlockEditorKeyboardShortcuts />
-
-						<Header
-							inserter={ inserter }
-							isInserterOpened={ isInserterOpened }
-							setIsInserterOpened={ setIsInserterOpened }
-						/>
-
 						<BlockSelectionClearer>
 							<WritingFlow>
 								<ObserveTyping>
@@ -66,7 +44,7 @@ export default function SidebarBlockEditor( { sidebar, inserter, inspector } ) {
 								</ObserveTyping>
 							</WritingFlow>
 						</BlockSelectionClearer>
-					</BlockEditorProvider>
+					</SidebarEditorProvider>
 
 					<Popover.Slot name="block-toolbar" />
 

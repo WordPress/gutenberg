@@ -1,15 +1,14 @@
 /**
  * External dependencies
  */
-import { omit, keyBy } from 'lodash';
+import { omit, isEqual } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { serialize, parse, createBlock } from '@wordpress/blocks';
-import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
-import { select } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+import { useState, useEffect, useCallback } from '@wordpress/element';
+import isShallowEqual from '@wordpress/is-shallow-equal';
 
 function addWidgetIdToBlock( block, widgetId ) {
 	return {
@@ -102,103 +101,21 @@ function widgetToBlock( {
 	return addWidgetIdToBlock( block, id );
 }
 
-function initState( sidebar ) {
-	const blocks = [];
-
-	for ( const widgetId of sidebar.getWidgetIds() ) {
-		const widget = sidebar.getWidget( widgetId );
-		const block = widgetToBlock( widget );
-		blocks.push( block );
-	}
-
-	return blocks;
+function widgetsToBlocks( widgets ) {
+	return widgets.map( ( widget ) => widgetToBlock( widget ) );
 }
 
 export default function useSidebarBlockEditor( sidebar ) {
-	const [ blocks, setBlocks ] = useState( () => initState( sidebar ) );
-
-	const ignoreIncoming = useRef( false );
-
-	// Get the blocks from the store and save it back to component's states once mounted.
-	// This is necessary since that after the first onChangeBlocks fired,
-	// all the blocks in the callback are transformed once via getBlocks internally.
-	// In order to only perform referential equality check in the callback,
-	// we have to make sure the references are the same between state and store.
-	useEffect( () => {
-		const storedBlocks = select( blockEditorStore ).getBlocks( null );
-
-		setBlocks( storedBlocks );
-	}, [] );
+	const [ blocks, setBlocks ] = useState( () =>
+		widgetsToBlocks( sidebar.getWidgets() )
+	);
 
 	useEffect( () => {
-		const handler = ( event ) => {
-			if ( ignoreIncoming.current ) {
-				return;
-			}
-
-			switch ( event.type ) {
-				case 'widgetAdded': {
-					const { widgetId } = event;
-					const block = blockToWidget(
-						sidebar.getWidget( widgetId )
-					);
-					setBlocks( ( prevBlocks ) => [ ...prevBlocks, block ] );
-					break;
-				}
-
-				case 'widgetRemoved': {
-					const { widgetId } = event;
-					setBlocks( ( prevBlocks ) =>
-						prevBlocks.filter(
-							( block ) => getWidgetId( block ) === widgetId
-						)
-					);
-					break;
-				}
-
-				case 'widgetChanged': {
-					const { widgetId } = event;
-					const blockToUpdate = blocks.find(
-						( block ) => getWidgetId( block ) === widgetId
-					);
-					const updatedBlock = widgetToBlock(
-						sidebar.getWidget( widgetId ),
-						blockToUpdate
-					);
-					setBlocks( ( prevBlocks ) =>
-						prevBlocks.map( ( block ) =>
-							block === blockToUpdate ? updatedBlock : block
-						)
-					);
-					break;
-				}
-
-				case 'widgetsReordered':
-					const { widgetIds } = event;
-
-					setBlocks( ( prevBlocks ) => {
-						const blocksByWidgetId = keyBy(
-							prevBlocks,
-							getWidgetId
-						);
-
-						return widgetIds.map(
-							( widgetId ) => blocksByWidgetId[ widgetId ]
-						);
-					} );
-					break;
-			}
-		};
-
-		sidebar.subscribe( handler );
-		return () => sidebar.unsubscribe( handler );
-	}, [ sidebar ] );
-
-	const onChangeBlocks = useCallback(
-		( _nextBlocks ) => {
-			ignoreIncoming.current = true;
-
+		return sidebar.subscribe( ( prevWidgets, nextWidgets ) => {
 			setBlocks( ( prevBlocks ) => {
+				const prevWidgetsMap = new Map(
+					prevWidgets.map( ( widget ) => [ widget.id, widget ] )
+				);
 				const prevBlocksMap = new Map(
 					prevBlocks.map( ( block ) => [
 						getWidgetId( block ),
@@ -206,64 +123,81 @@ export default function useSidebarBlockEditor( sidebar ) {
 					] )
 				);
 
-				let nextBlocks = _nextBlocks;
+				const nextBlocks = nextWidgets.map( ( nextWidget ) => {
+					const prevWidget = prevWidgetsMap.get( nextWidget.id );
 
-				nextBlocks.forEach( ( nextBlock, index ) => {
-					let widgetId = getWidgetId( nextBlock );
-
-					if ( widgetId && prevBlocksMap.has( widgetId ) ) {
-						// Update existing widgets.
-						const prevBlock = prevBlocksMap.get( widgetId );
-
-						// We can do referential equality check rather than isEqual here
-						// because the block editor store makes sure to cache the blocks for us.
-						if ( nextBlock !== prevBlock ) {
-							const widgetToUpdate = sidebar.getWidget(
-								widgetId
-							);
-							const widget = blockToWidget(
-								nextBlock,
-								widgetToUpdate
-							);
-							sidebar.updateWidget( widget );
-						}
-					} else {
-						// Add a new widget.
-						const widget = blockToWidget( nextBlock );
-						widgetId = sidebar.addWidget( widget, index );
-
-						// Only create a new instance of nextBlocks when there's a new widget.
-						// This is to prevent useBlockSync from incorrectly marking changes as persistent.
-						if ( nextBlocks === _nextBlocks ) {
-							nextBlocks = [ ..._nextBlocks ];
-						}
-
-						nextBlocks[ index ] = {
-							...nextBlock,
-							attributes: {
-								...nextBlock.attributes,
-								__internalWidgetId: widgetId,
-							},
-						};
+					// Bail out updates.
+					if ( prevWidget && prevWidget === nextWidget ) {
+						return prevBlocksMap.get( nextWidget.id );
 					}
+
+					return widgetToBlock( nextWidget );
 				} );
 
-				const nextBlocksWidgetIds = new Set(
-					nextBlocks.map( getWidgetId )
+				// Bail out updates.
+				if ( isShallowEqual( prevBlocks, nextBlocks ) ) {
+					return prevBlocks;
+				}
+
+				return nextBlocks;
+			} );
+		} );
+	}, [ sidebar ] );
+
+	const onChangeBlocks = useCallback(
+		( nextBlocks ) => {
+			setBlocks( ( prevBlocks ) => {
+				if ( isShallowEqual( prevBlocks, nextBlocks ) ) {
+					return prevBlocks;
+				}
+
+				const prevBlocksMap = new Map(
+					prevBlocks.map( ( block ) => [
+						getWidgetId( block ),
+						block,
+					] )
 				);
 
-				// Remove deleted widgets.
-				prevBlocks.map( getWidgetId ).forEach( ( widgetId ) => {
-					if ( ! nextBlocksWidgetIds.has( widgetId ) ) {
-						sidebar.removeWidget( widgetId );
+				const nextWidgets = nextBlocks.map( ( nextBlock ) => {
+					const widgetId = getWidgetId( nextBlock );
+
+					// Update existing widgets.
+					if ( widgetId && prevBlocksMap.has( widgetId ) ) {
+						const prevBlock = prevBlocksMap.get( widgetId );
+						const prevWidget = sidebar.getWidget( widgetId );
+
+						// Bail out updates by returning the previous widgets.
+						// Deep equality is necessary until the block editor's internals changes.
+						if ( isEqual( nextBlock, prevBlock ) ) {
+							return prevWidget;
+						}
+
+						return blockToWidget( nextBlock, prevWidget );
 					}
+
+					// Add a new widget.
+					return blockToWidget( nextBlock );
 				} );
 
-				// Reset order.
-				// Backbone API should make sure to bail out the updates if the value is deeply equal.
-				sidebar.setWidgetIds( Array.from( nextBlocksWidgetIds ) );
+				const addedWidgetIds = sidebar.setWidgets( nextWidgets );
 
-				ignoreIncoming.current = false;
+				if (
+					addedWidgetIds.filter( ( widgetId ) => widgetId !== null )
+						.length
+				) {
+					return nextBlocks.map( ( nextBlock, index ) => {
+						const addedWidgetId = addedWidgetIds[ index ];
+
+						if ( addedWidgetId !== null ) {
+							return addWidgetIdToBlock(
+								nextBlock,
+								addedWidgetId
+							);
+						}
+
+						return nextBlock;
+					} );
+				}
 
 				return nextBlocks;
 			} );
