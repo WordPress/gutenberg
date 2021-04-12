@@ -14,11 +14,20 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.50.0
 
+## 1.50.1
+
+-   [x] Truncate rangecell screenreader decimals] [#30678]
+-   [x] Fix Quote block citation [#30548]
+-   [xx] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
+-   [xx] Fix Unsupported Block Editor on Android [#30650]
+
+## 1.50.0
+
 -   [***] a11y: Screenreader improvements for the UnitControl component [#29741]
 
 ## 1.49.0
 
-* [*] Remove the cancel button from settings options (Android only) [https://github.com/WordPress/gutenberg/pull/29599]
+-   [*] Remove the cancel button from settings options (Android only) [https://github.com/WordPress/gutenberg/pull/29599]
 
 ## 1.48.0
 

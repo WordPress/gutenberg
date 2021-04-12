@@ -204,11 +204,11 @@ and has a valueAsNumber
 
 _Parameters_
 
--   _element_ `HTMLElement`: The HTML element.
+-   _node_ `Node`: The HTML node.
 
 _Returns_
 
--   `boolean`: True if the element is input and holds a number.
+-   `node is HTMLInputElement`: True if the node is input and holds a number.
 
 <a name="isPhrasingContent" href="#isPhrasingContent">#</a> **isPhrasingContent**
 
@@ -245,11 +245,11 @@ See: <https://html.spec.whatwg.org/#textFieldSelection>
 
 _Parameters_
 
--   _element_ `HTMLElement`: The HTML element.
+-   _node_ `Node`: The HTML element.
 
 _Returns_
 
--   `boolean`: True if the element is an text field, false if not.
+-   `element is HTMLElement`: True if the element is an text field, false if not.
 
 <a name="isVerticalEdge" href="#isVerticalEdge">#</a> **isVerticalEdge**
 

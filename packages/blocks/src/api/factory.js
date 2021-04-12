@@ -424,6 +424,10 @@ export function getBlockTransforms( direction, blockTypeOrName ) {
 		Array.isArray( transforms.supportedMobileTransforms );
 	const filteredTransforms = usingMobileTransformations
 		? filter( transforms[ direction ], ( t ) => {
+				if ( t.type === 'raw' ) {
+					return true;
+				}
+
 				if ( ! t.blocks || ! t.blocks.length ) {
 					return false;
 				}
