@@ -35,7 +35,7 @@ export default function save( { attributes, className } ) {
 		'wp-block-button__link',
 		colorProps.className,
 		{
-			'no-border-radius': style?.border?.radius === 0,
+			'no-border-radius': borderRadius === 0,
 		}
 	);
 
