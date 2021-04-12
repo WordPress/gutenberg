@@ -313,7 +313,7 @@ export function isSavingMetaBoxes( state ) {
  * @return {string} Device type.
  */
 export function __experimentalGetPreviewDeviceType( state ) {
-	return state.deviceType;
+	return state.isEditingTemplate ? 'Desktop' : state.deviceType;
 }
 
 /**
