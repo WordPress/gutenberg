@@ -35,7 +35,15 @@
 			"right",
 			"wide",
 			"full"
-		]
+		],
+		"color": {
+		  "gradients": false,
+		  "background": false
+		},
+		"__experimentalBorder": {
+		  "color": true,
+		  "radius": false
+		}
 	},
 	"editorStyle": "wp-block-pullquote-editor",
 	"style": "wp-block-pullquote"
