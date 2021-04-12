@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+- Add support for array and object destructured arguments in TypeScript documentation generation.
+
 ## 1.16.0 (2021-03-17)
 
 - Replace deprecated `doctrine` parser with simpler `comment-parser` to support a wider variety of types. This also de-normalizes types such that types will be transcribed exactly as they are declared in the doc comments.
