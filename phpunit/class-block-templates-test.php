@@ -279,4 +279,27 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		// TODO - update following array result once tt1-blocks theme.json is updated for area info.
 		$this->assertEquals( array( get_stylesheet() . '//' . 'my_template_part' ), $template_ids );
 	}
+
+	/**
+	 * Should flatten nested blocks
+	 */
+	function test_flatten_blocks() {
+		$content  = '<!-- wp:group --><!-- wp:template-part {"slug":"header","align":"full", "tagName":"header","className":"site-header"} /--><!-- /wp:group -->';
+		$blocks   = parse_blocks( $content );
+		$actual   = _flatten_blocks( $blocks );
+		$expected = array( $blocks[0], $blocks[0]['innerBlocks'][0] );
+		$this->assertEquals( $expected, $actual );
+
+		$content  = '<!-- wp:group --><!-- wp:group --><!-- wp:template-part {"slug":"header","align":"full", "tagName":"header","className":"site-header"} /--><!-- /wp:group --><!-- /wp:group -->';
+		$blocks   = parse_blocks( $content );
+		$actual   = _flatten_blocks( $blocks );
+		$expected = array( $blocks[0], $blocks[0]['innerBlocks'][0], $blocks[0]['innerBlocks'][0]['innerBlocks'][0] );
+		$this->assertEquals( $expected, $actual );
+
+		$content  = '<!-- wp:group /-->';
+		$blocks   = parse_blocks( $content );
+		$actual   = _flatten_blocks( $blocks );
+		$expected = array( $blocks[0] );
+		$this->assertEquals( $expected, $actual );
+	}
 }
