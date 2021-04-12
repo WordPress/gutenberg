@@ -574,13 +574,18 @@ class EditorPage {
 	// Search Block functions
 	// =============================
 
-	async getSearchBlockChild( { android, ios } ) {
-		let locator = `//XCUIElementTypeOther[@name="${ ios }"]`;
+	async getSearchBlockChild( testKeys ) {
+		let locator = `//XCUIElementTypeOther[@name="${ testKeys.ios }"]`;
 		if ( isAndroid() ) {
-			locator = `//android.view.View[starts-with(@content-desc, "${ android }")]/android.widget.EditText`;
+			locator = `//android.view.View[starts-with(@content-desc, "${ testKeys.android }")]/android.widget.EditText`;
 		}
 
 		return await this.driver.elementByXPath( locator );
+	}
+
+	async sendTextToSearchBlockChild( testKeys, text, clear = true ) {
+		const textViewElement = await this.getSearchBlockChild( testKeys );
+		return await typeString( this.driver, textViewElement, text, clear );
 	}
 
 	// =============================

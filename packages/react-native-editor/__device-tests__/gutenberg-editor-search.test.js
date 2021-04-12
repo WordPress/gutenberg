@@ -2,8 +2,10 @@
  * Internal dependencies
  */
 import { blockNames } from './pages/editor-page';
+import testData from './helpers/test-data';
+import { isAndroid } from './helpers/utils';
 
-const blockChildTestIds = {
+const testKeys = {
 	label: {
 		android: 'Search block label.',
 		ios: 'search-block-label',
@@ -19,35 +21,94 @@ const blockChildTestIds = {
 };
 
 describe( 'Gutenberg Editor Search Block tests', () => {
-	it( 'should be able to add a Search block', async () => {
-		await editorPage.addNewBlock( blockNames.search );
-		const searchBlock = await editorPage.getBlockAtPosition(
-			blockNames.search
-		);
+	describe( 'Should be able to edit child elements of Search Block', () => {
+		it( 'should be able to add a Search block', async () => {
+			await editorPage.addNewBlock( blockNames.search );
+			const searchBlock = await editorPage.getBlockAtPosition(
+				blockNames.search
+			);
 
-		expect( searchBlock ).toBeTruthy();
-	} );
+			expect( searchBlock ).toBeTruthy();
+		} );
 
-	it( 'label should be visible and text set', async () => {
-		// const block = await editorPage.getFirstBlockVisible();
-		// block.click();
+		it( 'able to customize label text', async () => {
+			await editorPage.sendTextToSearchBlockChild(
+				testKeys.label,
+				testData.shortText
+			);
 
-		const label = await editorPage.getSearchBlockChild(
-			blockChildTestIds.label
-		);
-		const labelValue = await label.text();
-		console.log( `AMANDA-TEST > label value: ${ labelValue }` );
+			let expected = '';
+			let actual = '';
+			if ( isAndroid() ) {
+				// Android pads the string entered into the `PlainText` component so we'll get the
+				// value a different way by asking for it directly.
+				const input = await editorPage.getSearchBlockChild(
+					testKeys.label
+				);
+				const inputValue = await input.text();
+				actual = inputValue.trim();
+				expected = testData.shortText;
+			} else {
+				// Couldn't figure out how to get the value directly from the element on iOS so here we
+				// switch to html and verify the results.
+				actual = await editorPage.getHtmlContent();
+				expected = `<!-- wp:search {"label":"${ testData.shortText }","buttonText":"Search"} /-->`;
+			}
 
-		const input = await editorPage.getSearchBlockChild(
-			blockChildTestIds.input
-		);
-		const inputValue = await input.text();
-		console.log( `AMANDA-TEST > input value: ${ inputValue }` );
+			expect( expected ).toBe( actual );
+		} );
 
-		const button = await editorPage.getSearchBlockChild(
-			blockChildTestIds.button
-		);
-		const buttonValue = await button.text();
-		console.log( `AMANDA-TEST > button value: ${ buttonValue }` );
+		it( 'able to customize placeholder text', async () => {
+			await editorPage.sendTextToSearchBlockChild(
+				testKeys.input,
+				testData.shortText,
+				false
+			);
+
+			let expected = '';
+			let actual = '';
+			if ( isAndroid() ) {
+				// Android pads the string entered into the `PlainText` component so we'll get the
+				// value a different way by asking for it directly.
+				const input = await editorPage.getSearchBlockChild(
+					testKeys.input
+				);
+				const inputValue = await input.text();
+				actual = inputValue.trim();
+				expected = testData.shortText;
+			} else {
+				// Couldn't figure out how to get the value directly from the element on iOS so here we
+				// switch to html and verify the results.
+				actual = await editorPage.getHtmlContent();
+				expected = `<!-- wp:search {"label":"${ testData.shortText }","placeholder":"${ testData.shortText }","buttonText":"Search"} /-->`;
+			}
+
+			expect( expected ).toBe( actual );
+		} );
+
+		it( 'able to customize button text', async () => {
+			// Changing text on the button doesn't work as expected on Android
+			// so skip This test if running on Android.
+			if ( isAndroid() ) {
+				// Remove the search block to end this suite of tests.
+				await editorPage.removeBlockAtPosition( blockNames.search );
+				return;
+			}
+
+			await editorPage.sendTextToSearchBlockChild(
+				testKeys.button,
+				testData.shortButtonText
+			);
+
+			// switch to html and verify html
+			const html = await editorPage.getHtmlContent();
+
+			expect( html ).toBe(
+				`<!-- wp:search {"label":"${ testData.shortText }","placeholder":"${ testData.shortText }","buttonText":"${ testData.shortButtonText }"} /-->`
+			);
+
+			// Remove the search block to end this suite of tests.
+			await editorPage.removeBlockAtPosition( blockNames.search );
+		} );
 	} );
 } );
