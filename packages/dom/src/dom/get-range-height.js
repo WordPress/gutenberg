@@ -3,6 +3,7 @@
  * some browsers ignore when creating a union.
  *
  * @param {Range} range The range to check.
+ * @return {number | undefined} Height of the range or undefined if the range has no client rectangles.
  */
 export default function getRangeHeight( range ) {
 	const rects = Array.from( range.getClientRects() );
