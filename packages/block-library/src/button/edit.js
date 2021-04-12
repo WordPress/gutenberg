@@ -23,7 +23,6 @@ import {
 	InspectorAdvancedControls,
 	RichText,
 	useBlockProps,
-	__experimentalGetInlineStyles as getInlineStyles,
 	__experimentalLinkControl as LinkControl,
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
@@ -201,6 +200,7 @@ function ButtonEdit( props ) {
 		setAttributes( { text: newText.replace( /<\/?a[^>]*>/g, '' ) } );
 	};
 
+	const borderRadius = style?.border?.radius;
 	const colorProps = getColorAndStyleProps( attributes, colors, true );
 	const ref = useRef();
 	const blockProps = useBlockProps( { ref } );
@@ -225,11 +225,13 @@ function ButtonEdit( props ) {
 						'wp-block-button__link',
 						colorProps.className,
 						{
-							'no-border-radius': style?.border?.radius === 0,
+							'no-border-radius': borderRadius === 0,
 						}
 					) }
 					style={ {
-						...getInlineStyles( style ),
+						borderRadius: borderRadius
+							? borderRadius + 'px'
+							: undefined,
 						...colorProps.style,
 					} }
 					onSplit={ ( value ) =>
