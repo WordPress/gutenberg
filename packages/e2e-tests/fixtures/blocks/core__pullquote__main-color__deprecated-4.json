@@ -1,0 +1,20 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/pullquote",
+        "isValid": true,
+        "attributes": {
+            "className": "has-background is-style-default",
+            "style": {
+                "border": {
+                    "color": "#2207d0"
+                }
+            },
+            "value": "<p>Pullquote custom color</p>",
+            "citation": "my citation",
+            "textColor": "subtle-background"
+        },
+        "innerBlocks": [],
+        "originalContent": "<figure class=\"wp-block-pullquote has-background is-style-default\" style=\"border-color:#2207d0\"><blockquote class=\"has-text-color has-subtle-background-color\"><p>Pullquote custom color</p><cite>my citation</cite></blockquote></figure>"
+    }
+]

@@ -15,17 +15,17 @@
 			"selector": "cite",
 			"default": ""
 		},
-		"mainColor": {
+		"backgroundColor": {
 			"type": "string"
 		},
-		"customMainColor": {
+		"borderColor": {
 			"type": "string"
 		},
 		"textColor": {
 			"type": "string"
 		},
-		"customTextColor": {
-			"type": "string"
+		"style": {
+			"type": "object"
 		}
 	},
 	"supports": {
@@ -37,12 +37,15 @@
 			"full"
 		],
 		"color": {
-		  "gradients": false,
-		  "background": false
+		  "gradients": true,
+		  "background": true,
+		  "link": true
 		},
 		"__experimentalBorder": {
 		  "color": true,
-		  "radius": false
+		  "radius": true,
+		  "style": true,
+		  "width": true
 		}
 	},
 	"editorStyle": "wp-block-pullquote-editor",
