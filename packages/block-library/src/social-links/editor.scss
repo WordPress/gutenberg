@@ -133,14 +133,3 @@
 .wp-social-link.wp-social-link__is-incomplete:focus {
 	opacity: 1;
 }
-
-
-// Focus styles for the button inside the child block.
-// The child block itself has a more generic focus style, see line 55.
-[data-type="core/social-links"] .wp-social-link:focus { // This needs specificity.
-	opacity: 1;
-	box-shadow: 0 0 0 2px $white, 0 0 0 4px var(--wp-admin-theme-color);
-
-	// Windows High Contrast mode will show this outline, but not the box-shadow.
-	outline: 2px solid transparent;
-}
