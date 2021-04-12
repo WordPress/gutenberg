@@ -1,16 +1,21 @@
 [
-	{
-		"clientId": "_clientId_0",
-		"name": "core/pullquote",
-		"isValid": true,
-		"attributes": {
-			"value": "<p>Pullquote custom color</p>",
-			"citation": "my citation",
-			"customMainColor": "#2207d0",
-			"textColor": "subtle-background",
-			"className": "has-background is-style-default"
-		},
-		"innerBlocks": [],
-		"originalContent": "<figure class=\"wp-block-pullquote has-background is-style-default\" style=\"border-color:#2207d0\"><blockquote class=\"has-text-color has-subtle-background-color\"><p>Pullquote custom color</p><cite>my citation</cite></blockquote></figure>"
-	}
+    {
+        "clientId": "_clientId_0",
+        "name": "core/pullquote",
+        "isValid": true,
+        "attributes": {
+            "value": "<p>Pullquote custom color</p>",
+            "citation": "before block supports",
+            "backgroundColor": "blue",
+            "textColor": "white",
+            "style": {
+                "border": {
+                    "color": "#2207d0"
+                }
+            },
+            "className": "is-style-default"
+        },
+        "innerBlocks": [],
+        "originalContent": "<figure class=\"wp-block-pullquote is-style-default has-border-color has-white-color has-blue-background-color has-text-color has-background\" style=\"border-color:#2207d0\"><blockquote><p>Pullquote custom color</p><cite>before block supports</cite></blockquote></figure>"
+    }
 ]

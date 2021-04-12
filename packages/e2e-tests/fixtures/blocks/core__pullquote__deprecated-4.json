@@ -1,0 +1,15 @@
+[
+    {
+        "clientId": "_clientId_0",
+        "name": "core/pullquote",
+        "isValid": true,
+        "attributes": {
+            "value": "<p>pullquote</p>",
+            "citation": "before block supports",
+            "customMainColor": "#cd2653",
+            "textColor": "secondary"
+        },
+        "innerBlocks": [],
+        "originalContent": "<figure class=\"wp-block-pullquote\" style=\"border-color:#cd2653\"><blockquote class=\"has-text-color has-secondary-color\"><p>pullquote</p><cite>before block supports</cite></blockquote></figure>"
+    }
+]
