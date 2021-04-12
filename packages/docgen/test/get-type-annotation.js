@@ -15,6 +15,7 @@ const getArrowFunctionNode = require( './fixtures/type-annotations/arrow-functio
 const getArrayDestructuringArrayTypeNode = require( './fixtures/type-annotations/array-destructuring-array-type/get-node' );
 const getArrayDestructuringTupleTypeNode = require( './fixtures/type-annotations/array-destructuring-tuple-type/get-node' );
 const getArrayDestructuringAnyOtherTypeNode = require( './fixtures/type-annotations/array-destructuring-any-other-type/get-node' );
+const getObjectDestructuringTypeLiteralNode = require( './fixtures/type-annotations/object-destructuring-object-literal-type/get-node' );
 
 describe( 'Type annotations', () => {
 	it( 'are taken from JSDoc if any', () => {
@@ -261,6 +262,38 @@ describe( 'Type annotations', () => {
 			expect(
 				getTypeAnnotation( { ...paramTag, name: 'callback' }, node, 0 )
 			).toBe( '( foo: string, ...rest: any[] ) => GenericType< T >' );
+		} );
+	} );
+
+	describe( 'function argument object destructuring', () => {
+		describe( 'type literal', () => {
+			const node = getObjectDestructuringTypeLiteralNode();
+
+			it( 'should get the full type for the param', () => {
+				expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
+					'{ foo: string; }'
+				);
+			} );
+
+			it( 'should get the member type for the param', () => {
+				expect(
+					getTypeAnnotation(
+						{ ...paramTag, name: 'props.foo' },
+						node,
+						0
+					)
+				).toBe( 'string' );
+			} );
+
+			it( 'should get the member type for an unfindable member', () => {
+				expect(
+					getTypeAnnotation(
+						{ ...paramTag, name: 'props.notFoo' },
+						node,
+						0
+					)
+				).toBe( "{ foo: string; }[ 'notFoo' ]" );
+			} );
 		} );
 	} );
 } );
