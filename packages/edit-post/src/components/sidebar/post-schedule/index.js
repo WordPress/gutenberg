@@ -22,16 +22,14 @@ export function PostSchedule() {
 					position="bottom left"
 					contentClassName="edit-post-post-schedule__dialog"
 					renderToggle={ ( { onToggle, isOpen } ) => (
-						<>
-							<Button
-								className="edit-post-post-schedule__toggle"
-								onClick={ onToggle }
-								aria-expanded={ isOpen }
-								isTertiary
-							>
-								<PostScheduleLabel />
-							</Button>
-						</>
+						<Button
+							className="edit-post-post-schedule__toggle"
+							onClick={ onToggle }
+							aria-expanded={ isOpen }
+							isTertiary
+						>
+							<PostScheduleLabel />
+						</Button>
 					) }
 					renderContent={ () => <PostScheduleForm /> }
 				/>
