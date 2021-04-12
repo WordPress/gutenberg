@@ -240,6 +240,7 @@ function Controls( {
 				</>
 			) : (
 				<TextControl
+					accessibilityLabel={ __( 'Add image or video' ) }
 					label={ __( 'Add image or video' ) }
 					labelStyle={ addMediaButtonStyle }
 					leftAlign
