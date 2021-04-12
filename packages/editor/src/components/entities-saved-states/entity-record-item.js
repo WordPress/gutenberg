@@ -74,7 +74,20 @@ export default function EntityRecordItem( {
 					}
 				}
 
-				return editedSiteProperties.join( ', ' );
+				if ( editedSiteProperties.length === 1 ) {
+					return editedSiteProperties[ 0 ];
+				} else if ( editedSiteProperties.length === 2 ) {
+					return (
+						editedSiteProperties[ 0 ] +
+						' & ' +
+						editedSiteProperties[ 1 ]
+					);
+				} else if ( editedSiteProperties.length > 2 ) {
+					const last = editedSiteProperties.pop();
+					return editedSiteProperties.join( ', ' ) + ', & ' + last;
+				}
+
+				return '';
 			}
 
 			return title;
