@@ -279,10 +279,6 @@ _Returns_
 
 Undocumented declaration.
 
-<a name="DuotoneControl" href="#DuotoneControl">#</a> **DuotoneControl**
-
-Undocumented declaration.
-
 <a name="FontSizePicker" href="#FontSizePicker">#</a> **FontSizePicker**
 
 Undocumented declaration.
