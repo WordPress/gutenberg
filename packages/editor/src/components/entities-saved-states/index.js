@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 import { close as closeIcon } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -21,11 +22,11 @@ function EntitiesSavedStates( { isOpen, close } ) {
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
 		return {
 			dirtyEntityRecords: select(
-				'core'
+				coreStore
 			).__experimentalGetDirtyEntityRecords(),
 		};
 	}, [] );
-	const { saveEditedEntityRecord } = useDispatch( 'core' );
+	const { saveEditedEntityRecord } = useDispatch( coreStore );
 
 	// To group entities by type.
 	const partitionedSavables = Object.values(

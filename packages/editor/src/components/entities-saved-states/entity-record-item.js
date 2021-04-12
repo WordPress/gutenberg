@@ -5,6 +5,20 @@ import { CheckboxControl, Button, PanelRow } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
+const TRANSLATED_SITE_PROTPERTIES = {
+	title: __( 'Title' ),
+	description: __( 'Tagline' ),
+	sitelogo: __( 'Logo' ),
+	show_on_front: __( 'Show on front' ),
+	page_on_front: __( 'Page on front' ),
+};
 
 export default function EntityRecordItem( {
 	record,
@@ -15,13 +29,13 @@ export default function EntityRecordItem( {
 	const { name, kind, title, key } = record;
 	const parentBlockId = useSelect( ( select ) => {
 		// Get entity's blocks.
-		const { blocks = [] } = select( 'core' ).getEditedEntityRecord(
+		const { blocks = [] } = select( coreStore ).getEditedEntityRecord(
 			kind,
 			name,
 			key
 		);
 		// Get parents of the entity's first block.
-		const parents = select( 'core/block-editor' ).getBlockParents(
+		const parents = select( blockEditorStore ).getBlockParents(
 			blocks[ 0 ]?.clientId
 		);
 		// Return closest parent block's clientId.
@@ -31,18 +45,39 @@ export default function EntityRecordItem( {
 	// Handle templates that might use default descriptive titles
 	const entityRecordTitle = useSelect(
 		( select ) => {
-			if ( 'postType' !== kind || 'wp_template' !== name ) {
-				return title;
-			}
-
-			const template = select( 'core' ).getEditedEntityRecord(
+			const editedEntity = select( coreStore ).getEditedEntityRecord(
 				kind,
 				name,
 				key
 			);
-			return select( 'core/editor' ).__experimentalGetTemplateInfo(
-				template
-			).title;
+
+			if ( 'postType' === kind && 'wp_template' === name ) {
+				return select( editorStore ).__experimentalGetTemplateInfo(
+					editedEntity
+				).title;
+			}
+
+			const entity = select( coreStore ).getEntityRecord(
+				kind,
+				name,
+				key
+			);
+
+			// Determine which sections of the site object have been changed.
+			if ( 'root' === kind && 'site' === name ) {
+				const editedSiteProperties = [];
+				for ( const field in editedEntity ) {
+					if ( editedEntity[ field ] !== entity[ field ] ) {
+						editedSiteProperties.push(
+							TRANSLATED_SITE_PROTPERTIES[ field ] || field
+						);
+					}
+				}
+
+				return editedSiteProperties.join( ', ' );
+			}
+
+			return title;
 		},
 		[ name, kind, title, key ]
 	);
@@ -50,14 +85,14 @@ export default function EntityRecordItem( {
 	const isSelected = useSelect(
 		( select ) => {
 			const selectedBlockId = select(
-				'core/block-editor'
+				blockEditorStore
 			).getSelectedBlockClientId();
 			return selectedBlockId === parentBlockId;
 		},
 		[ parentBlockId ]
 	);
 	const isSelectedText = isSelected ? __( 'Selected' ) : __( 'Select' );
-	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const selectParentBlock = useCallback( () => selectBlock( parentBlockId ), [
 		parentBlockId,
 	] );
