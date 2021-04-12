@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { space } from '..';
+import { ui } from '..';
 import { getScaleStyles } from '../css';
 
 describe( 'scales', () => {
-	test( 'should transform space values', () => {
+	test( 'should transform ui.space values', () => {
 		const numberValues = {
 			gridGap: 4,
 			gridColumnGap: 4,
@@ -21,7 +21,7 @@ describe( 'scales', () => {
 			const result = {};
 
 			assert[ key ] = value;
-			result[ key ] = space( value );
+			result[ key ] = ui.space( value );
 
 			expect( getScaleStyles( assert ) ).toEqual( result );
 		}
@@ -41,7 +41,7 @@ describe( 'scales', () => {
 			const result = {};
 
 			assert[ key ] = value;
-			result[ key ] = space( value );
+			result[ key ] = ui.space( value );
 
 			expect( getScaleStyles( assert ) ).toEqual( result );
 		}
