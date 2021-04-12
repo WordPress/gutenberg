@@ -605,6 +605,39 @@ class EditorPage {
 		return await typeString( this.driver, textViewElement, text, clear );
 	}
 
+	async toggleHideSearchLabelSetting( block ) {
+		await this.openBlockSettings( block );
+
+		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
+
+		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Hide search heading")]`;
+		return await this.driver.elementByXPath( locator ).click();
+	}
+
+	async changeSearchButtonPositionSetting( block, buttonPosition ) {
+		await this.openBlockSettings( block );
+
+		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeButton';
+
+		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Button position")]`;
+		await this.driver.elementByXPath( locator ).click();
+
+		const optionMenuButtonLocator = `${ elementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ buttonPosition }")]`;
+		return await this.driver
+			.elementByXPath( optionMenuButtonLocator )
+			.click()
+			.sleep( isAndroid() ? 500 : 200 );
+	}
+
+	async toggleSearchIconOnlySetting( block ) {
+		await this.openBlockSettings( block );
+
+		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
+
+		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Use icon button")]`;
+		return await this.driver.elementByXPath( locator ).click();
+	}
+
 	// =============================
 	// Unsupported Block functions
 	// =============================

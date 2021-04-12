@@ -90,8 +90,6 @@ describe( 'Gutenberg Editor Search Block tests', () => {
 			// Changing text on the button doesn't work as expected on Android
 			// so skip This test if running on Android.
 			if ( isAndroid() ) {
-				// Remove the search block to end this suite of tests.
-				await editorPage.removeBlockAtPosition( blockNames.search );
 				return;
 			}
 
@@ -106,6 +104,66 @@ describe( 'Gutenberg Editor Search Block tests', () => {
 			expect( html ).toBe(
 				`<!-- wp:search {"label":"${ testData.shortText }","placeholder":"${ testData.shortText }","buttonText":"${ testData.shortButtonText }"} /-->`
 			);
+		} );
+	} );
+
+	describe( 'Search block settings', () => {
+		it( 'able to hide search block label', async () => {
+			const searchBlock = await editorPage.getBlockAtPosition(
+				blockNames.search
+			);
+
+			await editorPage.toggleHideSearchLabelSetting( searchBlock );
+			await editorPage.dismissBottomSheet();
+
+			// switch to html and verify
+			const html = await editorPage.getHtmlContent();
+			expect( html ).toContain( `"showLabel":false` );
+		} );
+
+		it( 'able to change to icon only button', async () => {
+			const searchBlock = await editorPage.getBlockAtPosition(
+				blockNames.search
+			);
+
+			await editorPage.toggleSearchIconOnlySetting( searchBlock );
+			await editorPage.dismissBottomSheet();
+
+			// switch to html and verify
+			const html = await editorPage.getHtmlContent();
+			expect( html ).toContain( `"buttonUseIcon":true` );
+		} );
+
+		it( 'able to change button position to inside', async () => {
+			const searchBlock = await editorPage.getBlockAtPosition(
+				blockNames.search
+			);
+
+			await editorPage.changeSearchButtonPositionSetting(
+				searchBlock,
+				'Button inside'
+			);
+			await editorPage.dismissBottomSheet();
+
+			// switch to html and verify
+			const html = await editorPage.getHtmlContent();
+			expect( html ).toContain( `"buttonPosition":"button-inside"` );
+		} );
+
+		it( 'able change button position to no button', async () => {
+			const searchBlock = await editorPage.getBlockAtPosition(
+				blockNames.search
+			);
+
+			await editorPage.changeSearchButtonPositionSetting(
+				searchBlock,
+				'No button'
+			);
+			await editorPage.dismissBottomSheet();
+
+			// switch to html and verify
+			const html = await editorPage.getHtmlContent();
+			expect( html ).toContain( `"buttonPosition":"no-button"` );
 
 			// Remove the search block to end this suite of tests.
 			await editorPage.removeBlockAtPosition( blockNames.search );
