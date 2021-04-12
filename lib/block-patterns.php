@@ -77,7 +77,7 @@ register_block_pattern(
 		'title'      => __( 'Post Grid', 'gutenberg' ),
 		'blockTypes' => array( 'core/query' ),
 		'categories' => array( 'Query' ),
-		'content'    => '<!-- wp:query {"queryId":11,"query":{"perPage":12,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":true},"layout":{"type":"flex","columns":3}} -->
+		'content'    => '<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":true},"layout":{"type":"flex","columns":3}} -->
 						<!-- wp:query-loop -->
 						<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
 						<main class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:post-title {"isLink":true} /-->
@@ -97,7 +97,7 @@ register_block_pattern(
 		'categories' => array( 'Query' ),
 		'content'    => '<!-- wp:group {"align":"full","backgroundColor":"black","textColor":"white","style":{"spacing":{"padding":{"top":"100px","right":"100px","bottom":"100px","left":"100px"}}}} -->
 						<div class="wp-block-group alignfull has-white-color has-black-background-color has-text-color has-background" style="padding-top:100px;padding-right:100px;padding-bottom:100px;padding-left:100px">
-						<!-- wp:query {"query":{"perPage":10,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
+						<!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
 						<!-- wp:query-loop -->
 						<!-- wp:separator {"color":"white","align":"wide","className":"is-style-wide"} -->
 						<hr class="wp-block-separator alignwide has-text-color has-background has-white-background-color has-white-color is-style-wide"/>
@@ -125,7 +125,7 @@ register_block_pattern(
 		'content'    => '<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
 						<main class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:columns -->
 						<div class="wp-block-columns"><!-- wp:column {"width":"50%"} -->
-						<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"queryId":11,"query":{"perPage":5,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"layout":{"type":"list"}} -->
+						<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"layout":{"type":"list"}} -->
 						<!-- wp:query-loop -->
 						<!-- wp:post-featured-image /-->
 						<!-- wp:post-title /-->
@@ -137,7 +137,7 @@ register_block_pattern(
 						<!-- /wp:query --></div>
 						<!-- /wp:column -->
 						<!-- wp:column {"width":"50%"} -->
-						<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"queryId":11,"query":{"perPage":5,"pages":0,"offset":5,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"layout":{"type":"list"}} -->
+						<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"query":{"perPage":2,"pages":0,"offset":2,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"layout":{"type":"list"}} -->
 						<!-- wp:query-loop -->
 						<!-- wp:spacer {"height":200} -->
 						<div style="height:200px" aria-hidden="true" class="wp-block-spacer"></div>
