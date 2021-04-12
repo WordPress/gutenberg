@@ -119,3 +119,8 @@ $blocks-block__margin: 0.5em;
 		width: 100%;
 	}
 }
+
+// Legacy buttons that did not come in a wrapping container.
+.wp-block-button.aligncenter {
+	text-align: center;
+}
