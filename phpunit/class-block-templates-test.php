@@ -284,20 +284,20 @@ class Block_Templates_Test extends WP_UnitTestCase {
 	 * Should flatten nested blocks
 	 */
 	function test_flatten_blocks() {
-		$content  = '<!-- wp:group --><!-- wp:template-part {"slug":"header","align":"full", "tagName":"header","className":"site-header"} /--><!-- /wp:group -->';
-		$blocks   = parse_blocks( $content );
+		$content_template_part_inside_group  = '<!-- wp:group --><!-- wp:template-part {"slug":"header"} /--><!-- /wp:group -->';
+		$blocks   = parse_blocks( $content_template_part_inside_group );
 		$actual   = _flatten_blocks( $blocks );
 		$expected = array( $blocks[0], $blocks[0]['innerBlocks'][0] );
 		$this->assertEquals( $expected, $actual );
 
-		$content  = '<!-- wp:group --><!-- wp:group --><!-- wp:template-part {"slug":"header","align":"full", "tagName":"header","className":"site-header"} /--><!-- /wp:group --><!-- /wp:group -->';
-		$blocks   = parse_blocks( $content );
+		$content_template_part_inside_group_inside_group  = '<!-- wp:group --><!-- wp:group --><!-- wp:template-part {"slug":"header"} /--><!-- /wp:group --><!-- /wp:group -->';
+		$blocks   = parse_blocks( $content_template_part_inside_group_inside_group );
 		$actual   = _flatten_blocks( $blocks );
 		$expected = array( $blocks[0], $blocks[0]['innerBlocks'][0], $blocks[0]['innerBlocks'][0]['innerBlocks'][0] );
 		$this->assertEquals( $expected, $actual );
 
-		$content  = '<!-- wp:group /-->';
-		$blocks   = parse_blocks( $content );
+		$content_without_inner_blocks  = '<!-- wp:group /-->';
+		$blocks   = parse_blocks( $content_without_inner_blocks );
 		$actual   = _flatten_blocks( $blocks );
 		$expected = array( $blocks[0] );
 		$this->assertEquals( $expected, $actual );
