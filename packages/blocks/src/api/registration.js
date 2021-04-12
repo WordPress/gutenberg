@@ -4,10 +4,11 @@
  * External dependencies
  */
 import {
-	get,
+	camelCase,
 	isFunction,
 	isNil,
 	isPlainObject,
+	mapKeys,
 	omit,
 	pick,
 	pickBy,
@@ -82,6 +83,9 @@ import { store as blocksStore } from '../store';
  * @property {string}   name                   The unique and machine-readable name.
  * @property {string}   title                  A human-readable variation title.
  * @property {string}   [description]          A detailed variation description.
+ * @property {string}   [category]             Block type category classification,
+ *                                             used in search interfaces to arrange
+ *                                             block types by category.
  * @property {WPIcon}   [icon]                 An icon helping to visualize the variation.
  * @property {boolean}  [isDefault]            Indicates whether the current variation is
  *                                             the default one. Defaults to `false`.
@@ -97,6 +101,14 @@ import { store as blocksStore } from '../store';
  * @property {string[]} [keywords]             An array of terms (which can be translated)
  *                                             that help users discover the variation
  *                                             while searching.
+ * @property {Function} [isActive]             A function that accepts a block's attributes
+ *                                             and the variation's attributes and determines
+ *                                             if a variation is active. This function doesn't
+ *                                             try to find a match dynamically based on all
+ *                                             block's attributes, as in many cases some
+ *                                             attributes are irrelevant. An example would
+ *                                             be for `embed` block where we only care about
+ *                                             `providerNameSlug` attribute's value.
  */
 
 /**
@@ -138,7 +150,7 @@ const LEGACY_CATEGORY_MAPPING = {
 	layout: 'design',
 };
 
-export let serverSideBlockDefinitions = {};
+export const serverSideBlockDefinitions = {};
 
 /**
  * Sets the server side block definition of blocks.
@@ -147,10 +159,29 @@ export let serverSideBlockDefinitions = {};
  */
 // eslint-disable-next-line camelcase
 export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
-	serverSideBlockDefinitions = {
-		...serverSideBlockDefinitions,
-		...definitions,
-	};
+	for ( const blockName of Object.keys( definitions ) ) {
+		// Don't overwrite if already set. It covers the case when metadata
+		// was initialized from the server.
+		if ( serverSideBlockDefinitions[ blockName ] ) {
+			// We still need to polyfill `apiVersion` for WordPress version
+			// lower than 5.7. If it isn't present in the definition shared
+			// from the server, we try to fallback to the definition passed.
+			// @see https://github.com/WordPress/gutenberg/pull/29279
+			if (
+				serverSideBlockDefinitions[ blockName ].apiVersion ===
+					undefined &&
+				definitions[ blockName ].apiVersion
+			) {
+				serverSideBlockDefinitions[ blockName ].apiVersion =
+					definitions[ blockName ].apiVersion;
+			}
+			continue;
+		}
+		serverSideBlockDefinitions[ blockName ] = mapKeys(
+			pickBy( definitions[ blockName ], ( value ) => ! isNil( value ) ),
+			( value, key ) => camelCase( key )
+		);
+	}
 }
 
 /**
@@ -175,10 +206,7 @@ export function registerBlockType( name, settings ) {
 		supports: {},
 		styles: [],
 		save: () => null,
-		...pickBy(
-			get( serverSideBlockDefinitions, name, {} ),
-			( value ) => ! isNil( value )
-		),
+		...serverSideBlockDefinitions?.[ name ],
 		...settings,
 	};
 
@@ -461,6 +489,19 @@ export function hasBlockSupport( nameOrType, feature, defaultSupports ) {
  */
 export function isReusableBlock( blockOrType ) {
 	return blockOrType.name === 'core/block';
+}
+
+/**
+ * Determines whether or not the given block is a template part. This is a
+ * special block type that allows composing a page template out of reusable
+ * design elements.
+ *
+ * @param {Object} blockOrType Block or Block Type to test.
+ *
+ * @return {boolean} Whether the given block is a template part.
+ */
+export function isTemplatePart( blockOrType ) {
+	return blockOrType.name === 'core/template-part';
 }
 
 /**

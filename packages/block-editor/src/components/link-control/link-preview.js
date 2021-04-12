@@ -17,7 +17,8 @@ import { ViewerSlot } from './viewer-slot';
 
 export default function LinkPreview( { value, onEditClick } ) {
 	const displayURL =
-		( value && filterURLForDisplay( safeDecodeURI( value.url ) ) ) || '';
+		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
+		'';
 
 	return (
 		<div

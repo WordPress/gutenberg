@@ -27,6 +27,7 @@ import preventEventDiscovery from './prevent-event-discovery';
 import Layout from './components/layout';
 import EditorInitialization from './components/editor-initialization';
 import EditPostSettings from './components/edit-post-settings';
+import { store as editPostStore } from './store';
 
 function Editor( {
 	postId,
@@ -55,16 +56,29 @@ function Editor( {
 			getPreference,
 			__experimentalGetPreviewDeviceType,
 			isEditingTemplate,
-		} = select( 'core/edit-post' );
-		const { getEntityRecord, __experimentalGetTemplateForLink } = select(
+			getEditedPostTemplate,
+		} = select( editPostStore );
+		const { getEntityRecord, getPostType, getEntityRecords } = select(
 			'core'
 		);
-		const { getEditorSettings, __unstableIsAutodraftPost } = select(
-			'core/editor'
-		);
+		const { getEditorSettings } = select( 'core/editor' );
 		const { getBlockTypes } = select( blocksStore );
-		const postObject = getEntityRecord( 'postType', postType, postId );
-		const isFSETheme = getEditorSettings().isFSETheme;
+		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+			postType
+		);
+		// Ideally the initializeEditor function should be called using the ID of the REST endpoint.
+		// to avoid the special case.
+		let postObject;
+		if ( isTemplate ) {
+			const posts = getEntityRecords( 'postType', postType, {
+				wp_id: postId,
+			} );
+			postObject = posts?.[ 0 ];
+		} else {
+			postObject = getEntityRecord( 'postType', postType, postId );
+		}
+		const supportsTemplateMode = getEditorSettings().supportsTemplateMode;
+		const isViewable = getPostType( postType )?.viewable ?? false;
 
 		return {
 			hasFixedToolbar:
@@ -84,25 +98,20 @@ function Editor( {
 			keepCaretInsideBlock: isFeatureActive( 'keepCaretInsideBlock' ),
 			isTemplateMode: isEditingTemplate(),
 			template:
-				isFSETheme &&
-				postObject &&
-				! __unstableIsAutodraftPost() &&
-				postType !== 'wp_template'
-					? __experimentalGetTemplateForLink( postObject.link )
+				supportsTemplateMode && isViewable
+					? getEditedPostTemplate()
 					: null,
 			post: postObject,
 		};
 	} );
 
 	const { updatePreferredStyleVariations, setIsInserterOpened } = useDispatch(
-		'core/edit-post'
+		editPostStore
 	);
 
 	const editorSettings = useMemo( () => {
 		const result = {
-			...( hasThemeStyles
-				? settings
-				: omit( settings, [ 'defaultEditorStyles' ] ) ),
+			...omit( settings, [ 'styles' ] ),
 			__experimentalPreferredStyleVariations: {
 				value: preferredStyleVariations,
 				onChange: updatePreferredStyleVariations,
@@ -115,9 +124,6 @@ function Editor( {
 			// This is marked as experimental to give time for the quick inserter to mature.
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			keepCaretInsideBlock,
-			styles: hasThemeStyles
-				? settings.styles
-				: settings.defaultEditorStyles,
 		};
 
 		// Omit hidden block types if exists and non-empty.
@@ -142,7 +148,6 @@ function Editor( {
 		hasFixedToolbar,
 		focusMode,
 		hasReducedUI,
-		hasThemeStyles,
 		hiddenBlockTypes,
 		blockTypes,
 		preferredStyleVariations,
@@ -151,6 +156,10 @@ function Editor( {
 		updatePreferredStyleVariations,
 		keepCaretInsideBlock,
 	] );
+
+	const styles = useMemo( () => {
+		return hasThemeStyles ? settings.styles : [];
+	}, [ settings, hasThemeStyles ] );
 
 	if ( ! post ) {
 		return null;
@@ -173,7 +182,7 @@ function Editor( {
 						>
 							<ErrorBoundary onError={ onError }>
 								<EditorInitialization postId={ postId } />
-								<Layout settings={ settings } />
+								<Layout styles={ styles } />
 								<KeyboardShortcuts
 									shortcuts={ preventEventDiscovery }
 								/>

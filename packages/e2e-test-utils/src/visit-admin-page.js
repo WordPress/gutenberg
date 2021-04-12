@@ -20,6 +20,14 @@ import { getPageError } from './get-page-error';
 export async function visitAdminPage( adminPath, query ) {
 	await page.goto( createURL( join( 'wp-admin', adminPath ), query ) );
 
+	// Handle upgrade required screen
+	if ( isCurrentURL( 'wp-admin/upgrade.php' ) ) {
+		// Click update
+		await page.click( '.button.button-large.button-primary' );
+		// Click continue
+		await page.click( '.button.button-large' );
+	}
+
 	if ( isCurrentURL( 'wp-login.php' ) ) {
 		await loginUser();
 		await visitAdminPage( adminPath, query );

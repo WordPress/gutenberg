@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { button as icon } from '@wordpress/icons';
 
 /**
@@ -17,7 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Button' ),
+	title: _x( 'Button', 'block title' ),
 	description: __(
 		'Prompt visitors to take action with a button-style link.'
 	),

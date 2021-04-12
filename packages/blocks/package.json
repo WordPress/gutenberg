@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/blocks",
-	"version": "6.24.2",
+	"version": "8.0.1",
 	"description": "Block API for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"blocks"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/blocks/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/blocks/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -25,7 +25,7 @@
 		"{src,build,build-module}/{index.js,store/index.js}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
@@ -45,7 +45,7 @@
 		"rememo": "^3.0.0",
 		"showdown": "^1.9.1",
 		"simple-html-tokenizer": "^0.5.7",
-		"tinycolor2": "^1.4.1",
+		"tinycolor2": "^1.4.2",
 		"uuid": "^8.3.0"
 	},
 	"publishConfig": {

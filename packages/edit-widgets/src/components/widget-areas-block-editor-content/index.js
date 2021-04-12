@@ -8,6 +8,7 @@ import {
 	BlockSelectionClearer,
 	WritingFlow,
 	ObserveTyping,
+	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 
 /**
@@ -16,28 +17,23 @@ import {
 import Notices from '../notices';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 
-export default function WidgetAreasBlockEditorContent() {
+export default function WidgetAreasBlockEditorContent( {
+	blockEditorSettings,
+} ) {
 	return (
-		<BlockSelectionClearer>
-			<div
-				className="edit-widgets-block-editor editor-styles-wrapper"
-				onFocus={ ( event ) => {
-					// Stop propagation of the focus event to avoid the parent
-					// widget layout component catching the event and removing the selected area.
-					event.stopPropagation();
-					event.preventDefault();
-				} }
-			>
-				<KeyboardShortcuts />
-				<BlockEditorKeyboardShortcuts />
-				<Notices />
-				<Popover.Slot name="block-toolbar" />
+		<div className="edit-widgets-block-editor editor-styles-wrapper">
+			<EditorStyles styles={ blockEditorSettings.styles } />
+			<KeyboardShortcuts />
+			<BlockEditorKeyboardShortcuts />
+			<Notices />
+			<Popover.Slot name="block-toolbar" />
+			<BlockSelectionClearer>
 				<WritingFlow>
 					<ObserveTyping>
 						<BlockList className="edit-widgets-main-block-list" />
 					</ObserveTyping>
 				</WritingFlow>
-			</div>
-		</BlockSelectionClearer>
+			</BlockSelectionClearer>
+		</div>
 	);
 }

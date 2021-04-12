@@ -1,8 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { alignJustify as icon } from '@wordpress/icons';
+import { __, _x } from '@wordpress/i18n';
+import { postContent as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -14,7 +14,8 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Post Content' ),
+	title: _x( 'Post Content', 'block title' ),
+	description: __( 'Displays the contents of a post or page.' ),
 	icon,
 	edit,
 };

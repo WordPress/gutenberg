@@ -32,7 +32,7 @@ export function BorderRadiusEdit( props ) {
 	}
 
 	const onChange = ( newRadius ) => {
-		const newStyle = {
+		let newStyle = {
 			...style,
 			border: {
 				...style?.border,
@@ -40,7 +40,11 @@ export function BorderRadiusEdit( props ) {
 			},
 		};
 
-		setAttributes( { style: cleanEmptyObject( newStyle ) } );
+		if ( newRadius === undefined ) {
+			newStyle = cleanEmptyObject( newStyle );
+		}
+
+		setAttributes( { style: newStyle } );
 	};
 
 	return (
@@ -64,7 +68,7 @@ export function BorderRadiusEdit( props ) {
  */
 export function hasBorderRadiusSupport( blockType ) {
 	const support = getBlockSupport( blockType, BORDER_SUPPORT_KEY );
-	return true === support || ( support && !! support.radius );
+	return !! ( true === support || support?.radius );
 }
 
 /**

@@ -18,7 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Image' ),
+	title: _x( 'Image', 'block title' ),
 	description: __( 'Insert an image to make a visual statement.' ),
 	icon,
 	keywords: [

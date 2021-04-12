@@ -3,10 +3,5 @@
 	"plugins": [
 		"babel-plugin-emotion",
 		"babel-plugin-inline-json-import"
-	],
-	"env": {
-		"test": {
-			"plugins": [ "babel-plugin-require-context-hook" ]
-		}
-	}
+	]
 }

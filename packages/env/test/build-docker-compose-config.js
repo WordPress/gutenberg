@@ -73,4 +73,77 @@ describe( 'buildDockerComposeConfig', () => {
 			expect.arrayContaining( localSources )
 		);
 	} );
+
+	it( 'should not map the default phpunit uploads directory if the user has specified their own directory', () => {
+		const envConfig = {
+			...CONFIG,
+			mappings: {
+				'wp-content/uploads': {
+					path: '/path/to/wp-uploads',
+				},
+			},
+		};
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: envConfig, tests: envConfig },
+		} );
+		const expectedVolumes = [
+			'tests-wordpress:/var/www/html',
+			'/path/to/wp-uploads:/var/www/html/wp-content/uploads',
+		];
+		expect( dockerConfig.services.phpunit.volumes ).toEqual(
+			expectedVolumes
+		);
+	} );
+
+	it( 'should map the default phpunit uploads directory even if the user has specified their own directory only for the development instance', () => {
+		const envConfig = {
+			...CONFIG,
+			mappings: {
+				'wp-content/uploads': {
+					path: '/path/to/wp-uploads',
+				},
+			},
+		};
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: envConfig, tests: CONFIG },
+		} );
+		const expectedVolumes = [
+			'tests-wordpress:/var/www/html',
+			'phpunit-uploads:/var/www/html/wp-content/uploads',
+		];
+		expect( dockerConfig.services.phpunit.volumes ).toEqual(
+			expectedVolumes
+		);
+	} );
+
+	it( 'should create "wordpress" and "tests-wordpress" volumes if they are needed by containers', () => {
+		// CONFIG has no coreSource entry, so there are no core sources on the
+		// local filesystem, so a volume should be created to contain core
+		// sources.
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: CONFIG, tests: CONFIG },
+		} );
+
+		expect( dockerConfig.volumes.wordpress ).not.toBe( undefined );
+		expect( dockerConfig.volumes[ 'tests-wordpress' ] ).not.toBe(
+			undefined
+		);
+	} );
+
+	it( 'should NOT create "wordpress" and "tests-wordpress" volumes if they are not needed by containers', () => {
+		const envConfig = {
+			...CONFIG,
+			coreSource: {
+				path: '/some/random/path',
+				local: true,
+			},
+		};
+
+		const dockerConfig = buildDockerComposeConfig( {
+			env: { development: envConfig, tests: envConfig },
+		} );
+
+		expect( dockerConfig.volumes.wordpress ).toBe( undefined );
+		expect( dockerConfig.volumes[ 'tests-wordpress' ] ).toBe( undefined );
+	} );
 } );

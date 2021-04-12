@@ -10,7 +10,7 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
  * Internal dependencies
  */
 import { cleanEmptyObject } from './utils';
-import useEditorFeature from '../components/use-editor-feature';
+import { useCustomUnits } from '../components/unit-control';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
 
@@ -20,11 +20,11 @@ const hasPaddingSupport = ( blockName ) => {
 };
 
 /**
- * Inspector control panel containing the line height related configuration
+ * Inspector control panel containing the padding related configuration
  *
  * @param {Object} props
  *
- * @return {WPElement} Line height edit element.
+ * @return {WPElement} Padding edit element.
  */
 export function PaddingEdit( props ) {
 	const {
@@ -33,11 +33,7 @@ export function PaddingEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const customUnits = useEditorFeature( 'spacing.units' );
-	const units = customUnits?.map( ( unit ) => ( {
-		value: unit,
-		label: unit,
-	} ) );
+	const units = useCustomUnits();
 
 	if ( ! hasPaddingSupport( blockName ) ) {
 		return null;

@@ -8,6 +8,7 @@ import { noop } from 'lodash';
  * WordPress dependencies
  */
 import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
+import { isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -15,7 +16,6 @@ import { Icon, chevronLeft, chevronRight } from '@wordpress/icons';
 import Button from '../../button';
 import { useNavigationContext } from '../context';
 import { ItemUI } from '../styles/navigation-styles';
-import { useRTL } from '../../utils/rtl';
 import NavigationItemBaseContent from './base-content';
 import NavigationItemBase from './base';
 
@@ -39,7 +39,6 @@ export default function NavigationItem( props ) {
 		setActiveMenu,
 		navigationTree: { isMenuEmpty },
 	} = useNavigationContext();
-	const isRTL = useRTL();
 
 	// If hideIfTargetMenuEmpty prop is true
 	// And the menu we are supposed to navigate to
@@ -63,7 +62,7 @@ export default function NavigationItem( props ) {
 
 		onClick( event );
 	};
-	const icon = isRTL ? chevronLeft : chevronRight;
+	const icon = isRTL() ? chevronLeft : chevronRight;
 	const baseProps = isText
 		? restProps
 		: { as: Button, href, onClick: onItemClick, ...restProps };

@@ -16,6 +16,7 @@ import { __, _n, sprintf } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockManagerCategory from './category';
+import { store as editPostStore } from '../../store';
 
 function BlockManager( {
 	search,
@@ -26,9 +27,9 @@ function BlockManager( {
 	isMatchingSearchTerm,
 	numberOfHiddenBlocks,
 } ) {
-	// Filtering occurs here (as opposed to `withSelect`) to avoid wasted
-	// wasted renders by consequence of `Array#filter` producing a new
-	// value reference on each call.
+	// Filtering occurs here (as opposed to `withSelect`) to avoid
+	// wasted renders by consequence of `Array#filter` producing
+	// a new value reference on each call.
 	blockTypes = blockTypes.filter(
 		( blockType ) =>
 			hasBlockSupport( blockType, 'inserter', true ) &&
@@ -104,7 +105,7 @@ export default compose( [
 			hasBlockSupport,
 			isMatchingSearchTerm,
 		} = select( blocksStore );
-		const { getPreference } = select( 'core/edit-post' );
+		const { getPreference } = select( editPostStore );
 		const hiddenBlockTypes = getPreference( 'hiddenBlockTypes' );
 		const numberOfHiddenBlocks =
 			isArray( hiddenBlockTypes ) && hiddenBlockTypes.length;

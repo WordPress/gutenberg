@@ -7,32 +7,15 @@ import { useMemoOne } from 'use-memo-one';
  * WordPress dependencies
  */
 import { createQueue } from '@wordpress/priority-queue';
-import {
-	useLayoutEffect,
-	useRef,
-	useCallback,
-	useEffect,
-	useReducer,
-	useMemo,
-} from '@wordpress/element';
+import { useRef, useCallback, useReducer, useMemo } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+import { useIsomorphicLayoutEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import useRegistry from '../registry-provider/use-registry';
 import useAsyncMode from '../async-mode-provider/use-async-mode';
-
-/**
- * Favor useLayoutEffect to ensure the store subscription callback always has
- * the selector from the latest render. If a store update happens between render
- * and the effect, this could cause missed/stale updates or inconsistent state.
- *
- * Fallback to useEffect for server rendered components because currently React
- * throws a warning when using useLayoutEffect in that environment.
- */
-const useIsomorphicLayoutEffect =
-	typeof window !== 'undefined' ? useLayoutEffect : useEffect;
 
 const renderQueue = createQueue();
 

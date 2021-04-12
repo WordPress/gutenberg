@@ -10,6 +10,7 @@ import { compose } from '@wordpress/compose';
  * Internal dependencies
  */
 import BlockManager from './manager';
+import { store as editPostStore } from '../../store';
 
 /**
  * Unique identifier for Manage Blocks modal.
@@ -37,14 +38,14 @@ export function ManageBlocksModal( { isActive, closeModal } ) {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { isModalActive } = select( 'core/edit-post' );
+		const { isModalActive } = select( editPostStore );
 
 		return {
 			isActive: isModalActive( MODAL_NAME ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { closeModal } = dispatch( 'core/edit-post' );
+		const { closeModal } = dispatch( editPostStore );
 
 		return {
 			closeModal,

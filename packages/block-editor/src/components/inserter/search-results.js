@@ -24,6 +24,7 @@ import useInsertionPoint from './hooks/use-insertion-point';
 import usePatternsState from './hooks/use-patterns-state';
 import useBlockTypesState from './hooks/use-block-types-state';
 import { searchBlockItems, searchItems } from './search-items';
+import InserterListbox from '../inserter-listbox';
 
 function InserterSearchResults( {
 	filterValue,
@@ -32,10 +33,11 @@ function InserterSearchResults( {
 	rootClientId,
 	clientId,
 	isAppender,
-	selectBlockOnInsert,
 	maxBlockPatterns,
 	maxBlockTypes,
 	showBlockDirectory = false,
+	isDraggable = true,
+	shouldFocusBlock = true,
 } ) {
 	const debouncedSpeak = useDebounce( speak, 500 );
 
@@ -44,7 +46,7 @@ function InserterSearchResults( {
 		rootClientId,
 		clientId,
 		isAppender,
-		selectBlockOnInsert,
+		shouldFocusBlock,
 	} );
 	const [
 		blockTypes,
@@ -53,7 +55,8 @@ function InserterSearchResults( {
 		onSelectBlockType,
 	] = useBlockTypesState( destinationRootClientId, onInsertBlocks );
 	const [ patterns, , onSelectBlockPattern ] = usePatternsState(
-		onInsertBlocks
+		onInsertBlocks,
+		destinationRootClientId
 	);
 
 	const filteredBlockTypes = useMemo( () => {
@@ -102,7 +105,7 @@ function InserterSearchResults( {
 		! isEmpty( filteredBlockTypes ) || ! isEmpty( filteredBlockPatterns );
 
 	return (
-		<>
+		<InserterListbox>
 			{ ! showBlockDirectory && ! hasItems && <InserterNoResults /> }
 
 			{ !! filteredBlockTypes.length && (
@@ -116,6 +119,7 @@ function InserterSearchResults( {
 						onSelect={ onSelectBlockType }
 						onHover={ onHover }
 						label={ __( 'Blocks' ) }
+						isDraggable={ isDraggable }
 					/>
 				</InserterPanel>
 			) }
@@ -138,6 +142,7 @@ function InserterSearchResults( {
 							shownPatterns={ currentShownPatterns }
 							blockPatterns={ filteredBlockPatterns }
 							onClickPattern={ onSelectBlockPattern }
+							isDraggable={ isDraggable }
 						/>
 					</div>
 				</InserterPanel>
@@ -150,6 +155,7 @@ function InserterSearchResults( {
 						onHover,
 						filterValue,
 						hasItems,
+						rootClientId: destinationRootClientId,
 					} }
 				>
 					{ ( fills ) => {
@@ -163,7 +169,7 @@ function InserterSearchResults( {
 					} }
 				</__experimentalInserterMenuExtension.Slot>
 			) }
-		</>
+		</InserterListbox>
 	);
 }
 

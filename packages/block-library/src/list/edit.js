@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __, _x, isRTL } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
 	RichText,
@@ -9,7 +9,7 @@ import {
 	RichTextShortcut,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { ToolbarGroup } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import {
 	__unstableCanIndentListItems as canIndentListItems,
 	__unstableCanOutdentListItems as canOutdentListItems,
@@ -29,7 +29,6 @@ import {
 	formatOutdent,
 	formatOutdentRTL,
 } from '@wordpress/icons';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -46,10 +45,6 @@ export default function ListEdit( {
 } ) {
 	const { ordered, values, type, reversed, start } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
-
-	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
-	}, [] );
 
 	const controls = ( { value, onChange, onFocus } ) => (
 		<>
@@ -89,66 +84,58 @@ export default function ListEdit( {
 					/>
 				</>
 			) }
-			<BlockControls>
-				<ToolbarGroup
-					controls={ [
-						{
-							icon: isRTL
-								? formatListBulletsRTL
-								: formatListBullets,
-							title: __( 'Convert to unordered list' ),
-							isActive: isActiveListType( value, 'ul', tagName ),
-							onClick() {
-								onChange(
-									changeListType( value, { type: 'ul' } )
-								);
-								onFocus();
+			<BlockControls group="block">
+				<ToolbarButton
+					icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
+					title={ __( 'Unordered' ) }
+					describedBy={ __( 'Convert to unordered list' ) }
+					isActive={ isActiveListType( value, 'ul', tagName ) }
+					onClick={ () => {
+						onChange( changeListType( value, { type: 'ul' } ) );
+						onFocus();
 
-								if ( isListRootSelected( value ) ) {
-									setAttributes( { ordered: false } );
-								}
-							},
-						},
-						{
-							icon: isRTL
-								? formatListNumberedRTL
-								: formatListNumbered,
-							title: __( 'Convert to ordered list' ),
-							isActive: isActiveListType( value, 'ol', tagName ),
-							onClick() {
-								onChange(
-									changeListType( value, { type: 'ol' } )
-								);
-								onFocus();
+						if ( isListRootSelected( value ) ) {
+							setAttributes( { ordered: false } );
+						}
+					} }
+				/>
+				<ToolbarButton
+					icon={
+						isRTL() ? formatListNumberedRTL : formatListNumbered
+					}
+					title={ __( 'Ordered' ) }
+					describedBy={ __( 'Convert to ordered list' ) }
+					isActive={ isActiveListType( value, 'ol', tagName ) }
+					onClick={ () => {
+						onChange( changeListType( value, { type: 'ol' } ) );
+						onFocus();
 
-								if ( isListRootSelected( value ) ) {
-									setAttributes( { ordered: true } );
-								}
-							},
-						},
-						{
-							icon: isRTL ? formatOutdentRTL : formatOutdent,
-							title: __( 'Outdent list item' ),
-							shortcut: _x( 'Backspace', 'keyboard key' ),
-							isDisabled: ! canOutdentListItems( value ),
-							onClick() {
-								onChange( outdentListItems( value ) );
-								onFocus();
-							},
-						},
-						{
-							icon: isRTL ? formatIndentRTL : formatIndent,
-							title: __( 'Indent list item' ),
-							shortcut: _x( 'Space', 'keyboard key' ),
-							isDisabled: ! canIndentListItems( value ),
-							onClick() {
-								onChange(
-									indentListItems( value, { type: tagName } )
-								);
-								onFocus();
-							},
-						},
-					] }
+						if ( isListRootSelected( value ) ) {
+							setAttributes( { ordered: true } );
+						}
+					} }
+				/>
+				<ToolbarButton
+					icon={ isRTL() ? formatOutdentRTL : formatOutdent }
+					title={ __( 'Outdent' ) }
+					describedBy={ __( 'Outdent list item' ) }
+					shortcut={ _x( 'Backspace', 'keyboard key' ) }
+					isDisabled={ ! canOutdentListItems( value ) }
+					onClick={ () => {
+						onChange( outdentListItems( value ) );
+						onFocus();
+					} }
+				/>
+				<ToolbarButton
+					icon={ isRTL() ? formatIndentRTL : formatIndent }
+					title={ __( 'Indent' ) }
+					describedBy={ __( 'Indent list item' ) }
+					shortcut={ _x( 'Space', 'keyboard key' ) }
+					isDisabled={ ! canIndentListItems( value ) }
+					onClick={ () => {
+						onChange( indentListItems( value, { type: tagName } ) );
+						onFocus();
+					} }
 				/>
 			</BlockControls>
 		</>
@@ -168,7 +155,7 @@ export default function ListEdit( {
 				}
 				value={ values }
 				aria-label={ __( 'List text' ) }
-				placeholder={ __( 'Write list…' ) }
+				placeholder={ __( 'List' ) }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value ) =>
 					createBlock( name, { ...attributes, values: value } )

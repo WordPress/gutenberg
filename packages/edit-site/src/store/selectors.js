@@ -1,14 +1,29 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { get, map } from 'lodash';
 import createSelector from 'rememo';
 
 /**
  * WordPress dependencies
  */
+import { store as coreDataStore } from '@wordpress/core-data';
 import { createRegistrySelector } from '@wordpress/data';
 import { uploadMedia } from '@wordpress/media-utils';
+
+/**
+ * Internal dependencies
+ */
+import {
+	MENU_ROOT,
+	MENU_TEMPLATE_PARTS,
+	MENU_TEMPLATES_UNUSED,
+	TEMPLATE_PARTS_SUB_MENUS,
+} from '../components/navigation-sidebar/navigation-panel/constants';
+import {
+	getTemplateLocation,
+	isTemplateSuperseded,
+} from '../components/navigation-sidebar/navigation-panel/template-hierarchy';
 
 /**
  * Returns whether the given feature is enabled or not.
@@ -41,7 +56,7 @@ export function __experimentalGetPreviewDeviceType( state ) {
  * @return {Object} Whether the current user can create media or not.
  */
 export const getCanUserCreateMedia = createRegistrySelector( ( select ) => () =>
-	select( 'core' ).canUser( 'create', 'media' )
+	select( coreDataStore ).canUser( 'create', 'media' )
 );
 
 /**
@@ -96,36 +111,25 @@ export function getHomeTemplateId( state ) {
 }
 
 /**
- * Returns the current template ID.
+ * Returns the current edited post type (wp_template or wp_template_part).
  *
  * @param {Object} state Global application state.
  *
  * @return {number?} Template ID.
  */
-export function getTemplateId( state ) {
-	return state.templateId;
+export function getEditedPostType( state ) {
+	return state.editedPost.type;
 }
 
 /**
- * Returns the current template part ID.
+ * Returns the ID of the currently edited template or template part.
  *
  * @param {Object} state Global application state.
  *
- * @return {number?} Template part ID.
+ * @return {number?} Post ID.
  */
-export function getTemplatePartId( state ) {
-	return state.templatePartId;
-}
-
-/**
- * Returns the current template type.
- *
- * @param {Object} state Global application state.
- *
- * @return {string?} Template type.
- */
-export function getTemplateType( state ) {
-	return state.templateType;
+export function getEditedPostId( state ) {
+	return state.editedPost.id;
 }
 
 /**
@@ -136,7 +140,7 @@ export function getTemplateType( state ) {
  * @return {Object} Page.
  */
 export function getPage( state ) {
-	return state.page;
+	return state.editedPost.page;
 }
 
 /**
@@ -149,6 +153,64 @@ export function getPage( state ) {
 export function getNavigationPanelActiveMenu( state ) {
 	return state.navigationPanel.menu;
 }
+
+/**
+ * Returns the current template or template part's corresponding
+ * navigation panel's sub menu, to be used with `openNavigationPanelToMenu`.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {string} The current template or template part's sub menu.
+ */
+export const getCurrentTemplateNavigationPanelSubMenu = createRegistrySelector(
+	( select ) => ( state ) => {
+		const templateType = getEditedPostType( state );
+		const templateId = getEditedPostId( state );
+		const template = templateId
+			? select( coreDataStore ).getEntityRecord(
+					'postType',
+					templateType,
+					templateId
+			  )
+			: null;
+
+		if ( ! template ) {
+			return MENU_ROOT;
+		}
+
+		if ( 'wp_template_part' === templateType ) {
+			return (
+				TEMPLATE_PARTS_SUB_MENUS.find(
+					( submenu ) => submenu.area === template?.area
+				)?.menu || MENU_TEMPLATE_PARTS
+			);
+		}
+
+		const templates = select( coreDataStore ).getEntityRecords(
+			'postType',
+			'wp_template',
+			{
+				per_page: -1,
+			}
+		);
+		const showOnFront = select( coreDataStore ).getEditedEntityRecord(
+			'root',
+			'site'
+		).show_on_front;
+
+		if (
+			isTemplateSuperseded(
+				template.slug,
+				map( templates, 'slug' ),
+				showOnFront
+			)
+		) {
+			return MENU_TEMPLATES_UNUSED;
+		}
+
+		return getTemplateLocation( template.slug );
+	}
+);
 
 /**
  * Returns the current opened/closed state of the navigation panel.
@@ -170,4 +232,15 @@ export function isNavigationOpened( state ) {
  */
 export function isInserterOpened( state ) {
 	return state.blockInserterPanel;
+}
+
+/**
+ * Returns the current opened/closed state of the list view panel.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} True if the list view panel should be open; false if closed.
+ */
+export function isListViewOpened( state ) {
+	return state.listViewPanel;
 }

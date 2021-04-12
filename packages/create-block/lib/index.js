@@ -50,6 +50,7 @@ program
 		'--no-wp-scripts',
 		'disable integration with `@wordpress/scripts` package'
 	)
+	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
 	.action(
 		async (
 			slug,
@@ -60,6 +61,7 @@ program
 				template: templateName,
 				title,
 				wpScripts,
+				wpEnv,
 			}
 		) => {
 			await checkSystemRequirements( engines );
@@ -73,6 +75,7 @@ program
 						namespace,
 						title,
 						wpScripts,
+						wpEnv,
 					},
 					( value ) => value !== undefined
 				);

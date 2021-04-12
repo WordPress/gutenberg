@@ -19,7 +19,8 @@ const buildDockerComposeConfig = require( './build-docker-compose-config' );
 
 /**
  * Initializes the local environment so that Docker commands can be run. Reads
- * ./.wp-env.json, creates ~/.wp-env, and creates ~/.wp-env/docker-compose.yml.
+ * ./.wp-env.json, creates ~/.wp-env, ~/.wp-env/docker-compose.yml, and
+ * ~/.wp-env/Dockerfile.
  *
  * @param {Object}  options
  * @param {Object}  options.spinner      A CLI spinner which indicates progress.
@@ -106,7 +107,7 @@ function dockerFileContents( image, xdebugMode ) {
 
 	return `FROM ${ image }
 
-RUN apt -qy install $PHPIZE_DEPS \\
+RUN apt-get -qy install $PHPIZE_DEPS \\
 	&& pecl install xdebug \\
 	&& docker-php-ext-enable xdebug
 

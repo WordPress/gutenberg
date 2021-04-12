@@ -105,15 +105,6 @@ export function FontSizeEdit( props ) {
 	const isDisabled = useIsFontSizeDisabled( props );
 	const fontSizes = useEditorFeature( 'typography.fontSizes' );
 
-	if ( isDisabled ) {
-		return null;
-	}
-
-	const fontSizeObject = getFontSize(
-		fontSizes,
-		fontSize,
-		style?.typography?.fontSize
-	);
 	const onChange = ( value ) => {
 		const fontSizeSlug = getFontSizeObjectByValue( fontSizes, value ).slug;
 
@@ -129,9 +120,20 @@ export function FontSizeEdit( props ) {
 		} );
 	};
 
-	return (
-		<FontSizePicker value={ fontSizeObject.size } onChange={ onChange } />
+	if ( isDisabled ) {
+		return null;
+	}
+
+	const fontSizeObject = getFontSize(
+		fontSizes,
+		fontSize,
+		style?.typography?.fontSize
 	);
+
+	const fontSizeValue =
+		fontSizeObject?.size || style?.typography?.fontSize || fontSize;
+
+	return <FontSizePicker onChange={ onChange } value={ fontSizeValue } />;
 }
 
 /**

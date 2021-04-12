@@ -4,7 +4,7 @@
 import { useEffect, useLayoutEffect, useMemo } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
 	BlockContextProvider,
@@ -16,8 +16,6 @@ import { store as noticesStore } from '@wordpress/notices';
  * Internal dependencies
  */
 import withRegistryProvider from './with-registry-provider';
-import ConvertToGroupButtons from '../convert-to-group-buttons';
-import usePostContentEditor from './use-post-content-editor';
 import { store as editorStore } from '../../store';
 import useBlockEditorSettings from './use-block-editor-settings';
 
@@ -35,20 +33,21 @@ function EditorProvider( {
 		}
 		return { postId: post.id, postType: post.type };
 	}, [ post.id, post.type ] );
-	const { selectionEnd, selectionStart, isReady } = useSelect( ( select ) => {
-		const {
-			getEditorSelectionStart,
-			getEditorSelectionEnd,
-			__unstableIsEditorReady,
-		} = select( editorStore );
+	const { selection, isReady } = useSelect( ( select ) => {
+		const { getEditorSelection, __unstableIsEditorReady } = select(
+			editorStore
+		);
 		return {
 			isReady: __unstableIsEditorReady(),
-			selectionStart: getEditorSelectionStart(),
-			selectionEnd: getEditorSelectionEnd(),
+			selection: getEditorSelection(),
 		};
 	}, [] );
 	const { id, type } = __unstableTemplate ?? post;
-	const blockEditorProps = usePostContentEditor( type, id );
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		'postType',
+		type,
+		{ id }
+	);
 	const editorSettings = useBlockEditorSettings(
 		settings,
 		!! __unstableTemplate
@@ -58,7 +57,6 @@ function EditorProvider( {
 		setupEditor,
 		updateEditorSettings,
 		__experimentalTearDownEditor,
-		__unstableSetupTemplate,
 	} = useDispatch( editorStore );
 	const { createWarningNotice } = useDispatch( noticesStore );
 
@@ -99,13 +97,6 @@ function EditorProvider( {
 		updateEditorSettings( settings );
 	}, [ settings ] );
 
-	// Synchronize the template as it changes
-	useEffect( () => {
-		if ( __unstableTemplate ) {
-			__unstableSetupTemplate( __unstableTemplate );
-		}
-	}, [ __unstableTemplate?.id ] );
-
 	if ( ! isReady ) {
 		return null;
 	}
@@ -115,15 +106,15 @@ function EditorProvider( {
 			<EntityProvider kind="postType" type={ post.type } id={ post.id }>
 				<BlockContextProvider value={ defaultBlockContext }>
 					<BlockEditorProvider
-						{ ...blockEditorProps }
-						selectionStart={ selectionStart }
-						selectionEnd={ selectionEnd }
+						value={ blocks }
+						onChange={ onChange }
+						onInput={ onInput }
+						selection={ selection }
 						settings={ editorSettings }
 						useSubRegistry={ false }
 					>
 						{ children }
 						<ReusableBlocksMenuItems />
-						<ConvertToGroupButtons />
 					</BlockEditorProvider>
 				</BlockContextProvider>
 			</EntityProvider>

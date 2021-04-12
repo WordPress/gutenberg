@@ -13,7 +13,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getBlockDOMNode } from '../../utils/dom';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Renders focus capturing areas to redirect focus to the selected block if not
@@ -37,15 +37,16 @@ const FocusCapture = forwardRef(
 			isReverse,
 			containerRef,
 			noCapture,
+			lastFocus,
 			hasMultiSelection,
 			multiSelectionContainer,
 		},
 		ref
 	) => {
 		const isNavigationMode = useSelect( ( select ) =>
-			select( 'core/block-editor' ).isNavigationMode()
+			select( blockEditorStore ).isNavigationMode()
 		);
-		const { setNavigationMode } = useDispatch( 'core/block-editor' );
+		const { setNavigationMode } = useDispatch( blockEditorStore );
 
 		function onFocus() {
 			// Do not capture incoming focus if set by us in WritingFlow.
@@ -78,20 +79,7 @@ const FocusCapture = forwardRef(
 				return;
 			}
 
-			// If there is a selected block, move focus to the first or last
-			// tabbable element depending on the direction.
-			const wrapper = getBlockDOMNode(
-				selectedClientId,
-				ref.current.ownerDocument
-			);
-
-			if ( isReverse ) {
-				const tabbables = focus.tabbable.find( wrapper );
-				const lastTabbable = last( tabbables ) || wrapper;
-				lastTabbable.focus();
-			} else {
-				wrapper.focus();
-			}
+			lastFocus.current.focus();
 		}
 
 		return (

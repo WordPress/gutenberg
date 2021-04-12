@@ -12,7 +12,11 @@ import { Button, Spinner, ButtonGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { RichText, MediaPlaceholder } from '@wordpress/block-editor';
+import {
+	RichText,
+	MediaPlaceholder,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { isBlobURL } from '@wordpress/blob';
 import { compose } from '@wordpress/compose';
 import {
@@ -22,6 +26,7 @@ import {
 	edit,
 	image as imageIcon,
 } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -276,9 +281,7 @@ class GalleryImage extends Component {
 					<RichText
 						tagName="figcaption"
 						aria-label={ __( 'Image caption text' ) }
-						placeholder={
-							isSelected ? __( 'Write caption…' ) : null
-						}
+						placeholder={ isSelected ? __( 'Add caption' ) : null }
 						value={ caption }
 						isSelected={ this.state.captionSelected }
 						onChange={ ( newCaption ) =>
@@ -295,7 +298,7 @@ class GalleryImage extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const { getMedia } = select( 'core' );
+		const { getMedia } = select( coreStore );
 		const { id } = ownProps;
 
 		return {
@@ -304,7 +307,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { __unstableMarkNextChangeAsNotPersistent } = dispatch(
-			'core/block-editor'
+			blockEditorStore
 		);
 		return {
 			__unstableMarkNextChangeAsNotPersistent,

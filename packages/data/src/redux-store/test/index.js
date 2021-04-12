@@ -83,6 +83,7 @@ describe( 'controls', () => {
 					.hasFinishedResolution( 'getItems' );
 				if ( isFinished ) {
 					const items = registry.select( 'store' ).getItems();
+					// eslint-disable-next-line jest/no-conditional-expect
 					expect( items ).toEqual( [ 1, 2, 3 ] );
 				}
 				resolve();

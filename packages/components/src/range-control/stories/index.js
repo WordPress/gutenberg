@@ -7,7 +7,7 @@ import { boolean, number, text } from '@storybook/addon-knobs';
 /**
  * WordPress dependencies
  */
-import { useEffect, useState } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -25,7 +25,6 @@ const RangeControlWithState = ( props ) => {
 };
 
 const DefaultExample = () => {
-	const [ isRtl, setIsRtl ] = useState( false );
 	const [ value, setValue ] = useState( undefined );
 
 	const props = {
@@ -47,26 +46,6 @@ const DefaultExample = () => {
 		value,
 		onChange: setValue,
 	};
-
-	const rtl = boolean( 'RTL', false );
-
-	useEffect( () => {
-		if ( rtl !== isRtl ) {
-			setIsRtl( rtl );
-		}
-	}, [ rtl, isRtl ] );
-
-	useEffect( () => {
-		if ( isRtl ) {
-			document.documentElement.setAttribute( 'dir', 'rtl' );
-		} else {
-			document.documentElement.setAttribute( 'dir', 'ltr' );
-		}
-
-		return () => {
-			document.documentElement.setAttribute( 'dir', 'ltr' );
-		};
-	}, [ isRtl ] );
 
 	return (
 		<Wrapper>

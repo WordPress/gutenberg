@@ -27,7 +27,7 @@ describe( 'adding inline tokens', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'a ' );
 
-		await clickBlockToolbarButton( 'More rich text controls' );
+		await clickBlockToolbarButton( 'More' );
 		await clickButton( 'Inline image' );
 
 		// Wait for media modal to appear and upload image.

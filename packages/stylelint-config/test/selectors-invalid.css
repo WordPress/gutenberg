@@ -1,0 +1,31 @@
+#commentForm { /* Avoid camelcase. */
+	margin: 0;
+}
+
+#comment_form { /* Avoid underscores. */
+	margin: 0;
+}
+
+div#comment_form { /* Avoid over-qualification. */
+	margin: 0;
+}
+
+#c1-xr { /* What is a c1-xr?! Use a better name. */
+	margin: 0;
+}
+
+input[type='text'] { /* Should be [type="text"] */
+	line-height: 110% /* Also doubly incorrect */
+}
+
+#Selector {
+	color: #000;
+}
+
+.selectorA {
+	color: #000;
+}
+
+.selector:after {
+	color: #000;
+}

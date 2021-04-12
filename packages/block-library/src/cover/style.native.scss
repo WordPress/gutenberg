@@ -55,12 +55,12 @@
 	position: absolute;
 }
 
-.backgroundSolid {
-	background-color: $gray-lighten-30;
+.mediaBackground {
+	background-color: $light-ultra-dim;
 }
 
-.backgroundSolidDark {
-	background-color: $background-dark-secondary;
+.mediaBackgroundDark {
+	background-color: $dark-ultra-dim;
 }
 
 .uploadFailedContainer {
@@ -117,6 +117,14 @@
 	left: 7px;
 }
 
+.addMediaButton {
+	color: $blue-50;
+}
+
+.addMediaButtonDark {
+	color: $blue-30;
+}
+
 .clearMediaButton {
 	color: $alert-red;
 }
@@ -138,6 +146,40 @@
 
 .image {
 	width: 100%;
+}
+
+.mediaPreview {
+	flex-direction: row;
+	justify-content: center;
+}
+
+.mediaInner {
+	max-height: 150px;
+	position: relative;
+}
+
+.imagePlaceholder {
+	min-width: 100%;
+}
+
+.video {
+	height: 100%;
+	max-width: 100%;
+}
+
+.focalPointHint {
+	box-shadow: 0 0 0.5px rgba(0, 0, 0, 0.5);
+	fill: $white;
+	left: 50%;
+	margin: -16px 0 0 -16px;
+	opacity: 0.8;
+	position: absolute;
+	top: 50%;
+	width: 32px;
+}
+
+.dimmedActionButton {
+	opacity: 0.45;
 }
 
 .colorPaletteWrapper {

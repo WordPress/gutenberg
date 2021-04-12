@@ -69,79 +69,28 @@ export function settings( state = {}, action ) {
 }
 
 /**
- * Reducer returning the template ID.
+ * Reducer keeping track of the currently edited Post Type,
+ * Post Id and the context provided to fill the content of the block editor.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
  *
  * @return {Object} Updated state.
  */
-export function templateId( state, action ) {
+export function editedPost( state = {}, action ) {
 	switch ( action.type ) {
 		case 'SET_TEMPLATE':
 		case 'SET_PAGE':
-			return action.templateId;
+			return {
+				type: 'wp_template',
+				id: action.templateId,
+				page: action.page,
+			};
 		case 'SET_TEMPLATE_PART':
-			return undefined;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the template part ID.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function templatePartId( state, action ) {
-	switch ( action.type ) {
-		case 'SET_TEMPLATE_PART':
-			return action.templatePartId;
-		case 'SET_TEMPLATE':
-		case 'SET_PAGE':
-			return undefined;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the template type.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function templateType( state = 'wp_template', action ) {
-	switch ( action.type ) {
-		case 'SET_TEMPLATE':
-		case 'SET_PAGE':
-			return 'wp_template';
-		case 'SET_TEMPLATE_PART':
-			return 'wp_template_part';
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the page being edited.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function page( state, action ) {
-	switch ( action.type ) {
-		case 'SET_PAGE':
-			return action.page;
-		case 'SET_TEMPLATE_PART':
-			return undefined;
+			return {
+				type: 'wp_template_part',
+				id: action.templatePartId,
+			};
 	}
 
 	return state;
@@ -168,8 +117,8 @@ export function homeTemplateId( state, action ) {
  * Reducer for information about the navigation panel, such as its active menu
  * and whether it should be opened or closed.
  *
- * Note: this reducer interacts with the block inserter panel reducer to make
- * sure that only one of the two panels is open at the same time.
+ * Note: this reducer interacts with the inserter and list view panels reducers
+ * to make sure that only one of the three panels is open at the same time.
  *
  * @param {Object} state Current state.
  * @param {Object} action Dispatched action.
@@ -197,6 +146,7 @@ export function navigationPanel(
 				isOpen: action.isOpen,
 			};
 		case 'SET_IS_INSERTER_OPENED':
+		case 'SET_IS_LIST_VIEW_OPENED':
 			return {
 				...state,
 				menu: state.isOpen && action.isOpen ? MENU_ROOT : state.menu, // Set menu to root when closing panel.
@@ -209,8 +159,8 @@ export function navigationPanel(
 /**
  * Reducer to set the block inserter panel open or closed.
  *
- * Note: this reducer interacts with the navigation panel reducer to make
- * sure that only one of the two panels is open at the same time.
+ * Note: this reducer interacts with the navigation and list view panels reducers
+ * to make sure that only one of the three panels is open at the same time.
  *
  * @param {Object} state Current state.
  * @param {Object} action Dispatched action.
@@ -220,8 +170,31 @@ export function blockInserterPanel( state = false, action ) {
 		case 'OPEN_NAVIGATION_PANEL_TO_MENU':
 			return false;
 		case 'SET_IS_NAVIGATION_PANEL_OPENED':
+		case 'SET_IS_LIST_VIEW_OPENED':
 			return action.isOpen ? false : state;
 		case 'SET_IS_INSERTER_OPENED':
+			return action.isOpen;
+	}
+	return state;
+}
+
+/**
+ * Reducer to set the list view panel open or closed.
+ *
+ * Note: this reducer interacts with the navigation and inserter panels reducers
+ * to make sure that only one of the three panels is open at the same time.
+ *
+ * @param {Object} state Current state.
+ * @param {Object} action Dispatched action.
+ */
+export function listViewPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'OPEN_NAVIGATION_PANEL_TO_MENU':
+			return false;
+		case 'SET_IS_NAVIGATION_PANEL_OPENED':
+		case 'SET_IS_INSERTER_OPENED':
+			return action.isOpen ? false : state;
+		case 'SET_IS_LIST_VIEW_OPENED':
 			return action.isOpen;
 	}
 	return state;
@@ -231,11 +204,9 @@ export default combineReducers( {
 	preferences,
 	deviceType,
 	settings,
-	templateId,
-	templatePartId,
-	templateType,
-	page,
+	editedPost,
 	homeTemplateId,
 	navigationPanel,
 	blockInserterPanel,
+	listViewPanel,
 } );

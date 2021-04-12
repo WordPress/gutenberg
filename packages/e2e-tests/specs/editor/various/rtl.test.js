@@ -5,6 +5,8 @@ import {
 	createNewPost,
 	getEditedPostContent,
 	pressKeyWithModifier,
+	activatePlugin,
+	deactivatePlugin,
 } from '@wordpress/e2e-test-utils';
 
 // Avoid using three, as it looks too much like two with some fonts.
@@ -13,11 +15,16 @@ const ARABIC_ONE = '١';
 const ARABIC_TWO = '٢';
 
 describe( 'RTL', () => {
+	beforeAll( async () => {
+		await activatePlugin( 'gutenberg-test-plugin-activate-rtl' );
+	} );
+
 	beforeEach( async () => {
 		await createNewPost();
-		await page.evaluate( () => {
-			document.querySelector( '.is-root-container' ).dir = 'rtl';
-		} );
+	} );
+
+	afterAll( async () => {
+		await deactivatePlugin( 'gutenberg-test-plugin-activate-rtl' );
 	} );
 
 	it( 'should arrow navigate', async () => {

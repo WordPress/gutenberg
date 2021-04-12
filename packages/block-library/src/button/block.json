@@ -61,8 +61,14 @@
 		"anchor": true,
 		"align": true,
 		"alignWide": false,
+		"color": {
+			"__experimentalSkipSerialization": true,
+			"gradients": true
+		},
+		"fontSize": true,
 		"reusable": false,
-		"__experimentalSelector": ".wp-block-button > a"
+		"__experimentalFontFamily": true,
+		"__experimentalSelector": ".wp-block-button__link"
 	},
 	"editorStyle": "wp-block-button-editor",
 	"style": "wp-block-button"

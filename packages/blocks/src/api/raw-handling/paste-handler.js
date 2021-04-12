@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { flatMap, filter, compact } from 'lodash';
+import { flatMap, compact } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -11,10 +11,10 @@ import { getPhrasingContentSchema, removeInvalidHTML } from '@wordpress/dom';
 /**
  * Internal dependencies
  */
-import { createBlock, getBlockTransforms, findTransform } from '../factory';
+import { htmlToBlocks } from './html-to-blocks';
 import { hasBlockSupport } from '../registration';
-import { getBlockContent } from '../serializer';
-import { getBlockAttributes, parseWithGrammar } from '../parser';
+import { getBlockInnerHTML } from '../serializer';
+import { parseWithGrammar } from '../parser';
 import normaliseBlocks from './normalise-blocks';
 import specialCommentConverter from './special-comment-converter';
 import commentRemover from './comment-remover';
@@ -66,63 +66,6 @@ function filterInlineHTML( HTML, preserveWhiteSpace ) {
 	console.log( 'Processed inline HTML:\n\n', HTML );
 
 	return HTML;
-}
-
-function getRawTransformations() {
-	return filter( getBlockTransforms( 'from' ), { type: 'raw' } ).map(
-		( transform ) => {
-			return transform.isMatch
-				? transform
-				: {
-						...transform,
-						isMatch: ( node ) =>
-							transform.selector &&
-							node.matches( transform.selector ),
-				  };
-		}
-	);
-}
-
-/**
- * Converts HTML directly to blocks. Looks for a matching transform for each
- * top-level tag. The HTML should be filtered to not have any text between
- * top-level tags and formatted in a way that blocks can handle the HTML.
- *
- * @param  {Object} $1               Named parameters.
- * @param  {string} $1.html          HTML to convert.
- * @param  {Array}  $1.rawTransforms Transforms that can be used.
- *
- * @return {Array} An array of blocks.
- */
-function htmlToBlocks( { html, rawTransforms } ) {
-	const doc = document.implementation.createHTMLDocument( '' );
-
-	doc.body.innerHTML = html;
-
-	return Array.from( doc.body.children ).map( ( node ) => {
-		const rawTransform = findTransform( rawTransforms, ( { isMatch } ) =>
-			isMatch( node )
-		);
-
-		if ( ! rawTransform ) {
-			return createBlock(
-				// Should not be hardcoded.
-				'core/html',
-				getBlockAttributes( 'core/html', node.outerHTML )
-			);
-		}
-
-		const { transform, blockName } = rawTransform;
-
-		if ( transform ) {
-			return transform( node );
-		}
-
-		return createBlock(
-			blockName,
-			getBlockAttributes( blockName, node.outerHTML )
-		);
-	} );
 }
 
 /**
@@ -184,7 +127,12 @@ export function pasteHandler( {
 	// * There is a plain text version.
 	// * There is no HTML version, or it has no formatting.
 	if ( plainText && ( ! HTML || isPlain( HTML ) ) ) {
-		HTML = markdownConverter( plainText );
+		HTML = plainText;
+
+		// The markdown converter (Showdown) trims whitespace.
+		if ( ! /^\s+$/.test( plainText ) ) {
+			HTML = markdownConverter( HTML );
+		}
 
 		// Switch to inline mode if:
 		// * The current mode is AUTO.
@@ -222,13 +170,8 @@ export function pasteHandler( {
 		return filterInlineHTML( HTML, preserveWhiteSpace );
 	}
 
-	const rawTransforms = getRawTransformations();
 	const phrasingContentSchema = getPhrasingContentSchema( 'paste' );
-	const blockContentSchema = getBlockContentSchema(
-		rawTransforms,
-		phrasingContentSchema,
-		true
-	);
+	const blockContentSchema = getBlockContentSchema( 'paste' );
 
 	const blocks = compact(
 		flatMap( pieces, ( piece ) => {
@@ -269,26 +212,27 @@ export function pasteHandler( {
 			// Allows us to ask for this information when we get a report.
 			console.log( 'Processed HTML piece:\n\n', piece );
 
-			return htmlToBlocks( { html: piece, rawTransforms } );
+			return htmlToBlocks( piece );
 		} )
 	);
 
-	// If we're allowed to return inline content, and there is only one inlineable block,
-	// and the original plain text content does not have any line breaks, then
-	// treat it as inline paste.
+	// If we're allowed to return inline content, and there is only one
+	// inlineable block, and the original plain text content does not have any
+	// line breaks, then treat it as inline paste.
 	if (
 		mode === 'AUTO' &&
 		blocks.length === 1 &&
 		hasBlockSupport( blocks[ 0 ].name, '__unstablePasteTextInline', false )
 	) {
-		const trimmedPlainText = plainText.trim();
+		// Don't catch line breaks at the start or end.
+		const trimmedPlainText = plainText.replace( /^[\n]+|[\n]+$/g, '' );
 
 		if (
 			trimmedPlainText !== '' &&
 			trimmedPlainText.indexOf( '\n' ) === -1
 		) {
 			return removeInvalidHTML(
-				getBlockContent( blocks[ 0 ] ),
+				getBlockInnerHTML( blocks[ 0 ] ),
 				phrasingContentSchema
 			);
 		}

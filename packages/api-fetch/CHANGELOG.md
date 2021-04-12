@@ -1,6 +1,18 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+### Bug Fixes
+
+- Align exported type names with the DefinitelyTyped type names and actually export those types.
+
+## 3.23.0 (2021-04-06)
+
+### New Feature
+
+- Publish TypeScript definitions.
+
+## 3.22.0 (2021-03-17)
 
 ## 3.8.1 (2019-04-22)
 

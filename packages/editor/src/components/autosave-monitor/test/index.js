@@ -17,7 +17,7 @@ describe( 'AutosaveMonitor', () => {
 			AutosaveMonitor.prototype,
 			'setAutosaveTimer'
 		);
-		wrapper = shallow( <AutosaveMonitor />, {
+		wrapper = shallow( <AutosaveMonitor isDirty />, {
 			lifecycleExperimental: true,
 		} );
 	} );
@@ -36,7 +36,7 @@ describe( 'AutosaveMonitor', () => {
 	} );
 
 	describe( '#componentDidUpdate()', () => {
-		it( 'should set needsAutosave=true when editReference changes and other props stay the same (1)', () => {
+		it( 'should set needsAutosave=true when editReference changes', () => {
 			expect( wrapper.instance().needsAutosave ).toBe( false );
 			wrapper.setProps( {
 				editsReference: [],

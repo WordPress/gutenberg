@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import optimist from 'redux-optimist';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -85,19 +80,17 @@ export function notices( state = [], action ) {
 	return state;
 }
 
-export default optimist(
-	combineReducers( {
-		postId,
-		postType,
-		postTitle,
-		preferences,
-		saving,
-		postLock,
-		postSavingLock,
-		template,
-		isReady,
-		editorSettings,
-		clipboard,
-		notices,
-	} )
-);
+export default combineReducers( {
+	postId,
+	postType,
+	postTitle,
+	preferences,
+	saving,
+	postLock,
+	postSavingLock,
+	template,
+	isReady,
+	editorSettings,
+	clipboard,
+	notices,
+} );

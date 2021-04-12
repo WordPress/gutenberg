@@ -1,6 +1,23 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+## 13.0.0 (2021-03-17)
+
+### Breaking Change
+- `onChange` prop of `FocalPointPicker` is called at the end of drag operations. Previously, it was called repetitively while dragging.
+
+### New Feature
+- Supports ref forwarding in `withNotices` and `ResizableBox`.
+- Adds `onDrag` prop of `FocalPointPicker`.
+
+### Bug Fix
+- Allows focus of the `FocalPointPicker` draggable area and adjustment with arrow keys. This was added in [#22531](https://github.com/WordPress/gutenberg/pull/22264) but was no longer working.
+
+## 12.0.0 (2020-12-17)
+
+### Enhancements
+- ComboboxControl: Deburr option labels before filter
 
 ### Breaking Change
 

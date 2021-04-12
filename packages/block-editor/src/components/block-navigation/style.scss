@@ -1,6 +1,3 @@
-$tree-border-width: 2px;
-$tree-item-height: 36px;
-
 .block-editor-block-navigation__label {
 	margin: 0 0 $grid-unit-15;
 	color: $gray-700;
@@ -10,7 +7,7 @@ $tree-item-height: 36px;
 }
 
 .block-editor-block-navigation__container {
-	padding: $grid-unit - $border-width;
+	min-width: 280px;
 }
 
 .block-editor-block-navigation-tree {
@@ -18,11 +15,41 @@ $tree-item-height: 36px;
 	border-collapse: collapse;
 	padding: 0;
 	margin: 0;
+
+	// Move upwards when in modal.
+	.components-modal__content & {
+		margin: (-$grid-unit-15) (-$grid-unit-15 / 2) 0;
+		width: calc(100% + #{ $grid-unit-15 });
+	}
 }
 
 .block-editor-block-navigation-leaf {
 	// Use position relative for row animation.
 	position: relative;
+
+	&.is-selected .block-editor-block-navigation-block-contents {
+		background: var(--wp-admin-theme-color);
+		color: $white;
+	}
+	&.is-selected .block-editor-block-navigation-block-contents:focus {
+		box-shadow:
+			inset 0 0 0 1px $white,
+			0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+	}
+
+	&.is-branch-selected.is-selected .block-editor-block-navigation-block-contents {
+		border-radius: 2px 2px 0 0;
+	}
+	&.is-branch-selected:not(.is-selected) .block-editor-block-navigation-block-contents {
+		// Lighten a CSS variable without introducing a new SASS variable
+		background:
+			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
+			linear-gradient(var(--wp-admin-theme-color), var(--wp-admin-theme-color));
+		border-radius: 0;
+	}
+	&.is-branch-selected.is-last-of-selected-branch .block-editor-block-navigation-block-contents {
+		border-radius: 0 0 2px 2px;
+	}
 
 	&.is-dragging {
 		display: none;
@@ -33,14 +60,20 @@ $tree-item-height: 36px;
 		align-items: center;
 		width: 100%;
 		height: auto;
-		padding: $grid-unit-15 ($grid-unit-15 / 2);
-		margin-top: auto;
-		margin-bottom: auto;
+		padding: ($grid-unit-15 / 2) $grid-unit-15;
 		text-align: left;
 		color: $gray-900;
 		border-radius: 2px;
 		position: relative;
 		white-space: nowrap;
+
+		&:hover,
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+		&:focus {
+			z-index: 1;
+		}
 
 		&.is-dropping-before::before {
 			content: "";
@@ -88,15 +121,8 @@ $tree-item-height: 36px;
 
 	.block-editor-block-icon {
 		align-self: flex-start;
-		margin-right: 6px;
-	}
-
-	&.is-selected .block-editor-block-icon svg,
-	&.is-selected:focus .block-editor-block-icon svg {
-		color: $white;
-		background: $gray-900;
-		box-shadow: 0 0 0 $border-width $gray-900;
-		border-radius: $border-width;
+		margin-right: ( $grid-unit-05 * 2.5 ); // 10px is off the 4px grid, but required for visual alignment between block name and subsequent nested icon
+		width: 20px;
 	}
 
 	.block-editor-block-navigation-block__menu-cell,
@@ -114,7 +140,11 @@ $tree-item-height: 36px;
 		vertical-align: top;
 		@include reduce-motion("transition");
 
+		// Show on hover, visible, and show above to keep the hit area size.
+		&:hover,
 		&.is-visible {
+			position: relative;
+			z-index: 1;
 			opacity: 1;
 			@include edit-post__fade-in-animation;
 		}
@@ -138,29 +168,31 @@ $tree-item-height: 36px;
 		align-items: center;
 	}
 
-	// Keep the tap target large but the focus target small
+	// Keep the tap target large but the focus target small.
 	.block-editor-block-mover-button {
 		position: relative;
 		width: $button-size;
 		height: $button-size-small;
 
-		// Position the icon
+		// Position the icon.
 		svg {
 			position: relative;
 			height: $button-size-small;
 		}
 
 		&.is-up-button {
+			margin-top: -$grid-unit-15 / 2;
 			align-items: flex-end;
 			svg {
-				bottom: -4px;
+				bottom: -$grid-unit-05;
 			}
 		}
 
 		&.is-down-button {
+			margin-bottom: -$grid-unit-15 / 2;
 			align-items: flex-start;
 			svg {
-				top: -4px;
+				top: -$grid-unit-05;
 			}
 		}
 
@@ -225,64 +257,9 @@ $tree-item-height: 36px;
 	.block-editor-block-navigation-appender__container {
 		display: flex;
 	}
-
-	.block-editor-block-navigation-block__contents-container {
-		min-height: $grid-unit-60;
-	}
-
-	.block-editor-block-navigator-descender-line {
-		position: relative;
-		flex-shrink: 0;
-		width: ( $button-size / 2 ) + 6px;
-
-		&:first-child {
-			width: ( $button-size / 2 );
-		}
-
-		&.has-item {
-			margin-right: 6px;
-		}
-
-		// Draw a vertical line using border-right.
-		&::before {
-			content: "";
-			display: block;
-			position: absolute;
-			top: 1px;
-			bottom: -2px;
-			right: -1px;
-			border-right: 2px solid $gray-600;
-		}
-
-		// If a vertical line has terminated, don't draw it.
-		&.is-terminated::before {
-			border-color: transparent;
-		}
-
-		// Make the last vertical line half-height.
-		&.has-item.is-last-row {
-			height: 26px;
-		}
-
-		// Draw a horizontal line using border-bottom.
-		&.has-item::after {
-			content: "";
-			display: block;
-			position: absolute;
-			top: 26px;
-			left: 100%;
-			width: 5px;
-			border-bottom: 2px solid $gray-600;
-		}
-	}
 }
 
-// Position the horizontal line in the middle of appender's height
-.block-editor-block-navigation-appender__cell .block-editor-block-navigator-descender-line {
-	&.has-item.is-last-row {
-		height: $grid-unit-20;
-		&::after {
-			top: 100%;
-		}
-	}
+.block-editor-block-navigator-indentation {
+	flex-shrink: 0;
+	width: $grid-unit-30 + $grid-unit-05; // Indent a full icon size, plus 4px which optically aligns child icons to the text label above.
 }

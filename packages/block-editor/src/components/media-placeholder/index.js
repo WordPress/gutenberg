@@ -26,6 +26,7 @@ import { keyboardReturn } from '@wordpress/icons';
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import URLPopover from '../url-popover';
+import { store as blockEditorStore } from '../../store';
 
 const InsertFromURLPopover = ( { src, onChange, onSubmit, onClose } ) => (
 	<URLPopover onClose={ onClose }>
@@ -76,7 +77,7 @@ export function MediaPlaceholder( {
 	children,
 } ) {
 	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
 	}, [] );
 	const [ src, setSrc ] = useState( '' );
@@ -390,6 +391,7 @@ export function MediaPlaceholder( {
 	if ( dropZoneUIOnly || disableMediaButtons ) {
 		if ( dropZoneUIOnly ) {
 			deprecated( 'wp.blockEditor.MediaPlaceholder dropZoneUIOnly prop', {
+				since: '5.4',
 				alternative: 'disableMediaButtons',
 			} );
 		}
@@ -407,6 +409,6 @@ export function MediaPlaceholder( {
 }
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/media-placeholder/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-placeholder/README.md
  */
 export default withFilters( 'editor.MediaPlaceholder' )( MediaPlaceholder );

@@ -20,7 +20,11 @@
 			"gradients": true,
 			"link": true
 		},
-		"__experimentalFontFamily": true
+		"__experimentalFontFamily": true,
+		"fontSize": true,
+		"spacing": {
+			"padding": true
+		}
 	},
 	"style": "wp-block-verse",
 	"editorStyle": "wp-block-verse-editor"

@@ -1,22 +1,31 @@
 /**
  * Internal dependencies
  */
-import {
+const {
+	setupDriver,
+	stopDriver,
 	isAndroid,
 	swipeUp,
 	swipeDown,
 	typeString,
 	toggleHtmlMode,
 	swipeFromTo,
-} from '../helpers/utils';
+	longPressMiddleOfElement,
+	doubleTap,
+} = require( '../helpers/utils' );
 
-export default class EditorPage {
+const initializeEditorPage = async () => {
+	const driver = await setupDriver();
+	return new EditorPage( driver );
+};
+
+class EditorPage {
 	driver;
 	accessibilityIdKey;
 	accessibilityIdXPathAttrib;
 	paragraphBlockName = 'Paragraph';
 	verseBlockName = 'Verse';
-	orderedListButtonName = 'Convert to ordered list';
+	orderedListButtonName = 'Ordered';
 
 	constructor( driver ) {
 		this.driver = driver;
@@ -108,6 +117,13 @@ export default class EditorPage {
 		);
 	}
 
+	async addParagraphBlockByTappingEmptyAreaBelowLastBlock() {
+		const emptyAreaBelowLastBlock = await this.driver.elementByAccessibilityId(
+			'Add paragraph block'
+		);
+		await emptyAreaBelowLastBlock.click();
+	}
+
 	async getTitleElement( options = { autoscroll: false } ) {
 		//TODO: Improve the identifier for this element
 		const elements = await this.driver.elementsByXPath(
@@ -117,6 +133,27 @@ export default class EditorPage {
 			await swipeDown( this.driver );
 			return this.getTitleElement( options );
 		}
+		return elements[ elements.length - 1 ];
+	}
+
+	// iOS loads the block list more eagerly compared to Android.
+	// This makes this function return elements without scrolling on iOS.
+	// So we are keeping this Android only.
+	async androidScrollAndReturnElement( accessibilityLabel ) {
+		const elements = await this.driver.elementsByXPath(
+			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
+		);
+		if ( elements.length === 0 ) {
+			await swipeUp( this.driver, undefined, 100, 1 );
+			return this.androidScrollAndReturnElement( accessibilityLabel );
+		}
+		return elements[ elements.length - 1 ];
+	}
+
+	async getLastElementByXPath( accessibilityLabel ) {
+		const elements = await this.driver.elementsByXPath(
+			`//*[contains(@${ this.accessibilityIdXPathAttrib }, "${ accessibilityLabel }")]`
+		);
 		return elements[ elements.length - 1 ];
 	}
 
@@ -130,24 +167,46 @@ export default class EditorPage {
 		return await this.driver.elementByXPath( blockLocator );
 	}
 
-	// Converts to lower case and checks for a match to lowercased html content
+	// Returns html content
 	// Ensure to take additional steps to handle text being changed by auto correct
-	async verifyHtmlContent( html ) {
+	async getHtmlContent() {
 		await toggleHtmlMode( this.driver, true );
 
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
 		const text = await htmlContentView.text();
-		expect( text.toLowerCase() ).toBe( html.toLowerCase() );
 
 		await toggleHtmlMode( this.driver, false );
+		return text;
 	}
 
 	// set html editor content explicitly
 	async setHtmlContent( html ) {
 		await toggleHtmlMode( this.driver, true );
 
+		const base64String = Buffer.from( html ).toString( 'base64' );
+
+		await this.driver.setClipboard( base64String, 'plaintext' );
+
 		const htmlContentView = await this.getTextViewForHtmlViewContent();
-		await htmlContentView.type( html );
+
+		if ( isAndroid() ) {
+			// Attention! On Android `.type()` replaces the content of htmlContentView instead of appending
+			// contrary to what iOS is doing. On Android tried calling `driver.pressKeycode( 279 ) // KEYCODE_PASTE`
+			// before to paste, but for some reason it didn't work on GitHub Actions but worked only on Sauce Labs
+			await htmlContentView.type( html );
+		} else {
+			await htmlContentView.click();
+			await doubleTap( this.driver, htmlContentView );
+			// Sometimes double tap is not enough for paste menu to appear, so we also long press
+			await longPressMiddleOfElement( this.driver, htmlContentView );
+
+			const pasteButton = this.driver.elementByXPath(
+				'//XCUIElementTypeMenuItem[@name="Paste"]'
+			);
+
+			await pasteButton.click();
+			await this.driver.sleep( 3000 ); // wait for paste notification to disappear
+		}
 
 		await toggleHtmlMode( this.driver, false );
 	}
@@ -185,7 +244,7 @@ export default class EditorPage {
 	// Block toolbar functions
 	// =========================
 
-	async addNewBlock( blockName ) {
+	async addNewBlock( blockName, relativePosition ) {
 		// Click add button
 		let identifier = 'Add block';
 		if ( isAndroid() ) {
@@ -194,7 +253,18 @@ export default class EditorPage {
 		const addButton = await this.driver.elementByAccessibilityId(
 			identifier
 		);
-		await addButton.click();
+
+		if ( relativePosition === 'before' ) {
+			await longPressMiddleOfElement( this.driver, addButton );
+
+			const addBlockBeforeButton = await this.driver.elementByAccessibilityId(
+				'Add Block Before'
+			);
+
+			await addBlockBeforeButton.click();
+		} else {
+			await addButton.click();
+		}
 
 		// Click on block of choice
 		const blockButton = await this.findBlockButton( blockName );
@@ -238,7 +308,9 @@ export default class EditorPage {
 			blockAccessibilityLabel
 		);
 		const size = await this.driver.getWindowSize();
-		const height = size.height - 5;
+		// The virtual home button covers the bottom 34 in portrait and 21 on landscape on iOS.
+		// We start dragging a bit above it to not trigger home button.
+		const height = size.height - 50;
 
 		while ( ! ( await blockButton.isDisplayed() ) ) {
 			await this.driver.execute( 'mobile: dragFromToForDuration', {
@@ -536,4 +608,31 @@ export default class EditorPage {
 		this.driver.setImplicitWaitTimeout( 5000 );
 		return element;
 	}
+
+	async stopDriver() {
+		await stopDriver( this.driver );
+	}
+
+	async sauceJobStatus( allPassed ) {
+		await this.driver.sauceJobStatus( allPassed );
+	}
 }
+
+const blockNames = {
+	paragraph: 'Paragraph',
+	gallery: 'Gallery',
+	columns: 'Columns',
+	cover: 'Cover',
+	heading: 'Heading',
+	image: 'Image',
+	latestPosts: 'Latest Posts',
+	list: 'List',
+	more: 'More',
+	separator: 'Separator',
+	spacer: 'Spacer',
+	verse: 'Verse',
+	file: 'File',
+	audio: 'Audio',
+};
+
+module.exports = { initializeEditorPage, blockNames };

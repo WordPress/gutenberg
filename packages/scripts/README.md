@@ -16,7 +16,7 @@ You only need to install one npm module:
 npm install @wordpress/scripts --save-dev
 ```
 
-**Note**: This package requires `node` 10.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
+**Note**: This package requires Node.js 12.0.0 or later, and `npm` 6.9.0 or later. It is not compatible with older versions.
 
 ## Setup
 
@@ -44,13 +44,13 @@ _Example:_
 }
 ```
 
-It might also be a good idea to get familiar with the [JavaScript Build Setup tutorial](/docs/designers-developers/developers/tutorials/javascript/js-build-setup.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation of how to use the [build](#build) and [start](#start) scripts.
+It might also be a good idea to get familiar with the [JavaScript Build Setup tutorial](/docs/how-to-guides/javascript/js-build-setup.md) for setting up a development environment to use ESNext syntax. It gives a very in-depth explanation of how to use the [build](#build) and [start](#start) scripts.
 
 ## Updating to New Release
 
-To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
+To update an existing project to a new version of `@wordpress/scripts`, open the [changelog](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), find the version you’re currently on (check `package.json` in the top-level directory of your project), and apply the migration instructions for the newer versions.
 
-In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `packages-update` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
+In most cases bumping the `@wordpress/scripts` version in `package.json` and running `npm install` in the root folder of your project should be enough, but it’s good to check the [changelog](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md) for potential breaking changes. There is also `packages-update` script included in this package that aims to automate the process of updating WordPress dependencies in your projects.
 
 We commit to keeping the breaking changes minimal so you can upgrade `@wordpress/scripts` as seamless as possible.
 
@@ -105,7 +105,7 @@ This is how you execute the script with presented setup:
 
 #### Advanced information
 
-It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. Similarly to this package, the default requirements are `node` 10.0.0 or later, and `npm` 6.9.0 or later. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [check-node-version](https://www.npmjs.com/package/check-node-version) behind the scenes with the recommended configuration provided. The default requirements are set to the same Node.js and npm versions as listed in the [installation](#installation) section for this package. You can specify your own ranges as described in [check-node-version docs](https://www.npmjs.com/package/check-node-version). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `check-licenses`
 
@@ -150,7 +150,7 @@ This is how you execute the script with presented setup:
 
 When you run commands similar to the `npm run format:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
 
-By default, files located in `build`, `node_modules`, `vendor` and `wordpress` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 ### `lint-js`
 
@@ -174,7 +174,7 @@ This is how you execute the script with presented setup:
 
 When you run commands similar to the `npm run lint:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them. See [more examples](https://eslint.org/docs/user-guide/command-line-interface).
 
-By default, files located in `build`, `node_modules`, `vendor` and `wordpress` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
@@ -202,7 +202,7 @@ This is how you execute those scripts using the presented setup:
 
 When you run commands similar to the `npm run lint:pkg-json:src` example above, you can provide one or multiple directories to scan as well. See [more examples](https://github.com/tclindner/npm-package-json-lint/blob/HEAD/README.md#examples).
 
-By default, files located in `build`, `node_modules`, `vendor` and `wordpress` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
@@ -226,11 +226,11 @@ This is how you execute the script with presented setup:
 
 -   `npm run lint:md:docs` - lints markdown files in the entire project’s directories.
 
-By default, files located in `build`, `node_modules`, `vendor` and `wordpress` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
-It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
+It uses [markdownlint](https://github.com/DavidAnson/markdownlint) with the [.markdownlint.json](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/config/.markdownlint.json) configuration. This configuration tunes the linting rules to match WordPress standard, you can override with your own config, see [markdownlint-cli](https://github.com/igorshubovych/markdownlint-cli/) for command-line parameters.
 
 ### `lint-md-js`
 
@@ -250,11 +250,11 @@ This is how you execute the script with presented setup:
 
 -   `npm run lint:md:js` - lints markdown files in the entire project’s directories.
 
-By default, files located in `build`, `node_modules`, `vendor` and `wordpress` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
-It uses [eslint-plugin-markdown](https://github.com/eslint/eslint-plugin-markdown) with the [.eslintrc-md.js](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/config/.eslintrc-md.js) configuration. This configuration tunes down the linting rules since documentation often includes just snippets of code. It is recommended to use the markdown linting as a check, but not necessarily a blocker since it might report more false errors.
+It uses [eslint-plugin-markdown](https://github.com/eslint/eslint-plugin-markdown) with the [.eslintrc-md.js](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/config/.eslintrc-md.js) configuration. This configuration tunes down the linting rules since documentation often includes just snippets of code. It is recommended to use the markdown linting as a check, but not necessarily a blocker since it might report more false errors.
 
 ### `lint-style`
 
@@ -278,11 +278,11 @@ This is how you execute the script with presented setup:
 
 When you run commands similar to the `npm run lint:css:src` example above, be sure to include the quotation marks around file globs. This ensures that you can use the powers of [globby](https://github.com/sindresorhus/globby) (like the `**` globstar) regardless of your shell. See [more examples](https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/cli.md#examples).
 
-By default, files located in `build`, `node_modules`, `vendor` and `wordpress` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 
 #### Advanced information
 
-It uses [stylelint](https://github.com/stylelint/stylelint) with the [stylelint-config-wordpress](https://github.com/WordPress-Coding-Standards/stylelint-config-wordpress) configuration per the [WordPress CSS Coding Standards](https://make.wordpress.org/core/handbook/best-practices/coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://github.com/stylelint/stylelint/docs/user-guide.md). Learn more in the [Advanced Usage](#advanced-usage) section.
+It uses [stylelint](https://github.com/stylelint/stylelint) with the [@wordpress/stylelint-config](<(https://www.npmjs.com/package/@wordpress/stylelint-config)>) configuration per the [WordPress CSS Coding Standards](https://developer.wordpress.org/coding-standards/wordpress-coding-standards/css/). You can override them with your own rules as described in [stylelint user guide](https://stylelint.io/user-guide/configure). Learn more in the [Advanced Usage](#advanced-usage) section.
 
 ### `packages-update`
 
@@ -335,7 +335,7 @@ This script uses [webpack](https://webpack.js.org/) behind the scenes. It’ll l
 
 ### `test-e2e`
 
-Launches the End-To-End (E2E) test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api) in combination with the [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/master/docs/api.md):
+Launches the End-To-End (E2E) test runner. Writing tests can be done using the [Jest API](https://jestjs.io/docs/en/api) in combination with the [Puppeteer API](https://github.com/GoogleChrome/puppeteer/blob/HEAD/docs/api.md):
 
 > [Jest](https://jestjs.io/) is a delightful JavaScript Testing Framework with a focus on simplicity.
 
@@ -540,6 +540,26 @@ If you do so, then CSS files generated will follow the names of the entry points
 
 Avoid using `style` keyword in an entry point name, this might break your build process.
 
+You can also bundle CSS modules by prefixing `.module` to the extension, e.g. `style.module.scss`. Otherwise, these files are handled like all other `style.scss`. They will also be extracted into `style-index.css`.
+
+#### Using fonts and images
+
+It is possible to reference font (`woff`, `woff2`, `eot`, `ttf` and `otf`) and image (`bmp`, `png`, `jpg`, `jpeg` and `gif`) files from CSS that is controlled by webpack as explained in the previous section.
+
+_Example:_
+
+```css
+/* style.css */
+@font-face {
+	font-family: Gilbert;
+	src: url( ../assets/gilbert-color.otf );
+}
+.wp-block-my-block {
+	background-color: url( ../assets/block-background.png );
+	font-family: Gilbert;
+}
+```
+
 #### Using SVG
 
 _Example:_
@@ -590,6 +610,6 @@ module.exports = {
 };
 ```
 
-If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/master/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
+If you follow this approach, please, be aware that future versions of this package may change what webpack and Babel plugins we bundle, default configs, etc. Should those changes be necessary, they will be registered in the [package’s CHANGELOG](https://github.com/WordPress/gutenberg/blob/HEAD/packages/scripts/CHANGELOG.md), so make sure to read it before upgrading.
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

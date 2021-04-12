@@ -22,12 +22,14 @@ import {
 	useEffect,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { Icon, chevronDown, search } from '@wordpress/icons';
+import { navigation, chevronDown, Icon } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import createDataTree from './create-data-tree';
+import PlaceholderPreview from './placeholder-preview';
 
 /**
  * A recursive function that maps menu item nodes to blocks.
@@ -96,29 +98,6 @@ function convertMenuItemsToBlocks( menuItems ) {
 	return mapMenuItemsToBlocks( menuTree );
 }
 
-/**
- * Convert pages to blocks.
- *
- * @param {Object[]} pages An array of pages.
- *
- * @return {WPBlock[]} An array of blocks.
- */
-function convertPagesToBlocks( pages ) {
-	if ( ! pages ) {
-		return null;
-	}
-
-	return pages.map( ( { title, type, link: url, id } ) =>
-		createBlock( 'core/navigation-link', {
-			type,
-			id,
-			url,
-			label: ! title.rendered ? __( '(no title)' ) : title.rendered,
-			opensInNewTab: false,
-		} )
-	);
-}
-
 function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 
@@ -141,7 +120,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 				getMenuItems,
 				isResolving,
 				hasFinishedResolution,
-			} = select( 'core' );
+			} = select( coreStore );
 			const pagesParameters = [
 				'postType',
 				'page',
@@ -219,9 +198,9 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	};
 
 	const onCreateAllPages = () => {
-		const blocks = convertPagesToBlocks( pages );
+		const block = [ createBlock( 'core/page-list' ) ];
 		const selectNavigationBlock = true;
-		onCreate( blocks, selectNavigationBlock );
+		onCreate( block, selectNavigationBlock );
 	};
 
 	useEffect( () => {
@@ -233,14 +212,13 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		}
 	}, [ isCreatingFromMenu, hasResolvedMenuItems ] );
 
+	const toggleProps = {
+		isPrimary: true,
+		className: 'wp-block-navigation-placeholder__actions__dropdown',
+	};
 	return (
 		<div className="wp-block-navigation-placeholder">
-			<div className="wp-block-navigation-placeholder__preview">
-				<span className="wp-block-navigation-link"></span>
-				<span className="wp-block-navigation-link"></span>
-				<span className="wp-block-navigation-link"></span>
-				<Icon icon={ search } />
-			</div>
+			<PlaceholderPreview />
 
 			<div className="wp-block-navigation-placeholder__controls">
 				{ isLoading && (
@@ -253,11 +231,14 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 						ref={ ref }
 						className="wp-block-navigation-placeholder__actions"
 					>
+						<div className="wp-block-navigation-placeholder__actions__indicator">
+							<Icon icon={ navigation } /> { __( 'Navigation' ) }
+						</div>
 						{ hasMenus ? (
 							<DropdownMenu
 								text={ __( 'Existing menu' ) }
 								icon={ chevronDown }
-								className="wp-block-navigation-placeholder__actions__dropdown"
+								toggleProps={ toggleProps }
 							>
 								{ ( { onClose } ) => (
 									<MenuGroup>
@@ -282,11 +263,15 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 							</DropdownMenu>
 						) : undefined }
 						{ hasPages ? (
-							<Button onClick={ onCreateAllPages }>
+							<Button
+								isPrimary={ hasMenus ? false : true }
+								isTertiary={ hasMenus ? true : false }
+								onClick={ onCreateAllPages }
+							>
 								{ __( 'Add all pages' ) }
 							</Button>
 						) : undefined }
-						<Button onClick={ onCreateEmptyMenu }>
+						<Button isTertiary onClick={ onCreateEmptyMenu }>
 							{ __( 'Start empty' ) }
 						</Button>
 					</div>

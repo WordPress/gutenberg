@@ -68,6 +68,7 @@ exports[`MoreMenu should match snapshot 1`] = `
             text="Options"
           >
             <button
+              aria-describedby={null}
               aria-expanded={false}
               aria-haspopup="true"
               aria-label="Options"

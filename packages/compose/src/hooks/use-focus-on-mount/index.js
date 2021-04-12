@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useRef } from '@wordpress/element';
+import { useRef, useEffect, useCallback } from '@wordpress/element';
 import { focus } from '@wordpress/dom';
 
 /**
@@ -25,14 +25,16 @@ import { focus } from '@wordpress/dom';
  * }
  * ```
  */
-export default function useFocusOnMount( focusOnMount ) {
-	const didMount = useRef( false );
+export default function useFocusOnMount( focusOnMount = 'firstElement' ) {
+	const focusOnMountRef = useRef( focusOnMount );
+	useEffect( () => {
+		focusOnMountRef.current = focusOnMount;
+	}, [ focusOnMount ] );
+
 	return useCallback( ( node ) => {
-		if ( ! node || didMount.current === true ) {
+		if ( ! node || focusOnMountRef.current === false ) {
 			return;
 		}
-
-		didMount.current = true;
 
 		if ( node.contains( node.ownerDocument.activeElement ) ) {
 			return;
@@ -40,7 +42,7 @@ export default function useFocusOnMount( focusOnMount ) {
 
 		let target = node;
 
-		if ( focusOnMount === 'firstElement' ) {
+		if ( focusOnMountRef.current === 'firstElement' ) {
 			const firstTabbable = focus.tabbable.find( node )[ 0 ];
 
 			if ( firstTabbable ) {

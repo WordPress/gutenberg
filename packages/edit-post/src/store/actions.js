@@ -8,14 +8,17 @@ import { castArray, reduce } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { apiFetch } from '@wordpress/data-controls';
+import { store as interfaceStore } from '@wordpress/interface';
 import { controls, dispatch, select, subscribe } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import { getMetaBoxContainer } from '../utils/meta-boxes';
-
+import { store as editPostStore } from '.';
 /**
  * Returns an action object used in signalling that the user opened an editor sidebar.
  *
@@ -25,9 +28,9 @@ import { getMetaBoxContainer } from '../utils/meta-boxes';
  */
 export function* openGeneralSidebar( name ) {
 	yield controls.dispatch(
-		'core/interface',
+		interfaceStore.name,
 		'enableComplementaryArea',
-		'core/edit-post',
+		editPostStore.name,
 		name
 	);
 }
@@ -39,9 +42,9 @@ export function* openGeneralSidebar( name ) {
  */
 export function* closeGeneralSidebar() {
 	yield controls.dispatch(
-		'core/interface',
+		interfaceStore.name,
 		'disableComplementaryArea',
-		'core/edit-post'
+		editPostStore.name
 	);
 }
 
@@ -288,7 +291,7 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 	//
 	// See: https://github.com/WordPress/WordPress/blob/5.1.1/wp-admin/includes/post.php#L2307-L2309
 	const hasActiveMetaBoxes = yield controls.select(
-		'core/edit-post',
+		editPostStore.name,
 		'hasMetaBoxes'
 	);
 
@@ -314,7 +317,7 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 		wasAutosavingPost = isAutosavingPost;
 
 		if ( shouldTriggerMetaboxesSave ) {
-			dispatch( 'core/edit-post' ).requestMetaBoxUpdates();
+			dispatch( editPostStore.name ).requestMetaBoxUpdates();
 		}
 	} );
 }
@@ -349,7 +352,7 @@ export function* requestMetaBoxUpdates() {
 		document.querySelector( '.metabox-base-form' )
 	);
 	const activeMetaBoxLocations = yield controls.select(
-		'core/edit-post',
+		editPostStore.name,
 		'getActiveMetaBoxLocations'
 	);
 	const formDataToMerge = [
@@ -382,7 +385,7 @@ export function* requestMetaBoxUpdates() {
 		body: formData,
 		parse: false,
 	} );
-	yield controls.dispatch( 'core/edit-post', 'metaBoxUpdatesSuccess' );
+	yield controls.dispatch( editPostStore.name, 'metaBoxUpdatesSuccess' );
 }
 
 /**
@@ -434,4 +437,44 @@ export function setIsEditingTemplate( value ) {
 		type: 'SET_IS_EDITING_TEMPLATE',
 		value,
 	};
+}
+
+/**
+ * Potentially create a block based template and switches to the template mode.
+ *
+ * @param {Object?} template template to create and assign before switching.
+ */
+export function* __unstableSwitchToTemplateMode( template ) {
+	if ( !! template ) {
+		const savedTemplate = yield controls.dispatch(
+			coreStore,
+			'saveEntityRecord',
+			'postType',
+			'wp_template',
+			template
+		);
+		const post = yield controls.select( 'core/editor', 'getCurrentPost' );
+
+		yield controls.dispatch(
+			coreStore,
+			'editEntityRecord',
+			'postType',
+			post.type,
+			post.id,
+			{
+				template: savedTemplate.slug,
+			}
+		);
+	}
+
+	yield setIsEditingTemplate( true );
+
+	const message = !! template
+		? __( "Custom template created. You're in template mode now." )
+		: __(
+				'Editing template. Changes made here affect all posts and pages that use the template.'
+		  );
+	yield controls.dispatch( noticesStore, 'createSuccessNotice', message, {
+		type: 'snackbar',
+	} );
 }

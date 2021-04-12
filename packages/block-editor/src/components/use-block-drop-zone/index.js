@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect, useState } from '@wordpress/element';
 
 /**
@@ -10,6 +10,7 @@ import { useEffect, useState } from '@wordpress/element';
  */
 import useOnBlockDrop from '../use-on-block-drop';
 import { getDistanceToNearestEdge } from '../../utils/math';
+import { store as blockEditorStore } from '../../store';
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
 
@@ -85,8 +86,6 @@ export function getNearestBlockIndex( elements, position, orientation ) {
  * A React hook that can be used to make a block list handle drag and drop.
  *
  * @param {WPBlockDropZoneConfig} dropZoneConfig configuration data for the drop zone.
- *
- * @return {number|undefined} The block index that's closest to the drag position.
  */
 export default function useBlockDropZone( {
 	element,
@@ -101,7 +100,7 @@ export default function useBlockDropZone( {
 	const { isLockedAll, orientation } = useSelect(
 		( select ) => {
 			const { getBlockListSettings, getTemplateLock } = select(
-				'core/block-editor'
+				blockEditorStore
 			);
 			return {
 				isLockedAll: getTemplateLock( targetRootClientId ) === 'all',
@@ -112,12 +111,16 @@ export default function useBlockDropZone( {
 		[ targetRootClientId ]
 	);
 
+	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
+		'core/block-editor'
+	);
+
 	const dropEventHandlers = useOnBlockDrop(
 		targetRootClientId,
 		targetBlockIndex
 	);
 
-	const { position } = useDropZone( {
+	const { position, isDraggingOverDocument } = useDropZone( {
 		element,
 		isDisabled: isLockedAll,
 		withPosition: true,
@@ -135,10 +138,16 @@ export default function useBlockDropZone( {
 			);
 
 			setTargetBlockIndex( targetIndex === undefined ? 0 : targetIndex );
+		} else {
+			setTargetBlockIndex( null );
 		}
 	}, [ position ] );
 
-	if ( position ) {
-		return targetBlockIndex;
-	}
+	useEffect( () => {
+		if ( ! isDraggingOverDocument ) {
+			hideInsertionPoint();
+		} else if ( targetBlockIndex !== null ) {
+			showInsertionPoint( targetRootClientId, targetBlockIndex );
+		}
+	}, [ targetBlockIndex, isDraggingOverDocument ] );
 }

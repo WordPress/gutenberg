@@ -183,8 +183,8 @@ In the random image block above, we've given the `alt` attribute of the image a 
 
 <a name="cloneBlock" href="#cloneBlock">#</a> **cloneBlock**
 
-Given a block object, returns a copy of the block object, optionally merging
-new attributes and/or replacing its inner blocks.
+Given a block object, returns a copy of the block object,
+optionally merging new attributes and/or replacing its inner blocks.
 
 _Parameters_
 
@@ -223,7 +223,7 @@ _Parameters_
 
 _Returns_
 
--   `Array<Object>`: Array of Block objects.
+-   `Object[]`: Array of Block objects.
 
 <a name="doBlocksMatchTemplate" href="#doBlocksMatchTemplate">#</a> **doBlocksMatchTemplate**
 
@@ -248,7 +248,7 @@ falsey value for all entries.
 
 _Parameters_
 
--   _transforms_ `Array<Object>`: Transforms to search.
+-   _transforms_ `Object[]`: Transforms to search.
 -   _predicate_ `Function`: Function returning true on matching transform.
 
 _Returns_
@@ -261,7 +261,7 @@ Returns the block attributes of a registered block node given its type.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _innerHTML_ `string`: Raw block content.
 -   _attributes_ `?Object`: Known block attributes (from delimiters).
 
@@ -342,7 +342,7 @@ transform object includes `blockName` as a property.
 _Parameters_
 
 -   _direction_ `string`: Transform direction ("to", "from").
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 
 _Returns_
 
@@ -379,7 +379,7 @@ _Parameters_
 
 _Returns_
 
--   `(Array<WPBlockVariation>|void)`: Block variations.
+-   `(WPBlockVariation[]|void)`: Block variations.
 
 <a name="getCategories" href="#getCategories">#</a> **getCategories**
 
@@ -387,7 +387,7 @@ Returns all the block categories.
 
 _Returns_
 
--   `Array<WPBlockCategory>`: Block categories.
+-   `WPBlockCategory[]`: Block categories.
 
 <a name="getChildBlockNames" href="#getChildBlockNames">#</a> **getChildBlockNames**
 
@@ -450,7 +450,7 @@ static markup to be saved.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _attributes_ `Object`: Block attributes.
 -   _innerBlocks_ `?Array`: Nested blocks.
 
@@ -465,13 +465,13 @@ enhanced element to be saved or string when raw HTML expected.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type or name.
+-   _blockTypeOrName_ `string|Object`: Block type or name.
 -   _attributes_ `Object`: Block attributes.
 -   _innerBlocks_ `?Array`: Nested blocks.
 
 _Returns_
 
--   `(Object|string)`: Save element or raw HTML string.
+-   `Object|string`: Save element or raw HTML string.
 
 <a name="getUnregisteredTypeHandlerName" href="#getUnregisteredTypeHandlerName">#</a> **getUnregisteredTypeHandlerName**
 
@@ -534,6 +534,20 @@ _Returns_
 
 -   `boolean`: Whether the given block is a reusable block.
 
+<a name="isTemplatePart" href="#isTemplatePart">#</a> **isTemplatePart**
+
+Determines whether or not the given block is a template part. This is a
+special block type that allows composing a page template out of reusable
+design elements.
+
+_Parameters_
+
+-   _blockOrType_ `Object`: Block or Block Type to test.
+
+_Returns_
+
+-   `boolean`: Whether the given block is a template part.
+
 <a name="isUnmodifiedDefaultBlock" href="#isUnmodifiedDefaultBlock">#</a> **isUnmodifiedDefaultBlock**
 
 Determines whether the block is a default block
@@ -558,7 +572,7 @@ Logs to console in development environments when invalid.
 
 _Parameters_
 
--   _blockTypeOrName_ `(string|Object)`: Block type.
+-   _blockTypeOrName_ `string|Object`: Block type.
 -   _attributes_ `Object`: Parsed block attributes.
 -   _originalBlockContent_ `string`: Original block content.
 
@@ -594,7 +608,21 @@ _Returns_
 
 <a name="parse" href="#parse">#</a> **parse**
 
-Parses the post content with a PegJS grammar and returns a list of blocks.
+Utilizes an optimized token-driven parser based on the Gutenberg grammar spec
+defined through a parsing expression grammar to take advantage of the regular
+cadence provided by block delimiters -- composed syntactically through HTML
+comments -- which, given a general HTML document as an input, returns a block
+list array representation.
+
+This is a recursive-descent parser that scans linearly once through the input
+document. Instead of directly recursing it utilizes a trampoline mechanism to
+prevent stack overflow. This initial pass is mainly interested in separating
+and isolating the blocks serialized in the document and manifestly not in the
+content within the blocks.
+
+_Related_
+
+-   <https://developer.wordpress.org/block-editor/packages/packages-block-serialization-default-parser/>
 
 _Parameters_
 
@@ -633,7 +661,7 @@ _Parameters_
 
 _Returns_
 
--   `(Array|string)`: A list of blocks or a string, depending on `handlerMode`.
+-   `Array|string`: A list of blocks or a string, depending on `handlerMode`.
 
 <a name="rawHandler" href="#rawHandler">#</a> **rawHandler**
 
@@ -711,7 +739,7 @@ Sets the block categories.
 
 _Parameters_
 
--   _categories_ `Array<WPBlockCategory>`: Block categories.
+-   _categories_ `WPBlockCategory[]`: Block categories.
 
 <a name="setDefaultBlockName" href="#setDefaultBlockName">#</a> **setDefaultBlockName**
 
@@ -751,7 +779,7 @@ Store definition for the blocks namespace.
 
 _Related_
 
--   <https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore>
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
 
 _Type_
 
@@ -763,7 +791,7 @@ Switch one or more blocks into one or more blocks of the new block type.
 
 _Parameters_
 
--   _blocks_ `(Array|Object)`: Blocks array or block object.
+-   _blocks_ `Array|Object`: Blocks array or block object.
 -   _name_ `string`: Block name.
 
 _Returns_

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { audio as icon } from '@wordpress/icons';
 
 /**
@@ -18,7 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Audio' ),
+	title: _x( 'Audio', 'block title' ),
 	description: __( 'Embed a simple audio player.' ),
 	keywords: [
 		__( 'music' ),

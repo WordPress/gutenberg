@@ -64,6 +64,8 @@ _Parameters_
 -   _name_ `string`: Name of the deleted entity.
 -   _recordId_ `string`: Record ID of the deleted entity.
 -   _query_ `?Object`: Special query parameters for the DELETE API call.
+-   _options_ `[Object]`: Delete options.
+-   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a control descriptor.
 
 <a name="editEntityRecord" href="#editEntityRecord">#</a> **editEntityRecord**
 
@@ -91,7 +93,7 @@ post have been received.
 _Parameters_
 
 -   _postId_ `number`: The id of the post that is parent to the autosave.
--   _autosaves_ `(Array|Object)`: An array of autosaves or singular autosave object.
+-   _autosaves_ `Array|Object`: An array of autosaves or singular autosave object.
 
 _Returns_
 
@@ -143,9 +145,10 @@ _Parameters_
 
 -   _kind_ `string`: Kind of the received entity.
 -   _name_ `string`: Name of the received entity.
--   _records_ `(Array|Object)`: Records received.
+-   _records_ `Array|Object`: Records received.
 -   _query_ `?Object`: Query Object.
--   _invalidateCache_ `?boolean`: Should invalidate query caches
+-   _invalidateCache_ `?boolean`: Should invalidate query caches.
+-   _edits_ `?Object`: Edits to reset.
 
 _Returns_
 
@@ -196,7 +199,7 @@ Returns an action object used in signalling that authors have been received.
 _Parameters_
 
 -   _queryID_ `string`: Query ID.
--   _users_ `(Array|Object)`: Users received.
+-   _users_ `Array|Object`: Users received.
 
 _Returns_
 
@@ -229,6 +232,7 @@ _Parameters_
 -   _record_ `Object`: Record to be saved.
 -   _options_ `Object`: Saving options.
 -   _options.isAutosave_ `[boolean]`: Whether this is an autosave.
+-   _options.\_\_unstableFetch_ `[Function]`: Internal use only. Function to call instead of `apiFetch()`. Must return a control descriptor.
 
 <a name="undo" href="#undo">#</a> **undo**
 
@@ -258,11 +262,11 @@ _Parameters_
 -   _state_ `Object`: Data state.
 -   _action_ `string`: Action to check. One of: 'create', 'read', 'update', 'delete'.
 -   _resource_ `string`: REST resource to check, e.g. 'media' or 'posts'.
--   _id_ `[string]`: Optional ID of the rest resource to check.
+-   _id_ `string=`: Optional ID of the rest resource to check.
 
 _Returns_
 
--   `(boolean|undefined)`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
+-   `boolean|undefined`: Whether or not the user can perform the action, or `undefined` if the OPTIONS request is still being made.
 
 <a name="getAuthors" href="#getAuthors">#</a> **getAuthors**
 
@@ -271,7 +275,7 @@ Returns all available authors.
 _Parameters_
 
 -   _state_ `Object`: Data state.
--   _query_ `(Object|undefined)`: Optional object of query parameters to include with request.
+-   _query_ `Object|undefined`: Optional object of query parameters to include with request.
 
 _Returns_
 
@@ -346,7 +350,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: The entity record, merged with its edits.
+-   `Object?`: The entity record, merged with its edits.
 
 <a name="getEmbedPreview" href="#getEmbedPreview">#</a> **getEmbedPreview**
 
@@ -372,7 +376,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the entities are loaded
+-   `Array<Object>`: Array of entities with config matching kind.
 
 <a name="getEntity" href="#getEntity">#</a> **getEntity**
 
@@ -404,7 +408,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: Record.
+-   `Object?`: Record.
 
 <a name="getEntityRecordEdits" href="#getEntityRecordEdits">#</a> **getEntityRecordEdits**
 
@@ -419,7 +423,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: The entity record's edits.
+-   `Object?`: The entity record's edits.
 
 <a name="getEntityRecordNonTransientEdits" href="#getEntityRecordNonTransientEdits">#</a> **getEntityRecordNonTransientEdits**
 
@@ -438,7 +442,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: The entity record's non transient edits.
+-   `Object?`: The entity record's non transient edits.
 
 <a name="getEntityRecords" href="#getEntityRecords">#</a> **getEntityRecords**
 
@@ -468,7 +472,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: The entity record's save error.
+-   `Object?`: The entity record's save error.
 
 <a name="getLastEntitySaveError" href="#getLastEntitySaveError">#</a> **getLastEntitySaveError**
 
@@ -483,7 +487,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: The entity record's save error.
+-   `Object?`: The entity record's save error.
 
 <a name="getRawEntityRecord" href="#getRawEntityRecord">#</a> **getRawEntityRecord**
 
@@ -499,7 +503,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: Object with the entity's raw attributes.
+-   `Object?`: Object with the entity's raw attributes.
 
 <a name="getRedoEdit" href="#getRedoEdit">#</a> **getRedoEdit**
 
@@ -512,7 +516,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: The edit.
+-   `Object?`: The edit.
 
 <a name="getReferenceByDistinctEdits" href="#getReferenceByDistinctEdits">#</a> **getReferenceByDistinctEdits**
 
@@ -558,7 +562,7 @@ _Parameters_
 
 _Returns_
 
--   `?Object`: The edit.
+-   `Object?`: The edit.
 
 <a name="getUserQueryResults" href="#getUserQueryResults">#</a> **getUserQueryResults**
 
@@ -644,25 +648,6 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether there is a previous edit or not.
-
-<a name="hasUploadPermissions" href="#hasUploadPermissions">#</a> **hasUploadPermissions**
-
-> **Deprecated** since 5.0. Callers should use the more generic `canUser()` selector instead of `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
-
-Returns whether the current user can upload media.
-
-Calling this may trigger an OPTIONS request to the REST API via the
-`canUser()` resolver.
-
-<https://developer.wordpress.org/rest-api/reference/>
-
-_Parameters_
-
--   _state_ `Object`: Data state.
-
-_Returns_
-
--   `boolean`: Whether or not the user can upload media. Defaults to `true` if the OPTIONS request is being made.
 
 <a name="isAutosavingEntityRecord" href="#isAutosavingEntityRecord">#</a> **isAutosavingEntityRecord**
 

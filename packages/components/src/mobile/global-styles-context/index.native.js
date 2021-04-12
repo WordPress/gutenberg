@@ -19,6 +19,8 @@ import {
 
 const GlobalStylesContext = createContext( { style: {} } );
 
+GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES = BLOCK_STYLE_ATTRIBUTES;
+
 export const getMergedGlobalStyles = (
 	globalStyle,
 	wrapperPropsStyle,

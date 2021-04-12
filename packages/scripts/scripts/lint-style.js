@@ -35,7 +35,7 @@ const defaultConfigArgs = ! hasLintConfig
 	? [ '--config', fromConfigRoot( '.stylelintrc.json' ) ]
 	: [];
 
-// See: https://github.com/stylelint/stylelint/blob/master/docs/user-guide/configuration.md#stylelintignore.
+// See: https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/ignore-code.md#files-entirely.
 const hasIgnoredFiles =
 	hasArgInCLI( '--ignore-path' ) || hasProjectFile( '.stylelintignore' );
 

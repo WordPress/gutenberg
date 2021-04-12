@@ -1,4 +1,9 @@
 .wp-block-rss {
+	// This needs extra specificity due to the reset mixin on the parent: https://github.com/WordPress/gutenberg/blob/a250e9e5fe00dd5195624f96a3d924e7078951c3/packages/edit-post/src/style.scss#L54
+	&.wp-block-rss {
+		box-sizing: border-box;
+	}
+
 	&.alignleft {
 		/*rtl:ignore*/
 		margin-right: 2em;

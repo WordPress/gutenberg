@@ -1,14 +1,16 @@
 /**
  * External dependencies
  */
-const { isEmpty, omitBy } = require( 'lodash' );
+const { command } = require( 'execa' );
+const { isEmpty, omitBy, size } = require( 'lodash' );
+const npmPackageArg = require( 'npm-package-arg' );
 const { join } = require( 'path' );
 const writePkg = require( 'write-pkg' );
 
 /**
  * Internal dependencies
  */
-const { info } = require( './log' );
+const { info, error } = require( './log' );
 
 module.exports = async ( {
 	author,
@@ -17,6 +19,7 @@ module.exports = async ( {
 	slug,
 	version,
 	wpScripts,
+	npmDependencies,
 } ) => {
 	const cwd = join( process.cwd(), slug );
 
@@ -44,4 +47,32 @@ module.exports = async ( {
 			isEmpty
 		)
 	);
+
+	if ( size( npmDependencies ) ) {
+		info( '' );
+		info(
+			'Installing npm dependencies. It might take a couple of minutes...'
+		);
+		for ( const packageArg of npmDependencies ) {
+			try {
+				const { type } = npmPackageArg( packageArg );
+				if (
+					! [ 'git', 'tag', 'version', 'range', 'remote' ].includes(
+						type
+					)
+				) {
+					throw new Error(
+						`Provided package type "${ type }" is not supported.`
+					);
+				}
+				await command( `npm install ${ packageArg }`, {
+					cwd,
+				} );
+			} catch ( { message } ) {
+				info( '' );
+				info( `Skipping "${ packageArg }" npm dependency. Reason:` );
+				error( message );
+			}
+		}
+	}
 };

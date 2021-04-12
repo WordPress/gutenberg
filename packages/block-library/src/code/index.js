@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { code as icon } from '@wordpress/icons';
 
 /**
@@ -17,7 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Code' ),
+	title: _x( 'Code', 'block title' ),
 	description: __(
 		'Display code snippets that respect your spacing and tabs.'
 	),

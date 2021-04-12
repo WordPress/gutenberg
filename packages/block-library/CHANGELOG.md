@@ -1,6 +1,24 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+## 2.29.0 (2021-03-17)
+
+### Bug Fixes
+
+- Fix a regression where the Cover block migration would not work with a non-default contentPosition ([#29542](https://github.com/WordPress/gutenberg/pull/29542))
+
+## 2.28.0 (2021-02-01)
+
+### New Features
+
+- Allow setting the `crossOrigin` attribute so the `useTransformImage` hook can use cross-origin sources ([#28255](https://github.com/WordPress/gutenberg/pull/28255/)).
+
+### Bug Fixes
+
+- Fix a regression where the Cover block migration would not work with custom units for `minHeight` ([#28627](https://github.com/WordPress/gutenberg/pull/28627))
+
+## 2.27.0 (2020-12-17)
 
 ### Enhancement
 
@@ -12,6 +30,11 @@
 - Fix a regression where the Cover would not show opacity controls for the default overlay color ([#26625](https://github.com/WordPress/gutenberg/pull/26625)).
 - Fix a regression ([#26545](https://github.com/WordPress/gutenberg/pull/26545)) where the Cover block lost its default background overlay color
   ([#26569](https://github.com/WordPress/gutenberg/pull/26569)).
+- Fix Image Block, reset image dimensions when replace URL. bug mentioned in ([#26333](https://github.com/WordPress/gutenberg/issues/26333)).
+
+### Enhancement
+
+- File Block: Copy url button is moved to Block toolbar.
 
 ## 2.23.0 (2020-09-03)
 

@@ -42,9 +42,7 @@ export default function PostTextEditor() {
 	 */
 	const onChange = ( event ) => {
 		const newValue = event.target.value;
-
 		editPost( { content: newValue } );
-
 		setValue( newValue );
 		setIsDirty( true );
 	};
@@ -58,7 +56,6 @@ export default function PostTextEditor() {
 		if ( isDirty ) {
 			const blocks = parse( value );
 			resetEditorBlocks( blocks );
-
 			setIsDirty( false );
 		}
 	};

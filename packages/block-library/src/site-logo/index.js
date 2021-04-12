@@ -2,20 +2,20 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
+import { siteLogo as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import metadata from './block.json';
-import icon from './icon';
 import edit from './edit';
 
 const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Site Logo' ),
-	description: __( 'Show a site logo' ),
+	title: _x( 'Site Logo', 'block title' ),
+	description: __( 'Displays and enables editing of the site logo.' ),
 	icon,
 	styles: [
 		{

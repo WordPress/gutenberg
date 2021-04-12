@@ -12,6 +12,11 @@ import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
+/**
  * Module Constants
  */
 const PANEL_NAME = 'discussion-panel';
@@ -47,17 +52,15 @@ function DiscussionPanel( { isEnabled, isOpened, onTogglePanel } ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled(
+			isEnabled: select( editPostStore ).isEditorPanelEnabled(
 				PANEL_NAME
 			),
-			isOpened: select( 'core/edit-post' ).isEditorPanelOpened(
-				PANEL_NAME
-			),
+			isOpened: select( editPostStore ).isEditorPanelOpened( PANEL_NAME ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {
 		onTogglePanel() {
-			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened(
+			return dispatch( editPostStore ).toggleEditorPanelOpened(
 				PANEL_NAME
 			);
 		},

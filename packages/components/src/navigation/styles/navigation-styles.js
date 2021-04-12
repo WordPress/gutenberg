@@ -4,19 +4,24 @@
 import styled from '@emotion/styled';
 
 /**
+ * WordPress dependencies
+ */
+import { isRTL } from '@wordpress/i18n';
+
+/**
  * Internal dependencies
  */
 import { G2, UI } from '../../utils/colors-values';
 import Button from '../../button';
 import Text from '../../text';
-import { reduceMotion, space } from '../../utils';
+import { reduceMotion, space, rtl } from '../../utils';
 
 export const NavigationUI = styled.div`
 	width: 100%;
 	background-color: ${ G2.darkGray.primary };
 	box-sizing: border-box;
 	color: #f0f0f0;
-	padding: 0 ${ space( 1 ) };
+	padding: 0 ${ space( 2 ) };
 	overflow: hidden;
 `;
 
@@ -66,8 +71,8 @@ export const MenuTitleHeadingUI = styled( Text )`
 	display: flex;
 	justify-content: space-between;
 	margin-bottom: ${ space( 1 ) };
-	padding: ${ ( props ) =>
-		props.isRTL
+	padding: ${ () =>
+		isRTL()
 			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } ${ space(
 					1.5
 			  ) }`
@@ -139,8 +144,8 @@ export const MenuTitleSearchUI = styled.div`
 
 export const GroupTitleUI = styled( Text )`
 	margin-top: ${ space( 1 ) };
-	padding: ${ ( props ) =>
-		props.isRTL
+	padding: ${ () =>
+		isRTL()
 			? `${ space( 0.5 ) } ${ space( 2 ) } ${ space( 0.5 ) } 0`
 			: `${ space( 0.5 ) } 0 ${ space( 0.5 ) } ${ space( 2 ) }` };
 	text-transform: uppercase;
@@ -153,7 +158,13 @@ export const ItemBaseUI = styled.li`
 	margin-bottom: 0;
 
 	button,
+	a.components-button,
 	a {
+		width: 100%;
+		color: ${ G2.lightGray.ui };
+		padding: ${ space( 1 ) } ${ space( 2 ) }; /* 8px 16px */
+		${ rtl( { textAlign: 'left' }, { textAlign: 'right' } ) }
+
 		&:hover,
 		&:focus:not( [aria-disabled='true'] ):active,
 		&:active:not( [aria-disabled='true'] ):active {
@@ -180,7 +191,7 @@ export const ItemUI = styled.div`
 	display: flex;
 	align-items: center;
 	height: auto;
-	min-height: 32px;
+	min-height: 40px;
 	margin: 0;
 	padding: ${ space( 0.75 ) } ${ space( 2 ) };
 	font-weight: 400;
@@ -190,8 +201,8 @@ export const ItemUI = styled.div`
 `;
 
 export const ItemBadgeUI = styled.span`
-	margin-left: ${ ( props ) => ( props.isRTL ? '0' : space( 1 ) ) };
-	margin-right: ${ ( props ) => ( props.isRTL ? space( 1 ) : '0' ) };
+	margin-left: ${ () => ( isRTL() ? '0' : space( 1 ) ) };
+	margin-right: ${ () => ( isRTL() ? space( 1 ) : '0' ) };
 	display: inline-flex;
 	padding: ${ space( 0.5 ) } ${ space( 1.5 ) };
 	border-radius: 2px;
@@ -210,7 +221,7 @@ export const ItemBadgeUI = styled.span`
 `;
 
 export const ItemTitleUI = styled( Text )`
-	${ ( props ) =>
-		props.isRTL ? 'margin-left: auto;' : 'margin-right: auto;' }
-	font-size: 13px;
+	${ () => ( isRTL() ? 'margin-left: auto;' : 'margin-right: auto;' ) }
+	font-size: 14px;
+	line-height: 20px;
 `;

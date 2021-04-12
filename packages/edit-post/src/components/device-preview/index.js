@@ -8,6 +8,11 @@ import { __ } from '@wordpress/i18n';
 import { __experimentalPreviewOptions as PreviewOptions } from '@wordpress/block-editor';
 import { useDispatch, useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
+
 export default function DevicePreview() {
 	const {
 		hasActiveMetaboxes,
@@ -16,18 +21,18 @@ export default function DevicePreview() {
 		deviceType,
 	} = useSelect(
 		( select ) => ( {
-			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			isSaving: select( editPostStore ).isSavingMetaBoxes(),
 			isPostSaveable: select( 'core/editor' ).isEditedPostSaveable(),
 			deviceType: select(
-				'core/edit-post'
+				editPostStore
 			).__experimentalGetPreviewDeviceType(),
 		} ),
 		[]
 	);
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-	} = useDispatch( 'core/edit-post' );
+	} = useDispatch( editPostStore );
 
 	return (
 		<PreviewOptions

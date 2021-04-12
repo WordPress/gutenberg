@@ -1,0 +1,25 @@
+{
+	"apiVersion": 2,
+	"name": "core/post-navigation-link",
+	"category": "design",
+	"attributes": {
+		"textAlign": {
+			"type": "string"
+		},
+		"type": {
+			"type": "string",
+			"default": "next"
+		},
+		"label": {
+			"type": "string"
+		},
+		"showTitle": {
+			"type": "boolean",
+			"default": false
+		}
+	},
+	"supports": {
+		"reusable": false,
+		"html": false
+	}
+}

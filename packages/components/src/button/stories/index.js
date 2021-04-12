@@ -57,6 +57,23 @@ export const isDestructive = () => {
 	);
 };
 
+export const isPrimaryDestructive = () => {
+	const label = text( 'Label', 'Destructive Primary Button' );
+	const isSmall = boolean( 'isSmall', false );
+	const disabled = boolean( 'disabled', false );
+
+	return (
+		<Button
+			isPrimary
+			isDestructive
+			isSmall={ isSmall }
+			disabled={ disabled }
+		>
+			{ label }
+		</Button>
+	);
+};
+
 export const small = () => {
 	const label = text( 'Label', 'Small Button' );
 
