@@ -66,12 +66,12 @@ class Block_Templates_Test extends WP_UnitTestCase {
 					get_stylesheet(),
 				),
 				'wp_template_part_area' => array(
-					WP_TEMPLATE_PART_AREA_SIDEBAR,
+					WP_TEMPLATE_PART_AREA_HEADER,
 				),
 			),
 		);
 		self::$template_part_post = self::factory()->post->create_and_get( $template_part_args );
-		wp_set_post_terms( self::$template_part_post->ID, WP_TEMPLATE_PART_AREA_SIDEBAR, 'wp_template_part_area' );
+		wp_set_post_terms( self::$template_part_post->ID, WP_TEMPLATE_PART_AREA_HEADER, 'wp_template_part_area' );
 		wp_set_post_terms( self::$template_part_post->ID, get_stylesheet(), 'wp_theme' );
 	}
 
@@ -147,7 +147,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'My Template Part', $template_part->title );
 		$this->assertEquals( 'Description of my template part', $template_part->description );
 		$this->assertEquals( 'wp_template_part', $template_part->type );
-		$this->assertEquals( WP_TEMPLATE_PART_AREA_SIDEBAR, $template_part->area );
+		$this->assertEquals( WP_TEMPLATE_PART_AREA_HEADER, $template_part->area );
 	}
 
 	function test_inject_theme_attribute_in_content() {
@@ -228,7 +228,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'publish', $template->status );
 		$this->assertEquals( 'custom', $template->source );
 		$this->assertEquals( 'wp_template_part', $template->type );
-		$this->assertEquals( WP_TEMPLATE_PART_AREA_SIDEBAR, $template->area );
+		$this->assertEquals( WP_TEMPLATE_PART_AREA_HEADER, $template->area );
 	}
 
 	/**
@@ -263,7 +263,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( array( get_stylesheet() . '//' . 'my_template' ), $template_ids );
 
 		// Filter template part by area.
-		$templates    = gutenberg_get_block_templates( array( 'area' => WP_TEMPLATE_PART_AREA_SIDEBAR ), 'wp_template_part' );
+		$templates    = gutenberg_get_block_templates( array( 'area' => WP_TEMPLATE_PART_AREA_HEADER ), 'wp_template_part' );
 		$template_ids = get_template_ids( $templates );
 		// TODO - update following array result once tt1-blocks theme.json is updated for area info.
 		$this->assertEquals( array( get_stylesheet() . '//' . 'my_template_part' ), $template_ids );
