@@ -79,9 +79,10 @@ export default function VisualEditor( { styles } ) {
 		useCanvasClickRedirect(),
 		useTypewriter(),
 		useTypingObserver(),
+		useBlockSelectionClearer(),
 	] );
 
-	const blockSelectionClearerRef = useBlockSelectionClearer();
+	const blockSelectionClearerRef = useBlockSelectionClearer( true );
 
 	return (
 		<div
