@@ -90,7 +90,7 @@ function gutenberg_edit_site_init( $hook ) {
 	$current_screen->is_block_editor( true );
 
 	$settings = array_merge(
-		get_default_block_editor_settings(),
+		gutenberg_get_default_block_editor_settings(),
 		array(
 			'siteUrl'                              => site_url(),
 			'postsPerPage'                         => get_option( 'posts_per_page' ),
