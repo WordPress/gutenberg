@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
@@ -47,7 +47,7 @@ function ButtonBlockAppender(
 				}
 				const isToggleButton = ! hasSingleBlockType;
 
-				let inserterButton = (
+				return (
 					<Button
 						ref={ ref }
 						onFocus={ onFocus }
@@ -61,6 +61,8 @@ function ButtonBlockAppender(
 						aria-expanded={ isToggleButton ? isOpen : undefined }
 						disabled={ disabled }
 						label={ label }
+						showTooltip
+						tooltipPosition="bottom"
 					>
 						{ ! hasSingleBlockType && (
 							<VisuallyHidden as="span">{ label }</VisuallyHidden>
@@ -68,13 +70,6 @@ function ButtonBlockAppender(
 						<Icon icon={ plus } />
 					</Button>
 				);
-
-				if ( isToggleButton || hasSingleBlockType ) {
-					inserterButton = (
-						<Tooltip text={ label }>{ inserterButton }</Tooltip>
-					);
-				}
-				return inserterButton;
 			} }
 			isAppender
 		/>
