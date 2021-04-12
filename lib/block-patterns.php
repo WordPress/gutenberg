@@ -72,6 +72,24 @@ register_block_pattern(
 );
 
 register_block_pattern(
+	'query/posts-grid',
+	array(
+		'title'      => __( 'Post Grid', 'gutenberg' ),
+		'blockTypes' => array( 'core/query' ),
+		'categories' => array( 'Query' ),
+		'content'    => '<!-- wp:query {"queryId":11,"query":{"perPage":12,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":true},"layout":{"type":"flex","columns":3}} -->
+						<!-- wp:query-loop -->
+						<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
+						<main class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:post-title {"isLink":true} /-->
+						<!-- wp:post-excerpt /-->
+						<!-- wp:post-date /--></div>
+						<!-- /wp:group -->
+						<!-- /wp:query-loop -->
+						<!-- /wp:query -->',
+	)
+);
+
+register_block_pattern(
 	'query/large-title-and-date',
 	array(
 		'title'      => __( 'Large Title and Date', 'gutenberg' ),
@@ -99,34 +117,14 @@ register_block_pattern(
 );
 
 register_block_pattern(
-	'query/posts-grid',
-	array(
-		'title'      => __( 'Post Grid', 'gutenberg' ),
-		'blockTypes' => array( 'core/query' ),
-		'categories' => array( 'Query' ),
-		'content'    => '<!-- wp:query {"queryId":11,"query":{"perPage":12,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":true},"layout":{"type":"flex","columns":3}} -->
-						<!-- wp:query-loop -->
-						<!-- wp:cover {"customOverlayColor":"#efefef","minHeight":500,"minHeightUnit":"px","contentPosition":"top left","style":{"spacing":{"padding":{"top":"40px","right":"40px","bottom":"40px","left":"40px"}}}} -->
-						<div class="wp-block-cover has-background-dim has-custom-content-position is-position-top-left" style="padding-top:40px;padding-right:40px;padding-bottom:40px;padding-left:40px;background-color:#efefef;min-height:500px"><div class="wp-block-cover__inner-container"><!-- wp:post-title {"isLink":true,"style":{"color":{"text":"#000000"}}} /-->
-
-						<!-- wp:post-excerpt {"style":{"color":{"text":"#000000"}}} /-->
-
-						<!-- wp:post-date {"style":{"color":{"text":"#000000"}}} /--></div></div>
-						<!-- /wp:cover -->
-						<!-- /wp:query-loop -->
-						<!-- /wp:query -->',
-	)
-);
-
-register_block_pattern(
 	'query/offset-posts',
 	array(
 		'title'      => __( 'Offset Posts', 'gutenberg' ),
 		'blockTypes' => array( 'core/query' ),
 		'categories' => array( 'Query' ),
-		'content'    => '<!-- wp:group {"tagName":"main","layout":{"inherit":false}} -->
-						<main class="wp-block-group"><!-- wp:columns -->
-						<div class="wp-block-columns"><!-- wp:column {"width":50} -->
+		'content'    => '<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
+						<main class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:columns -->
+						<div class="wp-block-columns"><!-- wp:column {"width":"50%"} -->
 						<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"queryId":11,"query":{"perPage":5,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"layout":{"type":"list"}} -->
 						<!-- wp:query-loop -->
 						<!-- wp:post-featured-image /-->
@@ -138,7 +136,7 @@ register_block_pattern(
 						<!-- /wp:query-loop -->
 						<!-- /wp:query --></div>
 						<!-- /wp:column -->
-						<!-- wp:column {"width":50} -->
+						<!-- wp:column {"width":"50%"} -->
 						<div class="wp-block-column" style="flex-basis:50%"><!-- wp:query {"queryId":11,"query":{"perPage":5,"pages":0,"offset":5,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":false},"layout":{"type":"list"}} -->
 						<!-- wp:query-loop -->
 						<!-- wp:spacer {"height":200} -->
