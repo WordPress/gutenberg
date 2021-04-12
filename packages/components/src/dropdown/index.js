@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect, useState, cloneElement } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -56,16 +56,15 @@ export default function Dropdown( {
 	}
 
 	/**
-	 * Closes the dropdown if a focus leaves the dropdown wrapper. This is
-	 * intentionally distinct from `onClose` since focus loss from the popover
-	 * is expected to occur when using the Dropdown's toggle button, in which
-	 * case the correct behavior is to keep the dropdown closed. The same applies
-	 * in case when focus is moved to the modal dialog.
+	 * Closes the dropdown if focus leaves its popover unless its toggle was
+	 * pressed or focus was moved to within a modal dialog. The former is to
+	 * let the toggle act to close the dropdown and the latter is to enable
+	 * the focus to return after the dialog is dismissed.
 	 */
 	function closeIfFocusOutside() {
 		const { ownerDocument } = containerRef.current;
 		if (
-			! containerRef.current.contains( ownerDocument.activeElement ) &&
+			! isPressingToggle.current &&
 			! ownerDocument.activeElement.closest( '[role="dialog"]' )
 		) {
 			close();
@@ -81,17 +80,30 @@ export default function Dropdown( {
 
 	const args = { isOpen, onToggle: toggle, onClose: close };
 
+	const isPressingToggle = useRef();
+	let toggleElement = renderToggle( args );
+	const { props } = toggleElement;
+	const pressHandlers = {
+		onMouseDown: ( event ) => {
+			isPressingToggle.current = true;
+			props.onMouseDown?.( event );
+		},
+		onMouseUp: ( event ) => {
+			isPressingToggle.current = false;
+			props.onMouseUp?.( event );
+		},
+	};
+	toggleElement = cloneElement( toggleElement, pressHandlers );
 	return (
 		<div
 			className={ classnames( 'components-dropdown', className ) }
 			ref={ containerRef }
 		>
-			{ renderToggle( args ) }
+			{ toggleElement }
 			{ isOpen && (
 				<Popover
 					position={ position }
-					onClose={ close }
-					onFocusOutside={ closeIfFocusOutside }
+					onClose={ closeIfFocusOutside }
 					expandOnMobile={ expandOnMobile }
 					headerTitle={ headerTitle }
 					focusOnMount={ focusOnMount }
