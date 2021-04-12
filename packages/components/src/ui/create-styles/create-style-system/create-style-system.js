@@ -12,11 +12,10 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @template {Record<string, string | number>} TConfig
- * @template {Record<string, string | number>} TDarkConfig
- * @template {Record<string, string | number>} THCConfig
- * @template {Record<string, string | number>} TDarkHCConfig
- * @template {string} TGeneratedTokens
+ * @template {Record<string, string | number> | {}} TConfig
+ * @template {Record<string, string | number> | {}} TDarkConfig
+ * @template {Record<string, string | number> | {}} THCConfig
+ * @template {Record<string, string | number> | {}} TDarkHCConfig
  * @typedef CreateStyleSystemObjects
  * @property {import('./polymorphic-component').CoreElements} core A set of coreElements.
  * @property {import('../create-compiler').Compiler} compiler The Style system compiler (a custom Emotion instance).
@@ -24,17 +23,16 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
  * @property {import('../create-compiler').Compiler['css']} css A function to compile CSS styles.
  * @property {import('../create-compiler').Compiler['cx']} cx A function to resolve + combine classNames.
  * @property {(tokenName: string) => string} createToken A function to generate a design token (CSS variable) used by the system.
- * @property {(value: keyof (TConfig & TDarkConfig & THCConfig & TDarkHCConfig) | TGeneratedTokens) => string} get The primary function to retrieve Style system variables.
+ * @property {(value: keyof (TConfig & TDarkConfig & THCConfig & TDarkHCConfig)) => string} get The primary function to retrieve Style system variables.
  * @property {import('./polymorphic-component').CreateStyled} styled A set of styled components.
  * @property {import('react').ComponentType} View The base <View /> component.
  */
 
 /**
- * @template {Record<string, string | number>} TConfig
- * @template {Record<string, string | number>} TDarkConfig
- * @template {Record<string, string | number>} THCConfig
- * @template {Record<string, string | number>} TDarkHCConfig
- * @template {string} TGeneratedTokens
+ * @template {Record<string, string | number> | {}} TConfig
+ * @template {Record<string, string | number> | {}} TDarkConfig
+ * @template {Record<string, string | number> | {}} THCConfig
+ * @template {Record<string, string | number> | {}} TDarkHCConfig
  * @typedef CreateStyleSystemOptions
  * @property {import('create-emotion').ObjectInterpolation<any>} baseStyles The base styles.
  * @property {TConfig} config The base theme config.
@@ -54,13 +52,12 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
  * const blueStyleSystem = createStyleSystem({ baseStyles });
  * ```
  *
- * @template {Record<string, string | number>} TConfig
- * @template {Record<string, string | number>} TDarkConfig
- * @template {Record<string, string | number>} THCConfig
- * @template {Record<string, string | number>} TDarkHCConfig
- * @template {string} TGeneratedTokens
- * @param {CreateStyleSystemOptions<TConfig, TDarkConfig, THCConfig, TDarkHCConfig, TGeneratedTokens>} options Options to create a Style system with.
- * @return {CreateStyleSystemObjects<TConfig, TDarkConfig, THCConfig, TDarkHCConfig, TGeneratedTokens>} A collection of functions and elements from the generated Style system.
+ * @template {Record<string, string | number> | {}} TConfig
+ * @template {Record<string, string | number> | {}} TDarkConfig
+ * @template {Record<string, string | number> | {}} THCConfig
+ * @template {Record<string, string | number> | {}} TDarkHCConfig
+ * @param {CreateStyleSystemOptions<TConfig, TDarkConfig, THCConfig, TDarkHCConfig>} options Options to create a Style system with.
+ * @return {CreateStyleSystemObjects<TConfig, TDarkConfig, THCConfig, TDarkHCConfig>} A collection of functions and elements from the generated Style system.
  */
 export function createStyleSystem( options = defaultOptions ) {
 	const {
@@ -129,7 +126,7 @@ export function createStyleSystem( options = defaultOptions ) {
 		cx,
 		get: (
 			/* eslint-disable jsdoc/no-undefined-types */
-			/** @type {keyof TConfig | keyof TDarkConfig | keyof THCConfig | keyof TDarkHCConfig | TGeneratedTokens} */ key
+			/** @type {keyof TConfig | keyof TDarkConfig | keyof THCConfig | keyof TDarkHCConfig} */ key
 			/* eslint-enable jsdoc/no-undefined-types */
 		) => `var(${ createToken( key.toString() ) })`,
 		styled,
