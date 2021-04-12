@@ -51,7 +51,6 @@ export default function TemplateNavigationItem( { item } ) {
 		<NavigationItem
 			className="edit-site-navigation-panel__template-item"
 			item={ `${ item.type }-${ item.id }` }
-			title={ title }
 		>
 			<Button
 				onClick={ onActivateItem }
