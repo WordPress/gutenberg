@@ -173,7 +173,9 @@ $color-control-label-height: 20px;
 	}
 }
 
-.wp-block-navigation .block-editor-button-block-appender {
+.wp-block-navigation .block-editor-button-block-appender,
+// Ideally not needed but this overrides the high specificity of the buttons in the canvas that can be affected by themes.
+.editor-styles-wrapper .wp-block-navigation .block-editor-button-block-appender.components-button.components-button {
 	justify-content: flex-start;
 }
 
