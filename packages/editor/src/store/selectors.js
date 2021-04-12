@@ -27,7 +27,6 @@ import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
-import { layout, header, footer } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -41,6 +40,7 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { cleanForSlug } from '../utils/url';
+import { getTemplatePartIconByArea } from './utils/get-template-part-icon';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -1681,10 +1681,9 @@ export function __experimentalGetDefaultTemplateTypes( state ) {
 export const __experimentalGetDefaultTemplatePartAreas = createSelector(
 	( state ) => {
 		const areas = getEditorSettings( state )?.defaultTemplatePartAreas;
-		const areasWithIcons = areas?.map( ( item ) => {
+		return areas?.map( ( item ) => {
 			return { ...item, icon: getTemplatePartIconByArea( item.area ) };
 		} );
-		return areasWithIcons;
 	},
 	( state ) => [ getEditorSettings( state )?.defaultTemplatePartAreas ]
 );
@@ -1734,19 +1733,4 @@ export function __experimentalGetTemplateInfo( state, template ) {
 		description: templateDescription || defaultDescription,
 		icon: templateIcon,
 	};
-}
-
-/**
- * Helper function to find the corresponding icon for a template part's 'area'.
- *
- * @param {string} area The value of the template part 'area' tax term.
- *
- * @return {Object} The corresponding icon.
- */
-function getTemplatePartIconByArea( area ) {
-	const iconsByArea = {
-		footer,
-		header,
-	};
-	return iconsByArea[ area ] || layout;
 }
