@@ -78,15 +78,17 @@ export default function VisualEditor( { styles } ) {
 		useClipboardHandler(),
 		useCanvasClickRedirect(),
 		useTypewriter(),
-		useBlockSelectionClearer(),
 		useTypingObserver(),
 	] );
+
+	const blockSelectionClearerRef = useBlockSelectionClearer();
 
 	return (
 		<div
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
 			} ) }
+			ref={ blockSelectionClearerRef }
 		>
 			{ themeSupportsLayout && (
 				<LayoutStyle
