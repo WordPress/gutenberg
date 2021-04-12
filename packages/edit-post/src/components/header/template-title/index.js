@@ -26,9 +26,9 @@ function TemplateTitle() {
 	}
 
 	let templateTitle = __( 'Default' );
-	if ( template && template?.title?.raw ) {
-		templateTitle = template?.title?.raw;
-	} else if ( template ) {
+	if ( template?.title?.raw ) {
+		templateTitle = template.title.raw;
+	} else if ( !! template ) {
 		templateTitle = template.slug;
 	}
 
