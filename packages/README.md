@@ -176,7 +176,7 @@ If you are publishing new versions of packages, note that there are versioning r
 
 ## Releasing Packages
 
-Lerna automatically releases all outdated packages. To check which packages are outdated and will be released, type `npm run publish:check` from the branch that keeps the code for a given release type.
+Lerna automatically releases all outdated packages. To check which packages are outdated and will be released, type `npm run publish:check` from the branch that keeps the code for a given `wp/X.Y` release type (example `wp/5.7`).
 
 If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your [npm account][npm].
 
