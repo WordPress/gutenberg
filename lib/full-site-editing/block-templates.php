@@ -152,8 +152,9 @@ function _flatten_blocks( &$blocks ) {
 		$queue[] = &$block;
 	}
 
-	for ( $i = 0; $i < count( $queue ); $i++ ) {
-		$block        = &$queue[ $i ];
+	while ( count($queue) > 0 ) {
+		$block        = &$queue[ 0 ];
+		array_shift( $queue );
 		$all_blocks[] = &$block;
 
 		if ( ! empty( $block['innerBlocks'] ) ) {
