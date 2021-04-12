@@ -59,59 +59,48 @@ function gutenberg_widgets_customize_register( $manager ) {
 }
 
 /**
- * Our own implementation of WP_Customize_Widgets::sanitize_widget_instance
- * which uses __unstable_instance if it exists.
- *
- * @param array $value Widget instance to sanitize.
- * @return array|void Sanitized widget instance.
- */
-function gutenberg_widgets_customize_sanitize_widget_instance( $value ) {
-	global $wp_customize;
-
-	if ( isset( $value['__unstable_instance'] ) ) {
-		return $value['__unstable_instance'];
-	}
-
-	return $wp_customize->widgets->sanitize_widget_instance( $value );
-}
-
-/**
- * Our own implementation of WP_Customize_Widgets::sanitize_widget_js_instance
- * which adds __unstable_instance.
- *
- * @param array $value Widget instance to convert to JSON.
- * @return array JSON-converted widget instance.
- */
-function gutenberg_widgets_customize_sanitize_widget_js_instance( $value ) {
-	global $wp_customize;
-
-	$sanitized_value = $wp_customize->widgets->sanitize_widget_js_instance( $value );
-
-	$sanitized_value['__unstable_instance'] = $value;
-
-	return $sanitized_value;
-}
-
-/**
- * TEMPORARY HACK! \o/
- *
  * Swaps the customizer setting's sanitize_callback and sanitize_js_callback
- * arguments with our own implementation that adds __unstable_instance to the
- * sanitized value.
+ * arguments with our own implementation that adds raw_instance to the sanitized
+ * value. This is only done if the widget has declared that it supports raw
+ * instances via the show_instance_in_rest flag. This lets the block editor use
+ * raw_instance to create blocks.
  *
- * This lets the block editor use __unstable_instance to create blocks.
- *
- * A proper fix would be to only add the raw instance when the widget is a block
- * widget and to update the Legacy Widget block to work with encoded instance
- * values. See https://github.com/WordPress/gutenberg/issues/28902.
+ * When merged to Core, these changes should be made to
+ * WP_Customize_Widgets::sanitize_widget_instance and
+ * WP_Customize_Widgets::sanitize_widget_js_instance.
  *
  * @param array  $args Array of Customizer setting arguments.
  * @param string $id   Widget setting ID.
  */
 function gutenberg_widgets_customize_add_unstable_instance( $args, $id ) {
-	if ( 0 === strpos( $id, 'widget_' ) ) {
-		$args['sanitize_callback']    = 'gutenberg_widgets_customize_sanitize_widget_instance';
-		$args['sanitize_js_callback'] = 'gutenberg_widgets_customize_sanitize_widget_js_instance';
+	if ( preg_match( '/^widget_(?P<id_base>.+?)(?:\[(?P<widget_number>\d+)\])?$/', $id, $matches ) ) {
+		$id_base = $matches['id_base'];
+
+		$args['sanitize_callback'] = function( $value ) use ( $id_base ) {
+			global $wp_customize;
+
+			if ( isset( $value['raw_instance'] ) ) {
+				$widget_object = gutenberg_get_widget_object( $id_base );
+				if ( ! empty( $widget_object->show_instance_in_rest ) ) {
+					return $value['raw_instance'];
+				}
+			}
+
+			return $wp_customize->widgets->sanitize_widget_instance( $value );
+		};
+
+		$args['sanitize_js_callback'] = function( $value ) use ( $id_base ) {
+			global $wp_customize;
+
+			$sanitized_value = $wp_customize->widgets->sanitize_widget_js_instance( $value );
+
+			$widget_object = gutenberg_get_widget_object( $id_base );
+			if ( ! empty( $widget_object->show_instance_in_rest ) ) {
+				$sanitized_value['raw_instance'] = (object) $value;
+			}
+
+			return $sanitized_value;
+		};
 	}
 
 	return $args;

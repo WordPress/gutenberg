@@ -15,20 +15,25 @@ const isSymbolPrivate = require( './is-symbol-private' );
 /**
  * Helpers functions.
  */
-
+const extensions = [ '.js', '.ts', '.tsx' ];
 const relativeToAbsolute = ( basePath, relativePath ) => {
 	const target = path.join( path.dirname( basePath ), relativePath );
-	if ( path.extname( target ) === '.js' ) {
+	const extension = path.extname( target );
+	if ( extensions.includes( extension ) ) {
 		return target;
 	}
-	let targetFile = target + '.js';
-	if ( fs.existsSync( targetFile ) ) {
-		return targetFile;
+
+	for ( const ext of extensions ) {
+		const targetFileWithExtension = target + ext;
+		if ( fs.existsSync( targetFileWithExtension ) ) {
+			return targetFileWithExtension;
+		}
+		const targetFileAsIndexModule = path.join( target, 'index' + ext );
+		if ( fs.existsSync( targetFileAsIndexModule ) ) {
+			return targetFileAsIndexModule;
+		}
 	}
-	targetFile = path.join( target, 'index.js' );
-	if ( fs.existsSync( targetFile ) ) {
-		return targetFile;
-	}
+
 	process.stderr.write( '\nRelative path does not exists.' );
 	process.stderr.write( '\n' );
 	process.stderr.write( `\nBase: ${ basePath }` );

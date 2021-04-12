@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { addFilter } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
+import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,6 +17,7 @@ import ColorGradientControl from '../components/colors-gradients/control';
 import {
 	getColorClassName,
 	getColorObjectByColorValue,
+	getColorObjectByAttributeValues,
 } from '../components/colors';
 import useEditorFeature from '../components/use-editor-feature';
 import { hasBorderFeatureSupport, shouldSkipSerialization } from './border';
@@ -183,6 +185,45 @@ function addEditProps( settings ) {
 	return settings;
 }
 
+/**
+ * This adds inline styles for color palette colors.
+ * Ideally, this is not needed and themes should load their palettes on the editor.
+ *
+ * @param  {Function} BlockListBlock Original component
+ * @return {Function}                Wrapped component
+ */
+export const withBorderColorPaletteStyles = createHigherOrderComponent(
+	( BlockListBlock ) => ( props ) => {
+		const { name, attributes } = props;
+		const { borderColor } = attributes;
+		const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
+
+		if (
+			! hasBorderFeatureSupport( 'color', name ) ||
+			shouldSkipSerialization( name )
+		) {
+			return <BlockListBlock { ...props } />;
+		}
+
+		const extraStyles = {
+			borderColor: borderColor
+				? getColorObjectByAttributeValues( colors, borderColor )?.color
+				: undefined,
+		};
+
+		let wrapperProps = props.wrapperProps;
+		wrapperProps = {
+			...props.wrapperProps,
+			style: {
+				...extraStyles,
+				...props.wrapperProps?.style,
+			},
+		};
+
+		return <BlockListBlock { ...props } wrapperProps={ wrapperProps } />;
+	}
+);
+
 addFilter(
 	'blocks.registerBlockType',
 	'core/border/addAttributes',
@@ -199,4 +240,10 @@ addFilter(
 	'blocks.registerBlockType',
 	'core/border/addEditProps',
 	addEditProps
+);
+
+addFilter(
+	'editor.BlockListBlock',
+	'core/border/with-border-color-palette-styles',
+	withBorderColorPaletteStyles
 );

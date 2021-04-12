@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
 
 /**
@@ -88,6 +89,8 @@ if ( ! class_exists( 'WP_Block_Template ' ) ) {
 
 // These are used by some FSE features
 // as well as global styles.
+require __DIR__ . '/interface-wp-theme-json-schema.php';
+require __DIR__ . '/class-wp-theme-json-schema-v0.php';
 require __DIR__ . '/class-wp-theme-json.php';
 require __DIR__ . '/class-wp-theme-json-resolver.php';
 
@@ -122,3 +125,4 @@ require __DIR__ . '/block-supports/typography.php';
 require __DIR__ . '/block-supports/custom-classname.php';
 require __DIR__ . '/block-supports/border.php';
 require __DIR__ . '/block-supports/layout.php';
+require __DIR__ . '/block-supports/padding.php';

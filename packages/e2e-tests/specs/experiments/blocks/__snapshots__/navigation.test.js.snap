@@ -48,12 +48,12 @@ exports[`Navigation allows an empty navigation block to be created and manually 
 "<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
 <!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"id\\":\\"https://wordpress.org\\",\\"url\\":\\"https://wordpress.org\\"} /-->
 
-<!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\",\\"kind\\":\\"post-type\\"} /-->
 <!-- /wp:navigation -->"
 `;
 
 exports[`Navigation allows pages to be created from the navigation block and their links added to menu 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
-<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/create/page/my-new-page\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"A really long page name that will not exist\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/create/page/my-new-page\\",\\"kind\\":\\"post-type\\"} /-->
 <!-- /wp:navigation -->"
 `;
