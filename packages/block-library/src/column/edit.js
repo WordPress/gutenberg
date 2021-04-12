@@ -20,7 +20,7 @@ import {
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { __ } from '@wordpress/i18n';
+import { sprintf, __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -36,15 +36,18 @@ function ColumnEdit( {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	const { hasChildBlocks, rootClientId } = useSelect(
+	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
 		( select ) => {
 			const { getBlockOrder, getBlockRootClientId } = select(
 				blockEditorStore
 			);
 
+			const rootId = getBlockRootClientId( clientId );
+
 			return {
 				hasChildBlocks: getBlockOrder( clientId ).length > 0,
-				rootClientId: getBlockRootClientId( clientId ),
+				rootClientId: rootId,
+				columnsIds: getBlockOrder( rootId ),
 			};
 		},
 		[ clientId ]
@@ -66,12 +69,27 @@ function ColumnEdit( {
 		className: classes,
 		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
 	} );
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock,
-		renderAppender: hasChildBlocks
-			? undefined
-			: InnerBlocks.ButtonBlockAppender,
-	} );
+
+	const columnsCount = columnsIds.length;
+	const currentColumnPosition = columnsIds.indexOf( clientId ) + 1;
+
+	const label = sprintf(
+		/* translators: 1: Block label (i.e. "Block: Column"), 2: Position of the selected block, 3: Total number of sibling blocks of the same type */
+		__( '%1$s (%2$d of %3$d)' ),
+		blockProps[ 'aria-label' ],
+		currentColumnPosition,
+		columnsCount
+	);
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{ ...blockProps, 'aria-label': label },
+		{
+			templateLock,
+			renderAppender: hasChildBlocks
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
+		}
+	);
 
 	return (
 		<>
