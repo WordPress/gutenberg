@@ -295,9 +295,9 @@ function Autocomplete( {
 		}
 
 		const safeTrigger = escapeRegExp( completer.triggerPrefix );
-		const match = text.match(
-			new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` )
-		);
+		const match = text
+			.slice( text.lastIndexOf( completer.triggerPrefix ) )
+			.match( new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` ) );
 		const query = match && match[ 1 ];
 
 		setAutocompleter( completer );

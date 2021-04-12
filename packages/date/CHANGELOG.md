@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.15.0 (2021-04-06)
+
 ### New Feature
 
 - Bundle type definitions.

@@ -3,7 +3,9 @@
         "clientId": "_clientId_0",
         "name": "core/post-date",
         "isValid": true,
-        "attributes": {},
+        "attributes": {
+            "isLink": false
+        },
         "innerBlocks": [],
         "originalContent": ""
     }
