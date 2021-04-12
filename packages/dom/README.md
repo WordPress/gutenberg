@@ -138,11 +138,11 @@ Given a DOM node, finds the closest scrollable container node.
 
 _Parameters_
 
--   _node_ `Element`: Node from which to start.
+-   _node_ `Element | null`: Node from which to start.
 
 _Returns_
 
--   `?Element`: Scrollable container node, if found.
+-   `Element | undefined`: Scrollable container node, if found.
 
 <a name="insertAfter" href="#insertAfter">#</a> **insertAfter**
 
