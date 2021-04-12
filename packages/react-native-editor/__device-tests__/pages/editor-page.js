@@ -240,6 +240,23 @@ class EditorPage {
 		}
 	}
 
+	async openBlockSettings( block ) {
+		await block.click();
+
+		const buttonElementName = isAndroid()
+			? '//*'
+			: '//XCUIElementTypeButton';
+
+		const locator = `${ buttonElementName }[@${ this.accessibilityIdXPathAttrib }="Open Settings"]`;
+
+		const settingsButton = await block.elementByXPath( locator );
+		await settingsButton.click();
+	}
+
+	async dismissBottomSheet() {
+		return await swipeDown( this.driver );
+	}
+
 	// =========================
 	// Block toolbar functions
 	// =========================
