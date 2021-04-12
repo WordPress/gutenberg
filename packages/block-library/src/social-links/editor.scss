@@ -71,9 +71,10 @@
 	line-height: $button-size-small;
 	margin-top: auto;
 	margin-bottom: auto;
+	cursor: default;
 
 	& + .block-list-appender {
-		margin-right: $grid-unit-15;
+		margin-right: $grid-unit-10;
 		padding: 0.25em;
 	}
 }

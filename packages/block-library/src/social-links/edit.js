@@ -85,7 +85,7 @@ export function SocialLinksEdit( props ) {
 
 	const SelectedSocialPlaceholder = (
 		<li className="wp-block-social-links__social-prompt">
-			{ __( 'Add link' ) }
+			{ __( 'Click plus to add' ) }
 		</li>
 	);
 
