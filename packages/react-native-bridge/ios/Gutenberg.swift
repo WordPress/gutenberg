@@ -118,9 +118,9 @@ public class Gutenberg: NSObject {
         sendEvent(.updateHtml, body: ["html": html])
     }
 
-    //public func featuredImageIdCurrent() {
-    //    sendEvent(.featuredImageIdCurrent)
-    //}
+    public func featuredImageIdCurrent() {
+        sendEvent(.featuredImageIdCurrent)
+    }
 
     public func replace(block: Block) {
         sendEvent(.replaceBlock, body: ["html": block.content, "clientId": block.id])
