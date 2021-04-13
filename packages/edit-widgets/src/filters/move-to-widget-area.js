@@ -32,6 +32,7 @@ const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 
 		return (
 			<>
+				<BlockEdit { ...props } />
 				{ props.name !== 'core/widget-area' && (
 					<BlockControls>
 						<MoveToWidgetArea
@@ -41,7 +42,6 @@ const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 						/>
 					</BlockControls>
 				) }
-				<BlockEdit { ...props } />
 			</>
 		);
 	},
