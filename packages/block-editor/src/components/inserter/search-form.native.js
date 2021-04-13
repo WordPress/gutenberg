@@ -68,26 +68,26 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 		),
 	};
 
-	const formStyle = {
+	const inputContainerStyle = {
 		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__form' ],
-			styles[ 'inserter-search-form__form--dark' ]
+			styles[ 'inserter-search-form__input-container' ],
+			styles[ 'inserter-search-form__input-container--dark' ]
 		),
 		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__form' ],
-			platformStyles[ 'inserter-search-form__form--dark' ]
+			platformStyles[ 'inserter-search-form__input-container' ],
+			platformStyles[ 'inserter-search-form__input-container--dark' ]
 		),
 	};
 
-	const formActiveStyle = {
-		...formStyle,
+	const inputContainerActiveStyle = {
+		...inputContainerStyle,
 		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__form--active' ],
-			styles[ 'inserter-search-form__form--active-dark' ]
+			styles[ 'inserter-search-form__input-container--active' ],
+			styles[ 'inserter-search-form__input-container--active-dark' ]
 		),
 		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__form--active' ],
-			platformStyles[ 'inserter-search-form__form--active-dark' ]
+			platformStyles[ 'inserter-search-form__input-container--active' ],
+			platformStyles[ 'inserter-search-form__input-container--active-dark' ]
 		),
 	};
 
@@ -221,7 +221,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 			onLayout={ onLayout }
 			activeOpacity={ isActive ? 1 : 0.2 }
 		>
-			<View style={ isActive ? formActiveStyle : formStyle }>
+			<View style={ isActive ? inputContainerActiveStyle : inputContainerStyle }>
 				<View style={ isActive ? iconActiveStyle : iconStyle }>
 					{ renderLeftButton() }
 				</View>

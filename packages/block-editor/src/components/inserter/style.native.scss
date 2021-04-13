@@ -27,7 +27,7 @@
 	justify-content: space-between;
 }
 
-.inserter-search-form__form {
+.inserter-search-form__input-container {
 	height: 100%;
 	border-radius: 8px;
 	color: $gray-dark;
@@ -36,7 +36,7 @@
 	flex: 4;
 }
 
-.inserter-search-form__form--dark {
+.inserter-search-form__input-container--dark {
 	background-color: rgba($white, 0.07);
 }
 .inserter-search-form__form-input {
