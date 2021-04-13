@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { View, TouchableWithoutFeedback, Platform } from 'react-native';
 import { isEmpty, get, find, map } from 'lodash';
 
 /**
@@ -73,8 +73,6 @@ export class ImageEdit extends Component {
 
 		this.state = {
 			isCaptionSelected: false,
-			// eslint-disable-next-line no-undef
-			devOnly: __DEV__,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
@@ -482,7 +480,7 @@ export class ImageEdit extends Component {
 	}
 
 	render() {
-		const { isCaptionSelected, devOnly } = this.state;
+		const { isCaptionSelected } = this.state;
 		const {
 			attributes,
 			isSelected,
@@ -510,6 +508,12 @@ export class ImageEdit extends Component {
 			styles.setFeaturedButton,
 			styles.setFeaturedButtonDark
 		);
+
+		// eslint-disable-next-line no-undef
+		const devOnly = __DEV__;
+
+		// eslint-disable-next-line no-unused-vars
+		const androidOnly = Platform.OS === 'android' ? true : false;
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -548,7 +552,7 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ devOnly && (
+				{ devOnly && androidOnly && (
 					<PanelBody>
 						{ isFeaturedImage ? (
 							<BottomSheet.Cell
@@ -633,9 +637,7 @@ export class ImageEdit extends Component {
 										isSelected={
 											isSelected && ! isCaptionSelected
 										}
-										isFeaturedImage={
-											devOnly ? isFeaturedImage : false
-										}
+										isFeaturedImage={ isFeaturedImage }
 										isUploadFailed={ isUploadFailed }
 										isUploadInProgress={
 											isUploadInProgress
