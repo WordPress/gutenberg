@@ -9,14 +9,18 @@ import SafeArea from 'react-native-safe-area';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import { BottomSheetSettings, FloatingToolbar } from '@wordpress/block-editor';
+import {
+	BottomSheetSettings,
+	FloatingToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	HTMLTextInput,
 	KeyboardAvoidingView,
 	NoticeList,
 } from '@wordpress/components';
-import { AutosaveMonitor } from '@wordpress/editor';
+import { AutosaveMonitor, store as editorStore } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
 /**
@@ -99,7 +103,7 @@ class Layout extends Component {
 	}
 
 	render() {
-		const { getStylesFromColorScheme, mode } = this.props;
+		const { getStylesFromColorScheme, mode, globalStyles } = this.props;
 
 		const isHtmlView = mode === 'text';
 
@@ -116,6 +120,16 @@ class Layout extends Component {
 			bottom: this.state.safeAreaInsets.bottom,
 		};
 
+		const editorStyles = [
+			getStylesFromColorScheme(
+				styles.background,
+				styles.backgroundDark
+			),
+			globalStyles?.background && {
+				backgroundColor: globalStyles.background,
+			},
+		];
+
 		return (
 			<SafeAreaView
 				style={ getStylesFromColorScheme(
@@ -125,12 +139,7 @@ class Layout extends Component {
 				onLayout={ this.onRootViewLayout }
 			>
 				<AutosaveMonitor disableIntervalChecks />
-				<View
-					style={ getStylesFromColorScheme(
-						styles.background,
-						styles.backgroundDark
-					) }
-				>
+				<View style={ editorStyles }>
 					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
 					{ ! isHtmlView && Platform.OS === 'android' && (
 						<FloatingToolbar />
@@ -163,12 +172,17 @@ class Layout extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { __unstableIsEditorReady: isEditorReady } = select(
-			'core/editor'
+			editorStore
 		);
 		const { getEditorMode } = select( editPostStore );
+		const { getSettings } = select( blockEditorStore );
+		const globalStyles = getSettings()?.__experimentalGlobalStylesBaseStyles
+			?.styles?.color;
+
 		return {
 			isReady: isEditorReady(),
 			mode: getEditorMode(),
+			globalStyles,
 		};
 	} ),
 	withPreferredColorScheme,

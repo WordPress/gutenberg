@@ -48,11 +48,13 @@ function BlockForType( {
 	parentWidth,
 	wrapperProps,
 	blockWidth,
+	baseGlobalStyles,
 } ) {
 	const defaultColors = useEditorFeature( 'color.palette' ) || emptyArray;
 	const globalStyle = useGlobalStyles();
 	const mergedStyle = useMemo( () => {
 		return getMergedGlobalStyles(
+			baseGlobalStyles,
 			globalStyle,
 			wrapperProps.style,
 			attributes,
@@ -306,6 +308,7 @@ export default compose( [
 	withSelect( ( select, { clientId, rootClientId } ) => {
 		const {
 			getBlockIndex,
+			getSettings,
 			isBlockSelected,
 			__unstableGetBlockWithoutInnerBlocks,
 			getSelectedBlockClientId,
@@ -353,6 +356,9 @@ export default compose( [
 			isDescendantOfParentSelected ||
 			isParentSelected ||
 			parentId === '';
+		const baseGlobalStyles = getSettings()
+			?.__experimentalGlobalStylesBaseStyles?.styles;
+
 		return {
 			icon,
 			name: name || 'core/missing',
@@ -366,6 +372,7 @@ export default compose( [
 			isParentSelected,
 			firstToSelectId,
 			isTouchable,
+			baseGlobalStyles,
 			wrapperProps: getWrapperProps(
 				attributes,
 				blockType.getEditWrapperProps
