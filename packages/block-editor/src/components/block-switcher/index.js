@@ -109,7 +109,7 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					blockTitle
 			  )
 			: sprintf(
-					/* translators: %s: number of blocks. */
+					/* translators: %d: number of blocks. */
 					_n(
 						'Change type of %d block',
 						'Change type of %d blocks',
