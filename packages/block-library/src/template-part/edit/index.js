@@ -131,16 +131,12 @@ export default function TemplatePartEdit( {
 				<BlockControls>
 					<ToolbarGroup className="wp-block-template-part__block-control-group">
 						<Dropdown
-							className="wp-block-template-part__preview-dropdown-button"
 							contentClassName="wp-block-template-part__preview-dropdown-content"
 							position="bottom right left"
 							renderToggle={ ( { isOpen, onToggle } ) => (
 								<ToolbarButton
 									aria-expanded={ isOpen }
 									onClick={ onToggle }
-									// Disable when open to prevent odd FireFox bug causing reopening.
-									// As noted in https://github.com/WordPress/gutenberg/pull/24990#issuecomment-689094119 .
-									disabled={ isOpen }
 								>
 									{ __( 'Replace' ) }
 								</ToolbarButton>
