@@ -8,7 +8,7 @@
 		display: flex;
 		align-items: center;
 		position: relative;
-		margin: 0 0.5em 0 0;
+		margin: 0 2em 0 0;
 
 		.wp-block-navigation-link__container:empty {
 			display: none;
@@ -27,7 +27,21 @@
 		// Inherit colors set by the block color definition.
 		color: inherit;
 		display: block;
-		padding: 0.5em 1em;
+	}
+
+	// Treat margins and paddings differently when the block has a background.
+	&.has-background {
+		// Menu item container.
+		.wp-block-pages-list__item,
+		.wp-block-navigation-link {
+			margin: 0 0.5em 0 0;
+		}
+
+		// Menu item link.
+		.wp-block-pages-list__item__link,
+		.wp-block-navigation-link__content {
+			padding: 0.5em 1em;
+		}
 	}
 
 	// Force links to inherit text decoration applied to navigation block.
@@ -215,6 +229,9 @@
 		background-color: #fff;
 		color: #000;
 		border: 1px solid rgba(0, 0, 0, 0.15);
+
+		// Add some padding to menus even if the parent menu item doesn't have.
+		padding: 1em;
 
 		.submenu-container,
 		.wp-block-navigation-link__container {
