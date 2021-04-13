@@ -980,16 +980,21 @@ class WP_Theme_JSON {
 		return $template_parts;
 	}
 
-	public static function get_style_nodes( $theme_json, $metadata = array() ) {
+	public static function get_style_nodes( $theme_json, $selectors = array() ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
 		}
 
 		foreach( $theme_json['styles'] as $name => $node ) {
+			$selector = null;
+			if ( isset( $selectors[ $name ]['selector'] ) ) {
+				$selector = $selectors[ $name ]['selector'];
+			}
+
 			$nodes[] = array(
 				'path'     => array( 'styles', $name ),
-				'selector' => null,
+				'selector' => $selector,
 			);
 		}
 		return $nodes;

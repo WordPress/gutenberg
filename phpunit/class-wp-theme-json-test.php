@@ -1002,29 +1002,45 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 	function test_get_style_nodes() {
 		$theme_json = array(
 			'styles' => array(
-				'defaults' => array(
-					'color' => array( 'background' => 'red' ),
-				),
-				'root' => array(
-					'color' => array( 'background' => 'green' ),
-				),
-				'core/paragraph' => array(
-					'color' => array( 'background' => 'blue' ),
-				),
+				'defaults'        => array( 'color' => array( 'background' => 'red' ) ),
+				'root'            => array( 'color' => array( 'background' => 'green' ) ),
+				'core/paragraph'  => array( 'color' => array( 'background' => 'blue' ) ),
+				'core/heading/h1' => array( 'color' => array( 'background' => 'yellow' ) ),
+				'core/group'      => array( 'color' => array( 'background' => 'pink' ) ),
+				'core/post-title' => array( 'color' => array( 'background' => 'white' ) ),
 			)
 		);
-		$actual  = WP_Theme_JSON::get_style_nodes( $theme_json );
+		$selectors = array(
+			'defaults'        => array( 'selector' => ':root' ),
+			'root'            => array( 'selector' => ':root' ),
+			'core/paragraph'  => array( 'selector' => 'p' ),
+			'core/heading/h1' => array( 'selector' => 'h1' ),
+			'core/group'      => array( 'selector' => '.wp-block-group' ),
+		);
+		$actual  = WP_Theme_JSON::get_style_nodes( $theme_json, $selectors );
 		$expected = array(
 			array(
 				'path'     => array( 'styles', 'defaults' ),
-				'selector' => null
+				'selector' => ':root'
 			),
 			array(
 				'path'     => array( 'styles', 'root' ),
-				'selector' => null,
+				'selector' => ':root',
 			),
 			array(
 				'path'     => array( 'styles', 'core/paragraph' ),
+				'selector' => 'p',
+			),
+			array(
+				'path'     => array( 'styles', 'core/heading/h1' ),
+				'selector' => 'h1',
+			),
+			array(
+				'path'     => array( 'styles', 'core/group' ),
+				'selector' => '.wp-block-group',
+			),
+			array(
+				'path'     => array( 'styles', 'core/post-title' ),
 				'selector' => null,
 			),
 		);
