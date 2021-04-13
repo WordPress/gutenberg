@@ -509,9 +509,6 @@ export class ImageEdit extends Component {
 			styles.setFeaturedButtonDark
 		);
 
-		// eslint-disable-next-line no-undef
-		const devOnly = __DEV__;
-
 		// eslint-disable-next-line no-unused-vars
 		const androidOnly = Platform.OS === 'android' ? true : false;
 
@@ -552,29 +549,32 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ devOnly && androidOnly && (
-					<PanelBody>
-						{ isFeaturedImage ? (
-							<BottomSheet.Cell
-								label={ __( 'Remove as Featured Image ' ) }
-								labelStyle={ [
-									featuredButtonStyle,
-									styles.removeFeaturedButton,
-								] }
-								onPress={ this.onRemoveFeatured }
-							/>
-						) : (
-							<BottomSheet.Cell
-								label={ __( 'Set as Featured Image ' ) }
-								labelStyle={ [
-									featuredButtonStyle,
-									setFeaturedButtonStyle,
-								] }
-								onPress={ this.onSetFeatured }
-							/>
-						) }
-					</PanelBody>
-				) }
+				{
+					// eslint-disable-next-line no-undef
+					__DEV__ && androidOnly && (
+						<PanelBody>
+							{ isFeaturedImage ? (
+								<BottomSheet.Cell
+									label={ __( 'Remove as Featured Image ' ) }
+									labelStyle={ [
+										featuredButtonStyle,
+										styles.removeFeaturedButton,
+									] }
+									onPress={ this.onRemoveFeatured }
+								/>
+							) : (
+								<BottomSheet.Cell
+									label={ __( 'Set as Featured Image ' ) }
+									labelStyle={ [
+										featuredButtonStyle,
+										setFeaturedButtonStyle,
+									] }
+									onPress={ this.onSetFeatured }
+								/>
+							) }
+						</PanelBody>
+					)
+				}
 			</InspectorControls>
 		);
 
