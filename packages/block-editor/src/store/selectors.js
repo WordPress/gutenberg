@@ -1898,11 +1898,11 @@ export const __experimentalGetPatternTransformItems = createSelector(
 	( state, blocks, rootClientId = null ) => {
 		if ( ! blocks ) return EMPTY_ARRAY;
 		/**
-		 * For now we only hanlde blocks without InnerBlocks and take into account
-		 * the `role` property of block's attributes for the transformation.
-		 * Noting that blocks have been retrieved through `getBlock`, that doen't
-		 * return the child inner blocks of an inner block controller, so we still
-		 * need to check for this case too.
+		 * For now we only handle blocks without InnerBlocks and take into account
+		 * the `role` property of blocks' attributes for the transformation.  Note
+		 * that the blocks have been retrieved through `getBlock`, which doesn't
+		 * return the inner blocks of an inner block controller, so we still need
+		 * to check for this case too.
 		 */
 		if (
 			blocks.some(
