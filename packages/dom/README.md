@@ -304,8 +304,8 @@ Given a schema, unwraps or removes nodes, attributes and classes on HTML.
 _Parameters_
 
 -   _HTML_ `string`: The HTML to clean up.
--   _schema_ `Object`: Schema for the HTML.
--   _inline_ `Object`: Whether to clean for inline mode.
+-   _schema_ `import('./clean-node-list').Schema`: Schema for the HTML.
+-   _inline_ `boolean`: Whether to clean for inline mode.
 
 _Returns_
 

@@ -73,16 +73,18 @@ register_block_type( 'my-plugin/record-title', array(
 ```
 
 ## Example
+
 1. Create `record` block.
+
 ```
 npm init @wordpress/block --namespace my-plugin record
 cd record
 ```
-2. Edit `src/index.js`. Insert `recordId` attribute and `providesContext` property in `registerBlockType` function and add registration of `record-title` block at the bottom. 
+
+2. Edit `src/index.js`. Insert `recordId` attribute and `providesContext` property in `registerBlockType` function and add registration of `record-title` block at the bottom.
 
 ```js
-registerBlockType('my-plugin/record', {
-
+registerBlockType( 'my-plugin/record', {
 	// ... cut ...
 
 	attributes: {
@@ -104,46 +106,46 @@ registerBlockType('my-plugin/record', {
 	 * @see ./save.js
 	 */
 	save,
-});
+} );
 
-registerBlockType('my-plugin/record-title', {
+registerBlockType( 'my-plugin/record-title', {
 	title: 'Record Title',
 	category: 'widgets',
 
-	usesContext: ['my-plugin/recordId'],
+	usesContext: [ 'my-plugin/recordId' ],
 
-	edit({ context }) {
-		return 'The record ID: ' + context['my-plugin/recordId'];
+	edit( { context } ) {
+		return 'The record ID: ' + context[ 'my-plugin/recordId' ];
 	},
 
 	save() {
 		return null;
-	}
-});
+	},
+} );
 ```
 
-3. Edit `src/edit.js`. Replace `Edit` function by following code. 
+3. Edit `src/edit.js`. Replace `Edit` function by following code.
 
 ```js
 import { TextControl } from '@wordpress/components';
 import { InnerBlocks } from '@wordpress/block-editor';
 
-export default function Edit(props) {
-	const MY_TEMPLATE = [
-		['my-plugin/record-title', {}],
-	];
-	const { attributes: { recordId }, setAttributes } = props;
+export default function Edit( props ) {
+	const MY_TEMPLATE = [ [ 'my-plugin/record-title', {} ] ];
+	const {
+		attributes: { recordId },
+		setAttributes,
+	} = props;
 	return (
 		<div>
 			<TextControl
-				label={__('Record ID:')}
-				value={recordId}
-				onChange={(val) => setAttributes({ recordId: Number(val) })}
+				label={ __( 'Record ID:' ) }
+				value={ recordId }
+				onChange={ ( val ) =>
+					setAttributes( { recordId: Number( val ) } )
+				}
 			/>
-			<InnerBlocks
-				template={MY_TEMPLATE}
-				templateLock="all"
-			/>
+			<InnerBlocks template={ MY_TEMPLATE } templateLock="all" />
 		</div>
 	);
 }
@@ -152,12 +154,11 @@ export default function Edit(props) {
 4. Edit `src/save.js`. Replace `save` function by following code.
 
 ```js
-export default function save(props) {
-	return <p>The record ID: {props.attributes.recordId}</p>;
+export default function save( props ) {
+	return <p>The record ID: { props.attributes.recordId }</p>;
 }
 ```
 
 5. Create new post and add `record` block. If you type number in the above box, you'll see the same number is shown in below box.
 
 ![Block Context Example](https://user-images.githubusercontent.com/8876600/93000215-c8570380-f561-11ea-9bd0-0b2bd0ca1752.png)
-
