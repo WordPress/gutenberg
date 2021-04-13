@@ -6,6 +6,7 @@ import {
 	Text,
 	View,
 	Platform,
+	TouchableOpacity,
 } from 'react-native';
 
 /**
@@ -14,7 +15,7 @@ import {
 import { useState, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { ToolbarButton, Gridicons } from '@wordpress/components';
+import { ToolbarButton, Gridicons, Button } from '@wordpress/components';
 import { Icon, cancelCircleFilled, arrowLeft, close } from '@wordpress/icons';
 
 /**
@@ -29,10 +30,6 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	const isIOS = Platform.OS === 'ios';
 
 	const inputRef = useRef();
-
-	function isInactive() {
-		return ! value && ! isActive;
-	}
 
 	const containerStyle = usePreferredColorSchemeStyle(
 		styles[ 'inserter-search-form__container' ],
@@ -90,6 +87,11 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 		styles[ 'inserter-search-form__form-input-placeholder--dark' ]
 	);
 
+	const iconStyle = usePreferredColorSchemeStyle(
+		styles[ 'inserter-search-form__icon' ],
+		styles[ 'inserter-search-form__icon--dark' ]
+	);
+
 	const cancelButtonStyle = styles[ 'inserter-search-form__cancel-button' ];
 
 	const cancelButtonTextStyle = usePreferredColorSchemeStyle(
@@ -103,15 +105,10 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 		setIsActive( false );
 	}
 
-	function onActivate() {
-		inputRef.current.focus();
-		setIsActive( true );
-	}
-
 	function renderLeftButton() {
 		if ( ! isIOS && isActive ) {
 			return (
-				<ToolbarButton
+				<Button
 					title={ __( 'Cancel Search' ) }
 					icon={ arrowLeft }
 					onClick={ onCancel }
@@ -119,23 +116,13 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 			);
 		}
 
-		return (
-			<ToolbarButton
-				title={ __( 'Search Blocks' ) }
-				icon={ Gridicons.search }
-				onClick={ onActivate }
-			/>
-		);
+		return <Icon icon={ Gridicons.search } />;
 	}
 
 	function renderRightButton() {
-		if ( isInactive() ) {
-			return (
-				<ToolbarButton
-					title={ __( 'Search Blocks' ) }
-					onClick={ onActivate }
-				/>
-			);
+		// Add a View element to properly center the input placeholder via flexbox
+		if ( isIOS && ! isActive ) {
+			return <View style={ iconStyle } />;
 		}
 
 		if ( !! value ) {
@@ -154,12 +141,17 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	}
 
 	return (
-		<View
+		<TouchableOpacity
 			style={ isActive ? containerActiveStyle : containerStyle }
+			onPress={ () => {
+				setIsActive( true );
+				inputRef.current.focus();
+			} }
 			onLayout={ onLayout }
+			activeOpacity={ isActive ? 1 : 0.2 }
 		>
 			<View style={ isActive ? formActiveStyle : formStyle }>
-				{ renderLeftButton() }
+				<View style={ iconStyle }>{ renderLeftButton() }</View>
 				<TextInput
 					ref={ inputRef }
 					style={ isActive ? formInputActiveStyle : formInputStyle }
@@ -178,7 +170,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 					</Text>
 				</View>
 			) }
-		</View>
+		</TouchableOpacity>
 	);
 }
 

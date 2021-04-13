@@ -42,6 +42,7 @@
 .inserter-search-form__form-input {
 	color: $gray-dark;
 	text-align: left;
+	font-size: 17px;
 }
 
 .inserter-search-form__form-input--dark {
@@ -65,4 +66,10 @@
 
 .inserter-search-form__cancel-button-text {
 	color: $blue-wordpress;
+	font-size: 17px;
+}
+
+.inserter-search-form__icon {
+	padding: 0 16px;
+	justify-content: center;
 }
