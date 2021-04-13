@@ -16,16 +16,22 @@ export default function MoveToWidgetArea( {
 } ) {
 	return (
 		<DropdownMenu icon={ moveTo } label={ __( 'Move to widget area' ) }>
-			<MenuGroup label={ __( 'Move to' ) }>
-				<MenuItemsChoice
-					choices={ widgetAreas.map( ( widgetArea ) => ( {
-						value: widgetArea.slug,
-						label: widgetArea.name,
-					} ) ) }
-					value={ currentWidgetArea.slug }
-					onSelect={ onSelect }
-				/>
-			</MenuGroup>
+			{ ( { onClose } ) => (
+				<MenuGroup label={ __( 'Move to' ) }>
+					<MenuItemsChoice
+						choices={ widgetAreas.map( ( widgetArea ) => ( {
+							value: widgetArea.id,
+							label: widgetArea.name,
+							info: widgetArea.description,
+						} ) ) }
+						value={ currentWidgetArea?.id }
+						onSelect={ ( value ) => {
+							onSelect( value );
+							onClose();
+						} }
+					/>
+				</MenuGroup>
+			) }
 		</DropdownMenu>
 	);
 }
