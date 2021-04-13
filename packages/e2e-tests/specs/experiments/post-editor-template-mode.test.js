@@ -64,10 +64,10 @@ describe( 'Post Editor Template mode', () => {
 		);
 
 		// Save changes
-		const doneButton = await page.waitForXPath(
-			`//button[contains(text(), 'Apply')]`
+		const publishButton = await page.waitForXPath(
+			`//button[contains(text(), 'Publish')]`
 		);
-		await doneButton.click();
+		await publishButton.click();
 		const saveButton = await page.waitForXPath(
 			`//div[contains(@class, "entities-saved-states__panel-header")]/button[contains(text(), 'Save')]`
 		);
@@ -125,14 +125,19 @@ describe( 'Post Editor Template mode', () => {
 		);
 
 		// Save changes
-		const doneButton = await page.waitForXPath(
-			`//button[contains(text(), 'Apply')]`
+		const publishButton = await page.waitForXPath(
+			`//button[contains(text(), 'Publish')]`
 		);
-		await doneButton.click();
+		await publishButton.click();
 		const saveButton = await page.waitForXPath(
 			`//div[contains(@class, "entities-saved-states__panel-header")]/button[contains(text(), 'Save')]`
 		);
 		await saveButton.click();
+		// Avoid publishing the post
+		const cancelButton = await page.waitForXPath(
+			`//button[contains(text(), 'Cancel')]`
+		);
+		await cancelButton.click();
 
 		// Preview changes
 		const previewPage = await openPreviewPage();
