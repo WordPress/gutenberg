@@ -81,7 +81,7 @@ register_block_pattern(
 						<!-- wp:query-loop -->
 						<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
 						<main class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:post-title {"isLink":true} /-->
-						<!-- wp:post-excerpt /-->
+						<!-- wp:post-excerpt {"wordCount":20} /-->
 						<!-- wp:post-date /--></div>
 						<!-- /wp:group -->
 						<!-- /wp:query-loop -->
