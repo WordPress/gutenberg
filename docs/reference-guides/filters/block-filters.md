@@ -11,7 +11,7 @@ _Example:_
 ```js
 wp.blocks.registerBlockStyle( 'core/quote', {
 	name: 'fancy-quote',
-	label: 'Fancy Quote'
+	label: 'Fancy Quote',
 } );
 ```
 
@@ -48,7 +48,7 @@ add_action( 'enqueue_block_editor_assets', 'myguten_enqueue' );
 The JavaScript code in `myguten.js`:
 
 ```js
-wp.domReady( function() {
+wp.domReady( function () {
 	wp.blocks.unregisterBlockStyle( 'core/quote', 'large' );
 } );
 ```
@@ -64,13 +64,16 @@ To simplify the process of registering and unregistering block styles, two serve
 The `register_block_style` function receives the name of the block as the first argument and an array describing properties of the style as the second argument.
 
 The properties of the style array must include `name` and `label`:
- - `name`: The identifier of the style used to compute a CSS class.
- - `label`: A human-readable label for the style.
 
-Besides the two mandatory properties, the styles properties array should also include an `inline_style`  or a `style_handle` property:
+-   `name`: The identifier of the style used to compute a CSS class.
+-   `label`: A human-readable label for the style.
 
- - `inline_style`: Contains inline CSS code that registers the CSS class required for the style.
- - `style_handle`: Contains the handle to an already registered style that should be enqueued in places where block styles are needed.
+Besides the two mandatory properties, the styles properties array should also include an `inline_style` or a `style_handle` property:
+
+-   `inline_style`: Contains inline CSS code that registers the CSS class required for the style.
+-   `style_handle`: Contains the handle to an already registered style that should be enqueued in places where block styles are needed.
+
+It is also possible to set the `is_default` property to `true` to mark one of the block style variations as the default one.
 
 The following code sample registers a style for the quote block named "Blue Quote", and provides an inline style that makes quote blocks with the "Blue Quote" style have blue color:
 
@@ -110,7 +113,7 @@ register_block_style(
 
 The function's first argument is the registered name of the block, and the name of the style as the second argument.
 
-The following code sample unregisters the style named 'fancy-quote'  from the quote block:
+The following code sample unregisters the style named 'fancy-quote' from the quote block:
 
 ```php
 unregister_block_style( 'core/quote', 'fancy-quote' );
@@ -138,7 +141,7 @@ function addListBlockClassName( settings, name ) {
 
 	return lodash.assign( {}, settings, {
 		supports: lodash.assign( {}, settings.supports, {
-			className: true
+			className: true,
 		} ),
 	} );
 }
@@ -178,11 +181,9 @@ wp.hooks.addFilter(
 );
 ```
 
-_Note:_  A [block validation](/docs/reference-guides/block-api/block-edit-save.md#validation) error will occur if this filter modifies existing content the next time the post is edited. The editor verifies that the content stored in the post matches the content output by the `save()` function.
+_Note:_ A [block validation](/docs/reference-guides/block-api/block-edit-save.md#validation) error will occur if this filter modifies existing content the next time the post is edited. The editor verifies that the content stored in the post matches the content output by the `save()` function.
 
 To avoid this validation error, use `render_block` server-side to modify existing post content instead of this filter. See [render_block documentation](https://developer.wordpress.org/reference/hooks/render_block/).
-
-
 
 #### `blocks.getBlockDefaultClassName`
 
@@ -193,9 +194,7 @@ _Example:_
 ```js
 // Our filter function
 function setBlockCustomClassName( className, blockName ) {
-	return blockName === 'core/code' ?
-		'my-plugin-code' :
-		className;
+	return blockName === 'core/code' ? 'my-plugin-code' : className;
 }
 
 // Adding the filter
@@ -222,57 +221,63 @@ _Example:_
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 const { createHigherOrderComponent } = wp.compose;
 const { Fragment } = wp.element;
 const { InspectorControls } = wp.blockEditor;
 const { PanelBody } = wp.components;
 
-const withInspectorControls =  createHigherOrderComponent( ( BlockEdit ) => {
+const withInspectorControls = createHigherOrderComponent( ( BlockEdit ) => {
 	return ( props ) => {
 		return (
 			<Fragment>
 				<BlockEdit { ...props } />
 				<InspectorControls>
-					<PanelBody>
-						My custom control
-					</PanelBody>
+					<PanelBody>My custom control</PanelBody>
 				</InspectorControls>
 			</Fragment>
 		);
 	};
-}, "withInspectorControl" );
+}, 'withInspectorControl' );
 
-wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
+wp.hooks.addFilter(
+	'editor.BlockEdit',
+	'my-plugin/with-inspector-controls',
+	withInspectorControls
+);
 ```
+
 {% ES5 %}
+
 ```js
 var el = wp.element.createElement;
 
-var withInspectorControls = wp.compose.createHigherOrderComponent( function( BlockEdit ) {
-	return function( props ) {
+var withInspectorControls = wp.compose.createHigherOrderComponent( function (
+	BlockEdit
+) {
+	return function ( props ) {
 		return el(
 			wp.element.Fragment,
 			{},
-			el(
-				BlockEdit,
-				props
-			),
+			el( BlockEdit, props ),
 			el(
 				wp.blockEditor.InspectorControls,
 				{},
-				el(
-					wp.components.PanelBody,
-					{},
-					'My custom control'
-				)
+				el( wp.components.PanelBody, {}, 'My custom control' )
 			)
 		);
 	};
-}, 'withInspectorControls' );
+},
+'withInspectorControls' );
 
-wp.hooks.addFilter( 'editor.BlockEdit', 'my-plugin/with-inspector-controls', withInspectorControls );
+wp.hooks.addFilter(
+	'editor.BlockEdit',
+	'my-plugin/with-inspector-controls',
+	withInspectorControls
+);
 ```
+
 {% end %}
 
 #### `editor.BlockListBlock`
@@ -283,45 +288,61 @@ _Example:_
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 const { createHigherOrderComponent } = wp.compose;
 
-const withClientIdClassName = createHigherOrderComponent( ( BlockListBlock ) => {
-	return ( props ) => {
-		return <BlockListBlock { ...props } className={ "block-" + props.clientId } />;
-	};
-}, 'withClientIdClassName' );
+const withClientIdClassName = createHigherOrderComponent(
+	( BlockListBlock ) => {
+		return ( props ) => {
+			return (
+				<BlockListBlock
+					{ ...props }
+					className={ 'block-' + props.clientId }
+				/>
+			);
+		};
+	},
+	'withClientIdClassName'
+);
 
-wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-name', withClientIdClassName );
+wp.hooks.addFilter(
+	'editor.BlockListBlock',
+	'my-plugin/with-client-id-class-name',
+	withClientIdClassName
+);
 ```
+
 {% ES5 %}
+
 ```js
 var el = wp.element.createElement;
 
-var withClientIdClassName = wp.compose.createHigherOrderComponent( function( BlockListBlock ) {
-	return function( props ) {
-		var newProps = lodash.assign(
-			{},
-			props,
-			{
-				className: "block-" + props.clientId,
-			}
-		);
+var withClientIdClassName = wp.compose.createHigherOrderComponent( function (
+	BlockListBlock
+) {
+	return function ( props ) {
+		var newProps = lodash.assign( {}, props, {
+			className: 'block-' + props.clientId,
+		} );
 
-		return el(
-			BlockListBlock,
-			newProps
-		);
+		return el( BlockListBlock, newProps );
 	};
-}, 'withClientIdClassName' );
+},
+'withClientIdClassName' );
 
-wp.hooks.addFilter( 'editor.BlockListBlock', 'my-plugin/with-client-id-class-name', withClientIdClassName );
+wp.hooks.addFilter(
+	'editor.BlockListBlock',
+	'my-plugin/with-client-id-class-name',
+	withClientIdClassName
+);
 ```
+
 {% end %}
 
 #### `media.crossOrigin`
 
-Used to set or modify the `crossOrigin` attribute for foreign-origin media elements (i.e  `<img>`, `<audio>` , `<img>` , `<link>` , `<script>`, `<video>`). See this [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) for more information the `crossOrigin` attribute, its values and how it applies to each element.
+Used to set or modify the `crossOrigin` attribute for foreign-origin media elements (i.e `<img>`, `<audio>` , `<img>` , `<link>` , `<script>`, `<video>`). See this [article](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/crossorigin) for more information the `crossOrigin` attribute, its values and how it applies to each element.
 
 One example of it in action is in the Image block's transform feature to allow cross-origin images to be used in a `<canvas>`.
 
@@ -351,22 +372,26 @@ Adding blocks is easy enough, removing them is as easy. Plugin or theme authors 
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 // my-plugin.js
 import { unregisterBlockType } from '@wordpress/blocks';
-import domReady from '@wordpress/dom-ready'
+import domReady from '@wordpress/dom-ready';
 
-domReady( function() {
+domReady( function () {
 	unregisterBlockType( 'core/verse' );
 } );
 ```
+
 {% ES5 %}
+
 ```js
 // my-plugin.js
-wp.domReady( function() {
+wp.domReady( function () {
 	wp.blocks.unregisterBlockType( 'core/verse' );
 } );
 ```
+
 {% end %}
 
 and load this script in the Editor
@@ -398,10 +423,10 @@ var allowedBlocks = [
 	'core/paragraph',
 	'core/image',
 	'core/html',
-	'core/freeform'
+	'core/freeform',
 ];
 
-wp.blocks.getBlockTypes().forEach( function( blockType ) {
+wp.blocks.getBlockTypes().forEach( function ( blockType ) {
 	if ( allowedBlocks.indexOf( blockType.name ) === -1 ) {
 		wp.blocks.unregisterBlockType( blockType.name );
 	}
@@ -459,11 +484,22 @@ You can also set a custom icon in SVG format. To do so, the icon should be rende
 To set an SVG icon for the category shown in the previous example, add the following example JavaScript code to the editor calling `wp.blocks.updateCategory` e.g:
 
 ```js
-( function() {
+( function () {
 	var el = wp.element.createElement;
 	var SVG = wp.primitives.SVG;
-	var circle = el( 'circle', { cx: 10, cy: 10, r: 10, fill: 'red', stroke: 'blue', strokeWidth: '10' } );
-	var svgIcon = el( SVG, { width: 20, height: 20, viewBox: '0 0 20 20'}, circle);
+	var circle = el( 'circle', {
+		cx: 10,
+		cy: 10,
+		r: 10,
+		fill: 'red',
+		stroke: 'blue',
+		strokeWidth: '10',
+	} );
+	var svgIcon = el(
+		SVG,
+		{ width: 20, height: 20, viewBox: '0 0 20 20' },
+		circle
+	);
 	wp.blocks.updateCategory( 'my-category', { icon: svgIcon } );
 } )();
 ```
