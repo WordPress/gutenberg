@@ -45,6 +45,7 @@ export function SocialLinksEdit( props ) {
 		attributes,
 		iconBackgroundColor,
 		iconColor,
+		isSelected,
 		setAttributes,
 		setIconBackgroundColor,
 		setIconColor,
@@ -72,14 +73,20 @@ export function SocialLinksEdit( props ) {
 	}, [ logosOnly, setAttributes ] );
 
 	const SocialPlaceholder = (
-		<div className="wp-block-social-links__social-placeholder">
+		<li className="wp-block-social-links__social-placeholder">
 			<div className="wp-social-link"></div>
 			<div className="wp-block-social-links__social-placeholder-icons">
 				<div className="wp-social-link wp-social-link-twitter"></div>
 				<div className="wp-social-link wp-social-link-facebook"></div>
 				<div className="wp-social-link wp-social-link-instagram"></div>
 			</div>
-		</div>
+		</li>
+	);
+
+	const SelectedSocialPlaceholder = (
+		<li className="wp-block-social-links__social-prompt">
+			{ __( 'Click plus to add' ) }
+		</li>
 	);
 
 	// Fallback color values are used maintain selections in case switching
@@ -95,7 +102,7 @@ export function SocialLinksEdit( props ) {
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
-		placeholder: SocialPlaceholder,
+		placeholder: isSelected ? SelectedSocialPlaceholder : SocialPlaceholder,
 		templateLock: false,
 		__experimentalAppenderTagName: 'li',
 	} );
