@@ -461,7 +461,12 @@ describe( 'Widgets screen', () => {
 			'[aria-label="Block: Widget Area"][role="group"]'
 		);
 
-		const legacyWidget = await page.waitForSelector(
+		// Wait for the widget's form to load.
+		await page.waitForSelector(
+			'[data-block][data-type="core/legacy-widget"] input'
+		);
+
+		const legacyWidget = await page.$(
 			'[data-block][data-type="core/legacy-widget"]'
 		);
 
@@ -492,7 +497,7 @@ describe( 'Widgets screen', () => {
 		await editButton.click();
 
 		// TODO: Should query this with role and label.
-		const titleInput = await legacyWidget.$( 'input' );
+		const titleInput = await legacyWidget.$( '#widget-search-1-title' );
 		await titleInput.type( 'Search Title' );
 
 		// Trigger the toolbar to appear.
