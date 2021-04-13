@@ -1,11 +1,10 @@
 # Git Workflow
 
-The Gutenberg project follows a standard pull request process for contributions. See GitHub's documentation for [additional details about pull requests](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests).
-
 This documentation is intended to help you get started using git with Gutenberg. Git is a powerful source code management tool; to learn git deeply, check out the [Pro Git book](https://git-scm.com/book/en/v2) available free online under CC BY-NC-SA 3.0 license.
 
 If you are unfamiliar with using git, it is worthwhile to explore and play with it. Try out the [git tutorial](https://git-scm.com/docs/gittutorial) as well as the [git user manual](https://git-scm.com/docs/user-manual) for help getting started.
 
+The Gutenberg project follows a standard pull request process for contributions. See GitHub's documentation for [additional details about pull requests](https://docs.github.com/en/github/collaborating-with-issues-and-pull-requests).
 ## Overview
 
 An overview of the process for contributors is:
