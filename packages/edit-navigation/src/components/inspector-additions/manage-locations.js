@@ -53,7 +53,7 @@ export default function ManageLocations( {
 		menuLocations.length
 	);
 
-	const menusWithSelection = menuLocations.map( ( { name, menu } ) => {
+	const menusWithSelection = menuLocations.map( ( { name, description, menu } ) => {
 		const menuOnLocation = menus
 			.filter( ( { id } ) => ! [ 0, selectedMenuId ].includes( id ) )
 			.find( ( { id } ) => id === menu );
@@ -69,7 +69,7 @@ export default function ManageLocations( {
 					onChange={ () =>
 						toggleMenuLocationAssignment( name, selectedMenuId )
 					}
-					label={ name }
+					label={ description }
 					help={
 						menuOnLocation &&
 						sprintf(
