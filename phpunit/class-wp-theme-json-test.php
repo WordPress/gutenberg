@@ -999,4 +999,36 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $actual['settings']['defaults']['spacing'] );
 	}
 
+	function test_get_style_nodes() {
+		$theme_json = array(
+			'styles' => array(
+				'defaults' => array(
+					'color' => array( 'background' => 'red' ),
+				),
+				'root' => array(
+					'color' => array( 'background' => 'green' ),
+				),
+				'core/paragraph' => array(
+					'color' => array( 'background' => 'blue' ),
+				),
+			)
+		);
+		$actual  = WP_Theme_JSON::get_style_nodes( $theme_json );
+		$expected = array(
+			array(
+				'path'     => array( 'styles', 'defaults' ),
+				'selector' => null
+			),
+			array(
+				'path'     => array( 'styles', 'root' ),
+				'selector' => null,
+			),
+			array(
+				'path'     => array( 'styles', 'core/paragraph' ),
+				'selector' => null,
+			),
+		);
+
+		$this->assertEqualSets( $expected, $actual );
+	}
 }

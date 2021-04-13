@@ -980,6 +980,21 @@ class WP_Theme_JSON {
 		return $template_parts;
 	}
 
+	public static function get_style_nodes( $theme_json, $metadata = array() ) {
+		$nodes = array();
+		if ( ! isset( $theme_json['styles'] ) ) {
+			return $nodes;
+		}
+
+		foreach( $theme_json['styles'] as $name => $node ) {
+			$nodes[] = array(
+				'path'     => array( 'styles', $name ),
+				'selector' => null,
+			);
+		}
+		return $nodes;
+	}
+
 	/**
 	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
