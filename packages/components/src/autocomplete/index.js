@@ -13,7 +13,15 @@ import {
 	useLayoutEffect,
 	useState,
 } from '@wordpress/element';
-import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import {
+	ENTER,
+	ESCAPE,
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	BACKSPACE,
+} from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { useInstanceId } from '@wordpress/compose';
 import {
@@ -293,6 +301,7 @@ function Autocomplete( {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
+	const [ backspacing, setBackspacing ] = useState( false );
 
 	function insertCompletion( replacement ) {
 		const end = record.start;
@@ -375,6 +384,8 @@ function Autocomplete( {
 	}
 
 	function handleKeyDown( event ) {
+		setBackspacing( event.keyCode === BACKSPACE );
+
 		if ( ! autocompleter ) {
 			return;
 		}
@@ -448,33 +459,40 @@ function Autocomplete( {
 					index + triggerPrefix.length
 				);
 
-				// If we don't have any matching filteredOptions
-				// we didn't have a new trigger typed, then we should not continue with this effect.
-				const mismatch = filteredOptions.length === 0;
-				const textFromLastTrigger = text.slice(
-					text.lastIndexOf( triggerPrefix )
-				);
-
-				const lastTriggerHintParts = textFromLastTrigger.split( /\s/ );
-				const triggerMatchHint =
-					lastTriggerHintParts.length === 1 &&
-					lastTriggerHintParts[ 0 ];
-				const tooDistantFromTrigger = textFromLastTrigger.length > 50; // 50 chars seem to be a good limit
-
-				console.log( '------------------------' );
-				console.log( 'mismatch: ', mismatch );
-				console.log( 'tooDistantFromTrigger: ', tooDistantFromTrigger );
-				console.log( 'textFromLastTrigger: ', textFromLastTrigger );
-				console.log( 'triggerMatchHint: ', triggerMatchHint );
-				console.log( '------------------------' );
-
-				// Safe-hatch, sometimes when typing too fast after a completion
-				// filteredOptions is still not set to empty. Might be removed after
-				// we better understand why that happens and address that.
+				const tooDistantFromTrigger = textWithoutTrigger.length > 50; // 50 chars seem to be a good limit.
+				// This is a final barrier to prevent the effect from completing with
+				// an extremely long string, which causes the editor to slow-down
+				// significantly. This could happen, for example, if `isMatchingBackwards`
+				// is true and one of the "words" end up being too long. If that's the case,
+				// it will be caught by this guard.
 				if ( tooDistantFromTrigger ) return false;
 
-				if ( mismatch && ! triggerMatchHint ) {
-					console.log( 'Mismatch, bailing out!' );
+				const mismatch = filteredOptions.length === 0;
+				const wordsFromTrigger = textWithoutTrigger.split( /\s/ );
+				// We need to allow the effect to run when not backspacing and if there
+				// was a mismatch. i.e when typing a trigger + the match string or when
+				// clicking in an existing trigger word on the page. We do that if we
+				// detect that we have one word from trigger in the current textual context.
+				//
+				// Ex.: "Some text @a" <-- "@a" will be detected as the trigger word and
+				// allow the effect to run. It will run until there's a mismatch.
+				const hasOneTriggerWord = wordsFromTrigger.length === 1;
+				// This is used to allow the effect to run when backspacing and if
+				// "touching" a word that "belongs" to a trigger. We consider a "trigger
+				// word" any word up to the limit of 3 from the trigger character.
+				// Anything beyond that is ignored if there's a mismatch. This allows
+				// us to "escape" a mismatch when backspacing, but still imposing some
+				// sane limits.
+				//
+				// Ex: "Some text @marcelo sekkkk" <--- "kkkk" caused a mismatch, but
+				// if the user presses backspace here, it will show the completion popup again.
+				const isMatchingBackwards =
+					backspacing && textWithoutTrigger.split( /\s/ ).length <= 3;
+
+				if (
+					mismatch &&
+					! ( isMatchingBackwards || hasOneTriggerWord )
+				) {
 					return false;
 				}
 
@@ -506,10 +524,6 @@ function Autocomplete( {
 			.slice( text.lastIndexOf( completer.triggerPrefix ) )
 			.match( new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` ) );
 		const query = match && match[ 1 ];
-
-		// We're trying to avoid reaching this part when there's no match in the
-		// autocompleter UI, so uncomment this to make this easier to test:
-		console.log( 'Query: ', query );
 
 		setAutocompleter( completer );
 		setAutocompleterUI( () =>
