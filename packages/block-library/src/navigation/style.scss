@@ -50,4 +50,10 @@
 
 .is-vertical.items-justified-right > ul {
 	align-items: flex-end;
+
+	.wp-block-navigation-link,
+	.wp-block-pages-list__item {
+		margin-right: 0;
+		justify-content: flex-end;
+	}
 }
