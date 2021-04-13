@@ -8,4 +8,4 @@
 
 ### New Feature
 
-- Initial version of the module.
+-   Initial version of the module.

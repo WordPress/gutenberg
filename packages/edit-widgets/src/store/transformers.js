@@ -26,8 +26,7 @@ export function transformWidgetToBlock( widget ) {
 	}
 
 	let attributes;
-	// TODO: Don't use widget_class.
-	if ( widget.widget_class ) {
+	if ( widget._embedded.about[ 0 ].is_multi ) {
 		attributes = {
 			idBase: widget.id_base,
 			instance: widget.instance,

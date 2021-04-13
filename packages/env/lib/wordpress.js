@@ -19,56 +19,6 @@ const copyDir = util.promisify( require( 'copy-dir' ) );
  */
 
 /**
- * Makes the WordPress content directories (wp-content, wp-content/plugins,
- * wp-content/themes) owned by the www-data user. This ensures that WordPress
- * can write to these directories.
- *
- * This is necessary when running wp-env with `"core": null` because Docker
- * will automatically create these directories as the root user when binding
- * volumes during `docker-compose up`, and `docker-compose up` doesn't support
- * the `-u` option.
- *
- * See https://github.com/docker-library/wordpress/issues/436.
- *
- * @param {WPEnvironment} environment The environment to check. Either 'development' or 'tests'.
- * @param {WPConfig}      config      The wp-env config object.
- */
-async function makeContentDirectoriesWritable(
-	environment,
-	{ dockerComposeConfigPath, debug }
-) {
-	await dockerCompose.exec(
-		environment === 'development' ? 'wordpress' : 'tests-wordpress',
-		'chown www-data:www-data wp-content wp-content/plugins wp-content/themes',
-		{
-			config: dockerComposeConfigPath,
-			log: debug,
-		}
-	);
-}
-
-/**
- * Makes wp-config.php owned by www-data so that WordPress can work with the
- * file.
- *
- * @param {WPEnvironment} environment The environment to check. Either 'development' or 'tests'.
- * @param {WPConfig}      config      The wp-env config object.
- */
-async function makeConfigWritable(
-	environment,
-	{ dockerComposeConfigPath, debug }
-) {
-	await dockerCompose.exec(
-		environment === 'development' ? 'wordpress' : 'tests-wordpress',
-		'chown www-data:www-data wp-config.php',
-		{
-			config: dockerComposeConfigPath,
-			log: debug,
-		}
-	);
-}
-
-/**
  * Checks a WordPress database connection. An error is thrown if the test is
  * unsuccessful.
  *
@@ -280,8 +230,6 @@ async function copyCoreFiles( fromPath, toPath ) {
 
 module.exports = {
 	hasSameCoreSource,
-	makeContentDirectoriesWritable,
-	makeConfigWritable,
 	checkDatabaseConnection,
 	configureWordPress,
 	resetDatabase,

@@ -78,7 +78,6 @@ jobs:
 
             - name: Install WordPress
               run: |
-                  chmod -R 767 ./ # TODO: Possibly integrate in wp-env
                   npm run wp-env start
 
             - name: Running lint check

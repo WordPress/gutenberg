@@ -24,61 +24,67 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 
 The props accepted by the component are described below.
 
-
 ## Props
 
 ### attributes
 
 An object containing the attributes of the block to be server-side rendered.
 E.g: `{ displayAsDropdown: true }`, `{ showHierarchy: true }`, etc...
-- Type: `Object`
-- Required: No
+
+-   Type: `Object`
+-   Required: No
 
 ### block
 
 The identifier of the block to be server-side rendered.
 Examples: "core/archives", "core/latest-comments", "core/rss", etc...
-- Type: `String`
-- Required: Yes
+
+-   Type: `String`
+-   Required: Yes
 
 ### className
 
 A class added to the DOM element that wraps the server side rendered block.
 Examples: "my-custom-server-side-rendered".
-- Type: `String`
-- Required: No
+
+-   Type: `String`
+-   Required: No
 
 ### httpMethod
 
 The HTTP request method to use, either 'GET' or 'POST'. It's 'GET' by default. The 'POST' value will cause an error on WP earlier than 5.5, unless 'rest_endpoints' is filtered in PHP to allow this. If 'POST', this sends the attributes in the request body, not in the URL. This can allow a bigger attributes object.
-- Type: `String`
-- Required: No
+
+-   Type: `String`
+-   Required: No
 
 ### urlQueryArgs
 
 Query arguments to apply to the request URL.
 E.g: `{ post_id: 12 }`.
-- Type: `Object`
-- Required: No
+
+-   Type: `Object`
+-   Required: No
 
 ### EmptyResponsePlaceholder
 
 This is a [render prop](https://reactjs.org/docs/render-props.html). When the api response is empty, the value of this prop is rendered. The render prop will receive the value of the api response as well as all props passed into `ServerSideRenderer`.
-- Type: `WPElement`
-- Required: No
+
+-   Type: `WPElement`
+-   Required: No
 
 ### ErrorResponsePlaceholder
 
 This is a [render prop](https://reactjs.org/docs/render-props.html). When the api response is an error, the value of this prop is rendered. The render prop will receive the value of the api response as well as all props passed into `ServerSideRenderer`.
-- Type: `WPElement`
-- Required: No
+
+-   Type: `WPElement`
+-   Required: No
 
 ### LoadingResponsePlaceholder
 
 This is a [render prop](https://reactjs.org/docs/render-props.html). While the request is being processed (loading state), the value of this prop is rendered. The render prop will receive the value of the api response as well as all props passed into `ServerSideRenderer`.
-- Type: `WPElement`
-- Required: No
 
+-   Type: `WPElement`
+-   Required: No
 
 ## Usage
 
@@ -97,9 +103,10 @@ const MyServerSideRender = () => (
 	/>
 );
 ```
+
 If imported from the `wp` global, an alias is required to work in JSX.
 
-```jsx 
+```jsx
 const { serverSideRender: ServerSideRender } = wp;
 
 const MyServerSideRender = () => (
