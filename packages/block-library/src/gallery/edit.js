@@ -276,6 +276,7 @@ function GalleryEdit( props ) {
 			return createBlock( 'core/image', {
 				id: image.id,
 				url: image.url,
+				caption: image.caption,
 			} );
 		} );
 
