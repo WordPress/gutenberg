@@ -8,7 +8,7 @@ import { isEmpty, kebabCase } from 'lodash';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { useEffect, useState } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { edit, close, chevronDown, chevronUp, plus } from '@wordpress/icons';
 
 /**
@@ -20,15 +20,6 @@ import ColorPicker from '../color-picker';
 import Button from '../button';
 import TextControl from '../text-control';
 import BaseControl from '../base-control';
-
-function DropdownOpenOnMount( { shouldOpen, isOpen, onToggle } ) {
-	useEffect( () => {
-		if ( shouldOpen && ! isOpen ) {
-			onToggle();
-		}
-	}, [] );
-	return null;
-}
 
 function ColorOption( {
 	color,
@@ -56,6 +47,14 @@ function ColorOption( {
 		( isHover || isFocused || isEditingName || isShowingAdvancedPanel ) &&
 		! immutableColorSlugs.includes( slug );
 
+	const dropdownHandle = useRef();
+	useEffect( () => {
+		const { isOpen, onToggle } = dropdownHandle.current;
+		if ( isEditingColorOnMount && isOpen === false ) {
+			onToggle();
+		}
+	}, [ isEditingColorOnMount ] );
+
 	return (
 		<div
 			tabIndex={ 0 }
@@ -77,13 +76,11 @@ function ColorOption( {
 		>
 			<div className="components-color-edit__color-option-main-area">
 				<Dropdown
-					renderToggle={ ( { isOpen, onToggle } ) => (
-						<>
-							<DropdownOpenOnMount
-								shouldOpen={ isEditingColorOnMount }
-								isOpen={ isOpen }
-								onToggle={ onToggle }
-							/>
+					renderToggle={ ( { isOpen, onToggle } ) => {
+						if ( isOpen !== dropdownHandle.current?.isOpen ) {
+							dropdownHandle.current = { isOpen, onToggle };
+						}
+						return (
 							<CircularOptionPicker.Option
 								style={ { backgroundColor: color, color } }
 								aria-expanded={ isOpen }
@@ -91,8 +88,8 @@ function ColorOption( {
 								onClick={ onToggle }
 								aria-label={ __( 'Edit color value' ) }
 							/>
-						</>
-					) }
+						);
+					} }
 					renderContent={ () => (
 						<ColorPicker
 							color={ color }
