@@ -681,6 +681,27 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 }
 
 /**
+ * Action triggered to save specified edits for the site entity.
+ *
+ * @param {Array} itemsToSave List of site entity keys to save.
+ */
+export function* __experimentalSaveSiteEntityItems( itemsToSave ) {
+	const edits = yield controls.select(
+		'core',
+		'getEntityRecordNonTransientEdits',
+		'root',
+		'site'
+	);
+	const editsToSave = {};
+	for ( const edit in edits ) {
+		if ( itemsToSave.some( ( item ) => item === edit ) ) {
+			editsToSave[ edit ] = edits[ edit ];
+		}
+	}
+	return yield saveEntityRecord( 'root', 'site', editsToSave );
+}
+
+/**
  * Returns an action object used in signalling that Upload permissions have been received.
  *
  * @param {boolean} hasUploadPermissions Does the user have permission to upload files?

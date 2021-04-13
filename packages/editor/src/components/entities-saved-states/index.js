@@ -59,7 +59,10 @@ function EntitiesSavedStates( { isOpen, close } ) {
 			dirtyEntityRecords: dirtyRecordsWithSiteItems,
 		};
 	}, [] );
-	const { saveEditedEntityRecord } = useDispatch( 'core' );
+	const {
+		saveEditedEntityRecord,
+		__experimentalSaveSiteEntityItems: saveSiteEntityItems,
+	} = useDispatch( 'core' );
 
 	// To group entities by type.
 	const partitionedSavables = Object.values(
@@ -102,9 +105,15 @@ function EntitiesSavedStates( { isOpen, close } ) {
 
 		close( entitiesToSave );
 
+		const siteItemsToSave = [];
 		entitiesToSave.forEach( ( { kind, name, key } ) => {
-			saveEditedEntityRecord( kind, name, key );
+			if ( 'root' === kind && 'site' === name ) {
+				siteItemsToSave.push( key );
+			} else {
+				saveEditedEntityRecord( kind, name, key );
+			}
 		} );
+		saveSiteEntityItems( siteItemsToSave );
 	};
 
 	// Explicitly define this with no argument passed.  Using `close` on
