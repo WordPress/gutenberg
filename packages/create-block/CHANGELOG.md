@@ -2,10 +2,6 @@
 
 ## Unreleased
 
-### Breaking Changes
-
--   Rename `format:js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
-
 ### Enhancement
 
 -   Rename `format:js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
