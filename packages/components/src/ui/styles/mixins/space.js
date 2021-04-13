@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { VARS } from '../config';
+import { tokens } from '../tokens';
 
 /**
  * @param {import('react').ReactText} value
@@ -9,6 +9,6 @@ import { VARS } from '../config';
  */
 export function space( value ) {
 	return typeof value === 'number'
-		? `calc(${ VARS.gridBase } * ${ value })`
+		? `calc(${ tokens.gridBase } * ${ value })`
 		: value;
 }

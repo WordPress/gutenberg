@@ -72,12 +72,10 @@ const FONT_PROPS = {
 	fontWeightHeading: '600',
 };
 
-const BASE_THEME = {
+export const config = {
 	...COLOR_PROPS,
 	// Base
 	...FONT_PROPS,
 	// Animations
 	...ANIMATION_PROPS,
 };
-
-export const config = BASE_THEME;
