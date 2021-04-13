@@ -23,7 +23,7 @@ import { DOWN, ENTER } from '@wordpress/keycodes';
 
 onKeyDown( event ) {
 	const { keyCode } = event;
-	
+
 	if ( keyCode === DOWN ) {
 		alert( 'You pressed the down arrow!' );
 	} else if ( keyCode === ENTER ) {

@@ -4,14 +4,14 @@ A block template is defined as a list of block items. Such blocks can have prede
 
 The scope of templates include:
 
-- Setting a default state dynamically on the client. (like `defaultBlock`)
-- Registered as a default for a given post type.
+-   Setting a default state dynamically on the client. (like `defaultBlock`)
+-   Registered as a default for a given post type.
 
 Planned additions:
 
-- Saved and assigned to pages as "page templates".
-- Defined in a `template.php` file or pulled from a custom post type (`wp_templates`) that is site specific.
-- As the equivalent of the theme hierarchy.
+-   Saved and assigned to pages as "page templates".
+-   Defined in a `template.php` file or pulled from a custom post type (`wp_templates`) that is site specific.
+-   As the equivalent of the theme hierarchy.
 
 ## API
 
@@ -50,13 +50,13 @@ registerBlockType( 'myplugin/template', {
 	edit: ( props ) => {
 		return el( InnerBlocks, {
 			template: BLOCKS_TEMPLATE,
-			templateLock: false
-		});
+			templateLock: false,
+		} );
 	},
 	save: ( props ) => {
 		return el( InnerBlocks.Content, {} );
 	},
-});
+} );
 ```
 
 See the [Meta Block Tutorial](/docs/how-to-guides/metabox/meta-block-5-finishing.md) for a full example of a template in use.
@@ -68,7 +68,6 @@ To find a comprehensive list of all block attributes that you can define in a te
 For example, [packages/block-library/src/heading/block.json](https://github.com/WordPress/gutenberg/blob/c62ccd80c7c6abb85740cf8745439029bf0f4d35/packages/block-library/src/heading/block.json#L5-L25) shows that the block has a `level` attribute, and supports the `anchor` parameter.
 
 If you don't have the Gutenberg plugin installed, you can find `block.json` files inside `wp-includes/blocks/heading/block.json`.
-
 
 ## Custom Post types
 
@@ -114,10 +113,10 @@ function myplugin_register_template() {
 add_action( 'init', 'myplugin_register_template' );
 ```
 
-*Options:*
+_Options:_
 
-- `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
-- `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
+-   `all` — prevents all operations. It is not possible to insert new blocks, move existing blocks, or delete blocks.
+-   `insert` — prevents inserting or removing blocks, but allows moving existing blocks.
 
 Lock settings can be inherited by InnerBlocks. If `templateLock` is not set in an InnerBlocks area, the locking of the parent InnerBlocks area is used. If the block is a top level block, the locking configuration of the current post type is used.
 

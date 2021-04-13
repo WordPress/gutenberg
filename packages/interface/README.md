@@ -12,7 +12,6 @@ npm install @wordpress/interface --save
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
 
-
 ## API Usage
 
 ### Complementary Areas
@@ -24,18 +23,29 @@ This component was named after a [complementary landmark](https://www.w3.org/TR/
 It is possible to control which complementary is enabled by using the store:
 
 Below are some examples of how to control the active complementary area using the store:
+
 ```js
-wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core/edit-post' );
+wp.data
+	.select( 'core/interface' )
+	.getActiveComplementaryArea( 'core/edit-post' );
 // -> "edit-post/document"
 
-wp.data.dispatch( 'core/interface' ).enableComplementaryArea( 'core/edit-post', 'edit-post/block' );
+wp.data
+	.dispatch( 'core/interface' )
+	.enableComplementaryArea( 'core/edit-post', 'edit-post/block' );
 
-wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core/edit-post' );
+wp.data
+	.select( 'core/interface' )
+	.getActiveComplementaryArea( 'core/edit-post' );
 // -> "edit-post/block"
 
-wp.data.dispatch( 'core/interface' ).disableComplementaryArea( 'core/edit-post' );
+wp.data
+	.dispatch( 'core/interface' )
+	.disableComplementaryArea( 'core/edit-post' );
 
-wp.data.select( 'core/interface' ).getActiveComplementaryArea( 'core/edit-post' );
+wp.data
+	.select( 'core/interface' )
+	.getActiveComplementaryArea( 'core/edit-post' );
 // -> null
 ```
 

@@ -6,13 +6,13 @@ The only required field for an attribute is the `type` field. It indicates the t
 
 Accepted values in the `type` field MUST be one of the following:
 
-* null
-* boolean
-* object
-* array
-* number
-* string
-* integer
+-   null
+-   boolean
+-   object
+-   array
+-   number
+-   string
+-   integer
 
 See [WordPress's REST API documentation](https://developer.wordpress.org/rest-api/extending-the-rest-api/schema/) for additional details.
 
@@ -29,7 +29,6 @@ If no selector argument is specified, the source definition runs against the blo
 The selector specified can be an HTML tag, or anything queryable such as a class or id attribute, see examples below.
 
 Under the hood, attribute sources are a superset of the functionality provided by [hpq](https://github.com/aduth/hpq), a small library used to parse and query HTML markup into an object shape.
-
 
 ### `attribute`
 
@@ -186,6 +185,7 @@ From here, meta attributes can be read and written by a block using the same int
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 edit( { attributes, setAttributes } ) {
 	function onChange( event ) {
@@ -195,7 +195,9 @@ edit( { attributes, setAttributes } ) {
 	return <input value={ attributes.author } onChange={ onChange } type="text" />;
 },
 ```
+
 {% ES5 %}
+
 ```js
 edit: function( props ) {
 	function onChange( event ) {
@@ -208,6 +210,7 @@ edit: function( props ) {
 	} );
 },
 ```
+
 {% end %}
 
 ### Considerations
@@ -225,8 +228,8 @@ add_action( 'init', 'gutenberg_my_block_init' );
 
 Furthermore, be aware that WordPress defaults to:
 
-- not treating a meta datum as being unique, instead returning an array of values;
-- treating that datum as a string.
+-   not treating a meta datum as being unique, instead returning an array of values;
+-   treating that datum as a string.
 
 If either behavior is not desired, the same `register_post_meta` call can be complemented with the `single` and/or `type` parameters as follows:
 

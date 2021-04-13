@@ -34,13 +34,11 @@ See [Packages](/docs/reference-guides/packages.md) for list of available package
 
 After you have updated both JavaScript and PHP files, go to the block editor and create a new post.
 
-Add a quote block, and in the right sidebar under Styles, you will see your new Fancy Quote style listed.  
+Add a quote block, and in the right sidebar under Styles, you will see your new Fancy Quote style listed.
 
 Click the Fancy Quote to select and apply that style to your quote block:
 
-
 ![Fancy Quote Style in Inspector](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/fancy-quote-in-inspector.png)
-
 
 Even if you Preview or Publish the post you will not see a visible change. However, if you look at the source, you will see the `is-style-fancy-quote` class name is now attached to your quote block.
 

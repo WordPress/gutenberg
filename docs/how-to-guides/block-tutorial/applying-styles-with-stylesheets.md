@@ -6,6 +6,7 @@ The editor will automatically generate a class name for each block type to simpl
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
@@ -24,19 +25,29 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 	edit() {
 		const blockProps = useBlockProps();
 
-		return <p { ...blockProps }>Hello World, step 2 (from the editor, in green).</p>;
+		return (
+			<p { ...blockProps }>
+				Hello World, step 2 (from the editor, in green).
+			</p>
+		);
 	},
 
 	save() {
 		const blockProps = useBlockProps.save();
 
-		return <p { ...blockProps }>Hello World, step 2 (from the frontend, in red).</p>;
+		return (
+			<p { ...blockProps }>
+				Hello World, step 2 (from the frontend, in red).
+			</p>
+		);
 	},
 } );
 ```
+
 {% ES5 %}
+
 ```js
-( function( blocks, element, blockEditor ) {
+( function ( blocks, element, blockEditor ) {
 	var el = element.createElement;
 
 	blocks.registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
@@ -45,7 +56,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 		icon: 'universal-access-alt',
 		category: 'design',
 		example: {},
-		edit: function( props ) {
+		edit: function ( props ) {
 			var blockProps = blockEditor.useBlockProps();
 			return el(
 				'p',
@@ -53,7 +64,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 				'Hello World, step 2 (from the editor, in green).'
 			);
 		},
-		save: function() {
+		save: function () {
 			var blockProps = blockEditor.useBlockProps.save();
 			return el(
 				'p',
@@ -62,12 +73,9 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 			);
 		},
 	} );
-}(
-	window.wp.blocks,
-	window.wp.element,
-	window.wp.blockEditor,
-) );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
 ```
+
 {% end %}
 
 The class name is generated using the block's name prefixed with `wp-block-`, replacing the `/` namespace separator with a single `-`.

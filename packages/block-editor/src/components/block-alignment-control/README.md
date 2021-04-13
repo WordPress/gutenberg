@@ -20,10 +20,7 @@ import { BlockAlignmentToolbar } from '@wordpress/block-editor';
 
 const MyBlockAlignmentToolbar = () => (
 	<BlockControls>
-        <BlockAlignmentToolbar 
-            value={ align }
-            onChange={ updateAlignment } 
-        />
+		<BlockAlignmentToolbar value={ align } onChange={ updateAlignment } />
 	</BlockControls>
 );
 ```

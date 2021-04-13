@@ -28,7 +28,7 @@ import { Text, TextInput } from '@wordpress/components/ui';
 function Example() {
 	return (
 		<Text adjustLineHeightForInnerControls>
-			Lorem ipsum dolor sit amet, consectetur{ ' ' }
+			Lorem ipsum dolor sit amet, consectetur
 			<TextInput value="adipiscing elit..." />
 		</Text>
 	);

@@ -16,7 +16,7 @@
 
 ### New Features
 
-- Added `@babel/preset-typescript` so that the preset can by default transpile TypeScript files, too.
+-   Added `@babel/preset-typescript` so that the preset can by default transpile TypeScript files, too.
 
 ## 5.0.0 (2021-01-21)
 

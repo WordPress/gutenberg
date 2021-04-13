@@ -6,29 +6,29 @@
 
 ### New Feature
 
-- Export the default `createHooks` singleton instance as `defaultHooks`, in addition to exporting the individual methods.
+-   Export the default `createHooks` singleton instance as `defaultHooks`, in addition to exporting the individual methods.
 
 ## 2.11.0 (2020-12-17)
 
 ### New Feature
 
-- Include TypeScript type declarations ([#26430](https://github.com/WordPress/gutenberg/pull/26430))
+-   Include TypeScript type declarations ([#26430](https://github.com/WordPress/gutenberg/pull/26430))
 
 ### Bug Fix
 
-- Fix: Use own instance's `doAction` method for built-in `hookAdded` and `hookRemoved` hooks ([#26498](https://github.com/WordPress/gutenberg/pull/26498))
+-   Fix: Use own instance's `doAction` method for built-in `hookAdded` and `hookRemoved` hooks ([#26498](https://github.com/WordPress/gutenberg/pull/26498))
 
 ## 2.6.0 (2019-08-29)
 
 ### New Feature
 
- - Enable an optional namespace parameter for `hasAction` & `hasFilter`. When checking if an action or filter exists, `hasAction` and `hasFilter` now accept an optional paramter to limit matches by namespace.
+-   Enable an optional namespace parameter for `hasAction` & `hasFilter`. When checking if an action or filter exists, `hasAction` and `hasFilter` now accept an optional paramter to limit matches by namespace.
 
 ## 2.4.0 (2019-06-12)
 
 ### New Feature
 
-- Enable support for the 'all' hook in non production environments.
+-   Enable support for the 'all' hook in non production environments.
 
 ## 2.0.4 (2019-01-03)
 
@@ -36,26 +36,26 @@
 
 ### Breaking Change
 
-- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)).  If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
+-   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
 
 ## 1.2.0 (2018-07-12)
 
 ### New Feature
 
-- Updated build to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
+-   Updated build to work with Babel 7 ([#7832](https://github.com/WordPress/gutenberg/pull/7832))
 
 ### Polish
 
-- Moved `@WordPress/packages` repository to `@WordPress/gutenberg` ([#7805](https://github.com/WordPress/gutenberg/pull/7805))
+-   Moved `@WordPress/packages` repository to `@WordPress/gutenberg` ([#7805](https://github.com/WordPress/gutenberg/pull/7805))
 
 ## 1.1.8 (2018-05-08)
 
 ### Polish
 
-- Documentation: Improve usage examples ([#121](https://github.com/WordPress/packages/pull/121))
+-   Documentation: Improve usage examples ([#121](https://github.com/WordPress/packages/pull/121))
 
 ## 1.1.6 (2018-03-21)
 
 ### Bug Fix
 
-- Fix: Resolves issue where action argument would be undefined on all but the first action callback.
+-   Fix: Resolves issue where action argument would be undefined on all but the first action callback.

@@ -7,9 +7,9 @@ This module creates the Emotion instance that backs the style system. It integra
 Breakpoint values are supported by passing an array of values to a CSS property. For example:
 
 ```js
-css({
-	width: [300, 500, 700],
-});
+css( {
+	width: [ 300, 500, 700 ],
+} );
 ```
 
 This will dynamically respond to breakpoints and render the appropriate width for each `min-width`. The breakpoints are documented in the code in [`utils.js`](./utils.js).
@@ -36,7 +36,7 @@ const Text = styled.div`
 `;
 
 const greenText = css`
-	${Text} {
+	${ Text } {
 		color: green;
 	}
 `;
@@ -48,7 +48,7 @@ Psueudo selectors against the interpolated component are possible as well:
 
 ```js
 const blueText = css`
-	${Text}:first-child {
+	${ Text }:first-child {
 		color: blue;
 	}
 `;

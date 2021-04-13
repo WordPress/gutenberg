@@ -8,7 +8,7 @@
 
 ### New Feature
 
--	Add optional argument `maxLength` for truncating URL in `filterURLForDisplay`
+-   Add optional argument `maxLength` for truncating URL in `filterURLForDisplay`
 
 ## 2.16.0 (2020-06-15)
 

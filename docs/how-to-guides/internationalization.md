@@ -4,7 +4,7 @@
 
 Internationalization is the process to provide multiple language support to software, in this case WordPress. Internationalization is often abbreviated as **i18n**, where 18 stands for the number of letters between the first _i_ and the last _n_.
 
-Providing i18n support to your plugin and theme allows it to reach the largest possible audience, even without requiring you to provide the additional language translations.  When you upload your software to WordPress.org, all JS and PHP files will automatically be parsed. Any detected translation strings are added to [translate.wordpress.org](https://translate.wordpress.org/) to allow the community to translate, ensuring WordPress plugins and themes are available in as many languages as possible.
+Providing i18n support to your plugin and theme allows it to reach the largest possible audience, even without requiring you to provide the additional language translations. When you upload your software to WordPress.org, all JS and PHP files will automatically be parsed. Any detected translation strings are added to [translate.wordpress.org](https://translate.wordpress.org/) to allow the community to translate, ensuring WordPress plugins and themes are available in as many languages as possible.
 
 For PHP, WordPress has a long established process, see [How to Internationalize Your Plugin](https://developer.wordpress.org/plugins/internationalization/how-to-internationalize-your-plugin/). The release of WordPress 5.0 brings a similar process for translation to JavaScript code.
 
@@ -35,10 +35,11 @@ function myguten_block_init() {
 add_action( 'init', 'myguten_block_init' );
 ```
 
-In your code, you can include the i18n functions. The most common function is **__** (a double underscore) which provides translation of a simple string. Here is a basic block example:
+In your code, you can include the i18n functions. The most common function is **\_\_** (a double underscore) which provides translation of a simple string. Here is a basic block example:
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 import { __ } from '@wordpress/i18n';
 import { registerBlockType } from '@wordpress/blocks';
@@ -52,25 +53,19 @@ registerBlockType( 'myguten/simple', {
 	edit: () => {
 		const blockProps = useBlockProps( { style: { color: 'red' } } );
 
-		return (
-			<p {...blockProps}>
-				{ __( 'Hello World', 'myguten' ) }
-			</p>
-		);
+		return <p { ...blockProps }>{ __( 'Hello World', 'myguten' ) }</p>;
 	},
 
 	save: () => {
 		const blockProps = useBlockProps.save( { style: { color: 'red' } } );
 
-		return (
-			<p {...blockProps}>
-				{ __( 'Hello World', 'myguten' ) }
-			</p>
-		);
+		return <p { ...blockProps }>{ __( 'Hello World', 'myguten' ) }</p>;
 	},
 } );
 ```
+
 {% ES5 %}
+
 ```js
 const { __ } = wp.i18n;
 const el = wp.element.createElement;
@@ -81,35 +76,28 @@ registerBlockType( 'myguten/simple', {
 	title: __( 'Simple Block', 'myguten' ),
 	category: 'widgets',
 
-	edit: function() {
+	edit: function () {
 		const blockProps = useBlockProps( { style: { color: 'red' } } );
-		
-		return el(
-			'p',
-			blockProps,
-			__( 'Hello World', 'myguten' )
-		);
+
+		return el( 'p', blockProps, __( 'Hello World', 'myguten' ) );
 	},
 
-	save: function() {
+	save: function () {
 		const blockProps = useBlockProps.save( { style: { color: 'red' } } );
-		return el(
-			'p',
-			blockProps,
-			__( 'Hello World', 'myguten' )
-		);
+		return el( 'p', blockProps, __( 'Hello World', 'myguten' ) );
 	},
 } );
 ```
+
 {% end %}
 
 In the above example, the function will use the first argument for the string to be translated. The second argument is the text domain which must match the text domain slug specified by your plugin.
 
 Common functions available, these mirror their PHP counterparts are:
 
-- `__( 'Hello World', 'my-text-domain' )` - Translate a certain string.
-- `_n( '%s Comment', '%s Comments', numberOfComments, 'my-text-domain' )` - Translate and retrieve the singular or plural form based on the supplied number.
-- `_x( 'Default', 'block style', 'my-text-domain' )` - Translate a certain string with some additional context.
+-   `__( 'Hello World', 'my-text-domain' )` - Translate a certain string.
+-   `_n( '%s Comment', '%s Comments', numberOfComments, 'my-text-domain' )` - Translate and retrieve the singular or plural form based on the supplied number.
+-   `_x( 'Default', 'block style', 'my-text-domain' )` - Translate a certain string with some additional context.
 
 **Note:** Every string displayed to the user should be wrapped in an i18n function.
 
@@ -125,7 +113,7 @@ After all strings in your code is wrapped, the final step is to tell WordPress y
 
 This is all you need to make your plugin JavaScript code translatable.
 
-When you set script translations for a handle WordPress will automatically figure out if a translations file exists on translate.wordpress.org, and if so ensure that it's loaded into `wp.i18n` before your script runs.  With translate.wordpress.org, plugin authors also do not need to worry about setting up their own infrastructure for translations and can rely on a global community with dozens of active locales. Read more about [WordPress Translations](https://make.wordpress.org/meta/handbook/documentation/translations/).
+When you set script translations for a handle WordPress will automatically figure out if a translations file exists on translate.wordpress.org, and if so ensure that it's loaded into `wp.i18n` before your script runs. With translate.wordpress.org, plugin authors also do not need to worry about setting up their own infrastructure for translations and can rely on a global community with dozens of active locales. Read more about [WordPress Translations](https://make.wordpress.org/meta/handbook/documentation/translations/).
 
 ## Provide Your Own Translations
 
@@ -135,7 +123,7 @@ You can create and ship your own translations with your plugin, if you have suff
 
 The translation files must be in the JED 1.x JSON format.
 
-To create a JED translation file, first you need to extract the strings from the text. Typically, the language files all live in a directory called `languages` in your plugin.  Using [WP-CLI](https://wp-cli.org/), you create a `.pot` file using the following command from within your plugin directory:
+To create a JED translation file, first you need to extract the strings from the text. Typically, the language files all live in a directory called `languages` in your plugin. Using [WP-CLI](https://wp-cli.org/), you create a `.pot` file using the following command from within your plugin directory:
 
 ```
 mkdir languages
@@ -226,28 +214,23 @@ This will generate the JSON file `myguten-eo-[md5].json` with the contents:
 
 ```json
 {
-  "translation-revision-date": "2019-04-26T13:30:11-07:00",
-  "generator": "WP-CLI/2.2.0",
-  "source": "block.js",
-  "domain": "messages",
-  "locale_data": {
-    "messages": {
-      "": {
-        "domain": "messages",
-        "lang": "eo",
-        "plural-forms": "nplurals=2; plural=(n != 1);"
-      },
-      "Simple Block": [
-        "Simpla Bloko"
-      ],
-      "Hello World": [
-        "Salunton mondo"
-      ]
-    }
-  }
+	"translation-revision-date": "2019-04-26T13:30:11-07:00",
+	"generator": "WP-CLI/2.2.0",
+	"source": "block.js",
+	"domain": "messages",
+	"locale_data": {
+		"messages": {
+			"": {
+				"domain": "messages",
+				"lang": "eo",
+				"plural-forms": "nplurals=2; plural=(n != 1);"
+			},
+			"Simple Block": [ "Simpla Bloko" ],
+			"Hello World": [ "Salunton mondo" ]
+		}
+	}
 }
 ```
-
 
 ### Load Translation File
 

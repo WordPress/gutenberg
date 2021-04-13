@@ -30,16 +30,18 @@ Let's render a customized greeting into an empty element:
 ```html
 <div id="greeting"></div>
 <script>
-function Greeting( props ) {
-	return wp.element.createElement( 'span', null, 
-		'Hello ' + props.toWhom + '!'
-	);
-}
+	function Greeting( props ) {
+		return wp.element.createElement(
+			'span',
+			null,
+			'Hello ' + props.toWhom + '!'
+		);
+	}
 
-wp.element.render(
-	wp.element.createElement( Greeting, { toWhom: 'World' } ),
-	document.getElementById( 'greeting' )
-);
+	wp.element.render(
+		wp.element.createElement( Greeting, { toWhom: 'World' } ),
+		document.getElementById( 'greeting' )
+	);
 </script>
 ```
 
@@ -65,9 +67,12 @@ If you've configured [Babel](http://babeljs.io/) for your project, you can opt i
 ```json
 {
 	"plugins": [
-		[ "transform-react-jsx", {
-			"pragma": "createElement"
-		} ]
+		[
+			"transform-react-jsx",
+			{
+				"pragma": "createElement"
+			}
+		]
 	]
 }
 ```

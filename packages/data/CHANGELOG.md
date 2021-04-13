@@ -6,7 +6,7 @@
 
 ### New Features
 
-- Added new `resolveSelect` registry method to initiate and wait for selector resolution
+-   Added new `resolveSelect` registry method to initiate and wait for selector resolution
 
 ## 4.26.0 (2020-12-17)
 

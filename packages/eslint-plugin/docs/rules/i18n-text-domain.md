@@ -23,4 +23,4 @@ __( 'Hello World', 'foo-bar' ); // with allowedTextDomain = [ 'foo-bar' ]
 
 This rule accepts a single options argument:
 
-- Set `allowedTextDomain` to specify the list of allowed text domains, e.g. `[ 'foo', 'bar' ]`. The default is `[ 'default' ]`.
+-   Set `allowedTextDomain` to specify the list of allowed text domains, e.g. `[ 'foo', 'bar' ]`. The default is `[ 'default' ]`.

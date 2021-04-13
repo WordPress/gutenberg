@@ -19,11 +19,11 @@ const Text = styled.span`
 `styled` can also be used as a function to apply custom styles to existing components:
 
 ```jsx
-const Component = ({ className }) => {
-	return <div className={className}>My Favorite Component</div>;
+const Component = ( { className } ) => {
+	return <div className={ className }>My Favorite Component</div>;
 };
 
-const StyledComponent = styled(Component)`
+const StyledComponent = styled( Component )`
 	color: green;
 `;
 ```
@@ -42,7 +42,7 @@ const Text = styled.span`
 const Container = styled.div`
 	display: flex;
 
-	${Text} {
+	${ Text } {
 		color: blue;
 	}
 `;
@@ -66,8 +66,8 @@ This is even more powerful when combining elements:
 
 ```jsx
 <VStack as="form">
-	<HStack as={Button} variant="primary">
-		<View as="span" css={{ color: 'red' }}>
+	<HStack as={ Button } variant="primary">
+		<View as="span" css={ { color: 'red' } }>
 			Click me!
 		</View>
 	</HStack>
@@ -85,8 +85,8 @@ interface Props {
 	foo: string;
 }
 
-function MyButton(props: ViewOwnProps<Props, 'button'>) {
-	return <View as="button" {...props} />;
+function MyButton( props: ViewOwnProps< Props, 'button' > ) {
+	return <View as="button" { ...props } />;
 }
 ```
 

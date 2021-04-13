@@ -1,5 +1,4 @@
-Block Title
-===========
+# Block Title
 
 Renders the block's configured title as a string, or empty if the title cannot be determined.
 

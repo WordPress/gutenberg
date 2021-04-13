@@ -1,4 +1,3 @@
-
 # Gutenberg as a Development Platform
 
 The Gutenberg Project is not only building a better editor for WordPress, but also creating a platform to build upon. This platform consists of a set of JavaScript packages and tools that you can use in your web application. [View the list packages available on npm](https://www.npmjs.com/org/wordpress).
@@ -21,9 +20,7 @@ Usage in React:
 import { Button } from '@wordpress/components';
 
 function MyApp() {
-   return (
-      <Button>Hello Button</Button>
-   );
+	return <Button>Hello Button</Button>;
 }
 ```
 
@@ -61,4 +58,3 @@ You can also play with the [Gutenberg Example #03](https://github.com/WordPress/
 The [`@wordpress/block-editor` package](https://developer.wordpress.org/block-editor/packages/packages-block-editor/) allows you to create and use standalone block editors.
 
 You can learn more by reading the [tutorial "Building a custom block editor"](/docs/reference-guides/platform/custom-block-editor/README.md).
-
