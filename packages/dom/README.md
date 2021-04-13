@@ -24,7 +24,7 @@ _Parameters_
 
 _Returns_
 
--   `?DOMRect`: The rectangle.
+-   `DOMRect | null`: The rectangle.
 
 <a name="documentHasSelection" href="#documentHasSelection">#</a> **documentHasSelection**
 
@@ -151,8 +151,8 @@ the latter.
 
 _Parameters_
 
--   _newNode_ `Element`: Node to be inserted.
--   _referenceNode_ `Element`: Node after which to perform the insertion.
+-   _newNode_ `Node`: Node to be inserted.
+-   _referenceNode_ `Node`: Node after which to perform the insertion.
 
 _Returns_
 
@@ -204,11 +204,11 @@ and has a valueAsNumber
 
 _Parameters_
 
--   _element_ `HTMLElement`: The HTML element.
+-   _node_ `Node`: The HTML node.
 
 _Returns_
 
--   `boolean`: True if the element is input and holds a number.
+-   `node is HTMLInputElement`: True if the node is input and holds a number.
 
 <a name="isPhrasingContent" href="#isPhrasingContent">#</a> **isPhrasingContent**
 
@@ -245,11 +245,11 @@ See: <https://html.spec.whatwg.org/#textFieldSelection>
 
 _Parameters_
 
--   _element_ `HTMLElement`: The HTML element.
+-   _node_ `Node`: The HTML element.
 
 _Returns_
 
--   `boolean`: True if the element is an text field, false if not.
+-   `element is HTMLElement`: True if the element is an text field, false if not.
 
 <a name="isVerticalEdge" href="#isVerticalEdge">#</a> **isVerticalEdge**
 
@@ -272,6 +272,7 @@ _Parameters_
 
 -   _container_ `Element`: Focusable element.
 -   _isReverse_ `boolean`: True for end, false for start.
+-   _mayUseScroll_ `boolean`: Whether to allow scrolling.
 
 <a name="placeCaretAtVerticalEdge" href="#placeCaretAtVerticalEdge">#</a> **placeCaretAtVerticalEdge**
 
@@ -290,7 +291,7 @@ Given a DOM node, removes it from the DOM.
 
 _Parameters_
 
--   _node_ `Element`: Node to be removed.
+-   _node_ `Node`: Node to be removed.
 
 _Returns_
 

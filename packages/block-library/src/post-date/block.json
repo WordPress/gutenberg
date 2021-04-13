@@ -8,12 +8,13 @@
 		},
 		"format": {
 			"type": "string"
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false
 		}
 	},
-	"usesContext": [
-		"postId",
-		"postType"
-	],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,
 		"color": {

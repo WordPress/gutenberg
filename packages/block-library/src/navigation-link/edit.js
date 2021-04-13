@@ -46,8 +46,11 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { ItemSubmenuIcon } from './icons';
+import { name } from './block.json';
 
 const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/spacer' ];
+
+const MAX_NESTING = 5;
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -117,6 +120,8 @@ function getSuggestionsQuery( type, kind ) {
 			return { type: 'term', subtype: 'category' };
 		case 'tag':
 			return { type: 'term', subtype: 'post_tag' };
+		case 'post_format':
+			return { type: 'post-format' };
 		default:
 			if ( kind === 'taxonomy' ) {
 				return { type: 'term', subtype: type };
@@ -162,6 +167,7 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const {
+		isAtMaxNesting,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
@@ -175,6 +181,7 @@ export default function NavigationLinkEdit( {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
+				getBlockParentsByBlockName,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -183,6 +190,9 @@ export default function NavigationLinkEdit( {
 				.length;
 
 			return {
+				isAtMaxNesting:
+					getBlockParentsByBlockName( clientId, name ).length >=
+					MAX_NESTING,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
@@ -287,9 +297,10 @@ export default function NavigationLinkEdit( {
 
 		return {
 			id: page.id,
-			postType,
+			type: postType,
 			title: page.title.rendered,
 			url: page.link,
+			kind: 'post-type',
 		};
 	}
 
@@ -380,12 +391,14 @@ export default function NavigationLinkEdit( {
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ () => setIsLinkOpen( true ) }
 					/>
-					<ToolbarButton
-						name="submenu"
-						icon={ addSubmenu }
-						title={ __( 'Add submenu' ) }
-						onClick={ insertLinkBlock }
-					/>
+					{ ! isAtMaxNesting && (
+						<ToolbarButton
+							name="submenu"
+							icon={ addSubmenu }
+							title={ __( 'Add submenu' ) }
+							onClick={ insertLinkBlock }
+						/>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
@@ -450,7 +463,6 @@ export default function NavigationLinkEdit( {
 							}
 							aria-label={ __( 'Navigation link text' ) }
 							placeholder={ itemLabelPlaceholder }
-							keepPlaceholderOnFocus
 							withoutInteractiveFormatting
 							allowedFormats={ [
 								'core/bold',
@@ -512,6 +524,8 @@ export default function NavigationLinkEdit( {
 									url: newURL = '',
 									opensInNewTab: newOpensInNewTab,
 									id,
+									kind: newKind = '',
+									type: newType = '',
 								} = {} ) =>
 									setAttributes( {
 										url: encodeURI( newURL ),
@@ -539,6 +553,14 @@ export default function NavigationLinkEdit( {
 										} )(),
 										opensInNewTab: newOpensInNewTab,
 										id,
+										...( newKind && {
+											kind: newKind,
+										} ),
+										...( newType &&
+											newType !== 'URL' &&
+											newType !== 'post-format' && {
+												type: newType,
+											} ),
 									} )
 								}
 							/>

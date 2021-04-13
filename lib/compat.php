@@ -14,7 +14,7 @@
  * @return bool
  */
 function gutenberg_should_load_separate_block_assets() {
-	$load_separate_styles = gutenberg_is_fse_theme();
+	$load_separate_styles = gutenberg_supports_block_templates();
 	/**
 	 * Determine if separate styles will be loaded for blocks on-render or not.
 	 *
@@ -192,3 +192,18 @@ function gutenberg_override_reusable_block_post_type_labels() {
 	);
 }
 add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );
+
+/**
+ * Update allowed inline style attributes list.
+ *
+ * Note: This should be removed when the minimum required WP version is >= 5.8.
+ *
+ * @param string[] $attrs Array of allowed CSS attributes.
+ * @return string[] CSS attributes.
+ */
+function gutenberg_safe_style_attrs( $attrs ) {
+	$attrs[] = 'object-position';
+
+	return $attrs;
+}
+add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs' );

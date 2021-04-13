@@ -134,10 +134,7 @@ function ParagraphBlock( {
 						  )
 				}
 				data-empty={ content ? false : true }
-				placeholder={
-					placeholder ||
-					__( 'Start writing or type / to choose a block' )
-				}
+				placeholder={ placeholder || __( 'Type / to choose a block' ) }
 				__unstableEmbedURLOnPaste
 				__unstableAllowPrefixTransformations
 			/>

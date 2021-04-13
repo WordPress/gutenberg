@@ -14,7 +14,7 @@ import {
 /**
  * Middleware handling media upload failures and retries.
  *
- * @type {import('../types').ApiFetchMiddleware}
+ * @type {import('../types').APIFetchMiddleware}
  */
 const mediaUploadMiddleware = ( options, next ) => {
 	const isMediaUploadRequest =
