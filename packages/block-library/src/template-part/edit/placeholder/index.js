@@ -55,21 +55,17 @@ export default function TemplatePartPlaceholder( {
 			) }
 		>
 			<Dropdown
+				className="wp-block-template-part__placeholder-preview-dropdown"
 				contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
 				position="bottom right left"
 				renderToggle={ ( { isOpen, onToggle } ) => (
-					<>
-						<Button
-							isPrimary
-							onClick={ onToggle }
-							aria-expanded={ isOpen }
-						>
-							{ __( 'Choose existing' ) }
-						</Button>
-						<Button isTertiary onClick={ onCreate }>
-							{ __( 'New template part' ) }
-						</Button>
-					</>
+					<Button
+						isPrimary
+						onClick={ onToggle }
+						aria-expanded={ isOpen }
+					>
+						{ __( 'Choose existing' ) }
+					</Button>
 				) }
 				renderContent={ ( { onClose } ) => (
 					<TemplatePartSelection
@@ -78,6 +74,9 @@ export default function TemplatePartPlaceholder( {
 					/>
 				) }
 			/>
+			<Button isTertiary onClick={ onCreate }>
+				{ __( 'New template part' ) }
+			</Button>
 		</Placeholder>
 	);
 }
