@@ -52,6 +52,62 @@ const transforms = {
 					]
 				),
 		},
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			transform: (
+				{ align, anchor, backgroundColor, gradient, style },
+				innerBlocks
+			) => {
+				/*
+				 * If a cover block has no background, it displays the "placeholder" state,
+				 * which makes it look like it has no contents.
+				 *
+				 * As this could be confusing to users during a transform, if there aren't any
+				 * existing background colors or gradients in the group, default to 'white' so
+				 * that the transformed group's block contents are not hidden.
+				 */
+				let coverOverlayColor = backgroundColor;
+				if (
+					! (
+						coverOverlayColor ||
+						style?.color?.background ||
+						style?.color?.gradient ||
+						gradient
+					)
+				) {
+					coverOverlayColor = 'white';
+				}
+
+				/*
+				 * Clone the blocks to be transformed.
+				 * Failing to create new block references causes the original blocks
+				 * to be replaced in the switchToBlockType call thereby meaning they
+				 * are removed both from their original location and within the
+				 * new cover block.
+				 */
+				const coverInnerBlocks = innerBlocks.map( ( block ) => {
+					return createBlock(
+						block.name,
+						block.attributes,
+						block.innerBlocks
+					);
+				} );
+
+				return createBlock(
+					'core/cover',
+					{
+						align,
+						anchor,
+						overlayColor: coverOverlayColor,
+						customOverlayColor: style?.color?.background,
+						gradient,
+						customGradient: style?.color?.gradient,
+					},
+					coverInnerBlocks
+				);
+			},
+		},
 	],
 	to: [
 		{
