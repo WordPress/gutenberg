@@ -1876,16 +1876,14 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
 
 /**
  * Determines the items that appear in the available pattern transforms list.
- * There is special handling in two cases:
- * 1. For some blocks (`blocksToSkip`) when multiple blocks are selected,
- * don't show any transforms, as it doesn't make sense to try to be too smart.
- * 2. There are some blocks (`nestedSingleBlocksToHandle`) that makes sense to
- * replace everything when they are the only block selected.
  *
- * For the rest blocks we return a first set of possible eligible block patterns,
- * by checking the `scope` Patterns API. We still have to recurse through block
- * pattern's blocks and try to find matches from the selected blocks. Now this
- * happens in the consumer to avoid heavy operations in the selector.
+ * For now we only handle blocks without InnerBlocks and take into account
+ * the `__experimentalRole` property of blocks' attributes for the transformation.
+ *
+ * We return the first set of possible eligible block patterns,
+ * by checking the `blockTypes` property. We still have to recurse through
+ * block pattern's blocks and try to find matches from the selected blocks.
+ * Now this happens in the consumer to avoid heavy operations in the selector.
  *
  * @param {Object}  state Editor state.
  * @param {Object[]} blocks The selected blocks.
@@ -1899,8 +1897,8 @@ export const __experimentalGetPatternTransformItems = createSelector(
 		if ( ! blocks ) return EMPTY_ARRAY;
 		/**
 		 * For now we only handle blocks without InnerBlocks and take into account
-		 * the `role` property of blocks' attributes for the transformation.  Note
-		 * that the blocks have been retrieved through `getBlock`, which doesn't
+		 * the `__experimentalRole` property of blocks' attributes for the transformation.
+		 * Note that the blocks have been retrieved through `getBlock`, which doesn't
 		 * return the inner blocks of an inner block controller, so we still need
 		 * to check for this case too.
 		 */

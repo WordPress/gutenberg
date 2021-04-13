@@ -77,6 +77,10 @@ export const getPatternTransformedBlocks = (
 };
 
 /**
+ * @typedef {WPBlockPattern & {transformedBlocks: WPBlock[]}} TransformedBlockPattern
+ */
+
+/**
  * Custom hook that accepts patterns from state and the selected
  * blocks and tries to match these with the pattern's blocks.
  * If all selected blocks are matched with a Pattern's block,
@@ -86,7 +90,7 @@ export const getPatternTransformedBlocks = (
  *
  * @param {WPBlockPattern[]} patterns Patterns from state.
  * @param {WPBlock[]} selectedBlocks The currently selected blocks.
- * @return {WPBlockPattern[]} Returns the eligible matched patterns with all the selected blocks.
+ * @return {TransformedBlockPattern[]} Returns the eligible matched patterns with all the selected blocks.
  */
 // TODO tests
 const useTransformedPatterns = ( patterns, selectedBlocks ) => {

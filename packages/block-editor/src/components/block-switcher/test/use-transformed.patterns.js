@@ -20,15 +20,15 @@ describe( 'use-transformed-patterns', () => {
 				},
 				content: {
 					type: 'boolean',
-					role: 'content',
+					__experimentalRole: 'content',
 				},
 				level: {
 					type: 'number',
-					role: 'content',
+					__experimentalRole: 'content',
 				},
 				color: {
 					type: 'string',
-					role: 'other',
+					__experimentalRole: 'other',
 				},
 			},
 			save() {},
