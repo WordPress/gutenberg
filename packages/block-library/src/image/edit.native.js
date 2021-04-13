@@ -27,6 +27,7 @@ import {
 	LinkSettingsNavigation,
 	BottomSheetTextControl,
 	FooterMessageLink,
+	Badge,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -547,7 +548,7 @@ export class ImageEdit extends Component {
 		};
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
-			<>
+			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>
 				<TouchableWithoutFeedback
 					accessible={ ! isSelected }
 					onPress={ this.onImagePressed }
@@ -584,7 +585,6 @@ export class ImageEdit extends Component {
 										isSelected={
 											isSelected && ! isCaptionSelected
 										}
-										isFeaturedImage={ isFeaturedImage }
 										isUploadFailed={ isUploadFailed }
 										isUploadInProgress={
 											isUploadInProgress
@@ -612,7 +612,7 @@ export class ImageEdit extends Component {
 					onBlur={ this.props.onBlur } // always assign onBlur as props
 					insertBlocksAfter={ this.props.insertBlocksAfter }
 				/>
-			</>
+			</Badge>
 		);
 
 		return (
