@@ -1,4 +1,4 @@
 /**
  * Internal dependencies
  */
-import './components';
+import './replace-media-upload';
