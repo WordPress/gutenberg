@@ -132,3 +132,29 @@ register_block_pattern(
 						<!-- /wp:group -->',
 	)
 );
+
+// Initial block patterns to be used in block transformations with patterns.
+register_block_pattern(
+	'paragraph/large-with-background-color',
+	array(
+		'title'         => __( 'Large Paragraph with background color', 'gutenberg' ),
+		'blockTypes'    => array( 'core/paragraph' ),
+		'viewportWidth' => 500,
+		'content'       => '<!-- wp:paragraph {"style":{"color":{"link":"#FFFFFF","text":"#FFFFFF","background":"#000000"},"typography":{"lineHeight":"1.3","fontSize":"26px"}}} -->
+						 	<p class="has-text-color has-background has-link-color" style="--wp--style--color--link:#FFFFFF;background-color:#000000;color:#FFFFFF;font-size:26px;line-height:1.3">The whole series of my life appeared to me as a dream; I sometimes doubted if indeed it were all true, for it never presented itself to my mind with the force of reality.</p>
+							<!-- /wp:paragraph -->',
+	)
+);
+register_block_pattern(
+	'social-links/shared-background-color',
+	array(
+		'title'         => __( 'Social links with a shared background color', 'gutenberg' ),
+		'blockTypes'    => array( 'core/social-links' ),
+		'viewportWidth' => 500,
+		'content'       => '<!-- wp:social-links {"customIconColor":"#ffffff","iconColorValue":"#ffffff","customIconBackgroundColor":"#3962e3","iconBackgroundColorValue":"#3962e3","className":"has-icon-color"} -->
+							<ul class="wp-block-social-links has-icon-color has-icon-background-color"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /-->
+							<!-- wp:social-link {"url":"#","service":"chain"} /-->
+							<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
+							<!-- /wp:social-links -->',
+	)
+);
