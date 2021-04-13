@@ -25,11 +25,18 @@ function TemplateTitle() {
 		return null;
 	}
 
+	let templateTitle = __( 'Default' );
+	if ( template?.title?.raw ) {
+		templateTitle = template.title.raw;
+	} else if ( !! template ) {
+		templateTitle = template.slug;
+	}
+
 	return (
 		<span className="edit-post-template-title">
 			{
 				/* translators: 1: Template name. */
-				sprintf( __( 'Editing template: %s' ), template.slug )
+				sprintf( __( 'Editing template: %s' ), templateTitle )
 			}
 		</span>
 	);

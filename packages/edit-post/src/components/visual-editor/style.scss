@@ -23,6 +23,15 @@
 	@supports (position: sticky) {
 		flex-basis: 100%;
 	}
+
+	&.is-template-mode {
+		padding: $grid-unit-60;
+
+		.editor-styles-wrapper {
+			border-radius: 2px;
+			border: 1px solid $gray-300;
+		}
+	}
 }
 
 .editor-styles-wrapper {
@@ -54,4 +63,10 @@
 		// This rule can be retired once the title becomes an actual block.
 		margin-bottom: $default-block-margin;
 	}
+}
+
+.edit-post-visual-editor__exit-template-mode {
+	position: absolute;
+	top: $grid-unit-10;
+	left: $grid-unit-10;
 }

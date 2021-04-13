@@ -59,18 +59,20 @@ function PostTemplate() {
 		return null;
 	}
 
+	const templateTitle = (
+		<>
+			{ !! template && template?.title?.raw }
+			{ !! template && ! template?.title?.raw && template.slug }
+			{ ! template && __( 'Default' ) }
+		</>
+	);
+
 	return (
 		<PanelRow className="edit-post-post-template">
 			<span>{ __( 'Template' ) }</span>
 			{ ! isEditing && (
 				<div className="edit-post-post-template__value">
-					<div>
-						{ !! template && template?.title?.raw }
-						{ !! template &&
-							! template?.title?.raw &&
-							template.slug }
-						{ ! template && __( 'Default' ) }
-					</div>
+					<div>{ templateTitle }</div>
 					<div className="edit-post-post-template__actions">
 						{ !! template && (
 							<Button
@@ -90,7 +92,7 @@ function PostTemplate() {
 			) }
 			{ isEditing && (
 				<span className="edit-post-post-template__value">
-					{ template?.slug }
+					{ templateTitle }
 				</span>
 			) }
 			{ isModalOpen && (
