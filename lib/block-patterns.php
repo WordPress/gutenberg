@@ -159,6 +159,7 @@ register_block_pattern(
 	'paragraph/large-with-background-color',
 	array(
 		'title'         => __( 'Large Paragraph with background color', 'gutenberg' ),
+		'categories'    => array( 'Text' ),
 		'blockTypes'    => array( 'core/paragraph' ),
 		'viewportWidth' => 500,
 		'content'       => '<!-- wp:paragraph {"style":{"color":{"link":"#FFFFFF","text":"#FFFFFF","background":"#000000"},"typography":{"lineHeight":"1.3","fontSize":"26px"}}} -->
@@ -170,6 +171,7 @@ register_block_pattern(
 	'social-links/shared-background-color',
 	array(
 		'title'         => __( 'Social links with a shared background color', 'gutenberg' ),
+		'categories'    => array( 'Buttons' ),
 		'blockTypes'    => array( 'core/social-links' ),
 		'viewportWidth' => 500,
 		'content'       => '<!-- wp:social-links {"customIconColor":"#ffffff","iconColorValue":"#ffffff","customIconBackgroundColor":"#3962e3","iconBackgroundColorValue":"#3962e3","className":"has-icon-color"} -->
