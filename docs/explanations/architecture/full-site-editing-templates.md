@@ -22,22 +22,22 @@ The synchronization consists of duplicating the theme templates in the `wp_templ
 
 This means:
 
- - The rendering/fetching of templates only need to consider the custom post type templates. It is not necessary to fetch the template files from the theme folder directly. The synchronization will ensure these are duplicated in the CPT.
- - Untouched theme templates have the `auto-draft` status.
- - Edited theme templates have the `publish` status.
+-   The rendering/fetching of templates only need to consider the custom post type templates. It is not necessary to fetch the template files from the theme folder directly. The synchronization will ensure these are duplicated in the CPT.
+-   Untouched theme templates have the `auto-draft` status.
+-   Edited theme templates have the `publish` status.
 
 The synchronization is important for two different flows:
 
- - When editing the template and template parts, the site editor frontend fetches the edited and available templates through the REST API. This means that for all `GET` API requests performed to the `wp-templates` and `wp-template-parts` endpoint synchronization is required.
- - When rendering a template (sometimes referred to as "resolving a template"): this is the algorithm that WordPress follows to traverse the template hierarchy and find the right template to render for the current page being loaded.
- - When exporting a block-based theme, we need to export all its templates back as files. The synchronization is required to simplify the operation and only export the CPT templates.
+-   When editing the template and template parts, the site editor frontend fetches the edited and available templates through the REST API. This means that for all `GET` API requests performed to the `wp-templates` and `wp-template-parts` endpoint synchronization is required.
+-   When rendering a template (sometimes referred to as "resolving a template"): this is the algorithm that WordPress follows to traverse the template hierarchy and find the right template to render for the current page being loaded.
+-   When exporting a block-based theme, we need to export all its templates back as files. The synchronization is required to simplify the operation and only export the CPT templates.
 
 ## Switching themes
 
 Since block-based themes make use of templates that can refer to each other and that can be saved to a custom post type, it becomes possible to mix templates and template parts from different themes. For example:
 
- - A user might like the "header" template part of theme A and would like to use it in theme B.
- - A user might like the "contact" template from theme A and would like to use it in theme B.
+-   A user might like the "header" template part of theme A and would like to use it in theme B.
+-   A user might like the "contact" template from theme A and would like to use it in theme B.
 
 Enabling these flows will require well thought UIs and experience. For the current phase of Full-site editing, we're starting by forbidding these possibilities and making template and template-parts theme specific.
 

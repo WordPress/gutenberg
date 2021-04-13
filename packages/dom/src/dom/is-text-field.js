@@ -1,15 +1,20 @@
 /**
+ * Internal dependencies
+ */
+import isHTMLInputElement from './is-html-input-element';
+
+/* eslint-disable jsdoc/valid-types */
+/**
  * Check whether the given element is a text field, where text field is defined
  * by the ability to select within the input, or that it is contenteditable.
  *
  * See: https://html.spec.whatwg.org/#textFieldSelection
  *
- * @param {HTMLElement} element The HTML element.
- *
- * @return {boolean} True if the element is an text field, false if not.
+ * @param {Node} node The HTML element.
+ * @return {element is HTMLElement} True if the element is an text field, false if not.
  */
-export default function isTextField( element ) {
-	const { nodeName, contentEditable } = element;
+export default function isTextField( node ) {
+	/* eslint-enable jsdoc/valid-types */
 	const nonTextInputs = [
 		'button',
 		'checkbox',
@@ -23,8 +28,10 @@ export default function isTextField( element ) {
 		'number',
 	];
 	return (
-		( nodeName === 'INPUT' && ! nonTextInputs.includes( element.type ) ) ||
-		nodeName === 'TEXTAREA' ||
-		contentEditable === 'true'
+		( isHTMLInputElement( node ) &&
+			node.type &&
+			! nonTextInputs.includes( node.type ) ) ||
+		node.nodeName === 'TEXTAREA' ||
+		/** @type {HTMLElement} */ ( node ).contentEditable === 'true'
 	);
 }

@@ -10,7 +10,7 @@ export const _default = () => {
 	const wrapperStyle = { margin: '24px 0', position: 'relative' };
 	return (
 		<div style={ wrapperStyle }>
-			<BlockDraggableChip clientIds={ [ 1, 2 ] } />
+			<BlockDraggableChip count={ 2 } />
 		</div>
 	);
 };

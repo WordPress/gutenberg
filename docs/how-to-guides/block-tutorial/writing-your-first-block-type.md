@@ -6,7 +6,7 @@ Blocks containing static content are implemented entirely in JavaScript using th
 
 ## Enqueuing Block Scripts
 
-While the block's editor behaviors are implemented in JavaScript, you'll need to register your block server-side to ensure that the script is enqueued when the editor loads. Register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings. 
+While the block's editor behaviors are implemented in JavaScript, you'll need to register your block server-side to ensure that the script is enqueued when the editor loads. Register scripts and styles using [`wp_register_script`](https://developer.wordpress.org/reference/functions/wp_register_script/) and [`wp_register_style`](https://developer.wordpress.org/reference/functions/wp_register_style/), then assign these as handles associated with your block using the `script`, `style`, `editor_script`, and `editor_style` block type registration settings.
 
 The `editor_script` and `editor_style` files will only be enqueued in the editor, while the `script` and `style` will be enqueued both in the editor and when viewing a post on the front of your site.
 
@@ -36,13 +36,12 @@ function gutenberg_examples_01_register_block() {
 add_action( 'init', 'gutenberg_examples_01_register_block' );
 ```
 
-Note the above example, shows using the [wp-scripts build step](/docs/how-to-guides/javascript/js-build-setup/) that automatically sets dependencies and versions the file. 
+Note the above example, shows using the [wp-scripts build step](/docs/how-to-guides/javascript/js-build-setup/) that automatically sets dependencies and versions the file.
 
 If you were using the ES5 code, you would specify `array( 'wp-blocks', 'wp-element' )` as the dependency array. See the [example 01](https://github.com/WordPress/gutenberg-examples/blob/HEAD/01-basic/index.php) in Gutenberg Examples repository for full syntax.
 
-- __`wp-blocks`__ includes block type registration and related functions
-- __`wp-element`__ includes the [WordPress Element abstraction](/packages/element/README.md) for describing the structure of your blocks
-
+-   **`wp-blocks`** includes block type registration and related functions
+-   **`wp-element`** includes the [WordPress Element abstraction](/packages/element/README.md) for describing the structure of your blocks
 
 ## Registering the Block
 
@@ -50,6 +49,7 @@ With the script enqueued, let's look at the implementation of the block itself:
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps } from '@wordpress/block-editor';
@@ -69,18 +69,26 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 	edit() {
 		const blockProps = useBlockProps( { style: blockStyle } );
 
-		return <div { ...blockProps }>Hello World, step 1 (from the editor).</div>;
+		return (
+			<div { ...blockProps }>Hello World, step 1 (from the editor).</div>
+		);
 	},
 	save() {
 		const blockProps = useBlockProps.save( { style: blockStyle } );
 
-		return <div { ...blockProps }>Hello World, step 1 (from the frontend).</div>;
+		return (
+			<div { ...blockProps }>
+				Hello World, step 1 (from the frontend).
+			</div>
+		);
 	},
 } );
 ```
+
 {% ES5 %}
+
 ```js
-( function( blocks, element, blockEditor ) {
+( function ( blocks, element, blockEditor ) {
 	var el = element.createElement;
 	var useBlockProps = blockEditor.useBlockProps;
 
@@ -96,7 +104,7 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 		icon: 'universal-access-alt',
 		category: 'design',
 		example: {},
-		edit: function() {
+		edit: function () {
 			var blockProps = useBlockProps( { style: blockStyle } );
 			return el(
 				'p',
@@ -104,7 +112,7 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 				'Hello World, step 1 (from the editor).'
 			);
 		},
-		save: function() {
+		save: function () {
 			var blockProps = useBlockProps.save( { style: blockStyle } );
 			return el(
 				'p',
@@ -113,12 +121,9 @@ registerBlockType( 'gutenberg-examples/example-01-basic-esnext', {
 			);
 		},
 	} );
-}(
-	window.wp.blocks,
-	window.wp.element,
-	window.wp.blockEditor
-) );
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
 ```
+
 {% end %}
 
 _By now you should be able to see `Hello World, step 1 (from the editor).` in the admin side and `Hello World, step 1 (from the frontend).` on the frontend side._

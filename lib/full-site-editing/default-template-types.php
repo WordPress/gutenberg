@@ -30,12 +30,8 @@ function gutenberg_get_default_template_types() {
 			'description' => __( 'Template used for displaying single views of the content. This template is a fallback for the Single, Post, and Page templates, which take precedence when they exist.', 'gutenberg' ),
 		),
 		'single'         => array(
-			'title'       => _x( 'Single', 'Template name', 'gutenberg' ),
+			'title'       => _x( 'Single Post', 'Template name', 'gutenberg' ),
 			'description' => __( 'Template used to display a single blog post.', 'gutenberg' ),
-		),
-		'single-post'    => array(
-			'title'       => _x( 'Post', 'Template name', 'gutenberg' ),
-			'description' => __( 'Template used to display a single post type.', 'gutenberg' ),
 		),
 		'page'           => array(
 			'title'       => _x( 'Page', 'Template name', 'gutenberg' ),

@@ -17,7 +17,7 @@ Using compose:
 
 ```js
 const applyWithSelect = withSelect( ( select, ownProps ) => {
-	return doSomething( select, ownProps);
+	return doSomething( select, ownProps );
 } );
 const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 	return doSomethingElse( dispatch, ownProps );
@@ -26,7 +26,7 @@ const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 export default compose(
 	withPluginContext,
 	applyWithSelect,
-	applyWithDispatch,
+	applyWithDispatch
 )( PluginSidebarMoreMenuItem );
 ```
 
@@ -34,18 +34,14 @@ Without `compose`, the code would look like this:
 
 ```js
 const applyWithSelect = withSelect( ( select, ownProps ) => {
-	return doSomething( select, ownProps);
+	return doSomething( select, ownProps );
 } );
 const applyWithDispatch = withDispatch( ( dispatch, ownProps ) => {
 	return doSomethingElse( dispatch, ownProps );
 } );
 
 export default withPluginContext(
-	applyWithSelect(
-		applyWithDispatch(
-			PluginSidebarMoreMenuItem
-		)
-	)
+	applyWithSelect( applyWithDispatch( PluginSidebarMoreMenuItem ) )
 );
 ```
 

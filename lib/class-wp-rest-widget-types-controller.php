@@ -235,8 +235,11 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		$widgets = array();
 
 		foreach ( $wp_registered_widgets as $widget ) {
-			$parsed_id    = gutenberg_parse_widget_id( $widget['id'] );
-			$widget['id'] = $parsed_id['id_base'];
+			$parsed_id     = gutenberg_parse_widget_id( $widget['id'] );
+			$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
+
+			$widget['id']       = $parsed_id['id_base'];
+			$widget['is_multi'] = (bool) $widget_object;
 
 			unset( $widget['callback'] );
 
@@ -251,7 +254,6 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			$widget['classname'] = ltrim( $classname, '_' );
 
 			// Backwards compatibility. TODO: Remove.
-			$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
 			if ( $widget_object ) {
 				$widget['option_name']  = $widget_object->option_name;
 				$widget['widget_class'] = get_class( $widget_object );
@@ -301,6 +303,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		$extra_fields = array(
 			'name',
 			'description',
+			'is_multi',
 			'classname',
 			'widget_class',
 			'option_name',
@@ -397,6 +400,12 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'view', 'edit', 'embed' ),
+				),
+				'is_multi'                    => array(
+					'description' => __( 'Whether the widget supports multiple instances', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view', 'edit', 'embed' ),
+					'readonly'    => true,
 				),
 				'classname'                   => array(
 					'description' => __( 'Class name', 'gutenberg' ),

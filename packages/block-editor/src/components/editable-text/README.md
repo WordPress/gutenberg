@@ -6,40 +6,40 @@ Renders an editable text input in which text formatting is not allowed.
 
 ### `value: String`
 
-*Required.* String to make editable.
+_Required._ String to make editable.
 
 ### `onChange( value: String ): Function`
 
-*Required.* Called when the value changes.
+_Required._ Called when the value changes.
 
 ### `tagName: String`
 
-*Default: `div`.* The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element. Elements that display inline are not supported. Set to `inline-block` to use tag names that have `inline` as the default.
+_Default: `div`._ The [tag name](https://www.w3.org/TR/html51/syntax.html#tag-name) of the editable element. Elements that display inline are not supported. Set to `inline-block` to use tag names that have `inline` as the default.
 
 ### `disableLineBreaks: Boolean`
 
-*Optional.* `Text` won't insert line breaks on `Enter` if set to `true`.
+_Optional._ `Text` won't insert line breaks on `Enter` if set to `true`.
 
 ### `placeholder: String`
 
-*Optional.* Placeholder text to show when the field is empty, similar to the
-  [`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
+_Optional._ Placeholder text to show when the field is empty, similar to the
+[`input` and `textarea` attribute of the same name](https://developer.mozilla.org/en-US/docs/Learn/HTML/Forms/HTML5_updates#The_placeholder_attribute).
 
 ### `onSplit( value: String ): Function`
 
-*Optional.* Called when the content can be split, where `value` is a piece of content being split off. Here you should create a new block with that content and return it. Note that you also need to provide `onReplace` in order for this to take any effect.
+_Optional._ Called when the content can be split, where `value` is a piece of content being split off. Here you should create a new block with that content and return it. Note that you also need to provide `onReplace` in order for this to take any effect.
 
 ### `onReplace( blocks: Array ): Function`
 
-*Optional.* Called when the `Text` instance can be replaced with the given blocks.
+_Optional._ Called when the `Text` instance can be replaced with the given blocks.
 
 ### `onMerge( forward: Boolean ): Function`
 
-*Optional.* Called when blocks can be merged. `forward` is true when merging with the next block, false when merging with the previous block.
+_Optional._ Called when blocks can be merged. `forward` is true when merging with the next block, false when merging with the previous block.
 
 ### `onRemove( forward: Boolean ): Function`
 
-*Optional.* Called when the block can be removed. `forward` is true when the selection is expected to move to the next block, false to the previous block.
+_Optional._ Called when the block can be removed. `forward` is true when the selection is expected to move to the next block, false to the previous block.
 
 ## EditableText.Content
 
@@ -49,6 +49,7 @@ Renders an editable text input in which text formatting is not allowed.
 
 {% codetabs %}
 {% ES5 %}
+
 ```js
 wp.blocks.registerBlockType( /* ... */, {
 	// ...
@@ -77,7 +78,9 @@ wp.blocks.registerBlockType( /* ... */, {
 	}
 } );
 ```
+
 {% ESNext %}
+
 ```js
 const { registerBlockType } = wp.blocks;
 const { EditableText } = wp.editor;
@@ -107,4 +110,5 @@ registerBlockType( /* ... */, {
 	}
 } );
 ```
+
 {% end %}

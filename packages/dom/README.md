@@ -204,11 +204,11 @@ and has a valueAsNumber
 
 _Parameters_
 
--   _element_ `HTMLElement`: The HTML element.
+-   _node_ `Node`: The HTML node.
 
 _Returns_
 
--   `boolean`: True if the element is input and holds a number.
+-   `node is HTMLInputElement`: True if the node is input and holds a number.
 
 <a name="isPhrasingContent" href="#isPhrasingContent">#</a> **isPhrasingContent**
 
@@ -245,11 +245,11 @@ See: <https://html.spec.whatwg.org/#textFieldSelection>
 
 _Parameters_
 
--   _element_ `HTMLElement`: The HTML element.
+-   _node_ `Node`: The HTML element.
 
 _Returns_
 
--   `boolean`: True if the element is an text field, false if not.
+-   `element is HTMLElement`: True if the element is an text field, false if not.
 
 <a name="isVerticalEdge" href="#isVerticalEdge">#</a> **isVerticalEdge**
 
@@ -304,8 +304,8 @@ Given a schema, unwraps or removes nodes, attributes and classes on HTML.
 _Parameters_
 
 -   _HTML_ `string`: The HTML to clean up.
--   _schema_ `Object`: Schema for the HTML.
--   _inline_ `Object`: Whether to clean for inline mode.
+-   _schema_ `import('./clean-node-list').Schema`: Schema for the HTML.
+-   _inline_ `boolean`: Whether to clean for inline mode.
 
 _Returns_
 

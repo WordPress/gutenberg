@@ -20,4 +20,3 @@ registerPlugin( 'post-status-info-test', { render: PluginPostStatusInfoTest } );
 ## Location
 
 ![Location in the Status & visibility panel](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/plugin-post-status-info-location.png?raw=true)
-
