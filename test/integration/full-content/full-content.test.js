@@ -98,7 +98,7 @@ describe( 'full post content fixture', () => {
 				parserOutputExpectedString = parsedJSONFixtureContent;
 			} else if ( process.env.GENERATE_MISSING_FIXTURES ) {
 				parserOutputExpectedString =
-					JSON.stringify( parserOutputActual, null, 4 ) + '\n';
+					JSON.stringify( parserOutputActual, null, '\t' ) + '\n';
 				writeBlockFixtureParsedJSON(
 					basename,
 					parserOutputExpectedString
@@ -152,7 +152,7 @@ describe( 'full post content fixture', () => {
 				blocksExpectedString = jsonFixtureContent;
 			} else if ( process.env.GENERATE_MISSING_FIXTURES ) {
 				blocksExpectedString =
-					JSON.stringify( blocksActualNormalized, null, 4 ) + '\n';
+					JSON.stringify( blocksActualNormalized, null, '\t' ) + '\n';
 				writeBlockFixtureJSON( basename, blocksExpectedString );
 			} else {
 				throw new Error(
