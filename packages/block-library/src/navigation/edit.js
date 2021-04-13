@@ -53,6 +53,7 @@ function Navigation( {
 	updateInnerBlocks,
 	className,
 	hasSubmenuIndicatorSetting = true,
+	hasItemJustificationControls = true,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -119,7 +120,7 @@ function Navigation( {
 	return (
 		<>
 			<BlockControls>
-				{ attributes.showJustifyControls && (
+				{ hasItemJustificationControls && (
 					<JustifyToolbar
 						value={ attributes.itemsJustification }
 						allowedControls={ justifyAllowedControls }

@@ -30,10 +30,6 @@
 		"showSubmenuIcon": {
 			"type": "boolean",
 			"default": true
-		},
-		"showJustifyControls": {
-			"type": "boolean",
-			"default": true
 		}
 	},
 	"providesContext": {
@@ -44,7 +40,6 @@
 		"fontSize": "fontSize",
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
-		"showJustifyControls": "showJustifyControls",
 		"style": "style",
 		"orientation": "orientation"
 	},
