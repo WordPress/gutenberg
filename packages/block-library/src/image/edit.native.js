@@ -14,7 +14,6 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
-	setFeaturedImage,
 	subscribeFeaturedImageIdCurrent,
 } from '@wordpress/react-native-bridge';
 import {
@@ -26,7 +25,6 @@ import {
 	Image,
 	WIDE_ALIGNMENTS,
 	LinkSettingsNavigation,
-	BottomSheet,
 	BottomSheetTextControl,
 	FooterMessageLink,
 } from '@wordpress/components';
@@ -46,7 +44,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { withSelect } from '@wordpress/data';
 import {
 	image as placeholderIcon,
 	replace,
@@ -92,8 +90,6 @@ export class ImageEdit extends Component {
 		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
-		this.onSetFeatured = this.onSetFeatured.bind( this );
-		this.onRemoveFeatured = this.onRemoveFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
@@ -279,18 +275,6 @@ export class ImageEdit extends Component {
 			...extraUpdatedAttributes,
 			align: nextAlign,
 		} );
-	}
-
-	onSetFeatured() {
-		const { attributes, closeSettingsBottomSheet } = this.props;
-		setFeaturedImage( attributes.id );
-		closeSettingsBottomSheet();
-	}
-
-	onRemoveFeatured() {
-		const { closeSettingsBottomSheet } = this.props;
-		setFeaturedImage( 0 );
-		closeSettingsBottomSheet();
 	}
 
 	featuredImageIdCurrent( payload ) {
@@ -487,7 +471,6 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
-			getStylesFromColorScheme,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
@@ -498,19 +481,6 @@ export class ImageEdit extends Component {
 
 		const isFeaturedImage =
 			attributes.featuredImageId === attributes.id ? true : false;
-
-		const featuredButtonStyle = getStylesFromColorScheme(
-			styles.featuredButton,
-			styles.featuredButtonDark
-		);
-
-		const setFeaturedButtonStyle = getStylesFromColorScheme(
-			styles.setFeaturedButton,
-			styles.setFeaturedButtonDark
-		);
-
-		// eslint-disable-next-line no-undef
-		const devOnly = __DEV__;
 
 		// eslint-disable-next-line no-unused-vars
 		const androidOnly = Platform.OS === 'android' ? true : false;
@@ -552,29 +522,6 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ devOnly && androidOnly && (
-					<PanelBody>
-						{ isFeaturedImage ? (
-							<BottomSheet.Cell
-								label={ __( 'Remove as Featured Image ' ) }
-								labelStyle={ [
-									featuredButtonStyle,
-									styles.removeFeaturedButton,
-								] }
-								onPress={ this.onRemoveFeatured }
-							/>
-						) : (
-							<BottomSheet.Cell
-								label={ __( 'Set as Featured Image ' ) }
-								labelStyle={ [
-									featuredButtonStyle,
-									setFeaturedButtonStyle,
-								] }
-								onPress={ this.onSetFeatured }
-							/>
-						) }
-					</PanelBody>
-				) }
 			</InspectorControls>
 		);
 
@@ -707,13 +654,6 @@ export default compose( [
 			imageSizes,
 			imageDefaultSize,
 			featuredImageId,
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		return {
-			closeSettingsBottomSheet() {
-				dispatch( 'core/edit-post' ).closeGeneralSidebar();
-			},
 		};
 	} ),
 	withPreferredColorScheme,
