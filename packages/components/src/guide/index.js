@@ -32,6 +32,7 @@ export default function Guide( {
 	useEffect( () => {
 		if ( Children.count( children ) ) {
 			deprecated( 'Passing children to <Guide>', {
+				since: '5.5',
 				alternative: 'the `pages` prop',
 			} );
 		}

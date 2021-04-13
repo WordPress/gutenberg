@@ -3,6 +3,15 @@
  */
 import 'react-native-gesture-handler/jestSetup';
 
+// Mock component to render with props rather than merely a string name so that
+// we may assert against it. ...args is used avoid warnings about ignoring
+// forwarded refs if React.forwardRef happens to be used.
+const mockComponent = ( element ) => ( ...args ) => {
+	const [ props ] = args;
+	const React = require( 'react' );
+	return React.createElement( element, props, props.children );
+};
+
 jest.mock( '@wordpress/element', () => {
 	return {
 		__esModule: true,
@@ -81,9 +90,14 @@ jest.mock( 'react-native-safe-area', () => {
 	};
 } );
 
-jest.mock( '@react-native-community/slider', () => () => 'Slider', {
-	virtual: true,
-} );
+jest.mock(
+	'@react-native-community/slider',
+	() => {
+		const { forwardRef } = require( 'react' );
+		return forwardRef( mockComponent( 'Slider' ) );
+	},
+	{ virtual: true }
+);
 
 if ( ! global.window.matchMedia ) {
 	global.window.matchMedia = () => ( {
@@ -126,3 +140,14 @@ jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );
 // undefined." The private module referenced could possibly be replaced with
 // a React ref instead. We could then remove this internal mock.
 jest.mock( 'react-native/Libraries/Components/TextInput/TextInputState' );
+
+// Mock native modules incompatible with testing environment
+jest.mock(
+	'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo',
+	() => ( {
+		addEventListener: jest.fn(),
+		announceForAccessibility: jest.fn(),
+		removeEventListener: jest.fn(),
+		isScreenReaderEnabled: jest.fn( () => Promise.resolve( false ) ),
+	} )
+);

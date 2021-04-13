@@ -6,7 +6,7 @@
 	}
 }
 
-// Make links unclickable in the editor
+// Make links unclickable in the editor.
 .wp-block-pages-list__item__link {
 	pointer-events: none;
 }
@@ -18,5 +18,19 @@
 
 	.components-spinner {
 		margin: 0.5em;
+	}
+}
+
+// Modal that shows conversion option.
+.wp-block-page-list-modal {
+	max-width: 400px;
+}
+
+.wp-block-page-list-modal-buttons {
+	display: flex;
+	justify-content: flex-end;
+
+	.components-button {
+		margin-left: $grid-unit-15;
 	}
 }

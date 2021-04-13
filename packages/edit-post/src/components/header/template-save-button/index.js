@@ -21,9 +21,6 @@ function TemplateSaveButton() {
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	return (
 		<>
-			<Button onClick={ () => setIsEditingTemplate( false ) } isTertiary>
-				{ __( 'Cancel' ) }
-			</Button>
 			<Button
 				isPrimary
 				onClick={ () => setIsEntitiesReviewPanelOpen( true ) }

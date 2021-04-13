@@ -196,17 +196,17 @@ function FileEdit( { attributes, setAttributes, noticeUI, noticeOperations } ) {
 			</BlockControls>
 			<div { ...blockProps }>
 				<div className={ 'wp-block-file__content-wrapper' }>
-					<div className="wp-block-file__textlink">
-						<RichText
-							tagName="div" // must be block-level or else cursor disappears
-							value={ fileName }
-							placeholder={ __( 'Write file name…' ) }
-							withoutInteractiveFormatting
-							onChange={ ( text ) =>
-								setAttributes( { fileName: text } )
-							}
-						/>
-					</div>
+					<RichText
+						style={ { display: 'inline-block' } }
+						tagName="a" // must be block-level or else cursor disappears
+						value={ fileName }
+						placeholder={ __( 'Write file name…' ) }
+						withoutInteractiveFormatting
+						onChange={ ( text ) =>
+							setAttributes( { fileName: text } )
+						}
+						href={ textLinkHref }
+					/>
 					{ showDownloadButton && (
 						<div
 							className={

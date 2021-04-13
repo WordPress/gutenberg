@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
 import {
 	SlotFillProvider,
 	DropZoneProvider,
@@ -17,10 +17,13 @@ import {
 	ComplementaryArea,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { EntitiesSavedStates, UnsavedChangesWarning } from '@wordpress/editor';
+import {
+	EntitiesSavedStates,
+	UnsavedChangesWarning,
+	store as editorStore,
+} from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
-
 /**
  * Internal dependencies
  */
@@ -65,10 +68,6 @@ function Editor( { initialSettings } ) {
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
 
-		// Prefetch and parse patterns. This ensures patterns are loaded and parsed when
-		// the editor is loaded rather than degrading the performance of the inserter.
-		select( 'core/block-editor' ).__experimentalGetAllowedPatterns();
-
 		// The currently selected entity to display. Typically template or template part.
 		return {
 			isInserterOpen: isInserterOpened(),
@@ -90,7 +89,7 @@ function Editor( { initialSettings } ) {
 			isNavigationOpen: isNavigationOpened(),
 		};
 	}, [] );
-	const { updateEditorSettings } = useDispatch( 'core/editor' );
+	const { updateEditorSettings } = useDispatch( editorStore );
 	const { setPage, setIsInserterOpened, updateSettings } = useDispatch(
 		editSiteStore
 	);
@@ -102,10 +101,13 @@ function Editor( { initialSettings } ) {
 	// so that they can be selected with core/editor selectors in any editor.
 	// This is needed because edit-site doesn't initialize with EditorProvider,
 	// which internally uses updateEditorSettings as well.
-	const { defaultTemplateTypes } = settings;
+	const { defaultTemplateTypes, defaultTemplatePartAreas } = settings;
 	useEffect( () => {
-		updateEditorSettings( { defaultTemplateTypes } );
-	}, [ defaultTemplateTypes ] );
+		updateEditorSettings( {
+			defaultTemplateTypes,
+			defaultTemplatePartAreas,
+		} );
+	}, [ defaultTemplateTypes, defaultTemplatePartAreas ] );
 
 	const [
 		isEntitiesSavedStatesOpen,
@@ -158,7 +160,11 @@ function Editor( { initialSettings } ) {
 			return <InserterSidebar />;
 		}
 		if ( isListViewOpen ) {
-			return <ListViewSidebar />;
+			return (
+				<AsyncModeProvider value="true">
+					<ListViewSidebar />
+				</AsyncModeProvider>
+			);
 		}
 		return null;
 	};

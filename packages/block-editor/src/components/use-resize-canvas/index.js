@@ -67,6 +67,8 @@ export default function useResizeCanvas(
 					minHeight: height,
 					maxHeight: height,
 					overflowY: 'auto',
+					borderRadius: '2px',
+					border: '1px solid #ddd',
 				};
 			default:
 				return null;

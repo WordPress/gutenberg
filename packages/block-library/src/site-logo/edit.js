@@ -29,11 +29,11 @@ import {
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
+import { siteLogo as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import icon from './icon';
 import useClientWidth from '../image/use-client-width';
 
 /**
@@ -173,7 +173,7 @@ const SiteLogo = ( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Site Logo Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
 						label={ __( 'Image width' ) }
 						onChange={ ( newWidth ) =>
@@ -181,10 +181,6 @@ const SiteLogo = ( {
 						}
 						min={ minWidth }
 						max={ maxWidthBuffer }
-						initialPosition={ Math.min(
-							naturalWidth,
-							maxWidthBuffer
-						) }
 						value={ width || '' }
 						disabled={ ! isResizable }
 					/>
@@ -342,7 +338,6 @@ export default function LogoEdit( {
 
 	const classes = classnames( className, {
 		'is-resized': !! width,
-		'is-focused': isSelected,
 	} );
 
 	const blockProps = useBlockProps( {

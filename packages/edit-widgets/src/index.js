@@ -11,15 +11,16 @@ import {
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import './store';
 import './hooks';
-import { create as createLegacyWidget } from './blocks/legacy-widget';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
+import registerLegacyWidgetVariations from './register-legacy-widget-variations';
 
 /**
  * Initializes the block editor in the widgets screen.
@@ -32,12 +33,15 @@ export function initialize( id, settings ) {
 		( block ) => ! [ 'core/more' ].includes( block.name )
 	);
 	registerCoreBlocks( coreBlocks );
-
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks();
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableLegacyWidgetBlock: true,
+		} );
 	}
-	registerBlock( createLegacyWidget( settings ) );
+	registerLegacyWidgetVariations( settings );
 	registerBlock( widgetArea );
+	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
+		fetchLinkSuggestions( search, searchOptions, settings );
 	render(
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )

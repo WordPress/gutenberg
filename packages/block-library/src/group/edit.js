@@ -25,7 +25,7 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 		},
 		[ clientId ]
 	);
-	const defaultLayout = useEditorFeature( 'layout' );
+	const defaultLayout = useEditorFeature( 'layout' ) || {};
 	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 	const { contentSize, wideSize } = usedLayout;
@@ -34,17 +34,22 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			? [ 'wide', 'full' ]
 			: [ 'left', 'center', 'right' ];
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		templateLock,
-		renderAppender: hasInnerBlocks
-			? undefined
-			: InnerBlocks.ButtonBlockAppender,
-		__experimentalLayout: {
-			type: 'default',
-			// Find a way to inject this in the support flag code (hooks).
-			alignments: themeSupportsLayout ? alignments : undefined,
-		},
-	} );
+	const innerBlocksProps = useInnerBlocksProps(
+		themeSupportsLayout
+			? blockProps
+			: { className: 'wp-block-group__inner-container' },
+		{
+			templateLock,
+			renderAppender: hasInnerBlocks
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
+			__experimentalLayout: {
+				type: 'default',
+				// Find a way to inject this in the support flag code (hooks).
+				alignments: themeSupportsLayout ? alignments : undefined,
+			},
+		}
+	);
 
 	return (
 		<>
@@ -66,7 +71,14 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 					}
 				/>
 			</InspectorAdvancedControls>
-			<TagName { ...innerBlocksProps } />
+			{ themeSupportsLayout && <TagName { ...innerBlocksProps } /> }
+			{ /* Ideally this is not needed but it's there for backward compatibility reason
+				to keep this div for themes that might rely on its presence */ }
+			{ ! themeSupportsLayout && (
+				<TagName { ...blockProps }>
+					<div { ...innerBlocksProps } />
+				</TagName>
+			) }
 		</>
 	);
 }

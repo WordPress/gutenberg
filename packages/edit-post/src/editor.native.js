@@ -10,16 +10,11 @@ import { I18nManager } from 'react-native';
  */
 import { Component } from '@wordpress/element';
 import { EditorProvider } from '@wordpress/editor';
-import {
-	parse,
-	serialize,
-	rawHandler,
-	store as blocksStore,
-} from '@wordpress/blocks';
+import { parse, serialize, store as blocksStore } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
-import { SlotFillProvider, Preview } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -101,13 +96,6 @@ class Editor extends Component {
 		this.postTitleRef = titleRef;
 	}
 
-	editorMode( initialHtml, editorMode ) {
-		if ( editorMode === 'preview' ) {
-			return <Preview blocks={ rawHandler( { HTML: initialHtml } ) } />;
-		}
-		return <Layout setTitleRef={ this.setTitleRef } />;
-	}
-
 	render() {
 		const {
 			settings,
@@ -120,7 +108,6 @@ class Editor extends Component {
 			postId,
 			postType,
 			initialHtml,
-			editorMode,
 			...props
 		} = this.props;
 
@@ -157,7 +144,7 @@ class Editor extends Component {
 					useSubRegistry={ false }
 					{ ...props }
 				>
-					{ this.editorMode( initialHtml, editorMode ) }
+					<Layout setTitleRef={ this.setTitleRef } />
 				</EditorProvider>
 			</SlotFillProvider>
 		);

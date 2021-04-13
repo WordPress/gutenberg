@@ -6,17 +6,18 @@ import { find } from 'lodash';
 /**
  * WordPress dependencies
  */
+import { DropdownMenu } from '@wordpress/components';
+import { PinnedItems } from '@wordpress/interface';
 import { __, sprintf } from '@wordpress/i18n';
-import { Button, Dropdown, DropdownMenu, Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import SaveButton from './save-button';
-import ManageLocations from './manage-locations';
 import MenuSwitcher from '../menu-switcher';
 
 export default function Header( {
+	isMenuSelected,
 	menus,
 	selectedMenuId,
 	onSelectMenu,
@@ -40,8 +41,6 @@ export default function Header( {
 		actionHeaderText = __( 'No menus available' );
 	}
 
-	const hasMenus = !! menus?.length;
-
 	return (
 		<div className="edit-navigation-header">
 			<div className="edit-navigation-header__title-subtitle">
@@ -49,10 +48,10 @@ export default function Header( {
 					{ __( 'Navigation' ) }
 				</h1>
 				<h2 className="edit-navigation-header__subtitle">
-					{ hasMenus && actionHeaderText }
+					{ isMenuSelected && actionHeaderText }
 				</h2>
 			</div>
-			{ hasMenus && (
+			{ isMenuSelected && (
 				<div className="edit-navigation-header__actions">
 					<DropdownMenu
 						icon={ null }
@@ -69,7 +68,7 @@ export default function Header( {
 						popoverProps={ {
 							className:
 								'edit-navigation-header__menu-switcher-dropdown',
-							position: 'bottom left',
+							position: 'bottom center',
 						} }
 					>
 						{ ( { onClose } ) => (
@@ -84,26 +83,8 @@ export default function Header( {
 						) }
 					</DropdownMenu>
 
-					<Dropdown
-						contentClassName="edit-navigation-header__manage-locations"
-						position="bottom left"
-						renderToggle={ ( { isOpen, onToggle } ) => (
-							<Button
-								isTertiary
-								aria-expanded={ isOpen }
-								onClick={ onToggle }
-							>
-								{ __( 'Manage locations' ) }
-							</Button>
-						) }
-						renderContent={ () => (
-							<ManageLocations menus={ menus } />
-						) }
-					/>
-
 					<SaveButton navigationPost={ navigationPost } />
-
-					<Popover.Slot name="block-toolbar" />
+					<PinnedItems.Slot scope="core/edit-navigation" />
 				</div>
 			) }
 		</div>

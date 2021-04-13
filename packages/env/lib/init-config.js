@@ -19,7 +19,8 @@ const buildDockerComposeConfig = require( './build-docker-compose-config' );
 
 /**
  * Initializes the local environment so that Docker commands can be run. Reads
- * ./.wp-env.json, creates ~/.wp-env, and creates ~/.wp-env/docker-compose.yml.
+ * ./.wp-env.json, creates ~/.wp-env, ~/.wp-env/docker-compose.yml, and
+ * ~/.wp-env/Dockerfile.
  *
  * @param {Object}  options
  * @param {Object}  options.spinner      A CLI spinner which indicates progress.

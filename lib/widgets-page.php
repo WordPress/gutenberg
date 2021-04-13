@@ -59,7 +59,7 @@ function gutenberg_widgets_init( $hook ) {
 			'preload_paths'   => array(
 				array( '/wp/v2/media', 'OPTIONS' ),
 				'/wp/v2/sidebars?context=edit&per_page=-1',
-				'/wp/v2/widgets?context=edit&per_page=-1',
+				'/wp/v2/widgets?context=edit&per_page=-1&_embed=about',
 			),
 			'editor_settings' => $settings,
 		)
@@ -70,6 +70,7 @@ function gutenberg_widgets_init( $hook ) {
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-edit-widgets' );
 	wp_enqueue_style( 'wp-format-library' );
+	do_action( 'enqueue_block_editor_assets' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_widgets_init' );
 

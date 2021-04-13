@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useRef, createContext, useState } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -19,6 +20,7 @@ import useInsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
+import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 
 export const BlockNodes = createContext();
@@ -29,6 +31,28 @@ export default function BlockList( { className, __experimentalLayout } ) {
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
 	useScrollSelectionIntoView( ref );
+	usePreParsePatterns();
+
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const {
+		isTyping,
+		isOutlineMode,
+		isFocusMode,
+		isNavigationMode,
+	} = useSelect( ( select ) => {
+		const {
+			isTyping: _isTyping,
+			getSettings,
+			isNavigationMode: _isNavigationMode,
+		} = select( blockEditorStore );
+		const { outlineMode, focusMode } = getSettings();
+		return {
+			isTyping: _isTyping(),
+			isOutlineMode: outlineMode,
+			isFocusMode: focusMode,
+			isNavigationMode: _isNavigationMode(),
+		};
+	}, [] );
 
 	return (
 		<BlockNodes.Provider value={ blockNodes }>
@@ -38,7 +62,13 @@ export default function BlockList( { className, __experimentalLayout } ) {
 				ref={ ref }
 				className={ classnames(
 					'block-editor-block-list__layout is-root-container',
-					className
+					className,
+					{
+						'is-typing': isTyping,
+						'is-outline-mode': isOutlineMode,
+						'is-focus-mode': isFocusMode && isLargeViewport,
+						'is-navigate-mode': isNavigationMode,
+					}
 				) }
 			>
 				<SetBlockNodes.Provider value={ setBlockNodes }>
@@ -63,7 +93,6 @@ function Items( {
 	function selector( select ) {
 		const {
 			getBlockOrder,
-			getBlockListSettings,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
@@ -72,7 +101,6 @@ function Items( {
 			blockClientIds: getBlockOrder( rootClientId ),
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			orientation: getBlockListSettings( rootClientId )?.orientation,
 			hasMultiSelection: hasMultiSelection(),
 		};
 	}
@@ -81,16 +109,13 @@ function Items( {
 		blockClientIds,
 		selectedBlockClientId,
 		multiSelectedBlockClientIds,
-		orientation,
 		hasMultiSelection,
 	} = useSelect( selector, [ rootClientId ] );
 
-	const dropTargetIndex = useBlockDropZone( {
+	useBlockDropZone( {
 		element: wrapperRef,
 		rootClientId,
 	} );
-
-	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
 
 	return (
 		<LayoutProvider value={ layout }>
@@ -98,8 +123,6 @@ function Items( {
 				const isBlockInSelection = hasMultiSelection
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
-
-				const isDropTarget = dropTargetIndex === index;
 
 				return (
 					<AsyncModeProvider
@@ -113,12 +136,6 @@ function Items( {
 							// to avoid being impacted by the async mode
 							// otherwise there might be a small delay to trigger the animation.
 							index={ index }
-							className={ classnames( {
-								'is-drop-target': isDropTarget,
-								'is-dropping-horizontally':
-									isDropTarget &&
-									orientation === 'horizontal',
-							} ) }
 						/>
 					</AsyncModeProvider>
 				);
@@ -128,11 +145,6 @@ function Items( {
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
-				className={ classnames( {
-					'is-drop-target': isAppenderDropTarget,
-					'is-dropping-horizontally':
-						isAppenderDropTarget && orientation === 'horizontal',
-				} ) }
 			/>
 		</LayoutProvider>
 	);

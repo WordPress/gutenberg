@@ -649,7 +649,7 @@ class WP_Theme_JSON {
 		foreach ( $properties as $prop ) {
 			$value = self::get_property_value( $styles, $prop['value'] );
 			if ( ! empty( $value ) ) {
-				$declarations[]   = array(
+				$declarations[] = array(
 					'name'  => $prop['name'],
 					'value' => $value,
 				);
@@ -943,11 +943,20 @@ class WP_Theme_JSON {
 	 * @return array
 	 */
 	public function get_custom_templates() {
+		$custom_templates = array();
 		if ( ! isset( $this->theme_json['customTemplates'] ) ) {
-			return array();
-		} else {
-			return $this->theme_json['customTemplates'];
+			return $custom_templates;
 		}
+
+		foreach ( $this->theme_json['customTemplates'] as $item ) {
+			if ( isset( $item['name'] ) ) {
+				$custom_templates[ $item['name'] ] = array(
+					'title'     => isset( $item['title'] ) ? $item['title'] : '',
+					'postTypes' => isset( $item['postTypes'] ) ? $item['postTypes'] : array( 'page' ),
+				);
+			}
+		}
+		return $custom_templates;
 	}
 
 	/**
@@ -956,10 +965,19 @@ class WP_Theme_JSON {
 	 * @return array
 	 */
 	public function get_template_parts() {
+		$template_parts = array();
 		if ( ! isset( $this->theme_json['templateParts'] ) ) {
-			return array();
+			return $template_parts;
 		}
-		return $this->theme_json['templateParts'];
+
+		foreach ( $this->theme_json['templateParts'] as $item ) {
+			if ( isset( $item['name'] ) ) {
+				$template_parts[ $item['name'] ] = array(
+					'area' => isset( $item['area'] ) ? $item['area'] : '',
+				);
+			}
+		}
+		return $template_parts;
 	}
 
 	/**
@@ -1118,6 +1136,106 @@ class WP_Theme_JSON {
 	 */
 	public function get_raw_data() {
 		return $this->theme_json;
+	}
+
+	/**
+	 *
+	 * Transforms the given editor settings according the
+	 * add_theme_support format to the theme.json format.
+	 *
+	 * @param array $settings Existing editor settings.
+	 *
+	 * @return array Config that adheres to the theme.json schema.
+	 */
+	public static function get_from_editor_settings( $settings ) {
+		$theme_settings = array( 'settings' => array() );
+
+		// Deprecated theme supports.
+		if ( isset( $settings['disableCustomColors'] ) ) {
+			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] ) ) {
+				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] = array();
+			}
+			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color']['custom'] = ! $settings['disableCustomColors'];
+		}
+
+		if ( isset( $settings['disableCustomGradients'] ) ) {
+			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] ) ) {
+				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] = array();
+			}
+			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color']['customGradient'] = ! $settings['disableCustomGradients'];
+		}
+
+		if ( isset( $settings['disableCustomFontSizes'] ) ) {
+			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography'] ) ) {
+				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography'] = array();
+			}
+			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography']['customFontSize'] = ! $settings['disableCustomFontSizes'];
+		}
+
+		if ( isset( $settings['enableCustomLineHeight'] ) ) {
+			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography'] ) ) {
+				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography'] = array();
+			}
+			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
+		}
+
+		if ( isset( $settings['enableCustomUnits'] ) ) {
+			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['spacing'] ) ) {
+				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['spacing'] = array();
+			}
+			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
+				array( 'px', 'em', 'rem', 'vh', 'vw' ) :
+				$settings['enableCustomUnits'];
+		}
+
+		if ( isset( $settings['colors'] ) ) {
+			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] ) ) {
+				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] = array();
+			}
+			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color']['palette'] = $settings['colors'];
+		}
+
+		if ( isset( $settings['gradients'] ) ) {
+			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] ) ) {
+				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] = array();
+			}
+			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color']['gradients'] = $settings['gradients'];
+		}
+
+		if ( isset( $settings['fontSizes'] ) ) {
+			$font_sizes = $settings['fontSizes'];
+			// Back-compatibility for presets without units.
+			foreach ( $font_sizes as $key => $font_size ) {
+				if ( is_numeric( $font_size['size'] ) ) {
+					$font_sizes[ $key ]['size'] = $font_size['size'] . 'px';
+				}
+			}
+			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography'] ) ) {
+				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography'] = array();
+			}
+			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography']['fontSizes'] = $font_sizes;
+		}
+
+		// This allows to make the plugin work with WordPress 5.7 beta
+		// as well as lower versions. The second check can be removed
+		// as soon as the minimum WordPress version for the plugin
+		// is bumped to 5.7.
+		if ( isset( $settings['enableCustomSpacing'] ) ) {
+			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['spacing'] ) ) {
+				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['spacing'] = array();
+			}
+			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['spacing']['customPadding'] = $settings['enableCustomSpacing'];
+		}
+
+		// Things that didn't land in core yet, so didn't have a setting assigned.
+		if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
+			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] ) ) {
+				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] = array();
+			}
+			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color']['link'] = true;
+		}
+
+		return $theme_settings;
 	}
 
 }
