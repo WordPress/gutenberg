@@ -872,28 +872,18 @@ class WP_Theme_JSON {
 	 * @return string The new stylesheet.
 	 */
 	private function get_block_styles() {
-		$stylesheet = '';
-		if ( ! isset( $this->theme_json['styles'] ) && ! isset( $this->theme_json['settings'] ) ) {
-			return $stylesheet;
-		}
-
 		$blocks_metadata = self::get_blocks_metadata();
+
 		$block_rules     = '';
-		foreach ( $blocks_metadata as $block_selector => $metadata ) {
-			if ( empty( $metadata['selector'] ) ) {
+		$style_nodes = self::get_style_nodes( $this->theme_json, $blocks_metadata );
+		foreach( $style_nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
 				continue;
 			}
 
-			$selector = $metadata['selector'];
-
-			$declarations = array();
-			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				$declarations = self::compute_style_properties(
-					$declarations,
-					$this->theme_json['styles'][ $block_selector ]
-				);
-			}
-
+			$selector     = $metadata['selector'];
+			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$declarations = self::compute_style_properties( array(), $node );
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 		}
 
