@@ -118,7 +118,7 @@ export default {
 			elements: {
 				link: {
 					color: {
-						text: 'green',
+						text: 'var(--wp--preset--color--dark-gray)',
 					},
 				},
 			},

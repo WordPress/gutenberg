@@ -68,33 +68,27 @@ export function getBlockColors( blockStyleAttributes, defaultColors ) {
 }
 
 // To-do add tests
-export function parseGradientsColorVariables( colorPalette, gradients ) {
+export function parseColorVariables( styles, colorPalette ) {
+	const stylesBase = JSON.stringify( styles );
 	const colorPrefixRegex = /var\(--wp--preset--color--(.*?)\)/g;
-	Object.keys( gradients ).forEach( ( key ) => {
-		const value = gradients[ key ]?.gradient;
-		const colorValue = value?.replace( colorPrefixRegex, ( _$1, $2 ) => {
-			const mappedColor = find( colorPalette, {
-				slug: $2,
-			} );
-			return mappedColor?.color;
-		} );
-		gradients[ key ].gradient = colorValue;
-	} );
 
-	return gradients;
+	return stylesBase
+		? JSON.parse(
+				stylesBase?.replace( colorPrefixRegex, ( _$1, $2 ) => {
+					const mappedColor = find( colorPalette, {
+						slug: $2,
+					} );
+					return mappedColor?.color;
+				} )
+		  )
+		: styles;
 }
 
 export function getGlobalStyles( baseStyles ) {
-	const globalStyles = {
-		...baseStyles,
-	};
-	const colorSettings = globalStyles?.settings?.color;
+	const colorSettings = baseStyles?.settings?.color;
 	const palette = colorSettings?.palette;
 	const gradients = colorSettings?.gradients;
-
-	if ( gradients ) {
-		parseGradientsColorVariables( palette, gradients );
-	}
+	const globalStyles = parseColorVariables( baseStyles, palette );
 
 	return {
 		...( palette || gradients
