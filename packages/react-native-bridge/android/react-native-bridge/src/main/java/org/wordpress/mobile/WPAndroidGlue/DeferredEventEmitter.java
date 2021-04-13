@@ -1,6 +1,5 @@
 package org.wordpress.mobile.WPAndroidGlue;
 
-import android.util.Log;
 import android.util.Pair;
 
 import androidx.annotation.Nullable;
