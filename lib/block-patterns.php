@@ -182,6 +182,8 @@ register_block_pattern(
 	)
 );
 
+// Deactivate the legacy patterns bundled with WordPress, and add new block patterns for testing. 
+// More details in this trac issue: https://core.trac.wordpress.org/ticket/52846
 add_action(
 	'init',
 	function() {
