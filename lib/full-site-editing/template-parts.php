@@ -173,7 +173,7 @@ function gutenberg_get_allowed_template_part_areas() {
 			'area'        => WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
 			'label'       => __( 'General', 'gutenberg' ),
 			'description' => __(
-				'General templates often perform a specific role like displaying post content, and are not tied to any particular area.',
+				'General template parts are not tied to any particular area, and can appear in several locations across a site.',
 				'gutenberg'
 			),
 		),
