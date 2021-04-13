@@ -119,7 +119,7 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 			>
 				<BlockPreview
 					blocks={ pattern.transformedBlocks }
-					viewportWidth={ 700 }
+					viewportWidth={ pattern.viewportWidth || 500 }
 				/>
 				<div className={ `${ baseClassName }-list__item-title` }>
 					{ pattern.title }
