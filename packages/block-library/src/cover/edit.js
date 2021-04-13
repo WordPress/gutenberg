@@ -240,6 +240,17 @@ function mediaPosition( { x, y } ) {
 	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
 }
 
+/**
+ * Is the URL a temporary blob URL? A blob URL is one that is used temporarily while
+ * the media (image or video) is being uploaded and will not have an id allocated yet.
+ *
+ * @param {number} id  The id of the media.
+ * @param {string} url The url of the media.
+ *
+ * @return {boolean} Is the URL a Blob URL.
+ */
+const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
+
 function CoverPlaceholder( {
 	hasBackground = false,
 	children,
@@ -301,7 +312,7 @@ function CoverEdit( {
 		setGradient,
 	} = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes );
-	const isTemporaryImage = isBlobURL( url );
+	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
 	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
@@ -574,7 +585,7 @@ function CoverEdit( {
 		{
 			'is-dark-theme': isDark,
 			'has-background-dim': dimRatio !== 0,
-			'is-transient': isTemporaryImage,
+			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 			[ overlayColor.class ]: overlayColor.class,
@@ -644,7 +655,7 @@ function CoverEdit( {
 						style={ mediaStyle }
 					/>
 				) }
-				{ isTemporaryImage && <Spinner /> }
+				{ isUploadingMedia && <Spinner /> }
 				<CoverPlaceholder
 					hasBackground={ hasBackground }
 					noticeUI={ noticeUI }
