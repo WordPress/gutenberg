@@ -161,12 +161,13 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 7, $properties );
+		$this->assertCount( 8, $properties );
 
 		$this->assertArrayHasKey( 'name', $properties );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'option_name', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
+		$this->assertArrayHasKey( 'is_multi', $properties );
 		$this->assertArrayHasKey( 'classname', $properties );
 		$this->assertArrayHasKey( 'customize_selective_refresh', $properties );
 		$this->assertArrayHasKey( 'widget_class', $properties );
@@ -242,6 +243,7 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 			'control_options',
 			'widget_options',
 			'widget_class',
+			'is_multi',
 		);
 
 		foreach ( $extra_fields as $extra_field ) {

@@ -537,7 +537,7 @@ async function saveWidgets() {
 
 async function getSerializedWidgetAreas() {
 	const widgets = await page.evaluate( () =>
-		wp.data.select( 'core' ).getWidgets()
+		wp.data.select( 'core' ).getWidgets( { _embed: 'about' } )
 	);
 
 	const serializedWidgetAreas = mapValues(
