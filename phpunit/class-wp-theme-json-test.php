@@ -1008,20 +1008,22 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				'core/heading/h1' => array( 'color' => array( 'background' => 'yellow' ) ),
 				'core/group'      => array( 'color' => array( 'background' => 'pink' ) ),
 				'core/post-title' => array( 'color' => array( 'background' => 'white' ) ),
-			)
+			),
 		);
-		$selectors = array(
+		$selectors  = array(
 			'defaults'        => array( 'selector' => ':root' ),
 			'root'            => array( 'selector' => ':root' ),
 			'core/paragraph'  => array( 'selector' => 'p' ),
 			'core/heading/h1' => array( 'selector' => 'h1' ),
 			'core/group'      => array( 'selector' => '.wp-block-group' ),
 		);
-		$actual  = WP_Theme_JSON::get_style_nodes( $theme_json, $selectors );
+
+		$actual = WP_Theme_JSON::get_style_nodes( $theme_json, $selectors );
+
 		$expected = array(
 			array(
 				'path'     => array( 'styles', 'defaults' ),
-				'selector' => ':root'
+				'selector' => ':root',
 			),
 			array(
 				'path'     => array( 'styles', 'root' ),
@@ -1057,20 +1059,22 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				'core/heading/h1' => array( 'border' => array( 'customRadius' => false ) ),
 				'core/group'      => array( 'border' => array( 'customRadius' => true ) ),
 				'core/post-title' => array( 'border' => array( 'customRadius' => false ) ),
-			)
+			),
 		);
-		$selectors = array(
+		$selectors  = array(
 			'defaults'        => array( 'selector' => ':root' ),
 			'root'            => array( 'selector' => ':root' ),
 			'core/paragraph'  => array( 'selector' => 'p' ),
 			'core/heading/h1' => array( 'selector' => 'h1' ),
 			'core/group'      => array( 'selector' => '.wp-block-group' ),
 		);
-		$actual  = WP_Theme_JSON::get_setting_nodes( $theme_json, $selectors );
+
+		$actual = WP_Theme_JSON::get_setting_nodes( $theme_json, $selectors );
+
 		$expected = array(
 			array(
 				'path'     => array( 'settings', 'defaults' ),
-				'selector' => ':root'
+				'selector' => ':root',
 			),
 			array(
 				'path'     => array( 'settings', 'root' ),
