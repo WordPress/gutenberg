@@ -459,7 +459,7 @@ function Autocomplete( {
 					index + triggerPrefix.length
 				);
 
-				const tooDistantFromTrigger = textWithoutTrigger.length > 50; // 50 chars seem to be a good limit.
+				const tooDistantFromTrigger = textWithoutTrigger.length > 50; // 50 chars seems to be a good limit.
 				// This is a final barrier to prevent the effect from completing with
 				// an extremely long string, which causes the editor to slow-down
 				// significantly. This could happen, for example, if `isMatchingBackwards`
