@@ -193,8 +193,11 @@ export const createI18n = ( initialData, initialDomain, hooks ) => {
 
 	/** @type {ResetLocaleData} */
 	const resetLocaleData = ( data, domain ) => {
-		// Reset all current Tannin locale data .
+		// Reset all current Tannin locale data.
 		tannin.data = {};
+
+		// Reset cached plural forms functions cache.
+		tannin.pluralForms = {};
 
 		setLocaleData( data, domain );
 	};
