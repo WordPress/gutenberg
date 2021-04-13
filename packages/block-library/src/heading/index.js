@@ -8,6 +8,7 @@ import { isEmpty } from 'lodash';
  */
 import { heading as icon } from '@wordpress/icons';
 import { __, _x, sprintf } from '@wordpress/i18n';
+import domReady from '@wordpress/dom-ready';
 
 /**
  * Internal dependencies
@@ -17,8 +18,10 @@ import edit from './edit';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
-
+import subscribeToStore from './autogenerate-anchors';
 const { name } = metadata;
+
+domReady( subscribeToStore );
 
 export { metadata, name };
 
