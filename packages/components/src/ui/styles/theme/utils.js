@@ -1,19 +1,7 @@
 /**
  * External dependencies
  */
-/**
- * Internal dependencies
- */
-import { get } from '../../create-styles';
 import colorize from 'tinycolor2';
-
-/**
- * @param {number} value
- * @return {string} Space.
- */
-export function space( value ) {
-	return `calc(${ get( 'gridBase' ) } * ${ value })`;
-}
 
 /**
  * @param {Record<string, import('tinycolor2').ColorInput>} colors
