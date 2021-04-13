@@ -17,12 +17,46 @@ import { close as closeIcon } from '@wordpress/icons';
  */
 import EntityTypeList from './entity-type-list';
 
+const TRANSLATED_SITE_PROTPERTIES = {
+	title: __( 'Title' ),
+	description: __( 'Tagline' ),
+	sitelogo: __( 'Logo' ),
+	show_on_front: __( 'Show on front' ),
+	page_on_front: __( 'Page on front' ),
+};
+
 function EntitiesSavedStates( { isOpen, close } ) {
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
+		const dirtyRecords = select(
+			'core'
+		).__experimentalGetDirtyEntityRecords();
+
+		// Remove site object and decouple into its edited pieces.
+		const dirtyRecordsWithoutSite = dirtyRecords.filter(
+			( record ) => ! ( record.kind === 'root' && record.name === 'site' )
+		);
+
+		const siteEdits = select( 'core' ).getEntityRecordEdits(
+			'root',
+			'site'
+		);
+
+		const siteEditsAsEntities = [];
+		for ( const field in siteEdits ) {
+			siteEditsAsEntities.push( {
+				kind: 'root',
+				name: 'site',
+				title: TRANSLATED_SITE_PROTPERTIES[ field ] || field,
+				key: field,
+			} );
+		}
+		const dirtyRecordsWithSiteItems = [
+			...dirtyRecordsWithoutSite,
+			...siteEditsAsEntities,
+		];
+
 		return {
-			dirtyEntityRecords: select(
-				'core'
-			).__experimentalGetDirtyEntityRecords(),
+			dirtyEntityRecords: dirtyRecordsWithSiteItems,
 		};
 	}, [] );
 	const { saveEditedEntityRecord } = useDispatch( 'core' );
