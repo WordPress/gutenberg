@@ -40,6 +40,7 @@ import { store as editPostStore } from '../../store';
 
 export default function VisualEditor( { styles } ) {
 	const ref = useRef();
+
 	const { deviceType, isTemplateMode } = useSelect( ( select ) => {
 		const {
 			isEditingTemplate,
@@ -61,6 +62,8 @@ export default function VisualEditor( { styles } ) {
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
 		height: '100%',
+		width: '100%',
+		margin: 0,
 		// Add a constant padding for the typewritter effect. When typing at the
 		// bottom, there needs to be room to scroll up.
 		paddingBottom: hasMetaBoxes ? null : '40vh',
