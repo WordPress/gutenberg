@@ -11,6 +11,7 @@ exports[`Search Block renders block with button inside option 1`] = `
     accessibilityLabel="Search block label. Current text is Search"
     accessibilityRole="none"
     accessible={true}
+    testID="search-block-label"
   >
     <View>
       <RCTAztecView
@@ -77,6 +78,7 @@ exports[`Search Block renders block with button inside option 1`] = `
       accessibilityLabel="Search input field. No custom placeholder set"
       accessibilityRole="none"
       accessible={true}
+      testID="search-block-input"
     >
       <TextInput
         allowFontScaling={true}
@@ -107,6 +109,7 @@ exports[`Search Block renders block with button inside option 1`] = `
         accessibilityLabel="Search button. Current button text is Search Button"
         accessibilityRole="none"
         accessible={true}
+        testID="search-block-button"
       >
         <View>
           <RCTAztecView
@@ -178,6 +181,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
     accessibilityLabel="Search block label. Current text is Search"
     accessibilityRole="none"
     accessible={true}
+    testID="search-block-label"
   >
     <View>
       <RCTAztecView
@@ -244,6 +248,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
       accessibilityLabel="Search input field. No custom placeholder set"
       accessibilityRole="none"
       accessible={true}
+      testID="search-block-input"
     >
       <TextInput
         allowFontScaling={true}
@@ -294,6 +299,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
       accessibilityLabel="Search input field. No custom placeholder set"
       accessibilityRole="none"
       accessible={true}
+      testID="search-block-input"
     >
       <TextInput
         allowFontScaling={true}
@@ -324,6 +330,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         accessibilityLabel="Search button. Current button text is Search Button"
         accessibilityRole="none"
         accessible={true}
+        testID="search-block-button"
       >
         <View>
           <RCTAztecView
@@ -395,6 +402,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
     accessibilityLabel="Search block label. Current text is Search"
     accessibilityRole="none"
     accessible={true}
+    testID="search-block-label"
   >
     <View>
       <RCTAztecView
@@ -461,6 +469,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
       accessibilityLabel="Search input field. No custom placeholder set"
       accessibilityRole="none"
       accessible={true}
+      testID="search-block-input"
     >
       <TextInput
         allowFontScaling={true}
@@ -491,6 +500,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         accessibilityLabel="Search button. Current button text is Search Button"
         accessibilityRole="none"
         accessible={true}
+        testID="search-block-button"
       >
         <View>
           <RCTAztecView
@@ -562,6 +572,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
     accessibilityLabel="Search block label. Current text is Search"
     accessibilityRole="none"
     accessible={true}
+    testID="search-block-label"
   >
     <View>
       <RCTAztecView
@@ -620,6 +631,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
     accessibilityLabel="Search input field. No custom placeholder set"
     accessibilityRole="none"
     accessible={true}
+    testID="search-block-input"
   >
     <TextInput
       allowFontScaling={true}
