@@ -97,9 +97,12 @@ Whether to apply debouncing for the autocompleter. Set to true to enable debounc
 -   Type: `Boolean`
 -   Required: No
 
+
 #### position
 
-Use this string to modify the direction in which the popover should open relative to its parent node.
+Use this string to modify the direction in which the popover should open relative to its parent node. This value will be propagated to [`position` property of the the `<Popover />` component](../popover#position), where it describes...
+
+> Specify y- and x-axis as a space-separated string. Supports "top", "middle", "bottom" y axis, and "left", "center", "right" x axis.
 
 -   Type: `String`
 -   Required: No
