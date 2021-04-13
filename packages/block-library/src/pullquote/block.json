@@ -8,14 +8,14 @@
 			"source": "html",
 			"selector": "blockquote",
 			"multiline": "p",
-			"role": "content"
+			"__experimentalRole": "content"
 		},
 		"citation": {
 			"type": "string",
 			"source": "html",
 			"selector": "cite",
 			"default": "",
-			"role": "content"
+			"__experimentalRole": "content"
 		},
 		"mainColor": {
 			"type": "string"

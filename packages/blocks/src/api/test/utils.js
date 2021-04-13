@@ -321,15 +321,15 @@ describe( '__experimentalGetBlockAttributesNamesByRole', () => {
 				},
 				content: {
 					type: 'boolean',
-					role: 'content',
+					__experimentalRole: 'content',
 				},
 				level: {
 					type: 'number',
-					role: 'content',
+					__experimentalRole: 'content',
 				},
 				color: {
 					type: 'string',
-					role: 'other',
+					__experimentalRole: 'other',
 				},
 			},
 			save: noop,
@@ -365,10 +365,9 @@ describe( '__experimentalGetBlockAttributesNamesByRole', () => {
 		).toEqual( [] );
 	} );
 	it( 'should return all attribute names if no role is provided', () => {
-		const res = __experimentalGetBlockAttributesNamesByRole(
-			'core/test-block-1'
-		);
-		expect( res ).toEqual(
+		expect(
+			__experimentalGetBlockAttributesNamesByRole( 'core/test-block-1' )
+		).toEqual(
 			expect.arrayContaining( [ 'align', 'content', 'level', 'color' ] )
 		);
 	} );

@@ -6,7 +6,7 @@
 		"ordered": {
 			"type": "boolean",
 			"default": false,
-			"role": "content"
+			"__experimentalRole": "content"
 		},
 		"values": {
 			"type": "string",
@@ -15,7 +15,7 @@
 			"multiline": "li",
 			"__unstableMultilineWrapperTags": [ "ol", "ul" ],
 			"default": "",
-			"role": "content"
+			"__experimentalRole": "content"
 		},
 		"type": {
 			"type": "string"

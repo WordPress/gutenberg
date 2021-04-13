@@ -11,7 +11,7 @@
 			"source": "html",
 			"selector": "p",
 			"default": "",
-			"role": "content"
+			"__experimentalRole": "content"
 		},
 		"dropCap": {
 			"type": "boolean",

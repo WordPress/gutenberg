@@ -290,6 +290,7 @@ export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
 	const attributesNames = Object.keys( attributes );
 	if ( ! role ) return attributesNames;
 	return attributesNames.filter(
-		( attributeName ) => attributes[ attributeName ]?.role === role
+		( attributeName ) =>
+			attributes[ attributeName ]?.__experimentalRole === role
 	);
 }

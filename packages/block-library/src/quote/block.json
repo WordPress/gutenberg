@@ -9,14 +9,14 @@
 			"selector": "blockquote",
 			"multiline": "p",
 			"default": "",
-			"role": "content"
+			"__experimentalRole": "content"
 		},
 		"citation": {
 			"type": "string",
 			"source": "html",
 			"selector": "cite",
 			"default": "",
-			"role": "content"
+			"__experimentalRole": "content"
 		},
 		"align": {
 			"type": "string"

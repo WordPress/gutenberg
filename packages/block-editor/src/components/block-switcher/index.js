@@ -69,10 +69,6 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 					? getBlockType( firstBlockName )?.icon
 					: stack;
 			}
-			const _patterns = __experimentalGetPatternTransformItems(
-				blocks,
-				rootClientId
-			);
 			return {
 				possibleBlockTransformations: getBlockTransformItems(
 					blocks,
@@ -81,7 +77,10 @@ export const BlockSwitcherDropdownMenu = ( { clientIds, blocks } ) => {
 				hasBlockStyles: !! styles?.length,
 				icon: _icon,
 				blockTitle: getBlockType( firstBlockName ).title,
-				patterns: _patterns,
+				patterns: __experimentalGetPatternTransformItems(
+					blocks,
+					rootClientId
+				),
 			};
 		},
 		[ clientIds, blocks, blockInformation?.icon ]

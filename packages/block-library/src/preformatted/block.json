@@ -9,7 +9,7 @@
 			"selector": "pre",
 			"default": "",
 			"__unstablePreserveWhiteSpace": true,
-			"role": "content"
+			"__experimentalRole": "content"
 		}
 	},
 	"supports": {
