@@ -814,23 +814,23 @@ class WP_Theme_JSON {
 	 */
 	private function get_css_variables() {
 		$stylesheet = '';
-		if ( ! isset( $this->theme_json['settings'] ) ) {
-			return $stylesheet;
-		}
 
-		$metadata = self::get_blocks_metadata();
-		foreach ( $this->theme_json['settings'] as $block_selector => $settings ) {
-			if ( empty( $metadata[ $block_selector ]['selector'] ) ) {
+		$nodes = self::get_setting_nodes( $this->theme_json, self::get_blocks_metadata() );
+		foreach ( $nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
 				continue;
 			}
-			$selector = $metadata[ $block_selector ]['selector'];
 
-			$declarations = self::compute_preset_vars( array(), $settings );
-			$declarations = self::compute_theme_vars( $declarations, $settings );
+			$selector     = $metadata['selector'];
 
-			// Attach the ruleset for style and custom properties.
-			$stylesheet .= self::to_ruleset( $selector, $declarations );
+			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$declarations = array();
+			$declarations = self::compute_preset_vars( array(), $node );
+			$declarations = self::compute_theme_vars( $declarations, $node );
+
+			$stylesheet  .= self::to_ruleset( $selector, $declarations );
 		}
+
 		return $stylesheet;
 	}
 
