@@ -19,13 +19,7 @@
 .wp-block-social-links__social-placeholder {
 	display: flex;
 	opacity: 0.8;
-	transition: all 0.1s ease-in-out;
-	@include reduce-motion("transition");
-
-	.is-selected > & {
-		opacity: 0;
-		width: 0; // This allows the appender to sit on the left as it should.
-	}
+	list-style: none;
 
 	// Use the first link to set the height.
 	> .wp-social-link {
@@ -53,10 +47,6 @@
 		}
 	}
 
-	& + .block-list-appender {
-		box-shadow: inset 0 0 0 $border-width $gray-700;
-	}
-
 	.wp-social-link::before {
 		content: "";
 		display: block;
@@ -67,6 +57,25 @@
 		.is-style-logos-only & {
 			background: currentColor;
 		}
+	}
+}
+
+// Selected placeholder state.
+.wp-block-social-links .wp-block-social-links__social-prompt {
+	list-style: none;
+	order: 2; // Move after the appender button. Because this element is non-interactive, it does not affect tab order.
+
+	// Show as block UI.
+	font-family: $default-font;
+	font-size: $default-font-size;
+	line-height: $button-size-small;
+	margin-top: auto;
+	margin-bottom: auto;
+	cursor: default;
+
+	& + .block-list-appender {
+		margin-right: $grid-unit-10;
+		padding: 0.25em;
 	}
 }
 
