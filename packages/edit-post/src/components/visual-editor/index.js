@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -20,10 +25,12 @@ import {
 	__experimentalUseEditorFeature as useEditorFeature,
 	__experimentalLayoutStyle as LayoutStyle,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
+import { Popover, Button } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
+import { arrowLeft } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -51,6 +58,7 @@ export default function VisualEditor( { styles } ) {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().supportsLayout;
 	}, [] );
+	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
 		height: '100%',
 		// Add a constant padding for the typewritter effect. When typing at the
@@ -70,12 +78,19 @@ export default function VisualEditor( { styles } ) {
 		useClipboardHandler(),
 		useCanvasClickRedirect(),
 		useTypewriter(),
-		useBlockSelectionClearer(),
 		useTypingObserver(),
+		useBlockSelectionClearer(),
 	] );
 
+	const blockSelectionClearerRef = useBlockSelectionClearer( true );
+
 	return (
-		<div className="edit-post-visual-editor">
+		<div
+			className={ classnames( 'edit-post-visual-editor', {
+				'is-template-mode': isTemplateMode,
+			} ) }
+			ref={ blockSelectionClearerRef }
+		>
 			{ themeSupportsLayout && (
 				<LayoutStyle
 					selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
@@ -85,6 +100,15 @@ export default function VisualEditor( { styles } ) {
 			<EditorStyles styles={ styles } />
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
+			{ isTemplateMode && (
+				<Button
+					className="edit-post-visual-editor__exit-template-mode"
+					icon={ arrowLeft }
+					onClick={ () => setIsEditingTemplate( false ) }
+				>
+					{ __( 'Back' ) }
+				</Button>
+			) }
 			<div
 				ref={ mergedRefs }
 				className="editor-styles-wrapper"

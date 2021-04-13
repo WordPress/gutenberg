@@ -50,6 +50,7 @@ import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -575,13 +576,13 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
-		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
+		const { openGeneralSidebar } = dispatch( editPostStore );
 		const { selectBlock } = dispatch( blockEditorStore );
 
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 			closeSettingsBottomSheet() {
-				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+				dispatch( editPostStore ).closeGeneralSidebar();
 			},
 			selectBlock: () => selectBlock( clientId ),
 		};
