@@ -810,6 +810,8 @@ class WP_Theme_JSON {
 	 *     --wp--custom--variable: value;
 	 *   }
 	 *
+	 * @param array $nodes Nodes with settings.
+	 *
 	 * @return string The new stylesheet.
 	 */
 	private function get_css_variables( $nodes ) {
@@ -819,14 +821,14 @@ class WP_Theme_JSON {
 				continue;
 			}
 
-			$selector     = $metadata['selector'];
+			$selector = $metadata['selector'];
 
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$declarations = array();
 			$declarations = self::compute_preset_vars( array(), $node );
 			$declarations = self::compute_theme_vars( $declarations, $node );
 
-			$stylesheet  .= self::to_ruleset( $selector, $declarations );
+			$stylesheet .= self::to_ruleset( $selector, $declarations );
 		}
 
 		return $stylesheet;
@@ -867,11 +869,14 @@ class WP_Theme_JSON {
 	 *     background: value;
 	 *   }
 	 *
+	 * @param array $style_nodes Nodes with styles.
+	 * @param array $setting_nodes Nodes with settings.
+	 *
 	 * @return string The new stylesheet.
 	 */
 	private function get_block_styles( $style_nodes, $setting_nodes ) {
-		$block_rules     = '';
-		foreach( $style_nodes as $metadata ) {
+		$block_rules = '';
+		foreach ( $style_nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
 				continue;
 			}
@@ -882,9 +887,9 @@ class WP_Theme_JSON {
 			$block_rules .= self::to_ruleset( $selector, $declarations );
 		}
 
-		$preset_rules  = '';
-		foreach( $setting_nodes as $metadata ) {
-			if( null === $metadata['selector'] ) {
+		$preset_rules = '';
+		foreach ( $setting_nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
 				continue;
 			}
 
@@ -967,13 +972,32 @@ class WP_Theme_JSON {
 		return $template_parts;
 	}
 
+	/**
+	 * Builds metadata for the style nodes, which returns in the form of:
+	 *
+	 * [
+	 *   [
+	 *     'path'     => [ 'path', 'to', 'some', 'node' ],
+	 *     'selector' => 'CSS selector for some node'
+	 *   ],
+	 *   [
+	 *     'path'     => ['path', 'to', 'other', 'node' ],
+	 *     'selector' => 'CSS selector for other node'
+	 *   ],
+	 * ]
+	 *
+	 * @param array $theme_json The tree to extract style nodes from.
+	 * @param array $selectors List of selectors per block.
+	 *
+	 * @return array
+	 */
 	public static function get_style_nodes( $theme_json, $selectors = array() ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
 		}
 
-		foreach( $theme_json['styles'] as $name => $node ) {
+		foreach ( $theme_json['styles'] as $name => $node ) {
 			$selector = null;
 			if ( isset( $selectors[ $name ]['selector'] ) ) {
 				$selector = $selectors[ $name ]['selector'];
@@ -987,13 +1011,32 @@ class WP_Theme_JSON {
 		return $nodes;
 	}
 
+	/**
+	 * Builds metadata for the setting nodes, which returns in the form of:
+	 *
+	 * [
+	 *   [
+	 *     'path'     => ['path', 'to', 'some', 'node' ],
+	 *     'selector' => 'CSS selector for some node'
+	 *   ],
+	 *   [
+	 *     'path'     => [ 'path', 'to', 'other', 'node' ],
+	 *     'selector' => 'CSS selector for other node'
+	 *   ],
+	 * ]
+	 *
+	 * @param array $theme_json The tree to extract setting nodes from.
+	 * @param array $selectors List of selectors per block.
+	 *
+	 * @return array
+	 */
 	public static function get_setting_nodes( $theme_json, $selectors = array() ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['settings'] ) ) {
 			return $nodes;
 		}
 
-		foreach( $theme_json['settings'] as $name => $node ) {
+		foreach ( $theme_json['settings'] as $name => $node ) {
 			$selector = null;
 			if ( isset( $selectors[ $name ]['selector'] ) ) {
 				$selector = $selectors[ $name ]['selector'];
@@ -1006,7 +1049,7 @@ class WP_Theme_JSON {
 		}
 		return $nodes;
 	}
-	
+
 	/**
 	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
@@ -1050,7 +1093,7 @@ class WP_Theme_JSON {
 		$properties[] = array( 'spacing', 'units' );
 		$properties[] = array( 'typography', 'fontSizes' );
 		$properties[] = array( 'typography', 'fontFamilies' );
-		
+
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $metadata ) {
 			foreach ( $properties as $property_path ) {
@@ -1061,13 +1104,13 @@ class WP_Theme_JSON {
 				$paths[] = array_merge( $metadata['path'], $property_path );
 				$paths[] = array_merge( $metadata['path'], $property_path );
 				$paths[] = array_merge( $metadata['path'], $property_path );
-	
-				foreach( $paths as $path ) {
+
+				foreach ( $paths as $path ) {
 					$node = _wp_array_get( $incoming_data, $path, array() );
 					if ( empty( $node ) ) {
 						continue;
 					}
-		
+
 					gutenberg_experimental_set( $this->theme_json, $path, $node );
 				}
 			}
@@ -1075,6 +1118,14 @@ class WP_Theme_JSON {
 
 	}
 
+	/**
+	 * Processes a setting node and returns the same node
+	 * without the insecure settings.
+	 *
+	 * @param array $input Node to process.
+	 *
+	 * @return array
+	 */
 	private static function remove_insecure_settings( $input ) {
 		$output = array();
 		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
@@ -1120,6 +1171,14 @@ class WP_Theme_JSON {
 		return $output;
 	}
 
+	/**
+	 * Processes a style node and returns the same node
+	 * without the insecure styles.
+	 *
+	 * @param array $input Node to process.
+	 *
+	 * @return array
+	 */
 	private static function remove_insecure_styles( $input ) {
 		$output       = array();
 		$declarations = self::compute_style_properties( array(), $input );
@@ -1142,7 +1201,7 @@ class WP_Theme_JSON {
 	 * Removes insecure data from theme.json.
 	 */
 	public function remove_insecure_properties() {
-		$sanitized   = array();
+		$sanitized = array();
 
 		$style_nodes = self::get_style_nodes( $this->theme_json );
 		foreach ( $style_nodes as $metadata ) {
