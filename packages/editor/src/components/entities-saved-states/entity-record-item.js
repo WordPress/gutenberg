@@ -57,34 +57,31 @@ export default function EntityRecordItem( {
 				).title;
 			}
 
-			const entity = select( coreStore ).getEntityRecord(
-				kind,
-				name,
-				key
-			);
-
 			// Determine which sections of the site object have been changed.
 			if ( 'root' === kind && 'site' === name ) {
-				const editedSiteProperties = [];
-				for ( const field in editedEntity ) {
-					if ( editedEntity[ field ] !== entity[ field ] ) {
-						editedSiteProperties.push(
-							TRANSLATED_SITE_PROTPERTIES[ field ] || field
-						);
-					}
-				}
-
-				if ( editedSiteProperties.length === 1 ) {
-					return editedSiteProperties[ 0 ];
-				} else if ( editedSiteProperties.length === 2 ) {
+				const edits = select( coreStore ).getEntityRecordEdits(
+					kind,
+					name,
+					key
+				);
+				const editedSiteProperties = Object.keys( edits );
+				const translatedSiteProperties = editedSiteProperties.map(
+					( field ) => TRANSLATED_SITE_PROTPERTIES[ field ] || field
+				);
+				// Construct a title of edited properties.
+				if ( translatedSiteProperties.length === 1 ) {
+					return translatedSiteProperties[ 0 ];
+				} else if ( translatedSiteProperties.length === 2 ) {
 					return (
-						editedSiteProperties[ 0 ] +
+						translatedSiteProperties[ 0 ] +
 						' & ' +
-						editedSiteProperties[ 1 ]
+						translatedSiteProperties[ 1 ]
 					);
-				} else if ( editedSiteProperties.length > 2 ) {
-					const last = editedSiteProperties.pop();
-					return editedSiteProperties.join( ', ' ) + ', & ' + last;
+				} else if ( translatedSiteProperties.length > 2 ) {
+					const last = translatedSiteProperties.pop();
+					return (
+						translatedSiteProperties.join( ', ' ) + ', & ' + last
+					);
 				}
 
 				return '';
