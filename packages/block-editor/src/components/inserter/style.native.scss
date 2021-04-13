@@ -43,6 +43,7 @@
 	color: $gray-dark;
 	text-align: left;
 	font-size: 17px;
+	align-items: center;
 }
 
 .inserter-search-form__form-input--dark {
@@ -70,6 +71,13 @@
 }
 
 .inserter-search-form__icon {
-	padding: 0 16px;
+	margin: 0 12px;
 	justify-content: center;
+	width: 19px;
+}
+
+.inserter-search-form__input-buttons {
+	margin: 0 12px;
+	justify-content: center;
+	width: 19px;
 }

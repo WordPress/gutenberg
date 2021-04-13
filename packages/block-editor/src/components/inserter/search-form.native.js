@@ -15,7 +15,7 @@ import {
 import { useState, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
-import { ToolbarButton, Gridicons, Button } from '@wordpress/components';
+import { Gridicons } from '@wordpress/components';
 import { Icon, cancelCircleFilled, arrowLeft, close } from '@wordpress/icons';
 
 /**
@@ -24,6 +24,20 @@ import { Icon, cancelCircleFilled, arrowLeft, close } from '@wordpress/icons';
 import styles from './style.scss';
 import platformStyles from './searchFormStyles.scss';
 
+function IconButton( { icon, label, hint, ...props } ) {
+	return (
+		<TouchableOpacity
+			{ ...props }
+			accessible={ true }
+			accessibilityRole={ 'button' }
+			accessibilityHint={ hint }
+			accessibilityLabel={ label }
+		>
+			<Icon icon={ icon } />
+		</TouchableOpacity>
+	);
+}
+
 function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	const [ isActive, setIsActive ] = useState( false );
 
@@ -31,13 +45,23 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 
 	const inputRef = useRef();
 
-	const containerStyle = usePreferredColorSchemeStyle(
-		styles[ 'inserter-search-form__container' ],
-		styles[ 'inserter-search-form__container--dark' ]
-	);
+	const containerStyle = {
+		...usePreferredColorSchemeStyle(
+			styles[ 'inserter-search-form__container' ],
+			styles[ 'inserter-search-form__container--dark' ]
+		),
+		...usePreferredColorSchemeStyle(
+			platformStyles[ 'inserter-search-form__container' ],
+			platformStyles[ 'inserter-search-form__container--dark' ]
+		),
+	};
 
 	const containerActiveStyle = {
 		...containerStyle,
+		...usePreferredColorSchemeStyle(
+			styles[ 'inserter-search-form__container--active' ],
+			styles[ 'inserter-search-form__container--active-dark' ]
+		),
 		...usePreferredColorSchemeStyle(
 			platformStyles[ 'inserter-search-form__container--active' ],
 			platformStyles[ 'inserter-search-form__container--active-dark' ]
@@ -58,6 +82,10 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	const formActiveStyle = {
 		...formStyle,
 		...usePreferredColorSchemeStyle(
+			styles[ 'inserter-search-form__form--active' ],
+			styles[ 'inserter-search-form__form--active-dark' ]
+		),
+		...usePreferredColorSchemeStyle(
 			platformStyles[ 'inserter-search-form__form--active' ],
 			platformStyles[ 'inserter-search-form__form--active-dark' ]
 		),
@@ -77,41 +105,88 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	const formInputActiveStyle = {
 		...formInputStyle,
 		...usePreferredColorSchemeStyle(
+			styles[ 'inserter-search-form__form-input--active' ],
+			styles[ 'inserter-search-form__form-input--active-dark' ]
+		),
+		...usePreferredColorSchemeStyle(
 			platformStyles[ 'inserter-search-form__form-input--active' ],
 			platformStyles[ 'inserter-search-form__form-input--active-dark' ]
 		),
 	};
 
-	const placeholderStyle = usePreferredColorSchemeStyle(
-		styles[ 'inserter-search-form__form-input-placeholder' ],
-		styles[ 'inserter-search-form__form-input-placeholder--dark' ]
-	);
+	const placeholderStyle = {
+		...usePreferredColorSchemeStyle(
+			styles[ 'inserter-search-form__placeholder' ],
+			styles[ 'inserter-search-form__placeholder--dark' ]
+		),
+		...usePreferredColorSchemeStyle(
+			platformStyles[ 'inserter-search-form__placeholder' ],
+			platformStyles[ 'inserter-search-form__placeholder--dark' ]
+		),
+	};
 
-	const iconStyle = usePreferredColorSchemeStyle(
-		styles[ 'inserter-search-form__icon' ],
-		styles[ 'inserter-search-form__icon--dark' ]
-	);
+	const iconStyle = {
+		...usePreferredColorSchemeStyle(
+			styles[ 'inserter-search-form__icon' ],
+			styles[ 'inserter-search-form__icon--dark' ]
+		),
+		...usePreferredColorSchemeStyle(
+			platformStyles[ 'inserter-search-form__icon' ],
+			platformStyles[ 'inserter-search-form__icon--dark' ]
+		),
+	};
 
-	const cancelButtonStyle = styles[ 'inserter-search-form__cancel-button' ];
+	const iconActiveStyle = {
+		...iconStyle,
+		...usePreferredColorSchemeStyle(
+			styles[ 'inserter-search-form__icon--active' ],
+			styles[ 'inserter-search-form__icon--active-dark' ]
+		),
+		...usePreferredColorSchemeStyle(
+			platformStyles[ 'inserter-search-form__icon--active' ],
+			platformStyles[ 'inserter-search-form__icon--active-dark' ]
+		),
+	};
 
-	const cancelButtonTextStyle = usePreferredColorSchemeStyle(
-		styles[ 'inserter-search-form__cancel-button-text' ],
-		styles[ 'inserter-search-form__cancel-button-text--dark' ]
-	);
+	const cancelButtonStyle = {
+		...usePreferredColorSchemeStyle(
+			styles[ 'inserter-search-form__cancel-button' ],
+			styles[ 'inserter-search-form__cancel-button--dark' ]
+		),
+		...usePreferredColorSchemeStyle(
+			platformStyles[ 'inserter-search-form__cancel-button' ],
+			platformStyles[ 'inserter-search-form__cancel-button--dark' ]
+		),
+	};
+
+	const cancelButtonTextStyle = {
+		...usePreferredColorSchemeStyle(
+			styles[ 'inserter-search-form__cancel-button-text' ],
+			styles[ 'inserter-search-form__cancel-button-text--dark' ]
+		),
+		...usePreferredColorSchemeStyle(
+			platformStyles[ 'inserter-search-form__cancel-button-text' ],
+			platformStyles[ 'inserter-search-form__cancel-button-text--dark' ]
+		),
+	};
+
+	function clearInput() {
+		onChange( '' );
+	}
 
 	function onCancel() {
 		inputRef.current.blur();
-		onChange( '' );
+		clearInput();
 		setIsActive( false );
 	}
 
 	function renderLeftButton() {
 		if ( ! isIOS && isActive ) {
 			return (
-				<Button
-					title={ __( 'Cancel Search' ) }
+				<IconButton
+					label={ __( 'Cancel Search' ) }
 					icon={ arrowLeft }
-					onClick={ onCancel }
+					onPress={ onCancel }
 				/>
 			);
 		}
@@ -122,19 +197,15 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	function renderRightButton() {
 		// Add a View element to properly center the input placeholder via flexbox
 		if ( isIOS && ! isActive ) {
-			return <View style={ iconStyle } />;
+			return <View style={ isActive ? iconActiveStyle : iconStyle } />;
 		}
 
 		if ( !! value ) {
 			return (
-				<ToolbarButton
-					title={ __( 'Clear search' ) }
-					icon={
-						<Icon icon={ isIOS ? cancelCircleFilled : close } />
-					}
-					onClick={ () => {
-						onChange( '' );
-					} }
+				<IconButton
+					label={ __( 'Clear search' ) }
+					icon={ isIOS ? cancelCircleFilled : close }
+					onPress={ clearInput }
 				/>
 			);
 		}
@@ -151,7 +222,9 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 			activeOpacity={ isActive ? 1 : 0.2 }
 		>
 			<View style={ isActive ? formActiveStyle : formStyle }>
-				<View style={ iconStyle }>{ renderLeftButton() }</View>
+				<View style={ isActive ? iconActiveStyle : iconStyle }>
+					{ renderLeftButton() }
+				</View>
 				<TextInput
 					ref={ inputRef }
 					style={ isActive ? formInputActiveStyle : formInputStyle }
@@ -161,11 +234,19 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 					value={ value }
 					placeholder={ __( 'Search blocks' ) }
 				/>
-				{ renderRightButton() }
+				<View style={ isActive ? iconActiveStyle : iconStyle }>
+					{ renderRightButton() }
+				</View>
 			</View>
 			{ isActive && isIOS && (
 				<View style={ cancelButtonStyle }>
-					<Text onPress={ onCancel } style={ cancelButtonTextStyle }>
+					<Text
+						onPress={ onCancel }
+						style={ cancelButtonTextStyle }
+						accessible={ true }
+						accessibilityRole={ 'button' }
+						accessibilityLabel={ __( 'Cancel Search' ) }
+					>
 						{ __( 'Cancel' ) }
 					</Text>
 				</View>
