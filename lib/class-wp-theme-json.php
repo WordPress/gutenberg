@@ -1075,93 +1075,113 @@ class WP_Theme_JSON {
 
 	}
 
+	private static function remove_insecure_settings( $input ) {
+		$output = array();
+		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
+			$current_preset = _wp_array_get( $input, $preset_metadata['path'], null );
+			if ( null === $current_preset ) {
+				continue;
+			}
+
+			$escaped_preset = array();
+			foreach ( $current_preset as $single_preset ) {
+				if (
+					esc_attr( esc_html( $single_preset['name'] ) ) === $single_preset['name'] &&
+					sanitize_html_class( $single_preset['slug'] ) === $single_preset['slug']
+				) {
+					$value                  = $single_preset[ $preset_metadata['value_key'] ];
+					$single_preset_is_valid = null;
+					if ( isset( $preset_metadata['classes'] ) && count( $preset_metadata['classes'] ) > 0 ) {
+						$single_preset_is_valid = true;
+						foreach ( $preset_metadata['classes'] as $class_meta_data ) {
+							$property          = $class_meta_data['property_name'];
+							$style_to_validate = $property . ': ' . $value;
+							if ( esc_html( safecss_filter_attr( $style_to_validate ) ) !== $style_to_validate ) {
+								$single_preset_is_valid = false;
+								break;
+							}
+						}
+					} else {
+						$property               = $preset_metadata['css_var_infix'];
+						$style_to_validate      = $property . ': ' . $value;
+						$single_preset_is_valid = esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate;
+					}
+					if ( $single_preset_is_valid ) {
+						$escaped_preset[] = $single_preset;
+					}
+				}
+			}
+
+			if ( ! empty( $escaped_preset ) ) {
+				gutenberg_experimental_set( $output, $preset_metadata['path'], $escaped_preset );
+			}
+		}
+
+		return $output;
+	}
+
+	private static function remove_insecure_styles( $input ) {
+		$output       = array();
+		$declarations = self::compute_style_properties( array(), $input );
+		foreach ( $declarations as $declaration ) {
+			$style_to_validate = $declaration['name'] . ': ' . $declaration['value'];
+			if ( esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate ) {
+				$property = self::to_property( $declaration['name'] );
+				$path     = self::PROPERTIES_METADATA[ $property ]['value'];
+				if ( self::has_properties( self::PROPERTIES_METADATA[ $property ] ) ) {
+					$declaration_divided = explode( '-', $declaration['name'] );
+					$path[]              = $declaration_divided[1];
+				}
+				gutenberg_experimental_set( $output, $path, _wp_array_get( $input, $path, array() ) );
+			}
+		}
+		return $output;
+	}
+
 	/**
 	 * Removes insecure data from theme.json.
 	 */
 	public function remove_insecure_properties() {
-		$blocks_metadata = self::get_blocks_metadata();
-		foreach ( $blocks_metadata as $block_selector => $metadata ) {
-			$escaped_settings = array();
-			$escaped_styles   = array();
+		$sanitized   = array();
 
-			// Style escaping.
-			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				$declarations = self::compute_style_properties( array(), $this->theme_json['styles'][ $block_selector ] );
-				foreach ( $declarations as $declaration ) {
-					$style_to_validate = $declaration['name'] . ': ' . $declaration['value'];
-					if ( esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate ) {
-						$property = self::to_property( $declaration['name'] );
-						$path     = self::PROPERTIES_METADATA[ $property ]['value'];
-						if ( self::has_properties( self::PROPERTIES_METADATA[ $property ] ) ) {
-							$declaration_divided = explode( '-', $declaration['name'] );
-							$path[]              = $declaration_divided[1];
-						}
-						gutenberg_experimental_set(
-							$escaped_styles,
-							$path,
-							_wp_array_get( $this->theme_json['styles'][ $block_selector ], $path, array() )
-						);
-					}
-				}
+		$style_nodes = self::get_style_nodes( $this->theme_json );
+		foreach ( $style_nodes as $metadata ) {
+			$input = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			if ( empty( $input ) ) {
+				continue;
 			}
 
-			// Settings escaping.
-			// For now the ony allowed settings are presets.
-			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
-				foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-					$current_preset = _wp_array_get(
-						$this->theme_json['settings'][ $block_selector ],
-						$preset_metadata['path'],
-						null
-					);
-					if ( null !== $current_preset ) {
-						$escaped_preset = array();
-						foreach ( $current_preset as $single_preset ) {
-							if (
-								esc_attr( esc_html( $single_preset['name'] ) ) === $single_preset['name'] &&
-								sanitize_html_class( $single_preset['slug'] ) === $single_preset['slug']
-							) {
-								$value                  = $single_preset[ $preset_metadata['value_key'] ];
-								$single_preset_is_valid = null;
-								if ( isset( $preset_metadata['classes'] ) && count( $preset_metadata['classes'] ) > 0 ) {
-									$single_preset_is_valid = true;
-									foreach ( $preset_metadata['classes'] as $class_meta_data ) {
-										$property          = $class_meta_data['property_name'];
-										$style_to_validate = $property . ': ' . $value;
-										if ( esc_html( safecss_filter_attr( $style_to_validate ) ) !== $style_to_validate ) {
-											$single_preset_is_valid = false;
-											break;
-										}
-									}
-								} else {
-									$property               = $preset_metadata['css_var_infix'];
-									$style_to_validate      = $property . ': ' . $value;
-									$single_preset_is_valid = esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate;
-								}
-								if ( $single_preset_is_valid ) {
-									$escaped_preset[] = $single_preset;
-								}
-							}
-						}
-						if ( ! empty( $escaped_preset ) ) {
-							gutenberg_experimental_set( $escaped_settings, $preset_metadata['path'], $escaped_preset );
-						}
-					}
-				}
-			}
-
-			if ( empty( $escaped_settings ) ) {
-				unset( $this->theme_json['settings'][ $block_selector ] );
-			} else {
-				$this->theme_json['settings'][ $block_selector ] = $escaped_settings;
-			}
-
-			if ( empty( $escaped_styles ) ) {
-				unset( $this->theme_json['styles'][ $block_selector ] );
-			} else {
-				$this->theme_json['styles'][ $block_selector ] = $escaped_styles;
+			$output = self::remove_insecure_styles( $input );
+			if ( ! empty( $output ) ) {
+				gutenberg_experimental_set( $sanitized, $metadata['path'], $output );
 			}
 		}
+
+		$setting_nodes = self::get_setting_nodes( $this->theme_json );
+		foreach ( $setting_nodes as $metadata ) {
+			$input = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			if ( empty( $input ) ) {
+				continue;
+			}
+
+			$output = self::remove_insecure_settings( $input );
+			if ( ! empty( $output ) ) {
+				gutenberg_experimental_set( $sanitized, $metadata['path'], $output );
+			}
+		}
+
+		if ( empty( $sanitized['styles'] ) ) {
+			unset( $this->theme_json['styles'] );
+		} else {
+			$this->theme_json['styles'] = $sanitized['styles'];
+		}
+
+		if ( empty( $sanitized['settings'] ) ) {
+			unset( $this->theme_json['settings'] );
+		} else {
+			$this->theme_json['settings'] = $sanitized['settings'];
+		}
+
 	}
 
 	/**
