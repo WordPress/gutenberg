@@ -543,7 +543,8 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 				$prepared['instance']['hash']    = wp_hash( $serialized_instance );
 
 				if ( ! empty( $widget_object->show_instance_in_rest ) ) {
-					$prepared['instance']['raw'] = $instance;
+					// Use new stdClass so that JSON result is {} and not [].
+					$prepared['instance']['raw'] = empty( $instance ) ? new stdClass : $instance;
 				}
 			}
 		}
@@ -555,8 +556,9 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$prepared['description']  = ! empty( $widget['description'] ) ? $widget['description'] : '';
 		$prepared['number']       = $widget_object ? (int) $parsed_id['number'] : 0;
 		if ( rest_is_field_included( 'settings', $fields ) ) {
-			$instance             = gutenberg_get_widget_instance( $widget_id );
-			$prepared['settings'] = $instance ? $instance : array();
+			$instance = gutenberg_get_widget_instance( $widget_id );
+			// Use new stdClass so that JSON result is {} and not [].
+			$prepared['settings'] = empty( $instance ) ? new stdClass : $instance;
 		}
 
 		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
