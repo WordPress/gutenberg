@@ -173,6 +173,11 @@
 			"border": {
 				"customRadius": false
 			}
+		},
+		"core/button": {
+			"border": {
+				"customRadius": true
+			}
 		}
 	}
 }

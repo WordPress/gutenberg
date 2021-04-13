@@ -5,8 +5,10 @@
 		"isValid": true,
 		"attributes": {
 			"text": "My button",
-			"borderRadius": 0,
 			"style": {
+				"border": {
+					"radius": 0
+				},
 				"color": {
 					"text": "#1b9b6c",
 					"background": "#aa5a20"

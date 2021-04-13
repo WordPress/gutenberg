@@ -2,11 +2,11 @@
 
 exports[`adding patterns should insert a block pattern 1`] = `
 "<!-- wp:buttons {\\"contentJustification\\":\\"center\\"} -->
-<div class=\\"wp-block-buttons is-content-justification-center\\"><!-- wp:button {\\"borderRadius\\":2,\\"style\\":{\\"color\\":{\\"background\\":\\"#ba0c49\\",\\"text\\":\\"#fffffa\\"}}} -->
+<div class=\\"wp-block-buttons is-content-justification-center\\"><!-- wp:button {\\"style\\":{\\"color\\":{\\"background\\":\\"#ba0c49\\",\\"text\\":\\"#fffffa\\"},\\"border\\":{\\"radius\\":2}}} -->
 <div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link has-text-color has-background\\" style=\\"border-radius:2px;background-color:#ba0c49;color:#fffffa\\">Download now</a></div>
 <!-- /wp:button -->
 
-<!-- wp:button {\\"borderRadius\\":2,\\"style\\":{\\"color\\":{\\"text\\":\\"#ba0c49\\"}},\\"className\\":\\"is-style-outline\\"} -->
+<!-- wp:button {\\"style\\":{\\"color\\":{\\"text\\":\\"#ba0c49\\"},\\"border\\":{\\"radius\\":2}},\\"className\\":\\"is-style-outline\\"} -->
 <div class=\\"wp-block-button is-style-outline\\"><a class=\\"wp-block-button__link has-text-color\\" style=\\"border-radius:2px;color:#ba0c49\\">About Cervantes</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->"
