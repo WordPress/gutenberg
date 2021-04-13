@@ -1,8 +1,6 @@
 .edit-post-visual-editor {
 	position: relative;
-	transition: padding 0.2s linear;
-	@include reduce-motion("transition");
-	padding: 0;
+
 
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
@@ -27,23 +25,6 @@
 		flex-basis: 100%;
 	}
 
-	&.is-template-mode {
-		padding: $grid-unit-60;
-
-		.editor-styles-wrapper {
-			border-radius: 2px;
-			border: 1px solid $gray-300;
-		}
-	}
-
-	&.is-preview {
-		padding: $grid-unit-60;
-	}
-
-	.editor-styles-wrapper {
-		transition: all 0.2s linear;
-		@include reduce-motion("transition");
-	}
 }
 
 .editor-styles-wrapper {
