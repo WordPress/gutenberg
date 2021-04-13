@@ -65,20 +65,20 @@ describe( 'Dropdown', () => {
 			<Dropdown
 				className="container"
 				contentClassName="content"
-				renderToggle={ ( { isOpen, onToggle, onClose } ) => [
+				renderToggle={ ( { isOpen, onToggle } ) => (
 					<button
-						key="open"
 						className="open"
 						aria-expanded={ isOpen }
 						onClick={ onToggle }
 					>
 						Toggleee
-					</button>,
-					<button key="close" className="close" onClick={ onClose }>
-						closee
-					</button>,
-				] }
-				renderContent={ () => null }
+					</button>
+				) }
+				renderContent={ ( { onClose } ) => (
+					<button className="close" onClick={ onClose }>
+						test
+					</button>
+				) }
 			/>
 		);
 
