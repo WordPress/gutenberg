@@ -21,16 +21,16 @@ const testKeys = {
 };
 
 describe( 'Gutenberg Editor Search Block tests', () => {
-	describe( 'Should be able to edit child elements of Search Block', () => {
-		it( 'should be able to add a Search block', async () => {
-			await editorPage.addNewBlock( blockNames.search );
-			const searchBlock = await editorPage.getBlockAtPosition(
-				blockNames.search
-			);
+	it( 'should be able to add a Search block', async () => {
+		await editorPage.addNewBlock( blockNames.search );
+		const searchBlock = await editorPage.getBlockAtPosition(
+			blockNames.search
+		);
 
-			expect( searchBlock ).toBeTruthy();
-		} );
+		expect( searchBlock ).toBeTruthy();
+	} );
 
+	describe( 'Editing Search Block elements', () => {
 		it( 'able to customize label text', async () => {
 			await editorPage.sendTextToSearchBlockChild(
 				testKeys.label,
@@ -61,8 +61,7 @@ describe( 'Gutenberg Editor Search Block tests', () => {
 		it( 'able to customize placeholder text', async () => {
 			await editorPage.sendTextToSearchBlockChild(
 				testKeys.input,
-				testData.shortText,
-				false
+				testData.shortText
 			);
 
 			let expected = '';
