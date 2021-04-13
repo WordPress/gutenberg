@@ -73,6 +73,8 @@ export class ImageEdit extends Component {
 
 		this.state = {
 			isCaptionSelected: false,
+			// eslint-disable-next-line no-undef
+			devOnly: __DEV__,
 		};
 
 		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
@@ -480,7 +482,7 @@ export class ImageEdit extends Component {
 	}
 
 	render() {
-		const { isCaptionSelected } = this.state;
+		const { isCaptionSelected, devOnly } = this.state;
 		const {
 			attributes,
 			isSelected,
@@ -546,27 +548,29 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				<PanelBody>
-					{ isFeaturedImage ? (
-						<BottomSheet.Cell
-							label={ __( 'Remove as Featured Image ' ) }
-							labelStyle={ [
-								featuredButtonStyle,
-								styles.removeFeaturedButton,
-							] }
-							onPress={ this.onRemoveFeatured }
-						/>
-					) : (
-						<BottomSheet.Cell
-							label={ __( 'Set as Featured Image ' ) }
-							labelStyle={ [
-								featuredButtonStyle,
-								setFeaturedButtonStyle,
-							] }
-							onPress={ this.onSetFeatured }
-						/>
-					) }
-				</PanelBody>
+				{ devOnly && (
+					<PanelBody>
+						{ isFeaturedImage ? (
+							<BottomSheet.Cell
+								label={ __( 'Remove as Featured Image ' ) }
+								labelStyle={ [
+									featuredButtonStyle,
+									styles.removeFeaturedButton,
+								] }
+								onPress={ this.onRemoveFeatured }
+							/>
+						) : (
+							<BottomSheet.Cell
+								label={ __( 'Set as Featured Image ' ) }
+								labelStyle={ [
+									featuredButtonStyle,
+									setFeaturedButtonStyle,
+								] }
+								onPress={ this.onSetFeatured }
+							/>
+						) }
+					</PanelBody>
+				) }
 			</InspectorControls>
 		);
 
@@ -604,7 +608,6 @@ export class ImageEdit extends Component {
 						{ isSelected && getMediaOptions() }
 						{ ! this.state.isCaptionSelected &&
 							getToolbarEditButton( openMediaOptions ) }
-						{ isFeaturedImage }
 						<MediaUploadProgress
 							coverUrl={ url }
 							mediaId={ id }
@@ -630,7 +633,9 @@ export class ImageEdit extends Component {
 										isSelected={
 											isSelected && ! isCaptionSelected
 										}
-										isFeaturedImage={ isFeaturedImage }
+										isFeaturedImage={
+											devOnly ? isFeaturedImage : false
+										}
 										isUploadFailed={ isUploadFailed }
 										isUploadInProgress={
 											isUploadInProgress
