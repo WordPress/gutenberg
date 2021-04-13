@@ -43,8 +43,7 @@ export default function WidgetTypeSelector( { selectedId, onSelect } ) {
 					);
 					onSelect( {
 						selectedId: selected.id,
-						// TODO: Don't use widget_class.
-						isMulti: !! selected.widget_class,
+						isMulti: selected.is_multi,
 					} );
 				} else {
 					onSelect( { selectedId: null } );

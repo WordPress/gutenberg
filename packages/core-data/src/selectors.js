@@ -110,7 +110,7 @@ export const getUserQueryResults = createSelector(
  * @param {Object} state   Data state.
  * @param {string} kind  Entity kind.
  *
- * @return {boolean} Whether the entities are loaded
+ * @return {Array<Object>} Array of entities with config matching kind.
  */
 export function getEntitiesByKind( state, kind ) {
 	return filter( state.entities.config, { kind } );

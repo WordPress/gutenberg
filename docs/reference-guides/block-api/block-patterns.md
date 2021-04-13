@@ -11,12 +11,13 @@ The editor comes with a list of built-in block patterns. Theme and plugin author
 The `register_block_pattern` function receives the name of the pattern as the first argument and an array describing properties of the pattern as the second argument.
 
 The properties of the block pattern include:
- - `title` (required): A human-readable title for the pattern.
- - `content` (required): Raw HTML content for the pattern.
- - `description`: A visually hidden text used to describe the pattern in the inserter. A description is optional but it is strongly encouraged when the title does not fully describe what the pattern does.
- - `categories`: An array of pattern categories used to group block patterns. Block patterns can be shown on multiple categories.
- - `keywords`: An array of aliases or keywords that help users discover the pattern while searching.
- - `viewportWidth`: An integer specifying the width of the pattern in the inserter.
+
+-   `title` (required): A human-readable title for the pattern.
+-   `content` (required): Raw HTML content for the pattern.
+-   `description`: A visually hidden text used to describe the pattern in the inserter. A description is optional but it is strongly encouraged when the title does not fully describe what the pattern does.
+-   `categories`: An array of pattern categories used to group block patterns. Block patterns can be shown on multiple categories.
+-   `keywords`: An array of aliases or keywords that help users discover the pattern while searching.
+-   `viewportWidth`: An integer specifying the width of the pattern in the inserter.
 
 ```php
 register_block_pattern(
@@ -50,7 +51,8 @@ Block patterns can be grouped using categories. The block editor comes with bund
 The `register_block_pattern_category` function receives the name of the category as the first argument and an array describing properties of the category as the second argument.
 
 The properties of the pattern categories include:
- - `label` (required): A human-readable label for the pattern category.
+
+-   `label` (required): A human-readable label for the pattern category.
 
 ```php
 register_block_pattern_category(

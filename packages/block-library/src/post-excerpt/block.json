@@ -18,10 +18,7 @@
 			"default": true
 		}
 	},
-	"usesContext": [
-		"postId",
-		"postType"
-	],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,
 		"fontSize": true,
