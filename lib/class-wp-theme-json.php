@@ -812,10 +812,8 @@ class WP_Theme_JSON {
 	 *
 	 * @return string The new stylesheet.
 	 */
-	private function get_css_variables() {
+	private function get_css_variables( $nodes ) {
 		$stylesheet = '';
-
-		$nodes = self::get_setting_nodes( $this->theme_json, self::get_blocks_metadata() );
 		foreach ( $nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
 				continue;
@@ -871,11 +869,8 @@ class WP_Theme_JSON {
 	 *
 	 * @return string The new stylesheet.
 	 */
-	private function get_block_styles() {
-		$blocks_metadata = self::get_blocks_metadata();
-
+	private function get_block_styles( $style_nodes, $setting_nodes ) {
 		$block_rules     = '';
-		$style_nodes = self::get_style_nodes( $this->theme_json, $blocks_metadata );
 		foreach( $style_nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
 				continue;
@@ -888,7 +883,6 @@ class WP_Theme_JSON {
 		}
 
 		$preset_rules  = '';
-		$setting_nodes = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
 		foreach( $setting_nodes as $metadata ) {
 			if( null === $metadata['selector'] ) {
 				continue;
@@ -1021,13 +1015,17 @@ class WP_Theme_JSON {
 	 * @return string Stylesheet.
 	 */
 	public function get_stylesheet( $type = 'all' ) {
+		$blocks_metadata = self::get_blocks_metadata();
+		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
+		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
 		switch ( $type ) {
 			case 'block_styles':
-				return $this->get_block_styles();
+				return $this->get_block_styles( $style_nodes, $setting_nodes );
 			case 'css_variables':
-				return $this->get_css_variables();
+				return $this->get_css_variables( $setting_nodes );
 			default:
-				return $this->get_css_variables() . $this->get_block_styles();
+				return $this->get_css_variables( $setting_nodes ) . $this->get_block_styles( $style_nodes, $setting_nodes );
 		}
 	}
 
