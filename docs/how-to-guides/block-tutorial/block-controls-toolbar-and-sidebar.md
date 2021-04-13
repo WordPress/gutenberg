@@ -12,6 +12,7 @@ You can also customize the toolbar to include controls specific to your block ty
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
 import { registerBlockType } from '@wordpress/blocks';
 
@@ -44,17 +45,19 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 			alignment: 'right',
 		},
 	},
-	edit: ( {attributes, setAttributes} ) => {
+	edit: ( { attributes, setAttributes } ) => {
 		const onChangeContent = ( newContent ) => {
 			setAttributes( { content: newContent } );
 		};
 
 		const onChangeAlignment = ( newAlignment ) => {
-			setAttributes( { alignment: newAlignment === undefined ? 'none' : newAlignment } );
+			setAttributes( {
+				alignment: newAlignment === undefined ? 'none' : newAlignment,
+			} );
 		};
 
 		return (
-			<div {...useBlockProps()}>
+			<div { ...useBlockProps() }>
 				{
 					<BlockControls>
 						<AlignmentToolbar
@@ -77,7 +80,7 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 		const blockProps = useBlockProps.save();
 
 		return (
-			<div {...blockProps}>
+			<div { ...blockProps }>
 				<RichText.Content
 					className={ `gutenberg-examples-align-${ attributes.alignment }` }
 					tagName="p"
@@ -88,9 +91,11 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 	},
 } );
 ```
+
 {% ES5 %}
+
 ```js
-( function( blocks, blockEditor, element ) {
+( function ( blocks, blockEditor, element ) {
 	var el = element.createElement;
 	var RichText = blockEditor.RichText;
 	var AlignmentToolbar = blockEditor.AlignmentToolbar;
@@ -119,7 +124,7 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 				alignment: 'right',
 			},
 		},
-		edit: function( props ) {
+		edit: function ( props ) {
 			var content = props.attributes.content;
 			var alignment = props.attributes.alignment;
 
@@ -128,56 +133,52 @@ registerBlockType( 'gutenberg-examples/example-04-controls-esnext', {
 			}
 
 			function onChangeAlignment( newAlignment ) {
-				props.setAttributes( { alignment: newAlignment === undefined ? 'none' : newAlignment } );
+				props.setAttributes( {
+					alignment:
+						newAlignment === undefined ? 'none' : newAlignment,
+				} );
 			}
 
-			return el( 
+			return el(
 				'div',
-				useBlockProps(), 
+				useBlockProps(),
 				el(
 					BlockControls,
 					{ key: 'controls' },
-					el(
-						AlignmentToolbar,
-						{
-							value: alignment,
-							onChange: onChangeAlignment,
-						}
-					)
+					el( AlignmentToolbar, {
+						value: alignment,
+						onChange: onChangeAlignment,
+					} )
 				),
-				el(
-					RichText,
-					{
-						key: 'richtext',
-						tagName: 'p',
-						style: { textAlign: alignment },
-						onChange: onChangeContent,
-						value: content,
-					}
-				),
+				el( RichText, {
+					key: 'richtext',
+					tagName: 'p',
+					style: { textAlign: alignment },
+					onChange: onChangeContent,
+					value: content,
+				} )
 			);
 		},
 
-		save: function( props ) {
+		save: function ( props ) {
 			var blockProps = useBlockProps.save();
 
-			return el( 
-				'div', 
-				blockProps, 
+			return el(
+				'div',
+				blockProps,
 				el( RichText.Content, {
 					tagName: 'p',
-					className: 'gutenberg-examples-align-' + props.attributes.alignment,
+					className:
+						'gutenberg-examples-align-' +
+						props.attributes.alignment,
 					value: props.attributes.content,
-				} ) 
+				} )
 			);
 		},
 	} );
-}(
-	window.wp.blocks,
-	window.wp.blockEditor,
-	window.wp.element
-) );
+} )( window.wp.blocks, window.wp.blockEditor, window.wp.element );
 ```
+
 {% end %}
 
 Note that `BlockControls` is only visible when the block is currently selected and in visual editing mode. `BlockControls` are not shown when editing a block in HTML editing mode.
@@ -274,7 +275,6 @@ registerBlockType( 'create-block/gutenpride', {
 		);
 	},
 } );
-
 ```
 
 Block controls rendered in both the toolbar and sidebar will also be used when

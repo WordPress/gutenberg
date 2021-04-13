@@ -1,23 +1,19 @@
 [
-    {
-        "blockName": "core/navigation-link",
-        "attrs": {
-            "label": "WordPress",
-            "url": "https://wordpress.org/"
-        },
-        "innerBlocks": [],
-        "innerHTML": "\n",
-        "innerContent": [
-            "\n"
-        ]
-    },
-    {
-        "blockName": null,
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "\n",
-        "innerContent": [
-            "\n"
-        ]
-    }
+	{
+		"blockName": "core/navigation-link",
+		"attrs": {
+			"label": "WordPress",
+			"url": "https://wordpress.org/"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n",
+		"innerContent": [ "\n" ]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n",
+		"innerContent": [ "\n" ]
+	}
 ]

@@ -19,7 +19,7 @@
 
 ## 1.3.0 (2020-04-15)
 
-- Include TypeScript type declarations ([#21482](https://github.com/WordPress/gutenberg/pull/21482))
+-   Include TypeScript type declarations ([#21482](https://github.com/WordPress/gutenberg/pull/21482))
 
 ## 1.0.0
 

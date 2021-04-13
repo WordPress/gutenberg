@@ -20,8 +20,7 @@ export default function registerLegacyWidgetVariations( settings ) {
 					name: widgetType.id,
 					title: widgetType.name,
 					description: widgetType.description,
-					// TODO: Don't use widget_class.
-					attributes: widgetType.widget_class
+					attributes: widgetType.is_multi
 						? {
 								idBase: widgetType.id,
 								instance: {},
