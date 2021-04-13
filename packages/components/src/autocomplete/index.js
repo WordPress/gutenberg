@@ -462,7 +462,7 @@ function Autocomplete( {
 				const tooDistantFromTrigger = textWithoutTrigger.length > 50; // 50 chars seems to be a good limit.
 				// This is a final barrier to prevent the effect from completing with
 				// an extremely long string, which causes the editor to slow-down
-				// significantly. This could happen, for example, if `isMatchingBackwards`
+				// significantly. This could happen, for example, if `matchingWhileBackspacing`
 				// is true and one of the "words" end up being too long. If that's the case,
 				// it will be caught by this guard.
 				if ( tooDistantFromTrigger ) return false;
@@ -486,12 +486,12 @@ function Autocomplete( {
 				//
 				// Ex: "Some text @marcelo sekkkk" <--- "kkkk" caused a mismatch, but
 				// if the user presses backspace here, it will show the completion popup again.
-				const isMatchingBackwards =
+				const matchingWhileBackspacing =
 					backspacing && textWithoutTrigger.split( /\s/ ).length <= 3;
 
 				if (
 					mismatch &&
-					! ( isMatchingBackwards || hasOneTriggerWord )
+					! ( matchingWhileBackspacing || hasOneTriggerWord )
 				) {
 					return false;
 				}
