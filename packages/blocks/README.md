@@ -726,6 +726,7 @@ _Parameters_
 
 -   _metadata_ `Object`: Block metadata loaded from `block.json`.
 -   _metadata.name_ `string`: Block name.
+-   _metadata.textdomain_ `string`: Textdomain to use with translations.
 -   _additionalSettings_ `Object`: Additional block settings.
 
 _Returns_

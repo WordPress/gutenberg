@@ -835,6 +835,50 @@ describe( 'blocks', () => {
 				save: noop,
 			} );
 		} );
+		test( 'registers block from metadata with translation', () => {
+			const Edit = () => 'test';
+			const block = registerBlockTypeFromMetadata(
+				{
+					name: 'test/block-from-metadata-i18n',
+					title: 'I18n title from metadata',
+					description: 'I18n description from metadata',
+					keywords: [ 'i18n', 'metadata' ],
+					styles: [
+						{
+							label: 'i18n-metadata',
+							title: 'I18n Metadata',
+						},
+					],
+					textdomain: 'i18n',
+					icon: 'palmtree',
+				},
+				{
+					edit: Edit,
+					save: noop,
+				}
+			);
+			expect( block ).toEqual( {
+				name: 'test/block-from-metadata-i18n',
+				title: 'I18n title from metadata',
+				description: 'I18n description from metadata',
+				icon: {
+					src: 'palmtree',
+				},
+				keywords: [ 'i18n', 'metadata' ],
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				supports: {},
+				styles: [
+					{
+						label: 'i18n-metadata',
+						title: 'I18n Metadata',
+					},
+				],
+				edit: Edit,
+				save: noop,
+			} );
+		} );
 	} );
 
 	describe( 'registerBlockCollection()', () => {
