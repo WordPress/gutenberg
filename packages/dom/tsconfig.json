@@ -28,6 +28,6 @@
 		"src/utils/**/*",
 		"src/focusable.js",
 		"src/phrasing-content.js",
-		"src/tabbable.js",
+		"src/tabbable.js"
 	]
 }
