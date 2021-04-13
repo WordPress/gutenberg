@@ -17,6 +17,7 @@
 	}
 }
 
+
 .block-editor-block-variation-picker__variations.block-editor-block-variation-picker__variations {
 	display: flex;
 	justify-content: flex-start;
@@ -34,13 +35,18 @@
 		width: 75px;
 		text-align: center;
 
-		button {
+		button,
+		// Ideally not needed but this overrides the high specificity of the buttons in the canvas that can be affected by themes.
+		.editor-styles-wrapper & button.components-button.components-button {
 			display: inline-flex;
 			margin-right: 0;
 		}
 	}
 
-	.block-editor-block-variation-picker__variation {
+
+	.block-editor-block-variation-picker__variation,
+	// Ideally not needed but this overrides the high specificity of the buttons in the canvas that can be affected by themes.
+	.editor-styles-wrapper & .block-editor-block-variation-picker__variation.components-button.components-button {
 		padding: $grid-unit-10;
 	}
 

@@ -1,20 +1,5 @@
 .edit-post-visual-editor {
 	position: relative;
-
-	// The button element easily inherits styles that are meant for the editor style.
-	// These rules enhance the specificity to reduce that inheritance.
-	// This is duplicated in edit-site.
-	& .components-button {
-		font-family: $default-font;
-		font-size: $default-font-size;
-		padding: 6px 12px;
-
-		&.is-tertiary,
-		&.has-icon {
-			padding: 6px;
-		}
-	}
-
 	flex: 1 1 auto;
 
 	// In IE11 flex-basis: 100% cause a bug where the metaboxes area overlap with the content area.

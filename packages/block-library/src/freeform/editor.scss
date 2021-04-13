@@ -269,6 +269,14 @@ div[data-type="core/freeform"] {
 
 // mce global styles: the toolbars may get appended to <body>
 .mce-toolbar-grp {
+	.mce-toolbar .mce-btn button {
+		all: revert;
+		border: none;
+		background: none;
+		padding: 2px 3px;
+		cursor: pointer;
+	}
+
 	// Not sure why this is necessary, there seems to be a skin file that
 	// overrides this upstream.
 	.mce-btn.mce-active button,
