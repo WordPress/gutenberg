@@ -1000,6 +1000,26 @@ class WP_Theme_JSON {
 		return $nodes;
 	}
 
+	public static function get_setting_nodes( $theme_json, $selectors = array() ) {
+		$nodes = array();
+		if ( ! isset( $theme_json['settings'] ) ) {
+			return $nodes;
+		}
+
+		foreach( $theme_json['settings'] as $name => $node ) {
+			$selector = null;
+			if ( isset( $selectors[ $name ]['selector'] ) ) {
+				$selector = $selectors[ $name ]['selector'];
+			}
+
+			$nodes[] = array(
+				'path'     => array( 'settings', $name ),
+				'selector' => $selector,
+			);
+		}
+		return $nodes;
+	}
+	
 	/**
 	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
