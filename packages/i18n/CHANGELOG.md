@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Add new `resetLocaleData` method to reset the existing Tannin locale data.
+
 ## 3.19.0 (2021-03-17)
 
 ### Enhancements
