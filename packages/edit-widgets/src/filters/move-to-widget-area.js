@@ -14,7 +14,7 @@ import MoveToWidgetArea from '../components/move-to-widget-area';
 
 const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { __internalWidgetId } = props;
+		const { __internalWidgetId } = props.attributes;
 		const { widgetAreas, currentWidgetArea } = useSelect(
 			( select ) => {
 				const selectors = select( 'core/edit-widgets' );
