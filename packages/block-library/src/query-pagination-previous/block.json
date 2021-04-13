@@ -7,10 +7,7 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [
-		"queryId",
-		"query"
-	],
+	"usesContext": [ "queryId", "query" ],
 	"supports": {
 		"reusable": false,
 		"html": false,

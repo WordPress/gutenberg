@@ -1,18 +1,16 @@
 [
-    {
-        "blockName": "core/search",
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "",
-        "innerContent": []
-    },
-    {
-        "blockName": null,
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "\n",
-        "innerContent": [
-            "\n"
-        ]
-    }
+	{
+		"blockName": "core/search",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n",
+		"innerContent": [ "\n" ]
+	}
 ]

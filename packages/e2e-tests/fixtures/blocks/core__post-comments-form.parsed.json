@@ -1,18 +1,16 @@
 [
-    {
-        "blockName": "core/post-comments-form",
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "",
-        "innerContent": []
-    },
-    {
-        "blockName": null,
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "\n",
-        "innerContent": [
-            "\n"
-        ]
-    }
+	{
+		"blockName": "core/post-comments-form",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n",
+		"innerContent": [ "\n" ]
+	}
 ]

@@ -30,12 +30,7 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": [
-			"left",
-			"right",
-			"wide",
-			"full"
-		]
+		"align": [ "left", "right", "wide", "full" ]
 	},
 	"editorStyle": "wp-block-pullquote-editor",
 	"style": "wp-block-pullquote"

@@ -21,10 +21,7 @@
 		},
 		"direction": {
 			"type": "string",
-			"enum": [
-				"ltr",
-				"rtl"
-			]
+			"enum": [ "ltr", "rtl" ]
 		}
 	},
 	"supports": {

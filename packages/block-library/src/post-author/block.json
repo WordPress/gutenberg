@@ -21,10 +21,7 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [
-		"postType",
-		"postId"
-	],
+	"usesContext": [ "postType", "postId" ],
 	"supports": {
 		"html": false,
 		"fontSize": true,

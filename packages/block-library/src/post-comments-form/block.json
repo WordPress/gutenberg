@@ -7,10 +7,7 @@
 			"type": "string"
 		}
 	},
-	"usesContext": [
-		"postId",
-		"postType"
-	],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,
 		"color": {

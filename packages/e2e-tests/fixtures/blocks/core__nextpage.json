@@ -1,10 +1,10 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/nextpage",
-        "isValid": true,
-        "attributes": {},
-        "innerBlocks": [],
-        "originalContent": "<!--nextpage-->"
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/nextpage",
+		"isValid": true,
+		"attributes": {},
+		"innerBlocks": [],
+		"originalContent": "<!--nextpage-->"
+	}
 ]

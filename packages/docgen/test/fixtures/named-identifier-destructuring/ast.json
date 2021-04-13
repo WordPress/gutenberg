@@ -12,10 +12,7 @@
 			"column": 44
 		}
 	},
-	"range": [
-		35,
-		140
-	],
+	"range": [ 35, 140 ],
 	"body": [
 		{
 			"type": "VariableDeclaration",
@@ -31,10 +28,7 @@
 					"column": 59
 				}
 			},
-			"range": [
-				35,
-				94
-			],
+			"range": [ 35, 94 ],
 			"declarations": [
 				{
 					"type": "VariableDeclarator",
@@ -50,10 +44,7 @@
 							"column": 58
 						}
 					},
-					"range": [
-						41,
-						93
-					],
+					"range": [ 41, 93 ],
 					"id": {
 						"type": "ObjectPattern",
 						"start": 41,
@@ -68,10 +59,7 @@
 								"column": 25
 							}
 						},
-						"range": [
-							41,
-							60
-						],
+						"range": [ 41, 60 ],
 						"properties": [
 							{
 								"type": "Property",
@@ -87,10 +75,7 @@
 										"column": 23
 									}
 								},
-								"range": [
-									43,
-									58
-								],
+								"range": [ 43, 58 ],
 								"method": false,
 								"shorthand": true,
 								"computed": false,
@@ -108,10 +93,7 @@
 											"column": 23
 										}
 									},
-									"range": [
-										43,
-										58
-									],
+									"range": [ 43, 58 ],
 									"name": "someDeclaration"
 								},
 								"kind": "init",
@@ -129,10 +111,7 @@
 											"column": 23
 										}
 									},
-									"range": [
-										43,
-										58
-									],
+									"range": [ 43, 58 ],
 									"name": "someDeclaration"
 								}
 							}
@@ -152,10 +131,7 @@
 								"column": 58
 							}
 						},
-						"range": [
-							63,
-							93
-						],
+						"range": [ 63, 93 ],
 						"properties": [
 							{
 								"type": "Property",
@@ -171,10 +147,7 @@
 										"column": 56
 									}
 								},
-								"range": [
-									65,
-									91
-								],
+								"range": [ 65, 91 ],
 								"method": false,
 								"shorthand": false,
 								"computed": false,
@@ -192,10 +165,7 @@
 											"column": 45
 										}
 									},
-									"range": [
-										65,
-										80
-									],
+									"range": [ 65, 80 ],
 									"name": "someDeclaration"
 								},
 								"value": {
@@ -212,10 +182,7 @@
 											"column": 56
 										}
 									},
-									"range": [
-										82,
-										91
-									],
+									"range": [ 82, 91 ],
 									"id": null,
 									"generator": false,
 									"expression": false,
@@ -235,10 +202,7 @@
 												"column": 56
 											}
 										},
-										"range": [
-											88,
-											91
-										],
+										"range": [ 88, 91 ],
 										"body": []
 									}
 								},
@@ -255,10 +219,7 @@
 					"value": "*\n * My declaration example.\n ",
 					"start": 0,
 					"end": 34,
-					"range": [
-						0,
-						34
-					],
+					"range": [ 0, 34 ],
 					"loc": {
 						"start": {
 							"line": 1,
@@ -286,10 +247,7 @@
 					"column": 44
 				}
 			},
-			"range": [
-				96,
-				140
-			],
+			"range": [ 96, 140 ],
 			"declaration": null,
 			"specifiers": [
 				{
@@ -306,10 +264,7 @@
 							"column": 41
 						}
 					},
-					"range": [
-						105,
-						137
-					],
+					"range": [ 105, 137 ],
 					"local": {
 						"type": "Identifier",
 						"start": 105,
@@ -324,10 +279,7 @@
 								"column": 24
 							}
 						},
-						"range": [
-							105,
-							120
-						],
+						"range": [ 105, 120 ],
 						"name": "someDeclaration"
 					},
 					"exported": {
@@ -344,10 +296,7 @@
 								"column": 41
 							}
 						},
-						"range": [
-							124,
-							137
-						],
+						"range": [ 124, 137 ],
 						"name": "myDeclaration"
 					}
 				}
@@ -362,10 +311,7 @@
 			"value": "*\n * My declaration example.\n ",
 			"start": 0,
 			"end": 34,
-			"range": [
-				0,
-				34
-			],
+			"range": [ 0, 34 ],
 			"loc": {
 				"start": {
 					"line": 1,

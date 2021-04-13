@@ -12,10 +12,7 @@
 			"column": 35
 		}
 	},
-	"range": [
-		41,
-		118
-	],
+	"range": [ 41, 118 ],
 	"body": [
 		{
 			"type": "ExportNamedDeclaration",
@@ -31,10 +28,7 @@
 					"column": 40
 				}
 			},
-			"range": [
-				41,
-				81
-			],
+			"range": [ 41, 81 ],
 			"declaration": {
 				"type": "FunctionDeclaration",
 				"start": 48,
@@ -49,10 +43,7 @@
 						"column": 40
 					}
 				},
-				"range": [
-					48,
-					81
-				],
+				"range": [ 48, 81 ],
 				"id": {
 					"type": "Identifier",
 					"start": 57,
@@ -67,10 +58,7 @@
 							"column": 35
 						}
 					},
-					"range": [
-						57,
-						76
-					],
+					"range": [ 57, 76 ],
 					"name": "functionDeclaration"
 				},
 				"generator": false,
@@ -91,10 +79,7 @@
 							"column": 40
 						}
 					},
-					"range": [
-						79,
-						81
-					],
+					"range": [ 79, 81 ],
 					"body": []
 				}
 			},
@@ -106,10 +91,7 @@
 					"value": "*\n * Function declaration example.\n ",
 					"start": 0,
 					"end": 40,
-					"range": [
-						0,
-						40
-					],
+					"range": [ 0, 40 ],
 					"loc": {
 						"start": {
 							"line": 1,
@@ -137,10 +119,7 @@
 					"column": 35
 				}
 			},
-			"range": [
-				83,
-				118
-			],
+			"range": [ 83, 118 ],
 			"declaration": {
 				"type": "Identifier",
 				"start": 98,
@@ -155,10 +134,7 @@
 						"column": 34
 					}
 				},
-				"range": [
-					98,
-					117
-				],
+				"range": [ 98, 117 ],
 				"name": "functionDeclaration"
 			}
 		}
@@ -170,10 +146,7 @@
 			"value": "*\n * Function declaration example.\n ",
 			"start": 0,
 			"end": 40,
-			"range": [
-				0,
-				40
-			],
+			"range": [ 0, 40 ],
 			"loc": {
 				"start": {
 					"line": 1,

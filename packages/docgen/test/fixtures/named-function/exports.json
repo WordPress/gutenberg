@@ -12,10 +12,7 @@
 			"column": 34
 		}
 	},
-	"range": [
-		35,
-		69
-	],
+	"range": [ 35, 69 ],
 	"declaration": {
 		"type": "FunctionDeclaration",
 		"start": 42,
@@ -30,10 +27,7 @@
 				"column": 34
 			}
 		},
-		"range": [
-			42,
-			69
-		],
+		"range": [ 42, 69 ],
 		"id": {
 			"type": "Identifier",
 			"start": 51,
@@ -48,10 +42,7 @@
 					"column": 29
 				}
 			},
-			"range": [
-				51,
-				64
-			],
+			"range": [ 51, 64 ],
 			"name": "myDeclaration"
 		},
 		"generator": false,
@@ -72,10 +63,7 @@
 					"column": 34
 				}
 			},
-			"range": [
-				67,
-				69
-			],
+			"range": [ 67, 69 ],
 			"body": []
 		}
 	},
@@ -87,10 +75,7 @@
 			"value": "*\n * My declaration example.\n ",
 			"start": 0,
 			"end": 34,
-			"range": [
-				0,
-				34
-			],
+			"range": [ 0, 34 ],
 			"loc": {
 				"start": {
 					"line": 1,
