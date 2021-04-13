@@ -36,7 +36,7 @@ function gutenberg_get_common_block_editor_settings() {
 			'slug' => $image_size_slug,
 			'name' => $image_size_name,
 		);
-	};
+	}
 
 	$settings = array(
 		'__unstableEnableFullSiteEditingBlocks' => gutenberg_supports_block_templates(),
