@@ -50,6 +50,16 @@ Whether the palette should have a clearing button or not.
 - Required: No
 - Default: true
 
+### disableAlpha
+
+Whether the custom color picker allows the selection of alpha values. Only relevant, when
+`disableCustomColors` is false. If alpha is enabled, the returned color format will be rgba
+instead of hex.
+
+- Type: `Boolean`
+- Required: No
+- Default: true
+
 
 ## Usage
 ```jsx
