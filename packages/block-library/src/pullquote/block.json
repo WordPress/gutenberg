@@ -7,13 +7,15 @@
 			"type": "string",
 			"source": "html",
 			"selector": "blockquote",
-			"multiline": "p"
+			"multiline": "p",
+			"__experimentalRole": "content"
 		},
 		"citation": {
 			"type": "string",
 			"source": "html",
 			"selector": "cite",
-			"default": ""
+			"default": "",
+			"__experimentalRole": "content"
 		},
 		"mainColor": {
 			"type": "string"
