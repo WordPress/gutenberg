@@ -31,7 +31,7 @@
 		cursor: pointer;
 		margin: 0 $grid-unit-15 $grid-unit-15 0;
 		width: 200px;
-		max-height: 200px;
+		max-height: 140px;
 		text-align: center;
 		display: flex;
 		flex-direction: column;
@@ -95,6 +95,7 @@
 	// Size consecutive block variation icons the same.
 	.block-setup-block-layout-list__list-item.is-block-variation .block-setup-block-layout-list__item {
 		height: 90px;
+		min-height: 90px;
 	}
 
 	// Size the block variation icon same as the thumbnail on step 1.
