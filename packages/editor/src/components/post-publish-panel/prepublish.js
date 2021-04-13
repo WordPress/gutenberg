@@ -53,7 +53,7 @@ function PostPublishPanelPrepublish( { children } ) {
 			] ),
 			siteIconUrl: siteData.site_icon_url,
 			siteTitle: siteData.name,
-			siteHome: filterURLForDisplay( siteData.home ),
+			siteHome: siteData.home && filterURLForDisplay( siteData.home ),
 		};
 	}, [] );
 
@@ -102,10 +102,20 @@ function PostPublishPanelPrepublish( { children } ) {
 			<p>{ prePublishBodyText }</p>
 			<div className="components-site-card">
 				{ siteIcon }
-				<div className="components-site-info">
-					<span className="components-site-name">{ siteTitle }</span>
-					<span className="components-site-home">{ siteHome }</span>
-				</div>
+				{ ( siteTitle || siteHome ) && (
+					<div className="components-site-info">
+						{ siteTitle && (
+							<span className="components-site-name">
+								{ siteTitle }
+							</span>
+						) }
+						{ siteHome && (
+							<span className="components-site-home">
+								{ siteHome }
+							</span>
+						) }
+					</div>
+				) }
 			</div>
 			{ hasPublishAction && (
 				<>
