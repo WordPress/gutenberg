@@ -877,10 +877,9 @@ class WP_Theme_JSON {
 			return $stylesheet;
 		}
 
-		$metadata     = self::get_blocks_metadata();
-		$block_rules  = '';
-		$preset_rules = '';
-		foreach ( $metadata as $block_selector => $metadata ) {
+		$blocks_metadata = self::get_blocks_metadata();
+		$block_rules     = '';
+		foreach ( $blocks_metadata as $block_selector => $metadata ) {
 			if ( empty( $metadata['selector'] ) ) {
 				continue;
 			}
@@ -896,14 +895,18 @@ class WP_Theme_JSON {
 			}
 
 			$block_rules .= self::to_ruleset( $selector, $declarations );
+		}
 
-			// Attach the rulesets for the classes.
-			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
-				$preset_rules .= self::compute_preset_classes(
-					$this->theme_json['settings'][ $block_selector ],
-					$selector
-				);
+		$preset_rules  = '';
+		$setting_nodes = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
+		foreach( $setting_nodes as $metadata ) {
+			if( null === $metadata['selector'] ) {
+				continue;
 			}
+
+			$selector      = $metadata['selector'];
+			$node          = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$preset_rules .= self::compute_preset_classes( $node, $selector );
 		}
 
 		return $block_rules . $preset_rules;
