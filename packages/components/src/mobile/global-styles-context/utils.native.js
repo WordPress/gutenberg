@@ -87,8 +87,8 @@ export function parseColorVariables( styles, colorPalette ) {
 export function getGlobalStyles( baseStyles ) {
 	const colorSettings = baseStyles?.settings?.color;
 	const palette = colorSettings?.palette;
-	const gradients = colorSettings?.gradients;
 	const globalStyles = parseColorVariables( baseStyles, palette );
+	const gradients = globalStyles?.settings?.color?.gradients;
 
 	return {
 		...( palette || gradients
