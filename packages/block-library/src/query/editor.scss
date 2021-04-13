@@ -31,7 +31,6 @@
 		cursor: pointer;
 		margin: 0 $grid-unit-15 $grid-unit-15 0;
 		width: 200px;
-		max-height: 140px;
 		text-align: center;
 		display: flex;
 		flex-direction: column;
@@ -53,6 +52,7 @@
 
 		.block-setup-block-layout-list__item {
 			height: 100%;
+			max-height: 140px;
 			display: flex;
 			flex-direction: column;
 			padding: 2px;
