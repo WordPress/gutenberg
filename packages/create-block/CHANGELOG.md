@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Updated `.editorconfig` template files to work with automatic file formatting.
+
 ## 2.2.0 (2021-04-06)
 
 ### Enhancement
