@@ -63,10 +63,9 @@ export default function useResizeCanvas(
 					width: getCanvasWidth( device ),
 					margin: marginValue() + 'px auto',
 					height,
-					minHeight: height,
-					maxHeight: height,
 					borderRadius: '2px',
 					border: '1px solid #ddd',
+					overflowY: 'auto',
 				};
 			default:
 				return null;

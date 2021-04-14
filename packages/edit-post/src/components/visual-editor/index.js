@@ -65,9 +65,6 @@ export default function VisualEditor( { styles } ) {
 		height: '100%',
 		width: '100%',
 		margin: 0,
-		// padding: 0,
-		minHeight: 'auto',
-		maxHeight: 'auto',
 		// Add a constant padding for the typewritter effect. When typing at the
 		// bottom, there needs to be room to scroll up.
 		paddingBottom: hasMetaBoxes ? null : '40vh',
@@ -76,6 +73,7 @@ export default function VisualEditor( { styles } ) {
 		...desktopCanvasStyles,
 		borderRadius: '2px',
 		border: '1px solid #ddd',
+		paddingBottom: null,
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType );
 	const defaultLayout = useEditorFeature( 'layout' );
@@ -85,11 +83,11 @@ export default function VisualEditor( { styles } ) {
 			? [ 'wide', 'full' ]
 			: [ 'left', 'center', 'right' ];
 
-	let appliedStyles = isTemplateMode
+	let animatedStyles = isTemplateMode
 		? templateModeStyles
 		: desktopCanvasStyles;
 	if ( resizedCanvasStyles ) {
-		appliedStyles = resizedCanvasStyles;
+		animatedStyles = resizedCanvasStyles;
 	}
 
 	const mergedRefs = useMergeRefs( [
@@ -132,7 +130,7 @@ export default function VisualEditor( { styles } ) {
 			<motion.div
 				ref={ mergedRefs }
 				className="editor-styles-wrapper"
-				animate={ appliedStyles }
+				animate={ animatedStyles }
 			>
 				<AnimatePresence>
 					<motion.div
