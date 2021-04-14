@@ -74,11 +74,7 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 		} else {
 			commentsText = sprintf(
 				/* translators: %s: Number of comments */
-				_n(
-					'%s comment',
-					'%s comments',
-					commentsNumber
-				),
+				_n( '%s comment', '%s comments', commentsNumber ),
 				commentsNumber.toLocaleString()
 			);
 		}
