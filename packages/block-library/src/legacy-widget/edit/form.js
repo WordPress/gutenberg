@@ -20,8 +20,6 @@ import apiFetch from '@wordpress/api-fetch';
 import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 
-const $ = window.jQuery;
-
 export default function Form( { id, idBase, instance, setInstance } ) {
 	const { html, setFormData } = useForm( {
 		id,
@@ -132,11 +130,19 @@ function Control( { id, idBase, html, onChange, onSave } ) {
 	const controlRef = useRef();
 	const formRef = useRef();
 
-	// Trigger widget-added when widget is ready and widget-updated when widget
-	// changes. This event is what widgets' scripts use to initialize, attach
-	// events, etc.
+	// Trigger 'widget-added' when widget is ready and 'widget-updated' when
+	// widget changes. This event is what widgets' scripts use to initialize,
+	// attach events, etc. The event must be fired using jQuery's event bus as
+	// this is what widget scripts expect. If jQuery is not loaded, do nothing -
+	// some widgets will still work regardless.
 	const hasBeenAdded = useRef( false );
 	useEffect( () => {
+		if ( ! window.jQuery ) {
+			return;
+		}
+
+		const { jQuery: $ } = window;
+
 		if ( html ) {
 			$( document ).trigger(
 				hasBeenAdded.current ? 'widget-updated' : 'widget-added',
@@ -152,12 +158,19 @@ function Control( { id, idBase, html, onChange, onSave } ) {
 		idBase,
 	] );
 
-	// Use jQuery change event instead of the native change event because many
-	// widgets use jQuery's trigger() to trigger an update.
+	// Prefer jQuery 'change' event instead of the native 'change' event because
+	// many widgets use jQuery's event bus to trigger an update.
 	useEffect( () => {
 		const handler = () => onChange( serializeForm( formRef.current ) );
-		$( formRef.current ).on( 'change', null, handler );
-		return () => $( formRef.current ).off( 'change', null, handler );
+
+		if ( window.jQuery ) {
+			const { jQuery: $ } = window;
+			$( formRef.current ).on( 'change', null, handler );
+			return () => $( formRef.current ).off( 'change', null, handler );
+		}
+
+		formRef.current.addEventListener( 'change', handler );
+		return () => formRef.current.removeEventListener( 'change', handler );
 	}, [ onChange ] );
 
 	// Non-multi widgets can be saved via a Save button.
