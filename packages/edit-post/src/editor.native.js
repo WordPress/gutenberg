@@ -18,6 +18,7 @@ import {
 	subscribeFeaturedImageIdCurrent,
 } from '@wordpress/react-native-bridge';
 import { SlotFillProvider } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -87,6 +88,7 @@ class Editor extends Component {
 				}
 			}
 		);
+
 		this.subscriptionParentFeaturedImageIdCurrent = subscribeFeaturedImageIdCurrent(
 			( payload ) => {
 				this.props.editEntityRecord(
@@ -105,6 +107,7 @@ class Editor extends Component {
 		if ( this.subscriptionParentSetFocusOnTitle ) {
 			this.subscriptionParentSetFocusOnTitle.remove();
 		}
+
 		if ( this.subscribeFeaturedImageIdCurrent ) {
 			this.subscribeFeaturedImageIdCurrent.remove();
 		}
@@ -193,7 +196,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { switchEditorMode } = dispatch( editPostStore );
-		const { editEntityRecord } = dispatch( 'core' );
+		const { editEntityRecord } = dispatch( coreStore );
 		return {
 			switchEditorMode,
 			editEntityRecord,
