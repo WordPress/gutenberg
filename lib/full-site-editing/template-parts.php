@@ -192,7 +192,7 @@ function gutenberg_get_allowed_template_part_areas() {
 			'label'                 => __( 'Footer', 'gutenberg' ),
 			'description'           => __(
 				'The Footer template defines a page area that typically contains site credits, social links, or any other combination of blocks.',
-				'gutenberg',
+				'gutenberg'
 			),
 			'icon'                  => 'footer',
 			'defaultWrapperElement' => 'footer',
