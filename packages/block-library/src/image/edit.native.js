@@ -14,7 +14,6 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
-	subscribeFeaturedImageIdCurrent,
 } from '@wordpress/react-native-bridge';
 import {
 	CycleSelectControl,
@@ -85,7 +84,6 @@ export class ImageEdit extends Component {
 			this
 		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.featuredImageIdCurrent = this.featuredImageIdCurrent.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
@@ -122,7 +120,7 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes, featuredImageId } = this.props;
+		const { attributes, setAttributes } = this.props;
 		// This will warn when we have `id` defined, while `url` is undefined.
 		// This may help track this issue: https://github.com/wordpress-mobile/WordPress-Android/issues/9768
 		// where a cancelled image upload was resulting in a subsequent crash.
@@ -153,13 +151,6 @@ export class ImageEdit extends Component {
 		) {
 			mediaUploadSync();
 		}
-
-		// Flag the ID of a post's featured image when editor mounts.
-		if ( attributes.id ) {
-			setAttributes( { featuredImageId } );
-		}
-
-		this.addFeaturedImageIdListener();
 	}
 
 	componentWillUnmount() {
@@ -173,8 +164,6 @@ export class ImageEdit extends Component {
 				this.props.attributes.id
 			);
 		}
-
-		this.removeFeaturedImageIdListener();
 	}
 
 	componentDidUpdate( previousProps ) {
@@ -276,29 +265,6 @@ export class ImageEdit extends Component {
 			...extraUpdatedAttributes,
 			align: nextAlign,
 		} );
-	}
-
-	featuredImageIdCurrent( payload ) {
-		const { setAttributes } = this.props;
-		setAttributes( { featuredImageId: payload.featuredImageId } );
-	}
-
-	addFeaturedImageIdListener() {
-		//if we already have a subscription not worth doing it again
-		if ( this.subscriptionParentFeaturedImageIdCurrent ) {
-			return;
-		}
-		this.subscriptionParentFeaturedImageIdCurrent = subscribeFeaturedImageIdCurrent(
-			( payload ) => {
-				this.featuredImageIdCurrent( payload );
-			}
-		);
-	}
-
-	removeFeaturedImageIdListener() {
-		if ( this.subscriptionParentFeaturedImageIdCurrent ) {
-			this.subscriptionParentFeaturedImageIdCurrent.remove();
-		}
 	}
 
 	onSetLinkDestination( href ) {
@@ -472,6 +438,7 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
+			featuredImageId,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
@@ -480,11 +447,10 @@ export class ImageEdit extends Component {
 			imageDefaultSize,
 		] );
 
-		const isFeaturedImage =
-			attributes.featuredImageId === attributes.id ? true : false;
+		const isFeaturedImage = featuredImageId === attributes.id;
 
 		// eslint-disable-next-line no-unused-vars
-		const androidOnly = Platform.OS === 'android' ? true : false;
+		const androidOnly = Platform.OS === 'android';
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
