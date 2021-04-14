@@ -1681,7 +1681,8 @@ export function __experimentalGetDefaultTemplateTypes( state ) {
  */
 export const __experimentalGetDefaultTemplatePartAreas = createSelector(
 	( state ) => {
-		const areas = getEditorSettings( state )?.defaultTemplatePartAreas;
+		const areas =
+			getEditorSettings( state )?.defaultTemplatePartAreas || [];
 		return areas?.map( ( item ) => {
 			return { ...item, icon: getTemplatePartIcon( item.icon ) };
 		} );
