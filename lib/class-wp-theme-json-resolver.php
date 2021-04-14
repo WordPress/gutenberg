@@ -500,6 +500,10 @@ class WP_Theme_JSON_Resolver {
 		return $located;
 	}
 
+	/**
+	 * Cleans the cached data so it can be recalculated.
+	 *
+	 */
 	public static function clean_cached_data() {
 		self::$core                     = null;
 		self::$theme                    = null;
