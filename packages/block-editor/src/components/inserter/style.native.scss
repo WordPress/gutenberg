@@ -76,8 +76,15 @@
 	width: 19px;
 }
 
-.inserter-search-form__input-buttons {
-	margin: 0 12px;
+.inserter-search-form__input-button {
 	justify-content: center;
 	width: 19px;
+}
+
+.inserter-search-form__input-button-left {
+	margin: 0 12px;
+}
+
+.inserter-search-form__input-button-right {
+	margin: 0 12px;
 }

@@ -127,27 +127,50 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 		),
 	};
 
-	const iconStyle = {
+	const baseInputButtonStyle = {
 		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__icon' ],
-			styles[ 'inserter-search-form__icon--dark' ]
+			styles[ 'inserter-search-form__input-button' ],
+			styles[ 'inserter-search-form__input-button--dark' ]
 		),
 		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__icon' ],
-			platformStyles[ 'inserter-search-form__icon--dark' ]
+			platformStyles[ 'inserter-search-form__input-button' ],
+			platformStyles[ 'inserter-search-form__input-button--dark' ]
 		),
 	};
 
-	const iconActiveStyle = {
-		...iconStyle,
+	const activeInputButtonStyle = {
+		...baseInputButtonStyle,
 		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__icon--active' ],
-			styles[ 'inserter-search-form__icon--active-dark' ]
+			styles[ 'inserter-search-form__input-button--active' ],
+			styles[ 'inserter-search-form__input-button--active-dark' ]
 		),
 		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__icon--active' ],
-			platformStyles[ 'inserter-search-form__icon--active-dark' ]
+			platformStyles[ 'inserter-search-form__input-button--active' ],
+			platformStyles[ 'inserter-search-form__input-button--active-dark' ]
 		),
+	};
+
+	const inputButtonStyle = isActive
+		? activeInputButtonStyle
+		: baseInputButtonStyle;
+
+	const baseInputButtonLeftStyle = {
+		...styles[ 'inserter-search-form__input-button-left' ],
+		...platformStyles[ 'inserter-search-form__input-button-left' ],
+	};
+
+	const activeInputButtonLeftStyle = {
+		...styles[ 'inserter-search-form__input-button-left--active' ],
+		...platformStyles[ 'inserter-search-form__input-button-left--active' ],
+	};
+
+	const inputButtonLeftStyle = isActive
+		? activeInputButtonLeftStyle
+		: baseInputButtonLeftStyle;
+
+	const inputButtonRightStyle = {
+		...styles[ 'inserter-search-form__input-button-right' ],
+		...platformStyles[ 'inserter-search-form__input-button-right' ],
 	};
 
 	const cancelButtonStyle = {
@@ -199,7 +222,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	function renderRightButton() {
 		// Add a View element to properly center the input placeholder via flexbox
 		if ( isIOS && ! isActive ) {
-			return <View style={ isActive ? iconActiveStyle : iconStyle } />;
+			return <View />;
 		}
 
 		if ( !! value ) {
@@ -228,7 +251,9 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 					isActive ? inputContainerActiveStyle : inputContainerStyle
 				}
 			>
-				<View style={ isActive ? iconActiveStyle : iconStyle }>
+				<View
+					style={ { ...inputButtonStyle, ...inputButtonLeftStyle } }
+				>
 					{ renderLeftButton() }
 				</View>
 				<TextInput
@@ -240,7 +265,9 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 					value={ value }
 					placeholder={ __( 'Search blocks' ) }
 				/>
-				<View style={ isActive ? iconActiveStyle : iconStyle }>
+				<View
+					style={ { ...inputButtonStyle, ...inputButtonRightStyle } }
+				>
 					{ renderRightButton() }
 				</View>
 			</View>
