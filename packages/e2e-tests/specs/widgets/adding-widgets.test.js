@@ -496,8 +496,13 @@ describe( 'Widgets screen', () => {
 		);
 		await editButton.click();
 
-		// TODO: Should query this with role and label.
-		const titleInput = await legacyWidget.$( '#widget-search-1-title' );
+		const [ titleLabel ] = await legacyWidget.$x(
+			'//label[contains(text(), "Title")]'
+		);
+		const titleInputId = await titleLabel.evaluate( ( node ) =>
+			node.getAttribute( 'for' )
+		);
+		const titleInput = await page.$( `#${ titleInputId }` );
 		await titleInput.type( 'Search Title' );
 
 		// Trigger the toolbar to appear.
