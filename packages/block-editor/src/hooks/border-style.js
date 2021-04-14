@@ -2,8 +2,6 @@
  * Internal dependencies
  */
 import BorderStyleControl from '../components/border-style-control';
-import useEditorFeature from '../components/use-editor-feature';
-import { hasBorderFeatureSupport } from './border';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -17,10 +15,6 @@ export const BorderStyleEdit = ( props ) => {
 		attributes: { style },
 		setAttributes,
 	} = props;
-
-	if ( useIsBorderStyleDisabled( props ) ) {
-		return null;
-	}
 
 	const onChange = ( newBorderStyle ) => {
 		const newStyleAttributes = {
@@ -40,15 +34,4 @@ export const BorderStyleEdit = ( props ) => {
 			onChange={ onChange }
 		/>
 	);
-};
-
-/**
- * Custom hook that checks if border style settings have been disabled.
- *
- * @param  {string} blockName The name of the block to determine support scope.
- * @return {boolean}          Whether or not border style is disabled.
- */
-export const useIsBorderStyleDisabled = ( { name: blockName } = {} ) => {
-	const isDisabled = ! useEditorFeature( 'border.customStyle' );
-	return ! hasBorderFeatureSupport( 'style', blockName ) || isDisabled;
 };

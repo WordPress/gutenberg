@@ -7,8 +7,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useEditorFeature from '../components/use-editor-feature';
-import { hasBorderFeatureSupport } from './border';
 import { cleanEmptyObject } from './utils';
 
 const MIN_BORDER_WIDTH = 0;
@@ -25,10 +23,6 @@ export const BorderWidthEdit = ( props ) => {
 		attributes: { style },
 		setAttributes,
 	} = props;
-
-	if ( useIsBorderWidthDisabled( props ) ) {
-		return null;
-	}
 
 	const onChange = ( newWidth ) => {
 		const newStyle = {
@@ -53,15 +47,4 @@ export const BorderWidthEdit = ( props ) => {
 			onChange={ onChange }
 		/>
 	);
-};
-
-/**
- * Custom hook that checks if border width settings have been disabled.
- *
- * @param  {string} blockName The name of the block to determine support scope.
- * @return {boolean}          Whether or not border width is disabled.
- */
-export const useIsBorderWidthDisabled = ( { name: blockName } = {} ) => {
-	const isDisabled = ! useEditorFeature( 'border.customWidth' );
-	return ! hasBorderFeatureSupport( 'width', blockName ) || isDisabled;
 };

@@ -7,8 +7,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useEditorFeature from '../components/use-editor-feature';
-import { hasBorderFeatureSupport } from './border';
 import { cleanEmptyObject } from './utils';
 
 const MIN_BORDER_RADIUS_VALUE = 0;
@@ -25,10 +23,6 @@ export function BorderRadiusEdit( props ) {
 		attributes: { style },
 		setAttributes,
 	} = props;
-
-	if ( useIsBorderRadiusDisabled( props ) ) {
-		return null;
-	}
 
 	const onChange = ( newRadius ) => {
 		let newStyle = {
@@ -57,15 +51,4 @@ export function BorderRadiusEdit( props ) {
 			onChange={ onChange }
 		/>
 	);
-}
-
-/**
- * Custom hook that checks if border radius settings have been disabled.
- *
- * @param  {string} name The name of the block.
- * @return {boolean}                 Whether border radius setting is disabled.
- */
-export function useIsBorderRadiusDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useEditorFeature( 'border.customRadius' );
-	return ! hasBorderFeatureSupport( 'radius', blockName ) || isDisabled;
 }
