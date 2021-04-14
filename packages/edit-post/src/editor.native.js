@@ -81,6 +81,8 @@ class Editor extends Component {
 	}
 
 	componentDidMount() {
+		const { editEntityRecord, postType, postId } = this.props;
+
 		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle(
 			() => {
 				if ( this.postTitleRef ) {
@@ -91,14 +93,9 @@ class Editor extends Component {
 
 		this.subscriptionParentFeaturedImageIdCurrent = subscribeFeaturedImageIdCurrent(
 			( payload ) => {
-				this.props.editEntityRecord(
-					'postType',
-					this.props.postType,
-					this.props.postId,
-					{
-						featured_media: payload.featuredImageId,
-					}
-				);
+				editEntityRecord( 'postType', postType, postId, {
+					featured_media: payload.featuredImageId,
+				} );
 			}
 		);
 	}
