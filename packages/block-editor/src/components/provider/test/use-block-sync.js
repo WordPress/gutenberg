@@ -256,7 +256,13 @@ describe( 'useBlockSync hook', () => {
 
 		expect( onInput ).toHaveBeenCalledWith(
 			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
-			{ selectionEnd: {}, selectionStart: {} }
+			{
+				selection: {
+					selectionEnd: {},
+					selectionStart: {},
+					initialPosition: null,
+				},
+			}
 		);
 		expect( onChange ).not.toHaveBeenCalled();
 	} );
@@ -292,7 +298,13 @@ describe( 'useBlockSync hook', () => {
 
 		expect( onChange ).toHaveBeenCalledWith(
 			[ { clientId: 'a', innerBlocks: [], attributes: { foo: 2 } } ],
-			{ selectionEnd: {}, selectionStart: {} }
+			{
+				selection: {
+					selectionEnd: {},
+					selectionStart: {},
+					initialPosition: null,
+				},
+			}
 		);
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
@@ -395,7 +407,13 @@ describe( 'useBlockSync hook', () => {
 					attributes: { foo: 2 },
 				},
 			],
-			{ selectionEnd: {}, selectionStart: {} }
+			{
+				selection: {
+					selectionEnd: {},
+					selectionStart: {},
+					initialPosition: null,
+				},
+			}
 		);
 		expect( onInput ).not.toHaveBeenCalled();
 	} );
@@ -433,8 +451,11 @@ describe( 'useBlockSync hook', () => {
 		];
 
 		expect( onChange1 ).toHaveBeenCalledWith( updatedBlocks1, {
-			selectionEnd: {},
-			selectionStart: {},
+			selection: {
+				initialPosition: null,
+				selectionEnd: {},
+				selectionStart: {},
+			},
 		} );
 
 		const newBlocks = [
@@ -469,7 +490,13 @@ describe( 'useBlockSync hook', () => {
 		// The second callback should be called with the new change.
 		expect( onChange2 ).toHaveBeenCalledWith(
 			[ { clientId: 'b', innerBlocks: [], attributes: { foo: 3 } } ],
-			{ selectionEnd: {}, selectionStart: {} }
+			{
+				selection: {
+					selectionEnd: {},
+					selectionStart: {},
+					initialPosition: null,
+				},
+			}
 		);
 	} );
 
@@ -526,7 +553,13 @@ describe( 'useBlockSync hook', () => {
 		// Only the new callback should be called.
 		expect( onChange2 ).toHaveBeenCalledWith(
 			[ { clientId: 'b', innerBlocks: [], attributes: { foo: 3 } } ],
-			{ selectionEnd: {}, selectionStart: {} }
+			{
+				selection: {
+					selectionEnd: {},
+					selectionStart: {},
+					initialPosition: null,
+				},
+			}
 		);
 	} );
 } );

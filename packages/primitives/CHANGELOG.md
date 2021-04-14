@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.12.0 (2021-03-17)
+
 ## 1.5.0 (2020-05-14)
 
 ### New Feature
@@ -17,7 +19,7 @@
 
 ## 1.3.0 (2020-04-15)
 
-- Include TypeScript type declarations ([#21482](https://github.com/WordPress/gutenberg/pull/21482))
+-   Include TypeScript type declarations ([#21482](https://github.com/WordPress/gutenberg/pull/21482))
 
 ## 1.0.0
 

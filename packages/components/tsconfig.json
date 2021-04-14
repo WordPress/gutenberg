@@ -3,19 +3,30 @@
 	"compilerOptions": {
 		"rootDir": "src",
 		"declarationDir": "build-types",
-		"types": [ "gutenberg-env" ]
+		"types": [ "gutenberg-env" ],
+		"paths": {
+			"styled-griddie": [ "../../typings/styled-griddie" ]
+		}
 	},
 	"references": [
 		{ "path": "../deprecated" },
 		{ "path": "../element" },
 		{ "path": "../hooks" },
-		{ "path": "../primitives" }
+		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../primitives" },
+		{ "path": "../react-i18n" }
 	],
 	"include": [
 		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
+		"src/draggable/**/*",
 		"src/flex/**/*",
+		"src/form-group/**/*",
+		"src/scroll-lock/**/*",
+		"src/shortcut/**/*",
+		"src/spinner/**/*",
 		"src/tip/**/*",
 		"src/ui/**/*",
 		"src/utils/**/*",
@@ -31,6 +42,7 @@
 		"src/**/react-native-*",
 		"src/**/stories",
 		"src/**/test",
+		"src/ui/__storybook-utils",
 		"src/ui/font-size-control"
 	]
 }

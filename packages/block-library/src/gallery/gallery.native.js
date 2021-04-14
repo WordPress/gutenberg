@@ -16,7 +16,10 @@ import Tiles from './tiles';
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { BlockCaption } from '@wordpress/block-editor';
+import {
+	BlockCaption,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useState, useEffect } from '@wordpress/element';
 import { mediaUploadSync } from '@wordpress/react-native-bridge';
 import { useSelect } from '@wordpress/data';
@@ -35,7 +38,7 @@ export const Gallery = ( props ) => {
 	useEffect( mediaUploadSync, [] );
 
 	const isRTL = useSelect( ( select ) => {
-		return !! select( 'core/block-editor' ).getSettings().isRTL;
+		return !! select( blockEditorStore ).getSettings().isRTL;
 	}, [] );
 
 	const {

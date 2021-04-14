@@ -40,18 +40,17 @@ import {
 	buttonWithIcon,
 	toggleLabel,
 } from './icons';
+import {
+	CSS_UNITS,
+	PC_WIDTH_DEFAULT,
+	PX_WIDTH_DEFAULT,
+	MIN_WIDTH,
+	MIN_WIDTH_UNIT,
+} from './utils.js';
 
-/**
- * Constants
- */
-const MIN_WIDTH = 220;
-const MIN_WIDTH_UNIT = 'px';
-const PC_WIDTH_DEFAULT = 50;
-const PX_WIDTH_DEFAULT = 350;
-const CSS_UNITS = [
-	{ value: '%', label: '%', default: PC_WIDTH_DEFAULT },
-	{ value: 'px', label: 'px', default: PX_WIDTH_DEFAULT },
-];
+// Used to calculate border radius adjustment to avoid "fat" corners when
+// button is placed inside wrapper.
+const DEFAULT_INNER_PADDING = 4;
 
 export default function SearchEdit( {
 	className,
@@ -70,8 +69,10 @@ export default function SearchEdit( {
 		buttonText,
 		buttonPosition,
 		buttonUseIcon,
+		style,
 	} = attributes;
 
+	const borderRadius = style?.border?.radius;
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 
@@ -127,6 +128,7 @@ export default function SearchEdit( {
 		return (
 			<input
 				className="wp-block-search__input"
+				style={ { borderRadius } }
 				aria-label={ __( 'Optional placeholder text' ) }
 				// We hide the placeholder field's placeholder when there is a value. This
 				// stops screen readers from reading the placeholder field's placeholder
@@ -149,12 +151,14 @@ export default function SearchEdit( {
 					<Button
 						icon={ search }
 						className="wp-block-search__button"
+						style={ { borderRadius } }
 					/>
 				) }
 
 				{ ! buttonUseIcon && (
 					<RichText
 						className="wp-block-search__button"
+						style={ { borderRadius } }
 						aria-label={ __( 'Button text' ) }
 						placeholder={ __( 'Add button text…' ) }
 						withoutInteractiveFormatting
@@ -308,6 +312,19 @@ export default function SearchEdit( {
 		</>
 	);
 
+	const getWrapperStyles = () => {
+		if ( 'button-inside' === buttonPosition && style?.border?.radius ) {
+			// We have button inside wrapper and a border radius value to apply.
+			// Add default padding so we don't get "fat" corners.
+			const outerRadius =
+				parseInt( style?.border?.radius, 10 ) + DEFAULT_INNER_PADDING;
+
+			return { borderRadius: `${ outerRadius }px` };
+		}
+
+		return undefined;
+	};
+
 	const blockProps = useBlockProps( {
 		className: getBlockClassNames(),
 	} );
@@ -332,6 +349,7 @@ export default function SearchEdit( {
 					width: `${ width }${ widthUnit }`,
 				} }
 				className="wp-block-search__inside-wrapper"
+				style={ getWrapperStyles() }
 				minWidth={ MIN_WIDTH }
 				enable={ getResizableSides() }
 				onResizeStart={ ( event, direction, elt ) => {

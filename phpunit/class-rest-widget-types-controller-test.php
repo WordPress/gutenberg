@@ -1,28 +1,27 @@
 <?php
 /**
- * WP_REST_Widget_Types_Controller tests.
+ * WP_Test_REST_Widget_Types_Controller tests.
  *
  * @package WordPress
  * @subpackage REST_API
- * @since x.x.0
+ * @since 5.6.0
  */
 
 /**
  * Tests for WP_REST_Widget_Types_Controller.
  *
- * @since x.x.0
+ * @since 5.6.0
  *
  * @covers WP_REST_Widget_Types_Controller
  *
- * @group restapi-widgets
  * @group restapi
  */
-class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase {
+class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testcase {
 
 	/**
 	 * Admin user ID.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @var int $subscriber_id
 	 */
@@ -31,7 +30,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	/**
 	 * Subscriber user ID.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @var int $subscriber_id
 	 */
@@ -40,7 +39,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	/**
 	 * Create fake data before our tests run.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @param WP_UnitTest_Factory $factory Helper that lets us create fake data.
 	 */
@@ -63,20 +62,20 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_register_routes() {
 		$routes = rest_get_server()->get_routes();
 		$this->assertArrayHasKey( '/wp/v2/widget-types', $routes );
 		$this->assertCount( 1, $routes['/wp/v2/widget-types'] );
-		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<name>[a-zA-Z0-9_-]+)', $routes );
-		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<name>[a-zA-Z0-9_-]+)'] );
-		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<name>[a-zA-Z0-9_-]+)/form-renderer', $routes );
-		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<name>[a-zA-Z0-9_-]+)/form-renderer'] );
+		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)', $routes );
+		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)'] );
+		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)/form-renderer', $routes );
+		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)/form-renderer'] );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_context_param() {
 		// Collection.
@@ -94,7 +93,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items() {
 		wp_set_current_user( self::$admin_id );
@@ -111,7 +110,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item() {
 		$widget_name = 'calendar';
@@ -124,7 +123,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_widget_legacy() {
 		$widget_id = 'legacy';
@@ -142,7 +141,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_widget_invalid_name() {
 		$widget_type = 'fake';
@@ -154,7 +153,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item_schema() {
 		wp_set_current_user( self::$admin_id );
@@ -162,59 +161,60 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 7, $properties );
+		$this->assertCount( 8, $properties );
 
 		$this->assertArrayHasKey( 'name', $properties );
 		$this->assertArrayHasKey( 'id', $properties );
 		$this->assertArrayHasKey( 'option_name', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
+		$this->assertArrayHasKey( 'is_multi', $properties );
 		$this->assertArrayHasKey( 'classname', $properties );
 		$this->assertArrayHasKey( 'customize_selective_refresh', $properties );
 		$this->assertArrayHasKey( 'widget_class', $properties );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items_wrong_permission() {
 		wp_set_current_user( self::$subscriber_id );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 403 );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item_wrong_permission() {
 		wp_set_current_user( self::$subscriber_id );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types/calendar' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 403 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 403 );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_items_no_permission() {
 		wp_set_current_user( 0 );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 401 );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_get_item_no_permission() {
 		wp_set_current_user( 0 );
 		$request  = new WP_REST_Request( 'GET', '/wp/v2/widget-types/calendar' );
 		$response = rest_get_server()->dispatch( $request );
-		$this->assertErrorResponse( 'widgets_cannot_access', $response, 401 );
+		$this->assertErrorResponse( 'rest_cannot_manage_widgets', $response, 401 );
 	}
 
 	/**
-	 *
+	 * @ticket 51460
 	 */
 	public function test_prepare_item() {
 		$endpoint    = new WP_REST_Widget_Types_Controller;
@@ -228,7 +228,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 	/**
 	 * Util check widget type object against.
 	 *
-	 * @since x.x.0
+	 * @since 5.6.0
 	 *
 	 * @param WP_Widget_Type $widget_type Sample widget type.
 	 * @param array          $data Data to compare against.
@@ -243,7 +243,7 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 			'control_options',
 			'widget_options',
 			'widget_class',
-
+			'is_multi',
 		);
 
 		foreach ( $extra_fields as $extra_field ) {
@@ -254,10 +254,10 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 
 		// Test links.
 		$this->assertSame( rest_url( 'wp/v2/widget-types' ), $links['collection'][0]['href'] );
-		// $this->assertSame( rest_url( 'wp/v2/widget-types/' . $widget_type->id_base ), $links['self'][0]['href'] );
 	}
 
 	public function test_get_widget_form() {
+		$this->setExpectedDeprecated( 'WP_REST_Widget_Types_Controller::get_widget_form' );
 		$widget_name = 'calendar';
 		wp_set_current_user( self::$admin_id );
 		$request  = new WP_REST_Request( 'POST', '/wp/v2/widget-types/' . $widget_name . '/form-renderer' );
@@ -266,6 +266,112 @@ class REST_Widget_Types_Controller_Test extends WP_Test_REST_Controller_Testcase
 		$this->assertArrayHasKey( 'instance', $data );
 		$this->assertArrayHasKey( 'form', $data );
 	}
+
+	public function test_encode_form_data_with_no_input() {
+		wp_set_current_user( self::$admin_id );
+		$request  = new WP_REST_Request( 'POST', '/wp/v2/widget-types/search/encode' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			"<p>\n" .
+			"\t\t\t<label for=\"widget-search-1-title\">Title:</label>\n" .
+			"\t\t\t<input class=\"widefat\" id=\"widget-search-1-title\" name=\"widget-search[1][title]\" type=\"text\" value=\"\" />\n" .
+			"\t\t</p>",
+			$data['form']
+		);
+		$this->assertEqualSets(
+			array(
+				'encoded' => base64_encode( serialize( array() ) ),
+				'hash'    => wp_hash( serialize( array() ) ),
+				'raw'     => new stdClass,
+			),
+			$data['instance']
+		);
+	}
+
+	public function test_encode_form_data_with_instance() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/widget-types/search/encode' );
+		$request->set_param(
+			'instance',
+			array(
+				'encoded' => base64_encode( serialize( array( 'title' => 'Test title' ) ) ),
+				'hash'    => wp_hash( serialize( array( 'title' => 'Test title' ) ) ),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			"<p>\n" .
+			"\t\t\t<label for=\"widget-search-1-title\">Title:</label>\n" .
+			"\t\t\t<input class=\"widefat\" id=\"widget-search-1-title\" name=\"widget-search[1][title]\" type=\"text\" value=\"Test title\" />\n" .
+			"\t\t</p>",
+			$data['form']
+		);
+		$this->assertEqualSets(
+			array(
+				'encoded' => base64_encode( serialize( array( 'title' => 'Test title' ) ) ),
+				'hash'    => wp_hash( serialize( array( 'title' => 'Test title' ) ) ),
+				'raw'     => array( 'title' => 'Test title' ),
+			),
+			$data['instance']
+		);
+	}
+
+	public function test_encode_form_data_with_form_data() {
+		wp_set_current_user( self::$admin_id );
+		$request = new WP_REST_Request( 'POST', '/wp/v2/widget-types/search/encode' );
+		$request->set_param( 'form_data', 'widget-search[1][title]=Updated+title' );
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			"<p>\n" .
+			"\t\t\t<label for=\"widget-search-1-title\">Title:</label>\n" .
+			"\t\t\t<input class=\"widefat\" id=\"widget-search-1-title\" name=\"widget-search[1][title]\" type=\"text\" value=\"Updated title\" />\n" .
+			"\t\t</p>",
+			$data['form']
+		);
+		$this->assertEqualSets(
+			array(
+				'encoded' => base64_encode( serialize( array( 'title' => 'Updated title' ) ) ),
+				'hash'    => wp_hash( serialize( array( 'title' => 'Updated title' ) ) ),
+				'raw'     => array( 'title' => 'Updated title' ),
+			),
+			$data['instance']
+		);
+	}
+
+	public function test_encode_form_data_no_raw() {
+		global $wp_widget_factory;
+		wp_set_current_user( self::$admin_id );
+		$wp_widget_factory->widgets['WP_Widget_Search']->show_instance_in_rest = false;
+		$request = new WP_REST_Request( 'POST', '/wp/v2/widget-types/search/encode' );
+		$request->set_param(
+			'instance',
+			array(
+				'encoded' => base64_encode( serialize( array( 'title' => 'Test title' ) ) ),
+				'hash'    => wp_hash( serialize( array( 'title' => 'Test title' ) ) ),
+			)
+		);
+		$response = rest_get_server()->dispatch( $request );
+		$data     = $response->get_data();
+		$this->assertEquals(
+			"<p>\n" .
+			"\t\t\t<label for=\"widget-search-1-title\">Title:</label>\n" .
+			"\t\t\t<input class=\"widefat\" id=\"widget-search-1-title\" name=\"widget-search[1][title]\" type=\"text\" value=\"Test title\" />\n" .
+			"\t\t</p>",
+			$data['form']
+		);
+		$this->assertEqualSets(
+			array(
+				'encoded' => base64_encode( serialize( array( 'title' => 'Test title' ) ) ),
+				'hash'    => wp_hash( serialize( array( 'title' => 'Test title' ) ) ),
+			),
+			$data['instance']
+		);
+		$wp_widget_factory->widgets['WP_Widget_Search']->show_instance_in_rest = true;
+	}
+
 
 	/**
 	 * The test_create_item() method does not exist for widget types.

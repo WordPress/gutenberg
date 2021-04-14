@@ -19,25 +19,12 @@ const catchException = ( command ) => {
 /**
  * Internal dependencies
  */
-const { releaseRC, releaseStable } = require( './commands/release' );
 const {
 	publishNpmLatestDistTag,
 	publishNpmNextDistTag,
 } = require( './commands/packages' );
 const { getReleaseChangelog } = require( './commands/changelog' );
 const { runPerformanceTests } = require( './commands/performance' );
-
-program
-	.command( 'release-plugin-rc' )
-	.alias( 'rc' )
-	.description( 'Release an RC version of the plugin' )
-	.action( catchException( releaseRC ) );
-
-program
-	.command( 'release-plugin-stable' )
-	.alias( 'stable' )
-	.description( 'Release a stable version of the plugin' )
-	.action( catchException( releaseStable ) );
 
 program
 	.command( 'publish-npm-packages-latest' )
@@ -60,6 +47,10 @@ program
 	.alias( 'changelog' )
 	.option( '-m, --milestone <milestone>', 'Milestone' )
 	.option( '-t, --token <token>', 'Github token' )
+	.option(
+		'-u, --unreleased',
+		"Only include PRs that haven't been included in a release yet"
+	)
 	.description( 'Generates a changelog from merged Pull Requests' )
 	.action( catchException( getReleaseChangelog ) );
 

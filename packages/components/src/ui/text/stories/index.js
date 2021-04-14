@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import Text from '../text';
+import { Text } from '..';
 
 export default {
 	component: Text,

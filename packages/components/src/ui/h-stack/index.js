@@ -1,2 +1,2 @@
-export { default as HStack } from './h-stack';
-export * from './use-h-stack';
+export { default as HStack } from './component';
+export * from './hook';

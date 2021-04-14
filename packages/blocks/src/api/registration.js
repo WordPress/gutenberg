@@ -4,10 +4,11 @@
  * External dependencies
  */
 import {
-	get,
+	camelCase,
 	isFunction,
 	isNil,
 	isPlainObject,
+	mapKeys,
 	omit,
 	pick,
 	pickBy,
@@ -149,7 +150,7 @@ const LEGACY_CATEGORY_MAPPING = {
 	layout: 'design',
 };
 
-export let serverSideBlockDefinitions = {};
+export const serverSideBlockDefinitions = {};
 
 /**
  * Sets the server side block definition of blocks.
@@ -158,10 +159,29 @@ export let serverSideBlockDefinitions = {};
  */
 // eslint-disable-next-line camelcase
 export function unstable__bootstrapServerSideBlockDefinitions( definitions ) {
-	serverSideBlockDefinitions = {
-		...serverSideBlockDefinitions,
-		...definitions,
-	};
+	for ( const blockName of Object.keys( definitions ) ) {
+		// Don't overwrite if already set. It covers the case when metadata
+		// was initialized from the server.
+		if ( serverSideBlockDefinitions[ blockName ] ) {
+			// We still need to polyfill `apiVersion` for WordPress version
+			// lower than 5.7. If it isn't present in the definition shared
+			// from the server, we try to fallback to the definition passed.
+			// @see https://github.com/WordPress/gutenberg/pull/29279
+			if (
+				serverSideBlockDefinitions[ blockName ].apiVersion ===
+					undefined &&
+				definitions[ blockName ].apiVersion
+			) {
+				serverSideBlockDefinitions[ blockName ].apiVersion =
+					definitions[ blockName ].apiVersion;
+			}
+			continue;
+		}
+		serverSideBlockDefinitions[ blockName ] = mapKeys(
+			pickBy( definitions[ blockName ], ( value ) => ! isNil( value ) ),
+			( value, key ) => camelCase( key )
+		);
+	}
 }
 
 /**
@@ -186,10 +206,7 @@ export function registerBlockType( name, settings ) {
 		supports: {},
 		styles: [],
 		save: () => null,
-		...pickBy(
-			get( serverSideBlockDefinitions, name, {} ),
-			( value ) => ! isNil( value )
-		),
+		...serverSideBlockDefinitions?.[ name ],
 		...settings,
 	};
 

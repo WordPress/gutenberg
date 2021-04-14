@@ -6,7 +6,10 @@ import { View, Animated, Easing, TouchableWithoutFeedback } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BlockControls } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
 import {
 	ToolbarGroup,
@@ -202,7 +205,7 @@ const SocialLinkEdit = ( {
 
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlock } = select( 'core/block-editor' );
+		const { getBlock } = select( blockEditorStore );
 
 		const block = getBlock( clientId );
 		const name = block?.name.substring( 17 );

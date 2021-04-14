@@ -14,6 +14,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -51,6 +52,10 @@ function ColumnEdit( {
 	clientId,
 	blockWidth,
 } ) {
+	if ( ! contentStyle ) {
+		contentStyle = { [ clientId ]: {} };
+	}
+
 	const { verticalAlignment, width } = attributes;
 	const { valueUnit = '%' } = getValueAndUnit( width ) || {};
 
@@ -231,7 +236,7 @@ export default compose( [
 			getBlocks,
 			getBlockOrder,
 			getBlockAttributes,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		const isSelected = selectedBlockClientId === clientId;

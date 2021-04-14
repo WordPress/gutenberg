@@ -149,7 +149,12 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void logUserEvent(GutenbergUserEvent gutenbergUserEvent, ReadableMap eventProperties) {
+            public void setFocalPointPickerTooltipShown(boolean tooltipShown) {
+            }
+
+            @Override
+            public void requestFocalPointPickerTooltipShown(FocalPointPickerTooltipShownCallback focalPointPickerTooltipShownCallback) {
+                focalPointPickerTooltipShownCallback.onRequestFocalPointPickerTooltipShown(false);
             }
 
             @Override

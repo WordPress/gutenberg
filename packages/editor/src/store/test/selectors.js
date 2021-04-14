@@ -16,6 +16,7 @@ import {
 	getBlockTypes,
 } from '@wordpress/blocks';
 import { RawHTML } from '@wordpress/element';
+import { layout, footer, header } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -171,6 +172,7 @@ const {
 	__experimentalGetDefaultTemplateType,
 	__experimentalGetDefaultTemplateTypes,
 	__experimentalGetTemplateInfo,
+	__experimentalGetDefaultTemplatePartAreas,
 } = selectors;
 
 const defaultTemplateTypes = [
@@ -183,6 +185,19 @@ const defaultTemplateTypes = [
 		title: '404 (Not Found)',
 		description: 'Applied when content cannot be found',
 		slug: '404',
+	},
+];
+
+const defaultTemplatePartAreas = [
+	{
+		area: 'header',
+		label: 'Header',
+		description: 'Some description of a header',
+	},
+	{
+		area: 'footer',
+		label: 'Footer',
+		description: 'Some description of a footer',
 	},
 ];
 
@@ -2803,6 +2818,32 @@ describe( 'selectors', () => {
 		} );
 	} );
 
+	describe( '__experimentalGetDefaultTemplatePartAreas', () => {
+		const state = { editorSettings: { defaultTemplatePartAreas } };
+
+		it( 'returns undefined if there are no default template part areas', () => {
+			const emptyState = { editorSettings: {} };
+			expect(
+				__experimentalGetDefaultTemplatePartAreas( emptyState )
+			).toBeUndefined();
+		} );
+
+		it( 'returns a list of default template part areas if present in state', () => {
+			expect(
+				__experimentalGetDefaultTemplatePartAreas( state )
+			).toHaveLength( 2 );
+		} );
+
+		it( 'assigns an icon to each area', () => {
+			const templatePartAreas = __experimentalGetDefaultTemplatePartAreas(
+				state
+			);
+			templatePartAreas.forEach( ( area ) =>
+				expect( area.icon ).not.toBeNull()
+			);
+		} );
+	} );
+
 	describe( '__experimentalGetDefaultTemplateType', () => {
 		const state = { editorSettings: { defaultTemplateTypes } };
 
@@ -2894,12 +2935,13 @@ describe( 'selectors', () => {
 			).toEqual( 'test description' );
 		} );
 
-		it( 'should return both a title and a description', () => {
+		it( 'should return a title, description, and icon', () => {
 			expect(
 				__experimentalGetTemplateInfo( state, { slug: 'index' } )
 			).toEqual( {
 				title: 'Default (Index)',
 				description: 'Main template',
+				icon: layout,
 			} );
 
 			expect(
@@ -2910,6 +2952,7 @@ describe( 'selectors', () => {
 			).toEqual( {
 				title: 'test title',
 				description: 'Main template',
+				icon: layout,
 			} );
 
 			expect(
@@ -2920,6 +2963,7 @@ describe( 'selectors', () => {
 			).toEqual( {
 				title: 'Default (Index)',
 				description: 'test description',
+				icon: layout,
 			} );
 
 			expect(
@@ -2931,6 +2975,49 @@ describe( 'selectors', () => {
 			).toEqual( {
 				title: 'test title',
 				description: 'test description',
+				icon: layout,
+			} );
+		} );
+
+		it( 'should return correct icon based on area', () => {
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = uncategorized',
+					area: 'uncategorized',
+				} )
+			).toEqual( {
+				title: 'template part, area = uncategorized',
+				icon: layout,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = invalid',
+					area: 'invalid',
+				} )
+			).toEqual( {
+				title: 'template part, area = invalid',
+				icon: layout,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = header',
+					area: 'header',
+				} )
+			).toEqual( {
+				title: 'template part, area = header',
+				icon: header,
+			} );
+
+			expect(
+				__experimentalGetTemplateInfo( state, {
+					slug: 'template part, area = footer',
+					area: 'footer',
+				} )
+			).toEqual( {
+				title: 'template part, area = footer',
+				icon: footer,
 			} );
 		} );
 	} );

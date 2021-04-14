@@ -7,7 +7,7 @@ import { css, cx, ui } from '@wp-g2/styles';
 /**
  * Internal dependencies
  */
-import * as styles from './flex-styles';
+import * as styles from './styles';
 
 /**
  * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexItemProps, 'div'>} props
@@ -22,7 +22,7 @@ export function useFlexItem( props ) {
 	const sx = {};
 
 	sx.Base = css( {
-		display: displayProp || ui.get( 'FlexItemDisplay' ),
+		display: displayProp || ui.get( 'flexItemDisplay' ),
 	} );
 
 	const classes = cx(

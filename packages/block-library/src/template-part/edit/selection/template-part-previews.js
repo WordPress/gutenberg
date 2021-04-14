@@ -20,6 +20,7 @@ import {
 } from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 function PreviewPlaceholder() {
 	return (
@@ -48,7 +49,7 @@ function TemplatePartItem( {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const onClick = useCallback( () => {
-		setAttributes( { slug, theme } );
+		setAttributes( { slug, theme, area: undefined } );
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
@@ -206,7 +207,7 @@ export default function TemplatePartPreviews( {
 	const composite = useCompositeState();
 	const templateParts = useSelect( ( select ) => {
 		return (
-			select( 'core' ).getEntityRecords(
+			select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_template_part'
 			) || []

@@ -320,3 +320,29 @@ export function computePopoverPosition(
 		...yAxisPosition,
 	};
 }
+
+/**
+ * Offsets the given rect by the position of the iframe that contains the element.
+ * If the owner document is not in an iframe then it returns with the original rect.
+ *
+ * @param {DOMRect} rect bounds of the element
+ * @param {Document} ownerDocument document of the element
+ *
+ * @return {DOMRect} offsetted bounds
+ */
+export function offsetIframe( rect, ownerDocument ) {
+	const { defaultView } = ownerDocument;
+	const { frameElement } = defaultView;
+
+	if ( ! frameElement ) {
+		return rect;
+	}
+
+	const iframeRect = frameElement.getBoundingClientRect();
+	return new defaultView.DOMRect(
+		rect.left + iframeRect.left,
+		rect.top + iframeRect.top,
+		rect.width,
+		rect.height
+	);
+}

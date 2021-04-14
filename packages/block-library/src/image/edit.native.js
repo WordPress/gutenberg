@@ -19,12 +19,13 @@ import {
 	CycleSelectControl,
 	Icon,
 	PanelBody,
-	TextControl,
 	ToolbarButton,
 	ToolbarGroup,
 	Image,
 	WIDE_ALIGNMENTS,
 	LinkSettingsNavigation,
+	BottomSheetTextControl,
+	FooterMessageLink,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -36,6 +37,7 @@ import {
 	InspectorControls,
 	BlockAlignmentToolbar,
 	BlockStyles,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
@@ -44,10 +46,11 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import {
 	image as placeholderIcon,
-	textColor,
 	replace,
 	expand,
+	textColor,
 } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -55,7 +58,7 @@ import {
 import styles from './styles.scss';
 import { getUpdatedLinkTargetSettings } from './utils';
 
-import { LINK_DESTINATION_CUSTOM, DEFAULT_SIZE_SLUG } from './constants';
+import { LINK_DESTINATION_CUSTOM } from './constants';
 
 const getUrlForSlug = ( image, { sizeSlug } ) => {
 	return get( image, [ 'media_details', 'sizes', sizeSlug, 'source_url' ] );
@@ -80,7 +83,6 @@ export class ImageEdit extends Component {
 			this
 		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.updateAlt = this.updateAlt.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
@@ -244,10 +246,6 @@ export class ImageEdit extends Component {
 		this.setState( { isUploadInProgress: false } );
 	}
 
-	updateAlt( newAlt ) {
-		this.props.setAttributes( { alt: newAlt } );
-	}
-
 	updateImageURL( url ) {
 		this.props.setAttributes( {
 			url,
@@ -300,7 +298,10 @@ export class ImageEdit extends Component {
 	}
 
 	onSelectMediaUploadOption( media ) {
-		const { id, url } = this.props.attributes;
+		const {
+			attributes: { id, url },
+			imageDefaultSize,
+		} = this.props;
 
 		const mediaAttributes = {
 			id: media.id,
@@ -314,7 +315,7 @@ export class ImageEdit extends Component {
 			additionalAttributes = {
 				width: undefined,
 				height: undefined,
-				sizeSlug: DEFAULT_SIZE_SLUG,
+				sizeSlug: imageDefaultSize,
 			};
 		} else {
 			// Keep the same url when selecting the same file, so "Image Size" option is not changed.
@@ -391,18 +392,57 @@ export class ImageEdit extends Component {
 		);
 	}
 
+	getAltTextSettings() {
+		const {
+			attributes: { alt },
+		} = this.props;
+
+		const updateAlt = ( newAlt ) => {
+			this.props.setAttributes( { alt: newAlt } );
+		};
+
+		return (
+			<BottomSheetTextControl
+				initialValue={ alt }
+				onChange={ updateAlt }
+				placeholder={ __( 'Add alt text' ) }
+				label={ __( 'Alt Text' ) }
+				icon={ textColor }
+				footerNote={
+					<>
+						{ __(
+							'Describe the purpose of the image. Leave empty if the image is purely decorative. '
+						) }
+						<FooterMessageLink
+							href={
+								'https://www.w3.org/WAI/tutorials/images/decision-tree/'
+							}
+							value={ __( 'What is alt text?' ) }
+						/>
+					</>
+				}
+			/>
+		);
+	}
+
 	onSizeChangeValue( newValue ) {
 		this.onSetSizeSlug( newValue );
 	}
 
 	render() {
 		const { isCaptionSelected } = this.state;
-		const { attributes, isSelected, image, clientId } = this.props;
+		const {
+			attributes,
+			isSelected,
+			image,
+			clientId,
+			imageDefaultSize,
+		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
 		const sizeOptionsValid = find( this.sizeOptions, [
 			'value',
-			DEFAULT_SIZE_SLUG,
+			imageDefaultSize,
 		] );
 
 		const getToolbarEditButton = ( open ) => (
@@ -432,18 +472,12 @@ export class ImageEdit extends Component {
 						<CycleSelectControl
 							icon={ expand }
 							label={ __( 'Size' ) }
-							value={ sizeSlug || DEFAULT_SIZE_SLUG }
+							value={ sizeSlug || imageDefaultSize }
 							onChangeValue={ this.onSizeChangeValue }
 							options={ this.sizeOptions }
 						/>
 					) }
-					<TextControl
-						icon={ textColor }
-						label={ __( 'Alt Text' ) }
-						value={ alt || '' }
-						valuePlaceholder={ __( 'None' ) }
-						onChangeValue={ this.updateAlt }
-					/>
+					{ this.getAltTextSettings() }
 				</PanelBody>
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
@@ -555,13 +589,13 @@ export class ImageEdit extends Component {
 
 export default compose( [
 	withSelect( ( select, props ) => {
-		const { getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
+		const { getMedia } = select( coreStore );
+		const { getSettings } = select( blockEditorStore );
 		const {
 			attributes: { id, url },
 			isSelected,
 		} = props;
-		const { imageSizes } = getSettings();
+		const { imageSizes, imageDefaultSize } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
 
 		const shouldGetMedia =
@@ -575,6 +609,7 @@ export default compose( [
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
+			imageDefaultSize,
 		};
 	} ),
 	withPreferredColorScheme,

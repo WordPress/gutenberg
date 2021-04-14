@@ -9,7 +9,8 @@
 		"customBackgroundColor",
 		"fontSize",
 		"customFontSize",
-		"showSubmenuIcon"
+		"showSubmenuIcon",
+		"style"
 	],
 	"supports": {
 		"reusable": false,

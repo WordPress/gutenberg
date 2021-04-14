@@ -15,14 +15,21 @@ import getColorAndStyleProps from './color-props';
 
 export default function save( { attributes, className } ) {
 	const {
-		borderRadius,
+		fontSize,
 		linkTarget,
 		rel,
+		style,
 		text,
 		title,
 		url,
 		width,
 	} = attributes;
+
+	if ( ! text ) {
+		return null;
+	}
+
+	const borderRadius = style?.border?.radius;
 	const colorProps = getColorAndStyleProps( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
@@ -42,6 +49,7 @@ export default function save( { attributes, className } ) {
 
 	const wrapperClasses = classnames( className, {
 		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+		[ `has-custom-font-size` ]: fontSize || style?.typography?.fontSize,
 	} );
 
 	return (

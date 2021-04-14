@@ -10,9 +10,9 @@ import { Grid, View } from '@wordpress/components/ui';
 function Example() {
 	return (
 		<Grid columns={ 3 }>
-			<View>One</View>
-			<View>Two</View>
-			<View>Three</View>
+			<View>Code</View>
+			<View>is</View>
+			<View>Poetry</View>
 		</Grid>
 	);
 }

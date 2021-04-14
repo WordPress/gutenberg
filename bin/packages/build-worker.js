@@ -105,8 +105,7 @@ async function buildCSS( file ) {
 				// Editor styles should be excluded from the default CSS vars output.
 				.concat(
 					file.includes( 'common.scss' ) ||
-						( ! file.includes( 'block-library' ) &&
-							! file.includes( 'editor-styles.scss' ) )
+						! file.includes( 'block-library' )
 						? [ 'default-custom-properties' ]
 						: []
 				)
@@ -139,7 +138,10 @@ async function buildJS( file ) {
 	for ( const [ environment, buildDir ] of Object.entries(
 		JS_ENVIRONMENTS
 	) ) {
-		const destPath = getBuildPath( file, buildDir );
+		const destPath = getBuildPath(
+			file.replace( /\.tsx?$/, '.js' ),
+			buildDir
+		);
 		const babelOptions = getBabelConfig(
 			environment,
 			file.replace( PACKAGES_DIR, '@wordpress' )
@@ -171,6 +173,8 @@ async function buildJS( file ) {
 const BUILD_TASK_BY_EXTENSION = {
 	'.scss': buildCSS,
 	'.js': buildJS,
+	'.ts': buildJS,
+	'.tsx': buildJS,
 };
 
 module.exports = async ( file, callback ) => {

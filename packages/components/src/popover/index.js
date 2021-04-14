@@ -24,7 +24,7 @@ import { close } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { computePopoverPosition } from './utils';
+import { computePopoverPosition, offsetIframe } from './utils';
 import Button from '../button';
 import ScrollLock from '../scroll-lock';
 import { Slot, Fill, useSlot } from '../slot-fill';
@@ -36,24 +36,6 @@ import { getAnimateClassName } from '../animate';
  * @type {string}
  */
 const SLOT_NAME = 'Popover';
-
-function offsetIframe( rect, ownerDocument ) {
-	const { defaultView } = ownerDocument;
-	const { frameElement } = defaultView;
-
-	if ( ! frameElement ) {
-		return rect;
-	}
-
-	const iframeRect = frameElement.getBoundingClientRect();
-
-	return new defaultView.DOMRect(
-		rect.left + iframeRect.left,
-		rect.top + iframeRect.top,
-		rect.width,
-		rect.height
-	);
-}
 
 function computeAnchorRect(
 	anchorRefFallback,
@@ -71,7 +53,10 @@ function computeAnchorRect(
 			return;
 		}
 
-		return getAnchorRect( anchorRefFallback.current );
+		return offsetIframe(
+			getAnchorRect( anchorRefFallback.current ),
+			anchorRefFallback.current.ownerDocument
+		);
 	}
 
 	if ( anchorRef !== false ) {
@@ -559,6 +544,7 @@ const Popover = ( {
 		} );
 
 		deprecated( 'Popover onClickOutside prop', {
+			since: '5.3',
 			alternative: 'onFocusOutside',
 		} );
 

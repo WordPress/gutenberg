@@ -8,18 +8,23 @@
 /**
  * Renders the `core/social-link` block on server.
  *
- * @param Array   $attributes The block attributes.
- * @param String  $content InnerBlocks content of the Block.
- * @param WPBlock $block Block object.
+ * @param Array    $attributes The block attributes.
+ * @param String   $content    InnerBlocks content of the Block.
+ * @param WP_Block $block      Block object.
  *
  * @return string Rendered HTML of the referenced block.
  */
 function render_block_core_social_link( $attributes, $content, $block ) {
 	$open_in_new_tab = isset( $block->context['openInNewTab'] ) ? $block->context['openInNewTab'] : false;
 
-	$service    = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
-	$url        = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
-	$label      = ( isset( $attributes['label'] ) ) ? $attributes['label'] : block_core_social_link_get_name( $service );
+	$service = ( isset( $attributes['service'] ) ) ? $attributes['service'] : 'Icon';
+	$url     = ( isset( $attributes['url'] ) ) ? $attributes['url'] : false;
+	$label   = ( isset( $attributes['label'] ) ) ? $attributes['label'] : sprintf(
+		/* translators: %1$s: Social-network name. %2$s: URL. */
+		__( '%1$s: %2$s', 'gutenberg' ),
+		block_core_social_link_get_name( $service ),
+		$url
+	);
 	$class_name = isset( $attributes['className'] ) ? ' ' . $attributes['className'] : false;
 
 	// Don't render a link if there is no URL set.
@@ -33,7 +38,12 @@ function render_block_core_social_link( $attributes, $content, $block ) {
 	}
 
 	$icon               = block_core_social_link_get_icon( $service );
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'wp-social-link wp-social-link-' . $service . $class_name ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => 'wp-social-link wp-social-link-' . $service . $class_name,
+			'style' => block_core_social_link_get_color_styles( $block->context ),
+		)
+	);
 
 	return '<li ' . $wrapper_attributes . '><a href="' . esc_url( $url ) . '" aria-label="' . esc_attr( $label ) . '" ' . $attribute . ' class="wp-block-social-link-anchor"> ' . $icon . '</a></li>';
 }
@@ -279,4 +289,25 @@ function block_core_social_link_services( $service = '', $field = '' ) {
 	}
 
 	return $services_data;
+}
+
+/**
+ * Returns CSS styles for icon and icon background colors.
+ *
+ * @param array $context Block context passed to Social Link.
+ *
+ * @return string Inline CSS styles for link's icon and background colors.
+ */
+function block_core_social_link_get_color_styles( $context ) {
+	$styles = array();
+
+	if ( array_key_exists( 'iconColorValue', $context ) ) {
+		$styles[] = 'color: ' . $context['iconColorValue'] . '; ';
+	}
+
+	if ( array_key_exists( 'iconBackgroundColorValue', $context ) ) {
+		$styles[] = 'background-color: ' . $context['iconBackgroundColorValue'] . '; ';
+	}
+
+	return implode( '', $styles );
 }

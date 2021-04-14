@@ -1,69 +1,100 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/cover",
-        "isValid": true,
-        "attributes": {
-            "url": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
-            "hasParallax": false,
-            "dimRatio": 40,
-            "backgroundType": "image",
-            "title": "",
-            "contentAlign": "center",
-            "isRepeated": false
-        },
-        "innerBlocks": [
-            {
-                "clientId": "_clientId_0",
-                "name": "core/paragraph",
-                "isValid": true,
-                "attributes": {
-                    "align": "center",
-                    "content": "\n\t\t\tGuten Berg!\n\t\t",
-                    "dropCap": false,
-                    "placeholder": "Write title…",
-                    "fontSize": "large"
-                },
-                "innerBlocks": [],
-                "originalContent": "<p class=\"has-text-align-center has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>"
-            }
-        ],
-        "originalContent": "<div\n\tclass=\"wp-block-cover has-background-dim-40 has-background-dim\"\n\tstyle=\"background-image:url(data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=)\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
-    },
-    {
-        "clientId": "_clientId_1",
-        "name": "core/cover",
-        "isValid": true,
-        "attributes": {
-            "url": "https://example.com/some-background-image.png",
-            "id": 1933,
-            "hasParallax": false,
-            "dimRatio": 0,
-            "backgroundType": "image",
-            "focalPoint": {
-                "x": "0.50",
-                "y": "0.40"
-            },
-            "title": "",
-            "contentAlign": "center",
-            "isRepeated": false,
-            "minHeight": 48,
-            "minHeightUnit": "vw",
-            "className": "alignfull"
-        },
-        "innerBlocks": [
-            {
-                "clientId": "_clientId_0",
-                "name": "core/paragraph",
-                "isValid": true,
-                "attributes": {
-                    "content": "",
-                    "dropCap": false
-                },
-                "innerBlocks": [],
-                "originalContent": "<p></p>"
-            }
-        ],
-        "originalContent": "<div\n\tclass=\"wp-block-cover alignfull\"\n\tstyle=\"background-image: url( https://example.com/some-background-image.png ); min-height: 48vw; background-position: 50% 40%;\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"url": "data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=",
+			"hasParallax": false,
+			"dimRatio": 40,
+			"backgroundType": "image",
+			"title": "",
+			"contentAlign": "center",
+			"isRepeated": false
+		},
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"align": "center",
+					"content": "\n\t\t\tGuten Berg!\n\t\t",
+					"dropCap": false,
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"originalContent": "<p class=\"has-text-align-center has-large-font-size\">\n\t\t\tGuten Berg!\n\t\t</p>"
+			}
+		],
+		"originalContent": "<div\n\tclass=\"wp-block-cover has-background-dim-40 has-background-dim\"\n\tstyle=\"background-image:url(data:image/jpeg;base64,/9j/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/yQALCAABAAEBAREA/8wABgAQEAX/2gAIAQEAAD8A0s8g/9k=)\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+	},
+	{
+		"clientId": "_clientId_1",
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"url": "https://example.com/some-background-image.png",
+			"id": 1933,
+			"hasParallax": false,
+			"dimRatio": 0,
+			"backgroundType": "image",
+			"focalPoint": {
+				"x": "0.50",
+				"y": "0.40"
+			},
+			"title": "",
+			"contentAlign": "center",
+			"isRepeated": false,
+			"minHeight": 48,
+			"minHeightUnit": "vw",
+			"align": "full"
+		},
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"content": "",
+					"dropCap": false
+				},
+				"innerBlocks": [],
+				"originalContent": "<p></p>"
+			}
+		],
+		"originalContent": "<div\n\tclass=\"wp-block-cover alignfull\"\n\tstyle=\"background-image: url( https://example.com/some-background-image.png ); min-height: 48vw; background-position: 50% 40%;\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+	},
+	{
+		"clientId": "_clientId_2",
+		"name": "core/cover",
+		"isValid": true,
+		"attributes": {
+			"url": "http://localhost:8888/wp-content/uploads/2021/02/percy.jpg",
+			"id": 134,
+			"hasParallax": false,
+			"isRepeated": false,
+			"dimRatio": 50,
+			"backgroundType": "image",
+			"contentPosition": "bottom right"
+		},
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/paragraph",
+				"isValid": true,
+				"attributes": {
+					"align": "center",
+					"content": "test",
+					"dropCap": false,
+					"placeholder": "Write title…",
+					"fontSize": "large"
+				},
+				"innerBlocks": [],
+				"originalContent": "<p class=\"has-text-align-center has-large-font-size\">test</p>"
+			}
+		],
+		"originalContent": "<div class=\"wp-block-cover has-background-dim has-custom-content-position is-position-bottom-right\"><img class=\"wp-block-cover__image-background wp-image-134\" alt=\"\" src=\"http://localhost:8888/wp-content/uploads/2021/02/percy.jpg\" data-object-fit=\"cover\"/>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>"
+	}
 ]

@@ -8,23 +8,37 @@ import classnames from 'classnames';
  */
 import { useMemo, useRef, memo } from '@wordpress/element';
 import {
-	Button,
-	__unstableCompositeItem as CompositeItem,
-} from '@wordpress/components';
-import {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 } from '@wordpress/blocks';
+import { ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+import { InserterListboxItem } from '../inserter-listbox';
 import InserterDraggableBlocks from '../inserter-draggable-blocks';
+
+/**
+ * Return true if platform is MacOS.
+ *
+ * @param {Object} _window   window object by default; used for DI testing.
+ *
+ * @return {boolean} True if MacOS; false otherwise.
+ */
+function isAppleOS( _window = window ) {
+	const { platform } = _window.navigator;
+
+	return (
+		platform.indexOf( 'Mac' ) !== -1 ||
+		[ 'iPad', 'iPhone' ].includes( platform )
+	);
+}
 
 function InserterListItem( {
 	className,
-	composite,
+	isFirst,
 	item,
 	onSelect,
 	onHover,
@@ -72,10 +86,8 @@ function InserterListItem( {
 						}
 					} }
 				>
-					<CompositeItem
-						role="option"
-						as={ Button }
-						{ ...composite }
+					<InserterListboxItem
+						isFirst={ isFirst }
 						className={ classnames(
 							'block-editor-block-types-list__item',
 							className
@@ -83,8 +95,22 @@ function InserterListItem( {
 						disabled={ item.isDisabled }
 						onClick={ ( event ) => {
 							event.preventDefault();
-							onSelect( item );
+							onSelect(
+								item,
+								isAppleOS() ? event.metaKey : event.ctrlKey
+							);
 							onHover( null );
+						} }
+						onKeyDown={ ( event ) => {
+							const { keyCode } = event;
+							if ( keyCode === ENTER ) {
+								event.preventDefault();
+								onSelect(
+									item,
+									isAppleOS() ? event.metaKey : event.ctrlKey
+								);
+								onHover( null );
+							}
 						} }
 						onFocus={ () => {
 							if ( isDragging.current ) {
@@ -100,10 +126,6 @@ function InserterListItem( {
 						} }
 						onMouseLeave={ () => onHover( null ) }
 						onBlur={ () => onHover( null ) }
-						// Use the CompositeItem `focusable` prop over Button's
-						// isFocusable. The latter was shown to cause an issue
-						// with tab order in the inserter list.
-						focusable
 						{ ...props }
 					>
 						<span
@@ -115,7 +137,7 @@ function InserterListItem( {
 						<span className="block-editor-block-types-list__item-title">
 							{ item.title }
 						</span>
-					</CompositeItem>
+					</InserterListboxItem>
 				</div>
 			) }
 		</InserterDraggableBlocks>

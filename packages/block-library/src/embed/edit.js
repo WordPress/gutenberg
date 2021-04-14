@@ -26,6 +26,8 @@ import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
+import { store as coreStore } from '@wordpress/core-data';
+import { View } from '@wordpress/primitives';
 
 function getResponsiveHelp( checked ) {
 	return checked
@@ -75,7 +77,7 @@ const EmbedEdit = ( props ) => {
 				isPreviewEmbedFallback,
 				isRequestingEmbedPreview,
 				getThemeSupports,
-			} = select( 'core' );
+			} = select( coreStore );
 			if ( ! attributesUrl ) {
 				return { fetching: false, cannotEmbed: false };
 			}
@@ -178,9 +180,9 @@ const EmbedEdit = ( props ) => {
 
 	if ( fetching ) {
 		return (
-			<div { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedLoading />
-			</div>
+			</View>
 		);
 	}
 
@@ -191,7 +193,7 @@ const EmbedEdit = ( props ) => {
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
 	if ( showEmbedPlaceholder ) {
 		return (
-			<div { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedPlaceholder
 					icon={ icon }
 					label={ label }
@@ -213,7 +215,7 @@ const EmbedEdit = ( props ) => {
 						] );
 					} }
 				/>
-			</div>
+			</View>
 		);
 	}
 
@@ -243,7 +245,7 @@ const EmbedEdit = ( props ) => {
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>
-			<div { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedPreview
 					preview={ preview }
 					previewable={ previewable }
@@ -259,7 +261,7 @@ const EmbedEdit = ( props ) => {
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
 				/>
-			</div>
+			</View>
 		</>
 	);
 };

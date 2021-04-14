@@ -23,7 +23,7 @@ import { DOWN, ENTER } from '@wordpress/keycodes';
 
 onKeyDown( event ) {
 	const { keyCode } = event;
-	
+
 	if ( keyCode === DOWN ) {
 		alert( 'You pressed the down arrow!' );
 	} else if ( keyCode === ENTER ) {
@@ -88,7 +88,7 @@ displayShortcutList.primary( 'm' );
 
 _Type_
 
--   `WPModifierHandler<WPKeyHandler<Array<string>>>` Keyed map of functions to shortcut sequences.
+-   `WPModifierHandler<WPKeyHandler<string[]>>` Keyed map of functions to shortcut sequences.
 
 <a name="DOWN" href="#DOWN">#</a> **DOWN**
 
@@ -134,7 +134,7 @@ depending on platform.
 
 _Type_
 
--   (unknown type) 
+-   `WPModifierHandler< ( isApple: () => boolean ) => WPModifierPart[]>` 
 
 <a name="rawShortcut" href="#rawShortcut">#</a> **rawShortcut**
 

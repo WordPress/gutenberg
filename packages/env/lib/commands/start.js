@@ -23,7 +23,6 @@ const initConfig = require( '../init-config' );
 const downloadSources = require( '../download-sources' );
 const {
 	checkDatabaseConnection,
-	makeContentDirectoriesWritable,
 	configureWordPress,
 	setupWordPressDirectories,
 } = require( '../wordpress' );
@@ -143,14 +142,6 @@ module.exports = async function start( { spinner, debug, update, xdebug } ) {
 	// Only run WordPress install/configuration when config has changed.
 	if ( shouldConfigureWp ) {
 		spinner.text = 'Configuring WordPress.';
-
-		if ( config.coreSource === null ) {
-			// Don't chown wp-content when it exists on the user's local filesystem.
-			await Promise.all( [
-				makeContentDirectoriesWritable( 'development', config ),
-				makeContentDirectoriesWritable( 'tests', config ),
-			] );
-		}
 
 		try {
 			await checkDatabaseConnection( config );

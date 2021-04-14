@@ -29,6 +29,8 @@ import { store as blockEditorStore } from '../../store';
 
 const BlockListContext = createContext();
 
+export const OnCaretVerticalPositionChange = createContext();
+
 const stylesMemo = {};
 const getStyles = (
 	isRootList,
@@ -58,7 +60,7 @@ export class BlockList extends Component {
 			renderFooterAppender: this.props.renderFooterAppender,
 			renderAppender: this.props.renderAppender,
 			onDeleteBlock: this.props.onDeleteBlock,
-			contentStyle: this.props.contentstyle,
+			contentStyle: this.props.contentStyle,
 		};
 		this.renderItem = this.renderItem.bind( this );
 		this.renderBlockListFooter = this.renderBlockListFooter.bind( this );
@@ -166,7 +168,7 @@ export class BlockList extends Component {
 	render() {
 		const { isRootList } = this.props;
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
-		return isRootList ? (
+		const blockList = isRootList ? (
 			<BlockListContext.Provider value={ this.scrollViewRef }>
 				{ this.renderList() }
 			</BlockListContext.Provider>
@@ -178,6 +180,14 @@ export class BlockList extends Component {
 					} )
 				}
 			</BlockListContext.Consumer>
+		);
+
+		return (
+			<OnCaretVerticalPositionChange.Provider
+				value={ this.onCaretVerticalPositionChange }
+			>
+				{ blockList }
+			</OnCaretVerticalPositionChange.Provider>
 		);
 	}
 
@@ -320,9 +330,6 @@ export class BlockList extends Component {
 				shouldShowInnerBlockAppender={
 					this.shouldShowInnerBlockAppender
 				}
-				onCaretVerticalPositionChange={
-					this.onCaretVerticalPositionChange
-				}
 				blockWidth={ blockWidth }
 			/>
 		);
@@ -366,7 +373,6 @@ export default compose( [
 				getSelectedBlockClientId,
 				isBlockInsertionPointVisible,
 				getSettings,
-				getBlockHierarchyRootClientId,
 			} = select( blockEditorStore );
 
 			const isStackedHorizontally = orientation === 'horizontal';
@@ -382,10 +388,7 @@ export default compose( [
 			const { maxWidth } = getSettings();
 			const isReadOnly = getSettings().readOnly;
 
-			const rootBlockId = getBlockHierarchyRootClientId(
-				selectedBlockClientId
-			);
-			const blockCount = getBlockCount( rootBlockId );
+			const blockCount = getBlockCount();
 			const hasRootInnerBlocks = !! blockCount;
 
 			const isFloatingToolbarVisible =

@@ -241,7 +241,7 @@ export function getAccessibleBlockLabel(
  * @param {Object} attributes The block's attributes.
  * @return {Object} The sanitized attributes.
  */
-export function sanitizeBlockAttributes( name, attributes ) {
+export function __experimentalSanitizeBlockAttributes( name, attributes ) {
 	// Get the type definition associated with a registered block.
 	const blockType = getBlockType( name );
 
@@ -273,5 +273,24 @@ export function sanitizeBlockAttributes( name, attributes ) {
 			return accumulator;
 		},
 		{}
+	);
+}
+
+/**
+ * Filter block attributes by `role` and return their names.
+ *
+ * @param {string} name Block attribute's name.
+ * @param {string} role The role of a block attribute.
+ *
+ * @return {string[]} The attribute names that have the provided role.
+ */
+export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
+	const attributes = getBlockType( name )?.attributes;
+	if ( ! attributes ) return [];
+	const attributesNames = Object.keys( attributes );
+	if ( ! role ) return attributesNames;
+	return attributesNames.filter(
+		( attributeName ) =>
+			attributes[ attributeName ]?.__experimentalRole === role
 	);
 }

@@ -7,23 +7,23 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { BlockControls, InnerBlocks } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	InnerBlocks,
+	JustifyContentControl,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { useResizeObserver } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
-import {
-	ToolbarGroup,
-	ToolbarItem,
-	alignmentHelpers,
-} from '@wordpress/components';
+import { alignmentHelpers } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { name as buttonBlockName } from '../button/';
 import styles from './editor.scss';
-import ContentJustificationDropdown from './content-justification-dropdown';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
@@ -48,7 +48,7 @@ export default function ButtonsEdit( {
 				getBlockOrder: _getBlockOrder,
 				getBlockParents,
 				getSelectedBlockClientId,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const selectedBlockClientId = getSelectedBlockClientId();
 			const selectedBlockParents = getBlockParents(
 				selectedBlockClientId,
@@ -69,19 +69,16 @@ export default function ButtonsEdit( {
 	);
 
 	const { insertBlock, removeBlock, selectBlock } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
 	useEffect( () => {
-		const margins = 2 * styles.parent.marginRight;
 		const { width } = sizes || {};
 		const { isFullWidth } = alignmentHelpers;
 
 		if ( width ) {
-			const base = width - margins;
 			const isFullWidthBlock = isFullWidth( align );
-
-			setMaxWidth( isFullWidthBlock ? base - 2 * spacing : base );
+			setMaxWidth( isFullWidthBlock ? blockWidth : width );
 		}
 	}, [ sizes, align ] );
 
@@ -105,12 +102,6 @@ export default function ButtonsEdit( {
 		[]
 	);
 
-	function onChangeContentJustification( updatedValue ) {
-		setAttributes( {
-			contentJustification: updatedValue,
-		} );
-	}
-
 	const renderFooterAppender = useRef( () => (
 		<View style={ styles.appenderContainer }>
 			<InnerBlocks.ButtonBlockAppender
@@ -120,23 +111,25 @@ export default function ButtonsEdit( {
 		</View>
 	) );
 
+	const justifyControls = [ 'left', 'center', 'right' ];
+
 	const remove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 	return (
 		<>
 			{ isSelected && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<ContentJustificationDropdown
-									toggleProps={ toggleProps }
-									value={ contentJustification }
-									onChange={ onChangeContentJustification }
-								/>
-							) }
-						</ToolbarItem>
-					</ToolbarGroup>
+				<BlockControls group="block">
+					<JustifyContentControl
+						allowedControls={ justifyControls }
+						value={ contentJustification }
+						onChange={ ( value ) =>
+							setAttributes( { contentJustification: value } )
+						}
+						popoverProps={ {
+							position: 'bottom right',
+							isAlternate: true,
+						} }
+					/>
 				</BlockControls>
 			) }
 			{ resizeObserver }
@@ -150,7 +143,7 @@ export default function ButtonsEdit( {
 				horizontalAlignment={ contentJustification }
 				onDeleteBlock={ shouldDelete ? remove : undefined }
 				onAddBlock={ onAddNextButton }
-				parentWidth={ maxWidth }
+				parentWidth={ maxWidth } // This value controls the width of that the buttons are able to expand to.
 				marginHorizontal={ spacing }
 				marginVertical={ spacing }
 				__experimentalLayout={ layoutProp }

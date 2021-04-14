@@ -2,8 +2,9 @@
  * WordPress dependencies
  */
 import { __, _x } from '@wordpress/i18n';
-import { mapMarker as linkIcon } from '@wordpress/icons';
+import { customLink as linkIcon } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
+import { addFilter } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -11,20 +12,18 @@ import { InnerBlocks } from '@wordpress/block-editor';
 import metadata from './block.json';
 import edit from './edit';
 import save from './save';
-import variations from './variations';
+import { enhanceNavigationLinkVariations } from './hooks';
 
 const { name } = metadata;
 
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Link', 'block title' ),
+	title: _x( 'Custom Link', 'block title' ),
 
 	icon: linkIcon,
 
 	description: __( 'Add a page, link, or another item to your navigation.' ),
-
-	variations,
 
 	__experimentalLabel: ( { label } ) => label,
 
@@ -38,6 +37,13 @@ export const settings = {
 	edit,
 
 	save,
+
+	example: {
+		attributes: {
+			label: _x( 'Example Link', 'navigation link preview example' ),
+			url: 'https://example.com',
+		},
+	},
 
 	deprecated: [
 		{
@@ -83,3 +89,10 @@ export const settings = {
 		},
 	],
 };
+
+// importing this file includes side effects. This is whitelisted in block-library/package.json under sideEffects
+addFilter(
+	'blocks.registerBlockType',
+	'core/navigation-link',
+	enhanceNavigationLinkVariations
+);

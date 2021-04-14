@@ -61,6 +61,7 @@ module.exports = {
 			},
 		],
 		'@wordpress/no-unsafe-wp-apis': 'off',
+		'@wordpress/data-no-store-string-literals': 'warn',
 		'import/default': 'error',
 		'import/named': 'error',
 		'no-restricted-imports': [
@@ -175,7 +176,6 @@ module.exports = {
 					'error',
 					{
 						forbid: [
-							[ 'button', 'Button' ],
 							[ 'circle', 'Circle' ],
 							[ 'g', 'G' ],
 							[ 'path', 'Path' ],

@@ -29,9 +29,11 @@ import {
 	BlockControls,
 	__experimentalImageSizeControl as ImageSizeControl,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { pin, list, grid } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -80,8 +82,8 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 		defaultImageHeight,
 	} = useSelect(
 		( select ) => {
-			const { getEntityRecords, getMedia } = select( 'core' );
-			const { getSettings } = select( 'core/block-editor' );
+			const { getEntityRecords, getMedia } = select( coreStore );
+			const { getSettings } = select( blockEditorStore );
 			const { imageSizes, imageDimensions } = getSettings();
 			const catIds =
 				categories && categories.length > 0

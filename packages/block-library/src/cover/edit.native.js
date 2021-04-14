@@ -6,6 +6,7 @@ import {
 	TouchableWithoutFeedback,
 	InteractionManager,
 	AccessibilityInfo,
+	Platform,
 } from 'react-native';
 import Video from 'react-native-video';
 
@@ -24,12 +25,7 @@ import {
 	Image,
 	ImageEditingButton,
 	IMAGE_DEFAULT_FOCAL_POINT,
-	PanelBody,
-	RangeControl,
-	UnitControl,
-	TextControl,
 	ToolbarButton,
-	ToolbarGroup,
 	Gradient,
 	ColorPalette,
 	ColorPicker,
@@ -41,19 +37,20 @@ import {
 	InnerBlocks,
 	InspectorControls,
 	MEDIA_TYPE_IMAGE,
-	MEDIA_TYPE_VIDEO,
 	MediaPlaceholder,
 	MediaUpload,
 	MediaUploadProgress,
 	withColors,
 	__experimentalUseGradient,
 	__experimentalUseEditorFeature as useEditorFeature,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { useEffect, useState, useRef, useCallback } from '@wordpress/element';
 import { cover as icon, replace, image, warning } from '@wordpress/icons';
 import { getProtocol } from '@wordpress/url';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -61,17 +58,16 @@ import { getProtocol } from '@wordpress/url';
 import styles from './style.scss';
 import {
 	attributesFromMedia,
-	COVER_MIN_HEIGHT,
+	ALLOWED_MEDIA_TYPES,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
-	CSS_UNITS,
+	COVER_DEFAULT_HEIGHT,
 } from './shared';
-import OverlayColorSettings from './overlay-color-settings';
+import Controls from './controls';
 
 /**
  * Constants
  */
-const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
 const INNER_BLOCKS_TEMPLATE = [
 	[
 		'core/paragraph',
@@ -81,8 +77,6 @@ const INNER_BLOCKS_TEMPLATE = [
 		},
 	],
 ];
-const COVER_MAX_HEIGHT = 1000;
-const COVER_DEFAULT_HEIGHT = 300;
 
 const Cover = ( {
 	attributes,
@@ -111,8 +105,6 @@ const Cover = ( {
 	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
 		false
 	);
-
-	const CONTAINER_HEIGHT = minHeight || COVER_DEFAULT_HEIGHT;
 
 	useEffect( () => {
 		// sync with local media store
@@ -195,19 +187,6 @@ const Cover = ( {
 		onSelect( media );
 	};
 
-	const onHeightChange = useCallback(
-		( value ) => {
-			if ( minHeight || value !== COVER_DEFAULT_HEIGHT ) {
-				setAttributes( { minHeight: value } );
-			}
-		},
-		[ minHeight ]
-	);
-
-	const onOpacityChange = useCallback( ( value ) => {
-		setAttributes( { dimRatio: value } );
-	}, [] );
-
 	const onMediaPressed = () => {
 		if ( isUploadInProgress ) {
 			requestImageUploadCancelDialog( id );
@@ -229,7 +208,12 @@ const Cover = ( {
 	};
 
 	const onClearMedia = useCallback( () => {
-		setAttributes( { id: undefined, url: undefined } );
+		setAttributes( {
+			focalPoint: undefined,
+			hasParallax: undefined,
+			id: undefined,
+			url: undefined,
+		} );
 		closeSettingsBottomSheet();
 	}, [ closeSettingsBottomSheet ] );
 
@@ -281,19 +265,27 @@ const Cover = ( {
 	const placeholderIcon = <Icon icon={ icon } { ...placeholderIconStyle } />;
 
 	const toolbarControls = ( open ) => (
-		<BlockControls>
-			<ToolbarGroup>
-				<ToolbarButton
-					title={ __( 'Edit cover media' ) }
-					icon={ replace }
-					onClick={ open }
-				/>
-			</ToolbarGroup>
+		<BlockControls group="other">
+			<ToolbarButton
+				title={ __( 'Edit cover media' ) }
+				icon={ replace }
+				onClick={ open }
+			/>
 		</BlockControls>
 	);
 
+	const accessibilityHint =
+		Platform.OS === 'ios'
+			? __( 'Double tap to open Action Sheet to add image or video' )
+			: __( 'Double tap to open Bottom Sheet to add image or video' );
+
 	const addMediaButton = () => (
-		<TouchableWithoutFeedback onPress={ openMediaOptionsRef.current }>
+		<TouchableWithoutFeedback
+			accessibilityHint={ accessibilityHint }
+			accessibilityLabel={ __( 'Add image or video' ) }
+			accessibilityRole="button"
+			onPress={ openMediaOptionsRef.current }
+		>
 			<View style={ styles.selectImageContainer }>
 				<View style={ styles.selectImage }>
 					<Icon
@@ -306,70 +298,11 @@ const Cover = ( {
 		</TouchableWithoutFeedback>
 	);
 
-	const onChangeUnit = useCallback( ( nextUnit ) => {
-		setAttributes( {
-			minHeightUnit: nextUnit,
-			minHeight:
-				nextUnit === 'px'
-					? Math.max( CONTAINER_HEIGHT, COVER_MIN_HEIGHT )
-					: CONTAINER_HEIGHT,
-		} );
-	}, [] );
-
 	const onBottomSheetClosed = useCallback( () => {
 		InteractionManager.runAfterInteractions( () => {
 			setCustomColorPickerShowing( false );
 		} );
 	}, [] );
-
-	const controls = (
-		<InspectorControls>
-			<OverlayColorSettings
-				overlayColor={ attributes.overlayColor }
-				customOverlayColor={ attributes.customOverlayColor }
-				gradient={ attributes.gradient }
-				customGradient={ attributes.customGradient }
-				setAttributes={ setAttributes }
-			/>
-			{ url ? (
-				<PanelBody>
-					<RangeControl
-						label={ __( 'Opacity' ) }
-						minimumValue={ 0 }
-						maximumValue={ 100 }
-						value={ dimRatio }
-						onChange={ onOpacityChange }
-						style={ styles.rangeCellContainer }
-						separatorType={ 'topFullWidth' }
-					/>
-				</PanelBody>
-			) : null }
-			<PanelBody title={ __( 'Dimensions' ) }>
-				<UnitControl
-					label={ __( 'Minimum height' ) }
-					min={ minHeightUnit === 'px' ? COVER_MIN_HEIGHT : 1 }
-					max={ COVER_MAX_HEIGHT }
-					unit={ minHeightUnit }
-					value={ CONTAINER_HEIGHT }
-					onChange={ onHeightChange }
-					onUnitChange={ onChangeUnit }
-					units={ CSS_UNITS }
-					style={ styles.rangeCellContainer }
-					key={ minHeightUnit }
-				/>
-			</PanelBody>
-			{ url ? (
-				<PanelBody title={ __( 'Media' ) }>
-					<TextControl
-						leftAlign
-						label={ __( 'Clear Media' ) }
-						labelStyle={ styles.clearMediaButton }
-						onPress={ onClearMedia }
-					/>
-				</PanelBody>
-			) : null }
-		</InspectorControls>
-	);
 
 	const colorPickerControls = (
 		<InspectorControls>
@@ -545,32 +478,17 @@ const Cover = ( {
 
 	return (
 		<View style={ styles.backgroundContainer }>
-			{ isSelected && controls }
-
-			{ isImage &&
-				url &&
-				openMediaOptionsRef.current &&
-				isParentSelected &&
-				! isUploadInProgress &&
-				! didUploadFail && (
-					<View style={ styles.imageEditButton }>
-						<ImageEditingButton
-							onSelectMediaUploadOption={ onSelectMedia }
-							openMediaOptions={ openMediaOptionsRef.current }
-							pickerOptions={ [
-								{
-									destructiveButton: true,
-									id: 'clearMedia',
-									label: __( 'Clear Media' ),
-									onPress: onClearMedia,
-									separated: true,
-									value: 'clearMedia',
-								},
-							] }
-							url={ url }
-						/>
-					</View>
-				) }
+			{ isSelected && (
+				<Controls
+					attributes={ attributes }
+					didUploadFail={ didUploadFail }
+					hasOnlyColorBackground={ hasOnlyColorBackground }
+					isUploadInProgress={ isUploadInProgress }
+					onClearMedia={ onClearMedia }
+					onSelectMedia={ onSelectMedia }
+					setAttributes={ setAttributes }
+				/>
+			) }
 
 			<View
 				pointerEvents="box-none"
@@ -604,6 +522,31 @@ const Cover = ( {
 				} }
 			/>
 
+			{ isImage &&
+				url &&
+				openMediaOptionsRef.current &&
+				isParentSelected &&
+				! isUploadInProgress &&
+				! didUploadFail && (
+					<View style={ styles.imageEditButton }>
+						<ImageEditingButton
+							onSelectMediaUploadOption={ onSelectMedia }
+							openMediaOptions={ openMediaOptionsRef.current }
+							pickerOptions={ [
+								{
+									destructiveButton: true,
+									id: 'clearMedia',
+									label: __( 'Clear Media' ),
+									onPress: onClearMedia,
+									separated: true,
+									value: 'clearMedia',
+								},
+							] }
+							url={ url }
+						/>
+					</View>
+				) }
+
 			{ shouldShowFailure && (
 				<View
 					pointerEvents="none"
@@ -621,11 +564,11 @@ const Cover = ( {
 export default compose( [
 	withColors( { overlayColor: 'background-color' } ),
 	withSelect( ( select, { clientId } ) => {
-		const { getSelectedBlockClientId } = select( 'core/block-editor' );
+		const { getSelectedBlockClientId } = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 
 		return {
 			settings: getSettings(),
@@ -633,13 +576,13 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch, { clientId } ) => {
-		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
-		const { selectBlock } = dispatch( 'core/block-editor' );
+		const { openGeneralSidebar } = dispatch( editPostStore );
+		const { selectBlock } = dispatch( blockEditorStore );
 
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),
 			closeSettingsBottomSheet() {
-				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+				dispatch( editPostStore ).closeGeneralSidebar();
 			},
 			selectBlock: () => selectBlock( clientId ),
 		};

@@ -12,14 +12,18 @@ import FlexItem from '../flex-item';
 import FlexBlock from '../flex-block';
 
 describe( 'props', () => {
-	test( 'should render correctly', () => {
-		const { container } = render(
+	let base;
+	beforeEach( () => {
+		base = render(
 			<Flex>
 				<FlexItem />
 				<FlexBlock />
 			</Flex>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+	} );
+
+	test( 'should render correctly', () => {
+		expect( base.container.firstChild ).toMatchSnapshot();
 	} );
 
 	test( 'should render + wrap non Flex children', () => {
@@ -31,7 +35,10 @@ describe( 'props', () => {
 				<FlexBlock />
 			</Flex>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+
+		expect( container.firstChild ).toMatchDiffSnapshot(
+			base.container.firstChild
+		);
 	} );
 
 	test( 'should render align', () => {
@@ -41,7 +48,9 @@ describe( 'props', () => {
 				<FlexBlock />
 			</Flex>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+			base.container.firstChild
+		);
 	} );
 
 	test( 'should render justify', () => {
@@ -51,16 +60,20 @@ describe( 'props', () => {
 				<FlexBlock />
 			</Flex>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+			base.container.firstChild
+		);
 	} );
 
 	test( 'should render spacing', () => {
 		const { container } = render(
-			<Flex spacing={ 5 }>
+			<Flex gap={ 5 }>
 				<View />
 				<View />
 			</Flex>
 		);
-		expect( container.firstChild ).toMatchSnapshot();
+		expect( container.firstChild ).toMatchStyleDiffSnapshot(
+			base.container.firstChild
+		);
 	} );
 } );
