@@ -79,9 +79,3 @@
 		display: none;
 	}
 }
-
-.block-editor-default-block-appender .block-editor-inserter {
-	@include break-small {
-		align-items: center;
-	}
-}

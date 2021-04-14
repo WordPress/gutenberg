@@ -94,11 +94,7 @@ function BlockListAppender( {
 			// Prevent the block from being selected when the appender is
 			// clicked.
 			onFocus={ stopPropagation }
-			className={ classnames(
-				'block-list-appender',
-				'wp-block',
-				className
-			) }
+			className={ classnames( 'block-list-appender', className ) }
 		>
 			{ appender }
 		</TagName>
