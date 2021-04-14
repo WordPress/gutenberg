@@ -352,6 +352,22 @@ export function* moveBlockToWidgetArea( clientId, widgetAreaId ) {
 	);
 	const toIndex = destinationClientIds.length;
 
+	// Reveal the widget area, if it's not open.
+	const isDestinationWidgetAreaOpen = yield select(
+		editWidgetsStoreName,
+		'getIsWidgetAreaOpen',
+		toRootClientId
+	);
+
+	if ( ! isDestinationWidgetAreaOpen ) {
+		yield dispatch(
+			editWidgetsStoreName,
+			'setIsWidgetAreaOpen',
+			toRootClientId,
+			true
+		);
+	}
+
 	yield dispatch(
 		'core/block-editor',
 		'moveBlocksToPosition',
