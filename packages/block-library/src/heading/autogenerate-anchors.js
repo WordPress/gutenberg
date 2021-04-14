@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty, isNil, deburr, trim } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { dispatch, select, subscribe } from '@wordpress/data';
@@ -62,9 +57,9 @@ function generateAnchor(
 	// So when anchor isn't set for a heading that already has content set an empty string.
 	// However, if none of the headings have anchors, assume the page was old, and give all headings an anchor.
 	if (
-		isNil( block.attributes.anchor ) &&
+		! block.attributes.anchor &&
 		! fillAllAnchors &&
-		! isEmpty( block.attributes.content ) &&
+		'' !== block.attributes.content.trim() &&
 		! blocksThatWereNotHeadings.includes( block.clientId )
 	) {
 		return '';
@@ -74,12 +69,10 @@ function generateAnchor(
 	let slug = cleanForSlug( block.attributes.content );
 	// If slug is empty, then it's likely using non-latin characters.
 	if ( '' === slug ) {
-		slug = trim(
-			deburr( block.attributes.content )
-				.replace( /[\s\./]+/g, '-' )
-				.toLowerCase(),
-			'-'
-		);
+		slug = block.attributes.content
+			.trim()
+			.replace( /[\s\./]+/g, '-' )
+			.toLowerCase();
 	}
 
 	const baseAnchor = `wp-${ slug }`;
@@ -120,7 +113,7 @@ function maybeUpdateAnchor(
 		( ! knownHeadings[ block.clientId ] ||
 			knownHeadings[ block.clientId ].content !==
 				block.attributes.content ) &&
-		( isNil( anchor ) || anchor.startsWith( 'wp-' ) )
+		( ! anchor || anchor.startsWith( 'wp-' ) )
 	) {
 		anchor = generateAnchor(
 			block,
@@ -195,7 +188,7 @@ export default function subscribeToStore() {
 					knownHeadings[ block.clientId ] = heading;
 
 					// Empty strings shouldn't be added to the table of contents.
-					if ( anchor === '' || isEmpty( content ) ) {
+					if ( anchor === '' || '' === content.trim() ) {
 						return;
 					}
 
