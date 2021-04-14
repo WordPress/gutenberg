@@ -36,7 +36,7 @@ function myguten_render_paragraph( $block_attributes, $content ) {
 }
 
 register_block_type( 'core/paragraph', array(
-	'apiVersion' => 2,
+	'api_version' => 2,
 	'render_callback' => 'myguten_render_paragraph',
 ) );
 ```
