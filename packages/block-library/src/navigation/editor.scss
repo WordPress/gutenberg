@@ -290,6 +290,7 @@ $color-control-label-height: 20px;
 		align-items: center;
 		justify-content: flex-start;
 		display: none;
+		line-height: 0;
 
 		// line up with the icon in the toolbar.
 		margin-left: $grid-unit-05 + $border-width;
