@@ -145,12 +145,7 @@ const deprecated = [
 				<figure
 					{ ...useBlockProps.save( {
 						className: figureClasses,
-						// Block supports adds inline styles to the root element.
-						// This deprecation must therefore render all inline styles here.
-						style: {
-							...figureStyles,
-							...blockquoteStyles,
-						},
+						style: figureStyles,
 					} ) }
 				>
 					<blockquote
