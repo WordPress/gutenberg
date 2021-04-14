@@ -321,3 +321,43 @@ export function* closeGeneralSidebar() {
 		editWidgetsStoreName
 	);
 }
+
+/**
+ * Action that handles moving a block between widget areas
+ *
+ * @param {string} clientId     The clientId of the block to move.
+ * @param {string} widgetAreaId The id of the widget area to move the block to.
+ */
+export function* moveBlockToWidgetArea( clientId, widgetAreaId ) {
+	const fromRootClientId = yield select(
+		'core/block-editor',
+		'getBlockRootClientId',
+		[ clientId ]
+	);
+
+	// Search the top level blocks (widget areas) for the one with the matching
+	// id attribute. Makes the assumption that all top-level blocks are widget
+	// areas.
+	const widgetAreas = yield select( 'core/block-editor', 'getBlocks' );
+	const toWidgetAreaBlock = widgetAreas.find(
+		( { attributes } ) => attributes.id === widgetAreaId
+	);
+	const toRootClientId = toWidgetAreaBlock.clientId;
+
+	// Get the index for moving to the end of the the destination widget area.
+	const destinationClientIds = yield select(
+		'core/block-editor',
+		'getBlockOrder',
+		toRootClientId
+	);
+	const toIndex = destinationClientIds.length;
+
+	yield dispatch(
+		'core/block-editor',
+		'moveBlocksToPosition',
+		[ clientId ],
+		fromRootClientId,
+		toRootClientId,
+		toIndex
+	);
+}

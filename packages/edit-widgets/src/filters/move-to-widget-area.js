@@ -4,7 +4,7 @@
 
 import { BlockControls } from '@wordpress/block-editor';
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 
 /**
@@ -30,6 +30,8 @@ const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 			[ __internalWidgetId ]
 		);
 
+		const { moveBlockToWidgetArea } = useDispatch( 'core/edit-widgets' );
+
 		return (
 			<>
 				<BlockEdit { ...props } />
@@ -38,7 +40,12 @@ const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 						<MoveToWidgetArea
 							widgetAreas={ widgetAreas }
 							currentWidgetArea={ currentWidgetArea }
-							onSelect={ () => {} }
+							onSelect={ ( widgetAreaId ) => {
+								moveBlockToWidgetArea(
+									props.clientId,
+									widgetAreaId
+								);
+							} }
 						/>
 					</BlockControls>
 				) }
