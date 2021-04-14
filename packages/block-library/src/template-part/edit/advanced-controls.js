@@ -5,20 +5,13 @@ import { useEntityProp } from '@wordpress/core-data';
 import { SelectControl, TextControl } from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 import { InspectorAdvancedControls } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
 import { getTagBasedOnArea } from './get-tag-based-on-area';
-
-const AREA_OPTIONS = [
-	{ label: __( 'Header' ), value: 'header' },
-	{ label: __( 'Footer' ), value: 'footer' },
-	{
-		label: __( 'General' ),
-		value: 'uncategorized',
-	},
-];
 
 export function TemplatePartAdvancedControls( {
 	tagName,
@@ -40,6 +33,18 @@ export function TemplatePartAdvancedControls( {
 		templatePartId
 	);
 
+	const { areaOptions } = useSelect( ( select ) => {
+		const definedAreas = select(
+			editorStore
+		).__experimentalGetDefaultTemplatePartAreas();
+		return {
+			areaOptions: definedAreas.map( ( { label, area: _area } ) => ( {
+				label,
+				value: _area,
+			} ) ),
+		};
+	}, [] );
+
 	return (
 		<InspectorAdvancedControls>
 			{ isEntityAvailable && (
@@ -56,7 +61,7 @@ export function TemplatePartAdvancedControls( {
 					<SelectControl
 						label={ __( 'Area' ) }
 						labelPosition="top"
-						options={ AREA_OPTIONS }
+						options={ areaOptions }
 						value={ area }
 						onChange={ setArea }
 					/>
