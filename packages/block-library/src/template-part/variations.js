@@ -7,14 +7,14 @@ import { store as blocksStore } from '@wordpress/blocks';
 import { dispatch, select, subscribe } from '@wordpress/data';
 
 const unsubscribe = subscribe( () => {
-	const definedVariations =
-		select( editorStore ).__experimentalGetDefaultTemplatePartAreas() || [];
+	const definedVariations = select(
+		editorStore
+	).__experimentalGetDefaultTemplatePartAreas();
 
-	if ( definedVariations.length ) {
-		unsubscribe();
-	} else {
+	if ( ! definedVariations?.length ) {
 		return;
 	}
+	unsubscribe();
 
 	const variations = definedVariations
 		.filter( ( { area } ) => 'uncategorized' !== area )
