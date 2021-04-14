@@ -13,11 +13,11 @@
  */
 function gutenberg_register_border_support( $block_type ) {
 	// Determine if any border related features are supported.
-	$has_border_color_support = gutenberg_has_border_support( $block_type, 'color' );
+	$has_border_color_support = gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'color' ) );
 	$has_border_support       =
-		gutenberg_has_border_support( $block_type, 'radius' ) ||
-		gutenberg_has_border_support( $block_type, 'style' ) ||
-		gutenberg_has_border_support( $block_type, 'width' ) ||
+		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'radius' ) ) ||
+		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'style' ) ) ||
+		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'width' ) ) ||
 		$has_border_color_support;
 
 	// Setup attributes and styles within that if needed.
@@ -56,31 +56,34 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 	$styles  = array();
 
 	// Border radius.
-	if ( gutenberg_has_border_support( $block_type, 'radius' ) ) {
-		if ( isset( $block_attributes['style']['border']['radius'] ) ) {
-			$border_radius = (int) $block_attributes['style']['border']['radius'];
-			$styles[]      = sprintf( 'border-radius: %dpx;', $border_radius );
-		}
+	if (
+		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'radius' ) ) &&
+		isset( $block_attributes['style']['border']['radius'] )
+	) {
+		$border_radius = (int) $block_attributes['style']['border']['radius'];
+		$styles[]      = sprintf( 'border-radius: %dpx;', $border_radius );
 	}
 
 	// Border style.
-	if ( gutenberg_has_border_support( $block_type, 'style' ) ) {
-		if ( isset( $block_attributes['style']['border']['style'] ) ) {
-			$border_style = $block_attributes['style']['border']['style'];
-			$styles[]     = sprintf( 'border-style: %s;', $border_style );
-		}
+	if (
+		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'style' ) ) &&
+		isset( $block_attributes['style']['border']['style'] )
+	) {
+		$border_style = $block_attributes['style']['border']['style'];
+		$styles[]     = sprintf( 'border-style: %s;', $border_style );
 	}
 
 	// Border width.
-	if ( gutenberg_has_border_support( $block_type, 'width' ) ) {
-		if ( isset( $block_attributes['style']['border']['width'] ) ) {
-			$border_width = intval( $block_attributes['style']['border']['width'] );
-			$styles[]     = sprintf( 'border-width: %dpx;', $border_width );
-		}
+	if (
+		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'width' ) ) &&
+		isset( $block_attributes['style']['border']['width'] )
+	) {
+		$border_width = intval( $block_attributes['style']['border']['width'] );
+		$styles[]     = sprintf( 'border-width: %dpx;', $border_width );
 	}
 
 	// Border color.
-	if ( gutenberg_has_border_support( $block_type, 'color' ) ) {
+	if ( gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'color' ) ) ) {
 		$has_named_border_color  = array_key_exists( 'borderColor', $block_attributes );
 		$has_custom_border_color = isset( $block_attributes['style']['border']['color'] );
 
@@ -124,24 +127,6 @@ function gutenberg_skip_border_serialization( $block_type ) {
 	return is_array( $border_support ) &&
 		array_key_exists( '__experimentalSkipSerialization', $border_support ) &&
 		$border_support['__experimentalSkipSerialization'];
-}
-
-/**
- * Checks whether the current block type supports the feature requested.
- *
- * @param WP_Block_Type $block_type Block type to check for support.
- * @param string        $feature    Name of the feature to check support for.
- * @param mixed         $default    Fallback value for feature support, defaults to false.
- *
- * @return boolean                  Whether or not the feature is supported.
- */
-function gutenberg_has_border_support( $block_type, $feature, $default = false ) {
-	$block_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$block_support = _wp_array_get( $block_type->supports, array( '__experimentalBorder' ), $default );
-	}
-
-	return true === $block_support || ( is_array( $block_support ) && _wp_array_get( $block_support, array( $feature ), false ) );
 }
 
 // Register the block support.
