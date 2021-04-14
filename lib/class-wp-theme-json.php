@@ -300,6 +300,10 @@ class WP_Theme_JSON {
 		}
 
 		foreach ( array( 'styles', 'settings' ) as $subtree ) {
+			if ( ! isset( $input[ $subtree ] ) ) {
+				continue;
+			}
+
 			if ( ! is_array( $input[ $subtree ] ) ) {
 				unset( $output[ $subtree ] );
 				continue;
@@ -436,6 +440,10 @@ class WP_Theme_JSON {
 		$tree = array_intersect_key( $tree, $schema );
 
 		foreach ( $schema as $key => $data ) {
+			if ( ! isset( $tree[ $key ] ) ) {
+				continue;
+			}
+
 			if ( is_array( $schema[ $key ] ) && is_array( $tree[ $key ] ) ) {
 				$tree[ $key ] = self::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
 
