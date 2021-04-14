@@ -8,7 +8,6 @@
 .inserter-search-form__input-container {
 	border: 1px $gray-light;
 }
-
 .inserter-search-form__input-container--active {
 	border: none;
 }
@@ -17,3 +16,6 @@
 	flex: 1;
 }
 
+.inserter-search-form__input-button-left--active {
+	margin: 0 16px;
+}
