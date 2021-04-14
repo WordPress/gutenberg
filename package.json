@@ -229,6 +229,7 @@
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
+		"format": "wp-scripts format",
 		"format-js": "wp-scripts format-js",
 		"format-php": "wp-env run composer run-script format",
 		"lint": "concurrently \"npm run lint-lockfile\" \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
@@ -291,8 +292,8 @@
 		"*.scss": [
 			"wp-scripts lint-style"
 		],
-		"*.{js,ts,tsx}": [
-			"wp-scripts format-js",
+		"*.{js,ts,tsx,yml}": [
+			"wp-scripts format",
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [
