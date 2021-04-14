@@ -4,21 +4,21 @@
 
 **License for Contributions (on and after April 15, 2021)**
 
-All code contributed to the Gutenberg project is dual-licensed, 
-and released under both of the following licenses: 
+All code contributed to the Gutenberg project is dual-licensed,
+and released under both of the following licenses:
 
-the GNU General Public License as published by the Free Software Foundation; 
+the GNU General Public License as published by the Free Software Foundation;
 either version 2 of the License or (at your option) any later version (the “GPL”)
-and the Mozilla Public License, Version 2.0 (the “MPL”). 
+and the Mozilla Public License, Version 2.0 (the “MPL”).
 
 **Project License**
 
-The Gutenberg project license is not affected by the License for Contributions (as 
-discussed in the [Dual License section](#dual-license) below). The Gutenberg project 
+The Gutenberg project license is not affected by the License for Contributions (as
+discussed in the [Dual License section](#dual-license) below). The Gutenberg project
 continues to be free software; you can redistribute it and/or modify it
 under the terms of the GNU General Public License as published by the Free
 Software Foundation; either version 2 of the License or (at your option) any
-later version (the “GPL”). 
+later version (the “GPL”).
 
 This program incorporates work covered by the following copyright and
 permission notices:
@@ -39,8 +39,7 @@ and
 
     WordPress is released under the GPL
 
-
-### Dual License 
+### Dual License
 
 **We are currently in the process of changing Gutenberg’s software license from
 GPL to a dual license: GPL and MPL.**
@@ -64,14 +63,14 @@ the pre-April 15, 2021 code of the Gutenberg project (Part 1 above), you will
 have the option to use and distribute all of the Gutenberg project under
 either the GPL or MPL license. At this time we will change the “Project
 License” to the following:**
- 
+
     The Gutenberg project is free software; you can redistribute it and/or modify
-    it under the terms of either of the following licenses: 
+    it under the terms of either of the following licenses:
 
         1. the GNU General Public License as published by the Free Software Foundation;
            either version 2 of the License or (at your option) any later version (the
            “GPL”) OR
-       
+
         2. the Mozilla Public License Version 2.0 (the “MPL”).
 
 ---
@@ -181,16 +180,13 @@ portion of it, thus forming a work based on the Program, and copy and
 distribute such modifications or work under the terms of Section 1
 above, provided that you also meet all of these conditions:
 
-
 **a)** You must cause the modified files to carry prominent notices
 stating that you changed the files and the date of any change.
-
 
 **b)** You must cause any work that you distribute or publish, that in
 whole or in part contains or is derived from the Program or any part
 thereof, to be licensed as a whole at no charge to all third parties
 under the terms of this License.
-
 
 **c)** If the modified program normally reads commands interactively
 when run, you must cause it, when started running for such interactive
@@ -228,11 +224,9 @@ the scope of this License.
 under Section 2) in object code or executable form under the terms of
 Sections 1 and 2 above provided that you also do one of the following:
 
-
 **a)** Accompany it with the complete corresponding machine-readable
 source code, which must be distributed under the terms of Sections 1
 and 2 above on a medium customarily used for software interchange; or,
-
 
 **b)** Accompany it with a written offer, valid for at least three
 years, to give any third party, for a charge no more than your cost of
@@ -240,7 +234,6 @@ physically performing source distribution, a complete machine-readable
 copy of the corresponding source code, to be distributed under the
 terms of Sections 1 and 2 above on a medium customarily used for
 software interchange; or,
-
 
 **c)** Accompany it with the information you received as to the offer
 to distribute corresponding source code. (This alternative is allowed
@@ -446,87 +439,87 @@ License](http://www.gnu.org/licenses/lgpl.html) instead of this
 License.
 
 ---
+
 ## Mozilla Public License, Version 2.0
 
 ### 1. Definitions
 
 **1.1. “Contributor”**
-    means each individual or legal entity that creates, contributes to
-    the creation of, or owns Covered Software.
+means each individual or legal entity that creates, contributes to
+the creation of, or owns Covered Software.
 
 **1.2. “Contributor Version”**
-    means the combination of the Contributions of others (if any) used
-    by a Contributor and that particular Contributor's Contribution.
+means the combination of the Contributions of others (if any) used
+by a Contributor and that particular Contributor's Contribution.
 
 **1.3. “Contribution”**
-    means Covered Software of a particular Contributor.
+means Covered Software of a particular Contributor.
 
 **1.4. “Covered Software”**
-    means Source Code Form to which the initial Contributor has attached
-    the notice in Exhibit A, the Executable Form of such Source Code
-    Form, and Modifications of such Source Code Form, in each case
-    including portions thereof.
+means Source Code Form to which the initial Contributor has attached
+the notice in Exhibit A, the Executable Form of such Source Code
+Form, and Modifications of such Source Code Form, in each case
+including portions thereof.
 
 **1.5. “Incompatible With Secondary Licenses”**
-    means
+means
 
-* **(a)** that the initial Contributor has attached the notice described
+-   **(a)** that the initial Contributor has attached the notice described
     in Exhibit B to the Covered Software; or
-* **(b)** that the Covered Software was made available under the terms of
+-   **(b)** that the Covered Software was made available under the terms of
     version 1.1 or earlier of the License, but not also under the
     terms of a Secondary License.
 
 **1.6. “Executable Form”**
-    means any form of the work other than Source Code Form.
+means any form of the work other than Source Code Form.
 
 **1.7. “Larger Work”**
-    means a work that combines Covered Software with other material, in
-    a separate file or files, that is not Covered Software.
+means a work that combines Covered Software with other material, in
+a separate file or files, that is not Covered Software.
 
 **1.8. “License”**
-    means this document.
+means this document.
 
 **1.9. “Licensable”**
-    means having the right to grant, to the maximum extent possible,
-    whether at the time of the initial grant or subsequently, any and
-    all of the rights conveyed by this License.
+means having the right to grant, to the maximum extent possible,
+whether at the time of the initial grant or subsequently, any and
+all of the rights conveyed by this License.
 
 **1.10. “Modifications”**
-    means any of the following:
+means any of the following:
 
-* **(a)** any file in Source Code Form that results from an addition to,
+-   **(a)** any file in Source Code Form that results from an addition to,
     deletion from, or modification of the contents of Covered
     Software; or
-* **(b)** any new file in Source Code Form that contains any Covered
+-   **(b)** any new file in Source Code Form that contains any Covered
     Software.
 
 **1.11. “Patent Claims” of a Contributor**
-    means any patent claim(s), including without limitation, method,
-    process, and apparatus claims, in any patent Licensable by such
-    Contributor that would be infringed, but for the grant of the
-    License, by the making, using, selling, offering for sale, having
-    made, import, or transfer of either its Contributions or its
-    Contributor Version.
+means any patent claim(s), including without limitation, method,
+process, and apparatus claims, in any patent Licensable by such
+Contributor that would be infringed, but for the grant of the
+License, by the making, using, selling, offering for sale, having
+made, import, or transfer of either its Contributions or its
+Contributor Version.
 
 **1.12. “Secondary License”**
-    means either the GNU General Public License, Version 2.0, the GNU
-    Lesser General Public License, Version 2.1, the GNU Affero General
-    Public License, Version 3.0, or any later versions of those
-    licenses.
+means either the GNU General Public License, Version 2.0, the GNU
+Lesser General Public License, Version 2.1, the GNU Affero General
+Public License, Version 3.0, or any later versions of those
+licenses.
 
 **1.13. “Source Code Form”**
-    means the form of the work preferred for making modifications.
+means the form of the work preferred for making modifications.
 
 **1.14. “You” (or “Your”)**
-    means an individual or a legal entity exercising rights under this
-    License. For legal entities, “You” includes any entity that
-    controls, is controlled by, or is under common control with You. For
-    purposes of this definition, “control” means **(a)** the power, direct
-    or indirect, to cause the direction or management of such entity,
-    whether by contract or otherwise, or **(b)** ownership of more than
-    fifty percent (50%) of the outstanding shares or beneficial
-    ownership of such entity.
-
+means an individual or a legal entity exercising rights under this
+License. For legal entities, “You” includes any entity that
+controls, is controlled by, or is under common control with You. For
+purposes of this definition, “control” means **(a)** the power, direct
+or indirect, to cause the direction or management of such entity,
+whether by contract or otherwise, or **(b)** ownership of more than
+fifty percent (50%) of the outstanding shares or beneficial
+ownership of such entity.
 
 ### 2. License Grants and Conditions
 
@@ -535,12 +528,12 @@ License.
 Each Contributor hereby grants You a world-wide, royalty-free,
 non-exclusive license:
 
-* **(a)** under intellectual property rights (other than patent or trademark)
+-   **(a)** under intellectual property rights (other than patent or trademark)
     Licensable by such Contributor to use, reproduce, make available,
     modify, display, perform, distribute, and otherwise exploit its
     Contributions, either on an unmodified basis, with Modifications, or
     as part of a Larger Work; and
-* **(b)** under Patent Claims of such Contributor to make, use, sell, offer
+-   **(b)** under Patent Claims of such Contributor to make, use, sell, offer
     for sale, have made, import, and otherwise transfer either its
     Contributions or its Contributor Version.
 
@@ -558,13 +551,13 @@ distribution or licensing of Covered Software under this License.
 Notwithstanding Section 2.1(b) above, no patent license is granted by a
 Contributor:
 
-* **(a)** for any code that a Contributor has removed from Covered Software;
+-   **(a)** for any code that a Contributor has removed from Covered Software;
     or
-* **(b)** for infringements caused by: **(i)** Your and any other third party's
+-   **(b)** for infringements caused by: **(i)** Your and any other third party's
     modifications of Covered Software, or **(ii)** the combination of its
     Contributions with other software (except as part of its Contributor
     Version); or
-* **(c)** under Patent Claims infringed by Covered Software in the absence of
+-   **(c)** under Patent Claims infringed by Covered Software in the absence of
     its Contributions.
 
 This License does not grant any rights in the trademarks, service marks,
@@ -595,7 +588,6 @@ equivalents.
 Sections 3.1, 3.2, 3.3, and 3.4 are conditions of the licenses granted
 in Section 2.1.
 
-
 ### 3. Responsibilities
 
 #### 3.1. Distribution of Source Form
@@ -612,13 +604,13 @@ Form.
 
 If You distribute Covered Software in Executable Form then:
 
-* **(a)** such Covered Software must also be made available in Source Code
+-   **(a)** such Covered Software must also be made available in Source Code
     Form, as described in Section 3.1, and You must inform recipients of
     the Executable Form how they can obtain a copy of such Source Code
     Form by reasonable means in a timely manner, at a charge no more
     than the cost of distribution to the recipient; and
 
-* **(b)** You may distribute such Executable Form under the terms of this
+-   **(b)** You may distribute such Executable Form under the terms of this
     License, or sublicense it under different terms, provided that the
     license for the Executable Form does not attempt to limit or alter
     the recipients' rights in the Source Code Form under this License.
@@ -657,7 +649,6 @@ indemnity or liability terms You offer. You may include additional
 disclaimers of warranty and limitations of liability specific to any
 jurisdiction.
 
-
 ### 4. Inability to Comply Due to Statute or Regulation
 
 If it is impossible for You to comply with any of the terms of this
@@ -669,7 +660,6 @@ be placed in a text file included with all distributions of the Covered
 Software under this License. Except to the extent prohibited by statute
 or regulation, such description must be sufficiently detailed for a
 recipient of ordinary skill to be able to understand it.
-
 
 ### 5. Termination
 
@@ -698,7 +688,6 @@ You by any and all Contributors for the Covered Software under Section
 end user license agreements (excluding distributors and resellers) which
 have been validly granted by You or Your distributors under this License
 prior to termination shall survive termination.
-
 
 ### 6. Disclaimer of Warranty
 
@@ -732,7 +721,6 @@ prior to termination shall survive termination.
 > incidental or consequential damages, so this exclusion and
 > limitation may not apply to You.
 
-
 ### 8. Litigation
 
 Any litigation relating to this License may be brought only in the
@@ -742,7 +730,6 @@ jurisdiction, without reference to its conflict-of-law provisions.
 Nothing in this Section shall prevent a party's ability to bring
 cross-claims or counter-claims.
 
-
 ### 9. Miscellaneous
 
 This License represents the complete agreement concerning the subject
@@ -751,7 +738,6 @@ unenforceable, such provision shall be reformed only to the extent
 necessary to make it enforceable. Any law or regulation which provides
 that the language of a contract shall be construed against the drafter
 shall not be used to construe this License against a Contributor.
-
 
 ### 10. Versions of the License
 

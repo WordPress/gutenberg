@@ -10,5 +10,6 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
-- [*] Block split/merge fix for a (never shipped) regression (Android only) [#29683]
-- [***] Bump minimum deployment target to iOS 13.0 [#27577]
+
+-   [*] Block split/merge fix for a (never shipped) regression (Android only) [#29683]
+-   [***] Bump minimum deployment target to iOS 13.0 [#27577]

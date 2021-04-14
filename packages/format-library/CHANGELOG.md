@@ -8,7 +8,7 @@
 
 ### Internal
 
-- The inline link component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
+-   The inline link component has been refactored to focus changes using the `Popover` component's `onFocusOutside` prop.
 
 ## 1.2.10 (2019-01-03)
 
@@ -28,8 +28,8 @@
 
 ### Bug fixes
 
-- Link URL validation now works correctly when a URL includes a fragment. Previously any URL containing a fragment failed validation.
-- Link URL validation catches an incorrect number of forward slashes following a url using the http protocol.
+-   Link URL validation now works correctly when a URL includes a fragment. Previously any URL containing a fragment failed validation.
+-   Link URL validation catches an incorrect number of forward slashes following a url using the http protocol.
 
 ## 1.2.2 (2018-11-15)
 
@@ -39,7 +39,7 @@
 
 ## New Feature
 
-- Add URL validation to links.
+-   Add URL validation to links.
 
 ## 1.1.1 (2018-11-09)
 
@@ -47,7 +47,7 @@
 
 ### New Features
 
-- Import Format API components instead of passing as props.
+-   Import Format API components instead of passing as props.
 
 ## 1.0.3 (2018-11-03)
 
