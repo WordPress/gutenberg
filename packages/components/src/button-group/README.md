@@ -25,10 +25,10 @@ Only one option in a button group can be selected and active at a time. Selectin
 
 Button groups should:
 
-- **Be clearly and accurately labeled.**
-- **Clearly communicate that clicking or tapping will trigger an action.**
-- **Use established colors appropriately.** For example, only use red buttons for actions that are difficult or impossible to undo.
-- **Have consistent locations in the interface.**
+-   **Be clearly and accurately labeled.**
+-   **Clearly communicate that clicking or tapping will trigger an action.**
+-   **Use established colors appropriately.** For example, only use red buttons for actions that are difficult or impossible to undo.
+-   **Have consistent locations in the interface.**
 
 ### States
 
@@ -59,4 +59,4 @@ const MyButtonGroup = () => (
 
 ## Related components
 
-- For individual buttons, use a `Button` component.
+-   For individual buttons, use a `Button` component.

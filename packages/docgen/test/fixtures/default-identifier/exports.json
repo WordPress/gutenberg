@@ -12,10 +12,7 @@
 			"column": 32
 		}
 	},
-	"range": [
-		65,
-		97
-	],
+	"range": [ 65, 97 ],
 	"declaration": {
 		"type": "Identifier",
 		"start": 80,
@@ -30,10 +27,7 @@
 				"column": 31
 			}
 		},
-		"range": [
-			80,
-			96
-		],
+		"range": [ 80, 96 ],
 		"name": "ClassDeclaration"
 	}
 }

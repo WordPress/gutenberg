@@ -43,6 +43,12 @@ $blocks-block__margin: 0.5em;
 		}
 	}
 
+	&.has-custom-font-size {
+		.wp-block-button__link {
+			font-size: inherit;
+		}
+	}
+
 	&.wp-block-button__width-25 {
 		width: calc(25% - #{ $blocks-block__margin });
 	}
