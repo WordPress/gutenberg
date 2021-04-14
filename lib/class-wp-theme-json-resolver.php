@@ -151,7 +151,7 @@ class WP_Theme_JSON_Resolver {
 	 */
 	public static function get_fields_to_translate() {
 		if ( null === self::$theme_json_i18n ) {
-			$file_structure  = self::read_json_file( __DIR__ . '/experimental-i18n-theme.json' );
+			$file_structure        = self::read_json_file( __DIR__ . '/experimental-i18n-theme.json' );
 			self::$theme_json_i18n = self::extract_paths_to_translate( $file_structure );
 		}
 		return self::$theme_json_i18n;
@@ -502,7 +502,6 @@ class WP_Theme_JSON_Resolver {
 
 	/**
 	 * Cleans the cached data so it can be recalculated.
-	 *
 	 */
 	public static function clean_cached_data() {
 		self::$core                     = null;
@@ -515,4 +514,4 @@ class WP_Theme_JSON_Resolver {
 
 }
 
-add_action( 'switch_theme', [ 'WP_Theme_JSON_Resolver', 'clean_cached_data' ] );
+add_action( 'switch_theme', array( 'WP_Theme_JSON_Resolver', 'clean_cached_data' ) );
