@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { isEmpty, isNil } from 'lodash';
+import { isEmpty, isNil, deburr, trim } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { dispatch, select, subscribe } from '@wordpress/data';
+import { cleanForSlug } from '@wordpress/url';
 
 // This dummy element is used to strip all markup in getTextWithoutMarkup below.
 const dummyElement = document.createElement( 'div' );
@@ -69,12 +70,18 @@ function generateAnchor(
 		return '';
 	}
 
-	const slug = getTextWithoutMarkup( block.attributes.content )
-		.toLowerCase()
-		// Replace all non-word characters with dashes.
-		.replace( /[^\w]+/g, '-' )
-		// Remove leading and trailing dashes.
-		.replace( /^-+|-+$/g, '' );
+	// Get the slug.
+	let slug = cleanForSlug( block.attributes.content );
+	// If slug is empty, then it's likely using non-latin characters.
+	if ( '' === slug ) {
+		slug = trim(
+			deburr( block.attributes.content )
+				.replace( /[\s\./]+/g, '-' )
+				.toLowerCase(),
+			'-'
+		);
+	}
+
 	const baseAnchor = `wp-${ slug }`;
 	let anchor = baseAnchor;
 	let i = 0;
