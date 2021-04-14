@@ -2,9 +2,9 @@
 
 To modify the behavior of existing blocks, WordPress exposes several APIs:
 
-### Block Style Variations
+### Block Styles
 
-Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected. See the [Getting Started with JavaScript tutorial](/docs/how-to-guides/javascript/) for a full example.
+Block Styles allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected. See the [Getting Started with JavaScript tutorial](/docs/how-to-guides/javascript/) for a full example.
 
 _Example:_
 
@@ -73,7 +73,7 @@ Besides the two mandatory properties, the styles properties array should also in
 -   `inline_style`: Contains inline CSS code that registers the CSS class required for the style.
 -   `style_handle`: Contains the handle to an already registered style that should be enqueued in places where block styles are needed.
 
-It is also possible to set the `is_default` property to `true` to mark one of the block style variations as the default one.
+It is also possible to set the `is_default` property to `true` to mark one of the block styles as the default one.
 
 The following code sample registers a style for the quote block named "Blue Quote", and provides an inline style that makes quote blocks with the "Blue Quote" style have blue color:
 
