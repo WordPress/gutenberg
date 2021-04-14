@@ -29,7 +29,7 @@ In the above example, we are creating a custom instance of the `Hooks` object an
 
 In the WordPress context, that enables API functions to be called via the global `wp.hooks` object, like `wp.hooks.addAction()`, etc.
 
-One notable difference between the JS and PHP hooks API is that in the JS version, `addAction()` and `addFilter()` also need to include a namespace as the second argument.
+One notable difference between the JS and PHP hooks API is that in the JS version, `addAction()` and `addFilter()` also need to include a namespace as the second argument. Namespace uniquely identifies a callback in the form `vendor/plugin/function`.
 
 ### API Usage
 
