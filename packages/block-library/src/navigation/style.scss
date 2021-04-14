@@ -26,6 +26,8 @@
 	// Vertical layout
 	.is-vertical & {
 		display: block;
+		flex-direction: column;
+		align-items: flex-start;
 	}
 }
 
@@ -40,4 +42,19 @@
 
 .items-justified-space-between > ul {
 	justify-content: space-between;
+}
+
+// Vertical justification.
+.is-vertical.items-justified-center > ul {
+	align-items: center;
+}
+
+.is-vertical.items-justified-right > ul {
+	align-items: flex-end;
+
+	.wp-block-navigation-link,
+	.wp-block-pages-list__item {
+		margin-right: 0;
+		justify-content: flex-end;
+	}
 }
