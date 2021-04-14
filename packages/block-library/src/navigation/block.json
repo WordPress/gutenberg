@@ -3,6 +3,9 @@
 	"name": "core/navigation",
 	"category": "design",
 	"attributes": {
+		"source": {
+			"type": "string"
+		},
 		"orientation": {
 			"type": "string"
 		},
