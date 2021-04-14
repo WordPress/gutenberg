@@ -12,21 +12,19 @@ function usePatternsSetup( blockName, filterPatternsFn ) {
 	const { patterns } = useSelect(
 		( select ) => {
 			const {
-				__experimentalGetScopedBlockPatterns,
-				// __experimentalGetAllowedPatterns,
-				getSettings,
+				__experimentalGetPatternsByBlockTypes,
+				__experimentalGetAllowedPatterns,
 			} = select( blockEditorStore );
 			let _patterns;
 			// TODO maybe support combination of scoped and provided function??
 			if ( filterPatternsFn ) {
-				_patterns = getSettings().__experimentalBlockPatterns.filter(
+				// TODO check rootClientId
+				_patterns = __experimentalGetAllowedPatterns().filter(
 					filterPatternsFn
 				);
 			} else {
-				_patterns = __experimentalGetScopedBlockPatterns(
-					'block',
-					blockName
-				);
+				// TODO check and rootClientId
+				_patterns = __experimentalGetPatternsByBlockTypes( blockName );
 			}
 			return { patterns: _patterns };
 		},
