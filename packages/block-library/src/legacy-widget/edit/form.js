@@ -128,7 +128,8 @@ function useForm( { id, idBase, instance, setInstance } ) {
 }
 
 function Control( { id, idBase, html, onChange, onSave } ) {
-	const ref = useRef();
+	const controlRef = useRef();
+	const formRef = useRef();
 
 	// Trigger widget-added when widget is ready and widget-updated when widget
 	// changes. This event is what widgets' scripts use to initialize, attach
@@ -138,7 +139,7 @@ function Control( { id, idBase, html, onChange, onSave } ) {
 		if ( html ) {
 			$( document ).trigger(
 				hasBeenAdded.current ? 'widget-updated' : 'widget-added',
-				[ $( ref.current ) ]
+				[ $( controlRef.current ) ]
 			);
 			hasBeenAdded.current = true;
 		}
@@ -153,10 +154,9 @@ function Control( { id, idBase, html, onChange, onSave } ) {
 	// Use jQuery change event instead of the native change event because many
 	// widgets use jQuery's trigger() to trigger an update.
 	useEffect( () => {
-		const form = ref.current.querySelector( 'form' );
-		const handler = () => onChange( serializeForm( form ) );
-		$( form ).on( 'change', null, handler );
-		return () => $( form ).off( 'change', null, handler );
+		const handler = () => onChange( serializeForm( formRef.current ) );
+		$( formRef.current ).on( 'change', null, handler );
+		return () => $( formRef.current ).off( 'change', null, handler );
 	}, [ onChange ] );
 
 	// Non-multi widgets can be saved via a Save button.
@@ -171,9 +171,14 @@ function Control( { id, idBase, html, onChange, onSave } ) {
 	const number = useInstanceId( Control );
 
 	return (
-		<div ref={ ref } className="widget open">
+		<div ref={ controlRef } className="widget open">
 			<div className="widget-inside">
-				<form className="form" method="post" onSubmit={ handleSubmit }>
+				<form
+					ref={ formRef }
+					className="form"
+					method="post"
+					onSubmit={ handleSubmit }
+				>
 					{ /* Many widgets expect these hidden inputs to exist in the DOM. */ }
 					<input
 						type="hidden"
