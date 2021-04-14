@@ -49,7 +49,7 @@ export default class SidebarAdapter {
 		this.allSettings = allSettings;
 
 		this.locked = false;
-		this.widgetsMap = new WeakMap();
+		this.widgetsCache = new WeakMap();
 		this.subscribers = new Set();
 
 		this.history = [
@@ -213,8 +213,8 @@ export default class SidebarAdapter {
 
 		const instance = setting.get();
 
-		if ( this.widgetsMap.has( instance ) ) {
-			return this.widgetsMap.get( instance );
+		if ( this.widgetsCache.has( instance ) ) {
+			return this.widgetsCache.get( instance );
 		}
 
 		const widget = {
@@ -224,12 +224,12 @@ export default class SidebarAdapter {
 			instance,
 		};
 
-		this.widgetsMap.set( instance, widget );
+		this.widgetsCache.set( instance, widget );
 
 		return widget;
 	}
 
-	_internalUpdateWidgets( nextWidgets ) {
+	_updateWidgets( nextWidgets ) {
 		this.locked = true;
 
 		const addedWidgetIds = [];
@@ -258,19 +258,24 @@ export default class SidebarAdapter {
 	}
 
 	setWidgets( nextWidgets ) {
-		const addedWidgetIds = this._internalUpdateWidgets( nextWidgets );
+		const addedWidgetIds = this._updateWidgets( nextWidgets );
 
 		this._pushHistory();
 
 		return addedWidgetIds;
 	}
 
+	/**
+	 * Undo/Redo related features
+	 */
 	canUndo() {
 		return this.historyIndex > 0;
 	}
+
 	canRedo() {
 		return this.historyIndex < this.history.length - 1;
 	}
+
 	_seek( historyIndex ) {
 		const currentWidgets = this.getWidgets();
 
@@ -278,10 +283,11 @@ export default class SidebarAdapter {
 
 		const widgets = this.history[ this.historyIndex ];
 
-		this._internalUpdateWidgets( widgets );
+		this._updateWidgets( widgets );
 
 		this._emit( currentWidgets, this.getWidgets() );
 	}
+
 	undo() {
 		if ( ! this.canUndo() ) {
 			return;
@@ -289,6 +295,7 @@ export default class SidebarAdapter {
 
 		this._seek( this.historyIndex - 1 );
 	}
+
 	redo() {
 		if ( ! this.canRedo() ) {
 			return;
