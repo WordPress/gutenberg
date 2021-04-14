@@ -32,7 +32,7 @@ export default function Form( { id, idBase, instance, setInstance } ) {
 
 	const setFormDataDebounced = useCallback(
 		debounce( setFormData, 300 ),
-		[]
+		[ setFormData ]
 	);
 
 	return (
