@@ -1,6 +1,7 @@
 .edit-post-visual-editor {
 	position: relative;
 
+
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
 	// This is duplicated in edit-site.
@@ -24,14 +25,6 @@
 		flex-basis: 100%;
 	}
 
-	&.is-template-mode {
-		padding: $grid-unit-60;
-
-		.editor-styles-wrapper {
-			border-radius: 2px;
-			border: 1px solid $gray-300;
-		}
-	}
 }
 
 .editor-styles-wrapper {
@@ -43,6 +36,10 @@
 
 	> * {
 		cursor: auto;
+	}
+
+	> div {
+		min-height: 100%;
 	}
 }
 

@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { motion, AnimatePresence } from 'framer-motion';
 
 /**
  * WordPress dependencies
@@ -40,6 +41,7 @@ import { store as editPostStore } from '../../store';
 
 export default function VisualEditor( { styles } ) {
 	const ref = useRef();
+
 	const { deviceType, isTemplateMode } = useSelect( ( select ) => {
 		const {
 			isEditingTemplate,
@@ -61,9 +63,17 @@ export default function VisualEditor( { styles } ) {
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
 		height: '100%',
+		width: '100%',
+		margin: 0,
 		// Add a constant padding for the typewritter effect. When typing at the
 		// bottom, there needs to be room to scroll up.
 		paddingBottom: hasMetaBoxes ? null : '40vh',
+	};
+	const templateModeStyles = {
+		...desktopCanvasStyles,
+		borderRadius: '2px',
+		border: '1px solid #ddd',
+		paddingBottom: null,
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType );
 	const defaultLayout = useEditorFeature( 'layout' );
@@ -72,6 +82,13 @@ export default function VisualEditor( { styles } ) {
 		contentSize || wideSize
 			? [ 'wide', 'full' ]
 			: [ 'left', 'center', 'right' ];
+
+	let animatedStyles = isTemplateMode
+		? templateModeStyles
+		: desktopCanvasStyles;
+	if ( resizedCanvasStyles ) {
+		animatedStyles = resizedCanvasStyles;
+	}
 
 	const mergedRefs = useMergeRefs( [
 		ref,
@@ -85,10 +102,11 @@ export default function VisualEditor( { styles } ) {
 	const blockSelectionClearerRef = useBlockSelectionClearer( true );
 
 	return (
-		<div
+		<motion.div
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
 			} ) }
+			animate={ isTemplateMode ? { padding: '48px' } : { padding: 0 } }
 			ref={ blockSelectionClearerRef }
 		>
 			{ themeSupportsLayout && (
@@ -109,37 +127,46 @@ export default function VisualEditor( { styles } ) {
 					{ __( 'Back' ) }
 				</Button>
 			) }
-			<div
+			<motion.div
 				ref={ mergedRefs }
 				className="editor-styles-wrapper"
-				style={ resizedCanvasStyles || desktopCanvasStyles }
+				animate={ animatedStyles }
+				initial={ desktopCanvasStyles }
 			>
-				<WritingFlow>
-					{ ! isTemplateMode && (
-						<div className="edit-post-visual-editor__post-title-wrapper">
-							<PostTitle />
-						</div>
-					) }
-					<BlockList
-						__experimentalLayout={
-							themeSupportsLayout
-								? {
-										type: 'default',
-										// Find a way to inject this in the support flag code (hooks).
-										alignments: themeSupportsLayout
-											? alignments
-											: undefined,
-								  }
-								: undefined
-						}
-					/>
-				</WritingFlow>
-			</div>
+				<AnimatePresence>
+					<motion.div
+						key={ isTemplateMode ? 'template' : 'post' }
+						initial={ { opacity: 0 } }
+						animate={ { opacity: 1 } }
+					>
+						<WritingFlow>
+							{ ! isTemplateMode && (
+								<div className="edit-post-visual-editor__post-title-wrapper">
+									<PostTitle />
+								</div>
+							) }
+							<BlockList
+								__experimentalLayout={
+									themeSupportsLayout
+										? {
+												type: 'default',
+												// Find a way to inject this in the support flag code (hooks).
+												alignments: themeSupportsLayout
+													? alignments
+													: undefined,
+										  }
+										: undefined
+								}
+							/>
+						</WritingFlow>
+					</motion.div>
+				</AnimatePresence>
+			</motion.div>
 			<__experimentalBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
 				) }
 			</__experimentalBlockSettingsMenuFirstItem>
-		</div>
+		</motion.div>
 	);
 }

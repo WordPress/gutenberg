@@ -50,6 +50,7 @@
 		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/warning": "file:../warning",
 		"classnames": "^2.2.5",
+		"framer-motion": "^4.1.3",
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
 		"rememo": "^3.0.0",
