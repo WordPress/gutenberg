@@ -131,7 +131,6 @@ public class WPAndroidGlueCode {
         return mContentChanged;
     }
 
-
     public interface OnMediaLibraryButtonListener {
         void onMediaLibraryImageButtonClicked(boolean allowMultipleSelection);
         void onMediaLibraryVideoButtonClicked(boolean allowMultipleSelection);
