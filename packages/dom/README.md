@@ -270,9 +270,9 @@ Places the caret at start or end of a given element.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: True for end, false for start.
--   _mayUseScroll_ `boolean`: Whether to allow scrolling.
+-   _mayUseScroll_ `[boolean]`: Whether to allow scrolling.
 
 <a name="placeCaretAtVerticalEdge" href="#placeCaretAtVerticalEdge">#</a> **placeCaretAtVerticalEdge**
 
@@ -280,7 +280,7 @@ Places the caret at the top or bottom of a given element.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: True for bottom, false for top.
 -   _rect_ `[DOMRect]`: The rectangle to position the caret with.
 -   _mayUseScroll_ `[boolean]`: True to allow scrolling, false to disallow.
