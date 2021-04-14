@@ -14,16 +14,6 @@
 		display: table;
 	}
 
-	// Provide a sane starting point for the size.
-	&:not(.is-resized) {
-		width: 120px;
-
-		img {
-			width: 100%;
-		}
-	}
-
-
 	.custom-logo-link {
 		cursor: inherit;
 

@@ -181,6 +181,10 @@ const SiteLogo = ( {
 						}
 						min={ minWidth }
 						max={ maxWidthBuffer }
+						initialPosition={ Math.min(
+							naturalWidth,
+							maxWidthBuffer
+						) }
 						value={ width || '' }
 						disabled={ ! isResizable }
 					/>
