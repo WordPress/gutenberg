@@ -181,25 +181,27 @@ export default function useSidebarBlockEditor( sidebar ) {
 
 				const addedWidgetIds = sidebar.setWidgets( nextWidgets );
 
-				if (
-					addedWidgetIds.filter( ( widgetId ) => widgetId !== null )
-						.length
-				) {
-					return nextBlocks.map( ( nextBlock, index ) => {
+				return nextBlocks.reduce(
+					( updatedNextBlocks, nextBlock, index ) => {
 						const addedWidgetId = addedWidgetIds[ index ];
 
 						if ( addedWidgetId !== null ) {
-							return addWidgetIdToBlock(
+							// Only create a new instance if necessary to prevent
+							// the whole editor from re-rendering on every edit.
+							if ( updatedNextBlocks === nextBlocks ) {
+								updatedNextBlocks = nextBlocks.slice();
+							}
+
+							updatedNextBlocks[ index ] = addWidgetIdToBlock(
 								nextBlock,
 								addedWidgetId
 							);
 						}
 
-						return nextBlock;
-					} );
-				}
-
-				return nextBlocks;
+						return updatedNextBlocks;
+					},
+					nextBlocks
+				);
 			} );
 		},
 		[ sidebar ]
