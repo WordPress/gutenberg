@@ -81,14 +81,28 @@ export default function SearchEdit( {
 		}
 	}, [ isSelected ] );
 
+	useEffect( () => {
+		const maxButtonWidth = Math.floor( containerWidth / 2 - MARGINS );
+		const tempIsLongButton = buttonWidth > maxButtonWidth;
+
+		// Update this value only if it has changed to avoid flickering. This is required
+		// to update the view on orientation change if needed.
+		if ( isLongButton !== tempIsLongButton ) {
+			setIsLongButton( tempIsLongButton );
+		}
+	}, [ containerWidth, buttonWidth ] );
+
 	const hasTextInput = () => {
 		return textInputRef && textInputRef.current;
 	};
 
 	const onLayoutButton = ( { nativeEvent } ) => {
-		const { width } = nativeEvent.layout;
-		setButtonWidth( width );
-		processButtonWidthChanges( containerWidth );
+		const { width } = nativeEvent?.layout;
+
+		if ( width ) {
+			setButtonWidth( width );
+			// processButtonWidthChanges( containerWidth, width );
+		}
 	};
 
 	const onLayoutContainer = ( { nativeEvent } ) => {
@@ -96,17 +110,7 @@ export default function SearchEdit( {
 
 		if ( width ) {
 			setContainerWidth( width );
-			processButtonWidthChanges( width );
-		}
-	};
-
-	const processButtonWidthChanges = ( parentWidth ) => {
-		const maxButtonWidth = parentWidth / 2 - MARGINS;
-		// Update this value only if it has changed to avoid flickering. This is required
-		// to update the view on orientation change if needed.
-		const tempIsLongButton = buttonWidth > maxButtonWidth;
-		if ( isLongButton !== tempIsLongButton ) {
-			setIsLongButton( tempIsLongButton );
+			// processButtonWidthChanges( width, buttonWidth );
 		}
 	};
 
@@ -275,7 +279,13 @@ export default function SearchEdit( {
 					isLongButton && styles.buttonContainerWide,
 				] }
 			>
-				{ buttonUseIcon && <Icon icon={ search } { ...styles.icon } /> }
+				{ buttonUseIcon && (
+					<Icon
+						icon={ search }
+						{ ...styles.icon }
+						onLayout={ onLayoutButton }
+					/>
+				) }
 
 				{ ! buttonUseIcon && (
 					<View
