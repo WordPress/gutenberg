@@ -329,7 +329,7 @@ export function* closeGeneralSidebar() {
  * @param {string} widgetAreaId The id of the widget area to move the block to.
  */
 export function* moveBlockToWidgetArea( clientId, widgetAreaId ) {
-	const fromRootClientId = yield select(
+	const sourceRootClientId = yield select(
 		'core/block-editor',
 		'getBlockRootClientId',
 		[ clientId ]
@@ -339,41 +339,42 @@ export function* moveBlockToWidgetArea( clientId, widgetAreaId ) {
 	// id attribute. Makes the assumption that all top-level blocks are widget
 	// areas.
 	const widgetAreas = yield select( 'core/block-editor', 'getBlocks' );
-	const toWidgetAreaBlock = widgetAreas.find(
+	const destinationWidgetAreaBlock = widgetAreas.find(
 		( { attributes } ) => attributes.id === widgetAreaId
 	);
-	const toRootClientId = toWidgetAreaBlock.clientId;
+	const destinationRootClientId = destinationWidgetAreaBlock.clientId;
 
 	// Get the index for moving to the end of the the destination widget area.
-	const destinationClientIds = yield select(
+	const destinationInnerBlocksClientIds = yield select(
 		'core/block-editor',
 		'getBlockOrder',
-		toRootClientId
+		destinationRootClientId
 	);
-	const toIndex = destinationClientIds.length;
+	const destinationIndex = destinationInnerBlocksClientIds.length;
 
 	// Reveal the widget area, if it's not open.
 	const isDestinationWidgetAreaOpen = yield select(
 		editWidgetsStoreName,
 		'getIsWidgetAreaOpen',
-		toRootClientId
+		destinationRootClientId
 	);
 
 	if ( ! isDestinationWidgetAreaOpen ) {
 		yield dispatch(
 			editWidgetsStoreName,
 			'setIsWidgetAreaOpen',
-			toRootClientId,
+			destinationRootClientId,
 			true
 		);
 	}
 
+	// Move the block.
 	yield dispatch(
 		'core/block-editor',
 		'moveBlocksToPosition',
 		[ clientId ],
-		fromRootClientId,
-		toRootClientId,
-		toIndex
+		sourceRootClientId,
+		destinationRootClientId,
+		destinationIndex
 	);
 }
