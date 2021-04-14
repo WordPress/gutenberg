@@ -184,14 +184,16 @@ function gutenberg_get_allowed_template_part_areas() {
 				'The Header template defines a page area that typically contains a title, logo, and main navigation.',
 				'gutenberg'
 			),
+			'icon'        => 'header',
 		),
 		array(
 			'area'        => WP_TEMPLATE_PART_AREA_FOOTER,
 			'label'       => __( 'Footer', 'gutenberg' ),
 			'description' => __(
 				'The Footer template defines a page area that typically contains site credits, social links, or any other combination of blocks.',
-				'gutenberg'
+				'gutenberg',
 			),
+			'icon'        => 'footer',
 		),
 	);
 
