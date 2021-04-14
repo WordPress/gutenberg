@@ -209,6 +209,7 @@ function gutenberg_pre_init() {
 	// X.Y for its major releases.
 	if ( version_compare( $version, '5.6', '<' ) ) {
 		add_action( 'admin_notices', 'gutenberg_wordpress_version_notice' );
+		return;
 	}
 
 	require_once __DIR__ . '/lib/load.php';
