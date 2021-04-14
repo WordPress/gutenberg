@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Breaking changes
+
+- `OPTIONS` requests which are handled by the preloading middleware are no longer resolved as unparsed responses unless you explicitly set `parse: false`, for consistency with other request methods. If you expect an unparsed response, add `{ parse: false }` to your request options to preserve the previous behavior.
+
 ## 3.8.1 (2019-04-22)
 
 - Added deprecation to `useApiFetch` hook.

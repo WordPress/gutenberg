@@ -205,7 +205,7 @@ describe( 'Preloading Middleware', () => {
 			[ 'method empty', { [ method ]: {} } ],
 		] )( '%s', ( label, preloadedData ) => {
 			it( 'should move to the next middleware if no preloaded data', () => {
-				const prelooadingMiddleware = createPreloadingMiddleware(
+				const preloadingMiddleware = createPreloadingMiddleware(
 					preloadedData
 				);
 				const requestOptions = {
@@ -218,7 +218,7 @@ describe( 'Preloading Middleware', () => {
 					return true;
 				};
 
-				const ret = prelooadingMiddleware( requestOptions, callback );
+				const ret = preloadingMiddleware( requestOptions, callback );
 				expect( ret ).toBe( true );
 			} );
 		} );
