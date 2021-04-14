@@ -2,6 +2,7 @@
  * External dependencies
  */
 import { debounce } from 'lodash';
+import $ from 'jquery';
 
 /**
  * WordPress dependencies
@@ -19,8 +20,6 @@ import {
 import apiFetch from '@wordpress/api-fetch';
 import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
-
-const $ = window.jQuery;
 
 export default function Form( { id, idBase, instance, setInstance } ) {
 	const { html, setFormData } = useForm( {
