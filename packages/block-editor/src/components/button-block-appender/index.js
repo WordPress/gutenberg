@@ -31,9 +31,10 @@ function ButtonBlockAppender(
 				isOpen,
 				blockTitle,
 				hasSingleBlockType,
+				hasBlockVariations,
 			} ) => {
 				let label;
-				if ( hasSingleBlockType ) {
+				if ( hasSingleBlockType || hasBlockVariations ) {
 					label = sprintf(
 						// translators: %s: the name of the block when there is only one
 						_x( 'Add %s', 'directly add the only allowed block' ),
