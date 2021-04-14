@@ -16,11 +16,11 @@ import isInputOrTextArea from './is-input-or-text-area';
  *
  * @param {Element} container    Focusable element.
  * @param {boolean} isReverse    Set to true to check left, false to check right.
- * @param {boolean} onlyVertical Set to true to check only vertical position.
+ * @param {boolean} [onlyVertical=false] Set to true to check only vertical position.
  *
  * @return {boolean} True if at the edge, false if not.
  */
-export default function isEdge( container, isReverse, onlyVertical ) {
+export default function isEdge( container, isReverse, onlyVertical = false ) {
 	if ( isInputOrTextArea( container ) ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;

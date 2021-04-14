@@ -16,6 +16,9 @@ import inputFieldHasUncollapsedSelection from './input-field-has-uncollapsed-sel
 export default function documentHasUncollapsedSelection( doc ) {
 	return (
 		documentHasTextSelection( doc ) ||
-		inputFieldHasUncollapsedSelection( doc.activeElement )
+		( !! doc.activeElement &&
+			inputFieldHasUncollapsedSelection(
+				/** @type {HTMLElement} */ ( doc.activeElement )
+			) )
 	);
 }
