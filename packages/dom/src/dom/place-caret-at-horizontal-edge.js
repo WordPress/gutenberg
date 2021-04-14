@@ -1,24 +1,25 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { includes } from 'lodash';
+import { assertIsDefined } from '../utils/assert-is-defined';
 
 /**
  * Internal dependencies
  */
 import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
+import isInputOrTextArea from './is-input-or-text-area';
 
 /**
  * Places the caret at start or end of a given element.
  *
- * @param {Element} container    Focusable element.
+ * @param {HTMLElement} container    Focusable element.
  * @param {boolean} isReverse    True for end, false for start.
- * @param {boolean} mayUseScroll Whether to allow scrolling.
+ * @param {boolean} [mayUseScroll=false] Whether to allow scrolling.
  */
 export default function placeCaretAtHorizontalEdge(
 	container,
 	isReverse,
-	mayUseScroll
+	mayUseScroll = false
 ) {
 	if ( ! container ) {
 		return;
@@ -26,7 +27,7 @@ export default function placeCaretAtHorizontalEdge(
 
 	container.focus();
 
-	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
+	if ( isInputOrTextArea( container ) ) {
 		// The element may not support selection setting.
 		if ( typeof container.selectionStart !== 'number' ) {
 			return;
@@ -74,7 +75,9 @@ export default function placeCaretAtHorizontalEdge(
 	}
 
 	const { defaultView } = ownerDocument;
+	assertIsDefined( defaultView, 'defaultView' );
 	const selection = defaultView.getSelection();
+	assertIsDefined( selection, 'selection' );
 	selection.removeAllRanges();
 	selection.addRange( range );
 }
