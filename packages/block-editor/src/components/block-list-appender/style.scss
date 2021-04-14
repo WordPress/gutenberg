@@ -55,7 +55,7 @@
 }
 
 // This targets the appender on new posts, when it is technically a button.
-p.block-list-appender.wp-block {
+.block-list-appender.wp-block {
 	display: flex;
 
 	// This overrides some properties as this appender is also assigned a .wp-block class.

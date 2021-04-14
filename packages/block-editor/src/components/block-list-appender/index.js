@@ -33,7 +33,7 @@ function BlockListAppender( {
 	renderAppender: CustomAppender,
 	className,
 	selectedBlockClientId,
-	tagName: TagName = 'p',
+	tagName: TagName = 'div',
 } ) {
 	if ( isLocked || CustomAppender === false ) {
 		return null;

@@ -49,7 +49,7 @@ export function DefaultBlockAppender( {
 	// The wp-block className is important for editor styles.
 
 	return (
-		<div
+		<p
 			data-root-client-id={ rootClientId || '' }
 			className="wp-block block-editor-default-block-appender"
 		>
@@ -67,7 +67,7 @@ export function DefaultBlockAppender( {
 				isAppender
 				__experimentalIsQuick
 			/>
-		</div>
+		</p>
 	);
 }
 
