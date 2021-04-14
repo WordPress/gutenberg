@@ -1,6 +1,6 @@
 # Badge
 
-The Badge component is designed to be wrapped around another component. It add a "badge" with some text to the child component's upper left.
+The Badge component is designed to be wrapped around another component. It adds a "badge" with some text to the child component's upper left.
 
 An example can be found in the image block. After setting an image as featured, a "featured" badge overlays the block.
 
