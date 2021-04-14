@@ -7,16 +7,7 @@ import getRectangleFromRange from './get-rectangle-from-range';
 import isSelectionForward from './is-selection-forward';
 import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
 import { assertIsDefined } from '../utils/assert-is-defined';
-
-/* eslint-disable jsdoc/valid-types */
-/**
- * @param {Element} element
- * @return {element is HTMLInputElement | HTMLTextAreaElement} Whether the element is an input or textarea
- */
-function isInputOrTextArea( element ) {
-	/* eslint-enable jsdoc/valid-types */
-	return element.tagName === 'INPUT' || element.tagName === 'TEXTAREA';
-}
+import isInputOrTextArea from './is-input-or-text-area';
 
 /**
  * Check whether the selection is at the edge of the container. Checks for
