@@ -59,7 +59,7 @@ function generateAnchor(
 ) {
 	// Gutenberg doesn't save empty strings.
 	// So when anchor isn't set for a heading that already has content set an empty string.
-	// However, if none of the headings have anchors, we should assume the page was old, and still give all headings an anchor.
+	// However, if none of the headings have anchors, assume the page was old, and give all headings an anchor.
 	if (
 		isNil( block.attributes.anchor ) &&
 		! fillAllAnchors &&
@@ -107,7 +107,8 @@ function maybeUpdateAnchor(
 ) {
 	let anchor = block.attributes.anchor;
 
-	// If the block was previously unknown or has changed content and the anchor is empty or was set by us.
+	// If the block was previously unknown or has changed content
+	// and the anchor is empty or was auto-generated.
 	if (
 		( ! knownHeadings[ block.clientId ] ||
 			knownHeadings[ block.clientId ].content !==
