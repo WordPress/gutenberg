@@ -125,7 +125,6 @@ function RichTextWrapper(
 		autocompleters,
 		onReplace,
 		placeholder,
-		keepPlaceholderOnFocus,
 		allowedFormats,
 		formattingControls,
 		withoutInteractiveFormatting,
@@ -690,10 +689,7 @@ function RichTextWrapper(
 								className={ classnames(
 									classes,
 									props.className,
-									editableProps.className,
-									{
-										'keep-placeholder-on-focus': keepPlaceholderOnFocus,
-									}
+									editableProps.className
 								) }
 								aria-autocomplete={
 									listBoxId ? 'list' : undefined

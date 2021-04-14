@@ -36,10 +36,10 @@ function gutenberg_get_common_block_editor_settings() {
 			'slug' => $image_size_slug,
 			'name' => $image_size_name,
 		);
-	};
+	}
 
 	$settings = array(
-		'__unstableEnableFullSiteEditingBlocks' => gutenberg_is_fse_theme(),
+		'__unstableEnableFullSiteEditingBlocks' => gutenberg_supports_block_templates(),
 		'disableCustomColors'                   => get_theme_support( 'disable-custom-colors' ),
 		'disableCustomFontSizes'                => get_theme_support( 'disable-custom-font-sizes' ),
 		'disableCustomGradients'                => get_theme_support( 'disable-custom-gradients' ),
@@ -49,6 +49,7 @@ function gutenberg_get_common_block_editor_settings() {
 		'imageSizes'                            => $available_image_sizes,
 		'isRTL'                                 => is_rtl(),
 		'maxUploadFileSize'                     => $max_upload_size,
+		'allowedMimeTypes'                      => get_allowed_mime_types(),
 	);
 
 	$color_palette = current( (array) get_theme_support( 'editor-color-palette' ) );
@@ -81,7 +82,7 @@ function gutenberg_extend_post_editor_settings( $settings ) {
 	$image_sizes        = wp_list_pluck( $settings['imageSizes'], 'slug' );
 
 	$settings['imageDefaultSize']                      = in_array( $image_default_size, $image_sizes, true ) ? $image_default_size : 'large';
-	$settings['__unstableEnableFullSiteEditingBlocks'] = gutenberg_is_fse_theme();
+	$settings['__unstableEnableFullSiteEditingBlocks'] = gutenberg_supports_block_templates();
 
 	return $settings;
 }

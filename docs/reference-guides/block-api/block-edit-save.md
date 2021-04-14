@@ -8,40 +8,40 @@ The `edit` function describes the structure of your block in the context of the 
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 
 // ...
 const blockSettings = {
 	apiVersion: 2,
-	
-	// ... 
+
+	// ...
 
 	edit: () => {
 		const blockProps = useBlockProps();
 
-		return <div {...blockProps}>Your block.</div>;
-	}
+		return <div { ...blockProps }>Your block.</div>;
+	},
 };
 ```
+
 {% ES5 %}
+
 ```js
 var blockSettings = {
 	apiVersion: 2,
 
 	// ...
 
-	edit: function() {
+	edit: function () {
 		var blockProps = wp.blockEditor.useBlockProps();
 
-		return wp.element.createElement(
-			'div',
-			blockProps,
-			'Your block.'
-		);
-	}
+		return wp.element.createElement( 'div', blockProps, 'Your block.' );
+	},
 };
 ```
+
 {% end %}
 
 ### block wrapper props
@@ -52,40 +52,44 @@ If the element wrapper needs any extra custom HTML attributes, these need to be 
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
-import { useBlockProps } from '@wordpress/block-editor';
+import { useBlockProps } from '@wordpress/block-editor';
 
 // ...
 const blockSettings = {
 	apiVersion: 2,
-	
-	// ... 
+
+	// ...
 
 	edit: () => {
-		const blockProps = useBlockProps( { className: 'my-random-classname' } );
+		const blockProps = useBlockProps( {
+			className: 'my-random-classname',
+		} );
 
 		return <div { ...blockProps }>Your block.</div>;
-	}
+	},
 };
 ```
+
 {% ES5 %}
+
 ```js
 var blockSettings = {
 	apiVersion: 2,
 
 	// ...
 
-	edit: function() {
-		var blockProps = wp.blockEditor.useBlockProps( { className: 'my-random-classname' } );
+	edit: function () {
+		var blockProps = wp.blockEditor.useBlockProps( {
+			className: 'my-random-classname',
+		} );
 
-		return wp.element.createElement(
-			'div',
-			blockProps,
-			'Your block.'
-		);
-	}
+		return wp.element.createElement( 'div', blockProps, 'Your block.' );
+	},
 };
 ```
+
 {% end %}
 
 ### attributes
@@ -98,14 +102,17 @@ In this case, assuming we had defined an attribute of `content` during block reg
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 edit: ( { attributes } ) => {
 	const blockProps = useBlockProps();
 
 	return <div { ...blockProps }>{ attributes.content }</div>;
-}
+};
 ```
+
 {% ES5 %}
+
 ```js
 edit: function( props ) {
 	var blockProps = wp.blockEditor.useBlockProps();
@@ -117,6 +124,7 @@ edit: function( props ) {
 	);
 }
 ```
+
 {% end %}
 
 The value of `attributes.content` will be displayed inside the `div` when inserting the block in the editor.
@@ -127,6 +135,7 @@ The isSelected property is an object that communicates whether the block is curr
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
 edit: ( { attributes, isSelected } ) => {
 	const blockProps = useBlockProps();
@@ -134,14 +143,16 @@ edit: ( { attributes, isSelected } ) => {
 	return (
 		<div { ...blockProps }>
 			Your block.
-			{ isSelected &&
+			{ isSelected && (
 				<span>Shows only when the block is selected.</span>
-			}
+			) }
 		</div>
 	);
-}
+};
 ```
+
 {% ES5 %}
+
 ```js
 edit: function( props ) {
 	var blockProps = wp.blockEditor.useBlockProps();
@@ -160,6 +171,7 @@ edit: function( props ) {
 	);
 }
 ```
+
 {% end %}
 
 ### setAttributes
@@ -168,6 +180,7 @@ This function allows the block to update individual attributes based on user int
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
 edit: ( { attributes, setAttributes, isSelected } ) => {
 	const blockProps = useBlockProps();
@@ -180,14 +193,16 @@ edit: ( { attributes, setAttributes, isSelected } ) => {
 	return (
 		<div { ...blockProps }>
 			{ content }
-			{ isSelected &&
+			{ isSelected && (
 				<button onClick={ toggleSetting }>Toggle setting</button>
-			}
+			) }
 		</div>
 	);
-}
+};
 ```
+
 {% ES5 %}
+
 ```js
 edit: function( props ) {
 	var blockProps = wp.blockEditor.useBlockProps();
@@ -212,16 +227,19 @@ edit: function( props ) {
 	);
 },
 ```
+
 {% end %}
 
 When using attributes that are objects or arrays it's a good idea to copy or clone the attribute prior to updating it:
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 // Good - a new array is created from the old list attribute and a new list item:
 const { list } = attributes;
-const addListItem = ( newListItem ) => setAttributes( { list: [ ...list, newListItem ] } );
+const addListItem = ( newListItem ) =>
+	setAttributes( { list: [ ...list, newListItem ] } );
 
 // Bad - the list from the existing attribute is modified directly to add the new list item:
 const { list } = attributes;
@@ -230,22 +248,25 @@ const addListItem = ( newListItem ) => {
 	setAttributes( { list } );
 };
 ```
+
 {% ES5 %}
+
 ```js
 // Good - cloning the old list
 var newList = attributes.list.slice();
 
-var addListItem = function( newListItem ) {
+var addListItem = function ( newListItem ) {
 	setAttributes( { list: newList.concat( [ newListItem ] ) } );
 };
 
 // Bad - the list from the existing attribute is modified directly to add the new list item:
 var list = attributes.list;
-var addListItem = function( newListItem ) {
+var addListItem = function ( newListItem ) {
 	list.push( newListItem );
 	setAttributes( { list: list } );
 };
 ```
+
 {% end %}
 
 Why do this? In JavaScript, arrays and objects are passed by reference, so this practice ensures changes won't affect other code that might hold references to the same data. Furthermore, the Gutenberg project follows the philosophy of the Redux library that [state should be immutable](https://redux.js.org/faq/immutable-data#what-are-the-benefits-of-immutability)—data should not be changed directly, but instead a new version of the data created containing the changes.
@@ -256,14 +277,17 @@ The `save` function defines the way in which the different attributes should be 
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
 save: () => {
 	const blockProps = useBlockProps.save();
 
 	return <div { ...blockProps }> Your block. </div>;
-}
+};
 ```
+
 {% ES5 %}
+
 ```js
 save: function() {
 	var blockProps = wp.blockEditor.useBlockProps.save();
@@ -275,6 +299,7 @@ save: function() {
 	);
 }
 ```
+
 {% end %}
 
 For most blocks, the return value of `save` should be an [instance of WordPress Element](/packages/element/README.md) representing how the block is to appear on the front of the site.
@@ -285,8 +310,9 @@ _Note:_ The save function should be a pure function that depends only on the att
 It can not have any side effect or retrieve information from another source, e.g. it is not possible to use the data module inside it `select( store ).selector( ... )`.
 This is because if the external information changes, the block may be flagged as invalid when the post is later edited ([read more about Validation](#validation)).
 If there is a need to have other information as part of the save, developers can consider one of these two alternatives:
- - Use [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) and dynamically retrieve the required information on the server.
- - Store the external value as an attribute which is dynamically updated in the block's `edit` function as changes occur.
+
+-   Use [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md) and dynamically retrieve the required information on the server.
+-   Store the external value as an attribute which is dynamically updated in the block's `edit` function as changes occur.
 
 For [dynamic blocks](/docs/how-to-guides/block-tutorial/creating-dynamic-blocks.md), the return value of `save` could represent a cached copy of the block's content to be shown only in case the plugin implementing the block is ever disabled.
 
@@ -302,14 +328,17 @@ As with `edit`, the `save` function also receives an object argument including a
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
 save: ( { attributes } ) => {
 	const blockProps = useBlockProps.save();
-	
+
 	return <div { ...blockProps }>{ attributes.content }</div>;
-}
+};
 ```
+
 {% ES5 %}
+
 ```js
 save: function( props ) {
 	var blockProps = wp.blockEditor.useBlockProps.save();
@@ -321,19 +350,20 @@ save: function( props ) {
 	);
 }
 ```
-{% end %}
 
+{% end %}
 
 When saving your block, you want to save the attributes in the same format specified by the attribute source definition. If no attribute source is specified, the attribute will be saved to the block's comment delimiter. See the [Block Attributes documentation](/docs/reference-guides/block-api/block-attributes.md) for more details.
 
 ## Examples
 
-Here are a couple examples of using attributes, edit, and save all together.  For a full working example, see the [Introducing Attributes and Editable Fields](/docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md) section of the Block Tutorial.
+Here are a couple examples of using attributes, edit, and save all together. For a full working example, see the [Introducing Attributes and Editable Fields](/docs/how-to-guides/block-tutorial/introducing-attributes-and-editable-fields.md) section of the Block Tutorial.
 
 ### Saving Attributes to Child Elements
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
 attributes: {
 	content: {
@@ -365,7 +395,9 @@ save: ( { attributes } ) => {
 	return <div { ...blockProps }> { attributes.content } </div>;
 },
 ```
+
 {% ES5 %}
+
 ```js
 attributes: {
 	content: {
@@ -402,6 +434,7 @@ save: function( props ) {
 	return wp.element.createElement( 'div', blockProps, props.attributes.content );
 },
 ```
+
 {% end %}
 
 ### Saving Attributes via Serialization
@@ -412,6 +445,7 @@ This example could be for a dynamic block, such as the [Latest Posts block](http
 
 {% codetabs %}
 {% ESNext %}
+
 ```jsx
 attributes: {
 	postsToShow: {
@@ -439,7 +473,9 @@ save: () => {
 	return null;
 }
 ```
+
 {% ES5 %}
+
 ```js
 attributes: {
 	postsToShow: {
@@ -449,8 +485,8 @@ attributes: {
 
 edit: function( props ) {
 	var blockProps = wp.blockEditor.useBlockProps();
-	
-	return wp.element.createEleement( 
+
+	return wp.element.createEleement(
 		'div',
 		blockProps,
 		wp.element.createElement(
@@ -470,8 +506,8 @@ save: function() {
 	return null;
 }
 ```
-{% end %}
 
+{% end %}
 
 ## Validation
 
@@ -485,11 +521,11 @@ Clicking **Attempt Block Recovery** button will attempt recovery action as much 
 
 Clicking the "3-dot" menu on the side of the block displays three options:
 
-- **Resolve**: Open Resolve Block dialog box with two buttons:
-  - **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
-  - **Convert to Blocks**: Protects the original markup from the saved post content and convert the block from its original type to the validated block type.
-- **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
-- **Convert to Classic Block**: Protects the original markup from the saved post content as correct. Since the block will be converted from its original type to the Classic block type, it will no longer be possible to edit the content using controls available for the original block type.
+-   **Resolve**: Open Resolve Block dialog box with two buttons:
+    -   **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
+    -   **Convert to Blocks**: Protects the original markup from the saved post content and convert the block from its original type to the validated block type.
+-   **Convert to HTML**: Protects the original markup from the saved post content and convert the block from its original type to the HTML block type, enabling the user to modify the HTML markup directly.
+-   **Convert to Classic Block**: Protects the original markup from the saved post content as correct. Since the block will be converted from its original type to the Classic block type, it will no longer be possible to edit the content using controls available for the original block type.
 
 ### Validation FAQ
 
