@@ -6,14 +6,14 @@
         "attributes": {
             "value": "<p>Pullquote custom color</p>",
             "citation": "before block supports",
-            "backgroundColor": "blue",
             "textColor": "white",
+            "className": "is-style-default",
+            "backgroundColor": "blue",
             "style": {
                 "border": {
                     "color": "#2207d0"
                 }
-            },
-            "className": "is-style-default"
+            }
         },
         "innerBlocks": [],
         "originalContent": "<figure class=\"wp-block-pullquote is-style-default has-border-color has-white-color has-blue-background-color has-text-color has-background\" style=\"border-color:#2207d0\"><blockquote><p>Pullquote custom color</p><cite>before block supports</cite></blockquote></figure>"

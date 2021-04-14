@@ -15,17 +15,8 @@
 			"selector": "cite",
 			"default": ""
 		},
-		"backgroundColor": {
-			"type": "string"
-		},
-		"borderColor": {
-			"type": "string"
-		},
 		"textColor": {
 			"type": "string"
-		},
-		"style": {
-			"type": "object"
 		}
 	},
 	"supports": {

@@ -4,12 +4,14 @@
         "name": "core/pullquote",
         "isValid": true,
         "attributes": {
+            "className": "has-background has-black-background-color is-style-solid-color",
+            "backgroundColor": "black",
+            "style": {},
             "value": "<p>pullquote</p>",
             "citation": "before block supports",
-            "customMainColor": "#cd2653",
-            "textColor": "secondary"
+            "textColor": "white"
         },
         "innerBlocks": [],
-        "originalContent": "<figure class=\"wp-block-pullquote\" style=\"border-color:#cd2653\"><blockquote class=\"has-text-color has-secondary-color\"><p>pullquote</p><cite>before block supports</cite></blockquote></figure>"
+        "originalContent": "<figure class=\"wp-block-pullquote has-background has-black-background-color is-style-solid-color\"><blockquote class=\"has-text-color has-white-color\"><p>pullquote</p><cite>before block supports</cite></blockquote></figure>"
     }
 ]
