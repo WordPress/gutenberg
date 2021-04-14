@@ -1,4 +1,9 @@
 /**
+ * Internal dependencies
+ */
+import { assertIsDefined } from '../utils/assert-is-defined';
+
+/**
  * Replaces the given node with a new node with the given tag name.
  *
  * @param {Element}  node    The node to replace
@@ -13,6 +18,7 @@ export default function replaceTag( node, tagName ) {
 		newNode.appendChild( node.firstChild );
 	}
 
+	assertIsDefined( node.parentNode, 'node.parentNode' );
 	node.parentNode.replaceChild( newNode, node );
 
 	return newNode;

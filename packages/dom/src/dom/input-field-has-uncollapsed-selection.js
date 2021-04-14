@@ -22,7 +22,10 @@ export default function inputFieldHasUncollapsedSelection( element ) {
 		return false;
 	}
 	try {
-		const { selectionStart, selectionEnd } = element;
+		const {
+			selectionStart,
+			selectionEnd,
+		} = /** @type {HTMLInputElement | HTMLTextAreaElement} */ ( element );
 
 		return selectionStart !== null && selectionStart !== selectionEnd;
 	} catch ( error ) {
