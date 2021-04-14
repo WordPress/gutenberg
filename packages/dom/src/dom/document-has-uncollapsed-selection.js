@@ -17,8 +17,6 @@ export default function documentHasUncollapsedSelection( doc ) {
 	return (
 		documentHasTextSelection( doc ) ||
 		( !! doc.activeElement &&
-			inputFieldHasUncollapsedSelection(
-				/** @type {HTMLElement} */ ( doc.activeElement )
-			) )
+			inputFieldHasUncollapsedSelection( doc.activeElement ) )
 	);
 }
