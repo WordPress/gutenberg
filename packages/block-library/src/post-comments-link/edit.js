@@ -16,7 +16,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import apiFetch from '@wordpress/api-fetch';
 import { addQueryArgs } from '@wordpress/url';
-import { __, sprintf } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
 function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
@@ -67,15 +67,19 @@ function PostCommentsLinkEdit( { context, attributes, setAttributes } ) {
 
 	let commentsText;
 	if ( commentsCount !== undefined ) {
-		if ( commentsCount === '0' ) {
+		const commentsNumber = parseInt( commentsCount );
+
+		if ( commentsNumber === 0 ) {
 			commentsText = __( 'No comments' );
-		} else if ( commentsCount === '1' ) {
-			commentsText = __( 'One comment' );
 		} else {
 			commentsText = sprintf(
-				/* translators: %d Number of comments */
-				__( '%d comments' ),
-				commentsCount
+				/* translators: %s: Number of comments */
+				_n(
+					'%s comment',
+					'%s comments',
+					commentsNumber
+				),
+				commentsNumber.toLocaleString()
 			);
 		}
 	}

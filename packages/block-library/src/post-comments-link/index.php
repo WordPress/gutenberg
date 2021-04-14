@@ -35,17 +35,15 @@ function render_block_core_post_comments_link( $attributes, $content, $block ) {
 			__( 'No comments<span class="screen-reader-text"> on %s</span>' ),
 			$post_title
 		);
-	} elseif ( 1 === $comments_number ) {
-		$comment_text = sprintf(
-			/* translators: %s post title */
-			__( 'One comment<span class="screen-reader-text"> on %s</span>' ),
-			$post_title
-		);
 	} else {
 		$comment_text = sprintf(
-			/* translators: %1$d Number of comments, %2$s post title */
-			__( '%1$d comments<span class="screen-reader-text"> on %2$s</span>' ),
-			$comments_number,
+			/* translators: 1: Number of comments, 2: post title */
+			_n(
+				'%1$s comment<span class="screen-reader-text"> on %2$s</span>',
+				'%1$s comments<span class="screen-reader-text"> on %2$s</span>',
+				$comments_number
+			),
+			number_format_i18n( $comments_number ),
 			$post_title
 		);
 	}
