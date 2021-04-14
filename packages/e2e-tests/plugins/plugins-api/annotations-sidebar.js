@@ -1,4 +1,4 @@
-( function() {
+( function () {
 	var Button = wp.components.Button;
 	var PanelBody = wp.components.PanelBody;
 	var PanelRow = wp.components.PanelRow;
@@ -23,47 +23,45 @@
 			this.state = {
 				start: 0,
 				end: 0,
-			}
+			};
 		}
 
 		render() {
 			return el(
 				PanelBody,
 				{},
-				el(
-					'input',
-					{
-						type: 'number',
-						id: 'annotations-tests-range-start',
-						onChange: ( reactEvent ) => {
-							this.setState( {
-								start: reactEvent.target.value,
-							} );
-						},
-						value: this.state.start,
-					}
-				),
-				el(
-					'input',
-					{
-						type: 'number',
-						id: 'annotations-tests-range-end',
-						onChange: ( reactEvent ) => {
-							this.setState( {
-								end: reactEvent.target.value,
-							} );
-						},
-						value: this.state.end,
-					}
-				),
+				el( 'input', {
+					type: 'number',
+					id: 'annotations-tests-range-start',
+					onChange: ( reactEvent ) => {
+						this.setState( {
+							start: reactEvent.target.value,
+						} );
+					},
+					value: this.state.start,
+				} ),
+				el( 'input', {
+					type: 'number',
+					id: 'annotations-tests-range-end',
+					onChange: ( reactEvent ) => {
+						this.setState( {
+							end: reactEvent.target.value,
+						} );
+					},
+					value: this.state.end,
+				} ),
 				el(
 					Button,
 					{
 						isPrimary: true,
 						onClick: () => {
-							dispatch( 'core/annotations' ).__experimentalAddAnnotation( {
+							dispatch(
+								'core/annotations'
+							).__experimentalAddAnnotation( {
 								source: 'e2e-tests',
-								blockClientId: select( 'core/block-editor' ).getBlockOrder()[ 0 ],
+								blockClientId: select(
+									'core/block-editor'
+								).getBlockOrder()[ 0 ],
 								richTextIdentifier: 'content',
 								range: {
 									start: parseInt( this.state.start, 10 ),
@@ -79,8 +77,12 @@
 					{
 						isPrimary: true,
 						onClick: () => {
-							dispatch( 'core/annotations' ).__experimentalRemoveAnnotationsBySource( 'e2e-tests' );
-						}
+							dispatch(
+								'core/annotations'
+							).__experimentalRemoveAnnotationsBySource(
+								'e2e-tests'
+							);
+						},
 					},
 
 					__( 'Remove annotations' )
@@ -97,17 +99,14 @@
 				PluginSidebar,
 				{
 					name: 'annotations-sidebar',
-					title: __( 'Annotations Sidebar' )
+					title: __( 'Annotations Sidebar' ),
 				},
-				el(
-					SidebarContents,
-					{}
-				)
+				el( SidebarContents, {} )
 			),
 			el(
 				PluginSidebarMoreMenuItem,
 				{
-					target: 'annotations-sidebar'
+					target: 'annotations-sidebar',
 				},
 				__( 'Annotations Sidebar' )
 			)
@@ -116,6 +115,6 @@
 
 	registerPlugin( 'annotations-sidebar', {
 		icon: 'text',
-		render: AnnotationsSidebar
+		render: AnnotationsSidebar,
 	} );
 } )();

@@ -1,4 +1,4 @@
-( function() {
+( function () {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
 
@@ -15,17 +15,17 @@
 			},
 		},
 
-		edit: function( props ) {
+		edit: function ( props ) {
 			return el( 'input', {
 				className: 'my-meta-input',
 				value: props.attributes.content,
-				onChange: function( event ) {
+				onChange: function ( event ) {
 					props.setAttributes( { content: event.target.value } );
 				},
 			} );
 		},
 
-		save: function() {
+		save: function () {
 			return null;
 		},
 	} );

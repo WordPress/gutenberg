@@ -1,4 +1,4 @@
-( function() {
+( function () {
 	const { wp } = window;
 	const { registerBlockType } = wp.blocks;
 	const { createElement: el } = wp.element;

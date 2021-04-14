@@ -88,26 +88,27 @@
 
 		edit: function ( props ) {
 			const hasUpdatedTemplated = props.attributes.hasUpdatedTemplate;
-			return el(
-				'div',
-				null,
-				[
-					el( 'button', {
+			return el( 'div', null, [
+				el(
+					'button',
+					{
 						onClick: function () {
-							props.setAttributes( { hasUpdatedTemplate: true } )
+							props.setAttributes( { hasUpdatedTemplate: true } );
 						},
-					}, 'Update template' ),
-					el( InnerBlocks, {
-						template: hasUpdatedTemplated ? TEMPLATE_TWO_PARAGRAPHS : TEMPLATE,
-						templateLock: 'all',
-					} ),
-				]
-			);
+					},
+					'Update template'
+				),
+				el( InnerBlocks, {
+					template: hasUpdatedTemplated
+						? TEMPLATE_TWO_PARAGRAPHS
+						: TEMPLATE,
+					templateLock: 'all',
+				} ),
+			] );
 		},
 
 		save,
 	} );
-
 
 	registerBlockType( 'test/test-inner-blocks-paragraph-placeholder', {
 		title: 'Test Inner Blocks Paragraph Placeholder',

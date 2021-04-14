@@ -1,4 +1,4 @@
-( function() {
+( function () {
 	var el = wp.element.createElement;
 	var registerBlockVariation = wp.blocks.registerBlockVariation;
 	var __ = wp.i18n.__;

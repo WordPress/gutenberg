@@ -1,4 +1,4 @@
-( function() {
+( function () {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
 	var InnerBlocks = wp.blockEditor.InnerBlocks;
@@ -21,7 +21,7 @@
 		icon: svg,
 		category: 'text',
 
-		edit: function() {
+		edit: function () {
 			return el(
 				'div',
 				{
@@ -42,7 +42,7 @@
 			);
 		},
 
-		save: function() {
+		save: function () {
 			return el(
 				'div',
 				{
@@ -59,7 +59,7 @@
 		icon: 'cart',
 		category: 'text',
 
-		edit: function() {
+		edit: function () {
 			return el(
 				'div',
 				{
@@ -80,7 +80,7 @@
 			);
 		},
 
-		save: function() {
+		save: function () {
 			return el(
 				'div',
 				{
@@ -94,12 +94,12 @@
 
 	registerBlockType( 'test/test-function-icon', {
 		title: 'TestFunctionIcon',
-		icon: function() {
+		icon: function () {
 			return svg;
 		},
 		category: 'text',
 
-		edit: function() {
+		edit: function () {
 			return el(
 				'div',
 				{
@@ -120,7 +120,7 @@
 			);
 		},
 
-		save: function() {
+		save: function () {
 			return el(
 				'div',
 				{
@@ -141,7 +141,7 @@
 		},
 		category: 'text',
 
-		edit: function() {
+		edit: function () {
 			return el(
 				'div',
 				{
@@ -162,7 +162,7 @@
 			);
 		},
 
-		save: function() {
+		save: function () {
 			return el(
 				'div',
 				{
@@ -182,7 +182,7 @@
 		},
 		category: 'text',
 
-		edit: function() {
+		edit: function () {
 			return el(
 				'div',
 				{
@@ -203,7 +203,7 @@
 			);
 		},
 
-		save: function() {
+		save: function () {
 			return el(
 				'div',
 				{
