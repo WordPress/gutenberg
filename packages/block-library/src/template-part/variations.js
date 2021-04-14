@@ -58,5 +58,3 @@ const unsubscribe = subscribe( () => {
 		variations
 	);
 } );
-
-export default [];
