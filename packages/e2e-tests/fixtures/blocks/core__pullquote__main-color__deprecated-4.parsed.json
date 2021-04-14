@@ -2,14 +2,14 @@
     {
         "blockName": "core/pullquote",
         "attrs": {
-            "customMainColor": "#2207d0",
-            "textColor": "subtle-background",
-            "className": "has-background is-style-default"
+            "customMainColor": "#48ba90",
+            "customTextColor": "#1567eb",
+            "className": "has-background is-style-solid-color"
         },
         "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-pullquote has-background is-style-default\" style=\"border-color:#2207d0\"><blockquote class=\"has-text-color has-subtle-background-color\"><p>Pullquote custom color</p><cite>my citation</cite></blockquote></figure>\n",
+        "innerHTML": "\n<figure class=\"wp-block-pullquote has-background is-style-solid-color\" style=\"background-color:#48ba90;\"><blockquote class=\"has-text-color\" style=\"color:#1567eb\"><p>pullquote</p><cite>before block supports</cite></blockquote></figure>\n",
         "innerContent": [
-            "\n<figure class=\"wp-block-pullquote has-background is-style-default\" style=\"border-color:#2207d0\"><blockquote class=\"has-text-color has-subtle-background-color\"><p>Pullquote custom color</p><cite>my citation</cite></blockquote></figure>\n"
+            "\n<figure class=\"wp-block-pullquote has-background is-style-solid-color\" style=\"background-color:#48ba90;\"><blockquote class=\"has-text-color\" style=\"color:#1567eb\"><p>pullquote</p><cite>before block supports</cite></blockquote></figure>\n"
         ]
     },
     {
