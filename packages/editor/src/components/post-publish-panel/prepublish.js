@@ -102,20 +102,12 @@ function PostPublishPanelPrepublish( { children } ) {
 			<p>{ prePublishBodyText }</p>
 			<div className="components-site-card">
 				{ siteIcon }
-				{ ( siteTitle || siteHome ) && (
-					<div className="components-site-info">
-						{ siteTitle && (
-							<span className="components-site-name">
-								{ siteTitle }
-							</span>
-						) }
-						{ siteHome && (
-							<span className="components-site-home">
-								{ siteHome }
-							</span>
-						) }
-					</div>
-				) }
+				<div className="components-site-info">
+					<span className="components-site-name">
+						{ siteTitle || __( '(Untitled)' ) }
+					</span>
+					<span className="components-site-home">{ siteHome }</span>
+				</div>
 			</div>
 			{ hasPublishAction && (
 				<>
