@@ -20,7 +20,7 @@ import {
 	getColorObjectByAttributeValues,
 } from '../components/colors';
 import useEditorFeature from '../components/use-editor-feature';
-import { hasBorderFeatureSupport, shouldSkipSerialization } from './border';
+import { hasBorderSupport, shouldSkipSerialization } from './border';
 import { cleanEmptyObject } from './utils';
 
 // Defining empty array here instead of inline avoids unnecessary re-renders of
@@ -48,10 +48,6 @@ export function BorderColorEdit( props ) {
 
 	const disableCustomColors = ! useEditorFeature( 'color.custom' );
 	const disableCustomGradients = ! useEditorFeature( 'color.customGradient' );
-
-	if ( useIsBorderColorDisabled( props ) ) {
-		return null;
-	}
 
 	const onChangeColor = ( value ) => {
 		const colorObject = getColorObjectByColorValue( colors, value );
@@ -86,17 +82,6 @@ export function BorderColorEdit( props ) {
 }
 
 /**
- * Custom hook that checks if border color settings have been disabled.
- *
- * @param  {string} name The name of the block.
- * @return {boolean}     Whether border color setting is disabled.
- */
-export function useIsBorderColorDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useEditorFeature( 'border.customColor' );
-	return ! hasBorderFeatureSupport( 'color', blockName ) || isDisabled;
-}
-
-/**
  * Filters registered block settings, extending attributes to include
  * `borderColor` if needed.
  *
@@ -104,7 +89,7 @@ export function useIsBorderColorDisabled( { name: blockName } = {} ) {
  * @return {Object}          Updated block settings.
  */
 function addAttributes( settings ) {
-	if ( ! hasBorderFeatureSupport( 'color', settings ) ) {
+	if ( ! hasBorderSupport( settings, 'color' ) ) {
 		return settings;
 	}
 
@@ -135,7 +120,7 @@ function addAttributes( settings ) {
  */
 function addSaveProps( props, blockType, attributes ) {
 	if (
-		! hasBorderFeatureSupport( 'color', blockType ) ||
+		! hasBorderSupport( blockType, 'color' ) ||
 		shouldSkipSerialization( blockType )
 	) {
 		return props;
@@ -165,7 +150,7 @@ function addSaveProps( props, blockType, attributes ) {
  */
 function addEditProps( settings ) {
 	if (
-		! hasBorderFeatureSupport( 'color', settings ) ||
+		! hasBorderSupport( settings, 'color' ) ||
 		shouldSkipSerialization( settings )
 	) {
 		return settings;
@@ -199,7 +184,7 @@ export const withBorderColorPaletteStyles = createHigherOrderComponent(
 		const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 
 		if (
-			! hasBorderFeatureSupport( 'color', name ) ||
+			! hasBorderSupport( name, 'color' ) ||
 			shouldSkipSerialization( name )
 		) {
 			return <BlockListBlock { ...props } />;
