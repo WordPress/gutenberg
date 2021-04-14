@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createPortal, memo } from '@wordpress/element';
+import { createPortal } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { Button, ToolbarItem } from '@wordpress/components';
 import { NavigableToolbar } from '@wordpress/block-editor';
@@ -45,4 +45,4 @@ function Header( { inserter, isInserterOpened, setIsInserterOpened } ) {
 	);
 }
 
-export default memo( Header );
+export default Header;
