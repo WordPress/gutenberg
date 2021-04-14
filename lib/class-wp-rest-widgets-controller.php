@@ -537,13 +537,14 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
 			$instance      = gutenberg_get_widget_instance( $widget_id );
 
-			if ( $instance ) {
+			if ( ! is_null( $instance ) ) {
 				$serialized_instance             = serialize( $instance );
 				$prepared['instance']['encoded'] = base64_encode( $serialized_instance );
 				$prepared['instance']['hash']    = wp_hash( $serialized_instance );
 
 				if ( ! empty( $widget_object->show_instance_in_rest ) ) {
-					$prepared['instance']['raw'] = $instance;
+					// Use new stdClass so that JSON result is {} and not [].
+					$prepared['instance']['raw'] = empty( $instance ) ? new stdClass : $instance;
 				}
 			}
 		}
@@ -555,8 +556,9 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		$prepared['description']  = ! empty( $widget['description'] ) ? $widget['description'] : '';
 		$prepared['number']       = $widget_object ? (int) $parsed_id['number'] : 0;
 		if ( rest_is_field_included( 'settings', $fields ) ) {
-			$instance             = gutenberg_get_widget_instance( $widget_id );
-			$prepared['settings'] = $instance ? $instance : array();
+			$instance = gutenberg_get_widget_instance( $widget_id );
+			// Use new stdClass so that JSON result is {} and not [].
+			$prepared['settings'] = empty( $instance ) ? new stdClass : $instance;
 		}
 
 		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
@@ -675,6 +677,23 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 					'type'        => 'object',
 					'context'     => array( 'view', 'edit', 'embed' ),
 					'default'     => null,
+					'properties'  => array(
+						'encoded' => array(
+							'description' => __( 'Base64 encoded representation of the instance settings.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'hash'    => array(
+							'description' => __( 'Cryptographic hash of the instance settings.', 'gutenberg' ),
+							'type'        => 'string',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+						'raw'     => array(
+							'description' => __( 'Unencoded instance settings, if supported.', 'gutenberg' ),
+							'type'        => 'object',
+							'context'     => array( 'view', 'edit', 'embed' ),
+						),
+					),
 				),
 				'form_data'     => array(
 					'description' => __( 'URL-encoded form data from the widget admin form. Used to update a widget that does not support instance. Write only.', 'gutenberg' ),

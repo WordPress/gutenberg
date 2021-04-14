@@ -329,7 +329,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				array(
 					'id'           => 'testwidget',
 					'sidebar'      => 'sidebar-1',
-					'settings'     => array(),
+					'settings'     => new stdClass,
 					'instance'     => null,
 					'id_base'      => 'testwidget',
 					'widget_class' => '',
@@ -339,7 +339,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 					'rendered'     => '<h1>Default id</h1><span>Default text</span>',
 				),
 			),
-			$data
+			(array) $data
 		);
 
 		$wp_widget_factory->widgets['WP_Widget_RSS']->show_instance_in_rest = true;
@@ -410,7 +410,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 				array(
 					'id'            => 'testwidget',
 					'sidebar'       => 'sidebar-1',
-					'settings'      => array(),
+					'settings'      => new stdClass,
 					'instance'      => null,
 					'id_base'       => 'testwidget',
 					'widget_class'  => '',
@@ -1132,7 +1132,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array(
 				'id'            => 'testwidget',
 				'sidebar'       => 'sidebar-1',
-				'settings'      => array(),
+				'settings'      => new stdClass,
 				'instance'      => null,
 				'rendered'      => '<h1>My test id</h1><span>My test title</span>',
 				'name'          => 'WP test widget',
@@ -1180,7 +1180,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 			array(
 				'id'            => 'testwidget',
 				'sidebar'       => 'sidebar-1',
-				'settings'      => array(),
+				'settings'      => new stdClass,
 				'instance'      => null,
 				'rendered'      => '<h1>My test id</h1><span>My test title</span>',
 				'name'          => 'WP test widget',
@@ -1501,7 +1501,7 @@ class REST_Widgets_Controller_Test extends WP_Test_REST_Controller_Testcase {
 		}
 		$count = 0;
 		foreach ( $data as $item ) {
-			if ( isset( $item['_links'] ) ) {
+			if ( is_array( $item ) && isset( $item['_links'] ) ) {
 				unset( $data[ $count ]['_links'] );
 			}
 			$count ++;
