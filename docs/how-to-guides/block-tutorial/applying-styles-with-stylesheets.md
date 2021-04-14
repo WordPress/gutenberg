@@ -142,7 +142,7 @@ function gutenberg_examples_02_register_block() {
 	wp_style_add_data( 'gutenberg-examples-02', 'path', dirname( __FILE__ ) . '/style.css' );
 
 	register_block_type( 'gutenberg-examples/example-02-stylesheets', array(
-		'apiVersion' => 2,
+		'api_version' => 2,
 		'style' => 'gutenberg-examples-02',
 		'editor_style' => 'gutenberg-examples-02-editor',
 		'editor_script' => 'gutenberg-examples-02',

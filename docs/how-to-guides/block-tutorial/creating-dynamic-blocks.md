@@ -134,7 +134,7 @@ function gutenberg_examples_dynamic() {
 	);
 
 	register_block_type( 'gutenberg-examples/example-dynamic', array(
-		'apiVersion' => 2,
+		'api_version' => 2,
 		'editor_script' => 'gutenberg-examples-dynamic',
 		'render_callback' => 'gutenberg_examples_dynamic_render_callback'
 	) );
