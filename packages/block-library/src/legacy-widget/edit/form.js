@@ -29,10 +29,9 @@ export default function Form( { id, idBase, instance, setInstance } ) {
 		setInstance,
 	} );
 
-	const setFormDataDebounced = useCallback(
-		debounce( setFormData, 300 ),
-		[ setFormData ]
-	);
+	const setFormDataDebounced = useCallback( debounce( setFormData, 300 ), [
+		setFormData,
+	] );
 
 	return (
 		<Control
@@ -161,10 +160,10 @@ function Control( { id, idBase, html, onChange, onSave } ) {
 	}, [ onChange ] );
 
 	// Non-multi widgets can be saved via a Save button.
-	const handleSubmit = useCallback( ( event ) => {
+	const handleSubmit = ( event ) => {
 		event.preventDefault();
 		onSave( serializeForm( event.target ) );
-	}, [ onSave ] );
+	};
 
 	// We can't use the real widget number as this is calculated by the server
 	// and we may not ever *actually* save this widget. Instead, use a fake but
