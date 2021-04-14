@@ -205,6 +205,10 @@
 }
 
 // Default background and font color.
+// This includes blocks that have a background color,
+// as you might switch themes and the color specified is no longer registered.
+// But when one is explicitly chosen after the fact, it will override these rules.
+.wp-block-navigation.has-background,
 .wp-block-navigation:not(.has-background) {
 	.submenu-container, // This target items created by the Page List block.
 	.wp-block-navigation__container .wp-block-navigation-link__container {
@@ -214,6 +218,13 @@
 		// several times, so care needs to be taken.
 		background-color: #fff;
 		color: #000;
+	}
+}
+
+// Paint a border only when we know for sure that the block doesn't have a working background color.
+.wp-block-navigation:not(.has-background) {
+	.submenu-container,
+	.wp-block-navigation__container .wp-block-navigation-link__container {
 		border: 1px solid rgba(0, 0, 0, 0.15);
 
 		.submenu-container,
