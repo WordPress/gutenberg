@@ -131,6 +131,7 @@ export default function VisualEditor( { styles } ) {
 				ref={ mergedRefs }
 				className="editor-styles-wrapper"
 				animate={ animatedStyles }
+				initial={ desktopCanvasStyles }
 			>
 				<AnimatePresence>
 					<motion.div
