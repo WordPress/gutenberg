@@ -14,12 +14,12 @@ import isInputOrTextArea from './is-input-or-text-area';
  *
  * @param {HTMLElement} container    Focusable element.
  * @param {boolean} isReverse    True for end, false for start.
- * @param {boolean} mayUseScroll Whether to allow scrolling.
+ * @param {boolean} [mayUseScroll=false] Whether to allow scrolling.
  */
 export default function placeCaretAtHorizontalEdge(
 	container,
 	isReverse,
-	mayUseScroll
+	mayUseScroll = false
 ) {
 	if ( ! container ) {
 		return;

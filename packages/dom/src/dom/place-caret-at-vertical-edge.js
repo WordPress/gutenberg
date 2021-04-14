@@ -24,7 +24,7 @@ export default function placeCaretAtVerticalEdge(
 	}
 
 	if ( ! rect || ! container.isContentEditable ) {
-		placeCaretAtHorizontalEdge( container, isReverse, false );
+		placeCaretAtHorizontalEdge( container, isReverse );
 		return;
 	}
 
@@ -59,7 +59,7 @@ export default function placeCaretAtVerticalEdge(
 			return;
 		}
 
-		placeCaretAtHorizontalEdge( container, isReverse, false );
+		placeCaretAtHorizontalEdge( container, isReverse );
 		return;
 	}
 
