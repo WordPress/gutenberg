@@ -31,6 +31,13 @@
 		transition: all 0.1s ease;
 		@include reduce-motion("transition");
 	}
+
+	// Show one appender at a time.
+	display: none;
+}
+
+.block-editor-block-list__block.is-selected .block-list-appender {
+	display: block;
 }
 
 // For vertical flex containers, a 100% width ensures correct alignment.
