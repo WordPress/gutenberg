@@ -32,8 +32,8 @@ function render_block_core_site_logo( $attributes ) {
 		$classnames[] = "align{$attributes['align']}";
 	}
 
-	if ( !empty( $attributes['width'] ) ) {
-		$classnames[] = "is-resized";
+	if ( empty( $attributes['width'] ) ) {
+		$classnames[] = 'is-default-size';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );

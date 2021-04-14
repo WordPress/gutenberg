@@ -15,7 +15,7 @@
 	}
 
 	// Provide a sane starting point for the size.
-	&:not(.is-resized) {
+	&.is-default-size {
 		width: 120px;
 
 		img {
