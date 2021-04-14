@@ -11,13 +11,14 @@ import { addFilter } from '@wordpress/hooks';
  * Internal dependencies
  */
 import MoveToWidgetArea from '../components/move-to-widget-area';
+import { store as editWidgetsStore } from '../store';
 
 const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const { __internalWidgetId } = props.attributes;
 		const { widgetAreas, currentWidgetArea } = useSelect(
 			( select ) => {
-				const selectors = select( 'core/edit-widgets' );
+				const selectors = select( editWidgetsStore );
 				return {
 					widgetAreas: selectors.getWidgetAreas(),
 					currentWidgetArea: __internalWidgetId
@@ -30,7 +31,7 @@ const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 			[ __internalWidgetId ]
 		);
 
-		const { moveBlockToWidgetArea } = useDispatch( 'core/edit-widgets' );
+		const { moveBlockToWidgetArea } = useDispatch( editWidgetsStore );
 
 		return (
 			<>
