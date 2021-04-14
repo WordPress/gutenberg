@@ -9,6 +9,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	__experimentalBlockPatternSetup as BlockPatternSetup,
 } from '@wordpress/block-editor';
 
 /**
@@ -87,6 +88,22 @@ export function QueryContent( { attributes, setAttributes } ) {
 	);
 }
 
+function QueryLayoutSetup( props ) {
+	const { clientId, name: blockName } = props;
+	const blockProps = useBlockProps();
+	// `startBlankComponent` is what to render when clicking `Start blank`
+	// or if no matched patterns are found.
+	return (
+		<div { ...blockProps }>
+			<BlockPatternSetup
+				blockName={ blockName }
+				clientId={ clientId }
+				startBlankComponent={ <QueryBlockSetup { ...props } /> }
+			/>
+		</div>
+	);
+}
+
 const QueryEdit = ( props ) => {
 	const { clientId } = props;
 	const hasInnerBlocks = useSelect(
@@ -94,7 +111,7 @@ const QueryEdit = ( props ) => {
 			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
-	const Component = hasInnerBlocks ? QueryContent : QueryBlockSetup;
+	const Component = hasInnerBlocks ? QueryContent : QueryLayoutSetup;
 	return <Component { ...props } />;
 };
 

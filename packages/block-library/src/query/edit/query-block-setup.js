@@ -89,7 +89,7 @@ const QueryBlockSetup = ( {
 	return (
 		<BlockSetup
 			blockName={ blockName }
-			useLayoutSetup={ true }
+			useLayoutSetup={ false }
 			onVariationSelect={ onVariationSelect }
 			onBlockPatternSelect={ onBlockPatternSelect }
 		>
