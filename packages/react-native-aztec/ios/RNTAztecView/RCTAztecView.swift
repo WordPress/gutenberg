@@ -135,6 +135,7 @@ class RCTAztecView: Aztec.TextView {
         textContainerInset = .zero
         contentInset = .zero
         textContainer.lineFragmentPadding = 0
+        frame.size = CGSize(width: 0, height: 0);
         addPlaceholder()
         textDragInteraction?.isEnabled = false
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
