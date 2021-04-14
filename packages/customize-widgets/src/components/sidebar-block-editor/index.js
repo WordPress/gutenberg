@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createPortal } from '@wordpress/element';
+import { useMemo, createPortal } from '@wordpress/element';
 import {
 	BlockList,
 	BlockSelectionClearer,
@@ -21,9 +21,18 @@ import {
  * Internal dependencies
  */
 import BlockInspectorButton from '../block-inspector-button';
+import Header from '../header';
+import useInserter from '../inserter/use-inserter';
 import SidebarEditorProvider from './sidebar-editor-provider';
 
 export default function SidebarBlockEditor( { sidebar, inserter, inspector } ) {
+	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
+	const settings = useMemo(
+		() => ( {
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
+		} ),
+		[]
+	);
 	const parentContainer = document.getElementById(
 		'customize-theme-controls'
 	);
@@ -35,8 +44,16 @@ export default function SidebarBlockEditor( { sidebar, inserter, inspector } ) {
 				<DropZoneProvider>
 					<SidebarEditorProvider
 						sidebar={ sidebar }
-						inserter={ inserter }
+						settings={ settings }
 					>
+						<BlockEditorKeyboardShortcuts />
+
+						<Header
+							inserter={ inserter }
+							isInserterOpened={ isInserterOpened }
+							setIsInserterOpened={ setIsInserterOpened }
+						/>
+
 						<BlockSelectionClearer>
 							<WritingFlow>
 								<ObserveTyping>
