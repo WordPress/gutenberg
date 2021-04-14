@@ -8,7 +8,7 @@
 return array(
 	'title'       => _x( 'Quote', 'Block pattern title', 'default' ),
 	'categories'  => array( 'text' ),
-	'blockTypes'    => array( 'core/quote' ),
+	'blockTypes'  => array( 'core/quote' ),
 	'content'     => '<!-- wp:group -->
 	<div class="wp-block-group"><div class="wp-block-group__inner-container"><!-- wp:separator {"className":"is-style-default"} -->
 	<hr class="wp-block-separator is-style-default"/>
