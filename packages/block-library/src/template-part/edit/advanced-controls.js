@@ -8,16 +8,12 @@ import { InspectorAdvancedControls } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 
-/**
- * Internal dependencies
- */
-import { getTagBasedOnArea } from './get-tag-based-on-area';
-
 export function TemplatePartAdvancedControls( {
 	tagName,
 	setAttributes,
 	isEntityAvailable,
 	templatePartId,
+	defaultWrapper,
 } ) {
 	const [ area, setArea ] = useEntityProp(
 		'postType',
@@ -74,7 +70,7 @@ export function TemplatePartAdvancedControls( {
 						label: sprintf(
 							/* translators: %s: HTML tag based on area. */
 							__( 'Default based on area (%s)' ),
-							`<${ getTagBasedOnArea( area ) }>`
+							`<${ defaultWrapper }>`
 						),
 						value: '',
 					},

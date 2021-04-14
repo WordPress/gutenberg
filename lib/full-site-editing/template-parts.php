@@ -178,22 +178,24 @@ function gutenberg_get_allowed_template_part_areas() {
 			),
 		),
 		array(
-			'area'        => WP_TEMPLATE_PART_AREA_HEADER,
-			'label'       => __( 'Header', 'gutenberg' ),
-			'description' => __(
+			'area'                  => WP_TEMPLATE_PART_AREA_HEADER,
+			'label'                 => __( 'Header', 'gutenberg' ),
+			'description'           => __(
 				'The Header template defines a page area that typically contains a title, logo, and main navigation.',
 				'gutenberg'
 			),
-			'icon'        => 'header',
+			'icon'                  => 'header',
+			'defaultWrapperElement' => 'header',
 		),
 		array(
-			'area'        => WP_TEMPLATE_PART_AREA_FOOTER,
-			'label'       => __( 'Footer', 'gutenberg' ),
-			'description' => __(
+			'area'                  => WP_TEMPLATE_PART_AREA_FOOTER,
+			'label'                 => __( 'Footer', 'gutenberg' ),
+			'description'           => __(
 				'The Footer template defines a page area that typically contains site credits, social links, or any other combination of blocks.',
 				'gutenberg',
 			),
-			'icon'        => 'footer',
+			'icon'                  => 'footer',
+			'defaultWrapperElement' => 'footer',
 		),
 	);
 
