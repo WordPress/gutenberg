@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Button, Tooltip, VisuallyHidden } from '@wordpress/components';
+import { Button, VisuallyHidden } from '@wordpress/components';
 import { forwardRef } from '@wordpress/element';
 import { _x, sprintf } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
@@ -17,7 +17,7 @@ import { Icon, plus } from '@wordpress/icons';
 import Inserter from '../inserter';
 
 function ButtonBlockAppender(
-	{ rootClientId, className, onFocus, tabIndex },
+	{ rootClientId, className, onFocus, tabIndex, __experimentalButtonText },
 	ref
 ) {
 	return (
@@ -48,7 +48,7 @@ function ButtonBlockAppender(
 				}
 				const isToggleButton = ! hasSingleBlockType;
 
-				let inserterButton = (
+				return (
 					<Button
 						ref={ ref }
 						onFocus={ onFocus }
@@ -61,21 +61,20 @@ function ButtonBlockAppender(
 						aria-haspopup={ isToggleButton ? 'true' : undefined }
 						aria-expanded={ isToggleButton ? isOpen : undefined }
 						disabled={ disabled }
-						label={ label }
+						label={ __experimentalButtonText ? undefined : label }
+						tooltipPosition="bottom"
+						showTooltip={ ! __experimentalButtonText }
 					>
-						{ ! hasSingleBlockType && (
-							<VisuallyHidden as="span">{ label }</VisuallyHidden>
-						) }
+						{ ! hasSingleBlockType &&
+							! __experimentalButtonText && (
+								<VisuallyHidden as="span">
+									{ label }
+								</VisuallyHidden>
+							) }
 						<Icon icon={ plus } />
+						<span>{ __experimentalButtonText }</span>
 					</Button>
 				);
-
-				if ( isToggleButton || hasSingleBlockType ) {
-					inserterButton = (
-						<Tooltip text={ label }>{ inserterButton }</Tooltip>
-					);
-				}
-				return inserterButton;
 			} }
 			isAppender
 		/>

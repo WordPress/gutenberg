@@ -91,8 +91,15 @@
 		align-items: center;
 		justify-content: center;
 		font-size: inherit;
-		width: 1em;
 		height: 1em;
+
+		& .block-editor-button-block-appender.block-list-appender__toggle {
+			width: auto;
+
+			& > svg:not(:only-child) {
+				margin-right: $grid-unit-10;
+			}
+		}
 	}
 
 	// Duplicate the font sizes from style.scss to size the appender.
