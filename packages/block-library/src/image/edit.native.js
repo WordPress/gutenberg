@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback, Platform } from 'react-native';
+import { View, TouchableWithoutFeedback } from 'react-native';
 import { isEmpty, get, find, map } from 'lodash';
 
 /**
@@ -448,9 +448,6 @@ export class ImageEdit extends Component {
 		] );
 
 		const isFeaturedImage = featuredImageId === attributes.id;
-
-		// eslint-disable-next-line no-unused-vars
-		const androidOnly = Platform.OS === 'android';
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
