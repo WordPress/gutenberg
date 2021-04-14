@@ -165,7 +165,7 @@ function Control( { id, idBase, html, onChange, onSave } ) {
 	const handleSubmit = useCallback( ( event ) => {
 		event.preventDefault();
 		onSave( serializeForm( event.target ) );
-	}, [] );
+	}, [ onSave ] );
 
 	// We can't use the real widget number as this is calculated by the server
 	// and we may not ever *actually* save this widget. Instead, use a fake but
