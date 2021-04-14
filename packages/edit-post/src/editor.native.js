@@ -13,7 +13,10 @@ import { EditorProvider } from '@wordpress/editor';
 import { parse, serialize, store as blocksStore } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
+import {
+	subscribeSetFocusOnTitle,
+	subscribeFeaturedImageIdCurrent,
+} from '@wordpress/react-native-bridge';
 import { SlotFillProvider } from '@wordpress/components';
 
 /**
@@ -84,11 +87,26 @@ class Editor extends Component {
 				}
 			}
 		);
+		this.subscriptionParentFeaturedImageIdCurrent = subscribeFeaturedImageIdCurrent(
+			( payload ) => {
+				this.props.editEntityRecord(
+					'postType',
+					this.props.postType,
+					this.props.postId,
+					{
+						featured_media: payload.featuredImageId,
+					}
+				);
+			}
+		);
 	}
 
 	componentWillUnmount() {
 		if ( this.subscriptionParentSetFocusOnTitle ) {
 			this.subscriptionParentSetFocusOnTitle.remove();
+		}
+		if ( this.subscribeFeaturedImageIdCurrent ) {
+			this.subscribeFeaturedImageIdCurrent.remove();
 		}
 	}
 
@@ -175,8 +193,10 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { switchEditorMode } = dispatch( editPostStore );
+		const { editEntityRecord } = dispatch( 'core' );
 		return {
 			switchEditorMode,
+			editEntityRecord,
 		};
 	} ),
 ] )( Editor );
