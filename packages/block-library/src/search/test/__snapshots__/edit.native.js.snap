@@ -65,10 +65,12 @@ exports[`Search Block renders block with button inside option 1`] = `
     </View>
   </View>
   <View
+    onLayout={[Function]}
     style={
       Array [
         undefined,
         undefined,
+        false,
       ]
     }
   >
@@ -94,19 +96,27 @@ exports[`Search Block renders block with button inside option 1`] = `
         scrollEnabled={false}
         style={
           Array [
-            undefined,
             false,
+            undefined,
           ]
         }
         underlineColorAndroid="transparent"
       />
     </View>
-    <View>
+    <View
+      style={
+        Array [
+          undefined,
+          false,
+        ]
+      }
+    >
       <View
         accessibilityHint="Double tap to edit button text"
         accessibilityLabel="Search button. Current button text is Search Button"
         accessibilityRole="none"
         accessible={true}
+        onLayout={[Function]}
       >
         <View>
           <RCTAztecView
@@ -145,7 +155,7 @@ exports[`Search Block renders block with button inside option 1`] = `
             style={
               Object {
                 "backgroundColor": undefined,
-                "maxWidth": undefined,
+                "maxWidth": NaN,
                 "minHeight": 0,
               }
             }
@@ -232,9 +242,11 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
     </View>
   </View>
   <View
+    onLayout={[Function]}
     style={
       Array [
         undefined,
+        false,
         false,
       ]
     }
@@ -268,7 +280,14 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         underlineColorAndroid="transparent"
       />
     </View>
-    <View>
+    <View
+      style={
+        Array [
+          undefined,
+          false,
+        ]
+      }
+    >
       Svg
     </View>
   </View>
@@ -282,9 +301,11 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
   importantForAccessibility="no-hide-descendants"
 >
   <View
+    onLayout={[Function]}
     style={
       Array [
         undefined,
+        false,
         false,
       ]
     }
@@ -318,12 +339,20 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         underlineColorAndroid="transparent"
       />
     </View>
-    <View>
+    <View
+      style={
+        Array [
+          undefined,
+          false,
+        ]
+      }
+    >
       <View
         accessibilityHint="Double tap to edit button text"
         accessibilityLabel="Search button. Current button text is Search Button"
         accessibilityRole="none"
         accessible={true}
+        onLayout={[Function]}
       >
         <View>
           <RCTAztecView
@@ -362,7 +391,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
             style={
               Object {
                 "backgroundColor": undefined,
-                "maxWidth": undefined,
+                "maxWidth": NaN,
                 "minHeight": 0,
               }
             }
@@ -449,9 +478,11 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
     </View>
   </View>
   <View
+    onLayout={[Function]}
     style={
       Array [
         undefined,
+        false,
         false,
       ]
     }
@@ -485,12 +516,20 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         underlineColorAndroid="transparent"
       />
     </View>
-    <View>
+    <View
+      style={
+        Array [
+          undefined,
+          false,
+        ]
+      }
+    >
       <View
         accessibilityHint="Double tap to edit button text"
         accessibilityLabel="Search button. Current button text is Search Button"
         accessibilityRole="none"
         accessible={true}
+        onLayout={[Function]}
       >
         <View>
           <RCTAztecView
@@ -529,7 +568,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             style={
               Object {
                 "backgroundColor": undefined,
-                "maxWidth": undefined,
+                "maxWidth": NaN,
                 "minHeight": 0,
               }
             }
