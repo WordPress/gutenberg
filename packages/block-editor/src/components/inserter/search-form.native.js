@@ -32,6 +32,7 @@ function IconButton( { icon, label, hint, ...props } ) {
 			accessibilityRole={ 'button' }
 			accessibilityHint={ hint }
 			accessibilityLabel={ label }
+      style={ { alignItems: 'center' }}
 		>
 			<Icon icon={ icon } />
 		</TouchableOpacity>
@@ -168,10 +169,19 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 		? activeInputButtonLeftStyle
 		: baseInputButtonLeftStyle;
 
-	const inputButtonRightStyle = {
+	const baseInputButtonRightStyle = {
 		...styles[ 'inserter-search-form__input-button-right' ],
 		...platformStyles[ 'inserter-search-form__input-button-right' ],
 	};
+
+	const activeInputButtonRightStyle = {
+		...styles[ 'inserter-search-form__input-button-right--active' ],
+		...platformStyles[ 'inserter-search-form__input-button-right--active' ],
+	};
+
+	const inputButtonRightStyle = isActive
+		? activeInputButtonRightStyle
+		: baseInputButtonRightStyle;
 
 	const cancelButtonStyle = {
 		...usePreferredColorSchemeStyle(

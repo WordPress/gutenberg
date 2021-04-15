@@ -1,3 +1,6 @@
+.inserter-search-form__container {
+	height: 40px;
+}
 .inserter-search-form__container--active {
 	margin-right: 0;
 }
@@ -12,4 +15,8 @@
 
 .inserter-search-form__input-button-left--active {
 	margin: 0 8px 0 12px;
+}
+
+.inserter-search-form__input-button-right--active {
+	margin: 0 12px 0 8px;
 }
