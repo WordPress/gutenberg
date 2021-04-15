@@ -3,10 +3,6 @@
  */
 import { RichText, useBlockProps } from '@wordpress/block-editor';
 
-/**
- * Internal dependencies
- */
-
 export default function save( { attributes } ) {
 	const { value, citation } = attributes;
 	const shouldShowCitation = ! RichText.isEmpty( citation );
