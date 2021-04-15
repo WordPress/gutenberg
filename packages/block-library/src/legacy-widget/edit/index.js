@@ -16,8 +16,8 @@ import {
 } from '@wordpress/components';
 import { brush as brushIcon, update as updateIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useState, useCallback } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useState, useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
 /**
@@ -76,7 +76,11 @@ function Empty( { attributes: { id, idBase }, setAttributes } ) {
 	);
 }
 
-function NotEmpty( { attributes: { id, idBase, instance }, setAttributes } ) {
+function NotEmpty( {
+	attributes: { id, idBase, instance },
+	setAttributes,
+	isSelected,
+} ) {
 	const { widgetType, hasResolved, isWidgetTypeHidden } = useSelect(
 		( select ) => {
 			const widgetTypeId = id ?? idBase;
@@ -94,12 +98,20 @@ function NotEmpty( { attributes: { id, idBase, instance }, setAttributes } ) {
 		[ id, idBase ]
 	);
 
-	const [ tab, setTab ] = useState( 'edit' );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
-	const setInstance = useCallback(
-		( newInstance ) => setAttributes( { instance: newInstance } ),
-		[ setAttributes ]
-	);
+	const [ pendingInstance, setPendingInstance ] = useState( instance );
+
+	const applyChanges = () => {
+		setAttributes( { instance: pendingInstance } );
+		clearSelectedBlock();
+	};
+
+	useEffect( () => {
+		if ( ! isSelected ) {
+			setPendingInstance( instance );
+		}
+	}, [ isSelected ] );
 
 	if ( ! widgetType && ! hasResolved ) {
 		return <Spinner />;
@@ -112,8 +124,8 @@ function NotEmpty( { attributes: { id, idBase, instance }, setAttributes } ) {
 	return (
 		<>
 			<BlockControls>
-				<ToolbarGroup>
-					{ ! isWidgetTypeHidden && (
+				{ ! isWidgetTypeHidden && (
+					<ToolbarGroup>
 						<ToolbarButton
 							label={ __( 'Change widget' ) }
 							icon={ updateIcon }
@@ -125,26 +137,18 @@ function NotEmpty( { attributes: { id, idBase, instance }, setAttributes } ) {
 								} )
 							}
 						/>
-					) }
-					{ idBase && (
-						<>
-							<ToolbarButton
-								className="components-tab-button"
-								isPressed={ tab === 'edit' }
-								onClick={ () => setTab( 'edit' ) }
-							>
-								<span>{ __( 'Edit' ) }</span>
-							</ToolbarButton>
-							<ToolbarButton
-								className="components-tab-button"
-								isPressed={ tab === 'preview' }
-								onClick={ () => setTab( 'preview' ) }
-							>
-								<span>{ __( 'Preview' ) }</span>
-							</ToolbarButton>
-						</>
-					) }
-				</ToolbarGroup>
+					</ToolbarGroup>
+				) }
+				{ idBase && (
+					<ToolbarGroup>
+						<ToolbarButton onClick={ applyChanges }>
+							{ __( 'Apply' ) }
+						</ToolbarButton>
+						<ToolbarButton onClick={ clearSelectedBlock }>
+							{ __( 'Cancel' ) }
+						</ToolbarButton>
+					</ToolbarGroup>
+				) }
 			</BlockControls>
 
 			<InspectorControls>
@@ -154,12 +158,12 @@ function NotEmpty( { attributes: { id, idBase, instance }, setAttributes } ) {
 				/>
 			</InspectorControls>
 
-			<FormWrapper title={ widgetType.name } isVisible={ tab === 'edit' }>
+			<FormWrapper title={ widgetType.name } isVisible={ isSelected }>
 				<Form
 					id={ id }
 					idBase={ idBase }
-					instance={ instance }
-					setInstance={ setInstance }
+					instance={ pendingInstance }
+					setInstance={ setPendingInstance }
 				/>
 			</FormWrapper>
 
@@ -167,7 +171,7 @@ function NotEmpty( { attributes: { id, idBase, instance }, setAttributes } ) {
 				<Preview
 					idBase={ idBase }
 					instance={ instance }
-					isVisible={ tab === 'preview' }
+					isVisible={ ! isSelected }
 				/>
 			) }
 		</>

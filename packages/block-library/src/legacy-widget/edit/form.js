@@ -21,7 +21,7 @@ import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 
 export default function Form( { id, idBase, instance, setInstance } ) {
-	const { html, setFormData } = useForm( {
+	const { content, setFormData } = useForm( {
 		id,
 		idBase,
 		instance,
@@ -36,106 +36,141 @@ export default function Form( { id, idBase, instance, setInstance } ) {
 		<Control
 			id={ id }
 			idBase={ idBase }
-			html={ html }
+			content={ content }
 			onChange={ setFormDataDebounced }
 			onSave={ setFormData }
+			// Force a remount when the widget's form HTML changes. This clears
+			// out any mutations to the DOM that widget scripts have made.
+			key={ content.key }
 		/>
 	);
 }
 
 function useForm( { id, idBase, instance, setInstance } ) {
 	const isStillMounted = useRef( false );
-	const [ html, setHTML ] = useState( null );
-	const [ formData, setFormData ] = useState( null );
+	const outgoingInstances = useRef( new Set() );
+	const [ content, setContent ] = useState( { html: null, key: 0 } );
+
+	const { createNotice } = useDispatch( noticesStore );
 
 	useEffect( () => {
 		isStillMounted.current = true;
 		return () => ( isStillMounted.current = false );
 	}, [] );
 
-	const { createNotice } = useDispatch( noticesStore );
-
 	useEffect( () => {
-		const performFetch = async () => {
-			if ( id ) {
-				// Updating a widget that does not extend WP_Widget.
-				try {
-					let widget;
-					if ( formData ) {
-						widget = await apiFetch( {
-							path: `/wp/v2/widgets/${ id }?context=edit`,
-							method: 'PUT',
-							data: {
-								form_data: formData,
-							},
-						} );
-					} else {
-						widget = await apiFetch( {
-							path: `/wp/v2/widgets/${ id }?context=edit`,
-							method: 'GET',
-						} );
-					}
-					if ( isStillMounted.current ) {
-						setHTML( widget.rendered_form );
-					}
-				} catch ( error ) {
-					createNotice(
-						'error',
-						error?.message ??
-							__( 'An error occured while updating the widget.' )
-					);
-				}
-			} else if ( idBase ) {
-				// Updating a widget that extends WP_Widget.
-				try {
-					const response = await apiFetch( {
-						path: `/wp/v2/widget-types/${ idBase }/encode`,
-						method: 'POST',
-						data: {
-							instance,
-							form_data: formData,
-						},
-					} );
-					if ( isStillMounted.current ) {
-						setInstance( response.instance );
-						// Only set HTML the first time so that we don't cause a
-						// focus loss by remounting the form.
-						setHTML(
-							( previousHTML ) => previousHTML ?? response.form
-						);
-					}
-				} catch ( error ) {
-					createNotice(
-						'error',
-						error?.message ??
-							__( 'An error occured while updating the widget.' )
-					);
-				}
-			}
-		};
-		performFetch();
-	}, [
-		id,
-		idBase,
-		setInstance,
-		formData,
-		// Do not trigger when `instance` changes so that we don't make two API
-		// requests when there is form input.
-	] );
+		if ( outgoingInstances.current.has( instance ) ) {
+			outgoingInstances.current.delete( instance );
+			return;
+		}
 
-	return { html, setFormData };
+		( async () => {
+			try {
+				if ( id ) {
+					const { form } = await saveWidget( id );
+					if ( isStillMounted.current ) {
+						setContent( ( { key } ) => ( {
+							html: form,
+							key: key + 1,
+						} ) );
+					}
+				} else if ( idBase ) {
+					const { form } = await encodeWidget( idBase, instance );
+					if ( isStillMounted.current ) {
+						setContent( ( { key } ) => ( {
+							html: form,
+							key: key + 1,
+						} ) );
+					}
+				}
+			} catch ( error ) {
+				createNotice(
+					'error',
+					error?.message ??
+						__( 'An error occured while fetching the widget.' )
+				);
+			}
+		} )();
+	}, [ id, idBase, instance ] );
+
+	const setFormData = useCallback(
+		async ( formData ) => {
+			try {
+				if ( id ) {
+					const { form } = await saveWidget( id, formData );
+					if ( isStillMounted.current ) {
+						setContent( ( { key } ) => ( {
+							html: form,
+							key: key + 1,
+						} ) );
+					}
+				} else if ( idBase ) {
+					const { instance: nextInstance } = await encodeWidget(
+						idBase,
+						instance,
+						formData
+					);
+					if ( isStillMounted.current ) {
+						outgoingInstances.current.add( nextInstance );
+						setInstance( nextInstance );
+					}
+				}
+			} catch ( error ) {
+				createNotice(
+					'error',
+					error?.message ??
+						__( 'An error occured while updating the widget.' )
+				);
+			}
+		},
+		[ id, idBase ]
+	);
+
+	return { content, setFormData };
 }
 
-function Control( { id, idBase, html, onChange, onSave } ) {
+async function saveWidget( id, formData = null ) {
+	let widget;
+	if ( formData ) {
+		widget = await apiFetch( {
+			path: `/wp/v2/widgets/${ id }?context=edit`,
+			method: 'PUT',
+			data: {
+				form_data: formData,
+			},
+		} );
+	} else {
+		widget = await apiFetch( {
+			path: `/wp/v2/widgets/${ id }?context=edit`,
+			method: 'GET',
+		} );
+	}
+	return { form: widget.rendered_form };
+}
+
+async function encodeWidget( idBase, instance, formData = null ) {
+	const response = await apiFetch( {
+		path: `/wp/v2/widget-types/${ idBase }/encode`,
+		method: 'POST',
+		data: {
+			instance,
+			form_data: formData,
+		},
+	} );
+	return {
+		instance: response.instance,
+		form: response.form,
+	};
+}
+
+function Control( { id, idBase, content, onChange, onSave } ) {
 	const controlRef = useRef();
 	const formRef = useRef();
 
-	// Trigger 'widget-added' when widget is ready and 'widget-updated' when
-	// widget changes. This event is what widgets' scripts use to initialize,
-	// attach events, etc. The event must be fired using jQuery's event bus as
-	// this is what widget scripts expect. If jQuery is not loaded, do nothing -
-	// some widgets will still work regardless.
-	const hasBeenAdded = useRef( false );
+	// Trigger 'widget-added' when widget is ready. This event is what widgets'
+	// scripts use to initialize, attach events, etc. The event must be fired
+	// using jQuery's event bus as this is what widget scripts expect. If jQuery
+	// is not loaded, do nothing - some widgets will still work regardless.
 	useEffect( () => {
 		if ( ! window.jQuery ) {
 			return;
@@ -143,20 +178,12 @@ function Control( { id, idBase, html, onChange, onSave } ) {
 
 		const { jQuery: $ } = window;
 
-		if ( html ) {
-			$( document ).trigger(
-				hasBeenAdded.current ? 'widget-updated' : 'widget-added',
-				[ $( controlRef.current ) ]
-			);
-			hasBeenAdded.current = true;
+		if ( content.html ) {
+			$( document ).trigger( 'widget-added', [
+				$( controlRef.current ),
+			] );
 		}
-	}, [
-		html,
-		// Include id and idBase in the deps so that widget-updated is triggered
-		// if they change.
-		id,
-		idBase,
-	] );
+	}, [ content ] );
 
 	// Prefer jQuery 'change' event instead of the native 'change' event because
 	// many widgets use jQuery's event bus to trigger an update.
@@ -230,7 +257,9 @@ function Control( { id, idBase, html, onChange, onSave } ) {
 						className="add_new"
 						value=""
 					/>
-					<RawHTML className="widget-content">{ html }</RawHTML>
+					<RawHTML className="widget-content">
+						{ content.html }
+					</RawHTML>
 					{ id && (
 						<Button type="submit" isPrimary>
 							{ __( 'Save' ) }
