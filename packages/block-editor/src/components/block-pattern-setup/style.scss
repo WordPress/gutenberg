@@ -18,6 +18,11 @@
 			grid-template-columns: 1fr 1fr;
 			grid-gap: $grid-unit-20;
 			padding: $grid-unit-20;
+
+			.block-editor-block-preview__container,
+			div[role="button"] {
+				cursor: pointer;
+			}
 		}
 	}
 	.block-editor-block-pattern-setup__toolbar {
@@ -57,11 +62,6 @@
 		display: flex;
 		flex-direction: column;
 		width: 100%;
-
-		.block-editor-block-preview__container,
-		div[role="button"] {
-			cursor: pointer;
-		}
 
 		.carousel-container {
 			overflow: hidden;

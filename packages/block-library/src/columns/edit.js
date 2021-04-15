@@ -259,7 +259,7 @@ function ColumnsLayoutSetup( props ) {
 		( pattern ) =>
 			[ 'columns' ].some( ( category ) =>
 				pattern.categories?.includes( category )
-			) || pattern.scope?.block?.includes( blockName ),
+			),
 		[]
 	);
 	// `startBlankComponent` is what to render when clicking `Start blank`

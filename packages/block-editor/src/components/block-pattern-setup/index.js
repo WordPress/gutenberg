@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useDispatch } from '@wordpress/data';
-import { parse } from '@wordpress/blocks';
+import { cloneBlock } from '@wordpress/blocks';
 import {
 	VisuallyHidden,
 	__unstableComposite as Composite,
@@ -10,7 +10,7 @@ import {
 	__unstableCompositeItem as CompositeItem,
 } from '@wordpress/components';
 
-import { useState, useMemo } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
@@ -21,6 +21,7 @@ import { store as blockEditorStore } from '../../store';
 import BlockPreview from '../block-preview';
 import SetupToolbar from './setup-toolbar';
 import usePatternsSetup from './use-patterns-setup';
+import { VIEWMODES } from './constants';
 
 const SetupContent = ( {
 	viewMode,
@@ -31,33 +32,26 @@ const SetupContent = ( {
 	const composite = useCompositeState();
 	const containerClass = 'block-editor-block-pattern-setup__container';
 	let content;
-	// Render `carousel` in single viewMode.
-	if ( viewMode === 'single' ) {
-		const getSlideClass = ( index ) => {
-			if ( index === activeSlide ) return 'active-slide';
-			if ( index === activeSlide - 1 ) return 'previous-slide';
-			if ( index === activeSlide + 1 ) return 'next-slide';
-			return '';
-		};
+	if ( viewMode === VIEWMODES.carousel ) {
+		const slideClass = new Map( [
+			[ activeSlide, 'active-slide' ],
+			[ activeSlide - 1, 'previous-slide' ],
+			[ activeSlide + 1, 'next-slide' ],
+		] );
 		content = (
 			<div className={ containerClass }>
 				<ul className="carousel-container">
-					{ patterns.map( ( pattern, index ) => {
-						return (
-							<BlockPatternSlide
-								viewMode="single"
-								className={ getSlideClass( index ) }
-								key={ pattern.name }
-								pattern={ pattern }
-								onSelect={ onBlockPatternSelect }
-								composite={ composite }
-							/>
-						);
-					} ) }
+					{ patterns.map( ( pattern, index ) => (
+						<BlockPatternSlide
+							className={ slideClass.get( index ) || '' }
+							key={ pattern.name }
+							pattern={ pattern }
+						/>
+					) ) }
 				</ul>
 			</div>
 		);
-	} else {
+	} else if ( viewMode === VIEWMODES.grid ) {
 		content = (
 			<Composite
 				{ ...composite }
@@ -80,10 +74,7 @@ const SetupContent = ( {
 };
 
 function BlockPattern( { pattern, onSelect, composite } ) {
-	// TODO check viewportWidth. From pattern? From resizeObserver to have current width
-	// and manipulate later??
-	const { content } = pattern;
-	const blocks = useMemo( () => parse( content ), [ content ] );
+	const { blocks, viewportWidth = 700 } = pattern;
 	const descriptionId = useInstanceId(
 		BlockPattern,
 		'block-editor-block-pattern-setup-list__item-description'
@@ -101,7 +92,10 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 				className="block-editor-block-pattern-setup-list__item"
 				onClick={ () => onSelect( blocks ) }
 			>
-				<BlockPreview blocks={ blocks } viewportWidth={ 900 } />
+				<BlockPreview
+					blocks={ blocks }
+					viewportWidth={ viewportWidth }
+				/>
 			</CompositeItem>
 			{ !! pattern.description && (
 				<VisuallyHidden id={ descriptionId }>
@@ -113,8 +107,7 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 }
 
 function BlockPatternSlide( { className, pattern } ) {
-	const { content } = pattern;
-	const blocks = useMemo( () => parse( content ), [ content ] );
+	const { blocks, title, description } = pattern;
 	const descriptionId = useInstanceId(
 		BlockPatternSlide,
 		'block-editor-block-pattern-setup-list__item-description'
@@ -122,17 +115,13 @@ function BlockPatternSlide( { className, pattern } ) {
 	return (
 		<li
 			className={ `pattern-slide ${ className }` }
-			aria-label={ pattern.title }
-			aria-describedby={ pattern.description ? descriptionId : undefined }
+			aria-label={ title }
+			aria-describedby={ description ? descriptionId : undefined }
 		>
-			<BlockPreview
-				blocks={ blocks }
-				__experimentalLive
-				// viewportWidth={ viewportWidth }
-			/>
-			{ !! pattern.description && (
+			<BlockPreview blocks={ blocks } __experimentalLive />
+			{ !! description && (
 				<VisuallyHidden id={ descriptionId }>
-					{ pattern.description }
+					{ description }
 				</VisuallyHidden>
 			) }
 		</li>
@@ -144,21 +133,20 @@ const BlockPatternSetup = ( {
 	blockName,
 	filterPatternsFn,
 	startBlankComponent,
-	// onBlockPatternSelect = () => {}, // TODO check if needs override support.
 } ) => {
-	const [ viewMode, setViewMode ] = useState( 'single' );
+	const [ viewMode, setViewMode ] = useState( VIEWMODES.carousel );
 	const [ activeSlide, setActiveSlide ] = useState( 0 );
 	const [ showBlank, setShowBlank ] = useState( false );
 	const { replaceBlock } = useDispatch( blockEditorStore );
 	const patterns = usePatternsSetup( blockName, filterPatternsFn );
 
-	// Todo render fallback :)
 	if ( ! patterns?.length || showBlank ) {
 		return startBlankComponent;
 	}
 
 	const onBlockPatternSelect = ( blocks ) => {
-		replaceBlock( clientId, blocks );
+		const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+		replaceBlock( clientId, clonedBlocks );
 	};
 	return (
 		<div
@@ -176,8 +164,7 @@ const BlockPatternSetup = ( {
 					setActiveSlide( ( active ) => active - 1 );
 				} }
 				onBlockPatternSelect={ () => {
-					const { content } = patterns[ activeSlide ];
-					onBlockPatternSelect( parse( content ) );
+					onBlockPatternSelect( patterns[ activeSlide ].blocks );
 				} }
 				onStartBlank={ () => {
 					setShowBlank( true );

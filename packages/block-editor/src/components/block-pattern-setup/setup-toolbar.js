@@ -10,6 +10,11 @@ import {
 	stretchFullWidth,
 } from '@wordpress/icons';
 
+/**
+ * Internal dependencies
+ */
+import { VIEWMODES } from './constants';
+
 function SetupToolbar( {
 	viewMode,
 	setViewMode,
@@ -20,7 +25,7 @@ function SetupToolbar( {
 	onBlockPatternSelect,
 	onStartBlank,
 } ) {
-	const isSingleView = viewMode === 'single';
+	const isCarouselView = viewMode === VIEWMODES.carousel;
 	const navigation = (
 		<div className="block-editor-block-pattern-setup__navigation">
 			<Button
@@ -38,20 +43,19 @@ function SetupToolbar( {
 		</div>
 	);
 
-	// TODO check icons change (?).
 	const displayControls = (
 		<div className="block-editor-block-pattern-setup__display-controls">
 			<Button
 				icon={ stretchFullWidth }
-				label={ __( 'Single view' ) }
-				onClick={ () => setViewMode( 'single' ) }
-				isPressed={ viewMode === 'single' }
+				label={ __( 'Carousel view' ) }
+				onClick={ () => setViewMode( VIEWMODES.carousel ) }
+				isPressed={ isCarouselView }
 			/>
 			<Button
 				icon={ grid }
 				label={ __( 'Grid view' ) }
-				onClick={ () => setViewMode( 'grid' ) }
-				isPressed={ viewMode === 'grid' }
+				onClick={ () => setViewMode( VIEWMODES.grid ) }
+				isPressed={ viewMode === VIEWMODES.grid }
 			/>
 		</div>
 	);
@@ -67,9 +71,9 @@ function SetupToolbar( {
 
 	return (
 		<div className="block-editor-block-pattern-setup__toolbar">
-			{ isSingleView && navigation }
+			{ isCarouselView && navigation }
 			{ displayControls }
-			{ isSingleView && actions }
+			{ isCarouselView && actions }
 		</div>
 	);
 }
