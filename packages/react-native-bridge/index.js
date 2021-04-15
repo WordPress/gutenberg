@@ -63,10 +63,12 @@ export function subscribeUpdateHtml( callback ) {
 }
 
 export function subscribeFeaturedImageIdNativeUpdated( callback ) {
-	return gutenbergBridgeEvents.addListener(
-		'featuredImageIdNativeUpdated',
-		callback
-	);
+	return isAndroid
+		? gutenbergBridgeEvents.addListener(
+				'featuredImageIdNativeUpdated',
+				callback
+		  )
+		: undefined;
 }
 
 /**
