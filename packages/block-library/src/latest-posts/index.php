@@ -53,6 +53,7 @@ function render_block_core_latest_posts( $attributes ) {
 		if ( isset( $attributes['displayPostContent'] ) && $attributes['displayPostContent']
 			&& isset( $attributes['displayPostContentRadio'] ) && 'excerpt' === $attributes['displayPostContentRadio'] ) {
 			$post_excerpt = $post->post_excerpt;
+
 			if ( ! ( $post_excerpt ) ) {
 				$post_excerpt = $post->post_content;
 			}
