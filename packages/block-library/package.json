@@ -41,7 +41,6 @@
 		"@wordpress/date": "file:../date",
 		"@wordpress/deprecated": "file:../deprecated",
 		"@wordpress/dom": "file:../dom",
-		"@wordpress/dom-ready": "file:../dom-ready",
 		"@wordpress/editor": "file:../editor",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
