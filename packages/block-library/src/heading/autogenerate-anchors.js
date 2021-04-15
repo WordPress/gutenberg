@@ -6,7 +6,7 @@ import { isEmpty, isNil, deburr, trim } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { dispatch, select, subscribe } from '@wordpress/data';
+import { select } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/url';
 
 // This dummy element is used to strip all markup in getTextWithoutMarkup below.
@@ -20,7 +20,7 @@ const dummyElement = document.createElement( 'div' );
  *
  * @return {void}
  */
-function recurseOverBlocks( blocks, callback ) {
+const recurseOverBlocks = ( blocks, callback ) => {
 	for ( const block of blocks ) {
 		// eslint-disable-next-line callback-return
 		callback( block );
@@ -28,7 +28,7 @@ function recurseOverBlocks( blocks, callback ) {
 			recurseOverBlocks( block.innerBlocks, callback );
 		}
 	}
-}
+};
 
 /**
  * Returns the text without markup.
@@ -37,45 +37,60 @@ function recurseOverBlocks( blocks, callback ) {
  *
  * @return {string} The text without markup.
  */
-function getTextWithoutMarkup( text ) {
+const getTextWithoutMarkup = ( text ) => {
 	dummyElement.innerHTML = text;
 	return dummyElement.innerText;
-}
+};
 
 /**
- * Generates an anchor.
+ * Get all heading anchors.
  *
- * @param {Object}   block                     The block.
- * @param {string[]} knownAnchors              The known anchors.
- * @param {string[]} blocksThatWereNotHeadings The block client IDs that weren't headings in the previous state.
- * @param {boolean}  fillAllAnchors            Whether or not all empty anchors should be filled.
+ * @param {string} excludeId A block ID we want to exclude.
  *
- * @return {string} The anchor.
+ * @return {string[]} Return an array of anchors.
  */
-function generateAnchor(
-	block,
-	knownAnchors,
-	blocksThatWereNotHeadings,
-	fillAllAnchors
-) {
-	// Gutenberg doesn't save empty strings.
-	// So when anchor isn't set for a heading that already has content set an empty string.
-	// However, if none of the headings have anchors, assume the page was old, and give all headings an anchor.
-	if (
-		isNil( block.attributes.anchor ) &&
-		! fillAllAnchors &&
-		! isEmpty( block.attributes.content ) &&
-		! blocksThatWereNotHeadings.includes( block.clientId )
-	) {
+const getAllHeadingAnchors = ( excludeId ) => {
+	const blockList = select( 'core/block-editor' ).getBlocks();
+	const anchors = [];
+
+	recurseOverBlocks( blockList, ( block ) => {
+		if (
+			block.name === 'core/heading' &&
+			( ! excludeId || block.clientId !== excludeId ) &&
+			block.attributes.anchor
+		) {
+			anchors.push( block.attributes.anchor );
+		}
+	} );
+
+	return anchors;
+};
+
+// Whether this is an old post and we need to generate all headings or not.
+const noAnchorsExist = isEmpty( getAllHeadingAnchors() );
+
+/**
+ * Generate the anchor for a heading.
+ *
+ * @param {string}   anchor   The heading anchor.
+ * @param {string}   content  The block content.
+ * @param {clientId} clientId The block ID.
+ *
+ * @return {string} Return the heading anchor.
+ */
+const generateAnchor = ( anchor, content, clientId ) => {
+	content = getTextWithoutMarkup( content );
+	// When anchor isn't set for a heading that already has content set an empty string.
+	if ( isNil( anchor ) && ! isEmpty( content ) ) {
 		return '';
 	}
 
 	// Get the slug.
-	let slug = cleanForSlug( block.attributes.content );
+	let slug = cleanForSlug( content );
 	// If slug is empty, then it's likely using non-latin characters.
 	if ( '' === slug ) {
 		slug = trim(
-			deburr( block.attributes.content )
+			deburr( content )
 				.replace( /[\s\./]+/g, '-' )
 				.toLowerCase(),
 			'-'
@@ -83,137 +98,29 @@ function generateAnchor(
 	}
 
 	const baseAnchor = `wp-${ slug }`;
-	let anchor = baseAnchor;
+	anchor = baseAnchor;
 	let i = 0;
 
-	while ( knownAnchors.includes( anchor ) ) {
+	// If the anchor already exists in another heading, append -i.
+	while ( getAllHeadingAnchors( clientId ).includes( anchor ) ) {
 		i += 1;
 		anchor = baseAnchor + '-' + i;
 	}
 
 	return anchor;
-}
+};
 
 /**
  * Updates the anchor if required.
  *
- * @param {Object}   block                     The block.
- * @param {Object}   knownHeadings             The known headings.
- * @param {string[]} knownAnchors              The known anchors.
- * @param {string[]} blocksThatWereNotHeadings The block client IDs that weren't headings in the previous state.
- * @param {boolean}  fillAllAnchors            Whether or not all empty anchors should be filled.
+ * @param {string}   anchor   The heading anchor.
+ * @param {string}   content  The block content.
+ * @param {clientId} clientId The block ID.
  *
  * @return {string} The anchor.
  */
-function maybeUpdateAnchor(
-	block,
-	knownHeadings,
-	knownAnchors,
-	blocksThatWereNotHeadings,
-	fillAllAnchors
-) {
-	let anchor = block.attributes.anchor;
-
-	// If the block was previously unknown or has changed content
-	// and the anchor is empty or was auto-generated.
-	if (
-		( ! knownHeadings[ block.clientId ] ||
-			knownHeadings[ block.clientId ].content !==
-				block.attributes.content ) &&
-		( isNil( anchor ) || anchor.startsWith( 'wp-' ) )
-	) {
-		anchor = generateAnchor(
-			block,
-			knownAnchors,
-			blocksThatWereNotHeadings,
-			fillAllAnchors
-		);
-
-		if ( anchor !== block.attributes.anchor ) {
-			dispatch(
-				'core/block-editor'
-			).updateBlockAttributes( block.clientId, { anchor } );
-		}
-	}
-
-	return anchor;
-}
-
-/**
- * Subscribes to the store to update blocks as they are added or suggestions are updated.
- *
- * @return {void}
- */
-export default function subscribeToStore() {
-	let blockList = null;
-	let updatingHeadings = false;
-	let blocksThatWereNotHeadings = [];
-	const knownHeadings = {};
-
-	subscribe( () => {
-		if ( updatingHeadings ) {
-			return;
-		}
-
-		const updatedBlockList = select( 'core/block-editor' ).getBlocks();
-		const knownAnchors = [];
-
-		// If there have been any change in the blocks.
-		if ( blockList !== updatedBlockList ) {
-			const headings = [];
-			const blocksThatAreNotHeadings = [];
-			updatingHeadings = true;
-
-			/**
-			 * Loop over all blocks and test whether all headings don't have anchors.
-			 * If so, assume this is an older page.
-			 */
-			const headingAnchors = [];
-			recurseOverBlocks( updatedBlockList, ( block ) => {
-				if ( block.name === 'core/heading' ) {
-					headingAnchors.push( block.attributes.anchor );
-				}
-			} );
-
-			// If all heading anchors are undefined, they should be populated.
-			const fillAllAnchors = headingAnchors.every(
-				( anchor ) => undefined === anchor
-			);
-
-			// First loop over all core/heading blocks, give them anchors if necessary and collect all anchors.
-			recurseOverBlocks( updatedBlockList, ( block ) => {
-				if ( block.name === 'core/heading' ) {
-					const heading = block.attributes;
-					const content = getTextWithoutMarkup( heading.content );
-					const anchor = maybeUpdateAnchor(
-						block,
-						knownHeadings,
-						knownAnchors,
-						blocksThatWereNotHeadings,
-						fillAllAnchors
-					);
-					knownHeadings[ block.clientId ] = heading;
-
-					// Empty strings shouldn't be added to the table of contents.
-					if ( anchor === '' || isEmpty( content ) ) {
-						return;
-					}
-
-					knownAnchors.push( anchor );
-					headings.push( {
-						content,
-						href: '#' + anchor,
-						level: heading.level,
-					} );
-				} else {
-					blocksThatAreNotHeadings.push( block.clientId );
-				}
-			} );
-
-			updatingHeadings = false;
-			blocksThatWereNotHeadings = blocksThatAreNotHeadings;
-		}
-
-		blockList = updatedBlockList;
-	} );
+export default function maybeUpdateAnchor( anchor, content, clientId ) {
+	return noAnchorsExist || isNil( anchor ) || anchor.startsWith( 'wp-' )
+		? generateAnchor( anchor, content, clientId )
+		: anchor;
 }

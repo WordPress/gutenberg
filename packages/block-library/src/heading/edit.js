@@ -14,11 +14,13 @@ import {
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import HeadingLevelDropdown from './heading-level-dropdown';
+import maybeUpdateAnchor from './autogenerate-anchors';
 
 function HeadingEdit( {
 	attributes,
@@ -36,6 +38,16 @@ function HeadingEdit( {
 		} ),
 		style: mergedStyle,
 	} );
+	useEffect( () => {
+		const newAnchor = maybeUpdateAnchor(
+			attributes.anchor,
+			content,
+			clientId
+		);
+		if ( newAnchor !== attributes.anchor ) {
+			setAttributes( { anchor: newAnchor } );
+		}
+	}, [ attributes.anchor, content ] );
 
 	return (
 		<>
