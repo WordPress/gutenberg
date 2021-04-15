@@ -157,13 +157,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array()
 	);
 
-	if ( empty( $block->inner_blocks ) ) {
-		$inner_blocks_html = $classic_navigation_elements;
-	} else {
-		$inner_blocks_html = '';
-		foreach ( $block->inner_blocks as $inner_block ) {
-			$inner_blocks_html .= $inner_block->render();
-		}
+	$inner_blocks_html = '';
+	foreach ( $block->inner_blocks as $inner_block ) {
+		$inner_blocks_html .= $inner_block->render();
 	}
 
 	$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
