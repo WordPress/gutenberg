@@ -15,7 +15,7 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
 import {
 	subscribeSetFocusOnTitle,
-	subscribeFeaturedImageIdCurrent,
+	subscribeFeaturedImageIdNativeUpdated,
 } from '@wordpress/react-native-bridge';
 import { SlotFillProvider } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
@@ -91,7 +91,7 @@ class Editor extends Component {
 			}
 		);
 
-		this.subscriptionParentFeaturedImageIdCurrent = subscribeFeaturedImageIdCurrent(
+		this.subscriptionParentFeaturedImageIdNativeUpdated = subscribeFeaturedImageIdNativeUpdated(
 			( payload ) => {
 				editEntityRecord( 'postType', postType, postId, {
 					featured_media: payload.featuredImageId,
@@ -105,8 +105,8 @@ class Editor extends Component {
 			this.subscriptionParentSetFocusOnTitle.remove();
 		}
 
-		if ( this.subscribeFeaturedImageIdCurrent ) {
-			this.subscribeFeaturedImageIdCurrent.remove();
+		if ( this.subscribeFeaturedImageIdNativeUpdated ) {
+			this.subscribeFeaturedImageIdNativeUpdated.remove();
 		}
 	}
 

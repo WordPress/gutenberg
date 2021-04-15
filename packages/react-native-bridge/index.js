@@ -62,9 +62,9 @@ export function subscribeUpdateHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'updateHtml', callback );
 }
 
-export function subscribeFeaturedImageIdCurrent( callback ) {
+export function subscribeFeaturedImageIdNativeUpdated( callback ) {
 	return gutenbergBridgeEvents.addListener(
-		'featuredImageIdCurrent',
+		'featuredImageIdNativeUpdated',
 		callback
 	);
 }
