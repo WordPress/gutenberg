@@ -24,7 +24,7 @@ _Parameters_
 
 _Returns_
 
--   `?DOMRect`: The rectangle.
+-   `DOMRect | null`: The rectangle.
 
 <a name="documentHasSelection" href="#documentHasSelection">#</a> **documentHasSelection**
 
@@ -114,11 +114,11 @@ _Related_
 
 _Parameters_
 
--   _context_ `string`: Set to "paste" to exclude invisible elements and sensitive data.
+-   _context_ `[string]`: Set to "paste" to exclude invisible elements and sensitive data.
 
 _Returns_
 
--   `Object`: Schema.
+-   `Partial<ContentSchema>`: Schema.
 
 <a name="getRectangleFromRange" href="#getRectangleFromRange">#</a> **getRectangleFromRange**
 
@@ -151,8 +151,8 @@ the latter.
 
 _Parameters_
 
--   _newNode_ `Element`: Node to be inserted.
--   _referenceNode_ `Element`: Node after which to perform the insertion.
+-   _newNode_ `Node`: Node to be inserted.
+-   _referenceNode_ `Node`: Node after which to perform the insertion.
 
 _Returns_
 
@@ -220,7 +220,7 @@ _Related_
 
 _Parameters_
 
--   _node_ `Element`: The node to test.
+-   _node_ `Node`: The node to test.
 
 _Returns_
 
@@ -228,7 +228,13 @@ _Returns_
 
 <a name="isTextContent" href="#isTextContent">#</a> **isTextContent**
 
-Undocumented declaration.
+_Parameters_
+
+-   _node_ `Node`: 
+
+_Returns_
+
+-   `boolean`: Node is text content
 
 <a name="isTextField" href="#isTextField">#</a> **isTextField**
 
@@ -266,6 +272,7 @@ _Parameters_
 
 -   _container_ `Element`: Focusable element.
 -   _isReverse_ `boolean`: True for end, false for start.
+-   _mayUseScroll_ `boolean`: Whether to allow scrolling.
 
 <a name="placeCaretAtVerticalEdge" href="#placeCaretAtVerticalEdge">#</a> **placeCaretAtVerticalEdge**
 
@@ -284,7 +291,7 @@ Given a DOM node, removes it from the DOM.
 
 _Parameters_
 
--   _node_ `Element`: Node to be removed.
+-   _node_ `Node`: Node to be removed.
 
 _Returns_
 

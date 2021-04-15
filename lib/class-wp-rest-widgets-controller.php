@@ -150,10 +150,14 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 */
 	public function get_item( $request ) {
 		$widget_id  = $request['id'];
-		$sidebar_id = $this->find_widgets_sidebar( $widget_id );
+		$sidebar_id = gutenberg_find_widgets_sidebar( $widget_id );
 
-		if ( is_wp_error( $sidebar_id ) ) {
-			return $sidebar_id;
+		if ( is_null( $sidebar_id ) ) {
+			return new WP_Error(
+				'rest_widget_not_found',
+				__( 'No widget was found with that id.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
 		}
 
 		return $this->prepare_item_for_response( compact( 'widget_id', 'sidebar_id' ), $request );
@@ -225,13 +229,17 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 */
 	public function update_item( $request ) {
 		$widget_id  = $request['id'];
-		$sidebar_id = $this->find_widgets_sidebar( $widget_id );
+		$sidebar_id = gutenberg_find_widgets_sidebar( $widget_id );
 
 		// Allow sidebar to be unset or missing when widget is not a WP_Widget.
 		$parsed_id     = gutenberg_parse_widget_id( $widget_id );
 		$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
-		if ( is_wp_error( $sidebar_id ) && $widget_object ) {
-			return $sidebar_id;
+		if ( is_null( $sidebar_id ) && $widget_object ) {
+			return new WP_Error(
+				'rest_widget_not_found',
+				__( 'No widget was found with that id.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
 		}
 
 		if (
@@ -279,10 +287,14 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 	 */
 	public function delete_item( $request ) {
 		$widget_id  = $request['id'];
-		$sidebar_id = $this->find_widgets_sidebar( $widget_id );
+		$sidebar_id = gutenberg_find_widgets_sidebar( $widget_id );
 
-		if ( is_wp_error( $sidebar_id ) ) {
-			return $sidebar_id;
+		if ( is_null( $sidebar_id ) ) {
+			return new WP_Error(
+				'rest_widget_not_found',
+				__( 'No widget was found with that id.', 'gutenberg' ),
+				array( 'status' => 404 )
+			);
 		}
 
 		$request['context'] = 'edit';
@@ -329,26 +341,6 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Finds the sidebar a widget belongs to.
-	 *
-	 * @since 5.6.0
-	 *
-	 * @param string $widget_id The widget id to search for.
-	 * @return string|WP_Error The found sidebar id, or a WP_Error instance if it does not exist.
-	 */
-	protected function find_widgets_sidebar( $widget_id ) {
-		foreach ( wp_get_sidebars_widgets() as $sidebar_id => $widget_ids ) {
-			foreach ( $widget_ids as $maybe_widget_id ) {
-				if ( $maybe_widget_id === $widget_id ) {
-					return (string) $sidebar_id;
-				}
-			}
-		}
-
-		return new WP_Error( 'rest_widget_not_found', __( 'No widget was found with that id.', 'gutenberg' ), array( 'status' => 404 ) );
 	}
 
 	/**

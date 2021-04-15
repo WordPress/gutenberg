@@ -11,10 +11,7 @@
  * @param WP_Block_Type $block_type Block Type.
  */
 function gutenberg_register_layout_support( $block_type ) {
-	$support_layout = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$support_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout' ), false );
-	}
+	$support_layout = gutenberg_block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	if ( $support_layout ) {
 		if ( ! $block_type->attributes ) {
 			$block_type->attributes = array();
@@ -37,10 +34,7 @@ function gutenberg_register_layout_support( $block_type ) {
  */
 function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$block_type     = WP_Block_Type_Registry::get_instance()->get_registered( $block['blockName'] );
-	$support_layout = false;
-	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
-		$support_layout = _wp_array_get( $block_type->supports, array( '__experimentalLayout' ), false );
-	}
+	$support_layout = gutenberg_block_has_support( $block_type, array( '__experimentalLayout' ), false );
 	if ( ! $support_layout || ! isset( $block['attrs']['layout'] ) ) {
 		return $block_content;
 	}
@@ -94,8 +88,8 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	<?php
 	$style .= ob_get_clean();
 
-	// This assumes the hook only applys to blocks with a single wrapper.
-	// I think this is a reasonable limitation for that particular hoook.
+	// This assumes the hook only applies to blocks with a single wrapper.
+	// I think this is a reasonable limitation for that particular hook.
 	$content = preg_replace(
 		'/' . preg_quote( 'class="', '/' ) . '/',
 		'class="wp-container-' . $id . ' ',
