@@ -10,7 +10,9 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
-* [*] Image block: Improve text entry for long alt text. [#29670]
+
+-   [*] Image block: Improve text entry for long alt text. [#29670]
+-   [***] Search block now available on mobile! [https://github.com/WordPress/gutenberg/pull/30783]
 
 ## 1.50.0
 
@@ -18,7 +20,7 @@ For each user feature we should also add a importance categorization label  to i
 
 ## 1.49.0
 
-* [*] Remove the cancel button from settings options (Android only) [https://github.com/WordPress/gutenberg/pull/29599]
+-   [*] Remove the cancel button from settings options (Android only) [https://github.com/WordPress/gutenberg/pull/29599]
 
 ## 1.48.0
 
