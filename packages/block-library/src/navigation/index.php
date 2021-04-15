@@ -87,54 +87,25 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 
 function get_classic_navigation_elements( $attributes ){
 
-	$has_data_source = array_key_exists( 'source', $attributes );
 
-	if( !$has_data_source ) {
+	if ( ! current_theme_supports( 'block-nav-menus' ) ) {
 		return '';
 	}
 
-	$data_source_key = $attributes['source'];
+	if( ! array_key_exists( 'source', $attributes ) ) {
+		return '';
+	}
 
-	$classic_menu_html = wp_nav_menu(
+	//TODO: There are $attributes here that need to be communicated through to this call in some way (such as orientation, justification, etc)
+	return wp_nav_menu(
 		array(
-			'theme_location' => $data_source_key,
-			'container'		 => '',
-			'items_wrap'	 => '%3$s',
-			'link_before' => '<span class="wp-block-navigation-link__label">',
-			'link_after' => '</span>',
-			'depth' => 0,
+			'theme_location' => $attributes['source'],
+			'container'      => '',
+			'items_wrap'     => '%3$s',
 			'fallback_cb'    => false,
 			'echo'           => false,
 		)
 	);
-
-	//What follows is a fair bit of hacky stuff to transform the markup from a classic menu
-	//to the markup of a new menu.
-	$DOM = new DOMDocument();
-	$DOM->loadHTML($classic_menu_html, LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD);
-	$xpath = new DOMXpath($DOM);
-
-	$anchors = $DOM->getElementsByTagName('a');
-	$listItems = $DOM->getElementsByTagName('li');
-	$subMenus = $xpath->query("//ul[contains(@class,'sub-menu')]");
-	$menuItemsWithChildren = $xpath->query("//li[contains(@class,'menu-item-has-children')]");
-
-	foreach($anchors as $anchor) {
-		$anchor->setAttribute( 'class', 'wp-block-navigation-link__content' );
-	}
-	foreach($listItems as $listItem) {
-		$listItemClasses = $listItem->getAttribute( 'class' );
-		$listItem->setAttribute( 'class', $listItemClasses . ' wp-block-navigation-link' );
-	}
-	foreach($menuItemsWithChildren as $listItem) {
-		$listItemClasses = $listItem->getAttribute( 'class' );
-		$listItem->setAttribute( 'class', $listItemClasses . ' has-child' );
-	}
-	foreach($subMenus as $subMenu) {
-		$subMenu->setAttribute( 'class', 'wp-block-navigation-link__container');
-	}
-
-	return $DOM->saveHTML();
 }
 
 /**
@@ -173,10 +144,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-	$classic_navigation_elements = get_classic_navigation_elements ( $attributes );
-
-	if ( empty( $block->inner_blocks ) && $classic_navigation_elements === '' ) {
-		return '';
+	if ( empty( $block->inner_blocks ) ) {
+		return get_classic_navigation_elements ( $attributes );
 	}
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );
