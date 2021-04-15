@@ -61,13 +61,14 @@
 .inserter-search-form__cancel-button {
 	height: 100%;
 	justify-content: center;
-	align-items: center;
+	align-items: flex-start;
 	flex: 1;
 }
 
 .inserter-search-form__cancel-button-text {
 	color: $blue-wordpress;
 	font-size: 17px;
+	margin-left: 8px;
 }
 
 .inserter-search-form__icon {
