@@ -5,26 +5,28 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
   className="wp-block block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <ForwardRef
-    aria-label="Add block"
-    className="block-editor-default-block-appender__content"
-    onFocus={
-      [MockFunction] {
-        "calls": Array [
-          Array [],
-        ],
-        "results": Array [
-          Object {
-            "type": "return",
-            "value": undefined,
-          },
-        ],
+  <p>
+    <ForwardRef
+      aria-label="Add block"
+      className="block-editor-default-block-appender__content"
+      onFocus={
+        [MockFunction] {
+          "calls": Array [
+            Array [],
+          ],
+          "results": Array [
+            Object {
+              "type": "return",
+              "value": undefined,
+            },
+          ],
+        }
       }
-    }
-    readOnly={true}
-    role="button"
-    value="Type / to choose a block"
-  />
+      readOnly={true}
+      role="button"
+      value="Type / to choose a block"
+    />
+  </p>
   <WithSelect(WithDispatch(IfCondition(Inserter)))
     __experimentalIsQuick={true}
     isAppender={true}
@@ -38,14 +40,16 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   className="wp-block block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <ForwardRef
-    aria-label="Add block"
-    className="block-editor-default-block-appender__content"
-    onFocus={[MockFunction]}
-    readOnly={true}
-    role="button"
-    value="Type / to choose a block"
-  />
+  <p>
+    <ForwardRef
+      aria-label="Add block"
+      className="block-editor-default-block-appender__content"
+      onFocus={[MockFunction]}
+      readOnly={true}
+      role="button"
+      value="Type / to choose a block"
+    />
+  </p>
   <WithSelect(WithDispatch(IfCondition(Inserter)))
     __experimentalIsQuick={true}
     isAppender={true}
@@ -59,14 +63,16 @@ exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
   className="wp-block block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <ForwardRef
-    aria-label="Add block"
-    className="block-editor-default-block-appender__content"
-    onFocus={[MockFunction]}
-    readOnly={true}
-    role="button"
-    value=""
-  />
+  <p>
+    <ForwardRef
+      aria-label="Add block"
+      className="block-editor-default-block-appender__content"
+      onFocus={[MockFunction]}
+      readOnly={true}
+      role="button"
+      value=""
+    />
+  </p>
   <WithSelect(WithDispatch(IfCondition(Inserter)))
     __experimentalIsQuick={true}
     isAppender={true}
