@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 10.4.1 =
+
+### Bug Fixes
+
+- Editor: Handle case where unavailable siteData is causing WSOD. ([30812](https://github.com/WordPress/gutenberg/pull/30812))
+- Site Logo: Fix default size. ([30846](https://github.com/WordPress/gutenberg/pull/30846))
+- Latest posts block: Show error for password protected posts.
+
+
 = 10.4.0 =
 
 ### Enhancements
