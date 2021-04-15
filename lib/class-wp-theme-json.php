@@ -56,99 +56,76 @@ class WP_Theme_JSON {
 	 */
 	const ROOT_BLOCK_SELECTOR = ':root';
 
-	/**
-	 * Data schema of each block within a theme.json.
-	 *
-	 * Example:
-	 *
-	 * {
-	 *   'block-one': {
-	 *     'styles': {
-	 *       'color': {
-	 *         'background': 'color'
-	 *       }
-	 *     },
-	 *     'settings': {
-	 *       'color': {
-	 *         'custom': true
-	 *       }
-	 *     }
-	 *   },
-	 *   'block-two': {
-	 *     'styles': {
-	 *       'color': {
-	 *         'link': 'color'
-	 *       }
-	 *     }
-	 *   }
-	 * }
-	 */
-	const SCHEMA = array(
-		'customTemplates' => null,
-		'templateParts'   => null,
-		'styles'          => array(
-			'border'     => array(
-				'radius' => null,
-				'color'  => null,
-				'style'  => null,
-				'width'  => null,
-			),
-			'color'      => array(
-				'background' => null,
-				'gradient'   => null,
-				'link'       => null,
-				'text'       => null,
-			),
-			'spacing'    => array(
-				'padding' => array(
-					'top'    => null,
-					'right'  => null,
-					'bottom' => null,
-					'left'   => null,
-				),
-			),
-			'typography' => array(
-				'fontFamily'     => null,
-				'fontSize'       => null,
-				'fontStyle'      => null,
-				'fontWeight'     => null,
-				'lineHeight'     => null,
-				'textDecoration' => null,
-				'textTransform'  => null,
+	const VALID_TOP_LEVEL_KEYS = array(
+		'customTemplates',
+		'templateParts',
+		'styles',
+		'settings',
+	);
+
+	const VALID_STYLES = array(
+		'border'     => array(
+			'radius' => null,
+			'color'  => null,
+			'style'  => null,
+			'width'  => null,
+		),
+		'color'      => array(
+			'background' => null,
+			'gradient'   => null,
+			'link'       => null,
+			'text'       => null,
+		),
+		'spacing'    => array(
+			'padding' => array(
+				'top'    => null,
+				'right'  => null,
+				'bottom' => null,
+				'left'   => null,
 			),
 		),
-		'settings'        => array(
-			'border'     => array(
-				'customRadius' => null,
-				'customColor'  => null,
-				'customStyle'  => null,
-				'customWidth'  => null,
-			),
-			'color'      => array(
-				'custom'         => null,
-				'customGradient' => null,
-				'gradients'      => null,
-				'link'           => null,
-				'palette'        => null,
-			),
-			'spacing'    => array(
-				'customPadding' => null,
-				'units'         => null,
-			),
-			'typography' => array(
-				'customFontSize'        => null,
-				'customLineHeight'      => null,
-				'dropCap'               => null,
-				'fontFamilies'          => null,
-				'fontSizes'             => null,
-				'customFontStyle'       => null,
-				'customFontWeight'      => null,
-				'customTextDecorations' => null,
-				'customTextTransforms'  => null,
-			),
-			'custom'     => null,
-			'layout'     => null,
+		'typography' => array(
+			'fontFamily'     => null,
+			'fontSize'       => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'lineHeight'     => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
 		),
+	);
+
+	const VALID_SETTINGS = array(
+		'border'     => array(
+			'customRadius' => null,
+			'customColor'  => null,
+			'customStyle'  => null,
+			'customWidth'  => null,
+		),
+		'color'      => array(
+			'custom'         => null,
+			'customGradient' => null,
+			'gradients'      => null,
+			'link'           => null,
+			'palette'        => null,
+		),
+		'spacing'    => array(
+			'customPadding' => null,
+			'units'         => null,
+		),
+		'typography' => array(
+			'customFontSize'        => null,
+			'customLineHeight'      => null,
+			'dropCap'               => null,
+			'fontFamilies'          => null,
+			'fontSizes'             => null,
+			'customFontStyle'       => null,
+			'customFontWeight'      => null,
+			'customTextDecorations' => null,
+			'customTextTransforms'  => null,
+		),
+		'custom'     => null,
+		'layout'     => null,
 	);
 
 	/**
@@ -295,75 +272,53 @@ class WP_Theme_JSON {
 	 * @param array $theme_json A structure that follows the theme.json schema.
 	 */
 	public function __construct( $theme_json = array() ) {
-		$this->theme_json = array();
+		$valid_block_names = array_keys( self::get_blocks_metadata() );
+		$this->theme_json  = self::sanitize( $theme_json, $valid_block_names );
+	}
 
-		if ( ! is_array( $theme_json ) ) {
-			return;
+	/**
+	 * Sanitizes the input according to the schemas.
+	 *
+	 * @param array $input Structure to sanitize.
+	 * @param array $valid_block_names List of valid block names.
+	 *
+	 * @return array The sanitized output.
+	 */
+	private static function sanitize( $input, $valid_block_names ) {
+		$output = array();
+
+		if ( ! is_array( $input ) ) {
+			return $output;
 		}
 
-		// Remove top-level keys that aren't present in the schema.
-		$this->theme_json = array_intersect_key( $theme_json, self::SCHEMA );
+		$output = array_intersect_key( $input, array_flip( self::VALID_TOP_LEVEL_KEYS ) );
 
-		$block_metadata = self::get_blocks_metadata();
-		foreach ( array( 'settings', 'styles' ) as $subtree ) {
-			// Remove settings & styles subtrees if they aren't arrays.
-			if ( isset( $this->theme_json[ $subtree ] ) && ! is_array( $this->theme_json[ $subtree ] ) ) {
-				unset( $this->theme_json[ $subtree ] );
-			}
-
-			// Remove block selectors subtrees declared within settings & styles if that aren't registered.
-			if ( isset( $this->theme_json[ $subtree ] ) ) {
-				$this->theme_json[ $subtree ] = array_intersect_key( $this->theme_json[ $subtree ], $block_metadata );
-			}
+		$schema = array();
+		foreach ( $valid_block_names as $block_name ) {
+			$schema['styles'][ $block_name ]   = self::VALID_STYLES;
+			$schema['settings'][ $block_name ] = self::VALID_SETTINGS;
 		}
 
-		foreach ( $block_metadata as $block_selector => $metadata ) {
-			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				// Remove the block selector subtree if it's not an array.
-				if ( ! is_array( $this->theme_json['styles'][ $block_selector ] ) ) {
-					unset( $this->theme_json['styles'][ $block_selector ] );
-					continue;
-				}
-
-				$styles_schema                                 = self::SCHEMA['styles'];
-				$this->theme_json['styles'][ $block_selector ] = self::remove_keys_not_in_schema(
-					$this->theme_json['styles'][ $block_selector ],
-					$styles_schema
-				);
-
-				// Remove the block selector subtree if it is empty after having processed it.
-				if ( empty( $this->theme_json['styles'][ $block_selector ] ) ) {
-					unset( $this->theme_json['styles'][ $block_selector ] );
-				}
+		foreach ( array( 'styles', 'settings' ) as $subtree ) {
+			if ( ! isset( $input[ $subtree ] ) ) {
+				continue;
 			}
 
-			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
-				// Remove the block selector subtree if it's not an array.
-				if ( ! is_array( $this->theme_json['settings'][ $block_selector ] ) ) {
-					unset( $this->theme_json['settings'][ $block_selector ] );
-					continue;
-				}
+			if ( ! is_array( $input[ $subtree ] ) ) {
+				unset( $output[ $subtree ] );
+				continue;
+			}
 
-				// Remove the properties that aren't present in the schema.
-				$this->theme_json['settings'][ $block_selector ] = self::remove_keys_not_in_schema(
-					$this->theme_json['settings'][ $block_selector ],
-					self::SCHEMA['settings']
-				);
+			$result = self::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
 
-				// Remove the block selector subtree if it is empty after having processed it.
-				if ( empty( $this->theme_json['settings'][ $block_selector ] ) ) {
-					unset( $this->theme_json['settings'][ $block_selector ] );
-				}
+			if ( empty( $result ) ) {
+				unset( $output[ $subtree ] );
+			} else {
+				$output[ $subtree ] = $result;
 			}
 		}
 
-		// Remove the settings & styles subtrees if they're empty after having processed them.
-		foreach ( array( 'settings', 'styles' ) as $subtree ) {
-			if ( empty( $this->theme_json[ $subtree ] ) ) {
-				unset( $this->theme_json[ $subtree ] );
-			}
-		}
-
+		return $output;
 	}
 
 	/**
@@ -485,12 +440,18 @@ class WP_Theme_JSON {
 		$tree = array_intersect_key( $tree, $schema );
 
 		foreach ( $schema as $key => $data ) {
-			if ( is_array( $schema[ $key ] ) && isset( $tree[ $key ] ) ) {
+			if ( ! isset( $tree[ $key ] ) ) {
+				continue;
+			}
+
+			if ( is_array( $schema[ $key ] ) && is_array( $tree[ $key ] ) ) {
 				$tree[ $key ] = self::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
 
 				if ( empty( $tree[ $key ] ) ) {
 					unset( $tree[ $key ] );
 				}
+			} elseif ( is_array( $schema[ $key ] ) && ! is_array( $tree[ $key ] ) ) {
+				unset( $tree[ $key ] );
 			}
 		}
 
@@ -630,7 +591,7 @@ class WP_Theme_JSON {
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
 			// Some properties can be shorthand properties, meaning that
 			// they contain multiple values instead of a single one.
-			// An example of this is the padding property, see self::SCHEMA.
+			// An example of this is the padding property.
 			if ( self::has_properties( $metadata ) ) {
 				foreach ( $metadata['properties'] as $property ) {
 					$properties[] = array(
