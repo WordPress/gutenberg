@@ -44,7 +44,7 @@ function PostTemplate() {
 					.supportsTemplateMode && isViewable;
 
 			return {
-				template: supportsTemplateMode && getEditedPostTemplate(),
+				template: _supportsTemplateMode && getEditedPostTemplate(),
 				isEditing: isEditingTemplate(),
 				supportsTemplateMode: _supportsTemplateMode,
 			};
