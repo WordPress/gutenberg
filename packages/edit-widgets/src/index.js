@@ -17,7 +17,7 @@ import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wor
  * Internal dependencies
  */
 import './store';
-import './hooks';
+import './filters';
 import * as widgetArea from './blocks/widget-area';
 import Layout from './components/layout';
 import registerLegacyWidgetVariations from './register-legacy-widget-variations';

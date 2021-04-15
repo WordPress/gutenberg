@@ -1,9 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { createPortal, useMemo } from '@wordpress/element';
+import { useMemo, createPortal } from '@wordpress/element';
 import {
-	BlockEditorProvider,
 	BlockList,
 	BlockSelectionClearer,
 	BlockInspector,
@@ -23,14 +22,10 @@ import {
  */
 import BlockInspectorButton from '../block-inspector-button';
 import Header from '../header';
-import useSidebarBlockEditor from './use-sidebar-block-editor';
 import useInserter from '../inserter/use-inserter';
+import SidebarEditorProvider from './sidebar-editor-provider';
 
 export default function SidebarBlockEditor( { sidebar, inserter, inspector } ) {
-	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
-	const parentContainer = document.getElementById(
-		'customize-theme-controls'
-	);
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
 	const settings = useMemo(
 		() => ( {
@@ -38,18 +33,18 @@ export default function SidebarBlockEditor( { sidebar, inserter, inspector } ) {
 		} ),
 		[]
 	);
+	const parentContainer = document.getElementById(
+		'customize-theme-controls'
+	);
 
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
 			<SlotFillProvider>
 				<DropZoneProvider>
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ onInput }
-						onChange={ onChange }
+					<SidebarEditorProvider
+						sidebar={ sidebar }
 						settings={ settings }
-						useSubRegistry={ false }
 					>
 						<BlockEditorKeyboardShortcuts />
 
@@ -66,7 +61,7 @@ export default function SidebarBlockEditor( { sidebar, inserter, inspector } ) {
 								</ObserveTyping>
 							</WritingFlow>
 						</BlockSelectionClearer>
-					</BlockEditorProvider>
+					</SidebarEditorProvider>
 
 					<Popover.Slot name="block-toolbar" />
 
