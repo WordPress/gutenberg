@@ -7,15 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 
-import { useSelect } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
 import {
 	BlockControls,
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	JustifyContentControl,
-	__experimentalBlockPatternSetup as BlockPatternSetup,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 /**
@@ -26,7 +22,7 @@ import { name as buttonBlockName } from '../button';
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
-function ButtonsContent( {
+function ButtonsEdit( {
 	attributes: { contentJustification, orientation },
 	setAttributes,
 } ) {
@@ -70,43 +66,6 @@ function ButtonsContent( {
 			<div { ...innerBlocksProps } />
 		</>
 	);
-}
-
-function ButtonsLayoutSetup( props ) {
-	const { clientId, name: blockName } = props;
-	const blockProps = useBlockProps();
-	// Custom block patterns filtering for overriding the default scoped filtering.
-	const filterPatternsFn = useCallback(
-		( pattern ) =>
-			[ 'buttons' ].some( ( category ) =>
-				pattern.categories?.includes( category )
-			) || pattern.scope?.block?.includes( blockName ),
-		[]
-	);
-	// `startBlankComponent` is what to render when clicking `Start blank`
-	// or if no matched patterns are found.
-	return (
-		<div { ...blockProps }>
-			<BlockPatternSetup
-				blockName={ blockName }
-				clientId={ clientId }
-				filterPatternsFn={ filterPatternsFn }
-				startBlankComponent={ <ButtonsContent { ...props } /> }
-			/>
-		</div>
-	);
-}
-
-function ButtonsEdit( props ) {
-	const { clientId } = props;
-	const hasInnerBlocks = useSelect(
-		( select ) =>
-			!! select( blockEditorStore ).getBlocks( clientId ).length,
-		[ clientId ]
-	);
-	// This logic should be handled per `block` basis.
-	const Component = hasInnerBlocks ? ButtonsContent : ButtonsLayoutSetup;
-	return <Component { ...props } />;
 }
 
 export default ButtonsEdit;
