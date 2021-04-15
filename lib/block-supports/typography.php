@@ -61,6 +61,11 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		return array();
 	}
 
+	$skip_typography_serialization = _wp_array_get( $block_type->supports, array( '__experimentalSkipTypographySerialization' ), false );
+	if ( $skip_typography_serialization ) {
+		return array();
+	}
+
 	$classes = array();
 	$styles  = array();
 

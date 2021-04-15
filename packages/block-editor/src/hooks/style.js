@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { capitalize, get, has, omit, omitBy, startsWith } from 'lodash';
+import {
+	capitalize,
+	get,
+	has,
+	omit,
+	omitBy,
+	startsWith,
+	without,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -133,13 +141,34 @@ export function addSaveProps( props, blockType, attributes ) {
 		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
 	} );
 
+	let typographyFeaturesToRemove = [];
+	if (
+		getBlockSupport(
+			blockType,
+			'__experimentalSkipTypographySerialization'
+		)
+	) {
+		// Font size is handled separately.
+		typographyFeaturesToRemove = without(
+			TYPOGRAPHY_SUPPORT_KEYS,
+			FONT_SIZE_SUPPORT_KEY
+		);
+	}
+
 	if (
 		getBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
 	) {
-		filteredStyle = omit( filteredStyle, [
-			[ 'typography', FONT_SIZE_SUPPORT_KEY ],
-		] );
+		typographyFeaturesToRemove = [
+			...typographyFeaturesToRemove,
+			FONT_SIZE_SUPPORT_KEY,
+		];
 	}
+
+	const { typography, ...otherStyle } = filteredStyle;
+	filteredStyle = {
+		typography: omit( typography, typographyFeaturesToRemove ),
+		...otherStyle,
+	};
 
 	props.style = {
 		...getInlineStyles( filteredStyle ),
