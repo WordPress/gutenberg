@@ -85,8 +85,17 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 	return $font_sizes;
 }
 
+/**
+ * Renders a Navigation Block derived from data from the theme_location source assigned
+ * via the block attribute 'source'.
+ *
+ * If the theme doesn't explicity support 'block-nav-menus' or no source was provided
+ * as a block attribute then an empty string is returned.
+ *
+ * @param  array $attributes Navigation block attributes.
+ * @return string HTML markup of a generated Navigation Block.
+ */
 function get_classic_navigation_elements( $attributes ){
-
 
 	if ( ! current_theme_supports( 'block-nav-menus' ) ) {
 		return '';
@@ -96,14 +105,14 @@ function get_classic_navigation_elements( $attributes ){
 		return '';
 	}
 
-	//TODO: There are $attributes here that need to be communicated through to this call in some way (such as orientation, justification, etc)
 	return wp_nav_menu(
 		array(
-			'theme_location' => $attributes['source'],
-			'container'      => '',
-			'items_wrap'     => '%3$s',
-			'fallback_cb'    => false,
-			'echo'           => false,
+			'theme_location' 	=> $attributes['source'],
+			'block_attributes'	=> $attributes,
+			'container'      	=> '',
+			'items_wrap'     	=> '%3$s',
+			'fallback_cb'    	=> false,
+			'echo'           	=> false,
 		)
 	);
 }
