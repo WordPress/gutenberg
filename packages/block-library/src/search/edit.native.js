@@ -101,7 +101,6 @@ export default function SearchEdit( {
 
 		if ( width ) {
 			setButtonWidth( width );
-			// processButtonWidthChanges( containerWidth, width );
 		}
 	};
 
@@ -110,7 +109,6 @@ export default function SearchEdit( {
 
 		if ( width ) {
 			setContainerWidth( width );
-			// processButtonWidthChanges( width, buttonWidth );
 		}
 	};
 
