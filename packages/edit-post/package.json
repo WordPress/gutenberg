@@ -52,7 +52,8 @@
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
-		"rememo": "^3.0.0"
+		"rememo": "^3.0.0",
+		"uuid": "8.3.0"
 	},
 	"publishConfig": {
 		"access": "public"
