@@ -8,22 +8,49 @@ import { isEmpty, map } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { SelectControl } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
-export function PageTemplate( {
-	availableTemplates,
-	selectedTemplate,
-	onUpdate,
-} ) {
-	if ( isEmpty( availableTemplates ) ) {
+/**
+ * Internal dependencies
+ */
+import { store as editorStore } from '../../store';
+
+export function PageTemplate( {} ) {
+	const { availableTemplates, selectedTemplate, isViewable } = useSelect(
+		( select ) => {
+			const {
+				getEditedPostAttribute,
+				getEditorSettings,
+				getCurrentPostType,
+			} = select( editorStore );
+			const { getPostType } = select( coreStore );
+
+			return {
+				selectedTemplate: getEditedPostAttribute( 'template' ),
+				availableTemplates: getEditorSettings().availableTemplates,
+				isViewable:
+					getPostType( getCurrentPostType() )?.viewable ?? false,
+			};
+		},
+		[]
+	);
+
+	const { editPost } = useDispatch( editorStore );
+
+	if ( ! isViewable || isEmpty( availableTemplates ) ) {
 		return null;
 	}
+
 	return (
 		<SelectControl
 			label={ __( 'Template:' ) }
 			value={ selectedTemplate }
-			onChange={ onUpdate }
+			onChange={ ( templateSlug ) => {
+				editPost( {
+					template: templateSlug || '',
+				} );
+			} }
 			className="editor-page-attributes__template"
 			options={ map(
 				availableTemplates,
@@ -36,22 +63,4 @@ export function PageTemplate( {
 	);
 }
 
-export default compose(
-	withSelect( ( select ) => {
-		const { getEditedPostAttribute, getEditorSettings } = select(
-			'core/editor'
-		);
-		const { availableTemplates } = getEditorSettings();
-		return {
-			selectedTemplate: getEditedPostAttribute( 'template' ),
-			availableTemplates,
-		};
-	} ),
-	withDispatch( ( dispatch ) => ( {
-		onUpdate( templateSlug ) {
-			dispatch( 'core/editor' ).editPost( {
-				template: templateSlug || '',
-			} );
-		},
-	} ) )
-)( PageTemplate );
+export default PageTemplate;

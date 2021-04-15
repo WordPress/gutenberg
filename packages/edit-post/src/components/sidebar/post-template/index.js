@@ -36,17 +36,15 @@ function PostTemplate() {
 			const { isEditingTemplate, getEditedPostTemplate } = select(
 				editPostStore
 			);
-			const _supportsTemplateMode = select(
-				editorStore
-			).getEditorSettings().supportsTemplateMode;
+
 			const isViewable =
 				getPostType( getCurrentPostType() )?.viewable ?? false;
+			const _supportsTemplateMode =
+				select( editorStore ).getEditorSettings()
+					.supportsTemplateMode && isViewable;
 
 			return {
-				template:
-					supportsTemplateMode &&
-					isViewable &&
-					getEditedPostTemplate(),
+				template: _supportsTemplateMode && getEditedPostTemplate(),
 				isEditing: isEditingTemplate(),
 				supportsTemplateMode: _supportsTemplateMode,
 			};
