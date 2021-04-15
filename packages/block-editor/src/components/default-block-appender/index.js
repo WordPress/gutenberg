@@ -49,25 +49,27 @@ export function DefaultBlockAppender( {
 	// The wp-block className is important for editor styles.
 
 	return (
-		<p
+		<div
 			data-root-client-id={ rootClientId || '' }
 			className="wp-block block-editor-default-block-appender"
 		>
-			<TextareaAutosize
-				role="button"
-				aria-label={ __( 'Add block' ) }
-				className="block-editor-default-block-appender__content"
-				readOnly
-				onFocus={ onAppend }
-				value={ showPrompt ? value : '' }
-			/>
+			<p>
+				<TextareaAutosize
+					role="button"
+					aria-label={ __( 'Add block' ) }
+					className="block-editor-default-block-appender__content"
+					readOnly
+					onFocus={ onAppend }
+					value={ showPrompt ? value : '' }
+				/>
+			</p>
 			<Inserter
 				rootClientId={ rootClientId }
 				position="bottom right"
 				isAppender
 				__experimentalIsQuick
 			/>
-		</p>
+		</div>
 	);
 }
 
