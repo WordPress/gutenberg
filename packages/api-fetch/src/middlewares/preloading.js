@@ -72,7 +72,11 @@ function createPreloadingMiddleware( preloadedData ) {
 				cache[ method ] &&
 				cache[ method ][ path ]
 			) {
-				return Promise.resolve( cache[ method ][ path ] );
+				return Promise.resolve(
+					parse
+						? cache[ method ][ path ].body
+						: cache[ method ][ path ]
+				);
 			}
 		}
 
