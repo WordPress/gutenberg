@@ -10,7 +10,7 @@
 		pointer-events: none;
 	}
 
-	&.is-resized {
+	&:not(.is-default-size) {
 		display: table;
 	}
 
