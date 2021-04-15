@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { getBlobByURL, isBlobURL } from '@wordpress/blob';
@@ -7,6 +12,7 @@ import {
 	Button,
 	Disabled,
 	PanelBody,
+	Spinner,
 	withNotices,
 } from '@wordpress/components';
 import {
@@ -43,6 +49,7 @@ function VideoEdit( {
 	isSelected,
 	noticeUI,
 	attributes,
+	className,
 	setAttributes,
 	insertBlocksAfter,
 	onReplace,
@@ -52,6 +59,7 @@ function VideoEdit( {
 	const videoPlayer = useRef();
 	const posterImageButton = useRef();
 	const { id, caption, controls, poster, src, tracks } = attributes;
+	const isTemporaryVideo = ! id && isBlobURL( src );
 	const mediaUpload = useSelect(
 		( select ) => select( blockEditorStore ).getSettings().mediaUpload
 	);
@@ -113,7 +121,13 @@ function VideoEdit( {
 		noticeOperations.createErrorNotice( message );
 	}
 
-	const blockProps = useBlockProps();
+	const classes = classnames( className, {
+		'is-transient': isTemporaryVideo,
+	} );
+
+	const blockProps = useBlockProps( {
+		className: classes,
+	} );
 
 	if ( ! src ) {
 		return (
@@ -235,6 +249,7 @@ function VideoEdit( {
 						<Tracks tracks={ tracks } />
 					</video>
 				</Disabled>
+				{ isTemporaryVideo && <Spinner /> }
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
