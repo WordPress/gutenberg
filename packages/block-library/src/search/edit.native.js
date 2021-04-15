@@ -83,8 +83,7 @@ export default function SearchEdit( {
 		const maxButtonWidth = Math.floor( blockWidth / 2 - MARGINS );
 		const tempIsLongButton = buttonWidth > maxButtonWidth;
 
-		// Update this value only if it has changed to avoid flickering. This is required
-		// to update the view on orientation change if needed.
+		// Update this value only if it has changed to avoid flickering.
 		if ( isLongButton !== tempIsLongButton ) {
 			setIsLongButton( tempIsLongButton );
 		}
