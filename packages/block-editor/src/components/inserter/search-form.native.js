@@ -32,7 +32,7 @@ function IconButton( { icon, label, hint, ...props } ) {
 			accessibilityRole={ 'button' }
 			accessibilityHint={ hint }
 			accessibilityLabel={ label }
-      style={ { alignItems: 'center' }}
+			style={ { alignItems: 'center' } }
 		>
 			<Icon icon={ icon } />
 		</TouchableOpacity>
