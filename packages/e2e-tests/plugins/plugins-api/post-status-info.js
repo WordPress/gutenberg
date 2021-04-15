@@ -1,4 +1,4 @@
-( function () {
+( function() {
 	var el = wp.element.createElement;
 	var __ = wp.i18n.__;
 	var registerPlugin = wp.plugins.registerPlugin;
@@ -15,6 +15,6 @@
 	}
 
 	registerPlugin( 'my-post-status-info-plugin', {
-		render: MyPostStatusInfoPlugin,
+		render: MyPostStatusInfoPlugin
 	} );
 } )();

@@ -1,4 +1,4 @@
-( function () {
+( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
 	var InnerBlocks = wp.blockEditor.InnerBlocks;
@@ -14,7 +14,7 @@
 		[ 'core/embed' ],
 	];
 
-	var save = function () {
+	var save = function() {
 		return el( InnerBlocks.Content );
 	};
 
@@ -23,7 +23,7 @@
 		icon: 'cart',
 		category: 'text',
 
-		edit: function ( props ) {
+		edit: function( props ) {
 			return el( InnerBlocks, {
 				template: TEMPLATE,
 				templateLock: 'all',

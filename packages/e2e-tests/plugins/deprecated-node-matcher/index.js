@@ -1,4 +1,4 @@
-( function () {
+( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var RichText = wp.blockEditor.RichText;
 	var el = wp.element.createElement;
@@ -13,16 +13,16 @@
 			},
 		},
 		category: 'text',
-		edit: function ( { attributes, setAttributes } ) {
+		edit: function( { attributes, setAttributes } ) {
 			return el( RichText, {
 				tagName: 'p',
 				value: attributes.value,
-				onChange: function ( nextValue ) {
+				onChange: function( nextValue ) {
 					setAttributes( { value: nextValue } );
 				},
 			} );
 		},
-		save: function ( { attributes } ) {
+		save: function( { attributes } ) {
 			return el( RichText.Content, {
 				tagName: 'p',
 				value: attributes.value,
@@ -31,13 +31,13 @@
 	} );
 
 	function toRichTextValue( value ) {
-		return _.map( value, function ( subValue ) {
+		return _.map( value, function( subValue ) {
 			return subValue.children;
 		} );
 	}
 
 	function fromRichTextValue( value ) {
-		return _.map( value, function ( subValue ) {
+		return _.map( value, function( subValue ) {
 			return {
 				children: subValue,
 			};
@@ -59,14 +59,14 @@
 			},
 		},
 		category: 'text',
-		edit: function ( { attributes, setAttributes } ) {
+		edit: function( { attributes, setAttributes } ) {
 			return el(
 				'blockquote',
 				{},
 				el( RichText, {
 					multiline: 'p',
 					value: toRichTextValue( attributes.value ),
-					onChange: function ( nextValue ) {
+					onChange: function( nextValue ) {
 						setAttributes( {
 							value: fromRichTextValue( nextValue ),
 						} );
@@ -74,7 +74,7 @@
 				} )
 			);
 		},
-		save: function ( { attributes } ) {
+		save: function( { attributes } ) {
 			return el(
 				'blockquote',
 				{},

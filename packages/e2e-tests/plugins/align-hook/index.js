@@ -1,4 +1,4 @@
-( function () {
+( function() {
 	var registerBlockType = wp.blocks.registerBlockType;
 	var el = wp.element.createElement;
 	var InnerBlocks = wp.blockEditor.InnerBlocks;
@@ -10,14 +10,14 @@
 	var baseBlock = {
 		icon: 'cart',
 		category: 'text',
-		edit: function ( props ) {
+		edit: function( props ) {
 			return el(
 				'div',
 				{ style: { outline: '1px solid gray', padding: 5 } },
 				'Test Align Hook'
 			);
 		},
-		save: function () {
+		save: function() {
 			return el(
 				'div',
 				{ style: { outline: '1px solid gray', padding: 5 } },
