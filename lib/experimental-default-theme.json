@@ -171,10 +171,10 @@
 				"units": [ "px", "em", "rem", "vh", "vw" ]
 			},
 			"border": {
-				"customColor": true,
-				"customRadius": true,
-				"customStyle": true,
-				"customWidth": true
+				"customColor": false,
+				"customRadius": false,
+				"customStyle": false,
+				"customWidth": false
 			}
 		}
 	}
