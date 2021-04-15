@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/dom",
-	"version": "2.17.1",
+	"version": "2.17.2",
 	"description": "DOM utilities module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
