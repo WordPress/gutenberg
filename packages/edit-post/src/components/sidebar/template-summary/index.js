@@ -17,7 +17,7 @@ function TemplateSummary() {
 	}, [] );
 
 	if ( ! template ) {
-		return;
+		return null;
 	}
 
 	return (
