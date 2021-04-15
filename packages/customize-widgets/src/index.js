@@ -10,8 +10,8 @@ import {
 /**
  * Internal dependencies
  */
-import SidebarSection from './controls/sidebar-section';
-import SidebarControl from './controls/sidebar-control';
+import getSidebarSection from './controls/sidebar-section';
+import getSidebarControl from './controls/sidebar-control';
 
 const { wp } = window;
 
@@ -30,8 +30,8 @@ export function initialize() {
 		} );
 	}
 
-	wp.customize.sectionConstructor.sidebar = SidebarSection;
-	wp.customize.controlConstructor.sidebar_block_editor = SidebarControl;
+	wp.customize.sectionConstructor.sidebar = getSidebarSection();
+	wp.customize.controlConstructor.sidebar_block_editor = getSidebarControl();
 }
 
 wp.domReady( initialize );
