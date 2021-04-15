@@ -65,7 +65,6 @@ exports[`Search Block renders block with button inside option 1`] = `
     </View>
   </View>
   <View
-    onLayout={[Function]}
     style={
       Array [
         undefined,
@@ -242,7 +241,6 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
     </View>
   </View>
   <View
-    onLayout={[Function]}
     style={
       Array [
         undefined,
@@ -301,7 +299,6 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    onLayout={[Function]}
     style={
       Array [
         undefined,
@@ -478,7 +475,6 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
     </View>
   </View>
   <View
-    onLayout={[Function]}
     style={
       Array [
         undefined,
