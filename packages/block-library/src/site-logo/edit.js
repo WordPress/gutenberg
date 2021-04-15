@@ -337,7 +337,7 @@ export default function LogoEdit( {
 	);
 
 	const classes = classnames( className, {
-		'is-resized': !! width,
+		'is-default-size': ! width,
 	} );
 
 	const blockProps = useBlockProps( {
