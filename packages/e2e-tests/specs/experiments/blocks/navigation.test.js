@@ -535,11 +535,18 @@ describe( 'Navigation', () => {
 
 		await insertBlock( 'Navigation' );
 		await createNavBlockWithAllPages();
+		await insertBlock( 'Navigation' );
+		await createNavBlockWithAllPages();
 		await saveDraft();
+
 		await page.reload( {
 			waitFor: [ 'networkidle0', 'domcontentloaded' ],
 		} );
 
+		/*
+			Count instances of the tag to make sure that it's been loaded only once,
+			regardless of the number of navigation blocks present.
+		*/
 		const tagCount = await page.evaluate(
 			() =>
 				Array.from(
