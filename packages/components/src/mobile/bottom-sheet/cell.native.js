@@ -113,6 +113,7 @@ class BottomSheetCell extends Component {
 			type,
 			step,
 			borderless,
+			help,
 			...valueProps
 		} = this.props;
 
@@ -356,6 +357,16 @@ class BottomSheetCell extends Component {
 					{ showValue && getValueComponent() }
 					{ children }
 				</View>
+				{ help && (
+					<Text
+						style={ [
+							styles.cellHelpLabel,
+							styles.placeholderColor,
+						] }
+					>
+						{ help }
+					</Text>
+				) }
 				{ ! drawTopSeparator && <View style={ separatorStyle() } /> }
 			</TouchableRipple>
 		);
