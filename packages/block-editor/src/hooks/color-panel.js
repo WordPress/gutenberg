@@ -55,7 +55,7 @@ export default function ColorPanel( {
 	return (
 		<InspectorControls>
 			<PanelColorGradientSettings
-				title={ __( 'Color settings' ) }
+				title={ __( 'Color' ) }
 				initialOpen={ false }
 				settings={ settings }
 			>

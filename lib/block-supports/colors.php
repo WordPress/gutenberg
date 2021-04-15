@@ -81,7 +81,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 	$classes                       = array();
 	$styles                        = array();
 
-	// Text Colors.
+	// Text colors.
 	// Check support for text colors.
 	if ( $has_text_colors_support ) {
 		$has_named_text_color  = array_key_exists( 'textColor', $block_attributes );
@@ -117,7 +117,7 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	// Background Colors.
+	// Background colors.
 	if ( $has_background_colors_support ) {
 		$has_named_background_color  = array_key_exists( 'backgroundColor', $block_attributes );
 		$has_custom_background_color = isset( $block_attributes['style']['color']['background'] );

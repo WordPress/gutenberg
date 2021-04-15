@@ -35,8 +35,8 @@ function getComputedStyle( node ) {
 const DEFAULT_COLORS = [];
 
 const COMMON_COLOR_LABELS = {
-	textColor: __( 'Text Color' ),
-	backgroundColor: __( 'Background Color' ),
+	textColor: __( 'Text color' ),
+	backgroundColor: __( 'Background color' ),
 };
 
 const InspectorControlsColorPanel = ( props ) => (
@@ -48,7 +48,7 @@ const InspectorControlsColorPanel = ( props ) => (
 export default function __experimentalUseColors(
 	colorConfigs,
 	{
-		panelTitle = __( 'Color settings' ),
+		panelTitle = __( 'Color' ),
 		colorPanelProps,
 		contrastCheckers,
 		panelChildren,
@@ -58,7 +58,7 @@ export default function __experimentalUseColors(
 			textColorTargetRef = targetRef,
 		} = {},
 	} = {
-		panelTitle: __( 'Color settings' ),
+		panelTitle: __( 'Color' ),
 	},
 	deps = []
 ) {

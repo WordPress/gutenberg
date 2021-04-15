@@ -188,7 +188,7 @@ export function SocialLinksEdit( props ) {
 					/>
 				</PanelBody>
 				<PanelColorSettings
-					title={ __( 'Color settings' ) }
+					title={ __( 'Color' ) }
 					colorSettings={ [
 						{
 							// Use custom attribute as fallback to prevent loss of named color selection when

@@ -160,7 +160,7 @@ function PullQuoteEdit( {
 			{ Platform.OS === 'web' && (
 				<InspectorControls>
 					<PanelColorSettings
-						title={ __( 'Color settings' ) }
+						title={ __( 'Color' ) }
 						colorSettings={ [
 							{
 								value: mainColor.color,
