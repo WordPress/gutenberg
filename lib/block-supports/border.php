@@ -13,12 +13,8 @@
  */
 function gutenberg_register_border_support( $block_type ) {
 	// Determine if any border related features are supported.
+	$has_border_support       = gutenberg_block_has_support( $block_type, array( '__experimentalBorder' ) );
 	$has_border_color_support = gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'color' ) );
-	$has_border_support       =
-		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'radius' ) ) ||
-		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'style' ) ) ||
-		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', 'width' ) ) ||
-		$has_border_color_support;
 
 	// Setup attributes and styles within that if needed.
 	if ( ! $block_type->attributes ) {
