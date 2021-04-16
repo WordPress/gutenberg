@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import scrollIntoView from 'dom-scroll-into-view';
-
-/**
  * WordPress dependencies
  */
 import { useEffect, useRef } from '@wordpress/element';
@@ -16,6 +11,16 @@ import { getScrollContainer } from '@wordpress/dom';
 import { getBlockDOMNode } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
+/**
+ * Scrolls the selected block or extent of a multi-block selection into view if
+ * it is not in view at all. In particular this is for:
+ *
+ * - Multi-selection by keyboard to keep the selection extent in view.
+ * - Inserting a block from the global inserter (which does not focus the block,
+ *   so scroll-on-focus browser behaviour does not kick in).
+ *
+ * @param {import('@wordpress/element').RefObject} ref
+ */
 export function useScrollSelectionIntoView( ref ) {
 	// Although selectionRootClientId isn't used directly in calculating
 	// whether scrolling should occur, it is used as a dependency of the
@@ -24,6 +29,8 @@ export function useScrollSelectionIntoView( ref ) {
 	// remains the same, so the rootClientId is used to trigger the effect.
 	const { selectionRootClientId, selectionEnd } = useSelect( ( select ) => {
 		const selectors = select( blockEditorStore );
+		// In case of a multi-selection, scroll to the selection extent rather
+		// than the anchor.
 		const selectionEndClientId = selectors.getBlockSelectionEnd();
 		return {
 			selectionEnd: selectionEndClientId,
@@ -53,9 +60,20 @@ export function useScrollSelectionIntoView( ref ) {
 			return;
 		}
 
-		scrollIntoView( extentNode, scrollContainer, {
-			onlyScrollIfNeeded: true,
-		} );
+		const scrollContainerRect = scrollContainer.getBoundingClientRect();
+		const targetRect = extentNode.getBoundingClientRect();
+
+		// Only scroll if the target is completely out of view. If the target is
+		// partly in view, we shouldn't scroll the page as the selection might
+		// have been made by the user and scrolling would be disorientating.
+		if (
+			targetRect.bottom > scrollContainerRect.top &&
+			targetRect.top < scrollContainerRect.bottom
+		) {
+			return;
+		}
+
+		extentNode.scrollIntoView();
 	}, [ selectionRootClientId, selectionEnd ] );
 }
 
