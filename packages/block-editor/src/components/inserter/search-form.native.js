@@ -46,7 +46,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 
 	const inputRef = useRef();
 
-	const containerStyle = {
+	const baseContainerStyle = {
 		...usePreferredColorSchemeStyle(
 			styles[ 'inserter-search-form__container' ],
 			styles[ 'inserter-search-form__container--dark' ]
@@ -58,7 +58,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	};
 
 	const containerActiveStyle = {
-		...containerStyle,
+		...baseContainerStyle,
 		...usePreferredColorSchemeStyle(
 			styles[ 'inserter-search-form__container--active' ],
 			styles[ 'inserter-search-form__container--active-dark' ]
@@ -68,6 +68,8 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 			platformStyles[ 'inserter-search-form__container--active-dark' ]
 		),
 	};
+
+	const containerStyle = isActive ? containerActiveStyle : baseContainerStyle;
 
 	const inputContainerStyle = {
 		...usePreferredColorSchemeStyle(
@@ -103,6 +105,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 			platformStyles[ 'inserter-search-form__form-input' ],
 			platformStyles[ 'inserter-search-form__form-input--dark' ]
 		),
+		...{},
 	};
 
 	const formInputActiveStyle = {
@@ -248,7 +251,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 
 	return (
 		<TouchableOpacity
-			style={ isActive ? containerActiveStyle : containerStyle }
+			style={ containerStyle }
 			onPress={ () => {
 				setIsActive( true );
 				inputRef.current.focus();
