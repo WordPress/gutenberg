@@ -69,7 +69,7 @@ function Navigation( {
 		className: classnames( className, {
 			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
 			'is-vertical': attributes.orientation === 'vertical',
-			'is-responsive': attributes.responsiveNavigation,
+			'is-responsive': attributes.isResponsive,
 		} ),
 	} );
 
@@ -154,10 +154,10 @@ function Navigation( {
 							label={ __( 'Show submenu indicator icons' ) }
 						/>
 						<ToggleControl
-							checked={ attributes.responsiveNavigation }
+							checked={ attributes.isResponsive }
 							onChange={ ( value ) => {
 								setAttributes( {
-									responsiveNavigation: value,
+									isResponsive: value,
 								} );
 							} }
 							label={ __( 'Enable responsive menu' ) }
@@ -172,7 +172,7 @@ function Navigation( {
 						setResponsiveMenuVisibility( value )
 					}
 					isOpen={ isResponsiveMenuOpen }
-					isResponsive={ attributes.responsiveNavigation }
+					isResponsive={ attributes.isResponsive }
 				>
 					<ul { ...innerBlocksProps }></ul>
 				</ResponsiveWrapper>

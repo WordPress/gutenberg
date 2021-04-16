@@ -35,7 +35,7 @@
 			"type": "boolean",
 			"default": true
 		},
-		"responsiveNavigation": {
+		"isResponsive": {
 			"type": "boolean",
 			"default": true
 		}
@@ -50,10 +50,13 @@
 		"showSubmenuIcon": "showSubmenuIcon",
 		"style": "style",
 		"orientation": "orientation",
-		"responsiveNavigation": "responsiveNavigation"
+		"isResponsive": "isResponsive"
 	},
 	"supports": {
-		"align": [ "wide", "full" ],
+		"align": [
+			"wide",
+			"full"
+		],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
