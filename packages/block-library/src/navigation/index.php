@@ -105,10 +105,13 @@ function get_classic_navigation_elements( $attributes ){
 		return '';
 	}
 
+	$block_attributes = $attributes;
+	unset($block_attributes['source']);
+
 	return wp_nav_menu(
 		array(
 			'theme_location' 	=> $attributes['source'],
-			'block_attributes'	=> $attributes,
+			'block_attributes'	=> $block_attributes,
 			'container'      	=> '',
 			'items_wrap'     	=> '%3$s',
 			'fallback_cb'    	=> false,
