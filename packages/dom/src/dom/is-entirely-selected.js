@@ -2,10 +2,6 @@
  * Internal dependencies
  */
 import { assertIsDefined } from '../utils/assert-is-defined';
-
-/**
- * Internal dependencies
- */
 import isInputOrTextArea from './is-input-or-text-area';
 
 /**
