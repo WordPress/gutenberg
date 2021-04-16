@@ -116,14 +116,9 @@ _Returns_
 Given a component returns the enhanced component augmented with a component
 only rerendering when its props/state change
 
-_Parameters_
+_Type_
 
--   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
--   _modifierName_ `string`: Seed name from which to generated display name.
-
-_Returns_
-
--   `WPComponent`: Component class with generated display name assigned.
+-   `import('../../utils/create-higher-order-component').HigherOrderComponent<{}>` 
 
 <a name="useAsyncList" href="#useAsyncList">#</a> **useAsyncList**
 

@@ -4,8 +4,10 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
+	"references": [ { "path": "../element" } ],
 	"include": [
 		"src/higher-order/if-condition/**/*",
+		"src/higher-order/pure/**/*",
 		"src/utils/**/*"
 	]
 }
