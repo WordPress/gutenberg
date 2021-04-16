@@ -33,6 +33,8 @@ import styles from './style.scss';
  * Constants
  */
 const MIN_BUTTON_WIDTH = 75;
+const MARGINS =
+	styles.widthMargin?.marginLeft + styles.widthMargin?.paddingLeft;
 
 const BUTTON_OPTIONS = [
 	{ value: 'button-inside', label: __( 'Button inside' ) },
@@ -46,12 +48,15 @@ export default function SearchEdit( {
 	attributes,
 	setAttributes,
 	className,
+	blockWidth,
 } ) {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
 	const [ isPlaceholderSelected, setIsPlaceholderSelected ] = useState(
 		true
 	);
+	const [ isLongButton, setIsLongButton ] = useState( false );
+	const [ buttonWidth, setButtonWidth ] = useState( MIN_BUTTON_WIDTH );
 
 	const textInputRef = useRef( null );
 
@@ -74,8 +79,26 @@ export default function SearchEdit( {
 		}
 	}, [ isSelected ] );
 
+	useEffect( () => {
+		const maxButtonWidth = Math.floor( blockWidth / 2 - MARGINS );
+		const tempIsLongButton = buttonWidth > maxButtonWidth;
+
+		// Update this value only if it has changed to avoid flickering.
+		if ( isLongButton !== tempIsLongButton ) {
+			setIsLongButton( tempIsLongButton );
+		}
+	}, [ blockWidth, buttonWidth ] );
+
 	const hasTextInput = () => {
 		return textInputRef && textInputRef.current;
+	};
+
+	const onLayoutButton = ( { nativeEvent } ) => {
+		const { width } = nativeEvent?.layout;
+
+		if ( width ) {
+			setButtonWidth( width );
+		}
 	};
 
 	const getBlockClassNames = () => {
@@ -163,11 +186,11 @@ export default function SearchEdit( {
 	);
 
 	const inputStyle = [
+		! isButtonInside && borderStyle,
 		usePreferredColorSchemeStyle(
 			styles.plainTextInput,
 			styles.plainTextInputDark
 		),
-		! isButtonInside && borderStyle,
 	];
 
 	const placeholderStyle = usePreferredColorSchemeStyle(
@@ -178,6 +201,7 @@ export default function SearchEdit( {
 	const searchBarStyle = [
 		styles.searchBarContainer,
 		isButtonInside && borderStyle,
+		isLongButton && { flexDirection: 'column' },
 	];
 
 	const getPlaceholderAccessibilityLabel = () => {
@@ -236,8 +260,19 @@ export default function SearchEdit( {
 
 	const renderButton = () => {
 		return (
-			<View style={ styles.buttonContainer }>
-				{ buttonUseIcon && <Icon icon={ search } { ...styles.icon } /> }
+			<View
+				style={ [
+					styles.buttonContainer,
+					isLongButton && styles.buttonContainerWide,
+				] }
+			>
+				{ buttonUseIcon && (
+					<Icon
+						icon={ search }
+						{ ...styles.icon }
+						onLayout={ onLayoutButton }
+					/>
+				) }
 
 				{ ! buttonUseIcon && (
 					<View
@@ -249,6 +284,7 @@ export default function SearchEdit( {
 						accessibilityLabel={ `${ __(
 							'Search button. Current button text is'
 						) } ${ buttonText }` }
+						onLayout={ onLayoutButton }
 					>
 						<RichText
 							className="wp-block-search__button"
@@ -262,6 +298,7 @@ export default function SearchEdit( {
 								setAttributes( { buttonText: html } )
 							}
 							minWidth={ MIN_BUTTON_WIDTH }
+							maxWidth={ blockWidth - MARGINS }
 							textAlign="center"
 							isSelected={ isButtonSelected }
 							__unstableMobileNoFocusOnMount={ ! isSelected }
