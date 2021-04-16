@@ -22,7 +22,7 @@ import {
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
-import { getBlockVariations } from '@wordpress/blocks';
+import { unstable__getActiveBlockVariation as getActiveBlockVariation } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
@@ -1510,9 +1510,10 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
 				const { attributes, name: blockName } = block;
-				const variations = getBlockVariations( blockName );
-				const match = variations?.find( ( variation ) =>
-					variation.isActive?.( attributes, variation.attributes )
+				const match = getActiveBlockVariation(
+					blockName,
+					null,
+					attributes
 				);
 				// If a block variation match is found change the name to be the same with the
 				// one that is used for block variations in the Inserter (`getItemFromVariation`).
