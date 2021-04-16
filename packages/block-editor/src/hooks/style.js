@@ -19,6 +19,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  */
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
+import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
 import { SPACING_SUPPORT_KEY, PaddingEdit } from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
@@ -135,7 +136,9 @@ export function addSaveProps( props, blockType, attributes ) {
 	if (
 		getBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
 	) {
-		filteredStyle = omit( filteredStyle, TYPOGRAPHY_SUPPORT_KEYS );
+		filteredStyle = omit( filteredStyle, [
+			[ 'typography', FONT_SIZE_SUPPORT_KEY ],
+		] );
 	}
 
 	props.style = {
