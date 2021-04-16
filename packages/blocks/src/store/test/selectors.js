@@ -16,6 +16,7 @@ import {
 	getGroupingBlockName,
 	isMatchingSearchTerm,
 	getCategories,
+	unstable__getActiveBlockVariation as getActiveBlockVariation,
 } from '../selectors';
 
 describe( 'selectors', () => {
@@ -275,6 +276,166 @@ describe( 'selectors', () => {
 						'no-scope',
 					] )
 				);
+			} );
+		} );
+		describe( 'getActiveBlockVariation', () => {
+			const FIRST_VARIATION_TEST_ATTRIBUTE_VALUE = 1;
+			const SECOND_VARIATION_TEST_ATTRIBUTE_VALUE = 2;
+			const UNUSED_TEST_ATTRIBUTE_VALUE = 5555;
+			const firstActiveBlockVariationFunction = {
+				...firstBlockVariation,
+				attributes: {
+					testAttribute: FIRST_VARIATION_TEST_ATTRIBUTE_VALUE,
+				},
+				isActive: ( blockAttributes, variationAttributes ) => {
+					return (
+						blockAttributes.testAttribute ===
+						variationAttributes.testAttribute
+					);
+				},
+			};
+			const secondActiveBlockVariationFunction = {
+				...secondBlockVariation,
+				attributes: {
+					testAttribute: SECOND_VARIATION_TEST_ATTRIBUTE_VALUE,
+				},
+				isActive: ( blockAttributes, variationAttributes ) => {
+					return (
+						blockAttributes.testAttribute ===
+						variationAttributes.testAttribute
+					);
+				},
+			};
+			const firstActiveBlockVariationArray = {
+				...firstBlockVariation,
+				attributes: {
+					testAttribute: FIRST_VARIATION_TEST_ATTRIBUTE_VALUE,
+				},
+				isActive: [ 'testAttribute' ],
+			};
+			const secondActiveBlockVariationArray = {
+				...secondBlockVariation,
+				attributes: {
+					testAttribute: SECOND_VARIATION_TEST_ATTRIBUTE_VALUE,
+				},
+				isActive: [ 'testAttribute' ],
+			};
+			const stateFunction = createBlockVariationsState( [
+				firstActiveBlockVariationFunction,
+				secondActiveBlockVariationFunction,
+				thirdBlockVariation,
+			] );
+			const stateArray = createBlockVariationsState( [
+				firstActiveBlockVariationArray,
+				secondActiveBlockVariationArray,
+				thirdBlockVariation,
+			] );
+			it( 'should return the active variation based on the given isActive function', () => {
+				[
+					firstActiveBlockVariationFunction,
+					secondActiveBlockVariationFunction,
+				].forEach( ( variation ) => {
+					const blockAttributes = {
+						testAttribute: variation.attributes.testAttribute,
+					};
+
+					const result = getActiveBlockVariation(
+						stateFunction,
+						blockName,
+						blockAttributes
+					);
+
+					expect( result ).toEqual( variation );
+				} );
+			} );
+			it( 'should return undefined if no active variation is found', () => {
+				const blockAttributes = {
+					testAttribute: UNUSED_TEST_ATTRIBUTE_VALUE,
+				};
+
+				const result = getActiveBlockVariation(
+					stateFunction,
+					blockName,
+					blockAttributes
+				);
+
+				expect( result ).toBeUndefined();
+			} );
+			it( 'should return the active variation based on the given isActive array', () => {
+				[
+					firstActiveBlockVariationArray,
+					secondActiveBlockVariationArray,
+				].forEach( ( variation ) => {
+					const blockAttributes = {
+						testAttribute: variation.attributes.testAttribute,
+					};
+
+					const result = getActiveBlockVariation(
+						stateArray,
+						blockName,
+						blockAttributes
+					);
+
+					expect( result ).toEqual( variation );
+				} );
+			} );
+			it( 'should return the active variation based on the given isActive array (multiple values)', () => {
+				const variations = [
+					{
+						name: 'variation-1',
+						attributes: {
+							firstTestAttribute: 1,
+							secondTestAttribute: 10,
+						},
+						isActive: [
+							'firstTestAttribute',
+							'secondTestAttribute',
+						],
+					},
+					{
+						name: 'variation-2',
+						attributes: {
+							firstTestAttribute: 2,
+							secondTestAttribute: 20,
+						},
+						isActive: [
+							'firstTestAttribute',
+							'secondTestAttribute',
+						],
+					},
+					{
+						name: 'variation-3',
+						attributes: {
+							firstTestAttribute: 1,
+							secondTestAttribute: 20,
+						},
+						isActive: [
+							'firstTestAttribute',
+							'secondTestAttribute',
+						],
+					},
+				];
+
+				const state = createBlockVariationsState( variations );
+
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: 1,
+						secondTestAttribute: 10,
+					} )
+				).toEqual( variations[ 0 ] );
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: 2,
+						secondTestAttribute: 20,
+					} )
+				).toEqual( variations[ 1 ] );
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: 1,
+						secondTestAttribute: 20,
+					} )
+				).toEqual( variations[ 2 ] );
 			} );
 		} );
 		describe( 'getDefaultBlockVariation', () => {
