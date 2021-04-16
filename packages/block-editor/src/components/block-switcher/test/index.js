@@ -8,8 +8,6 @@ import { shallow, mount } from 'enzyme';
  */
 import { useSelect } from '@wordpress/data';
 import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import { DOWN } from '@wordpress/keycodes';
-import { Button } from '@wordpress/components';
 import { stack } from '@wordpress/icons';
 
 /**
@@ -155,7 +153,7 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 		expect( wrapper ).toMatchSnapshot();
 	} );
 
-	describe( 'Dropdown', () => {
+	describe( 'Dropdown .renderContent', () => {
 		beforeAll( () => {
 			useSelect.mockImplementation( () => ( {
 				possibleBlockTransformations: [
@@ -168,66 +166,19 @@ describe( 'BlockSwitcherDropdownMenu', () => {
 				<BlockSwitcherDropdownMenu blocks={ [ headingBlock1 ] } />
 			).find( 'Dropdown' );
 
-		test( 'should dropdown exist', () => {
-			expect( getDropdown() ).toHaveLength( 1 );
-		} );
-
-		describe( '.renderToggle', () => {
-			const onToggleStub = jest.fn();
-			const mockKeyDown = {
-				preventDefault: () => {},
-				stopPropagation: () => {},
-				keyCode: DOWN,
-			};
-
-			afterEach( () => {
-				onToggleStub.mockReset();
-			} );
-
-			test( 'should simulate a keydown event, which should call onToggle and open transform toggle.', () => {
-				const toggleClosed = mount(
-					getDropdown().props().renderToggle( {
-						onToggle: onToggleStub,
-						isOpen: false,
-					} )
-				);
-				const iconButtonClosed = toggleClosed.find( Button );
-
-				iconButtonClosed.simulate( 'keydown', mockKeyDown );
-
-				expect( onToggleStub ).toHaveBeenCalledTimes( 1 );
-			} );
-
-			test( 'should simulate a click event, which should call onToggle.', () => {
-				const toggleOpen = mount(
-					getDropdown().props().renderToggle( {
-						onToggle: onToggleStub,
-						isOpen: true,
-					} )
-				);
-				const iconButtonOpen = toggleOpen.find( Button );
-
-				iconButtonOpen.simulate( 'keydown', mockKeyDown );
-
-				expect( onToggleStub ).toHaveBeenCalledTimes( 0 );
-			} );
-		} );
-
-		describe( '.renderContent', () => {
-			test( 'should create the transform items for the chosen block. A heading block will have 3 items', () => {
-				const onCloseStub = jest.fn();
-				const content = shallow(
-					<div>
-						{ getDropdown()
-							.props()
-							.renderContent( { onClose: onCloseStub } ) }
-					</div>
-				);
-				const blockList = content.find( 'BlockTransformationsMenu' );
-				expect(
-					blockList.prop( 'possibleBlockTransformations' )
-				).toHaveLength( 1 );
-			} );
+		test( 'should create the transform items for the chosen block. A heading block will have 1 item', () => {
+			const onCloseStub = jest.fn();
+			const content = shallow(
+				<div>
+					{ getDropdown()
+						.props()
+						.renderContent( { onClose: onCloseStub } ) }
+				</div>
+			);
+			const blockList = content.find( 'BlockTransformationsMenu' );
+			expect(
+				blockList.prop( 'possibleBlockTransformations' )
+			).toHaveLength( 1 );
 		} );
 	} );
 } );

@@ -92,7 +92,7 @@ function DropdownMenu( {
 		<Dropdown
 			className={ classnames( 'components-dropdown-menu', className ) }
 			popoverProps={ mergedPopoverProps }
-			renderToggle={ ( { isOpen, onToggle } ) => {
+			renderToggle={ ( { isOpen, onToggle, togglerHandlers } ) => {
 				const openOnArrowDown = ( event ) => {
 					if ( disableOpenOnArrowDown ) {
 						return;
@@ -115,22 +115,24 @@ function DropdownMenu( {
 					},
 					toggleProps
 				);
+				Object.keys( togglerHandlers ).forEach( ( key ) => {
+					if ( toggleProps?.key ) {
+						mergedToggleProps[ key ] = ( event ) => {
+							togglerHandlers[ key ]( event );
+							toggleProps[ key ]( event );
+						};
+					} else {
+						mergedToggleProps[ key ] = togglerHandlers[ key ];
+					}
+				} );
 
 				return (
 					<ButtonComponent
 						{ ...mergedToggleProps }
 						icon={ icon }
-						onClick={ ( event ) => {
-							onToggle( event );
-							if ( mergedToggleProps.onClick ) {
-								mergedToggleProps.onClick( event );
-							}
-						} }
 						onKeyDown={ ( event ) => {
 							openOnArrowDown( event );
-							if ( mergedToggleProps.onKeyDown ) {
-								mergedToggleProps.onKeyDown( event );
-							}
+							mergedToggleProps.onKeyDown?.( event );
 						} }
 						aria-haspopup="true"
 						aria-expanded={ isOpen }
