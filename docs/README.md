@@ -28,15 +28,14 @@ The Editor offers rich new value to users with visual, drag-and-drop creation to
 
 Whether you want to extend the functionality of the block editor, or create a plugin based on it, [see the developer documentation](/docs/how-to-guides/README.md) to find all the information about the basic concepts you need to get started, the block editor APIs and its architecture.
 
-- [Gutenberg Architecture](/docs/explanations/architecture/README.md)
-- [Block Style Variations](/docs/reference-guides/filters/block-filters.md#block-style-variations)
-- [Creating Block Patterns](/docs/reference-guides/block-api/block-patterns.md)
-- [Theming for the Block Editor](/docs/how-to-guides/themes/README.md)
-- [Block API Reference](/docs/reference-guides/block-api/README.md)
-- [Block Editor Accessibility](/docs/how-to-guides/accessibility.md)
-- [Internationalization](/docs/how-to-guides/internationalization.md)
+-   [Gutenberg Architecture](/docs/explanations/architecture/README.md)
+-   [Block Style Variations](/docs/reference-guides/filters/block-filters.md#block-style-variations)
+-   [Creating Block Patterns](/docs/reference-guides/block-api/block-patterns.md)
+-   [Theming for the Block Editor](/docs/how-to-guides/themes/README.md)
+-   [Block API Reference](/docs/reference-guides/block-api/README.md)
+-   [Block Editor Accessibility](/docs/how-to-guides/accessibility.md)
+-   [Internationalization](/docs/how-to-guides/internationalization.md)
 
 ### Contribute to the block editor
 
 Everything you need to know to [start contributing to the block editor](/docs/contributors/README.md) . Whether you are interested in the design, code, triage, documentation, support or internationalization of the block editor, you will find here guides to help you.
-

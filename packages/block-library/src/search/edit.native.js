@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, Dimensions } from 'react-native';
+import { View } from 'react-native';
 import classnames from 'classnames';
 
 /**
@@ -48,6 +48,7 @@ export default function SearchEdit( {
 	attributes,
 	setAttributes,
 	className,
+	blockWidth,
 } ) {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
@@ -55,9 +56,6 @@ export default function SearchEdit( {
 		true
 	);
 	const [ isLongButton, setIsLongButton ] = useState( false );
-	const [ containerWidth, setContainerWidth ] = useState(
-		Math.floor( Dimensions.get( 'window' ).width )
-	);
 	const [ buttonWidth, setButtonWidth ] = useState( MIN_BUTTON_WIDTH );
 
 	const textInputRef = useRef( null );
@@ -82,15 +80,14 @@ export default function SearchEdit( {
 	}, [ isSelected ] );
 
 	useEffect( () => {
-		const maxButtonWidth = Math.floor( containerWidth / 2 - MARGINS );
+		const maxButtonWidth = Math.floor( blockWidth / 2 - MARGINS );
 		const tempIsLongButton = buttonWidth > maxButtonWidth;
 
-		// Update this value only if it has changed to avoid flickering. This is required
-		// to update the view on orientation change if needed.
+		// Update this value only if it has changed to avoid flickering.
 		if ( isLongButton !== tempIsLongButton ) {
 			setIsLongButton( tempIsLongButton );
 		}
-	}, [ containerWidth, buttonWidth ] );
+	}, [ blockWidth, buttonWidth ] );
 
 	const hasTextInput = () => {
 		return textInputRef && textInputRef.current;
@@ -101,14 +98,6 @@ export default function SearchEdit( {
 
 		if ( width ) {
 			setButtonWidth( width );
-		}
-	};
-
-	const onLayoutContainer = ( { nativeEvent } ) => {
-		const { width } = nativeEvent?.layout;
-
-		if ( width ) {
-			setContainerWidth( width );
 		}
 	};
 
@@ -311,7 +300,7 @@ export default function SearchEdit( {
 								setAttributes( { buttonText: html } )
 							}
 							minWidth={ MIN_BUTTON_WIDTH }
-							maxWidth={ containerWidth - MARGINS }
+							maxWidth={ blockWidth - MARGINS }
 							textAlign="center"
 							isSelected={ isButtonSelected }
 							__unstableMobileNoFocusOnMount={ ! isSelected }
@@ -378,7 +367,7 @@ export default function SearchEdit( {
 
 			{ ( 'button-inside' === buttonPosition ||
 				'button-outside' === buttonPosition ) && (
-				<View style={ searchBarStyle } onLayout={ onLayoutContainer }>
+				<View style={ searchBarStyle }>
 					{ renderTextField() }
 					{ renderButton() }
 				</View>

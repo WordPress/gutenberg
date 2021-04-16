@@ -58,7 +58,7 @@ exports[`Search Block renders block with button inside option 1`] = `
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
-            "text": "<p >Search</p>",
+            "text": "<p>Search</p>",
           }
         }
         triggerKeyCodes={Array []}
@@ -167,7 +167,7 @@ exports[`Search Block renders block with button inside option 1`] = `
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
-                "text": "<p >Search Button</p>",
+                "text": "<p>Search Button</p>",
               }
             }
             textAlign="center"
@@ -238,7 +238,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
-            "text": "<p >Search</p>",
+            "text": "<p>Search</p>",
           }
         }
         triggerKeyCodes={Array []}
@@ -407,7 +407,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
-                "text": "<p >Search Button</p>",
+                "text": "<p>Search Button</p>",
               }
             }
             textAlign="center"
@@ -478,7 +478,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
-            "text": "<p >Search</p>",
+            "text": "<p>Search</p>",
           }
         }
         triggerKeyCodes={Array []}
@@ -587,7 +587,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
                 "eventCount": undefined,
                 "linkTextColor": undefined,
                 "selection": null,
-                "text": "<p >Search Button</p>",
+                "text": "<p>Search Button</p>",
               }
             }
             textAlign="center"
@@ -658,7 +658,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
             "eventCount": undefined,
             "linkTextColor": undefined,
             "selection": null,
-            "text": "<p >Search</p>",
+            "text": "<p>Search</p>",
           }
         }
         triggerKeyCodes={Array []}

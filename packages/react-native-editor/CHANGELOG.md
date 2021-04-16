@@ -14,6 +14,13 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Image block: Improve text entry for long alt text. [#29670]
 -   [***] Search block now available on mobile! [https://github.com/WordPress/gutenberg/pull/30783]
 
+## 1.50.1
+
+-   [x] Truncate rangecell screenreader decimals] [#30678]
+-   [x] Fix Quote block citation [#30548]
+-   [xx] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
+-   [xx] Fix Unsupported Block Editor on Android [#30650]
+
 ## 1.50.0
 
 -   [***] a11y: Screenreader improvements for the UnitControl component [#29741]

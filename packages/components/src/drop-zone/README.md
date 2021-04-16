@@ -14,10 +14,10 @@ const MyDropZone = withState( {
 	<DropZoneProvider>
 		<div>
 			{ hasDropped ? 'Dropped!' : 'Drop something here' }
-			<DropZone 
+			<DropZone
 				onFilesDrop={ () => setState( { hasDropped: true } ) }
-				onHTMLDrop={ () => setState( { hasDropped: true } )  }
-				onDrop={ () => setState( { hasDropped: true } ) } 
+				onHTMLDrop={ () => setState( { hasDropped: true } ) }
+				onDrop={ () => setState( { hasDropped: true } ) }
 			/>
 		</div>
 	</DropZoneProvider>
@@ -32,36 +32,36 @@ The component accepts the following props:
 
 A CSS `class` to be _appended_ after the default `components-drop-zone` class.
 
-- Type: `String`
-- Default: `undefined`
+-   Type: `String`
+-   Default: `undefined`
 
 ### label
 
 A string to be shown within the drop zone area.
 
-- Type: `String`
-- Default: `Drop files to upload`
+-   Type: `String`
+-   Default: `Drop files to upload`
 
 ### onFilesDrop
 
 The function is called when dropping a file into the `DropZone`. It receives an array of dropped files as an argument.
 
-- Type: `Function`
-- Required: No
-- Default: `noop`
+-   Type: `Function`
+-   Required: No
+-   Default: `noop`
 
 ### onHTMLDrop
 
 The function is called when dropping a file into the `DropZone`. It receives the HTML being dropped as an argument.
 
-- Type: `Function`
-- Required: No
-- Default: `noop`
+-   Type: `Function`
+-   Required: No
+-   Default: `noop`
 
 ### onDrop
 
 The function is generic drop handler called if the `onFilesDrop` or `onHTMLDrop` are not called. It receives the drop `event` object as an argument.
 
-- Type: `Function`
-- Required: No
-- Default: `noop`
+-   Type: `Function`
+-   Required: No
+-   Default: `noop`

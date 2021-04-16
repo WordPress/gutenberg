@@ -36,17 +36,15 @@ function PostTemplate() {
 			const { isEditingTemplate, getEditedPostTemplate } = select(
 				editPostStore
 			);
-			const _supportsTemplateMode = select(
-				editorStore
-			).getEditorSettings().supportsTemplateMode;
+
 			const isViewable =
 				getPostType( getCurrentPostType() )?.viewable ?? false;
+			const _supportsTemplateMode =
+				select( editorStore ).getEditorSettings()
+					.supportsTemplateMode && isViewable;
 
 			return {
-				template:
-					supportsTemplateMode &&
-					isViewable &&
-					getEditedPostTemplate(),
+				template: _supportsTemplateMode && getEditedPostTemplate(),
 				isEditing: isEditingTemplate(),
 				supportsTemplateMode: _supportsTemplateMode,
 			};
@@ -59,18 +57,20 @@ function PostTemplate() {
 		return null;
 	}
 
+	const templateTitle = (
+		<>
+			{ !! template && template?.title?.raw }
+			{ !! template && ! template?.title?.raw && template.slug }
+			{ ! template && __( 'Default' ) }
+		</>
+	);
+
 	return (
 		<PanelRow className="edit-post-post-template">
 			<span>{ __( 'Template' ) }</span>
 			{ ! isEditing && (
 				<div className="edit-post-post-template__value">
-					<div>
-						{ !! template && template?.title?.raw }
-						{ !! template &&
-							! template?.title?.raw &&
-							template.slug }
-						{ ! template && __( 'Default' ) }
-					</div>
+					<div>{ templateTitle }</div>
 					<div className="edit-post-post-template__actions">
 						{ !! template && (
 							<Button
@@ -90,7 +90,7 @@ function PostTemplate() {
 			) }
 			{ isEditing && (
 				<span className="edit-post-post-template__value">
-					{ template?.slug }
+					{ templateTitle }
 				</span>
 			) }
 			{ isModalOpen && (
