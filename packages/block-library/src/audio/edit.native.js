@@ -167,6 +167,14 @@ function AudioEdit( {
 				<InspectorControls>
 					<PanelBody title={ __( 'Audio settings' ) }>
 						<ToggleControl
+							label={ __( 'Autoplay' ) }
+							onChange={ toggleAttribute( 'autoplay' ) }
+							checked={ autoplay }
+							help={ __(
+								'Note: Autoplaying audio may cause usability issues for some visitors.'
+							) }
+						/>
+						<ToggleControl
 							label={ __( 'Loop' ) }
 							onChange={ toggleAttribute( 'loop' ) }
 							checked={ loop }
@@ -187,14 +195,6 @@ function AudioEdit( {
 								{ value: 'none', label: __( 'None' ) },
 							] }
 							hideCancelButton={ true }
-						/>
-						<ToggleControl
-							label={ __( 'Autoplay' ) }
-							onChange={ toggleAttribute( 'autoplay' ) }
-							checked={ autoplay }
-							help={ __(
-								'Note: Autoplaying audio may cause usability issues for some visitors.'
-							) }
 						/>
 					</PanelBody>
 				</InspectorControls>
