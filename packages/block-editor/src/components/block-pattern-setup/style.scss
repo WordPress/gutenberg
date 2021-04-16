@@ -18,6 +18,8 @@
 			grid-template-columns: 1fr 1fr;
 			grid-gap: $grid-unit-20;
 			padding: $grid-unit-20;
+			max-height: 550px;
+			overflow: auto;
 
 			.block-editor-block-preview__container,
 			div[role="button"] {

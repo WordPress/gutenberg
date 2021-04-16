@@ -6,7 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-
 import {
 	BlockControls,
 	useBlockProps,
