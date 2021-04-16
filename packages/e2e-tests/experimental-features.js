@@ -139,25 +139,43 @@ export const siteEditor = {
 			'core/edit-site',
 			'getEditedPostType'
 		);
-		const record = await wpDataSelect(
+		const getEntityContent = async ( entity ) => {
+			if ( ! entity ) {
+				return null;
+			}
+			if ( typeof entity.content === 'function' ) {
+				return entity.content( entity );
+			} else if ( entity.blocks ) {
+				return await page.evaluate(
+					( blocks ) =>
+						window.wp.blocks.__unstableSerializeAndClean( blocks ),
+					entity.blocks
+				);
+			} else if ( entity.content ) {
+				return entity.content.raw || entity.content;
+			}
+		};
+		const editedRecord = await wpDataSelect(
 			'core',
 			'getEditedEntityRecord',
 			'postType',
 			postType,
 			postId
 		);
-		if ( record ) {
-			if ( typeof record.content === 'function' ) {
-				return record.content( record );
-			} else if ( record.blocks ) {
-				return await page.evaluate(
-					( blocks ) =>
-						window.wp.blocks.__unstableSerializeAndClean( blocks ),
-					record.blocks
-				);
-			} else if ( record.content ) {
-				return record.content;
-			}
+		const editedContent = getEntityContent( editedRecord );
+		if ( editedContent ) {
+			return editedContent;
+		}
+		const originalRecord = await wpDataSelect(
+			'core',
+			'getEntityRecord',
+			'postType',
+			postType,
+			postId
+		);
+		const originalContent = getEntityContent( originalRecord );
+		if ( originalContent ) {
+			return originalContent;
 		}
 		return '';
 	},
