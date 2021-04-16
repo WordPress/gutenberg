@@ -108,11 +108,6 @@ describe( 'Widgets screen', () => {
 		// 	firstWidgetArea
 		// );
 
-		// Simulate an unexpected error in the tests.
-		( () => {
-			throw new Error( 'Oops!' );
-		} )();
-
 		await addParagraphBlock.click();
 
 		let addedParagraphBlockInFirstWidgetArea = await firstWidgetArea.$(
@@ -212,9 +207,6 @@ describe( 'Widgets screen', () => {
 				firstWidgetAreaBoundingBox.height -
 				10
 		);
-
-		// Simulate a failing test.
-		expect( true ).toBe( false );
 
 		let inlineInserterButton = await getInlineInserterButton();
 		await inlineInserterButton.click();
