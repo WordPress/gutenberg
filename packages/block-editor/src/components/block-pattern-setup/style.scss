@@ -25,6 +25,11 @@
 			div[role="button"] {
 				cursor: pointer;
 			}
+			.block-editor-block-pattern-setup-list__item-title {
+				padding: $grid-unit-05;
+				font-size: $helptext-font-size;
+				text-align: center;
+			}
 		}
 	}
 	.block-editor-block-pattern-setup__toolbar {

@@ -74,14 +74,15 @@ const SetupContent = ( {
 };
 
 function BlockPattern( { pattern, onSelect, composite } ) {
-	const { blocks, viewportWidth = 700 } = pattern;
+	const baseClassName = 'block-editor-block-pattern-setup-list';
+	const { blocks, title, description, viewportWidth = 700 } = pattern;
 	const descriptionId = useInstanceId(
 		BlockPattern,
-		'block-editor-block-pattern-setup-list__item-description'
+		`${ baseClassName }__item-description`
 	);
 	return (
 		<div
-			className="block-editor-block-pattern-setup-list__list-item"
+			className={ `${ baseClassName }__list-item` }
 			aria-label={ pattern.title }
 			aria-describedby={ pattern.description ? descriptionId : undefined }
 		>
@@ -89,17 +90,20 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 				role="option"
 				as="div"
 				{ ...composite }
-				className="block-editor-block-pattern-setup-list__item"
+				className={ `${ baseClassName }__item` }
 				onClick={ () => onSelect( blocks ) }
 			>
 				<BlockPreview
 					blocks={ blocks }
 					viewportWidth={ viewportWidth }
 				/>
+				<div className={ `${ baseClassName }__item-title` }>
+					{ title }
+				</div>
 			</CompositeItem>
-			{ !! pattern.description && (
+			{ !! description && (
 				<VisuallyHidden id={ descriptionId }>
-					{ pattern.description }
+					{ description }
 				</VisuallyHidden>
 			) }
 		</div>
