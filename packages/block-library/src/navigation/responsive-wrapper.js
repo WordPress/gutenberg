@@ -47,7 +47,7 @@ export default function ResponsiveWrapper( props ) {
 					width="24"
 					height="24"
 					role="img"
-					ariaHidden="true"
+					aria-hidden="true"
 					focusable="false"
 				>
 					<Rect x="4" y="7.5" width="16" height="1.5" />
