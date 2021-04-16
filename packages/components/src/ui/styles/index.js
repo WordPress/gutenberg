@@ -1,8 +1,9 @@
 export { css } from './css';
+export { core } from './core';
 export { cache, cx, injectGlobal, keyframes } from './style-system';
 export { styled } from './styled';
-export { useResponsiveValue, useRTL } from './hooks';
+export { useResponsiveValue } from './hooks';
 export { ui } from './ui';
 
 /** @typedef {import('./components').StyleFrameProviderProps} StyleFrameProviderProps */
-export { StyleFrameProvider } from './components';
+export { StyleFrameProvider, View } from './components';
