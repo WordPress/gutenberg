@@ -142,7 +142,7 @@ const BlockPatternSetup = ( {
 	const [ activeSlide, setActiveSlide ] = useState( 0 );
 	const [ showBlank, setShowBlank ] = useState( false );
 	const { replaceBlock } = useDispatch( blockEditorStore );
-	const patterns = usePatternsSetup( blockName, filterPatternsFn );
+	const patterns = usePatternsSetup( clientId, blockName, filterPatternsFn );
 
 	if ( ! patterns?.length || showBlank ) {
 		return startBlankComponent;
