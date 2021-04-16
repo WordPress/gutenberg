@@ -8,7 +8,7 @@ import { __ } from '@wordpress/i18n';
 
 const DEFAULT_HEIGHT = 300;
 
-export default function PreviewIframe( { idBase, instance, isVisible } ) {
+export default function PreviewIframe( { idBase, instance } ) {
 	const ref = useRef();
 
 	const [ height, setHeight ] = useState( DEFAULT_HEIGHT );
@@ -18,13 +18,11 @@ export default function PreviewIframe( { idBase, instance, isVisible } ) {
 	}, [] );
 
 	useEffect( () => {
-		if ( isVisible ) {
-			adjustHeight();
-		}
-	}, [ isVisible, adjustHeight ] );
+		adjustHeight();
+	}, [ adjustHeight ] );
 
 	return (
-		<Disabled hidden={ ! isVisible }>
+		<Disabled>
 			{ /*
 			Rendering the preview in an iframe ensures compatibility with any
 			scripts that the widget uses. TODO: This chokes when the

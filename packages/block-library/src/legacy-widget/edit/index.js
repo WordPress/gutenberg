@@ -81,6 +81,9 @@ function NotEmpty( {
 	setAttributes,
 	isSelected,
 } ) {
+	const [ pendingInstance, setPendingInstance ] = useState( instance );
+	const [ hasPreview, setHasPreview ] = useState( false );
+
 	const { widgetType, hasResolved, isWidgetTypeHidden } = useSelect(
 		( select ) => {
 			const widgetTypeId = id ?? idBase;
@@ -100,18 +103,16 @@ function NotEmpty( {
 
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
-	const [ pendingInstance, setPendingInstance ] = useState( instance );
-
-	const applyChanges = () => {
-		setAttributes( { instance: pendingInstance } );
-		clearSelectedBlock();
-	};
-
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setPendingInstance( instance );
 		}
 	}, [ isSelected ] );
+
+	const applyChanges = () => {
+		setAttributes( { instance: pendingInstance } );
+		clearSelectedBlock();
+	};
 
 	if ( ! widgetType && ! hasResolved ) {
 		return <Spinner />;
@@ -164,16 +165,22 @@ function NotEmpty( {
 					idBase={ idBase }
 					instance={ pendingInstance }
 					setInstance={ setPendingInstance }
+					// TODO: Hm, this is awkward. Probably useForm() should move up a level.
+					setHasPreview={ setHasPreview }
 				/>
 			</FormWrapper>
 
-			{ idBase && (
-				<Preview
-					idBase={ idBase }
-					instance={ instance }
-					isVisible={ ! isSelected }
-				/>
-			) }
+			{ idBase &&
+				! isSelected &&
+				( hasPreview ? (
+					<Preview idBase={ idBase } instance={ instance } />
+				) : (
+					// TODO: This flashes for a second when enode request is pending.
+					<Placeholder>
+						{ widgetType.name && <h3>{ widgetType.name }</h3> }
+						<p>{ __( 'No preview available.' ) }</p>
+					</Placeholder>
+				) ) }
 		</>
 	);
 }
