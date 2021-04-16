@@ -96,6 +96,44 @@ export function getBlockVariations( state, blockName, scope ) {
 }
 
 /**
+ * Returns the active block variation for a given block based on its attributes.
+ *
+ * @param {Object}                state      Data state.
+ * @param {string}                blockName  Name of block (example: “core/columns”).
+ * @param {Object}                attributes Block attributes used to determine active variation.
+ * @param {WPBlockVariationScope} [scope]    Block variation scope name.
+ *
+ * @return {(WPBlockVariation|void)} Active block variation.
+ */
+// eslint-disable-next-line camelcase
+export function unstable__getActiveBlockVariation(
+	state,
+	blockName,
+	attributes,
+	scope
+) {
+	const variations = getBlockVariations( state, blockName, scope );
+
+	const match = variations?.find( ( variation ) => {
+		if ( typeof variation.isActive === 'function' ) {
+			return variation.isActive( attributes, variation.attributes );
+		}
+
+		if ( Array.isArray( variation.isActive ) ) {
+			return variation.isActive.every(
+				( attribute ) =>
+					attributes[ attribute ] ===
+					variation.attributes[ attribute ]
+			);
+		}
+
+		return false;
+	} );
+
+	return match;
+}
+
+/**
  * Returns the default block variation for the given block type.
  * When there are multiple variations annotated as the default one,
  * the last added item is picked. This simplifies registering overrides.

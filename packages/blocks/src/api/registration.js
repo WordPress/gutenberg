@@ -571,6 +571,28 @@ export const getBlockVariations = ( blockName, scope ) => {
 };
 
 /**
+ * Returns the active block variation for a given block based on its attributes.
+ *
+ * @param {string}                blockName  Name of block (example: “core/columns”).
+ * @param {Object}                attributes Block attributes used to determine active variation.
+ * @param {WPBlockVariationScope} [scope]    Block variation scope name.
+ *
+ * @return {(WPBlockVariation|void)} Active block variation.
+ */
+// eslint-disable-next-line camelcase
+export const unstable__getActiveBlockVariation = (
+	blockName,
+	attributes,
+	scope
+) => {
+	return select( blocksStore ).unstable__getActiveBlockVariation(
+		blockName,
+		attributes,
+		scope
+	);
+};
+
+/**
  * Registers a new block variation for the given block type.
  *
  * @param {string}           blockName Name of the block (example: “core/columns”).

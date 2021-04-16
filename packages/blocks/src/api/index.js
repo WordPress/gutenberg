@@ -123,6 +123,7 @@ export {
 	getBlockSupport,
 	hasBlockSupport,
 	getBlockVariations,
+	unstable__getActiveBlockVariation, // eslint-disable-line camelcase
 	isReusableBlock,
 	isTemplatePart,
 	getChildBlockNames,
