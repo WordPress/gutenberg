@@ -629,34 +629,35 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		$settings['styles'] = array();
 	} else {
 		/*
-		 * The styles setting is an array of CSS strings, so there is no direct
-		 * way to find the default styles. To maximize stability, load (again)
-		 * the default styles from disk and find its place in the array.
-		 *
-		 * See: https://github.com/WordPress/wordpress-develop/blob/5.0.3/src/wp-admin/edit-form-blocks.php#L168-L175
+		 * WordPress versions prior to 5.8 include a legacy editor styles file
+		 * that need to be removed.
+		 * This code can be removed from the Gutenberg plugin when the supported WP
+		 * version is 5.8
 		 */
+		$default_styles_file = is_rtl() ?
+			ABSPATH . WPINC . '/css/dist/editor/editor-styles-rtl.css' :
+			ABSPATH . WPINC . '/css/dist/editor/editor-styles.css';
 
-		$default_styles = file_get_contents(
-			is_rtl() ?
-				ABSPATH . WPINC . '/css/dist/editor/editor-styles-rtl.css' :
-				ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
-		);
+		if ( file_exists( $default_styles_file ) ) {
+			$default_styles = file_get_contents(
+				$default_styles_file
+			);
 
-		/*
-		 * Iterate backwards from the end of the array since the preferred
-		 * insertion point in case not found is prepended as first entry.
-		 */
-		for ( $i = count( $settings['styles'] ) - 1; $i >= 0; $i-- ) {
-			if ( isset( $settings['styles'][ $i ]['css'] ) &&
-					$default_styles === $settings['styles'][ $i ]['css'] ) {
-				break;
+			/*
+			* Iterate backwards from the end of the array since the preferred
+			* insertion point in case not found is prepended as first entry.
+			*/
+			for ( $i = count( $settings['styles'] ) - 1; $i >= 0; $i-- ) {
+				if ( isset( $settings['styles'][ $i ]['css'] ) &&
+						$default_styles === $settings['styles'][ $i ]['css'] ) {
+					break;
+				}
+			}
+
+			if ( isset( $i ) && $i >= 0 ) {
+				unset( $settings['styles'][ $i ] );
 			}
 		}
-	}
-
-	// Substitute default styles if found. Otherwise, prepend to setting array.
-	if ( isset( $i ) && $i >= 0 ) {
-		unset( $settings['styles'][ $i ] );
 	}
 
 	// Remove the default font editor styles for FSE themes.
