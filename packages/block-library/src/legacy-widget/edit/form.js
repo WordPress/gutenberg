@@ -20,12 +20,19 @@ import apiFetch from '@wordpress/api-fetch';
 import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 
-export default function Form( { id, idBase, instance, setInstance } ) {
+export default function Form( {
+	id,
+	idBase,
+	instance,
+	setInstance,
+	setHasPreview,
+} ) {
 	const { content, setFormData } = useForm( {
 		id,
 		idBase,
 		instance,
 		setInstance,
+		setHasPreview,
 	} );
 
 	const setFormDataDebounced = useCallback( debounce( setFormData, 300 ), [
@@ -46,7 +53,7 @@ export default function Form( { id, idBase, instance, setInstance } ) {
 	);
 }
 
-function useForm( { id, idBase, instance, setInstance } ) {
+function useForm( { id, idBase, instance, setInstance, setHasPreview } ) {
 	const isStillMounted = useRef( false );
 	const outgoingInstances = useRef( new Set() );
 	const [ content, setContent ] = useState( { html: null, key: 0 } );
@@ -75,12 +82,16 @@ function useForm( { id, idBase, instance, setInstance } ) {
 						} ) );
 					}
 				} else if ( idBase ) {
-					const { form } = await encodeWidget( idBase, instance );
+					const { form, preview } = await encodeWidget(
+						idBase,
+						instance
+					);
 					if ( isStillMounted.current ) {
 						setContent( ( { key } ) => ( {
 							html: form,
 							key: key + 1,
 						} ) );
+						setHasPreview( !! preview );
 					}
 				}
 			} catch ( error ) {
@@ -105,14 +116,14 @@ function useForm( { id, idBase, instance, setInstance } ) {
 						} ) );
 					}
 				} else if ( idBase ) {
-					const { instance: nextInstance } = await encodeWidget(
-						idBase,
-						instance,
-						formData
-					);
+					const {
+						instance: nextInstance,
+						preview,
+					} = await encodeWidget( idBase, instance, formData );
 					if ( isStillMounted.current ) {
 						outgoingInstances.current.add( nextInstance );
 						setInstance( nextInstance );
+						setHasPreview( !! preview );
 					}
 				}
 			} catch ( error ) {
@@ -160,6 +171,7 @@ async function encodeWidget( idBase, instance, formData = null ) {
 	return {
 		instance: response.instance,
 		form: response.form,
+		preview: response.preview,
 	};
 }
 
