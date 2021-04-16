@@ -27,7 +27,7 @@ All issues should have [one or more labels](https://github.com/WordPress/gutenbe
 
 Workflow labels start with “Needs” and may be applied as needed. Ideally, each workflow label will have a group that follows it, such as the Accessibility Team for `Needs Accessibility Feedback`, the Testing Team for `Needs Testing`, etc.
 
-[Priority High](https://github.com/WordPress/gutenberg/labels/Priority%20High) and [Priority OMGWTFBBQ](https://github.com/WordPress/gutenberg/labels/Priority%20OMGWTFBBQ) issues should have an assignee and/or be in an active milestone.
+[Priority High](https://github.com/WordPress/gutenberg/labels/%5BPriority%5D%20High) and [Priority OMGWTFBBQ](https://github.com/WordPress/gutenberg/labels/%5BPriority%5D%20OMGWTFBBQ) issues should have an assignee and/or be in an active milestone.
 
 Help requests or 'how to' questions should be posted in a relevant support forum as a first step. If something might be a bug but it's not clear, the Support Team or a forum volunteer can help troubleshoot the case to help get all the right information needed for an effective bug report.
 
@@ -35,11 +35,11 @@ Here are some labels you might commonly see:
 
 -   [Good First Issue](https://github.com/WordPress/gutenberg/labels/Good%20First%20Issue) - Issues identified as good for new contributors to work on. Comment to note that you intend to work on the issue and reference the issue number in the pull request you submit.
 -   [Good First Review](https://github.com/WordPress/gutenberg/labels/Good%20First%20Review) - Pull requests identified as good for new contributors who are interested in doing code reviews.
--   [Needs Accessibility Feedback](https://github.com/WordPress/gutenberg/labels/Accessibility) - Changes that impact accessibility and need corresponding review (e.g. markup changes).
+-   [Needs Accessibility Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Accessibility%20Feedback) - Changes that impact accessibility and need corresponding review (e.g. markup changes).
 -   [Needs Design Feedback](https://github.com/WordPress/gutenberg/labels/Needs%20Design%20Feedback) - Changes that modify the design or user experience in some way and need sign-off.
 -   [[Type] Bug](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Bug) - An existing feature is broken in some way.
 -   [[Type] Enhancement](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Enhancement) - Gutenberg would be better with this improvement added.
--   [[Type] Plugin / Extension Conflict](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Plugin%20%2F%20Extension%20Conflict) - Documentation of a conflict between Gutenberg and a plugin or extension. The plugin author should be informed and provided documentation on how to address.
+-   [[Type] Plugin Interoperability](https://github.com/WordPress/gutenberg/labels/%5BType%5D%20Plugin%20Interoperability) - Documentation of a conflict between Gutenberg and a plugin or extension. The plugin author should be informed and provided documentation on how to address.
 -   [[Status] Needs More Info](https://github.com/WordPress/gutenberg/labels/%5BStatus%5D%20Needs%20More%20Info) - The issue needs more information in order to be actionable and relevant. Typically this requires follow-up from the original reporter.
 
 [Check out the label directory](https://github.com/WordPress/gutenberg/labels) for a listing of all labels.

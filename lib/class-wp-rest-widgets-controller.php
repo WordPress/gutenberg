@@ -243,7 +243,6 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 		}
 
 		if (
-			$request->has_param( 'settings' ) || // Backwards compatibility. TODO: Remove.
 			$request->has_param( 'instance' ) ||
 			$request->has_param( 'form_data' )
 		) {
@@ -386,18 +385,7 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			);
 		}
 
-		if ( ! empty( $request['settings'] ) ) { // Backwards compatibility. TODO: Remove.
-			_deprecated_argument( 'settings', '10.2.0' );
-			if ( $widget_object ) {
-				$form_data = array(
-					"widget-$id_base" => array(
-						$number => $request['settings'],
-					),
-				);
-			} else {
-				$form_data = $request['settings'];
-			}
-		} elseif ( isset( $request['instance'] ) ) {
+		if ( isset( $request['instance'] ) ) {
 			if ( ! $widget_object ) {
 				return new WP_Error(
 					'rest_invalid_widget',
@@ -549,18 +537,6 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 			}
 		}
 
-		// Backwards compatibility. TODO: Remove.
-		$widget_object            = gutenberg_get_widget_object( $parsed_id['id_base'] );
-		$prepared['widget_class'] = $widget_object ? get_class( $widget_object ) : '';
-		$prepared['name']         = $widget['name'];
-		$prepared['description']  = ! empty( $widget['description'] ) ? $widget['description'] : '';
-		$prepared['number']       = $widget_object ? (int) $parsed_id['number'] : 0;
-		if ( rest_is_field_included( 'settings', $fields ) ) {
-			$instance = gutenberg_get_widget_instance( $widget_id );
-			// Use new stdClass so that JSON result is {} and not [].
-			$prepared['settings'] = empty( $instance ) ? new stdClass : $instance;
-		}
-
 		$context  = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		$prepared = $this->add_additional_fields_to_object( $prepared, $request );
 		$prepared = $this->filter_response_by_context( $prepared, $context );
@@ -707,34 +683,6 @@ class WP_REST_Widgets_Controller extends WP_REST_Controller {
 						},
 					),
 				),
-				// BEGIN backwards compatibility. TODO: Remove.
-				'widget_class'  => array(
-					'description' => __( 'DEPRECATED. Class name of the widget implementation.', 'gutenberg' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit', 'embed' ),
-				),
-				'name'          => array(
-					'description' => __( 'DEPRECATED. Name of the widget.', 'gutenberg' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit', 'embed' ),
-				),
-				'description'   => array(
-					'description' => __( 'DEPRECATED. Description of the widget.', 'gutenberg' ),
-					'type'        => 'string',
-					'context'     => array( 'view', 'edit', 'embed' ),
-				),
-				'number'        => array(
-					'description' => __( 'DEPRECATED. Number of the widget.', 'gutenberg' ),
-					'type'        => 'integer',
-					'context'     => array( 'view', 'edit', 'embed' ),
-				),
-				'settings'      => array(
-					'description' => __( 'DEPRECATED. Settings of the widget.', 'gutenberg' ),
-					'type'        => 'object',
-					'context'     => array( 'view', 'edit', 'embed' ),
-					'default'     => array(),
-				),
-				// END backwards compatibility.
 			),
 		);
 

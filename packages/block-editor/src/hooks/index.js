@@ -9,3 +9,5 @@ import './style';
 import './color';
 import './font-size';
 import './layout';
+
+export { getColorClassesAndStyles, useColorProps } from './use-color-props';
