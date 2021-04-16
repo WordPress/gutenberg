@@ -112,7 +112,7 @@ The first step is automated via `./bin/plugin/cli.js npm-latest` command. You on
 7. Update the `CHANGELOG.md` files of the packages with the new publish version calculated and commit to the `wp/trunk` branch. Assuming the package versions are written using this format `major.minor.patch`, make sure to bump at least the `minor` version number after every major WordPress release. For example, if the CHANGELOG of the package to be released indicates that the next unreleased version is `5.6.1`, choose `5.7.0` as a version in case of `minor` version. This is important as the patch version numbers should be reserved in case bug fixes are needed for a minor WordPress release (see below).
 8. Log-in to npm via the console: `npm login`. Note that you should have 2FA enabled.
 9. From the `wp/trunk` branch, install npm dependencies with `npm ci`.
-10. Run the script `npm run publish:prod`.
+10. Run the script `npm run publish:latest`.
     - When asked for the version numbers to choose for each package pick the values of the updated CHANGELOG files.
     - You'll be asked for your One-Time Password (OTP) a couple of times. This is the code from the 2FA authenticator app you use. Depending on how many packages are to be released you may be asked for more than one OTP, as they tend to expire before all packages are released.
     - If the publishing process ends up incomplete (perhaps because it timed-out or an bad OTP was introduce) you can resume it via [`lerna publish from-package`](https://github.com/lerna/lerna/tree/HEAD/commands/publish#bump-from-package).
@@ -215,11 +215,11 @@ Now that the changes have been committed to the `wp/trunk` branch and the Travis
     > @wordpress/scripts
     > lerna success found 3 packages ready to publish
     > ```
-2. Run the `npm run publish:prod` command (see more in [package release process]) but when asked for the version numbers to choose for each package use the versions you made note of above when updating each packages `CHANGELOG.md` file.
+2. Run the `npm run publish:latest` command (see more in [package release process]) but when asked for the version numbers to choose for each package use the versions you made note of above when updating each packages `CHANGELOG.md` file.
     > Truncated example of publishing process output
     >
     > ```
-    > npm run publish:prod
+    > npm run publish:latest
     >
     > Build Progress: [==============================] 100%
     > lerna notice cli v3.18.2

@@ -98,8 +98,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				'source'         => 'theme',
 				'type'           => 'wp_template_part',
 				'wp_id'          => null,
-				// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
-				'area'           => WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
+				'area'           => WP_TEMPLATE_PART_AREA_HEADER,
 				'has_theme_file' => true,
 			),
 			find_and_normalize_template_by_id( $data, 'tt1-blocks//header' )
@@ -153,8 +152,7 @@ class WP_REST_Template_Controller_Test extends WP_Test_REST_Controller_Testcase 
 				'source'         => 'theme',
 				'type'           => 'wp_template_part',
 				'wp_id'          => null,
-				// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
-				'area'           => WP_TEMPLATE_PART_AREA_UNCATEGORIZED,
+				'area'           => WP_TEMPLATE_PART_AREA_HEADER,
 				'has_theme_file' => true,
 			),
 			$data

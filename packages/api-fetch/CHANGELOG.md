@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.23.1 (2021-04-15)
+
 ### Bug Fixes
 
 -   Align exported type names with the DefinitelyTyped type names and actually export those types.
