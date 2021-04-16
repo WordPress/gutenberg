@@ -9,6 +9,7 @@ import { dropRight, get, times } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, RangeControl, Notice } from '@wordpress/components';
+
 import {
 	InspectorControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
