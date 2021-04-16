@@ -681,16 +681,38 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 }
 
 /**
- * Action triggered to save specified edits for the site entity.
+ * Action triggered to save only specified properties for the entity.
  *
- * @param {Array} itemsToSave List of site entity keys to save.
+ * @param {string} kind     Kind of the entity.
+ * @param {string} name     Name of the entity.
+ * @param {Object} recordId ID of the record.
+ * @param {Array} itemsToSave List of entity properties to save.
+ * @param {Object} options  Saving options.
  */
-export function* __experimentalSaveSiteEntityItems( itemsToSave ) {
+export function* __experimentalSaveSpecifiedEntityEdits(
+	kind,
+	name,
+	recordId,
+	itemsToSave,
+	options
+) {
+	if (
+		! ( yield controls.select(
+			'core',
+			'hasEditsForEntityRecord',
+			kind,
+			name,
+			recordId
+		) )
+	) {
+		return;
+	}
 	const edits = yield controls.select(
 		'core',
 		'getEntityRecordNonTransientEdits',
-		'root',
-		'site'
+		kind,
+		name,
+		recordId
 	);
 	const editsToSave = {};
 	for ( const edit in edits ) {
@@ -698,7 +720,7 @@ export function* __experimentalSaveSiteEntityItems( itemsToSave ) {
 			editsToSave[ edit ] = edits[ edit ];
 		}
 	}
-	return yield saveEntityRecord( 'root', 'site', editsToSave );
+	return yield* saveEntityRecord( kind, name, editsToSave, options );
 }
 
 /**

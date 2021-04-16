@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback } from '@wordpress/element';
 import { close as closeIcon } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -28,7 +29,7 @@ const TRANSLATED_SITE_PROTPERTIES = {
 function EntitiesSavedStates( { isOpen, close } ) {
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
 		const dirtyRecords = select(
-			'core'
+			coreStore
 		).__experimentalGetDirtyEntityRecords();
 
 		// Remove site object and decouple into its edited pieces.
@@ -36,18 +37,18 @@ function EntitiesSavedStates( { isOpen, close } ) {
 			( record ) => ! ( record.kind === 'root' && record.name === 'site' )
 		);
 
-		const siteEdits = select( 'core' ).getEntityRecordEdits(
+		const siteEdits = select( coreStore ).getEntityRecordEdits(
 			'root',
 			'site'
 		);
 
 		const siteEditsAsEntities = [];
-		for ( const field in siteEdits ) {
+		for ( const property in siteEdits ) {
 			siteEditsAsEntities.push( {
 				kind: 'root',
 				name: 'site',
-				title: TRANSLATED_SITE_PROTPERTIES[ field ] || field,
-				key: field,
+				title: TRANSLATED_SITE_PROTPERTIES[ property ] || property,
+				property,
 			} );
 		}
 		const dirtyRecordsWithSiteItems = [
@@ -61,8 +62,8 @@ function EntitiesSavedStates( { isOpen, close } ) {
 	}, [] );
 	const {
 		saveEditedEntityRecord,
-		__experimentalSaveSiteEntityItems: saveSiteEntityItems,
-	} = useDispatch( 'core' );
+		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
+	} = useDispatch( coreStore );
 
 	// To group entities by type.
 	const partitionedSavables = Object.values(
@@ -72,33 +73,38 @@ function EntitiesSavedStates( { isOpen, close } ) {
 	// Unchecked entities to be ignored by save function.
 	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
 
-	const setUnselectedEntities = ( { kind, name, key }, checked ) => {
+	const setUnselectedEntities = (
+		{ kind, name, key, property },
+		checked
+	) => {
 		if ( checked ) {
 			_setUnselectedEntities(
 				unselectedEntities.filter(
 					( elt ) =>
 						elt.kind !== kind ||
 						elt.name !== name ||
-						elt.key !== key
+						elt.key !== key ||
+						elt.property !== property
 				)
 			);
 		} else {
 			_setUnselectedEntities( [
 				...unselectedEntities,
-				{ kind, name, key },
+				{ kind, name, key, property },
 			] );
 		}
 	};
 
 	const saveCheckedEntities = () => {
 		const entitiesToSave = dirtyEntityRecords.filter(
-			( { kind, name, key } ) => {
+			( { kind, name, key, property } ) => {
 				return ! some(
 					unselectedEntities,
 					( elt ) =>
 						elt.kind === kind &&
 						elt.name === name &&
-						elt.key === key
+						elt.key === key &&
+						elt.property === property
 				);
 			}
 		);
@@ -106,14 +112,14 @@ function EntitiesSavedStates( { isOpen, close } ) {
 		close( entitiesToSave );
 
 		const siteItemsToSave = [];
-		entitiesToSave.forEach( ( { kind, name, key } ) => {
+		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
 			if ( 'root' === kind && 'site' === name ) {
-				siteItemsToSave.push( key );
+				siteItemsToSave.push( property );
 			} else {
 				saveEditedEntityRecord( kind, name, key );
 			}
 		} );
-		saveSiteEntityItems( siteItemsToSave );
+		saveSpecifiedEntityEdits( 'root', 'site', undefined, siteItemsToSave );
 	};
 
 	// Explicitly define this with no argument passed.  Using `close` on
