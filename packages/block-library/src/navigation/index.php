@@ -122,7 +122,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
 	$script_path                 = __DIR__ . '/navigation/frontend.js';
-	$should_load_frontend_script = $attributes['responsiveNavigation'] && ! wp_script_is( 'core_block_navigation_load_frontend_scripts' ) && file_exists( $script_path );
+	$should_load_frontend_script = $attributes['isResponsive'] && ! wp_script_is( 'core_block_navigation_load_frontend_scripts' ) && file_exists( $script_path );
 
 	if ( $should_load_frontend_script ) {
 		wp_enqueue_script(
@@ -145,7 +145,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		$font_sizes['css_classes'],
 		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
-		isset( $attributes['responsiveNavigation'] ) && true === $attributes['responsiveNavigation'] ? array( 'is-responsive' ) : array()
+		isset( $attributes['isResponsive'] ) && true === $attributes['isResponsive'] ? array( 'is-responsive' ) : array()
 	);
 
 	$inner_blocks_html = '';
@@ -165,7 +165,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	$modal_unique_id = uniqid();
 
 	// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive.
-	$responsive_container_markup = isset( $attributes['responsiveNavigation'] ) && true === $attributes['responsiveNavigation'] ? sprintf(
+	$responsive_container_markup = isset( $attributes['isResponsive'] ) && true === $attributes['isResponsive'] ? sprintf(
 		'<button class="wp-block-navigation__responsive-container-open" data-micromodal-trigger="modal-%2$s" aria-label="Open menu"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
 			<div class="wp-block-navigation__responsive-container" id="modal-%2$s" aria-hidden="true">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>

@@ -5,7 +5,7 @@
 		"isValid": true,
 		"attributes": {
 			"showSubmenuIcon": true,
-			"responsiveNavigation": true
+			"isResponsive": true
 		},
 		"innerBlocks": [],
 		"originalContent": ""
