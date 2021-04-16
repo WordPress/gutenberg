@@ -1,0 +1,11 @@
+.edit-post-post-template__modal-actions {
+	padding-top: $grid-unit-15;
+}
+
+.edit-post-post-template__actions {
+	margin-bottom: $grid-unit-30;
+
+	button:not(:last-child) {
+		margin-right: $grid-unit-10;
+	}
+}

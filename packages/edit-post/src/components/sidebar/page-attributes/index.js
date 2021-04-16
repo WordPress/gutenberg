@@ -8,18 +8,20 @@ import { get, partial } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, PanelRow } from '@wordpress/components';
-import { compose } from '@wordpress/compose';
 import {
+	store as editorStore,
 	PageAttributesCheck,
 	PageAttributesOrder,
 	PageAttributesParent,
 	PageTemplate,
 } from '@wordpress/editor';
-import { withSelect, withDispatch } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
+import PostTemplateActions from './post-template-actions';
 import { store as editPostStore } from '../../../store';
 
 /**
@@ -27,15 +29,28 @@ import { store as editPostStore } from '../../../store';
  */
 const PANEL_NAME = 'page-attributes';
 
-export function PageAttributes( {
-	isEnabled,
-	isOpened,
-	onTogglePanel,
-	postType,
-} ) {
+export function PageAttributes() {
+	const { isEnabled, isOpened, postType } = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( editorStore );
+		const { isEditorPanelEnabled, isEditorPanelOpened } = select(
+			editPostStore
+		);
+		const { getPostType } = select( coreStore );
+		return {
+			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
+			isOpened: isEditorPanelOpened( PANEL_NAME ),
+			postType: getPostType( getEditedPostAttribute( 'type' ) ),
+		};
+	}, [] );
+
+	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
+
 	if ( ! isEnabled || ! postType ) {
 		return null;
 	}
+
+	const onTogglePanel = partial( toggleEditorPanelOpened, PANEL_NAME );
+
 	return (
 		<PageAttributesCheck>
 			<PanelBody
@@ -48,6 +63,7 @@ export function PageAttributes( {
 				onToggle={ onTogglePanel }
 			>
 				<PageTemplate />
+				<PostTemplateActions />
 				<PageAttributesParent />
 				<PanelRow>
 					<PageAttributesOrder />
@@ -57,25 +73,4 @@ export function PageAttributes( {
 	);
 }
 
-const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( 'core/editor' );
-	const { isEditorPanelEnabled, isEditorPanelOpened } = select(
-		editPostStore
-	);
-	const { getPostType } = select( 'core' );
-	return {
-		isEnabled: isEditorPanelEnabled( PANEL_NAME ),
-		isOpened: isEditorPanelOpened( PANEL_NAME ),
-		postType: getPostType( getEditedPostAttribute( 'type' ) ),
-	};
-} );
-
-const applyWithDispatch = withDispatch( ( dispatch ) => {
-	const { toggleEditorPanelOpened } = dispatch( editPostStore );
-
-	return {
-		onTogglePanel: partial( toggleEditorPanelOpened, PANEL_NAME ),
-	};
-} );
-
-export default compose( applyWithSelect, applyWithDispatch )( PageAttributes );
+export default PageAttributes;

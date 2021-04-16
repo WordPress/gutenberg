@@ -9,6 +9,7 @@ import {
 	trashAllPosts,
 	openPreviewPage,
 	openDocumentSettingsSidebar,
+	openSidebarPanelWithTitle,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Post Editor Template mode', () => {
@@ -42,6 +43,7 @@ describe( 'Post Editor Template mode', () => {
 
 		// Switch to template mode.
 		await openDocumentSettingsSidebar();
+		await openSidebarPanelWithTitle( 'Post Attributes' );
 		const editTemplateXPath =
 			"//*[contains(@class, 'edit-post-post-template__actions')]//button[contains(text(), 'Edit')]";
 		const switchLink = await page.waitForXPath( editTemplateXPath );
@@ -101,6 +103,7 @@ describe( 'Post Editor Template mode', () => {
 
 		// Create a new custom template.
 		await openDocumentSettingsSidebar();
+		await openSidebarPanelWithTitle( 'Post Attributes' );
 		const newTemplateXPath =
 			"//*[contains(@class, 'edit-post-post-template__actions')]//button[contains(text(), 'New')]";
 		const newButton = await page.waitForXPath( newTemplateXPath );
