@@ -12,7 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 -   [*] Image block: Improve text entry for long alt text. [#29670]
--	The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. 
+-	The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]
 
 ## 1.50.0
 
