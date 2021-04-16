@@ -300,7 +300,7 @@ function gutenberg_output_block_nav_menu( $output, $args ) {
 	}
 
 	$block_attributes = array();
-	if( isset( $args->block_attributes ) ) {
+	if ( isset( $args->block_attributes ) ) {
 		$block_attributes = $args->block_attributes;
 	}
 
