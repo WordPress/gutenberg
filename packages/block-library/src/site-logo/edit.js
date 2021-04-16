@@ -141,6 +141,10 @@ const SiteLogo = ( {
 	// becomes available.
 	const maxWidthBuffer = maxWidth * 2.5;
 
+	// Set the default width to a responsible size.
+	// Note that this width is also set in the attached CSS file.
+	const defaultWidth = 120;
+
 	let showRightHandle = false;
 	let showLeftHandle = false;
 
@@ -181,6 +185,10 @@ const SiteLogo = ( {
 						}
 						min={ minWidth }
 						max={ maxWidthBuffer }
+						initialPosition={ Math.min(
+							defaultWidth,
+							maxWidthBuffer
+						) }
 						value={ width || '' }
 						disabled={ ! isResizable }
 					/>
