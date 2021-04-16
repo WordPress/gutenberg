@@ -15,12 +15,16 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import HeadingLevelDropdown from './heading-level-dropdown';
-import maybeUpdateAnchor from './autogenerate-anchors';
+import {
+	getAllHeadingAnchors,
+	maybeUpdateAnchor,
+} from './autogenerate-anchors';
 
 function HeadingEdit( {
 	attributes,
@@ -38,11 +42,15 @@ function HeadingEdit( {
 		} ),
 		style: mergedStyle,
 	} );
+	const allHeadingAnchors = useSelect( ( select ) => {
+		const allBlocks = select( 'core/block-editor' ).getBlocks();
+		return getAllHeadingAnchors( allBlocks, clientId );
+	}, [] );
 	useEffect( () => {
 		const newAnchor = maybeUpdateAnchor(
 			attributes.anchor,
 			content,
-			clientId
+			allHeadingAnchors
 		);
 		if ( newAnchor !== attributes.anchor ) {
 			setAttributes( { anchor: newAnchor } );

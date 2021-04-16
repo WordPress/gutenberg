@@ -1,19 +1,18 @@
 /**
  * External dependencies
  */
-import { isEmpty, isNil, deburr, trim } from 'lodash';
+import { isNil, deburr, trim } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { select } from '@wordpress/data';
 import { cleanForSlug } from '@wordpress/url';
 
 // This dummy element is used to strip all markup in getTextWithoutMarkup below.
 const dummyElement = document.createElement( 'div' );
 
 /**
- * Runs a function over all blocks, including nested blocks.
+ * Runs a callback over all blocks, including nested blocks.
  *
  * @param {Object[]} blocks   The blocks.
  * @param {Function} callback The callback.
@@ -45,12 +44,12 @@ const getTextWithoutMarkup = ( text ) => {
 /**
  * Get all heading anchors.
  *
+ * @param {Object} blockList An object containing all blocks.
  * @param {string} excludeId A block ID we want to exclude.
  *
  * @return {string[]} Return an array of anchors.
  */
-const getAllHeadingAnchors = ( excludeId ) => {
-	const blockList = select( 'core/block-editor' ).getBlocks();
+export const getAllHeadingAnchors = ( blockList, excludeId ) => {
 	const anchors = [];
 
 	recurseOverBlocks( blockList, ( block ) => {
@@ -66,24 +65,17 @@ const getAllHeadingAnchors = ( excludeId ) => {
 	return anchors;
 };
 
-// Whether this is an old post and we need to generate all headings or not.
-const noAnchorsExist = isEmpty( getAllHeadingAnchors() );
-
 /**
  * Generate the anchor for a heading.
  *
- * @param {string}   anchor   The heading anchor.
- * @param {string}   content  The block content.
- * @param {clientId} clientId The block ID.
+ * @param {string}   anchor            The heading anchor.
+ * @param {string}   content           The block content.
+ * @param {string[]} allHeadingAnchors An array containing all headings anchors.
  *
  * @return {string} Return the heading anchor.
  */
-const generateAnchor = ( anchor, content, clientId ) => {
+const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 	content = getTextWithoutMarkup( content );
-	// When anchor isn't set for a heading that already has content set an empty string.
-	if ( isNil( anchor ) && ! isEmpty( content ) ) {
-		return '';
-	}
 
 	// Get the slug.
 	let slug = cleanForSlug( content );
@@ -102,7 +94,7 @@ const generateAnchor = ( anchor, content, clientId ) => {
 	let i = 0;
 
 	// If the anchor already exists in another heading, append -i.
-	while ( getAllHeadingAnchors( clientId ).includes( anchor ) ) {
+	while ( allHeadingAnchors.includes( anchor ) ) {
 		i += 1;
 		anchor = baseAnchor + '-' + i;
 	}
@@ -113,14 +105,14 @@ const generateAnchor = ( anchor, content, clientId ) => {
 /**
  * Updates the anchor if required.
  *
- * @param {string}   anchor   The heading anchor.
- * @param {string}   content  The block content.
- * @param {clientId} clientId The block ID.
+ * @param {string}   anchor            The heading anchor.
+ * @param {string}   content           The block content.
+ * @param {string[]} allHeadingAnchors An array containing all headings anchors.
  *
  * @return {string} The anchor.
  */
-export default function maybeUpdateAnchor( anchor, content, clientId ) {
-	return noAnchorsExist || isNil( anchor ) || anchor.startsWith( 'wp-' )
-		? generateAnchor( anchor, content, clientId )
+export const maybeUpdateAnchor = ( anchor, content, allHeadingAnchors ) => {
+	return isNil( anchor ) || anchor.startsWith( 'wp-' )
+		? generateAnchor( anchor, content, allHeadingAnchors )
 		: anchor;
-}
+};
