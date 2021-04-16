@@ -361,7 +361,7 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background-color: #fff;
+
 	/*
 		arbitrary, high z-index
 		@todo: find correct value in order to make sure
@@ -427,7 +427,7 @@
 }
 
 // Default menu background and font color.
-.wp-block-navigation:not(.has-background) .wp-block-navigation__responsive-container {
+.wp-block-navigation:not(.has-background) .wp-block-navigation__responsive-container.is-menu-open {
 	background-color: #fff;
 	color: #000;
 }
