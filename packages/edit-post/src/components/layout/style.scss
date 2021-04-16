@@ -115,3 +115,11 @@
 		height: 100%;
 	}
 }
+
+.edit-post-layout__sticky-block-toolbar:not(:empty) {
+	position: sticky;
+	z-index: 10000;
+	top: 0;
+	background: $white;
+	border-bottom: 1px solid $gray-300;
+}

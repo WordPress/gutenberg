@@ -36,32 +36,23 @@ export default function PostTitle() {
 		clearSelectedBlock,
 		insertBlocks,
 	} = useDispatch( 'core/block-editor' );
-	const {
-		isCleanNewPost,
-		title,
-		placeholder,
-		isFocusMode,
-		hasFixedToolbar,
-	} = useSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-			isCleanNewPost: _isCleanNewPost,
-		} = select( 'core/editor' );
-		const { getSettings } = select( 'core/block-editor' );
-		const {
-			titlePlaceholder,
-			focusMode,
-			hasFixedToolbar: _hasFixedToolbar,
-		} = getSettings();
+	const { isCleanNewPost, title, placeholder, isFocusMode } = useSelect(
+		( select ) => {
+			const {
+				getEditedPostAttribute,
+				isCleanNewPost: _isCleanNewPost,
+			} = select( 'core/editor' );
+			const { getSettings } = select( 'core/block-editor' );
+			const { titlePlaceholder, focusMode } = getSettings();
 
-		return {
-			isCleanNewPost: _isCleanNewPost(),
-			title: getEditedPostAttribute( 'title' ),
-			placeholder: titlePlaceholder,
-			isFocusMode: focusMode,
-			hasFixedToolbar: _hasFixedToolbar,
-		};
-	} );
+			return {
+				isCleanNewPost: _isCleanNewPost(),
+				title: getEditedPostAttribute( 'title' ),
+				placeholder: titlePlaceholder,
+				isFocusMode: focusMode,
+			};
+		}
+	);
 
 	useEffect( () => {
 		if ( ! ref.current ) {
@@ -169,7 +160,6 @@ export default function PostTitle() {
 		{
 			'is-selected': isSelected,
 			'is-focus-mode': isFocusMode,
-			'has-fixed-toolbar': hasFixedToolbar,
 		}
 	);
 	const decodedPlaceholder = decodeEntities( placeholder );

@@ -10,7 +10,6 @@ import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
-import { BlockToolbar } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -25,9 +24,6 @@ import { store as editPostStore } from '../../store';
 
 function Header( { setEntitiesSavedStatesCallback } ) {
 	const {
-		hasFixedToolbar,
-		previewDeviceType,
-		isTemplateMode,
 		hasActiveMetaboxes,
 		isPublishSidebarOpened,
 		isSaving,
@@ -49,9 +45,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 		} ),
 		[]
 	);
-
-	const displayBlockToolbar =
-		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
 
 	const isLargeViewport = useViewportMatch( 'large' );
 
@@ -104,16 +97,6 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 					) }
 				</div>
 			</div>
-
-			{ displayBlockToolbar && (
-				<div
-					className={ classnames( 'edit-post-header__block-toolbar', {
-						'is-pushed-down': isTemplateMode,
-					} ) }
-				>
-					<BlockToolbar hideDragHandle />
-				</div>
-			) }
 		</div>
 	);
 }

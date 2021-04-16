@@ -92,31 +92,6 @@
 	}
 }
 
-// Block toolbar when fixed to the top of the screen.
-.edit-post-header__block-toolbar {
-	height: $block-toolbar-height;
-	.block-editor-block-toolbar .components-toolbar-group,
-	.block-editor-block-toolbar .components-toolbar {
-		border-top: none;
-		border-bottom: none;
-	}
-
-	.is-sidebar-opened & {
-		display: none;
-	}
-
-	.block-editor-block-toolbar__block-parent-selector-wrapper {
-		display: none;
-	}
-
-	@include break-medium {
-		.is-sidebar-opened & {
-			display: block;
-			right: $sidebar-width;
-		}
-	}
-}
-
 .edit-post-header-toolbar .edit-post-header-toolbar__left > .edit-post-header-toolbar__inserter-toggle.has-icon {
 	margin-right: $grid-unit-10;
 	// Special dimensions for this button.

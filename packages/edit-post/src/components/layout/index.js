@@ -16,6 +16,7 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
+	BlockToolbar,
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
 import {
@@ -74,6 +75,7 @@ const interfaceLabels = {
 function Layout( { styles } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
+	const isLargeViewport = useViewportMatch( 'large' );
 	const {
 		openGeneralSidebar,
 		closeGeneralSidebar,
@@ -94,12 +96,16 @@ function Layout( { styles } ) {
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
+		previewDeviceType,
 	} = useSelect( ( select ) => {
 		const editorSettings = select( 'core/editor' ).getEditorSettings();
 		return {
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
 			),
+			previewDeviceType: select(
+				editPostStore
+			).__experimentalGetPreviewDeviceType(),
 			sidebarIsOpened: !! (
 				select( interfaceStore ).getActiveComplementaryArea(
 					editPostStore.name
@@ -136,7 +142,6 @@ function Layout( { styles } ) {
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
 		'is-sidebar-opened': sidebarIsOpened,
-		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 		'show-icon-labels': showIconLabels,
 	} );
@@ -176,6 +181,8 @@ function Layout( { styles } ) {
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );
+	const displayStickyBlockToolbar =
+		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
 
 	return (
 		<>
@@ -247,6 +254,11 @@ function Layout( { styles } ) {
 				}
 				content={
 					<>
+						{ displayStickyBlockToolbar && (
+							<div className="edit-post-layout__sticky-block-toolbar">
+								<BlockToolbar hideDragHandle />
+							</div>
+						) }
 						<EditorNotices />
 						{ ( mode === 'text' || ! isRichEditingEnabled ) && (
 							<TextEditor />
