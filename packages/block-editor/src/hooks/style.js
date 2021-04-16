@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { capitalize, get, has, omitBy, startsWith } from 'lodash';
+import { capitalize, get, has, omit, omitBy, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -20,7 +20,6 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
-import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { SPACING_SUPPORT_KEY, PaddingEdit } from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
 
@@ -128,14 +127,17 @@ export function addSaveProps( props, blockType, attributes ) {
 	}
 
 	const { style } = attributes;
-	const filteredStyle = omitKeysNotToSerialize( style, {
+	let filteredStyle = omitKeysNotToSerialize( style, {
 		border: getBlockSupport( blockType, BORDER_SUPPORT_KEY ),
 		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
-		[ FONT_SIZE_SUPPORT_KEY ]: getBlockSupport(
-			blockType,
-			FONT_SIZE_SUPPORT_KEY
-		),
 	} );
+
+	if (
+		getBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
+	) {
+		filteredStyle = omit( filteredStyle, TYPOGRAPHY_SUPPORT_KEYS );
+	}
+
 	props.style = {
 		...getInlineStyles( filteredStyle ),
 		...props.style,
