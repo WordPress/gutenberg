@@ -57,6 +57,12 @@ function addSaveProps( props, blockType, attributes ) {
 		return props;
 	}
 
+	if (
+		hasBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
+	) {
+		return props;
+	}
+
 	// Use TokenList to dedupe classes.
 	const classes = new TokenList( props.className );
 	classes.add( getFontSizeClass( attributes.fontSize ) );
