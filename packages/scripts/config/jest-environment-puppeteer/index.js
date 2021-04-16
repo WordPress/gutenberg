@@ -28,7 +28,10 @@ const chalk = require( 'chalk' );
 const { readConfig, getPuppeteer } = require( './config' );
 
 const handleError = ( error ) => {
-	// To match the same behavior in jest-jasmine2.
+	// To match the same behavior in jest-jasmine2:
+	// https://github.com/facebook/jest/blob/1be8d737abd0e2f30e3314184a0efc372ad6d88f/packages/jest-jasmine2/src/jasmine/Env.ts#L250-L251
+	// Emitting an uncaughtException event to the process will throw an
+	// empty error which is very hard to debug in puppeteer context.
 	// eslint-disable-next-line no-console
 	console.error( error );
 };
