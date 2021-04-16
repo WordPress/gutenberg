@@ -95,27 +95,27 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
  * @param  array $attributes Navigation block attributes.
  * @return string HTML markup of a generated Navigation Block.
  */
-function get_classic_navigation_elements( $attributes ){
+function get_classic_navigation_elements( $attributes ) {
 
 	if ( ! current_theme_supports( 'block-nav-menus' ) ) {
 		return '';
 	}
 
-	if( ! array_key_exists( 'source', $attributes ) ) {
+	if ( ! array_key_exists( 'source', $attributes ) ) {
 		return '';
 	}
 
 	$block_attributes = $attributes;
-	unset($block_attributes['source']);
+	unset( $block_attributes['source'] );
 
 	return wp_nav_menu(
 		array(
-			'theme_location' 	=> $attributes['source'],
-			'block_attributes'	=> $block_attributes,
-			'container'      	=> '',
-			'items_wrap'     	=> '%3$s',
-			'fallback_cb'    	=> false,
-			'echo'           	=> false,
+			'theme_location'   => $attributes['source'],
+			'block_attributes' => $block_attributes,
+			'container'        => '',
+			'items_wrap'       => '%3$s',
+			'fallback_cb'      => false,
+			'echo'             => false,
 		)
 	);
 }
@@ -157,7 +157,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
 	if ( empty( $block->inner_blocks ) ) {
-		return get_classic_navigation_elements ( $attributes );
+		return get_classic_navigation_elements( $attributes );
 	}
 
 	$colors     = block_core_navigation_build_css_colors( $attributes );
