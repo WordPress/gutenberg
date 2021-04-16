@@ -477,9 +477,9 @@
 }
 
 // The menu adds a wrapping container.
-.wp-block-navigation__responsive-close,
-.wp-block-navigation__responsive-dialog,
-.wp-block-navigation__responsive-container-content {
+.is-menu-open .wp-block-navigation__responsive-close,
+.is-menu-open .wp-block-navigation__responsive-dialog,
+.is-menu-open .wp-block-navigation__responsive-container-content {
 	width: 100%;
 	height: 100%;
 }
