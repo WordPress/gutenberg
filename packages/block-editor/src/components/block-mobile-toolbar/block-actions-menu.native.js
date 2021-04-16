@@ -291,10 +291,10 @@ export default compose(
 
 		const selectedBlockClientId = first( getSelectedBlockClientIds() );
 		const selectedBlock = selectedBlockClientId
-			? getBlocksByClientId( selectedBlockClientId )
+			? first( getBlocksByClientId( selectedBlockClientId ) )
 			: undefined;
 		const selectedBlockPossibleTransformations = selectedBlock
-			? getBlockTransformItems( selectedBlock, rootClientId )
+			? getBlockTransformItems( [ selectedBlock ], rootClientId )
 			: [];
 
 		return {
