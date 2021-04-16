@@ -3,11 +3,7 @@
  */
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
-import {
-	ToolSelector,
-	BlockToolbar,
-	__experimentalPreviewOptions as PreviewOptions,
-} from '@wordpress/block-editor';
+import { ToolSelector, BlockToolbar } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { _x, __ } from '@wordpress/i18n';
@@ -26,6 +22,7 @@ import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
+import PreviewMenu from './preview-menu';
 import { store as editSiteStore } from '../../store';
 
 export default function Header( {
@@ -79,11 +76,9 @@ export default function Header( {
 		};
 	}, [] );
 
-	const {
-		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
-		setIsInserterOpened,
-		setIsListViewOpened,
-	} = useDispatch( editSiteStore );
+	const { setIsInserterOpened, setIsListViewOpened } = useDispatch(
+		editSiteStore
+	);
 
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const displayBlockToolbar =
@@ -165,10 +160,7 @@ export default function Header( {
 
 			<div className="edit-site-header_end">
 				<div className="edit-site-header__actions">
-					<PreviewOptions
-						deviceType={ deviceType }
-						setDeviceType={ setPreviewDeviceType }
-					/>
+					<PreviewMenu />
 					<SaveButton
 						openEntitiesSavedStates={ openEntitiesSavedStates }
 						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
