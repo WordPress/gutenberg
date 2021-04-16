@@ -30,8 +30,9 @@ describe( 'Gutenberg Editor tests for List block (end)', () => {
 		await editorPage.sendTextToListBlock( listBlockElement, '\n' );
 
 		const html = await editorPage.getHtmlContent();
-		expect( testData.listEndedHtml.toLowerCase() ).toBe(
-			html.toLowerCase()
+
+		expect( html.toLowerCase() ).toBe(
+			testData.listEndedHtml.toLowerCase()
 		);
 	} );
 } );

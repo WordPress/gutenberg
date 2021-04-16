@@ -5,6 +5,7 @@ const { command } = require( 'execa' );
 const glob = require( 'fast-glob' );
 const { mkdtemp, readFile } = require( 'fs' ).promises;
 const { fromPairs, isObject } = require( 'lodash' );
+const npmPackageArg = require( 'npm-package-arg' );
 const { tmpdir } = require( 'os' );
 const { join } = require( 'path' );
 const rimraf = require( 'rimraf' ).sync;
@@ -29,6 +30,7 @@ const predefinedBlockTemplates = {
 			editorStyle: 'file:./editor.css',
 			style: 'file:./style.css',
 		},
+		templatesPath: join( __dirname, 'templates', 'es5' ),
 	},
 	esnext: {
 		defaultValues: {
@@ -37,12 +39,16 @@ const predefinedBlockTemplates = {
 			description:
 				'Example block written with ESNext standard and JSX support – build step required.',
 			dashicon: 'smiley',
+			supports: {
+				html: false,
+			},
 			npmDependencies: [
 				'@wordpress/block-editor',
 				'@wordpress/blocks',
 				'@wordpress/i18n',
 			],
 		},
+		templatesPath: join( __dirname, 'templates', 'esnext' ),
 	},
 };
 
@@ -94,16 +100,41 @@ const externalTemplateExists = async ( templateName ) => {
 	return true;
 };
 
+const configToTemplate = async ( {
+	assetsPath,
+	defaultValues = {},
+	templatesPath,
+} ) => {
+	if ( ! isObject( defaultValues ) || ! templatesPath ) {
+		throw new CLIError( 'Template found but invalid definition provided.' );
+	}
+
+	return {
+		defaultValues,
+		outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
+		outputTemplates: await getOutputTemplates( templatesPath ),
+	};
+};
+
 const getBlockTemplate = async ( templateName ) => {
 	if ( predefinedBlockTemplates[ templateName ] ) {
-		return {
-			...predefinedBlockTemplates[ templateName ],
-			outputTemplates: await getOutputTemplates(
-				join( __dirname, 'templates', templateName )
-			),
-			outputAssets: {},
-		};
+		return await configToTemplate(
+			predefinedBlockTemplates[ templateName ]
+		);
 	}
+
+	try {
+		return await configToTemplate( require( templateName ) );
+	} catch ( error ) {
+		if ( error instanceof CLIError ) {
+			throw error;
+		} else if ( error.code !== 'MODULE_NOT_FOUND' ) {
+			throw new CLIError(
+				`Invalid block template loaded. Error: ${ error.message }`
+			);
+		}
+	}
+
 	if ( ! ( await externalTemplateExists( templateName ) ) ) {
 		throw new CLIError(
 			`Invalid block template type name: "${ templateName }". Allowed values: ` +
@@ -126,26 +157,20 @@ const getBlockTemplate = async ( templateName ) => {
 			cwd: tempCwd,
 		} );
 
-		const {
-			defaultValues = {},
-			templatesPath,
-			assetsPath,
-		} = require( require.resolve( templateName, {
-			paths: [ tempCwd ],
-		} ) );
-		if ( ! isObject( defaultValues ) || ! templatesPath ) {
-			throw new Error();
-		}
-
-		return {
-			defaultValues,
-			outputTemplates: await getOutputTemplates( templatesPath ),
-			outputAssets: assetsPath ? await getOutputAssets( assetsPath ) : {},
-		};
-	} catch ( error ) {
-		throw new CLIError(
-			`Invalid template definition provided in "${ templateName }" package.`
+		const { name } = npmPackageArg( templateName );
+		return await configToTemplate(
+			require( require.resolve( name, {
+				paths: [ tempCwd ],
+			} ) )
 		);
+	} catch ( error ) {
+		if ( error instanceof CLIError ) {
+			throw error;
+		} else {
+			throw new CLIError(
+				`Invalid block template downloaded. Error: ${ error.message }`
+			);
+		}
 	} finally {
 		if ( tempCwd ) {
 			rimraf( tempCwd );
@@ -163,6 +188,7 @@ const getDefaultValues = ( blockTemplate ) => {
 		licenseURI: 'https://www.gnu.org/licenses/gpl-2.0.html',
 		version: '0.1.0',
 		wpScripts: true,
+		wpEnv: false,
 		npmDependencies: [],
 		editorScript: 'file:./build/index.js',
 		editorStyle: 'file:./build/index.css',

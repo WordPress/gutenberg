@@ -9,11 +9,13 @@ import { flatMap, isEmpty, isFunction } from 'lodash';
  */
 import { DOWN } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
+import { menu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
+import ToolbarButton from '../toolbar-button';
 import Dropdown from '../dropdown';
 import { NavigableMenu } from '../navigable-container';
 
@@ -37,7 +39,7 @@ function DropdownMenu( {
 	children,
 	className,
 	controls,
-	icon = 'menu',
+	icon = menu,
 	label,
 	popoverProps,
 	toggleProps,
@@ -48,18 +50,19 @@ function DropdownMenu( {
 	menuLabel,
 	position,
 	noIcons,
+	isToolbarButton = false,
 } ) {
 	if ( menuLabel ) {
 		deprecated( '`menuLabel` prop in `DropdownComponent`', {
+			since: '5.3',
 			alternative: '`menuProps` object and its `aria-label` property',
-			plugin: 'Gutenberg',
 		} );
 	}
 
 	if ( position ) {
 		deprecated( '`position` prop in `DropdownComponent`', {
+			since: '5.3',
 			alternative: '`popoverProps` object and its `position` property',
-			plugin: 'Gutenberg',
 		} );
 	}
 
@@ -82,6 +85,8 @@ function DropdownMenu( {
 		},
 		popoverProps
 	);
+
+	const ButtonComponent = isToolbarButton ? ToolbarButton : Button;
 
 	return (
 		<Dropdown
@@ -112,7 +117,7 @@ function DropdownMenu( {
 				);
 
 				return (
-					<Button
+					<ButtonComponent
 						{ ...mergedToggleProps }
 						icon={ icon }
 						onClick={ ( event ) => {
@@ -134,7 +139,7 @@ function DropdownMenu( {
 						showTooltip={ toggleProps?.showTooltip ?? true }
 					>
 						{ mergedToggleProps.children }
-					</Button>
+					</ButtonComponent>
 				);
 			} }
 			renderContent={ ( props ) => {

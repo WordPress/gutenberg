@@ -1,6 +1,7 @@
 .edit-post-visual-editor {
 	position: relative;
 
+
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
 	// This is duplicated in edit-site.
@@ -23,6 +24,7 @@
 	@supports (position: sticky) {
 		flex-basis: 100%;
 	}
+
 }
 
 .editor-styles-wrapper {
@@ -34,6 +36,10 @@
 
 	> * {
 		cursor: auto;
+	}
+
+	> div {
+		min-height: 100%;
 	}
 }
 
@@ -54,4 +60,10 @@
 		// This rule can be retired once the title becomes an actual block.
 		margin-bottom: $default-block-margin;
 	}
+}
+
+.edit-post-visual-editor__exit-template-mode {
+	position: absolute;
+	top: $grid-unit-10;
+	left: $grid-unit-10;
 }

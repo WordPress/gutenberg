@@ -5,42 +5,81 @@ import { useSelect } from '@wordpress/data';
 import {
 	InnerBlocks,
 	useBlockProps,
+	InspectorAdvancedControls,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	__experimentalUseEditorFeature as useEditorFeature,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
-const { __Visualizer: BoxControlVisualizer } = BoxControl;
+import { SelectControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-function GroupEdit( { attributes, clientId } ) {
-	const hasInnerBlocks = useSelect(
+function GroupEdit( { attributes, setAttributes, clientId } ) {
+	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
 		( select ) => {
-			const { getBlock } = select( 'core/block-editor' );
+			const { getBlock, getSettings } = select( blockEditorStore );
 			const block = getBlock( clientId );
-			return !! ( block && block.innerBlocks.length );
+			return {
+				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+				themeSupportsLayout: getSettings()?.supportsLayout,
+			};
 		},
 		[ clientId ]
 	);
+	const defaultLayout = useEditorFeature( 'layout' ) || {};
+	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
+	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const { contentSize, wideSize } = usedLayout;
+	const alignments =
+		contentSize || wideSize
+			? [ 'wide', 'full' ]
+			: [ 'left', 'center', 'right' ];
 	const blockProps = useBlockProps();
-	const { tagName: TagName = 'div', templateLock } = attributes;
 	const innerBlocksProps = useInnerBlocksProps(
-		{
-			className: 'wp-block-group__inner-container',
-		},
+		themeSupportsLayout
+			? blockProps
+			: { className: 'wp-block-group__inner-container' },
 		{
 			templateLock,
 			renderAppender: hasInnerBlocks
 				? undefined
 				: InnerBlocks.ButtonBlockAppender,
+			__experimentalLayout: {
+				type: 'default',
+				// Find a way to inject this in the support flag code (hooks).
+				alignments: themeSupportsLayout ? alignments : undefined,
+			},
 		}
 	);
 
 	return (
-		<TagName { ...blockProps }>
-			<BoxControlVisualizer
-				values={ attributes.style?.spacing?.padding }
-				showValues={ attributes.style?.visualizers?.padding }
-			/>
-			<div { ...innerBlocksProps } />
-		</TagName>
+		<>
+			<InspectorAdvancedControls>
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<header>', value: 'header' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<article>', value: 'article' },
+						{ label: '<aside>', value: 'aside' },
+						{ label: '<footer>', value: 'footer' },
+					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+				/>
+			</InspectorAdvancedControls>
+			{ themeSupportsLayout && <TagName { ...innerBlocksProps } /> }
+			{ /* Ideally this is not needed but it's there for backward compatibility reason
+				to keep this div for themes that might rely on its presence */ }
+			{ ! themeSupportsLayout && (
+				<TagName { ...blockProps }>
+					<div { ...innerBlocksProps } />
+				</TagName>
+			) }
+		</>
 	);
 }
 

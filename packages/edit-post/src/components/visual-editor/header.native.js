@@ -1,10 +1,7 @@
 /**
- * External dependencies
- */
-import React from 'react';
-/**
  * WordPress dependencies
  */
+import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -16,7 +13,7 @@ import { ReadableContentView } from '@wordpress/components';
  */
 import styles from './style.scss';
 
-const Header = React.memo(
+const Header = memo(
 	function EditorHeader( {
 		editTitle,
 		setTitleRef,

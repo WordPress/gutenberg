@@ -29,6 +29,7 @@ import {
 	MediaPlaceholder,
 	InspectorControls,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Platform, useEffect, useState, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -36,6 +37,7 @@ import { getBlobByURL, isBlobURL, revokeBlobURL } from '@wordpress/blob';
 import { useDispatch, withSelect } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { View } from '@wordpress/primitives';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -90,7 +92,7 @@ function GalleryEdit( props ) {
 	const [ selectedImage, setSelectedImage ] = useState();
 	const [ attachmentCaptions, setAttachmentCaptions ] = useState();
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
 	function setAttributes( newAttrs ) {
@@ -322,10 +324,11 @@ function GalleryEdit( props ) {
 	}, [ linkTo ] );
 
 	const hasImages = !! images.length;
+	const hasImageIds = hasImages && images.some( ( image ) => !! image.id );
 
 	const mediaPlaceholder = (
 		<MediaPlaceholder
-			addToGallery={ hasImages }
+			addToGallery={ hasImageIds }
 			isAppender={ hasImages }
 			disableMediaButtons={ hasImages && ! isSelected }
 			icon={ ! hasImages && sharedIcon }
@@ -337,7 +340,7 @@ function GalleryEdit( props ) {
 			accept="image/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			multiple
-			value={ images }
+			value={ hasImageIds ? images : {} }
 			onError={ onUploadError }
 			notices={ hasImages ? undefined : noticeUI }
 			onFocus={ onFocus }
@@ -379,6 +382,7 @@ function GalleryEdit( props ) {
 						value={ linkTo }
 						onChange={ setLinkTo }
 						options={ linkOptions }
+						hideCancelButton={ true }
 					/>
 					{ shouldShowSizeOptions && (
 						<SelectControl
@@ -386,6 +390,7 @@ function GalleryEdit( props ) {
 							value={ sizeSlug }
 							options={ imageSizeOptions }
 							onChange={ updateImagesSize }
+							hideCancelButton={ true }
 						/>
 					) }
 				</PanelBody>
@@ -410,8 +415,8 @@ function GalleryEdit( props ) {
 
 export default compose( [
 	withSelect( ( select, { attributes: { ids }, isSelected } ) => {
-		const { getMedia } = select( 'core' );
-		const { getSettings } = select( 'core/block-editor' );
+		const { getMedia } = select( coreStore );
+		const { getSettings } = select( blockEditorStore );
 		const { imageSizes, mediaUpload } = getSettings();
 
 		const resizedImages = useMemo( () => {

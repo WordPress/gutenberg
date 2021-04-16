@@ -11,6 +11,7 @@ export const PREFERENCES_DEFAULTS = {
 		fullscreenMode: true,
 		showIconLabels: false,
 		themeStyles: true,
+		showBlockBreadcrumbs: true,
 	},
 	hiddenBlockTypes: [],
 	preferredStyleVariations: {},

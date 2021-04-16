@@ -35,11 +35,18 @@ export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
 export { default as ComboboxControl } from './combobox-control';
+export {
+	Composite as __unstableComposite,
+	CompositeGroup as __unstableCompositeGroup,
+	CompositeItem as __unstableCompositeItem,
+	useCompositeState as __unstableUseCompositeState,
+} from './composite';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
+export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
 export { default as Draggable } from './draggable';
 export {
 	default as DropZone,
@@ -148,3 +155,9 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+
+// Component System
+export {
+	withNext as __unstableWithNext,
+	ComponentSystemProvider as __unstableComponentSystemProvider,
+} from './ui/context';

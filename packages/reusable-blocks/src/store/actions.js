@@ -20,9 +20,10 @@ export function* __experimentalConvertBlockToStatic( clientId ) {
  * Returns a generator converting one or more static blocks into a reusable block.
  *
  * @param {string[]} clientIds The client IDs of the block to detach.
+ * @param {string}   title     Reusable block title.
  */
-export function* __experimentalConvertBlocksToReusable( clientIds ) {
-	yield convertBlocksToReusable( clientIds );
+export function* __experimentalConvertBlocksToReusable( clientIds, title ) {
+	yield convertBlocksToReusable( clientIds, title );
 }
 
 /**

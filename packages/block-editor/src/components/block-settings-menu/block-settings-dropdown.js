@@ -7,18 +7,14 @@ import { castArray, flow, noop } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	DropdownMenu,
-	MenuGroup,
-	MenuItem,
-	ClipboardButton,
-} from '@wordpress/components';
+import { DropdownMenu, MenuGroup, MenuItem } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { moreVertical } from '@wordpress/icons';
 
 import { Children, cloneElement, useCallback } from '@wordpress/element';
 import { serialize } from '@wordpress/blocks';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { useCopyToClipboard } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -34,6 +30,11 @@ const POPOVER_PROPS = {
 	position: 'bottom right',
 	isAlternate: true,
 };
+
+function CopyMenuItem( { blocks, onCopy } ) {
+	const ref = useCopyToClipboard( () => serialize( blocks ), onCopy );
+	return <MenuItem ref={ ref }>{ __( 'Copy' ) }</MenuItem>;
+}
 
 export function BlockSettingsDropdown( {
 	clientIds,
@@ -95,7 +96,7 @@ export function BlockSettingsDropdown( {
 			} ) => (
 				<DropdownMenu
 					icon={ moreVertical }
-					label={ __( 'More options' ) }
+					label={ __( 'Options' ) }
 					className="block-editor-block-settings-menu"
 					popoverProps={ POPOVER_PROPS }
 					noIcons
@@ -112,14 +113,10 @@ export function BlockSettingsDropdown( {
 										clientId={ firstBlockClientId }
 									/>
 								) }
-								<ClipboardButton
-									text={ () => serialize( blocks ) }
-									role="menuitem"
-									className="components-menu-item__button"
+								<CopyMenuItem
+									blocks={ blocks }
 									onCopy={ onCopy }
-								>
-									{ __( 'Copy' ) }
-								</ClipboardButton>
+								/>
 								{ canDuplicate && (
 									<MenuItem
 										onClick={ flow(
@@ -141,7 +138,7 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertBefore }
 										>
-											{ __( 'Insert Before' ) }
+											{ __( 'Insert before' ) }
 										</MenuItem>
 										<MenuItem
 											onClick={ flow(
@@ -150,7 +147,7 @@ export function BlockSettingsDropdown( {
 											) }
 											shortcut={ shortcuts.insertAfter }
 										>
-											{ __( 'Insert After' ) }
+											{ __( 'Insert after' ) }
 										</MenuItem>
 									</>
 								) }
@@ -158,7 +155,7 @@ export function BlockSettingsDropdown( {
 									<MenuItem
 										onClick={ flow( onClose, onMoveTo ) }
 									>
-										{ __( 'Move To' ) }
+										{ __( 'Move to' ) }
 									</MenuItem>
 								) }
 								{ count === 1 && (

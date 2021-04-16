@@ -37,7 +37,6 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 				{
 					label: __( 'Reset the template' ),
 					onClick: confirmSynchronization,
-					isPrimary: true,
 				},
 			] }
 		>

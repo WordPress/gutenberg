@@ -9,7 +9,8 @@ import useResizeAware from 'react-resize-aware';
  */
 import { useEffect, useRef, useState } from '@wordpress/element';
 
-const { clearTimeout, setTimeout } = window;
+const { clearTimeout, setTimeout } =
+	typeof window !== 'undefined' ? window : {};
 
 export const POSITIONS = {
 	bottom: 'bottom',

@@ -12,6 +12,11 @@ import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 import { speak } from '@wordpress/a11y';
 
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../../store';
+
 export default function FeatureToggle( {
 	feature,
 	label,
@@ -28,10 +33,10 @@ export default function FeatureToggle( {
 	};
 
 	const isActive = useSelect( ( select ) => {
-		return select( 'core/edit-site' ).isFeatureActive( feature );
+		return select( editSiteStore ).isFeatureActive( feature );
 	}, [] );
 
-	const { toggleFeature } = useDispatch( 'core/edit-site' );
+	const { toggleFeature } = useDispatch( editSiteStore );
 
 	return (
 		<MenuItem

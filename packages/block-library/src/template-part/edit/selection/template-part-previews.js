@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { groupBy, deburr } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -7,15 +12,15 @@ import { useMemo, useCallback } from '@wordpress/element';
 import { ENTER, SPACE } from '@wordpress/keycodes';
 import { __, sprintf } from '@wordpress/i18n';
 import { BlockPreview } from '@wordpress/block-editor';
-import { Icon } from '@wordpress/components';
+import {
+	__unstableComposite as Composite,
+	__unstableCompositeItem as CompositeItem,
+	Icon,
+	__unstableUseCompositeState as useCompositeState,
+} from '@wordpress/components';
 import { useAsyncList } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
-
-/**
- * External dependencies
- */
-import { groupBy, deburr } from 'lodash';
-import { Composite, useCompositeState, CompositeItem } from 'reakit';
+import { store as coreStore } from '@wordpress/core-data';
 
 function PreviewPlaceholder() {
 	return (
@@ -32,7 +37,11 @@ function TemplatePartItem( {
 	onClose,
 	composite,
 } ) {
-	const { slug, theme, title } = templatePart;
+	const {
+		slug,
+		theme,
+		title: { rendered: title },
+	} = templatePart;
 	// The 'raw' property is not defined for a brief period in the save cycle.
 	// The fallback prevents an error in the parse function while saving.
 	const content = templatePart.content.raw || '';
@@ -40,12 +49,12 @@ function TemplatePartItem( {
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	const onClick = useCallback( () => {
-		setAttributes( { slug, theme } );
+		setAttributes( { slug, theme, area: undefined } );
 		createSuccessNotice(
 			sprintf(
 				/* translators: %s: template part title. */
 				__( 'Template Part "%s" inserted.' ),
-				title
+				title || slug
 			),
 			{
 				type: 'snackbar',
@@ -66,12 +75,12 @@ function TemplatePartItem( {
 				}
 			} }
 			tabIndex={ 0 }
-			aria-label={ templatePart.slug }
+			aria-label={ title || slug }
 			{ ...composite }
 		>
 			<BlockPreview blocks={ blocks } />
 			<div className="wp-block-template-part__selection-preview-item-title">
-				{ templatePart.slug }
+				{ title || slug }
 			</div>
 		</CompositeItem>
 	);
@@ -198,7 +207,7 @@ export default function TemplatePartPreviews( {
 	const composite = useCompositeState();
 	const templateParts = useSelect( ( select ) => {
 		return (
-			select( 'core' ).getEntityRecords(
+			select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_template_part'
 			) || []

@@ -172,7 +172,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|boolean)`: The error text, or false if no error.
+-   `string|boolean`: The error text, or false if no error.
 
 <a name="getErrorNotices" href="#getErrorNotices">#</a> **getErrorNotices**
 

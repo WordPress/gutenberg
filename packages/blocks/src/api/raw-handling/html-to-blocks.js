@@ -19,7 +19,7 @@ export function htmlToBlocks( html ) {
 
 	doc.body.innerHTML = html;
 
-	return Array.from( doc.body.children ).map( ( node ) => {
+	return Array.from( doc.body.children ).flatMap( ( node ) => {
 		const rawTransform = findTransform(
 			getRawTransforms(),
 			( { isMatch } ) => isMatch( node )

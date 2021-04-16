@@ -1,6 +1,6 @@
 {
-	"global": {
-		"settings": {
+	"settings": {
+		"defaults": {
 			"color": {
 				"palette": [
 					{
@@ -172,6 +172,11 @@
 			},
 			"border": {
 				"customRadius": false
+			}
+		},
+		"core/button": {
+			"border": {
+				"customRadius": true
 			}
 		}
 	}

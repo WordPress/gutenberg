@@ -87,6 +87,33 @@ describe( 'Blocks raw handling', () => {
 			},
 			save: () => null,
 		} );
+
+		registerBlockType( 'test/transform-to-multiple-blocks', {
+			title: 'Test Transform to Multiple Blocks',
+			category: 'text',
+			transforms: {
+				from: [
+					{
+						type: 'raw',
+						isMatch: ( node ) => {
+							return node.textContent
+								.split( ' ' )
+								.every( ( chunk ) => /^P\S+?/.test( chunk ) );
+						},
+						transform: ( node ) => {
+							return node.textContent
+								.split( ' ' )
+								.map( ( chunk ) =>
+									createBlock( 'core/paragraph', {
+										content: chunk.substring( 1 ),
+									} )
+								);
+						},
+					},
+				],
+			},
+			save: () => null,
+		} );
 	} );
 
 	it( 'should filter inline content', () => {
@@ -117,6 +144,28 @@ describe( 'Blocks raw handling', () => {
 
 		expect( filtered ).toBe( '<em>test</em>' );
 		expect( console ).toHaveLogged();
+	} );
+
+	it( 'should paste special whitespace', () => {
+		const filtered = pasteHandler( {
+			HTML: '<p>&thinsp;</p>',
+			plainText: ' ',
+			mode: 'AUTO',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( filtered ).toBe( ' ' );
+	} );
+
+	it( 'should paste special whitespace in plain text only', () => {
+		const filtered = pasteHandler( {
+			HTML: '',
+			plainText: ' ',
+			mode: 'AUTO',
+		} );
+
+		expect( console ).toHaveLogged();
+		expect( filtered ).toBe( ' ' );
 	} );
 
 	it( 'should parse Markdown', () => {
@@ -360,6 +409,18 @@ describe( 'Blocks raw handling', () => {
 				} )
 			)
 		).toBe( block );
+	} );
+
+	it( 'should handle transforms that return an array of blocks', () => {
+		const transformed = pasteHandler( {
+			HTML: '<p>P1 P2</p>',
+			plainText: 'P1 P2\n',
+		} )
+			.map( getBlockContent )
+			.join( '' );
+
+		expect( transformed ).toBe( '<p>1</p><p>2</p>' );
+		expect( console ).toHaveLogged();
 	} );
 
 	describe( 'pasteHandler', () => {

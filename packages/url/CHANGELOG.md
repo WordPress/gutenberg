@@ -1,12 +1,14 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+## 2.22.0 (2021-03-17)
 
 ## 2.21.0 (2021-01-05)
 
 ### New Feature
 
--	Add optional argument `maxLength` for truncating URL in `filterURLForDisplay`
+-   Add optional argument `maxLength` for truncating URL in `filterURLForDisplay`
 
 ## 2.16.0 (2020-06-15)
 

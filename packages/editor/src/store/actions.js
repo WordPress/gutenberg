@@ -114,8 +114,8 @@ export function resetPost( post ) {
  */
 export function* resetAutosave( newAutosave ) {
 	deprecated( 'resetAutosave action (`core/editor` store)', {
+		since: '5.3',
 		alternative: 'receiveAutosaves action (`core` store)',
-		plugin: 'Gutenberg',
 	} );
 
 	const postId = yield controls.select( STORE_NAME, 'getCurrentPostId' );
@@ -161,6 +161,7 @@ export function __experimentalRequestPostUpdateFinish( options = {} ) {
  */
 export function updatePost() {
 	deprecated( "wp.data.dispatch( 'core/editor' ).updatePost", {
+		since: '5.7',
 		alternative: 'User the core entitires store instead',
 	} );
 	return {
@@ -593,12 +594,8 @@ export function unlockPostAutosaving( lockName ) {
  * @yield {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
-	const {
-		__unstableShouldCreateUndoLevel,
-		selectionStart,
-		selectionEnd,
-	} = options;
-	const edits = { blocks, selectionStart, selectionEnd };
+	const { __unstableShouldCreateUndoLevel, selection } = options;
+	const edits = { blocks, selection };
 
 	if ( __unstableShouldCreateUndoLevel !== false ) {
 		const { id, type } = yield controls.select(
@@ -653,6 +650,7 @@ export function updateEditorSettings( settings ) {
 const getBlockEditorAction = ( name ) =>
 	function* ( ...args ) {
 		deprecated( "`wp.data.dispatch( 'core/editor' )." + name + '`', {
+			since: '5.3',
 			alternative:
 				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
 		} );

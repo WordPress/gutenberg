@@ -11,6 +11,7 @@ import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import ServerSideRender from '@wordpress/server-side-render';
+import { store as coreStore } from '@wordpress/core-data';
 
 function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 	const { taxonomy, showTagCounts } = attributes;
@@ -72,6 +73,6 @@ function TagCloudEdit( { attributes, setAttributes, taxonomies } ) {
 
 export default withSelect( ( select ) => {
 	return {
-		taxonomies: select( 'core' ).getTaxonomies( { per_page: -1 } ),
+		taxonomies: select( coreStore ).getTaxonomies( { per_page: -1 } ),
 	};
 } )( TagCloudEdit );

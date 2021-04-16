@@ -15,7 +15,9 @@ export { metadata, name };
 
 export const settings = {
 	title: _x( 'Post Title', 'block title' ),
-	description: __( 'Add the title of your post.' ),
+	description: __(
+		'Displays the title of a post, page, or any other content-type.'
+	),
 	icon,
 	edit,
 };

@@ -15,10 +15,11 @@ import {
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
-	__unstableUseEditorStyles as useEditorStyles,
+	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { DropZoneProvider, Popover } from '@wordpress/components';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -26,20 +27,7 @@ import { DropZoneProvider, Popover } from '@wordpress/components';
 import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
-
-function Canvas( { body, styles } ) {
-	useBlockSelectionClearer( body );
-	useTypingObserver( body );
-	useEditorStyles( body, styles );
-
-	return (
-		<DropZoneProvider>
-			<WritingFlow>
-				<BlockList className="edit-site-block-editor__block-list" />
-			</WritingFlow>
-		</DropZoneProvider>
-	);
-}
+import { store as editSiteStore } from '../../store';
 
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, page, deviceType } = useSelect(
@@ -49,7 +37,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				getEditedPostType,
 				getPage,
 				__experimentalGetPreviewDeviceType,
-			} = select( 'core/edit-site' );
+			} = select( editSiteStore );
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
@@ -63,13 +51,15 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		'postType',
 		templateType
 	);
-	const { setPage } = useDispatch( 'core/edit-site' );
-
+	const { setPage } = useDispatch( editSiteStore );
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
-	const ref = useRef();
+	const ref = useMouseMoveTypingReset();
 	const contentRef = useRef();
-
-	useMouseMoveTypingReset( ref );
+	const mergedRefs = useMergeRefs( [
+		contentRef,
+		useBlockSelectionClearer(),
+		useTypingObserver(),
+	] );
 
 	// Allow scrolling "through" popovers over the canvas. This is only called
 	// for as long as the pointer is over a popover.
@@ -106,11 +96,23 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<Popover.Slot name="block-toolbar" />
 				<Iframe
 					style={ resizedCanvasStyles }
-					head={ window.__editorStyles.html }
+					headHTML={ window.__editorStyles.html }
+					head={ <EditorStyles styles={ settings.styles } /> }
 					ref={ ref }
-					contentRef={ contentRef }
+					contentRef={ mergedRefs }
 				>
-					<Canvas body={ contentRef } styles={ settings.styles } />
+					<DropZoneProvider>
+						<WritingFlow>
+							<BlockList
+								className="edit-site-block-editor__block-list"
+								__experimentalLayout={ {
+									type: 'default',
+									// At the root level of the site editor, no alignments should be allowed.
+									alignments: [],
+								} }
+							/>
+						</WritingFlow>
+					</DropZoneProvider>
 				</Iframe>
 			</div>
 		</BlockEditorProvider>

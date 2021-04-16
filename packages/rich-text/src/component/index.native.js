@@ -12,7 +12,7 @@ import {
 	showUserSuggestions,
 	showXpostSuggestions,
 } from '@wordpress/react-native-bridge';
-import { get, pickBy, debounce } from 'lodash';
+import { get, pickBy, debounce, isString } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -32,6 +32,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
+import { useFormatTypes } from './use-format-types';
 import FormatEdit from './format-edit';
 import { applyFormat } from '../apply-format';
 import { getActiveFormat } from '../get-active-format';
@@ -46,7 +47,6 @@ import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
 import styles from './style.scss';
 import ToolbarButtonWithOptions from './toolbar-button-with-options';
-import { store as richTextStore } from '../store';
 
 const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
@@ -114,6 +114,15 @@ export class RichText extends Component {
 		).bind( this );
 		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
+		this.convertFontSizeFromString = this.convertFontSizeFromString.bind(
+			this
+		);
+		this.manipulateEventCounterToForceNativeToRefresh = this.manipulateEventCounterToForceNativeToRefresh.bind(
+			this
+		);
+		this.shouldDropEventFromAztec = this.shouldDropEventFromAztec.bind(
+			this
+		);
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -218,7 +227,7 @@ export class RichText extends Component {
 
 	insertString( record, string ) {
 		if ( record && string ) {
-			this.lastEventCount = undefined;
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			const toInsert = insert( record, string );
 			this.onFormatChange( toInsert );
 		}
@@ -271,10 +280,21 @@ export class RichText extends Component {
 			.replace( closingTagRegexp, '' );
 	}
 
+	// Fix for crash https://github.com/wordpress-mobile/gutenberg-mobile/issues/2991
+	convertFontSizeFromString( fontSize ) {
+		return fontSize && isString( fontSize ) && fontSize.endsWith( 'px' )
+			? parseFloat( fontSize.substring( 0, fontSize.length - 2 ) )
+			: fontSize;
+	}
+
 	/*
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
 	onChangeFromAztec( event ) {
+		if ( this.shouldDropEventFromAztec( event, 'onChange' ) ) {
+			return;
+		}
+
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
@@ -355,6 +375,10 @@ export class RichText extends Component {
 	}
 
 	handleDelete( event ) {
+		if ( this.shouldDropEventFromAztec( event, 'handleDelete' ) ) {
+			return;
+		}
+
 		const { keyCode } = event;
 
 		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
@@ -582,7 +606,22 @@ export class RichText extends Component {
 		this.props.onSelectionChange( start, end );
 	}
 
+	shouldDropEventFromAztec( event, logText ) {
+		const shouldDrop =
+			! this.isIOS && event.nativeEvent.eventCount <= this.lastEventCount;
+		if ( shouldDrop ) {
+			window.console.log(
+				`Dropping ${ logText } from Aztec as its event counter is older than latest sent to the native side. Got ${ event.nativeEvent.eventCount } but lastEventCount is ${ this.lastEventCount }.`
+			);
+		}
+		return shouldDrop;
+	}
+
 	onSelectionChangeFromAztec( start, end, text, event ) {
+		if ( this.shouldDropEventFromAztec( event, 'onSelectionChange' ) ) {
+			return;
+		}
+
 		// `end` can be less than `start` on iOS
 		// Let's fix that here so `rich-text/slice` can work properly
 		const realStart = Math.min( start, end );
@@ -657,13 +696,28 @@ export class RichText extends Component {
 		return value;
 	}
 
+	manipulateEventCounterToForceNativeToRefresh() {
+		if ( this.isIOS ) {
+			this.lastEventCount = undefined;
+			return;
+		}
+
+		if ( typeof this.lastEventCount !== 'undefined' ) {
+			this.lastEventCount += 100; // bump by a hundred, hopefully native hasn't bombarded the JS side in the meantime.
+		} else {
+			window.console.warn(
+				"Tried to bump the RichText native event counter but was 'undefined'. Aborting bump."
+			);
+		}
+	}
+
 	shouldComponentUpdate( nextProps ) {
 		if (
 			nextProps.tagName !== this.props.tagName ||
 			nextProps.reversed !== this.props.reversed ||
 			nextProps.start !== this.props.start
 		) {
-			this.lastEventCount = undefined;
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			this.value = undefined;
 			return true;
 		}
@@ -693,7 +747,7 @@ export class RichText extends Component {
 				this.needsSelectionUpdate = true;
 			}
 
-			this.lastEventCount = undefined; // force a refresh on the native side
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 		}
 
 		if ( ! this.comesFromAztec ) {
@@ -705,7 +759,7 @@ export class RichText extends Component {
 				nextProps.__unstableIsSelected
 			) {
 				this.needsSelectionUpdate = true;
-				this.lastEventCount = undefined; // force a refresh on the native side
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			}
 		}
 
@@ -738,7 +792,6 @@ export class RichText extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
-			this.lastEventCount = undefined;
 		}
 		const { __unstableIsSelected: isSelected } = this.props;
 
@@ -762,7 +815,7 @@ export class RichText extends Component {
 		let value = this.valueToFormat( record );
 
 		if ( value === undefined ) {
-			this.lastEventCount = undefined; // force a refresh on the native side
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			value = '';
 		}
 		// On android if content is empty we need to send no content or else the placeholder will not show.
@@ -783,7 +836,7 @@ export class RichText extends Component {
 					extraAttributes += ` start=${ this.props.start }`;
 				}
 			}
-			value = `<${ tagName } ${ extraAttributes }>${ value }</${ tagName }>`;
+			value = `<${ tagName }${ extraAttributes }>${ value }</${ tagName }>`;
 		}
 		return value;
 	}
@@ -799,7 +852,6 @@ export class RichText extends Component {
 			maxWidth,
 			formatTypes,
 			parentBlockStyles,
-			withoutInteractiveFormatting,
 			accessibilityLabel,
 			disableEditingMenu = false,
 		} = this.props;
@@ -936,7 +988,9 @@ export class RichText extends Component {
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
 					fontSize={
-						this.props.fontSize || ( style && style.fontSize )
+						this.props.fontSize ||
+						( style &&
+							this.convertFontSizeFromString( style.fontSize ) )
 					}
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
@@ -953,9 +1007,6 @@ export class RichText extends Component {
 						<FormatEdit
 							formatTypes={ formatTypes }
 							value={ record }
-							withoutInteractiveFormatting={
-								withoutInteractiveFormatting
-							}
 							onChange={ this.onFormatChange }
 							onFocus={ () => {} }
 						/>
@@ -977,6 +1028,16 @@ RichText.defaultProps = {
 	tagName: 'div',
 };
 
+const withFormatTypes = ( WrappedComponent ) => ( props ) => {
+	const { formatTypes } = useFormatTypes( {
+		clientId: props.clientId,
+		identifier: props.identifier,
+		withoutInteractiveFormatting: props.withoutInteractiveFormatting,
+	} );
+
+	return <WrappedComponent { ...props } formatTypes={ formatTypes } />;
+};
+
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
 		const { getBlockParents, getBlock, getSettings } = select(
@@ -984,11 +1045,12 @@ export default compose( [
 		);
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
-		const parentBlockStyles =
-			get( parentBlock, [ 'attributes', 'childrenStyles' ] ) || {};
+		const parentBlockStyles = get( parentBlock, [
+			'attributes',
+			'childrenStyles',
+		] );
 
 		return {
-			formatTypes: select( richTextStore ).getFormatTypes(),
 			areMentionsSupported:
 				getSettings( 'capabilities' ).mentions === true,
 			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
@@ -996,4 +1058,5 @@ export default compose( [
 		};
 	} ),
 	withPreferredColorScheme,
+	withFormatTypes,
 ] )( RichText );

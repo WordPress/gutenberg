@@ -11,7 +11,9 @@ import { createRegistrySelector } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { KIND, POST_TYPE, buildNavigationPostId } from './utils';
+import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
+
+import { buildNavigationPostId } from './utils';
 
 /**
  * Returns a "stub" navigation post reflecting the contents of menu with id=menuId. The
@@ -32,8 +34,8 @@ export const getNavigationPostForMenu = createRegistrySelector(
 			return null;
 		}
 		return select( 'core' ).getEditedEntityRecord(
-			KIND,
-			POST_TYPE,
+			NAVIGATION_POST_KIND,
+			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId )
 		);
 	}
@@ -48,8 +50,8 @@ export const getNavigationPostForMenu = createRegistrySelector(
 export const hasResolvedNavigationPost = createRegistrySelector(
 	( select ) => ( state, menuId ) => {
 		return select( 'core' ).hasFinishedResolution( 'getEntityRecord', [
-			KIND,
-			POST_TYPE,
+			NAVIGATION_POST_KIND,
+			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId ),
 		] );
 	}

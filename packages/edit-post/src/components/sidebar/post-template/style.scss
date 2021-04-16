@@ -1,6 +1,7 @@
 .edit-post-post-template {
 	width: 100%;
 	justify-content: left;
+	align-items: baseline;
 
 	span {
 		display: block;
@@ -10,4 +11,16 @@
 
 .edit-post-post-template__value {
 	padding-left: 6px;
+}
+
+.edit-post-post-template__modal-actions {
+	padding-top: $grid-unit-15;
+}
+
+.edit-post-post-template__actions {
+	margin-top: $grid-unit-10;
+
+	button:not(:last-child) {
+		margin-right: $grid-unit-10;
+	}
 }

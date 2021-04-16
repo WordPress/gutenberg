@@ -2,7 +2,13 @@
  * WordPress dependencies
  */
 import { hasBlockSupport } from '@wordpress/blocks';
-import { PanelBody } from '@wordpress/components';
+/**
+ * External dependencies
+ */
+import {
+	PanelBody,
+	__unstableComponentSystemProvider as ComponentSystemProvider,
+} from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -61,11 +67,15 @@ export function TypographyPanel( props ) {
 	return (
 		<InspectorControls>
 			<PanelBody title={ __( 'Typography' ) }>
-				<FontFamilyEdit { ...props } />
-				<FontSizeEdit { ...props } />
-				<FontAppearanceEdit { ...props } />
-				<LineHeightEdit { ...props } />
-				<TextDecorationAndTransformEdit { ...props } />
+				<ComponentSystemProvider
+					__unstableNextInclude={ [ 'WPComponentsFontSizePicker' ] }
+				>
+					<FontFamilyEdit { ...props } />
+					<FontSizeEdit { ...props } />
+					<FontAppearanceEdit { ...props } />
+					<LineHeightEdit { ...props } />
+					<TextDecorationAndTransformEdit { ...props } />
+				</ComponentSystemProvider>
 			</PanelBody>
 		</InspectorControls>
 	);

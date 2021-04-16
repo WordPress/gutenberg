@@ -18,7 +18,7 @@ describe( 'Columns', () => {
 		await insertBlock( 'Columns' );
 		await closeGlobalBlockInserter();
 		await page.click( '[aria-label="Two columns; equal split"]' );
-		await page.click( '[aria-label="Outline"]' );
+		await page.click( '[aria-label="List view"]' );
 		const columnBlockMenuItem = (
 			await page.$x(
 				'//button[contains(concat(" ", @class, " "), " block-editor-block-navigation-block-select-button ")][text()="Column"]'

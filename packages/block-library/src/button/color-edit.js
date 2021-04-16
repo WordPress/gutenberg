@@ -7,7 +7,13 @@ import { pickBy, isEqual, isObject, identity, mapValues } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef, Platform } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useMemo,
+	Platform,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -62,9 +68,7 @@ function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 
-	const title = isWebPlatform
-		? __( 'Color settings' )
-		: __( 'Color Settings' );
+	const title = __( 'Color' );
 
 	useEffect( () => {
 		if ( isWebPlatform && ! enableContrastChecking ) {
@@ -200,32 +204,43 @@ function ColorEdit( props ) {
 		};
 	};
 
+	const settings = useMemo( () => {
+		return [
+			{
+				label: __( 'Text color' ),
+				onColorChange: onChangeColor( 'text' ),
+				colorValue: getColorObjectByAttributeValues(
+					colors,
+					textColor,
+					style?.color?.text
+				).color,
+			},
+			{
+				label: __( 'Background color' ),
+				onColorChange: onChangeColor( 'background' ),
+				colorValue: getColorObjectByAttributeValues(
+					colors,
+					backgroundColor,
+					style?.color?.background
+				).color,
+				gradientValue,
+				onGradientChange: onChangeGradient,
+			},
+		];
+	}, [
+		colors,
+		textColor,
+		backgroundColor,
+		gradientValue,
+		style?.color?.text,
+		style?.color?.background,
+	] );
+
 	return (
 		<ColorPanel
 			enableContrastChecking={ ! gradient && ! style?.color?.gradient }
 			clientId={ props.clientId }
-			settings={ [
-				{
-					label: __( 'Text Color' ),
-					onColorChange: onChangeColor( 'text' ),
-					colorValue: getColorObjectByAttributeValues(
-						colors,
-						textColor,
-						style?.color?.text
-					).color,
-				},
-				{
-					label: __( 'Background Color' ),
-					onColorChange: onChangeColor( 'background' ),
-					colorValue: getColorObjectByAttributeValues(
-						colors,
-						backgroundColor,
-						style?.color?.background
-					).color,
-					gradientValue,
-					onGradientChange: onChangeGradient,
-				},
-			] }
+			settings={ settings }
 		/>
 	);
 }

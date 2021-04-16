@@ -211,7 +211,7 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 async function runPerformanceTests( branches, options ) {
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
-		branches = [ 'master' ];
+		branches = [ 'trunk' ];
 	}
 
 	log(
@@ -262,7 +262,7 @@ async function runPerformanceTests( branches, options ) {
 	log( '>> Starting the WordPress environment' );
 	await runShellScript( 'npm run wp-env start', environmentDirectory );
 
-	const testSuites = [ 'post-editor', 'site-editor' ];
+	const testSuites = [ 'post-editor', 'i18n-filters', 'site-editor' ];
 
 	/** @type {Record<string,Record<string, WPFormattedPerformanceResults>>} */
 	let results = {};

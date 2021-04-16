@@ -8,6 +8,11 @@ import {
 } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
 /**
@@ -74,7 +79,13 @@ export function onBlockDrop(
 		// If the user is inserting a block
 		if ( dropType === 'inserter' ) {
 			clearSelectedBlock();
-			insertBlocks( blocks, targetBlockIndex, targetRootClientId, false );
+			insertBlocks(
+				blocks,
+				targetBlockIndex,
+				targetRootClientId,
+				true,
+				null
+			);
 		}
 
 		// If the user is moving a block
@@ -132,6 +143,7 @@ export function onBlockDrop(
  * @param {number}   targetBlockIndex      The index where the block(s) will be inserted.
  * @param {boolean}  hasUploadPermissions  Whether the user has upload permissions.
  * @param {Function} updateBlockAttributes A function that updates a block's attributes.
+ * @param {Function} canInsertBlockType    A function that returns checks whether a block type can be inserted.
  * @param {Function} insertBlocks          A function that inserts blocks.
  *
  * @return {Function} The event handler for a block-related file drop event.
@@ -141,6 +153,7 @@ export function onFilesDrop(
 	targetBlockIndex,
 	hasUploadPermissions,
 	updateBlockAttributes,
+	canInsertBlockType,
 	insertBlocks
 ) {
 	return ( files ) => {
@@ -151,7 +164,9 @@ export function onFilesDrop(
 		const transformation = findTransform(
 			getBlockTransforms( 'from' ),
 			( transform ) =>
-				transform.type === 'files' && transform.isMatch( files )
+				transform.type === 'files' &&
+				canInsertBlockType( transform.blockName, targetRootClientId ) &&
+				transform.isMatch( files )
 		);
 
 		if ( transformation ) {
@@ -197,17 +212,20 @@ export function onHTMLDrop(
  */
 export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 	const {
+		canInsertBlockType,
 		getBlockIndex,
 		getClientIdsOfDescendants,
 		hasUploadPermissions,
 	} = useSelect( ( select ) => {
 		const {
+			canInsertBlockType: _canInsertBlockType,
 			getBlockIndex: _getBlockIndex,
 			getClientIdsOfDescendants: _getClientIdsOfDescendants,
 			getSettings,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		return {
+			canInsertBlockType: _canInsertBlockType,
 			getBlockIndex: _getBlockIndex,
 			getClientIdsOfDescendants: _getClientIdsOfDescendants,
 			hasUploadPermissions: getSettings().mediaUpload,
@@ -219,7 +237,7 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 		moveBlocksToPosition,
 		updateBlockAttributes,
 		clearSelectedBlock,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 
 	return {
 		onDrop: onBlockDrop(
@@ -236,6 +254,7 @@ export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
 			targetBlockIndex,
 			hasUploadPermissions,
 			updateBlockAttributes,
+			canInsertBlockType,
 			insertBlocks
 		),
 		onHTMLDrop: onHTMLDrop(

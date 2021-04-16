@@ -1,6 +1,10 @@
 .components-tab-panel__tabs {
 	display: flex;
 	align-items: stretch;
+	flex-direction: row;
+	&[aria-orientation="vertical"] {
+		flex-direction: column;
+	}
 }
 
 .components-tab-panel__tabs-item {

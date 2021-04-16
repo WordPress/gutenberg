@@ -7,7 +7,6 @@ import { find, includes, get, hasIn, compact, uniq } from 'lodash';
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
-import deprecated from '@wordpress/deprecated';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
 /**
@@ -136,6 +135,9 @@ export function* getEntityRecord( kind, name, key = '', query ) {
 
 		const record = yield apiFetch( { path } );
 		yield receiveEntityRecords( kind, name, record, query );
+	} catch ( error ) {
+		// We need a way to handle and access REST API errors in state
+		// Until then, catching the error ensures the resolver is marked as resolved.
 	} finally {
 		yield* __unstableReleaseStoreLock( lock );
 	}
@@ -284,19 +286,6 @@ export function* getEmbedPreview( url ) {
 }
 
 /**
- * Requests Upload Permissions from the REST API.
- *
- * @deprecated since 5.0. Callers should use the more generic `canUser()` selector instead of
- *            `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
- */
-export function* hasUploadPermissions() {
-	deprecated( "select( 'core' ).hasUploadPermissions()", {
-		alternative: "select( 'core' ).canUser( 'create', 'media' )",
-	} );
-	yield* canUser( 'create', 'media' );
-}
-
-/**
  * Checks whether the current user can perform the given action on the given
  * REST resource.
  *
@@ -396,13 +385,18 @@ export function* __experimentalGetTemplateForLink( link ) {
 	// Ideally this should be using an apiFetch call
 	// We could potentially do so by adding a "filter" to the `wp_template` end point.
 	// Also it seems the returned object is not a regular REST API post type.
-	const template = yield regularFetch(
-		addQueryArgs( link, {
-			'_wp-find-template': true,
-		} )
-	);
+	let template;
+	try {
+		template = yield regularFetch(
+			addQueryArgs( link, {
+				'_wp-find-template': true,
+			} )
+		);
+	} catch ( e ) {
+		// For non-FSE themes, it is possible that this request returns an error.
+	}
 
-	if ( template === null ) {
+	if ( ! template ) {
 		return;
 	}
 
@@ -421,3 +415,12 @@ export function* __experimentalGetTemplateForLink( link ) {
 		} );
 	}
 }
+
+__experimentalGetTemplateForLink.shouldInvalidate = ( action ) => {
+	return (
+		( action.type === 'RECEIVE_ITEMS' || action.type === 'REMOVE_ITEMS' ) &&
+		action.invalidateCache &&
+		action.kind === 'postType' &&
+		action.name === 'wp_template'
+	);
+};
