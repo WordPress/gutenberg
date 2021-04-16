@@ -4,8 +4,8 @@ Each template or template part contains the [block grammar](https://developer.wo
 
 There is more than one way to add blocks to the theme files:
 
-- Adding and editing blocks in the site editor and exporting the theme.
-- Adding block HTML and comments to the HTML files manually.
+-   Adding and editing blocks in the site editor and exporting the theme.
+-   Adding block HTML and comments to the HTML files manually.
 
 ## Working with blocks and templates in the site editor
 
@@ -35,7 +35,6 @@ Select the index template again to view the template parts together in the page 
 
 To add a post loop to the index template, add a **query** block. The query block includes the query loop and the query pagination. The default loop displays the post title and post content. The query loop and query pagination are also available as individual blocks.
 
-
 ## Saving templates and template parts
 
 When you have made your changes, click on the **update design** button in the upper right corner,
@@ -48,7 +47,6 @@ Select the templates and template parts that you want to save:
 When you save changes in the site editor, the files in the active theme are not updated. Instead, the templates and template parts are saved as custom post types, that are accessed via the appearance menu.
 
 ![The template parts view in the admin area displays a list of all saved template parts](https://wordpress.org/gutenberg/files/2020/07/block-based-themes-appearance-template-parts.png)
-
 
 ## Exporting changes
 
