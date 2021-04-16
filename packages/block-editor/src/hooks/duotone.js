@@ -2,6 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import tinycolor from 'tinycolor2';
 
 /**
  * WordPress dependencies
@@ -19,6 +20,27 @@ import {
 	__experimentalDuotoneControl as DuotoneControl,
 	__experimentalUseEditorFeature as useEditorFeature,
 } from '../components';
+
+/**
+ * Convert a list of colors to an object of R, G, and B values.
+ *
+ * @param {string[]} colors Array of RBG color strings.
+ *
+ * @return {Object} R, G, and B values.
+ */
+export function getValuesFromColors( colors = [] ) {
+	const values = { r: [], g: [], b: [] };
+
+	colors.forEach( ( color ) => {
+		// Access values directly to skip extra rounding that tinycolor.toRgb() does.
+		const tcolor = tinycolor( color );
+		values.r.push( tcolor._r / 255 );
+		values.g.push( tcolor._g / 255 );
+		values.b.push( tcolor._b / 255 );
+	} );
+
+	return values;
+}
 
 /**
  * Values for the SVG `feComponentTransfer`.
@@ -207,7 +229,7 @@ const withDuotoneStyles = createHigherOrderComponent(
 				<DuotoneFilter
 					selector={ selectorsGroup }
 					id={ id }
-					values={ values }
+					values={ getValuesFromColors( values ) }
 				/>
 				<BlockListBlock { ...props } className={ className } />
 			</>

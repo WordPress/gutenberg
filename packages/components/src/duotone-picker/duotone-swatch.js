@@ -3,11 +3,13 @@
  */
 import Swatch from '../swatch';
 
-import { getGradientFromValues } from './utils';
+import { getGradientFromCSSColors } from './utils';
 
 function DuotoneSwatch( { values } ) {
 	return (
-		<Swatch fill={ values && getGradientFromValues( values, '135deg' ) } />
+		<Swatch
+			fill={ values && getGradientFromCSSColors( values, '135deg' ) }
+		/>
 	);
 }
 

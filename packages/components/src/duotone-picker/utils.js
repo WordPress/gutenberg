@@ -13,15 +13,6 @@ import tinycolor from 'tinycolor2';
  */
 
 /**
- * Arrays of values in convenient format for SVG feComponentTransfer.
- *
- * @typedef {Object} RGBValues
- * @property {number[]} r Array of red components of the colors in the range [0,1].
- * @property {number[]} g Array of green components of the colors in the range [0,1].
- * @property {number[]} b Array of blue components of the colors in the range [0,1].
- */
-
-/**
  * Calculate the brightest and darkest values from a color palette.
  *
  * @param {Object[]} palette Color palette for the theme.
@@ -68,97 +59,26 @@ export function getGradientFromCSSColors( colors = [], angle = '90deg' ) {
 }
 
 /**
- * Create a CSS gradient for duotone swatches.
+ * Convert a color array to an array of color stops.
  *
- * @param {RGBValues} values R, G, and B values.
- * @param {string}   angle  CSS gradient angle.
- *
- * @return {string} CSS gradient string for the duotone swatch.
- */
-export function getGradientFromValues(
-	values = { r: [], g: [], b: [] },
-	angle
-) {
-	return getGradientFromCSSColors(
-		getColorsFromValues( values ).map( ( tcolor ) => tcolor.toRgbString() ),
-		angle
-	);
-}
-
-/**
- * Convert a list of colors to an object of R, G, and B values.
- *
- * @param {string[]} colors Array of RBG color strings.
- *
- * @return {RGBValues} R, G, and B values.
- */
-export function getValuesFromColors( colors = [] ) {
-	const values = { r: [], g: [], b: [] };
-
-	colors.forEach( ( color ) => {
-		// Access values directly to skip rounding that tinycolor.toRgb() does.
-		const tcolor = tinycolor( color );
-		values.r.push( tcolor._r / 255 );
-		values.g.push( tcolor._g / 255 );
-		values.b.push( tcolor._b / 255 );
-	} );
-
-	return values;
-}
-
-/**
- * Convert a color values object to an array of colors.
- *
- * @param {RGBValues} values R, G, and B values.
- *
- * @return {Object[]} Tinycolor object array.
- */
-function getColorsFromValues( values = { r: [], g: [], b: [] } ) {
-	// R, G, and B should all be the same length, so we only need to map over one.
-	return values.r.map( ( x, i ) => {
-		return tinycolor( {
-			r: values.r[ i ] * 255,
-			g: values.g[ i ] * 255,
-			b: values.b[ i ] * 255,
-		} );
-	} );
-}
-
-/**
- * Convert a color values object to an array of color stops.
- *
- * @param {RGBValues} values R, G, and B values.
+ * @param {string[]} colors CSS colors array
  *
  * @return {Object[]} Color stop information.
  */
-export function getColorStopsFromValues( values = { r: [], g: [], b: [] } ) {
-	const colors = getColorsFromValues( values );
-	return colors.map( ( tcolor, i ) => ( {
+export function getColorStopsFromColors( colors ) {
+	return colors.map( ( color, i ) => ( {
 		position: ( i * 100 ) / ( colors.length - 1 ),
-		color: tcolor.toRgbString(),
+		color,
 	} ) );
 }
 
 /**
- * Convert a color values object to an array of color stops.
+ * Convert a color stop array to an array colors.
  *
  * @param {Object[]} colorStops Color stop information.
  *
- * @return {RGBValues} R, G, and B values.
+ * @return {string[]} CSS colors array.
  */
-export function getValuesFromColorStops( colorStops = [] ) {
-	return getValuesFromColors( colorStops.map( ( { color } ) => color ) );
-}
-
-/**
- * Convert a color values object to an array of colors.
- *
- * @param {RGBValues} values R, G, and B values.
- *
- * @return {string[]} Hex color array.
- */
-export function getHexColorsFromValues( values = { r: [], g: [], b: [] } ) {
-	return getColorsFromValues( values ).map( ( tcolor ) =>
-		tcolor.toHexString()
-	);
+export function getColorsFromColorStops( colorStops = [] ) {
+	return colorStops.map( ( { color } ) => color );
 }

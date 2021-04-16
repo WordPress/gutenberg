@@ -10,7 +10,7 @@ import Button from '../button';
 import ColorPalette from '../color-palette';
 import Swatch from '../swatch';
 
-function CustomColorOption( { label, value, colors, onChange } ) {
+function ColorOption( { label, value, colors, onChange } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
 	return (
 		<>
@@ -33,11 +33,11 @@ function CustomColorOption( { label, value, colors, onChange } ) {
 	);
 }
 
-function CustomColorListPicker( { colors, labels, value, onChange } ) {
+function ColorListPicker( { colors, labels, value = [], onChange } ) {
 	return (
 		<div className="components-color-list-picker">
 			{ labels.map( ( label, index ) => (
-				<CustomColorOption
+				<ColorOption
 					key={ index }
 					label={ label }
 					value={ value[ index ] }
@@ -53,4 +53,4 @@ function CustomColorListPicker( { colors, labels, value, onChange } ) {
 	);
 }
 
-export default CustomColorListPicker;
+export default ColorListPicker;

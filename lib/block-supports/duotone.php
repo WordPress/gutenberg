@@ -144,7 +144,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	 * @param  string $color_str CSS color string.
 	 * @return array             RGB object.
 	 */
-	function color_string_to_rgb( $color_str ) {
+	function tinycolor_string_to_rgb( $color_str ) {
 		$color_str = strtolower( trim( $color_str ) );
 
 		$css_integer = '[-\\+]?\\d+%?';
@@ -155,7 +155,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		$permissive_match3 = '[\\s|\\(]+(' . $css_unit . ')[,|\\s]+(' . $css_unit . ')[,|\\s]+(' . $css_unit . ')\\s*\\)?';
 		$permissive_match4 = '[\\s|\\(]+(' . $css_unit . ')[,|\\s]+(' . $css_unit . ')[,|\\s]+(' . $css_unit . ')[,|\\s]+(' . $css_unit . ')\\s*\\)?';
 
-		$rgb_regexp  = 'rgb' . $permissive_match3;
+		$rgb_regexp  = '/^rgb' . $permissive_match3 . '$/';
 		if ( preg_match( $rgb_regexp, $color_str, $match ) ) {
 			return rgb_to_rgb( array(
 				'r' => $match[1],
@@ -164,7 +164,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			) );
 		}
 
-		$rgba_regexp = 'rgba' . $permissive_match4;
+		$rgba_regexp = '/^rgba' . $permissive_match4 . '$/';
 		if ( preg_match( $rgba_regexp, $color_str, $match ) ) {
 			return rgb_to_rgb( array(
 				'r' => $match[1],
@@ -173,7 +173,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			) );
 		}
 
-		$hsl_regexp  = 'hsl' . $permissive_match3;
+		$hsl_regexp  = '/^hsl' . $permissive_match3 . '$/';
 		if ( preg_match( $hsl_regexp, $color_str, $match ) ) {
 			return hsl_to_rgb( array(
 				'h' => $match[1],
@@ -182,7 +182,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 			) );
 		}
 
-		$hsla_regexp = 'hsla' . $permissive_match4;
+		$hsla_regexp = '/^hsla' . $permissive_match4 . '$/';
 		if ( preg_match( $hsla_regexp, $color_str, $match ) ) {
 			return hsl_to_rgb( array(
 				'h' => $match[1],
@@ -228,8 +228,21 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 		}
 	}
 
-	$duotone_values = $block['attrs']['style']['color']['duotone'];
-	$duotone_id     = 'wp-duotone-filter-' . uniqid();
+	$duotone_colors = $block['attrs']['style']['color']['duotone'];
+
+	$duotone_values = array(
+		'r' => array(),
+		'g' => array(),
+		'b' => array()
+	);
+	foreach ( $duotone_colors as $color_str ) {
+		$color = tinycolor_string_to_rgb( $color_str );
+		$duotone_values['r'][] = $color['r'] / 255;
+		$duotone_values['g'][] = $color['g'] / 255;
+		$duotone_values['b'][] = $color['b'] / 255;
+	}
+
+	$duotone_id = 'wp-duotone-filter-' . uniqid();
 
 	$selectors        = explode( ',', $duotone_support );
 	$selectors_scoped = array_map(
