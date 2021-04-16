@@ -124,6 +124,12 @@
 				opacity: 1;
 			}
 		}
+
+		// Because of how submenus are positioned, to not crop the focus style, elevate it.
+		:focus {
+			position: relative;
+			z-index: 3;
+		}
 	}
 
 	// Styles for the open modal.
