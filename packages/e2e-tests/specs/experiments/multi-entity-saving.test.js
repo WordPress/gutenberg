@@ -3,6 +3,7 @@
  */
 import {
 	createNewPost,
+	disablePrePublishChecks,
 	insertBlock,
 	publishPost,
 	trashAllPosts,
@@ -167,6 +168,29 @@ describe( 'Multi-entity save flow', () => {
 			// Multi-entity saving should be enabled.
 			await assertMultiSaveEnabled();
 			await assertExistance( saveA11ySelector, true );
+		} );
+
+		it( 'Site blocks should save individually', async () => {
+			await createNewPost();
+			await disablePrePublishChecks();
+
+			await insertBlock( 'Site Title' );
+			await page.keyboard.type( '...' );
+			await insertBlock( 'Site Tagline' );
+			await page.keyboard.type( '...' );
+
+			await page.click( savePostSelector );
+			await page.waitForSelector( savePanelSelector );
+			let checkboxInputs = await page.$$( checkboxInputSelector );
+			expect( checkboxInputs ).toHaveLength( 3 );
+
+			await checkboxInputs[ 1 ].click();
+			await page.click( entitiesSaveSelector );
+
+			await page.click( savePostSelector );
+			await page.waitForSelector( savePanelSelector );
+			checkboxInputs = await page.$$( checkboxInputSelector );
+			expect( checkboxInputs ).toHaveLength( 1 );
 		} );
 	} );
 
