@@ -92,7 +92,7 @@ const createEntrypoints = () => {
 
 		return {
 			...entries,
-			[ blockName ]: scriptPath,
+			[ blockName ]: `./packages/block-library/build-module/${ blockName }/frontend.js`,
 		};
 	}, {} );
 
