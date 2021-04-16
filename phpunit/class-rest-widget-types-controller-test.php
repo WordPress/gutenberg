@@ -70,8 +70,8 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 		$this->assertCount( 1, $routes['/wp/v2/widget-types'] );
 		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)', $routes );
 		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)'] );
-		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)/form-renderer', $routes );
-		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)/form-renderer'] );
+		$this->assertArrayHasKey( '/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)/encode', $routes );
+		$this->assertCount( 1, $routes['/wp/v2/widget-types/(?P<id>[a-zA-Z0-9_-]+)/encode'] );
 	}
 
 	/**
@@ -161,16 +161,13 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 		$response   = rest_get_server()->dispatch( $request );
 		$data       = $response->get_data();
 		$properties = $data['schema']['properties'];
-		$this->assertCount( 8, $properties );
+		$this->assertCount( 5, $properties );
 
 		$this->assertArrayHasKey( 'name', $properties );
 		$this->assertArrayHasKey( 'id', $properties );
-		$this->assertArrayHasKey( 'option_name', $properties );
 		$this->assertArrayHasKey( 'description', $properties );
 		$this->assertArrayHasKey( 'is_multi', $properties );
 		$this->assertArrayHasKey( 'classname', $properties );
-		$this->assertArrayHasKey( 'customize_selective_refresh', $properties );
-		$this->assertArrayHasKey( 'widget_class', $properties );
 	}
 
 	/**
@@ -254,17 +251,6 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 
 		// Test links.
 		$this->assertSame( rest_url( 'wp/v2/widget-types' ), $links['collection'][0]['href'] );
-	}
-
-	public function test_get_widget_form() {
-		$this->setExpectedDeprecated( 'WP_REST_Widget_Types_Controller::get_widget_form' );
-		$widget_name = 'calendar';
-		wp_set_current_user( self::$admin_id );
-		$request  = new WP_REST_Request( 'POST', '/wp/v2/widget-types/' . $widget_name . '/form-renderer' );
-		$response = rest_get_server()->dispatch( $request );
-		$data     = $response->get_data();
-		$this->assertArrayHasKey( 'instance', $data );
-		$this->assertArrayHasKey( 'form', $data );
 	}
 
 	public function test_encode_form_data_with_no_input() {
