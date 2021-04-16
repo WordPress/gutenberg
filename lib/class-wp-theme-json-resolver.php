@@ -422,15 +422,7 @@ class WP_Theme_JSON_Resolver {
 			'show_ui'      => false,
 			'show_in_rest' => true,
 			'rest_base'    => '__experimental/global-styles',
-			'capabilities' => array(
-				'read'                   => 'edit_theme_options',
-				'create_posts'           => 'edit_theme_options',
-				'edit_posts'             => 'edit_theme_options',
-				'edit_published_posts'   => 'edit_theme_options',
-				'delete_published_posts' => 'edit_theme_options',
-				'edit_others_posts'      => 'edit_theme_options',
-				'delete_others_posts'    => 'edit_theme_options',
-			),
+			'capabilities' => gutenberg_get_default_capabilities_for_fse(),
 			'map_meta_cap' => true,
 			'supports'     => array(
 				'title',

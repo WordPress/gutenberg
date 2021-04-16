@@ -143,3 +143,25 @@ function gutenberg_site_editor_load_block_editor_scripts_and_styles( $is_block_e
 		: $is_block_editor_screen;
 }
 add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_site_editor_load_block_editor_scripts_and_styles' );
+
+/**
+ * Used by wp_template, wp_template_part and wp_global_styles to map post type capabilities to edit_theme_options.
+ *
+ * @return array Default capabilities.
+ */
+function gutenberg_get_default_capabilities_for_fse() {
+	return array(
+		'create_posts'           => 'edit_theme_options',
+		'delete_posts'           => 'edit_theme_options',
+		'delete_others_posts'    => 'edit_theme_options',
+		'delete_private_posts'   => 'edit_theme_options',
+		'delete_published_posts' => 'edit_theme_options',
+		'edit_posts'             => 'edit_theme_options',
+		'edit_others_posts'      => 'edit_theme_options',
+		'edit_private_posts'     => 'edit_theme_options',
+		'edit_published_posts'   => 'edit_theme_options',
+		'publish_posts'          => 'edit_theme_options',
+		'read'                   => 'edit_theme_options',
+		'read_private_posts'     => 'edit_theme_options',
+	);
+}

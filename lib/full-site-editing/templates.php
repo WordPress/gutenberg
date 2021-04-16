@@ -66,6 +66,7 @@ function gutenberg_register_template_post_type() {
 		'rest_base'             => 'templates',
 		'rest_controller_class' => 'WP_REST_Templates_Controller',
 		'capability_type'       => array( 'template', 'templates' ),
+		'capabilities'          => gutenberg_get_default_capabilities_for_fse(),
 		'map_meta_cap'          => true,
 		'supports'              => array(
 			'title',
@@ -108,32 +109,6 @@ function gutenberg_register_wp_theme_taxonomy() {
 	);
 }
 add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
-
-/**
- * Filters the capabilities of a user to conditionally grant them capabilities for managing 'wp_template' posts.
- *
- * Any user who can 'edit_theme_options' will have access.
- *
- * @param array $allcaps A user's capabilities.
- * @return array Filtered $allcaps.
- */
-function gutenberg_grant_template_caps( array $allcaps ) {
-	if ( isset( $allcaps['edit_theme_options'] ) ) {
-		$allcaps['edit_templates']             = $allcaps['edit_theme_options'];
-		$allcaps['edit_others_templates']      = $allcaps['edit_theme_options'];
-		$allcaps['edit_published_templates']   = $allcaps['edit_theme_options'];
-		$allcaps['edit_private_templates']     = $allcaps['edit_theme_options'];
-		$allcaps['delete_templates']           = $allcaps['edit_theme_options'];
-		$allcaps['delete_others_templates']    = $allcaps['edit_theme_options'];
-		$allcaps['delete_published_templates'] = $allcaps['edit_theme_options'];
-		$allcaps['delete_private_templates']   = $allcaps['edit_theme_options'];
-		$allcaps['publish_templates']          = $allcaps['edit_theme_options'];
-		$allcaps['read_private_templates']     = $allcaps['edit_theme_options'];
-	}
-
-	return $allcaps;
-}
-add_filter( 'user_has_cap', 'gutenberg_grant_template_caps' );
 
 /**
  * Fixes the label of the 'wp_template' admin menu entry.
