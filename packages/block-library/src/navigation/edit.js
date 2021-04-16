@@ -35,6 +35,7 @@ const ALLOWED_BLOCKS = [
 	'core/social-links',
 	'core/page-list',
 	'core/spacer',
+	'core/home',
 ];
 
 const LAYOUT = {
