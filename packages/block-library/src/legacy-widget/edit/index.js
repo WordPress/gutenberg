@@ -28,6 +28,7 @@ import InspectorCard from './inspector-card';
 import FormWrapper from './form-wrapper';
 import Form from './form';
 import Preview from './preview';
+import NoPreview from './no-preview';
 
 export default function Edit( props ) {
 	const { id, idBase } = props.attributes;
@@ -176,10 +177,7 @@ function NotEmpty( {
 					<Preview idBase={ idBase } instance={ instance } />
 				) : (
 					// TODO: This flashes for a second when enode request is pending.
-					<Placeholder>
-						{ widgetType.name && <h3>{ widgetType.name }</h3> }
-						<p>{ __( 'No preview available.' ) }</p>
-					</Placeholder>
+					<NoPreview name={ widgetType.name } />
 				) ) }
 		</>
 	);
