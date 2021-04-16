@@ -8,9 +8,6 @@ import { isNil, deburr, trim } from 'lodash';
  */
 import { cleanForSlug } from '@wordpress/url';
 
-// This dummy element is used to strip all markup in getTextWithoutMarkup below.
-const dummyElement = document.createElement( 'div' );
-
 /**
  * Runs a callback over all blocks, including nested blocks.
  *
@@ -37,6 +34,7 @@ const recurseOverBlocks = ( blocks, callback ) => {
  * @return {string} The text without markup.
  */
 const getTextWithoutMarkup = ( text ) => {
+	const dummyElement = document.createElement( 'div' );
 	dummyElement.innerHTML = text;
 	return dummyElement.innerText;
 };
