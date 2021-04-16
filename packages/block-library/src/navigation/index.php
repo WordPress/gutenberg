@@ -121,9 +121,10 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
-	$script_path = __DIR__ . '/navigation/frontend.js';
+	$script_path                 = __DIR__ . '/navigation/frontend.js';
+	$should_load_frontend_script = $attributes['responsiveNavigation'] && ! wp_script_is( 'core_block_navigation_load_frontend_scripts' ) && file_exists( $script_path );
 
-	if ( file_exists( $script_path ) ) {
+	if ( $should_load_frontend_script ) {
 		wp_enqueue_script(
 			'core_block_navigation_load_frontend_scripts',
 			plugins_url( 'frontend.js', $script_path ),
@@ -233,4 +234,5 @@ function block_core_navigation_typographic_presets_backcompatibility( $parsed_bl
 	}
 	return $parsed_block;
 }
-	add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
+
+add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );
