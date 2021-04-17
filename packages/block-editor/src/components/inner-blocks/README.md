@@ -41,6 +41,17 @@ _Note:_ A block can render at most a single `InnerBlocks` and `InnerBlocks.Conte
 
 _Note:_ Because the save step will automatically apply props to the element returned by `save`, it is important to include the wrapping `div` in the above simple example even though we are applying no props of our own. In a real-world example, you may have your own attributes to apply to the saved markup, or sibling content adjacent to the rendered nested blocks.
 
+### Alternative usage
+Use `useInnerBlocksProps` hook on an element. This hook is used to lightly mark an element as an inner blocks wrapper element. Call this hook and pass the returned props to the element to mark as an inner blocks wrapper, automatically rendering inner blocks as children. If you define a ref for the element, it is important to pass the ref to this hook, which the hook in turn will pass to the component through the props it returns. Optionally, you can also pass any other props through this hook, and they will be merged and returned.
+
+#### Example:
+
+```jsx
+import { useBlockProps } from '@wordpress/block-editor';
+...
+<div { ...useBlockProps( { className: classNames, style } ) }>
+```
+
 ## Props
 
 ### `allowedBlocks`
