@@ -398,8 +398,11 @@ async function publishNpmLatestDistTag() {
 	await prepareForPackageRelease();
 
 	log(
-		'\n>> 🎉 WordPress packages are now published!\n',
-		'Let also people know on WordPress Slack.\n'
+		'\n>> 🎉 WordPress packages are now published!\n\n',
+		'Please remember to run `git cherry-pick` in the `trunk` branch for the newly created commits during the release with labels:\n',
+		' - Update changelog files (if exists)\n',
+		' - chore(release): publish\n\n',
+		'Finally, let also people know on WordPress Slack and celebrate together.'
 	);
 }
 

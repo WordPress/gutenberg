@@ -17,10 +17,21 @@ import { getBlockDOMNode } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
 
 export function useScrollSelectionIntoView( ref ) {
-	const selectionEnd = useSelect(
-		( select ) => select( blockEditorStore ).getBlockSelectionEnd(),
-		[]
-	);
+	// Although selectionRootClientId isn't used directly in calculating
+	// whether scrolling should occur, it is used as a dependency of the
+	// effect to take into account situations where a block might be moved
+	// to a different parent. In this situation, the selectionEnd clientId
+	// remains the same, so the rootClientId is used to trigger the effect.
+	const { selectionRootClientId, selectionEnd } = useSelect( ( select ) => {
+		const selectors = select( blockEditorStore );
+		const selectionEndClientId = selectors.getBlockSelectionEnd();
+		return {
+			selectionEnd: selectionEndClientId,
+			selectionRootClientId: selectors.getBlockRootClientId(
+				selectionEndClientId
+			),
+		};
+	}, [] );
 
 	useEffect( () => {
 		if ( ! selectionEnd ) {
@@ -45,7 +56,7 @@ export function useScrollSelectionIntoView( ref ) {
 		scrollIntoView( extentNode, scrollContainer, {
 			onlyScrollIfNeeded: true,
 		} );
-	}, [ selectionEnd ] );
+	}, [ selectionRootClientId, selectionEnd ] );
 }
 
 /**

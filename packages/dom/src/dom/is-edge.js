@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { includes } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import getComputedStyle from './get-computed-style';
@@ -11,6 +6,8 @@ import getRangeHeight from './get-range-height';
 import getRectangleFromRange from './get-rectangle-from-range';
 import isSelectionForward from './is-selection-forward';
 import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
+import { assertIsDefined } from '../utils/assert-is-defined';
+import isInputOrTextArea from './is-input-or-text-area';
 
 /**
  * Check whether the selection is at the edge of the container. Checks for
@@ -24,7 +21,7 @@ import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
  * @return {boolean} True if at the edge, false if not.
  */
 export default function isEdge( container, isReverse, onlyVertical ) {
-	if ( includes( [ 'INPUT', 'TEXTAREA' ], container.tagName ) ) {
+	if ( isInputOrTextArea( container ) ) {
 		if ( container.selectionStart !== container.selectionEnd ) {
 			return false;
 		}
@@ -36,16 +33,17 @@ export default function isEdge( container, isReverse, onlyVertical ) {
 		return container.value.length === container.selectionStart;
 	}
 
-	if ( ! container.isContentEditable ) {
+	if ( ! (/** @type {HTMLElement} */ ( container ).isContentEditable) ) {
 		return true;
 	}
 
 	const { ownerDocument } = container;
 	const { defaultView } = ownerDocument;
 
+	assertIsDefined( defaultView, 'defaultView' );
 	const selection = defaultView.getSelection();
 
-	if ( ! selection.rangeCount ) {
+	if ( ! selection || ! selection.rangeCount ) {
 		return false;
 	}
 
@@ -69,9 +67,11 @@ export default function isEdge( container, isReverse, onlyVertical ) {
 	// Only consider the multiline selection at the edge if the direction is
 	// towards the edge. The selection is multiline if it is taller than the
 	// collapsed  selection.
+	const rangeHeight = getRangeHeight( range );
 	if (
 		! isCollapsed &&
-		getRangeHeight( range ) > collapsedRangeRect.height &&
+		rangeHeight &&
+		rangeHeight > collapsedRangeRect.height &&
 		isForward === isReverse
 	) {
 		return false;
@@ -99,7 +99,7 @@ export default function isEdge( container, isReverse, onlyVertical ) {
 		ownerDocument,
 		x,
 		y,
-		container
+		/** @type {HTMLElement} */ ( container )
 	);
 
 	if ( ! testRange ) {

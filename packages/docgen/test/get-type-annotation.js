@@ -12,6 +12,11 @@ const getExportedVariableDeclarationNode = require( './fixtures/type-annotations
 const getImportsParameterizedRestOperatorPredicateIndexerTypeNode = require( './fixtures/type-annotations/imports-parameterized-rest-operator-predicate-indexers/get-node' );
 const getMissingTypesNode = require( './fixtures/type-annotations/missing-types/get-node' );
 const getArrowFunctionNode = require( './fixtures/type-annotations/arrow-function/get-node' );
+const getArrayDestructuringArrayTypeNode = require( './fixtures/type-annotations/array-destructuring-array-type/get-node' );
+const getArrayDestructuringTupleTypeNode = require( './fixtures/type-annotations/array-destructuring-tuple-type/get-node' );
+const getArrayDestructuringAnyOtherTypeNode = require( './fixtures/type-annotations/array-destructuring-any-other-type/get-node' );
+const getObjectDestructuringTypeLiteralNode = require( './fixtures/type-annotations/object-destructuring-object-literal-type/get-node' );
+const getAssignmentPatternNode = require( './fixtures/type-annotations/assignment-pattern/get-node' );
 
 describe( 'Type annotations', () => {
 	it( 'are taken from JSDoc if any', () => {
@@ -20,7 +25,7 @@ describe( 'Type annotations', () => {
 			type: 'number',
 		};
 		const node = {};
-		const result = getTypeAnnotation( tag, node );
+		const result = getTypeAnnotation( tag, node, 0 );
 		expect( result ).toBe( 'number' );
 	} );
 
@@ -29,7 +34,7 @@ describe( 'Type annotations', () => {
 			tag: 'unknown',
 		};
 		const node = {};
-		const result = getTypeAnnotation( tag, node );
+		const result = getTypeAnnotation( tag, node, 0 );
 		expect( result ).toBe( '' );
 	} );
 
@@ -67,7 +72,9 @@ describe( 'Type annotations', () => {
 			`should get the parameter type for an %s`,
 			( paramType, expected ) => {
 				const node = getSimpleTypeNode( { paramType } );
-				expect( getTypeAnnotation( paramTag, node ) ).toBe( expected );
+				expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
+					expected
+				);
 			}
 		);
 
@@ -75,7 +82,9 @@ describe( 'Type annotations', () => {
 			`should get the return type for an %s`,
 			( returnType, expected ) => {
 				const node = getSimpleTypeNode( { returnType } );
-				expect( getTypeAnnotation( returnTag, node ) ).toBe( expected );
+				expect( getTypeAnnotation( returnTag, node, 0 ) ).toBe(
+					expected
+				);
 			}
 		);
 	} );
@@ -84,13 +93,13 @@ describe( 'Type annotations', () => {
 		const node = getArraysGenericTypesUnionsAndIntersctionsNode();
 
 		it( 'should get the param type', () => {
-			expect( getTypeAnnotation( paramTag, node ) ).toBe(
+			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
 				'MyType< string | number >[]'
 			);
 		} );
 
 		it( 'should get the return type', () => {
-			expect( getTypeAnnotation( returnTag, node ) ).toBe(
+			expect( getTypeAnnotation( returnTag, node, 0 ) ).toBe(
 				'MyType< string & number >[]'
 			);
 		} );
@@ -113,7 +122,7 @@ describe( 'Type annotations', () => {
 						literalType,
 						literalValue,
 					} );
-					expect( getTypeAnnotation( tag, node ) ).toBe(
+					expect( getTypeAnnotation( tag, node, 0 ) ).toBe(
 						literalResult
 					);
 				}
@@ -125,13 +134,13 @@ describe( 'Type annotations', () => {
 		const node = getTypeLiteralNode();
 
 		it( 'should get the param type literal annotation', () => {
-			expect( getTypeAnnotation( paramTag, node ) ).toBe(
+			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
 				"{ ( bar: string ): void; bar: string; optionalBar?: 'left' | 'right'; [ key: number ]: string; }"
 			);
 		} );
 
 		it( 'should get the return type literal annotation', () => {
-			expect( getTypeAnnotation( returnTag, node ) ).toBe(
+			expect( getTypeAnnotation( returnTag, node, 0 ) ).toBe(
 				"{ ( bar: string ): void; bar: string; optionalBar?: 'left' | 'right'; [ key: number ]: string; }"
 			);
 		} );
@@ -141,11 +150,11 @@ describe( 'Type annotations', () => {
 		const node = getNamedExportNode();
 
 		it( 'should get the param type', () => {
-			expect( getTypeAnnotation( paramTag, node ) ).toBe( 'string' );
+			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe( 'string' );
 		} );
 
 		it( 'should get the return type', () => {
-			expect( getTypeAnnotation( returnTag, node ) ).toBe( 'string' );
+			expect( getTypeAnnotation( returnTag, node, 0 ) ).toBe( 'string' );
 		} );
 	} );
 
@@ -153,11 +162,11 @@ describe( 'Type annotations', () => {
 		const node = getExportedVariableDeclarationNode();
 
 		it( 'should get the param type', () => {
-			expect( getTypeAnnotation( paramTag, node ) ).toBe( 'string' );
+			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe( 'string' );
 		} );
 
 		it( 'should get the return type', () => {
-			expect( getTypeAnnotation( returnTag, node ) ).toBe( 'void' );
+			expect( getTypeAnnotation( returnTag, node, 0 ) ).toBe( 'void' );
 		} );
 	} );
 
@@ -165,19 +174,19 @@ describe( 'Type annotations', () => {
 		const node = getImportsParameterizedRestOperatorPredicateIndexerTypeNode();
 
 		it( 'should get the index accessed import type', () => {
-			expect( getTypeAnnotation( paramTag, node ) ).toBe(
+			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
 				"import( 'react' ).bar.baz.types.ComponentType[ 'displayName' ]"
 			);
 		} );
 
 		it( 'should get the parameterized tuple rest type', () => {
 			expect(
-				getTypeAnnotation( { ...paramTag, name: 'rest' }, node )
+				getTypeAnnotation( { ...paramTag, name: 'rest' }, node, 1 )
 			).toBe( '[ string | number, ...( keyof constant ) ]' );
 		} );
 
 		it( 'should get the type predicate return type', () => {
-			expect( getTypeAnnotation( returnTag, node ) ).toBe(
+			expect( getTypeAnnotation( returnTag, node, 1 ) ).toBe(
 				'foo is string'
 			);
 		} );
@@ -187,23 +196,63 @@ describe( 'Type annotations', () => {
 		const node = getMissingTypesNode();
 
 		it( 'should throw an error if there is no return type', () => {
-			expect( () => getTypeAnnotation( returnTag, node ) ).toThrow(
+			expect( () => getTypeAnnotation( returnTag, node, 0 ) ).toThrow(
 				"Could not find return type for function 'fn'."
 			);
 		} );
 
 		it( 'should throw an error if there is no param type', () => {
-			expect( () => getTypeAnnotation( paramTag, node ) ).toThrow(
+			expect( () => getTypeAnnotation( paramTag, node, 0 ) ).toThrow(
 				"Could not find type for parameter 'foo' in function 'fn'."
 			);
 		} );
+	} );
 
-		it( 'should throw an error if it cannot find the param by name', () => {
-			expect( () =>
-				getTypeAnnotation( { ...paramTag, name: 'notFoo' }, node )
-			).toThrow(
-				"Could not find corresponding parameter token for documented parameter 'notFoo' in function 'fn'."
-			);
+	describe( 'function argument array-destructuring', () => {
+		describe( 'array-type', () => {
+			const node = getArrayDestructuringArrayTypeNode();
+
+			it( 'should grab the whole type for the unqualified name', () => {
+				expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe( 'T[]' );
+			} );
+
+			it( 'should get the individual type for the qualified name', () => {
+				expect(
+					getTypeAnnotation( { ...paramTag, name: 'foo.0' }, node, 0 )
+				).toBe( 'T' );
+			} );
+		} );
+
+		describe( 'tuple-type', () => {
+			const node = getArrayDestructuringTupleTypeNode();
+
+			it( 'should grab the whole type for the unqualified name', () => {
+				expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
+					'[ T, S ]'
+				);
+			} );
+
+			it( 'should get the individual type for the qualified name', () => {
+				expect(
+					getTypeAnnotation( { ...paramTag, name: 'foo.1' }, node, 0 )
+				).toBe( 'S' );
+			} );
+		} );
+
+		describe( 'any-other-type', () => {
+			const node = getArrayDestructuringAnyOtherTypeNode();
+
+			it( 'should get the full type name for the unqualified name', () => {
+				expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
+					'( T & S ) | V'
+				);
+			} );
+
+			it( 'should get the full type with a qualification for the qualified name', () => {
+				expect(
+					getTypeAnnotation( { ...paramTag, name: 'foo.1' }, node, 0 )
+				).toBe( '( ( T & S ) | V )[ 1 ]' );
+			} );
 		} );
 	} );
 
@@ -212,8 +261,54 @@ describe( 'Type annotations', () => {
 
 		it( 'should correctly format the arrow function', () => {
 			expect(
-				getTypeAnnotation( { ...paramTag, name: 'callback' }, node )
+				getTypeAnnotation( { ...paramTag, name: 'callback' }, node, 0 )
 			).toBe( '( foo: string, ...rest: any[] ) => GenericType< T >' );
+		} );
+	} );
+
+	describe( 'function argument object destructuring', () => {
+		describe( 'type literal', () => {
+			const node = getObjectDestructuringTypeLiteralNode();
+
+			it( 'should get the full type for the param', () => {
+				expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe(
+					'{ foo: string; }'
+				);
+			} );
+
+			it( 'should get the member type for the param', () => {
+				expect(
+					getTypeAnnotation(
+						{ ...paramTag, name: 'props.foo' },
+						node,
+						0
+					)
+				).toBe( 'string' );
+			} );
+
+			it( 'should get the member type for an unfindable member', () => {
+				expect(
+					getTypeAnnotation(
+						{ ...paramTag, name: 'props.notFoo' },
+						node,
+						0
+					)
+				).toBe( "{ foo: string; }[ 'notFoo' ]" );
+			} );
+		} );
+	} );
+
+	describe( 'assignment pattern', () => {
+		const node = getAssignmentPatternNode();
+
+		it( 'should get the type of the assignment pattern', () => {
+			expect( getTypeAnnotation( paramTag, node, 0 ) ).toBe( 'string' );
+		} );
+
+		it( 'should get the type of the assignment pattern for array destructuring', () => {
+			expect(
+				getTypeAnnotation( { ...paramTag, name: 'props.0' }, node, 0 )
+			).toBe( '( string )[ 0 ]' );
 		} );
 	} );
 } );

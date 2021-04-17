@@ -7,7 +7,7 @@ import { doAction } from '@wordpress/hooks';
  * Object map tracking messages which have been logged, for use in ensuring a
  * message is only logged once.
  *
- * @type {Record<string,true|undefined>}
+ * @type {Record<string, true | undefined>}
  */
 export const logged = Object.create( null );
 
@@ -78,3 +78,5 @@ export default function deprecated( feature, options = {} ) {
 
 	logged[ message ] = true;
 }
+
+/** @typedef {import('utility-types').NonUndefined<Parameters<typeof deprecated>[1]>} DeprecatedOptions */
