@@ -2,9 +2,9 @@
 
 To modify the behavior of existing blocks, WordPress exposes several APIs:
 
-### Block Style Variations
+### Block Styles
 
-Block Style Variations allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the style variation is selected. See the [Getting Started with JavaScript tutorial](/docs/how-to-guides/javascript/) for a full example.
+Block Styles allow providing alternative styles to existing blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the block style is selected. See the [Getting Started with JavaScript tutorial](/docs/how-to-guides/javascript/) for a full example.
 
 _Example:_
 
@@ -15,11 +15,11 @@ wp.blocks.registerBlockStyle( 'core/quote', {
 } );
 ```
 
-The example above registers a block style variation named `fancy-quote` to the `core/quote` block. When the user selects this block style variation from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
+The example above registers a block style named `fancy-quote` to the `core/quote` block. When the user selects this block style from the styles selector, an `is-style-fancy-quote` className will be added to the block's wrapper.
 
-By adding `isDefault: true` you can mark the registered style variation as the one that is recognized as active when no custom class name is provided. It also means that there will be no custom class name added to the HTML output for the style that is marked as default.
+By adding `isDefault: true` you can mark the registered block style as the one that is recognized as active when no custom class name is provided. It also means that there will be no custom class name added to the HTML output for the style that is marked as default.
 
-To remove a block style variation use `wp.blocks.unregisterBlockStyle()`.
+To remove a block style use `wp.blocks.unregisterBlockStyle()`.
 
 _Example:_
 
@@ -27,7 +27,7 @@ _Example:_
 wp.blocks.unregisterBlockStyle( 'core/quote', 'large' );
 ```
 
-The above removes the variation named `large` from the `core/quote` block.
+The above removes the block style named `large` from the `core/quote` block.
 
 **Important:** When unregistering a block style, there can be a [race condition](https://en.wikipedia.org/wiki/Race_condition) on which code runs first: registering the style, or unregistering the style. You want your unregister code to run last. The way to do that is specify the component that is registering the style as a dependency, in this case `wp-edit-post`. Additionally, using `wp.domReady()` ensures the unregister code runs once the dom is loaded.
 
@@ -73,7 +73,7 @@ Besides the two mandatory properties, the styles properties array should also in
 -   `inline_style`: Contains inline CSS code that registers the CSS class required for the style.
 -   `style_handle`: Contains the handle to an already registered style that should be enqueued in places where block styles are needed.
 
-It is also possible to set the `is_default` property to `true` to mark one of the block style variations as the default one.
+It is also possible to set the `is_default` property to `true` to mark one of the block styles as the default one.
 
 The following code sample registers a style for the quote block named "Blue Quote", and provides an inline style that makes quote blocks with the "Blue Quote" style have blue color:
 
@@ -88,7 +88,7 @@ register_block_style(
 );
 ```
 
-Alternatively, if a stylesheet was already registered which contains the CSS for the style variation, it is possible to just pass the stylesheet's handle so `register_block_style` function will make sure it is enqueue.
+Alternatively, if a stylesheet was already registered which contains the CSS for the block style, it is possible to just pass the stylesheet's handle so `register_block_style` function will make sure it is enqueue.
 
 The following code sample provides an example of this use case:
 
