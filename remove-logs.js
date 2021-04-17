@@ -30,6 +30,7 @@ const logConfig = [
 				nonCommented: /\t\t", version " \+ jQuery.migrateVersion \);\n/g,
 				commented: '\t\t", version " + jQuery.migrateVersion );*/\n',
 			},
+			{
 				nonCommented: /\t\t\tconsole.warn\( "JQMIGRATE: " \+ msg \);\n/g,
 				commented: '\t\t\t/*console.warn( "JQMIGRATE: " + msg );\n',
 			},
