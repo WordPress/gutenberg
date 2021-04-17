@@ -50,9 +50,9 @@ An object describing a variation defined for the block type can contain the foll
 -   `keywords` (optional, type `string[]`) - An array of terms (which can be translated) that help users discover the variation while searching.
 -   `isActive` (optional, type `Function`) - A function that accepts a block's attributes and the variation's attributes and determines if a variation is active. This function doesn't try to find a match dynamically based on all block's attributes, as in many cases some attributes are irrelevant. An example would be for `embed` block where we only care about `providerNameSlug` attribute's value.
 
-The main difference between style variations and block variations is that a style variation just applies a `css class` to the block, so it can be styled in an alternative way. If we want to apply initial attributes or inner blocks, we fall in block variation territory.
+The main difference between block styles and block variations is that a block style just applies a CSS class to the block, so it can be styled in an alternative way. If we want to apply initial attributes or inner blocks, we fall in block variation territory.
 
-It's also possible to override the default block style variation using the `className` attribute when defining block variations.
+It's also possible to override the default block style using the `className` attribute when defining block variations.
 
 ```js
 variations: [
