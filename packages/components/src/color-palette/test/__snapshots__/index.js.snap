@@ -118,6 +118,8 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
       aria-label="Custom color picker"
       isLink={true}
       onClick={[Function]}
+      onMouseDown={[Function]}
+      onMouseUp={[Function]}
     >
       <button
         aria-describedby={null}
@@ -126,6 +128,8 @@ exports[`ColorPalette Dropdown should render it correctly 1`] = `
         aria-label="Custom color picker"
         className="components-button is-link"
         onClick={[Function]}
+        onMouseDown={[Function]}
+        onMouseUp={[Function]}
         type="button"
       >
         Custom color
@@ -552,6 +556,8 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                 aria-label="Custom color picker"
                 isLink={true}
                 onClick={[Function]}
+                onMouseDown={[Function]}
+                onMouseUp={[Function]}
               >
                 <button
                   aria-describedby={null}
@@ -560,6 +566,8 @@ exports[`ColorPalette should render a dynamic toolbar of colors 1`] = `
                   aria-label="Custom color picker"
                   className="components-button is-link"
                   onClick={[Function]}
+                  onMouseDown={[Function]}
+                  onMouseUp={[Function]}
                   type="button"
                 >
                   Custom color

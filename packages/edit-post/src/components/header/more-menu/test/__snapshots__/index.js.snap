@@ -60,6 +60,8 @@ exports[`MoreMenu should match snapshot 1`] = `
           label="Options"
           onClick={[Function]}
           onKeyDown={[Function]}
+          onMouseDown={[Function]}
+          onMouseUp={[Function]}
           showTooltip={true}
           tooltipPosition="bottom"
         >
@@ -80,6 +82,7 @@ exports[`MoreMenu should match snapshot 1`] = `
               onMouseDown={[Function]}
               onMouseEnter={[Function]}
               onMouseLeave={[Function]}
+              onMouseUp={[Function]}
               type="button"
             >
               <Icon

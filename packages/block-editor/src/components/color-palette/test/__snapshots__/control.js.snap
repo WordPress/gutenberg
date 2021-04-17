@@ -98,6 +98,8 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
               aria-label="Custom color picker"
               className="components-button is-link"
               onClick={[Function]}
+              onMouseDown={[Function]}
+              onMouseUp={[Function]}
               type="button"
             >
               Custom color
