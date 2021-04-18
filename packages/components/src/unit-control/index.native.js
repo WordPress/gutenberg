@@ -123,11 +123,18 @@ function UnitControl( {
 		);
 	}, [ pickerRef, units, onUnitChange, getAnchor ] );
 
-	// Get current unit type
-	const activeUnit = units.find( ( option ) => option.value === unit );
-
-	// Extract the step
-	const unitStep = activeUnit?.step ? activeUnit.step : 1;
+	let step = props.step;
+	// If no step prop has been passed
+	if ( ! step ) {
+		// Get current unit type
+		let activeUnit = units.find( ( option ) => option.value === unit );
+		// if unit wasn't found, choose the first option
+		if ( ! activeUnit && units.length > 0 ) {
+			activeUnit = units[ 0 ];
+		}
+		// Extract the step if it exists, or default to `1`
+		step = activeUnit?.step ? activeUnit.step : 1;
+	}
 
 	return (
 		<>
@@ -139,7 +146,7 @@ function UnitControl( {
 					onChange={ onChange }
 					separatorType={ separatorType }
 					value={ value }
-					step={ unitStep }
+					step={ step }
 					defaultValue={ initialControlValue }
 					shouldDisplayTextInput
 					decimalNum={ unit === 'px' ? 0 : decimalNum }

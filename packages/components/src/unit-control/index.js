@@ -159,11 +159,18 @@ function UnitControl(
 		/>
 	) : null;
 
-	// Get current unit type
-	const activeUnit = units.find( ( option ) => option.value === unit );
-
-	// Extract the step
-	const unitStep = activeUnit?.step ? activeUnit.step : 1;
+	let step = props.step;
+	// if no step prop has been passed
+	if ( ! step ) {
+		// Get current unit type
+		let activeUnit = units.find( ( option ) => option.value === unit );
+		// if unit wasn't found, choose the first option
+		if ( ! activeUnit && units.length > 0 ) {
+			activeUnit = units[ 0 ];
+		}
+		// Extract the step if it exists, or default to `1`
+		step = activeUnit?.step ? activeUnit.step : 1;
+	}
 
 	return (
 		<Root className="components-unit-control-wrapper" style={ style }>
@@ -184,7 +191,7 @@ function UnitControl(
 				size={ size }
 				suffix={ inputSuffix }
 				value={ value }
-				step={ unitStep }
+				step={ step }
 				__unstableStateReducer={ composeStateReducers(
 					unitControlStateReducer,
 					stateReducer
