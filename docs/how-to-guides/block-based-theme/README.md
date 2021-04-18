@@ -180,7 +180,7 @@ The HTML comments starts with `wp:template-part` which is the name of the templa
 <!-- wp:template-part {"slug":"footer","theme":"myfirsttheme"} /-->
 ```
 
-If you used a different theme name, adjust the value for the theme key.
+If you used a different theme name, adjust the value for the theme text domain.
 
 Eventually, you will be able to create and combine templates and template parts directly in the site editor.
 
