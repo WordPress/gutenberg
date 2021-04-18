@@ -1,11 +1,11 @@
 /**
  * WordPress dependencies
  */
-import { useReducer, createPortal, useMemo } from '@wordpress/element';
+import { useMemo, createPortal } from '@wordpress/element';
 import {
-	BlockEditorProvider,
 	BlockList,
 	BlockSelectionClearer,
+	BlockInspector,
 	ObserveTyping,
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
@@ -20,42 +20,12 @@ import {
 /**
  * Internal dependencies
  */
-import Inspector, { BlockInspectorButton } from '../inspector';
+import BlockInspectorButton from '../block-inspector-button';
 import Header from '../header';
-import useSidebarBlockEditor from './use-sidebar-block-editor';
 import useInserter from '../inserter/use-inserter';
+import SidebarEditorProvider from './sidebar-editor-provider';
 
-const inspectorOpenStateReducer = ( state, action ) => {
-	switch ( action ) {
-		case 'OPEN':
-			return {
-				open: true,
-				busy: true,
-			};
-		case 'TRANSITION_END':
-			return {
-				...state,
-				busy: false,
-			};
-		case 'CLOSE':
-			return {
-				open: false,
-				busy: true,
-			};
-		default:
-			throw new Error( 'Unexpected action' );
-	}
-};
-
-export default function SidebarBlockEditor( { sidebar, inserter } ) {
-	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
-	const [
-		{ open: isInspectorOpened, busy: isInspectorAnimating },
-		setInspectorOpenState,
-	] = useReducer( inspectorOpenStateReducer, { open: false, busy: false } );
-	const parentContainer = document.getElementById(
-		'customize-theme-controls'
-	);
+export default function SidebarBlockEditor( { sidebar, inserter, inspector } ) {
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
 	const settings = useMemo(
 		() => ( {
@@ -63,58 +33,52 @@ export default function SidebarBlockEditor( { sidebar, inserter } ) {
 		} ),
 		[]
 	);
+	const parentContainer = document.getElementById(
+		'customize-theme-controls'
+	);
 
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
 			<SlotFillProvider>
 				<DropZoneProvider>
-					<div hidden={ isInspectorOpened && ! isInspectorAnimating }>
-						<BlockEditorProvider
-							value={ blocks }
-							onInput={ onInput }
-							onChange={ onChange }
-							settings={ settings }
-							useSubRegistry={ false }
-						>
-							<BlockEditorKeyboardShortcuts />
+					<SidebarEditorProvider
+						sidebar={ sidebar }
+						settings={ settings }
+					>
+						<BlockEditorKeyboardShortcuts />
 
-							<Header
-								inserter={ inserter }
-								isInserterOpened={ isInserterOpened }
-								setIsInserterOpened={ setIsInserterOpened }
-							/>
+						<Header
+							inserter={ inserter }
+							isInserterOpened={ isInserterOpened }
+							setIsInserterOpened={ setIsInserterOpened }
+						/>
 
-							<BlockSelectionClearer>
-								<WritingFlow>
-									<ObserveTyping>
-										<BlockList />
-									</ObserveTyping>
-								</WritingFlow>
-							</BlockSelectionClearer>
-						</BlockEditorProvider>
+						<BlockSelectionClearer>
+							<WritingFlow>
+								<ObserveTyping>
+									<BlockList />
+								</ObserveTyping>
+							</WritingFlow>
+						</BlockSelectionClearer>
+					</SidebarEditorProvider>
 
-						<Popover.Slot name="block-toolbar" />
-					</div>
+					<Popover.Slot name="block-toolbar" />
 
 					{ createPortal(
-						<Inspector
-							isOpened={ isInspectorOpened }
-							isAnimating={ isInspectorAnimating }
-							setInspectorOpenState={ setInspectorOpenState }
-						/>,
-						parentContainer
+						// This is a temporary hack to prevent button component inside <BlockInspector>
+						// from submitting form when type="button" is not specified.
+						<form onSubmit={ ( event ) => event.preventDefault() }>
+							<BlockInspector />
+						</form>,
+						inspector.contentContainer[ 0 ]
 					) }
 
 					<__experimentalBlockSettingsMenuFirstItem>
 						{ ( { onClose } ) => (
 							<BlockInspectorButton
-								onClick={ () => {
-									// Open the inspector,
-									setInspectorOpenState( 'OPEN' );
-									// Then close the dropdown menu.
-									onClose();
-								} }
+								inspector={ inspector }
+								closeMenu={ onClose }
 							/>
 						) }
 					</__experimentalBlockSettingsMenuFirstItem>

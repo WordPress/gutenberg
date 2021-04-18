@@ -11,9 +11,9 @@ import apiFetch from '..';
 /**
  * Apply query arguments to both URL and Path, whichever is present.
  *
- * @param {import('../types').ApiFetchRequestProps} props
+ * @param {import('../types').APIFetchOptions} props
  * @param {Record<string, string | number>} queryArgs
- * @return {import('../types').ApiFetchRequestProps} The request with the modified query args
+ * @return {import('../types').APIFetchOptions} The request with the modified query args
  */
 const modifyQuery = ( { path, url, ...options }, queryArgs ) => ( {
 	...options,
@@ -56,7 +56,7 @@ const getNextPageUrl = ( response ) => {
 };
 
 /**
- * @param {import('../types').ApiFetchRequestProps} options
+ * @param {import('../types').APIFetchOptions} options
  * @return {boolean} True if the request contains an unbounded query.
  */
 const requestContainsUnboundedQuery = ( options ) => {
@@ -72,7 +72,7 @@ const requestContainsUnboundedQuery = ( options ) => {
  * collections, apiFetch consumers can pass `per_page=-1`; this middleware will
  * then recursively assemble a full response array from all available pages.
  *
- * @type {import('../types').ApiFetchMiddleware}
+ * @type {import('../types').APIFetchMiddleware}
  */
 const fetchAllMiddleware = async ( options, next ) => {
 	if ( options.parse === false ) {

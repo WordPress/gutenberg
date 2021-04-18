@@ -21,9 +21,7 @@ Renders the variations of a block.
 import { BlockVariationPicker } from '@wordpress/block-editor';
 
 const MyBlockVariationPicker = () => (
-	<BlockVariationPicker
-		variations={ variations }
-	/>
+	<BlockVariationPicker variations={ variations } />
 );
 ```
 

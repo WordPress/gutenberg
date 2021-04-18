@@ -15,6 +15,9 @@ import {
 } from '@wordpress/block-editor';
 import { BlockQuotation } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
+import { Platform } from '@wordpress/element';
+
+const isWebPlatform = Platform.OS === 'web';
 
 export default function QuoteEdit( {
 	attributes,
@@ -65,7 +68,7 @@ export default function QuoteEdit( {
 					aria-label={ __( 'Quote text' ) }
 					placeholder={
 						// translators: placeholder text used for the quote
-						__( 'Write quote…' )
+						__( 'Add quote' )
 					}
 					onReplace={ onReplace }
 					onSplit={ ( piece ) =>
@@ -82,7 +85,7 @@ export default function QuoteEdit( {
 				{ ( ! RichText.isEmpty( citation ) || isSelected ) && (
 					<RichText
 						identifier="citation"
-						tagName="cite"
+						tagName={ isWebPlatform ? 'cite' : undefined }
 						style={ { display: 'block' } }
 						value={ citation }
 						onChange={ ( nextCitation ) =>
@@ -94,7 +97,7 @@ export default function QuoteEdit( {
 						aria-label={ __( 'Quote citation text' ) }
 						placeholder={
 							// translators: placeholder text used for the citation
-							__( 'Write citation…' )
+							__( 'Add citation' )
 						}
 						className="wp-block-quote__citation"
 						textAlign={ align }

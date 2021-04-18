@@ -124,6 +124,16 @@ As we're still early in the process, the number of blocks specifically dedicated
 
 One of the most important aspects of themes (if not the most important) is the styling. While initially you'll be able to provide styles and enqueue them using the same hooks themes have always used, the [Global Styles](/docs/how-to-guides/themes/theme-json.md) effort will provide a scaffolding for adding many theme styles in the future.
 
+## Classic Themes
+
+Users of classic themes can also build custom block templates and use theme in their Pages and Custom Post Types that supports Page Templates.
+
+Theme authors can opt-out of this feature by removing the `block-templates` theme support in their `functions.php` file.
+
+```php
+remove_theme_support( 'block-templates' );
+```
+
 ## Resources
 
 -   [Full Site Editing](https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Full%20Site%20Editing) label.

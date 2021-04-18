@@ -1,18 +1,16 @@
 [
-    {
-        "blockName": "core/calendar",
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "",
-        "innerContent": []
-    },
-    {
-        "blockName": null,
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "\n",
-        "innerContent": [
-            "\n"
-        ]
-    }
+	{
+		"blockName": "core/calendar",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n",
+		"innerContent": [ "\n" ]
+	}
 ]
