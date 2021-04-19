@@ -18,6 +18,10 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		return '';
 	}
 
+	if ( empty( get_the_content( $block->context['postId'] ) ) ) {
+		return '';
+	}
+
 	if ( ! in_the_loop() ) {
 		the_post();
 	}
