@@ -8,35 +8,37 @@
 /**
  * Direct port of tinycolor's bound01 function, lightly simplified to maintain
  * consistency with tinycolor.
+ *
  * @see https://github.com/bgrins/TinyColor
- * 
+ *
  * @param  mixed $n   Number of unknown type.
  * @param  int   $max Upper value of the range to bound to.
- * @return float      Value in the range [0,1]
+ * @return float      Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound01( $n, $max ) {
-    if ( gettype( $n ) === 'string' && strpos( $n, '.' ) != false && (float) $n === 1 ) { $n = '100%'; }
+	if ( 'string' === gettype( $n ) && false !== strpos( $n, '.' ) && 1 === (float) $n ) { $n = '100%'; }
 
-    $n = min( $max, max( 0, (float) $n ) );
+	$n = min( $max, max( 0, (float) $n ) );
 
-    // Automatically convert percentage into number
-    if ( gettype( $n ) === 'string' && strpos( $n, '%' ) != false ) {
-        $n = (int) ( $n * $max ) / 100;
-    }
+	// Automatically convert percentage into number.
+	if ( 'string' === gettype( $n ) && false !== strpos( $n, '%' ) ) {
+		$n = (int) ( $n * $max ) / 100;
+	}
 
-    // Handle floating point rounding errors
-    if ( ( abs( $n - $max ) < 0.000001 ) ) {
-        return 1.0;
-    }
+	// Handle floating point rounding errors.
+	if ( ( abs( $n - $max ) < 0.000001 ) ) {
+		return 1.0;
+	}
 
-    // Convert into [0, 1] range if it isn't already
-    return ( $n % $max ) / (float) $max;
+	// Convert into [0, 1] range if it isn't already.
+	return ( $n % $max ) / (float) $max;
 }
 
 /**
  * Round and convert values of an RGB object.
+ *
  * @see https://github.com/bgrins/TinyColor
- * 
+ *
  * @param  array $rgb_color RGB object.
  * @return array            Rounded and converted RGB object.
  */
@@ -50,45 +52,60 @@ function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
 
 /**
  * Helper function for hsl to rgb conversion.
+ *
  * @see https://github.com/bgrins/TinyColor
- * 
- * @param  float $p first component
- * @param  float $q second component
- * @param  float $t third component
- * @return float    R, G, or B component
+ *
+ * @param  float $p first component.
+ * @param  float $q second component.
+ * @param  float $t third component.
+ * @return float    R, G, or B component.
  */
 function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
-	if ( $t < 0 ) $t += 1;
-	if ( $t > 1 ) $t -= 1;
-	if ( $t < 1 / 6 ) return $p + ( $q - $p ) * 6 * $t;
-	if ( $t < 1 / 2 ) return $q;
-	if ( $t < 2 / 3 ) return $p + ( $q - $p ) * ( 2 / 3 - $t ) * 6;
+	if ( $t < 0 ) {
+		$t += 1;
+	}
+	if ( $t > 1 ) {
+		$t -= 1;
+	}
+	if ( $t < 1 / 6 ) {
+		return $p + ( $q - $p ) * 6 * $t;
+	}
+	if ( $t < 1 / 2 ) {
+		return $q;
+	}
+	if ( $t < 2 / 3 ) {
+		return $p + ( $q - $p ) * ( 2 / 3 - $t ) * 6;
+	}
 	return $p;
 }
 
 /**
  * Convert an HSL object to an RGB object with converted and rounded values.
- * @see https://github.com/bgrins/TinyColor
  * 
+ * @see https://github.com/bgrins/TinyColor
+ *
  * @param  array $hsl_color HSL object.
  * @return array            Rounded and converted RGB object.
  */
 function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
-    $h = gutenberg_tinycolor_bound01( $hsl_color['h'], 360 );
-    $s = gutenberg_tinycolor_bound01( $hsl_color['s'], 100 );
-    $l = gutenberg_tinycolor_bound01( $hsl_color['l'], 100 );
+	$h = gutenberg_tinycolor_bound01( $hsl_color['h'], 360 );
+	$s = gutenberg_tinycolor_bound01( $hsl_color['s'], 100 );
+	$l = gutenberg_tinycolor_bound01( $hsl_color['l'], 100 );
 
-    if ( $s === 0 ) {
-        $r = $g = $b = $l; // achromatic
-    } else {
-        $q = $l < 0.5 ? $l * ( 1 + $s ) : $l + $s - $l * $s;
-        $p = 2 * $l - $q;
-        $r = gutenberg_tinycolor_hue_to_rgb( $p, $q, $h + 1 / 3 );
-        $g = gutenberg_tinycolor_hue_to_rgb( $p, $q, $h );
-        $b = gutenberg_tinycolor_hue_to_rgb( $p, $q, $h - 1 / 3 );
-    }
+	if ( 0 === $s ) {
+ 		// Achromatic.
+		$r = $l;
+		$g = $l;
+		$b = $l;
+	} else {
+		$q = $l < 0.5 ? $l * ( 1 + $s ) : $l + $s - $l * $s;
+		$p = 2 * $l - $q;
+		$r = gutenberg_tinycolor_hue_to_rgb( $p, $q, $h + 1 / 3 );
+		$g = gutenberg_tinycolor_hue_to_rgb( $p, $q, $h );
+		$b = gutenberg_tinycolor_hue_to_rgb( $p, $q, $h - 1 / 3 );
+	}
 
-    return array(
+	return array(
 		'r' => $r * 255,
 		'g' => $g * 255,
 		'b' => $b * 255
@@ -99,9 +116,10 @@ function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
  * Parses hex, hsl, and rgb CSS strings using the same regex as tinycolor v1.4.2
  * used in the JavaScript. Only colors output from react-color are implemented
  * and the alpha value is ignored as it is not used in duotone.
+ * 
  * @see https://github.com/bgrins/TinyColor
  * @see https://github.com/casesandberg/react-color/
- * 
+ *
  * @param  string $color_str CSS color string.
  * @return array             RGB object.
  */
@@ -109,83 +127,99 @@ function gutenberg_tinycolor_string_to_rgb( $color_str ) {
 	$color_str = strtolower( trim( $color_str ) );
 
 	$css_integer = '[-\\+]?\\d+%?';
-	$css_number = '[-\\+]?\\d*\\.\\d+%?';
+	$css_number  = '[-\\+]?\\d*\\.\\d+%?';
 
 	$css_unit = '(?:' . $css_number . ')|(?:' . $css_integer . ')';
 
 	$permissive_match3 = '[\\s|\\(]+(' . $css_unit . ')[,|\\s]+(' . $css_unit . ')[,|\\s]+(' . $css_unit . ')\\s*\\)?';
 	$permissive_match4 = '[\\s|\\(]+(' . $css_unit . ')[,|\\s]+(' . $css_unit . ')[,|\\s]+(' . $css_unit . ')[,|\\s]+(' . $css_unit . ')\\s*\\)?';
 
-	$rgb_regexp  = '/^rgb' . $permissive_match3 . '$/';
+	$rgb_regexp = '/^rgb' . $permissive_match3 . '$/';
 	if ( preg_match( $rgb_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_rgb_to_rgb( array(
-			'r' => $match[1],
-			'g' => $match[2],
-			'b' => $match[3]
-		) );
+		return gutenberg_tinycolor_rgb_to_rgb(
+			array(
+				'r' => $match[1],
+				'g' => $match[2],
+				'b' => $match[3],
+			)
+		);
 	}
 
 	$rgba_regexp = '/^rgba' . $permissive_match4 . '$/';
 	if ( preg_match( $rgba_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_rgb_to_rgb( array(
-			'r' => $match[1],
-			'g' => $match[2],
-			'b' => $match[3]
-		) );
+		return gutenberg_tinycolor_rgb_to_rgb(
+			array(
+				'r' => $match[1],
+				'g' => $match[2],
+				'b' => $match[3],
+			)
+		);
 	}
 
-	$hsl_regexp  = '/^hsl' . $permissive_match3 . '$/';
+	$hsl_regexp = '/^hsl' . $permissive_match3 . '$/';
 	if ( preg_match( $hsl_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_hsl_to_rgb( array(
-			'h' => $match[1],
-			's' => $match[2],
-			'l' => $match[3]
-		) );
+		return gutenberg_tinycolor_hsl_to_rgb(
+			array(
+				'h' => $match[1],
+				's' => $match[2],
+				'l' => $match[3],
+			)
+		);
 	}
 
 	$hsla_regexp = '/^hsla' . $permissive_match4 . '$/';
 	if ( preg_match( $hsla_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_hsl_to_rgb( array(
-			'h' => $match[1],
-			's' => $match[2],
-			'l' => $match[3]
-		) );
+		return gutenberg_tinycolor_hsl_to_rgb(
+			array(
+				'h' => $match[1],
+				's' => $match[2],
+				'l' => $match[3],
+			)
+		);
 	}
 
 	$hex8_regexp = '/^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/';
 	if ( preg_match( $hex8_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_rgb_to_rgb( array(
-			'r' => base_convert( $match[1], 16, 10 ),
-			'g' => base_convert( $match[2], 16, 10 ),
-			'b' => base_convert( $match[3], 16, 10 )
-		) );
+		return gutenberg_tinycolor_rgb_to_rgb(
+			array(
+				'r' => base_convert( $match[1], 16, 10 ),
+				'g' => base_convert( $match[2], 16, 10 ),
+				'b' => base_convert( $match[3], 16, 10 ),
+			)
+		);
 	}
 
 	$hex6_regexp = '/^#?([0-9a-fA-F]{2})([0-9a-fA-F]{2})([0-9a-fA-F]{2})$/';
 	if ( preg_match( $hex6_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_rgb_to_rgb( array(
-			'r' => base_convert( $match[1], 16, 10 ),
-			'g' => base_convert( $match[2], 16, 10 ),
-			'b' => base_convert( $match[3], 16, 10 )
-		) );
+		return gutenberg_tinycolor_rgb_to_rgb(
+			array(
+				'r' => base_convert( $match[1], 16, 10 ),
+				'g' => base_convert( $match[2], 16, 10 ),
+				'b' => base_convert( $match[3], 16, 10 ),
+			)
+		);
 	}
 
 	$hex4_regexp = '/^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/';
 	if ( preg_match( $hex4_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_rgb_to_rgb( array(
-			'r' => base_convert( $match[1] . $match[1], 16, 10 ),
-			'g' => base_convert( $match[2] . $match[2], 16, 10 ),
-			'b' => base_convert( $match[3] . $match[3], 16, 10 )
-		) );
+		return gutenberg_tinycolor_rgb_to_rgb(
+			array(
+				'r' => base_convert( $match[1] . $match[1], 16, 10 ),
+				'g' => base_convert( $match[2] . $match[2], 16, 10 ),
+				'b' => base_convert( $match[3] . $match[3], 16, 10 ),
+			)
+		);
 	}
 
 	$hex3_regexp = '/^#?([0-9a-fA-F]{1})([0-9a-fA-F]{1})([0-9a-fA-F]{1})$/';
 	if ( preg_match( $hex3_regexp, $color_str, $match ) ) {
-		return gutenberg_tinycolor_rgb_to_rgb( array(
-			'r' => base_convert( $match[1] . $match[1], 16, 10 ),
-			'g' => base_convert( $match[2] . $match[2], 16, 10 ),
-			'b' => base_convert( $match[3] . $match[3], 16, 10 )
-		) );
+		return gutenberg_tinycolor_rgb_to_rgb(
+			array(
+				'r' => base_convert( $match[1] . $match[1], 16, 10 ),
+				'g' => base_convert( $match[2] . $match[2], 16, 10 ),
+				'b' => base_convert( $match[3] . $match[3], 16, 10 ),
+			)
+		);
 	}
 }
 
@@ -247,6 +281,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	);
 	foreach ( $duotone_colors as $color_str ) {
 		$color = gutenberg_tinycolor_string_to_rgb( $color_str );
+
 		$duotone_values['r'][] = $color['r'] / 255;
 		$duotone_values['g'][] = $color['g'] / 255;
 		$duotone_values['b'][] = $color['b'] / 255;
