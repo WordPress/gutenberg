@@ -144,6 +144,7 @@ export function computeCustomizedAttribute(
 				xfn: block.attributes.rel?.split( ' ' ),
 				classes: block.attributes.className?.split( ' ' ),
 				attr_title: block.attributes.title,
+				target: block.attributes.opensInNewTab ? '_blank' : '',
 			};
 		} else {
 			attributes = {

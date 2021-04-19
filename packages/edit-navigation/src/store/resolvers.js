@@ -147,6 +147,7 @@ function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
 		className: menuItem.classes.join( ' ' ),
 		description: menuItem.description,
 		rel: menuItem.xfn.join( ' ' ),
+		opensInNewTab: menuItem.target === '_blank',
 	};
 
 	return createBlock( 'core/navigation-link', attributes, innerBlocks );
