@@ -16,7 +16,7 @@ import {
 	getGroupingBlockName,
 	isMatchingSearchTerm,
 	getCategories,
-	unstable__getActiveBlockVariation as getActiveBlockVariation,
+	getActiveBlockVariation,
 } from '../selectors';
 
 describe( 'selectors', () => {

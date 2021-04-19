@@ -105,13 +105,7 @@ export function getBlockVariations( state, blockName, scope ) {
  *
  * @return {(WPBlockVariation|void)} Active block variation.
  */
-// eslint-disable-next-line camelcase
-export function unstable__getActiveBlockVariation(
-	state,
-	blockName,
-	attributes,
-	scope
-) {
+export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 	const variations = getBlockVariations( state, blockName, scope );
 
 	const match = variations?.find( ( variation ) => {
