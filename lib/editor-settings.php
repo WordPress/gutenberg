@@ -8,11 +8,20 @@
 /**
  * Extends the block editor with settings that are only in the plugin.
  *
+ * This is a temporary solution until the Gutenberg plugin sets
+ * the required WordPress version to 5.8.
+ *
+ * @see https://core.trac.wordpress.org/ticket/52920
+ *
  * @param array $settings Existing editor settings.
  *
  * @return array Filtered settings.
  */
 function gutenberg_extend_post_editor_settings( $settings ) {
+	$image_default_size = get_option( 'image_default_size', 'large' );
+	$image_sizes        = wp_list_pluck( $settings['imageSizes'], 'slug' );
+
+	$settings['imageDefaultSize']                      = in_array( $image_default_size, $image_sizes, true ) ? $image_default_size : 'large';
 	$settings['__unstableEnableFullSiteEditingBlocks'] = gutenberg_supports_block_templates();
 
 	return $settings;
