@@ -6,6 +6,7 @@ import { RichText, useBlockProps } from '@wordpress/block-editor';
 export default function save( { attributes } ) {
 	const {
 		href,
+		fileId,
 		fileName,
 		textLinkHref,
 		textLinkTarget,
@@ -18,6 +19,7 @@ export default function save( { attributes } ) {
 			<div { ...useBlockProps.save() }>
 				{ ! RichText.isEmpty( fileName ) && (
 					<a
+						id={ fileId }
 						href={ textLinkHref }
 						target={ textLinkTarget }
 						rel={ textLinkTarget ? 'noreferrer noopener' : false }
@@ -30,6 +32,7 @@ export default function save( { attributes } ) {
 						href={ href }
 						className="wp-block-file__button"
 						download={ true }
+						aria-describedby={ fileId }
 					>
 						<RichText.Content value={ downloadButtonText } />
 					</a>
