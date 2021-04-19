@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isNil, deburr, trim } from 'lodash';
+import { isNil, deburr, trim, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -70,7 +70,7 @@ export const getAllHeadingAnchors = ( blockList, excludeId ) => {
  * @param {string}   content           The block content.
  * @param {string[]} allHeadingAnchors An array containing all headings anchors.
  *
- * @return {string} Return the heading anchor.
+ * @return {string|null} Return the heading anchor.
  */
 const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 	content = getTextWithoutMarkup( content );
@@ -87,9 +87,10 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 			'-'
 		);
 	}
-	// If slug is still empty, then return empty string.
+	// If slug is still empty, then return null.
+	// Returning null instead of an empty string allows us to check again when the content changes.
 	if ( '' === slug ) {
-		return '';
+		return null;
 	}
 
 	const baseAnchor = `wp-${ slug }`;
@@ -115,7 +116,8 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
  * @return {string} The anchor.
  */
 export const maybeUpdateAnchor = ( anchor, content, allHeadingAnchors ) => {
-	return isNil( anchor ) || anchor.startsWith( 'wp-' )
-		? generateAnchor( anchor, content, allHeadingAnchors )
-		: anchor;
+	if ( isNil( anchor ) || startsWith( anchor, 'wp-' ) ) {
+		return generateAnchor( anchor, content, allHeadingAnchors );
+	}
+	return anchor;
 };
