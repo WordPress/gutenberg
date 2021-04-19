@@ -77,8 +77,8 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 
 	// Get the slug.
 	let slug = cleanForSlug( content );
-	// If slug is empty, then it's either empty, or using non-latin characters.
-	// Try for non-latin first.
+	// If slug is empty, then there is no content, or content is using non-latin characters.
+	// Try non-latin first.
 	if ( '' === slug ) {
 		slug = trim(
 			deburr( content )
@@ -87,7 +87,7 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 			'-'
 		);
 	}
-	// If slug is still empty, then return empty strng.
+	// If slug is still empty, then return empty string.
 	if ( '' === slug ) {
 		return '';
 	}
