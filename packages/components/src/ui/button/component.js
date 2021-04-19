@@ -47,6 +47,7 @@ function Button( props, forwardedRef ) {
 		isSubtle = false,
 		onClick = noop,
 		size = 'medium',
+		type = 'button',
 		variant = 'secondary',
 		describedBy,
 		...otherProps
@@ -114,6 +115,7 @@ function Button( props, forwardedRef ) {
 				onClick={ handleOnClick }
 				ref={ forwardedRef }
 				aria-describedby={ describedById }
+				type={ type }
 				{ ...otherProps }
 			>
 				{ children }

@@ -23,7 +23,6 @@ import { BlockListItems } from '../block-list';
 import { BlockContextProvider } from '../block-context';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
-import { defaultLayout, LayoutProvider } from './layout';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -47,7 +46,7 @@ function UncontrolledInnerBlocks( props ) {
 		renderAppender,
 		orientation,
 		placeholder,
-		__experimentalLayout: layout = defaultLayout,
+		__experimentalLayout,
 	} = props;
 
 	useNestedSettingsUpdate(
@@ -82,19 +81,16 @@ function UncontrolledInnerBlocks( props ) {
 	// This component needs to always be synchronous as it's the one changing
 	// the async mode depending on the block selection.
 	return (
-		<LayoutProvider value={ layout }>
-			<BlockContextProvider value={ context }>
-				<BlockListItems
-					rootClientId={ clientId }
-					renderAppender={ renderAppender }
-					__experimentalAppenderTagName={
-						__experimentalAppenderTagName
-					}
-					wrapperRef={ wrapperRef }
-					placeholder={ placeholder }
-				/>
-			</BlockContextProvider>
-		</LayoutProvider>
+		<BlockContextProvider value={ context }>
+			<BlockListItems
+				rootClientId={ clientId }
+				renderAppender={ renderAppender }
+				__experimentalAppenderTagName={ __experimentalAppenderTagName }
+				__experimentalLayout={ __experimentalLayout }
+				wrapperRef={ wrapperRef }
+				placeholder={ placeholder }
+			/>
+		</BlockContextProvider>
 	);
 }
 

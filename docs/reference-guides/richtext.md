@@ -4,9 +4,9 @@ RichText is a component that allows developers to render a [`contenteditable` in
 
 The RichText component is extremely powerful because it provides built-in functionality you won't find in other components:
 
-* **Consistent Styling in the Admin and Frontend:** The editable container can be set to any block-level element, such as a `div`, `h2` or `p` tag. This allows the styles you apply in style.css to more easily apply on the frontend and admin, without having to rewrite them in editor.css.
-* **Cohesive Placeholder Text:** Before the user writes their content, it's easy to include placeholder text that's already styled to match the rest of the block editor.
-* **Control Over Formatting Options:** It's possible to dictate exactly which formatting options you want to allow for the RichText field. For example, you can dictate whether to allow the user to make text bold, italics or both.
+-   **Consistent Styling in the Admin and Frontend:** The editable container can be set to any block-level element, such as a `div`, `h2` or `p` tag. This allows the styles you apply in style.css to more easily apply on the frontend and admin, without having to rewrite them in editor.css.
+-   **Cohesive Placeholder Text:** Before the user writes their content, it's easy to include placeholder text that's already styled to match the rest of the block editor.
+-   **Control Over Formatting Options:** It's possible to dictate exactly which formatting options you want to allow for the RichText field. For example, you can dictate whether to allow the user to make text bold, italics or both.
 
 Unlike other components that exist in the [Component Reference](/packages/components/README.md) section, RichText lives separately because it only makes sense within the block editor, and not within other areas of WordPress.
 
@@ -18,15 +18,16 @@ For a list of the possible properties to pass your RichText component, [check ou
 
 There are a number of core blocks using the RichText component. The JavaScript edit function linked below for each block can be used as a best practice reference while creating your own blocks.
 
-* **[Button](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/button/edit.js):** RichText is used to enter the button's text.
-* **[Heading](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/heading/edit.js):** RichText is used to enter the heading's text.
-* **[Quote](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/quote/edit.js):** RichText is used in two places, for both the quotation and citation text.
-* **[Search](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/search/edit.js):** RichText is used in two places, for both the label above the search field and the submit button text.
+-   **[Button](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/button/edit.js):** RichText is used to enter the button's text.
+-   **[Heading](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/heading/edit.js):** RichText is used to enter the heading's text.
+-   **[Quote](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/quote/edit.js):** RichText is used in two places, for both the quotation and citation text.
+-   **[Search](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-library/src/search/edit.js):** RichText is used in two places, for both the label above the search field and the submit button text.
 
 ## Example
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 import { registerBlockType } from '@wordpress/blocks';
 import { useBlockProps, RichText } from '@wordpress/block-editor';
@@ -64,7 +65,9 @@ registerBlockType( /* ... */, {
 	}
 } );
 ```
+
 {% ES5 %}
+
 ```js
 wp.blocks.registerBlockType( /* ... */, {
 	// ...
@@ -100,6 +103,7 @@ wp.blocks.registerBlockType( /* ... */, {
 	}
 } );
 ```
+
 {% end %}
 
 ## Common Issues & Solutions
@@ -110,7 +114,7 @@ While using the RichText component a number of common issues tend to appear.
 
 In some cases the placeholder content on RichText can appear separate from the input where you would write your content. This is likely due to one of two reasons:
 
-1. You can't use an [inline HTML element](https://developer.mozilla.org/en-US/docs/Web/HTML/Inline_elements) as the RichText component. If your `tagName` property is using an inline element such as `span`, `a` or `code`, it needs to be changed to a [block-level element](https://developer.mozilla.org/en-US/docs/Web/HTML/Block-level_elements).
+1. You can't have an element with the CSS `display` property set to `inline`. You will need to set it to `inline-block` or any other value.
 2. The `position` CSS property value for the element must be set to `relative` or `absolute` within the admin. If the styles within style.css or editor.css modify the `position` property value for this element, you may see issues with how it displays.
 
 ### HTML Formatting Tags Display in the Content
@@ -122,3 +126,15 @@ If the HTML tags from text formatting such as `<strong>` or `<em>` are being esc
 Before moving forward, consider if using the RichText component makes sense at all. Would it be better to use a basic `input` or `textarea` element? If you don't think any formatting should be possible, these HTML tags may make more sense.
 
 If you'd still like to use RichText, you can eliminate all of the formatting options by specifying the `withoutInteractiveFormatting` property.
+
+If you want to limit the formats allowed, you can specify using `allowedFormats` property in your code, see the example above or [the component documentation](https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/rich-text/README.md#allowedformats-array) for details.
+
+### Disable Specific Format Types in Editor
+
+The RichText component uses formats to display inline elements, for example images within the paragraph block. If you just want to disable a format from the editor, you can use the `unregisterFormatType` function. For example to disable inline images, use:
+
+```
+wp.richText.unregisterFormatType( 'core/image' );
+```
+
+To apply, you would need to enqueue the above script in your plugin or theme. See the JavaScript tutorial for [how to load JavaScript in WordPress](https://developer.wordpress.org/block-editor/tutorials/javascript/loading-javascript/).

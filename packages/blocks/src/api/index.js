@@ -56,7 +56,7 @@ export {
 // attributes needed to operate with the block later on.
 export {
 	default as serialize,
-	getBlockContent,
+	getBlockInnerHTML as getBlockContent,
 	getBlockDefaultClassName,
 	getBlockMenuDefaultClassName,
 	getSaveElement,
@@ -141,6 +141,7 @@ export {
 	getBlockLabel as __experimentalGetBlockLabel,
 	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
 	__experimentalSanitizeBlockAttributes,
+	__experimentalGetBlockAttributesNamesByRole,
 } from './utils';
 
 // Templates are, in a general sense, a basic collection of block nodes with any

@@ -1,7 +1,3 @@
-.editor-styles-wrapper .wp-block.wp-block-query {
-	max-width: 100%;
-}
-
 .block-library-query-toolbar__popover .components-popover__content {
 	min-width: 230px;
 }
@@ -56,6 +52,7 @@
 
 		.block-setup-block-layout-list__item {
 			height: 100%;
+			max-height: 140px;
 			display: flex;
 			flex-direction: column;
 			padding: 2px;
@@ -98,6 +95,7 @@
 	// Size consecutive block variation icons the same.
 	.block-setup-block-layout-list__list-item.is-block-variation .block-setup-block-layout-list__item {
 		height: 90px;
+		min-height: 90px;
 	}
 
 	// Size the block variation icon same as the thumbnail on step 1.

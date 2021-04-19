@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-library",
-	"version": "2.29.0",
+	"version": "2.29.2",
 	"description": "Block library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -23,10 +23,11 @@
 	"react-native": "src/index",
 	"sideEffects": [
 		"build-style/**",
-		"src/**/*.scss"
+		"src/**/*.scss",
+		"src/navigation-link/index.js"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",

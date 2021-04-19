@@ -38,6 +38,8 @@ import * as navigation from './navigation';
 import * as navigationLink from './navigation-link';
 import * as latestComments from './latest-comments';
 import * as latestPosts from './latest-posts';
+import * as legacyWidget from './legacy-widget';
+import * as logInOut from './loginout';
 import * as list from './list';
 import * as missing from './missing';
 import * as more from './more';
@@ -85,6 +87,7 @@ import * as postCommentDate from './post-comment-date';
 import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
+import * as postCommentsLink from './post-comments-link';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
@@ -208,10 +211,13 @@ export const registerCoreBlocks = (
  */
 export const __experimentalRegisterExperimentalCoreBlocks =
 	process.env.GUTENBERG_PHASE === 2
-		? ( enableFSEBlocks ) => {
+		? ( { enableLegacyWidgetBlock, enableFSEBlocks } = {} ) => {
 				[
 					navigation,
 					navigationLink,
+
+					// Register Legacy Widget block.
+					...( enableLegacyWidgetBlock ? [ legacyWidget ] : [] ),
 
 					// Register Full Site Editing Blocks.
 					...( enableFSEBlocks
@@ -227,6 +233,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								queryPaginationNext,
 								queryPaginationNumbers,
 								queryPaginationPrevious,
+								logInOut,
 								postTitle,
 								postContent,
 								postAuthor,
@@ -237,6 +244,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postComments,
 								postCommentsCount,
 								postCommentsForm,
+								postCommentsLink,
 								postDate,
 								postExcerpt,
 								postFeaturedImage,

@@ -10,7 +10,7 @@ import { View } from 'react-native';
 import {
 	BlockControls,
 	InnerBlocks,
-	JustifyToolbar,
+	JustifyContentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
@@ -31,7 +31,7 @@ const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 const layoutProp = { type: 'default', alignments: [] };
 
 export default function ButtonsEdit( {
-	attributes: { contentJustification, align, orientation },
+	attributes: { contentJustification, align },
 	clientId,
 	isSelected,
 	setAttributes,
@@ -111,18 +111,15 @@ export default function ButtonsEdit( {
 		</View>
 	) );
 
-	const justifyControls =
-		orientation === 'vertical'
-			? [ 'left', 'center', 'right' ]
-			: [ 'left', 'center', 'right', 'space-between' ];
+	const justifyControls = [ 'left', 'center', 'right' ];
 
 	const remove = useCallback( () => removeBlock( clientId ), [ clientId ] );
 	const shouldRenderFooterAppender = isSelected || isInnerButtonSelected;
 	return (
 		<>
 			{ isSelected && (
-				<BlockControls>
-					<JustifyToolbar
+				<BlockControls group="block">
+					<JustifyContentControl
 						allowedControls={ justifyControls }
 						value={ contentJustification }
 						onChange={ ( value ) =>

@@ -32,9 +32,9 @@ From the [kickoff post](https://make.wordpress.org/core/2017/01/04/focus-tech-an
 
 We can extract a few key principles from this:
 
-- **Authoring rich posts is a key strength of WordPress.**
-- **Blocks will unify features and types of interaction under a single interface.** Users shouldn’t have to write shortcodes, custom HTML, or paste URLs to embed. Users only need to learn how the block works in order to use all of its features.
-- **Make core features more discoverable**, reducing hard-to-find “Mystery meat.” WordPress supports a large number of blocks and 30+ embeds. Let’s increase their visibility.
+-   **Authoring rich posts is a key strength of WordPress.**
+-   **Blocks will unify features and types of interaction under a single interface.** Users shouldn’t have to write shortcodes, custom HTML, or paste URLs to embed. Users only need to learn how the block works in order to use all of its features.
+-   **Make core features more discoverable**, reducing hard-to-find “Mystery meat.” WordPress supports a large number of blocks and 30+ embeds. Let’s increase their visibility.
 
 ### Why
 

@@ -15,6 +15,7 @@ $blocks-block__margin: 0.5em;
 	text-align: center;
 	text-decoration: none;
 	overflow-wrap: break-word;
+	box-sizing: border-box;
 
 	&:hover,
 	&:focus,
@@ -39,6 +40,12 @@ $blocks-block__margin: 0.5em;
 		max-width: none;
 		.wp-block-button__link {
 			width: 100%;
+		}
+	}
+
+	&.has-custom-font-size {
+		.wp-block-button__link {
+			font-size: inherit;
 		}
 	}
 

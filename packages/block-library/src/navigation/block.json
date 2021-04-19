@@ -44,14 +44,12 @@
 		"orientation": "orientation"
 	},
 	"supports": {
-		"align": [
-			"wide",
-			"full"
-		],
+		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
 		"fontSize": true,
+		"lineHeight": true,
 		"__experimentalFontStyle": true,
 		"__experimentalFontWeight": true,
 		"__experimentalTextTransform": true,

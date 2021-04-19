@@ -103,17 +103,15 @@ export function* saveWidgetArea( widgetAreaId ) {
 
 	// Remove all duplicate reference widget instances
 	const usedReferenceWidgets = [];
-	const widgetsBlocks = post.blocks.filter(
-		( { attributes: { referenceWidgetName } } ) => {
-			if ( referenceWidgetName ) {
-				if ( usedReferenceWidgets.includes( referenceWidgetName ) ) {
-					return false;
-				}
-				usedReferenceWidgets.push( referenceWidgetName );
+	const widgetsBlocks = post.blocks.filter( ( { attributes: { id } } ) => {
+		if ( id ) {
+			if ( usedReferenceWidgets.includes( id ) ) {
+				return false;
 			}
-			return true;
+			usedReferenceWidgets.push( id );
 		}
-	);
+		return true;
+	} );
 
 	const batchMeta = [];
 	const batchTasks = [];
@@ -321,5 +319,62 @@ export function* closeGeneralSidebar() {
 		interfaceStore.name,
 		'disableComplementaryArea',
 		editWidgetsStoreName
+	);
+}
+
+/**
+ * Action that handles moving a block between widget areas
+ *
+ * @param {string} clientId     The clientId of the block to move.
+ * @param {string} widgetAreaId The id of the widget area to move the block to.
+ */
+export function* moveBlockToWidgetArea( clientId, widgetAreaId ) {
+	const sourceRootClientId = yield select(
+		'core/block-editor',
+		'getBlockRootClientId',
+		[ clientId ]
+	);
+
+	// Search the top level blocks (widget areas) for the one with the matching
+	// id attribute. Makes the assumption that all top-level blocks are widget
+	// areas.
+	const widgetAreas = yield select( 'core/block-editor', 'getBlocks' );
+	const destinationWidgetAreaBlock = widgetAreas.find(
+		( { attributes } ) => attributes.id === widgetAreaId
+	);
+	const destinationRootClientId = destinationWidgetAreaBlock.clientId;
+
+	// Get the index for moving to the end of the the destination widget area.
+	const destinationInnerBlocksClientIds = yield select(
+		'core/block-editor',
+		'getBlockOrder',
+		destinationRootClientId
+	);
+	const destinationIndex = destinationInnerBlocksClientIds.length;
+
+	// Reveal the widget area, if it's not open.
+	const isDestinationWidgetAreaOpen = yield select(
+		editWidgetsStoreName,
+		'getIsWidgetAreaOpen',
+		destinationRootClientId
+	);
+
+	if ( ! isDestinationWidgetAreaOpen ) {
+		yield dispatch(
+			editWidgetsStoreName,
+			'setIsWidgetAreaOpen',
+			destinationRootClientId,
+			true
+		);
+	}
+
+	// Move the block.
+	yield dispatch(
+		'core/block-editor',
+		'moveBlocksToPosition',
+		[ clientId ],
+		sourceRootClientId,
+		destinationRootClientId,
+		destinationIndex
 	);
 }

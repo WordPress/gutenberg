@@ -33,6 +33,33 @@
 	}
 }
 
+.components-site-card {
+	display: flex;
+	align-items: center;
+	margin: $grid-unit-20 0;
+}
+
+.components-site-icon {
+	border: none;
+	border-radius: $radius-block-ui;
+	margin-right: $grid-unit-15;
+
+	// Same size as in the Site menu.
+	height: 36px;
+	width: 36px;
+}
+
+.components-site-name {
+	display: block;
+	font-size: 14px;
+}
+
+.components-site-home {
+	display: block;
+	color: $gray-700;
+	font-size: $helptext-font-size;
+}
+
 .editor-post-publish-panel__header-publish-button,
 .editor-post-publish-panel__header-cancel-button {
 	flex-grow: 1;

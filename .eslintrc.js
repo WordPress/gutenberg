@@ -176,7 +176,6 @@ module.exports = {
 					'error',
 					{
 						forbid: [
-							[ 'button', 'Button' ],
 							[ 'circle', 'Circle' ],
 							[ 'g', 'G' ],
 							[ 'path', 'Path' ],
@@ -205,7 +204,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js' ],
+			files: [ 'bin/**/*.js', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},

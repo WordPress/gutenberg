@@ -24,7 +24,7 @@ To opt-in to the default configuration, extend your own project's `.eslintrc` fi
 
 Refer to the [ESLint documentation on Shareable Configs](http://eslint.org/docs/developer-guide/shareable-configs) for more information.
 
-The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsx-a11y`](https://github.com/evcohen/eslint-plugin-jsx-a11y), [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react), and [`eslint-plugin-prettier`](https://github.com/prettier/eslint-plugin-prettier) projects.
+The `recommended` preset will include rules governing an ES2015+ environment, and includes rules from the [`eslint-plugin-jsx-a11y`](https://github.com/evcohen/eslint-plugin-jsx-a11y), [`eslint-plugin-react`](https://github.com/yannickcr/eslint-plugin-react), and [`eslint-plugin-prettier`](https://github.com/prettier/eslint-plugin-prettier) projects. It also includes an optional integration with [`@typescript-eslint/eslint-plugin`](https://github.com/typescript-eslint/typescript-eslint) that gets activated when the [`typescript`](https://www.npmjs.com/package/typescript) package is installed in the project.
 
 There is also `recommended-with-formatting` ruleset for projects that want to opt out from [Prettier](https://prettier.io). It has the native ESLint code formatting rules enabled instead.
 
@@ -58,7 +58,7 @@ The granular rulesets will not define any environment globals. As such, if they 
 
 | Rule                                                                                                                 | Description                                                                                    | Recommended |
 | -------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ----------- |
-| [data-no-store-string-literals](/packages/eslint-plugin/docs/rules/data-no-store-string-literals.md)                                           | Discourage passing string literals to reference data stores                                                      |             |
+| [data-no-store-string-literals](/packages/eslint-plugin/docs/rules/data-no-store-string-literals.md)                 | Discourage passing string literals to reference data stores                                    |             |
 | [dependency-group](/packages/eslint-plugin/docs/rules/dependency-group.md)                                           | Enforce dependencies docblocks formatting                                                      | ✓           |
 | [gutenberg-phase](docs/rules/gutenberg-phase.md)                                                                     | Governs the use of the `process.env.GUTENBERG_PHASE` constant                                  | ✓           |
 | [no-base-control-with-label-without-id](/packages/eslint-plugin/docs/rules/no-base-control-with-label-without-id.md) | Disallow the usage of BaseControl component with a label prop set but omitting the id property | ✓           |
