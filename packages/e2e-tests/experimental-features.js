@@ -162,7 +162,7 @@ export const siteEditor = {
 			postType,
 			postId
 		);
-		const editedContent = getEntityContent( editedRecord );
+		const editedContent = await getEntityContent( editedRecord );
 		if ( editedContent ) {
 			return editedContent;
 		}
@@ -173,7 +173,7 @@ export const siteEditor = {
 			postType,
 			postId
 		);
-		const originalContent = getEntityContent( originalRecord );
+		const originalContent = await getEntityContent( originalRecord );
 		if ( originalContent ) {
 			return originalContent;
 		}
