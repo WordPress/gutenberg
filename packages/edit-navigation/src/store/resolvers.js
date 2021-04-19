@@ -11,7 +11,12 @@ import { parse, createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
+import {
+	NAVIGATION_POST_KIND,
+	NAVIGATION_POST_POST_TYPE,
+	NEW_TAB_TARGET_ATTRIBUTE,
+} from '../constants';
+
 import { resolveMenuItems, dispatch } from './controls';
 import { buildNavigationPostId } from './utils';
 
@@ -147,7 +152,7 @@ function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
 		className: menuItem.classes.join( ' ' ),
 		description: menuItem.description,
 		rel: menuItem.xfn.join( ' ' ),
-		opensInNewTab: menuItem.target === '_blank',
+		opensInNewTab: menuItem.target === NEW_TAB_TARGET_ATTRIBUTE,
 	};
 
 	return createBlock( 'core/navigation-link', attributes, innerBlocks );
