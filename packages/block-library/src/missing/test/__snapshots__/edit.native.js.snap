@@ -40,6 +40,5 @@ exports[`Missing block renders without crashing 1`] = `
   <Text>
     Unsupported
   </Text>
-  Modal
 </View>
 `;
