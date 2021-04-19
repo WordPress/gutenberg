@@ -366,6 +366,7 @@ extension RNReactNativeGutenbergBridge {
         case setTitle
         case toggleHTMLMode
         case updateHtml
+        case featuredImageIdNativeUpdated
         case mediaUpload
         case setFocusOnTitle
         case mediaAppend

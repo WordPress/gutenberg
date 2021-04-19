@@ -186,6 +186,10 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         progress.cancel()
     }
 
+    func gutenbergDidRequestFeaturedImageId(for mediaID: Int32) {
+        gutenberg.featuredImageIdNativeUpdated(mediaID);
+    }
+
     func gutenbergDidEmitLog(message: String, logLevel: LogLevel) {
         switch logLevel {
         case .trace:
