@@ -19,7 +19,6 @@ function render_block_core_post_comment_edit( $attributes, $content, $block ) {
 		return '';
 	}
 
-
 	$edit_comment_link = get_edit_comment_link( $block->context['commentId'] );
 	$open_in_new_tab   = $attributes['openInNewTab'] === true;
 
@@ -30,7 +29,7 @@ function render_block_core_post_comment_edit( $attributes, $content, $block ) {
 	}
 
 	return sprintf(
-		'<div %1$s><a href=%2$s %3$s>%4$s</a></div>',
+		'<div %1$s><a href="%2$s" %3$s>%4$s</a></div>',
 		get_block_wrapper_attributes(),
 		esc_url( $edit_comment_link ),
 		$link_atts,
