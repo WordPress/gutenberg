@@ -1510,11 +1510,7 @@ export function preferences( state = PREFERENCES_DEFAULTS, action ) {
 		case 'REPLACE_BLOCKS':
 			return action.blocks.reduce( ( prevState, block ) => {
 				const { attributes, name: blockName } = block;
-				const match = getActiveBlockVariation(
-					blockName,
-					null,
-					attributes
-				);
+				const match = getActiveBlockVariation( blockName, attributes );
 				// If a block variation match is found change the name to be the same with the
 				// one that is used for block variations in the Inserter (`getItemFromVariation`).
 				let id = match?.name

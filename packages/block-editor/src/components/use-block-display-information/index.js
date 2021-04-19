@@ -56,11 +56,7 @@ export default function useBlockDisplayInformation( clientId ) {
 				description: blockType.description,
 			};
 			const attributes = getBlockAttributes( clientId );
-			const match = getActiveBlockVariation(
-				blockName,
-				null,
-				attributes
-			);
+			const match = getActiveBlockVariation( blockName, attributes );
 			if ( ! match ) return blockTypeInfo;
 			return {
 				title: match.title || blockType.title,
