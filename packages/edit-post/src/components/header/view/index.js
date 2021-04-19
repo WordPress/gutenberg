@@ -61,6 +61,7 @@ export default function ViewMenu() {
 				disabled: ! isPostSaveable,
 				/* translators: button label text should, if possible, be under 16 characters. */
 				children: __( 'Preview' ),
+				className: 'edit-post-view__button-toggle',
 			} }
 			icon={ null }
 		>
