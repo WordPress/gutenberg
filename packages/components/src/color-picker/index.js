@@ -109,11 +109,12 @@ const dataToColors = ( oldColors, { source, valueKey, value } ) => {
 };
 
 export default class ColorPicker extends Component {
-	constructor( { color = '0071a1' } ) {
+	constructor( { color = '0071a1', source = 'hex' } ) {
 		super( ...arguments );
 		const colors = colorToState( color );
 		this.state = {
 			...colors,
+			source,
 			draftHex: toLowerCase( colors.hex ),
 			draftRgb: colors.rgb,
 			draftHsl: colors.hsl,
@@ -163,7 +164,14 @@ export default class ColorPicker extends Component {
 		}
 	}
 
+	commitSourceChange() {
+		const { onSourceChangeComplete = noop } = this.props;
+		const { source } = this.state;
+		onSourceChangeComplete( source );
+	}
+
 	handleInputChange( data ) {
+		this.setState( { source: data.source }, this.commitSourceChange );
 		switch ( data.state ) {
 			case 'reset':
 				this.resetDraftValues();
@@ -190,6 +198,7 @@ export default class ColorPicker extends Component {
 			draftHex,
 			draftHsl,
 			draftRgb,
+			source,
 		} = this.state;
 		const classes = classnames( className, {
 			'components-color-picker': true,
@@ -232,6 +241,7 @@ export default class ColorPicker extends Component {
 					</div>
 
 					<Inputs
+						source={ source }
 						rgb={ draftRgb }
 						hsl={ draftHsl }
 						hex={ draftHex }

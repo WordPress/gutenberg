@@ -9,6 +9,7 @@ import { isObject } from 'lodash';
  */
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useRef, useEffect, Platform } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
@@ -26,6 +27,7 @@ import {
 	getGradientValueBySlug,
 	getGradientSlugByValue,
 } from '../components/gradients';
+import { store as blockEditorStore } from '../store';
 import { cleanEmptyObject } from './utils';
 import ColorPanel from './color-panel';
 import useEditorFeature from '../components/use-editor-feature';
@@ -212,12 +214,16 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
  *
  * @return {WPElement} Color edit element.
  */
+// TODO: PR Colorpicker: add onChangeSource
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
 	const isLinkColorEnabled = useEditorFeature( 'color.link' );
 	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
 	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
-
+	const { updateSettings } = useDispatch( blockEditorStore );
+	const { colorPickerMode } = useSelect( ( select ) => {
+		return select( blockEditorStore ).getSettings();
+	} );
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
 	// synchronously causing our two callbacks to override changes
@@ -316,6 +322,10 @@ export function ColorEdit( props ) {
 		} );
 	};
 
+	const onChangeSource = ( value ) => {
+		updateSettings( { colorPickerMode: value } );
+	};
+
 	return (
 		<ColorPanel
 			enableContrastChecking={
@@ -329,6 +339,8 @@ export function ColorEdit( props ) {
 							{
 								label: __( 'Text color' ),
 								onColorChange: onChangeColor( 'text' ),
+								onSourceChange: onChangeSource,
+								colorPickerMode,
 								colorValue: getColorObjectByAttributeValues(
 									colors,
 									textColor,
@@ -344,6 +356,8 @@ export function ColorEdit( props ) {
 								onColorChange: hasBackground
 									? onChangeColor( 'background' )
 									: undefined,
+								onSourceChange: onChangeSource,
+								colorPickerMode,
 								colorValue: getColorObjectByAttributeValues(
 									colors,
 									backgroundColor,
@@ -361,6 +375,8 @@ export function ColorEdit( props ) {
 							{
 								label: __( 'Link Color' ),
 								onColorChange: onChangeLinkColor,
+								onSourceChange: onChangeSource,
+								colorPickerMode,
 								colorValue: getLinkColorFromAttributeValue(
 									colors,
 									style?.color?.link

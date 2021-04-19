@@ -7,7 +7,7 @@ import { get } from 'lodash';
  * WordPress dependencies
  */
 import { useCallback, useMemo } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	applyFormat,
 	removeFormat,
@@ -15,6 +15,7 @@ import {
 	useAnchorRef,
 } from '@wordpress/rich-text';
 import {
+	store as blockEditorStore,
 	ColorPalette,
 	URLPopover,
 	getColorClassName,
@@ -51,6 +52,12 @@ const ColorPicker = ( { name, value, onChange } ) => {
 		const { getSettings } = select( 'core/block-editor' );
 		return get( getSettings(), [ 'colors' ], [] );
 	} );
+	const { updateSettings } = useDispatch( blockEditorStore );
+	const onSourceChange = useCallback( ( source ) => {
+		if ( source ) {
+			updateSettings( { colorPickerMode: source } );
+		}
+	} );
 	const onColorChange = useCallback(
 		( color ) => {
 			if ( color ) {
@@ -82,7 +89,13 @@ const ColorPicker = ( { name, value, onChange } ) => {
 		colors,
 	] );
 
-	return <ColorPalette value={ activeColor } onChange={ onColorChange } />;
+	return (
+		<ColorPalette
+			value={ activeColor }
+			onChange={ onColorChange }
+			onSourceChange={ onSourceChange }
+		/>
+	);
 };
 
 export default function InlineColorUI( {
