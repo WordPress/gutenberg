@@ -109,19 +109,19 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 	const variations = getBlockVariations( state, blockName, scope );
 
 	const match = variations?.find( ( variation ) => {
-		if ( typeof variation.isActive === 'function' ) {
-			return variation.isActive( attributes, variation.attributes );
-		}
-
 		if ( Array.isArray( variation.isActive ) ) {
-			return variation.isActive.every(
-				( attribute ) =>
-					attributes[ attribute ] ===
-					variation.attributes[ attribute ]
-			);
+			const blockType = getBlockType( state, blockName );
+			const attributeKeys = Object.keys( blockType.attributes || {} );
+			return variation.isActive
+				.filter( ( attribute ) => attributeKeys.includes( attribute ) )
+				.every(
+					( attribute ) =>
+						attributes[ attribute ] ===
+						variation.attributes[ attribute ]
+				);
 		}
 
-		return false;
+		return variation.isActive?.( attributes, variation.attributes );
 	} );
 
 	return match;
