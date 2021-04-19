@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Breaking Change
+
+-   The callback provided to `renderToggle` prop of `Dropdown` must return a single child in order to ensure expected toggling behavior when the toggle is pressed while the dropdown is open.
+
+### Bug Fix
+
+-   Fix for broken toggling behavior exhibited by `Dropdown` and `DropdownMenu` in some browsers.
+
 ## 13.0.0 (2021-03-17)
 
 ### Breaking Change

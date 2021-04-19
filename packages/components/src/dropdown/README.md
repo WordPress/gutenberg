@@ -1,8 +1,8 @@
 # Dropdown
 
-Dropdown is a React component to render a button that opens a floating content modal when clicked.
-This components takes care of updating the state of the dropdown menu (opened/closed), handles closing the menu when clicking outside
-and uses render props to render the button and the content.
+Dropdown is a React component to render a button that opens a floating content dialog when clicked.
+The component takes care of updating the state of the dropdown (opened/closed), handles closing
+the popover when clicking outside and uses render props to render the button and the content.
 
 ## Usage
 
@@ -52,7 +52,9 @@ The direction in which the popover should open relative to its parent node. Spec
 
 ### renderToggle
 
-A callback invoked to render the Dropdown Toggle Button.
+A callback invoked to render the Dropdown Toggle Button. NOTE: The return must be a single child as it
+will be cloned and have some event handlers added to ensure that a press of the toggle while the
+dropdown is open will bypass the auto-closing behavior and defer control to the toggle.
 
 -   Type: `Function`
 -   Required: Yes
