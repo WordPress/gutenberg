@@ -78,3 +78,16 @@ svg.components-checkbox-control__checked {
 	user-select: none;
 	pointer-events: none;
 }
+
+.components-checkbox-control__label-container {
+	display: inline-block;
+}
+
+.components-checkbox-control__centered-help-text {
+	position: fixed;
+}
+
+.components-checkbox-control__label-container .components-base-control__help {
+	margin: 0;
+	position: fixed;
+}

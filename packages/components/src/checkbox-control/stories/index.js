@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { text } from '@storybook/addon-knobs';
+import { select, text } from '@storybook/addon-knobs';
 
 /**
  * WordPress dependencies
@@ -40,12 +40,21 @@ export const all = () => {
 	const heading = text( 'Heading', 'User' );
 	const label = text( 'Label', 'Is author' );
 	const help = text( 'Help', 'Is the user an author or not?' );
+	const helpPosition = select(
+		'align',
+		{
+			left: 'left',
+			center: 'center',
+		},
+		'center'
+	);
 
 	return (
 		<CheckboxControlWithState
 			heading={ heading }
 			label={ label }
 			help={ help }
+			helpPosition={ helpPosition }
 			checked
 		/>
 	);
