@@ -8,3 +8,5 @@ import './generated-class-name';
 import './style';
 import './color';
 import './font-size';
+
+export { getColorClassesAndStyles, useColorProps } from './use-color-props';
