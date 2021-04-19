@@ -16,7 +16,7 @@
 function render_block_core_file( $attributes, $content ) {
 	if ( ! empty( $attributes['displayPreview'] ) ) {
 		// Check if it's already enqueued, so we don't add the inline script multiple times.
-		if ( ! in_array( 'wp-block-library-file', wp_scripts()->queue, true ) ) {
+		if ( ! wp_script_is( 'wp-block-library-file' ) ) {
 			wp_enqueue_script( 'wp-block-library-file', plugins_url( 'file/frontend.js', __FILE__ ) );
 		}
 	}
