@@ -30,6 +30,11 @@ import { image as icon } from '@wordpress/icons';
 import Image from './image';
 
 /**
+ * Browser dependencies
+ */
+const { AbortController } = window;
+
+/**
  * Module constants
  */
 import {
@@ -224,32 +229,49 @@ export function ImageEdit( {
 	}
 
 	const isTemp = isTemporaryImage( id, url );
+	const isStillMounted = useRef();
 
 	// Upload a temporary image on mount.
 	useEffect( () => {
+		isStillMounted.current = true;
+
 		if ( ! isTemp ) {
 			return;
 		}
 
 		const file = getBlobByURL( url );
+		if ( ! file ) {
+			return;
+		}
 
-		if ( file ) {
-			mediaUpload( {
-				filesList: [ file ],
-				onFileChange: ( [ img ] ) => {
+		const abortController = new AbortController();
+
+		mediaUpload( {
+			filesList: [ file ],
+			onFileChange: ( [ img ] ) => {
+				if ( isStillMounted.current ) {
 					onSelectImage( img );
-				},
-				allowedTypes: ALLOWED_MEDIA_TYPES,
-				onError: ( message ) => {
+				}
+			},
+			allowedTypes: ALLOWED_MEDIA_TYPES,
+			onError: ( message ) => {
+				if ( isStillMounted.current ) {
 					noticeOperations.createErrorNotice( message );
 					setAttributes( {
 						src: undefined,
 						id: undefined,
 						url: undefined,
 					} );
-				},
-			} );
-		}
+				}
+			},
+			requestOptions: { signal: abortController.signal },
+		} );
+
+		// Cancel upload request on "unmount".
+		return () => {
+			isStillMounted.current = false;
+			abortController.abort();
+		};
 	}, [] );
 
 	// If an image is temporary, revoke the Blob url when it is uploaded (and is

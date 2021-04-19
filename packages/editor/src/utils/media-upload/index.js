@@ -20,6 +20,7 @@ import { uploadMedia } from '@wordpress/media-utils';
  * @param   {?number}  $0.maxUploadFileSize Maximum upload size in bytes allowed for the site.
  * @param   {Function} $0.onError           Function called when an error happens.
  * @param   {Function} $0.onFileChange      Function called each time a file or a temporary representation of the file is available.
+ * @param   {?Object}  $0.requestOptions    Additional options to include in the request.
  */
 export default function mediaUpload( {
 	additionalData = {},
@@ -28,6 +29,7 @@ export default function mediaUpload( {
 	maxUploadFileSize,
 	onError = noop,
 	onFileChange,
+	requestOptions = {},
 } ) {
 	const { getCurrentPostId, getEditorSettings } = select( 'core/editor' );
 	const wpAllowedMimeTypes = getEditorSettings().allowedMimeTypes;
@@ -45,5 +47,6 @@ export default function mediaUpload( {
 		maxUploadFileSize,
 		onError: ( { message } ) => onError( message ),
 		wpAllowedMimeTypes,
+		requestOptions,
 	} );
 }
