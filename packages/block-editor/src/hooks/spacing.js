@@ -7,7 +7,11 @@ import { Platform } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { PaddingEdit, useIsPaddingDisabled } from './padding';
+import {
+	PaddingEdit,
+	hasPaddingSupport,
+	useIsPaddingDisabled,
+} from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
@@ -44,9 +48,7 @@ export function hasSpacingSupport( blockName ) {
 		return false;
 	}
 
-	const support = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
-
-	return !! ( true === support || support?.padding );
+	return hasPaddingSupport( blockName );
 }
 
 /**

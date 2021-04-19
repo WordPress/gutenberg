@@ -49,10 +49,10 @@ const CSS_UNITS = [
  * @param  {string|Object} blockType Block name or Block Type object.
  * @return {boolean}                 Whether there is support.
  */
-const hasPaddingSupport = ( blockType ) => {
+export function hasPaddingSupport( blockType ) {
 	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
 	return !! ( true === support || support?.padding );
-};
+}
 
 /**
  * Custom hook that checks if padding settings have been disabled.
