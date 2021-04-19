@@ -16,9 +16,9 @@ import { useEditorFeature } from '../editor/utils';
 
 export function useHasTypographyPanel( { supports, name } ) {
 	const hasLineHeight = useHasLineHeightControl( { supports, name } );
-	const hasFontAppearence = useHasAppearenceControl( { supports, name } );
+	const hasFontAppearance = useHasAppearanceControl( { supports, name } );
 	return (
-		hasLineHeight || hasFontAppearence || supports.includes( 'fontSize' )
+		hasLineHeight || hasFontAppearance || supports.includes( 'fontSize' )
 	);
 }
 
@@ -29,7 +29,7 @@ function useHasLineHeightControl( { supports, name } ) {
 	);
 }
 
-function useHasAppearenceControl( { supports, name } ) {
+function useHasAppearanceControl( { supports, name } ) {
 	const hasFontStyles =
 		useEditorFeature( 'typography.customFontStyle', name ) &&
 		supports.includes( 'fontStyle' );
@@ -57,7 +57,7 @@ export default function TypographyPanel( {
 		useEditorFeature( 'typography.customFontWeight', name ) &&
 		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
-	const hasAppearenceControl = useHasAppearenceControl( { supports, name } );
+	const hasAppearanceControl = useHasAppearanceControl( { supports, name } );
 
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
@@ -88,7 +88,7 @@ export default function TypographyPanel( {
 					}
 				/>
 			) }
-			{ hasAppearenceControl && (
+			{ hasAppearanceControl && (
 				<FontAppearanceControl
 					value={ {
 						fontStyle: getStyle( name, 'fontStyle' ),

@@ -29,6 +29,7 @@ import {
 	default as TypographyPanel,
 	useHasTypographyPanel,
 } from './typography-panel';
+import { default as BorderPanel, useHasBorderPanel } from './border-panel';
 import { default as ColorPanel, useHasColorPanel } from './color-panel';
 import { default as SpacingPanel, useHasSpacingPanel } from './spacing-panel';
 
@@ -40,6 +41,7 @@ function GlobalStylesPanel( {
 	getSetting,
 	setSetting,
 } ) {
+	const hasBorderPanel = useHasBorderPanel( context );
 	const hasColorPanel = useHasColorPanel( context );
 	const hasTypographyPanel = useHasTypographyPanel( context );
 	const hasSpacingPanel = useHasSpacingPanel( context );
@@ -70,6 +72,13 @@ function GlobalStylesPanel( {
 			) }
 			{ hasSpacingPanel && (
 				<SpacingPanel
+					context={ context }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
+				/>
+			) }
+			{ hasBorderPanel && (
+				<BorderPanel
 					context={ context }
 					getStyle={ getStyle }
 					setStyle={ setStyle }
