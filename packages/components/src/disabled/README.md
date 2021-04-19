@@ -12,16 +12,16 @@ import { withState } from '@wordpress/compose';
 
 const MyDisabled = withState( {
 	isDisabled: true,
-} )( ( { isDisabled, setState } ) => { 
+} )( ( { isDisabled, setState } ) => {
 	let input = <TextControl label="Input" onChange={ () => {} } />;
 	if ( isDisabled ) {
 		input = <Disabled>{ input }</Disabled>;
 	}
-	
+
 	const toggleDisabled = () => {
 		setState( ( state ) => ( { isDisabled: ! state.isDisabled } ) );
 	};
-	
+
 	return (
 		<div>
 			{ input }
@@ -58,6 +58,6 @@ The component accepts the following props:
 
 Whether to disable all the descendant fields. Defaults to `true`.
 
-- Type: `Boolean`
-- Required: No
-- Default: `true`
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`

@@ -36,11 +36,11 @@ function myplugin_enqueue_block_editor_assets() {
 add_action( 'enqueue_block_editor_assets', 'myplugin_enqueue_block_editor_assets' );
 ```
 
-The `enqueue_block_editor_assets` hook is only run in the Gutenberg editor context when the editor is ready to receive additional scripts and stylesheets. There is also an `enqueue_block_assets` hook which is run under **both** the editor and front-end contexts.  This should be used to enqueue stylesheets common to the front-end and the editor.  (The rules can be overridden in the editor-specific stylesheet if necessary.)
+The `enqueue_block_editor_assets` hook is only run in the Gutenberg editor context when the editor is ready to receive additional scripts and stylesheets. There is also an `enqueue_block_assets` hook which is run under **both** the editor and front-end contexts. This should be used to enqueue stylesheets common to the front-end and the editor. (The rules can be overridden in the editor-specific stylesheet if necessary.)
 
 The following sections will describe what you'll need to include in `block.js` to describe the behavior of your custom block.
 
-Note that all JavaScript code samples in this document are enclosed in a function that is evaluated immediately afterwards.  We recommend using either ES6 modules [as used in this project](/docs/contributors/develop/coding-guidelines.md#imports) (documentation on setting up a plugin with Webpack + ES6 modules coming soon) or these ["immediately-invoked function expressions"](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression) as used in this document.  Both of these methods ensure that your plugin's variables will not pollute the global `window` object, which could cause incompatibilities with WordPress core or with other plugins.
+Note that all JavaScript code samples in this document are enclosed in a function that is evaluated immediately afterwards. We recommend using either ES6 modules [as used in this project](/docs/contributors/develop/coding-guidelines.md#imports) (documentation on setting up a plugin with Webpack + ES6 modules coming soon) or these ["immediately-invoked function expressions"](https://en.wikipedia.org/wiki/Immediately-invoked_function_expression) as used in this document. Both of these methods ensure that your plugin's variables will not pollute the global `window` object, which could cause incompatibilities with WordPress core or with other plugins.
 
 ## Example
 
@@ -48,7 +48,7 @@ Let's imagine you wanted to define a block to show a randomly generated image in
 
 Take a step back and consider the ideal workflow for adding a new random image:
 
--   Insert the block.  It should be shown in some empty state, with an option to choose a category in a select dropdown.
+-   Insert the block. It should be shown in some empty state, with an option to choose a category in a select dropdown.
 -   Upon confirming my selection, a preview of the image should be shown next to the dropdown.
 
 At this point, you might realize that while you'd want some controls to be shown when editing content, the markup included in the published post might not appear the same (your visitors should not see a dropdown field when reading your content).
@@ -81,7 +81,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 
 ```js
 // block.js
-( function( blocks, element, blockEditor ) {
+( function ( blocks, element, blockEditor ) {
 	var el = element.createElement,
 		source = blocks.source,
 		useBlockProps = blockEditor.useBlockProps;
@@ -91,7 +91,7 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 
 		return el( 'img', {
 			src: src,
-			alt: props.category
+			alt: props.category,
 		} );
 	}
 
@@ -110,10 +110,10 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 				source: 'attribute',
 				attribute: 'alt',
 				selector: 'img',
-			}
+			},
 		},
 
-		edit: function( props ) {
+		edit: function ( props ) {
 			var blockProps = useBlockProps();
 			var category = props.attributes.category,
 				children;
@@ -130,7 +130,9 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 			}
 
 			children.push(
-				el( 'select', { value: category, onChange: setCategory },
+				el(
+					'select',
+					{ value: category, onChange: setCategory },
 					el( 'option', null, '- Select -' ),
 					el( 'option', { value: 'sports' }, 'Sports' ),
 					el( 'option', { value: 'animals' }, 'Animals' ),
@@ -138,18 +140,18 @@ add_action( 'enqueue_block_editor_assets', 'random_image_enqueue_block_editor_as
 				)
 			);
 
-			return el( 'form', Object.assing( blockProps, {  onSubmit: setCategory } ), children );
+			return el(
+				'form',
+				Object.assing( blockProps, { onSubmit: setCategory } ),
+				children
+			);
 		},
 
-		save: function( props ) {
+		save: function ( props ) {
 			return RandomImage( { category: props.attributes.category } );
-		}
+		},
 	} );
-} )(
-	window.wp.blocks,
-	window.wp.element,
-	window.wp.blockEditor
-);
+} )( window.wp.blocks, window.wp.element, window.wp.blockEditor );
 ```
 
 _[(Example in ES2015+, JSX)](https://gist.github.com/aduth/fb1cc9a2296110a62b96383e4b2e8a7c)_

@@ -8,19 +8,19 @@
 
 ### New Features
 
-- Add the `useIsomorphicLayoutEffect` hook.
+-   Add the `useIsomorphicLayoutEffect` hook.
 
 ## 3.4.0 (2019-06-12)
 
 ### New Features
 
-- Add the `useMediaQuery` and `useReducedMotion` hooks.
+-   Add the `useMediaQuery` and `useReducedMotion` hooks.
 
 ## 3.0.0 (2018-11-15)
 
 ### Breaking Changes
 
-- `remountOnPropChange` has been removed.
+-   `remountOnPropChange` has been removed.
 
 ## 2.1.2 (2018-11-09)
 
@@ -30,7 +30,7 @@
 
 ### Deprecation
 
-- `remountOnPropChange` has been deprecated.
+-   `remountOnPropChange` has been deprecated.
 
 ## 2.0.5 (2018-10-19)
 
@@ -40,4 +40,4 @@
 
 ### Breaking Change
 
-- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)).  If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
+-   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

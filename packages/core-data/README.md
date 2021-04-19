@@ -376,7 +376,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the entities are loaded
+-   `Array<Object>`: Array of entities with config matching kind.
 
 <a name="getEntity" href="#getEntity">#</a> **getEntity**
 

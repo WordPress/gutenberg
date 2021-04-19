@@ -1875,6 +1875,68 @@ export const __experimentalGetPatternsByBlockTypes = createSelector(
 );
 
 /**
+ * Determines the items that appear in the available pattern transforms list.
+ *
+ * For now we only handle blocks without InnerBlocks and take into account
+ * the `__experimentalRole` property of blocks' attributes for the transformation.
+ *
+ * We return the first set of possible eligible block patterns,
+ * by checking the `blockTypes` property. We still have to recurse through
+ * block pattern's blocks and try to find matches from the selected blocks.
+ * Now this happens in the consumer to avoid heavy operations in the selector.
+ *
+ * @param {Object}  state Editor state.
+ * @param {Object[]} blocks The selected blocks.
+ * @param {?string} rootClientId Optional root client ID of block list.
+ *
+ * @return {WPBlockPattern[]} Items that are eligible for a pattern transformation.
+ */
+// TODO tests
+export const __experimentalGetPatternTransformItems = createSelector(
+	( state, blocks, rootClientId = null ) => {
+		if ( ! blocks ) return EMPTY_ARRAY;
+		/**
+		 * For now we only handle blocks without InnerBlocks and take into account
+		 * the `__experimentalRole` property of blocks' attributes for the transformation.
+		 * Note that the blocks have been retrieved through `getBlock`, which doesn't
+		 * return the inner blocks of an inner block controller, so we still need
+		 * to check for this case too.
+		 */
+		if (
+			blocks.some(
+				( { clientId, innerBlocks } ) =>
+					innerBlocks.length ||
+					areInnerBlocksControlled( state, clientId )
+			)
+		) {
+			return EMPTY_ARRAY;
+		}
+
+		// Create a Set of the selected block names that is used in patterns filtering.
+		const selectedBlockNames = Array.from(
+			new Set( blocks.map( ( { name } ) => name ) )
+		);
+		/**
+		 * Here we will return first set of possible eligible block patterns,
+		 * by checking the `blockTypes` property. We still have to recurse through
+		 * block pattern's blocks and try to find matches from the selected blocks.
+		 * Now this happens in the consumer to avoid heavy operations in the selector.
+		 */
+		return __experimentalGetPatternsByBlockTypes(
+			state,
+			selectedBlockNames,
+			rootClientId
+		);
+	},
+	( state, rootClientId ) => [
+		...__experimentalGetPatternsByBlockTypes.getDependants(
+			state,
+			rootClientId
+		),
+	]
+);
+
+/**
  * Returns the Block List settings of a block, if any exist.
  *
  * @param {Object}  state    Editor state.

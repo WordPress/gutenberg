@@ -1,6 +1,16 @@
 .wp-block-site-logo {
 	line-height: 0;
 
+	a {
+		display: inline-block;
+	}
+
+	// Provide a sane starting point for the size.
+	&.is-default-size img {
+		width: 120px;
+		height: auto;
+	}
+
 	.aligncenter {
 		display: table;
 	}

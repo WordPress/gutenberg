@@ -141,6 +141,10 @@ const SiteLogo = ( {
 	// becomes available.
 	const maxWidthBuffer = maxWidth * 2.5;
 
+	// Set the default width to a responsible size.
+	// Note that this width is also set in the attached CSS file.
+	const defaultWidth = 120;
+
 	let showRightHandle = false;
 	let showLeftHandle = false;
 
@@ -173,7 +177,7 @@ const SiteLogo = ( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Site Logo Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
 						label={ __( 'Image width' ) }
 						onChange={ ( newWidth ) =>
@@ -182,7 +186,7 @@ const SiteLogo = ( {
 						min={ minWidth }
 						max={ maxWidthBuffer }
 						initialPosition={ Math.min(
-							naturalWidth,
+							defaultWidth,
 							maxWidthBuffer
 						) }
 						value={ width || '' }
@@ -341,7 +345,7 @@ export default function LogoEdit( {
 	);
 
 	const classes = classnames( className, {
-		'is-resized': !! width,
+		'is-default-size': ! width,
 	} );
 
 	const blockProps = useBlockProps( {

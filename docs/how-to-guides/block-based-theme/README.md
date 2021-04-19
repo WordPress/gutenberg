@@ -12,11 +12,11 @@ This tutorial is up to date as of Gutenberg version 9.1.
 
 ## Table of Contents
 
- 1. [What is needed to create a block-based theme?](/docs/how-to-guides/block-based-themes/README.md#what-is-needed-to-create-a-block-based-theme)
- 2. [Creating the theme](/docs/how-to-guides/block-based-themes/README.md#creating-the-theme)
- 3. [Creating the templates and template parts](/docs/how-to-guides/block-based-themes/README.md#creating-the-templates-and-template-parts)
- 4. [experimental-theme.json - Global styles](/docs/how-to-guides/block-based-themes/README.md#experimental-theme-json-global-styles)
- 5. [Adding blocks](/docs/how-to-guides/block-based-themes/block-based-themes-2-adding-blocks.md)
+1.  [What is needed to create a block-based theme?](/docs/how-to-guides/block-based-themes/README.md#what-is-needed-to-create-a-block-based-theme)
+2.  [Creating the theme](/docs/how-to-guides/block-based-themes/README.md#creating-the-theme)
+3.  [Creating the templates and template parts](/docs/how-to-guides/block-based-themes/README.md#creating-the-templates-and-template-parts)
+4.  [experimental-theme.json - Global styles](/docs/how-to-guides/block-based-themes/README.md#experimental-theme-json-global-styles)
+5.  [Adding blocks](/docs/how-to-guides/block-based-themes/block-based-themes-2-adding-blocks.md)
 
 ## What is needed to create a block-based theme?
 
@@ -64,10 +64,10 @@ Create a `style.css` file. The file header in the `style.css` file has [the same
 ```
 /*
 Theme Name: My first theme
-Theme URI: 
+Theme URI:
 Author: The WordPress team
 Author URI: https://wordpress.org/
-Description: 
+Description:
 Tags:
 Version: 1.0.0
 Requires at least: 5.0
@@ -103,12 +103,12 @@ if ( ! function_exists( 'myfirsttheme_setup' ) ) :
  * support post thumbnails.
  */
 function myfirsttheme_setup() {
- 
+
 	/**
 	 * Add default posts and comments RSS feed links to <head>.
 	 */
 	add_theme_support( 'automatic-feed-links' );
- 
+
 	/**
 	 * Enable support for post thumbnails and featured images.
 	 */
@@ -148,7 +148,7 @@ add_action( 'wp_enqueue_scripts', 'myfirsttheme_scripts' );
 ```
 
 Create an `index.php` file.
-This file is used as a fallback if the theme is activated when full site editing is not enabled. 
+This file is used as a fallback if the theme is activated when full site editing is not enabled.
 You may leave the file empty for this tutorial.
 
 Your theme should now include the following files and folders:
@@ -189,9 +189,10 @@ Eventually, you will be able to create and combine templates and template parts 
 The purpose of the `experimental-theme.json` file is to make it easier to style blocks by setting defaults.
 
 It is used to:
- * Create CSS variables (also called CSS custom properties) that can be used to style blocks both on the front and in the editor.
- * Set global styles.
- * Set styles for individual block types.
+
+-   Create CSS variables (also called CSS custom properties) that can be used to style blocks both on the front and in the editor.
+-   Set global styles.
+-   Set styles for individual block types.
 
 [The documentation for global styles contains a list of available block and style combinations.](https://developer.wordpress.org/block-editor/developers/themes/theme-json/)
 
@@ -238,10 +239,11 @@ Add the following global presets to the `experimental-theme.json` file:
 ```
 
 This code generates the following variables:
+
 ```
 	--wp--preset--color--strong-magenta: #a156b4;
 	--wp--preset--color--very-dark-gray: #444;
-	
+
 	--wp--custom--line-height--small: 1.3;
 	--wp--custom--line-height--medium: 2;
 	--wp--custom--line-height--large: 2.5;
@@ -251,6 +253,7 @@ This code generates the following variables:
 
 This example will add the dark grey color as the website background color.
 Add the code inside the globals, after the presets:
+
 ```
 	"styles": {
 		"color": {

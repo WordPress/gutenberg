@@ -2,10 +2,10 @@
 
 TreeSelect component is used to generate select input fields.
 
-
 ## Usage
 
 Render a user interface to select the parent page in a hierarchy of pages:
+
 ```jsx
 import { TreeSelect } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
@@ -57,33 +57,33 @@ Props not included in this set will be applied to the SelectControl component be
 
 If this property is added, a label will be generated using label property as the content.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ### noOptionLabel
 
 If this property is added, an option will be added with this label to represent empty selection.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ### onChange
 
 A function that receives the id of the new node element that is being selected.
 
-- Type: `function`
-- Required: Yes
+-   Type: `function`
+-   Required: Yes
 
 ### selectedId
 
 The id of the currently selected node.
 
-- Type: `Object`
-- Required: No
+-   Type: `Object`
+-   Required: No
 
 ### tree
 
 An array containing the tree objects with the possible nodes the user can select.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
