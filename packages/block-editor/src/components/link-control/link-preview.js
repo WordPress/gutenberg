@@ -15,7 +15,11 @@ import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
  */
 import { ViewerSlot } from './viewer-slot';
 
-export default function LinkPreview( { value, onEditClick } ) {
+export default function LinkPreview( {
+	value,
+	onEditClick,
+	allowEditing = true,
+} ) {
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
 		'';
@@ -42,13 +46,15 @@ export default function LinkPreview( { value, onEditClick } ) {
 				) }
 			</span>
 
-			<Button
-				isSecondary
-				onClick={ () => onEditClick() }
-				className="block-editor-link-control__search-item-action"
-			>
-				{ __( 'Edit' ) }
-			</Button>
+			{ allowEditing && (
+				<Button
+					isSecondary
+					onClick={ () => onEditClick() }
+					className="block-editor-link-control__search-item-action"
+				>
+					{ __( 'Edit' ) }
+				</Button>
+			) }
 			<ViewerSlot fillProps={ value } />
 		</div>
 	);

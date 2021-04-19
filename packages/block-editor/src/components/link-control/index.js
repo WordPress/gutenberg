@@ -91,6 +91,7 @@ import { ViewerFill } from './viewer-slot';
  * @property {Object=}                    suggestionsQuery           Query parameters to pass along to wp.blockEditor.__experimentalFetchLinkSuggestions.
  * @property {boolean=}                   noURLSuggestion            Whether to add a fallback suggestion which treats the search query as a URL.
  * @property {string|Function|undefined}  createSuggestionButtonText The text to use in the button that calls createSuggestion.
+ * @property {boolean}                    allowEditing               Whether a URL is editable in link preview. Defaults to true.
  */
 
 /**
@@ -115,6 +116,7 @@ function LinkControl( {
 	suggestionsQuery = {},
 	noURLSuggestion = false,
 	createSuggestionButtonText,
+	allowEditing = true,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -251,6 +253,7 @@ function LinkControl( {
 				<LinkPreview
 					value={ value }
 					onEditClick={ () => setIsEditingLink( true ) }
+					allowEditing={ allowEditing }
 				/>
 			) }
 

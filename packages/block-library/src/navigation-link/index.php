@@ -150,7 +150,9 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		'<a class="wp-block-navigation-link__content" ';
 
 	// Start appending HTML attributes to anchor tag.
-	if ( isset( $attributes['url'] ) ) {
+	if ( isset( $attributes['type'] ) && 'home' === $attributes['type'] ) {
+		$html .= ' href="' . esc_url( home_url() ) . '"';
+	} elseif ( isset( $attributes['url'] ) ) {
 		$html .= ' href="' . esc_url( $attributes['url'] ) . '"';
 	}
 
@@ -311,6 +313,18 @@ function register_block_core_navigation_link() {
 			}
 		}
 	}
+	// Home variation.
+	$built_ins[] = array(
+		'name'        => 'home',
+		'title'       => __( 'Home Link' ),
+		'description' => __( 'A link back to home.' ),
+		'attributes'  => array(
+			'type'  => 'home',
+			/* translators: default label for home navigation menu link  */
+			'label' => __( 'Home' ),
+			'url'   => home_url(),
+		),
+	);
 	if ( $taxonomies ) {
 		foreach ( $taxonomies as $taxonomy ) {
 			$variation = build_variation_for_navigation_link( $taxonomy, 'taxonomy' );

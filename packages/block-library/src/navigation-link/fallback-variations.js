@@ -7,6 +7,7 @@ import {
 	page as pageIcon,
 	postTitle as postIcon,
 	tag as tagIcon,
+	home as homeIcon,
 } from '@wordpress/icons';
 
 // FALLBACK: this is only used when the server does not understand the variations property in the
@@ -34,6 +35,18 @@ const fallbackVariations = [
 		title: __( 'Page Link' ),
 		description: __( 'A link to a page.' ),
 		attributes: { type: 'page', kind: 'post-type' },
+	},
+	{
+		name: 'home',
+		icon: homeIcon,
+		title: __( 'Home Link' ),
+		description: __( 'A link back to home.' ),
+		attributes: {
+			type: 'home',
+			url: '/', // make sure a url is provided to avoid editing state, this will get overwritten
+			/* translators: default label for home navigation menu link  */
+			label: __( 'Home' ),
+		},
 	},
 	{
 		name: 'category',

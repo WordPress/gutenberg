@@ -7,6 +7,7 @@ import {
 	postTitle,
 	tag,
 	customPostType,
+	home,
 } from '@wordpress/icons';
 
 /**
@@ -24,6 +25,8 @@ function getIcon( variationName ) {
 			return tag;
 		case 'category':
 			return category;
+		case 'home':
+			return home;
 		default:
 			return customPostType;
 	}

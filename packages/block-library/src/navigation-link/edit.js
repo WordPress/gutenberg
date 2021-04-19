@@ -175,6 +175,7 @@ export default function NavigationLinkEdit( {
 		numberOfDescendants,
 		userCanCreatePages,
 		userCanCreatePosts,
+		homeUrl,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -188,6 +189,8 @@ export default function NavigationLinkEdit( {
 
 			const descendants = getClientIdsOfDescendants( [ clientId ] )
 				.length;
+
+			const { canUser, getUnstableBase } = select( coreStore );
 
 			return {
 				isAtMaxNesting:
@@ -206,14 +209,9 @@ export default function NavigationLinkEdit( {
 					selectedBlockId,
 				] )?.length,
 				numberOfDescendants: descendants,
-				userCanCreatePages: select( coreStore ).canUser(
-					'create',
-					'pages'
-				),
-				userCanCreatePosts: select( coreStore ).canUser(
-					'create',
-					'posts'
-				),
+				userCanCreatePages: canUser( 'create', 'pages' ),
+				userCanCreatePosts: canUser( 'create', 'posts' ),
+				homeUrl: getUnstableBase()?.home,
 			};
 		},
 		[ clientId ]
@@ -264,6 +262,16 @@ export default function NavigationLinkEdit( {
 			}
 		}
 	}, [ url ] );
+
+	// Update home url to reflect current value which may have changed since last save. Server render_callback
+	// always ignores url attr in favor of home_url()
+	useEffect( () => {
+		if ( type === 'home' ) {
+			setAttributes( {
+				url: encodeURI( homeUrl ),
+			} );
+		}
+	}, [ url, type ] );
 
 	/**
 	 * Focus the Link label text and select it.
@@ -491,6 +499,7 @@ export default function NavigationLinkEdit( {
 							/>
 							<LinkControl
 								className="wp-block-navigation-link__inline-link-input"
+								allowEditing={ 'home' !== type }
 								value={ link }
 								showInitialSuggestions={ true }
 								withCreateSuggestion={ userCanCreate }
