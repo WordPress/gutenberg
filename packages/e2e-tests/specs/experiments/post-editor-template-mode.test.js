@@ -9,8 +9,14 @@ import {
 	trashAllPosts,
 	openPreviewPage,
 	openDocumentSettingsSidebar,
-	openSidebarPanelWithTitle,
 } from '@wordpress/e2e-test-utils';
+
+const openSidebarPanelWithTitle = async ( title ) => {
+	const panel = await page.waitForXPath(
+		`//div[contains(@class,"edit-post-sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"${ title }")]`
+	);
+	await panel.click();
+};
 
 describe( 'Post Editor Template mode', () => {
 	beforeAll( async () => {
@@ -43,9 +49,9 @@ describe( 'Post Editor Template mode', () => {
 
 		// Switch to template mode.
 		await openDocumentSettingsSidebar();
-		await openSidebarPanelWithTitle( 'Post Attributes' );
+		await openSidebarPanelWithTitle( 'Template' );
 		const editTemplateXPath =
-			"//*[contains(@class, 'edit-post-post-template__actions')]//button[contains(text(), 'Edit')]";
+			"//*[contains(@class, 'edit-post-template__actions')]//button[contains(text(), 'Edit')]";
 		const switchLink = await page.waitForXPath( editTemplateXPath );
 		await switchLink.click();
 
@@ -103,15 +109,15 @@ describe( 'Post Editor Template mode', () => {
 
 		// Create a new custom template.
 		await openDocumentSettingsSidebar();
-		await openSidebarPanelWithTitle( 'Post Attributes' );
+		await openSidebarPanelWithTitle( 'Template' );
 		const newTemplateXPath =
-			"//*[contains(@class, 'edit-post-post-template__actions')]//button[contains(text(), 'New')]";
+			"//*[contains(@class, 'edit-post-template__actions')]//button[contains(text(), 'New')]";
 		const newButton = await page.waitForXPath( newTemplateXPath );
 		await newButton.click();
 
 		// Fill the template title and submit.
 		const templateNameInputSelector =
-			'.edit-post-post-template__modal .components-text-control__input';
+			'.edit-post-template__modal .components-text-control__input';
 		await page.click( templateNameInputSelector );
 		await page.keyboard.type( 'Blank Template' );
 		await page.keyboard.press( 'Enter' );

@@ -31,6 +31,7 @@ export function TemplatePanel() {
 		availableTemplates,
 		isViewable,
 		template,
+		supportsTemplateMode,
 	} = useSelect( ( select ) => {
 		const {
 			isEditorPanelEnabled,
@@ -56,13 +57,18 @@ export function TemplatePanel() {
 			availableTemplates: getEditorSettings().availableTemplates,
 			template: _supportsTemplateMode && getEditedPostTemplate(),
 			isViewable: _isViewable,
+			supportsTemplateMode: _supportsTemplateMode,
 		};
 	}, [] );
 
 	const { toggleEditorPanelOpened } = useDispatch( editPostStore );
 	const { editPost } = useDispatch( editorStore );
 
-	if ( ! isEnabled || ! isViewable || isEmpty( availableTemplates ) ) {
+	if (
+		! isEnabled ||
+		! isViewable ||
+		( isEmpty( availableTemplates ) && ! supportsTemplateMode )
+	) {
 		return null;
 	}
 
