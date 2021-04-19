@@ -19,7 +19,6 @@ import useBlockDropZone from '../use-block-drop-zone';
 import useInsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
-import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 
@@ -30,7 +29,6 @@ export default function BlockList( { className, __experimentalLayout } ) {
 	const ref = useRef();
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
-	useScrollSelectionIntoView( ref );
 	usePreParsePatterns();
 
 	const isLargeViewport = useViewportMatch( 'medium' );
