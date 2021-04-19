@@ -68,7 +68,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	public function get_items( $request ) {// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
 		$settings = array_merge(
 			apply_filters( 'block_editor_settings', array() ),
-			get_default_block_editor_settings()
+			gutenberg_get_default_block_editor_settings()
 		);
 
 		return rest_ensure_response( $settings );
@@ -103,14 +103,14 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'context'     => array( 'view' ),
 				),
 
-				'supportsLayout'                         => array(
-					'description' => __( 'Enable/disable layouts support in container blocks.', 'gutenberg' ),
+				'supportsTemplateMode'                   => array(
+					'description' => __( 'Returns if the current theme is full site editing-enabled or not.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'view' ),
 				),
 
-				'isFSETheme'                             => array(
-					'description' => __( 'Theme support for full site editing.', 'gutenberg' ),
+				'supportsLayout'                         => array(
+					'description' => __( 'Enable/disable layouts support in container blocks.', 'gutenberg' ),
 					'type'        => 'boolean',
 					'context'     => array( 'view' ),
 				),
@@ -154,6 +154,12 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				'allowedMimeTypes'                       => array(
 					'description' => __( 'List of allowed mime types and file extensions.', 'gutenberg' ),
 					'type'        => 'object',
+					'context'     => array( 'view' ),
+				),
+
+				'blockCategories'                        => array(
+					'description' => __( 'Returns all the categories for block types that will be shown in the block editor.', 'gutenberg' ),
+					'type'        => 'array',
 					'context'     => array( 'view' ),
 				),
 
