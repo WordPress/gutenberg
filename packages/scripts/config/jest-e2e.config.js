@@ -9,6 +9,7 @@ const path = require( 'path' );
 const { hasBabelConfig } = require( '../utils' );
 
 const jestE2EConfig = {
+	testRunner: 'jest-circus/runner',
 	globalSetup: path.join( __dirname, 'jest-environment-puppeteer', 'setup' ),
 	globalTeardown: path.join(
 		__dirname,
