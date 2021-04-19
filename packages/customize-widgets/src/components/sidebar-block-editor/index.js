@@ -11,11 +11,7 @@ import {
 	BlockEditorKeyboardShortcuts,
 	__experimentalBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
-import {
-	DropZoneProvider,
-	SlotFillProvider,
-	Popover,
-} from '@wordpress/components';
+import { SlotFillProvider, Popover } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -41,54 +37,52 @@ export default function SidebarBlockEditor( { sidebar, inserter, inspector } ) {
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
 			<SlotFillProvider>
-				<DropZoneProvider>
-					<SidebarEditorProvider
-						sidebar={ sidebar }
-						settings={ settings }
-					>
-						<BlockEditorKeyboardShortcuts />
+				<SidebarEditorProvider
+					sidebar={ sidebar }
+					settings={ settings }
+				>
+					<BlockEditorKeyboardShortcuts />
 
-						<Header
-							inserter={ inserter }
-							isInserterOpened={ isInserterOpened }
-							setIsInserterOpened={ setIsInserterOpened }
+					<Header
+						inserter={ inserter }
+						isInserterOpened={ isInserterOpened }
+						setIsInserterOpened={ setIsInserterOpened }
+					/>
+
+					<BlockSelectionClearer>
+						<WritingFlow>
+							<ObserveTyping>
+								<BlockList />
+							</ObserveTyping>
+						</WritingFlow>
+					</BlockSelectionClearer>
+				</SidebarEditorProvider>
+
+				<Popover.Slot name="block-toolbar" />
+
+				{ createPortal(
+					// This is a temporary hack to prevent button component inside <BlockInspector>
+					// from submitting form when type="button" is not specified.
+					<form onSubmit={ ( event ) => event.preventDefault() }>
+						<BlockInspector />
+					</form>,
+					inspector.contentContainer[ 0 ]
+				) }
+
+				<__experimentalBlockSettingsMenuFirstItem>
+					{ ( { onClose } ) => (
+						<BlockInspectorButton
+							inspector={ inspector }
+							closeMenu={ onClose }
 						/>
-
-						<BlockSelectionClearer>
-							<WritingFlow>
-								<ObserveTyping>
-									<BlockList />
-								</ObserveTyping>
-							</WritingFlow>
-						</BlockSelectionClearer>
-					</SidebarEditorProvider>
-
-					<Popover.Slot name="block-toolbar" />
-
-					{ createPortal(
-						// This is a temporary hack to prevent button component inside <BlockInspector>
-						// from submitting form when type="button" is not specified.
-						<form onSubmit={ ( event ) => event.preventDefault() }>
-							<BlockInspector />
-						</form>,
-						inspector.contentContainer[ 0 ]
 					) }
+				</__experimentalBlockSettingsMenuFirstItem>
 
-					<__experimentalBlockSettingsMenuFirstItem>
-						{ ( { onClose } ) => (
-							<BlockInspectorButton
-								inspector={ inspector }
-								closeMenu={ onClose }
-							/>
-						) }
-					</__experimentalBlockSettingsMenuFirstItem>
-
-					{
-						// We have to portal this to the parent of both the editor and the inspector,
-						// so that the popovers will appear above both of them.
-						createPortal( <Popover.Slot />, parentContainer )
-					}
-				</DropZoneProvider>
+				{
+					// We have to portal this to the parent of both the editor and the inspector,
+					// so that the popovers will appear above both of them.
+					createPortal( <Popover.Slot />, parentContainer )
+				}
 			</SlotFillProvider>
 		</>
 	);

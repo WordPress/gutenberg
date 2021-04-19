@@ -1,26 +1,24 @@
 # DropZone
 
-`DropZone` is a Component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event. To work properly this components needs to be wrapped in a `DropZoneProvider`.
+`DropZone` is a Component creating a drop zone area taking the full size of its parent element. It supports dropping files, HTML content or any other HTML drop event.
 
 ## Usage
 
 ```jsx
-import { DropZoneProvider, DropZone } from '@wordpress/components';
+import { DropZone } from '@wordpress/components';
 import { withState } from '@wordpress/compose';
 
 const MyDropZone = withState( {
 	hasDropped: false,
 } )( ( { hasDropped, setState } ) => (
-	<DropZoneProvider>
-		<div>
-			{ hasDropped ? 'Dropped!' : 'Drop something here' }
-			<DropZone
-				onFilesDrop={ () => setState( { hasDropped: true } ) }
-				onHTMLDrop={ () => setState( { hasDropped: true } ) }
-				onDrop={ () => setState( { hasDropped: true } ) }
-			/>
-		</div>
-	</DropZoneProvider>
+	<div>
+		{ hasDropped ? 'Dropped!' : 'Drop something here' }
+		<DropZone
+			onFilesDrop={ () => setState( { hasDropped: true } ) }
+			onHTMLDrop={ () => setState( { hasDropped: true } ) }
+			onDrop={ () => setState( { hasDropped: true } ) }
+		/>
+	</div>
 ) );
 ```
 

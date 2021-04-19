@@ -650,6 +650,19 @@
 .block-editor-block-list__insertion-point-popover.is-without-arrow {
 	z-index: z-index(".block-editor-block-list__insertion-point-popover");
 	position: absolute;
+	pointer-events: none;
+
+	* {
+		pointer-events: none;
+	}
+
+	.is-with-inserter {
+		pointer-events: all;
+
+		* {
+			pointer-events: all;
+		}
+	}
 
 	.components-popover__content.components-popover__content { // Needs specificity.
 		background: none;

@@ -18,7 +18,7 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
-import { DropZoneProvider, Popover } from '@wordpress/components';
+import { Popover } from '@wordpress/components';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -101,18 +101,16 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					ref={ ref }
 					contentRef={ mergedRefs }
 				>
-					<DropZoneProvider>
-						<WritingFlow>
-							<BlockList
-								className="edit-site-block-editor__block-list"
-								__experimentalLayout={ {
-									type: 'default',
-									// At the root level of the site editor, no alignments should be allowed.
-									alignments: [],
-								} }
-							/>
-						</WritingFlow>
-					</DropZoneProvider>
+					<WritingFlow>
+						<BlockList
+							className="edit-site-block-editor__block-list"
+							__experimentalLayout={ {
+								type: 'default',
+								// At the root level of the site editor, no alignments should be allowed.
+								alignments: [],
+							} }
+						/>
+					</WritingFlow>
 				</Iframe>
 			</div>
 		</BlockEditorProvider>

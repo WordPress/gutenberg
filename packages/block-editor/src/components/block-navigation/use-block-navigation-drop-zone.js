@@ -1,9 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { __unstableUseDropZone as useDropZone } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
-import { useEffect, useRef, useState } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
+import {
+	useThrottle,
+	__experimentalUseDropZone as useDropZone,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -13,7 +16,6 @@ import useOnBlockDrop from '../use-on-block-drop';
 import { store as blockEditorStore } from '../../store';
 
 /** @typedef {import('../../utils/math').WPPoint} WPPoint */
-/** @typedef {import('@wordpress/element').RefObject} RefObject */
 
 /**
  * The type of a drag event.
@@ -45,91 +47,6 @@ import { store as blockEditorStore } from '../../store';
  * @property {'top'|'bottom'|'inside'}  dropPosition The position relative to the block that the user is dropping to.
  *                                                   'inside' refers to nesting as an inner block.
  */
-
-/**
- * A react hook that returns data about blocks used for computing where a user
- * can drop to when dragging and dropping blocks.
- *
- * @param {Object}          ref           A React ref of a containing element for block navigation.
- * @param {WPPoint}         position      The current drag position.
- * @param {WPDragEventType} dragEventType The drag event type.
- *
- * @return {RefObject<WPBlockNavigationDropZoneBlocks>} A React ref containing the blocks data.
- */
-function useDropTargetBlocksData( ref, position, dragEventType ) {
-	const {
-		getBlockRootClientId,
-		getBlockIndex,
-		getBlockCount,
-		getDraggedBlockClientIds,
-		canInsertBlocks,
-	} = useSelect( ( select ) => {
-		const selectors = select( blockEditorStore );
-		return {
-			canInsertBlocks: selectors.canInsertBlocks,
-			getBlockRootClientId: selectors.getBlockRootClientId,
-			getBlockIndex: selectors.getBlockIndex,
-			getBlockCount: selectors.getBlockCount,
-			getDraggedBlockClientIds: selectors.getDraggedBlockClientIds,
-		};
-	}, [] );
-	const blocksData = useRef();
-
-	// Compute data about blocks only when the user
-	// starts dragging, as determined by `hasPosition`.
-	const hasPosition = !! position;
-
-	useEffect( () => {
-		if ( ! ref.current || ! hasPosition ) {
-			return;
-		}
-
-		const isBlockDrag = dragEventType === 'default';
-
-		const draggedBlockClientIds = isBlockDrag
-			? getDraggedBlockClientIds()
-			: undefined;
-
-		const blockElements = Array.from(
-			ref.current.querySelectorAll( '[data-block]' )
-		);
-
-		blocksData.current = blockElements.map( ( blockElement ) => {
-			const clientId = blockElement.dataset.block;
-			const rootClientId = getBlockRootClientId( clientId );
-
-			return {
-				clientId,
-				rootClientId,
-				blockIndex: getBlockIndex( clientId, rootClientId ),
-				element: blockElement,
-				isDraggedBlock: isBlockDrag
-					? draggedBlockClientIds.includes( clientId )
-					: false,
-				innerBlockCount: getBlockCount( clientId ),
-				canInsertDraggedBlocksAsSibling: isBlockDrag
-					? canInsertBlocks( draggedBlockClientIds, rootClientId )
-					: true,
-				canInsertDraggedBlocksAsChild: isBlockDrag
-					? canInsertBlocks( draggedBlockClientIds, clientId )
-					: true,
-			};
-		} );
-	}, [
-		// `ref` shouldn't actually change during a drag operation, but
-		// is specified for completeness as it's used within the hook.
-		ref,
-		hasPosition,
-		dragEventType,
-		canInsertBlocks,
-		getBlockCount,
-		getBlockIndex,
-		getBlockRootClientId,
-		getDraggedBlockClientIds,
-	] );
-
-	return blocksData;
-}
 
 /**
  * Is the point contained by the rectangle.
@@ -275,45 +192,90 @@ function getBlockNavigationDropTarget( blocksData, position ) {
 /**
  * A react hook for implementing a drop zone in block navigation.
  *
- * @param {Object} ref A React ref of a containing element for block navigation.
- *
  * @return {WPBlockNavigationDropZoneTarget} The drop target.
  */
-export default function useBlockNavigationDropZone( ref ) {
-	const [ target = {}, setTarget ] = useState();
+export default function useBlockNavigationDropZone() {
 	const {
-		rootClientId: targetRootClientId,
-		blockIndex: targetBlockIndex,
-	} = target;
+		getBlockRootClientId,
+		getBlockIndex,
+		getBlockCount,
+		getDraggedBlockClientIds,
+		canInsertBlocks,
+	} = useSelect( ( select ) => {
+		const selectors = select( blockEditorStore );
+		return {
+			canInsertBlocks: selectors.canInsertBlocks,
+			getBlockRootClientId: selectors.getBlockRootClientId,
+			getBlockIndex: selectors.getBlockIndex,
+			getBlockCount: selectors.getBlockCount,
+			getDraggedBlockClientIds: selectors.getDraggedBlockClientIds,
+		};
+	}, [] );
+	const [ target, setTarget ] = useState();
+	const { rootClientId: targetRootClientId, blockIndex: targetBlockIndex } =
+		target || {};
 
-	const dropEventHandlers = useOnBlockDrop(
-		targetRootClientId,
-		targetBlockIndex
-	);
+	const onBlockDrop = useOnBlockDrop( targetRootClientId, targetBlockIndex );
+	const throttled = useThrottle(
+		useCallback( ( event, currentTarget ) => {
+			const position = { x: event.clientX, y: event.clientY };
+			const isBlockDrag = !! event.dataTransfer.getData( 'wp-blocks' );
 
-	const { position, type: dragEventType } = useDropZone( {
-		element: ref,
-		withPosition: true,
-		...dropEventHandlers,
-	} );
+			const draggedBlockClientIds = isBlockDrag
+				? getDraggedBlockClientIds()
+				: undefined;
 
-	const blocksData = useDropTargetBlocksData( ref, position, dragEventType );
+			const blockElements = Array.from(
+				currentTarget.querySelectorAll( '[data-block]' )
+			);
 
-	// Calculate the drop target based on the drag position.
-	useEffect( () => {
-		if ( position ) {
+			const blocksData = blockElements.map( ( blockElement ) => {
+				const clientId = blockElement.dataset.block;
+				const rootClientId = getBlockRootClientId( clientId );
+
+				return {
+					clientId,
+					rootClientId,
+					blockIndex: getBlockIndex( clientId, rootClientId ),
+					element: blockElement,
+					isDraggedBlock: isBlockDrag
+						? draggedBlockClientIds.includes( clientId )
+						: false,
+					innerBlockCount: getBlockCount( clientId ),
+					canInsertDraggedBlocksAsSibling: isBlockDrag
+						? canInsertBlocks( draggedBlockClientIds, rootClientId )
+						: true,
+					canInsertDraggedBlocksAsChild: isBlockDrag
+						? canInsertBlocks( draggedBlockClientIds, clientId )
+						: true,
+				};
+			} );
+
 			const newTarget = getBlockNavigationDropTarget(
-				blocksData.current,
+				blocksData,
 				position
 			);
 
 			if ( newTarget ) {
 				setTarget( newTarget );
 			}
-		}
-	}, [ blocksData, position ] );
+		}, [] ),
+		200
+	);
 
-	if ( position ) {
-		return target;
-	}
+	const ref = useDropZone( {
+		onDrop: onBlockDrop,
+		onDragOver( event ) {
+			// `currentTarget` is only available while the event is being
+			// handled, so get it now and pass it to the thottled function.
+			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
+			throttled( event, event.currentTarget );
+		},
+		onDragEnd() {
+			throttled.cancel();
+			setTarget( null );
+		},
+	} );
+
+	return { ref, target };
 }
