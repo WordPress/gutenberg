@@ -16,7 +16,9 @@
  * @return float      Value in the range [0,1].
  */
 function gutenberg_tinycolor_bound01( $n, $max ) {
-	if ( 'string' === gettype( $n ) && false !== strpos( $n, '.' ) && 1 === (float) $n ) { $n = '100%'; }
+	if ( 'string' === gettype( $n ) && false !== strpos( $n, '.' ) && 1 === (float) $n ) {
+		$n = '100%';
+	}
 
 	$n = min( $max, max( 0, (float) $n ) );
 
@@ -46,7 +48,7 @@ function gutenberg_tinycolor_rgb_to_rgb( $rgb_color ) {
 	return array(
 		'r' => gutenberg_tinycolor_bound01( $rgb_color['r'], 255 ) * 255,
 		'g' => gutenberg_tinycolor_bound01( $rgb_color['g'], 255 ) * 255,
-		'b' => gutenberg_tinycolor_bound01( $rgb_color['b'], 255 ) * 255
+		'b' => gutenberg_tinycolor_bound01( $rgb_color['b'], 255 ) * 255,
 	);
 }
 
@@ -81,7 +83,7 @@ function gutenberg_tinycolor_hue_to_rgb( $p, $q, $t ) {
 
 /**
  * Convert an HSL object to an RGB object with converted and rounded values.
- * 
+ *
  * @see https://github.com/bgrins/TinyColor
  *
  * @param  array $hsl_color HSL object.
@@ -93,7 +95,7 @@ function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
 	$l = gutenberg_tinycolor_bound01( $hsl_color['l'], 100 );
 
 	if ( 0 === $s ) {
- 		// Achromatic.
+		// Achromatic.
 		$r = $l;
 		$g = $l;
 		$b = $l;
@@ -108,7 +110,7 @@ function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
 	return array(
 		'r' => $r * 255,
 		'g' => $g * 255,
-		'b' => $b * 255
+		'b' => $b * 255,
 	);
 }
 
@@ -116,7 +118,7 @@ function gutenberg_tinycolor_hsl_to_rgb( $hsl_color ) {
  * Parses hex, hsl, and rgb CSS strings using the same regex as tinycolor v1.4.2
  * used in the JavaScript. Only colors output from react-color are implemented
  * and the alpha value is ignored as it is not used in duotone.
- * 
+ *
  * @see https://github.com/bgrins/TinyColor
  * @see https://github.com/casesandberg/react-color/
  *
@@ -277,7 +279,7 @@ function gutenberg_render_duotone_support( $block_content, $block ) {
 	$duotone_values = array(
 		'r' => array(),
 		'g' => array(),
-		'b' => array()
+		'b' => array(),
 	);
 	foreach ( $duotone_colors as $color_str ) {
 		$color = gutenberg_tinycolor_string_to_rgb( $color_str );
