@@ -29,13 +29,13 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { debounce, noop, partial } from 'lodash';
+import { noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
-
+import { useState, useCallback } from '@wordpress/element';
+import { useDebounce } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -45,8 +45,11 @@ import Inputs from './inputs';
 import Saturation from './saturation';
 import { colorToState, simpleCheckForValidColor, isValidHex } from './utils';
 
-const toLowerCase = ( value ) => String( value ).toLowerCase();
-const isValueEmpty = ( data ) => {
+function toLowerCase( value ) {
+	return String( value ).toLowerCase();
+}
+
+function isValueEmpty( data ) {
 	if ( data.source === 'hex' && ! data.hex ) {
 		return true;
 	} else if (
@@ -63,9 +66,13 @@ const isValueEmpty = ( data ) => {
 		return true;
 	}
 	return false;
-};
-const isValidColor = ( colors ) =>
-	colors.hex ? isValidHex( colors.hex ) : simpleCheckForValidColor( colors );
+}
+
+function isValidColor( colors ) {
+	return colors.hex
+		? isValidHex( colors.hex )
+		: simpleCheckForValidColor( colors );
+}
 
 /**
  * Function that creates the new color object
@@ -95,7 +102,7 @@ const isValidColor = ( colors ) =>
  * @return {Object} A new color object for a specific source. For example:
  * { source: 'rgb', r: 1, g: 2, b:3, a:0 }
  */
-const dataToColors = ( oldColors, { source, valueKey, value } ) => {
+function dataToColors( oldColors, { source, valueKey, value } ) {
 	if ( source === 'hex' ) {
 		return {
 			source,
@@ -106,140 +113,137 @@ const dataToColors = ( oldColors, { source, valueKey, value } ) => {
 		source,
 		...{ ...oldColors[ source ], ...{ [ valueKey ]: value } },
 	};
-};
+}
 
-export default class ColorPicker extends Component {
-	constructor( { color = '0071a1' } ) {
-		super( ...arguments );
-		const colors = colorToState( color );
-		this.state = {
-			...colors,
-			draftHex: toLowerCase( colors.hex ),
-			draftRgb: colors.rgb,
-			draftHsl: colors.hsl,
-		};
-		this.commitValues = this.commitValues.bind( this );
-		this.setDraftValues = this.setDraftValues.bind( this );
-		this.resetDraftValues = this.resetDraftValues.bind( this );
-		this.handleInputChange = this.handleInputChange.bind( this );
-	}
+export default function ColorPicker( {
+	color = '0071a1',
+	className,
+	disableAlpha,
+	oldHue,
+	onChangeComplete = noop,
+} ) {
+	const initialColor = colorToState( color );
+	const [ colors, setColors ] = useState( {
+		...initialColor,
+		draftHex: toLowerCase( initialColor.hex ),
+		draftRgb: initialColor.rgb,
+		draftHsl: initialColor.hsl,
+	} );
 
-	commitValues( data ) {
-		const { oldHue, onChangeComplete = noop } = this.props;
+	const debouncedOnChangeComplete = useCallback(
+		useDebounce( onChangeComplete, 100 ),
+		[ onChangeComplete ]
+	);
 
+	const { hex, hsl, hsv, rgb, draftHex, draftHsl, draftRgb } = colors;
+
+	const classes = classnames( className, {
+		'components-color-picker': true,
+		'is-alpha-disabled': disableAlpha,
+		'is-alpha-enabled': ! disableAlpha,
+	} );
+
+	function commitValues( data ) {
 		if ( isValidColor( data ) ) {
-			const colors = colorToState( data, data.h || oldHue );
-			this.setState(
-				{
-					...colors,
-					draftHex: toLowerCase( colors.hex ),
-					draftHsl: colors.hsl,
-					draftRgb: colors.rgb,
-				},
-				debounce( partial( onChangeComplete, colors ), 100 )
-			);
+			const newColors = colorToState( data, data.h || oldHue );
+			setColors( {
+				...newColors,
+				draftHex: toLowerCase( newColors.hex ),
+				draftHsl: newColors.hsl,
+				draftRgb: newColors.rgb,
+			} );
+
+			debouncedOnChangeComplete( newColors );
 		}
 	}
 
-	resetDraftValues() {
-		this.setState( {
-			draftHex: this.state.hex,
-			draftHsl: this.state.hsl,
-			draftRgb: this.state.rgb,
+	function resetDraftValues() {
+		setColors( {
+			...colors,
+			draftHex: hex,
+			draftHsl: hsl,
+			draftRgb: rgb,
 		} );
 	}
 
-	setDraftValues( data ) {
+	function setDraftValues( data ) {
 		switch ( data.source ) {
 			case 'hex':
-				this.setState( { draftHex: toLowerCase( data.hex ) } );
+				setColors( {
+					...colors,
+					draftHex: toLowerCase( data.hex ),
+				} );
 				break;
 			case 'rgb':
-				this.setState( { draftRgb: data } );
+				setColors( {
+					...colors,
+					draftRgb: data,
+				} );
 				break;
 			case 'hsl':
-				this.setState( { draftHsl: data } );
+				setColors( {
+					...colors,
+					draftHsl: data,
+				} );
 				break;
 		}
 	}
 
-	handleInputChange( data ) {
+	function handleInputChange( data ) {
 		switch ( data.state ) {
 			case 'reset':
-				this.resetDraftValues();
+				resetDraftValues();
 				break;
 			case 'commit':
-				const colors = dataToColors( this.state, data );
-				if ( ! isValueEmpty( colors ) ) {
-					this.commitValues( colors );
+				const newColors = dataToColors( colors, data );
+				if ( ! isValueEmpty( newColors ) ) {
+					commitValues( newColors );
 				}
 				break;
 			case 'draft':
-				this.setDraftValues( dataToColors( this.state, data ) );
+				setDraftValues( dataToColors( colors, data ) );
 				break;
 		}
 	}
 
-	render() {
-		const { className, disableAlpha } = this.props;
-		const {
-			color,
-			hsl,
-			hsv,
-			rgb,
-			draftHex,
-			draftHsl,
-			draftRgb,
-		} = this.state;
-		const classes = classnames( className, {
-			'components-color-picker': true,
-			'is-alpha-disabled': disableAlpha,
-			'is-alpha-enabled': ! disableAlpha,
-		} );
+	return (
+		<div className={ classes }>
+			<div className="components-color-picker__saturation">
+				<Saturation hsl={ hsl } hsv={ hsv } onChange={ commitValues } />
+			</div>
 
-		return (
-			<div className={ classes }>
-				<div className="components-color-picker__saturation">
-					<Saturation
-						hsl={ hsl }
-						hsv={ hsv }
-						onChange={ this.commitValues }
-					/>
-				</div>
-
-				<div className="components-color-picker__body">
-					<div className="components-color-picker__controls">
-						<div className="components-color-picker__swatch">
-							<div
-								className="components-color-picker__active"
-								style={ {
-									backgroundColor:
-										color && color.toRgbString(),
-								} }
-							/>
-						</div>
-
-						<div className="components-color-picker__toggles">
-							<Hue hsl={ hsl } onChange={ this.commitValues } />
-							{ disableAlpha ? null : (
-								<Alpha
-									rgb={ rgb }
-									hsl={ hsl }
-									onChange={ this.commitValues }
-								/>
-							) }
-						</div>
+			<div className="components-color-picker__body">
+				<div className="components-color-picker__controls">
+					<div className="components-color-picker__swatch">
+						<div
+							className="components-color-picker__active"
+							style={ {
+								backgroundColor:
+									colors.color && colors.color.toRgbString(),
+							} }
+						/>
 					</div>
 
-					<Inputs
-						rgb={ draftRgb }
-						hsl={ draftHsl }
-						hex={ draftHex }
-						onChange={ this.handleInputChange }
-						disableAlpha={ disableAlpha }
-					/>
+					<div className="components-color-picker__toggles">
+						<Hue hsl={ hsl } onChange={ commitValues } />
+						{ disableAlpha ? null : (
+							<Alpha
+								rgb={ rgb }
+								hsl={ hsl }
+								onChange={ commitValues }
+							/>
+						) }
+					</div>
 				</div>
+
+				<Inputs
+					rgb={ draftRgb }
+					hsl={ draftHsl }
+					hex={ draftHex }
+					onChange={ handleInputChange }
+					disableAlpha={ disableAlpha }
+				/>
 			</div>
-		);
-	}
+		</div>
+	);
 }

@@ -28,15 +28,15 @@
 /**
  * External dependencies
  */
-import { clamp, noop, throttle } from 'lodash';
+import { clamp, noop } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component, createRef } from '@wordpress/element';
+import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { TAB } from '@wordpress/keycodes';
-import { compose, pure, withInstanceId } from '@wordpress/compose';
+import { useThrottle, useInstanceId } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -46,29 +46,21 @@ import Button from '../button';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import VisuallyHidden from '../visually-hidden';
 
-export class Saturation extends Component {
-	constructor( props ) {
-		super( props );
+export default function Saturation( { hsv, hsl, onChange = noop } ) {
+	const container = useRef();
+	const instanceId = useInstanceId( Saturation );
+	const [ mouseDown, setMouseDown ] = useState( false );
 
-		this.throttle = throttle( ( fn, data, e ) => {
-			fn( data, e );
-		}, 50 );
+	const pointerLocation = {
+		top: `${ -hsv.v + 100 }%`,
+		left: `${ hsv.s }%`,
+	};
 
-		this.container = createRef();
-		this.saturate = this.saturate.bind( this );
-		this.brighten = this.brighten.bind( this );
-		this.handleChange = this.handleChange.bind( this );
-		this.handleMouseDown = this.handleMouseDown.bind( this );
-		this.handleMouseUp = this.handleMouseUp.bind( this );
-	}
+	const throttledOnChange = useCallback( useThrottle( onChange, 50 ), [
+		onChange,
+	] );
 
-	componentWillUnmount() {
-		this.throttle.cancel();
-		this.unbindEventListeners();
-	}
-
-	saturate( amount = 0.01 ) {
-		const { hsv, onChange = noop } = this.props;
+	function saturate( amount = 0.01 ) {
 		const intSaturation = clamp(
 			hsv.s + Math.round( amount * 100 ),
 			0,
@@ -85,8 +77,7 @@ export class Saturation extends Component {
 		onChange( change );
 	}
 
-	brighten( amount = 0.01 ) {
-		const { hsv, onChange = noop } = this.props;
+	function brighten( amount = 0.01 ) {
 		const intValue = clamp( hsv.v + Math.round( amount * 100 ), 0, 100 );
 		const change = {
 			h: hsv.h,
@@ -99,92 +90,87 @@ export class Saturation extends Component {
 		onChange( change );
 	}
 
-	handleChange( e ) {
-		const { onChange = noop } = this.props;
+	function handleChange( e ) {
 		const change = calculateSaturationChange(
 			e,
-			this.props,
-			this.container.current
+			{ hsl },
+			container.current
 		);
-		this.throttle( onChange, change, e );
+		throttledOnChange( change, e );
 	}
 
-	handleMouseDown( e ) {
-		this.handleChange( e );
-		window.addEventListener( 'mousemove', this.handleChange );
-		window.addEventListener( 'mouseup', this.handleMouseUp );
+	function handleMouseUp() {
+		setMouseDown( false );
 	}
 
-	handleMouseUp() {
-		this.unbindEventListeners();
-	}
-
-	preventKeyEvents( event ) {
-		if ( event.keyCode === TAB ) {
+	function preventKeyEvents( e ) {
+		if ( e.keyCode === TAB ) {
 			return;
 		}
-		event.preventDefault();
+		e.preventDefault();
 	}
 
-	unbindEventListeners() {
-		window.removeEventListener( 'mousemove', this.handleChange );
-		window.removeEventListener( 'mouseup', this.handleMouseUp );
-	}
+	useEffect( () => {
+		const { ownerDocument } = container.current;
 
-	render() {
-		const { hsv, hsl, instanceId } = this.props;
-		const pointerLocation = {
-			top: `${ -hsv.v + 100 }%`,
-			left: `${ hsv.s }%`,
-		};
-		const shortcuts = {
-			up: () => this.brighten(),
-			'shift+up': () => this.brighten( 0.1 ),
-			pageup: () => this.brighten( 1 ),
-			down: () => this.brighten( -0.01 ),
-			'shift+down': () => this.brighten( -0.1 ),
-			pagedown: () => this.brighten( -1 ),
-			right: () => this.saturate(),
-			'shift+right': () => this.saturate( 0.1 ),
-			end: () => this.saturate( 1 ),
-			left: () => this.saturate( -0.01 ),
-			'shift+left': () => this.saturate( -0.1 ),
-			home: () => this.saturate( -1 ),
-		};
+		if ( ! mouseDown ) {
+			return;
+		}
 
-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
-		return (
-			<KeyboardShortcuts shortcuts={ shortcuts }>
-				<div
-					style={ { background: `hsl(${ hsl.h },100%, 50%)` } }
-					className="components-color-picker__saturation-color"
-					ref={ this.container }
-					onMouseDown={ this.handleMouseDown }
-					onTouchMove={ this.handleChange }
-					onTouchStart={ this.handleChange }
-					role="application"
+		ownerDocument.addEventListener( 'mousemove', handleChange );
+		ownerDocument.addEventListener( 'mouseup', handleMouseUp );
+
+		return () => {
+			ownerDocument.removeEventListener( 'mousemove', handleChange );
+			ownerDocument.removeEventListener( 'mouseup', handleMouseUp );
+		};
+	}, [ mouseDown ] );
+
+	const shortcuts = {
+		up: () => brighten(),
+		'shift+up': () => brighten( 0.1 ),
+		pageup: () => brighten( 1 ),
+		down: () => brighten( -0.01 ),
+		'shift+down': () => brighten( -0.1 ),
+		pagedown: () => brighten( -1 ),
+		right: () => saturate(),
+		'shift+right': () => saturate( 0.1 ),
+		end: () => saturate( 1 ),
+		left: () => saturate( -0.01 ),
+		'shift+left': () => saturate( -0.1 ),
+		home: () => saturate( -1 ),
+	};
+
+	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions */
+	return (
+		<KeyboardShortcuts shortcuts={ shortcuts }>
+			<div
+				style={ { background: `hsl(${ hsl.h },100%, 50%)` } }
+				className="components-color-picker__saturation-color"
+				ref={ container }
+				onMouseDown={ () => setMouseDown( true ) }
+				onTouchMove={ handleChange }
+				onTouchStart={ handleChange }
+				role="application"
+			>
+				<div className="components-color-picker__saturation-white" />
+				<div className="components-color-picker__saturation-black" />
+				<Button
+					aria-label={ __( 'Choose a shade' ) }
+					aria-describedby={ `color-picker-saturation-${ instanceId }` }
+					className="components-color-picker__saturation-pointer"
+					style={ pointerLocation }
+					onKeyDown={ preventKeyEvents }
+				/>
+				<VisuallyHidden
+					id={ `color-picker-saturation-${ instanceId }` }
 				>
-					<div className="components-color-picker__saturation-white" />
-					<div className="components-color-picker__saturation-black" />
-					<Button
-						aria-label={ __( 'Choose a shade' ) }
-						aria-describedby={ `color-picker-saturation-${ instanceId }` }
-						className="components-color-picker__saturation-pointer"
-						style={ pointerLocation }
-						onKeyDown={ this.preventKeyEvents }
-					/>
-					<VisuallyHidden
-						id={ `color-picker-saturation-${ instanceId }` }
-					>
-						{ __(
-							'Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.'
-						) }
-					</VisuallyHidden>
-				</div>
-			</KeyboardShortcuts>
-		);
-		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
-	}
+					{ __(
+						'Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.'
+					) }
+				</VisuallyHidden>
+			</div>
+		</KeyboardShortcuts>
+	);
+	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions */
 }
-
-export default compose( pure, withInstanceId )( Saturation );

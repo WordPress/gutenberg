@@ -387,7 +387,7 @@ _Returns_
 
 <a name="useThrottle" href="#useThrottle">#</a> **useThrottle**
 
-Throttles a function with Lodash's `throttle`. A new throttled function will
+Throttle a function with Lodash's `throttle`. A new throttled function will
 be returned and any scheduled calls cancelled if any of the arguments change,
 including the function to throttle, so please wrap functions created on
 render in components in `useCallback`.
@@ -398,7 +398,7 @@ _Parameters_
 
 _Returns_
 
--   `Function`: Throttled function.
+-   `Function`: returns the throttled function
 
 <a name="useViewportMatch" href="#useViewportMatch">#</a> **useViewportMatch**
 
