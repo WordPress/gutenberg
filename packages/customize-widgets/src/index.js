@@ -12,6 +12,7 @@ import {
  */
 import getSidebarSection from './controls/sidebar-section';
 import getSidebarControl from './controls/sidebar-control';
+import './filters';
 
 const { wp } = window;
 
