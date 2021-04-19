@@ -111,7 +111,7 @@ function gutenberg_widgets_customize_add_unstable_instance( $args, $id ) {
  */
 function gutenberg_customize_widgets_init() {
 	$settings = array_merge(
-		gutenberg_get_common_block_editor_settings(),
+		gutenberg_get_default_block_editor_settings(),
 		gutenberg_get_legacy_widget_settings()
 	);
 
