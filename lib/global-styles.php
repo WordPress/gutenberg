@@ -260,6 +260,7 @@ function gutenberg_global_styles_include_support_for_wp_variables( $allow_css, $
 	$allowed_preset_attributes = array(
 		'background',
 		'background-color',
+		'border-color',
 		'color',
 		'font-family',
 		'font-size',

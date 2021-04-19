@@ -29,7 +29,7 @@ The Editor offers rich new value to users with visual, drag-and-drop creation to
 Whether you want to extend the functionality of the block editor, or create a plugin based on it, [see the developer documentation](/docs/how-to-guides/README.md) to find all the information about the basic concepts you need to get started, the block editor APIs and its architecture.
 
 -   [Gutenberg Architecture](/docs/explanations/architecture/README.md)
--   [Block Style Variations](/docs/reference-guides/filters/block-filters.md#block-style-variations)
+-   [Block Styles](/docs/reference-guides/filters/block-filters.md#block-styles)
 -   [Creating Block Patterns](/docs/reference-guides/block-api/block-patterns.md)
 -   [Theming for the Block Editor](/docs/how-to-guides/themes/README.md)
 -   [Block API Reference](/docs/reference-guides/block-api/README.md)

@@ -32,6 +32,7 @@ export {
 	BlockVerticalAlignmentToolbar,
 	BlockVerticalAlignmentControl,
 } from './block-vertical-alignment-control';
+export { default as __experimentalBorderStyleControl } from './border-style-control';
 export { default as ButtonBlockerAppender } from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPaletteControl } from './color-palette/control';

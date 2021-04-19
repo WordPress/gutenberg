@@ -171,7 +171,10 @@
 				"units": [ "px", "em", "rem", "vh", "vw" ]
 			},
 			"border": {
-				"customRadius": false
+				"customColor": false,
+				"customRadius": false,
+				"customStyle": false,
+				"customWidth": false
 			}
 		},
 		"core/button": {
