@@ -51,7 +51,7 @@ export default function FileBlockInspector( {
 									  )
 									: null
 							}
-							checked={ displayPreview }
+							checked={ !! displayPreview }
 							onChange={ changeDisplayPreview }
 						/>
 						<RangeControl
