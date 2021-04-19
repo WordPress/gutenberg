@@ -49,6 +49,7 @@ import { isBlobURL } from '@wordpress/blob';
  * Internal dependencies
  */
 import {
+	ALLOWED_MEDIA_TYPES,
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
@@ -63,7 +64,7 @@ import {
 /**
  * Module Constants
  */
-const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+
 const INNER_BLOCKS_TEMPLATE = [
 	[
 		'core/paragraph',
