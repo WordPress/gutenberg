@@ -152,7 +152,9 @@ function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
 		className: menuItem.classes.join( ' ' ),
 		description: menuItem.description,
 		rel: menuItem.xfn.join( ' ' ),
-		opensInNewTab: menuItem.target === NEW_TAB_TARGET_ATTRIBUTE,
+		...( menuItem.target === NEW_TAB_TARGET_ATTRIBUTE && {
+			opensInNewTab: true,
+		} ),
 	};
 
 	return createBlock( 'core/navigation-link', attributes, innerBlocks );
