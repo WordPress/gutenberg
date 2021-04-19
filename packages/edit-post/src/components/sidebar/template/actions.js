@@ -52,7 +52,7 @@ function PostTemplateActions() {
 
 	return (
 		<>
-			<div className="edit-post-post-template__actions">
+			<div className="edit-post-template__actions">
 				{ !! template && (
 					<Button
 						isLink
@@ -73,7 +73,7 @@ function PostTemplateActions() {
 						setIsModalOpen( false );
 						setTitle( '' );
 					} }
-					overlayClassName="edit-post-post-template__modal"
+					overlayClassName="edit-post-template__modal"
 				>
 					<form
 						onSubmit={ ( event ) => {

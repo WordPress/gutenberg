@@ -13,7 +13,6 @@ import {
 	PageAttributesCheck,
 	PageAttributesOrder,
 	PageAttributesParent,
-	PageTemplate,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
@@ -21,7 +20,6 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import PostTemplateActions from './post-template-actions';
 import { store as editPostStore } from '../../../store';
 
 /**
@@ -62,8 +60,6 @@ export function PageAttributes() {
 				opened={ isOpened }
 				onToggle={ onTogglePanel }
 			>
-				<PageTemplate />
-				<PostTemplateActions />
 				<PageAttributesParent />
 				<PanelRow>
 					<PageAttributesOrder />
