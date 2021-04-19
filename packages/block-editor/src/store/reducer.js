@@ -1738,7 +1738,7 @@ export function highlightedBlock( state, action ) {
 export function lastBlockInserted( state = {}, action ) {
 	switch ( action.type ) {
 		case 'INSERT_BLOCKS':
-			if ( ! action.updateSelection || ! action.blocks.length ) {
+			if ( ! action.blocks.length ) {
 				return state;
 			}
 

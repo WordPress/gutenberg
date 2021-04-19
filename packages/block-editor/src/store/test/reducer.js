@@ -2960,7 +2960,6 @@ describe( 'state', () => {
 					source: 'inserter_menu',
 				},
 				type: 'INSERT_BLOCKS',
-				updateSelection: true,
 			};
 
 			const state = lastBlockInserted( {}, action );
@@ -2981,35 +2980,11 @@ describe( 'state', () => {
 					source: expectedSource,
 				},
 				type: 'INSERT_BLOCKS',
-				updateSelection: true,
 			};
 
 			const state = lastBlockInserted( {}, action );
 
 			expect( state.source ).toBe( expectedSource );
-		} );
-
-		it( 'should return state if last block inserted is called with action INSERT_BLOCKS that is not a updateSelection', () => {
-			const expectedState = {
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
-			};
-
-			const action = {
-				blocks: [
-					{
-						clientId: '62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
-					},
-				],
-				meta: {
-					source: 'inserter_menu',
-				},
-				type: 'INSERT_BLOCKS',
-				updateSelection: false,
-			};
-
-			const state = lastBlockInserted( expectedState, action );
-
-			expect( state ).toEqual( expectedState );
 		} );
 
 		it( 'should return state if last block inserted is called with action INSERT_BLOCKS and block list is empty', () => {
@@ -3023,7 +2998,6 @@ describe( 'state', () => {
 					source: 'inserter_menu',
 				},
 				type: 'INSERT_BLOCKS',
-				updateSelection: true,
 			};
 
 			const state = lastBlockInserted( expectedState, action );
