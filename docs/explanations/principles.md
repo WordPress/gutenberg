@@ -67,7 +67,7 @@ As it applies to **developers** (plugin or theme), progressive complexity means 
 
 As an example of this continuum, the complexity needed for building and distributing blocks or building and distributing themes should be minimal. As you get closer to working within Gutenberg internals directly, it does require more understanding of various technologies and technical stacks to be effective in this area.
 
-The other perspective is that of the **creator **of content using Gutenberg where the UI/UX should present very simple “keep out of my way” interactions until more complex requirements are needed which are “revealed” when and as needed.
+The other perspective is that of the **creator** of content using Gutenberg where the UI/UX should present very simple “keep out of my way” interactions until more complex requirements are needed which are “revealed” when and as needed.
 
 An example here would be creators discovering they can move a block into another block in various contexts and discovering it _just works_. So even learning basic interactions can help _empower_ more complex interactions through the delight of experimenting as a natural outflow of the creative process. A great example of this is the power of multi-block transforms.
 
