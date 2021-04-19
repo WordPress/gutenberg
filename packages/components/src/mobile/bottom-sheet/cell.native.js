@@ -8,6 +8,7 @@ import {
 	TextInput,
 	I18nManager,
 	AccessibilityInfo,
+	Platform,
 } from 'react-native';
 import { isEmpty, get } from 'lodash';
 
@@ -27,6 +28,7 @@ import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
 import TouchableRipple from './ripple.native.js';
 
+const isIOS = Platform.OS === 'ios';
 class BottomSheetCell extends Component {
 	constructor( props ) {
 		super( ...arguments );
@@ -276,6 +278,10 @@ class BottomSheetCell extends Component {
 			styles.resetButton,
 			styles.resetButtonDark
 		);
+		const cellHelpStyle = [
+			styles.cellHelpLabel,
+			isIOS && styles.cellHelpLabelIOS,
+		];
 		const containerPointerEvents =
 			this.state.isScreenReaderEnabled && accessible ? 'none' : 'auto';
 		const { title, handler } = customActionButton || {};
@@ -358,12 +364,7 @@ class BottomSheetCell extends Component {
 					{ children }
 				</View>
 				{ help && (
-					<Text
-						style={ [
-							styles.cellHelpLabel,
-							styles.placeholderColor,
-						] }
-					>
+					<Text style={ [ cellHelpStyle, styles.placeholderColor ] }>
 						{ help }
 					</Text>
 				) }
