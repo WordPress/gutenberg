@@ -77,7 +77,7 @@ export default function PostExcerptEditor( {
 			className="wp-block-post-excerpt__more-link"
 			tagName="a"
 			aria-label={ __( 'Read more link text' ) }
-			placeholder={ __( 'Read more…' ) }
+			placeholder={ __( 'Add read more link text' ) }
 			value={ moreText }
 			onChange={ ( newMoreText ) =>
 				setAttributes( { moreText: newMoreText } )
