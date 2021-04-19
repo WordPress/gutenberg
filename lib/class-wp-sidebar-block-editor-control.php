@@ -24,6 +24,8 @@ class WP_Sidebar_Block_Editor_Control extends WP_Customize_Control {
 	public function enqueue() {
 		wp_enqueue_script( 'wp-customize-widgets' );
 		wp_enqueue_style( 'wp-customize-widgets' );
+		wp_enqueue_script( 'wp-format-library' );
+		wp_enqueue_style( 'wp-format-library' );
 	}
 
 	/**
