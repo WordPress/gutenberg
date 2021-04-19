@@ -3,7 +3,7 @@
  */
 
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { useMemo, useRef } from '@wordpress/element';
+import { useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
@@ -26,8 +26,10 @@ export default function BlockNavigationTree( {
 	__experimentalPersistentListViewFeatures,
 	...props
 } ) {
-	const treeGridRef = useRef();
-	let blockDropTarget = useBlockNavigationDropZone( treeGridRef );
+	let {
+		ref: treeGridRef,
+		target: blockDropTarget,
+	} = useBlockNavigationDropZone();
 
 	if ( ! __experimentalFeatures ) {
 		blockDropTarget = undefined;
