@@ -6,7 +6,7 @@ const __INTERNAL_STATE__ = {
 /**
  * @typedef UseHydrateGlobalStylesProps
  * @property {import('create-emotion').Emotion['injectGlobal']} injectGlobal injectGlobal function from the compiler (Emotion).
- * @property {import('../create-style-system/generate-theme').GenerateThemeResults} globalStyles Global style values to be injected.
+ * @property {import('../create-style-system/create-css-custom-properties').CreateCSSCustomPropertiesResults} globalStyles Global style values to be injected.
  */
 /* eslint-enable jsdoc/valid-types */
 
@@ -25,12 +25,7 @@ const __INTERNAL_STATE__ = {
 export function useHydrateGlobalStyles( { globalStyles, injectGlobal } ) {
 	if ( __INTERNAL_STATE__.didInjectGlobal ) return;
 
-	const {
-		darkHighContrastModeCSSVariables,
-		darkModeCSSVariables,
-		globalCSSVariables,
-		highContrastModeCSSVariables,
-	} = globalStyles;
+	const { globalCSSVariables } = globalStyles;
 
 	/**
 	 * Using the compiler's (Emotion) injectGlobal function.
@@ -39,9 +34,6 @@ export function useHydrateGlobalStyles( { globalStyles, injectGlobal } ) {
 		// eslint-disable-next-line no-unused-expressions
 		injectGlobal`
 			${ globalCSSVariables };
-			${ darkModeCSSVariables };
-			${ highContrastModeCSSVariables };
-			${ darkHighContrastModeCSSVariables };
 		`;
 
 		/**

@@ -8,7 +8,7 @@ import { tags } from './tags';
  * @typedef CreateCoreElementProps
  * @property {import('create-emotion').ObjectInterpolation<any>} baseStyles Base styles for the coreElements.
  * @property {import('../create-compiler').Compiler} compiler The injectGlobal from the Style system's compiler.
- * @property {import('./generate-theme').GenerateThemeResults} globalStyles Global styles for the coreElements.
+ * @property {import('./create-css-custom-properties').CreateCSSCustomPropertiesResults} globalStyles Global styles for the coreElements.
  */
 
 /**

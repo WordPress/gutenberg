@@ -5,7 +5,7 @@ import { createCompiler } from '../create-compiler';
 import { createCoreElement } from './create-core-element';
 import { createCoreElements } from './create-core-elements';
 import { createStyledComponents } from './create-styled-components';
-import { generateTheme } from './generate-theme';
+import { createCSSCustomProperties } from './create-css-custom-properties';
 import { createToken, DEFAULT_STYLE_SYSTEM_OPTIONS } from './utils';
 
 const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
@@ -13,9 +13,6 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
 /* eslint-disable jsdoc/valid-types */
 /**
  * @template {Record<string, string | number> | {}} TConfig
- * @template {Record<string, string | number> | {}} TDarkConfig
- * @template {Record<string, string | number> | {}} THCConfig
- * @template {Record<string, string | number> | {}} TDarkHCConfig
  * @typedef CreateStyleSystemObjects
  * @property {import('./polymorphic-component').CoreElements} core A set of coreElements.
  * @property {import('../create-compiler').Compiler} compiler The Style system compiler (a custom Emotion instance).
@@ -23,22 +20,16 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
  * @property {import('../create-compiler').Compiler['css']} css A function to compile CSS styles.
  * @property {import('../create-compiler').Compiler['cx']} cx A function to resolve + combine classNames.
  * @property {(tokenName: string) => string} createToken A function to generate a design token (CSS variable) used by the system.
- * @property {(value: keyof (TConfig & TDarkConfig & THCConfig & TDarkHCConfig)) => string} get The primary function to retrieve Style system variables.
+ * @property {(value: keyof TConfig) => string} get The primary function to retrieve Style system variables.
  * @property {import('./polymorphic-component').CreateStyled} styled A set of styled components.
  * @property {import('react').ComponentType} View The base <View /> component.
  */
 
 /**
  * @template {Record<string, string | number> | {}} TConfig
- * @template {Record<string, string | number> | {}} TDarkConfig
- * @template {Record<string, string | number> | {}} THCConfig
- * @template {Record<string, string | number> | {}} TDarkHCConfig
  * @typedef CreateStyleSystemOptions
  * @property {import('create-emotion').ObjectInterpolation<any>} baseStyles The base styles.
  * @property {TConfig} config The base theme config.
- * @property {TDarkConfig} darkModeConfig The dark mode theme config.
- * @property {THCConfig} highContrastModeConfig The high contrast mode theme config.
- * @property {TDarkHCConfig} darkHighContrastModeConfig The dark-high contrast mode theme config.
  * @property {import('../create-compiler').CreateCompilerOptions} [compilerOptions] The compiler options.
  */
 /* eslint-enable jsdoc/valid-types */
@@ -53,30 +44,17 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
  * ```
  *
  * @template {Record<string, string | number> | {}} TConfig
- * @template {Record<string, string | number> | {}} TDarkConfig
- * @template {Record<string, string | number> | {}} THCConfig
- * @template {Record<string, string | number> | {}} TDarkHCConfig
- * @param {CreateStyleSystemOptions<TConfig, TDarkConfig, THCConfig, TDarkHCConfig>} options Options to create a Style system with.
- * @return {CreateStyleSystemObjects<TConfig, TDarkConfig, THCConfig, TDarkHCConfig>} A collection of functions and elements from the generated Style system.
+ * @param {CreateStyleSystemOptions<TConfig>} options Options to create a Style system with.
+ * @return {CreateStyleSystemObjects<TConfig>} A collection of functions and elements from the generated Style system.
  */
 export function createStyleSystem( options = defaultOptions ) {
-	const {
-		baseStyles,
-		compilerOptions,
-		config,
-		darkHighContrastModeConfig,
-		darkModeConfig,
-		highContrastModeConfig,
-	} = {
+	const { baseStyles, compilerOptions, config } = {
 		...defaultOptions,
 		...options,
 	};
 
-	const globalStyles = generateTheme( {
+	const globalStyles = createCSSCustomProperties( {
 		config,
-		darkHighContrastModeConfig,
-		darkModeConfig,
-		highContrastModeConfig,
 	} );
 
 	/**
@@ -126,7 +104,7 @@ export function createStyleSystem( options = defaultOptions ) {
 		cx,
 		get: (
 			/* eslint-disable jsdoc/no-undefined-types */
-			/** @type {keyof TConfig | keyof TDarkConfig | keyof THCConfig | keyof TDarkHCConfig} */ key
+			/** @type {keyof TConfig} */ key
 			/* eslint-enable jsdoc/no-undefined-types */
 		) => `var(${ createToken( key.toString() ) })`,
 		styled,

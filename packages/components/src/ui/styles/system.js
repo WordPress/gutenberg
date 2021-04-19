@@ -2,14 +2,9 @@
  * Internal dependencies
  */
 import { createStyleSystem, get as getConfig } from '../create-styles';
-import {
-	config,
-	darkHighContrastModeConfig,
-	darkModeConfig,
-	highContrastModeConfig,
-} from './theme';
+import { config } from './theme';
 
-/** @type {import('../create-styles').CreateStyleSystemOptions<typeof config, typeof darkModeConfig, typeof highContrastModeConfig, typeof darkHighContrastModeConfig>} */
+/** @type {import('../create-styles').CreateStyleSystemOptions<typeof config>} */
 const systemConfig = {
 	baseStyles: {
 		MozOsxFontSmoothing: 'grayscale',
@@ -21,9 +16,6 @@ const systemConfig = {
 		margin: 0,
 	},
 	config,
-	darkModeConfig,
-	highContrastModeConfig,
-	darkHighContrastModeConfig,
 };
 
 export const {

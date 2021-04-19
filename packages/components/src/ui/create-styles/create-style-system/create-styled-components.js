@@ -38,9 +38,9 @@ export function createStyledComponents( { compiler, core } ) {
 	const { css, cx, generateInterpolationName } = compiler;
 
 	/**
-	 * That's all a <Box /> is :). A core.div.
+	 * That's all a <View /> is :). A core.div.
 	 */
-	const Box = core.div;
+	const View = core.div;
 
 	/**
 	 *
@@ -79,7 +79,7 @@ export function createStyledComponents( { compiler, core } ) {
 				);
 
 				return (
-					<Box
+					<View
 						as={ baseTag }
 						{ ...mergedProps }
 						className={ classes }

@@ -8,10 +8,7 @@ import { forwardRef, createElement } from '@wordpress/element';
  * Internal dependencies
  */
 import { useHydrateGlobalStyles } from '../hooks';
-import {
-	INTERPOLATION_CLASS_NAME,
-	REDUCED_MOTION_MODE_ATTR,
-} from './constants';
+import { INTERPOLATION_CLASS_NAME } from './constants';
 import {
 	DEFAULT_STYLE_SYSTEM_OPTIONS,
 	getInterpolatedClassName,
@@ -23,7 +20,7 @@ const defaultOptions = DEFAULT_STYLE_SYSTEM_OPTIONS;
  * @typedef CreateCoreElementOptions
  * @property {import('create-emotion').ObjectInterpolation<any>} baseStyles The baseStyles from the Style system.
  * @property {import('../create-compiler').Compiler} compiler The injectGlobal from the Style system's compiler.
- * @property {import('./generate-theme').GenerateThemeResults} globalStyles The globalStyles from the Style system.
+ * @property {import('./create-css-custom-properties').CreateCSSCustomPropertiesResults} globalStyles The globalStyles from the Style system.
  */
 
 /**
@@ -67,9 +64,6 @@ export const createCoreElement = ( tagName, options ) => {
 		// Enforced reduced-motion preferred styles.
 		reduceMotion: css`
 			@media ( prefers-reduced-motion ) {
-				transition: none !important;
-			}
-			${ REDUCED_MOTION_MODE_ATTR } & {
 				transition: none !important;
 			}
 		`,
