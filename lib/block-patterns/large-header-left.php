@@ -8,7 +8,7 @@
 return array(
 	'title'       => _x( 'Large header with left-aligned text', 'Block pattern title', 'default' ),
 	'categories'  => array( 'header' ),
-	'content'     => '<!-- wp:cover {"url":"https://s.w.org/images/core/5.8/forest.jpg","dimRatio":60,"minHeight":800,"align":"full"} -->
+	'content'     => '<!-- wp:cover {"url":"https://s.w.org/images/core/5.8/forest.jpg","id":null,"dimRatio":60,"minHeight":800,"align":"full"} -->
 		<div class="wp-block-cover alignfull has-background-dim-60 has-background-dim" style="min-height:800px"><img class="wp-block-cover__image-background " alt="" src="https://s.w.org/images/core/5.8/forest.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:heading {"align":"wide","style":{"color":{"text":"#ffe074"},"typography":{"fontSize":"64px"}}} -->
 		<h2 class="alignwide has-text-color" style="color:#ffe074;font-size:64px">' . esc_html__( 'Forest.', 'default' ) . '</h2>
 		<!-- /wp:heading -->

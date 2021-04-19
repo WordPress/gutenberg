@@ -9,7 +9,7 @@ return array(
 	'title'       => _x( 'Media & text in a full height container', 'Block pattern title', 'default' ),
 	'categories'  => array( 'header' ),
 	'content'     => '<!-- wp:cover {"customOverlayColor":"#ffffff","minHeight":100,"minHeightUnit":"vh","contentPosition":"center center","align":"full"} -->
-	<div class="wp-block-cover alignfull has-background-dim" style="background-color:#ffffff;min-height:100vh"><div class="wp-block-cover__inner-container"><!-- wp:media-text {"mediaLink":"https://s.w.org/images/core/5.8/soil.jpg","mediaType":"image","mediaWidth":56,"verticalAlignment":"center","imageFill":true} -->
+	<div class="wp-block-cover alignfull has-background-dim" style="background-color:#ffffff;min-height:100vh"><div class="wp-block-cover__inner-container"><!-- wp:media-text {"mediaId":null,"mediaLink":"https://s.w.org/images/core/5.8/soil.jpg","mediaType":"image","mediaWidth":56,"verticalAlignment":"center","imageFill":true} -->
 	<div class="wp-block-media-text alignwide is-stacked-on-mobile is-vertically-aligned-center is-image-fill" style="grid-template-columns:56% auto"><figure class="wp-block-media-text__media" style="background-image:url(https://s.w.org/images/core/5.8/soil.jpg);background-position:50% 50%"><img src="https://s.w.org/images/core/5.8/soil.jpg" alt="' . esc_attr__( 'Close-up of dried, cracked earth.', 'default' ) . '"/></figure><div class="wp-block-media-text__content"><!-- wp:heading {"style":{"typography":{"fontSize":"32px"},"color":{"text":"#000000"}}} -->
 	<h2 class="has-text-color" style="color:#000000;font-size:32px"><strong>' . esc_html__( "What's the problem?", 'default' ) . '</strong></h2>
 	<!-- /wp:heading -->

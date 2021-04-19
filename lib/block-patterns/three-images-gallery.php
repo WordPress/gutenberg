@@ -10,7 +10,7 @@ return array(
 	'categories'  => array( 'gallery' ),
 	'content'     => '<!-- wp:columns {"align":"wide"} -->
 	<div class="wp-block-columns alignwide"><!-- wp:column {"width":"25%"} -->
-	<div class="wp-block-column" style="flex-basis:25%"><!-- wp:image {"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
+	<div class="wp-block-column" style="flex-basis:25%"><!-- wp:image {"id":null,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
 	<figure class="wp-block-image size-large is-style-default"><img src="https://s.w.org/images/core/5.8/architecture-01.jpg" alt="' . esc_attr__( 'Close-up, abstract view of geometric architecture.', 'default' ) . '" /></figure>
 	<!-- /wp:image --></div>
 	<!-- /wp:column -->
@@ -24,13 +24,13 @@ return array(
 	<div style="height:150px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer -->
 	
-	<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+	<!-- wp:image {"id":null,"sizeSlug":"large","linkDestination":"none"} -->
 	<figure class="wp-block-image size-large"><img src="https://s.w.org/images/core/5.8/architecture-02.jpg" alt="' . esc_attr__( 'Close-up, angled view of a window on a white building.', 'default' ) . '" /></figure>
 	<!-- /wp:image --></div>
 	<!-- /wp:column -->
 	
 	<!-- wp:column {"width":"45%"} -->
-	<div class="wp-block-column" style="flex-basis:45%"><!-- wp:image {"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
+	<div class="wp-block-column" style="flex-basis:45%"><!-- wp:image {"id":null,"sizeSlug":"large","linkDestination":"none","className":"is-style-default"} -->
 	<figure class="wp-block-image size-large is-style-default"><img src="https://s.w.org/images/core/5.8/architecture-03.jpg" alt="' . esc_attr__( 'Close-up of the corner of a white, geometric building with both sharp points and round corners.', 'default' ) . '" /></figure>
 	<!-- /wp:image -->
 	

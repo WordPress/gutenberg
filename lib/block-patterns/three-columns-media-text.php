@@ -39,13 +39,13 @@ return array(
 	<div style="height:100px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer -->
 	
-	<!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+	<!-- wp:image {"id":null,"sizeSlug":"large","linkDestination":"none"} -->
 	<figure class="wp-block-image size-large"><img src="https://s.w.org/images/core/5.8/outside-01.jpg" alt="' . esc_attr__( 'The sun setting through a dense forest of trees.', 'default' ) . '" /></figure>
 	<!-- /wp:image --></div>
 	<!-- /wp:column -->
 	
 	<!-- wp:column {"width":"33.62%"} -->
-	<div class="wp-block-column" style="flex-basis:33.62%"><!-- wp:image {"sizeSlug":"large","linkDestination":"none"} -->
+	<div class="wp-block-column" style="flex-basis:33.62%"><!-- wp:image {"id":null,"sizeSlug":"large","linkDestination":"none"} -->
 	<figure class="wp-block-image size-large"><img src="https://s.w.org/images/core/5.8/outside-02.jpg" alt="' . esc_attr__( 'Wind turbines standing on a grassy plain, against a blue sky.', 'default' ) . '" /></figure>
 	<!-- /wp:image --></div>
 	<!-- /wp:column --></div>
@@ -53,7 +53,7 @@ return array(
 	
 	<!-- wp:columns {"align":"wide"} -->
 	<div class="wp-block-columns alignwide"><!-- wp:column {"width":"67%"} -->
-	<div class="wp-block-column" style="flex-basis:67%"><!-- wp:image {"align":"right","sizeSlug":"large","linkDestination":"none"} -->
+	<div class="wp-block-column" style="flex-basis:67%"><!-- wp:image {"align":"right","id":null,"sizeSlug":"large","linkDestination":"none"} -->
 	<div class="wp-block-image"><figure class="alignright size-large"><img src="https://s.w.org/images/core/5.8/outside-03.jpg" alt="' . esc_attr__( 'The sun shining over a ridge leading down into the shore. In the distance, a car drives down a road.', 'default' ) . '" /></figure></div>
 	<!-- /wp:image --></div>
 	<!-- /wp:column -->
