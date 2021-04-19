@@ -20,6 +20,9 @@ The Editor offers rich new value to users with visual, drag-and-drop creation to
 
 ## Quick links
 
+### Gutenberg Principles
+[The Gutenberg principles document](/docs/explanations/principles.md) highlights a few principles that are guiding the overall project and shape various development and design decisions.
+
 ### Create a Block Tutorial
 
 [Learn how to create your first block](/docs/getting-started/tutorials/create-block/README.md) for the WordPress block editor. From setting up your development environment, tools, and getting comfortable with the new development model, this tutorial covers all what you need to know to get started with the block editor.
