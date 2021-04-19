@@ -17,7 +17,7 @@
 		"color": {
 			"link": true,
 			"text": false
-        },
+		},
 		"fontSize": true,
 		"lineHeight": true
 	}
