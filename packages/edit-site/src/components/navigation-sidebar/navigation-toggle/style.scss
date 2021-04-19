@@ -12,6 +12,22 @@
 	width: $header-height;
 }
 
+.edit-site-navigation-panel__inner-toggle {
+	opacity: 0;
+	right: 0;
+	background: none;
+
+	&.is-open {
+		opacity: 1;
+		transition: opacity 0.5s ease;
+		@include reduce-motion("transition");
+	}
+
+	.edit-site-navigation-toggle__button {
+		background: none;
+	}
+}
+
 .edit-site-navigation-toggle__button {
 	align-items: center;
 	background: $gray-900;
