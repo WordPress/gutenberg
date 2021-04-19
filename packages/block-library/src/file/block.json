@@ -39,7 +39,8 @@
 			"type": "boolean"
 		},
 		"previewHeight": {
-			"type": "number"
+			"type": "number",
+			"default": 800
 		}
 	},
 	"supports": {

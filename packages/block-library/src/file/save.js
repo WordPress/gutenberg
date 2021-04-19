@@ -16,6 +16,14 @@ export default function save( { attributes } ) {
 		previewHeight,
 	} = attributes;
 
+	const embedLabel = RichText.isEmpty( fileName )
+		? __( 'PDF embed' )
+		: sprintf(
+				/* translators: %s: filename. */
+				__( 'Embed of %s.' ),
+				fileName
+		  );
+
 	return (
 		href && (
 			<div { ...useBlockProps.save() }>
@@ -29,11 +37,7 @@ export default function save( { attributes } ) {
 								width: '100%',
 								height: `${ previewHeight }px`,
 							} }
-							aria-label={ sprintf(
-								/* translators: %s: filename. */
-								__( 'Embed of %s.' ),
-								fileName
-							) }
+							aria-label={ embedLabel }
 						/>
 					</>
 				) }
