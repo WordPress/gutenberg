@@ -169,7 +169,7 @@ function UnitControl(
 			activeUnit = units[ 0 ];
 		}
 		// Extract the step if it exists, or default to `1`
-		step = activeUnit?.step ? activeUnit.step : 1;
+		step = activeUnit?.step ?? 1;
 	}
 
 	return (
