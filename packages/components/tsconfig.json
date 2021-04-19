@@ -22,6 +22,7 @@
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
 		"src/draggable/**/*",
+		"src/emotion/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
 		"src/scroll-lock/**/*",
