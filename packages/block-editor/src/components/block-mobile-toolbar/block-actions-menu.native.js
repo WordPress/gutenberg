@@ -272,7 +272,7 @@ export default compose(
 		const block = getBlock( normalizedClientIds );
 		const blockName = getBlockName( normalizedClientIds );
 		const blockType = getBlockType( blockName );
-		const blockTitle = blockType.title;
+		const blockTitle = blockType?.title;
 		const firstClientId = first( normalizedClientIds );
 		const rootClientId = getBlockRootClientId( firstClientId );
 		const blockOrder = getBlockOrder( rootClientId );
@@ -284,17 +284,18 @@ export default compose(
 		);
 
 		const isDefaultBlock = blockName === getDefaultBlockName();
-		const isEmptyContent = block.attributes.content === '';
+		const isEmptyContent = block?.attributes.content === '';
 		const isExactlyOneBlock = blockOrder.length === 1;
 		const isEmptyDefaultBlock =
 			isExactlyOneBlock && isDefaultBlock && isEmptyContent;
 
-		const selectedBlockClientId = getSelectedBlockClientIds();
-		const selectedBlock = getBlocksByClientId( selectedBlockClientId );
-		const selectedBlockPossibleTransformations = getBlockTransformItems(
-			selectedBlock,
-			rootClientId
-		);
+		const selectedBlockClientId = first( getSelectedBlockClientIds() );
+		const selectedBlock = selectedBlockClientId
+			? first( getBlocksByClientId( selectedBlockClientId ) )
+			: undefined;
+		const selectedBlockPossibleTransformations = selectedBlock
+			? getBlockTransformItems( [ selectedBlock ], rootClientId )
+			: [];
 
 		return {
 			blockTitle,
