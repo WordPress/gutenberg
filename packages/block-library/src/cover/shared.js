@@ -4,7 +4,9 @@
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
 import { __ } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
-import { MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO } from '@wordpress/block-editor';
+
+const MEDIA_TYPE_IMAGE = 'image';
+const MEDIA_TYPE_VIDEO = 'video';
 
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
