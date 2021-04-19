@@ -28,7 +28,10 @@ import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
 import { store as editSiteStore } from '../../store';
 
-export default function Header( { openEntitiesSavedStates } ) {
+export default function Header( {
+	openEntitiesSavedStates,
+	isEntitiesSavedStatesOpen,
+} ) {
 	const inserterButton = useRef();
 	const {
 		deviceType,
@@ -168,6 +171,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 					/>
 					<SaveButton
 						openEntitiesSavedStates={ openEntitiesSavedStates }
+						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
 					/>
 					<PinnedItems.Slot scope="core/edit-site" />
 					<MoreMenu />

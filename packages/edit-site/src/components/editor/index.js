@@ -9,7 +9,7 @@ import {
 	Popover,
 	Button,
 } from '@wordpress/components';
-import { EntityProvider } from '@wordpress/core-data';
+import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
 import {
 	FullscreenMode,
@@ -79,7 +79,7 @@ function Editor( { initialSettings } ) {
 			templateType: postType,
 			page: getPage(),
 			template: postId
-				? select( 'core' ).getEntityRecord(
+				? select( coreStore ).getEntityRecord(
 						'postType',
 						postType,
 						postId
@@ -210,6 +210,9 @@ function Editor( { initialSettings } ) {
 												<Header
 													openEntitiesSavedStates={
 														openEntitiesSavedStates
+													}
+													isEntitiesSavedStatesOpen={
+														isEntitiesSavedStatesOpen
 													}
 												/>
 											}
