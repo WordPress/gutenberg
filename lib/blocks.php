@@ -73,6 +73,7 @@ function gutenberg_reregister_core_block_types() {
 				'post-comments.php'             => 'core/post-comments',
 				'post-comments-count.php'       => 'core/post-comments-count',
 				'post-comments-form.php'        => 'core/post-comments-form',
+				'post-comments-link.php'        => 'core/post-comments-link',
 				'post-content.php'              => 'core/post-content',
 				'post-date.php'                 => 'core/post-date',
 				'post-excerpt.php'              => 'core/post-excerpt',

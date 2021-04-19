@@ -1,4 +1,4 @@
 /**
  * Internal dependencies
  */
-import './components';
+import './move-to-sidebar';

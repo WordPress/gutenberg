@@ -30,7 +30,7 @@ _Example:_
 		"build": "wp-scripts build",
 		"check-engines": "wp-scripts check-engines",
 		"check-licenses": "wp-scripts check-licenses",
-		"format:js": "wp-scripts format-js",
+		"format": "wp-scripts format",
 		"lint:css": "wp-scripts lint-style",
 		"lint:js": "wp-scripts lint-js",
 		"lint:md:docs": "wp-scripts lint-md-docs",
@@ -128,27 +128,27 @@ _Flags_:
 -   `--gpl2`: Validates against [GPLv2 license compatibility](https://www.gnu.org/licenses/license-list.en.html)
 -   `--ignore=a,b,c`: A comma-separated set of package names to ignore for validation. This is intended to be used primarily in cases where a dependency’s `license` field is malformed. It’s assumed that any `ignored` package argument would be manually vetted for compatibility by the project owner.
 
-### `format-js`
+### `format`
 
-It helps to enforce coding style guidelines for your JavaScript files by formatting source code in a consistent way.
+It helps to enforce coding style guidelines for your files (JavaScript, YAML) by formatting source code in a consistent way.
 
 _Example:_
 
 ```json
 {
 	"scripts": {
-		"format:js": "wp-scripts format-js",
-		"format:js:src": "wp-scripts format-js ./src"
+		"format": "wp-scripts format",
+		"format:src": "wp-scripts format ./src"
 	}
 }
 ```
 
 This is how you execute the script with presented setup:
 
--   `npm run format:js` - formats JavaScript files in the entire project’s directories.
--   `npm run format:js:src` - formats JavaScript files in the project’s `src` subfolder’s directories.
+-   `npm run format` - formats files in the entire project’s directories.
+-   `npm run format:src` - formats files in the project’s `src` subfolder’s directories.
 
-When you run commands similar to the `npm run format:js:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
+When you run commands similar to the `npm run format:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
 
 By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
 

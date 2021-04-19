@@ -18,7 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 import apiFetch from '@wordpress/api-fetch';
 
 // GET
-apiFetch( { path: '/wp/v2/posts' } ).then( posts => {
+apiFetch( { path: '/wp/v2/posts' } ).then( ( posts ) => {
 	console.log( posts );
 } );
 
@@ -27,7 +27,7 @@ apiFetch( {
 	path: '/wp/v2/posts/1',
 	method: 'POST',
 	data: { title: 'New Post Title' },
-} ).then( res => {
+} ).then( ( res ) => {
 	console.log( res );
 } );
 ```
@@ -82,7 +82,7 @@ The `api-fetch` package provides built-in middlewares you can use to provide a `
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-const nonce = "nonce value";
+const nonce = 'nonce value';
 apiFetch.use( apiFetch.createNonceMiddleware( nonce ) );
 ```
 
@@ -93,7 +93,7 @@ The function returned by `createNonceMiddleware` includes a `nonce` property cor
 ```js
 import apiFetch from '@wordpress/api-fetch';
 
-const rootURL = "http://my-wordpress-site/wp-json/";
+const rootURL = 'http://my-wordpress-site/wp-json/';
 apiFetch.use( apiFetch.createRootURLMiddleware( rootURL ) );
 ```
 

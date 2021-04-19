@@ -5,7 +5,9 @@
 	"description": "Widgets blocks in Customizer Module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
-	"keywords": [ "wordpress" ],
+	"keywords": [
+		"wordpress"
+	],
 	"homepage": "https://github.com/WordPress/gutenberg/blob/HEAD/packages/customize-widgets/README.md",
 	"repository": {
 		"type": "git",
@@ -29,8 +31,10 @@
 		"@wordpress/data": "file:../data",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/icons": "file:../icons",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
 		"classnames": "^2.2.6",
 		"lodash": "^4.17.19"

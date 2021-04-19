@@ -10,7 +10,7 @@ const MyQueryControls = withState( {
 	orderBy: 'title',
 	order: 'asc',
 	category: 1,
-	categories: [ 
+	categories: [
 		{
 			id: 1,
 			name: 'Category 1',
@@ -36,7 +36,9 @@ const MyQueryControls = withState( {
 		categoriesList={ categories }
 		selectedCategoryId={ category }
 		onCategoryChange={ ( category ) => setState( { category } ) }
-		onNumberOfItemsChange={ ( numberOfItems ) => setState( { numberOfItems } ) }
+		onNumberOfItemsChange={ ( numberOfItems ) =>
+			setState( { numberOfItems } )
+		}
 	/>
 ) );
 ```
@@ -50,7 +52,7 @@ const MyQueryControls = withState( {
 	orderBy: 'title',
 	order: 'asc',
 	selectedCategories: [ 1 ],
-	categories: { 
+	categories: {
 		'Category 1': {
 			id: 1,
 			name: 'Category 1',
@@ -76,7 +78,9 @@ const MyQueryControls = withState( {
 		categorySuggestions={ categories }
 		selectedCategories={ selectedCategories }
 		onCategoryChange={ ( category ) => setState( { category } ) }
-		onNumberOfItemsChange={ ( numberOfItems ) => setState( { numberOfItems } ) }
+		onNumberOfItemsChange={ ( numberOfItems ) =>
+			setState( { numberOfItems } )
+		}
 	/>
 ) );
 ```

@@ -42,7 +42,7 @@ function gutenberg_widgets_init( $hook ) {
 	}
 
 	$settings = array_merge(
-		gutenberg_get_common_block_editor_settings(),
+		gutenberg_get_default_block_editor_settings(),
 		gutenberg_get_legacy_widget_settings()
 	);
 
@@ -59,7 +59,7 @@ function gutenberg_widgets_init( $hook ) {
 			'preload_paths'   => array(
 				array( '/wp/v2/media', 'OPTIONS' ),
 				'/wp/v2/sidebars?context=edit&per_page=-1',
-				'/wp/v2/widgets?context=edit&per_page=-1',
+				'/wp/v2/widgets?context=edit&per_page=-1&_embed=about',
 			),
 			'editor_settings' => $settings,
 		)
