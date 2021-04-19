@@ -12,10 +12,14 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { Item } from './styles/flex-styles';
-import { withNextFlexItem } from './next';
 
 /**
- * @typedef {import('react').RefAttributes<HTMLDivElement> & import('react').HTMLProps<HTMLDivElement>} Props
+ * @typedef OwnProps
+ * @property {import('react').ElementType} [as] Emotion's As prop.
+ */
+
+/**
+ * @typedef {OwnProps & import('react').RefAttributes<HTMLDivElement> & import('react').HTMLProps<HTMLDivElement>} Props
  */
 
 /**
@@ -28,4 +32,4 @@ function FlexItem( { className, ...props }, ref ) {
 	return <Item { ...props } className={ classes } ref={ ref } />;
 }
 
-export default withNextFlexItem( forwardRef( FlexItem ) );
+export default forwardRef( FlexItem );

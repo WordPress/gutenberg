@@ -12,7 +12,6 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { Flex as BaseFlex } from './styles/flex-styles';
-import { withNextFlex } from './next';
 
 export { default as FlexBlock } from './block';
 export { default as FlexItem } from './item';
@@ -20,9 +19,10 @@ export { default as FlexItem } from './item';
 /* eslint-disable jsdoc/valid-types */
 /**
  * @typedef OwnProps
+ * @property {import('react').ElementType<any>} [as] Emotion's As prop.
  * @property {import('react').CSSProperties['alignItems'] | 'top' | 'bottom'} [align='center'] Sets align-items. Top and bottom are shorthand for flex-start and flex-end respectively.
  * @property {number} [gap=2] Determines the spacing in between children components. The `gap` value is a multiplier to the base value of `4`.
- * @property {import('react').CSSProperties['justifyContent'] | 'left' | 'right'} [justify='space-between']          * Sets jusifty-content. Left and right are shorthand for flex-start and flex-end respectively, not the actual CSS value.
+ * @property {import('react').CSSProperties['justifyContent'] | 'left' | 'right'} [justify='space-between'] Sets jusifty-content. Left and right are shorthand for flex-start and flex-end respectively, not the actual CSS value.
  * @property {boolean} [isReversed=false] Reversed the flex direction.
  */
 /* eslint-enable jsdoc/valid-types */
@@ -59,6 +59,8 @@ function FlexComponent(
 	);
 }
 
-export const Flex = withNextFlex( forwardRef( FlexComponent ) );
+export const Flex = forwardRef( FlexComponent );
+
+console.log( '=======================', Flex );
 
 export default Flex;

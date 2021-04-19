@@ -11,10 +11,14 @@ import { forwardRef } from '@wordpress/element';
  * Internal dependencies
  */
 import { Block } from './styles/flex-styles';
-import { withNextFlexBlock } from './next';
 
 /**
- * @typedef {import('react').HTMLProps<HTMLDivElement> & import('react').RefAttributes<HTMLDivElement>} Props
+ * @typedef OwnProps
+ * @property {import('react').ElementType} [as] Emotion's As prop.
+ */
+
+/**
+ * @typedef {OwnProps & import('react').HTMLProps<HTMLDivElement> & import('react').RefAttributes<HTMLDivElement>} Props
  */
 
 /**
@@ -27,4 +31,4 @@ function FlexBlock( { className, ...props }, ref ) {
 	return <Block { ...props } className={ classes } ref={ ref } />;
 }
 
-export default withNextFlexBlock( forwardRef( FlexBlock ) );
+export default forwardRef( FlexBlock );
