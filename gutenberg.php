@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Gutenberg - Nightly
  * Plugin URI: https://github.com/bph/gutenberg
- * Description: Zip from trunk (the default branch) of WordPress Gutenberg GitHub repo: Gutenberg This is the development plugin for the new block editor in core. Ping @bph on WPSlack for questions. Or [post on the Discussion board](https://github.com/bph/gutenberg/discussions/new)
+ * Description: Zip from trunk (the default branch) of WordPress Gutenberg GitHub repo: Gutenberg This is the development plugin for the new block editor in core. Ping @bph on WPSlack for questions. Or <a href="https://github.com/bph/gutenberg/discussions/new">post on the Discussion board</a>
  * Requires at least: 5.6
  * Requires PHP: 5.6
  * Version: 10.6.0.20210419
