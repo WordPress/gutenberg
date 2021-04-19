@@ -22,7 +22,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$more_text = isset( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . $attributes['moreText'] . '</a>' : '';
+	$more_text = isset( $attributes['moreText'] ) && '' !== $attributes['moreText'] ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . $attributes['moreText'] . '</a>' : '';
 
 	$filter_excerpt_length = function() use ( $attributes ) {
 		return isset( $attributes['wordCount'] ) ? $attributes['wordCount'] : 55;
