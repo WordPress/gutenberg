@@ -8,9 +8,9 @@
 return array(
 	'title'       => _x( 'Media and text with image on the right', 'Block pattern title', 'default' ),
 	'categories'  => array( 'header' ),
-	'content'     => '<!-- wp:media-text {"align":"full","mediaId":1352,"mediaType":"image","verticalAlignment":"center"} -->
-	<div class="wp-block-media-text alignfull is-stacked-on-mobile is-vertically-aligned-center"><figure class="wp-block-media-text__media"><img src="https://s.w.org/images/core/5.8/architecture-04.jpg" alt="' . esc_attr__( 'Close-up, abstract view of architecture.', 'default' ) . '" class="wp-image-1352 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:heading {"textAlign":"center","level":3,"style":{"color":{"text":"#000000"}}} -->
-	<h3 class="has-text-align-center has-text-color"  style="color:#000000"><strong>' . esc_html__( 'Open Spaces', 'default' ) . '</strong></h3>
+	'content'     => '<!-- wp:media-text {"align":"full","mediaType":"image","verticalAlignment":"center"} -->
+	<div class="wp-block-media-text alignfull is-stacked-on-mobile is-vertically-aligned-center"><figure class="wp-block-media-text__media"><img src="https://s.w.org/images/core/5.8/architecture-04.jpg" alt="' . esc_attr__( 'Close-up, abstract view of architecture.', 'default' ) . '"/></figure><div class="wp-block-media-text__content"><!-- wp:heading {"textAlign":"center","level":3,"style":{"color":{"text":"#000000"}}} -->
+	<h3 class="has-text-align-center has-text-color" style="color:#000000"><strong>' . esc_html__( 'Open Spaces', 'default' ) . '</strong></h3>
 	<!-- /wp:heading -->
 	
 	<!-- wp:paragraph {"align":"center","fontSize":"extra-small"} -->

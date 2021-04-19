@@ -8,7 +8,7 @@
 return array(
 	'title'       => _x( 'Large header with text and a button.', 'Block pattern title', 'default' ),
 	'categories'  => array( 'header' ),
-	'content'     => '<!-- wp:cover {"url":"https://s.w.org/images/core/5.8/art-01.jpg","id":613,"hasParallax":true,"dimRatio":40,"customOverlayColor":"#000000","minHeight":100,"minHeightUnit":"vh","contentPosition":"center center","align":"full"} -->
+	'content'     => '<!-- wp:cover {"url":"https://s.w.org/images/core/5.8/art-01.jpg","hasParallax":true,"dimRatio":40,"customOverlayColor":"#000000","minHeight":100,"minHeightUnit":"vh","contentPosition":"center center","align":"full"} -->
 	<div class="wp-block-cover alignfull has-background-dim-40 has-background-dim has-parallax" style="background-color:#000000;background-image:url(https://s.w.org/images/core/5.8/art-01.jpg);min-height:100vh"><div class="wp-block-cover__inner-container"><!-- wp:heading {"style":{"typography":{"fontSize":"48px","lineHeight":"1.2"}},"className":"alignwide has-white-color has-text-color"} -->
 	<h2 class="alignwide has-white-color has-text-color" style="font-size:48px;line-height:1.2"><strong><em>' . esc_html__( 'Overseas:', 'default' ) . '</em></strong><br><strong><em>' . esc_html__( '1500 — 1960', 'default' ) . '</em></strong></h2>
 	<!-- /wp:heading -->

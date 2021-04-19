@@ -8,8 +8,8 @@
 return array(
 	'title'       => _x( 'Media & text with image on the right', 'Block pattern title', 'default' ),
 	'categories'  => array( 'header' ),
-	'content'     => '<!-- wp:media-text {"align":"full","mediaPosition":"right","mediaId":615,"mediaLink":"#","mediaType":"image","mediaWidth":56,"verticalAlignment":"center","className":"is-style-default"} -->
-	<div class="wp-block-media-text alignfull has-media-on-the-right is-stacked-on-mobile is-vertically-aligned-center is-style-default" style="grid-template-columns:auto 56%"><figure class="wp-block-media-text__media"><img src="https://s.w.org/images/core/5.8/art-02.jpg" alt="' . esc_attr__( 'A green and brown rural landscape leading into a bright blue ocean and slightly cloudy sky, done in oil paints.', 'default' ) . '" class="wp-image-615 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:heading {"style":{"color":{"text":"#000000"}},"className":"has-text-color"} -->
+	'content'     => '<!-- wp:media-text {"align":"full","mediaPosition":"right","mediaLink":"#","mediaType":"image","mediaWidth":56,"verticalAlignment":"center","className":"is-style-default"} -->
+	<div class="wp-block-media-text alignfull has-media-on-the-right is-stacked-on-mobile is-vertically-aligned-center is-style-default" style="grid-template-columns:auto 56%"><figure class="wp-block-media-text__media"><img src="https://s.w.org/images/core/5.8/art-02.jpg" alt="' . esc_attr__( 'A green and brown rural landscape leading into a bright blue ocean and slightly cloudy sky, done in oil paints.', 'default' ) . '"/></figure><div class="wp-block-media-text__content"><!-- wp:heading {"style":{"color":{"text":"#000000"}}} -->
 	<h2 class="has-text-color" style="color:#000000"><strong>' . esc_html__( 'Shore with Blue Sea', 'default' ) . '</strong></h2>
 	<!-- /wp:heading -->
 	
