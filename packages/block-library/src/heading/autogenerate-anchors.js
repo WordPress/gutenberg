@@ -77,7 +77,8 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 
 	// Get the slug.
 	let slug = cleanForSlug( content );
-	// If slug is empty, then it's likely using non-latin characters.
+	// If slug is empty, then it's either empty, or using non-latin characters.
+	// Try for non-latin first.
 	if ( '' === slug ) {
 		slug = trim(
 			deburr( content )
@@ -85,6 +86,10 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 				.toLowerCase(),
 			'-'
 		);
+	}
+	// If slug is still empty, then return empty strng.
+	if ( '' === slug ) {
+		return '';
 	}
 
 	const baseAnchor = `wp-${ slug }`;
@@ -97,7 +102,7 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 		anchor = baseAnchor + '-' + i;
 	}
 
-	return 'wp-' === anchor ? '' : anchor;
+	return anchor;
 };
 
 /**
