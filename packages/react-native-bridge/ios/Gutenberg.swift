@@ -118,6 +118,10 @@ public class Gutenberg: NSObject {
         sendEvent(.updateHtml, body: ["html": html])
     }
 
+    public func featuredImageIdNativeUpdated(mediaId: Int32) {
+        sendEvent(.featuredImageIdNativeUpdated, body: ["featuredImageId": mediaId])
+    }
+
     public func replace(block: Block) {
         sendEvent(.replaceBlock, body: ["html": block.content, "clientId": block.id])
     }
