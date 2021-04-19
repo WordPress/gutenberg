@@ -97,7 +97,7 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 		anchor = baseAnchor + '-' + i;
 	}
 
-	return anchor;
+	return 'wp-' === anchor ? '' : anchor;
 };
 
 /**
