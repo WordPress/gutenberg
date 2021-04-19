@@ -383,20 +383,6 @@ _Returns_
 
 -   `(WPBlockVariation[]|void)`: Block variations.
 
-<a name="unstable__getActiveBlockVariation" href="#unstable__getActiveBlockVariation">#</a> **unstable\_\_getActiveBlockVariation**
-
-Returns the active block variation for a given block based on its attributes.
-
-_Parameters_
-
--   _blockName_ `string`: Name of block (example: “core/columns”).
--   _attributes_ `Object`: Block attributes used to determine active variation.
--   _scope_ `[WPBlockVariationScope]`: Block variation scope name.
-
-_Returns_
-
--   `(WPBlockVariation|void)`: Active block variation.
-
 <a name="getCategories" href="#getCategories">#</a> **getCategories**
 
 Returns all the block categories.
