@@ -59,10 +59,11 @@ export default function BoxControl( {
 	} );
 	const inputValues = values || DEFAULT_VALUES;
 	const hasInitialValue = isValuesDefined( valuesProp );
+	const hasOneSide = sides?.length === 1;
 
 	const [ isDirty, setIsDirty ] = useState( hasInitialValue );
 	const [ isLinked, setIsLinked ] = useState(
-		! hasInitialValue || ! isValuesMixed( inputValues )
+		! hasInitialValue || ! isValuesMixed( inputValues ) || hasOneSide
 	);
 
 	const [ side, setSide ] = useState( isLinked ? 'all' : 'top' );
@@ -146,12 +147,14 @@ export default function BoxControl( {
 						/>
 					</FlexBlock>
 				) }
-				<FlexItem>
-					<LinkedButton
-						onClick={ toggleLinked }
-						isLinked={ isLinked }
-					/>
-				</FlexItem>
+				{ ! hasOneSide && (
+					<FlexItem>
+						<LinkedButton
+							onClick={ toggleLinked }
+							isLinked={ isLinked }
+						/>
+					</FlexItem>
+				) }
 			</HeaderControlWrapper>
 			{ ! isLinked && <InputControls { ...inputControlProps } /> }
 		</Root>
