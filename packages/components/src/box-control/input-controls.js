@@ -68,9 +68,9 @@ export default function BoxInputControls( {
 	};
 
 	// Filter sides if custom configuration provided, maintaining default order.
-	const filteredSides = ! sides
-		? allSides
-		: allSides.filter( ( side ) => sides && sides.includes( side ) );
+	const filteredSides = sides?.length
+		? allSides.filter( ( side ) => sides.includes( side ) )
+		: allSides;
 
 	const first = filteredSides[ 0 ];
 	const last = filteredSides[ filteredSides.length - 1 ];

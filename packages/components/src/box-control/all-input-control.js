@@ -29,7 +29,9 @@ export default function AllInputControl( {
 
 	const handleOnChange = ( next ) => {
 		const nextValues = { ...values };
-		const selectedSides = sides || [ 'top', 'right', 'bottom', 'left' ];
+		const selectedSides = sides?.length
+			? sides
+			: [ 'top', 'right', 'bottom', 'left' ];
 
 		selectedSides.forEach( ( side ) => ( nextValues[ side ] = next ) );
 
