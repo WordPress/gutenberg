@@ -26,16 +26,16 @@ import { store as blockEditorStore } from '../../../store';
  */
 export function useEventHandlers( clientId ) {
 	const onSelectionStart = useContext( SelectionStart );
-	const { isSelected, rootClientId, index } = useSelect(
+	const { isBlockSelected, rootClientId, index } = useSelect(
 		( select ) => {
 			const {
-				isBlockSelected,
+				isBlockSelected: _isBlockSelected,
 				getBlockRootClientId,
 				getBlockIndex,
 			} = select( blockEditorStore );
 
 			return {
-				isSelected: isBlockSelected( clientId ),
+				isBlockSelected: _isBlockSelected,
 				rootClientId: getBlockRootClientId( clientId ),
 				index: getBlockIndex( clientId ),
 			};
@@ -48,30 +48,26 @@ export function useEventHandlers( clientId ) {
 
 	return useRefEffect(
 		( node ) => {
-			if ( ! isSelected ) {
-				/**
-				 * Marks the block as selected when focused and not already
-				 * selected. This specifically handles the case where block does not
-				 * set focus on its own (via `setFocus`), typically if there is no
-				 * focusable input in the block.
-				 *
-				 * @param {FocusEvent} event Focus event.
-				 */
-				function onFocus( event ) {
-					// If an inner block is focussed, that block is resposible for
-					// setting the selected block.
-					if ( ! isInsideRootBlock( node, event.target ) ) {
-						return;
-					}
-
-					selectBlock( clientId );
+			/**
+			 * Marks the block as selected when focused and not already
+			 * selected. This specifically handles the case where block does not
+			 * set focus on its own (via `setFocus`), typically if there is no
+			 * focusable input in the block.
+			 *
+			 * @param {FocusEvent} event Focus event.
+			 */
+			function onFocus( event ) {
+				if ( isBlockSelected( clientId ) ) {
+					return;
 				}
 
-				node.addEventListener( 'focusin', onFocus );
+				// If an inner block is focussed, that block is resposible for
+				// setting the selected block.
+				if ( ! isInsideRootBlock( node, event.target ) ) {
+					return;
+				}
 
-				return () => {
-					node.removeEventListener( 'focusin', onFocus );
-				};
+				selectBlock( clientId );
 			}
 
 			/**
@@ -85,6 +81,10 @@ export function useEventHandlers( clientId ) {
 			 */
 			function onKeyDown( event ) {
 				const { keyCode, target } = event;
+
+				if ( ! isBlockSelected( clientId ) ) {
+					return;
+				}
 
 				if (
 					keyCode !== ENTER &&
@@ -108,6 +108,10 @@ export function useEventHandlers( clientId ) {
 			}
 
 			function onMouseLeave( { buttons } ) {
+				if ( ! isBlockSelected( clientId ) ) {
+					return;
+				}
+
 				// The primary button must be pressed to initiate selection.
 				// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
 				if ( buttons === 1 ) {
@@ -122,21 +126,27 @@ export function useEventHandlers( clientId ) {
 			 * @param {DragEvent} event Drag event.
 			 */
 			function onDragStart( event ) {
+				if ( ! isBlockSelected( clientId ) ) {
+					return;
+				}
+
 				event.preventDefault();
 			}
 
+			node.addEventListener( 'focusin', onFocus );
 			node.addEventListener( 'keydown', onKeyDown );
 			node.addEventListener( 'mouseleave', onMouseLeave );
 			node.addEventListener( 'dragstart', onDragStart );
 
 			return () => {
+				node.removeEventListener( 'focusin', onFocus );
 				node.removeEventListener( 'mouseleave', onMouseLeave );
 				node.removeEventListener( 'keydown', onKeyDown );
 				node.removeEventListener( 'dragstart', onDragStart );
 			};
 		},
 		[
-			isSelected,
+			isBlockSelected,
 			rootClientId,
 			index,
 			onSelectionStart,
