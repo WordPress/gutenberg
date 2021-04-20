@@ -200,8 +200,6 @@ When the block declares support for `color.duotone`, the attributes definition i
 
 - `style`: attribute of `object` type with no default assigned.
 
-  The values are split by channel (i.e. 'r' for red, 'g' for green, and 'b' for blue) and represent the intensity of that channel from dark to light using values in the closed interval [0,1].
-
   The block can apply a default duotone color by specifying its own attribute with a default e.g.:
 
   ```js
