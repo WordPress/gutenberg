@@ -45,7 +45,7 @@ function HeadingEdit( {
 	const allHeadingAnchors = useSelect( ( select ) => {
 		const allBlocks = select( 'core/block-editor' ).getBlocks();
 		return getAllHeadingAnchors( allBlocks, clientId );
-	}, [] );
+	}, [ clientId ] );
 	useEffect( () => {
 		const newAnchor = maybeUpdateAnchor(
 			attributes.anchor,
