@@ -175,6 +175,10 @@ class WP_Theme_JSON {
 					'class_suffix'  => 'background-color',
 					'property_name' => 'background-color',
 				),
+				array(
+					'class_suffix'  => 'border-color',
+					'property_name' => 'border-color',
+				),
 			),
 		),
 		array(

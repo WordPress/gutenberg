@@ -6,12 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import getColorAndStyleProps from './color-props';
+import {
+	RichText,
+	useBlockProps,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+} from '@wordpress/block-editor';
 
 export default function save( { attributes, className } ) {
 	const {
@@ -30,7 +29,7 @@ export default function save( { attributes, className } ) {
 	}
 
 	const borderRadius = style?.border?.radius;
-	const colorProps = getColorAndStyleProps( attributes );
+	const colorProps = getColorClassesAndStyles( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
 		colorProps.className,
