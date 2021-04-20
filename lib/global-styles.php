@@ -63,7 +63,7 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	$settings           = gutenberg_get_common_block_editor_settings();
+	$settings           = gutenberg_get_default_block_editor_settings();
 	$theme_support_data = WP_Theme_JSON::get_from_editor_settings( $settings );
 
 	$all = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data );

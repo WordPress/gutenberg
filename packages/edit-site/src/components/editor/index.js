@@ -3,12 +3,7 @@
  */
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
-import {
-	SlotFillProvider,
-	DropZoneProvider,
-	Popover,
-	Button,
-} from '@wordpress/components';
+import { SlotFillProvider, Popover, Button } from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
 import {
@@ -175,100 +170,98 @@ function Editor( { initialSettings } ) {
 			<FullscreenMode isActive />
 			<UnsavedChangesWarning />
 			<SlotFillProvider>
-				<DropZoneProvider>
-					<EntityProvider kind="root" type="site">
+				<EntityProvider kind="root" type="site">
+					<EntityProvider
+						kind="postType"
+						type={ templateType }
+						id={ entityId }
+					>
 						<EntityProvider
 							kind="postType"
-							type={ templateType }
-							id={ entityId }
+							type="wp_global_styles"
+							id={
+								settings.__experimentalGlobalStylesUserEntityId
+							}
 						>
-							<EntityProvider
-								kind="postType"
-								type="wp_global_styles"
-								id={
-									settings.__experimentalGlobalStylesUserEntityId
-								}
-							>
-								<BlockContextProvider value={ blockContext }>
-									<GlobalStylesProvider
-										baseStyles={
-											settings.__experimentalGlobalStylesBaseStyles
+							<BlockContextProvider value={ blockContext }>
+								<GlobalStylesProvider
+									baseStyles={
+										settings.__experimentalGlobalStylesBaseStyles
+									}
+								>
+									<KeyboardShortcuts.Register />
+									<SidebarComplementaryAreaFills />
+									<InterfaceSkeleton
+										labels={ interfaceLabels }
+										drawer={ <NavigationSidebar /> }
+										secondarySidebar={ secondarySidebar() }
+										sidebar={
+											sidebarIsOpened && (
+												<ComplementaryArea.Slot scope="core/edit-site" />
+											)
 										}
-									>
-										<KeyboardShortcuts.Register />
-										<SidebarComplementaryAreaFills />
-										<InterfaceSkeleton
-											labels={ interfaceLabels }
-											drawer={ <NavigationSidebar /> }
-											secondarySidebar={ secondarySidebar() }
-											sidebar={
-												sidebarIsOpened && (
-													<ComplementaryArea.Slot scope="core/edit-site" />
-												)
-											}
-											header={
-												<Header
-													openEntitiesSavedStates={
-														openEntitiesSavedStates
+										header={
+											<Header
+												openEntitiesSavedStates={
+													openEntitiesSavedStates
+												}
+											/>
+										}
+										content={
+											<>
+												<Notices />
+												{ template && (
+													<BlockEditor
+														setIsInserterOpen={
+															setIsInserterOpened
+														}
+													/>
+												) }
+												<KeyboardShortcuts />
+											</>
+										}
+										actions={
+											<>
+												<EntitiesSavedStates
+													isOpen={
+														isEntitiesSavedStatesOpen
+													}
+													close={
+														closeEntitiesSavedStates
 													}
 													isEntitiesSavedStatesOpen={
 														isEntitiesSavedStatesOpen
 													}
 												/>
-											}
-											content={
-												<>
-													<Notices />
-													{ template && (
-														<BlockEditor
-															setIsInserterOpen={
-																setIsInserterOpened
+												{ ! isEntitiesSavedStatesOpen && (
+													<div className="edit-site-editor__toggle-save-panel">
+														<Button
+															isSecondary
+															className="edit-site-editor__toggle-save-panel-button"
+															onClick={
+																openEntitiesSavedStates
 															}
-														/>
-													) }
-													<KeyboardShortcuts />
-												</>
-											}
-											actions={
-												<>
-													<EntitiesSavedStates
-														isOpen={
-															isEntitiesSavedStatesOpen
-														}
-														close={
-															closeEntitiesSavedStates
-														}
-													/>
-													{ ! isEntitiesSavedStatesOpen && (
-														<div className="edit-site-editor__toggle-save-panel">
-															<Button
-																isSecondary
-																className="edit-site-editor__toggle-save-panel-button"
-																onClick={
-																	openEntitiesSavedStates
-																}
-																aria-expanded={
-																	false
-																}
-															>
-																{ __(
-																	'Open save panel'
-																) }
-															</Button>
-														</div>
-													) }
-												</>
-											}
-											footer={ <BlockBreadcrumb /> }
-										/>
-										<Popover.Slot />
-										<PluginArea />
-									</GlobalStylesProvider>
-								</BlockContextProvider>
-							</EntityProvider>
+															aria-expanded={
+																false
+															}
+														>
+															{ __(
+																'Open save panel'
+															) }
+														</Button>
+													</div>
+												) }
+											</>
+										}
+										footer={ <BlockBreadcrumb /> }
+									/>
+									<Popover.Slot />
+									<PluginArea />
+								</GlobalStylesProvider>
+							</BlockContextProvider>
 						</EntityProvider>
 					</EntityProvider>
-				</DropZoneProvider>
+				</EntityProvider>
 			</SlotFillProvider>
 		</>
 	);

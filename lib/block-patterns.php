@@ -159,6 +159,7 @@ register_block_pattern(
 	'paragraph/large-with-background-color',
 	array(
 		'title'         => __( 'Large Paragraph with background color', 'gutenberg' ),
+		'categories'    => array( 'Text' ),
 		'blockTypes'    => array( 'core/paragraph' ),
 		'viewportWidth' => 500,
 		'content'       => '<!-- wp:paragraph {"style":{"color":{"link":"#FFFFFF","text":"#FFFFFF","background":"#000000"},"typography":{"lineHeight":"1.3","fontSize":"26px"}}} -->
@@ -170,6 +171,7 @@ register_block_pattern(
 	'social-links/shared-background-color',
 	array(
 		'title'         => __( 'Social links with a shared background color', 'gutenberg' ),
+		'categories'    => array( 'Buttons' ),
 		'blockTypes'    => array( 'core/social-links' ),
 		'viewportWidth' => 500,
 		'content'       => '<!-- wp:social-links {"customIconColor":"#ffffff","iconColorValue":"#ffffff","customIconBackgroundColor":"#3962e3","iconBackgroundColorValue":"#3962e3","className":"has-icon-color"} -->
@@ -178,4 +180,65 @@ register_block_pattern(
 							<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
 							<!-- /wp:social-links -->',
 	)
+);
+
+// Deactivate the legacy patterns bundled with WordPress, and add new block patterns for testing.
+// More details in the trac issue (https://core.trac.wordpress.org/ticket/52846).
+add_action(
+	'init',
+	function() {
+
+		$core_block_patterns = array(
+			'text-two-columns',
+			'two-buttons',
+			'two-images',
+			'text-two-columns-with-images',
+			'text-three-columns-buttons',
+			'large-header',
+			'large-header-button',
+			'three-buttons',
+			'heading-paragraph',
+			'quote',
+		);
+
+		$new_core_block_patterns = array(
+			'media-text-nature',
+			'two-images-gallery',
+			'three-columns-media-text',
+			'quote',
+			'large-header-left',
+			'large-header-text-button',
+			'media-text-art',
+			'text-two-columns-title',
+			'three-columns-text',
+			'text-two-columns-title-offset',
+			'heading',
+			'three-images-gallery',
+			'text-two-columns',
+			'media-text-arquitecture',
+			'two-buttons',
+		);
+
+		if ( ! function_exists( 'unregister_block_pattern' ) ) {
+			return;
+		}
+
+		foreach ( $core_block_patterns as $core_block_pattern ) {
+			unregister_block_pattern( 'core/' . $core_block_pattern );
+		}
+
+		register_block_pattern_category( 'buttons', array( 'label' => _x( 'Buttons', 'Block pattern category', 'default' ) ) );
+		register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category', 'default' ) ) );
+		register_block_pattern_category( 'header', array( 'label' => _x( 'Headers', 'Block pattern category', 'default' ) ) );
+		register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category', 'default' ) ) );
+		register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category', 'default' ) ) );
+
+		foreach ( $new_core_block_patterns as $core_block_pattern ) {
+			register_block_pattern(
+				'core/' . $core_block_pattern,
+				require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
+			);
+		}
+
+	}
 );

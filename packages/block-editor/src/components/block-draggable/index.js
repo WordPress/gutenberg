@@ -76,6 +76,7 @@ const BlockDraggable = ( {
 		<Draggable
 			cloneClassname={ cloneClassname }
 			elementId={ elementId }
+			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
 				startDraggingBlocks( clientIds );

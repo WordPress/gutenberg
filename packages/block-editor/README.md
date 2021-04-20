@@ -448,6 +448,8 @@ _Related_
 
 <a name="MultiSelectScrollIntoView" href="#MultiSelectScrollIntoView">#</a> **MultiSelectScrollIntoView**
 
+> **Deprecated** 
+
 Scrolls the multi block selection end into view if not in view already. This
 is important to do after selection by keyboard.
 
