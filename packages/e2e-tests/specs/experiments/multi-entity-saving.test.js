@@ -175,8 +175,12 @@ describe( 'Multi-entity save flow', () => {
 			await disablePrePublishChecks();
 
 			await insertBlock( 'Site Title' );
+			await page.waitForXPath( '//a[contains(text(), "gutenberg")]' ); // Ensure title is retrieved before typing.
 			await page.keyboard.type( '...' );
 			await insertBlock( 'Site Tagline' );
+			await page.waitForXPath(
+				'//p[contains(text(), "Just another WordPress site")]'
+			); // Esnure tagline is retrieved before typing.
 			await page.keyboard.type( '...' );
 
 			await page.click( savePostSelector );
