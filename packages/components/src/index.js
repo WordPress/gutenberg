@@ -132,6 +132,7 @@ export {
 	Provider as SlotFillProvider,
 	useSlot as __experimentalUseSlot,
 } from './slot-fill';
+export { default as __experimentalFrameProvider } from './frame-provider';
 
 // Higher-Order Components
 export {

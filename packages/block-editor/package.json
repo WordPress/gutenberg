@@ -29,6 +29,7 @@
 	],
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
+		"@emotion/weak-memoize": "0.2.2",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/blob": "file:../blob",
 		"@wordpress/blocks": "file:../blocks",
