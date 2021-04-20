@@ -141,7 +141,8 @@ class WP_Test_Block_Editor extends WP_UnitTestCase {
 	function test_get_default_block_editor_settings() {
 		$settings = gutenberg_get_default_block_editor_settings();
 
-		$this->assertCount( 16, $settings );
+		$this->assertCount( 17, $settings );
+		$this->assertTrue( $settings['__unstableEnableFullSiteEditingBlocks'] );
 		$this->assertFalse( $settings['alignWide'] );
 		$this->assertInternalType( 'array', $settings['allowedMimeTypes'] );
 		$this->assertTrue( $settings['allowedBlockTypes'] );
@@ -243,7 +244,7 @@ class WP_Test_Block_Editor extends WP_UnitTestCase {
 	 */
 	function test_get_block_editor_settings_returns_default_settings() {
 		$this->assertSameSets(
-			gutenberg_get_block_editor_settings( 'post-editor' ),
+			gutenberg_get_block_editor_settings( 'my-editor' ),
 			gutenberg_get_default_block_editor_settings()
 		);
 	}
@@ -274,7 +275,7 @@ class WP_Test_Block_Editor extends WP_UnitTestCase {
 		add_filter( 'block_categories_my-editor', 'filter_block_categories_my_editor', 10, 1 );
 		add_filter( 'block_editor_settings_my-editor', 'filter_block_editor_settings_my_editor', 10, 1 );
 
-		$settings = get_block_editor_settings( 'my-editor' );
+		$settings = gutenberg_get_block_editor_settings( 'my-editor' );
 
 		remove_filter( 'allowed_block_types_my-editor', 'filter_allowed_block_types_my_editor' );
 		remove_filter( 'block_categories_my-editor', 'filter_block_categories_my_editor' );
@@ -296,12 +297,14 @@ class WP_Test_Block_Editor extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 52920
+	 * @expectedDeprecated block_categories
 	 * @expectedDeprecated block_editor_settings
 	 */
 	function test_get_block_editor_settings_deprecated_filter_post_editor() {
-		add_filter( 'block_editor_settings', array( $this, 'filter_set_block_editor_settings_post' ), 10, 2 );
+		// This filter needs to run last to account for other filters registered in the plugin.
+		add_filter( 'block_editor_settings', array( $this, 'filter_set_block_editor_settings_post' ), PHP_INT_MAX, 2 );
 
-		$settings = get_block_editor_settings( 'post-editor' );
+		$settings = gutenberg_get_block_editor_settings( 'post-editor' );
 
 		remove_filter( 'block_editor_settings', array( $this, 'filter_set_block_editor_settings_post' ) );
 
