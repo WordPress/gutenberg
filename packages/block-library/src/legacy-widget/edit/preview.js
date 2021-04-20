@@ -22,27 +22,32 @@ export default function Preview( { idBase, instance, isVisible } ) {
 	}, [ adjustHeight ] );
 
 	return (
-		<Disabled hidden={ ! isVisible }>
-			{ /*
-			Rendering the preview in an iframe ensures compatibility with any
-			scripts that the widget uses. TODO: This chokes when the
-			legacy-widget-preview query param is too big. Ideally, we'd render a
-			<ServerSideRender> into an iframe using a portal.
-			*/ }
-			<iframe
-				ref={ ref }
-				className="wp-block-legacy-widget__edit-preview"
-				src={ addQueryArgs( 'themes.php', {
-					page: 'gutenberg-widgets',
-					'legacy-widget-preview': {
-						idBase,
-						instance,
-					},
-				} ) }
-				title={ __( 'Legacy Widget Preview' ) }
-				height={ height }
-				onLoad={ adjustHeight }
-			/>
-		</Disabled>
+		<div
+			className="wp-block-legacy-widget__edit-preview"
+			hidden={ ! isVisible }
+		>
+			<Disabled>
+				{ /*
+				Rendering the preview in an iframe ensures compatibility with
+				any scripts that the widget uses. TODO: This chokes when the
+				legacy-widget-preview query param is too big.  Ideally, we'd
+				render a <ServerSideRender> into an iframe using a portal.
+				*/ }
+				<iframe
+					ref={ ref }
+					className="wp-block-legacy-widget__edit-preview-iframe"
+					src={ addQueryArgs( 'themes.php', {
+						page: 'gutenberg-widgets',
+						'legacy-widget-preview': {
+							idBase,
+							instance,
+						},
+					} ) }
+					title={ __( 'Legacy Widget Preview' ) }
+					height={ height }
+					onLoad={ adjustHeight }
+				/>
+			</Disabled>
+		</div>
 	);
 }

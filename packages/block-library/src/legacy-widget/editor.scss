@@ -1,11 +1,3 @@
-.wp-block-legacy-widget:not(.is-selected) {
-	cursor: pointer;
-
-	&:hover::after {
-		border: 1px solid $gray-600;
-	}
-}
-
 .wp-block-legacy-widget__edit-form {
 	background: $white;
 	border-radius: $radius-block-ui;
@@ -37,7 +29,23 @@
 	}
 }
 
-.wp-block-legacy-widget__edit-preview {
+.wp-block-legacy-widget__edit-preview,
+.wp-block-legacy-widget__edit-no-preview {
+	cursor: pointer;
+
+	&:hover::after {
+		border-radius: $radius-block-ui;
+		border: 1px solid $gray-600;
+		bottom: 0;
+		content: "";
+		left: 0;
+		position: absolute;
+		right: 0;
+		top: 0;
+	}
+}
+
+.wp-block-legacy-widget__edit-preview-iframe {
 	overflow: auto;
 	width: 100%;
 }
