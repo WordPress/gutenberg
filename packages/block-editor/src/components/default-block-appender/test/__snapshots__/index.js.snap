@@ -35,17 +35,19 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
 
 exports[`DefaultBlockAppender should match snapshot 1`] = `
 <div
-  className="wp-block block-editor-default-block-appender"
+  className="block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <ForwardRef
+  <p
     aria-label="Add block"
-    className="block-editor-default-block-appender__content"
+    className="wp-block block-editor-default-block-appender__content"
+    contentEditable={true}
     onFocus={[MockFunction]}
-    readOnly={true}
     role="button"
-    value="Type / to choose a block"
-  />
+    suppressContentEditableWarning={true}
+  >
+    Type / to choose a block
+  </p>
   <WithSelect(WithDispatch(IfCondition(Inserter)))
     __experimentalIsQuick={true}
     isAppender={true}
