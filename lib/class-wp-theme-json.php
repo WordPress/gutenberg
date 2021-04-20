@@ -96,6 +96,9 @@ class WP_Theme_JSON {
 	);
 
 	const VALID_SETTINGS = array(
+		'experience' => array(
+			'enable_fse' => null,
+		),
 		'border'     => array(
 			'customRadius' => null,
 			'customColor'  => null,
