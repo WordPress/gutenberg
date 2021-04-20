@@ -129,8 +129,9 @@ function removeBuildFile( event, filename ) {
 	const buildFile = getBuildFile( filename );
 	if ( exists( buildFile ) ) {
 		try {
-			fs.unlinkSync( buildFile );
-			console.log( chalk.red( '<-' ), `${ event }: ${ filename }` );
+			fs.unlink( buildFile, () => {
+				console.log( chalk.red( '<-' ), `${ event }: ${ filename }` );
+			} );
 		} catch ( e ) {
 			console.log(
 				chalk.red( 'Error:' ),
