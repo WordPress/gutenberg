@@ -1727,6 +1727,31 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
+/**
+ * Reducer returning the block insertion event list state.
+ *
+ * @param {Object}  state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function lastBlockInserted( state = {}, action ) {
+	switch ( action.type ) {
+		case 'INSERT_BLOCKS':
+			if ( ! action.blocks.length ) {
+				return state;
+			}
+
+			const clientId = action.blocks[ 0 ].clientId;
+			const source = action.meta?.source;
+
+			return { clientId, source };
+		case 'RESET_BLOCKS':
+			return {};
+	}
+	return state;
+}
+
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1748,4 +1773,5 @@ export default combineReducers( {
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
+	lastBlockInserted,
 } );

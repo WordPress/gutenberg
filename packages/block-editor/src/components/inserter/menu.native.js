@@ -133,7 +133,13 @@ function InserterMenu( {
 				innerBlocks
 			);
 
-			insertBlock( newBlock, insertionIndex, destinationRootClientId );
+			insertBlock(
+				newBlock,
+				insertionIndex,
+				destinationRootClientId,
+				true,
+				{ source: 'inserter_menu' }
+			);
 		},
 		[ insertBlock, destinationRootClientId, insertionIndex ]
 	);
