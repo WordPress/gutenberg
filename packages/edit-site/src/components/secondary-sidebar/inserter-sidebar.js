@@ -15,7 +15,7 @@ import {
  */
 import { store as editSiteStore } from '../../store';
 
-export default function InserterSidebar() {
+export default function InserterSidebar( { rootClientId, index } ) {
 	const { setIsInserterOpened } = useDispatch( editSiteStore );
 
 	const isMobile = useViewportMatch( 'medium', '<' );
@@ -36,7 +36,12 @@ export default function InserterSidebar() {
 				/>
 			</div>
 			<div className="edit-site-editor__inserter-panel-content">
-				<Library showInserterHelpPanel shouldFocusBlock={ isMobile } />
+				<Library
+					showInserterHelpPanel
+					shouldFocusBlock={ isMobile }
+					rootClientId={ rootClientId }
+					index={ index }
+				/>
 			</div>
 		</div>
 	);
