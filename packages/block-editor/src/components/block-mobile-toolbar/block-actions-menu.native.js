@@ -19,6 +19,7 @@ import {
 	rawHandler,
 	createBlock,
 	isUnmodifiedDefaultBlock,
+	isReusableBlock,
 } from '@wordpress/blocks';
 import { __, sprintf } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -26,6 +27,8 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import { moreHorizontalMobile } from '@wordpress/icons';
 import { useRef, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+
 /**
  * Internal dependencies
  */
@@ -46,6 +49,7 @@ const BlockActionsMenu = ( {
 	selectedBlockPossibleTransformations,
 	// Dispatch
 	createSuccessNotice,
+	convertBlockToStatic,
 	duplicateBlock,
 	onMoveDown,
 	onMoveUp,
@@ -58,6 +62,7 @@ const BlockActionsMenu = ( {
 	onDelete,
 	wrapBlockMover,
 	wrapBlockSettings,
+	isReusableBlockType,
 } ) => {
 	const [ clipboard, setCurrentClipboard ] = useState( getClipboard() );
 	const blockActionsMenuPickerRef = useRef();
@@ -175,6 +180,21 @@ const BlockActionsMenu = ( {
 				);
 			},
 		},
+		convertToRegularBlocks: {
+			id: 'convertToRegularBlocksOption',
+			label: __( 'Convert to regular blocks' ),
+			value: 'convertToRegularBlocksOption',
+			onSelect: () => {
+				createSuccessNotice(
+					sprintf(
+						/* translators: %s: name of the reusable block */
+						__( '%s converted to regular blocks' ),
+						blockTitle
+					)
+				);
+				convertBlockToStatic( selectedBlockClientId );
+			},
+		},
 	};
 
 	const options = compact( [
@@ -187,6 +207,7 @@ const BlockActionsMenu = ( {
 		allOptions.cutButton,
 		isPasteEnabled && allOptions.pasteButton,
 		allOptions.duplicateButton,
+		isReusableBlockType && allOptions.convertToRegularBlocks,
 		allOptions.delete,
 	] );
 
@@ -297,6 +318,8 @@ export default compose(
 			? getBlockTransformItems( [ selectedBlock ], rootClientId )
 			: [];
 
+		const isReusableBlockType = block ? isReusableBlock( block ) : false;
+
 		return {
 			blockTitle,
 			canInsertBlockType,
@@ -305,6 +328,7 @@ export default compose(
 			isEmptyDefaultBlock,
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
+			isReusableBlockType,
 			rootClientId,
 			selectedBlockClientId,
 			selectedBlockPossibleTransformations,
@@ -326,8 +350,13 @@ export default compose(
 			);
 			const { createSuccessNotice } = dispatch( noticesStore );
 
+			const {
+				__experimentalConvertBlockToStatic: convertBlockToStatic,
+			} = dispatch( reusableBlocksStore );
+
 			return {
 				createSuccessNotice,
+				convertBlockToStatic,
 				duplicateBlock() {
 					return duplicateBlocks( clientIds );
 				},
