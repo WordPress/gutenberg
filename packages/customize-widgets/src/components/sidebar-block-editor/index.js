@@ -1,6 +1,13 @@
 /**
+ * External dependencies
+ */
+import { defaultTo } from 'lodash';
+
+/**
  * WordPress dependencies
  */
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
 import { useMemo, createPortal } from '@wordpress/element';
 import {
 	BlockList,
@@ -12,6 +19,7 @@ import {
 	__experimentalBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
 import { SlotFillProvider, Popover } from '@wordpress/components';
+import { uploadMedia } from '@wordpress/media-utils';
 
 /**
  * Internal dependencies
@@ -21,14 +29,35 @@ import Header from '../header';
 import useInserter from '../inserter/use-inserter';
 import SidebarEditorProvider from './sidebar-editor-provider';
 
-export default function SidebarBlockEditor( { sidebar, inserter, inspector } ) {
+export default function SidebarBlockEditor( {
+	blockEditorSettings,
+	sidebar,
+	inserter,
+	inspector,
+} ) {
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
-	const settings = useMemo(
-		() => ( {
-			__experimentalSetIsInserterOpened: setIsInserterOpened,
-		} ),
+	const hasUploadPermissions = useSelect(
+		( select ) =>
+			defaultTo( select( coreStore ).canUser( 'create', 'media' ), true ),
 		[]
 	);
+	const settings = useMemo( () => {
+		let mediaUploadBlockEditor;
+		if ( hasUploadPermissions ) {
+			mediaUploadBlockEditor = ( { onError, ...argumentsObject } ) => {
+				uploadMedia( {
+					wpAllowedMimeTypes: blockEditorSettings.allowedMimeTypes,
+					onError: ( { message } ) => onError( message ),
+					...argumentsObject,
+				} );
+			};
+		}
+
+		return {
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
+			mediaUpload: mediaUploadBlockEditor,
+		};
+	}, [] );
 	const parentContainer = document.getElementById(
 		'customize-theme-controls'
 	);
