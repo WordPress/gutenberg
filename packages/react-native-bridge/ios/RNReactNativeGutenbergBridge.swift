@@ -129,13 +129,6 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
         }
     }
 
-    //@objc
-    //func setFeaturedImage(_ mediaID: Int32) {
-    //    DispatchQueue.main.async {
-    //        self.delegate?.gutenbergDidSetFeaturedImage(for: mediaID)
-    //    }
-    //}
-
     @objc
     func editorDidLayout() {
         DispatchQueue.main.async {
@@ -373,7 +366,6 @@ extension RNReactNativeGutenbergBridge {
         case setTitle
         case toggleHTMLMode
         case updateHtml
-        //case featuredImageIdCurrent
         case mediaUpload
         case setFocusOnTitle
         case mediaAppend
