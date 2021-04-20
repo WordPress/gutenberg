@@ -112,11 +112,9 @@ function render_block_core_template_part( $attributes ) {
 	if ( empty( $attributes['tagName'] ) ) {
 		$defined_areas = gutenberg_get_allowed_template_part_areas();
 		$area_tag      = 'div';
-		if ( null !== $area ) {
-			foreach ( $defined_areas as $defined_area ) {
-				if ( $defined_area['area'] === $area && isset( $defined_area['area_tag'] ) ) {
-					$area_tag = $defined_area['area_tag'];
-				}
+		foreach ( $defined_areas as $defined_area ) {
+			if ( $defined_area['area'] === $area && isset( $defined_area['area_tag'] ) ) {
+				$area_tag = $defined_area['area_tag'];
 			}
 		}
 		$html_tag = $area_tag;
