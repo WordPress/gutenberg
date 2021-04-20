@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -53,14 +48,17 @@ export function DefaultBlockAppender( {
 			data-root-client-id={ rootClientId || '' }
 			className="wp-block block-editor-default-block-appender"
 		>
-			<TextareaAutosize
+			<p
+				contentEditable
+				suppressContentEditableWarning
+				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 				role="button"
 				aria-label={ __( 'Add block' ) }
 				className="block-editor-default-block-appender__content"
-				readOnly
 				onFocus={ onAppend }
-				value={ showPrompt ? value : '' }
-			/>
+			>
+				{ showPrompt ? value : '' }
+			</p>
 			<Inserter
 				rootClientId={ rootClientId }
 				position="bottom right"
