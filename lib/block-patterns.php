@@ -161,7 +161,7 @@ register_block_pattern(
 register_block_pattern(
 	'paragraph/large-with-background-color',
 	array(
-		'title'         => __( 'Large Paragraph with background color', 'gutenberg' ),
+		'title'         => __( 'Large paragraph with background color', 'gutenberg' ),
 		'categories'    => array( 'text' ),
 		'blockTypes'    => array( 'core/paragraph' ),
 		'viewportWidth' => 500,
