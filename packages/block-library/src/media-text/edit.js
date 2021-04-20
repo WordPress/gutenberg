@@ -22,6 +22,7 @@ import {
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
+	RangeControl,
 	TextareaControl,
 	ToggleControl,
 	ToolbarButton,
@@ -48,6 +49,21 @@ const TEMPLATE = [
 			placeholder: _x( 'Content…', 'content placeholder' ),
 		},
 	],
+];
+
+const WIDTH_SCALE_MARKS = [
+	{
+		value: 25,
+		label: '25%',
+	},
+	{
+		value: 50,
+		label: '50%',
+	},
+	{
+		value: 75,
+		label: '75%',
+	},
 ];
 // this limits the resize to a safe zone to avoid making broken layouts
 const WIDTH_CONSTRAINT_PERCENTAGE = 15;
@@ -274,6 +290,16 @@ function MediaTextEdit( { attributes, isSelected, setAttributes } ) {
 					slug={ mediaSizeSlug }
 					imageSizeOptions={ imageSizeOptions }
 					isResizable={ false }
+				/>
+			) }
+			{ mediaUrl && (
+				<RangeControl
+					label={ __( 'Media width' ) }
+					value={ temporaryMediaWidth || mediaWidth }
+					marks={ WIDTH_SCALE_MARKS }
+					onChange={ commitWidthChange }
+					min={ WIDTH_CONSTRAINT_PERCENTAGE }
+					max={ 100 - WIDTH_CONSTRAINT_PERCENTAGE }
 				/>
 			) }
 		</PanelBody>
