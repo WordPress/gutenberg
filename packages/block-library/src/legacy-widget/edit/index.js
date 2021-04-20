@@ -123,11 +123,22 @@ function NotEmpty( {
 	};
 
 	if ( ! widgetType && hasResolvedWidgetType ) {
-		return <Placeholder>{ __( 'Widget is missing.' ) }</Placeholder>;
+		return (
+			<Placeholder
+				icon={ <BlockIcon icon={ brushIcon } /> }
+				label={ __( 'Legacy Widget' ) }
+			>
+				{ __( 'Widget is missing.' ) }
+			</Placeholder>
+		);
 	}
 
 	if ( ! hasResolvedWidgetType || hasPreview === null ) {
-		return <Spinner />;
+		return (
+			<Placeholder>
+				<Spinner />
+			</Placeholder>
+		);
 	}
 
 	return (
