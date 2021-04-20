@@ -46,7 +46,7 @@ export function DefaultBlockAppender( {
 	return (
 		<div
 			data-root-client-id={ rootClientId || '' }
-			className="wp-block block-editor-default-block-appender"
+			className="block-editor-default-block-appender"
 		>
 			<p
 				contentEditable
@@ -54,7 +54,7 @@ export function DefaultBlockAppender( {
 				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 				role="button"
 				aria-label={ __( 'Add block' ) }
-				className="block-editor-default-block-appender__content"
+				className="wp-block block-editor-default-block-appender__content"
 				onFocus={ onAppend }
 			>
 				{ showPrompt ? value : '' }
