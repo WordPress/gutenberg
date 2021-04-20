@@ -11,8 +11,13 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
--   [*] Image block: Improve text entry for long alt text. [#29670]
 -   [*] Image block: Add a "featured" banner. (Android only) [#30806]
+-   [**] The media upload options of the Image, Video and Gallery block automatically opens when the respective block is inserted. [#29546]
+
+## 1.51.0
+
+-   [*] Image block: Improve text entry for long alt text. [#29670]
+-   [*] a11y: Bug fix: Allow stepper cell to be selected by screenreader [#30694]
 
 ## 1.50.1
 
