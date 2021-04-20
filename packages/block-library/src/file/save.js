@@ -16,7 +16,7 @@ export default function save( { attributes } ) {
 		previewHeight,
 	} = attributes;
 
-	const embedLabel = RichText.isEmpty( fileName )
+	const pdfEmbedLabel = RichText.isEmpty( fileName )
 		? __( 'PDF embed' )
 		: sprintf(
 				/* translators: %s: filename. */
@@ -37,7 +37,7 @@ export default function save( { attributes } ) {
 								width: '100%',
 								height: `${ previewHeight }px`,
 							} }
-							aria-label={ embedLabel }
+							aria-label={ pdfEmbedLabel }
 						/>
 					</>
 				) }
@@ -45,7 +45,9 @@ export default function save( { attributes } ) {
 					<a
 						href={ textLinkHref }
 						target={ textLinkTarget }
-						rel={ textLinkTarget ? 'noreferrer noopener' : false }
+						rel={
+							textLinkTarget ? 'noreferrer noopener' : undefined
+						}
 					>
 						<RichText.Content value={ fileName } />
 					</a>
