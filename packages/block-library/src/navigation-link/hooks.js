@@ -46,7 +46,11 @@ export function enhanceNavigationLinkVariations( settings, name ) {
 	// Otherwise decorate server passed variations with an icon and isActive function
 	if ( settings.variations ) {
 		const isActive = ( blockAttributes, variationAttributes ) => {
-			return blockAttributes.type === variationAttributes.type;
+			const normalizedVariationKind = variationAttributes.kind.replace(
+				'-',
+				'_'
+			);
+			return blockAttributes.type === normalizedVariationKind;
 		};
 		const variations = settings.variations.map( ( variation ) => {
 			return {

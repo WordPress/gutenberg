@@ -58,8 +58,14 @@ const fallbackVariations = [
  */
 fallbackVariations.forEach( ( variation ) => {
 	if ( variation.isActive ) return;
-	variation.isActive = ( blockAttributes, variationAttributes ) =>
-		blockAttributes.type === variationAttributes.type;
+
+	variation.isActive = ( blockAttributes, variationAttributes ) => {
+		const normalizedVariationKind = variationAttributes.kind.replace(
+			'-',
+			'_'
+		);
+		return blockAttributes.type === normalizedVariationKind;
+	};
 } );
 
 export default fallbackVariations;
