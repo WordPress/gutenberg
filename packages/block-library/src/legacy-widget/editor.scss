@@ -49,17 +49,16 @@
 	}
 }
 
-.wp-block-legacy-widget__edit-preview-iframe {
-	overflow: auto;
+.wp-block-legacy-widget__edit-preview.is-offscreen {
+	left: -9999px;
+	position: absolute;
+	top: 0;
 	width: 100%;
+}
 
-	&.is-offscreen {
-		left: 0;
-		opacity: 0;
-		position: absolute;
-		right: 0;
-		top: 0;
-	}
+.wp-block-legacy-widget__edit-preview-iframe {
+	overflow: hidden;
+	width: 100%;
 }
 
 .wp-block-legacy-widget__edit-no-preview {
