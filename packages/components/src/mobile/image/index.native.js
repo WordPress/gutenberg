@@ -7,7 +7,7 @@ import { Image, Text, View } from 'react-native';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Icon, Badge } from '@wordpress/components';
+import { Icon } from '@wordpress/components';
 import { image as icon } from '@wordpress/icons';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { useEffect, useState } from '@wordpress/element';
@@ -36,7 +36,6 @@ const ImageComponent = ( {
 	height: imageHeight,
 	highlightSelected = true,
 	isSelected,
-	isFeaturedImage,
 	isUploadFailed,
 	isUploadInProgress,
 	mediaPickerOptions,
@@ -246,8 +245,6 @@ const ImageComponent = ( {
 					</View>
 				) }
 			</View>
-
-			{ isFeaturedImage && <Badge label={ __( 'Featured' ) } /> }
 
 			{ editButton && isSelected && ! isUploadInProgress && (
 				<ImageEditingButton

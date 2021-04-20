@@ -604,7 +604,6 @@ export class ImageEdit extends Component {
 										isSelected={
 											isSelected && ! isCaptionSelected
 										}
-										isFeaturedImage={ isFeaturedImage }
 										isUploadFailed={ isUploadFailed }
 										isUploadInProgress={
 											isUploadInProgress
