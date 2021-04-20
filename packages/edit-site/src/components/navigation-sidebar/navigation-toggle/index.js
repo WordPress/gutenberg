@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -15,15 +10,9 @@ import { store as coreDataStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import { store as editSiteStore } from '../../../store/index';
+import { store as editSiteStore } from '../../../store';
 
-function NavigationToggle( {
-	icon,
-	isOpen,
-	size = '36px',
-	className = '',
-	label = __( 'Toggle navigation' ),
-} ) {
+function NavigationToggle( { icon, isOpen } ) {
 	const {
 		isRequestingSiteIcon,
 		navigationPanelMenu,
@@ -60,11 +49,9 @@ function NavigationToggle( {
 		openNavigationPanelToMenu( navigationPanelMenu );
 	};
 
-	let buttonIcon = <Icon size={ size } icon={ wordpress } />;
+	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
 
-	if ( icon ) {
-		buttonIcon = <Icon size={ size } icon={ icon } />;
-	} else if ( siteIconUrl ) {
+	if ( siteIconUrl ) {
 		buttonIcon = (
 			<img
 				alt={ __( 'Site Icon' ) }
@@ -74,18 +61,19 @@ function NavigationToggle( {
 		);
 	} else if ( isRequestingSiteIcon ) {
 		buttonIcon = null;
+	} else if ( icon ) {
+		buttonIcon = <Icon size="36px" icon={ icon } />;
 	}
 
-	const classNames = classnames( 'edit-site-navigation-toggle', {
-		'is-open': isOpen,
-		[ className ]: true,
-	} );
-
 	return (
-		<div className={ classNames }>
+		<div
+			className={
+				'edit-site-navigation-toggle' + ( isOpen ? ' is-open' : '' )
+			}
+		>
 			<Button
 				className="edit-site-navigation-toggle__button has-icon"
-				label={ label }
+				label={ __( 'Toggle navigation' ) }
 				onClick={ toggleNavigationPanel }
 				showTooltip
 			>

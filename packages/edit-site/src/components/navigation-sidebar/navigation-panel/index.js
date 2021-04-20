@@ -11,8 +11,6 @@ import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { ESCAPE } from '@wordpress/keycodes';
-import { close } from '@wordpress/icons';
-import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -21,7 +19,6 @@ import ContentNavigation from './content-navigation';
 import TemplatesNavigation from './templates-navigation';
 import { MENU_ROOT } from './constants';
 import { store as editSiteStore } from '../../../store';
-import NavigationToggle from '../navigation-toggle';
 
 const NavigationPanel = ( { isOpen } ) => {
 	const [ contentActiveMenu, setContentActiveMenu ] = useState( MENU_ROOT );
@@ -75,13 +72,6 @@ const NavigationPanel = ( { isOpen } ) => {
 			tabIndex="-1"
 			onKeyDown={ closeOnEscape }
 		>
-			<NavigationToggle
-				isOpen={ isOpen }
-				size="24px"
-				icon={ close }
-				className="edit-site-navigation-panel__inner-toggle"
-				label={ __( 'Close navigation' ) }
-			/>
 			<div className="edit-site-navigation-panel__inner">
 				<div className="edit-site-navigation-panel__site-title-container">
 					<div className="edit-site-navigation-panel__site-title">

@@ -9,7 +9,7 @@ import { useSelect } from '@wordpress/data';
  */
 import NavigationPanel from './navigation-panel';
 import NavigationToggle from './navigation-toggle';
-import { store as editSiteStore } from '../../store/index';
+import { store as editSiteStore } from '../../store';
 
 export const {
 	Fill: NavigationPanelPreviewFill,
