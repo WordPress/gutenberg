@@ -25,8 +25,8 @@ status "Scaffolding block..."
 npx wp-create-block esnext-test --no-wp-scripts
 cd esnext-test
 
-status "Formatting JavaScript files..."
-../node_modules/.bin/wp-scripts format-js
+status "Formatting files..."
+../node_modules/.bin/wp-scripts format
 
 status "Building block..."
 ../node_modules/.bin/wp-scripts build

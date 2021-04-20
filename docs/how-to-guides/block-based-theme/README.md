@@ -172,7 +172,7 @@ Inside the block-templates folder, create an `index.html` file.
 
 In `index.html`, include the template parts by adding two HTML comments.
 
-The HTML comments starts with `wp:template-part` which is the name of the template-part block type. Inside the curly brackets are two keys and their values: The slug of the template part, and the theme name.
+The HTML comments starts with `wp:template-part` which is the name of the template-part block type. Inside the curly brackets are two keys and their values: The slug of the template part, and the theme text domain.
 
 ```
 <!-- wp:template-part {"slug":"header","theme":"myfirsttheme"} /-->
@@ -180,7 +180,7 @@ The HTML comments starts with `wp:template-part` which is the name of the templa
 <!-- wp:template-part {"slug":"footer","theme":"myfirsttheme"} /-->
 ```
 
-If you used a different theme name, adjust the value for the theme key.
+If you used a different theme name, adjust the value for the theme text domain.
 
 Eventually, you will be able to create and combine templates and template parts directly in the site editor.
 

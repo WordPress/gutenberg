@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useRef, createContext, useState } from '@wordpress/element';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -19,7 +19,6 @@ import useBlockDropZone from '../use-block-drop-zone';
 import useInsertionPoint from './insertion-point';
 import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
-import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 
@@ -30,7 +29,6 @@ export default function BlockList( { className, __experimentalLayout } ) {
 	const ref = useRef();
 	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
-	useScrollSelectionIntoView( ref );
 	usePreParsePatterns();
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -59,7 +57,7 @@ export default function BlockList( { className, __experimentalLayout } ) {
 			{ insertionPoint }
 			<BlockPopover />
 			<div
-				ref={ ref }
+				ref={ useMergeRefs( [ ref, useBlockDropZone() ] ) }
 				className={ classnames(
 					'block-editor-block-list__layout is-root-container',
 					className,
@@ -73,7 +71,6 @@ export default function BlockList( { className, __experimentalLayout } ) {
 			>
 				<SetBlockNodes.Provider value={ setBlockNodes }>
 					<BlockListItems
-						wrapperRef={ ref }
 						__experimentalLayout={ __experimentalLayout }
 					/>
 				</SetBlockNodes.Provider>
@@ -88,7 +85,6 @@ function Items( {
 	renderAppender,
 	__experimentalAppenderTagName,
 	__experimentalLayout: layout = defaultLayout,
-	wrapperRef,
 } ) {
 	function selector( select ) {
 		const {
@@ -111,11 +107,6 @@ function Items( {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 	} = useSelect( selector, [ rootClientId ] );
-
-	useBlockDropZone( {
-		element: wrapperRef,
-		rootClientId,
-	} );
 
 	return (
 		<LayoutProvider value={ layout }>

@@ -213,8 +213,7 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		$this->assertEquals( 'publish', $template->status );
 		$this->assertEquals( 'theme', $template->source );
 		$this->assertEquals( 'wp_template_part', $template->type );
-		// TODO - update 'UNCATEGORIZED' to 'HEADER' once tt1-blocks theme.json updated for template part area info.
-		$this->assertEquals( WP_TEMPLATE_PART_AREA_UNCATEGORIZED, $template->area );
+		$this->assertEquals( WP_TEMPLATE_PART_AREA_HEADER, $template->area );
 	}
 
 	/**
@@ -276,8 +275,13 @@ class Block_Templates_Test extends WP_UnitTestCase {
 		// Filter template part by area.
 		$templates    = gutenberg_get_block_templates( array( 'area' => WP_TEMPLATE_PART_AREA_HEADER ), 'wp_template_part' );
 		$template_ids = get_template_ids( $templates );
-		// TODO - update following array result once tt1-blocks theme.json is updated for area info.
-		$this->assertEquals( array( get_stylesheet() . '//' . 'my_template_part' ), $template_ids );
+		$this->assertEquals(
+			array(
+				get_stylesheet() . '//' . 'my_template_part',
+				get_stylesheet() . '//' . 'header',
+			),
+			$template_ids
+		);
 	}
 
 	/**

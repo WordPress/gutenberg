@@ -10,12 +10,12 @@
 		pointer-events: none;
 	}
 
-	&.is-resized {
+	&:not(.is-default-size) {
 		display: table;
 	}
 
 	// Provide a sane starting point for the size.
-	&:not(.is-resized) {
+	&.is-default-size {
 		width: 120px;
 
 		img {

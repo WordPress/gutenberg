@@ -51,6 +51,27 @@ register_block_pattern(
 );
 
 register_block_pattern(
+	'query/small-posts',
+	array(
+		'title'      => __( 'Small Image and Title', 'gutenberg' ),
+		'blockTypes' => array( 'core/query' ),
+		'categories' => array( 'Query' ),
+		'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
+						<!-- wp:query-loop -->
+						<!-- wp:columns {"verticalAlignment":"center"} -->
+						<div class="wp-block-columns are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"25%"} -->
+						<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:25%"><!-- wp:post-featured-image {"isLink":true} /--></div>
+						<!-- /wp:column -->
+						<!-- wp:column {"verticalAlignment":"center","width":"75%"} -->
+						<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:75%"><!-- wp:post-title {"isLink":true} /--></div>
+						<!-- /wp:column --></div>
+						<!-- /wp:columns -->
+						<!-- /wp:query-loop -->
+						<!-- /wp:query -->',
+	)
+);
+
+register_block_pattern(
 	'query/grid-posts',
 	array(
 		'title'      => __( 'Grid', 'gutenberg' ),
@@ -60,7 +81,7 @@ register_block_pattern(
 						<!-- wp:query-loop -->
 						<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
 						<main class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:post-title {"isLink":true} /-->
-						<!-- wp:post-excerpt /-->
+						<!-- wp:post-excerpt {"wordCount":20} /-->
 						<!-- wp:post-date /--></div>
 						<!-- /wp:group -->
 						<!-- /wp:query-loop -->
@@ -131,4 +152,93 @@ register_block_pattern(
 						<!-- /wp:columns --></main>
 						<!-- /wp:group -->',
 	)
+);
+
+// Initial block patterns to be used in block transformations with patterns.
+register_block_pattern(
+	'paragraph/large-with-background-color',
+	array(
+		'title'         => __( 'Large Paragraph with background color', 'gutenberg' ),
+		'categories'    => array( 'Text' ),
+		'blockTypes'    => array( 'core/paragraph' ),
+		'viewportWidth' => 500,
+		'content'       => '<!-- wp:paragraph {"style":{"color":{"link":"#FFFFFF","text":"#FFFFFF","background":"#000000"},"typography":{"lineHeight":"1.3","fontSize":"26px"}}} -->
+							<p class="has-text-color has-background has-link-color" style="--wp--style--color--link:#FFFFFF;background-color:#000000;color:#FFFFFF;font-size:26px;line-height:1.3">The whole series of my life appeared to me as a dream; I sometimes doubted if indeed it were all true, for it never presented itself to my mind with the force of reality.</p>
+							<!-- /wp:paragraph -->',
+	)
+);
+register_block_pattern(
+	'social-links/shared-background-color',
+	array(
+		'title'         => __( 'Social links with a shared background color', 'gutenberg' ),
+		'categories'    => array( 'Buttons' ),
+		'blockTypes'    => array( 'core/social-links' ),
+		'viewportWidth' => 500,
+		'content'       => '<!-- wp:social-links {"customIconColor":"#ffffff","iconColorValue":"#ffffff","customIconBackgroundColor":"#3962e3","iconBackgroundColorValue":"#3962e3","className":"has-icon-color"} -->
+							<ul class="wp-block-social-links has-icon-color has-icon-background-color"><!-- wp:social-link {"url":"https://wordpress.org","service":"wordpress"} /-->
+							<!-- wp:social-link {"url":"#","service":"chain"} /-->
+							<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
+							<!-- /wp:social-links -->',
+	)
+);
+
+// Deactivate the legacy patterns bundled with WordPress, and add new block patterns for testing.
+// More details in the trac issue (https://core.trac.wordpress.org/ticket/52846).
+add_action(
+	'init',
+	function() {
+
+		$core_block_patterns = array(
+			'text-two-columns',
+			'two-buttons',
+			'two-images',
+			'text-two-columns-with-images',
+			'text-three-columns-buttons',
+			'large-header',
+			'large-header-button',
+			'three-buttons',
+			'heading-paragraph',
+			'quote',
+		);
+
+		$new_core_block_patterns = array(
+			'media-text-nature',
+			'two-images-gallery',
+			'three-columns-media-text',
+			'quote',
+			'large-header-left',
+			'large-header-text-button',
+			'media-text-art',
+			'text-two-columns-title',
+			'three-columns-text',
+			'text-two-columns-title-offset',
+			'heading',
+			'three-images-gallery',
+			'text-two-columns',
+			'media-text-arquitecture',
+			'two-buttons',
+		);
+
+		if ( ! function_exists( 'unregister_block_pattern' ) ) {
+			return;
+		}
+
+		foreach ( $core_block_patterns as $core_block_pattern ) {
+			unregister_block_pattern( 'core/' . $core_block_pattern );
+		}
+
+		register_block_pattern_category( 'buttons', array( 'label' => _x( 'Buttons', 'Block pattern category', 'default' ) ) );
+		register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category', 'default' ) ) );
+		register_block_pattern_category( 'header', array( 'label' => _x( 'Headers', 'Block pattern category', 'default' ) ) );
+		register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category', 'default' ) ) );
+		register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category', 'default' ) ) );
+
+		foreach ( $new_core_block_patterns as $core_block_pattern ) {
+			register_block_pattern(
+				'core/' . $core_block_pattern,
+				require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
+			);
+		}
+
+	}
 );

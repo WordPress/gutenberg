@@ -49,6 +49,13 @@ class WP_Theme_JSON_Resolver {
 	private static $user_custom_post_type_id = null;
 
 	/**
+	 * Structure to hold i18n metadata.
+	 *
+	 * @var Array
+	 */
+	private static $theme_json_i18n = null;
+
+	/**
 	 * Processes a file that adheres to the theme.json
 	 * schema and returns an array with its contents,
 	 * or a void array if none found.
@@ -143,12 +150,11 @@ class WP_Theme_JSON_Resolver {
 	 * @return array An array of theme.json fields that are translatable and the keys that are translatable
 	 */
 	public static function get_fields_to_translate() {
-		static $theme_json_i18n = null;
-		if ( null === $theme_json_i18n ) {
-			$file_structure  = self::read_json_file( __DIR__ . '/experimental-i18n-theme.json' );
-			$theme_json_i18n = self::extract_paths_to_translate( $file_structure );
+		if ( null === self::$theme_json_i18n ) {
+			$file_structure        = self::read_json_file( __DIR__ . '/experimental-i18n-theme.json' );
+			self::$theme_json_i18n = self::extract_paths_to_translate( $file_structure );
 		}
-		return $theme_json_i18n;
+		return self::$theme_json_i18n;
 	}
 
 	/**
@@ -494,4 +500,18 @@ class WP_Theme_JSON_Resolver {
 		return $located;
 	}
 
+	/**
+	 * Cleans the cached data so it can be recalculated.
+	 */
+	public static function clean_cached_data() {
+		self::$core                     = null;
+		self::$theme                    = null;
+		self::$user                     = null;
+		self::$user_custom_post_type_id = null;
+		self::$theme_has_support        = null;
+		self::$theme_json_i18n          = null;
+	}
+
 }
+
+add_action( 'switch_theme', array( 'WP_Theme_JSON_Resolver', 'clean_cached_data' ) );

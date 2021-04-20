@@ -9,7 +9,7 @@ import { some, groupBy } from 'lodash';
 import { Button, withFocusReturn } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
 import { close as closeIcon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -27,6 +27,13 @@ const TRANSLATED_SITE_PROTPERTIES = {
 };
 
 function EntitiesSavedStates( { isOpen, close } ) {
+	const saveButtonRef = useRef();
+	useEffect( () => {
+		if ( isOpen ) {
+			// Focus the save button when the saved states panel is opened
+			saveButtonRef.current?.focus();
+		}
+	}, [ isOpen ] );
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
 		const dirtyRecords = select(
 			coreStore
@@ -130,6 +137,7 @@ function EntitiesSavedStates( { isOpen, close } ) {
 		<div className="entities-saved-states__panel">
 			<div className="entities-saved-states__panel-header">
 				<Button
+					ref={ saveButtonRef }
 					isPrimary
 					disabled={
 						dirtyEntityRecords.length -

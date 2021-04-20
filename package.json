@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "10.4.0-rc.1",
+	"version": "10.4.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -99,6 +99,7 @@
 		"@storybook/react": "6.2.5",
 		"@testing-library/jest-dom": "5.11.9",
 		"@testing-library/react": "11.2.2",
+		"@testing-library/react-native": "7.1.0",
 		"@types/classnames": "2.2.10",
 		"@types/eslint": "6.8.0",
 		"@types/estree": "0.0.44",
@@ -229,6 +230,7 @@
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
+		"format": "wp-scripts format",
 		"format-js": "wp-scripts format-js",
 		"format-php": "wp-env run composer run-script format",
 		"lint": "concurrently \"npm run lint-lockfile\" \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
@@ -248,7 +250,7 @@
 		"prepublishOnly": "npm run clean:package-types && npm run build:packages",
 		"publish:check": "lerna updated",
 		"publish:patch": "lerna publish --dist-tag patch",
-		"publish:prod": "lerna publish",
+		"publish:latest": "lerna publish",
 		"test": "npm run lint && npm run test-unit",
 		"test:create-block": "./bin/test-create-block.sh",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
@@ -291,8 +293,8 @@
 		"*.scss": [
 			"wp-scripts lint-style"
 		],
-		"*.{js,ts,tsx}": [
-			"wp-scripts format-js",
+		"*.{js,ts,tsx,yml}": [
+			"wp-scripts format",
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [

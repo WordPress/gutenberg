@@ -2,8 +2,10 @@
 	{
 		"blockName": "core/button",
 		"attrs": {
-			"borderRadius": 0,
 			"style": {
+				"border": {
+					"radius": 0
+				},
 				"color": {
 					"text": "#1b9b6c",
 					"background": "#aa5a20"
