@@ -30,13 +30,13 @@
 		transform: scale(1);
 		transition: all 0.1s ease;
 		@include reduce-motion("transition");
-	}
 
-	// Show one appender at a time.
-	display: none;
+		// Show one appender at a time.
+		display: none;
+	}
 }
 
-.block-editor-block-list__block.is-selected .block-list-appender {
+.block-editor-block-list__block.is-selected .block-list-appender .block-list-appender__toggle {
 	display: block;
 }
 
