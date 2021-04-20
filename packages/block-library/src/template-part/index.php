@@ -114,8 +114,8 @@ function render_block_core_template_part( $attributes ) {
 		$area_tag      = 'div';
 		if ( null !== $area ) {
 			foreach ( $defined_areas as $defined_area ) {
-				if ( $defined_area['area'] === $area && isset( $defined_area['defaultWrapperElement'] ) ) {
-					$area_tag = $defined_area['defaultWrapperElement'];
+				if ( $defined_area['area'] === $area && isset( $defined_area['area_tag'] ) ) {
+					$area_tag = $defined_area['area_tag'];
 				}
 			}
 		}

@@ -66,8 +66,10 @@ export default function TemplatePartEdit( {
 
 			const defaultWrapperElement = select( editorStore )
 				.__experimentalGetDefaultTemplatePartAreas()
-				.find( ( { area } ) => area === entityRecord?.area )
-				?.defaultWrapperElement;
+				.find(
+					( { area } ) =>
+						area === ( entityRecord?.area || attributes.area )
+				)?.area_tag;
 
 			return {
 				innerBlocks: getBlocks( clientId ),
