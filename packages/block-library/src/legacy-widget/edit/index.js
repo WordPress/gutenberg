@@ -16,7 +16,7 @@ import {
 } from '@wordpress/components';
 import { brush as brushIcon, update as updateIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -83,8 +83,6 @@ function NotEmpty( {
 	setAttributes,
 	isSelected,
 } ) {
-	const [ pendingInstance, setPendingInstance ] = useState( instance );
-
 	const { widgetType, hasResolvedWidgetType, isWidgetTypeHidden } = useSelect(
 		( select ) => {
 			const widgetTypeId = id ?? idBase;
@@ -104,23 +102,16 @@ function NotEmpty( {
 
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
+	const setInstance = useCallback( ( nextInstance ) => {
+		setAttributes( { instance: nextInstance } );
+	}, [] );
+
 	const { content, setFormData, hasPreview } = useForm( {
 		id,
 		idBase,
-		instance: pendingInstance,
-		setInstance: setPendingInstance,
+		instance,
+		setInstance,
 	} );
-
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setPendingInstance( instance );
-		}
-	}, [ isSelected ] );
-
-	const applyChanges = () => {
-		setAttributes( { instance: pendingInstance } );
-		clearSelectedBlock();
-	};
 
 	if ( ! widgetType && hasResolvedWidgetType ) {
 		return (
@@ -161,11 +152,8 @@ function NotEmpty( {
 				) }
 				{ idBase && (
 					<ToolbarGroup>
-						<ToolbarButton onClick={ applyChanges }>
-							{ __( 'Apply' ) }
-						</ToolbarButton>
 						<ToolbarButton onClick={ clearSelectedBlock }>
-							{ __( 'Cancel' ) }
+							{ __( 'Done editing' ) }
 						</ToolbarButton>
 					</ToolbarGroup>
 				) }
