@@ -124,7 +124,7 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidMount() {
-		const { attributes, setAttributes, featuredImageId } = this.props;
+		const { attributes, setAttributes } = this.props;
 		// This will warn when we have `id` defined, while `url` is undefined.
 		// This may help track this issue: https://github.com/wordpress-mobile/WordPress-Android/issues/9768
 		// where a cancelled image upload was resulting in a subsequent crash.
@@ -154,11 +154,6 @@ export class ImageEdit extends Component {
 			getProtocol( attributes.url ) === 'file:'
 		) {
 			mediaUploadSync();
-		}
-
-		// Flag the ID of a post's featured image when editor mounts.
-		if ( attributes.id ) {
-			setAttributes( { featuredImageId } );
 		}
 	}
 
