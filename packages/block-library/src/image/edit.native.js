@@ -477,7 +477,7 @@ export class ImageEdit extends Component {
 		);
 
 		// eslint-disable-next-line no-unused-vars
-		const androidOnly = Platform.OS === 'android' ? true : false;
+		const androidOnly = Platform.OS === 'android';
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
