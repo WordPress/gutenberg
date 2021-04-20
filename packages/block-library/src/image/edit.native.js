@@ -26,6 +26,7 @@ import {
 	LinkSettingsNavigation,
 	BottomSheetTextControl,
 	FooterMessageLink,
+	Badge,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -437,6 +438,7 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
+			featuredImageId,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
@@ -444,6 +446,8 @@ export class ImageEdit extends Component {
 			'value',
 			imageDefaultSize,
 		] );
+
+		const isFeaturedImage = featuredImageId === attributes.id;
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -507,7 +511,7 @@ export class ImageEdit extends Component {
 		};
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
-			<>
+			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>
 				<TouchableWithoutFeedback
 					accessible={ ! isSelected }
 					onPress={ this.onImagePressed }
@@ -571,7 +575,7 @@ export class ImageEdit extends Component {
 					onBlur={ this.props.onBlur } // always assign onBlur as props
 					insertBlocksAfter={ this.props.insertBlocksAfter }
 				/>
-			</>
+			</Badge>
 		);
 
 		return (
@@ -591,12 +595,14 @@ export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( coreStore );
 		const { getSettings } = select( blockEditorStore );
+		const { getEditedPostAttribute } = select( 'core/editor' );
 		const {
 			attributes: { id, url },
 			isSelected,
 		} = props;
 		const { imageSizes, imageDefaultSize } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
+		const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 		const shouldGetMedia =
 			( isSelected && isNotFileUrl ) ||
@@ -610,6 +616,7 @@ export default compose( [
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
 			imageDefaultSize,
+			featuredImageId,
 		};
 	} ),
 	withPreferredColorScheme,
