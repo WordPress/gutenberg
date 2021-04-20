@@ -5,7 +5,8 @@
  * @package gutenberg
  */
 
-register_block_pattern_category( 'Query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
+// Register categories used for block patterns.
+register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
 
 // Initial Query block patterns.
 register_block_pattern(
@@ -13,7 +14,7 @@ register_block_pattern(
 	array(
 		'title'      => __( 'Standard', 'gutenberg' ),
 		'blockTypes' => array( 'core/query' ),
-		'categories' => array( 'Query' ),
+		'categories' => array( 'query' ),
 		'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
 						<!-- wp:query-loop -->
 						<!-- wp:post-title {"isLink":true} /-->
@@ -31,9 +32,9 @@ register_block_pattern(
 register_block_pattern(
 	'query/medium-posts',
 	array(
-		'title'      => __( 'Image at Left', 'gutenberg' ),
+		'title'      => __( 'Image at left', 'gutenberg' ),
 		'blockTypes' => array( 'core/query' ),
-		'categories' => array( 'Query' ),
+		'categories' => array( 'query' ),
 		'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
 						<!-- wp:query-loop -->
 						<!-- wp:columns {"align":"wide"} -->
@@ -53,9 +54,9 @@ register_block_pattern(
 register_block_pattern(
 	'query/small-posts',
 	array(
-		'title'      => __( 'Small Image and Title', 'gutenberg' ),
+		'title'      => __( 'Small image and title', 'gutenberg' ),
 		'blockTypes' => array( 'core/query' ),
-		'categories' => array( 'Query' ),
+		'categories' => array( 'query' ),
 		'content'    => '<!-- wp:query {"query":{"perPage":1,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
 						<!-- wp:query-loop -->
 						<!-- wp:columns {"verticalAlignment":"center"} -->
@@ -76,7 +77,7 @@ register_block_pattern(
 	array(
 		'title'      => __( 'Grid', 'gutenberg' ),
 		'blockTypes' => array( 'core/query' ),
-		'categories' => array( 'Query' ),
+		'categories' => array( 'query' ),
 		'content'    => '<!-- wp:query {"query":{"perPage":6,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"exclude","inherit":true},"layout":{"type":"flex","columns":3}} -->
 						<!-- wp:query-loop -->
 						<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
@@ -92,9 +93,9 @@ register_block_pattern(
 register_block_pattern(
 	'query/large-title-posts',
 	array(
-		'title'      => __( 'Large Title', 'gutenberg' ),
+		'title'      => __( 'Large title', 'gutenberg' ),
 		'blockTypes' => array( 'core/query' ),
-		'categories' => array( 'Query' ),
+		'categories' => array( 'query' ),
 		'content'    => '<!-- wp:group {"align":"full","style":{"spacing":{"padding":{"top":"100px","right":"100px","bottom":"100px","left":"100px"}},"color":{"text":"#ffffff","background":"#000000"}}} -->
 						<div class="wp-block-group alignfull has-text-color has-background" style="background-color:#000000;color:#ffffff;padding-top:100px;padding-right:100px;padding-bottom:100px;padding-left:100px"><!-- wp:query {"query":{"perPage":3,"pages":0,"offset":0,"postType":"post","categoryIds":[],"tagIds":[],"order":"desc","orderBy":"date","author":"","search":"","exclude":[],"sticky":"","inherit":true}} -->
 						<!-- wp:query-loop -->
@@ -122,7 +123,7 @@ register_block_pattern(
 	array(
 		'title'      => __( 'Offset', 'gutenberg' ),
 		'blockTypes' => array( 'core/query' ),
-		'categories' => array( 'Query' ),
+		'categories' => array( 'query' ),
 		'content'    => '<!-- wp:group {"tagName":"main","style":{"spacing":{"padding":{"top":"30px","right":"30px","bottom":"30px","left":"30px"}}},"layout":{"inherit":false}} -->
 						<main class="wp-block-group" style="padding-top:30px;padding-right:30px;padding-bottom:30px;padding-left:30px"><!-- wp:columns -->
 						<div class="wp-block-columns"><!-- wp:column {"width":"50%"} -->
@@ -158,8 +159,8 @@ register_block_pattern(
 register_block_pattern(
 	'paragraph/large-with-background-color',
 	array(
-		'title'         => __( 'Large Paragraph with background color', 'gutenberg' ),
-		'categories'    => array( 'Text' ),
+		'title'         => __( 'Large paragraph with background color', 'gutenberg' ),
+		'categories'    => array( 'text' ),
 		'blockTypes'    => array( 'core/paragraph' ),
 		'viewportWidth' => 500,
 		'content'       => '<!-- wp:paragraph {"style":{"color":{"link":"#FFFFFF","text":"#FFFFFF","background":"#000000"},"typography":{"lineHeight":"1.3","fontSize":"26px"}}} -->
@@ -171,7 +172,7 @@ register_block_pattern(
 	'social-links/shared-background-color',
 	array(
 		'title'         => __( 'Social links with a shared background color', 'gutenberg' ),
-		'categories'    => array( 'Buttons' ),
+		'categories'    => array( 'buttons' ),
 		'blockTypes'    => array( 'core/social-links' ),
 		'viewportWidth' => 500,
 		'content'       => '<!-- wp:social-links {"customIconColor":"#ffffff","iconColorValue":"#ffffff","customIconBackgroundColor":"#3962e3","iconBackgroundColorValue":"#3962e3","className":"has-icon-color"} -->
@@ -226,12 +227,6 @@ add_action(
 		foreach ( $core_block_patterns as $core_block_pattern ) {
 			unregister_block_pattern( 'core/' . $core_block_pattern );
 		}
-
-		register_block_pattern_category( 'buttons', array( 'label' => _x( 'Buttons', 'Block pattern category', 'default' ) ) );
-		register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category', 'default' ) ) );
-		register_block_pattern_category( 'header', array( 'label' => _x( 'Headers', 'Block pattern category', 'default' ) ) );
-		register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category', 'default' ) ) );
-		register_block_pattern_category( 'text', array( 'label' => _x( 'Text', 'Block pattern category', 'default' ) ) );
 
 		foreach ( $new_core_block_patterns as $core_block_pattern ) {
 			register_block_pattern(
