@@ -17,7 +17,7 @@ import { store as blockEditorStore } from '../../store';
  * Zero width non-breaking space, used as padding for the paragraph when it is
  * empty.
  */
-const ZWNBSP = '\ufeff';
+export const ZWNBSP = '\ufeff';
 
 export function DefaultBlockAppender( {
 	isLocked,
