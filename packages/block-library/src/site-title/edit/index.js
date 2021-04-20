@@ -14,13 +14,18 @@ import {
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import LevelToolbar from './level-toolbar';
 
-export default function SiteTitleEdit( { attributes, setAttributes } ) {
+export default function SiteTitleEdit( {
+	attributes,
+	setAttributes,
+	insertBlocksAfter,
+} ) {
 	const { level, textAlign } = attributes;
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
 	const TagName = level === 0 ? 'p' : `h${ level }`;
@@ -56,6 +61,11 @@ export default function SiteTitleEdit( { attributes, setAttributes } ) {
 					onChange={ setTitle }
 					allowedFormats={ [] }
 					disableLineBreaks
+					__unstableOnSplitAtEnd={ () =>
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						)
+					}
 				/>
 			</TagName>
 		</>
