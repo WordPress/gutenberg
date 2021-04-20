@@ -96,8 +96,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	unset( $settings['fontSizes'] );
 	unset( $settings['gradients'] );
 
-	$is_rest_request = defined( 'REST_REQUEST' ) && REST_REQUEST;
-	$origin          = 'theme';
+	$origin = 'theme';
 	if (
 		WP_Theme_JSON_Resolver::theme_has_support() &&
 		gutenberg_supports_block_templates()
@@ -120,12 +119,11 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// In the site editor, the user can change styles, so the client
 	// needs the ability to create them. Hence, we pass it some data
 	// for this: base styles (core+theme) and the ID of the user CPT.
-	$screen = ! $is_rest_request ? get_current_screen() : null;
+	$screen = get_current_screen();
 	if (
-		( ( ! empty( $screen ) &&
+		! empty( $screen ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
-		gutenberg_is_edit_site_page( $screen->id ) ||
-		$is_rest_request ) ) &&
+		gutenberg_is_edit_site_page( $screen->id ) &&
 		WP_Theme_JSON_Resolver::theme_has_support() &&
 		gutenberg_supports_block_templates()
 	) {
