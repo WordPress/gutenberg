@@ -76,10 +76,7 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	 */
 	public function get_items( $request ) {
 		$context  = ! empty( $request['context'] ) ? $request['context'] : 'post-editor';
-		$settings = array_merge(
-			apply_filters( 'block_editor_settings', array() ),
-			gutenberg_get_block_editor_settings( $context )
-		);
+		$settings = gutenberg_get_block_editor_settings( $context );
 
 		return rest_ensure_response( $settings );
 	}
