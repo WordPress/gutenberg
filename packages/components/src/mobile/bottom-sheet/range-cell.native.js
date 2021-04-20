@@ -214,6 +214,7 @@ class BottomSheetRangeCell extends Component {
 						<View style={ containerStyle }>
 							{ preview }
 							<Slider
+								testID={ `Slider ${ cellProps.label }` }
 								value={ sliderValue }
 								defaultValue={ defaultValue }
 								disabled={ disabled }

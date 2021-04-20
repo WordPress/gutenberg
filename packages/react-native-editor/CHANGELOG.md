@@ -13,6 +13,12 @@ For each user feature we should also add a importance categorization label  to i
 
 -   [*] Image block: Improve text entry for long alt text. [#29670]
 -   [***] Search block now available on mobile! [https://github.com/WordPress/gutenberg/pull/30783]
+-   [*] Image block: Add a "featured" banner. (Android only) [#30806]
+
+## 1.51.0
+
+-   [*] Image block: Improve text entry for long alt text. [#29670]
+-   [*] a11y: Bug fix: Allow stepper cell to be selected by screenreader [#30694]
 
 ## 1.50.1
 
