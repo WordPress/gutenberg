@@ -918,9 +918,9 @@ export class RichText extends Component {
 			maxWidth && this.state.width && maxWidth - this.state.width < 10
 				? maxWidth
 				: this.state.width;
-		const containerStyles = style?.padding &&
+		const containerStyles = style?.containerPadding &&
 			style?.backgroundColor && {
-				padding: style.padding,
+				padding: style.containerPadding,
 				backgroundColor: style.backgroundColor,
 			};
 

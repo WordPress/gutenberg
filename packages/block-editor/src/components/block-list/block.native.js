@@ -58,7 +58,8 @@ function BlockForType( {
 			globalStyle,
 			wrapperProps.style,
 			attributes,
-			defaultColors
+			defaultColors,
+			name
 		);
 	}, [
 		defaultColors,

@@ -123,5 +123,30 @@ export default {
 				},
 			},
 		},
+		blocks: {
+			'core/heading': {
+				elements: {
+					link: {
+						color: {
+							text: 'var(--wp--preset--color--yellow)',
+						},
+					},
+				},
+				color: {
+					text: 'var(--wp--preset--color--white)',
+					background: 'var(--wp--preset--color--dark-gray)',
+				},
+			},
+			'core/quote': {
+				color: {
+					text: 'var(--wp--preset--color--red)',
+				},
+			},
+			'core/cover': {
+				color: {
+					text: 'var(--wp--preset--color--green)',
+				},
+			},
+		},
 	},
 };

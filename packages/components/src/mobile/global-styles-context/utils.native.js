@@ -3,28 +3,39 @@
  */
 import { find, startsWith } from 'lodash';
 
-export const BLOCK_STYLE_ATTRIBUTES = [ 'textColor', 'backgroundColor' ];
+export const BLOCK_STYLE_ATTRIBUTES = [
+	'textColor',
+	'backgroundColor',
+	'style',
+];
 
 // Mapping style properties name to native
 const BLOCK_STYLE_ATTRIBUTES_MAPPING = {
 	textColor: 'color',
+	text: 'color',
+	background: 'backgroundColor',
+	link: 'linkColor',
+	placeholder: 'placeholderColor',
 };
 
-const PADDING = 12; // solid-border-space
+const PADDING = 12; // $solid-border-space
+const UNKNOWN_VALUE = 'undefined';
 
 export function getBlockPaddings(
 	mergedStyle,
 	wrapperPropsStyle,
-	blockStyleAttributes
+	blockStyleAttributes,
+	blockColors
 ) {
 	const blockPaddings = {};
 
 	if (
 		! mergedStyle.padding &&
 		( wrapperPropsStyle?.backgroundColor ||
-			blockStyleAttributes?.backgroundColor )
+			blockStyleAttributes?.backgroundColor ||
+			blockColors?.backgroundColor )
 	) {
-		blockPaddings.padding = PADDING;
+		blockPaddings.containerPadding = PADDING;
 		return blockPaddings;
 	}
 
@@ -34,15 +45,53 @@ export function getBlockPaddings(
 		! wrapperPropsStyle?.backgroundColor &&
 		! blockStyleAttributes?.backgroundColor
 	) {
-		blockPaddings.padding = undefined;
+		blockPaddings.containerPadding = undefined;
 	}
 
 	return blockPaddings;
 }
 
-export function getBlockColors( blockStyleAttributes, defaultColors ) {
+export function getBlockColors(
+	blockStyleAttributes,
+	defaultColors,
+	blockName,
+	baseGlobalStyles
+) {
 	const blockStyles = {};
+	const customBlockStyles = blockStyleAttributes?.style?.color || {};
+	const blockGlobalStyles = baseGlobalStyles?.blocks?.[ blockName ];
 
+	// Global styles colors
+	if ( blockGlobalStyles?.color ) {
+		Object.entries( blockGlobalStyles.color ).forEach(
+			( [ key, value ] ) => {
+				const styleKey = BLOCK_STYLE_ATTRIBUTES_MAPPING[ key ];
+
+				if ( styleKey && value !== UNKNOWN_VALUE ) {
+					const color = customBlockStyles[ key ] ?? value;
+					blockStyles[ styleKey ] = color;
+
+					if ( styleKey === BLOCK_STYLE_ATTRIBUTES_MAPPING.text ) {
+						blockStyles[
+							BLOCK_STYLE_ATTRIBUTES_MAPPING.placeholder
+						] = color;
+					}
+				}
+			}
+		);
+	}
+
+	// Global styles elements
+	if ( blockGlobalStyles?.elements ) {
+		const linkColor = blockGlobalStyles.elements?.link?.color?.text;
+		const styleKey = BLOCK_STYLE_ATTRIBUTES_MAPPING.link;
+
+		if ( styleKey && linkColor && linkColor !== UNKNOWN_VALUE ) {
+			blockStyles[ styleKey ] = linkColor;
+		}
+	}
+
+	// Custom colors
 	Object.entries( blockStyleAttributes ).forEach( ( [ key, value ] ) => {
 		const isCustomColor = startsWith( value, '#' );
 		let styleKey = key;

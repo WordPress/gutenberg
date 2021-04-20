@@ -32,7 +32,8 @@ function ParagraphBlock( {
 	const styles = {
 		...( mergedStyle?.baseColors && {
 			color: mergedStyle.baseColors?.color?.text,
-			placeholderColor: mergedStyle.baseColors?.color?.text,
+			placeholderColor:
+				mergedStyle.color || mergedStyle.baseColors?.color?.text,
 			linkColor: mergedStyle.baseColors?.elements?.link?.color?.text,
 		} ),
 		...mergedStyle,
