@@ -6,35 +6,12 @@ import { debounce } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
-import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-import {
-	useEffect,
-	useRef,
-	useState,
-	useCallback,
-	RawHTML,
-} from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
+import { useEffect, useRef, useCallback, RawHTML } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 
-export default function Form( {
-	id,
-	idBase,
-	instance,
-	setInstance,
-	setHasPreview,
-} ) {
-	const { content, setFormData } = useForm( {
-		id,
-		idBase,
-		instance,
-		setInstance,
-		setHasPreview,
-	} );
-
+export default function Form( { id, idBase, content, setFormData } ) {
 	const setFormDataDebounced = useCallback( debounce( setFormData, 300 ), [
 		setFormData,
 	] );
@@ -51,128 +28,6 @@ export default function Form( {
 			key={ content.key }
 		/>
 	);
-}
-
-function useForm( { id, idBase, instance, setInstance, setHasPreview } ) {
-	const isStillMounted = useRef( false );
-	const outgoingInstances = useRef( new Set() );
-	const [ content, setContent ] = useState( { html: null, key: 0 } );
-
-	const { createNotice } = useDispatch( noticesStore );
-
-	useEffect( () => {
-		isStillMounted.current = true;
-		return () => ( isStillMounted.current = false );
-	}, [] );
-
-	useEffect( () => {
-		if ( outgoingInstances.current.has( instance ) ) {
-			outgoingInstances.current.delete( instance );
-			return;
-		}
-
-		( async () => {
-			try {
-				if ( id ) {
-					const { form } = await saveWidget( id );
-					if ( isStillMounted.current ) {
-						setContent( ( { key } ) => ( {
-							html: form,
-							key: key + 1,
-						} ) );
-					}
-				} else if ( idBase ) {
-					const { form, preview } = await encodeWidget(
-						idBase,
-						instance
-					);
-					if ( isStillMounted.current ) {
-						setContent( ( { key } ) => ( {
-							html: form,
-							key: key + 1,
-						} ) );
-						setHasPreview( !! preview );
-					}
-				}
-			} catch ( error ) {
-				createNotice(
-					'error',
-					error?.message ??
-						__( 'An error occured while fetching the widget.' )
-				);
-			}
-		} )();
-	}, [ id, idBase, instance ] );
-
-	const setFormData = useCallback(
-		async ( formData ) => {
-			try {
-				if ( id ) {
-					const { form } = await saveWidget( id, formData );
-					if ( isStillMounted.current ) {
-						setContent( ( { key } ) => ( {
-							html: form,
-							key: key + 1,
-						} ) );
-					}
-				} else if ( idBase ) {
-					const {
-						instance: nextInstance,
-						preview,
-					} = await encodeWidget( idBase, instance, formData );
-					if ( isStillMounted.current ) {
-						outgoingInstances.current.add( nextInstance );
-						setInstance( nextInstance );
-						setHasPreview( !! preview );
-					}
-				}
-			} catch ( error ) {
-				createNotice(
-					'error',
-					error?.message ??
-						__( 'An error occured while updating the widget.' )
-				);
-			}
-		},
-		[ id, idBase ]
-	);
-
-	return { content, setFormData };
-}
-
-async function saveWidget( id, formData = null ) {
-	let widget;
-	if ( formData ) {
-		widget = await apiFetch( {
-			path: `/wp/v2/widgets/${ id }?context=edit`,
-			method: 'PUT',
-			data: {
-				form_data: formData,
-			},
-		} );
-	} else {
-		widget = await apiFetch( {
-			path: `/wp/v2/widgets/${ id }?context=edit`,
-			method: 'GET',
-		} );
-	}
-	return { form: widget.rendered_form };
-}
-
-async function encodeWidget( idBase, instance, formData = null ) {
-	const response = await apiFetch( {
-		path: `/wp/v2/widget-types/${ idBase }/encode`,
-		method: 'POST',
-		data: {
-			instance,
-			form_data: formData,
-		},
-	} );
-	return {
-		instance: response.instance,
-		form: response.form,
-		preview: response.preview,
-	};
 }
 
 function Control( { id, idBase, content, onChange, onSave } ) {
