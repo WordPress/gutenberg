@@ -43,7 +43,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     private static final String EVENT_NAME_MEDIA_SAVE = "mediaSave";
     private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
 
-    private static final String EVENT_FEATURED_IMAGE_ID_CURRENT = "featuredImageIdCurrent";
+    private static final String EVENT_FEATURED_IMAGE_ID_NATIVE_UPDATED = "featuredImageIdNativeUpdated";
 
     private static final String MAP_KEY_MEDIA_FILE_STATE = "state";
     private static final String MAP_KEY_MEDIA_FILE_MEDIA_ACTION_PROGRESS = "progress";
@@ -213,7 +213,7 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     public void sendToJSFeaturedImageId(int mediaId) {
         WritableMap writableMap = new WritableNativeMap();
         writableMap.putInt(MAP_KEY_FEATURED_IMAGE_ID, mediaId);
-        queueActionToJS(EVENT_FEATURED_IMAGE_ID_CURRENT, writableMap);
+        queueActionToJS(EVENT_FEATURED_IMAGE_ID_NATIVE_UPDATED, writableMap);
     }
 
     @Override public void onReplaceMediaFilesEditedBlock(String mediaFiles, String blockId) {

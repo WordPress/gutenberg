@@ -62,11 +62,13 @@ export function subscribeUpdateHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'updateHtml', callback );
 }
 
-export function subscribeFeaturedImageIdCurrent( callback ) {
-	return gutenbergBridgeEvents.addListener(
-		'featuredImageIdCurrent',
-		callback
-	);
+export function subscribeFeaturedImageIdNativeUpdated( callback ) {
+	return isAndroid
+		? gutenbergBridgeEvents.addListener(
+				'featuredImageIdNativeUpdated',
+				callback
+		  )
+		: undefined;
 }
 
 /**

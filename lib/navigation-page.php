@@ -33,7 +33,7 @@ function gutenberg_navigation_init( $hook ) {
 	}
 
 	$settings = array_merge(
-		gutenberg_get_common_block_editor_settings(),
+		gutenberg_get_default_block_editor_settings(),
 		array(
 			'blockNavMenus' => get_theme_support( 'block-nav-menus' ),
 		)

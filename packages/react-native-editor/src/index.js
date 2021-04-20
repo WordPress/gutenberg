@@ -70,7 +70,7 @@ const setupInitHooks = () => {
 				initialData,
 				initialTitle,
 				postType,
-				featuredMedia,
+				featuredImageId,
 				colors,
 				gradients,
 			} = props;
@@ -94,7 +94,7 @@ const setupInitHooks = () => {
 				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
 				initialTitle,
 				postType,
-				featuredMedia,
+				featuredImageId,
 				capabilities,
 				colors,
 				gradients,

@@ -24,6 +24,7 @@ const bodyClass = 'is-dragging-components-draggable';
  * @property {string} [cloneClassname] Classname for the cloned element.
  * @property {string} [elementId] ID for the element.
  * @property {any} [transferData] Transfer data for the drag event.
+ * @property {string} [__experimentalTransferDataType] The transfer data type to set.
  * @property {import('react').ReactNode} __experimentalDragComponent Component to show when dragging.
  */
 
@@ -39,6 +40,7 @@ export default function Draggable( {
 	cloneClassname,
 	elementId,
 	transferData,
+	__experimentalTransferDataType: transferDataType = 'text',
 	__experimentalDragComponent: dragComponent,
 } ) {
 	/** @type {import('react').MutableRefObject<HTMLDivElement | null>} */
@@ -73,7 +75,10 @@ export default function Draggable( {
 		// @ts-ignore We know that ownerDocument does exist on an Element
 		const { ownerDocument } = event.target;
 
-		event.dataTransfer.setData( 'text', JSON.stringify( transferData ) );
+		event.dataTransfer.setData(
+			transferDataType,
+			JSON.stringify( transferData )
+		);
 
 		const cloneWrapper = ownerDocument.createElement( 'div' );
 		const dragImage = ownerDocument.createElement( 'div' );

@@ -204,7 +204,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js' ],
+			files: [ 'bin/**/*.js', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},

@@ -15,6 +15,8 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] "Featured" badge that overlays an image block containing a post's featured image. (Android only) [#28854]
 -   [*] "Set as featured" button within image block settings. (Android and dev only) [#28854]
 
+## 1.50.0
+
 ## 1.50.1
 
 -   [x] Truncate rangecell screenreader decimals] [#30678]

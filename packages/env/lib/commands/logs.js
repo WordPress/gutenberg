@@ -60,12 +60,10 @@ module.exports = async function logs( { environment, watch, spinner, debug } ) {
 	);
 
 	if ( result.out.length ) {
-		// eslint-disable-next-line no-console
 		console.log(
 			process.stdout.isTTY ? `\n\n${ result.out }\n\n` : result.out
 		);
 	} else if ( result.err.length ) {
-		// eslint-disable-next-line no-console
 		console.error(
 			process.stdout.isTTY ? `\n\n${ result.err }\n\n` : result.err
 		);

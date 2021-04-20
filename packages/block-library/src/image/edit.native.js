@@ -29,6 +29,7 @@ import {
 	BottomSheet,
 	BottomSheetTextControl,
 	FooterMessageLink,
+	Badge,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -488,6 +489,7 @@ export class ImageEdit extends Component {
 			clientId,
 			imageDefaultSize,
 			getStylesFromColorScheme,
+			featuredImageId,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
@@ -495,11 +497,10 @@ export class ImageEdit extends Component {
 			'value',
 			imageDefaultSize,
 		] );
-
-		const isFeaturedImage =
-			attributes.featuredImageId === attributes.id ? true : false;
-
-		const featuredButtonStyle = getStylesFromColorScheme(
+    
+    const isFeaturedImage = featuredImageId === attributes.id;
+		
+    const featuredButtonStyle = getStylesFromColorScheme(
 			styles.featuredButton,
 			styles.featuredButtonDark
 		);
@@ -600,7 +601,7 @@ export class ImageEdit extends Component {
 		};
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
-			<>
+			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>
 				<TouchableWithoutFeedback
 					accessible={ ! isSelected }
 					onPress={ this.onImagePressed }
@@ -665,7 +666,7 @@ export class ImageEdit extends Component {
 					onBlur={ this.props.onBlur } // always assign onBlur as props
 					insertBlocksAfter={ this.props.insertBlocksAfter }
 				/>
-			</>
+			</Badge>
 		);
 
 		return (

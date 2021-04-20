@@ -25,7 +25,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
-import TouchableRipple from './ripple.native.js';
+import TouchableRipple from './ripple';
 
 class BottomSheetCell extends Component {
 	constructor( props ) {
@@ -38,6 +38,8 @@ class BottomSheetCell extends Component {
 		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind(
 			this
 		);
+
+		this.isCurrent = false;
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -47,6 +49,7 @@ class BottomSheetCell extends Component {
 	}
 
 	componentDidMount() {
+		this.isCurrent = true;
 		AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
 			this.handleScreenReaderToggled
@@ -54,12 +57,15 @@ class BottomSheetCell extends Component {
 
 		AccessibilityInfo.isScreenReaderEnabled().then(
 			( isScreenReaderEnabled ) => {
-				this.setState( { isScreenReaderEnabled } );
+				if ( this.isCurrent ) {
+					this.setState( { isScreenReaderEnabled } );
+				}
 			}
 		);
 	}
 
 	componentWillUnmount() {
+		this.isCurrent = false;
 		AccessibilityInfo.removeEventListener(
 			'screenReaderChanged',
 			this.handleScreenReaderToggled
@@ -249,6 +255,9 @@ class BottomSheetCell extends Component {
 		};
 
 		const getAccessibilityLabel = () => {
+			if ( accessible === false ) {
+				return;
+			}
 			if ( accessibilityLabel || ! showValue ) {
 				return accessibilityLabel || label;
 			}

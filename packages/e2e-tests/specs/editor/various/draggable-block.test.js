@@ -48,7 +48,7 @@ describe( 'Draggable block', () => {
 		await page.evaluate( () => {
 			document.addEventListener( 'dragstart', ( event ) => {
 				window._dataTransfer = JSON.parse(
-					event.dataTransfer.getData( 'text' )
+					event.dataTransfer.getData( 'wp-blocks' )
 				);
 			} );
 		} );
@@ -76,7 +76,7 @@ describe( 'Draggable block', () => {
 			( element, clientX, clientY ) => {
 				const dataTransfer = new DataTransfer();
 				dataTransfer.setData(
-					'text/plain',
+					'wp-blocks',
 					JSON.stringify( window._dataTransfer )
 				);
 				const event = new DragEvent( 'drop', {
