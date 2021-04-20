@@ -56,6 +56,9 @@ function mapMenuItemsToBlocks( menuItems ) {
 				? __( '(no title)' )
 				: menuItem.title.rendered,
 			opensInNewTab: menuItem.target === '_blank',
+			type: menuItem?.type,
+			id: menuItem?.object_id,
+			title: menuItem?.attr_title,
 		};
 
 		if ( menuItem.url ) {

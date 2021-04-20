@@ -149,6 +149,9 @@ export function computeCustomizedAttribute(
 				target: block.attributes.opensInNewTab
 					? NEW_TAB_TARGET_ATTRIBUTE
 					: '',
+                object_id: block.attributes?.id,
+
+
 			};
 		} else {
 			attributes = {

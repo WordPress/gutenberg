@@ -156,6 +156,7 @@ function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
 		...( menuItem.target === NEW_TAB_TARGET_ATTRIBUTE && {
 			opensInNewTab: true,
 		} ),
+        id: menuItem?.object_id,
         type: menuItem.type,
 	};
 
