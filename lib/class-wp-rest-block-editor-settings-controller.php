@@ -48,12 +48,21 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	 * @return WP_Error|bool True if the request has permission, WP_Error object otherwise.
 	 */
 	public function get_items_permissions_check( $request ) {// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
-		if ( ! current_user_can( 'edit_posts' ) ) {
-			$error = __( 'Sorry, you are not allowed to read the block editor settings.', 'gutenberg' );
-			return new WP_Error( 'rest_cannot_read_settings', $error, array( 'status' => rest_authorization_required_code() ) );
+		if ( current_user_can( 'edit_posts' ) ) {
+			return true;
 		}
 
-		return true;
+		foreach ( get_post_types( array( 'show_in_rest' => true ), 'objects' ) as $post_type ) {
+			if ( current_user_can( $post_type->cap->edit_posts ) ) {
+				return true;
+			}
+		}
+
+		return new WP_Error(
+			'rest_cannot_read_block_editor_settings',
+			__( 'Sorry, you are not allowed to read the block editor settings.', 'gutenberg' ),
+			array( 'status' => rest_authorization_required_code() )
+		);
 	}
 
 	/**
@@ -65,10 +74,11 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 	 *
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
-	public function get_items( $request ) {// phpcs:ignore VariableAnalysis.CodeAnalysis.VariableAnalysis.UnusedVariable
+	public function get_items( $request ) {
+		$context  = ! empty( $request['context'] ) ? $request['context'] : 'post-editor';
 		$settings = array_merge(
 			apply_filters( 'block_editor_settings', array() ),
-			gutenberg_get_default_block_editor_settings()
+			gutenberg_get_block_editor_settings( $context )
 		);
 
 		return rest_ensure_response( $settings );
