@@ -2,7 +2,7 @@
 	background: $white;
 	border-radius: $radius-block-ui;
 	border: 1px solid $gray-300;
-	padding: $grid-unit-15;
+	padding: $grid-unit-15 - 1px; //Subtract the border width.
 
 	.wp-block-legacy-widget__edit-form-title {
 		color: $black;
