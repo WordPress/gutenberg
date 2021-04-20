@@ -1,0 +1,29 @@
+.wp-block-navigation {
+	// Force links to inherit text decoration applied to navigation block.
+	// The extra selector adds specificity to ensure it works when user-set.
+	&[style*="text-decoration"] {
+		.wp-block-home-link {
+			text-decoration: inherit;
+		}
+
+		.wp-block-home-link__content {
+			text-decoration: inherit;
+
+			&:focus,
+			&:active {
+				text-decoration: inherit;
+			}
+		}
+	}
+
+	&:not([style*="text-decoration"]) {
+		.wp-block-home-link__content {
+			text-decoration: none;
+
+			&:focus,
+			&:active {
+				text-decoration: none;
+			}
+		}
+	}
+}

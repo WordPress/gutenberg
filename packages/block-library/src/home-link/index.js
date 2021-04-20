@@ -30,7 +30,7 @@ export const settings = {
 
 	example: {
 		attributes: {
-			label: _x( 'Home', 'Home preview example' ),
+			label: _x( 'Home', 'Home Link preview example' ),
 		},
 	},
 };

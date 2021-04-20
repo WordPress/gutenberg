@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Renders the `core/home` block.
+ * Renders the `core/home-link` block.
  *
  * @param array $attributes The block attributes.
  *
@@ -52,7 +52,7 @@ function render_block_core_home( $attributes ) {
  */
 function register_block_core_home() {
 	register_block_type_from_metadata(
-		__DIR__ . '/home',
+		__DIR__ . '/home-link',
 		array(
 			'render_callback' => 'render_block_core_home',
 		)
