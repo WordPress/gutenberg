@@ -13,7 +13,7 @@ import {
 	BlockControls,
 	RichText,
 	useBlockProps,
-	store as blockEditorStore
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
@@ -43,10 +43,13 @@ function HeadingEdit( {
 		} ),
 		style: mergedStyle,
 	} );
-	const allHeadingAnchors = useSelect( ( select ) => {
-		const allBlocks = select( blockEditorStore ).getBlocks();
-		return getAllHeadingAnchors( allBlocks, clientId );
-	}, [ clientId ] );
+	const allHeadingAnchors = useSelect(
+		( select ) => {
+			const allBlocks = select( blockEditorStore ).getBlocks();
+			return getAllHeadingAnchors( allBlocks, clientId );
+		},
+		[ clientId ]
+	);
 	useEffect( () => {
 		const newAnchor = maybeUpdateAnchor(
 			attributes.anchor,
