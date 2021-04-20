@@ -12,7 +12,7 @@ import getInserterOuterSection from './inserter-outer-section';
 
 const getInserterId = ( controlId ) => `widgets-inserter-${ controlId }`;
 
-export default function getSidebarControl() {
+export default function getSidebarControl( blockEditorSettings ) {
 	const {
 		wp: { customize },
 	} = window;
@@ -46,6 +46,7 @@ export default function getSidebarControl() {
 			if ( this.sectionInstance.expanded() ) {
 				render(
 					<SidebarBlockEditor
+						blockEditorSettings={ blockEditorSettings }
 						sidebar={
 							new SidebarAdapter( this.setting, customize )
 						}

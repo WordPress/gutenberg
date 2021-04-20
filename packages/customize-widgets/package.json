@@ -28,6 +28,7 @@
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
 		"@wordpress/data": "file:../data",
 		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
@@ -36,6 +37,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/media-utils": "file:../media-utils",
 		"classnames": "^2.2.6",
 		"lodash": "^4.17.19"
 	},
