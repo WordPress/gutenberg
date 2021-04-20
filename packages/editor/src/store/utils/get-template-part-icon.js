@@ -3,7 +3,7 @@
  */
 const icons = require( '@wordpress/icons' );
 /**
- * Helper function to find the corresponding icon for a template part's 'area'.
+ * Helper function to retrieve the corresponding icon by name.
  *
  * @param {string} iconName The name of the icon.
  *
