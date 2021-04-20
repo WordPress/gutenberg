@@ -32,7 +32,9 @@
 		"attrs": {},
 		"innerBlocks": [],
 		"innerHTML": "\n",
-		"innerContent": [ "\n" ]
+		"innerContent": [
+			"\n"
+		]
 	},
 	{
 		"blockName": "core/cover",
@@ -54,7 +56,9 @@
 				"attrs": {},
 				"innerBlocks": [],
 				"innerHTML": "\n\t\t<p></p>\n\t\t",
-				"innerContent": [ "\n\t\t<p></p>\n\t\t" ]
+				"innerContent": [
+					"\n\t\t<p></p>\n\t\t"
+				]
 			}
 		],
 		"innerHTML": "\n<div\n\tclass=\"wp-block-cover alignfull\"\n\tstyle=\"background-image: url( https://example.com/some-background-image.png ); min-height: 48vw; background-position: 50% 40%;\"\n>\n\t<div class=\"wp-block-cover__inner-container\">\n\t\t\n\t</div>\n</div>\n",
@@ -69,7 +73,9 @@
 		"attrs": {},
 		"innerBlocks": [],
 		"innerHTML": "\n",
-		"innerContent": [ "\n" ]
+		"innerContent": [
+			"\n"
+		]
 	},
 	{
 		"blockName": "core/cover",
@@ -99,12 +105,5 @@
 			null,
 			"\n\t</div>\n</div>\n"
 		]
-	},
-	{
-		"blockName": null,
-		"attrs": {},
-		"innerBlocks": [],
-		"innerHTML": "\n",
-		"innerContent": [ "\n" ]
 	}
 ]
