@@ -175,15 +175,17 @@ When the block declares support for `color.background`, the attributes definitio
   }
   ```
 
-### color.duotone
+### color.__experimentalDuotone
 
 This property adds UI controls which allow to apply a duotone filter to a block or part of a block.
+
+The parent selector is automatically added much like nesting in Sass/SCSS (however, the `&` selector is not supported).
 
 ```js
 supports: {
     color: {
         // Apply the filter to the same selector in both edit and save.
-        duotone: '.duotone-img, .duotone-video',
+        __experimentalDuotone: '> .duotone-img, > .duotone-video',
 
         // Default values must be disabled if you don't want to use them with duotone.
         background: false,
@@ -208,13 +210,10 @@ When the block declares support for `color.duotone`, the attributes definition i
           type: 'object',
           default: {
               color: {
-                  duotone: {
-                      values: {
-                          r: [0, 0.3],
-                          g: [0, 0.6],
-                          b: [0, 1.0],
-                      }
-                  }
+                  duotone: [
+                      '#FFF',
+                      '#000
+                  ]
               }
           }
       }
