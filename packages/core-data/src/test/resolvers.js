@@ -136,14 +136,14 @@ describe( 'getEntityRecords', () => {
 
 		// It should mark the entity record that has an ID as resolved
 		expect( fulfillment.next().value ).toEqual( {
-			type: 'START_RESOLUTION',
+			type: 'START_RESOLUTIONS',
 			selectorName: 'getEntityRecord',
-			args: [ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ],
+			args: [ [ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ] ],
 		} );
 		expect( fulfillment.next().value ).toEqual( {
-			type: 'FINISH_RESOLUTION',
+			type: 'FINISH_RESOLUTIONS',
 			selectorName: 'getEntityRecord',
-			args: [ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ],
+			args: [ [ ENTITIES[ 1 ].kind, ENTITIES[ 1 ].name, 2 ] ],
 		} );
 	} );
 } );
