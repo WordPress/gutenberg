@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 
 -   [*] Image block: Improve text entry for long alt text. [#29670]
+-   [*] Image block: Add a "featured" banner. (Android only) [#30806]
 
 ## 1.50.0
 

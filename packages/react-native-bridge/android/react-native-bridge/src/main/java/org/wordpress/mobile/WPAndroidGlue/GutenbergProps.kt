@@ -12,6 +12,7 @@ data class GutenbergProps @JvmOverloads constructor(
     val enableAudioBlock: Boolean,
     val localeSlug: String,
     val postType: String,
+    val featuredImageId: Int,
     val editorTheme: Bundle?,
     val translations: Bundle,
     val isDarkMode: Boolean,
@@ -23,6 +24,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putString(PROP_INITIAL_TITLE, "")
         putString(PROP_LOCALE, localeSlug)
         putString(PROP_POST_TYPE, postType)
+        putInt(PROP_INITIAL_FEATURED_IMAGE_ID, featuredImageId)
         putBundle(PROP_TRANSLATIONS, translations)
         putBoolean(PROP_INITIAL_HTML_MODE_ENABLED, htmlModeEnabled)
 
@@ -56,6 +58,7 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_INITIAL_TITLE = "initialTitle"
         private const val PROP_INITIAL_HTML_MODE_ENABLED = "initialHtmlModeEnabled"
         private const val PROP_POST_TYPE = "postType"
+        private const val PROP_INITIAL_FEATURED_IMAGE_ID = "featuredImageId"
         private const val PROP_LOCALE = "locale"
         private const val PROP_TRANSLATIONS = "translations"
         private const val PROP_COLORS = "colors"
