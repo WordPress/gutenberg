@@ -59,35 +59,6 @@ describe( 'Search Block', () => {
 		expect( rendered ).toBeTruthy();
 	} );
 
-	describe( 'testIDs are properly configured', () => {
-		it( 'label contains the testID "search-block-label"', () => {
-			const component = getTestComponent();
-			const instance = component.root;
-
-			expect( () => {
-				instance.findByProps( { testID: 'search-block-label' } );
-			} ).not.toThrow();
-		} );
-
-		it( 'input contains the testID "search-block-input"', () => {
-			const component = getTestComponent();
-			const instance = component.root;
-
-			expect( () => {
-				instance.findByProps( { testID: 'search-block-input' } );
-			} ).not.toThrow();
-		} );
-
-		it( 'button contains the testID "search-block-button"', () => {
-			const component = getTestComponent();
-			const instance = component.root;
-
-			expect( () => {
-				instance.findByProps( { testID: 'search-block-button' } );
-			} ).not.toThrow();
-		} );
-	} );
-
 	describe( 'renders with default configuration', () => {
 		const component = getTestComponent();
 		const instance = component.root;
