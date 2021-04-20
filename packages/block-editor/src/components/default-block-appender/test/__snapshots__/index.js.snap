@@ -41,10 +41,9 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
   <p
     aria-label="Add block"
     className="wp-block block-editor-default-block-appender__content"
-    contentEditable={true}
     onFocus={[MockFunction]}
     role="button"
-    suppressContentEditableWarning={true}
+    tabIndex="0"
   >
     Type / to choose a block
   </p>
