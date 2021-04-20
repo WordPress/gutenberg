@@ -15,7 +15,6 @@ import {
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
 	setFeaturedImage,
-	subscribeFeaturedImageIdCurrent,
 } from '@wordpress/react-native-bridge';
 import {
 	CycleSelectControl,
@@ -87,7 +86,6 @@ export class ImageEdit extends Component {
 			this
 		);
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.featuredImageIdCurrent = this.featuredImageIdCurrent.bind( this );
 		this.updateImageURL = this.updateImageURL.bind( this );
 		this.onSetLinkDestination = this.onSetLinkDestination.bind( this );
 		this.onSetNewTab = this.onSetNewTab.bind( this );
@@ -162,8 +160,6 @@ export class ImageEdit extends Component {
 		if ( attributes.id ) {
 			setAttributes( { featuredImageId } );
 		}
-
-		this.addFeaturedImageIdListener();
 	}
 
 	componentWillUnmount() {
@@ -177,8 +173,6 @@ export class ImageEdit extends Component {
 				this.props.attributes.id
 			);
 		}
-
-		this.removeFeaturedImageIdListener();
 	}
 
 	componentDidUpdate( previousProps ) {
@@ -292,29 +286,6 @@ export class ImageEdit extends Component {
 		const { closeSettingsBottomSheet } = this.props;
 		setFeaturedImage( 0 );
 		closeSettingsBottomSheet();
-	}
-
-	featuredImageIdCurrent( payload ) {
-		const { setAttributes } = this.props;
-		setAttributes( { featuredImageId: payload.featuredImageId } );
-	}
-
-	addFeaturedImageIdListener() {
-		//if we already have a subscription not worth doing it again
-		if ( this.subscriptionParentFeaturedImageIdCurrent ) {
-			return;
-		}
-		this.subscriptionParentFeaturedImageIdCurrent = subscribeFeaturedImageIdCurrent(
-			( payload ) => {
-				this.featuredImageIdCurrent( payload );
-			}
-		);
-	}
-
-	removeFeaturedImageIdListener() {
-		if ( this.subscriptionParentFeaturedImageIdCurrent ) {
-			this.subscriptionParentFeaturedImageIdCurrent.remove();
-		}
 	}
 
 	onSetLinkDestination( href ) {
@@ -497,10 +468,10 @@ export class ImageEdit extends Component {
 			'value',
 			imageDefaultSize,
 		] );
-    
-    const isFeaturedImage = featuredImageId === attributes.id;
-		
-    const featuredButtonStyle = getStylesFromColorScheme(
+
+		const isFeaturedImage = featuredImageId === attributes.id;
+
+		const featuredButtonStyle = getStylesFromColorScheme(
 			styles.featuredButton,
 			styles.featuredButtonDark
 		);
