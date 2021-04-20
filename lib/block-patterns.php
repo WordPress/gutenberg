@@ -7,8 +7,6 @@
 
 // Register categories used for block patterns.
 register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
-register_block_pattern_category( 'text', array( 'label' => __( 'Text', 'gutenberg' ) ) );
-register_block_pattern_category( 'buttons', array( 'label' => __( 'Buttons', 'gutenberg' ) ) );
 
 // Initial Query block patterns.
 register_block_pattern(
@@ -229,10 +227,6 @@ add_action(
 		foreach ( $core_block_patterns as $core_block_pattern ) {
 			unregister_block_pattern( 'core/' . $core_block_pattern );
 		}
-
-		register_block_pattern_category( 'columns', array( 'label' => _x( 'Columns', 'Block pattern category', 'default' ) ) );
-		register_block_pattern_category( 'header', array( 'label' => _x( 'Headers', 'Block pattern category', 'default' ) ) );
-		register_block_pattern_category( 'gallery', array( 'label' => _x( 'Gallery', 'Block pattern category', 'default' ) ) );
 
 		foreach ( $new_core_block_patterns as $core_block_pattern ) {
 			register_block_pattern(
