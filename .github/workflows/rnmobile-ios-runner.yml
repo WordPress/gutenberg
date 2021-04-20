@@ -2,16 +2,18 @@ name: React Native E2E Tests (iOS)
 
 on:
     pull_request:
+        type: [labeled, opened, synchronize, reopened]
     push:
         branches: [trunk]
 
 jobs:
     test:
+        if: ${{ github.event.label.name == 'Mobile App - i.e. Android or iOS' }}
         runs-on: macos-latest
         strategy:
             matrix:
                 xcode: [12.2]
-                native-test-name: [gutenberg-editor-initial-html]
+                native-test-name: [gutenberg-editor-audio, gutenberg-editor-block-insertion-2, gutenberg-editor-block-insertion, gutenberg-editor-columns, gutenberg-editor-cover, gutenberg-editor-file-@canary, gutenberg-editor-gallery, gutenberg-editor-heading-@canary, gutenberg-editor-image-@canary, gutenberg-editor-initial-html, gutenberg-editor-latest-posts, gutenberg-editor-lists-@canary, gutenberg-editor-lists-end, gutenberg-editor-lists, gutenberg-editor-more, gutenberg-editor-paragraph, gutenberg-editor-paste, gutenberg-editor-rotation, gutenberg-editor-search, gutenberg-editor-separator, gutenberg-editor-spacer, gutenberg-editor-unsupported-blocks, gutenberg-editor-verse]
 
         steps:
             - uses: actions/checkout@5a4ac9002d0be2fb38bd78e4b4dbde5606d7042f # v2.3.4
