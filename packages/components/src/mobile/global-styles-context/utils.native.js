@@ -70,12 +70,6 @@ export function getBlockColors(
 				if ( styleKey && value !== UNKNOWN_VALUE ) {
 					const color = customBlockStyles[ key ] ?? value;
 					blockStyles[ styleKey ] = color;
-
-					if ( styleKey === BLOCK_STYLE_ATTRIBUTES_MAPPING.text ) {
-						blockStyles[
-							BLOCK_STYLE_ATTRIBUTES_MAPPING.placeholder
-						] = color;
-					}
 				}
 			}
 		);
@@ -112,6 +106,12 @@ export function getBlockColors(
 			blockStyles[ styleKey ] = value;
 		}
 	} );
+
+	// Color placeholder
+	if ( blockStyles?.color ) {
+		blockStyles[ BLOCK_STYLE_ATTRIBUTES_MAPPING.placeholder ] =
+			blockStyles.color;
+	}
 
 	return blockStyles;
 }
