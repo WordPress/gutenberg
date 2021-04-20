@@ -5,7 +5,7 @@
  * @package gutenberg
  */
 
-// Register categories used for block patterns. 
+// Register categories used for block patterns.
 register_block_pattern_category( 'query', array( 'label' => __( 'Query', 'gutenberg' ) ) );
 register_block_pattern_category( 'text', array( 'label' => __( 'Text', 'gutenberg' ) ) );
 register_block_pattern_category( 'buttons', array( 'label' => __( 'Buttons', 'gutenberg' ) ) );
