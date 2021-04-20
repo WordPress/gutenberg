@@ -7,6 +7,7 @@
 	},
 	"references": [
 		{ "path": "../deprecated" },
+		{ "path": "../dom" },
 		{ "path": "../element" },
 		{ "path": "../hooks" },
 		{ "path": "../icons" },
@@ -19,6 +20,7 @@
 		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
+		"src/disabled/**/*",
 		"src/draggable/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
