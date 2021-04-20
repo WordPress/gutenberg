@@ -11,7 +11,6 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
--   [*] Image block: Improve text entry for long alt text. [#29670]
 -   [***] Search block now available on mobile! [https://github.com/WordPress/gutenberg/pull/30783]
 -   [*] Image block: Add a "featured" banner. (Android only) [#30806]
 
