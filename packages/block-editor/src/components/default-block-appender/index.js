@@ -41,8 +41,14 @@ export function DefaultBlockAppender( {
 		>
 			<p
 				tabIndex="0"
+				// Only necessary for `useCanvasClickRedirect` to consider it
+				// as a target. Ideally it should consider any tabbable target,
+				// but the inserter is rendered in place while it should be
+				// rendered in a popover, just like it does for an empty
+				// paragraph block.
+				contentEditable
+				suppressContentEditableWarning
 				// We want this element to be styled as a paragraph by themes.
-				// In
 				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 				role="button"
 				aria-label={ __( 'Add block' ) }
