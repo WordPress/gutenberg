@@ -40,7 +40,7 @@
 		},
 		"previewHeight": {
 			"type": "number",
-			"default": 800
+			"default": 600
 		}
 	},
 	"supports": {
