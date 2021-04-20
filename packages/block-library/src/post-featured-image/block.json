@@ -8,10 +8,7 @@
 			"default": false
 		}
 	},
-	"usesContext": [
-		"postId",
-		"postType"
-	],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"align": [ "left", "right", "center", "wide", "full" ],
 		"html": false

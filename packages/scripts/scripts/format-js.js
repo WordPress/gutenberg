@@ -1,116 +1,36 @@
 /**
  * External dependencies
  */
-const { exit, stdout } = require( 'process' );
-
-/**
- * External dependencies
- */
 const chalk = require( 'chalk' );
-const { sync: spawn } = require( 'cross-spawn' );
-const { sync: resolveBin } = require( 'resolve-bin' );
-const { sync: dirGlob } = require( 'dir-glob' );
-const { sync: readPkgUp } = require( 'read-pkg-up' );
 
 /**
  * Internal dependencies
  */
-const {
-	fromConfigRoot,
-	fromProjectRoot,
-	getArgFromCLI,
-	getFileArgsFromCLI,
-	hasArgInCLI,
-	hasPrettierConfig,
-	hasProjectFile,
-} = require( '../utils' );
+const { getNodeArgsFromCLI, spawnScript } = require( '../utils' );
 
-// Check if the project has wp-prettier installed and if the project has a Prettier config
-function checkPrettier() {
-	try {
-		const prettierResolvePath = require.resolve( 'prettier' );
-		const prettierPackageJson = readPkgUp( { cwd: prettierResolvePath } );
-		const prettierPackageName = prettierPackageJson.pkg.name;
+const { scriptArgs, nodeArgs } = getNodeArgsFromCLI();
 
-		if (
-			! [ 'wp-prettier', '@wordpress/prettier' ].includes(
-				prettierPackageName
-			)
-		) {
-			return {
-				success: false,
-				message:
-					chalk.red(
-						'Incompatible version of Prettier was found in your project\n'
-					) +
-					"You need to install the 'wp-prettier' package to get " +
-					'code formatting compliant with the WordPress coding standards.\n\n',
-			};
-		}
-	} catch {
-		return {
-			success: false,
-			message:
-				chalk.red(
-					"The 'prettier' package was not found in your project\n"
-				) +
-				"You need to install the 'wp-prettier' package under an alias to get " +
-				'code formatting compliant with the WordPress coding standards.\n\n',
-		};
-	}
+const keypress = async () => {
+	process.stdin.setRawMode( true );
+	return new Promise( ( resolve ) =>
+		process.stdin.once( 'data', () => {
+			process.stdin.setRawMode( false );
+			resolve();
+		} )
+	);
+};
 
-	return { success: true };
-}
+( async () => {
+	const message =
+		`Please note that the ${ chalk.red(
+			'format-js'
+		) } script has been renamed to ${ chalk.green( 'format' ) }.\n` +
+		"If you're calling it from any of your own scripts, please update them accordingly.\n" +
+		'Press any key to continiue.';
 
-const checkResult = checkPrettier();
-if ( ! checkResult.success ) {
-	stdout.write( checkResult.message );
-	exit( 1 );
-}
+	// eslint-disable-next-line no-console
+	console.log( message );
 
-// Check for existing config in project, if it exists no command-line args are
-// needed for config, otherwise pass in args to default config in packages
-// See: https://prettier.io/docs/en/configuration.html
-let configArgs = [];
-if ( ! hasPrettierConfig() ) {
-	configArgs = [
-		'--config',
-		require.resolve( '@wordpress/prettier-config' ),
-	];
-}
-
-// If `--ignore-path` is not explicitly specified, use the project's or global .eslintignore
-let ignorePath = getArgFromCLI( '--ignore-path' );
-if ( ! ignorePath ) {
-	if ( hasProjectFile( '.eslintignore' ) ) {
-		ignorePath = fromProjectRoot( '.eslintignore' );
-	} else {
-		ignorePath = fromConfigRoot( '.eslintignore' );
-	}
-}
-const ignoreArgs = [ '--ignore-path', ignorePath ];
-
-// forward the --require-pragma option that formats only files that already have the @format
-// pragma in the first docblock.
-const pragmaArgs = hasArgInCLI( '--require-pragma' )
-	? [ '--require-pragma' ]
-	: [];
-
-// Get the files and directories to format and convert them to globs
-let fileArgs = getFileArgsFromCLI();
-if ( fileArgs.length === 0 ) {
-	fileArgs = [ '.' ];
-}
-
-// Converts `foo/bar` directory to `foo/bar/**/*.js`
-const globArgs = dirGlob( fileArgs, {
-	extensions: [ 'js', 'jsx', 'ts', 'tsx' ],
-} );
-
-const result = spawn(
-	resolveBin( 'prettier' ),
-	[ '--write', ...configArgs, ...ignoreArgs, ...pragmaArgs, ...globArgs ],
-	{ stdio: 'inherit' }
-);
-
-process.exit( result.status );
+	await keypress();
+	spawnScript( 'format', scriptArgs, nodeArgs );
+} )();

@@ -52,6 +52,10 @@ function ColumnEdit( {
 	clientId,
 	blockWidth,
 } ) {
+	if ( ! contentStyle ) {
+		contentStyle = { [ clientId ]: {} };
+	}
+
 	const { verticalAlignment, width } = attributes;
 	const { valueUnit = '%' } = getValueAndUnit( width ) || {};
 

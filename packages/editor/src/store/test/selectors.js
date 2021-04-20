@@ -172,6 +172,7 @@ const {
 	__experimentalGetDefaultTemplateType,
 	__experimentalGetDefaultTemplateTypes,
 	__experimentalGetTemplateInfo,
+	__experimentalGetDefaultTemplatePartAreas,
 } = selectors;
 
 const defaultTemplateTypes = [
@@ -184,6 +185,19 @@ const defaultTemplateTypes = [
 		title: '404 (Not Found)',
 		description: 'Applied when content cannot be found',
 		slug: '404',
+	},
+];
+
+const defaultTemplatePartAreas = [
+	{
+		area: 'header',
+		label: 'Header',
+		description: 'Some description of a header',
+	},
+	{
+		area: 'footer',
+		label: 'Footer',
+		description: 'Some description of a footer',
 	},
 ];
 
@@ -2801,6 +2815,32 @@ describe( 'selectors', () => {
 			expect(
 				__experimentalGetDefaultTemplateTypes( state )
 			).toHaveLength( 2 );
+		} );
+	} );
+
+	describe( '__experimentalGetDefaultTemplatePartAreas', () => {
+		const state = { editorSettings: { defaultTemplatePartAreas } };
+
+		it( 'returns undefined if there are no default template part areas', () => {
+			const emptyState = { editorSettings: {} };
+			expect(
+				__experimentalGetDefaultTemplatePartAreas( emptyState )
+			).toBeUndefined();
+		} );
+
+		it( 'returns a list of default template part areas if present in state', () => {
+			expect(
+				__experimentalGetDefaultTemplatePartAreas( state )
+			).toHaveLength( 2 );
+		} );
+
+		it( 'assigns an icon to each area', () => {
+			const templatePartAreas = __experimentalGetDefaultTemplatePartAreas(
+				state
+			);
+			templatePartAreas.forEach( ( area ) =>
+				expect( area.icon ).not.toBeNull()
+			);
 		} );
 	} );
 

@@ -93,6 +93,7 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Contact Page',
 					type: 'page',
 					url: 'http://wordpress.local/contact-page/',
+					kind: 'post-type',
 				},
 			] )
 		);
@@ -108,12 +109,14 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Cats',
 					url: 'http://wordpress.local/category/cats/',
 					type: 'category',
+					kind: 'taxonomy',
 				},
 				{
 					id: 1,
 					title: 'Uncategorized',
 					url: 'http://wordpress.local/category/uncategorized/',
 					type: 'category',
+					kind: 'taxonomy',
 				},
 			] )
 		);
@@ -155,18 +158,21 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Contact Page',
 					url: 'http://wordpress.local/contact-page/',
 					type: 'page',
+					kind: 'post-type',
 				},
 				{
 					id: 9,
 					title: 'Cats',
 					url: 'http://wordpress.local/category/cats/',
 					type: 'category',
+					kind: 'taxonomy',
 				},
 				{
 					id: 1,
 					title: 'Uncategorized',
 					url: 'http://wordpress.local/category/uncategorized/',
 					type: 'category',
+					kind: 'taxonomy',
 				},
 				{
 					id: 'gallery',
@@ -195,6 +201,7 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Limit Case',
 					url: 'http://wordpress.local/limit-case/',
 					type: 'page',
+					kind: 'post-type',
 				},
 			] )
 		);
@@ -211,6 +218,7 @@ describe( 'fetchLinkSuggestions', () => {
 					title: 'Page Case',
 					url: 'http://wordpress.local/page-case/',
 					type: 'page',
+					kind: 'post-type',
 				},
 			] )
 		);
