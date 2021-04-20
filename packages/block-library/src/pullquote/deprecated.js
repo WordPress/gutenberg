@@ -284,6 +284,12 @@ const deprecated = [
 					return {
 						...attributes,
 						className,
+						// Block supports: Set style.border.color if a deprecated block has `mainColor`, inline border CSS and is not a solid color style.
+						style: {
+							border: {
+								color: borderColor,
+							},
+						},
 						customMainColor: borderColor,
 					};
 				}
