@@ -45,7 +45,10 @@ function HeadingEdit( {
 	);
 	useEffect( () => {
 		if ( generatedAnchor !== attributes.anchor ) {
-			setAttributes( { anchor: generatedAnchor } );
+			setAttributes( {
+				anchor: generatedAnchor,
+				autoAnchor: true,
+			} );
 		}
 	}, [ attributes.anchor, content ] );
 

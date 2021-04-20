@@ -6,6 +6,9 @@
 		"textAlign": {
 			"type": "string"
 		},
+		"autoAnchor": {
+			"type": "boolean"
+		},
 		"content": {
 			"type": "string",
 			"source": "html",

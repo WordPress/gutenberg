@@ -92,9 +92,15 @@ export const withInspectorControl = createHigherOrderComponent(
 						placeholder={ ! isWeb ? __( 'Add an anchor' ) : null }
 						onChange={ ( nextValue ) => {
 							nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
-							props.setAttributes( {
-								anchor: nextValue,
-							} );
+
+							if (
+								props.attributes.autoAnchor &&
+								0 === nextValue.indexOf( 'wp-' )
+							) {
+								nextValue = nextValue.replace( 'wp-', '' );
+							}
+							delete props.attributes.autoAnchor;
+							props.setAttributes( { anchor: nextValue } );
 						} }
 						autoCapitalize="none"
 						autoComplete="off"
