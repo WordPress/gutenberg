@@ -7,6 +7,8 @@ import { isNil, deburr, trim, startsWith } from 'lodash';
  * WordPress dependencies
  */
 import { cleanForSlug } from '@wordpress/url';
+import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Runs a callback over all blocks, including nested blocks.
@@ -47,7 +49,7 @@ const getTextWithoutMarkup = ( text ) => {
  *
  * @return {string[]} Return an array of anchors.
  */
-export const getAllHeadingAnchors = ( blockList, excludeId ) => {
+const getAllHeadingAnchors = ( blockList, excludeId ) => {
 	const anchors = [];
 
 	recurseOverBlocks( blockList, ( block ) => {
@@ -109,15 +111,22 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 /**
  * Updates the anchor if required.
  *
- * @param {string}   anchor            The heading anchor.
- * @param {string}   content           The block content.
- * @param {string[]} allHeadingAnchors An array containing all headings anchors.
+ * @param {string} clientId The block's client-ID.
+ * @param {string} anchor   The heading anchor.
+ * @param {string} content  The block content.
  *
  * @return {string} The anchor.
  */
-export const maybeUpdateAnchor = ( anchor, content, allHeadingAnchors ) => {
+export default function useGeneratedAnchor( clientId, anchor, content ) {
+	const allHeadingAnchors = useSelect(
+		( select ) => {
+			const allBlocks = select( blockEditorStore ).getBlocks();
+			return getAllHeadingAnchors( allBlocks, clientId );
+		},
+		[ clientId ]
+	);
 	if ( isNil( anchor ) || startsWith( anchor, 'wp-' ) ) {
 		return generateAnchor( anchor, content, allHeadingAnchors );
 	}
 	return anchor;
-};
+}

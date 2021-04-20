@@ -13,19 +13,14 @@ import {
 	BlockControls,
 	RichText,
 	useBlockProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import HeadingLevelDropdown from './heading-level-dropdown';
-import {
-	getAllHeadingAnchors,
-	maybeUpdateAnchor,
-} from './autogenerate-anchors';
+import useGeneratedAnchor from './autogenerate-anchors';
 
 function HeadingEdit( {
 	attributes,
@@ -43,21 +38,14 @@ function HeadingEdit( {
 		} ),
 		style: mergedStyle,
 	} );
-	const allHeadingAnchors = useSelect(
-		( select ) => {
-			const allBlocks = select( blockEditorStore ).getBlocks();
-			return getAllHeadingAnchors( allBlocks, clientId );
-		},
-		[ clientId ]
+	const generatedAnchor = useGeneratedAnchor(
+		clientId,
+		attributes.anchor,
+		content
 	);
 	useEffect( () => {
-		const newAnchor = maybeUpdateAnchor(
-			attributes.anchor,
-			content,
-			allHeadingAnchors
-		);
-		if ( newAnchor !== attributes.anchor ) {
-			setAttributes( { anchor: newAnchor } );
+		if ( generatedAnchor !== attributes.anchor ) {
+			setAttributes( { anchor: generatedAnchor } );
 		}
 	}, [ attributes.anchor, content ] );
 
