@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, isEmpty } from 'lodash';
+import { every, isEmpty, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -21,7 +21,10 @@ import { sprintf, __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { getColorObjectByColorValue } from '../colors';
+import {
+	getColorObjectByColorValue,
+	getVariableColorFromAttributeValue,
+} from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useEditorFeature from '../use-editor-feature';
 
@@ -46,13 +49,20 @@ function VisualLabel( {
 	colorValue,
 	gradientValue,
 } ) {
-	let value, ariaLabel;
+	let value, ariaLabel, colorObject;
 	if ( currentTab === 'color' ) {
 		if ( colorValue ) {
 			value = colorValue;
-			const colorObject = getColorObjectByColorValue( colors, value );
-			const colorName = colorObject && colorObject.name;
-			ariaLabel = sprintf( colorIndicatorAriaLabel, colorName || value );
+			if ( startsWith( colorValue, 'var:' ) ) {
+				colorObject = getVariableColorFromAttributeValue(
+					colors,
+					value
+				);
+				value = colorObject?.color || value;
+			} else {
+				colorObject = getColorObjectByColorValue( colors, value );
+			}
+			ariaLabel = sprintf( colorIndicatorAriaLabel, value );
 		}
 	} else if ( currentTab === 'gradient' && gradientValue ) {
 		value = gradientValue;
@@ -115,6 +125,7 @@ function ColorGradientControlInner( {
 						<BaseControl.VisualLabel>
 							<VisualLabel
 								currentTab={ currentTab }
+								colors={ colors }
 								label={ label }
 								colorValue={ colorValue }
 								gradientValue={ gradientValue }

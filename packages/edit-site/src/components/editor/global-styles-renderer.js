@@ -157,7 +157,7 @@ export default ( blockData, tree, type = 'all' ) => {
 				];
 
 				if ( variableDeclarations.length > 0 ) {
-					styles.push(
+					styles.unshift(
 						`${ selector } { ${ variableDeclarations.join(
 							';'
 						) } }`
@@ -170,7 +170,7 @@ export default ( blockData, tree, type = 'all' ) => {
 				);
 
 				if ( blockStyleDeclarations.length > 0 ) {
-					styles.push(
+					styles.unshift(
 						`${ selector } { ${ blockStyleDeclarations.join(
 							';'
 						) } }`
@@ -182,7 +182,7 @@ export default ( blockData, tree, type = 'all' ) => {
 					tree?.settings?.[ context ]
 				);
 				if ( presetClasses ) {
-					styles.push( presetClasses );
+					styles.unshift( presetClasses );
 				}
 			}
 			return styles;

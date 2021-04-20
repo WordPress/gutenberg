@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, kebabCase, map } from 'lodash';
+import { find, kebabCase, map, startsWith } from 'lodash';
 import tinycolor from 'tinycolor2';
 
 /**
@@ -31,6 +31,28 @@ export const getColorObjectByAttributeValues = (
 	return {
 		color: customColor,
 	};
+};
+
+export const getVariableColorFromAttributeValue = ( colors, value ) => {
+	const attributeParsed = /var:preset\|color\|(.+)/.exec( value );
+	if ( attributeParsed && attributeParsed[ 1 ] ) {
+		return getColorObjectByAttributeValues( colors, attributeParsed[ 1 ] );
+	}
+	return value;
+};
+
+export const compileStyleValue = ( uncompiledValue ) => {
+	const VARIABLE_REFERENCE_PREFIX = 'var:';
+	const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
+	const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
+	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
+		const variable = uncompiledValue
+			.slice( VARIABLE_REFERENCE_PREFIX.length )
+			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
+			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
+		return `var(--wp--${ variable })`;
+	}
+	return uncompiledValue;
 };
 
 /**

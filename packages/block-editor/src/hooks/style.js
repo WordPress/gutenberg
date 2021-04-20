@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { capitalize, get, has, omitBy, startsWith } from 'lodash';
+import { capitalize, get, has, omitBy } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,6 +22,7 @@ import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
 import { SPACING_SUPPORT_KEY, PaddingEdit } from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
+import { compileStyleValue } from '../components/colors';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -32,20 +33,6 @@ const styleSupportKeys = [
 
 const hasStyleSupport = ( blockType ) =>
 	styleSupportKeys.some( ( key ) => hasBlockSupport( blockType, key ) );
-
-const VARIABLE_REFERENCE_PREFIX = 'var:';
-const VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE = '|';
-const VARIABLE_PATH_SEPARATOR_TOKEN_STYLE = '--';
-function compileStyleValue( uncompiledValue ) {
-	if ( startsWith( uncompiledValue, VARIABLE_REFERENCE_PREFIX ) ) {
-		const variable = uncompiledValue
-			.slice( VARIABLE_REFERENCE_PREFIX.length )
-			.split( VARIABLE_PATH_SEPARATOR_TOKEN_ATTRIBUTE )
-			.join( VARIABLE_PATH_SEPARATOR_TOKEN_STYLE );
-		return `var(--wp--${ variable })`;
-	}
-	return uncompiledValue;
-}
 
 /**
  * Returns the inline styles to add depending on the style object

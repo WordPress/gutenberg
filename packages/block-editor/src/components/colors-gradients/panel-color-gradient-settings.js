@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { every, isEmpty } from 'lodash';
+import { every, isEmpty, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,7 +14,10 @@ import { sprintf, __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import ColorGradientControl from './control';
-import { getColorObjectByColorValue } from '../colors';
+import {
+	getColorObjectByColorValue,
+	getVariableColorFromAttributeValue,
+} from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
 import useEditorFeature from '../use-editor-feature';
 
@@ -48,10 +51,19 @@ const Indicators = ( { colors, gradients, settings } ) => {
 			}
 			let ariaLabel;
 			if ( colorValue ) {
-				const colorObject = getColorObjectByColorValue(
-					availableColors || colors,
-					colorValue
-				);
+				let colorObject;
+				if ( startsWith( colorValue, 'var:' ) ) {
+					colorObject = getVariableColorFromAttributeValue(
+						availableColors || colors,
+						colorValue
+					);
+					colorValue = colorObject?.color || colorValue;
+				} else {
+					colorObject = getColorObjectByColorValue(
+						availableColors || colors,
+						colorValue
+					);
+				}
 				ariaLabel = sprintf(
 					colorIndicatorAriaLabel,
 					label.toLowerCase(),

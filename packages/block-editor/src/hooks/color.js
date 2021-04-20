@@ -2,7 +2,7 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import { isObject } from 'lodash';
+import { isObject, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -19,7 +19,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import {
 	getColorClassName,
 	getColorObjectByColorValue,
-	getColorObjectByAttributeValues,
+	getVariableColorFromAttributeValue,
 } from '../components/colors';
 import {
 	__experimentalGetGradientClass,
@@ -196,15 +196,6 @@ export function addEditProps( settings ) {
 	return settings;
 }
 
-const getLinkColorFromAttributeValue = ( colors, value ) => {
-	const attributeParsed = /var:preset\|color\|(.+)/.exec( value );
-	if ( attributeParsed && attributeParsed[ 1 ] ) {
-		return getColorObjectByAttributeValues( colors, attributeParsed[ 1 ] )
-			.color;
-	}
-	return value;
-};
-
 /**
  * Inspector control panel containing the color related configuration
  *
@@ -234,7 +225,7 @@ export function ColorEdit( props ) {
 	const hasBackground = hasBackgroundColorSupport( blockName );
 	const hasGradient = hasGradientSupport( blockName );
 
-	const { style, textColor, backgroundColor, gradient } = attributes;
+	const { style, gradient } = attributes;
 	let gradientValue;
 	if ( hasGradient && gradient ) {
 		gradientValue = getGradientValueBySlug( gradients, gradient );
@@ -243,13 +234,20 @@ export function ColorEdit( props ) {
 	}
 
 	const onChangeColor = ( name ) => ( value ) => {
-		const colorObject = getColorObjectByColorValue( colors, value );
+		let colorObject;
+		if ( startsWith( value, 'var:' ) ) {
+			colorObject = getVariableColorFromAttributeValue( colors, value );
+		} else {
+			colorObject = getColorObjectByColorValue( colors, value );
+		}
 		const attributeName = name + 'Color';
 		const newStyle = {
 			...localAttributes.current.style,
 			color: {
 				...localAttributes.current?.style?.color,
-				[ name ]: colorObject?.slug ? undefined : value,
+				[ name ]: colorObject?.slug
+					? `var:preset|color|${ colorObject.slug }`
+					: value,
 			},
 		};
 
@@ -302,7 +300,12 @@ export function ColorEdit( props ) {
 	};
 
 	const onChangeLinkColor = ( value ) => {
-		const colorObject = getColorObjectByColorValue( colors, value );
+		let colorObject;
+		if ( startsWith( value, 'var:' ) ) {
+			colorObject = getVariableColorFromAttributeValue( colors, value );
+		} else {
+			colorObject = getColorObjectByColorValue( colors, value );
+		}
 		props.setAttributes( {
 			style: {
 				...props.attributes.style,
@@ -329,11 +332,7 @@ export function ColorEdit( props ) {
 							{
 								label: __( 'Text color' ),
 								onColorChange: onChangeColor( 'text' ),
-								colorValue: getColorObjectByAttributeValues(
-									colors,
-									textColor,
-									style?.color?.text
-								).color,
+								colorValue: style?.color?.text,
 							},
 					  ]
 					: [] ),
@@ -344,11 +343,7 @@ export function ColorEdit( props ) {
 								onColorChange: hasBackground
 									? onChangeColor( 'background' )
 									: undefined,
-								colorValue: getColorObjectByAttributeValues(
-									colors,
-									backgroundColor,
-									style?.color?.background
-								).color,
+								colorValue: style?.color?.background,
 								gradientValue,
 								onGradientChange: hasGradient
 									? onChangeGradient
@@ -361,10 +356,7 @@ export function ColorEdit( props ) {
 							{
 								label: __( 'Link Color' ),
 								onColorChange: onChangeLinkColor,
-								colorValue: getLinkColorFromAttributeValue(
-									colors,
-									style?.color?.link
-								),
+								colorValue: style?.color?.link,
 								clearable: !! props.attributes.style?.color
 									?.link,
 							},
@@ -393,10 +385,10 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 
 		const extraStyles = {
 			color: textColor
-				? getColorObjectByAttributeValues( colors, textColor )?.color
+				? getVariableColorFromAttributeValue( colors, textColor )?.color
 				: undefined,
 			backgroundColor: backgroundColor
-				? getColorObjectByAttributeValues( colors, backgroundColor )
+				? getVariableColorFromAttributeValue( colors, backgroundColor )
 						?.color
 				: undefined,
 		};

@@ -5,7 +5,7 @@ $blocks-block__margin: 0.5em;
 // to support the previous markup in addition to the new one.
 .wp-block-button__link {
 	color: $white;
-	background-color: #32373c;
+	background-color: inherit;
 	border-radius: 9999px; // 100% causes an oval, but any explicit but really high value retains the pill shape.
 	box-shadow: none;
 	cursor: pointer;
