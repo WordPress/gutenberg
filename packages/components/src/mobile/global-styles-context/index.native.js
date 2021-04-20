@@ -29,7 +29,7 @@ export const getMergedGlobalStyles = (
 	defaultColors
 ) => {
 	const baseGlobalColors = {
-		baseColors: baseGlobalStyles || {},
+		baseColors: baseGlobalStyles?.styles || {},
 	};
 	const blockStyleAttributes = pick(
 		blockAttributes,

@@ -959,6 +959,7 @@ export class RichText extends Component {
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
+						style?.placeholderColor ||
 						this.props.placeholderTextColor ||
 						defaultPlaceholderTextColor
 					}

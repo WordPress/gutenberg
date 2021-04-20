@@ -357,7 +357,7 @@ export default compose( [
 			isParentSelected ||
 			parentId === '';
 		const baseGlobalStyles = getSettings()
-			?.__experimentalGlobalStylesBaseStyles?.styles;
+			?.__experimentalGlobalStylesBaseStyles;
 
 		return {
 			icon,
