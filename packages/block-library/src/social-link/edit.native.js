@@ -18,7 +18,7 @@ import {
 } from '@wordpress/components';
 import { compose, usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
-import { link, Icon } from '@wordpress/icons';
+import { link } from '@wordpress/icons';
 import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
@@ -65,7 +65,7 @@ const SocialLinkEdit = ( {
 
 	const animatedValue = useRef( new Animated.Value( 0 ) ).current;
 
-	const IconComponent = GetIconBySite( service )();
+	const IconComponent = GetIconBySite( service );
 	const socialLinkName = GetNameBySite( service );
 
 	// When new social icon is added link sheet is opened automatically
@@ -192,11 +192,7 @@ const SocialLinkEdit = ( {
 				<Animated.View
 					style={ [ styles.iconContainer, { backgroundColor } ] }
 				>
-					<Icon
-						animated
-						icon={ IconComponent }
-						style={ { stroke, color } }
-					/>
+					<IconComponent animated style={ { stroke, color } } />
 				</Animated.View>
 			</TouchableWithoutFeedback>
 		</View>
