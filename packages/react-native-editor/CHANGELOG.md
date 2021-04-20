@@ -11,9 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
--   [*] Image block: Improve text entry for long alt text. [#29670]
--   [*] "Featured" badge that overlays an image block containing a post's featured image. (Android only) [#28854]
--   [*] "Set as featured" button within image block settings. (Android and dev only) [#28854]
+-   [*] Image block: "Set as featured" button within image block settings. (Android and dev only) [#28854]
+-   [*] Image block: Add a "featured" banner. (Android only) [#30806]
 
 ## 1.51.0
 
