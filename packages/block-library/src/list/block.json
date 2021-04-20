@@ -25,6 +25,9 @@
 		},
 		"reversed": {
 			"type": "boolean"
+		},
+		"placeholder": {
+			"type": "string"
 		}
 	},
 	"supports": {
