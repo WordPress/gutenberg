@@ -35,7 +35,7 @@ export function getBlockPaddings(
 			blockStyleAttributes?.backgroundColor ||
 			blockColors?.backgroundColor )
 	) {
-		blockPaddings.containerPadding = PADDING;
+		blockPaddings.padding = PADDING;
 		return blockPaddings;
 	}
 
@@ -45,7 +45,7 @@ export function getBlockPaddings(
 		! wrapperPropsStyle?.backgroundColor &&
 		! blockStyleAttributes?.backgroundColor
 	) {
-		blockPaddings.containerPadding = undefined;
+		blockPaddings.padding = undefined;
 	}
 
 	return blockPaddings;

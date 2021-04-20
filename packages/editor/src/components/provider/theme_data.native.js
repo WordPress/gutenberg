@@ -142,9 +142,9 @@ export default {
 					text: 'var(--wp--preset--color--red)',
 				},
 			},
-			'core/cover': {
+			'core/group': {
 				color: {
-					text: 'var(--wp--preset--color--green)',
+					background: 'var(--wp--preset--color--red)',
 				},
 			},
 		},
