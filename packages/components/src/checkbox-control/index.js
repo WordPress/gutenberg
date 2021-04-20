@@ -26,8 +26,7 @@ export default function CheckboxControl( {
 } ) {
 	if ( heading ) {
 		deprecated( '`heading` prop in `CheckboxControl`', {
-			alternative:
-				'A separate element should be used to implement a heading',
+			alternative: 'a separate element to implement a heading',
 			plugin: 'Gutenberg',
 		} );
 	}
