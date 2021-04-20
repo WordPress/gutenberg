@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Feature
+
+-	Export type definitions
+
 ## 2.17.0 (2021-03-17)
 
 ## 2.11.0 (2020-06-15)

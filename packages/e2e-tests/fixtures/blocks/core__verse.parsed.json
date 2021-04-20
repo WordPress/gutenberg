@@ -7,12 +7,5 @@
 		"innerContent": [
 			"\n<pre class=\"wp-block-verse\">A <em>verse</em>…<br>And more!</pre>\n"
 		]
-	},
-	{
-		"blockName": null,
-		"attrs": {},
-		"innerBlocks": [],
-		"innerHTML": "\n",
-		"innerContent": [ "\n" ]
 	}
 ]

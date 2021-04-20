@@ -28,7 +28,7 @@ function myguten_block_init() {
     );
 
     register_block_type( 'myguten/simple', array(
-		'apiVersion' => 2,
+		'api_version' => 2,
         'editor_script' => 'myguten-script',
     ) );
 }

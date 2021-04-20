@@ -43,7 +43,7 @@ You can then add a scripts section to your package.json file, for example:
 ```json
 	"scripts": {
 		"build": "wp-scripts build",
-		"format:js": "wp-scripts format-js",
+		"format": "wp-scripts format",
 		"lint:js": "wp-scripts lint-js",
 		"start": "wp-scripts start"
 	}

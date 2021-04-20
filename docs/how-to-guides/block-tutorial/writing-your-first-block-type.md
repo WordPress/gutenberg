@@ -28,7 +28,7 @@ function gutenberg_examples_01_register_block() {
 	);
 
 	register_block_type( 'gutenberg-examples/example-01-basic-esnext', array(
-		'apiVersion' => 2,
+		'api_version' => 2,
 		'editor_script' => 'gutenberg-examples-01-esnext',
 	) );
 
