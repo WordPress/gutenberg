@@ -177,9 +177,12 @@ function NotEmpty( {
 			</FormWrapper>
 
 			{ idBase &&
-				! isSelected &&
 				( hasPreview ? (
-					<Preview idBase={ idBase } instance={ instance } />
+					<Preview
+						idBase={ idBase }
+						instance={ instance }
+						isVisible={ ! isSelected }
+					/>
 				) : (
 					<NoPreview name={ widgetType.name } />
 				) ) }
