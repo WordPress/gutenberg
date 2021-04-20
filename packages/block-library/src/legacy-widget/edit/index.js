@@ -29,6 +29,7 @@ import FormWrapper from './form-wrapper';
 import Form from './form';
 import Preview from './preview';
 import NoPreview from './no-preview';
+import useForm from './use-form';
 
 export default function Edit( props ) {
 	const { id, idBase } = props.attributes;
@@ -83,9 +84,8 @@ function NotEmpty( {
 	isSelected,
 } ) {
 	const [ pendingInstance, setPendingInstance ] = useState( instance );
-	const [ hasPreview, setHasPreview ] = useState( false );
 
-	const { widgetType, hasResolved, isWidgetTypeHidden } = useSelect(
+	const { widgetType, hasResolvedWidgetType, isWidgetTypeHidden } = useSelect(
 		( select ) => {
 			const widgetTypeId = id ?? idBase;
 			const hiddenIds =
@@ -93,7 +93,7 @@ function NotEmpty( {
 					?.widgetTypesToHideFromLegacyWidgetBlock ?? [];
 			return {
 				widgetType: select( coreStore ).getWidgetType( widgetTypeId ),
-				hasResolved: select(
+				hasResolvedWidgetType: select(
 					coreStore
 				).hasFinishedResolution( 'getWidgetType', [ widgetTypeId ] ),
 				isWidgetTypeHidden: hiddenIds.includes( widgetTypeId ),
@@ -103,6 +103,13 @@ function NotEmpty( {
 	);
 
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
+
+	const { content, setFormData, hasPreview } = useForm( {
+		id,
+		idBase,
+		instance,
+		setInstance: setPendingInstance,
+	} );
 
 	useEffect( () => {
 		if ( ! isSelected ) {
@@ -115,12 +122,12 @@ function NotEmpty( {
 		clearSelectedBlock();
 	};
 
-	if ( ! widgetType && ! hasResolved ) {
-		return <Spinner />;
+	if ( ! widgetType && hasResolvedWidgetType ) {
+		return <Placeholder>{ __( 'Widget is missing.' ) }</Placeholder>;
 	}
 
-	if ( ! widgetType && hasResolved ) {
-		return <Placeholder>{ __( 'Widget is missing.' ) }</Placeholder>;
+	if ( ! hasResolvedWidgetType || hasPreview === null ) {
+		return <Spinner />;
 	}
 
 	return (
@@ -164,10 +171,8 @@ function NotEmpty( {
 				<Form
 					id={ id }
 					idBase={ idBase }
-					instance={ pendingInstance }
-					setInstance={ setPendingInstance }
-					// TODO: Hm, this is awkward. Probably useForm() should move up a level.
-					setHasPreview={ setHasPreview }
+					content={ content }
+					setFormData={ setFormData }
 				/>
 			</FormWrapper>
 
@@ -176,7 +181,6 @@ function NotEmpty( {
 				( hasPreview ? (
 					<Preview idBase={ idBase } instance={ instance } />
 				) : (
-					// TODO: This flashes for a second when enode request is pending.
 					<NoPreview name={ widgetType.name } />
 				) ) }
 		</>
