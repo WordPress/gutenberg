@@ -22,7 +22,7 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		the_post();
 	}
 
-	$content = get_the_content( $block->context['postId'] );
+	$content = get_the_content( null, false, $block->context['postId'] );
 
 	if ( empty( $content ) ) {
 		return '';
