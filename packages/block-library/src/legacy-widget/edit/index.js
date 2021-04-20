@@ -184,7 +184,7 @@ function NotEmpty( {
 						isVisible={ ! isSelected }
 					/>
 				) : (
-					<NoPreview name={ widgetType.name } />
+					! isSelected && <NoPreview name={ widgetType.name } />
 				) ) }
 		</>
 	);
