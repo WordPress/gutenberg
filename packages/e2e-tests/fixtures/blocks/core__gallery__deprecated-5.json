@@ -30,7 +30,11 @@
 					"caption": ""
 				}
 			],
-			"ids": [ 705, 704, 703 ],
+			"ids": [
+				705,
+				704,
+				703
+			],
 			"caption": "",
 			"imageCrop": true,
 			"linkTo": "file",

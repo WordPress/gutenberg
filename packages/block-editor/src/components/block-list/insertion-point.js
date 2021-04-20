@@ -233,7 +233,9 @@ function InsertionPointPopover( {
 				tabIndex={ -1 }
 				onClick={ onClick }
 				onFocus={ onFocus }
-				className={ className }
+				className={ classnames( className, {
+					'is-with-inserter': showInsertionPointInserter,
+				} ) }
 				style={ style }
 			>
 				{ showInsertionPointIndicator && (
