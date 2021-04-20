@@ -1,5 +1,15 @@
+.wp-block-legacy-widget:not(.is-selected) {
+	cursor: pointer;
+
+	&:hover::after {
+		border: 1px solid $gray-600;
+	}
+}
+
 .wp-block-legacy-widget__edit-form {
 	background: $white;
+	border-radius: $radius-block-ui;
+	border: 1px solid $gray-300;
 	padding: $grid-unit-15;
 
 	.wp-block-legacy-widget__edit-form-title {
@@ -29,6 +39,7 @@
 
 .wp-block-legacy-widget__edit-preview {
 	overflow: auto;
+	width: 100%;
 }
 
 .wp-block-legacy-widget__edit-no-preview {
