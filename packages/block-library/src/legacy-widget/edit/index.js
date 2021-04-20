@@ -107,7 +107,7 @@ function NotEmpty( {
 	const { content, setFormData, hasPreview } = useForm( {
 		id,
 		idBase,
-		instance,
+		instance: pendingInstance,
 		setInstance: setPendingInstance,
 	} );
 
