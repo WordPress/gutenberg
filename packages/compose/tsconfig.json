@@ -6,6 +6,7 @@
 	},
 	"include": [
 		"src/higher-order/if-condition/**/*",
+		"src/higher-order/pure/**/*",
 		"src/utils/**/*"
 	]
 }

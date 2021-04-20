@@ -72,7 +72,7 @@ displayShortcut.primary( 'm' );
 
 _Type_
 
--   `WPModifierHandler<WPKeyHandler<string>>` Keyed map of functions to display shortcuts.
+-   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to display shortcuts.
 
 <a name="displayShortcutList" href="#displayShortcutList">#</a> **displayShortcutList**
 
@@ -88,7 +88,7 @@ displayShortcutList.primary( 'm' );
 
 _Type_
 
--   `WPModifierHandler<WPKeyHandler<string[]>>` Keyed map of functions to shortcut sequences.
+-   `WPModifierHandler<WPKeyHandler<string[]>>`Keyed map of functions to shortcut sequences.
 
 <a name="DOWN" href="#DOWN">#</a> **DOWN**
 
@@ -121,7 +121,7 @@ isKeyboardEvent.primary( event, 'm' );
 
 _Type_
 
--   `WPModifierHandler<WPEventKeyHandler>` Keyed map of functions to match events.
+-   `WPModifierHandler<WPEventKeyHandler>`Keyed map of functions to match events.
 
 <a name="LEFT" href="#LEFT">#</a> **LEFT**
 
@@ -134,7 +134,7 @@ depending on platform.
 
 _Type_
 
--   `WPModifierHandler< ( isApple: () => boolean ) => WPModifierPart[]>` 
+-   `WPModifierHandler< ( isApple: () => boolean ) => WPModifierPart[]>`
 
 <a name="rawShortcut" href="#rawShortcut">#</a> **rawShortcut**
 
@@ -152,7 +152,7 @@ rawShortcut.primary( 'm' )
 
 _Type_
 
--   `WPModifierHandler<WPKeyHandler<string>>` Keyed map of functions to raw shortcuts.
+-   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to raw shortcuts.
 
 <a name="RIGHT" href="#RIGHT">#</a> **RIGHT**
 
@@ -177,7 +177,7 @@ shortcutAriaLabel.primary( '.' );
 
 _Type_
 
--   `WPModifierHandler<WPKeyHandler<string>>` Keyed map of functions to shortcut ARIA labels.
+-   `WPModifierHandler<WPKeyHandler<string>>`Keyed map of functions to shortcut ARIA labels.
 
 <a name="SPACE" href="#SPACE">#</a> **SPACE**
 
