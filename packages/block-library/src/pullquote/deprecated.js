@@ -107,11 +107,10 @@ const deprecated = [
 				'color',
 				textColor
 			);
-			const blockquoteClasses =
-				( textColor || customTextColor ) &&
-				classnames( 'has-text-color', {
-					[ blockquoteTextColorClass ]: blockquoteTextColorClass,
-				} );
+			const blockquoteClasses = classnames( {
+				'has-text-color': textColor || customTextColor,
+				[ blockquoteTextColorClass ]: blockquoteTextColorClass,
+			} );
 
 			const blockquoteStyles = blockquoteTextColorClass
 				? undefined
@@ -149,18 +148,18 @@ const deprecated = [
 			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
 
 			const style = {};
-			// Block supports: Set style.border.color if a deprecated block has a default style and a `customMainColor` attribute.
-			if ( ! isSolidColorStyle && customMainColor ) {
-				style.border = {
-					color: customMainColor,
-				};
-			}
-
-			// Block supports: Set style.color.background if a deprecated block has a solid style and a `customMainColor` attribute.
-			if ( isSolidColorStyle && customMainColor ) {
-				style.color = {
-					background: customMainColor,
-				};
+			if ( customMainColor ) {
+				if ( ! isSolidColorStyle ) {
+					// Block supports: Set style.border.color if a deprecated block has a default style and a `customMainColor` attribute.
+					style.border = {
+						color: customMainColor,
+					};
+				} else {
+					// Block supports: Set style.color.background if a deprecated block has a solid style and a `customMainColor` attribute.
+					style.color = {
+						background: customMainColor,
+					};
+				}
 			}
 
 			// Block supports: Set style.color.text if a deprecated block has a `customTextColor` attribute.

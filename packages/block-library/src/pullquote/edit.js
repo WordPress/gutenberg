@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RichText, withColors, useBlockProps } from '@wordpress/block-editor';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -71,7 +71,4 @@ function PullQuoteEdit( {
 	);
 }
 
-export default withColors( {
-	mainColor: 'background-color',
-	textColor: 'color',
-} )( PullQuoteEdit );
+export default PullQuoteEdit;

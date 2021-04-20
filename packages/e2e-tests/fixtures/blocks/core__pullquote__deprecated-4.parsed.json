@@ -1,24 +1,24 @@
 [
-    {
-        "blockName": "core/pullquote",
-        "attrs": {
-            "mainColor": "black",
-            "textColor": "white",
-            "className": "is-style-solid-color"
-        },
-        "innerBlocks": [],
-        "innerHTML": "\n<figure class=\"wp-block-pullquote has-background has-black-background-color is-style-solid-color\"><blockquote class=\"has-text-color has-white-color\"><p>pullquote</p><cite>before block supports</cite></blockquote></figure>\n",
-        "innerContent": [
-            "\n<figure class=\"wp-block-pullquote has-background has-black-background-color is-style-solid-color\"><blockquote class=\"has-text-color has-white-color\"><p>pullquote</p><cite>before block supports</cite></blockquote></figure>\n"
-        ]
-    },
-    {
-        "blockName": null,
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "\n",
-        "innerContent": [
-            "\n"
-        ]
-    }
+	{
+		"blockName": "core/pullquote",
+		"attrs": {
+			"mainColor": "black",
+			"textColor": "white",
+			"className": "is-style-solid-color"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<figure class=\"wp-block-pullquote has-background has-black-background-color is-style-solid-color\"><blockquote class=\"has-text-color has-white-color\"><p>pullquote</p><cite>before block supports</cite></blockquote></figure>\n",
+		"innerContent": [
+			"\n<figure class=\"wp-block-pullquote has-background has-black-background-color is-style-solid-color\"><blockquote class=\"has-text-color has-white-color\"><p>pullquote</p><cite>before block supports</cite></blockquote></figure>\n"
+		]
+	},
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n",
+		"innerContent": [
+			"\n"
+		]
+	}
 ]
