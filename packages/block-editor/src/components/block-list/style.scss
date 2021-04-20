@@ -501,6 +501,11 @@
  * Block Toolbar when contextual.
  */
 
+// Show a small gap above the block toolbar when it stickies to the top of the screen.
+.block-editor-block-contextual-toolbar-wrapper {
+	padding-top: $grid-unit-15;
+}
+
 .block-editor-block-contextual-toolbar {
 	// Block UI appearance.
 	border: $border-width solid $gray-900;
