@@ -34,7 +34,6 @@ function BlockListAppender( {
 	className,
 	selectedBlockClientId,
 	tagName: TagName = 'div',
-	__experimentalButtonText,
 } ) {
 	if ( isLocked || CustomAppender === false ) {
 		return null;
@@ -74,7 +73,6 @@ function BlockListAppender( {
 			// default block can't be inserted.
 			appender = (
 				<ButtonBlockAppender
-					__experimentalButtonText={ __experimentalButtonText }
 					rootClientId={ rootClientId }
 					className="block-list-appender__toggle"
 				/>

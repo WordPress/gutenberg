@@ -11,12 +11,14 @@ import { Fragment, useEffect } from '@wordpress/element';
 
 import {
 	BlockControls,
+	ButtonBlockerAppender,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
 	JustifyToolbar,
 	ContrastChecker,
 	PanelColorSettings,
+	store as blockEditorStore,
 	withColors,
 } from '@wordpress/block-editor';
 import {
@@ -28,6 +30,7 @@ import {
 	ToolbarItem,
 	ToolbarGroup,
 } from '@wordpress/components';
+import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
 
@@ -43,8 +46,10 @@ const sizeOptions = [
 export function SocialLinksEdit( props ) {
 	const {
 		attributes,
+		clientId,
 		iconBackgroundColor,
 		iconColor,
+		isSelected,
 		setAttributes,
 		setIconBackgroundColor,
 		setIconColor,
@@ -91,14 +96,30 @@ export function SocialLinksEdit( props ) {
 		[ `items-justified-${ itemsJustification }` ]: itemsJustification,
 	} );
 
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
+			0,
+		[ clientId ]
+	);
+
 	const blockProps = useBlockProps( { className } );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
 		orientation: 'horizontal',
-		placeholder: SocialPlaceholder,
+		placeholder: ! isSelected && SocialPlaceholder,
 		templateLock: false,
-		__experimentalAppenderTagName: 'li',
-		__experimentalAppenderButtonText: 'Add a social icon',
+		renderAppender:
+			isSelected && ! hasInnerBlocks
+				? () => (
+						<ButtonBlockerAppender
+							__experimentalShowLabel
+							className="block-list-appender__toggle"
+							rootClientId={ clientId }
+							tagName="li"
+						/>
+				  )
+				: undefined,
 	} );
 
 	const POPOVER_PROPS = {

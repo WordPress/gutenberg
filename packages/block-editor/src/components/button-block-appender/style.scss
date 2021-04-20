@@ -35,6 +35,14 @@
 		height: $icon-size;
 		width: $icon-size;
 
+		&.has-visible-label {
+			width: auto;
+
+			& > svg + span {
+				padding: 0 $grid-unit-10;
+			}
+		}
+
 		& > svg {
 			width: $icon-size;
 			background-color: $gray-900;

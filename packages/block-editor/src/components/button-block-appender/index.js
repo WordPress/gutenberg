@@ -17,7 +17,7 @@ import { Icon, plus } from '@wordpress/icons';
 import Inserter from '../inserter';
 
 function ButtonBlockAppender(
-	{ rootClientId, className, onFocus, tabIndex, __experimentalButtonText },
+	{ rootClientId, className, onFocus, tabIndex, __experimentalShowLabel },
 	ref
 ) {
 	return (
@@ -55,24 +55,22 @@ function ButtonBlockAppender(
 						tabIndex={ tabIndex }
 						className={ classnames(
 							className,
-							'block-editor-button-block-appender'
+							'block-editor-button-block-appender',
+							{ 'has-visible-label': __experimentalShowLabel }
 						) }
 						onClick={ onToggle }
 						aria-haspopup={ isToggleButton ? 'true' : undefined }
 						aria-expanded={ isToggleButton ? isOpen : undefined }
 						disabled={ disabled }
-						label={ __experimentalButtonText ? undefined : label }
+						label={ __experimentalShowLabel ? undefined : label }
 						tooltipPosition="bottom"
-						showTooltip={ ! __experimentalButtonText }
+						showTooltip={ ! __experimentalShowLabel }
 					>
-						{ ! hasSingleBlockType &&
-							! __experimentalButtonText && (
-								<VisuallyHidden as="span">
-									{ label }
-								</VisuallyHidden>
-							) }
+						{ ! hasSingleBlockType && ! __experimentalShowLabel && (
+							<VisuallyHidden as="span">{ label }</VisuallyHidden>
+						) }
 						<Icon icon={ plus } />
-						<span>{ __experimentalButtonText }</span>
+						{ __experimentalShowLabel && <span>{ label }</span> }
 					</Button>
 				);
 			} }
