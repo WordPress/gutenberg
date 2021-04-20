@@ -347,11 +347,18 @@ describe( 'selectors', () => {
 				secondActiveBlockVariationArray,
 				thirdBlockVariation,
 			] );
-			it( 'should return the active variation based on the given isActive function', () => {
+			test.each( [
 				[
+					firstActiveBlockVariationFunction.name,
 					firstActiveBlockVariationFunction,
+				],
+				[
+					secondActiveBlockVariationFunction.name,
 					secondActiveBlockVariationFunction,
-				].forEach( ( variation ) => {
+				],
+			] )(
+				'should return the active variation based on the given isActive function (%s)',
+				( _variationName, variation ) => {
 					const blockAttributes = {
 						testAttribute: variation.attributes.testAttribute,
 					};
@@ -363,8 +370,8 @@ describe( 'selectors', () => {
 					);
 
 					expect( result ).toEqual( variation );
-				} );
-			} );
+				}
+			);
 			it( 'should return undefined if no active variation is found', () => {
 				const blockAttributes = {
 					testAttribute: UNUSED_TEST_ATTRIBUTE_VALUE,
