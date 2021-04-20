@@ -22,12 +22,17 @@ import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 import BlockToolsBackCompat from '../block-tools/back-compat';
 import { useBlockSelectionClearer } from '../block-selection-clearer';
+import { useInnerBlocksProps } from '../inner-blocks';
+import {
+	BlockEditContextProvider,
+	DEFAULT_BLOCK_EDIT_CONTEXT,
+} from '../block-edit/context';
 
 const elementContext = createContext();
 
 export const IntersectionObserver = createContext();
 
-function Root( { className, children } ) {
+function Root( { className, ...settings } ) {
 	const [ element, setElement ] = useState();
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const { isOutlineMode, isFocusMode, isNavigationMode } = useSelect(
@@ -44,38 +49,35 @@ function Root( { className, children } ) {
 		},
 		[]
 	);
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			ref: useMergeRefs( [
+				useBlockSelectionClearer(),
+				useInBetweenInserter(),
+				setElement,
+			] ),
+			className: classnames( 'is-root-container', className, {
+				'is-outline-mode': isOutlineMode,
+				'is-focus-mode': isFocusMode && isLargeViewport,
+				'is-navigate-mode': isNavigationMode,
+			} ),
+		},
+		settings
+	);
 	return (
 		<elementContext.Provider value={ element }>
-			<div
-				ref={ useMergeRefs( [
-					useBlockSelectionClearer(),
-					useBlockDropZone(),
-					useInBetweenInserter(),
-					setElement,
-				] ) }
-				className={ classnames(
-					'block-editor-block-list__layout is-root-container',
-					className,
-					{
-						'is-outline-mode': isOutlineMode,
-						'is-focus-mode': isFocusMode && isLargeViewport,
-						'is-navigate-mode': isNavigationMode,
-					}
-				) }
-			>
-				{ children }
-			</div>
+			<div { ...innerBlocksProps } />
 		</elementContext.Provider>
 	);
 }
 
-export default function BlockList( { className, ...props } ) {
+export default function BlockList( settings ) {
 	usePreParsePatterns();
 	return (
 		<BlockToolsBackCompat>
-			<Root className={ className }>
-				<BlockListItems { ...props } />
-			</Root>
+			<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
+				<Root { ...settings } />
+			</BlockEditContextProvider>
 		</BlockToolsBackCompat>
 	);
 }
