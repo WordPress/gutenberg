@@ -44,7 +44,10 @@ function HeadingEdit( {
 		content
 	);
 	useEffect( () => {
-		if ( generatedAnchor !== attributes.anchor ) {
+		if (
+			false !== attributes.autoAnchor &&
+			generatedAnchor !== attributes.anchor
+		) {
 			setAttributes( {
 				anchor: generatedAnchor,
 				autoAnchor: true,

@@ -93,13 +93,9 @@ export const withInspectorControl = createHigherOrderComponent(
 						onChange={ ( nextValue ) => {
 							nextValue = nextValue.replace( ANCHOR_REGEX, '-' );
 
-							if (
-								props.attributes.autoAnchor &&
-								0 === nextValue.indexOf( 'wp-' )
-							) {
-								nextValue = nextValue.replace( 'wp-', '' );
+							if ( props.attributes.autoAnchor ) {
+								props.setAttributes( { autoAnchor: false } );
 							}
-							delete props.attributes.autoAnchor;
 							props.setAttributes( { anchor: nextValue } );
 						} }
 						autoCapitalize="none"

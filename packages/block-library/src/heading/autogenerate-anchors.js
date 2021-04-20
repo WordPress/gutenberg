@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isNil, deburr, trim, startsWith } from 'lodash';
+import { deburr, trim } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -95,14 +95,13 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 		return null;
 	}
 
-	const baseAnchor = `wp-${ slug }`;
-	anchor = baseAnchor;
+	anchor = slug;
 	let i = 0;
 
 	// If the anchor already exists in another heading, append -i.
 	while ( allHeadingAnchors.includes( anchor ) ) {
 		i += 1;
-		anchor = baseAnchor + '-' + i;
+		anchor = slug + '-' + i;
 	}
 
 	return anchor;
@@ -125,8 +124,5 @@ export default function useGeneratedAnchor( clientId, anchor, content ) {
 		},
 		[ clientId ]
 	);
-	if ( isNil( anchor ) || startsWith( anchor, 'wp-' ) ) {
-		return generateAnchor( anchor, content, allHeadingAnchors );
-	}
-	return anchor;
+	return generateAnchor( anchor, content, allHeadingAnchors );
 }
