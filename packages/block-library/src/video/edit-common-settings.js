@@ -22,7 +22,7 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 	} = attributes;
 
 	const autoPlayHelpText = __(
-		'Note: Autoplaying videos may cause usability issues for some visitors.'
+		'Autoplay may cause usability issues for some users.'
 	);
 	const getAutoplayHelp = Platform.select( {
 		web: useCallback( ( checked ) => {

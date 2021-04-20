@@ -171,7 +171,7 @@ function AudioEdit( {
 							onChange={ toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
 							help={ __(
-								'Note: Autoplaying audio may cause usability issues for some visitors.'
+								'Autoplay may cause usability issues for some users.'
 							) }
 						/>
 						<ToggleControl
