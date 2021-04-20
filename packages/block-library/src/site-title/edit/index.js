@@ -36,19 +36,18 @@ export default function SiteTitleEdit( {
 	} );
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-
+			<BlockControls group="block">
 				<LevelToolbar
 					level={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}
+				/>
+				<AlignmentToolbar
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
 				/>
 			</BlockControls>
 			<TagName { ...blockProps }>
