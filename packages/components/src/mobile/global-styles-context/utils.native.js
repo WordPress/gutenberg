@@ -43,7 +43,8 @@ export function getBlockPaddings(
 	if (
 		mergedStyle?.padding &&
 		! wrapperPropsStyle?.backgroundColor &&
-		! blockStyleAttributes?.backgroundColor
+		! blockStyleAttributes?.backgroundColor &&
+		! blockColors?.backgroundColor
 	) {
 		blockPaddings.padding = undefined;
 	}
