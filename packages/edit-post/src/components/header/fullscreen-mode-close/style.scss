@@ -14,9 +14,10 @@
 		background: #23282e; // WP-admin gray.
 		color: $white;
 		border-radius: 0;
-		height: $header-height;
+		height: $header-height + 1px;
 		width: $header-height;
 		position: relative;
+		margin-bottom: -1px;
 
 		&:active {
 			color: $white;

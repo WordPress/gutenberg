@@ -66,4 +66,9 @@
 	position: absolute;
 	top: $grid-unit-10;
 	left: $grid-unit-10;
+	color: $white;
+
+	&:hover {
+		color: $gray-100;
+	}
 }
