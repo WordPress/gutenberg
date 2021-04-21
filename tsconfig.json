@@ -30,7 +30,8 @@
 		{ "path": "packages/token-list" },
 		{ "path": "packages/url" },
 		{ "path": "packages/warning" },
-		{ "path": "packages/wordcount" }
+		{ "path": "packages/wordcount" },
+		{ "path": "test" },
 	],
 	"files": []
 }
