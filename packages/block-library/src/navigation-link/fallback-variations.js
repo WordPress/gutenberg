@@ -59,9 +59,8 @@ const fallbackVariations = [
 fallbackVariations.forEach( ( variation ) => {
 	if ( variation.isActive ) return;
 
-	variation.isActive = ( blockAttributes, variationAttributes ) => {
-		return blockAttributes.type === variationAttributes.type;
-	};
+	variation.isActive = ( blockAttributes, variationAttributes ) =>
+		blockAttributes.type === variationAttributes.type;
 } );
 
 export default fallbackVariations;
