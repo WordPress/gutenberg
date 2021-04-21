@@ -90,8 +90,8 @@ function Header() {
 								'Generic label for block inserter button'
 							) }
 						/>
-						<ToolbarItem as={ UndoButton } />
-						<ToolbarItem as={ RedoButton } />
+						<UndoButton />
+						<RedoButton />
 						<ToolbarItem as={ BlockNavigationDropdown } />
 					</NavigableToolbar>
 				</div>
