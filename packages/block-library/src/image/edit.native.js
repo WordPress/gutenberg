@@ -499,7 +499,7 @@ export class ImageEdit extends Component {
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
 						autoOpenMediaUpload={
-							isSelected && ! url && wasBlockJustInserted
+							isSelected && wasBlockJustInserted
 						}
 					/>
 				</View>
