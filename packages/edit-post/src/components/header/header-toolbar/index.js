@@ -84,7 +84,7 @@ function HeaderToolbar() {
 			/>
 			<ToolbarItem
 				as={ Button }
-				className="edit-site-header-toolbar__list-view-toggle"
+				className="edit-post-header-toolbar__list-view-toggle"
 				icon={ listView }
 				disabled={ isTextModeEnabled }
 				isPressed={ isListViewOpen }
