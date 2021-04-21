@@ -8,25 +8,16 @@ import classnames from 'classnames';
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
+	HeadingLevelControl,
 	BlockControls,
 	InspectorControls,
 	useBlockProps,
 	PlainText,
 } from '@wordpress/block-editor';
-import {
-	ToolbarGroup,
-	ToggleControl,
-	TextControl,
-	PanelBody,
-} from '@wordpress/components';
+import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
-
-/**
- * Internal dependencies
- */
-import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 export default function PostTitleEdit( {
 	attributes: { level, textAlign, isLink, rel, linkTarget },
@@ -104,16 +95,14 @@ export default function PostTitleEdit( {
 
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<HeadingLevelDropdown
-						selectedLevel={ level }
-						onChange={ ( newLevel ) =>
-							setAttributes( { level: newLevel } )
-						}
-					/>
-				</ToolbarGroup>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<HeadingLevelControl
+					selectedLevel={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
+				/>
+				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );

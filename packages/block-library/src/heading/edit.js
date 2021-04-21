@@ -10,15 +10,11 @@ import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentControl,
+	HeadingLevelControl,
 	BlockControls,
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import HeadingLevelDropdown from './heading-level-dropdown';
 
 function HeadingEdit( {
 	attributes,
@@ -40,7 +36,7 @@ function HeadingEdit( {
 	return (
 		<>
 			<BlockControls group="block">
-				<HeadingLevelDropdown
+				<HeadingLevelControl
 					selectedLevel={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )

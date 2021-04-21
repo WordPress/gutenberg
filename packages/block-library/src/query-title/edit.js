@@ -8,18 +8,13 @@ import classnames from 'classnames';
  */
 // import { useSelect, useDispatch } from '@wordpress/data';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
+	HeadingLevelControl,
 	BlockControls,
 	useBlockProps,
 	Warning,
 } from '@wordpress/block-editor';
-import { ToolbarGroup } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import HeadingLevelDropdown from '../heading/heading-level-dropdown';
 
 const SUPPORTED_TYPES = [ 'archive' ];
 
@@ -52,16 +47,14 @@ export default function QueryTitleEdit( {
 	}
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					<HeadingLevelDropdown
-						selectedLevel={ level }
-						onChange={ ( newLevel ) =>
-							setAttributes( { level: newLevel } )
-						}
-					/>
-				</ToolbarGroup>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<HeadingLevelControl
+					selectedLevel={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
+				/>
+				<AlignmentControl
 					value={ textAlign }
 					onChange={ ( nextAlign ) => {
 						setAttributes( { textAlign: nextAlign } );

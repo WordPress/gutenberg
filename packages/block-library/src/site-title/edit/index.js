@@ -11,15 +11,11 @@ import { __ } from '@wordpress/i18n';
 import {
 	RichText,
 	AlignmentControl,
+	HeadingLevelControl,
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
-
-/**
- * Internal dependencies
- */
-import LevelControl from './level-toolbar';
 
 export default function SiteTitleEdit( {
 	attributes,
@@ -37,11 +33,12 @@ export default function SiteTitleEdit( {
 	return (
 		<>
 			<BlockControls group="block">
-				<LevelControl
-					level={ level }
+				<HeadingLevelControl
+					selectedLevel={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}
+					isParagraphAllowed
 				/>
 				<AlignmentControl
 					value={ textAlign }

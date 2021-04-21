@@ -411,6 +411,22 @@ _Returns_
 
 -   `string`: Gradient value.
 
+<a name="HeadingLevelControl" href="#HeadingLevelControl">#</a> **HeadingLevelControl**
+
+The `HeadingLevelControl` component renders a dropdown menu that displays
+heading level options for the selected block. This component is used to set
+the level of the heading in a block and also allows to use a `paragraph`
+element by setting the level to zero (`0`).
+This would also need handling in the block's `edit` function.
+
+_Parameters_
+
+-   _props_ `WPHeadingLevelControlProps`: Component props.
+
+_Returns_
+
+-   `WPComponent`: The Heading Level Control Dropdown.
+
 <a name="InnerBlocks" href="#InnerBlocks">#</a> **InnerBlocks**
 
 _Related_
