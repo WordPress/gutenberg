@@ -11,7 +11,10 @@ const lineAndColumnInStackTrace = /^.*:([0-9]+):([0-9]+).*$/;
 
 class GithubActionReporter {
 	async onRunComplete( _contexts, _aggregatedResults ) {
-		const messages = getMessages( _aggregatedResults?.testResults );
+		if ( ! _aggregatedResults ) {
+			return;
+		}
+		const messages = getMessages( _aggregatedResults.testResults );
 
 		for ( const message of messages ) {
 			// eslint-disable-next-line no-console
