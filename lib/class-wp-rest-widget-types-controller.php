@@ -459,14 +459,14 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		$serialized_instance = serialize( $instance );
 
 		$response = array(
-			'preview'  => trim(
-				$this->get_widget_preview(
+			'form'     => trim(
+				$this->get_widget_form(
 					$widget_object,
 					$instance
 				)
 			),
-			'form'     => trim(
-				$this->get_widget_form(
+			'preview'  => trim(
+				$this->get_widget_preview(
 					$widget_object,
 					$instance
 				)
