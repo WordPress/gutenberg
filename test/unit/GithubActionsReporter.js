@@ -14,7 +14,8 @@ class GithubActionReporter {
 		const messages = getMessages( _aggregatedResults?.testResults );
 
 		for ( const message of messages ) {
-			process.stderr.write( message + '\n' );
+			// eslint-disable-next-line no-console
+			console.log( message );
 		}
 	}
 }
