@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get, isEmpty } from 'lodash';
+import { get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -15,16 +15,11 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '../../store';
 
 export function PageAttributesCheck( { children } ) {
-	const { postType, availableTemplates } = useSelect( ( select ) => {
-		const { getEditedPostAttribute, getEditorSettings } = select(
-			editorStore
-		);
+	const postType = useSelect( ( select ) => {
+		const { getEditedPostAttribute } = select( editorStore );
 		const { getPostType } = select( coreStore );
 
-		return {
-			postType: getPostType( getEditedPostAttribute( 'type' ) ),
-			availableTemplates: getEditorSettings().availableTemplates,
-		};
+		return getPostType( getEditedPostAttribute( 'type' ) );
 	}, [] );
 	const supportsPageAttributes = get(
 		postType,
@@ -33,10 +28,7 @@ export function PageAttributesCheck( { children } ) {
 	);
 
 	// Only render fields if post type supports page attributes or available templates exist.
-	if (
-		! supportsPageAttributes &&
-		( isEmpty( availableTemplates ) || ! postType?.viewable )
-	) {
+	if ( ! supportsPageAttributes ) {
 		return null;
 	}
 

@@ -16,7 +16,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import { store as editorStore } from '../../store';
 
-export function PageTemplate( {} ) {
+export function PostTemplate( {} ) {
 	const { availableTemplates, selectedTemplate, isViewable } = useSelect(
 		( select ) => {
 			const {
@@ -51,7 +51,6 @@ export function PageTemplate( {} ) {
 					template: templateSlug || '',
 				} );
 			} }
-			className="editor-page-attributes__template"
 			options={ map(
 				availableTemplates,
 				( templateName, templateSlug ) => ( {
@@ -63,4 +62,4 @@ export function PageTemplate( {} ) {
 	);
 }
 
-export default PageTemplate;
+export default PostTemplate;
