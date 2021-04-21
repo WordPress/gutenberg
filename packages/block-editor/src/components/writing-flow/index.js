@@ -542,7 +542,7 @@ export default function WritingFlow( { children } ) {
 		};
 	}, [] );
 
-	function onFocusCapture() {
+	function onFocusCapture( event ) {
 		// Do not capture incoming focus if set by us in WritingFlow.
 		if ( noCapture.current ) {
 			noCapture.current = null;
@@ -552,6 +552,14 @@ export default function WritingFlow( { children } ) {
 			lastFocus.current.focus();
 		} else {
 			setNavigationMode( true );
+
+			const isBefore =
+				// eslint-disable-next-line no-bitwise
+				event.target.compareDocumentPosition( container.current ) &
+				event.target.DOCUMENT_POSITION_FOLLOWING;
+			const action = isBefore ? 'findNext' : 'findPrevious';
+
+			focus.tabbable[ action ]( event.target ).focus();
 		}
 	}
 
