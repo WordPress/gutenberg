@@ -648,6 +648,60 @@ describe( 'blocks', () => {
 			} );
 		} );
 
+		it( "should warn and remove isActive if a variation's isActive is not an array or function", () => {
+			const blockType = {
+				save: noop,
+				category: 'text',
+				title: 'block title',
+				variations: [
+					{
+						name: 'variation-1',
+						isActive: 'ignore this',
+					},
+				],
+			};
+			registerBlockType( 'core/test-block-with-variations', blockType );
+			expect(
+				getBlockType( 'core/test-block-with-variations' ).variations
+			).toEqual( [
+				{
+					name: 'variation-1',
+				},
+			] );
+			expect( console ).toHaveWarnedWith(
+				'The block "core/test-block-with-variations"\'s "variation-1" variation "isActive" must be either an array or a function.'
+			);
+		} );
+
+		it( "should warn and remove extra attribute if a variation isActive's array contains attribute that is not defined in the block type", () => {
+			const blockType = {
+				save: noop,
+				category: 'text',
+				title: 'block title',
+				attributes: {
+					link: {},
+				},
+				variations: [
+					{
+						name: 'variation-1',
+						isActive: [ 'link', 'text' ],
+					},
+				],
+			};
+			registerBlockType( 'core/test-block-with-variations', blockType );
+			expect(
+				getBlockType( 'core/test-block-with-variations' ).variations
+			).toEqual( [
+				{
+					name: 'variation-1',
+					isActive: [ 'link' ],
+				},
+			] );
+			expect( console ).toHaveWarnedWith(
+				'The block "core/test-block-with-variations"\'s "variation-1" variation "isActive" array contains attributes ("text") that aren\'t defined in the block type. They will be ignored.'
+			);
+		} );
+
 		describe( 'applyFilters', () => {
 			afterEach( () => {
 				removeAllFilters( 'blocks.registerBlockType' );
