@@ -28,6 +28,7 @@ import { moreHorizontalMobile } from '@wordpress/icons';
 import { useRef, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -44,6 +45,7 @@ const BlockActionsMenu = ( {
 	isEmptyDefaultBlock,
 	isFirst,
 	isLast,
+	reusableBlock,
 	rootClientId,
 	selectedBlockClientId,
 	selectedBlockPossibleTransformations,
@@ -189,7 +191,7 @@ const BlockActionsMenu = ( {
 					sprintf(
 						/* translators: %s: name of the reusable block */
 						__( '%s converted to regular blocks' ),
-						blockTitle
+						reusableBlock?.title?.raw || blockTitle
 					)
 				);
 				convertBlockToStatic( selectedBlockClientId );
@@ -319,6 +321,13 @@ export default compose(
 			: [];
 
 		const isReusableBlockType = block ? isReusableBlock( block ) : false;
+		const reusableBlock = isReusableBlockType
+			? select( coreStore ).getEntityRecord(
+					'postType',
+					'wp_block',
+					block?.attributes.ref
+			  )
+			: undefined;
 
 		return {
 			blockTitle,
@@ -329,6 +338,7 @@ export default compose(
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 			isReusableBlockType,
+			reusableBlock,
 			rootClientId,
 			selectedBlockClientId,
 			selectedBlockPossibleTransformations,
