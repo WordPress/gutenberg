@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import deepMerge from 'deepmerge';
-import deepEqual from 'fast-deep-equal';
+import { isEqual, merge } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -35,20 +34,20 @@ export const useComponentsContext = () => useContext( ComponentsContext );
 function useContextSystemBridge( { value } ) {
 	const parentContext = useComponentsContext();
 	const parentContextRef = useRef( parentContext );
-	const valueRef = useRef( deepMerge( parentContext, value ) );
+	const valueRef = useRef( merge( parentContext, value ) );
 
 	const [ config, setConfig ] = useState( valueRef.current );
 
 	useIsomorphicLayoutEffect( () => {
 		let hasChange = false;
 
-		if ( ! deepEqual( value, valueRef.current ) ) {
+		if ( ! isEqual( value, valueRef.current ) ) {
 			valueRef.current = value;
 			hasChange = true;
 		}
 
-		if ( ! deepEqual( parentContext, parentContextRef.current ) ) {
-			valueRef.current = deepMerge( parentContext, valueRef.current );
+		if ( ! isEqual( parentContext, parentContextRef.current ) ) {
+			valueRef.current = merge( parentContext, valueRef.current );
 			parentContextRef.current = parentContext;
 			hasChange = true;
 		}
