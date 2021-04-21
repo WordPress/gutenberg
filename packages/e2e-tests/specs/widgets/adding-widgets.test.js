@@ -510,11 +510,6 @@ describe( 'Widgets screen', () => {
 			name: 'Block: Widget Area',
 		} );
 
-		// Wait for the widget's form to load.
-		// await page.waitForSelector(
-		// 	'[data-block][data-type="core/legacy-widget"] input'
-		// );
-
 		const legacyWidget = await find( {
 			role: 'group',
 			name: 'Block: Legacy Widget',
