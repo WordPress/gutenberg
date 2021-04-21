@@ -249,7 +249,7 @@ function gutenberg_the_skip_link() {
 	?>
 	<script>
 	( function() {
-		var skipLinkTarget = document.querySelector( 'main' ),
+		var skipLinkTarget = document.querySelector( 'main, .wp-block-post-title, .wp-block-query-loop, .wp-block-post-content, .entry-content' ),
 			parentEl,
 			skipLinkTargetID,
 			skipLink;
