@@ -8,11 +8,11 @@
 
 ## Breaking Change
 
-- A `parser.js` file generated from the PEGJS grammar is now outputted in commonjs format.
+-   A `parser.js` file generated from the PEGJS grammar is now outputted in commonjs format.
 
 ## New Feature
 
-- A `parser.php` file generated from the PEGJS grammar is now added upon installation.
+-   A `parser.php` file generated from the PEGJS grammar is now added upon installation.
 
 ## 2.0.2 (2018-12-12)
 
@@ -22,14 +22,14 @@
 
 ### Breaking Change
 
-- JS and PHP parsers now behave consistently when parsing empty attributes.
+-   JS and PHP parsers now behave consistently when parsing empty attributes.
 
 ## 1.1.1 (2018-11-09)
 
 ## 1.1.0 (2018-11-09)
 
-- Add new list of HTML fragments to parse output.
-- Optimize JSON-attribute parsing.
+-   Add new list of HTML fragments to parse output.
+-   Optimize JSON-attribute parsing.
 
 ## 1.0.4 (2018-11-03)
 

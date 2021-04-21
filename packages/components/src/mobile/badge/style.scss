@@ -1,0 +1,15 @@
+.badgeContainer {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 2;
+}
+
+.badge {
+	padding: 10px;
+	margin: 8px;
+	color: #fff;
+	border-radius: 3px;
+	background-color: $gray-70;
+	border-color: $gray-70;
+}

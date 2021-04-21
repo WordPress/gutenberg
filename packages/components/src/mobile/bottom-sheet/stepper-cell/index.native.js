@@ -209,7 +209,6 @@ class BottomSheetStepperCell extends Component {
 						cellRowContainerStyle={
 							preview ? containerStyle : styles.cellRowStyles
 						}
-						disabled={ true }
 						editable={ false }
 						icon={ icon }
 						label={ label }

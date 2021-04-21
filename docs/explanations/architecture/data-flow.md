@@ -9,11 +9,7 @@ A block editor post is not the artifact it produces, namely the `post_content`. 
 The input and output of the block editor is a tree of block objects with the current format:
 
 ```js
-const value = [
-    block1,
-    block2,
-    block3
-];
+const value = [ block1, block2, block3 ];
 ```
 
 ### The block object
@@ -22,60 +18,60 @@ Each block object has an id, a set of attributes and potentially a list of child
 
 ```js
 const block = {
-    clientId,   // unique string identifier.
-    type,       // The block type (paragraph, image...)
-    attributes, // (key, value) set of attributes representing the direct properties/content of the current block.
-    innerBlocks // An array of child blocks or inner blocks.
-}
+	clientId, // unique string identifier.
+	type, // The block type (paragraph, image...)
+	attributes, // (key, value) set of attributes representing the direct properties/content of the current block.
+	innerBlocks, // An array of child blocks or inner blocks.
+};
 ```
 
-Note the attributes keys and types, the allowed inner blocks are defined by the block type. For example, the core quote block has a `cite` string attribute representing the cite content while a heading block has a numeric `level` attribute, representing the level of the heading (1 to 6). 
+Note the attributes keys and types, the allowed inner blocks are defined by the block type. For example, the core quote block has a `cite` string attribute representing the cite content while a heading block has a numeric `level` attribute, representing the level of the heading (1 to 6).
 
 During the lifecycle of the block in the editor, the block object can receive extra metadata:
 
- - `isValid`: A boolean representing whether the block is valid or not;
- - `originalContent`: The original HTML serialization of the block.
+-   `isValid`: A boolean representing whether the block is valid or not;
+-   `originalContent`: The original HTML serialization of the block.
 
 **Examples**
 
 ```js
 // A simple paragraph block.
 const paragraphBlock1 = {
-    clientId: "51828be1-5f0d-4a6b-8099-f4c6f897e0a3",
-    type: "core/paragraph",
-    attributes: {
-        content: "This is the <strong>content</strong> of the paragraph block",
-        dropCap: true
-    }
-}
+	clientId: '51828be1-5f0d-4a6b-8099-f4c6f897e0a3',
+	type: 'core/paragraph',
+	attributes: {
+		content: 'This is the <strong>content</strong> of the paragraph block',
+		dropCap: true,
+	},
+};
 
 // A separator block.
 const separatorBlock = {
-    clientId: "51828be1-5f0d-4a6b-8099-f4c6f897e0a4",
-    type: "core/separator",
-    attributes: {}
-}
+	clientId: '51828be1-5f0d-4a6b-8099-f4c6f897e0a4',
+	type: 'core/separator',
+	attributes: {},
+};
 
 // A columns block with a paragraph block on each column.
 const columnsBlock = {
-    clientId: "51828be1-5f0d-4a6b-8099-f4c6f897e0a7",
-    type: "core/columns",
-    attributes: {},
-    innerBlocks: [
-        {
-            clientId: "51828be1-5f0d-4a6b-8099-f4c6f897e0a5",
-            type: "core/column",
-            attributes: {},
-            innerBlocks: [ paragraphBlock1 ],
-        },
-        {
-            clientId: "51828be1-5f0d-4a6b-8099-f4c6f897e0a6",
-            type: "core/column",
-            attributes: {},
-            innerBlocks: [ paragraphBlock2 ],
-        }
-    ]
-}
+	clientId: '51828be1-5f0d-4a6b-8099-f4c6f897e0a7',
+	type: 'core/columns',
+	attributes: {},
+	innerBlocks: [
+		{
+			clientId: '51828be1-5f0d-4a6b-8099-f4c6f897e0a5',
+			type: 'core/column',
+			attributes: {},
+			innerBlocks: [ paragraphBlock1 ],
+		},
+		{
+			clientId: '51828be1-5f0d-4a6b-8099-f4c6f897e0a6',
+			type: 'core/column',
+			attributes: {},
+			innerBlocks: [ paragraphBlock2 ],
+		},
+	],
+};
 ```
 
 ## Serialization and Parsing

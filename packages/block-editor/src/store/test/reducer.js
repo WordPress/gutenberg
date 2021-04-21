@@ -33,6 +33,7 @@ import {
 	template,
 	blockListSettings,
 	lastBlockAttributesChange,
+	lastBlockInserted,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -2942,6 +2943,78 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'lastBlockInserted', () => {
+		it( 'should return client id if last block inserted is called with action INSERT_BLOCKS', () => {
+			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+
+			const action = {
+				blocks: [
+					{
+						clientId: expectedClientId,
+					},
+				],
+				meta: {
+					source: 'inserter_menu',
+				},
+				type: 'INSERT_BLOCKS',
+			};
+
+			const state = lastBlockInserted( {}, action );
+
+			expect( state.clientId ).toBe( expectedClientId );
+		} );
+
+		it( 'should return inserter_menu source if last block inserted is called with action INSERT_BLOCKS', () => {
+			const expectedSource = 'inserter_menu';
+
+			const action = {
+				blocks: [
+					{
+						clientId: '62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
+					},
+				],
+				meta: {
+					source: expectedSource,
+				},
+				type: 'INSERT_BLOCKS',
+			};
+
+			const state = lastBlockInserted( {}, action );
+
+			expect( state.source ).toBe( expectedSource );
+		} );
+
+		it( 'should return state if last block inserted is called with action INSERT_BLOCKS and block list is empty', () => {
+			const expectedState = {
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+			};
+
+			const action = {
+				blocks: [],
+				meta: {
+					source: 'inserter_menu',
+				},
+				type: 'INSERT_BLOCKS',
+			};
+
+			const state = lastBlockInserted( expectedState, action );
+
+			expect( state ).toEqual( expectedState );
+		} );
+
+		it( 'should return empty state if last block inserted is called with action RESET_BLOCKS', () => {
+			const expectedState = {};
+
+			const action = {
+				type: 'RESET_BLOCKS',
+			};
+
+			const state = lastBlockInserted( expectedState, action );
+
+			expect( state ).toEqual( expectedState );
 		} );
 	} );
 } );

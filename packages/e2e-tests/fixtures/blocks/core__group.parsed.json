@@ -11,14 +11,18 @@
 				"attrs": {},
 				"innerBlocks": [],
 				"innerHTML": "\n<p>This is a group block.</p>\n",
-				"innerContent": [ "\n<p>This is a group block.</p>\n" ]
+				"innerContent": [
+					"\n<p>This is a group block.</p>\n"
+				]
 			},
 			{
 				"blockName": "core/paragraph",
 				"attrs": {},
 				"innerBlocks": [],
 				"innerHTML": "\n<p>Group block content.</p>\n",
-				"innerContent": [ "\n<p>Group block content.</p>\n" ]
+				"innerContent": [
+					"\n<p>Group block content.</p>\n"
+				]
 			}
 		],
 		"innerHTML": "\n<div class=\"wp-block-group alignfull has-secondary-background-color has-background\">\n\n</div>\n",
@@ -29,12 +33,5 @@
 			null,
 			"</div>\n"
 		]
-	},
-	{
-		"blockName": null,
-		"attrs": {},
-		"innerBlocks": [],
-		"innerHTML": "\n",
-		"innerContent": [ "\n" ]
 	}
 ]

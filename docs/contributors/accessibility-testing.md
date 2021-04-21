@@ -10,9 +10,9 @@ Make sure you have set up your local environment following the instructions on [
 
 In addition to mouse, make sure the interface is fully accessible for keyboard-only users. Try to interact with your changes using only the keyboard:
 
-- Make sure interactive elements can receive focus using <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd> or arrow keys.
-- Buttons should be activable by pressing <kbd>Enter</kbd> and <kbd>Space</kbd>.
-- Radio buttons and checkboxes should be checked by pressing <kbd>Space</kbd>, but not <kbd>Enter</kbd>.
+-   Make sure interactive elements can receive focus using <kbd>Tab</kbd>, <kbd>Shift+Tab</kbd> or arrow keys.
+-   Buttons should be activable by pressing <kbd>Enter</kbd> and <kbd>Space</kbd>.
+-   Radio buttons and checkboxes should be checked by pressing <kbd>Space</kbd>, but not <kbd>Enter</kbd>.
 
 If the elements can be focused using arrow keys, but not <kbd>Tab</kbd> or <kbd>Shift+Tab</kbd>, consider grouping them using one of the [WAI-ARIA composite subclass roles](https://www.w3.org/TR/wai-aria-1.1/#composite), such as [`toolbar`](https://www.w3.org/TR/wai-aria-1.1/#toolbar), [`menu`](https://www.w3.org/TR/wai-aria-1.1/#menu) and [`listbox`](https://www.w3.org/TR/wai-aria-1.1/#listbox).
 
@@ -23,7 +23,7 @@ If the interaction is complex or confusing to you, consider that it's also going
 According to the [WebAIM: Screen Reader User Survey #8 Results](https://webaim.org/projects/screenreadersurvey8/#usage), these are the most common screen reader and browser combinations:
 
 | Screen Reader & Browser     | # of Respondents | % of Respondents |
-|-----------------------------|------------------|------------------|
+| --------------------------- | ---------------- | ---------------- |
 | JAWS with Chrome            | 259              | 21.4%            |
 | NVDA with Firefox           | 237              | 19.6%            |
 | NVDA with Chrome            | 218              | 18.0%            |
