@@ -5,8 +5,8 @@ UnitControl component allows the user to set a value as well as a unit (e.g. `px
 ```js
 // theme.json
 {
-	"global": {
-		"settings": {
+	"settings": {
+		"defaults": {
 			"spacing": {
 				"units": [
 					{ "value": "px", "label": "px" },
