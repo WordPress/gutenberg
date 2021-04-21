@@ -51,7 +51,7 @@ const BlockActionsMenu = ( {
 	selectedBlockPossibleTransformations,
 	// Dispatch
 	createSuccessNotice,
-	convertBlockToStatic,
+	convertToRegularBlocks,
 	duplicateBlock,
 	onMoveDown,
 	onMoveUp,
@@ -194,7 +194,7 @@ const BlockActionsMenu = ( {
 						reusableBlock?.title?.raw || blockTitle
 					)
 				);
-				convertBlockToStatic( selectedBlockClientId );
+				convertToRegularBlocks();
 			},
 		},
 	};
@@ -345,7 +345,11 @@ export default compose(
 		};
 	} ),
 	withDispatch(
-		( dispatch, { clientIds, rootClientId, currentIndex }, { select } ) => {
+		(
+			dispatch,
+			{ clientIds, rootClientId, currentIndex, selectedBlockClientId },
+			{ select }
+		) => {
 			const {
 				moveBlocksDown,
 				moveBlocksUp,
@@ -353,6 +357,7 @@ export default compose(
 				removeBlocks,
 				insertBlock,
 				replaceBlocks,
+				clearSelectedBlock,
 			} = dispatch( blockEditorStore );
 			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 			const { getBlockSelectionEnd, getBlock } = select(
@@ -366,7 +371,14 @@ export default compose(
 
 			return {
 				createSuccessNotice,
-				convertBlockToStatic,
+				convertToRegularBlocks() {
+					clearSelectedBlock();
+					// Convert action is executed at the end of the current JavaScript execution block
+					// to prevent issues related to undo/redo actions.
+					setImmediate( () =>
+						convertBlockToStatic( selectedBlockClientId )
+					);
+				},
 				duplicateBlock() {
 					return duplicateBlocks( clientIds );
 				},
