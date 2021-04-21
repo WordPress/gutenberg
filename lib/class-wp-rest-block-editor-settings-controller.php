@@ -101,163 +101,163 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				'__unstableEnableFullSiteEditingBlocks'  => array(
 					'description' => __( 'Enables Full site editing blocks', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'styles'                                 => array(
 					'description' => __( 'Editor styles', 'gutenberg' ),
 					'type'        => 'array',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'supportsTemplateMode'                   => array(
 					'description' => __( 'Returns if the current theme is full site editing-enabled or not.', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'supportsLayout'                         => array(
 					'description' => __( 'Enable/disable layouts support in container blocks.', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'widgetTypesToHideFromLegacyWidgetBlock' => array(
 					'description' => __( 'Widget types to hide from legacy widget block.', 'gutenberg' ),
 					'type'        => 'array',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'__experimentalFeatures'                 => array(
 					'description' => __( 'Active theme settings and default values.', 'gutenberg' ),
 					'type'        => 'object',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'__experimentalGlobalStylesUserEntityId' => array(
 					'description' => __( 'Global styles user entity ID.', 'gutenberg' ),
 					'type'        => 'integer',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'__experimentalGlobalStylesBaseStyles'   => array(
 					'description' => __( 'Global styles settings.', 'gutenberg' ),
 					'type'        => 'object',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'alignWide'                              => array(
 					'description' => __( 'Enable/Disable Wide/Full Alignments.', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'allowedBlockTypes'                      => array(
 					'description' => __( 'Enable/Disable Wide/Full Alignments.', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'allowedMimeTypes'                       => array(
 					'description' => __( 'List of allowed mime types and file extensions.', 'gutenberg' ),
 					'type'        => 'object',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'blockCategories'                        => array(
 					'description' => __( 'Returns all the categories for block types that will be shown in the block editor.', 'gutenberg' ),
 					'type'        => 'array',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'disableCustomColors'                    => array(
 					'description' => __( 'Disables custom colors.', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'disableCustomFontSizes'                 => array(
 					'description' => __( 'Disables custom font size.', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'disableCustomGradients'                 => array(
 					'description' => __( 'Disables custom font size.', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'enableCustomLineHeight'                 => array(
 					'description' => __( 'Enables custom line height.', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'enableCustomSpacing'                    => array(
 					'description' => __( 'Enables custom spacing.', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'enableCustomUnits'                      => array(
 					'description' => __( 'Enables custom units.', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'isRTL'                                  => array(
 					'description' => __( 'Determines whether the current locale is right-to-left (RTL).', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'imageDefaultSize'                       => array(
 					'description' => __( 'Image default size slug.', 'gutenberg' ),
 					'type'        => 'string',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'imageDimensions'                        => array(
 					'description' => __( 'Available image dimensions.', 'gutenberg' ),
 					'type'        => 'object',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'imageEditing'                           => array(
 					'description' => __( 'Image Editing settings set to false to disable.', 'gutenberg' ),
 					'type'        => 'boolean',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'imageSizes'                             => array(
 					'description' => __( 'Available image sizes.', 'gutenberg' ),
 					'type'        => 'array',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'maxUploadFileSize'                      => array(
 					'description' => __( 'Maximum upload size in bytes allowed for the site.', 'gutenberg' ),
 					'type'        => 'number',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'colors'                                 => array(
 					'description' => __( 'Active theme color palette.', 'gutenberg' ),
 					'type'        => 'array',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'fontSizes'                              => array(
 					'description' => __( 'Active theme font sizes.', 'gutenberg' ),
 					'type'        => 'array',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 
 				'gradients'                              => array(
 					'description' => __( 'Active theme gradients.', 'gutenberg' ),
 					'type'        => 'array',
-					'context'     => array( 'view' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widget-editor' ),
 				),
 			),
 		);
