@@ -72,10 +72,15 @@ const FONT_PROPS = {
 	fontWeightHeading: '600',
 };
 
+const SPACING_PROPS = {
+	gridBase: '4px',
+};
+
 export const config = {
 	...COLOR_PROPS,
 	// Base
 	...FONT_PROPS,
+	...SPACING_PROPS,
 	// Animations
 	...ANIMATION_PROPS,
 };

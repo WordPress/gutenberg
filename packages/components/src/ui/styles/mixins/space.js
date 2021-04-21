@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { tokens } from '../tokens';
+import { get } from '../core';
 
 /**
  * @param {import('react').ReactText} value
@@ -9,6 +9,6 @@ import { tokens } from '../tokens';
  */
 export function space( value ) {
 	return typeof value === 'number'
-		? `calc(${ tokens.gridBase } * ${ value })`
+		? `calc(${ get( 'gridBase' ) } * ${ value })`
 		: value;
 }
