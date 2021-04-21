@@ -6,7 +6,6 @@ import {
 	activateTheme,
 	clickBlockToolbarButton,
 	deactivatePlugin,
-	pressKeyWithModifier,
 	showBlockToolbar,
 	visitAdminPage,
 } from '@wordpress/e2e-test-utils';
@@ -395,8 +394,7 @@ describe( 'Widgets screen', () => {
 		);
 		await firstParagraphBlock.focus();
 
-		// Trigger the toolbar to appear.
-		await pressKeyWithModifier( 'shift', 'Tab' );
+		await showBlockToolbar();
 
 		const blockToolbar = await page.waitForSelector(
 			'[role="toolbar"][aria-label="Block tools"]'
@@ -533,9 +531,7 @@ describe( 'Widgets screen', () => {
 
 		await legacyWidget.focus();
 
-		// Trigger the toolbar to appear.
-		await pressKeyWithModifier( 'shift', 'Tab' );
-
+		await showBlockToolbar();
 		let previewButton = await find( {
 			role: 'button',
 			name: 'Preview',
@@ -572,14 +568,15 @@ describe( 'Widgets screen', () => {
 		);
 		await titleInput.type( 'Search Title' );
 
-		// Trigger the toolbar to appear.
-		await pressKeyWithModifier( 'shift', 'Tab' );
-
+		await showBlockToolbar();
 		previewButton = await find( {
 			role: 'button',
 			name: 'Preview',
 		} );
-		await previewButton.click();
+		await Promise.all( [
+			previewButton.click(),
+			frame.waitForNavigation(),
+		] );
 
 		// Expect to have search title.
 		await find(
