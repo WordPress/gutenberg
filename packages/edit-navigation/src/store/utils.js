@@ -138,7 +138,6 @@ export function computeCustomizedAttribute(
 
 		if ( block.name === 'core/navigation-link' ) {
 			attributes = {
-				type: block.attributes?.object,
 				title: block.attributes?.label,
 				original_title: '',
 				url: block.attributes.url,
@@ -149,9 +148,12 @@ export function computeCustomizedAttribute(
 				target: block.attributes.opensInNewTab
 					? NEW_TAB_TARGET_ATTRIBUTE
 					: '',
-                object_id: block.attributes?.id,
-
-
+                ...( block.attributes?.id && {
+					object_id: block.attributes.id,
+				} ),
+				...( block.attributes?.type && {
+					object: block.attributes.type,
+				} ),
 			};
 		} else {
 			attributes = {
