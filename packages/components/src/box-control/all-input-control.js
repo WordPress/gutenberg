@@ -14,6 +14,7 @@ export default function AllInputControl( {
 	onHoverOn = noop,
 	onHoverOff = noop,
 	values,
+	sides,
 	...props
 } ) {
 	const allValue = getAllValue( values );
@@ -28,11 +29,11 @@ export default function AllInputControl( {
 
 	const handleOnChange = ( next ) => {
 		const nextValues = { ...values };
+		const selectedSides = sides?.length
+			? sides
+			: [ 'top', 'right', 'bottom', 'left' ];
 
-		nextValues.top = next;
-		nextValues.bottom = next;
-		nextValues.left = next;
-		nextValues.right = next;
+		selectedSides.forEach( ( side ) => ( nextValues[ side ] = next ) );
 
 		onChange( nextValues );
 	};

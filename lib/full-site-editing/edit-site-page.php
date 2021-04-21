@@ -90,13 +90,13 @@ function gutenberg_edit_site_init( $hook ) {
 	$current_screen->is_block_editor( true );
 
 	$settings = array_merge(
-		gutenberg_get_common_block_editor_settings(),
+		gutenberg_get_default_block_editor_settings(),
 		array(
-			'alignWide'                            => get_theme_support( 'align-wide' ),
 			'siteUrl'                              => site_url(),
 			'postsPerPage'                         => get_option( 'posts_per_page' ),
 			'styles'                               => gutenberg_get_editor_styles(),
 			'defaultTemplateTypes'                 => gutenberg_get_indexed_default_template_types(),
+			'defaultTemplatePartAreas'             => gutenberg_get_allowed_template_part_areas(),
 			'__experimentalBlockPatterns'          => WP_Block_Patterns_Registry::get_instance()->get_all_registered(),
 			'__experimentalBlockPatternCategories' => WP_Block_Pattern_Categories_Registry::get_instance()->get_all_registered(),
 		)

@@ -1,5 +1,4 @@
-Higher Order Components
-=======================
+# Higher Order Components
 
 This directory includes a library of generic Higher Order React Components.
 

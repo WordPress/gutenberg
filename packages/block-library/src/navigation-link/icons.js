@@ -11,10 +11,6 @@ export const ItemSubmenuIcon = () => (
 		viewBox="0 0 12 12"
 		fill="none"
 	>
-		<Path
-			d="M1.50002 4L6.00002 8L10.5 4"
-			stroke="#000000"
-			strokeWidth="1.5"
-		/>
+		<Path d="M1.50002 4L6.00002 8L10.5 4" strokeWidth="1.5" />
 	</SVG>
 );

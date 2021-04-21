@@ -13,10 +13,7 @@
 				"column": 49
 			}
 		},
-		"range": [
-			141,
-			190
-		],
+		"range": [ 141, 190 ],
 		"declaration": null,
 		"specifiers": [
 			{
@@ -33,10 +30,7 @@
 						"column": 28
 					}
 				},
-				"range": [
-					150,
-					169
-				],
+				"range": [ 150, 169 ],
 				"local": {
 					"type": "Identifier",
 					"start": 150,
@@ -51,10 +45,7 @@
 							"column": 28
 						}
 					},
-					"range": [
-						150,
-						169
-					],
+					"range": [ 150, 169 ],
 					"name": "functionDeclaration"
 				},
 				"exported": {
@@ -71,10 +62,7 @@
 							"column": 28
 						}
 					},
-					"range": [
-						150,
-						169
-					],
+					"range": [ 150, 169 ],
 					"name": "functionDeclaration"
 				}
 			},
@@ -92,10 +80,7 @@
 						"column": 46
 					}
 				},
-				"range": [
-					171,
-					187
-				],
+				"range": [ 171, 187 ],
 				"local": {
 					"type": "Identifier",
 					"start": 171,
@@ -110,10 +95,7 @@
 							"column": 46
 						}
 					},
-					"range": [
-						171,
-						187
-					],
+					"range": [ 171, 187 ],
 					"name": "ClassDeclaration"
 				},
 				"exported": {
@@ -130,10 +112,7 @@
 							"column": 46
 						}
 					},
-					"range": [
-						171,
-						187
-					],
+					"range": [ 171, 187 ],
 					"name": "ClassDeclaration"
 				}
 			}
@@ -145,10 +124,7 @@
 				"value": "*\n * Variable declaration example.\n ",
 				"start": 192,
 				"end": 232,
-				"range": [
-					192,
-					232
-				],
+				"range": [ 192, 232 ],
 				"loc": {
 					"start": {
 						"line": 13,
@@ -176,10 +152,7 @@
 				"column": 40
 			}
 		},
-		"range": [
-			233,
-			273
-		],
+		"range": [ 233, 273 ],
 		"declaration": {
 			"type": "VariableDeclaration",
 			"start": 240,
@@ -194,10 +167,7 @@
 					"column": 40
 				}
 			},
-			"range": [
-				240,
-				273
-			],
+			"range": [ 240, 273 ],
 			"declarations": [
 				{
 					"type": "VariableDeclarator",
@@ -213,10 +183,7 @@
 							"column": 39
 						}
 					},
-					"range": [
-						246,
-						272
-					],
+					"range": [ 246, 272 ],
 					"id": {
 						"type": "Identifier",
 						"start": 246,
@@ -231,10 +198,7 @@
 								"column": 32
 							}
 						},
-						"range": [
-							246,
-							265
-						],
+						"range": [ 246, 265 ],
 						"name": "variableDeclaration"
 					},
 					"init": {
@@ -251,10 +215,7 @@
 								"column": 39
 							}
 						},
-						"range": [
-							268,
-							272
-						],
+						"range": [ 268, 272 ],
 						"value": true,
 						"raw": "true"
 					}
@@ -270,10 +231,7 @@
 				"value": "*\n * Variable declaration example.\n ",
 				"start": 192,
 				"end": 232,
-				"range": [
-					192,
-					232
-				],
+				"range": [ 192, 232 ],
 				"loc": {
 					"start": {
 						"line": 13,

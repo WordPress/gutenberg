@@ -7,6 +7,8 @@ import { useState, useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as editNavigationStore } from '../store';
+import { store as noticesStore } from '@wordpress/notices';
+import { __, sprintf } from '@wordpress/i18n';
 
 const getMenusData = ( select ) => {
 	const selectors = select( 'core' );
@@ -32,19 +34,27 @@ export default function useNavigationEditor() {
 	const [ hasFinishedInitialLoad, setHasFinishedInitialLoad ] = useState(
 		false
 	);
-
 	const { menus, hasLoadedMenus } = useSelect( getMenusData, [] );
+	const [ isMenuSelected, setIsMenuSelected ] = useState( true );
+
+	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
+	const isMenuBeingDeleted = useSelect(
+		( select ) =>
+			select( 'core' ).isDeletingEntityRecord(
+				'root',
+				'menu',
+				selectedMenuId
+			),
+		[ selectedMenuId ]
+	);
+	const selectedMenuName =
+		menus?.find( ( { id } ) => id === selectedMenuId )?.name || '';
+
 	useEffect( () => {
 		if ( hasLoadedMenus ) {
 			setHasFinishedInitialLoad( true );
 		}
 	}, [ hasLoadedMenus ] );
-
-	useEffect( () => {
-		if ( ! selectedMenuId && menus?.length ) {
-			setSelectedMenuId( menus[ 0 ].id );
-		}
-	}, [ selectedMenuId, menus ] );
 
 	const navigationPost = useSelect(
 		( select ) => {
@@ -64,19 +74,37 @@ export default function useNavigationEditor() {
 		} );
 		if ( didDeleteMenu ) {
 			setSelectedMenuId( null );
+			createInfoNotice(
+				sprintf(
+					// translators: %s: the name of a menu.
+					__( '"%s" menu has been deleted' ),
+					selectedMenuName
+				),
+				{
+					type: 'snackbar',
+					isDismissible: true,
+				}
+			);
+		} else {
+			createErrorNotice( __( 'Menu deletion unsuccessful' ) );
 		}
 	};
 
+	useEffect( () => setIsMenuSelected( selectedMenuId !== null ), [
+		selectedMenuId,
+	] );
 	return {
 		menus,
+		hasLoadedMenus,
+		hasFinishedInitialLoad,
 		selectedMenuId,
 		navigationPost,
+		isMenuBeingDeleted,
 		selectMenu: setSelectedMenuId,
 		deleteMenu,
-		hasFinishedInitialLoad,
-		hasLoadedMenus,
 		openManageLocationsModal,
 		closeManageLocationsModal,
 		isManageLocationsModalOpen,
+		isMenuSelected,
 	};
 }

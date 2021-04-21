@@ -280,7 +280,6 @@ function gutenberg_set_show_instance_in_rest_on_core_widgets() {
 	global $wp_widget_factory;
 
 	$core_widgets = array(
-		'WP_Widget_Block',
 		'WP_Widget_Pages',
 		'WP_Widget_Calendar',
 		'WP_Widget_Archives',
@@ -301,7 +300,9 @@ function gutenberg_set_show_instance_in_rest_on_core_widgets() {
 	);
 
 	foreach ( $core_widgets as $widget ) {
-		$wp_widget_factory->widgets[ $widget ]->show_instance_in_rest = true;
+		if ( isset( $wp_widget_factory->widgets[ $widget ] ) ) {
+			$wp_widget_factory->widgets[ $widget ]->show_instance_in_rest = true;
+		}
 	}
 }
 add_action( 'widgets_init', 'gutenberg_set_show_instance_in_rest_on_core_widgets' );

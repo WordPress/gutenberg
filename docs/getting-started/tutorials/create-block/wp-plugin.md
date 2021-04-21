@@ -104,7 +104,16 @@ The `register_block_type_from_metadata` function registers the block we are goin
 	"apiVersion": 2,
 	"name": "create-block/gutenpride",
 	"title": "Gutenpride",
-	"editorScript": "file:./build/index.js"
+	"category": "widgets",
+	"icon": "smiley",
+	"description": "Example block written with ESNext standard and JSX support – build step required.",
+	"supports": {
+		"html": false
+	},
+	"textdomain": "gutenpride",
+	"editorScript": "file:./build/index.js",
+	"editorStyle": "file:./build/index.css",
+	"style": "file:./build/style-index.css"
 }
 ```
 
