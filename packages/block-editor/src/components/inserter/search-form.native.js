@@ -34,7 +34,7 @@ function IconButton( { icon, label, hint, style, ...props } ) {
 			accessibilityLabel={ label }
 			style={ { alignItems: 'center' } }
 		>
-			<Icon icon={ icon } color={ style?.color } />
+			<Icon icon={ icon } fill={ style?.color } />
 		</TouchableOpacity>
 	);
 }
@@ -243,7 +243,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 			);
 		}
 
-		return <Icon icon={ Gridicons.search } color={ iconStyle.color } />;
+		return <Icon icon={ Gridicons.search } fill={ iconStyle.color } />;
 	}
 
 	function renderRightButton() {
@@ -272,7 +272,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 				inputRef.current.focus();
 			} }
 			onLayout={ onLayout }
-			activeOpacity={ isActive ? 1 : 0.2 }
+			activeOpacity={ 1 }
 		>
 			<View
 				style={
