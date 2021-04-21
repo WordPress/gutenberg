@@ -138,7 +138,7 @@ export function computeCustomizedAttribute(
 
 		if ( block.name === 'core/navigation-link' ) {
 			attributes = {
-				type: block.attributes?.object || 'custom',
+				type: block.attributes?.object,
 				title: block.attributes?.label,
 				original_title: '',
 				url: block.attributes.url,
