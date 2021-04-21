@@ -105,8 +105,6 @@ import { store as blocksStore } from '../store';
  * @property {Function|string[]} [isActive]    This can be a function or an array of block attributes.
  *                                             Function that accepts a block's attributes and the
  *                                             variation's attributes and determines if a variation is active.
- *                                             A function that accepts a block's attributes and the
- *                                             variation's attributes and determines if a variation is active.
  *                                             This function doesn't try to find a match dynamically based
  *                                             on all block's attributes, as in many cases some attributes are irrelevant.
  *                                             An example would be for `embed` block where we only care
