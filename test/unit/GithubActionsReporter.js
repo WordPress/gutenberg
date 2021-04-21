@@ -5,30 +5,27 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-/**
- * External dependencies
- */
-import type { AggregatedResult, TestResult } from '@jest/test-result';
-import { BaseReporter, Context } from '@jest/reporters';
+// import type {AggregatedResult, TestResult} from '@jest/test-result';
+// import type { Reporter, Context } from '@jest/reporters';
+// import type {Context} from './types';
+
+// const { flatMap } = require( 'lodash' );
 
 const newLine = /\n/g;
 const encodedNewLine = '%0A';
 const lineAndColumnInStackTrace = /^.*:([0-9]+):([0-9]+).*$/;
 
-export default class GithubActionReporter extends BaseReporter {
-	onRunComplete(
-		_contexts?: Set< Context >,
-		aggregatedResults?: AggregatedResult
-	): void {
-		const messages = getMessages( aggregatedResults?.testResults );
+class GithubActionReporter {
+	async onRunComplete( _contexts, _aggregatedResults ) {
+		const messages = getMessages( _aggregatedResults?.testResults );
 
 		for ( const message of messages ) {
-			this.log( message );
+			process.stderr.write( message + '\n' );
 		}
 	}
 }
 
-function getMessages( results: Array< TestResult > | undefined ) {
+function getMessages( results ) {
 	if ( ! results ) return [];
 
 	return results.reduce(
@@ -41,7 +38,7 @@ function getMessages( results: Array< TestResult > | undefined ) {
 				)
 				.map( ( m ) => m.replace( newLine, encodedNewLine ) )
 				.map( ( m ) => lineAndColumnInStackTrace.exec( m ) )
-				.filter( ( m ): m is RegExpExecArray => m !== null )
+				//.filter((m): m is RegExpExecArray => m !== null)
 				.map(
 					( [ message, line, col ] ) =>
 						`::error file=${ testFilePath },line=${ line },col=${ col }::${ message }`
@@ -51,6 +48,12 @@ function getMessages( results: Array< TestResult > | undefined ) {
 	);
 }
 
-function flatMap< In, Out >( map: ( x: In ) => Array< Out > ) {
-	return ( out: Array< Out >, entry: In ) => out.concat( ...map( entry ) );
+function flatMap( fn ) {
+	return ( out, entry ) => out.concat( ...fn( entry ) );
 }
+
+// function flatMap< In, Out >( map: ( x: In ) => Array< Out > ) {
+// 	return ( out: Array< Out >, entry: In ) => out.concat( ...map( entry ) );
+// }
+
+module.exports = GithubActionReporter;
