@@ -468,14 +468,22 @@ describe( 'Widgets screen', () => {
 	it( 'Should display legacy widgets', async () => {
 		await visitAdminPage( 'widgets.php' );
 
-		const [ searchWidget ] = await page.$x(
-			'//*[@id="widget-list"]//h3[text()="Search"]'
+		const searchWidget = await find(
+			{
+				role: 'heading',
+				name: 'Search',
+				level: 3,
+			},
+			{
+				root: await page.$( '#widget-list' ),
+			}
 		);
 		await searchWidget.click();
 
-		const [ addWidgetButton ] = await page.$x(
-			'//button[text()="Add Widget"]'
-		);
+		const addWidgetButton = await find( {
+			role: 'button',
+			name: 'Add Widget',
+		} );
 		await addWidgetButton.click();
 
 		// Wait for the changes to be saved.
@@ -497,64 +505,87 @@ describe( 'Widgets screen', () => {
 
 		await visitAdminPage( 'themes.php', 'page=gutenberg-widgets' );
 		// Wait for the widget areas to load.
-		await page.waitForSelector(
-			'[aria-label="Block: Widget Area"][role="group"]'
-		);
+		await findAll( {
+			role: 'group',
+			name: 'Block: Widget Area',
+		} );
 
 		// Wait for the widget's form to load.
-		await page.waitForSelector(
-			'[data-block][data-type="core/legacy-widget"] input'
-		);
+		// await page.waitForSelector(
+		// 	'[data-block][data-type="core/legacy-widget"] input'
+		// );
 
-		const legacyWidget = await page.$(
-			'[data-block][data-type="core/legacy-widget"]'
-		);
+		const legacyWidget = await find( {
+			role: 'group',
+			name: 'Block: Legacy Widget',
+		} );
 
-		const legacyWidgetName = await legacyWidget.$( 'h3' );
-		expect(
-			await legacyWidgetName.evaluate( ( node ) => node.textContent )
-		).toBe( 'Search' );
+		const legacyWidgetName = await find(
+			{
+				role: 'heading',
+				level: 3,
+			},
+			{
+				root: legacyWidget,
+			}
+		);
+		expect( legacyWidgetName ).toMatchQuery( { text: 'Search' } );
 
 		await legacyWidget.focus();
 
 		// Trigger the toolbar to appear.
 		await pressKeyWithModifier( 'shift', 'Tab' );
 
-		let [ previewButton ] = await page.$x(
-			'//button[*[contains(text(), "Preview")]]'
-		);
+		let previewButton = await find( {
+			role: 'button',
+			name: 'Preview',
+		} );
 		await previewButton.click();
 
 		const iframe = await legacyWidget.$( 'iframe' );
 		const frame = await iframe.contentFrame();
 
 		// Expect to have search input.
-		await frame.waitForSelector( 'input[type="search"]' );
-
-		const [ editButton ] = await page.$x(
-			'//button[*[contains(text(), "Edit")]]'
+		await find(
+			{
+				role: 'searchbox',
+			},
+			{
+				page: frame,
+			}
 		);
+
+		const editButton = await find( {
+			role: 'button',
+			name: 'Edit',
+		} );
 		await editButton.click();
 
-		const [ titleLabel ] = await legacyWidget.$x(
-			'//label[contains(text(), "Title")]'
-		);
-		const titleInputId = await titleLabel.evaluate( ( node ) =>
-			node.getAttribute( 'for' )
-		);
-		const titleInput = await page.$( `#${ titleInputId }` );
+		const titleInput = await find( {
+			role: 'textbox',
+			name: /^Title/,
+		} );
 		await titleInput.type( 'Search Title' );
 
 		// Trigger the toolbar to appear.
 		await pressKeyWithModifier( 'shift', 'Tab' );
 
-		[ previewButton ] = await page.$x(
-			'//button[*[contains(text(), "Preview")]]'
-		);
+		previewButton = await find( {
+			role: 'button',
+			name: 'Preview',
+		} );
 		await previewButton.click();
 
 		// Expect to have search title.
-		await frame.waitForXPath( '//h2[text()="Search Title"]' );
+		await find(
+			{
+				role: 'heading',
+				name: 'Search Title',
+			},
+			{
+				page: frame,
+			}
+		);
 
 		await saveWidgets();
 		const serializedWidgetAreas = await getSerializedWidgetAreas();
@@ -573,10 +604,11 @@ describe( 'Widgets screen', () => {
 	} );
 
 	it( 'allows widgets to be moved between widget areas using the dropdown in the block toolbar', async () => {
-		const widgetAreas = await page.$$(
-			'[aria-label="Block: Widget Area"][role="group"]'
-		);
-		const [ firstWidgetArea ] = widgetAreas;
+		const widgetAreas = await findAll( {
+			role: 'group',
+			name: 'Block: Widget Area',
+		} );
+		const [ firstWidgetArea, secondWidgetArea ] = widgetAreas;
 
 		// Insert a paragraph it should be in the first widget area.
 		const inserterParagraphBlock = await getBlockInGlobalInserter(
@@ -584,28 +616,47 @@ describe( 'Widgets screen', () => {
 		);
 		await inserterParagraphBlock.hover();
 		await inserterParagraphBlock.click();
-		const addedParagraphBlockInFirstWidgetArea = await firstWidgetArea.$(
-			'[data-block][data-type="core/paragraph"][aria-label^="Empty block"]'
+		const addedParagraphBlockInFirstWidgetArea = await find(
+			{
+				role: 'group',
+				name: /^Empty block/,
+			},
+			{ root: firstWidgetArea }
 		);
 		await addedParagraphBlockInFirstWidgetArea.focus();
 		await page.keyboard.type( 'First Paragraph' );
 
 		// Check that the block exists in the first widget area.
-		await page.waitForXPath(
-			'//*[@aria-label="Block: Widget Area"][@role="group"][1]//p[@data-type="core/paragraph"][.="First Paragraph"]'
+		await find(
+			{
+				role: 'group',
+				name: 'Paragraph block',
+				value: 'First Paragraph',
+			},
+			{
+				root: firstWidgetArea,
+			}
 		);
 
 		// Move the block to the second widget area.
 		await showBlockToolbar();
 		await clickBlockToolbarButton( 'Move to widget area' );
-		const widgetAreaButton = await page.waitForXPath(
-			'//button[@role="menuitemradio"][contains(.,"Footer #2")]'
-		);
+		const widgetAreaButton = await find( {
+			role: 'menuitemradio',
+			name: /^Footer #2/,
+		} );
 		await widgetAreaButton.click();
 
 		// Check that the block exists in the second widget area.
-		await page.waitForXPath(
-			'//*[@aria-label="Block: Widget Area"][@role="group"][2]//p[@data-type="core/paragraph"][.="First Paragraph"]'
+		await find(
+			{
+				role: 'group',
+				name: 'Paragraph block',
+				value: 'First Paragraph',
+			},
+			{
+				root: secondWidgetArea,
+			}
 		);
 
 		// Assert that the serialized widget areas shows the block as in the second widget area.
@@ -622,10 +673,15 @@ describe( 'Widgets screen', () => {
 } );
 
 async function saveWidgets() {
-	const [ updateButton ] = await page.$x( '//button[text()="Update"]' );
+	const updateButton = await find( {
+		role: 'button',
+		name: 'Update',
+	} );
 	await updateButton.click();
 
-	await page.waitForXPath( '//*[text()="Widgets saved."]' );
+	await findAll( {
+		text: 'Widgets saved.',
+	} );
 
 	// FIXME: The snackbar above is enough for the widget areas to get saved,
 	// but not enough for the widgets to get saved.
