@@ -2,14 +2,16 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies
  */
-import { View } from '../../view';
 import { contextConnect } from '../context-connect';
 import { ContextSystemProvider } from '../context-system-provider';
 import { useContextSystem } from '../use-context-system';
+
+const View = styled.div``;
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {
