@@ -94,7 +94,7 @@ Imagine a world where content created by Gutenberg can be consumed and read _any
 
 This manifests in letting machines do what machines are good for, and preserve content in a format that is readable to users.
 
-Finally, the principle of ubiquitous and safe adoption is found in the way Gutenberg is being developed _incrementally_. WordPress powers ~ 40% of the Web and the changes that GB brings cannot happen overnight (Gutenberg or the ship of Theseus - Matías)
+Finally, the principle of ubiquitous and safe adoption is found in the way Gutenberg is being developed _incrementally_. WordPress powers over 40% of the Web and the changes that GB brings cannot happen overnight (Gutenberg or the ship of Theseus - Matías)
 
 
 ## Resources
