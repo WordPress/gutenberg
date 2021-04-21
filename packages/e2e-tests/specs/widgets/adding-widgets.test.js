@@ -510,6 +510,11 @@ describe( 'Widgets screen', () => {
 			name: 'Block: Widget Area',
 		} );
 
+		// Wait for the widget's form to load.
+		await page.waitForSelector(
+			'[data-block][data-type="core/legacy-widget"] input'
+		);
+
 		const legacyWidget = await find( {
 			role: 'group',
 			name: 'Block: Legacy Widget',
@@ -556,10 +561,15 @@ describe( 'Widgets screen', () => {
 		} );
 		await editButton.click();
 
-		const titleInput = await find( {
-			role: 'textbox',
-			name: /^Title/,
-		} );
+		const titleInput = await find(
+			{
+				role: 'textbox',
+				name: /^Title/,
+			},
+			{
+				root: legacyWidget,
+			}
+		);
 		await titleInput.type( 'Search Title' );
 
 		// Trigger the toolbar to appear.
