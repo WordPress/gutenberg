@@ -1,0 +1,23 @@
+// Developer notes: these rules are duplicated for the post editor.
+// They need to be updated in both places.
+
+.edit-site-navigation-icon {
+	align-items: center;
+	align-self: stretch;
+	justify-content: center;
+	display: flex;
+	position: absolute;
+	z-index: z-index(".edit-site-navigation-toggle");
+	height: $header-height;
+	width: $header-height;
+	min-width: $header-height;
+	color: $white;
+	background: $gray-900;
+}
+
+.edit-site-navigation-icon svg {
+	width: $button-size;
+	border-radius: $radius-block-ui;
+	fill: currentColor;
+	outline: none;
+}

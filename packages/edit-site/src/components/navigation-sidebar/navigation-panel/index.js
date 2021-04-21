@@ -19,7 +19,6 @@ import ContentNavigation from './content-navigation';
 import TemplatesNavigation from './templates-navigation';
 import { MENU_ROOT } from './constants';
 import { store as editSiteStore } from '../../../store';
-import NavigationClose from '../navigation-close';
 
 const NavigationPanel = ( { isOpen } ) => {
 	const [ contentActiveMenu, setContentActiveMenu ] = useState( MENU_ROOT );
@@ -73,7 +72,6 @@ const NavigationPanel = ( { isOpen } ) => {
 			tabIndex="-1"
 			onKeyDown={ closeOnEscape }
 		>
-			<NavigationClose isOpen={ isOpen } />
 			<div className="edit-site-navigation-panel__inner">
 				<div className="edit-site-navigation-panel__site-title-container">
 					<div className="edit-site-navigation-panel__site-title">

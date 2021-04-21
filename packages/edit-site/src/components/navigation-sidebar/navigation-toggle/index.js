@@ -1,38 +1,29 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useDispatch, useSelect } from '@wordpress/data';
-import { Button, Icon } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { wordpress } from '@wordpress/icons';
-import { store as coreDataStore } from '@wordpress/core-data';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../../store';
 
-function NavigationToggle( { icon, isOpen } ) {
-	const {
-		isRequestingSiteIcon,
-		navigationPanelMenu,
-		siteIconUrl,
-	} = useSelect( ( select ) => {
+function NavigationToggle( { isOpen } ) {
+	const { navigationPanelMenu } = useSelect( ( select ) => {
 		const { getCurrentTemplateNavigationPanelSubMenu } = select(
 			editSiteStore
 		);
-		const { getEntityRecord, isResolving } = select( coreDataStore );
-		const siteData =
-			getEntityRecord( 'root', '__unstableBase', undefined ) || {};
 
 		return {
-			isRequestingSiteIcon: isResolving( 'core', 'getEntityRecord', [
-				'root',
-				'__unstableBase',
-				undefined,
-			] ),
 			navigationPanelMenu: getCurrentTemplateNavigationPanelSubMenu(),
-			siteIconUrl: siteData.site_icon_url,
 		};
 	}, [] );
 
@@ -49,36 +40,18 @@ function NavigationToggle( { icon, isOpen } ) {
 		openNavigationPanelToMenu( navigationPanelMenu );
 	};
 
-	let buttonIcon = <Icon size="36px" icon={ wordpress } />;
-
-	if ( siteIconUrl ) {
-		buttonIcon = (
-			<img
-				alt={ __( 'Site Icon' ) }
-				className="edit-site-navigation-toggle__site-icon"
-				src={ siteIconUrl }
-			/>
-		);
-	} else if ( isRequestingSiteIcon ) {
-		buttonIcon = null;
-	} else if ( icon ) {
-		buttonIcon = <Icon size="36px" icon={ icon } />;
-	}
+	const classNames = classnames( 'edit-site-navigation-toggle', {
+		'is-open': isOpen,
+	} );
 
 	return (
-		<div
-			className={
-				'edit-site-navigation-toggle' + ( isOpen ? ' is-open' : '' )
-			}
-		>
+		<div className={ classNames }>
 			<Button
-				className="edit-site-navigation-toggle__button has-icon"
-				label={ __( 'Toggle navigation' ) }
+				className="edit-site-navigation-toggle__button"
+				icon={ closeSmall }
+				label={ __( 'Toggle navigation sidebar' ) }
 				onClick={ toggleNavigationPanel }
-				showTooltip
-			>
-				{ buttonIcon }
-			</Button>
+			/>
 		</div>
 	);
 }

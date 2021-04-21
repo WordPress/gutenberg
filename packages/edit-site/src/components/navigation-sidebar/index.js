@@ -9,6 +9,7 @@ import { useSelect } from '@wordpress/data';
  */
 import NavigationPanel from './navigation-panel';
 import NavigationToggle from './navigation-toggle';
+import NavigationIcon from './navigation-icon';
 import { store as editSiteStore } from '../../store';
 
 export const {
@@ -23,6 +24,7 @@ export default function NavigationSidebar() {
 
 	return (
 		<>
+			<NavigationIcon />
 			<NavigationToggle isOpen={ isNavigationOpen } />
 			<NavigationPanel isOpen={ isNavigationOpen } />
 			<NavigationPanelPreviewSlot />
