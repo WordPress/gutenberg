@@ -362,7 +362,10 @@ Each block declares which style properties it exposes via the [block supports me
 	"styles": {
 		"some/block/selector": {
 			"border": {
-				"radius": "value"
+				"color": "value",
+				"radius": "value",
+				"style": "value",
+				"width": "value"
 			},
 			"color": {
 				"background": "value",
