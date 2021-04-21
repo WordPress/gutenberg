@@ -13,9 +13,9 @@ import { View } from '../view';
  * Factory that creates a React component.
  *
  * @template {import('reakit-utils/types').As} T
- * @template {import('../context/polymorphic-component').ViewOwnProps<{}, T>} P
+ * @template {import('@wp-g2/create-styles').ViewOwnProps<{}, T>} P
  * @param {import('./types').Options<T, P>} options Options to customize the component.
- * @return {import('../context/polymorphic-component').PolymorphicComponent<T, import('../context/polymorphic-component').PropsFromViewOwnProps<P>>} New React component.
+ * @return {import('@wp-g2/create-styles').PolymorphicComponent<T, import('@wp-g2/create-styles').PropsFromViewOwnProps<P>>} New React component.
  */
 /* eslint-disable jsdoc/no-undefined-types */
 export const createComponent = ( {
