@@ -10,6 +10,12 @@
 		"opensInNewTab": {
 			"type": "boolean",
 			"default": false
+		},
+		"rel": {
+			"type": "string"
+		},
+		"title": {
+			"type": "string"
 		}
 	},
 	"usesContext": [
@@ -19,7 +25,6 @@
 		"customBackgroundColor",
 		"fontSize",
 		"customFontSize",
-		"showSubmenuIcon",
 		"style"
 	],
 	"supports": {

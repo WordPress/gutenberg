@@ -17,6 +17,7 @@
 	}
 
 	&:not([style*="text-decoration"]) {
+		.wp-block-home-link,
 		.wp-block-home-link__content {
 			text-decoration: none;
 

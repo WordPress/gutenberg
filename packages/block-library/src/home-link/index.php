@@ -19,28 +19,49 @@ function render_block_core_home( $attributes ) {
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
 
-	$label = wp_kses(
-		$attributes['label'],
-		array(
-			'code'   => array(),
-			'em'     => array(),
-			'img'    => array(
-				'scale' => array(),
-				'class' => array(),
-				'style' => array(),
-				'src'   => array(),
-				'alt'   => array(),
-			),
-			's'      => array(),
-			'span'   => array(
-				'style' => array(),
-			),
-			'strong' => array(),
-		)
-	);
+	$html = '<li ' . $wrapper_attributes . '><a class="wp-block-home__content"';
 
-	$html = sprintf( '<li %s><a classname="wp-block-home__content" href="%s">%s</a></li>', $wrapper_attributes, home_url(), $label );
+	// Start appending HTML attributes to anchor tag.
+	$html .= ' href="' . esc_url( home_url() ) . '"';
 
+	if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
+		$html .= ' target="_blank" ';
+	}
+
+	if ( isset( $attributes['rel'] ) ) {
+		$html .= ' rel="' . esc_attr( $attributes['rel'] ) . '"';
+	}
+
+	if ( isset( $attributes['title'] ) ) {
+		$html .= ' title="' . esc_attr( $attributes['title'] ) . '"';
+	}
+
+	// End appending HTML attributes to anchor tag.
+	$html .= '>';
+
+	if ( isset( $attributes['label'] ) ) {
+		$html .= wp_kses(
+			$attributes['label'],
+			array(
+				'code'   => array(),
+				'em'     => array(),
+				'img'    => array(
+					'scale' => array(),
+					'class' => array(),
+					'style' => array(),
+					'src'   => array(),
+					'alt'   => array(),
+				),
+				's'      => array(),
+				'span'   => array(
+					'style' => array(),
+				),
+				'strong' => array(),
+			)
+		);
+	}
+
+	$html .= '</a></li>';
 	return $html;
 }
 
