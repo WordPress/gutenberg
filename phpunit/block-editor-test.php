@@ -297,7 +297,6 @@ class WP_Test_Block_Editor extends WP_UnitTestCase {
 
 	/**
 	 * @ticket 52920
-	 * @expectedDeprecated block_categories
 	 * @expectedDeprecated block_editor_settings
 	 */
 	function test_get_block_editor_settings_deprecated_filter_post_editor() {
