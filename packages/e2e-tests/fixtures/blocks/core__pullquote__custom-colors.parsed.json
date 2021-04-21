@@ -18,14 +18,5 @@
 		"innerContent": [
 			"\n<figure class=\"wp-block-pullquote is-style-default has-border-color has-text-color has-background\" style=\"background-color:#3486aa;border-color:#045679;color:#ffefef\"><blockquote><p>pullquote</p><cite>citation</cite></blockquote></figure>\n"
 		]
-	},
-	{
-		"blockName": null,
-		"attrs": {},
-		"innerBlocks": [],
-		"innerHTML": "\n",
-		"innerContent": [
-			"\n"
-		]
 	}
 ]
