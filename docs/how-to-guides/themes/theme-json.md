@@ -190,7 +190,13 @@ The settings section has the following structure and default values:
       "custom": { ... },
       "spacing": {
         "customPadding": false, /* true to opt-in, as in add_theme_support('custom-spacing') */
-        "units": [ "px", "em", "rem", "vh", "vw" ], /* filter values, as in add_theme_support('custom-units', ... ) */
+	    	"units": [ /* filter values */
+					{ "value": "px", "label": "px" },
+					{ "value": "em", "label": "em" },
+					{ "value": "rem", "label": "rem" },
+					{ "value": "vh", "label": "vh" },
+					{ "value": "vw", "label": "vw" }
+		    ]
       },
       "typography": {
         "customFontSize": true, /* false to opt-out, as in add_theme_support( 'disable-custom-font-sizes' ) */

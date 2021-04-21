@@ -168,7 +168,13 @@
 			},
 			"spacing": {
 				"customPadding": false,
-				"units": [ "px", "em", "rem", "vh", "vw" ]
+				"units": [
+					{ "value": "px", "label": "px" },
+					{ "value": "em", "label": "em" },
+					{ "value": "rem", "label": "rem" },
+					{ "value": "vh", "label": "vh" },
+					{ "value": "vw", "label": "vw" }
+				]
 			},
 			"border": {
 				"customColor": false,

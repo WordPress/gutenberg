@@ -8,7 +8,13 @@ UnitControl component allows the user to set a value as well as a unit (e.g. `px
 	"global": {
 		"settings": {
 			"spacing": {
-				"units": [ "px", "em", "rem", "vh", "vw" ]
+				"units": [
+					{ "value": "px", "label": "px" },
+					{ "value": "em", "label": "em" },
+					{ "value": "rem", "label": "rem" },
+					{ "value": "vh", "label": "vh" },
+					{ "value": "vw", "label": "vw" }
+				]
 			}
 		}
 	}
