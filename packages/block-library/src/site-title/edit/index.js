@@ -10,7 +10,7 @@ import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
@@ -19,7 +19,7 @@ import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import LevelToolbar from './level-toolbar';
+import LevelControl from './level-toolbar';
 
 export default function SiteTitleEdit( {
 	attributes,
@@ -36,19 +36,18 @@ export default function SiteTitleEdit( {
 	} );
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-
-				<LevelToolbar
+			<BlockControls group="block">
+				<LevelControl
 					level={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}
+				/>
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
 				/>
 			</BlockControls>
 			<TagName { ...blockProps }>

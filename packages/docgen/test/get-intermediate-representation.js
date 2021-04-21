@@ -151,6 +151,7 @@ describe( 'Intermediate Representation', () => {
 				lineEnd: 4,
 			} );
 		} );
+
 		it( 'named export', () => {
 			const tokenClass = fs.readFileSync(
 				path.join( __dirname, './fixtures/named-class/exports.json' ),
@@ -165,7 +166,12 @@ describe( 'Intermediate Representation', () => {
 				path: null,
 				name: 'MyDeclaration',
 				description: 'My declaration example.',
-				tags: [],
+				tags: [
+					{
+						tag: 'type',
+						type: 'MyDeclaration',
+					},
+				],
 				lineStart: 4,
 				lineEnd: 4,
 			} );
@@ -266,7 +272,12 @@ describe( 'Intermediate Representation', () => {
 				path: null,
 				name: 'default',
 				description: 'Class declaration example.',
-				tags: [],
+				tags: [
+					{
+						tag: 'type',
+						type: 'ClassDeclaration',
+					},
+				],
 				lineStart: 6,
 				lineEnd: 6,
 			} );
@@ -404,7 +415,12 @@ describe( 'Intermediate Representation', () => {
 				path: null,
 				name: 'ClassDeclaration',
 				description: 'Class declaration example.',
-				tags: [],
+				tags: [
+					{
+						tag: 'type',
+						type: 'ClassDeclaration',
+					},
+				],
 				lineStart: 16,
 				lineEnd: 16,
 			} );
@@ -440,7 +456,12 @@ describe( 'Intermediate Representation', () => {
 				path: null,
 				name: 'ClassDeclaration',
 				description: 'Class declaration example.',
-				tags: [],
+				tags: [
+					{
+						tag: 'type',
+						type: 'ClassDeclaration',
+					},
+				],
 				lineStart: 11,
 				lineEnd: 11,
 			} );
