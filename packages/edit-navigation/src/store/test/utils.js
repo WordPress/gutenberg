@@ -237,6 +237,21 @@ describe( 'computeCustomizedAttribute', () => {
 				isValid: true,
 				name: 'core/navigation-link',
 			},
+			{
+				attributes: {
+					id: 678,
+					label: 'Page Example',
+					opensInNewTab: false,
+					url: 'https://localhost:8889/page-example/',
+					className: '',
+					rel: '',
+					type: 'page',
+				},
+				clientId: 'navigation-link-block-client-id-3',
+				innerBlocks: [],
+				isValid: true,
+				name: 'core/navigation-link',
+			},
 		];
 
 		const menuId = 123;
@@ -251,6 +266,7 @@ describe( 'computeCustomizedAttribute', () => {
 				url: 'http://wp.com',
 				menu_order: 1,
 				menus: [ 1 ],
+				object: 'custom',
 			},
 			'navigation-link-block-client-id-2': {
 				id: 101,
@@ -261,6 +277,18 @@ describe( 'computeCustomizedAttribute', () => {
 				url: 'http://wp.org',
 				menu_order: 2,
 				menus: [ 1 ],
+				object: 'custom',
+			},
+			'navigation-link-block-client-id-3': {
+				id: 102,
+				title: {
+					raw: 'Page Example',
+					rendered: 'Page Example',
+				},
+				url: 'https://wordpress.org',
+				menu_order: 3,
+				menus: [ 1 ],
+				object: 'page',
 			},
 		};
 
@@ -284,7 +312,7 @@ describe( 'computeCustomizedAttribute', () => {
 				position: 1,
 				status: 'publish',
 				title: 'wp.org',
-				type: 'custom',
+				object: 'custom',
 				url: 'http://wp.org',
 				xfn: [ 'external' ],
 				target: '',
@@ -300,10 +328,26 @@ describe( 'computeCustomizedAttribute', () => {
 				position: 2,
 				status: 'publish',
 				title: 'wp.com',
-				type: 'custom',
+				object: 'custom',
 				url: 'http://wp.com',
 				xfn: [ '' ],
 				target: '_blank',
+			},
+			'nav_menu_item[102]': {
+				_invalid: false,
+				classes: [ '' ],
+				id: 102,
+				menu_item_parent: 0,
+				menu_order: 3,
+				nav_menu_term_id: 123,
+				original_title: '',
+				position: 3,
+				status: 'publish',
+				title: 'Page Example',
+				object: 'page',
+				object_id: 678,
+				url: 'https://localhost:8889/page-example/',
+				xfn: [ '' ],
 			},
 		} );
 	} );
