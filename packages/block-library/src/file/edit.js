@@ -123,7 +123,7 @@ function FileEdit( {
 				textLinkHref: newMedia.url,
 				id: newMedia.id,
 				displayPreview: isPdf ? true : undefined,
-				previewHeight: isPdf ? 800 : undefined,
+				previewHeight: isPdf ? 600 : undefined,
 			} );
 		}
 	}
