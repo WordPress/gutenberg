@@ -5,12 +5,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-// import type {AggregatedResult, TestResult} from '@jest/test-result';
-// import type { Reporter, Context } from '@jest/reporters';
-// import type {Context} from './types';
-
-// const { flatMap } = require( 'lodash' );
-
 const newLine = /\n/g;
 const encodedNewLine = '%0A';
 const lineAndColumnInStackTrace = /^.*:([0-9]+):([0-9]+).*$/;
@@ -51,9 +45,5 @@ function getMessages( results ) {
 function flatMap( fn ) {
 	return ( out, entry ) => out.concat( ...fn( entry ) );
 }
-
-// function flatMap< In, Out >( map: ( x: In ) => Array< Out > ) {
-// 	return ( out: Array< Out >, entry: In ) => out.concat( ...map( entry ) );
-// }
 
 module.exports = GithubActionReporter;
