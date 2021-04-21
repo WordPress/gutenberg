@@ -1,4 +1,4 @@
-# Block Supports
+# Supports
 
 Block Supports is the API that allows a block to declare features used in the editor.
 

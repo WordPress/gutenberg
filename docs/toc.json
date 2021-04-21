@@ -189,10 +189,10 @@
 			{
 				"docs/reference-guides/block-api/README.md": [
 					{
-						"docs/reference-guides/block-api/block-registration.md": []
+						"docs/reference-guides/block-api/block-annotations.md": []
 					},
 					{
-						"docs/reference-guides/block-api/block-edit-save.md": []
+						"docs/reference-guides/block-api/block-api-versions.md": []
 					},
 					{
 						"docs/reference-guides/block-api/block-attributes.md": []
@@ -201,22 +201,24 @@
 					{
 						"docs/reference-guides/block-api/block-deprecation.md": []
 					},
+					{
+						"docs/reference-guides/block-api/block-edit-save.md": []
+					},
+					{ "docs/reference-guides/block-api/block-metadata.md": [] },
+					{ "docs/reference-guides/block-api/block-patterns.md": [] },
+					{
+						"docs/reference-guides/block-api/block-registration.md": []
+					},
 					{ "docs/reference-guides/block-api/block-supports.md": [] },
+					{
+						"docs/reference-guides/block-api/block-templates.md": []
+					},
 					{
 						"docs/reference-guides/block-api/block-transforms.md": []
 					},
 					{
-						"docs/reference-guides/block-api/block-templates.md": []
-					},
-					{ "docs/reference-guides/block-api/block-metadata.md": [] },
-					{
 						"docs/reference-guides/block-api/block-variations.md": []
-					},
-					{ "docs/reference-guides/block-api/block-patterns.md": [] },
-					{
-						"docs/reference-guides/block-api/block-annotations.md": []
-					},
-					{ "docs/reference-guides/block-api/versions.md": [] }
+					}
 				]
 			},
 			{

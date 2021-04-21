@@ -438,15 +438,15 @@
 		"parent": "reference-guides"
 	},
 	{
-		"title": "Block Registration",
-		"slug": "block-registration",
-		"markdown_source": "../docs/reference-guides/block-api/block-registration.md",
+		"title": "Annotations",
+		"slug": "block-annotations",
+		"markdown_source": "../docs/reference-guides/block-api/block-annotations.md",
 		"parent": "block-api"
 	},
 	{
-		"title": "Edit and Save",
-		"slug": "block-edit-save",
-		"markdown_source": "../docs/reference-guides/block-api/block-edit-save.md",
+		"title": "API Versions",
+		"slug": "block-api-versions",
+		"markdown_source": "../docs/reference-guides/block-api/block-api-versions.md",
 		"parent": "block-api"
 	},
 	{
@@ -456,27 +456,45 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Block Context",
+		"title": "Context",
 		"slug": "block-context",
 		"markdown_source": "../docs/reference-guides/block-api/block-context.md",
 		"parent": "block-api"
 	},
 	{
-		"title": "Deprecated Blocks",
+		"title": "Deprecation",
 		"slug": "block-deprecation",
 		"markdown_source": "../docs/reference-guides/block-api/block-deprecation.md",
 		"parent": "block-api"
 	},
 	{
-		"title": "Block Supports",
-		"slug": "block-supports",
-		"markdown_source": "../docs/reference-guides/block-api/block-supports.md",
+		"title": "Edit and Save",
+		"slug": "block-edit-save",
+		"markdown_source": "../docs/reference-guides/block-api/block-edit-save.md",
 		"parent": "block-api"
 	},
 	{
-		"title": "Block Transforms",
-		"slug": "block-transforms",
-		"markdown_source": "../docs/reference-guides/block-api/block-transforms.md",
+		"title": "Metadata",
+		"slug": "block-metadata",
+		"markdown_source": "../docs/reference-guides/block-api/block-metadata.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Patterns",
+		"slug": "block-patterns",
+		"markdown_source": "../docs/reference-guides/block-api/block-patterns.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Registration",
+		"slug": "block-registration",
+		"markdown_source": "../docs/reference-guides/block-api/block-registration.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Supports",
+		"slug": "block-supports",
+		"markdown_source": "../docs/reference-guides/block-api/block-supports.md",
 		"parent": "block-api"
 	},
 	{
@@ -486,33 +504,15 @@
 		"parent": "block-api"
 	},
 	{
-		"title": "Block Type Metadata",
-		"slug": "block-metadata",
-		"markdown_source": "../docs/reference-guides/block-api/block-metadata.md",
+		"title": "Transforms",
+		"slug": "block-transforms",
+		"markdown_source": "../docs/reference-guides/block-api/block-transforms.md",
 		"parent": "block-api"
 	},
 	{
-		"title": "Block Variations",
+		"title": "Variations",
 		"slug": "block-variations",
 		"markdown_source": "../docs/reference-guides/block-api/block-variations.md",
-		"parent": "block-api"
-	},
-	{
-		"title": "Block Patterns",
-		"slug": "block-patterns",
-		"markdown_source": "../docs/reference-guides/block-api/block-patterns.md",
-		"parent": "block-api"
-	},
-	{
-		"title": "Annotations",
-		"slug": "block-annotations",
-		"markdown_source": "../docs/reference-guides/block-api/block-annotations.md",
-		"parent": "block-api"
-	},
-	{
-		"title": "Block API Versions",
-		"slug": "versions",
-		"markdown_source": "../docs/reference-guides/block-api/versions.md",
 		"parent": "block-api"
 	},
 	{
