@@ -1,4 +1,4 @@
-# Block Styles
+# Styles
 
 Block Styles allow alternative styles to be applied toexisting blocks. They work by adding a className to the block's wrapper. This className can be used to provide an alternative styling for the block if the block style is selected. See the [Getting Started with JavaScript tutorial](/docs/how-to-guides/javascript/) for a full example.
 
