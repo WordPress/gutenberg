@@ -299,7 +299,7 @@ describe( 'Inserting blocks', () => {
 		);
 		await browseAll.click();
 		const inserterMenuInputSelector =
-			'.edit-post-layout__inserter-panel .block-editor-inserter__search-input';
+			'.edit-post-editor__inserter-panel .block-editor-inserter__search-input';
 		const inserterMenuSearchInput = await page.waitForSelector(
 			inserterMenuInputSelector
 		);
