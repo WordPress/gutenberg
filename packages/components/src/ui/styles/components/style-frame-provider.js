@@ -18,7 +18,7 @@ const { cache } = compiler;
 
 /**
  * A special Provider designed specifically for iFrame usage.
- * Components using `@wp-g2/styled` that render within will have their
+ * Components using the style system's styled that render within will have their
  * styles injected and rendered correctly within the iFrame out-of-the-box.
  *
  * No external stylesheet loading is necessary when using <StyleFrameProvider />.
@@ -27,7 +27,7 @@ const { cache } = compiler;
  * ```jsx
  * <Frame>
  *   <StyleFrameProvider>
- *     <Button>Let It Go</Button>
+ *     <Button>Code is Poetry</Button>
  *   </StyleFrameProvider>
  * </Frame>
  * ```
