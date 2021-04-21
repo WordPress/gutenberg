@@ -113,6 +113,9 @@ describe( 'List', () => {
 		await clickBlockAppender();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '* ' );
+		// Not entirely certain why  this timeout is needed.
+		// eslint-disable-next-line no-restricted-syntax
+		await page.waitFor( 1000 );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
