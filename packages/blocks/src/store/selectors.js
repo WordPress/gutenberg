@@ -121,13 +121,17 @@ export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 		if ( Array.isArray( variation.isActive ) ) {
 			const blockType = getBlockType( state, blockName );
 			const attributeKeys = Object.keys( blockType.attributes || {} );
-			return variation.isActive
-				.filter( ( attribute ) => attributeKeys.includes( attribute ) )
-				.every(
-					( attribute ) =>
-						attributes[ attribute ] ===
-						variation.attributes[ attribute ]
-				);
+			const definedAttributes = variation.isActive.filter(
+				( attribute ) => attributeKeys.includes( attribute )
+			);
+			if ( definedAttributes.length === 0 ) {
+				return false;
+			}
+			return definedAttributes.every(
+				( attribute ) =>
+					attributes[ attribute ] ===
+					variation.attributes[ attribute ]
+			);
 		}
 
 		return variation.isActive?.( attributes, variation.attributes );
