@@ -9,7 +9,7 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
-import { __experimentalFrameProvider as FrameProvider } from '@wordpress/components';
+import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
@@ -185,9 +185,9 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 		>
 			{ iframeDocument &&
 				createPortal(
-					<FrameProvider iframeDocument={ iframeDocument }>
+					<StyleProvider iframeDocument={ iframeDocument }>
 						{ children }
-					</FrameProvider>,
+					</StyleProvider>,
 					iframeDocument.body
 				) }
 			{ iframeDocument && createPortal( head, iframeDocument.head ) }

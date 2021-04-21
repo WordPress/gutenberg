@@ -9,7 +9,7 @@ const memoizedCreateCacheWithContainer = memoize( ( container ) => {
 	return createCache( { container } );
 } );
 
-export default function FrameProvider( { children, iframeDocument } ) {
+export default function StyleProvider( { children, iframeDocument } ) {
 	if ( ! iframeDocument ) {
 		return null;
 	}
