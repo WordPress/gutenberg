@@ -5,19 +5,10 @@ import { blockNames } from './pages/editor-page';
 import testData from './helpers/test-data';
 import { isAndroid } from './helpers/utils';
 
-const testKeys = {
-	label: {
-		android: 'Search block label.',
-		ios: 'search-block-label',
-	},
-	input: {
-		android: 'Search input field.',
-		ios: 'search-block-input',
-	},
-	button: {
-		android: 'Search button.',
-		ios: 'search-block-button',
-	},
+const testIds = {
+	label: 'search-block-label',
+	input: 'search-block-input',
+	button: 'search-block-button',
 };
 
 describe( 'Gutenberg Editor Search Block tests', () => {
@@ -33,7 +24,7 @@ describe( 'Gutenberg Editor Search Block tests', () => {
 	describe( 'Editing Search Block elements', () => {
 		it( 'able to customize label text', async () => {
 			await editorPage.sendTextToSearchBlockChild(
-				testKeys.label,
+				testIds.label,
 				testData.shortText
 			);
 
@@ -42,8 +33,8 @@ describe( 'Gutenberg Editor Search Block tests', () => {
 			if ( isAndroid() ) {
 				// Android pads the string entered into the `PlainText` component so we'll get the
 				// value a different way by asking for it directly.
-				const input = await editorPage.getSearchBlockChild(
-					testKeys.label
+				const input = await editorPage.getSearchBlockTextElement(
+					testIds.label
 				);
 				const inputValue = await input.text();
 				actual = inputValue.trim();
@@ -60,7 +51,7 @@ describe( 'Gutenberg Editor Search Block tests', () => {
 
 		it( 'able to customize placeholder text', async () => {
 			await editorPage.sendTextToSearchBlockChild(
-				testKeys.input,
+				testIds.input,
 				testData.shortText
 			);
 
@@ -69,8 +60,8 @@ describe( 'Gutenberg Editor Search Block tests', () => {
 			if ( isAndroid() ) {
 				// Android pads the string entered into the `PlainText` component so we'll get the
 				// value a different way by asking for it directly.
-				const input = await editorPage.getSearchBlockChild(
-					testKeys.input
+				const input = await editorPage.getSearchBlockTextElement(
+					testIds.input
 				);
 				const inputValue = await input.text();
 				actual = inputValue.trim();
@@ -93,7 +84,7 @@ describe( 'Gutenberg Editor Search Block tests', () => {
 			}
 
 			await editorPage.sendTextToSearchBlockChild(
-				testKeys.button,
+				testIds.button,
 				testData.shortButtonText
 			);
 

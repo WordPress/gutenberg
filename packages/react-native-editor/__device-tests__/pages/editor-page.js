@@ -243,13 +243,9 @@ class EditorPage {
 	async openBlockSettings( block ) {
 		await block.click();
 
-		const buttonElementName = isAndroid()
-			? '//*'
-			: '//XCUIElementTypeButton';
-
-		const locator = `${ buttonElementName }[@${ this.accessibilityIdXPathAttrib }="Open Settings"]`;
-
-		const settingsButton = await block.elementByXPath( locator );
+		const settingsButton = await block.elementByAccessibilityId(
+			'Open Settings'
+		);
 		await settingsButton.click();
 	}
 
@@ -591,17 +587,24 @@ class EditorPage {
 	// Search Block functions
 	// =============================
 
-	async getSearchBlockChild( testKeys ) {
-		let locator = `//XCUIElementTypeOther[@name="${ testKeys.ios }"]`;
+	async getSearchBlockTextElement( testID ) {
+		const child = await this.driver.elementByAccessibilityId( testID );
+
 		if ( isAndroid() ) {
-			locator = `//android.view.View[starts-with(@content-desc, "${ testKeys.android }")]/android.widget.EditText`;
+			// Get the child EditText element of the ViewGroup returned by
+			// elementByAccessibilityId.
+			return await child.elementByClassName( 'android.widget.EditText' );
 		}
 
-		return await this.driver.elementByXPath( locator );
+		return child;
 	}
 
-	async sendTextToSearchBlockChild( testKeys, text, clear = true ) {
-		const textViewElement = await this.getSearchBlockChild( testKeys );
+	async sendTextToSearchBlockChild( testID, text, clear = true ) {
+		const textViewElement = await this.getSearchBlockTextElement( testID );
+
+		if ( isAndroid() ) {
+			// await doubleTap( this.driver, textViewElement );
+		}
 		return await typeString( this.driver, textViewElement, text, clear );
 	}
 
