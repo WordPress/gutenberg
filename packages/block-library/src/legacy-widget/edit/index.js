@@ -8,12 +8,7 @@ import {
 	BlockIcon,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	ToolbarGroup,
-	ToolbarButton,
-	Spinner,
-	Placeholder,
-} from '@wordpress/components';
+import { ToolbarButton, Spinner, Placeholder } from '@wordpress/components';
 import { brush as brushIcon, update as updateIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
@@ -143,33 +138,31 @@ function NotEmpty( {
 
 	return (
 		<>
-			<BlockControls>
-				{ ! isWidgetTypeHidden && (
-					<ToolbarGroup>
-						<ToolbarButton
-							label={ __( 'Change widget' ) }
-							icon={ updateIcon }
-							onClick={ () =>
-								setAttributes( {
-									id: null,
-									idBase: null,
-									instance: null,
-								} )
-							}
-						/>
-					</ToolbarGroup>
-				) }
-				{ idBase && (
-					<ToolbarGroup>
-						<ToolbarButton onClick={ applyChanges }>
-							{ __( 'Apply' ) }
-						</ToolbarButton>
-						<ToolbarButton onClick={ clearSelectedBlock }>
-							{ __( 'Cancel' ) }
-						</ToolbarButton>
-					</ToolbarGroup>
-				) }
-			</BlockControls>
+			{ ! isWidgetTypeHidden && (
+				<BlockControls group="block">
+					<ToolbarButton
+						label={ __( 'Change widget' ) }
+						icon={ updateIcon }
+						onClick={ () =>
+							setAttributes( {
+								id: null,
+								idBase: null,
+								instance: null,
+							} )
+						}
+					/>
+				</BlockControls>
+			) }
+			{ idBase && (
+				<BlockControls group="other">
+					<ToolbarButton onClick={ applyChanges }>
+						{ __( 'Apply' ) }
+					</ToolbarButton>
+					<ToolbarButton onClick={ clearSelectedBlock }>
+						{ __( 'Cancel' ) }
+					</ToolbarButton>
+				</BlockControls>
+			) }
 
 			<InspectorControls>
 				<InspectorCard
