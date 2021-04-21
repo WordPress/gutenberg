@@ -103,7 +103,7 @@ export function getBlockVariations( state, blockName, scope ) {
  * @param {Object}                attributes Block attributes used to determine active variation.
  * @param {WPBlockVariationScope} [scope]    Block variation scope name.
  *
- * @return {(WPBlockVariation|void)} Active block variation.
+ * @return {(WPBlockVariation|undefined)} Active block variation.
  */
 export function getActiveBlockVariation( state, blockName, attributes, scope ) {
 	const variations = getBlockVariations( state, blockName, scope );
