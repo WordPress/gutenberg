@@ -340,6 +340,17 @@ export function __experimentalGetInsertionPoint( state ) {
 }
 
 /**
+ * Returns true if the list view is opened.
+ *
+ * @param  {Object}  state Global application state.
+ *
+ * @return {boolean} Whether the list view is opened.
+ */
+export function isListViewOpened( state ) {
+	return state.listViewPanel;
+}
+
+/**
  * Returns true if the template editing mode is enabled.
  *
  * @param  {Object}  state Global application state.
