@@ -13,6 +13,7 @@
 		.block-editor-block-pattern-setup__toolbar {
 			justify-content: center;
 		}
+
 		.block-editor-block-pattern-setup__container {
 			display: grid;
 			grid-template-columns: 1fr 1fr;
@@ -20,18 +21,27 @@
 			padding: $grid-unit-20;
 			max-height: 550px;
 			overflow: auto;
+			margin: 0 $border-width $border-width $border-width;
+			width: calc(100% - #{ $border-width * 2 });
+			background: $white;
 
 			.block-editor-block-preview__container,
 			div[role="button"] {
 				cursor: pointer;
 			}
+
 			.block-editor-block-pattern-setup-list__item-title {
 				padding: $grid-unit-05;
 				font-size: $helptext-font-size;
 				text-align: center;
 			}
+
+			.block-editor-block-preview__container {
+				border-radius: $radius-block-ui;
+			}
 		}
 	}
+
 	.block-editor-block-pattern-setup__toolbar {
 		box-sizing: border-box;
 		position: relative;
