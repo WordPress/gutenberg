@@ -6,7 +6,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import {
 	NavigableToolbar,
-	BlockNavigationDropdown,
 	ToolSelector,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
@@ -14,10 +13,12 @@ import {
 	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
+	store as editorStore,
 } from '@wordpress/editor';
 import { Button, ToolbarItem } from '@wordpress/components';
-import { plus } from '@wordpress/icons';
+import { listView, plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -27,32 +28,42 @@ import { store as editPostStore } from '../../../store';
 
 function HeaderToolbar() {
 	const inserterButton = useRef();
-	const { setIsInserterOpened } = useDispatch( editPostStore );
+	const { setIsInserterOpened, setIsListViewOpened } = useDispatch(
+		editPostStore
+	);
 	const {
 		isInserterEnabled,
 		isInserterOpened,
 		isTextModeEnabled,
 		showIconLabels,
+		isListViewOpen,
+		listViewShortcut,
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
 		} = select( blockEditorStore );
+		const { getEditorSettings } = select( editorStore );
+		const { getEditorMode, isFeatureActive, isListViewOpened } = select(
+			editPostStore
+		);
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
+
 		return {
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
-				select( editPostStore ).getEditorMode() === 'visual' &&
-				select( 'core/editor' ).getEditorSettings()
-					.richEditingEnabled &&
+				getEditorMode() === 'visual' &&
+				getEditorSettings().richEditingEnabled &&
 				hasInserterItems(
 					getBlockRootClientId( getBlockSelectionEnd() )
 				),
 			isInserterOpened: select( editPostStore ).isInserterOpened(),
-			isTextModeEnabled:
-				select( editPostStore ).getEditorMode() === 'text',
-			showIconLabels: select( editPostStore ).isFeatureActive(
-				'showIconLabels'
+			isTextModeEnabled: getEditorMode() === 'text',
+			showIconLabels: isFeatureActive( 'showIconLabels' ),
+			isListViewOpen: isListViewOpened(),
+			listViewShortcut: getShortcutRepresentation(
+				'core/edit-post/toggle-list-view'
 			),
 		};
 	}, [] );
@@ -72,10 +83,16 @@ function HeaderToolbar() {
 				isTertiary={ showIconLabels }
 			/>
 			<ToolbarItem
-				as={ BlockNavigationDropdown }
-				isDisabled={ isTextModeEnabled }
+				as={ Button }
+				className="edit-site-header-toolbar__list-view-toggle"
+				icon={ listView }
+				disabled={ isTextModeEnabled }
+				isPressed={ isListViewOpen }
+				/* translators: button label text should, if possible, be under 16 characters. */
+				label={ __( 'List View' ) }
+				onClick={ () => setIsListViewOpened( ! isListViewOpen ) }
+				shortcut={ listViewShortcut }
 				showTooltip={ ! showIconLabels }
-				isTertiary={ showIconLabels }
 			/>
 		</>
 	);

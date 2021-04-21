@@ -14,7 +14,7 @@ import {
 	EditorKeyboardShortcutsRegister,
 	store as editorStore,
 } from '@wordpress/editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
 import { BlockBreadcrumb } from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
@@ -41,6 +41,7 @@ import PreferencesModal from '../preferences-modal';
 import BrowserURL from '../browser-url';
 import Header from '../header';
 import InserterSidebar from '../secondary-sidebar/inserter-sidebar';
+import ListViewSidebar from '../secondary-sidebar/list-view-sidebar';
 import SettingsSidebar from '../sidebar/settings-sidebar';
 import MetaBoxes from '../meta-boxes';
 import WelcomeGuide from '../welcome-guide';
@@ -80,6 +81,7 @@ function Layout( { styles } ) {
 		nextShortcut,
 		hasBlockSelected,
 		isInserterOpened,
+		isListViewOpened,
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
@@ -98,6 +100,7 @@ function Layout( { styles } ) {
 				'fullscreenMode'
 			),
 			isInserterOpened: select( editPostStore ).isInserterOpened(),
+			isListViewOpened: select( editPostStore ).isListViewOpened(),
 			mode: select( editPostStore ).getEditorMode(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -162,6 +165,13 @@ function Layout( { styles } ) {
 	const secondarySidebar = () => {
 		if ( mode === 'visual' && isInserterOpened ) {
 			return <InserterSidebar />;
+		}
+		if ( mode === 'visual' && isListViewOpened ) {
+			return (
+				<AsyncModeProvider value="true">
+					<ListViewSidebar />
+				</AsyncModeProvider>
+			);
 		}
 		return null;
 	};
