@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, AccessibilityInfo } from 'react-native';
 import classnames from 'classnames';
 
 /**
@@ -57,6 +57,9 @@ export default function SearchEdit( {
 	);
 	const [ isLongButton, setIsLongButton ] = useState( false );
 	const [ buttonWidth, setButtonWidth ] = useState( MIN_BUTTON_WIDTH );
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
+		false
+	);
 
 	const textInputRef = useRef( null );
 
@@ -68,6 +71,34 @@ export default function SearchEdit( {
 		placeholder,
 		buttonText,
 	} = attributes;
+
+	/*
+	 * Check if screenreader is enabled and save to state. This is important for
+	 * properly creating accessibilityLabel text.
+	 */
+	useEffect( () => {
+		AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			handleScreenReaderToggled
+		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then(
+			( screenReaderEnabled ) => {
+				setIsScreenReaderEnabled( screenReaderEnabled );
+			}
+		);
+
+		return () => {
+			AccessibilityInfo.removeEventListener(
+				'screenReaderChanged',
+				handleScreenReaderToggled
+			);
+		};
+	}, [] );
+
+	const handleScreenReaderToggled = ( screenReaderEnabled ) => {
+		setIsScreenReaderEnabled( screenReaderEnabled );
+	};
 
 	/*
 	 * Called when the value of isSelected changes. Blurs the PlainText component
