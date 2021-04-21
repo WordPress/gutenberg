@@ -189,4 +189,105 @@ describe( 'getNavigationPostForMenu', () => {
 
 		expect( generator.next().done ).toBe( true );
 	} );
+
+	it( 'creates correct core/navigation-link block variations from menu objects', () => {
+		const menuId = 123;
+
+		const generator = getNavigationPostForMenu( menuId );
+
+		// Advance generator
+		generator.next();
+		generator.next();
+		generator.next();
+
+		const menuItems = [
+			{
+				id: 100,
+				title: {
+					raw: 'wp.com',
+					rendered: 'wp.com',
+				},
+				url: 'http://wp.com',
+				menu_order: 1,
+				menus: [ 1 ],
+				parent: 0,
+				classes: [ 'menu', 'classes' ],
+				xfn: [ 'nofollow' ],
+				description: 'description',
+				attr_title: 'link title',
+				object: 'post',
+				object_id: 123, // the post object ID not the menu object ID
+			},
+			{
+				id: 101,
+				title: {
+					raw: 'wp.org',
+					rendered: 'wp.org',
+				},
+				url: 'http://wp.org',
+				menu_order: 2,
+				menus: [ 1 ],
+				parent: 0,
+				classes: [],
+				xfn: [],
+				description: '',
+				attr_title: '',
+				object: 'page',
+				object_id: 456, // the page object ID not the menu object ID
+			},
+			{
+				id: 102,
+				title: {
+					raw: 'wordpress.org',
+					rendered: 'wordpress.org',
+				},
+				url: 'https://wordpress.org',
+				menu_order: 3,
+				menus: [ 1 ],
+				parent: 0,
+				classes: [],
+				xfn: [],
+				description: '',
+				attr_title: '',
+				object: 'custom',
+			},
+		];
+
+		// Feed a known value to the generator yield result
+		generator.next( menuItems );
+
+		const persistPostAction = generator.next().value;
+
+		// Get the core/navigation-link blocks from the generated core/navigation block innerBlocks.
+		const blockAttrs = persistPostAction.args[ 2 ].blocks[ 0 ].innerBlocks.map(
+			( block ) => block.attributes
+		);
+
+		// Post link
+		expect( blockAttrs[ 0 ] ).toEqual(
+			expect.objectContaining( {
+				id: 123,
+				type: 'post',
+			} )
+		);
+
+		// Page link
+		expect( blockAttrs[ 1 ] ).toEqual(
+			expect.objectContaining( {
+				id: 456,
+				type: 'page',
+			} )
+		);
+
+		// Custom link
+		expect( blockAttrs[ 2 ] ).toEqual(
+			expect.objectContaining( {
+				type: 'custom',
+			} )
+		);
+
+		// We should not manually create an ID unless the menu object
+		// has a `object_id` field set.
+		expect( blockAttrs[ 2 ].id ).toBeUndefined();
+	} );
 } );
