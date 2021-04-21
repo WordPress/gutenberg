@@ -2,11 +2,11 @@
 
 To modify the behavior of existing blocks, WordPress exposes several APIs:
 
-### Filters
+## Filters
 
 The following filters are available to extend the settings for existing block.
 
-#### `blocks.registerBlockType`
+### `blocks.registerBlockType`
 
 Used to filter the block settings. It receives the block settings and the name of the registered block as arguments. Since v6.1.0 this filter is also applied to each of a block's deprecated settings.
 
@@ -34,7 +34,7 @@ wp.hooks.addFilter(
 );
 ```
 
-#### `blocks.getSaveElement`
+### `blocks.getSaveElement`
 
 A filter that applies to the result of a block's `save` function. This filter is used to replace or extend the element, for example using `wp.element.cloneElement` to modify the element's props or replace its children, or returning an entirely new element.
 
@@ -66,7 +66,7 @@ _Note:_ A [block validation](/docs/reference-guides/block-api/block-edit-save.md
 
 To avoid this validation error, use `render_block` server-side to modify existing post content instead of this filter. See [render_block documentation](https://developer.wordpress.org/reference/hooks/render_block/).
 
-#### `blocks.getBlockDefaultClassName`
+### `blocks.getBlockDefaultClassName`
 
 Generated HTML classes for blocks follow the `wp-block-{name}` nomenclature. This filter allows to provide an alternative class name.
 
@@ -86,15 +86,15 @@ wp.hooks.addFilter(
 );
 ```
 
-#### `blocks.switchToBlockType.transformedBlock`
+### `blocks.switchToBlockType.transformedBlock`
 
 Used to filter an individual transform result from block transformation. All of the original blocks are passed since transformations are many-to-many, not one-to-one.
 
-#### `blocks.getBlockAttributes`
+### `blocks.getBlockAttributes`
 
 Called immediately after the default parsing of a block's attributes and before validation to allow a plugin to manipulate attribute values in time for validation and/or the initial values rendering of the block in the editor.
 
-#### `editor.BlockEdit`
+### `editor.BlockEdit`
 
 Used to modify the block's `edit` component. It receives the original block `BlockEdit` component and returns a new wrapped component.
 

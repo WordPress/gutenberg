@@ -49,13 +49,13 @@ wp.domReady( function () {
 } );
 ```
 
-### Server-side registration helper
+## Server-side registration helper
 
 While the samples provided do allow full control of block styles, they do require a considerable amount of code.
 
 To simplify the process of registering and unregistering block styles, two server-side functions are also available: `register_block_style`, and `unregister_block_style`.
 
-#### register_block_style
+### register_block_style
 
 The `register_block_style` function receives the name of the block as the first argument and an array describing properties of the style as the second argument.
 
@@ -103,7 +103,7 @@ register_block_style(
 );
 ```
 
-#### unregister_block_style
+### unregister_block_style
 
 `unregister_block_style` allows unregistering a block style previously registered on the server using `register_block_style`.
 
