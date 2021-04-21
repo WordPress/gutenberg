@@ -80,7 +80,7 @@
 
 .wp-block-legacy-widget-inspector-card {
 	// Padding left = an icon, some margin and some padding
-	padding: 0 $grid-unit-20 $grid-unit-20 ( $icon-size + $grid-unit-40 + $grid-unit-05 );
+	padding: 0 $grid-unit-20 $grid-unit-20 ( $grid-unit-20 + $icon-size + $grid-unit-15 );
 }
 
 .interface-complementary-area .wp-block-legacy-widget-inspector-card__name {
