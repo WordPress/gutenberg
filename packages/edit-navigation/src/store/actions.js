@@ -186,7 +186,7 @@ function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
 	);
 
 	return yield apiFetch( {
-		url: ajaxurl,
+		url: ajaxurl || '/wp-admin/admin-ajax.php',
 		method: 'POST',
 		body,
 	} );
