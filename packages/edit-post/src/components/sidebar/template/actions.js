@@ -8,7 +8,6 @@ import { kebabCase } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import {
-	PanelRow,
 	Button,
 	Modal,
 	TextControl,
@@ -26,73 +25,46 @@ import { store as coreStore } from '@wordpress/core-data';
 import { store as editPostStore } from '../../../store';
 import { createBlock, serialize } from '@wordpress/blocks';
 
-function PostTemplate() {
+function PostTemplateActions() {
 	const [ isModalOpen, setIsModalOpen ] = useState( false );
 	const [ title, setTitle ] = useState( '' );
-	const { template, isEditing, supportsTemplateMode } = useSelect(
-		( select ) => {
-			const { getCurrentPostType } = select( editorStore );
-			const { getPostType } = select( coreStore );
-			const { isEditingTemplate, getEditedPostTemplate } = select(
-				editPostStore
-			);
+	const { template, supportsTemplateMode } = useSelect( ( select ) => {
+		const { getCurrentPostType } = select( editorStore );
+		const { getPostType } = select( coreStore );
+		const { getEditedPostTemplate } = select( editPostStore );
 
-			const isViewable =
-				getPostType( getCurrentPostType() )?.viewable ?? false;
-			const _supportsTemplateMode =
-				select( editorStore ).getEditorSettings()
-					.supportsTemplateMode && isViewable;
+		const isViewable =
+			getPostType( getCurrentPostType() )?.viewable ?? false;
+		const _supportsTemplateMode =
+			select( editorStore ).getEditorSettings().supportsTemplateMode &&
+			isViewable;
 
-			return {
-				template: _supportsTemplateMode && getEditedPostTemplate(),
-				isEditing: isEditingTemplate(),
-				supportsTemplateMode: _supportsTemplateMode,
-			};
-		},
-		[]
-	);
+		return {
+			template: _supportsTemplateMode && getEditedPostTemplate(),
+			supportsTemplateMode: _supportsTemplateMode,
+		};
+	}, [] );
 	const { __unstableSwitchToTemplateMode } = useDispatch( editPostStore );
 
 	if ( ! supportsTemplateMode ) {
 		return null;
 	}
 
-	const templateTitle = (
-		<>
-			{ !! template && template?.title?.raw }
-			{ !! template && ! template?.title?.raw && template.slug }
-			{ ! template && __( 'Default' ) }
-		</>
-	);
-
 	return (
-		<PanelRow className="edit-post-post-template">
-			<span>{ __( 'Template' ) }</span>
-			{ ! isEditing && (
-				<div className="edit-post-post-template__value">
-					<div>{ templateTitle }</div>
-					<div className="edit-post-post-template__actions">
-						{ !! template && (
-							<Button
-								isLink
-								onClick={ () =>
-									__unstableSwitchToTemplateMode()
-								}
-							>
-								{ __( 'Edit' ) }
-							</Button>
-						) }
-						<Button isLink onClick={ () => setIsModalOpen( true ) }>
-							{ __( 'New' ) }
-						</Button>
-					</div>
-				</div>
-			) }
-			{ isEditing && (
-				<span className="edit-post-post-template__value">
-					{ templateTitle }
-				</span>
-			) }
+		<>
+			<div className="edit-post-template__actions">
+				{ !! template && (
+					<Button
+						isLink
+						onClick={ () => __unstableSwitchToTemplateMode() }
+					>
+						{ __( 'Edit' ) }
+					</Button>
+				) }
+				<Button isLink onClick={ () => setIsModalOpen( true ) }>
+					{ __( 'New' ) }
+				</Button>
+			</div>
 			{ isModalOpen && (
 				<Modal
 					title={ __( 'Create a custom template' ) }
@@ -101,7 +73,7 @@ function PostTemplate() {
 						setIsModalOpen( false );
 						setTitle( '' );
 					} }
-					overlayClassName="edit-post-post-template__modal"
+					overlayClassName="edit-post-template__modal"
 				>
 					<form
 						onSubmit={ ( event ) => {
@@ -153,8 +125,8 @@ function PostTemplate() {
 					</form>
 				</Modal>
 			) }
-		</PanelRow>
+		</>
 	);
 }
 
-export default PostTemplate;
+export default PostTemplateActions;
