@@ -52,13 +52,16 @@ export default function QuickInserter( {
 		( showPatterns && patterns.length > SEARCH_THRESHOLD ) ||
 		blockTypes.length > SEARCH_THRESHOLD;
 
-	const { setInserterIsOpened, blockIndex } = useSelect(
+	const { setInserterIsOpened, insertionIndex } = useSelect(
 		( select ) => {
-			const { getSettings, getBlockIndex } = select( blockEditorStore );
+			const { getSettings, getBlockIndex, getBlockCount } = select(
+				blockEditorStore
+			);
+			const index = getBlockIndex( clientId, rootClientId );
 			return {
 				setInserterIsOpened: getSettings()
 					.__experimentalSetIsInserterOpened,
-				blockIndex: getBlockIndex( clientId, rootClientId ),
+				insertionIndex: index === -1 ? getBlockCount() : index,
 			};
 		},
 		[ clientId, rootClientId ]
@@ -73,7 +76,7 @@ export default function QuickInserter( {
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected
 	const onBrowseAll = () => {
-		setInserterIsOpened( { rootClientId, blockIndex } );
+		setInserterIsOpened( { rootClientId, insertionIndex } );
 	};
 
 	return (

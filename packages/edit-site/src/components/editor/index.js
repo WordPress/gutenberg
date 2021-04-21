@@ -155,7 +155,7 @@ function Editor( { initialSettings } ) {
 			return (
 				<InserterSidebar
 					rootClientId={ isInserterOpen?.rootClientId }
-					index={ isInserterOpen?.blockIndex }
+					insertionIndex={ isInserterOpen?.insertionIndex }
 				/>
 			);
 		}
