@@ -156,8 +156,8 @@ function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
 		...( menuItem.target === NEW_TAB_TARGET_ATTRIBUTE && {
 			opensInNewTab: true,
 		} ),
-		id: menuItem?.object_id,
-		type: menuItem.object, // https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L796
+		...( menuItem?.object_id && { id: menuItem.object_id } ),
+		...( menuItem?.object && { type: menuItem.object } ), //  https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L796
 	};
 
 	return createBlock( 'core/navigation-link', attributes, innerBlocks );
