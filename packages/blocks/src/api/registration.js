@@ -13,7 +13,6 @@ import {
 	pick,
 	pickBy,
 	some,
-	castArray,
 } from 'lodash';
 
 /**
@@ -306,48 +305,9 @@ export function registerBlockType( name, settings ) {
 		return;
 	}
 
-	validateVariations( settings );
-
 	dispatch( blocksStore ).addBlockTypes( settings );
 
 	return settings;
-}
-
-function validateVariations( settings ) {
-	if ( ! Array.isArray( settings.variations ) ) {
-		return;
-	}
-	const attributeKeys = Object.keys( settings.attributes || {} );
-	settings.variations.forEach( ( variation ) => {
-		if ( Array.isArray( variation.isActive ) ) {
-			const undefinedAttributes = variation.isActive.filter(
-				( attribute ) => ! attributeKeys.includes( attribute )
-			);
-			if ( undefinedAttributes.length === 0 ) {
-				return;
-			}
-
-			console.warn(
-				`The block "${ settings.name }"'s "${
-					variation.name
-				}" variation "isActive" array contains attributes ("${ undefinedAttributes.join(
-					'", "'
-				) }") that aren't defined in the block type. They will be ignored.`
-			);
-			variation.isActive = variation.isActive.filter( ( attribute ) =>
-				attributeKeys.includes( attribute )
-			);
-		} else if (
-			! isFunction( variation.isActive ) &&
-			typeof variation.isActive !== 'undefined' &&
-			variation.isActive !== null
-		) {
-			console.warn(
-				`The block "${ settings.name }"'s "${ variation.name }" variation "isActive" must be either an array or a function.`
-			);
-			delete variation.isActive;
-		}
-	} );
 }
 
 /**
@@ -619,8 +579,6 @@ export const getBlockVariations = ( blockName, scope ) => {
  * @param {WPBlockVariation} variation Object describing a block variation.
  */
 export const registerBlockVariation = ( blockName, variation ) => {
-	const blockType = getBlockType( blockName );
-	validateVariations( { ...blockType, variations: castArray( variation ) } );
 	dispatch( blocksStore ).addBlockVariations( blockName, variation );
 };
 

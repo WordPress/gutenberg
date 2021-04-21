@@ -463,6 +463,69 @@ describe( 'selectors', () => {
 					} )
 				).toEqual( variations[ 2 ] );
 			} );
+			it( 'should ignore attributes that are not defined in the block type', () => {
+				const variations = [
+					{
+						name: 'variation-1',
+						attributes: {
+							firstTestAttribute: 1,
+							secondTestAttribute: 10,
+							undefinedTestAttribute: 100,
+						},
+						isActive: [
+							'firstTestAttribute',
+							'secondTestAttribute',
+							'undefinedTestAttribute',
+						],
+					},
+					{
+						name: 'variation-2',
+						attributes: {
+							firstTestAttribute: 2,
+							secondTestAttribute: 20,
+							undefinedTestAttribute: 200,
+						},
+						isActive: [
+							'firstTestAttribute',
+							'secondTestAttribute',
+							'undefinedTestAttribute',
+						],
+					},
+				];
+
+				const state = createBlockVariationsStateWithTestBlockType(
+					variations
+				);
+
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: 1,
+						secondTestAttribute: 10,
+						undefinedTestAttribute: 100,
+					} )
+				).toEqual( variations[ 0 ] );
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: 1,
+						secondTestAttribute: 10,
+						undefinedTestAttribute: 1234,
+					} )
+				).toEqual( variations[ 0 ] );
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: 2,
+						secondTestAttribute: 20,
+						undefinedTestAttribute: 200,
+					} )
+				).toEqual( variations[ 1 ] );
+				expect(
+					getActiveBlockVariation( state, blockName, {
+						firstTestAttribute: 2,
+						secondTestAttribute: 20,
+						undefinedTestAttribute: 2345,
+					} )
+				).toEqual( variations[ 1 ] );
+			} );
 		} );
 		describe( 'getDefaultBlockVariation', () => {
 			it( 'should return the default variation when set', () => {
