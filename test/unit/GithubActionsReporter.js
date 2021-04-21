@@ -39,7 +39,10 @@ function getMessages( results ) {
 				//.filter((m): m is RegExpExecArray => m !== null)
 				.map(
 					( [ message, line, col ] ) =>
-						`::error file=${ testFilePath },line=${ line },col=${ col }::${ message }`
+						`::error file=${ testFilePath.replace(
+							process.env.GITHUB_WORKSPACE + '/',
+							''
+						) },line=${ line },col=${ col }::${ message }`
 				)
 		),
 		[]
