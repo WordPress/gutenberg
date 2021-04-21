@@ -56,13 +56,12 @@ function AudioEdit( {
 		setAttributes( { id: mediaId, src: mediaUrl } );
 	};
 
-	const { wasBlockJustInserted } = useSelect( ( select ) => {
-		return {
-			wasBlockJustInserted: select(
-				blockEditorStore
-			).wasBlockJustInserted( clientId, 'inserter_menu' ),
-		};
-	} );
+	const { wasBlockJustInserted } = useSelect( ( select ) => ( {
+		wasBlockJustInserted: select( blockEditorStore ).wasBlockJustInserted(
+			clientId,
+			'inserter_menu'
+		),
+	} ) );
 
 	const { createErrorNotice } = useDispatch( noticesStore );
 
