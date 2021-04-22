@@ -101,14 +101,16 @@ import { store as blocksStore } from '../store';
  * @property {string[]} [keywords]             An array of terms (which can be translated)
  *                                             that help users discover the variation
  *                                             while searching.
- * @property {Function} [isActive]             A function that accepts a block's attributes
- *                                             and the variation's attributes and determines
- *                                             if a variation is active. This function doesn't
- *                                             try to find a match dynamically based on all
- *                                             block's attributes, as in many cases some
- *                                             attributes are irrelevant. An example would
- *                                             be for `embed` block where we only care about
- *                                             `providerNameSlug` attribute's value.
+ * @property {Function|string[]} [isActive]    This can be a function or an array of block attributes.
+ *                                             Function that accepts a block's attributes and the
+ *                                             variation's attributes and determines if a variation is active.
+ *                                             This function doesn't try to find a match dynamically based
+ *                                             on all block's attributes, as in many cases some attributes are irrelevant.
+ *                                             An example would be for `embed` block where we only care
+ *                                             about `providerNameSlug` attribute's value.
+ *                                             We can also use a `string[]` to tell which attributes
+ *                                             should be compared as a shorthand. Each attributes will
+ *                                             be matched and the variation will be active if all of them are matching.
  */
 
 /**
