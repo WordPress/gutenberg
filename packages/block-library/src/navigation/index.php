@@ -86,10 +86,10 @@ function block_core_navigation_build_css_font_sizes( $attributes ) {
 }
 
 /**
- * Renders a Navigation Block derived from data from the theme_location source assigned
- * via the block attribute 'source'.
+ * Renders a Navigation Block derived from data from the theme_location assigned
+ * via the block attribute 'location'.
  *
- * If the theme doesn't explicity support 'block-nav-menus' or no source was provided
+ * If the theme doesn't explicity support 'block-nav-menus' or no location was provided
  * as a block attribute then an empty string is returned.
  *
  * @param  array $attributes Navigation block attributes.
@@ -101,16 +101,16 @@ function get_classic_navigation_elements( $attributes ) {
 		return '';
 	}
 
-	if ( ! array_key_exists( 'source', $attributes ) ) {
+	if ( ! array_key_exists( 'location', $attributes ) ) {
 		return '';
 	}
 
 	$block_attributes = $attributes;
-	unset( $block_attributes['source'] );
+	unset( $block_attributes['location'] );
 
 	return wp_nav_menu(
 		array(
-			'theme_location'   => $attributes['source'],
+			'theme_location'   => $attributes['location'],
 			'block_attributes' => $block_attributes,
 			'container'        => '',
 			'items_wrap'       => '%3$s',

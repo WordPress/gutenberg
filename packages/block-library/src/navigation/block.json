@@ -3,7 +3,7 @@
 	"name": "core/navigation",
 	"category": "design",
 	"attributes": {
-		"source": {
+		"location": {
 			"type": "string"
 		},
 		"orientation": {
