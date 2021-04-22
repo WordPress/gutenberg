@@ -16,11 +16,11 @@ return array(
 	<!-- /wp:spacer -->
 
 	<!-- wp:heading {"level":6,"style":{"color":{"text":"#000000"}}} -->
-	<h6 class="has-text-color" style="color:#000000">' . esc_html__( 'ECOSYSTEM', 'default' ) . '</h6>
+	<h6 class="has-text-color" style="color:#000000">' . esc_html__( 'ECOLOGY', 'default' ) . '</h6>
 	<!-- /wp:heading -->
 
 	<!-- wp:paragraph {"style":{"typography":{"lineHeight":"1.1","fontSize":"5vw"},"color":{"text":"#000000"}}} -->
-	<p class="has-text-color" style="color:#000000;font-size:5vw;line-height:1.1"><strong>' . esc_html__( 'Positive growth.', 'default' ) . '</strong></p>
+	<p class="has-text-color" style="color:#000000;font-size:5vw;line-height:1.1"><strong>' . esc_html__( 'Natural resources.', 'default' ) . '</strong></p>
 	<!-- /wp:paragraph --><!-- wp:spacer {"height":5} -->
 	<div style="height:5px" aria-hidden="true" class="wp-block-spacer"></div>
 	<!-- /wp:spacer --></div>

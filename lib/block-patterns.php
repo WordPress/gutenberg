@@ -155,19 +155,7 @@ register_block_pattern(
 	)
 );
 
-// Initial block patterns to be used in block transformations with patterns.
-register_block_pattern(
-	'paragraph/large-with-background-color',
-	array(
-		'title'         => __( 'Large paragraph with background color', 'gutenberg' ),
-		'categories'    => array( 'text' ),
-		'blockTypes'    => array( 'core/paragraph' ),
-		'viewportWidth' => 500,
-		'content'       => '<!-- wp:paragraph {"style":{"color":{"link":"#FFFFFF","text":"#FFFFFF","background":"#000000"},"typography":{"lineHeight":"1.3","fontSize":"26px"}}} -->
-							<p class="has-text-color has-background has-link-color" style="--wp--style--color--link:#FFFFFF;background-color:#000000;color:#FFFFFF;font-size:26px;line-height:1.3">The whole series of my life appeared to me as a dream; I sometimes doubted if indeed it were all true, for it never presented itself to my mind with the force of reality.</p>
-							<!-- /wp:paragraph -->',
-	)
-);
+// Initial block pattern to be used with block transformations with patterns.
 register_block_pattern(
 	'social-links/shared-background-color',
 	array(
