@@ -66,19 +66,18 @@ const getAllHeadingAnchors = ( blockList, excludeId ) => {
 };
 
 /**
- * Generate the anchor for a heading.
+ * Get the slug from the content.
  *
- * @param {string}   anchor            The heading anchor.
- * @param {string}   content           The block content.
- * @param {string[]} allHeadingAnchors An array containing all headings anchors.
+ * @param {string} content The block content.
  *
- * @return {string|null} Return the heading anchor.
+ * @return {string} Returns the slug.
  */
-const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
+const getSlug = ( content ) => {
 	content = getTextWithoutMarkup( content );
 
 	// Get the slug.
 	let slug = cleanForSlug( content );
+
 	// If slug is empty, then there is no content, or content is using non-latin characters.
 	// Try non-latin first.
 	if ( '' === slug ) {
@@ -89,13 +88,28 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 			'-'
 		);
 	}
-	// If slug is still empty, then return null.
+
+	return slug;
+};
+
+/**
+ * Generate the anchor for a heading.
+ *
+ * @param {string}   anchor            The heading anchor.
+ * @param {string}   content           The block content.
+ * @param {string[]} allHeadingAnchors An array containing all headings anchors.
+ *
+ * @return {string|null} Return the heading anchor.
+ */
+const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
+	const slug = getSlug( content );
+	// If slug is empty, then return null.
 	// Returning null instead of an empty string allows us to check again when the content changes.
 	if ( '' === slug ) {
 		return null;
 	}
 
-	const baseAnchor = `wp-${ slug }`;
+	const baseAnchor = slug;
 	anchor = baseAnchor;
 	let i = 0;
 
@@ -125,9 +139,5 @@ export default function useGeneratedAnchor( clientId, anchor, content ) {
 		},
 		[ clientId ]
 	);
-	// eslint-disable-next-line eqeqeq
-	if ( null == anchor || 0 === anchor.indexOf( 'wp-' ) ) {
-		return generateAnchor( anchor, content, allHeadingAnchors );
-	}
-	return anchor;
+	return generateAnchor( anchor, content, allHeadingAnchors );
 }
