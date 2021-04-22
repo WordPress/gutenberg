@@ -55,30 +55,23 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/group' ],
+			isMatch: ( { backgroundColor, gradient, style } ) => {
+				/*
+				 * Make sure the group has a background, since if the cover block is
+				 * created without one, it displays the "placeholder" state,
+				 * which makes it look like it has no contents.
+				 */
+				return (
+					backgroundColor ||
+					style?.color?.background ||
+					style?.color?.gradient ||
+					gradient
+				);
+			},
 			transform: (
 				{ align, anchor, backgroundColor, gradient, style },
 				innerBlocks
 			) => {
-				/*
-				 * If a cover block has no background, it displays the "placeholder" state,
-				 * which makes it look like it has no contents.
-				 *
-				 * As this could be confusing to users during a transform, if there aren't any
-				 * existing background colors or gradients in the group, default to 'white' so
-				 * that the transformed group's block contents are not hidden.
-				 */
-				let coverOverlayColor = backgroundColor;
-				if (
-					! (
-						coverOverlayColor ||
-						style?.color?.background ||
-						style?.color?.gradient ||
-						gradient
-					)
-				) {
-					coverOverlayColor = 'white';
-				}
-
 				/*
 				 * Clone the blocks to be transformed.
 				 * Failing to create new block references causes the original blocks
@@ -99,7 +92,7 @@ const transforms = {
 					{
 						align,
 						anchor,
-						overlayColor: coverOverlayColor,
+						overlayColor: backgroundColor,
 						customOverlayColor: style?.color?.background,
 						gradient,
 						customGradient: style?.color?.gradient,
