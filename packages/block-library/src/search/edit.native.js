@@ -296,7 +296,6 @@ export default function SearchEdit( {
 						: undefined
 				}
 				accessibilityLabel={ getAccessibilityLabelForPlaceholder() }
-				testID="search-block-input"
 			>
 				<PlainText
 					ref={ textInputRef }
@@ -359,7 +358,6 @@ export default function SearchEdit( {
 								: undefined
 						}
 						accessibilityLabel={ getAccessibilityLabelForButton() }
-						testID="search-block-button"
 						onLayout={ onLayoutButton }
 					>
 						<RichText
@@ -415,7 +413,6 @@ export default function SearchEdit( {
 							: undefined
 					}
 					accessibilityLabel={ getAccessibilityLabelForLabel() }
-					testID="search-block-label"
 				>
 					<RichText
 						className="wp-block-search__label"
