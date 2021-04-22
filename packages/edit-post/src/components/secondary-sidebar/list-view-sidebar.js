@@ -38,7 +38,7 @@ export default function ListViewSidebar() {
 	const { clearSelectedBlock, selectBlock } = useDispatch( blockEditorStore );
 	async function selectEditorBlock( clientId ) {
 		await clearSelectedBlock();
-		selectBlock( clientId );
+		selectBlock( clientId, -1 );
 	}
 
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );
