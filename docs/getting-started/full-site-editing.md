@@ -35,4 +35,8 @@ Your new theme is ready!
 
 You can then copy the generated directory to your `wp-content/themes` directory and start playing with the Site Editor to build and extend the theme.
 
+### theme.json
 
+Instead of the proliferation of theme support flags or alternative methods, a new `theme.json` file is being used to define theme settings. **NOTE:** This feature is still experimental and changing, so the interim file name is `experimental-theme.json`
+
+See [documentation for theme.json](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/).
