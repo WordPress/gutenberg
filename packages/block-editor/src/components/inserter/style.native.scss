@@ -22,15 +22,14 @@
 
 .inserter-search-form__container {
 	height: 46px;
-	margin: 0 $grid-unit-30;
+	margin: 0 27px $grid-unit-10;
 	flex-direction: row;
 	justify-content: space-between;
 }
 
 .inserter-search-form__input-container {
 	height: 100%;
-	border-radius: 8px;
-	color: $gray-dark;
+	border-radius: $grid-unit;
 	flex-direction: row;
 	justify-content: space-between;
 	flex: 4;
@@ -76,6 +75,11 @@
 	margin: 0 12px;
 	justify-content: center;
 	width: 19px;
+	color: $gray;
+}
+
+.inserter-search-form__icon--dark {
+	color: $white;
 }
 
 .inserter-search-form__input-button {
