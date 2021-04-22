@@ -19,21 +19,28 @@ import useAsyncMode from '../async-mode-provider/use-async-mode';
 
 const renderQueue = createQueue();
 
+/** @typedef {import('./types').WPDataStore} WPDataStore */
+
 /**
  * Custom react hook for retrieving props from registered selectors.
  *
  * In general, this custom React hook follows the
  * [rules of hooks](https://reactjs.org/docs/hooks-rules.html).
  *
- * @param {Function} _mapSelect  Function called on every state change. The
- *                               returned value is exposed to the component
- *                               implementing this hook. The function receives
- *                               the `registry.select` method on the first
- *                               argument and the `registry` on the second
- *                               argument.
- * @param {Array}    deps        If provided, this memoizes the mapSelect so the
- *                               same `mapSelect` is invoked on every state
- *                               change unless the dependencies change.
+ * @param {Function|WPDataStore|string} _mapSelect  Function called on every state change. The
+ *                                                  returned value is exposed to the component
+ *                                                  implementing this hook. The function receives
+ *                                                  the `registry.select` method on the first
+ *                                                  argument and the `registry` on the second
+ *                                                  argument.
+ *                                                  When a store key is passed, all selectors for
+ *                                                  the store will be returned. This is only meant
+ *                                                  for usage of these selectors in event
+ *                                                  callbacks, not for data needed to create the
+ *                                                  element tree.
+ * @param {Array}                       deps        If provided, this memoizes the mapSelect so the
+ *                                                  same `mapSelect` is invoked on every state
+ *                                                  change unless the dependencies change.
  *
  * @example
  * ```js
@@ -59,6 +66,22 @@ const renderQueue = createQueue();
  * any price in the state for that currency is retrieved. If the currency prop
  * doesn't change and other props are passed in that do change, the price will
  * not change because the dependency is just the currency.
+ *
+ * When data is only used in an event callback, the data should not be retrieved
+ * on render, so it may be useful to get the selectors function instead.
+ *
+ * ```js
+ * import { useSelect } from '@wordpress/data';
+ *
+ * function Paste( { children } ) {
+ *   const { getSettings } = useSelect( 'my-shop' );
+ *   function onPaste() {
+ *     // Do something with the settings.
+ *     const settings = getSettings();
+ *   }
+ *   return <div onPaste={ onPaste }>{ children }</div>;
+ * }
+ * ```
  *
  * @return {Function}  A custom react hook.
  */
