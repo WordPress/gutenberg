@@ -24,6 +24,7 @@ import {
  */
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
+import { _x } from '@wordpress/i18n';
 import { blockDefault } from '@wordpress/icons';
 
 /**
@@ -318,45 +319,46 @@ export function registerBlockType( name, settings ) {
 /**
  * Translates block settings provided with metadata using the i18n schema.
  *
- * @param {string|string[]|Object[]} settingSchema I18n schema for the block setting.
+ * @param {string|string[]|Object[]} i18nSchema    I18n schema for the block setting.
  * @param {string|string[]|Object[]} settingValue  Value for the block setting.
  * @param {string}                   textdomain    Textdomain to use with translations.
  *
  * @return {string|string[]|Object[]} Translated setting.
  */
 function translateBlockSettingUsingI18nSchema(
-	settingSchema,
+	i18nSchema,
 	settingValue,
 	textdomain
 ) {
-	if ( isString( settingSchema ) && isString( settingValue ) ) {
-		return settingValue + ':' + settingSchema + ':' + textdomain;
+	if ( isString( i18nSchema ) && isString( settingValue ) ) {
+		// eslint-disable-next-line @wordpress/i18n-no-variables, @wordpress/i18n-text-domain
+		return _x( settingValue, i18nSchema, textdomain );
 	}
 	if (
-		isArray( settingSchema ) &&
-		! isEmpty( settingSchema ) &&
+		isArray( i18nSchema ) &&
+		! isEmpty( i18nSchema ) &&
 		isArray( settingValue )
 	) {
 		return settingValue.map( ( value ) =>
 			translateBlockSettingUsingI18nSchema(
-				settingSchema[ 0 ],
+				i18nSchema[ 0 ],
 				value,
 				textdomain
 			)
 		);
 	}
 	if (
-		isObject( settingSchema ) &&
-		! isEmpty( settingSchema ) &&
+		isObject( i18nSchema ) &&
+		! isEmpty( i18nSchema ) &&
 		isObject( settingValue )
 	) {
 		return Object.keys( settingValue ).reduce( ( accumulator, key ) => {
-			if ( ! settingSchema[ key ] ) {
+			if ( ! i18nSchema[ key ] ) {
 				accumulator[ key ] = settingValue[ key ];
 				return accumulator;
 			}
 			accumulator[ key ] = translateBlockSettingUsingI18nSchema(
-				settingSchema[ key ],
+				i18nSchema[ key ],
 				settingValue[ key ],
 				textdomain
 			);

@@ -8,7 +8,7 @@ import { noop, get, omit, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { addFilter, removeAllFilters } from '@wordpress/hooks';
+import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
 import { select } from '@wordpress/data';
 import { blockDefault as blockIcon } from '@wordpress/icons';
 
@@ -836,6 +836,12 @@ describe( 'blocks', () => {
 			} );
 		} );
 		test( 'registers block from metadata with translation', () => {
+			addFilter(
+				'i18n.gettext_with_context_test',
+				'test/mark-as-translated',
+				( value ) => value + ' (translated)'
+			);
+
 			const Edit = () => 'test';
 			const block = registerBlockTypeFromMetadata(
 				{
@@ -845,11 +851,11 @@ describe( 'blocks', () => {
 					keywords: [ 'i18n', 'metadata' ],
 					styles: [
 						{
-							label: 'i18n-metadata',
-							title: 'I18n Metadata',
+							name: 'i18n-metadata',
+							label: 'I18n Metadata',
 						},
 					],
-					textdomain: 'i18n',
+					textdomain: 'test',
 					icon: 'palmtree',
 				},
 				{
@@ -857,22 +863,27 @@ describe( 'blocks', () => {
 					save: noop,
 				}
 			);
+			removeFilter(
+				'i18n.gettext_with_context_test',
+				'test/mark-as-translated'
+			);
+
 			expect( block ).toEqual( {
 				name: 'test/block-from-metadata-i18n',
-				title: 'I18n title from metadata',
-				description: 'I18n description from metadata',
+				title: 'I18n title from metadata (translated)',
+				description: 'I18n description from metadata (translated)',
 				icon: {
 					src: 'palmtree',
 				},
-				keywords: [ 'i18n', 'metadata' ],
+				keywords: [ 'i18n (translated)', 'metadata (translated)' ],
 				attributes: {},
 				providesContext: {},
 				usesContext: [],
 				supports: {},
 				styles: [
 					{
-						label: 'i18n-metadata',
-						title: 'I18n Metadata',
+						name: 'i18n-metadata',
+						label: 'I18n Metadata (translated)',
 					},
 				],
 				edit: Edit,
