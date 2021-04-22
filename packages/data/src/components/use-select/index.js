@@ -70,6 +70,9 @@ const renderQueue = createQueue();
  * When data is only used in an event callback, the data should not be retrieved
  * on render, so it may be useful to get the selectors function instead.
  *
+ * **Don't use `useSelect` this way when calling the selectors in the render
+ * function because your component won't re-render on a data change.**
+ *
  * ```js
  * import { useSelect } from '@wordpress/data';
  *
