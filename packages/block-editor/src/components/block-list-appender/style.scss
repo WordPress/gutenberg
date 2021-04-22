@@ -29,14 +29,18 @@
 		opacity: 1;
 		transition: all 0.1s ease;
 		@include reduce-motion("transition");
-
-		// Show one appender at a time.
-		visibility: hidden;
-		transform: scale(0);
 	}
 }
 
-.block-editor-block-list__block.is-selected .block-list-appender .block-list-appender__toggle {
+// Show one appender at a time.
+.block-editor-inserter__toggle,
+.block-list-appender__toggle {
+	visibility: hidden;
+	transform: scale(0);
+}
+
+.block-editor-block-list__block.is-selected .block-editor-inserter__toggle,
+.block-editor-block-list__block.is-selected .block-list-appender__toggle {
 	visibility: visible;
 	transform: scale(1);
 }
