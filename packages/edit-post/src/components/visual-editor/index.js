@@ -64,6 +64,7 @@ export default function VisualEditor( { styles } ) {
 	const desktopCanvasStyles = {
 		height: '100%',
 		width: '100%',
+		border: '1px solid #ddd',
 		margin: 0,
 		// Add a constant padding for the typewritter effect. When typing at the
 		// bottom, there needs to be room to scroll up.

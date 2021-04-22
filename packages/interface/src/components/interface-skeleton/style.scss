@@ -110,22 +110,13 @@ html.interface-interface-skeleton__html-container {
 
 .interface-interface-skeleton__sidebar {
 	overflow: auto;
-
-	@include break-medium() {
-		border-left: $border-width solid $gray-200;
-	}
-}
-
-.interface-interface-skeleton__secondary-sidebar {
-	@include break-medium() {
-		border-right: $border-width solid $gray-200;
-	}
+	border-top: $border-width solid $gray-200;
+	border-bottom: $border-width solid $gray-200;
 }
 
 .interface-interface-skeleton__header {
 	flex-shrink: 0;
 	height: auto;  // Keep the height flexible.
-	border-bottom: $border-width solid $gray-200;
 	z-index: z-index(".interface-interface-skeleton__header");
 	color: $gray-900;
 }
@@ -133,7 +124,6 @@ html.interface-interface-skeleton__html-container {
 .interface-interface-skeleton__footer {
 	height: auto; // Keep the height flexible.
 	flex-shrink: 0;
-	border-top: $border-width solid $gray-200;
 	color: $gray-900;
 	position: absolute;
 	bottom: 0;
