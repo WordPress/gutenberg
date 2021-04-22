@@ -24,7 +24,7 @@ export default function InserterSidebar() {
 			insertionPoint: __experimentalGetInsertionPoint(),
 			showMostUsedBlocks: isFeatureActive( 'mostUsedBlocks' ),
 		};
-	} );
+	}, [] );
 	const { setIsInserterOpened } = useDispatch( editPostStore );
 
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
