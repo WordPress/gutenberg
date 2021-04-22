@@ -7,7 +7,6 @@ exports[`Search Block renders block with button inside option 1`] = `
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    accessibilityHint={null}
     accessibilityLabel="search-block-label"
     accessibilityRole="none"
     accessible={true}
@@ -75,7 +74,6 @@ exports[`Search Block renders block with button inside option 1`] = `
     }
   >
     <View
-      accessibilityHint={null}
       accessibilityLabel="search-block-input"
       accessibilityRole="none"
       accessible={true}
@@ -113,7 +111,6 @@ exports[`Search Block renders block with button inside option 1`] = `
       }
     >
       <View
-        accessibilityHint={null}
         accessibilityLabel="search-block-button"
         accessibilityRole="none"
         accessible={true}
@@ -186,7 +183,6 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    accessibilityHint={null}
     accessibilityLabel="search-block-label"
     accessibilityRole="none"
     accessible={true}
@@ -254,7 +250,6 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
     }
   >
     <View
-      accessibilityHint={null}
       accessibilityLabel="search-block-input"
       accessibilityRole="none"
       accessible={true}
@@ -313,7 +308,6 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
     }
   >
     <View
-      accessibilityHint={null}
       accessibilityLabel="search-block-input"
       accessibilityRole="none"
       accessible={true}
@@ -351,7 +345,6 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
       }
     >
       <View
-        accessibilityHint={null}
         accessibilityLabel="search-block-button"
         accessibilityRole="none"
         accessible={true}
@@ -424,7 +417,6 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    accessibilityHint={null}
     accessibilityLabel="search-block-label"
     accessibilityRole="none"
     accessible={true}
@@ -492,7 +484,6 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
     }
   >
     <View
-      accessibilityHint={null}
       accessibilityLabel="search-block-input"
       accessibilityRole="none"
       accessible={true}
@@ -530,7 +521,6 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
       }
     >
       <View
-        accessibilityHint={null}
         accessibilityLabel="search-block-button"
         accessibilityRole="none"
         accessible={true}
@@ -603,7 +593,6 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    accessibilityHint={null}
     accessibilityLabel="search-block-label"
     accessibilityRole="none"
     accessible={true}
@@ -662,7 +651,6 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
     </View>
   </View>
   <View
-    accessibilityHint={null}
     accessibilityLabel="search-block-input"
     accessibilityRole="none"
     accessible={true}

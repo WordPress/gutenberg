@@ -293,7 +293,7 @@ export default function SearchEdit( {
 				accessibilityHint={
 					isScreenReaderEnabled
 						? __( 'Double tap to edit placeholder text' )
-						: null
+						: undefined
 				}
 				accessibilityLabel={ getAccessibilityLabelForPlaceholder() }
 				testID="search-block-input"
@@ -356,7 +356,7 @@ export default function SearchEdit( {
 						accessibilityHint={
 							isScreenReaderEnabled
 								? __( 'Double tap to edit button text' )
-								: null
+								: undefined
 						}
 						accessibilityLabel={ getAccessibilityLabelForButton() }
 						testID="search-block-button"
@@ -412,7 +412,7 @@ export default function SearchEdit( {
 					accessibilityHint={
 						isScreenReaderEnabled
 							? __( 'Double tap to edit label text' )
-							: null
+							: undefined
 					}
 					accessibilityLabel={ getAccessibilityLabelForLabel() }
 					testID="search-block-label"
