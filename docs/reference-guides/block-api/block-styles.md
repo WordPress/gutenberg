@@ -97,7 +97,7 @@ register_block_style(
     'core/quote',
     array(
         'name'         => 'fancy-quote',
-        'label'        => 'Fancy Quote',
+        'label'        => __( 'Fancy Quote', 'textdomain' )
         'style_handle' => 'myguten-style',
     )
 );
