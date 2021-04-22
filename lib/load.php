@@ -89,6 +89,8 @@ if ( ! class_exists( 'WP_Block_Template ' ) ) {
 
 // These are used by some FSE features
 // as well as global styles.
+require __DIR__ . '/interface-wp-theme-json-schema.php';
+require __DIR__ . '/class-wp-theme-json-schema-v0.php';
 require __DIR__ . '/class-wp-theme-json.php';
 require __DIR__ . '/class-wp-theme-json-resolver.php';
 
@@ -104,6 +106,7 @@ require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/full-site-editing/edit-site-export.php';
 
 require __DIR__ . '/blocks.php';
+require __DIR__ . '/block-editor.php';
 require __DIR__ . '/block-patterns.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';

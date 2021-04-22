@@ -90,10 +90,10 @@ $ npm run build
 Builds the code for production. [Learn more](/packages/scripts#build).
 
 ```bash
-$ npm run format:js
+$ npm run format
 ```
 
-Formats JavaScript files. [Learn more](/packages/scripts#format-js).
+Formats files. [Learn more](/packages/scripts#format).
 
 ```bash
 $ npm run lint:css

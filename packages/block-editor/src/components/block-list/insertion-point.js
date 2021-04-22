@@ -152,6 +152,15 @@ function InsertionPointPopover( {
 			? nextElement.getBoundingClientRect()
 			: null;
 		if ( orientation === 'vertical' ) {
+			if ( isRTL() ) {
+				return {
+					top: previousRect.bottom,
+					left: previousRect.right,
+					right: previousRect.left,
+					bottom: nextRect ? nextRect.top : previousRect.bottom,
+				};
+			}
+
 			return {
 				top: previousRect.bottom,
 				left: previousRect.left,
@@ -233,7 +242,9 @@ function InsertionPointPopover( {
 				tabIndex={ -1 }
 				onClick={ onClick }
 				onFocus={ onFocus }
-				className={ className }
+				className={ classnames( className, {
+					'is-with-inserter': showInsertionPointInserter,
+				} ) }
 				style={ style }
 			>
 				{ showInsertionPointIndicator && (

@@ -8,4 +8,4 @@
 
 ### New Features
 
-- Implemented first version of the package.
+-   Implemented first version of the package.
