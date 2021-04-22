@@ -23,7 +23,7 @@ import { CONNECT_STATIC_NAMESPACE } from './constants';
  * The hope is that we can improve render performance by removing functional
  * component wrappers.
  *
- * @template {import('../create-styles').ViewOwnProps<{}, any>} P
+ * @template {import('./polymorphic-component').ViewOwnProps<{}, any>} P
  * @param {(props: P, ref: import('react').Ref<any>) => JSX.Element | null} Component The component to register into the Context system.
  * @param {Array<string>|string} namespace The namespace to register the component under.
  * @param {Object} options
