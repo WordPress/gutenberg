@@ -31,14 +31,13 @@ const SetupContent = ( {
 } ) => {
 	const composite = useCompositeState();
 	const containerClass = 'block-editor-block-pattern-setup__container';
-	let content;
 	if ( viewMode === VIEWMODES.carousel ) {
 		const slideClass = new Map( [
 			[ activeSlide, 'active-slide' ],
 			[ activeSlide - 1, 'previous-slide' ],
 			[ activeSlide + 1, 'next-slide' ],
 		] );
-		content = (
+		return (
 			<div className={ containerClass }>
 				<ul className="carousel-container">
 					{ patterns.map( ( pattern, index ) => (
@@ -51,26 +50,24 @@ const SetupContent = ( {
 				</ul>
 			</div>
 		);
-	} else if ( viewMode === VIEWMODES.grid ) {
-		content = (
-			<Composite
-				{ ...composite }
-				role="listbox"
-				className={ containerClass }
-				aria-label={ __( 'Patterns list' ) }
-			>
-				{ patterns.map( ( pattern ) => (
-					<BlockPattern
-						key={ pattern.name }
-						pattern={ pattern }
-						onSelect={ onBlockPatternSelect }
-						composite={ composite }
-					/>
-				) ) }
-			</Composite>
-		);
 	}
-	return content;
+	return (
+		<Composite
+			{ ...composite }
+			role="listbox"
+			className={ containerClass }
+			aria-label={ __( 'Patterns list' ) }
+		>
+			{ patterns.map( ( pattern ) => (
+				<BlockPattern
+					key={ pattern.name }
+					pattern={ pattern }
+					onSelect={ onBlockPatternSelect }
+					composite={ composite }
+				/>
+			) ) }
+		</Composite>
+	);
 };
 
 function BlockPattern( { pattern, onSelect, composite } ) {
@@ -160,7 +157,7 @@ const BlockPatternSetup = ( {
 				viewMode={ viewMode }
 				setViewMode={ setViewMode }
 				activeSlide={ activeSlide }
-				totalSlides={ +patterns?.length }
+				totalSlides={ patterns.length }
 				handleNext={ () => {
 					setActiveSlide( ( active ) => active + 1 );
 				} }

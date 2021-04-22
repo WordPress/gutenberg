@@ -15,7 +15,38 @@ import {
  */
 import { VIEWMODES } from './constants';
 
-function SetupToolbar( {
+const Actions = ( { onStartBlank, onBlockPatternSelect } ) => (
+	<div className="block-editor-block-pattern-setup__actions">
+		<Button onClick={ onStartBlank }>{ __( 'Start blank' ) }</Button>
+		<Button isPrimary onClick={ onBlockPatternSelect }>
+			{ __( 'Choose' ) }
+		</Button>
+	</div>
+);
+
+const CarouselNavigation = ( {
+	handlePrevious,
+	handleNext,
+	activeSlide,
+	totalSlides,
+} ) => (
+	<div className="block-editor-block-pattern-setup__navigation">
+		<Button
+			icon={ chevronLeft }
+			label={ __( 'Previous pattern' ) }
+			onClick={ handlePrevious }
+			disabled={ activeSlide === 0 }
+		/>
+		<Button
+			icon={ chevronRight }
+			label={ __( 'Next pattern' ) }
+			onClick={ handleNext }
+			disabled={ activeSlide === totalSlides - 1 }
+		/>
+	</div>
+);
+
+const SetupToolbar = ( {
 	viewMode,
 	setViewMode,
 	handlePrevious,
@@ -24,25 +55,8 @@ function SetupToolbar( {
 	totalSlides,
 	onBlockPatternSelect,
 	onStartBlank,
-} ) {
+} ) => {
 	const isCarouselView = viewMode === VIEWMODES.carousel;
-	const navigation = (
-		<div className="block-editor-block-pattern-setup__navigation">
-			<Button
-				icon={ chevronLeft }
-				label={ __( 'Previous pattern' ) }
-				onClick={ handlePrevious }
-				disabled={ activeSlide === 0 }
-			/>
-			<Button
-				icon={ chevronRight }
-				label={ __( 'Next pattern' ) }
-				onClick={ handleNext }
-				disabled={ activeSlide === totalSlides - 1 }
-			/>
-		</div>
-	);
-
 	const displayControls = (
 		<div className="block-editor-block-pattern-setup__display-controls">
 			<Button
@@ -59,23 +73,25 @@ function SetupToolbar( {
 			/>
 		</div>
 	);
-
-	const actions = (
-		<div className="block-editor-block-pattern-setup__actions">
-			<Button onClick={ onStartBlank }>{ __( 'Start blank' ) }</Button>
-			<Button isPrimary onClick={ onBlockPatternSelect }>
-				{ __( 'Choose' ) }
-			</Button>
-		</div>
-	);
-
 	return (
 		<div className="block-editor-block-pattern-setup__toolbar">
-			{ isCarouselView && navigation }
+			{ isCarouselView && (
+				<CarouselNavigation
+					handlePrevious={ handlePrevious }
+					handleNext={ handleNext }
+					activeSlide={ activeSlide }
+					totalSlides={ totalSlides }
+				/>
+			) }
 			{ displayControls }
-			{ isCarouselView && actions }
+			{ isCarouselView && (
+				<Actions
+					onBlockPatternSelect={ onBlockPatternSelect }
+					onStartBlank={ onStartBlank }
+				/>
+			) }
 		</div>
 	);
-}
+};
 
 export default SetupToolbar;

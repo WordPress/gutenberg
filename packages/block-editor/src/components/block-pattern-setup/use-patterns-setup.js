@@ -9,7 +9,7 @@ import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 
 function usePatternsSetup( clientId, blockName, filterPatternsFn ) {
-	const { patterns } = useSelect(
+	return useSelect(
 		( select ) => {
 			const {
 				getBlockRootClientId,
@@ -17,24 +17,18 @@ function usePatternsSetup( clientId, blockName, filterPatternsFn ) {
 				__experimentalGetAllowedPatterns,
 			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientId );
-			let _patterns;
-			// TODO maybe support combination of scoped and provided function??
 			if ( filterPatternsFn ) {
-				_patterns = __experimentalGetAllowedPatterns(
-					rootClientId
-				).filter( filterPatternsFn );
-			} else {
-				_patterns = __experimentalGetPatternsByBlockTypes(
-					blockName,
-					rootClientId
+				return __experimentalGetAllowedPatterns( rootClientId ).filter(
+					filterPatternsFn
 				);
 			}
-			return { patterns: _patterns };
+			return __experimentalGetPatternsByBlockTypes(
+				blockName,
+				rootClientId
+			);
 		},
 		[ clientId, blockName, filterPatternsFn ]
 	);
-
-	return patterns;
 }
 
 export default usePatternsSetup;
