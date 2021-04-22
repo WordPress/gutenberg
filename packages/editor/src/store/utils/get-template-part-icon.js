@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-const icons = require( '@wordpress/icons' );
+import * as icons from '@wordpress/icons';
 /**
  * Helper function to retrieve the corresponding icon by name.
  *
