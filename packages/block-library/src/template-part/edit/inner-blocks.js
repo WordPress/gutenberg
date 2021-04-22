@@ -11,6 +11,11 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
 
+/**
+ * Internal dependencies
+ */
+import ContentLock from './content-lock';
+
 export default function TemplatePartInnerBlocks( {
 	postId: id,
 	hasInnerBlocks,
@@ -49,26 +54,26 @@ export default function TemplatePartInnerBlocks( {
 		},
 	} );
 
-	const [ isHovered, setIsHovered ] = useState( false );
-	const {
-		hideInsertionPointPopover,
-		showInsertionPointPopover,
-	} = useDispatch( blockEditorStore );
+	// const [ isHovered, setIsHovered ] = useState( false );
+	// const {
+	// 	hideInsertionPointPopover,
+	// 	showInsertionPointPopover,
+	// } = useDispatch( blockEditorStore );
 
-	useEffect( () => {
-		if ( isHovered && ! isSelected ) {
-			hideInsertionPointPopover();
-		} else {
-			showInsertionPointPopover();
-		}
-	}, [ isSelected, isHovered ] );
+	// useEffect( () => {
+	// 	if ( isHovered && ! isSelected ) {
+	// 		hideInsertionPointPopover();
+	// 	} else {
+	// 		showInsertionPointPopover();
+	// 	}
+	// }, [ isSelected, isHovered ] );
 
 	return (
-		<div
-			onMouseEnter={ () => setIsHovered( true ) }
-			onMouseLeave={ () => setIsHovered( false ) }
+		<ContentLock
+		// onMouseEnter={ () => setIsHovered( true ) }
+		// onMouseLeave={ () => setIsHovered( false ) }
 		>
 			<TagName { ...innerBlocksProps } />
-		</div>
+		</ContentLock>
 	);
 }
