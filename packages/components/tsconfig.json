@@ -12,7 +12,8 @@
 		{ "path": "../icons" },
 		{ "path": "../is-shallow-equal" },
 		{ "path": "../primitives" },
-		{ "path": "../react-i18n" }
+		{ "path": "../react-i18n" },
+		{ "path": "../warning" }
 	],
 	"include": [
 		"src/animate/**/*",
