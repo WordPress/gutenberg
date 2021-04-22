@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	useShortcut,
@@ -61,7 +61,7 @@ function KeyboardShortcuts() {
 		} );
 
 		registerShortcut( {
-			name: 'core/edit-post/toggle-list-view',
+			name: 'core/edit-post/toggle-block-navigation',
 			category: 'global',
 			description: __( 'Open the block list view.' ),
 			keyCombination: {
@@ -166,7 +166,7 @@ function KeyboardShortcuts() {
 	);
 
 	useShortcut(
-		'core/edit-post/toggle-list-view',
+		'core/edit-post/toggle-block-navigation',
 		() => setIsListViewOpened( ! isListViewOpened() ),
 		{ bindGlobal: true }
 	);
