@@ -36,7 +36,7 @@ function exists( filename ) {
  *
  * @param {string} pathname
  *
- * @return {boolean} True if the directory should be watched.
+ * @return {boolean} True if the given path is a directory.
  */
 function isDirectory( pathname ) {
 	try {
