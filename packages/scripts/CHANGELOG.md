@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Include a Jest Reporter that formats test results for GitHub Actions annotations ([#31041](https://github.com/WordPress/gutenberg/pull/31041)).
+
 ### Breaking Changes
 
 -   Rename `format-js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
