@@ -22,11 +22,17 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		the_post();
 	}
 
+	$content = get_the_content( null, false, $block->context['postId'] );
+
+	if ( empty( $content ) ) {
+		return '';
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
 
 	return (
 		'<div ' . $wrapper_attributes . '>' .
-			apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', get_the_content( null, false, $block->context['postId'] ) ) ) .
+			apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) ) .
 		'</div>'
 	);
 }

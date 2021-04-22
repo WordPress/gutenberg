@@ -77,7 +77,7 @@ function gutenberg_get_default_block_categories() {
 function gutenberg_get_block_categories( $editor_name_or_post ) {
 	// Assume the post editor when the WP_Post object passed.
 	$editor_name        = is_object( $editor_name_or_post ) ? 'post-editor' : $editor_name_or_post;
-	$default_categories = get_default_block_categories();
+	$default_categories = gutenberg_get_default_block_categories();
 
 	/**
 	 * Filters the default array of categories for block types.
