@@ -18,6 +18,10 @@ const lineAndColumnInStackTrace = /^.*?:([0-9]+):([0-9]+).*$/;
 
 class GithubActionsReporter {
 	async onRunComplete( _contexts, _aggregatedResults ) {
+		if ( ! process.env.GITHUB_ACTIONS ) {
+			return;
+		}
+
 		if ( ! _aggregatedResults ) {
 			return;
 		}
