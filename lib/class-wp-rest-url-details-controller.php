@@ -162,6 +162,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		// see https://www.php.net/manual/en/domdocument.loadhtml.php#95463.
 		$errors = libxml_use_internal_errors( true );
 
+		// Clear the error buffer.
+		libxml_clear_errors();
+
 		// Ensure UTF-8 is respected by using 'mb_convert_encoding'.
 		$loaded_status = $doc->loadHTML( mb_convert_encoding( $remote_url_response, 'HTML-ENTITIES', 'UTF-8' ) );
 
