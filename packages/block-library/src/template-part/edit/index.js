@@ -164,7 +164,7 @@ export default function TemplatePartEdit( {
 			) }
 			{ isEntityAvailable && (
 				<TemplatePartInnerBlocks
-					isSelected={ isSelected }
+					clientId={ clientId }
 					tagName={ TagName }
 					blockProps={ blockProps }
 					postId={ templatePartId }

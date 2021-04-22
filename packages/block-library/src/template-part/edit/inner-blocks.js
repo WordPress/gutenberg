@@ -22,7 +22,7 @@ export default function TemplatePartInnerBlocks( {
 	layout,
 	tagName: TagName,
 	blockProps,
-	isSelected,
+	clientId,
 } ) {
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -70,8 +70,9 @@ export default function TemplatePartInnerBlocks( {
 
 	return (
 		<ContentLock
-		// onMouseEnter={ () => setIsHovered( true ) }
-		// onMouseLeave={ () => setIsHovered( false ) }
+			clientId={ clientId }
+			// onMouseEnter={ () => setIsHovered( true ) }
+			// onMouseLeave={ () => setIsHovered( false ) }
 		>
 			<TagName { ...innerBlocksProps } />
 		</ContentLock>

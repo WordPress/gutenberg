@@ -76,21 +76,6 @@
 			}
 		}
 	}
-
-	// &:not(.has-child-selected):not(.is-selected):not(.is-placeholder) {
-	// 	* {
-	// 		pointer-events: none;
-	// 		user-select: none; // Stops text being inadvertently highlighted when selecting a template part
-	// 	}
-	// }
-
-	// &.is-selected:not(.is-placeholder) {
-	// 	background: rgba(#007cba, 0.1); // todo: use var
-	// }
-
-	&.is-hovered:not(.is-selected) {
-		background: rgba($gray-900, 0.05);
-	}
 }
 
 .wp-block-template-part__content-lock {
@@ -100,13 +85,19 @@
 		position: absolute;
 		top: 0;
 		left: 0;
-		background-color: rgb(0, 0, 250, 0.8);
 		z-index: 100;
-	}
-	.wp-block-template-part__content-lock-content-wrapper {
-		position: static;
-		// display: inline;
-		width: auto;
-		height: auto;
+		background: transparent;
+		border: none;
+
+		&.overlay-selected {
+			background: rgb(#007cba, 0.1); // todo: use var
+			pointer-events: none;
+		}
+		&.child-selected {
+			display: none;
+		}
+		&:hover:not(.overlay-selected):not(.child-selected) {
+			background: rgba($gray-900, 0.05);
+		}
 	}
 }

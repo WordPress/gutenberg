@@ -1,12 +1,17 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 import { useRef, useEffect, useState } from '@wordpress/element';
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
 
 export default function ContentLock( { clientId, children } ) {
 	const wrapperRef = useRef();
+	const baseClassName = 'wp-block-template-part__content-lock';
 
 	const [ overlaySizes, setOverlaySizes ] = useState( {} );
 	const { isSelected, hasChildSelected } = useSelect(
@@ -16,14 +21,16 @@ export default function ContentLock( { clientId, children } ) {
 			);
 			return {
 				isSelected: isBlockSelected( clientId ),
-				hasChildSelected: hasSelectedInnerBlock( clientId ),
+				hasChildSelected: hasSelectedInnerBlock( clientId, true ),
 			};
 		},
 		[ clientId ]
 	);
 
+	const selectBlock = useDispatch( blockEditorStore ).selectBlock;
+
 	useEffect( () => {
-		if ( wrapperRef.current?.clientHeight ) {
+		if ( wrapperRef.current?.clientHeight && ! hasChildSelected ) {
 			setOverlaySizes( {
 				height: wrapperRef.current?.clientHeight + 'px',
 				width: wrapperRef.current?.clientWidth + 'px',
@@ -35,28 +42,30 @@ export default function ContentLock( { clientId, children } ) {
 		wrapperRef.current,
 		wrapperRef.current?.clientHeight,
 		wrapperRef.current?.clientWidth,
+		hasChildSelected,
 	] );
 
-	// if not selected in any way, disable children / wrap container (no color)
-	if ( true || ! ( isSelected || hasChildSelected ) ) {
-		return (
-			<div className="wp-block-template-part__content-lock">
-				<div
-					className="wp-block-template-part__content-lock-overlay"
-					style={ overlaySizes }
-				/>
+	const overlayClasses = classnames( `${ baseClassName }-overlay`, {
+		'overlay-selected': isSelected,
+		'child-selected': hasChildSelected,
+	} );
+	const onClick = ! ( isSelected || hasChildSelected )
+		? () => selectBlock( clientId )
+		: null;
 
-				<div
-					className="wp-block-template-part__content-lock-content-wrapper"
-					ref={ wrapperRef }
-				>
-					{ children }
-				</div>
+	return (
+		<div className={ baseClassName }>
+			<button
+				className={ overlayClasses }
+				style={ overlaySizes }
+				onClick={ onClick }
+			/>
+			<div
+				className={ `${ baseClassName }-content-wrapper` }
+				ref={ wrapperRef }
+			>
+				{ children }
 			</div>
-		);
-	}
-	// if isSelected -  wrap container (color) + disable children? | unlock button?
-	// if childSelected - normal ?
-
-	return <div>{ children }</div>;
+		</div>
+	);
 }
