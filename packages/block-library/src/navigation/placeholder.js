@@ -98,7 +98,7 @@ function convertMenuItemsToBlocks( menuItems ) {
 	return mapMenuItemsToBlocks( menuTree );
 }
 
-function NavigationPlaceholder( { onCreate }, ref ) {
+function NavigationPlaceholder( { onCreate, location }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
@@ -216,6 +216,109 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		isPrimary: true,
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
+
+	const setSelectedLocation = ( menu, location ) => {
+		console.log(menu, location);
+	};
+
+	const locationPlaceholder = () => {
+		if ( ! location ) {
+			return;
+		}
+
+		//TODO: Get this from the gettin' place
+		const menuLocations = [ location ];
+
+		return (
+			<>
+				{ ' ' }
+				<DropdownMenu
+					text={ location }
+					icon={ chevronDown }
+					toggleProps={ toggleProps }
+				>
+					{ ( { onClose } ) => (
+						<MenuGroup>
+							{ menuLocations.map( ( menuLocation ) => {
+								return (
+									<MenuItem
+										onClick={ () => {
+											setSelectedLocation( menuLocation );
+										} }
+										isSelected={ menuLocation === location }
+										onClose={ onClose }
+										key={ menuLocation }
+									>
+										{ menuLocation }
+									</MenuItem>
+								);
+							} ) }
+						</MenuGroup>
+					) }
+				</DropdownMenu>
+				<Button isTertiary onClick={ editExistingMenu() }>
+					{ __( 'Edit' ) }
+				</Button>
+				<Button isTertiary onClick={ onConvertToBlocks() }>
+					{ __( 'Convert to Blocks' ) }
+				</Button>
+			</>
+		);
+	};
+
+	const editExistingMenu = () => {};
+
+	const onConvertToBlocks = () => {};
+
+	const defaultPlaceholder = () => {
+		if ( location ) {
+			return;
+		}
+		return (
+			<>
+				{ hasMenus ? (
+					<DropdownMenu
+						text={ __( 'Existing menu' ) }
+						icon={ chevronDown }
+						toggleProps={ toggleProps }
+					>
+						{ ( { onClose } ) => (
+							<MenuGroup>
+								{ menus.map( ( menu ) => {
+									return (
+										<MenuItem
+											onClick={ () => {
+												setSelectedMenu( menu.id );
+												onCreateFromMenu();
+											} }
+											onClose={ onClose }
+											key={ menu.id }
+										>
+											{ menu.name }
+										</MenuItem>
+									);
+								} ) }
+							</MenuGroup>
+						) }
+					</DropdownMenu>
+				) : undefined }
+
+				{ hasPages ? (
+					<Button
+						isPrimary={ hasMenus ? false : true }
+						isTertiary={ hasMenus ? true : false }
+						onClick={ onCreateAllPages }
+					>
+						{ __( 'Add all pages' ) }
+					</Button>
+				) : undefined }
+				<Button isTertiary onClick={ onCreateEmptyMenu }>
+					{ __( 'Start empty' ) }
+				</Button>
+			</>
+		);
+	};
+
 	return (
 		<div className="wp-block-navigation-placeholder">
 			<PlaceholderPreview />
@@ -234,46 +337,9 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 						<div className="wp-block-navigation-placeholder__actions__indicator">
 							<Icon icon={ navigation } /> { __( 'Navigation' ) }
 						</div>
-						{ hasMenus ? (
-							<DropdownMenu
-								text={ __( 'Existing menu' ) }
-								icon={ chevronDown }
-								toggleProps={ toggleProps }
-							>
-								{ ( { onClose } ) => (
-									<MenuGroup>
-										{ menus.map( ( menu ) => {
-											return (
-												<MenuItem
-													onClick={ () => {
-														setSelectedMenu(
-															menu.id
-														);
-														onCreateFromMenu();
-													} }
-													onClose={ onClose }
-													key={ menu.id }
-												>
-													{ menu.name }
-												</MenuItem>
-											);
-										} ) }
-									</MenuGroup>
-								) }
-							</DropdownMenu>
-						) : undefined }
-						{ hasPages ? (
-							<Button
-								isPrimary={ hasMenus ? false : true }
-								isTertiary={ hasMenus ? true : false }
-								onClick={ onCreateAllPages }
-							>
-								{ __( 'Add all pages' ) }
-							</Button>
-						) : undefined }
-						<Button isTertiary onClick={ onCreateEmptyMenu }>
-							{ __( 'Start empty' ) }
-						</Button>
+
+						{ locationPlaceholder() }
+						{ defaultPlaceholder() }
 					</div>
 				) }
 			</div>
