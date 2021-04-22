@@ -27,6 +27,7 @@ export { BlockNavigationBlockFill as __experimentalBlockNavigationBlockFill } fr
 export { default as __experimentalBlockNavigationEditor } from './block-navigation/editor';
 export { default as __experimentalBlockNavigationTree } from './block-navigation/tree';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
+export { default as __experimentalBlockPatternSetup } from './block-pattern-setup';
 export { default as __experimentalBlockVariationTransforms } from './block-variation-transforms';
 export {
 	BlockVerticalAlignmentToolbar,

@@ -76,6 +76,11 @@ $z-layers: (
 	// should overlap most block content.
 	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 61,
 
+	// Query block setup state.
+	".block-editor-block-pattern-setup .pattern-slide": 100,
+	".block-editor-block-pattern-setup .{next,previous}-slide": 101,
+	".block-editor-block-pattern-setup .active-slide": 102,
+
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
 	".interface-interface-skeleton__sidebar": 100000,
