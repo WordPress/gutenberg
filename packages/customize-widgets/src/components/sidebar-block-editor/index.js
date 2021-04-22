@@ -87,7 +87,9 @@ export default function SidebarBlockEditor( {
 					</BlockSelectionClearer>
 				</SidebarEditorProvider>
 
-				<Popover.Slot name="block-toolbar" />
+				<div className="customize-widgets__contextual-toolbar-wrapper">
+					<Popover.Slot name="block-toolbar" />
+				</div>
 
 				{ createPortal(
 					// This is a temporary hack to prevent button component inside <BlockInspector>
