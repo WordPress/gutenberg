@@ -1,4 +1,11 @@
 /**
+ * Based on https://github.com/facebook/jest/pull/11320.
+ *
+ * We might be able to remove this file once the Jest PR is merged, and a
+ * version of Jest that includes the GithubActionsReporter is released.
+ */
+
+/**
  * Copyright (c) Facebook, Inc. and its affiliates. All Rights Reserved.
  *
  * This source code is licensed under the MIT license found in the
