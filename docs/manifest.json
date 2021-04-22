@@ -762,6 +762,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "DuotonePicker",
+		"slug": "duotone-picker",
+		"markdown_source": "../packages/components/src/duotone-picker/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ExternalLink",
 		"slug": "external-link",
 		"markdown_source": "../packages/components/src/external-link/README.md",

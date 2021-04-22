@@ -86,12 +86,11 @@ supports: {
 -   Default value: null
 -   Subproperties:
     -   `background`: type `boolean`, default value `true`
+    -   `duotone`: type `string`, default value undefined
     -   `gradients`: type `boolean`, default value `false`
     -   `text`: type `boolean`, default value `true`
 
-This value signals that a block supports some of the CSS style properties related to color. When it does, the block editor will show UI controls for the user to set their values.
-
-The controls for background and text will source their colors from the `editor-color-palette` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), while the gradient's from `editor-gradient-presets` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets).
+This value signals that a block supports some of the properties related to color. When it does, the block editor will show UI controls for the user to set their values.
 
 Note that the `text` and `background` keys have a default value of `true`, so if the `color` property is present they'll also be considered enabled:
 
@@ -115,57 +114,226 @@ supports: {
 }
 ```
 
-When the block has support for a specific color property, the attributes definition is extended to include some attributes.
+### color.background
 
--   `style`: attribute of `object` type with no default assigned. This is added when any of support color properties are declared. It stores the custom values set by the user. The block can apply a default style by specifying its own `style` attribute with a default e.g.:
+This property adds UI controls which allow the user to apply a solid background color to a block.
+
+When color support is declared, this property is enabled by default (along with text), so simply setting color will enable background color.
 
 ```js
-attributes: {
-    style: {
-        type: 'object',
-        default: {
-            color: {
-                background: 'value',
-                gradient: 'value',
-                text: 'value'
-            }
-        }
+supports: {
+    color: true // Enable both background and text
+}
+```
+
+To disable background support while keeping other color supports enabled, set to `false`.
+
+```js
+supports: {
+    color: {
+        // Disable background support. Text color support is still enabled.
+        background: false
     }
 }
 ```
 
--   When `background` support is declared: it'll be added a new `backgroundColor` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default background color by specifying its own attribute with a default e.g.:
+When the block declares support for `color.background`, the attributes definition is extended to include two new attributes: `backgroundColor` and `style`:
+
+- `backgroundColor`: attribute of `string` type with no default assigned.
+
+  When a user chooses from the list of preset background colors, the preset slug is stored in the `backgroundColor` attribute.
+
+  Background color presets are sourced from the `editor-color-palette` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes).
+
+  The block can apply a default preset background color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      backgroundColor: {
+          type: 'string',
+          default: 'some-preset-background-slug',
+      }
+  }
+  ```
+
+- `style`: attribute of `object` type with no default assigned.
+  
+  When a custom background color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.background` attribute.
+
+  The block can apply a default custom background color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      style: {
+          type: 'object',
+          default: {
+              color: {
+                  background: '#aabbcc',
+              }
+          }
+      }
+  }
+  ```
+
+### color.__experimentalDuotone
+
+This property adds UI controls which allow to apply a duotone filter to a block or part of a block.
+
+The parent selector is automatically added much like nesting in Sass/SCSS (however, the `&` selector is not supported).
 
 ```js
-attributes: {
-    backgroundColor: {
-        type: 'string',
-        default: 'some-value',
+supports: {
+    color: {
+        // Apply the filter to the same selector in both edit and save.
+        __experimentalDuotone: '> .duotone-img, > .duotone-video',
+
+        // Default values must be disabled if you don't want to use them with duotone.
+        background: false,
+        text: false
     }
 }
 ```
 
--   When `gradients` support is declared: it'll be added a new `gradient` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default text color by specifying its own attribute with a default e.g.:
+Duotone presets are sourced from `color.duotone` in [theme.json](https://developer.wordpress.org/block-editor/developers/themes/theme-json/).
+
+When the block declares support for `color.duotone`, the attributes definition is extended to include the attribute `style`:
+
+- `style`: attribute of `object` type with no default assigned.
+
+  The block can apply a default duotone color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      style: {
+          type: 'object',
+          default: {
+              color: {
+                  duotone: [
+                      '#FFF',
+                      '#000
+                  ]
+              }
+          }
+      }
+  }
+  ```
+
+### color.gradients
+
+This property adds UI controls which allow the user to apply a gradient background to a block.
 
 ```js
-attributes: {
-    gradient: {
-        type: 'string',
-        default: 'some-value',
+supports: {
+    color: {
+        gradient: true,
+
+        // Default values must be disabled if you don't want to use them with gradient.
+        background: false,
+        text: false
     }
 }
 ```
 
--   When `text` support is declared: it'll be added a new `textColor` attribute of type `string` with no default assigned. It stores the preset values set by the user. The block can apply a default text color by specifying its own attribute with a default e.g.:
+Gradient presets are sourced from `editor-gradient-presets` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets).
+
+
+When the block declares support for `color.gradient`, the attributes definition is extended to include two new attributes: `gradient` and `style`:
+
+- `gradient`: attribute of `string` type with no default assigned.
+
+  When a user chooses from the list of preset gradients, the preset slug is stored in the `gradient` attribute.
+
+  The block can apply a default preset gradient by specifying its own attribute with a default e.g.:
+  
+  ```js
+  attributes: {
+      gradient: {
+          type: 'string',
+          default: 'some-preset-gradient-slug',
+      }
+  }
+  ```
+
+- `style`: attribute of `object` type with no default assigned.
+  
+  When a custom gradient is selected (i.e. using the custom gradient picker), the custom gradient value is stored in the `style.color.gradient` attribute.
+  
+  The block can apply a default custom gradient by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      style: {
+          type: 'object',
+          default: {
+              color: {
+                  background: 'linear-gradient(135deg,rgb(170,187,204) 0%,rgb(17,34,51) 100%)',
+              }
+          }
+      }
+  }
+  ```
+
+### color.text
+
+This property adds block controls which allow the user to set text color in a block.
+
+When color support is declared, this property is enabled by default (along with background), so simply setting color will enable text color.
 
 ```js
-attributes: {
-    textColor: {
-        type: 'string',
-        default: 'some-value',
+supports: {
+    color: true // Enable both text and background
+}
+```
+
+To disable text color support while keeping other color supports enabled, set to `false`.
+
+```js
+supports: {
+    color: {
+        // Disable text color support. Background support is still enabled.
+        text: false
     }
 }
 ```
+
+Text color presets are sourced from the `editor-color-palette` [theme support](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes).
+  
+
+When the block declares support for `color.text`, the attributes definition is extended to include two new attributes: `textColor` and `style`:
+
+- `textColor`: attribute of `string` type with no default assigned.
+
+  When a user chooses from the list of preset text colors, the preset slug is stored in the `textColor` attribute.
+  
+  The block can apply a default preset text color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      textColor: {
+          type: 'string',
+          default: 'some-preset-text-color-slug',
+      }
+  }
+  ```
+
+- `style`: attribute of `object` type with no default assigned.
+  
+  When a custom text color is selected (i.e. using the custom color picker), the custom color value is stored in the `style.color.text` attribute.
+  
+  The block can apply a default custom text color by specifying its own attribute with a default e.g.:
+
+  ```js
+  attributes: {
+      style: {
+          type: 'object',
+          default: {
+              color: {
+                  text: '#aabbcc',
+              }
+          }
+      }
+  }
+  ```
 
 ## customClassName
 

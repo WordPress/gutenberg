@@ -85,6 +85,11 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 				'context' => 'Gradient name',
 			),
 			array(
+				'path'    => array( 'settings', '*', 'color', 'duotone' ),
+				'key'     => 'name',
+				'context' => 'Duotone name',
+			),
+			array(
 				'path'    => array( 'customTemplates' ),
 				'key'     => 'title',
 				'context' => 'Custom template name',

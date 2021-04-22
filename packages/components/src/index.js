@@ -52,6 +52,7 @@ export { default as DropZone } from './drop-zone';
 export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
+export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
 export { default as ExternalLink } from './external-link';
 export { default as Flex } from './flex';
 export { default as FlexBlock } from './flex/block';

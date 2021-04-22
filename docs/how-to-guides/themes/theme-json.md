@@ -186,6 +186,7 @@ The settings section has the following structure and default values:
       "color": {
         "custom": true, /* false to opt-out, as in add_theme_support('disable-custom-colors') */
         "customGradient": true, /* false to opt-out, as in add_theme_support('disable-custom-gradients') */
+        "duotone": [ ... ], /* duotone presets, a list of { "colors": [ "#000", "#FFF" ], "slug": "black-and-white", "name": "Black and White" } */
         "gradients": [ ... ], /* gradient presets, as in add_theme_support('editor-gradient-presets', ... ) */
         "link": false, /* true to opt-in, as in add_theme_support('experimental-link-color') */
         "palette": [ ... ], /* color presets, as in add_theme_support('editor-color-palette', ... ) */
