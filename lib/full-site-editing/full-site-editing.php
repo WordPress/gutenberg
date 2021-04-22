@@ -11,7 +11,13 @@
  * @return boolean Whether the current theme is an FSE theme or not.
  */
 function gutenberg_is_fse_theme() {
-	return is_readable( get_stylesheet_directory() . '/block-templates/index.html' ) && !current_theme_supports( 'disable-fse' );
+	$enable_fse     = true;
+	$theme_settings = WP_Theme_JSON_Resolver::get_merged_data()->get_settings();
+	if ( isset( $theme_settings['defaults']['experience']['enable_fse'] ) ) {
+		$enable_fse = $theme_settings['defaults']['experience']['enable_fse'];
+	}
+
+	return is_readable( get_stylesheet_directory() . '/block-templates/index.html' ) && $enable_fse;
 }
 
 /**
@@ -20,13 +26,7 @@ function gutenberg_is_fse_theme() {
  * @return boolean Whether the current theme is FSE-enabled or not.
  */
 function gutenberg_supports_block_templates() {
-	$enable_fse     = true;
-	$theme_settings = WP_Theme_JSON_Resolver::get_merged_data()->get_settings();
-	if ( isset( $theme_settings['defaults']['experience']['enable_fse'] ) ) {
-		$enable_fse = $theme_settings['defaults']['experience']['enable_fse'];
-	}
-
-	return is_readable( get_stylesheet_directory() . '/block-templates/index.html' ) && $enable_fse;
+	return gutenberg_is_fse_theme() || current_theme_supports( 'block-templates' );
 }
 
 /**
