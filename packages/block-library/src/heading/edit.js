@@ -47,7 +47,7 @@ function HeadingEdit( {
 		if ( generatedAnchor !== attributes.anchor ) {
 			setAttributes( { anchor: generatedAnchor } );
 		}
-	}, [ attributes.anchor, content ] );
+	}, [ attributes.anchor, generatedAnchor ] );
 
 	return (
 		<>
