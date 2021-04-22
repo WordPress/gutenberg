@@ -16,7 +16,7 @@ const newLine = /\n/g;
 const encodedNewLine = '%0A';
 const lineAndColumnInStackTrace = /^.*?:([0-9]+):([0-9]+).*$/;
 
-class GithubActionReporter {
+class GithubActionsReporter {
 	async onRunComplete( _contexts, _aggregatedResults ) {
 		if ( ! _aggregatedResults ) {
 			return;
@@ -57,4 +57,4 @@ function flatMap( fn ) {
 	return ( out, entry ) => out.concat( ...fn( entry ) );
 }
 
-module.exports = GithubActionReporter;
+module.exports = GithubActionsReporter;
