@@ -38,7 +38,10 @@
 .noticeContent {
 	position: relative;
 	z-index: 1;
-	padding: 6px;
+	padding-left: 8px;
+	padding-right: 8px;
+	padding-top: 5px;
+	padding-bottom: 5px;
 }
 
 .noticeSolid {
