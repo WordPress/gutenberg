@@ -16,21 +16,13 @@ import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
 	const { getBlockSelectionStart } = useSelect( 'core/block-editor' );
-	const {
-		getEditorMode,
-		isEditorSidebarOpened,
-		richEditingEnabled,
-		codeEditingEnabled,
-	} = useSelect( ( select ) => {
-		const settings = select( 'core/editor' ).getEditorSettings();
-		return {
-			getEditorMode: select( editPostStore ).getEditorMode,
-			isEditorSidebarOpened: select( editPostStore )
-				.isEditorSidebarOpened,
-			richEditingEnabled: settings.richEditingEnabled,
-			codeEditingEnabled: settings.codeEditingEnabled,
-		};
-	} );
+	const { getEditorMode, isEditorSidebarOpened } = useSelect( editPostStore );
+	const isModeToggleDisabled = useSelect( ( select ) => {
+		const { richEditingEnabled, codeEditingEnabled } = select(
+			'core/editor'
+		).getEditorSettings();
+		return ! richEditingEnabled || ! codeEditingEnabled;
+	}, [] );
 
 	const {
 		switchEditorMode,
@@ -133,7 +125,7 @@ function KeyboardShortcuts() {
 		},
 		{
 			bindGlobal: true,
-			isDisabled: ! richEditingEnabled || ! codeEditingEnabled,
+			isDisabled: isModeToggleDisabled,
 		}
 	);
 

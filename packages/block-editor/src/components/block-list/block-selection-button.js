@@ -100,33 +100,14 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	}, [] );
 
 	const {
-		selectedBlockClientId,
-		selectionBeforeEndClientId,
-		selectionAfterEndClientId,
-	} = useSelect( ( select ) => {
-		const {
-			getSelectedBlockClientId,
-			getMultiSelectedBlocksEndClientId,
-			getPreviousBlockClientId,
-			getNextBlockClientId,
-		} = select( blockEditorStore );
-		const _selectedBlockClientId = getSelectedBlockClientId();
-		const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-		return {
-			selectedBlockClientId: _selectedBlockClientId,
-			selectionBeforeEndClientId: getPreviousBlockClientId(
-				selectionEndClientId || _selectedBlockClientId
-			),
-			selectionAfterEndClientId: getNextBlockClientId(
-				selectionEndClientId || _selectedBlockClientId
-			),
-		};
-	}, [] );
-	const {
 		hasBlockMovingClientId,
 		getBlockIndex,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
+		getSelectedBlockClientId,
+		getMultiSelectedBlocksEndClientId,
+		getPreviousBlockClientId,
+		getNextBlockClientId,
 	} = useSelect( blockEditorStore );
 	const {
 		selectBlock,
@@ -152,6 +133,15 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 			event.preventDefault();
 			return;
 		}
+
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+		const selectionBeforeEndClientId = getPreviousBlockClientId(
+			selectionEndClientId || selectedBlockClientId
+		);
+		const selectionAfterEndClientId = getNextBlockClientId(
+			selectionEndClientId || selectedBlockClientId
+		);
 
 		const navigateUp = ( isTab && isShift ) || isUp;
 		const navigateDown = ( isTab && ! isShift ) || isDown;
