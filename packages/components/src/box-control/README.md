@@ -129,6 +129,7 @@ Collection of sides to allow control of. If omitted or empty, all sides will be 
 
 -   Type: `Array<Object>`
 -   Required: No
+
 ### units
 
 Collection of available units which are compatible with [UnitControl](../unit-control).
