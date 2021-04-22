@@ -4,15 +4,15 @@ Full Site Editing is the umbrella project name for various sub-projects within G
 
 ## Get Involved
 
-The majority of full site editing features are avilable in the Gutenberg plungin, and an ongoing [FSE Outreach program](https://make.wordpress.org/test/handbook/full-site-editing-outreach-experiment/) is running with calls for testing amongst a community of folks.
+The majority of full site editing features are available in the Gutenberg plugin, and an ongoing [FSE Outreach program](https://make.wordpress.org/test/handbook/full-site-editing-outreach-experiment/) is running with calls for testing.
 
 - Join in on Slack at #fse-outreach-experiment
-- Participate in the [Calls for Testing](https://make.wordpress.org/test/tag/fse-testing-call/) and test and feedback.
+- Participate in the [Calls for Testing](https://make.wordpress.org/test/tag/fse-testing-call/), test and give feedback.
 - See the [How to Test FSE instructions](https://make.wordpress.org/test/handbook/full-site-editing-outreach-experiment/how-to-test-fse/) to get setup to test FSE features.
 
 ## Block Themes
 
-If you are using the Gutenberg plugin: you can run, test, and develop block themes. Block themes are themes built using templates composed using blocks.
+If you are using the Gutenberg plugin you can run, test, and develop block themes. Block themes are themes built using templates composed using blocks.
 
 - See the [Create a Block Theme](/docs/how-to-guides/block-theme/README.md) tutorial for a walk-through of the pieces of a block theme.
 
