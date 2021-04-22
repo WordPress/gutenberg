@@ -45,6 +45,6 @@ module.exports = {
 	],
 	reporters: [
 		'default',
-		'<rootDir>/test/unit/config/github-actions-reporter.js',
+		'<rootDir>packages/scripts/config/jest-github-actions-reporter.js',
 	],
 };
