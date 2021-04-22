@@ -139,7 +139,7 @@ function GalleryEdit( props ) {
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
 			updateBlockAttributes( newImage.clientId, {
-				...buildImageAttributes( false, newImage ),
+				...buildImageAttributes( false, newImage.attributes ),
 				id: newImage.id,
 			} );
 		} );
@@ -277,6 +277,7 @@ function GalleryEdit( props ) {
 				id: image.id,
 				url: image.url,
 				caption: image.caption,
+				alt: image.alt,
 			} );
 		} );
 
