@@ -13,7 +13,8 @@
 	"supports": {
 		"customClassName": false,
 		"html": false,
-		"inserter": false
+		"inserter": false,
+		"align": [ "wide", "full" ]
 	},
 	"editorStyle": "wp-block-editor"
 }
