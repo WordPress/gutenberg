@@ -8,8 +8,7 @@ import {
 	__experimentalUseEditorFeature as useEditorFeature,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -54,26 +53,8 @@ export default function TemplatePartInnerBlocks( {
 		},
 	} );
 
-	// const [ isHovered, setIsHovered ] = useState( false );
-	// const {
-	// 	hideInsertionPointPopover,
-	// 	showInsertionPointPopover,
-	// } = useDispatch( blockEditorStore );
-
-	// useEffect( () => {
-	// 	if ( isHovered && ! isSelected ) {
-	// 		hideInsertionPointPopover();
-	// 	} else {
-	// 		showInsertionPointPopover();
-	// 	}
-	// }, [ isSelected, isHovered ] );
-
 	return (
-		<ContentLock
-			clientId={ clientId }
-			// onMouseEnter={ () => setIsHovered( true ) }
-			// onMouseLeave={ () => setIsHovered( false ) }
-		>
+		<ContentLock clientId={ clientId }>
 			<TagName { ...innerBlocksProps } />
 		</ContentLock>
 	);

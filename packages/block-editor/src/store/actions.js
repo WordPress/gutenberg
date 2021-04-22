@@ -1391,15 +1391,3 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
-
-export function hideInsertionPointPopover() {
-	return {
-		type: 'HIDE_INSERTION_POINT_POPOVER',
-	};
-}
-
-export function showInsertionPointPopover() {
-	return {
-		type: 'SHOW_INSERTION_POINT_POPOVER',
-	};
-}

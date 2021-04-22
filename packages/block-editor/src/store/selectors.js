@@ -2194,10 +2194,6 @@ export const __experimentalGetActiveBlockIdByBlockNames = createSelector(
 	]
 );
 
-export function isInsertionPointPopoverHidden( state ) {
-	return state.insertionPointPopoverHiddenStatus;
-}
-
 /**
  * Tells if the block with the passed clientId was just inserted.
  *

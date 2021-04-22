@@ -1727,16 +1727,6 @@ export function highlightedBlock( state, action ) {
 	return state;
 }
 
-export function insertionPointPopoverHiddenStatus( state = false, action ) {
-	if ( action.type === 'HIDE_INSERTION_POINT_POPOVER' ) {
-		return true;
-	}
-	if ( action.type === 'SHOW_INSERTION_POINT_POPOVER' ) {
-		return false;
-	}
-	return state;
-}
-
 /**
  * Reducer returning the block insertion event list state.
  *
@@ -1783,6 +1773,5 @@ export default combineReducers( {
 	hasBlockMovingClientId,
 	automaticChangeStatus,
 	highlightedBlock,
-	insertionPointPopoverHiddenStatus,
 	lastBlockInserted,
 } );
