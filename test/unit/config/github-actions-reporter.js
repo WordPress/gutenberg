@@ -47,7 +47,7 @@ function getMessages( results ) {
 				)
 				.map( ( m ) => m.replace( newLine, encodedNewLine ) )
 				.map( ( m ) => lineAndColumnInStackTrace.exec( m ) )
-				//.filter((m): m is RegExpExecArray => m !== null)
+				.filter( ( m ) => m !== null )
 				.map(
 					( [ message, line, col ] ) =>
 						`::error file=${ testFilePath },line=${ line },col=${ col }::${ message }`
