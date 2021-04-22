@@ -43,12 +43,8 @@ function KeyboardShortcuts() {
 	useShortcut(
 		'core/edit-site/toggle-list-view',
 		useCallback( () => {
-			if ( isListViewOpen ) {
-				setIsListViewOpened( false );
-			} else {
-				setIsListViewOpened( true );
-			}
-		}, [ isListViewOpen, isListViewOpen ] ),
+			setIsListViewOpened( ! isListViewOpen );
+		}, [ isListViewOpen, setIsListViewOpened ] ),
 		{ bindGlobal: true }
 	);
 
