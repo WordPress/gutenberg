@@ -17,6 +17,8 @@ import {
 	isProcessingPost,
 } from './controls';
 
+import { NEW_TAB_TARGET_ATTRIBUTE } from '../constants';
+
 /**
  * Builds an ID for a new navigation post.
  *
@@ -144,6 +146,9 @@ export function computeCustomizedAttribute(
 				xfn: block.attributes.rel?.split( ' ' ),
 				classes: block.attributes.className?.split( ' ' ),
 				attr_title: block.attributes.title,
+				target: block.attributes.opensInNewTab
+					? NEW_TAB_TARGET_ATTRIBUTE
+					: '',
 			};
 		} else {
 			attributes = {

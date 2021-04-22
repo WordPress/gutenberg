@@ -106,6 +106,7 @@ describe( 'getNavigationPostForMenu', () => {
 				xfn: [],
 				description: '',
 				attr_title: '',
+				target: '_blank',
 			},
 		];
 
@@ -151,6 +152,7 @@ describe( 'getNavigationPostForMenu', () => {
 								rel: '',
 								description: '',
 								title: '',
+								opensInNewTab: true,
 							},
 							clientId: 'client-id-1',
 							innerBlocks: [],
