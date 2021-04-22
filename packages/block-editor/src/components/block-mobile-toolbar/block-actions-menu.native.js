@@ -45,6 +45,7 @@ const BlockActionsMenu = ( {
 	isEmptyDefaultBlock,
 	isFirst,
 	isLast,
+	isReusableBlockType,
 	reusableBlock,
 	rootClientId,
 	selectedBlockClientId,
@@ -64,7 +65,6 @@ const BlockActionsMenu = ( {
 	onDelete,
 	wrapBlockMover,
 	wrapBlockSettings,
-	isReusableBlockType,
 } ) => {
 	const [ clipboard, setCurrentClipboard ] = useState( getClipboard() );
 	const blockActionsMenuPickerRef = useRef();
