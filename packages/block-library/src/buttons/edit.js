@@ -11,7 +11,9 @@ import {
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	JustifyContentControl,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -19,7 +21,6 @@ import {
 import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
-const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 const LAYOUT = {
 	type: 'default',
 	alignments: [],
@@ -42,9 +43,23 @@ function ButtonsEdit( {
 			'is-vertical': orientation === 'vertical',
 		} ),
 	} );
+	const preferredStyle = useSelect( ( select ) => {
+		const preferredStyleVariations = select(
+			blockEditorStore
+		).getSettings().__experimentalPreferredStyleVariations;
+		return preferredStyleVariations?.value?.[ 'core/button' ];
+	}, [] );
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
-		template: BUTTONS_TEMPLATE,
+		template: [
+			[
+				'core/button',
+				preferredStyle
+					? { className: `is-style-${ preferredStyle }` }
+					: {},
+			],
+		],
 		orientation,
 		__experimentalLayout: LAYOUT,
 		templateInsertUpdatesSelection: true,
