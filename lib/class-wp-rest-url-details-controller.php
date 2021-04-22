@@ -116,11 +116,13 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			$this->set_cache( $cache_key, $remote_url_response );
 		}
 
-		$xpath = $this->build_xpath_from_response( $remote_url_response );
+		$dom_doc = $this->build_dom_doc_from_response( $remote_url_response );
 
-		if ( is_wp_error( $xpath ) ) {
-			return $xpath;
+		if ( is_wp_error( $dom_doc ) ) {
+			return $dom_doc;
 		}
+
+		$xpath = $this->build_xpath_from_doc( $dom_doc );
 
 		$data = $this->add_additional_fields_to_object(
 			array(
@@ -144,13 +146,12 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	}
 
 	/**
-	 * Builds a new DOMXpath object from the given remote url response HTML
-	 * using DOMDocument.
+	 * Builds a new DOMDocument object from the given remote url response HTML
 	 *
 	 * @param string $remote_url_response HTTP response body from the remote URL.
-	 * @return DOMXpath a new DOMXpath object from the remote URL response body.
+	 * @return DOMDocument|WP_Error a new DOMDocument object from the remote URL response body or error.
 	 */
-	private function build_xpath_from_response( $remote_url_response ) {
+	private function build_dom_doc_from_response( $remote_url_response ) {
 		// Initial DOMDocument.
 		$doc = new DOMDocument();
 
@@ -174,9 +175,18 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			return new WP_Error( 'rest_invalid_content', __( 'Unable to parse HTML response from remote URL.', 'gutenberg' ) );
 		}
 
-		$xpath = new DOMXpath( $doc );
+		return $doc;
+	}
 
-		return $xpath;
+	/**
+	 * Builds a new DOMXpath object from the given remote url response HTML
+	 * using DOMDocument.
+	 *
+	 * @param DOMDocument $doc DOMDocument built from the remote url response body.
+	 * @return DOMXpath a new DOMXpath object from DOMDocument.
+	 */
+	private function build_xpath_from_doc( $doc ) {
+		return new DOMXpath( $doc );
 	}
 
 	/**
