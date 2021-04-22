@@ -1,0 +1,15 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/home-link",
+		"isValid": true,
+		"attributes": {
+			"label": "Home",
+			"opensInNewTab": true,
+			"rel": "nofollow",
+			"title": "title"
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
+]

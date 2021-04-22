@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -14,8 +19,12 @@ import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
 
 const preventDefault = ( event ) => event.preventDefault();
 
-export default function HomeEdit( { attributes, setAttributes, clientId } ) {
-	const blockProps = useBlockProps();
+export default function HomeEdit( {
+	attributes,
+	setAttributes,
+	context,
+	clientId,
+} ) {
 	const { homeUrl } = useSelect(
 		( select ) => {
 			const {
@@ -27,6 +36,20 @@ export default function HomeEdit( { attributes, setAttributes, clientId } ) {
 		},
 		[ clientId ]
 	);
+
+	const { textColor, backgroundColor, style } = context;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			'has-text-color': !! textColor || !! style?.color?.text,
+			[ `has-${ textColor }-color` ]: !! textColor,
+			'has-background': !! backgroundColor || !! style?.color?.background,
+			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+		} ),
+		style: {
+			color: style?.color?.text,
+			backgroundColor: style?.color?.background,
+		},
+	} );
 
 	const { label, opensInNewTab, rel, title } = attributes;
 

@@ -1,0 +1,14 @@
+[
+	{
+		"blockName": "core/home-link",
+		"attrs": {
+			"label": "Home",
+			"opensInNewTab": true,
+			"rel": "nofollow",
+			"title": "title"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
+]

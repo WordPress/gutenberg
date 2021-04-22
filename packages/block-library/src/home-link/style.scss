@@ -1,4 +1,12 @@
 .wp-block-navigation {
+
+	.wp-block-home-link__content {
+		// Inherit colors set by the block color definition.
+		color: inherit;
+		display: block;
+		padding: 0.5em 1em;
+	}
+
 	// Force links to inherit text decoration applied to navigation block.
 	// The extra selector adds specificity to ensure it works when user-set.
 	&[style*="text-decoration"] {
@@ -17,7 +25,6 @@
 	}
 
 	&:not([style*="text-decoration"]) {
-		.wp-block-home-link,
 		.wp-block-home-link__content {
 			text-decoration: none;
 
@@ -28,3 +35,18 @@
 		}
 	}
 }
+
+// Default background and font color.
+.wp-block-navigation:not(.has-background) {
+	.wp-block-navigation__container .wp-block-home-link__container {
+		// Set a background color for submenus so that they're not transparent.
+		background-color: #fff;
+		color: #000;
+		border: 1px solid rgba(0, 0, 0, 0.15);
+
+		.wp-block-home-link__container {
+			top: -1px;
+		}
+	}
+}
+
