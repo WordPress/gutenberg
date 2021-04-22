@@ -192,7 +192,8 @@ function InsertionPointPopover( {
 
 	const className = classnames(
 		'block-editor-block-list__insertion-point',
-		'is-' + orientation
+		'is-' + orientation,
+		{ 'is-visible': isInserterShown || isInserterForced }
 	);
 
 	function onClick( event ) {
@@ -212,8 +213,7 @@ function InsertionPointPopover( {
 	// Only show the inserter when there's a `nextElement` (a block after the
 	// insertion point). At the end of the block list the trailing appender
 	// should serve the purpose of inserting blocks.
-	const showInsertionPointInserter =
-		! isHidden && nextElement && ( isInserterShown || isInserterForced );
+	const showInsertionPointInserter = ! isHidden && nextElement;
 
 	// Show the indicator if the insertion point inserter is visible, or if
 	// the `showInsertionPoint` state is `true`. The latter is generally true
@@ -273,6 +273,7 @@ export default function useInsertionPoint( ref ) {
 		selectedClientId,
 		selectedRootClientId,
 		getBlockListSettings,
+		selectedBlockClientId,
 	} = useSelect( ( select ) => {
 		const {
 			isMultiSelecting: _isMultiSelecting,
@@ -280,6 +281,7 @@ export default function useInsertionPoint( ref ) {
 			getBlockInsertionPoint,
 			getBlockOrder,
 			getBlockListSettings: _getBlockListSettings,
+			getSelectedBlockClientId,
 		} = select( blockEditorStore );
 
 		const insertionPoint = getBlockInsertionPoint();
@@ -291,6 +293,7 @@ export default function useInsertionPoint( ref ) {
 			isInserterVisible: isBlockInsertionPointVisible(),
 			selectedClientId: order[ insertionPoint.index - 1 ],
 			selectedRootClientId: insertionPoint.rootClientId,
+			selectedBlockClientId: getSelectedBlockClientId(),
 		};
 	}, [] );
 
@@ -395,14 +398,20 @@ export default function useInsertionPoint( ref ) {
 		};
 	}, [ enableMouseMove, onMouseMove ] );
 
-	const isVisible = isInserterShown || isInserterForced || isInserterVisible;
+	const isVisible =
+		isInserterShown ||
+		isInserterForced ||
+		isInserterVisible ||
+		!! selectedBlockClientId;
 
 	return (
 		! isMultiSelecting &&
 		isVisible && (
 			<InsertionPointPopover
 				clientId={
-					isInserterVisible ? selectedClientId : inserterClientId
+					isInserterVisible
+						? selectedClientId
+						: inserterClientId || selectedBlockClientId
 				}
 				selectedRootClientId={ selectedRootClientId }
 				isInserterShown={ isInserterShown }
