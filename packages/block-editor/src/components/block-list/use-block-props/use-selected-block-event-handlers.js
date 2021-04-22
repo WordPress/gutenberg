@@ -10,13 +10,11 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { isInsideRootBlock } from '../../../utils/dom';
 import { SelectionStart } from '../../writing-flow';
 import { store as blockEditorStore } from '../../../store';
 
 /**
  * Adds block behaviour:
- *   - Selects the block if it receives focus.
  *   - Removes the block on BACKSPACE.
  *   - Inserts a default block on ENTER.
  *   - Initiates selection start for multi-selection.
@@ -26,52 +24,19 @@ import { store as blockEditorStore } from '../../../store';
  */
 export function useEventHandlers( clientId ) {
 	const onSelectionStart = useContext( SelectionStart );
-	const { isSelected, rootClientId, index } = useSelect(
-		( select ) => {
-			const {
-				isBlockSelected,
-				getBlockRootClientId,
-				getBlockIndex,
-			} = select( blockEditorStore );
-
-			return {
-				isSelected: isBlockSelected( clientId ),
-				rootClientId: getBlockRootClientId( clientId ),
-				index: getBlockIndex( clientId ),
-			};
-		},
+	const isSelected = useSelect(
+		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
 		[ clientId ]
 	);
-	const { insertDefaultBlock, removeBlock, selectBlock } = useDispatch(
+	const { getBlockRootClientId, getBlockIndex } = useSelect(
 		blockEditorStore
 	);
+	const { insertDefaultBlock, removeBlock } = useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {
 			if ( ! isSelected ) {
-				/**
-				 * Marks the block as selected when focused and not already
-				 * selected. This specifically handles the case where block does not
-				 * set focus on its own (via `setFocus`), typically if there is no
-				 * focusable input in the block.
-				 *
-				 * @param {FocusEvent} event Focus event.
-				 */
-				function onFocus( event ) {
-					// If an inner block is focussed, that block is resposible for
-					// setting the selected block.
-					if ( ! isInsideRootBlock( node, event.target ) ) {
-						return;
-					}
-
-					selectBlock( clientId );
-				}
-
-				node.addEventListener( 'focusin', onFocus );
-
-				return () => {
-					node.removeEventListener( 'focusin', onFocus );
-				};
+				return;
 			}
 
 			/**
@@ -101,7 +66,11 @@ export function useEventHandlers( clientId ) {
 				event.preventDefault();
 
 				if ( keyCode === ENTER ) {
-					insertDefaultBlock( {}, rootClientId, index + 1 );
+					insertDefaultBlock(
+						{},
+						getBlockRootClientId( clientId ),
+						getBlockIndex( clientId ) + 1
+					);
 				} else {
 					removeBlock( clientId );
 				}
@@ -136,13 +105,13 @@ export function useEventHandlers( clientId ) {
 			};
 		},
 		[
+			clientId,
 			isSelected,
-			rootClientId,
-			index,
+			getBlockRootClientId,
+			getBlockIndex,
 			onSelectionStart,
 			insertDefaultBlock,
 			removeBlock,
-			selectBlock,
 		]
 	);
 }
