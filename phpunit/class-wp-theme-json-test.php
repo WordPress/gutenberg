@@ -774,6 +774,33 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
+	function test_remove_insecure_properties_applies_safe_styles() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'styles' => array(
+					'root' => array(
+						'color' => array(
+							'text' => '#abcabc ', // Trailing space.
+						),
+					),
+				),
+			),
+			true
+		);
+		$theme_json->remove_insecure_properties();
+		$result   = $theme_json->get_raw_data();
+		$expected = array(
+			'styles' => array(
+				'root' => array(
+					'color' => array(
+						'text' => '#abcabc ',
+					),
+				),
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
+
 	function test_get_custom_templates() {
 		$theme_json = new WP_Theme_JSON(
 			array(
