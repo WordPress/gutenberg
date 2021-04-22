@@ -553,7 +553,7 @@ export default function Image( {
 			isEditing={ isEditingImage }
 			onFinishEditing={ () => setIsEditingImage( false ) }
 		>
-			{ controls }
+			{ ! temporaryURL && controls }
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText

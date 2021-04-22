@@ -63,7 +63,6 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
  * @param   {Function} $0.onError            Function called when an error happens.
  * @param   {Function} $0.onFileChange       Function called each time a file or a temporary representation of the file is available.
  * @param   {?Object}  $0.wpAllowedMimeTypes List of allowed mime types and file extensions.
- * @param   {?Object}  $0.requestOptions     Additional options to include in the request.
  */
 export async function uploadMedia( {
 	allowedTypes,
@@ -73,7 +72,6 @@ export async function uploadMedia( {
 	onError = noop,
 	onFileChange,
 	wpAllowedMimeTypes = null,
-	requestOptions = {},
 } ) {
 	// Cast filesList to array
 	const files = [ ...filesList ];
@@ -183,8 +181,7 @@ export async function uploadMedia( {
 		try {
 			const savedMedia = await createMediaFromFile(
 				mediaFile,
-				additionalData,
-				requestOptions
+				additionalData
 			);
 			const mediaObject = {
 				...omit( savedMedia, [ 'alt_text', 'source_url' ] ),
@@ -219,11 +216,10 @@ export async function uploadMedia( {
 /**
  * @param {File}    file           Media File to Save.
  * @param {?Object} additionalData Additional data to include in the request.
- * @param {?Object} requestOptions Additional options to include in the request.
  *
  * @return {Promise} Media Object Promise.
  */
-function createMediaFromFile( file, additionalData, requestOptions ) {
+function createMediaFromFile( file, additionalData ) {
 	// Create upload payload
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
@@ -232,6 +228,5 @@ function createMediaFromFile( file, additionalData, requestOptions ) {
 		path: '/wp/v2/media',
 		body: data,
 		method: 'POST',
-		...requestOptions,
 	} );
 }
