@@ -601,10 +601,6 @@ class EditorPage {
 
 	async sendTextToSearchBlockChild( testID, text, clear = true ) {
 		const textViewElement = await this.getSearchBlockTextElement( testID );
-
-		if ( isAndroid() ) {
-			// await doubleTap( this.driver, textViewElement );
-		}
 		return await typeString( this.driver, textViewElement, text, clear );
 	}
 
