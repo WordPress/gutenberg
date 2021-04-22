@@ -219,20 +219,20 @@ export function* getEntityRecords( kind, name, query = {} ) {
 		// See https://github.com/WordPress/gutenberg/pull/26575
 		if ( ! query?._fields ) {
 			const key = entity.key || DEFAULT_ENTITY_KEY;
-			for ( const record of records ) {
-				if ( record[ key ] ) {
-					yield {
-						type: 'START_RESOLUTION',
-						selectorName: 'getEntityRecord',
-						args: [ kind, name, record[ key ] ],
-					};
-					yield {
-						type: 'FINISH_RESOLUTION',
-						selectorName: 'getEntityRecord',
-						args: [ kind, name, record[ key ] ],
-					};
-				}
-			}
+			const resolutionsArgs = records
+				.filter( ( record ) => record[ key ] )
+				.map( ( record ) => [ kind, name, record[ key ] ] );
+
+			yield {
+				type: 'START_RESOLUTIONS',
+				selectorName: 'getEntityRecord',
+				args: resolutionsArgs,
+			};
+			yield {
+				type: 'FINISH_RESOLUTIONS',
+				selectorName: 'getEntityRecord',
+				args: resolutionsArgs,
+			};
 		}
 	} finally {
 		yield* __unstableReleaseStoreLock( lock );
