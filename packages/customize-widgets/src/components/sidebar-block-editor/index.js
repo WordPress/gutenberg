@@ -78,6 +78,10 @@ export default function SidebarBlockEditor( {
 						setIsInserterOpened={ setIsInserterOpened }
 					/>
 
+					<div className="customize-widgets__contextual-toolbar-wrapper">
+						<Popover.Slot name="block-toolbar" />
+					</div>
+
 					<BlockSelectionClearer>
 						<WritingFlow>
 							<ObserveTyping>
@@ -86,8 +90,6 @@ export default function SidebarBlockEditor( {
 						</WritingFlow>
 					</BlockSelectionClearer>
 				</SidebarEditorProvider>
-
-				<Popover.Slot name="block-toolbar" />
 
 				{ createPortal(
 					// This is a temporary hack to prevent button component inside <BlockInspector>
