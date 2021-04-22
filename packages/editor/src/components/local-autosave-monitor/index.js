@@ -46,12 +46,7 @@ const hasSessionStorageSupport = once( () => {
  * restore a local autosave, if one exists.
  */
 function useAutosaveNotice() {
-	const {
-		postId,
-		isEditedPostNew,
-		getEditedPostAttribute,
-		hasRemoteAutosave,
-	} = useSelect(
+	const { postId, isEditedPostNew, hasRemoteAutosave } = useSelect(
 		( select ) => ( {
 			postId: select( 'core/editor' ).getCurrentPostId(),
 			isEditedPostNew: select( 'core/editor' ).isEditedPostNew(),
@@ -62,6 +57,7 @@ function useAutosaveNotice() {
 		} ),
 		[]
 	);
+	const { getEditedPostAttribute } = useSelect( 'core/editor' );
 
 	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
 	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
