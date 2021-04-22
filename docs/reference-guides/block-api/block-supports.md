@@ -66,6 +66,29 @@ supports: {
 }
 ```
 
+## border
+
+-   Type: `Object`
+-   Default value: null
+-   Subproperties:
+    -   `color`: type `boolean`, default value `false`
+    -   `radius`: type `boolean`, default value `false`
+    -   `style`: type `boolean`, default value `false`
+    -   `width`: type `boolean`, default value `false`
+
+This signals that a block supports some border related CSS style properties. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md##cover-block-padding).
+
+```js
+supports: {
+    border: {
+        color: true,  // Enable border color UI control.
+        radius: true, // Enable border radius UI control.
+        style: true,  // Enable border style UI control.
+        width: true,  // Enable border width UI control.
+    }
+}
+```
+
 ## className
 
 -   Type: `boolean`
