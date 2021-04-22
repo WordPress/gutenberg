@@ -16,7 +16,7 @@ If you are using the Gutenberg plugin you can run, test, and develop block theme
 
 - See the [Create a Block Theme](/docs/how-to-guides/block-theme/README.md) tutorial for a walk-through of the pieces of a block theme.
 
-- If you want to dive right in, see the [github.com/WordPress/theme-experiments](https://github.com/WordPress/theme-experiments/) repository. You can download different example block themes there, try the [TT1 Blocks](https://github.com/WordPress/theme-experiments/tree/master/tt1-blocks) is a block theme recreating the TwentyTwentyOne default theme.
+- If you want to dive right in, see the [github.com/WordPress/theme-experiments](https://github.com/WordPress/theme-experiments/) repository. You can download different example block themes there, try the [TT1 Blocks](https://github.com/WordPress/theme-experiments/tree/master/tt1-blocks) is a block theme recreating the Twenty Twenty-One default theme.
 
 - Use the `empty-theme.php` script from theme-experiments repo to generate a start block theme, it will prompt you with a few questions and create a theme.
 
