@@ -32,14 +32,13 @@
 }
 
 .notice {
-	height: 24;
 	justify-content: center;
 }
 
 .noticeContent {
-	position: absolute;
+	position: relative;
 	z-index: 1;
-	width: 100%;
+	padding: 6px;
 }
 
 .noticeSolid {
