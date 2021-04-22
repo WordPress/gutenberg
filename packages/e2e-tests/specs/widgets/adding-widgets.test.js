@@ -13,6 +13,7 @@ import {
 /**
  * External dependencies
  */
+// eslint-disable-next-line no-restricted-imports
 import { find, findAll } from 'puppeteer-testing-library';
 import { groupBy, mapValues } from 'lodash';
 
