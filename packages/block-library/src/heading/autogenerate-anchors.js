@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { isNil, deburr, trim, startsWith } from 'lodash';
+import { deburr, trim } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -125,7 +125,8 @@ export default function useGeneratedAnchor( clientId, anchor, content ) {
 		},
 		[ clientId ]
 	);
-	if ( isNil( anchor ) || startsWith( anchor, 'wp-' ) ) {
+	// eslint-disable-next-line eqeqeq
+	if ( null == anchor || 0 === anchor.indexOf( 'wp-' ) ) {
 		return generateAnchor( anchor, content, allHeadingAnchors );
 	}
 	return anchor;
