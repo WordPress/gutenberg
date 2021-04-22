@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import {
 	__experimentalBoxControl as BoxControl,
@@ -11,6 +12,35 @@ import {
  * Internal dependencies
  */
 import { useEditorFeature } from '../editor/utils';
+
+const isWeb = Platform.OS === 'web';
+const CSS_UNITS = [
+	{
+		value: '%',
+		label: isWeb ? '%' : __( 'Percentage (%)' ),
+		default: '',
+	},
+	{
+		value: 'px',
+		label: isWeb ? 'px' : __( 'Pixels (px)' ),
+		default: '',
+	},
+	{
+		value: 'em',
+		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
+		default: '',
+	},
+	{
+		value: 'rem',
+		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
+		default: '',
+	},
+	{
+		value: 'vw',
+		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
+		default: '',
+	},
+];
 
 export function useHasSpacingPanel( { supports, name } ) {
 	return (
@@ -40,7 +70,7 @@ export default function SpacingPanel( {
 	getStyle,
 	setStyle,
 } ) {
-	const units = useCustomUnits( { contextName: name } );
+	const units = useCustomUnits( { contextName: name, units: CSS_UNITS } );
 	const paddingValues = getStyle( name, 'padding' );
 	const setPaddingValues = ( { top, right, bottom, left } ) => {
 		setStyle( name, 'padding', {
