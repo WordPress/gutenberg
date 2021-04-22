@@ -11,7 +11,7 @@
 			"type": "string"
 		},
 		"templateLock": {
-			"type": "string"
+			"enum": [ "all", "insert", false ]
 		}
 	},
 	"supports": {

@@ -8,7 +8,7 @@
 			"default": "div"
 		},
 		"templateLock": {
-			"type": "string"
+			"enum": [ "all", "insert", false ]
 		}
 	},
 	"supports": {
