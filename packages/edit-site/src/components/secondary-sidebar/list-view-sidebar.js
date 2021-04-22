@@ -32,7 +32,7 @@ export default function ListViewSidebar() {
 			clientIdsTree: __unstableGetClientIdsTree(),
 			selectedBlockClientIds: getSelectedBlockClientIds(),
 		};
-	} );
+	}, [] );
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
 	const { clearSelectedBlock, selectBlock } = useDispatch( blockEditorStore );
