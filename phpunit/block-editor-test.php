@@ -242,17 +242,7 @@ class WP_Test_Block_Editor extends WP_UnitTestCase {
 	/**
 	 * @ticket 52920
 	 */
-	function test_get_block_editor_settings_returns_default_settings() {
-		$this->assertSameSets(
-			gutenberg_get_block_editor_settings( 'my-editor' ),
-			gutenberg_get_default_block_editor_settings()
-		);
-	}
-
-	/**
-	 * @ticket 52920
-	 */
-	function test_get_block_editor_settings_overrides_default_settings_my_editor() {
+	function test_get_block_editor_settings_overrides_default_settings_all_editors() {
 		function filter_allowed_block_types_my_editor() {
 			return array( 'test/filtered-my-block' );
 		}
@@ -271,15 +261,15 @@ class WP_Test_Block_Editor extends WP_UnitTestCase {
 			return $editor_settings;
 		}
 
-		add_filter( 'allowed_block_types_my-editor', 'filter_allowed_block_types_my_editor', 10, 1 );
-		add_filter( 'block_categories_my-editor', 'filter_block_categories_my_editor', 10, 1 );
-		add_filter( 'block_editor_settings_my-editor', 'filter_block_editor_settings_my_editor', 10, 1 );
+		add_filter( 'allowed_block_types_all', 'filter_allowed_block_types_my_editor', 10, 1 );
+		add_filter( 'block_categories_all', 'filter_block_categories_my_editor', 10, 1 );
+		add_filter( 'block_editor_settings_all', 'filter_block_editor_settings_my_editor', 10, 1 );
 
 		$settings = gutenberg_get_block_editor_settings( 'my-editor' );
 
-		remove_filter( 'allowed_block_types_my-editor', 'filter_allowed_block_types_my_editor' );
-		remove_filter( 'block_categories_my-editor', 'filter_block_categories_my_editor' );
-		remove_filter( 'block_editor_settings_my-editor', 'filter_block_editor_settings_my_editor' );
+		remove_filter( 'allowed_block_types_all', 'filter_allowed_block_types_my_editor' );
+		remove_filter( 'block_categories_all', 'filter_block_categories_my_editor' );
+		remove_filter( 'block_editor_settings_all', 'filter_block_editor_settings_my_editor' );
 
 		$this->assertSameSets( array( 'test/filtered-my-block' ), $settings['allowedBlockTypes'] );
 		$this->assertSameSets(
