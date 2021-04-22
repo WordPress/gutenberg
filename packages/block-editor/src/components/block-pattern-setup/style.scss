@@ -100,21 +100,23 @@
 				width: 100%;
 				margin: auto;
 				padding: $grid-unit-20;
-				z-index: 100;
 				transition: transform 0.5s, opacity 0.5s, z-index 0.5s;
+				z-index: z-index(".block-editor-block-pattern-setup .pattern-slide");
 
 				&.active-slide {
 					opacity: 1;
 					position: relative;
-					z-index: 900;
+					z-index: z-index(".block-editor-block-pattern-setup .active-slide");
 				}
+
 				&.previous-slide {
 					transform: translateX(-100%);
-					z-index: 800;
+					z-index: z-index(".block-editor-block-pattern-setup .{next,previous}-slide");
 				}
+
 				&.next-slide {
 					transform: translateX(100%);
-					z-index: 800;
+					z-index: z-index(".block-editor-block-pattern-setup .{next,previous}-slide");
 				}
 			}
 		}
