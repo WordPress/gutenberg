@@ -31,7 +31,6 @@ import { addQueryArgs, prependHTTP } from '@wordpress/url';
  * ```
  * @return {Promise< WPRemoteUrlData[] >} Remote URL data.
  */
-
 const fetchRemoteUrlData = async ( url ) => {
 	const endpoint = '/__experimental/url-details';
 
