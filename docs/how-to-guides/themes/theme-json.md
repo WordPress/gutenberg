@@ -178,7 +178,10 @@ The settings section has the following structure and default values:
         "wideSize": "1000px",
       }
       "border": {
-        "customRadius": false /* true to opt-in */
+        "customColor": false, /* true to opt-in */
+        "customRadius": false,
+        "customStyle": false,
+        "customWidth": false
       },
       "color": {
         "custom": true, /* false to opt-out, as in add_theme_support('disable-custom-colors') */
@@ -359,7 +362,10 @@ Each block declares which style properties it exposes via the [block supports me
 	"styles": {
 		"some/block/selector": {
 			"border": {
-				"radius": "value"
+				"color": "value",
+				"radius": "value",
+				"style": "value",
+				"width": "value"
 			},
 			"color": {
 				"background": "value",

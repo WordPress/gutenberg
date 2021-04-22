@@ -1,6 +1,7 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+-   The `getEntityRecords` resolver has been updated and now uses the batched variants of start and finish resolution actions.
 
 ## 2.26.0 (2021-03-17)
 
