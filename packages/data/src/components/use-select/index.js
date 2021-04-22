@@ -63,6 +63,12 @@ const renderQueue = createQueue();
  * @return {Function}  A custom react hook.
  */
 export default function useSelect( _mapSelect, deps ) {
+	const isWithoutMapping = typeof _mapSelect !== 'function';
+
+	if ( isWithoutMapping ) {
+		deps = [];
+	}
+
 	const mapSelect = useCallback( _mapSelect, deps );
 	const registry = useRegistry();
 	const isAsync = useAsyncMode();
@@ -97,33 +103,39 @@ export default function useSelect( _mapSelect, deps ) {
 
 	let mapOutput;
 
-	try {
-		if (
-			latestMapSelect.current !== mapSelect ||
-			latestMapOutputError.current
-		) {
-			mapOutput = trapSelect( () =>
-				mapSelect( registry.select, registry )
-			);
-		} else {
-			mapOutput = latestMapOutput.current;
-		}
-	} catch ( error ) {
-		let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
+	if ( ! isWithoutMapping ) {
+		try {
+			if (
+				latestMapSelect.current !== mapSelect ||
+				latestMapOutputError.current
+			) {
+				mapOutput = trapSelect( () =>
+					mapSelect( registry.select, registry )
+				);
+			} else {
+				mapOutput = latestMapOutput.current;
+			}
+		} catch ( error ) {
+			let errorMessage = `An error occurred while running 'mapSelect': ${ error.message }`;
 
-		if ( latestMapOutputError.current ) {
-			errorMessage += `\nThe error may be correlated with this previous error:\n`;
-			errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
-			errorMessage += 'Original stack trace:';
+			if ( latestMapOutputError.current ) {
+				errorMessage += `\nThe error may be correlated with this previous error:\n`;
+				errorMessage += `${ latestMapOutputError.current.stack }\n\n`;
+				errorMessage += 'Original stack trace:';
 
-			throw new Error( errorMessage );
-		} else {
-			// eslint-disable-next-line no-console
-			console.error( errorMessage );
+				throw new Error( errorMessage );
+			} else {
+				// eslint-disable-next-line no-console
+				console.error( errorMessage );
+			}
 		}
 	}
 
 	useIsomorphicLayoutEffect( () => {
+		if ( isWithoutMapping ) {
+			return;
+		}
+
 		latestMapSelect.current = mapSelect;
 		latestMapOutput.current = mapOutput;
 		latestMapOutputError.current = undefined;
@@ -140,6 +152,10 @@ export default function useSelect( _mapSelect, deps ) {
 	} );
 
 	useIsomorphicLayoutEffect( () => {
+		if ( isWithoutMapping ) {
+			return;
+		}
+
 		const onStoreChange = () => {
 			if ( isMountedAndNotUnsubscribing.current ) {
 				try {
@@ -186,7 +202,7 @@ export default function useSelect( _mapSelect, deps ) {
 			unsubscribers.forEach( ( unsubscribe ) => unsubscribe?.() );
 			renderQueue.flush( queueContext );
 		};
-	}, [ registry, trapSelect, depsChangedFlag ] );
+	}, [ registry, trapSelect, depsChangedFlag, isWithoutMapping ] );
 
-	return mapOutput;
+	return isWithoutMapping ? registry.select( _mapSelect ) : mapOutput;
 }

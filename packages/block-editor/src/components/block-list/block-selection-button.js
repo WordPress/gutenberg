@@ -48,40 +48,6 @@ function isWindows() {
 	return window.navigator.platform.indexOf( 'Win' ) > -1;
 }
 
-function selector( select ) {
-	const {
-		getSelectedBlockClientId,
-		getMultiSelectedBlocksEndClientId,
-		getPreviousBlockClientId,
-		getNextBlockClientId,
-		hasBlockMovingClientId,
-		getBlockIndex,
-		getBlockRootClientId,
-		getClientIdsOfDescendants,
-		canInsertBlockType,
-		getBlockName,
-	} = select( blockEditorStore );
-
-	const selectedBlockClientId = getSelectedBlockClientId();
-	const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-
-	return {
-		selectedBlockClientId,
-		selectionBeforeEndClientId: getPreviousBlockClientId(
-			selectionEndClientId || selectedBlockClientId
-		),
-		selectionAfterEndClientId: getNextBlockClientId(
-			selectionEndClientId || selectedBlockClientId
-		),
-		hasBlockMovingClientId,
-		getBlockIndex,
-		getBlockRootClientId,
-		getClientIdsOfDescendants,
-		canInsertBlockType,
-		getBlockName,
-	};
-}
-
 /**
  * Block selection button component, displaying the label of the block. If the block
  * descends from a root block, a button is displayed enabling the user to select
@@ -137,11 +103,31 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 		selectedBlockClientId,
 		selectionBeforeEndClientId,
 		selectionAfterEndClientId,
+	} = useSelect( ( select ) => {
+		const {
+			getSelectedBlockClientId,
+			getMultiSelectedBlocksEndClientId,
+			getPreviousBlockClientId,
+			getNextBlockClientId,
+		} = select( blockEditorStore );
+		const _selectedBlockClientId = getSelectedBlockClientId();
+		const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+		return {
+			selectedBlockClientId: _selectedBlockClientId,
+			selectionBeforeEndClientId: getPreviousBlockClientId(
+				selectionEndClientId || _selectedBlockClientId
+			),
+			selectionAfterEndClientId: getNextBlockClientId(
+				selectionEndClientId || _selectedBlockClientId
+			),
+		};
+	}, [] );
+	const {
 		hasBlockMovingClientId,
 		getBlockIndex,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
-	} = useSelect( selector, [] );
+	} = useSelect( blockEditorStore );
 	const {
 		selectBlock,
 		clearSelectedBlock,

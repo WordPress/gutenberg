@@ -15,8 +15,8 @@ import { __ } from '@wordpress/i18n';
 import { store as editPostStore } from '../../store';
 
 function KeyboardShortcuts() {
+	const { getBlockSelectionStart } = useSelect( 'core/block-editor' );
 	const {
-		getBlockSelectionStart,
 		getEditorMode,
 		isEditorSidebarOpened,
 		richEditingEnabled,
@@ -24,8 +24,6 @@ function KeyboardShortcuts() {
 	} = useSelect( ( select ) => {
 		const settings = select( 'core/editor' ).getEditorSettings();
 		return {
-			getBlockSelectionStart: select( 'core/block-editor' )
-				.getBlockSelectionStart,
 			getEditorMode: select( editPostStore ).getEditorMode,
 			isEditorSidebarOpened: select( editPostStore )
 				.isEditorSidebarOpened,
