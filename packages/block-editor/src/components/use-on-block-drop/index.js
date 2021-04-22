@@ -212,27 +212,15 @@ export function onHTMLDrop(
  * @return {Object} An object that contains the event handlers `onDrop`, `onFilesDrop` and `onHTMLDrop`.
  */
 export default function useOnBlockDrop( targetRootClientId, targetBlockIndex ) {
+	const hasUploadPermissions = useSelect(
+		( select ) => select( blockEditorStore ).getSettings().mediaUpload,
+		[]
+	);
 	const {
 		canInsertBlockType,
 		getBlockIndex,
 		getClientIdsOfDescendants,
-		hasUploadPermissions,
-	} = useSelect( ( select ) => {
-		const {
-			canInsertBlockType: _canInsertBlockType,
-			getBlockIndex: _getBlockIndex,
-			getClientIdsOfDescendants: _getClientIdsOfDescendants,
-			getSettings,
-		} = select( blockEditorStore );
-
-		return {
-			canInsertBlockType: _canInsertBlockType,
-			getBlockIndex: _getBlockIndex,
-			getClientIdsOfDescendants: _getClientIdsOfDescendants,
-			hasUploadPermissions: getSettings().mediaUpload,
-		};
-	}, [] );
-
+	} = useSelect( blockEditorStore );
 	const {
 		insertBlocks,
 		moveBlocksToPosition,

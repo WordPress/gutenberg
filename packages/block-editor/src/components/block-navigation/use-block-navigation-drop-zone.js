@@ -201,16 +201,7 @@ export default function useBlockNavigationDropZone() {
 		getBlockCount,
 		getDraggedBlockClientIds,
 		canInsertBlocks,
-	} = useSelect( ( select ) => {
-		const selectors = select( blockEditorStore );
-		return {
-			canInsertBlocks: selectors.canInsertBlocks,
-			getBlockRootClientId: selectors.getBlockRootClientId,
-			getBlockIndex: selectors.getBlockIndex,
-			getBlockCount: selectors.getBlockCount,
-			getDraggedBlockClientIds: selectors.getDraggedBlockClientIds,
-		};
-	}, [] );
+	} = useSelect( blockEditorStore );
 	const [ target, setTarget ] = useState();
 	const { rootClientId: targetRootClientId, blockIndex: targetBlockIndex } =
 		target || {};

@@ -48,40 +48,6 @@ function isWindows() {
 	return window.navigator.platform.indexOf( 'Win' ) > -1;
 }
 
-function selector( select ) {
-	const {
-		getSelectedBlockClientId,
-		getMultiSelectedBlocksEndClientId,
-		getPreviousBlockClientId,
-		getNextBlockClientId,
-		hasBlockMovingClientId,
-		getBlockIndex,
-		getBlockRootClientId,
-		getClientIdsOfDescendants,
-		canInsertBlockType,
-		getBlockName,
-	} = select( blockEditorStore );
-
-	const selectedBlockClientId = getSelectedBlockClientId();
-	const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-
-	return {
-		selectedBlockClientId,
-		selectionBeforeEndClientId: getPreviousBlockClientId(
-			selectionEndClientId || selectedBlockClientId
-		),
-		selectionAfterEndClientId: getNextBlockClientId(
-			selectionEndClientId || selectedBlockClientId
-		),
-		hasBlockMovingClientId,
-		getBlockIndex,
-		getBlockRootClientId,
-		getClientIdsOfDescendants,
-		canInsertBlockType,
-		getBlockName,
-	};
-}
-
 /**
  * Block selection button component, displaying the label of the block. If the block
  * descends from a root block, a button is displayed enabling the user to select
@@ -134,14 +100,15 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 	}, [] );
 
 	const {
-		selectedBlockClientId,
-		selectionBeforeEndClientId,
-		selectionAfterEndClientId,
 		hasBlockMovingClientId,
 		getBlockIndex,
 		getBlockRootClientId,
 		getClientIdsOfDescendants,
-	} = useSelect( selector, [] );
+		getSelectedBlockClientId,
+		getMultiSelectedBlocksEndClientId,
+		getPreviousBlockClientId,
+		getNextBlockClientId,
+	} = useSelect( blockEditorStore );
 	const {
 		selectBlock,
 		clearSelectedBlock,
@@ -166,6 +133,15 @@ function BlockSelectionButton( { clientId, rootClientId, blockElement } ) {
 			event.preventDefault();
 			return;
 		}
+
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+		const selectionBeforeEndClientId = getPreviousBlockClientId(
+			selectionEndClientId || selectedBlockClientId
+		);
+		const selectionAfterEndClientId = getNextBlockClientId(
+			selectionEndClientId || selectedBlockClientId
+		);
 
 		const navigateUp = ( isTab && isShift ) || isUp;
 		const navigateDown = ( isTab && ! isShift ) || isDown;

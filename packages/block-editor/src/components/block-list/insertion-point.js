@@ -272,27 +272,25 @@ export default function useInsertionPoint( ref ) {
 		isInserterVisible,
 		selectedClientId,
 		selectedRootClientId,
-		getBlockListSettings,
 	} = useSelect( ( select ) => {
 		const {
 			isMultiSelecting: _isMultiSelecting,
 			isBlockInsertionPointVisible,
 			getBlockInsertionPoint,
 			getBlockOrder,
-			getBlockListSettings: _getBlockListSettings,
 		} = select( blockEditorStore );
 
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
 
 		return {
-			getBlockListSettings: _getBlockListSettings,
 			isMultiSelecting: _isMultiSelecting(),
 			isInserterVisible: isBlockInsertionPointVisible(),
 			selectedClientId: order[ insertionPoint.index - 1 ],
 			selectedRootClientId: insertionPoint.rootClientId,
 		};
 	}, [] );
+	const { getBlockListSettings } = useSelect( blockEditorStore );
 
 	const onMouseMove = useCallback(
 		( event ) => {

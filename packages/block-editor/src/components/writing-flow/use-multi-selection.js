@@ -42,7 +42,6 @@ function selector( select ) {
 		isMultiSelecting,
 		getMultiSelectedBlockClientIds,
 		hasMultiSelection,
-		getBlockParents,
 		getSelectedBlockClientId,
 	} = select( blockEditorStore );
 
@@ -51,7 +50,6 @@ function selector( select ) {
 		isMultiSelecting: isMultiSelecting(),
 		multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 		hasMultiSelection: hasMultiSelection(),
-		getBlockParents,
 		selectedBlockClientId: getSelectedBlockClientId(),
 	};
 }
@@ -74,9 +72,9 @@ export default function useMultiSelection( ref ) {
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
-		getBlockParents,
 		selectedBlockClientId,
 	} = useSelect( selector, [] );
+	const { getBlockParents } = useSelect( blockEditorStore );
 	const {
 		startMultiSelect,
 		stopMultiSelect,
