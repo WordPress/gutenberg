@@ -171,7 +171,6 @@ export class BlockList extends Component {
 			isRootList,
 			isBlockInsertionPointVisible,
 			insertionPoint,
-			blockClientIds,
 		} = this.props;
 
 		// Typical usage (don't forget to compare props):
