@@ -177,7 +177,7 @@ describe( 'Multi-entity save flow', () => {
 
 			await insertBlock( 'Site Title' );
 			// Ensure title is retrieved before typing.
-			await page.waitForXPath( '//a[contains(text(), "Gutenberg")]' );
+			await page.waitForXPath( '//a[contains(text(), "gutenberg")]' );
 			await page.keyboard.type( '...' );
 			await insertBlock( 'Site Tagline' );
 			// Ensure tagline is retrieved before typing.
