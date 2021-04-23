@@ -300,26 +300,20 @@ export class BlockList extends Component {
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
 					getItemLayout={ ( data, index ) => {
+						const heights = this.itemHeights;
 						const ITEM_HEIGHT = 30;
-						// const ii = this.itemHeights;
-						const length =
-							this.itemHeights &&
-							this.itemHeights.length > 0 &&
-							this.itemHeights[ index ]
-								? this.itemHeights[ index ]
-								: ITEM_HEIGHT;
-						const offset =
-							this.itemHeights && this.itemHeights.length > 0
-								? this.itemHeights
-										.slice( 0, index + 1 )
-										.reduce(
-											( acc, val, i ) =>
-												val && val > 0
-													? acc + val
-													: acc + ITEM_HEIGHT,
-											0
-										)
-								: ITEM_HEIGHT * index;
+						const length = heights[ data[ index ] ]
+							? heights[ data[ index ] ]
+							: ITEM_HEIGHT;
+						const offset = data
+							.slice( 0, index + 1 )
+							.reduce(
+								( acc, id, i ) =>
+									heights[ id ] && heights[ id ] > 0
+										? acc + heights[ id ]
+										: acc + ITEM_HEIGHT,
+								0
+							);
 						return {
 							length: length,
 							offset: offset,
@@ -383,7 +377,7 @@ export class BlockList extends Component {
 				}
 				blockWidth={ blockWidth }
 				onLayout={ ( object ) =>
-					( this.itemHeights[ index ] =
+					( this.itemHeights[ clientId ] =
 						object.nativeEvent.layout.height )
 				}
 			/>
