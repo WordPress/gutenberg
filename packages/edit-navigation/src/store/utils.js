@@ -160,7 +160,7 @@ export function computeCustomizedAttribute(
 						'kind',
 						block.attributes?.kind
 					) ),
-                target: block.attributes.opensInNewTab
+				target: block.attributes.opensInNewTab
 					? NEW_TAB_TARGET_ATTRIBUTE
 					: '',
 			};

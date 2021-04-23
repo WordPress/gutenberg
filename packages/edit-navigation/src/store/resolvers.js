@@ -162,7 +162,7 @@ function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
 			mapMenuItemFieldToBlockAttribute( 'object', menuItem.object ) ),
 		...( menuItem?.type &&
 			mapMenuItemFieldToBlockAttribute( 'type', menuItem.type ) ),
-            ...( menuItem.target === NEW_TAB_TARGET_ATTRIBUTE && {
+		...( menuItem?.target === NEW_TAB_TARGET_ATTRIBUTE && {
 			opensInNewTab: true,
 		} ),
 	};
