@@ -27,19 +27,15 @@ buildscript {
     }
 }
 
-plugins {
-    id "com.jfrog.bintray"
-}
-
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'com.github.dcendents.android-maven'
-apply plugin: 'maven-publish' // this enables publishing via Bintray
+apply plugin: 'maven-publish'
 
 // import the `readReactNativeVersion()` function
 apply from: 'https://gist.githubusercontent.com/hypest/742448b9588b3a0aa580a5e80ae95bdf/raw/8eb62d40ee7a5104d2fcaeff21ce6f29bd93b054/readReactNativeVersion.gradle'
 
-group = 'com.github.wordpress-mobile.gutenberg-mobile'
+group = 'org.wordpress-mobile.gutenberg-mobile'
 
 // The sample build uses multiple directories to
 // keep boilerplate and common code separate from
@@ -86,6 +82,7 @@ repositories {
     google()
 
     maven { url "https://jitpack.io" }
+    maven { url "https://a8c-libs.s3.amazonaws.com/android" }
 
     if (willPublishReactNativeAztecBinary) {
         maven { url "https://dl.bintray.com/wordpress-mobile/react-native-mirror/" }
@@ -120,35 +117,26 @@ dependencies {
 }
 
 if (willPublishReactNativeAztecBinary) {
-    bintray {
-        user = project.hasProperty('bintrayUser') ? project.property('bintrayUser') : System.getenv('BINTRAY_USER')
-        key = project.hasProperty('bintrayKey') ? project.property('bintrayKey') : System.getenv('BINTRAY_KEY')
-        publications = ['ReactNativeAztecPublication']
-        publish = true
-        pkg {
-            repo = 'maven'
-            name = 'react-native-aztec'
-            licenses = ['GPL-2.0']
-            userOrg = 'wordpress-mobile'
-            vcsUrl = 'https://github.com/wordpress-mobile/gutenberg-mobile.git'
-            version {
-                name = publishReactNativeAztecVersion
-                released  = new Date()
-            }
-        }
-    }
-
     project.afterEvaluate {
         publishing {
             publications {
                 ReactNativeAztecPublication(MavenPublication) {
                     artifact bundleReleaseAar
 
-                    groupId 'com.github.wordpress-mobile.gutenberg-mobile'
+                    groupId 'org.wordpress-mobile.gutenberg-mobile'
                     artifactId 'react-native-aztec'
                     version publishReactNativeAztecVersion
 
                     addDependenciesToPom(pom)
+                }
+            }
+            repositories {
+                maven {
+                    url "s3://a8c-libs.s3.amazonaws.com/android"
+                    credentials(AwsCredentials) {
+                        accessKey project.hasProperty('awsAccessKey') ? project.properties['awsAccessKey'] : System.getenv('AWS_ACCESS_KEY')
+                        secretKey project.hasProperty('awsSecretKey') ? project.properties['awsSecretKey'] : System.getenv('AWS_SECRET_KEY')
+                    }
                 }
             }
         }
@@ -171,4 +159,24 @@ def addDependenciesToPom(pom) {
                 }
     }
 }
+
+tasks.register('checkIfVersionIsAlreadyPublished') {
+    def pomUrl = "https://a8c-libs.s3.amazonaws.com/android/org/wordpress-mobile/gutenberg-mobile/react-native-aztec/${publishReactNativeAztecVersion}/react-native-aztec-${publishReactNativeAztecVersion}.pom"
+    def responseCode = new URL(pomUrl).openConnection().with { connection ->
+        requestMethod = 'HEAD'
+        connect()
+        responseCode
+    }
+
+    if (responseCode == 200) {
+        throw new GradleException("'$publishReactNativeAztecVersion' is already published, please use a different version name. If this happened in CI for a PR, a new commit is necessary. If this happened for a tag, the existing version needs to be manually removed from S3.")
+    } else if (responseCode == 403) {
+        // S3 returns 403 status code if a file doesn't exist, which is what we want. Proceed to publish..
+    } else {
+        throw new GradleException("An unexpected status code ($responseCode) was received while checking if the version ($publishReactNativeAztecVersion) is already published to S3. If this issue persists, please contact Platform 9 team for help.")
+    }
+}
+
+publish.dependsOn(tasks.named('checkIfVersionIsAlreadyPublished'))
+publish.doLast { println "Successfully published 'react-native-aztec' version '$publishReactNativeAztecVersion'" }
 

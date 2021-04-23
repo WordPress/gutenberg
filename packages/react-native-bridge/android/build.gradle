@@ -13,10 +13,6 @@ buildscript {
     }
 }
 
-plugins {
-  id 'com.jfrog.bintray' apply false
-}
-
 allprojects {
     repositories {
         if (willPublishReactNativeBridgeBinary) {
