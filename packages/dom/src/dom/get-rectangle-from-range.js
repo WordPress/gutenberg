@@ -15,7 +15,25 @@ export default function getRectangleFromRange( range ) {
 	// range; this a rectangle enclosing the union of the bounding rectangles
 	// for all the elements in the range.
 	if ( ! range.collapsed ) {
-		return range.getBoundingClientRect();
+		// Ignore tiny selection at the edge of a range.
+		const rects = Array.from( range.getClientRects() ).filter(
+			( { width } ) => width > 1
+		);
+		const furthestTop = Math.min( ...rects.map( ( { top } ) => top ) );
+		const furthestBottom = Math.max(
+			...rects.map( ( { bottom } ) => bottom )
+		);
+		const furthestLeft = Math.min( ...rects.map( ( { left } ) => left ) );
+		const furthestRight = Math.max(
+			...rects.map( ( { right } ) => right )
+		);
+
+		return new window.DOMRect(
+			furthestLeft,
+			furthestTop,
+			furthestRight - furthestLeft,
+			furthestBottom - furthestTop
+		);
 	}
 
 	const { startContainer } = range;
