@@ -599,9 +599,9 @@ class EditorPage {
 		return child;
 	}
 
-	async sendTextToSearchBlockChild( testID, text, clear = true ) {
+	async sendTextToSearchBlockChild( testID, text ) {
 		const textViewElement = await this.getSearchBlockTextElement( testID );
-		return await typeString( this.driver, textViewElement, text, clear );
+		return await typeString( this.driver, textViewElement, text );
 	}
 
 	async toggleHideSearchLabelSetting( block ) {
@@ -610,7 +610,10 @@ class EditorPage {
 		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
 
 		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Hide search heading")]`;
-		return await this.driver.elementByXPath( locator ).click();
+		return await this.driver
+			.elementByXPath( locator )
+			.click()
+			.sleep( isAndroid() ? 200 : 0 );
 	}
 
 	async changeSearchButtonPositionSetting( block, buttonPosition ) {
@@ -625,7 +628,7 @@ class EditorPage {
 		return await this.driver
 			.elementByXPath( optionMenuButtonLocator )
 			.click()
-			.sleep( isAndroid() ? 500 : 200 );
+			.sleep( isAndroid() ? 500 : 200 ); // sleep a little longer due to multiple menus
 	}
 
 	async toggleSearchIconOnlySetting( block ) {
@@ -634,7 +637,10 @@ class EditorPage {
 		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
 
 		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Use icon button")]`;
-		return await this.driver.elementByXPath( locator ).click();
+		return await this.driver
+			.elementByXPath( locator )
+			.click()
+			.sleep( isAndroid() ? 200 : 0 );
 	}
 
 	// =============================
