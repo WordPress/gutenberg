@@ -131,8 +131,10 @@ ${ shouldInstallXdebug ? installXdebug( config.xdebug ) : '' }
 }
 
 function installXdebug( enableXdebug ) {
-	const isLinux = os.type() === 'Linux';
-	// Discover client host does not appear to work on macOS with Docker.
+	const isLinux =
+		os.type() === 'Linux' &&
+		! /-microsoft-standard-WSL2$/.test( os.release() );
+	// Discover client host does not appear to work on macOS and Windows WSL2 with Docker.
 	const clientDetectSettings = isLinux
 		? 'xdebug.discover_client_host=true'
 		: 'xdebug.client_host="host.docker.internal"';
