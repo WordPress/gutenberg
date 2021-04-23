@@ -225,9 +225,9 @@ function NavigationPlaceholder( { location, onCreate, setAttributes }, ref ) {
 			return;
 		}
 
-		const selectedMenuLocation = menuLocations.filter(
+		const selectedMenuLocation = menuLocations.find(
 			( menuLocation ) => menuLocation.name === location
-		)?.[ 0 ];
+		);
 
 		if ( ! selectedMenuLocation ) {
 			return;
@@ -248,6 +248,7 @@ function NavigationPlaceholder( { location, onCreate, setAttributes }, ref ) {
 									<MenuItem
 										onClick={ () => {
 											setAttributes( { location: name } );
+											onClose();
 										} }
 										isSelected={ name === location }
 										onClose={ onClose }
@@ -266,19 +267,28 @@ function NavigationPlaceholder( { location, onCreate, setAttributes }, ref ) {
 				>
 					{ __( 'Edit' ) }
 				</Button>
-				<Button isTertiary onClick={ onConvertToBlocks() }>
+				<Button isTertiary onClick={ convertToBlocks }>
 					{ __( 'Convert to Blocks' ) }
 				</Button>
 			</>
 		);
 	};
 
-	const onConvertToBlocks = () => {};
+	const convertToBlocks = () => {
+		setAttributes( { location: null } );
+	};
+
+	const convertToClassic = ( newLocation ) => {
+		setAttributes( { location: newLocation.name } );
+	};
 
 	const defaultPlaceholder = () => {
 		if ( location ) {
 			return;
 		}
+
+		const defaultClassicMenuLocation = menuLocations?.[ 0 ];
+
 		return (
 			<>
 				{ hasMenus ? (
@@ -320,6 +330,16 @@ function NavigationPlaceholder( { location, onCreate, setAttributes }, ref ) {
 				<Button isTertiary onClick={ onCreateEmptyMenu }>
 					{ __( 'Start empty' ) }
 				</Button>
+				{ !! defaultClassicMenuLocation ? (
+					<Button
+						isTertiary
+						onClick={ () => {
+							convertToClassic( defaultClassicMenuLocation );
+						} }
+					>
+						{ __( 'Use classic' ) }
+					</Button>
+				) : null }
 			</>
 		);
 	};
