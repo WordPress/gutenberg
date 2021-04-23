@@ -212,13 +212,19 @@ export function computeCustomizedAttribute(
 			},
 		};
 
-		const key =
-			MAPPING[ blockAttributeName ].attr ?? MAPPING[ blockAttributeName ];
-		const val =
-			MAPPING[ blockAttributeName ].mapper?.() ?? blockAttributeValue;
-
-		return {
-			[ key ]: val,
-		};
+		return convertAttribute(
+			MAPPING,
+			blockAttributeName,
+			blockAttributeValue
+		);
 	}
 }
+
+export const convertAttribute = function convertAttribute( mapping, key, val ) {
+	const left = mapping[ key ].attr ?? mapping[ key ];
+	const right = mapping[ key ].mapper?.() ?? val;
+
+	return {
+		[ left ]: right,
+	};
+};

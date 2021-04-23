@@ -18,7 +18,7 @@ import {
 } from '../constants';
 
 import { resolveMenuItems, dispatch } from './controls';
-import { buildNavigationPostId } from './utils';
+import { buildNavigationPostId, convertAttribute } from './utils';
 
 /**
  * Creates a "stub" navigation post reflecting the contents of menu with id=menuId. The
@@ -193,10 +193,5 @@ function mapMenuItemFieldToBlockAttribute( menuItemField, menuItemVal ) {
 		},
 	};
 
-	const key = MAPPING[ menuItemField ].attr ?? MAPPING[ menuItemField ];
-	const val = MAPPING[ menuItemField ].mapper?.() ?? menuItemVal;
-
-	return {
-		[ key ]: val,
-	};
+	return convertAttribute( MAPPING, menuItemField, menuItemVal );
 }
