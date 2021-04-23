@@ -10,6 +10,10 @@ const { hasBabelConfig } = require( '../utils' );
 
 const jestUnitConfig = {
 	preset: '@wordpress/jest-preset-default',
+	reporters: [
+		'default',
+		path.join( __dirname, 'jest-github-actions-reporter.js' ),
+	],
 };
 
 if ( ! hasBabelConfig() ) {
