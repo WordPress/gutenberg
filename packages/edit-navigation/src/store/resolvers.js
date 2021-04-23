@@ -153,12 +153,50 @@ function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
 		className: menuItem.classes.join( ' ' ),
 		description: menuItem.description,
 		rel: menuItem.xfn.join( ' ' ),
-		...( menuItem.target === NEW_TAB_TARGET_ATTRIBUTE && {
+		...( menuItem?.object_id &&
+			mapMenuItemFieldToBlockAttribute(
+				'object_id',
+				menuItem.object_id
+			) ),
+		...( menuItem?.object &&
+			mapMenuItemFieldToBlockAttribute( 'object', menuItem.object ) ),
+		...( menuItem?.type &&
+			mapMenuItemFieldToBlockAttribute( 'type', menuItem.type ) ),
+            ...( menuItem.target === NEW_TAB_TARGET_ATTRIBUTE && {
 			opensInNewTab: true,
 		} ),
-		...( menuItem?.object_id && { id: menuItem.object_id } ),
-		...( menuItem?.object && { type: menuItem.object } ), //  https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L796
 	};
 
 	return createBlock( 'core/navigation-link', attributes, innerBlocks );
+}
+
+function mapMenuItemFieldToBlockAttribute( menuItemField, menuItemVal ) {
+	const MAPPING = {
+		object_id: 'id',
+		object: 'type',
+		// `nav_menu_item` may be one of:
+		// 1. `post_type`,
+		// 2. `post_type_archive`,
+		// 3. `taxonomy`,
+		// 4. `custom`.
+		type: {
+			attr: 'kind',
+			mapper: () => {
+				switch ( menuItemVal ) {
+					case 'post_type':
+					case 'post_type_archive':
+						return menuItemVal.replace( '_', '-' );
+					default:
+						return menuItemVal;
+				}
+			},
+		},
+	};
+
+	const key = MAPPING[ menuItemField ].attr ?? MAPPING[ menuItemField ];
+	const val = MAPPING[ menuItemField ].mapper?.() ?? menuItemVal;
+
+	return {
+		[ key ]: val,
+	};
 }

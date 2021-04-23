@@ -145,15 +145,24 @@ export function computeCustomizedAttribute(
 				xfn: block.attributes.rel?.split( ' ' ),
 				classes: block.attributes.className?.split( ' ' ),
 				attr_title: block.attributes.title,
-				target: block.attributes.opensInNewTab
+				...( block.attributes?.type &&
+					mapBlockAttributeToMenuItemField(
+						'type',
+						block.attributes?.type
+					) ),
+				...( block.attributes?.id &&
+					mapBlockAttributeToMenuItemField(
+						'id',
+						block.attributes?.id
+					) ),
+				...( block.attributes?.kind &&
+					mapBlockAttributeToMenuItemField(
+						'kind',
+						block.attributes?.kind
+					) ),
+                target: block.attributes.opensInNewTab
 					? NEW_TAB_TARGET_ATTRIBUTE
 					: '',
-                ...( block.attributes?.id && {
-					object_id: block.attributes.id,
-				} ),
-				...( block.attributes?.type && {
-					object: block.attributes.type,
-				} ),
 			};
 		} else {
 			attributes = {
@@ -175,5 +184,41 @@ export function computeCustomizedAttribute(
 
 	function getMenuItemForBlock( block ) {
 		return omit( menuItemsByClientId[ block.clientId ] || {}, '_links' );
+	}
+
+	function mapBlockAttributeToMenuItemField(
+		blockAttributeName,
+		blockAttributeValue
+	) {
+		const MAPPING = {
+			id: 'object_id',
+			type: 'object',
+			// `nav_menu_item` may be one of:
+			// 1. `post_type`,
+			// 2. `post_type_archive`,
+			// 3. `taxonomy`,
+			// 4. `custom`.
+			kind: {
+				attr: 'type',
+				mapper: () => {
+					switch ( blockAttributeValue ) {
+						case 'post-type':
+						case 'post-type-archive':
+							return blockAttributeValue.replace( '-', '_' );
+						default:
+							return blockAttributeValue;
+					}
+				},
+			},
+		};
+
+		const key =
+			MAPPING[ blockAttributeName ].attr ?? MAPPING[ blockAttributeName ];
+		const val =
+			MAPPING[ blockAttributeName ].mapper?.() ?? blockAttributeValue;
+
+		return {
+			[ key ]: val,
+		};
 	}
 }
