@@ -55,10 +55,9 @@
 		margin-left: auto;
 		margin-right: auto;
 
-		// Apply default block margin below the post title.
-		// This ensures the first block on the page is in a good position.
-		// This rule can be retired once the title becomes an actual block.
-		margin-bottom: $default-block-margin;
+		// Margins between the title and the first block, or appender, do not collapse.
+		// By explicitly setting this to zero, we avoid "double margin".
+		margin-bottom: 0;
 	}
 }
 
