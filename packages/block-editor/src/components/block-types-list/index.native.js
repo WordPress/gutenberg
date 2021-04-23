@@ -80,7 +80,7 @@ export default function BlockTypesList( { name, items, onSelect, listProps } ) {
 					<View style={ styles.rowSeparator } />
 				</TouchableWithoutFeedback>
 			) }
-			keyExtractor={ ( item ) => item.name }
+			keyExtractor={ ( item ) => item.id }
 			renderItem={ ( { item } ) => (
 				<InserterButton
 					{ ...{
