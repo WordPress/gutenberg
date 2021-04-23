@@ -227,9 +227,9 @@ function NavigationPlaceholder( { location, onCreate, setAttributes }, ref ) {
 
 		const selectedMenuLocation = menuLocations.filter(
 			( menuLocation ) => menuLocation.name === location
-		)?.[0];
+		)?.[ 0 ];
 
-		if( ! selectedMenuLocation ) {
+		if ( ! selectedMenuLocation ) {
 			return;
 		}
 
@@ -260,7 +260,10 @@ function NavigationPlaceholder( { location, onCreate, setAttributes }, ref ) {
 						</MenuGroup>
 					) }
 				</DropdownMenu>
-				<Button isTertiary href={`/wp-admin/nav-menus.php?action=edit&menu=${selectedMenuLocation.menu}`}>
+				<Button
+					isTertiary
+					href={ `/wp-admin/nav-menus.php?action=edit&menu=${ selectedMenuLocation.menu }` }
+				>
 					{ __( 'Edit' ) }
 				</Button>
 				<Button isTertiary onClick={ onConvertToBlocks() }>
