@@ -66,7 +66,8 @@ public class ReactAztecText extends AztecText {
 
     // FIXME: Used in `incrementAndGetEventCounter` but never read. I guess we can get rid of it, but before this
     // check when it's used in EditText in RN. (maybe tests?)
-    int mNativeEventCount = 0;
+    private int mNativeEventCount = 0;           //  \ Using two distinct counters to avoid race conditions,
+    private int mEventCountSyncFromJS = 0; //  / each side is responsible for bumping the respective counter.
 
     String lastSentFormattingOptionsEventString = "";
     boolean shouldHandleOnEnter = false;
@@ -377,7 +378,22 @@ public class ReactAztecText extends AztecText {
 
     //// Text changed events
 
+    public int getEventCounter() {
+        return mNativeEventCount;
+    }
+
+    public void setEventCounterSyncFromJS(int syncToValue) {
+        mEventCountSyncFromJS = syncToValue;
+    }
+
     public int incrementAndGetEventCounter() {
+        if (mNativeEventCount < mEventCountSyncFromJS) {
+            // need to sync up to the counter the JS side is expecting. Avoiding setting
+            //   mNativeEventCount directly from the JS side to avoid race conditions, and instead
+            //   syncing just-in-time when we need the new increment
+            mNativeEventCount = mEventCountSyncFromJS;
+        }
+
         return ++mNativeEventCount;
     }
 

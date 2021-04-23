@@ -1,4 +1,15 @@
 .block-editor-block-inspector {
+	p {
+		margin-top: 0;
+	}
+
+	h2,
+	h3 {
+		font-size: $default-font-size;
+		color: $gray-900;
+		margin-bottom: 1.5em;
+	}
+
 	.components-base-control {
 		margin-bottom: #{ $grid-unit-30 };
 

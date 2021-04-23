@@ -16,26 +16,33 @@ import DownloadableBlocksPanel from '../../components/downloadable-blocks-panel'
 
 function InserterMenuDownloadableBlocksPanel() {
 	const [ debouncedFilterValue, setFilterValue ] = useState( '' );
-
 	const debouncedSetFilterValue = debounce( setFilterValue, 400 );
 
 	return (
 		<__experimentalInserterMenuExtension>
-			{ ( { onSelect, onHover, filterValue, hasItems } ) => {
-				if ( hasItems || ! filterValue ) {
-					return null;
-				}
-
+			{ ( {
+				onSelect,
+				onHover,
+				filterValue,
+				hasItems,
+				rootClientId,
+			} ) => {
 				if ( debouncedFilterValue !== filterValue ) {
 					debouncedSetFilterValue( filterValue );
+				}
+
+				if ( ! debouncedFilterValue ) {
+					return null;
 				}
 
 				return (
 					<DownloadableBlocksPanel
 						onSelect={ onSelect }
 						onHover={ onHover }
+						rootClientId={ rootClientId }
 						filterValue={ debouncedFilterValue }
-						isWaiting={ filterValue !== debouncedFilterValue }
+						hasLocalBlocks={ hasItems }
+						isTyping={ filterValue !== debouncedFilterValue }
 					/>
 				);
 			} }

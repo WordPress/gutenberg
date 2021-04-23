@@ -22,21 +22,24 @@ const manifest = require( '../../../package.json' );
 /** @typedef {import('@octokit/rest')} GitHub */
 /** @typedef {import('@octokit/rest').IssuesListForRepoResponseItem} IssuesListForRepoResponseItem */
 /** @typedef {import('@octokit/rest').IssuesListMilestonesForRepoResponseItem} OktokitIssuesListMilestonesForRepoResponseItem */
+/** @typedef {import('@octokit/rest').ReposListReleasesResponseItem} ReposListReleasesResponseItem */
 
 /**
  * @typedef WPChangelogCommandOptions
  *
- * @property {string=} milestone Optional Milestone title.
- * @property {string=} token     Optional personal access token.
+ * @property {string=}  milestone   Optional Milestone title.
+ * @property {string=}  token       Optional personal access token.
+ * @property {boolean=} unreleased  Optional flag to only include issues that haven't been part of a release yet.
  */
 
 /**
  * @typedef WPChangelogSettings
  *
- * @property {string}  owner     Repository owner.
- * @property {string}  repo      Repository name.
- * @property {string=} token     Optional personal access token.
- * @property {string}  milestone Milestone title.
+ * @property {string}   owner       Repository owner.
+ * @property {string}   repo        Repository name.
+ * @property {string=}  token       Optional personal access token.
+ * @property {string}   milestone   Milestone title.
+ * @property {boolean=} unreleased  Only include issues that have been closed since the milestone's latest release.
  */
 
 /**
@@ -381,6 +384,43 @@ function getEntry( issue ) {
 }
 
 /**
+ * Returns the latest release for a given series
+ *
+ * @param {GitHub} octokit  Initialized Octokit REST client.
+ * @param {string} owner    Repository owner.
+ * @param {string} repo     Repository name.
+ * @param {string} series   Gutenberg release series (e.g. '6.7' or '9.8').
+ *
+ * @return {Promise<ReposListReleasesResponseItem|undefined>} Promise resolving to pull
+ *                                                            requests for the given
+ *                                                            milestone.
+ */
+async function getLatestReleaseInSeries( octokit, owner, repo, series ) {
+	const releaseOptions = await octokit.repos.listReleases.endpoint.merge( {
+		owner,
+		repo,
+	} );
+
+	let latestReleaseForMilestone;
+
+	/**
+	 * @type {AsyncIterableIterator<import('@octokit/rest').Response<import('@octokit/rest').ReposListReleasesResponse>>}
+	 */
+	const releases = octokit.paginate.iterator( releaseOptions );
+
+	for await ( const releasesPage of releases ) {
+		latestReleaseForMilestone = releasesPage.data.find( ( release ) =>
+			release.name.startsWith( series )
+		);
+
+		if ( latestReleaseForMilestone ) {
+			return latestReleaseForMilestone;
+		}
+	}
+	return undefined;
+}
+
+/**
  * Returns a promise resolving to an array of pull requests associated with the
  * changelog settings object.
  *
@@ -391,7 +431,7 @@ function getEntry( issue ) {
  *                                            pull requests.
  */
 async function fetchAllPullRequests( octokit, settings ) {
-	const { owner, repo, milestone: milestoneTitle } = settings;
+	const { owner, repo, milestone: milestoneTitle, unreleased } = settings;
 	const milestone = await getMilestoneByTitle(
 		octokit,
 		owner,
@@ -405,13 +445,19 @@ async function fetchAllPullRequests( octokit, settings ) {
 		);
 	}
 
+	const series = milestoneTitle.replace( 'Gutenberg ', '' );
+	const latestReleaseInSeries = unreleased
+		? await getLatestReleaseInSeries( octokit, owner, repo, series )
+		: undefined;
+
 	const { number } = milestone;
 	const issues = await getIssuesByMilestone(
 		octokit,
 		owner,
 		repo,
 		number,
-		'closed'
+		'closed',
+		latestReleaseInSeries ? latestReleaseInSeries.published_at : undefined
 	);
 	return issues.filter( ( issue ) => issue.pull_request );
 }
@@ -430,9 +476,15 @@ async function getChangelog( settings ) {
 
 	const pullRequests = await fetchAllPullRequests( octokit, settings );
 	if ( ! pullRequests.length ) {
-		throw new Error(
-			'There are no pull requests associated with the milestone.'
-		);
+		if ( settings.unreleased ) {
+			throw new Error(
+				'There are no unreleased pull requests associated with the milestone.'
+			);
+		} else {
+			throw new Error(
+				'There are no pull requests associated with the milestone.'
+			);
+		}
 	}
 
 	let changelog = '';
@@ -502,6 +554,7 @@ async function getReleaseChangelog( options ) {
 						),
 				  } )
 				: options.milestone,
+		unreleased: options.unreleased,
 	} );
 }
 

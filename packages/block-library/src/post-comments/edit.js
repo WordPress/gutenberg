@@ -15,11 +15,12 @@ import {
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import { RawHTML } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
 
 function PostCommentsDisplay( { postId } ) {
 	return useSelect(
 		( select ) => {
-			const comments = select( 'core' ).getEntityRecords(
+			const comments = select( coreStore ).getEntityRecords(
 				'root',
 				'comment',
 				{
@@ -57,7 +58,11 @@ export default function PostCommentsEdit( {
 
 	if ( ! postType || ! postId ) {
 		return (
-			<Warning>{ __( 'Post comments block: no post found.' ) }</Warning>
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Post comments block: no post found.' ) }
+				</Warning>
+			</div>
 		);
 	}
 

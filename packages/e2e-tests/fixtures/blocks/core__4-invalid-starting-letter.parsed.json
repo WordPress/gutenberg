@@ -1,11 +1,11 @@
 [
-    {
-        "blockName": null,
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "<!-- wp:core/4-invalid /-->\n",
-        "innerContent": [
-            "<!-- wp:core/4-invalid /-->\n"
-        ]
-    }
+	{
+		"blockName": null,
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "<!-- wp:core/4-invalid /-->",
+		"innerContent": [
+			"<!-- wp:core/4-invalid /-->"
+		]
+	}
 ]

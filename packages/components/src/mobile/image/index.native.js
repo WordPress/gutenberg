@@ -34,10 +34,12 @@ const ImageComponent = ( {
 	editButton = true,
 	focalPoint,
 	height: imageHeight,
+	highlightSelected = true,
 	isSelected,
 	isUploadFailed,
 	isUploadInProgress,
 	mediaPickerOptions,
+	onImageDataLoad,
 	onSelectMediaUploadOption,
 	openMediaOptions,
 	resizeMode,
@@ -45,21 +47,31 @@ const ImageComponent = ( {
 	retryIcon,
 	url,
 	shapeStyle,
+	style,
 	width: imageWidth,
 } ) => {
 	const [ imageData, setImageData ] = useState( null );
 	const [ containerSize, setContainerSize ] = useState( null );
 
 	useEffect( () => {
+		let isCurrent = true;
 		if ( url ) {
 			Image.getSize( url, ( imgWidth, imgHeight ) => {
-				setImageData( {
+				if ( ! isCurrent ) {
+					return;
+				}
+				const metaData = {
 					aspectRatio: imgWidth / imgHeight,
 					width: imgWidth,
 					height: imgHeight,
-				} );
+				};
+				setImageData( metaData );
+				if ( onImageDataLoad ) {
+					onImageDataLoad( metaData );
+				}
 			} );
 		}
+		return () => ( isCurrent = false );
 	}, [ url ] );
 
 	const onContainerLayout = ( event ) => {
@@ -117,20 +129,20 @@ const ImageComponent = ( {
 	const customWidth =
 		imageData?.width < containerSize?.width
 			? imageData?.width
-			: styles.wide.width;
+			: styles.wide?.width;
 
 	const imageContainerStyles = [
 		styles.imageContent,
 		{
 			width:
-				imageWidth === styles.wide.width ||
+				imageWidth === styles.wide?.width ||
 				( imageData &&
 					imageWidth > 0 &&
 					imageWidth < containerSize?.width )
 					? imageWidth
 					: customWidth,
 		},
-		resizeMode && { width: styles.wide.width },
+		resizeMode && { width: styles.wide?.width },
 		focalPoint && styles.focalPointContainer,
 	];
 
@@ -166,6 +178,7 @@ const ImageComponent = ( {
 				// to disappear when an aligned image can't be downloaded
 				// https://github.com/wordpress-mobile/gutenberg-mobile/issues/1592
 				imageData && align && { alignItems: align },
+				style,
 			] }
 			onLayout={ onContainerLayout }
 		>
@@ -178,14 +191,16 @@ const ImageComponent = ( {
 				key={ url }
 				style={ imageContainerStyles }
 			>
-				{ isSelected && ! ( isUploadInProgress || isUploadFailed ) && (
-					<View
-						style={ [
-							styles.imageBorder,
-							{ height: containerSize?.height },
-						] }
-					/>
-				) }
+				{ isSelected &&
+					highlightSelected &&
+					! ( isUploadInProgress || isUploadFailed ) && (
+						<View
+							style={ [
+								styles.imageBorder,
+								{ height: containerSize?.height },
+							] }
+						/>
+					) }
 
 				{ ! imageData ? (
 					<View style={ placeholderStyles }>
@@ -229,16 +244,16 @@ const ImageComponent = ( {
 						</Text>
 					</View>
 				) }
-
-				{ editButton && isSelected && ! isUploadInProgress && (
-					<ImageEditingButton
-						onSelectMediaUploadOption={ onSelectMediaUploadOption }
-						openMediaOptions={ openMediaOptions }
-						url={ ! isUploadFailed && imageData && url }
-						pickerOptions={ mediaPickerOptions }
-					/>
-				) }
 			</View>
+
+			{ editButton && isSelected && ! isUploadInProgress && (
+				<ImageEditingButton
+					onSelectMediaUploadOption={ onSelectMediaUploadOption }
+					openMediaOptions={ openMediaOptions }
+					url={ ! isUploadFailed && imageData && url }
+					pickerOptions={ mediaPickerOptions }
+				/>
+			) }
 		</View>
 	);
 };

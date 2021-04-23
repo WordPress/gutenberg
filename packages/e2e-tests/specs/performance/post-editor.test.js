@@ -127,7 +127,7 @@ describe( 'Post Editor Performance', () => {
 		}, html );
 		await saveDraft();
 
-		let i = 1;
+		let i = 5;
 
 		// Measuring loading time
 		while ( i-- ) {

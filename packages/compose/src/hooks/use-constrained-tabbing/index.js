@@ -3,11 +3,7 @@
  */
 import { TAB } from '@wordpress/keycodes';
 import { focus } from '@wordpress/dom';
-
-/**
- * Internal dependencies
- */
-import useCallbackRef from '../use-callback-ref';
+import { useCallback } from '@wordpress/element';
 
 /**
  * In Dialogs/modals, the tabbing must be constrained to the content of
@@ -31,7 +27,7 @@ import useCallbackRef from '../use-callback-ref';
  * ```
  */
 function useConstrainedTabbing() {
-	const ref = useCallbackRef( ( node ) => {
+	const ref = useCallback( ( node ) => {
 		if ( ! node ) {
 			return;
 		}

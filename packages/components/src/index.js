@@ -35,23 +35,24 @@ export { default as ColorIndicator } from './color-indicator';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPicker } from './color-picker';
 export { default as ComboboxControl } from './combobox-control';
+export {
+	Composite as __unstableComposite,
+	CompositeGroup as __unstableCompositeGroup,
+	CompositeItem as __unstableCompositeItem,
+	useCompositeState as __unstableUseCompositeState,
+} from './composite';
 export { default as CustomSelectControl } from './custom-select-control';
 export { default as Dashicon } from './dashicon';
 export { default as DateTimePicker, DatePicker, TimePicker } from './date-time';
 export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
+export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
 export { default as Draggable } from './draggable';
-export {
-	default as DropZone,
-	useDropZone as __unstableUseDropZone,
-} from './drop-zone';
-export {
-	default as DropZoneProvider,
-	DropZoneContextProvider as __unstableDropZoneContextProvider,
-	useDrop as __unstableUseDrop,
-} from './drop-zone/provider';
+export { default as DropZone } from './drop-zone';
+export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
+export { DuotoneSwatch, DuotonePicker } from './duotone-picker';
 export { default as ExternalLink } from './external-link';
 export { default as Flex } from './flex';
 export { default as FlexBlock } from './flex/block';
@@ -132,6 +133,7 @@ export {
 	Provider as SlotFillProvider,
 	useSlot as __experimentalUseSlot,
 } from './slot-fill';
+export { default as __experimentalStyleProvider } from './style-provider';
 
 // Higher-Order Components
 export {
@@ -148,3 +150,9 @@ export {
 } from './higher-order/with-focus-return';
 export { default as withNotices } from './higher-order/with-notices';
 export { default as withSpokenMessages } from './higher-order/with-spoken-messages';
+
+// Component System
+export {
+	withNext as __unstableWithNext,
+	ComponentSystemProvider as __unstableComponentSystemProvider,
+} from './ui/context';

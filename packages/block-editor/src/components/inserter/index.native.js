@@ -15,6 +15,7 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import {
 	Icon,
+	plusCircle,
 	plusCircleFilled,
 	insertAfter,
 	insertBefore,
@@ -26,6 +27,7 @@ import {
 import styles from './style.scss';
 import InserterMenu from './menu';
 import BlockInsertionPoint from '../block-list/insertion-point';
+import { store as blockEditorStore } from '../../store';
 
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
@@ -64,7 +66,7 @@ export class Inserter extends Component {
 		const addBeforeOption = {
 			value: 'before',
 			label: __( 'Add Block Before' ),
-			icon: insertBefore,
+			icon: plusCircle,
 		};
 
 		const replaceCurrentOption = {
@@ -76,17 +78,17 @@ export class Inserter extends Component {
 		const addAfterOption = {
 			value: 'after',
 			label: __( 'Add Block After' ),
-			icon: insertAfter,
+			icon: plusCircle,
 		};
 
 		const addToBeginningOption = {
-			value: 'before',
+			value: 'start',
 			label: __( 'Add To Beginning' ),
 			icon: insertBefore,
 		};
 
 		const addToEndOption = {
-			value: 'after',
+			value: 'end',
 			label: __( 'Add To End' ),
 			icon: insertAfter,
 		};
@@ -95,12 +97,19 @@ export class Inserter extends Component {
 		if ( isAnyBlockSelected ) {
 			if ( isSelectedBlockReplaceable ) {
 				return [
+					addToBeginningOption,
 					addBeforeOption,
 					replaceCurrentOption,
 					addAfterOption,
+					addToEndOption,
 				];
 			}
-			return [ addBeforeOption, addAfterOption ];
+			return [
+				addToBeginningOption,
+				addBeforeOption,
+				addAfterOption,
+				addToEndOption,
+			];
 		}
 		return [ addToBeginningOption, addToEndOption ];
 	}
@@ -108,14 +117,22 @@ export class Inserter extends Component {
 	getInsertionIndex( insertionType ) {
 		const {
 			insertionIndexDefault,
+			insertionIndexStart,
 			insertionIndexBefore,
 			insertionIndexAfter,
+			insertionIndexEnd,
 		} = this.props;
+		if ( insertionType === 'start' ) {
+			return insertionIndexStart;
+		}
 		if ( insertionType === 'before' || insertionType === 'replace' ) {
 			return insertionIndexBefore;
 		}
 		if ( insertionType === 'after' ) {
 			return insertionIndexAfter;
+		}
+		if ( insertionType === 'end' ) {
+			return insertionIndexEnd;
 		}
 		return insertionIndexDefault;
 	}
@@ -284,7 +301,7 @@ export default compose( [
 			getBlockOrder,
 			getBlockIndex,
 			getBlock,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const end = getBlockSelectionEnd();
 		// `end` argument (id) can refer to the component which is removed
@@ -304,7 +321,7 @@ export default compose( [
 			: undefined;
 
 		function getDefaultInsertionIndex() {
-			const { getSettings } = select( 'core/block-editor' );
+			const { getSettings } = select( blockEditorStore );
 
 			const {
 				__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
@@ -335,20 +352,26 @@ export default compose( [
 			return endOfRootIndex;
 		}
 
+		const insertionIndexStart = 0;
+
 		const insertionIndexBefore = isAnyBlockSelected
 			? selectedBlockIndex
-			: 0;
+			: insertionIndexStart;
 
 		const insertionIndexAfter = isAnyBlockSelected
 			? selectedBlockIndex + 1
 			: endOfRootIndex;
+
+		const insertionIndexEnd = endOfRootIndex;
 
 		return {
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,
 			insertionIndexAfter,
-			isAnyBlockSelected,
+			insertionIndexStart,
+			insertionIndexEnd,
+			isAnyBlockSelected: !! isAnyBlockSelected,
 			isSelectedBlockReplaceable: isSelectedUnmodifiedDefaultBlock,
 		};
 	} ),

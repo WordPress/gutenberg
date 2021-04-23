@@ -222,7 +222,7 @@ function gutenberg_convert_menu_items_to_blocks(
 	}
 
 	return $blocks;
-};
+}
 
 /**
  * Shim that causes `wp_nav_menu()` to output a Navigation block instead of a

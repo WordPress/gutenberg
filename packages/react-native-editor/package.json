@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/react-native-editor",
-	"version": "1.43.1",
+	"version": "1.51.0",
 	"description": "Mobile WordPress gutenberg editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -13,7 +13,7 @@
 		"jsfiles": "./*.js src/*.js src/**/*.js src/**/**/*.js",
 		"scssfiles": "src/*.scss src/**/*.scss"
 	},
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/react-native-editor/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/react-native-editor/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -29,7 +29,7 @@
 	"main": "src/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
+		"@babel/runtime": "^7.13.10",
 		"@react-native-community/blur": "3.6.0",
 		"@react-native-community/masked-view": "git+https://github.com/wordpress-mobile/react-native-masked-view.git#f65a51a3320e58404d7f38d967bfd1f42b439ca9",
 		"@react-native-community/slider": "git+https://github.com/wordpress-mobile/react-native-slider.git#d263ff16cdd9fb7352b354342522ff030f220f42",
@@ -49,6 +49,7 @@
 		"@wordpress/i18n": "file:../i18n",
 		"@wordpress/react-native-aztec": "file:../react-native-aztec",
 		"@wordpress/react-native-bridge": "file:../react-native-bridge",
+		"core-js": "^3.8.3",
 		"fast-average-color": "^4.3.0",
 		"jed": "^1.1.1",
 		"jsc-android": "^241213.1.0",
@@ -78,9 +79,10 @@
 		"access": "public"
 	},
 	"scripts": {
-		"start": "react-native start",
-		"start:reset": "npm run clean:runtime && npm run start -- --reset-cache",
+		"start": "echo \"\\x1b[33mThe start command is not available in this project. It is strongly recommended to use \\x1b[1:33mstart:reset\\x1b[0m\\x1b[33m to perform some cleanup when starting the metro bundler.\nOr you may use \\x1b[1:33mstart:quick\\x1b[0m\\x1b[33m for a quicker startup, but this may lead to unexpected javascript errors when running the app.\\x1b[0m\"",
 		"start:debug": "node --inspect-brk node_modules/.bin/react-native start",
+		"start:reset": "npm run clean:runtime && npm run start:quick -- --reset-cache",
+		"start:quick": "react-native start",
 		"prern-bundle": "cd ../.. && patch-package --patch-dir packages/react-native-editor/metro-patch",
 		"rn-bundle": "react-native bundle",
 		"postrn-bundle": "cd ../.. && patch-package --reverse --patch-dir packages/react-native-editor/metro-patch",
@@ -103,7 +105,7 @@
 		"test": "cross-env NODE_ENV=test jest --verbose --config ../../test/native/jest.config.js",
 		"test:debug": "cross-env NODE_ENV=test node --inspect-brk jest --runInBand --verbose --config ../../test/native/jest.config.js",
 		"device-tests": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --no-cache --maxWorkers=3 --verbose --config ./jest_ui.config.js",
-		"device-tests-canary": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --no-cache --maxWorkers=2 --testNamePattern=@canary --verbose --config ./jest_ui.config.js",
+		"device-tests-canary": "cross-env NODE_ENV=test jest --forceExit --detectOpenHandles --no-cache --maxWorkers=2 --testPathPattern=@canary --verbose --config ./jest_ui.config.js",
 		"device-tests:local": "cross-env NODE_ENV=test jest --runInBand --detectOpenHandles --verbose --forceExit --config ./jest_ui.config.js",
 		"device-tests:debug": "cross-env NODE_ENV=test node $NODE_DEBUG_OPTION --inspect-brk node_modules/jest/bin/jest --runInBand --detectOpenHandles --verbose --config ./jest_ui.config.js",
 		"test:e2e:bundle:android": "mkdir -p android/app/src/main/assets && npm run rn-bundle -- --reset-cache --platform android --dev false --minify false --entry-file index.js --bundle-output android/app/src/main/assets/index.android.bundle --assets-dest android/app/src/main/res",
@@ -111,7 +113,8 @@
 		"test:e2e:android:local": "npm run test:e2e:bundle:android && npm run test:e2e:build-app:android && TEST_RN_PLATFORM=android npm run device-tests:local",
 		"test:e2e:bundle:ios": "mkdir -p ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app && npm run rn-bundle -- --reset-cache --platform=ios --dev=false --minify false --entry-file=index.js --bundle-output=./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle --assets-dest=./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app",
 		"test:e2e:build-app:ios": "npm run preios && SKIP_BUNDLING=true xcodebuild -workspace ios/GutenbergDemo.xcworkspace -configuration Release -scheme GutenbergDemo -destination 'platform=iOS Simulator,name=iPhone 11' -derivedDataPath ios/build/GutenbergDemo",
-		"test:e2e:ios:local": "npm run test:e2e:bundle:ios && npm run test:e2e:build-app:ios && TEST_RN_PLATFORM=ios npm run device-tests:local",
+		"test:e2e:build-wda": "xcodebuild -project ../../node_modules/appium/node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj -scheme WebDriverAgentRunner -destination 'platform=iOS Simulator,name=iPhone 11' -derivedDataPath ios/build/WDA",
+		"test:e2e:ios:local": "npm run test:e2e:bundle:ios && npm run test:e2e:build-app:ios && npm run test:e2e:build-wda && TEST_RN_PLATFORM=ios npm run device-tests:local",
 		"build:gutenberg": "cd gutenberg && npm ci && npm run build",
 		"clean": "npm run clean:build-artifacts; npm run clean:aztec; npm run clean:haste; npm run clean:jest; npm run clean:metro; npm run clean:react; npm run clean:watchman",
 		"clean:runtime": "npm run clean:haste; npm run clean:react; npm run clean:metro; npm run clean:jest; npm run clean:watchman; npm run clean:babel-cache",

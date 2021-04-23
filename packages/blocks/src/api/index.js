@@ -8,6 +8,7 @@ export {
 	createBlock,
 	createBlocksFromInnerBlocksTemplate,
 	cloneBlock,
+	__experimentalCloneSanitizedBlock,
 	getPossibleBlockTransformations,
 	switchToBlockType,
 	getBlockTransforms,
@@ -55,12 +56,13 @@ export {
 // attributes needed to operate with the block later on.
 export {
 	default as serialize,
-	getBlockContent,
+	getBlockInnerHTML as getBlockContent,
 	getBlockDefaultClassName,
 	getBlockMenuDefaultClassName,
 	getSaveElement,
 	getSaveContent,
 	getBlockProps as __unstableGetBlockProps,
+	__unstableSerializeAndClean,
 } from './serializer';
 
 // Validation is the process of comparing a block source with its output before
@@ -122,6 +124,7 @@ export {
 	hasBlockSupport,
 	getBlockVariations,
 	isReusableBlock,
+	isTemplatePart,
 	getChildBlockNames,
 	hasChildBlocks,
 	hasChildBlocksWithInserterSupport,
@@ -137,6 +140,8 @@ export {
 	isValidIcon,
 	getBlockLabel as __experimentalGetBlockLabel,
 	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
+	__experimentalSanitizeBlockAttributes,
+	__experimentalGetBlockAttributesNamesByRole,
 } from './utils';
 
 // Templates are, in a general sense, a basic collection of block nodes with any

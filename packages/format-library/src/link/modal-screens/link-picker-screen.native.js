@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import React from 'react';
 import { Platform, Keyboard } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { delay } from 'lodash';

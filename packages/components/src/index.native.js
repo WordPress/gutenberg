@@ -14,6 +14,7 @@ export { default as ColorPicker } from './color-picker';
 export { default as Dashicon } from './dashicon';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
+export { default as FocalPointPicker } from './focal-point-picker';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
 export { default as __experimentalToolbarContext } from './toolbar-context';
@@ -46,6 +47,7 @@ export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
 export { default as RadioControl } from './radio-control';
 export { default as UnitControl } from './unit-control';
+export { default as Disabled } from './disabled';
 
 // Higher-Order Components
 export { default as withConstrainedTabbing } from './higher-order/with-constrained-tabbing';
@@ -64,15 +66,19 @@ export {
 	BottomSheetProvider,
 	BottomSheetContext,
 } from './mobile/bottom-sheet/bottom-sheet-context';
+export { default as BottomSheetSelectControl } from './mobile/bottom-sheet-select-control';
 export { default as HTMLTextInput } from './mobile/html-text-input';
 export { default as KeyboardAvoidingView } from './mobile/keyboard-avoiding-view';
 export { default as KeyboardAwareFlatList } from './mobile/keyboard-aware-flat-list';
-export { default as ModalHeaderBar } from './mobile/modal-header-bar';
 export { default as Picker } from './mobile/picker';
 export { default as ReadableContentView } from './mobile/readable-content-view';
 export { default as CycleSelectControl } from './mobile/cycle-select-control';
 export { default as Gradient } from './mobile/gradient';
 export { default as ColorSettings } from './mobile/color-settings';
+export { default as SegmentedControls } from './mobile/segmented-control';
+export { default as FocalPointSettingsPanel } from './mobile/focal-point-settings-panel';
+export { default as BottomSheetTextControl } from './mobile/bottom-sheet-text-control';
+export { default as FooterMessageLink } from './mobile/bottom-sheet/footer-message-link/footer-message-link';
 export { LinkPicker } from './mobile/link-picker';
 export { default as LinkPickerScreen } from './mobile/link-picker/link-picker-screen';
 export { default as LinkSettings } from './mobile/link-settings';
@@ -82,6 +88,8 @@ export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
 export { default as InserterButton } from './mobile/inserter-button';
 export { setClipboard, getClipboard } from './mobile/clipboard';
+export { default as AudioPlayer } from './mobile/audio-player';
+export { default as Badge } from './mobile/badge';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';

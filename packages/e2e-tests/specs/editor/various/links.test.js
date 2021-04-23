@@ -318,7 +318,7 @@ describe( 'Links', () => {
 		// Disable reason: Wait for the animation to complete, since otherwise the
 		// click attempt may occur at the wrong point.
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 100 );
+		await page.waitForTimeout( 100 );
 
 		// Publish the post
 		await page.click( '.editor-post-publish-button' );

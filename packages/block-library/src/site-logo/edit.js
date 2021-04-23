@@ -16,8 +16,6 @@ import {
 	RangeControl,
 	ResizableBox,
 	Spinner,
-	ToolbarButton,
-	ToolbarGroup,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -27,14 +25,15 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { trash } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
+import { siteLogo as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import icon from './icon';
 import useClientWidth from '../image/use-client-width';
 
 /**
@@ -59,13 +58,13 @@ const SiteLogo = ( {
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
-	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const { toggleSelection } = useDispatch( blockEditorStore );
 	const classes = classnames( {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
 	const { maxWidth, title } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
-		const siteEntities = select( 'core' ).getEditedEntityRecord(
+		const { getSettings } = select( blockEditorStore );
+		const siteEntities = select( coreStore ).getEditedEntityRecord(
 			'root',
 			'site'
 		);
@@ -142,6 +141,10 @@ const SiteLogo = ( {
 	// becomes available.
 	const maxWidthBuffer = maxWidth * 2.5;
 
+	// Set the default width to a responsible size.
+	// Note that this width is also set in the attached CSS file.
+	const defaultWidth = 120;
+
 	let showRightHandle = false;
 	let showLeftHandle = false;
 
@@ -174,7 +177,7 @@ const SiteLogo = ( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Site Logo Settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<RangeControl
 						label={ __( 'Image width' ) }
 						onChange={ ( newWidth ) =>
@@ -183,7 +186,7 @@ const SiteLogo = ( {
 						min={ minWidth }
 						max={ maxWidthBuffer }
 						initialPosition={ Math.min(
-							naturalWidth,
+							defaultWidth,
 							maxWidthBuffer
 						) }
 						value={ width || '' }
@@ -231,11 +234,11 @@ export default function LogoEdit( {
 	const [ error, setError ] = useState();
 	const ref = useRef();
 	const { mediaItemData, sitelogo, url } = useSelect( ( select ) => {
-		const siteSettings = select( 'core' ).getEditedEntityRecord(
+		const siteSettings = select( coreStore ).getEditedEntityRecord(
 			'root',
 			'site'
 		);
-		const mediaItem = select( 'core' ).getEntityRecord(
+		const mediaItem = select( coreStore ).getEntityRecord(
 			'root',
 			'media',
 			siteSettings.sitelogo
@@ -250,7 +253,7 @@ export default function LogoEdit( {
 		};
 	}, [] );
 
-	const { editEntityRecord } = useDispatch( 'core' );
+	const { editEntityRecord } = useDispatch( coreStore );
 	const setLogo = ( newValue ) =>
 		editEntityRecord( 'root', 'site', undefined, {
 			sitelogo: newValue,
@@ -280,35 +283,19 @@ export default function LogoEdit( {
 		setLogo( media.id.toString() );
 	};
 
-	const deleteLogo = () => {
-		setLogo( '' );
-		setLogoUrl( '' );
-	};
-
 	const onUploadError = ( message ) => {
 		setError( message[ 2 ] ? message[ 2 ] : null );
 	};
 
-	const controls = (
-		<BlockControls>
-			<ToolbarGroup>
-				{ logoUrl && (
-					<MediaReplaceFlow
-						mediaURL={ logoUrl }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						accept={ ACCEPT_MEDIA_STRING }
-						onSelect={ onSelectLogo }
-						onError={ onUploadError }
-					/>
-				) }
-				{ !! logoUrl && (
-					<ToolbarButton
-						icon={ trash }
-						onClick={ () => deleteLogo() }
-						label={ __( 'Delete Site Logo' ) }
-					/>
-				) }
-			</ToolbarGroup>
+	const controls = logoUrl && (
+		<BlockControls group="other">
+			<MediaReplaceFlow
+				mediaURL={ logoUrl }
+				allowedTypes={ ALLOWED_MEDIA_TYPES }
+				accept={ ACCEPT_MEDIA_STRING }
+				onSelect={ onSelectLogo }
+				onError={ onUploadError }
+			/>
 		</BlockControls>
 	);
 
@@ -358,16 +345,12 @@ export default function LogoEdit( {
 	);
 
 	const classes = classnames( className, {
-		'is-resized': !! width,
-		'is-focused': isSelected,
+		'is-default-size': ! width,
 	} );
-
-	const key = !! logoUrl;
 
 	const blockProps = useBlockProps( {
 		ref,
 		className: classes,
-		key,
 	} );
 
 	return (

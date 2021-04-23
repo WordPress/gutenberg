@@ -1,6 +1,8 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+## 3.10.0 (2021-03-17)
 
 ## 2.0.3 (2019-01-03)
 
@@ -12,15 +14,15 @@
 
 ### Breaking Changes
 
-- Inner blocks are now cast as arrays instead of objects.
-- JS and PHP parsers now behave consistently when parsing empty attributes.
+-   Inner blocks are now cast as arrays instead of objects.
+-   JS and PHP parsers now behave consistently when parsing empty attributes.
 
 ## 1.1.1 (2018-11-09)
 
 ## 1.1.0 (2018-11-09)
 
-- Add new list of HTML fragments to parse output.
-- Optimize JSON-attribute parsing.
+-   Add new list of HTML fragments to parse output.
+-   Optimize JSON-attribute parsing.
 
 ## 1.0.2 (2018-11-03)
 

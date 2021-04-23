@@ -8,6 +8,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { getBlockClientId, getBlockDOMNode } from '../../utils/dom';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Returns for the deepest node at the start or end of a container node. Ignores
@@ -41,16 +42,14 @@ function selector( select ) {
 		isMultiSelecting,
 		getMultiSelectedBlockClientIds,
 		hasMultiSelection,
-		getBlockParents,
 		getSelectedBlockClientId,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 
 	return {
 		isSelectionEnabled: isSelectionEnabled(),
 		isMultiSelecting: isMultiSelecting(),
 		multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 		hasMultiSelection: hasMultiSelection(),
-		getBlockParents,
 		selectedBlockClientId: getSelectedBlockClientId(),
 	};
 }
@@ -73,15 +72,15 @@ export default function useMultiSelection( ref ) {
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
-		getBlockParents,
 		selectedBlockClientId,
 	} = useSelect( selector, [] );
+	const { getBlockParents } = useSelect( blockEditorStore );
 	const {
 		startMultiSelect,
 		stopMultiSelect,
 		multiSelect,
 		selectBlock,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 	const rafId = useRef();
 	const startClientId = useRef();
 	const anchorElement = useRef();

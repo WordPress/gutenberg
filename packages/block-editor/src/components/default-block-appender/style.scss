@@ -24,9 +24,11 @@
 		outline: $border-width solid transparent;
 		transition: 0.2s outline;
 		@include reduce-motion("transition");
-		resize: none;
 		margin-top: $default-block-margin;
 		margin-bottom: $default-block-margin;
+
+		// This needs high specificity as it's output as an inline style by the library.
+		resize: none !important;
 
 		// Emulate the dimensions of a paragraph block.
 		// On mobile and in nested contexts, the plus to add blocks shows up on the right.

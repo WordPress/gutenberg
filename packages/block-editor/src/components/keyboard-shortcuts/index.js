@@ -13,6 +13,11 @@ import {
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 function KeyboardShortcuts() {
 	// Shortcuts Logic
 	const { clientIds, rootBlocksClientIds, rootClientId } = useSelect(
@@ -21,7 +26,7 @@ function KeyboardShortcuts() {
 				getSelectedBlockClientIds,
 				getBlockOrder,
 				getBlockRootClientId,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 			const selectedClientIds = getSelectedBlockClientIds();
 			const [ firstClientId ] = selectedClientIds;
 			return {
@@ -42,7 +47,7 @@ function KeyboardShortcuts() {
 		clearSelectedBlock,
 		moveBlocksUp,
 		moveBlocksDown,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 
 	// Moves selected block/blocks up
 	useShortcut(

@@ -32,7 +32,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( visualBlock ).toHaveLength( 1 );
 
 		// Change editing mode from "Visual" to "HTML".
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Edit as HTML' );
 
 		// Wait for the block to be converted to HTML editing mode.
@@ -42,7 +42,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 		expect( htmlBlock ).toHaveLength( 1 );
 
 		// Change editing mode from "HTML" back to "Visual".
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Edit visually' );
 
 		// This block should be in "visual" mode by default.
@@ -54,7 +54,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 	it( 'should display sidebar in HTML mode', async () => {
 		// Change editing mode from "Visual" to "HTML".
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Edit as HTML' );
 
 		// The font size picker for the paragraph block should appear, even in
@@ -67,7 +67,7 @@ describe( 'Editing modes (visual/HTML)', () => {
 
 	it( 'should update HTML in HTML mode when sidebar is used', async () => {
 		// Change editing mode from "Visual" to "HTML".
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Edit as HTML' );
 
 		// Make sure the paragraph content is rendered as expected.

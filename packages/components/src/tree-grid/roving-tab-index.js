@@ -11,7 +11,7 @@ import { RovingTabIndexProvider } from './roving-tab-index-context';
 /**
  * Provider for adding roving tab index behaviors to tree grid structures.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/components/src/tree-grid/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/components/src/tree-grid/README.md
  *
  * @param {Object}    props          Component props.
  * @param {WPElement} props.children Children to be rendered

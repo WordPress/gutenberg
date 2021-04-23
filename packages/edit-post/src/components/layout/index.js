@@ -17,14 +17,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
 	__experimentalLibrary as Library,
-	__unstableUseEditorStyles as useEditorStyles,
 } from '@wordpress/block-editor';
-import {
-	Button,
-	ScrollLock,
-	Popover,
-	__unstableUseDrop as useDrop,
-} from '@wordpress/components';
+import { Button, ScrollLock, Popover } from '@wordpress/components';
 import {
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
@@ -37,7 +31,7 @@ import {
 	InterfaceSkeleton,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { close } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
@@ -94,7 +88,9 @@ function Layout( { styles } ) {
 		isInserterOpened,
 		showIconLabels,
 		hasReducedUI,
+		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
+		const editorSettings = select( 'core/editor' ).getEditorSettings();
 		return {
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
@@ -112,8 +108,7 @@ function Layout( { styles } ) {
 			),
 			isInserterOpened: select( editPostStore ).isInserterOpened(),
 			mode: select( editPostStore ).getEditorMode(),
-			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
-				.richEditingEnabled,
+			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
@@ -128,6 +123,9 @@ function Layout( { styles } ) {
 			),
 			hasReducedUI: select( editPostStore ).isFeatureActive(
 				'reducedUI'
+			),
+			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
+				'showBlockBreadcrumbs'
 			),
 		};
 	}, [] );
@@ -169,10 +167,6 @@ function Layout( { styles } ) {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
-	const ref = useRef();
-
-	useDrop( ref );
-	useEditorStyles( ref, styles );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );
@@ -188,7 +182,6 @@ function Layout( { styles } ) {
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
 			<InterfaceSkeleton
-				ref={ ref }
 				className={ className }
 				labels={ interfaceLabels }
 				header={
@@ -218,11 +211,7 @@ function Layout( { styles } ) {
 								<Library
 									showMostUsedBlocks={ showMostUsedBlocks }
 									showInserterHelpPanel
-									onSelect={ () => {
-										if ( isMobileViewport ) {
-											setIsInserterOpened( false );
-										}
-									} }
+									shouldFocusBlock={ isMobileViewport }
 								/>
 							</div>
 						</div>
@@ -256,7 +245,7 @@ function Layout( { styles } ) {
 							<TextEditor />
 						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
-							<VisualEditor />
+							<VisualEditor styles={ styles } />
 						) }
 						<div className="edit-post-layout__metaboxes">
 							<MetaBoxes location="normal" />
@@ -269,6 +258,7 @@ function Layout( { styles } ) {
 				}
 				footer={
 					! hasReducedUI &&
+					showBlockBreadcrumbs &&
 					! isMobileViewport &&
 					isRichEditingEnabled &&
 					mode === 'visual' && (

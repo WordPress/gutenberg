@@ -21,12 +21,13 @@ import {
 	MENU_CONTENT_PAGES,
 	MENU_CONTENT_POSTS,
 } from './constants';
+import { store as editSiteStore } from '../../../store';
 
 export default function ContentNavigation( { onActivateMenu } ) {
 	const [ activeMenu, setActiveMenu ] = useState( 'root' );
 
 	const page = useSelect(
-		( select ) => select( 'core/edit-site' ).getPage(),
+		( select ) => select( editSiteStore ).getPage(),
 		[]
 	);
 

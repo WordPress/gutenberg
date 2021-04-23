@@ -1,18 +1,30 @@
 // Block Creation Components
-export { default as BlockAlignmentToolbar } from './block-alignment-toolbar';
+export {
+	BlockAlignmentControl,
+	BlockAlignmentToolbar,
+} from './block-alignment-control';
 export { BlockContextProvider } from './block-context';
-export { default as BlockControls } from './block-controls';
+export {
+	default as BlockControls,
+	BlockFormatControls,
+} from './block-controls';
 export { default as BlockEdit, useBlockEditContext } from './block-edit';
-export { default as BlockFormatControls } from './block-format-controls';
 export { default as BlockIcon } from './block-icon';
-export { default as BlockVerticalAlignmentToolbar } from './block-vertical-alignment-toolbar';
+export {
+	BlockVerticalAlignmentToolbar,
+	BlockVerticalAlignmentControl,
+} from './block-vertical-alignment-control';
 export * from './colors';
 export * from './gradients';
 export * from './font-sizes';
-export { default as AlignmentToolbar } from './alignment-toolbar';
+export { AlignmentControl, AlignmentToolbar } from './alignment-control';
 export { default as InnerBlocks } from './inner-blocks';
 export { default as InspectorAdvancedControls } from './inspector-advanced-controls';
 export { default as InspectorControls } from './inspector-controls';
+export {
+	JustifyToolbar,
+	JustifyContentControl,
+} from './justify-content-control';
 export { default as LineHeightControl } from './line-height-control';
 export { default as PlainText } from './plain-text';
 export {
@@ -26,6 +38,7 @@ export {
 	default as MediaUpload,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
+	MEDIA_TYPE_AUDIO,
 	MEDIA_TYPE_ANY,
 } from './media-upload';
 export { default as MediaUploadProgress } from './media-upload-progress';
@@ -46,11 +59,6 @@ export {
 export { default as VideoPlayer, VIDEO_ASPECT_RATIO } from './video-player';
 
 // Content Related Components
-export {
-	__experimentalPageTemplatePicker,
-	__experimentalWithPageTemplatePicker,
-	Preview,
-} from './page-template-picker';
 export { default as BlockList } from './block-list';
 export { default as BlockMover } from './block-mover';
 export { default as BlockToolbar } from './block-toolbar';

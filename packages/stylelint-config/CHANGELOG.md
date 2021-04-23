@@ -1,18 +1,23 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+## 19.0.0 (2021-01-21)
+
+### Breaking Change
+
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
+-   Increased minimum peer dependency of `stylelint` to `13.7.0`.
+
+### Bug Fixes
+
+-   Fixed deprecation warning for `declaration-property-unit-whitelist`.
 
 ## 18.0.0 (2021-01-05)
 
 ### Breaking Change
 
 -   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
--   Increased minimum peer dependency of `stylelint` to `13.7.0`.
--   Removed stylelint `^10.1.0`, `^11.0.0`, and `^12.0.0` as peer dependency.
-
-### Bug Fixes
-
--   Fixed deprecation warning for `declaration-property-unit-whitelist`.
 
 ### Internal
 
@@ -68,7 +73,7 @@
 
 ## 12.0.0 (2017-07-18)
 
--   Changed: `stylelint-config-wordpress` now extends [`stylelint-config-recommended`](https://github.com/stylelint/stylelint-config-recommended), which turns on the `at-rule-no-unknown`, `block-no-empty`, `comment-no-empty`, `declaration-block-no-ignored-properties`, `declaration-block-no-redundant-longhand-properties`, `font-family-no-duplicate-names`, `media-feature-name-no-unknown`, `no-empty-source` rule. These rules are part of stylelint's [possible errors](https://github.com/stylelint/stylelint/blob/master/docs/user-guide/rules.md#possible-errors) rules.
+-   Changed: `stylelint-config-wordpress` now extends [`stylelint-config-recommended`](https://github.com/stylelint/stylelint-config-recommended), which turns on the `at-rule-no-unknown`, `block-no-empty`, `comment-no-empty`, `declaration-block-no-ignored-properties`, `declaration-block-no-redundant-longhand-properties`, `font-family-no-duplicate-names`, `media-feature-name-no-unknown`, `no-empty-source` rule. These rules are part of stylelint's [possible errors](https://github.com/stylelint/stylelint/blob/HEAD/docs/user-guide/rules/list.md#possible-errors) rules.
 -   Removed: `stylelint-scss < 1.5.1` compatibility.
 -   Removed: Removed style guide docs.
 -   Removed: `at-rule-no-unknown` custom `ignoreAtRules` options in `stylelint-config-wordpress/scss` shared config.

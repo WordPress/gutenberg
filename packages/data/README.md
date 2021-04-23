@@ -385,7 +385,7 @@ configurations.
 _Parameters_
 
 -   _storeConfigs_ `Object`: Initial store configurations.
--   _parent_ `?Object`: Parent registry.
+-   _parent_ `Object?`: Parent registry.
 
 _Returns_
 
@@ -484,7 +484,7 @@ dispatch( 'my-shop' ).setPrice( 'hammer', 9.75 );
 
 _Parameters_
 
--   _storeNameOrDefinition_ `(string|WPDataStore)`: Unique namespace identifier for the store or the store definition.
+-   _storeNameOrDefinition_ `string|WPDataStore`: Unique namespace identifier for the store or the store definition.
 
 _Returns_
 
@@ -591,6 +591,29 @@ components via a consumer.
 See <a name="#RegistryConsumer">RegistryConsumer</a> documentation for
 example.
 
+<a name="resolveSelect" href="#resolveSelect">#</a> **resolveSelect**
+
+Given the name of a registered store, returns an object containing the store's
+selectors pre-bound to state so that you only need to supply additional arguments,
+and modified so that they return promises that resolve to their eventual values,
+after any resolvers have ran.
+
+_Usage_
+
+```js
+import { resolveSelect } from '@wordpress/data';
+
+resolveSelect( 'my-shop' ).getPrice( 'hammer' ).then(console.log)
+```
+
+_Parameters_
+
+-   _storeNameOrDefinition_ `string|WPDataStore`: Unique namespace identifier for the store or the store definition.
+
+_Returns_
+
+-   `Object`: Object containing the store's promise-wrapped selectors.
+
 <a name="select" href="#select">#</a> **select**
 
 Given the name or definition of a registered store, returns an object of the store's selectors.
@@ -607,7 +630,7 @@ select( 'my-shop' ).getPrice( 'hammer' );
 
 _Parameters_
 
--   _storeNameOrDefinition_ `(string|WPDataStore)`: Unique namespace identifier for the store or the store definition.
+-   _storeNameOrDefinition_ `string|WPDataStore`: Unique namespace identifier for the store or the store definition.
 
 _Returns_
 
@@ -688,7 +711,7 @@ const SaleButton = ( { children } ) => {
 
 _Parameters_
 
--   _storeNameOrDefinition_ `[(string|WPDataStore)]`: Optionally provide the name of the store or its definition from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
+-   _storeNameOrDefinition_ `[string|WPDataStore]`: Optionally provide the name of the store or its definition from which to retrieve action creators. If not provided, the registry.dispatch function is returned instead.
 
 _Returns_
 
@@ -770,9 +793,28 @@ any price in the state for that currency is retrieved. If the currency prop
 doesn't change and other props are passed in that do change, the price will
 not change because the dependency is just the currency.
 
+When data is only used in an event callback, the data should not be retrieved
+on render, so it may be useful to get the selectors function instead.
+
+**Don't use `useSelect` this way when calling the selectors in the render
+function because your component won't re-render on a data change.**
+
+```js
+import { useSelect } from '@wordpress/data';
+
+function Paste( { children } ) {
+  const { getSettings } = useSelect( 'my-shop' );
+  function onPaste() {
+    // Do something with the settings.
+    const settings = getSettings();
+  }
+  return <div onPaste={ onPaste }>{ children }</div>;
+}
+```
+
 _Parameters_
 
--   _\_mapSelect_ `Function`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument.
+-   _\_mapSelect_ `Function|WPDataStore|string`: Function called on every state change. The returned value is exposed to the component implementing this hook. The function receives the `registry.select` method on the first argument and the `registry` on the second argument. When a store key is passed, all selectors for the store will be returned. This is only meant for usage of these selectors in event callbacks, not for data needed to create the element tree.
 -   _deps_ `Array`: If provided, this memoizes the mapSelect so the same `mapSelect` is invoked on every state change unless the dependencies change.
 
 _Returns_

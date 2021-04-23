@@ -18,6 +18,7 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  */
 import BlockInsertionPoint from '../block-list/insertion-point';
 import styles from './style.scss';
+import { store as blockEditorStore } from '../../store';
 
 export function DefaultBlockAppender( {
 	isLocked,
@@ -62,7 +63,7 @@ export default compose(
 			getBlockName,
 			isBlockValid,
 			getTemplateLock,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
 		const isLastBlockDefault =
@@ -77,7 +78,7 @@ export default compose(
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
 		const { insertDefaultBlock, startTyping } = dispatch(
-			'core/block-editor'
+			blockEditorStore
 		);
 
 		return {

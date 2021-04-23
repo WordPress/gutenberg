@@ -9,6 +9,7 @@ import { Button } from '@wordpress/components';
  * Internal dependencies
  */
 import { getBlockDOMNode } from '../../utils/dom';
+import { store as blockEditorStore } from '../../store';
 
 const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 	const onClick = () => {
@@ -19,23 +20,21 @@ const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
 		selectedBlockElement.focus();
 	};
 
-	return (
-		selectedBlockClientId && (
-			<Button
-				isSecondary
-				className="block-editor-skip-to-selected-block"
-				onClick={ onClick }
-			>
-				{ __( 'Skip to the selected block' ) }
-			</Button>
-		)
-	);
+	return selectedBlockClientId ? (
+		<Button
+			isSecondary
+			className="block-editor-skip-to-selected-block"
+			onClick={ onClick }
+		>
+			{ __( 'Skip to the selected block' ) }
+		</Button>
+	) : null;
 };
 
 export default withSelect( ( select ) => {
 	return {
 		selectedBlockClientId: select(
-			'core/block-editor'
+			blockEditorStore
 		).getBlockSelectionStart(),
 	};
 } )( SkipToSelectedBlock );

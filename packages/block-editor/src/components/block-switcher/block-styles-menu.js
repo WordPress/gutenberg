@@ -5,7 +5,11 @@ import { __ } from '@wordpress/i18n';
 import { MenuGroup } from '@wordpress/components';
 import { useState } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
-import { cloneBlock, getBlockFromExample } from '@wordpress/blocks';
+import {
+	cloneBlock,
+	getBlockFromExample,
+	store as blocksStore,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -13,13 +17,11 @@ import { cloneBlock, getBlockFromExample } from '@wordpress/blocks';
 import BlockStyles from '../block-styles';
 import PreviewBlockPopover from './preview-block-popover';
 
-export default function BlockStylesMenu( {
-	hoveredBlock: { name, clientId },
-	onSwitch,
-} ) {
+export default function BlockStylesMenu( { hoveredBlock, onSwitch } ) {
+	const { name, clientId } = hoveredBlock;
 	const [ hoveredClassName, setHoveredClassName ] = useState();
 	const blockType = useSelect(
-		( select ) => select( 'core/blocks' ).getBlockType( name ),
+		( select ) => select( blocksStore ).getBlockType( name ),
 		[ name ]
 	);
 
@@ -39,7 +41,7 @@ export default function BlockStylesMenu( {
 									},
 									innerBlocks: blockType.example.innerBlocks,
 							  } )
-							: cloneBlock( blockType, {
+							: cloneBlock( hoveredBlock, {
 									className: hoveredClassName,
 							  } )
 					}

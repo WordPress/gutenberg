@@ -2,13 +2,11 @@
 	"apiVersion": 2,
 	"name": "core/post-content",
 	"category": "design",
-	"usesContext": [
-		"postId",
-		"postType"
-	],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"align": [ "wide", "full" ],
-		"html": false
+		"html": false,
+		"__experimentalLayout": true
 	},
 	"editorStyle": "wp-block-post-content-editor"
 }

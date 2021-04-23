@@ -18,63 +18,27 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 	$page_key = isset( $block->context['queryId'] ) ? 'query-' . $block->context['queryId'] . '-page' : 'query-page';
 	$page     = empty( $_GET[ $page_key ] ) ? 1 : filter_var( $_GET[ $page_key ], FILTER_VALIDATE_INT );
 
-	$query = array(
-		'post_type'    => 'post',
-		'offset'       => 0,
-		'order'        => 'DESC',
-		'orderby'      => 'date',
-		'post__not_in' => array(),
-	);
-
-	if ( isset( $block->context['query'] ) ) {
-		if ( isset( $block->context['query']['postType'] ) ) {
-			$query['post_type'] = $block->context['query']['postType'];
-		}
-		if ( isset( $block->context['query']['sticky'] ) && ! empty( $block->context['query']['sticky'] ) ) {
-			$sticky = get_option( 'sticky_posts' );
-			if ( 'only' === $block->context['query']['sticky'] ) {
-				$query['post__in'] = $sticky;
-			} else {
-				$query['post__not_in'] = array_merge( $query['post__not_in'], $sticky );
-			}
-		}
-		if ( isset( $block->context['query']['exclude'] ) ) {
-			$query['post__not_in'] = array_merge( $query['post__not_in'], $block->context['query']['exclude'] );
-		}
-		if ( isset( $block->context['query']['perPage'] ) ) {
-			$query['offset']         = ( $block->context['query']['perPage'] * ( $page - 1 ) ) + $block->context['query']['offset'];
-			$query['posts_per_page'] = $block->context['query']['perPage'];
-		}
-		if ( isset( $block->context['query']['categoryIds'] ) ) {
-			$query['category__in'] = $block->context['query']['categoryIds'];
-		}
-		if ( isset( $block->context['query']['tagIds'] ) ) {
-			$query['tag__in'] = $block->context['query']['tagIds'];
-		}
-		if ( isset( $block->context['query']['order'] ) ) {
-			$query['order'] = strtoupper( $block->context['query']['order'] );
-		}
-		if ( isset( $block->context['query']['orderBy'] ) ) {
-			$query['orderby'] = $block->context['query']['orderBy'];
-		}
-		if ( isset( $block->context['query']['author'] ) ) {
-			$query['author'] = $block->context['query']['author'];
-		}
-		if ( isset( $block->context['query']['search'] ) ) {
-			$query['s'] = $block->context['query']['search'];
-		}
-	}
-
+	$query_args = construct_wp_query_args( $block, $page );
 	// Override the custom query with the global query if needed.
 	$use_global_query = ( isset( $block->context['query']['inherit'] ) && $block->context['query']['inherit'] );
 	if ( $use_global_query ) {
 		global $wp_query;
 		if ( $wp_query && isset( $wp_query->query_vars ) && is_array( $wp_query->query_vars ) ) {
-			$query = wp_parse_args( $wp_query->query_vars, $query );
+			// Unset `offset` because if is set, $wp_query overrides/ignores the paged parameter and breaks pagination.
+			unset( $query_args['offset'] );
+			$query_args = wp_parse_args( $wp_query->query_vars, $query_args );
+
+			if ( empty( $query_args['post_type'] ) && is_singular() ) {
+				$query_args['post_type'] = get_post_type( get_the_ID() );
+			}
 		}
 	}
 
-	$posts = get_posts( $query );
+	$query = new WP_Query( $query_args );
+
+	if ( ! $query->have_posts() ) {
+		return '';
+	}
 
 	$classnames = '';
 	if ( isset( $block->context['layout'] ) && isset( $block->context['query'] ) ) {
@@ -86,18 +50,22 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
 
 	$content = '';
-	foreach ( $posts as $post ) {
+	while ( $query->have_posts() ) {
+		$query->the_post();
 		$block_content = (
 			new WP_Block(
 				$block->parsed_block,
 				array(
-					'postType' => $post->post_type,
-					'postId'   => $post->ID,
+					'postType' => get_post_type(),
+					'postId'   => get_the_ID(),
 				)
 			)
 		)->render( array( 'dynamic' => false ) );
 		$content      .= "<li>{$block_content}</li>";
 	}
+
+	wp_reset_postdata();
+
 	return sprintf(
 		'<ul %1$s>%2$s</ul>',
 		$wrapper_attributes,

@@ -47,6 +47,7 @@ Options:
 --category <name>            category name for the block
 --wp-scripts                 enable integration with `@wordpress/scripts` package
 --no-wp-scripts              disable integration with `@wordpress/scripts` package
+--wp-env                     enable integration with `@wordpress/env` package
 -h, --help                   output usage information
 ```
 
@@ -89,10 +90,10 @@ $ npm run build
 Builds the code for production. [Learn more](/packages/scripts#build).
 
 ```bash
-$ npm run format:js
+$ npm run format
 ```
 
-Formats JavaScript files. [Learn more](/packages/scripts#format-js).
+Formats files. [Learn more](/packages/scripts#format).
 
 ```bash
 $ npm run lint:css
@@ -120,17 +121,39 @@ Since version `0.19.0` it is possible to use external templates hosted on npm. T
 
 ### Template Configuration
 
-It is mandatory to provide the main file for the package that returns a configuration object. It must containing at least `templatesPath` field with the path pointing to the location where template files live (nested folders are also supported).
+It is mandatory to provide the main file (`index.js` by default) for the package that returns a configuration object. It must contain at least the `templatesPath` field.
+
+#### `templatesPath`
+
+A mandatory field with the path pointing to the location where template files live (nested folders are also supported). All files without the `.mustache` extension will be ignored.
 
 _Example:_
 
 ```js
+const { join } = require( 'path' );
+
 module.exports = {
-	templatesPath: __dirname,
+	templatesPath: join( __dirname, 'templates' ),
 };
 ```
 
-It is also possible to override the default template configuration using the `defaultValues` field.
+#### `assetsPath`
+
+This setting is useful when your template scaffolds a block that uses static assets like images or fonts, which should not be processed. It provides the path pointing to the location where assets are located. They will be copied to the `assets` subfolder in the generated plugin.
+
+_Example:_
+
+```js
+const { join } = require( 'path' );
+
+module.exports = {
+	assetsPath: join( __dirname, 'assets' ),
+};
+```
+
+#### `defaultValues`
+
+It is possible to override the default template configuration using the `defaultValues` field.
 
 _Example:_
 
@@ -148,18 +171,21 @@ module.exports = {
 
 The following configurable variables are used with the template files. Template authors can change default values to use when users don't provide their data:
 
--   `apiVersion` (default: `2`)
+-   `apiVersion` (default: `2`) - see https://make.wordpress.org/core/2020/11/18/block-api-version-2/.
 -   `slug` (no default)
 -   `namespace` (default: `'create-block'`)
--   `title` (no default)
--   `description` (no default)
--   `dashicon` (no default)
--   `category` (default: `'widgets'`)
+-   `title` (no default) - a display title for your block.
+-   `description` (no default) - a short description for your block.
+-   `dashicon` (no default) - an icon property thats makes it easier to identify a block, see https://developer.wordpress.org/resource/dashicons/.
+-   `category` (default: `'widgets'`) - blocks are grouped into categories to help users browse and discover them. The categories provided by core are `text`, `media`, `design`, `widgets`, `theme`, and `embed`.
+-   `attributes` (no default) - see https://developer.wordpress.org/block-editor/developers/block-api/block-attributes/.
+-   `supports` (no default) - optional block extended support features, see https://developer.wordpress.org/block-editor/developers/block-api/block-supports/.
 -   `author` (default: `'The WordPress Contributors'`)
 -   `license` (default: `'GPL-2.0-or-later'`)
 -   `licenseURI` (default: `'https://www.gnu.org/licenses/gpl-2.0.html'`)
 -   `version` (default: `'0.1.0'`)
 -   `wpScripts` (default: `true`)
+-   `wpEnv` (default: `false`)
 -   `npmDependencies` (default: `[]`) – the list of remote npm packages to be installed in the project with [`npm install`](https://docs.npmjs.com/cli/v6/commands/npm-install).
 -   `editorScript` (default: `'file:./build/index.js'`)
 -   `editorStyle` (default: `'file:./build/index.css'`)

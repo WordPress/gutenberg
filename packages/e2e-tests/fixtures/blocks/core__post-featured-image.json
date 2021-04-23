@@ -1,12 +1,12 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/post-featured-image",
-        "isValid": true,
-        "attributes": {
-            "isLink": false
-        },
-        "innerBlocks": [],
-        "originalContent": ""
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/post-featured-image",
+		"isValid": true,
+		"attributes": {
+			"isLink": false
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
 ]

@@ -8,6 +8,11 @@ import jsdomLevel1Core from 'jsdom-jscore-rn/lib/jsdom/level1/core';
 import 'react-native-url-polyfill/auto';
 
 /**
+ * Babel polyfills
+ */
+import 'core-js/features/array/flat-map';
+
+/**
  * WordPress dependencies
  */
 import { nativeLoggingHook } from '@wordpress/react-native-bridge';

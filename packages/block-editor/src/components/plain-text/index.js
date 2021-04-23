@@ -15,7 +15,7 @@ import { forwardRef } from '@wordpress/element';
 import EditableText from '../editable-text';
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/plain-text/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/plain-text/README.md
  */
 const PlainText = forwardRef( ( { __experimentalVersion, ...props }, ref ) => {
 	if ( __experimentalVersion === 2 ) {

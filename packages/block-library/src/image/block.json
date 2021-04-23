@@ -71,7 +71,15 @@
 		}
 	},
 	"supports": {
-		"anchor": true
+		"anchor": true,
+		"color": {
+			"__experimentalDuotone": "img",
+			"text": false,
+			"background": false
+		},
+		"__experimentalBorder": {
+			"radius": true
+		}
 	},
 	"editorStyle": "wp-block-image-editor",
 	"style": "wp-block-image"

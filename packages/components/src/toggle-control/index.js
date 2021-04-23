@@ -21,6 +21,7 @@ export default function ToggleControl( {
 	help,
 	className,
 	onChange,
+	disabled,
 } ) {
 	function onChangeToggle( event ) {
 		onChange( event.target.checked );
@@ -45,6 +46,7 @@ export default function ToggleControl( {
 				checked={ checked }
 				onChange={ onChangeToggle }
 				aria-describedby={ describedBy }
+				disabled={ disabled }
 			/>
 			<label htmlFor={ id } className="components-toggle-control__label">
 				{ label }

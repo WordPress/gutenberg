@@ -22,6 +22,10 @@ figure.wp-block-image:not(.wp-block) {
 		margin-top: -9px;
 		margin-left: -9px;
 	}
+
+	&:not(.is-style-rounded) > div {
+		border-radius: inherit;
+	}
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.

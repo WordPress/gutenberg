@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+    - name: General help request
+      url: https://wordpress.org/support/forum/how-to-and-troubleshooting/
+      about: For general help requests, create a new topic in the Fixing WordPress support forum
+    - name: Technical help request
+      url: https://wordpress.org/support/forum/wp-advanced/
+      about: For more technical help requests, create a new topic in the Developing with WordPress Forum
+    - name: Development help request
+      url: https://wordpress.stackexchange.com/
+      about: For questions about WordPress development, ask a question in the WordPress Development Stack Exchange

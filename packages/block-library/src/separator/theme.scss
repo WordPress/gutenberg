@@ -7,7 +7,7 @@
 
 	// Default, thin style
 	&:not(.is-style-wide):not(.is-style-dots) {
-		max-width: 100px;
+		width: 100px;
 	}
 
 	&.has-background:not(.is-style-dots) {

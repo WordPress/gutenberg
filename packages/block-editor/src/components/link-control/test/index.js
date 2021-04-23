@@ -1168,7 +1168,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			// This is a Notice component
 			// we allow selecting by className here as an edge case because the
 			// a11y is handled via `speak`.
-			// See: https://github.com/WordPress/gutenberg/tree/master/packages/a11y#speak.
+			// See: https://github.com/WordPress/gutenberg/tree/HEAD/packages/a11y#speak.
 			const errorNotice = container.querySelector(
 				'.block-editor-link-control__search-error'
 			);

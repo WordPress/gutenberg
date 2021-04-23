@@ -60,6 +60,7 @@ $toggle-border-width: 1px;
 	}
 
 	// Disabled state:
+	&.is-disabled,
 	.components-disabled & {
 		opacity: 0.3;
 	}
