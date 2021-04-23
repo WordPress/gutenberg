@@ -24,4 +24,4 @@ function gutenberg_load_block_page_templates( $templates ) {
 
 	return $templates;
 }
-add_filter( 'theme_templates', 'gutenberg_load_block_page_templates', 10, 4 );
+add_filter( 'theme_templates', 'gutenberg_load_block_page_templates' );
