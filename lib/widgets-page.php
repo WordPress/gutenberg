@@ -41,6 +41,8 @@ function gutenberg_widgets_init( $hook ) {
 		return;
 	}
 
+	add_filter( 'admin_body_class', 'gutenberg_widgets_editor_add_admin_body_classes' );
+
 	$settings = array_merge(
 		gutenberg_get_default_block_editor_settings(),
 		gutenberg_get_legacy_widget_settings()
@@ -91,14 +93,15 @@ function gutenberg_widgets_editor_load_block_editor_scripts_and_styles( $is_bloc
 add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_editor_load_block_editor_scripts_and_styles' );
 
 /**
- * Show responsive embeds correctly on the widgets screen by adding the wp-embed-responsive class.
+ * Adds admin classes necessary for the block-based widgets screen.
+ *
+ * - Adds `block-editor-page` editor body class to allow directly styling the admin pages that are based on the block editor.
+ * - Shows responsive embeds correctly on the widgets screen by adding the `wp-embed-responsive` class.
  *
  * @param string $classes existing admin body classes.
  *
- * @return string admin body classes including the wp-embed-responsive class.
+ * @return string admin body classes including the `block-editor-page` and `wp-embed-responsive` classes.
  */
-function gutenberg_widgets_editor_add_responsive_embed_body_class( $classes ) {
-	return "$classes wp-embed-responsive";
+function gutenberg_widgets_editor_add_admin_body_classes( $classes ) {
+	return "$classes block-editor-page wp-embed-responsive";
 }
-
-add_filter( 'admin_body_class', 'gutenberg_widgets_editor_add_responsive_embed_body_class' );
