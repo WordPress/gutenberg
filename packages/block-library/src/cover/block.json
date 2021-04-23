@@ -56,6 +56,11 @@
 		"html": false,
 		"spacing": {
 			"padding": true
+		},
+		"color": {
+			"__experimentalDuotone": "> .wp-block-cover__image-background, > .wp-block-cover__video-background",
+			"text": false,
+			"background": false
 		}
 	},
 	"editorStyle": "wp-block-cover-editor",
