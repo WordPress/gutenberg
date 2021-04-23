@@ -308,7 +308,7 @@ export class BlockList extends Component {
 						const offset = data
 							.slice( 0, index + 1 )
 							.reduce(
-								( acc, id, i ) =>
+								( acc, id ) =>
 									heights[ id ] && heights[ id ] > 0
 										? acc + heights[ id ]
 										: acc + ITEM_HEIGHT,
