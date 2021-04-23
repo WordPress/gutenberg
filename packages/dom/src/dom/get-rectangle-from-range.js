@@ -15,18 +15,38 @@ export default function getRectangleFromRange( range ) {
 	// range; this a rectangle enclosing the union of the bounding rectangles
 	// for all the elements in the range.
 	if ( ! range.collapsed ) {
+		const rects = Array.from( range.getClientRects() );
+
+		// If there's just a single rect, return it.
+		if ( rects.length === 1 ) {
+			return rects[ 0 ];
+		}
+
 		// Ignore tiny selection at the edge of a range.
-		const rects = Array.from( range.getClientRects() ).filter(
-			( { width } ) => width > 1
-		);
-		const furthestTop = Math.min( ...rects.map( ( { top } ) => top ) );
-		const furthestBottom = Math.max(
-			...rects.map( ( { bottom } ) => bottom )
-		);
-		const furthestLeft = Math.min( ...rects.map( ( { left } ) => left ) );
-		const furthestRight = Math.max(
-			...rects.map( ( { right } ) => right )
-		);
+		const filteredRects = rects.filter( ( { width } ) => width > 1 );
+
+		// If it's full of tiny selections, return browser default.
+		if ( filteredRects.length === 0 ) {
+			return range.getBoundingClientRect();
+		}
+
+		if ( filteredRects.length === 1 ) {
+			return filteredRects[ 0 ];
+		}
+
+		let {
+			top: furthestTop,
+			bottom: furthestBottom,
+			left: furthestLeft,
+			right: furthestRight,
+		} = filteredRects[ 0 ];
+
+		for ( const { top, bottom, left, right } of filteredRects ) {
+			if ( top < furthestTop ) furthestTop = top;
+			if ( bottom > furthestBottom ) furthestBottom = bottom;
+			if ( left < furthestLeft ) furthestLeft = left;
+			if ( right > furthestRight ) furthestRight = right;
+		}
 
 		return new window.DOMRect(
 			furthestLeft,
