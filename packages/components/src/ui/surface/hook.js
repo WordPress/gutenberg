@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { useContextSystem } from '@wp-g2/context';
 import { css, cx, ui } from '@wp-g2/styles';
 
 /**
@@ -12,6 +11,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { useContextSystem } from '../context';
 import * as styles from './styles';
 
 /**

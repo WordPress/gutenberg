@@ -32,7 +32,7 @@ export function useControlLabel( props ) {
 	const htmlFor = useFormGroupContextId( htmlForProp );
 	const classes = cx(
 		styles.ControlLabel,
-		styles[ size ],
+		styles[ /** @type {'small' | 'medium' | 'large'} */ ( size ) ],
 		className,
 		isBlock ? styles.block : styles.inline
 	);

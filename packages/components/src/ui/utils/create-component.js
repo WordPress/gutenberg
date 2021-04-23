@@ -1,21 +1,21 @@
 /**
  * External dependencies
  */
-import { contextConnect } from '@wp-g2/context';
 import { identity } from 'lodash';
 
 /**
  * Internal dependencies
  */
+import { contextConnect } from '../context';
 import { View } from '../view';
 
 /**
  * Factory that creates a React component.
  *
  * @template {import('reakit-utils/types').As} T
- * @template {import('@wp-g2/create-styles').ViewOwnProps<{}, T>} P
+ * @template {import('../context').ViewOwnProps<{}, T>} P
  * @param {import('./types').Options<T, P>} options Options to customize the component.
- * @return {import('@wp-g2/create-styles').PolymorphicComponent<T, import('@wp-g2/create-styles').PropsFromViewOwnProps<P>>} New React component.
+ * @return {import('../context').PolymorphicComponent<T, import('../context').PropsFromViewOwnProps<P>>} New React component.
  */
 /* eslint-disable jsdoc/no-undefined-types */
 export const createComponent = ( {
