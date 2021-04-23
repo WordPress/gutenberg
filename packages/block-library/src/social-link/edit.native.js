@@ -23,7 +23,7 @@ import { withSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { GetIconBySite, GetNameBySite } from './social-list';
+import { useServiceIcon, useServiceName } from './social-list';
 import styles from './editor.scss';
 
 const ANIMATION_DELAY = 300;
@@ -65,8 +65,8 @@ const SocialLinkEdit = ( {
 
 	const animatedValue = useRef( new Animated.Value( 0 ) ).current;
 
-	const IconComponent = GetIconBySite( service );
-	const socialLinkName = GetNameBySite( service );
+	const IconComponent = useServiceIcon( service );
+	const socialLinkName = useServiceName( service );
 
 	// When new social icon is added link sheet is opened automatically
 	useEffect( () => {

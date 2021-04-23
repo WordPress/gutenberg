@@ -22,7 +22,7 @@ import { ChainIcon } from './icons';
  *
  * @return {WPComponent} Icon component for social service.
  */
-export const GetIconBySite = ( name ) => {
+export const useServiceIcon = ( name ) => {
 	const variations = useSelect( ( select ) => {
 		const { getBlockVariations } = select( blocksStore );
 		return getBlockVariations( 'core/social-link', 'block' );
@@ -38,7 +38,7 @@ export const GetIconBySite = ( name ) => {
  *
  * @return {string} Display name for social service
  */
-export const GetNameBySite = ( name ) => {
+export const useServiceName = ( name ) => {
 	const variations = useSelect( ( select ) => {
 		const { getBlockVariations } = select( blocksStore );
 		return getBlockVariations( 'core/social-link', 'block' );
