@@ -20,7 +20,10 @@ export function useHasTypographyPanel( { supports, name } ) {
 	const hasFontAppearance = useHasAppearanceControl( { supports, name } );
 	const hasLetterSpacing = useHasLetterSpacingControl( { supports, name } );
 	return (
-		hasLineHeight || hasFontAppearance || hasLetterSpacing || supports.includes( 'fontSize' )
+		hasLineHeight ||
+		hasFontAppearance ||
+		hasLetterSpacing ||
+		supports.includes( 'fontSize' )
 	);
 }
 
@@ -67,7 +70,10 @@ export default function TypographyPanel( {
 		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
 	const hasAppearanceControl = useHasAppearanceControl( { supports, name } );
-	const hasLetterSpacingControl = useHasLetterSpacingControl( { supports, name } );
+	const hasLetterSpacingControl = useHasLetterSpacingControl( {
+		supports,
+		name
+	} );
 
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
@@ -119,7 +125,7 @@ export default function TypographyPanel( {
 						setStyle( name, 'letterSpacing', value )
 					}
 				/>
-			)}
+			) }
 		</PanelBody>
 	);
 }
