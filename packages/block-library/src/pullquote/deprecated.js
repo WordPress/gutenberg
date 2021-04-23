@@ -146,26 +146,30 @@ const deprecated = [
 			...attributes
 		} ) {
 			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+			let style;
 
-			const style = {};
 			if ( customMainColor ) {
 				if ( ! isSolidColorStyle ) {
 					// Block supports: Set style.border.color if a deprecated block has a default style and a `customMainColor` attribute.
-					style.border = {
-						color: customMainColor,
+					style = {
+						border: {
+							color: customMainColor,
+						},
 					};
 				} else {
 					// Block supports: Set style.color.background if a deprecated block has a solid style and a `customMainColor` attribute.
-					style.color = {
-						background: customMainColor,
+					style = {
+						color: {
+							background: customMainColor,
+						},
 					};
 				}
 			}
 
 			// Block supports: Set style.color.text if a deprecated block has a `customTextColor` attribute.
-			if ( customTextColor ) {
+			if ( customTextColor && style ) {
 				style.color = {
-					...style?.color,
+					...style.color,
 					text: customTextColor,
 				};
 			}
@@ -273,11 +277,45 @@ const deprecated = [
 				</figure>
 			);
 		},
-		migrate( { className, figureStyle, mainColor, ...attributes } ) {
+		migrate( {
+			className,
+			figureStyle,
+			mainColor,
+			customMainColor,
+			customTextColor,
+			...attributes
+		} ) {
 			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+			let style;
+
+			if ( customMainColor ) {
+				if ( ! isSolidColorStyle ) {
+					// Block supports: Set style.border.color if a deprecated block has a default style and a `customMainColor` attribute.
+					style = {
+						border: {
+							color: customMainColor,
+						},
+					};
+				} else {
+					// Block supports: Set style.color.background if a deprecated block has a solid style and a `customMainColor` attribute.
+					style = {
+						color: {
+							background: customMainColor,
+						},
+					};
+				}
+			}
+
+			// Block supports: Set style.color.text if a deprecated block has a `customTextColor` attribute.
+			if ( customTextColor && style ) {
+				style.color = {
+					...style.color,
+					text: customTextColor,
+				};
+			}
 			// If is the default style, and a main color is set,
-			// migrate the main color value into a custom color.
-			// The custom color value is retrieved by parsing the figure styles.
+			// migrate the main color value into a custom border color.
+			// The custom border color value is retrieved by parsing the figure styles.
 			if ( ! isSolidColorStyle && mainColor && figureStyle ) {
 				const borderColor = parseBorderColor( figureStyle );
 				if ( borderColor ) {
@@ -290,13 +328,14 @@ const deprecated = [
 								color: borderColor,
 							},
 						},
-						customMainColor: borderColor,
 					};
 				}
 			}
 			return {
 				className,
-				mainColor,
+				backgroundColor: isSolidColorStyle ? mainColor : undefined,
+				borderColor: isSolidColorStyle ? undefined : mainColor,
+				style,
 				...attributes,
 			};
 		},
@@ -378,6 +417,50 @@ const deprecated = [
 					</blockquote>
 				</figure>
 			);
+		},
+		migrate( {
+			className,
+			mainColor,
+			customMainColor,
+			customTextColor,
+			...attributes
+		} ) {
+			const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+			let style = {};
+
+			if ( customMainColor ) {
+				if ( ! isSolidColorStyle ) {
+					// Block supports: Set style.border.color if a deprecated block has a default style and a `customMainColor` attribute.
+					style = {
+						border: {
+							color: customMainColor,
+						},
+					};
+				} else {
+					// Block supports: Set style.color.background if a deprecated block has a solid style and a `customMainColor` attribute.
+					style = {
+						color: {
+							background: customMainColor,
+						},
+					};
+				}
+			}
+
+			// Block supports: Set style.color.text if a deprecated block has a `customTextColor` attribute.
+			if ( customTextColor && style ) {
+				style.color = {
+					...style.color,
+					text: customTextColor,
+				};
+			}
+
+			return {
+				className,
+				backgroundColor: isSolidColorStyle ? mainColor : undefined,
+				borderColor: isSolidColorStyle ? undefined : mainColor,
+				style,
+				...attributes,
+			};
 		},
 	},
 	{
