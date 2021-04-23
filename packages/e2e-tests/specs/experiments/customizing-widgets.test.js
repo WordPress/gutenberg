@@ -6,6 +6,8 @@ import {
 	activateTheme,
 	deactivatePlugin,
 	visitAdminPage,
+	showBlockToolbar,
+	clickBlockToolbarButton,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -181,6 +183,211 @@ describe( 'Widgets screen', () => {
 				root: frameContentDocument,
 			}
 		);
+	} );
+
+	it( 'should open the inspector panel', async () => {
+		const widgetsPanel = await find( {
+			role: 'heading',
+			name: /Widgets/,
+			level: 3,
+		} );
+		await widgetsPanel.click();
+
+		const footer1Section = await find( {
+			role: 'heading',
+			name: /Footer #1/,
+			level: 3,
+		} );
+		await footer1Section.click();
+
+		const emptyBlock = await find( {
+			role: 'button',
+			name: 'Add block',
+			value: 'Type / to choose a block',
+		} );
+		await emptyBlock.focus();
+
+		await page.keyboard.type( 'First Paragraph' );
+
+		await showBlockToolbar();
+		await clickBlockToolbarButton( 'Options' );
+		let showMoreSettingsButton = await find( {
+			role: 'menuitem',
+			name: 'Show more settings',
+		} );
+		await showMoreSettingsButton.click();
+
+		const backButton = await find( {
+			role: 'button',
+			name: 'Back',
+			focused: true,
+		} );
+		await expect( backButton ).toHaveFocus();
+
+		// Expect the inspector panel to be found.
+		let inspectorHeading = await find( {
+			role: 'heading',
+			name: 'Customizing ▸ Widgets ▸ Footer #1 Block Settings',
+			level: 3,
+		} );
+
+		// Expect the block title to be found.
+		await find( {
+			role: 'heading',
+			name: 'Paragraph',
+			level: 2,
+		} );
+
+		await backButton.click();
+
+		// Go back to the widgets editor.
+		await find( {
+			role: 'heading',
+			name: 'Customizing ▸ Widgets Footer #1',
+			level: 3,
+		} );
+
+		await expect( inspectorHeading ).not.toBeVisible();
+
+		await clickBlockToolbarButton( 'Options' );
+		showMoreSettingsButton = await find( {
+			role: 'menuitem',
+			name: 'Show more settings',
+		} );
+		await showMoreSettingsButton.click();
+
+		// Expect the inspector panel to be found.
+		inspectorHeading = await find( {
+			role: 'heading',
+			name: 'Customizing ▸ Widgets ▸ Footer #1 Block Settings',
+			level: 3,
+		} );
+
+		// Press Escape to close the inspector panel.
+		await page.keyboard.press( 'Escape' );
+
+		// Go back to the widgets editor.
+		await find( {
+			role: 'heading',
+			name: 'Customizing ▸ Widgets Footer #1',
+			level: 3,
+		} );
+
+		await expect( inspectorHeading ).not.toBeVisible();
+	} );
+
+	it( 'should handle the inserter outer section', async () => {
+		const widgetsPanel = await find( {
+			role: 'heading',
+			name: /Widgets/,
+			level: 3,
+		} );
+		await widgetsPanel.click();
+
+		const footer1Section = await find( {
+			role: 'heading',
+			name: /^Footer #1/,
+			level: 3,
+		} );
+		await footer1Section.click();
+
+		const emptyBlock = await find( {
+			role: 'button',
+			name: 'Add block',
+			value: 'Type / to choose a block',
+		} );
+		await emptyBlock.focus();
+
+		// We need to make some changes for the publish settings to appear.
+		await page.keyboard.type( 'First Paragraph' );
+
+		const documentTools = await find( {
+			role: 'toolbar',
+			name: 'Document tools',
+		} );
+
+		// Open the inserter outer section.
+		const addBlockButton = await find(
+			{
+				role: 'button',
+				name: 'Add block',
+			},
+			{ root: documentTools }
+		);
+		await addBlockButton.click();
+
+		// Expect the inserter outer section to be found.
+		await find( {
+			role: 'heading',
+			name: 'Add a block',
+			level: 2,
+		} );
+
+		// Expect to close the inserter outer section when pressing Escape.
+		await page.keyboard.press( 'Escape' );
+
+		// Open the inserter outer section again.
+		await addBlockButton.click();
+
+		// Expect the inserter outer section to be found again.
+		let inserterHeading = await find( {
+			role: 'heading',
+			name: 'Add a block',
+			level: 2,
+		} );
+
+		// Open the Publish Settings.
+		const publishSettingsButton = await find( {
+			role: 'button',
+			name: 'Publish Settings',
+		} );
+		await publishSettingsButton.click();
+
+		// Expect the Publish Settings outer section to be found.
+		const publishSettingsRadio = await find( {
+			role: 'radio',
+			name: 'Publish',
+		} );
+
+		// Expect the inserter outer section to be closed.
+		await expect( inserterHeading ).not.toBeVisible();
+
+		// Focus the block and start typing to hide the block toolbar.
+		// Shouldn't be needed if we automatically hide the toolbar on blur.
+		const paragraphBlock = await find( {
+			role: 'group',
+			name: 'Paragraph block',
+		} );
+		await paragraphBlock.focus();
+		await page.keyboard.type( ' ' );
+
+		// Open the inserter outer section.
+		await addBlockButton.click();
+
+		inserterHeading = await find( {
+			role: 'heading',
+			name: 'Add a block',
+			level: 2,
+		} );
+
+		// Expect the Publish Settings section to be closed.
+		expect( publishSettingsRadio ).not.toBeVisible();
+
+		// Back to the widget areas panel.
+		const backButton = await find( {
+			role: 'button',
+			name: 'Back',
+		} );
+		await backButton.click();
+
+		await find( {
+			role: 'heading',
+			name: /^Footer #1/,
+			level: 3,
+		} );
+
+		// Expect the inserter outer section to be closed.
+		expect( inserterHeading ).not.toBeVisible();
 	} );
 } );
 
