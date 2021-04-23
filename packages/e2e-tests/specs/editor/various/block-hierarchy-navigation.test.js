@@ -68,6 +68,12 @@ describe( 'Navigating the block hierarchy', () => {
 		await page.keyboard.up( 'Shift' );
 		await page.keyboard.type( '3' );
 
+		// Wait for the new column block to appear in the list view
+		// 5 = Columns, Column, Paragraph, Column, *Column*
+		await page.waitForSelector(
+			'tr.block-editor-block-navigation-leaf:nth-of-type(5)'
+		);
+
 		// Navigate to the last column block.
 		const lastColumnsBlockMenuItem = (
 			await page.$x(
