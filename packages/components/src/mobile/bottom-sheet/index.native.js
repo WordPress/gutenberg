@@ -2,6 +2,7 @@
  * External dependencies
  */
 import {
+	LayoutAnimation,
 	Text,
 	View,
 	Platform,
@@ -67,8 +68,8 @@ class BottomSheet extends Component {
 		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
 			this
 		);
-		this.keyboardWillShow = this.keyboardWillShow.bind( this );
-		this.keyboardDidHide = this.keyboardDidHide.bind( this );
+		this.keyboardShow = this.keyboardShow.bind( this );
+		this.keyboardHide = this.keyboardHide.bind( this );
 
 		this.headerHeight = 0;
 		this.keyboardHeight = 0;
@@ -92,16 +93,35 @@ class BottomSheet extends Component {
 		Dimensions.addEventListener( 'change', this.onDimensionsChange );
 	}
 
-	keyboardWillShow( e ) {
+	keyboardShow( e ) {
 		const { height } = e.endCoordinates;
 
 		this.keyboardHeight = height;
+		this.performKeyboardLayoutAnimation( e );
 		this.onSetMaxHeight();
 	}
 
-	keyboardDidHide() {
+	keyboardHide( e ) {
 		this.keyboardHeight = 0;
+		this.performKeyboardLayoutAnimation( e );
 		this.onSetMaxHeight();
+	}
+
+	// This layout animation is the same as the React Native's KeyboardAvoidingView component.
+	// Reference: https://github.com/facebook/react-native/blob/266b21baf35e052ff28120f79c06c4f6dddc51a9/Libraries/Components/Keyboard/KeyboardAvoidingView.js#L119-L128
+	performKeyboardLayoutAnimation( event ) {
+		const { duration, easing } = event;
+
+		if ( duration && easing ) {
+			LayoutAnimation.configureNext( {
+				// We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m
+				duration: duration > 10 ? duration : 10,
+				update: {
+					duration: duration > 10 ? duration : 10,
+					type: LayoutAnimation.Types[ easing ] || 'keyboard',
+				},
+			} );
+		}
 	}
 
 	componentDidMount() {
@@ -113,14 +133,14 @@ class BottomSheet extends Component {
 			);
 		}
 
-		this.keyboardWillShowListener = Keyboard.addListener(
-			'keyboardWillShow',
-			this.keyboardWillShow
+		this.keyboardShowListener = Keyboard.addListener(
+			Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+			this.keyboardShow
 		);
 
-		this.keyboardDidHideListener = Keyboard.addListener(
-			'keyboardDidHide',
-			this.keyboardDidHide
+		this.keyboardHideListener = Keyboard.addListener(
+			Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+			this.keyboardHide
 		);
 
 		this.safeAreaEventSubscription = SafeArea.addEventListener(
@@ -131,8 +151,8 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
-		this.keyboardWillShowListener.remove();
-		this.keyboardDidHideListener.remove();
+		this.keyboardShowListener.remove();
+		this.keyboardHideListener.remove();
 		if ( this.androidModalClosedSubscription ) {
 			this.androidModalClosedSubscription.remove();
 		}
