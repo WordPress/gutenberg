@@ -6,12 +6,17 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, withFocusReturn } from '@wordpress/components';
+import {
+	Button,
+	withFocusReturn,
+	withConstrainedTabbing,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
 import { close as closeIcon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { compose } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -132,4 +137,6 @@ function EntitiesSavedStates( { isOpen, close } ) {
 	) : null;
 }
 
-export default withFocusReturn( EntitiesSavedStates );
+export default compose( [ withFocusReturn, withConstrainedTabbing ] )(
+	EntitiesSavedStates
+);
