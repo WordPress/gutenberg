@@ -247,7 +247,7 @@ export const registerCoreBlocks = () => {
 		pullquote,
 		file,
 		audio,
-		devOnly( reusableBlock ),
+		reusableBlock,
 		devOnly( search ),
 		devOnly( embed ),
 	].forEach( registerBlock );
