@@ -173,12 +173,13 @@ function InserterMenu( {
 				</>
 			}
 			hasNavigation
+			setMinHeightToMaxHeight={ showSearchForm }
 			contentStyle={ styles.list }
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps } ) => (
 					<TouchableHighlight accessible={ false }>
-						{ filterValue ? (
+						{ searchFocus || filterValue ? (
 							<InserterSearchResults
 								filterValue={ filterValue }
 								onSelect={ onSelectItem }
