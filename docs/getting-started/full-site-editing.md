@@ -2,13 +2,15 @@
 
 Full Site Editing is the umbrella project name for various sub-projects within Gutenberg. Projects under Full Site Editing (FSE) include the Site Editor, Widgets Editor, Navigation Editor, Global Styles, numerous Site/Post/Page specific blocks, Query block, Navigation block, Templates, and block themes.
 
+**Jump in:** To start using Full Site Editing you need to use the Gutenberg plugin, and a block theme. You can install both from the WordPress directories. We recommend the [TT1 Blocks theme](https://wordpress.org/themes/tt1-blocks/), it is listed in the theme diretory and our reference block theme.
+
 ## Get Involved
 
 The majority of full site editing features are available in the Gutenberg plugin, and an ongoing [FSE Outreach program](https://make.wordpress.org/test/handbook/full-site-editing-outreach-experiment/) is running with calls for testing.
 
 - Join in on Slack at #fse-outreach-experiment
 - Participate in the [Calls for Testing](https://make.wordpress.org/test/tag/fse-testing-call/), test and give feedback.
-- See the [How to Test FSE instructions](https://make.wordpress.org/test/handbook/full-site-editing-outreach-experiment/how-to-test-fse/) to get setup to test FSE features.
+- See detailed [How to Test FSE instructions](https://make.wordpress.org/test/handbook/full-site-editing-outreach-experiment/how-to-test-fse/) to get setup to test FSE features.
 
 ## Block Themes
 
@@ -16,7 +18,7 @@ If you are using the Gutenberg plugin you can run, test, and develop block theme
 
 - See the [Create a Block Theme](/docs/how-to-guides/block-theme/README.md) tutorial for a walk-through of the pieces of a block theme.
 
-- If you want to dive right in, see the [github.com/WordPress/theme-experiments](https://github.com/WordPress/theme-experiments/) repository. You can download different example block themes there, try the [TT1 Blocks](https://github.com/WordPress/theme-experiments/tree/master/tt1-blocks) is a block theme recreating the Twenty Twenty-One default theme.
+- For examples, see the [github.com/WordPress/theme-experiments](https://github.com/WordPress/theme-experiments/) repository several block themes are availabe including the source for the above mentioned TT1 Blocks.
 
 - Use the `empty-theme.php` script from theme-experiments repo to generate a start block theme, it will prompt you with a few questions and create a theme.
 
