@@ -10,18 +10,18 @@ import { wpDataSelect } from './wp-data-select';
  */
 export async function getAllBlocks() {
 	const blocks = wpDataSelect( 'core/block-editor', 'getBlocks' );
-	//if ( typeof blocks === 'undefined' ) {
-	const listener = ( message ) => {
-		// eslint-disable-next-line no-console
-		console.log( message.text() );
-	};
-	page.on( 'console', listener );
-	await page.evaluate( () => {
-		const _blocks = wp.data.select( 'core/block-editor' ).getBlocks();
-		// eslint-disable-next-line no-console
-		console.log( _blocks, JSON.stringify( _blocks ) );
-	} );
-	page.off( 'console', listener );
-	//}
+	if ( typeof blocks === 'undefined' ) {
+		const listener = ( message ) => {
+			// eslint-disable-next-line no-console
+			console.log( message.text() );
+		};
+		page.on( 'console', listener );
+		await page.evaluate( () => {
+			const _blocks = wp.data.select( 'core/block-editor' ).getBlocks();
+			// eslint-disable-next-line no-console
+			console.log( _blocks, JSON.stringify( _blocks ) );
+		} );
+		page.off( 'console', listener );
+	}
 	return blocks;
 }
