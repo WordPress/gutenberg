@@ -193,5 +193,5 @@ export const getIsWidgetAreaOpen = ( state, clientId ) => {
  * @return {boolean} Whether the inserter is opened.
  */
 export function isInserterOpened( state ) {
-	return state.isInserterOpened;
+	return !! state.blockInserterPanel;
 }

@@ -1393,32 +1393,9 @@ export function blocksMode( state = {}, action ) {
 }
 
 /**
- * A helper for resetting the insertion point state.
- *
- * @param {Object} state        Current state.
- * @param {Object} action       Dispatched action.
- * @param {*}      defaultValue The default value for the reducer.
- *
- * @return {*} Either the default value if a reset is required, or the state.
- */
-function resetInsertionPoint( state, action, defaultValue ) {
-	switch ( action.type ) {
-		case 'CLEAR_SELECTED_BLOCK':
-		case 'SELECT_BLOCK':
-		case 'SELECTION_CHANGE':
-		case 'REPLACE_INNER_BLOCKS':
-		case 'INSERT_BLOCKS':
-		case 'REMOVE_BLOCKS':
-		case 'REPLACE_BLOCKS':
-			return defaultValue;
-	}
-
-	return state;
-}
-
-/**
- * Reducer returning the insertion point position, consisting of the
- * rootClientId and an index.
+ * Reducer returning the block insertion point visibility, either null if there
+ * is not an explicit insertion point assigned, or an object of its `index` and
+ * `rootClientId`.
  *
  * @param {Object} state  Current state.
  * @param {Object} action Dispatched action.
@@ -1427,33 +1404,15 @@ function resetInsertionPoint( state, action, defaultValue ) {
  */
 export function insertionPoint( state = null, action ) {
 	switch ( action.type ) {
-		case 'SET_INSERTION_POINT':
-		case 'SHOW_INSERTION_POINT': {
+		case 'SHOW_INSERTION_POINT':
 			const { rootClientId, index } = action;
 			return { rootClientId, index };
-		}
-	}
 
-	return resetInsertionPoint( state, action, null );
-}
-
-/**
- * Reducer returning the visibility of the insertion point.
- *
- * @param {Object} state  Current state.
- * @param {Object} action Dispatched action.
- *
- * @return {Object} Updated state.
- */
-export function insertionPointVisibility( state = false, action ) {
-	switch ( action.type ) {
-		case 'SHOW_INSERTION_POINT':
-			return true;
 		case 'HIDE_INSERTION_POINT':
-			return false;
+			return null;
 	}
 
-	return resetInsertionPoint( state, action, false );
+	return state;
 }
 
 /**
@@ -1764,7 +1723,6 @@ export default combineReducers( {
 	blocksMode,
 	blockListSettings,
 	insertionPoint,
-	insertionPointVisibility,
 	template,
 	settings,
 	preferences,

@@ -38,7 +38,7 @@ import { store as blockEditorStore } from '../../../store';
  * @return {Array} Insertion Point State (rootClientID, onInsertBlocks and onToggle).
  */
 function useInsertionPoint( {
-	rootClientId,
+	rootClientId = '',
 	insertionIndex,
 	clientId,
 	isAppender,
@@ -49,40 +49,38 @@ function useInsertionPoint( {
 	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
 			const {
+				getSelectedBlockClientId,
+				getBlockRootClientId,
 				getBlockIndex,
 				getBlockOrder,
-				getBlockInsertionPoint,
 			} = select( blockEditorStore );
+			const selectedBlockClientId = getSelectedBlockClientId();
 
-			let _destinationRootClientId, _destinationIndex;
+			let _destinationRootClientId = rootClientId;
+			let _destinationIndex;
 
-			if ( rootClientId || insertionIndex || clientId || isAppender ) {
-				// If any of these arguments are set, we're in "manual mode"
-				// meaning the insertion point is set by the caller.
-
-				_destinationRootClientId = rootClientId;
-
-				if ( insertionIndex ) {
-					// Insert into a specific index.
-					_destinationIndex = insertionIndex;
-				} else if ( clientId ) {
-					// Insert after a specific client ID.
-					_destinationIndex = getBlockIndex(
-						clientId,
+			if ( insertionIndex ) {
+				// Insert into a specific index.
+				_destinationIndex = insertionIndex;
+			} else if ( clientId ) {
+				// Insert after a specific client ID.
+				_destinationIndex = getBlockIndex(
+					clientId,
+					_destinationRootClientId
+				);
+			} else if ( ! isAppender && selectedBlockClientId ) {
+				_destinationRootClientId = getBlockRootClientId(
+					selectedBlockClientId
+				);
+				_destinationIndex =
+					getBlockIndex(
+						selectedBlockClientId,
 						_destinationRootClientId
-					);
-				} else {
-					// Insert at the end of the list.
-					_destinationIndex = getBlockOrder(
-						_destinationRootClientId
-					).length;
-				}
+					) + 1;
 			} else {
-				// Otherwise, we're in "auto mode" where the insertion point is
-				// decided by getBlockInsertionPoint().
-				const insertionPoint = getBlockInsertionPoint();
-				_destinationRootClientId = insertionPoint.rootClientId;
-				_destinationIndex = insertionPoint.index;
+				// Insert at the end of the list.
+				_destinationIndex = getBlockOrder( _destinationRootClientId )
+					.length;
 			}
 
 			return {
