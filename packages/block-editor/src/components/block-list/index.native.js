@@ -79,6 +79,8 @@ export class BlockList extends Component {
 		this.getExtraData = this.getExtraData.bind( this );
 
 		this.onLayout = this.onLayout.bind( this );
+
+		this.offsetOfIndex = this.offsetOfIndex.bind( this );
 		this.itemHeights = [];
 
 		this.state = {
@@ -166,11 +168,27 @@ export class BlockList extends Component {
 		}
 	}
 
+	offsetOfIndex( heights, blockClientIds, index ) {
+		const ITEM_HEIGHT = 30; // just an kinda arbitrary default height, just to have it non zero.
+		const offset = blockClientIds
+			.slice( 0, index + 1 ) // only add up to the index we want (adding 1 to include the indexed item itself too)
+			.reduce(
+				// accumulate the heights of the items
+				( acc, id ) =>
+					heights[ id ] && heights[ id ] > 0
+						? acc + heights[ id ]
+						: acc + ITEM_HEIGHT,
+				0
+			);
+		return offset;
+	}
+
 	componentDidUpdate( prevProps ) {
 		const {
 			isRootList,
 			isBlockInsertionPointVisible,
 			insertionPoint,
+			blockClientIds,
 		} = this.props;
 
 		// Typical usage (don't forget to compare props):
@@ -180,10 +198,25 @@ export class BlockList extends Component {
 		) {
 			if ( isRootList && isBlockInsertionPointVisible ) {
 				const jumpToIndex = insertionPoint.index - 1; // scrolling goes to the bottom of the item so, let's scroll to one above
-				if ( jumpToIndex < 0 ) {
-					this.scrollViewRef.scrollToOffset( { offset: 0 } );
+				if ( Platform.OS === 'android' ) {
+					if ( jumpToIndex < 0 ) {
+						this.scrollViewRef.scrollToOffset( { offset: 0 } );
+					} else {
+						this.scrollViewRef.scrollToIndex( {
+							index: jumpToIndex,
+						} );
+					}
 				} else {
-					this.scrollViewRef.scrollToIndex( { index: jumpToIndex } );
+					this.scrollViewRef.scrollTo( {
+						y:
+							jumpToIndex < 0
+								? 0
+								: this.offsetOfIndex(
+										this.itemHeights,
+										blockClientIds,
+										jumpToIndex
+								  ),
+					} );
 				}
 			}
 		}
