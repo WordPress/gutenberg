@@ -15,10 +15,10 @@ import type { Subtract } from 'utility-types';
  * of this is the `pure` HOC which does not change the API surface of the component but
  * simply modifies the internals.
  */
-export interface HigherOrderComponent< TObviatedProps extends object = {} > {
-	< TP extends TObviatedProps >(
+export interface HigherOrderComponent< TRemovedProps extends object = {} > {
+	< TP extends TRemovedProps >(
 		OriginalComponent: ComponentType< TP >
-	): ComponentType< Subtract< TP, TObviatedProps > >;
+	): ComponentType< Subtract< TP, TRemovedProps > >;
 }
 
 /**
@@ -31,14 +31,14 @@ export interface HigherOrderComponent< TObviatedProps extends object = {} > {
  * @return Component class with generated display name assigned.
  */
 function createHigherOrderComponent<
-	TObviatedProps extends object,
-	TProps extends TObviatedProps
+	TRemovedProps extends object,
+	TProps extends TRemovedProps
 >(
 	mapComponentToEnhancedComponent: (
 		OriginalComponent: ComponentType< TProps >
-	) => ComponentType< Subtract< TProps, TObviatedProps > >,
+	) => ComponentType< Subtract< TProps, TRemovedProps > >,
 	modifierName: string
-): HigherOrderComponent< TObviatedProps > {
+): HigherOrderComponent< TRemovedProps > {
 	return ( ( OriginalComponent: ComponentType< TProps > ) => {
 		const EnhancedComponent = mapComponentToEnhancedComponent(
 			OriginalComponent
@@ -53,6 +53,6 @@ function createHigherOrderComponent<
 		) }(${ displayName })`;
 
 		return EnhancedComponent;
-	} ) as HigherOrderComponent< TObviatedProps >;
+	} ) as HigherOrderComponent< TRemovedProps >;
 }
 export default createHigherOrderComponent;

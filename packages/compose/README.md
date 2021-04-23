@@ -81,12 +81,12 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   _mapComponentToEnhancedComponent_ `( OriginalComponent: ComponentType< TProps > ) => ComponentType< Subtract< TProps, TObviatedProps > >`: Function mapping component to enhanced component.
+-   _mapComponentToEnhancedComponent_ `( OriginalComponent: ComponentType< TProps > ) => ComponentType< Subtract< TProps, TRemovedProps > >`: Function mapping component to enhanced component.
 -   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
 
--   `HigherOrderComponent< TObviatedProps >`: Component class with generated display name assigned.
+-   `HigherOrderComponent< TRemovedProps >`: Component class with generated display name assigned.
 
 <a name="ifCondition" href="#ifCondition">#</a> **ifCondition**
 
