@@ -14,7 +14,6 @@ This tutorial is up to date as of Gutenberg version 9.1.
 2.  [Creating the theme](/docs/how-to-guides/block-theme/README.md#creating-the-theme)
 3.  [Creating the templates and template parts](/docs/how-to-guides/block-theme/README.md#creating-the-templates-and-template-parts)
 4.  [experimental-theme.json - Global styles](/docs/how-to-guides/block-theme/README.md#experimental-theme-json-global-styles)
-5.  [Adding blocks](/docs/how-to-guides/block-theme/block-theme-2-adding-blocks.md)
 
 ## What is needed to create a block theme?
 
@@ -376,4 +375,3 @@ Below are the presets and styles combined:
 }
 ```
 
-Next: [Adding blocks](/docs/how-to-guides/block-theme/block-theme-2-adding-blocks.md)

@@ -324,12 +324,6 @@
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Adding blocks to your theme",
-		"slug": "block-theme-2-adding-blocks",
-		"markdown_source": "../docs/how-to-guides/block-theme/block-theme-2-adding-blocks.md",
-		"parent": "block-theme"
-	},
-	{
 		"title": "Backward Compatibility",
 		"slug": "backward-compatibility",
 		"markdown_source": "../docs/how-to-guides/backward-compatibility/README.md",
