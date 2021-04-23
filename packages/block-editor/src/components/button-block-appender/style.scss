@@ -49,5 +49,9 @@
 			color: $white;
 			border-radius: $radius-block-ui;
 		}
+
+		&:hover > svg {
+			background-color: var(--wp-admin-theme-color);
+		}
 	}
 }
