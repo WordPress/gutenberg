@@ -45,7 +45,7 @@ export default function ContentLock( { clientId, children } ) {
 		hasChildSelected,
 	] );
 
-	const overlayClasses = classnames( `${ baseClassName }-overlay`, {
+	const classes = classnames( baseClassName, {
 		'overlay-selected': isSelected,
 		'child-selected': hasChildSelected,
 	} );
@@ -54,9 +54,9 @@ export default function ContentLock( { clientId, children } ) {
 		: null;
 
 	return (
-		<div className={ baseClassName }>
+		<div className={ classes }>
 			<button
-				className={ overlayClasses }
+				className={ `${ baseClassName }-overlay` }
 				style={ overlaySizes }
 				onClick={ onClick }
 			/>

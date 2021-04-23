@@ -89,15 +89,40 @@
 		background: transparent;
 		border: none;
 
-		&.overlay-selected {
+	}
+
+	&.overlay-selected {
+		.wp-block-template-part__content-lock-overlay {
 			background: rgb(#007cba, 0.1); // todo: use var
 			pointer-events: none;
 		}
-		&.child-selected {
+		.wp-block-template-part__content-lock .wp-block-template-part__content-lock-overlay {
+			pointer-events: auto;
+			background: inherit;
+		}
+	}
+
+	&.child-selected {
+		.wp-block-template-part__content-lock-overlay {
 			display: none;
 		}
-		&:hover:not(.overlay-selected):not(.child-selected) {
+		.wp-block-template-part__content-lock:not(.child-selected) .wp-block-template-part__content-lock-overlay {
+			display: block;
+		}
+	}
+
+	&:hover:not(.overlay-selected):not(.child-selected) {
+		.wp-block-template-part__content-lock-overlay {
 			background: rgba($gray-900, 0.05);
+		}
+		.wp-block-template-part__content-lock .wp-block-template-part__content-lock-overlay {
+			background: inherit;
+		}
+	}
+
+	&:not(.overlay-selected):not(.child-selected) .wp-block-template-part__content-lock-content-wrapper {
+		* {
+			pointer-events: none;
 		}
 	}
 }
