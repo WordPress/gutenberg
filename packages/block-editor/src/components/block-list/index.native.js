@@ -315,8 +315,8 @@ export class BlockList extends Component {
 								0
 							);
 						return {
-							length: length,
-							offset: offset,
+							length,
+							offset,
 							index,
 						};
 					} }
@@ -347,7 +347,7 @@ export class BlockList extends Component {
 		);
 	}
 
-	renderItem( { item: clientId, index } ) {
+	renderItem( { item: clientId } ) {
 		const {
 			contentResizeMode,
 			contentStyle,
