@@ -219,7 +219,16 @@ export function computeCustomizedAttribute(
 		);
 	}
 }
-
+/**
+ * Converts a given key in an object to it's mapped equivalent.
+ *
+ * Typically used to convert block attributes to their equivalent menu item fields.
+ *
+ * @param {Object} mapping a key/value mapping of attributes to their equivalents.
+ * @param {string} key the name of the key within the mapping to be converted.
+ * @param {string} val the value to be assigned to the converted field.
+ * @return {Object} the converted field object.
+ */
 export const convertAttribute = function convertAttribute( mapping, key, val ) {
 	const left = mapping[ key ].attr ?? mapping[ key ];
 	const right = mapping[ key ].mapper?.() ?? val;
