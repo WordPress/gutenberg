@@ -38,8 +38,9 @@ const POPOVER_PROPS = {
  * The `HeadingLevelControl` component renders a dropdown menu that displays
  * heading level options for the selected block. This component is used to set
  * the level of the heading in a block and also allows to use a `paragraph`
- * element by setting the level to zero (`0`).
- * This would also need handling in the block's `edit` function.
+ * element by setting the level to zero (`0`). The block's `edit` function
+ * would also need to handle the zero value. An example of this would be
+ * `const TagName = level === 0 ? 'p' : `h${ level }`;`
  *
  * @param {WPHeadingLevelControlProps} props Component props.
  * @return {WPComponent} The Heading Level Control Dropdown.
