@@ -17,7 +17,7 @@ module.exports = ( api ) => {
 
 	const getPresetEnv = () => {
 		const opts = {
-			include: [ '@babel/plugin-syntax-nullish-coalescing-operator' ],
+			include: [ 'syntax-nullish-coalescing-operator' ],
 		};
 
 		if ( isTestEnv ) {
