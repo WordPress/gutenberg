@@ -245,11 +245,11 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}:root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}.has-grey-color{color: grey !important;}.has-grey-background-color{background-color: grey !important;}',
+			':root{--wp--preset--color--grey: grey;--wp--preset--font-family--small: 14px;--wp--preset--font-family--big: 41px;}.wp-block-group{--wp--custom--base-font: 16;--wp--custom--line-height--small: 1.2;--wp--custom--line-height--medium: 1.4;--wp--custom--line-height--large: 1.8;}:root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}.has-grey-color{color: grey !important;}.has-grey-background-color{background-color: grey !important;}.has-grey-border-color{border-color: grey !important;}',
 			$theme_json->get_stylesheet()
 		);
 		$this->assertEquals(
-			':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}.has-grey-color{color: grey !important;}.has-grey-background-color{background-color: grey !important;}',
+			':root{--wp--style--color--link: #111;color: var(--wp--preset--color--grey);}.wp-block-group{padding-top: 12px;padding-bottom: 24px;}.has-grey-color{color: grey !important;}.has-grey-background-color{background-color: grey !important;}.has-grey-border-color{border-color: grey !important;}',
 			$theme_json->get_stylesheet( 'block_styles' )
 		);
 		$this->assertEquals(
@@ -284,11 +284,11 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			'.wp-block-group{--wp--preset--color--grey: grey;}.wp-block-group{color: red;}.wp-block-group.has-grey-color{color: grey !important;}.wp-block-group.has-grey-background-color{background-color: grey !important;}',
+			'.wp-block-group{--wp--preset--color--grey: grey;}.wp-block-group{color: red;}.wp-block-group.has-grey-color{color: grey !important;}.wp-block-group.has-grey-background-color{background-color: grey !important;}.wp-block-group.has-grey-border-color{border-color: grey !important;}',
 			$theme_json->get_stylesheet()
 		);
 		$this->assertEquals(
-			'.wp-block-group{color: red;}.wp-block-group.has-grey-color{color: grey !important;}.wp-block-group.has-grey-background-color{background-color: grey !important;}',
+			'.wp-block-group{color: red;}.wp-block-group.has-grey-color{color: grey !important;}.wp-block-group.has-grey-background-color{background-color: grey !important;}.wp-block-group.has-grey-border-color{border-color: grey !important;}',
 			$theme_json->get_stylesheet( 'block_styles' )
 		);
 	}
@@ -324,7 +324,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		);
 
 		$this->assertEquals(
-			':root{--wp--preset--color--grey: grey;}h2.wp-block-post-title{background-color: blue;color: red;font-size: 12px;line-height: 1.3;}.has-grey-color{color: grey !important;}.has-grey-background-color{background-color: grey !important;}',
+			':root{--wp--preset--color--grey: grey;}h2.wp-block-post-title{background-color: blue;color: red;font-size: 12px;line-height: 1.3;}.has-grey-color{color: grey !important;}.has-grey-background-color{background-color: grey !important;}.has-grey-border-color{border-color: grey !important;}',
 			$theme_json->get_stylesheet()
 		);
 	}
@@ -774,6 +774,33 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 		$this->assertEqualSetsWithIndex( $expected, $result );
 	}
 
+	function test_remove_insecure_properties_applies_safe_styles() {
+		$theme_json = new WP_Theme_JSON(
+			array(
+				'styles' => array(
+					'root' => array(
+						'color' => array(
+							'text' => '#abcabc ', // Trailing space.
+						),
+					),
+				),
+			),
+			true
+		);
+		$theme_json->remove_insecure_properties();
+		$result   = $theme_json->get_raw_data();
+		$expected = array(
+			'styles' => array(
+				'root' => array(
+					'color' => array(
+						'text' => '#abcabc ',
+					),
+				),
+			),
+		);
+		$this->assertEqualSetsWithIndex( $expected, $result );
+	}
+
 	function test_get_custom_templates() {
 		$theme_json = new WP_Theme_JSON(
 			array(
@@ -821,5 +848,283 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				),
 			)
 		);
+	}
+
+	function test_get_from_editor_settings() {
+		$input = array(
+			'disableCustomColors'    => true,
+			'disableCustomGradients' => true,
+			'disableCustomFontSizes' => true,
+			'enableCustomLineHeight' => true,
+			'enableCustomUnits'      => true,
+			'colors'                 => array(
+				array(
+					'slug'  => 'color-slug',
+					'name'  => 'Color Name',
+					'color' => 'colorvalue',
+				),
+			),
+			'gradients'              => array(
+				array(
+					'slug'     => 'gradient-slug',
+					'name'     => 'Gradient Name',
+					'gradient' => 'gradientvalue',
+				),
+			),
+			'fontSizes'              => array(
+				array(
+					'slug' => 'size-slug',
+					'name' => 'Size Name',
+					'size' => 'sizevalue',
+				),
+			),
+		);
+
+		$expected = array(
+			'settings' => array(
+				'defaults' => array(
+					'color'      => array(
+						'custom'         => false,
+						'customGradient' => false,
+						'gradients'      => array(
+							array(
+								'slug'     => 'gradient-slug',
+								'name'     => 'Gradient Name',
+								'gradient' => 'gradientvalue',
+							),
+						),
+						'palette'        => array(
+							array(
+								'slug'  => 'color-slug',
+								'name'  => 'Color Name',
+								'color' => 'colorvalue',
+							),
+						),
+					),
+					'spacing'    => array(
+						'units' => array( 'px', 'em', 'rem', 'vh', 'vw' ),
+					),
+					'typography' => array(
+						'customFontSize'   => false,
+						'customLineHeight' => true,
+						'fontSizes'        => array(
+							array(
+								'slug' => 'size-slug',
+								'name' => 'Size Name',
+								'size' => 'sizevalue',
+							),
+						),
+					),
+				),
+			),
+		);
+
+		$actual = WP_Theme_JSON::get_from_editor_settings( $input );
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	function test_get_editor_settings_no_theme_support() {
+		$input = array(
+			'__unstableEnableFullSiteEditingBlocks' => false,
+			'disableCustomColors'                   => false,
+			'disableCustomFontSizes'                => false,
+			'disableCustomGradients'                => false,
+			'enableCustomLineHeight'                => false,
+			'enableCustomUnits'                     => false,
+			'imageSizes'                            => array(
+				array(
+					'slug' => 'thumbnail',
+					'name' => 'Thumbnail',
+				),
+				array(
+					'slug' => 'medium',
+					'name' => 'Medium',
+				),
+				array(
+					'slug' => 'large',
+					'name' => 'Large',
+				),
+				array(
+					'slug' => 'full',
+					'name' => 'Full Size',
+				),
+			),
+			'isRTL'                                 => false,
+			'maxUploadFileSize'                     => 123,
+		);
+
+		$expected = array(
+			'settings' => array(
+				'defaults' => array(
+					'color'      => array(
+						'custom'         => true,
+						'customGradient' => true,
+					),
+					'spacing'    => array(
+						'units' => false,
+					),
+					'typography' => array(
+						'customFontSize'   => true,
+						'customLineHeight' => false,
+					),
+				),
+			),
+		);
+
+		$actual = WP_Theme_JSON::get_from_editor_settings( $input );
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	function test_get_editor_settings_blank() {
+		$expected = array( 'settings' => array() );
+		$actual   = WP_Theme_JSON::get_from_editor_settings( array() );
+
+		$this->assertEqualSetsWithIndex( $expected, $actual );
+	}
+
+	function test_get_editor_settings_custom_units_can_be_disabled() {
+		add_theme_support( 'custom-units', array() );
+		$input = gutenberg_get_default_block_editor_settings();
+
+		$expected = array(
+			'units'         => array( array() ),
+			'customPadding' => false,
+		);
+
+		$actual = WP_Theme_JSON::get_from_editor_settings( $input );
+
+		$this->assertEqualSetsWithIndex( $expected, $actual['settings']['defaults']['spacing'] );
+	}
+
+	function test_get_editor_settings_custom_units_can_be_enabled() {
+		add_theme_support( 'custom-units' );
+		$input = gutenberg_get_default_block_editor_settings();
+
+		$expected = array(
+			'units'         => array( 'px', 'em', 'rem', 'vh', 'vw' ),
+			'customPadding' => false,
+		);
+
+		$actual = WP_Theme_JSON::get_from_editor_settings( $input );
+
+		$this->assertEqualSetsWithIndex( $expected, $actual['settings']['defaults']['spacing'] );
+	}
+
+	function test_get_editor_settings_custom_units_can_be_filtered() {
+		add_theme_support( 'custom-units', 'rem', 'em' );
+		$input = gutenberg_get_default_block_editor_settings();
+
+		$expected = array(
+			'units'         => array( 'rem', 'em' ),
+			'customPadding' => false,
+		);
+
+		$actual = WP_Theme_JSON::get_from_editor_settings( $input );
+
+		$this->assertEqualSetsWithIndex( $expected, $actual['settings']['defaults']['spacing'] );
+	}
+
+	function test_get_style_nodes() {
+		$theme_json = array(
+			'styles' => array(
+				'defaults'        => array( 'color' => array( 'background' => 'red' ) ),
+				'root'            => array( 'color' => array( 'background' => 'green' ) ),
+				'core/paragraph'  => array( 'color' => array( 'background' => 'blue' ) ),
+				'core/heading/h1' => array( 'color' => array( 'background' => 'yellow' ) ),
+				'core/group'      => array( 'color' => array( 'background' => 'pink' ) ),
+				'core/post-title' => array( 'color' => array( 'background' => 'white' ) ),
+			),
+		);
+		$selectors  = array(
+			'defaults'        => array( 'selector' => ':root' ),
+			'root'            => array( 'selector' => ':root' ),
+			'core/paragraph'  => array( 'selector' => 'p' ),
+			'core/heading/h1' => array( 'selector' => 'h1' ),
+			'core/group'      => array( 'selector' => '.wp-block-group' ),
+		);
+
+		$actual = WP_Theme_JSON::get_style_nodes( $theme_json, $selectors );
+
+		$expected = array(
+			array(
+				'path'     => array( 'styles', 'defaults' ),
+				'selector' => ':root',
+			),
+			array(
+				'path'     => array( 'styles', 'root' ),
+				'selector' => ':root',
+			),
+			array(
+				'path'     => array( 'styles', 'core/paragraph' ),
+				'selector' => 'p',
+			),
+			array(
+				'path'     => array( 'styles', 'core/heading/h1' ),
+				'selector' => 'h1',
+			),
+			array(
+				'path'     => array( 'styles', 'core/group' ),
+				'selector' => '.wp-block-group',
+			),
+			array(
+				'path'     => array( 'styles', 'core/post-title' ),
+				'selector' => null,
+			),
+		);
+
+		$this->assertEqualSets( $expected, $actual );
+	}
+
+	function test_get_setting_nodes() {
+		$theme_json = array(
+			'settings' => array(
+				'defaults'        => array( 'border' => array( 'customRadius' => true ) ),
+				'root'            => array( 'border' => array( 'customRadius' => false ) ),
+				'core/paragraph'  => array( 'border' => array( 'customRadius' => true ) ),
+				'core/heading/h1' => array( 'border' => array( 'customRadius' => false ) ),
+				'core/group'      => array( 'border' => array( 'customRadius' => true ) ),
+				'core/post-title' => array( 'border' => array( 'customRadius' => false ) ),
+			),
+		);
+		$selectors  = array(
+			'defaults'        => array( 'selector' => ':root' ),
+			'root'            => array( 'selector' => ':root' ),
+			'core/paragraph'  => array( 'selector' => 'p' ),
+			'core/heading/h1' => array( 'selector' => 'h1' ),
+			'core/group'      => array( 'selector' => '.wp-block-group' ),
+		);
+
+		$actual = WP_Theme_JSON::get_setting_nodes( $theme_json, $selectors );
+
+		$expected = array(
+			array(
+				'path'     => array( 'settings', 'defaults' ),
+				'selector' => ':root',
+			),
+			array(
+				'path'     => array( 'settings', 'root' ),
+				'selector' => ':root',
+			),
+			array(
+				'path'     => array( 'settings', 'core/paragraph' ),
+				'selector' => 'p',
+			),
+			array(
+				'path'     => array( 'settings', 'core/heading/h1' ),
+				'selector' => 'h1',
+			),
+			array(
+				'path'     => array( 'settings', 'core/group' ),
+				'selector' => '.wp-block-group',
+			),
+			array(
+				'path'     => array( 'settings', 'core/post-title' ),
+				'selector' => null,
+			),
+		);
+
+		$this->assertEqualSets( $expected, $actual );
 	}
 }

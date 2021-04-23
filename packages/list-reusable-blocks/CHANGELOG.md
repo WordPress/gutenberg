@@ -40,4 +40,4 @@
 
 ### New Features
 
-- Initial public release.
+-   Initial public release.

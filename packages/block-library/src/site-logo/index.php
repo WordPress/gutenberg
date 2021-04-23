@@ -17,8 +17,8 @@ function render_block_core_site_logo( $attributes ) {
 		if ( empty( $attributes['width'] ) ) {
 			return $image;
 		}
-		$height = floatval( $attributes['width'] ) / ( floatval( $image[1] ) / floatval( $image[2] ) );
-		return array( $image[0], intval( $attributes['width'] ), intval( $height ) );
+		$height = (float) $attributes['width'] / ( (float) $image[1] / (float) $image[2] );
+		return array( $image[0], (int) $attributes['width'], (int) $height );
 	};
 
 	add_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
@@ -30,6 +30,10 @@ function render_block_core_site_logo( $attributes ) {
 
 	if ( ! empty( $attributes['align'] ) && in_array( $attributes['align'], array( 'center', 'left', 'right' ), true ) ) {
 		$classnames[] = "align{$attributes['align']}";
+	}
+
+	if ( empty( $attributes['width'] ) ) {
+		$classnames[] = 'is-default-size';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => implode( ' ', $classnames ) ) );
@@ -74,7 +78,11 @@ function override_custom_logo_theme_mod( $custom_logo ) {
  * @return string The custom logo.
  */
 function sync_site_logo_to_theme_mod( $custom_logo ) {
-	if ( $custom_logo ) {
+	// Delete the option when the custom logo does not exist or was removed.
+	// This step ensures the option stays in sync.
+	if ( empty( $custom_logo ) ) {
+		delete_option( 'sitelogo' );
+	} else {
 		update_option( 'sitelogo', $custom_logo );
 	}
 	return $custom_logo;

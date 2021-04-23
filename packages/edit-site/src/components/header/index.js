@@ -14,6 +14,8 @@ import { _x, __ } from '@wordpress/i18n';
 import { listView, plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -26,7 +28,10 @@ import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
 import { store as editSiteStore } from '../../store';
 
-export default function Header( { openEntitiesSavedStates } ) {
+export default function Header( {
+	openEntitiesSavedStates,
+	isEntitiesSavedStatesOpen,
+} ) {
 	const inserterButton = useRef();
 	const {
 		deviceType,
@@ -46,15 +51,15 @@ export default function Header( { openEntitiesSavedStates } ) {
 			isInserterOpened,
 			isListViewOpened,
 		} = select( editSiteStore );
-		const { getEntityRecord } = select( 'core' );
+		const { getEditedEntityRecord } = select( coreStore );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
-			'core/editor'
+			editorStore
 		);
 		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
-		const record = getEntityRecord( 'postType', postType, postId );
+		const record = getEditedEntityRecord( 'postType', postType, postId );
 		const _entityTitle =
 			'wp_template' === postType
 				? getTemplateInfo( record ).title
@@ -166,6 +171,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 					/>
 					<SaveButton
 						openEntitiesSavedStates={ openEntitiesSavedStates }
+						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
 					/>
 					<PinnedItems.Slot scope="core/edit-site" />
 					<MoreMenu />

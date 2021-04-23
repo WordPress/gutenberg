@@ -18,10 +18,7 @@
 			"default": true
 		}
 	},
-	"usesContext": [
-		"postId",
-		"postType"
-	],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,
 		"fontSize": true,
@@ -31,5 +28,6 @@
 		},
 		"lineHeight": true
 	},
-	"editorStyle": "wp-block-post-excerpt-editor"
+	"editorStyle": "wp-block-post-excerpt-editor",
+	"style": "wp-block-post-excerpt"
 }

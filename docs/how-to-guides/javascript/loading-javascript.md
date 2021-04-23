@@ -30,7 +30,7 @@ If your code is registered and enqueued correctly, you should see a message in y
 
 ![Console Log Message Success](https://raw.githubusercontent.com/WordPress/gutenberg/HEAD/docs/assets/js-tutorial-console-log-success.png)
 
-**Note for Theme Developers:**  The above method of enqueuing is used for plugins. If you are extending the block editor for your theme there is a minor difference, you will use the `get_template_directory_uri()` function instead of `plugins_url()`. So for a theme, the enqueue example is:
+**Note for Theme Developers:** The above method of enqueuing is used for plugins. If you are extending the block editor for your theme there is a minor difference, you will use the `get_template_directory_uri()` function instead of `plugins_url()`. So for a theme, the enqueue example is:
 
 ```php
 function myguten_enqueue() {

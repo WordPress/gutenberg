@@ -14,7 +14,7 @@
  * @return bool
  */
 function gutenberg_should_load_separate_block_assets() {
-	$load_separate_styles = gutenberg_is_fse_theme();
+	$load_separate_styles = gutenberg_supports_block_templates();
 	/**
 	 * Determine if separate styles will be loaded for blocks on-render or not.
 	 *
@@ -142,23 +142,6 @@ function gutenberg_inject_default_block_context( $args ) {
 add_filter( 'register_block_type_args', 'gutenberg_inject_default_block_context' );
 
 /**
- * Amends the paths to preload when initializing edit post.
- *
- * @see https://core.trac.wordpress.org/ticket/50606
- *
- * @since 8.4.0
- *
- * @param  array $preload_paths Default path list that will be preloaded.
- * @return array Modified path list to preload.
- */
-function gutenberg_preload_edit_post( $preload_paths ) {
-	$additional_paths = array( '/?context=edit' );
-	return array_merge( $preload_paths, $additional_paths );
-}
-
-add_filter( 'block_editor_preload_paths', 'gutenberg_preload_edit_post' );
-
-/**
  * Override post type labels for Reusable Block custom post type.
  * The labels are different from the ones in Core.
  *
@@ -192,3 +175,18 @@ function gutenberg_override_reusable_block_post_type_labels() {
 	);
 }
 add_filter( 'post_type_labels_wp_block', 'gutenberg_override_reusable_block_post_type_labels', 10, 0 );
+
+/**
+ * Update allowed inline style attributes list.
+ *
+ * Note: This should be removed when the minimum required WP version is >= 5.8.
+ *
+ * @param string[] $attrs Array of allowed CSS attributes.
+ * @return string[] CSS attributes.
+ */
+function gutenberg_safe_style_attrs( $attrs ) {
+	$attrs[] = 'object-position';
+
+	return $attrs;
+}
+add_filter( 'safe_style_css', 'gutenberg_safe_style_attrs' );

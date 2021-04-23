@@ -99,34 +99,6 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 				),
 			)
 		);
-
-		// Backwards compatibility. TODO: Remove.
-		register_rest_route(
-			$this->namespace,
-			'/' . $this->rest_base . '/(?P<id>[a-zA-Z0-9_-]+)/form-renderer',
-			array(
-				'args' => array(
-					'id'       => array(
-						'description' => __( 'The widget type id.', 'gutenberg' ),
-						'type'        => 'string',
-						'required'    => true,
-					),
-					'instance' => array(
-						'description' => __( 'Current widget instance', 'gutenberg' ),
-						'type'        => 'object',
-						'default'     => array(),
-					),
-				),
-				array(
-					'methods'             => WP_REST_Server::CREATABLE,
-					'permission_callback' => array( $this, 'get_item_permissions_check' ),
-					'callback'            => array( $this, 'get_widget_form' ),
-					'args'                => array(
-						'context' => $this->get_context_param( array( 'default' => 'edit' ) ),
-					),
-				),
-			)
-		);
 	}
 
 	/**
@@ -235,8 +207,11 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		$widgets = array();
 
 		foreach ( $wp_registered_widgets as $widget ) {
-			$parsed_id    = gutenberg_parse_widget_id( $widget['id'] );
-			$widget['id'] = $parsed_id['id_base'];
+			$parsed_id     = gutenberg_parse_widget_id( $widget['id'] );
+			$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
+
+			$widget['id']       = $parsed_id['id_base'];
+			$widget['is_multi'] = (bool) $widget_object;
 
 			unset( $widget['callback'] );
 
@@ -249,13 +224,6 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 				}
 			}
 			$widget['classname'] = ltrim( $classname, '_' );
-
-			// Backwards compatibility. TODO: Remove.
-			$widget_object = gutenberg_get_widget_object( $parsed_id['id_base'] );
-			if ( $widget_object ) {
-				$widget['option_name']  = $widget_object->option_name;
-				$widget['widget_class'] = get_class( $widget_object );
-			}
 
 			$widgets[] = $widget;
 		}
@@ -301,6 +269,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		$extra_fields = array(
 			'name',
 			'description',
+			'is_multi',
 			'classname',
 			'widget_class',
 			'option_name',
@@ -379,50 +348,35 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			'title'      => 'widget-type',
 			'type'       => 'object',
 			'properties' => array(
-				'id'                          => array(
+				'id'          => array(
 					'description' => __( 'Unique slug identifying the widget type.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'name'                        => array(
+				'name'        => array(
 					'description' => __( 'Human-readable name identifying the widget type.', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
-				'description'                 => array(
+				'description' => array(
 					'description' => __( 'Description of the widget.', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
 					'context'     => array( 'view', 'edit', 'embed' ),
 				),
-				'classname'                   => array(
+				'is_multi'    => array(
+					'description' => __( 'Whether the widget supports multiple instances', 'gutenberg' ),
+					'type'        => 'boolean',
+					'context'     => array( 'view', 'edit', 'embed' ),
+					'readonly'    => true,
+				),
+				'classname'   => array(
 					'description' => __( 'Class name', 'gutenberg' ),
 					'type'        => 'string',
 					'default'     => '',
-					'context'     => array( 'embed', 'view', 'edit' ),
-					'readonly'    => true,
-				),
-				'option_name'                 => array(
-					'description' => __( 'DEPRECATED. Option name.', 'gutenberg' ),
-					'type'        => 'string',
-					'default'     => '',
-					'context'     => array( 'embed', 'view', 'edit' ),
-					'readonly'    => true,
-				),
-				'widget_class'                => array(
-					'description' => __( 'DEPRECATED. Widget class name.', 'gutenberg' ),
-					'type'        => 'string',
-					'default'     => '',
-					'context'     => array( 'embed', 'view', 'edit' ),
-					'readonly'    => true,
-				),
-				'customize_selective_refresh' => array(
-					'description' => __( 'DEPRECATED. Customize selective refresh.', 'gutenberg' ),
-					'type'        => 'boolean',
-					'default'     => false,
 					'context'     => array( 'embed', 'view', 'edit' ),
 					'readonly'    => true,
 				),
@@ -432,45 +386,6 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		$this->schema = $schema;
 
 		return $this->add_additional_fields_schema( $this->schema );
-	}
-
-	/**
-	 * Returns the new widget instance and the form that represents it.
-	 *
-	 * @since 5.6.0
-	 *
-	 * @param WP_REST_Request $request Full details about the request.
-	 * @return WP_REST_Response|WP_Error Response object on success, or WP_Error object on failure.
-	 */
-	public function get_widget_form( $request ) {
-		_deprecated_function( __METHOD__, '10.2.0' );
-
-		$instance = $request->get_param( 'instance' );
-
-		$widget_name = $request['id'];
-		$widget      = $this->get_widget( $widget_name );
-		$widget_obj  = new $widget['widget_class'];
-		$widget_obj->_set( -1 );
-		ob_start();
-
-		/** This filter is documented in wp-includes/class-wp-widget.php */
-		$instance = apply_filters( 'widget_form_callback', $instance, $widget_obj );
-
-		$return = null;
-		if ( false !== $instance ) {
-			$return = $widget_obj->form( $instance );
-
-			/** This filter is documented in wp-includes/class-wp-widget.php */
-			do_action_ref_array( 'in_widget_form', array( &$widget_obj, &$return, $instance ) );
-		}
-		$form = ob_get_clean();
-
-		return rest_ensure_response(
-			array(
-				'instance' => $instance,
-				'form'     => $form,
-			)
-		);
 	}
 
 	/**
@@ -573,13 +488,8 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 		);
 
 		if ( ! empty( $widget_object->show_instance_in_rest ) ) {
-			if ( empty( $instance ) ) {
-				// Use new stdClass() instead of array() so that endpoint
-				// returns {} and not [].
-				$response['instance']['raw'] = new stdClass;
-			} else {
-				$response['instance']['raw'] = $instance;
-			}
+			// Use new stdClass so that JSON result is {} and not [].
+			$response['instance']['raw'] = empty( $instance ) ? new stdClass : $instance;
 		}
 
 		return rest_ensure_response( $response );

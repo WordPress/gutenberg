@@ -85,6 +85,11 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 				'context' => 'Gradient name',
 			),
 			array(
+				'path'    => array( 'settings', '*', 'color', 'duotone' ),
+				'key'     => 'name',
+				'context' => 'Duotone name',
+			),
+			array(
 				'path'    => array( 'customTemplates' ),
 				'key'     => 'title',
 				'context' => 'Custom template name',
@@ -134,4 +139,18 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 			)
 		);
 	}
+
+	function test_switching_themes_recalculates_data() {
+		// By default, the theme for unit tests is "default",
+		// which doesn't have theme.json support.
+		$default = WP_Theme_JSON_Resolver::theme_has_support();
+
+		// Switch to a theme that does have support.
+		switch_theme( 'fse' );
+		$fse = WP_Theme_JSON_Resolver::theme_has_support();
+
+		$this->assertSame( false, $default );
+		$this->assertSame( true, $fse );
+	}
+
 }

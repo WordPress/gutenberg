@@ -4,9 +4,6 @@
 		"rootDir": "src",
 		"declarationDir": "build-types"
 	},
-	"references": [
-		{ "path": "../dom-ready" },
-		{ "path": "../i18n" },
-	],
+	"references": [ { "path": "../dom-ready" }, { "path": "../i18n" } ],
 	"include": [ "src/**/*" ]
 }

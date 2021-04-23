@@ -30,6 +30,15 @@ const subKeysIsResolved = onSubKey( 'selectorName' )(
 				nextState.set( action.args, isStarting );
 				return nextState;
 			}
+			case 'START_RESOLUTIONS':
+			case 'FINISH_RESOLUTIONS': {
+				const isStarting = action.type === 'START_RESOLUTIONS';
+				const nextState = new EquivalentKeyMap( state );
+				for ( const resolutionArgs of action.args ) {
+					nextState.set( resolutionArgs, isStarting );
+				}
+				return nextState;
+			}
 			case 'INVALIDATE_RESOLUTION': {
 				const nextState = new EquivalentKeyMap( state );
 				nextState.delete( action.args );
@@ -60,6 +69,8 @@ const isResolved = ( state = {}, action ) => {
 				: state;
 		case 'START_RESOLUTION':
 		case 'FINISH_RESOLUTION':
+		case 'START_RESOLUTIONS':
+		case 'FINISH_RESOLUTIONS':
 		case 'INVALIDATE_RESOLUTION':
 			return subKeysIsResolved( state, action );
 	}
