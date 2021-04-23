@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { useContextSystem } from '@wp-g2/context';
-import { css, cx } from '@wp-g2/styles';
+import { css, cx } from 'emotion';
 
 /**
  * Internal dependencies
  */
+import { useContextSystem } from '../context';
 import { useControlGroupContext } from '../control-group';
 import { useFlex } from '../flex';
 import * as styles from './styles';
@@ -17,13 +17,12 @@ import * as styles from './styles';
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'button'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').Props, 'button'>} props
  */
 export function useBaseButton( props ) {
 	const {
 		children,
 		className,
-		css: cssProp,
 		currentColor,
 		disabled = false,
 		elevation = 0,
@@ -79,7 +78,6 @@ export function useBaseButton( props ) {
 		isSplit && styles.split,
 		currentColor && styles.currentColor,
 		css( { textAlign } ),
-		css( cssProp ),
 		className
 	);
 

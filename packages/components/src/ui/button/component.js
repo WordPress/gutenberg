@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { contextConnect, useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
+import { cx } from 'emotion';
 import { noop, uniqueId } from 'lodash';
 
 /**
@@ -13,6 +12,7 @@ import { useCallback } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { contextConnect, useContextSystem } from '../context';
 import { BaseButton } from '../base-button';
 import { useButtonGroupContext } from '../button-group';
 import { VisuallyHidden } from '../visually-hidden';
@@ -33,7 +33,7 @@ import * as styles from './styles';
  */
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'button'>} props
+ * @param {import('../context').ViewOwnProps<Props, 'button'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Button( props, forwardedRef ) {
