@@ -98,7 +98,7 @@ function convertMenuItemsToBlocks( menuItems ) {
 	return mapMenuItemsToBlocks( menuTree );
 }
 
-function NavigationPlaceholder( { onCreate, location }, ref ) {
+function NavigationPlaceholder( { location, onCreate, setAttributes }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
 
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
@@ -220,23 +220,19 @@ function NavigationPlaceholder( { onCreate, location }, ref ) {
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
 
-	const setSelectedLocation = ( menu ) => {
-		console.log( menu, location );
-	};
-
 	const locationPlaceholder = () => {
 		if ( ! location || ! menuLocations ) {
 			return;
 		}
 
 		const getDropDownText = () => {
-			return menuLocations.map( ( { name, description } ) => {
-				if ( name === location ) {
-					return description;
-				}
+			const selectedMenuLocation = menuLocations.filter(
+				( menuLocation ) => menuLocation.name === location
+			);
 
-				return __( 'No location selected' );
-			} );
+			if ( selectedMenuLocation.length >= 0 ) {
+				return selectedMenuLocation[ 0 ].description;
+			}
 		};
 
 		return (
@@ -253,7 +249,7 @@ function NavigationPlaceholder( { onCreate, location }, ref ) {
 								return (
 									<MenuItem
 										onClick={ () => {
-											setSelectedLocation( name );
+											setAttributes( { location: name } );
 										} }
 										isSelected={ name === location }
 										onClose={ onClose }

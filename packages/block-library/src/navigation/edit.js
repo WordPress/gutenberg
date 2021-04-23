@@ -101,6 +101,7 @@ function Navigation( {
 			<div { ...blockProps }>
 				<NavigationPlaceholder
 					location={ attributes.location }
+					setAttributes={ setAttributes }
 					onCreate={ ( blocks, selectNavigationBlock ) => {
 						setIsPlaceholderShown( false );
 						updateInnerBlocks( blocks );
