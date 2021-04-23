@@ -72,7 +72,7 @@ export default function TypographyPanel( {
 	const hasAppearanceControl = useHasAppearanceControl( { supports, name } );
 	const hasLetterSpacingControl = useHasLetterSpacingControl( {
 		supports,
-		name
+		name,
 	} );
 
 	return (
