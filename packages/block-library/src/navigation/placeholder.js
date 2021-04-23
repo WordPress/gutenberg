@@ -108,6 +108,7 @@ function NavigationPlaceholder( { onCreate, location }, ref ) {
 		isResolvingPages,
 		hasResolvedPages,
 		menus,
+		menuLocations,
 		isResolvingMenus,
 		hasResolvedMenus,
 		menuItems,
@@ -118,6 +119,7 @@ function NavigationPlaceholder( { onCreate, location }, ref ) {
 				getEntityRecords,
 				getMenus,
 				getMenuItems,
+				getMenuLocations,
 				isResolving,
 				hasFinishedResolution,
 			} = select( coreStore );
@@ -167,6 +169,7 @@ function NavigationPlaceholder( { onCreate, location }, ref ) {
 							menuItemsParameters
 					  )
 					: false,
+				menuLocations: getMenuLocations(),
 			};
 		},
 		[ selectedMenu ]
@@ -217,39 +220,46 @@ function NavigationPlaceholder( { onCreate, location }, ref ) {
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
 
-	const setSelectedLocation = ( menu, location ) => {
-		console.log(menu, location);
+	const setSelectedLocation = ( menu ) => {
+		console.log( menu, location );
 	};
 
 	const locationPlaceholder = () => {
-		if ( ! location ) {
+		if ( ! location || ! menuLocations ) {
 			return;
 		}
 
-		//TODO: Get this from the gettin' place
-		const menuLocations = [ location ];
+		const getDropDownText = () => {
+			return menuLocations.map( ( { name, description } ) => {
+				if ( name === location ) {
+					return description;
+				}
+
+				return __( 'No location selected' );
+			} );
+		};
 
 		return (
 			<>
 				{ ' ' }
 				<DropdownMenu
-					text={ location }
+					text={ getDropDownText() }
 					icon={ chevronDown }
 					toggleProps={ toggleProps }
 				>
 					{ ( { onClose } ) => (
 						<MenuGroup>
-							{ menuLocations.map( ( menuLocation ) => {
+							{ menuLocations.map( ( { name, description } ) => {
 								return (
 									<MenuItem
 										onClick={ () => {
-											setSelectedLocation( menuLocation );
+											setSelectedLocation( name );
 										} }
-										isSelected={ menuLocation === location }
+										isSelected={ name === location }
 										onClose={ onClose }
-										key={ menuLocation }
+										key={ name }
 									>
-										{ menuLocation }
+										{ description }
 									</MenuItem>
 								);
 							} ) }
