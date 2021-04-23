@@ -109,7 +109,7 @@ function gutenberg_edit_site_init( $hook ) {
 		array(
 			'preload_paths'    => array(
 				array( '/wp/v2/media', 'OPTIONS' ),
-				'/?context=edit',
+				'/',
 				'/wp/v2/types?context=edit',
 				'/wp/v2/taxonomies?context=edit',
 				'/wp/v2/pages?context=edit',
