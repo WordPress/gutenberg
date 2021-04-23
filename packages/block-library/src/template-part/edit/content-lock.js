@@ -3,17 +3,17 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 /**
  * External dependencies
  */
 import classnames from 'classnames';
 
+const baseClassName = 'wp-block-template-part__content-lock';
+
 export default function ContentLock( { clientId, children } ) {
 	const wrapperRef = useRef();
-	const baseClassName = 'wp-block-template-part__content-lock';
 
-	const [ overlaySizes, setOverlaySizes ] = useState( {} );
 	const { isSelected, hasChildSelected } = useSelect(
 		( select ) => {
 			const { isBlockSelected, hasSelectedInnerBlock } = select(
@@ -29,22 +29,6 @@ export default function ContentLock( { clientId, children } ) {
 
 	const selectBlock = useDispatch( blockEditorStore ).selectBlock;
 
-	useEffect( () => {
-		if ( wrapperRef.current?.clientHeight && ! hasChildSelected ) {
-			setOverlaySizes( {
-				height: wrapperRef.current?.clientHeight + 'px',
-				width: wrapperRef.current?.clientWidth + 'px',
-			} );
-		} else {
-			setOverlaySizes( {} );
-		}
-	}, [
-		wrapperRef.current,
-		wrapperRef.current?.clientHeight,
-		wrapperRef.current?.clientWidth,
-		hasChildSelected,
-	] );
-
 	const classes = classnames( baseClassName, {
 		'overlay-selected': isSelected,
 		'child-selected': hasChildSelected,
@@ -55,10 +39,10 @@ export default function ContentLock( { clientId, children } ) {
 
 	return (
 		<div className={ classes }>
-			<button
-				className={ `${ baseClassName }-overlay` }
-				style={ overlaySizes }
+			<ContentOverlay
 				onClick={ onClick }
+				height={ wrapperRef.current?.clientHeight }
+				width={ wrapperRef.current?.clientWidth }
 			/>
 			<div
 				className={ `${ baseClassName }-content-wrapper` }
@@ -67,5 +51,22 @@ export default function ContentLock( { clientId, children } ) {
 				{ children }
 			</div>
 		</div>
+	);
+}
+
+function ContentOverlay( { onClick, height, width } ) {
+	const overlayDimensions =
+		height && width
+			? {
+					height: height + 'px',
+					width: width + 'px',
+			  }
+			: {};
+	return (
+		<button
+			className={ `${ baseClassName }-overlay` }
+			style={ overlayDimensions }
+			onClick={ onClick }
+		/>
 	);
 }
