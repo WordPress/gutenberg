@@ -17,7 +17,7 @@ module.exports = ( api ) => {
 
 	const getPresetEnv = () => {
 		const opts = {
-			include: [ 'syntax-nullish-coalescing-operator' ],
+			include: [ 'proposal-nullish-coalescing-operator' ],
 		};
 
 		if ( isTestEnv ) {
