@@ -18,6 +18,7 @@
 		"fontSize": true,
 		"lineHeight": true,
 		"__experimentalFontFamily": true,
-		"__experimentalTextTransform": true
+		"__experimentalTextTransform": true,
+		"__experimentalLetterSpacing": true
 	}
 }

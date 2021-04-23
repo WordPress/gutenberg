@@ -180,6 +180,7 @@
 				"customFontWeight": true,
 				"customTextTransforms": true,
 				"customTextDecorations": true,
+				"customLetterSpacing": true,
 				"fontSizes": [
 					{
 						"name": "Small",

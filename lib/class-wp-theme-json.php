@@ -92,6 +92,7 @@ class WP_Theme_JSON {
 			'lineHeight'     => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
+			'letterSpacing'  => null,
 		),
 	);
 
@@ -124,6 +125,7 @@ class WP_Theme_JSON {
 			'customFontWeight'      => null,
 			'customTextDecorations' => null,
 			'customTextTransforms'  => null,
+			'customLetterSpacing'   => null,
 		),
 		'custom'     => null,
 		'layout'     => null,
@@ -268,6 +270,9 @@ class WP_Theme_JSON {
 		),
 		'text-transform'           => array(
 			'value' => array( 'typography', 'textTransform' ),
+		),
+		'letter-spacing'           => array(
+			'value' => array( 'typography', 'letterSpacing' ),
 		),
 	);
 
