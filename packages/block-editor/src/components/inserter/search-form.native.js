@@ -6,7 +6,7 @@ import { TextInput, View, TouchableHighlight } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useState, useRef, useCallback } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
@@ -22,7 +22,12 @@ import {
  */
 import styles from './style.scss';
 
-function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
+function InserterSearchForm( {
+	value,
+	onChange,
+	onFocus,
+	onLayout = () => {},
+} ) {
 	const [ isActive, setIsActive ] = useState( false );
 
 	const inputRef = useRef();
@@ -42,6 +47,16 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 		styles.searchFormPlaceholderDark
 	);
 
+	const onActive = useCallback(
+		( active ) => {
+			if ( onFocus ) {
+				onFocus( active );
+			}
+			setIsActive( active );
+		},
+		[ onFocus, setIsActive ]
+	);
+
 	return (
 		<TouchableHighlight accessible={ false } onLayout={ onLayout }>
 			<View style={ searchFormStyle }>
@@ -52,7 +67,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 						onClick={ () => {
 							inputRef.current.blur();
 							onChange( '' );
-							setIsActive( false );
+							onActive( false );
 						} }
 					/>
 				) : (
@@ -61,7 +76,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 						icon={ searchIcon }
 						onClick={ () => {
 							inputRef.current.focus();
-							setIsActive( true );
+							onActive( true );
 						} }
 					/>
 				) }
@@ -70,7 +85,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 					style={ searchFormInputStyle }
 					placeholderTextColor={ placeholderStyle.color }
 					onChangeText={ onChange }
-					onFocus={ () => setIsActive( true ) }
+					onFocus={ () => onActive( true ) }
 					value={ value }
 					placeholder={ __( 'Search blocks' ) }
 				/>

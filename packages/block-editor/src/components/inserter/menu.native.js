@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { TouchableHighlight } from 'react-native';
+import { LayoutAnimation, TouchableHighlight } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -32,6 +32,7 @@ function InserterMenu( {
 	insertionIndex,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ searchFocus, setSearchFocus ] = useState( false );
 	// eslint-disable-next-line no-undef
 	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
 	const [ tabIndex, setTabIndex ] = useState( 0 );
@@ -145,6 +146,16 @@ function InserterMenu( {
 		[ onInsert, onSelect ]
 	);
 
+	const onFocusSearch = useCallback(
+		( focus ) => {
+			LayoutAnimation.configureNext(
+				LayoutAnimation.Presets.easeInEaseOut
+			);
+			setSearchFocus( focus );
+		},
+		[ setSearchFocus ]
+	);
+
 	return (
 		<BottomSheet
 			isVisible={ true }
@@ -156,10 +167,11 @@ function InserterMenu( {
 							onChange={ ( value ) => {
 								setFilterValue( value );
 							} }
+							onFocus={ onFocusSearch }
 							value={ filterValue }
 						/>
 					) }
-					{ ! filterValue && hasReusableBlocks && (
+					{ ! searchFocus && ! filterValue && hasReusableBlocks && (
 						<InserterTabs.Control onChangeTab={ setTabIndex } />
 					) }
 				</>
