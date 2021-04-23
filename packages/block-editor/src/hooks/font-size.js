@@ -174,11 +174,16 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 			wrapperProps,
 		} = props;
 
-		// Only add inline styles if the block supports font sizes, doesn't
-		// already have an inline font size, and does have a class to extract
-		// the font size from.
+		// Only add inline styles if the block supports font sizes,
+		// doesn't skip serialization of font sizes,
+		// doesn't already have an inline font size,
+		// and does have a class to extract the font size from.
 		if (
 			! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ||
+			hasBlockSupport(
+				blockName,
+				'__experimentalSkipFontSizeSerialization'
+			) ||
 			! fontSize ||
 			style?.typography?.fontSize
 		) {
