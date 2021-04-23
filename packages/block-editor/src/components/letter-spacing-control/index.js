@@ -7,7 +7,7 @@ import {
 	FlexItem,
 	FlexBlock,
 	BaseControl,
-	__experimentalUnitControl as UnitControl
+	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -44,8 +44,10 @@ export default function LetterSpacingControl( { value, onChange } ) {
 	return (
 		<BaseControl
 			className="block-editor-letter-spacing-control"
-			label={ __( 'Letter-spacing' ) }
 		>
+			<BaseControl.VisualLabel>
+			{ __( 'Letter-spacing' ) }
+			</BaseControl.VisualLabel>
 			<Flex>
 				<FlexBlock>
 					<UnitControl
