@@ -6,7 +6,7 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { wrap, unwrap, replaceTag } from '@wordpress/dom';
+import { wrap, replaceTag } from '@wordpress/dom';
 
 export default function phrasingContentReducer( node, doc ) {
 	// In jsdom-jscore, 'node.style' can be null.
@@ -61,8 +61,6 @@ export default function phrasingContentReducer( node, doc ) {
 		if ( node.name && ! node.id ) {
 			node.id = node.name;
 		}
-		// Removes obsolete name attribute in any case
-		node.removeAttribute( 'name' );
 
 		// Keeps id only if there is an internal link pointing to it
 		if (
@@ -70,11 +68,6 @@ export default function phrasingContentReducer( node, doc ) {
 			! node.ownerDocument.querySelector( `[href="#${ node.id }"]` )
 		) {
 			node.removeAttribute( 'id' );
-		}
-
-		// Remove anchor tag if no href nor id
-		if ( ! node.id && ! node.href ) {
-			unwrap( node );
 		}
 	}
 }

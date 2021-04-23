@@ -32,7 +32,7 @@ const textContentSchema = {
 	s: {},
 	del: {},
 	ins: {},
-	a: { attributes: [ 'href', 'target', 'rel', 'id', 'name' ] },
+	a: { attributes: [ 'href', 'target', 'rel', 'id' ] },
 	code: {},
 	abbr: { attributes: [ 'title' ] },
 	sub: {},
