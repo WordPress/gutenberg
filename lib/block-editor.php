@@ -23,37 +23,37 @@ function gutenberg_get_default_block_categories() {
 	return array(
 		array(
 			'slug'  => 'text',
-			'title' => _x( 'Text', 'block category' ),
+			'title' => _x( 'Text', 'block category', 'gutenberg' ),
 			'icon'  => null,
 		),
 		array(
 			'slug'  => 'media',
-			'title' => _x( 'Media', 'block category' ),
+			'title' => _x( 'Media', 'block category', 'gutenberg' ),
 			'icon'  => null,
 		),
 		array(
 			'slug'  => 'design',
-			'title' => _x( 'Design', 'block category' ),
+			'title' => _x( 'Design', 'block category', 'gutenberg' ),
 			'icon'  => null,
 		),
 		array(
 			'slug'  => 'widgets',
-			'title' => _x( 'Widgets', 'block category' ),
+			'title' => _x( 'Widgets', 'block category', 'gutenberg' ),
 			'icon'  => null,
 		),
 		array(
 			'slug'  => 'theme',
-			'title' => _x( 'Theme', 'block category' ),
+			'title' => _x( 'Theme', 'block category', 'gutenberg' ),
 			'icon'  => null,
 		),
 		array(
 			'slug'  => 'embed',
-			'title' => _x( 'Embeds', 'block category' ),
+			'title' => _x( 'Embeds', 'block category', 'gutenberg' ),
 			'icon'  => null,
 		),
 		array(
 			'slug'  => 'reusable',
-			'title' => _x( 'Reusable Blocks', 'block category' ),
+			'title' => _x( 'Reusable Blocks', 'block category', 'gutenberg' ),
 			'icon'  => null,
 		),
 	);
@@ -175,10 +175,10 @@ function gutenberg_get_default_block_editor_settings() {
 	$image_size_names = apply_filters(
 		'image_size_names_choose',
 		array(
-			'thumbnail' => __( 'Thumbnail' ),
-			'medium'    => __( 'Medium' ),
-			'large'     => __( 'Large' ),
-			'full'      => __( 'Full Size' ),
+			'thumbnail' => __( 'Thumbnail', 'gutenberg' ),
+			'medium'    => __( 'Medium', 'gutenberg' ),
+			'large'     => __( 'Large', 'gutenberg' ),
+			'full'      => __( 'Full Size', 'gutenberg' ),
 		)
 	);
 
