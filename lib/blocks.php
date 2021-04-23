@@ -144,7 +144,7 @@ function gutenberg_reregister_core_block_types() {
 				gutenberg_register_core_block_styles( $block_name );
 			}
 
-			require $blocks_dir . $file;
+			require_once $blocks_dir . $file;
 		}
 	}
 }
