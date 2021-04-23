@@ -387,6 +387,7 @@ export function registerBlockTypeFromMetadata(
 	additionalSettings
 ) {
 	const allowedFields = [
+		'apiVersion',
 		'title',
 		'category',
 		'parent',
@@ -399,7 +400,7 @@ export function registerBlockTypeFromMetadata(
 		'supports',
 		'styles',
 		'example',
-		'apiVersion',
+		'variations',
 	];
 
 	const settings = pick( metadata, allowedFields );

@@ -812,6 +812,14 @@ describe( 'blocks', () => {
 					title: 'Block from metadata',
 					category: 'text',
 					icon: 'palmtree',
+					variations: [
+						{
+							name: 'variation',
+							title: 'Variation Title',
+							description: 'Variation description',
+							keywords: [ 'variation' ],
+						},
+					],
 				},
 				{
 					edit: Edit,
@@ -831,6 +839,14 @@ describe( 'blocks', () => {
 				usesContext: [],
 				supports: {},
 				styles: [],
+				variations: [
+					{
+						name: 'variation',
+						title: 'Variation Title',
+						description: 'Variation description',
+						keywords: [ 'variation' ],
+					},
+				],
 				edit: Edit,
 				save: noop,
 			} );
@@ -851,8 +867,16 @@ describe( 'blocks', () => {
 					keywords: [ 'i18n', 'metadata' ],
 					styles: [
 						{
-							name: 'i18n-metadata',
-							label: 'I18n Metadata',
+							name: 'i18n-style',
+							label: 'I18n Style Label',
+						},
+					],
+					variations: [
+						{
+							name: 'i18n-variation',
+							title: 'I18n Variation Title',
+							description: 'I18n variation description',
+							keywords: [ 'variation' ],
 						},
 					],
 					textdomain: 'test',
@@ -882,8 +906,16 @@ describe( 'blocks', () => {
 				supports: {},
 				styles: [
 					{
-						name: 'i18n-metadata',
-						label: 'I18n Metadata (translated)',
+						name: 'i18n-style',
+						label: 'I18n Style Label (translated)',
+					},
+				],
+				variations: [
+					{
+						name: 'i18n-variation',
+						title: 'I18n Variation Title (translated)',
+						description: 'I18n variation description (translated)',
+						keywords: [ 'variation (translated)' ],
 					},
 				],
 				edit: Edit,
