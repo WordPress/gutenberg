@@ -17,6 +17,7 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -25,7 +26,6 @@ import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
 import { TemplatePartAdvancedControls } from './advanced-controls';
-import { getTagBasedOnArea } from './get-tag-based-on-area';
 
 export default function TemplatePartEdit( {
 	attributes,
@@ -42,7 +42,7 @@ export default function TemplatePartEdit( {
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { isResolved, innerBlocks, isMissing, area } = useSelect(
+	const { isResolved, innerBlocks, isMissing, defaultWrapper } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } = select(
 				coreStore
@@ -64,11 +64,18 @@ export default function TemplatePartEdit( {
 				  )
 				: false;
 
+			const defaultWrapperElement = select( editorStore )
+				.__experimentalGetDefaultTemplatePartAreas()
+				.find(
+					( { area } ) =>
+						area === ( entityRecord?.area || attributes.area )
+				)?.area_tag;
+
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isResolved: hasResolvedEntity,
 				isMissing: hasResolvedEntity && ! entityRecord,
-				area: entityRecord?.area,
+				defaultWrapper: defaultWrapperElement || 'div',
 			};
 		},
 		[ templatePartId, clientId ]
@@ -77,7 +84,7 @@ export default function TemplatePartEdit( {
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
-	const TagName = tagName || getTagBasedOnArea( area );
+	const TagName = tagName || defaultWrapper;
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
@@ -117,6 +124,7 @@ export default function TemplatePartEdit( {
 				setAttributes={ setAttributes }
 				isEntityAvailable={ isEntityAvailable }
 				templatePartId={ templatePartId }
+				defaultWrapper={ defaultWrapper }
 			/>
 			{ isPlaceholder && (
 				<TagName { ...blockProps }>
