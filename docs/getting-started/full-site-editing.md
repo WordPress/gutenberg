@@ -2,7 +2,7 @@
 
 Full Site Editing is the umbrella project name for various sub-projects within Gutenberg. Projects under Full Site Editing (FSE) include the Site Editor, Widgets Editor, Navigation Editor, Global Styles, numerous Site/Post/Page specific blocks, Query block, Navigation block, Templates, and block themes.
 
-**Jump in:** To start using Full Site Editing you need to use the Gutenberg plugin, and a block theme. You can install both from the WordPress directories. We recommend the [TT1 Blocks theme](https://wordpress.org/themes/tt1-blocks/), it is listed in the theme diretory and our reference block theme.
+**Jump in:** The best way to learn something is start playing with it. So jump in, install the Gutenberg plugin from the plugins directory and then all you need is a block theme. We recommend the [TT1 Blocks theme](https://wordpress.org/themes/tt1-blocks/), it is listed in the theme diretory and our development reference theme. You can find other themes in the directory using the [full-site-editing feature tag](https://wordpress.org/themes/tags/full-site-editing/).
 
 ## Get Involved
 
