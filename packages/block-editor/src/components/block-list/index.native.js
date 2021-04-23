@@ -310,15 +310,15 @@ export class BlockList extends Component {
 								: ITEM_HEIGHT;
 						const offset =
 							this.itemHeights && this.itemHeights.length > 0
-								? this.itemHeights.reduce(
-										( acc, val, i ) =>
-											i <= index
-												? val && val > 0
+								? this.itemHeights
+										.slice( 0, index + 1 )
+										.reduce(
+											( acc, val, i ) =>
+												val && val > 0
 													? acc + val
-													: acc + ITEM_HEIGHT
-												: acc,
-										0
-								  )
+													: acc + ITEM_HEIGHT,
+											0
+										)
 								: ITEM_HEIGHT * index;
 						return {
 							length: length,
