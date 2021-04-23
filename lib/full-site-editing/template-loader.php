@@ -17,7 +17,9 @@ function gutenberg_add_template_loader_filters() {
 		if ( 'embed' === $template_type ) { // Skip 'embed' for now because it is not a regular template type.
 			continue;
 		}
-		add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_override_query_template', 20, 3 );
+		if( ! file_exists( get_stylesheet_directory() . '/' . $template_type . '.php' ) || null !== _gutenberg_get_template_file( 'wp_template', $template_type )){
+			add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_override_query_template', 20, 3 );
+		}
 	}
 }
 add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
@@ -129,7 +131,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 }
 
 /**
- * Return the correct 'wp_template' to render fot the request template type.
+ * Return the correct 'wp_template' to render for the request template type.
  *
  * Accepts an optional $template_hierarchy argument as a hint.
  *
