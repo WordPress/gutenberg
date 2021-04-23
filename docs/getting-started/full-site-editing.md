@@ -14,7 +14,7 @@ An ongoing [FSE Outreach program](https://make.wordpress.org/test/handbook/full-
 
 ## Block Themes
 
-If you are using the Gutenberg plugin you can run, test, and develop block themes. Block themes are themes built using templates composed using blocks.
+If you are using the Gutenberg plugin you can run, test, and develop block themes. Block themes are themes built using templates composed using blocks. See [block theme overview](/docs/how-to-guides/themes/block-based-themes.md) for additional details.
 
 - See the [Create a Block Theme](/docs/how-to-guides/block-theme/README.md) tutorial for a walk-through of the pieces of a block theme.
 
