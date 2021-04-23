@@ -59,7 +59,7 @@ function mapMenuItemsToBlocks( menuItems ) {
 			type: menuItem?.object,
 			id: menuItem?.object_id,
 			// the equivalent on `nav_menu_item` is "type" but it is stored with underscores whereas the block attr uses hyphens.
-			kind: menuItem.type.replace( '_', '_' ),
+			kind: menuItem.type.replace( '_', '-' ),
 		};
 
 		if ( menuItem.url ) {
