@@ -6,7 +6,7 @@ Full Site Editing is the umbrella project name for various sub-projects within G
 
 ## Get Involved
 
-The majority of full site editing features are available in the Gutenberg plugin, and an ongoing [FSE Outreach program](https://make.wordpress.org/test/handbook/full-site-editing-outreach-experiment/) is running with calls for testing.
+An ongoing [FSE Outreach program](https://make.wordpress.org/test/handbook/full-site-editing-outreach-experiment/) is running with calls for testing, this is a great way to get involved and learn about the new features.
 
 - Join in on Slack at #fse-outreach-experiment
 - Participate in the [Calls for Testing](https://make.wordpress.org/test/tag/fse-testing-call/), test and give feedback.
@@ -18,7 +18,7 @@ If you are using the Gutenberg plugin you can run, test, and develop block theme
 
 - See the [Create a Block Theme](/docs/how-to-guides/block-theme/README.md) tutorial for a walk-through of the pieces of a block theme.
 
-- For examples, see the [github.com/WordPress/theme-experiments](https://github.com/WordPress/theme-experiments/) repository several block themes are availabe including the source for the above mentioned TT1 Blocks.
+- For examples, see the [WordPress/theme-experiments](https://github.com/WordPress/theme-experiments/) repository with several block themes there including the source for the above mentioned TT1 Blocks.
 
 - Use the `empty-theme.php` script from theme-experiments repo to generate a start block theme, it will prompt you with a few questions and create a theme.
 
@@ -36,6 +36,10 @@ Your new theme is ready!
 ```
 
 You can then copy the generated directory to your `wp-content/themes` directory and start playing with the Site Editor to build and extend the theme.
+
+### Template and Template Parts
+
+See the [architecture document on templates](docs/explanations/architecture/full-site-editing-templates.md) for an explanation on the internals of how templates and templates parts are rendered in the frontend and edited in the backend.
 
 ### theme.json
 
