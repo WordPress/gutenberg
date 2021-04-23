@@ -10,7 +10,7 @@ import KeyboardAvoidingView from '../keyboard-avoiding-view';
 
 export const KeyboardAwareFlatList = ( props ) => (
 	<KeyboardAvoidingView style={ { flex: 1 } }>
-		<FlatList { ...props } />
+		<FlatList ref={ props.innerRef } { ...props } />
 	</KeyboardAvoidingView>
 );
 

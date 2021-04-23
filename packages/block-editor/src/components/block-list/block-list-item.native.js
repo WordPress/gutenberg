@@ -117,6 +117,7 @@ export class BlockListItem extends Component {
 			marginHorizontal,
 			blockName,
 			blockWidth,
+			onLayout,
 			...restProps
 		} = this.props;
 		const readableContentViewStyle =
@@ -141,6 +142,7 @@ export class BlockListItem extends Component {
 				<View
 					style={ this.getContentStyles( readableContentViewStyle ) }
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
+					onLayout={ onLayout }
 				>
 					{ shouldShowInsertionPointBefore && (
 						<BlockInsertionPoint />

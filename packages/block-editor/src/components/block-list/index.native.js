@@ -79,6 +79,7 @@ export class BlockList extends Component {
 		this.getExtraData = this.getExtraData.bind( this );
 
 		this.onLayout = this.onLayout.bind( this );
+		this.itemHeights = [];
 
 		this.state = {
 			blockWidth: this.props.blockWidth || 0,
@@ -103,7 +104,7 @@ export class BlockList extends Component {
 	}
 
 	shouldFlatListPreventAutomaticScroll() {
-		return this.props.isBlockInsertionPointVisible;
+		return false;
 	}
 
 	shouldShowInnerBlockAppender() {
@@ -166,7 +167,12 @@ export class BlockList extends Component {
 	}
 
 	render() {
-		const { isRootList } = this.props;
+		const {
+			isRootList,
+			isBlockInsertionPointVisible,
+			selectedBlockClientId,
+			blockClientIds,
+		} = this.props;
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
 		const blockList = isRootList ? (
 			<BlockListContext.Provider value={ this.scrollViewRef }>
@@ -182,6 +188,17 @@ export class BlockList extends Component {
 			</BlockListContext.Consumer>
 		);
 
+		if ( isRootList && isBlockInsertionPointVisible ) {
+			const jumpToIndex = blockClientIds.findIndex(
+				( el ) => el === selectedBlockClientId
+			);
+			console.log( {
+				selectedBlockClientId,
+				jumpToIndex,
+				blockClientIds,
+			} );
+			this.scrollViewRef.scrollToIndex( { index: jumpToIndex } );
+		}
 		return (
 			<OnCaretVerticalPositionChange.Provider
 				value={ this.onCaretVerticalPositionChange }
@@ -275,6 +292,32 @@ export class BlockList extends Component {
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
+					getItemLayout={ ( data, index ) => {
+						const ITEM_HEIGHT = 30;
+						// const ii = this.itemHeights;
+						const length =
+							this.itemHeights &&
+							this.itemHeights.length > 0 &&
+							this.itemHeights[ index ]
+								? this.itemHeights[ index ]
+								: ITEM_HEIGHT;
+						const offset =
+							this.itemHeights && this.itemHeights.length > 0
+								? this.itemHeights.reduce(
+										( acc, val, i ) =>
+											val && val > 0
+												? acc + val
+												: acc + ITEM_HEIGHT,
+										0
+								  )
+								: ITEM_HEIGHT * index;
+						// console.log( { ii, index } );
+						return {
+							length: length,
+							offset: offset,
+							index,
+						};
+					} }
 					shouldPreventAutomaticScroll={
 						this.shouldFlatListPreventAutomaticScroll
 					}
@@ -302,7 +345,7 @@ export class BlockList extends Component {
 		);
 	}
 
-	renderItem( { item: clientId } ) {
+	renderItem( { item: clientId, index } ) {
 		const {
 			contentResizeMode,
 			contentStyle,
@@ -331,6 +374,10 @@ export class BlockList extends Component {
 					this.shouldShowInnerBlockAppender
 				}
 				blockWidth={ blockWidth }
+				onLayout={ ( object ) =>
+					( this.itemHeights[ index ] =
+						object.nativeEvent.layout.height )
+				}
 			/>
 		);
 	}
@@ -396,8 +443,8 @@ export default compose( [
 			return {
 				blockClientIds,
 				blockCount,
-				isBlockInsertionPointVisible:
-					Platform.OS === 'ios' && isBlockInsertionPointVisible(),
+				isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
+				selectedBlockClientId,
 				isReadOnly,
 				isRootList: rootClientId === undefined,
 				isFloatingToolbarVisible,
