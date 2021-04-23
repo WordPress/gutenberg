@@ -225,21 +225,19 @@ function NavigationPlaceholder( { location, onCreate, setAttributes }, ref ) {
 			return;
 		}
 
-		const getDropDownText = () => {
-			const selectedMenuLocation = menuLocations.filter(
-				( menuLocation ) => menuLocation.name === location
-			);
+		const selectedMenuLocation = menuLocations.filter(
+			( menuLocation ) => menuLocation.name === location
+		)?.[0];
 
-			if ( selectedMenuLocation.length >= 0 ) {
-				return selectedMenuLocation[ 0 ].description;
-			}
-		};
+		if( ! selectedMenuLocation ) {
+			return;
+		}
 
 		return (
 			<>
 				{ ' ' }
 				<DropdownMenu
-					text={ getDropDownText() }
+					text={ selectedMenuLocation.description }
 					icon={ chevronDown }
 					toggleProps={ toggleProps }
 				>
@@ -262,7 +260,7 @@ function NavigationPlaceholder( { location, onCreate, setAttributes }, ref ) {
 						</MenuGroup>
 					) }
 				</DropdownMenu>
-				<Button isTertiary onClick={ editExistingMenu() }>
+				<Button isTertiary href={`/wp-admin/nav-menus.php?action=edit&menu=${selectedMenuLocation.menu}`}>
 					{ __( 'Edit' ) }
 				</Button>
 				<Button isTertiary onClick={ onConvertToBlocks() }>
@@ -271,8 +269,6 @@ function NavigationPlaceholder( { location, onCreate, setAttributes }, ref ) {
 			</>
 		);
 	};
-
-	const editExistingMenu = () => {};
 
 	const onConvertToBlocks = () => {};
 
