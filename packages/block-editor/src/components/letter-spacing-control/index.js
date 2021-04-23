@@ -42,11 +42,9 @@ const CSS_UNITS = [
  */
 export default function LetterSpacingControl( { value, onChange } ) {
 	return (
-		<BaseControl
-			className="block-editor-letter-spacing-control"
-		>
+		<BaseControl className="block-editor-letter-spacing-control">
 			<BaseControl.VisualLabel>
-			{ __( 'Letter-spacing' ) }
+				{ __( 'Letter-spacing' ) }
 			</BaseControl.VisualLabel>
 			<Flex>
 				<FlexBlock>
