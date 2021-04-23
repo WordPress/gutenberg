@@ -9,7 +9,7 @@ import { wpDataSelect } from './wp-data-select';
  * @return {Promise} Promise resolving with an array containing all blocks in the document.
  */
 export async function getAllBlocks() {
-	const blocks = wpDataSelect( 'core/block-editor', 'getBlocks' );
+	const blocks = await wpDataSelect( 'core/block-editor', 'getBlocks' );
 	if ( typeof blocks === 'undefined' ) {
 		const listener = ( message ) => {
 			// eslint-disable-next-line no-console
