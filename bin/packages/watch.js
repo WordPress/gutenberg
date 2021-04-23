@@ -57,12 +57,16 @@ function isDirectory( pathname ) {
  * @return {boolean} True if the file a source file.
  */
 function isSourceFile( filename ) {
+	// Only run this regex on the relative path, otherwise we might run
+	// into some false positives when eg. the project directory contains `src`
+	const relativePath = path.relative( process.cwd(), filename );
+
 	return (
-		/\/src\/.+\.(js|json|scss)$/.test( filename ) &&
+		/\/src\/.+\.(js|json|scss)$/.test( relativePath ) &&
 		! [
 			/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
 			/.\.(spec|test)\.js$/,
-		].some( ( regex ) => regex.test( filename ) )
+		].some( ( regex ) => regex.test( relativePath ) )
 	);
 }
 
