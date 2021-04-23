@@ -17,7 +17,7 @@ function gutenberg_add_template_loader_filters() {
 		if ( 'embed' === $template_type ) { // Skip 'embed' for now because it is not a regular template type.
 			continue;
 		}
-		if( ! file_exists( get_stylesheet_directory() . '/' . $template_type . '.php' ) || null !== _gutenberg_get_template_file( 'wp_template', $template_type )){
+		if ( ! file_exists( get_stylesheet_directory() . '/' . $template_type . '.php' ) || null !== _gutenberg_get_template_file( 'wp_template', $template_type ) ) {
 			add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_override_query_template', 20, 3 );
 		}
 	}
