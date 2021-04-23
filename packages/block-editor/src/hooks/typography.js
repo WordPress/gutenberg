@@ -81,7 +81,7 @@ export function TypographyPanel( props ) {
 					<FontAppearanceEdit { ...props } />
 					<LineHeightEdit { ...props } />
 					<TextDecorationAndTransformEdit { ...props } />
-					<LetterSpacingEdit {...props} />
+					<LetterSpacingEdit { ...props } />
 				</ComponentSystemProvider>
 			</PanelBody>
 		</InspectorControls>
