@@ -2,9 +2,16 @@
  * WordPress dependencies
  */
 import { useEntityProp } from '@wordpress/core-data';
-import { SelectControl, TextControl } from '@wordpress/components';
+import {
+	BaseControl,
+	Button,
+	SelectControl,
+	TextControl,
+	Tooltip,
+} from '@wordpress/components';
 import { sprintf, __ } from '@wordpress/i18n';
 import { InspectorAdvancedControls } from '@wordpress/block-editor';
+import { footer, header, layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -12,9 +19,27 @@ import { InspectorAdvancedControls } from '@wordpress/block-editor';
 import { getTagBasedOnArea } from './get-tag-based-on-area';
 
 const AREA_OPTIONS = [
-	{ label: __( 'Header' ), value: 'header' },
-	{ label: __( 'Footer' ), value: 'footer' },
 	{
+		description: __(
+			'The Header template defines a page area that typically contains a title, logo, and main navigation.'
+		),
+		icon: header,
+		label: __( 'Header' ),
+		value: 'header',
+	},
+	{
+		description: __(
+			'The Footer template defines a page area that typically contains site credits, social links, or any other combination of blocks.'
+		),
+		icon: footer,
+		label: __( 'Footer' ),
+		value: 'footer',
+	},
+	{
+		description: __(
+			'General templates often perform a specific role like displaying post content, and are not tied to any particular area.'
+		),
+		icon: layout,
 		label: __( 'General' ),
 		value: 'uncategorized',
 	},
@@ -53,13 +78,41 @@ export function TemplatePartAdvancedControls( {
 						onFocus={ ( event ) => event.target.select() }
 					/>
 
-					<SelectControl
-						label={ __( 'Area' ) }
-						labelPosition="top"
-						options={ AREA_OPTIONS }
-						value={ area }
-						onChange={ setArea }
-					/>
+					<BaseControl
+						id={ `template-part-area-control-${ templatePartId }` }
+						className="template-part-area-control"
+						help={ __(
+							'The area of the page that this block should occupy.'
+						) }
+					>
+						<BaseControl.VisualLabel className="template-part-area-control__label">
+							{ __( 'Area' ) }
+						</BaseControl.VisualLabel>
+
+						<div>
+							{ AREA_OPTIONS.map(
+								( { description, icon, label, value } ) => (
+									<Tooltip
+										id={ `template-part-area-option-${ value }` }
+										className="template-part-area-control__option-description"
+										key={ value }
+										position="top right"
+										text={ description }
+									>
+										<Button
+											aria-describedby={ `template-part-area-option-${ value }` }
+											className="template-part-area-control__option"
+											icon={ icon }
+											isSecondary
+											isPressed={ value === area }
+											label={ label }
+											onClick={ () => setArea( value ) }
+										/>
+									</Tooltip>
+								)
+							) }
+						</div>
+					</BaseControl>
 				</>
 			) }
 			<SelectControl
