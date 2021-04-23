@@ -10,6 +10,7 @@ import { debounce } from 'lodash';
 import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -36,7 +37,7 @@ export default function LinkPickerResults( {
 
 	// a stable debounced function to fetch suggestions and append
 	const { fetchMoreSuggestions } = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		const fetchLinkSuggestions = async ( { search } ) => {
 			if ( meetsThreshold( search ) ) {
 				return await getSettings().__experimentalFetchLinkSuggestions(
