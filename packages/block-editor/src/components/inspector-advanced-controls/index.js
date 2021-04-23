@@ -17,7 +17,7 @@ const { Fill, Slot } = createSlotFill( name );
 function InspectorAdvancedControls( { children } ) {
 	const { isSelected } = useBlockEditContext();
 	return isSelected ? (
-		<StyleProvider iframeDocument={ document }>
+		<StyleProvider document={ document }>
 			<Fill>{ children }</Fill>
 		</StyleProvider>
 	) : null;

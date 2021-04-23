@@ -72,7 +72,7 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
  */
 function BlockSettingsMenuControls( { ...props } ) {
 	return (
-		<StyleProvider iframeDocument={ document }>
+		<StyleProvider document={ document }>
 			<Fill { ...props } />
 		</StyleProvider>
 	);

@@ -29,7 +29,7 @@ export default function BlockControlsFill( {
 	const Fill = groups[ group ].Fill;
 
 	return (
-		<StyleProvider iframeDocument={ document }>
+		<StyleProvider document={ document }>
 			<Fill>
 				{ ( fillProps ) => {
 					// Children passed to BlockControlsFill will not have access to any

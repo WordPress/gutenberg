@@ -15,7 +15,7 @@ const { Fill, Slot } = createSlotFill( 'InspectorControls' );
 
 function InspectorControls( { children } ) {
 	return useDisplayBlockControls() ? (
-		<StyleProvider iframeDocument={ document }>
+		<StyleProvider document={ document }>
 			<Fill>{ children }</Fill>
 		</StyleProvider>
 	) : null;
