@@ -19,6 +19,9 @@
 			"text": false,
 			"link": true
 		},
+		"spacing": {
+			"padding": true
+		},
 		"fontSize": true,
 		"lineHeight": true,
 		"__experimentalFontFamily": true,
