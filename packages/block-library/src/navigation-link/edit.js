@@ -234,7 +234,14 @@ export default function NavigationLinkEdit( {
 		url,
 		opensInNewTab,
 	};
-	const { textColor, backgroundColor, style, showSubmenuIcon } = context;
+	const {
+		textColor,
+		backgroundColor,
+		overlayTextColor,
+		overlayBackgroundColor,
+		style,
+		showSubmenuIcon,
+	} = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
@@ -245,6 +252,7 @@ export default function NavigationLinkEdit( {
 
 	const {
 		isAtMaxNesting,
+		isTopLevelLink,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
@@ -270,6 +278,8 @@ export default function NavigationLinkEdit( {
 				isAtMaxNesting:
 					getBlockParentsByBlockName( clientId, name ).length >=
 					MAX_NESTING,
+				isTopLevelLink:
+					getBlockParentsByBlockName( clientId, name ).length === 0,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
@@ -381,6 +391,13 @@ export default function NavigationLinkEdit( {
 		};
 	}
 
+	const textColorForNesting = isTopLevelLink
+		? textColor
+		: overlayTextColor || textColor;
+	const bgColorForNesting = isTopLevelLink
+		? backgroundColor
+		: overlayBackgroundColor || backgroundColor;
+
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
 		className: classnames( {
@@ -388,10 +405,11 @@ export default function NavigationLinkEdit( {
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasDescendants,
-			'has-text-color': !! textColor || !! style?.color?.text,
-			[ `has-${ textColor }-color` ]: !! textColor,
-			'has-background': !! backgroundColor || !! style?.color?.background,
-			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
+			'has-text-color': !! textColorForNesting || !! style?.color?.text,
+			[ `has-${ textColorForNesting }-color` ]: !! textColorForNesting,
+			'has-background':
+				!! bgColorForNesting || !! style?.color?.background,
+			[ `has-${ bgColorForNesting }-background-color` ]: !! bgColorForNesting,
 		} ),
 		style: {
 			color: style?.color?.text,
@@ -407,7 +425,28 @@ export default function NavigationLinkEdit( {
 		{
 			className: classnames( 'wp-block-navigation-link__container', {
 				'is-parent-of-selected-block': isParentOfSelectedBlock,
+				'has-text-color': !! (
+					overlayTextColor ||
+					textColor ||
+					!! style?.color?.text
+				),
+				[ `has-${ overlayTextColor || textColor }-color` ]: !! (
+					overlayTextColor || textColor
+				),
+				'has-background':
+					!! overlayBackgroundColor ||
+					backgroundColor ||
+					!! style?.color?.background,
+				[ `has-${
+					overlayBackgroundColor || backgroundColor
+				}-background-color` ]: !! (
+					overlayBackgroundColor || backgroundColor
+				),
 			} ),
+			style: {
+				color: style?.color?.text,
+				backgroundColor: style?.color?.background,
+			},
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,

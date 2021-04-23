@@ -64,6 +64,12 @@
 		margin-bottom: $grid-unit-20;
 		margin-left: $grid-unit-20;
 	}
+
+	// Override the list reset for colored, nested menus
+	ol.has-background,
+	ul.has-background {
+		padding: 0;
+	}
 }
 
 .wp-block-navigation .block-editor-block-list__block[data-type="core/navigation-link"] {

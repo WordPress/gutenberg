@@ -15,6 +15,8 @@ import {
 	BlockControls,
 	useBlockProps,
 	store as blockEditorStore,
+	withColors,
+	PanelColorSettings,
 } from '@wordpress/block-editor';
 import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
 import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
@@ -53,6 +55,14 @@ function Navigation( {
 	isSelected,
 	updateInnerBlocks,
 	className,
+	backgroundColor,
+	setBackgroundColor,
+	textColor,
+	setTextColor,
+	overlayBackgroundColor,
+	setOverlayBackgroundColor,
+	overlayTextColor,
+	setOverlayTextColor,
 	hasSubmenuIndicatorSetting = true,
 	hasItemJustificationControls = true,
 } ) {
@@ -66,11 +76,23 @@ function Navigation( {
 	const { selectBlock } = useDispatch( blockEditorStore );
 
 	const blockProps = useBlockProps( {
-		className: classnames( className, {
-			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-			'is-vertical': attributes.orientation === 'vertical',
-			'is-responsive': attributes.isResponsive,
-		} ),
+		className: classnames(
+			className,
+			textColor.class,
+			backgroundColor.class,
+			{
+				[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+				'is-vertical': attributes.orientation === 'vertical',
+				'is-responsive': attributes.isResponsive,
+				'has-text-color': !! textColor.color || !! textColor.class,
+				'has-background':
+					!! backgroundColor.color || !! backgroundColor.class,
+			}
+		),
+		style: {
+			color: textColor.color,
+			backgroundColor: backgroundColor.color,
+		},
 	} );
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
@@ -166,6 +188,31 @@ function Navigation( {
 						/>
 					</PanelBody>
 				) }
+				<PanelColorSettings
+					title={ __( 'Color' ) }
+					colorSettings={ [
+						{
+							value: textColor.color,
+							onChange: setTextColor,
+							label: __( 'Text color' ),
+						},
+						{
+							value: backgroundColor.color,
+							onChange: setBackgroundColor,
+							label: __( 'Background text' ),
+						},
+						{
+							value: overlayTextColor.color,
+							onChange: setOverlayTextColor,
+							label: __( 'Overlay text color' ),
+						},
+						{
+							value: overlayBackgroundColor.color,
+							onChange: setOverlayBackgroundColor,
+							label: __( 'Overlay background color' ),
+						},
+					] }
+				/>
 			</InspectorControls>
 			<nav { ...blockProps }>
 				<ResponsiveWrapper
@@ -222,4 +269,10 @@ export default compose( [
 			},
 		};
 	} ),
+	withColors(
+		{ textColor: 'color' },
+		{ backgroundColor: 'color' },
+		{ overlayBackgroundColor: 'color' },
+		{ overlayTextColor: 'color' }
+	),
 ] )( Navigation );
