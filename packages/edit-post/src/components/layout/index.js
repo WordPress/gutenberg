@@ -86,6 +86,7 @@ function Layout( { styles } ) {
 		hasBlockSelected,
 		showMostUsedBlocks,
 		isInserterOpened,
+		insertionPoint,
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
@@ -107,6 +108,9 @@ function Layout( { styles } ) {
 				'mostUsedBlocks'
 			),
 			isInserterOpened: select( editPostStore ).isInserterOpened(),
+			insertionPoint: select(
+				editPostStore
+			).__experimentalGetInsertionPoint(),
 			mode: select( editPostStore ).getEditorMode(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -212,11 +216,9 @@ function Layout( { styles } ) {
 									showMostUsedBlocks={ showMostUsedBlocks }
 									showInserterHelpPanel
 									shouldFocusBlock={ isMobileViewport }
-									rootClientId={
-										isInserterOpened?.rootClientId
-									}
+									rootClientId={ insertionPoint.rootClientId }
 									__experimentalInsertionIndex={
-										isInserterOpened?.insertionIndex
+										insertionPoint.insertionIndex
 									}
 								/>
 							</div>

@@ -152,12 +152,7 @@ function Editor( { initialSettings } ) {
 
 	const secondarySidebar = () => {
 		if ( isInserterOpen ) {
-			return (
-				<InserterSidebar
-					rootClientId={ isInserterOpen?.rootClientId }
-					insertionIndex={ isInserterOpen?.insertionIndex }
-				/>
-			);
+			return <InserterSidebar />;
 		}
 		if ( isListViewOpen ) {
 			return (

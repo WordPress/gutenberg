@@ -38,7 +38,7 @@ import { store as blockEditorStore } from '../../../store';
  * @return {Array} Insertion Point State (rootClientID, onInsertBlocks and onToggle).
  */
 function useInsertionPoint( {
-	rootClientId,
+	rootClientId = '',
 	insertionIndex,
 	clientId,
 	isAppender,
