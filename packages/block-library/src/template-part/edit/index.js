@@ -8,6 +8,7 @@ import {
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	Warning,
 	store as blockEditorStore,
+	__experimentalBlockPatternSetup as BlockPatternSetup,
 } from '@wordpress/block-editor';
 import {
 	Dropdown,
@@ -18,6 +19,7 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -35,6 +37,11 @@ export default function TemplatePartEdit( {
 	const { slug, theme, tagName, layout = {} } = attributes;
 	const templatePartId = theme && slug ? theme + '//' + slug : null;
 
+	const [
+		bypassPatternsPlaceholder,
+		setBypassPatternsPlaceholder,
+	] = useState( false );
+
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		templatePartId
 	);
@@ -42,7 +49,14 @@ export default function TemplatePartEdit( {
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { isResolved, innerBlocks, isMissing, defaultWrapper } = useSelect(
+	const {
+		isResolved,
+		innerBlocks,
+		isMissing,
+		defaultWrapper,
+		hasContent,
+		blockName,
+	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } = select(
 				coreStore
@@ -57,12 +71,23 @@ export default function TemplatePartEdit( {
 			const entityRecord = templatePartId
 				? getEditedEntityRecord( ...getEntityArgs )
 				: null;
+
 			const hasResolvedEntity = templatePartId
 				? hasFinishedResolution(
 						'getEditedEntityRecord',
 						getEntityArgs
 				  )
 				: false;
+
+			const _hasContent =
+				( entityRecord?.content &&
+					typeof entityRecord.content !== 'function' ) ||
+				entityRecord?.blocks?.length;
+
+			const _blockName =
+				entityRecord?.area && entityRecord.area !== 'uncategorized'
+					? `core/template-part/${ entityRecord.area }`
+					: 'core/template-part';
 
 			const defaultWrapperElement = select( editorStore )
 				.__experimentalGetDefaultTemplatePartAreas()
@@ -76,10 +101,18 @@ export default function TemplatePartEdit( {
 				isResolved: hasResolvedEntity,
 				isMissing: hasResolvedEntity && ! entityRecord,
 				defaultWrapper: defaultWrapperElement || 'div',
+				hasContent: _hasContent,
+				blockName: _blockName,
 			};
 		},
 		[ templatePartId, clientId ]
 	);
+
+	useEffect( () => {
+		if ( hasContent ) {
+			setBypassPatternsPlaceholder( false );
+		}
+	}, [ hasContent ] );
 
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
@@ -163,15 +196,26 @@ export default function TemplatePartEdit( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
-			{ isEntityAvailable && (
-				<TemplatePartInnerBlocks
-					tagName={ TagName }
-					blockProps={ blockProps }
-					postId={ templatePartId }
-					hasInnerBlocks={ innerBlocks.length > 0 }
-					layout={ layout }
-				/>
-			) }
+			{ isEntityAvailable &&
+				( hasContent || bypassPatternsPlaceholder ? (
+					<TemplatePartInnerBlocks
+						tagName={ TagName }
+						blockProps={ blockProps }
+						postId={ templatePartId }
+						hasInnerBlocks={ innerBlocks.length > 0 }
+						layout={ layout }
+					/>
+				) : (
+					<BlockPatternSetup
+						blockName={ blockName }
+						clientId={ clientId }
+						startBlankComponent={
+							<StartBlankComponent
+								setBlank={ setBypassPatternsPlaceholder }
+							/>
+						}
+					/>
+				) ) }
 			{ ! isPlaceholder && ! isResolved && (
 				<TagName { ...blockProps }>
 					<Spinner />
@@ -179,4 +223,9 @@ export default function TemplatePartEdit( {
 			) }
 		</RecursionProvider>
 	);
+}
+
+function StartBlankComponent( { setBlank } ) {
+	setBlank( true );
+	return null;
 }
