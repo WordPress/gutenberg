@@ -174,30 +174,32 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 			wrapperProps,
 		} = props;
 
-		const newProps = { ...props };
-
 		// Only add inline styles if the block supports font sizes, doesn't
 		// already have an inline font size, and does have a class to extract
 		// the font size from.
 		if (
-			hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) &&
-			fontSize &&
-			! style?.typography?.fontSize
+			! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ||
+			! fontSize ||
+			style?.typography?.fontSize
 		) {
-			const fontSizeValue = getFontSize(
-				fontSizes,
-				fontSize,
-				style?.typography?.fontSize
-			).size;
-
-			newProps.wrapperProps = {
-				...wrapperProps,
-				style: {
-					fontSize: fontSizeValue,
-					...wrapperProps?.style,
-				},
-			};
+			return <BlockListBlock { ...props } />;
 		}
+
+		const newProps = { ...props };
+
+		const fontSizeValue = getFontSize(
+			fontSizes,
+			fontSize,
+			style?.typography?.fontSize
+		).size;
+
+		newProps.wrapperProps = {
+			...wrapperProps,
+			style: {
+				fontSize: fontSizeValue,
+				...wrapperProps?.style,
+			},
+		};
 
 		return <BlockListBlock { ...newProps } />;
 	},
