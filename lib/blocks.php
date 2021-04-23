@@ -261,7 +261,10 @@ function gutenberg_maybe_inline_styles() {
 		}
 	}
 }
+// Run for styles enqueued in <head>.
 add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
+// Run for late-loaded styles in the footer.
+add_action( 'wp_footer', 'gutenberg_maybe_inline_styles', 1 );
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it
