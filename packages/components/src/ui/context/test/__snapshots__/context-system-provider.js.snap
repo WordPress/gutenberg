@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render _override props 1`] = `
+<div
+  class="components-component wp-components-component test-component emotion-0 emotion-1"
+  data-wp-c16t="true"
+  data-wp-component="Component"
+>
+  Code is Poetry
+</div>
+`;
+
+exports[`props should render context props 1`] = `
+<div
+  class="components-component wp-components-component emotion-0 emotion-1"
+  data-wp-c16t="true"
+  data-wp-component="Component"
+>
+  Code is Poetry
+</div>
+`;
+
+exports[`props should render correctly 1`] = `
+<div
+  class="components-component wp-components-component emotion-0 emotion-1"
+  data-wp-c16t="true"
+  data-wp-component="Component"
+/>
+`;

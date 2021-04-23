@@ -8,17 +8,10 @@
 		display: flex;
 		align-items: center;
 		position: relative;
-		margin: 0 0.5em 0 0;
 
 		.wp-block-navigation-link__container:empty {
 			display: none;
 		}
-	}
-
-	// Margin of right-most margin should be zero, for right aligned or justified items.
-	.wp-block-navigation__container > .wp-block-pages-list__item:last-child,
-	.wp-block-navigation__container > .wp-block-navigation-link:last-child {
-		margin-right: 0;
 	}
 
 	// Menu item link.
@@ -27,7 +20,6 @@
 		// Inherit colors set by the block color definition.
 		color: inherit;
 		display: block;
-		padding: 0.5em 1em;
 	}
 
 	// Force links to inherit text decoration applied to navigation block.
@@ -72,7 +64,6 @@
 	.wp-block-page-list__submenu-icon,
 	.wp-block-navigation-link__submenu-icon {
 		height: inherit;
-		padding: 0.375em 1em 0.375em 0;
 
 		svg {
 			stroke: currentColor;
@@ -91,8 +82,6 @@
 			background-color: inherit;
 			color: inherit;
 			position: absolute;
-			left: 0;
-			top: 100%;
 			z-index: 2;
 			display: flex;
 			flex-direction: column;
@@ -106,8 +95,6 @@
 
 			> .wp-block-pages-list__item,
 			> .wp-block-navigation-link {
-				margin: 0;
-
 				> .wp-block-pages-list__item__link,
 				> .wp-block-navigation-link__content {
 					flex-grow: 1;
@@ -119,13 +106,11 @@
 				}
 			}
 
+			// Nested submenus sit to the left on large breakpoints.
+			// On smaller breakpoints, they open vertically, accordion-style.
 			@include break-medium {
-				// Nested submenus sit to the left on large breakpoints.
 				.submenu-container,
 				.wp-block-navigation-link__container {
-					left: 100%;
-					top: 0;
-
 					// Prevent the menu from disappearing when the mouse is over the gap
 					&::before {
 						content: "";
@@ -204,6 +189,80 @@
 	}
 }
 
+// Margins, paddings, and submenu positions.
+// These need extra specificity to override potentially inherited properties.
+.wp-block.wp-block-navigation {
+
+	// Menu items with no background.
+	.wp-block-page-list,
+	.wp-block-page-list > .wp-block-pages-list__item,
+	.wp-block-navigation__container > .wp-block-navigation-link {
+		margin: 0 2em 0 0;
+
+		// Margin of right-most margin should be zero, for right aligned or justified items.
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
+	// When the menu has a background, items have paddings, reduce margins to compensate.
+	// Treat margins and paddings differently when the block has a background.
+	&.has-background {
+		.wp-block-page-list,
+		.wp-block-page-list > .wp-block-pages-list__item,
+		.wp-block-navigation__container > .wp-block-navigation-link {
+			margin: 0 0.5em 0 0;
+		}
+
+		.wp-block-page-list > .wp-block-pages-list__item,
+		.wp-block-navigation__container > .wp-block-navigation-link {
+			padding: 0.5em 1em;
+		}
+	}
+
+	// Margins in submenus.
+	.has-child .submenu-container,
+	.has-child .wp-block-navigation-link__container {
+		.wp-block-pages-list__item,
+		.wp-block-navigation-link {
+			margin: 0 0 1em 0;
+		}
+
+		// Submenu indentation.
+		left: -1em;
+		top: calc(100% + 1em);
+
+		@include break-medium {
+			.submenu-container,
+			.wp-block-navigation-link__container {
+				left: calc(100% + 1em);
+				top: calc(-1px - 1em);
+			}
+		}
+	}
+
+	&.has-background .has-child .submenu-container,
+	&.has-background .has-child .wp-block-navigation-link__container {
+		.wp-block-pages-list__item,
+		.wp-block-navigation-link {
+			margin: 0;
+			padding: 0.5em 1em;
+		}
+
+		// Submenu indentation.
+		left: 0;
+		top: 100%;
+
+		@include break-medium {
+			.submenu-container,
+			.wp-block-navigation-link__container {
+				left: 100%;
+				top: 0;
+			}
+		}
+	}
+}
+
 // Default background and font color.
 .wp-block-navigation:not(.has-background) {
 	.submenu-container, // This target items created by the Page List block.
@@ -216,9 +275,7 @@
 		color: #000;
 		border: 1px solid rgba(0, 0, 0, 0.15);
 
-		.submenu-container,
-		.wp-block-navigation-link__container {
-			top: -1px;
-		}
+		// Add some padding to menus even if the parent menu item doesn't have.
+		padding: 1em;
 	}
 }

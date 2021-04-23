@@ -28,16 +28,16 @@ function getBlockDisplayText( block ) {
 }
 
 function useSecondaryText() {
-	const { activeEntityBlockId, getBlock } = useSelect( ( select ) => {
-		return {
-			activeEntityBlockId: select(
+	const { getBlock } = useSelect( 'core/block-editor' );
+	const activeEntityBlockId = useSelect(
+		( select ) =>
+			select(
 				'core/block-editor'
 			).__experimentalGetActiveBlockIdByBlockNames( [
 				'core/template-part',
 			] ),
-			getBlock: select( 'core/block-editor' ).getBlock,
-		};
-	} );
+		[]
+	);
 
 	if ( activeEntityBlockId ) {
 		return {

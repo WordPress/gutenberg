@@ -43,6 +43,11 @@
 					{
 						"name": "Gradient name"
 					}
+				],
+				"duotone": [
+					{
+						"name": "Duotone name"
+					}
 				]
 			}
 		}
