@@ -142,23 +142,6 @@ function gutenberg_inject_default_block_context( $args ) {
 add_filter( 'register_block_type_args', 'gutenberg_inject_default_block_context' );
 
 /**
- * Amends the paths to preload when initializing edit post.
- *
- * @see https://core.trac.wordpress.org/ticket/50606
- *
- * @since 8.4.0
- *
- * @param  array $preload_paths Default path list that will be preloaded.
- * @return array Modified path list to preload.
- */
-function gutenberg_preload_edit_post( $preload_paths ) {
-	$additional_paths = array( '/?context=edit' );
-	return array_merge( $preload_paths, $additional_paths );
-}
-
-add_filter( 'block_editor_preload_paths', 'gutenberg_preload_edit_post' );
-
-/**
  * Override post type labels for Reusable Block custom post type.
  * The labels are different from the ones in Core.
  *
