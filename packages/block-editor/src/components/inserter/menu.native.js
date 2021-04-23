@@ -9,12 +9,7 @@ import { TouchableHighlight } from 'react-native';
 import { useEffect, useState, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { createBlock } from '@wordpress/blocks';
-import {
-	BottomSheet,
-	BottomSheetConsumer,
-	SegmentedControl,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { BottomSheet, BottomSheetConsumer } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -22,12 +17,10 @@ import { __ } from '@wordpress/i18n';
 import InserterSearchResults from './search-results';
 import InserterSearchForm from './search-form';
 import { store as blockEditorStore } from '../../store';
-import BlocksTypesTab from './blocks-types-tab';
-import ReusableBlocksTab from './reusable-blocks-tab';
+import InserterTabs from './tabs';
 import styles from './style.scss';
 
 const MIN_ITEMS_FOR_SEARCH = 2;
-const TABS = [ __( 'Blocks' ), __( 'Reusable' ) ];
 
 function InserterMenu( {
 	onSelect,
@@ -144,37 +137,12 @@ function InserterMenu( {
 		[ insertBlock, destinationRootClientId, insertionIndex ]
 	);
 
-	const onChangeTab = useCallback(
-		( selectedTab ) => {
-			setTabIndex( TABS.indexOf( selectedTab ) );
-		},
-		[ setTabIndex ]
-	);
-
 	const onSelectItem = useCallback(
 		( item ) => {
 			onInsert( item );
 			onSelect( item );
 		},
 		[ onInsert, onSelect ]
-	);
-
-	const getCurrentTab = useCallback(
-		( listProps ) => {
-			const tabProps = {
-				rootClientId,
-				onSelect: onSelectItem,
-				listProps,
-			};
-
-			switch ( tabIndex ) {
-				case 0:
-					return <BlocksTypesTab { ...tabProps } />;
-				case 1:
-					return <ReusableBlocksTab { ...tabProps } />;
-			}
-		},
-		[ tabIndex, rootClientId, onSelectItem ]
 	);
 
 	return (
@@ -192,10 +160,7 @@ function InserterMenu( {
 						/>
 					) }
 					{ ! filterValue && hasReusableBlocks && (
-						<SegmentedControl
-							segments={ TABS }
-							segmentHandler={ onChangeTab }
-						/>
+						<InserterTabs.Control onChangeTab={ setTabIndex } />
 					) }
 				</>
 			}
@@ -212,7 +177,12 @@ function InserterMenu( {
 								listProps={ listProps }
 							/>
 						) : (
-							getCurrentTab( listProps )
+							<InserterTabs
+								rootClientId={ rootClientId }
+								listProps={ listProps }
+								tabIndex={ tabIndex }
+								onSelect={ onSelectItem }
+							/>
 						) }
 					</TouchableHighlight>
 				) }
