@@ -42,7 +42,6 @@ export default function save( { attributes } ) {
 			width={ width }
 			height={ height }
 			title={ title }
-			data-id={ id ? id : null }
 		/>
 	);
 

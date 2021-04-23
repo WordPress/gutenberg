@@ -419,7 +419,6 @@ export default function Image( {
 			<img
 				src={ temporaryURL || url }
 				alt={ defaultedAlt }
-				data-id={ id ? id : null }
 				onClick={ onImageClick }
 				onError={ () => onImageError() }
 				onLoad={ ( event ) => {
