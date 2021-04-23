@@ -128,6 +128,11 @@ function gutenberg_skip_border_serialization( $block_type ) {
 /**
  * Checks whether the current block type supports the border feature requested.
  *
+ * If the `__experimentalBorder` support flag is a boolean `true` all border
+ * support features are available. Otherwise, the specific feature's support
+ * flag nested under `experimentalBorder` must be enabled for the feature
+ * to be opted into.
+ *
  * @param WP_Block_Type $block_type Block type to check for support.
  * @param string        $feature    Name of the feature to check support for.
  * @param mixed         $default    Fallback value for feature support, defaults to false.
@@ -135,13 +140,17 @@ function gutenberg_skip_border_serialization( $block_type ) {
  * @return boolean                  Whether or not the feature is supported.
  */
 function gutenberg_has_border_feature_support( $block_type, $feature, $default = false ) {
-	$block_support = false;
-	if ( property_exists( $block_type, 'supports' ) ) {
-		$block_support = _wp_array_get( $block_type->supports, array( '__experimentalBorder' ), $default );
+	// Check if all border support features have been opted into via `"__experimentalBorder": true`.
+	if (
+		property_exists( $block_type, 'supports' ) &&
+		( true === _wp_array_get( $block_type->supports, array( '__experimentalBorder' ), $default ) )
+	) {
+		return true;
 	}
 
-	return true === $block_support ||
-		gutenberg_block_has_support( $block_type, array( '__experimentalBorder', $feature ), $default );
+	// Check if the specific feature has been opted into individually
+	// via nested flag under `__experimentalBorder`.
+	return gutenberg_block_has_support( $block_type, array( '__experimentalBorder', $feature ), $default );
 }
 
 // Register the block support.
