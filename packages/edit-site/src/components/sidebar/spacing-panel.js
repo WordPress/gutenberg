@@ -8,13 +8,11 @@ import {
 	PanelBody,
 } from '@wordpress/components';
 import { getBlockSupport } from '@wordpress/blocks';
-import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { useEditorFeature } from '../editor/utils';
-import { store as editSiteStore } from '../../store';
 
 const isWeb = Platform.OS === 'web';
 const CSS_UNITS = [
@@ -98,24 +96,12 @@ function filterValuesBySides( values, sides ) {
 	return filteredValues;
 }
 
-function useThemeValues( name, feature ) {
-	return useSelect(
-		( select ) => {
-			const baseStyles = select( editSiteStore ).getSettings()
-				.__experimentalGlobalStylesBaseStyles;
-			return baseStyles?.styles?.[ name ]?.spacing?.[ feature ];
-		},
-		[ name, feature ]
-	);
-}
-
 export default function SpacingPanel( { context, getStyle, setStyle } ) {
 	const { name } = context;
 	const showPaddingControl = useHasPadding( context );
 	const units = useCustomUnits( { contextName: name, units: CSS_UNITS } );
 
 	const paddingValues = getStyle( name, 'padding' );
-	const themePaddingValues = useThemeValues( name, 'padding' );
 	const paddingSides = useCustomSides( name, 'padding' );
 
 	const setPaddingValues = ( newPaddingValues ) => {
@@ -132,7 +118,6 @@ export default function SpacingPanel( { context, getStyle, setStyle } ) {
 					label={ __( 'Padding' ) }
 					sides={ paddingSides }
 					units={ units }
-					resetValues={ themePaddingValues }
 				/>
 			) }
 		</PanelBody>
