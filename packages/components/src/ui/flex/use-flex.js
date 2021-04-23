@@ -17,7 +17,7 @@ import { space } from '../utils/space';
 import * as styles from './styles';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').FlexProps, 'div'>} props
  */
 export function useFlex( props ) {
 	const {

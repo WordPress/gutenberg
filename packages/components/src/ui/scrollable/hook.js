@@ -16,7 +16,7 @@ import * as styles from './styles';
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param  {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param  {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
  */
 /* eslint-enable jsdoc/valid-types */
 export function useScrollable( props ) {

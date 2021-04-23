@@ -15,7 +15,7 @@ import { useContextSystem } from '../context';
 import * as styles from './styles';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
  */
 export function useSurface( props ) {
 	const {
