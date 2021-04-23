@@ -347,7 +347,7 @@ describe( 'Widgets screen', () => {
 		<p>First Paragraph</p>
 		</div></div>
 		<div class=\\"widget widget_block\\"><div class=\\"widget-content\\">
-		<h2 id=\\"my-heading\\">My Heading</h2>
+		<h2 id=\\"wp-my-heading\\">My Heading</h2>
 		</div></div>
 		<div class=\\"widget widget_block widget_text\\"><div class=\\"widget-content\\">
 		<p>Second Paragraph</p>
