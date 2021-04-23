@@ -112,7 +112,7 @@ describe( 'Inserting blocks', () => {
 
 		// Verify vertical traversal at offset. This has been buggy in the past
 		// where verticality on a blank newline would skip into previous block.
-		await page.keyboard.type( 'Bar' );
+		await page.keyboard.type( 'Foo' );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pressKeyTimes( 'Delete', 6 );
