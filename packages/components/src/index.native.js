@@ -28,6 +28,7 @@ export {
 	Fill,
 	Provider as SlotFillProvider,
 } from './slot-fill';
+export { default as __experimentalStyleProvider } from './style-provider';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';

@@ -159,6 +159,11 @@ class BottomSheetCell extends Component {
 			cellRowContainerStyle,
 		];
 
+		const isInteractive =
+			isValueEditable ||
+			onPress !== undefined ||
+			onLongPress !== undefined;
+
 		const onCellPress = () => {
 			if ( isValueEditable ) {
 				startEditing();
@@ -308,7 +313,7 @@ class BottomSheetCell extends Component {
 						  __( 'Double tap to edit this value' )
 						: accessibilityHint
 				}
-				disabled={ disabled }
+				disabled={ disabled || ! isInteractive }
 				activeOpacity={ opacity }
 				onPress={ onCellPress }
 				onLongPress={ onLongPress }

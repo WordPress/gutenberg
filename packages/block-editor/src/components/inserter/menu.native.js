@@ -47,38 +47,34 @@ function InserterMenu( {
 		insertDefaultBlock,
 	} = useDispatch( blockEditorStore );
 
-	const {
-		items,
-		destinationRootClientId,
-		getBlockOrder,
-		getBlockCount,
-		hasReusableBlocks,
-	} = useSelect( ( select ) => {
-		const {
-			getInserterItems,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-			getSettings,
-			...selectBlockEditorStore
-		} = select( blockEditorStore );
+	const { items, destinationRootClientId, hasReusableBlocks } = useSelect(
+		( select ) => {
+			const {
+				getInserterItems,
+				getBlockRootClientId,
+				getBlockSelectionEnd,
+				getSettings,
+			} = select( blockEditorStore );
 
-		let targetRootClientId = rootClientId;
-		if ( ! targetRootClientId && ! clientId && ! isAppender ) {
-			const end = getBlockSelectionEnd();
-			if ( end ) {
-				targetRootClientId = getBlockRootClientId( end ) || undefined;
+			let targetRootClientId = rootClientId;
+			if ( ! targetRootClientId && ! clientId && ! isAppender ) {
+				const end = getBlockSelectionEnd();
+				if ( end ) {
+					targetRootClientId =
+						getBlockRootClientId( end ) || undefined;
+				}
 			}
-		}
 
-		return {
-			items: getInserterItems( targetRootClientId ),
-			destinationRootClientId: targetRootClientId,
-			getBlockOrder: selectBlockEditorStore.getBlockOrder,
-			getBlockCount: selectBlockEditorStore.getBlockCount,
-			hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
-				?.length,
-		};
-	} );
+			return {
+				items: getInserterItems( targetRootClientId ),
+				destinationRootClientId: targetRootClientId,
+				hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
+					?.length,
+			};
+		}
+	);
+
+	const { getBlockOrder, getBlockCount } = useSelect( blockEditorStore );
 
 	useEffect( () => {
 		// Show/Hide insertion point on Mount/Dismount
