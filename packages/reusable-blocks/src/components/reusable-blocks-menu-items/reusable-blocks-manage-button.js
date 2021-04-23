@@ -7,7 +7,7 @@ import { isReusableBlock } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
 	BlockSettingsMenuControls,
-	store as blockEditorStore
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { addQueryArgs } from '@wordpress/url';
 
