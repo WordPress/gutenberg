@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { DropdownMenu } from '@wordpress/components';
@@ -15,6 +10,7 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import SaveButton from './save-button';
 import MenuSwitcher from '../menu-switcher';
+import { useMenuEntity } from '../../hooks';
 
 export default function Header( {
 	isMenuSelected,
@@ -24,7 +20,7 @@ export default function Header( {
 	isPending,
 	navigationPost,
 } ) {
-	const selectedMenu = find( menus, { id: selectedMenuId } );
+	const { editedMenu: selectedMenu } = useMenuEntity( selectedMenuId );
 	const menuName = selectedMenu ? selectedMenu.name : undefined;
 	let actionHeaderText;
 

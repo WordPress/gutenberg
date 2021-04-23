@@ -37,16 +37,21 @@ jest.mock( '../locks/actions', () => ( {
 
 describe( 'getEntityRecord', () => {
 	const POST_TYPE = { slug: 'post' };
+	const ENTITIES = [
+		{
+			name: 'postType',
+			kind: 'root',
+			baseURL: '/wp/v2/types',
+			baseURLParams: { context: 'edit' },
+		},
+	];
 
 	it( 'yields with requested post type', async () => {
-		const entities = [
-			{ name: 'postType', kind: 'root', baseURL: '/wp/v2/types' },
-		];
 		const fulfillment = getEntityRecord( 'root', 'postType', 'post' );
 		// Trigger generator
 		fulfillment.next();
 		// Provide entities and acquire lock
-		expect( fulfillment.next( entities ).value.type ).toEqual(
+		expect( fulfillment.next( ENTITIES ).value.type ).toEqual(
 			'MOCKED_ACQUIRE_LOCK'
 		);
 		// trigger apiFetch
@@ -59,6 +64,49 @@ describe( 'getEntityRecord', () => {
 		expect( received ).toEqual(
 			receiveEntityRecords( 'root', 'postType', POST_TYPE )
 		);
+		// Release lock
+		expect( fulfillment.next().value.type ).toEqual(
+			'MOCKED_RELEASE_LOCK'
+		);
+	} );
+
+	it( 'accepts a query that overrides default api path', async () => {
+		const query = { context: 'view', _envelope: '1' };
+		const queryObj = { include: [ 'post' ], ...query };
+
+		const fulfillment = getEntityRecord(
+			'root',
+			'postType',
+			'post',
+			query
+		);
+
+		// Trigger generator
+		fulfillment.next();
+
+		// Provide entities and acquire lock
+		expect( fulfillment.next( ENTITIES ).value.type ).toEqual(
+			'MOCKED_ACQUIRE_LOCK'
+		);
+
+		// Check resolution cache for an existing entity that fulfills the request with query
+		const {
+			value: { args: selectArgs },
+		} = fulfillment.next();
+		expect( selectArgs ).toEqual( [ 'root', 'postType', queryObj ] );
+
+		// Trigger apiFetch, test that the query is present in the url
+		const { value: apiFetchAction } = fulfillment.next();
+		expect( apiFetchAction.request ).toEqual( {
+			path: '/wp/v2/types/post?context=view&_envelope=1',
+		} );
+
+		// Receive response
+		const { value: received } = fulfillment.next( POST_TYPE );
+		expect( received ).toEqual(
+			receiveEntityRecords( 'root', 'postType', POST_TYPE, queryObj )
+		);
+
 		// Release lock
 		expect( fulfillment.next().value.type ).toEqual(
 			'MOCKED_RELEASE_LOCK'
