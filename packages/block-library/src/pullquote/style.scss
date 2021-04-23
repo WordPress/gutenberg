@@ -3,6 +3,12 @@
 	padding: 3em 0;
 	text-align: center;
 
+	p,
+	blockquote,
+	cite {
+		color: inherit;
+	}
+
 	&.alignleft,
 	&.alignright {
 		max-width: $content-width * 0.5;
