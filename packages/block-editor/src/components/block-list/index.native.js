@@ -166,13 +166,32 @@ export class BlockList extends Component {
 		}
 	}
 
-	render() {
+	componentDidUpdate( prevProps ) {
 		const {
 			isRootList,
 			isBlockInsertionPointVisible,
-			selectedBlockClientId,
+			insertionPoint,
 			blockClientIds,
 		} = this.props;
+
+		// Typical usage (don't forget to compare props):
+		if (
+			isBlockInsertionPointVisible !==
+			prevProps.isBlockInsertionPointVisible
+		) {
+			if ( isRootList && isBlockInsertionPointVisible ) {
+				const jumpToIndex = insertionPoint.index - 1; // scrolling goes to the bottom of the item so, let's scroll to one above
+				if ( jumpToIndex < 0 ) {
+					this.scrollViewRef.scrollToOffset( { offset: 0 } );
+				} else {
+					this.scrollViewRef.scrollToIndex( { index: jumpToIndex } );
+				}
+			}
+		}
+	}
+
+	render() {
+		const { isRootList } = this.props;
 		// Use of Context to propagate the main scroll ref to its children e.g InnerBlocks
 		const blockList = isRootList ? (
 			<BlockListContext.Provider value={ this.scrollViewRef }>
@@ -188,17 +207,6 @@ export class BlockList extends Component {
 			</BlockListContext.Consumer>
 		);
 
-		if ( isRootList && isBlockInsertionPointVisible ) {
-			const jumpToIndex = blockClientIds.findIndex(
-				( el ) => el === selectedBlockClientId
-			);
-			console.log( {
-				selectedBlockClientId,
-				jumpToIndex,
-				blockClientIds,
-			} );
-			this.scrollViewRef.scrollToIndex( { index: jumpToIndex } );
-		}
 		return (
 			<OnCaretVerticalPositionChange.Provider
 				value={ this.onCaretVerticalPositionChange }
@@ -305,13 +313,14 @@ export class BlockList extends Component {
 							this.itemHeights && this.itemHeights.length > 0
 								? this.itemHeights.reduce(
 										( acc, val, i ) =>
-											val && val > 0
-												? acc + val
-												: acc + ITEM_HEIGHT,
+											i <= index
+												? val && val > 0
+													? acc + val
+													: acc + ITEM_HEIGHT
+												: acc,
 										0
 								  )
 								: ITEM_HEIGHT * index;
-						// console.log( { ii, index } );
 						return {
 							length: length,
 							offset: offset,
@@ -418,6 +427,7 @@ export default compose( [
 				getBlockCount,
 				getBlockOrder,
 				getSelectedBlockClientId,
+				getBlockInsertionPoint,
 				isBlockInsertionPointVisible,
 				getSettings,
 			} = select( blockEditorStore );
@@ -440,9 +450,13 @@ export default compose( [
 
 			const isFloatingToolbarVisible =
 				!! selectedBlockClientId && hasRootInnerBlocks;
+
+			const insertionPoint = getBlockInsertionPoint();
+
 			return {
 				blockClientIds,
 				blockCount,
+				insertionPoint,
 				isBlockInsertionPointVisible: isBlockInsertionPointVisible(),
 				selectedBlockClientId,
 				isReadOnly,
