@@ -11,7 +11,7 @@
 	}
 
 	@include break-medium() {
-		width: $sidebar-width;
+		width: auto;
 	}
 
 	> .components-panel {
