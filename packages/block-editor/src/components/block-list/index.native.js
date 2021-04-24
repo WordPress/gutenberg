@@ -210,7 +210,7 @@ export class BlockList extends Component {
 								jumpToIndex
 						  );
 				Platform.OS === 'android'
-					? this.scrollViewRef.scrollToOffset( { offset: offset } )
+					? this.scrollViewRef.scrollToOffset( { offset } )
 					: this.scrollViewRef.scrollTo( { y: offset } );
 			}
 		}
