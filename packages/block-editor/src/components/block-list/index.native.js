@@ -323,27 +323,6 @@ export class BlockList extends Component {
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
-					getItemLayout={ ( data, index ) => {
-						const heights = this.itemHeights;
-						const ITEM_HEIGHT = 30;
-						const length = heights[ data[ index ] ]
-							? heights[ data[ index ] ]
-							: ITEM_HEIGHT;
-						const offset = data
-							.slice( 0, index + 1 )
-							.reduce(
-								( acc, id ) =>
-									heights[ id ] && heights[ id ] > 0
-										? acc + heights[ id ]
-										: acc + ITEM_HEIGHT,
-								0
-							);
-						return {
-							length,
-							offset,
-							index,
-						};
-					} }
 					shouldPreventAutomaticScroll={
 						this.shouldFlatListPreventAutomaticScroll
 					}
