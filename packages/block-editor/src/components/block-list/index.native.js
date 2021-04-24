@@ -198,26 +198,17 @@ export class BlockList extends Component {
 		) {
 			if ( isRootList && isBlockInsertionPointVisible ) {
 				const jumpToIndex = insertionPoint.index - 1; // scrolling goes to the bottom of the item so, let's scroll to one above
-				if ( Platform.OS === 'android' ) {
-					if ( jumpToIndex < 0 ) {
-						this.scrollViewRef.scrollToOffset( { offset: 0 } );
-					} else {
-						this.scrollViewRef.scrollToIndex( {
-							index: jumpToIndex,
-						} );
-					}
-				} else {
-					this.scrollViewRef.scrollTo( {
-						y:
-							jumpToIndex < 0
-								? 0
-								: this.offsetOfIndex(
-										this.itemHeights,
-										blockClientIds,
-										jumpToIndex
-								  ),
-					} );
-				}
+				const offset =
+					jumpToIndex < 0
+						? 0
+						: this.offsetOfIndex(
+								this.itemHeights,
+								blockClientIds,
+								jumpToIndex
+						  );
+				Platform.OS === 'android'
+					? this.scrollViewRef.scrollToOffset( { offset: offset } )
+					: this.scrollViewRef.scrollTo( { y: offset } );
 			}
 		}
 	}
