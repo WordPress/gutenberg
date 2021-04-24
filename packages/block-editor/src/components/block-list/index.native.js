@@ -198,7 +198,8 @@ export class BlockList extends Component {
 			isBlockInsertionPointVisible !==
 			prevProps.isBlockInsertionPointVisible
 		) {
-			const insertionPointInRootList = insertionPoint.rootClientId === undefined;
+			const insertionPointInRootList =
+				insertionPoint.rootClientId === undefined;
 			if ( insertionPointInRootList && isBlockInsertionPointVisible ) {
 				const jumpToIndex = insertionPoint.index - 1; // scrolling goes to the bottom of the item so, let's scroll to one above
 				const offset =
@@ -209,9 +210,11 @@ export class BlockList extends Component {
 								blockClientIds,
 								jumpToIndex
 						  );
-				Platform.OS === 'android'
-					? this.scrollViewRef.scrollToOffset( { offset } )
-					: this.scrollViewRef.scrollTo( { y: offset } );
+				if ( Platform.OS === 'android' ) {
+					this.scrollViewRef.scrollToOffset( { offset } );
+				} else {
+					this.scrollViewRef.scrollTo( { y: offset } );
+				}
 			}
 		}
 	}
