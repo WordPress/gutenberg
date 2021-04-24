@@ -72,6 +72,12 @@
 		"parent": "create-block"
 	},
 	{
+		"title": "Full Site Editing",
+		"slug": "full-site-editing",
+		"markdown_source": "../docs/getting-started/full-site-editing.md",
+		"parent": "handbook"
+	},
+	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/getting-started/glossary.md",
@@ -312,16 +318,10 @@
 		"parent": "themes"
 	},
 	{
-		"title": "Creating a block-based theme",
-		"slug": "block-based-theme",
-		"markdown_source": "../docs/how-to-guides/block-based-theme/README.md",
+		"title": "Create a block theme",
+		"slug": "block-theme",
+		"markdown_source": "../docs/how-to-guides/block-theme/README.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "Adding blocks to your theme",
-		"slug": "block-based-themes-2-adding-blocks",
-		"markdown_source": "../docs/how-to-guides/block-based-theme/block-based-themes-2-adding-blocks.md",
-		"parent": "block-based-theme"
 	},
 	{
 		"title": "Backward Compatibility",
