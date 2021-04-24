@@ -24,7 +24,7 @@ If you are using the Gutenberg plugin you can run, test, and develop block theme
 
 - For examples, see the [WordPress/theme-experiments](https://github.com/WordPress/theme-experiments/) repository with several block themes there including the source for the above mentioned TT1 Blocks.
 
-- Use the `empty-theme.php` script from theme-experiments repo to generate a start block theme, it will prompt you with a few questions and create a theme.
+- Use the `empty-theme.php` script from theme-experiments repo to generate a starter block theme, it will prompt you with a few questions and create a theme.
 
 ```
 ❯ git clone https://github.com/WordPress/theme-experiments
@@ -43,7 +43,7 @@ You can then copy the generated directory to your `wp-content/themes` directory 
 
 ### Template and Template Parts
 
-See the [architecture document on templates](docs/explanations/architecture/full-site-editing-templates.md) for an explanation on the internals of how templates and templates parts are rendered in the frontend and edited in the backend.
+See the [architecture document on templates](/docs/explanations/architecture/full-site-editing-templates.md) for an explanation on the internals of how templates and templates parts are rendered in the frontend and edited in the backend.
 
 ### theme.json
 
