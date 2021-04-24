@@ -80,6 +80,7 @@ export class BlockList extends Component {
 
 		this.onLayout = this.onLayout.bind( this );
 
+		this.listHeight = 0;
 		this.offsetOfIndex = this.offsetOfIndex.bind( this );
 		this.itemHeights = [];
 
@@ -157,6 +158,8 @@ export class BlockList extends Component {
 		const { layout } = nativeEvent;
 		const { blockWidth } = this.state;
 		const { isRootList, maxWidth } = this.props;
+
+		this.listHeight = layout.height;
 
 		const layoutWidth = Math.floor( layout.width );
 		if ( isRootList && blockWidth !== layoutWidth ) {
@@ -396,6 +399,11 @@ export class BlockList extends Component {
 		} = this.props;
 
 		if ( ! isReadOnly && withFooter ) {
+			const footerHeight = Math.max(
+				( this.listHeight * 3 ) / 4, // set the footer to 3 quarters of the list height to give room for the inserter and the insertion point
+				styles.blockListFooter.minHeight
+			);
+
 			return (
 				<>
 					<TouchableWithoutFeedback
@@ -405,7 +413,12 @@ export class BlockList extends Component {
 							this.addBlockToEndOfPost( paragraphBlock );
 						} }
 					>
-						<View style={ styles.blockListFooter } />
+						<View
+							style={ [
+								styles.blockListFooter,
+								{ height: footerHeight },
+							] }
+						/>
 					</TouchableWithoutFeedback>
 				</>
 			);
