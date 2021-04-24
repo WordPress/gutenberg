@@ -15,6 +15,7 @@ import {
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
 	isEntirelySelected,
+	isRTL,
 } from '@wordpress/dom';
 import {
 	UP,
@@ -42,10 +43,6 @@ export const SelectionStart = createContext();
  * element does not scroll the page.
  */
 const PREVENT_SCROLL_ON_FOCUS = { position: 'fixed' };
-
-function getComputedStyle( node ) {
-	return node.ownerDocument.defaultView.getComputedStyle( node );
-}
 
 function isFormElement( element ) {
 	const { tagName } = element;
@@ -437,8 +434,7 @@ export default function WritingFlow( { children } ) {
 
 		// In the case of RTL scripts, right means previous and left means next,
 		// which is the exact reverse of LTR.
-		const { direction } = getComputedStyle( target );
-		const isReverseDir = direction === 'rtl' ? ! isReverse : isReverse;
+		const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
 
 		if ( isShift ) {
 			if (
@@ -484,7 +480,7 @@ export default function WritingFlow( { children } ) {
 				isReverseDir,
 				container.current
 			);
-			placeCaretAtHorizontalEdge( closestTabbable, isReverseDir );
+			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 			event.preventDefault();
 		}
 	}
