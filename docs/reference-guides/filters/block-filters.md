@@ -4,7 +4,7 @@ To modify the behavior of existing blocks, WordPress exposes several APIs:
 
 ## Filters
 
-The following filters are available to extend the settings for existing block.
+The following filters are available to extend the settings for existing blocks.
 
 ### `blocks.registerBlockType`
 
