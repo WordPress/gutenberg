@@ -339,7 +339,6 @@ export default function WritingFlow( { children } ) {
 		const isShift = event.shiftKey;
 		const hasModifier =
 			isShift || event.ctrlKey || event.altKey || event.metaKey;
-		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 		const { ownerDocument } = container.current;
 		const { defaultView } = ownerDocument;
 
@@ -446,7 +445,7 @@ export default function WritingFlow( { children } ) {
 				( ( isReverse && selectionBeforeEndClientId ) ||
 					( ! isReverse && selectionAfterEndClientId ) ) &&
 				isTabbableEdge( target, isReverse ) &&
-				isNavEdge( target, isReverse )
+				isHorizontalEdge( target, isReverse )
 			) {
 				// Shift key is down, and there is multi selection or we're at
 				// the end of the current block.
