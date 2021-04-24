@@ -294,33 +294,33 @@
 		"parent": "block-tutorial"
 	},
 	{
+		"title": "Block Theme",
+		"slug": "block-theme",
+		"markdown_source": "../docs/how-to-guides/block-theme/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Create a block theme",
+		"slug": "create-block-theme",
+		"markdown_source": "../docs/how-to-guides/block-theme/create-block-theme.md",
+		"parent": "block-theme"
+	},
+	{
+		"title": "Global Settings (theme.json)",
+		"slug": "theme-json",
+		"markdown_source": "../docs/how-to-guides/block-theme/theme-json.md",
+		"parent": "block-theme"
+	},
+	{
 		"title": "Feature Flags",
 		"slug": "feature-flags",
 		"markdown_source": "../docs/how-to-guides/feature-flags.md",
 		"parent": "how-to-guides"
 	},
 	{
-		"title": "Theming for the Block Editor",
-		"slug": "themes",
-		"markdown_source": "../docs/how-to-guides/themes/README.md",
-		"parent": "how-to-guides"
-	},
-	{
 		"title": "Theme Support",
 		"slug": "theme-support",
-		"markdown_source": "../docs/how-to-guides/themes/theme-support.md",
-		"parent": "themes"
-	},
-	{
-		"title": "Themes & Block Editor: experimental theme.json",
-		"slug": "theme-json",
-		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
-		"parent": "themes"
-	},
-	{
-		"title": "Create a block theme",
-		"slug": "block-theme",
-		"markdown_source": "../docs/how-to-guides/block-theme/README.md",
+		"markdown_source": "../docs/how-to-guides/theme-support.md",
 		"parent": "how-to-guides"
 	},
 	{

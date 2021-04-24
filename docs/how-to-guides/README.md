@@ -32,7 +32,7 @@ See how the new editor [supports existing Meta Boxes](/docs/reference-guides/bac
 
 By default, blocks provide their styles to enable basic support for blocks in themes without any change. Themes can add/override these styles, or rely on defaults.
 
-There are some advanced block features which require opt-in support in the theme. See [theme support](/docs/how-to-guides/themes/theme-support.md).
+There are some advanced block features which require opt-in support in the theme. See [theme support](/docs/how-to-guides/theme-support.md).
 
 ## Autocomplete
 
