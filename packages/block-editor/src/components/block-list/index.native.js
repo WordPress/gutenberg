@@ -185,7 +185,6 @@ export class BlockList extends Component {
 
 	componentDidUpdate( prevProps ) {
 		const {
-			isRootList,
 			isBlockInsertionPointVisible,
 			insertionPoint,
 			blockClientIds,
@@ -196,7 +195,8 @@ export class BlockList extends Component {
 			isBlockInsertionPointVisible !==
 			prevProps.isBlockInsertionPointVisible
 		) {
-			if ( isRootList && isBlockInsertionPointVisible ) {
+			const insertionPointInRootList = insertionPoint.rootClientId === undefined;
+			if ( insertionPointInRootList && isBlockInsertionPointVisible ) {
 				const jumpToIndex = insertionPoint.index - 1; // scrolling goes to the bottom of the item so, let's scroll to one above
 				const offset =
 					jumpToIndex < 0
