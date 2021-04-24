@@ -101,11 +101,6 @@ html.interface-interface-skeleton__html-container {
 	@include break-medium() {
 		position: relative !important;
 		z-index: z-index(".interface-interface-skeleton__sidebar {greater than small}");
-	}
-}
-
-.interface-interface-skeleton__secondary-sidebar {
-	@include break-medium() {
 		width: auto; // Keep the sidebar width flexible.
 	}
 }
@@ -114,6 +109,11 @@ html.interface-interface-skeleton__html-container {
 	@include break-medium() {
 		overflow: auto;
 		border-left: $border-width solid $gray-200;
+	}
+}
+
+.is-sidebar-opened .interface-interface-skeleton__sidebar {
+	@include break-medium() {
 		width: $sidebar-width;
 	}
 }
