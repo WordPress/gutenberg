@@ -37,6 +37,7 @@
 					}
 				]
 			},
+			{ "docs/getting-started/full-site-editing.md": [] },
 			{ "docs/getting-started/glossary.md": [] },
 			{ "docs/getting-started/faq.md": [] },
 			{ "docs/getting-started/history.md": [] },
@@ -135,13 +136,7 @@
 					{ "docs/how-to-guides/themes/theme-json.md": [] }
 				]
 			},
-			{
-				"docs/how-to-guides/block-based-theme/README.md": [
-					{
-						"docs/how-to-guides/block-based-theme/block-based-themes-2-adding-blocks.md": []
-					}
-				]
-			},
+			{ "docs/how-to-guides/block-theme/README.md": [] },
 			{
 				"docs/how-to-guides/backward-compatibility/README.md": [
 					{
