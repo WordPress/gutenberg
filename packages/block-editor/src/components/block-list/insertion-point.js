@@ -253,7 +253,7 @@ function InsertionPointPopover( {
 	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 }
 
-export default function useInsertionPoint( ref ) {
+export default function InsertionPoint( { containerRef } ) {
 	const [ isInserterForced, setIsInserterForced ] = useState( false );
 	const {
 		isMultiSelecting,
