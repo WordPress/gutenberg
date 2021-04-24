@@ -8,6 +8,14 @@
 		},
 		"width": {
 			"type": "number"
+		},
+		"isLink": {
+			"type": "boolean",
+			"default": false
+		},
+		"linkTarget": {
+			"type": "string",
+			"default": "_self"
 		}
 	},
 	"supports": {

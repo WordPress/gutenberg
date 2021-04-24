@@ -16,6 +16,7 @@ import {
 	RangeControl,
 	ResizableBox,
 	Spinner,
+	ToggleControl,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -46,7 +47,7 @@ const ACCEPT_MEDIA_STRING = 'image/*';
 
 const SiteLogo = ( {
 	alt,
-	attributes: { align, width, height },
+	attributes: { align, width, height, isLink, linkTarget },
 	containerRef,
 	isSelected,
 	setAttributes,
@@ -82,35 +83,55 @@ const SiteLogo = ( {
 		toggleSelection( true );
 	}
 
-	const img = (
-		// Disable reason: Image itself is not meant to be interactive, but
-		// should direct focus to block.
-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-		<a
-			href={ siteUrl }
-			className={ classes }
-			rel="home"
-			title={ title }
-			onClick={ ( event ) => event.preventDefault() }
-		>
-			<span className="custom-logo-link">
-				<img
-					className="custom-logo"
-					src={ logoUrl }
-					alt={ alt }
-					onLoad={ ( event ) => {
-						setNaturalSize(
-							pick( event.target, [
-								'naturalWidth',
-								'naturalHeight',
-							] )
-						);
-					} }
-				/>
-			</span>
-		</a>
-		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+	let img = (
+		<span className="custom-logo-link">
+			<img
+				className="custom-logo"
+				src={ logoUrl }
+				alt={ alt }
+				onLoad={ ( event ) => {
+					setNaturalSize(
+						pick( event.target, [
+							'naturalWidth',
+							'naturalHeight',
+						] )
+					);
+				} }
+			/>
+		</span>
 	);
+
+	// Disable reason: Image itself is not meant to be interactive, but
+	// should direct focus to block.
+	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+	if ( isLink ) {
+		img = (
+			<a
+				href={ siteUrl }
+				className={ classes }
+				rel="home"
+				title={ title }
+				onClick={ ( event ) => event.preventDefault() }
+			>
+				<span className="custom-logo-link">
+					<img
+						className="custom-logo"
+						src={ logoUrl }
+						alt={ alt }
+						onLoad={ ( event ) => {
+							setNaturalSize(
+								pick( event.target, [
+									'naturalWidth',
+									'naturalHeight',
+								] )
+							);
+						} }
+					/>
+				</span>
+			</a>
+		);
+	}
+	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 
 	let imageWidthWithinContainer;
 
@@ -192,6 +213,24 @@ const SiteLogo = ( {
 						value={ width || '' }
 						disabled={ ! isResizable }
 					/>
+					<ToggleControl
+						label={ __( 'Make image a link to home' ) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+					{ isLink && (
+						<>
+							<ToggleControl
+								label={ __( 'Open in new tab' ) }
+								onChange={ ( value ) =>
+									setAttributes( {
+										linkTarget: value ? '_blank' : '_self',
+									} )
+								}
+								checked={ linkTarget === '_blank' }
+							/>
+						</>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<ResizableBox
