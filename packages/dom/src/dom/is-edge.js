@@ -2,7 +2,6 @@
  * Internal dependencies
  */
 import getComputedStyle from './get-computed-style';
-import getRangeHeight from './get-range-height';
 import getRectangleFromRange from './get-rectangle-from-range';
 import isSelectionForward from './is-selection-forward';
 import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
@@ -47,33 +46,12 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 		return false;
 	}
 
-	const range = selection.getRangeAt( 0 );
-	const collapsedRange = range.cloneRange();
 	const isForward = isSelectionForward( selection );
 	const isCollapsed = selection.isCollapsed;
 
-	// Collapse in direction of selection.
-	if ( ! isCollapsed ) {
-		collapsedRange.collapse( ! isForward );
-	}
-
-	const collapsedRangeRect = getRectangleFromRange( collapsedRange );
-	const rangeRect = getRectangleFromRange( range );
-
-	if ( ! collapsedRangeRect || ! rangeRect ) {
-		return false;
-	}
-
-	// Only consider the multiline selection at the edge if the direction is
-	// towards the edge. The selection is multiline if it is taller than the
-	// collapsed  selection.
-	const rangeHeight = getRangeHeight( range );
-	if (
-		! isCollapsed &&
-		rangeHeight &&
-		rangeHeight > collapsedRangeRect.height &&
-		isForward === isReverse
-	) {
+	// Only consider an uncollapsed selection at the edge if the direction is
+	// towards the edge.
+	if ( ! isCollapsed && isForward === isReverse ) {
 		return false;
 	}
 
@@ -112,6 +90,16 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 		return false;
 	}
 
+	const range = selection.getRangeAt( 0 );
+	const collapsedRange = range.cloneRange();
+
+	// Collapse in direction of selection.
+	if ( ! isCollapsed ) {
+		collapsedRange.collapse( ! isForward );
+	}
+
+	const collapsedRangeRect = getRectangleFromRange( collapsedRange );
+	const rangeRect = getRectangleFromRange( range );
 	const verticalSide = isReverse ? 'top' : 'bottom';
 	const horizontalSide = isReverseDir ? 'left' : 'right';
 	const verticalDiff = testRect[ verticalSide ] - rangeRect[ verticalSide ];
