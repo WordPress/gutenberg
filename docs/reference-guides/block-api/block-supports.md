@@ -57,7 +57,7 @@ attributes: {
 -   Type: `boolean`
 -   Default value: `true`
 
-This property allows to enable [wide alignment](/docs/how-to-guides/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
+This property allows to enable [wide alignment](/docs/how-to-guides/themes/theme-support.md#wide-alignment) for your theme. To disable this behavior for a single block, set this flag to `false`.
 
 ```js
 supports: {
@@ -143,7 +143,7 @@ When the block declares support for `color.background`, the attributes definitio
 
   When a user chooses from the list of preset background colors, the preset slug is stored in the `backgroundColor` attribute.
 
-  Background color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/theme-support.md#block-color-palettes).
+  Background color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
 
   The block can apply a default preset background color by specifying its own attribute with a default e.g.:
 
@@ -194,7 +194,7 @@ supports: {
 }
 ```
 
-Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/block-theme/theme-json.md).
+Duotone presets are sourced from `color.duotone` in [theme.json](/docs/how-to-guides/themes/theme-json.md).
 
 When the block declares support for `color.duotone`, the attributes definition is extended to include the attribute `style`:
 
@@ -234,7 +234,7 @@ supports: {
 }
 ```
 
-Gradient presets are sourced from `editor-gradient-presets` [theme support](/docs/how-to-guides/theme-support.md#block-gradient-presets).
+Gradient presets are sourced from `editor-gradient-presets` [theme support](/docs/how-to-guides/themes/theme-support.md#block-gradient-presets).
 
 
 When the block declares support for `color.gradient`, the attributes definition is extended to include two new attributes: `gradient` and `style`:
@@ -296,7 +296,7 @@ supports: {
 }
 ```
 
-Text color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/theme-support.md#block-color-palettes).
+Text color presets are sourced from the `editor-color-palette` [theme support](/docs/how-to-guides/themes/theme-support.md#block-color-palettes).
 
 
 When the block declares support for `color.text`, the attributes definition is extended to include two new attributes: `textColor` and `style`:
@@ -370,7 +370,7 @@ supports: {
 
 This value signals that a block supports the font-size CSS style property. When it does, the block editor will show an UI control for the user to set its value.
 
-The values shown in this control are the ones declared by the theme via the `editor-font-sizes` [theme support](/docs/how-to-guides/theme-support.md#block-font-sizes), or the default ones if none is provided.
+The values shown in this control are the ones declared by the theme via the `editor-font-sizes` [theme support](/docs/how-to-guides/themes/theme-support.md#block-font-sizes), or the default ones if none is provided.
 
 ```js
 supports: {
@@ -440,7 +440,7 @@ supports: {
 -   Type: `boolean`
 -   Default value: `false`
 
-This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if [the theme declares support](/docs/how-to-guides/theme-support.md#supporting-custom-line-heights).
+This value signals that a block supports the line-height CSS style property. When it does, the block editor will show an UI control for the user to set its value if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#supporting-custom-line-heights).
 
 ```js
 supports: {
@@ -499,7 +499,7 @@ supports: {
 -   Subproperties:
     -   `padding`: type `boolean`, default value `false`
 
-This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/theme-support.md#cover-block-padding).
+This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
 
 ```js
 supports: {

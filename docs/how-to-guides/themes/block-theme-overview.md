@@ -31,7 +31,7 @@ theme
     |__ ...
 ```
 
-The difference with existing WordPress themes is that the different templates in the template hierarchy, and template parts, are block templates instead of php files. In addition, this example includes an [`experimental-theme.json`](/docs/how-to-guides/block-theme/theme-json.md) file for some styles.
+The difference with existing WordPress themes is that the different templates in the template hierarchy, and template parts, are block templates instead of php files. In addition, this example includes an [`experimental-theme.json`](/docs/how-to-guides/themes/theme-json.md) file for some styles.
 
 ## What is a block template?
 
@@ -122,7 +122,7 @@ As we're still early in the process, the number of blocks specifically dedicated
 
 ## Styling
 
-One of the most important aspects of themes (if not the most important) is the styling. While initially you'll be able to provide styles and enqueue them using the same hooks themes have always used, the [Global Styles](/docs/how-to-guides/block-theme/theme-json.md) effort will provide a scaffolding for adding many theme styles in the future.
+One of the most important aspects of themes (if not the most important) is the styling. While initially you'll be able to provide styles and enqueue them using the same hooks themes have always used, the [Global Styles](/docs/how-to-guides/themes/theme-json.md) effort will provide a scaffolding for adding many theme styles in the future.
 
 ## Classic Themes
 

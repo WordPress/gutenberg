@@ -27,7 +27,7 @@ Each template or template part contains the [block grammar](/docs/explanations/a
 
 A block theme requires an `index.php` file, an index template file, a `style.css` file, and a `functions.php` file.
 
-The theme may optionally include an [experimental-theme.json file](/docs/how-to-guides/block-theme/theme-json.md) to manage global styles. You decide what additional templates and template parts to include in your theme.
+The theme may optionally include an [experimental-theme.json file](/docs/how-to-guides/themes/theme-json.md) to manage global styles. You decide what additional templates and template parts to include in your theme.
 
 Templates are placed inside the `block-templates` folder, and template parts are placed inside the `block-template-parts` folder:
 
@@ -85,7 +85,7 @@ _You no longer need to add theme support for the title tag. It is already enable
 
 https://developer.wordpress.org/themes/basics/theme-functions/#what-is-functions-php
 
-https://developer.wordpress.org/block-editor/how-to-guides/theme-support/
+https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/
 
 ```php
 <?php
@@ -189,7 +189,7 @@ It is used to:
 -   Set global styles.
 -   Set styles for individual block types.
 
-[The documentation for global styles contains a list of available block and style combinations.](/docs/how-to-guides/block-theme/theme-json.md)
+[The documentation for global styles contains a list of available block and style combinations.](/docs/how-to-guides/themes/theme-json.md)
 
 Create a file called `experimental-theme.json` and save it inside the main folder.
 
@@ -282,7 +282,7 @@ Block styles are separate from global styles. Add the code after the globals, bu
 
 CSS variables for font sizes are generated using the `editor-font-sizes` theme support or by adding a global preset.
 
-https://developer.wordpress.org/block-editor/how-to-guides/theme-support/#block-font-sizes
+https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#block-font-sizes
 
 If the theme does not add any custom font sizes, variables are created using the default sizes.
 This example adds the default medium font size to the paragraph block.

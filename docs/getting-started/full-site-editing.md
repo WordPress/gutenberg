@@ -18,9 +18,9 @@ An ongoing [FSE Outreach program](https://make.wordpress.org/test/handbook/full-
 
 ## Block Themes
 
-If you are using the Gutenberg plugin you can run, test, and develop block themes. Block themes are themes built using templates composed using blocks. See [block theme overview](/docs/how-to-guides/block-theme/README.md) for additional details.
+If you are using the Gutenberg plugin you can run, test, and develop block themes. Block themes are themes built using templates composed using blocks. See [block theme overview](/docs/how-to-guides/themes/block-theme-overview.md) for additional details.
 
-- See the [Create a Block Theme](/docs/how-to-guides/block-theme/create-block-theme.md) tutorial for a walk-through of the pieces of a block theme.
+- See the [Create a Block Theme](/docs/how-to-guides/themes/create-block-theme.md) tutorial for a walk-through of the pieces of a block theme.
 
 - For examples, see the [WordPress/theme-experiments](https://github.com/WordPress/theme-experiments/) repository with several block themes there including the source for the above mentioned TT1 Blocks.
 
@@ -49,4 +49,4 @@ See the [architecture document on templates](/docs/explanations/architecture/ful
 
 Instead of the proliferation of theme support flags or alternative methods, a new `theme.json` file is being used to define theme settings. **NOTE:** This feature is still experimental and changing, so the interim file name is `experimental-theme.json`
 
-See [documentation for theme.json](/docs/how-to-guides/block-theme/theme-json.md).
+See [documentation for theme.json](/docs/how-to-guides/themes/theme-json.md).
