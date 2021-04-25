@@ -4,7 +4,7 @@
 
 ### Breaking Changes
 
--   The bundled `puppeteer-core` (`5.5.0`) dependency has been upgraded to version `9.0.0`. Puppeteer uses Chromium v91 instead of Chromium v81. See the full list of breaking changes of [9.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v9.0.0) and lower versions.
+-   The bundled `puppeteer-core` (`^5.5.0`) dependency has been upgraded to version `^9.0.0`. Puppeteer uses Chromium v91 instead of Chromium v88. See the full list of breaking changes of [9.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v9.0.0) and lower versions ([#31138](https://github.com/WordPress/gutenberg/pull/31138)).
 
 ### New Features
 
