@@ -10,15 +10,21 @@ const SUPPORTED_ENDPOINTS = [
 	/wp\/v2\/search\?.*/i,
 ];
 
+// [ONLY ON ANDROID] The requests made to these endpoints won't be cached.
+const DISABLED_CACHING_ENDPOINTS = [ /wp\/v2\/(blocks)\/?\d*?.*/i ];
+
 const setTimeoutPromise = ( delay ) =>
 	new Promise( ( resolve ) => setTimeout( resolve, delay ) );
+
+const shouldEnableCaching = ( path ) =>
+	! DISABLED_CACHING_ENDPOINTS.some( ( pattern ) => pattern.test( path ) );
 
 const fetchHandler = ( { path }, retries = 20, retryCount = 1 ) => {
 	if ( ! isPathSupported( path ) ) {
 		return Promise.reject( `Unsupported path: ${ path }` );
 	}
 
-	const responsePromise = fetchRequest( path );
+	const responsePromise = fetchRequest( path, shouldEnableCaching( path ) );
 
 	const parseResponse = ( response ) => {
 		if ( typeof response === 'string' ) {
