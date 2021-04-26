@@ -189,11 +189,13 @@ describe( 'Block Grouping', () => {
 
 			await transformBlockTo( 'Group' );
 
-			const allBlocks = await getAllBlocks();
+			const align = await getAllBlocks(
+				( blocks ) => blocks[ 0 ].attributes.align
+			);
 
 			// We expect Group block align setting to match that
 			// of the widest of it's "child" innerBlocks
-			expect( allBlocks[ 0 ].attributes.align ).toBe( 'full' );
+			expect( align ).toBe( 'full' );
 
 			expect( await getEditedPostContent() ).toMatchSnapshot();
 		} );

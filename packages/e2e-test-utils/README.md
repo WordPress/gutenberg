@@ -273,6 +273,10 @@ _Returns_
 
 Returns an array with all blocks; Equivalent to calling wp.data.select( 'core/block-editor' ).getBlocks();
 
+_Parameters_
+
+-   _evaluate_ `Function`: test
+
 _Returns_
 
 -   `Promise`: Promise resolving with an array containing all blocks in the document.

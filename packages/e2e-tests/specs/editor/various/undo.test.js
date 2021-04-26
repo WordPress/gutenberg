@@ -350,7 +350,9 @@ describe( 'undo', () => {
 
 		// Issue is demonstrated by forcing state merges (multiple inputs) on
 		// an existing text after a fresh reload.
-		await selectBlockByClientId( ( await getAllBlocks() )[ 0 ].clientId );
+		await selectBlockByClientId(
+			await getAllBlocks( ( blocks ) => blocks[ 0 ]?.clientId )
+		);
 		await page.keyboard.type( 'modified' );
 
 		// The issue is demonstrated after the one second delay to trigger the

@@ -100,7 +100,7 @@ describe( 'Align Hook Works As Expected', () => {
 			await verifyMarkupIsValid( htmlMarkup );
 
 			await selectBlockByClientId(
-				( await getAllBlocks() )[ 0 ].clientId
+				await getAllBlocks( ( blocks ) => blocks[ 0 ]?.clientId )
 			);
 
 			// remove the alignment.
@@ -120,7 +120,7 @@ describe( 'Align Hook Works As Expected', () => {
 			await verifyMarkupIsValid( htmlMarkup );
 
 			await selectBlockByClientId(
-				( await getAllBlocks() )[ 0 ].clientId
+				await getAllBlocks( ( blocks ) => blocks[ 0 ]?.clientId )
 			);
 
 			// verify no alignment button is in pressed state after parsing the block.

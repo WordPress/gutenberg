@@ -109,11 +109,13 @@ describe( 'Template Part', () => {
 			);
 
 			// Select the header template part block.
-			const allBlocks = await getAllBlocks();
-			const headerBlock = allBlocks.find(
-				( block ) => block.name === 'core/template-part'
+			const headerBlockClientId = await getAllBlocks(
+				( blocks ) =>
+					blocks.find(
+						( block ) => block.name === 'core/template-part'
+					)?.clientId
 			);
-			await selectBlockByClientId( headerBlock.clientId );
+			await selectBlockByClientId( headerBlockClientId );
 
 			// Detach blocks from template part using ellipsis menu.
 			await triggerEllipsisMenuItem( 'Detach blocks from template part' );

@@ -88,8 +88,10 @@ describe( 'Settings sidebar', () => {
 
 	describe( 'Block tab', () => {
 		it( 'should open block tab by default if a block is selected', async () => {
-			const allBlocks = await getAllBlocks();
-			await selectBlockByClientId( allBlocks[ 0 ].clientId );
+			const clientId = await getAllBlocks(
+				( blocks ) => blocks[ 0 ]?.clientId
+			);
+			await selectBlockByClientId( clientId );
 
 			await toggleSidebar();
 
