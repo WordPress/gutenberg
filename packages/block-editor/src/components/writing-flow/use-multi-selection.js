@@ -90,10 +90,10 @@ export default function useMultiSelection( ref ) {
 	const rafId = useRef();
 	const startClientId = useRef();
 	const anchorElement = useRef();
-	const startRef = useBlockRef( selectedBlockClientId );
+	const selectedRef = useBlockRef( selectedBlockClientId );
 	// These must be in the right DOM order.
-	const endRef = useBlockRef( first( multiSelectedBlockClientIds ) );
-	const selectedRef = useBlockRef( last( multiSelectedBlockClientIds ) );
+	const startRef = useBlockRef( first( multiSelectedBlockClientIds ) );
+	const endRef = useBlockRef( last( multiSelectedBlockClientIds ) );
 
 	/**
 	 * When the component updates, and there is multi selection, we need to

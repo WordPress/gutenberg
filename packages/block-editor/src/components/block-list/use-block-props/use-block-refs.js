@@ -36,15 +36,17 @@ export function useBlockRefProvider( clientId ) {
 
 function useBlockRef( clientId ) {
 	const { refs } = useContext( BlockRefs );
+	const freshClientId = useRef();
+	freshClientId.current = clientId;
 	// Always return an object, even if no ref exists for a given client ID, so
 	// that `current` works at a later point.
 	return useMemo(
 		() => ( {
 			get current() {
-				return refs.get( clientId )?.current || null;
+				return refs.get( freshClientId.current )?.current || null;
 			},
 		} ),
-		[ clientId ]
+		[]
 	);
 }
 
