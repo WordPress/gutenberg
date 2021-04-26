@@ -12,8 +12,8 @@ import {
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
-import { usePreferredColorSchemeStyle } from '@wordpress/compose';
+import { useState, useRef, useMemo } from '@wordpress/element';
+import { usePreferredColorSchemeStyleBem } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { Gridicons } from '@wordpress/components';
 import { Icon, cancelCircleFilled, arrowLeft, close } from '@wordpress/icons';
@@ -46,180 +46,47 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 
 	const inputRef = useRef();
 
-	const baseContainerStyle = {
-		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__container' ],
-			styles[ 'inserter-search-form__container--dark' ]
-		),
-		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__container' ],
-			platformStyles[ 'inserter-search-form__container--dark' ]
-		),
-	};
+	const baseStyles = usePreferredColorSchemeStyleBem(
+		styles,
+		platformStyles
+	);
 
-	const containerActiveStyle = {
-		...baseContainerStyle,
-		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__container--active' ],
-			styles[ 'inserter-search-form__container--active-dark' ]
-		),
-		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__container--active' ],
-			platformStyles[ 'inserter-search-form__container--active-dark' ]
-		),
-	};
+	const activeStyles = useMemo( () => {
+		const activeSelectors = Object.keys( baseStyles ).filter(
+			( key ) => !! key.match( /active/ )
+		);
 
-	const containerStyle = isActive ? containerActiveStyle : baseContainerStyle;
+		const _activeStyles = { ...styles };
 
-	const inputContainerStyle = {
-		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__input-container' ],
-			styles[ 'inserter-search-form__input-container--dark' ]
-		),
-		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__input-container' ],
-			platformStyles[ 'inserter-search-form__input-container--dark' ]
-		),
-	};
+		activeSelectors.forEach( ( activeSelector ) => {
+			const selector = activeSelector
+				.replace( /-active/, '' )
+				.replace( /-$/, '' );
 
-	const inputContainerActiveStyle = {
-		...inputContainerStyle,
-		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__input-container--active' ],
-			styles[ 'inserter-search-form__input-container--active-dark' ]
-		),
-		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__input-container--active' ],
-			platformStyles[
-				'inserter-search-form__input-container--active-dark'
-			]
-		),
-	};
+			_activeStyles[ selector ] = {
+				...baseStyles[ selector ],
+				...baseStyles[ activeSelector ],
+			};
+		} );
+		return _activeStyles;
+	}, [] );
 
-	const formInputStyle = {
-		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__form-input' ],
-			styles[ 'inserter-search-form__form-input--dark' ]
-		),
-		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__form-input' ],
-			platformStyles[ 'inserter-search-form__form-input--dark' ]
-		),
-		...{},
-	};
+	const newStyles = useMemo( () => {
+		return isActive ? activeStyles : baseStyles;
+	}, [ isActive ] );
 
-	const formInputActiveStyle = {
-		...formInputStyle,
-		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__form-input--active' ],
-			styles[ 'inserter-search-form__form-input--active-dark' ]
-		),
-		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__form-input--active' ],
-			platformStyles[ 'inserter-search-form__form-input--active-dark' ]
-		),
-	};
-
-	const placeholderStyle = {
-		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__form-input-placeholder' ],
-			styles[ 'inserter-search-form__form-input-placeholder--dark' ]
-		),
-		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__form-input-placeholder' ],
-			platformStyles[
-				'inserter-search-form__form-input-placeholder--dark'
-			]
-		),
-	};
-
-	const baseInputButtonStyle = {
-		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__input-button' ],
-			styles[ 'inserter-search-form__input-button--dark' ]
-		),
-		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__input-button' ],
-			platformStyles[ 'inserter-search-form__input-button--dark' ]
-		),
-	};
-
-	const activeInputButtonStyle = {
-		...baseInputButtonStyle,
-		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__input-button--active' ],
-			styles[ 'inserter-search-form__input-button--active-dark' ]
-		),
-		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__input-button--active' ],
-			platformStyles[ 'inserter-search-form__input-button--active-dark' ]
-		),
-	};
-
-	const inputButtonStyle = isActive
-		? activeInputButtonStyle
-		: baseInputButtonStyle;
-
-	const baseInputButtonLeftStyle = {
-		...styles[ 'inserter-search-form__input-button-left' ],
-		...platformStyles[ 'inserter-search-form__input-button-left' ],
-	};
-
-	const activeInputButtonLeftStyle = {
-		...styles[ 'inserter-search-form__input-button-left--active' ],
-		...platformStyles[ 'inserter-search-form__input-button-left--active' ],
-	};
-
-	const inputButtonLeftStyle = isActive
-		? activeInputButtonLeftStyle
-		: baseInputButtonLeftStyle;
-
-	const baseInputButtonRightStyle = {
-		...styles[ 'inserter-search-form__input-button-right' ],
-		...platformStyles[ 'inserter-search-form__input-button-right' ],
-	};
-
-	const activeInputButtonRightStyle = {
-		...styles[ 'inserter-search-form__input-button-right--active' ],
-		...platformStyles[ 'inserter-search-form__input-button-right--active' ],
-	};
-
-	const inputButtonRightStyle = isActive
-		? activeInputButtonRightStyle
-		: baseInputButtonRightStyle;
-
-	const cancelButtonStyle = {
-		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__cancel-button' ],
-			styles[ 'inserter-search-form__cancel-button--dark' ]
-		),
-		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__cancel-button' ],
-			platformStyles[ 'inserter-search-form__cancel-button--dark' ]
-		),
-	};
-
-	const cancelButtonTextStyle = {
-		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__cancel-button-text' ],
-			styles[ 'inserter-search-form__cancel-button-text--dark' ]
-		),
-		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__cancel-button-text' ],
-			platformStyles[ 'inserter-search-form__cancel-button-text--dark' ]
-		),
-	};
-
-	const iconStyle = {
-		...usePreferredColorSchemeStyle(
-			styles[ 'inserter-search-form__icon' ],
-			styles[ 'inserter-search-form__icon--dark' ]
-		),
-		...usePreferredColorSchemeStyle(
-			platformStyles[ 'inserter-search-form__icon' ],
-			platformStyles[ 'inserter-search-form__icon--dark' ]
-		),
-	};
+	const {
+		'inserter-search-form__container': containerStyle,
+		'inserter-search-form__input-container': inputContainerStyle,
+		'inserter-search-form__form-input': formInputStyle,
+		'inserter-search-form__form-input-placeholder': placeholderStyle,
+		'inserter-search-form__input-button': inputButtonStyle,
+		'inserter-serach-form__input-button-left': inputButtonRightStyle,
+		'inserter-search-form__input-button-right': inputButtonLeftStyle,
+		'inserter-search-form__cancel-button': cancelButtonStyle,
+		'inserter-search-form__cancel-button-text': cancelButtonTextStyle,
+		'inserter-search-form__icon': iconStyle,
+	} = newStyles;
 
 	function clearInput() {
 		onChange( '' );
@@ -274,11 +141,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 			onLayout={ onLayout }
 			activeOpacity={ 1 }
 		>
-			<View
-				style={
-					isActive ? inputContainerActiveStyle : inputContainerStyle
-				}
-			>
+			<View style={ inputContainerStyle }>
 				<View
 					style={ { ...inputButtonStyle, ...inputButtonLeftStyle } }
 				>
@@ -286,7 +149,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 				</View>
 				<TextInput
 					ref={ inputRef }
-					style={ isActive ? formInputActiveStyle : formInputStyle }
+					style={ formInputStyle }
 					placeholderTextColor={ placeholderStyle.color }
 					onChangeText={ onChange }
 					onFocus={ () => setIsActive( true ) }
