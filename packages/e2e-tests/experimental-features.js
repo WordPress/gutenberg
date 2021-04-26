@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
-import { visitAdminPage, wpDataSelect } from '@wordpress/e2e-test-utils';
+import { visitAdminPage } from '@wordpress/e2e-test-utils';
 
 async function setExperimentalFeaturesState( features, enable ) {
 	const query = addQueryArgs( '', {
@@ -131,34 +131,28 @@ export const siteEditor = {
 	},
 
 	async getEditedPostContent() {
-		const postId = await wpDataSelect(
-			'core/edit-site',
-			'getEditedPostId'
-		);
-		const postType = await wpDataSelect(
-			'core/edit-site',
-			'getEditedPostType'
-		);
-		const record = await wpDataSelect(
-			'core',
-			'getEditedEntityRecord',
-			'postType',
-			postType,
-			postId
-		);
-		if ( record ) {
-			if ( typeof record.content === 'function' ) {
-				return record.content( record );
-			} else if ( record.blocks ) {
-				return await page.evaluate(
-					( blocks ) =>
-						window.wp.blocks.__unstableSerializeAndClean( blocks ),
-					record.blocks
-				);
-			} else if ( record.content ) {
-				return record.content;
+		return await page.evaluate( async () => {
+			const postId = window.wp.data
+				.select( 'core/edit-site' )
+				.getEditedPostId();
+			const postType = window.wp.data
+				.select( 'core/edit-site' )
+				.getEditedPostType();
+			const record = window.wp.data
+				.select( 'core' )
+				.getEditedEntityRecord( 'postType', postType, postId );
+			if ( record ) {
+				if ( typeof record.content === 'function' ) {
+					return record.content( record );
+				} else if ( record.blocks ) {
+					return window.wp.blocks.__unstableSerializeAndClean(
+						record.blocks
+					);
+				} else if ( record.content ) {
+					return record.content;
+				}
 			}
-		}
-		return '';
+			return '';
+		} );
 	},
 };
