@@ -98,7 +98,7 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 		return null;
 	}
 
-	const baseAnchor = slug;
+	const baseAnchor = `wp-${ slug }`;
 	anchor = baseAnchor;
 	let i = 0;
 
@@ -128,5 +128,7 @@ export default function useGeneratedAnchor( clientId, anchor, content ) {
 		},
 		[ clientId ]
 	);
-	return generateAnchor( anchor, content, allHeadingAnchors );
+	return ! anchor || anchor.startsWith( 'wp-' )
+		? generateAnchor( anchor, content, allHeadingAnchors )
+		: anchor;
 }
