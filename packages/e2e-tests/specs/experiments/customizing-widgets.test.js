@@ -174,6 +174,8 @@ describe( 'Widgets Customizer', () => {
 
 		// Expect the search box to be found in the preview iframe.
 		await contentFrame.waitForSelector( 'input[type="search"]' );
+
+		expect( console ).toHaveWarned();
 	} );
 
 	it( 'should open the inspector panel', async () => {
@@ -265,6 +267,8 @@ describe( 'Widgets Customizer', () => {
 		} );
 
 		await expect( inspectorHeading ).not.toBeVisible();
+
+		expect( console ).toHaveWarned();
 	} );
 
 	it( 'should handle the inserter outer section', async () => {
@@ -336,8 +340,7 @@ describe( 'Widgets Customizer', () => {
 
 		// Expect the Publish Settings outer section to be found.
 		const publishSettingsRadio = await find( {
-			role: 'radio',
-			name: 'Publish',
+			selector: '#sub-accordion-section-publish_settings',
 		} );
 
 		// Expect the inserter outer section to be closed.
@@ -379,6 +382,8 @@ describe( 'Widgets Customizer', () => {
 
 		// Expect the inserter outer section to be closed.
 		expect( inserterHeading ).not.toBeVisible();
+
+		expect( console ).toHaveWarned();
 	} );
 } );
 
