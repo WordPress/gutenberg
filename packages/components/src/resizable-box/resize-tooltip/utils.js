@@ -79,7 +79,6 @@ export function useResizeLabel( {
 	 */
 	const moveTimeoutRef = useRef();
 
-
 	const unsetMoveXY = () => {
 		/*
 		 * If axis is controlled, we will avoid resetting the moveX and moveY values.
