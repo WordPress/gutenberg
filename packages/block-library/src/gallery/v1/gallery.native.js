@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
  * Internal dependencies
  */
 import GalleryImage from './gallery-image';
-import { defaultColumnsNumber } from './shared';
+import { defaultColumnsNumber } from '../shared';
 import styles from './gallery-styles.scss';
 import Tiles from './tiles';
 
