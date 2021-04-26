@@ -1,18 +1,18 @@
-# Block-based Themes (Experimental)
+# Block Theme
 
-> This is the documentation for the current implementation of block-based themes, also known as Full Site Editing or Block Content Areas. These features are still experimental in the plugin. “Experimental” means this is just an early implementation that is subject to potential drastic and breaking changes in iterations based on feedback from users, contributors and theme authors.
+<div class="callout callout-alert">
+These features are still experimental in the plugin. “Experimental” means this is just an early implementation that is subject to potential drastic and breaking changes in iterations based on feedback from users, contributors and theme authors.
 
-> Documentation has been shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. You can provide feedback in the weekly #core-editor chats where the latest progress of this effort will be shared and discussed, or async via Github issues.
+Documentation is shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. You can provide feedback in the weekly #core-editor chats, or #fse-outreach-experiment channels, or async via Github issues.
+</div>
 
-**Note:** To use these features, activate a theme that includes a `block-templates/index.html` file. This will signal to the block editor that the theme should use full-site editing features.
+## What is a block theme?
 
-## What is a block-based theme?
+A block theme is a WordPress theme with templates entirely composed of blocks so that in addition to the post content of the different post types (pages, posts, ...), the block editor can also be used to edit all areas of the site: headers, footers, sidebars, etc.
 
-A block-based theme is a WordPress theme with templates entirely composed of blocks so that in addition to the post content of the different post types (pages, posts, ...), the block editor can also be used to edit all areas of the site: headers, footers, sidebars, etc.
+## What is the structure of a block theme?
 
-## What is the structure of a block-based theme?
-
-A very simple block-based theme is structured like so:
+A very simple block theme is structured like so:
 
 ```
 theme
@@ -96,7 +96,7 @@ Note that it won't take precedence over any of your theme's templates with highe
 
 ## Theme Blocks
 
-Some blocks have been made specifically for block-based themes. For example, you'll most likely use the **Site Title** block in your site's header while your **single** block template will most likely include a **Post Title** and a **Post Content** block.
+Some blocks have been made specifically for block themes. For example, you'll most likely use the **Site Title** block in your site's header while your **single** block template will most likely include a **Post Title** and a **Post Content** block.
 
 As we're still early in the process, the number of blocks specifically dedicated to these block templates is relatively small but more will be added as we move forward with the project. As of Gutenberg 8.5, the following blocks are currently available:
 
@@ -137,4 +137,4 @@ remove_theme_support( 'block-templates' );
 ## Resources
 
 -   [Full Site Editing](https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Full%20Site%20Editing) label.
--   [Theme Experiments](https://github.com/WordPress/theme-experiments) repository, full of block-based theme examples created by the WordPress community.
+-   [Theme Experiments](https://github.com/WordPress/theme-experiments) repository, full of block theme examples created by the WordPress community.

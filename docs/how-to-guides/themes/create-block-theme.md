@@ -10,10 +10,10 @@ This tutorial is up to date as of Gutenberg version 9.1.
 
 ## Table of Contents
 
-1.  [What is needed to create a block-theme?](/docs/how-to-guides/block-theme/README.md#what-is-needed-to-create-a-block-theme)
-2.  [Creating the theme](/docs/how-to-guides/block-theme/README.md#creating-the-theme)
-3.  [Creating the templates and template parts](/docs/how-to-guides/block-theme/README.md#creating-the-templates-and-template-parts)
-4.  [experimental-theme.json - Global styles](/docs/how-to-guides/block-theme/README.md#experimental-theme-json-global-styles)
+1.  [What is needed to create a block-theme?](#what-is-needed-to-create-a-block-theme)
+2.  [Creating the theme](#creating-the-theme)
+3.  [Creating the templates and template parts](#creating-the-templates-and-template-parts)
+4.  [experimental-theme.json - Global styles](#experimental-theme-json-global-styles)
 
 ## What is needed to create a block theme?
 
@@ -21,7 +21,7 @@ To use a block theme you need to use the Gutenberg plugin.
 
 A block theme is built using HTML templates and template parts. Templates are the main files used in the [template hierarchy](https://developer.wordpress.org/themes/basics/template-hierarchy/), for example index, single or archive. Templates can optionally include structural template parts, for example a header, footer or sidebar.
 
-Each template or template part contains the [block grammar](https://developer.wordpress.org/block-editor/principles/key-concepts/#blocks), the HTML, for the selected blocks. The block HTML is generated in and exported from the **site editor**. It can also be added to the theme's HTML files manually.
+Each template or template part contains the [block grammar](/docs/explanations/architecture/key-concepts/), the HTML, for the selected blocks. The block HTML is generated in and exported from the **site editor**. It can also be added to the theme's HTML files manually.
 
 ### Required files and file structure
 
@@ -85,7 +85,7 @@ _You no longer need to add theme support for the title tag. It is already enable
 
 https://developer.wordpress.org/themes/basics/theme-functions/#what-is-functions-php
 
-https://developer.wordpress.org/block-editor/developers/themes/theme-support/
+https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/
 
 ```php
 <?php
@@ -189,7 +189,7 @@ It is used to:
 -   Set global styles.
 -   Set styles for individual block types.
 
-[The documentation for global styles contains a list of available block and style combinations.](https://developer.wordpress.org/block-editor/developers/themes/theme-json/)
+[The documentation for global styles contains a list of available block and style combinations.](/docs/how-to-guides/themes/theme-json.md)
 
 Create a file called `experimental-theme.json` and save it inside the main folder.
 
@@ -282,7 +282,7 @@ Block styles are separate from global styles. Add the code after the globals, bu
 
 CSS variables for font sizes are generated using the `editor-font-sizes` theme support or by adding a global preset.
 
-https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes
+https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#block-font-sizes
 
 If the theme does not add any custom font sizes, variables are created using the default sizes.
 This example adds the default medium font size to the paragraph block.
