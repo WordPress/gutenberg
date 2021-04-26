@@ -4,33 +4,39 @@
 import { useRefEffect } from '@wordpress/compose';
 
 import { useSelect, useDispatch } from '@wordpress/data';
+import { useContext } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { InsertionPointOpenRef } from './insertion-point';
 
 export function useInBetweenInserter() {
-	const isMultiSelecting = useSelect(
-		( select ) => select( blockEditorStore ).isMultiSelecting(),
-		[]
-	);
+	const openRef = useContext( InsertionPointOpenRef );
 	const {
+		getBlockInsertionPoint,
 		getBlockListSettings,
 		getBlockRootClientId,
 		getBlockIndex,
 		isBlockInsertionPointVisible,
+		isMultiSelecting,
 	} = useSelect( blockEditorStore );
 	const { showInsertionPoint, hideInsertionPoint } = useDispatch(
 		blockEditorStore
 	);
+
 	return useRefEffect(
 		( node ) => {
-			if ( isMultiSelecting ) {
-				return;
-			}
-
 			function onMouseMove( event ) {
+				if ( openRef.current ) {
+					return;
+				}
+
+				if ( isMultiSelecting() ) {
+					return;
+				}
+
 				if (
 					! event.target.classList.contains(
 						'block-editor-block-list__layout'
@@ -125,10 +131,13 @@ export function useInBetweenInserter() {
 			};
 		},
 		[
-			isMultiSelecting,
+			openRef,
+			getBlockInsertionPoint,
 			getBlockListSettings,
 			getBlockRootClientId,
 			getBlockIndex,
+			isBlockInsertionPointVisible,
+			isMultiSelecting,
 			showInsertionPoint,
 			hideInsertionPoint,
 		]

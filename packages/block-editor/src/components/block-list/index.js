@@ -23,10 +23,7 @@ import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 
-export default function BlockList( { className, __experimentalLayout } ) {
-	const ref = useRef();
-	usePreParsePatterns();
-
+function Root( { className, children } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		isTyping,
@@ -47,30 +44,43 @@ export default function BlockList( { className, __experimentalLayout } ) {
 			isNavigationMode: _isNavigationMode(),
 		};
 	}, [] );
+	return (
+		<div
+			ref={ useMergeRefs( [
+				useBlockDropZone(),
+				useInBetweenInserter(),
+			] ) }
+			className={ classnames(
+				'block-editor-block-list__layout is-root-container',
+				className,
+				{
+					'is-typing': isTyping,
+					'is-outline-mode': isOutlineMode,
+					'is-focus-mode': isFocusMode && isLargeViewport,
+					'is-navigate-mode': isNavigationMode,
+				}
+			) }
+		>
+			{ children }
+		</div>
+	);
+}
+
+export default function BlockList( { className, __experimentalLayout } ) {
+	const ref = useRef();
+
+	usePreParsePatterns();
 
 	return (
 		<>
-			<InsertionPoint />
 			<BlockPopover />
-			<div
-				ref={ useMergeRefs( [
-					ref,
-					useBlockDropZone(),
-					useInBetweenInserter(),
-				] ) }
-				className={ classnames(
-					'block-editor-block-list__layout is-root-container',
-					className,
-					{
-						'is-typing': isTyping,
-						'is-outline-mode': isOutlineMode,
-						'is-focus-mode': isFocusMode && isLargeViewport,
-						'is-navigate-mode': isNavigationMode,
-					}
-				) }
-			>
-				<BlockListItems __experimentalLayout={ __experimentalLayout } />
-			</div>
+			<InsertionPoint>
+				<Root className={ className } containerRef={ ref }>
+					<BlockListItems
+						__experimentalLayout={ __experimentalLayout }
+					/>
+				</Root>
+			</InsertionPoint>
 		</>
 	);
 }
