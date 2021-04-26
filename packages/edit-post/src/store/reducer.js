@@ -250,7 +250,7 @@ export function deviceType( state = 'Desktop', action ) {
 export function blockInserterPanel( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_IS_LIST_VIEW_OPENED':
-			return action.value ? false : state;
+			return action.isOpen ? false : state;
 		case 'SET_IS_INSERTER_OPENED':
 			return action.value;
 	}
