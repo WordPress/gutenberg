@@ -34,7 +34,6 @@ export default function TemplatePartInnerBlocks( {
 		'wp_template_part',
 		{ id }
 	);
-
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		value: blocks,
 		onInput,
@@ -49,6 +48,5 @@ export default function TemplatePartInnerBlocks( {
 			alignments: themeSupportsLayout ? alignments : undefined,
 		},
 	} );
-
 	return <TagName { ...innerBlocksProps } />;
 }

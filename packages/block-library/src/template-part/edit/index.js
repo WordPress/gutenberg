@@ -57,7 +57,6 @@ export default function TemplatePartEdit( {
 			const entityRecord = templatePartId
 				? getEditedEntityRecord( ...getEntityArgs )
 				: null;
-
 			const hasResolvedEntity = templatePartId
 				? hasFinishedResolution(
 						'getEditedEntityRecord',
