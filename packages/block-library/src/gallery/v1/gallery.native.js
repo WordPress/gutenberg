@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
  * Internal dependencies
  */
 import GalleryImage from './gallery-image';
-import { defaultColumnsNumber } from '../shared';
+import { defaultColumnsNumberV1 } from '../deprecated';
 import styles from './gallery-styles.scss';
 import Tiles from './tiles';
 
@@ -61,7 +61,7 @@ export const Gallery = ( props ) => {
 
 	const {
 		align,
-		columns = defaultColumnsNumber( attributes ),
+		columns = defaultColumnsNumberV1( attributes ),
 		imageCrop,
 		images,
 	} = attributes;
