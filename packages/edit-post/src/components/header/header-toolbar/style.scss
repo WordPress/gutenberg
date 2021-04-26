@@ -46,9 +46,6 @@
 		&::before {
 			display: none;
 		}
-		body.rtl &{
-			transform: rotateY(180deg);
-		}
 	}
 }
 
