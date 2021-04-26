@@ -27,20 +27,21 @@ function useObservableState( initialState, onStateChange ) {
 }
 
 export default function Dropdown( {
-	renderContent,
-	renderToggle,
-	position = 'bottom right',
 	className,
 	contentClassName,
 	expandOnMobile,
-	headerTitle,
 	focusOnMount,
-	popoverProps,
+	headerTitle,
 	onClose,
 	onToggle,
+	openOnMount = false,
+	popoverProps,
+	position = 'bottom right',
+	renderContent,
+	renderToggle,
 } ) {
 	const containerRef = useRef();
-	const [ isOpen, setIsOpen ] = useObservableState( false, onToggle );
+	const [ isOpen, setIsOpen ] = useObservableState( openOnMount, onToggle );
 
 	useEffect(
 		() => () => {
