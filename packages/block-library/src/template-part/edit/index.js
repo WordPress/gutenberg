@@ -53,7 +53,7 @@ export default function TemplatePartEdit( {
 		isMissing,
 		defaultWrapper,
 		hasContent,
-		blockName,
+		blockNameWithArea,
 	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } = select(
@@ -82,7 +82,7 @@ export default function TemplatePartEdit( {
 					typeof entityRecord.content !== 'function' ) ||
 				entityRecord?.blocks?.length;
 
-			const _blockName =
+			const _blockNameWithArea =
 				entityRecord?.area && entityRecord.area !== 'uncategorized'
 					? `core/template-part/${ entityRecord.area }`
 					: 'core/template-part';
@@ -100,7 +100,7 @@ export default function TemplatePartEdit( {
 				isMissing: hasResolvedEntity && ! entityRecord,
 				defaultWrapper: defaultWrapperElement || 'div',
 				hasContent: _hasContent,
-				blockName: _blockName,
+				blockNameWithArea: _blockNameWithArea,
 			};
 		},
 		[ templatePartId, clientId ]
@@ -207,7 +207,7 @@ export default function TemplatePartEdit( {
 					/>
 				) : (
 					<PatternsSetup
-						blockName={ blockName }
+						blockNameWithArea={ blockNameWithArea }
 						clientId={ clientId }
 						setStartingPattern={ setStartingPattern }
 					/>
@@ -221,7 +221,7 @@ export default function TemplatePartEdit( {
 	);
 }
 
-function PatternsSetup( { blockName, clientId, setStartingPattern } ) {
+function PatternsSetup( { blockNameWithArea, clientId, setStartingPattern } ) {
 	const onSelect = ( blocks ) => {
 		const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 		setStartingPattern( clonedBlocks );
@@ -229,7 +229,7 @@ function PatternsSetup( { blockName, clientId, setStartingPattern } ) {
 
 	return (
 		<BlockPatternSetup
-			blockName={ blockName }
+			blockName={ 'core/template-part' }
 			clientId={ clientId }
 			startBlankComponent={
 				<StartBlankComponent
@@ -237,6 +237,11 @@ function PatternsSetup( { blockName, clientId, setStartingPattern } ) {
 				/>
 			}
 			onBlockPatternSelect={ onSelect }
+			filterPatternsFn={ ( pattern ) =>
+				pattern?.blockTypes?.some?.(
+					( blockType ) => blockType === blockNameWithArea
+				)
+			}
 		/>
 	);
 }
