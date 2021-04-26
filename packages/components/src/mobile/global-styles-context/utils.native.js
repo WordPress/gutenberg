@@ -74,6 +74,9 @@ export function getBlockColors(
 				}
 			}
 		);
+	} else if ( baseGlobalStyles?.styles?.color?.text ) {
+		blockStyles[ BLOCK_STYLE_ATTRIBUTES_MAPPING.text ] =
+			baseGlobalStyles?.styles?.color?.text;
 	}
 
 	// Global styles elements
