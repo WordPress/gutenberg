@@ -1,10 +1,8 @@
-# Creating a block-based theme
+# Create a block theme
 
-The purpose of this tutorial is to show how to create a basic block based theme
-and help theme developers transition to full site editing.
+The purpose of this tutorial is to show how to create a block theme and help theme developers transition to full site editing.
 
-You will learn about the required files, how to combine templates and template parts,
-how to add presets for global styles, and how to add blocks and export the templates in the site editor.
+You will learn about the required files, how to combine templates and template parts, how to add presets for global styles, and how to add blocks and export the templates in the site editor.
 
 Full site editing is an experimental feature and the workflow in this tutorial is likely to change.
 
@@ -12,25 +10,22 @@ This tutorial is up to date as of Gutenberg version 9.1.
 
 ## Table of Contents
 
-1.  [What is needed to create a block-based theme?](/docs/how-to-guides/block-based-themes/README.md#what-is-needed-to-create-a-block-based-theme)
-2.  [Creating the theme](/docs/how-to-guides/block-based-themes/README.md#creating-the-theme)
-3.  [Creating the templates and template parts](/docs/how-to-guides/block-based-themes/README.md#creating-the-templates-and-template-parts)
-4.  [experimental-theme.json - Global styles](/docs/how-to-guides/block-based-themes/README.md#experimental-theme-json-global-styles)
-5.  [Adding blocks](/docs/how-to-guides/block-based-themes/block-based-themes-2-adding-blocks.md)
+1.  [What is needed to create a block-theme?](/docs/how-to-guides/block-theme/README.md#what-is-needed-to-create-a-block-theme)
+2.  [Creating the theme](/docs/how-to-guides/block-theme/README.md#creating-the-theme)
+3.  [Creating the templates and template parts](/docs/how-to-guides/block-theme/README.md#creating-the-templates-and-template-parts)
+4.  [experimental-theme.json - Global styles](/docs/how-to-guides/block-theme/README.md#experimental-theme-json-global-styles)
 
-## What is needed to create a block-based theme?
+## What is needed to create a block theme?
 
-To use a block based theme you need to have Gutenberg installed and full site editing must be enabled.
+To use a block theme you need to use the Gutenberg plugin.
 
-Full site editing can be enabled from the Gutenberg experiments menu in the WordPress admin area.
-
-A block-based theme is built using HTML templates and template parts. Templates are the main files used in the [template hierarchy](https://developer.wordpress.org/themes/basics/template-hierarchy/), for example index, single or archive. Templates can optionally include structural template parts, for example a header, footer or sidebar.
+A block theme is built using HTML templates and template parts. Templates are the main files used in the [template hierarchy](https://developer.wordpress.org/themes/basics/template-hierarchy/), for example index, single or archive. Templates can optionally include structural template parts, for example a header, footer or sidebar.
 
 Each template or template part contains the [block grammar](https://developer.wordpress.org/block-editor/principles/key-concepts/#blocks), the HTML, for the selected blocks. The block HTML is generated in and exported from the **site editor**. It can also be added to the theme's HTML files manually.
 
 ### Required files and file structure
 
-A block based theme requires an `index.php` file, an index template file, a `style.css` file, and a `functions.php` file.
+A block theme requires an `index.php` file, an index template file, a `style.css` file, and a `functions.php` file.
 
 The theme may optionally include an [experimental-theme.json file](/docs/how-to-guides/themes/theme-json.md) to manage global styles. You decide what additional templates and template parts to include in your theme.
 
@@ -380,4 +375,3 @@ Below are the presets and styles combined:
 }
 ```
 
-## [Adding blocks](/docs/how-to-guides/block-based-theme/block-based-themes-2-adding-blocks.md)

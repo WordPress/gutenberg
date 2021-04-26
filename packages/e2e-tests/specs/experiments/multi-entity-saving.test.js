@@ -8,6 +8,7 @@ import {
 	publishPost,
 	trashAllPosts,
 	activateTheme,
+	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -175,15 +176,17 @@ describe( 'Multi-entity save flow', () => {
 			await disablePrePublishChecks();
 
 			await insertBlock( 'Site Title' );
-			await page.waitForXPath( '//a[contains(text(), "gutenberg")]' ); // Ensure title is retrieved before typing.
+			// Ensure title is retrieved before typing.
+			await page.waitForXPath( '//a[contains(text(), "gutenberg")]' );
 			await page.keyboard.type( '...' );
 			await insertBlock( 'Site Tagline' );
+			// Ensure tagline is retrieved before typing.
 			await page.waitForXPath(
 				'//p[contains(text(), "Just another WordPress site")]'
-			); // Esnure tagline is retrieved before typing.
+			);
 			await page.keyboard.type( '...' );
 
-			await page.click( savePostSelector );
+			await clickButton( 'Publish' );
 			await page.waitForSelector( savePanelSelector );
 			let checkboxInputs = await page.$$( checkboxInputSelector );
 			expect( checkboxInputs ).toHaveLength( 3 );
@@ -191,7 +194,7 @@ describe( 'Multi-entity save flow', () => {
 			await checkboxInputs[ 1 ].click();
 			await page.click( entitiesSaveSelector );
 
-			await page.click( savePostSelector );
+			await clickButton( 'Update…' );
 			await page.waitForSelector( savePanelSelector );
 			checkboxInputs = await page.$$( checkboxInputSelector );
 			expect( checkboxInputs ).toHaveLength( 1 );
