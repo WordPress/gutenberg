@@ -5,10 +5,10 @@
  * @return {Promise} Promise resolving with an array containing all blocks in the document.
  */
 export async function getAllBlocks( evaluate ) {
-	const allBlocks = await page.evaluate( ( _evaluate ) => {
+	await page.exposeFunction( '_getAllBlocks_evaluate', evaluate );
+	const allBlocks = await page.evaluate( () => {
 		const blocks = wp.data.select( 'core/block-editor' ).getBlocks();
-
-		return _evaluate( blocks );
-	}, evaluate );
+		return window._getAllBlocks_evaluate( blocks );
+	} );
 	return allBlocks;
 }
