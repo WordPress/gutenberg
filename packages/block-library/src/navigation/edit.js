@@ -194,22 +194,22 @@ function Navigation( {
 						{
 							value: textColor.color,
 							onChange: setTextColor,
-							label: __( 'Text color' ),
+							label: __( 'Text' ),
 						},
 						{
 							value: backgroundColor.color,
 							onChange: setBackgroundColor,
-							label: __( 'Background text' ),
+							label: __( 'Background' ),
 						},
 						{
 							value: overlayTextColor.color,
 							onChange: setOverlayTextColor,
-							label: __( 'Overlay text color' ),
+							label: __( 'Overlay text' ),
 						},
 						{
 							value: overlayBackgroundColor.color,
 							onChange: setOverlayBackgroundColor,
-							label: __( 'Overlay background color' ),
+							label: __( 'Overlay background' ),
 						},
 					] }
 				/>
