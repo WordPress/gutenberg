@@ -199,16 +199,8 @@ export function computeCustomizedAttribute(
 			// 3. `taxonomy`,
 			// 4. `custom`.
 			kind: {
-				attr: 'type',
-				mapper: () => {
-					switch ( blockAttributeValue ) {
-						case 'post-type':
-						case 'post-type-archive':
-							return blockAttributeValue.replace( '-', '_' );
-						default:
-							return blockAttributeValue;
-					}
-				},
+				attr: 'type', // the equivalent on `nav_menu_item` is "type" but it is stored with underscores whereas the block attr uses hyphens.
+				mapper: () => blockAttributeValue.replace( '-', '_' ),
 			},
 		};
 
@@ -219,6 +211,7 @@ export function computeCustomizedAttribute(
 		);
 	}
 }
+
 /**
  * Converts a given key in an object to it's mapped equivalent.
  *

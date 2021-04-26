@@ -180,16 +180,8 @@ function mapMenuItemFieldToBlockAttribute( menuItemField, menuItemVal ) {
 		// 3. `taxonomy`,
 		// 4. `custom`.
 		type: {
-			attr: 'kind',
-			mapper: () => {
-				switch ( menuItemVal ) {
-					case 'post_type':
-					case 'post_type_archive':
-						return menuItemVal.replace( '_', '-' );
-					default:
-						return menuItemVal;
-				}
-			},
+			attr: 'kind', // the equivalent on `nav_menu_item` is "type" but it is stored with underscores whereas the block attr uses hyphens.
+			mapper: () => menuItemVal.replace( '_', '-' ),
 		},
 	};
 
