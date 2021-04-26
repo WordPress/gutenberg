@@ -16,6 +16,7 @@ import { Elevation } from '../elevation';
 import { View } from '../view';
 import * as styles from './styles';
 import { useCard } from './hook';
+import CONFIG from '../../utils/config-values';
 
 /**
  * @param {import('../context').ViewOwnProps<import('./types').CardProps, 'div'>} props
@@ -25,7 +26,7 @@ function Card( props, forwardedRef ) {
 	const { children, elevation, isRounded = true, ...otherProps } = useCard(
 		props
 	);
-	const elevationBorderRadius = isRounded ? '2px' : 0;
+	const elevationBorderRadius = isRounded ? CONFIG.cardBorderRadius : 0;
 
 	const elevationClassName = useMemo(
 		() => css( { borderRadius: elevationBorderRadius } ),

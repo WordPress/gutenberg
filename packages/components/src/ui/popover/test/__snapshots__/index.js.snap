@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-15.emotion-15.emotion-15.emotion-15.emotion-15.emotion-15.emotion-15 {
+.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17 {
   background-color: #ffffff;
   background-color: var(--wp-g2-surface-color);
   color: #1e1e1e;
@@ -9,44 +9,35 @@ exports[`props should render correctly 1`] = `
   position: relative;
   --wp-g2-surface-background-size: 12px;
   --wp-g2-surface-background-size-dotted: 11px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0 0 1px var(--wp-g2-surface-border-color);
-  outline: none;
-  border-radius: 2px;
-  border-radius: var(--wp-g2-card-border-radius);
 }
 
-.emotion-15.emotion-15.emotion-15.emotion-15.emotion-15.emotion-15.emotion-15 .components-card-body {
+.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17 .components-card-body {
   max-height: 80vh;
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  height: auto;
-  max-height: 100%;
-  padding: calc(4px * 3) calc(4px * 3);
-  padding: var(--wp-g2-card-padding);
 }
 
 @media only screen and ( min-device-width:40em ) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-scrollbar {
+  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar {
     height: 12px;
     width: 12px;
   }
 
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-scrollbar-track {
+  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar-track {
     background-color: transparent;
   }
 
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-scrollbar-track {
+  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.04);
     background: var(--wp-g2-color-scrollbar-track);
     border-radius: 8px;
   }
 
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0::-webkit-scrollbar-thumb {
+  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar-thumb {
     background-clip: padding-box;
     background-color: rgba(0, 0, 0, 0.2);
     background-color: var(--wp-g2-color-scrollbar-thumb);
@@ -54,27 +45,13 @@ exports[`props should render correctly 1`] = `
     border-radius: 7px;
   }
 
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:hover::-webkit-scrollbar-thumb {
+  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1:hover::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.5);
     background-color: var(--wp-g2-color-scrollbar-thumb-hover);
   }
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:first-of-type {
-  border-top-left-radius: 2px;
-  border-top-left-radius: var(--wp-g2-card-border-radius);
-  border-top-right-radius: 2px;
-  border-top-right-radius: var(--wp-g2-card-border-radius);
-}
-
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:last-of-type {
-  border-bottom-left-radius: 2px;
-  border-bottom-left-radius: var(--wp-g2-card-border-radius);
-  border-bottom-right-radius: 2px;
-  border-bottom-right-radius: var(--wp-g2-card-border-radius);
-}
-
-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
+.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7 {
   border-radius: inherit;
   bottom: 0;
   box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
@@ -89,7 +66,7 @@ exports[`props should render correctly 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-.emotion-11.emotion-11.emotion-11.emotion-11.emotion-11.emotion-11.emotion-11 {
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
   border-radius: inherit;
   bottom: 0;
   box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
@@ -104,7 +81,7 @@ exports[`props should render correctly 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-.emotion-5 {
+.emotion-6 {
   background: transparent;
   display: block;
   margin: 0 !important;
@@ -113,17 +90,39 @@ exports[`props should render correctly 1`] = `
   will-change: box-shadow;
 }
 
-.emotion-7 {
+.emotion-16 {
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+  outline: none;
   border-radius: 2px;
 }
 
+.emotion-8 {
+  border-radius: 2px;
+}
+
+.emotion-0 {
+  height: auto;
+  max-height: 100%;
+  padding: 24px,24px;
+}
+
+.emotion-0:first-of-type {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.emotion-0:last-of-type {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
 <div
-  class="components-surface components-card emotion-15 emotion-1 emotion-2"
+  class="components-surface components-card emotion-16 emotion-17 emotion-2 emotion-3"
   data-wp-c16t="true"
   data-wp-component="Card"
 >
   <div
-    class="emotion-1 emotion-2"
+    class="emotion-2 emotion-3"
   >
     <iframe
       aria-hidden="true"
@@ -133,7 +132,7 @@ exports[`props should render correctly 1`] = `
       tabindex="-1"
     />
     <div
-      class="components-scrollable wp-components-scrollable components-card-body ic-y3p1xi emotion-0 emotion-1 emotion-2"
+      class="components-scrollable wp-components-scrollable components-card-body emotion-0 ic-y3p1xi emotion-1 emotion-2 emotion-3"
       data-g2-c16t="true"
       data-g2-component="Scrollable"
       data-wp-c16t="true"
@@ -144,13 +143,13 @@ exports[`props should render correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
-    class="emotion-5 emotion-6 components-elevation emotion-7 emotion-1 emotion-2"
+    class="emotion-6 emotion-7 components-elevation emotion-8 emotion-2 emotion-3"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
   <div
     aria-hidden="true"
-    class="emotion-5 emotion-11 components-elevation emotion-7 emotion-1 emotion-2"
+    class="emotion-6 emotion-12 components-elevation emotion-8 emotion-2 emotion-3"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
@@ -176,7 +175,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-6k5pts css-1mm2cvy-View egi4jkx0"
+      class="components-surface components-card css-1tf68oj-Card-rounded css-1wit8k9 css-1mm2cvy-View egi4jkx0"
 `;
 
 exports[`props should render without content 1`] = `
@@ -198,7 +197,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-6k5pts css-1mm2cvy-View egi4jkx0"
+      class="components-surface components-card css-1tf68oj-Card-rounded css-1wit8k9 css-1mm2cvy-View egi4jkx0"
 @@ -21,10 +21,19 @@
           frameborder="0"
           src="about:blank"
@@ -206,7 +205,7 @@ Snapshot Diff:
           tabindex="-1"
         />
 +       <div
-+         class="components-scrollable wp-components-scrollable components-card-body ic-y3p1xi css-yk69wq css-1mm2cvy-View egi4jkx0"
++         class="components-scrollable wp-components-scrollable components-card-body css-aej86y-Body-borderRadius ic-y3p1xi css-1jyvxqk css-1mm2cvy-View egi4jkx0"
 +         data-g2-c16t="true"
 +         data-g2-component="Scrollable"
 +         data-wp-c16t="true"

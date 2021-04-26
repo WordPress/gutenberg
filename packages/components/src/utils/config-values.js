@@ -1,6 +1,14 @@
+/**
+ * Internal dependencies
+ */
+import { space } from './space';
+
 const CONTROL_HEIGHT = '30px';
+const CARD_PADDING_X = space( 3 );
+const CARD_PADDING_Y = space( 3 );
 
 export default {
+	colorDivider: 'rgba(0, 0, 0, 0.1)',
 	radiusBlockUi: '2px',
 	borderWidth: '1px',
 	borderWidthFocus: '1.5px',
@@ -25,4 +33,11 @@ export default {
 	controlHeightLarge: `calc( ${ CONTROL_HEIGHT } * 1.2 )`,
 	controlHeightSmall: `calc( ${ CONTROL_HEIGHT } * 0.8 )`,
 	controlHeightXSmall: `calc( ${ CONTROL_HEIGHT } * 0.6 )`,
+	cardBorderRadius: '2px',
+	cardPaddingX: CARD_PADDING_X,
+	cardPaddingY: CARD_PADDING_Y,
+	cardPadding: `${ CARD_PADDING_X }, ${ CARD_PADDING_Y }`,
+	cardHeaderFooterPaddingY: space( 1 ),
+	cardHeaderHeight: '44px',
+	surfaceBorderColor: 'rgba(0, 0, 0, 0.1)',
 };

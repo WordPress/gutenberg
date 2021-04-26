@@ -11,8 +11,8 @@ Snapshot Diff:
         title="WordPress.org"
       />
       <div
--       class="css-1maos9l components-card-inner-body css-1mm2cvy-View egi4jkx0"
-+       class="components-scrollable wp-components-scrollable components-card-body ic-y3p1xi css-yk69wq css-1mm2cvy-View egi4jkx0"
+-       class="css-yyubco-InnerBody components-card-inner-body css-1mm2cvy-View egi4jkx0"
++       class="components-scrollable wp-components-scrollable components-card-body css-aej86y-Body-borderRadius ic-y3p1xi css-1jyvxqk css-1mm2cvy-View egi4jkx0"
 +       data-g2-c16t="true"
 +       data-g2-component="Scrollable"
         data-wp-c16t="true"
@@ -22,44 +22,11 @@ Snapshot Diff:
         Code is Poetry.
       </div>
       <div
-        class="components-flex css-1tfkqy8 css-196clky css-0 components-card-footer css-138amlm-Flex-ItemsRow css-1mm2cvy-View egi4jkx0"
+        class="components-flex components-card-footer css-k894y4-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View egi4jkx0"
 `;
 
 exports[`props should render correctly 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  border-bottom: 1px solid;
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  border-color: rgba(0, 0, 0, 0.1);
-  border-color: var(--wp-g2-color-divider);
-  min-height: 44px;
-  min-height: var(--wp-g2-card-header-height);
-  padding-bottom: calc(4px * 1);
-  padding-bottom: var(--wp-g2-card-header-footer-padding-y);
-  padding-left: calc(4px * 3);
-  padding-left: var(--wp-g2-card-padding-x);
-  padding-right: calc(4px * 3);
-  padding-right: var(--wp-g2-card-padding-x);
-  padding-top: calc(4px * 1);
-  padding-top: var(--wp-g2-card-header-footer-padding-y);
-}
-
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1:first-of-type {
-  border-top-left-radius: 2px;
-  border-top-left-radius: var(--wp-g2-card-border-radius);
-  border-top-right-radius: 2px;
-  border-top-right-radius: var(--wp-g2-card-border-radius);
-}
-
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1:last-of-type {
-  border-bottom-left-radius: 2px;
-  border-bottom-left-radius: var(--wp-g2-card-border-radius);
-  border-bottom-right-radius: 2px;
-  border-bottom-right-radius: var(--wp-g2-card-border-radius);
-}
-
-.emotion-28.emotion-28.emotion-28.emotion-28.emotion-28.emotion-28.emotion-28 {
+.emotion-23.emotion-23.emotion-23.emotion-23.emotion-23.emotion-23.emotion-23 {
   background-color: #ffffff;
   background-color: var(--wp-g2-surface-color);
   color: #1e1e1e;
@@ -67,40 +34,31 @@ exports[`props should render correctly 1`] = `
   position: relative;
   --wp-g2-surface-background-size: 12px;
   --wp-g2-surface-background-size-dotted: 11px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0 0 1px var(--wp-g2-surface-border-color);
-  outline: none;
-  border-radius: 2px;
-  border-radius: var(--wp-g2-card-border-radius);
 }
 
-.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7 {
+.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  height: auto;
-  max-height: 100%;
-  padding: calc(4px * 3) calc(4px * 3);
-  padding: var(--wp-g2-card-padding);
 }
 
 @media only screen and ( min-device-width:40em ) {
-  .emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7::-webkit-scrollbar {
+  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4::-webkit-scrollbar {
     height: 12px;
     width: 12px;
   }
 
-  .emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7::-webkit-scrollbar-track {
+  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4::-webkit-scrollbar-track {
     background-color: transparent;
   }
 
-  .emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7::-webkit-scrollbar-track {
+  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4::-webkit-scrollbar-track {
     background: rgba(0, 0, 0, 0.04);
     background: var(--wp-g2-color-scrollbar-track);
     border-radius: 8px;
   }
 
-  .emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7::-webkit-scrollbar-thumb {
+  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4::-webkit-scrollbar-thumb {
     background-clip: padding-box;
     background-color: rgba(0, 0, 0, 0.2);
     background-color: var(--wp-g2-color-scrollbar-thumb);
@@ -108,27 +66,13 @@ exports[`props should render correctly 1`] = `
     border-radius: 7px;
   }
 
-  .emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7:hover::-webkit-scrollbar-thumb {
+  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4:hover::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.5);
     background-color: var(--wp-g2-color-scrollbar-thumb-hover);
   }
 }
 
-.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7:first-of-type {
-  border-top-left-radius: 2px;
-  border-top-left-radius: var(--wp-g2-card-border-radius);
-  border-top-right-radius: 2px;
-  border-top-right-radius: var(--wp-g2-card-border-radius);
-}
-
-.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7.emotion-7:last-of-type {
-  border-bottom-left-radius: 2px;
-  border-bottom-left-radius: var(--wp-g2-card-border-radius);
-  border-bottom-right-radius: 2px;
-  border-bottom-right-radius: var(--wp-g2-card-border-radius);
-}
-
-.emotion-19.emotion-19.emotion-19.emotion-19.emotion-19.emotion-19.emotion-19 {
+.emotion-13.emotion-13.emotion-13.emotion-13.emotion-13.emotion-13.emotion-13 {
   border-radius: inherit;
   bottom: 0;
   box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
@@ -143,7 +87,7 @@ exports[`props should render correctly 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-.emotion-24.emotion-24.emotion-24.emotion-24.emotion-24.emotion-24.emotion-24 {
+.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18 {
   border-radius: inherit;
   bottom: 0;
   box-shadow: 0 2px 4px 0 rgba(0 ,0,0,0.1);
@@ -158,7 +102,7 @@ exports[`props should render correctly 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-.emotion-18 {
+.emotion-12 {
   background: transparent;
   display: block;
   margin: 0 !important;
@@ -167,11 +111,17 @@ exports[`props should render correctly 1`] = `
   will-change: box-shadow;
 }
 
-.emotion-20 {
+.emotion-22 {
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+  outline: none;
   border-radius: 2px;
 }
 
-.emotion-4 {
+.emotion-14 {
+  border-radius: 2px;
+}
+
+.emotion-0 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -188,17 +138,50 @@ exports[`props should render correctly 1`] = `
   -ms-flex-pack: justify;
   justify-content: space-between;
   width: 100%;
+  border-bottom: 1px solid;
+  border-color: rgba(0,0,0,0.1);
+  min-height: 44px;
+  padding-bottom: 8px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 8px;
 }
 
-.emotion-4 > * + *:not(marquee) {
+.emotion-0 > * + *:not(marquee) {
   margin-left: calc(4px * 2);
 }
 
-.emotion-4 > * {
+.emotion-0 > * {
   min-width: 0;
 }
 
-.emotion-13 {
+.emotion-0:first-of-type {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.emotion-0:last-of-type {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+.emotion-3 {
+  height: auto;
+  max-height: 100%;
+  padding: 24px,24px;
+}
+
+.emotion-3:first-of-type {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.emotion-3:last-of-type {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+.emotion-7 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -215,32 +198,48 @@ exports[`props should render correctly 1`] = `
   -ms-flex-pack: end;
   justify-content: flex-end;
   width: 100%;
+  border-color: rgba(0,0,0,0.1);
+  min-height: 44px;
+  padding-bottom: 8px;
+  padding-left: 24px;
+  padding-right: 24px;
+  padding-top: 8px;
 }
 
-.emotion-13 > * + *:not(marquee) {
+.emotion-7 > * + *:not(marquee) {
   margin-left: calc(4px * 2);
 }
 
-.emotion-13 > * {
+.emotion-7 > * {
   min-width: 0;
 }
 
+.emotion-7:first-of-type {
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.emotion-7:last-of-type {
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
 <div
-  class="components-surface components-card emotion-28 emotion-5 emotion-6"
+  class="components-surface components-card emotion-22 emotion-23 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Card"
 >
   <div
-    class="emotion-5 emotion-6"
+    class="emotion-1 emotion-2"
   >
     <div
-      class="components-flex emotion-0 emotion-1 emotion-2 emotion-3 components-card-header emotion-4 emotion-5 emotion-6"
+      class="components-flex components-card-header emotion-0 emotion-1 emotion-2"
       data-wp-c16t="true"
       data-wp-component="CardHeader"
       title="WordPress.org"
     />
     <div
-      class="components-scrollable wp-components-scrollable components-card-body ic-y3p1xi emotion-7 emotion-5 emotion-6"
+      class="components-scrollable wp-components-scrollable components-card-body emotion-3 ic-y3p1xi emotion-4 emotion-1 emotion-2"
       data-g2-c16t="true"
       data-g2-component="Scrollable"
       data-wp-c16t="true"
@@ -249,7 +248,7 @@ exports[`props should render correctly 1`] = `
       Code is Poetry.
     </div>
     <div
-      class="components-flex emotion-1 emotion-2 emotion-3 components-card-footer emotion-13 emotion-5 emotion-6"
+      class="components-flex components-card-footer emotion-7 emotion-1 emotion-2"
       data-wp-c16t="true"
       data-wp-component="CardFooter"
     >
@@ -260,13 +259,13 @@ exports[`props should render correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
-    class="emotion-18 emotion-19 components-elevation emotion-20 emotion-5 emotion-6"
+    class="emotion-12 emotion-13 components-elevation emotion-14 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
   <div
     aria-hidden="true"
-    class="emotion-18 emotion-24 components-elevation emotion-20 emotion-5 emotion-6"
+    class="emotion-12 emotion-18 components-elevation emotion-14 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
