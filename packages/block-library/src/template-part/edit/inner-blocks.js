@@ -8,7 +8,8 @@ import {
 	__experimentalUseEditorFeature as useEditorFeature,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { useEffect } from '@wordpress/element';
 
 export default function TemplatePartInnerBlocks( {
 	postId: id,
@@ -16,6 +17,8 @@ export default function TemplatePartInnerBlocks( {
 	layout,
 	tagName: TagName,
 	blockProps,
+	startingPattern,
+	clientId,
 } ) {
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -46,5 +49,13 @@ export default function TemplatePartInnerBlocks( {
 			alignments: themeSupportsLayout ? alignments : undefined,
 		},
 	} );
+
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
+	useEffect( () => {
+		if ( ! blocks?.length && startingPattern?.length ) {
+			replaceInnerBlocks( clientId, startingPattern );
+		}
+	}, [ clientId, blocks, startingPattern ] );
+
 	return <TagName { ...innerBlocksProps } />;
 }

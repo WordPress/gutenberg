@@ -20,6 +20,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
 import { useState, useEffect } from '@wordpress/element';
+import { cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -37,10 +38,7 @@ export default function TemplatePartEdit( {
 	const { slug, theme, tagName, layout = {} } = attributes;
 	const templatePartId = theme && slug ? theme + '//' + slug : null;
 
-	const [
-		bypassPatternsPlaceholder,
-		setBypassPatternsPlaceholder,
-	] = useState( false );
+	const [ startingPattern, setStartingPattern ] = useState( null );
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		templatePartId
@@ -110,7 +108,7 @@ export default function TemplatePartEdit( {
 
 	useEffect( () => {
 		if ( hasContent ) {
-			setBypassPatternsPlaceholder( false );
+			setStartingPattern( null );
 		}
 	}, [ hasContent ] );
 
@@ -197,23 +195,21 @@ export default function TemplatePartEdit( {
 				</BlockControls>
 			) }
 			{ isEntityAvailable &&
-				( hasContent || bypassPatternsPlaceholder ? (
+				( hasContent || startingPattern ? (
 					<TemplatePartInnerBlocks
 						tagName={ TagName }
 						blockProps={ blockProps }
 						postId={ templatePartId }
 						hasInnerBlocks={ innerBlocks.length > 0 }
 						layout={ layout }
+						startingPattern={ startingPattern }
+						clientId={ clientId }
 					/>
 				) : (
-					<BlockPatternSetup
+					<PatternsSetup
 						blockName={ blockName }
 						clientId={ clientId }
-						startBlankComponent={
-							<StartBlankComponent
-								setBlank={ setBypassPatternsPlaceholder }
-							/>
-						}
+						setStartingPattern={ setStartingPattern }
 					/>
 				) ) }
 			{ ! isPlaceholder && ! isResolved && (
@@ -225,7 +221,27 @@ export default function TemplatePartEdit( {
 	);
 }
 
-function StartBlankComponent( { setBlank } ) {
-	setBlank( true );
+function PatternsSetup( { blockName, clientId, setStartingPattern } ) {
+	const onSelect = ( blocks ) => {
+		const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
+		setStartingPattern( clonedBlocks );
+	};
+
+	return (
+		<BlockPatternSetup
+			blockName={ blockName }
+			clientId={ clientId }
+			startBlankComponent={
+				<StartBlankComponent
+					setStartingPattern={ setStartingPattern }
+				/>
+			}
+			onBlockPatternSelect={ onSelect }
+		/>
+	);
+}
+
+function StartBlankComponent( { setStartingPattern } ) {
+	setStartingPattern( [] );
 	return null;
 }
