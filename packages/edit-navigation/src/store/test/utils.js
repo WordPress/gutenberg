@@ -6,6 +6,8 @@ import {
 	menuItemsQuery,
 	serializeProcessing,
 	computeCustomizedAttribute,
+	mapBlockAttributeToMenuItemField,
+	mapMenuItemFieldToBlockAttribute,
 } from '../utils';
 import {
 	isProcessingPost,
@@ -246,6 +248,7 @@ describe( 'computeCustomizedAttribute', () => {
 					className: '',
 					rel: '',
 					type: 'page',
+					kind: 'post-type',
 				},
 				clientId: 'navigation-link-block-client-id-3',
 				innerBlocks: [],
@@ -289,6 +292,8 @@ describe( 'computeCustomizedAttribute', () => {
 				menu_order: 3,
 				menus: [ 1 ],
 				object: 'page',
+				object_id: 678,
+				type: 'post_type',
 			},
 		};
 
@@ -344,12 +349,123 @@ describe( 'computeCustomizedAttribute', () => {
 				position: 3,
 				status: 'publish',
 				title: 'Page Example',
-				object: 'page',
-				object_id: 678,
+				object: 'page', // equivalent: block.attributes.type
+				object_id: 678, // equivalent: block.attributes.id
+				type: 'post_type', // // equivalent: block.attributes.kind
 				url: 'https://localhost:8889/page-example/',
 				xfn: [ '' ],
 				target: '',
 			},
+		} );
+	} );
+} );
+
+describe( 'Mapping block attributes and menu item fields', () => {
+	const blocks = [
+		{
+			attributes: {
+				id: 100,
+				type: 'page',
+				kind: 'post-type',
+			},
+			clientId: 'navigation-link-block-client-id-1',
+			innerBlocks: [],
+			isValid: true,
+			name: 'core/navigation-link',
+		},
+		{
+			attributes: {
+				id: 101,
+				type: 'post',
+				kind: 'post-type',
+			},
+			clientId: 'navigation-link-block-client-id-2',
+			innerBlocks: [],
+			isValid: true,
+			name: 'core/navigation-link',
+		},
+		{
+			attributes: {
+				id: 102,
+				type: 'category',
+				kind: 'taxonomy',
+			},
+			clientId: 'navigation-link-block-client-id-3',
+			innerBlocks: [],
+			isValid: true,
+			name: 'core/navigation-link',
+		},
+		{
+			attributes: {
+				id: 103,
+				type: 'tag',
+				kind: 'taxonomy',
+			},
+			clientId: 'navigation-link-block-client-id-4',
+			innerBlocks: [],
+			isValid: true,
+			name: 'core/navigation-link',
+		},
+	];
+
+	const menuItems = [
+		{
+			object_id: 100,
+			object: 'page',
+			type: 'post_type',
+		},
+		{
+			object_id: 101,
+			object: 'post',
+			type: 'post_type',
+		},
+		{
+			object_id: 102,
+			object: 'category',
+			type: 'taxonomy',
+		},
+		{
+			object_id: 103,
+			object: 'tag',
+			type: 'taxonomy',
+		},
+	];
+
+	const blockAttrs = blocks.map( ( block ) => block.attributes );
+
+	describe( 'mapBlockAttributeToMenuItemField', () => {
+		it( 'maps block attributes to equivalent menu item fields', () => {
+			const expected = blockAttrs.map( ( attrs ) => {
+				return Object.entries( attrs ).reduce(
+					( acc, [ key, value ] ) => {
+						acc = {
+							...acc,
+							...mapBlockAttributeToMenuItemField( key, value ),
+						};
+						return acc;
+					},
+					{}
+				);
+			} );
+			expect( expected ).toEqual( menuItems );
+		} );
+	} );
+
+	describe( 'mapMenuItemFieldToBlockAttribute', () => {
+		it( 'maps menu item fields equivalent block attributes', () => {
+			const expected = menuItems.map( ( attrs ) => {
+				return Object.entries( attrs ).reduce(
+					( acc, [ key, value ] ) => {
+						acc = {
+							...acc,
+							...mapMenuItemFieldToBlockAttribute( key, value ),
+						};
+						return acc;
+					},
+					{}
+				);
+			} );
+			expect( expected ).toEqual( blockAttrs );
 		} );
 	} );
 } );

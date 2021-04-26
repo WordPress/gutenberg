@@ -185,32 +185,63 @@ export function computeCustomizedAttribute(
 	function getMenuItemForBlock( block ) {
 		return omit( menuItemsByClientId[ block.clientId ] || {}, '_links' );
 	}
-
-	function mapBlockAttributeToMenuItemField(
-		blockAttributeName,
-		blockAttributeValue
-	) {
-		const MAPPING = {
-			id: 'object_id',
-			type: 'object',
-			// `nav_menu_item` may be one of:
-			// 1. `post_type`,
-			// 2. `post_type_archive`,
-			// 3. `taxonomy`,
-			// 4. `custom`.
-			kind: {
-				attr: 'type', // the equivalent on `nav_menu_item` is "type" but it is stored with underscores whereas the block attr uses hyphens.
-				mapper: () => blockAttributeValue.replace( '-', '_' ),
-			},
-		};
-
-		return convertAttribute(
-			MAPPING,
-			blockAttributeName,
-			blockAttributeValue
-		);
-	}
 }
+
+/**
+ * Maps a given block attribute to its equivalent menu item field.
+ *
+ * @param {string} blockAttributeName the name of the block attribute to be mapped.
+ * @param {string} blockAttributeValue the value of the block attribute to be mapped.
+ * @return {Object} block attribute mapped to correct menu item.
+ */
+export const mapBlockAttributeToMenuItemField = function mapBlockAttributeToMenuItemField(
+	blockAttributeName,
+	blockAttributeValue
+) {
+	const MAPPING = {
+		id: 'object_id',
+		type: 'object',
+		// `nav_menu_item` may be one of:
+		// 1. `post_type`,
+		// 2. `post_type_archive`,
+		// 3. `taxonomy`,
+		// 4. `custom`.
+		kind: {
+			attr: 'type', // the equivalent on `nav_menu_item` is "type" but it is stored with underscores whereas the block attr uses hyphens.
+			mapper: () => blockAttributeValue.replace( '-', '_' ),
+		},
+	};
+
+	return convertAttribute( MAPPING, blockAttributeName, blockAttributeValue );
+};
+
+/**
+ * Maps a given menu item field to its equivalent block attribute.
+ *
+ * @param {string} menuItemField the name of the menu item field to be mapped.
+ * @param {string} menuItemVal the value of the menu item field to be mapped.
+ * @return {Object} menu item field mapped to correct block attribute.
+ */
+export const mapMenuItemFieldToBlockAttribute = function mapMenuItemFieldToBlockAttribute(
+	menuItemField,
+	menuItemVal
+) {
+	const MAPPING = {
+		object_id: 'id',
+		object: 'type',
+		// `nav_menu_item` may be one of:
+		// 1. `post_type`,
+		// 2. `post_type_archive`,
+		// 3. `taxonomy`,
+		// 4. `custom`.
+		type: {
+			attr: 'kind', // the equivalent on `nav_menu_item` is "type" but it is stored with underscores whereas the block attr uses hyphens.
+			mapper: () => menuItemVal.replace( '_', '-' ),
+		},
+	};
+
+	return convertAttribute( MAPPING, menuItemField, menuItemVal );
+};
 
 /**
  * Converts a given key in an object to it's mapped equivalent.
@@ -222,7 +253,7 @@ export function computeCustomizedAttribute(
  * @param {string} val the value to be assigned to the converted field.
  * @return {Object} the converted field object.
  */
-export const convertAttribute = function convertAttribute( mapping, key, val ) {
+const convertAttribute = function convertAttribute( mapping, key, val ) {
 	const left = mapping[ key ].attr ?? mapping[ key ];
 	const right = mapping[ key ].mapper?.() ?? val;
 

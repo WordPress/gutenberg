@@ -18,7 +18,10 @@ import {
 } from '../constants';
 
 import { resolveMenuItems, dispatch } from './controls';
-import { buildNavigationPostId, convertAttribute } from './utils';
+import {
+	buildNavigationPostId,
+	mapMenuItemFieldToBlockAttribute,
+} from './utils';
 
 /**
  * Creates a "stub" navigation post reflecting the contents of menu with id=menuId. The
@@ -168,22 +171,4 @@ function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
 	};
 
 	return createBlock( 'core/navigation-link', attributes, innerBlocks );
-}
-
-function mapMenuItemFieldToBlockAttribute( menuItemField, menuItemVal ) {
-	const MAPPING = {
-		object_id: 'id',
-		object: 'type',
-		// `nav_menu_item` may be one of:
-		// 1. `post_type`,
-		// 2. `post_type_archive`,
-		// 3. `taxonomy`,
-		// 4. `custom`.
-		type: {
-			attr: 'kind', // the equivalent on `nav_menu_item` is "type" but it is stored with underscores whereas the block attr uses hyphens.
-			mapper: () => menuItemVal.replace( '_', '-' ),
-		},
-	};
-
-	return convertAttribute( MAPPING, menuItemField, menuItemVal );
 }
