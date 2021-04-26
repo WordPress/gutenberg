@@ -301,10 +301,10 @@ describe( 'Widgets screen', () => {
 		inlineInserterButton = await getInlineInserterButton();
 		await inlineInserterButton.click();
 
-		const inserterSearchBox = await find( {
-			role: 'searchbox',
-			name: 'Search for blocks and patterns',
-		} );
+		// TODO: Convert to find() API from puppeteer-testing-library.
+		const inserterSearchBox = await page.waitForSelector(
+			'aria/Search for blocks and patterns[role="searchbox"]'
+		);
 		await expect( inserterSearchBox ).toHaveFocus();
 
 		await page.keyboard.type( 'Heading' );
@@ -558,14 +558,9 @@ describe( 'Widgets screen', () => {
 		} );
 		await editButton.click();
 
-		const titleInput = await find(
-			{
-				role: 'textbox',
-				name: /^Title/,
-			},
-			{
-				root: legacyWidget,
-			}
+		// TODO: Convert to find() API from puppeteer-testing-library.
+		const titleInput = await page.waitForSelector(
+			`#widget-search-1-title`
 		);
 		await titleInput.type( 'Search Title' );
 
