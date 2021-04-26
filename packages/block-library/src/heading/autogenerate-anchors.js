@@ -6,7 +6,6 @@ import { deburr, trim } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { cleanForSlug } from '@wordpress/url';
 import { useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -73,23 +72,13 @@ const getAllHeadingAnchors = ( blockList, excludeId ) => {
  * @return {string} Returns the slug.
  */
 const getSlug = ( content ) => {
-	content = getTextWithoutMarkup( content );
-
 	// Get the slug.
-	let slug = cleanForSlug( content );
-
-	// If slug is empty, then there is no content, or content is using non-latin characters.
-	// Try non-latin first.
-	if ( '' === slug ) {
-		slug = trim(
-			deburr( content )
-				.replace( /[\s\./]+/g, '-' )
-				.toLowerCase(),
-			'-'
-		);
-	}
-
-	return slug;
+	return trim(
+		deburr( getTextWithoutMarkup( content ) )
+			.replace( /[^\p{L}\p{N}]+/gu, '-' )
+			.toLowerCase(),
+		'-'
+	);
 };
 
 /**
