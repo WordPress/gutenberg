@@ -34,7 +34,7 @@ function IconButton( { icon, label, hint, style, ...props } ) {
 			accessibilityLabel={ label }
 			style={ { alignItems: 'center' } }
 		>
-			<Icon icon={ icon } fill={ style?.color } />
+			<Icon icon={ icon } fill={ style?.color } color={ style?.color } />
 		</TouchableOpacity>
 	);
 }
