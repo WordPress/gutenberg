@@ -11,8 +11,8 @@ Snapshot Diff:
         title="WordPress.org"
       />
       <div
--       class="css-1maos9l components-card-inner-body wp-components-card-inner-body css-1mm2cvy-View egi4jkx0"
-+       class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body ic-y3p1xi css-yk69wq css-1mm2cvy-View egi4jkx0"
+-       class="css-1maos9l components-card-inner-body css-1mm2cvy-View egi4jkx0"
++       class="components-scrollable wp-components-scrollable components-card-body ic-y3p1xi css-yk69wq css-1mm2cvy-View egi4jkx0"
 +       data-g2-c16t="true"
 +       data-g2-component="Scrollable"
         data-wp-c16t="true"
@@ -22,7 +22,7 @@ Snapshot Diff:
         Code is Poetry.
       </div>
       <div
-        class="components-flex wp-components-flex css-1tfkqy8 css-196clky css-0 components-card-footer wp-components-card-footer css-138amlm-Flex-ItemsRow css-1mm2cvy-View egi4jkx0"
+        class="components-flex css-1tfkqy8 css-196clky css-0 components-card-footer css-138amlm-Flex-ItemsRow css-1mm2cvy-View egi4jkx0"
 `;
 
 exports[`props should render correctly 1`] = `
@@ -226,7 +226,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface wp-components-surface components-card wp-components-card emotion-28 emotion-5 emotion-6"
+  class="components-surface components-card emotion-28 emotion-5 emotion-6"
   data-wp-c16t="true"
   data-wp-component="Card"
 >
@@ -234,13 +234,13 @@ exports[`props should render correctly 1`] = `
     class="emotion-5 emotion-6"
   >
     <div
-      class="components-flex wp-components-flex emotion-0 emotion-1 emotion-2 emotion-3 components-card-header wp-components-card-header emotion-4 emotion-5 emotion-6"
+      class="components-flex emotion-0 emotion-1 emotion-2 emotion-3 components-card-header emotion-4 emotion-5 emotion-6"
       data-wp-c16t="true"
       data-wp-component="CardHeader"
       title="WordPress.org"
     />
     <div
-      class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body ic-y3p1xi emotion-7 emotion-5 emotion-6"
+      class="components-scrollable wp-components-scrollable components-card-body ic-y3p1xi emotion-7 emotion-5 emotion-6"
       data-g2-c16t="true"
       data-g2-component="Scrollable"
       data-wp-c16t="true"
@@ -249,7 +249,7 @@ exports[`props should render correctly 1`] = `
       Code is Poetry.
     </div>
     <div
-      class="components-flex wp-components-flex emotion-1 emotion-2 emotion-3 components-card-footer wp-components-card-footer emotion-13 emotion-5 emotion-6"
+      class="components-flex emotion-1 emotion-2 emotion-3 components-card-footer emotion-13 emotion-5 emotion-6"
       data-wp-c16t="true"
       data-wp-component="CardFooter"
     >
@@ -260,13 +260,13 @@ exports[`props should render correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
-    class="emotion-18 emotion-19 components-elevation wp-components-elevation emotion-20 emotion-5 emotion-6"
+    class="emotion-18 emotion-19 components-elevation emotion-20 emotion-5 emotion-6"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
   <div
     aria-hidden="true"
-    class="emotion-18 emotion-24 components-elevation wp-components-elevation emotion-20 emotion-5 emotion-6"
+    class="emotion-18 emotion-24 components-elevation emotion-20 emotion-5 emotion-6"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
@@ -284,15 +284,15 @@ Snapshot Diff:
     />
     <div
       aria-hidden="true"
--     class="css-zsg5ag-Elevation css-1yc4u8p components-elevation wp-components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
-+     class="css-zsg5ag-Elevation css-lxi9t4 components-elevation wp-components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
+-     class="css-zsg5ag-Elevation css-1yc4u8p components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
++     class="css-zsg5ag-Elevation css-lxi9t4 components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
       data-wp-c16t="true"
       data-wp-component="Elevation"
     />
     <div
       aria-hidden="true"
--     class="css-zsg5ag-Elevation css-akhjqa components-elevation wp-components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
-+     class="css-zsg5ag-Elevation css-19rc1q1 components-elevation wp-components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
+-     class="css-zsg5ag-Elevation css-akhjqa components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
++     class="css-zsg5ag-Elevation css-19rc1q1 components-elevation css-icip60 css-1mm2cvy-View egi4jkx0"
       data-wp-c16t="true"
       data-wp-component="Elevation"
     />

@@ -14,7 +14,7 @@ Snapshot Diff:
 - <a
 + <button
     aria-busy="false"
-    class="components-flex wp-components-flex css-mbzchx css-0 components-base-button wp-components-base-button css-1px5u32 css-sldsgx css-0 components-button wp-components-button css-19ecm5d-Flex-ItemsRow-classes css-1mm2cvy-View egi4jkx0"
+    class="components-flex css-mbzchx css-0 components-base-button css-1px5u32 css-sldsgx css-0 components-button css-19ecm5d-Flex-ItemsRow-classes css-1mm2cvy-View egi4jkx0"
     data-active="false"
     data-destructive="false"
     data-focused="false"
@@ -25,10 +25,10 @@ Snapshot Diff:
     type="button"
   >
     <span
-      class="css-1636tkh-Item css-jhhyjf-block components-flex-item wp-components-flex-item css-s8mfij css-1mm2cvy-View egi4jkx0"
+      class="css-1636tkh-Item css-jhhyjf-block components-flex-item css-s8mfij css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonContent"
 @@ -23,6 +22,6 @@
-      class="css-zsg5ag-Elevation css-178mhg components-elevation wp-components-elevation css-1mm2cvy-View egi4jkx0"
+      class="css-zsg5ag-Elevation css-178mhg components-elevation css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonElevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"
@@ -270,7 +270,7 @@ exports[`props should render correctly 1`] = `
 
 <button
   aria-busy="false"
-  class="components-flex wp-components-flex emotion-9 emotion-10 components-base-button wp-components-base-button emotion-11 emotion-12 emotion-10 components-button wp-components-button emotion-14 emotion-3 emotion-4"
+  class="components-flex emotion-9 emotion-10 components-base-button emotion-11 emotion-12 emotion-10 components-button emotion-14 emotion-3 emotion-4"
   data-active="false"
   data-destructive="false"
   data-focused="false"
@@ -280,7 +280,7 @@ exports[`props should render correctly 1`] = `
   type="button"
 >
   <span
-    class="emotion-0 emotion-1 components-flex-item wp-components-flex-item emotion-2 emotion-3 emotion-4"
+    class="emotion-0 emotion-1 components-flex-item emotion-2 emotion-3 emotion-4"
     data-g2-component="ButtonContent"
     data-wp-c16t="true"
     data-wp-component="FlexItem"
@@ -289,7 +289,7 @@ exports[`props should render correctly 1`] = `
   </span>
   <span
     aria-hidden="true"
-    class="emotion-5 emotion-6 components-elevation wp-components-elevation emotion-3 emotion-4"
+    class="emotion-5 emotion-6 components-elevation emotion-3 emotion-4"
     data-g2-component="ButtonElevation"
     data-wp-c16t="true"
     data-wp-component="Elevation"
@@ -306,13 +306,13 @@ Snapshot Diff:
   <button
     aria-busy="false"
 -   aria-describedby="1"
-    class="components-flex wp-components-flex css-mbzchx css-0 components-base-button wp-components-base-button css-1px5u32 css-sldsgx css-0 components-button wp-components-button css-19ecm5d-Flex-ItemsRow-classes css-1mm2cvy-View egi4jkx0"
+    class="components-flex css-mbzchx css-0 components-base-button css-1px5u32 css-sldsgx css-0 components-button css-19ecm5d-Flex-ItemsRow-classes css-1mm2cvy-View egi4jkx0"
     data-active="false"
     data-destructive="false"
     data-focused="false"
     data-icon="false"
 @@ -14,11 +13,11 @@
-      class="css-1636tkh-Item css-jhhyjf-block components-flex-item wp-components-flex-item css-s8mfij css-1mm2cvy-View egi4jkx0"
+      class="css-1636tkh-Item css-jhhyjf-block components-flex-item css-s8mfij css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonContent"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
@@ -322,7 +322,7 @@ Snapshot Diff:
     </span>
     <span
       aria-hidden="true"
-      class="css-zsg5ag-Elevation css-178mhg components-elevation wp-components-elevation css-1mm2cvy-View egi4jkx0"
+      class="css-zsg5ag-Elevation css-178mhg components-elevation css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonElevation"
 `;
 
@@ -335,7 +335,7 @@ Snapshot Diff:
   <button
     aria-busy="false"
 -   aria-disabled="true"
-    class="components-flex wp-components-flex css-mbzchx css-0 components-base-button wp-components-base-button css-1px5u32 css-sldsgx css-0 components-button wp-components-button css-19ecm5d-Flex-ItemsRow-classes css-1mm2cvy-View egi4jkx0"
+    class="components-flex css-mbzchx css-0 components-base-button css-1px5u32 css-sldsgx css-0 components-button css-19ecm5d-Flex-ItemsRow-classes css-1mm2cvy-View egi4jkx0"
     data-active="false"
     data-destructive="false"
     data-focused="false"
@@ -358,7 +358,7 @@ Snapshot Diff:
       Lorem
     </span>
     <span
--     class="css-1636tkh-Item components-flex-item wp-components-flex-item css-37xewi css-1mm2cvy-View egi4jkx0"
+-     class="css-1636tkh-Item components-flex-item css-37xewi css-1mm2cvy-View egi4jkx0"
 -     data-g2-component="ButtonCaret"
 -     data-wp-c16t="true"
 -     data-wp-component="FlexItem"
@@ -379,7 +379,7 @@ Snapshot Diff:
 -   </span>
 -   <span
       aria-hidden="true"
-      class="css-zsg5ag-Elevation css-178mhg components-elevation wp-components-elevation css-1mm2cvy-View egi4jkx0"
+      class="css-zsg5ag-Elevation css-178mhg components-elevation css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonElevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"
@@ -392,7 +392,7 @@ Snapshot Diff:
 
 @@ -2,23 +2,15 @@
     aria-busy="false"
-    class="components-flex wp-components-flex css-mbzchx css-0 components-base-button wp-components-base-button css-1px5u32 css-sldsgx css-0 components-button wp-components-button css-19ecm5d-Flex-ItemsRow-classes css-1mm2cvy-View egi4jkx0"
+    class="components-flex css-mbzchx css-0 components-base-button css-1px5u32 css-sldsgx css-0 components-button css-19ecm5d-Flex-ItemsRow-classes css-1mm2cvy-View egi4jkx0"
     data-active="false"
     data-destructive="false"
     data-focused="false"
@@ -403,7 +403,7 @@ Snapshot Diff:
     type="button"
 - >
 -   <span
--     class="css-1636tkh-Item components-flex-item wp-components-flex-item css-gzcy0h css-1mm2cvy-View egi4jkx0"
+-     class="css-1636tkh-Item components-flex-item css-gzcy0h css-1mm2cvy-View egi4jkx0"
 -     data-g2-component="ButtonIcon"
 -     data-wp-c16t="true"
 -     data-wp-component="FlexItem"
@@ -411,7 +411,7 @@ Snapshot Diff:
 -     <svg />
 -   </span>
     <span
-      class="css-1636tkh-Item css-jhhyjf-block components-flex-item wp-components-flex-item css-s8mfij css-1mm2cvy-View egi4jkx0"
+      class="css-1636tkh-Item css-jhhyjf-block components-flex-item css-s8mfij css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonContent"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
@@ -558,7 +558,7 @@ Snapshot Diff:
     type="button"
   >
     <span
--     class="css-1636tkh-Item components-flex-item wp-components-flex-item css-gzcy0h css-1mm2cvy-View egi4jkx0"
+-     class="css-1636tkh-Item components-flex-item css-gzcy0h css-1mm2cvy-View egi4jkx0"
 -     data-g2-component="ButtonPrefix"
 -     data-wp-c16t="true"
 -     data-wp-component="FlexItem"
@@ -568,7 +568,7 @@ Snapshot Diff:
 -     </span>
 -   </span>
 -   <span
-      class="css-1636tkh-Item css-jhhyjf-block components-flex-item wp-components-flex-item css-s8mfij css-1mm2cvy-View egi4jkx0"
+      class="css-1636tkh-Item css-jhhyjf-block components-flex-item css-s8mfij css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonContent"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
@@ -609,7 +609,7 @@ Snapshot Diff:
       Lorem
     </span>
     <span
--     class="css-1636tkh-Item components-flex-item wp-components-flex-item css-gzcy0h css-1mm2cvy-View egi4jkx0"
+-     class="css-1636tkh-Item components-flex-item css-gzcy0h css-1mm2cvy-View egi4jkx0"
 -     data-g2-component="ButtonSuffix"
 -     data-wp-c16t="true"
 -     data-wp-component="FlexItem"
@@ -620,7 +620,7 @@ Snapshot Diff:
 -   </span>
 -   <span
       aria-hidden="true"
-      class="css-zsg5ag-Elevation css-178mhg components-elevation wp-components-elevation css-1mm2cvy-View egi4jkx0"
+      class="css-zsg5ag-Elevation css-178mhg components-elevation css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonElevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"

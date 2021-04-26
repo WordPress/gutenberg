@@ -169,7 +169,7 @@ exports[`props should render correctly 1`] = `
 
 <div
   aria-busy="true"
-  class="components-spinner wp-components-spinner emotion-4 emotion-5"
+  class="components-spinner emotion-4 emotion-5"
   data-wp-c16t="true"
   data-wp-component="Spinner"
   style="height: 16px; width: 16px;"
@@ -231,7 +231,7 @@ Snapshot Diff:
 @@ -1,16 +1,16 @@
   <div
     aria-busy="true"
-    class="components-spinner wp-components-spinner css-ssf0q0-ContainerView e1s9yo7h0"
+    class="components-spinner css-ssf0q0-ContainerView e1s9yo7h0"
     data-wp-c16t="true"
     data-wp-component="Spinner"
 -   style="height: 31px; width: 31px;"

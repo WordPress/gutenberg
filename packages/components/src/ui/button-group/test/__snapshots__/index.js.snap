@@ -270,7 +270,7 @@ exports[`props should render correctly 1`] = `
   <button
     aria-busy="false"
     aria-checked="false"
-    class="components-flex wp-components-flex emotion-9 emotion-10 components-base-button wp-components-base-button emotion-11 emotion-12 emotion-10 components-button wp-components-button emotion-14"
+    class="components-flex emotion-9 emotion-10 components-base-button emotion-11 emotion-12 emotion-10 components-button emotion-14"
     data-active="false"
     data-destructive="false"
     data-focused="false"
@@ -283,7 +283,7 @@ exports[`props should render correctly 1`] = `
     type="button"
   >
     <span
-      class="emotion-0 emotion-1 components-flex-item wp-components-flex-item emotion-2 emotion-3 emotion-4"
+      class="emotion-0 emotion-1 components-flex-item emotion-2 emotion-3 emotion-4"
       data-g2-component="ButtonContent"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
@@ -292,7 +292,7 @@ exports[`props should render correctly 1`] = `
     </span>
     <span
       aria-hidden="true"
-      class="emotion-5 emotion-6 components-elevation wp-components-elevation emotion-3 emotion-4"
+      class="emotion-5 emotion-6 components-elevation emotion-3 emotion-4"
       data-g2-component="ButtonElevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"
@@ -301,7 +301,7 @@ exports[`props should render correctly 1`] = `
   <button
     aria-busy="false"
     aria-checked="false"
-    class="components-flex wp-components-flex emotion-9 emotion-10 components-base-button wp-components-base-button emotion-11 emotion-12 emotion-10 components-button wp-components-button emotion-14"
+    class="components-flex emotion-9 emotion-10 components-base-button emotion-11 emotion-12 emotion-10 components-button emotion-14"
     data-active="false"
     data-destructive="false"
     data-focused="false"
@@ -314,7 +314,7 @@ exports[`props should render correctly 1`] = `
     type="button"
   >
     <span
-      class="emotion-0 emotion-1 components-flex-item wp-components-flex-item emotion-2 emotion-3 emotion-4"
+      class="emotion-0 emotion-1 components-flex-item emotion-2 emotion-3 emotion-4"
       data-g2-component="ButtonContent"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
@@ -323,7 +323,7 @@ exports[`props should render correctly 1`] = `
     </span>
     <span
       aria-hidden="true"
-      class="emotion-5 emotion-6 components-elevation wp-components-elevation emotion-3 emotion-4"
+      class="emotion-5 emotion-6 components-elevation emotion-3 emotion-4"
       data-g2-component="ButtonElevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"
@@ -332,7 +332,7 @@ exports[`props should render correctly 1`] = `
   <button
     aria-busy="false"
     aria-checked="false"
-    class="components-flex wp-components-flex emotion-9 emotion-10 components-base-button wp-components-base-button emotion-11 emotion-12 emotion-10 components-button wp-components-button emotion-14"
+    class="components-flex emotion-9 emotion-10 components-base-button emotion-11 emotion-12 emotion-10 components-button emotion-14"
     data-active="false"
     data-destructive="false"
     data-focused="false"
@@ -345,7 +345,7 @@ exports[`props should render correctly 1`] = `
     type="button"
   >
     <span
-      class="emotion-0 emotion-1 components-flex-item wp-components-flex-item emotion-2 emotion-3 emotion-4"
+      class="emotion-0 emotion-1 components-flex-item emotion-2 emotion-3 emotion-4"
       data-g2-component="ButtonContent"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
@@ -354,7 +354,7 @@ exports[`props should render correctly 1`] = `
     </span>
     <span
       aria-hidden="true"
-      class="emotion-5 emotion-6 components-elevation wp-components-elevation emotion-3 emotion-4"
+      class="emotion-5 emotion-6 components-elevation emotion-3 emotion-4"
       data-g2-component="ButtonElevation"
       data-wp-c16t="true"
       data-wp-component="Elevation"

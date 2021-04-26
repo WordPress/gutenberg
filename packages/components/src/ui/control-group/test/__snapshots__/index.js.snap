@@ -318,7 +318,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-flex wp-components-flex components-control-group wp-components-control-group emotion-6 emotion-7 emotion-8"
+  class="components-flex components-control-group emotion-6 emotion-7 emotion-8"
   data-wp-c16t="true"
   data-wp-component="ControlGroup"
 >
@@ -1183,7 +1183,7 @@ exports[`props should render mixed control types 1`] = `
 }
 
 <div
-  class="components-flex wp-components-flex components-control-group wp-components-control-group emotion-10 emotion-11 emotion-12"
+  class="components-flex components-control-group emotion-10 emotion-11 emotion-12"
   data-wp-c16t="true"
   data-wp-component="ControlGroup"
 >

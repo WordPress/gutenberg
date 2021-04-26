@@ -35,7 +35,7 @@ exports[`props should render active 1`] = `
 
 <div
   aria-hidden="true"
-  class="emotion-0 components-elevation wp-components-elevation emotion-1 emotion-2 emotion-3"
+  class="emotion-0 components-elevation emotion-1 emotion-2 emotion-3"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -68,7 +68,7 @@ exports[`props should render correctly 1`] = `
 
 <div
   aria-hidden="true"
-  class="emotion-0 emotion-1 components-elevation wp-components-elevation emotion-2 emotion-3"
+  class="emotion-0 emotion-1 components-elevation emotion-2 emotion-3"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -105,7 +105,7 @@ exports[`props should render hover 1`] = `
 
 <div
   aria-hidden="true"
-  class="emotion-0 components-elevation wp-components-elevation emotion-1 emotion-2 emotion-3"
+  class="emotion-0 components-elevation emotion-1 emotion-2 emotion-3"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -146,7 +146,7 @@ exports[`props should render isInteractive 1`] = `
 
 <div
   aria-hidden="true"
-  class="emotion-0 components-elevation wp-components-elevation emotion-1 emotion-2 emotion-3"
+  class="emotion-0 components-elevation emotion-1 emotion-2 emotion-3"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -187,7 +187,7 @@ exports[`props should render offset 1`] = `
 
 <div
   aria-hidden="true"
-  class="emotion-0 components-elevation wp-components-elevation emotion-1 emotion-2 emotion-3"
+  class="emotion-0 components-elevation emotion-1 emotion-2 emotion-3"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />
@@ -220,7 +220,7 @@ exports[`props should render value 1`] = `
 
 <div
   aria-hidden="true"
-  class="emotion-0 emotion-1 components-elevation wp-components-elevation emotion-2 emotion-3"
+  class="emotion-0 emotion-1 components-elevation emotion-2 emotion-3"
   data-wp-c16t="true"
   data-wp-component="Elevation"
 />

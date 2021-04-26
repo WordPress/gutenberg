@@ -6,7 +6,7 @@ Snapshot Diff:
 + Second value
 
 @@ -7,14 +7,10 @@
-      class="css-1636tkh-Item css-1bncg8t components-flex-item wp-components-flex-item css-1mm2cvy-View egi4jkx0"
+      class="css-1636tkh-Item css-1bncg8t components-flex-item css-1mm2cvy-View egi4jkx0"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
     />
@@ -15,7 +15,7 @@ Snapshot Diff:
 -   />
 -   <div />
 -   <div
-      class="css-1636tkh-Item css-1bncg8t css-jhhyjf-block components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block css-1mm2cvy-View egi4jkx0"
+      class="css-1636tkh-Item css-1bncg8t css-jhhyjf-block components-flex-item components-flex-block css-1mm2cvy-View egi4jkx0"
       data-wp-c16t="true"
       data-wp-component="FlexBlock"
     />
@@ -97,17 +97,17 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-flex wp-components-flex emotion-9 emotion-2 emotion-3"
+  class="components-flex emotion-9 emotion-2 emotion-3"
   data-wp-c16t="true"
   data-wp-component="Flex"
 >
   <div
-    class="emotion-0 emotion-1 components-flex-item wp-components-flex-item emotion-2 emotion-3"
+    class="emotion-0 emotion-1 components-flex-item emotion-2 emotion-3"
     data-wp-c16t="true"
     data-wp-component="FlexItem"
   />
   <div
-    class="emotion-0 emotion-1 emotion-6 components-flex-item wp-components-flex-item components-flex-block wp-components-flex-block emotion-2 emotion-3"
+    class="emotion-0 emotion-1 emotion-6 components-flex-item components-flex-block emotion-2 emotion-3"
     data-wp-c16t="true"
     data-wp-component="FlexBlock"
   />

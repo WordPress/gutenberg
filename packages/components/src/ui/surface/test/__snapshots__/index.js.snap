@@ -6,8 +6,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface css-w8sz4c css-1mm2cvy-View egi4jkx0"
-+   class="components-surface wp-components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
+-   class="components-surface css-w8sz4c css-1mm2cvy-View egi4jkx0"
++   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -21,8 +21,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface css-1rsk61w css-1mm2cvy-View egi4jkx0"
-+   class="components-surface wp-components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
+-   class="components-surface css-1rsk61w css-1mm2cvy-View egi4jkx0"
++   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -36,8 +36,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface css-1k4iwhs css-1mm2cvy-View egi4jkx0"
-+   class="components-surface wp-components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
+-   class="components-surface css-1k4iwhs css-1mm2cvy-View egi4jkx0"
++   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -51,8 +51,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface css-l7n8r9 css-1mm2cvy-View egi4jkx0"
-+   class="components-surface wp-components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
+-   class="components-surface css-l7n8r9 css-1mm2cvy-View egi4jkx0"
++   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -66,8 +66,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface css-1dxo3zh css-1mm2cvy-View egi4jkx0"
-+   class="components-surface wp-components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
+-   class="components-surface css-1dxo3zh css-1mm2cvy-View egi4jkx0"
++   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
@@ -87,7 +87,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface wp-components-surface emotion-0 emotion-1 emotion-2"
+  class="components-surface emotion-0 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Surface"
 >
@@ -101,8 +101,8 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface css-1dajkma css-1mm2cvy-View egi4jkx0"
-+   class="components-surface wp-components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
+-   class="components-surface css-1dajkma css-1mm2cvy-View egi4jkx0"
++   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
     data-wp-c16t="true"
     data-wp-component="Surface"
   >
