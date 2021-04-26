@@ -2,6 +2,15 @@
   line-height: 0;
 }
 
+.wp-block-site-logo a {
+  display: inline-block;
+}
+
+.wp-block-site-logo.is-default-size img {
+  width: 120px;
+  height: auto;
+}
+
 .wp-block-site-logo .aligncenter {
   display: table;
 }

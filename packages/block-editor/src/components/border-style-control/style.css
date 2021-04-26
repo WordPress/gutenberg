@@ -1,0 +1,13 @@
+.components-border-style-control__select {
+  margin-bottom: 24px;
+}
+
+.components-border-style-control__select button {
+  width: 100%;
+}
+
+.components-border-style-control__select ul li,
+.components-border-style-control__select ul li:last-child {
+  margin: 6px;
+}
+/*# sourceMappingURL=style.css.map */

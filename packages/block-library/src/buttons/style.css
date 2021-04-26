@@ -130,4 +130,8 @@
   margin-bottom: 0.5em;
   width: 100%;
 }
+
+.wp-block-button.aligncenter {
+  text-align: center;
+}
 /*# sourceMappingURL=style.css.map */

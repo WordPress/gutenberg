@@ -14,4 +14,8 @@
 .components-button.edit-post-post-schedule__toggle {
   text-align: right;
 }
+
+.edit-post-post-schedule__dialog .components-popover__content > div {
+  padding: 0;
+}
 /*# sourceMappingURL=style.css.map */

@@ -2,6 +2,8 @@
   display: -webkit-box;
   display: -ms-flexbox;
   display: flex;
+  -ms-flex-wrap: wrap;
+      flex-wrap: wrap;
   -webkit-box-pack: justify;
       -ms-flex-pack: justify;
           justify-content: space-between;
@@ -9,6 +11,29 @@
       -ms-flex-align: center;
           align-items: center;
   margin-bottom: 0;
+}
+
+.wp-block[data-align="left"] > .wp-block-file,
+.wp-block[data-align="right"] > .wp-block-file {
+  height: auto;
+}
+
+.wp-block-file .components-resizable-box__container {
+  margin-bottom: 1em;
+}
+
+.wp-block-file .wp-block-file__preview {
+  margin-bottom: 1em;
+  width: 100%;
+  height: 100%;
+}
+
+.wp-block-file .wp-block-file__preview-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
 }
 
 .wp-block-file .wp-block-file__content-wrapper {
