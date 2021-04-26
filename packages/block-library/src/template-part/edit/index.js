@@ -8,7 +8,6 @@ import {
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	Warning,
 	store as blockEditorStore,
-	__experimentalBlockPatternSetup as BlockPatternSetup,
 } from '@wordpress/block-editor';
 import {
 	Dropdown,
@@ -19,16 +18,14 @@ import {
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
-import { useState, useEffect } from '@wordpress/element';
-import { cloneBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
 import { TemplatePartAdvancedControls } from './advanced-controls';
+import EntityContent from './entity-content';
 
 export default function TemplatePartEdit( {
 	attributes,
@@ -38,8 +35,6 @@ export default function TemplatePartEdit( {
 	const { slug, theme, tagName, layout = {} } = attributes;
 	const templatePartId = theme && slug ? theme + '//' + slug : null;
 
-	const [ startingPattern, setStartingPattern ] = useState( null );
-
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		templatePartId
 	);
@@ -47,14 +42,7 @@ export default function TemplatePartEdit( {
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const {
-		isResolved,
-		innerBlocks,
-		isMissing,
-		defaultWrapper,
-		hasContent,
-		blockNameWithArea,
-	} = useSelect(
+	const { isResolved, innerBlocks, isMissing, defaultWrapper } = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } = select(
 				coreStore
@@ -77,16 +65,6 @@ export default function TemplatePartEdit( {
 				  )
 				: false;
 
-			const _hasContent =
-				( entityRecord?.content &&
-					typeof entityRecord.content !== 'function' ) ||
-				entityRecord?.blocks?.length;
-
-			const _blockNameWithArea =
-				entityRecord?.area && entityRecord.area !== 'uncategorized'
-					? `core/template-part/${ entityRecord.area }`
-					: 'core/template-part';
-
 			const defaultWrapperElement = select( editorStore )
 				.__experimentalGetDefaultTemplatePartAreas()
 				.find(
@@ -99,18 +77,10 @@ export default function TemplatePartEdit( {
 				isResolved: hasResolvedEntity,
 				isMissing: hasResolvedEntity && ! entityRecord,
 				defaultWrapper: defaultWrapperElement || 'div',
-				hasContent: _hasContent,
-				blockNameWithArea: _blockNameWithArea,
 			};
 		},
 		[ templatePartId, clientId ]
 	);
-
-	useEffect( () => {
-		if ( hasContent ) {
-			setStartingPattern( null );
-		}
-	}, [ hasContent ] );
 
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
@@ -194,24 +164,16 @@ export default function TemplatePartEdit( {
 					</ToolbarGroup>
 				</BlockControls>
 			) }
-			{ isEntityAvailable &&
-				( hasContent || startingPattern ? (
-					<TemplatePartInnerBlocks
-						tagName={ TagName }
-						blockProps={ blockProps }
-						postId={ templatePartId }
-						hasInnerBlocks={ innerBlocks.length > 0 }
-						layout={ layout }
-						startingPattern={ startingPattern }
-						clientId={ clientId }
-					/>
-				) : (
-					<PatternsSetup
-						blockNameWithArea={ blockNameWithArea }
-						clientId={ clientId }
-						setStartingPattern={ setStartingPattern }
-					/>
-				) ) }
+			{ isEntityAvailable && (
+				<EntityContent
+					tagName={ TagName }
+					blockProps={ blockProps }
+					postId={ templatePartId }
+					hasInnerBlocks={ innerBlocks.length > 0 }
+					layout={ layout }
+					clientId={ clientId }
+				/>
+			) }
 			{ ! isPlaceholder && ! isResolved && (
 				<TagName { ...blockProps }>
 					<Spinner />
@@ -219,34 +181,4 @@ export default function TemplatePartEdit( {
 			) }
 		</RecursionProvider>
 	);
-}
-
-function PatternsSetup( { blockNameWithArea, clientId, setStartingPattern } ) {
-	const onSelect = ( blocks ) => {
-		const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
-		setStartingPattern( clonedBlocks );
-	};
-
-	return (
-		<BlockPatternSetup
-			blockName={ 'core/template-part' }
-			clientId={ clientId }
-			startBlankComponent={
-				<StartBlankComponent
-					setStartingPattern={ setStartingPattern }
-				/>
-			}
-			onBlockPatternSelect={ onSelect }
-			filterPatternsFn={ ( pattern ) =>
-				pattern?.blockTypes?.some?.(
-					( blockType ) => blockType === blockNameWithArea
-				)
-			}
-		/>
-	);
-}
-
-function StartBlankComponent( { setStartingPattern } ) {
-	setStartingPattern( [] );
-	return null;
 }

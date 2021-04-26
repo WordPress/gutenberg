@@ -8,8 +8,7 @@ import {
 	__experimentalUseEditorFeature as useEditorFeature,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 export default function TemplatePartInnerBlocks( {
 	postId: id,
@@ -17,8 +16,7 @@ export default function TemplatePartInnerBlocks( {
 	layout,
 	tagName: TagName,
 	blockProps,
-	startingPattern,
-	clientId,
+	startBlank,
 } ) {
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -36,26 +34,21 @@ export default function TemplatePartInnerBlocks( {
 		'wp_template_part',
 		{ id }
 	);
+
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		value: blocks,
 		onInput,
 		onChange,
-		renderAppender: hasInnerBlocks
-			? undefined
-			: InnerBlocks.ButtonBlockAppender,
+		renderAppender:
+			hasInnerBlocks || ! startBlank
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
 		__experimentalLayout: {
 			type: 'default',
 			// Find a way to inject this in the support flag code (hooks).
 			alignments: themeSupportsLayout ? alignments : undefined,
 		},
 	} );
-
-	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
-	useEffect( () => {
-		if ( ! blocks?.length && startingPattern?.length ) {
-			replaceInnerBlocks( clientId, startingPattern );
-		}
-	}, [ clientId, blocks, startingPattern ] );
 
 	return <TagName { ...innerBlocksProps } />;
 }
