@@ -2,16 +2,6 @@
 
 exports[`VisuallyHidden should render correctly 1`] = `
 .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
   border: 0;
   -webkit-clip: rect( 1px,1px,1px,1px );
   clip: rect( 1px,1px,1px,1px );
@@ -25,18 +15,6 @@ exports[`VisuallyHidden should render correctly 1`] = `
   position: absolute;
   width: 1px;
   word-wrap: normal !important;
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
 }
 
 .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:focus {
@@ -61,7 +39,7 @@ exports[`VisuallyHidden should render correctly 1`] = `
 }
 
 <div
-  class="components-visually-hidden wp-components-visually-hidden ic-192yz5d emotion-0"
+  class="components-visually-hidden wp-components-visually-hidden emotion-0 emotion-1 emotion-2"
 >
   This is hidden
 </div>
