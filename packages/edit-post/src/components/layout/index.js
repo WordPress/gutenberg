@@ -12,6 +12,7 @@ import {
 	UnsavedChangesWarning,
 	EditorNotices,
 	EditorKeyboardShortcutsRegister,
+	store as editorStore,
 } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -91,7 +92,7 @@ function Layout( { styles } ) {
 		hasReducedUI,
 		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
-		const editorSettings = select( 'core/editor' ).getEditorSettings();
+		const editorSettings = select( editorStore ).getEditorSettings();
 		return {
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'

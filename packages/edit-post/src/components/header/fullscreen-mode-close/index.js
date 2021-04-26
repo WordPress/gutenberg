@@ -11,6 +11,7 @@ import { Button, Icon } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { addQueryArgs } from '@wordpress/url';
 import { wordpress } from '@wordpress/icons';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -20,7 +21,7 @@ import { store as editPostStore } from '../../../store';
 function FullscreenModeClose( { showTooltip, icon, href } ) {
 	const { isActive, isRequestingSiteIcon, postType, siteIconUrl } = useSelect(
 		( select ) => {
-			const { getCurrentPostType } = select( 'core/editor' );
+			const { getCurrentPostType } = select( editorStore );
 			const { isFeatureActive } = select( editPostStore );
 			const { isResolving } = select( 'core/data' );
 			const { getEntityRecord, getPostType } = select( 'core' );

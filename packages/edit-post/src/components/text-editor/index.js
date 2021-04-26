@@ -5,6 +5,7 @@ import {
 	PostTextEditor,
 	PostTitle,
 	TextEditorGlobalKeyboardShortcuts,
+	store as editorStore,
 } from '@wordpress/editor';
 import { Button } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
@@ -43,7 +44,7 @@ function TextEditor( { onExit, isRichEditingEnabled } ) {
 
 export default compose(
 	withSelect( ( select ) => ( {
-		isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
+		isRichEditingEnabled: select( editorStore ).getEditorSettings()
 			.richEditingEnabled,
 	} ) ),
 	withDispatch( ( dispatch ) => {

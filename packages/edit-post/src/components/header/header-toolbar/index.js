@@ -20,6 +20,7 @@ import {
 	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
+	store as editorStore,
 } from '@wordpress/editor';
 import {
 	Button,
@@ -62,8 +63,7 @@ function HeaderToolbar() {
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
 				select( editPostStore ).getEditorMode() === 'visual' &&
-				select( 'core/editor' ).getEditorSettings()
-					.richEditingEnabled &&
+				select( editorStore ).getEditorSettings().richEditingEnabled &&
 				hasInserterItems(
 					getBlockRootClientId( getBlockSelectionEnd() )
 				),

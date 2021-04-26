@@ -15,6 +15,7 @@ import {
 import { useDispatch, useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Icon, plus } from '@wordpress/icons';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -27,7 +28,7 @@ export default function NewTemplateDropdown() {
 	const { defaultTemplateTypes, templates } = useSelect( ( select ) => {
 		const {
 			__experimentalGetDefaultTemplateTypes: getDefaultTemplateTypes,
-		} = select( 'core/editor' );
+		} = select( editorStore );
 		const templateEntities = select( 'core' ).getEntityRecords(
 			'postType',
 			'wp_template'

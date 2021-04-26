@@ -8,6 +8,7 @@ import {
 	store as keyboardShortcutsStore,
 } from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -19,7 +20,7 @@ function KeyboardShortcuts() {
 	const { getEditorMode, isEditorSidebarOpened } = useSelect( editPostStore );
 	const isModeToggleDisabled = useSelect( ( select ) => {
 		const { richEditingEnabled, codeEditingEnabled } = select(
-			'core/editor'
+			editorStore
 		).getEditorSettings();
 		return ! richEditingEnabled || ! codeEditingEnabled;
 	}, [] );

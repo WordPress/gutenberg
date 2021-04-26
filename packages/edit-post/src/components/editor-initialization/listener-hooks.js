@@ -3,6 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -53,7 +54,7 @@ export const useBlockSelectionListener = ( postId ) => {
 export const useUpdatePostLinkListener = ( postId ) => {
 	const { newPermalink } = useSelect(
 		( select ) => ( {
-			newPermalink: select( 'core/editor' ).getCurrentPost().link,
+			newPermalink: select( editorStore ).getCurrentPost().link,
 		} ),
 		[ postId ]
 	);

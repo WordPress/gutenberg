@@ -8,7 +8,11 @@ import { get, partial } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody } from '@wordpress/components';
-import { PostFeaturedImage, PostFeaturedImageCheck } from '@wordpress/editor';
+import {
+	PostFeaturedImage,
+	PostFeaturedImageCheck,
+	store as editorStore,
+} from '@wordpress/editor';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -45,7 +49,7 @@ function FeaturedImage( { isEnabled, isOpened, postType, onTogglePanel } ) {
 }
 
 const applyWithSelect = withSelect( ( select ) => {
-	const { getEditedPostAttribute } = select( 'core/editor' );
+	const { getEditedPostAttribute } = select( editorStore );
 	const { getPostType } = select( 'core' );
 	const { isEditorPanelEnabled, isEditorPanelOpened } = select(
 		editPostStore

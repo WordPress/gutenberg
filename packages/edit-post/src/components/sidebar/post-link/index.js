@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { PanelBody, TextControl, ExternalLink } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose, ifCondition, withState } from '@wordpress/compose';
-import { cleanForSlug } from '@wordpress/editor';
+import { cleanForSlug, store as editorStore } from '@wordpress/editor';
 import { safeDecodeURIComponent } from '@wordpress/url';
 
 /**
@@ -136,7 +136,7 @@ export default compose( [
 			getPermalinkParts,
 			getEditedPostAttribute,
 			getEditedPostSlug,
-		} = select( 'core/editor' );
+		} = select( editorStore );
 		const { isEditorPanelEnabled, isEditorPanelOpened } = select(
 			editPostStore
 		);
@@ -167,7 +167,7 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { toggleEditorPanelOpened } = dispatch( editPostStore );
-		const { editPost } = dispatch( 'core/editor' );
+		const { editPost } = dispatch( editorStore );
 		return {
 			onTogglePanel: () => toggleEditorPanelOpened( PANEL_NAME ),
 			editPermalink: ( newSlug ) => {

@@ -13,6 +13,7 @@ import { controls, dispatch, select, subscribe } from '@wordpress/data';
 import { speak } from '@wordpress/a11y';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -272,17 +273,14 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 		metaBoxesPerLocation,
 	};
 
-	const postType = yield controls.select(
-		'core/editor',
-		'getCurrentPostType'
-	);
+	const postType = yield controls.select( editorStore, 'getCurrentPostType' );
 	if ( window.postboxes.page !== postType ) {
 		window.postboxes.add_postbox_toggles( postType );
 	}
 
-	let wasSavingPost = yield controls.select( 'core/editor', 'isSavingPost' );
+	let wasSavingPost = yield controls.select( editorStore, 'isSavingPost' );
 	let wasAutosavingPost = yield controls.select(
-		'core/editor',
+		editorStore,
 		'isAutosavingPost'
 	);
 
@@ -302,8 +300,8 @@ export function* setAvailableMetaBoxesPerLocation( metaBoxesPerLocation ) {
 
 	// Save metaboxes when performing a full save on the post.
 	saveMetaboxUnsubscribe = subscribe( () => {
-		const isSavingPost = select( 'core/editor' ).isSavingPost();
-		const isAutosavingPost = select( 'core/editor' ).isAutosavingPost();
+		const isSavingPost = select( editorStore ).isSavingPost();
+		const isAutosavingPost = select( editorStore ).isAutosavingPost();
 
 		// Save metaboxes on save completion, except for autosaves that are not a post preview.
 		const shouldTriggerMetaboxesSave =
@@ -339,7 +337,7 @@ export function* requestMetaBoxUpdates() {
 
 	// Additional data needed for backward compatibility.
 	// If we do not provide this data, the post will be overridden with the default values.
-	const post = yield controls.select( 'core/editor', 'getCurrentPost' );
+	const post = yield controls.select( editorStore, 'getCurrentPost' );
 	const additionalData = [
 		post.comment_status ? [ 'comment_status', post.comment_status ] : false,
 		post.ping_status ? [ 'ping_status', post.ping_status ] : false,
@@ -459,7 +457,7 @@ export function* __unstableSwitchToTemplateMode( template ) {
 			'wp_template',
 			template
 		);
-		const post = yield controls.select( 'core/editor', 'getCurrentPost' );
+		const post = yield controls.select( editorStore, 'getCurrentPost' );
 
 		yield controls.dispatch(
 			coreStore,

@@ -5,7 +5,7 @@ import { memo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { PostTitle } from '@wordpress/editor';
+import { PostTitle, store as editorStore } from '@wordpress/editor';
 import { ReadableContentView } from '@wordpress/components';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
@@ -44,14 +44,14 @@ const Header = memo(
 
 export default compose( [
 	withSelect( ( select ) => {
-		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getEditedPostAttribute } = select( editorStore );
 
 		return {
 			title: getEditedPostAttribute( 'title' ),
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost } = dispatch( 'core/editor' );
+		const { editPost } = dispatch( editorStore );
 
 		const { clearSelectedBlock } = dispatch( blockEditorStore );
 

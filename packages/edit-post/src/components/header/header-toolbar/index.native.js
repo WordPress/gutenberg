@@ -22,6 +22,7 @@ import {
 	undo as undoIcon,
 	redo as redoIcon,
 } from '@wordpress/icons';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -111,22 +112,22 @@ function HeaderToolbar( {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		hasRedo: select( 'core/editor' ).hasEditorRedo(),
-		hasUndo: select( 'core/editor' ).hasEditorUndo(),
+		hasRedo: select( editorStore ).hasEditorRedo(),
+		hasUndo: select( editorStore ).hasEditorUndo(),
 		// This setting (richEditingEnabled) should not live in the block editor's setting.
 		showInserter:
 			select( editPostStore ).getEditorMode() === 'visual' &&
-			select( 'core/editor' ).getEditorSettings().richEditingEnabled,
+			select( editorStore ).getEditorSettings().richEditingEnabled,
 		isTextModeEnabled: select( editPostStore ).getEditorMode() === 'text',
 		isRTL: select( blockEditorStore ).getSettings().isRTL,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock } = dispatch( blockEditorStore );
-		const { togglePostTitleSelection } = dispatch( 'core/editor' );
+		const { togglePostTitleSelection } = dispatch( editorStore );
 
 		return {
-			redo: dispatch( 'core/editor' ).redo,
-			undo: dispatch( 'core/editor' ).undo,
+			redo: dispatch( editorStore ).redo,
+			undo: dispatch( editorStore ).undo,
 			onHideKeyboard() {
 				clearSelectedBlock();
 				togglePostTitleSelection( false );

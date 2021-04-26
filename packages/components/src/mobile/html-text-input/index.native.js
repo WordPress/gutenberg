@@ -16,6 +16,7 @@ import {
 	compose,
 	withPreferredColorScheme,
 } from '@wordpress/compose';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -116,7 +117,7 @@ export class HTMLTextInput extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { getEditedPostAttribute, getEditedPostContent } = select(
-			'core/editor'
+			editorStore
 		);
 
 		return {
@@ -125,7 +126,7 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
+		const { editPost, resetEditorBlocks } = dispatch( editorStore );
 		return {
 			editTitle( title ) {
 				editPost( { title } );
