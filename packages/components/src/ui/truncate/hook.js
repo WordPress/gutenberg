@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { useContextSystem } from '@wp-g2/context';
-import { css, cx } from '@wp-g2/styles';
+import { css, cx } from 'emotion';
 
 /**
  * WordPress dependencies
@@ -12,11 +11,12 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { useContextSystem } from '../context';
 import * as styles from './styles';
 import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'span'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').Props, 'span'>} props
  */
 export default function useTruncate( props ) {
 	const {

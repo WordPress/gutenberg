@@ -1,9 +1,8 @@
 /**
  * External dependencies
  */
-import { hasNamespace, useContextSystem } from '@wp-g2/context';
-import { css, cx, getFontSize, ui } from '@wp-g2/styles';
-import { isPlainObject, isNil } from 'lodash';
+import { css, cx } from 'emotion';
+import { isPlainObject } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -13,13 +12,17 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { hasConnectNamespace, useContextSystem } from '../context';
 import { useTruncate } from '../truncate';
 import { getOptimalTextShade } from '../utils';
 import * as styles from './styles';
 import { createHighlighterText } from './utils';
+import { getFontSize } from '../utils/font-size';
+import { CONFIG, COLORS } from '../../utils';
+import { getLineHeight } from './get-line-height';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'span'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').Props, 'span'>} props
  */
 export default function useText( props ) {
 	const {
@@ -43,7 +46,7 @@ export default function useText( props ) {
 		truncate = false,
 		upperCase = false,
 		variant,
-		weight = ui.get( 'fontWeight' ),
+		weight = CONFIG.fontWeight,
 		...otherProps
 	} = useContextSystem( props, 'Text' );
 
@@ -73,10 +76,10 @@ export default function useText( props ) {
 	const classes = useMemo( () => {
 		const sx = {};
 
-		const lineHeight = getLineHeight( {
-			lineHeight: lineHeightProp,
+		const lineHeight = getLineHeight(
 			adjustLineHeightForInnerControls,
-		} );
+			lineHeightProp
+		);
 
 		sx.Base = css( {
 			color,
@@ -99,8 +102,8 @@ export default function useText( props ) {
 				getOptimalTextShade( optimizeReadabilityFor ) === 'dark';
 
 			sx.optimalTextColor = isOptimalTextColorDark
-				? css( { color: ui.get( 'black' ) } )
-				: css( { color: ui.get( 'white' ) } );
+				? css( { color: COLORS.black } )
+				: css( { color: COLORS.white } );
 		}
 
 		return cx(
@@ -162,7 +165,7 @@ export default function useText( props ) {
 				return child;
 			}
 
-			const isLink = hasNamespace( child, [ 'Link' ] );
+			const isLink = hasConnectNamespace( child, [ 'Link' ] );
 			if ( isLink ) {
 				return cloneElement( child, {
 					size: child.props.size || 'inherit',
@@ -177,41 +180,4 @@ export default function useText( props ) {
 		...truncateProps,
 		children: truncate ? truncateProps.children : content,
 	};
-}
-
-/* eslint-disable jsdoc/valid-types */
-/**
- * @param {Object} props
- * @param {import('./types').Props['adjustLineHeightForInnerControls']} [props.adjustLineHeightForInnerControls]
- * @param {import('react').CSSProperties['lineHeight']} [props.lineHeight]
- */
-/* eslint-enable jsdoc/valid-types */
-function getLineHeight( { adjustLineHeightForInnerControls, lineHeight } ) {
-	if ( ! isNil( lineHeight ) ) return lineHeight;
-
-	if ( ! adjustLineHeightForInnerControls ) return;
-
-	let value = `calc(${ ui.get( 'controlHeight' ) } + ${ ui.space( 2 ) })`;
-
-	switch ( adjustLineHeightForInnerControls ) {
-		case 'large':
-			value = `calc(${ ui.get( 'controlHeightLarge' ) } + ${ ui.space(
-				2
-			) })`;
-			break;
-		case 'small':
-			value = `calc(${ ui.get( 'controlHeightSmall' ) } + ${ ui.space(
-				2
-			) })`;
-			break;
-		case 'xSmall':
-			value = `calc(${ ui.get( 'controlHeightXSmall' ) } + ${ ui.space(
-				2
-			) })`;
-			break;
-		default:
-			break;
-	}
-
-	return value;
 }

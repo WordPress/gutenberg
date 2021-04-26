@@ -2,16 +2,6 @@
 
 exports[`props should render correctly 1`] = `
 .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
   z-index: 1000002;
   box-sizing: border-box;
   opacity: 0;
@@ -23,18 +13,6 @@ exports[`props should render correctly 1`] = `
   -webkit-transition: opacity var(--wp-g2-transition-duration-fastest) ease;
   transition: opacity 100ms ease;
   transition: opacity var(--wp-g2-transition-duration-fastest) ease;
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  -webkit-transition: none !important;
-  transition: none !important;
 }
 
 .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1[data-enter] {
@@ -73,7 +51,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-tooltip-content wp-components-tooltip-content ic-1av77e4 ic-192yz5d emotion-1"
+  class="emotion-1 components-tooltip-content wp-components-tooltip-content ic-1av77e4 emotion-2 emotion-3"
   data-g2-c16t="true"
   data-g2-component="TooltipContent"
   id="base-tooltip"

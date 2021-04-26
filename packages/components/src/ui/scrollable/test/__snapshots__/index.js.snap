@@ -2,31 +2,9 @@
 
 exports[`props should render correctly 1`] = `
 .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
 }
 
 @media only screen and ( min-device-width:40em ) {
@@ -60,7 +38,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-scrollable wp-components-scrollable ic-y3p1xi ic-192yz5d emotion-0"
+  class="components-scrollable wp-components-scrollable ic-y3p1xi emotion-0 emotion-1 emotion-2"
   data-g2-c16t="true"
   data-g2-component="Scrollable"
 >
@@ -75,17 +53,10 @@ Snapshot Diff:
 
   Array [
     Object {
-      "-moz-osx-font-smoothing": "grayscale",
 -     "-moz-scroll-behavior": "smooth",
 -     "-ms-scroll-behavior": "smooth",
-      "-webkit-font-smoothing": "antialiased",
 -     "-webkit-scroll-behavior": "smooth",
-      "box-sizing": "border-box",
-      "font-family": "var(--wp-g2-font-family)",
-      "font-size": "var(--wp-g2-font-size)",
-      "font-weight": "var(--wp-g2-font-weight)",
       "height": "100%",
-      "margin": "0",
       "overflow-x": "hidden",
       "overflow-y": "auto",
 -     "scroll-behavior": "smooth",

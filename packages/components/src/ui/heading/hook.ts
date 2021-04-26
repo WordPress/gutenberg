@@ -1,15 +1,13 @@
 /**
- * External dependencies
- */
-import { useContextSystem } from '@wp-g2/context';
-import { getHeadingFontSize, ui } from '@wp-g2/styles';
-import type { ViewOwnProps } from '@wp-g2/create-styles';
-
-/**
  * Internal dependencies
  */
+import { useContextSystem } from '../context';
+// eslint-disable-next-line no-duplicate-imports
+import type { ViewOwnProps } from '../context';
 import type { Props as TextProps } from '../text/types';
 import { useText } from '../text';
+import { getHeadingFontSize } from '../utils/font-size';
+import { CONFIG, COLORS } from '../../utils';
 
 export type HeadingSize =
 	| 1
@@ -71,11 +69,10 @@ export function useHeading( props: ViewOwnProps< HeadingProps, 'h1' > ) {
 	}
 
 	const textProps = useText( {
-		color: ui.get( 'colorTextHeading' ),
+		color: COLORS.darkGray.heading,
 		size: getHeadingFontSize( level ),
 		isBlock: true,
-		// @ts-ignore We're passing a variable so `string` is safe
-		weight: ui.get( 'fontWeightHeading' ),
+		weight: CONFIG.fontWeightHeading as import('react').CSSProperties[ 'fontWeight' ],
 		...otherProps,
 	} );
 

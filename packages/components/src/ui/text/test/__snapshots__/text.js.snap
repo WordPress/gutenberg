@@ -1,50 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Text should render highlighted words with highlightCaseSensitive 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  color: #1e1e1e;
-  color: var(--wp-g2-color-text);
+.emotion-0 {
+  color: #000;
   line-height: 1.2;
-  line-height: var(--wp-g2-font-line-height-base);
+  margin: 0;
   font-size: calc((13 / 13) * 13px);
-  font-size: calc((13 / 13) * var(--wp-g2-font-size));
   font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 mark {
-  background: rgba(255, 185, 0, 0.7);
-  background: var(--wp-g2-yellow-rgba-70);
+.emotion-0 mark {
+  background: #f0b849;
   border-radius: 2px;
-  box-shadow: 0 0 0 1px rgba( 0,0,0,0.05 ) inset, 0 -1px 0 rgba( 0,0,0,0.1 ) inset;
+  box-shadow: 0 0 0 1px rgba( 0,0,0,0.05 ) inset,0 -1px 0 rgba( 0,0,0,0.1 ) inset;
 }
 
 <span
-  class="components-truncate wp-components-truncate components-text wp-components-text ic-7u3orf ic-1m45iq3 ic-192yz5d emotion-0"
-  data-g2-c16t="true"
-  data-g2-component="Text"
+  class="components-truncate components-text emotion-0 emotion-1 emotion-2"
+  data-wp-c16t="true"
+  data-wp-component="Text"
 >
   <span
     class=""
@@ -56,43 +30,18 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
 `;
 
 exports[`Text snapshot tests should render correctly 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  color: #1e1e1e;
-  color: var(--wp-g2-color-text);
+.emotion-0 {
+  color: #000;
   line-height: 1.2;
-  line-height: var(--wp-g2-font-line-height-base);
+  margin: 0;
   font-size: calc((13 / 13) * 13px);
-  font-size: calc((13 / 13) * var(--wp-g2-font-size));
   font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
 }
 
 <span
-  class="components-truncate wp-components-truncate components-text wp-components-text ic-7u3orf ic-1m45iq3 ic-192yz5d emotion-0"
-  data-g2-c16t="true"
-  data-g2-component="Text"
+  class="components-truncate components-text emotion-0 emotion-1 emotion-2"
+  data-wp-c16t="true"
+  data-wp-component="Text"
 >
   Lorem ipsum.
 </span>

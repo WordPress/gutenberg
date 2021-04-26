@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { useContextSystem } from '@wp-g2/context';
-import { css, cx, ui, useResponsiveValue } from '@wp-g2/styles';
+import { css, cx } from 'emotion';
 
 /**
  * WordPress dependencies
@@ -12,10 +11,13 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { useContextSystem } from '../context';
+import { useResponsiveValue } from '../utils/use-responsive-value';
+import { space } from '../utils/space';
 import * as styles from './styles';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexProps, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').FlexProps, 'div'>} props
  */
 export function useFlex( props ) {
 	const {
@@ -43,17 +45,13 @@ export function useFlex( props ) {
 		const sx = {};
 
 		sx.Base = css( {
-			[ ui.createToken( 'flexGap' ) ]: ui.space( gap ),
-			[ ui.createToken( 'flexItemDisplay' ) ]: isColumn
-				? 'block'
-				: undefined,
 			alignItems: isColumn ? 'normal' : align,
 			flexDirection: direction,
 			flexWrap: wrap ? 'wrap' : undefined,
 			justifyContent: justify,
 			height: isColumn && expanded ? '100%' : undefined,
 			width: ! isColumn && expanded ? '100%' : undefined,
-			marginBottom: wrap ? `calc(${ ui.space( gap ) } * -1)` : undefined,
+			marginBottom: wrap ? `calc(${ space( gap ) } * -1)` : undefined,
 		} );
 
 		sx.Items = css( {
@@ -65,21 +63,19 @@ export function useFlex( props ) {
 			 * Far less DOM less. However, UI rendering is not as reliable.
 			 */
 			'> * + *:not(marquee)': {
-				marginTop: isColumn ? ui.space( gap ) : undefined,
-				marginRight:
-					! isColumn && isReverse ? ui.space( gap ) : undefined,
+				marginTop: isColumn ? space( gap ) : undefined,
+				marginRight: ! isColumn && isReverse ? space( gap ) : undefined,
 				marginLeft:
-					! isColumn && ! isReverse ? ui.space( gap ) : undefined,
+					! isColumn && ! isReverse ? space( gap ) : undefined,
 			},
 		} );
 
 		sx.WrapItems = css( {
 			'> *:not(marquee)': {
-				marginBottom: ui.space( gap ),
-				marginLeft:
-					! isColumn && isReverse ? ui.space( gap ) : undefined,
+				marginBottom: space( gap ),
+				marginLeft: ! isColumn && isReverse ? space( gap ) : undefined,
 				marginRight:
-					! isColumn && ! isReverse ? ui.space( gap ) : undefined,
+					! isColumn && ! isReverse ? space( gap ) : undefined,
 			},
 			'> *:last-child:not(marquee)': {
 				marginLeft: ! isColumn && isReverse ? 0 : undefined,

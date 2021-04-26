@@ -1,11 +1,17 @@
 /**
  * External dependencies
  */
-import { css, ui } from '@wp-g2/styles';
+import { css } from 'emotion';
+
+/**
+ * Internal dependencies
+ */
+import { COLORS, CONFIG } from '../../utils';
 
 export const Text = css`
-	color: ${ ui.color.text };
-	line-height: ${ ui.get( 'fontLineHeightBase' ) };
+	color: ${ COLORS.black };
+	line-height: ${ CONFIG.fontLineHeightBase };
+	margin: 0;
 `;
 
 export const block = css`
@@ -13,20 +19,20 @@ export const block = css`
 `;
 
 export const positive = css`
-	color: ${ ui.color.positive };
+	color: ${ COLORS.alert.green };
 `;
 
 export const destructive = css`
-	color: ${ ui.color.destructive };
+	color: ${ COLORS.alert.red };
 `;
 
 export const muted = css`
-	color: ${ ui.get( 'colorTextMuted' ) };
+	color: ${ COLORS.mediumGray.text };
 `;
 
 export const highlighterText = css`
 	mark {
-		background: ${ ui.get( 'yellowRgba70' ) };
+		background: ${ COLORS.alert.yellow };
 		border-radius: 2px;
 		box-shadow: 0 0 0 1px rgba( 0, 0, 0, 0.05 ) inset,
 			0 -1px 0 rgba( 0, 0, 0, 0.1 ) inset;

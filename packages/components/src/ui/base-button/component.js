@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { contextConnect } from '@wp-g2/context';
 import { cx, ui } from '@wp-g2/styles';
 // eslint-disable-next-line no-restricted-imports
 import { Radio as ReakitRadio } from 'reakit';
@@ -14,6 +13,7 @@ import { Icon, chevronDown } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
+import { contextConnect } from '../context';
 import { useButtonGroupContext } from '../button-group';
 import { Elevation } from '../elevation';
 import { FlexItem } from '../flex';
@@ -23,7 +23,7 @@ import LoadingOverlay from './loading-overlay';
 import { useBaseButton } from './hook';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'button'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').Props, 'button'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function BaseButton( props, forwardedRef ) {

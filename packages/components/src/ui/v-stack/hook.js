@@ -10,7 +10,7 @@ import { useHStack } from '../h-stack';
 
 /**
  *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
  */
 export function useVStack( props ) {
 	const { expanded = false, ...otherProps } = useContextSystem(

@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { contextConnect, useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
+import { cx } from 'emotion';
 
 /**
  * WordPress dependencies
@@ -12,11 +11,12 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { contextConnect, useContextSystem } from '../context';
 import { Flex } from '../flex';
 import * as styles from './styles';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').CardHeaderProps, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').CardHeaderProps, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function CardHeader( props, forwardedRef ) {

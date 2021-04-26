@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
-import { getFontSize, ui } from '@wp-g2/styles';
 
 /**
  * Internal dependencies
  */
+import { getFontSize } from '../../utils/font-size';
+import { COLORS } from '../../../utils/colors-values';
 import { Text } from '..';
 
 describe( 'Text', () => {
@@ -22,7 +23,7 @@ describe( 'Text', () => {
 			<Text optimizeReadabilityFor="blue">Lorem ipsum.</Text>
 		);
 		expect( container.firstChild ).toHaveStyle( {
-			color: ui.get( 'white' ),
+			color: COLORS.white,
 		} );
 	} );
 
@@ -52,7 +53,7 @@ describe( 'Text', () => {
 			<Text variant="muted">Lorem ipsum.</Text>
 		);
 		expect( container.firstChild ).toHaveStyle( {
-			color: ui.get( 'colorTextMuted' ),
+			color: COLORS.mediumGray.text,
 		} );
 	} );
 

@@ -28,7 +28,7 @@ export const PopoverContent = css`
 `;
 
 export const cardStyle = css`
-	${ CardBody } {
+	${ CardBody.selector } {
 		max-height: 80vh;
 	}
 `;

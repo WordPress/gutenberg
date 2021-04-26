@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { contextConnect, useContextSystem } from '@wp-g2/context';
 import { get } from '@wp-g2/styles';
 
 /**
@@ -9,6 +8,7 @@ import { get } from '@wp-g2/styles';
  */
 import { BarsView, BarsWrapperView, ContainerView } from './styles';
 import { BASE_SIZE, WRAPPER_SIZE } from './utils';
+import { contextConnect, useContextSystem } from '../context';
 
 /* eslint-disable jsdoc/valid-types */
 /**
@@ -20,7 +20,7 @@ import { BASE_SIZE, WRAPPER_SIZE } from './utils';
 
 /**
  *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<Props, 'div'>} props
+ * @param {import('../context').ViewOwnProps<Props, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Spinner( props, forwardedRef ) {
