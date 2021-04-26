@@ -236,9 +236,13 @@ export default function NavigationLinkEdit( {
 	};
 	const {
 		textColor,
+		customTextColor: navCustomTextColor,
 		backgroundColor,
+		customBackgroundColor: navCustomBackgroundColor,
 		overlayTextColor,
+		customOverlayTextColor,
 		overlayBackgroundColor,
+		customOverlayBackgroundColor,
 		style,
 		showSubmenuIcon,
 	} = context;
@@ -391,12 +395,28 @@ export default function NavigationLinkEdit( {
 		};
 	}
 
-	const textColorForNesting = isTopLevelLink
-		? textColor
-		: overlayTextColor || textColor;
-	const bgColorForNesting = isTopLevelLink
-		? backgroundColor
-		: overlayBackgroundColor || backgroundColor;
+	/*
+	 * Order of preference for colors:
+	 *
+	 * Overlay color (if this is in a submenu)
+	 * Navigation color
+	 * Global style
+	 */
+
+	const textColorSlug = ( ! isTopLevelLink && overlayTextColor ) || textColor;
+
+	const backgroundColorSlug =
+		( ! isTopLevelLink && overlayBackgroundColor ) || backgroundColor;
+
+	const customTextColor =
+		( ! isTopLevelLink && customOverlayTextColor ) ||
+		navCustomTextColor ||
+		style?.color?.text;
+
+	const customBackgroundColor =
+		( ! isTopLevelLink && customOverlayBackgroundColor ) ||
+		navCustomBackgroundColor ||
+		style?.color?.background;
 
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
@@ -405,15 +425,14 @@ export default function NavigationLinkEdit( {
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasDescendants,
-			'has-text-color': !! textColorForNesting || !! style?.color?.text,
-			[ `has-${ textColorForNesting }-color` ]: !! textColorForNesting,
-			'has-background':
-				!! bgColorForNesting || !! style?.color?.background,
-			[ `has-${ bgColorForNesting }-background-color` ]: !! bgColorForNesting,
+			'has-text-color': !! textColorSlug || !! customTextColor,
+			[ `has-${ textColorSlug }-color` ]: !! textColorSlug,
+			'has-background': !! backgroundColorSlug || customBackgroundColor,
+			[ `has-${ backgroundColorSlug }-background-color` ]: !! backgroundColorSlug,
 		} ),
 		style: {
-			color: style?.color?.text,
-			backgroundColor: style?.color?.background,
+			color: customTextColor,
+			backgroundColor: customBackgroundColor,
 		},
 	} );
 
