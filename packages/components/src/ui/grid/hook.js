@@ -14,6 +14,7 @@ import { useMemo } from '@wordpress/element';
 import { useContextSystem } from '../context';
 import { getAlignmentProps } from './utils';
 import { useResponsiveValue } from '../utils/use-responsive-value';
+import CONFIG from '../../utils/config-values';
 
 /**
  * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
@@ -51,7 +52,7 @@ export default function useGrid( props ) {
 		const gridClasses = css( {
 			alignItems: align,
 			display: isInline ? 'inline-grid' : 'grid',
-			gap,
+			gap: `calc( ${ CONFIG.gridBase } * ${ gap } )`,
 			gridTemplateColumns: gridTemplateColumns || undefined,
 			gridTemplateRows: gridTemplateRows || undefined,
 			gridRowGap: rowGap,
