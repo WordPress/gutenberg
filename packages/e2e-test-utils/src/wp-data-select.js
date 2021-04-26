@@ -5,7 +5,7 @@
  * @param {string}    selector   Selector to exectute e.g: getBlocks.
  * @param {...Object} parameters Parameters to pass to the selector.
  *
- * @return {Promise<?Object>} Result of querying.
+ * @return {Promise<?Object>} Result of querying. test
  */
 export async function wpDataSelect( store, selector, ...parameters ) {
 	return page.evaluate(
