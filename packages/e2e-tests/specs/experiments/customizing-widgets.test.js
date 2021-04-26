@@ -16,7 +16,7 @@ import {
 // eslint-disable-next-line no-restricted-imports
 import { find } from 'puppeteer-testing-library';
 
-describe( 'Widgets screen', () => {
+describe( 'Widgets Customizer', () => {
 	beforeEach( async () => {
 		await visitAdminPage( 'customize.php' );
 	} );
@@ -105,10 +105,9 @@ describe( 'Widgets screen', () => {
 		} );
 		await inlineAddBlockButton.click();
 
-		const inlineInserterSearchBox = await find( {
-			role: 'searchbox',
-			name: 'Search for blocks and patterns',
-		} );
+		const inlineInserterSearchBox = await page.waitForSelector(
+			'aria/Search for blocks and patterns[role="searchbox"]'
+		);
 
 		await expect( inlineInserterSearchBox ).toHaveFocus();
 
@@ -173,16 +172,7 @@ describe( 'Widgets screen', () => {
 		);
 
 		// Expect the search box to be found in the preview iframe.
-		await find(
-			{
-				role: 'searchbox',
-				name: 'My Search',
-				selector: '.widget-content *',
-			},
-			{
-				root: frameContentDocument,
-			}
-		);
+		await contentFrame.waitForSelector( 'input[type="search"]' );
 	} );
 
 	it( 'should open the inspector panel', async () => {
