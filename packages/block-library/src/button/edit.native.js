@@ -184,7 +184,12 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor, attributes, gradientValue } = this.props;
+		const {
+			backgroundColor,
+			attributes,
+			gradientValue,
+			mergedStyle,
+		} = this.props;
 		const { customGradient } = attributes;
 
 		if ( customGradient || gradientValue ) {
@@ -196,18 +201,20 @@ class ButtonEdit extends Component {
 			colorAndStyleProps.style?.background ||
 			// We still need the `backgroundColor.color` to support colors from the color pallete (not custom ones)
 			backgroundColor.color ||
+			mergedStyle?.backgroundColor ||
 			styles.defaultButton.backgroundColor
 		);
 	}
 
 	getTextColor() {
-		const { textColor, attributes } = this.props;
+		const { textColor, attributes, mergedStyle } = this.props;
 		const colorAndStyleProps = getColorAndStyleProps( attributes );
 
 		return (
 			colorAndStyleProps.style?.color ||
 			// We still need the `textColor.color` to support colors from the color pallete (not custom ones)
 			textColor.color ||
+			mergedStyle?.color ||
 			styles.defaultButton.color
 		);
 	}
@@ -351,6 +358,7 @@ class ButtonEdit extends Component {
 			mergeBlocks,
 			parentWidth,
 			setAttributes,
+			mergedStyle,
 		} = this.props;
 		const {
 			placeholder,
@@ -437,6 +445,7 @@ class ButtonEdit extends Component {
 						} }
 						textAlign={ align }
 						placeholderTextColor={
+							mergedStyle?.color ||
 							styles.placeholderTextColor.color
 						}
 						identifier="text"

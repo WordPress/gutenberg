@@ -438,7 +438,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 )( memo( ColumnsEditContainer ) );
 
 const ColumnsEdit = ( props ) => {
-	const { clientId, isSelected } = props;
+	const { clientId, isSelected, mergedStyle } = props;
 	const {
 		columnCount,
 		isDefaultColumns,
@@ -501,7 +501,7 @@ const ColumnsEdit = ( props ) => {
 	}, [] );
 
 	return (
-		<>
+		<View style={ mergedStyle }>
 			<ColumnsEditContainerWrapper
 				columnCount={ columnCount }
 				innerWidths={ memoizedInnerWidths }
@@ -516,7 +516,7 @@ const ColumnsEdit = ( props ) => {
 				clientId={ clientId }
 				isVisible={ isVisible }
 			/>
-		</>
+		</View>
 	);
 };
 
