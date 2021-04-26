@@ -27,21 +27,5 @@ export async function getAllBlocks() {
 		}
 		return blocksCopy;
 	} );
-
-	if ( typeof allBlocks === 'undefined' ) {
-		const listener = ( message ) => {
-			// eslint-disable-next-line no-console
-			console.log( message.text() );
-		};
-		page.on( 'console', listener );
-		await page.evaluate( () => {
-			const _allBlocks = wp.data
-				.select( 'core/block-editor' )
-				.getBlocks();
-			// eslint-disable-next-line no-console
-			console.log( _allBlocks, JSON.stringify( _allBlocks ) );
-		} );
-		page.off( 'console', listener );
-	}
 	return allBlocks;
 }
