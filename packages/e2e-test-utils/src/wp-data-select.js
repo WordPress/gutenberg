@@ -10,10 +10,9 @@
 export async function wpDataSelect( store, selector, ...parameters ) {
 	return page.evaluate(
 		( _store, _selector, ..._parameters ) => {
-			const data = window.wp.data
+			return window.wp.data
 				.select( _store )
 				[ _selector ]( ..._parameters );
-			return JSON.parse( JSON.stringify( data ) );
 		},
 		store,
 		selector,
