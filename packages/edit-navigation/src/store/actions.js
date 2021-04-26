@@ -26,6 +26,8 @@ import {
 	computeCustomizedAttribute,
 } from './utils';
 
+const { ajaxurl } = window;
+
 /**
  * Creates a menu item for every block that doesn't have an associated menuItem.
  * Requests POST /wp/v2/menu-items once for every menu item created.
@@ -184,7 +186,7 @@ function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
 	);
 
 	return yield apiFetch( {
-		url: '/wp-admin/admin-ajax.php',
+		url: ajaxurl || '/wp-admin/admin-ajax.php',
 		method: 'POST',
 		body,
 	} );
