@@ -32,6 +32,20 @@ function exists( filename ) {
 }
 
 /**
+ * Is the path name a directory?
+ *
+ * @param {string} pathname
+ *
+ * @return {boolean} True if the given path is a directory.
+ */
+function isDirectory( pathname ) {
+	try {
+		return fs.statSync( pathname ).isDirectory();
+	} catch ( e ) {}
+	return false;
+}
+
+/**
  * Determine if a file is source code.
  *
  * Exclude test files including .js files inside of __tests__ or test folders
@@ -43,12 +57,16 @@ function exists( filename ) {
  * @return {boolean} True if the file a source file.
  */
 function isSourceFile( filename ) {
+	// Only run this regex on the relative path, otherwise we might run
+	// into some false positives when eg. the project directory contains `src`
+	const relativePath = path.relative( process.cwd(), filename );
+
 	return (
-		/\/src\/.+\.(js|json|scss)$/.test( filename ) &&
+		/\/src\/.+\.(js|json|scss)$/.test( relativePath ) &&
 		! [
 			/\/(benchmark|__mocks__|__tests__|test|storybook|stories)\/.+/,
 			/.\.(spec|test)\.js$/,
-		].some( ( regex ) => regex.test( filename ) )
+		].some( ( regex ) => regex.test( relativePath ) )
 	);
 }
 
@@ -77,6 +95,13 @@ function isModulePackage( filename ) {
  * @return {boolean | symbol} True if the file should be watched.
  */
 function isWatchableFile( filename, skip ) {
+	// Recursive file watching is not available on a Linux-based OS. If this is the case,
+	// the watcher library falls back to watching changes in the subdirectories
+	// and passes the directories to this filter callback instead.
+	if ( isDirectory( filename ) ) {
+		return true;
+	}
+
 	return isSourceFile( filename ) && isModulePackage( filename )
 		? true
 		: skip;
@@ -147,6 +172,12 @@ watch(
 	PACKAGES_DIR,
 	{ recursive: true, delay: 500, filter: isWatchableFile },
 	( event, filename ) => {
+		// Double check whether we're dealing with a file that needs watching, to accomodate for
+		// the inability to watch recursively on linux-based operating systems.
+		if ( ! isSourceFile( filename ) || ! isModulePackage( filename ) ) {
+			return;
+		}
+
 		switch ( event ) {
 			case 'update':
 				updateBuildFile( event, filename );
