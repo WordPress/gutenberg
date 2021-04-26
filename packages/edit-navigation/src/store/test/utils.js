@@ -348,6 +348,7 @@ describe( 'computeCustomizedAttribute', () => {
 				object_id: 678,
 				url: 'https://localhost:8889/page-example/',
 				xfn: [ '' ],
+				target: '',
 			},
 		} );
 	} );
