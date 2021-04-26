@@ -167,8 +167,7 @@ $color-control-label-height: 20px;
 
 // Ensure that an empty block has space around the appender.
 .wp-block-navigation-placeholder,
-.wp-block-navigation-placeholder__preview,
-.is-selected .wp-block-navigation__container {
+.wp-block-navigation-placeholder__preview {
 	min-height: $grid-unit-05 + $grid-unit-05 + $button-size;
 }
 
