@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { useContextSystem } from '@wp-g2/context';
 import { css, cx, getBoxShadow, ui } from '@wp-g2/styles';
 import { isNil } from 'lodash';
 
@@ -13,10 +12,11 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { useContextSystem } from '../context';
 import * as styles from './styles';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
  */
 export function useElevation( props ) {
 	const {

@@ -2,19 +2,7 @@
 
 exports[`props should render (Flex) gap 1`] = `
 Snapshot Diff:
-- Received styles
-+ Base styles
-
-@@ -1,8 +1,8 @@
-  Array [
-    Object {
--     "--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 1)",
-+     "--wp-g2-flex-gap": "calc(var(--wp-g2-grid-base) * 2)",
-      "-moz-appearance": "none",
-      "-moz-osx-font-smoothing": "grayscale",
-      "-moz-user-select": "none",
-      "-ms-flex-align": "center",
-      "-ms-flex-direction": "row",
+Compared values have no visual difference.
 `;
 
 exports[`props should render as link (href) 1`] = `
@@ -26,59 +14,31 @@ Snapshot Diff:
 - <a
 + <button
     aria-busy="false"
-    class="components-flex wp-components-flex ic-17cs4ki components-base-button wp-components-base-button components-button wp-components-button ic-i0z4gr ic-1d6ec17 ic-192yz5d css-pr721c"
+    class="components-flex css-mbzchx css-0 components-base-button css-1px5u32 css-sldsgx css-0 components-button css-19ecm5d-Flex-ItemsRow-classes css-1mm2cvy-View egi4jkx0"
     data-active="false"
     data-destructive="false"
     data-focused="false"
-    data-g2-c16t="true"
-    data-g2-component="Button"
     data-icon="false"
+    data-wp-c16t="true"
+    data-wp-component="Button"
 -   href="#"
     type="button"
   >
     <span
-      class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1493c17"
-      data-g2-c16t="true"
-@@ -21,6 +20,6 @@
-      aria-hidden="true"
-      class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-8abvx7"
-      data-g2-c16t="true"
+      class="css-1636tkh-Item css-jhhyjf-block components-flex-item css-s8mfij css-1mm2cvy-View egi4jkx0"
+      data-g2-component="ButtonContent"
+@@ -23,6 +22,6 @@
+      class="css-zsg5ag-Elevation css-178mhg components-elevation css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonElevation"
+      data-wp-c16t="true"
+      data-wp-component="Elevation"
     />
 - </a>
 + </button>
 `;
 
 exports[`props should render correctly 1`] = `
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  --wp-g2-flex-gap: calc(4px * 2);
-  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-box-pack: center;
-  -webkit-justify-content: center;
-  -ms-flex-pack: center;
-  justify-content: center;
-  width: 100%;
+.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9 {
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -126,7 +86,43 @@ exports[`props should render correctly 1`] = `
   -ms-user-select: none;
   user-select: none;
   width: auto;
-  text-align: center;
+}
+
+.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9:hover,
+.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9:active,
+.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9:focus {
+  -webkit-transition: all 200ms cubic-bezier( 0.12,0.8,0.32,1 );
+  -webkit-transition: all var(--wp-g2-transition-duration) cubic-bezier( 0.12,0.8,0.32,1 );
+  transition: all 200ms cubic-bezier( 0.12,0.8,0.32,1 );
+  transition: all var(--wp-g2-transition-duration) cubic-bezier( 0.12,0.8,0.32,1 );
+}
+
+.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[disabled]:not( [aria-busy='true'] ),
+.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[aria-disabled='true']:not( [aria-busy='true'] ) {
+  opacity: 0.5;
+  cursor: auto;
+}
+
+.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9:focus {
+  box-shadow: 0 0 0 0.5px #007cba;
+  box-shadow: var(--wp-g2-control-box-shadow-focus);
+}
+
+.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[data-destructive='true']:focus {
+  box-shadow: 0 0 0 0.5px #D94F4F;
+  box-shadow: var(--wp-g2-control-destructive-box-shadow-focus);
+}
+
+.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9[data-icon='true'] {
+  min-width: 30px;
+  min-width: var(--wp-g2-control-height);
+}
+
+.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9 svg {
+  display: block;
+}
+
+.emotion-11.emotion-11.emotion-11.emotion-11.emotion-11.emotion-11.emotion-11 {
   color: #007cba;
   color: var(--wp-g2-button-text-color);
   font-weight: 600;
@@ -134,6 +130,14 @@ exports[`props should render correctly 1`] = `
   padding-left: var(--wp-g2-button-padding-x);
   padding-right: calc(12px * calc(4/3));
   padding-right: var(--wp-g2-button-padding-x);
+}
+
+.emotion-11.emotion-11.emotion-11.emotion-11.emotion-11.emotion-11.emotion-11:active {
+  color: #007cba;
+  color: var(--wp-g2-button-text-color-active);
+}
+
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
   background-color: transparent;
   background-color: var(--wp-g2-button-secondary-color);
   border-color: #007cba;
@@ -142,75 +146,15 @@ exports[`props should render correctly 1`] = `
   color: var(--wp-g2-button-secondary-text-color);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
-  margin-left: calc(4px * 2);
-  margin-left: calc(var(--wp-g2-grid-base) * 2);
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
-  min-width: 0;
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:hover,
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active,
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
-  -webkit-transition: all 200ms cubic-bezier( 0.12,0.8,0.32,1 );
-  -webkit-transition: all var(--wp-g2-transition-duration) cubic-bezier( 0.12,0.8,0.32,1 );
-  transition: all 200ms cubic-bezier( 0.12,0.8,0.32,1 );
-  transition: all var(--wp-g2-transition-duration) cubic-bezier( 0.12,0.8,0.32,1 );
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[disabled]:not( [aria-busy='true'] ),
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[aria-disabled='true']:not( [aria-busy='true'] ) {
-  opacity: 0.5;
-  cursor: auto;
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus {
-  box-shadow: 0 0 0 0.5px #007cba;
-  box-shadow: var(--wp-g2-control-box-shadow-focus);
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:focus {
-  box-shadow: 0 0 0 0.5px #D94F4F;
-  box-shadow: var(--wp-g2-control-destructive-box-shadow-focus);
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-icon='true'] {
-  min-width: 30px;
-  min-width: var(--wp-g2-control-height);
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 svg {
-  display: block;
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active {
-  color: #007cba;
-  color: var(--wp-g2-button-text-color-active);
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:hover {
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12:hover {
   background-color: transparent;
   background-color: var(--wp-g2-button-secondary-color-hover);
   border-color: #007cba;
   border-color: var(--wp-g2-button-secondary-border-color-hover);
 }
 
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:focus,
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-focused='true'] {
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12:focus,
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12[data-focused='true'] {
   background-color: transparent;
   background-color: var(--wp-g2-button-secondary-color-focus);
   border-color: #007cba;
@@ -219,7 +163,7 @@ exports[`props should render correctly 1`] = `
   color: var(--wp-g2-button-secondary-text-color-focus);
 }
 
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:active {
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12:active {
   background-color: rgba(0, 0, 0, 0.05);
   background-color: var(--wp-g2-button-secondary-color-active);
   border-color: #007cba;
@@ -228,83 +172,37 @@ exports[`props should render correctly 1`] = `
   color: var(--wp-g2-button-secondary-text-color-active);
 }
 
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true'] {
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12[data-destructive='true'] {
   border-color: #D94F4F;
   border-color: var(--wp-g2-color-destructive);
   color: #D94F4F;
   color: var(--wp-g2-color-destructive);
 }
 
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:hover,
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:active,
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:focus,
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true'][data-focused='true'] {
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12[data-destructive='true']:hover,
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12[data-destructive='true']:active,
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12[data-destructive='true']:focus,
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12[data-destructive='true'][data-focused='true'] {
   border-color: #D94F4F;
   border-color: var(--wp-g2-color-destructive);
   color: #D94F4F;
   color: var(--wp-g2-color-destructive);
 }
 
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2[data-destructive='true']:active {
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12[data-destructive='true']:active {
   color: #1e1e1e;
   color: var(--wp-g2-color-text);
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  display: block;
-  max-height: 100%;
-  max-width: 100%;
-  min-height: 0;
-  min-width: 0;
+.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
   display: var(--wp-g2-flex-item-display);
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
   font-size: 13px;
   font-size: var(--wp-g2-font-size);
   opacity: 1;
   white-space: nowrap;
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  background: transparent;
-  display: block;
-  margin: 0 !important;
-  pointer-events: none;
-  position: absolute;
-  will-change: box-shadow;
+.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
   border-radius: inherit;
   bottom: -1px;
   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
@@ -319,41 +217,82 @@ exports[`props should render correctly 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
+.emotion-0 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
 }
 
-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  -webkit-transition: none !important;
-  transition: none !important;
+.emotion-1 {
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
+}
+
+.emotion-5 {
+  background: transparent;
+  display: block;
+  margin: 0 !important;
+  pointer-events: none;
+  position: absolute;
+  will-change: box-shadow;
+}
+
+.emotion-14 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  -ms-flex-pack: center;
+  justify-content: center;
+  width: 100%;
+  text-align: center;
+}
+
+.emotion-14 > * + *:not(marquee) {
+  margin-left: calc(4px * 2);
+}
+
+.emotion-14 > * {
+  min-width: 0;
 }
 
 <button
   aria-busy="false"
-  class="components-flex wp-components-flex ic-17cs4ki components-base-button wp-components-base-button components-button wp-components-button ic-i0z4gr ic-1d6ec17 ic-192yz5d emotion-2"
+  class="components-flex emotion-9 emotion-10 components-base-button emotion-11 emotion-12 emotion-10 components-button emotion-14 emotion-3 emotion-4"
   data-active="false"
   data-destructive="false"
   data-focused="false"
-  data-g2-c16t="true"
-  data-g2-component="Button"
   data-icon="false"
+  data-wp-c16t="true"
+  data-wp-component="Button"
   type="button"
 >
   <span
-    class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d emotion-0"
-    data-g2-c16t="true"
+    class="emotion-0 emotion-1 components-flex-item emotion-2 emotion-3 emotion-4"
     data-g2-component="ButtonContent"
+    data-wp-c16t="true"
+    data-wp-component="FlexItem"
   >
     Lorem
   </span>
   <span
     aria-hidden="true"
-    class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-1"
-    data-g2-c16t="true"
+    class="emotion-5 emotion-6 components-elevation emotion-3 emotion-4"
     data-g2-component="ButtonElevation"
+    data-wp-c16t="true"
+    data-wp-component="Elevation"
   />
 </button>
 `;
@@ -367,24 +306,24 @@ Snapshot Diff:
   <button
     aria-busy="false"
 -   aria-describedby="1"
-    class="components-flex wp-components-flex ic-17cs4ki components-base-button wp-components-base-button components-button wp-components-button ic-i0z4gr ic-1d6ec17 ic-192yz5d css-pr721c"
+    class="components-flex css-mbzchx css-0 components-base-button css-1px5u32 css-sldsgx css-0 components-button css-19ecm5d-Flex-ItemsRow-classes css-1mm2cvy-View egi4jkx0"
     data-active="false"
     data-destructive="false"
     data-focused="false"
-    data-g2-c16t="true"
-@@ -13,11 +12,11 @@
-    <span
-      class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1493c17"
-      data-g2-c16t="true"
+    data-icon="false"
+@@ -14,11 +13,11 @@
+      class="css-1636tkh-Item css-jhhyjf-block components-flex-item css-s8mfij css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonContent"
+      data-wp-c16t="true"
+      data-wp-component="FlexItem"
     >
 -     WordPress.org
 +     Lorem
     </span>
     <span
       aria-hidden="true"
-      class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-8abvx7"
-      data-g2-c16t="true"
+      class="css-zsg5ag-Elevation css-178mhg components-elevation css-1mm2cvy-View egi4jkx0"
+      data-g2-component="ButtonElevation"
 `;
 
 exports[`props should render disabled 1`] = `
@@ -396,11 +335,11 @@ Snapshot Diff:
   <button
     aria-busy="false"
 -   aria-disabled="true"
-    class="components-flex wp-components-flex ic-17cs4ki components-base-button wp-components-base-button components-button wp-components-button ic-i0z4gr ic-1d6ec17 ic-192yz5d css-pr721c"
+    class="components-flex css-mbzchx css-0 components-base-button css-1px5u32 css-sldsgx css-0 components-button css-19ecm5d-Flex-ItemsRow-classes css-1mm2cvy-View egi4jkx0"
     data-active="false"
     data-destructive="false"
     data-focused="false"
-    data-g2-c16t="true"
+    data-icon="false"
 `;
 
 exports[`props should render elevation 1`] = `
@@ -413,15 +352,16 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -15,29 +15,10 @@
-      data-g2-component="ButtonContent"
+@@ -16,30 +16,10 @@
+      data-wp-component="FlexItem"
     >
       Lorem
     </span>
     <span
--     class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1wwr4qj"
--     data-g2-c16t="true"
+-     class="css-1636tkh-Item components-flex-item css-37xewi css-1mm2cvy-View egi4jkx0"
 -     data-g2-component="ButtonCaret"
+-     data-wp-c16t="true"
+-     data-wp-component="FlexItem"
 -   >
 -     <svg
 -       aria-hidden="true"
@@ -439,10 +379,10 @@ Snapshot Diff:
 -   </span>
 -   <span
       aria-hidden="true"
-      class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-8abvx7"
-      data-g2-c16t="true"
+      class="css-zsg5ag-Elevation css-178mhg components-elevation css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonElevation"
-    />
+      data-wp-c16t="true"
+      data-wp-component="Elevation"
 `;
 
 exports[`props should render icon 1`] = `
@@ -450,28 +390,31 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -4,20 +4,13 @@
+@@ -2,23 +2,15 @@
+    aria-busy="false"
+    class="components-flex css-mbzchx css-0 components-base-button css-1px5u32 css-sldsgx css-0 components-button css-19ecm5d-Flex-ItemsRow-classes css-1mm2cvy-View egi4jkx0"
     data-active="false"
     data-destructive="false"
     data-focused="false"
-    data-g2-c16t="true"
-    data-g2-component="Button"
 -   data-icon="true"
 +   data-icon="false"
+    data-wp-c16t="true"
+    data-wp-component="Button"
     type="button"
-  >
+- >
 -   <span
--     class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1dor7w6"
--     data-g2-c16t="true"
+-     class="css-1636tkh-Item components-flex-item css-gzcy0h css-1mm2cvy-View egi4jkx0"
 -     data-g2-component="ButtonIcon"
--   >
+-     data-wp-c16t="true"
+-     data-wp-component="FlexItem"
+  >
 -     <svg />
 -   </span>
     <span
-      class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1493c17"
-      data-g2-c16t="true"
+      class="css-1636tkh-Item css-jhhyjf-block components-flex-item css-s8mfij css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonContent"
-    >
+      data-wp-c16t="true"
+      data-wp-component="FlexItem"
 `;
 
 exports[`props should render isControl 1`] = `
@@ -479,29 +422,25 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -17,19 +17,18 @@
-      "-webkit-justify-content": "center",
-      "-webkit-text-decoration": "none",
-      "-webkit-user-select": "none",
-      "align-items": "center",
-      "appearance": "none",
+@@ -35,18 +35,10 @@
+      "touch-action": "manipulation",
+      "user-select": "none",
+      "width": "auto",
+    },
+    Object {
 -     "background-color": "var(--wp-g2-control-background-color)",
 -     "border": "1px solid",
 -     "border-color": "var(--wp-g2-control-border-color)",
-+     "background-color": "var(--wp-g2-button-secondary-color)",
-+     "border-color": "var(--wp-g2-button-secondary-border-color)",
-      "border-radius": "var(--wp-g2-control-border-radius)",
-      "border-style": "solid",
-      "border-width": "1px",
-      "box-shadow": "0 0 0 var(--wp-g2-control-box-shadow-focus-size) transparent",
-      "box-sizing": "border-box",
 -     "color": "var(--wp-g2-color-text)",
-+     "color": "var(--wp-g2-button-secondary-text-color)",
-      "cursor": "pointer",
-      "display": "inline-flex",
-      "flex-direction": "row",
-      "font-family": "var(--wp-g2-font-family)",
-      "font-size": "var(--wp-g2-font-size)",
+-     "font-family": "var(--wp-g2-font-family)",
+-     "font-size": "var(--wp-g2-font-size)",
+-   },
+-   Object {
+      "color": "var(--wp-g2-button-text-color)",
+      "font-weight": "600",
+      "padding-left": "var(--wp-g2-button-padding-x)",
+      "padding-right": "var(--wp-g2-button-padding-x)",
+    },
 `;
 
 exports[`props should render isDestructive 1`] = `
@@ -509,17 +448,33 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -48,10 +48,6 @@
-      "text-decoration": "none",
+@@ -35,26 +35,19 @@
       "touch-action": "manipulation",
       "user-select": "none",
       "width": "auto",
     },
+    Object {
+-     "color": "var(--wp-g2-color-destructive)",
+-   },
+-   Object {
+      "color": "var(--wp-g2-button-text-color)",
+      "font-weight": "600",
+      "padding-left": "var(--wp-g2-button-padding-x)",
+      "padding-right": "var(--wp-g2-button-padding-x)",
+    },
+    Object {
+      "background-color": "var(--wp-g2-button-secondary-color)",
+      "border-color": "var(--wp-g2-button-secondary-border-color)",
+      "color": "var(--wp-g2-button-secondary-text-color)",
+-   },
 -   Object {
 -     "border-color": "var(--wp-g2-color-destructive)",
 -     "color": "var(--wp-g2-color-destructive)",
--   },
-  ]
+    },
+    Object {
+      "-ms-flex-align": "center",
+      "-ms-flex-direction": "row",
+      "-ms-flex-pack": "center",
 `;
 
 exports[`props should render isLoading 1`] = `
@@ -529,7 +484,24 @@ Compared values have no visual difference.
 
 exports[`props should render isNarrow 1`] = `
 Snapshot Diff:
-Compared values have no visual difference.
+- Received styles
++ Base styles
+
+@@ -35,14 +35,10 @@
+      "touch-action": "manipulation",
+      "user-select": "none",
+      "width": "auto",
+    },
+    Object {
+-     "padding-left": "var(--wp-g2-control-padding-x)",
+-     "padding-right": "var(--wp-g2-control-padding-x)",
+-   },
+-   Object {
+      "color": "var(--wp-g2-button-text-color)",
+      "font-weight": "600",
+      "padding-left": "var(--wp-g2-button-padding-x)",
+      "padding-right": "var(--wp-g2-button-padding-x)",
+    },
 `;
 
 exports[`props should render isRounded 1`] = `
@@ -537,19 +509,20 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -19,11 +19,11 @@
-      "-webkit-user-select": "none",
-      "align-items": "center",
-      "appearance": "none",
-      "background-color": "var(--wp-g2-button-secondary-color)",
-      "border-color": "var(--wp-g2-button-secondary-border-color)",
+@@ -35,13 +35,10 @@
+      "touch-action": "manipulation",
+      "user-select": "none",
+      "width": "auto",
+    },
+    Object {
 -     "border-radius": "99999px",
-+     "border-radius": "var(--wp-g2-control-border-radius)",
-      "border-style": "solid",
-      "border-width": "1px",
-      "box-shadow": "0 0 0 var(--wp-g2-control-box-shadow-focus-size) transparent",
-      "box-sizing": "border-box",
-      "color": "var(--wp-g2-button-secondary-text-color)",
+-   },
+-   Object {
+      "color": "var(--wp-g2-button-text-color)",
+      "font-weight": "600",
+      "padding-left": "var(--wp-g2-button-padding-x)",
+      "padding-right": "var(--wp-g2-button-padding-x)",
+    },
 `;
 
 exports[`props should render isSubtle 1`] = `
@@ -557,26 +530,21 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -18,17 +18,17 @@
-      "-webkit-text-decoration": "none",
-      "-webkit-user-select": "none",
-      "align-items": "center",
-      "appearance": "none",
-      "background-color": "var(--wp-g2-button-secondary-color)",
+@@ -35,14 +35,10 @@
+      "touch-action": "manipulation",
+      "user-select": "none",
+      "width": "auto",
+    },
+    Object {
 -     "border-color": "var(--wp-g2-control-border-color-subtle)",
-+     "border-color": "var(--wp-g2-button-secondary-border-color)",
-      "border-radius": "var(--wp-g2-control-border-radius)",
-      "border-style": "solid",
-      "border-width": "1px",
-      "box-shadow": "0 0 0 var(--wp-g2-control-box-shadow-focus-size) transparent",
-      "box-sizing": "border-box",
 -     "color": "var(--wp-g2-color-text)",
-+     "color": "var(--wp-g2-button-secondary-text-color)",
-      "cursor": "pointer",
-      "display": "inline-flex",
-      "flex-direction": "row",
-      "font-family": "var(--wp-g2-font-family)",
-      "font-size": "var(--wp-g2-font-size)",
+-   },
+-   Object {
+      "color": "var(--wp-g2-button-text-color)",
+      "font-weight": "600",
+      "padding-left": "var(--wp-g2-button-padding-x)",
+      "padding-right": "var(--wp-g2-button-padding-x)",
+    },
 `;
 
 exports[`props should render prefix 1`] = `
@@ -584,26 +552,27 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -8,19 +8,10 @@
-    data-g2-component="Button"
-    data-icon="false"
+@@ -8,20 +8,10 @@
+    data-wp-c16t="true"
+    data-wp-component="Button"
     type="button"
   >
     <span
--     class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1dor7w6"
--     data-g2-c16t="true"
+-     class="css-1636tkh-Item components-flex-item css-gzcy0h css-1mm2cvy-View egi4jkx0"
 -     data-g2-component="ButtonPrefix"
+-     data-wp-c16t="true"
+-     data-wp-component="FlexItem"
 -   >
 -     <span>
 -       Prefix
 -     </span>
 -   </span>
 -   <span
-      class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1493c17"
-      data-g2-c16t="true"
+      class="css-1636tkh-Item css-jhhyjf-block components-flex-item css-s8mfij css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonContent"
+      data-wp-c16t="true"
+      data-wp-component="FlexItem"
     >
-      Lorem
 `;
 
 exports[`props should render size 1`] = `
@@ -611,25 +580,22 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -35,15 +35,15 @@
+@@ -41,15 +41,10 @@
       "font-weight": "600",
-      "height": "auto",
-      "justify-content": "center",
-      "line-height": "1",
-      "margin": "0",
+      "padding-left": "var(--wp-g2-button-padding-x)",
+      "padding-right": "var(--wp-g2-button-padding-x)",
+    },
+    Object {
 -     "min-height": "var(--wp-g2-control-height-small)",
-+     "min-height": "var(--wp-g2-control-height)",
-      "outline": "none",
-      "padding-bottom": "calc(var(--wp-g2-grid-base) * 1)",
 -     "padding-left": "var(--wp-g2-control-padding-x)",
 -     "padding-right": "var(--wp-g2-control-padding-x)",
-+     "padding-left": "var(--wp-g2-button-padding-x)",
-+     "padding-right": "var(--wp-g2-button-padding-x)",
-      "padding-top": "calc(var(--wp-g2-grid-base) * 1)",
-      "position": "relative",
-      "text-align": "center",
-      "text-decoration": "none",
-      "touch-action": "manipulation",
+-   },
+-   Object {
+      "background-color": "var(--wp-g2-button-secondary-color)",
+      "border-color": "var(--wp-g2-button-secondary-border-color)",
+      "color": "var(--wp-g2-button-secondary-text-color)",
+    },
+    Object {
 `;
 
 exports[`props should render suffix 1`] = `
@@ -637,15 +603,16 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -15,19 +15,10 @@
-      data-g2-component="ButtonContent"
+@@ -16,20 +16,10 @@
+      data-wp-component="FlexItem"
     >
       Lorem
     </span>
     <span
--     class="components-flex-item wp-components-flex-item ic-1p3tlc8 ic-192yz5d css-1dor7w6"
--     data-g2-c16t="true"
+-     class="css-1636tkh-Item components-flex-item css-gzcy0h css-1mm2cvy-View egi4jkx0"
 -     data-g2-component="ButtonSuffix"
+-     data-wp-c16t="true"
+-     data-wp-component="FlexItem"
 -   >
 -     <span>
 -       Suffix
@@ -653,10 +620,10 @@ Snapshot Diff:
 -   </span>
 -   <span
       aria-hidden="true"
-      class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-8abvx7"
-      data-g2-c16t="true"
+      class="css-zsg5ag-Elevation css-178mhg components-elevation css-1mm2cvy-View egi4jkx0"
       data-g2-component="ButtonElevation"
-    />
+      data-wp-c16t="true"
+      data-wp-component="Elevation"
 `;
 
 exports[`props should render variant 1`] = `
@@ -664,26 +631,21 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -17,18 +17,18 @@
-      "-webkit-justify-content": "center",
-      "-webkit-text-decoration": "none",
-      "-webkit-user-select": "none",
-      "align-items": "center",
-      "appearance": "none",
+@@ -41,13 +41,13 @@
+      "font-weight": "600",
+      "padding-left": "var(--wp-g2-button-padding-x)",
+      "padding-right": "var(--wp-g2-button-padding-x)",
+    },
+    Object {
 -     "background-color": "var(--wp-g2-button-primary-color)",
 -     "border-color": "var(--wp-g2-button-primary-border-color)",
+-     "color": "var(--wp-g2-button-primary-text-color)",
 +     "background-color": "var(--wp-g2-button-secondary-color)",
 +     "border-color": "var(--wp-g2-button-secondary-border-color)",
-      "border-radius": "var(--wp-g2-control-border-radius)",
-      "border-style": "solid",
-      "border-width": "1px",
-      "box-shadow": "0 0 0 var(--wp-g2-control-box-shadow-focus-size) transparent",
-      "box-sizing": "border-box",
--     "color": "var(--wp-g2-button-primary-text-color)",
 +     "color": "var(--wp-g2-button-secondary-text-color)",
-      "cursor": "pointer",
-      "display": "inline-flex",
-      "flex-direction": "row",
-      "font-family": "var(--wp-g2-font-family)",
-      "font-size": "var(--wp-g2-font-size)",
+    },
+    Object {
+      "-ms-flex-align": "center",
+      "-ms-flex-direction": "row",
+      "-ms-flex-pack": "center",
 `;

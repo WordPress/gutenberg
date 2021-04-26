@@ -1,43 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render alignLabel 1`] = `
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  width: 100%;
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
 .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
   display: inline-block;
   line-height: calc(13px * 1.2);
   line-height: calc(var(--wp-g2-font-size) * 1.2);
@@ -47,33 +11,6 @@ exports[`props should render alignLabel 1`] = `
   padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
   padding-top: calc((30px - calc(13px * 1.2)) / 2);
   padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
-  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
-  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
-  padding-top: calc((30px - calc(13px * 1.2)) / 2);
-  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
-  color: #1e1e1e;
-  color: var(--wp-g2-color-text);
-  line-height: 1.2;
-  line-height: var(--wp-g2-font-line-height-base);
-  font-size: calc((13 / 13) * 13px);
-  font-size: calc((13 / 13) * var(--wp-g2-font-size));
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  text-align: right;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
 }
 
 .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:active {
@@ -90,15 +27,40 @@ exports[`props should render alignLabel 1`] = `
   }
 }
 
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
+  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
+  padding-top: calc((30px - calc(13px * 1.2)) / 2);
+  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
+}
+
+.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.emotion-6 {
+  width: 100%;
+}
+
+.emotion-2 {
+  color: #000;
+  line-height: 1.2;
+  margin: 0;
+  font-size: calc((13 / 13) * 13px);
+  font-weight: normal;
+  text-align: right;
+}
+
 <div
-  class="components-form-group wp-components-form-group ic-1tpea9i ic-192yz5d emotion-1"
-  data-g2-c16t="true"
-  data-g2-component="FormGroup"
+  class="emotion-6 components-form-group emotion-4 emotion-5"
+  data-wp-c16t="true"
+  data-wp-component="FormGroup"
 >
   <label
-    class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label ic-k1x6d ic-7u3orf ic-1m45iq3 ic-192yz5d emotion-0"
-    data-g2-c16t="true"
-    data-g2-component="ControlLabel"
+    class="emotion-0 emotion-1 components-truncate components-text components-control-label emotion-2 emotion-3 emotion-4 emotion-5"
+    data-wp-c16t="true"
+    data-wp-component="ControlLabel"
     for="fname"
   >
     First name
@@ -111,43 +73,7 @@ exports[`props should render alignLabel 1`] = `
 `;
 
 exports[`props should render vertically 1`] = `
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  width: 100%;
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
 .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
   display: inline-block;
   line-height: calc(13px * 1.2);
   line-height: calc(var(--wp-g2-font-size) * 1.2);
@@ -157,33 +83,6 @@ exports[`props should render vertically 1`] = `
   padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
   padding-top: calc((30px - calc(13px * 1.2)) / 2);
   padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
-  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
-  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
-  padding-top: calc((30px - calc(13px * 1.2)) / 2);
-  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
-  color: #1e1e1e;
-  color: var(--wp-g2-color-text);
-  line-height: 1.2;
-  line-height: var(--wp-g2-font-line-height-base);
-  font-size: calc((13 / 13) * 13px);
-  font-size: calc((13 / 13) * var(--wp-g2-font-size));
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  text-align: left;
-  display: inline-block;
-  vertical-align: middle;
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
 }
 
 .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:active {
@@ -200,15 +99,40 @@ exports[`props should render vertically 1`] = `
   }
 }
 
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
+  padding-bottom: calc((30px - calc(13px * 1.2)) / 2);
+  padding-bottom: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
+  padding-top: calc((30px - calc(13px * 1.2)) / 2);
+  padding-top: calc((var(--wp-g2-control-height) - calc(var(--wp-g2-font-size) * 1.2)) / 2);
+}
+
+.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.emotion-6 {
+  width: 100%;
+}
+
+.emotion-2 {
+  color: #000;
+  line-height: 1.2;
+  margin: 0;
+  font-size: calc((13 / 13) * 13px);
+  font-weight: normal;
+  text-align: left;
+}
+
 <div
-  class="components-form-group wp-components-form-group ic-1tpea9i ic-192yz5d emotion-1"
-  data-g2-c16t="true"
-  data-g2-component="FormGroup"
+  class="emotion-6 components-form-group emotion-4 emotion-5"
+  data-wp-c16t="true"
+  data-wp-component="FormGroup"
 >
   <label
-    class="components-truncate wp-components-truncate components-text wp-components-text components-control-label wp-components-control-label ic-k1x6d ic-7u3orf ic-1m45iq3 ic-192yz5d emotion-0"
-    data-g2-c16t="true"
-    data-g2-component="ControlLabel"
+    class="emotion-0 emotion-1 components-truncate components-text components-control-label emotion-2 emotion-3 emotion-4 emotion-5"
+    data-wp-c16t="true"
+    data-wp-component="ControlLabel"
     for="fname"
   >
     First name
