@@ -7,15 +7,15 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useCallback, useState, useRef } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import {
 	Button,
 	ButtonGroup,
+	Dropdown,
 	KeyboardShortcuts,
 	PanelBody,
 	TextControl,
 	ToolbarButton,
-	Popover,
 } from '@wordpress/components';
 import {
 	BlockControls,
@@ -62,64 +62,39 @@ function WidthPanel( { selectedWidth, setAttributes } ) {
 }
 
 function URLPicker( {
-	isSelected,
-	url,
-	setAttributes,
-	opensInNewTab,
-	onToggleOpenInNewTab,
 	anchorRef,
+	isSelected,
+	onToggleOpenInNewTab,
+	opensInNewTab,
+	setAttributes,
+	url,
 } ) {
-	const [ isURLPickerOpen, setIsURLPickerOpen ] = useState( false );
 	const urlIsSet = !! url;
 	const urlIsSetandSelected = urlIsSet && isSelected;
-	const openLinkControl = () => {
-		setIsURLPickerOpen( true );
-		return false; // prevents default behaviour for event
-	};
-	const unlinkButton = () => {
-		setAttributes( {
-			url: undefined,
-			linkTarget: undefined,
-			rel: undefined,
-		} );
-		setIsURLPickerOpen( false );
-	};
-	const linkControl = ( isURLPickerOpen || urlIsSetandSelected ) && (
-		<Popover
-			position="bottom center"
-			onClose={ () => setIsURLPickerOpen( false ) }
-			anchorRef={ anchorRef?.current }
-		>
-			<LinkControl
-				className="wp-block-navigation-link__inline-link-input"
-				value={ { url, opensInNewTab } }
-				onChange={ ( {
-					url: newURL = '',
-					opensInNewTab: newOpensInNewTab,
-				} ) => {
-					setAttributes( { url: newURL } );
-
-					if ( opensInNewTab !== newOpensInNewTab ) {
-						onToggleOpenInNewTab( newOpensInNewTab );
-					}
-				} }
-			/>
-		</Popover>
-	);
-	return (
-		<>
-			<BlockControls group="block">
+	const renderToggle = ( { isOpen, onToggle, onClose } ) => {
+		const unlinkButton = () => {
+			setAttributes( {
+				url: undefined,
+				linkTarget: undefined,
+				rel: undefined,
+			} );
+			onClose();
+		};
+		return (
+			<>
 				{ ! urlIsSet && (
 					<ToolbarButton
+						aria-expanded={ isOpen }
 						name="link"
 						icon={ link }
 						title={ __( 'Link' ) }
 						shortcut={ displayShortcut.primary( 'k' ) }
-						onClick={ openLinkControl }
+						onClick={ onToggle }
 					/>
 				) }
 				{ urlIsSetandSelected && (
 					<ToolbarButton
+						aria-expanded="true"
 						name="link"
 						icon={ linkOff }
 						title={ __( 'Unlink' ) }
@@ -128,18 +103,43 @@ function URLPicker( {
 						isActive={ true }
 					/>
 				) }
-			</BlockControls>
-			{ isSelected && (
 				<KeyboardShortcuts
 					bindGlobal
 					shortcuts={ {
-						[ rawShortcut.primary( 'k' ) ]: openLinkControl,
+						[ rawShortcut.primary( 'k' ) ]: () => {
+							onToggle();
+							return false; // prevents default for event
+						},
 						[ rawShortcut.primaryShift( 'k' ) ]: unlinkButton,
 					} }
 				/>
-			) }
-			{ linkControl }
-		</>
+			</>
+		);
+	};
+	const renderContent = () => (
+		<LinkControl
+			className="wp-block-navigation-link__inline-link-input"
+			value={ { url, opensInNewTab } }
+			onChange={ ( {
+				url: newURL = '',
+				opensInNewTab: newOpensInNewTab,
+			} ) => {
+				setAttributes( { url: newURL } );
+
+				if ( opensInNewTab !== newOpensInNewTab ) {
+					onToggleOpenInNewTab( newOpensInNewTab );
+				}
+			} }
+		/>
+	);
+	return (
+		<Dropdown
+			openOnMount={ urlIsSetandSelected }
+			popoverProps={ { anchorRef: anchorRef?.current } }
+			position="bottom center"
+			renderContent={ renderContent }
+			renderToggle={ renderToggle }
+		/>
 	);
 }
 
@@ -237,14 +237,16 @@ function ButtonEdit( props ) {
 					identifier="text"
 				/>
 			</div>
-			<URLPicker
-				url={ url }
-				setAttributes={ setAttributes }
-				isSelected={ isSelected }
-				opensInNewTab={ linkTarget === '_blank' }
-				onToggleOpenInNewTab={ onToggleOpenInNewTab }
-				anchorRef={ ref }
-			/>
+			<BlockControls group="block">
+				<URLPicker
+					anchorRef={ ref }
+					isSelected={ isSelected }
+					onToggleOpenInNewTab={ onToggleOpenInNewTab }
+					opensInNewTab={ linkTarget === '_blank' }
+					setAttributes={ setAttributes }
+					url={ url }
+				/>
+			</BlockControls>
 			<InspectorControls>
 				<WidthPanel
 					selectedWidth={ width }
