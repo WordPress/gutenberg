@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { contextConnect, useContextSystem } from '@wp-g2/context';
-import { noop, useUpdateEffect } from '@wp-g2/utils';
+import { noop } from 'lodash';
 // eslint-disable-next-line no-restricted-imports
 import { PopoverDisclosure, usePopoverState, Portal } from 'reakit';
 
@@ -14,13 +13,15 @@ import { useCallback, useMemo, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { contextConnect, useContextSystem } from '../context';
 import { PopoverContext } from './context';
 import { usePopoverResizeUpdater } from './utils';
 import PopoverContent from './content';
+import { useUpdateEffect } from '../../utils/hooks';
 
 /**
  *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Popover( props, forwardedRef ) {

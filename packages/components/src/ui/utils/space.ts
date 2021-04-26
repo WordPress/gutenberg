@@ -6,10 +6,11 @@ import type { ReactText } from 'react';
 /**
  * Internal dependencies
  */
-import { CONFIG } from '../../utils';
+
+const GRID_BASE = '4px';
 
 export function space( value: ReactText ): string {
 	return typeof value === 'number'
-		? `calc(${ CONFIG.gridBase } * ${ value })`
+		? `calc(${ GRID_BASE } * ${ value })`
 		: value;
 }
