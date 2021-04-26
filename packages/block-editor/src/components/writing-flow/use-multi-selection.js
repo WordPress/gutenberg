@@ -14,7 +14,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { getBlockClientId } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
-import { useBlockRef } from '../block-list/use-block-props/use-block-refs';
+import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
 /**
  * Returns for the deepest node at the start or end of a container node. Ignores
@@ -90,14 +90,10 @@ export default function useMultiSelection( ref ) {
 	const rafId = useRef();
 	const startClientId = useRef();
 	const anchorElement = useRef();
-	const startRef = useRef();
-	const endRef = useRef();
-	const selectedRef = useRef();
-
-	useBlockRef( selectedBlockClientId, selectedRef );
+	const startRef = useBlockRef( selectedBlockClientId );
 	// These must be in the right DOM order.
-	useBlockRef( first( multiSelectedBlockClientIds ), startRef );
-	useBlockRef( last( multiSelectedBlockClientIds ), endRef );
+	const endRef = useBlockRef( first( multiSelectedBlockClientIds ) );
+	const selectedRef = useBlockRef( last( multiSelectedBlockClientIds ) );
 
 	/**
 	 * When the component updates, and there is multi selection, we need to

@@ -21,8 +21,8 @@ import { isRTL } from '@wordpress/i18n';
  * Internal dependencies
  */
 import Inserter from '../inserter';
-import { getBlockDOMNode } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
+import { __unstableUseBlockElement as useBlockElement } from './use-block-props/use-block-refs';
 
 function InsertionPointInserter( {
 	clientId,
@@ -53,17 +53,14 @@ function InsertionPointPopover( {
 	isInserterShown,
 	isInserterForced,
 	setIsInserterForced,
-	containerRef,
 	showInsertionPoint,
 } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const ref = useRef();
-
 	const {
-		previousElement,
-		nextElement,
 		orientation,
 		isHidden,
+		previousClientId,
 		nextClientId,
 		rootClientId,
 	} = useSelect(
@@ -77,7 +74,6 @@ function InsertionPointPopover( {
 				hasMultiSelection,
 				getSettings,
 			} = select( blockEditorStore );
-			const { ownerDocument } = containerRef.current;
 			const targetRootClientId = clientId
 				? getBlockRootClientId( clientId )
 				: selectedRootClientId;
@@ -100,8 +96,7 @@ function InsertionPointPopover( {
 				'vertical';
 
 			return {
-				previousElement: getBlockDOMNode( previous, ownerDocument ),
-				nextElement: getBlockDOMNode( next, ownerDocument ),
+				previousClientId: previous,
 				nextClientId: next,
 				isHidden:
 					hasReducedUI ||
@@ -116,7 +111,8 @@ function InsertionPointPopover( {
 		},
 		[ clientId, selectedRootClientId ]
 	);
-
+	const previousElement = useBlockElement( previousClientId );
+	const nextElement = useBlockElement( nextClientId );
 	const style = useMemo( () => {
 		if ( ! previousElement ) {
 			return {};
@@ -411,7 +407,6 @@ export default function useInsertionPoint( ref ) {
 						setIsInserterShown( value );
 					}
 				} }
-				containerRef={ ref }
 				showInsertionPoint={ isInserterVisible }
 			/>
 		)

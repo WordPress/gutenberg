@@ -22,7 +22,7 @@ import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
-import { useBlockRef } from './use-block-props/use-block-refs';
+import { __unstableUseBlockElement as useBlockElement } from './use-block-props/use-block-refs';
 
 function selector( select ) {
 	const {
@@ -113,22 +113,9 @@ function BlockPopover( {
 		initialToolbarItemIndexRef.current = undefined;
 	}, [ clientId ] );
 
-	const [ selectedElement, setSelectedElement ] = useState();
-	const [ lastSelectedElement, setLastSelectedElement ] = useState();
-	const [ capturingElement, setCapturingElement ] = useState();
-
-	useBlockRef(
-		clientId,
-		useCallback( ( node ) => node && setSelectedElement( node ), [] )
-	);
-	useBlockRef(
-		lastClientId,
-		useCallback( ( node ) => node && setLastSelectedElement( node ), [] )
-	);
-	useBlockRef(
-		capturingClientId,
-		useCallback( ( node ) => node && setCapturingElement( node ), [] )
-	);
+	const selectedElement = useBlockElement( clientId );
+	const lastSelectedElement = useBlockElement( lastClientId );
+	const capturingElement = useBlockElement( capturingClientId );
 
 	if (
 		! shouldShowBreadcrumb &&

@@ -4,21 +4,18 @@
 import { withSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { useBlockRef } from '../block-list/use-block-props/use-block-refs';
+import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
 const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
-	const ref = useRef();
+	const ref = useBlockRef( selectedBlockClientId );
 	const onClick = () => {
 		ref.current.focus();
 	};
-
-	useBlockRef( selectedBlockClientId, ref );
 
 	return selectedBlockClientId ? (
 		<Button

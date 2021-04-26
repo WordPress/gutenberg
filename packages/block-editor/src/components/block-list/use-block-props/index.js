@@ -30,7 +30,7 @@ import { useFocusHandler } from './use-focus-handler';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useScrollIntoView } from './use-scroll-into-view';
-import { useRegisteredBlockRefs } from './use-block-refs';
+import { useBlockRefProvider } from './use-block-refs';
 import { store as blockEditorStore } from '../../../store';
 
 /**
@@ -116,7 +116,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			enableAnimation,
 			triggerAnimationOnChange: index,
 		} ),
-		...useRegisteredBlockRefs( clientId ),
+		useBlockRefProvider( clientId ),
 	] );
 
 	return {

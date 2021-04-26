@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -10,7 +10,7 @@ import { useState, useEffect, useRef } from '@wordpress/element';
 import PanelColorGradientSettings from '../components/colors-gradients/panel-color-gradient-settings';
 import ContrastChecker from '../components/contrast-checker';
 import InspectorControls from '../components/inspector-controls';
-import { useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
+import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -23,9 +23,8 @@ export default function ColorPanel( {
 } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
-	const ref = useRef();
+	const ref = useBlockRef( clientId );
 
-	useBlockRef( clientId, ref );
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
 			return;
