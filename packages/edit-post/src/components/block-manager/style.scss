@@ -1,10 +1,10 @@
-.edit-post-manage-blocks-modal__no-results {
+.edit-post-block-manager__no-results {
 	font-style: italic;
 	padding: 24px 0;
 	text-align: center;
 }
 
-.edit-post-manage-blocks-modal__search {
+.edit-post-block-manager__search {
 	margin: $grid-unit-20 0;
 
 	.components-base-control__field {
@@ -21,7 +21,7 @@
 	}
 }
 
-.edit-post-manage-blocks-modal__disabled-blocks-count {
+.edit-post-block-manager__disabled-blocks-count {
 	border: 1px solid $gray-300;
 	border-width: 1px 0;
 	margin-left: -$grid-unit-40;
@@ -33,16 +33,16 @@
 	background-color: $gray-100;
 }
 
-.edit-post-manage-blocks-modal__category {
+.edit-post-block-manager__category {
 	margin: 0 0 2rem 0;
 }
 
-.edit-post-manage-blocks-modal__category-title {
+.edit-post-block-manager__category-title {
 	position: sticky;
 	top: 0;
 	padding: $grid-unit-20 0;
 	background-color: $white;
-	z-index: z-index(".edit-post-manage-blocks-modal__category-title");
+	z-index: z-index(".edit-post-block-manager__category-title");
 
 	.components-base-control__field {
 		margin-bottom: 0;
@@ -54,20 +54,20 @@
 	}
 }
 
-.edit-post-manage-blocks-modal__show-all {
+.edit-post-block-manager__show-all {
 	margin-right: $grid-unit-10;
 }
 
-.edit-post-manage-blocks-modal__checklist {
+.edit-post-block-manager__checklist {
 	margin-top: 0;
 }
 
-.edit-post-manage-blocks-modal__category-title,
-.edit-post-manage-blocks-modal__checklist-item {
+.edit-post-block-manager__category-title,
+.edit-post-block-manager__checklist-item {
 	border-bottom: 1px solid $gray-300;
 }
 
-.edit-post-manage-blocks-modal__checklist-item {
+.edit-post-block-manager__checklist-item {
 	margin-bottom: 0;
 	padding-left: $grid-unit-20;
 
@@ -95,11 +95,11 @@
 	}
 }
 
-.edit-post-manage-blocks-modal__results {
+.edit-post-block-manager__results {
 	border-top: $border-width solid $gray-300;
 }
 
 // Remove the top border from results when adjacent to the disabled block count
-.edit-post-manage-blocks-modal__disabled-blocks-count + .edit-post-manage-blocks-modal__results {
+.edit-post-block-manager__disabled-blocks-count + .edit-post-block-manager__results {
 	border-top-width: 0;
 }

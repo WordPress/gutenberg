@@ -163,7 +163,7 @@ $z-layers: (
 	".components-resizable-box__corner-handle": 2,
 
 	// Make sure block manager sticky category titles appear above the options
-	".edit-post-manage-blocks-modal__category-title": 1,
+	".edit-post-block-manager__category-title": 1,
 
 	// Needs to be higher than any other element as this is an overlay to catch all events
 	".components-tooltip .event-catcher": 100002,

@@ -11,11 +11,11 @@ import { CheckboxControl } from '@wordpress/components';
 
 function BlockTypesChecklist( { blockTypes, value, onItemChange } ) {
 	return (
-		<ul className="edit-post-manage-blocks-modal__checklist">
+		<ul className="edit-post-block-manager__checklist">
 			{ blockTypes.map( ( blockType ) => (
 				<li
 					key={ blockType.name }
-					className="edit-post-manage-blocks-modal__checklist-item"
+					className="edit-post-block-manager__checklist-item"
 				>
 					<CheckboxControl
 						label={

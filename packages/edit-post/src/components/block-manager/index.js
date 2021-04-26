@@ -39,16 +39,16 @@ function BlockManager( {
 	);
 
 	return (
-		<div className="edit-post-manage-blocks-modal__content">
+		<div className="edit-post-block-manager__content">
 			<TextControl
 				type="search"
 				label={ __( 'Search for a block' ) }
 				value={ search }
 				onChange={ ( nextSearch ) => setSearch( nextSearch ) }
-				className="edit-post-manage-blocks-modal__search"
+				className="edit-post-block-manager__search"
 			/>
 			{ !! numberOfHiddenBlocks && (
-				<div className="edit-post-manage-blocks-modal__disabled-blocks-count">
+				<div className="edit-post-block-manager__disabled-blocks-count">
 					{ sprintf(
 						/* translators: %d: number of blocks. */
 						_n(
@@ -64,10 +64,10 @@ function BlockManager( {
 				tabIndex="0"
 				role="region"
 				aria-label={ __( 'Available block types' ) }
-				className="edit-post-manage-blocks-modal__results"
+				className="edit-post-block-manager__results"
 			>
 				{ blockTypes.length === 0 && (
-					<p className="edit-post-manage-blocks-modal__no-results">
+					<p className="edit-post-block-manager__no-results">
 						{ __( 'No blocks found.' ) }
 					</p>
 				) }
