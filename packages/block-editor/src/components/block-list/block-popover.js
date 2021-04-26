@@ -117,9 +117,18 @@ function BlockPopover( {
 	const [ lastSelectedElement, setLastSelectedElement ] = useState();
 	const [ capturingElement, setCapturingElement ] = useState();
 
-	useBlockRef( clientId, setSelectedElement );
-	useBlockRef( lastClientId, setLastSelectedElement );
-	useBlockRef( capturingClientId, setCapturingElement );
+	useBlockRef(
+		clientId,
+		useCallback( ( node ) => node && setSelectedElement( node ), [] )
+	);
+	useBlockRef(
+		lastClientId,
+		useCallback( ( node ) => node && setLastSelectedElement( node ), [] )
+	);
+	useBlockRef(
+		capturingClientId,
+		useCallback( ( node ) => node && setCapturingElement( node ), [] )
+	);
 
 	if (
 		! shouldShowBreadcrumb &&

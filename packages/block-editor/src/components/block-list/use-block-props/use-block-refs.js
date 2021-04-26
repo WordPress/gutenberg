@@ -1,54 +1,34 @@
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useReducer } from '@wordpress/element';
+import { useContext, useLayoutEffect, useReducer } from '@wordpress/element';
 
-const store = {
-	add( clientId, ref ) {
-		store[ clientId ] = store[ clientId ] || new Set();
-		store[ clientId ].add( ref );
-
-		if ( listeners[ clientId ] ) {
-			listeners[ clientId ]();
-		}
-	},
-	remove( clientId, ref ) {
-		store[ clientId ].delete( ref );
-
-		if ( listeners[ clientId ] ) {
-			listeners[ clientId ]();
-		}
-	},
-};
-
-const listeners = {
-	add( clientId, fn ) {
-		listeners[ clientId ] = fn;
-	},
-	remove( clientId ) {
-		delete listeners[ clientId ];
-	},
-};
-
-function useUpdate( object, key, value ) {
-	useLayoutEffect( () => {
-		if ( ! key ) {
-			return;
-		}
-
-		object.add( key, value );
-		return () => {
-			object.remove( key, value );
-		};
-	}, [ key, value ] );
-}
+/**
+ * Internal dependencies
+ */
+import { BlockRefs } from '../../provider/block-refs-provider';
 
 export function useRegisteredBlockRefs( clientId ) {
+	const { listeners, store } = useContext( BlockRefs );
 	const [ , forceRender ] = useReducer( ( s ) => ! s );
-	useUpdate( listeners, clientId, forceRender );
+	useLayoutEffect( () => {
+		listeners.add( clientId, forceRender );
+		return () => {
+			listeners.remove( clientId, forceRender );
+		};
+	}, [ listeners, clientId, forceRender ] );
 	return store[ clientId ] ? Array.from( store[ clientId ] ) : [];
 }
 
 export function useBlockRef( clientId, ref ) {
-	useUpdate( store, clientId, ref );
+	const { listeners, store } = useContext( BlockRefs );
+	const [ , forceRender ] = useReducer( ( s ) => ! s );
+	useLayoutEffect( () => {
+		store.add( clientId, ref );
+		listeners.add( clientId, forceRender );
+		return () => {
+			store.remove( clientId, ref );
+			listeners.remove( clientId, forceRender );
+		};
+	}, [ listeners, store, clientId, ref, forceRender ] );
 }
