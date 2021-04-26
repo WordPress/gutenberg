@@ -32,7 +32,7 @@ export type PolymorphicComponent< T extends As, O > = {
 	): JSX.Element | null;
 	( props: ViewOwnProps< O, T > ): JSX.Element | null;
 	displayName?: string;
-	__interpolationClassName__: string;
+	selector: string;
 };
 
 export type CreatePolymorphicComponent< T extends As, P > = (
