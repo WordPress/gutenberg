@@ -5,16 +5,14 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -11,13 +11,15 @@
+@@ -11,13 +11,13 @@
         data-wp-c16t="true"
         data-wp-component="CardHeader"
         title="WordPress.org"
       />
       <div
 -       class="css-yc36db-InnerBody components-card-inner-body css-1mm2cvy-View egi4jkx0"
-+       class="components-scrollable wp-components-scrollable components-card-body css-3sz8a0-Body-borderRadius ic-y3p1xi css-1jyvxqk css-1mm2cvy-View egi4jkx0"
-+       data-g2-c16t="true"
-+       data-g2-component="Scrollable"
++       class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View egi4jkx0"
         data-wp-c16t="true"
 -       data-wp-component="CardInnerBody"
 +       data-wp-component="CardBody"
@@ -26,7 +24,7 @@ Snapshot Diff:
 `;
 
 exports[`props should render correctly 1`] = `
-.emotion-23.emotion-23.emotion-23.emotion-23.emotion-23.emotion-23.emotion-23 {
+.emotion-22.emotion-22.emotion-22.emotion-22.emotion-22.emotion-22.emotion-22 {
   background-color: #ffffff;
   background-color: var(--wp-g2-surface-color);
   color: #1e1e1e;
@@ -36,43 +34,7 @@ exports[`props should render correctly 1`] = `
   --wp-g2-surface-background-size-dotted: 11px;
 }
 
-.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
-  height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-}
-
-@media only screen and ( min-device-width:40em ) {
-  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4::-webkit-scrollbar {
-    height: 12px;
-    width: 12px;
-  }
-
-  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-
-  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.04);
-    background: var(--wp-g2-color-scrollbar-track);
-    border-radius: 8px;
-  }
-
-  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4::-webkit-scrollbar-thumb {
-    background-clip: padding-box;
-    background-color: rgba(0, 0, 0, 0.2);
-    background-color: var(--wp-g2-color-scrollbar-thumb);
-    border: 2px solid rgba( 0,0,0,0 );
-    border-radius: 7px;
-  }
-
-  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4:hover::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.5);
-    background-color: var(--wp-g2-color-scrollbar-thumb-hover);
-  }
-}
-
-.emotion-13.emotion-13.emotion-13.emotion-13.emotion-13.emotion-13.emotion-13 {
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
   border-radius: inherit;
   bottom: 0;
   box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
@@ -87,7 +49,7 @@ exports[`props should render correctly 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18 {
+.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17 {
   border-radius: inherit;
   bottom: 0;
   box-shadow: 0 2px 4px 0 rgba(0 ,0,0,0.1);
@@ -102,7 +64,7 @@ exports[`props should render correctly 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-.emotion-12 {
+.emotion-11 {
   background: transparent;
   display: block;
   margin: 0 !important;
@@ -111,13 +73,13 @@ exports[`props should render correctly 1`] = `
   will-change: box-shadow;
 }
 
-.emotion-22 {
+.emotion-21 {
   box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
   outline: none;
   border-radius: 2px;
 }
 
-.emotion-14 {
+.emotion-13 {
   border-radius: 2px;
 }
 
@@ -166,9 +128,39 @@ exports[`props should render correctly 1`] = `
 }
 
 .emotion-3 {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
   height: auto;
   max-height: 100%;
   padding: calc(4px * 3) calc(4px * 3);
+}
+
+@media only screen and ( min-device-width:40em ) {
+  .emotion-3::-webkit-scrollbar {
+    height: 12px;
+    width: 12px;
+  }
+
+  .emotion-3::-webkit-scrollbar-track {
+    background-color: transparent;
+  }
+
+  .emotion-3::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.04);
+    border-radius: 8px;
+  }
+
+  .emotion-3::-webkit-scrollbar-thumb {
+    background-clip: padding-box;
+    background-color: rgba(0,0,0,0.2);
+    border: 2px solid rgba( 0,0,0,0 );
+    border-radius: 7px;
+  }
+
+  .emotion-3:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.5);
+  }
 }
 
 .emotion-3:first-of-type {
@@ -181,7 +173,7 @@ exports[`props should render correctly 1`] = `
   border-bottom-right-radius: 2px;
 }
 
-.emotion-7 {
+.emotion-6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -206,26 +198,26 @@ exports[`props should render correctly 1`] = `
   padding-top: calc(4px * 1);
 }
 
-.emotion-7 > * + *:not(marquee) {
+.emotion-6 > * + *:not(marquee) {
   margin-left: calc(4px * 2);
 }
 
-.emotion-7 > * {
+.emotion-6 > * {
   min-width: 0;
 }
 
-.emotion-7:first-of-type {
+.emotion-6:first-of-type {
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
 
-.emotion-7:last-of-type {
+.emotion-6:last-of-type {
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
 }
 
 <div
-  class="components-surface components-card emotion-22 emotion-23 emotion-1 emotion-2"
+  class="components-surface components-card emotion-21 emotion-22 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Card"
 >
@@ -239,16 +231,14 @@ exports[`props should render correctly 1`] = `
       title="WordPress.org"
     />
     <div
-      class="components-scrollable wp-components-scrollable components-card-body emotion-3 ic-y3p1xi emotion-4 emotion-1 emotion-2"
-      data-g2-c16t="true"
-      data-g2-component="Scrollable"
+      class="components-scrollable components-card-body emotion-3 emotion-1 emotion-2"
       data-wp-c16t="true"
       data-wp-component="CardBody"
     >
       Code is Poetry.
     </div>
     <div
-      class="components-flex components-card-footer emotion-7 emotion-1 emotion-2"
+      class="components-flex components-card-footer emotion-6 emotion-1 emotion-2"
       data-wp-c16t="true"
       data-wp-component="CardFooter"
     >
@@ -259,13 +249,13 @@ exports[`props should render correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
-    class="emotion-12 emotion-13 components-elevation emotion-14 emotion-1 emotion-2"
+    class="emotion-11 emotion-12 components-elevation emotion-13 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
   <div
     aria-hidden="true"
-    class="emotion-12 emotion-18 components-elevation emotion-14 emotion-1 emotion-2"
+    class="emotion-11 emotion-17 components-elevation emotion-13 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
