@@ -46,8 +46,7 @@ function BlockManagerCategory( {
 		...hiddenBlockTypes
 	);
 
-	const titleId =
-		'edit-post-manage-blocks-modal__category-title-' + instanceId;
+	const titleId = 'edit-post-block-manager__category-title-' + instanceId;
 
 	const isAllChecked = checkedBlockNames.length === filteredBlockTypes.length;
 
@@ -64,12 +63,12 @@ function BlockManagerCategory( {
 		<div
 			role="group"
 			aria-labelledby={ titleId }
-			className="edit-post-manage-blocks-modal__category"
+			className="edit-post-block-manager__category"
 		>
 			<CheckboxControl
 				checked={ isAllChecked }
 				onChange={ toggleAllVisible }
-				className="edit-post-manage-blocks-modal__category-title"
+				className="edit-post-block-manager__category-title"
 				aria-checked={ ariaChecked }
 				label={ <span id={ titleId }>{ title }</span> }
 			/>

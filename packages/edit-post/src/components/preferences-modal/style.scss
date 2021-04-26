@@ -61,6 +61,9 @@
 		display: flex;
 		flex-direction: row;
 		.components-tab-panel__tabs {
+			position: sticky;
+			top: 90px;
+			align-self: start;
 			width: 160px;
 			.components-tab-panel__tabs-item {
 				border-radius: $radius-block-ui;

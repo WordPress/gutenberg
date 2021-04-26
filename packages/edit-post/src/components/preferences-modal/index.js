@@ -39,6 +39,7 @@ import {
 } from './options';
 import MetaBoxesSection from './meta-boxes-section';
 import { store as editPostStore } from '../../store';
+import BlockManager from '../block-manager';
 
 const MODAL_NAME = 'edit-post/preferences';
 const PREFERENCES_MENU = 'preferences-menu';
@@ -140,6 +141,17 @@ export default function PreferencesModal() {
 							) }
 							label={ __( 'Use theme styles' ) }
 						/>
+					</Section>
+				),
+			},
+			{
+				name: 'block-manager',
+				tabLabel: __( 'Block Manager' ),
+				content: (
+					<Section
+						title={ __( 'Show/Hide blocks from the inserter.' ) }
+					>
+						<BlockManager />
 					</Section>
 				),
 			},
