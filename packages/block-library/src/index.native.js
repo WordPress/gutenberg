@@ -248,7 +248,7 @@ export const registerCoreBlocks = () => {
 		file,
 		audio,
 		devOnly( reusableBlock ),
-		devOnly( search ),
+		search,
 		devOnly( embed ),
 	].forEach( registerBlock );
 

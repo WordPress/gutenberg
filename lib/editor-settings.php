@@ -24,6 +24,10 @@ function gutenberg_extend_post_editor_settings( $settings ) {
 	$settings['imageDefaultSize']                      = in_array( $image_default_size, $image_sizes, true ) ? $image_default_size : 'large';
 	$settings['__unstableEnableFullSiteEditingBlocks'] = gutenberg_supports_block_templates();
 
+	if ( gutenberg_is_fse_theme() ) {
+		$settings['defaultTemplatePartAreas'] = gutenberg_get_allowed_template_part_areas();
+	}
+
 	return $settings;
 }
 add_filter( 'block_editor_settings', 'gutenberg_extend_post_editor_settings' );

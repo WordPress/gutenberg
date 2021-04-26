@@ -26,7 +26,8 @@ import { useBlockClassNames } from './use-block-class-names';
 import { useBlockDefaultClassName } from './use-block-default-class-name';
 import { useBlockCustomClassName } from './use-block-custom-class-name';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
-import { useEventHandlers } from './use-event-handlers';
+import { useFocusHandler } from './use-focus-handler';
+import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockNodes } from './use-block-nodes';
 import { useScrollIntoView } from './use-scroll-into-view';
@@ -106,6 +107,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		// Must happen after focus because we check for focus in the block.
 		useScrollIntoView( clientId ),
 		useBlockNodes( clientId ),
+		useFocusHandler( clientId ),
 		useEventHandlers( clientId ),
 		useNavModeExit( clientId ),
 		useIsHovered(),
