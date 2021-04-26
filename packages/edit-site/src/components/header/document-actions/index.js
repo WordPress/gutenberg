@@ -20,6 +20,7 @@ import {
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function getBlockDisplayText( block ) {
 	return block
@@ -32,7 +33,7 @@ function useSecondaryText() {
 	const activeEntityBlockId = useSelect(
 		( select ) =>
 			select(
-				'core/block-editor'
+				blockEditorStore
 			).__experimentalGetActiveBlockIdByBlockNames( [
 				'core/template-part',
 			] ),

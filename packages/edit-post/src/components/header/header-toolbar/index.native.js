@@ -11,7 +11,11 @@ import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
 import { __ } from '@wordpress/i18n';
-import { Inserter, BlockToolbar } from '@wordpress/block-editor';
+import {
+	Inserter,
+	BlockToolbar,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { Toolbar, ToolbarButton } from '@wordpress/components';
 import {
 	keyboardClose,
@@ -114,10 +118,10 @@ export default compose( [
 			select( editPostStore ).getEditorMode() === 'visual' &&
 			select( 'core/editor' ).getEditorSettings().richEditingEnabled,
 		isTextModeEnabled: select( editPostStore ).getEditorMode() === 'text',
-		isRTL: select( 'core/block-editor' ).getSettings().isRTL,
+		isRTL: select( blockEditorStore ).getSettings().isRTL,
 	} ) ),
 	withDispatch( ( dispatch ) => {
-		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
+		const { clearSelectedBlock } = dispatch( blockEditorStore );
 		const { togglePostTitleSelection } = dispatch( 'core/editor' );
 
 		return {

@@ -12,7 +12,11 @@ import {
 	ComplementaryArea,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { BlockInspector } from '@wordpress/block-editor';
+import {
+	BlockInspector,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+
 import { cog } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -69,7 +73,7 @@ export default function Sidebar() {
 			getSelectedBlock,
 			getBlock,
 			getBlockParentsByBlockName,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 
 		const selectedBlock = getSelectedBlock();
