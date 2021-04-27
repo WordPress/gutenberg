@@ -1,6 +1,6 @@
 .inserter-search-form__container {
 	border-radius: 8px;
-	elevation: 1;
+	elevation: 2;
 	background-color: $white;
 }
 .inserter-search-form__container--dark {
@@ -10,7 +10,7 @@
 
 .inserter-search-form__container--active {
 	border-bottom-color: $gray-light;
-	border-bottom-width: 2px;
+	border-bottom-width: 1px;
 	margin-left: 0;
 	margin-right: 0;
 	border-radius: 0;
@@ -18,7 +18,7 @@
 }
 
 .inserter-search-form__input-container--active {
-	border: none;
+	background-color: none;
 }
 
 .inserter-search-form__form-input {
