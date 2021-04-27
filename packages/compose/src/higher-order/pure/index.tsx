@@ -9,7 +9,7 @@ import { Component } from '@wordpress/element';
  */
 import createHigherOrderComponent from '../../utils/create-higher-order-component';
 // eslint-disable-next-line no-duplicate-imports
-import type { HigherOrderComponent } from '../../utils/create-higher-order-component';
+import type { SimpleHigherOrderComponent } from '../../utils/create-higher-order-component';
 
 /**
  * External dependencies
@@ -21,7 +21,7 @@ import type { ComponentType, ComponentClass } from 'react';
  * Given a component returns the enhanced component augmented with a component
  * only rerendering when its props/state change
  */
-const pure: HigherOrderComponent = createHigherOrderComponent(
+const pure: SimpleHigherOrderComponent = createHigherOrderComponent(
 	< TProps, >( Wrapped: ComponentType< TProps > ) => {
 		if ( Wrapped.prototype instanceof Component ) {
 			return class extends ( Wrapped as ComponentClass< TProps > ) {

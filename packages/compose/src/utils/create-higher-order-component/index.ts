@@ -4,7 +4,6 @@
 import { camelCase, upperFirst } from 'lodash';
 // eslint-disable-next-line no-restricted-imports
 import type { ComponentType } from 'react';
-import type { Subtract } from 'utility-types';
 
 /**
  * Higher order components can cause props to be obviated. For example a HOC that
@@ -15,11 +14,13 @@ import type { Subtract } from 'utility-types';
  * of this is the `pure` HOC which does not change the API surface of the component but
  * simply modifies the internals.
  */
-export interface HigherOrderComponent< TRemovedProps extends object = {} > {
-	< TP extends TRemovedProps >(
-		OriginalComponent: ComponentType< TP >
-	): ComponentType< Subtract< TP, TRemovedProps > >;
-}
+export type HigherOrderComponent< TInnerProps, TOuterProps > = (
+	Inner: ComponentType< TInnerProps >
+) => ComponentType< TOuterProps >;
+
+export type SimpleHigherOrderComponent = < TProps >(
+	Inner: ComponentType< TProps >
+) => ComponentType< TProps >;
 
 /**
  * Given a function mapping a component to an enhanced component and modifier
@@ -30,29 +31,18 @@ export interface HigherOrderComponent< TRemovedProps extends object = {} > {
  *
  * @return Component class with generated display name assigned.
  */
-function createHigherOrderComponent<
-	TRemovedProps extends object,
-	TProps extends TRemovedProps
->(
-	mapComponentToEnhancedComponent: (
-		OriginalComponent: ComponentType< TProps >
-	) => ComponentType< Subtract< TProps, TRemovedProps > >,
+
+function createHigherOrderComponent< TInnerProps, TOuterProps >(
+	mapComponent: HigherOrderComponent< TInnerProps, TOuterProps >,
 	modifierName: string
-): HigherOrderComponent< TRemovedProps > {
-	return ( ( OriginalComponent: ComponentType< TProps > ) => {
-		const EnhancedComponent = mapComponentToEnhancedComponent(
-			OriginalComponent
-		);
-
-		const {
-			displayName = OriginalComponent.name || 'Component',
-		} = OriginalComponent;
-
-		EnhancedComponent.displayName = `${ upperFirst(
+): HigherOrderComponent< TInnerProps, TOuterProps > {
+	return ( Inner ) => {
+		const Outer = mapComponent( Inner );
+		const displayName = Inner.displayName || Inner.name || 'Component';
+		Outer.displayName = `${ upperFirst(
 			camelCase( modifierName )
 		) }(${ displayName })`;
-
-		return EnhancedComponent;
-	} ) as HigherOrderComponent< TRemovedProps >;
+		return Outer;
+	};
 }
 export default createHigherOrderComponent;

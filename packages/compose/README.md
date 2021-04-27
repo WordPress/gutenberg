@@ -81,12 +81,12 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   _mapComponentToEnhancedComponent_ `( OriginalComponent: ComponentType< TProps > ) => ComponentType< Subtract< TProps, TRemovedProps > >`: Function mapping component to enhanced component.
+-   _mapComponentToEnhancedComponent_ `HigherOrderComponent< TInnerProps, TOuterProps >`: Function mapping component to enhanced component.
 -   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
 
--   `HigherOrderComponent< TRemovedProps >`: Component class with generated display name assigned.
+-   `HigherOrderComponent< TInnerProps, TOuterProps >`: Component class with generated display name assigned.
 
 <a name="ifCondition" href="#ifCondition">#</a> **ifCondition**
 
@@ -109,7 +109,7 @@ _Parameters_
 
 _Returns_
 
--   `HigherOrderComponent`: Higher-order component.
+-   `HigherOrderComponent< TProps, TProps >`: Higher-order component.
 
 <a name="pure" href="#pure">#</a> **pure**
 
@@ -118,7 +118,7 @@ only rerendering when its props/state change
 
 _Type_
 
--   `HigherOrderComponent`
+-   `SimpleHigherOrderComponent`
 
 <a name="useAsyncList" href="#useAsyncList">#</a> **useAsyncList**
 
