@@ -409,6 +409,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 		{
 			attributes: {
 				type: 'custom',
+				kind: 'custom',
 			},
 			clientId: 'navigation-link-block-client-id-5',
 			innerBlocks: [],
@@ -446,7 +447,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 
 	const blockAttrs = blocks.map( ( block ) => block.attributes );
 
-	describe( 'mapBlockAttributeToMenuItemField', () => {
+	describe( 'mapping block attributes to menu item fields', () => {
 		it( 'maps block attributes to equivalent menu item fields', () => {
 			const expected = blockAttrs.map( ( attrs ) => {
 				return Object.entries( attrs ).reduce(
@@ -464,7 +465,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 		} );
 	} );
 
-	describe( 'mapMenuItemFieldToBlockAttribute', () => {
+	describe( 'mapping menu item fields to block attributes', () => {
 		it( 'maps menu item fields equivalent block attributes', () => {
 			const expected = menuItems.map( ( attrs ) => {
 				return Object.entries( attrs ).reduce(
@@ -479,31 +480,6 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				);
 			} );
 			expect( expected ).toEqual( blockAttrs );
-		} );
-
-		it( 'does not map id to object_id for "custom" block variation', () => {
-			const customBlockVariationAttrs = {
-				type: 'custom',
-				id: 123456,
-			};
-
-			const actual = Object.entries( customBlockVariationAttrs ).reduce(
-				( acc, [ key, value ] ) => {
-					acc = {
-						...acc,
-						...mapMenuItemFieldToBlockAttribute( key, value ),
-					};
-					return acc;
-				},
-				{}
-			);
-
-			expect( actual ).toEqual( {
-				object: 'custom',
-				type: 'custom',
-			} );
-
-			expect( actual.id ).toBeUndefined();
 		} );
 	} );
 } );
