@@ -92,6 +92,12 @@
 	}
 }
 
+.edit-post-header-toolbar__middle {
+	display: inline-flex;
+	flex-grow: 1;
+	justify-content: center;
+}
+
 // Block toolbar when fixed to the top of the screen.
 .edit-post-header-toolbar__block-toolbar {
 	// Stack toolbar below Editor Bar.

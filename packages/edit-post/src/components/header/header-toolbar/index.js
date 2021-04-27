@@ -35,6 +35,7 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import TemplateTitle from '../template-title';
+import PostTitle from '../post-title';
 import { store as editPostStore } from '../../../store';
 
 function HeaderToolbar() {
@@ -220,7 +221,9 @@ characters. */
 				) }
 			</div>
 
-			<TemplateTitle />
+			<div className="edit-post-header-toolbar__middle">
+				{ isTemplateMode ? <TemplateTitle /> : <PostTitle /> }
+			</div>
 
 			{ displayBlockToolbar && (
 				<div
