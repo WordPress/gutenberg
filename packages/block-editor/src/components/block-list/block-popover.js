@@ -7,13 +7,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-	useCallback,
-	useContext,
-	useRef,
-	useEffect,
-} from '@wordpress/element';
+import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -27,9 +21,8 @@ import { getScrollContainer } from '@wordpress/dom';
 import BlockSelectionButton from './block-selection-button';
 import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
-import { BlockNodes } from './';
-import { getBlockDOMNode } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
+import { __unstableUseBlockElement as useBlockElement } from './use-block-props/use-block-refs';
 
 function selector( select ) {
 	const {
@@ -71,7 +64,6 @@ function BlockPopover( {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
-	const blockNodes = useContext( BlockNodes );
 	const { stopTyping } = useDispatch( blockEditorStore );
 
 	// Controls when the side inserter on empty lines should
@@ -115,11 +107,9 @@ function BlockPopover( {
 	// to it when re-mounting.
 	const initialToolbarItemIndexRef = useRef();
 
-	useEffect( () => {
-		// Resets the index whenever the active block changes so this is not
-		// persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
-		initialToolbarItemIndexRef.current = undefined;
-	}, [ clientId ] );
+	const selectedElement = useBlockElement( clientId );
+	const lastSelectedElement = useBlockElement( lastClientId );
+	const capturingElement = useBlockElement( capturingClientId );
 
 	if (
 		! shouldShowBreadcrumb &&
@@ -130,32 +120,28 @@ function BlockPopover( {
 		return null;
 	}
 
-	let node = blockNodes[ clientId ];
+	let node = selectedElement;
 
 	if ( ! node ) {
 		return null;
 	}
 
-	const { ownerDocument } = node;
-
 	if ( capturingClientId ) {
-		node = getBlockDOMNode( capturingClientId, ownerDocument );
+		node = capturingElement;
 	}
 
 	let anchorRef = node;
 
 	if ( hasMultiSelection ) {
-		const bottomNode = blockNodes[ lastClientId ];
-
 		// Wait to render the popover until the bottom reference is available
 		// as well.
-		if ( ! bottomNode ) {
+		if ( ! lastSelectedElement ) {
 			return null;
 		}
 
 		anchorRef = {
 			top: node,
-			bottom: bottomNode,
+			bottom: lastSelectedElement,
 		};
 	}
 
@@ -174,6 +160,7 @@ function BlockPopover( {
 	const popoverPosition = showEmptyBlockSideInserter
 		? 'top left right'
 		: 'top right left';
+	const { ownerDocument } = node;
 	const stickyBoundaryElement = showEmptyBlockSideInserter
 		? undefined
 		: // The sticky boundary element should be the boundary at which the
@@ -235,6 +222,9 @@ function BlockPopover( {
 					__experimentalOnIndexChange={ ( index ) => {
 						initialToolbarItemIndexRef.current = index;
 					} }
+					// Resets the index whenever the active block changes so
+					// this is not persisted. See https://github.com/WordPress/gutenberg/pull/25760#issuecomment-717906169
+					key={ clientId }
 				/>
 			) }
 			{ shouldShowBreadcrumb && (

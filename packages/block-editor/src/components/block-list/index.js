@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef, createContext, useState } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -22,12 +22,8 @@ import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 
-export const BlockNodes = createContext();
-export const SetBlockNodes = createContext();
-
 export default function BlockList( { className, __experimentalLayout } ) {
 	const ref = useRef();
-	const [ blockNodes, setBlockNodes ] = useState( {} );
 	const insertionPoint = useInsertionPoint( ref );
 	usePreParsePatterns();
 
@@ -53,7 +49,7 @@ export default function BlockList( { className, __experimentalLayout } ) {
 	}, [] );
 
 	return (
-		<BlockNodes.Provider value={ blockNodes }>
+		<>
 			{ insertionPoint }
 			<BlockPopover />
 			<div
@@ -69,13 +65,9 @@ export default function BlockList( { className, __experimentalLayout } ) {
 					}
 				) }
 			>
-				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems
-						__experimentalLayout={ __experimentalLayout }
-					/>
-				</SetBlockNodes.Provider>
+				<BlockListItems __experimentalLayout={ __experimentalLayout } />
 			</div>
-		</BlockNodes.Provider>
+		</>
 	);
 }
 
