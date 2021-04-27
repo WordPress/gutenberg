@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### New Features
+
+-   Include a Jest Reporter that formats test results for GitHub Actions annotations ([#31041](https://github.com/WordPress/gutenberg/pull/31041)).
+-   Have the `format` command ignore files listed in a `.prettierignore` file, add a fallback `.prettierignore` to the package ([30844](https://github.com/WordPress/gutenberg/pull/30844)).
+
 ### Breaking Changes
 
 -   Rename `format-js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).

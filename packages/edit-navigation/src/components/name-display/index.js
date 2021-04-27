@@ -1,23 +1,29 @@
 /**
  * WordPress dependencies
  */
+import { useContext } from '@wordpress/element';
 import { ToolbarGroup, ToolbarButton } from '@wordpress/components';
 import { BlockControls } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
 import {
+	untitledMenu,
+	useMenuEntity,
 	useSelectedMenuData,
 	IsMenuNameControlFocusedContext,
 } from '../../hooks';
-import { useContext } from '@wordpress/element';
 
 import { sprintf, __ } from '@wordpress/i18n';
 export default function NameDisplay() {
-	const { menuName } = useSelectedMenuData();
+	const { menuId } = useSelectedMenuData();
+	const { editedMenu } = useMenuEntity( menuId );
 	const [ , setIsMenuNameEditFocused ] = useContext(
 		IsMenuNameControlFocusedContext
 	);
+
+	const menuName = editedMenu?.name ?? untitledMenu;
+
 	return (
 		<BlockControls>
 			<ToolbarGroup>
