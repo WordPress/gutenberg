@@ -16,8 +16,8 @@ import TemplatePartSelection from '../selection';
 import PatternsSetup from './patterns-setup';
 
 const PLACEHOLDER_STEPS = {
-	INITIAL: 'choose-existing-or-new',
-	PATTERNS: 'select-a-pattern-or-blank',
+	initial: 1,
+	patterns: 2,
 };
 
 export default function TemplatePartPlaceholder( {
@@ -26,7 +26,7 @@ export default function TemplatePartPlaceholder( {
 	setAttributes,
 } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.INITIAL );
+	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.initial );
 
 	const onCreate = useCallback(
 		async ( startingBlocks = [] ) => {
@@ -59,7 +59,7 @@ export default function TemplatePartPlaceholder( {
 
 	return (
 		<>
-			{ step === PLACEHOLDER_STEPS.INITIAL && (
+			{ step === PLACEHOLDER_STEPS.initial && (
 				<Placeholder
 					icon={ blockDefault }
 					label={ __( 'Template Part' ) }
@@ -82,7 +82,7 @@ export default function TemplatePartPlaceholder( {
 								<Button
 									isTertiary
 									onClick={ () =>
-										setStep( PLACEHOLDER_STEPS.PATTERNS )
+										setStep( PLACEHOLDER_STEPS.patterns )
 									}
 								>
 									{ __( 'New template part' ) }
@@ -98,7 +98,7 @@ export default function TemplatePartPlaceholder( {
 					/>
 				</Placeholder>
 			) }
-			{ step === PLACEHOLDER_STEPS.PATTERNS && (
+			{ step === PLACEHOLDER_STEPS.patterns && (
 				<PatternsSetup
 					area={ area }
 					onCreate={ onCreate }
