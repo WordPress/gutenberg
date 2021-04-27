@@ -98,16 +98,6 @@ exports[`props should render correctly 1`] = `
   border-radius: 2px;
 }
 
-.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
-  background-color: #ffffff;
-  background-color: var(--wp-g2-surface-color);
-  color: #1e1e1e;
-  color: var(--wp-g2-color-text);
-  position: relative;
-  --wp-g2-surface-background-size: 12px;
-  --wp-g2-surface-background-size-dotted: 11px;
-}
-
 <div
   class="components-surface components-card emotion-11 emotion-1 emotion-2"
   data-wp-c16t="true"
