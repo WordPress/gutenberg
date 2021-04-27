@@ -8,6 +8,7 @@ import {
 	invoke,
 	isEmpty,
 	map,
+	orderBy,
 	throttle,
 	unescape as lodashUnescapeString,
 	uniqBy,
@@ -16,8 +17,8 @@ import {
 /**
  * WordPress dependencies
  */
-import { __, _x, sprintf } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { __, _n, _x, sprintf } from '@wordpress/i18n';
+import { useMemo, Component } from '@wordpress/element';
 import {
 	Button,
 	FormTokenField,
@@ -38,6 +39,9 @@ import { store as editorStore } from '../../store';
 /**
  * Module constants
  */
+const MIN_FONT_SIZE = 10;
+const MAX_FONT_SIZE = 22;
+const FONT_SPREAD = MAX_FONT_SIZE - MIN_FONT_SIZE;
 const MAX_TERMS_SUGGESTIONS = 20;
 const DEFAULT_QUERY = {
 	per_page: MAX_TERMS_SUGGESTIONS,
@@ -95,36 +99,77 @@ function FlatTermSelectorMostUsed( { onSelect, taxonomy } ) {
 			taxonomy.slug,
 			DEFAULT_QUERY
 		);
+
 		return {
-			terms: mostUsedTerms,
+			terms: mostUsedTerms ?? [],
 			hasTerms: mostUsedTerms?.length > 0,
 		};
 	}, [] );
 
-	const _terms = unescapeTerms( terms );
+	const { filteredTerms, fontStep, min } = useMemo( () => {
+		const termCounts = terms.map( ( term ) => term.count );
+		const minCount = Math.min( ...termCounts );
+		const maxCount = Math.max( ...termCounts );
+		const spread = maxCount !== minCount ? maxCount - minCount : 1;
+
+		return {
+			filteredTerms: orderBy(
+				unescapeTerms( terms ),
+				[ 'name' ],
+				[ 'asc' ]
+			),
+			fontStep: FONT_SPREAD / spread,
+			min: minCount,
+		};
+	}, [ terms ] );
+
+	// The logic is adapted from `wp_generate_tag_cloud` function.
+	const getFontSize = ( count ) => {
+		const size = MIN_FONT_SIZE + ( count - min ) * fontStep;
+
+		return `${ size }px`;
+	};
+
+	if ( ! hasTerms ) {
+		return null;
+	}
 
 	return (
 		<div className="editor-post-taxonomies__flat-term-most-used">
-			{ hasTerms && (
-				/*
-				 * Disable reason: The `list` ARIA role is redundant but
-				 * Safari+VoiceOver won't announce the list otherwise.
-				 */
-				/* eslint-disable jsx-a11y/no-redundant-roles */
-				<ul
-					role="list"
-					className="editor-post-taxonomies__flat-term-most-used-list"
-				>
-					{ _terms.map( ( term ) => (
-						<li key={ term.id }>
-							<Button isLink onClick={ () => onSelect( term ) }>
-								{ term.name }
-							</Button>
-						</li>
-					) ) }
-				</ul>
-				/* eslint-enable jsx-a11y/no-redundant-roles */
-			) }
+			{ /*
+			 * Disable reason: The `list` ARIA role is redundant but
+			 * Safari+VoiceOver won't announce the list otherwise.
+			 */
+			/* eslint-disable jsx-a11y/no-redundant-roles */ }
+			<ul
+				role="list"
+				className="editor-post-taxonomies__flat-term-most-used-list"
+			>
+				{ filteredTerms.map( ( term ) => (
+					<li key={ term.id }>
+						<Button
+							isLink
+							onClick={ () => onSelect( term ) }
+							style={ {
+								fontSize: getFontSize( term.count ),
+							} }
+							aria-label={ sprintf(
+								/* translators: %1$s: term name. %2$d: number items. */
+								_n(
+									'%1$s (%2$d item)',
+									'%1$s (%2$d items)',
+									term.count
+								),
+								term.name,
+								term.count
+							) }
+						>
+							{ term.name }
+						</Button>
+					</li>
+				) ) }
+			</ul>
+			{ /* eslint-enable jsx-a11y/no-redundant-roles */ }
 		</div>
 	);
 }
