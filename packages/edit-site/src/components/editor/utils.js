@@ -41,6 +41,10 @@ export const PRESET_METADATA = [
 				classSuffix: 'background-color',
 				propertyName: 'background-color',
 			},
+			{
+				classSuffix: 'border-color',
+				propertyName: 'border-color',
+			},
 		],
 	},
 	{
