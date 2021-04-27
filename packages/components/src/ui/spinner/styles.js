@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { styled, ui } from '@wp-g2/styles';
+import { ui } from '@wp-g2/styles';
+import styled from '@emotion/styled';
 
 /**
  * Internal dependencies

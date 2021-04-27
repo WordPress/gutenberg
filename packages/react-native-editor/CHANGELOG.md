@@ -11,8 +11,9 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
--   [*] Image block: "Set as featured" button within image block settings. (Android and dev only) [#28854]
+-   [***] Search block now available on mobile! [https://github.com/WordPress/gutenberg/pull/30783]
 -   [*] Image block: Add a "featured" banner. (Android only) [#30806]
+-   [*] Image block: "Set as featured" button within image block settings. (Android only) [#28854]
 -   [**] The media upload options of the Image, Video and Gallery block automatically opens when the respective block is inserted. [#29546]
 -   [**] The media upload options of the File and Audio block automatically opens when the respective block is inserted. [#31025]
 

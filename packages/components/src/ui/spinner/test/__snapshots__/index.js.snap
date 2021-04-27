@@ -6,11 +6,11 @@ Snapshot Diff:
 + Second value
 
 @@ -10,11 +10,10 @@
-      class="ic-1blhbvo ic-192yz5d css-16xh7r5"
+      class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
       style="transform: scale(0.4444444444444444);"
     >
       <div
-        class="ic-1c3kh7b ic-192yz5d css-1frx7qu"
+        class="css-lrlbd4-BarsView e1s9yo7h2"
 -       style="color: blue;"
       >
         <div
@@ -20,17 +20,7 @@ Snapshot Diff:
 `;
 
 exports[`props should render correctly 1`] = `
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-4 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -39,29 +29,7 @@ exports[`props should render correctly 1`] = `
   position: relative;
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-2 {
   height: 36px;
   left: 0;
   opacity: 0.6;
@@ -73,29 +41,7 @@ exports[`props should render correctly 1`] = `
   width: 36px;
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-0 {
   color: currentColor;
   display: -webkit-inline-box;
   display: -webkit-inline-flex;
@@ -112,19 +58,7 @@ exports[`props should render correctly 1`] = `
   width: 54px;
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > div {
+.emotion-0 > div {
   -webkit-animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite;
   animation: ComponentsUISpinnerFadeAnimation 1000ms linear infinite;
   background: currentColor;
@@ -137,7 +71,7 @@ exports[`props should render correctly 1`] = `
   width: 6%;
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar1 {
+.emotion-0 .InnerBar1 {
   -webkit-animation-delay: 0s;
   animation-delay: 0s;
   -webkit-transform: rotate( 0deg ) translate( 0,-130% );
@@ -145,7 +79,7 @@ exports[`props should render correctly 1`] = `
   transform: rotate( 0deg ) translate( 0,-130% );
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar2 {
+.emotion-0 .InnerBar2 {
   -webkit-animation-delay: -0.9167s;
   animation-delay: -0.9167s;
   -webkit-transform: rotate( 30deg ) translate( 0,-130% );
@@ -153,7 +87,7 @@ exports[`props should render correctly 1`] = `
   transform: rotate( 30deg ) translate( 0,-130% );
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar3 {
+.emotion-0 .InnerBar3 {
   -webkit-animation-delay: -0.833s;
   animation-delay: -0.833s;
   -webkit-transform: rotate( 60deg ) translate( 0,-130% );
@@ -161,7 +95,7 @@ exports[`props should render correctly 1`] = `
   transform: rotate( 60deg ) translate( 0,-130% );
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar4 {
+.emotion-0 .InnerBar4 {
   -webkit-animation-delay: -0.7497s;
   animation-delay: -0.7497s;
   -webkit-transform: rotate( 90deg ) translate( 0,-130% );
@@ -169,7 +103,7 @@ exports[`props should render correctly 1`] = `
   transform: rotate( 90deg ) translate( 0,-130% );
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar5 {
+.emotion-0 .InnerBar5 {
   -webkit-animation-delay: -0.667s;
   animation-delay: -0.667s;
   -webkit-transform: rotate( 120deg ) translate( 0,-130% );
@@ -177,7 +111,7 @@ exports[`props should render correctly 1`] = `
   transform: rotate( 120deg ) translate( 0,-130% );
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar6 {
+.emotion-0 .InnerBar6 {
   -webkit-animation-delay: -0.5837s;
   animation-delay: -0.5837s;
   -webkit-transform: rotate( 150deg ) translate( 0,-130% );
@@ -185,7 +119,7 @@ exports[`props should render correctly 1`] = `
   transform: rotate( 150deg ) translate( 0,-130% );
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar7 {
+.emotion-0 .InnerBar7 {
   -webkit-animation-delay: -0.5s;
   animation-delay: -0.5s;
   -webkit-transform: rotate( 180deg ) translate( 0,-130% );
@@ -193,7 +127,7 @@ exports[`props should render correctly 1`] = `
   transform: rotate( 180deg ) translate( 0,-130% );
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar8 {
+.emotion-0 .InnerBar8 {
   -webkit-animation-delay: -0.4167s;
   animation-delay: -0.4167s;
   -webkit-transform: rotate( 210deg ) translate( 0,-130% );
@@ -201,7 +135,7 @@ exports[`props should render correctly 1`] = `
   transform: rotate( 210deg ) translate( 0,-130% );
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar9 {
+.emotion-0 .InnerBar9 {
   -webkit-animation-delay: -0.333s;
   animation-delay: -0.333s;
   -webkit-transform: rotate( 240deg ) translate( 0,-130% );
@@ -209,7 +143,7 @@ exports[`props should render correctly 1`] = `
   transform: rotate( 240deg ) translate( 0,-130% );
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar10 {
+.emotion-0 .InnerBar10 {
   -webkit-animation-delay: -0.2497s;
   animation-delay: -0.2497s;
   -webkit-transform: rotate( 270deg ) translate( 0,-130% );
@@ -217,7 +151,7 @@ exports[`props should render correctly 1`] = `
   transform: rotate( 270deg ) translate( 0,-130% );
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar11 {
+.emotion-0 .InnerBar11 {
   -webkit-animation-delay: -0.167s;
   animation-delay: -0.167s;
   -webkit-transform: rotate( 300deg ) translate( 0,-130% );
@@ -225,7 +159,7 @@ exports[`props should render correctly 1`] = `
   transform: rotate( 300deg ) translate( 0,-130% );
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 .InnerBar12 {
+.emotion-0 .InnerBar12 {
   -webkit-animation-delay: -0.0833s;
   animation-delay: -0.0833s;
   -webkit-transform: rotate( 330deg ) translate( 0,-130% );
@@ -235,18 +169,18 @@ exports[`props should render correctly 1`] = `
 
 <div
   aria-busy="true"
-  class="components-spinner wp-components-spinner ic-134ljdn ic-otytyz ic-192yz5d emotion-2"
-  data-g2-c16t="true"
-  data-g2-component="Spinner"
+  class="components-spinner emotion-4 emotion-5"
+  data-wp-c16t="true"
+  data-wp-component="Spinner"
   style="height: 16px; width: 16px;"
 >
   <div
     aria-hidden="true"
-    class="ic-1blhbvo ic-192yz5d emotion-1"
+    class="emotion-2 emotion-3"
     style="transform: scale(0.4444444444444444);"
   >
     <div
-      class="ic-1c3kh7b ic-192yz5d emotion-0"
+      class="emotion-0 emotion-1"
     >
       <div
         class="InnerBar1"
@@ -297,20 +231,20 @@ Snapshot Diff:
 @@ -1,16 +1,16 @@
   <div
     aria-busy="true"
-    class="components-spinner wp-components-spinner ic-134ljdn ic-otytyz ic-192yz5d css-10r9amq"
-    data-g2-c16t="true"
-    data-g2-component="Spinner"
+    class="components-spinner css-ssf0q0-ContainerView e1s9yo7h0"
+    data-wp-c16t="true"
+    data-wp-component="Spinner"
 -   style="height: 31px; width: 31px;"
 +   style="height: 16px; width: 16px;"
   >
     <div
       aria-hidden="true"
-      class="ic-1blhbvo ic-192yz5d css-16xh7r5"
+      class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
 -     style="transform: scale(0.8611111111111112);"
 +     style="transform: scale(0.4444444444444444);"
     >
       <div
-        class="ic-1c3kh7b ic-192yz5d css-1frx7qu"
+        class="css-lrlbd4-BarsView e1s9yo7h2"
       >
         <div
 `;

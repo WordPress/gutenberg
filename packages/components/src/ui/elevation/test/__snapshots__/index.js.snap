@@ -1,23 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render active 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  background: transparent;
-  display: block;
-  margin: 0 !important;
-  pointer-events: none;
-  position: absolute;
-  will-change: box-shadow;
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   border-radius: inherit;
   bottom: 0;
   box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
@@ -32,52 +16,33 @@ exports[`props should render active 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:hover > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
 }
 
-*:active > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:active > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
+}
+
+.emotion-0 {
+  background: transparent;
+  display: block;
+  margin: 0 !important;
+  pointer-events: none;
+  position: absolute;
+  will-change: box-shadow;
 }
 
 <div
   aria-hidden="true"
-  class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-0"
-  data-g2-c16t="true"
-  data-g2-component="Elevation"
+  class="emotion-0 components-elevation emotion-1 emotion-2 emotion-3"
+  data-wp-c16t="true"
+  data-wp-component="Elevation"
 />
 `;
 
 exports[`props should render correctly 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  background: transparent;
-  display: block;
-  margin: 0 !important;
-  pointer-events: none;
-  position: absolute;
-  will-change: box-shadow;
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   border-radius: inherit;
   bottom: 0;
   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
@@ -92,44 +57,25 @@ exports[`props should render correctly 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-<div
-  aria-hidden="true"
-  class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-0"
-  data-g2-c16t="true"
-  data-g2-component="Elevation"
-/>
-`;
-
-exports[`props should render hover 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-0 {
   background: transparent;
   display: block;
   margin: 0 !important;
   pointer-events: none;
   position: absolute;
   will-change: box-shadow;
+}
+
+<div
+  aria-hidden="true"
+  class="emotion-0 emotion-1 components-elevation emotion-2 emotion-3"
+  data-wp-c16t="true"
+  data-wp-component="Elevation"
+/>
+`;
+
+exports[`props should render hover 1`] = `
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   border-radius: inherit;
   bottom: 0;
   box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
@@ -144,48 +90,29 @@ exports[`props should render hover 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:hover > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
 }
 
-<div
-  aria-hidden="true"
-  class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-0"
-  data-g2-c16t="true"
-  data-g2-component="Elevation"
-/>
-`;
-
-exports[`props should render isInteractive 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-0 {
   background: transparent;
   display: block;
   margin: 0 !important;
   pointer-events: none;
   position: absolute;
   will-change: box-shadow;
+}
+
+<div
+  aria-hidden="true"
+  class="emotion-0 components-elevation emotion-1 emotion-2 emotion-3"
+  data-wp-c16t="true"
+  data-wp-component="Elevation"
+/>
+`;
+
+exports[`props should render isInteractive 1`] = `
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   border-radius: inherit;
   bottom: 0;
   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
@@ -200,52 +127,33 @@ exports[`props should render isInteractive 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:hover > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
 }
 
-*:active > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:active > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   box-shadow: 0 0px 0px 0 rgba(0 ,0,0,0);
 }
 
-<div
-  aria-hidden="true"
-  class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-0"
-  data-g2-c16t="true"
-  data-g2-component="Elevation"
-/>
-`;
-
-exports[`props should render offset 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-0 {
   background: transparent;
   display: block;
   margin: 0 !important;
   pointer-events: none;
   position: absolute;
   will-change: box-shadow;
+}
+
+<div
+  aria-hidden="true"
+  class="emotion-0 components-elevation emotion-1 emotion-2 emotion-3"
+  data-wp-c16t="true"
+  data-wp-component="Elevation"
+/>
+`;
+
+exports[`props should render offset 1`] = `
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   border-radius: inherit;
   bottom: -2px;
   box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
@@ -260,52 +168,33 @@ exports[`props should render offset 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-*:hover > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:hover > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   box-shadow: 0 14px 28px 0 rgba(0 ,0,0,0.7);
 }
 
-*:active > .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
+*:active > .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
 }
 
-<div
-  aria-hidden="true"
-  class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-0"
-  data-g2-c16t="true"
-  data-g2-component="Elevation"
-/>
-`;
-
-exports[`props should render value 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-0 {
   background: transparent;
   display: block;
   margin: 0 !important;
   pointer-events: none;
   position: absolute;
   will-change: box-shadow;
+}
+
+<div
+  aria-hidden="true"
+  class="emotion-0 components-elevation emotion-1 emotion-2 emotion-3"
+  data-wp-c16t="true"
+  data-wp-component="Elevation"
+/>
+`;
+
+exports[`props should render value 1`] = `
+.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   border-radius: inherit;
   bottom: 0;
   box-shadow: 0 7px 14px 0 rgba(0 ,0,0,0.35);
@@ -320,22 +209,19 @@ exports[`props should render value 1`] = `
   transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
+.emotion-0 {
+  background: transparent;
+  display: block;
+  margin: 0 !important;
+  pointer-events: none;
+  position: absolute;
+  will-change: box-shadow;
 }
 
 <div
   aria-hidden="true"
-  class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-0"
-  data-g2-c16t="true"
-  data-g2-component="Elevation"
+  class="emotion-0 emotion-1 components-elevation emotion-2 emotion-3"
+  data-wp-c16t="true"
+  data-wp-component="Elevation"
 />
 `;

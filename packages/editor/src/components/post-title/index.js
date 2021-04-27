@@ -15,6 +15,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { pasteHandler } from '@wordpress/blocks';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -35,7 +36,7 @@ export default function PostTitle() {
 		insertDefaultBlock,
 		clearSelectedBlock,
 		insertBlocks,
-	} = useDispatch( 'core/block-editor' );
+	} = useDispatch( blockEditorStore );
 	const {
 		isCleanNewPost,
 		title,
@@ -47,7 +48,7 @@ export default function PostTitle() {
 			getEditedPostAttribute,
 			isCleanNewPost: _isCleanNewPost,
 		} = select( 'core/editor' );
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		const {
 			titlePlaceholder,
 			focusMode,
