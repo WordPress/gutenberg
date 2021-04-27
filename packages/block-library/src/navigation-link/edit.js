@@ -133,6 +133,50 @@ function getSuggestionsQuery( type, kind ) {
 	}
 }
 
+export const updateNavigationLinkBlockAttributes = (
+	updatedValue = {},
+	{ setAttributes, label = '' }
+) => {
+	const {
+		title = '',
+		url = '',
+		opensInNewTab,
+		id,
+		kind = '',
+		type = '',
+	} = updatedValue;
+
+	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
+	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
+	const escapeTitle =
+		title !== '' && normalizedTitle !== normalizedURL && label !== title;
+	const newLabel = escapeTitle
+		? escape( title )
+		: label || escape( normalizedURL );
+
+	const isBuiltInType =
+		[ 'post', 'page', 'tag', 'category', 'post_type' ].indexOf( type ) > -1;
+
+	if ( ! kind && ! isBuiltInType ) {
+		return setAttributes( {
+			url: encodeURI( url ),
+			label: newLabel,
+			opensInNewTab,
+			...( Number.isInteger( id ) && { id } ),
+			kind: 'custom',
+		} );
+	}
+
+	return setAttributes( {
+		url: encodeURI( url ),
+		label: newLabel,
+		opensInNewTab,
+		...( Number.isInteger( id ) && { id } ),
+		...( kind && { kind } ),
+		...( type && { type } ),
+	} );
+};
+
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -519,55 +563,12 @@ export default function NavigationLinkEdit( {
 									type,
 									kind
 								) }
-								onChange={ ( {
-									title: newTitle = '',
-									url: newURL = '',
-									opensInNewTab: newOpensInNewTab,
-									id: newId,
-									kind: newKind = '',
-									type: newType = '',
-								} = {} ) => {
-									setAttributes( {
-										url: encodeURI( newURL ),
-										label: ( () => {
-											const normalizedTitle = newTitle.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											const normalizedURL = newURL.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											if (
-												newTitle !== '' &&
-												normalizedTitle !==
-													normalizedURL &&
-												label !== newTitle
-											) {
-												return escape( newTitle );
-											} else if ( label ) {
-												return label;
-											}
-											// If there's no label, add the URL.
-											return escape( normalizedURL );
-										} )(),
-										opensInNewTab: newOpensInNewTab,
-										// `id` represents the DB ID of the entity which this link represents (eg: Post ID).
-										// Therefore we must not inadvertently set it to `undefined` if the `onChange` is called with no `id` value.
-										// This is possible when a setting changes such as the `opensInNewTab`.
-										...( newId && {
-											id: newId,
-										} ),
-										...( newKind && {
-											kind: newKind,
-										} ),
-										...( newType &&
-											newType !== 'URL' &&
-											newType !== 'post-format' && {
-												type: newType,
-											} ),
-									} );
-								} }
+								onChange={ ( updatedValue ) =>
+									updateNavigationLinkBlockAttributes(
+										updatedValue,
+										{ setAttributes, label }
+									)
+								}
 							/>
 						</Popover>
 					) }
