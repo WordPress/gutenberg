@@ -265,6 +265,16 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 			"\t\t</p>",
 			$data['form']
 		);
+		$this->assertStringMatchesFormat(
+			"<div class=\"widget widget_search\"><form role=\"search\" method=\"get\" id=\"searchform\" class=\"searchform\" action=\"%s\">\n" .
+			"\t\t\t\t<div>\n" .
+			"\t\t\t\t\t<label class=\"screen-reader-text\" for=\"s\">Search for:</label>\n" .
+			"\t\t\t\t\t<input type=\"text\" value=\"\" name=\"s\" id=\"s\" />\n" .
+			"\t\t\t\t\t<input type=\"submit\" id=\"searchsubmit\" value=\"Search\" />\n" .
+			"\t\t\t\t</div>\n" .
+			"\t\t\t</form></div>",
+			$data['preview']
+		);
 		$this->assertEqualSets(
 			array(
 				'encoded' => base64_encode( serialize( array() ) ),
@@ -294,6 +304,16 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 			"\t\t</p>",
 			$data['form']
 		);
+		$this->assertStringMatchesFormat(
+			"<div class=\"widget widget_search\"><h2 class=\"widgettitle\">Test title</h2><form role=\"search\" method=\"get\" id=\"searchform\" class=\"searchform\" action=\"%s\">\n" .
+			"\t\t\t\t<div>\n" .
+			"\t\t\t\t\t<label class=\"screen-reader-text\" for=\"s\">Search for:</label>\n" .
+			"\t\t\t\t\t<input type=\"text\" value=\"\" name=\"s\" id=\"s\" />\n" .
+			"\t\t\t\t\t<input type=\"submit\" id=\"searchsubmit\" value=\"Search\" />\n" .
+			"\t\t\t\t</div>\n" .
+			"\t\t\t</form></div>",
+			$data['preview']
+		);
 		$this->assertEqualSets(
 			array(
 				'encoded' => base64_encode( serialize( array( 'title' => 'Test title' ) ) ),
@@ -316,6 +336,16 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 			"\t\t\t<input class=\"widefat\" id=\"widget-search-1-title\" name=\"widget-search[1][title]\" type=\"text\" value=\"Updated title\" />\n" .
 			"\t\t</p>",
 			$data['form']
+		);
+		$this->assertStringMatchesFormat(
+			"<div class=\"widget widget_search\"><h2 class=\"widgettitle\">Updated title</h2><form role=\"search\" method=\"get\" id=\"searchform\" class=\"searchform\" action=\"%s\">\n" .
+			"\t\t\t\t<div>\n" .
+			"\t\t\t\t\t<label class=\"screen-reader-text\" for=\"s\">Search for:</label>\n" .
+			"\t\t\t\t\t<input type=\"text\" value=\"\" name=\"s\" id=\"s\" />\n" .
+			"\t\t\t\t\t<input type=\"submit\" id=\"searchsubmit\" value=\"Search\" />\n" .
+			"\t\t\t\t</div>\n" .
+			"\t\t\t</form></div>",
+			$data['preview']
 		);
 		$this->assertEqualSets(
 			array(
@@ -347,6 +377,16 @@ class WP_Test_REST_Widget_Types_Controller extends WP_Test_REST_Controller_Testc
 			"\t\t\t<input class=\"widefat\" id=\"widget-search-1-title\" name=\"widget-search[1][title]\" type=\"text\" value=\"Test title\" />\n" .
 			"\t\t</p>",
 			$data['form']
+		);
+		$this->assertStringMatchesFormat(
+			"<div class=\"widget widget_search\"><h2 class=\"widgettitle\">Test title</h2><form role=\"search\" method=\"get\" id=\"searchform\" class=\"searchform\" action=\"%s\">\n" .
+			"\t\t\t\t<div>\n" .
+			"\t\t\t\t\t<label class=\"screen-reader-text\" for=\"s\">Search for:</label>\n" .
+			"\t\t\t\t\t<input type=\"text\" value=\"\" name=\"s\" id=\"s\" />\n" .
+			"\t\t\t\t\t<input type=\"submit\" id=\"searchsubmit\" value=\"Search\" />\n" .
+			"\t\t\t\t</div>\n" .
+			"\t\t\t</form></div>",
+			$data['preview']
 		);
 		$this->assertEqualSets(
 			array(
