@@ -6,10 +6,10 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-2anhki"
-+   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-9yhif5"
-    data-g2-c16t="true"
-    data-g2-component="Surface"
+-   class="components-surface css-w8sz4c css-1mm2cvy-View egi4jkx0"
++   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
+    data-wp-c16t="true"
+    data-wp-component="Surface"
   >
     Surface
   </div>
@@ -21,10 +21,10 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-17q8f3e"
-+   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-9yhif5"
-    data-g2-c16t="true"
-    data-g2-component="Surface"
+-   class="components-surface css-1rsk61w css-1mm2cvy-View egi4jkx0"
++   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
+    data-wp-c16t="true"
+    data-wp-component="Surface"
   >
     Surface
   </div>
@@ -36,10 +36,10 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-187zti8"
-+   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-9yhif5"
-    data-g2-c16t="true"
-    data-g2-component="Surface"
+-   class="components-surface css-1k4iwhs css-1mm2cvy-View egi4jkx0"
++   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
+    data-wp-c16t="true"
+    data-wp-component="Surface"
   >
     Surface
   </div>
@@ -51,10 +51,10 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-evf9lw"
-+   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-9yhif5"
-    data-g2-c16t="true"
-    data-g2-component="Surface"
+-   class="components-surface css-l7n8r9 css-1mm2cvy-View egi4jkx0"
++   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
+    data-wp-c16t="true"
+    data-wp-component="Surface"
   >
     Surface
   </div>
@@ -66,10 +66,10 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-19tpeum"
-+   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-9yhif5"
-    data-g2-c16t="true"
-    data-g2-component="Surface"
+-   class="components-surface css-1dxo3zh css-1mm2cvy-View egi4jkx0"
++   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
+    data-wp-c16t="true"
+    data-wp-component="Surface"
   >
     Surface
   </div>
@@ -77,16 +77,6 @@ Snapshot Diff:
 
 exports[`props should render correctly 1`] = `
 .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
   background-color: #ffffff;
   background-color: var(--wp-g2-surface-color);
   color: #1e1e1e;
@@ -96,22 +86,10 @@ exports[`props should render correctly 1`] = `
   --wp-g2-surface-background-size-dotted: 11px;
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
 <div
-  class="components-surface wp-components-surface ic-15506ld ic-192yz5d emotion-0"
-  data-g2-c16t="true"
-  data-g2-component="Surface"
+  class="components-surface emotion-0 emotion-1 emotion-2"
+  data-wp-c16t="true"
+  data-wp-component="Surface"
 >
   Surface
 </div>
@@ -123,10 +101,10 @@ Snapshot Diff:
 + Second value
 
   <div
--   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-icckk4"
-+   class="components-surface wp-components-surface ic-15506ld ic-192yz5d css-9yhif5"
-    data-g2-c16t="true"
-    data-g2-component="Surface"
+-   class="components-surface css-1dajkma css-1mm2cvy-View egi4jkx0"
++   class="components-surface css-10jei3p css-1mm2cvy-View egi4jkx0"
+    data-wp-c16t="true"
+    data-wp-component="Surface"
   >
     Surface
   </div>
