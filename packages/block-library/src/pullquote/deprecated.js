@@ -178,6 +178,7 @@ const deprecated = [
 				className,
 				backgroundColor: isSolidColorStyle ? mainColor : undefined,
 				borderColor: isSolidColorStyle ? undefined : mainColor,
+				textAlign: isSolidColorStyle ? 'left' : undefined,
 				style,
 				...attributes,
 			};
@@ -335,6 +336,7 @@ const deprecated = [
 				className,
 				backgroundColor: isSolidColorStyle ? mainColor : undefined,
 				borderColor: isSolidColorStyle ? undefined : mainColor,
+				textAlign: isSolidColorStyle ? 'left' : undefined,
 				style,
 				...attributes,
 			};
@@ -458,6 +460,7 @@ const deprecated = [
 				className,
 				backgroundColor: isSolidColorStyle ? mainColor : undefined,
 				borderColor: isSolidColorStyle ? undefined : mainColor,
+				textAlign: isSolidColorStyle ? 'left' : undefined,
 				style,
 				...attributes,
 			};

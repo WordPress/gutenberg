@@ -6,6 +6,7 @@
 		"attributes": {
 			"className": "has-background has-black-background-color is-style-solid-color",
 			"backgroundColor": "black",
+			"textAlign": "left",
 			"value": "<p>pullquote</p>",
 			"citation": "before block supports",
 			"textColor": "white"

@@ -1,8 +1,18 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import {
+	AlignmentControl,
+	BlockControls,
+	RichText,
+	useBlockProps,
+} from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 
 /**
@@ -21,53 +31,69 @@ function PullQuoteEdit( {
 	isSelected,
 	insertBlocksAfter,
 } ) {
-	const { value, citation } = attributes;
-	const blockProps = useBlockProps();
+	const { textAlign, citation, value } = attributes;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+	} );
 	const shouldShowCitation = ! RichText.isEmpty( citation ) || isSelected;
 
 	return (
-		<Figure { ...blockProps }>
-			<BlockQuote>
-				<RichText
-					identifier="value"
-					multiline
-					value={ value }
-					onChange={ ( nextValue ) =>
-						setAttributes( {
-							value: nextValue,
-						} )
-					}
-					aria-label={ __( 'Pullquote text' ) }
-					placeholder={
-						// translators: placeholder text used for the quote
-						__( 'Add quote' )
-					}
-					textAlign="center"
+		<>
+			<BlockControls group="block">
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
 				/>
-				{ shouldShowCitation && (
+			</BlockControls>
+			<Figure { ...blockProps }>
+				<BlockQuote>
 					<RichText
-						identifier="citation"
-						value={ citation }
-						aria-label={ __( 'Pullquote citation text' ) }
-						placeholder={
-							// translators: placeholder text used for the citation
-							__( 'Add citation' )
-						}
-						onChange={ ( nextCitation ) =>
+						identifier="value"
+						multiline
+						value={ value }
+						onChange={ ( nextValue ) =>
 							setAttributes( {
-								citation: nextCitation,
+								value: nextValue,
 							} )
 						}
-						className="wp-block-pullquote__citation"
-						__unstableMobileNoFocusOnMount
-						textAlign="center"
-						__unstableOnSplitAtEnd={ () =>
-							insertBlocksAfter( createBlock( 'core/paragraph' ) )
+						aria-label={ __( 'Pullquote text' ) }
+						placeholder={
+							// translators: placeholder text used for the quote
+							__( 'Add quote' )
 						}
+						textAlign="center"
 					/>
-				) }
-			</BlockQuote>
-		</Figure>
+					{ shouldShowCitation && (
+						<RichText
+							identifier="citation"
+							value={ citation }
+							aria-label={ __( 'Pullquote citation text' ) }
+							placeholder={
+								// translators: placeholder text used for the citation
+								__( 'Add citation' )
+							}
+							onChange={ ( nextCitation ) =>
+								setAttributes( {
+									citation: nextCitation,
+								} )
+							}
+							className="wp-block-pullquote__citation"
+							__unstableMobileNoFocusOnMount
+							textAlign="center"
+							__unstableOnSplitAtEnd={ () =>
+								insertBlocksAfter(
+									createBlock( 'core/paragraph' )
+								)
+							}
+						/>
+					) }
+				</BlockQuote>
+			</Figure>
+		</>
 	);
 }
 
