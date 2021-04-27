@@ -165,19 +165,18 @@ $color-control-label-height: 20px;
  * Setup state
  */
 
-// Ensure that an empty block has space around the appender.
-.wp-block-navigation-placeholder,
-.wp-block-navigation-placeholder__preview {
-	min-height: $grid-unit-05 + $grid-unit-05 + $button-size;
-}
-
 // Output a zero width space before the appender, so the appender is the same height as a default menu item.
-.wp-block-navigation:not(.is-vertical) .block-list-appender {
-	display: flex;
-	align-items: center;
+// Doing the same for the horizontal placeholder preview accomplishes the same.
+.wp-block-navigation:not(.is-vertical) {
+	.wp-block-navigation-placeholder,
+	.wp-block-navigation-placeholder__preview,
+	.block-list-appender {
+		display: flex;
+		align-items: center;
 
-	&::before {
-		content: "\200B";
+		&::before {
+			content: "\200B";
+		}
 	}
 }
 
@@ -204,7 +203,7 @@ $color-control-label-height: 20px;
 		background: currentColor;
 		min-width: 72px;
 		height: $grid-unit-20;
-		margin: $grid-unit-15 $grid-unit-30 $grid-unit-15 0;
+		margin: auto $grid-unit-30 auto 0;
 	}
 
 	svg {
@@ -219,13 +218,7 @@ $color-control-label-height: 20px;
 	.is-selected & {
 		// Don't show the preview boxes for an empty nav block.
 		opacity: 0;
-
-		// Need to show the placeholder box above the preview boxes.
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
+		width: 0;
 	}
 }
 
