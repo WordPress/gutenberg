@@ -11,8 +11,8 @@ Snapshot Diff:
         title="WordPress.org"
       />
       <div
--       class="css-yyubco-InnerBody components-card-inner-body css-1mm2cvy-View egi4jkx0"
-+       class="components-scrollable wp-components-scrollable components-card-body css-aej86y-Body-borderRadius ic-y3p1xi css-1jyvxqk css-1mm2cvy-View egi4jkx0"
+-       class="css-yc36db-InnerBody components-card-inner-body css-1mm2cvy-View egi4jkx0"
++       class="components-scrollable wp-components-scrollable components-card-body css-3sz8a0-Body-borderRadius ic-y3p1xi css-1jyvxqk css-1mm2cvy-View egi4jkx0"
 +       data-g2-c16t="true"
 +       data-g2-component="Scrollable"
         data-wp-c16t="true"
@@ -22,7 +22,7 @@ Snapshot Diff:
         Code is Poetry.
       </div>
       <div
-        class="components-flex components-card-footer css-k894y4-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View egi4jkx0"
+        class="components-flex components-card-footer css-g6s6xo-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View egi4jkx0"
 `;
 
 exports[`props should render correctly 1`] = `
@@ -141,10 +141,10 @@ exports[`props should render correctly 1`] = `
   border-bottom: 1px solid;
   border-color: rgba(0,0,0,0.1);
   min-height: 44px;
-  padding-bottom: 8px;
-  padding-left: 24px;
-  padding-right: 24px;
-  padding-top: 8px;
+  padding-bottom: calc(4px * 1);
+  padding-left: calc(4px * 3);
+  padding-right: calc(4px * 3);
+  padding-top: calc(4px * 1);
 }
 
 .emotion-0 > * + *:not(marquee) {
@@ -168,7 +168,7 @@ exports[`props should render correctly 1`] = `
 .emotion-3 {
   height: auto;
   max-height: 100%;
-  padding: 24px,24px;
+  padding: calc(4px * 3) calc(4px * 3);
 }
 
 .emotion-3:first-of-type {
@@ -200,10 +200,10 @@ exports[`props should render correctly 1`] = `
   width: 100%;
   border-color: rgba(0,0,0,0.1);
   min-height: 44px;
-  padding-bottom: 8px;
-  padding-left: 24px;
-  padding-right: 24px;
-  padding-top: 8px;
+  padding-bottom: calc(4px * 1);
+  padding-left: calc(4px * 3);
+  padding-right: calc(4px * 3);
+  padding-top: calc(4px * 1);
 }
 
 .emotion-7 > * + *:not(marquee) {
