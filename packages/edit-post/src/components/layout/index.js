@@ -229,10 +229,10 @@ function Layout( { styles } ) {
 					( ! isMobileViewport || sidebarIsOpened ) && (
 						<>
 							{ ! isMobileViewport && ! sidebarIsOpened && (
-								<div className="edit-post-layout__toogle-sidebar-panel">
+								<div className="edit-post-layout__toggle-sidebar-panel">
 									<Button
 										isSecondary
-										className="edit-post-layout__toogle-sidebar-panel-button"
+										className="edit-post-layout__toggle-sidebar-panel-button"
 										onClick={ openSidebarPanel }
 										aria-expanded={ false }
 									>

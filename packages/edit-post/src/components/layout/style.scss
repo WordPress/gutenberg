@@ -63,9 +63,9 @@
 
 
 .edit-post-layout__toggle-publish-panel,
-.edit-post-layout__toogle-sidebar-panel,
+.edit-post-layout__toggle-sidebar-panel,
 .edit-post-layout__toggle-entities-saved-states-panel {
-	z-index: z-index(".edit-post-layout__toogle-sidebar-panel");
+	z-index: z-index(".edit-post-layout__toggle-sidebar-panel");
 	position: fixed !important; // Need to override the default relative positionning
 	top: -9999em;
 	bottom: auto;
