@@ -9,6 +9,9 @@ const CARD_PADDING_Y = space( 3 );
 
 export default {
 	colorDivider: 'rgba(0, 0, 0, 0.1)',
+	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
+	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',
+	colorScrollbarTrack: 'rgba(0, 0, 0, 0.04)',
 	radiusBlockUi: '2px',
 	borderWidth: '1px',
 	borderWidthFocus: '1.5px',
