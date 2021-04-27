@@ -1,0 +1,57 @@
+.edit-post-title-actions {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	height: 100%;
+	// Flex items will, by default, refuse to shrink below a minimum
+	// intrinsic width. In order to shrink this flexbox item, and
+	// subsequently truncate child text, we set an explicit min-width.
+	// See https://dev.w3.org/csswg/css-flexbox/#min-size-auto
+	min-width: 0;
+
+	.edit-post-title-actions__title-wrapper {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		align-items: center;
+
+		// See comment above about min-width
+		min-width: 0;
+
+		.components-dropdown {
+			display: inline-flex;
+			margin-left: $grid-unit-05;
+
+			.components-button {
+				min-width: 0;
+				padding: 0;
+			}
+		}
+	}
+
+	.edit-post-title-actions__title-wrapper > h1 {
+		margin: 0;
+
+		// See comment above about min-width
+		min-width: 0;
+	}
+
+	.edit-post-title-actions__title {
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		max-width: 120px;
+
+		@include break-medium() {
+			max-width: 75px;
+		}
+
+		@include break-xlarge() {
+			max-width: 180px;
+		}
+	}
+}
+.edit-post-title-actions__info-dropdown > .components-popover__content > div {
+	padding: 0;
+	min-width: 240px;
+}
