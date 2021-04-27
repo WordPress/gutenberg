@@ -7,9 +7,6 @@
 			"type": "boolean",
 			"default": false
 		},
-		"backgroundColor": {
-			"type": "string"
-		},
 		"caption": {
 			"type": "string",
 			"source": "html",
@@ -125,6 +122,10 @@
 	"supports": {
 		"anchor": true,
 		"align": true,
+		"color": {
+			"__experimentalSkipSerialization": true,
+			"gradients": true
+		},
 		"__experimentalSelector": ".wp-block-table > table"
 	},
 	"editorStyle": "wp-block-table-editor",

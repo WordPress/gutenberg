@@ -11,11 +11,10 @@ import {
 	InspectorControls,
 	BlockControls,
 	RichText,
-	PanelColorSettings,
-	createCustomColorsHOC,
 	BlockIcon,
 	AlignmentToolbar,
 	useBlockProps,
+	__experimentalUseColorProps as useColorProps,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -58,29 +57,6 @@ import {
 	isEmptyTableSection,
 } from './state';
 
-const BACKGROUND_COLORS = [
-	{
-		color: '#f3f4f5',
-		name: 'Subtle light gray',
-		slug: 'subtle-light-gray',
-	},
-	{
-		color: '#e9fbe5',
-		name: 'Subtle pale green',
-		slug: 'subtle-pale-green',
-	},
-	{
-		color: '#e7f5fe',
-		name: 'Subtle pale blue',
-		slug: 'subtle-pale-blue',
-	},
-	{
-		color: '#fcf0ef',
-		name: 'Subtle pale pink',
-		slug: 'subtle-pale-pink',
-	},
-];
-
 const ALIGNMENT_CONTROLS = [
 	{
 		icon: alignLeft,
@@ -98,8 +74,6 @@ const ALIGNMENT_CONTROLS = [
 		align: 'right',
 	},
 ];
-
-const withCustomBackgroundColors = createCustomColorsHOC( BACKGROUND_COLORS );
 
 const cellAriaLabel = {
 	head: __( 'Header cell text' ),
@@ -119,8 +93,6 @@ function TSection( { name, ...props } ) {
 
 function TableEdit( {
 	attributes,
-	backgroundColor,
-	setBackgroundColor,
 	setAttributes,
 	insertBlocksAfter,
 	isSelected,
@@ -129,6 +101,8 @@ function TableEdit( {
 	const [ initialRowCount, setInitialRowCount ] = useState( 2 );
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
+
+	const colorProps = useColorProps( attributes );
 
 	/**
 	 * Updates the initial column count used for table creation.
@@ -499,27 +473,14 @@ function TableEdit( {
 							onChange={ onToggleFooterSection }
 						/>
 					</PanelBody>
-					<PanelColorSettings
-						title={ __( 'Color' ) }
-						initialOpen={ false }
-						colorSettings={ [
-							{
-								value: backgroundColor.color,
-								onChange: setBackgroundColor,
-								label: __( 'Background color' ),
-								disableCustomColors: true,
-								colors: BACKGROUND_COLORS,
-							},
-						] }
-					/>
 				</InspectorControls>
 			) }
 			{ ! isEmpty && (
 				<table
-					className={ classnames( backgroundColor.class, {
+					className={ classnames( colorProps.className, {
 						'has-fixed-layout': hasFixedLayout,
-						'has-background': !! backgroundColor.color,
 					} ) }
+					style={ colorProps.style }
 				>
 					{ renderedSections }
 				</table>
@@ -580,4 +541,4 @@ function TableEdit( {
 	);
 }
 
-export default withCustomBackgroundColors( 'backgroundColor' )( TableEdit );
+export default TableEdit;
