@@ -6,31 +6,20 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	withFocusReturn,
-	withConstrainedTabbing,
-} from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
-import { close as closeIcon } from '@wordpress/icons';
+import { useState, useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
-import { compose } from '@wordpress/compose';
+import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
 
-function EntitiesSavedStates( { isOpen, close } ) {
+export default function EntitiesSavedStates( { close } ) {
 	const saveButtonRef = useRef();
-	useEffect( () => {
-		if ( isOpen ) {
-			// Focus the save button when the saved states panel is opened
-			saveButtonRef.current?.focus();
-		}
-	}, [ isOpen ] );
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
 		return {
 			dirtyEntityRecords: select(
@@ -90,8 +79,16 @@ function EntitiesSavedStates( { isOpen, close } ) {
 	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => close(), [ close ] );
 
-	return isOpen ? (
-		<div className="entities-saved-states__panel">
+	const [ saveDialogRef, saveDialogProps ] = useDialog( {
+		onClose: () => dismissPanel(),
+	} );
+
+	return (
+		<div
+			ref={ saveDialogRef }
+			{ ...saveDialogProps }
+			className="entities-saved-states__panel"
+		>
 			<div className="entities-saved-states__panel-header">
 				<Button
 					ref={ saveButtonRef }
@@ -106,11 +103,7 @@ function EntitiesSavedStates( { isOpen, close } ) {
 				>
 					{ __( 'Save' ) }
 				</Button>
-				<Button
-					onClick={ dismissPanel }
-					icon={ closeIcon }
-					label={ __( 'Close panel' ) }
-				/>
+				<Button icon={ close } onClick={ dismissPanel } />
 			</div>
 
 			<div className="entities-saved-states__text-prompt">
@@ -134,9 +127,5 @@ function EntitiesSavedStates( { isOpen, close } ) {
 				);
 			} ) }
 		</div>
-	) : null;
+	);
 }
-
-export default compose( [ withFocusReturn, withConstrainedTabbing ] )(
-	EntitiesSavedStates
-);
