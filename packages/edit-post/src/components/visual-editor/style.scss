@@ -65,4 +65,11 @@
 	position: absolute;
 	top: $grid-unit-10;
 	left: $grid-unit-10;
+	color: $white;
+
+	&:active:not([aria-disabled="true"]),
+	&:focus:not([aria-disabled="true"]),
+	&:hover {
+		color: $gray-100;
+	}
 }
