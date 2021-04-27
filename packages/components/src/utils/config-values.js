@@ -12,6 +12,7 @@ export default {
 	colorScrollbarThumb: 'rgba(0, 0, 0, 0.2)',
 	colorScrollbarThumbHover: 'rgba(0, 0, 0, 0.5)',
 	colorScrollbarTrack: 'rgba(0, 0, 0, 0.04)',
+	elevationIntensity: 1,
 	radiusBlockUi: '2px',
 	borderWidth: '1px',
 	borderWidthFocus: '1.5px',

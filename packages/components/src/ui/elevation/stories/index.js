@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { number } from '@storybook/addon-knobs';
-import { Divider } from '@wp-g2/components';
 
 /**
  * Internal dependencies
@@ -11,6 +10,7 @@ import { Elevation } from '../index';
 import { Grid } from '../../grid';
 import { View } from '../../view';
 import { HStack } from '../../h-stack';
+import { Divider } from '../../divider';
 import {
 	ExampleGrid,
 	ExampleGridItem,
