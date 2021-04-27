@@ -100,7 +100,7 @@ export {
 	ALIGNMENT_BREAKPOINTS,
 	alignmentHelpers,
 } from './mobile/utils/alignments';
-
+export { default as Gridicons } from './mobile/gridicons';
 // Hooks
 export {
 	convertUnitToMobile,
