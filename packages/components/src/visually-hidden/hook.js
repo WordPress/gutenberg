@@ -14,7 +14,7 @@ import * as styles from './styles';
 export function useVisuallyHidden( { className, ...props } ) {
 	// circumvent the context system and write the classnames ourselves
 	const classes = cx(
-		'components-visually-hidden wp-components-visually-hidden',
+		'components-visually-hidden',
 		className,
 		styles.VisuallyHidden
 	);
