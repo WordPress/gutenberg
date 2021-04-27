@@ -11,10 +11,6 @@ exports[`props should render correctly 1`] = `
   --wp-g2-surface-background-size-dotted: 11px;
 }
 
-.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17.emotion-17 .components-card-body {
-  max-height: 80vh;
-}
-
 .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
   height: 100%;
   overflow-x: hidden;
@@ -96,6 +92,10 @@ exports[`props should render correctly 1`] = `
   border-radius: 2px;
 }
 
+.emotion-16 .components-card-body {
+  max-height: 80vh;
+}
+
 .emotion-8 {
   border-radius: 2px;
 }
@@ -103,7 +103,7 @@ exports[`props should render correctly 1`] = `
 .emotion-0 {
   height: auto;
   max-height: 100%;
-  padding: 24px,24px;
+  padding: calc(4px * 3) calc(4px * 3);
 }
 
 .emotion-0:first-of-type {
@@ -165,17 +165,17 @@ Snapshot Diff:
   <div
 -   aria-label="show"
 +   aria-label="popover-base-popover"
-    class="components-popover-content wp-components-popover-content components-popover wp-components-popover ic-fzg5i9 ic-1o22l1x css-xnf55w css-1mm2cvy-View egi4jkx0"
+    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View egi4jkx0"
     data-dialog="true"
-    data-g2-c16t="true"
-    data-g2-component="Popover"
+    data-wp-c16t="true"
+    data-wp-component="Popover"
 -   id="labelled-popover"
 +   id="base-popover"
     role="dialog"
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-1tf68oj-Card-rounded css-1wit8k9 css-1mm2cvy-View egi4jkx0"
+      class="components-surface components-card css-hy95ag-Card-rounded-cardStyle css-10jei3p css-1mm2cvy-View egi4jkx0"
 `;
 
 exports[`props should render without content 1`] = `
@@ -187,17 +187,17 @@ Snapshot Diff:
   <div
 -   aria-label="popover-contentless-popover"
 +   aria-label="popover-base-popover"
-    class="components-popover-content wp-components-popover-content components-popover wp-components-popover ic-fzg5i9 ic-1o22l1x css-xnf55w css-1mm2cvy-View egi4jkx0"
+    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View egi4jkx0"
     data-dialog="true"
-    data-g2-c16t="true"
-    data-g2-component="Popover"
+    data-wp-c16t="true"
+    data-wp-component="Popover"
 -   id="contentless-popover"
 +   id="base-popover"
     role="dialog"
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-1tf68oj-Card-rounded css-1wit8k9 css-1mm2cvy-View egi4jkx0"
+      class="components-surface components-card css-hy95ag-Card-rounded-cardStyle css-10jei3p css-1mm2cvy-View egi4jkx0"
 @@ -21,10 +21,19 @@
           frameborder="0"
           src="about:blank"
@@ -205,7 +205,7 @@ Snapshot Diff:
           tabindex="-1"
         />
 +       <div
-+         class="components-scrollable wp-components-scrollable components-card-body css-aej86y-Body-borderRadius ic-y3p1xi css-1jyvxqk css-1mm2cvy-View egi4jkx0"
++         class="components-scrollable wp-components-scrollable components-card-body css-3sz8a0-Body-borderRadius ic-y3p1xi css-1jyvxqk css-1mm2cvy-View egi4jkx0"
 +         data-g2-c16t="true"
 +         data-g2-component="Scrollable"
 +         data-wp-c16t="true"

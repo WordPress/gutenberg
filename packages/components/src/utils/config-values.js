@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { space } from './space';
+import { space } from '../ui/utils/space';
 
 const CONTROL_HEIGHT = '30px';
 const CARD_PADDING_X = space( 3 );
@@ -36,8 +36,14 @@ export default {
 	cardBorderRadius: '2px',
 	cardPaddingX: CARD_PADDING_X,
 	cardPaddingY: CARD_PADDING_Y,
-	cardPadding: `${ CARD_PADDING_X }, ${ CARD_PADDING_Y }`,
+	cardPadding: `${ CARD_PADDING_X } ${ CARD_PADDING_Y }`,
 	cardHeaderFooterPaddingY: space( 1 ),
 	cardHeaderHeight: '44px',
 	surfaceBorderColor: 'rgba(0, 0, 0, 0.1)',
+	transitionDuration: '200ms',
+	transitionDurationFast: '160ms',
+	transitionDurationFaster: '120ms',
+	transitionDurationFastest: '100ms',
+	transitionTimingFunction: 'cubic-bezier(0.08, 0.52, 0.52, 1)',
+	transitionTimingFunctionControl: 'cubic-bezier(0.12, 0.8, 0.32, 1)',
 };
