@@ -25,7 +25,7 @@ import { store as editorStore } from '@wordpress/editor';
 import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
 import { TemplatePartAdvancedControls } from './advanced-controls';
-import EntityContent from './entity-content';
+import TemplatePartInnerBlocks from './inner-blocks';
 
 export default function TemplatePartEdit( {
 	attributes,
@@ -130,8 +130,8 @@ export default function TemplatePartEdit( {
 				<TagName { ...blockProps }>
 					<TemplatePartPlaceholder
 						area={ attributes.area }
+						clientId={ clientId }
 						setAttributes={ setAttributes }
-						innerBlocks={ innerBlocks }
 					/>
 				</TagName>
 			) }
@@ -164,13 +164,12 @@ export default function TemplatePartEdit( {
 				</BlockControls>
 			) }
 			{ isEntityAvailable && (
-				<EntityContent
+				<TemplatePartInnerBlocks
 					tagName={ TagName }
 					blockProps={ blockProps }
 					postId={ templatePartId }
 					hasInnerBlocks={ innerBlocks.length > 0 }
 					layout={ layout }
-					clientId={ clientId }
 				/>
 			) }
 			{ ! isPlaceholder && ! isResolved && (

@@ -16,7 +16,6 @@ export default function TemplatePartInnerBlocks( {
 	layout,
 	tagName: TagName,
 	blockProps,
-	startBlank,
 } ) {
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
@@ -38,10 +37,9 @@ export default function TemplatePartInnerBlocks( {
 		value: blocks,
 		onInput,
 		onChange,
-		renderAppender:
-			hasInnerBlocks || ! startBlank
-				? undefined
-				: InnerBlocks.ButtonBlockAppender,
+		renderAppender: hasInnerBlocks
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
 		__experimentalLayout: {
 			type: 'default',
 			// Find a way to inject this in the support flag code (hooks).
