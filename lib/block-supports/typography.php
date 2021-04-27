@@ -72,7 +72,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 	$has_text_decoration_support = _wp_array_get( $block_type->supports, array( '__experimentalTextDecoration' ), false );
 	$has_text_transform_support  = _wp_array_get( $block_type->supports, array( '__experimentalTextTransform' ), false );
 
-	$skip_font_size_support_serialization = _wp_array_get( $block_type->supports, array( '__experimentalSkipTypographySerialization' ), false );
+	$skip_font_size_support_serialization = _wp_array_get( $block_type->supports, array( '__experimentalSkipFontSizeSerialization' ), false );
 
 	// Font Size.
 	if ( $has_font_size_support && ! $skip_font_size_support_serialization ) {
