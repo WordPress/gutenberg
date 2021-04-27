@@ -7,7 +7,6 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef } from '@wordpress/element';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -67,21 +66,14 @@ function Root( { className, children } ) {
 }
 
 export default function BlockList( { className, __experimentalLayout } ) {
-	const ref = useRef();
-
 	usePreParsePatterns();
-
 	return (
-		<>
+		<InsertionPoint>
 			<BlockPopover />
-			<InsertionPoint>
-				<Root className={ className } containerRef={ ref }>
-					<BlockListItems
-						__experimentalLayout={ __experimentalLayout }
-					/>
-				</Root>
-			</InsertionPoint>
-		</>
+			<Root className={ className }>
+				<BlockListItems __experimentalLayout={ __experimentalLayout } />
+			</Root>
+		</InsertionPoint>
 	);
 }
 
