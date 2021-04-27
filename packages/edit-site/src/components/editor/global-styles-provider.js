@@ -142,6 +142,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 
 	const contexts = useMemo( () => getContexts( blockTypes ), [ blockTypes ] );
 
+	const { __experimentalGlobalStylesBaseStyles: themeStyles } = settings;
 	const { userStyles, mergedStyles } = useMemo( () => {
 		let newUserStyles;
 		try {
@@ -175,6 +176,17 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 		};
 	}, [ content ] );
 
+	const getStyleOrigin = ( origin ) => {
+		switch ( origin ) {
+			case 'user':
+				return userStyles;
+			case 'theme':
+				return themeStyles;
+			default:
+				return mergedStyles;
+		}
+	};
+
 	const nextValue = useMemo(
 		() => ( {
 			contexts,
@@ -191,14 +203,15 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				setContent( JSON.stringify( newContent ) );
 			},
 			getStyle: ( context, propertyName, origin = 'merged' ) => {
-				const styleOrigin =
-					'user' === origin ? userStyles : mergedStyles;
+				const styleOrigin = getStyleOrigin( origin );
 
 				const value = get(
 					styleOrigin?.styles?.[ context ],
 					STYLE_PROPERTY[ propertyName ].value
 				);
-				return getValueFromVariable( mergedStyles, context, value );
+
+				const styles = 'theme' === origin ? themeStyles : mergedStyles;
+				return getValueFromVariable( styles, context, value );
 			},
 			setStyle: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
@@ -220,7 +233,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				setContent( JSON.stringify( newContent ) );
 			},
 		} ),
-		[ content, mergedStyles ]
+		[ content, mergedStyles, themeStyles ]
 	);
 
 	useEffect( () => {
