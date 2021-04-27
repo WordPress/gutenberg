@@ -106,6 +106,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusFirstElement( clientId ),
 		// Must happen after focus because we check for focus in the block.
 		useScrollIntoView( clientId ),
+		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
 		useEventHandlers( clientId ),
 		useNavModeExit( clientId ),
@@ -116,7 +117,6 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			enableAnimation,
 			triggerAnimationOnChange: index,
 		} ),
-		useBlockRefProvider( clientId ),
 	] );
 
 	return {

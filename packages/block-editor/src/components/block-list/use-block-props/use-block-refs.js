@@ -15,6 +15,16 @@ import {
  */
 import { BlockRefs } from '../../provider/block-refs-provider';
 
+/** @typedef {import('@wordpress/element').RefCallback} RefCallback */
+/** @typedef {import('@wordpress/element').RefObject} RefObject */
+
+/**
+ * Provides a ref to the BlockRefs context.
+ *
+ * @param {string} clientId The client ID of the element ref.
+ *
+ * @return {RefCallback} Ref callback.
+ */
 export function useBlockRefProvider( clientId ) {
 	const { refs, callbacks } = useContext( BlockRefs );
 	const ref = useRef();
@@ -24,16 +34,26 @@ export function useBlockRefProvider( clientId ) {
 			refs.delete( clientId );
 		};
 	}, [] );
-	return useCallback( ( node ) => {
-		ref.current = node;
-		callbacks.forEach( ( id, callback ) => {
+	return useCallback( ( element ) => {
+		// Update the ref in the provider.
+		ref.current = element;
+		// Call any update functions.
+		callbacks.forEach( ( id, setElement ) => {
 			if ( clientId === id ) {
-				callback( node );
+				setElement( element );
 			}
 		} );
 	}, [] );
 }
 
+/**
+ * Gets a ref pointing to the current block element. Continues to return a
+ * stable ref even if the block client ID changes.
+ *
+ * @param {string} clientId The client ID to get a ref for.
+ *
+ * @return {RefObject} A ref containing the element.
+ */
 function useBlockRef( clientId ) {
 	const { refs } = useContext( BlockRefs );
 	const freshClientId = useRef();
@@ -50,6 +70,14 @@ function useBlockRef( clientId ) {
 	);
 }
 
+/**
+ * Return the element for a given client ID. Updates whenever the element
+ * changes, becomes available, or disappears.
+ *
+ * @param {string} clientId The client ID to an element for.
+ *
+ * @return {Element|null} The block's wrapper element.
+ */
 function useBlockElement( clientId ) {
 	const { callbacks } = useContext( BlockRefs );
 	const ref = useBlockRef( clientId );
