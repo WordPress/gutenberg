@@ -7,7 +7,7 @@ import type { CSSProperties, ReactText } from 'react';
 /**
  * Internal dependencies
  */
-import { config } from '../../utils';
+import CONFIG from '../../utils/config-values';
 
 export type HeadingSize =
 	| 1
@@ -57,7 +57,7 @@ export function getFontSize(
 	}
 
 	const ratio = `(${ size } / ${ BASE_FONT_SIZE })`;
-	return `calc(${ ratio } * ${ config( 'fontSize' ) })`;
+	return `calc(${ ratio } * ${ CONFIG.fontSize })`;
 }
 
 export function getHeadingFontSize( size: ReactText = 3 ): string {
@@ -66,5 +66,5 @@ export function getHeadingFontSize( size: ReactText = 3 ): string {
 	}
 
 	const headingSize = `fontSizeH${ size }` as `fontSizeH${ HeadingSize }`;
-	return config( headingSize );
+	return CONFIG[ headingSize ];
 }
