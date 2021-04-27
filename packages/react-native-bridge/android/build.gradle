@@ -178,7 +178,7 @@ dependencies {
 
         // FIXME Temporary fix to get Jitpack builds to green while I work on a solution without hardcoded values.
         //def rnVersion = readReactNativeVersion('../package.json', 'peerDependencies')
-        def rnVersion = '0.64.0-rc.3'
+        def rnVersion = '0.64.0'
         implementation "com.facebook.react:react-native:${rnVersion}"
     }
 

@@ -82,7 +82,7 @@
 		"@wordpress/warning": "file:packages/warning",
 		"@wordpress/wordcount": "file:packages/wordcount",
 		"fbjs": "3.0.0",
-		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#e5d52756f7c4287bd6e40127a0554ab009dffd93"
+		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#97792c7737b234fe48840d443a9b3135711e5df7"
 	},
 	"devDependencies": {
 		"@actions/core": "1.2.6",
@@ -192,7 +192,7 @@
 		"progress": "2.0.3",
 		"react": "17.0.1",
 		"react-dom": "17.0.1",
-		"react-native": "0.64.0-rc.3",
+		"react-native": "0.64.0",
 		"react-test-renderer": "16.13.1",
 		"rimraf": "3.0.2",
 		"rtlcss": "2.6.2",
