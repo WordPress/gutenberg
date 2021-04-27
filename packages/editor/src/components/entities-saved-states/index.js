@@ -12,6 +12,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
 import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
+import { close as closeIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -103,7 +104,11 @@ export default function EntitiesSavedStates( { close } ) {
 				>
 					{ __( 'Save' ) }
 				</Button>
-				<Button icon={ close } onClick={ dismissPanel } />
+				<Button
+					icon={ closeIcon }
+					onClick={ dismissPanel }
+					label={ __( 'Close panel' ) }
+				/>
 			</div>
 
 			<div className="entities-saved-states__text-prompt">
