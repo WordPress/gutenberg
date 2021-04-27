@@ -92,7 +92,7 @@ describe( 'Text', () => {
 		expect( wrapper.container.firstChild.childNodes ).toHaveLength( 5 );
 		const words = await wrapper.findAllByText( 'm' );
 		expect( words ).toHaveLength( 2 );
-		expect( words[ 0 ].dataset.g2Component ).toBe( 'TextHighlight' );
+		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
 	} );
 
 	test( 'should render highlighted words with undefined passed', () => {

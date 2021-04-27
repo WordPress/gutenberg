@@ -6,7 +6,7 @@ Snapshot Diff:
 + Second value
 
 @@ -7,14 +7,10 @@
-      class="css-1636tkh-Item css-1bncg8t components-flex-item css-1mm2cvy-View egi4jkx0"
+      class="components-flex-item css-1636tkh-Item css-1mm2cvy-View egi4jkx0"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
     />
@@ -15,7 +15,7 @@ Snapshot Diff:
 -   />
 -   <div />
 -   <div
-      class="css-1636tkh-Item css-1bncg8t css-jhhyjf-block components-flex-item components-flex-block css-1mm2cvy-View egi4jkx0"
+      class="components-flex-item components-flex-block css-1fgvc79-Item-block css-1mm2cvy-View egi4jkx0"
       data-wp-c16t="true"
       data-wp-component="FlexBlock"
     />
@@ -60,12 +60,6 @@ exports[`props should render correctly 1`] = `
 }
 
 .emotion-6 {
-  -webkit-flex: 1;
-  -ms-flex: 1;
-  flex: 1;
-}
-
-.emotion-9 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -84,30 +78,37 @@ exports[`props should render correctly 1`] = `
   width: 100%;
 }
 
-.emotion-9 > * + *:not(marquee) {
+.emotion-6 > * + *:not(marquee) {
   margin-left: calc(4px * 2);
 }
 
-.emotion-9 > * {
+.emotion-6 > * {
   min-width: 0;
 }
 
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  display: var(--wp-g2-flex-item-display);
+.emotion-3 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+  -webkit-flex: 1;
+  -ms-flex: 1;
+  flex: 1;
 }
 
 <div
-  class="components-flex emotion-9 emotion-2 emotion-3"
+  class="components-flex emotion-6 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Flex"
 >
   <div
-    class="emotion-0 emotion-1 components-flex-item emotion-2 emotion-3"
+    class="components-flex-item emotion-0 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="FlexItem"
   />
   <div
-    class="emotion-0 emotion-1 emotion-6 components-flex-item components-flex-block emotion-2 emotion-3"
+    class="components-flex-item components-flex-block emotion-3 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="FlexBlock"
   />

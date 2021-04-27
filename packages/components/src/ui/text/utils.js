@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { ui } from '@wp-g2/styles';
 import memoize from 'memize';
 import { findAll } from 'highlight-words-core';
 
@@ -126,7 +125,6 @@ export function createHighlighterText( {
 
 			/** @type {Record<string, any>} */
 			const props = {
-				...ui.$( 'TextHighlight' ),
 				children: text,
 				className: highlightClassNames,
 				key: index,
@@ -142,7 +140,6 @@ export function createHighlighterText( {
 			return createElement( HighlightTag, props );
 		}
 		return createElement( 'span', {
-			...ui.$( 'Text' ),
 			children: text,
 			className: unhighlightClassName,
 			key: index,

@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { css, cx, ui } from '@wp-g2/styles';
+import { css, cx } from 'emotion';
 
 /**
  * Internal dependencies
  */
 import { useContextSystem } from '../context';
+import { useFlexContext } from './context';
 import * as styles from './styles';
 
 /**
@@ -21,8 +22,10 @@ export function useFlexItem( props ) {
 	} = useContextSystem( props, 'FlexItem' );
 	const sx = {};
 
+	const contextDisplay = useFlexContext().flexItemDisplay;
+
 	sx.Base = css( {
-		display: displayProp || ui.get( 'flexItemDisplay' ),
+		display: displayProp || contextDisplay,
 	} );
 
 	const classes = cx(

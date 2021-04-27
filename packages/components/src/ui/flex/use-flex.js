@@ -102,5 +102,5 @@ export function useFlex( props ) {
 		wrap,
 	] );
 
-	return { ...otherProps, className: classes };
+	return { ...otherProps, className: classes, isColumn };
 }
