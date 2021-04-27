@@ -1,11 +1,7 @@
 /**
- * External dependencies
- */
-import { useContextSystem } from '@wp-g2/context';
-
-/**
  * Internal dependencies
  */
+import { useContextSystem } from '../context';
 import { useHStack } from '../h-stack';
 
 /**
