@@ -12,7 +12,7 @@ import usePreferredColorScheme from '../use-preferred-color-scheme';
  * light case.
  *
  * @example
- * const styles = { 
+ * const styles = {
 			'block__element': {padding: 10, backgroundColor: 'white' },
 			'block__element--dark': { backgroundColor: 'black' }
 	 };
@@ -46,14 +46,12 @@ const usePreferredColorSchemeStyleBem = (
 	}
 
 	const darkSelectors = Object.keys( styles ).filter( ( selector ) =>
-		selector.match( `-{1,2}${ darkModifier }` )
+		selector.match( `--${ darkModifier }` )
 	);
 
 	darkSelectors.forEach( ( darkSelector ) => {
 		const lightSelector = darkSelector
-			.replace( `-${ darkModifier }`, '' )
-			.replace( /-$/, '' );
-
+			.replace( `--${ darkModifier }`, '' )
 		styles[ lightSelector ] = {
 			...styles[ lightSelector ],
 			...styles[ darkSelector ],

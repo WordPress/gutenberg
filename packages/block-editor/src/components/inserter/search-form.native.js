@@ -52,16 +52,15 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	);
 
 	const activeStyles = useMemo( () => {
-		const activeSelectors = Object.keys( baseStyles ).filter(
-			( key ) => !! key.match( /active/ )
-		);
+		const activeSelectors = Object.keys( {
+			...baseStyles,
+			...platformStyles,
+		} ).filter( ( key ) => !! key.match( /--active/ ) );
 
 		const _activeStyles = { ...styles };
 
 		activeSelectors.forEach( ( activeSelector ) => {
-			const selector = activeSelector
-				.replace( /-active/, '' )
-				.replace( /-$/, '' );
+			const selector = activeSelector.replace( /--active/, '' );
 
 			_activeStyles[ selector ] = {
 				...baseStyles[ selector ],
@@ -86,6 +85,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 		'inserter-search-form__cancel-button': cancelButtonStyle,
 		'inserter-search-form__cancel-button-text': cancelButtonTextStyle,
 		'inserter-search-form__icon': iconStyle,
+		'inserter-search-form__right-icon': rightIconStyle,
 	} = newStyles;
 
 	function clearInput() {
@@ -125,7 +125,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 					label={ __( 'Clear search' ) }
 					icon={ isIOS ? cancelCircleFilled : close }
 					onPress={ clearInput }
-					style={ iconStyle }
+					style={ {...iconStyle, ...rightIconStyle} }
 				/>
 			);
 		}

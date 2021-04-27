@@ -9,7 +9,7 @@
 }
 
 .inserter-search-form__container--active {
-	border-bottom-color: $gray-light;
+	border-bottom-color: $gray-70;
 	border-bottom-width: 1px;
 	margin-left: 0;
 	margin-right: 0;
@@ -17,8 +17,12 @@
 	elevation: 0;
 }
 
+.inserter-search-form__input-container--dark {
+	background-color: $dark-ultra-dim;
+}
+
 .inserter-search-form__input-container--active {
-	background-color: none;
+	background-color: transparent;
 }
 
 .inserter-search-form__form-input {
@@ -31,4 +35,8 @@
 
 .inserter-search-form__input-button-right--active {
 	margin-right: 12px;
+}
+
+.inserter-search-form__right-icon--dark {
+	color: $dark-tertiary;
 }
