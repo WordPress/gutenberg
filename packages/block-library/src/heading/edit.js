@@ -75,6 +75,8 @@ function HeadingEdit( {
 
 					if ( isOriginal ) {
 						block.clientId = clientId;
+						// Skip sanitizing attributes if it's the original block,
+						// This allows us to keep the internal attributes untouched.
 						block.attributes = newAttributes;
 					}
 
