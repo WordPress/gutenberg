@@ -25,6 +25,9 @@ Snapshot Diff:
 
 exports[`props should render correctly 1`] = `
 .emotion-17 {
+  background-color: #fff;
+  color: #000;
+  position: relative;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
   outline: none;
   border-radius: 2px;
@@ -201,18 +204,8 @@ exports[`props should render correctly 1`] = `
   border-radius: 2px;
 }
 
-.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18.emotion-18 {
-  background-color: #ffffff;
-  background-color: var(--wp-g2-surface-color);
-  color: #1e1e1e;
-  color: var(--wp-g2-color-text);
-  position: relative;
-  --wp-g2-surface-background-size: 12px;
-  --wp-g2-surface-background-size-dotted: 11px;
-}
-
 <div
-  class="components-surface components-card emotion-17 emotion-18 emotion-1 emotion-2"
+  class="components-surface components-card emotion-17 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Card"
 >

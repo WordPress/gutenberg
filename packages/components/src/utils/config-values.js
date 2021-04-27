@@ -2,6 +2,7 @@
  * Internal dependencies
  */
 import { space } from '../ui/utils/space';
+import { COLORS } from './colors-values';
 
 const CONTROL_HEIGHT = '30px';
 const CARD_PADDING_X = space( 3 );
@@ -43,7 +44,14 @@ export default {
 	cardPadding: `${ CARD_PADDING_X } ${ CARD_PADDING_Y }`,
 	cardHeaderFooterPaddingY: space( 1 ),
 	cardHeaderHeight: '44px',
+	surfaceBackgroundColor: COLORS.white,
+	surfaceBackgroundSubtleColor: '#F3F3F3',
+	surfaceBackgroundTintColor: '#F5F5F5',
 	surfaceBorderColor: 'rgba(0, 0, 0, 0.1)',
+	surfaceBorderBoldColor: 'rgba(0, 0, 0, 0.15)',
+	surfaceBorderSubtleColor: 'rgba(0, 0, 0, 0.05)',
+	surfaceBackgroundTertiaryColor: COLORS.white,
+	surfaceColor: COLORS.white,
 	transitionDuration: '200ms',
 	transitionDurationFast: '160ms',
 	transitionDurationFaster: '120ms',
