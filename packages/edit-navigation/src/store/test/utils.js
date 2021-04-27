@@ -406,6 +406,15 @@ describe( 'Mapping block attributes and menu item fields', () => {
 			isValid: true,
 			name: 'core/navigation-link',
 		},
+		{
+			attributes: {
+				type: 'custom',
+			},
+			clientId: 'navigation-link-block-client-id-5',
+			innerBlocks: [],
+			isValid: true,
+			name: 'core/navigation-link',
+		},
 	];
 
 	const menuItems = [
@@ -428,6 +437,10 @@ describe( 'Mapping block attributes and menu item fields', () => {
 			object_id: 103,
 			object: 'tag',
 			type: 'taxonomy',
+		},
+		{
+			object: 'custom',
+			type: 'custom',
 		},
 	];
 
@@ -466,6 +479,31 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				);
 			} );
 			expect( expected ).toEqual( blockAttrs );
+		} );
+
+		it( 'does not map id to object_id for "custom" block variation', () => {
+			const customBlockVariationAttrs = {
+				type: 'custom',
+				id: 123456,
+			};
+
+			const actual = Object.entries( customBlockVariationAttrs ).reduce(
+				( acc, [ key, value ] ) => {
+					acc = {
+						...acc,
+						...mapMenuItemFieldToBlockAttribute( key, value ),
+					};
+					return acc;
+				},
+				{}
+			);
+
+			expect( actual ).toEqual( {
+				object: 'custom',
+				type: 'custom',
+			} );
+
+			expect( actual.id ).toBeUndefined();
 		} );
 	} );
 } );

@@ -57,7 +57,9 @@ function mapMenuItemsToBlocks( menuItems ) {
 				: menuItem.title.rendered,
 			opensInNewTab: menuItem.target === '_blank',
 			type: menuItem?.object,
-			id: menuItem?.object_id,
+			...( menuItem?.object !== 'custom' && {
+				id: menuItem?.object_id,
+			} ),
 			// the equivalent on `nav_menu_item` is "type" but it is stored with underscores whereas the block attr uses hyphens.
 			kind: menuItem.type.replace( '_', '-' ),
 		};

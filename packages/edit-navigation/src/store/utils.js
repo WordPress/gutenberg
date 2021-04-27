@@ -151,6 +151,7 @@ export function computeCustomizedAttribute(
 						block.attributes?.type
 					) ),
 				...( block.attributes?.id &&
+					block.attributes?.type !== 'custom' &&
 					mapBlockAttributeToMenuItemField(
 						'id',
 						block.attributes?.id
