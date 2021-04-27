@@ -15,13 +15,18 @@ import { store as coreStore } from '@wordpress/core-data';
 import TemplatePartSelection from '../selection';
 import PatternsSetup from './patterns-setup';
 
+const PLACEHOLDER_STEPS = {
+	INITIAL: 'choose-existing-or-new',
+	PATTERNS: 'select-a-pattern-or-blank',
+};
+
 export default function TemplatePartPlaceholder( {
 	area,
 	clientId,
 	setAttributes,
 } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
-	const [ step, setStep ] = useState( 1 );
+	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.INITIAL );
 
 	const onCreate = useCallback(
 		async ( startingBlocks = [] ) => {
@@ -54,7 +59,7 @@ export default function TemplatePartPlaceholder( {
 
 	return (
 		<>
-			{ step === 1 && (
+			{ step === PLACEHOLDER_STEPS.INITIAL && (
 				<Placeholder
 					icon={ blockDefault }
 					label={ __( 'Template Part' ) }
@@ -76,7 +81,9 @@ export default function TemplatePartPlaceholder( {
 								</Button>
 								<Button
 									isTertiary
-									onClick={ () => setStep( 2 ) }
+									onClick={ () =>
+										setStep( PLACEHOLDER_STEPS.PATTERNS )
+									}
 								>
 									{ __( 'New template part' ) }
 								</Button>
@@ -91,7 +98,7 @@ export default function TemplatePartPlaceholder( {
 					/>
 				</Placeholder>
 			) }
-			{ step === 2 && (
+			{ step === PLACEHOLDER_STEPS.PATTERNS && (
 				<PatternsSetup
 					area={ area }
 					onCreate={ onCreate }
