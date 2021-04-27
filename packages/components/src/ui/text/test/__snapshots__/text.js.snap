@@ -22,7 +22,6 @@ exports[`Text should render highlighted words with highlightCaseSensitive 1`] = 
 >
   <span
     class=""
-    data-g2-component="Text"
   >
     Lorem ipsum.
   </span>

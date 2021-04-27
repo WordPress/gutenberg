@@ -5,13 +5,14 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -10,11 +10,10 @@
+@@ -10,11 +10,11 @@
       class="css-1rq9ofd-BarsWrapperView e1s9yo7h1"
       style="transform: scale(0.4444444444444444);"
     >
       <div
         class="css-lrlbd4-BarsView e1s9yo7h2"
 -       style="color: blue;"
++       style="color: rgb(0, 0, 0);"
       >
         <div
           class="InnerBar1"
@@ -181,6 +182,7 @@ exports[`props should render correctly 1`] = `
   >
     <div
       class="emotion-0 emotion-1"
+      style="color: rgb(0, 0, 0);"
     >
       <div
         class="InnerBar1"
@@ -245,6 +247,6 @@ Snapshot Diff:
     >
       <div
         class="css-lrlbd4-BarsView e1s9yo7h2"
+        style="color: rgb(0, 0, 0);"
       >
-        <div
 `;
