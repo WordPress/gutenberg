@@ -151,12 +151,17 @@ class Layout extends Component {
 						style={ toolbarKeyboardAvoidingViewStyle }
 						withAnimatedHeight
 					>
-						<AutocompletionItemsSlot />
-						{ Platform.OS === 'ios' && <FloatingToolbar /> }
+						{ Platform.OS === 'ios' && (
+							<>
+								<AutocompletionItemsSlot />
+								<FloatingToolbar />
+							</>
+						) }
 						<Header />
 						<BottomSheetSettings />
 					</KeyboardAvoidingView>
 				) }
+				{ Platform.OS === 'android' && <AutocompletionItemsSlot /> }
 			</SafeAreaView>
 		);
 	}

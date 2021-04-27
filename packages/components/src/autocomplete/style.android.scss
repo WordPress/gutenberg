@@ -1,0 +1,7 @@
+@import "./style.native.scss";
+
+.wrapper {
+	width: 100%;
+	height: $mobile-header-toolbar-height;
+	bottom: $mobile-header-toolbar-height;
+}

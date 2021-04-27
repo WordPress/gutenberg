@@ -338,6 +338,7 @@ function Autocomplete( {
 					onSelect={ select }
 					value={ record }
 					contentRef={ contentRef }
+					reset={ reset }
 				/>
 			) }
 		</>

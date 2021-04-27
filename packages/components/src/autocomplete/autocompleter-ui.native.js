@@ -63,6 +63,7 @@ export function getAutoCompleterUI( autocompleter ) {
 		onChangeOptions,
 		onSelect,
 		value,
+		reset,
 	} ) {
 		const [ items ] = useItems( filterValue );
 		const scrollViewRef = useRef();
@@ -121,6 +122,7 @@ export function getAutoCompleterUI( autocompleter ) {
 				} ).start( ( { finished } ) => {
 					if ( finished && ! show && isVisible ) {
 						setIsVisible( false );
+						reset();
 					}
 				} );
 			},
