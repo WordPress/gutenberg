@@ -106,9 +106,10 @@ describe( 'Widgets Customizer', () => {
 		} );
 		await inlineAddBlockButton.click();
 
-		const inlineInserterSearchBox = await page.waitForSelector(
-			'aria/Search for blocks and patterns[role="searchbox"]'
-		);
+		const inlineInserterSearchBox = await find( {
+			role: 'searchbox',
+			name: 'Search for blocks and patterns',
+		} );
 
 		await expect( inlineInserterSearchBox ).toHaveFocus();
 
@@ -136,18 +137,14 @@ describe( 'Widgets Customizer', () => {
 
 		await page.keyboard.type( 'My ' );
 
-		// TODO: It's the only reliable way for now to make sure the iframe is ready.
-		// eslint-disable-next-line no-restricted-syntax
-		await page.waitForTimeout( 3000 );
-
-		const sitePreviewIframe = await find( {
-			name: 'Site Preview',
-			selector: 'iframe',
-		} );
-		const contentFrame = await sitePreviewIframe.contentFrame();
-		const frameContentDocument = await contentFrame.evaluateHandle(
-			'document'
-		);
+		const findOptions = {
+			get root() {
+				return find( {
+					name: 'Site Preview',
+					selector: 'iframe',
+				} );
+			},
+		};
 
 		// Expect the paragraph to be found in the preview iframe.
 		await find(
@@ -155,9 +152,7 @@ describe( 'Widgets Customizer', () => {
 				text: 'First Paragraph',
 				selector: '.widget-content p',
 			},
-			{
-				root: frameContentDocument,
-			}
+			findOptions
 		);
 
 		// Expect the heading to be found in the preview iframe.
@@ -167,13 +162,18 @@ describe( 'Widgets Customizer', () => {
 				name: 'My Heading',
 				selector: '.widget-content *',
 			},
-			{
-				root: frameContentDocument,
-			}
+			findOptions
 		);
 
 		// Expect the search box to be found in the preview iframe.
-		await contentFrame.waitForSelector( 'input[type="search"]' );
+		await find(
+			{
+				role: 'searchbox',
+				name: 'My Search',
+				selector: '.widget-content *',
+			},
+			findOptions
+		);
 
 		expect( console ).toHaveWarned();
 	} );
@@ -339,7 +339,7 @@ describe( 'Widgets Customizer', () => {
 		await publishSettingsButton.click();
 
 		// Expect the Publish Settings outer section to be found.
-		const publishSettingsRadio = await find( {
+		const publishSettings = await find( {
 			selector: '#sub-accordion-section-publish_settings',
 		} );
 
@@ -365,7 +365,7 @@ describe( 'Widgets Customizer', () => {
 		} );
 
 		// Expect the Publish Settings section to be closed.
-		expect( publishSettingsRadio ).not.toBeVisible();
+		await expect( publishSettings ).not.toBeVisible();
 
 		// Back to the widget areas panel.
 		const backButton = await find( {
@@ -374,14 +374,12 @@ describe( 'Widgets Customizer', () => {
 		} );
 		await backButton.click();
 
-		await find( {
-			role: 'heading',
-			name: /^Footer #1/,
-			level: 3,
-		} );
-
 		// Expect the inserter outer section to be closed.
-		expect( inserterHeading ).not.toBeVisible();
+		await expect( {
+			role: 'heading',
+			name: 'Add a block',
+			level: 2,
+		} ).not.toBeFound();
 
 		expect( console ).toHaveWarned();
 	} );
