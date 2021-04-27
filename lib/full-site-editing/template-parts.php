@@ -271,7 +271,7 @@ register_block_pattern(
 	'template-part/header-test',
 	array(
 		'title'      => __( 'Header Test', 'gutenberg' ),
-		'blockTypes' => array( 'core/template-part/header' ),
+		'blockTypes' => array( 'core/template-part', 'core/template-part/header' ),
 		'content'    => '<!-- wp:spacer {"height":70} -->
 		<div style="height:70px" aria-hidden="true" class="wp-block-spacer"></div>
 		<!-- /wp:spacer -->
@@ -299,7 +299,7 @@ register_block_pattern(
 	'template-part/footer-test',
 	array(
 		'title'      => __( 'Footer Test', 'gutenberg' ),
-		'blockTypes' => array( 'core/template-part/footer' ),
+		'blockTypes' => array( 'core/template-part', 'core/template-part/footer' ),
 		'content'    => '<!-- wp:spacer {"height":70} -->
 		<div style="height:70px" aria-hidden="true" class="wp-block-spacer"></div>
 		<!-- /wp:spacer -->
