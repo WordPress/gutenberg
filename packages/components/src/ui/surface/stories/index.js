@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { boolean, number, select } from '@storybook/addon-knobs';
-import { ThemeProvider } from '@wp-g2/styles';
 
 /**
  * Internal dependencies
@@ -24,8 +23,6 @@ const variantOptions = {
 };
 
 export const _default = () => {
-	const darkMode = boolean( 'Dark mode', false );
-
 	const props = {
 		backgroundSize: number( 'backgroundSize', 12 ),
 		border: boolean( 'border', false ),
@@ -37,13 +34,11 @@ export const _default = () => {
 	};
 
 	return (
-		<ThemeProvider isDark={ darkMode }>
-			<Surface
-				{ ...props }
-				css={ { padding: 20, maxWidth: 400, margin: '20vh auto' } }
-			>
-				<Text>Surface</Text>
-			</Surface>
-		</ThemeProvider>
+		<Surface
+			{ ...props }
+			style={ { padding: 20, maxWidth: 400, margin: '20vh auto' } }
+		>
+			<Text>Surface</Text>
+		</Surface>
 	);
 };

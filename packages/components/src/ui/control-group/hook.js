@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import { cx } from '@wp-g2/styles';
-import { getValidChildren } from '@wp-g2/utils';
+import { cx } from 'emotion';
 
 /**
  * Internal dependencies
  */
+import { getValidChildren } from '../utils/get-valid-children';
 import { useContextSystem } from '../context';
 import { ControlGroupContext } from './context';
 import * as styles from './styles';
