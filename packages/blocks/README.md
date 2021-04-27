@@ -713,6 +713,26 @@ _Returns_
 
 -   `?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
 
+<a name="registerBlockTypeFromMetadata" href="#registerBlockTypeFromMetadata">#</a> **registerBlockTypeFromMetadata**
+
+Registers a new block provided from metadata stored in `block.json` file.
+It uses `registerBlockType` internally.
+
+_Related_
+
+-   registerBlockType
+
+_Parameters_
+
+-   _metadata_ `Object`: Block metadata loaded from `block.json`.
+-   _metadata.name_ `string`: Block name.
+-   _metadata.textdomain_ `string`: Textdomain to use with translations.
+-   _additionalSettings_ `Object`: Additional block settings.
+
+_Returns_
+
+-   `?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
+
 <a name="registerBlockVariation" href="#registerBlockVariation">#</a> **registerBlockVariation**
 
 Registers a new block variation for the given block type.
