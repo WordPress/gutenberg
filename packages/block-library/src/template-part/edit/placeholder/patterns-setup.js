@@ -11,7 +11,6 @@ export default function PatternsSetup( { area, clientId, onCreate } ) {
 
 	return (
 		<BlockPatternSetup
-			blockName={ 'core/template-part' }
 			clientId={ clientId }
 			startBlankComponent={
 				<StartBlankComponent onCreate={ onCreate } />
