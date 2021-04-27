@@ -702,13 +702,16 @@
 		// Allow clicking through the toolbar holder.
 		pointer-events: none;
 
-		> * {
+		.block-editor-block-list__block-selection-button,
+		.block-editor-block-contextual-toolbar,
+		.block-editor-block-list__empty-block-inserter {
 			pointer-events: all;
 		}
 
 		// Position the block toolbar.
 		.block-editor-block-list__block-selection-button,
 		.block-editor-block-contextual-toolbar {
+			margin-top: $grid-unit-15;
 			margin-bottom: $grid-unit-15;
 		}
 	}
