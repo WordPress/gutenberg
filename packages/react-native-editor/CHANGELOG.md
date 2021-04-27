@@ -13,7 +13,14 @@ For each user feature we should also add a importance categorization label  to i
 
 -   [*] Image block: Improve text entry for long alt text. [#29670]
 
-## 1.50.0
+## 1.51.1
+
+-   [*] Updates relative block-support asset path [#31184]
+
+## 1.51.0
+
+-   [*] Image block: Improve text entry for long alt text. [#29670]
+-   [*] a11y: Bug fix: Allow stepper cell to be selected by screenreader [#30694]
 
 ## 1.50.1
 
