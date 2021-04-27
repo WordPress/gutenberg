@@ -67,9 +67,9 @@ const stylesTransform = ( content ) => {
 
 /*
  * Matches a block's name in paths in the form
- * src/<blockName>/frontend.js
+ * build-module/<blockName>/frontend.js
  */
-const blockNameRegex = new RegExp( /(?<=src\/).*(?=(\/frontend))/g );
+const blockNameRegex = new RegExp( /(?<=build-module\/).*(?=(\/frontend))/g );
 
 const createEntrypoints = () => {
 	/*
@@ -80,7 +80,7 @@ const createEntrypoints = () => {
 	 * Returns an empty array if no files were found.
 	 */
 	const scriptPaths = fastGlob.sync(
-		'./packages/block-library/src/**/frontend.js'
+		'./packages/block-library/build-module/**/frontend.js'
 	);
 
 	/*

@@ -1,8 +1,28 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../utils';
+import { contextConnect } from '../context';
 import { useFlex } from './use-flex';
+import { FlexContext } from './context';
+import { View } from '../view';
+
+/**
+ * @param {import('../context').ViewOwnProps<import('./types').FlexProps, 'div'>} props
+ * @param {import('react').Ref<any>} forwardedRef
+ */
+function Flex( props, forwardedRef ) {
+	const { children, isColumn, ...otherProps } = useFlex( props );
+
+	return (
+		<FlexContext.Provider
+			value={ { flexItemDisplay: isColumn ? 'block' : undefined } }
+		>
+			<View { ...otherProps } ref={ forwardedRef }>
+				{ children }
+			</View>
+		</FlexContext.Provider>
+	);
+}
 
 /**
  * `Flex` is a primitive layout component that adaptively aligns child content
@@ -28,11 +48,8 @@ import { useFlex } from './use-flex';
  * 	);
  * }
  * ```
+ *
  */
-const Flex = createComponent( {
-	as: 'div',
-	useHook: useFlex,
-	name: 'Flex',
-} );
+const ConnectedFlex = contextConnect( Flex, 'Flex' );
 
-export default Flex;
+export default ConnectedFlex;

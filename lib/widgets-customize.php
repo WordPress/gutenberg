@@ -106,7 +106,36 @@ function gutenberg_widgets_customize_add_unstable_instance( $args, $id ) {
 	return $args;
 }
 
+/**
+ * Initialize the Gutenberg customize widgets page.
+ */
+function gutenberg_customize_widgets_init() {
+	$settings = array_merge(
+		gutenberg_get_default_block_editor_settings(),
+		gutenberg_get_legacy_widget_settings()
+	);
+
+	// This purposefully does not rely on apply_filters( 'block_editor_settings', $settings, null );
+	// Applying that filter would bring over multitude of features from the post editor, some of which
+	// may be undesirable. Instead of using that filter, we simply pick just the settings that are needed.
+	$settings = gutenberg_experimental_global_styles_settings( $settings );
+	$settings = gutenberg_extend_block_editor_styles( $settings );
+
+	gutenberg_initialize_editor(
+		'widgets_customizer',
+		'customize-widgets',
+		array(
+			'editor_settings' => $settings,
+		)
+	);
+	wp_enqueue_script( 'wp-customize-widgets' );
+	wp_enqueue_style( 'wp-customize-widgets' );
+	wp_enqueue_script( 'wp-format-library' );
+	wp_enqueue_style( 'wp-format-library' );
+}
+
 if ( gutenberg_is_experiment_enabled( 'gutenberg-widgets-in-customizer' ) ) {
 	add_action( 'customize_register', 'gutenberg_widgets_customize_register' );
 	add_filter( 'widget_customizer_setting_args', 'gutenberg_widgets_customize_add_unstable_instance', 10, 2 );
+	add_action( 'customize_controls_enqueue_scripts', 'gutenberg_customize_widgets_init' );
 }

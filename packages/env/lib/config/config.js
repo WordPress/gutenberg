@@ -26,7 +26,6 @@ const md5 = require( '../md5' );
  * @property {boolean}                          detectedLocalConfig     If true, wp-env detected local config and used it.
  * @property {Object.<string, WPServiceConfig>} env                     Specific config for different environments.
  * @property {boolean}                          debug                   True if debug mode is enabled.
- * @property {string}                           phpVersion              Version of PHP to use in the environments, of the format 0.0.
  */
 
 /**
@@ -39,6 +38,7 @@ const md5 = require( '../md5' );
  * @property {number}                    port          The port to use.
  * @property {Object}                    config        Mapping of wp-config.php constants to their desired values.
  * @property {Object.<string, WPSource>} mappings      Mapping of WordPress directories to local directories which should be mounted.
+ * @property {string}                    phpVersion    Version of PHP to use in the environments, of the format 0.0.
  */
 
 /**

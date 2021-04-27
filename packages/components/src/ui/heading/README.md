@@ -14,7 +14,6 @@ function Example() {
 
 ## Props
 
-
 `Heading` uses `Text` underneath, so we have access to all of `Text`'s props except for `size` which is replaced by `level`. For a complete list of those props, check out [`Text`](../text/#props).
 
 ##### level

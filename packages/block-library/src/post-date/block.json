@@ -14,14 +14,12 @@
 			"default": false
 		}
 	},
-	"usesContext": [
-		"postId",
-		"postType"
-	],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,
 		"color": {
-			"gradients": true
+			"gradients": true,
+			"link": true
 		},
 		"fontSize": true,
 		"lineHeight": true

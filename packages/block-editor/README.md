@@ -194,6 +194,14 @@ _Related_
 
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md>
 
+_Parameters_
+
+-   _props_ `Object`: Fill props.
+
+_Returns_
+
+-   `WPElement`: Element.
+
 <a name="BlockTitle" href="#BlockTitle">#</a> **BlockTitle**
 
 Renders the block's configured title as a string, or empty if the title
@@ -447,6 +455,8 @@ _Related_
 -   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/media-upload/README.md>
 
 <a name="MultiSelectScrollIntoView" href="#MultiSelectScrollIntoView">#</a> **MultiSelectScrollIntoView**
+
+> **Deprecated** 
 
 Scrolls the multi block selection end into view if not in view already. This
 is important to do after selection by keyboard.

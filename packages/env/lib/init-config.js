@@ -85,12 +85,12 @@ module.exports = async function initConfig( {
 			path.resolve( config.workDirectoryPath, 'Dockerfile' ),
 			dockerFileContents(
 				dockerComposeConfig.services.wordpress.image,
-				xdebug
+				config
 			)
 		);
 	} else if ( ! existsSync( config.workDirectoryPath ) ) {
 		spinner.fail(
-			'wp-env has not yet been initalized. Please run `wp-env start` to install the WordPress instance before using any other commands. This is only necessary to set up the environment for the first time; it is typically not necessary for the instance to be running after that in order to use other commands.'
+			'wp-env has not yet been initialized. Please run `wp-env start` to install the WordPress instance before using any other commands. This is only necessary to set up the environment for the first time; it is typically not necessary for the instance to be running after that in order to use other commands.'
 		);
 		process.exit( 1 );
 	}
@@ -98,22 +98,50 @@ module.exports = async function initConfig( {
 	return config;
 };
 
-function dockerFileContents( image, xdebugMode ) {
+/**
+ * Generates the Dockerfile used by wp-env's development instance.
+ *
+ * @param {string}   image  The base docker image to use.
+ * @param {WPConfig} config The configuration object
+ * @return {string}         The dockerfile contents.
+ */
+function dockerFileContents( image, config ) {
+	let shouldInstallXdebug = true;
+	// By default, an undefined phpVersion uses the version on the docker image,
+	// which is supported by Xdebug 3.
+	if ( config.env.development.phpVersion ) {
+		const versionTokens = config.env.development.phpVersion.split( '.' );
+		const majorVersion = parseInt( versionTokens[ 0 ] );
+		const minorVersion = parseInt( versionTokens[ 1 ] );
+		if ( isNaN( majorVersion ) || isNaN( minorVersion ) ) {
+			throw new Error( 'Something went wrong parsing the php version.' );
+		}
+
+		// Disable Xdebug for PHP < 7.2. Xdebug 3 supports 7.2 and higher.
+		if ( majorVersion < 7 || ( majorVersion === 7 && minorVersion < 2 ) ) {
+			shouldInstallXdebug = false;
+		}
+	}
+
+	return `FROM ${ image }
+
+RUN apt-get -qy install $PHPIZE_DEPS && touch /usr/local/etc/php/php.ini
+${ shouldInstallXdebug ? installXdebug( config.xdebug ) : '' }
+`;
+}
+
+function installXdebug( enableXdebug ) {
 	const isLinux = os.type() === 'Linux';
 	// Discover client host does not appear to work on macOS with Docker.
 	const clientDetectSettings = isLinux
 		? 'xdebug.discover_client_host=true'
 		: 'xdebug.client_host="host.docker.internal"';
 
-	return `FROM ${ image }
-
-RUN apt-get -qy install $PHPIZE_DEPS \\
-	&& pecl install xdebug \\
-	&& docker-php-ext-enable xdebug
-
-RUN touch /usr/local/etc/php/php.ini
+	return `
+# Install Xdebug:
+RUN pecl install xdebug && docker-php-ext-enable xdebug
 RUN echo 'xdebug.start_with_request=yes' >> /usr/local/etc/php/php.ini
-RUN echo 'xdebug.mode=${ xdebugMode }' >> /usr/local/etc/php/php.ini
+RUN echo 'xdebug.mode=${ enableXdebug }' >> /usr/local/etc/php/php.ini
 RUN echo '${ clientDetectSettings }' >> /usr/local/etc/php/php.ini
-`;
+	`;
 }

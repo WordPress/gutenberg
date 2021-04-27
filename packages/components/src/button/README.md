@@ -247,6 +247,13 @@ If provided with `icon`, sets the position of icon relative to the `text`. Avail
 -   Required: No
 -   Default: `left`
 
+#### text
+
+If provided, displays the given text inside the button. If the button contains children elements, the text is displayed before them.
+
+-   Type: `String`
+-   Required: No
+
 #### showTooltip
 
 If provided, renders a [Tooltip](/packages/components/src/tooltip/README.md) component for the button.
