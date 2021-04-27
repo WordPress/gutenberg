@@ -255,6 +255,13 @@ export const mapMenuItemFieldToBlockAttribute = function mapMenuItemFieldToBlock
  * @return {Object} the converted field object.
  */
 const convertAttribute = function convertAttribute( mapping, key, val ) {
+	// If there is no mapping for this key then default to assuming a 1:1 relationship.
+	if ( ! mapping[ key ] ) {
+		return {
+			[ key ]: val,
+		};
+	}
+
 	const left = mapping[ key ].attr ?? mapping[ key ];
 	const right = mapping[ key ].mapper?.() ?? val;
 
