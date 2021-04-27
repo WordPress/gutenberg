@@ -40,7 +40,7 @@ export default function useForm( { id, idBase, instance, setInstance } ) {
 					);
 					if ( isStillMounted.current ) {
 						setContent( form );
-						setHasPreview( !! preview );
+						setHasPreview( ! isEmptyHTML( preview ) );
 					}
 				}
 			} catch ( error ) {
@@ -69,7 +69,7 @@ export default function useForm( { id, idBase, instance, setInstance } ) {
 					if ( isStillMounted.current ) {
 						outgoingInstances.current.add( nextInstance );
 						setInstance( nextInstance );
-						setHasPreview( !! preview );
+						setHasPreview( ! isEmptyHTML( preview ) );
 					}
 				}
 			} catch ( error ) {
@@ -119,4 +119,10 @@ async function encodeWidget( idBase, instance, formData = null ) {
 		form: response.form,
 		preview: response.preview,
 	};
+}
+
+function isEmptyHTML( html ) {
+	const element = document.createElement( 'div' );
+	element.innerHTML = html;
+	return element.innerText.trim() === '';
 }
