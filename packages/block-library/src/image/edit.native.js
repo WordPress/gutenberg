@@ -92,7 +92,6 @@ export class ImageEdit extends Component {
 		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
 		this.onSetFeatured = this.onSetFeatured.bind( this );
-		this.onRemoveFeatured = this.onRemoveFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
@@ -271,18 +270,6 @@ export class ImageEdit extends Component {
 		} );
 	}
 
-	onSetFeatured() {
-		const { attributes, closeSettingsBottomSheet } = this.props;
-		setFeaturedImage( attributes.id );
-		closeSettingsBottomSheet();
-	}
-
-	onRemoveFeatured() {
-		const { closeSettingsBottomSheet } = this.props;
-		setFeaturedImage( 0 );
-		closeSettingsBottomSheet();
-	}
-
 	onSetLinkDestination( href ) {
 		this.props.setAttributes( {
 			linkDestination: LINK_DESTINATION_CUSTOM,
@@ -446,25 +433,17 @@ export class ImageEdit extends Component {
 		this.onSetSizeSlug( newValue );
 	}
 
-	render() {
-		const { isCaptionSelected } = this.state;
-		const {
-			attributes,
-			isSelected,
-			image,
-			clientId,
-			imageDefaultSize,
-			getStylesFromColorScheme,
-			featuredImageId,
-		} = this.props;
-		const { align, url, alt, id, sizeSlug, className } = attributes;
+	onSetFeatured = ( mediaId ) => {
+		const { closeSettingsBottomSheet } = this.props;
+		setFeaturedImage( mediaId );
+		closeSettingsBottomSheet();
+	};
 
-		const sizeOptionsValid = find( this.sizeOptions, [
-			'value',
-			imageDefaultSize,
-		] );
+	getSetFeaturedButton( isFeaturedImage ) {
+		const { attributes, getStylesFromColorScheme } = this.props;
 
-		const isFeaturedImage = featuredImageId === attributes.id;
+		// eslint-disable-next-line no-unused-vars
+		const androidOnly = Platform.OS === 'android';
 
 		const featuredButtonStyle = getStylesFromColorScheme(
 			styles.featuredButton,
@@ -476,8 +455,58 @@ export class ImageEdit extends Component {
 			styles.setFeaturedButtonDark
 		);
 
-		// eslint-disable-next-line no-unused-vars
-		const androidOnly = Platform.OS === 'android';
+		return (
+			<>
+				{
+					// eslint-disable-next-line no-undef
+					androidOnly && (
+						<PanelBody>
+							{ isFeaturedImage ? (
+								<BottomSheet.Cell
+									label={ __( 'Remove as Featured Image ' ) }
+									labelStyle={ [
+										featuredButtonStyle,
+										styles.removeFeaturedButton,
+									] }
+									onPress={ () => this.onSetFeatured( 0 ) }
+								/>
+							) : (
+								<BottomSheet.Cell
+									label={ __( 'Set as Featured Image ' ) }
+									labelStyle={ [
+										featuredButtonStyle,
+										setFeaturedButtonStyle,
+									] }
+									onPress={ () =>
+										this.onSetFeatured( attributes.id )
+									}
+								/>
+							) }
+						</PanelBody>
+					)
+				}
+			</>
+		);
+	}
+
+	render() {
+		const { isCaptionSelected } = this.state;
+		const {
+			attributes,
+			isSelected,
+			image,
+			clientId,
+			imageDefaultSize,
+			featuredImageId,
+		} = this.props;
+		const { align, url, alt, id, sizeSlug, className } = attributes;
+
+		const isFeaturedImage = featuredImageId === attributes.id;
+
+		const sizeOptionsValid = find( this.sizeOptions, [
+			'value',
+			imageDefaultSize,
+		] );
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -516,32 +545,7 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{
-					// eslint-disable-next-line no-undef
-					__DEV__ && androidOnly && (
-						<PanelBody>
-							{ isFeaturedImage ? (
-								<BottomSheet.Cell
-									label={ __( 'Remove as Featured Image ' ) }
-									labelStyle={ [
-										featuredButtonStyle,
-										styles.removeFeaturedButton,
-									] }
-									onPress={ this.onRemoveFeatured }
-								/>
-							) : (
-								<BottomSheet.Cell
-									label={ __( 'Set as Featured Image ' ) }
-									labelStyle={ [
-										featuredButtonStyle,
-										setFeaturedButtonStyle,
-									] }
-									onPress={ this.onSetFeatured }
-								/>
-							) }
-						</PanelBody>
-					)
-				}
+				{ this.getSetFeaturedButton( isFeaturedImage ) }
 			</InspectorControls>
 		);
 
