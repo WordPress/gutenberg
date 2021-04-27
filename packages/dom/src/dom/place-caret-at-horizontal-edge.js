@@ -8,6 +8,7 @@ import { assertIsDefined } from '../utils/assert-is-defined';
  */
 import hiddenCaretRangeFromPoint from './hidden-caret-range-from-point';
 import isInputOrTextArea from './is-input-or-text-area';
+import isRTL from './is-rtl';
 
 /**
  * Places the caret at start or end of a given element.
@@ -49,11 +50,13 @@ export default function placeCaretAtHorizontalEdge(
 	}
 
 	const { ownerDocument } = container;
+	// In the case of RTL scripts, the horizontal edge is at the opposite side.
+	const isReverseDir = isRTL( container ) ? ! isReverse : isReverse;
 	const containerRect = container.getBoundingClientRect();
 	// When placing at the end (isReverse), find the closest range to the bottom
 	// right corner. When placing at the start, to the top left corner.
 	const x = isReverse ? containerRect.right - 1 : containerRect.left + 1;
-	const y = isReverse ? containerRect.bottom - 1 : containerRect.top + 1;
+	const y = isReverseDir ? containerRect.bottom - 1 : containerRect.top + 1;
 	const range = hiddenCaretRangeFromPoint( ownerDocument, x, y, container );
 
 	// If no range range can be created or it is outside the container, the

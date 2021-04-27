@@ -1,60 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  --wp-g2-flex-gap: -1px;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-  width: 100%;
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 > * + *:not(marquee) {
-  margin-left: -1px;
-}
-
-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 > * {
-  min-width: 0;
-}
-
-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 > *:focus-within {
-  z-index: 1;
-}
-
 .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
@@ -340,10 +286,41 @@ exports[`props should render correctly 1`] = `
   transition: none !important;
 }
 
+.emotion-6 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.emotion-6 > * + *:not(marquee) {
+  margin-left: -1px;
+}
+
+.emotion-6 > * {
+  min-width: 0;
+}
+
+.emotion-6 > *:focus-within {
+  z-index: 1;
+}
+
 <div
-  class="components-flex wp-components-flex components-control-group wp-components-control-group ic-s9h86e ic-17cs4ki ic-192yz5d emotion-6"
-  data-g2-c16t="true"
-  data-g2-component="ControlGroup"
+  class="components-flex components-control-group emotion-6 emotion-7 emotion-8"
+  data-wp-c16t="true"
+  data-wp-component="ControlGroup"
 >
   <button
     aria-busy="false"
@@ -395,60 +372,6 @@ exports[`props should render correctly 1`] = `
 `;
 
 exports[`props should render mixed control types 1`] = `
-.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -ms-flexbox;
-  display: flex;
-  --wp-g2-flex-gap: -1px;
-  -webkit-align-items: center;
-  -webkit-box-align: center;
-  -ms-flex-align: center;
-  align-items: center;
-  -webkit-flex-direction: row;
-  -ms-flex-direction: row;
-  flex-direction: row;
-  -webkit-box-pack: justify;
-  -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
-  justify-content: space-between;
-  width: 100%;
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10 > * + *:not(marquee) {
-  margin-left: -1px;
-}
-
-.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10 > * {
-  min-width: 0;
-}
-
-.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10.emotion-10 > *:focus-within {
-  z-index: 1;
-}
-
 .emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9.emotion-9 {
   box-sizing: border-box;
   -moz-osx-font-smoothing: grayscale;
@@ -1228,10 +1151,41 @@ exports[`props should render mixed control types 1`] = `
   -moz-appearance: textfield;
 }
 
+.emotion-10 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-align-items: center;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  -webkit-flex-direction: row;
+  -ms-flex-direction: row;
+  flex-direction: row;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.emotion-10 > * + *:not(marquee) {
+  margin-left: -1px;
+}
+
+.emotion-10 > * {
+  min-width: 0;
+}
+
+.emotion-10 > *:focus-within {
+  z-index: 1;
+}
+
 <div
-  class="components-flex wp-components-flex components-control-group wp-components-control-group ic-s9h86e ic-17cs4ki ic-192yz5d emotion-10"
-  data-g2-c16t="true"
-  data-g2-component="ControlGroup"
+  class="components-flex components-control-group emotion-10 emotion-11 emotion-12"
+  data-wp-c16t="true"
+  data-wp-component="ControlGroup"
 >
   <div
     class="components-flex wp-components-flex components-base-field wp-components-base-field ic-172ogxm ic-17cs4ki components-select wp-components-select ic-gutgg1 ic-192yz5d emotion-4"

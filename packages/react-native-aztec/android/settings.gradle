@@ -1,8 +1,2 @@
-pluginManagement {
-  plugins {
-    id 'com.jfrog.bintray' version '1.8.5'
-  }
-}
-
 rootProject.name = '@wordpress_react-native-aztec'
 
