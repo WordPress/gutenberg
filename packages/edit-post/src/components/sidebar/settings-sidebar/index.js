@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { BlockInspector } from '@wordpress/block-editor';
+import {
+	BlockInspector,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { cog } from '@wordpress/icons';
 import { Platform } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -22,6 +25,7 @@ import PageAttributes from '../page-attributes';
 import MetaBoxes from '../../meta-boxes';
 import PluginDocumentSettingPanel from '../plugin-document-setting-panel';
 import PluginSidebarEditPost from '../plugin-sidebar';
+import Template from '../template';
 import TemplateSummary from '../template-summary';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -50,7 +54,7 @@ const SettingsSidebar = () => {
 					sidebar
 				)
 			) {
-				if ( select( 'core/block-editor' ).getBlockSelectionStart() ) {
+				if ( select( blockEditorStore ).getBlockSelectionStart() ) {
 					sidebar = 'edit-post/block';
 				}
 				sidebar = 'edit-post/document';
@@ -82,6 +86,7 @@ const SettingsSidebar = () => {
 			{ ! isTemplateMode && sidebarName === 'edit-post/document' && (
 				<>
 					<PostStatus />
+					<Template />
 					<PluginDocumentSettingPanel.Slot />
 					<LastRevision />
 					<PostLink />

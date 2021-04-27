@@ -28,6 +28,7 @@ export {
 	Fill,
 	Provider as SlotFillProvider,
 } from './slot-fill';
+export { default as __experimentalStyleProvider } from './style-provider';
 export { default as BaseControl } from './base-control';
 export { default as TextareaControl } from './textarea-control';
 export { default as PanelBody } from './panel/body';
@@ -89,6 +90,7 @@ export { default as ImageEditingButton } from './mobile/image/image-editing-butt
 export { default as InserterButton } from './mobile/inserter-button';
 export { setClipboard, getClipboard } from './mobile/clipboard';
 export { default as AudioPlayer } from './mobile/audio-player';
+export { default as Badge } from './mobile/badge';
 
 // Utils
 export { colorsUtils } from './mobile/color-settings/utils';

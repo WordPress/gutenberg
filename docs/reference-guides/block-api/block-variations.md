@@ -1,4 +1,4 @@
-# Block Variations
+# Variations
 
 Block Variations is the API that allows a block to have similar versions of it, but all these versions share some common functionality. Each block variation is differentiated from the others by setting some initial attributes or inner blocks. Then at the time when a block is inserted these attributes and/or inner blocks are applied.
 
@@ -48,11 +48,11 @@ An object describing a variation defined for the block type can contain the foll
     -   `block` - Used by blocks to filter specific block variations. Mostly used in Placeholder patterns like `Columns` block.
     -   `transform` - Block Variation will be shown in the component for Block Variations transformations.
 -   `keywords` (optional, type `string[]`) - An array of terms (which can be translated) that help users discover the variation while searching.
--   `isActive` (optional, type `Function`) - A function that accepts a block's attributes and the variation's attributes and determines if a variation is active. This function doesn't try to find a match dynamically based on all block's attributes, as in many cases some attributes are irrelevant. An example would be for `embed` block where we only care about `providerNameSlug` attribute's value.
+-   `isActive` (optional, type `Function|string[]`) - This can be a function or an array of block attributes. Function that accepts a block's attributes and the variation's attributes and determines if a variation is active. This function doesn't try to find a match dynamically based on all block's attributes, as in many cases some attributes are irrelevant. An example would be for `embed` block where we only care about `providerNameSlug` attribute's value. We can also use a `string[]` to tell which attributes should be compared as a shorthand. Each attributes will be matched and the variation will be active if all of them are matching.
 
-The main difference between style variations and block variations is that a style variation just applies a `css class` to the block, so it can be styled in an alternative way. If we want to apply initial attributes or inner blocks, we fall in block variation territory.
+The main difference between block styles and block variations is that a block style just applies a CSS class to the block, so it can be styled in an alternative way. If we want to apply initial attributes or inner blocks, we fall in block variation territory.
 
-It's also possible to override the default block style variation using the `className` attribute when defining block variations.
+It's also possible to override the default block style using the `className` attribute when defining block variations.
 
 ```js
 variations: [

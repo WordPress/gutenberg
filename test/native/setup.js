@@ -23,12 +23,15 @@ jest.mock( '@wordpress/element', () => {
 jest.mock( '@wordpress/react-native-bridge', () => {
 	return {
 		addEventListener: jest.fn(),
+		mediaUploadSync: jest.fn(),
 		removeEventListener: jest.fn(),
+		requestFocalPointPickerTooltipShown: jest.fn( () => true ),
 		subscribeParentGetHtml: jest.fn(),
 		subscribeParentToggleHTMLMode: jest.fn(),
 		subscribeSetTitle: jest.fn(),
 		subscribeSetFocusOnTitle: jest.fn(),
 		subscribeUpdateHtml: jest.fn(),
+		subscribeFeaturedImageIdNativeUpdated: jest.fn(),
 		subscribeMediaAppend: jest.fn(),
 		subscribeAndroidModalClosed: jest.fn(),
 		subscribeUpdateTheme: jest.fn(),
@@ -40,6 +43,7 @@ jest.mock( '@wordpress/react-native-bridge', () => {
 		subscribeMediaUpload: jest.fn(),
 		subscribeMediaSave: jest.fn(),
 		getOtherMediaOptions: jest.fn(),
+		requestMediaEditor: jest.fn(),
 		requestMediaPicker: jest.fn(),
 		requestUnsupportedBlockFallback: jest.fn(),
 		subscribeReplaceBlock: jest.fn(),
@@ -61,7 +65,9 @@ jest.mock( 'react-native-dark-mode', () => {
 	};
 } );
 
-jest.mock( 'react-native-modal', () => () => 'Modal' );
+jest.mock( 'react-native-modal', () => ( props ) =>
+	props.isVisible ? mockComponent( 'Modal' )( props ) : null
+);
 
 jest.mock( 'react-native-hr', () => () => 'Hr' );
 
@@ -142,6 +148,7 @@ jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );
 jest.mock( 'react-native/Libraries/Components/TextInput/TextInputState' );
 
 // Mock native modules incompatible with testing environment
+jest.mock( 'react-native/Libraries/LayoutAnimation/LayoutAnimation' );
 jest.mock(
 	'react-native/Libraries/Components/AccessibilityInfo/AccessibilityInfo',
 	() => ( {

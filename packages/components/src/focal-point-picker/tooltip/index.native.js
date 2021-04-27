@@ -95,7 +95,7 @@ function Label( { align, text, xOffset, yOffset } ) {
 	const tooltipStyles = [
 		styles.tooltip,
 		{
-			shadowColor: styles.tooltipShadow.color,
+			shadowColor: styles.tooltipShadow?.color,
 			shadowOffset: {
 				width: 0,
 				height: 2,

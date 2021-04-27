@@ -44,6 +44,10 @@ public interface GutenbergBridgeJS2Parent extends RequestExecutor {
         void onReplaceMediaFilesEditedBlock(final String mediaFiles, final String blockId);
     }
 
+    interface FeaturedImageEmitter {
+        void sendToJSFeaturedImageId(int mediaId);
+    }
+
     interface ReplaceUnsupportedBlockCallback {
         void replaceUnsupportedBlock(String content, String blockId);
     }

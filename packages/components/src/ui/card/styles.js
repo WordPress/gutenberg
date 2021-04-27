@@ -1,10 +1,15 @@
 /**
  * External dependencies
  */
-import { css, ui } from '@wp-g2/styles';
+import { css } from 'emotion';
+
+/**
+ * Internal dependencies
+ */
+import CONFIG from '../../utils/config-values';
 
 export const Card = css`
-	box-shadow: 0 0 0 1px ${ ui.get( 'surfaceBorderColor' ) };
+	box-shadow: 0 0 0 1px ${ CONFIG.surfaceBorderColor };
 	outline: none;
 `;
 
@@ -19,32 +24,32 @@ export const Content = css`
 export const Body = css`
 	height: auto;
 	max-height: 100%;
-	padding: ${ ui.get( 'cardPadding' ) };
+	padding: ${ CONFIG.cardPadding };
 `;
 
 export const InnerBody = css`
-	margin-left: calc( ${ ui.get( 'cardPadding' ) } * -1 );
-	margin-right: calc( ${ ui.get( 'cardPadding' ) } * -1 );
+	margin-left: calc( ${ CONFIG.cardPadding } * -1 );
+	margin-right: calc( ${ CONFIG.cardPadding } * -1 );
 `;
 
 export const headerFooter = css`
-	border-color: ${ ui.get( 'colorDivider' ) };
-	min-height: ${ ui.get( 'cardHeaderHeight' ) };
-	padding-bottom: ${ ui.get( 'cardHeaderFooterPaddingY' ) };
-	padding-left: ${ ui.get( 'cardPaddingX' ) };
-	padding-right: ${ ui.get( 'cardPaddingX' ) };
-	padding-top: ${ ui.get( 'cardHeaderFooterPaddingY' ) };
+	border-color: ${ CONFIG.colorDivider };
+	min-height: ${ CONFIG.cardHeaderHeight };
+	padding-bottom: ${ CONFIG.cardHeaderFooterPaddingY };
+	padding-left: ${ CONFIG.cardPaddingX };
+	padding-right: ${ CONFIG.cardPaddingX };
+	padding-top: ${ CONFIG.cardHeaderFooterPaddingY };
 `;
 
 export const borderRadius = css`
 	&:first-of-type {
-		border-top-left-radius: ${ ui.get( 'cardBorderRadius' ) };
-		border-top-right-radius: ${ ui.get( 'cardBorderRadius' ) };
+		border-top-left-radius: ${ CONFIG.cardBorderRadius };
+		border-top-right-radius: ${ CONFIG.cardBorderRadius };
 	}
 
 	&:last-of-type {
-		border-bottom-left-radius: ${ ui.get( 'cardBorderRadius' ) };
-		border-bottom-right-radius: ${ ui.get( 'cardBorderRadius' ) };
+		border-bottom-left-radius: ${ CONFIG.cardBorderRadius };
+		border-bottom-right-radius: ${ CONFIG.cardBorderRadius };
 	}
 `;
 
@@ -53,7 +58,7 @@ export const borderless = css`
 `;
 
 export const rounded = css`
-	border-radius: ${ ui.get( 'cardBorderRadius' ) };
+	border-radius: ${ CONFIG.cardBorderRadius };
 `;
 
 export const small = css`

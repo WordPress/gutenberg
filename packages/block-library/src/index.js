@@ -4,12 +4,11 @@
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
 import {
-	registerBlockType,
+	registerBlockTypeFromMetadata,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
 	setGroupingBlockName,
-	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
 } from '@wordpress/blocks';
 
 /**
@@ -87,6 +86,7 @@ import * as postCommentDate from './post-comment-date';
 import * as postComments from './post-comments';
 import * as postCommentsCount from './post-comments-count';
 import * as postCommentsForm from './post-comments-form';
+import * as postCommentsLink from './post-comments-link';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
@@ -105,10 +105,7 @@ const registerBlock = ( block ) => {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	if ( metadata ) {
-		unstable__bootstrapServerSideBlockDefinitions( { [ name ]: metadata } );
-	}
-	registerBlockType( name, settings );
+	registerBlockTypeFromMetadata( { name, ...metadata }, settings );
 };
 
 /**
@@ -243,6 +240,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postComments,
 								postCommentsCount,
 								postCommentsForm,
+								postCommentsLink,
 								postDate,
 								postExcerpt,
 								postFeaturedImage,

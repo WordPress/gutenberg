@@ -62,6 +62,15 @@ This property is similar to the `accept` property. The difference is the format 
 -   Required: No
 -   Platform: Web | Mobile
 
+### autoOpenMediaUpload
+
+If true, the MediaUpload component auto-opens the picker of the respective platform.
+
+- Type: `Boolean`
+- Required: No
+- Default: `false`
+- Platform: Mobile
+
 ### className
 
 Class name added to the placeholder.
