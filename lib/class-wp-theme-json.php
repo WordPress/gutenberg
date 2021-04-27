@@ -957,7 +957,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return array
 	 */
-	public static function get_style_nodes( $theme_json, $selectors = array() ) {
+	private static function get_style_nodes( $theme_json, $selectors = array() ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
@@ -996,7 +996,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return array
 	 */
-	public static function get_setting_nodes( $theme_json, $selectors = array() ) {
+	private static function get_setting_nodes( $theme_json, $selectors = array() ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['settings'] ) ) {
 			return $nodes;
