@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { ui } from '@wp-g2/styles';
-
-/**
  * WordPress dependencies
  */
 import { useMemo, memo } from '@wordpress/element';
@@ -37,11 +32,7 @@ function FormGroupContent( {
 	] );
 
 	const content = help ? (
-		<VStack
-			expanded={ false }
-			{ ...ui.$( 'FormGroupContentContainer' ) }
-			spacing={ spacing }
-		>
+		<VStack expanded={ false } spacing={ spacing }>
 			{ children }
 			<FormGroupHelp>{ help }</FormGroupHelp>
 		</VStack>
