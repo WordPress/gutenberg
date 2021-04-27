@@ -433,11 +433,11 @@ export class ImageEdit extends Component {
 		this.onSetSizeSlug( newValue );
 	}
 
-	onSetFeatured = ( mediaId ) => {
+	onSetFeatured( mediaId ) {
 		const { closeSettingsBottomSheet } = this.props;
 		setFeaturedImage( mediaId );
 		closeSettingsBottomSheet();
-	};
+	}
 
 	getSetFeaturedButton( isFeaturedImage ) {
 		const { attributes, getStylesFromColorScheme } = this.props;
