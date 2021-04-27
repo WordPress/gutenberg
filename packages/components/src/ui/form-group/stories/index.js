@@ -16,7 +16,7 @@ const TextInput = ( { id: idProp, ...props } ) => {
 
 export default {
 	component: FormGroup,
-	title: 'Components/FormGroup',
+	title: 'G2 Components (Experimental)/FormGroup',
 };
 
 export const _default = () => {
