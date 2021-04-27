@@ -1,16 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
-  background-color: #ffffff;
-  background-color: var(--wp-g2-surface-color);
-  color: #1e1e1e;
-  color: var(--wp-g2-color-text);
-  position: relative;
-  --wp-g2-surface-background-size: 12px;
-  --wp-g2-surface-background-size-dotted: 11px;
-}
-
 .emotion-11 {
   box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
   outline: none;
@@ -103,6 +93,16 @@ exports[`props should render correctly 1`] = `
   -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
   transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
   border-radius: 2px;
+}
+
+.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
+  background-color: #ffffff;
+  background-color: var(--wp-g2-surface-color);
+  color: #1e1e1e;
+  color: var(--wp-g2-color-text);
+  position: relative;
+  --wp-g2-surface-background-size: 12px;
+  --wp-g2-surface-background-size-dotted: 11px;
 }
 
 <div
