@@ -1,17 +1,10 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12.emotion-12 {
-  background-color: #ffffff;
-  background-color: var(--wp-g2-surface-color);
-  color: #1e1e1e;
-  color: var(--wp-g2-color-text);
-  position: relative;
-  --wp-g2-surface-background-size: 12px;
-  --wp-g2-surface-background-size-dotted: 11px;
-}
-
 .emotion-11 {
+  background-color: #fff;
+  color: #000;
+  position: relative;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
   outline: none;
   border-radius: 2px;
@@ -106,7 +99,7 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface components-card emotion-11 emotion-12 emotion-1 emotion-2"
+  class="components-surface components-card emotion-11 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Card"
 >
@@ -162,7 +155,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-hy95ag-Card-rounded-cardStyle css-10jei3p css-1mm2cvy-View egi4jkx0"
+      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View egi4jkx0"
 `;
 
 exports[`props should render without content 1`] = `
@@ -184,7 +177,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-hy95ag-Card-rounded-cardStyle css-10jei3p css-1mm2cvy-View egi4jkx0"
+      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View egi4jkx0"
 @@ -21,10 +21,17 @@
           frameborder="0"
           src="about:blank"
