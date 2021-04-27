@@ -25,7 +25,7 @@ export default function Form( { id, idBase, content, setFormData } ) {
 			onSave={ setFormData }
 			// Force a remount when the widget's form HTML changes. This clears
 			// out any mutations to the DOM that widget scripts have made.
-			key={ content.key }
+			key={ content }
 		/>
 	);
 }
@@ -45,7 +45,7 @@ function Control( { id, idBase, content, onChange, onSave } ) {
 
 		const { jQuery: $ } = window;
 
-		if ( content.html ) {
+		if ( content ) {
 			$( document ).trigger( 'widget-added', [
 				$( controlRef.current ),
 			] );
@@ -124,9 +124,7 @@ function Control( { id, idBase, content, onChange, onSave } ) {
 						className="add_new"
 						value=""
 					/>
-					<RawHTML className="widget-content">
-						{ content.html }
-					</RawHTML>
+					<RawHTML className="widget-content">{ content }</RawHTML>
 					{ id && (
 						<Button type="submit" isPrimary>
 							{ __( 'Save' ) }

@@ -10,7 +10,7 @@ import apiFetch from '@wordpress/api-fetch';
 export default function useForm( { id, idBase, instance, setInstance } ) {
 	const isStillMounted = useRef( false );
 	const outgoingInstances = useRef( new Set() );
-	const [ content, setContent ] = useState( { html: null, key: 0 } );
+	const [ content, setContent ] = useState( null );
 	const [ hasPreview, setHasPreview ] = useState( null );
 
 	const { createNotice } = useDispatch( noticesStore );
@@ -31,10 +31,7 @@ export default function useForm( { id, idBase, instance, setInstance } ) {
 				if ( id ) {
 					const { form } = await saveWidget( id );
 					if ( isStillMounted.current ) {
-						setContent( ( { key } ) => ( {
-							html: form,
-							key: key + 1,
-						} ) );
+						setContent( form );
 					}
 				} else if ( idBase ) {
 					const { form, preview } = await encodeWidget(
@@ -42,10 +39,7 @@ export default function useForm( { id, idBase, instance, setInstance } ) {
 						instance
 					);
 					if ( isStillMounted.current ) {
-						setContent( ( { key } ) => ( {
-							html: form,
-							key: key + 1,
-						} ) );
+						setContent( form );
 						setHasPreview( !! preview );
 					}
 				}
@@ -65,10 +59,7 @@ export default function useForm( { id, idBase, instance, setInstance } ) {
 				if ( id ) {
 					const { form } = await saveWidget( id, formData );
 					if ( isStillMounted.current ) {
-						setContent( ( { key } ) => ( {
-							html: form,
-							key: key + 1,
-						} ) );
+						setContent( form );
 					}
 				} else if ( idBase ) {
 					const {
