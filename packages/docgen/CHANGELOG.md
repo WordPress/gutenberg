@@ -5,8 +5,8 @@
 ### New Features
 
 -   Add support for array and object destructured arguments in TypeScript documentation generation.
--	Add support for default arguments in TypeScript.
--	Add support for static non-function variable type extraction in TypeScript.
+-   Add support for default arguments in TypeScript.
+-   Add support for static non-function variable type extraction in TypeScript.
 
 ## 1.16.0 (2021-03-17)
 
