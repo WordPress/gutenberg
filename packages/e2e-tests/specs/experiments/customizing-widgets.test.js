@@ -147,35 +147,28 @@ describe( 'Widgets Customizer', () => {
 		};
 
 		// Expect the paragraph to be found in the preview iframe.
-		await find(
-			{
-				text: 'First Paragraph',
-				selector: '.widget-content p',
-			},
-			findOptions
-		);
+		await expect( {
+			text: 'First Paragraph',
+			selector: '.widget-content p',
+		} ).toBeFound( findOptions );
 
 		// Expect the heading to be found in the preview iframe.
-		await find(
-			{
-				role: 'heading',
-				name: 'My Heading',
-				selector: '.widget-content *',
-			},
-			findOptions
-		);
+		await expect( {
+			role: 'heading',
+			name: 'My Heading',
+			selector: '.widget-content *',
+		} ).toBeFound( findOptions );
 
 		// Expect the search box to be found in the preview iframe.
-		await find(
-			{
-				role: 'searchbox',
-				name: 'My Search',
-				selector: '.widget-content *',
-			},
-			findOptions
-		);
+		await expect( {
+			role: 'searchbox',
+			name: 'My Search',
+			selector: '.widget-content *',
+		} ).toBeFound( findOptions );
 
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarned(
+			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
+		);
 	} );
 
 	it( 'should open the inspector panel', async () => {
@@ -225,11 +218,11 @@ describe( 'Widgets Customizer', () => {
 		} );
 
 		// Expect the block title to be found.
-		await find( {
+		await expect( {
 			role: 'heading',
 			name: 'Paragraph',
 			level: 2,
-		} );
+		} ).toBeFound();
 
 		await backButton.click();
 
@@ -260,15 +253,17 @@ describe( 'Widgets Customizer', () => {
 		await page.keyboard.press( 'Escape' );
 
 		// Go back to the widgets editor.
-		await find( {
+		await expect( {
 			role: 'heading',
 			name: 'Customizing ▸ Widgets Footer #1',
 			level: 3,
-		} );
+		} ).toBeFound();
 
 		await expect( inspectorHeading ).not.toBeVisible();
 
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarned(
+			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
+		);
 	} );
 
 	it( 'should handle the inserter outer section', async () => {
@@ -312,11 +307,11 @@ describe( 'Widgets Customizer', () => {
 		await addBlockButton.click();
 
 		// Expect the inserter outer section to be found.
-		await find( {
+		await expect( {
 			role: 'heading',
 			name: 'Add a block',
 			level: 2,
-		} );
+		} ).toBeFound();
 
 		// Expect to close the inserter outer section when pressing Escape.
 		await page.keyboard.press( 'Escape' );
@@ -325,7 +320,7 @@ describe( 'Widgets Customizer', () => {
 		await addBlockButton.click();
 
 		// Expect the inserter outer section to be found again.
-		let inserterHeading = await find( {
+		const inserterHeading = await find( {
 			role: 'heading',
 			name: 'Add a block',
 			level: 2,
@@ -358,11 +353,11 @@ describe( 'Widgets Customizer', () => {
 		// Open the inserter outer section.
 		await addBlockButton.click();
 
-		inserterHeading = await find( {
+		await expect( {
 			role: 'heading',
 			name: 'Add a block',
 			level: 2,
-		} );
+		} ).toBeFound();
 
 		// Expect the Publish Settings section to be closed.
 		await expect( publishSettings ).not.toBeVisible();
@@ -381,7 +376,9 @@ describe( 'Widgets Customizer', () => {
 			level: 2,
 		} ).not.toBeFound();
 
-		expect( console ).toHaveWarned();
+		expect( console ).toHaveWarned(
+			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
+		);
 	} );
 } );
 
