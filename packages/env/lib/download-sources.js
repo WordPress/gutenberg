@@ -123,15 +123,10 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 		await git.clone( source.url, source.clonePath, {
 			'--depth': '1',
 			'--no-single-branch': null,
+			'--branch': source.ref
 		} );
 		await git.cwd( source.clonePath );
 	}
-
-	log( 'Fetching the specified ref.' );
-	await git.fetch( 'origin', source.ref );
-
-	log( 'Checking out the specified ref.' );
-	await git.checkout( source.ref );
 
 	onProgress( 1 );
 }
