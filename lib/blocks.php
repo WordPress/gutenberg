@@ -253,8 +253,11 @@ function gutenberg_maybe_inline_styles() {
 			$style['css'] = file_get_contents( $style['path'] );
 
 			// Set `src` to `false` and add styles inline.
-			$wp_styles->registered[ $style['handle'] ]->src              = false;
-			$wp_styles->registered[ $style['handle'] ]->extra['after'][] = $style['css'];
+			$wp_styles->registered[ $style['handle'] ]->src = false;
+			if ( empty( $wp_styles->registered[ $style['handle'] ]->extra['after'] ) ) {
+				$wp_styles->registered[ $style['handle'] ]->extra['after'] = array();
+			}
+			array_unshift( $wp_styles->registered[ $style['handle'] ]->extra['after'], $style['css'] );
 
 			// Add the styles size to the $total_inline_size var.
 			$total_inline_size += (int) $style['size'];
