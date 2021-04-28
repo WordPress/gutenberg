@@ -5,105 +5,39 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -12,13 +12,13 @@
-        data-g2-c16t="true"
-        data-g2-component="CardHeader"
+@@ -11,13 +11,13 @@
+        data-wp-c16t="true"
+        data-wp-component="CardHeader"
         title="WordPress.org"
       />
       <div
--       class="components-card-inner-body wp-components-card-inner-body ic-b8zmsr ic-192yz5d css-1n7epz"
-+       class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body ic-1reds0m ic-y3p1xi ic-192yz5d css-1hp1ar"
-        data-g2-c16t="true"
--       data-g2-component="CardInnerBody"
-+       data-g2-component="CardBody"
+-       class="css-yc36db-InnerBody components-card-inner-body css-1mm2cvy-View egi4jkx0"
++       class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View egi4jkx0"
+        data-wp-c16t="true"
+-       data-wp-component="CardInnerBody"
++       data-wp-component="CardBody"
       >
         Code is Poetry.
       </div>
       <div
-        class="components-flex wp-components-flex components-card-footer wp-components-card-footer ic-i2oc6g ic-17cs4ki ic-192yz5d css-1qwgs3h"
+        class="components-flex components-card-footer css-g6s6xo-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View egi4jkx0"
 `;
 
 exports[`props should render correctly 1`] = `
-.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  background-color: #ffffff;
-  background-color: var(--wp-g2-surface-color);
-  color: #1e1e1e;
-  color: var(--wp-g2-color-text);
+.emotion-17 {
+  background-color: #fff;
+  color: #000;
   position: relative;
-  --wp-g2-surface-background-size: 12px;
-  --wp-g2-surface-background-size-dotted: 11px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
-  box-shadow: 0 0 0 1px var(--wp-g2-surface-border-color);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
   outline: none;
   border-radius: 2px;
-  border-radius: var(--wp-g2-card-border-radius);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6.emotion-6 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  height: 100%;
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3.emotion-3 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-0 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  --wp-g2-flex-gap: calc(4px * 2);
-  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -117,148 +51,83 @@ exports[`props should render correctly 1`] = `
   justify-content: space-between;
   width: 100%;
   border-bottom: 1px solid;
-  border-color: rgba(0, 0, 0, 0.1);
-  border-color: var(--wp-g2-color-divider);
+  border-color: rgba(0,0,0,0.1);
   min-height: 44px;
-  min-height: var(--wp-g2-card-header-height);
   padding-bottom: calc(4px * 1);
-  padding-bottom: var(--wp-g2-card-header-footer-padding-y);
   padding-left: calc(4px * 3);
-  padding-left: var(--wp-g2-card-padding-x);
   padding-right: calc(4px * 3);
-  padding-right: var(--wp-g2-card-padding-x);
   padding-top: calc(4px * 1);
-  padding-top: var(--wp-g2-card-header-footer-padding-y);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * + *:not(marquee) {
+.emotion-0 > * + *:not(marquee) {
   margin-left: calc(4px * 2);
-  margin-left: calc(var(--wp-g2-grid-base) * 2);
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 > * {
+.emotion-0 > * {
   min-width: 0;
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:first-of-type {
+.emotion-0:first-of-type {
   border-top-left-radius: 2px;
-  border-top-left-radius: var(--wp-g2-card-border-radius);
   border-top-right-radius: 2px;
-  border-top-right-radius: var(--wp-g2-card-border-radius);
 }
 
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0:last-of-type {
+.emotion-0:last-of-type {
   border-bottom-left-radius: 2px;
-  border-bottom-left-radius: var(--wp-g2-card-border-radius);
   border-bottom-right-radius: 2px;
-  border-bottom-right-radius: var(--wp-g2-card-border-radius);
 }
 
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-3 {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
   height: auto;
   max-height: 100%;
   padding: calc(4px * 3) calc(4px * 3);
-  padding: var(--wp-g2-card-padding);
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1 {
-  -webkit-transition: none !important;
-  transition: none !important;
 }
 
 @media only screen and ( min-device-width:40em ) {
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar {
+  .emotion-3::-webkit-scrollbar {
     height: 12px;
     width: 12px;
   }
 
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar-track {
+  .emotion-3::-webkit-scrollbar-track {
     background-color: transparent;
   }
 
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar-track {
-    background: rgba(0, 0, 0, 0.04);
-    background: var(--wp-g2-color-scrollbar-track);
+  .emotion-3::-webkit-scrollbar-track {
+    background: rgba(0,0,0,0.04);
     border-radius: 8px;
   }
 
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1::-webkit-scrollbar-thumb {
+  .emotion-3::-webkit-scrollbar-thumb {
     background-clip: padding-box;
-    background-color: rgba(0, 0, 0, 0.2);
-    background-color: var(--wp-g2-color-scrollbar-thumb);
+    background-color: rgba(0,0,0,0.2);
     border: 2px solid rgba( 0,0,0,0 );
     border-radius: 7px;
   }
 
-  .emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1:hover::-webkit-scrollbar-thumb {
-    background-color: rgba(0, 0, 0, 0.5);
-    background-color: var(--wp-g2-color-scrollbar-thumb-hover);
+  .emotion-3:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.5);
   }
 }
 
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1:first-of-type {
+.emotion-3:first-of-type {
   border-top-left-radius: 2px;
-  border-top-left-radius: var(--wp-g2-card-border-radius);
   border-top-right-radius: 2px;
-  border-top-right-radius: var(--wp-g2-card-border-radius);
 }
 
-.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1.emotion-1:last-of-type {
+.emotion-3:last-of-type {
   border-bottom-left-radius: 2px;
-  border-bottom-left-radius: var(--wp-g2-card-border-radius);
   border-bottom-right-radius: 2px;
-  border-bottom-right-radius: var(--wp-g2-card-border-radius);
 }
 
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
   display: flex;
-  --wp-g2-flex-gap: calc(4px * 2);
-  --wp-g2-flex-gap: calc(var(--wp-g2-grid-base) * 2);
   -webkit-align-items: center;
   -webkit-box-align: center;
   -ms-flex-align: center;
@@ -271,66 +140,33 @@ exports[`props should render correctly 1`] = `
   -ms-flex-pack: end;
   justify-content: flex-end;
   width: 100%;
-  border-color: rgba(0, 0, 0, 0.1);
-  border-color: var(--wp-g2-color-divider);
+  border-color: rgba(0,0,0,0.1);
   min-height: 44px;
-  min-height: var(--wp-g2-card-header-height);
   padding-bottom: calc(4px * 1);
-  padding-bottom: var(--wp-g2-card-header-footer-padding-y);
   padding-left: calc(4px * 3);
-  padding-left: var(--wp-g2-card-padding-x);
   padding-right: calc(4px * 3);
-  padding-right: var(--wp-g2-card-padding-x);
   padding-top: calc(4px * 1);
-  padding-top: var(--wp-g2-card-header-footer-padding-y);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * + *:not(marquee) {
+.emotion-6 > * + *:not(marquee) {
   margin-left: calc(4px * 2);
-  margin-left: calc(var(--wp-g2-grid-base) * 2);
 }
 
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2 > * {
+.emotion-6 > * {
   min-width: 0;
 }
 
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:first-of-type {
+.emotion-6:first-of-type {
   border-top-left-radius: 2px;
-  border-top-left-radius: var(--wp-g2-card-border-radius);
   border-top-right-radius: 2px;
-  border-top-right-radius: var(--wp-g2-card-border-radius);
 }
 
-.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2.emotion-2:last-of-type {
+.emotion-6:last-of-type {
   border-bottom-left-radius: 2px;
-  border-bottom-left-radius: var(--wp-g2-card-border-radius);
   border-bottom-right-radius: 2px;
-  border-bottom-right-radius: var(--wp-g2-card-border-radius);
 }
 
-.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-11 {
   background: transparent;
   display: block;
   margin: 0 !important;
@@ -341,41 +177,15 @@ exports[`props should render correctly 1`] = `
   bottom: 0;
   box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
   opacity: 1;
-  opacity: var(--wp-g2-elevation-intensity);
   left: 0;
   right: 0;
   top: 0;
-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
-  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
-  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
   border-radius: 2px;
-  border-radius: var(--wp-g2-card-border-radius);
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4.emotion-4 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
-.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
+.emotion-14 {
   background: transparent;
   display: block;
   margin: 0 !important;
@@ -386,56 +196,39 @@ exports[`props should render correctly 1`] = `
   bottom: 0;
   box-shadow: 0 2px 4px 0 rgba(0 ,0,0,0.1);
   opacity: 1;
-  opacity: var(--wp-g2-elevation-intensity);
   left: 0;
   right: 0;
   top: 0;
-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
-  -webkit-transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
-  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
-  transition: box-shadow var(--wp-g2-transition-duration) var(--wp-g2-transition-timing-function);
+  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
   border-radius: 2px;
-  border-radius: var(--wp-g2-card-border-radius);
-}
-
-@media (prefers-reduced-motion) {
-  .emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5.emotion-5 {
-  -webkit-transition: none !important;
-  transition: none !important;
 }
 
 <div
-  class="components-surface wp-components-surface components-card wp-components-card ic-1vr61kr ic-15506ld ic-192yz5d emotion-6"
-  data-g2-c16t="true"
-  data-g2-component="Card"
+  class="components-surface components-card emotion-17 emotion-1 emotion-2"
+  data-wp-c16t="true"
+  data-wp-component="Card"
 >
   <div
-    class="ic-192yz5d emotion-3"
-    data-g2-component="CardContent"
+    class="emotion-1 emotion-2"
   >
     <div
-      class="components-flex wp-components-flex components-card-header wp-components-card-header ic-1jf72r7 ic-17cs4ki ic-192yz5d emotion-0"
-      data-g2-c16t="true"
-      data-g2-component="CardHeader"
+      class="components-flex components-card-header emotion-0 emotion-1 emotion-2"
+      data-wp-c16t="true"
+      data-wp-component="CardHeader"
       title="WordPress.org"
     />
     <div
-      class="components-scrollable wp-components-scrollable components-card-body wp-components-card-body ic-1reds0m ic-y3p1xi ic-192yz5d emotion-1"
-      data-g2-c16t="true"
-      data-g2-component="CardBody"
+      class="components-scrollable components-card-body emotion-3 emotion-1 emotion-2"
+      data-wp-c16t="true"
+      data-wp-component="CardBody"
     >
       Code is Poetry.
     </div>
     <div
-      class="components-flex wp-components-flex components-card-footer wp-components-card-footer ic-i2oc6g ic-17cs4ki ic-192yz5d emotion-2"
-      data-g2-c16t="true"
-      data-g2-component="CardFooter"
+      class="components-flex components-card-footer emotion-6 emotion-1 emotion-2"
+      data-wp-c16t="true"
+      data-wp-component="CardFooter"
     >
       <button>
         Agree
@@ -444,15 +237,15 @@ exports[`props should render correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
-    class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-4"
-    data-g2-c16t="true"
-    data-g2-component="CardElevation"
+    class="components-elevation emotion-11 emotion-1 emotion-2"
+    data-wp-c16t="true"
+    data-wp-component="Elevation"
   />
   <div
     aria-hidden="true"
-    class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d emotion-5"
-    data-g2-c16t="true"
-    data-g2-component="CardElevation"
+    class="components-elevation emotion-14 emotion-1 emotion-2"
+    data-wp-c16t="true"
+    data-wp-component="Elevation"
   />
 </div>
 `;
@@ -462,23 +255,23 @@ Snapshot Diff:
 - First value
 + Second value
 
-@@ -7,16 +7,16 @@
-      class="ic-192yz5d css-1kk7lqu"
-      data-g2-component="CardContent"
+@@ -6,16 +6,16 @@
+    <div
+      class="css-1mm2cvy-View egi4jkx0"
     />
     <div
       aria-hidden="true"
--     class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-1vg495v"
-+     class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-1wkolpp"
-      data-g2-c16t="true"
-      data-g2-component="CardElevation"
+-     class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View egi4jkx0"
++     class="components-elevation css-xtff41-Elevation css-1mm2cvy-View egi4jkx0"
+      data-wp-c16t="true"
+      data-wp-component="Elevation"
     />
     <div
       aria-hidden="true"
--     class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-dgxm8l"
-+     class="components-elevation wp-components-elevation ic-i1zzlu ic-192yz5d css-1zwi7l"
-      data-g2-c16t="true"
-      data-g2-component="CardElevation"
+-     class="components-elevation css-1ajhhcx-Elevation css-1mm2cvy-View egi4jkx0"
++     class="components-elevation css-hdn3qt-Elevation css-1mm2cvy-View egi4jkx0"
+      data-wp-c16t="true"
+      data-wp-component="Elevation"
     />
   </div>
 `;

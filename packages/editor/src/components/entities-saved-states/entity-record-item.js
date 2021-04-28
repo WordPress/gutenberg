@@ -5,6 +5,7 @@ import { CheckboxControl, Button, PanelRow } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 export default function EntityRecordItem( {
 	record,
@@ -21,7 +22,7 @@ export default function EntityRecordItem( {
 			key
 		);
 		// Get parents of the entity's first block.
-		const parents = select( 'core/block-editor' ).getBlockParents(
+		const parents = select( blockEditorStore ).getBlockParents(
 			blocks[ 0 ]?.clientId
 		);
 		// Return closest parent block's clientId.
@@ -50,14 +51,14 @@ export default function EntityRecordItem( {
 	const isSelected = useSelect(
 		( select ) => {
 			const selectedBlockId = select(
-				'core/block-editor'
+				blockEditorStore
 			).getSelectedBlockClientId();
 			return selectedBlockId === parentBlockId;
 		},
 		[ parentBlockId ]
 	);
 	const isSelectedText = isSelected ? __( 'Selected' ) : __( 'Select' );
-	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const selectParentBlock = useCallback( () => selectBlock( parentBlockId ), [
 		parentBlockId,
 	] );

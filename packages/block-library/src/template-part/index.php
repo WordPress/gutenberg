@@ -19,12 +19,7 @@ function render_block_core_template_part( $attributes ) {
 	$content          = null;
 	$area             = WP_TEMPLATE_PART_AREA_UNCATEGORIZED;
 
-	if ( ! empty( $attributes['postId'] ) && get_post_status( $attributes['postId'] ) ) {
-		$template_part_id = $attributes['postId'];
-		// If we have a post ID and the post exists, which means this template part
-		// is user-customized, render the corresponding post content.
-		$content = get_post( $attributes['postId'] )->post_content;
-	} elseif (
+	if (
 		isset( $attributes['slug'] ) &&
 		isset( $attributes['theme'] ) &&
 		wp_get_theme()->get_stylesheet() === $attributes['theme']
@@ -66,6 +61,10 @@ function render_block_core_template_part( $attributes ) {
 	}
 
 	if ( is_null( $content ) && is_user_logged_in() ) {
+		if ( ! isset( $attributes['slug'] ) ) {
+			// If there is no slug this is a placeholder and we dont want to return any message.
+			return;
+		}
 		return sprintf(
 			/* translators: %s: Template part slug. */
 			__( 'Template part has been deleted or is unavailable: %s' ),
@@ -110,12 +109,14 @@ function render_block_core_template_part( $attributes ) {
 	$content = do_shortcode( $content );
 
 	if ( empty( $attributes['tagName'] ) ) {
-		$area_tags = array(
-			WP_TEMPLATE_PART_AREA_HEADER        => 'header',
-			WP_TEMPLATE_PART_AREA_FOOTER        => 'footer',
-			WP_TEMPLATE_PART_AREA_UNCATEGORIZED => 'div',
-		);
-		$html_tag  = null !== $area && isset( $area_tags[ $area ] ) ? $area_tags[ $area ] : $area_tags[ WP_TEMPLATE_PART_AREA_UNCATEGORIZED ];
+		$defined_areas = gutenberg_get_allowed_template_part_areas();
+		$area_tag      = 'div';
+		foreach ( $defined_areas as $defined_area ) {
+			if ( $defined_area['area'] === $area && isset( $defined_area['area_tag'] ) ) {
+				$area_tag = $defined_area['area_tag'];
+			}
+		}
+		$html_tag = $area_tag;
 	} else {
 		$html_tag = esc_attr( $attributes['tagName'] );
 	}

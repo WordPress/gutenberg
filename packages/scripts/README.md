@@ -150,7 +150,7 @@ This is how you execute the script with presented setup:
 
 When you run commands similar to the `npm run format:src` example above, you can provide a file, a directory, or `glob` syntax or any combination of them.
 
-By default, files located in `build`, `node_modules`, and `vendor` folders are ignored.
+By default, files located in `build`, `node_modules`, and `vendor` folders are ignored. You can customize the list of ignored files and directories by adding them to a `.prettierignore` file in your project.
 
 ### `lint-js`
 
