@@ -230,7 +230,7 @@
 
 		// Submenu indentation.
 		left: -1em;
-		top: calc(100% + 1em);
+		top: 100%;
 
 		@include break-medium {
 			.submenu-container,
