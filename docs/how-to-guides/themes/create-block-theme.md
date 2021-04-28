@@ -184,7 +184,7 @@ You would not be able to place an opening tag for a group block in a header temp
 
 Open `index.html` and include the template parts by adding two HTML comments.
 The HTML comments starts with `wp:template-part` which is the name of the template-part block.
-Each template part is identify by its slug, the name of the file without the file ending.
+Each template part is identified by its slug, the name of the file without the file ending.
 
 Inside the HTML comment, add two curly brackets and the key, "slug", together with the name of the template part:
 
@@ -411,4 +411,3 @@ There are three default areas to choose from: header, footer and general.
 ## Creating custom templates
 
 Assigning custom templates in theme-json.
-
