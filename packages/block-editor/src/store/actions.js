@@ -1391,3 +1391,17 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+export function __experimentalSetFocusedBlock( clientId ) {
+	return {
+		type: 'SET_FOCUSED_BLOCK',
+		clientId,
+	};
+}
+
+export function __experimentalRemoveFocusedBlock( clientId ) {
+	return {
+		type: 'REMOVE_FOCUSED_BLOCK',
+		clientId,
+	};
+}

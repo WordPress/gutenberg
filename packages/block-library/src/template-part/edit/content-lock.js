@@ -11,14 +11,17 @@ import classnames from 'classnames';
 const baseClassName = 'wp-block-template-part__content-lock';
 
 export default function ContentLock( { clientId, children } ) {
-	const { isSelected, hasChildSelected } = useSelect(
+	const { isSelected, hasChildSelected, isBlockFocused } = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } = select(
-				blockEditorStore
-			);
+			const {
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				getFocusedBlock,
+			} = select( blockEditorStore );
 			return {
 				isSelected: isBlockSelected( clientId ),
 				hasChildSelected: hasSelectedInnerBlock( clientId, true ),
+				isBlockFocused: getFocusedBlock() === clientId,
 			};
 		},
 		[ clientId ]
@@ -26,8 +29,9 @@ export default function ContentLock( { clientId, children } ) {
 	const selectBlock = useDispatch( blockEditorStore ).selectBlock;
 
 	const classes = classnames( baseClassName, {
-		'overlay-selected': isSelected,
+		'parent-selected': isSelected,
 		'child-selected': hasChildSelected,
+		'parent-focused': isBlockFocused,
 	} );
 
 	const onClick = ! ( isSelected || hasChildSelected )

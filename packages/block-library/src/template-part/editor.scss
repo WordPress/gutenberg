@@ -92,14 +92,16 @@
 		border: none;
 	}
 
-	&.overlay-selected {
+	&.parent-selected {
 		.wp-block-template-part__content-lock-overlay {
-			background: rgb(#007cba, 0.1); // todo: use var
 			pointer-events: none;
 		}
 		.wp-block-template-part__content-lock .wp-block-template-part__content-lock-overlay {
 			pointer-events: auto;
 			background: inherit;
+		}
+		&.parent-focused .wp-block-template-part__content-lock-overlay {
+			background: rgb(#007cba, 0.1); // todo: use var
 		}
 	}
 
@@ -112,7 +114,7 @@
 		}
 	}
 
-	&:hover:not(.overlay-selected):not(.child-selected) {
+	&:hover:not(.parent-selected):not(.child-selected) {
 		.wp-block-template-part__content-lock-overlay {
 			background: rgba($gray-900, 0.05);
 		}
@@ -121,7 +123,7 @@
 		}
 	}
 
-	&:not(.overlay-selected):not(.child-selected) .wp-block-template-part__content-lock-content-wrapper {
+	&:not(.parent-selected):not(.child-selected) .wp-block-template-part__content-lock-content-wrapper {
 		* {
 			pointer-events: none;
 		}

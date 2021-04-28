@@ -30,6 +30,7 @@ import { useEventHandlers } from './use-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useBlockNodes } from './use-block-nodes';
 import { useScrollIntoView } from './use-scroll-into-view';
+import { useBlockFocusState } from './use-block-focus-state';
 import { store as blockEditorStore } from '../../../store';
 
 /**
@@ -115,6 +116,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 			enableAnimation,
 			triggerAnimationOnChange: index,
 		} ),
+		useBlockFocusState( clientId ),
 	] );
 
 	return {
