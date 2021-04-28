@@ -70,11 +70,19 @@
 		}
 	}
 
+	// Some themes have added custom padding to the link, which does not consider the Page List block.
+	// Unfortunately we now need to add extra specificity and undo that, so that the block still works.
+	.wp-block-pages-list__item .wp-block-pages-list__item__link,
+	.wp-block-navigation-link .wp-block-navigation-link__content.wp-block-navigation-link__content.wp-block-navigation-link__content {
+		padding: 0;
+	}
+
 	// Styles for submenu flyout.
 	.has-child {
+		// This adds a little space between the link and the dropdown icon.
 		> .wp-block-pages-list__item__link,
 		> .wp-block-navigation-link__content {
-			padding-right: 0.5em;
+			margin-right: 0.5em;
 		}
 
 		.submenu-container,
@@ -191,7 +199,7 @@
 
 // Margins, paddings, and submenu positions.
 // These need extra specificity to override potentially inherited properties.
-.wp-block.wp-block-navigation {
+.wp-block-navigation.wp-block-navigation {
 
 	// Menu items with no background.
 	.wp-block-page-list,
@@ -214,45 +222,46 @@
 			margin: 0 0.5em 0 0;
 		}
 
-		.wp-block-page-list > .wp-block-pages-list__item,
-		.wp-block-navigation__container > .wp-block-navigation-link {
+		.wp-block-page-list .wp-block-pages-list__item__link,
+		.wp-block-navigation__container .wp-block-navigation-link__content {
 			padding: 0.5em 1em;
 		}
 	}
 
-	// Margins in submenus.
+	// Spacing in all submenus.
 	.has-child .submenu-container,
 	.has-child .wp-block-navigation-link__container {
 		.wp-block-pages-list__item,
 		.wp-block-navigation-link {
-			margin: 0 0 1em 0;
+			margin: 0;
 		}
 
-		// Submenu indentation.
-		left: -1em;
-		top: calc(100% + 1em);
+		.wp-block-pages-list__item__link,
+		.wp-block-navigation-link__content {
+			padding: 0.5em 1em;
+		}
 
+		// Submenu indentation when there's no background.
+		left: -1em;
+		top: 100%;
+
+		// Indentation for all submenus.
 		@include break-medium {
 			.submenu-container,
 			.wp-block-navigation-link__container {
-				left: calc(100% + 1em);
-				top: calc(-1px - 1em);
+				left: 100%;
+				top: -1px; // Border width.
 			}
 		}
 	}
 
+	// Submenu indentation when there's a background.
 	&.has-background .has-child .submenu-container,
 	&.has-background .has-child .wp-block-navigation-link__container {
-		.wp-block-pages-list__item,
-		.wp-block-navigation-link {
-			margin: 0;
-			padding: 0.5em 1em;
-		}
-
-		// Submenu indentation.
 		left: 0;
 		top: 100%;
 
+		// There's no border on submenus when there are backgrounds.
 		@include break-medium {
 			.submenu-container,
 			.wp-block-navigation-link__container {
@@ -274,8 +283,5 @@
 		background-color: #fff;
 		color: #000;
 		border: 1px solid rgba(0, 0, 0, 0.15);
-
-		// Add some padding to menus even if the parent menu item doesn't have.
-		padding: 1em;
 	}
 }

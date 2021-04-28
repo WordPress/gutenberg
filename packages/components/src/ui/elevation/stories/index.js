@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { number } from '@storybook/addon-knobs';
-import { Divider } from '@wp-g2/components';
 
 /**
  * Internal dependencies
@@ -11,6 +10,7 @@ import { Elevation } from '../index';
 import { Grid } from '../../grid';
 import { View } from '../../view';
 import { HStack } from '../../h-stack';
+import { Divider } from '../../divider';
 import {
 	ExampleGrid,
 	ExampleGridItem,
@@ -30,7 +30,7 @@ export default {
 const ElevationWrapper = ( { children } ) => (
 	<HStack alignment="center">
 		<View
-			css={ {
+			style={ {
 				position: 'relative',
 				width: 40,
 				height: 40,
@@ -59,10 +59,10 @@ export const _default = () => {
 			{ elevations.map( ( elevation, index ) => {
 				return (
 					<ExampleGridItem key={ index }>
-						<View css={ { padding: 20, paddingBottom: 40 } }>
+						<View style={ { padding: 20, paddingBottom: 40 } }>
 							<ElevationWrapper>
 								<Elevation
-									css={ { background: 'white' } }
+									style={ { background: 'white' } }
 									value={ index }
 								/>
 							</ElevationWrapper>
@@ -92,7 +92,7 @@ export const Focus = () => {
 				as="a"
 				href="#"
 				onClick={ ( e ) => e.preventDefault() }
-				css={ {
+				style={ {
 					display: 'block',
 					width: 100,
 					height: 100,
@@ -107,7 +107,7 @@ export const Focus = () => {
 
 	return (
 		<View
-			css={ {
+			style={ {
 				padding: '10vh',
 			} }
 		>

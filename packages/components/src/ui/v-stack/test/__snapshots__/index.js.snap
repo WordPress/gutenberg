@@ -28,11 +28,9 @@ exports[`props should render alignment 1`] = `
 }
 
 <div
-  class="components-flex components-h-stack components-v-stack wp-components-v-stack ic-osizff emotion-4 emotion-0 emotion-1"
-  data-g2-c16t="true"
-  data-g2-component="VStack"
+  class="components-flex components-h-stack components-v-stack emotion-4 emotion-0 emotion-1"
   data-wp-c16t="true"
-  data-wp-component="HStack"
+  data-wp-component="VStack"
 >
   <div
     class="emotion-0 emotion-1"
@@ -71,11 +69,9 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-flex components-h-stack components-v-stack wp-components-v-stack ic-osizff emotion-4 emotion-0 emotion-1"
-  data-g2-c16t="true"
-  data-g2-component="VStack"
+  class="components-flex components-h-stack components-v-stack emotion-4 emotion-0 emotion-1"
   data-wp-c16t="true"
-  data-wp-component="HStack"
+  data-wp-component="VStack"
 >
   <div
     class="emotion-0 emotion-1"
@@ -114,11 +110,9 @@ exports[`props should render spacing 1`] = `
 }
 
 <div
-  class="components-flex components-h-stack components-v-stack wp-components-v-stack ic-osizff emotion-4 emotion-0 emotion-1"
-  data-g2-c16t="true"
-  data-g2-component="VStack"
+  class="components-flex components-h-stack components-v-stack emotion-4 emotion-0 emotion-1"
   data-wp-c16t="true"
-  data-wp-component="HStack"
+  data-wp-component="VStack"
 >
   <div
     class="emotion-0 emotion-1"
