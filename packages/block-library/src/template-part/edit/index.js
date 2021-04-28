@@ -22,10 +22,10 @@ import { store as editorStore } from '@wordpress/editor';
 /**
  * Internal dependencies
  */
-import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
 import { TemplatePartAdvancedControls } from './advanced-controls';
+import TemplatePartInnerBlocks from './inner-blocks';
 
 export default function TemplatePartEdit( {
 	attributes,
@@ -130,8 +130,8 @@ export default function TemplatePartEdit( {
 				<TagName { ...blockProps }>
 					<TemplatePartPlaceholder
 						area={ attributes.area }
+						clientId={ clientId }
 						setAttributes={ setAttributes }
-						innerBlocks={ innerBlocks }
 					/>
 				</TagName>
 			) }
