@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import { identity } from 'lodash';
 // eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 import type { As } from 'reakit-utils/types';
@@ -41,9 +40,9 @@ export const createComponent = <
 	P extends ViewOwnProps< {}, A >
 >( {
 	as,
-	name = 'Component',
-	useHook = identity,
-	memo = true,
+	name,
+	useHook,
+	memo = false,
 }: Options< A, P > ): PolymorphicComponent<
 	ElementTypeFromViewOwnProps< P >,
 	PropsFromViewOwnProps< P >

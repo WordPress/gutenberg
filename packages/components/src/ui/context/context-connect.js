@@ -28,12 +28,12 @@ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
  * @param {(props: P, ref: import('react').Ref<any>) => JSX.Element | null} Component The component to register into the Context system.
  * @param {string} namespace The namespace to register the component under.
  * @param {Object} options
- * @param {boolean} [options.memo=true]
+ * @param {boolean} [options.memo=false]
  * @return {import('./polymorphic-component').PolymorphicComponent<import('./polymorphic-component').ElementTypeFromViewOwnProps<P>, import('./polymorphic-component').PropsFromViewOwnProps<P>>} The connected PolymorphicComponent
  */
 export function contextConnect( Component, namespace, options = {} ) {
 	/* eslint-enable jsdoc/valid-types */
-	const { memo: memoProp = true } = options;
+	const { memo: memoProp = false } = options;
 
 	let WrappedComponent = forwardRef( Component );
 	if ( memoProp ) {

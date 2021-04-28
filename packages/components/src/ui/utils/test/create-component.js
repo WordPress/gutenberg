@@ -23,6 +23,7 @@ describe( 'createComponent', () => {
 		as: 'output',
 		name,
 		useHook,
+		memo: true,
 	} );
 	const Output = createComponent( {
 		as: 'output',
@@ -40,7 +41,7 @@ describe( 'createComponent', () => {
 		expect( container.firstChild.innerHTML ).toBe( 'Example output' );
 	} );
 
-	it( 'should create a memoized, ref-forwarded component by default', () => {
+	it( 'should create a memoized, ref-forwarded component', () => {
 		expect( MemoizedOutput.$$typeof ).toEqual( Symbol.for( 'react.memo' ) );
 		const ref = createRef();
 		const wrapper = render(
