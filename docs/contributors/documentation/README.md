@@ -108,19 +108,19 @@ The recommended way to implement in markdown is to use the raw HTML and `callout
 
 The following classes are available: `info`, `tip`, `alert`, `warning`
 
-<div class="callout-tip">
+<div class="callout callout-tip">
 This is a **tip** callout.
 </div>
 
-<div class="callout-info">
+<div class="callout callout-info">
 This is an **info** callout.
 </div>
 
-<div class="callout-alert">
+<div class="callout callout-alert">
 This is an **alert** callout.
 </div>
 
-<div class="callout-warning">
+<div class="callout callout-warning">
 This is a **warning** callout.
 </div>
 
