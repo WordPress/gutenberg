@@ -124,16 +124,12 @@ function UnitControl( {
 	}, [ pickerRef, units, onUnitChange, getAnchor ] );
 
 	let step = props.step;
-	// If no step prop has been passed
+
+	// if no step prop has been passed, lookup the active unit
+	// and try to get step from `units`, or default to a value of `1`
 	if ( ! step ) {
-		// Get current unit type
-		let activeUnit = units.find( ( option ) => option.value === unit );
-		// if unit wasn't found, choose the first option
-		if ( ! activeUnit && units.length > 0 ) {
-			activeUnit = units[ 0 ];
-		}
-		// Extract the step if it exists, or default to `1`
-		step = activeUnit?.step ? activeUnit.step : 1;
+		const activeUnit = units.find( ( option ) => option.value === unit );
+		step = activeUnit?.step ?? 1;
 	}
 
 	return (

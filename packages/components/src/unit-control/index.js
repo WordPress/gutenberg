@@ -22,7 +22,6 @@ import { Root, ValueInput } from './styles/unit-control-styles';
 import UnitSelectControl from './unit-select-control';
 import { CSS_UNITS, getParsedValue, getValidParsedUnit } from './utils';
 import { useControlledState } from '../utils/hooks';
-// import { active } from '@wp-g2/styles/types';
 
 function UnitControl(
 	{
@@ -160,15 +159,11 @@ function UnitControl(
 	) : null;
 
 	let step = props.step;
-	// if no step prop has been passed
+
+	// if no step prop has been passed, lookup the active unit
+	// and try to get step from `units`, or default to a value of `1`
 	if ( ! step ) {
-		// Get current unit type
-		let activeUnit = units.find( ( option ) => option.value === unit );
-		// if unit wasn't found, choose the first option
-		if ( ! activeUnit && units.length > 0 ) {
-			activeUnit = units[ 0 ];
-		}
-		// Extract the step if it exists, or default to `1`
+		const activeUnit = units.find( ( option ) => option.value === unit );
 		step = activeUnit?.step ?? 1;
 	}
 
