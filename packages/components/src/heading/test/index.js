@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { Heading } from '../index';
+import Heading from '../index';
 
 describe( 'props', () => {
 	let base;
