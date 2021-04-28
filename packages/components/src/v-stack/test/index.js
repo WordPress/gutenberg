@@ -7,7 +7,7 @@ import { render } from '@testing-library/react';
  * Internal dependencies
  */
 import { View } from '../../view';
-import { VStack } from '../index';
+import VStack from '../index';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {
