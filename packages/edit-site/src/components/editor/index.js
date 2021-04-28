@@ -13,16 +13,17 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import {
+	EditorNotices,
 	EntitiesSavedStates,
 	UnsavedChangesWarning,
 	store as editorStore,
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
+
 /**
  * Internal dependencies
  */
-import Notices from '../notices';
 import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
 import BlockEditor from '../block-editor';
@@ -209,7 +210,7 @@ function Editor( { initialSettings } ) {
 										}
 										content={
 											<>
-												<Notices />
+												<EditorNotices />
 												{ template && (
 													<BlockEditor
 														setIsInserterOpen={
