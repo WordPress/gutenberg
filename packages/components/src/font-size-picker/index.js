@@ -18,7 +18,6 @@ import Button from '../button';
 import RangeControl from '../range-control';
 import CustomSelectControl from '../custom-select-control';
 import VisuallyHidden from '../visually-hidden';
-import { withNextComponent } from './next';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
@@ -177,4 +176,4 @@ function FontSizePicker(
 	);
 }
 
-export default withNextComponent( forwardRef( FontSizePicker ) );
+export default forwardRef( FontSizePicker );
