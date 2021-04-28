@@ -125,8 +125,10 @@ function UnitControl( {
 
 	let step = props.step;
 
-	// If no step prop has been passed, lookup the active unit and
-	// try to get step from `units`, or default to a value of `1`
+	/*
+	 * If no step prop has been passed, lookup the active unit and
+	 * try to get step from `units`, or default to a value of `1`
+	 */
 	if ( ! step ) {
 		const activeUnit = units.find( ( option ) => option.value === unit );
 		step = activeUnit?.step ?? 1;
