@@ -222,18 +222,13 @@ function Editor( { initialSettings } ) {
 										}
 										actions={
 											<>
-												<EntitiesSavedStates
-													isOpen={
-														isEntitiesSavedStatesOpen
-													}
-													close={
-														closeEntitiesSavedStates
-													}
-													isEntitiesSavedStatesOpen={
-														isEntitiesSavedStatesOpen
-													}
-												/>
-												{ ! isEntitiesSavedStatesOpen && (
+												{ isEntitiesSavedStatesOpen ? (
+													<EntitiesSavedStates
+														close={
+															closeEntitiesSavedStates
+														}
+													/>
+												) : (
 													<div className="edit-site-editor__toggle-save-panel">
 														<Button
 															isSecondary
