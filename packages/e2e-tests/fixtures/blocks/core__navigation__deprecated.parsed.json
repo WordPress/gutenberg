@@ -25,13 +25,10 @@
 			}
 		],
 		"innerHTML": "\n\n",
-		"innerContent": [ "\n", null, "\n" ]
-	},
-	{
-		"blockName": null,
-		"attrs": {},
-		"innerBlocks": [],
-		"innerHTML": "\n",
-		"innerContent": [ "\n" ]
+		"innerContent": [
+			"\n",
+			null,
+			"\n"
+		]
 	}
 ]

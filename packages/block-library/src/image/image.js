@@ -553,7 +553,9 @@ export default function Image( {
 			isEditing={ isEditingImage }
 			onFinishEditing={ () => setIsEditingImage( false ) }
 		>
-			{ controls }
+			{ /* Hide controls during upload to avoid component remount,
+				which causes duplicated image upload. */ }
+			{ ! temporaryURL && controls }
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText

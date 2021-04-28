@@ -1,46 +1,20 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  box-sizing: border-box;
-  -moz-osx-font-smoothing: grayscale;
-  -webkit-font-smoothing: antialiased;
-  font-family: Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",sans-serif;
-  font-family: var(--wp-g2-font-family);
-  font-size: 13px;
-  font-size: var(--wp-g2-font-size);
-  font-weight: normal;
-  font-weight: var(--wp-g2-font-weight);
-  margin: 0;
-  color: #1e1e1e;
-  color: var(--wp-g2-color-text);
+.emotion-0 {
+  color: #000;
   line-height: 1.2;
-  line-height: var(--wp-g2-font-line-height-base);
+  margin: 0;
   color: #050505;
-  color: var(--wp-g2-color-text-heading);
   font-size: calc(1.95 * 13px);
-  font-size: var(--wp-g2-font-size-h-2);
   font-weight: 600;
-  font-weight: var(--wp-g2-font-weight-heading);
   display: block;
 }
 
-@media (prefers-reduced-motion) {
-  .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-    -webkit-transition: none !important;
-    transition: none !important;
-  }
-}
-
-[data-system-ui-reduced-motion-mode="true"] .emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  -webkit-transition: none !important;
-  transition: none !important;
-}
-
 <h2
-  class="components-truncate wp-components-truncate components-text wp-components-text components-heading wp-components-heading ic-1ng8wck ic-7u3orf ic-1m45iq3 ic-192yz5d emotion-0"
-  data-g2-c16t="true"
-  data-g2-component="Heading"
+  class="components-truncate components-text components-heading emotion-0 emotion-1 emotion-2"
+  data-wp-c16t="true"
+  data-wp-component="Heading"
 >
   Code is Poetry
 </h2>
@@ -51,16 +25,14 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -4,11 +4,11 @@
-      "-webkit-font-smoothing": "antialiased",
-      "box-sizing": "border-box",
-      "color": "var(--wp-g2-color-text-heading)",
+  Array [
+    Object {
+      "color": "#050505",
       "display": "block",
-      "font-family": "var(--wp-g2-font-family)",
--     "font-size": "var(--wp-g2-font-size-h-4)",
-+     "font-size": "var(--wp-g2-font-size-h-2)",
-      "font-weight": "var(--wp-g2-font-weight-heading)",
-      "line-height": "var(--wp-g2-font-line-height-base)",
+-     "font-size": "calc(1.25 * 13px)",
++     "font-size": "calc(1.95 * 13px)",
+      "font-weight": "600",
+      "line-height": "1.2",
       "margin": "0",
     },
   ]
@@ -71,16 +43,14 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -4,11 +4,11 @@
-      "-webkit-font-smoothing": "antialiased",
-      "box-sizing": "border-box",
-      "color": "var(--wp-g2-color-text-heading)",
+  Array [
+    Object {
+      "color": "#050505",
       "display": "block",
-      "font-family": "var(--wp-g2-font-family)",
--     "font-size": "var(--wp-g2-font-size-h-4)",
-+     "font-size": "var(--wp-g2-font-size-h-2)",
-      "font-weight": "var(--wp-g2-font-weight-heading)",
-      "line-height": "var(--wp-g2-font-line-height-base)",
+-     "font-size": "calc(1.25 * 13px)",
++     "font-size": "calc(1.95 * 13px)",
+      "font-weight": "600",
+      "line-height": "1.2",
       "margin": "0",
     },
   ]

@@ -63,7 +63,6 @@ const MyCheckboxControl = () => {
 	const [ isChecked, setChecked ] = useState( true );
 	return (
 		<CheckboxControl
-			heading="User"
 			label="Is author"
 			help="Is the user a author or not?"
 			checked={ isChecked }
@@ -77,13 +76,6 @@ const MyCheckboxControl = () => {
 
 The set of props accepted by the component will be specified below.
 Props not included in this set will be applied to the input element.
-
-#### heading
-
-A heading for the input field, that appears above the checkbox. If the prop is not passed no heading will be rendered.
-
--   Type: `String`
--   Required: No
 
 #### label
 

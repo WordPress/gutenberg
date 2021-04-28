@@ -102,7 +102,7 @@ _Parameters_
 
 _Returns_
 
--   `?Node`: Offset parent.
+-   `Node | null`: Offset parent.
 
 <a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
 
@@ -178,7 +178,7 @@ Returns true if there is no possibility of selection.
 
 _Parameters_
 
--   _element_ `Element`: The element to check.
+-   _element_ `HTMLElement`: The element to check.
 
 _Returns_
 
@@ -225,6 +225,18 @@ _Parameters_
 _Returns_
 
 -   `boolean`: True if phrasing content, false if not.
+
+<a name="isRTL" href="#isRTL">#</a> **isRTL**
+
+Whether the element's text direction is right-to-left.
+
+_Parameters_
+
+-   _element_ `Element`: The element to check.
+
+_Returns_
+
+-   `boolean`: True if rtl, false if ltr.
 
 <a name="isTextContent" href="#isTextContent">#</a> **isTextContent**
 
