@@ -3,7 +3,7 @@
  */
 import { VStack } from '../v-stack';
 import { View } from '../view';
-import { Heading } from '../heading';
+import Heading from '../../heading';
 import { Divider } from '../divider';
 
 function Page( { title = 'Component', children } ) {
