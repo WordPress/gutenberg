@@ -22,7 +22,7 @@ This tutorial is up to date as of Gutenberg version 10.6.
 
 ## What is needed to create a block theme?
 
-To be use a block theme you first need to activate the Gutenberg plugin.
+To use a block theme you first need to activate the Gutenberg plugin.
 
 ### Required files and file structure
 
@@ -411,5 +411,4 @@ There are three default areas to choose from: header, footer and general.
 ## Creating custom templates
 
 Assigning custom templates in theme-json.
-
 
