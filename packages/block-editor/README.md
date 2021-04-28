@@ -464,9 +464,7 @@ Undocumented declaration.
 
 <a name="ObserveTyping" href="#ObserveTyping">#</a> **ObserveTyping**
 
-_Related_
-
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/observe-typing/README.md>
+> **Deprecated** 
 
 <a name="PanelColorSettings" href="#PanelColorSettings">#</a> **PanelColorSettings**
 
