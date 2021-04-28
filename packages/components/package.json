@@ -30,7 +30,6 @@
 		"@emotion/cache": "^10.0.27",
 		"@emotion/core": "^10.1.1",
 		"@emotion/css": "^10.0.22",
-		"@emotion/hash": "^0.8.0",
 		"@emotion/native": "^10.0.22",
 		"@emotion/styled": "^10.0.23",
 		"@wordpress/a11y": "file:../a11y",
@@ -47,10 +46,6 @@
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/warning": "file:../warning",
-		"@wp-g2/components": "^0.0.160",
-		"@wp-g2/context": "^0.0.160",
-		"@wp-g2/styles": "^0.0.160",
-		"@wp-g2/utils": "^0.0.160",
 		"classnames": "^2.2.5",
 		"dom-scroll-into-view": "^1.2.1",
 		"downshift": "^6.0.15",
@@ -71,7 +66,6 @@
 		"uuid": "^8.3.0"
 	},
 	"peerDependencies": {
-		"@wp-g2/create-styles": "^0.0.154",
 		"reakit-utils": "^0.15.1"
 	},
 	"publishConfig": {
