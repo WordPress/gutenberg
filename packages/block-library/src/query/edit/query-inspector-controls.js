@@ -56,6 +56,28 @@ const CreateNewPostLink = ( { type } ) => {
 	);
 };
 
+// Helper function to get the term id based on user input in terms `FormTokenField`.
+const getTermIdByTermValue = ( termsMapedByName, termValue ) => {
+	// First we check for exact match by `term.id` or case sensitive `term.name` match.
+	const termId = termValue?.id || termsMapedByName[ termValue ]?.id;
+	if ( termId ) return termId;
+	/**
+	 * Here we make an extra check for entered terms in a non case sensitive way,
+	 * to match user expectations, due to `FormTokenField` behaviour that shows
+	 * suggestions which are case insensitive.
+	 *
+	 * Although WP tries to discourage users to add terms with the same name (case insensitive),
+	 * it's still possible if you manually change the name, as long as the terms have different slugs.
+	 * In this edge case we always apply the first match from the terms list.
+	 */
+	const termValueLower = termValue.toLocaleLowerCase();
+	for ( const term in termsMapedByName ) {
+		if ( term.toLocaleLowerCase() === termValueLower ) {
+			return termsMapedByName[ term ].id;
+		}
+	}
+};
+
 export default function QueryInspectorControls( {
 	attributes: { query, layout },
 	setQuery,
@@ -114,11 +136,16 @@ export default function QueryInspectorControls( {
 	};
 	// Handles categories and tags changes.
 	const onTermsChange = ( terms, queryProperty ) => ( newTermValues ) => {
-		const termIds = newTermValues.reduce( ( accumulator, termValue ) => {
-			const termId = termValue?.id || terms.mapByName[ termValue ]?.id;
-			if ( termId ) accumulator.push( termId );
-			return accumulator;
-		}, [] );
+		const termIds = Array.from(
+			newTermValues.reduce( ( accumulator, termValue ) => {
+				const termId = getTermIdByTermValue(
+					terms.mapByName,
+					termValue
+				);
+				if ( termId ) accumulator.add( termId );
+				return accumulator;
+			}, new Set() )
+		);
 		setQuery( { [ queryProperty ]: termIds } );
 	};
 	const onCategoriesChange = onTermsChange( categories, 'categoryIds' );
