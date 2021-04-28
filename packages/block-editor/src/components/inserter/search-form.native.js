@@ -52,26 +52,35 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 	);
 
 	const activeStyles = useMemo( () => {
+		// find any selectors with 'active' modifiers
 		const activeSelectors = Object.keys( {
-			...baseStyles,
+			...styles,
 			...platformStyles,
-		} ).filter( ( key ) => !! key.match( /--active/ ) );
+		} ).filter( ( key ) => !! key?.match( /--(.*)active/ ) );
 
-		const _activeStyles = { ...styles };
+		const _activeStyles = {};
 
 		activeSelectors.forEach( ( activeSelector ) => {
-			const selector = activeSelector.replace( /--active/, '' );
-
-			_activeStyles[ selector ] = {
-				...baseStyles[ selector ],
-				...baseStyles[ activeSelector ],
-			};
+			const selector = activeSelector.split( '--' )[ 0 ];
+			_activeStyles[ selector ] = styles[ activeSelector ];
 		} );
+
 		return _activeStyles;
 	}, [] );
 
 	const newStyles = useMemo( () => {
-		return isActive ? activeStyles : baseStyles;
+		if ( ! isActive ) {
+			return baseStyles;
+		}
+
+		const _newStyles = { ...baseStyles };
+		for ( const selector in activeStyles ) {
+			_newStyles[ selector ] = {
+				...baseStyles[ selector ],
+				...activeStyles[ selector ],
+			};
+		}
+		return _newStyles;
 	}, [ isActive ] );
 
 	const {
@@ -125,7 +134,7 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 					label={ __( 'Clear search' ) }
 					icon={ isIOS ? cancelCircleFilled : close }
 					onPress={ clearInput }
-					style={ {...iconStyle, ...rightIconStyle} }
+					style={ { ...iconStyle, ...rightIconStyle } }
 				/>
 			);
 		}
@@ -141,40 +150,58 @@ function InserterSearchForm( { value, onChange, onLayout = () => {} } ) {
 			onLayout={ onLayout }
 			activeOpacity={ 1 }
 		>
-			<View style={ inputContainerStyle }>
-				<View
-					style={ { ...inputButtonStyle, ...inputButtonLeftStyle } }
-				>
-					{ renderLeftButton() }
-				</View>
-				<TextInput
-					ref={ inputRef }
-					style={ formInputStyle }
-					placeholderTextColor={ placeholderStyle.color }
-					onChangeText={ onChange }
-					onFocus={ () => setIsActive( true ) }
-					value={ value }
-					placeholder={ __( 'Search blocks' ) }
-				/>
-				<View
-					style={ { ...inputButtonStyle, ...inputButtonRightStyle } }
-				>
-					{ renderRightButton() }
-				</View>
-			</View>
-			{ isActive && isIOS && (
-				<View style={ cancelButtonStyle }>
-					<Text
-						onPress={ onCancel }
-						style={ cancelButtonTextStyle }
-						accessible={ true }
-						accessibilityRole={ 'button' }
-						accessibilityLabel={ __( 'Cancel Search' ) }
+			<View
+				style={ {
+					flex: 1,
+					flexDirection: 'row',
+				} }
+			>
+				<View style={ inputContainerStyle }>
+					<View
+						style={ {
+							...inputButtonStyle,
+							...inputButtonLeftStyle,
+						} }
 					>
-						{ __( 'Cancel' ) }
-					</Text>
+						{ renderLeftButton() }
+					</View>
+					<TextInput
+						ref={ inputRef }
+						style={ formInputStyle }
+						placeholderTextColor={ placeholderStyle.color }
+						onChangeText={ onChange }
+						onFocus={ () => setIsActive( true ) }
+						value={ value }
+						placeholder={ __( 'Search blocks' ) }
+					/>
+					<View
+						style={ {
+							...inputButtonStyle,
+							...inputButtonRightStyle,
+						} }
+					>
+						{ renderRightButton() }
+					</View>
 				</View>
-			) }
+				{ isActive && isIOS && (
+					<View
+						style={ [
+							cancelButtonStyle,
+							{ alignSelf: 'flex-start' },
+						] }
+					>
+						<Text
+							onPress={ onCancel }
+							style={ cancelButtonTextStyle }
+							accessible={ true }
+							accessibilityRole={ 'button' }
+							accessibilityLabel={ __( 'Cancel Search' ) }
+						>
+							{ __( 'Cancel' ) }
+						</Text>
+					</View>
+				) }
+			</View>
 		</TouchableOpacity>
 	);
 }

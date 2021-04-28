@@ -50,8 +50,7 @@ const usePreferredColorSchemeStyleBem = (
 	);
 
 	darkSelectors.forEach( ( darkSelector ) => {
-		const lightSelector = darkSelector
-			.replace( `--${ darkModifier }`, '' )
+		const lightSelector = darkSelector.replace( `--${ darkModifier }`, '' );
 		styles[ lightSelector ] = {
 			...styles[ lightSelector ],
 			...styles[ darkSelector ],
