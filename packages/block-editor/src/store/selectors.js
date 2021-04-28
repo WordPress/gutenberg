@@ -2095,6 +2095,10 @@ export function isNavigationMode( state ) {
 	return state.isNavigationMode;
 }
 
+export function isToolBarActive( state ) {
+	return state.toolBarActive;
+}
+
 /**
  * Returns whether block moving mode is enabled.
  *

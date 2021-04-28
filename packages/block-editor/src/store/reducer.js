@@ -1665,8 +1665,18 @@ export function automaticChangeStatus( state, action ) {
  *
  * @return {string} Updated state.
  */
-export function highlightedBlock( state, action ) {
+export function highlightedBlock( state={toolBarActive:false}, action ) {
 	switch ( action.type ) {
+		case 'TOOL_BAR_SWITCH':
+			if ('toolBarActive' in state){
+				state.toolBarActive = ! state.toolBarActive;
+			} else {
+				state.toolBarActive = false
+			}
+			
+			return state;
+
+		break;
 		case 'TOGGLE_BLOCK_HIGHLIGHT':
 			const { clientId, isHighlighted } = action;
 
@@ -1681,6 +1691,7 @@ export function highlightedBlock( state, action ) {
 			if ( action.clientId !== state ) {
 				return null;
 			}
+
 	}
 
 	return state;

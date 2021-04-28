@@ -20,7 +20,8 @@ import {
 	useMergeRefs,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
-
+import { useSelect } from '@wordpress/data';
+//import store ??
 /**
  * Internal dependencies
  */
@@ -595,7 +596,9 @@ const Popover = ( {
 					/>
 				</div>
 			) }
-			<div ref={ contentRef } className="components-popover__content">
+			<div ref={ contentRef } className="components-popover__content"
+			// margin-left : 300px on tool bar showed
+			>
 				<div style={ { position: 'relative' } }>
 					{ containerResizeListener }
 					{ children }
