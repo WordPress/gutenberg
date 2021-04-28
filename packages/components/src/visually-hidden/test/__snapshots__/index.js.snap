@@ -38,7 +38,7 @@ exports[`VisuallyHidden should render correctly 1`] = `
 }
 
 <div
-  class="components-visually-hidden wp-components-visually-hidden emotion-0 emotion-1 emotion-2"
+  class="components-visually-hidden emotion-0 emotion-1 emotion-2"
 >
   This is hidden
 </div>

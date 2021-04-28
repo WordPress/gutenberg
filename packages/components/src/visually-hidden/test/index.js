@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { VisuallyHidden, useVisuallyHidden } from '..';
+import VisuallyHidden, { useVisuallyHidden } from '..';
 
 describe( 'useVisuallyHidden', () => {
 	it( 'should apply the expected classnames', () => {
