@@ -220,34 +220,30 @@
 		}
 	}
 
-	// Margins in submenus.
+	// Spacing in all submenus.
 	.has-child .submenu-container,
 	.has-child .wp-block-navigation-link__container {
 		.wp-block-pages-list__item,
 		.wp-block-navigation-link {
-			margin: 0 0 1em 0;
+			margin: 0;
+			padding: 0.5em 1em;
 		}
 
 		// Submenu indentation.
-		left: -1em;
+		left: -1em; // Border width.
 		top: 100%;
 
 		@include break-medium {
 			.submenu-container,
 			.wp-block-navigation-link__container {
-				left: calc(100% + 1em);
-				top: calc(-1px - 1em);
+				left: 100%;
+				top: -1px; // Border width.
 			}
 		}
 	}
 
 	&.has-background .has-child .submenu-container,
 	&.has-background .has-child .wp-block-navigation-link__container {
-		.wp-block-pages-list__item,
-		.wp-block-navigation-link {
-			margin: 0;
-			padding: 0.5em 1em;
-		}
 
 		// Submenu indentation.
 		left: 0;
@@ -274,8 +270,5 @@
 		background-color: #fff;
 		color: #000;
 		border: 1px solid rgba(0, 0, 0, 0.15);
-
-		// Add some padding to menus even if the parent menu item doesn't have.
-		padding: 1em;
 	}
 }
