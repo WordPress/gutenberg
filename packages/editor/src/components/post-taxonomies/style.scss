@@ -37,18 +37,13 @@
 	width: 100%;
 }
 
-.editor-post-taxonomies__flat-term-most-used {
-	margin: $grid-unit-05 0 $grid-unit-10;
-	padding: $grid-unit-10;
-	border: $border-width solid $gray-300;
-}
-
 .editor-post-taxonomies__flat-term-most-used-list {
-	margin: 0;
-
 	li {
-		display: inline-block;
-		margin-right: 6px;
-		margin-bottom: 6px;
+		display: inline;
+		padding-right: 6px;
+	}
+
+	.components-button {
+		font-size: 12px;
 	}
 }
