@@ -8,16 +8,13 @@ import { cx } from 'emotion';
  */
 import * as styles from './styles';
 
-// duplicate this for the sake of being able to export it, it'll be removed when we replace VisuallyHidden in components/src anyway
-/** @typedef {import('../context').ViewOwnProps<{}, 'div'>} Props */
-
 /**
- * @param {import('../context').ViewOwnProps<{}, 'div'>} props
+ * @param {import('../ui/context').ViewOwnProps<{}, 'div'>} props
  */
 export function useVisuallyHidden( { className, ...props } ) {
 	// circumvent the context system and write the classnames ourselves
 	const classes = cx(
-		'components-visually-hidden wp-components-visually-hidden',
+		'components-visually-hidden',
 		className,
 		styles.VisuallyHidden
 	);
