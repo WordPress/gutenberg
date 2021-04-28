@@ -15,7 +15,7 @@ import { createComponent } from '../create-component';
 
 describe( 'createComponent', () => {
 	/**
-	 * @param {import('@wp-g2/create-styles').ViewOwnProps<{}, 'output'>} props
+	 * @param {import('../context').ViewOwnProps<{}, 'output'>} props
 	 */
 	const useHook = ( props ) => ( { ...props, 'data-hook-test-prop': true } );
 	const name = 'Output';
