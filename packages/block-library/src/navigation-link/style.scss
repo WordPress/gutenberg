@@ -191,7 +191,7 @@
 
 // Margins, paddings, and submenu positions.
 // These need extra specificity to override potentially inherited properties.
-.wp-block.wp-block-navigation {
+.wp-block-navigation.wp-block-navigation {
 
 	// Menu items with no background.
 	.wp-block-page-list,
