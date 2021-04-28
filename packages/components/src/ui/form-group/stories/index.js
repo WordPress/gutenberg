@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { FormGroup, useFormGroupContextId } from '../index';
-import { Text } from '../../text';
+import Text from '../../../text';
 
 // @todo: Refactor this after adding next TextInput component.
 const TextInput = ( { id: idProp, ...props } ) => {

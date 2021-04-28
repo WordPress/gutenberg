@@ -8,7 +8,7 @@ import { cx } from 'emotion';
  */
 import { useContextSystem } from '../context';
 import { useFormGroupContextId } from '../form-group';
-import { useText } from '../text';
+import { useText } from '../../text';
 import * as styles from './styles';
 
 /**

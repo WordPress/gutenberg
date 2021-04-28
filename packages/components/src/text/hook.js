@@ -12,17 +12,17 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { hasConnectNamespace, useContextSystem } from '../context';
-import { useTruncate } from '../../truncate';
-import { getOptimalTextShade } from '../utils';
+import { hasConnectNamespace, useContextSystem } from '../ui/context';
+import { useTruncate } from '../truncate';
+import { getOptimalTextShade } from '../ui/utils';
 import * as styles from './styles';
 import { createHighlighterText } from './utils';
-import { getFontSize } from '../utils/font-size';
-import { CONFIG, COLORS } from '../../utils';
+import { getFontSize } from '../ui/utils/font-size';
+import { CONFIG, COLORS } from '../utils';
 import { getLineHeight } from './get-line-height';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'span'>} props
+ * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'span'>} props
  */
 export default function useText( props ) {
 	const {

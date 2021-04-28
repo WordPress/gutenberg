@@ -7,7 +7,6 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import Text from '../../../text';
-import { text } from '../../../text/styles/text-mixins';
 import { color } from '../../../utils/style-mixins';
 
 export const Root = styled.div`
@@ -45,7 +44,6 @@ export const Tooltip = styled.div`
 
 export const LabelText = styled( Text )`
 	&&& {
-		${ text };
 		display: block;
 		font-size: 13px;
 		line-height: 1.4;

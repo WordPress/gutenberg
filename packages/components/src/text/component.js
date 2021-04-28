@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../utils';
+import { createComponent } from '../ui/utils';
 import useText from './hook';
 
 /**
@@ -13,7 +13,7 @@ import useText from './hook';
  * @example
  *
  * ```jsx
- * import { Text } from `@wordpress/components/ui`;
+ * import { Text } from `@wordpress/components`;
  *
  * function Example() {
  * 	return <Text>Code is Poetry</Text>;

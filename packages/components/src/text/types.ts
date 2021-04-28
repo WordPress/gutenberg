@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import type { Props as TruncateProps } from '../../truncate/types';
+import type { Props as TruncateProps } from '../truncate/types';
 
 /**
  * External dependencies

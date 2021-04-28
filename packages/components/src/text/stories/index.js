@@ -1,30 +1,53 @@
 /**
  * Internal dependencies
  */
-import Text from '../index';
+import { Text } from '..';
 
 export default {
-	title: 'Components/Text',
 	component: Text,
+	title: 'Components/Text',
 };
 
-export const _default = () => (
-	<>
-		<Text variant="title.large" as="h1">
-			Title Large
+export const _default = () => {
+	return <Text>Hello</Text>;
+};
+
+export const truncate = () => {
+	return (
+		<Text numberOfLines={ 2 } truncate>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
+			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
+			Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla
+			facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
+			In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis
+			arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque
+			eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada
+			ultricies eros ut faucibus. Aliquam erat volutpat. Nulla nec feugiat
+			risus. Vivamus iaculis dui aliquet ante ultricies feugiat.
+			Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
+			posuere cubilia curae; Vivamus nec pretium velit, sit amet
+			consectetur ante. Praesent porttitor ex eget fermentum mattis.
 		</Text>
-		<Text variant="title.medium" as="h2">
-			Title Medium
+	);
+};
+
+export const highlight = () => {
+	return (
+		<Text highlightWords={ [ 'con' ] }>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
+			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
+			Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla
+			facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
+			In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis
+			arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque
+			eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada
+			ultricies eros ut faucibus. Aliquam erat volutpat. Nulla nec feugiat
+			risus. Vivamus iaculis dui aliquet ante ultricies feugiat.
+			Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
+			posuere cubilia curae; Vivamus nec pretium velit, sit amet
+			consectetur ante. Praesent porttitor ex eget fermentum mattis.
 		</Text>
-		<Text variant="title.small" as="h3">
-			Title Small
-		</Text>
-		<Text variant="subtitle">Subtitle</Text>
-		<Text variant="subtitle.small">Subtitle Small</Text>
-		<Text variant="body">Body</Text>
-		<Text variant="body.small">Body Small</Text>
-		<Text variant="button">Button</Text>
-		<Text variant="caption">Caption</Text>
-		<Text variant="label">Label</Text>
-	</>
-);
+	);
+};

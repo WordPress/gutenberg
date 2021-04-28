@@ -7,7 +7,7 @@ import { boolean, number, select } from '@storybook/addon-knobs';
  * Internal dependencies
  */
 import { Surface } from '../index';
-import { Text } from '../../text';
+import Text from '../../../text';
 
 export default {
 	component: Surface,

@@ -9,6 +9,5 @@ export * from './h-stack';
 export * from './heading';
 export * from './shortcut';
 export * from './spinner';
-export * from './text';
 export * from './v-stack';
 export * from './view';

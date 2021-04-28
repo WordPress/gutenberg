@@ -6,7 +6,7 @@ import { render, screen } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { Text } from '../../text';
+import Text from '../../../text';
 import { Tooltip } from '../index';
 
 describe( 'props', () => {
