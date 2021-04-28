@@ -17,12 +17,12 @@ This tutorial is up to date as of Gutenberg version 10.6.
 4.  [experimental-theme.json - Global styles](#experimental-theme-json-global-styles)
 5.  [Using query and loop blocks](#using-query-and-loop-blocks)
 6.  [Layouts](#layouts)
-7.  [Additional templates](#additional-templatess)
+7.  [Additional templates](#additional-templates)
 8.  [Creating custom templates](#creating-custom-templates)
 
 ## What is needed to create a block theme?
 
-To be able to use a block theme you first need to activate the Gutenberg plugin.
+To be use a block theme you first need to activate the Gutenberg plugin.
 
 ### Required files and file structure
 
@@ -92,13 +92,10 @@ Create an `index.php` file.
 This file is used as a fallback if the theme is activated without Gutenberg.
 You may leave the file empty for this tutorial.
 
-
 Opttionally, create a `functions.php` file.
-In this file, you can enqueue `style.css`, include additional files,
-enable an editor stylesheet and add theme support.
+In this file, you can enqueue `style.css`, include additional files, enable an editor stylesheet and add theme support.
 
-Support for the title tag is already enabled for all block themes,
-and most of the theme support will be added in the experimental-theme.json file.
+Support for the title tag is already enabled for all block themes, and most of the theme support will be added in the experimental-theme.json file.
 
 ```php
 <?php
@@ -382,6 +379,24 @@ Apply the dark grey color to the body background by adding ```color``` as a top 
 
 #### Template parts
 
+In the templeParts section, assign the two template parts that you created to their template areas.
+Add two keys: name, which is the file name of the template part file without the file ending,
+and area, which is the name of the area.
+
+There are three default areas to choose from: header, footer and general.
+
+```json
+	"templateParts": [
+		{
+			"name": "header",
+			"area": "header"
+		},
+		{
+			"name": "footer",
+			"area": "footer"
+		}
+	],
+```
 
 ## Using query and loop blocks
 
