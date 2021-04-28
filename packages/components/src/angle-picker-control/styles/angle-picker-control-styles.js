@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import Flex from '../../flex';
+import { Flex } from '../../flex';
 import { color } from '../../utils/style-mixins';
 
 const CIRCLE_SIZE = 30;
