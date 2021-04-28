@@ -89,16 +89,16 @@ export default function SidebarBlockEditor( {
 							</ObserveTyping>
 						</WritingFlow>
 					</BlockSelectionClearer>
-				</SidebarEditorProvider>
 
-				{ createPortal(
-					// This is a temporary hack to prevent button component inside <BlockInspector>
-					// from submitting form when type="button" is not specified.
-					<form onSubmit={ ( event ) => event.preventDefault() }>
-						<BlockInspector />
-					</form>,
-					inspector.contentContainer[ 0 ]
-				) }
+					{ createPortal(
+						// This is a temporary hack to prevent button component inside <BlockInspector>
+						// from submitting form when type="button" is not specified.
+						<form onSubmit={ ( event ) => event.preventDefault() }>
+							<BlockInspector />
+						</form>,
+						inspector.contentContainer[ 0 ]
+					) }
+				</SidebarEditorProvider>
 
 				<__experimentalBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
