@@ -21,6 +21,7 @@ import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
+import { useTypingObserver } from '../observe-typing';
 
 function Root( { className, children } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -48,6 +49,7 @@ function Root( { className, children } ) {
 			ref={ useMergeRefs( [
 				useBlockDropZone(),
 				useInBetweenInserter(),
+				useTypingObserver(),
 			] ) }
 			className={ classnames(
 				'block-editor-block-list__layout is-root-container',

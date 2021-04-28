@@ -18,7 +18,6 @@ import {
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseClipboardHandler as useClipboardHandler,
-	__unstableUseTypingObserver as useTypingObserver,
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
@@ -95,7 +94,6 @@ export default function VisualEditor( { styles } ) {
 		useClipboardHandler(),
 		useCanvasClickRedirect(),
 		useTypewriter(),
-		useTypingObserver(),
 		useBlockSelectionClearer(),
 	] );
 

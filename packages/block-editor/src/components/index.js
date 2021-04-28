@@ -118,11 +118,7 @@ export { default as __experimentalSearchForm } from './inserter/search-form';
 export { default as BlockEditorKeyboardShortcuts } from './keyboard-shortcuts';
 export { MultiSelectScrollIntoView } from './selection-scroll-into-view';
 export { default as NavigableToolbar } from './navigable-toolbar';
-export {
-	default as ObserveTyping,
-	useTypingObserver as __unstableUseTypingObserver,
-	useMouseMoveTypingReset as __unstableUseMouseMoveTypingReset,
-} from './observe-typing';
+export { default as ObserveTyping } from './observe-typing';
 export { default as PreserveScrollInReorder } from './preserve-scroll-in-reorder';
 export { default as SkipToSelectedBlock } from './skip-to-selected-block';
 export {

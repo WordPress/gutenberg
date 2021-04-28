@@ -7,7 +7,6 @@ import {
 	BlockEditorKeyboardShortcuts,
 	BlockSelectionClearer,
 	WritingFlow,
-	ObserveTyping,
 	__unstableEditorStyles as EditorStyles,
 } from '@wordpress/block-editor';
 
@@ -29,9 +28,7 @@ export default function WidgetAreasBlockEditorContent( {
 			<Popover.Slot name="block-toolbar" />
 			<BlockSelectionClearer>
 				<WritingFlow>
-					<ObserveTyping>
-						<BlockList className="edit-widgets-main-block-list" />
-					</ObserveTyping>
+					<BlockList className="edit-widgets-main-block-list" />
 				</WritingFlow>
 			</BlockSelectionClearer>
 		</div>
