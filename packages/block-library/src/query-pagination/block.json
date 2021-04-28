@@ -4,6 +4,7 @@
 	"category": "design",
 	"usesContext": [ "queryId", "query" ],
 	"supports": {
+		"align": true,
 		"reusable": false,
 		"html": false
 	},

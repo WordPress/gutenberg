@@ -37,6 +37,7 @@
 		"layout": "layout"
 	},
 	"supports": {
+		"align": [ "wide", "full" ],
 		"html": false
 	},
 	"editorStyle": "wp-block-query-editor"

@@ -131,7 +131,7 @@ export const siteEditor = {
 	},
 
 	async getEditedPostContent() {
-		return await page.evaluate( async () => {
+		return page.evaluate( async () => {
 			const postId = window.wp.data
 				.select( 'core/edit-site' )
 				.getEditedPostId();
