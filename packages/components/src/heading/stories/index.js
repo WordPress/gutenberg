@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Heading } from '../index';
+import Heading from '../index';
 
 export default {
 	component: Heading,
