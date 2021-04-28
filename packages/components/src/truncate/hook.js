@@ -11,12 +11,12 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
+import { useContextSystem } from '../ui/context';
 import * as styles from './styles';
 import { TRUNCATE_ELLIPSIS, TRUNCATE_TYPE, truncateContent } from './utils';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'span'>} props
+ * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'span'>} props
  */
 export default function useTruncate( props ) {
 	const {

@@ -13,7 +13,7 @@ import { useMemo, Children, cloneElement } from '@wordpress/element';
  * Internal dependencies
  */
 import { hasConnectNamespace, useContextSystem } from '../context';
-import { useTruncate } from '../truncate';
+import { useTruncate } from '../../truncate';
 import { getOptimalTextShade } from '../utils';
 import * as styles from './styles';
 import { createHighlighterText } from './utils';
