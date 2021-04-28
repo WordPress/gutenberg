@@ -1,12 +1,13 @@
 # Create a block theme
 
 The purpose of this tutorial is to show how to create a block theme and help theme developers transition to full site editing.
+It is recommended that you first read the [block theme overview](/docs/how-to-guides/themes/block-theme-overview.md).
 
 You will learn about the required files, how to combine templates and template parts, how to add presets for global styles, and how to add blocks and export the templates in the site editor.
 
 Full site editing is an experimental feature and the workflow in this tutorial is likely to change.
 
-This tutorial is up to date as of Gutenberg version 9.1.
+This tutorial is up to date as of Gutenberg version 10.6.
 
 ## Table of Contents
 
@@ -14,20 +15,30 @@ This tutorial is up to date as of Gutenberg version 9.1.
 2.  [Creating the theme](#creating-the-theme)
 3.  [Creating the templates and template parts](#creating-the-templates-and-template-parts)
 4.  [experimental-theme.json - Global styles](#experimental-theme-json-global-styles)
+5.  [Using query and loop blocks](#using-query-and-loop-blocks)
+6.  [Layouts](#layouts)
+7.  [Additional templates](#additional-templatess)
+8.  [Creating custom templates](#creating-custom-templates)
 
 ## What is needed to create a block theme?
 
-To use a block theme you need to use the Gutenberg plugin.
-
-A block theme is built using HTML templates and template parts. Templates are the main files used in the [template hierarchy](https://developer.wordpress.org/themes/basics/template-hierarchy/), for example index, single or archive. Templates can optionally include structural template parts, for example a header, footer or sidebar.
-
-Each template or template part contains the [block grammar](/docs/explanations/architecture/key-concepts/), the HTML, for the selected blocks. The block HTML is generated in and exported from the **site editor**. It can also be added to the theme's HTML files manually.
+To be able to use a block theme you first need to activate the Gutenberg plugin.
 
 ### Required files and file structure
 
-A block theme requires an `index.php` file, an index template file, a `style.css` file, and a `functions.php` file.
+There are two files that are required to be able to activate any theme:
+`index.php` and `style.css`.
 
-The theme may optionally include an [experimental-theme.json file](/docs/how-to-guides/themes/theme-json.md) to manage global styles. You decide what additional templates and template parts to include in your theme.
+A block theme is built using HTML templates and template parts. For the plugin to recognise that it is a block theme,
+the theme must also include an `index.html` template.
+
+The theme may optionally include a functions.php file, to enqueue custom CSS and add theme support,
+and a [experimental-theme.json file](/docs/how-to-guides/themes/theme-json.md) to manage global styles.
+
+You decide what additional templates and template parts to include in your theme.
+Templates are the main files used in the [template hierarchy](https://developer.wordpress.org/themes/basics/template-hierarchy/), for example index, single or archive. Templates can optionally include structural template parts, for example a header, footer or sidebar.
+
+Each template or template part contains the [block grammar](/docs/explanations/architecture/key-concepts/), the HTML, for the selected blocks. The block HTML is generated in and exported from the **site editor**. It can also be added to the theme's HTML files manually.
 
 Templates are placed inside the `block-templates` folder, and template parts are placed inside the `block-template-parts` folder:
 
@@ -66,7 +77,7 @@ Description:
 Tags:
 Version: 1.0.0
 Requires at least: 5.0
-Tested up to: 5.4
+Tested up to: 5.7
 Requires PHP: 7.0
 License: GNU General Public License v2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -77,15 +88,17 @@ Use it to make something cool, have fun, and share what you've learned with othe
 */
 ```
 
-Create a `functions.php` file.
+Create an `index.php` file.
+This file is used as a fallback if the theme is activated without Gutenberg.
+You may leave the file empty for this tutorial.
 
-In this file, you will enqueue the `style.css` file and add any theme support that you want to use. For example colors, wide blocks and featured images.
 
-_You no longer need to add theme support for the title tag. It is already enabled with full site editing._
+Opttionally, create a `functions.php` file.
+In this file, you can enqueue `style.css`, include additional files,
+enable an editor stylesheet and add theme support.
 
-https://developer.wordpress.org/themes/basics/theme-functions/#what-is-functions-php
-
-https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/
+Support for the title tag is already enabled for all block themes,
+and most of the theme support will be added in the experimental-theme.json file.
 
 ```php
 <?php
@@ -98,7 +111,6 @@ if ( ! function_exists( 'myfirsttheme_setup' ) ) :
  * support post thumbnails.
  */
 function myfirsttheme_setup() {
-
 	/**
 	 * Add default posts and comments RSS feed links to <head>.
 	 */
@@ -109,22 +121,9 @@ function myfirsttheme_setup() {
 	 */
 	add_theme_support( 'post-thumbnails' );
 
-	add_theme_support( 'editor-color-palette', array(
-		array(
-			'name' => __( 'strong magenta', 'myfirsttheme' ),
-			'slug' => 'strong-magenta',
-			'color' => '#a156b4',
-		),
-		array(
-			'name' => __( 'very dark gray', 'myfirsttheme' ),
-			'slug' => 'very-dark-gray',
-			'color' => '#444',
-		),
-	) );
+	add_theme_support( 'editor-styles' )
 
 	add_theme_support( 'wp-block-styles' );
-
-	add_theme_support( 'align-wide' );
 }
 endif; // myfirsttheme_setup
 add_action( 'after_setup_theme', 'myfirsttheme_setup' );
@@ -134,244 +133,268 @@ add_action( 'after_setup_theme', 'myfirsttheme_setup' );
  */
 function myfirsttheme_scripts() {
 	wp_enqueue_style( 'myfirsttheme-style', get_stylesheet_uri() );
-
-	if ( is_singular() && comments_open() && get_option( 'thread_comments' ) ) {
-		wp_enqueue_script( 'comment-reply' );
-	}
 }
 add_action( 'wp_enqueue_scripts', 'myfirsttheme_scripts' );
 ```
 
-Create an `index.php` file.
-This file is used as a fallback if the theme is activated when full site editing is not enabled.
-You may leave the file empty for this tutorial.
+It is no longer necesarry to enqueue the comment reply script,
+because it is included with the comments block.
+
+Inside the block-templates folder, create a blank `index.html` file.
 
 Your theme should now include the following files and folders:
 
 ```
 theme
  |__ style.css
- |__ functions.php
+ |__ functions.php (optional)
  |__ index.php
  |__ block-templates
- 	|__ (empty folder)
+ 	|__ index.html
  |__ block-template-parts
  	|__ (empty folder)
 ```
 
 ### Creating the templates and template parts
 
-Create two template parts called `footer.html` and `header.html` and place them inside the `block-template-parts` folder. You can leave the files empty for now.
+Now that you have the required files you can choose to create templates and template parts manually,
+via the site editor or via the template editing mode.
 
-Inside the block-templates folder, create an `index.html` file.
+#### Manual template creation
 
-In `index.html`, include the template parts by adding two HTML comments.
+Create two template part files called `footer.html` and `header.html` and place them inside the `block-template-parts` folder.
 
-The HTML comments starts with `wp:template-part` which is the name of the template-part block type. Inside the curly brackets are two keys and their values: The slug of the template part, and the theme text domain.
+When you add blocks manually to your HTML files, you will start by adding an HTML comment that includes the block name prefixed with `wp:`.
 
+There are both self-closing and multi-line blocks:
+
+Add the site title to `header.html`:
+
+```html
+<!-- wp:site-title /-->
 ```
-<!-- wp:template-part {"slug":"header","theme":"myfirsttheme"} /-->
 
-<!-- wp:template-part {"slug":"footer","theme":"myfirsttheme"} /-->
+And a credit text to `footer.html`:
+
+```html
+<!-- wp:paragraph -->
+<p>Proudly powered by <a href="https://wordpress.org/">WordPress</a>.</p>
+<!-- /wp:paragraph -->
 ```
 
-If you used a different theme name, adjust the value for the theme text domain.
+The blocks are self-containing, the opening tag and the closing tag for a multi-line block must be in the same template.
+You would not be able to place an opening tag for a group block in a header template and close it in a footer template.
 
-Eventually, you will be able to create and combine templates and template parts directly in the site editor.
+Open `index.html` and include the template parts by adding two HTML comments.
+The HTML comments starts with `wp:template-part` which is the name of the template-part block.
+Each template part is identify by its slug, the name of the file without the file ending.
+
+Inside the HTML comment, add two curly brackets and the key, "slug", together with the name of the template part:
+
+```html
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:template-part {"slug":"footer"} /-->
+```
+
+All block attributes are placed inside these curly brackets.
+For example, if you wanted the paragraph in `footer.html` to be centered,
+you would use the align attribute:
+
+```html
+<!-- wp:paragraph {"align":"center"} -->
+<p class="has-text-align-center">Proudly powered by
+<a href="https://wordpress.org/">WordPress</a>.</p>
+<!-- /wp:paragraph -->
+```
+
+The HTML element that wraps the content also needs to use the corresponding CSS class:
+```has-text-align-center```.
+
+#### Template creation in the site editor
+
+To access the site editor to create templates and template parts, you first need to activate the basic block theme that we created in [step 2] (#creating-the-theme).
+
+Open the Site Editor from the WordPress admin menu. The default view is the blank index.html template.
+
+Open the Add block menu and select and place a new template part.
+The block will have the default name "Untitled Template Part".
+Open the advanced section of the block settings sidebar and make the following changes:
+Change the title and area to Header, and the HTML element to ```<header>```.
+
+Save the changes. You will be asked if you want to save the template part, the index template, or both. Choose both.
+Repeat the process and add a footer template part.
+
+Add your preferred blocks to the header and footer template parts, for example a navigation block, a cover block with a site logo, title and tagline, or a columns block with contact information. Save the changes.
+
+##### Exporting
+
+The template, template parts saved to the database as custom post types, but they need to be exported as theme files.
+
+In the site editor, open the "More tools and options menu"
+Select the Export option to download a zip file containing the files.
+From here, some assembly is required.
+Copy the updated index.html file from theme/block-templates/ folder to your themes block-templates folder.
+Copy template part one and two from theme/block-template-parts/ folder your themes block-template-parts folder.
+Rename the template parts to header.html and footer.html respectively.
+Then open index.html and update the slugs in the block markup.
+
+To use the theme files and not the saved templates and template parts,
+you need to go to the Appearance menu -> Templates/Template parts and delete them.
+
+To create your theme you will likely use a combination of manually created files and the site editor.
+You can assemble blocks in the block editor, and copy the markup from the code editor mode to your theme files.
 
 ### Experimental-theme.json - Global styles
 
-The purpose of the `experimental-theme.json` file is to make it easier to style blocks by setting defaults.
+The `experimental-theme.json` is a configuration file that can be used to
+enable or disable features and set default styles for both the website and individual block types.
 
-It is used to:
+Style settings are converted to CSS custom properties (CSS variables) and enqueued both for the editor and the front,
+reducing the need for the theme to enque block styles.
 
--   Create CSS variables (also called CSS custom properties) that can be used to style blocks both on the front and in the editor.
--   Set global styles.
--   Set styles for individual block types.
+To make the most out of this tutorial please read the [documentation for global styles](/docs/how-to-guides/themes/theme-json.md).
 
-[The documentation for global styles contains a list of available block and style combinations.](/docs/how-to-guides/themes/theme-json.md)
+[Learn more about the JSON format (external link)](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON)
 
 Create a file called `experimental-theme.json` and save it inside the main folder.
 
-CSS variables are generated using **Global presets**. The variables are added to the `:root` on the front, and to the `.editor-styles-wrapper` class in the editor.
+You will start by adding some of the theme support that you previously added to functions.php,
+but first, add two curly brackets to the file:
 
-Styles that are added to the themes `style.css` file or an editor style sheet are loaded after global styles.
-
-Add the following global presets to the `experimental-theme.json` file:
-
-```
+```json
 {
-	"global": {
-		"settings": {
-			"color": {
-				"palette": [
-					{
-						"slug": "strong-magenta",
-						"color": "#a156b4"
-					},
-					{
-						"slug": "very-dark-gray",
-						"color": "#444"
-					},
-				]
-			},
-			"custom": {
-				"line-height": [
-					{
-						"small": "1.3"
-					},
-					{
-						"medium": "2"
-					},
-					{
-						"large": "2.5"
-					}
-				]
-			}
+
+}
+```
+
+Next, add three main sections:
+Settings -Where you will enable features and create presets for styles.
+Styles -Where you apply styles to the website, elements and blocks.
+templateParts -where you assign template part files to template areas.
+
+```json
+{
+	"settings": {
+	},
+	"styles": {
+	},
+	"templateParts": {
+	}
+}
+```
+
+#### Content width and theme support for wide and full width blocks
+
+Inside settings, include the layout option:
+The contentSize is the default width of the blocks. wideSize is the wide width.
+The example uses pixels but any CSS value is valid.
+
+```json
+	"layout": {
+		"contentSize": "840px",
+		"wideSize": "1100px"
+	}
+```
+
+This will enable the layout setting for parent blocks in the editors.
+With this seting, inner blocks can either inherit the widths that are set in the experimental-theme.json
+file, or use specific values.
+
+#### Color palette
+
+The equivalent of add_theme_support( 'editor-color-palette' ).
+You can add mulitple color palettes, a default palette for all blocks,
+and color palettes that are specific to a block type.
+
+Inside settings, add a default color palette with following code:
+
+```json
+"color": {
+	"palette": [
+		{
+			"slug": "strong-magenta",
+			"color": "#a156b4"
+		},
+		{
+			"slug": "very-dark-gray",
+			"color": "#444"
+		}
+	]
+}
+```
+
+Add a trailing comma to separate the objects, and add a palette for the heading block.
+This palette will be used instead of the default theme palette.
+
+```json
+"blocks": {
+	"core/heading/": {
+		"color": {
+			"palette": [
+				{
+					"slug": "light-blue",
+					"color": "#5d8ac8"
+				},
+				{
+					"slug": "light-grey",
+					"color": "#ccc"
+				}
+			]
 		}
 	}
 }
 ```
 
-This code generates the following variables:
+This code generates the following CSS:
 
-```
+```css
+:root {
 	--wp--preset--color--strong-magenta: #a156b4;
 	--wp--preset--color--very-dark-gray: #444;
+}
 
-	--wp--custom--line-height--small: 1.3;
-	--wp--custom--line-height--medium: 2;
-	--wp--custom--line-height--large: 2.5;
+h2 {
+	--wp--preset--color--light-blue: #5d8ac8;
+	--wp--preset--color--light-grey: #ccc;
+}
 ```
 
-**Global styles** are used to set default values for the website and for the blocks.
+Apply the dark grey color to the body background by adding ```color``` as a top key under styles:
 
-This example will add the dark grey color as the website background color.
-Add the code inside the globals, after the presets:
-
-```
-	"styles": {
-		"color": {
-			"background": "var(--wp--preset--color--very-dark-gray)"
-		}
-	}
-```
-
-**Block styles** sets default values for all blocks of a specific type.
-
-This example uses the CSS variables to add text color and line height to the H2 heading block,
-in combination with a custom font size.
-
-When adding styles for the headings block, include the heading level, h1 to h6.
-
-Block styles are separate from global styles. Add the code after the globals, but before the closing brace.
-
-```
-"core/heading/h2": {
-	"styles": {
-		"color": {
-			"text": "var( --wp--preset--color--strong-magenta )"
-		},
-		"typography": {
-			"fontSize": "2.5rem",
-			"lineHeight": "var(--wp--custom--line-height--medium)"
-		}
-	}
-},
-```
-
-CSS variables for font sizes are generated using the `editor-font-sizes` theme support or by adding a global preset.
-
-https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#block-font-sizes
-
-If the theme does not add any custom font sizes, variables are created using the default sizes.
-This example adds the default medium font size to the paragraph block.
-
-The font sizes are unitless, which is why calc is used: https://developer.mozilla.org/en-US/docs/Web/CSS/calc
-
-```
-"core/paragraph": {
-	"styles": {
-		"typography": {
-			"fontSize": "calc(1px * var( --wp--preset--font-size--medium ))"
-		}
-	}
-},
-```
-
-Using the CSS variables is optional. In this example, the default background color for the group block is changed to white using a color code:
-
-```
-"core/group": {
-	"styles": {
-		"color": {
-			"background": "#ffffff"
-		}
+```json
+"styles": {
+	"color": {
+		"background": "var(--wp--preset--color--very-dark-gray)"
 	}
 }
 ```
 
-Below are the presets and styles combined:
+#### Typography
 
-```
-{
-	"global": {
-		"settings": {
-			"color": {
-				"palette": [
-					{
-						"slug": "strong-magenta",
-						"color": "#a156b4"
-					},
-					{
-						"slug": "very-dark-gray",
-						"color": "#444"
-					},
-				]
-			},
-			"custom": {
-				"line-height": [
-					{
-						"small": "1.3"
-					},
-					{
-						"medium": "2"
-					},
-					{
-						"large": "2.5"
-					}
-				]
-			}
-		}
-	},
+#### Borders
 
-	"core/heading/h2": {
-		"styles": {
-			"color": {
-				"text": "var( --wp--preset--color--strong-magenta )"
-			},
-			"typography": {
-				"fontSize": "2.5rem",
-				"lineHeight": "var(--wp--custom--line-height--medium)"
-			}
-		}
-	},
+#### Spacing
 
-	"core/paragraph": {
-		"styles": {
-			"typography": {
-				"fontSize": "calc(1px * var( --wp--preset--font-size--medium ))"
-			}
-		}
-	},
+#### Custom
 
-	"core/group": {
-		"styles": {
-			"color": {
-				"background": "#ffffff"
-			}
-		}
-	}
-}
-```
+#### Elements
+
+#### Template parts
+
+
+## Using query and loop blocks
+
+## Layouts
+
+-Using the layout setting and inherit
+
+## Additional templates
+
+-We only created an index so far, create single, 404, search and archives.
+
+## Creating custom templates
+
+Assigning custom templates in theme-json.
+
 
