@@ -5,7 +5,7 @@ import { __, isRTL } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
-import { undo as undoIcon, redo } from '@wordpress/icons';
+import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
 
 /**
@@ -23,7 +23,7 @@ function EditorHistoryUndo( props, ref ) {
 		<Button
 			{ ...props }
 			ref={ ref }
-			icon={ ! isRTL() ? undoIcon : redo }
+			icon={ ! isRTL() ? undoIcon : redoIcon }
 			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }

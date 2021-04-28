@@ -4,7 +4,7 @@
 import { __, isRTL } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { undo as undoIcon, redo } from '@wordpress/icons';
+import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -13,7 +13,7 @@ export default function UndoButton() {
 	const { undo } = useDispatch( coreStore );
 	return (
 		<ToolbarButton
-			icon={ ! isRTL() ? undoIcon : redo }
+			icon={ ! isRTL() ? undoIcon : redoIcon }
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }
 			// If there are no undo levels we don't want to actually disable this

@@ -51,7 +51,7 @@ function HeaderToolbar( {
 			<ToolbarButton
 				key="undoButton"
 				title={ __( 'Undo' ) }
-				icon={ ! isRTL ? undoIcon : redo }
+				icon={ ! isRTL ? undoIcon : redoIcon }
 				isDisabled={ ! hasUndo }
 				onClick={ undo }
 				extraProps={ {
@@ -61,7 +61,7 @@ function HeaderToolbar( {
 			<ToolbarButton
 				key="redoButton"
 				title={ __( 'Redo' ) }
-				icon={ ! isRTL ? redoIcon : undo }
+				icon={ ! isRTL ? redoIcon : undoIcon }
 				isDisabled={ ! hasRedo }
 				onClick={ redo }
 				extraProps={ {
