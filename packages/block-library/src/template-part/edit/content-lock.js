@@ -11,17 +11,14 @@ import classnames from 'classnames';
 const baseClassName = 'wp-block-template-part__content-lock';
 
 export default function ContentLock( { clientId, children } ) {
-	const { isSelected, hasChildSelected, isBlockFocused } = useSelect(
+	const { isSelected, hasChildSelected } = useSelect(
 		( select ) => {
-			const {
-				isBlockSelected,
-				hasSelectedInnerBlock,
-				getFocusedBlock,
-			} = select( blockEditorStore );
+			const { isBlockSelected, hasSelectedInnerBlock } = select(
+				blockEditorStore
+			);
 			return {
 				isSelected: isBlockSelected( clientId ),
 				hasChildSelected: hasSelectedInnerBlock( clientId, true ),
-				isBlockFocused: getFocusedBlock() === clientId,
 			};
 		},
 		[ clientId ]
@@ -31,22 +28,24 @@ export default function ContentLock( { clientId, children } ) {
 	const classes = classnames( baseClassName, {
 		'parent-selected': isSelected,
 		'child-selected': hasChildSelected,
-		'parent-focused': isBlockFocused,
 	} );
 
-	const onClick = ! ( isSelected || hasChildSelected )
-		? () => selectBlock( clientId )
-		: null;
-
+	// Disabled because the overlay div doesn't actually have a role or functionality
+	// as far as the user is concerned. We're just catching the first click so that
+	// the block can be selected without interacting with its contents.
+	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div className={ classes }>
-			<button
-				className={ `${ baseClassName }-overlay` }
-				onClick={ onClick }
-			/>
+			{ ! isSelected && ! hasChildSelected && (
+				<div
+					className={ `${ baseClassName }-overlay` }
+					onMouseUp={ () => selectBlock( clientId ) }
+				/>
+			) }
 			<div className={ `${ baseClassName }-content-wrapper` }>
 				{ children }
 			</div>
 		</div>
 	);
 }
+/* eslint-enable jsx-a11y/no-static-element-interactions */

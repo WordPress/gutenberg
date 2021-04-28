@@ -93,21 +93,6 @@
 		border-radius: 2px;
 	}
 
-	&.parent-selected {
-		> .wp-block-template-part__content-lock-overlay {
-			pointer-events: none;
-		}
-		&.parent-focused > .wp-block-template-part__content-lock-overlay {
-			background: rgb(#007cba, 0.2); // todo: use var
-		}
-	}
-
-	&.child-selected {
-		> .wp-block-template-part__content-lock-overlay {
-			display: none;
-		}
-	}
-
 	&:hover:not(.parent-selected):not(.child-selected) {
 		> .wp-block-template-part__content-lock-overlay {
 			background: rgba(#007cba, 0.1);

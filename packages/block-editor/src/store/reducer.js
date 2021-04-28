@@ -1752,18 +1752,6 @@ export function lastBlockInserted( state = {}, action ) {
 	return state;
 }
 
-export function focusedBlock( state = null, action ) {
-	switch ( action.type ) {
-		case 'SET_FOCUSED_BLOCK':
-			return action.clientId;
-		case 'REMOVE_FOCUSED_BLOCK':
-			if ( action.clientId === state ) {
-				return null;
-			}
-	}
-	return state;
-}
-
 export default combineReducers( {
 	blocks,
 	isTyping,
@@ -1786,5 +1774,4 @@ export default combineReducers( {
 	automaticChangeStatus,
 	highlightedBlock,
 	lastBlockInserted,
-	focusedBlock,
 } );

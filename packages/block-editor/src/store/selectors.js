@@ -2209,7 +2209,3 @@ export function wasBlockJustInserted( state, clientId, source ) {
 		lastBlockInserted.source === source
 	);
 }
-
-export function getFocusedBlock( state ) {
-	return state.focusedBlock;
-}
