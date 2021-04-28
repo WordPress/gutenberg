@@ -16,7 +16,9 @@ For each user feature we should also add a importance categorization label  to i
 -   [**] The media upload options of the Image, Video and Gallery block automatically opens when the respective block is inserted. [#29546]
 -   [**] The media upload options of the File and Audio block automatically opens when the respective block is inserted. [#31025]
 
+## 1.51.1
 
+-   [*] Updates relative block-support asset path [#31184]
 
 ## 1.51.0
 
