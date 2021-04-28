@@ -9,6 +9,15 @@
 }
 
 .inserter-search-form__container--active {
+	border-bottom-color: $light-gray-500;
+	border-bottom-width: 1px;
+	margin-left: 0;
+	margin-right: 0;
+	border-radius: 0;
+	elevation: 0;
+}
+
+.inserter-search-form__container--dark-active {
 	border-bottom-color: $gray-70;
 	border-bottom-width: 1px;
 	margin-left: 0;

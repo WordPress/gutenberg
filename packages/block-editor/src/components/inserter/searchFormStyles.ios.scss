@@ -24,3 +24,21 @@
 .inserter-search-form__input-button-right--active {
 	margin: 0 12px 0 8px;
 }
+
+.inserter-search-form__cancel-button {
+	height: 100%;
+	justify-content: center;
+	flex: 1;
+	flex-basis: auto;
+	flex-grow: 0;
+}
+
+.inserter-search-form__cancel-button-text {
+	color: $blue-wordpress;
+	font-size: 17px;
+	padding-left: 8px;
+	padding-right: 16px;
+}
+.inserter-serach-form__cancel-button-text--dark {
+	color: $blue-30;
+}
