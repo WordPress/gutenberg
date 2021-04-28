@@ -6,9 +6,9 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { getFontSize } from '../../utils/font-size';
-import { COLORS } from '../../../utils/colors-values';
-import { Text } from '..';
+import { getFontSize } from '../../ui/utils/font-size';
+import { COLORS } from '../../utils';
+import Text from '..';
 
 describe( 'Text', () => {
 	describe( 'snapshot tests', () => {
