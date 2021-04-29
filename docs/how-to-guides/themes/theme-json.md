@@ -91,7 +91,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 {% Output %}
 
 ```css
-:root {
+body {
 	--wp--preset--color--black: #000000;
 	--wp--preset--color--white: #ffffff;
 }
@@ -122,7 +122,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 {% Output %}
 
 ```css
-:root {
+body {
 	--wp--custom--line-height--body: 1.7;
 	--wp--custom--line-height--heading: 1.3;
 }
@@ -292,7 +292,7 @@ For example:
 {% Output %}
 
 ```css
-:root {
+body {
 	--wp--preset--color--strong-magenta: #a156b4;
 	--wp--preset--color--very-dark-gray: #444;
 	--wp--preset--font-size--big: 32;
@@ -344,7 +344,7 @@ For example:
 {% Output %}
 
 ```css
-:root {
+body {
 	--wp--custom--base-font: 16;
 	--wp--custom--line-height--small: 1.2;
 	--wp--custom--line-height--medium: 1.4;
@@ -434,7 +434,7 @@ For example:
 {% Output %}
 
 ```css
-:root {
+body {
 	color: var( --wp--preset--color--primary );
 }
 h1 {
@@ -549,7 +549,7 @@ For example:
 {% Output %}
 
 ```css
-:root {
+body {
 	--wp--custom--line-height--body: 1.7;
 	--wp--custom--font-primary: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif";
 }
