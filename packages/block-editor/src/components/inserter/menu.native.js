@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { LayoutAnimation, TouchableHighlight } from 'react-native';
+import { LayoutAnimation, Platform, TouchableHighlight } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -142,11 +142,25 @@ function InserterMenu( {
 		[ onInsert, onSelect ]
 	);
 
+	const onChangeSearch = useCallback(
+		( value ) => {
+			if ( Platform.OS === 'ios' && ! value ) {
+				LayoutAnimation.configureNext(
+					LayoutAnimation.Presets.easeInEaseOut
+				);
+			}
+			setFilterValue( value );
+		},
+		[ setFilterValue ]
+	);
+
 	const onFocusSearch = useCallback(
 		( focus ) => {
-			LayoutAnimation.configureNext(
-				LayoutAnimation.Presets.easeInEaseOut
-			);
+			if ( Platform.OS === 'ios' ) {
+				LayoutAnimation.configureNext(
+					LayoutAnimation.Presets.easeInEaseOut
+				);
+			}
 			setSearchFocus( focus );
 		},
 		[ setSearchFocus ]
@@ -160,9 +174,7 @@ function InserterMenu( {
 				<>
 					{ showSearchForm && (
 						<InserterSearchForm
-							onChange={ ( value ) => {
-								setFilterValue( value );
-							} }
+							onChange={ onChangeSearch }
 							onFocus={ onFocusSearch }
 							value={ filterValue }
 						/>
