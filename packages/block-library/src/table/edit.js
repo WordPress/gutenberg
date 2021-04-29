@@ -15,6 +15,7 @@ import {
 	AlignmentToolbar,
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
@@ -103,6 +104,7 @@ function TableEdit( {
 	const [ selectedCell, setSelectedCell ] = useState();
 
 	const colorProps = useColorProps( attributes );
+	const borderProps = useBorderProps( attributes );
 
 	/**
 	 * Updates the initial column count used for table creation.
@@ -477,10 +479,12 @@ function TableEdit( {
 			) }
 			{ ! isEmpty && (
 				<table
-					className={ classnames( colorProps.className, {
-						'has-fixed-layout': hasFixedLayout,
-					} ) }
-					style={ colorProps.style }
+					className={ classnames(
+						colorProps.className,
+						borderProps.className,
+						{ 'has-fixed-layout': hasFixedLayout }
+					) }
+					style={ { ...colorProps.style, ...borderProps.style } }
 				>
 					{ renderedSections }
 				</table>
