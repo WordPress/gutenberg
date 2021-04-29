@@ -129,8 +129,8 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 
 	log( 'Fetching the specified ref.' );
 	await git.fetch( 'origin', source.ref, {
-		'--tags': null
-	} );	
+		'--tags': null,
+	} );
 
 	log( 'Checking out the specified ref.' );
 	await git.checkout( source.ref );
