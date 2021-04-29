@@ -6,8 +6,8 @@ import {
 	menuItemsQuery,
 	serializeProcessing,
 	computeCustomizedAttribute,
-	mapBlockAttributeToMenuItemField,
-	mapMenuItemFieldToBlockAttribute,
+	blockAttributesToMenuItem,
+	menuItemToBlockAttributes,
 } from '../utils';
 import {
 	isProcessingPost,
@@ -220,6 +220,7 @@ describe( 'computeCustomizedAttribute', () => {
 					url: 'http://wp.org',
 					className: 'block classnames',
 					rel: 'external',
+					type: 'custom',
 				},
 				clientId: 'navigation-link-block-client-id-1',
 				innerBlocks: [],
@@ -233,6 +234,7 @@ describe( 'computeCustomizedAttribute', () => {
 					url: 'http://wp.com',
 					className: '',
 					rel: '',
+					type: 'custom',
 				},
 				clientId: 'navigation-link-block-client-id-2',
 				innerBlocks: [],
@@ -270,6 +272,7 @@ describe( 'computeCustomizedAttribute', () => {
 				menu_order: 1,
 				menus: [ 1 ],
 				object: 'custom',
+				original_title: '',
 			},
 			'navigation-link-block-client-id-2': {
 				id: 101,
@@ -281,6 +284,7 @@ describe( 'computeCustomizedAttribute', () => {
 				menu_order: 2,
 				menus: [ 1 ],
 				object: 'custom',
+				original_title: '',
 			},
 			'navigation-link-block-client-id-3': {
 				id: 102,
@@ -294,6 +298,7 @@ describe( 'computeCustomizedAttribute', () => {
 				object: 'page',
 				object_id: 678,
 				type: 'post_type',
+				original_title: '',
 			},
 		};
 
@@ -314,13 +319,17 @@ describe( 'computeCustomizedAttribute', () => {
 				menu_order: 1,
 				nav_menu_term_id: 123,
 				original_title: '',
+				object: 'custom',
 				position: 1,
 				status: 'publish',
-				title: 'wp.org',
-				object: 'custom',
+				title: {
+					raw: 'wp.org',
+					rendered: 'wp.org',
+				},
 				url: 'http://wp.org',
 				xfn: [ 'external' ],
 				target: '',
+				type: 'custom',
 			},
 			'nav_menu_item[101]': {
 				_invalid: false,
@@ -332,11 +341,15 @@ describe( 'computeCustomizedAttribute', () => {
 				original_title: '',
 				position: 2,
 				status: 'publish',
-				title: 'wp.com',
+				title: {
+					raw: 'wp.com',
+					rendered: 'wp.com',
+				},
 				object: 'custom',
 				url: 'http://wp.com',
 				xfn: [ '' ],
 				target: '_blank',
+				type: 'custom',
 			},
 			'nav_menu_item[102]': {
 				_invalid: false,
@@ -348,7 +361,10 @@ describe( 'computeCustomizedAttribute', () => {
 				original_title: '',
 				position: 3,
 				status: 'publish',
-				title: 'Page Example',
+				title: {
+					raw: 'Page Example',
+					rendered: 'Page Example',
+				},
 				object: 'page', // equivalent: block.attributes.type
 				object_id: 678, // equivalent: block.attributes.id
 				type: 'post_type', // // equivalent: block.attributes.kind
@@ -364,9 +380,16 @@ describe( 'Mapping block attributes and menu item fields', () => {
 	const blocks = [
 		{
 			attributes: {
+				label: 'Example Page',
+				url: '/example-page/',
+				description: 'Lorem ipsum dolor sit amet.',
+				rel: 'friend met',
+				className: 'my-custom-class-one my-custom-class-two',
+				title: 'Example page link title attribute',
 				id: 100,
 				type: 'page',
 				kind: 'post-type',
+				opensInNewTab: true,
 			},
 			clientId: 'navigation-link-block-client-id-1',
 			innerBlocks: [],
@@ -375,9 +398,16 @@ describe( 'Mapping block attributes and menu item fields', () => {
 		},
 		{
 			attributes: {
+				label: 'Example Post',
+				url: '/example-post/',
+				description: 'Consectetur adipiscing elit.',
+				rel: 'friend',
+				className: 'my-custom-class-one',
+				title: 'Example post link title attribute',
 				id: 101,
 				type: 'post',
 				kind: 'post-type',
+				opensInNewTab: false,
 			},
 			clientId: 'navigation-link-block-client-id-2',
 			innerBlocks: [],
@@ -386,9 +416,17 @@ describe( 'Mapping block attributes and menu item fields', () => {
 		},
 		{
 			attributes: {
+				label: 'Example Category',
+				url: '/example-category/',
+				description:
+					'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+				rel: '',
+				className: '',
+				title: '',
 				id: 102,
 				type: 'category',
 				kind: 'taxonomy',
+				opensInNewTab: true,
 			},
 			clientId: 'navigation-link-block-client-id-3',
 			innerBlocks: [],
@@ -397,9 +435,16 @@ describe( 'Mapping block attributes and menu item fields', () => {
 		},
 		{
 			attributes: {
+				label: 'Example Tag',
+				url: '/example-tag/',
+				description: '',
+				rel: '',
+				className: '',
+				title: '',
 				id: 103,
 				type: 'tag',
 				kind: 'taxonomy',
+				opensInNewTab: false,
 			},
 			clientId: 'navigation-link-block-client-id-4',
 			innerBlocks: [],
@@ -408,8 +453,15 @@ describe( 'Mapping block attributes and menu item fields', () => {
 		},
 		{
 			attributes: {
+				label: 'Example Custom Link',
+				url: 'https://wordpress.org',
+				description: '',
+				rel: '',
+				className: '',
+				title: '',
 				type: 'custom',
 				kind: 'custom',
+				opensInNewTab: true,
 			},
 			clientId: 'navigation-link-block-client-id-5',
 			innerBlocks: [],
@@ -420,28 +472,79 @@ describe( 'Mapping block attributes and menu item fields', () => {
 
 	const menuItems = [
 		{
+			title: {
+				raw: 'Example Page',
+				rendered: 'Example Page',
+			},
+			url: '/example-page/',
+			description: 'Lorem ipsum dolor sit amet.',
+			xfn: [ 'friend', 'met' ],
+			classes: [ 'my-custom-class-one', 'my-custom-class-two' ],
+			attr_title: 'Example page link title attribute',
 			object_id: 100,
 			object: 'page',
 			type: 'post_type',
+			target: '_blank',
 		},
 		{
+			title: {
+				raw: 'Example Post',
+				rendered: 'Example Post',
+			},
+			url: '/example-post/',
+			description: 'Consectetur adipiscing elit.',
+			xfn: [ 'friend' ],
+			classes: [ 'my-custom-class-one' ],
+			attr_title: 'Example post link title attribute',
 			object_id: 101,
 			object: 'post',
 			type: 'post_type',
+			target: '',
 		},
 		{
+			title: {
+				raw: 'Example Category',
+				rendered: 'Example Category',
+			},
+			url: '/example-category/',
+			description:
+				'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+			xfn: [ '' ],
+			classes: [ '' ],
+			attr_title: '',
 			object_id: 102,
 			object: 'category',
 			type: 'taxonomy',
+			target: '_blank',
 		},
 		{
+			title: {
+				raw: 'Example Tag',
+				rendered: 'Example Tag',
+			},
+			url: '/example-tag/',
+			description: '',
+			xfn: [ '' ],
+			classes: [ '' ],
+			attr_title: '',
 			object_id: 103,
 			object: 'tag',
 			type: 'taxonomy',
+			target: '',
 		},
 		{
+			title: {
+				raw: 'Example Custom Link',
+				rendered: 'Example Custom Link',
+			},
+			url: 'https://wordpress.org',
+			description: '',
+			xfn: [ '' ],
+			classes: [ '' ],
+			attr_title: '',
 			object: 'custom',
 			type: 'custom',
+			target: '_blank',
 		},
 	];
 
@@ -449,37 +552,58 @@ describe( 'Mapping block attributes and menu item fields', () => {
 
 	describe( 'mapping block attributes to menu item fields', () => {
 		it( 'maps block attributes to equivalent menu item fields', () => {
-			const expected = blockAttrs.map( ( attrs ) => {
-				return Object.entries( attrs ).reduce(
-					( acc, [ key, value ] ) => {
-						acc = {
-							...acc,
-							...mapBlockAttributeToMenuItemField( key, value ),
-						};
-						return acc;
-					},
-					{}
-				);
-			} );
-			expect( expected ).toEqual( menuItems );
+			const actual = blockAttrs.map( ( attrs ) =>
+				blockAttributesToMenuItem( attrs )
+			);
+
+			expect( actual ).toEqual( menuItems );
+		} );
+
+		it( 'does not map block attribute "id" to menu item "object_id" field for custom (non-entity) links', () => {
+			const customLinkBlockAttributes = {
+				id: 123456, // added for test purposes only - should not occur.
+				title: 'Example Custom Link',
+				url: 'https://wordpress.org',
+				description: '',
+				xfn: [ '' ],
+				classes: [ '' ],
+				attr_title: '',
+				object: 'custom',
+				type: 'custom',
+			};
+			const actual = blockAttributesToMenuItem(
+				customLinkBlockAttributes
+			);
+
+			expect( actual.object_id ).toBeUndefined();
 		} );
 	} );
 
 	describe( 'mapping menu item fields to block attributes', () => {
-		it( 'maps menu item fields equivalent block attributes', () => {
-			const expected = menuItems.map( ( attrs ) => {
-				return Object.entries( attrs ).reduce(
-					( acc, [ key, value ] ) => {
-						acc = {
-							...acc,
-							...mapMenuItemFieldToBlockAttribute( key, value ),
-						};
-						return acc;
-					},
-					{}
-				);
-			} );
-			expect( expected ).toEqual( blockAttrs );
+		it( 'maps menu item fields to equivalent block attributes', () => {
+			const actual = menuItems.map( ( fields ) =>
+				menuItemToBlockAttributes( fields )
+			);
+
+			expect( actual ).toEqual( blockAttrs );
+		} );
+
+		it( 'does not map menu item "object_id" field to block attribute "id" for custom (non-entity) links', () => {
+			const customLinkMenuItem = {
+				title: 'Example Custom Link',
+				url: 'https://wordpress.org',
+				description: '',
+				xfn: [ '' ],
+				classes: [ '' ],
+				attr_title: '',
+				object_id: 123456, // added for test purposes.
+				object: 'custom',
+				type: 'custom',
+				target: '_blank',
+			};
+			const actual = menuItemToBlockAttributes( customLinkMenuItem );
+
+			expect( actual.id ).toBeUndefined();
 		} );
 	} );
 } );
