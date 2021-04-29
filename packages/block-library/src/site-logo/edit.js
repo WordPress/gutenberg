@@ -83,7 +83,7 @@ const SiteLogo = ( {
 		toggleSelection( true );
 	}
 
-	let img = (
+	const img = (
 		<span className="custom-logo-link">
 			<img
 				className="custom-logo"
@@ -101,11 +101,13 @@ const SiteLogo = ( {
 		</span>
 	);
 
+	let imgWrapper = img;
+
 	// Disable reason: Image itself is not meant to be interactive, but
 	// should direct focus to block.
 	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	if ( isLink ) {
-		img = (
+		imgWrapper = (
 			<a
 				href={ siteUrl }
 				className={ classes }
@@ -113,21 +115,7 @@ const SiteLogo = ( {
 				title={ title }
 				onClick={ ( event ) => event.preventDefault() }
 			>
-				<span className="custom-logo-link">
-					<img
-						className="custom-logo"
-						src={ logoUrl }
-						alt={ alt }
-						onLoad={ ( event ) => {
-							setNaturalSize(
-								pick( event.target, [
-									'naturalWidth',
-									'naturalHeight',
-								] )
-							);
-						} }
-					/>
-				</span>
+				{ img }
 			</a>
 		);
 	}
@@ -141,7 +129,7 @@ const SiteLogo = ( {
 	}
 
 	if ( ! isResizable || ! imageWidthWithinContainer ) {
-		return <div style={ { width, height } }>{ img }</div>;
+		return <div style={ { width, height } }>{ imgWrapper }</div>;
 	}
 
 	const currentWidth = width || imageWidthWithinContainer;
@@ -256,7 +244,7 @@ const SiteLogo = ( {
 					} );
 				} }
 			>
-				{ img }
+				{ imgWrapper }
 			</ResizableBox>
 		</>
 	);
