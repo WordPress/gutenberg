@@ -28,6 +28,7 @@ export default function BlockTypesList( { name, items, onSelect, listProps } ) {
 
 	useEffect( () => {
 		Dimensions.addEventListener( 'change', onLayout );
+		onLayout();
 		return () => {
 			Dimensions.removeEventListener( 'change', onLayout );
 		};
