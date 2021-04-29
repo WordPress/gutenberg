@@ -22,7 +22,12 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		the_post();
 	}
 
-	$content            = '';
+	$content = get_the_content( null, false, $block->context['postId'] );
+
+	if ( empty( $content ) ) {
+		return '';
+	}
+
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
 
 	if ( is_attachment() ) {
