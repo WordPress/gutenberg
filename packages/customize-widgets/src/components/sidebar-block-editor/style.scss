@@ -1,0 +1,5 @@
+.customize-widgets__contextual-toolbar-wrapper {
+	position: fixed;
+	// Appear over block placeholders, but under widgets page headings.
+	z-index: 8;
+}

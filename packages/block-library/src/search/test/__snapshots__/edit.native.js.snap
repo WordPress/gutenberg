@@ -7,8 +7,7 @@ exports[`Search Block renders block with button inside option 1`] = `
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    accessibilityHint="Double tap to edit label text"
-    accessibilityLabel="Search block label. Current text is Search"
+    accessibilityLabel="search-block-label"
     accessibilityRole="none"
     accessible={true}
   >
@@ -74,8 +73,7 @@ exports[`Search Block renders block with button inside option 1`] = `
     }
   >
     <View
-      accessibilityHint="Double tap to edit placeholder text"
-      accessibilityLabel="Search input field. No custom placeholder set"
+      accessibilityLabel="search-block-input"
       accessibilityRole="none"
       accessible={true}
     >
@@ -111,8 +109,7 @@ exports[`Search Block renders block with button inside option 1`] = `
       }
     >
       <View
-        accessibilityHint="Double tap to edit button text"
-        accessibilityLabel="Search button. Current button text is Search Button"
+        accessibilityLabel="search-block-button"
         accessibilityRole="none"
         accessible={true}
         onLayout={[Function]}
@@ -183,8 +180,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    accessibilityHint="Double tap to edit label text"
-    accessibilityLabel="Search block label. Current text is Search"
+    accessibilityLabel="search-block-label"
     accessibilityRole="none"
     accessible={true}
   >
@@ -250,8 +246,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
     }
   >
     <View
-      accessibilityHint="Double tap to edit placeholder text"
-      accessibilityLabel="Search input field. No custom placeholder set"
+      accessibilityLabel="search-block-input"
       accessibilityRole="none"
       accessible={true}
     >
@@ -308,8 +303,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
     }
   >
     <View
-      accessibilityHint="Double tap to edit placeholder text"
-      accessibilityLabel="Search input field. No custom placeholder set"
+      accessibilityLabel="search-block-input"
       accessibilityRole="none"
       accessible={true}
     >
@@ -345,8 +339,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
       }
     >
       <View
-        accessibilityHint="Double tap to edit button text"
-        accessibilityLabel="Search button. Current button text is Search Button"
+        accessibilityLabel="search-block-button"
         accessibilityRole="none"
         accessible={true}
         onLayout={[Function]}
@@ -417,8 +410,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    accessibilityHint="Double tap to edit label text"
-    accessibilityLabel="Search block label. Current text is Search"
+    accessibilityLabel="search-block-label"
     accessibilityRole="none"
     accessible={true}
   >
@@ -484,8 +476,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
     }
   >
     <View
-      accessibilityHint="Double tap to edit placeholder text"
-      accessibilityLabel="Search input field. No custom placeholder set"
+      accessibilityLabel="search-block-input"
       accessibilityRole="none"
       accessible={true}
     >
@@ -521,8 +512,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
       }
     >
       <View
-        accessibilityHint="Double tap to edit button text"
-        accessibilityLabel="Search button. Current button text is Search Button"
+        accessibilityLabel="search-block-button"
         accessibilityRole="none"
         accessible={true}
         onLayout={[Function]}
@@ -593,8 +583,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    accessibilityHint="Double tap to edit label text"
-    accessibilityLabel="Search block label. Current text is Search"
+    accessibilityLabel="search-block-label"
     accessibilityRole="none"
     accessible={true}
   >
@@ -651,8 +640,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
     </View>
   </View>
   <View
-    accessibilityHint="Double tap to edit placeholder text"
-    accessibilityLabel="Search input field. No custom placeholder set"
+    accessibilityLabel="search-block-input"
     accessibilityRole="none"
     accessible={true}
   >

@@ -1,15 +1,11 @@
 /**
- * External dependencies
- */
-import { useContextSystem } from '@wp-g2/context';
-
-/**
  * Internal dependencies
  */
+import { useContextSystem } from '../context';
 import { useFlexItem } from './use-flex-item';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FlexBlockProps, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').FlexBlockProps, 'div'>} props
  */
 export function useFlexBlock( props ) {
 	const otherProps = useContextSystem( props, 'FlexBlock' );

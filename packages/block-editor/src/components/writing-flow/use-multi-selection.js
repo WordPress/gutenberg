@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { first, last } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useRef, useCallback } from '@wordpress/element';
@@ -7,8 +12,9 @@ import { useSelect, useDispatch } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { getBlockClientId, getBlockDOMNode } from '../../utils/dom';
+import { getBlockClientId } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
+import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
 /**
  * Returns for the deepest node at the start or end of a container node. Ignores
@@ -42,7 +48,6 @@ function selector( select ) {
 		isMultiSelecting,
 		getMultiSelectedBlockClientIds,
 		hasMultiSelection,
-		getBlockParents,
 		getSelectedBlockClientId,
 	} = select( blockEditorStore );
 
@@ -51,7 +56,6 @@ function selector( select ) {
 		isMultiSelecting: isMultiSelecting(),
 		multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
 		hasMultiSelection: hasMultiSelection(),
-		getBlockParents,
 		selectedBlockClientId: getSelectedBlockClientId(),
 	};
 }
@@ -74,9 +78,9 @@ export default function useMultiSelection( ref ) {
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
-		getBlockParents,
 		selectedBlockClientId,
 	} = useSelect( selector, [] );
+	const { getBlockParents } = useSelect( blockEditorStore );
 	const {
 		startMultiSelect,
 		stopMultiSelect,
@@ -86,6 +90,10 @@ export default function useMultiSelection( ref ) {
 	const rafId = useRef();
 	const startClientId = useRef();
 	const anchorElement = useRef();
+	const selectedRef = useBlockRef( selectedBlockClientId );
+	// These must be in the right DOM order.
+	const startRef = useBlockRef( first( multiSelectedBlockClientIds ) );
+	const endRef = useBlockRef( last( multiSelectedBlockClientIds ) );
 
 	/**
 	 * When the component updates, and there is multi selection, we need to
@@ -103,10 +111,7 @@ export default function useMultiSelection( ref ) {
 			const selection = defaultView.getSelection();
 
 			if ( selection.rangeCount && ! selection.isCollapsed ) {
-				const blockNode = getBlockDOMNode(
-					selectedBlockClientId,
-					ownerDocument
-				);
+				const blockNode = selectedRef.current;
 				const { startContainer, endContainer } = selection.getRangeAt(
 					0
 				);
@@ -130,19 +135,14 @@ export default function useMultiSelection( ref ) {
 		}
 
 		// These must be in the right DOM order.
-		const start = multiSelectedBlockClientIds[ 0 ];
-		const end = multiSelectedBlockClientIds[ length - 1 ];
-
-		let startNode = getBlockDOMNode( start, ownerDocument );
-		let endNode = getBlockDOMNode( end, ownerDocument );
 
 		const selection = defaultView.getSelection();
 		const range = ownerDocument.createRange();
 
 		// The most stable way to select the whole block contents is to start
 		// and end at the deepest points.
-		startNode = getDeepestNode( startNode, 'start' );
-		endNode = getDeepestNode( endNode, 'end' );
+		const startNode = getDeepestNode( startRef.current, 'start' );
+		const endNode = getDeepestNode( endRef.current, 'end' );
 
 		range.setStartBefore( startNode );
 		range.setEndAfter( endNode );
