@@ -1,8 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { speak } from '@wordpress/a11y';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useCallback, useRef } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
@@ -21,10 +19,8 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
-import { MenuItem, Popover } from '@wordpress/components';
+import { Popover } from '@wordpress/components';
 import { useMergeRefs } from '@wordpress/compose';
-import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
-import { store as interfaceStore } from '@wordpress/interface';
 
 /**
  * Internal dependencies
@@ -33,59 +29,7 @@ import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 import { store as editSiteStore } from '../../store';
-
-export function BlockInspectorButton( { onClick = () => {}, small = false } ) {
-	const { shortcut, areAdvancedSettingsOpened } = useSelect(
-		( select ) => ( {
-			// shortcut: select(
-			// 	keyboardShortcutsStore
-			// ).getShortcutRepresentation( 'core/edit-site/toggle-sidebar' ),
-			areAdvancedSettingsOpened: !! select(
-				interfaceStore
-			).getActiveComplementaryArea( editSiteStore.name ),
-		} ),
-		[]
-	);
-	const { enableComplementaryArea, disableComplementaryArea } = useDispatch(
-		interfaceStore
-	);
-
-	const speakMessage = () => {
-		if ( areAdvancedSettingsOpened ) {
-			speak( __( 'Block settings closed' ) );
-		} else {
-			speak(
-				__(
-					'Additional settings are now available in the Editor block settings sidebar'
-				)
-			);
-		}
-	};
-
-	const label = areAdvancedSettingsOpened
-		? __( 'Hide more settings' )
-		: __( 'Show more settings' );
-
-	return (
-		<MenuItem
-			onClick={ () => {
-				if ( areAdvancedSettingsOpened ) {
-					disableComplementaryArea( 'core/edit-site' );
-				} else {
-					enableComplementaryArea(
-						'core/edit-site',
-						'edit-site/block-inspector'
-					);
-					speakMessage();
-					onClick();
-				}
-			} }
-			shortcut={ shortcut }
-		>
-			{ ! small && label }
-		</MenuItem>
-	);
-}
+import BlockInspectorButton from './block-inspector-button';
 
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, page, deviceType } = useSelect(
