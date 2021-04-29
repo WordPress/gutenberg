@@ -361,7 +361,14 @@ export default function Image( {
 					) }
 					<ImageSizeControl
 						onChangeImage={ updateImage }
-						onChange={ ( value ) => setAttributes( value ) }
+						onChange={ ( { width: newWidth, height: newHeight } ) =>
+							setAttributes( {
+								width: isNaN( newWidth ) ? undefined : newWidth,
+								height: isNaN( newHeight )
+									? undefined
+									: newHeight,
+							} )
+						}
 						slug={ sizeSlug }
 						width={ width }
 						height={ height }
