@@ -118,29 +118,22 @@ class BottomSheet extends Component {
 		this.onSetMaxHeight();
 	}
 
+	// This layout animation is the same as the React Native's KeyboardAvoidingView component.
+	// Reference: https://github.com/facebook/react-native/blob/266b21baf35e052ff28120f79c06c4f6dddc51a9/Libraries/Components/Keyboard/KeyboardAvoidingView.js#L119-L128
 	performKeyboardLayoutAnimation( event ) {
-		if ( Platform.OS === 'android' ) {
-			LayoutAnimation.configureNext( {
-				update: DEFAULT_LAYOUT_ANIMATION.update,
-				duration: DEFAULT_LAYOUT_ANIMATION.duration,
-			} );
-		} else {
-			// This layout animation is the same as the React Native's KeyboardAvoidingView component.
-			// Reference: https://github.com/facebook/react-native/blob/266b21baf35e052ff28120f79c06c4f6dddc51a9/Libraries/Components/Keyboard/KeyboardAvoidingView.js#L119-L128
-			const { duration, easing } = event;
+		const { duration, easing } = event;
 
-			if ( duration && easing ) {
-				const layoutAnimation = {
-					// We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m
+		if ( duration && easing ) {
+			const layoutAnimation = {
+				// We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m
+				duration: duration > 10 ? duration : 10,
+				update: {
 					duration: duration > 10 ? duration : 10,
-					update: {
-						duration: duration > 10 ? duration : 10,
-						type: LayoutAnimation.Types[ easing ] || 'keyboard',
-					},
-				};
-				LayoutAnimation.configureNext( layoutAnimation );
-				this.lastLayoutAnimation = layoutAnimation;
-			}
+					type: LayoutAnimation.Types[ easing ] || 'keyboard',
+				},
+			};
+			LayoutAnimation.configureNext( layoutAnimation );
+			this.lastLayoutAnimation = layoutAnimation;
 		}
 	}
 

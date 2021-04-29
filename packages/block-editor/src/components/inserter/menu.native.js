@@ -156,11 +156,9 @@ function InserterMenu( {
 
 	const onFocusSearch = useCallback(
 		( focus ) => {
-			if ( Platform.OS === 'ios' ) {
-				LayoutAnimation.configureNext(
-					LayoutAnimation.Presets.easeInEaseOut
-				);
-			}
+			LayoutAnimation.configureNext(
+				LayoutAnimation.Presets.easeInEaseOut
+			);
 			setSearchFocus( focus );
 		},
 		[ setSearchFocus ]
