@@ -17,7 +17,7 @@ export { default as LocalAutosaveMonitor } from './local-autosave-monitor';
 export { default as PageAttributesCheck } from './page-attributes/check';
 export { default as PageAttributesOrder } from './page-attributes/order';
 export { default as PageAttributesParent } from './page-attributes/parent';
-export { default as PageTemplate } from './page-attributes/template';
+export { default as PageTemplate } from './post-template';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
 export { default as PostComments } from './post-comments';

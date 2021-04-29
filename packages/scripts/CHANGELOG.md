@@ -2,6 +2,25 @@
 
 ## Unreleased
 
+### Breaking Changes
+
+-   Rename `format-js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
+-   Include YAML files when formatting files with `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
+-   The bundled `css-loader` dependency has been updated from requiring `^3.5.2` to requiring `^5.1.3` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `mini-css-extract-plugin` dependency has been updated from requiring `^0.9.0` to requiring `^1.3.9` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `postcss-loader` dependency has been updated from requiring `^3.0.0` to requiring `^4.2.0` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `sass-loader` dependency has been updated from requiring `^8.0.2` to requiring `^10.1.1` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `thread-loader` dependency has been updated from requiring `^2.1.3` to requiring `^3.0.1` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `url-loader` dependency has been updated from requiring `^3.0.0` to requiring `^4.1.1` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+
+### New Features
+
+-   `build` and `start` command now bundle files ending with `.module.css` as CSS modules and extracts `style.module.css` ([#29182](https://github.com/WordPress/gutenberg/pull/29182)).
+
+### Enhancements
+
+-   The bundled `webpack` dependency has been updated from requiring `4.42.0` to requiring `^4.46.0` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+
 ## 14.1.0 (2021-04-06)
 
 ### Enhancements

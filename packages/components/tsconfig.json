@@ -10,6 +10,7 @@
 		{ "path": "../element" },
 		{ "path": "../hooks" },
 		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" },
 		{ "path": "../primitives" },
 		{ "path": "../react-i18n" }
 	],

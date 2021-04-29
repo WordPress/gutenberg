@@ -45,14 +45,10 @@ function useInsertionPoint( {
 	onSelect,
 	shouldFocusBlock = true,
 } ) {
-	const {
-		destinationRootClientId,
-		destinationIndex,
-		getSelectedBlock,
-	} = useSelect(
+	const { getSelectedBlock } = useSelect( blockEditorStore );
+	const { destinationRootClientId, destinationIndex } = useSelect(
 		( select ) => {
 			const {
-				getSelectedBlock: _getSelectedBlock,
 				getBlockIndex,
 				getBlockOrder,
 				getBlockInsertionPoint,
@@ -90,7 +86,6 @@ function useInsertionPoint( {
 			}
 
 			return {
-				getSelectedBlock: _getSelectedBlock,
 				destinationRootClientId: _destinationRootClientId,
 				destinationIndex: _destinationIndex,
 			};

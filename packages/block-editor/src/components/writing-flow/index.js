@@ -32,11 +32,16 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { isInSameBlock, getBlockClientId } from '../../utils/dom';
-import FocusCapture from './focus-capture';
 import useMultiSelection from './use-multi-selection';
 import { store as blockEditorStore } from '../../store';
 
 export const SelectionStart = createContext();
+
+/**
+ * Useful for positioning an element within the viewport so focussing the
+ * element does not scroll the page.
+ */
+const PREVENT_SCROLL_ON_FOCUS = { position: 'fixed' };
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -159,6 +164,7 @@ function selector( select ) {
 		getBlockSelectionStart,
 		isMultiSelecting,
 		getSettings,
+		isNavigationMode,
 	} = select( blockEditorStore );
 
 	const selectedBlockClientId = getSelectedBlockClientId();
@@ -184,6 +190,7 @@ function selector( select ) {
 		blockSelectionStart: getBlockSelectionStart(),
 		isMultiSelecting: isMultiSelecting(),
 		keepCaretInsideBlock: getSettings().keepCaretInsideBlock,
+		isNavigationMode: isNavigationMode(),
 	};
 }
 
@@ -225,6 +232,7 @@ export default function WritingFlow( { children } ) {
 		blockSelectionStart,
 		isMultiSelecting,
 		keepCaretInsideBlock,
+		isNavigationMode,
 	} = useSelect( selector, [] );
 	const { multiSelect, selectBlock, setNavigationMode } = useDispatch(
 		blockEditorStore
@@ -534,19 +542,40 @@ export default function WritingFlow( { children } ) {
 		};
 	}, [] );
 
+	function onFocusCapture( event ) {
+		// Do not capture incoming focus if set by us in WritingFlow.
+		if ( noCapture.current ) {
+			noCapture.current = null;
+		} else if ( hasMultiSelection ) {
+			multiSelectionContainer.current.focus();
+		} else if ( selectedBlockClientId ) {
+			lastFocus.current.focus();
+		} else {
+			setNavigationMode( true );
+
+			const isBefore =
+				// eslint-disable-next-line no-bitwise
+				event.target.compareDocumentPosition( container.current ) &
+				event.target.DOCUMENT_POSITION_FOLLOWING;
+			const action = isBefore ? 'findNext' : 'findPrevious';
+
+			focus.tabbable[ action ]( event.target ).focus();
+		}
+	}
+
+	// Don't allow tabbing to this element in Navigation mode.
+	const focusCaptureTabIndex = ! isNavigationMode ? '0' : undefined;
+
 	// Disable reason: Wrapper itself is non-interactive, but must capture
 	// bubbling events from children to determine focus transition intents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<SelectionStart.Provider value={ onSelectionStart }>
-			<FocusCapture
+			<div
 				ref={ focusCaptureBeforeRef }
-				selectedClientId={ selectedBlockClientId }
-				containerRef={ container }
-				noCapture={ noCapture }
-				lastFocus={ lastFocus }
-				hasMultiSelection={ hasMultiSelection }
-				multiSelectionContainer={ multiSelectionContainer }
+				tabIndex={ focusCaptureTabIndex }
+				onFocus={ onFocusCapture }
+				style={ PREVENT_SCROLL_ON_FOCUS }
 			/>
 			<div
 				ref={ multiSelectionContainer }
@@ -556,9 +585,7 @@ export default function WritingFlow( { children } ) {
 						? __( 'Multiple selected blocks' )
 						: undefined
 				}
-				// Needs to be positioned within the viewport, so focus to this
-				// element does not scroll the page.
-				style={ { position: 'fixed' } }
+				style={ PREVENT_SCROLL_ON_FOCUS }
 				onKeyDown={ onMultiSelectKeyDown }
 			/>
 			<div
@@ -569,15 +596,11 @@ export default function WritingFlow( { children } ) {
 			>
 				{ children }
 			</div>
-			<FocusCapture
+			<div
 				ref={ focusCaptureAfterRef }
-				selectedClientId={ selectedBlockClientId }
-				containerRef={ container }
-				noCapture={ noCapture }
-				lastFocus={ lastFocus }
-				hasMultiSelection={ hasMultiSelection }
-				multiSelectionContainer={ multiSelectionContainer }
-				isReverse
+				tabIndex={ focusCaptureTabIndex }
+				onFocus={ onFocusCapture }
+				style={ PREVENT_SCROLL_ON_FOCUS }
 			/>
 		</SelectionStart.Provider>
 	);

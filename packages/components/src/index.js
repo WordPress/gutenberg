@@ -48,15 +48,8 @@ export { default as __experimentalDimensionControl } from './dimension-control';
 export { default as Disabled } from './disabled';
 export { DisclosureContent as __unstableDisclosureContent } from './disclosure';
 export { default as Draggable } from './draggable';
-export {
-	default as DropZone,
-	useDropZone as __unstableUseDropZone,
-} from './drop-zone';
-export {
-	default as DropZoneProvider,
-	DropZoneContextProvider as __unstableDropZoneContextProvider,
-	useDrop as __unstableUseDrop,
-} from './drop-zone/provider';
+export { default as DropZone } from './drop-zone';
+export { default as DropZoneProvider } from './drop-zone/provider';
 export { default as Dropdown } from './dropdown';
 export { default as DropdownMenu } from './dropdown-menu';
 export { default as ExternalLink } from './external-link';
@@ -139,6 +132,7 @@ export {
 	Provider as SlotFillProvider,
 	useSlot as __experimentalUseSlot,
 } from './slot-fill';
+export { default as __experimentalStyleProvider } from './style-provider';
 
 // Higher-Order Components
 export {

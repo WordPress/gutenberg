@@ -21,7 +21,6 @@ function gutenberg_reregister_core_block_types() {
 				'code',
 				'column',
 				'columns',
-				'file',
 				'gallery',
 				'group',
 				'heading',
@@ -53,6 +52,7 @@ function gutenberg_reregister_core_block_types() {
 				'calendar.php'                  => 'core/calendar',
 				'categories.php'                => 'core/categories',
 				'cover.php'                     => 'core/cover',
+				'file.php'                      => 'core/file',
 				'latest-comments.php'           => 'core/latest-comments',
 				'latest-posts.php'              => 'core/latest-posts',
 				'legacy-widget.php'             => 'core/legacy-widget',
@@ -73,6 +73,7 @@ function gutenberg_reregister_core_block_types() {
 				'post-comments.php'             => 'core/post-comments',
 				'post-comments-count.php'       => 'core/post-comments-count',
 				'post-comments-form.php'        => 'core/post-comments-form',
+				'post-comments-link.php'        => 'core/post-comments-link',
 				'post-content.php'              => 'core/post-content',
 				'post-date.php'                 => 'core/post-date',
 				'post-excerpt.php'              => 'core/post-excerpt',
@@ -380,7 +381,7 @@ add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
  * Checks whether the current block type supports the feature requested.
  *
  * @param WP_Block_Type $block_type Block type to check for support.
- * @param string        $feature    Name of the feature to check support for.
+ * @param array         $feature    Path of the feature to check support for.
  * @param mixed         $default    Fallback value for feature support, defaults to false.
  *
  * @return boolean                  Whether or not the feature is supported.
