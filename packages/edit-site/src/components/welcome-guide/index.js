@@ -8,9 +8,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-/**
- * Internal dependencies
- */
 import { DocumentationImage } from './images';
 import { store as editSiteStore } from '../../store';
 
