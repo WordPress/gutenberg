@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Animated, View } from 'react-native';
+import { Animated, Dimensions, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -17,59 +17,56 @@ import BlocksTypesTab from './blocks-types-tab';
 import ReusableBlocksTab from './reusable-blocks-tab';
 import styles from './style.scss';
 
-function InserterTab( {
-	index,
-	opacityAnimation,
-	selected,
-	tabProps,
-	tabComponent,
-} ) {
-	const tabKeys = [ ...InserterTabs.TABS.keys() ];
-	const opacity = opacityAnimation.interpolate( {
-		inputRange: tabKeys,
-		outputRange: tabKeys.map( ( key ) => ( key === index ? 1 : 0 ) ),
-	} );
-
-	return (
-		<Animated.View
-			pointerEvents={ selected ? 'auto' : 'none' }
-			style={ [ styles[ 'inserter-tabs__item' ], { opacity } ] }
-		>
-			{ tabComponent( tabProps ) }
-		</Animated.View>
-	);
-}
+const TAB_ANIMATION_DURATION = 250;
 
 function InserterTabs( { rootClientId, tabIndex, onSelect, listProps } ) {
-	const opacity = useRef( new Animated.Value( 0 ) ).current;
+	const tabAnimation = useRef( new Animated.Value( 0 ) ).current;
 
 	useEffect( () => {
-		Animated.timing( opacity, {
-			duration: 250,
+		Animated.timing( tabAnimation, {
+			duration: TAB_ANIMATION_DURATION,
 			toValue: tabIndex,
 			useNativeDriver: true,
 		} ).start();
 	}, [ tabIndex ] );
 
-	const tabProps = {
-		rootClientId,
-		onSelect,
-		listProps,
-	};
+	const { width } = Dimensions.get( 'window' );
+	const tabKeys = useMemo( () => [ ...InserterTabs.TABS.keys() ], [] );
+	const translateX = useMemo(
+		() =>
+			tabAnimation.interpolate( {
+				inputRange: tabKeys,
+				outputRange: tabKeys.map( ( key ) => key * -width ),
+			} ),
+		[ tabAnimation ]
+	);
 
 	return (
-		<View style={ styles[ 'inserter-tabs__container' ] }>
+		<Animated.View
+			style={ [
+				styles[ 'inserter-tabs__container' ],
+				{
+					width: width * tabKeys.length,
+					transform: [ { translateX } ],
+				},
+			] }
+		>
 			{ InserterTabs.TABS.map( ( tab, index ) => (
-				<InserterTab
-					key={ tab.name }
-					index={ index }
-					opacityAnimation={ opacity }
-					selected={ tabIndex === index }
-					tabComponent={ tab.component }
-					tabProps={ tabProps }
-				/>
+				<View
+					key={ `tab-${ index }` }
+					style={ [
+						styles[ 'inserter-tabs__item' ],
+						{ left: index * width },
+					] }
+				>
+					{ tab.component( {
+						rootClientId,
+						onSelect,
+						listProps,
+					} ) }
+				</View>
 			) ) }
-		</View>
+		</Animated.View>
 	);
 }
 
