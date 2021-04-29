@@ -11,6 +11,10 @@
 
 -   Added new `startResolutions` and `finishResolutions` actions as batched variants of `startResolution` and `finishResolutions` actions.
 
+### Enhancements
+
+-   Updated `redux` dependency from requiring `^4.0.0` to `^4.1.0` (see changes at https://github.com/reduxjs/redux/releases/tag/v4.1.0).
+
 ## 4.27.0 (2021-03-17)
 
 ### New Features
