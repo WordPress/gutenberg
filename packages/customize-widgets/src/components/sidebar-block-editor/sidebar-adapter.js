@@ -1,3 +1,8 @@
+/**
+ * Internal dependencies
+ */
+import { settingIdToWidgetId } from '../../utils';
+
 const { wp } = window;
 
 function parseWidgetId( widgetId ) {
@@ -22,31 +27,10 @@ function widgetIdToSettingId( widgetId ) {
 	return `widget_${ idBase }`;
 }
 
-function parseSettingId( settingId ) {
-	const matches = settingId.match( /^widget_(.+)(?:\[(\d+)\])$/ );
-	if ( matches ) {
-		return {
-			idBase: matches[ 1 ],
-			number: parseInt( matches[ 2 ], 10 ),
-		};
-	}
-
-	return { idBase: settingId };
-}
-
-function settingIdToWidgetId( settingId ) {
-	const { idBase, number } = parseSettingId( settingId );
-	if ( number ) {
-		return `${ idBase }-${ number }`;
-	}
-
-	return idBase;
-}
-
 export default class SidebarAdapter {
-	constructor( setting, allSettings ) {
+	constructor( setting, api ) {
 		this.setting = setting;
-		this.allSettings = allSettings;
+		this.api = api;
 
 		this.locked = false;
 		this.widgetsCache = new WeakMap();
@@ -72,19 +56,19 @@ export default class SidebarAdapter {
 	subscribe( callback ) {
 		if ( ! this.subscribers.size ) {
 			this.setting.bind( this._handleSettingChange );
-			this.allSettings.bind( 'change', this._handleAllSettingsChange );
+			this.api.bind( 'change', this._handleAllSettingsChange );
 		}
 
 		this.subscribers.add( callback );
-	}
 
-	unsubscribe( callback ) {
-		this.subscribers.delete( callback );
+		return () => {
+			this.subscribers.delete( callback );
 
-		if ( ! this.subscribers.size ) {
-			this.setting.unbind( this._handleSettingChange );
-			this.allSettings.unbind( 'change', this._handleAllSettingsChange );
-		}
+			if ( ! this.subscribers.size ) {
+				this.setting.bind( this._handleSettingChange );
+				this.api.bind( 'change', this._handleAllSettingsChange );
+			}
+		};
 	}
 
 	getWidgets() {
@@ -170,7 +154,7 @@ export default class SidebarAdapter {
 				: 'refresh',
 			previewer: this.setting.previewer,
 		};
-		const setting = this.allSettings.create(
+		const setting = this.api.create(
 			settingId,
 			settingId,
 			'',
@@ -203,7 +187,7 @@ export default class SidebarAdapter {
 			prevWidget.idBase === widget.idBase
 		) {
 			const settingId = widgetIdToSettingId( widget.id );
-			this.allSettings( settingId ).set( widget.instance );
+			this.api( settingId ).set( widget.instance );
 			return widget.id;
 		}
 
@@ -219,7 +203,7 @@ export default class SidebarAdapter {
 
 		const { idBase, number } = parseWidgetId( widgetId );
 		const settingId = widgetIdToSettingId( widgetId );
-		const setting = this.allSettings( settingId );
+		const setting = this.api( settingId );
 
 		if ( ! setting ) {
 			return null;
