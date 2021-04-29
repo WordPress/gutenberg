@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 15.0.0 (2021-04-29)
+
 ### Breaking Changes
 
 -   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
