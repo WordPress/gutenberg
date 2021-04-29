@@ -25,6 +25,7 @@ import Form from './form';
 import Preview from './preview';
 import NoPreview from './no-preview';
 import useForm from './use-form';
+import ConvertToBlocksButton from './convert-to-blocks-button';
 
 export default function Edit( props ) {
 	const { id, idBase } = props.attributes;
@@ -76,6 +77,7 @@ function Empty( { attributes: { id, idBase }, setAttributes } ) {
 function NotEmpty( {
 	attributes: { id, idBase, instance },
 	setAttributes,
+	clientId,
 	isSelected,
 } ) {
 	const {
@@ -147,6 +149,15 @@ function NotEmpty( {
 								instance: null,
 							} )
 						}
+					/>
+				</BlockControls>
+			) }
+
+			{ idBase === 'text' && (
+				<BlockControls group="other">
+					<ConvertToBlocksButton
+						clientId={ clientId }
+						rawInstance={ instance.raw }
 					/>
 				</BlockControls>
 			) }
