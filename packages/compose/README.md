@@ -81,39 +81,44 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
+-   _mapComponentToEnhancedComponent_ `HigherOrderComponent< TInnerProps, TOuterProps >`: Function mapping component to enhanced component.
 -   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
 
--   `WPComponent`: Component class with generated display name assigned.
+-   `HigherOrderComponent< TInnerProps, TOuterProps >`: Component class with generated display name assigned.
 
 <a name="ifCondition" href="#ifCondition">#</a> **ifCondition**
 
 Higher-order component creator, creating a new component which renders if
 the given condition is satisfied or with the given optional prop name.
 
+_Usage_
+
+```ts
+type Props = { foo: string };
+const Component = ( props: Props ) => <div>{ props.foo }</div>;
+const ConditionalComponent = ifCondition( ( props: Props ) => props.foo.length !== 0 )( Component );
+<ConditionalComponent foo="" />; // => null
+<ConditionalComponent foo="bar" />; // => <div>bar</div>;
+```
+
 _Parameters_
 
--   _predicate_ `Function`: Function to test condition.
+-   _predicate_ `( props: TProps ) => boolean`: Function to test condition.
 
 _Returns_
 
--   `Function`: Higher-order component.
+-   `HigherOrderComponent< TProps, TProps >`: Higher-order component.
 
 <a name="pure" href="#pure">#</a> **pure**
 
 Given a component returns the enhanced component augmented with a component
 only rerendering when its props/state change
 
-_Parameters_
+_Type_
 
--   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
--   _modifierName_ `string`: Seed name from which to generated display name.
-
-_Returns_
-
--   `WPComponent`: Component class with generated display name assigned.
+-   `SimpleHigherOrderComponent`
 
 <a name="useAsyncList" href="#useAsyncList">#</a> **useAsyncList**
 

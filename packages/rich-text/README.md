@@ -312,7 +312,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="toggleFormat" href="#toggleFormat">#</a> **toggleFormat**
 

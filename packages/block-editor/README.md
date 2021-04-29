@@ -541,7 +541,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="storeConfig" href="#storeConfig">#</a> **storeConfig**
 
@@ -553,7 +553,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="ToolSelector" href="#ToolSelector">#</a> **ToolSelector**
 
