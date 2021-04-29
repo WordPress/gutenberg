@@ -279,6 +279,10 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return nil
     }
 
+    func gutenbergFeaturedImageId() -> NSNumber? {
+        return nil
+    }
+
     func gutenbergCapabilities() -> [Capabilities : Bool] {
         return [
             .mentions: true,
