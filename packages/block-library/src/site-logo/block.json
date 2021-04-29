@@ -11,7 +11,7 @@
 		},
 		"isLink": {
 			"type": "boolean",
-			"default": false
+			"default": true
 		},
 		"linkTarget": {
 			"type": "string",
