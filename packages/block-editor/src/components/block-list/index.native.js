@@ -323,22 +323,24 @@ export class BlockList extends Component {
 		} = this.props;
 		const { blockWidth } = this.state;
 		return (
-			<BlockListItem
-				isStackedHorizontally={ isStackedHorizontally }
-				rootClientId={ rootClientId }
-				clientId={ clientId }
-				parentWidth={ parentWidth }
-				contentResizeMode={ contentResizeMode }
-				contentStyle={ contentStyle }
-				onAddBlock={ onAddBlock }
-				marginVertical={ marginVertical }
-				marginHorizontal={ marginHorizontal }
-				onDeleteBlock={ onDeleteBlock }
-				shouldShowInnerBlockAppender={
-					this.shouldShowInnerBlockAppender
-				}
-				blockWidth={ blockWidth }
-			/>
+			<View style={ { flex: 1 } }>
+				<BlockListItem
+					isStackedHorizontally={ isStackedHorizontally }
+					rootClientId={ rootClientId }
+					clientId={ clientId }
+					parentWidth={ parentWidth }
+					contentResizeMode={ contentResizeMode }
+					contentStyle={ contentStyle }
+					onAddBlock={ onAddBlock }
+					marginVertical={ marginVertical }
+					marginHorizontal={ marginHorizontal }
+					onDeleteBlock={ onDeleteBlock }
+					shouldShowInnerBlockAppender={
+						this.shouldShowInnerBlockAppender
+					}
+					blockWidth={ blockWidth }
+				/>
+			</View>
 		);
 	}
 
