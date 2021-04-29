@@ -135,6 +135,12 @@ async function downloadGitSource( source, { onProgress, spinner, debug } ) {
 	log( 'Checking out the specified ref.' );
 	await git.checkout( source.ref );
 
+	const { detached, current } = await git.branch();
+	if ( ! detached && current ) {
+		log( "Running git pull since we're on a branch." );
+		await git.pull();
+	}
+
 	onProgress( 1 );
 }
 
