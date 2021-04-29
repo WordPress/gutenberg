@@ -1,8 +1,10 @@
-# Themes & Block Editor: experimental theme.json
+# Global Settings (theme.json)
 
-> **These features are still experimental**. “Experimental” means this is an early implementation subject to drastic and breaking changes.
->
-> Documentation has been shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. Please, be welcomed to share yours in the weekly #core-editor chats as well as async via the Github issues and Pull Requests.
+<div class="callout callout-alert">
+These features are still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+
+Documentation has been shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. Please share your feedback in the weekly #core-editor or #fse-outreach-experiment channels in Slack, or async in GitHub issues.
+</div>
 
 This is documentation for the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
@@ -58,7 +60,7 @@ There are some areas of styling that would benefit from having shared values tha
 
 To address this need, we've started to experiment with CSS Custom Properties, aka CSS Variables, in some places:
 
--   **Presets**: [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), or [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) declared by the theme are converted to CSS Custom Properties and enqueued both the front-end and the editors.
+-   **Presets**: [color palettes](/docs/how-to-guides/themes/theme-support.md#block-color-palettes), [font sizes](/docs/how-to-guides/themes/theme-support.md#block-font-sizes), or [gradients](/docs/how-to-guides/themes/theme-support.md#block-gradient-presets) declared by the theme are converted to CSS Custom Properties and enqueued both the front-end and the editors.
 
 {% codetabs %}
 {% Input %}
@@ -186,6 +188,7 @@ The settings section has the following structure and default values:
       "color": {
         "custom": true, /* false to opt-out, as in add_theme_support('disable-custom-colors') */
         "customGradient": true, /* false to opt-out, as in add_theme_support('disable-custom-gradients') */
+        "duotone": [ ... ], /* duotone presets, a list of { "colors": [ "#000", "#FFF" ], "slug": "black-and-white", "name": "Black and White" } */
         "gradients": [ ... ], /* gradient presets, as in add_theme_support('editor-gradient-presets', ... ) */
         "link": false, /* true to opt-in, as in add_theme_support('experimental-link-color') */
         "palette": [ ... ], /* color presets, as in add_theme_support('editor-color-palette', ... ) */

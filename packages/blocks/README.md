@@ -14,7 +14,7 @@ Install the module
 npm install @wordpress/blocks --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Getting Started
 
@@ -708,6 +708,26 @@ _Parameters_
 
 -   _name_ `string`: Block name.
 -   _settings_ `Object`: Block settings.
+
+_Returns_
+
+-   `?WPBlock`: The block, if it has been successfully registered; otherwise `undefined`.
+
+<a name="registerBlockTypeFromMetadata" href="#registerBlockTypeFromMetadata">#</a> **registerBlockTypeFromMetadata**
+
+Registers a new block provided from metadata stored in `block.json` file.
+It uses `registerBlockType` internally.
+
+_Related_
+
+-   registerBlockType
+
+_Parameters_
+
+-   _metadata_ `Object`: Block metadata loaded from `block.json`.
+-   _metadata.name_ `string`: Block name.
+-   _metadata.textdomain_ `string`: Textdomain to use with translations.
+-   _additionalSettings_ `Object`: Additional block settings.
 
 _Returns_
 

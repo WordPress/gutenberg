@@ -227,7 +227,7 @@ describe( 'computeCustomizedAttribute', () => {
 			{
 				attributes: {
 					label: 'wp.com',
-					opensInNewTab: false,
+					opensInNewTab: true,
 					url: 'http://wp.com',
 					className: '',
 					rel: '',
@@ -287,6 +287,7 @@ describe( 'computeCustomizedAttribute', () => {
 				type: 'custom',
 				url: 'http://wp.org',
 				xfn: [ 'external' ],
+				target: '',
 			},
 			'nav_menu_item[101]': {
 				_invalid: false,
@@ -302,6 +303,7 @@ describe( 'computeCustomizedAttribute', () => {
 				type: 'custom',
 				url: 'http://wp.com',
 				xfn: [ '' ],
+				target: '_blank',
 			},
 		} );
 	} );

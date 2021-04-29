@@ -33,6 +33,7 @@ import { applyFilters } from '@wordpress/hooks';
 import {
 	validateThemeColors,
 	validateThemeGradients,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 const postTypeEntities = [
@@ -291,7 +292,7 @@ export default compose( [
 			getBlockIndex,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
@@ -312,7 +313,7 @@ export default compose( [
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
-		} = dispatch( 'core/block-editor' );
+		} = dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
 		const { createSuccessNotice } = dispatch( 'core/notices' );
