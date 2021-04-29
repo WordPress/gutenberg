@@ -490,7 +490,7 @@ function GalleryEdit( props ) {
 							hideCancelButton={ true }
 						/>
 					) }
-					{ ! imageSizeOptions && (
+					{/* { ! imageSizeOptions && (
 						<BaseControl className={ 'gallery-image-sizes' }>
 							<BaseControl.VisualLabel>
 								{ __( 'Image size' ) }
@@ -500,7 +500,7 @@ function GalleryEdit( props ) {
 								{ __( 'Loading options…' ) }
 							</View>
 						</BaseControl>
-					) }
+					) } */}
 				</PanelBody>
 			</InspectorControls>
 			{ noticeUI }
