@@ -245,7 +245,7 @@ export const mapMenuItemFieldToBlockAttribute = function mapMenuItemFieldToBlock
 };
 
 /**
- * Converts a given key in an object to it's mapped equivalent.
+ * Converts a given key in an object to its mapped equivalent.
  *
  * Typically used to convert block attributes to their equivalent menu item fields.
  *
