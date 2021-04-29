@@ -169,10 +169,7 @@ function gutenberg_experimental_global_styles_register_user_cpt() {
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
 add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
-
-// In non-block themes using theme.json, load global styles in the footer.
-$global_styles_register_hook = ! gutenberg_is_fse_theme() ? 'wp_footer' : 'wp_enqueue_scripts';
-add_action( $global_styles_register_hook, 'gutenberg_experimental_global_styles_enqueue_assets' );
+add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 
 
 /**
