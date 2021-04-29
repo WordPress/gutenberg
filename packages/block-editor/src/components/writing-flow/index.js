@@ -144,51 +144,6 @@ export function getClosestTabbable(
 	return find( focusableNodes, isTabCandidate );
 }
 
-function selector( select ) {
-	const {
-		getSelectedBlockClientId,
-		getMultiSelectedBlocksStartClientId,
-		getMultiSelectedBlocksEndClientId,
-		getPreviousBlockClientId,
-		getNextBlockClientId,
-		getFirstMultiSelectedBlockClientId,
-		getLastMultiSelectedBlockClientId,
-		hasMultiSelection,
-		getBlockOrder,
-		isSelectionEnabled,
-		getBlockSelectionStart,
-		isMultiSelecting,
-		getSettings,
-		isNavigationMode,
-	} = select( blockEditorStore );
-
-	const selectedBlockClientId = getSelectedBlockClientId();
-	const selectionStartClientId = getMultiSelectedBlocksStartClientId();
-	const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-	const blocks = getBlockOrder();
-
-	return {
-		selectedBlockClientId,
-		selectionStartClientId,
-		selectionBeforeEndClientId: getPreviousBlockClientId(
-			selectionEndClientId || selectedBlockClientId
-		),
-		selectionAfterEndClientId: getNextBlockClientId(
-			selectionEndClientId || selectedBlockClientId
-		),
-		selectedFirstClientId: getFirstMultiSelectedBlockClientId(),
-		selectedLastClientId: getLastMultiSelectedBlockClientId(),
-		hasMultiSelection: hasMultiSelection(),
-		firstBlock: first( blocks ),
-		lastBlock: last( blocks ),
-		isSelectionEnabled: isSelectionEnabled(),
-		blockSelectionStart: getBlockSelectionStart(),
-		isMultiSelecting: isMultiSelecting(),
-		keepCaretInsideBlock: getSettings().keepCaretInsideBlock,
-		isNavigationMode: isNavigationMode(),
-	};
-}
-
 /**
  * Handles selection and navigation across blocks. This component should be
  * wrapped around BlockList.
@@ -213,22 +168,30 @@ export default function WritingFlow( { children } ) {
 	// browser behaviour across blocks.
 	const verticalRect = useRef();
 
+	const { hasMultiSelection, isMultiSelecting, isNavigationMode } = useSelect(
+		( select ) => {
+			const selectors = select( blockEditorStore );
+			return {
+				hasMultiSelection: selectors.hasMultiSelection(),
+				isMultiSelecting: selectors.isMultiSelecting(),
+				isNavigationMode: selectors.isNavigationMode(),
+			};
+		},
+		[]
+	);
 	const {
-		selectedBlockClientId,
-		selectionStartClientId,
-		selectionBeforeEndClientId,
-		selectionAfterEndClientId,
-		selectedFirstClientId,
-		selectedLastClientId,
-		hasMultiSelection,
-		firstBlock,
-		lastBlock,
+		getSelectedBlockClientId,
+		getMultiSelectedBlocksStartClientId,
+		getMultiSelectedBlocksEndClientId,
+		getPreviousBlockClientId,
+		getNextBlockClientId,
+		getFirstMultiSelectedBlockClientId,
+		getLastMultiSelectedBlockClientId,
+		getBlockOrder,
 		isSelectionEnabled,
-		blockSelectionStart,
-		isMultiSelecting,
-		keepCaretInsideBlock,
-		isNavigationMode,
-	} = useSelect( selector, [] );
+		getBlockSelectionStart,
+		getSettings,
+	} = useSelect( blockEditorStore );
 	const { multiSelect, selectBlock, setNavigationMode } = useDispatch(
 		blockEditorStore
 	);
@@ -238,7 +201,7 @@ export default function WritingFlow( { children } ) {
 
 		// Multi-select blocks when Shift+clicking.
 		if (
-			isSelectionEnabled &&
+			isSelectionEnabled() &&
 			// The main button.
 			// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
 			event.button === 0
@@ -247,6 +210,7 @@ export default function WritingFlow( { children } ) {
 
 			if ( clientId ) {
 				if ( event.shiftKey ) {
+					const blockSelectionStart = getBlockSelectionStart();
 					if ( blockSelectionStart !== clientId ) {
 						multiSelect( blockSelectionStart, clientId );
 						event.preventDefault();
@@ -264,6 +228,15 @@ export default function WritingFlow( { children } ) {
 	}
 
 	function expandSelection( isReverse ) {
+		const selectedBlockClientId = getSelectedBlockClientId();
+		const selectionStartClientId = getMultiSelectedBlocksStartClientId();
+		const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+		const selectionBeforeEndClientId = getPreviousBlockClientId(
+			selectionEndClientId || selectedBlockClientId
+		);
+		const selectionAfterEndClientId = getNextBlockClientId(
+			selectionEndClientId || selectedBlockClientId
+		);
 		const nextSelectionEndClientId = isReverse
 			? selectionBeforeEndClientId
 			: selectionAfterEndClientId;
@@ -277,6 +250,8 @@ export default function WritingFlow( { children } ) {
 	}
 
 	function moveSelection( isReverse ) {
+		const selectedFirstClientId = getFirstMultiSelectedBlockClientId();
+		const selectedLastClientId = getLastMultiSelectedBlockClientId();
 		const focusedBlockClientId = isReverse
 			? selectedFirstClientId
 			: selectedLastClientId;
@@ -337,6 +312,7 @@ export default function WritingFlow( { children } ) {
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 		const { ownerDocument } = container.current;
 		const { defaultView } = ownerDocument;
+		const selectedBlockClientId = getSelectedBlockClientId();
 
 		// In Edit mode, Tab should focus the first tabbable element after the
 		// content, which is normally the sidebar (with block controls) and
@@ -406,7 +382,8 @@ export default function WritingFlow( { children } ) {
 						? entirelySelected.current
 						: isEntirelySelected( target )
 				) {
-					multiSelect( firstBlock, lastBlock );
+					const blocks = getBlockOrder();
+					multiSelect( first( blocks ), last( blocks ) );
 					event.preventDefault();
 				}
 
@@ -433,8 +410,17 @@ export default function WritingFlow( { children } ) {
 		// In the case of RTL scripts, right means previous and left means next,
 		// which is the exact reverse of LTR.
 		const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
+		const { keepCaretInsideBlock } = getSettings();
 
 		if ( isShift ) {
+			const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+			const selectionBeforeEndClientId = getPreviousBlockClientId(
+				selectionEndClientId || selectedBlockClientId
+			);
+			const selectionAfterEndClientId = getNextBlockClientId(
+				selectionEndClientId || selectedBlockClientId
+			);
+
 			if (
 				// Ensure that there is a target block.
 				( ( isReverse && selectionBeforeEndClientId ) ||
@@ -542,7 +528,7 @@ export default function WritingFlow( { children } ) {
 			noCapture.current = null;
 		} else if ( hasMultiSelection ) {
 			multiSelectionContainer.current.focus();
-		} else if ( selectedBlockClientId ) {
+		} else if ( getSelectedBlockClientId() ) {
 			lastFocus.current.focus();
 		} else {
 			setNavigationMode( true );
