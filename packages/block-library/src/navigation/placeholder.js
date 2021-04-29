@@ -1,12 +1,7 @@
 /**
- * External dependencies
- */
-import { some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { createBlock, parse } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import {
 	Button,
 	DropdownMenu,
@@ -29,64 +24,8 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import createDataTree from './create-data-tree';
+import mapMenuItemsToBlocks from './map-menu-items-to-blocks';
 import PlaceholderPreview from './placeholder-preview';
-
-/**
- * A recursive function that maps menu item nodes to blocks.
- *
- * @param {Object[]} menuItems An array of menu items.
- * @return {WPBlock[]} An array of blocks.
- */
-function mapMenuItemsToBlocks( menuItems ) {
-	return menuItems.map( ( menuItem ) => {
-		if ( menuItem.type === 'block' ) {
-			const [ block ] = parse( menuItem.content.raw );
-
-			if ( ! block ) {
-				return createBlock( 'core/freeform', {
-					content: menuItem.content,
-				} );
-			}
-
-			return block;
-		}
-
-		const attributes = {
-			label: ! menuItem.title.rendered
-				? __( '(no title)' )
-				: menuItem.title.rendered,
-			opensInNewTab: menuItem.target === '_blank',
-			type: menuItem?.object,
-			...( menuItem?.object !== 'custom' && {
-				id: menuItem?.object_id,
-			} ),
-			// the equivalent on `nav_menu_item` is "type" but it is stored with underscores whereas the block attr uses hyphens.
-			kind: menuItem.type.replace( '_', '-' ),
-		};
-
-		if ( menuItem.url ) {
-			attributes.url = menuItem.url;
-		}
-
-		if ( menuItem.description ) {
-			attributes.description = menuItem.description;
-		}
-
-		if ( menuItem.xfn?.length && some( menuItem.xfn ) ) {
-			attributes.rel = menuItem.xfn.join( ' ' );
-		}
-
-		if ( menuItem.classes?.length && some( menuItem.classes ) ) {
-			attributes.className = menuItem.classes.join( ' ' );
-		}
-
-		const innerBlocks = menuItem.children?.length
-			? mapMenuItemsToBlocks( menuItem.children )
-			: [];
-
-		return createBlock( 'core/navigation-link', attributes, innerBlocks );
-	} );
-}
 
 /**
  * Convert a flat menu item structure to a nested blocks structure.
