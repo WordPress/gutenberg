@@ -1,18 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { getBlockSupport } from '@wordpress/blocks';
+import { PanelBody } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+import { getBlockSupport } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
+import InspectorControls from '../components/inspector-controls';
 import {
 	PaddingEdit,
 	hasPaddingSupport,
 	useIsPaddingDisabled,
 } from './padding';
-import SpacingPanelControl from '../components/spacing-panel-control';
 
 export const SPACING_SUPPORT_KEY = 'spacing';
 
@@ -31,9 +33,11 @@ export function SpacingPanel( props ) {
 	}
 
 	return (
-		<SpacingPanelControl key="spacing">
-			<PaddingEdit { ...props } />
-		</SpacingPanelControl>
+		<InspectorControls key="spacing">
+			<PanelBody title={ __( 'Spacing' ) }>
+				<PaddingEdit { ...props } />
+			</PanelBody>
+		</InspectorControls>
 	);
 }
 
