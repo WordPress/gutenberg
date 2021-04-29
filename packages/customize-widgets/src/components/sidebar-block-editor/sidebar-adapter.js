@@ -43,10 +43,9 @@ export default class SidebarAdapter {
 		];
 		this.historyIndex = 0;
 
-		this._handleSettingChange = this._handleSettingChange.bind( this );
-		this._handleAllSettingsChange = this._handleAllSettingsChange.bind(
-			this
-		);
+		this.setting.bind( this._handleSettingChange.bind( this ) );
+		this.api.bind( 'change', this._handleAllSettingsChange.bind( this ) );
+
 		this.canUndo = this.canUndo.bind( this );
 		this.canRedo = this.canRedo.bind( this );
 		this.undo = this.undo.bind( this );
@@ -54,20 +53,10 @@ export default class SidebarAdapter {
 	}
 
 	subscribe( callback ) {
-		if ( ! this.subscribers.size ) {
-			this.setting.bind( this._handleSettingChange );
-			this.api.bind( 'change', this._handleAllSettingsChange );
-		}
-
 		this.subscribers.add( callback );
 
 		return () => {
 			this.subscribers.delete( callback );
-
-			if ( ! this.subscribers.size ) {
-				this.setting.bind( this._handleSettingChange );
-				this.api.bind( 'change', this._handleAllSettingsChange );
-			}
 		};
 	}
 

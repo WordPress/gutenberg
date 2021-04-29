@@ -8,19 +8,20 @@ import { useState, useEffect, createPortal } from '@wordpress/element';
  */
 import SidebarBlockEditor from '../sidebar-block-editor';
 import FocusControl from '../focus-control';
+import SidebarControls from '../sidebar-controls';
 
 export default function CustomizeWidgets( {
 	api,
 	sidebarControls,
 	blockEditorSettings,
 } ) {
-	const [ activeSidebar, setActiveSidebar ] = useState( null );
+	const [ activeSidebarControl, setActiveSidebarControl ] = useState( null );
 
 	useEffect( () => {
 		const unsubscribers = sidebarControls.map( ( sidebarControl ) =>
 			sidebarControl.subscribe( ( expanded ) => {
 				if ( expanded ) {
-					setActiveSidebar( sidebarControl );
+					setActiveSidebarControl( sidebarControl );
 				}
 			} )
 		);
@@ -30,21 +31,27 @@ export default function CustomizeWidgets( {
 		};
 	}, [ sidebarControls ] );
 
-	const sidebar =
-		activeSidebar &&
+	const activeSidebar =
+		activeSidebarControl &&
 		createPortal(
 			<SidebarBlockEditor
+				key={ activeSidebarControl.id }
 				blockEditorSettings={ blockEditorSettings }
-				sidebar={ activeSidebar.sidebarAdapter }
-				inserter={ activeSidebar.inserter }
-				inspector={ activeSidebar.inspector }
+				sidebar={ activeSidebarControl.sidebarAdapter }
+				inserter={ activeSidebarControl.inserter }
+				inspector={ activeSidebarControl.inspector }
 			/>,
-			activeSidebar.container[ 0 ]
+			activeSidebarControl.container[ 0 ]
 		);
 
 	return (
-		<FocusControl api={ api } sidebarControls={ sidebarControls }>
-			{ sidebar }
-		</FocusControl>
+		<SidebarControls
+			sidebarControls={ sidebarControls }
+			activeSidebarControl={ activeSidebarControl }
+		>
+			<FocusControl api={ api } sidebarControls={ sidebarControls }>
+				{ activeSidebar }
+			</FocusControl>
+		</SidebarControls>
 	);
 }
