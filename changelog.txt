@@ -1,5 +1,22 @@
 == Changelog ==
 
+= 10.5.1 =
+
+
+
+### Bug Fixes
+
+- Plugin: Fix "Undefined variable: $image_default_size". ([31324](https://github.com/WordPress/gutenberg/pull/31324))
+- Select mode: Fix navigate by pointer. ([31321](https://github.com/WordPress/gutenberg/pull/31321))
+- Fix Inserter Drag and Drop. ([31319](https://github.com/WordPress/gutenberg/pull/31319))
+
+### Code Quality
+
+- Plugin: Unregister only registered block patterns. ([31325](https://github.com/WordPress/gutenberg/pull/31325))
+
+
+
+
 = 10.5.0 =
 
 ### Enhancements
