@@ -221,7 +221,10 @@ add_action(
 		}
 
 		foreach ( $core_block_patterns as $core_block_pattern ) {
-			unregister_block_pattern( 'core/' . $core_block_pattern );
+			$name = 'core/' . $core_block_pattern;
+			if ( WP_Block_Patterns_Registry::get_instance()->is_registered( $name ) ) {
+				unregister_block_pattern( $name );
+			}
 		}
 
 		foreach ( $new_core_block_patterns as $core_block_pattern ) {
