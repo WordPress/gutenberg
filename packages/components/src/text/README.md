@@ -7,7 +7,7 @@
 `Text` can be used to render any text-content, like an HTML `p` or `span`.
 
 ```jsx
-import { Text } from '@wordpress/components';
+import { __experimentalText as Text } from '@wordpress/components';
 
 function Example() {
 	return <Text>Code is Poetry</Text>;
@@ -16,7 +16,7 @@ function Example() {
 
 ## Props
 
-##### adjustLineHeightForInnerControls
+### adjustLineHeightForInnerControls
 
 **Type**: `boolean`,`"large"`,`"medium"`,`"small"`,`"xSmall"`
 
@@ -35,9 +35,9 @@ function Example() {
 }
 ```
 
-##### align
+### align
 
-**Type**: `CSS['textAlign']`
+**Type**: `CSSProperties['textAlign']`
 
 Adjusts the text alignment.
 
@@ -53,25 +53,25 @@ function Example() {
 }
 ```
 
-##### color
+### color
 
-**Type**: `CSS['color']`
+**Type**: `CSSProperties['color']`
 
 Adjusts the text color.
 
-##### display
+### display
 
-**Type**: `CSS['display']`
+**Type**: `CSSProperties['display']`
 
 Adjusts the CSS display.
 
-##### ellipsis
+### ellipsis
 
 **Type**: `string`
 
 The ellipsis string when `truncate` is set.
 
-##### ellipsizeMode
+### ellipsizeMode
 
 **Type**: `"auto"`,`"head"`,`"tail"`,`"middle"`
 
@@ -82,25 +82,25 @@ Determines where to truncate. For example, we can truncate text right in the mid
 -   `middle`: Trims content in the middle. Requires a `limit`.
 -   `tail`: Trims content at the end. Requires a `limit`.
 
-##### highlightCaseSensitive
+### highlightCaseSensitive
 
 **Type**: `boolean`
 
 Escape characters in `highlightWords` which are meaningful in regular expressions.
 
-##### highlightEscape
+### highlightEscape
 
 **Type**: `boolean`
 
 Determines if `highlightWords` should be case sensitive.
 
-##### highlightSanitize
+### highlightSanitize
 
 **Type**: `boolean`
 
 Array of search words. String search terms are automatically cast to RegExps unless `highlightEscape` is true.
 
-##### highlightWords
+### highlightWords
 
 **Type**: `any[]`
 
@@ -122,39 +122,39 @@ function Example() {
 }
 ```
 
-##### isBlock
+### isBlock
 
 **Type**: `boolean`
 
 Sets `Text` to have `display: block`.
 
-##### isDestructive
+### isDestructive
 
 **Type**: `boolean`
 
 Renders a destructive color.
 
-##### limit
+### limit
 
 **Type**: `number`
 
 Determines the max characters when `truncate` is set.
 
-##### lineHeight
+### lineHeight
 
-**Type**: `CSS['lineHeight']`
+**Type**: `CSSProperties['lineHeight']`
 
 Adjusts all text line-height based on the typography system.
 
-##### numberOfLines
+### numberOfLines
 
 **Type**: `number`
 
 Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` at the end.
 
-##### optimizeReadabilityFor
+### optimizeReadabilityFor
 
-**Type**: `CSS['color']`
+**Type**: `CSSProperties['color']`
 
 The `Text` color can be adapted to a background color for optimal readability. `optimizeReadabilityFor` can accept CSS variables, in addition to standard CSS color values (e.g. Hex, RGB, HSL, etc...).
 
@@ -174,9 +174,9 @@ function Example() {
 }
 ```
 
-##### size
+### size
 
-**Type**: `CSS['fontSize']`,`TextSize`
+**Type**: `CSSProperties['fontSize']`,`TextSize`
 
 Adjusts text size based on the typography system. `Text` can render a wide range of font sizes, which are automatically calculated and adapted to the typography system. The `size` value can be a system preset, a `number`, or a custom unit value (`string`) such as `30em`.
 
@@ -188,7 +188,7 @@ function Example() {
 }
 ```
 
-##### truncate
+### truncate
 
 **Type**: `boolean`
 
@@ -210,13 +210,13 @@ function Example() {
 }
 ```
 
-##### upperCase
+### upperCase
 
 **Type**: `boolean`
 
 Uppercases the text content.
 
-##### variant
+### variant
 
 **Type**: `"muted"`
 
@@ -230,8 +230,8 @@ function Example() {
 }
 ```
 
-##### weight
+### weight
 
-**Type**: `CSS['fontWeight']`,`TextWeight`
+**Type**: `CSSProperties['fontWeight']`,`TextWeight`
 
 Adjusts font-weight of the text.
