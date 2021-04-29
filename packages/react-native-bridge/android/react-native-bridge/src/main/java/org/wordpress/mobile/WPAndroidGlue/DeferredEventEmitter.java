@@ -10,6 +10,7 @@ import com.facebook.react.bridge.WritableNativeMap;
 
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaUploadEventEmitter;
 import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.MediaSaveEventEmitter;
+import org.wordpress.mobile.ReactNativeGutenbergBridge.GutenbergBridgeJS2Parent.FeaturedImageEmitter;
 
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -18,8 +19,9 @@ import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGuten
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_NEW_ID;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FILE_UPLOAD_MEDIA_URL;
 import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_MEDIA_FINAL_SAVE_RESULT_SUCCESS_VALUE;
+import static org.wordpress.mobile.ReactNativeGutenbergBridge.RNReactNativeGutenbergBridgeModule.MAP_KEY_FEATURED_IMAGE_ID;
 
-public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveEventEmitter {
+public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveEventEmitter, FeaturedImageEmitter {
     public interface JSEventEmitter {
         void emitToJS(String eventName, @Nullable WritableMap data);
     }
@@ -39,6 +41,8 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
     private static final String EVENT_NAME_MEDIA_UPLOAD = "mediaUpload";
     private static final String EVENT_NAME_MEDIA_SAVE = "mediaSave";
     private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
+
+    private static final String EVENT_FEATURED_IMAGE_ID_NATIVE_UPDATED = "featuredImageIdNativeUpdated";
 
     private static final String MAP_KEY_MEDIA_FILE_STATE = "state";
     private static final String MAP_KEY_MEDIA_FILE_MEDIA_ACTION_PROGRESS = "progress";
@@ -203,6 +207,12 @@ public class DeferredEventEmitter implements MediaUploadEventEmitter, MediaSaveE
         } else {
             emitOrDrop(EVENT_NAME_MEDIA_SAVE, writableMap);
         }
+    }
+
+    public void sendToJSFeaturedImageId(int mediaId) {
+        WritableMap writableMap = new WritableNativeMap();
+        writableMap.putInt(MAP_KEY_FEATURED_IMAGE_ID, mediaId);
+        queueActionToJS(EVENT_FEATURED_IMAGE_ID_NATIVE_UPDATED, writableMap);
     }
 
     @Override public void onReplaceMediaFilesEditedBlock(String mediaFiles, String blockId) {

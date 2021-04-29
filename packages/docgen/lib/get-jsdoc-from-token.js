@@ -26,6 +26,7 @@ module.exports = ( token ) => {
 		} )[ 0 ];
 		if ( jsdoc ) {
 			let paramCount = 0;
+
 			jsdoc.tags = jsdoc.tags.map( ( tag ) => {
 				const isUnqualifiedParam =
 					tag.tag === 'param' && ! tag.name.includes( '.' );
@@ -40,6 +41,20 @@ module.exports = ( token ) => {
 							: tag.description,
 				};
 			} );
+
+			if ( jsdoc.tags.length === 0 ) {
+				const potentialTypeAnnotation = getTypeAnnotation(
+					{ tag: 'type' },
+					token,
+					0
+				);
+				if ( potentialTypeAnnotation !== '' ) {
+					jsdoc.tags.push( {
+						tag: 'type',
+						type: potentialTypeAnnotation,
+					} );
+				}
+			}
 		}
 	}
 	return jsdoc;

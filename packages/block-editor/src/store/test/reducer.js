@@ -29,10 +29,10 @@ import {
 	preferences,
 	blocksMode,
 	insertionPoint,
-	insertionPointVisibility,
 	template,
 	blockListSettings,
 	lastBlockAttributesChange,
+	lastBlockInserted,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -2040,82 +2040,35 @@ describe( 'state', () => {
 	} );
 
 	describe( 'insertionPoint', () => {
-		it( 'defaults to `null`', () => {
+		it( 'should default to null', () => {
 			const state = insertionPoint( undefined, {} );
 
-			expect( state ).toEqual( null );
+			expect( state ).toBe( null );
 		} );
 
-		it.each( [ 'SET_INSERTION_POINT', 'SHOW_INSERTION_POINT' ] )(
-			'sets the insertion point on %s',
-			( type ) => {
-				const original = deepFreeze( {
-					rootClientId: 'clientId1',
-					index: 0,
-				} );
+		it( 'should set insertion point', () => {
+			const state = insertionPoint( null, {
+				type: 'SHOW_INSERTION_POINT',
+				rootClientId: 'clientId1',
+				index: 0,
+			} );
 
-				const expectedNewState = {
-					rootClientId: 'clientId2',
-					index: 1,
-				};
+			expect( state ).toEqual( {
+				rootClientId: 'clientId1',
+				index: 0,
+			} );
+		} );
 
-				const state = insertionPoint( original, {
-					type,
-					...expectedNewState,
-				} );
-
-				expect( state ).toEqual( expectedNewState );
-			}
-		);
-
-		it.each( [
-			'CLEAR_SELECTED_BLOCK',
-			'SELECT_BLOCK',
-			'REPLACE_INNER_BLOCKS',
-			'INSERT_BLOCKS',
-			'REMOVE_BLOCKS',
-			'REPLACE_BLOCKS',
-		] )( 'resets the insertion point to `null` on %s', ( type ) => {
+		it( 'should clear the insertion point', () => {
 			const original = deepFreeze( {
 				rootClientId: 'clientId1',
 				index: 0,
 			} );
 			const state = insertionPoint( original, {
-				type,
+				type: 'HIDE_INSERTION_POINT',
 			} );
 
-			expect( state ).toEqual( null );
-		} );
-	} );
-
-	describe( 'insertionPointVisibility', () => {
-		it( 'defaults to `false`', () => {
-			const state = insertionPointVisibility( undefined, {} );
-			expect( state ).toBe( false );
-		} );
-
-		it( 'shows the insertion point', () => {
-			const state = insertionPointVisibility( false, {
-				type: 'SHOW_INSERTION_POINT',
-			} );
-
-			expect( state ).toBe( true );
-		} );
-
-		it.each( [
-			'HIDE_INSERTION_POINT',
-			'CLEAR_SELECTED_BLOCK',
-			'SELECT_BLOCK',
-			'REPLACE_INNER_BLOCKS',
-			'INSERT_BLOCKS',
-			'REMOVE_BLOCKS',
-			'REPLACE_BLOCKS',
-		] )( 'sets the insertion point on %s to `false`', ( type ) => {
-			const state = insertionPointVisibility( true, {
-				type,
-			} );
-
-			expect( state ).toBe( false );
+			expect( state ).toBe( null );
 		} );
 	} );
 
@@ -2942,6 +2895,78 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'lastBlockInserted', () => {
+		it( 'should return client id if last block inserted is called with action INSERT_BLOCKS', () => {
+			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+
+			const action = {
+				blocks: [
+					{
+						clientId: expectedClientId,
+					},
+				],
+				meta: {
+					source: 'inserter_menu',
+				},
+				type: 'INSERT_BLOCKS',
+			};
+
+			const state = lastBlockInserted( {}, action );
+
+			expect( state.clientId ).toBe( expectedClientId );
+		} );
+
+		it( 'should return inserter_menu source if last block inserted is called with action INSERT_BLOCKS', () => {
+			const expectedSource = 'inserter_menu';
+
+			const action = {
+				blocks: [
+					{
+						clientId: '62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
+					},
+				],
+				meta: {
+					source: expectedSource,
+				},
+				type: 'INSERT_BLOCKS',
+			};
+
+			const state = lastBlockInserted( {}, action );
+
+			expect( state.source ).toBe( expectedSource );
+		} );
+
+		it( 'should return state if last block inserted is called with action INSERT_BLOCKS and block list is empty', () => {
+			const expectedState = {
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+			};
+
+			const action = {
+				blocks: [],
+				meta: {
+					source: 'inserter_menu',
+				},
+				type: 'INSERT_BLOCKS',
+			};
+
+			const state = lastBlockInserted( expectedState, action );
+
+			expect( state ).toEqual( expectedState );
+		} );
+
+		it( 'should return empty state if last block inserted is called with action RESET_BLOCKS', () => {
+			const expectedState = {};
+
+			const action = {
+				type: 'RESET_BLOCKS',
+			};
+
+			const state = lastBlockInserted( expectedState, action );
+
+			expect( state ).toEqual( expectedState );
 		} );
 	} );
 } );

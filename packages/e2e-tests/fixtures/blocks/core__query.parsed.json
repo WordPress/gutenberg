@@ -3,14 +3,9 @@
 		"blockName": "core/query",
 		"attrs": {},
 		"innerBlocks": [],
-		"innerHTML": "",
-		"innerContent": []
-	},
-	{
-		"blockName": null,
-		"attrs": {},
-		"innerBlocks": [],
-		"innerHTML": "\n",
-		"innerContent": [ "\n" ]
+		"innerHTML": "\n<div class=\"wp-block-query\"></div>\n",
+		"innerContent": [
+			"\n<div class=\"wp-block-query\"></div>\n"
+		]
 	}
 ]

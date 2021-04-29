@@ -69,6 +69,7 @@ export function useResizeLabel( {
 	 * Cached dimension values to check for width/height updates from the
 	 * sizes property from useResizeAware()
 	 */
+	const { width, height } = sizes;
 	const heightRef = useRef( height );
 	const widthRef = useRef( width );
 
@@ -77,8 +78,6 @@ export function useResizeLabel( {
 	 * both width and height values have changed at (roughly) the same time.
 	 */
 	const moveTimeoutRef = useRef();
-
-	const { width, height } = sizes;
 
 	const unsetMoveXY = () => {
 		/*

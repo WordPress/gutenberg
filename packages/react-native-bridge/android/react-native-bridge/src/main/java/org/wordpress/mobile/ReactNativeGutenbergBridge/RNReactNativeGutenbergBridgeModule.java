@@ -68,6 +68,8 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String MAP_KEY_REPLACE_BLOCK_HTML = "html";
     private static final String MAP_KEY_REPLACE_BLOCK_BLOCK_ID = "clientId";
 
+    public static final String MAP_KEY_FEATURED_IMAGE_ID = "featuredImageId";
+
     private boolean mIsDarkMode;
 
     public RNReactNativeGutenbergBridgeModule(ReactApplicationContext reactContext,

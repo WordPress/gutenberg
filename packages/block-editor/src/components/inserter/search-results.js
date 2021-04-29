@@ -33,6 +33,7 @@ function InserterSearchResults( {
 	rootClientId,
 	clientId,
 	isAppender,
+	__experimentalInsertionIndex,
 	maxBlockPatterns,
 	maxBlockTypes,
 	showBlockDirectory = false,
@@ -46,6 +47,7 @@ function InserterSearchResults( {
 		rootClientId,
 		clientId,
 		isAppender,
+		insertionIndex: __experimentalInsertionIndex,
 		shouldFocusBlock,
 	} );
 	const [

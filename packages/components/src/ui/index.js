@@ -14,4 +14,3 @@ export * from './text';
 export * from './truncate';
 export * from './v-stack';
 export * from './view';
-export * from './visually-hidden';

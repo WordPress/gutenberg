@@ -1,7 +1,13 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { useInstanceId } from '@wordpress/compose';
+import deprecated from '@wordpress/deprecated';
 import { Icon, check } from '@wordpress/icons';
 
 /**
@@ -18,6 +24,13 @@ export default function CheckboxControl( {
 	onChange,
 	...props
 } ) {
+	if ( heading ) {
+		deprecated( '`heading` prop in `CheckboxControl`', {
+			alternative: 'a separate element to implement a heading',
+			plugin: 'Gutenberg',
+		} );
+	}
+
 	const instanceId = useInstanceId( CheckboxControl );
 	const id = `inspector-checkbox-control-${ instanceId }`;
 	const onChangeValue = ( event ) => onChange( event.target.checked );
@@ -27,7 +40,7 @@ export default function CheckboxControl( {
 			label={ heading }
 			id={ id }
 			help={ help }
-			className={ className }
+			className={ classnames( 'components-checkbox-control', className ) }
 		>
 			<span className="components-checkbox-control__input-container">
 				<input

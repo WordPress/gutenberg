@@ -2,11 +2,12 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
-import { getFontSize, ui } from '@wp-g2/styles';
 
 /**
  * Internal dependencies
  */
+import { getFontSize } from '../../utils/font-size';
+import { COLORS } from '../../../utils/colors-values';
 import { Text } from '..';
 
 describe( 'Text', () => {
@@ -22,7 +23,7 @@ describe( 'Text', () => {
 			<Text optimizeReadabilityFor="blue">Lorem ipsum.</Text>
 		);
 		expect( container.firstChild ).toHaveStyle( {
-			color: ui.get( 'white' ),
+			color: COLORS.white,
 		} );
 	} );
 
@@ -52,7 +53,7 @@ describe( 'Text', () => {
 			<Text variant="muted">Lorem ipsum.</Text>
 		);
 		expect( container.firstChild ).toHaveStyle( {
-			color: ui.get( 'colorTextMuted' ),
+			color: COLORS.mediumGray.text,
 		} );
 	} );
 
@@ -91,7 +92,7 @@ describe( 'Text', () => {
 		expect( wrapper.container.firstChild.childNodes ).toHaveLength( 5 );
 		const words = await wrapper.findAllByText( 'm' );
 		expect( words ).toHaveLength( 2 );
-		expect( words[ 0 ].dataset.g2Component ).toBe( 'TextHighlight' );
+		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
 	} );
 
 	test( 'should render highlighted words with undefined passed', () => {

@@ -20,6 +20,7 @@ import {
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function getBlockDisplayText( block ) {
 	return block
@@ -28,16 +29,16 @@ function getBlockDisplayText( block ) {
 }
 
 function useSecondaryText() {
-	const { activeEntityBlockId, getBlock } = useSelect( ( select ) => {
-		return {
-			activeEntityBlockId: select(
-				'core/block-editor'
+	const { getBlock } = useSelect( 'core/block-editor' );
+	const activeEntityBlockId = useSelect(
+		( select ) =>
+			select(
+				blockEditorStore
 			).__experimentalGetActiveBlockIdByBlockNames( [
 				'core/template-part',
 			] ),
-			getBlock: select( 'core/block-editor' ).getBlock,
-		};
-	} );
+		[]
+	);
 
 	if ( activeEntityBlockId ) {
 		return {

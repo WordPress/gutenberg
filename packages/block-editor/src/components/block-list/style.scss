@@ -266,7 +266,7 @@
 			left: $border-width;
 			right: $border-width;
 			bottom: $border-width;
-			box-shadow: 0 0 0 $border-width $gray-900;
+			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 			border-radius: $radius-block-ui - $border-width; // Border is outset, so subtract the width to achieve correct radius.
 		}
 	}
@@ -275,7 +275,7 @@
 		cursor: unset;
 
 		&::after {
-			box-shadow: 0 0 0 $border-width $gray-900; // Selected not focussed
+			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color); // Selected not focussed.
 			top: $border-width;
 			left: $border-width;
 			right: $border-width;
@@ -702,13 +702,16 @@
 		// Allow clicking through the toolbar holder.
 		pointer-events: none;
 
-		> * {
+		.block-editor-block-list__block-selection-button,
+		.block-editor-block-contextual-toolbar,
+		.block-editor-block-list__empty-block-inserter {
 			pointer-events: all;
 		}
 
 		// Position the block toolbar.
 		.block-editor-block-list__block-selection-button,
 		.block-editor-block-contextual-toolbar {
+			margin-top: $grid-unit-15;
 			margin-bottom: $grid-unit-15;
 		}
 	}

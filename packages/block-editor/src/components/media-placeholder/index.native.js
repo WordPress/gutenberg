@@ -48,6 +48,7 @@ function MediaPlaceholder( props ) {
 		height,
 		backgroundColor,
 		hideContent,
+		autoOpenMediaUpload,
 		onSelectURL,
 	} = props;
 
@@ -162,6 +163,7 @@ function MediaPlaceholder( props ) {
 				}
 				multiple={ multiple }
 				isReplacingMedia={ false }
+				autoOpen={ autoOpenMediaUpload }
 				render={ ( { open, getMediaOptions } ) => {
 					return (
 						<TouchableWithoutFeedback
