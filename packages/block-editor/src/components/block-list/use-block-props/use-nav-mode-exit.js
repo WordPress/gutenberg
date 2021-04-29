@@ -20,10 +20,13 @@ export function useNavModeExit( clientId ) {
 	return useRefEffect(
 		( node ) => {
 			function onMouseDown( event ) {
-				if ( isNavigationMode() ) {
+				// Don't select a block if it's already handled by a child
+				// block.
+				if ( isNavigationMode() && ! event.defaultPrevented ) {
 					// Prevent focus from moving to the block.
 					event.preventDefault();
 
+					// When clicking on a selected block, exit navigation mode.
 					if ( isBlockSelected( clientId ) ) {
 						setNavigationMode( false );
 					} else {
