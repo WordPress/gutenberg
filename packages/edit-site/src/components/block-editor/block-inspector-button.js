@@ -12,14 +12,17 @@ import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import { store as editSiteStore } from '../../store';
+import { STORE_NAME } from '../../store/constants';
 import { SIDEBAR_BLOCK } from '../sidebar/constants';
 
 export default function BlockInspectorButton( { onClick = () => {} } ) {
 	const { shortcut, isBlockInspectorOpen } = useSelect(
 		( select ) => ( {
-			// shortcut: select(
-			// 	keyboardShortcutsStore
-			// ).getShortcutRepresentation( 'core/edit-site/toggle-sidebar' ),
+			shortcut: select(
+				keyboardShortcutsStore
+			).getShortcutRepresentation(
+				'core/edit-site/toggle-block-settings-sidebar'
+			),
 			isBlockInspectorOpen:
 				select( interfaceStore ).getActiveComplementaryArea(
 					editSiteStore.name
@@ -51,12 +54,9 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 		<MenuItem
 			onClick={ () => {
 				if ( isBlockInspectorOpen ) {
-					disableComplementaryArea( 'core/edit-site' );
+					disableComplementaryArea( STORE_NAME );
 				} else {
-					enableComplementaryArea(
-						'core/edit-site',
-						'edit-site/block-inspector'
-					);
+					enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
 					speakMessage();
 				}
 				// Close dropdown menu.
