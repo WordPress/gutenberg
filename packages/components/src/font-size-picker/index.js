@@ -137,7 +137,11 @@ function FontSizePicker(
 						__unstableInputWidth="60px"
 						value={ value }
 						onChange={ ( nextSize ) => {
-							onChange( nextSize );
+							if ( 0 === parseFloat( nextSize ) || ! nextSize ) {
+								onChange( undefined );
+							} else {
+								onChange( nextSize );
+							}
 						} }
 						units={ CSS_UNITS }
 					/>
