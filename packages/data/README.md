@@ -500,7 +500,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="register" href="#register">#</a> **register**
 

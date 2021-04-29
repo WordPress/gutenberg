@@ -92,7 +92,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="withViewportMatch" href="#withViewportMatch">#</a> **withViewportMatch**
 

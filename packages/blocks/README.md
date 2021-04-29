@@ -805,7 +805,7 @@ _Related_
 
 _Type_
 
--   `Object` 
+-   `Object`
 
 <a name="switchToBlockType" href="#switchToBlockType">#</a> **switchToBlockType**
 
