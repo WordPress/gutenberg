@@ -76,7 +76,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 		$has_php_template   = file_exists( get_stylesheet_directory() . '/' . $type . '.php' );
 		$has_block_template = false;
 		$block_template     = _gutenberg_get_template_file( 'wp_template', $type );
-		if ( null !==$block_template  && $block_template['theme'] === wp_get_theme()->get_stylesheet() ) {
+		if ( null !== $block_template && wp_get_theme()->get_stylesheet() === $block_template['theme'] ) {
 			$has_block_template = true;
 		}
 		if ( is_child_theme() && ( $has_php_template && ! $has_block_template ) ) {
