@@ -52,8 +52,8 @@ function gutenberg_widgets_customize_register( $manager ) {
 					'section'     => "sidebar-widgets-$sidebar_id",
 					'settings'    => "sidebars_widgets[$sidebar_id]",
 					'sidebar_id'  => $sidebar_id,
-					'label'       => $sidebar["name"],
-					'description' => $sidebar["description"],
+					'label'       => $sidebar['name'],
+					'description' => $sidebar['description'],
 				)
 			)
 		);
