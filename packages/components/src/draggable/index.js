@@ -9,6 +9,29 @@ const cloneHeightTransformationBreakpoint = 700;
 const clonePadding = 0;
 const bodyClass = 'is-dragging-components-draggable';
 
+/**
+ * @typedef RenderProp
+ * @property {(event: import('react').DragEvent) => void} onDraggableStart `onDragStart` handler.
+ * @property {(event: import('react').DragEvent) => void} onDraggableEnd `onDragEnd` handler.
+ */
+
+/**
+ * @typedef Props
+ * @property {(props: RenderProp) => JSX.Element | null} children Children.
+ * @property {(event: import('react').DragEvent) => void} [onDragStart] Callback when dragging starts.
+ * @property {(event: import('react').DragEvent) => void} [onDragOver] Callback when dragging happens over the document.
+ * @property {(event: import('react').DragEvent) => void} [onDragEnd] Callback when dragging ends.
+ * @property {string} [cloneClassname] Classname for the cloned element.
+ * @property {string} [elementId] ID for the element.
+ * @property {any} [transferData] Transfer data for the drag event.
+ * @property {string} [__experimentalTransferDataType] The transfer data type to set.
+ * @property {import('react').ReactNode} __experimentalDragComponent Component to show when dragging.
+ */
+
+/**
+ * @param {Props} props
+ * @return {JSX.Element} A draggable component.
+ */
 export default function Draggable( {
 	children,
 	onDragStart,
@@ -17,21 +40,23 @@ export default function Draggable( {
 	cloneClassname,
 	elementId,
 	transferData,
+	__experimentalTransferDataType: transferDataType = 'text',
 	__experimentalDragComponent: dragComponent,
 } ) {
-	const dragComponentRef = useRef();
+	/** @type {import('react').MutableRefObject<HTMLDivElement | null>} */
+	const dragComponentRef = useRef( null );
 	const cleanup = useRef( () => {} );
 
 	/**
 	 * Removes the element clone, resets cursor, and removes drag listener.
 	 *
-	 * @param {Object} event The non-custom DragEvent.
+	 * @param {import('react').DragEvent} event The non-custom DragEvent.
 	 */
 	function end( event ) {
 		event.preventDefault();
 		cleanup.current();
 
-		if ( onDragOver ) {
+		if ( onDragEnd ) {
 			onDragEnd( event );
 		}
 	}
@@ -44,12 +69,16 @@ export default function Draggable( {
 	 * - Sets transfer data.
 	 * - Adds dragover listener.
 	 *
-	 * @param {Object} event The non-custom DragEvent.
+	 * @param {import('react').DragEvent} event The non-custom DragEvent.
 	 */
 	function start( event ) {
+		// @ts-ignore We know that ownerDocument does exist on an Element
 		const { ownerDocument } = event.target;
 
-		event.dataTransfer.setData( 'text', JSON.stringify( transferData ) );
+		event.dataTransfer.setData(
+			transferDataType,
+			JSON.stringify( transferData )
+		);
 
 		const cloneWrapper = ownerDocument.createElement( 'div' );
 		const dragImage = ownerDocument.createElement( 'div' );
@@ -130,6 +159,9 @@ export default function Draggable( {
 		let cursorLeft = event.clientX;
 		let cursorTop = event.clientY;
 
+		/**
+		 * @param {import('react').DragEvent} e
+		 */
 		function over( e ) {
 			cloneWrapper.style.top = `${
 				parseInt( cloneWrapper.style.top, 10 ) + e.clientY - cursorTop
@@ -156,6 +188,7 @@ export default function Draggable( {
 		// https://reactjs.org/docs/events.html#event-pooling
 		event.persist();
 
+		/** @type {number | undefined} */
 		let timerId;
 
 		if ( onDragStart ) {

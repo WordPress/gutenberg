@@ -27,7 +27,7 @@ When creating a new package, you need to provide at least the following:
     	"module": "build-module/index.js",
     	"react-native": "src/index",
     	"dependencies": {
-    		"@babel/runtime": "^7.12.5"
+    		"@babel/runtime": "^7.13.10"
     	},
     	"publishConfig": {
     		"access": "public"
@@ -89,7 +89,6 @@ _Example:_
                 "cross-spawn": "^5.1.0",
                 "eslint": "^7.1.0",
 -               "jest": "^26.6.3",
-                "jest-puppeteer": "^4.4.0",
                 "minimist": "^1.2.0",
                 "npm-package-json-lint": "^3.6.0",
 ```
@@ -177,7 +176,7 @@ If you are publishing new versions of packages, note that there are versioning r
 
 ## Releasing Packages
 
-Lerna automatically releases all outdated packages. To check which packages are outdated and will be released, type `npm run publish:check`.
+Lerna automatically releases all outdated packages. To check which packages are outdated and will be released, type `npm run publish:check` from the branch that keeps the code for a given `wp/X.Y` release type (example `wp/5.7`).
 
 If you have the ability to publish packages, you _must_ have [2FA enabled](https://docs.npmjs.com/getting-started/using-two-factor-authentication) on your [npm account][npm].
 
@@ -199,35 +198,38 @@ You can check your package configs by running `npm run lint-pkg-json`.
 
 ### Development Release
 
-Run the following command to release a dev version of the outdated packages.
+Run the following commands from the `trunk` branch to publish to npm (with a `next` dist tag) a development version of the packages.
 
 ```bash
-npm run publish:dev
+npm install
+./bin/plugin/cli.js npm-next
 ```
 
-Lerna will ask you which version number you want to choose for each package. For a `dev` release, you'll more likely want to choose the "prerelease" option. Repeat the same for all the outdated packages and confirm your version updates.
-
-Lerna will then publish to [npm], commit the `package.json` changes and create the git tags.
+See more details in [Development Releases](/docs/contributors/code/release.md#development-releases) section of the Gutenberg release process documentation.
 
 ### Production Release
 
-To release a production version for the outdated packages, run the following command:
+To release a production version for the outdated packages, run the following commands from the `trunk` branch:
 
 ```bash
-npm run publish:prod
+npm install
+./bin/plugin/cli.js npm-latest
 ```
 
-Choose the correct version based on `CHANGELOG.md` files, confirm your choices and let Lerna do its magic.
+See more details in [Synchronizing WordPress Trunk](/docs/contributors/code/release.md#synchronizing-wordpress-trunk) section of the Gutenberg release process documentation.
 
 ### Legacy Patch Release
 
-To release a patch for the older major or minor version of packages, run the following command:
+To release a patch for the older major or minor version of packages, run the following commands from the corresponding `wp/X.Y` (example `wp/5.7`) release branch:
 
 ```bash
+npm install
 npm run publish:patch
 ```
 
 This is usually necessary when adding bug fixes or security patches to the earlier versions of WordPress. This will publish only a patch version of the built packages. This is useful for backpublishing certain packages to WordPress.
+
+See more details in [Minor WordPress Releases](/docs/contributors/code/release.md#minor-wordpress-releases) section of the Gutenberg release process documentation.
 
 ## TypeScript
 

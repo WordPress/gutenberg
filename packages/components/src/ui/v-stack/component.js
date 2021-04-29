@@ -11,20 +11,22 @@ import { useVStack } from './hook';
  *
  * @example
  * ```jsx
+ * import { VStack, Text, View } from `@wordpress/components/ui`;
+ *
  * function Example() {
- *   return (
- *     <VStack css={ [ ui.frame.height( 200 ) ] }>
- *       <View css={ [ ui.background.blue ] }>
- *         <Text>Ana</Text>
- *       </View>
- *       <View css={ [ ui.background.blue ] }>
- *         <Text>Elsa</Text>
- *       </View>
- *       <View css={ [ ui.background.blue ] }>
- *         <Text>Olaf</Text>
- *       </View>
- *     </VStack>
- *   );
+ * 	return (
+ * 		<VStack>
+ * 			<View>
+ * 				<Text>Code</Text>
+ * 			</View>
+ * 			<View>
+ * 				<Text>is</Text>
+ * 			</View>
+ * 			<View>
+ * 				<Text>Poetry</Text>
+ * 			</View>
+ * 		</VStack>
+ * 	);
  * }
  * ```
  */

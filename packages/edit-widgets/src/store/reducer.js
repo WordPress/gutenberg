@@ -32,10 +32,10 @@ export function widgetAreasOpenState( state = {}, action ) {
 /**
  * Reducer tracking whether the inserter is open.
  *
- * @param {boolean} state
- * @param {Object}  action
+ * @param {boolean|Object} state
+ * @param {Object}         action
  */
-function isInserterOpened( state = false, action ) {
+function blockInserterPanel( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_IS_INSERTER_OPENED':
 			return action.value;
@@ -44,6 +44,6 @@ function isInserterOpened( state = false, action ) {
 }
 
 export default combineReducers( {
-	isInserterOpened,
+	blockInserterPanel,
 	widgetAreasOpenState,
 } );

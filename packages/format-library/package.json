@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "1.26.7",
+	"version": "1.27.2",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -22,7 +22,7 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.12.5",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/components": "file:../components",

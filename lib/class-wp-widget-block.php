@@ -23,13 +23,22 @@ class WP_Widget_Block extends WP_Widget {
 	);
 
 	/**
+	 * Whether or not to show the widget's instance settings array in the REST
+	 * API.
+	 *
+	 * @since 5.8.0
+	 * @var array
+	 */
+	public $show_instance_in_rest = true;
+
+	/**
 	 * Sets up a new Block widget instance.
 	 *
 	 * @since 4.8.1
 	 */
 	public function __construct() {
 		$widget_ops  = array(
-			'classname'                   => '%s', // Set dynamically in widget().
+			'classname'                   => 'widget_block',
 			'description'                 => __( 'Gutenberg block.', 'gutenberg' ),
 			'customize_selective_refresh' => true,
 		);
@@ -53,8 +62,13 @@ class WP_Widget_Block extends WP_Widget {
 	 * @global WP_Post $post Global post object.
 	 */
 	public function widget( $args, $instance ) {
-		echo sprintf( $args['before_widget'], $this->get_dynamic_classname( $instance ) );
-		echo do_blocks( $instance['content'] );
+		$instance = wp_parse_args( $instance, $this->default_instance );
+
+		echo str_replace(
+			'widget_block',
+			$this->get_dynamic_classname( $instance['content'] ),
+			$args['before_widget']
+		);
 
 		// Handle embeds for block widgets.
 		//
@@ -63,7 +77,13 @@ class WP_Widget_Block extends WP_Widget {
 		// filter for its content, which WP_Embed uses in its constructor.
 		// See https://core.trac.wordpress.org/ticket/51566.
 		global $wp_embed;
-		echo $wp_embed->autoembed( $content );
+		$content = $wp_embed->run_shortcode( $instance['content'] );
+		$content = $wp_embed->autoembed( $content );
+
+		$content = do_blocks( $content );
+		$content = do_shortcode( $content );
+
+		echo $content;
 
 		echo $args['after_widget'];
 	}
@@ -73,20 +93,20 @@ class WP_Widget_Block extends WP_Widget {
 	 *
 	 * Usually this is set to $this->widget_options['classname'] by
 	 * dynamic_sidebar(). In this case, however, we want to set the classname
-	 * dynamically depending on the block conatined by this block widget.
+	 * dynamically depending on the block contained by this block widget.
 	 *
-	 * If a block widget contains a block that has an equivelant legacy widget,
+	 * If a block widget contains a block that has an equivalent legacy widget,
 	 * we display that legacy widget's class name. This helps with theme
 	 * backwards compatibility.
 	 *
 	 * @since 9.3.0
 	 *
-	 * @param array $instance Settings for the current block widget instance.
+	 * @param array $content The HTML content of the current block widget.
 	 *
 	 * @return string The classname to use in the block widget's container HTML.
 	 */
-	private function get_dynamic_classname( $instance ) {
-		$blocks = parse_blocks( $instance['content'] );
+	private function get_dynamic_classname( $content ) {
+		$blocks = parse_blocks( $content );
 
 		$block_name = isset( $blocks[0] ) ? $blocks[0]['blockName'] : null;
 

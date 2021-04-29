@@ -42,7 +42,6 @@ const {
 	resetBlocks,
 	selectBlock,
 	selectPreviousBlock,
-	__unstableSetInsertionPoint,
 	showInsertionPoint,
 	startMultiSelect,
 	startTyping,
@@ -90,6 +89,7 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds: [ clientId ],
 				attributes,
+				uniqueByBlock: false,
 			} );
 		} );
 
@@ -101,6 +101,7 @@ describe( 'actions', () => {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
 				clientIds,
 				attributes,
+				uniqueByBlock: false,
 			} );
 		} );
 	} );
@@ -739,30 +740,10 @@ describe( 'actions', () => {
 		} );
 	} );
 
-	describe( '__unstableSetInsertionPoint', () => {
-		it( 'should return the SET_INSERTION_POINT action', () => {
-			expect( __unstableSetInsertionPoint() ).toEqual( {
-				type: 'SET_INSERTION_POINT',
-			} );
-			expect( __unstableSetInsertionPoint( 'rootClientId', 2 ) ).toEqual(
-				{
-					type: 'SET_INSERTION_POINT',
-					rootClientId: 'rootClientId',
-					index: 2,
-				}
-			);
-		} );
-	} );
-
 	describe( 'showInsertionPoint', () => {
 		it( 'should return the SHOW_INSERTION_POINT action', () => {
 			expect( showInsertionPoint() ).toEqual( {
 				type: 'SHOW_INSERTION_POINT',
-			} );
-			expect( showInsertionPoint( 'rootClientId', 2 ) ).toEqual( {
-				type: 'SHOW_INSERTION_POINT',
-				rootClientId: 'rootClientId',
-				index: 2,
 			} );
 		} );
 	} );

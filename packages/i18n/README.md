@@ -88,6 +88,20 @@ _Returns_
 
 -   `boolean`: Whether locale is RTL.
 
+<a name="resetLocaleData" href="#resetLocaleData">#</a> **resetLocaleData**
+
+Resets all current Tannin instance locale data and sets the specified
+locale data for the domain. Accepts data in a Jed-formatted JSON object shape.
+
+_Related_
+
+-   <http://messageformat.github.io/Jed/>
+
+_Parameters_
+
+-   _data_ `[LocaleData]`: Locale data configuration.
+-   _domain_ `[string]`: Domain for which configuration applies.
+
 <a name="setLocaleData" href="#setLocaleData">#</a> **setLocaleData**
 
 Merges locale data into the Tannin instance by domain. Accepts data in a
@@ -109,7 +123,7 @@ original format string is returned.
 
 _Related_
 
--   <http://www.diveintojavascript.com/projects/javascript-sprintf>
+-   <https://www.npmjs.com/package/sprintf-js>
 
 _Parameters_
 

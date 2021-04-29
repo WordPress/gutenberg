@@ -75,12 +75,10 @@ export function* getWidgets() {
 		query
 	);
 
-	const widgetIdToClientId = {};
 	const groupedBySidebar = {};
 
 	for ( const widget of widgets ) {
 		const block = transformWidgetToBlock( widget );
-		widgetIdToClientId[ widget.id ] = block.clientId;
 		groupedBySidebar[ widget.sidebar ] =
 			groupedBySidebar[ widget.sidebar ] || [];
 		groupedBySidebar[ widget.sidebar ].push( block );
@@ -95,9 +93,4 @@ export function* getWidgets() {
 			);
 		}
 	}
-
-	yield {
-		type: 'SET_WIDGET_TO_CLIENT_ID_MAPPING',
-		mapping: widgetIdToClientId,
-	};
 }

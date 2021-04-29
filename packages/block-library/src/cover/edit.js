@@ -36,8 +36,8 @@ import {
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	__experimentalUnitControl as UnitControl,
-	__experimentalBlockAlignmentMatrixToolbar as BlockAlignmentMatrixToolbar,
-	__experimentalBlockFullHeightAligmentToolbar as FullHeightAlignment,
+	__experimentalBlockAlignmentMatrixControl as BlockAlignmentMatrixControl,
+	__experimentalBlockFullHeightAligmentControl as FullHeightAlignmentControl,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
@@ -49,6 +49,7 @@ import { isBlobURL } from '@wordpress/blob';
  * Internal dependencies
  */
 import {
+	ALLOWED_MEDIA_TYPES,
 	attributesFromMedia,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
@@ -63,7 +64,7 @@ import {
 /**
  * Module Constants
  */
-const ALLOWED_MEDIA_TYPES = [ 'image', 'video' ];
+
 const INNER_BLOCKS_TEMPLATE = [
 	[
 		'core/paragraph',
@@ -240,6 +241,49 @@ function mediaPosition( { x, y } ) {
 	return `${ Math.round( x * 100 ) }% ${ Math.round( y * 100 ) }%`;
 }
 
+/**
+ * Is the URL a temporary blob URL? A blob URL is one that is used temporarily while
+ * the media (image or video) is being uploaded and will not have an id allocated yet.
+ *
+ * @param {number} id  The id of the media.
+ * @param {string} url The url of the media.
+ *
+ * @return {boolean} Is the URL a Blob URL.
+ */
+const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
+
+function CoverPlaceholder( {
+	hasBackground = false,
+	children,
+	noticeUI,
+	noticeOperations,
+	onSelectMedia,
+} ) {
+	const { removeAllNotices, createErrorNotice } = noticeOperations;
+	return (
+		<MediaPlaceholder
+			icon={ <BlockIcon icon={ icon } /> }
+			labels={ {
+				title: __( 'Cover' ),
+				instructions: __(
+					'Upload an image or video file, or pick one from your media library.'
+				),
+			} }
+			onSelect={ onSelectMedia }
+			accept="image/*,video/*"
+			allowedTypes={ ALLOWED_MEDIA_TYPES }
+			notices={ noticeUI }
+			disableMediaButtons={ hasBackground }
+			onError={ ( message ) => {
+				removeAllNotices();
+				createErrorNotice( message );
+			} }
+		>
+			{ children }
+		</MediaPlaceholder>
+	);
+}
+
 function CoverEdit( {
 	attributes,
 	isSelected,
@@ -269,7 +313,7 @@ function CoverEdit( {
 		setGradient,
 	} = __experimentalUseGradient();
 	const onSelectMedia = attributesFromMedia( setAttributes );
-	const isBlogUrl = isBlobURL( url );
+	const isUploadingMedia = isTemporaryMedia( id, url );
 
 	const [ prevMinHeightValue, setPrevMinHeightValue ] = useState( minHeight );
 	const [ prevMinHeightUnit, setPrevMinHeightUnit ] = useState(
@@ -329,7 +373,6 @@ function CoverEdit( {
 	const isVideoBackground = VIDEO_BACKGROUND_TYPE === backgroundType;
 
 	const [ temporaryMinHeight, setTemporaryMinHeight ] = useState( null );
-	const { removeAllNotices, createErrorNotice } = noticeOperations;
 
 	const minHeightWithUnit = minHeightUnit
 		? `${ minHeight }${ minHeightUnit }`
@@ -362,14 +405,14 @@ function CoverEdit( {
 	const imperativeFocalPointPreview = ( value ) => {
 		const [ styleOfRef, property ] = isDarkElement.current
 			? [ isDarkElement.current.style, 'objectPosition' ]
-			: [ blockProps.ref.current.style, 'backgroundPosition' ];
+			: [ ref.current.style, 'backgroundPosition' ];
 		styleOfRef[ property ] = mediaPosition( value );
 	};
 
 	const controls = (
 		<>
-			<BlockControls>
-				<BlockAlignmentMatrixToolbar
+			<BlockControls group="block">
+				<BlockAlignmentMatrixControl
 					label={ __( 'Change content position' ) }
 					value={ contentPosition }
 					onChange={ ( nextPosition ) =>
@@ -379,11 +422,13 @@ function CoverEdit( {
 					}
 					isDisabled={ ! hasBackground }
 				/>
-				<FullHeightAlignment
+				<FullHeightAlignmentControl
 					isActive={ isMinFullHeight }
 					onToggle={ toggleMinFullHeight }
 					isDisabled={ ! hasBackground }
 				/>
+			</BlockControls>
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ url }
@@ -494,7 +539,8 @@ function CoverEdit( {
 		</>
 	);
 
-	const blockProps = useBlockProps();
+	const ref = useRef();
+	const blockProps = useBlockProps( { ref } );
 	const innerBlocksProps = useInnerBlocksProps(
 		{
 			className: 'wp-block-cover__inner-container',
@@ -506,9 +552,6 @@ function CoverEdit( {
 	);
 
 	if ( ! hasBackground ) {
-		const placeholderIcon = <BlockIcon icon={ icon } />;
-		const label = __( 'Cover' );
-
 		return (
 			<>
 				{ controls }
@@ -519,22 +562,10 @@ function CoverEdit( {
 						blockProps.className
 					) }
 				>
-					<MediaPlaceholder
-						icon={ placeholderIcon }
-						labels={ {
-							title: label,
-							instructions: __(
-								'Upload an image or video file, or pick one from your media library.'
-							),
-						} }
-						onSelect={ onSelectMedia }
-						accept="image/*,video/*"
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						notices={ noticeUI }
-						onError={ ( message ) => {
-							removeAllNotices();
-							createErrorNotice( message );
-						} }
+					<CoverPlaceholder
+						noticeUI={ noticeUI }
+						onSelectMedia={ onSelectMedia }
+						noticeOperations={ noticeOperations }
 					>
 						<div className="wp-block-cover__placeholder-background-options">
 							<ColorPalette
@@ -544,7 +575,7 @@ function CoverEdit( {
 								clearable={ false }
 							/>
 						</div>
-					</MediaPlaceholder>
+					</CoverPlaceholder>
 				</div>
 			</>
 		);
@@ -555,7 +586,7 @@ function CoverEdit( {
 		{
 			'is-dark-theme': isDark,
 			'has-background-dim': dimRatio !== 0,
-			'is-transient': isBlogUrl,
+			'is-transient': isUploadingMedia,
 			'has-parallax': hasParallax,
 			'is-repeated': isRepeated,
 			[ overlayColor.class ]: overlayColor.class,
@@ -605,7 +636,7 @@ function CoverEdit( {
 						style={ { backgroundImage: gradientValue } }
 					/>
 				) }
-				{ isImageBackground && isImgElement && (
+				{ url && isImageBackground && isImgElement && (
 					<img
 						ref={ isDarkElement }
 						className="wp-block-cover__image-background"
@@ -614,7 +645,7 @@ function CoverEdit( {
 						style={ mediaStyle }
 					/>
 				) }
-				{ isVideoBackground && (
+				{ url && isVideoBackground && (
 					<video
 						ref={ isDarkElement }
 						className="wp-block-cover__video-background"
@@ -625,7 +656,13 @@ function CoverEdit( {
 						style={ mediaStyle }
 					/>
 				) }
-				{ isBlogUrl && <Spinner /> }
+				{ isUploadingMedia && <Spinner /> }
+				<CoverPlaceholder
+					hasBackground={ hasBackground }
+					noticeUI={ noticeUI }
+					onSelectMedia={ onSelectMedia }
+					noticeOperations={ noticeOperations }
+				/>
 				<div { ...innerBlocksProps } />
 			</div>
 		</>

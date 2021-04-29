@@ -36,10 +36,8 @@
 		"query": "query",
 		"layout": "layout"
 	},
-	"usesContext": [
-		"postId"
-	],
 	"supports": {
+		"align": [ "wide", "full" ],
 		"html": false
 	},
 	"editorStyle": "wp-block-query-editor"

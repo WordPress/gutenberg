@@ -9,14 +9,22 @@
 		{ "path": "../deprecated" },
 		{ "path": "../element" },
 		{ "path": "../hooks" },
-		{ "path": "../primitives" }
+		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" },
+		{ "path": "../primitives" },
+		{ "path": "../react-i18n" },
+		{ "path": "../warning" }
 	],
 	"include": [
 		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
+		"src/draggable/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
+		"src/scroll-lock/**/*",
+		"src/shortcut/**/*",
+		"src/spinner/**/*",
 		"src/tip/**/*",
 		"src/ui/**/*",
 		"src/utils/**/*",
@@ -32,6 +40,7 @@
 		"src/**/react-native-*",
 		"src/**/stories",
 		"src/**/test",
+		"src/ui/__storybook-utils",
 		"src/ui/font-size-control"
 	]
 }

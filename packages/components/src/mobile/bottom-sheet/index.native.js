@@ -39,6 +39,8 @@ import RadioCell from './radio-cell';
 import NavigationScreen from './bottom-sheet-navigation/navigation-screen';
 import NavigationContainer from './bottom-sheet-navigation/navigation-container';
 import KeyboardAvoidingView from './keyboard-avoiding-view';
+import BottomSheetSubSheet from './sub-sheet';
+import NavigationHeader from './navigation-header';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
 class BottomSheet extends Component {
@@ -342,7 +344,14 @@ class BottomSheet extends Component {
 			listStyle = { flexGrow: 1 };
 		} else if ( isMaxHeightSet ) {
 			listStyle = { maxHeight };
+
+			// Allow setting a "static" height of the bottom sheet
+			// by settting the min height to the max height.
+			if ( this.props.setMinHeightToMaxHeight ) {
+				listStyle.minHeight = maxHeight;
+			}
 		}
+
 		const listProps = {
 			disableScrollViewPanResponder: true,
 			bounces,
@@ -486,6 +495,8 @@ const ThemedBottomSheet = withPreferredColorScheme( BottomSheet );
 ThemedBottomSheet.getWidth = getWidth;
 ThemedBottomSheet.Button = Button;
 ThemedBottomSheet.Cell = Cell;
+ThemedBottomSheet.SubSheet = BottomSheetSubSheet;
+ThemedBottomSheet.NavigationHeader = NavigationHeader;
 ThemedBottomSheet.CyclePickerCell = CyclePickerCell;
 ThemedBottomSheet.PickerCell = PickerCell;
 ThemedBottomSheet.SwitchCell = SwitchCell;

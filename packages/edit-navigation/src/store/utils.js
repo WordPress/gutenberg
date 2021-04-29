@@ -17,19 +17,7 @@ import {
 	isProcessingPost,
 } from './controls';
 
-/**
- * "Kind" of the navigation post.
- *
- * @type {string}
- */
-export const KIND = 'root';
-
-/**
- * "post type" of the navigation post.
- *
- * @type {string}
- */
-export const POST_TYPE = 'postType';
+import { NEW_TAB_TARGET_ATTRIBUTE } from '../constants';
 
 /**
  * Builds an ID for a new navigation post.
@@ -158,6 +146,9 @@ export function computeCustomizedAttribute(
 				xfn: block.attributes.rel?.split( ' ' ),
 				classes: block.attributes.className?.split( ' ' ),
 				attr_title: block.attributes.title,
+				target: block.attributes.opensInNewTab
+					? NEW_TAB_TARGET_ATTRIBUTE
+					: '',
 			};
 		} else {
 			attributes = {

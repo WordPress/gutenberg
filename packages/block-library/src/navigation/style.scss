@@ -1,27 +1,37 @@
-// Default background and font color
-.wp-block-navigation:not(.has-background) .wp-block-navigation__container {
-	.wp-block-navigation__container {
-		// Set a background color for submenus so that they're not transparent.
-		// NOTE TO DEVS - if refactoring this code, please double-check that
-		// submenus have a default background color, this feature has regressed
-		// several times, so care needs to be taken.
-		background-color: $white;
-		color: $gray-900;
+.wp-block-navigation {
+	// Normalize list styles.
+	ul,
+	ul li {
+		list-style: none;
+
+		// Overrides generic ".entry-content li" styles on the front end.
+		padding: 0;
 	}
 }
 
-.wp-block-navigation .wp-block-navigation__container {
-	.wp-block-navigation__container {
-		align-items: normal;
-		min-width: 200px;
-	}
-}
-
+// Navigation block inner container.
 .wp-block-navigation__container {
-	// Vertically align child blocks, like Social Links or Search.
+	// Vertically center child blocks, like Social Links or Search.
 	align-items: center;
+
+	// Reset the default list styles
+	list-style: none;
+	margin: 0;
+	padding-left: 0;
+
+	// Horizontal layout
+	display: flex;
+	flex-wrap: wrap;
+
+	// Vertical layout
+	.is-vertical & {
+		display: block;
+		flex-direction: column;
+		align-items: flex-start;
+	}
 }
 
+// Justification.
 .items-justified-center > ul {
 	justify-content: center;
 }
@@ -32,4 +42,19 @@
 
 .items-justified-space-between > ul {
 	justify-content: space-between;
+}
+
+// Vertical justification.
+.is-vertical.items-justified-center > ul {
+	align-items: center;
+}
+
+.is-vertical.items-justified-right > ul {
+	align-items: flex-end;
+
+	.wp-block-navigation-link,
+	.wp-block-pages-list__item {
+		margin-right: 0;
+		justify-content: flex-end;
+	}
 }

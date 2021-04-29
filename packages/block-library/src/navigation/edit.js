@@ -29,6 +29,19 @@ import useBlockNavigator from './use-block-navigator';
 import NavigationPlaceholder from './placeholder';
 import PlaceholderPreview from './placeholder-preview';
 
+const ALLOWED_BLOCKS = [
+	'core/navigation-link',
+	'core/search',
+	'core/social-links',
+	'core/page-list',
+	'core/spacer',
+];
+
+const LAYOUT = {
+	type: 'default',
+	alignments: [],
+};
+
 function Navigation( {
 	selectedBlockHasDescendants,
 	attributes,
@@ -40,8 +53,7 @@ function Navigation( {
 	updateInnerBlocks,
 	className,
 	hasSubmenuIndicatorSetting = true,
-	hasItemJustificationControls = attributes.orientation === 'horizontal',
-	hasListViewModal = true,
+	hasItemJustificationControls = true,
 } ) {
 	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
 		! hasExistingNavItems
@@ -65,12 +77,7 @@ function Navigation( {
 			className: 'wp-block-navigation__container',
 		},
 		{
-			allowedBlocks: [
-				'core/navigation-link',
-				'core/search',
-				'core/social-links',
-				'core/page-list',
-			],
+			allowedBlocks: ALLOWED_BLOCKS,
 			orientation: attributes.orientation || 'horizontal',
 			renderAppender:
 				( isImmediateParentOfSelectedBlock &&
@@ -84,10 +91,7 @@ function Navigation( {
 			// Block on the experimental menus screen does not
 			// inherit templateLock={ 'all' }.
 			templateLock: false,
-			__experimentalLayout: {
-				type: 'default',
-				alignments: [],
-			},
+			__experimentalLayout: LAYOUT,
 			placeholder: <PlaceholderPreview />,
 		}
 	);
@@ -108,12 +112,18 @@ function Navigation( {
 		);
 	}
 
+	const justifyAllowedControls =
+		attributes.orientation === 'vertical'
+			? [ 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right', 'space-between' ];
+
 	return (
 		<>
 			<BlockControls>
 				{ hasItemJustificationControls && (
 					<JustifyToolbar
 						value={ attributes.itemsJustification }
+						allowedControls={ justifyAllowedControls }
 						onChange={ ( value ) =>
 							setAttributes( { itemsJustification: value } )
 						}
@@ -123,11 +133,9 @@ function Navigation( {
 						} }
 					/>
 				) }
-				{ hasListViewModal && (
-					<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
-				) }
+				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
 			</BlockControls>
-			{ hasListViewModal && navigatorModal }
+			{ navigatorModal }
 			<InspectorControls>
 				{ hasSubmenuIndicatorSetting && (
 					<PanelBody title={ __( 'Display settings' ) }>

@@ -211,7 +211,7 @@ async function runTestSuite( testSuite, performanceTestDirectory ) {
 async function runPerformanceTests( branches, options ) {
 	// The default value doesn't work because commander provides an array.
 	if ( branches.length === 0 ) {
-		branches = [ 'master' ];
+		branches = [ 'trunk' ];
 	}
 
 	log(

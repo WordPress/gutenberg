@@ -2,6 +2,7 @@
  * External dependencies
  */
 import {
+	findNodeHandle,
 	requireNativeComponent,
 	UIManager,
 	TouchableWithoutFeedback,
@@ -41,7 +42,7 @@ class AztecView extends Component {
 	dispatch( command, params ) {
 		params = params || [];
 		UIManager.dispatchViewManagerCommand(
-			this.aztecViewRef.current,
+			findNodeHandle( this ),
 			command,
 			params
 		);
@@ -127,7 +128,7 @@ class AztecView extends Component {
 
 	_onBlur( event ) {
 		this.selectionEndCaretY = null;
-		TextInputState.blurTextInput( this.aztecViewRef.current );
+		TextInputState.blurTextInput( findNodeHandle( this ) );
 
 		if ( ! this.props.onBlur ) {
 			return;
@@ -179,16 +180,16 @@ class AztecView extends Component {
 	}
 
 	blur() {
-		TextInputState.blurTextInput( this.aztecViewRef.current );
+		TextInputState.blurTextInput( findNodeHandle( this ) );
 	}
 
 	focus() {
-		TextInputState.focusTextInput( this.aztecViewRef.current );
+		TextInputState.focusTextInput( findNodeHandle( this ) );
 	}
 
 	isFocused() {
-		const focusedField = TextInputState.currentlyFocusedInput();
-		return focusedField && focusedField === this.aztecViewRef.current;
+		const focusedField = TextInputState.currentlyFocusedField();
+		return focusedField && focusedField === findNodeHandle( this );
 	}
 
 	_onPress( event ) {

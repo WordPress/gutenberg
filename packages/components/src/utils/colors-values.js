@@ -36,6 +36,7 @@ export const G2 = {
 	},
 	darkGray: {
 		primary: '#1e1e1e',
+		heading: '#050505',
 	},
 	mediumGray: {
 		text: '#757575',

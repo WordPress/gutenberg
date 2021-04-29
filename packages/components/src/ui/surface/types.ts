@@ -36,27 +36,6 @@ export type Props = {
 	 * * `primary`: Used for almost all cases.
 	 * * `secondary`: Used as a secondary background for inner `Surface` components.
 	 * * `tertiary`: Used as the app/site wide background. Visible in **dark mode** only. Use case is rare.
-	 *
-	 * @example
-	 * ```jsx
-	 * import { Surface, Text, VStack } from `@wordpress/components/ui`
-	 *
-	 * function Example() {
-	 *   return (
-	 *     <VStack>
-	 *       <Surface variant="primary">
-	 *         <Text>Primary Surface</Text>
-	 *       </Surface>
-	 *       <Surface variant="secondary">
-	 *         <Text>Secondary Surface</Text>
-	 *       </Surface>
-	 *       <Surface variant="tertiary">
-	 *         <Text>Tertiary Surface</Text>
-	 *       </Surface>
-	 *     </VStack>
-	 *   );
-	 * }
-	 * ```
 	 */
 	variant?: SurfaceVariant;
 };

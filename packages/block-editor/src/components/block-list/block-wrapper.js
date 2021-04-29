@@ -13,6 +13,7 @@ import { useBlockProps } from './use-block-props';
 const BlockComponent = forwardRef(
 	( { children, tagName: TagName = 'div', ...props }, ref ) => {
 		deprecated( 'wp.blockEditor.__experimentalBlock', {
+			since: '5.6',
 			alternative: 'wp.blockEditor.useBlockProps',
 		} );
 		const blockProps = useBlockProps( { ...props, ref } );

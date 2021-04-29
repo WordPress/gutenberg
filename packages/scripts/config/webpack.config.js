@@ -35,6 +35,9 @@ const cssLoaders = [
 		loader: require.resolve( 'css-loader' ),
 		options: {
 			sourceMap: ! isProduction,
+			modules: {
+				auto: true,
+			},
 		},
 	},
 	{
@@ -43,8 +46,10 @@ const cssLoaders = [
 			// Provide a fallback configuration if there's not
 			// one explicitly available in the project.
 			...( ! hasPostCSSConfig() && {
-				ident: 'postcss',
-				plugins: postcssPlugins,
+				postcssOptions: {
+					ident: 'postcss',
+					plugins: postcssPlugins,
+				},
 			} ),
 		},
 	},
@@ -76,6 +81,12 @@ const getJsonpFunctionIdentifier = () => {
 	);
 };
 
+const getLiveReloadPort = ( inputPort ) => {
+	const parsedPort = parseInt( inputPort, 10 );
+
+	return Number.isInteger( parsedPort ) ? parsedPort : 35729;
+};
+
 const config = {
 	mode,
 	entry: {
@@ -101,7 +112,7 @@ const config = {
 		splitChunks: {
 			cacheGroups: {
 				style: {
-					test: /[\\/]style\.(sc|sa|c)ss$/,
+					test: /[\\/]style(\.module)?\.(sc|sa|c)ss$/,
 					chunks: 'all',
 					enforce: true,
 					automaticNameDelimiter: '-',
@@ -212,7 +223,7 @@ const config = {
 		// bundle content as a convenient interactive zoomable treemap.
 		process.env.WP_BUNDLE_ANALYZER && new BundleAnalyzerPlugin(),
 		// MiniCSSExtractPlugin to extract the CSS thats gets imported into JavaScript.
-		new MiniCSSExtractPlugin( { esModule: false, filename: '[name].css' } ),
+		new MiniCSSExtractPlugin( { filename: '[name].css' } ),
 		// MiniCSSExtractPlugin creates JavaScript assets for CSS that are
 		// obsolete and should be removed. Related webpack issue:
 		// https://github.com/webpack-contrib/mini-css-extract-plugin/issues/85
@@ -221,7 +232,7 @@ const config = {
 		// works when running watch mode.
 		! isProduction &&
 			new LiveReloadPlugin( {
-				port: process.env.WP_LIVE_RELOAD_PORT || 35729,
+				port: getLiveReloadPort( process.env.WP_LIVE_RELOAD_PORT ),
 			} ),
 		// WP_NO_EXTERNALS global variable controls whether scripts' assets get
 		// generated, and the default externals set.

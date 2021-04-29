@@ -14,6 +14,7 @@ import {
 	NavigableToolbar,
 	BlockNavigationDropdown,
 	ToolSelector,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	TableOfContents,
@@ -53,7 +54,7 @@ function HeaderToolbar() {
 			hasInserterItems,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		return {
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
@@ -75,14 +76,14 @@ function HeaderToolbar() {
 			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
-			isNavigationTool: select( 'core/block-editor' ).isNavigationMode(),
+			isNavigationTool: select( blockEditorStore ).isNavigationMode(),
 			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
 	const isSmallViewport = useViewportMatch( 'small', '<' );
-	const { setNavigationMode } = useDispatch( 'core/block-editor' );
+	const { setNavigationMode } = useDispatch( blockEditorStore );
 
 	const displayBlockToolbar =
 		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
@@ -143,7 +144,7 @@ function HeaderToolbar() {
 					/* translators: button label text should, if possible, be under 16
 			characters. */
 					label={ _x(
-						'Add block',
+						'Toggle block inserter',
 						'Generic label for block inserter button'
 					) }
 					showTooltip={ ! showIconLabels }

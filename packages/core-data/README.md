@@ -376,7 +376,7 @@ _Parameters_
 
 _Returns_
 
--   `boolean`: Whether the entities are loaded
+-   `Array<Object>`: Array of entities with config matching kind.
 
 <a name="getEntity" href="#getEntity">#</a> **getEntity**
 
@@ -648,25 +648,6 @@ _Parameters_
 _Returns_
 
 -   `boolean`: Whether there is a previous edit or not.
-
-<a name="hasUploadPermissions" href="#hasUploadPermissions">#</a> **hasUploadPermissions**
-
-> **Deprecated** since 5.0. Callers should use the more generic `canUser()` selector instead of `hasUploadPermissions()`, e.g. `canUser( 'create', 'media' )`.
-
-Returns whether the current user can upload media.
-
-Calling this may trigger an OPTIONS request to the REST API via the
-`canUser()` resolver.
-
-<https://developer.wordpress.org/rest-api/reference/>
-
-_Parameters_
-
--   _state_ `Object`: Data state.
-
-_Returns_
-
--   `boolean`: Whether or not the user can upload media. Defaults to `true` if the OPTIONS request is being made.
 
 <a name="isAutosavingEntityRecord" href="#isAutosavingEntityRecord">#</a> **isAutosavingEntityRecord**
 

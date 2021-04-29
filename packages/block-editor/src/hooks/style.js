@@ -1,13 +1,14 @@
 /**
  * External dependencies
  */
-import { capitalize, has, get, startsWith } from 'lodash';
+import { capitalize, get, has, omit, omitBy, startsWith } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { addFilter } from '@wordpress/hooks';
 import {
+	getBlockSupport,
 	hasBlockSupport,
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
 } from '@wordpress/blocks';
@@ -18,6 +19,7 @@ import { createHigherOrderComponent } from '@wordpress/compose';
  */
 import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
+import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
 import { SPACING_SUPPORT_KEY, PaddingEdit } from './padding';
 import SpacingPanelControl from '../components/spacing-panel-control';
@@ -97,6 +99,22 @@ function addAttribute( settings ) {
 }
 
 /**
+ * Filters a style object returning only the keys
+ * that are serializable for a given block.
+ *
+ * @param {Object} style Input style object to filter.
+ * @param {Object} blockSupports Info about block supports.
+ * @return {Object} Filtered style.
+ */
+export function omitKeysNotToSerialize( style, blockSupports ) {
+	return omitBy(
+		style,
+		( value, key ) =>
+			!! blockSupports[ key ]?.__experimentalSkipSerialization
+	);
+}
+
+/**
  * Override props assigned to save component to inject the CSS variables definition.
  *
  * @param  {Object} props      Additional props applied to save element
@@ -110,8 +128,21 @@ export function addSaveProps( props, blockType, attributes ) {
 	}
 
 	const { style } = attributes;
+	let filteredStyle = omitKeysNotToSerialize( style, {
+		border: getBlockSupport( blockType, BORDER_SUPPORT_KEY ),
+		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
+	} );
+
+	if (
+		getBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
+	) {
+		filteredStyle = omit( filteredStyle, [
+			[ 'typography', FONT_SIZE_SUPPORT_KEY ],
+		] );
+	}
+
 	props.style = {
-		...getInlineStyles( style ),
+		...getInlineStyles( filteredStyle ),
 		...props.style,
 	};
 

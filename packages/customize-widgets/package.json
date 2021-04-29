@@ -5,8 +5,10 @@
 	"description": "Widgets blocks in Customizer Module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
-	"keywords": [ "wordpress" ],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/customize-widgets/README.md",
+	"keywords": [
+		"wordpress"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/blob/HEAD/packages/customize-widgets/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -20,11 +22,23 @@
 	"react-native": "src/index",
 	"dependencies": {
 		"@babel/runtime": "^7.11.2",
+		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
+		"@wordpress/compose": "file:../compose",
+		"@wordpress/core-data": "file:../core-data",
+		"@wordpress/data": "file:../data",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
+		"@wordpress/hooks": "file:../hooks",
+		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
+		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/media-utils": "file:../media-utils",
+		"classnames": "^2.2.6",
 		"lodash": "^4.17.19"
 	},
 	"publishConfig": {

@@ -36,14 +36,17 @@ const createTemplatePart = async (
 	await createNewButton.click();
 	await page.waitForSelector(
 		isNested
-			? '.wp-block-template-part .wp-block-template-part .block-editor-block-list__layout'
-			: '.wp-block-template-part .block-editor-block-list__layout'
+			? '.wp-block-template-part .wp-block-template-part.block-editor-block-list__layout'
+			: '.wp-block-template-part.block-editor-block-list__layout'
 	);
 	await openDocumentSettingsSidebar();
 
-	const nameInputSelector =
-		'.block-editor-block-inspector .components-text-control__input';
-	const nameInput = await page.waitForSelector( nameInputSelector );
+	const advancedPanelXPath = `//div[contains(@class,"interface-interface-skeleton__sidebar")]//button[@class="components-button components-panel__body-toggle"][contains(text(),"Advanced")]`;
+	const advancedPanel = await page.waitForXPath( advancedPanelXPath );
+	await advancedPanel.click();
+
+	const nameInputXPath = `${ advancedPanelXPath }/ancestor::div[contains(@class, "components-panel__body")]//div[contains(@class,"components-base-control__field")]//label[contains(text(), "Title")]/following-sibling::input`;
+	const nameInput = await page.waitForXPath( nameInputXPath );
 	await nameInput.click();
 
 	// Select all of the text in the title field.
@@ -146,8 +149,7 @@ describe( 'Multi-entity editor states', () => {
 
 	it( 'should not dirty an entity by switching to it in the template dropdown', async () => {
 		await siteEditor.visit();
-		// TODO: Change General to Headers once TT1 blocks categorise the template parts
-		await clickTemplateItem( [ 'Template Parts', 'General' ], 'header' );
+		await clickTemplateItem( [ 'Template Parts', 'Headers' ], 'header' );
 		await page.waitForFunction( () =>
 			Array.from( window.frames ).find(
 				( { name } ) => name === 'editor-canvas'
@@ -201,11 +203,14 @@ describe( 'Multi-entity editor states', () => {
 
 			// Wait for site editor to load.
 			await canvas().waitForSelector(
-				'.wp-block-template-part .block-editor-block-list__layout'
+				'.wp-block-template-part.block-editor-block-list__layout'
 			);
 
-			// Our custom template shows up in the " templates > all" menu; let's use it.
-			await clickTemplateItem( [ 'Templates', 'All' ], templateName );
+			// Our custom template shows up in the "Templates > General" menu; let's use it.
+			await clickTemplateItem(
+				[ 'Templates', 'General templates' ],
+				templateName
+			);
 			await page.waitForXPath(
 				`//h1[contains(@class, "edit-site-document-actions__title") and contains(text(), '${ templateName }')]`
 			);

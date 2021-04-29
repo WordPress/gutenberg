@@ -9,12 +9,14 @@ import { startCase } from 'lodash';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import metadata from './block.json';
 import edit from './edit';
+import './variations';
 
 const { name } = metadata;
 export { metadata, name };
@@ -24,6 +26,7 @@ export const settings = {
 	description: __(
 		'Edit the different global regions of your site, like the header, footer, sidebar, or create your own.'
 	),
+	icon: layout,
 	keywords: [ __( 'template part' ) ],
 	__experimentalLabel: ( { slug, theme } ) => {
 		// Attempt to find entity title if block is a template part.

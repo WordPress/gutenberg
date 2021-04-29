@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### New API
+
+-   `registerBlockTypeFromMetadata` method can be used to register a block type using the metadata loaded from `block.json` file ([#30293](https://github.com/WordPress/gutenberg/pull/30293)).
+
+## 8.0.0 (2021-03-17)
+
+### Breaking Change
+
+-   Reverted `cloneBlock` back to its original logic that doesn't sanitize block's attributes. [#28379](https://github.com/WordPress/gutenberg/pull/29111)
+
 ## 7.0.0 (2021-02-01)
 
 ### Breaking Change

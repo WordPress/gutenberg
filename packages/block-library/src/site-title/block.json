@@ -15,10 +15,16 @@
 		"align": [ "wide", "full" ],
 		"html": false,
 		"color": {
-			"gradients": true
+			"gradients": true,
+			"text": false,
+			"link": true
+		},
+		"spacing": {
+			"padding": true
 		},
 		"fontSize": true,
 		"lineHeight": true,
-		"__experimentalFontFamily": true
+		"__experimentalFontFamily": true,
+		"__experimentalTextTransform": true
 	}
 }

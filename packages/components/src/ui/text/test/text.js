@@ -2,56 +2,47 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
-import { getFontSize, ui } from '@wp-g2/styles';
 
 /**
  * Internal dependencies
  */
+import { getFontSize } from '../../utils/font-size';
+import { COLORS } from '../../../utils/colors-values';
 import { Text } from '..';
 
 describe( 'Text', () => {
 	describe( 'snapshot tests', () => {
 		test( 'should render correctly', () => {
-			const { container } = render(
-				<Text>Some people are worth melting for.</Text>
-			);
+			const { container } = render( <Text>Lorem ipsum.</Text> );
 			expect( container.firstChild ).toMatchSnapshot();
 		} );
 	} );
 
 	test( 'should render optimizeReadabilityFor', () => {
 		const { container } = render(
-			<Text optimizeReadabilityFor="blue">
-				Some people are worth melting for.
-			</Text>
+			<Text optimizeReadabilityFor="blue">Lorem ipsum.</Text>
 		);
 		expect( container.firstChild ).toHaveStyle( {
-			color: ui.get( 'white' ),
+			color: COLORS.white,
 		} );
 	} );
 
 	test( 'should render truncate', () => {
-		const { container } = render(
-			<Text truncate>Some people are worth melting for.</Text>
-		);
+		const { container } = render( <Text truncate>Lorem ipsum.</Text> );
 		expect( container.firstChild ).toHaveStyle( {
 			textOverflow: 'ellipsis',
 		} );
 	} );
 
 	test( 'should render size', () => {
-		const { container } = render(
-			<Text size="title">Some people are worth melting for.</Text>
-		);
+		const { container } = render( <Text size="title">Lorem ipsum.</Text> );
 		expect( container.firstChild ).toHaveStyle( {
 			fontSize: getFontSize( 'title' ),
 		} );
 	} );
 
 	test( 'should render custom size', () => {
-		const { container } = render(
-			<Text size={ 15 }>Some people are worth melting for.</Text>
-		);
+		const { container } = render( <Text size={ 15 }>Lorem ipsum.</Text> );
 		expect( container.firstChild ).toHaveStyle( {
 			fontSize: getFontSize( 15 ),
 		} );
@@ -59,39 +50,35 @@ describe( 'Text', () => {
 
 	test( 'should render variant', () => {
 		const { container } = render(
-			<Text variant="muted">Some people are worth melting for.</Text>
+			<Text variant="muted">Lorem ipsum.</Text>
 		);
 		expect( container.firstChild ).toHaveStyle( {
-			color: ui.get( 'colorTextMuted' ),
+			color: COLORS.mediumGray.text,
 		} );
 	} );
 
 	test( 'should render as another element', () => {
-		const { container } = render(
-			<Text as="div">Some people are worth melting for.</Text>
-		);
+		const { container } = render( <Text as="div">Lorem ipsum.</Text> );
 		expect( container.firstChild.nodeName ).toBe( 'DIV' );
 	} );
 
 	test( 'should render align', () => {
 		const { container } = render(
-			<Text align="center">Some people are worth melting for.</Text>
+			<Text align="center">Lorem ipsum.</Text>
 		);
 		expect( container.firstChild ).toHaveStyle( { textAlign: 'center' } );
 	} );
 
 	test( 'should render color', () => {
 		const { container } = render(
-			<Text color="orange">Some people are worth melting for.</Text>
+			<Text color="orange">Lorem ipsum.</Text>
 		);
 		expect( container.firstChild ).toHaveStyle( { color: 'orange' } );
 	} );
 
 	test( 'should render display', () => {
 		const { container } = render(
-			<Text display="inline-flex">
-				Some people are worth melting for.
-			</Text>
+			<Text display="inline-flex">Lorem ipsum.</Text>
 		);
 		expect( container.firstChild ).toHaveStyle( {
 			display: 'inline-flex',
@@ -100,22 +87,17 @@ describe( 'Text', () => {
 
 	test( 'should render highlighted words', async () => {
 		const wrapper = render(
-			<Text highlightWords={ [ 'worth' ] }>
-				Some people are worth melting for.
-			</Text>
+			<Text highlightWords={ [ 'm' ] }>Lorem ipsum.</Text>
 		);
-		// It should have three child nodes: (Some people are )(worth)( melting for.)
-		expect( wrapper.container.firstChild.childNodes ).toHaveLength( 3 );
-		const worth = await wrapper.findAllByText( 'worth' );
-		expect( worth ).toHaveLength( 1 );
-		expect( worth[ 0 ].dataset.g2Component ).toBe( 'TextHighlight' );
+		expect( wrapper.container.firstChild.childNodes ).toHaveLength( 5 );
+		const words = await wrapper.findAllByText( 'm' );
+		expect( words ).toHaveLength( 2 );
+		words.forEach( ( word ) => expect( word.tagName ).toEqual( 'MARK' ) );
 	} );
 
 	test( 'should render highlighted words with undefined passed', () => {
 		const { container } = render(
-			<Text highlightWords={ undefined }>
-				Some people are worth melting for.
-			</Text>
+			<Text highlightWords={ undefined }>Lorem ipsum.</Text>
 		);
 		// It'll have a length of 1 because there shouldn't be anything but the single span being rendered
 		expect( container.firstChild.childNodes ).toHaveLength( 1 );
@@ -123,8 +105,8 @@ describe( 'Text', () => {
 
 	test( 'should render highlighted words with highlightCaseSensitive', () => {
 		const { container } = render(
-			<Text highlightCaseSensitive highlightWords={ [ 'WORTH' ] }>
-				Some people are worth melting for.
+			<Text highlightCaseSensitive highlightWords={ [ 'IPSUM' ] }>
+				Lorem ipsum.
 			</Text>
 		);
 
@@ -134,9 +116,7 @@ describe( 'Text', () => {
 	} );
 
 	test( 'should render isBlock', () => {
-		const { container } = render(
-			<Text isBlock>Some people are worth melting for.</Text>
-		);
+		const { container } = render( <Text isBlock>Lorem ipsum.</Text> );
 		expect( container.firstChild ).toHaveStyle( {
 			display: 'block',
 		} );
@@ -144,15 +124,13 @@ describe( 'Text', () => {
 
 	test( 'should render lineHeight', () => {
 		const { container } = render(
-			<Text lineHeight={ 1.5 }>Some people are worth melting for.</Text>
+			<Text lineHeight={ 1.5 }>Lorem ipsum.</Text>
 		);
 		expect( container.firstChild ).toHaveStyle( { lineHeight: '1.5' } );
 	} );
 
 	test( 'should render upperCase', () => {
-		const { container } = render(
-			<Text upperCase>Some people are worth melting for.</Text>
-		);
+		const { container } = render( <Text upperCase>Lorem ipsum.</Text> );
 		expect( container.firstChild ).toHaveStyle( {
 			textTransform: 'uppercase',
 		} );
@@ -160,7 +138,7 @@ describe( 'Text', () => {
 
 	test( 'should render weight', () => {
 		const { container } = render(
-			<Text weight={ 700 }>Some people are worth melting for.</Text>
+			<Text weight={ 700 }>Lorem ipsum.</Text>
 		);
 		expect( container.firstChild ).toHaveStyle( { fontWeight: '700' } );
 	} );

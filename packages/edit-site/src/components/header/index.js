@@ -4,16 +4,18 @@
 import { useRef } from '@wordpress/element';
 import { useViewportMatch } from '@wordpress/compose';
 import {
-	BlockNavigationDropdown,
 	ToolSelector,
 	BlockToolbar,
 	__experimentalPreviewOptions as PreviewOptions,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
-import { _x } from '@wordpress/i18n';
-import { plus } from '@wordpress/icons';
+import { _x, __ } from '@wordpress/i18n';
+import { listView, plus } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
+import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
+import { store as editorStore } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -26,7 +28,10 @@ import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
 import { store as editSiteStore } from '../../store';
 
-export default function Header( { openEntitiesSavedStates } ) {
+export default function Header( {
+	openEntitiesSavedStates,
+	isEntitiesSavedStatesOpen,
+} ) {
 	const inserterButton = useRef();
 	const {
 		deviceType,
@@ -35,6 +40,8 @@ export default function Header( { openEntitiesSavedStates } ) {
 		template,
 		templateType,
 		isInserterOpen,
+		isListViewOpen,
+		listViewShortcut,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -42,15 +49,17 @@ export default function Header( { openEntitiesSavedStates } ) {
 			getEditedPostType,
 			getEditedPostId,
 			isInserterOpened,
+			isListViewOpened,
 		} = select( editSiteStore );
-		const { getEntityRecord } = select( 'core' );
+		const { getEditedEntityRecord } = select( coreStore );
 		const { __experimentalGetTemplateInfo: getTemplateInfo } = select(
-			'core/editor'
+			editorStore
 		);
+		const { getShortcutRepresentation } = select( keyboardShortcutsStore );
 
 		const postType = getEditedPostType();
 		const postId = getEditedPostId();
-		const record = getEntityRecord( 'postType', postType, postId );
+		const record = getEditedEntityRecord( 'postType', postType, postId );
 		const _entityTitle =
 			'wp_template' === postType
 				? getTemplateInfo( record ).title
@@ -63,12 +72,17 @@ export default function Header( { openEntitiesSavedStates } ) {
 			template: record,
 			templateType: postType,
 			isInserterOpen: isInserterOpened(),
+			isListViewOpen: isListViewOpened(),
+			listViewShortcut: getShortcutRepresentation(
+				'core/edit-site/toggle-list-view'
+			),
 		};
 	}, [] );
 
 	const {
 		__experimentalSetPreviewDeviceType: setPreviewDeviceType,
 		setIsInserterOpened,
+		setIsListViewOpened,
 	} = useDispatch( editSiteStore );
 
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -97,7 +111,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 						} }
 						icon={ plus }
 						label={ _x(
-							'Add block',
+							'Toggle block inserter',
 							'Generic label for block inserter button'
 						) }
 					/>
@@ -106,7 +120,17 @@ export default function Header( { openEntitiesSavedStates } ) {
 							<ToolSelector />
 							<UndoButton />
 							<RedoButton />
-							<BlockNavigationDropdown />
+							<Button
+								className="edit-site-header-toolbar__list-view-toggle"
+								icon={ listView }
+								isPressed={ isListViewOpen }
+								/* translators: button label text should, if possible, be under 16 characters. */
+								label={ __( 'List View' ) }
+								onClick={ () =>
+									setIsListViewOpened( ! isListViewOpen )
+								}
+								shortcut={ listViewShortcut }
+							/>
 						</>
 					) }
 					{ displayBlockToolbar && (
@@ -147,6 +171,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 					/>
 					<SaveButton
 						openEntitiesSavedStates={ openEntitiesSavedStates }
+						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
 					/>
 					<PinnedItems.Slot scope="core/edit-site" />
 					<MoreMenu />

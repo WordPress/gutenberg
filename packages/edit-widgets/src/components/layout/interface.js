@@ -89,11 +89,7 @@ function Interface( { blockEditorSettings } ) {
 						<div className="edit-widgets-layout__inserter-panel-content">
 							<Library
 								showInserterHelpPanel
-								onSelect={ () => {
-									if ( isMobileViewport ) {
-										setIsInserterOpened( false );
-									}
-								} }
+								shouldFocusBlock={ isMobileViewport }
 								rootClientId={ rootClientId }
 								__experimentalInsertionIndex={ insertionIndex }
 							/>

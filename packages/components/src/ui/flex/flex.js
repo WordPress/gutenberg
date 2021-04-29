@@ -1,41 +1,55 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../utils';
+import { contextConnect } from '../context';
 import { useFlex } from './use-flex';
+import { FlexContext } from './context';
+import { View } from '../view';
 
 /**
- * `Flex` is a primitive layout component that adaptively aligns child content horizontally or vertically. `Flex` powers components like `HStack` and `VStack`.
+ * @param {import('../context').ViewOwnProps<import('./types').FlexProps, 'div'>} props
+ * @param {import('react').Ref<any>} forwardedRef
+ */
+function Flex( props, forwardedRef ) {
+	const { children, isColumn, ...otherProps } = useFlex( props );
+
+	return (
+		<FlexContext.Provider
+			value={ { flexItemDisplay: isColumn ? 'block' : undefined } }
+		>
+			<View { ...otherProps } ref={ forwardedRef }>
+				{ children }
+			</View>
+		</FlexContext.Provider>
+	);
+}
+
+/**
+ * `Flex` is a primitive layout component that adaptively aligns child content
+ * horizontally or vertically. `Flex` powers components like `HStack` and
+ * `VStack`.
  *
  * `Flex` is used with any of it's two sub-components, `FlexItem` and `FlexBlock`.
  *
- *
  * @example
  * ```jsx
- * import { Flex, FlexItem, FlexBlock, Text, View } from `@wordpress/components`
+ * import { Flex, FlexItem, FlexBlock, Text } from `@wordpress/components/ui`;
  *
  * function Example() {
- *   return (
- *     <Flex>
- *       <FlexItem>
- *         <View css={[ui.background.blue]}>
- *           <Text>Ana</Text>
- *         </View>
- *       </FlexItem>
- *       <FlexBlock>
- *         <View css={[ui.background.blue]}>
- *           <Text>Elsa</Text>
- *         </View>
- *       </FlexBlock>
- *     </Flex>
- *   );
+ * 	return (
+ * 		<Flex>
+ * 			<FlexItem>
+ * 				<Text>Code</Text>
+ * 			</FlexItem>
+ * 			<FlexBlock>
+ * 				<Text>Poetry</Text>
+ * 			</FlexBlock>
+ * 		</Flex>
+ * 	);
  * }
  * ```
+ *
  */
-const Flex = createComponent( {
-	as: 'div',
-	useHook: useFlex,
-	name: 'Flex',
-} );
+const ConnectedFlex = contextConnect( Flex, 'Flex' );
 
-export default Flex;
+export default ConnectedFlex;

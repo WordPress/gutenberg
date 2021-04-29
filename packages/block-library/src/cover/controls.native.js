@@ -21,7 +21,7 @@ import {
 import { plus } from '@wordpress/icons';
 import { useState, useCallback, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { InspectorControls, MediaUpload } from '@wordpress/block-editor';
+import { MediaUpload } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -29,7 +29,7 @@ import { __ } from '@wordpress/i18n';
  */
 import styles from './style.scss';
 import OverlayColorSettings from './overlay-color-settings';
-import FocalPointSettings from './focal-point-settings';
+import FocalPointSettingsButton from './focal-point-settings-button';
 import {
 	ALLOWED_MEDIA_TYPES,
 	COVER_MIN_HEIGHT,
@@ -134,7 +134,7 @@ function Controls( {
 	const focalPointHint = ! hasParallax && ! displayPlaceholder && (
 		<Icon
 			icon={ plus }
-			size={ styles.focalPointHint.width }
+			size={ styles.focalPointHint?.width }
 			style={ [
 				styles.focalPointHint,
 				focalPointPosition( focalPoint ),
@@ -184,7 +184,7 @@ function Controls( {
 									url={ url }
 									height="100%"
 									style={ imagePreviewStyles }
-									width={ styles.image.width }
+									width={ styles.image?.width }
 								/>
 							) }
 							{ VIDEO_BACKGROUND_TYPE === backgroundType && (
@@ -218,7 +218,7 @@ function Controls( {
 							{ displayPlaceholder ? null : focalPointHint }
 						</View>
 					</BottomSheet.Cell>
-					<FocalPointSettings
+					<FocalPointSettingsButton
 						disabled={ hasParallax }
 						focalPoint={ focalPoint || IMAGE_DEFAULT_FOCAL_POINT }
 						onFocalPointChange={ setFocalPoint }
@@ -240,6 +240,7 @@ function Controls( {
 				</>
 			) : (
 				<TextControl
+					accessibilityLabel={ __( 'Add image or video' ) }
 					label={ __( 'Add image or video' ) }
 					labelStyle={ addMediaButtonStyle }
 					leftAlign
@@ -250,7 +251,7 @@ function Controls( {
 	);
 
 	return (
-		<InspectorControls>
+		<>
 			<PanelBody title={ __( 'Media' ) }>
 				<MediaUpload
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -296,7 +297,7 @@ function Controls( {
 					key={ minHeightUnit }
 				/>
 			</PanelBody>
-		</InspectorControls>
+		</>
 	);
 }
 

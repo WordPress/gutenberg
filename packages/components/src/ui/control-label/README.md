@@ -5,11 +5,7 @@
 ## Usage
 
 ```jsx
-import {
-	__experimentalControlLabel as ControlLabel,
-	__experimentalFormGroup as FormGroup,
-	__experimentalTextInput as TextInput,
-} from '@wordpress/components';
+import { ControlLabel, FormGroup, TextInput } from '@wordpress/components/ui';
 
 function Example() {
 	return (
