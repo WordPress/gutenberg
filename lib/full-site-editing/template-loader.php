@@ -21,7 +21,7 @@ function gutenberg_add_template_loader_filters() {
 	}
 }
 
-add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
+//add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
 
 /**
  * Get the template hierarchy for a given template type.
