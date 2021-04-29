@@ -108,6 +108,25 @@ describe( 'getNavigationPostForMenu', () => {
 				attr_title: '',
 				target: '_blank',
 			},
+			{
+				id: 102,
+				title: {
+					raw: 'My Example Page',
+					rendered: 'My Example Page',
+				},
+				url: '/my-example-page/',
+				object: 'page',
+				object_id: 56789,
+				type: 'post-type',
+				menu_order: 3,
+				menus: [ 1 ],
+				parent: 0,
+				classes: [],
+				xfn: [],
+				description: '',
+				attr_title: '',
+				target: '_blank',
+			},
 		];
 
 		expect( generator.next( menuItems ).value ).toEqual( {
@@ -116,6 +135,7 @@ describe( 'getNavigationPostForMenu', () => {
 			mapping: {
 				100: expect.stringMatching( /client-id-\d+/ ),
 				101: expect.stringMatching( /client-id-\d+/ ),
+				102: expect.stringMatching( /client-id-\d+/ ),
 			},
 		} );
 
@@ -160,6 +180,23 @@ describe( 'getNavigationPostForMenu', () => {
 								type: 'custom',
 							},
 							clientId: 'client-id-1',
+							innerBlocks: [],
+							name: 'core/navigation-link',
+						},
+						{
+							attributes: {
+								label: 'My Example Page',
+								url: '/my-example-page/',
+								className: '',
+								rel: '',
+								description: '',
+								title: '',
+								opensInNewTab: true,
+								kind: 'post-type',
+								type: 'page',
+								id: 56789,
+							},
+							clientId: 'client-id-2',
 							innerBlocks: [],
 							name: 'core/navigation-link',
 						},
