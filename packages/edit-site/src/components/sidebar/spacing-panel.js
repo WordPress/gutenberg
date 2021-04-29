@@ -7,7 +7,7 @@ import {
 	__experimentalBoxControl as BoxControl,
 	PanelBody,
 } from '@wordpress/components';
-import { getBlockSupport } from '@wordpress/blocks';
+import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -70,17 +70,6 @@ function useCustomUnits( { units, contextName } ) {
 	);
 
 	return usedUnits.length === 0 ? false : usedUnits;
-}
-
-function useCustomSides( blockName, feature ) {
-	const support = getBlockSupport( blockName, 'spacing' );
-
-	// Skip when setting is boolean as theme isn't setting arbitrary sides.
-	if ( typeof support[ feature ] === 'boolean' ) {
-		return;
-	}
-
-	return support[ feature ];
 }
 
 function filterValuesBySides( values, sides ) {

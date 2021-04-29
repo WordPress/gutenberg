@@ -10,6 +10,7 @@ import './hooks';
 export {
 	getColorClassesAndStyles as __experimentalGetColorClassesAndStyles,
 	useColorProps as __experimentalUseColorProps,
+	useCustomSides as __experimentalUseCustomSides,
 } from './hooks';
 export * from './components';
 export * from './utils';
