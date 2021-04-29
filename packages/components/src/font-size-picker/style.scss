@@ -5,6 +5,20 @@
 	align-items: center;
 	margin-bottom: $grid-unit-30;
 
+	.components-unit-control-wrapper {
+		margin-right: $grid-unit-10;
+
+		.components-input-control__label {
+			font-weight: 300;
+			padding-bottom: 0 !important;
+			margin-bottom: $grid-unit-10 !important;
+		}
+	}
+
+	.components-custom-select-control__button {
+		min-width: 110px;
+	}
+
 	// Apply the same height as the isSmall Reset button.
 	.components-font-size-picker__number {
 		@include input-control;

@@ -134,7 +134,7 @@ function FontSizePicker(
 					<UnitControl
 						label={ __( 'Custom' ) }
 						labelPosition="top"
-						__unstableInputWidth="80px"
+						__unstableInputWidth="60px"
 						value={ value }
 						onChange={ ( nextSize ) => {
 							onChange( nextSize );
