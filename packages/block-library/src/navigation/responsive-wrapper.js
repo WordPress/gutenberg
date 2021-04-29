@@ -31,7 +31,7 @@ export default function ResponsiveWrapper( props ) {
 		}
 	);
 
-	const modalId = `${ props.clientId }-modal`;
+	const modalId = `${ props.id }-modal`;
 
 	return (
 		<>
@@ -81,7 +81,7 @@ export default function ResponsiveWrapper( props ) {
 						</Button>
 						<div
 							className="wp-block-navigation__responsive-container-content"
-							id={ `${ props.clientId }-modal-content` }
+							id={ `${ modalId }-content` }
 						>
 							{ props.children }
 						</div>
