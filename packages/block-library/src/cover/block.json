@@ -48,6 +48,12 @@
 		},
 		"contentPosition": {
 			"type": "string"
+		},
+		"allowedBlocks": {
+			"type": "array"
+		},
+		"templateLock": {
+			"type": "string"
 		}
 	},
 	"supports": {

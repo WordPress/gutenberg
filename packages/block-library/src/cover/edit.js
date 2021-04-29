@@ -306,6 +306,8 @@ function CoverEdit( {
 		minHeightUnit,
 		style: styleAttribute,
 		url,
+		allowedBlocks,
+		templateLock = false,
 	} = attributes;
 	const {
 		gradientClass,
@@ -546,8 +548,10 @@ function CoverEdit( {
 			className: 'wp-block-cover__inner-container',
 		},
 		{
+			allowedBlocks,
 			template: INNER_BLOCKS_TEMPLATE,
 			templateInsertUpdatesSelection: true,
+			templateLock,
 		}
 	);
 
