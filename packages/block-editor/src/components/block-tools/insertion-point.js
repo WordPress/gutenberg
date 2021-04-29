@@ -22,7 +22,7 @@ import { isRTL } from '@wordpress/i18n';
  */
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
-import { __unstableUseBlockElement as useBlockElement } from './use-block-props/use-block-refs';
+import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
 
 export const InsertionPointOpenRef = createContext();
 
