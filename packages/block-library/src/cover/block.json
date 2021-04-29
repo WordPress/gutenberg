@@ -62,6 +62,12 @@
 		"isDark": {
 			"type": "boolean",
 			"default": true
+		},
+		"allowedBlocks": {
+			"type": "array"
+		},
+		"templateLock": {
+			"type": "string"
 		}
 	},
 	"supports": {
