@@ -4,6 +4,8 @@
 
 ### Breaking Changes
 
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
 -   The bundled `puppeteer-core` (`^5.5.0`) dependency has been upgraded to version `^9.0.0`. Puppeteer uses Chromium v91 instead of Chromium v88. See the full list of breaking changes of [9.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v9.0.0) and lower versions ([#31138](https://github.com/WordPress/gutenberg/pull/31138)).
 
 ### New Features
