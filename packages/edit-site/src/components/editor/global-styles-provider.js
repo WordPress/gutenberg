@@ -176,17 +176,6 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 		};
 	}, [ content ] );
 
-	const getStyleOrigin = ( origin ) => {
-		switch ( origin ) {
-			case 'user':
-				return userStyles;
-			case 'theme':
-				return themeStyles;
-			default:
-				return mergedStyles;
-		}
-	};
-
 	const nextValue = useMemo(
 		() => ( {
 			contexts,
@@ -203,15 +192,31 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				setContent( JSON.stringify( newContent ) );
 			},
 			getStyle: ( context, propertyName, origin = 'merged' ) => {
-				const styleOrigin = getStyleOrigin( origin );
+				if ( origin === 'theme' ) {
+					const value = get(
+						themeStyles?.styles?.[ context ],
+						STYLE_PROPERTY[ propertyName ].value
+					);
+					return getValueFromVariable( themeStyles, context, value );
+				}
+
+				if ( origin === 'user' ) {
+					const value = get(
+						userStyles?.styles?.[ context ],
+						STYLE_PROPERTY[ propertyName ].value
+					);
+
+					// We still need to use merged styles here because the
+					// presets used to resolve user variable may be defined a
+					// layer down ( core, theme, or user ).
+					return getValueFromVariable( mergedStyles, context, value );
+				}
 
 				const value = get(
-					styleOrigin?.styles?.[ context ],
+					mergedStyles?.styles?.[ context ],
 					STYLE_PROPERTY[ propertyName ].value
 				);
-
-				const styles = 'theme' === origin ? themeStyles : mergedStyles;
-				return getValueFromVariable( styles, context, value );
+				return getValueFromVariable( mergedStyles, context, value );
 			},
 			setStyle: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
