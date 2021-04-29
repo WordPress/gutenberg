@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 1.17.0 (2021-04-29)
+
 ### New Features
 
 -   Add support for array and object destructured arguments in TypeScript documentation generation.
