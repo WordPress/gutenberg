@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 10.5.2 =
+
+## Bug Fixes
+
+ - Include new API for useSelect to prevent the global editor white screen.
+
+
 = 10.5.1 =
 
 
