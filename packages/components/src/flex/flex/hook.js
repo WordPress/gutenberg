@@ -12,15 +12,15 @@ import deprecated from '@wordpress/deprecated';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../ui/context';
-import { useResponsiveValue } from '../ui/utils/use-responsive-value';
-import { space } from '../ui/utils/space';
-import * as styles from './styles';
+import { useContextSystem } from '../../ui/context';
+import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
+import { space } from '../../ui/utils/space';
+import * as styles from '../styles';
 
 /**
  *
- * @param {import('../ui/context').ViewOwnProps<import('./types').FlexProps, 'div'>} props
- * @return {import('../ui/context').ViewOwnProps<import('./types').FlexProps, 'div'>} Props with the deprecated props removed.
+ * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} props
+ * @return {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
  */
 function useDeprecatedProps( { isReversed, ...otherProps } ) {
 	if ( typeof isReversed !== 'undefined' ) {
@@ -38,7 +38,7 @@ function useDeprecatedProps( { isReversed, ...otherProps } ) {
 }
 
 /**
- * @param {import('../ui/context').ViewOwnProps<import('./types').FlexProps, 'div'>} props
+ * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} props
  */
 export function useFlex( props ) {
 	const {

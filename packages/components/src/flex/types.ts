@@ -23,10 +23,6 @@ export type FlexProps = {
 	 */
 	align?: CSSProperties[ 'alignItems' ];
 	/**
-	 * @default false
-	 */
-	alignItems?: boolean;
-	/**
 	 * The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
 	 *
 	 * @default 'row'
@@ -51,10 +47,6 @@ export type FlexProps = {
 	 * @default 'space-between'
 	 */
 	justify?: CSSProperties[ 'justifyContent' ];
-	/**
-	 * @default false
-	 */
-	justifyContent?: boolean;
 	/**
 	 * Determines if children should wrap.
 	 *

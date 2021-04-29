@@ -1,13 +1,13 @@
 /**
  * Internal dependencies
  */
-import { contextConnect } from '../ui/context';
-import { useFlex } from './use-flex';
-import { FlexContext } from './context';
-import { View } from '../ui/view';
+import { contextConnect } from '../../ui/context';
+import { useFlex } from './hook';
+import { FlexContext } from './../context';
+import { View } from '../../ui/view';
 
 /**
- * @param {import('../ui/context').ViewOwnProps<import('./types').FlexProps, 'div'>} props
+ * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Flex( props, forwardedRef ) {
