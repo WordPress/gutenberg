@@ -1,7 +1,11 @@
 /**
  * External dependencies
  */
-import { css, ui } from '@wp-g2/styles';
+import { css } from 'emotion';
+/**
+ * Internal dependencies
+ */
+import CONFIG from '../../utils/config-values';
 
 export const scrollableScrollbar = css`
 	@media only screen and ( min-device-width: 40em ) {
@@ -15,19 +19,19 @@ export const scrollableScrollbar = css`
 		}
 
 		&::-webkit-scrollbar-track {
-			background: ${ ui.get( 'colorScrollbarTrack' ) };
+			background: ${ CONFIG.colorScrollbarTrack };
 			border-radius: 8px;
 		}
 
 		&::-webkit-scrollbar-thumb {
 			background-clip: padding-box;
-			background-color: ${ ui.get( 'colorScrollbarThumb' ) };
+			background-color: ${ CONFIG.colorScrollbarThumb };
 			border: 2px solid rgba( 0, 0, 0, 0 );
 			border-radius: 7px;
 		}
 
 		&:hover::-webkit-scrollbar-thumb {
-			background-color: ${ ui.get( 'colorScrollbarThumbHover' ) };
+			background-color: ${ CONFIG.colorScrollbarThumbHover };
 		}
 	}
 `;

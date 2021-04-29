@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, AccessibilityInfo } from 'react-native';
 import classnames from 'classnames';
 
 /**
@@ -57,6 +57,9 @@ export default function SearchEdit( {
 	);
 	const [ isLongButton, setIsLongButton ] = useState( false );
 	const [ buttonWidth, setButtonWidth ] = useState( MIN_BUTTON_WIDTH );
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
+		false
+	);
 
 	const textInputRef = useRef( null );
 
@@ -68,6 +71,34 @@ export default function SearchEdit( {
 		placeholder,
 		buttonText,
 	} = attributes;
+
+	/*
+	 * Check if screenreader is enabled and save to state. This is important for
+	 * properly creating accessibilityLabel text.
+	 */
+	useEffect( () => {
+		AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			handleScreenReaderToggled
+		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then(
+			( screenReaderEnabled ) => {
+				setIsScreenReaderEnabled( screenReaderEnabled );
+			}
+		);
+
+		return () => {
+			AccessibilityInfo.removeEventListener(
+				'screenReaderChanged',
+				handleScreenReaderToggled
+			);
+		};
+	}, [] );
+
+	const handleScreenReaderToggled = ( screenReaderEnabled ) => {
+		setIsScreenReaderEnabled( screenReaderEnabled );
+	};
 
 	/*
 	 * Called when the value of isSelected changes. Blurs the PlainText component
@@ -204,12 +235,53 @@ export default function SearchEdit( {
 		isLongButton && { flexDirection: 'column' },
 	];
 
-	const getPlaceholderAccessibilityLabel = () => {
+	/**
+	 * If a screenreader is enabled, create a descriptive label for this field. If
+	 * not, return a label that is used during automated UI tests.
+	 *
+	 * @return {string} The accessibilityLabel for the Search Button
+	 */
+	const getAccessibilityLabelForButton = () => {
+		if ( ! isScreenReaderEnabled ) {
+			return 'search-block-button';
+		}
+
+		return `${ __(
+			'Search button. Current button text is'
+		) } ${ buttonText }`;
+	};
+
+	/**
+	 * If a screenreader is enabled, create a descriptive label for this field. If
+	 * not, return a label that is used during automated UI tests.
+	 *
+	 * @return {string} The accessibilityLabel for the Search Input
+	 * 					 placeholder field.
+	 */
+	const getAccessibilityLabelForPlaceholder = () => {
+		if ( ! isScreenReaderEnabled ) {
+			return 'search-block-input';
+		}
+
 		const title = __( 'Search input field.' );
 		const description = placeholder
 			? `${ __( 'Current placeholder text is' ) } ${ placeholder }`
 			: __( 'No custom placeholder set' );
 		return `${ title } ${ description }`;
+	};
+
+	/**
+	 * If a screenreader is enabled, create a descriptive label for this field. If
+	 * not, return a label that is used during automated UI tests.
+	 *
+	 * @return {string} The accessibilityLabel for the Search Label field
+	 */
+	const getAccessibilityLabelForLabel = () => {
+		if ( ! isScreenReaderEnabled ) {
+			return 'search-block-label';
+		}
+
+		return `${ __( 'Search block label. Current text is' ) } ${ label }`;
 	};
 
 	const renderTextField = () => {
@@ -218,10 +290,12 @@ export default function SearchEdit( {
 				style={ styles.searchInputContainer }
 				accessible={ true }
 				accessibilityRole="none"
-				accessibilityHint={ __(
-					'Double tap to edit placeholder text'
-				) }
-				accessibilityLabel={ getPlaceholderAccessibilityLabel() }
+				accessibilityHint={
+					isScreenReaderEnabled
+						? __( 'Double tap to edit placeholder text' )
+						: undefined
+				}
+				accessibilityLabel={ getAccessibilityLabelForPlaceholder() }
 			>
 				<PlainText
 					ref={ textInputRef }
@@ -278,12 +352,12 @@ export default function SearchEdit( {
 					<View
 						accessible={ true }
 						accessibilityRole="none"
-						accessibilityHint={ __(
-							'Double tap to edit button text'
-						) }
-						accessibilityLabel={ `${ __(
-							'Search button. Current button text is'
-						) } ${ buttonText }` }
+						accessibilityHint={
+							isScreenReaderEnabled
+								? __( 'Double tap to edit button text' )
+								: undefined
+						}
+						accessibilityLabel={ getAccessibilityLabelForButton() }
 						onLayout={ onLayoutButton }
 					>
 						<RichText
@@ -333,10 +407,12 @@ export default function SearchEdit( {
 				<View
 					accessible={ true }
 					accessibilityRole="none"
-					accessibilityHint={ __( 'Double tap to edit label text' ) }
-					accessibilityLabel={ `${ __(
-						'Search block label. Current text is'
-					) } ${ label }` }
+					accessibilityHint={
+						isScreenReaderEnabled
+							? __( 'Double tap to edit label text' )
+							: undefined
+					}
+					accessibilityLabel={ getAccessibilityLabelForLabel() }
 				>
 					<RichText
 						className="wp-block-search__label"

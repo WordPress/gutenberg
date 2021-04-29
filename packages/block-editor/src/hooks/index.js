@@ -12,4 +12,5 @@ import './font-size';
 import './border-color';
 import './layout';
 
+export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';

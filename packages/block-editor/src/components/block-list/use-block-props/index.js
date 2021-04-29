@@ -29,8 +29,8 @@ import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-name
 import { useFocusHandler } from './use-focus-handler';
 import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
-import { useBlockNodes } from './use-block-nodes';
 import { useScrollIntoView } from './use-scroll-into-view';
+import { useBlockRefProvider } from './use-block-refs';
 import { store as blockEditorStore } from '../../../store';
 
 /**
@@ -106,7 +106,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useFocusFirstElement( clientId ),
 		// Must happen after focus because we check for focus in the block.
 		useScrollIntoView( clientId ),
-		useBlockNodes( clientId ),
+		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
 		useEventHandlers( clientId ),
 		useNavModeExit( clientId ),
