@@ -80,7 +80,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 			if ( is_child_theme() ) {
 
 				$has_php_template   = file_exists( get_stylesheet_directory() . '/' . $current_template_slug . '.php' );
-				$block_template     = _gutenberg_get_template_file( 'wp_template', $type );
+				$block_template     = _gutenberg_get_template_file( 'wp_template', $current_block_template_slug );
 				$has_block_template = false;
 
 				if ( null !== $block_template && wp_get_theme()->get_stylesheet() === $block_template['theme'] ) {
