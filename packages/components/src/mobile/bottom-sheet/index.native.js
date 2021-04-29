@@ -44,6 +44,8 @@ import BottomSheetSubSheet from './sub-sheet';
 import NavigationHeader from './navigation-header';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
+const DEFAULT_LAYOUT_ANIMATION = LayoutAnimation.Presets.easeInEaseOut;
+
 class BottomSheet extends Component {
 	constructor() {
 		super( ...arguments );
@@ -73,6 +75,7 @@ class BottomSheet extends Component {
 
 		this.headerHeight = 0;
 		this.keyboardHeight = 0;
+		this.lastLayoutAnimation = null;
 
 		this.state = {
 			safeAreaBottomInset: 0,
@@ -94,6 +97,10 @@ class BottomSheet extends Component {
 	}
 
 	keyboardShow( e ) {
+		if ( ! this.props.isVisible ) {
+			return;
+		}
+
 		const { height } = e.endCoordinates;
 
 		this.keyboardHeight = height;
@@ -102,26 +109,48 @@ class BottomSheet extends Component {
 	}
 
 	keyboardHide( e ) {
+		if ( ! this.props.isVisible ) {
+			return;
+		}
+
 		this.keyboardHeight = 0;
 		this.performKeyboardLayoutAnimation( e );
 		this.onSetMaxHeight();
 	}
 
-	// This layout animation is the same as the React Native's KeyboardAvoidingView component.
-	// Reference: https://github.com/facebook/react-native/blob/266b21baf35e052ff28120f79c06c4f6dddc51a9/Libraries/Components/Keyboard/KeyboardAvoidingView.js#L119-L128
 	performKeyboardLayoutAnimation( event ) {
-		const { duration, easing } = event;
-
-		if ( duration && easing ) {
+		if ( Platform.OS === 'android' ) {
 			LayoutAnimation.configureNext( {
-				// We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m
-				duration: duration > 10 ? duration : 10,
-				update: {
-					duration: duration > 10 ? duration : 10,
-					type: LayoutAnimation.Types[ easing ] || 'keyboard',
-				},
+				update: DEFAULT_LAYOUT_ANIMATION.update,
+				duration: DEFAULT_LAYOUT_ANIMATION.duration,
 			} );
+		} else {
+			// This layout animation is the same as the React Native's KeyboardAvoidingView component.
+			// Reference: https://github.com/facebook/react-native/blob/266b21baf35e052ff28120f79c06c4f6dddc51a9/Libraries/Components/Keyboard/KeyboardAvoidingView.js#L119-L128
+			const { duration, easing } = event;
+
+			if ( duration && easing ) {
+				const layoutAnimation = {
+					// We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m
+					duration: duration > 10 ? duration : 10,
+					update: {
+						duration: duration > 10 ? duration : 10,
+						type: LayoutAnimation.Types[ easing ] || 'keyboard',
+					},
+				};
+				LayoutAnimation.configureNext( layoutAnimation );
+				this.lastLayoutAnimation = layoutAnimation;
+			}
 		}
+	}
+
+	performRegularLayoutAnimation( { useLastLayoutAnimation } ) {
+		const layoutAnimation = useLastLayoutAnimation
+			? this.lastLayoutAnimation || DEFAULT_LAYOUT_ANIMATION
+			: DEFAULT_LAYOUT_ANIMATION;
+
+		LayoutAnimation.configureNext( layoutAnimation );
+		this.lastLayoutAnimation = layoutAnimation;
 	}
 
 	componentDidMount() {
@@ -222,6 +251,11 @@ class BottomSheet extends Component {
 	onHeaderLayout( { nativeEvent } ) {
 		const { height } = nativeEvent.layout;
 		this.headerHeight = height;
+		if ( Platform.OS === 'ios' ) {
+			this.performRegularLayoutAnimation( {
+				useLastLayoutAnimation: true,
+			} );
+		}
 		this.onSetMaxHeight();
 	}
 
