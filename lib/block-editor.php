@@ -191,7 +191,7 @@ function gutenberg_get_default_block_editor_settings() {
 	}
 
 	$default_size       = get_option( 'image_default_size', 'large' );
-	$image_default_size = in_array( $default_size, array_keys( $image_size_names ), true ) ? $image_default_size : 'large';
+	$image_default_size = in_array( $default_size, array_keys( $image_size_names ), true ) ? $default_size : 'large';
 
 	$image_dimensions = array();
 	$all_sizes        = wp_get_registered_image_subsizes();
