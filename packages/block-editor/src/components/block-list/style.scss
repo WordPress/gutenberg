@@ -568,7 +568,7 @@
 
 	// Dark block UI appearance.
 	border-radius: $radius-block-ui;
-	background-color: $gray-900;
+	background-color: var(--wp-admin-theme-color);
 
 	font-size: $default-font-size;
 	height: $block-toolbar-height;
