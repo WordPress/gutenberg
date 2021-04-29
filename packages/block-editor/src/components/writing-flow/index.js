@@ -6,7 +6,7 @@ import { find, reverse, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, createContext } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -35,8 +35,6 @@ import { __ } from '@wordpress/i18n';
 import { isInSameBlock, getBlockClientId } from '../../utils/dom';
 import useMultiSelection from './use-multi-selection';
 import { store as blockEditorStore } from '../../store';
-
-export const SelectionStart = createContext();
 
 /**
  * Useful for positioning an element within the viewport so focussing the
@@ -523,7 +521,7 @@ export default function WritingFlow( { children } ) {
 	// This hook sets the selection after the user makes a multi-selection. For
 	// some browsers, like Safari, it is important that this happens AFTER
 	// setting focus on the multi-selection container above.
-	const onSelectionStart = useMultiSelection( container );
+	useMultiSelection( container );
 
 	const lastFocus = useRef();
 
@@ -566,7 +564,7 @@ export default function WritingFlow( { children } ) {
 	// bubbling events from children to determine focus transition intents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<SelectionStart.Provider value={ onSelectionStart }>
+		<>
 			<div
 				ref={ focusCaptureBeforeRef }
 				tabIndex={ focusCaptureTabIndex }
@@ -598,7 +596,7 @@ export default function WritingFlow( { children } ) {
 				onFocus={ onFocusCapture }
 				style={ PREVENT_SCROLL_ON_FOCUS }
 			/>
-		</SelectionStart.Provider>
+		</>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }

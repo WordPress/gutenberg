@@ -31,6 +31,7 @@ import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
 import { useScrollIntoView } from './use-scroll-into-view';
 import { useBlockRefProvider } from './use-block-refs';
+import { useMultiSelection } from './use-multi-selection';
 import { store as blockEditorStore } from '../../../store';
 
 /**
@@ -108,6 +109,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		useScrollIntoView( clientId ),
 		useBlockRefProvider( clientId ),
 		useFocusHandler( clientId ),
+		useMultiSelection( clientId ),
 		useEventHandlers( clientId ),
 		useNavModeExit( clientId ),
 		useIsHovered(),
