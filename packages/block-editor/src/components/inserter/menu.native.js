@@ -193,6 +193,7 @@ function InserterMenu( {
 					<TouchableHighlight accessible={ false }>
 						{ searchFocus || filterValue ? (
 							<InserterSearchResults
+								rootClientId={ rootClientId }
 								filterValue={ filterValue }
 								onSelect={ onSelectItem }
 								listProps={ listProps }
