@@ -15,22 +15,21 @@ import { store as blockEditorStore } from '../../../store';
  * @param {string} clientId Block client ID.
  */
 export function useNavModeExit( clientId ) {
-	const isEnabled = useSelect( ( select ) => {
-		const { isNavigationMode, isBlockSelected } = select(
-			blockEditorStore
-		);
-		return isNavigationMode() && isBlockSelected( clientId );
-	}, [] );
-	const { setNavigationMode } = useDispatch( blockEditorStore );
-
+	const { isNavigationMode, isBlockSelected } = useSelect( blockEditorStore );
+	const { setNavigationMode, selectBlock } = useDispatch( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
-			if ( ! isEnabled ) {
-				return;
-			}
+			function onMouseDown( event ) {
+				if ( isNavigationMode() ) {
+					// Prevent focus from moving to the block.
+					event.preventDefault();
 
-			function onMouseDown() {
-				setNavigationMode( false );
+					if ( isBlockSelected( clientId ) ) {
+						setNavigationMode( false );
+					} else {
+						selectBlock( clientId );
+					}
+				}
 			}
 
 			node.addEventListener( 'mousedown', onMouseDown );
@@ -39,6 +38,6 @@ export function useNavModeExit( clientId ) {
 				node.addEventListener( 'mousedown', onMouseDown );
 			};
 		},
-		[ isEnabled ]
+		[ clientId, isNavigationMode, isBlockSelected, setNavigationMode ]
 	);
 }
