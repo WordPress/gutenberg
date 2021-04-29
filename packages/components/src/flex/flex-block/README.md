@@ -4,7 +4,7 @@ A layout component to contain items of a fixed width within `Flex`.
 
 ## Usage
 
-See [`flex/README.md#usage`](../flex/README.md#usage) for how to use `FlexBlock`.
+See [`flex/README.md#usage`](/packages/comonents/src/flex/README.md#usage) for how to use `FlexBlock`.
 
 ## Props
 
