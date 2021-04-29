@@ -19,7 +19,13 @@ import styles from './style.scss';
 
 const TAB_ANIMATION_DURATION = 250;
 
-function InserterTabs( { rootClientId, tabIndex, onSelect, listProps } ) {
+function InserterTabs( {
+	listProps,
+	onSelect,
+	rootClientId,
+	showReusableBlocks,
+	tabIndex,
+} ) {
 	const tabAnimation = useRef( new Animated.Value( 0 ) ).current;
 
 	useEffect( () => {
@@ -30,15 +36,26 @@ function InserterTabs( { rootClientId, tabIndex, onSelect, listProps } ) {
 		} ).start();
 	}, [ tabIndex ] );
 
+	const { tabs, tabKeys } = useMemo( () => {
+		const filteredTabs = InserterTabs.TABS.filter(
+			( { name } ) => showReusableBlocks || name !== 'reusable'
+		);
+		return {
+			tabs: filteredTabs,
+			tabKeys: [ ...filteredTabs.keys() ],
+		};
+	}, [ showReusableBlocks ] );
+
 	const { width } = Dimensions.get( 'window' );
-	const tabKeys = useMemo( () => [ ...InserterTabs.TABS.keys() ], [] );
 	const translateX = useMemo(
 		() =>
-			tabAnimation.interpolate( {
-				inputRange: tabKeys,
-				outputRange: tabKeys.map( ( key ) => key * -width ),
-			} ),
-		[ tabAnimation ]
+			tabKeys.length > 1
+				? tabAnimation.interpolate( {
+						inputRange: tabKeys,
+						outputRange: tabKeys.map( ( key ) => key * -width ),
+				  } )
+				: tabAnimation,
+		[ tabAnimation, tabKeys ]
 	);
 
 	return (
@@ -51,7 +68,7 @@ function InserterTabs( { rootClientId, tabIndex, onSelect, listProps } ) {
 				},
 			] }
 		>
-			{ InserterTabs.TABS.map( ( tab, index ) => (
+			{ tabs.map( ( tab, index ) => (
 				<View
 					key={ `tab-${ index }` }
 					style={ [
@@ -70,33 +87,35 @@ function InserterTabs( { rootClientId, tabIndex, onSelect, listProps } ) {
 	);
 }
 
-function TabsControl( { onChangeTab } ) {
-	const segments = useMemo(
-		() => InserterTabs.TABS.map( ( { name } ) => name ),
-		[]
-	);
+function TabsControl( { onChangeTab, showReusableBlocks } ) {
+	const segments = useMemo( () => {
+		const filteredTabs = InserterTabs.TABS.filter(
+			( { name } ) => showReusableBlocks || name !== 'reusable'
+		);
+		return filteredTabs.map( ( { title } ) => title );
+	}, [ showReusableBlocks ] );
 
 	const segmentHandler = useCallback(
 		( selectedTab ) => {
-			const tabNames = InserterTabs.TABS.map( ( { name } ) => name );
-			onChangeTab( tabNames.indexOf( selectedTab ) );
+			const tabTitles = InserterTabs.TABS.map( ( { title } ) => title );
+			onChangeTab( tabTitles.indexOf( selectedTab ) );
 		},
 		[ onChangeTab ]
 	);
 
-	return (
+	return segments.length > 1 ? (
 		<SegmentedControl
 			segments={ segments }
 			segmentHandler={ segmentHandler }
 		/>
-	);
+	) : null;
 }
 
 InserterTabs.Control = TabsControl;
 
 InserterTabs.TABS = [
-	{ name: __( 'Blocks' ), component: BlocksTypesTab },
-	{ name: __( 'Reusable' ), component: ReusableBlocksTab },
+	{ name: 'blocks', title: __( 'Blocks' ), component: BlocksTypesTab },
+	{ name: 'reusable', title: __( 'Reusable' ), component: ReusableBlocksTab },
 ];
 
 export default InserterTabs;

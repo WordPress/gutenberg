@@ -166,6 +166,8 @@ function InserterMenu( {
 		[ setSearchFocus ]
 	);
 
+	const showReusableBlocks = ! rootClientId;
+
 	return (
 		<BottomSheet
 			isVisible={ true }
@@ -180,7 +182,10 @@ function InserterMenu( {
 						/>
 					) }
 					{ ! searchFocus && ! filterValue && hasReusableBlocks && (
-						<InserterTabs.Control onChangeTab={ setTabIndex } />
+						<InserterTabs.Control
+							onChangeTab={ setTabIndex }
+							showReusableBlocks={ showReusableBlocks }
+						/>
 					) }
 				</>
 			}
@@ -204,6 +209,7 @@ function InserterMenu( {
 								listProps={ listProps }
 								tabIndex={ tabIndex }
 								onSelect={ onSelectItem }
+								showReusableBlocks={ showReusableBlocks }
 							/>
 						) }
 					</TouchableHighlight>
