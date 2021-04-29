@@ -10,7 +10,7 @@ exports[`Navigation editor allows creation of a menu when there are no current m
 
 exports[`Navigation editor displays the first menu from the REST response when at least one menu exists 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"vertical\\"} -->
-<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"custom\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"id\\":94,\\"url\\":\\"http://localhost:8889/\\",\\"title\\":\\"\\",\\"kind\\":\\"custom\\",\\"className\\":\\"\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"Home\\",\\"type\\":\\"custom\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"http://localhost:8889/\\",\\"title\\":\\"\\",\\"kind\\":\\"custom\\",\\"className\\":\\"\\"} /-->
 
 <!-- wp:navigation-link {\\"label\\":\\"Accusamus quo repellat illum magnam quas\\",\\"type\\":\\"page\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"id\\":41,\\"url\\":\\"http://localhost:8889/?page_id=41\\",\\"title\\":\\"\\",\\"kind\\":\\"post-type\\",\\"className\\":\\"\\"} -->
 <!-- wp:navigation-link {\\"label\\":\\"Debitis cum consequatur sit doloremque\\",\\"type\\":\\"page\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"id\\":51,\\"url\\":\\"http://localhost:8889/?page_id=51\\",\\"title\\":\\"\\",\\"kind\\":\\"post-type\\",\\"className\\":\\"\\"} /-->
@@ -38,8 +38,8 @@ exports[`Navigation editor displays the first menu from the REST response when a
 <!-- /wp:navigation-link -->
 <!-- /wp:navigation-link -->
 
-<!-- wp:navigation-link {\\"label\\":\\"WordPress.org\\",\\"type\\":\\"custom\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"id\\":108,\\"url\\":\\"https://wordpress.org\\",\\"title\\":\\"\\",\\"kind\\":\\"custom\\",\\"className\\":\\"\\"} -->
-<!-- wp:navigation-link {\\"label\\":\\"Google\\",\\"type\\":\\"custom\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"id\\":109,\\"url\\":\\"https://google.com\\",\\"title\\":\\"\\",\\"kind\\":\\"custom\\",\\"className\\":\\"\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"WordPress.org\\",\\"type\\":\\"custom\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"https://wordpress.org\\",\\"title\\":\\"\\",\\"kind\\":\\"custom\\",\\"className\\":\\"\\"} -->
+<!-- wp:navigation-link {\\"label\\":\\"Google\\",\\"type\\":\\"custom\\",\\"description\\":\\"\\",\\"rel\\":\\"\\",\\"url\\":\\"https://google.com\\",\\"title\\":\\"\\",\\"kind\\":\\"custom\\",\\"className\\":\\"\\"} /-->
 <!-- /wp:navigation-link -->
 <!-- /wp:navigation -->"
 `;
