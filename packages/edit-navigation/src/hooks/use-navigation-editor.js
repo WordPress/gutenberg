@@ -1,14 +1,15 @@
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+
 /**
  * Internal dependencies
  */
 import { store as editNavigationStore } from '../store';
-import { store as noticesStore } from '@wordpress/notices';
-import { __, sprintf } from '@wordpress/i18n';
 
 const getMenusData = ( select ) => {
 	const selectors = select( 'core' );
