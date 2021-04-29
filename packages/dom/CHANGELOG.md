@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 2.18.0 (2021-04-29)
+
 ### New Feature
 
 -	Export type definitions

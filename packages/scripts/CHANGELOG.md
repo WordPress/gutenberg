@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 15.0.0 (2021-04-29)
+
 ### Breaking Changes
 
 -   Rename `format-js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
