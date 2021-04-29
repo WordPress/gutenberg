@@ -60,7 +60,7 @@ const SiteLogo = ( {
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const { toggleSelection } = useDispatch( blockEditorStore );
-	const classes = classnames( {
+	const classes = classnames( 'custom-logo-link', {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
 	const { maxWidth, title } = useSelect( ( select ) => {
@@ -84,7 +84,6 @@ const SiteLogo = ( {
 	}
 
 	const img = (
-		<span className="custom-logo-link">
 			<img
 				className="custom-logo"
 				src={ logoUrl }
@@ -98,16 +97,15 @@ const SiteLogo = ( {
 					);
 				} }
 			/>
-		</span>
 	);
 
 	let imgWrapper = img;
 
 	// Disable reason: Image itself is not meant to be interactive, but
 	// should direct focus to block.
-	/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	if ( isLink ) {
 		imgWrapper = (
+			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 			<a
 				href={ siteUrl }
 				className={ classes }
@@ -117,9 +115,9 @@ const SiteLogo = ( {
 			>
 				{ img }
 			</a>
+			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		);
 	}
-	/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 
 	let imageWidthWithinContainer;
 
