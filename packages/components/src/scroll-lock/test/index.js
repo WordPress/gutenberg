@@ -41,6 +41,14 @@ describe( 'scroll-lock', () => {
 		wrapper = mount( <ScrollLock /> );
 		expectLocked( true );
 		wrapper.unmount();
-		expectLocked( false );
+
+		// Running cleanup functions now works asynchronously. the unofficial
+		// enzyme adapter for react 17 we're currently using does not account
+		// for this, yet. So for now, we'll use setTimeout to wait for cleanup.
+		//
+		// @see https://reactjs.org/blog/2020/08/10/react-v17-rc.html#effect-cleanup-timing
+		setTimeout( () => {
+			expectLocked( false );
+		} );
 	} );
 } );
