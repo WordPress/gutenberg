@@ -1,7 +1,11 @@
 <!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+### Enhancements
+
 -   Added new `startResolutions` and `finishResolutions` actions as batched variants of `startResolution` and `finishResolutions` actions.
+-   Updated `redux` dependency from requiring `^4.0.0` to `^4.1.0` (see changes at https://github.com/reduxjs/redux/releases/tag/v4.1.0).
 
 ## 4.27.0 (2021-03-17)
 
