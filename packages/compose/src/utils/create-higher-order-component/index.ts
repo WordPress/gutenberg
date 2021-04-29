@@ -22,6 +22,12 @@ export type SimpleHigherOrderComponent = < TProps >(
 	Inner: ComponentType< TProps >
 ) => ComponentType< TProps >;
 
+export type PropRemovingHigherOrderComponent< TRemovedProps > = <
+	TProps extends TRemovedProps
+>(
+	Inner: ComponentType< TProps >
+) => ComponentType< Omit< TProps, keyof TRemovedProps > >;
+
 /**
  * Given a function mapping a component to an enhanced component and modifier
  * name, returns the enhanced component augmented with a generated displayName.

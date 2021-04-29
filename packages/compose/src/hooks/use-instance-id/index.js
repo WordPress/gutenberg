@@ -11,7 +11,7 @@ const instanceMap = new WeakMap();
 /**
  * Creates a new id for a given object.
  *
- * @param {unknown} object Object reference to create an id for.
+ * @param {any} object Object reference to create an id for.
  * @return {number} The instance id (index).
  */
 function createId( object ) {
@@ -23,9 +23,9 @@ function createId( object ) {
 /**
  * Provides a unique instance ID.
  *
- * @param {Object} object Object reference to create an id for.
- * @param {string} prefix Prefix for the unique id.
- * @param {string} preferredId Default ID to use.
+ * @param {any} object Object reference to create an id for.
+ * @param {string} [prefix] Prefix for the unique id.
+ * @param {string} [preferredId=''] Default ID to use.
  * @return {string | number} The unique instance id.
  */
 export default function useInstanceId( object, prefix, preferredId = '' ) {
