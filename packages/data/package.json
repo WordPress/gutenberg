@@ -38,7 +38,7 @@
 		"is-promise": "^4.0.0",
 		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
-		"redux": "^4.0.0",
+		"redux": "^4.1.0",
 		"turbo-combine-reducers": "^1.0.2",
 		"use-memo-one": "^1.1.1"
 	},
