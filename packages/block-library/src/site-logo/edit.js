@@ -84,19 +84,16 @@ const SiteLogo = ( {
 	}
 
 	const img = (
-			<img
-				className="custom-logo"
-				src={ logoUrl }
-				alt={ alt }
-				onLoad={ ( event ) => {
-					setNaturalSize(
-						pick( event.target, [
-							'naturalWidth',
-							'naturalHeight',
-						] )
-					);
-				} }
-			/>
+		<img
+			className="custom-logo"
+			src={ logoUrl }
+			alt={ alt }
+			onLoad={ ( event ) => {
+				setNaturalSize(
+					pick( event.target, [ 'naturalWidth', 'naturalHeight' ] )
+				);
+			} }
+		/>
 	);
 
 	let imgWrapper = img;
