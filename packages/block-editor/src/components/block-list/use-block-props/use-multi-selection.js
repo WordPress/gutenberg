@@ -165,9 +165,11 @@ export function useMultiSelection( clientId ) {
 
 				if ( event.shiftKey ) {
 					const blockSelectionStart = getBlockSelectionStart();
-					toggleRichText( node, false );
-					multiSelect( blockSelectionStart, clientId );
-					event.preventDefault();
+					if ( blockSelectionStart !== clientId ) {
+						toggleRichText( node, false );
+						multiSelect( blockSelectionStart, clientId );
+						event.preventDefault();
+					}
 				} else if ( hasMultiSelection() ) {
 					// Allow user to escape out of a multi-selection to a
 					// singular selection of a block via click. This is handled
