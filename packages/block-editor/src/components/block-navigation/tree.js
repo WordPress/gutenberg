@@ -4,7 +4,7 @@
 
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
-import { useEffect, useMemo, useRef } from '@wordpress/element';
+import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -46,10 +46,13 @@ export default function BlockNavigationTree( {
 		__experimentalPersistentListViewFeatures
 	);
 	const { selectBlock } = useDispatch( blockEditorStore );
-	function selectEditorBlock( clientId ) {
-		selectBlock( clientId );
-		onSelect( clientId );
-	}
+	const selectEditorBlock = useCallback(
+		( clientId ) => {
+			selectBlock( clientId );
+			onSelect( clientId );
+		},
+		[ selectBlock, onSelect ]
+	);
 
 	let {
 		ref: treeGridRef,

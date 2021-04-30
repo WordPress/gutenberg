@@ -8,8 +8,10 @@ import { __ } from '@wordpress/i18n';
  */
 import BlockNavigationTree from './tree';
 
+const noop = () => {};
+
 export default function BlockNavigation( {
-	onSelect = () => {},
+	onSelect = noop,
 	__experimentalFeatures,
 } ) {
 	return (
