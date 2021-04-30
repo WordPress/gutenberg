@@ -34,18 +34,6 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 		interfaceStore
 	);
 
-	const speakMessage = () => {
-		if ( isBlockInspectorOpen ) {
-			speak( __( 'Block settings closed' ) );
-		} else {
-			speak(
-				__(
-					'Additional settings are now available in the Editor block settings sidebar'
-				)
-			);
-		}
-	};
-
 	const label = isBlockInspectorOpen
 		? __( 'Hide more settings' )
 		: __( 'Show more settings' );
@@ -55,10 +43,15 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 			onClick={ () => {
 				if ( isBlockInspectorOpen ) {
 					disableComplementaryArea( STORE_NAME );
+					speak( __( 'Block settings closed' ) );
 				} else {
 					enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+					speak(
+						__(
+							'Additional settings are now available in the Editor block settings sidebar'
+						)
+					);
 				}
-				speakMessage();
 				// Close dropdown menu.
 				onClick();
 			} }
