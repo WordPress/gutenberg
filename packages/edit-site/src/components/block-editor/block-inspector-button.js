@@ -57,8 +57,8 @@ export default function BlockInspectorButton( { onClick = () => {} } ) {
 					disableComplementaryArea( STORE_NAME );
 				} else {
 					enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
-					speakMessage();
 				}
+				speakMessage();
 				// Close dropdown menu.
 				onClick();
 			} }
