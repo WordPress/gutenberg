@@ -606,4 +606,22 @@ describe( 'Mapping block attributes and menu item fields', () => {
 			expect( actual.id ).toBeUndefined();
 		} );
 	} );
+
+	describe( 'full conversion cycles', () => {
+		it( 'converts menu item fields to block attributes and back again without data loss', () => {
+			const actual = menuItems
+				.map( ( fields ) => menuItemToBlockAttributes( fields ) )
+				.map( ( attrs ) => blockAttributesToMenuItem( attrs ) );
+
+			expect( actual ).toEqual( menuItems );
+		} );
+
+		it( 'converts block attributes to menu item fields and back again without data loss', () => {
+			const actual = blockAttrs
+				.map( ( attrs ) => blockAttributesToMenuItem( attrs ) )
+				.map( ( fields ) => menuItemToBlockAttributes( fields ) );
+
+			expect( actual ).toEqual( blockAttrs );
+		} );
+	} );
 } );
