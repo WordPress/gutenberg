@@ -6,6 +6,8 @@ import {
 	useState,
 	useEffect,
 	useContext,
+	useCallback,
+	useMemo,
 } from '@wordpress/element';
 
 /**
@@ -20,10 +22,8 @@ export default function FocusControl( { api, sidebarControls, children } ) {
 		current: null,
 	} );
 
-	useEffect( () => {
-		function handleFocus( settingId ) {
-			const widgetId = settingIdToWidgetId( settingId );
-
+	const focusWidget = useCallback(
+		( widgetId ) => {
 			for ( const sidebarControl of sidebarControls ) {
 				const widgets = sidebarControl.setting.get();
 
@@ -36,6 +36,15 @@ export default function FocusControl( { api, sidebarControls, children } ) {
 					break;
 				}
 			}
+		},
+		[ sidebarControls ]
+	);
+
+	useEffect( () => {
+		function handleFocus( settingId ) {
+			const widgetId = settingIdToWidgetId( settingId );
+
+			focusWidget( widgetId );
 		}
 
 		function handleReady() {
@@ -54,13 +63,18 @@ export default function FocusControl( { api, sidebarControls, children } ) {
 				handleFocus
 			);
 		};
-	}, [ api, sidebarControls ] );
+	}, [ api, focusWidget ] );
+
+	const context = useMemo( () => [ focusedWidgetIdRef, focusWidget ], [
+		focusedWidgetIdRef,
+		focusWidget,
+	] );
 
 	return (
-		<FocusControlContext.Provider value={ focusedWidgetIdRef }>
+		<FocusControlContext.Provider value={ context }>
 			{ children }
 		</FocusControlContext.Provider>
 	);
 }
 
-export const useFocusedWidgetIdRef = () => useContext( FocusControlContext );
+export const useFocusedWidget = () => useContext( FocusControlContext );

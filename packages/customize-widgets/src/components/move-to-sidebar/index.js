@@ -23,10 +23,12 @@ import {
 	useSidebarControls,
 	useActiveSidebarControl,
 } from '../sidebar-controls';
+import { useFocusedWidget } from '../focus-control';
 
 export default function MoveToSidebar( { widgetId } ) {
 	const sidebarControls = useSidebarControls();
 	const activeSidebarControl = useActiveSidebarControl();
+	const [ , focusWidget ] = useFocusedWidget();
 
 	function moveToSidebar( sidebarControlId ) {
 		const newSidebarControl = sidebarControls.find(
@@ -39,7 +41,7 @@ export default function MoveToSidebar( { widgetId } ) {
 		oldSetting( without( oldSetting(), widgetId ) );
 		newSetting( [ ...newSetting(), widgetId ] );
 
-		newSidebarControl.expand();
+		focusWidget( widgetId );
 	}
 
 	return (
