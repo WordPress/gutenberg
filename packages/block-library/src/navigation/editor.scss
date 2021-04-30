@@ -223,9 +223,14 @@ $color-control-label-height: 20px;
 		opacity: 0.3;
 	}
 
-	// Don't show the preview boxes for an empty nav block,
-	// but be present to size it correctly.
+	// Don't show the preview boxes for an empty nav block.
 	.is-selected & {
+		display: none;
+	}
+
+	// ... but be present in larger contexts to size it correctly.
+	.is-selected .is-large & {
+		display: flex;
 		opacity: 0;
 		width: 0;
 		overflow: hidden;
@@ -256,7 +261,9 @@ $color-control-label-height: 20px;
 		display: flex;
 	}
 
-	// Vertical navigation.
+	// Show stacked for the vertical navigation, or small placeholders.
+	.is-small &,
+	.is-medium &,
 	.is-vertical & {
 		.wp-block-navigation-placeholder__actions {
 			flex-direction: column;
@@ -279,10 +286,9 @@ $color-control-label-height: 20px;
 		padding: 0;
 		align-items: center;
 		justify-content: flex-start;
-		display: inline-flex;
 		line-height: 0;
 
-		// line up with the icon in the toolbar.
+		// Line up with the icon in the toolbar.
 		margin-left: $grid-unit-05 + $border-width;
 
 		svg {
@@ -292,6 +298,12 @@ $color-control-label-height: 20px;
 		.is-vertical & {
 			margin-bottom: $grid-unit-05;
 			margin-left: 0;
+		}
+
+		// Show only in big placeholders.
+		display: none;
+		.is-large & {
+			display: inline-flex;
 		}
 	}
 }

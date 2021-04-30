@@ -46,8 +46,8 @@ function Placeholder( {
 	let modifierClassNames;
 	if ( typeof width === 'number' ) {
 		modifierClassNames = {
-			'is-large': width >= 320,
-			'is-medium': width >= 160 && width < 320,
+			'is-large': width >= 480,
+			'is-medium': width >= 160 && width < 480,
 			'is-small': width < 160,
 		};
 	}
