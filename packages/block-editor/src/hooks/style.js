@@ -189,10 +189,10 @@ export const withBlockControls = createHigherOrderComponent(
 			<>
 				{ shouldDisplayControls && (
 					<>
-						<TypographyPanel { ...props } />,
-						<BorderPanel { ...props } />,
-						<ColorEdit { ...props } />,
-						<SpacingPanel { ...props } />,
+						<TypographyPanel { ...props } />
+						<BorderPanel { ...props } />
+						<ColorEdit { ...props } />
+						<SpacingPanel { ...props } />
 					</>
 				) }
 				<BlockEdit { ...props } />
