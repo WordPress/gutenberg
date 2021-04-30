@@ -22,6 +22,7 @@ import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
 import { SPACING_SUPPORT_KEY, SpacingPanel } from './spacing';
+import useDisplayBlockControls from '../components/use-display-block-controls';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -182,13 +183,21 @@ export function addEditProps( settings ) {
  */
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		return [
-			<TypographyPanel key="typography" { ...props } />,
-			<BorderPanel key="border" { ...props } />,
-			<ColorEdit key="colors" { ...props } />,
-			<BlockEdit key="edit" { ...props } />,
-			<SpacingPanel key="spacing" { ...props } />,
-		];
+		const shouldDisplayControls = useDisplayBlockControls();
+
+		return (
+			<>
+				{ shouldDisplayControls && (
+					<>
+						<TypographyPanel { ...props } />
+						<BorderPanel { ...props } />
+						<ColorEdit { ...props } />
+						<SpacingPanel { ...props } />
+					</>
+				) }
+				<BlockEdit { ...props } />
+			</>
+		);
 	},
 	'withToolbarControls'
 );
