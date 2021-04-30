@@ -21,8 +21,7 @@ import { BORDER_SUPPORT_KEY, BorderPanel } from './border';
 import { COLOR_SUPPORT_KEY, ColorEdit } from './color';
 import { FONT_SIZE_SUPPORT_KEY } from './font-size';
 import { TypographyPanel, TYPOGRAPHY_SUPPORT_KEYS } from './typography';
-import { SPACING_SUPPORT_KEY, PaddingEdit } from './padding';
-import SpacingPanelControl from '../components/spacing-panel-control';
+import { SPACING_SUPPORT_KEY, SpacingPanel } from './spacing';
 
 const styleSupportKeys = [
 	...TYPOGRAPHY_SUPPORT_KEYS,
@@ -150,7 +149,7 @@ export function addSaveProps( props, blockType, attributes ) {
 }
 
 /**
- * Filters registered block settings to extand the block edit wrapper
+ * Filters registered block settings to extend the block edit wrapper
  * to apply the desired styles and classnames properly.
  *
  * @param  {Object} settings Original block settings
@@ -183,23 +182,12 @@ export function addEditProps( settings ) {
  */
 export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { name: blockName } = props;
-
-		const hasSpacingSupport = hasBlockSupport(
-			blockName,
-			SPACING_SUPPORT_KEY
-		);
-
 		return [
 			<TypographyPanel key="typography" { ...props } />,
 			<BorderPanel key="border" { ...props } />,
 			<ColorEdit key="colors" { ...props } />,
 			<BlockEdit key="edit" { ...props } />,
-			hasSpacingSupport && (
-				<SpacingPanelControl key="spacing">
-					<PaddingEdit { ...props } />
-				</SpacingPanelControl>
-			),
+			<SpacingPanel key="spacing" { ...props } />,
 		];
 	},
 	'withToolbarControls'
