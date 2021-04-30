@@ -105,6 +105,7 @@ class BottomSheet extends Component {
 		this.keyboardHeight = height;
 		this.performKeyboardLayoutAnimation( e );
 		this.onSetMaxHeight();
+		this.props.onKeyboardShow?.();
 	}
 
 	keyboardHide( e ) {
@@ -115,6 +116,7 @@ class BottomSheet extends Component {
 		this.keyboardHeight = 0;
 		this.performKeyboardLayoutAnimation( e );
 		this.onSetMaxHeight();
+		this.props.onKeyboardHide?.();
 	}
 
 	performKeyboardLayoutAnimation( event ) {
