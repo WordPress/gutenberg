@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { remove, replace, insertAfter } from '@wordpress/dom';
+import { remove, replace } from '@wordpress/dom';
 
 /**
  * Looks for `<!--nextpage-->` and `<!--more-->` comments and
@@ -78,24 +78,29 @@ function moreCommentConverter( node, doc ) {
 	} else {
 		const childNodes = Array.from( node.parentNode.childNodes );
 		const nodeIndex = childNodes.indexOf( node );
+		const wrapperNode = node.parentNode.parentNode || doc.body;
 
+		const paragraphBuilder = ( acc, child ) => {
+			if ( ! acc ) {
+				acc = doc.createElement( 'p' );
+			}
+
+			acc.appendChild( child );
+
+			return acc;
+		};
+
+		// Split the original parent node and insert our more block
 		[
-			childNodes.slice( 0, nodeIndex ).reduce( ( acc, childNode ) => {
-				acc.appendChild( childNode );
-
-				return acc;
-			}, doc.createElement( 'p' ) ),
+			childNodes.slice( 0, nodeIndex ).reduce( paragraphBuilder, null ),
 			moreBlock,
-			childNodes.slice( nodeIndex + 1 ).reduce( ( acc, childNode ) => {
-				acc.appendChild( childNode );
+			childNodes.slice( nodeIndex + 1 ).reduce( paragraphBuilder, null ),
+		].forEach(
+			( element ) =>
+				element && wrapperNode.insertBefore( element, node.parentNode )
+		);
 
-				return acc;
-			}, doc.createElement( 'p' ) ),
-		].reduce( ( referenceNode, childNode ) => {
-			insertAfter( childNode, referenceNode );
-			return childNode;
-		}, node.parentNode );
-
+		// Remove the old parent paragraph
 		remove( node.parentNode );
 	}
 }
