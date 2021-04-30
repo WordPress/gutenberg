@@ -8,7 +8,7 @@ import { isEmpty } from 'lodash';
  * Internal dependencies
  */
 import { defaultColumnsNumber } from './shared';
-import styles from './v1/gallery-styles.scss';
+import styles from './gallery-styles.native.scss';
 
 /**
  * WordPress dependencies
@@ -71,7 +71,14 @@ export const Gallery = ( props ) => {
 	return (
 		<View style={ [ isFullWidth && styles.fullWidth ] }>
 			<View { ...innerBlocksProps } />
-			{ mediaPlaceholder }
+			<View
+				style={ [
+					isFullWidth && styles.fullWidth,
+					styles.galleryAppender,
+				] }
+			>
+				{ mediaPlaceholder }
+			</View>
 		</View>
 	);
 };
