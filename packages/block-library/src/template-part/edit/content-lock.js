@@ -11,14 +11,17 @@ import classnames from 'classnames';
 const baseClassName = 'wp-block-template-part__content-lock';
 
 export default function ContentLock( { clientId, children } ) {
-	const { isSelected, hasChildSelected } = useSelect(
+	const { isSelected, hasChildSelected, isDraggingBlocks } = useSelect(
 		( select ) => {
-			const { isBlockSelected, hasSelectedInnerBlock } = select(
-				blockEditorStore
-			);
+			const {
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				isDraggingBlocks: _isDraggingBlocks,
+			} = select( blockEditorStore );
 			return {
 				isSelected: isBlockSelected( clientId ),
 				hasChildSelected: hasSelectedInnerBlock( clientId, true ),
+				isDraggingBlocks: _isDraggingBlocks(),
 			};
 		},
 		[ clientId ]
@@ -28,6 +31,7 @@ export default function ContentLock( { clientId, children } ) {
 	const classes = classnames( baseClassName, {
 		'parent-selected': isSelected,
 		'child-selected': hasChildSelected,
+		'is-dragging-blocks': isDraggingBlocks,
 	} );
 
 	// Disabled because the overlay div doesn't actually have a role or functionality
