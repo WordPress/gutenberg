@@ -182,7 +182,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 						</div>
 						{ hasMenus ? (
 							<DropdownMenu
-								text={ __( 'Existing menu' ) }
+								text={ __( 'Add existing menu' ) }
 								icon={ chevronDown }
 								toggleProps={ toggleProps }
 							>
