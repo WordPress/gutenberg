@@ -40,7 +40,8 @@ export default function ContentLock( { clientId, children } ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div className={ classes }>
-			{ ! isSelected && ! hasChildSelected && (
+			{ ( ( ! isSelected && ! hasChildSelected ) ||
+				isDraggingBlocks ) && (
 				<div
 					className={ `${ baseClassName }-overlay` }
 					onMouseUp={ () => selectBlock( clientId ) }
