@@ -5,7 +5,7 @@
 /**
  * Internal dependencies
  */
-import { Flex } from '../flex';
+import { Flex } from '../../flex';
 import { Grid } from '../grid';
 import { useControlGroup } from './hook';
 import { contextConnect } from '../context';

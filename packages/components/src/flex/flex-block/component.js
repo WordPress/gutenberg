@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../utils';
-import { useFlexBlock } from './use-flex-block';
+import { createComponent } from '../../ui/utils';
+import { useFlexBlock } from './hook';
 
 /**
  * `FlexBlock` is a primitive layout component that adaptively resizes content within layout containers like `Flex`.

@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
-import { useFlexItem } from './use-flex-item';
+import { useContextSystem } from '../../ui/context';
+import { useFlexItem } from '../flex-item';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').FlexBlockProps, 'div'>} props
+ * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexBlockProps, 'div'>} props
  */
 export function useFlexBlock( props ) {
 	const otherProps = useContextSystem( props, 'FlexBlock' );
