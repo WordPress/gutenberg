@@ -1,17 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { createContext, useState, useEffect } from '@wordpress/element';
+import {
+	createContext,
+	useState,
+	useEffect,
+	useContext,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import { settingIdToWidgetId } from '../../utils';
 
-export const FocusControlContext = createContext( null );
+const FocusControlContext = createContext();
 
 export default function FocusControl( { api, sidebarControls, children } ) {
-	const [ focusedWidgetId, setFocusedWidgetId ] = useState( null );
+	const [ focusedWidgetIdRef, setFocusedWidgetIdRef ] = useState( {
+		current: null,
+	} );
 
 	useEffect( () => {
 		function handleFocus( settingId ) {
@@ -23,7 +30,9 @@ export default function FocusControl( { api, sidebarControls, children } ) {
 				if ( widgets.includes( widgetId ) ) {
 					sidebarControl.sectionInstance.expand();
 
-					setFocusedWidgetId( widgetId );
+					// Create a "ref-like" object every time to ensure
+					// the same widget id can also triggers the focus control.
+					setFocusedWidgetIdRef( { current: widgetId } );
 					break;
 				}
 			}
@@ -48,8 +57,10 @@ export default function FocusControl( { api, sidebarControls, children } ) {
 	}, [ api, sidebarControls ] );
 
 	return (
-		<FocusControlContext.Provider value={ focusedWidgetId }>
+		<FocusControlContext.Provider value={ focusedWidgetIdRef }>
 			{ children }
 		</FocusControlContext.Provider>
 	);
 }
+
+export const useFocusedWidgetIdRef = () => useContext( FocusControlContext );
