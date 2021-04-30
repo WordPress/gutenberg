@@ -9,15 +9,15 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import { DocumentationImage } from './images';
-import { store as editSiteStore } from '../../store';
+import { store as editPostStore } from '../../store';
 
 export default function WelcomeGuideTemplate() {
-	const { toggleFeature } = useDispatch( editSiteStore );
+	const { toggleFeature } = useDispatch( editPostStore );
 
 	return (
 		<Guide
 			className="edit-post-welcome-guide"
-			contentLabel={ __( 'Welcome to the design editor' ) }
+			contentLabel={ __( 'Welcome to the template editor' ) }
 			finishButtonText={ __( 'Get started' ) }
 			onFinish={ () => toggleFeature( 'welcomeGuideTemplate' ) }
 			pages={ [
@@ -26,41 +26,11 @@ export default function WelcomeGuideTemplate() {
 					content: (
 						<>
 							<h1 className="edit-post-welcome-guide__heading">
-								{ __( 'Welcome to the design editor' ) }
+								{ __( 'Welcome to the template editor' ) }
 							</h1>
 							<p className="edit-post-welcome-guide__text">
 								{ __(
-									'The Design Editor allows customizing all aspects of the site using the tools of blocks and patterns. Discover a whole new set of blocks to help build a site.'
-								) }
-							</p>
-						</>
-					),
-				},
-				{
-					image: <DocumentationImage />,
-					content: (
-						<>
-							<h1 className="edit-post-welcome-guide__heading">
-								{ __( 'Create and edit templates' ) }
-							</h1>
-							<p className="edit-post-welcome-guide__text">
-								{ __(
-									'Templates express the layout of the site, including the homepage, archives, posts and pages. Add new layout elements like sidebars, edit the navigation, or customise the appearance of search results.'
-								) }
-							</p>
-						</>
-					),
-				},
-				{
-					image: <DocumentationImage />,
-					content: (
-						<>
-							<h1 className="edit-post-welcome-guide__heading">
-								{ __( 'Paint with global styles' ) }
-							</h1>
-							<p className="edit-post-welcome-guide__text">
-								{ __(
-									'Change how different elements and blocks look across the entire site, including colors, typography, and spacing tools.'
+									'Templates express the layout of the site. Customize all aspects of your posts and pages using the tools of blocks and patterns.'
 								) }
 							</p>
 						</>
