@@ -10,69 +10,86 @@ import { useSelect } from '@wordpress/data';
 import { isClientIdSelected } from './utils';
 import { store as blockEditorStore } from '../../store';
 
+const useBlockNavigationSelectedClientIds = (
+	selectedBlockClientIds,
+	__experimentalPersistentListViewFeatures
+) =>
+	useSelect(
+		( select ) => {
+			const {
+				getSelectedBlockClientId,
+				getSelectedBlockClientIds,
+			} = select( blockEditorStore );
+
+			if ( selectedBlockClientIds ) {
+				return selectedBlockClientIds;
+			}
+
+			if ( __experimentalPersistentListViewFeatures ) {
+				return getSelectedBlockClientIds();
+			}
+
+			return getSelectedBlockClientId();
+		},
+		[ selectedBlockClientIds, __experimentalPersistentListViewFeatures ]
+	);
+
+const useBlockNavigationClientIdsTree = (
+	blocks,
+	selectedClientIds,
+	showOnlyCurrentHierarchy
+) =>
+	useSelect(
+		( select ) => {
+			const {
+				getBlockHierarchyRootClientId,
+				__unstableGetClientIdsTree,
+				__unstableGetClientIdWithClientIdsTree,
+			} = select( blockEditorStore );
+
+			if ( blocks ) {
+				return blocks;
+			}
+
+			const isSingleBlockSelected =
+				selectedClientIds && ! Array.isArray( selectedClientIds );
+			if ( ! showOnlyCurrentHierarchy || ! isSingleBlockSelected ) {
+				return __unstableGetClientIdsTree();
+			}
+
+			const rootBlock = __unstableGetClientIdWithClientIdsTree(
+				getBlockHierarchyRootClientId( selectedClientIds )
+			);
+			if ( ! rootBlock ) {
+				return __unstableGetClientIdsTree();
+			}
+
+			const hasHierarchy =
+				! isClientIdSelected( rootBlock.clientId, selectedClientIds ) ||
+				( rootBlock.innerBlocks && rootBlock.innerBlocks.length !== 0 );
+			if ( hasHierarchy ) {
+				return [ rootBlock ];
+			}
+
+			return __unstableGetClientIdsTree();
+		},
+		[ blocks, selectedClientIds, showOnlyCurrentHierarchy ]
+	);
+
 export default function useBlockNavigationClientIds(
 	blocks,
 	showOnlyCurrentHierarchy,
 	selectedBlockClientIds,
 	__experimentalPersistentListViewFeatures
 ) {
-	return useSelect(
-		( select ) => {
-			const {
-				getBlockHierarchyRootClientId,
-				getSelectedBlockClientId,
-				getSelectedBlockClientIds,
-				__unstableGetClientIdsTree,
-				__unstableGetClientIdWithClientIdsTree,
-			} = select( blockEditorStore );
-
-			let selectedClientIds;
-			if ( selectedBlockClientIds ) {
-				selectedClientIds = selectedBlockClientIds;
-			} else if ( __experimentalPersistentListViewFeatures ) {
-				selectedClientIds = getSelectedBlockClientIds();
-			} else {
-				selectedClientIds = getSelectedBlockClientId();
-			}
-
-			let clientIdsTree = blocks;
-			if ( blocks ) {
-				clientIdsTree = blocks;
-			} else if ( ! showOnlyCurrentHierarchy ) {
-				clientIdsTree = __unstableGetClientIdsTree();
-			} else {
-				const rootBlock =
-					selectedClientIds && ! Array.isArray( selectedClientIds )
-						? __unstableGetClientIdWithClientIdsTree(
-								getBlockHierarchyRootClientId(
-									selectedClientIds
-								)
-						  )
-						: null;
-				const hasHierarchy =
-					rootBlock &&
-					( ! isClientIdSelected(
-						rootBlock.clientId,
-						selectedClientIds
-					) ||
-						( rootBlock.innerBlocks &&
-							rootBlock.innerBlocks.length !== 0 ) );
-				clientIdsTree = hasHierarchy
-					? [ rootBlock ]
-					: __unstableGetClientIdsTree();
-			}
-
-			if ( ! Array.isArray( selectedClientIds ) ) {
-				selectedClientIds = [ selectedClientIds ];
-			}
-
-			return { clientIdsTree, selectedClientIds };
-		},
-		[
-			blocks,
-			showOnlyCurrentHierarchy,
-			selectedBlockClientIds,
-			__experimentalPersistentListViewFeatures,
-		]
+	const selectedClientIds = useBlockNavigationSelectedClientIds(
+		selectedBlockClientIds,
+		__experimentalPersistentListViewFeatures
 	);
+	const clientIdsTree = useBlockNavigationClientIdsTree(
+		blocks,
+		selectedClientIds,
+		showOnlyCurrentHierarchy
+	);
+	return { clientIdsTree, selectedClientIds };
 }
