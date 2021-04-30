@@ -4,6 +4,8 @@ exports.shortText = `Rock music approaches at high velocity.`;
 
 exports.mediumText = `The finer continuum interprets the polynomial rabbit. When can the geology runs? An astronomer runs. Should a communist consent?`;
 
+exports.slashInserter = '/';
+
 exports.longText = `Beneath the busy continuum blinks the ineffective husband. Why a metric now outside the official subway? How can the prompt crop exhaust his tree 
 Does this chord crowd my emptied search? A theory bubbles under the cartoon. The discontinued speaker cracks every thick epic. extraordinary twin shifts behind
 The finer continuum interprets the polynomial rabbit. When can the geology runs? An astronomer runs. Should a communist consent?`;
@@ -100,6 +102,10 @@ exports.imageShorteHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <!-- wp:paragraph -->
 <p>rock music approaches at high velocity.</p>
 <!-- /wp:paragraph -->`;
+
+exports.imagePlaceholderHtml = `<!-- wp:image -->
+<figure class="wp-block-image"><img alt=""/></figure>
+<!-- /wp:image -->`;
 
 exports.unsupportedBlockHtml = `<!-- wp:jetpack/gif {"giphyUrl":"https://giphy.com/embed/3orieS4jfHJaKwkeli","searchText":"example"} /-->`;
 

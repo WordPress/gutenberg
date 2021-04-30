@@ -22,6 +22,7 @@ import {
 	useState,
 	useCallback,
 } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
 import { Icon, AutocompletionItemsFill } from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
@@ -155,6 +156,10 @@ export function getAutoCompleterUI( autocompleter ) {
 								contentContainerStyle={ styles.content }
 								showsHorizontalScrollIndicator={ false }
 								keyboardShouldPersistTaps="always"
+								accessibilityLabel={
+									// translators: Slash inserter autocomplete results
+									__( 'Slash inserter results' )
+								}
 							>
 								{ items.map( ( option, index ) => {
 									const isActive = index === selectedIndex;
@@ -177,6 +182,11 @@ export function getAutoCompleterUI( autocompleter ) {
 											style={ itemStyle }
 											key={ index }
 											onPress={ () => onSelect( option ) }
+											accessibilityLabel={ sprintf(
+												// translators: %s: Block name e.g. "Image block"
+												__( '%s block' ),
+												option?.value?.title
+											) }
 										>
 											<View style={ styles.icon }>
 												<Icon
