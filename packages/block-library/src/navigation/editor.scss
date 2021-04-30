@@ -177,6 +177,10 @@ $color-control-label-height: 20px;
 	.components-placeholder__fieldset {
 		font-size: inherit;
 	}
+
+	.components-placeholder__fieldset .components-button {
+		margin-bottom: 0;
+	}
 }
 
 // Spinner.
@@ -272,10 +276,10 @@ $color-control-label-height: 20px;
 	// Block title
 	.wp-block-navigation-placeholder__actions__indicator {
 		margin-right: $grid-unit-15;
-		padding: ($grid-unit-15 / 2) 0;
+		padding: 0;
 		align-items: center;
 		justify-content: flex-start;
-		display: none;
+		display: inline-flex;
 		line-height: 0;
 
 		// line up with the icon in the toolbar.
@@ -288,10 +292,6 @@ $color-control-label-height: 20px;
 		.is-vertical & {
 			margin-bottom: $grid-unit-05;
 			margin-left: 0;
-		}
-
-		@include break-small {
-			display: inline-flex;
 		}
 	}
 }
