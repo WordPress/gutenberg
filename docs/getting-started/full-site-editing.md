@@ -1,6 +1,15 @@
 # Full Site Editing
 
-At the highest level, the vision of Full Site Editing is to provide a collection of features that bring the familiar experience and extendability of blocks to all parts of your site rather than just post and pages. You can think of Full Site Editing as the umbrella project name for various sub-projects within Gutenberg that make this vision possible. Projects under Full Site Editing (FSE) include the Site Editor, Global Styles, numerous Site/Post/Page specific blocks, Query block, Navigation block, Templates, and block themes.
+At the highest level, the vision of Full Site Editing is to provide a collection of features that bring the familiar experience and extendability of blocks to all parts of your site rather than just post and pages. You can think of Full Site Editing as the umbrella project name for various sub-projects within Gutenberg that make this vision possible. Projects under Full Site Editing (FSE) include everything from the Site Editor, Global Styles, numerous Site/Post/Page specific blocks, Query block, Navigation block, Templates, and block themes. What follows are brief descriptions of the major pieces with more details found [here](https://github.com/WordPress/gutenberg/issues/24551): 
+
+- Site Editor: the cohesive experience that allows you to directly edit and navigate between various templates, template parts, styling options, and more. 
+- Template Editing: a scaled down direct editing experience allowing you to edit/change/create the template a post/page uses. 
+- Block Theme: work to allow for a theme that's built using templates composed using blocks that works with full site editing. More below. 
+- Styling: the feature that enables styling modifications across three levels (local blocks, theme defaults, and global modifications).
+- Theme Blocks: new blocks that accomplish everything possible in traditional templates using template tags (ex: Post Author Block). 
+- Browsing: the feature that unlocks the ability to navigate between various entities in the site editing experience including templates, pages, etc. 
+- Navigation Block: a new block that allows you to edit a site's navigation menu, both in terms of structure and design.
+- Query Block: a new block that replicates the classic WP_Query and allows for further customization with additional functionality. 
 
 There are other projects, like the Navigation Editor and Widget Editor, that are meant to specifically help classic themes begin adapting more to the block framework and to act as a stepping stone of sorts to Full Site Editing. These are separate projects from Full Site Editing though but are worth being aware of as they ultimately help the cause of getting more people adjusted to using blocks in more places.
 
