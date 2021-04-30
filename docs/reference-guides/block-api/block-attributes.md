@@ -167,7 +167,10 @@ _Example_: Extract `src` and `alt` from each image element in the block's markup
 // }
 ```
 
-## Meta
+## Meta (deprecated)
+
+> **Although attributes may be obtained from a post's meta, meta attribute sources are considered deprecated; [EntityProvider and related hook APIs](https://github.com/WordPress/gutenberg/blob/c367c4e2765f9e6b890d1565db770147efca5d66/packages/core-data/src/entity-provider.js) should be used instead, as shown in the [Create Meta Block how-to](/docs/how-to-guides/metabox/meta-block-3-add.md).**
+
 
 Attributes may be obtained from a post's meta rather than from the block's representation in saved post content. For this, an attribute is required to specify its corresponding meta key under the `meta` key:
 
