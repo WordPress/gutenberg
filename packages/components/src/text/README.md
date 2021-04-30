@@ -1,4 +1,6 @@
-# Text (Experimental)
+# Text
+
+> **Experimental!**
 
 `Text` is a core component that renders text in the library, using the library's typography system.
 

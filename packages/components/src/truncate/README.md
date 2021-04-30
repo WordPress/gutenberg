@@ -1,4 +1,6 @@
-# Truncate (Experimental)
+# Truncate
+
+> **Experimental!**
 
 `Truncate` is a typography primitive that trims text content. For almost all cases, it is recommended that `Text`, `Heading`, or `Subheading` is used to render text content. However, `Truncate` is available for custom implementations.
 

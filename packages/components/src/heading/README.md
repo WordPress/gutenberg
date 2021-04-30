@@ -1,11 +1,13 @@
 # Heading
 
+> **Experimental!**
+
 `Heading` renders headings and titles using the library's typography system.
 
 ## Usage
 
 ```jsx
-import { Heading } from '@wordpress/components/ui';
+import { __experimentalHeading as Heading } from '@wordpress/components';
 
 function Example() {
 	return <Heading>Code is Poetry</Heading>;
@@ -14,7 +16,7 @@ function Example() {
 
 ## Props
 
-`Heading` uses `Text` underneath, so we have access to all of `Text`'s props except for `size` which is replaced by `level`. For a complete list of those props, check out [`Text`](../text/#props).
+`Heading` uses `Text` underneath, so we have access to all of `Text`'s props except for `size` which is replaced by `level`. For a complete list of those props, check out [`Text`](/packages/components/src/text/README.md#props).
 
 ##### level
 

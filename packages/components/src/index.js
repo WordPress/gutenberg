@@ -65,6 +65,7 @@ export { default as __experimentalGradientPicker } from './gradient-picker';
 export { default as __experimentalCustomGradientPicker } from './custom-gradient-picker';
 export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
+export { Heading as __experimentalHeading } from './heading';
 export { default as Icon } from './icon';
 export { default as IconButton } from './button/deprecated';
 export { default as __experimentalInputControl } from './input-control';

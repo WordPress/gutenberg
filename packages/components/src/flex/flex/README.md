@@ -1,4 +1,6 @@
-# Flex (Experimental)
+# Flex
+
+> **Experimental!**
 
 `Flex` is a primitive layout component that adaptively aligns child content horizontally or vertically. `Flex` powers components like `HStack` and `VStack`.
 
@@ -11,7 +13,7 @@ import {
 	__experimentalFlex as Flex,
 	__experimentalFlexBlock as FlexBlock,
 	__experimentalFlexItem as FlexItem,
-	__experimentalText as Text
+	__experimentalText as Text,
 } from '@wordpress/components';
 
 function Example() {
