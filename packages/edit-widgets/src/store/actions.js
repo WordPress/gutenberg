@@ -101,6 +101,11 @@ export function* saveWidgetArea( widgetAreaId ) {
 		buildWidgetAreaPostId( widgetAreaId )
 	);
 
+	// Get all widgets from this area
+	const areaWidgets = Object.values( widgets ).filter(
+		( { sidebar } ) => sidebar === widgetAreaId
+	);
+
 	// Remove all duplicate reference widget instances
 	const usedReferenceWidgets = [];
 	const widgetsBlocks = post.blocks.filter( ( { attributes: { id } } ) => {
@@ -111,6 +116,17 @@ export function* saveWidgetArea( widgetAreaId ) {
 			usedReferenceWidgets.push( id );
 		}
 		return true;
+	} );
+
+	// Get all widgets that have been deleted
+	const deletedWidgets = areaWidgets.filter( ( widget ) => {
+		const { id } = widget;
+		return (
+			widgetsBlocks.findIndex(
+				( { attributes: { __internalWidgetId } } ) =>
+					__internalWidgetId === id
+			) === -1
+		);
 	} );
 
 	const batchMeta = [];
@@ -168,12 +184,23 @@ export function* saveWidgetArea( widgetAreaId ) {
 			clientId: block.clientId,
 		} );
 	}
+	for ( let i = 0; i < deletedWidgets.length; i++ ) {
+		batchTasks.push( ( { deleteEntityRecord } ) =>
+			deleteEntityRecord( 'root', 'widget', deletedWidgets[ i ].id, {
+				force: true,
+			} )
+		);
+	}
 
 	const records = yield dispatch( 'core', '__experimentalBatch', batchTasks );
 
 	const failedWidgetNames = [];
 
 	for ( let i = 0; i < records.length; i++ ) {
+		// Deleted widgets have a record but they don't have meta.
+		if ( ! batchMeta[ i ] ) {
+			continue;
+		}
 		const widget = records[ i ];
 		const { block, position } = batchMeta[ i ];
 
