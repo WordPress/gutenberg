@@ -39,7 +39,7 @@ class WP_Theme_JSON {
 	 *
 	 * @var string
 	 */
-	const ALL_BLOCKS_SELECTOR = ':root';
+	const ALL_BLOCKS_SELECTOR = 'body';
 
 	/**
 	 * How to address the root block
@@ -54,7 +54,7 @@ class WP_Theme_JSON {
 	 *
 	 * @var string
 	 */
-	const ROOT_BLOCK_SELECTOR = ':root';
+	const ROOT_BLOCK_SELECTOR = 'body';
 
 	const VALID_TOP_LEVEL_KEYS = array(
 		'customTemplates',
@@ -356,7 +356,7 @@ class WP_Theme_JSON {
 	 *
 	 * {
 	 *   'root': {
-	 *     'selector': ':root'
+	 *     'selector': 'body'
 	 *   },
 	 *   'core/heading/h1': {
 	 *     'selector': 'h1'
@@ -957,7 +957,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return array
 	 */
-	public static function get_style_nodes( $theme_json, $selectors = array() ) {
+	private static function get_style_nodes( $theme_json, $selectors = array() ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['styles'] ) ) {
 			return $nodes;
@@ -996,7 +996,7 @@ class WP_Theme_JSON {
 	 *
 	 * @return array
 	 */
-	public static function get_setting_nodes( $theme_json, $selectors = array() ) {
+	private static function get_setting_nodes( $theme_json, $selectors = array() ) {
 		$nodes = array();
 		if ( ! isset( $theme_json['settings'] ) ) {
 			return $nodes;

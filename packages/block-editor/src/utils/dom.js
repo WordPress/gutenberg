@@ -1,37 +1,4 @@
 /**
- * Given a block client ID, returns the corresponding DOM node for the block,
- * if exists. As much as possible, this helper should be avoided, and used only
- * in cases where isolated behaviors need remote access to a block node.
- *
- * @param {string}   clientId Block client ID.
- * @param {Document} doc      Document to search.
- *
- * @return {Element?} Block DOM node.
- */
-export function getBlockDOMNode( clientId, doc ) {
-	return doc.getElementById( 'block-' + clientId );
-}
-
-/**
- * Returns the preview container DOM node for a given block client ID, or
- * undefined if the container cannot be determined.
- *
- * @param {string}   clientId Block client ID.
- * @param {Document} doc      Document to search.
- *
- * @return {Node|undefined} Preview container DOM node.
- */
-export function getBlockPreviewContainerDOMNode( clientId, doc ) {
-	const domNode = getBlockDOMNode( clientId, doc );
-
-	if ( ! domNode ) {
-		return;
-	}
-
-	return domNode.firstChild || domNode;
-}
-
-/**
  * Returns true if two elements are contained within the same block.
  *
  * @param {Element} a First element.
