@@ -93,7 +93,7 @@
 		border-radius: 2px;
 	}
 
-	&:hover:not(.parent-selected):not(.child-selected) {
+	&:hover:not(.parent-selected):not(.child-selected):not(.is-dragging-blocks) {
 		> .wp-block-template-part__content-lock-overlay {
 			background: rgba(#007cba, 0.1);
 			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
