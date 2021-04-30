@@ -8,12 +8,12 @@ import { store as blockEditorStore } from '@wordpress/block-editor';
 /**
  * Internal dependencies
  */
-import { useFocusedWidget } from './';
+import { useFocusControl } from '.';
 import { getWidgetIdFromBlock } from '../../utils';
 
-export default function useFocusControl( blocks ) {
+export default function useBlocksFocusControl( blocks ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
-	const [ focusedWidgetIdRef ] = useFocusedWidget();
+	const [ focusedWidgetIdRef ] = useFocusControl();
 
 	const blocksRef = useRef( blocks );
 

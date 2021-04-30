@@ -7,7 +7,7 @@ import { BlockEditorProvider } from '@wordpress/block-editor';
  * Internal dependencies
  */
 import useSidebarBlockEditor from './use-sidebar-block-editor';
-import useFocusControl from '../focus-control/use-focus-control';
+import useBlocksFocusControl from '../focus-control/use-blocks-focus-control';
 
 export default function SidebarEditorProvider( {
 	sidebar,
@@ -16,7 +16,7 @@ export default function SidebarEditorProvider( {
 } ) {
 	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
 
-	useFocusControl( blocks );
+	useBlocksFocusControl( blocks );
 
 	return (
 		<BlockEditorProvider

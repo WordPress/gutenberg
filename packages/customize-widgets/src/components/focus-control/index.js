@@ -77,4 +77,4 @@ export default function FocusControl( { api, sidebarControls, children } ) {
 	);
 }
 
-export const useFocusedWidget = () => useContext( FocusControlContext );
+export const useFocusControl = () => useContext( FocusControlContext );
