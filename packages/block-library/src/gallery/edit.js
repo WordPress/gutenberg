@@ -285,6 +285,7 @@ function GalleryEdit( props ) {
 				id: image.id,
 				url: image.url,
 				caption: image.caption,
+				alt: image.alt,
 			} );
 		} );
 
