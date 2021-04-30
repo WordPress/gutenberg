@@ -262,21 +262,15 @@ export class BlockList extends Component {
 					horizontal={ horizontal }
 					extraData={ this.getExtraData() }
 					scrollEnabled={ isRootList }
-					contentContainerStyle={ [
-						horizontal && styles.horizontalContentContainer,
-						isWider( blockWidth, 'medium' ) &&
-							( isContentStretch && isMultiBlocks
-								? styles.horizontalContentContainerStretch
-								: styles.horizontalContentContainerCenter ),
-					] }
-					style={ [
-						getStyles(
-							isRootList,
-							isStackedHorizontally,
-							horizontalAlignment,
-							numColumns
-						),
-					] }
+					contentContainerStyle={
+						horizontal && styles.horizontalContentContainer
+					}
+					style={ getStyles(
+						isRootList,
+						isStackedHorizontally,
+						horizontalAlignment,
+						numColumns
+					) }
 					data={ blockClientIds }
 					keyExtractor={ identity }
 					renderItem={ this.renderItem }
