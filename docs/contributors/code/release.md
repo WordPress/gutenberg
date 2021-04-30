@@ -2,7 +2,7 @@
 
 This Repository is used to perform several types of releases. This document serves as a checklist for each one of these. It is helpful if you'd like to understand the different workflows.
 
-To release a stable version of the Gutenberg plugin, you need approval from a member of the [`gutenberg-core` team](https://github.com/orgs/WordPress/teams/gutenberg-core) for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release.
+To release a stable version of the Gutenberg plugin, you need approval from a member of the Gutenberg Core team for the final step of the release process (upload to the WordPress.org plugin repo -- see below). If you aren't a member yourself, make sure to contact one ahead of time so they'll be around at the time of the release. You can ping in the [#core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7).
 
 To release Gutenberg's npm packages, you need to be part of the [WordPress organization at npm](https://www.npmjs.com/org/wordpress). 🙂
 
@@ -41,7 +41,7 @@ Only once you're happy with the shape of the release notes should you press the 
 1. Use the release notes that you just edited to update `changelog.txt`, and
 2. upload the new plugin version to the WordPress.org plugin repository (SVN) (only if you're releasing a stable version).
 
-The latter step needs approval by a member of the [`gutenberg-core` team](https://github.com/orgs/WordPress/teams/gutenberg-core). Locate the ["Upload Gutenberg plugin to WordPress.org plugin repo" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
+The latter step needs approval by a member of the Gutenberg Core team. Locate the ["Upload Gutenberg plugin to WordPress.org plugin repo" workflow](https://github.com/WordPress/gutenberg/actions/workflows/upload-release-to-plugin-repo.yml) for the new version, and have it [approved](https://docs.github.com/en/actions/managing-workflow-runs/reviewing-deployments#approving-or-rejecting-a-job).
 
 This will cause the new version to be available to users of WordPress all over the globe! 💃
 You should check that folks are able to install the new version from their Dashboard.
@@ -67,7 +67,7 @@ You should also include a performance audit at the end of the release post. You 
 
 Compile this to a draft post on [make.wordpress.org/core](https://make.wordpress.org/core/); this post should be published after the actual release.
 
-If you don't have access to [make.wordpress.org/core](https://make.wordpress.org/core/), ping [someone on the Gutenberg Core team](https://github.com/orgs/WordPress/teams/gutenberg-core) in the [WordPress #core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7) to publish the post.
+If you don't have access to [make.wordpress.org/core](https://make.wordpress.org/core/), ping someone on the Gutenberg Core team in the [WordPress #core-editor Slack channel](https://wordpress.slack.com/messages/C02QB2JS7) to publish the post.
 
 ### Creating Release Candidate Patches (done via `git cherry-pick`)
 

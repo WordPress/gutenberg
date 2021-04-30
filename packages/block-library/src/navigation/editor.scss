@@ -11,29 +11,6 @@
 		margin-left: 0;
 		padding-left: 0;
 	}
-
-	// Unset horizontal and vertical margin rules from editor normalization stylesheet.
-	// Both margin-left: auto; and margin-right: auto; from .wp-block, and also
-	// margin: revert; from .editor-styles-wrapper ul li.
-	.block-editor-block-list__block {
-		margin: 0;
-
-		// This CSS provides a little spacing between blocks.
-		// It matches a rule in style.scss exactly, but needs higher specificity due to the unsetting of inherited styles above.
-		&.wp-block-navigation-link {
-			margin: 0 0.5em 0 0;
-		}
-
-		&.has-child .block-editor-block-list__block.wp-block-navigation-link {
-			margin: 0;
-		}
-
-		// Margin of right-most margin should be zero, for right aligned or justified items.
-		&.wp-block-pages-list__item:last-child,
-		&.wp-block-navigation-link:last-child {
-			margin-right: 0;
-		}
-	}
 }
 
 

@@ -18,7 +18,11 @@ import {
 } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
-import { MediaUpload, MediaUploadCheck } from '@wordpress/block-editor';
+import {
+	MediaUpload,
+	MediaUploadCheck,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -227,7 +231,7 @@ const applyWithDispatch = withDispatch(
 				editPost( { featured_media: image.id } );
 			},
 			onDropImage( filesList ) {
-				select( 'core/block-editor' )
+				select( blockEditorStore )
 					.getSettings()
 					.mediaUpload( {
 						allowedTypes: [ 'image' ],

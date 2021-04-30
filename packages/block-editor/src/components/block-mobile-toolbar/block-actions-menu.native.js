@@ -28,6 +28,7 @@ import { moreHorizontalMobile } from '@wordpress/icons';
 import { useRef, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -44,12 +45,14 @@ const BlockActionsMenu = ( {
 	isEmptyDefaultBlock,
 	isFirst,
 	isLast,
+	isReusableBlockType,
+	reusableBlock,
 	rootClientId,
 	selectedBlockClientId,
 	selectedBlockPossibleTransformations,
 	// Dispatch
 	createSuccessNotice,
-	convertBlockToStatic,
+	convertToRegularBlocks,
 	duplicateBlock,
 	onMoveDown,
 	onMoveUp,
@@ -62,7 +65,6 @@ const BlockActionsMenu = ( {
 	onDelete,
 	wrapBlockMover,
 	wrapBlockSettings,
-	isReusableBlockType,
 } ) => {
 	const [ clipboard, setCurrentClipboard ] = useState( getClipboard() );
 	const blockActionsMenuPickerRef = useRef();
@@ -189,10 +191,10 @@ const BlockActionsMenu = ( {
 					sprintf(
 						/* translators: %s: name of the reusable block */
 						__( '%s converted to regular blocks' ),
-						blockTitle
+						reusableBlock?.title?.raw || blockTitle
 					)
 				);
-				convertBlockToStatic( selectedBlockClientId );
+				convertToRegularBlocks();
 			},
 		},
 	};
@@ -319,6 +321,13 @@ export default compose(
 			: [];
 
 		const isReusableBlockType = block ? isReusableBlock( block ) : false;
+		const reusableBlock = isReusableBlockType
+			? select( coreStore ).getEntityRecord(
+					'postType',
+					'wp_block',
+					block?.attributes.ref
+			  )
+			: undefined;
 
 		return {
 			blockTitle,
@@ -329,13 +338,18 @@ export default compose(
 			isFirst: firstIndex === 0,
 			isLast: lastIndex === blockOrder.length - 1,
 			isReusableBlockType,
+			reusableBlock,
 			rootClientId,
 			selectedBlockClientId,
 			selectedBlockPossibleTransformations,
 		};
 	} ),
 	withDispatch(
-		( dispatch, { clientIds, rootClientId, currentIndex }, { select } ) => {
+		(
+			dispatch,
+			{ clientIds, rootClientId, currentIndex, selectedBlockClientId },
+			{ select }
+		) => {
 			const {
 				moveBlocksDown,
 				moveBlocksUp,
@@ -343,6 +357,7 @@ export default compose(
 				removeBlocks,
 				insertBlock,
 				replaceBlocks,
+				clearSelectedBlock,
 			} = dispatch( blockEditorStore );
 			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 			const { getBlockSelectionEnd, getBlock } = select(
@@ -356,7 +371,14 @@ export default compose(
 
 			return {
 				createSuccessNotice,
-				convertBlockToStatic,
+				convertToRegularBlocks() {
+					clearSelectedBlock();
+					// Convert action is executed at the end of the current JavaScript execution block
+					// to prevent issues related to undo/redo actions.
+					setImmediate( () =>
+						convertBlockToStatic( selectedBlockClientId )
+					);
+				},
 				duplicateBlock() {
 					return duplicateBlocks( clientIds );
 				},
