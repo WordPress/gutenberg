@@ -1,11 +1,11 @@
 /**
  * Internal dependencies
  */
-import Heading from '../index';
+import { Heading } from '../';
 
 export default {
 	component: Heading,
-	title: 'Components/Heading',
+	title: 'G2 Components (Experimental)/Heading',
 };
 
 export const _default = () => {
