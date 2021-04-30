@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../utils';
+import { createComponent } from '../ui/utils';
 import useTruncate from './hook';
 
 /**
@@ -12,7 +12,7 @@ import useTruncate from './hook';
  *
  * @example
  * ```jsx
- * import { Truncate } from `@wordpress/components/ui`;
+ * import { __experimentalTruncate as Truncate } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (
