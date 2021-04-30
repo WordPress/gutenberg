@@ -359,7 +359,7 @@ callback will be called multiple times for the same node.
 
 _Parameters_
 
--   _calllback_ `Function`: Callback with ref as argument.
+-   _callback_ `Function`: Callback with ref as argument.
 -   _dependencies_ `Array`: Dependencies of the callback.
 
 _Returns_
