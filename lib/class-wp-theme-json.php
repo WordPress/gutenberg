@@ -702,6 +702,10 @@ class WP_Theme_JSON {
 	 * @return array Returns the modified $declarations.
 	 */
 	private static function compute_root_vars( $declarations, $settings ) {
+		if ( empty( $settings['styles'] ) ) {
+			return;
+		}
+
 		$root_values = gutenberg_experimental_get( $settings, array( 'root' ) );
 		$css_vars      = self::flatten_tree( $root_values );
 		foreach ( $css_vars as $key => $value ) {
@@ -818,7 +822,7 @@ class WP_Theme_JSON {
 		}
 
 		// Create variables for root level settings
-		$declarations = self::compute_root_vars( array(), $this->theme_json['styles'] );
+		$declarations = self::compute_root_vars( array(), $this->theme_json );
 		$stylesheet .= self::to_ruleset( ':root', $declarations );
 
 		return $stylesheet;
