@@ -19,6 +19,7 @@ import { __ } from '@wordpress/i18n';
 import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	__experimentalBlockContentOverlay as BlockContentOverlay,
 	InnerBlocks,
 	BlockControls,
 	InspectorControls,
@@ -116,30 +117,34 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 
 	return (
 		<RecursionProvider>
-			<div { ...blockProps }>
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ () => convertBlockToStatic( clientId ) }
-							label={ __( 'Convert to regular blocks' ) }
-							icon={ ungroup }
-							showTooltip
-						/>
-					</ToolbarGroup>
-				</BlockControls>
-				<InspectorControls>
-					<PanelBody>
-						<TextControl
-							label={ __( 'Name' ) }
-							value={ title }
-							onChange={ setTitle }
-						/>
-					</PanelBody>
-				</InspectorControls>
-				<div className="block-library-block__reusable-block-container">
-					{ <div { ...innerBlocksProps } /> }
+			<BlockContentOverlay clientId={ clientId }>
+				<div { ...blockProps }>
+					<BlockControls>
+						<ToolbarGroup>
+							<ToolbarButton
+								onClick={ () =>
+									convertBlockToStatic( clientId )
+								}
+								label={ __( 'Convert to regular blocks' ) }
+								icon={ ungroup }
+								showTooltip
+							/>
+						</ToolbarGroup>
+					</BlockControls>
+					<InspectorControls>
+						<PanelBody>
+							<TextControl
+								label={ __( 'Name' ) }
+								value={ title }
+								onChange={ setTitle }
+							/>
+						</PanelBody>
+					</InspectorControls>
+					<div className="block-library-block__reusable-block-container">
+						{ <div { ...innerBlocksProps } /> }
+					</div>
 				</div>
-			</div>
+			</BlockContentOverlay>
 		</RecursionProvider>
 	);
 }

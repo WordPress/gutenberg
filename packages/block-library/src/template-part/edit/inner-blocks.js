@@ -6,14 +6,10 @@ import {
 	InnerBlocks,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseEditorFeature as useEditorFeature,
+	__experimentalBlockContentOverlay as BlockContentOverlay,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useSelect } from '@wordpress/data';
-
-/**
- * Internal dependencies
- */
-import ContentLock from './content-lock';
 
 export default function TemplatePartInnerBlocks( {
 	postId: id,
@@ -54,8 +50,8 @@ export default function TemplatePartInnerBlocks( {
 	} );
 
 	return (
-		<ContentLock clientId={ clientId }>
+		<BlockContentOverlay clientId={ clientId }>
 			<TagName { ...innerBlocksProps } />
-		</ContentLock>
+		</BlockContentOverlay>
 	);
 }

@@ -2,15 +2,19 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
 /**
  * External dependencies
  */
 import classnames from 'classnames';
 
-const baseClassName = 'wp-block-template-part__content-lock';
-
-export default function ContentLock( { clientId, children } ) {
+export default function BlockContentOverlay( { clientId, children } ) {
+	const baseClassName = 'block-editor-block-content-overlay';
 	const { isSelected, hasChildSelected, isDraggingBlocks } = useSelect(
 		( select ) => {
 			const {
@@ -43,11 +47,11 @@ export default function ContentLock( { clientId, children } ) {
 			{ ( ( ! isSelected && ! hasChildSelected ) ||
 				isDraggingBlocks ) && (
 				<div
-					className={ `${ baseClassName }-overlay` }
+					className={ `${ baseClassName }__overlay` }
 					onMouseUp={ () => selectBlock( clientId ) }
 				/>
 			) }
-			<div className={ `${ baseClassName }-content-wrapper` }>
+			<div className={ `${ baseClassName }__content-wrapper` }>
 				{ children }
 			</div>
 		</div>
