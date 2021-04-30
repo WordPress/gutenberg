@@ -39,7 +39,6 @@ function InserterMenu( {
 	insertionIndex,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ searchFormHeight, setSearchFormHeight ] = useState( 0 );
 	// eslint-disable-next-line no-undef
 	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
 
@@ -188,10 +187,6 @@ function InserterMenu( {
 							setFilterValue( value );
 						} }
 						value={ filterValue }
-						onLayout={ ( event ) => {
-							const { height } = event.nativeEvent.layout;
-							setSearchFormHeight( height );
-						} }
 					/>
 				)
 			}
@@ -210,7 +205,6 @@ function InserterMenu( {
 							{ ...{
 								listProps,
 								safeAreaBottomInset,
-								searchFormHeight,
 							} }
 						/>
 					</View>
