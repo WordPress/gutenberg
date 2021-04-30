@@ -840,6 +840,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Heading",
+		"slug": "heading",
+		"markdown_source": "../packages/components/src/heading/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "NavigateRegions",
 		"slug": "navigate-regions",
 		"markdown_source": "../packages/components/src/higher-order/navigate-regions/README.md",

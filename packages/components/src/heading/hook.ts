@@ -1,13 +1,13 @@
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
+import { useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
-import type { ViewOwnProps } from '../context';
-import type { Props as TextProps } from '../../text/types';
-import { useText } from '../../text';
-import { getHeadingFontSize } from '../utils/font-size';
-import { CONFIG, COLORS } from '../../utils';
+import type { ViewOwnProps } from '../ui/context';
+import type { Props as TextProps } from '../text/types';
+import { useText } from '../text';
+import { getHeadingFontSize } from '../ui/utils/font-size';
+import { CONFIG, COLORS } from '../utils';
 
 export type HeadingSize =
 	| 1
