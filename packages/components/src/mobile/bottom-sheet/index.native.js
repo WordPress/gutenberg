@@ -2,15 +2,16 @@
  * External dependencies
  */
 import {
-	Text,
-	View,
-	Platform,
-	PanResponder,
 	Dimensions,
 	Keyboard,
-	StatusBar,
+	LayoutAnimation,
+	PanResponder,
+	Platform,
 	ScrollView,
+	StatusBar,
+	Text,
 	TouchableHighlight,
+	View,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
@@ -43,6 +44,8 @@ import BottomSheetSubSheet from './sub-sheet';
 import NavigationHeader from './navigation-header';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
+const DEFAULT_LAYOUT_ANIMATION = LayoutAnimation.Presets.easeInEaseOut;
+
 class BottomSheet extends Component {
 	constructor() {
 		super( ...arguments );
@@ -67,11 +70,12 @@ class BottomSheet extends Component {
 		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
 			this
 		);
-		this.keyboardWillShow = this.keyboardWillShow.bind( this );
-		this.keyboardDidHide = this.keyboardDidHide.bind( this );
+		this.keyboardShow = this.keyboardShow.bind( this );
+		this.keyboardHide = this.keyboardHide.bind( this );
 
 		this.headerHeight = 0;
 		this.keyboardHeight = 0;
+		this.lastLayoutAnimation = null;
 
 		this.state = {
 			safeAreaBottomInset: 0,
@@ -92,16 +96,57 @@ class BottomSheet extends Component {
 		Dimensions.addEventListener( 'change', this.onDimensionsChange );
 	}
 
-	keyboardWillShow( e ) {
-		const { height } = e.endCoordinates;
+	keyboardShow( e ) {
+		if ( ! this.props.isVisible ) {
+			return;
+		}
 
+		const { height } = e.endCoordinates;
 		this.keyboardHeight = height;
+		this.performKeyboardLayoutAnimation( e );
 		this.onSetMaxHeight();
 	}
 
-	keyboardDidHide() {
+	keyboardHide( e ) {
+		if ( ! this.props.isVisible ) {
+			return;
+		}
+
 		this.keyboardHeight = 0;
+		this.performKeyboardLayoutAnimation( e );
 		this.onSetMaxHeight();
+	}
+
+	// This layout animation is the same as the React Native's KeyboardAvoidingView component.
+	// Reference: https://github.com/facebook/react-native/blob/266b21baf35e052ff28120f79c06c4f6dddc51a9/Libraries/Components/Keyboard/KeyboardAvoidingView.js#L119-L128
+	performKeyboardLayoutAnimation( event ) {
+		const { duration, easing } = event;
+
+		if ( duration && easing ) {
+			const layoutAnimation = {
+				// We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m
+				duration: duration > 10 ? duration : 10,
+				update: {
+					duration: duration > 10 ? duration : 10,
+					type: LayoutAnimation.Types[ easing ] || 'keyboard',
+				},
+			};
+			LayoutAnimation.configureNext( layoutAnimation );
+			this.lastLayoutAnimation = layoutAnimation;
+		} else {
+			this.performRegularLayoutAnimation( {
+				useLastLayoutAnimation: false,
+			} );
+		}
+	}
+
+	performRegularLayoutAnimation( { useLastLayoutAnimation } ) {
+		const layoutAnimation = useLastLayoutAnimation
+			? this.lastLayoutAnimation || DEFAULT_LAYOUT_ANIMATION
+			: DEFAULT_LAYOUT_ANIMATION;
+
+		LayoutAnimation.configureNext( layoutAnimation );
+		this.lastLayoutAnimation = layoutAnimation;
 	}
 
 	componentDidMount() {
@@ -113,14 +158,14 @@ class BottomSheet extends Component {
 			);
 		}
 
-		this.keyboardWillShowListener = Keyboard.addListener(
-			'keyboardWillShow',
-			this.keyboardWillShow
+		this.keyboardShowListener = Keyboard.addListener(
+			Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+			this.keyboardShow
 		);
 
-		this.keyboardDidHideListener = Keyboard.addListener(
-			'keyboardDidHide',
-			this.keyboardDidHide
+		this.keyboardHideListener = Keyboard.addListener(
+			Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+			this.keyboardHide
 		);
 
 		this.safeAreaEventSubscription = SafeArea.addEventListener(
@@ -131,8 +176,8 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
-		this.keyboardWillShowListener.remove();
-		this.keyboardDidHideListener.remove();
+		this.keyboardShowListener.remove();
+		this.keyboardHideListener.remove();
 		if ( this.androidModalClosedSubscription ) {
 			this.androidModalClosedSubscription.remove();
 		}
@@ -202,6 +247,11 @@ class BottomSheet extends Component {
 	onHeaderLayout( { nativeEvent } ) {
 		const { height } = nativeEvent.layout;
 		this.headerHeight = height;
+		if ( Platform.OS === 'ios' ) {
+			this.performRegularLayoutAnimation( {
+				useLastLayoutAnimation: true,
+			} );
+		}
 		this.onSetMaxHeight();
 	}
 
