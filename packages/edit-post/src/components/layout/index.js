@@ -18,12 +18,7 @@ import {
 	BlockBreadcrumb,
 	__experimentalLibrary as Library,
 } from '@wordpress/block-editor';
-import {
-	Button,
-	ScrollLock,
-	Popover,
-	__unstableUseDrop as useDrop,
-} from '@wordpress/components';
+import { Button, ScrollLock, Popover } from '@wordpress/components';
 import {
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
@@ -91,10 +86,10 @@ function Layout( { styles } ) {
 		hasBlockSelected,
 		showMostUsedBlocks,
 		isInserterOpened,
+		insertionPoint,
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
-		supportsLayout,
 	} = useSelect( ( select ) => {
 		const editorSettings = select( 'core/editor' ).getEditorSettings();
 		return {
@@ -113,9 +108,11 @@ function Layout( { styles } ) {
 				'mostUsedBlocks'
 			),
 			isInserterOpened: select( editPostStore ).isInserterOpened(),
+			insertionPoint: select(
+				editPostStore
+			).__experimentalGetInsertionPoint(),
 			mode: select( editPostStore ).getEditorMode(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
-			supportsLayout: editorSettings.supportsLayout,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
@@ -141,7 +138,6 @@ function Layout( { styles } ) {
 		'has-fixed-toolbar': hasFixedToolbar,
 		'has-metaboxes': hasActiveMetaboxes,
 		'show-icon-labels': showIconLabels,
-		'supports-layout': supportsLayout,
 	} );
 	const openSidebarPanel = () =>
 		openGeneralSidebar(
@@ -175,7 +171,6 @@ function Layout( { styles } ) {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
-	const ref = useDrop( ref );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );
@@ -191,7 +186,6 @@ function Layout( { styles } ) {
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
 			<InterfaceSkeleton
-				ref={ ref }
 				className={ className }
 				labels={ interfaceLabels }
 				header={
@@ -222,6 +216,10 @@ function Layout( { styles } ) {
 									showMostUsedBlocks={ showMostUsedBlocks }
 									showInserterHelpPanel
 									shouldFocusBlock={ isMobileViewport }
+									rootClientId={ insertionPoint.rootClientId }
+									__experimentalInsertionIndex={
+										insertionPoint.insertionIndex
+									}
 								/>
 							</div>
 						</div>
@@ -231,10 +229,10 @@ function Layout( { styles } ) {
 					( ! isMobileViewport || sidebarIsOpened ) && (
 						<>
 							{ ! isMobileViewport && ! sidebarIsOpened && (
-								<div className="edit-post-layout__toogle-sidebar-panel">
+								<div className="edit-post-layout__toggle-sidebar-panel">
 									<Button
 										isSecondary
-										className="edit-post-layout__toogle-sidebar-panel-button"
+										className="edit-post-layout__toggle-sidebar-panel-button"
 										onClick={ openSidebarPanel }
 										aria-expanded={ false }
 									>

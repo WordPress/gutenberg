@@ -1,5 +1,4 @@
-Add Milestone
-===
+# Add Milestone
 
 Assigns the plugin release milestone to a pull request once it is merged.
 

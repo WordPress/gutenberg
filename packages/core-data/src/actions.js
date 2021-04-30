@@ -681,6 +681,49 @@ export function* saveEditedEntityRecord( kind, name, recordId, options ) {
 }
 
 /**
+ * Action triggered to save only specified properties for the entity.
+ *
+ * @param {string} kind     Kind of the entity.
+ * @param {string} name     Name of the entity.
+ * @param {Object} recordId ID of the record.
+ * @param {Array} itemsToSave List of entity properties to save.
+ * @param {Object} options  Saving options.
+ */
+export function* __experimentalSaveSpecifiedEntityEdits(
+	kind,
+	name,
+	recordId,
+	itemsToSave,
+	options
+) {
+	if (
+		! ( yield controls.select(
+			'core',
+			'hasEditsForEntityRecord',
+			kind,
+			name,
+			recordId
+		) )
+	) {
+		return;
+	}
+	const edits = yield controls.select(
+		'core',
+		'getEntityRecordNonTransientEdits',
+		kind,
+		name,
+		recordId
+	);
+	const editsToSave = {};
+	for ( const edit in edits ) {
+		if ( itemsToSave.some( ( item ) => item === edit ) ) {
+			editsToSave[ edit ] = edits[ edit ];
+		}
+	}
+	return yield* saveEntityRecord( kind, name, editsToSave, options );
+}
+
+/**
  * Returns an action object used in signalling that Upload permissions have been received.
  *
  * @param {boolean} hasUploadPermissions Does the user have permission to upload files?

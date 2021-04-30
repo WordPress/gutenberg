@@ -36,7 +36,8 @@ function gutenberg_menu() {
 			__( 'Widgets', 'gutenberg' ),
 			'edit_theme_options',
 			'gutenberg-widgets',
-			'the_gutenberg_widgets'
+			'the_gutenberg_widgets',
+			2
 		);
 		remove_submenu_page( 'themes.php', 'widgets.php' );
 	}
@@ -177,3 +178,4 @@ function register_site_icon_url( $response ) {
 add_filter( 'rest_index', 'register_site_icon_url' );
 
 add_theme_support( 'widgets-block-editor' );
+add_theme_support( 'block-templates' );

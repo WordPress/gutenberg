@@ -29,6 +29,7 @@ import { useState, useEffect, Platform } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { View } from '@wordpress/primitives';
 
 function getResponsiveHelp( checked ) {
 	return checked
@@ -181,9 +182,9 @@ const EmbedEdit = ( props ) => {
 
 	if ( fetching ) {
 		return (
-			<EmbedWrapper { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedLoading />
-			</EmbedWrapper>
+			</View>
 		);
 	}
 
@@ -196,7 +197,7 @@ const EmbedEdit = ( props ) => {
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
 	if ( showEmbedPlaceholder ) {
 		return (
-			<EmbedWrapper { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedPlaceholder
 					icon={ icon }
 					label={ label }
@@ -218,7 +219,7 @@ const EmbedEdit = ( props ) => {
 						] );
 					} }
 				/>
-			</EmbedWrapper>
+			</View>
 		);
 	}
 
@@ -248,7 +249,7 @@ const EmbedEdit = ( props ) => {
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>
-			<EmbedWrapper { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedPreview
 					preview={ preview }
 					previewable={ previewable }
@@ -264,7 +265,7 @@ const EmbedEdit = ( props ) => {
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
 				/>
-			</EmbedWrapper>
+			</View>
 		</>
 	);
 };

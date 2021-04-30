@@ -1,13 +1,13 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/social-link",
-        "isValid": true,
-        "attributes": {
-            "url": "https://example.com/",
-            "service": "pocket"
-        },
-        "innerBlocks": [],
-        "originalContent": ""
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/social-link",
+		"isValid": true,
+		"attributes": {
+			"url": "https://example.com/",
+			"service": "pocket"
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
 ]

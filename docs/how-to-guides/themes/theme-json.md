@@ -1,8 +1,10 @@
-# Themes & Block Editor: experimental theme.json
+# Global Settings (theme.json)
 
-> **These features are still experimental**. “Experimental” means this is an early implementation subject to drastic and breaking changes.
->
-> Documentation has been shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. Please, be welcomed to share yours in the weekly #core-editor chats as well as async via the Github issues and Pull Requests.
+<div class="callout callout-alert">
+These features are still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
+
+Documentation has been shared early to surface what’s being worked on and invite feedback from those experimenting with the APIs. Please share your feedback in the weekly #core-editor or #fse-outreach-experiment channels in Slack, or async in GitHub issues.
+</div>
 
 This is documentation for the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
@@ -58,7 +60,7 @@ There are some areas of styling that would benefit from having shared values tha
 
 To address this need, we've started to experiment with CSS Custom Properties, aka CSS Variables, in some places:
 
--   **Presets**: [color palettes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-color-palettes), [font sizes](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-font-sizes), or [gradients](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#block-gradient-presets) declared by the theme are converted to CSS Custom Properties and enqueued both the front-end and the editors.
+-   **Presets**: [color palettes](/docs/how-to-guides/themes/theme-support.md#block-color-palettes), [font sizes](/docs/how-to-guides/themes/theme-support.md#block-font-sizes), or [gradients](/docs/how-to-guides/themes/theme-support.md#block-gradient-presets) declared by the theme are converted to CSS Custom Properties and enqueued both the front-end and the editors.
 
 {% codetabs %}
 {% Input %}
@@ -89,7 +91,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 {% Output %}
 
 ```css
-:root {
+body {
 	--wp--preset--color--black: #000000;
 	--wp--preset--color--white: #ffffff;
 }
@@ -120,7 +122,7 @@ To address this need, we've started to experiment with CSS Custom Properties, ak
 {% Output %}
 
 ```css
-:root {
+body {
 	--wp--custom--line-height--body: 1.7;
 	--wp--custom--line-height--heading: 1.3;
 }
@@ -178,11 +180,15 @@ The settings section has the following structure and default values:
         "wideSize": "1000px",
       }
       "border": {
-        "customRadius": false /* true to opt-in */
+        "customColor": false, /* true to opt-in */
+        "customRadius": false,
+        "customStyle": false,
+        "customWidth": false
       },
       "color": {
         "custom": true, /* false to opt-out, as in add_theme_support('disable-custom-colors') */
         "customGradient": true, /* false to opt-out, as in add_theme_support('disable-custom-gradients') */
+        "duotone": [ ... ], /* duotone presets, a list of { "colors": [ "#000", "#FFF" ], "slug": "black-and-white", "name": "Black and White" } */
         "gradients": [ ... ], /* gradient presets, as in add_theme_support('editor-gradient-presets', ... ) */
         "link": false, /* true to opt-in, as in add_theme_support('experimental-link-color') */
         "palette": [ ... ], /* color presets, as in add_theme_support('editor-color-palette', ... ) */
@@ -286,7 +292,7 @@ For example:
 {% Output %}
 
 ```css
-:root {
+body {
 	--wp--preset--color--strong-magenta: #a156b4;
 	--wp--preset--color--very-dark-gray: #444;
 	--wp--preset--font-size--big: 32;
@@ -338,7 +344,7 @@ For example:
 {% Output %}
 
 ```css
-:root {
+body {
 	--wp--custom--base-font: 16;
 	--wp--custom--line-height--small: 1.2;
 	--wp--custom--line-height--medium: 1.4;
@@ -359,7 +365,10 @@ Each block declares which style properties it exposes via the [block supports me
 	"styles": {
 		"some/block/selector": {
 			"border": {
-				"radius": "value"
+				"color": "value",
+				"radius": "value",
+				"style": "value",
+				"width": "value"
 			},
 			"color": {
 				"background": "value",
@@ -425,7 +434,7 @@ For example:
 {% Output %}
 
 ```css
-:root {
+body {
 	color: var( --wp--preset--color--primary );
 }
 h1 {
@@ -464,16 +473,16 @@ There's a growing need to add more theme metadata to the theme.json. This sectio
 }
 ```
 
-**templateParts**: within this field themes can list the template parts present in the `block-template-parts` folder. For example, for a template part named `my-template-part.html`, the `theme.json` can declare the area term for the template part entity which is responsible for rendering the corresponding block variation (Header block, Footer block, etc.) in the editor.  Defining this area term in the json will allow the setting to persist across all uses of that template part entity, as opposed to a block attribute that would only affect one block.  Defining area as a block attribute is not recommended as this is only used 'behind the scenes' to aid in bridging the gap between placeholder flows and entity creation.
+**templateParts**: within this field themes can list the template parts present in the `block-template-parts` folder. For example, for a template part named `my-template-part.html`, the `theme.json` can declare the area term for the template part entity which is responsible for rendering the corresponding block variation (Header block, Footer block, etc.) in the editor. Defining this area term in the json will allow the setting to persist across all uses of that template part entity, as opposed to a block attribute that would only affect one block. Defining area as a block attribute is not recommended as this is only used 'behind the scenes' to aid in bridging the gap between placeholder flows and entity creation.
 
-Currently block variations exist for "header" and "footer" values of the area term, any other values and template parts not defined in the json will default to the general template part block.  Variations will be denoted by specific icons within the editor's interface, will default to the corresponding semantic HTML element for the wrapper (this can also be overridden by the `tagName` attribute set on the template part block), and will contextualize the template part allowing more custom flows in future editor improvements.
+Currently block variations exist for "header" and "footer" values of the area term, any other values and template parts not defined in the json will default to the general template part block. Variations will be denoted by specific icons within the editor's interface, will default to the corresponding semantic HTML element for the wrapper (this can also be overridden by the `tagName` attribute set on the template part block), and will contextualize the template part allowing more custom flows in future editor improvements.
 
 ```json
 {
 	"templateParts": [
 		{
 			"name": "my-template-part" /* Mandatory */,
-			"area": "header" /* Optional, will be set to 'uncategorized' by default and trigger no block variation */,
+			"area": "header" /* Optional, will be set to 'uncategorized' by default and trigger no block variation */
 		}
 	]
 }
@@ -540,7 +549,7 @@ For example:
 {% Output %}
 
 ```css
-:root {
+body {
 	--wp--custom--line-height--body: 1.7;
 	--wp--custom--font-primary: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif";
 }

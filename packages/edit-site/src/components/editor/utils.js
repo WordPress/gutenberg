@@ -13,9 +13,9 @@ import { store as editSiteStore } from '../../store';
 
 /* Supporting data */
 export const ALL_BLOCKS_NAME = 'defaults';
-export const ALL_BLOCKS_SELECTOR = ':root';
+export const ALL_BLOCKS_SELECTOR = 'body';
 export const ROOT_BLOCK_NAME = 'root';
-export const ROOT_BLOCK_SELECTOR = ':root';
+export const ROOT_BLOCK_SELECTOR = 'body';
 export const ROOT_BLOCK_SUPPORTS = [
 	'--wp--style--color--link',
 	'background',
@@ -40,6 +40,10 @@ export const PRESET_METADATA = [
 			{
 				classSuffix: 'background-color',
 				propertyName: 'background-color',
+			},
+			{
+				classSuffix: 'border-color',
+				propertyName: 'border-color',
 			},
 		],
 	},
@@ -118,8 +122,8 @@ export function getPresetVariable( styles, blockName, propertyName, value ) {
 	}
 	const { valueKey, path, cssVarInfix } = presetData;
 	const presets =
-		get( styles, [ blockName, ...path ] ) ??
-		get( styles, [ ALL_BLOCKS_NAME, ...path ] );
+		get( styles, [ 'settings', blockName, ...path ] ) ??
+		get( styles, [ 'settings', ALL_BLOCKS_NAME, ...path ] );
 	const presetObject = find( presets, ( preset ) => {
 		return preset[ valueKey ] === value;
 	} );
@@ -141,8 +145,8 @@ function getValueFromPresetVariable(
 		return variable;
 	}
 	const presets =
-		get( styles, [ blockName, ...presetData.path ] ) ??
-		get( styles, [ ALL_BLOCKS_NAME, ...presetData.path ] );
+		get( styles, [ 'settings', blockName, ...presetData.path ] ) ??
+		get( styles, [ 'settings', ALL_BLOCKS_NAME, ...presetData.path ] );
 	if ( ! presets ) {
 		return variable;
 	}
@@ -159,8 +163,8 @@ function getValueFromPresetVariable(
 
 function getValueFromCustomVariable( styles, blockName, variable, path ) {
 	const result =
-		get( styles, [ blockName, 'settings', 'custom', ...path ] ) ??
-		get( styles, [ ALL_BLOCKS_NAME, 'settings', 'custom', ...path ] );
+		get( styles, [ 'settings', blockName, 'custom', ...path ] ) ??
+		get( styles, [ 'settings', ALL_BLOCKS_NAME, 'custom', ...path ] );
 	if ( ! result ) {
 		return variable;
 	}

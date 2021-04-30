@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
+import { cx } from 'emotion';
 
 /**
  * WordPress dependencies
@@ -12,11 +11,12 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { useContextSystem } from '../context';
 import { useSurface } from '../surface';
 import * as styles from './styles';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').CardProps, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').CardProps, 'div'>} props
  */
 export function useCard( props ) {
 	const {

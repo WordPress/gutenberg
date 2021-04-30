@@ -1,50 +1,67 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { addQueryArgs } from '@wordpress/url';
-import { useRef, useState, useCallback, useEffect } from '@wordpress/element';
-import { Disabled } from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { Placeholder, Spinner, Disabled } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const DEFAULT_HEIGHT = 300;
-
-export default function PreviewIframe( { idBase, instance, isVisible } ) {
-	const ref = useRef();
-
-	const [ height, setHeight ] = useState( DEFAULT_HEIGHT );
-
-	const adjustHeight = useCallback( () => {
-		setHeight( ref.current.contentDocument.body.scrollHeight );
-	}, [] );
-
-	useEffect( () => {
-		if ( isVisible ) {
-			adjustHeight();
-		}
-	}, [ isVisible, adjustHeight ] );
-
+export default function Preview( { idBase, instance, isVisible } ) {
+	const [ iframeHeight, setIframeHeight ] = useState( null );
 	return (
-		<Disabled hidden={ ! isVisible }>
+		<>
 			{ /*
-			Rendering the preview in an iframe ensures compatibility with any
-			scripts that the widget uses. TODO: This chokes when the
-			legacy-widget-preview query param is too big. Ideally, we'd render a
-			<ServerSideRender> into an iframe using a portal.
+			While the iframe contents are loading, we move the iframe off-screen
+			and display a placeholder instead. This ensures that the user
+			doesn't see the iframe resize (which looks really janky). We have to
+			move the iframe off-screen instead of hiding it because web browsers
+			will not trigger onLoad if the iframe is hidden.
 			*/ }
-			<iframe
-				ref={ ref }
-				className="wp-block-legacy-widget__edit-preview"
-				src={ addQueryArgs( 'themes.php', {
-					page: 'gutenberg-widgets',
-					'legacy-widget-preview': {
-						idBase,
-						instance,
-					},
-				} ) }
-				title={ __( 'Legacy Widget Preview' ) }
-				height={ height }
-				onLoad={ adjustHeight }
-			/>
-		</Disabled>
+			{ isVisible && iframeHeight === null && (
+				<Placeholder>
+					<Spinner />
+				</Placeholder>
+			) }
+			<div
+				className={ classnames(
+					'wp-block-legacy-widget__edit-preview',
+					{
+						'is-offscreen': ! isVisible || iframeHeight === null,
+					}
+				) }
+			>
+				<Disabled>
+					{ /*
+					We use an iframe so that the widget has an opportunity to
+					load scripts and styles that it needs to run.
+					*/ }
+					<iframe
+						className="wp-block-legacy-widget__edit-preview-iframe"
+						title={ __( 'Legacy Widget Preview' ) }
+						// TODO: This chokes when the query param is too big.
+						// Ideally, we'd render a <ServerSideRender>. Maybe by
+						// rendering one in an iframe via a portal.
+						src={ addQueryArgs( 'themes.php', {
+							page: 'gutenberg-widgets',
+							'legacy-widget-preview': {
+								idBase,
+								instance,
+							},
+						} ) }
+						height={ iframeHeight ?? 100 }
+						onLoad={ ( event ) => {
+							setIframeHeight(
+								event.target.contentDocument.body.scrollHeight
+							);
+						} }
+					/>
+				</Disabled>
+			</div>
+		</>
 	);
 }

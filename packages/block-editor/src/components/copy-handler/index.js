@@ -23,14 +23,8 @@ import { getPasteEventData } from '../../utils/get-paste-event-data';
 import { store as blockEditorStore } from '../../store';
 
 export function useNotifyCopy() {
-	const { getBlockName } = useSelect(
-		( select ) => select( blockEditorStore ),
-		[]
-	);
-	const { getBlockType } = useSelect(
-		( select ) => select( blocksStore ),
-		[]
-	);
+	const { getBlockName } = useSelect( blockEditorStore );
+	const { getBlockType } = useSelect( blocksStore );
 	const { createSuccessNotice } = useDispatch( noticesStore );
 
 	return useCallback( ( eventType, selectedBlockClientIds ) => {
@@ -84,7 +78,7 @@ export function useClipboardHandler() {
 		getSelectedBlockClientIds,
 		hasMultiSelection,
 		getSettings,
-	} = useSelect( ( select ) => select( blockEditorStore ), [] );
+	} = useSelect( blockEditorStore );
 	const { flashBlock, removeBlocks, replaceBlocks } = useDispatch(
 		blockEditorStore
 	);

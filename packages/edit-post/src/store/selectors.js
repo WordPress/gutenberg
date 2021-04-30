@@ -9,6 +9,8 @@ import { get, includes, some, flatten, values } from 'lodash';
  */
 import { createRegistrySelector } from '@wordpress/data';
 import { store as interfaceStore } from '@wordpress/interface';
+import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 /**
  * Returns the current editing mode.
  *
@@ -311,7 +313,7 @@ export function isSavingMetaBoxes( state ) {
  * @return {string} Device type.
  */
 export function __experimentalGetPreviewDeviceType( state ) {
-	return state.deviceType;
+	return state.isEditingTemplate ? 'Desktop' : state.deviceType;
 }
 
 /**
@@ -322,7 +324,19 @@ export function __experimentalGetPreviewDeviceType( state ) {
  * @return {boolean} Whether the inserter is opened.
  */
 export function isInserterOpened( state ) {
-	return state.isInserterOpened;
+	return !! state.blockInserterPanel;
+}
+
+/**
+ * Get the insertion point for the inserter.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The root client ID and index to insert at.
+ */
+export function __experimentalGetInsertionPoint( state ) {
+	const { rootClientId, insertionIndex } = state.blockInserterPanel;
+	return { rootClientId, insertionIndex };
 }
 
 /**
@@ -335,3 +349,30 @@ export function isInserterOpened( state ) {
 export function isEditingTemplate( state ) {
 	return state.isEditingTemplate;
 }
+
+/**
+ * Retrieves the template of the currently edited post.
+ *
+ * @return {Object?} Post Template.
+ */
+export const getEditedPostTemplate = createRegistrySelector(
+	( select ) => () => {
+		const currentTemplate = select( editorStore ).getEditedPostAttribute(
+			'template'
+		);
+		if ( currentTemplate ) {
+			return select( coreStore )
+				.getEntityRecords( 'postType', 'wp_template' )
+				?.find( ( template ) => template.slug === currentTemplate );
+		}
+
+		const post = select( editorStore ).getCurrentPost();
+		if ( post.link && post.status !== 'auto-draft' ) {
+			return select( coreStore ).__experimentalGetTemplateForLink(
+				post.link
+			);
+		}
+
+		return null;
+	}
+);

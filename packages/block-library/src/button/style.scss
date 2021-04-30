@@ -43,6 +43,12 @@ $blocks-block__margin: 0.5em;
 		}
 	}
 
+	&.has-custom-font-size {
+		.wp-block-button__link {
+			font-size: inherit;
+		}
+	}
+
 	&.wp-block-button__width-25 {
 		width: calc(25% - #{ $blocks-block__margin });
 	}
@@ -56,35 +62,11 @@ $blocks-block__margin: 0.5em;
 	}
 
 	&.wp-block-button__width-100 {
-		margin-right: 0;
-		width: 100%;
-	}
-}
+		width: calc(100% - #{ $blocks-block__margin });
 
-// If the browser supports column-gap, use that instead of the margins above.
-@supports ( column-gap: #{ $blocks-block__margin } ) {
-	.wp-block-buttons > .wp-block-button {
-		// Added .wp-block specificity needed to override the default button margin.
-		&.wp-block,
-		&.has-custom-width {
+		&:only-child {
 			margin-right: 0;
-		}
-
-		&.wp-block-button__width-25 {
-			width: calc(25% - #{ $blocks-block__margin * 0.75 });
-		}
-
-		&.wp-block-button__width-50 {
-			width: calc(50% - #{ $blocks-block__margin * 0.5 });
-		}
-
-		&.wp-block-button__width-75 {
-			width: calc(75% - #{ $blocks-block__margin * 0.25 });
-		}
-
-		&.wp-block-button__width-100 {
-			width: auto;
-			flex-basis: 100%;
+			width: 100%;
 		}
 	}
 }

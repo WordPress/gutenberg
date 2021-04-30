@@ -18,7 +18,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$more_text = isset( $attributes['moreText'] ) ? '<a href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . $attributes['moreText'] . '</a>' : '';
+	$more_text = isset( $attributes['moreText'] ) ? '<a class="wp-block-post-excerpt__more-link" href="' . esc_url( get_the_permalink( $block->context['postId'] ) ) . '">' . $attributes['moreText'] . '</a>' : '';
 
 	$filter_excerpt_length = function() use ( $attributes ) {
 		return isset( $attributes['wordCount'] ) ? $attributes['wordCount'] : 55;
@@ -34,11 +34,11 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 	}
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classes ) );
 
-	$output = sprintf( '<div %1$s>', $wrapper_attributes ) . '<p class="wp-block-post-excerpt__excerpt">' . get_the_excerpt( $block->context['postId'] );
+	$content = '<p class="wp-block-post-excerpt__excerpt">' . get_the_excerpt( $block->context['postId'] );
 	if ( ! isset( $attributes['showMoreOnNewLine'] ) || $attributes['showMoreOnNewLine'] ) {
-		$output .= '</p>' . '<p class="wp-block-post-excerpt__more-text">' . $more_text . '</p></div>';
+		$content .= '</p><p class="wp-block-post-excerpt__more-text">' . $more_text . '</p>';
 	} else {
-		$output .= ' ' . $more_text . '</p>' . '</div>';
+		$content .= " $more_text</p>";
 	}
 
 	remove_filter(
@@ -46,7 +46,7 @@ function render_block_core_post_excerpt( $attributes, $content, $block ) {
 		$filter_excerpt_length
 	);
 
-	return $output;
+	return sprintf( '<div %1$s>%2$s</div>', $wrapper_attributes, $content );
 }
 
 /**
