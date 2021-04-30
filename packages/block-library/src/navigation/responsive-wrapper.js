@@ -58,7 +58,7 @@ export default function ResponsiveWrapper( props ) {
 			<div
 				className={ responsiveContainerClasses }
 				id={ modalId }
-				aria-hidden="true"
+				aria-hidden={ ! props.isOpen }
 			>
 				<div
 					className="wp-block-navigation__responsive-close"
