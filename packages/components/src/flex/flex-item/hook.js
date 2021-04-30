@@ -6,12 +6,12 @@ import { css, cx } from 'emotion';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
-import { useFlexContext } from './context';
-import * as styles from './styles';
+import { useContextSystem } from '../../ui/context';
+import { useFlexContext } from '../context';
+import * as styles from '../styles';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').FlexItemProps, 'div'>} props
+ * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexItemProps, 'div'>} props
  */
 export function useFlexItem( props ) {
 	const {
