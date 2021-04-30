@@ -8,7 +8,7 @@ import { render } from '@testing-library/react';
  */
 import { getFontSize } from '../../ui/utils/font-size';
 import { COLORS } from '../../utils';
-import Text from '..';
+import { Text } from '../';
 
 describe( 'Text', () => {
 	describe( 'snapshot tests', () => {

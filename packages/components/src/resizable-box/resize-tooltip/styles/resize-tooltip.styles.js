@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import Text from '../../../text';
+import { Text } from '../../../text';
 import { color } from '../../../utils/style-mixins';
 
 export const Root = styled.div`

@@ -1,4 +1,4 @@
-# Text
+# Text (Experimental)
 
 `Text` is a core component that renders text in the library, using the library's typography system.
 
@@ -23,7 +23,7 @@ function Example() {
 Automatically calculate the appropriate line-height value for contents that render text and Control elements (e.g. `TextInput`).
 
 ```jsx
-import { Text, TextInput } from '@wordpress/components';
+import { __experimentalText as Text, TextInput } from '@wordpress/components';
 
 function Example() {
 	return (
@@ -42,7 +42,7 @@ function Example() {
 Adjusts the text alignment.
 
 ```jsx
-import { Text } from '@wordpress/components';
+import { __experimentalText as Text } from '@wordpress/components';
 
 function Example() {
 	return (
@@ -107,7 +107,7 @@ Array of search words. String search terms are automatically cast to RegExps unl
 Letters or words within `Text` can be highlighted using `highlightWords`.
 
 ```jsx
-import { Text } from '@wordpress/components';
+import { __experimentalText as Text } from '@wordpress/components';
 
 function Example() {
 	return (
@@ -159,7 +159,7 @@ Clamps the text content to the specifiec `numberOfLines`, adding the `ellipsis` 
 The `Text` color can be adapted to a background color for optimal readability. `optimizeReadabilityFor` can accept CSS variables, in addition to standard CSS color values (e.g. Hex, RGB, HSL, etc...).
 
 ```jsx
-import { Text, View } from '@wordpress/components';
+import { __experimentalText as Text, View } from '@wordpress/components';
 
 function Example() {
 	const backgroundColor = 'blue';
@@ -181,7 +181,7 @@ function Example() {
 Adjusts text size based on the typography system. `Text` can render a wide range of font sizes, which are automatically calculated and adapted to the typography system. The `size` value can be a system preset, a `number`, or a custom unit value (`string`) such as `30em`.
 
 ```jsx
-import { Text } from '@wordpress/components';
+import { __experimentalText as Text } from '@wordpress/components';
 
 function Example() {
 	return <Text size="largeTitle">Code is Poetry</Text>;
@@ -195,7 +195,7 @@ function Example() {
 Enables text truncation. When `truncate` is set,we are able to truncate the long text in a variety of ways.
 
 ```jsx
-import { Text } from '@wordpress/components';
+import { __experimentalText as Text } from '@wordpress/components';
 
 function Example() {
 	return (
@@ -223,7 +223,7 @@ Uppercases the text content.
 Adjusts style variation of the text.
 
 ```jsx
-import { Text } from '@wordpress/components';
+import { __experimentalText as Text } from '@wordpress/components';
 
 function Example() {
 	return <Text variant="muted">Code is Poetry</Text>;
