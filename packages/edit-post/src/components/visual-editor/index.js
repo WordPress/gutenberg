@@ -25,9 +25,10 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__experimentalUseEditorFeature as useEditorFeature,
 	__experimentalLayoutStyle as LayoutStyle,
+	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
+	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { Popover, Button } from '@wordpress/components';
-import { useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
@@ -39,9 +40,34 @@ import { __ } from '@wordpress/i18n';
 import BlockInspectorButton from './block-inspector-button';
 import { store as editPostStore } from '../../store';
 
-export default function VisualEditor( { styles } ) {
-	const ref = useRef();
+function MaybeIframe( { children, contentRef, isTemplateMode, styles } ) {
+	const ref = useMouseMoveTypingReset();
 
+	if ( ! isTemplateMode ) {
+		return (
+			<>
+				<EditorStyles styles={ styles } />
+				<div ref={ contentRef } className="editor-styles-wrapper">
+					{ children }
+				</div>
+			</>
+		);
+	}
+
+	return (
+		<Iframe
+			headHTML={ window.__editorStyles.html }
+			head={ <EditorStyles styles={ styles } /> }
+			ref={ ref }
+			contentRef={ contentRef }
+			style={ { width: '100%', height: '100%' } }
+		>
+			{ children }
+		</Iframe>
+	);
+}
+
+export default function VisualEditor( { styles } ) {
 	const { deviceType, isTemplateMode } = useSelect( ( select ) => {
 		const {
 			isEditingTemplate,
@@ -90,8 +116,7 @@ export default function VisualEditor( { styles } ) {
 		animatedStyles = resizedCanvasStyles;
 	}
 
-	const mergedRefs = useMergeRefs( [
-		ref,
+	const contentRef = useMergeRefs( [
 		useClipboardHandler(),
 		useCanvasClickRedirect(),
 		useTypewriter(),
@@ -115,7 +140,6 @@ export default function VisualEditor( { styles } ) {
 					layout={ defaultLayout }
 				/>
 			) }
-			<EditorStyles styles={ styles } />
 			<VisualEditorGlobalKeyboardShortcuts />
 			<Popover.Slot name="block-toolbar" />
 			{ isTemplateMode && (
@@ -128,39 +152,43 @@ export default function VisualEditor( { styles } ) {
 				</Button>
 			) }
 			<motion.div
-				ref={ mergedRefs }
-				className="editor-styles-wrapper"
 				animate={ animatedStyles }
 				initial={ desktopCanvasStyles }
 			>
-				<AnimatePresence>
-					<motion.div
-						key={ isTemplateMode ? 'template' : 'post' }
-						initial={ { opacity: 0 } }
-						animate={ { opacity: 1 } }
-					>
-						<WritingFlow>
-							{ ! isTemplateMode && (
-								<div className="edit-post-visual-editor__post-title-wrapper">
-									<PostTitle />
-								</div>
-							) }
-							<BlockList
-								__experimentalLayout={
-									themeSupportsLayout
-										? {
-												type: 'default',
-												// Find a way to inject this in the support flag code (hooks).
-												alignments: themeSupportsLayout
-													? alignments
-													: undefined,
-										  }
-										: undefined
-								}
-							/>
-						</WritingFlow>
-					</motion.div>
-				</AnimatePresence>
+				<MaybeIframe
+					isTemplateMode={ isTemplateMode }
+					contentRef={ contentRef }
+					styles={ styles }
+				>
+					<AnimatePresence>
+						<motion.div
+							key={ isTemplateMode ? 'template' : 'post' }
+							initial={ { opacity: 0 } }
+							animate={ { opacity: 1 } }
+						>
+							<WritingFlow>
+								{ ! isTemplateMode && (
+									<div className="edit-post-visual-editor__post-title-wrapper">
+										<PostTitle />
+									</div>
+								) }
+								<BlockList
+									__experimentalLayout={
+										themeSupportsLayout
+											? {
+													type: 'default',
+													// Find a way to inject this in the support flag code (hooks).
+													alignments: themeSupportsLayout
+														? alignments
+														: undefined,
+											  }
+											: undefined
+									}
+								/>
+							</WritingFlow>
+						</motion.div>
+					</AnimatePresence>
+				</MaybeIframe>
 			</motion.div>
 			<__experimentalBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
