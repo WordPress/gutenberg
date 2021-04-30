@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
 import { isTextField } from '@wordpress/dom';
 import { ENTER, BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -10,20 +9,17 @@ import { useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import { SelectionStart } from '../../writing-flow';
 import { store as blockEditorStore } from '../../../store';
 
 /**
  * Adds block behaviour:
  *   - Removes the block on BACKSPACE.
  *   - Inserts a default block on ENTER.
- *   - Initiates selection start for multi-selection.
  *   - Disables dragging of block contents.
  *
  * @param {string} clientId Block client ID.
  */
 export function useEventHandlers( clientId ) {
-	const onSelectionStart = useContext( SelectionStart );
 	const isSelected = useSelect(
 		( select ) => select( blockEditorStore ).isBlockSelected( clientId ),
 		[ clientId ]
@@ -76,14 +72,6 @@ export function useEventHandlers( clientId ) {
 				}
 			}
 
-			function onMouseLeave( { buttons } ) {
-				// The primary button must be pressed to initiate selection.
-				// See https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/buttons
-				if ( buttons === 1 ) {
-					onSelectionStart( clientId );
-				}
-			}
-
 			/**
 			 * Prevents default dragging behavior within a block. To do: we must
 			 * handle this in the future and clean up the drag target.
@@ -95,11 +83,9 @@ export function useEventHandlers( clientId ) {
 			}
 
 			node.addEventListener( 'keydown', onKeyDown );
-			node.addEventListener( 'mouseleave', onMouseLeave );
 			node.addEventListener( 'dragstart', onDragStart );
 
 			return () => {
-				node.removeEventListener( 'mouseleave', onMouseLeave );
 				node.removeEventListener( 'keydown', onKeyDown );
 				node.removeEventListener( 'dragstart', onDragStart );
 			};
@@ -109,7 +95,6 @@ export function useEventHandlers( clientId ) {
 			isSelected,
 			getBlockRootClientId,
 			getBlockIndex,
-			onSelectionStart,
 			insertDefaultBlock,
 			removeBlock,
 		]

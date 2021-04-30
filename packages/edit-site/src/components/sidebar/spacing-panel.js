@@ -7,6 +7,7 @@ import {
 	__experimentalBoxControl as BoxControl,
 	PanelBody,
 } from '@wordpress/components';
+import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -42,7 +43,13 @@ const CSS_UNITS = [
 	},
 ];
 
-export function useHasSpacingPanel( { supports, name } ) {
+export function useHasSpacingPanel( context ) {
+	const hasPadding = useHasPadding( context );
+
+	return hasPadding;
+}
+
+export function useHasPadding( { name, supports } ) {
 	return (
 		useEditorFeature( 'spacing.customPadding', name ) &&
 		supports.includes( 'padding' )
@@ -65,29 +72,43 @@ function useCustomUnits( { units, contextName } ) {
 	return usedUnits.length === 0 ? false : usedUnits;
 }
 
-export default function SpacingPanel( {
-	context: { name },
-	getStyle,
-	setStyle,
-} ) {
+function filterValuesBySides( values, sides ) {
+	if ( ! sides ) {
+		// If no custom side configuration all sides are opted into by default.
+		return values;
+	}
+
+	// Only include sides opted into within filtered values.
+	const filteredValues = {};
+	sides.forEach( ( side ) => ( filteredValues[ side ] = values[ side ] ) );
+
+	return filteredValues;
+}
+
+export default function SpacingPanel( { context, getStyle, setStyle } ) {
+	const { name } = context;
+	const showPaddingControl = useHasPadding( context );
 	const units = useCustomUnits( { contextName: name, units: CSS_UNITS } );
+
 	const paddingValues = getStyle( name, 'padding' );
-	const setPaddingValues = ( { top, right, bottom, left } ) => {
-		setStyle( name, 'padding', {
-			top: top || paddingValues?.top,
-			right: right || paddingValues?.right,
-			bottom: bottom || paddingValues?.bottom,
-			left: left || paddingValues?.left,
-		} );
+	const paddingSides = useCustomSides( name, 'padding' );
+
+	const setPaddingValues = ( newPaddingValues ) => {
+		const padding = filterValuesBySides( newPaddingValues, paddingSides );
+		setStyle( name, 'padding', padding );
 	};
+
 	return (
 		<PanelBody title={ __( 'Spacing' ) }>
-			<BoxControl
-				values={ paddingValues }
-				onChange={ setPaddingValues }
-				label={ __( 'Padding' ) }
-				units={ units }
-			/>
+			{ showPaddingControl && (
+				<BoxControl
+					values={ paddingValues }
+					onChange={ setPaddingValues }
+					label={ __( 'Padding' ) }
+					sides={ paddingSides }
+					units={ units }
+				/>
+			) }
 		</PanelBody>
 	);
 }
