@@ -18,7 +18,7 @@ function FormGroupLabel( { children, id, labelHidden = false, ...props } ) {
 
 	if ( labelHidden ) {
 		return (
-			<VisuallyHidden as="label" htmlFor={ id }>
+			<VisuallyHidden as="label" htmlFor={ id?.toString() }>
 				{ children }
 			</VisuallyHidden>
 		);

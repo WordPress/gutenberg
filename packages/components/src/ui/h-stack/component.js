@@ -11,7 +11,7 @@ import { useHStack } from './hook';
  *
  * @example
  * ```jsx
- * import { HStack, Text, View } from `@wp-g2/components/ui`;
+ * import { HStack, Text, View } from `@wordpress/components/ui`;
  *
  * function Example() {
  * 	return (

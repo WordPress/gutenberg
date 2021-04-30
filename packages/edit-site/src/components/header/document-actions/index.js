@@ -92,7 +92,7 @@ export default function DocumentActions( {
 				className="edit-site-document-actions__title-wrapper"
 			>
 				<Text
-					variant="body.small"
+					size="body"
 					className="edit-site-document-actions__title-prefix"
 				>
 					<VisuallyHidden as="span">
@@ -105,7 +105,7 @@ export default function DocumentActions( {
 				</Text>
 
 				<Text
-					variant="body.small"
+					size="body"
 					className="edit-site-document-actions__title"
 					as="h1"
 				>
@@ -113,7 +113,7 @@ export default function DocumentActions( {
 				</Text>
 
 				<Text
-					variant="body.small"
+					size="body"
 					className="edit-site-document-actions__secondary-item"
 				>
 					{ label ?? '' }
