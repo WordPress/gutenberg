@@ -40,14 +40,24 @@ import { __ } from '@wordpress/i18n';
 import BlockInspectorButton from './block-inspector-button';
 import { store as editPostStore } from '../../store';
 
-function MaybeIframe( { children, contentRef, isTemplateMode, styles } ) {
+function MaybeIframe( {
+	children,
+	contentRef,
+	isTemplateMode,
+	styles,
+	style,
+} ) {
 	const ref = useMouseMoveTypingReset();
 
 	if ( ! isTemplateMode ) {
 		return (
 			<>
 				<EditorStyles styles={ styles } />
-				<div ref={ contentRef } className="editor-styles-wrapper">
+				<div
+					ref={ contentRef }
+					className="editor-styles-wrapper"
+					style={ style }
+				>
 					{ children }
 				</div>
 			</>
@@ -91,15 +101,11 @@ export default function VisualEditor( { styles } ) {
 		height: '100%',
 		width: '100%',
 		margin: 0,
-		// Add a constant padding for the typewritter effect. When typing at the
-		// bottom, there needs to be room to scroll up.
-		paddingBottom: hasMetaBoxes ? null : '40vh',
 	};
 	const templateModeStyles = {
 		...desktopCanvasStyles,
 		borderRadius: '2px',
 		border: '1px solid #ddd',
-		paddingBottom: null,
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType );
 	const defaultLayout = useEditorFeature( 'layout' );
@@ -113,10 +119,15 @@ export default function VisualEditor( { styles } ) {
 		? templateModeStyles
 		: desktopCanvasStyles;
 	if ( resizedCanvasStyles ) {
-		animatedStyles = {
-			...resizedCanvasStyles,
-			paddingBottom: null,
-		};
+		animatedStyles = resizedCanvasStyles;
+	}
+
+	let paddingBottom;
+
+	// Add a constant padding for the typewritter effect. When typing at the
+	// bottom, there needs to be room to scroll up.
+	if ( ! hasMetaBoxes && ! resizedCanvasStyles && ! isTemplateMode ) {
+		paddingBottom = '40vh';
 	}
 
 	const contentRef = useMergeRefs( [
@@ -162,6 +173,7 @@ export default function VisualEditor( { styles } ) {
 					isTemplateMode={ isTemplateMode }
 					contentRef={ contentRef }
 					styles={ styles }
+					style={ { paddingBottom } }
 				>
 					<AnimatePresence>
 						<motion.div
