@@ -266,10 +266,7 @@ describe( 'computeCustomizedAttribute', () => {
 		const menuItemsByClientId = {
 			'navigation-link-block-client-id-1': {
 				id: 100,
-				title: {
-					raw: 'wp.com',
-					rendered: 'wp.com',
-				},
+				title: 'wp.com',
 				url: 'http://wp.com',
 				menu_order: 1,
 				menus: [ 1 ],
@@ -278,10 +275,7 @@ describe( 'computeCustomizedAttribute', () => {
 			},
 			'navigation-link-block-client-id-2': {
 				id: 101,
-				title: {
-					raw: 'wp.org',
-					rendered: 'wp.org',
-				},
+				title: 'wp.org',
 				url: 'http://wp.org',
 				menu_order: 2,
 				menus: [ 1 ],
@@ -290,10 +284,7 @@ describe( 'computeCustomizedAttribute', () => {
 			},
 			'navigation-link-block-client-id-3': {
 				id: 102,
-				title: {
-					raw: 'Page Example',
-					rendered: 'Page Example',
-				},
+				title: 'Page Example',
 				url: 'https://wordpress.org',
 				menu_order: 3,
 				menus: [ 1 ],
@@ -324,10 +315,7 @@ describe( 'computeCustomizedAttribute', () => {
 				object: 'custom',
 				position: 1,
 				status: 'publish',
-				title: {
-					raw: 'wp.org',
-					rendered: 'wp.org',
-				},
+				title: 'wp.org',
 				url: 'http://wp.org',
 				xfn: [ 'external' ],
 				type: 'custom',
@@ -341,10 +329,7 @@ describe( 'computeCustomizedAttribute', () => {
 				original_title: '',
 				position: 2,
 				status: 'publish',
-				title: {
-					raw: 'wp.com',
-					rendered: 'wp.com',
-				},
+				title: 'wp.com',
 				object: 'custom',
 				url: 'http://wp.com',
 				target: '_blank',
@@ -359,10 +344,7 @@ describe( 'computeCustomizedAttribute', () => {
 				original_title: '',
 				position: 3,
 				status: 'publish',
-				title: {
-					raw: 'Page Example',
-					rendered: 'Page Example',
-				},
+				title: 'Page Example',
 				object: 'page', // equivalent: block.attributes.type
 				object_id: 678, // equivalent: block.attributes.id
 				type: 'post_type', // // equivalent: block.attributes.kind
@@ -394,10 +376,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				name: 'core/navigation-link',
 			},
 			menuItem: {
-				title: {
-					raw: 'Example Page',
-					rendered: 'Example Page',
-				},
+				title: 'Example Page',
 				url: '/example-page/',
 				description: 'Lorem ipsum dolor sit amet.',
 				xfn: [ 'friend', 'met' ],
@@ -429,10 +408,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				name: 'core/navigation-link',
 			},
 			menuItem: {
-				title: {
-					raw: 'Example Post',
-					rendered: 'Example Post',
-				},
+				title: 'Example Post',
 				url: '/example-post/',
 				description: 'Consectetur adipiscing elit.',
 				xfn: [ 'friend' ],
@@ -464,10 +440,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				name: 'core/navigation-link',
 			},
 			menuItem: {
-				title: {
-					raw: 'Example Category',
-					rendered: 'Example Category',
-				},
+				title: 'Example Category',
 				url: '/example-category/',
 				description:
 					'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -497,10 +470,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				name: 'core/navigation-link',
 			},
 			menuItem: {
-				title: {
-					raw: 'Example Tag',
-					rendered: 'Example Tag',
-				},
+				title: 'Example Tag',
 				url: '/example-tag/',
 				object_id: 103,
 				object: 'tag',
@@ -526,10 +496,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				name: 'core/navigation-link',
 			},
 			menuItem: {
-				title: {
-					raw: 'Example Custom Link',
-					rendered: 'Example Custom Link',
-				},
+				title: 'Example Custom Link',
 				url: 'https://wordpress.org',
 				object: 'custom',
 				type: 'custom',
@@ -709,10 +676,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 
 			// Check the basic conversion to menuItem happened successfully.
 			expect( actual ).toEqual( {
-				title: {
-					raw: 'Example Custom Link',
-					rendered: 'Example Custom Link',
-				},
+				title: 'Example Custom Link',
 				url: 'https://wordpress.org',
 				object: 'custom',
 				type: 'custom',
@@ -744,10 +708,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 			// Defaults are taken from https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L438.
 			expect( actual ).toEqual(
 				expect.objectContaining( {
-					title: {
-						raw: '',
-						rendered: '',
-					},
+					title: '',
 					url: '',
 				} )
 			);

@@ -117,7 +117,6 @@ export function computeCustomizedAttribute(
 			dataObject[ key ] = false;
 		}
 	}
-
 	return JSON.stringify( dataObject );
 
 	function blocksTreeToFlatList( innerBlocks, parentId = 0 ) {
@@ -195,10 +194,7 @@ export const blockAttributesToMenuItem = ( {
 	opensInNewTab,
 } ) => {
 	return {
-		title: {
-			rendered: label,
-			raw: label,
-		},
+		title: label,
 		url,
 		...( description?.length && {
 			description,
