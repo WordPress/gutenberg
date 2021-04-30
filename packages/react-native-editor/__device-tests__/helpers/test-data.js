@@ -103,10 +103,6 @@ exports.imageShorteHtml = `<!-- wp:image {"id":1,"sizeslug":"large"} -->
 <p>rock music approaches at high velocity.</p>
 <!-- /wp:paragraph -->`;
 
-exports.imagePlaceholderHtml = `<!-- wp:image -->
-<figure class="wp-block-image"><img alt=""/></figure>
-<!-- /wp:image -->`;
-
 exports.unsupportedBlockHtml = `<!-- wp:jetpack/gif {"giphyUrl":"https://giphy.com/embed/3orieS4jfHJaKwkeli","searchText":"example"} /-->`;
 
 exports.columnsWithDifferentUnitsHtml = `<!-- wp:columns -->

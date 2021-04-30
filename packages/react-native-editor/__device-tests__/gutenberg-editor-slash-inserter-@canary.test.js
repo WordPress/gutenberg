@@ -3,11 +3,7 @@
  */
 import { blockNames } from './pages/editor-page';
 import { isAndroid, backspace, clickBeginningOfElement } from './helpers/utils';
-import {
-	slashInserter,
-	shortText,
-	imagePlaceholderHtml,
-} from './helpers/test-data';
+import { slashInserter, shortText } from './helpers/test-data';
 
 const ANIMATION_TIME = 200;
 
@@ -77,7 +73,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 
-	it( 'should add an Image block after tying /image', async () => {
+	it( 'should add an Image block after tying /image and tapping on the Image block button', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
 		const paragraphBlockElement = await editorPage.getBlockAtPosition(
 			blockNames.paragraph
@@ -107,9 +103,10 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		// Add image block
 		await imageButtonElement.click();
 
-		// Check image block content in the editor
-		const html = await editorPage.getHtmlContent();
-		expect( html.toLowerCase() ).toBe( imagePlaceholderHtml.toLowerCase() );
+		// Check image exists in the editor
+		expect(
+			await editorPage.hasBlockAtPosition( 1, blockNames.image )
+		).toBe( true );
 
 		// Slash inserter UI should not be present after adding a block
 		const foundElements = await editorPage.driver.elementsByAccessibilityId(
@@ -118,12 +115,27 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		expect( foundElements.length ).toBe( 0 );
 
 		// Remove image block
-		const imageBlock = await editorPage.getBlockAtPosition(
-			blockNames.image
+		await editorPage.removeBlockAtPosition( blockNames.image );
+	} );
+
+	it( 'should insert an image block with "/img" + enter', async () => {
+		await editorPage.addNewBlock( blockNames.paragraph );
+		const paragraphBlockElement = await editorPage.getBlockAtPosition(
+			blockNames.paragraph
 		);
-		await imageBlock.click();
-		await editorPage.driver.sleep( 1000 );
-		await editorPage.closePicker();
+		if ( isAndroid() ) {
+			await paragraphBlockElement.click();
+		}
+
+		await editorPage.typeTextToParagraphBlock(
+			paragraphBlockElement,
+			'/img\n',
+			false
+		);
+		expect(
+			await editorPage.hasBlockAtPosition( 1, blockNames.image )
+		).toBe( true );
+
 		await editorPage.removeBlockAtPosition( blockNames.image );
 	} );
 } );
