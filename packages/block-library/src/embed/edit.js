@@ -13,7 +13,6 @@ import EmbedControls from './embed-controls';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
-import { EmbedWrapper } from './embed-wrapper';
 
 /**
  * External dependencies
