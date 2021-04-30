@@ -11,7 +11,11 @@ import { useVStack } from './hook';
  *
  * @example
  * ```jsx
- * import { VStack, Text, View } from `@wordpress/components`;
+ * import {
+ * 	__experimentalText as Text,
+ * 	__experimentalView as View,
+ * 	__experimentalVStack as VStack,
+ * } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (

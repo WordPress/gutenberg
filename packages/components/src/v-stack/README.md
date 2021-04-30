@@ -1,5 +1,7 @@
 # VStack
 
+> **Experimental!**
+
 `VStack` (or Vertical Stack) is a layout component that arranges child elements in a vertical line.
 
 ## Usage
@@ -7,7 +9,11 @@
 `VStack` can render anything inside.
 
 ```jsx
-import { VStack, Text, View } from '@wordpress/components';
+import {
+	__experimentalText as Text,
+	__experimentalView as View
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
 
 function Example() {
 	return (
@@ -83,6 +89,13 @@ Determines if children should wrap.
 When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to take up the remaining space.
 
 ```jsx
+import {
+	__experimentalSpacer as Text,
+	__experimentalText as Text,
+	__experimentalView as View
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
+
 function Example() {
 	return (
 		<VStack>
@@ -103,6 +116,13 @@ function Example() {
 `Spacer` can also be used in-between items to push them apart.
 
 ```jsx
+import {
+	__experimentalSpacer as Text,
+	__experimentalText as Text,
+	__experimentalView as View
+	__experimentalVStack as VStack,
+} from '@wordpress/components';
+
 function Example() {
 	return (
 		<VStack>

@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { View } from '../../view';
-import { HStack } from '../index';
+import { HStack } from '..';
 
 export default {
 	component: HStack,

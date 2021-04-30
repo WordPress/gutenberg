@@ -1,2 +1,2 @@
-export { default } from './component';
-export * from './hook';
+export { default as HStack } from './component';
+export { useHStack } from './hook';

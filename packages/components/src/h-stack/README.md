@@ -1,5 +1,7 @@
 # HStack
 
+> **Experimental!**
+
 `HStack` (Horizontal Stack) arranges child elements in a horizontal line.
 
 ## Usage
@@ -7,7 +9,11 @@
 `HStack` can render anything inside.
 
 ```jsx
-import { HStack, Text, View } from '@wordpress/components/ui';
+import {
+	__experimentalHStack as HStack,
+	__experimentalText as Text,
+	__experimentalView as View,
+} from '@wordpress/components';
 
 function Example() {
 	return (
@@ -83,7 +89,12 @@ Determines if children should wrap.
 When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to take up the remaining space.
 
 ```jsx
-import { HStack, Spacer, Text, View } from '@wordpress/components/ui';
+import {
+	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
+	__experimentalText as Text,
+	__experimentalView as View,
+} from '@wordpress/components';
 
 function Example() {
 	return (
@@ -105,7 +116,12 @@ function Example() {
 `Spacer` also be used in-between items to push them apart.
 
 ```jsx
-import { HStack, Spacer, Text, View } from '@wordpress/components/ui';
+import {
+	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
+	__experimentalText as Text,
+	__experimentalView as View,
+} from '@wordpress/components';
 
 function Example() {
 	return (
