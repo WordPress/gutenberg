@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Bug Fix
+
+-   Add `postcss` as a dependency to ensure that the correct version gets installed.
+
 ## 15.0.0 (2021-04-29)
 
 ### Breaking Changes
