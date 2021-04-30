@@ -94,6 +94,7 @@ figure.wp-block-image:not(.wp-block) {
 	position: relative;
 	max-width: 100%;
 	width: 100%;
+	overflow: hidden;
 }
 
 .wp-block-image__crop-icon {
