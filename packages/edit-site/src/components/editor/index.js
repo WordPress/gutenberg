@@ -3,7 +3,12 @@
  */
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
-import { SlotFillProvider, Popover, Button } from '@wordpress/components';
+import {
+	SlotFillProvider,
+	Popover,
+	Button,
+	Notice,
+} from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
 import {
@@ -218,6 +223,20 @@ function Editor( { initialSettings } ) {
 														}
 													/>
 												) }
+												{ ! template &&
+													settings?.siteUrl &&
+													entityId && (
+														<Notice
+															status="warning"
+															isDismissible={
+																false
+															}
+														>
+															{ __(
+																"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+															) }
+														</Notice>
+													) }
 												<KeyboardShortcuts />
 											</>
 										}
