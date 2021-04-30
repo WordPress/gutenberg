@@ -35,7 +35,7 @@ export function DefaultBlockAppender( {
 	const value =
 		typeof placeholder === 'string'
 			? decodeEntities( placeholder )
-			: __( 'Tap (+) or type / to add blocks' );
+			: __( 'Start writing…' );
 
 	return (
 		<TouchableWithoutFeedback onPress={ onAppend }>

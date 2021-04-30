@@ -78,9 +78,7 @@ function ParagraphBlock( {
 				onMerge={ mergeBlocks }
 				onReplace={ onReplace }
 				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
-				placeholder={
-					placeholder || __( 'Tap (+) or type / to add blocks' )
-				}
+				placeholder={ placeholder || __( 'Start writing…' ) }
 				textAlign={ align }
 			/>
 		</>
