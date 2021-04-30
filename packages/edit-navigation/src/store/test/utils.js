@@ -473,7 +473,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				title: 'Example Tag',
 				url: '/example-tag/',
 				object_id: 103,
-				object: 'tag',
+				object: 'post_tag',
 				type: 'taxonomy',
 			},
 		},
@@ -687,6 +687,20 @@ describe( 'Mapping block attributes and menu item fields', () => {
 			expect( actual.object_id ).toBeUndefined();
 		} );
 
+		it( 'correctly maps "tag" block type variation to "post_tag" value as expected in "object" type field', () => {
+			const tagLinkBlockVariation = {
+				id: 12345, // added for test purposes only - should't exist.
+				type: 'tag', // custom type indicates we shouldn't need an `id` field.
+				kind: 'taxonomy', // custom type indicates we shouldn't need an `id` field.
+				label: 'Example Tag',
+				url: '/example-tag/',
+			};
+
+			const actual = blockAttributesToMenuItem( tagLinkBlockVariation );
+
+			expect( actual.object ).toBe( 'post_tag' );
+		} );
+
 		it( 'gracefully handles undefined values by falling back to menu item defaults', () => {
 			const blockAttrsWithUndefinedValues = {
 				id: undefined,
@@ -761,6 +775,20 @@ describe( 'Mapping block attributes and menu item fields', () => {
 			const actual = menuItemToBlockAttributes( customLinkMenuItem );
 
 			expect( actual.id ).toBeUndefined();
+		} );
+
+		it( 'correctly maps "post_tag" menu item object type to "tag" block type variation', () => {
+			const tagMenuItem = {
+				title: 'Example Tag',
+				url: '/example-tag/',
+				object_id: 123456,
+				object: 'post_tag',
+				type: 'taxonomy',
+			};
+
+			const actual = menuItemToBlockAttributes( tagMenuItem );
+
+			expect( actual.type ).toBe( 'tag' );
 		} );
 
 		it( 'gracefully handles undefined values by falling back to block attribute defaults', () => {
