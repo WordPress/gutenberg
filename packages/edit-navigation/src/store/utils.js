@@ -267,12 +267,14 @@ export const menuItemToBlockAttributes = ( {
 		type: object || 'custom',
 		kind: menuItemTypeField?.replace( '_', '-' ) || 'custom',
 		url: url || '',
-		...( xfn?.length && {
-			rel: xfn.join( ' ' ).trim(),
-		} ),
-		...( classes?.length && {
-			className: classes.join( ' ' ).trim(),
-		} ),
+		...( xfn?.length &&
+			xfn.join( ' ' ).trim() && {
+				rel: xfn.join( ' ' ).trim(),
+			} ),
+		...( classes?.length &&
+			classes.join( ' ' ).trim() && {
+				className: classes.join( ' ' ).trim(),
+			} ),
 		...( attr_title?.length && {
 			title: attr_title,
 		} ),
