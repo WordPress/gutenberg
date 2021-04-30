@@ -229,9 +229,9 @@ describe( 'getNavigationPostForMenu', () => {
 		const generator = getNavigationPostForMenu( menuId );
 
 		// Advance generator
-		generator.next();
-		generator.next();
-		generator.next();
+		generator.next(); // Gen step: yield persistPost
+		generator.next(); // Gen step: yield dispatch "getEntityRecord"
+		generator.next(); // Gen step: yield resolveMenuItems
 
 		const menuItems = [
 			{
@@ -286,9 +286,12 @@ describe( 'getNavigationPostForMenu', () => {
 			},
 		];
 
-		// Feed a known value to the generator yield result
+		// // Gen step: yield 'SET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
+		// By feeding `menuItems` to the generator this will overload the **result** of
+		// the call to yield resolveMenuItems( menuId );
 		generator.next( menuItems );
 
+		// Gen step: yield persistPost
 		const persistPostAction = generator.next().value;
 
 		// Get the core/navigation-link blocks from the generated core/navigation block innerBlocks.
