@@ -1,4 +1,6 @@
-# FlexItem (Experimental)
+# FlexItem
+
+> **Experimental!**
 
 A layout component to contain items of a fixed width within `Flex`.
 

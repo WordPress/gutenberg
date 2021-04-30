@@ -1,4 +1,6 @@
-# Heading (Experimental)
+# Heading
+
+> **Experimental!**
 
 `Heading` renders headings and titles using the library's typography system.
 
