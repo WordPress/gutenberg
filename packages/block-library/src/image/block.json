@@ -84,9 +84,14 @@
 			"background": false
 		},
 		"__experimentalBorder": {
+			"color": true,
 			"radius": true,
+			"width": true,
+			"__experimentalSkipSerialization": true,
 			"__experimentalDefaultControls": {
-				"radius": true
+				"color": true,
+				"radius": true,
+				"width": true
 			}
 		},
 		"__experimentalStyle": {
