@@ -9,10 +9,10 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 /**
  * Internal dependencies
  */
+import useEditorFeature from '../components/use-editor-feature';
+import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
 import { cleanEmptyObject } from './utils';
 import { useCustomUnits } from '../components/unit-control';
-
-export const SPACING_SUPPORT_KEY = 'spacing';
 
 const isWeb = Platform.OS === 'web';
 const CSS_UNITS = [
@@ -43,10 +43,27 @@ const CSS_UNITS = [
 	},
 ];
 
-const hasPaddingSupport = ( blockName ) => {
-	const spacingSupport = getBlockSupport( blockName, SPACING_SUPPORT_KEY );
-	return spacingSupport && spacingSupport.padding !== false;
-};
+/**
+ * Determines if there is padding support.
+ *
+ * @param  {string|Object} blockType Block name or Block Type object.
+ * @return {boolean}                 Whether there is support.
+ */
+export function hasPaddingSupport( blockType ) {
+	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
+	return !! ( true === support || support?.padding );
+}
+
+/**
+ * Custom hook that checks if padding settings have been disabled.
+ *
+ * @param  {string} name The name of the block.
+ * @return {boolean}                 Whether padding setting is disabled.
+ */
+export function useIsPaddingDisabled( { name: blockName } = {} ) {
+	const isDisabled = ! useEditorFeature( 'spacing.customPadding' );
+	return ! hasPaddingSupport( blockName ) || isDisabled;
+}
 
 /**
  * Inspector control panel containing the padding related configuration
@@ -63,6 +80,7 @@ export function PaddingEdit( props ) {
 	} = props;
 
 	const units = useCustomUnits( CSS_UNITS );
+	const sides = useCustomSides( blockName, 'padding' );
 
 	if ( ! hasPaddingSupport( blockName ) ) {
 		return null;
@@ -72,6 +90,7 @@ export function PaddingEdit( props ) {
 		const newStyle = {
 			...style,
 			spacing: {
+				...style?.spacing,
 				padding: next,
 			},
 		};
@@ -102,6 +121,7 @@ export function PaddingEdit( props ) {
 					onChange={ onChange }
 					onChangeShowVisualizer={ onChangeShowVisualizer }
 					label={ __( 'Padding' ) }
+					sides={ sides }
 					units={ units }
 				/>
 			</>
