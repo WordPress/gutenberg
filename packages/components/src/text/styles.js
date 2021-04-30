@@ -6,7 +6,7 @@ import { css } from 'emotion';
 /**
  * Internal dependencies
  */
-import { COLORS, CONFIG } from '../../utils';
+import { COLORS, CONFIG } from '../utils';
 
 export const Text = css`
 	color: ${ COLORS.black };

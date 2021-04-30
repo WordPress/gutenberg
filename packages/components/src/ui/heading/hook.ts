@@ -4,8 +4,8 @@
 import { useContextSystem } from '../context';
 // eslint-disable-next-line no-duplicate-imports
 import type { ViewOwnProps } from '../context';
-import type { Props as TextProps } from '../text/types';
-import { useText } from '../text';
+import type { Props as TextProps } from '../../text/types';
+import { useText } from '../../text';
 import { getHeadingFontSize } from '../utils/font-size';
 import { CONFIG, COLORS } from '../../utils';
 

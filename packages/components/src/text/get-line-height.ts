@@ -8,8 +8,8 @@ import type { CSSProperties } from 'react';
  * Internal dependencies
  */
 import type { Props } from './types';
-import { space } from '../utils/space';
-import { CONFIG } from '../../utils';
+import { space } from '../ui/utils/space';
+import { CONFIG } from '../utils';
 
 export function getLineHeight(
 	adjustLineHeightForInnerControls: Props[ 'adjustLineHeightForInnerControls' ],
