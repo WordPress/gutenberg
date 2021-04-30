@@ -37,18 +37,32 @@ export const menuItemToBlockAttributes = ( {
 	target,
 } ) => {
 	return {
-		label: menuItemTitleField.rendered,
-		rel: xfn.join( ' ' ).trim(),
-		className: classes.join( ' ' ).trim(),
-		title: attr_title,
+		label: menuItemTitleField?.rendered || '',
 		type: object || 'custom',
-		...( 'custom' !== object && {
-			id: object_id,
+		kind: menuItemTypeField?.replace( '_', '-' ) || 'custom',
+		url: url || '',
+		...( xfn?.length &&
+			xfn.join( ' ' ).trim() && {
+				rel: xfn.join( ' ' ).trim(),
+			} ),
+		...( classes?.length &&
+			classes.join( ' ' ).trim() && {
+				className: classes.join( ' ' ).trim(),
+			} ),
+		...( attr_title?.length && {
+			title: attr_title,
 		} ),
-		description,
-		url,
-		kind: menuItemTypeField?.replace( '_', '-' ) ?? 'custom',
-		opensInNewTab: target === '_blank',
+		// eslint-disable-next-line camelcase
+		...( object_id &&
+			'custom' !== object && {
+				id: object_id,
+			} ),
+		...( description?.length && {
+			description,
+		} ),
+		...( target === '_blank' && {
+			opensInNewTab: true,
+		} ),
 	};
 };
 
