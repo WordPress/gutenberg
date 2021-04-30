@@ -596,6 +596,52 @@ describe( 'Mapping block attributes and menu item fields', () => {
 			// Assert `id` attr has not been converted to a `object_id` field for a "custom" type even if present.
 			expect( actual.object_id ).toBeUndefined();
 		} );
+
+		it( 'gracefully handles undefined values by falling back to menu item defaults', () => {
+			const blockAttrsWithUndefinedValues = {
+				id: undefined,
+				type: undefined,
+				kind: undefined,
+				label: undefined,
+				url: undefined,
+				description: undefined,
+				rel: undefined,
+				className: undefined,
+				title: undefined,
+				opensInNewTab: undefined,
+			};
+
+			const actual = blockAttributesToMenuItem(
+				blockAttrsWithUndefinedValues
+			);
+
+			// Defaults are taken from https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L438.
+			expect( actual ).toEqual(
+				expect.objectContaining( {
+					title: {
+						raw: '',
+						rendered: '',
+					},
+					url: '',
+				} )
+			);
+
+			// Remaining values should not be present.
+			expect( Object.keys( actual ) ).not.toEqual(
+				expect.arrayContaining( [
+					'description',
+					'xfn',
+					'classes',
+					'attr_title',
+					'object',
+					'type',
+					'object_id',
+					'target',
+				] )
+			);
+
+			expect( Object.values( actual ) ).not.toContain( undefined );
+		} );
 	} );
 
 	describe( 'mapping menu item fields to block attributes', () => {
@@ -623,6 +669,48 @@ describe( 'Mapping block attributes and menu item fields', () => {
 			const actual = menuItemToBlockAttributes( customLinkMenuItem );
 
 			expect( actual.id ).toBeUndefined();
+		} );
+
+		it( 'gracefully handles undefined values by falling back to block attribute defaults', () => {
+			// Note that whilst Core provides default values for nav_menu_item's it is possible that these
+			// values could be manipulated via Plugins. As such we must account for unexpected values.
+			const menuItemsWithUndefinedValues = {
+				title: undefined,
+				url: undefined,
+				description: undefined,
+				xfn: undefined,
+				classes: undefined,
+				attr_title: undefined,
+				object_id: undefined,
+				object: undefined,
+				type: undefined,
+				target: undefined,
+			};
+
+			const actual = menuItemToBlockAttributes(
+				menuItemsWithUndefinedValues
+			);
+
+			expect( actual ).toEqual(
+				expect.objectContaining( {
+					label: '',
+					type: 'custom',
+					kind: 'custom',
+				} )
+			);
+
+			expect( Object.keys( actual ) ).not.toEqual(
+				expect.arrayContaining( [
+					'rel',
+					'className',
+					'title',
+					'id',
+					'description',
+					'opensInNewTab',
+				] )
+			);
+
+			expect( Object.values( actual ) ).not.toContain( undefined );
 		} );
 	} );
 

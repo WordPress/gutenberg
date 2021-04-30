@@ -164,6 +164,11 @@ export function computeCustomizedAttribute(
 /**
  * Convert block attributes to menu item fields.
  *
+ * Note that nav_menu_item has defaults provided in Core so in the case of undefined Block attributes
+ * we need only include a subset of values in the knowledge that the defaults will be provided in Core.
+ *
+ * See: https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L438.
+ *
  * @param {Object} blockAttributes the block attributes of the block to be converted into menu item fields.
  * @param {string} blockAttributes.label the visual name of the block shown in the UI.
  * @param {string} blockAttributes.url the URL for the link.
@@ -178,12 +183,12 @@ export function computeCustomizedAttribute(
  * @return {Object} the menu item (converted from block attributes).
  */
 export const blockAttributesToMenuItem = ( {
-	label,
-	url,
+	label = '',
+	url = '',
 	description,
 	rel,
 	className,
-	title,
+	title: blockTitleAttr,
 	type,
 	id,
 	kind,
@@ -194,17 +199,33 @@ export const blockAttributesToMenuItem = ( {
 			rendered: label,
 			raw: label,
 		},
-		xfn: rel?.trim().split( ' ' ),
-		classes: className?.trim().split( ' ' ),
-		attr_title: title,
-		object: type || 'custom',
-		...( 'custom' !== type && {
-			object_id: id,
-		} ),
-		description,
 		url,
-		type: kind?.replace( '-', '_' ) ?? 'custom',
-		target: opensInNewTab ? NEW_TAB_TARGET_ATTRIBUTE : '',
+		...( description?.length && {
+			description,
+		} ),
+		...( rel?.length && {
+			xfn: rel?.trim().split( ' ' ),
+		} ),
+		...( className?.length && {
+			classes: className?.trim().split( ' ' ),
+		} ),
+		...( blockTitleAttr?.length && {
+			attr_title: blockTitleAttr,
+		} ),
+		...( type?.length && {
+			object: type,
+		} ),
+		...( kind?.length && {
+			type: kind?.replace( '-', '_' ),
+		} ),
+		// Only assign object_id if it's a entity type (ie: not "custom").
+		...( id &&
+			'custom' !== type && {
+				object_id: id,
+			} ),
+		...( opensInNewTab && {
+			target: NEW_TAB_TARGET_ATTRIBUTE,
+		} ),
 	};
 };
 
@@ -242,17 +263,29 @@ export const menuItemToBlockAttributes = ( {
 	target,
 } ) => {
 	return {
-		label: menuItemTitleField.rendered,
-		rel: xfn.join( ' ' ).trim(),
-		className: classes.join( ' ' ).trim(),
-		title: attr_title,
+		label: menuItemTitleField?.rendered || '',
 		type: object || 'custom',
-		...( 'custom' !== object && {
-			id: object_id,
+		kind: menuItemTypeField?.replace( '_', '-' ) || 'custom',
+		url: url || '',
+		...( xfn?.length && {
+			rel: xfn.join( ' ' ).trim(),
 		} ),
-		description,
-		url,
-		kind: menuItemTypeField?.replace( '_', '-' ) ?? 'custom',
-		opensInNewTab: target === NEW_TAB_TARGET_ATTRIBUTE,
+		...( classes?.length && {
+			className: classes.join( ' ' ).trim(),
+		} ),
+		...( attr_title?.length && {
+			title: attr_title,
+		} ),
+		// eslint-disable-next-line camelcase
+		...( object_id &&
+			'custom' !== object && {
+				id: object_id,
+			} ),
+		...( description?.length && {
+			description,
+		} ),
+		...( target === NEW_TAB_TARGET_ATTRIBUTE && {
+			opensInNewTab: true,
+		} ),
 	};
 };
