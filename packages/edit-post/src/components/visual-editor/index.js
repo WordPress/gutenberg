@@ -60,7 +60,7 @@ function MaybeIframe( { children, contentRef, isTemplateMode, styles } ) {
 			head={ <EditorStyles styles={ styles } /> }
 			ref={ ref }
 			contentRef={ contentRef }
-			style={ { width: '100%', height: '100%' } }
+			style={ { width: '100%', height: '100%', display: 'block' } }
 		>
 			{ children }
 		</Iframe>
@@ -113,7 +113,10 @@ export default function VisualEditor( { styles } ) {
 		? templateModeStyles
 		: desktopCanvasStyles;
 	if ( resizedCanvasStyles ) {
-		animatedStyles = resizedCanvasStyles;
+		animatedStyles = {
+			...resizedCanvasStyles,
+			paddingBottom: null,
+		};
 	}
 
 	const contentRef = useMergeRefs( [
