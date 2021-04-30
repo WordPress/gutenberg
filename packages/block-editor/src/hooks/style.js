@@ -185,17 +185,19 @@ export const withBlockControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const shouldDisplayControls = useDisplayBlockControls();
 
-		if ( ! shouldDisplayControls ) {
-			return <BlockEdit key="edit" { ...props } />;
-		}
-
-		return [
-			<TypographyPanel key="typography" { ...props } />,
-			<BorderPanel key="border" { ...props } />,
-			<ColorEdit key="colors" { ...props } />,
-			<SpacingPanel key="spacing" { ...props } />,
-			<BlockEdit key="edit" { ...props } />,
-		];
+		return (
+			<>
+				{ shouldDisplayControls && (
+					<>
+						<TypographyPanel { ...props } />,
+						<BorderPanel { ...props } />,
+						<ColorEdit { ...props } />,
+						<SpacingPanel { ...props } />,
+					</>
+				) }
+				<BlockEdit { ...props } />
+			</>
+		);
 	},
 	'withToolbarControls'
 );
