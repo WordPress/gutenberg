@@ -561,8 +561,28 @@ describe( 'Mapping block attributes and menu item fields', () => {
 
 		it( 'does not map block attribute "id" to menu item "object_id" field for custom (non-entity) links', () => {
 			const customLinkBlockAttributes = {
-				id: 123456, // added for test purposes only - should not occur.
-				title: 'Example Custom Link',
+				id: 12345, // added for test purposes only - should't exist.
+				type: 'custom', // custom type indicates we shouldn't need an `id` field.
+				kind: 'custom', // custom type indicates we shouldn't need an `id` field.
+				label: 'Example Custom Link',
+				url: 'https://wordpress.org',
+				description: '',
+				rel: '',
+				className: '',
+				title: '',
+				opensInNewTab: true,
+			};
+
+			const actual = blockAttributesToMenuItem(
+				customLinkBlockAttributes
+			);
+
+			// Check the actual conversion to menuItem happened successfully.
+			expect( actual ).toEqual( {
+				title: {
+					raw: 'Example Custom Link',
+					rendered: 'Example Custom Link',
+				},
 				url: 'https://wordpress.org',
 				description: '',
 				xfn: [ '' ],
@@ -570,11 +590,10 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				attr_title: '',
 				object: 'custom',
 				type: 'custom',
-			};
-			const actual = blockAttributesToMenuItem(
-				customLinkBlockAttributes
-			);
+				target: '_blank',
+			} );
 
+			// Assert `id` attr has not been converted to a `object_id` field for a "custom" type even if present.
 			expect( actual.object_id ).toBeUndefined();
 		} );
 	} );
