@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../utils';
-import { useFlexItem } from './use-flex-item';
+import { createComponent } from '../../ui/utils';
+import { useFlexItem } from './hook';
 
 /**
  * `FlexItem` is a primitive layout component that aligns content within layout containers like `Flex`.

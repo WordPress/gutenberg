@@ -7,17 +7,38 @@ import { css, cx } from 'emotion';
  * WordPress dependencies
  */
 import { useMemo } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
-import { useResponsiveValue } from '../utils/use-responsive-value';
-import { space } from '../utils/space';
-import * as styles from './styles';
+import { useContextSystem } from '../../ui/context';
+import { useResponsiveValue } from '../../ui/utils/use-responsive-value';
+import { space } from '../../ui/utils/space';
+import * as styles from '../styles';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').FlexProps, 'div'>} props
+ *
+ * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} props
+ * @return {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} Props with the deprecated props removed.
+ */
+function useDeprecatedProps( { isReversed, ...otherProps } ) {
+	if ( typeof isReversed !== 'undefined' ) {
+		deprecated( 'Flex isReversed', {
+			alternative: 'Flex direction="row-reverse" or "column-reverse"',
+			since: '5.9',
+		} );
+		return {
+			...otherProps,
+			direction: isReversed ? 'row-reverse' : 'row',
+		};
+	}
+
+	return otherProps;
+}
+
+/**
+ * @param {import('../../ui/context').ViewOwnProps<import('../types').FlexProps, 'div'>} props
  */
 export function useFlex( props ) {
 	const {
@@ -29,7 +50,7 @@ export function useFlex( props ) {
 		justify = 'space-between',
 		wrap = false,
 		...otherProps
-	} = useContextSystem( props, 'Flex' );
+	} = useContextSystem( useDeprecatedProps( props ), 'Flex' );
 
 	const directionAsArray = Array.isArray( directionProp )
 		? directionProp

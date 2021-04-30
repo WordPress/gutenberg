@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { hasConnectNamespace, useContextSystem } from '../context';
-import { FlexItem, useFlex } from '../flex';
+import { FlexItem, useFlex } from '../../flex';
 import { getAlignmentProps } from './utils';
 import { getValidChildren } from '../utils/get-valid-children';
 

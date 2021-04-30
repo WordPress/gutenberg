@@ -780,9 +780,21 @@
 		"parent": "components"
 	},
 	{
+		"title": "FlexBlock",
+		"slug": "flex-block",
+		"markdown_source": "../packages/components/src/flex/flex-block/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "FlexItem",
+		"slug": "flex-item",
+		"markdown_source": "../packages/components/src/flex/flex-item/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Flex",
 		"slug": "flex",
-		"markdown_source": "../packages/components/src/flex/README.md",
+		"markdown_source": "../packages/components/src/flex/flex/README.md",
 		"parent": "components"
 	},
 	{

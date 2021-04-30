@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { View } from '../../view';
+import { View } from '../../ui/view';
 import Flex from '../flex';
 import FlexItem from '../flex-item';
 import FlexBlock from '../flex-block';

@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react';
 /**
  * Internal dependencies
  */
-import type { ResponsiveCSSValue } from '../utils/types';
+import type { ResponsiveCSSValue } from '../ui/utils/types';
 
 export type FlexDirection = ResponsiveCSSValue<
 	CSSProperties[ 'flexDirection' ]
@@ -22,10 +22,6 @@ export type FlexProps = {
 	 * @default 'center'
 	 */
 	align?: CSSProperties[ 'alignItems' ];
-	/**
-	 * @default false
-	 */
-	alignItems?: boolean;
 	/**
 	 * The direction flow of the children content can be adjusted with `direction`. `column` will align children vertically and `row` will align children horizontally.
 	 *
@@ -52,15 +48,15 @@ export type FlexProps = {
 	 */
 	justify?: CSSProperties[ 'justifyContent' ];
 	/**
-	 * @default false
-	 */
-	justifyContent?: boolean;
-	/**
 	 * Determines if children should wrap.
 	 *
 	 * @default false
 	 */
 	wrap?: boolean;
+	/**
+	 * @deprecated
+	 */
+	isReversed?: boolean;
 };
 
 export type FlexItemProps = {
