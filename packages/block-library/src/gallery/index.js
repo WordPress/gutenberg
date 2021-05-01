@@ -22,6 +22,17 @@ export const settings = {
 	description: __( 'Display multiple images in a rich gallery.' ),
 	icon,
 	keywords: [ __( 'images' ), __( 'photos' ) ],
+	styles: [
+		{
+			name: 'default',
+			label: _x( 'Default', 'block style' ),
+			isDefault: true,
+		},
+		{
+			name: 'white-caption-background',
+			label: _x( 'White caption background', 'block style' ),
+		},
+	],
 	example: {
 		attributes: {
 			columns: 2,

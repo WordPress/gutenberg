@@ -65,6 +65,12 @@
 			box-sizing: border-box;
 			margin: 0;
 
+			// White background variation
+			.is-style-white-caption-background & {
+				color: inherit;
+				background: linear-gradient(0deg, rgba($color: $white, $alpha: 0.7) 0, rgba($color: $white, $alpha: 0.3) 70%, rgba($color: $white, $alpha: 0));
+			}
+
 			img {
 				display: inline;
 			}
