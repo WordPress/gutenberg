@@ -90,7 +90,7 @@ When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to t
 
 ```jsx
 import {
-	__experimentalSpacer as Text,
+	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
 	__experimentalView as View
 	__experimentalVStack as VStack,
@@ -117,7 +117,7 @@ function Example() {
 
 ```jsx
 import {
-	__experimentalSpacer as Text,
+	__experimentalSpacer as Spacer,
 	__experimentalText as Text,
 	__experimentalView as View
 	__experimentalVStack as VStack,
