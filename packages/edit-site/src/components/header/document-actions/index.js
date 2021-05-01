@@ -56,6 +56,7 @@ function useSecondaryText() {
  * @param {string}   props.entityLabel A label to use for entity-related options.
  *                                     E.g. "template" would be used for "edit
  *                                     template" and "show template details".
+ * @param {boolean}  props.isLoaded    Whether the data is available.
  * @param {Function} props.children    React component to use for the
  *                                     information dropdown area. Should be a
  *                                     function which accepts dropdown props.
@@ -63,6 +64,7 @@ function useSecondaryText() {
 export default function DocumentActions( {
 	entityTitle,
 	entityLabel,
+	isLoaded,
 	children: dropdownContent,
 } ) {
 	const { label } = useSecondaryText();
@@ -73,10 +75,19 @@ export default function DocumentActions( {
 	const titleRef = useRef();
 
 	// Return a simple loading indicator until we have information to show.
-	if ( ! entityTitle ) {
+	if ( ! isLoaded ) {
 		return (
 			<div className="edit-site-document-actions">
 				{ __( 'Loading…' ) }
+			</div>
+		);
+	}
+
+	// Return feedback that the template does not seem to exist.
+	if ( ! entityTitle ) {
+		return (
+			<div className="edit-site-document-actions">
+				{ __( 'Template not found' ) }
 			</div>
 		);
 	}
