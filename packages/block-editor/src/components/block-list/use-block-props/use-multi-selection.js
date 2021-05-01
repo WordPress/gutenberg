@@ -36,9 +36,13 @@ export function useMultiSelection( clientId ) {
 		multiSelect,
 		selectBlock,
 	} = useDispatch( blockEditorStore );
-	const { isSelectionEnabled, isBlockSelected, getBlockParents } = useSelect(
-		blockEditorStore
-	);
+	const {
+		isSelectionEnabled,
+		isBlockSelected,
+		getBlockParents,
+		getBlockSelectionStart,
+		hasMultiSelection,
+	} = useSelect( blockEditorStore );
 	return useRefEffect(
 		( node ) => {
 			const { ownerDocument } = node;
@@ -152,9 +156,36 @@ export function useMultiSelection( clientId ) {
 				toggleRichText( node, false );
 			}
 
+			function onMouseDown( event ) {
+				// The main button.
+				// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
+				if ( ! isSelectionEnabled() || event.button !== 0 ) {
+					return;
+				}
+
+				if ( event.shiftKey ) {
+					const blockSelectionStart = getBlockSelectionStart();
+					if ( blockSelectionStart !== clientId ) {
+						toggleRichText( node, false );
+						multiSelect( blockSelectionStart, clientId );
+						event.preventDefault();
+					}
+				} else if ( hasMultiSelection() ) {
+					// Allow user to escape out of a multi-selection to a
+					// singular selection of a block via click. This is handled
+					// here since focus handling excludes blocks when there is
+					// multiselection, as focus can be incurred by starting a
+					// multiselection (focus moved to first block's multi-
+					// controls).
+					selectBlock( clientId );
+				}
+			}
+
+			node.addEventListener( 'mousedown', onMouseDown );
 			node.addEventListener( 'mouseleave', onMouseLeave );
 
 			return () => {
+				node.removeEventListener( 'mousedown', onMouseDown );
 				node.removeEventListener( 'mouseleave', onMouseLeave );
 				ownerDocument.removeEventListener(
 					'selectionchange',
