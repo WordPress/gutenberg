@@ -12,7 +12,7 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import { contextConnect, useContextSystem } from '../context';
-import { Flex } from '../flex';
+import { Flex } from '../../flex';
 import * as styles from './styles';
 
 /**

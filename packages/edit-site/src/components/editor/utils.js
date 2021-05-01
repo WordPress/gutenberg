@@ -13,9 +13,9 @@ import { store as editSiteStore } from '../../store';
 
 /* Supporting data */
 export const ALL_BLOCKS_NAME = 'defaults';
-export const ALL_BLOCKS_SELECTOR = ':root';
+export const ALL_BLOCKS_SELECTOR = 'body';
 export const ROOT_BLOCK_NAME = 'root';
-export const ROOT_BLOCK_SELECTOR = ':root';
+export const ROOT_BLOCK_SELECTOR = 'body';
 export const ROOT_BLOCK_SUPPORTS = [
 	'--wp--style--color--link',
 	'background',

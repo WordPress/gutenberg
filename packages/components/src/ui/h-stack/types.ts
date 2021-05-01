@@ -7,7 +7,7 @@ import type { CSSProperties } from 'react';
 /**
  * Internal dependencies
  */
-import type { FlexProps } from '../flex/types';
+import type { FlexProps } from '../../flex/types';
 
 export type HStackAlignment =
 	| 'bottom'

@@ -11,6 +11,7 @@ import {
 	BlockInspector,
 	WritingFlow,
 	BlockList,
+	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
@@ -28,6 +29,7 @@ import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 import { store as editSiteStore } from '../../store';
+import BlockInspectorButton from './block-inspector-button';
 
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, page, deviceType } = useSelect(
@@ -112,6 +114,11 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						/>
 					</WritingFlow>
 				</Iframe>
+				<__experimentalBlockSettingsMenuFirstItem>
+					{ ( { onClose } ) => (
+						<BlockInspectorButton onClick={ onClose } />
+					) }
+				</__experimentalBlockSettingsMenuFirstItem>
 			</div>
 		</BlockEditorProvider>
 	);
