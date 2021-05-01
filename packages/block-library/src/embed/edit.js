@@ -22,7 +22,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-
 import { __, sprintf } from '@wordpress/i18n';
 import { useState, useEffect, Platform } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';

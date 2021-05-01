@@ -231,6 +231,7 @@ else:
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->
 
+<!-- wp:heading -->
 <h2>Legacy</h2>
 <!-- /wp:heading -->
 
