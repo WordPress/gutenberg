@@ -107,7 +107,7 @@ export default function VisualEditor( { styles } ) {
 		borderRadius: '2px',
 		border: '1px solid #ddd',
 	};
-	const resizedCanvasStyles = useResizeCanvas( deviceType );
+	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
 	const defaultLayout = useEditorFeature( 'layout' );
 	const { contentSize, wideSize } = defaultLayout || {};
 	const alignments =
