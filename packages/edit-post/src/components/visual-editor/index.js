@@ -56,7 +56,7 @@ function MaybeIframe( {
 				<div
 					ref={ contentRef }
 					className="editor-styles-wrapper"
-					style={ style }
+					style={ { width: '100%', height: '100%', ...style } }
 				>
 					{ children }
 				</div>
