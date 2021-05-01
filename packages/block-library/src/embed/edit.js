@@ -196,7 +196,7 @@ const EmbedEdit = ( props ) => {
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
 	if ( showEmbedPlaceholder ) {
 		return (
-			<View { ...blockProps }>
+			<View style={ { flex: 1 } } { ...blockProps }>
 				<EmbedPlaceholder
 					icon={ icon }
 					label={ label }
