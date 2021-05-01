@@ -13,7 +13,7 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/image' ],
-			transform: ( { caption, url, align, id, anchor } ) =>
+			transform: ( { caption, url, align, id, anchor, duotone } ) =>
 				createBlock(
 					'core/cover',
 					{
@@ -21,6 +21,7 @@ const transforms = {
 						align,
 						id,
 						anchor,
+						duotone,
 					},
 					[
 						createBlock( 'core/paragraph', {
@@ -76,13 +77,14 @@ const transforms = {
 					! customGradient
 				);
 			},
-			transform: ( { title, url, align, id, anchor } ) =>
+			transform: ( { title, url, align, id, anchor, duotone } ) =>
 				createBlock( 'core/image', {
 					caption: title,
 					url,
 					align,
 					id,
 					anchor,
+					duotone,
 				} ),
 		},
 		{

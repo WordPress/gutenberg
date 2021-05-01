@@ -12,45 +12,15 @@
 		outline: 1px solid transparent;
 	}
 
-	textarea.block-editor-default-block-appender__content { // Needs specificity in order to override input field styles from WP-admin styles.
-		font-family: inherit;
-		font-size: inherit;
-		border: none;
-		background: none;
-		box-shadow: none;
-		display: block;
-		cursor: text;
-		width: 100%;
-		outline: $border-width solid transparent;
-		transition: 0.2s outline;
-		@include reduce-motion("transition");
-		margin-top: $default-block-margin;
-		margin-bottom: $default-block-margin;
-
-		// This needs high specificity as it's output as an inline style by the library.
-		resize: none !important;
-
-		// Emulate the dimensions of a paragraph block.
-		// On mobile and in nested contexts, the plus to add blocks shows up on the right.
-		// The rightmost padding makes sure it doesn't overlap text.
-		padding: 0 #{ $block-padding + $button-size } 0 0;
-
-		// Use opacity to work in various editor styles.
-		color: $dark-gray-placeholder;
-		.is-dark-theme & {
-			color: $light-gray-placeholder;
-		}
+	.block-editor-default-block-appender__content {
+		// Set the opacity of the initial block appender to the same as placeholder text in an empty Paragraph block.
+		opacity: 0.62;
 	}
 
 	// Dropzone.
 	.components-drop-zone__content-icon {
 		display: none;
 	}
-}
-
-// Ensure that the height of the first appender, and the one between blocks, is the same as text.
-.block-editor-default-block-appender__content {
-	line-height: $editor-line-height;
 }
 
 // Empty / default block side inserter.
@@ -77,11 +47,5 @@
 
 	&:disabled {
 		display: none;
-	}
-}
-
-.block-editor-default-block-appender .block-editor-inserter {
-	@include break-small {
-		align-items: center;
 	}
 }

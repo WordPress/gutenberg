@@ -21,7 +21,6 @@ function gutenberg_reregister_core_block_types() {
 				'code',
 				'column',
 				'columns',
-				'file',
 				'gallery',
 				'group',
 				'heading',
@@ -53,8 +52,10 @@ function gutenberg_reregister_core_block_types() {
 				'calendar.php'                  => 'core/calendar',
 				'categories.php'                => 'core/categories',
 				'cover.php'                     => 'core/cover',
+				'file.php'                      => 'core/file',
 				'latest-comments.php'           => 'core/latest-comments',
 				'latest-posts.php'              => 'core/latest-posts',
+				'legacy-widget.php'             => 'core/legacy-widget',
 				'loginout.php'                  => 'core/loginout',
 				'navigation.php'                => 'core/navigation',
 				'navigation-link.php'           => 'core/navigation-link',
@@ -72,6 +73,7 @@ function gutenberg_reregister_core_block_types() {
 				'post-comments.php'             => 'core/post-comments',
 				'post-comments-count.php'       => 'core/post-comments-count',
 				'post-comments-form.php'        => 'core/post-comments-form',
+				'post-comments-link.php'        => 'core/post-comments-link',
 				'post-content.php'              => 'core/post-content',
 				'post-date.php'                 => 'core/post-date',
 				'post-excerpt.php'              => 'core/post-excerpt',
@@ -97,12 +99,10 @@ function gutenberg_reregister_core_block_types() {
 		),
 		__DIR__ . '/../build/edit-widgets/blocks/'  => array(
 			'block_folders' => array(
-				'legacy-widget',
 				'widget-area',
 			),
 			'block_names'   => array(
-				'legacy-widget.php' => 'core/legacy-widget',
-				'widget-area.php'   => 'core/widget-area',
+				'widget-area.php' => 'core/widget-area',
 			),
 		),
 	);
@@ -144,7 +144,7 @@ function gutenberg_reregister_core_block_types() {
 				gutenberg_register_core_block_styles( $block_name );
 			}
 
-			require $blocks_dir . $file;
+			require_once $blocks_dir . $file;
 		}
 	}
 }
@@ -253,15 +253,21 @@ function gutenberg_maybe_inline_styles() {
 			$style['css'] = file_get_contents( $style['path'] );
 
 			// Set `src` to `false` and add styles inline.
-			$wp_styles->registered[ $style['handle'] ]->src              = false;
-			$wp_styles->registered[ $style['handle'] ]->extra['after'][] = $style['css'];
+			$wp_styles->registered[ $style['handle'] ]->src = false;
+			if ( empty( $wp_styles->registered[ $style['handle'] ]->extra['after'] ) ) {
+				$wp_styles->registered[ $style['handle'] ]->extra['after'] = array();
+			}
+			array_unshift( $wp_styles->registered[ $style['handle'] ]->extra['after'], $style['css'] );
 
 			// Add the styles size to the $total_inline_size var.
 			$total_inline_size += (int) $style['size'];
 		}
 	}
 }
+// Run for styles enqueued in <head>.
 add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
+// Run for late-loaded styles in the footer.
+add_action( 'wp_footer', 'gutenberg_maybe_inline_styles', 1 );
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it
@@ -376,3 +382,21 @@ function gutenberg_register_theme_block_category( $categories ) {
 }
 
 add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+
+/**
+ * Checks whether the current block type supports the feature requested.
+ *
+ * @param WP_Block_Type $block_type Block type to check for support.
+ * @param array         $feature    Path of the feature to check support for.
+ * @param mixed         $default    Fallback value for feature support, defaults to false.
+ *
+ * @return boolean                  Whether or not the feature is supported.
+ */
+function gutenberg_block_has_support( $block_type, $feature, $default = false ) {
+	$block_support = $default;
+	if ( $block_type && property_exists( $block_type, 'supports' ) ) {
+		$block_support = _wp_array_get( $block_type->supports, $feature, $default );
+	}
+
+	return true === $block_support || is_array( $block_support );
+}

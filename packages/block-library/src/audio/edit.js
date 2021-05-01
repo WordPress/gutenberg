@@ -178,17 +178,18 @@ function AudioEdit( {
 			</InspectorControls>
 			<figure { ...blockProps }>
 				{ /*
-					Disable the audio tag so the user clicking on it won't play the
+					Disable the audio tag if the block is not selected
+					so the user clicking on it won't play the
 					file or change the position slider when the controls are enabled.
 				*/ }
-				<Disabled>
+				<Disabled isDisabled={ ! isSelected }>
 					<audio controls="controls" src={ src } />
 				</Disabled>
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
 						aria-label={ __( 'Audio caption text' ) }
-						placeholder={ __( 'Write caption…' ) }
+						placeholder={ __( 'Add caption' ) }
 						value={ caption }
 						onChange={ ( value ) =>
 							setAttributes( { caption: value } )

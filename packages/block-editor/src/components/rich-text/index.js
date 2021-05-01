@@ -101,6 +101,7 @@ function getAllowedFormats( {
 	}
 
 	deprecated( 'wp.blockEditor.RichText formattingControls prop', {
+		since: '5.4',
 		alternative: 'allowedFormats',
 	} );
 
@@ -124,7 +125,6 @@ function RichTextWrapper(
 		autocompleters,
 		onReplace,
 		placeholder,
-		keepPlaceholderOnFocus,
 		allowedFormats,
 		formattingControls,
 		withoutInteractiveFormatting,
@@ -689,10 +689,7 @@ function RichTextWrapper(
 								className={ classnames(
 									classes,
 									props.className,
-									editableProps.className,
-									{
-										'keep-placeholder-on-focus': keepPlaceholderOnFocus,
-									}
+									editableProps.className
 								) }
 								aria-autocomplete={
 									listBoxId ? 'list' : undefined
@@ -716,6 +713,7 @@ function RichTextWrapper(
 	}
 
 	deprecated( 'wp.blockEditor.RichText wrapperClassName prop', {
+		since: '5.4',
 		alternative: 'className prop or create your own wrapper div',
 	} );
 

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { registerBlockType } from '@wordpress/blocks';
 import {
 	registerCoreBlocks,
 	__experimentalGetCoreBlocks,
@@ -11,56 +10,32 @@ import {
 /**
  * Internal dependencies
  */
-import {
-	SidebarSection,
-	SidebarControl,
-} from './customize-sidebar-constructors';
+import getSidebarSection from './controls/sidebar-section';
+import getSidebarControl from './controls/sidebar-control';
+import './filters';
 
 const { wp } = window;
 
 /**
  * Initializes the widgets block editor in the customizer.
+ *
+ * @param {string} editorName          The editor name.
+ * @param {Object} blockEditorSettings Block editor settings.
  */
-export function initialize() {
+export function initialize( editorName, blockEditorSettings ) {
 	const coreBlocks = __experimentalGetCoreBlocks().filter(
 		( block ) => ! [ 'core/more' ].includes( block.name )
 	);
 	registerCoreBlocks( coreBlocks );
 
 	if ( process.env.GUTENBERG_PHASE === 2 ) {
-		__experimentalRegisterExperimentalCoreBlocks();
+		__experimentalRegisterExperimentalCoreBlocks( {
+			enableLegacyWidgetBlock: true,
+		} );
 	}
 
-	// TODO: Register legacy widgets block
-	registerBlockType( 'core/legacy-widget', {
-		title: 'Legacy Widget',
-		attributes: {
-			widgetClass: {
-				type: 'string',
-			},
-			referenceWidgetName: {
-				type: 'string',
-			},
-			name: {
-				type: 'string',
-			},
-			idBase: {
-				type: 'string',
-			},
-			number: {
-				type: 'number',
-			},
-			instance: {
-				type: 'object',
-			},
-		},
-		edit( { attributes } ) {
-			return <div>{ JSON.stringify( attributes ) }</div>;
-		},
-	} );
-
-	wp.customize.sectionConstructor.sidebar = SidebarSection;
-	wp.customize.controlConstructor.sidebar_block_editor = SidebarControl;
+	wp.customize.sectionConstructor.sidebar = getSidebarSection();
+	wp.customize.controlConstructor.sidebar_block_editor = getSidebarControl(
+		blockEditorSettings
+	);
 }
-
-wp.domReady( initialize );

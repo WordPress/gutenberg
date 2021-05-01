@@ -11,15 +11,10 @@ import {
 	BlockEditorProvider,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
-import {
-	DropZoneProvider,
-	Popover,
-	SlotFillProvider,
-	Spinner,
-} from '@wordpress/components';
+import { Popover, SlotFillProvider, Spinner } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { useMemo, useState } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import {
 	InterfaceSkeleton,
 	ComplementaryArea,
@@ -30,7 +25,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import EmptyState from './empty-state';
+import UnselectedMenuState from './unselected-menu-state';
 import {
 	IsMenuNameControlFocusedContext,
 	MenuIdContext,
@@ -72,16 +67,27 @@ export default function Layout( { blockEditorSettings } ) {
 		hasFinishedInitialLoad,
 		selectedMenuId,
 		navigationPost,
+		isMenuBeingDeleted,
 		selectMenu,
 		deleteMenu,
 		openManageLocationsModal,
 		closeManageLocationsModal,
 		isManageLocationsModalOpen,
+		isMenuSelected,
 	} = useNavigationEditor();
 
 	const [ blocks, onInput, onChange ] = useNavigationBlockEditor(
 		navigationPost
 	);
+
+	const [ isMenuLoaded, setIsMenuLoaded ] = useState( false );
+
+	useEffect( () => {
+		if ( ! isMenuLoaded && menus?.length ) {
+			setIsMenuLoaded( true );
+			selectMenu( menus[ 0 ].id );
+		}
+	}, [ menus ] );
 
 	const { hasSidebarEnabled } = useSelect(
 		( select ) => ( {
@@ -92,124 +98,146 @@ export default function Layout( { blockEditorSettings } ) {
 		[]
 	);
 
+	useEffect( () => {
+		if ( ! selectedMenuId && menus?.length ) {
+			selectMenu( menus[ 0 ].id );
+		}
+	}, [] );
+
 	useMenuNotifications( selectedMenuId );
 
 	const hasMenus = !! menus?.length;
-	const isBlockEditorReady = !! ( hasMenus && navigationPost );
 	const hasPermanentSidebar = isLargeViewport && hasMenus;
+
+	const isBlockEditorReady = !! (
+		hasMenus &&
+		navigationPost &&
+		isMenuSelected
+	);
 
 	return (
 		<ErrorBoundary>
+			<div
+				hidden={ ! isMenuBeingDeleted }
+				className={ 'edit-navigation-layout__overlay' }
+			/>
 			<SlotFillProvider>
-				<DropZoneProvider>
-					<BlockEditorKeyboardShortcuts.Register />
-					<NavigationEditorShortcuts.Register />
-					<NavigationEditorShortcuts saveBlocks={ savePost } />
-					<Notices />
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ onInput }
-						onChange={ onChange }
-						settings={ {
-							...blockEditorSettings,
-							templateLock: 'all',
-						} }
-						useSubRegistry={ false }
-					>
-						<MenuIdContext.Provider value={ selectedMenuId }>
-							<IsMenuNameControlFocusedContext.Provider
-								value={ useMemo(
-									() => [
-										isMenuNameControlFocused,
-										setIsMenuNameControlFocused,
-									],
-									[ isMenuNameControlFocused ]
-								) }
-							>
-								<InterfaceSkeleton
-									className={ classnames(
-										'edit-navigation-layout',
-										{
-											'has-permanent-sidebar': hasPermanentSidebar,
-										}
-									) }
-									labels={ interfaceLabels }
-									header={
-										<Header
-											isPending={ ! hasLoadedMenus }
-											menus={ menus }
-											selectedMenuId={ selectedMenuId }
-											onSelectMenu={ selectMenu }
-											navigationPost={ navigationPost }
-										/>
+				<BlockEditorKeyboardShortcuts.Register />
+				<NavigationEditorShortcuts.Register />
+				<NavigationEditorShortcuts saveBlocks={ savePost } />
+				<Notices />
+				<BlockEditorProvider
+					value={ blocks }
+					onInput={ onInput }
+					onChange={ onChange }
+					settings={ {
+						...blockEditorSettings,
+						templateLock: 'all',
+					} }
+					useSubRegistry={ false }
+				>
+					<MenuIdContext.Provider value={ selectedMenuId }>
+						<IsMenuNameControlFocusedContext.Provider
+							value={ useMemo(
+								() => [
+									isMenuNameControlFocused,
+									setIsMenuNameControlFocused,
+								],
+								[ isMenuNameControlFocused ]
+							) }
+						>
+							<InterfaceSkeleton
+								className={ classnames(
+									'edit-navigation-layout',
+									{
+										'has-permanent-sidebar': hasPermanentSidebar,
 									}
-									content={
-										<>
-											{ ! hasFinishedInitialLoad && (
-												<Spinner />
+								) }
+								labels={ interfaceLabels }
+								header={
+									<Header
+										isMenuSelected={ isMenuSelected }
+										isPending={ ! hasLoadedMenus }
+										menus={ menus }
+										selectedMenuId={ selectedMenuId }
+										onSelectMenu={ selectMenu }
+										navigationPost={ navigationPost }
+									/>
+								}
+								content={
+									<>
+										{ ! hasFinishedInitialLoad && (
+											<Spinner />
+										) }
+
+										{ ! isMenuSelected &&
+											hasFinishedInitialLoad && (
+												<UnselectedMenuState
+													onSelectMenu={ selectMenu }
+													onCreate={ selectMenu }
+													menus={ menus }
+												/>
 											) }
-
-											{ hasFinishedInitialLoad &&
-												! hasMenus && <EmptyState /> }
-
-											{ isBlockEditorReady && (
-												<>
-													<BlockToolbar
-														isFixed={
-															! isLargeViewport
+										{ isBlockEditorReady && (
+											<>
+												<BlockToolbar
+													isFixed={
+														! isLargeViewport
+													}
+												/>
+												<div
+													className="edit-navigation-layout__content-area"
+													ref={ contentAreaRef }
+												>
+													<Editor
+														isPending={
+															! hasLoadedMenus
+														}
+														blocks={ blocks }
+													/>
+													<InspectorAdditions
+														isManageLocationsModalOpen={
+															isManageLocationsModalOpen
+														}
+														openManageLocationsModal={
+															openManageLocationsModal
+														}
+														closeManageLocationsModal={
+															closeManageLocationsModal
+														}
+														onSelectMenu={
+															selectMenu
+														}
+														menus={ menus }
+														menuId={
+															selectedMenuId
+														}
+														onDeleteMenu={
+															deleteMenu
+														}
+														isMenuBeingDeleted={
+															isMenuBeingDeleted
 														}
 													/>
-													<div
-														className="edit-navigation-layout__content-area"
-														ref={ contentAreaRef }
-													>
-														<Editor
-															isPending={
-																! hasLoadedMenus
-															}
-															blocks={ blocks }
-														/>
-														<InspectorAdditions
-															isManageLocationsModalOpen={
-																isManageLocationsModalOpen
-															}
-															openManageLocationsModal={
-																openManageLocationsModal
-															}
-															closeManageLocationsModal={
-																closeManageLocationsModal
-															}
-															onSelectMenu={
-																selectMenu
-															}
-															menus={ menus }
-															menuId={
-																selectedMenuId
-															}
-															onDeleteMenu={
-																deleteMenu
-															}
-														/>
-													</div>
-												</>
-											) }
-										</>
-									}
-									sidebar={
-										( hasPermanentSidebar ||
-											hasSidebarEnabled ) && (
-											<ComplementaryArea.Slot scope="core/edit-navigation" />
-										)
-									}
-								/>
-								<Sidebar
-									hasPermanentSidebar={ hasPermanentSidebar }
-								/>
-							</IsMenuNameControlFocusedContext.Provider>
-						</MenuIdContext.Provider>
-					</BlockEditorProvider>
-					<Popover.Slot />
-				</DropZoneProvider>
+												</div>
+											</>
+										) }
+									</>
+								}
+								sidebar={
+									( hasPermanentSidebar ||
+										hasSidebarEnabled ) && (
+										<ComplementaryArea.Slot scope="core/edit-navigation" />
+									)
+								}
+							/>
+							<Sidebar
+								hasPermanentSidebar={ hasPermanentSidebar }
+							/>
+						</IsMenuNameControlFocusedContext.Provider>
+					</MenuIdContext.Provider>
+				</BlockEditorProvider>
+				<Popover.Slot />
 			</SlotFillProvider>
 		</ErrorBoundary>
 	);

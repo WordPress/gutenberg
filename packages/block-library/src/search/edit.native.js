@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, AccessibilityInfo } from 'react-native';
 import classnames from 'classnames';
 
 /**
@@ -14,25 +14,28 @@ import {
 	InspectorControls,
 } from '@wordpress/block-editor';
 import {
-	Button,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
+	Icon,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { search } from '@wordpress/icons';
 import { useRef, useEffect, useState } from '@wordpress/element';
+import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import styles from './style.scss';
-import richTextStyles from './rich-text.scss';
 
 /**
  * Constants
  */
-const MIN_BUTTON_WIDTH = 100;
+const MIN_BUTTON_WIDTH = 75;
+const MARGINS =
+	styles.widthMargin?.marginLeft + styles.widthMargin?.paddingLeft;
+
 const BUTTON_OPTIONS = [
 	{ value: 'button-inside', label: __( 'Button inside' ) },
 	{ value: 'button-outside', label: __( 'Button outside' ) },
@@ -45,11 +48,17 @@ export default function SearchEdit( {
 	attributes,
 	setAttributes,
 	className,
+	blockWidth,
 } ) {
 	const [ isButtonSelected, setIsButtonSelected ] = useState( false );
 	const [ isLabelSelected, setIsLabelSelected ] = useState( false );
 	const [ isPlaceholderSelected, setIsPlaceholderSelected ] = useState(
 		true
+	);
+	const [ isLongButton, setIsLongButton ] = useState( false );
+	const [ buttonWidth, setButtonWidth ] = useState( MIN_BUTTON_WIDTH );
+	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
+		false
 	);
 
 	const textInputRef = useRef( null );
@@ -64,6 +73,34 @@ export default function SearchEdit( {
 	} = attributes;
 
 	/*
+	 * Check if screenreader is enabled and save to state. This is important for
+	 * properly creating accessibilityLabel text.
+	 */
+	useEffect( () => {
+		AccessibilityInfo.addEventListener(
+			'screenReaderChanged',
+			handleScreenReaderToggled
+		);
+
+		AccessibilityInfo.isScreenReaderEnabled().then(
+			( screenReaderEnabled ) => {
+				setIsScreenReaderEnabled( screenReaderEnabled );
+			}
+		);
+
+		return () => {
+			AccessibilityInfo.removeEventListener(
+				'screenReaderChanged',
+				handleScreenReaderToggled
+			);
+		};
+	}, [] );
+
+	const handleScreenReaderToggled = ( screenReaderEnabled ) => {
+		setIsScreenReaderEnabled( screenReaderEnabled );
+	};
+
+	/*
 	 * Called when the value of isSelected changes. Blurs the PlainText component
 	 * used by the placeholder when this block loses focus.
 	 */
@@ -73,8 +110,26 @@ export default function SearchEdit( {
 		}
 	}, [ isSelected ] );
 
+	useEffect( () => {
+		const maxButtonWidth = Math.floor( blockWidth / 2 - MARGINS );
+		const tempIsLongButton = buttonWidth > maxButtonWidth;
+
+		// Update this value only if it has changed to avoid flickering.
+		if ( isLongButton !== tempIsLongButton ) {
+			setIsLongButton( tempIsLongButton );
+		}
+	}, [ blockWidth, buttonWidth ] );
+
 	const hasTextInput = () => {
 		return textInputRef && textInputRef.current;
+	};
+
+	const onLayoutButton = ( { nativeEvent } ) => {
+		const { width } = nativeEvent?.layout;
+
+		if ( width ) {
+			setButtonWidth( width );
+		}
 	};
 
 	const getBlockClassNames = () => {
@@ -154,112 +209,233 @@ export default function SearchEdit( {
 		</InspectorControls>
 	);
 
-	const mergeWithBorderStyle = ( style ) => {
-		return { ...style, ...styles.border };
+	const isButtonInside = buttonPosition === 'button-inside';
+
+	const borderStyle = usePreferredColorSchemeStyle(
+		styles.border,
+		styles.borderDark
+	);
+
+	const inputStyle = [
+		! isButtonInside && borderStyle,
+		usePreferredColorSchemeStyle(
+			styles.plainTextInput,
+			styles.plainTextInputDark
+		),
+	];
+
+	const placeholderStyle = usePreferredColorSchemeStyle(
+		styles.plainTextPlaceholder,
+		styles.plainTextPlaceholderDark
+	);
+
+	const searchBarStyle = [
+		styles.searchBarContainer,
+		isButtonInside && borderStyle,
+		isLongButton && { flexDirection: 'column' },
+	];
+
+	/**
+	 * If a screenreader is enabled, create a descriptive label for this field. If
+	 * not, return a label that is used during automated UI tests.
+	 *
+	 * @return {string} The accessibilityLabel for the Search Button
+	 */
+	const getAccessibilityLabelForButton = () => {
+		if ( ! isScreenReaderEnabled ) {
+			return 'search-block-button';
+		}
+
+		return `${ __(
+			'Search button. Current button text is'
+		) } ${ buttonText }`;
+	};
+
+	/**
+	 * If a screenreader is enabled, create a descriptive label for this field. If
+	 * not, return a label that is used during automated UI tests.
+	 *
+	 * @return {string} The accessibilityLabel for the Search Input
+	 * 					 placeholder field.
+	 */
+	const getAccessibilityLabelForPlaceholder = () => {
+		if ( ! isScreenReaderEnabled ) {
+			return 'search-block-input';
+		}
+
+		const title = __( 'Search input field.' );
+		const description = placeholder
+			? `${ __( 'Current placeholder text is' ) } ${ placeholder }`
+			: __( 'No custom placeholder set' );
+		return `${ title } ${ description }`;
+	};
+
+	/**
+	 * If a screenreader is enabled, create a descriptive label for this field. If
+	 * not, return a label that is used during automated UI tests.
+	 *
+	 * @return {string} The accessibilityLabel for the Search Label field
+	 */
+	const getAccessibilityLabelForLabel = () => {
+		if ( ! isScreenReaderEnabled ) {
+			return 'search-block-label';
+		}
+
+		return `${ __( 'Search block label. Current text is' ) } ${ label }`;
 	};
 
 	const renderTextField = () => {
-		const inputStyle =
-			buttonPosition === 'button-inside'
-				? styles.searchTextInput
-				: mergeWithBorderStyle( styles.searchTextInput );
-
 		return (
-			<PlainText
-				ref={ textInputRef }
-				isSelected={ isPlaceholderSelected }
-				className="wp-block-search__input"
-				style={ inputStyle }
-				numberOfLines={ 1 }
-				ellipsizeMode="tail" // currently only works on ios
-				label={ null }
-				value={ placeholder }
-				placeholder={
-					placeholder ? undefined : __( 'Optional placeholder…' )
+			<View
+				style={ styles.searchInputContainer }
+				accessible={ true }
+				accessibilityRole="none"
+				accessibilityHint={
+					isScreenReaderEnabled
+						? __( 'Double tap to edit placeholder text' )
+						: undefined
 				}
-				onChange={ ( newVal ) =>
-					setAttributes( { placeholder: newVal } )
-				}
-				onFocus={ () => {
-					setIsPlaceholderSelected( true );
-					onFocus();
-				} }
-				onBlur={ () => setIsPlaceholderSelected( false ) }
-			/>
+				accessibilityLabel={ getAccessibilityLabelForPlaceholder() }
+			>
+				<PlainText
+					ref={ textInputRef }
+					isSelected={ isPlaceholderSelected }
+					className="wp-block-search__input"
+					style={ inputStyle }
+					numberOfLines={ 1 }
+					ellipsizeMode="tail" // currently only works on ios
+					label={ null }
+					value={ placeholder }
+					placeholder={
+						placeholder ? undefined : __( 'Optional placeholder…' )
+					}
+					onChange={ ( newVal ) =>
+						setAttributes( { placeholder: newVal } )
+					}
+					onFocus={ () => {
+						setIsPlaceholderSelected( true );
+						onFocus();
+					} }
+					onBlur={ () => setIsPlaceholderSelected( false ) }
+					placeholderTextColor={ placeholderStyle?.color }
+				/>
+			</View>
 		);
 	};
 
+	// To achieve proper expanding and shrinking `RichText` on Android, there is a need to set
+	// a `placeholder` as an empty string when `RichText` is focused,
+	// because `AztecView` is calculating a `minWidth` based on placeholder text.
+	const buttonPlaceholderText =
+		isButtonSelected ||
+		( ! isButtonSelected && buttonText && buttonText !== '' )
+			? ''
+			: __( 'Add button text' );
+
 	const renderButton = () => {
 		return (
-			<View style={ styles.buttonContainer }>
+			<View
+				style={ [
+					styles.buttonContainer,
+					isLongButton && styles.buttonContainerWide,
+				] }
+			>
 				{ buttonUseIcon && (
-					<Button
-						className="wp-block-search__button"
+					<Icon
 						icon={ search }
-						onFocus={ onFocus }
+						{ ...styles.icon }
+						onLayout={ onLayoutButton }
 					/>
 				) }
 
 				{ ! buttonUseIcon && (
-					<RichText
-						className="wp-block-search__button"
-						identifier="text"
-						tagName="p"
-						style={ richTextStyles.searchButton }
-						placeholder={ __( 'Add button text' ) }
-						value={ buttonText }
-						withoutInteractiveFormatting
-						onChange={ ( html ) =>
-							setAttributes( { buttonText: html } )
+					<View
+						accessible={ true }
+						accessibilityRole="none"
+						accessibilityHint={
+							isScreenReaderEnabled
+								? __( 'Double tap to edit button text' )
+								: undefined
 						}
-						minWidth={ MIN_BUTTON_WIDTH }
-						textAlign="center"
-						isSelected={ isButtonSelected }
-						__unstableMobileNoFocusOnMount={ ! isSelected }
-						unstableOnFocus={ () => {
-							setIsButtonSelected( true );
-						} }
-						onBlur={ () => {
-							setIsButtonSelected( false );
-						} }
-					/>
+						accessibilityLabel={ getAccessibilityLabelForButton() }
+						onLayout={ onLayoutButton }
+					>
+						<RichText
+							className="wp-block-search__button"
+							identifier="text"
+							tagName="p"
+							style={ styles.richTextButton }
+							placeholder={ buttonPlaceholderText }
+							value={ buttonText }
+							withoutInteractiveFormatting
+							onChange={ ( html ) =>
+								setAttributes( { buttonText: html } )
+							}
+							minWidth={ MIN_BUTTON_WIDTH }
+							maxWidth={ blockWidth - MARGINS }
+							textAlign="center"
+							isSelected={ isButtonSelected }
+							__unstableMobileNoFocusOnMount={ ! isSelected }
+							unstableOnFocus={ () => {
+								setIsButtonSelected( true );
+							} }
+							onBlur={ () => {
+								setIsButtonSelected( false );
+							} }
+							selectionColor={
+								styles.richTextButtonCursor?.color
+							}
+						/>
+					</View>
 				) }
 			</View>
 		);
 	};
 
-	const searchBarStyle =
-		buttonPosition === 'button-inside'
-			? mergeWithBorderStyle( styles.searchBarContainer )
-			: styles.searchBarContainer;
-
 	return (
-		<View { ...blockProps } style={ styles.searchBlockContainer }>
+		<View
+			{ ...blockProps }
+			style={ styles.searchBlockContainer }
+			importantForAccessibility={
+				isSelected ? 'yes' : 'no-hide-descendants'
+			}
+			accessibilityElementsHidden={ isSelected ? false : true }
+		>
 			{ isSelected && controls }
 
 			{ showLabel && (
-				<RichText
-					className="wp-block-search__label"
-					identifier="text"
-					tagName="p"
-					style={ {
-						...styles.searchLabel,
-						...richTextStyles.searchLabel,
-					} }
-					aria-label={ __( 'Label text' ) }
-					placeholder={ __( 'Add label…' ) }
-					withoutInteractiveFormatting
-					value={ label }
-					onChange={ ( html ) => setAttributes( { label: html } ) }
-					isSelected={ isLabelSelected }
-					__unstableMobileNoFocusOnMount={ ! isSelected }
-					unstableOnFocus={ () => {
-						setIsLabelSelected( true );
-					} }
-					onBlur={ () => {
-						setIsLabelSelected( false );
-					} }
-				/>
+				<View
+					accessible={ true }
+					accessibilityRole="none"
+					accessibilityHint={
+						isScreenReaderEnabled
+							? __( 'Double tap to edit label text' )
+							: undefined
+					}
+					accessibilityLabel={ getAccessibilityLabelForLabel() }
+				>
+					<RichText
+						className="wp-block-search__label"
+						identifier="text"
+						tagName="p"
+						style={ styles.richTextLabel }
+						placeholder={ __( 'Add label…' ) }
+						withoutInteractiveFormatting
+						value={ label }
+						onChange={ ( html ) =>
+							setAttributes( { label: html } )
+						}
+						isSelected={ isLabelSelected }
+						__unstableMobileNoFocusOnMount={ ! isSelected }
+						unstableOnFocus={ () => {
+							setIsLabelSelected( true );
+						} }
+						onBlur={ () => {
+							setIsLabelSelected( false );
+						} }
+						selectionColor={ styles.richTextButtonCursor?.color }
+					/>
+				</View>
 			) }
 
 			{ ( 'button-inside' === buttonPosition ||

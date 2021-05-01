@@ -9,11 +9,13 @@ import { withInstanceId, compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
-	withColors,
 	InspectorControls,
 	BlockControls,
 	withGradient,
 	store as blockEditorStore,
+	getColorObjectByAttributeValues,
+	getGradientValueBySlug,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -34,7 +36,6 @@ import richTextStyle from './rich-text.scss';
 import styles from './editor.scss';
 import ColorBackground from './color-background';
 import ColorEdit from './color-edit';
-import getColorAndStyleProps from './color-props';
 
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
@@ -184,30 +185,47 @@ class ButtonEdit extends Component {
 	}
 
 	getBackgroundColor() {
-		const { backgroundColor, attributes, gradientValue } = this.props;
-		const { customGradient } = attributes;
+		const { attributes, colors, gradients } = this.props;
+		const { backgroundColor, gradient } = attributes;
 
-		if ( customGradient || gradientValue ) {
-			return customGradient || gradientValue;
+		// Return named gradient value if available.
+		const gradientValue = getGradientValueBySlug( gradients, gradient );
+
+		if ( gradientValue ) {
+			return gradientValue;
 		}
-		const colorAndStyleProps = getColorAndStyleProps( attributes );
+
+		const colorProps = getColorClassesAndStyles( attributes );
+
+		// Retrieve named color object to force inline styles for themes that
+		// do not load their color stylesheets in the editor.
+		const colorObject = getColorObjectByAttributeValues(
+			colors,
+			backgroundColor
+		);
+
 		return (
-			colorAndStyleProps.style?.backgroundColor ||
-			colorAndStyleProps.style?.background ||
-			// We still need the `backgroundColor.color` to support colors from the color pallete (not custom ones)
-			backgroundColor.color ||
+			colorObject?.color ||
+			colorProps.style?.backgroundColor ||
+			colorProps.style?.background ||
 			styles.defaultButton.backgroundColor
 		);
 	}
 
 	getTextColor() {
-		const { textColor, attributes } = this.props;
-		const colorAndStyleProps = getColorAndStyleProps( attributes );
+		const { attributes, colors } = this.props;
+		const colorProps = getColorClassesAndStyles( attributes );
+
+		// Retrieve named color object to force inline styles for themes that
+		// do not load their color stylesheets in the editor.
+		const colorObject = getColorObjectByAttributeValues(
+			colors,
+			attributes.textColor
+		);
 
 		return (
-			colorAndStyleProps.style?.color ||
-			// We still need the `textColor.color` to support colors from the color pallete (not custom ones)
-			textColor.color ||
+			colorObject?.color ||
+			colorProps.style?.color ||
 			styles.defaultButton.color
 		);
 	}
@@ -398,6 +416,7 @@ class ButtonEdit extends Component {
 
 		const backgroundColor = this.getBackgroundColor();
 		const textColor = this.getTextColor();
+		const isFixedWidth = !! width;
 
 		return (
 			<View onLayout={ this.onLayout }>
@@ -426,6 +445,12 @@ class ButtonEdit extends Component {
 						onChange={ this.onChangeText }
 						style={ {
 							...richTextStyle.richText,
+							paddingLeft: isFixedWidth
+								? 0
+								: richTextStyle.richText.paddingLeft,
+							paddingRight: isFixedWidth
+								? 0
+								: richTextStyle.richText.paddingRight,
 							color: textColor,
 						} }
 						textAlign={ align }
@@ -435,7 +460,7 @@ class ButtonEdit extends Component {
 						identifier="text"
 						tagName="p"
 						minWidth={ minWidth } // The minimum Button size.
-						maxWidth={ maxWidth } // The width of the screen.
+						maxWidth={ isFixedWidth ? minWidth : maxWidth } // The width of the screen.
 						id={ clientId }
 						isSelected={ isButtonFocused }
 						withoutInteractiveFormatting
@@ -495,16 +520,18 @@ class ButtonEdit extends Component {
 export default compose( [
 	withInstanceId,
 	withGradient,
-	withColors( 'backgroundColor', { textColor: 'color' } ),
 	withSelect( ( select, { clientId, isSelected } ) => {
 		const { isEditorSidebarOpened } = select( 'core/edit-post' );
-		const { getBlockCount, getBlockRootClientId } = select(
+		const { getBlockCount, getBlockRootClientId, getSettings } = select(
 			blockEditorStore
 		);
 		const parentId = getBlockRootClientId( clientId );
 		const numOfButtons = getBlockCount( parentId );
+		const settings = getSettings();
 
 		return {
+			colors: settings?.colors || [],
+			gradients: settings?.gradients || [],
 			editorSidebarOpened: isSelected && isEditorSidebarOpened(),
 			numOfButtons,
 		};

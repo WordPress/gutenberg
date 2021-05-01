@@ -15,7 +15,12 @@
 /packages/block-library/src/gallery             @mkevins
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
-/packages/block-library/src/image               @ajlende
+
+# Duotone
+/lib/block-supports/duotone.php                       @ajlende
+/packages/block-editor/src/components/duotone-control @ajlende
+/packages/block-editor/src/hooks/duotone.js           @ajlende
+/packages/components/src/duotone-picker               @ajlende
 
 # Editor
 /packages/annotations                           @atimmer
@@ -53,6 +58,7 @@
 /packages/create-block                          @gziolo @mkaz
 /packages/create-block-tutorial-template        @gziolo
 /packages/custom-templated-path-webpack-plugin  @ntwb @nerrad @ajitbohra
+/packages/dependency-extraction-webpack-plugin  @gziolo
 /packages/docgen                                @nosolosw
 /packages/e2e-test-utils                        @ntwb @nerrad @ajitbohra
 /packages/e2e-tests                             @ntwb @nerrad @ajitbohra
@@ -63,9 +69,9 @@
 /packages/library-export-default-webpack-plugin @ntwb @nerrad @ajitbohra
 /packages/npm-package-json-lint-config          @gziolo @ntwb @nerrad @ajitbohra
 /packages/postcss-themes                        @ntwb @nerrad @ajitbohra
-/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra
-/packages/dependency-extraction-webpack-plugin  @gziolo
 /packages/prettier-config                       @ntwb @gziolo
+/packages/scripts                               @gziolo @ntwb @nerrad @ajitbohra
+/packages/stylelint-config                      @ntwb
 
 # UI Components
 /packages/components                            @ajitbohra @jaymanpandya @chrisvanpatten

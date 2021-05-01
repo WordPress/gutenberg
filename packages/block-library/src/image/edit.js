@@ -18,7 +18,7 @@ import {
 	useBlockProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { image as icon } from '@wordpress/icons';
 
@@ -91,6 +91,7 @@ export function ImageEdit( {
 		height,
 		sizeSlug,
 	} = attributes;
+	const [ temporaryURL, setTemporaryURL ] = useState();
 
 	const altRef = useRef();
 	useEffect( () => {
@@ -125,15 +126,14 @@ export function ImageEdit( {
 			return;
 		}
 
-		let mediaAttributes = pickRelevantMediaFiles( media, imageDefaultSize );
-
-		// If the current image is temporary but an alt text was meanwhile
-		// written by the user, make sure the text is not overwritten.
-		if ( isTemporaryImage( id, url ) ) {
-			if ( altRef.current ) {
-				mediaAttributes = omit( mediaAttributes, [ 'alt' ] );
-			}
+		if ( isBlobURL( media.url ) ) {
+			setTemporaryURL( media.url );
+			return;
 		}
+
+		setTemporaryURL();
+
+		let mediaAttributes = pickRelevantMediaFiles( media, imageDefaultSize );
 
 		// If a caption text was meanwhile written by the user,
 		// make sure the text is not overwritten by empty captions.
@@ -255,14 +255,14 @@ export function ImageEdit( {
 	// If an image is temporary, revoke the Blob url when it is uploaded (and is
 	// no longer temporary).
 	useEffect( () => {
-		if ( ! isTemp ) {
+		if ( ! temporaryURL ) {
 			return;
 		}
 
 		return () => {
-			revokeBlobURL( url );
+			revokeBlobURL( temporaryURL );
 		};
-	}, [ isTemp ] );
+	}, [ temporaryURL ] );
 
 	const isExternal = isExternalImage( id, url );
 	const src = isExternal ? url : undefined;
@@ -276,7 +276,7 @@ export function ImageEdit( {
 	);
 
 	const classes = classnames( className, {
-		'is-transient': isBlobURL( url ),
+		'is-transient': temporaryURL,
 		'is-resized': !! width || !! height,
 		[ `size-${ sizeSlug }` ]: sizeSlug,
 	} );
@@ -288,8 +288,9 @@ export function ImageEdit( {
 
 	return (
 		<figure { ...blockProps }>
-			{ url && (
+			{ ( temporaryURL || url ) && (
 				<Image
+					temporaryURL={ temporaryURL }
 					attributes={ attributes }
 					setAttributes={ setAttributes }
 					isSelected={ isSelected }
@@ -319,7 +320,7 @@ export function ImageEdit( {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
 				mediaPreview={ mediaPreview }
-				disableMediaButtons={ url }
+				disableMediaButtons={ temporaryURL || url }
 			/>
 		</figure>
 	);

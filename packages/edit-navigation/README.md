@@ -18,7 +18,6 @@ import { initialize } from '@wordpress/edit-navigation';
 import blockEditorSettings from './block-editor-settings';
 
 initialize( '#navigation-editor-root', blockEditorSettings );
-
 ```
 
 ## Hooks
@@ -27,41 +26,39 @@ initialize( '#navigation-editor-root', blockEditorSettings );
 
 ```js
 const menuId = 1;
-const query = useMemo( () => ( { menus: menuId, per_page: -1 } ), [
-    menuId,
-] );
+const query = useMemo( () => ( { menus: menuId, per_page: -1 } ), [ menuId ] );
 // Data manipulation:
 const {
-    menuItems,
-    eventuallySaveMenuItems,
-    createMissingMenuItems,
+	menuItems,
+	eventuallySaveMenuItems,
+	createMissingMenuItems,
 } = useMenuItems( query );
 
 // Working state:
-const { blocks, setBlocks, menuItemsRef } = useNavigationBlocks(
-    menuItems
-);
+const { blocks, setBlocks, menuItemsRef } = useNavigationBlocks( menuItems );
 
 return (
-    <BlockEditorProvider
-        value={ blocks }
-        onInput={ ( updatedBlocks ) => setBlocks( updatedBlocks ) }
-        onChange={ ( updatedBlocks ) => {
-            createMissingMenuItems( updatedBlocks, menuItemsRef );
-            setBlocks( updatedBlocks );
-        } }
-        settings={ blockEditorSettings }
-    >
-        <NavigationStructureArea blocks={ blocks } initialOpen />
-        <BlockEditorArea
-            menuId={ menuId }
-            saveBlocks={ () => eventuallySaveMenuItems( blocks, menuItemsRef ) }
-            onDeleteMenu={ () => { /* ... */ } }
-        />
-    </BlockEditorProvider>
+	<BlockEditorProvider
+		value={ blocks }
+		onInput={ ( updatedBlocks ) => setBlocks( updatedBlocks ) }
+		onChange={ ( updatedBlocks ) => {
+			createMissingMenuItems( updatedBlocks, menuItemsRef );
+			setBlocks( updatedBlocks );
+		} }
+		settings={ blockEditorSettings }
+	>
+		<NavigationStructureArea blocks={ blocks } initialOpen />
+		<BlockEditorArea
+			menuId={ menuId }
+			saveBlocks={ () => eventuallySaveMenuItems( blocks, menuItemsRef ) }
+			onDeleteMenu={ () => {
+				/* ... */
+			} }
+		/>
+	</BlockEditorProvider>
 );
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>

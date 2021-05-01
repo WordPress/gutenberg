@@ -3,10 +3,12 @@
  */
 import {
 	createNewPost,
+	disablePrePublishChecks,
 	insertBlock,
 	publishPost,
 	trashAllPosts,
 	activateTheme,
+	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -167,6 +169,35 @@ describe( 'Multi-entity save flow', () => {
 			// Multi-entity saving should be enabled.
 			await assertMultiSaveEnabled();
 			await assertExistance( saveA11ySelector, true );
+		} );
+
+		it( 'Site blocks should save individually', async () => {
+			await createNewPost();
+			await disablePrePublishChecks();
+
+			await insertBlock( 'Site Title' );
+			// Ensure title is retrieved before typing.
+			await page.waitForXPath( '//a[contains(text(), "gutenberg")]' );
+			await page.keyboard.type( '...' );
+			await insertBlock( 'Site Tagline' );
+			// Ensure tagline is retrieved before typing.
+			await page.waitForXPath(
+				'//p[contains(text(), "Just another WordPress site")]'
+			);
+			await page.keyboard.type( '...' );
+
+			await clickButton( 'Publish' );
+			await page.waitForSelector( savePanelSelector );
+			let checkboxInputs = await page.$$( checkboxInputSelector );
+			expect( checkboxInputs ).toHaveLength( 3 );
+
+			await checkboxInputs[ 1 ].click();
+			await page.click( entitiesSaveSelector );
+
+			await clickButton( 'Update…' );
+			await page.waitForSelector( savePanelSelector );
+			checkboxInputs = await page.$$( checkboxInputSelector );
+			expect( checkboxInputs ).toHaveLength( 1 );
 		} );
 	} );
 

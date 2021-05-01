@@ -12,10 +12,7 @@
 			"column": 24
 		}
 	},
-	"range": [
-		35,
-		97
-	],
+	"range": [ 35, 97 ],
 	"declaration": {
 		"type": "VariableDeclaration",
 		"start": 42,
@@ -30,10 +27,7 @@
 				"column": 24
 			}
 		},
-		"range": [
-			42,
-			97
-		],
+		"range": [ 42, 97 ],
 		"declarations": [
 			{
 				"type": "VariableDeclarator",
@@ -49,10 +43,7 @@
 						"column": 36
 					}
 				},
-				"range": [
-					48,
-					71
-				],
+				"range": [ 48, 71 ],
 				"id": {
 					"type": "Identifier",
 					"start": 48,
@@ -67,10 +58,7 @@
 							"column": 29
 						}
 					},
-					"range": [
-						48,
-						64
-					],
+					"range": [ 48, 64 ],
 					"name": "firstDeclaration"
 				},
 				"init": {
@@ -87,10 +75,7 @@
 							"column": 36
 						}
 					},
-					"range": [
-						67,
-						71
-					],
+					"range": [ 67, 71 ],
 					"value": true,
 					"raw": "true"
 				}
@@ -109,10 +94,7 @@
 						"column": 23
 					}
 				},
-				"range": [
-					74,
-					96
-				],
+				"range": [ 74, 96 ],
 				"id": {
 					"type": "Identifier",
 					"start": 74,
@@ -127,10 +109,7 @@
 							"column": 18
 						}
 					},
-					"range": [
-						74,
-						91
-					],
+					"range": [ 74, 91 ],
 					"name": "secondDeclaration"
 				},
 				"init": {
@@ -147,10 +126,7 @@
 							"column": 23
 						}
 					},
-					"range": [
-						94,
-						96
-					],
+					"range": [ 94, 96 ],
 					"value": 42,
 					"raw": "42"
 				}
@@ -166,10 +142,7 @@
 			"value": "*\n * My declaration example.\n ",
 			"start": 0,
 			"end": 34,
-			"range": [
-				0,
-				34
-			],
+			"range": [ 0, 34 ],
 			"loc": {
 				"start": {
 					"line": 1,
