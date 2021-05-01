@@ -28,6 +28,7 @@ import {
 } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -162,17 +163,13 @@ export default function WritingFlow( { children } ) {
 	// capturing on the focus capture elements.
 	const noCapture = useRef();
 
-	// Here a DOMRect is stored while moving the caret vertically so vertical
-	// position of the start position can be restored. This is to recreate
-	// browser behaviour across blocks.
-	const verticalRect = useRef();
-
-	const { hasMultiSelection, isMultiSelecting, isNavigationMode } = useSelect(
+	const { hasFinishedMultiSelection, isNavigationMode } = useSelect(
 		( select ) => {
 			const selectors = select( blockEditorStore );
 			return {
-				hasMultiSelection: selectors.hasMultiSelection(),
-				isMultiSelecting: selectors.isMultiSelecting(),
+				hasFinishedMultiSelection:
+					selectors.hasMultiSelection() &&
+					! selectors.isMultiSelecting(),
 				isNavigationMode: selectors.isNavigationMode(),
 			};
 		},
@@ -188,284 +185,17 @@ export default function WritingFlow( { children } ) {
 		getLastMultiSelectedBlockClientId,
 		getBlockOrder,
 		getSettings,
+		hasMultiSelection,
 	} = useSelect( blockEditorStore );
 	const { multiSelect, selectBlock, setNavigationMode } = useDispatch(
 		blockEditorStore
 	);
 
-	function onMouseDown() {
-		verticalRect.current = null;
-	}
-
-	function expandSelection( isReverse ) {
-		const selectedBlockClientId = getSelectedBlockClientId();
-		const selectionStartClientId = getMultiSelectedBlocksStartClientId();
-		const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-		const selectionBeforeEndClientId = getPreviousBlockClientId(
-			selectionEndClientId || selectedBlockClientId
-		);
-		const selectionAfterEndClientId = getNextBlockClientId(
-			selectionEndClientId || selectedBlockClientId
-		);
-		const nextSelectionEndClientId = isReverse
-			? selectionBeforeEndClientId
-			: selectionAfterEndClientId;
-
-		if ( nextSelectionEndClientId ) {
-			multiSelect(
-				selectionStartClientId || selectedBlockClientId,
-				nextSelectionEndClientId
-			);
-		}
-	}
-
-	function moveSelection( isReverse ) {
-		const selectedFirstClientId = getFirstMultiSelectedBlockClientId();
-		const selectedLastClientId = getLastMultiSelectedBlockClientId();
-		const focusedBlockClientId = isReverse
-			? selectedFirstClientId
-			: selectedLastClientId;
-
-		if ( focusedBlockClientId ) {
-			selectBlock( focusedBlockClientId );
-		}
-	}
-
-	/**
-	 * Returns true if the given target field is the last in its block which
-	 * can be considered for tab transition. For example, in a block with two
-	 * text fields, this would return true when reversing from the first of the
-	 * two fields, but false when reversing from the second.
-	 *
-	 * @param {Element} target    Currently focused text field.
-	 * @param {boolean} isReverse True if considering as the first field.
-	 *
-	 * @return {boolean} Whether field is at edge for tab transition.
-	 */
-	function isTabbableEdge( target, isReverse ) {
-		const closestTabbable = getClosestTabbable(
-			target,
-			isReverse,
-			container.current
-		);
-		return ! closestTabbable || ! isInSameBlock( target, closestTabbable );
-	}
-
-	function onKeyDown( event ) {
-		const { keyCode, target } = event;
-
-		// Handle only if the event occurred within the same DOM hierarchy as
-		// the rendered container. This is used to distinguish between events
-		// which bubble through React's virtual event system from those which
-		// strictly occur in the DOM created by the component.
-		//
-		// The implication here is: If it's not desirable for a bubbled event to
-		// be considered by WritingFlow, it can be avoided by rendering to a
-		// distinct place in the DOM (e.g. using Slot/Fill).
-		if ( ! container.current.contains( target ) ) {
-			return;
-		}
-
-		const isUp = keyCode === UP;
-		const isDown = keyCode === DOWN;
-		const isLeft = keyCode === LEFT;
-		const isRight = keyCode === RIGHT;
-		const isTab = keyCode === TAB;
-		const isEscape = keyCode === ESCAPE;
-		const isReverse = isUp || isLeft;
-		const isHorizontal = isLeft || isRight;
-		const isVertical = isUp || isDown;
-		const isNav = isHorizontal || isVertical;
-		const isShift = event.shiftKey;
-		const hasModifier =
-			isShift || event.ctrlKey || event.altKey || event.metaKey;
-		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
-		const { ownerDocument } = container.current;
-		const { defaultView } = ownerDocument;
-
-		if ( hasMultiSelection ) {
-			if ( keyCode === TAB ) {
-				// Disable focus capturing on the focus capture element, so it
-				// doesn't refocus this element and so it allows default behaviour
-				// (moving focus to the next tabbable element).
-				noCapture.current = true;
-
-				if ( isShift ) {
-					focusCaptureBeforeRef.current.focus();
-				} else {
-					focusCaptureAfterRef.current.focus();
-				}
-			} else if ( isNav ) {
-				const action = isShift ? expandSelection : moveSelection;
-				action( isReverse );
-				event.preventDefault();
-			}
-
-			return;
-		}
-
-		const selectedBlockClientId = getSelectedBlockClientId();
-
-		// In Edit mode, Tab should focus the first tabbable element after the
-		// content, which is normally the sidebar (with block controls) and
-		// Shift+Tab should focus the first tabbable element before the content,
-		// which is normally the block toolbar.
-		// Arrow keys can be used, and Tab and arrow keys can be used in
-		// Navigation mode (press Esc), to navigate through blocks.
-		if ( selectedBlockClientId ) {
-			if ( isTab ) {
-				const direction = isShift ? 'findPrevious' : 'findNext';
-				// Allow tabbing between form elements rendered in a block,
-				// such as inside a placeholder. Form elements are generally
-				// meant to be UI rather than part of the content. Ideally
-				// these are not rendered in the content and perhaps in the
-				// future they can be rendered in an iframe or shadow DOM.
-				if (
-					isFormElement( target ) &&
-					isFormElement( focus.tabbable[ direction ]( target ) )
-				) {
-					return;
-				}
-
-				const next = isShift
-					? focusCaptureBeforeRef
-					: focusCaptureAfterRef;
-
-				// Disable focus capturing on the focus capture element, so it
-				// doesn't refocus this block and so it allows default behaviour
-				// (moving focus to the next tabbable element).
-				noCapture.current = true;
-				next.current.focus();
-				return;
-			} else if ( isEscape ) {
-				setNavigationMode( true );
-			}
-		}
-
-		// When presing any key other than up or down, the initial vertical
-		// position must ALWAYS be reset. The vertical position is saved so it
-		// can be restored as well as possible on sebsequent vertical arrow key
-		// presses. It may not always be possible to restore the exact same
-		// position (such as at an empty line), so it wouldn't be good to
-		// compute the position right before any vertical arrow key press.
-		if ( ! isVertical ) {
-			verticalRect.current = null;
-		} else if ( ! verticalRect.current ) {
-			verticalRect.current = computeCaretRect( defaultView );
-		}
-
-		// This logic inside this condition needs to be checked before
-		// the check for event.nativeEvent.defaultPrevented.
-		// The logic handles meta+a keypress and this event is default prevented
-		// by RichText.
-		if ( ! isNav ) {
-			// Set immediately before the meta+a combination can be pressed.
-			if ( isKeyboardEvent.primary( event ) ) {
-				entirelySelected.current = isEntirelySelected( target );
-			}
-
-			if ( isKeyboardEvent.primary( event, 'a' ) ) {
-				// When the target is contentEditable, selection will already
-				// have been set by the browser earlier in this call stack. We
-				// need check the previous result, otherwise all blocks will be
-				// selected right away.
-				if (
-					target.isContentEditable
-						? entirelySelected.current
-						: isEntirelySelected( target )
-				) {
-					const blocks = getBlockOrder();
-					multiSelect( first( blocks ), last( blocks ) );
-					event.preventDefault();
-				}
-
-				// After pressing primary + A we can assume isEntirelySelected is true.
-				// Calling right away isEntirelySelected after primary + A may still return false on some browsers.
-				entirelySelected.current = true;
-			}
-
-			return;
-		}
-
-		// Abort if navigation has already been handled (e.g. RichText inline
-		// boundaries).
-		if ( event.nativeEvent.defaultPrevented ) {
-			return;
-		}
-
-		// Abort if our current target is not a candidate for navigation (e.g.
-		// preserve native input behaviors).
-		if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
-			return;
-		}
-
-		// In the case of RTL scripts, right means previous and left means next,
-		// which is the exact reverse of LTR.
-		const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
-		const { keepCaretInsideBlock } = getSettings();
-
-		if ( isShift ) {
-			const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-			const selectionBeforeEndClientId = getPreviousBlockClientId(
-				selectionEndClientId || selectedBlockClientId
-			);
-			const selectionAfterEndClientId = getNextBlockClientId(
-				selectionEndClientId || selectedBlockClientId
-			);
-
-			if (
-				// Ensure that there is a target block.
-				( ( isReverse && selectionBeforeEndClientId ) ||
-					( ! isReverse && selectionAfterEndClientId ) ) &&
-				isTabbableEdge( target, isReverse ) &&
-				isNavEdge( target, isReverse )
-			) {
-				// Shift key is down, and there is multi selection or we're at
-				// the end of the current block.
-				expandSelection( isReverse );
-				event.preventDefault();
-			}
-		} else if (
-			isVertical &&
-			isVerticalEdge( target, isReverse ) &&
-			! keepCaretInsideBlock
-		) {
-			const closestTabbable = getClosestTabbable(
-				target,
-				isReverse,
-				container.current,
-				true
-			);
-
-			if ( closestTabbable ) {
-				placeCaretAtVerticalEdge(
-					closestTabbable,
-					isReverse,
-					verticalRect.current
-				);
-				event.preventDefault();
-			}
-		} else if (
-			isHorizontal &&
-			defaultView.getSelection().isCollapsed &&
-			isHorizontalEdge( target, isReverseDir ) &&
-			! keepCaretInsideBlock
-		) {
-			const closestTabbable = getClosestTabbable(
-				target,
-				isReverseDir,
-				container.current
-			);
-			placeCaretAtHorizontalEdge( closestTabbable, isReverse );
-			event.preventDefault();
-		}
-	}
-
 	useEffect( () => {
-		if ( hasMultiSelection && ! isMultiSelecting ) {
+		if ( hasFinishedMultiSelection ) {
 			container.current.focus();
 		}
-	}, [ hasMultiSelection, isMultiSelecting ] );
+	}, [ hasFinishedMultiSelection ] );
 
 	// This hook sets the selection after the user makes a multi-selection. For
 	// some browsers, like Safari, it is important that this happens AFTER
@@ -474,14 +204,280 @@ export default function WritingFlow( { children } ) {
 
 	const lastFocus = useRef();
 
-	useEffect( () => {
+	const refCallback = useRefEffect( ( node ) => {
+		// Here a DOMRect is stored while moving the caret vertically so vertical
+		// position of the start position can be restored. This is to recreate
+		// browser behaviour across blocks.
+		let verticalRect;
+
 		function onFocusOut( event ) {
 			lastFocus.current = event.target;
 		}
 
-		container.current.addEventListener( 'focusout', onFocusOut );
+		function onMouseDown() {
+			verticalRect = null;
+		}
+
+		function expandSelection( isReverse ) {
+			const selectedBlockClientId = getSelectedBlockClientId();
+			const selectionStartClientId = getMultiSelectedBlocksStartClientId();
+			const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+			const selectionBeforeEndClientId = getPreviousBlockClientId(
+				selectionEndClientId || selectedBlockClientId
+			);
+			const selectionAfterEndClientId = getNextBlockClientId(
+				selectionEndClientId || selectedBlockClientId
+			);
+			const nextSelectionEndClientId = isReverse
+				? selectionBeforeEndClientId
+				: selectionAfterEndClientId;
+
+			if ( nextSelectionEndClientId ) {
+				multiSelect(
+					selectionStartClientId || selectedBlockClientId,
+					nextSelectionEndClientId
+				);
+			}
+		}
+
+		function moveSelection( isReverse ) {
+			const selectedFirstClientId = getFirstMultiSelectedBlockClientId();
+			const selectedLastClientId = getLastMultiSelectedBlockClientId();
+			const focusedBlockClientId = isReverse
+				? selectedFirstClientId
+				: selectedLastClientId;
+
+			if ( focusedBlockClientId ) {
+				selectBlock( focusedBlockClientId );
+			}
+		}
+
+		/**
+		 * Returns true if the given target field is the last in its block which
+		 * can be considered for tab transition. For example, in a block with two
+		 * text fields, this would return true when reversing from the first of the
+		 * two fields, but false when reversing from the second.
+		 *
+		 * @param {Element} target    Currently focused text field.
+		 * @param {boolean} isReverse True if considering as the first field.
+		 *
+		 * @return {boolean} Whether field is at edge for tab transition.
+		 */
+		function isTabbableEdge( target, isReverse ) {
+			const closestTabbable = getClosestTabbable(
+				target,
+				isReverse,
+				container.current
+			);
+			return (
+				! closestTabbable || ! isInSameBlock( target, closestTabbable )
+			);
+		}
+
+		function onKeyDown( event ) {
+			const { keyCode, target } = event;
+			const isUp = keyCode === UP;
+			const isDown = keyCode === DOWN;
+			const isLeft = keyCode === LEFT;
+			const isRight = keyCode === RIGHT;
+			const isTab = keyCode === TAB;
+			const isEscape = keyCode === ESCAPE;
+			const isReverse = isUp || isLeft;
+			const isHorizontal = isLeft || isRight;
+			const isVertical = isUp || isDown;
+			const isNav = isHorizontal || isVertical;
+			const isShift = event.shiftKey;
+			const hasModifier =
+				isShift || event.ctrlKey || event.altKey || event.metaKey;
+			const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
+			const { ownerDocument } = container.current;
+			const { defaultView } = ownerDocument;
+
+			if ( hasMultiSelection() ) {
+				if ( keyCode === TAB ) {
+					// Disable focus capturing on the focus capture element, so it
+					// doesn't refocus this element and so it allows default behaviour
+					// (moving focus to the next tabbable element).
+					noCapture.current = true;
+
+					if ( isShift ) {
+						focusCaptureBeforeRef.current.focus();
+					} else {
+						focusCaptureAfterRef.current.focus();
+					}
+				} else if ( isNav ) {
+					const action = isShift ? expandSelection : moveSelection;
+					action( isReverse );
+					event.preventDefault();
+				}
+
+				return;
+			}
+
+			const selectedBlockClientId = getSelectedBlockClientId();
+
+			// In Edit mode, Tab should focus the first tabbable element after the
+			// content, which is normally the sidebar (with block controls) and
+			// Shift+Tab should focus the first tabbable element before the content,
+			// which is normally the block toolbar.
+			// Arrow keys can be used, and Tab and arrow keys can be used in
+			// Navigation mode (press Esc), to navigate through blocks.
+			if ( selectedBlockClientId ) {
+				if ( isTab ) {
+					const direction = isShift ? 'findPrevious' : 'findNext';
+					// Allow tabbing between form elements rendered in a block,
+					// such as inside a placeholder. Form elements are generally
+					// meant to be UI rather than part of the content. Ideally
+					// these are not rendered in the content and perhaps in the
+					// future they can be rendered in an iframe or shadow DOM.
+					if (
+						isFormElement( target ) &&
+						isFormElement( focus.tabbable[ direction ]( target ) )
+					) {
+						return;
+					}
+
+					const next = isShift
+						? focusCaptureBeforeRef
+						: focusCaptureAfterRef;
+
+					// Disable focus capturing on the focus capture element, so it
+					// doesn't refocus this block and so it allows default behaviour
+					// (moving focus to the next tabbable element).
+					noCapture.current = true;
+					next.current.focus();
+					return;
+				} else if ( isEscape ) {
+					setNavigationMode( true );
+				}
+			}
+
+			// When presing any key other than up or down, the initial vertical
+			// position must ALWAYS be reset. The vertical position is saved so it
+			// can be restored as well as possible on sebsequent vertical arrow key
+			// presses. It may not always be possible to restore the exact same
+			// position (such as at an empty line), so it wouldn't be good to
+			// compute the position right before any vertical arrow key press.
+			if ( ! isVertical ) {
+				verticalRect = null;
+			} else if ( ! verticalRect ) {
+				verticalRect = computeCaretRect( defaultView );
+			}
+
+			// This logic inside this condition needs to be checked before
+			// the check for event.defaultPrevented.
+			// The logic handles meta+a keypress and this event is default prevented
+			// by RichText.
+			if ( ! isNav ) {
+				// Set immediately before the meta+a combination can be pressed.
+				if ( isKeyboardEvent.primary( event ) ) {
+					entirelySelected.current = isEntirelySelected( target );
+				}
+
+				if ( isKeyboardEvent.primary( event, 'a' ) ) {
+					// When the target is contentEditable, selection will already
+					// have been set by the browser earlier in this call stack. We
+					// need check the previous result, otherwise all blocks will be
+					// selected right away.
+					if (
+						target.isContentEditable
+							? entirelySelected.current
+							: isEntirelySelected( target )
+					) {
+						const blocks = getBlockOrder();
+						multiSelect( first( blocks ), last( blocks ) );
+						event.preventDefault();
+					}
+
+					// After pressing primary + A we can assume isEntirelySelected is true.
+					// Calling right away isEntirelySelected after primary + A may still return false on some browsers.
+					entirelySelected.current = true;
+				}
+
+				return;
+			}
+
+			// Abort if navigation has already been handled (e.g. RichText inline
+			// boundaries).
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			// Abort if our current target is not a candidate for navigation (e.g.
+			// preserve native input behaviors).
+			if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
+				return;
+			}
+
+			// In the case of RTL scripts, right means previous and left means next,
+			// which is the exact reverse of LTR.
+			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
+			const { keepCaretInsideBlock } = getSettings();
+
+			if ( isShift ) {
+				const selectionEndClientId = getMultiSelectedBlocksEndClientId();
+				const selectionBeforeEndClientId = getPreviousBlockClientId(
+					selectionEndClientId || selectedBlockClientId
+				);
+				const selectionAfterEndClientId = getNextBlockClientId(
+					selectionEndClientId || selectedBlockClientId
+				);
+
+				if (
+					// Ensure that there is a target block.
+					( ( isReverse && selectionBeforeEndClientId ) ||
+						( ! isReverse && selectionAfterEndClientId ) ) &&
+					isTabbableEdge( target, isReverse ) &&
+					isNavEdge( target, isReverse )
+				) {
+					// Shift key is down, and there is multi selection or we're at
+					// the end of the current block.
+					expandSelection( isReverse );
+					event.preventDefault();
+				}
+			} else if (
+				isVertical &&
+				isVerticalEdge( target, isReverse ) &&
+				! keepCaretInsideBlock
+			) {
+				const closestTabbable = getClosestTabbable(
+					target,
+					isReverse,
+					container.current,
+					true
+				);
+
+				if ( closestTabbable ) {
+					placeCaretAtVerticalEdge(
+						closestTabbable,
+						isReverse,
+						verticalRect
+					);
+					event.preventDefault();
+				}
+			} else if (
+				isHorizontal &&
+				defaultView.getSelection().isCollapsed &&
+				isHorizontalEdge( target, isReverseDir ) &&
+				! keepCaretInsideBlock
+			) {
+				const closestTabbable = getClosestTabbable(
+					target,
+					isReverseDir,
+					container.current
+				);
+				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
+				event.preventDefault();
+			}
+		}
+
+		node.addEventListener( 'focusout', onFocusOut );
+		node.addEventListener( 'mousedown', onMouseDown );
+		node.addEventListener( 'keydown', onKeyDown );
 		return () => {
-			container.current.removeEventListener( 'focusout', onFocusOut );
+			node.removeEventListener( 'focusout', onFocusOut );
+			node.removeEventListener( 'mousedown', onMouseDown );
+			node.removeEventListener( 'keydown', onKeyDown );
 		};
 	}, [] );
 
@@ -489,7 +485,7 @@ export default function WritingFlow( { children } ) {
 		// Do not capture incoming focus if set by us in WritingFlow.
 		if ( noCapture.current ) {
 			noCapture.current = null;
-		} else if ( hasMultiSelection ) {
+		} else if ( hasFinishedMultiSelection ) {
 			container.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
 			lastFocus.current.focus();
@@ -509,9 +505,6 @@ export default function WritingFlow( { children } ) {
 	// Don't allow tabbing to this element in Navigation mode.
 	const focusCaptureTabIndex = ! isNavigationMode ? '0' : undefined;
 
-	// Disable reason: Wrapper itself is non-interactive, but must capture
-	// bubbling events from children to determine focus transition intents.
-	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<>
 			<div
@@ -521,13 +514,11 @@ export default function WritingFlow( { children } ) {
 				style={ PREVENT_SCROLL_ON_FOCUS }
 			/>
 			<div
-				ref={ container }
+				ref={ useMergeRefs( [ container, refCallback ] ) }
 				className="block-editor-writing-flow"
-				onKeyDown={ onKeyDown }
-				onMouseDown={ onMouseDown }
-				tabIndex={ hasMultiSelection ? '0' : undefined }
+				tabIndex={ hasFinishedMultiSelection ? '0' : undefined }
 				aria-label={
-					hasMultiSelection
+					hasFinishedMultiSelection
 						? __( 'Multiple selected blocks' )
 						: undefined
 				}
@@ -542,5 +533,4 @@ export default function WritingFlow( { children } ) {
 			/>
 		</>
 	);
-	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
