@@ -38,6 +38,7 @@ export const settings = {
 			label: _x( 'Default', 'block style' ),
 			isDefault: true,
 		},
+		{ name: 'plain', label: _x( 'Plain', 'block style' ) },
 		{ name: 'large', label: _x( 'Large', 'block style' ) },
 	],
 	transforms,
