@@ -28,11 +28,16 @@ export default function FocusControl( { api, sidebarControls, children } ) {
 				const widgets = sidebarControl.setting.get();
 
 				if ( widgets.includes( widgetId ) ) {
-					sidebarControl.sectionInstance.expand();
+					sidebarControl.sectionInstance.expand( {
+						// Schedule it after the complete callback so that
+						// it won't be overridden by the "Back" button focus.
+						completeCallback() {
+							// Create a "ref-like" object every time to ensure
+							// the same widget id can also triggers the focus control.
+							setFocusedWidgetIdRef( { current: widgetId } );
+						},
+					} );
 
-					// Create a "ref-like" object every time to ensure
-					// the same widget id can also triggers the focus control.
-					setFocusedWidgetIdRef( { current: widgetId } );
 					break;
 				}
 			}
