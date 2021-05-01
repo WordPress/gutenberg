@@ -71,7 +71,10 @@ export { default as __unstableEditorStyles } from './editor-styles';
 export { default as Inserter } from './inserter';
 export { useBlockProps } from './block-list/use-block-props';
 export { Block as __experimentalBlock } from './block-list/block-wrapper';
-export { default as FloatingToolbar } from './floating-toolbar';
+export {
+	default as FloatingToolbar,
+	FloatingToolbarButtons,
+} from './floating-toolbar';
 
 // State Related Components
 export { default as BlockEditorProvider } from './provider';
