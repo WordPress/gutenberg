@@ -11,6 +11,8 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.52.0
+
 -   [***] Search block now available on mobile! [https://github.com/WordPress/gutenberg/pull/30783]
 -   [*] Image block: Add a "featured" banner. (Android only) [#30806]
 -   [**] The media upload options of the Image, Video and Gallery block automatically opens when the respective block is inserted. [#29546]
