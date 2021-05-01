@@ -89,21 +89,8 @@ export default function save( { attributes } ) {
 
 	return (
 		<div { ...useBlockProps.save( { className: classes, style } ) }>
-			{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
-				<span
-					aria-hidden="true"
-					className={ classnames(
-						'wp-block-cover__gradient-background',
-						gradientClass
-					) }
-					style={
-						customGradient
-							? { background: customGradient }
-							: undefined
-					}
-				/>
-			) }
 			{ isImageBackground && isImgElement && url && (
+			 <div className="wp-block-cover__media-container">
 				<img
 					className={ classnames(
 						'wp-block-cover__image-background',
@@ -115,8 +102,10 @@ export default function save( { attributes } ) {
 					data-object-fit="cover"
 					data-object-position={ objectPosition }
 				/>
+			</div>
 			) }
 			{ isVideoBackground && url && (
+			<div className="wp-block-cover__media-container">
 				<video
 					className={ classnames(
 						'wp-block-cover__video-background',
@@ -131,7 +120,23 @@ export default function save( { attributes } ) {
 					data-object-fit="cover"
 					data-object-position={ objectPosition }
 				/>
+			</div>
 			) }
+			{ url && ( gradient || customGradient ) && dimRatio !== 0 && (
+				<span
+					aria-hidden="true"
+					className={ classnames(
+						'wp-block-cover__gradient-background',
+						gradientClass
+					) }
+					style={
+						customGradient
+							? { background: customGradient }
+							: undefined
+					}
+				/>
+			) }
+			</div>
 			<div className="wp-block-cover__inner-container">
 				<InnerBlocks.Content />
 			</div>
