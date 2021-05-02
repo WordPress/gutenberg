@@ -410,6 +410,13 @@ function CoverEdit( {
 		styleOfRef[ property ] = mediaPosition( value );
 	};
 
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
+			0,
+		[ clientId ]
+	);
+
 	const controls = (
 		<>
 			<BlockControls group="block">
@@ -421,12 +428,12 @@ function CoverEdit( {
 							contentPosition: nextPosition,
 						} )
 					}
-					isDisabled={ ! hasBackground }
+					isDisabled={ ! hasInnerBlocks }
 				/>
 				<FullHeightAlignmentControl
 					isActive={ isMinFullHeight }
 					onToggle={ toggleMinFullHeight }
-					isDisabled={ ! hasBackground }
+					isDisabled={ ! hasInnerBlocks }
 				/>
 			</BlockControls>
 			<BlockControls group="other">
@@ -550,13 +557,6 @@ function CoverEdit( {
 			template: INNER_BLOCKS_TEMPLATE,
 			templateInsertUpdatesSelection: true,
 		}
-	);
-
-	const hasInnerBlocks = useSelect(
-		( select ) =>
-			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
-			0,
-		[ clientId ]
 	);
 
 	if ( ! hasInnerBlocks && ! hasBackground ) {
