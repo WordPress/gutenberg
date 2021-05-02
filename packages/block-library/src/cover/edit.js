@@ -41,7 +41,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, useSelect } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
 
@@ -286,6 +286,7 @@ function CoverPlaceholder( {
 
 function CoverEdit( {
 	attributes,
+	clientId,
 	isSelected,
 	noticeUI,
 	noticeOperations,
@@ -551,7 +552,14 @@ function CoverEdit( {
 		}
 	);
 
-	if ( ! hasBackground ) {
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
+			0,
+		[ clientId ]
+	);
+
+	if ( ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
 				{ controls }
@@ -657,12 +665,6 @@ function CoverEdit( {
 					/>
 				) }
 				{ isUploadingMedia && <Spinner /> }
-				<CoverPlaceholder
-					hasBackground={ hasBackground }
-					noticeUI={ noticeUI }
-					onSelectMedia={ onSelectMedia }
-					noticeOperations={ noticeOperations }
-				/>
 				<div { ...innerBlocksProps } />
 			</div>
 		</>
