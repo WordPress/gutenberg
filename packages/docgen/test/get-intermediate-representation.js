@@ -168,99 +168,109 @@ describe( 'Intermediate Representation', () => {
 				} );
 			} );
 		} );
-
-		it( 'named export', () => {
-			const tokenClass = fs.readFileSync(
-				path.join( __dirname, './fixtures/named-class/exports.json' ),
-				'utf-8'
-			);
-			const irNamedClass = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenClass )
-			);
-			expect( irNamedClass ).toHaveLength( 1 );
-			expect( irNamedClass[ 0 ] ).toEqual( {
-				path: null,
-				name: 'MyDeclaration',
-				description: 'My declaration example.',
-				tags: [
-					{
-						tag: 'type',
-						type: 'MyDeclaration',
-						name: '',
-						description: '',
-					},
-				],
-				lineStart: 4,
-				lineEnd: 4,
+		describe( 'named export', () => {
+			it( 'named class', () => {
+				const tokenClass = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/named-class/exports.json'
+					),
+					'utf-8'
+				);
+				const irNamedClass = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenClass )
+				);
+				expect( irNamedClass ).toHaveLength( 1 );
+				expect( irNamedClass[ 0 ] ).toEqual( {
+					path: null,
+					name: 'MyDeclaration',
+					description: 'My declaration example.',
+					tags: [
+						{
+							tag: 'type',
+							type: 'MyDeclaration',
+							name: '',
+							description: '',
+						},
+					],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
 			} );
-			const tokenFn = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/named-function/exports.json'
-				),
-				'utf-8'
-			);
-			const irNamedFn = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenFn )
-			);
-			expect( irNamedFn ).toHaveLength( 1 );
-			expect( irNamedFn[ 0 ] ).toEqual( {
-				path: null,
-				name: 'myDeclaration',
-				description: 'My declaration example.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 4,
+			it( 'named function', () => {
+				const tokenFn = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/named-function/exports.json'
+					),
+					'utf-8'
+				);
+				const irNamedFn = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenFn )
+				);
+				expect( irNamedFn ).toHaveLength( 1 );
+				expect( irNamedFn[ 0 ] ).toEqual( {
+					path: null,
+					name: 'myDeclaration',
+					description: 'My declaration example.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
 			} );
-			const tokenVariable = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/named-variable/exports.json'
-				),
-				'utf-8'
-			);
-			const irNamedVar = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenVariable )
-			);
-			expect( irNamedVar ).toHaveLength( 1 );
-			expect( irNamedVar[ 0 ] ).toEqual( {
-				path: null,
-				name: 'myDeclaration',
-				description: 'My declaration example.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 4,
+			it( 'named variable', () => {
+				const tokenVariable = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/named-variable/exports.json'
+					),
+					'utf-8'
+				);
+				const irNamedVar = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenVariable )
+				);
+				expect( irNamedVar ).toHaveLength( 1 );
+				expect( irNamedVar[ 0 ] ).toEqual( {
+					path: null,
+					name: 'myDeclaration',
+					description: 'My declaration example.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
 			} );
-			const tokenVariables = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/named-variables/exports.json'
-				),
-				'utf-8'
-			);
-			const irNamedVars = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenVariables )
-			);
-			expect( irNamedVars ).toHaveLength( 2 );
-			expect( irNamedVars[ 0 ] ).toEqual( {
-				path: null,
-				name: 'firstDeclaration',
-				description: 'My declaration example.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 5,
-			} );
-			expect( irNamedVars[ 1 ] ).toEqual( {
-				path: null,
-				name: 'secondDeclaration',
-				description: 'My declaration example.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 5,
+			it( 'named variables', () => {
+				const tokenVariables = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/named-variables/exports.json'
+					),
+					'utf-8'
+				);
+				const irNamedVars = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenVariables )
+				);
+				expect( irNamedVars ).toHaveLength( 2 );
+				expect( irNamedVars[ 0 ] ).toEqual( {
+					path: null,
+					name: 'firstDeclaration',
+					description: 'My declaration example.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 5,
+				} );
+				expect( irNamedVars[ 1 ] ).toEqual( {
+					path: null,
+					name: 'secondDeclaration',
+					description: 'My declaration example.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 5,
+				} );
 			} );
 		} );
 	} );
