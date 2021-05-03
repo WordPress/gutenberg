@@ -138,6 +138,7 @@ function gutenberg_customize_widgets_init() {
 	wp_enqueue_style( 'wp-customize-widgets' );
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-format-library' );
+	do_action( 'enqueue_block_editor_assets' );
 }
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-widgets-in-customizer' ) ) {
