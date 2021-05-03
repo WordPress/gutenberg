@@ -586,11 +586,7 @@ describe( 'Intermediate Representation', () => {
 			} );
 		} );
 
-		it( 'named default export', () => {
-			const tokenDefault = fs.readFileSync(
-				path.join( __dirname, './fixtures/named-default/exports.json' ),
-				'utf-8'
-			);
+		describe( 'named default export', () => {
 			const getModule = () =>
 				JSON.parse(
 					fs.readFileSync(
@@ -601,42 +597,53 @@ describe( 'Intermediate Representation', () => {
 						'utf-8'
 					)
 				);
-			const irNamedDefault = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenDefault ),
-				{ body: [] },
-				getModule
-			);
-			expect( irNamedDefault ).toHaveLength( 1 );
-			expect( irNamedDefault[ 0 ] ).toEqual( {
-				path: null,
-				name: 'default',
-				description: 'Module declaration.',
-				tags: [],
-				lineStart: 1,
-				lineEnd: 1,
+			it( 'default', () => {
+				const tokenDefault = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/named-default/exports.json'
+					),
+					'utf-8'
+				);
+				const irNamedDefault = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenDefault ),
+					{ body: [] },
+					getModule
+				);
+				expect( irNamedDefault ).toHaveLength( 1 );
+				expect( irNamedDefault[ 0 ] ).toEqual( {
+					path: null,
+					name: 'default',
+					description: 'Module declaration.',
+					tags: [],
+					lineStart: 1,
+					lineEnd: 1,
+				} );
 			} );
-			const tokenDefaultExported = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/named-default-exported/exports.json'
-				),
-				'utf-8'
-			);
-			const irNamedDefaultExported = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenDefaultExported ),
-				{ body: [] },
-				getModule
-			);
-			expect( irNamedDefaultExported ).toHaveLength( 1 );
-			expect( irNamedDefaultExported[ 0 ] ).toEqual( {
-				path: null,
-				name: 'moduleName',
-				description: 'Module declaration.',
-				tags: [],
-				lineStart: 1,
-				lineEnd: 1,
+			it( 'renamed', () => {
+				const tokenDefaultExported = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/named-default-exported/exports.json'
+					),
+					'utf-8'
+				);
+				const irNamedDefaultExported = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenDefaultExported ),
+					{ body: [] },
+					getModule
+				);
+				expect( irNamedDefaultExported ).toHaveLength( 1 );
+				expect( irNamedDefaultExported[ 0 ] ).toEqual( {
+					path: null,
+					name: 'moduleName',
+					description: 'Module declaration.',
+					tags: [],
+					lineStart: 1,
+					lineEnd: 1,
+				} );
 			} );
 		} );
 
