@@ -67,7 +67,6 @@ describe( 'edit', () => {
 			updateNavigationLinkBlockAttributes( linkSuggestion, {
 				setAttributes,
 			} );
-			// TODO: existing bug: if url is not set, placeholder has "tag" and set value has "post_tag"
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				id: 15,
 				kind: 'taxonomy',
@@ -176,7 +175,7 @@ describe( 'edit', () => {
 			const setAttributes = jest.fn();
 			const linkSuggestion = {
 				id: 'video',
-				kind: undefined, //TODO also fix this in experimental fetch link suggestions
+				kind: 'taxonomy',
 				opensInNewTab: false,
 				title: 'Video',
 				type: 'post-format',
@@ -289,6 +288,201 @@ describe( 'edit', () => {
 					label: 'tel:5555555',
 					kind: 'custom',
 					url: 'tel:5555555',
+				} );
+			} );
+		} );
+
+		describe( 'link label', () => {
+			// https://github.com/WordPress/gutenberg/pull/19461
+			it( 'sets the url as a label if title is not provided', () => {
+				const setAttributes = jest.fn();
+				const linkSuggestion = {
+					id: 'www.wordpress.org/foo bar',
+					opensInNewTab: false,
+					title: '',
+					type: 'URL',
+					url: 'https://www.wordpress.org',
+				};
+				updateNavigationLinkBlockAttributes( linkSuggestion, {
+					setAttributes,
+				} );
+				expect( setAttributes ).toHaveBeenCalledWith( {
+					opensInNewTab: false,
+					label: 'www.wordpress.org',
+					kind: 'custom',
+					url: 'https://www.wordpress.org',
+				} );
+			} );
+			it( 'does not replace label when editing url without protocol', () => {
+				const setAttributes = jest.fn();
+				const linkSuggestion = {
+					id: 'www.wordpress.org',
+					opensInNewTab: false,
+					title: 'Custom Title',
+					type: 'URL',
+					url: 'wordpress.org',
+				};
+				updateNavigationLinkBlockAttributes( linkSuggestion, {
+					setAttributes,
+				} );
+				expect( setAttributes ).toHaveBeenCalledWith( {
+					opensInNewTab: false,
+					label: 'Custom Title',
+					kind: 'custom',
+					url: 'wordpress.org',
+				} );
+			} );
+			it( 'does not replace label when editing url with protocol', () => {
+				const setAttributes = jest.fn();
+				const linkSuggestion = {
+					id: 'www.wordpress.org',
+					opensInNewTab: false,
+					title: 'Custom Title',
+					type: 'URL',
+					url: 'https://wordpress.org',
+				};
+				updateNavigationLinkBlockAttributes( linkSuggestion, {
+					setAttributes,
+				} );
+				expect( setAttributes ).toHaveBeenCalledWith( {
+					opensInNewTab: false,
+					label: 'Custom Title',
+					kind: 'custom',
+					url: 'https://wordpress.org',
+				} );
+			} );
+			// https://github.com/WordPress/gutenberg/pull/18617
+			it( 'label is javascript escaped', () => {
+				const setAttributes = jest.fn();
+				const linkSuggestion = {
+					opensInNewTab: false,
+					title: '<Navigation />',
+					type: 'URL',
+					url: 'https://wordpress.local?p=1',
+				};
+				updateNavigationLinkBlockAttributes( linkSuggestion, {
+					setAttributes,
+				} );
+				expect( setAttributes ).toHaveBeenCalledWith( {
+					opensInNewTab: false,
+					label: '&lt;Navigation /&gt;',
+					kind: 'custom',
+					url: 'https://wordpress.local?p=1',
+				} );
+			} );
+			// https://github.com/WordPress/gutenberg/pull/19679
+			it( 'url when escaped is still an actual link', () => {
+				const setAttributes = jest.fn();
+				const linkSuggestion = {
+					id: 'http://wordpress.org/?s=',
+					opensInNewTab: false,
+					title: 'Custom Title',
+					type: 'URL',
+					url: 'http://wordpress.org/?s=<>',
+				};
+				updateNavigationLinkBlockAttributes( linkSuggestion, {
+					setAttributes,
+				} );
+				expect( setAttributes ).toHaveBeenCalledWith( {
+					opensInNewTab: false,
+					label: 'Custom Title',
+					kind: 'custom',
+					url: 'http://wordpress.org/?s=%3C%3E',
+				} );
+			} );
+		} );
+
+		describe( 'does not overwrite props when only some props are passed', () => {
+			it( 'id is retained after toggling opensInNewTab', () => {
+				const mockState = {};
+				const setAttributes = jest.fn( ( attr ) =>
+					Object.assign( mockState, attr )
+				);
+				const linkSuggestion = {
+					opensInNewTab: false,
+					id: 1337,
+					url: 'https://wordpress.local/menu-test/',
+					kind: 'post-type',
+					title: 'Menu Test',
+					type: 'post',
+				};
+
+				updateNavigationLinkBlockAttributes( linkSuggestion, {
+					setAttributes,
+					...mockState,
+				} );
+				expect( mockState ).toEqual( {
+					id: 1337,
+					label: 'Menu Test',
+					opensInNewTab: false,
+					kind: 'post-type',
+					type: 'post',
+					url: 'https://wordpress.local/menu-test/',
+				} );
+				//click on the existing link control, and toggle opens new tab
+				updateNavigationLinkBlockAttributes(
+					{
+						url: 'https://wordpress.local/menu-test/',
+						opensInNewTab: true,
+					},
+					{
+						setAttributes,
+						...mockState,
+					}
+				);
+				expect( mockState ).toEqual( {
+					id: 1337,
+					label: 'Menu Test',
+					opensInNewTab: true,
+					kind: 'post-type',
+					type: 'post',
+					url: 'https://wordpress.local/menu-test/',
+				} );
+			} );
+			it( 'id is retained after editing url', () => {
+				const mockState = {};
+				const setAttributes = jest.fn( ( attr ) =>
+					Object.assign( mockState, attr )
+				);
+				const linkSuggestion = {
+					opensInNewTab: false,
+					id: 1337,
+					url: 'https://wordpress.local/menu-test/',
+					kind: 'post-type',
+					title: 'Menu Test',
+					type: 'post',
+				};
+
+				updateNavigationLinkBlockAttributes( linkSuggestion, {
+					setAttributes,
+					...mockState,
+				} );
+				expect( mockState ).toEqual( {
+					id: 1337,
+					label: 'Menu Test',
+					opensInNewTab: false,
+					kind: 'post-type',
+					type: 'post',
+					url: 'https://wordpress.local/menu-test/',
+				} );
+				//click on the existing link control, and toggle opens new tab
+				updateNavigationLinkBlockAttributes(
+					{
+						url: 'https://wordpress.local/foo/',
+						opensInNewTab: false,
+					},
+					{
+						setAttributes,
+						...mockState,
+					}
+				);
+				expect( mockState ).toEqual( {
+					id: 1337,
+					label: 'Menu Test',
+					opensInNewTab: false,
+					kind: 'post-type',
+					type: 'post',
+					url: 'https://wordpress.local/foo/',
 				} );
 			} );
 		} );

@@ -135,45 +135,48 @@ function getSuggestionsQuery( type, kind ) {
 
 export const updateNavigationLinkBlockAttributes = (
 	updatedValue = {},
-	{ setAttributes, label = '' }
+	{
+		setAttributes,
+		label: originalLabel = '',
+		kind: originalKind = '',
+		type: originalType = '',
+	}
 ) => {
 	const {
 		title = '',
 		url = '',
 		opensInNewTab,
 		id,
-		kind = '',
-		type = '',
+		kind: newKind = originalKind,
+		type: newType = originalType,
 	} = updatedValue;
 
 	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
 	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
 	const escapeTitle =
-		title !== '' && normalizedTitle !== normalizedURL && label !== title;
-	const newLabel = escapeTitle
+		title !== '' &&
+		normalizedTitle !== normalizedURL &&
+		originalLabel !== title;
+	const label = escapeTitle
 		? escape( title )
-		: label || escape( normalizedURL );
+		: originalLabel || escape( normalizedURL );
+
+	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
 
 	const isBuiltInType =
-		[ 'post', 'page', 'tag', 'category', 'post_type' ].indexOf( type ) > -1;
+		[ 'post', 'page', 'tag', 'category' ].indexOf( type ) > -1;
 
-	if ( ! kind && ! isBuiltInType ) {
-		return setAttributes( {
-			url: encodeURI( url ),
-			label: newLabel,
-			opensInNewTab,
-			...( Number.isInteger( id ) && { id } ),
-			kind: 'custom',
-		} );
-	}
+	const isCustomLink =
+		( ! newKind && ! isBuiltInType ) || newKind === 'custom';
+	const kind = isCustomLink ? 'custom' : newKind;
 
 	return setAttributes( {
 		url: encodeURI( url ),
-		label: newLabel,
+		label,
 		opensInNewTab,
 		...( Number.isInteger( id ) && { id } ),
 		...( kind && { kind } ),
-		...( type && { type } ),
+		...( type && ! isCustomLink && { type } ),
 	} );
 };
 
@@ -566,7 +569,7 @@ export default function NavigationLinkEdit( {
 								onChange={ ( updatedValue ) =>
 									updateNavigationLinkBlockAttributes(
 										updatedValue,
-										{ setAttributes, label }
+										{ setAttributes, label, kind, type }
 									)
 								}
 							/>
