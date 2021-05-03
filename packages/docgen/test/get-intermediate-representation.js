@@ -276,82 +276,86 @@ describe( 'Intermediate Representation', () => {
 	} );
 
 	describe( 'JSDoc in same file', () => {
-		it( 'default export', () => {
-			const token = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-identifier/exports.json'
-				),
-				'utf-8'
-			);
-			const ast = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-identifier/ast.json'
-				),
-				'utf-8'
-			);
-			const irDefaultId = getIntermediateRepresentation(
-				null,
-				JSON.parse( token ),
-				JSON.parse( ast )
-			);
-			expect( irDefaultId ).toHaveLength( 1 );
-			expect( irDefaultId[ 0 ] ).toEqual( {
-				path: null,
-				name: 'default',
-				description: 'Class declaration example.',
-				tags: [
-					{
-						tag: 'type',
-						type: 'ClassDeclaration',
-						name: '',
-						description: '',
-					},
-				],
-				lineStart: 6,
-				lineEnd: 6,
+		describe( 'default export', () => {
+			it( 'named class', () => {
+				const token = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-identifier/exports.json'
+					),
+					'utf-8'
+				);
+				const ast = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-identifier/ast.json'
+					),
+					'utf-8'
+				);
+				const irDefaultId = getIntermediateRepresentation(
+					null,
+					JSON.parse( token ),
+					JSON.parse( ast )
+				);
+				expect( irDefaultId ).toHaveLength( 1 );
+				expect( irDefaultId[ 0 ] ).toEqual( {
+					path: null,
+					name: 'default',
+					description: 'Class declaration example.',
+					tags: [
+						{
+							tag: 'type',
+							type: 'ClassDeclaration',
+							name: '',
+							description: '',
+						},
+					],
+					lineStart: 6,
+					lineEnd: 6,
+				} );
 			} );
-			const namedExport = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-named-export/exports.json'
-				),
-				'utf-8'
-			);
-			const namedExportAST = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-named-export/ast.json'
-				),
-				'utf-8'
-			);
-			const irDefaultNamed0 = getIntermediateRepresentation(
-				null,
-				JSON.parse( namedExport )[ 0 ],
-				JSON.parse( namedExportAST )
-			);
-			expect( irDefaultNamed0 ).toHaveLength( 1 );
-			expect( irDefaultNamed0[ 0 ] ).toEqual( {
-				path: null,
-				name: 'functionDeclaration',
-				description: 'Function declaration example.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 4,
-			} );
-			const irDefaultNamed1 = getIntermediateRepresentation(
-				null,
-				JSON.parse( namedExport )[ 1 ],
-				JSON.parse( namedExportAST )
-			);
-			expect( irDefaultNamed1[ 0 ] ).toEqual( {
-				path: null,
-				name: 'default',
-				description: 'Function declaration example.',
-				tags: [],
-				lineStart: 6,
-				lineEnd: 6,
+			it( 'named function', () => {
+				const namedExport = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-named-export/exports.json'
+					),
+					'utf-8'
+				);
+				const namedExportAST = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-named-export/ast.json'
+					),
+					'utf-8'
+				);
+				const irDefaultNamed0 = getIntermediateRepresentation(
+					null,
+					JSON.parse( namedExport )[ 0 ],
+					JSON.parse( namedExportAST )
+				);
+				expect( irDefaultNamed0 ).toHaveLength( 1 );
+				expect( irDefaultNamed0[ 0 ] ).toEqual( {
+					path: null,
+					name: 'functionDeclaration',
+					description: 'Function declaration example.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
+				const irDefaultNamed1 = getIntermediateRepresentation(
+					null,
+					JSON.parse( namedExport )[ 1 ],
+					JSON.parse( namedExportAST )
+				);
+				expect( irDefaultNamed1[ 0 ] ).toEqual( {
+					path: null,
+					name: 'default',
+					description: 'Function declaration example.',
+					tags: [],
+					lineStart: 6,
+					lineEnd: 6,
+				} );
 			} );
 		} );
 
