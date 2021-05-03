@@ -739,84 +739,88 @@ describe( 'Intermediate Representation', () => {
 	} );
 
 	describe( 'JSDoc in module dependency through import', () => {
-		it( 'default export', () => {
-			const tokenDefault = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-import-default/exports.json'
-				),
-				'utf-8'
-			);
-			const astDefault = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-import-default/ast.json'
-				),
-				'utf-8'
-			);
-			const getModuleDefault = () =>
-				JSON.parse(
-					fs.readFileSync(
-						path.join(
-							__dirname,
-							'./fixtures/default-import-default/module-ir.json'
-						),
-						'utf-8'
-					)
+		describe( 'default export', () => {
+			it( 'default import', () => {
+				const tokenDefault = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-import-default/exports.json'
+					),
+					'utf-8'
 				);
-			const irDefault = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenDefault ),
-				JSON.parse( astDefault ),
-				getModuleDefault
-			);
-			expect( irDefault ).toHaveLength( 1 );
-			expect( irDefault[ 0 ] ).toEqual( {
-				path: null,
-				name: 'default',
-				description: 'Function declaration.',
-				tags: [],
-				lineStart: 3,
-				lineEnd: 3,
+				const astDefault = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-import-default/ast.json'
+					),
+					'utf-8'
+				);
+				const getModuleDefault = () =>
+					JSON.parse(
+						fs.readFileSync(
+							path.join(
+								__dirname,
+								'./fixtures/default-import-default/module-ir.json'
+							),
+							'utf-8'
+						)
+					);
+				const irDefault = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenDefault ),
+					JSON.parse( astDefault ),
+					getModuleDefault
+				);
+				expect( irDefault ).toHaveLength( 1 );
+				expect( irDefault[ 0 ] ).toEqual( {
+					path: null,
+					name: 'default',
+					description: 'Function declaration.',
+					tags: [],
+					lineStart: 3,
+					lineEnd: 3,
+				} );
 			} );
-			const tokenNamed = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-import-named/exports.json'
-				),
-				'utf-8'
-			);
-			const astNamed = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-import-named/ast.json'
-				),
-				'utf-8'
-			);
-			const getModuleNamed = () =>
-				JSON.parse(
-					fs.readFileSync(
-						path.join(
-							__dirname,
-							'./fixtures/default-import-named/module-ir.json'
-						),
-						'utf-8'
-					)
+			it( 'named import', () => {
+				const tokenNamed = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-import-named/exports.json'
+					),
+					'utf-8'
 				);
-			const irNamed = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenNamed ),
-				JSON.parse( astNamed ),
-				getModuleNamed
-			);
-			expect( irNamed ).toHaveLength( 1 );
-			expect( irNamed[ 0 ] ).toEqual( {
-				path: null,
-				name: 'default',
-				description: 'Function declaration.',
-				tags: [],
-				lineStart: 3,
-				lineEnd: 3,
+				const astNamed = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-import-named/ast.json'
+					),
+					'utf-8'
+				);
+				const getModuleNamed = () =>
+					JSON.parse(
+						fs.readFileSync(
+							path.join(
+								__dirname,
+								'./fixtures/default-import-named/module-ir.json'
+							),
+							'utf-8'
+						)
+					);
+				const irNamed = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenNamed ),
+					JSON.parse( astNamed ),
+					getModuleNamed
+				);
+				expect( irNamed ).toHaveLength( 1 );
+				expect( irNamed[ 0 ] ).toEqual( {
+					path: null,
+					name: 'default',
+					description: 'Function declaration.',
+					tags: [],
+					lineStart: 3,
+					lineEnd: 3,
+				} );
 			} );
 		} );
 
