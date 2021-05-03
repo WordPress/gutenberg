@@ -5,7 +5,6 @@ import { Notice } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function TemplateValidationNotice( { isValid, ...props } ) {
 	if ( isValid ) {
@@ -50,11 +49,11 @@ function TemplateValidationNotice( { isValid, ...props } ) {
 
 export default compose( [
 	withSelect( ( select ) => ( {
-		isValid: select( blockEditorStore ).isValidTemplate(),
+		isValid: select( 'core/block-editor' ).isValidTemplate(),
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { setTemplateValidity, synchronizeTemplate } = dispatch(
-			blockEditorStore
+			'core/block-editor'
 		);
 		return {
 			resetTemplateValidity: () => setTemplateValidity( true ),

@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createSlotFill,
-	__experimentalStyleProvider as StyleProvider,
-} from '@wordpress/components';
+import { createSlotFill } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -16,11 +13,7 @@ const { Fill, Slot } = createSlotFill( name );
 
 function InspectorAdvancedControls( { children } ) {
 	const { isSelected } = useBlockEditContext();
-	return isSelected ? (
-		<StyleProvider document={ document }>
-			<Fill>{ children }</Fill>
-		</StyleProvider>
-	) : null;
+	return isSelected ? <Fill>{ children }</Fill> : null;
 }
 
 InspectorAdvancedControls.slotName = name;

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { _x } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { customLink as linkIcon } from '@wordpress/icons';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { addFilter } from '@wordpress/hooks';
@@ -19,7 +19,11 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
+	title: _x( 'Custom Link', 'block title' ),
+
 	icon: linkIcon,
+
+	description: __( 'Add a page, link, or another item to your navigation.' ),
 
 	__experimentalLabel: ( { label } ) => label,
 

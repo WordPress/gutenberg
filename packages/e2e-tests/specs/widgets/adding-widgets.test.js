@@ -301,10 +301,10 @@ describe( 'Widgets screen', () => {
 		inlineInserterButton = await getInlineInserterButton();
 		await inlineInserterButton.click();
 
-		// TODO: Convert to find() API from puppeteer-testing-library.
-		const inserterSearchBox = await page.waitForSelector(
-			'aria/Search for blocks and patterns[role="searchbox"]'
-		);
+		const inserterSearchBox = await find( {
+			role: 'searchbox',
+			name: 'Search for blocks and patterns',
+		} );
 		await expect( inserterSearchBox ).toHaveFocus();
 
 		await page.keyboard.type( 'Heading' );
@@ -503,39 +503,22 @@ describe( 'Widgets screen', () => {
 		await page.waitForTimeout( 500 );
 
 		await visitAdminPage( 'themes.php', 'page=gutenberg-widgets' );
-
-		// Wait for the Legacy Widget block's preview iframe to load.
-		const frame = await new Promise( ( resolve ) => {
-			const checkFrame = async ( candidateFrame ) => {
-				const url = await candidateFrame.url();
-				if ( url.includes( 'legacy-widget-preview' ) ) {
-					page.off( 'frameattached', checkFrame );
-					page.off( 'framenavigated', checkFrame );
-					resolve( candidateFrame );
-				}
-			};
-			page.on( 'frameattached', checkFrame );
-			page.on( 'framenavigated', checkFrame );
+		// Wait for the widget areas to load.
+		await findAll( {
+			role: 'group',
+			name: 'Block: Widget Area',
 		} );
 
-		// Expect to have search input.
-		await find(
-			{
-				role: 'searchbox',
-			},
-			{
-				page: frame,
-			}
+		// Wait for the widget's form to load.
+		await page.waitForSelector(
+			'[data-block][data-type="core/legacy-widget"] input'
 		);
 
-		// Focus the Legacy Widget block.
 		const legacyWidget = await find( {
 			role: 'group',
 			name: 'Block: Legacy Widget',
 		} );
-		await legacyWidget.focus();
 
-		// There should be a title at the top of the widget form.
 		const legacyWidgetName = await find(
 			{
 				role: 'heading',
@@ -547,18 +530,54 @@ describe( 'Widgets screen', () => {
 		);
 		expect( legacyWidgetName ).toMatchQuery( { text: 'Search' } );
 
-		// Update the widget form.
-		// TODO: Convert to find() API from puppeteer-testing-library.
-		const titleInput = await page.waitForSelector(
-			`#widget-search-1-title`
+		await legacyWidget.focus();
+
+		await showBlockToolbar();
+		let previewButton = await find( {
+			role: 'button',
+			name: 'Preview',
+		} );
+		await previewButton.click();
+
+		const iframe = await legacyWidget.$( 'iframe' );
+		const frame = await iframe.contentFrame();
+
+		// Expect to have search input.
+		await find(
+			{
+				role: 'searchbox',
+			},
+			{
+				page: frame,
+			}
+		);
+
+		const editButton = await find( {
+			role: 'button',
+			name: 'Edit',
+		} );
+		await editButton.click();
+
+		const titleInput = await find(
+			{
+				role: 'textbox',
+				name: /^Title/,
+			},
+			{
+				root: legacyWidget,
+			}
 		);
 		await titleInput.type( 'Search Title' );
 
-		// Switch to Navigation mode.
-		await page.keyboard.press( 'Escape' );
-
-		// Wait for the preview to update.
-		await frame.waitForNavigation();
+		await showBlockToolbar();
+		previewButton = await find( {
+			role: 'button',
+			name: 'Preview',
+		} );
+		await Promise.all( [
+			previewButton.click(),
+			frame.waitForNavigation(),
+		] );
 
 		// Expect to have search title.
 		await find(

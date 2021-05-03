@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Text } from '../../../text';
+import { Text } from '../../index';
 import { Tooltip } from '../index';
 
 export default {

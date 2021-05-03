@@ -20,7 +20,6 @@ import {
 } from '@wordpress/components';
 import { chevronDown } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function getBlockDisplayText( block ) {
 	return block
@@ -33,7 +32,7 @@ function useSecondaryText() {
 	const activeEntityBlockId = useSelect(
 		( select ) =>
 			select(
-				blockEditorStore
+				'core/block-editor'
 			).__experimentalGetActiveBlockIdByBlockNames( [
 				'core/template-part',
 			] ),
@@ -56,7 +55,6 @@ function useSecondaryText() {
  * @param {string}   props.entityLabel A label to use for entity-related options.
  *                                     E.g. "template" would be used for "edit
  *                                     template" and "show template details".
- * @param {boolean}  props.isLoaded    Whether the data is available.
  * @param {Function} props.children    React component to use for the
  *                                     information dropdown area. Should be a
  *                                     function which accepts dropdown props.
@@ -64,7 +62,6 @@ function useSecondaryText() {
 export default function DocumentActions( {
 	entityTitle,
 	entityLabel,
-	isLoaded,
 	children: dropdownContent,
 } ) {
 	const { label } = useSecondaryText();
@@ -75,19 +72,10 @@ export default function DocumentActions( {
 	const titleRef = useRef();
 
 	// Return a simple loading indicator until we have information to show.
-	if ( ! isLoaded ) {
-		return (
-			<div className="edit-site-document-actions">
-				{ __( 'Loading…' ) }
-			</div>
-		);
-	}
-
-	// Return feedback that the template does not seem to exist.
 	if ( ! entityTitle ) {
 		return (
 			<div className="edit-site-document-actions">
-				{ __( 'Template not found' ) }
+				{ __( 'Loading…' ) }
 			</div>
 		);
 	}
@@ -103,7 +91,7 @@ export default function DocumentActions( {
 				className="edit-site-document-actions__title-wrapper"
 			>
 				<Text
-					size="body"
+					variant="body.small"
 					className="edit-site-document-actions__title-prefix"
 				>
 					<VisuallyHidden as="span">
@@ -116,7 +104,7 @@ export default function DocumentActions( {
 				</Text>
 
 				<Text
-					size="body"
+					variant="body.small"
 					className="edit-site-document-actions__title"
 					as="h1"
 				>
@@ -124,7 +112,7 @@ export default function DocumentActions( {
 				</Text>
 
 				<Text
-					size="body"
+					variant="body.small"
 					className="edit-site-document-actions__secondary-item"
 				>
 					{ label ?? '' }

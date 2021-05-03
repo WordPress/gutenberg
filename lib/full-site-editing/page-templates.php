@@ -8,10 +8,13 @@
 /**
  * Load the page templates in Gutenberg.
  *
- * @param array $templates Page templates.
+ * @param array    $templates Page templates.
+ * @param WP_Theme $theme     WP_Theme instance.
+ * @param WP_Post  $post      The post being edited, provided for context, or null.
+ * @param string   $post_type Post type to get the templates for.
  * @return array (Maybe) modified page templates array.
  */
-function gutenberg_load_block_page_templates( $templates ) {
+function gutenberg_load_block_page_templates( $templates, $theme, $post, $post_type ) {
 	if ( ! gutenberg_supports_block_templates() ) {
 		return $templates;
 	}
@@ -24,4 +27,4 @@ function gutenberg_load_block_page_templates( $templates ) {
 
 	return $templates;
 }
-add_filter( 'theme_templates', 'gutenberg_load_block_page_templates' );
+add_filter( 'theme_templates', 'gutenberg_load_block_page_templates', 10, 4 );

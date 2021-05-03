@@ -15,24 +15,22 @@ import { store as blockEditorStore } from '../../../store';
  * @param {string} clientId Block client ID.
  */
 export function useNavModeExit( clientId ) {
-	const { isNavigationMode, isBlockSelected } = useSelect( blockEditorStore );
-	const { setNavigationMode, selectBlock } = useDispatch( blockEditorStore );
+	const isEnabled = useSelect( ( select ) => {
+		const { isNavigationMode, isBlockSelected } = select(
+			blockEditorStore
+		);
+		return isNavigationMode() && isBlockSelected( clientId );
+	}, [] );
+	const { setNavigationMode } = useDispatch( blockEditorStore );
+
 	return useRefEffect(
 		( node ) => {
-			function onMouseDown( event ) {
-				// Don't select a block if it's already handled by a child
-				// block.
-				if ( isNavigationMode() && ! event.defaultPrevented ) {
-					// Prevent focus from moving to the block.
-					event.preventDefault();
+			if ( ! isEnabled ) {
+				return;
+			}
 
-					// When clicking on a selected block, exit navigation mode.
-					if ( isBlockSelected( clientId ) ) {
-						setNavigationMode( false );
-					} else {
-						selectBlock( clientId );
-					}
-				}
+			function onMouseDown() {
+				setNavigationMode( false );
 			}
 
 			node.addEventListener( 'mousedown', onMouseDown );
@@ -41,6 +39,6 @@ export function useNavModeExit( clientId ) {
 				node.addEventListener( 'mousedown', onMouseDown );
 			};
 		},
-		[ clientId, isNavigationMode, isBlockSelected, setNavigationMode ]
+		[ isEnabled ]
 	);
 }

@@ -241,10 +241,10 @@ export function deviceType( state = 'Desktop', action ) {
 /**
  * Reducer tracking whether the inserter is open.
  *
- * @param {boolean|Object} state
- * @param {Object}         action
+ * @param {boolean} state
+ * @param {Object}  action
  */
-function blockInserterPanel( state = false, action ) {
+function isInserterOpened( state = false, action ) {
 	switch ( action.type ) {
 		case 'SET_IS_INSERTER_OPENED':
 			return action.value;
@@ -278,6 +278,6 @@ export default combineReducers( {
 	publishSidebarActive,
 	removedPanels,
 	deviceType,
-	blockInserterPanel,
+	isInserterOpened,
 	isEditingTemplate,
 } );

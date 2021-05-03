@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __, _x } from '@wordpress/i18n';
 import { search as icon } from '@wordpress/icons';
 
 /**
@@ -15,7 +16,10 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
+	title: _x( 'Search', 'block title' ),
+	description: __( 'Help visitors find your content.' ),
 	icon,
+	keywords: [ __( 'find' ) ],
 	example: {},
 	variations,
 	edit,

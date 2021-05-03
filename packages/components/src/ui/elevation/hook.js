@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+import { useContextSystem } from '@wp-g2/context';
+import { css, cx, getBoxShadow, ui } from '@wp-g2/styles';
 import { isNil } from 'lodash';
 
 /**
@@ -12,24 +13,10 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
 import * as styles from './styles';
-import CONFIG from '../../utils/config-values';
 
 /**
- * @param {number} value
- * @return {string} The box shadow value.
- */
-export function getBoxShadow( value ) {
-	const boxShadowColor = `rgba(0 ,0, 0, ${ value / 20 })`;
-	const boxShadow = `0 ${ value }px ${ value * 2 }px 0
-	${ boxShadowColor }`;
-
-	return boxShadow;
-}
-
-/**
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
  */
 export function useElevation( props ) {
 	const {
@@ -55,7 +42,9 @@ export function useElevation( props ) {
 			activeValue = ! isNil( active ) ? active : undefined;
 		}
 
-		const transition = `box-shadow ${ CONFIG.transitionDuration } ${ CONFIG.transitionTimingFunction }`;
+		const transition = `box-shadow ${ ui.get(
+			'transitionDuration'
+		) } ${ ui.get( 'transitionTimingFunction' ) }`;
 
 		const sx = {};
 
@@ -63,7 +52,7 @@ export function useElevation( props ) {
 			borderRadius,
 			bottom: offset,
 			boxShadow: getBoxShadow( value ),
-			opacity: CONFIG.elevationIntensity,
+			opacity: ui.get( 'elevationIntensity' ),
 			left: offset,
 			right: offset,
 			top: offset,

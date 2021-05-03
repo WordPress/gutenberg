@@ -8,7 +8,6 @@ import {
 	BlockNavigationDropdown,
 	BlockToolbar,
 	NavigableToolbar,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
@@ -41,7 +40,7 @@ function Header() {
 	const { setIsWidgetAreaOpen, setIsInserterOpened } = useDispatch(
 		editWidgetsStore
 	);
-	const { selectBlock } = useDispatch( blockEditorStore );
+	const { selectBlock } = useDispatch( 'core/block-editor' );
 	const handleClick = () => {
 		if ( isInserterOpened ) {
 			// Focusing the inserter button closes the inserter popover

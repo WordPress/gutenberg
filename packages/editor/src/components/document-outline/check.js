@@ -7,7 +7,6 @@ import { filter } from 'lodash';
  * WordPress dependencies
  */
 import { withSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 function DocumentOutlineCheck( { blocks, children } ) {
 	const headings = filter(
@@ -23,5 +22,5 @@ function DocumentOutlineCheck( { blocks, children } ) {
 }
 
 export default withSelect( ( select ) => ( {
-	blocks: select( blockEditorStore ).getBlocks(),
+	blocks: select( 'core/block-editor' ).getBlocks(),
 } ) )( DocumentOutlineCheck );

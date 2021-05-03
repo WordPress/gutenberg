@@ -10,7 +10,6 @@ import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { create, getTextContent } from '@wordpress/rich-text';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -145,7 +144,7 @@ export const DocumentOutline = ( {
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getBlocks } = select( blockEditorStore );
+		const { getBlocks } = select( 'core/block-editor' );
 		const { getEditedPostAttribute } = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );

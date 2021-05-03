@@ -13,7 +13,6 @@ import warn from '@wordpress/warning';
  * Internal dependencies
  */
 import { CONNECT_STATIC_NAMESPACE } from './constants';
-import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
 
 /* eslint-disable jsdoc/valid-types */
 /**
@@ -26,14 +25,14 @@ import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
  *
  * @template {import('./polymorphic-component').ViewOwnProps<{}, any>} P
  * @param {(props: P, ref: import('react').Ref<any>) => JSX.Element | null} Component The component to register into the Context system.
- * @param {string} namespace The namespace to register the component under.
+ * @param {Array<string>|string} namespace The namespace to register the component under.
  * @param {Object} options
- * @param {boolean} [options.memo=false]
+ * @param {boolean} [options.memo=true]
  * @return {import('./polymorphic-component').PolymorphicComponent<import('./polymorphic-component').ElementTypeFromViewOwnProps<P>, import('./polymorphic-component').PropsFromViewOwnProps<P>>} The connected PolymorphicComponent
  */
 export function contextConnect( Component, namespace, options = {} ) {
 	/* eslint-enable jsdoc/valid-types */
-	const { memo: memoProp = false } = options;
+	const { memo: memoProp = true } = options;
 
 	let WrappedComponent = forwardRef( Component );
 	if ( memoProp ) {
@@ -41,13 +40,17 @@ export function contextConnect( Component, namespace, options = {} ) {
 		WrappedComponent = memo( WrappedComponent );
 	}
 
+	const displayName = Array.isArray( namespace )
+		? namespace[ 0 ]
+		: namespace || WrappedComponent.name;
+
 	if ( typeof namespace === 'undefined' ) {
 		warn( 'contextConnect: Please provide a namespace' );
 	}
 
 	// @ts-ignore internal property
 	let mergedNamespace = WrappedComponent[ CONNECT_STATIC_NAMESPACE ] || [
-		namespace,
+		displayName,
 	];
 
 	/**
@@ -60,13 +63,10 @@ export function contextConnect( Component, namespace, options = {} ) {
 		mergedNamespace = [ ...mergedNamespace, namespace ];
 	}
 
-	WrappedComponent.displayName = namespace;
+	WrappedComponent.displayName = displayName;
 
 	// @ts-ignore internal property
 	WrappedComponent[ CONNECT_STATIC_NAMESPACE ] = uniq( mergedNamespace );
-
-	// @ts-ignore PolymorphicComponent property
-	WrappedComponent.selector = `.${ getStyledClassNameFromKey( namespace ) }`;
 
 	// @ts-ignore
 	return WrappedComponent;

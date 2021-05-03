@@ -8,13 +8,16 @@ import { Button } from '@wordpress/components';
 /**
  * Internal dependencies
  */
+import { getBlockDOMNode } from '../../utils/dom';
 import { store as blockEditorStore } from '../../store';
-import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
 const SkipToSelectedBlock = ( { selectedBlockClientId } ) => {
-	const ref = useBlockRef( selectedBlockClientId );
 	const onClick = () => {
-		ref.current.focus();
+		const selectedBlockElement = getBlockDOMNode(
+			selectedBlockClientId,
+			document
+		);
+		selectedBlockElement.focus();
 	};
 
 	return selectedBlockClientId ? (

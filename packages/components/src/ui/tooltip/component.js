@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+import { contextConnect, useContextSystem } from '@wp-g2/context';
 // eslint-disable-next-line no-restricted-imports
 import { TooltipReference, useTooltipState } from 'reakit';
 
@@ -12,13 +13,12 @@ import { useMemo, cloneElement } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { contextConnect, useContextSystem } from '../context';
 import { TooltipContext } from './context';
 import TooltipContent from './content';
 import { TooltipShortcut } from './styles';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Tooltip( props, forwardedRef ) {

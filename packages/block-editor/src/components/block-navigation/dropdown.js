@@ -80,8 +80,9 @@ function BlockNavigationDropdown(
 					isEnabled={ isEnabled }
 				/>
 			) }
-			renderContent={ () => (
+			renderContent={ ( { onClose } ) => (
 				<BlockNavigation
+					onSelect={ onClose }
 					__experimentalFeatures={ __experimentalFeatures }
 				/>
 			) }

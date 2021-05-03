@@ -16,7 +16,6 @@ import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Spinner } from '@wordpress/components';
 import { store as coreStore } from '@wordpress/core-data';
 
 const TEMPLATE = [
@@ -128,11 +127,7 @@ export default function QueryLoopEdit( {
 	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
 
 	if ( ! posts ) {
-		return (
-			<p { ...blockProps }>
-				<Spinner />
-			</p>
-		);
+		return <p { ...blockProps }>{ __( 'Loading…' ) }</p>;
 	}
 
 	if ( ! posts.length ) {

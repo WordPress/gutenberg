@@ -1,7 +1,7 @@
 .titleContainer {
 	flex-direction: row;
 	align-items: center;
-	padding-bottom: 28;
+	padding-bottom: 12;
 }
 
 .title {
@@ -21,7 +21,7 @@
 	position: absolute;
 	left: -$block-selected-to-content + $block-selected-border-width;
 	right: -$block-selected-to-content + $block-selected-border-width;
-	bottom: 16;
+	bottom: 0;
 }
 
 .separatorDark {

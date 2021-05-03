@@ -205,11 +205,11 @@ class PuppeteerEnvironment extends NodeEnvironment {
 			replacement: '-',
 		} );
 		await writeFile(
-			path.join( ARTIFACTS_PATH, `${ fileName }-snapshot.html` ),
+			`${ ARTIFACTS_PATH }/${ fileName }-snapshot.html`,
 			await this.global.page.content()
 		);
 		await this.global.page.screenshot( {
-			path: path.join( ARTIFACTS_PATH, `${ fileName }.jpg` ),
+			path: `${ ARTIFACTS_PATH }/${ fileName }.jpg`,
 		} );
 	}
 

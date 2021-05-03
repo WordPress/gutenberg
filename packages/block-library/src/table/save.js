@@ -8,24 +8,33 @@ import classnames from 'classnames';
  */
 import {
 	RichText,
+	getColorClassName,
 	useBlockProps,
-	__experimentalGetBorderClassesAndStyles as getBorderClassesAndStyles,
-	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
-	const { hasFixedLayout, head, body, foot, caption } = attributes;
+	const {
+		hasFixedLayout,
+		head,
+		body,
+		foot,
+		backgroundColor,
+		caption,
+	} = attributes;
 	const isEmpty = ! head.length && ! body.length && ! foot.length;
 
 	if ( isEmpty ) {
 		return null;
 	}
 
-	const colorProps = getColorClassesAndStyles( attributes );
-	const borderProps = getBorderClassesAndStyles( attributes );
+	const backgroundClass = getColorClassName(
+		'background-color',
+		backgroundColor
+	);
 
-	const classes = classnames( colorProps.className, borderProps.className, {
+	const classes = classnames( backgroundClass, {
 		'has-fixed-layout': hasFixedLayout,
+		'has-background': !! backgroundClass,
 	} );
 
 	const hasCaption = ! RichText.isEmpty( caption );
@@ -73,10 +82,7 @@ export default function save( { attributes } ) {
 
 	return (
 		<figure { ...useBlockProps.save() }>
-			<table
-				className={ classes === '' ? undefined : classes }
-				style={ { ...colorProps.style, ...borderProps.style } }
-			>
+			<table className={ classes === '' ? undefined : classes }>
 				<Section type="head" rows={ head } />
 				<Section type="body" rows={ body } />
 				<Section type="foot" rows={ foot } />

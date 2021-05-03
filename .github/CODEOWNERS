@@ -15,12 +15,7 @@
 /packages/block-library/src/gallery             @mkevins
 /packages/block-library/src/social-links        @mkaz
 /packages/block-library/src/social-link         @mkaz
-
-# Duotone
-/lib/block-supports/duotone.php                       @ajlende
-/packages/block-editor/src/components/duotone-control @ajlende
-/packages/block-editor/src/hooks/duotone.js           @ajlende
-/packages/components/src/duotone-picker               @ajlende
+/packages/block-library/src/image               @ajlende
 
 # Editor
 /packages/annotations                           @atimmer

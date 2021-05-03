@@ -21,4 +21,3 @@ export { default as wrap } from './wrap';
 export { default as __unstableStripHTML } from './strip-html';
 export { default as isEmpty } from './is-empty';
 export { default as removeInvalidHTML } from './remove-invalid-html';
-export { default as isRTL } from './is-rtl';

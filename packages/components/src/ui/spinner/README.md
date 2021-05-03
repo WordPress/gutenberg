@@ -5,7 +5,7 @@
 ## Usage
 
 ```jsx
-import { Spinner } from '@wordpress/components/ui';
+import { Spinner } from '@wp-g2/components/ui';
 
 function Example() {
 	return <Spinner />;

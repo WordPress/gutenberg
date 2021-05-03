@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { blockTable as icon } from '@wordpress/icons';
 
 /**
@@ -18,6 +18,8 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
+	title: _x( 'Table', 'block title' ),
+	description: __( 'Insert a table — perfect for sharing charts and data.' ),
 	icon,
 	example: {
 		attributes: {
@@ -91,6 +93,14 @@ export const settings = {
 			],
 		},
 	},
+	styles: [
+		{
+			name: 'regular',
+			label: _x( 'Default', 'block style' ),
+			isDefault: true,
+		},
+		{ name: 'stripes', label: __( 'Stripes' ) },
+	],
 	transforms,
 	edit,
 	save,

@@ -1,11 +1,13 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+import { contextConnect, useContextSystem } from '@wp-g2/context';
+import { css, cx, ui } from '@wp-g2/styles';
 // eslint-disable-next-line no-restricted-imports
 import { Separator } from 'reakit';
 // eslint-disable-next-line no-restricted-imports, no-duplicate-imports
 import type { SeparatorProps } from 'reakit';
+import type { ViewOwnProps } from '@wp-g2/create-styles';
 // eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
 
@@ -17,11 +19,7 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { contextConnect, useContextSystem } from '../context';
-// eslint-disable-next-line no-duplicate-imports
-import type { ViewOwnProps } from '../context';
 import * as styles from './styles';
-import { space } from '../utils/space';
 
 export interface DividerProps extends SeparatorProps {
 	/**
@@ -52,19 +50,19 @@ function Divider(
 
 		if ( typeof m !== 'undefined' ) {
 			sx.m = css`
-				margin-bottom: ${ space( m ) };
-				margin-top: ${ space( m ) };
+				margin-bottom: ${ ui.space( m ) };
+				margin-top: ${ ui.space( m ) };
 			`;
 		} else {
 			if ( typeof mt !== 'undefined' ) {
 				sx.mt = css`
-					margin-top: ${ space( mt ) };
+					margin-top: ${ ui.space( mt ) };
 				`;
 			}
 
 			if ( typeof mb !== 'undefined' ) {
 				sx.mb = css`
-					margin-bottom: ${ space( mb ) };
+					margin-bottom: ${ ui.space( mb ) };
 				`;
 			}
 		}

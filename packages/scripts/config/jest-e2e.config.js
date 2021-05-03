@@ -20,10 +20,6 @@ const jestE2EConfig = {
 	setupFilesAfterEnv: [ 'expect-puppeteer' ],
 	testMatch: [ '**/specs/**/*.[jt]s', '**/?(*.)spec.[jt]s' ],
 	testPathIgnorePatterns: [ '/node_modules/' ],
-	reporters: [
-		'default',
-		path.join( __dirname, 'jest-github-actions-reporter.js' ),
-	],
 };
 
 if ( ! hasBabelConfig() ) {

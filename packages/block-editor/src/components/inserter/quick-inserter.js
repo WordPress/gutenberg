@@ -9,7 +9,7 @@ import classnames from 'classnames';
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -52,16 +52,13 @@ export default function QuickInserter( {
 		( showPatterns && patterns.length > SEARCH_THRESHOLD ) ||
 		blockTypes.length > SEARCH_THRESHOLD;
 
-	const { setInserterIsOpened, insertionIndex } = useSelect(
+	const { setInserterIsOpened, blockIndex } = useSelect(
 		( select ) => {
-			const { getSettings, getBlockIndex, getBlockCount } = select(
-				blockEditorStore
-			);
-			const index = getBlockIndex( clientId, rootClientId );
+			const { getSettings, getBlockIndex } = select( blockEditorStore );
 			return {
 				setInserterIsOpened: getSettings()
 					.__experimentalSetIsInserterOpened,
-				insertionIndex: index === -1 ? getBlockCount() : index,
+				blockIndex: getBlockIndex( clientId, rootClientId ),
 			};
 		},
 		[ clientId, rootClientId ]
@@ -73,10 +70,13 @@ export default function QuickInserter( {
 		}
 	}, [ setInserterIsOpened ] );
 
+	const { __unstableSetInsertionPoint } = useDispatch( blockEditorStore );
+
 	// When clicking Browse All select the appropriate block so as
 	// the insertion point can work as expected
 	const onBrowseAll = () => {
-		setInserterIsOpened( { rootClientId, insertionIndex } );
+		__unstableSetInsertionPoint( rootClientId, blockIndex );
+		setInserterIsOpened( true );
 	};
 
 	return (

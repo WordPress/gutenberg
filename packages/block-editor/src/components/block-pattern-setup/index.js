@@ -134,7 +134,6 @@ const BlockPatternSetup = ( {
 	blockName,
 	filterPatternsFn,
 	startBlankComponent,
-	onBlockPatternSelect,
 } ) => {
 	const [ viewMode, setViewMode ] = useState( VIEWMODES.carousel );
 	const [ activeSlide, setActiveSlide ] = useState( 0 );
@@ -146,12 +145,10 @@ const BlockPatternSetup = ( {
 		return startBlankComponent;
 	}
 
-	const onBlockPatternSelectDefault = ( blocks ) => {
+	const onBlockPatternSelect = ( blocks ) => {
 		const clonedBlocks = blocks.map( ( block ) => cloneBlock( block ) );
 		replaceBlock( clientId, clonedBlocks );
 	};
-	const onPatternSelectCallback =
-		onBlockPatternSelect || onBlockPatternSelectDefault;
 	return (
 		<div
 			className={ `block-editor-block-pattern-setup view-mode-${ viewMode }` }
@@ -168,7 +165,7 @@ const BlockPatternSetup = ( {
 					setActiveSlide( ( active ) => active - 1 );
 				} }
 				onBlockPatternSelect={ () => {
-					onPatternSelectCallback( patterns[ activeSlide ].blocks );
+					onBlockPatternSelect( patterns[ activeSlide ].blocks );
 				} }
 				onStartBlank={ () => {
 					setShowBlank( true );
@@ -178,7 +175,7 @@ const BlockPatternSetup = ( {
 				viewMode={ viewMode }
 				activeSlide={ activeSlide }
 				patterns={ patterns }
-				onBlockPatternSelect={ onPatternSelectCallback }
+				onBlockPatternSelect={ onBlockPatternSelect }
 			/>
 		</div>
 	);

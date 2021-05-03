@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { cx } from 'emotion';
+import { useContextSystem } from '@wp-g2/context';
+import { cx } from '@wp-g2/styles';
 
 /**
  * WordPress dependencies
@@ -11,12 +12,11 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
 import * as styles from './styles';
 
 /* eslint-disable jsdoc/valid-types */
 /**
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param  {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
  */
 /* eslint-enable jsdoc/valid-types */
 export function useScrollable( props ) {

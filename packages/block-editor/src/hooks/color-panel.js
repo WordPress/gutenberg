@@ -10,7 +10,7 @@ import { useState, useEffect } from '@wordpress/element';
 import PanelColorGradientSettings from '../components/colors-gradients/panel-color-gradient-settings';
 import ContrastChecker from '../components/contrast-checker';
 import InspectorControls from '../components/inspector-controls';
-import { __unstableUseBlockRef as useBlockRef } from '../components/block-list/use-block-props/use-block-refs';
+import { getBlockDOMNode } from '../utils/dom';
 
 function getComputedStyle( node ) {
 	return node.ownerDocument.defaultView.getComputedStyle( node );
@@ -23,19 +23,19 @@ export default function ColorPanel( {
 } ) {
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
-	const ref = useBlockRef( clientId );
 
 	useEffect( () => {
 		if ( ! enableContrastChecking ) {
 			return;
 		}
 
-		if ( ! ref.current ) {
+		const colorsDetectionElement = getBlockDOMNode( clientId, document );
+		if ( ! colorsDetectionElement ) {
 			return;
 		}
-		setDetectedColor( getComputedStyle( ref.current ).color );
+		setDetectedColor( getComputedStyle( colorsDetectionElement ).color );
 
-		let backgroundColorNode = ref.current;
+		let backgroundColorNode = colorsDetectionElement;
 		let backgroundColor = getComputedStyle( backgroundColorNode )
 			.backgroundColor;
 		while (

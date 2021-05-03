@@ -93,9 +93,10 @@ export default function ActionsPanel( {
 	// always mounted to retain its own component state (such as checkboxes).
 	return (
 		<>
-			{ isEntitiesSavedStatesOpen && (
-				<EntitiesSavedStates close={ closeEntitiesSavedStates } />
-			) }
+			<EntitiesSavedStates
+				isOpen={ isEntitiesSavedStatesOpen }
+				close={ closeEntitiesSavedStates }
+			/>
 			<Slot bubblesVirtually />
 			{ ! isEntitiesSavedStatesOpen && unmountableContent }
 		</>

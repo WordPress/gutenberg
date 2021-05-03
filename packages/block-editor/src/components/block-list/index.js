@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
+import { useRef, createContext, useState } from '@wordpress/element';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -15,13 +16,21 @@ import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import useBlockDropZone from '../use-block-drop-zone';
-import { useInBetweenInserter } from './use-in-between-inserter';
-import BlockTools from '../block-tools';
+import useInsertionPoint from './insertion-point';
+import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 
-function Root( { className, children } ) {
+export const BlockNodes = createContext();
+export const SetBlockNodes = createContext();
+
+export default function BlockList( { className, __experimentalLayout } ) {
+	const ref = useRef();
+	const [ blockNodes, setBlockNodes ] = useState( {} );
+	const insertionPoint = useInsertionPoint( ref );
+	usePreParsePatterns();
+
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		isTyping,
@@ -42,36 +51,31 @@ function Root( { className, children } ) {
 			isNavigationMode: _isNavigationMode(),
 		};
 	}, [] );
-	return (
-		<div
-			ref={ useMergeRefs( [
-				useBlockDropZone(),
-				useInBetweenInserter(),
-			] ) }
-			className={ classnames(
-				'block-editor-block-list__layout is-root-container',
-				className,
-				{
-					'is-typing': isTyping,
-					'is-outline-mode': isOutlineMode,
-					'is-focus-mode': isFocusMode && isLargeViewport,
-					'is-navigate-mode': isNavigationMode,
-				}
-			) }
-		>
-			{ children }
-		</div>
-	);
-}
 
-export default function BlockList( { className, __experimentalLayout } ) {
-	usePreParsePatterns();
 	return (
-		<BlockTools>
-			<Root className={ className }>
-				<BlockListItems __experimentalLayout={ __experimentalLayout } />
-			</Root>
-		</BlockTools>
+		<BlockNodes.Provider value={ blockNodes }>
+			{ insertionPoint }
+			<BlockPopover />
+			<div
+				ref={ useMergeRefs( [ ref, useBlockDropZone() ] ) }
+				className={ classnames(
+					'block-editor-block-list__layout is-root-container',
+					className,
+					{
+						'is-typing': isTyping,
+						'is-outline-mode': isOutlineMode,
+						'is-focus-mode': isFocusMode && isLargeViewport,
+						'is-navigate-mode': isNavigationMode,
+					}
+				) }
+			>
+				<SetBlockNodes.Provider value={ setBlockNodes }>
+					<BlockListItems
+						__experimentalLayout={ __experimentalLayout }
+					/>
+				</SetBlockNodes.Provider>
+			</div>
+		</BlockNodes.Provider>
 	);
 }
 

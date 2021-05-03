@@ -14,7 +14,6 @@ import {
 } from '@wordpress/blocks';
 import { createRegistryControl } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -66,7 +65,7 @@ const controls = {
 	CONVERT_BLOCK_TO_STATIC: createRegistryControl(
 		( registry ) => ( { clientId } ) => {
 			const oldBlock = registry
-				.select( blockEditorStore )
+				.select( 'core/block-editor' )
 				.getBlock( clientId );
 			const reusableBlock = registry
 				.select( 'core' )
@@ -82,7 +81,7 @@ const controls = {
 					: reusableBlock.content
 			);
 			registry
-				.dispatch( blockEditorStore )
+				.dispatch( 'core/block-editor' )
 				.replaceBlocks( oldBlock.clientId, newBlocks );
 		}
 	),
@@ -94,7 +93,7 @@ const controls = {
 					title: title || __( 'Untitled Reusable block' ),
 					content: serialize(
 						registry
-							.select( blockEditorStore )
+							.select( 'core/block-editor' )
 							.getBlocksByClientId( clientIds )
 					),
 					status: 'publish',
@@ -108,7 +107,7 @@ const controls = {
 					ref: updatedRecord.id,
 				} );
 				registry
-					.dispatch( blockEditorStore )
+					.dispatch( 'core/block-editor' )
 					.replaceBlocks( clientIds, newBlock );
 				registry
 					.dispatch( reusableBlocksStore )
@@ -133,7 +132,7 @@ const controls = {
 
 				// Remove any other blocks that reference this reusable block
 				const allBlocks = registry
-					.select( blockEditorStore )
+					.select( 'core/block-editor' )
 					.getBlocks();
 				const associatedBlocks = allBlocks.filter(
 					( block ) =>
@@ -146,7 +145,7 @@ const controls = {
 				// Remove the parsed block.
 				if ( associatedBlockClientIds.length ) {
 					registry
-						.dispatch( blockEditorStore )
+						.dispatch( 'core/block-editor' )
 						.removeBlocks( associatedBlockClientIds );
 				}
 

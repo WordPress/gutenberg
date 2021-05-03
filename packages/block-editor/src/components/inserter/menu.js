@@ -190,9 +190,6 @@ function InserterMenu( {
 							rootClientId={ rootClientId }
 							clientId={ clientId }
 							isAppender={ isAppender }
-							__experimentalInsertionIndex={
-								__experimentalInsertionIndex
-							}
 							showBlockDirectory
 							shouldFocusBlock={ shouldFocusBlock }
 						/>

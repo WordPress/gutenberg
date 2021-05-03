@@ -183,7 +183,7 @@ describe( 'controls', () => {
 				const testDispatch = () =>
 					registry.dispatch( 'store' ).normalShouldFail();
 				expect( testDispatch ).toThrow(
-					"Actions must be plain objects. Instead, the actual type was: 'number'"
+					'Actions must be plain objects. Use custom middleware for async actions.'
 				);
 			}
 		);
@@ -230,7 +230,7 @@ describe( 'controls', () => {
 				.dispatch( 'store' )
 				.withPromiseAndNonAction();
 			await expect( dispatchedAction ).rejects.toThrow(
-				"Actions must be plain objects. Instead, the actual type was: 'number'."
+				'Actions must be plain objects. Use custom middleware for async actions.'
 			);
 		} );
 	} );

@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import styled from '@emotion/styled';
+import { styled, ui } from '@wp-g2/styles';
 
 /**
  * Internal dependencies
@@ -15,13 +15,13 @@ export const ContainerView = styled.div`
 `;
 
 export const BarsWrapperView = styled.div`
-	height: ${ WRAPPER_SIZE }px;
+	height: ${ ui.value.px( WRAPPER_SIZE ) };
 	left: 0;
 	opacity: 0.6;
 	position: absolute;
 	top: 0;
 	transform-origin: top left;
-	width: ${ WRAPPER_SIZE }px;
+	width: ${ ui.value.px( WRAPPER_SIZE ) };
 `;
 
 export const BarsView = styled.div`

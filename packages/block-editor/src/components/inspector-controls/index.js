@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalStyleProvider as StyleProvider,
-	createSlotFill,
-} from '@wordpress/components';
+import { createSlotFill } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -14,11 +11,7 @@ import useDisplayBlockControls from '../use-display-block-controls';
 const { Fill, Slot } = createSlotFill( 'InspectorControls' );
 
 function InspectorControls( { children } ) {
-	return useDisplayBlockControls() ? (
-		<StyleProvider document={ document }>
-			<Fill>{ children }</Fill>
-		</StyleProvider>
-	) : null;
+	return useDisplayBlockControls() ? <Fill>{ children }</Fill> : null;
 }
 
 InspectorControls.Slot = Slot;

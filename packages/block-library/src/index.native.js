@@ -10,7 +10,6 @@ import { sortBy } from 'lodash';
 import {
 	hasBlockSupport,
 	registerBlockType,
-	registerBlockTypeFromMetadata,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -128,13 +127,10 @@ const registerBlock = ( block ) => {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	registerBlockTypeFromMetadata(
-		{
-			name,
-			...metadata,
-		},
-		settings
-	);
+	registerBlockType( name, {
+		...metadata,
+		...settings,
+	} );
 };
 
 /**
@@ -252,7 +248,7 @@ export const registerCoreBlocks = () => {
 		file,
 		audio,
 		devOnly( reusableBlock ),
-		search,
+		devOnly( search ),
 		devOnly( embed ),
 	].forEach( registerBlock );
 

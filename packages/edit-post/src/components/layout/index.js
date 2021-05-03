@@ -86,7 +86,6 @@ function Layout( { styles } ) {
 		hasBlockSelected,
 		showMostUsedBlocks,
 		isInserterOpened,
-		insertionPoint,
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
@@ -108,9 +107,6 @@ function Layout( { styles } ) {
 				'mostUsedBlocks'
 			),
 			isInserterOpened: select( editPostStore ).isInserterOpened(),
-			insertionPoint: select(
-				editPostStore
-			).__experimentalGetInsertionPoint(),
 			mode: select( editPostStore ).getEditorMode(),
 			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
@@ -216,10 +212,6 @@ function Layout( { styles } ) {
 									showMostUsedBlocks={ showMostUsedBlocks }
 									showInserterHelpPanel
 									shouldFocusBlock={ isMobileViewport }
-									rootClientId={ insertionPoint.rootClientId }
-									__experimentalInsertionIndex={
-										insertionPoint.insertionIndex
-									}
 								/>
 							</div>
 						</div>
@@ -229,10 +221,10 @@ function Layout( { styles } ) {
 					( ! isMobileViewport || sidebarIsOpened ) && (
 						<>
 							{ ! isMobileViewport && ! sidebarIsOpened && (
-								<div className="edit-post-layout__toggle-sidebar-panel">
+								<div className="edit-post-layout__toogle-sidebar-panel">
 									<Button
 										isSecondary
-										className="edit-post-layout__toggle-sidebar-panel-button"
+										className="edit-post-layout__toogle-sidebar-panel-button"
 										onClick={ openSidebarPanel }
 										aria-expanded={ false }
 									>

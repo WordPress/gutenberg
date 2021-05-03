@@ -23,37 +23,37 @@ function gutenberg_get_default_block_categories() {
 	return array(
 		array(
 			'slug'  => 'text',
-			'title' => _x( 'Text', 'block category', 'gutenberg' ),
+			'title' => _x( 'Text', 'block category' ),
 			'icon'  => null,
 		),
 		array(
 			'slug'  => 'media',
-			'title' => _x( 'Media', 'block category', 'gutenberg' ),
+			'title' => _x( 'Media', 'block category' ),
 			'icon'  => null,
 		),
 		array(
 			'slug'  => 'design',
-			'title' => _x( 'Design', 'block category', 'gutenberg' ),
+			'title' => _x( 'Design', 'block category' ),
 			'icon'  => null,
 		),
 		array(
 			'slug'  => 'widgets',
-			'title' => _x( 'Widgets', 'block category', 'gutenberg' ),
+			'title' => _x( 'Widgets', 'block category' ),
 			'icon'  => null,
 		),
 		array(
 			'slug'  => 'theme',
-			'title' => _x( 'Theme', 'block category', 'gutenberg' ),
+			'title' => _x( 'Theme', 'block category' ),
 			'icon'  => null,
 		),
 		array(
 			'slug'  => 'embed',
-			'title' => _x( 'Embeds', 'block category', 'gutenberg' ),
+			'title' => _x( 'Embeds', 'block category' ),
 			'icon'  => null,
 		),
 		array(
 			'slug'  => 'reusable',
-			'title' => _x( 'Reusable Blocks', 'block category', 'gutenberg' ),
+			'title' => _x( 'Reusable Blocks', 'block category' ),
 			'icon'  => null,
 		),
 	);
@@ -175,10 +175,10 @@ function gutenberg_get_default_block_editor_settings() {
 	$image_size_names = apply_filters(
 		'image_size_names_choose',
 		array(
-			'thumbnail' => __( 'Thumbnail', 'gutenberg' ),
-			'medium'    => __( 'Medium', 'gutenberg' ),
-			'large'     => __( 'Large', 'gutenberg' ),
-			'full'      => __( 'Full Size', 'gutenberg' ),
+			'thumbnail' => __( 'Thumbnail' ),
+			'medium'    => __( 'Medium' ),
+			'large'     => __( 'Large' ),
+			'full'      => __( 'Full Size' ),
 		)
 	);
 
@@ -191,7 +191,7 @@ function gutenberg_get_default_block_editor_settings() {
 	}
 
 	$default_size       = get_option( 'image_default_size', 'large' );
-	$image_default_size = in_array( $default_size, array_keys( $image_size_names ), true ) ? $default_size : 'large';
+	$image_default_size = in_array( $default_size, array_keys( $image_size_names ), true ) ? $image_default_size : 'large';
 
 	$image_dimensions = array();
 	$all_sizes        = wp_get_registered_image_subsizes();

@@ -43,8 +43,4 @@ module.exports = {
 		'jest-watch-typeahead/filename',
 		'jest-watch-typeahead/testname',
 	],
-	reporters: [
-		'default',
-		'<rootDir>packages/scripts/config/jest-github-actions-reporter.js',
-	],
 };

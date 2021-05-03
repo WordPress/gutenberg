@@ -438,7 +438,7 @@ return array(
 
 ## Internationalization
 
-WordPress string discovery system can automatically translate fields marked in this document as translatable. First, you need to set the `textdomain` property in the `block.json` file that provides block metadata.
+WordPress string discovery automatically will translate fields marked in the documentation as translatable using the `textdomain` property when specified in the `block.json` file. In that case, localized properties will be automatically wrapped in `_x` function calls on the backend of WordPress when executing `register_block_type_from_metadata`. These translations are added as an inline script to the `wp-block-library` script handle in WordPress core or to the plugin's script handle.
 
 **Example:**
 
@@ -451,39 +451,18 @@ WordPress string discovery system can automatically translate fields marked in t
 }
 ```
 
-### PHP
-
-In PHP, localized properties will be automatically wrapped in `_x` function calls on the backend of WordPress when executing `register_block_type_from_metadata`. These translations get added as an inline script to the plugin's script handle or to the `wp-block-library` script handle in WordPress core.
-
-The way `register_block_type_from_metadata` processes translatable values is roughly equivalent to the following code snippet:
+The way `register_block_type_from_metadata` processes translatable values is roughly equivalent to:
 
 ```php
 <?php
 $metadata = array(
 	'title'       => _x( 'My block', 'block title', 'my-plugin' ),
 	'description' => _x( 'My block is fantastic!', 'block description', 'my-plugin' ),
-	'keywords'    => array( _x( 'fantastic', 'block keyword', 'my-plugin' ) ),
+	'keywords'    => array( _x( 'fantastic', 'block keywords', 'my-plugin' ) ),
 );
 ```
 
 Implementation follows the existing [get_plugin_data](https://codex.wordpress.org/Function_Reference/get_plugin_data) function which parses the plugin contents to retrieve the plugin’s metadata, and it applies translations dynamically.
-
-### JavaScript
-
-In JavaScript, you need to use `registerBlockTypeFromMetadata` method from `@wordpress/blocks` package to process loaded block metadata. All localized properties get automatically wrapped in `_x` (from `@wordpress/i18n` package) function calls similar to how it works in PHP.
-
-**Example:**
-
-```js
-import { registerBlockTypeFromMetadata } from '@wordpress/blocks';
-import Edit from './edit';
-import metadata from './block.json';
-
-registerBlockTypeFromMetadata( metadata, {
-	edit: Edit,
-	// ...other client-side settings
-} );
-```
 
 ## Backward Compatibility
 
