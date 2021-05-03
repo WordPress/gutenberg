@@ -196,6 +196,9 @@ $color-control-label-height: 20px;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	flex-wrap: nowrap;
+	width: 100%;
+	overflow: hidden;
 	transition: all 0.1s ease-in-out;
 	@include reduce-motion("transition");
 
