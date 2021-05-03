@@ -134,6 +134,13 @@ function gutenberg_customize_widgets_init() {
 			'editor_settings' => $settings,
 		)
 	);
+
+	wp_add_inline_script(
+		'wp-blocks',
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( 'widgets_customizer' ) ) ),
+		'after'
+	);
+
 	wp_enqueue_script( 'wp-customize-widgets' );
 	wp_enqueue_style( 'wp-customize-widgets' );
 	wp_enqueue_script( 'wp-format-library' );
