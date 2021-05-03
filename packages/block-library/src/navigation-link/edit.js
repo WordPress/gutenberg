@@ -133,15 +133,44 @@ function getSuggestionsQuery( type, kind ) {
 	}
 }
 
+/**
+ * @typedef {'post-type'|'custom'|'taxonomy'} WPNavigationLinkKind
+ */
+
+/**
+ * Navigation Link Block Attributes
+ *
+ * @typedef {Object} WPNavigationLinkBlockAttributes
+ *
+ * @property {string}                [label]          Link text.
+ * @property {WPNavigationLinkKind}  [kind]           Kind is used to differentiate between term and post ids to check post draft status.
+ * @property {string}                [type]           The type such as post, page, tag, category and other custom types.
+ * @property {string}                [rel]            The relationship of the linked URL.
+ * @property {number}                [id]             A post or term id.
+ * @property {boolean}               [opensInNewTab]  Sets link target to _blank when true.
+ * @property {string}                [url]            Link href.
+ * @property {string}                [title]          Link title attribute.
+ */
+
+/**
+ * OnChange handler that updates block attributes when a link suggestion is chosen, a url is updated, or
+ * opensInNewTab is toggled
+ *
+ * @param {Object}                          updatedValue    New block attributes to update.
+ * @param {Function}                        setAttributes   Block attribute update function.
+ * @param {WPNavigationLinkBlockAttributes} blockAttributes Current block attributes.
+ *
+ */
 export const updateNavigationLinkBlockAttributes = (
 	updatedValue = {},
-	{
-		setAttributes,
+	setAttributes,
+	blockAttributes = {}
+) => {
+	const {
 		label: originalLabel = '',
 		kind: originalKind = '',
 		type: originalType = '',
-	}
-) => {
+	} = blockAttributes;
 	const {
 		title = '',
 		url = '',
@@ -170,7 +199,7 @@ export const updateNavigationLinkBlockAttributes = (
 		( ! newKind && ! isBuiltInType ) || newKind === 'custom';
 	const kind = isCustomLink ? 'custom' : newKind;
 
-	return setAttributes( {
+	setAttributes( {
 		url: encodeURI( url ),
 		label,
 		opensInNewTab,
@@ -569,7 +598,8 @@ export default function NavigationLinkEdit( {
 								onChange={ ( updatedValue ) =>
 									updateNavigationLinkBlockAttributes(
 										updatedValue,
-										{ setAttributes, label, kind, type }
+										setAttributes,
+										attributes
 									)
 								}
 							/>
