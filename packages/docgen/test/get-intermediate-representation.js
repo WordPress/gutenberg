@@ -824,57 +824,59 @@ describe( 'Intermediate Representation', () => {
 			} );
 		} );
 
-		it( 'named export', () => {
-			const tokenImportNamespace = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/named-import-namespace/exports.json'
-				),
-				'utf-8'
-			);
-			const astImportNamespace = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/named-import-namespace/ast.json'
-				),
-				'utf-8'
-			);
-			const getModuleImportNamespace = ( filePath ) => {
-				if ( filePath === './named-import-namespace-module' ) {
+		describe( 'named export', () => {
+			it( 'namespace import', () => {
+				const tokenImportNamespace = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/named-import-namespace/exports.json'
+					),
+					'utf-8'
+				);
+				const astImportNamespace = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/named-import-namespace/ast.json'
+					),
+					'utf-8'
+				);
+				const getModuleImportNamespace = ( filePath ) => {
+					if ( filePath === './named-import-namespace-module' ) {
+						return JSON.parse(
+							fs.readFileSync(
+								path.join(
+									__dirname,
+									'./fixtures/named-import-namespace/module-ir.json'
+								),
+								'utf-8'
+							)
+						);
+					}
 					return JSON.parse(
 						fs.readFileSync(
 							path.join(
 								__dirname,
-								'./fixtures/named-import-namespace/module-ir.json'
+								'./fixtures/default-function/ir.json'
 							),
 							'utf-8'
 						)
 					);
-				}
-				return JSON.parse(
-					fs.readFileSync(
-						path.join(
-							__dirname,
-							'./fixtures/default-function/ir.json'
-						),
-						'utf-8'
-					)
+				};
+				const ir = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenImportNamespace ),
+					JSON.parse( astImportNamespace ),
+					getModuleImportNamespace
 				);
-			};
-			const ir = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenImportNamespace ),
-				JSON.parse( astImportNamespace ),
-				getModuleImportNamespace
-			);
-			expect( ir ).toHaveLength( 1 );
-			expect( ir[ 0 ] ).toEqual( {
-				path: null,
-				name: 'variables',
-				description: 'Undocumented declaration.',
-				tags: [],
-				lineStart: 3,
-				lineEnd: 3,
+				expect( ir ).toHaveLength( 1 );
+				expect( ir[ 0 ] ).toEqual( {
+					path: null,
+					name: 'variables',
+					description: 'Undocumented declaration.',
+					tags: [],
+					lineStart: 3,
+					lineEnd: 3,
+				} );
 			} );
 		} );
 	} );
