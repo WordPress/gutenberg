@@ -183,19 +183,33 @@ export default class SidebarAdapter {
 		return widgetId;
 	}
 
+	_removeWidget( widget ) {
+		const settingId = widgetIdToSettingId( widget.id );
+		this.allSettings.remove( settingId );
+	}
+
 	_updateWidget( widget ) {
 		const prevWidget = this.getWidget( widget.id );
 
-		// Bail out update.
+		// Bail out update if nothing changed.
 		if ( prevWidget === widget ) {
 			return widget.id;
 		}
 
-		const settingId = widgetIdToSettingId( widget.id );
-		this.allSettings( settingId ).set( widget.instance );
-		// TODO: what about the other stuff?
+		// Update existing setting if only the widget's instance changed.
+		if (
+			prevWidget.idBase &&
+			widget.idBase &&
+			prevWidget.idBase === widget.idBase
+		) {
+			const settingId = widgetIdToSettingId( widget.id );
+			this.allSettings( settingId ).set( widget.instance );
+			return widget.id;
+		}
 
-		return widget.id;
+		// Otherwise delete and re-create.
+		this._removeWidget( widget );
+		return this._createWidget( widget );
 	}
 
 	getWidget( widgetId ) {

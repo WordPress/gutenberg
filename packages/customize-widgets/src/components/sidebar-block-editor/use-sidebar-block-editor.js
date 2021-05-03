@@ -27,7 +27,11 @@ function getWidgetId( block ) {
 function blockToWidget( block, existingWidget = null ) {
 	let widget;
 
-	if ( block.name === 'core/legacy-widget' ) {
+	const isValidLegacyWidgetBlock =
+		block.name === 'core/legacy-widget' &&
+		( block.attributes.id || block.attributes.instance );
+
+	if ( isValidLegacyWidgetBlock ) {
 		if ( block.attributes.id ) {
 			// Widget that does not extend WP_Widget.
 			widget = {

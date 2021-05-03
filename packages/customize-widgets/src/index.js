@@ -13,6 +13,7 @@ import {
 import getSidebarSection from './controls/sidebar-section';
 import getSidebarControl from './controls/sidebar-control';
 import './filters';
+import registerLegacyWidgetVariations from './register-legacy-widget-variations';
 
 const { wp } = window;
 
@@ -33,6 +34,8 @@ export function initialize( editorName, blockEditorSettings ) {
 			enableLegacyWidgetBlock: true,
 		} );
 	}
+
+	registerLegacyWidgetVariations( blockEditorSettings );
 
 	wp.customize.sectionConstructor.sidebar = getSidebarSection();
 	wp.customize.controlConstructor.sidebar_block_editor = getSidebarControl(
