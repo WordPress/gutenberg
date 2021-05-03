@@ -84,13 +84,13 @@ add_action( 'init', 'gutenberg_register_template_post_type' );
  * Registers block editor 'wp_theme' taxonomy.
  */
 function gutenberg_register_wp_theme_taxonomy() {
-	if ( ! gutenberg_supports_block_templates() ) {
+	if ( ! gutenberg_supports_block_templates() && ! WP_Theme_JSON_Resolver::theme_has_support() ) {
 		return;
 	}
 
 	register_taxonomy(
 		'wp_theme',
-		array( 'wp_template', 'wp_template_part' ),
+		array( 'wp_template', 'wp_template_part', 'wp_global_styles' ),
 		array(
 			'public'            => false,
 			'hierarchical'      => false,

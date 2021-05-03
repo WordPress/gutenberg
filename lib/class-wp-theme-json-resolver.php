@@ -311,7 +311,6 @@ class WP_Theme_JSON_Resolver {
 	private static function get_user_data_from_custom_post_type( $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
-		$post_name_filter = 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() );
 		$recent_posts     = wp_get_recent_posts(
 			array(
 				'numberposts' => 1,
@@ -319,7 +318,13 @@ class WP_Theme_JSON_Resolver {
 				'order'       => 'desc',
 				'post_type'   => $post_type_filter,
 				'post_status' => $post_status_filter,
-				'name'        => $post_name_filter,
+				'tax_query'      => array(
+					array(
+						'taxonomy' => 'wp_theme',
+						'field'    => 'name',
+						'terms'    => wp_get_theme()->get_stylesheet(),
+					),
+				),
 			)
 		);
 
@@ -332,7 +337,10 @@ class WP_Theme_JSON_Resolver {
 					'post_status'  => 'publish',
 					'post_title'   => __( 'Custom Styles', 'default' ),
 					'post_type'    => $post_type_filter,
-					'post_name'    => $post_name_filter,
+					'post_name'    => 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() ),
+					'tax_input'    => array(
+						'wp_theme' => array( wp_get_theme()->get_stylesheet() ),
+					),
 				),
 				true
 			);
