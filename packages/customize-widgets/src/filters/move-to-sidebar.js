@@ -9,13 +9,9 @@ import { without } from 'lodash';
 import { BlockControls } from '@wordpress/block-editor';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
+import { MoveToWidgetArea } from '@wordpress/widgets';
 
 const { wp } = window;
-
-/**
- * Internal dependencies
- */
-import MoveToSidebar from '../components/move-to-sidebar';
 
 /**
  * Use the customize API to get the setting for the sidebar.
@@ -83,9 +79,9 @@ const withMoveToSidebarToolbarItem = createHigherOrderComponent(
 			<>
 				<BlockEdit { ...props } />
 				<BlockControls>
-					<MoveToSidebar
-						sidebars={ getSidebars() }
-						currentSidebar={ currentSidebar }
+					<MoveToWidgetArea
+						widgetAreas={ getSidebars() }
+						currentWidgetArea={ currentSidebar }
 						onSelect={ ( newSidebarId ) => {
 							moveToSidebar(
 								widgetId,

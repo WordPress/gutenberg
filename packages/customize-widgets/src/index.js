@@ -6,6 +6,7 @@ import {
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import { registerLegacyWidgetVariations } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -13,7 +14,6 @@ import {
 import getSidebarSection from './controls/sidebar-section';
 import getSidebarControl from './controls/sidebar-control';
 import './filters';
-import registerLegacyWidgetVariations from './register-legacy-widget-variations';
 
 const { wp } = window;
 
