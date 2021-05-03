@@ -2,14 +2,12 @@
  * External dependencies
  */
 import classnames from 'classnames';
-import micromodal from 'micromodal';
 
 /**
  * WordPress dependencies
  */
 import { close, Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
-import { useEffect } from '@wordpress/element';
 import { SVG, Rect } from '@wordpress/primitives';
 
 export default function ResponsiveWrapper( props ) {
@@ -28,8 +26,10 @@ export default function ResponsiveWrapper( props ) {
 	return (
 		<>
 			<Button
-				className="wp-block-navigation__responsive-container-open"
+				aria-haspopup="true"
+				aria-expanded={ props.isOpen }
 				aria-label="Close menu"
+				className="wp-block-navigation__responsive-container-open"
 				onClick={ () => props.onToggle( true ) }
 			>
 				<SVG
