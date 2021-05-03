@@ -647,11 +647,7 @@ describe( 'Intermediate Representation', () => {
 			} );
 		} );
 
-		it( 'namespace export', () => {
-			const token = fs.readFileSync(
-				path.join( __dirname, './fixtures/namespace/exports.json' ),
-				'utf-8'
-			);
+		describe( 'namespace export', () => {
 			const getModule = () =>
 				JSON.parse(
 					fs.readFileSync(
@@ -662,74 +658,82 @@ describe( 'Intermediate Representation', () => {
 						'utf-8'
 					)
 				);
-			const irNamespace = getIntermediateRepresentation(
-				null,
-				JSON.parse( token ),
-				{ body: [] },
-				getModule
-			);
-			expect( irNamespace ).toHaveLength( 3 );
-			expect( irNamespace[ 0 ] ).toEqual( {
-				path: null,
-				name: 'MyClass',
-				description: 'Named class.',
-				tags: [],
-				lineStart: 1,
-				lineEnd: 1,
+			it( 'exports', () => {
+				const token = fs.readFileSync(
+					path.join( __dirname, './fixtures/namespace/exports.json' ),
+					'utf-8'
+				);
+				const irNamespace = getIntermediateRepresentation(
+					null,
+					JSON.parse( token ),
+					{ body: [] },
+					getModule
+				);
+				expect( irNamespace ).toHaveLength( 3 );
+				expect( irNamespace[ 0 ] ).toEqual( {
+					path: null,
+					name: 'MyClass',
+					description: 'Named class.',
+					tags: [],
+					lineStart: 1,
+					lineEnd: 1,
+				} );
+				expect( irNamespace[ 1 ] ).toEqual( {
+					path: null,
+					name: 'myFunction',
+					description: 'Named function.',
+					tags: [],
+					lineStart: 1,
+					lineEnd: 1,
+				} );
+				expect( irNamespace[ 2 ] ).toEqual( {
+					path: null,
+					name: 'myVariable',
+					description: 'Named variable.',
+					tags: [],
+					lineStart: 1,
+					lineEnd: 1,
+				} );
 			} );
-			expect( irNamespace[ 1 ] ).toEqual( {
-				path: null,
-				name: 'myFunction',
-				description: 'Named function.',
-				tags: [],
-				lineStart: 1,
-				lineEnd: 1,
-			} );
-			expect( irNamespace[ 2 ] ).toEqual( {
-				path: null,
-				name: 'myVariable',
-				description: 'Named variable.',
-				tags: [],
-				lineStart: 1,
-				lineEnd: 1,
-			} );
-			const tokenCommented = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/namespace-commented/exports.json'
-				),
-				'utf-8'
-			);
-			const irNamespaceCommented = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenCommented ),
-				{ body: [] },
-				getModule
-			);
-			expect( irNamespaceCommented ).toHaveLength( 3 );
-			expect( irNamespaceCommented[ 0 ] ).toEqual( {
-				path: null,
-				name: 'MyClass',
-				description: 'Named class.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 4,
-			} );
-			expect( irNamespaceCommented[ 1 ] ).toEqual( {
-				path: null,
-				name: 'myFunction',
-				description: 'Named function.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 4,
-			} );
-			expect( irNamespaceCommented[ 2 ] ).toEqual( {
-				path: null,
-				name: 'myVariable',
-				description: 'Named variable.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 4,
+			it( 'exports with comment', () => {
+				const tokenCommented = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/namespace-commented/exports.json'
+					),
+					'utf-8'
+				);
+				const irNamespaceCommented = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenCommented ),
+					{ body: [] },
+					getModule
+				);
+				expect( irNamespaceCommented ).toHaveLength( 3 );
+				expect( irNamespaceCommented[ 0 ] ).toEqual( {
+					path: null,
+					name: 'MyClass',
+					description: 'Named class.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
+				expect( irNamespaceCommented[ 1 ] ).toEqual( {
+					path: null,
+					name: 'myFunction',
+					description: 'Named function.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
+				expect( irNamespaceCommented[ 2 ] ).toEqual( {
+					path: null,
+					name: 'myVariable',
+					description: 'Named variable.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
 			} );
 		} );
 	} );
