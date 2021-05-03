@@ -535,54 +535,56 @@ describe( 'Intermediate Representation', () => {
 	} );
 
 	describe( 'JSDoc in module dependency', () => {
-		it( 'named export', () => {
-			const tokenImportNamed = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/named-import-named/exports.json'
-				),
-				'utf-8'
-			);
-			const getModuleImportNamed = () =>
-				JSON.parse(
-					fs.readFileSync(
-						path.join(
-							__dirname,
-							'./fixtures/named-identifiers/ir.json'
-						),
-						'utf-8'
-					)
+		describe( 'named export', () => {
+			it( 'named import', () => {
+				const tokenImportNamed = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/named-import-named/exports.json'
+					),
+					'utf-8'
 				);
-			const ir = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenImportNamed ),
-				{ body: [] },
-				getModuleImportNamed
-			);
-			expect( ir ).toHaveLength( 3 );
-			expect( ir[ 0 ] ).toEqual( {
-				path: null,
-				name: 'functionDeclaration',
-				description: 'Function declaration example.',
-				tags: [],
-				lineStart: 2,
-				lineEnd: 2,
-			} );
-			expect( ir[ 1 ] ).toEqual( {
-				path: null,
-				name: 'variableDeclaration',
-				description: 'Variable declaration example.',
-				tags: [],
-				lineStart: 3,
-				lineEnd: 3,
-			} );
-			expect( ir[ 2 ] ).toEqual( {
-				path: null,
-				name: 'ClassDeclaration',
-				description: 'Class declaration example.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 4,
+				const getModuleImportNamed = () =>
+					JSON.parse(
+						fs.readFileSync(
+							path.join(
+								__dirname,
+								'./fixtures/named-identifiers/ir.json'
+							),
+							'utf-8'
+						)
+					);
+				const ir = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenImportNamed ),
+					{ body: [] },
+					getModuleImportNamed
+				);
+				expect( ir ).toHaveLength( 3 );
+				expect( ir[ 0 ] ).toEqual( {
+					path: null,
+					name: 'functionDeclaration',
+					description: 'Function declaration example.',
+					tags: [],
+					lineStart: 2,
+					lineEnd: 2,
+				} );
+				expect( ir[ 1 ] ).toEqual( {
+					path: null,
+					name: 'variableDeclaration',
+					description: 'Variable declaration example.',
+					tags: [],
+					lineStart: 3,
+					lineEnd: 3,
+				} );
+				expect( ir[ 2 ] ).toEqual( {
+					path: null,
+					name: 'ClassDeclaration',
+					description: 'Class declaration example.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
 			} );
 		} );
 
