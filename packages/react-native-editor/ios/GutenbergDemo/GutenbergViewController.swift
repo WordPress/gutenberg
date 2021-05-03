@@ -143,7 +143,7 @@ extension GutenbergViewController: GutenbergBridgeDelegate {
         print("Gutenberg request for media uploads to be resync")
     }
 
-    func gutenbergDidRequestToSetFeaturedImage() {
+    func gutenbergDidRequestToSetFeaturedImage(for mediaID: Int32) {
         print("Gutenberg request to set featured image")
     }
 
