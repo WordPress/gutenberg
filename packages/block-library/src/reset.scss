@@ -127,7 +127,7 @@
 		transform: revert;
 	}
 
-	// Safari can have renderint issues with CSS3 transitions.
+	// Safari can have rendering issues with CSS3 transitions.
 	// By applying perspective and backface-visibility, it disappears.
 	.wp-block {
 		// Even though these properties get picked up by Chrome and Edge,
