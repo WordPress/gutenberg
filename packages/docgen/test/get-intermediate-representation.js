@@ -58,104 +58,114 @@ describe( 'Intermediate Representation', () => {
 	} );
 
 	describe( 'JSDoc in export statement', () => {
-		it( 'default export', () => {
-			const tokenClassAnonymous = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-class-anonymous/exports.json'
-				),
-				'utf-8'
-			);
-			const irClassAnonymous = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenClassAnonymous )
-			);
-			expect( irClassAnonymous ).toHaveLength( 1 );
-			expect( irClassAnonymous[ 0 ] ).toEqual( {
-				path: null,
-				name: 'default',
-				description: 'Class declaration example.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 4,
+		describe( 'default export', () => {
+			it( 'anonymous class', () => {
+				const tokenClassAnonymous = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-class-anonymous/exports.json'
+					),
+					'utf-8'
+				);
+				const irClassAnonymous = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenClassAnonymous )
+				);
+				expect( irClassAnonymous ).toHaveLength( 1 );
+				expect( irClassAnonymous[ 0 ] ).toEqual( {
+					path: null,
+					name: 'default',
+					description: 'Class declaration example.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
 			} );
-			const tokenClassNamed = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-class-named/exports.json'
-				),
-				'utf-8'
-			);
-			const irClassNamed = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenClassNamed )
-			);
-			expect( irClassNamed ).toHaveLength( 1 );
-			expect( irClassNamed[ 0 ] ).toEqual( {
-				path: null,
-				name: 'default',
-				description: 'Class declaration example.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 4,
+			it( 'named class', () => {
+				const tokenClassNamed = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-class-named/exports.json'
+					),
+					'utf-8'
+				);
+				const irClassNamed = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenClassNamed )
+				);
+				expect( irClassNamed ).toHaveLength( 1 );
+				expect( irClassNamed[ 0 ] ).toEqual( {
+					path: null,
+					name: 'default',
+					description: 'Class declaration example.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
 			} );
-			const tokenFnAnonymous = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-function-anonymous/exports.json'
-				),
-				'utf-8'
-			);
-			const irFnAnonymous = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenFnAnonymous )
-			);
-			expect( irFnAnonymous ).toHaveLength( 1 );
-			expect( irFnAnonymous[ 0 ] ).toEqual( {
-				path: null,
-				name: 'default',
-				description: 'Function declaration example.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 4,
+			it( 'anonymous function', () => {
+				const tokenFnAnonymous = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-function-anonymous/exports.json'
+					),
+					'utf-8'
+				);
+				const irFnAnonymous = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenFnAnonymous )
+				);
+				expect( irFnAnonymous ).toHaveLength( 1 );
+				expect( irFnAnonymous[ 0 ] ).toEqual( {
+					path: null,
+					name: 'default',
+					description: 'Function declaration example.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
 			} );
-			const tokenFnNamed = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-function-named/exports.json'
-				),
-				'utf-8'
-			);
-			const irFnNamed = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenFnNamed )
-			);
-			expect( irFnNamed[ 0 ] ).toEqual( {
-				path: null,
-				name: 'default',
-				description: 'Function declaration example.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 4,
+			it( 'named function', () => {
+				const tokenFnNamed = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-function-named/exports.json'
+					),
+					'utf-8'
+				);
+				const irFnNamed = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenFnNamed )
+				);
+				expect( irFnNamed[ 0 ] ).toEqual( {
+					path: null,
+					name: 'default',
+					description: 'Function declaration example.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
 			} );
-			const tokenVariable = fs.readFileSync(
-				path.join(
-					__dirname,
-					'./fixtures/default-variable/exports.json'
-				),
-				'utf-8'
-			);
-			const irVar = getIntermediateRepresentation(
-				null,
-				JSON.parse( tokenVariable )
-			);
-			expect( irVar[ 0 ] ).toEqual( {
-				path: null,
-				name: 'default',
-				description: 'Variable declaration example.',
-				tags: [],
-				lineStart: 4,
-				lineEnd: 4,
+			it( 'variable', () => {
+				const tokenVariable = fs.readFileSync(
+					path.join(
+						__dirname,
+						'./fixtures/default-variable/exports.json'
+					),
+					'utf-8'
+				);
+				const irVar = getIntermediateRepresentation(
+					null,
+					JSON.parse( tokenVariable )
+				);
+				expect( irVar[ 0 ] ).toEqual( {
+					path: null,
+					name: 'default',
+					description: 'Variable declaration example.',
+					tags: [],
+					lineStart: 4,
+					lineEnd: 4,
+				} );
 			} );
 		} );
 
