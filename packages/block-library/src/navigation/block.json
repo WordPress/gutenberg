@@ -4,7 +4,11 @@
 	"title": "Navigation",
 	"category": "design",
 	"description": "A collection of blocks that allow visitors to get around your site.",
-	"keywords": [ "menu", "navigation", "links" ],
+	"keywords": [
+		"menu",
+		"navigation",
+		"links"
+	],
 	"textdomain": "default",
 	"attributes": {
 		"orientation": {
@@ -37,7 +41,7 @@
 		},
 		"isResponsive": {
 			"type": "boolean",
-			"default": true
+			"default": false
 		}
 	},
 	"providesContext": {

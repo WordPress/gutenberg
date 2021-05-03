@@ -13,14 +13,6 @@ import { useEffect } from '@wordpress/element';
 import { SVG, Rect } from '@wordpress/primitives';
 
 export default function ResponsiveWrapper( props ) {
-	useEffect( () => {
-		if ( true === props.isResponsive ) {
-			micromodal.init( {
-				openClass: 'is-menu-open',
-			} );
-		}
-	}, [ props.isResponsive ] );
-
 	if ( ! props.isResponsive ) {
 		return props.children;
 	}
@@ -38,7 +30,6 @@ export default function ResponsiveWrapper( props ) {
 			<Button
 				className="wp-block-navigation__responsive-container-open"
 				aria-label="Close menu"
-				data-micromodal-trigger={ modalId }
 				onClick={ () => props.onToggle( true ) }
 			>
 				<SVG
@@ -63,7 +54,6 @@ export default function ResponsiveWrapper( props ) {
 				<div
 					className="wp-block-navigation__responsive-close"
 					tabIndex="-1"
-					data-micromodal-close
 				>
 					<div
 						className="wp-block-navigation__responsive-dialog"
@@ -74,7 +64,6 @@ export default function ResponsiveWrapper( props ) {
 						<Button
 							className="wp-block-navigation__responsive-container-close"
 							aria-label="Close menu"
-							data-micromodal-close
 							onClick={ () => props.onToggle( false ) }
 						>
 							<Icon icon={ close } />
