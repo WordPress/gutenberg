@@ -1,10 +1,8 @@
 /**
  * Internal dependencies
  */
-/**
- * External dependencies
- */
-import { Button, CardBody, CardHeader } from '@wp-g2/components';
+import { CardBody, CardHeader } from '../../card';
+import Button from '../../../button';
 import { Popover } from '..';
 
 export default {

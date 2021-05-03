@@ -39,3 +39,4 @@ jobs:
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
                   publish_dir: ./storybook/build
+                  force_orphan: true

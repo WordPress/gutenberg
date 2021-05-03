@@ -1,8 +1,6 @@
 /**
  * External dependencies
  */
-import memoize from 'memize';
-import { kebabCase, uniq } from 'lodash';
 import { cx } from 'emotion';
 
 /**
@@ -15,6 +13,7 @@ import warn from '@wordpress/warning';
  */
 import { useComponentsContext } from './context-system-provider';
 import { getNamespace, getConnectedNamespace } from './utils';
+import { getStyledClassNameFromKey } from './get-styled-class-name-from-key';
 
 /* eslint-disable jsdoc/valid-types */
 /**
@@ -37,16 +36,15 @@ export function useContextSystem( props, namespace ) {
 	if ( typeof namespace === 'undefined' ) {
 		warn( 'useContextSystem: Please provide a namespace' );
 	}
-	const displayName = Array.isArray( namespace ) ? namespace[ 0 ] : namespace;
 
-	const contextProps = contextSystemProps?.[ displayName ] || {};
+	const contextProps = contextSystemProps?.[ namespace ] || {};
 
 	/* eslint-disable jsdoc/no-undefined-types */
 	/** @type {ConnectedProps<P>} */
 	// @ts-ignore We fill in the missing properties below
 	const finalComponentProps = {
 		...getConnectedNamespace(),
-		...getNamespace( displayName ),
+		...getNamespace( namespace ),
 	};
 	/* eslint-enable jsdoc/no-undefined-types */
 
@@ -57,7 +55,7 @@ export function useContextSystem( props, namespace ) {
 		: props;
 
 	const classes = cx(
-		memoizedGetStyledClassNameFromKey( displayName ),
+		getStyledClassNameFromKey( namespace ),
 		props.className
 	);
 
@@ -82,37 +80,3 @@ export function useContextSystem( props, namespace ) {
 
 	return finalComponentProps;
 }
-
-/**
- * Generates the connected component CSS className based on the namespace.
- *
- * @param {string} displayName The name of the connected component.
- * @return {string} The generated CSS className.
- */
-function getStyledClassName( displayName ) {
-	if ( ! displayName || typeof displayName !== 'string' ) return '';
-
-	const kebab = kebabCase( displayName );
-	return `components-${ kebab } wp-components-${ kebab }`;
-}
-
-/**
- * Generates the connected component CSS className based on the namespace.
- *
- * @param {string} key The name of the connected component.
- * @return {string} The generated CSS className.
- */
-function getStyledClassNameFromKey( key ) {
-	if ( ! key ) return '';
-
-	if ( Array.isArray( key ) ) {
-		return cx( uniq( key ).map( getStyledClassName ) );
-	}
-	if ( typeof key === 'string' ) {
-		return getStyledClassName( key );
-	}
-
-	return '';
-}
-
-const memoizedGetStyledClassNameFromKey = memoize( getStyledClassNameFromKey );

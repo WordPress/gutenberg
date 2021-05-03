@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { quote as icon } from '@wordpress/icons';
 
 /**
@@ -18,12 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Quote', 'block title' ),
-	description: __(
-		'Give quoted text visual emphasis. "In quoting others, we cite ourselves." — Julio Cortázar'
-	),
 	icon,
-	keywords: [ __( 'blockquote' ), __( 'cite' ) ],
 	example: {
 		attributes: {
 			value:
@@ -32,14 +27,6 @@ export const settings = {
 			className: 'is-style-large',
 		},
 	},
-	styles: [
-		{
-			name: 'default',
-			label: _x( 'Default', 'block style' ),
-			isDefault: true,
-		},
-		{ name: 'large', label: _x( 'Large', 'block style' ) },
-	],
 	transforms,
 	edit,
 	save,

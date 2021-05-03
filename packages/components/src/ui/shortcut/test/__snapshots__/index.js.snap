@@ -2,9 +2,9 @@
 
 exports[`Shortcut should render a span with the shortcut text 1`] = `
 <span
-  class="components-shortcut wp-components-shortcut ic-1x9nauu"
-  data-g2-c16t="true"
-  data-g2-component="Shortcut"
+  class="components-shortcut"
+  data-wp-c16t="true"
+  data-wp-component="Shortcut"
 >
   meta + P
 </span>

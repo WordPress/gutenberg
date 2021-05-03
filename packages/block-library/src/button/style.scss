@@ -62,8 +62,12 @@ $blocks-block__margin: 0.5em;
 	}
 
 	&.wp-block-button__width-100 {
-		margin-right: 0;
-		width: 100%;
+		width: calc(100% - #{ $blocks-block__margin });
+
+		&:only-child {
+			margin-right: 0;
+			width: 100%;
+		}
 	}
 }
 

@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { columns as icon } from '@wordpress/icons';
 
 /**
@@ -19,11 +19,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Columns', 'block title' ),
 	icon,
-	description: __(
-		'Add a block that displays content in multiple columns, then add whatever content blocks you’d like.'
-	),
 	variations,
 	example: {
 		innerBlocks: [

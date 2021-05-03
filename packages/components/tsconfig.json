@@ -26,6 +26,7 @@
 		"src/shortcut/**/*",
 		"src/spinner/**/*",
 		"src/tip/**/*",
+		"src/truncate/**/*",
 		"src/ui/**/*",
 		"src/utils/**/*",
 		"src/visually-hidden/**/*",
