@@ -11,7 +11,7 @@
  * @param array    $attributes Block attributes.
  * @param string   $content    Block default content.
  * @param WP_Block $block      Block instance.
- * @return string Returns the filtered post content of the current post.
+ * @return string  Returns the filtered post content of the current post.
  */
 function render_block_core_post_content( $attributes, $content, $block ) {
 	if ( ! isset( $block->context['postId'] ) ) {
@@ -24,44 +24,36 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 
 	$content = get_the_content( null, false, $block->context['postId'] );
 
-	if ( empty( $content ) ) {
+	if ( empty( $content ) && ! is_attachment() ) {
 		return '';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
+	$attachment         = '';
+
+	add_filter( 'prepend_attachment', '__return_false' );
+	$content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', get_the_content( null, false, $block->context['postId'] ) ) );
+	remove_filter( 'prepend_attachment', '__return_false' );
 
 	if ( is_attachment() ) {
-		if ( wp_attachment_is_image( $block->context['postId'] ) ) {
-			$content = '<figure class="wp-block-image size-large">' .
-			wp_get_attachment_image( $block->context['postId'], 'large' );
-			if ( wp_get_attachment_caption( $block->context['postId'] ) ) {
-				$content .= '<figcaption>' . wp_get_attachment_caption( $block->context['postId'] ) . '</figcaption>';
-			}
-			$content .= '</figure>';
-			// Retrieve image attachment metadata.
-			$metadata = wp_get_attachment_metadata( $block->context['postId'] );
-			if ( $metadata ) {
-				$content .= sprintf(
-					'<div class="wp-block-attachment-details full-size-link"><span class="screen-reader-text">%1$s </span><a href="%2$s">%3$s &times; %4$s</a></div>',
-					esc_html_x( 'Full size', 'Used before full size attachment link.' ),
-					esc_url( wp_get_attachment_url( $block->context['postId'] ) ),
-					absint( $metadata['width'] ),
-					absint( $metadata['height'] )
-				);
-			}
+		if (
+			wp_attachment_is( 'audio', $block->context['postId'] ) ||
+			wp_attachment_is( 'video', $block->context['postId'] ) ||
+			wp_attachment_is( 'image', $block->context['postId'] )
+		) {
+			// @see https://developer.wordpress.org/reference/functions/prepend_attachment/
+			$attachment = prepend_attachment( '' );
 		} else {
-			$content = sprintf(
-				'<div class="wp-block-attachment-details"><a href="%1$s">%2$s</a></div>',
+			$attachment = sprintf(
+				'<div class="wp-block-attachment__details"><a href="%1$s">%2$s</a></div>',
 				esc_url( wp_get_attachment_url( $block->context['postId'] ) ),
 				get_the_title( $block->context['postId'] )
 			);
 		}
-	} else {
-		$content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', get_the_content( null, false, $block->context['postId'] ) ) );
 	}
 
 	return (
-		'<div ' . $wrapper_attributes . '>' . $content . '</div>'
+		'<div ' . $wrapper_attributes . '>' . $attachment . $content . '</div>'
 	);
 }
 
