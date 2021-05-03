@@ -14,6 +14,7 @@ import {
 	requestImageFailedRetryDialog,
 	requestImageUploadCancelDialog,
 	requestImageFullscreenPreview,
+	setFeaturedImage,
 } from '@wordpress/react-native-bridge';
 import {
 	CycleSelectControl,
@@ -24,6 +25,7 @@ import {
 	Image,
 	WIDE_ALIGNMENTS,
 	LinkSettingsNavigation,
+	BottomSheet,
 	BottomSheetTextControl,
 	FooterMessageLink,
 	Badge,
@@ -44,7 +46,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	image as placeholderIcon,
 	replace,
@@ -89,6 +91,7 @@ export class ImageEdit extends Component {
 		this.onSetNewTab = this.onSetNewTab.bind( this );
 		this.onSetSizeSlug = this.onSetSizeSlug.bind( this );
 		this.onImagePressed = this.onImagePressed.bind( this );
+		this.onSetFeatured = this.onSetFeatured.bind( this );
 		this.onFocusCaption = this.onFocusCaption.bind( this );
 		this.updateAlignment = this.updateAlignment.bind( this );
 		this.accessibilityLabelCreator = this.accessibilityLabelCreator.bind(
@@ -430,6 +433,54 @@ export class ImageEdit extends Component {
 		this.onSetSizeSlug( newValue );
 	}
 
+	onSetFeatured( mediaId ) {
+		const { closeSettingsBottomSheet } = this.props;
+		closeSettingsBottomSheet();
+		setFeaturedImage( mediaId );
+	}
+
+	getSetFeaturedButton( isFeaturedImage ) {
+		const { attributes, getStylesFromColorScheme } = this.props;
+
+		const featuredButtonStyle = getStylesFromColorScheme(
+			styles.featuredButton,
+			styles.featuredButtonDark
+		);
+
+		const setFeaturedButtonStyle = getStylesFromColorScheme(
+			styles.setFeaturedButton,
+			styles.setFeaturedButtonDark
+		);
+
+		return (
+			<>
+				<PanelBody>
+					{ isFeaturedImage ? (
+						<BottomSheet.Cell
+							label={ __( 'Remove as Featured Image ' ) }
+							labelStyle={ [
+								featuredButtonStyle,
+								styles.removeFeaturedButton,
+							] }
+							onPress={ () => this.onSetFeatured( 0 ) }
+						/>
+					) : (
+						<BottomSheet.Cell
+							label={ __( 'Set as Featured Image ' ) }
+							labelStyle={ [
+								featuredButtonStyle,
+								setFeaturedButtonStyle,
+							] }
+							onPress={ () =>
+								this.onSetFeatured( attributes.id )
+							}
+						/>
+					) }
+				</PanelBody>
+			</>
+		);
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
 		const {
@@ -443,12 +494,12 @@ export class ImageEdit extends Component {
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
+		const isFeaturedImage = featuredImageId === attributes.id;
+
 		const sizeOptionsValid = find( this.sizeOptions, [
 			'value',
 			imageDefaultSize,
 		] );
-
-		const isFeaturedImage = featuredImageId === attributes.id;
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -487,6 +538,7 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
+				{ this.getSetFeaturedButton( isFeaturedImage ) }
 			</InspectorControls>
 		);
 
@@ -629,6 +681,13 @@ export default compose( [
 				clientId,
 				'inserter_menu'
 			),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			closeSettingsBottomSheet() {
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+			},
 		};
 	} ),
 	withPreferredColorScheme,
