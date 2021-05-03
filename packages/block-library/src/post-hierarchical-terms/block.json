@@ -1,7 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "core/post-hierarchical-terms",
+	"title": "Post Hierarchical Terms",
 	"category": "design",
+	"description": "Post hierarchical terms.",
+	"textdomain": "default",
 	"attributes": {
 		"term": {
 			"type": "string"
