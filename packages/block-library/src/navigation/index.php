@@ -166,7 +166,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive.
 	$responsive_container_markup = isset( $attributes['isResponsive'] ) && true === $attributes['isResponsive'] ? sprintf(
-		'<button class="wp-block-navigation__responsive-container-open" data-micromodal-trigger="modal-%2$s" aria-label="Open menu"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
+		'<button aria-expanded="false" aria-haspopup="true" aria-label="Open menu" class="wp-block-navigation__responsive-container-open" data-micromodal-trigger="modal-%2$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
 			<div class="wp-block-navigation__responsive-container" id="modal-%2$s" aria-hidden="true">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
 					<div class="wp-block-navigation__responsive-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-%2$s-title" >
