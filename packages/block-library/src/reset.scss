@@ -126,4 +126,15 @@
 		cursor: revert;
 		transform: revert;
 	}
+
+	// Safari can have renderint issues with CSS3 transitions.
+	// By applying perspective and backface-visibility, it disappears.
+	.wp-block {
+		// Even though these properties get picked up by Chrome and Edge,
+		// by keeping the prefixes we're reminded that this is a hack.
+		/* eslint-disable property-no-vendor-prefix */
+		-webkit-perspective: 1;
+		-webkit-backface-visibility: none;
+		/* eslint-enable property-no-vendor-prefix */
+	}
 }
