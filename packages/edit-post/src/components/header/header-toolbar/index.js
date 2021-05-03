@@ -14,7 +14,6 @@ import {
 	NavigableToolbar,
 	BlockNavigationDropdown,
 	ToolSelector,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	TableOfContents,
@@ -54,7 +53,7 @@ function HeaderToolbar() {
 			hasInserterItems,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
-		} = select( blockEditorStore );
+		} = select( 'core/block-editor' );
 		return {
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
@@ -76,14 +75,14 @@ function HeaderToolbar() {
 			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
-			isNavigationTool: select( blockEditorStore ).isNavigationMode(),
+			isNavigationTool: select( 'core/block-editor' ).isNavigationMode(),
 			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
 	const isSmallViewport = useViewportMatch( 'small', '<' );
-	const { setNavigationMode } = useDispatch( blockEditorStore );
+	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
 	const displayBlockToolbar =
 		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;

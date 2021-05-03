@@ -185,7 +185,7 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 		>
 			{ iframeDocument &&
 				createPortal(
-					<StyleProvider document={ iframeDocument }>
+					<StyleProvider iframeDocument={ iframeDocument }>
 						{ children }
 					</StyleProvider>,
 					iframeDocument.body

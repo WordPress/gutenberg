@@ -1,19 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
+import { undo as undoIcon } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
-import { store as coreStore } from '@wordpress/core-data';
 
 export default function UndoButton() {
-	const hasUndo = useSelect( ( select ) => select( coreStore ).hasUndo() );
-	const { undo } = useDispatch( coreStore );
+	const hasUndo = useSelect( ( select ) => select( 'core' ).hasUndo() );
+	const { undo } = useDispatch( 'core' );
 	return (
 		<Button
-			icon={ ! isRTL() ? undoIcon : redoIcon }
+			icon={ undoIcon }
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }
 			// If there are no undo levels we don't want to actually disable this

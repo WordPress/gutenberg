@@ -620,32 +620,47 @@ export function* insertBlocks(
 }
 
 /**
- * Returns an action object used in signalling that the insertion point should
- * be shown.
+ * Sets the insertion point without showing it to users.
  *
- * @param {?string} rootClientId Optional root client ID of block list on
- *                               which to insert.
- * @param {?number} index        Index at which block should be inserted.
- * @param {Object}  __unstableOptions Wether or not to show an inserter button.
+ * Components like <Inserter> will default to inserting blocks at this point.
+ *
+ * @param {?string} rootClientId Root client ID of block list in which to
+ *                               insert. Use `undefined` for the root block
+ *                               list.
+ * @param {number} index         Index at which block should be inserted.
  *
  * @return {Object} Action object.
  */
-export function showInsertionPoint(
-	rootClientId,
-	index,
-	__unstableOptions = {}
-) {
-	const { __unstableWithInserter } = __unstableOptions;
+export function __unstableSetInsertionPoint( rootClientId, index ) {
 	return {
-		type: 'SHOW_INSERTION_POINT',
+		type: 'SET_INSERTION_POINT',
 		rootClientId,
 		index,
-		__unstableWithInserter,
 	};
 }
 
 /**
- * Returns an action object hiding the insertion point.
+ * Sets the insertion point and shows it to users.
+ *
+ * Components like <Inserter> will default to inserting blocks at this point.
+ *
+ * @param {?string} rootClientId Root client ID of block list in which to
+ *                               insert. Use `undefined` for the root block
+ *                               list.
+ * @param {number} index         Index at which block should be inserted.
+ *
+ * @return {Object} Action object.
+ */
+export function showInsertionPoint( rootClientId, index ) {
+	return {
+		type: 'SHOW_INSERTION_POINT',
+		rootClientId,
+		index,
+	};
+}
+
+/**
+ * Hides the insertion point for users.
  *
  * @return {Object} Action object.
  */

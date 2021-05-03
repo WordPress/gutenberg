@@ -1,7 +1,8 @@
 /**
  * External dependencies
  */
-import { css, cx } from 'emotion';
+import { useContextSystem } from '@wp-g2/context';
+import { css, cx, useResponsiveValue } from '@wp-g2/styles';
 
 /**
  * WordPress dependencies
@@ -11,13 +12,10 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
 import { getAlignmentProps } from './utils';
-import { useResponsiveValue } from '../utils/use-responsive-value';
-import CONFIG from '../../utils/config-values';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
  */
 export default function useGrid( props ) {
 	const {
@@ -52,7 +50,7 @@ export default function useGrid( props ) {
 		const gridClasses = css( {
 			alignItems: align,
 			display: isInline ? 'inline-grid' : 'grid',
-			gap: `calc( ${ CONFIG.gridBase } * ${ gap } )`,
+			gap,
 			gridTemplateColumns: gridTemplateColumns || undefined,
 			gridTemplateRows: gridTemplateRows || undefined,
 			gridRowGap: rowGap,

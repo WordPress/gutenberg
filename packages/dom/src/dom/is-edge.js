@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import isRTL from './is-rtl';
+import getComputedStyle from './get-computed-style';
 import getRangeHeight from './get-range-height';
 import getRectangleFromRange from './get-rectangle-from-range';
 import isSelectionForward from './is-selection-forward';
@@ -78,7 +78,9 @@ export default function isEdge( container, isReverse, onlyVertical = false ) {
 	}
 
 	// In the case of RTL scripts, the horizontal edge is at the opposite side.
-	const isReverseDir = isRTL( container ) ? ! isReverse : isReverse;
+	const { direction } = getComputedStyle( container );
+	const isReverseDir = direction === 'rtl' ? ! isReverse : isReverse;
+
 	const containerRect = container.getBoundingClientRect();
 
 	// To check if a selection is at the edge, we insert a test selection at the

@@ -1,14 +1,19 @@
 /**
  * WordPress dependencies
  */
-import * as icons from '@wordpress/icons';
+import { layout, header, footer } from '@wordpress/icons';
+
 /**
- * Helper function to retrieve the corresponding icon by name.
+ * Helper function to find the corresponding icon for a template part's 'area'.
  *
- * @param {string} iconName The name of the icon.
+ * @param {string} area The value of the template part 'area' tax term.
  *
  * @return {Object} The corresponding icon.
  */
-export function getTemplatePartIcon( iconName ) {
-	return icons[ iconName ] || icons.layout;
+export function getTemplatePartIconByArea( area ) {
+	const iconsByArea = {
+		footer,
+		header,
+	};
+	return iconsByArea[ area ] || layout;
 }

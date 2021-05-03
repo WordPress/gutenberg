@@ -1,11 +1,8 @@
 {
 	"apiVersion": 2,
 	"name": "core/column",
-	"title": "Column",
 	"category": "text",
 	"parent": [ "core/columns" ],
-	"description": "A single column within a columns block.",
-	"textdomain": "default",
 	"attributes": {
 		"verticalAlignment": {
 			"type": "string"

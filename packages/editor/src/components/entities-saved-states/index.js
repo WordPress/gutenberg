@@ -6,66 +6,34 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button } from '@wordpress/components';
+import { Button, withFocusReturn } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useCallback, useRef } from '@wordpress/element';
-import { store as coreStore } from '@wordpress/core-data';
-import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
+import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
 import { close as closeIcon } from '@wordpress/icons';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
 import EntityTypeList from './entity-type-list';
 
-const TRANSLATED_SITE_PROTPERTIES = {
-	title: __( 'Title' ),
-	description: __( 'Tagline' ),
-	sitelogo: __( 'Logo' ),
-	show_on_front: __( 'Show on front' ),
-	page_on_front: __( 'Page on front' ),
-};
-
-export default function EntitiesSavedStates( { close } ) {
+function EntitiesSavedStates( { isOpen, close } ) {
 	const saveButtonRef = useRef();
-	const { dirtyEntityRecords } = useSelect( ( select ) => {
-		const dirtyRecords = select(
-			coreStore
-		).__experimentalGetDirtyEntityRecords();
-
-		// Remove site object and decouple into its edited pieces.
-		const dirtyRecordsWithoutSite = dirtyRecords.filter(
-			( record ) => ! ( record.kind === 'root' && record.name === 'site' )
-		);
-
-		const siteEdits = select( coreStore ).getEntityRecordEdits(
-			'root',
-			'site'
-		);
-
-		const siteEditsAsEntities = [];
-		for ( const property in siteEdits ) {
-			siteEditsAsEntities.push( {
-				kind: 'root',
-				name: 'site',
-				title: TRANSLATED_SITE_PROTPERTIES[ property ] || property,
-				property,
-			} );
+	useEffect( () => {
+		if ( isOpen ) {
+			// Focus the save button when the saved states panel is opened
+			saveButtonRef.current?.focus();
 		}
-		const dirtyRecordsWithSiteItems = [
-			...dirtyRecordsWithoutSite,
-			...siteEditsAsEntities,
-		];
-
+	}, [ isOpen ] );
+	const { dirtyEntityRecords } = useSelect( ( select ) => {
 		return {
-			dirtyEntityRecords: dirtyRecordsWithSiteItems,
+			dirtyEntityRecords: select(
+				coreStore
+			).__experimentalGetDirtyEntityRecords(),
 		};
 	}, [] );
-	const {
-		saveEditedEntityRecord,
-		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
-	} = useDispatch( coreStore );
+	const { saveEditedEntityRecord } = useDispatch( coreStore );
 
 	// To group entities by type.
 	const partitionedSavables = Object.values(
@@ -75,69 +43,50 @@ export default function EntitiesSavedStates( { close } ) {
 	// Unchecked entities to be ignored by save function.
 	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
 
-	const setUnselectedEntities = (
-		{ kind, name, key, property },
-		checked
-	) => {
+	const setUnselectedEntities = ( { kind, name, key }, checked ) => {
 		if ( checked ) {
 			_setUnselectedEntities(
 				unselectedEntities.filter(
 					( elt ) =>
 						elt.kind !== kind ||
 						elt.name !== name ||
-						elt.key !== key ||
-						elt.property !== property
+						elt.key !== key
 				)
 			);
 		} else {
 			_setUnselectedEntities( [
 				...unselectedEntities,
-				{ kind, name, key, property },
+				{ kind, name, key },
 			] );
 		}
 	};
 
 	const saveCheckedEntities = () => {
 		const entitiesToSave = dirtyEntityRecords.filter(
-			( { kind, name, key, property } ) => {
+			( { kind, name, key } ) => {
 				return ! some(
 					unselectedEntities,
 					( elt ) =>
 						elt.kind === kind &&
 						elt.name === name &&
-						elt.key === key &&
-						elt.property === property
+						elt.key === key
 				);
 			}
 		);
 
 		close( entitiesToSave );
 
-		const siteItemsToSave = [];
-		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
-			if ( 'root' === kind && 'site' === name ) {
-				siteItemsToSave.push( property );
-			} else {
-				saveEditedEntityRecord( kind, name, key );
-			}
+		entitiesToSave.forEach( ( { kind, name, key } ) => {
+			saveEditedEntityRecord( kind, name, key );
 		} );
-		saveSpecifiedEntityEdits( 'root', 'site', undefined, siteItemsToSave );
 	};
 
 	// Explicitly define this with no argument passed.  Using `close` on
 	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => close(), [ close ] );
 
-	const [ saveDialogRef, saveDialogProps ] = useDialog( {
-		onClose: () => dismissPanel(),
-	} );
-
-	return (
-		<div
-			ref={ saveDialogRef }
-			{ ...saveDialogProps }
-			className="entities-saved-states__panel"
-		>
+	return isOpen ? (
+		<div className="entities-saved-states__panel">
 			<div className="entities-saved-states__panel-header">
 				<Button
 					ref={ saveButtonRef }
@@ -153,8 +102,8 @@ export default function EntitiesSavedStates( { close } ) {
 					{ __( 'Save' ) }
 				</Button>
 				<Button
-					icon={ closeIcon }
 					onClick={ dismissPanel }
+					icon={ closeIcon }
 					label={ __( 'Close panel' ) }
 				/>
 			</div>
@@ -180,5 +129,7 @@ export default function EntitiesSavedStates( { close } ) {
 				);
 			} ) }
 		</div>
-	);
+	) : null;
 }
+
+export default withFocusReturn( EntitiesSavedStates );

@@ -10,7 +10,6 @@ import { useEffect } from '@wordpress/element';
 import withRegistryProvider from './with-registry-provider';
 import useBlockSync from './use-block-sync';
 import { store as blockEditorStore } from '../../store';
-import { BlockRefsProvider } from './block-refs-provider';
 
 /** @typedef {import('@wordpress/data').WPDataRegistry} WPDataRegistry */
 
@@ -25,7 +24,7 @@ function BlockEditorProvider( props ) {
 	// Syncs the entity provider with changes in the block-editor store.
 	useBlockSync( props );
 
-	return <BlockRefsProvider>{ children }</BlockRefsProvider>;
+	return children;
 }
 
 export default withRegistryProvider( BlockEditorProvider );

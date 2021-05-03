@@ -27,7 +27,6 @@ import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
-import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -41,7 +40,7 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { cleanForSlug } from '../utils/url';
-import { getTemplatePartIcon } from './utils/get-template-part-icon';
+import { getTemplatePartIconByArea } from './utils/get-template-part-icon';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -1681,10 +1680,9 @@ export function __experimentalGetDefaultTemplateTypes( state ) {
  */
 export const __experimentalGetDefaultTemplatePartAreas = createSelector(
 	( state ) => {
-		const areas =
-			getEditorSettings( state )?.defaultTemplatePartAreas || [];
+		const areas = getEditorSettings( state )?.defaultTemplatePartAreas;
 		return areas?.map( ( item ) => {
-			return { ...item, icon: getTemplatePartIcon( item.icon ) };
+			return { ...item, icon: getTemplatePartIconByArea( item.area ) };
 		} );
 	},
 	( state ) => [ getEditorSettings( state )?.defaultTemplatePartAreas ]
@@ -1725,10 +1723,7 @@ export function __experimentalGetTemplateInfo( state, template ) {
 
 	const templateTitle = isString( title ) ? title : title?.rendered;
 	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
-	const templateIcon =
-		__experimentalGetDefaultTemplatePartAreas( state ).find(
-			( item ) => area === item.area
-		)?.icon || layout;
+	const templateIcon = getTemplatePartIconByArea( area );
 
 	return {
 		title:

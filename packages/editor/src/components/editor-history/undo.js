@@ -1,29 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { displayShortcut } from '@wordpress/keycodes';
-import { undo as undoIcon, redo as redoIcon } from '@wordpress/icons';
+import { undo as undoIcon } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
-
-/**
- * Internal dependencies
- */
-import { store as editorStore } from '../../store';
 
 function EditorHistoryUndo( props, ref ) {
 	const hasUndo = useSelect(
-		( select ) => select( editorStore ).hasEditorUndo(),
+		( select ) => select( 'core/editor' ).hasEditorUndo(),
 		[]
 	);
-	const { undo } = useDispatch( editorStore );
+	const { undo } = useDispatch( 'core/editor' );
 	return (
 		<Button
 			{ ...props }
 			ref={ ref }
-			icon={ ! isRTL() ? undoIcon : redoIcon }
+			icon={ undoIcon }
 			/* translators: button label text should, if possible, be under 16 characters. */
 			label={ __( 'Undo' ) }
 			shortcut={ displayShortcut.primary( 'z' ) }

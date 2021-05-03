@@ -12,11 +12,7 @@ import {
 	ComplementaryArea,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import {
-	BlockInspector,
-	store as blockEditorStore,
-} from '@wordpress/block-editor';
-
+import { BlockInspector } from '@wordpress/block-editor';
 import { cog } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
@@ -73,7 +69,7 @@ export default function Sidebar() {
 			getSelectedBlock,
 			getBlock,
 			getBlockParentsByBlockName,
-		} = select( blockEditorStore );
+		} = select( 'core/block-editor' );
 		const { getActiveComplementaryArea } = select( interfaceStore );
 
 		const selectedBlock = getSelectedBlock();
@@ -122,7 +118,7 @@ export default function Sidebar() {
 			isGeneralSidebarOpen
 		) {
 			enableComplementaryArea(
-				'core/edit-widgets',
+				editWidgetsStore,
 				BLOCK_INSPECTOR_IDENTIFIER
 			);
 		}
@@ -132,7 +128,7 @@ export default function Sidebar() {
 			isGeneralSidebarOpen
 		) {
 			enableComplementaryArea(
-				'core/edit-widgets',
+				editWidgetsStore,
 				WIDGET_AREAS_IDENTIFIER
 			);
 		}

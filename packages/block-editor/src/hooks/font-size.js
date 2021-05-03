@@ -57,12 +57,6 @@ function addSaveProps( props, blockType, attributes ) {
 		return props;
 	}
 
-	if (
-		hasBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
-	) {
-		return props;
-	}
-
 	// Use TokenList to dedupe classes.
 	const classes = new TokenList( props.className );
 	classes.add( getFontSizeClass( attributes.fontSize ) );
@@ -174,38 +168,30 @@ const withFontSizeInlineStyles = createHigherOrderComponent(
 			wrapperProps,
 		} = props;
 
-		// Only add inline styles if the block supports font sizes,
-		// doesn't skip serialization of font sizes,
-		// doesn't already have an inline font size,
-		// and does have a class to extract the font size from.
+		const newProps = { ...props };
+
+		// Only add inline styles if the block supports font sizes, doesn't
+		// already have an inline font size, and does have a class to extract
+		// the font size from.
 		if (
-			! hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) ||
-			hasBlockSupport(
-				blockName,
-				'__experimentalSkipFontSizeSerialization'
-			) ||
-			! fontSize ||
-			style?.typography?.fontSize
+			hasBlockSupport( blockName, FONT_SIZE_SUPPORT_KEY ) &&
+			fontSize &&
+			! style?.typography?.fontSize
 		) {
-			return <BlockListBlock { ...props } />;
-		}
+			const fontSizeValue = getFontSize(
+				fontSizes,
+				fontSize,
+				style?.typography?.fontSize
+			).size;
 
-		const fontSizeValue = getFontSize(
-			fontSizes,
-			fontSize,
-			style?.typography?.fontSize
-		).size;
-
-		const newProps = {
-			...props,
-			wrapperProps: {
+			newProps.wrapperProps = {
 				...wrapperProps,
 				style: {
 					fontSize: fontSizeValue,
 					...wrapperProps?.style,
 				},
-			},
-		};
+			};
+		}
 
 		return <BlockListBlock { ...newProps } />;
 	},

@@ -79,13 +79,13 @@ if ( ! hasPrettierConfig() ) {
 	];
 }
 
-// If `--ignore-path` is not explicitly specified, use the project's or global .prettierignore.
+// If `--ignore-path` is not explicitly specified, use the project's or global .eslintignore
 let ignorePath = getArgFromCLI( '--ignore-path' );
 if ( ! ignorePath ) {
-	if ( hasProjectFile( '.prettierignore' ) ) {
-		ignorePath = fromProjectRoot( '.prettierignore' );
+	if ( hasProjectFile( '.eslintignore' ) ) {
+		ignorePath = fromProjectRoot( '.eslintignore' );
 	} else {
-		ignorePath = fromConfigRoot( '.prettierignore' );
+		ignorePath = fromConfigRoot( '.eslintignore' );
 	}
 }
 const ignoreArgs = [ '--ignore-path', ignorePath ];

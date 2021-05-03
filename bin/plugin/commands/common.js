@@ -116,7 +116,6 @@ function calculateVersionBumpFromChangelog(
 		if (
 			lineNormalized.startsWith( '### deprecation' ) ||
 			lineNormalized.startsWith( '### enhancement' ) ||
-			lineNormalized.startsWith( '### new api' ) ||
 			lineNormalized.startsWith( '### new feature' )
 		) {
 			versionBump = 'minor';

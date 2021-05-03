@@ -3,13 +3,8 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type { Ref } from 'react';
-
-/**
- * Internal dependencies
- */
-import { useContextSystem, contextConnect } from '../context';
-// eslint-disable-next-line no-duplicate-imports
-import type { ViewOwnProps } from '../context';
+import type { ViewOwnProps } from '@wp-g2/create-styles';
+import { useContextSystem, contextConnect } from '@wp-g2/context';
 
 export interface ShortcutDescription {
 	display: string;

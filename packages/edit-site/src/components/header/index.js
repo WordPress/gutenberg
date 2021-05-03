@@ -42,7 +42,6 @@ export default function Header( {
 		isInserterOpen,
 		isListViewOpen,
 		listViewShortcut,
-		isLoaded,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -65,12 +64,10 @@ export default function Header( {
 			'wp_template' === postType
 				? getTemplateInfo( record ).title
 				: record?.slug;
-		const _isLoaded = !! postId;
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			entityTitle: _entityTitle,
-			isLoaded: _isLoaded,
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 			template: record,
 			templateType: postType,
@@ -149,7 +146,6 @@ export default function Header( {
 					<DocumentActions
 						entityTitle={ entityTitle }
 						entityLabel="template"
-						isLoaded={ isLoaded }
 					>
 						{ ( { onClose } ) => (
 							<TemplateDetails
@@ -163,7 +159,6 @@ export default function Header( {
 					<DocumentActions
 						entityTitle={ entityTitle }
 						entityLabel="template part"
-						isLoaded={ isLoaded }
 					/>
 				) }
 			</div>

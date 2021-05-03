@@ -193,13 +193,11 @@ const defaultTemplatePartAreas = [
 		area: 'header',
 		label: 'Header',
 		description: 'Some description of a header',
-		icon: 'header',
 	},
 	{
 		area: 'footer',
 		label: 'Footer',
 		description: 'Some description of a footer',
-		icon: 'footer',
 	},
 ];
 
@@ -2823,11 +2821,11 @@ describe( 'selectors', () => {
 	describe( '__experimentalGetDefaultTemplatePartAreas', () => {
 		const state = { editorSettings: { defaultTemplatePartAreas } };
 
-		it( 'returns empty array if there are no default template part areas', () => {
+		it( 'returns undefined if there are no default template part areas', () => {
 			const emptyState = { editorSettings: {} };
 			expect(
 				__experimentalGetDefaultTemplatePartAreas( emptyState )
-			).toHaveLength( 0 );
+			).toBeUndefined();
 		} );
 
 		it( 'returns a list of default template part areas if present in state', () => {
@@ -2884,9 +2882,7 @@ describe( 'selectors', () => {
 	} );
 
 	describe( '__experimentalGetTemplateInfo', () => {
-		const state = {
-			editorSettings: { defaultTemplateTypes, defaultTemplatePartAreas },
-		};
+		const state = { editorSettings: { defaultTemplateTypes } };
 
 		it( 'should return an empty object if no template is passed', () => {
 			expect( __experimentalGetTemplateInfo( state, null ) ).toEqual(

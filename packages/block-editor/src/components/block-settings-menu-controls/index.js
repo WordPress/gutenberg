@@ -6,11 +6,7 @@ import { compact, map } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	createSlotFill,
-	MenuGroup,
-	__experimentalStyleProvider as StyleProvider,
-} from '@wordpress/components';
+import { createSlotFill, MenuGroup } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 
 /**
@@ -22,7 +18,9 @@ import {
 } from '../convert-to-group-buttons';
 import { store as blockEditorStore } from '../../store';
 
-const { Fill, Slot } = createSlotFill( 'BlockSettingsMenuControls' );
+const { Fill: BlockSettingsMenuControls, Slot } = createSlotFill(
+	'BlockSettingsMenuControls'
+);
 
 const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	const selectedBlocks = useSelect(
@@ -64,20 +62,9 @@ const BlockSettingsMenuControlsSlot = ( { fillProps, clientIds = null } ) => {
 	);
 };
 
-/**
- * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md
- *
- * @param {Object} props  Fill props.
- * @return {WPElement} Element.
- */
-function BlockSettingsMenuControls( { ...props } ) {
-	return (
-		<StyleProvider document={ document }>
-			<Fill { ...props } />
-		</StyleProvider>
-	);
-}
-
 BlockSettingsMenuControls.Slot = BlockSettingsMenuControlsSlot;
 
+/**
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/block-settings-menu-controls/README.md
+ */
 export default BlockSettingsMenuControls;

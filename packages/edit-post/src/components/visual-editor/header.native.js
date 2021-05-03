@@ -7,7 +7,6 @@ import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { PostTitle } from '@wordpress/editor';
 import { ReadableContentView } from '@wordpress/components';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -53,7 +52,7 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { editPost } = dispatch( 'core/editor' );
 
-		const { clearSelectedBlock } = dispatch( blockEditorStore );
+		const { clearSelectedBlock } = dispatch( 'core/block-editor' );
 
 		return {
 			clearSelectedBlock,

@@ -7,39 +7,22 @@ import { isNumber, isString } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useInstanceId } from '@wordpress/compose';
 import { textColor } from '@wordpress/icons';
-import { useMemo, forwardRef, Platform } from '@wordpress/element';
+import { useMemo, forwardRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import RangeControl from '../range-control';
-import UnitControl from '../unit-control';
 import CustomSelectControl from '../custom-select-control';
 import VisuallyHidden from '../visually-hidden';
+import { withNextComponent } from './next';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';
 const MAX_FONT_SIZE_DISPLAY = '25px';
-const isWeb = Platform.OS === 'web';
-const CSS_UNITS = [
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-	},
-];
 
 function getSelectValueFromFontSize( fontSizes, value ) {
 	if ( value ) {
@@ -95,6 +78,8 @@ function FontSizePicker(
 	const isPixelValue =
 		isNumber( value ) || ( isString( value ) && value.endsWith( 'px' ) );
 
+	const instanceId = useInstanceId( FontSizePicker );
+
 	const options = useMemo(
 		() => getSelectOptions( fontSizes, disableCustomFontSizes ),
 		[ fontSizes, disableCustomFontSizes ]
@@ -105,6 +90,8 @@ function FontSizePicker(
 	}
 
 	const selectedFontSizeSlug = getSelectValueFromFontSize( fontSizes, value );
+
+	const fontSizePickerNumberId = `components-font-size-picker__number#${ instanceId }`;
 
 	return (
 		<fieldset
@@ -131,20 +118,33 @@ function FontSizePicker(
 					/>
 				) }
 				{ ! withSlider && ! disableCustomFontSizes && (
-					<UnitControl
-						label={ __( 'Custom' ) }
-						labelPosition="top"
-						__unstableInputWidth="60px"
-						value={ value }
-						onChange={ ( nextSize ) => {
-							if ( 0 === parseFloat( nextSize ) || ! nextSize ) {
-								onChange( undefined );
-							} else {
-								onChange( nextSize );
-							}
-						} }
-						units={ CSS_UNITS }
-					/>
+					<div className="components-font-size-picker__number-container">
+						<label htmlFor={ fontSizePickerNumberId }>
+							{ __( 'Custom' ) }
+						</label>
+						<input
+							id={ fontSizePickerNumberId }
+							className="components-font-size-picker__number"
+							type="number"
+							min={ 1 }
+							onChange={ ( event ) => {
+								if (
+									! event.target.value &&
+									event.target.value !== 0
+								) {
+									onChange( undefined );
+									return;
+								}
+								if ( hasUnits ) {
+									onChange( event.target.value + 'px' );
+								} else {
+									onChange( Number( event.target.value ) );
+								}
+							} }
+							aria-label={ __( 'Custom' ) }
+							value={ ( isPixelValue && noUnitsValue ) || '' }
+						/>
+					</div>
 				) }
 				<Button
 					className="components-color-palette__clear"
@@ -177,4 +177,4 @@ function FontSizePicker(
 	);
 }
 
-export default forwardRef( FontSizePicker );
+export default withNextComponent( forwardRef( FontSizePicker ) );

@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { __, _x } from '@wordpress/i18n';
 import { list as icon } from '@wordpress/icons';
 
 /**
@@ -16,7 +17,14 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
+	title: _x( 'List', 'block title' ),
+	description: __( 'Create a bulleted or numbered list.' ),
 	icon,
+	keywords: [
+		__( 'bullet list' ),
+		__( 'ordered list' ),
+		__( 'numbered list' ),
+	],
 	example: {
 		attributes: {
 			values:

@@ -6,7 +6,7 @@ import { shallow } from 'enzyme';
 /**
  * Internal dependencies
  */
-import { DefaultBlockAppender, ZWNBSP } from '../';
+import { DefaultBlockAppender } from '../';
 
 describe( 'DefaultBlockAppender', () => {
 	const expectOnAppendCalled = ( onAppend ) => {
@@ -35,7 +35,7 @@ describe( 'DefaultBlockAppender', () => {
 			<DefaultBlockAppender isVisible onAppend={ onAppend } showPrompt />
 		);
 
-		wrapper.find( 'p' ).simulate( 'focus' );
+		wrapper.find( 'ForwardRef' ).simulate( 'focus' );
 
 		expect( wrapper ).toMatchSnapshot();
 
@@ -51,9 +51,9 @@ describe( 'DefaultBlockAppender', () => {
 				showPrompt={ false }
 			/>
 		);
-		const input = wrapper.find( 'p' );
+		const input = wrapper.find( 'ForwardRef' );
 
-		expect( input.prop( 'children' ) ).toEqual( ZWNBSP );
+		expect( input.prop( 'value' ) ).toEqual( '' );
 
 		expect( wrapper ).toMatchSnapshot();
 	} );

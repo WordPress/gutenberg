@@ -13,8 +13,7 @@ import {
 	CardBody,
 	CardFooter,
 	Text,
-	Heading,
-} from '@wordpress/components';
+} from '@wordpress/components/ui';
 
 function Example() {
 	return (

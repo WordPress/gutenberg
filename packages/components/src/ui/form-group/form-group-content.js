@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { ui } from '@wp-g2/styles';
+
+/**
  * WordPress dependencies
  */
 import { useMemo, memo } from '@wordpress/element';
@@ -12,7 +17,7 @@ import FormGroupHelp from './form-group-help';
 import FormGroupLabel from './form-group-label';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').FormGroupContentProps, 'label'>} props
+ * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FormGroupContentProps, 'label'>} props
  */
 function FormGroupContent( {
 	alignLabel,
@@ -32,7 +37,11 @@ function FormGroupContent( {
 	] );
 
 	const content = help ? (
-		<VStack expanded={ false } spacing={ spacing }>
+		<VStack
+			expanded={ false }
+			{ ...ui.$( 'FormGroupContentContainer' ) }
+			spacing={ spacing }
+		>
 			{ children }
 			<FormGroupHelp>{ help }</FormGroupHelp>
 		</VStack>

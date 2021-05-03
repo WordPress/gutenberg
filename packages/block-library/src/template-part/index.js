@@ -8,6 +8,7 @@ import { startCase } from 'lodash';
  */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
+import { __, _x } from '@wordpress/i18n';
 import { layout } from '@wordpress/icons';
 
 /**
@@ -15,13 +16,18 @@ import { layout } from '@wordpress/icons';
  */
 import metadata from './block.json';
 import edit from './edit';
-import './variations';
+import variations from './variations';
 
 const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
+	title: _x( 'Template Part', 'block title' ),
+	description: __(
+		'Edit the different global regions of your site, like the header, footer, sidebar, or create your own.'
+	),
 	icon: layout,
+	keywords: [ __( 'template part' ) ],
 	__experimentalLabel: ( { slug, theme } ) => {
 		// Attempt to find entity title if block is a template part.
 		// Require slug to request, otherwise entity is uncreated and will throw 404.
@@ -41,4 +47,5 @@ export const settings = {
 		return startCase( entity.title?.rendered || entity.slug );
 	},
 	edit,
+	variations,
 };

@@ -3,7 +3,6 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -15,7 +14,7 @@ import CharacterCount from '../character-count';
 function TableOfContentsPanel( { hasOutlineItemsDisabled, onRequestClose } ) {
 	const { headingCount, paragraphCount, numberOfBlocks } = useSelect(
 		( select ) => {
-			const { getGlobalBlockCount } = select( blockEditorStore );
+			const { getGlobalBlockCount } = select( 'core/block-editor' );
 			return {
 				headingCount: getGlobalBlockCount( 'core/heading' ),
 				paragraphCount: getGlobalBlockCount( 'core/paragraph' ),

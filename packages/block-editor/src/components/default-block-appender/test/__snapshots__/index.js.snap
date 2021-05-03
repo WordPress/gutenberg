@@ -2,13 +2,12 @@
 
 exports[`DefaultBlockAppender should append a default block when input focused 1`] = `
 <div
-  className="block-editor-default-block-appender"
+  className="wp-block block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <p
+  <ForwardRef
     aria-label="Add block"
-    className="wp-block block-editor-default-block-appender__content"
-    contentEditable={true}
+    className="block-editor-default-block-appender__content"
     onFocus={
       [MockFunction] {
         "calls": Array [
@@ -22,12 +21,10 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
         ],
       }
     }
+    readOnly={true}
     role="button"
-    suppressContentEditableWarning={true}
-    tabIndex="0"
-  >
-    Type / to choose a block
-  </p>
+    value="Type / to choose a block"
+  />
   <WithSelect(WithDispatch(IfCondition(Inserter)))
     __experimentalIsQuick={true}
     isAppender={true}
@@ -38,20 +35,17 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
 
 exports[`DefaultBlockAppender should match snapshot 1`] = `
 <div
-  className="block-editor-default-block-appender"
+  className="wp-block block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <p
+  <ForwardRef
     aria-label="Add block"
-    className="wp-block block-editor-default-block-appender__content"
-    contentEditable={true}
+    className="block-editor-default-block-appender__content"
     onFocus={[MockFunction]}
+    readOnly={true}
     role="button"
-    suppressContentEditableWarning={true}
-    tabIndex="0"
-  >
-    Type / to choose a block
-  </p>
+    value="Type / to choose a block"
+  />
   <WithSelect(WithDispatch(IfCondition(Inserter)))
     __experimentalIsQuick={true}
     isAppender={true}
@@ -62,20 +56,17 @@ exports[`DefaultBlockAppender should match snapshot 1`] = `
 
 exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
 <div
-  className="block-editor-default-block-appender"
+  className="wp-block block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <p
+  <ForwardRef
     aria-label="Add block"
-    className="wp-block block-editor-default-block-appender__content"
-    contentEditable={true}
+    className="block-editor-default-block-appender__content"
     onFocus={[MockFunction]}
+    readOnly={true}
     role="button"
-    suppressContentEditableWarning={true}
-    tabIndex="0"
-  >
-    ﻿
-  </p>
+    value=""
+  />
   <WithSelect(WithDispatch(IfCondition(Inserter)))
     __experimentalIsQuick={true}
     isAppender={true}

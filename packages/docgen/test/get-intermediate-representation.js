@@ -170,8 +170,6 @@ describe( 'Intermediate Representation', () => {
 					{
 						tag: 'type',
 						type: 'MyDeclaration',
-						name: '',
-						description: '',
 					},
 				],
 				lineStart: 4,
@@ -278,8 +276,6 @@ describe( 'Intermediate Representation', () => {
 					{
 						tag: 'type',
 						type: 'ClassDeclaration',
-						name: '',
-						description: '',
 					},
 				],
 				lineStart: 6,
@@ -423,8 +419,6 @@ describe( 'Intermediate Representation', () => {
 					{
 						tag: 'type',
 						type: 'ClassDeclaration',
-						name: '',
-						description: '',
 					},
 				],
 				lineStart: 16,
@@ -466,8 +460,6 @@ describe( 'Intermediate Representation', () => {
 					{
 						tag: 'type',
 						type: 'ClassDeclaration',
-						name: '',
-						description: '',
 					},
 				],
 				lineStart: 11,

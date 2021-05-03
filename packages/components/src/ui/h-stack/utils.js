@@ -36,7 +36,7 @@ const V_ALIGNMENTS = {
 /* eslint-disable jsdoc/valid-types */
 /**
  * @param {import('./types').HStackAlignment | import('react').CSSProperties[ 'alignItems' ]} alignment Where to align.
- * @param {import('../../flex/types').FlexDirection} [direction='row'] Direction to align.
+ * @param {import('../flex/types').FlexDirection} [direction='row'] Direction to align.
  * @return {import('./types').AlignmentProps} Alignment props.
  */
 /* eslint-enable jsdoc/valid-types */

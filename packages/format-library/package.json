@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/format-library",
-	"version": "1.27.3",
+	"version": "1.27.2",
 	"description": "Format library for the WordPress editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -17,9 +17,6 @@
 	},
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
-	},
-	"engines": {
-		"node": ">=12"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",

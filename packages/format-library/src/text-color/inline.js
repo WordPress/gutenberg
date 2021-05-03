@@ -20,7 +20,6 @@ import {
 	getColorClassName,
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 /**
@@ -49,7 +48,7 @@ export function getActiveColor( formatName, formatValue, colors ) {
 
 const ColorPicker = ( { name, value, onChange } ) => {
 	const colors = useSelect( ( select ) => {
-		const { getSettings } = select( blockEditorStore );
+		const { getSettings } = select( 'core/block-editor' );
 		return get( getSettings(), [ 'colors' ], [] );
 	} );
 	const onColorChange = useCallback(

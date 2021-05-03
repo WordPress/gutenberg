@@ -264,21 +264,15 @@ export function setIsNavigationPanelOpened( isOpen ) {
 }
 
 /**
- * Returns an action object used to open/close the inserter.
+ * Sets whether the block inserter panel should be open.
  *
- * @param {boolean|Object} value                Whether the inserter should be
- *                                              opened (true) or closed (false).
- *                                              To specify an insertion point,
- *                                              use an object.
- * @param {string}         value.rootClientId   The root client ID to insert at.
- * @param {number}         value.insertionIndex The index to insert at.
- *
- * @return {Object} Action object.
+ * @param {boolean} isOpen If true, opens the inserter. If false, closes it. It
+ *                         does not toggle the state, but sets it directly.
  */
-export function setIsInserterOpened( value ) {
+export function setIsInserterOpened( isOpen ) {
 	return {
 		type: 'SET_IS_INSERTER_OPENED',
-		value,
+		isOpen,
 	};
 }
 

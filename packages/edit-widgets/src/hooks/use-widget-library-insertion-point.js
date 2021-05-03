@@ -2,7 +2,6 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -28,7 +27,7 @@ const useWidgetLibraryInsertionPoint = () => {
 				getBlockSelectionEnd,
 				getBlockOrder,
 				getBlockIndex,
-			} = select( blockEditorStore );
+			} = select( 'core/block-editor' );
 
 			const clientId = getBlockSelectionEnd() || firstRootId;
 			const rootClientId = getBlockRootClientId( clientId );

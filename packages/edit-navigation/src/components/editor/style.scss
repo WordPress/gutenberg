@@ -47,9 +47,7 @@
 			}
 
 			// Menu items.
-			// This needs high specificity.
-			.wp-block-navigation-link__content.wp-block-navigation-link__content.wp-block-navigation-link__content {
-				padding: 0.5em 1em;
+			.wp-block-navigation-link__content {
 				margin-bottom: 6px;
 				border-radius: $radius-block-ui;
 

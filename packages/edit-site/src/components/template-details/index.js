@@ -43,13 +43,11 @@ export default function TemplateDetails( { template, onClose } ) {
 	return (
 		<>
 			<div className="edit-site-template-details">
-				<Text size="body" weight={ 600 }>
-					{ title }
-				</Text>
+				<Text variant="subtitle">{ title }</Text>
 
 				{ description && (
 					<Text
-						size="body"
+						variant="body"
 						className="edit-site-template-details__description"
 					>
 						{ description }
