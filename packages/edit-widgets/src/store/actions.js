@@ -193,16 +193,22 @@ export function* saveWidgetArea( widgetAreaId ) {
 	}
 
 	const records = yield dispatch( 'core', '__experimentalBatch', batchTasks );
+	const preservedRecords = records.filter(
+		( record ) => ! record.hasOwnProperty( 'deleted' )
+	);
 
 	const failedWidgetNames = [];
 
-	for ( let i = 0; i < records.length; i++ ) {
-		// Deleted widgets have a record but they don't have meta.
-		if ( ! batchMeta[ i ] ) {
-			continue;
-		}
-		const widget = records[ i ];
+	for ( let i = 0; i < preservedRecords.length; i++ ) {
+		const widget = preservedRecords[ i ];
 		const { block, position } = batchMeta[ i ];
+
+		yield dispatch(
+			'core/block-editor',
+			'updateBlockAttributes',
+			block.clientId,
+			{ __internalWidgetId: widget.id }
+		);
 
 		const error = yield select(
 			'core',
