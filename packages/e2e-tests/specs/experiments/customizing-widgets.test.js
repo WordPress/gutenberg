@@ -57,6 +57,8 @@ describe( 'Widgets Customizer', () => {
 		await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
+		await waitForPreviewIframe();
+
 		await addBlock( 'Heading' );
 		await page.keyboard.type( 'My Heading' );
 
@@ -240,6 +242,8 @@ describe( 'Widgets Customizer', () => {
 		await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
+		await waitForPreviewIframe();
+
 		const documentTools = await find( {
 			role: 'toolbar',
 			name: 'Document tools',
@@ -347,6 +351,8 @@ describe( 'Widgets Customizer', () => {
 
 		await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
+
+		await waitForPreviewIframe();
 
 		await addBlock( 'Heading' );
 		await page.keyboard.type( 'First Heading' );
