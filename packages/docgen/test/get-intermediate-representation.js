@@ -10,43 +10,50 @@ const path = require( 'path' );
 const getIntermediateRepresentation = require( '../lib/get-intermediate-representation' );
 
 describe( 'Intermediate Representation', () => {
-	it( 'undocumented', () => {
-		const token = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/default-undocumented-nocomments/exports.json'
-			),
-			'utf-8'
-		);
-		const ir = getIntermediateRepresentation( null, JSON.parse( token ) );
-		expect( ir ).toHaveLength( 1 );
-		expect( ir[ 0 ] ).toEqual( {
-			path: null,
-			name: 'default',
-			description: 'Undocumented declaration.',
-			tags: [],
-			lineStart: 3,
-			lineEnd: 3,
+	describe( 'undocumented code', () => {
+		it( 'default export on multiple lines', () => {
+			const token = fs.readFileSync(
+				path.join(
+					__dirname,
+					'./fixtures/default-undocumented-nocomments/exports.json'
+				),
+				'utf-8'
+			);
+			const ir = getIntermediateRepresentation(
+				null,
+				JSON.parse( token )
+			);
+			expect( ir ).toHaveLength( 1 );
+			expect( ir[ 0 ] ).toEqual( {
+				path: null,
+				name: 'default',
+				description: 'Undocumented declaration.',
+				tags: [],
+				lineStart: 3,
+				lineEnd: 3,
+			} );
 		} );
-		const tokenOneliner = fs.readFileSync(
-			path.join(
-				__dirname,
-				'./fixtures/default-undocumented-oneliner/exports.json'
-			),
-			'utf-8'
-		);
-		const irOneliner = getIntermediateRepresentation(
-			null,
-			JSON.parse( tokenOneliner )
-		);
-		expect( irOneliner ).toHaveLength( 1 );
-		expect( irOneliner[ 0 ] ).toEqual( {
-			path: null,
-			name: 'default',
-			description: 'Undocumented declaration.',
-			tags: [],
-			lineStart: 2,
-			lineEnd: 2,
+		it( 'default export on one line', () => {
+			const tokenOneliner = fs.readFileSync(
+				path.join(
+					__dirname,
+					'./fixtures/default-undocumented-oneliner/exports.json'
+				),
+				'utf-8'
+			);
+			const irOneliner = getIntermediateRepresentation(
+				null,
+				JSON.parse( tokenOneliner )
+			);
+			expect( irOneliner ).toHaveLength( 1 );
+			expect( irOneliner[ 0 ] ).toEqual( {
+				path: null,
+				name: 'default',
+				description: 'Undocumented declaration.',
+				tags: [],
+				lineStart: 2,
+				lineEnd: 2,
+			} );
 		} );
 	} );
 
