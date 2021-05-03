@@ -11,7 +11,7 @@ import {
 import { ToolbarButton, Spinner, Placeholder } from '@wordpress/components';
 import { brush as brushIcon, update as updateIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useCallback } from '@wordpress/element';
+import { useState, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 
@@ -20,17 +20,16 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import WidgetTypeSelector from './widget-type-selector';
 import InspectorCard from './inspector-card';
-import FormWrapper from './form-wrapper';
 import Form from './form';
 import Preview from './preview';
 import NoPreview from './no-preview';
-import useForm from './use-form';
 import ConvertToBlocksButton from './convert-to-blocks-button';
 
 export default function Edit( props ) {
 	const { id, idBase } = props.attributes;
 	return (
 		<div { ...useBlockProps() }>
+			{ JSON.stringify( props.attributes ) }
 			{ ! id && ! idBase ? (
 				<Empty { ...props } />
 			) : (
@@ -80,6 +79,8 @@ function NotEmpty( {
 	clientId,
 	isSelected,
 } ) {
+	const [ hasPreview, setHasPreview ] = useState( false );
+
 	const {
 		widgetType,
 		hasResolvedWidgetType,
@@ -106,13 +107,6 @@ function NotEmpty( {
 	const setInstance = useCallback( ( nextInstance ) => {
 		setAttributes( { instance: nextInstance } );
 	}, [] );
-
-	const { content, setFormData, hasPreview } = useForm( {
-		id,
-		idBase,
-		instance,
-		setInstance,
-	} );
 
 	if ( ! widgetType && hasResolvedWidgetType ) {
 		return (
@@ -169,17 +163,15 @@ function NotEmpty( {
 				/>
 			</InspectorControls>
 
-			<FormWrapper
+			<Form
 				title={ widgetType.name }
 				isVisible={ mode === 'edit' }
-			>
-				<Form
-					id={ id }
-					idBase={ idBase }
-					content={ content }
-					setFormData={ setFormData }
-				/>
-			</FormWrapper>
+				id={ id }
+				idBase={ idBase }
+				instance={ instance }
+				onChangeInstance={ setInstance }
+				onChangeHasPreview={ setHasPreview }
+			/>
 
 			{ idBase &&
 				( hasPreview ? (
