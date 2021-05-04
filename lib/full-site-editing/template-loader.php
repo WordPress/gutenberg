@@ -68,8 +68,8 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 
 	// Allow falling back to a PHP template if it has a higher priority than the block template.
 	$current_template_slug       = str_replace(
-		array( trailingslashit( get_stylesheet_directory() ), '.php' ),
-		array( '', '' ),
+		array( trailingslashit( get_stylesheet_directory() ), trailingslashit( get_template_directory() ), '.php' ),
+		'',
 		$template
 	);
 	$current_block_template_slug = is_object( $current_template ) ? $current_template->slug : false;
