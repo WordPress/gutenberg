@@ -119,15 +119,13 @@ export function* saveWidgetArea( widgetAreaId ) {
 	} );
 
 	// Get all widgets that have been deleted
-	const deletedWidgets = areaWidgets.filter( ( widget ) => {
-		const { id } = widget;
-		return (
-			widgetsBlocks.findIndex(
+	const deletedWidgets = areaWidgets.filter(
+		( { id } ) =>
+			! widgetsBlocks.some(
 				( { attributes: { __internalWidgetId } } ) =>
 					__internalWidgetId === id
-			) === -1
-		);
-	} );
+			)
+	);
 
 	const batchMeta = [];
 	const batchTasks = [];
@@ -184,9 +182,9 @@ export function* saveWidgetArea( widgetAreaId ) {
 			clientId: block.clientId,
 		} );
 	}
-	for ( let i = 0; i < deletedWidgets.length; i++ ) {
+	for ( const widget of deletedWidgets ) {
 		batchTasks.push( ( { deleteEntityRecord } ) =>
-			deleteEntityRecord( 'root', 'widget', deletedWidgets[ i ].id, {
+			deleteEntityRecord( 'root', 'widget', widget.id, {
 				force: true,
 			} )
 		);
