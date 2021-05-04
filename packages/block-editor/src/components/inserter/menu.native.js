@@ -32,7 +32,7 @@ function InserterMenu( {
 	insertionIndex,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ searchFocus, setSearchFocus ] = useState( false );
+	const [ showTabs, setShowTabs ] = useState( true );
 	// eslint-disable-next-line no-undef
 	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
 	const [ tabIndex, setTabIndex ] = useState( 0 );
@@ -154,32 +154,23 @@ function InserterMenu( {
 		[ setFilterValue ]
 	);
 
-	const onFocusSearch = useCallback(
-		( focus ) => {
-			LayoutAnimation.configureNext(
-				LayoutAnimation.Presets.easeInEaseOut
-			);
-			setSearchFocus( focus );
-		},
-		[ setSearchFocus ]
-	);
-
 	const showReusableBlocks = ! rootClientId;
 
 	return (
 		<BottomSheet
 			isVisible={ true }
 			onClose={ onClose }
+			onKeyboardShow={ () => setShowTabs( false ) }
+			onKeyboardHide={ () => setShowTabs( true ) }
 			header={
 				<>
 					{ showSearchForm && (
 						<InserterSearchForm
 							onChange={ onChangeSearch }
-							onFocus={ onFocusSearch }
 							value={ filterValue }
 						/>
 					) }
-					{ ! searchFocus && ! filterValue && hasReusableBlocks && (
+					{ showTabs && ! filterValue && hasReusableBlocks && (
 						<InserterTabs.Control
 							onChangeTab={ setTabIndex }
 							showReusableBlocks={ showReusableBlocks }
@@ -194,7 +185,7 @@ function InserterMenu( {
 			<BottomSheetConsumer>
 				{ ( { listProps } ) => (
 					<TouchableHighlight accessible={ false }>
-						{ searchFocus || filterValue ? (
+						{ ! showTabs || filterValue ? (
 							<InserterSearchResults
 								rootClientId={ rootClientId }
 								filterValue={ filterValue }
