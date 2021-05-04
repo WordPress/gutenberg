@@ -1,16 +1,10 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
 import {
-	BlockToolbar,
 	NavigableToolbar,
 	BlockNavigationDropdown,
 	ToolSelector,
@@ -35,13 +29,10 @@ function HeaderToolbar() {
 	const inserterButton = useRef();
 	const { setIsInserterOpened } = useDispatch( editPostStore );
 	const {
-		hasFixedToolbar,
 		isInserterEnabled,
 		isInserterOpened,
 		isTextModeEnabled,
-		previewDeviceType,
 		showIconLabels,
-		isTemplateMode,
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
@@ -49,9 +40,6 @@ function HeaderToolbar() {
 			getBlockSelectionEnd,
 		} = select( blockEditorStore );
 		return {
-			hasFixedToolbar: select( editPostStore ).isFeatureActive(
-				'fixedToolbar'
-			),
 			// This setting (richEditingEnabled) should not live in the block editor's setting.
 			isInserterEnabled:
 				select( editPostStore ).getEditorMode() === 'visual' &&
@@ -63,26 +51,16 @@ function HeaderToolbar() {
 			isInserterOpened: select( editPostStore ).isInserterOpened(),
 			isTextModeEnabled:
 				select( editPostStore ).getEditorMode() === 'text',
-			previewDeviceType: select(
-				editPostStore
-			).__experimentalGetPreviewDeviceType(),
 			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
-			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
 
-	const displayBlockToolbar =
-		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
-
-	const toolbarAriaLabel = displayBlockToolbar
-		? /* translators: accessibility text for the editor toolbar when Top Toolbar is on */
-		  __( 'Document and block tools' )
-		: /* translators: accessibility text for the editor toolbar when Top Toolbar is off */
-		  __( 'Document tools' );
+	/* translators: accessibility text for the editor toolbar */
+	const toolbarAriaLabel = __( 'Document tools' );
 
 	const overflowItems = (
 		<>
@@ -163,19 +141,6 @@ function HeaderToolbar() {
 			</div>
 
 			<TemplateTitle />
-
-			{ displayBlockToolbar && (
-				<div
-					className={ classnames(
-						'edit-post-header-toolbar__block-toolbar',
-						{
-							'is-pushed-down': isTemplateMode,
-						}
-					) }
-				>
-					<BlockToolbar hideDragHandle />
-				</div>
-			) }
 		</NavigableToolbar>
 	);
 }
