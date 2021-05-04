@@ -130,7 +130,6 @@ describe( 'TypeWriter', () => {
 				wp.dom.getScrollContainer( document.activeElement ).scrollTop >
 				2
 		);
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		expect( await getDiff( initialPosition ) ).toBe( 0 );
 	} );
 
