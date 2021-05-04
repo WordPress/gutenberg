@@ -49,7 +49,13 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": true
+		"align": true,
+		"color": {
+			"gradients": true,
+			"link": true
+		},
+		"fontSize": true,
+		"__experimentalFontFamily": true
 	},
 	"editorStyle": "wp-block-file-editor",
 	"style": "wp-block-file"
