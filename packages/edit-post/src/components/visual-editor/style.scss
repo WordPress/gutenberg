@@ -73,3 +73,41 @@
 		color: $gray-100;
 	}
 }
+
+
+// Begin proof of concept
+.is-template-mode {
+	// Hide editability of all blocks inside the Post Content block
+	.wp-block-post-content {
+		> * {
+			pointer-events: none;
+		}
+	}
+
+	// Hide inline inserters
+	.popover-slot {
+		.block-editor-block-list__insertion-point {
+			display: none !important;
+		}
+	}
+
+	// Hide editability of text based post blocks
+	.wp-block-post-title,
+	.wp-block-post-author,
+	.wp-block-post-date,
+	.wp-block-post-hierarchical-terms,
+	.wp-block-post-tags,
+	.wp-block-post-comments,
+	.wp-block-post-comments-link,
+	.wp-block-post-excerpt {
+		cursor: default !important;
+		caret-color: transparent;
+	}
+
+	// Disable featured image uploading
+	.wp-block-post-featured-image {
+		.components-placeholder__fieldset {
+			display: none;
+		}
+	}
+}
