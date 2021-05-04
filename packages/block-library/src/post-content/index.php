@@ -56,7 +56,8 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
-	$content            = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
+	/** This filter is documented in wp-includes/post-template.php */
+	$content = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
 	unset( $seen_ids[ $post_id ] );
 
 	return (
