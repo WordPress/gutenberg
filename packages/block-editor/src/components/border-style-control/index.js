@@ -1,37 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { CustomSelectControl } from '@wordpress/components';
+import { SelectControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-const DEFAULT_STYLE = {
-	key: 'default',
-	name: __( 'Default' ),
-	style: { borderStyle: undefined },
-};
-
 const BORDER_STYLES = [
-	DEFAULT_STYLE,
-	{
-		key: 'none',
-		name: __( 'None' ),
-		style: { borderStyle: 'none' },
-	},
-	{
-		key: 'solid',
-		name: __( 'Solid' ),
-		style: { borderStyle: 'solid' },
-	},
-	{
-		key: 'dashed',
-		name: __( 'Dashed' ),
-		style: { borderStyle: 'dashed' },
-	},
-	{
-		key: 'dotted',
-		name: __( 'Dotted' ),
-		style: { borderStyle: 'dotted' },
-	},
+	{ label: __( 'Default' ), value: undefined },
+	{ label: __( 'None' ), value: 'none' },
+	{ label: __( 'Solid' ), value: 'solid' },
+	{ label: __( 'Dashed' ), value: 'dashed' },
+	{ label: __( 'Dotted' ), value: 'dotted' },
 ];
 
 /**
@@ -44,20 +22,14 @@ const BORDER_STYLES = [
  * @return {WPElement} Custom border style select control.
  */
 export default function BorderStyleControl( { onChange, value } ) {
-	const style = BORDER_STYLES.find( ( option ) => option.key === value );
-
 	return (
 		<fieldset className="components-border-style-control">
-			<CustomSelectControl
+			<SelectControl
 				className="components-border-style-control__select"
 				label={ __( 'Style' ) }
 				options={ BORDER_STYLES }
-				value={ style || DEFAULT_STYLE }
-				onChange={ ( { selectedItem } ) =>
-					selectedItem.key === 'default'
-						? onChange( undefined )
-						: onChange( selectedItem.key )
-				}
+				value={ value }
+				onChange={ onChange }
 			/>
 		</fieldset>
 	);
