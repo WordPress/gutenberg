@@ -53,8 +53,7 @@
 		"customFontSize": "customFontSize",
 		"showSubmenuIcon": "showSubmenuIcon",
 		"style": "style",
-		"orientation": "orientation",
-		"isResponsive": "isResponsive"
+		"orientation": "orientation"
 	},
 	"supports": {
 		"align": [
