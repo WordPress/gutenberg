@@ -9,13 +9,37 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { Button, ExternalLink } from '@wordpress/components';
 import { filterURLForDisplay, safeDecodeURI } from '@wordpress/url';
+import { useSelect } from '@wordpress/data';
+import { useState, useEffect } from '@wordpress/element';
+import { Icon, globe } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import { ViewerSlot } from './viewer-slot';
+import { store as blockEditorStore } from '../../store';
 
 export default function LinkPreview( { value, onEditClick } ) {
+	const [ richData, setRichData ] = useState( {} );
+
+	const { fetchRemoteUrlData } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return {
+			fetchRemoteUrlData: getSettings().__experimentalFetchRemoteUrlData,
+		};
+	}, [] );
+
+	useEffect( () => {
+		const fetchRichData = async () => {
+			const urlData = await fetchRemoteUrlData( value.url );
+			setRichData( urlData );
+		};
+
+		if ( value?.url?.length ) {
+			fetchRichData();
+		}
+	}, [ value ] );
+
 	const displayURL =
 		( value && filterURLForDisplay( safeDecodeURI( value.url ), 16 ) ) ||
 		'';
@@ -29,17 +53,23 @@ export default function LinkPreview( { value, onEditClick } ) {
 			} ) }
 		>
 			<span className="block-editor-link-control__search-item-header">
-				<ExternalLink
-					className="block-editor-link-control__search-item-title"
-					href={ value.url }
-				>
-					{ ( value && value.title ) || displayURL }
-				</ExternalLink>
-				{ value && value.title && (
-					<span className="block-editor-link-control__search-item-info">
-						{ displayURL }
-					</span>
-				) }
+				<Icon
+					className="block-editor-link-control__search-item-icon"
+					icon={ globe }
+				/>
+				<span className="block-editor-link-control__search-item-details">
+					<ExternalLink
+						className="block-editor-link-control__search-item-title"
+						href={ value.url }
+					>
+						{ richData?.title || value?.title || displayURL }
+					</ExternalLink>
+					{ value?.url && (
+						<span className="block-editor-link-control__search-item-info">
+							{ displayURL }
+						</span>
+					) }
+				</span>
 			</span>
 
 			<Button

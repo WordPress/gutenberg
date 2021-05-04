@@ -150,10 +150,15 @@ $block-editor-link-control-number-of-actions: 1;
 	}
 
 	.block-editor-link-control__search-item-header {
-		display: block;
-		margin-right: $grid-unit-10;
+		display: flex;
+		flex-direction: row;
+		margin-right: $grid-unit-20;
 		overflow: hidden;
 		white-space: nowrap;
+	}
+
+	.block-editor-link-control__search-item-details {
+		display: block;
 	}
 
 	.block-editor-link-control__search-item-icon {
