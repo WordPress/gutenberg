@@ -256,6 +256,8 @@ describe( 'Multi-entity editor states', () => {
 		} );
 
 		it( 'should only dirty the child when editing the child', async () => {
+			// Select parent TP to unlock selecting content.
+			await canvas().click( '.wp-block-template-part' );
 			await canvas().click(
 				'.wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
@@ -267,6 +269,12 @@ describe( 'Multi-entity editor states', () => {
 		} );
 
 		it( 'should only dirty the nested entity when editing the nested entity', async () => {
+			// Select parent TP to unlock selecting child.
+			await canvas().click( '.wp-block-template-part' );
+			// Select child TP to unlock selecting content.
+			await canvas().click(
+				'.wp-block-template-part .wp-block-template-part'
+			);
 			await canvas().click(
 				'.wp-block-template-part .wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
