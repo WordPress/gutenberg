@@ -219,7 +219,7 @@ describe( 'Multi-entity editor states', () => {
 			removeErrorMocks();
 		} );
 
-		afterEach( async () => {
+		const saveAndWaitResponse = async () => {
 			await Promise.all( [
 				saveAllEntities(),
 
@@ -242,7 +242,7 @@ describe( 'Multi-entity editor states', () => {
 				} ),
 			] );
 			removeErrorMocks();
-		} );
+		};
 
 		it( 'should only dirty the parent entity when editing the parent', async () => {
 			// Clear selection so that the block is not added to the template part.
@@ -254,6 +254,7 @@ describe( 'Multi-entity editor states', () => {
 			expect( await isEntityDirty( templateName ) ).toBe( true );
 			expect( await isEntityDirty( templatePartName ) ).toBe( false );
 			expect( await isEntityDirty( nestedTPName ) ).toBe( false );
+			await saveAndWaitResponse();
 		} );
 
 		it( 'should only dirty the child when editing the child', async () => {
@@ -267,6 +268,7 @@ describe( 'Multi-entity editor states', () => {
 			expect( await isEntityDirty( templateName ) ).toBe( false );
 			expect( await isEntityDirty( templatePartName ) ).toBe( true );
 			expect( await isEntityDirty( nestedTPName ) ).toBe( false );
+			await saveAndWaitResponse();
 		} );
 
 		it( 'should only dirty the nested entity when editing the nested entity', async () => {
@@ -284,6 +286,7 @@ describe( 'Multi-entity editor states', () => {
 			expect( await isEntityDirty( templateName ) ).toBe( false );
 			expect( await isEntityDirty( templatePartName ) ).toBe( false );
 			expect( await isEntityDirty( nestedTPName ) ).toBe( true );
+			await saveAndWaitResponse();
 		} );
 
 		it( 'should not allow selecting template part content without parent selected', async () => {
