@@ -105,6 +105,13 @@ Whether to present suggestions when typing the URL.
 
 Whether to present initial suggestions immediately.
 
+### noDirectEntry
+
+-   Type: `boolean`
+-   Required: No
+
+Whether to allow turning a URL-like search query directly into a link.
+
 ### forceIsEditingLink
 
 -   Type: `boolean`
