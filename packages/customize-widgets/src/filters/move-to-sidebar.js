@@ -51,7 +51,7 @@ const withMoveToSidebarToolbarItem = createHigherOrderComponent(
 								description: sidebarControl.params.description,
 							} )
 						) }
-						currentWidgetArea={ activeSidebarControl }
+						currentWidgetAreaId={ activeSidebarControl?.id }
 						onSelect={ moveToSidebar }
 					/>
 				</BlockControls>
