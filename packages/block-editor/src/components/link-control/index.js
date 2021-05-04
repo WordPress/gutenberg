@@ -117,6 +117,7 @@ function LinkControl( {
 	noURLSuggestion = false,
 	createSuggestionButtonText,
 	hasRichPreviews = false,
+	fetchSuggestions,
 } ) {
 	if ( withCreateSuggestion === undefined && createSuggestion ) {
 		withCreateSuggestion = true;
@@ -217,6 +218,7 @@ function LinkControl( {
 							allowDirectEntry={ ! noDirectEntry }
 							showSuggestions={ showSuggestions }
 							suggestionsQuery={ suggestionsQuery }
+							fetchSuggestions={ fetchSuggestions }
 							withURLSuggestion={ ! noURLSuggestion }
 							createSuggestionButtonText={
 								createSuggestionButtonText

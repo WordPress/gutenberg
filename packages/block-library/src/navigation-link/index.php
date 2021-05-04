@@ -322,11 +322,29 @@ function register_block_core_navigation_link() {
 		}
 	}
 
+	// Some plugins use the `customize_nav_menu_available_item_types` filter to
+	// add new menu item types.
+	$item_types        = apply_filters( 'customize_nav_menu_available_item_types', array() );
+	$filter_variations = array();
+	if ( is_array( $item_types ) ) {
+		foreach ( $item_types as $item_type ) {
+			$filter_variations[] = array(
+				'name'        => $item_type['object'],
+				'title'       => $item_type['title'],
+				'description' => '',
+				'attributes'  => array(
+					'type'        => $item_type['type'],
+					'suggestions' => apply_filters( 'customize_nav_menu_available_items', array(), $item_type['type'], $item_type['object'] ),
+				),
+			);
+		}
+	}
+
 	register_block_type_from_metadata(
 		__DIR__ . '/navigation-link',
 		array(
 			'render_callback' => 'render_block_core_navigation_link',
-			'variations'      => array_merge( $built_ins, $variations ),
+			'variations'      => array_merge( $built_ins, $variations, $filter_variations ),
 		)
 	);
 }
