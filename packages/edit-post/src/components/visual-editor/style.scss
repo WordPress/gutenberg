@@ -82,6 +82,14 @@
 		> * {
 			pointer-events: none;
 		}
+
+		&.is-selected,
+		&.is-hovered {
+			&::after {
+				background: rgba(#007cba, 0.2);
+				z-index: 1;
+			}
+		}
 	}
 
 	// Hide inline inserters
@@ -105,6 +113,14 @@
 
 		&::selection {
 			background: transparent;
+		}
+
+		&.is-selected,
+		&.is-hovered {
+			&::after {
+				background: rgba(#007cba, 0.2);
+				z-index: 1;
+			}
 		}
 	}
 
