@@ -236,15 +236,29 @@ function block_core_page_list_nest_pages( $current_level, $children ) {
  * @return string Returns the page list markup.
  */
 function render_block_core_page_list( $attributes, $content, $block ) {
+	global $post;
 	static $block_id = 0;
 	$block_id++;
 
-	$all_pages = get_pages(
-		array(
-			'sort_column' => 'menu_order,post_title',
-			'order'       => 'asc',
-		)
+	$only_child_pages = isset( $attributes['showOnlyChildPages'] ) && $attributes['showOnlyChildPages'];
+	// The pages will be siblings (same parent) or set parent id equal to self if no children.
+	$parent_id = ( $post->post_parent ) ? $post->post_parent : $post->ID;
+
+	// TODO: When https://core.trac.wordpress.org/ticket/39037 REST API support for multiple orderby values is resolved,
+	// update 'sort_column' to 'menu_order, post_title'. Sorting by both menu_order and post_title ensures a stable sort.
+	// Otherwise with pages that have the same menu_order value, we can see different ordering depending on how DB
+	// queries are constructed internally. For example we might see a different order when a limit is set to <499
+	// versus >= 500.
+	$query_args = array(
+		'sort_column' => 'menu_order',
+		'order'       => 'asc',
 	);
+
+	if ( $only_child_pages && $parent_id ) {
+		$query_args['child_of'] = $parent_id;
+	}
+
+	$all_pages = get_pages( $query_args );
 
 	// If thare are no pages, there is nothing to show.
 	if ( empty( $all_pages ) ) {
@@ -264,7 +278,16 @@ function render_block_core_page_list( $attributes, $content, $block ) {
 			$active_page_ancestor_ids = get_post_ancestors( $page->ID );
 		}
 
-		if ( $page->post_parent ) {
+		// When showing only child pages of parent, set the pages to top level
+		// since there is no other top level page.
+		if ( $only_child_pages ) {
+			$top_level_pages[ $page->ID ] = array(
+				'page_id'   => $page->ID,
+				'title'     => $page->post_title,
+				'link'      => get_permalink( $page->ID ),
+				'is_active' => $is_active,
+			);
+		} else if ( $page->post_parent )  {
 			$pages_with_children[ $page->post_parent ][ $page->ID ] = array(
 				'page_id'   => $page->ID,
 				'title'     => $page->post_title,

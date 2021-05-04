@@ -11,8 +11,10 @@ import {
 	BlockControls,
 	useBlockProps,
 	getColorClassName,
+	InspectorControls,
 } from '@wordpress/block-editor';
 import { ToolbarButton, Placeholder, Spinner } from '@wordpress/components';
+import { PanelBody, ToggleControl, ToolbarButton } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useState, memo } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
@@ -31,32 +33,80 @@ const MAX_PAGE_COUNT = 100;
 export default function PageListEdit( { context, clientId } ) {
 	const { pagesByParentId, totalPages } = usePagesByParentId();
 
-	const isNavigationChild = 'showSubmenuIcon' in context;
-	const allowConvertToLinks =
-		isNavigationChild && totalPages <= MAX_PAGE_COUNT;
+	const isParentBlockNavigation = useSelect(
+		( select ) => {
+			const { getBlockParentsByBlockName } = select( blockEditorStore );
+			return (
+				getBlockParentsByBlockName( clientId, 'core/navigation' )
+					.length > 0
+			);
+		},
+		[ clientId ]
+	);
+
+	const showChildPageToggle = useSelect( ( select ) => {
+		const { getCurrentPostType } = select( editorStore );
+		const currentPostType = getCurrentPostType();
+		const allowedTypes = [ 'page', 'wp_template' ];
+		return allowedTypes.includes( currentPostType );
+	} );
+
+	useEffect( () => {
+		setAttributes( {
+			isNavigationChild: isParentBlockNavigation,
+			openSubmenusOnClick: !! context.openSubmenusOnClick,
+			showSubmenuIcon: !! context.showSubmenuIcon,
+		} );
+	}, [ context.openSubmenusOnClick, context.showSubmenuIcon ] );
+
+	useEffect( () => {
+		if ( isParentBlockNavigation ) {
+			apiFetch( {
+				path: addQueryArgs( '/wp/v2/pages', {
+					per_page: 1,
+					_fields: [ 'id' ],
+				} ),
+				parse: false,
+			} ).then( ( res ) => {
+				setAllowConvertToLinks(
+					res.headers.get( 'X-WP-Total' ) <= MAX_PAGE_COUNT
+				);
+			} );
+		} else {
+			setAllowConvertToLinks( false );
+		}
+	}, [ isParentBlockNavigation ] );
 
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
 
-	const blockProps = useBlockProps( {
-		className: classnames( 'wp-block-page-list', {
-			'has-text-color': !! context.textColor,
-			[ getColorClassName(
-				'color',
-				context.textColor
-			) ]: !! context.textColor,
-			'has-background': !! context.backgroundColor,
-			[ getColorClassName(
-				'background-color',
-				context.backgroundColor
-			) ]: !! context.backgroundColor,
-		} ),
-		style: { ...context.style?.color },
-	} );
+	// Update parent status before component first renders.
+	const attributesWithParentBlockStatus = {
+		...attributes,
+		isNavigationChild: isParentBlockNavigation,
+		openSubmenusOnClick: !! context.openSubmenusOnClick,
+		showSubmenuIcon: !! context.showSubmenuIcon,
+	};
 
 	return (
 		<>
+			<InspectorControls>
+				{ showChildPageToggle && (
+					<PanelBody>
+						<ToggleControl
+							label={ __( 'List child pages' ) }
+							checked={ !! attributes.showOnlyChildPages }
+							onChange={ () =>
+								setAttributes( {
+									showOnlyChildPages: ! attributes.showOnlyChildPages,
+								} )
+							}
+							help={ __( 'Uses parent to list child pages.' ) }
+						/>
+					</PanelBody>
+				) }
+			</InspectorControls>
 			{ allowConvertToLinks && (
 				<BlockControls group="other">
 					<ToolbarButton title={ __( 'Edit' ) } onClick={ openModal }>
@@ -70,26 +120,15 @@ export default function PageListEdit( { context, clientId } ) {
 					clientId={ clientId }
 				/>
 			) }
-			{ totalPages === null && (
-				<div { ...blockProps }>
-					<Placeholder>
-						<Spinner />
-					</Placeholder>
-				</div>
-			) }
-			{ totalPages === 0 && (
-				<div { ...blockProps }>
-					<span>{ __( 'Page List: No pages to show.' ) }</span>
-				</div>
-			) }
-			{ totalPages > 0 && (
-				<ul { ...blockProps }>
-					<PageItems
-						context={ context }
-						pagesByParentId={ pagesByParentId }
-					/>
-				</ul>
-			) }
+			<div { ...blockProps }>
+				<ServerSideRender
+					block="core/page-list"
+					attributes={ attributesWithParentBlockStatus }
+					EmptyResponsePlaceholder={ () => (
+						<span>{ __( 'Page List: No pages to show.' ) }</span>
+					) }
+				/>
+			</div>
 		</>
 	);
 }
