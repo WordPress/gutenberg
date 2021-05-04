@@ -39,7 +39,7 @@ export const LinkControlSearchItem = ( {
 			<span className="block-editor-link-control__search-item-header">
 				<span className="block-editor-link-control__search-item-title">
 					<TextHighlight
-						text={ suggestion.title }
+						text={ suggestion?.richMeta?.title || suggestion.title }
 						highlight={ searchTerm }
 					/>
 				</span>

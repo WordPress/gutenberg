@@ -59,7 +59,17 @@ export const handleDirectEntry = async (
 			return [
 				{
 					...defaultResponse,
-					...urlData,
+					richMeta: {
+						...( urlData?.title && {
+							title: urlData.title,
+						} ),
+						...( urlData?.description && {
+							description: urlData.description,
+						} ),
+						...( urlData?.icon && {
+							icon: urlData.title,
+						} ),
+					},
 				},
 			];
 		} catch ( error ) {
