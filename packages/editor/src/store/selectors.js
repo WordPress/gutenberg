@@ -28,6 +28,7 @@ import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
 import { layout } from '@wordpress/icons';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
@@ -1200,10 +1201,23 @@ export function canUserUseUnfilteredHTML( state ) {
  * @return {boolean} Whether the pre-publish panel should be shown or not.
  */
 export function isPublishSidebarEnabled( state ) {
+	let enabled;
+
 	if ( state.preferences.hasOwnProperty( 'isPublishSidebarEnabled' ) ) {
-		return state.preferences.isPublishSidebarEnabled;
+		enabled = state.preferences.isPublishSidebarEnabled;
+	} else {
+		enabled = PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
 	}
-	return PREFERENCES_DEFAULTS.isPublishSidebarEnabled;
+
+	/**
+	 * Filters the user setting to enable or disable the pre-publish panel.
+	 *
+	 * @param {boolean} enabled Pre-publish panel display setting.
+	 */
+	return applyFilters(
+		'editor.userPreferences.isPublishSidebarEnabled',
+		enabled
+	);
 }
 
 /**
