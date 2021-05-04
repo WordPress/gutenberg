@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 import { moveTo } from '@wordpress/icons';
 
 export default function MoveToWidgetArea( {
-	currentWidgetArea,
+	currentWidgetAreaId,
 	widgetAreas,
 	onSelect,
 } ) {
@@ -35,7 +35,7 @@ export default function MoveToWidgetArea( {
 											info: widgetArea.description,
 										} )
 									) }
-									value={ currentWidgetArea?.id }
+									value={ currentWidgetAreaId }
 									onSelect={ ( value ) => {
 										onSelect( value );
 										onClose();

@@ -6,7 +6,7 @@ import { BlockControls } from '@wordpress/block-editor';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
-import { MoveToWidgetArea } from '@wordpress/widgets';
+import { getWidgetIdFromBlock, MoveToWidgetArea } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -15,20 +15,18 @@ import { store as editWidgetsStore } from '../store';
 
 const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { __internalWidgetId } = props.attributes;
-		const { widgetAreas, currentWidgetArea } = useSelect(
+		const widgetId = getWidgetIdFromBlock( props );
+		const { widgetAreas, currentWidgetAreaId } = useSelect(
 			( select ) => {
 				const selectors = select( editWidgetsStore );
 				return {
 					widgetAreas: selectors.getWidgetAreas(),
-					currentWidgetArea: __internalWidgetId
-						? selectors.getWidgetAreaForWidgetId(
-								__internalWidgetId
-						  )
+					currentWidgetArea: widgetId
+						? selectors.getWidgetAreaForWidgetId( widgetId )?.id
 						: undefined,
 				};
 			},
-			[ __internalWidgetId ]
+			[ widgetId ]
 		);
 
 		const { moveBlockToWidgetArea } = useDispatch( editWidgetsStore );
@@ -40,7 +38,7 @@ const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 					<BlockControls>
 						<MoveToWidgetArea
 							widgetAreas={ widgetAreas }
-							currentWidgetArea={ currentWidgetArea }
+							currentWidgetAreaId={ currentWidgetAreaId }
 							onSelect={ ( widgetAreaId ) => {
 								moveBlockToWidgetArea(
 									props.clientId,
