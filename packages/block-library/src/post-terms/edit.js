@@ -23,9 +23,9 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import useHierarchicalTermLinks from './use-hierarchical-term-links';
+import useTermLinks from './use-term-links';
 
-export default function PostHierarchicalTermsEdit( {
+export default function PostTermsEdit( {
 	attributes,
 	clientId,
 	context,
@@ -62,27 +62,21 @@ export default function PostHierarchicalTermsEdit( {
 				find(
 					taxonomies,
 					( taxonomy ) =>
-						taxonomy.slug === term &&
-						taxonomy.hierarchical &&
-						taxonomy.visibility.show_ui
+						taxonomy.slug === term && taxonomy.visibility.show_ui
 				) || {}
 			);
 		},
 		[ term ]
 	);
 
-	const {
-		hierarchicalTermLinks,
-		isLoadingHierarchicalTermLinks,
-	} = useHierarchicalTermLinks( {
+	const { termLinks, isLoadingTermLinks } = useTermLinks( {
 		postId,
 		postType,
 		term: selectedTerm,
 	} );
 
 	const hasPost = postId && postType;
-	const hasHierarchicalTermLinks =
-		hierarchicalTermLinks && hierarchicalTermLinks.length > 0;
+	const hasTermLinks = termLinks && termLinks.length > 0;
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
@@ -92,9 +86,7 @@ export default function PostHierarchicalTermsEdit( {
 	if ( ! hasPost ) {
 		return (
 			<div { ...blockProps }>
-				<Warning>
-					{ __( 'Post Hierarchical Terms block: post not found.' ) }
-				</Warning>
+				<Warning>{ __( 'Post Terms block: post not found.' ) }</Warning>
 			</div>
 		);
 	}
@@ -125,18 +117,18 @@ export default function PostHierarchicalTermsEdit( {
 				/>
 			</BlockControls>
 			<div { ...blockProps }>
-				{ isLoadingHierarchicalTermLinks && <Spinner /> }
+				{ isLoadingTermLinks && <Spinner /> }
 
-				{ hasHierarchicalTermLinks &&
-					! isLoadingHierarchicalTermLinks &&
-					hierarchicalTermLinks.reduce( ( prev, curr ) => [
+				{ hasTermLinks &&
+					! isLoadingTermLinks &&
+					termLinks.reduce( ( prev, curr ) => [
 						prev,
 						' | ',
 						curr,
 					] ) }
 
-				{ ! isLoadingHierarchicalTermLinks &&
-					! hasHierarchicalTermLinks &&
+				{ ! isLoadingTermLinks &&
+					! hasTermLinks &&
 					// eslint-disable-next-line camelcase
 					( selectedTerm?.labels?.no_terms ||
 						__( 'Term items not found.' ) ) }

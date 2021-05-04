@@ -78,7 +78,7 @@ function gutenberg_reregister_core_block_types() {
 				'post-date.php'                 => 'core/post-date',
 				'post-excerpt.php'              => 'core/post-excerpt',
 				'post-featured-image.php'       => 'core/post-featured-image',
-				'post-hierarchical-terms.php'   => 'core/post-hierarchical-terms',
+				'post-terms.php'                => 'core/post-terms',
 				'post-navigation-link.php'      => 'core/post-navigation-link',
 				'post-tags.php'                 => 'core/post-tags',
 				'post-title.php'                => 'core/post-title',

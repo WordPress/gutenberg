@@ -1,7 +1,7 @@
 [
 	{
 		"clientId": "_clientId_0",
-		"name": "core/post-hierarchical-terms",
+		"name": "core/post-terms",
 		"isValid": true,
 		"attributes": {},
 		"innerBlocks": [],

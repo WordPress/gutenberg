@@ -9,23 +9,23 @@ import { map } from 'lodash';
 import { useEntityProp, store as coreStore } from '@wordpress/core-data';
 import { useSelect } from '@wordpress/data';
 
-export default function useHierarchicalTermLinks( { postId, postType, term } ) {
+export default function useTermLinks( { postId, postType, term } ) {
 	const { rest_base: restBase, slug } = term;
 
-	const [ hierarchicalTermItems ] = useEntityProp(
+	const [ termItems ] = useEntityProp(
 		'postType',
 		postType,
 		restBase,
 		postId
 	);
 
-	const { hierarchicalTermLinks, isLoadingHierarchicalTermLinks } = useSelect(
+	const { termLinks, isLoadingTermLinks } = useSelect(
 		( select ) => {
 			const { getEntityRecord } = select( coreStore );
 
 			let loaded = true;
 
-			const links = map( hierarchicalTermItems, ( itemId ) => {
+			const links = map( termItems, ( itemId ) => {
 				const item = getEntityRecord( 'taxonomy', slug, itemId );
 
 				if ( ! item ) {
@@ -44,12 +44,12 @@ export default function useHierarchicalTermLinks( { postId, postType, term } ) {
 			} );
 
 			return {
-				hierarchicalTermLinks: links,
-				isLoadingHierarchicalTermLinks: ! loaded,
+				termLinks: links,
+				isLoadingTermLinks: ! loaded,
 			};
 		},
-		[ hierarchicalTermItems ]
+		[ termItems ]
 	);
 
-	return { hierarchicalTermLinks, isLoadingHierarchicalTermLinks };
+	return { termLinks, isLoadingTermLinks };
 }
