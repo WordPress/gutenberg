@@ -162,7 +162,9 @@ export default function VisualEditor( { styles } ) {
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
 			} ) }
-			animate={ isTemplateMode ? { padding: '48px' } : { padding: 0 } }
+			animate={
+				isTemplateMode ? { padding: '48px 48px 0' } : { padding: 0 }
+			}
 			ref={ blockSelectionClearerRef }
 		>
 			{ themeSupportsLayout && (
