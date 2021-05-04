@@ -76,6 +76,7 @@ class BottomSheet extends Component {
 		this.headerHeight = 0;
 		this.keyboardHeight = 0;
 		this.lastLayoutAnimation = null;
+		this.lastLayoutAnimationFinished = false;
 
 		this.state = {
 			safeAreaBottomInset: 0,
@@ -140,7 +141,10 @@ class BottomSheet extends Component {
 					property: LayoutAnimation.Properties.opacity,
 				},
 			};
-			LayoutAnimation.configureNext( layoutAnimation );
+			this.lastLayoutAnimationFinished = false;
+			LayoutAnimation.configureNext( layoutAnimation, () => {
+				this.lastLayoutAnimationFinished = true;
+			} );
 			this.lastLayoutAnimation = layoutAnimation;
 		} else {
 			this.performRegularLayoutAnimation( {
@@ -150,11 +154,23 @@ class BottomSheet extends Component {
 	}
 
 	performRegularLayoutAnimation( { useLastLayoutAnimation } ) {
+		// On Android, we should prevent triggering multiple layout animations at the same time because it can produce visual glitches.
+		if (
+			Platform.OS === 'android' &&
+			this.lastLayoutAnimation &&
+			! this.lastLayoutAnimationFinished
+		) {
+			return;
+		}
+
 		const layoutAnimation = useLastLayoutAnimation
 			? this.lastLayoutAnimation || DEFAULT_LAYOUT_ANIMATION
 			: DEFAULT_LAYOUT_ANIMATION;
 
-		LayoutAnimation.configureNext( layoutAnimation );
+		this.lastLayoutAnimationFinished = false;
+		LayoutAnimation.configureNext( layoutAnimation, () => {
+			this.lastLayoutAnimationFinished = true;
+		} );
 		this.lastLayoutAnimation = layoutAnimation;
 	}
 
