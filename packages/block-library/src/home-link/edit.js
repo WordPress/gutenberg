@@ -11,11 +11,11 @@ import {
 	useBlockProps,
 	InspectorControls,
 } from '@wordpress/block-editor';
-import { __ } from '@wordpress/i18n';
+import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
-import { PanelBody, TextControl, ToggleControl } from '@wordpress/components';
+import { TextControl, ToggleControl } from '@wordpress/components';
 
 const preventDefault = ( event ) => event.preventDefault();
 
@@ -62,7 +62,10 @@ export default function HomeEdit( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Settings' ) }>
+				<div className="wp-block-home-link__settings">
+					<h2 className="wp-block-home-link__settings_label">
+						{ _x( 'Settings', 'Home link settings' ) }
+					</h2>
 					<ToggleControl
 						label={ __( 'Open in new tab' ) }
 						checked={ opensInNewTab }
@@ -86,7 +89,7 @@ export default function HomeEdit( {
 						label={ __( 'Link rel' ) }
 						autoComplete="off"
 					/>
-				</PanelBody>
+				</div>
 			</InspectorControls>
 			<li { ...blockProps }>
 				<a
