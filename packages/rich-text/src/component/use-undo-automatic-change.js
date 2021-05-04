@@ -2,36 +2,39 @@
  * WordPress dependencies
  */
 import { useRefEffect } from '@wordpress/compose';
-
 import { BACKSPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
 
-export function useUndoAutomaticChange( { didAutomaticChange, undo } ) {
-	return useRefEffect(
-		( element ) => {
-			function onKeyDown( event ) {
-				const { keyCode } = event;
+/**
+ * Internal dependencies
+ */
+import { useFreshRef } from './use-fresh-ref';
 
-				if ( ! didAutomaticChange ) {
-					return;
-				}
+export function useUndoAutomaticChange( props ) {
+	const propsRef = useFreshRef( props );
+	return useRefEffect( ( element ) => {
+		function onKeyDown( event ) {
+			const { keyCode } = event;
+			const { didAutomaticChange, undo } = propsRef.current;
 
-				if (
-					keyCode !== DELETE &&
-					keyCode !== BACKSPACE &&
-					keyCode !== ESCAPE
-				) {
-					return;
-				}
-
-				event.preventDefault();
-				undo();
+			if ( ! didAutomaticChange || ! undo ) {
+				return;
 			}
 
-			element.addEventListener( 'keydown', onKeyDown );
-			return () => {
-				element.removeEventListener( 'keydown', onKeyDown );
-			};
-		},
-		[ didAutomaticChange, undo ]
-	);
+			if (
+				keyCode !== DELETE &&
+				keyCode !== BACKSPACE &&
+				keyCode !== ESCAPE
+			) {
+				return;
+			}
+
+			event.preventDefault();
+			undo();
+		}
+
+		element.addEventListener( 'keydown', onKeyDown );
+		return () => {
+			element.removeEventListener( 'keydown', onKeyDown );
+		};
+	}, [] );
 }
