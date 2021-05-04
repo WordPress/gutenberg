@@ -185,11 +185,12 @@ class BottomSheet extends Component {
 			);
 		}
 
+		// 'Will' keyboard events are not available on Android.
+		// Reference: https://reactnative.dev/docs/0.61/keyboard#addlistener
 		this.keyboardShowListener = Keyboard.addListener(
 			Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
 			this.keyboardShow
 		);
-
 		this.keyboardHideListener = Keyboard.addListener(
 			Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
 			this.keyboardHide
