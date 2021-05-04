@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
+import { PostSavedState } from '@wordpress/editor';
 import { useSelect } from '@wordpress/data';
 import { PinnedItems } from '@wordpress/interface';
 import { useViewportMatch } from '@wordpress/compose';
@@ -18,7 +18,7 @@ import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
-import { default as DevicePreview } from '../device-preview';
+import ViewMenu from './view';
 import MainDashboardButton from './main-dashboard-button';
 import { store as editPostStore } from '../../store';
 
@@ -73,11 +73,7 @@ function Header( { setEntitiesSavedStatesCallback } ) {
 						showIconLabels={ showIconLabels }
 					/>
 				) }
-				<DevicePreview />
-				<PostPreviewButton
-					forceIsAutosaveable={ hasActiveMetaboxes }
-					forcePreviewLink={ isSaving ? null : undefined }
-				/>
+				<ViewMenu />
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }

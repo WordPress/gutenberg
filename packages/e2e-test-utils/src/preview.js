@@ -15,9 +15,9 @@ export async function openPreviewPage( editorPage = page ) {
 	let openTabs = await browser.pages();
 	const expectedTabsCount = openTabs.length + 1;
 	await page.waitForSelector(
-		'.block-editor-post-preview__button-toggle:not([disabled])'
+		'.edit-post-view__button-toggle:not([disabled])'
 	);
-	await editorPage.click( '.block-editor-post-preview__button-toggle' );
+	await editorPage.click( '.edit-post-view__button-toggle' );
 	await editorPage.waitForSelector(
 		'.edit-post-header-preview__button-external'
 	);

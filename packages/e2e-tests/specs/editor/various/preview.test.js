@@ -24,7 +24,7 @@ import {
  * @return {Promise} Promise resolving once selector is visible on page.
  */
 async function waitForPreviewDropdownOpen( editorPage ) {
-	await editorPage.click( '.block-editor-post-preview__button-toggle' );
+	await editorPage.click( '.edit-post-view__button-toggle' );
 	return editorPage.waitForSelector(
 		'.edit-post-header-preview__button-external'
 	);
@@ -95,7 +95,7 @@ describe( 'Preview', () => {
 
 		// Disabled until content present.
 		const isPreviewDisabled = await editorPage.$$eval(
-			'.block-editor-post-preview__button-toggle:not( :disabled ):not( [aria-disabled="true"] )',
+			'.edit-post-view__button-toggle:not( :disabled ):not( [aria-disabled="true"] )',
 			( enabledButtons ) => ! enabledButtons.length
 		);
 		expect( isPreviewDisabled ).toBe( true );
@@ -327,7 +327,7 @@ describe( 'Preview with private custom post type', () => {
 		await page.keyboard.press( 'Tab' );
 
 		// Open the preview menu.
-		await page.click( '.block-editor-post-preview__button-toggle' );
+		await page.click( '.edit-post-view__button-toggle' );
 
 		const previewDropdownContents = await page.$(
 			'.block-editor-post-preview__dropdown-content'
