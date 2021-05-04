@@ -9,21 +9,7 @@ import { omit, isEqual } from 'lodash';
 import { serialize, parse, createBlock } from '@wordpress/blocks';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-
-/**
- * Internal dependencies
- */
-import { getWidgetIdFromBlock } from '../../utils';
-
-function addWidgetIdToBlock( block, widgetId ) {
-	return {
-		...block,
-		attributes: {
-			...( block.attributes || {} ),
-			__internalWidgetId: widgetId,
-		},
-	};
-}
+import { getWidgetIdFromBlock, addWidgetIdToBlock } from '@wordpress/widgets';
 
 function blockToWidget( block, existingWidget = null ) {
 	let widget;

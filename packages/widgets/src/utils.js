@@ -1,25 +1,6 @@
 // @ts-check
 
 /**
- * Convert settingId to widgetId.
- *
- * @param {string} settingId The setting id.
- * @return {string} The widget id.
- */
-export function settingIdToWidgetId( settingId ) {
-	const matches = settingId.match( /^widget_(.+)(?:\[(\d+)\])$/ );
-
-	if ( matches ) {
-		const idBase = matches[ 1 ];
-		const number = parseInt( matches[ 2 ], 10 );
-
-		return `${ idBase }-${ number }`;
-	}
-
-	return settingId;
-}
-
-/**
  * Get the internal widget id from block.
  *
  * @typedef  {Object} Attributes
@@ -32,4 +13,21 @@ export function settingIdToWidgetId( settingId ) {
  */
 export function getWidgetIdFromBlock( block ) {
 	return block.attributes.__internalWidgetId;
+}
+
+/**
+ * Add internal widget id to block's attributes.
+ *
+ * @param {Block} block The block.
+ * @param {string} widgetId The widget id.
+ * @return {Block} The updated block.
+ */
+export function addWidgetIdToBlock( block, widgetId ) {
+	return {
+		...block,
+		attributes: {
+			...( block.attributes || {} ),
+			__internalWidgetId: widgetId,
+		},
+	};
 }

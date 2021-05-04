@@ -18,18 +18,3 @@ export function settingIdToWidgetId( settingId ) {
 
 	return settingId;
 }
-
-/**
- * Get the internal widget id from block.
- *
- * @typedef  {Object} Attributes
- * @property {string} __internalWidgetId The intenral widget id.
- * @typedef  {Object} Block
- * @property {Attributes} attributes The attributes of the block.
- *
- * @param {Block} block The block.
- * @return {string} The internal widget id.
- */
-export function getWidgetIdFromBlock( block ) {
-	return block.attributes.__internalWidgetId;
-}
