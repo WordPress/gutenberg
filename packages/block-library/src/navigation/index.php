@@ -122,7 +122,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
 
 	$script_path                 = __DIR__ . '/navigation/frontend.js';
-	$should_load_frontend_script = $attributes['isResponsive'] && ! wp_script_is( 'core_block_navigation_load_frontend_scripts' ) && file_exists( $script_path );
+	$should_load_frontend_script = $attributes['isResponsive'] && ! wp_script_is( 'core_block_navigation_load_frontend_scripts' );
 
 	if ( $should_load_frontend_script ) {
 		wp_enqueue_script(
