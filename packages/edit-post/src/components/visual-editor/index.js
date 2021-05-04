@@ -30,7 +30,7 @@ import {
 } from '@wordpress/block-editor';
 import { Popover, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -96,6 +96,7 @@ export default function VisualEditor( { styles } ) {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().supportsLayout;
 	}, [] );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
 		height: '100%',
@@ -140,6 +141,19 @@ export default function VisualEditor( { styles } ) {
 
 	const blockSelectionClearerRef = useBlockSelectionClearer( true );
 
+	// Allow scrolling "through" popovers over the canvas. This is only called
+	// for as long as the pointer is over a popover. Do not use React events
+	// because it will bubble through portals.
+	const toolWrapperRef = useRefEffect( ( node ) => {
+		function onWheel( { deltaX, deltaY } ) {
+			contentRef.current.scrollBy( deltaX, deltaY );
+		}
+		node.addEventListener( 'wheel', onWheel );
+		return () => {
+			node.addEventListener( 'wheel', onWheel );
+		};
+	}, [] );
+
 	return (
 		<motion.div
 			className={ classnames( 'edit-post-visual-editor', {
@@ -155,56 +169,64 @@ export default function VisualEditor( { styles } ) {
 				/>
 			) }
 			<VisualEditorGlobalKeyboardShortcuts />
-			<Popover.Slot name="block-toolbar" />
 			{ isTemplateMode && (
 				<Button
 					className="edit-post-visual-editor__exit-template-mode"
 					icon={ arrowLeft }
-					onClick={ () => setIsEditingTemplate( false ) }
+					onClick={ () => {
+						clearSelectedBlock();
+						setIsEditingTemplate( false );
+					} }
 				>
 					{ __( 'Back' ) }
 				</Button>
 			) }
-			<motion.div
-				animate={ animatedStyles }
-				initial={ desktopCanvasStyles }
+			<div
+				ref={ toolWrapperRef }
+				style={ { width: '100%', height: '100%' } }
 			>
-				<MaybeIframe
-					isTemplateMode={ isTemplateMode }
-					contentRef={ contentRef }
-					styles={ styles }
-					style={ { paddingBottom } }
+				<Popover.Slot name="block-toolbar" />
+				<motion.div
+					animate={ animatedStyles }
+					initial={ desktopCanvasStyles }
 				>
-					<AnimatePresence>
-						<motion.div
-							key={ isTemplateMode ? 'template' : 'post' }
-							initial={ { opacity: 0 } }
-							animate={ { opacity: 1 } }
-						>
-							<WritingFlow>
-								{ ! isTemplateMode && (
-									<div className="edit-post-visual-editor__post-title-wrapper">
-										<PostTitle />
-									</div>
-								) }
-								<BlockList
-									__experimentalLayout={
-										themeSupportsLayout
-											? {
-													type: 'default',
-													// Find a way to inject this in the support flag code (hooks).
-													alignments: themeSupportsLayout
-														? alignments
-														: undefined,
-											  }
-											: undefined
-									}
-								/>
-							</WritingFlow>
-						</motion.div>
-					</AnimatePresence>
-				</MaybeIframe>
-			</motion.div>
+					<MaybeIframe
+						isTemplateMode={ isTemplateMode }
+						contentRef={ contentRef }
+						styles={ styles }
+						style={ { paddingBottom } }
+					>
+						<AnimatePresence>
+							<motion.div
+								key={ isTemplateMode ? 'template' : 'post' }
+								initial={ { opacity: 0 } }
+								animate={ { opacity: 1 } }
+							>
+								<WritingFlow>
+									{ ! isTemplateMode && (
+										<div className="edit-post-visual-editor__post-title-wrapper">
+											<PostTitle />
+										</div>
+									) }
+									<BlockList
+										__experimentalLayout={
+											themeSupportsLayout
+												? {
+														type: 'default',
+														// Find a way to inject this in the support flag code (hooks).
+														alignments: themeSupportsLayout
+															? alignments
+															: undefined,
+												  }
+												: undefined
+										}
+									/>
+								</WritingFlow>
+							</motion.div>
+						</AnimatePresence>
+					</MaybeIframe>
+				</motion.div>
+			</div>
 			<__experimentalBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
