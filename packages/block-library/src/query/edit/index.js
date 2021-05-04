@@ -6,11 +6,14 @@ import { useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
+	InspectorAdvancedControls,
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalBlockPatternSetup as BlockPatternSetup,
 } from '@wordpress/block-editor';
+import { SelectControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -22,7 +25,7 @@ import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
 const TEMPLATE = [ [ 'core/query-loop' ] ];
 export function QueryContent( { attributes, setAttributes } ) {
-	const { queryId, query, layout } = attributes;
+	const { queryId, query, layout, tagName: TagName = 'div' } = attributes;
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
@@ -81,9 +84,24 @@ export function QueryContent( { attributes, setAttributes } ) {
 					setLayout={ updateLayout }
 				/>
 			</BlockControls>
-			<div { ...blockProps }>
+			<InspectorAdvancedControls>
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<aside>', value: 'aside' },
+					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+				/>
+			</InspectorAdvancedControls>
+			<TagName { ...blockProps }>
 				<div { ...innerBlocksProps } />
-			</div>
+			</TagName>
 		</>
 	);
 }
