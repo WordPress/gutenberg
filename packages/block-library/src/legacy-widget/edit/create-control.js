@@ -21,61 +21,46 @@ export default function createControl( {
 	function initDOM() {
 		const number = ++lastNumber;
 
-		control = document.createElement( 'div' );
-		control.classList.add( 'widget' );
-		control.classList.add( 'open' );
-
-		form = document.createElement( 'form' );
-		form.classList.add( 'widget-inside' );
-		form.setAttribute( 'method', 'post' );
-		control.appendChild( form );
-
-		const idInput = document.createElement( 'input' );
-		idInput.classList.add( 'widget-id' );
-		idInput.setAttribute( 'type', 'hidden' );
-		idInput.setAttribute( 'name', 'widget-id' );
-		idInput.setAttribute( 'value', id ?? `${ idBase }-${ number }` );
-		form.appendChild( idInput );
-
-		const idBaseInput = document.createElement( 'input' );
-		idBaseInput.classList.add( 'id_base' );
-		idBaseInput.setAttribute( 'type', 'hidden' );
-		idBaseInput.setAttribute( 'name', 'id_base' );
-		idBaseInput.setAttribute( 'value', idBase ?? id );
-		form.appendChild( idBaseInput );
-
-		const widthInput = document.createElement( 'input' );
-		widthInput.classList.add( 'widget-width' );
-		widthInput.setAttribute( 'type', 'hidden' );
-		widthInput.setAttribute( 'name', 'widget-width' );
-		widthInput.setAttribute( 'value', '250' );
-		form.appendChild( widthInput );
-
-		const heightInput = document.createElement( 'input' );
-		heightInput.classList.add( 'widget-height' );
-		heightInput.setAttribute( 'type', 'hidden' );
-		heightInput.setAttribute( 'name', 'widget-height' );
-		heightInput.setAttribute( 'value', '200' );
-		form.appendChild( heightInput );
-
-		const numberInput = document.createElement( 'input' );
-		numberInput.classList.add( 'widget_number' );
-		numberInput.setAttribute( 'type', 'hidden' );
-		numberInput.setAttribute( 'name', 'widget_number' );
-		numberInput.setAttribute( 'value', idBase ? number.toString() : '' );
-		form.appendChild( numberInput );
-
-		content = document.createElement( 'div' );
-		content.classList.add( 'widget-content' );
-		form.appendChild( content );
-
-		if ( id ) {
-			const submitButton = document.createElement( 'button' );
-			submitButton.classList.add( 'button' );
-			submitButton.classList.add( 'is-primary' );
-			submitButton.setAttribute( 'type', 'submit' );
-			form.appendChild( submitButton );
-		}
+		control = el( 'div', { class: 'widget open' }, [
+			( form = el( 'form', { class: 'widget-inside', method: 'post' }, [
+				el( 'input', {
+					class: 'widget-id',
+					type: 'hidden',
+					name: 'widget-id',
+					value: id ?? `${ idBase }-${ number }`,
+				} ),
+				el( 'input', {
+					class: 'id_base',
+					type: 'hidden',
+					name: 'id_base',
+					value: idBase ?? id,
+				} ),
+				el( 'input', {
+					class: 'widget-width',
+					type: 'hidden',
+					name: 'widget-width',
+					value: '250',
+				} ),
+				el( 'input', {
+					class: 'widget-height',
+					type: 'hidden',
+					name: 'widget-height',
+					value: '200',
+				} ),
+				el( 'input', {
+					class: 'widget_number',
+					type: 'hidden',
+					name: 'widget_number',
+					value: idBase ? number.toString() : '',
+				} ),
+				( content = el( 'div', { class: 'widget-content' } ) ),
+				id &&
+					el( 'button', {
+						class: 'button is-primary',
+						type: 'submit',
+					} ),
+			] ) ),
+		] );
 	}
 
 	function bindEvents() {
@@ -193,6 +178,19 @@ export default function createControl( {
 }
 
 let lastNumber = 0;
+
+function el( tagName, attributes = {}, children = [] ) {
+	const element = document.createElement( tagName );
+	for ( const [ attribute, value ] of Object.entries( attributes ) ) {
+		element.setAttribute( attribute, value );
+	}
+	for ( const child of children ) {
+		if ( child ) {
+			element.appendChild( child );
+		}
+	}
+	return element;
+}
 
 async function saveWidget( id, formData = null ) {
 	let widget;
