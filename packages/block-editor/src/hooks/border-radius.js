@@ -63,7 +63,7 @@ export function BorderRadiusEdit( props ) {
 	return (
 		<UnitControl
 			value={ style?.border?.radius }
-			label={ __( 'Border radius' ) }
+			label={ __( 'Radius' ) }
 			min={ MIN_BORDER_RADIUS_VALUE }
 			onChange={ onChange }
 			onUnitChange={ onUnitChange }

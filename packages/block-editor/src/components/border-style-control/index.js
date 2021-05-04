@@ -50,7 +50,7 @@ export default function BorderStyleControl( { onChange, value } ) {
 		<fieldset className="components-border-style-control">
 			<CustomSelectControl
 				className="components-border-style-control__select"
-				label={ __( 'Border style' ) }
+				label={ __( 'Style' ) }
 				options={ BORDER_STYLES }
 				value={ style || DEFAULT_STYLE }
 				onChange={ ( { selectedItem } ) =>

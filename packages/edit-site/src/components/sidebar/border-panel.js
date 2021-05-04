@@ -104,7 +104,7 @@ export default function BorderPanel( {
 			{ hasBorderWidth && (
 				<RangeControl
 					value={ borderWidthValue }
-					label={ __( 'Border width' ) }
+					label={ __( 'Width' ) }
 					min={ MIN_BORDER_WIDTH }
 					max={ MAX_BORDER_WIDTH }
 					initialPosition={ borderWidthValue }
@@ -118,7 +118,7 @@ export default function BorderPanel( {
 			{ hasBorderRadius && (
 				<RangeControl
 					value={ borderRadiusValue }
-					label={ __( 'Border radius' ) }
+					label={ __( 'Radius' ) }
 					min={ MIN_BORDER_RADIUS_VALUE }
 					max={ MAX_BORDER_RADIUS_VALUE }
 					initialPosition={ borderRadiusValue }
@@ -131,7 +131,7 @@ export default function BorderPanel( {
 			) }
 			{ hasBorderColor && (
 				<ColorGradientControl
-					label={ __( 'Border color' ) }
+					label={ __( 'Color' ) }
 					value={ borderColor }
 					colors={ colors }
 					gradients={ undefined }

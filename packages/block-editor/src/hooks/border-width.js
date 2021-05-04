@@ -63,7 +63,7 @@ export const BorderWidthEdit = ( props ) => {
 	return (
 		<UnitControl
 			value={ style?.border?.width }
-			label={ __( 'Border width' ) }
+			label={ __( 'Width' ) }
 			min={ MIN_BORDER_WIDTH }
 			onChange={ onChange }
 			onUnitChange={ onUnitChange }
