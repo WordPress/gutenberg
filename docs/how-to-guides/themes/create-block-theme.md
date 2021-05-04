@@ -144,7 +144,7 @@ theme
  	|__ (empty folder)
 ```
 
-### Creating the templates and template parts
+## Creating the templates and template parts
 
 Now that you have the required files, you can choose to create templates and template parts manually
 or via the site editor or the template editing mode.
@@ -152,7 +152,7 @@ or via the site editor or the template editing mode.
 To create your theme, you will likely use a combination of manually created files and the site editor.
 You can assemble blocks in the block editor and copy the block markup from the code editor mode to your theme files.
 
-#### Manual template creation
+### Manual template creation
 
 Create two template part files called `footer.html` and `header.html` and place them inside the `block-template-parts` folder.
 
@@ -198,22 +198,23 @@ All block attributes are placed inside these curly brackets. If you wanted the p
 
 The HTML element that wraps the content also needs to use the corresponding CSS class: `has-text-align-center`.
 
-#### Template creation in the site editor
+### Template creation in the site editor
 
-To access the site editor to create templates and template parts, you first need to activate the basic block theme created in [step 2] (#creating-the-theme).
+To access the site editor to create templates and template parts, you first need to activate the basic block theme created in [step 2](#creating-the-theme).
 
 Open the Site Editor from the WordPress admin menu. The default view is the blank index.html template.
 
 Open the Add block menu and select and place a new template part.
 The block will have the default name "Untitled Template Part".
+
 Open the advanced section of the block settings sidebar and make the following changes:
 Change the title and area to Header, and the HTML element to `<header>`.
 
-Save the changes. You will be asked if you want to save the template part, the index template, or both. Choose both.Repeat the process and add a footer template part.
+Save the changes. You will be asked if you want to save the template part, the index template, or both. Choose both. Repeat the process and add a footer template part.
 
 Add your preferred blocks to the header and footer template parts, for example, a navigation block, a cover block with a site logo, or a columns block with contact information. Save the changes.
 
-##### Template editing mode
+### Template editing mode
 
 The template editing mode is a way to edit the website without the complexity of the site editor interface.
 It is more limited than the site editor because you can not create, select or navigate between templates in this view.
@@ -222,7 +223,7 @@ You can access the template editing mode via the block editor.
 When the document settings sidebar is open, you can find the Template panel below Status & Visibility.
 Here you will find information about the current template, and you can create a new blank template or change to an existing template.
 
-##### Exporting
+### Exporting
 
 Templates and template parts created or edited in the site editor are saved to the database as custom post types. To export them as theme files, follow these steps:
 
@@ -235,7 +236,7 @@ Templates and template parts created or edited in the site editor are saved to t
 
 Saved templates have precedence over theme files. To use the updated theme files, go to Appearance > Templates/Template parts and delete the saved templates.
 
-### Experimental-theme.json - Global styles
+## Experimental-theme.json - Global styles
 
 The `experimental-theme.json` is a configuration file used to enable or disable features and set default styles for both the website and blocks.
 
@@ -273,22 +274,22 @@ Next, add three main sections:
 }
 ```
 
-#### Content width and theme support for wide and full-width blocks
+### Content width and theme support for wide and full-width blocks
 
 Add the layout option under settings:
 The `contentSize` is the default width of the blocks. `wideSize` is the wide width.
 The example uses pixels, but any CSS value is valid.
 
 ```json
-	"layout": {
-		"contentSize": "840px",
-		"wideSize": "1100px"
-	}
+"layout": {
+	"contentSize": "840px",
+	"wideSize": "1100px"
+}
 ```
 
 This code will enable the layout setting for parent blocks in the editors. With this setting, inner blocks can either inherit the widths from the experimental-theme.json file or use specific values.
 
-#### Color palette
+### Color palette
 
 This is the equivalent of `add_theme_support( 'editor-color-palette' )`.
 You can add multiple color palettes: a default palette for all blocks and color palettes specific to a block type.
@@ -356,7 +357,7 @@ Apply the dark grey color to the body background by adding `color` as a top key 
 }
 ```
 
-#### Typography
+### Typography
 
 For a list of all typography features that can be enabled, please see the [documenation for theme.json](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/#settings).
 
@@ -436,15 +437,15 @@ The resulting CSS is:
 }
 ```
 
-#### Borders
+### Borders
 
-#### Spacing
+### Spacing
 
-#### Custom
+### Custom
 
-#### Elements
+### Elements
 
-#### Template parts
+### Template parts
 
 In the templeParts section, assign the two template parts that you created to their template areas.
 Add two keys: `name`, which is the file name of the template part file without the file ending,
@@ -453,16 +454,16 @@ and `area`, the name of the template area.
 There are three template areas to choose from: Header, footer, and general.
 
 ```json
-	"templateParts": [
-		{
-			"name": "header",
-			"area": "header"
-		},
-		{
-			"name": "footer",
-			"area": "footer"
-		}
-	],
+"templateParts": [
+	{
+		"name": "header",
+		"area": "header"
+	},
+	{
+		"name": "footer",
+		"area": "footer"
+	}
+]
 ```
 
 ## Using query and loop blocks
@@ -533,5 +534,6 @@ There is also an optional setting where you can decide which post types that can
 		]
 	}
 ]
+```
 
 If you include more than one template, separate them with a comma.
