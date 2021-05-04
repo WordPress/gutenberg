@@ -26,9 +26,9 @@ function render_block_core_post_content( $attributes, $content, $block ) {
 		if ( ! is_admin() ) {
 			trigger_error(
 				sprintf(
-					// translators: %s are the block attributes.
-					__( 'Could not render Post Content block with the attributes: <code>%s</code>. Block cannot be rendered inside itself.' ),
-					wp_json_encode( $attributes )
+					// translators: %s is a post ID (integer).
+					__( 'Could not render Post Content block with post ID: <code>%s</code>. Block cannot be rendered inside itself.' ),
+					$post_id
 				),
 				E_USER_WARNING
 			);
