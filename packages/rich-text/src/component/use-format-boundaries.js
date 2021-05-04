@@ -1,20 +1,20 @@
 /**
  * WordPress dependencies
  */
+import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
-
 import { LEFT, RIGHT } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
 import { isCollapsed } from '../is-collapsed';
-import { useFreshRef } from './use-fresh-ref';
 
 const EMPTY_ACTIVE_FORMATS = [];
 
 export function useFormatBoundaries( props ) {
-	const propsRef = useFreshRef( props );
+	const propsRef = useRef( props );
+	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
@@ -31,7 +31,6 @@ export function useFormatBoundaries( props ) {
 			}
 
 			const { record, applyRecord, setActiveFormats } = propsRef.current;
-
 			const {
 				text,
 				formats,

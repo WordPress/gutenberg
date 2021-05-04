@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 
 /**
@@ -10,10 +11,10 @@ import { toHTMLString } from '../to-html-string';
 import { isCollapsed } from '../is-collapsed';
 import { slice } from '../slice';
 import { getTextContent } from '../get-text-content';
-import { useFreshRef } from './use-fresh-ref';
 
 export function useCopyHandler( props ) {
-	const propsRef = useFreshRef( props );
+	const propsRef = useRef( props );
+	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onCopy( event ) {
 			const {

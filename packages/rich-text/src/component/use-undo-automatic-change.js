@@ -1,16 +1,13 @@
 /**
  * WordPress dependencies
  */
+import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { BACKSPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
 
-/**
- * Internal dependencies
- */
-import { useFreshRef } from './use-fresh-ref';
-
 export function useUndoAutomaticChange( props ) {
-	const propsRef = useFreshRef( props );
+	const propsRef = useRef( props );
+	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			const { keyCode } = event;
