@@ -1,8 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { _x } from '@wordpress/i18n';
 import { home } from '@wordpress/icons';
+import { createInterpolateElement } from '@wordpress/element';
+import { ExternalLink } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -16,13 +18,12 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Home Link', 'block title' ),
-
 	icon: home,
 
-	description: __( 'Link to your homepage.' ),
-
-	keywords: [ __( 'home' ), __( 'menu' ), __( 'navigation' ) ],
+	description: createInterpolateElement(
+		_x( 'Link to <a>your homepage</a>.', 'block description' ),
+		{ a: <ExternalLink href="options-reading.php" /> }
+	),
 
 	edit,
 
@@ -30,7 +31,7 @@ export const settings = {
 
 	example: {
 		attributes: {
-			label: _x( 'Home', 'Home Link preview example' ),
+			label: _x( 'Home Link', 'block example' ),
 		},
 	},
 };

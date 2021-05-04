@@ -3,6 +3,9 @@
 	"name": "core/home-link",
 	"category": "design",
 	"parent": [ "core/navigation" ],
+	"title": "Home Link",
+	"keywords": [ "home", "menu", "navigation" ],
+	"textdomain": "default",
 	"attributes": {
 		"label": {
 			"type": "string"
