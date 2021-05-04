@@ -66,7 +66,7 @@ function gutenberg_register_template_post_type() {
 		'rest_base'             => 'templates',
 		'rest_controller_class' => 'WP_REST_Templates_Controller',
 		'capability_type'       => array( 'template', 'templates' ),
-		'capabilities'          => gutenberg_get_default_capabilities_for_fse(),
+		'capabilities'          => _gutenberg_get_default_capabilities_for_fse_post_types(),
 		'map_meta_cap'          => true,
 		'supports'              => array(
 			'title',

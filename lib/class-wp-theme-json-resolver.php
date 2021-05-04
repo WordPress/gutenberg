@@ -422,7 +422,7 @@ class WP_Theme_JSON_Resolver {
 			'show_ui'      => false,
 			'show_in_rest' => true,
 			'rest_base'    => '__experimental/global-styles',
-			'capabilities' => gutenberg_get_default_capabilities_for_fse(),
+			'capabilities' => _gutenberg_get_default_capabilities_for_fse_post_types(),
 			'map_meta_cap' => true,
 			'supports'     => array(
 				'title',

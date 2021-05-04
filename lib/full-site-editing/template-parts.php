@@ -46,7 +46,7 @@ function gutenberg_register_template_part_post_type() {
 		'show_in_rest'          => true,
 		'rest_base'             => 'template-parts',
 		'rest_controller_class' => 'WP_REST_Templates_Controller',
-		'capabilities'          => gutenberg_get_default_capabilities_for_fse(),
+		'capabilities'          => _gutenberg_get_default_capabilities_for_fse_post_types(),
 		'map_meta_cap'          => true,
 		'supports'              => array(
 			'title',

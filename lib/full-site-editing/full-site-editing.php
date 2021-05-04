@@ -147,9 +147,12 @@ add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_site_edito
 /**
  * Used by wp_template, wp_template_part and wp_global_styles to map post type capabilities to edit_theme_options.
  *
+ * @access private
+ * @internal
+ *
  * @return array Default capabilities.
  */
-function gutenberg_get_default_capabilities_for_fse() {
+function _gutenberg_get_default_capabilities_for_fse_post_types() {
 	return array(
 		'create_posts'           => 'edit_theme_options',
 		'delete_posts'           => 'edit_theme_options',
