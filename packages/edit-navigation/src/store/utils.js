@@ -248,9 +248,7 @@ export const blockAttributesToMenuItem = ( {
 			'custom' !== type && {
 				object_id: id,
 			} ),
-		...( opensInNewTab && {
-			target: NEW_TAB_TARGET_ATTRIBUTE,
-		} ),
+		target: opensInNewTab ? NEW_TAB_TARGET_ATTRIBUTE : '',
 	};
 };
 

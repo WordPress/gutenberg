@@ -319,6 +319,7 @@ describe( 'computeCustomizedAttribute', () => {
 				url: 'http://wp.org',
 				xfn: [ 'external' ],
 				type: 'custom',
+				target: '',
 			},
 			'nav_menu_item[101]': {
 				_invalid: false,
@@ -349,6 +350,7 @@ describe( 'computeCustomizedAttribute', () => {
 				object_id: 678, // equivalent: block.attributes.id
 				type: 'post_type', // // equivalent: block.attributes.kind
 				url: 'https://localhost:8889/page-example/',
+				target: '',
 			},
 		} );
 	} );
@@ -417,6 +419,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				object_id: 101,
 				object: 'post',
 				type: 'post_type',
+				target: '',
 			},
 		},
 		{
@@ -475,6 +478,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 				object_id: 103,
 				object: 'post_tag',
 				type: 'taxonomy',
+				target: '',
 			},
 		},
 		{
@@ -742,6 +746,39 @@ describe( 'Mapping block attributes and menu item fields', () => {
 			);
 
 			expect( Object.values( actual ) ).not.toContain( undefined );
+		} );
+
+		it( 'allows for setting and unsetting of target property based on opensInNewTab arttribute boolean', () => {
+			const shared = {
+				id: 12345, // added for test purposes only - should't exist.
+				type: 'custom', // custom type indicates we shouldn't need an `id` field.
+				kind: 'custom', // custom type indicates we shouldn't need an `id` field.
+				label: 'Example',
+				url: '/example/',
+			};
+
+			const openInNewTabBlock = {
+				...shared,
+				opensInNewTab: true,
+			};
+
+			const doNotOpenInNewTabBlock = {
+				...shared,
+				opensInNewTab: false,
+			};
+
+			const shouldOpenInNewTab = blockAttributesToMenuItem(
+				openInNewTabBlock
+			);
+
+			const shouldNotOpenInNewTab = blockAttributesToMenuItem(
+				doNotOpenInNewTabBlock
+			);
+
+			expect( shouldOpenInNewTab.target ).toBe( '_blank' );
+
+			// Should also allow unsetting of an existing value.
+			expect( shouldNotOpenInNewTab.target ).toBe( '' );
 		} );
 	} );
 
