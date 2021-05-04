@@ -28,6 +28,7 @@ import {
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { useRef } from '@wordpress/element';
 import { Popover, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
@@ -131,7 +132,9 @@ export default function VisualEditor( { styles } ) {
 		paddingBottom = '40vh';
 	}
 
+	const ref = useRef();
 	const contentRef = useMergeRefs( [
+		ref,
 		useClipboardHandler(),
 		useCanvasClickRedirect(),
 		useTypewriter(),
@@ -146,11 +149,11 @@ export default function VisualEditor( { styles } ) {
 	// because it will bubble through portals.
 	const toolWrapperRef = useRefEffect( ( node ) => {
 		function onWheel( { deltaX, deltaY } ) {
-			contentRef.current.scrollBy( deltaX, deltaY );
+			ref.current.scrollBy( deltaX, deltaY );
 		}
 		node.addEventListener( 'wheel', onWheel );
 		return () => {
-			node.addEventListener( 'wheel', onWheel );
+			node.removeEventListener( 'wheel', onWheel );
 		};
 	}, [] );
 
@@ -181,52 +184,48 @@ export default function VisualEditor( { styles } ) {
 					{ __( 'Back' ) }
 				</Button>
 			) }
-			<div
+			<motion.div
 				ref={ toolWrapperRef }
-				style={ { width: '100%', height: '100%' } }
+				animate={ animatedStyles }
+				initial={ desktopCanvasStyles }
 			>
 				<Popover.Slot name="block-toolbar" />
-				<motion.div
-					animate={ animatedStyles }
-					initial={ desktopCanvasStyles }
+				<MaybeIframe
+					isTemplateMode={ isTemplateMode }
+					contentRef={ contentRef }
+					styles={ styles }
+					style={ { paddingBottom } }
 				>
-					<MaybeIframe
-						isTemplateMode={ isTemplateMode }
-						contentRef={ contentRef }
-						styles={ styles }
-						style={ { paddingBottom } }
-					>
-						<AnimatePresence>
-							<motion.div
-								key={ isTemplateMode ? 'template' : 'post' }
-								initial={ { opacity: 0 } }
-								animate={ { opacity: 1 } }
-							>
-								<WritingFlow>
-									{ ! isTemplateMode && (
-										<div className="edit-post-visual-editor__post-title-wrapper">
-											<PostTitle />
-										</div>
-									) }
-									<BlockList
-										__experimentalLayout={
-											themeSupportsLayout
-												? {
-														type: 'default',
-														// Find a way to inject this in the support flag code (hooks).
-														alignments: themeSupportsLayout
-															? alignments
-															: undefined,
-												  }
-												: undefined
-										}
-									/>
-								</WritingFlow>
-							</motion.div>
-						</AnimatePresence>
-					</MaybeIframe>
-				</motion.div>
-			</div>
+					<AnimatePresence>
+						<motion.div
+							key={ isTemplateMode ? 'template' : 'post' }
+							initial={ { opacity: 0 } }
+							animate={ { opacity: 1 } }
+						>
+							<WritingFlow>
+								{ ! isTemplateMode && (
+									<div className="edit-post-visual-editor__post-title-wrapper">
+										<PostTitle />
+									</div>
+								) }
+								<BlockList
+									__experimentalLayout={
+										themeSupportsLayout
+											? {
+													type: 'default',
+													// Find a way to inject this in the support flag code (hooks).
+													alignments: themeSupportsLayout
+														? alignments
+														: undefined,
+											  }
+											: undefined
+									}
+								/>
+							</WritingFlow>
+						</motion.div>
+					</AnimatePresence>
+				</MaybeIframe>
+			</motion.div>
 			<__experimentalBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
