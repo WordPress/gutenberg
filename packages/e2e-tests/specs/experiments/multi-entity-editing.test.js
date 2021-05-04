@@ -10,6 +10,7 @@ import {
 	canvas,
 	openDocumentSettingsSidebar,
 	pressKeyWithModifier,
+	selectBlockByClientId,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -286,19 +287,17 @@ describe( 'Multi-entity editor states', () => {
 		} );
 
 		it( 'should not allow selecting template part content without parent selected', async () => {
-			// Try to select parent template first.
-			await canvas().click(
-				'.wp-block-template-part .wp-block[data-type="core/paragraph"]'
-			);
-			// Try to select and edit content of child template part.
+			// Unselect blocks.
+			await selectBlockByClientId();
+			// Try to select a child block of a template part.
 			await canvas().click(
 				'.wp-block-template-part .wp-block-template-part .wp-block[data-type="core/paragraph"]'
 			);
-			await page.keyboard.type( 'this shouldnt affect anything...' );
 
-			expect( await isEntityDirty( templateName ) ).toBe( false );
-			expect( await isEntityDirty( templatePartName ) ).toBe( false );
-			expect( await isEntityDirty( nestedTPName ) ).toBe( false );
+			const selectedBlock = await page.evaluate( () => {
+				return wp.data.select( 'core/block-editor' ).getSelectedBlock();
+			} );
+			expect( selectedBlock?.name ).toBe( 'core/template-part' );
 		} );
 	} );
 } );
