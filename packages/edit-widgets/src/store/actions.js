@@ -4,6 +4,8 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as interfaceStore } from '@wordpress/interface';
+import { getWidgetIdFromBlock } from '@wordpress/widgets';
+
 /**
  * Internal dependencies
  */
@@ -122,8 +124,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 	const deletedWidgets = areaWidgets.filter(
 		( { id } ) =>
 			! widgetsBlocks.some(
-				( { attributes: { __internalWidgetId } } ) =>
-					__internalWidgetId === id
+				( widgetBlock ) => getWidgetIdFromBlock( widgetBlock ) === id
 			)
 	);
 
@@ -132,7 +133,7 @@ export function* saveWidgetArea( widgetAreaId ) {
 	const sidebarWidgetsIds = [];
 	for ( let i = 0; i < widgetsBlocks.length; i++ ) {
 		const block = widgetsBlocks[ i ];
-		const widgetId = block.attributes.__internalWidgetId;
+		const widgetId = getWidgetIdFromBlock( block );
 		const oldWidget = widgets[ widgetId ];
 		const widget = transformBlockToWidget( block, oldWidget );
 		// We'll replace the null widgetId after save, but we track it here
