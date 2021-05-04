@@ -20,7 +20,7 @@ export const settings = {
 
 	icon: home,
 
-	description: __( 'Add a home link to your navigation.' ),
+	description: __( 'Link to your homepage.' ),
 
 	keywords: [ __( 'home' ), __( 'menu' ), __( 'navigation' ) ],
 

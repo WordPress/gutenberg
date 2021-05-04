@@ -62,14 +62,13 @@ export default function HomeEdit( {
 	return (
 		<>
 			<InspectorControls>
-				<PanelBody title={ __( 'Home link settings' ) }>
+				<PanelBody title={ __( 'Settings' ) }>
 					<ToggleControl
 						label={ __( 'Open in new tab' ) }
 						checked={ opensInNewTab }
 						onChange={ () => {
 							setAttributes( { opensInNewTab: ! opensInNewTab } );
 						} }
-						help={ __( 'Opens the home link in a new tab' ) }
 					/>
 					<TextControl
 						value={ title || '' }
