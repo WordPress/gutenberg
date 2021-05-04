@@ -101,6 +101,11 @@ export function* saveWidgetArea( widgetAreaId ) {
 		buildWidgetAreaPostId( widgetAreaId )
 	);
 
+	// Get all widgets from this area
+	const areaWidgets = Object.values( widgets ).filter(
+		( { sidebar } ) => sidebar === widgetAreaId
+	);
+
 	// Remove all duplicate reference widget instances
 	const usedReferenceWidgets = [];
 	const widgetsBlocks = post.blocks.filter( ( { attributes: { id } } ) => {
@@ -112,6 +117,15 @@ export function* saveWidgetArea( widgetAreaId ) {
 		}
 		return true;
 	} );
+
+	// Get all widgets that have been deleted
+	const deletedWidgets = areaWidgets.filter(
+		( { id } ) =>
+			! widgetsBlocks.some(
+				( { attributes: { __internalWidgetId } } ) =>
+					__internalWidgetId === id
+			)
+	);
 
 	const batchMeta = [];
 	const batchTasks = [];
@@ -168,14 +182,31 @@ export function* saveWidgetArea( widgetAreaId ) {
 			clientId: block.clientId,
 		} );
 	}
+	for ( const widget of deletedWidgets ) {
+		batchTasks.push( ( { deleteEntityRecord } ) =>
+			deleteEntityRecord( 'root', 'widget', widget.id, {
+				force: true,
+			} )
+		);
+	}
 
 	const records = yield dispatch( 'core', '__experimentalBatch', batchTasks );
+	const preservedRecords = records.filter(
+		( record ) => ! record.hasOwnProperty( 'deleted' )
+	);
 
 	const failedWidgetNames = [];
 
-	for ( let i = 0; i < records.length; i++ ) {
-		const widget = records[ i ];
+	for ( let i = 0; i < preservedRecords.length; i++ ) {
+		const widget = preservedRecords[ i ];
 		const { block, position } = batchMeta[ i ];
+
+		yield dispatch(
+			'core/block-editor',
+			'updateBlockAttributes',
+			block.clientId,
+			{ __internalWidgetId: widget.id }
+		);
 
 		const error = yield select(
 			'core',
