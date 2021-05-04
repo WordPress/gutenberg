@@ -94,7 +94,7 @@ const handleEntitySearch = async (
 	return isURLLike( val ) || ! withCreateSuggestion
 		? results
 		: results.concat( {
-				// the `id` prop is intentionally ommitted here because it
+				// the `id` prop is intentionally omitted here because it
 				// is never exposed as part of the component's public API.
 				// see: https://github.com/WordPress/gutenberg/pull/19775#discussion_r378931316.
 				title: val, // must match the existing `<input>`s text value

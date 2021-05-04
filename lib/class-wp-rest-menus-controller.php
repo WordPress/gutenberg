@@ -382,7 +382,7 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 
 		$prepared_term = $this->prepare_item_for_database( $request );
 
-		// Only update the term if we haz something to update.
+		// Only update the term if we have something to update.
 		if ( ! empty( $prepared_term ) ) {
 			$update = wp_update_nav_menu_object( $term->term_id, wp_slash( (array) $prepared_term ) );
 
