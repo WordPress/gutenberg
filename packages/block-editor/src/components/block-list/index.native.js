@@ -207,6 +207,7 @@ export class BlockList extends Component {
 			isStackedHorizontally,
 			horizontalAlignment,
 			contentResizeMode,
+			// eslint-disable-next-line no-unused-vars
 			blockWidth,
 			numColumns,
 		} = this.props;
@@ -226,8 +227,11 @@ export class BlockList extends Component {
 			marginHorizontal: isRootList ? 0 : -marginHorizontal,
 		};
 
+		// eslint-disable-next-line no-unused-vars
 		const isContentStretch = contentResizeMode === 'stretch';
+		// eslint-disable-next-line no-unused-vars
 		const isMultiBlocks = blockClientIds.length > 1;
+		// eslint-disable-next-line no-unused-vars
 		const { isWider } = alignmentHelpers;
 
 		return (

@@ -45,6 +45,7 @@ export const Gallery = ( props ) => {
 		imageCount,
 		align,
 		columns = defaultColumnsNumber( imageCount ),
+		// eslint-disable-next-line no-unused-vars
 		imageCrop,
 	} = attributes;
 

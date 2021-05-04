@@ -9,12 +9,14 @@ import { concat, find } from 'lodash';
  */
 import { compose } from '@wordpress/compose';
 import {
+	// eslint-disable-next-line no-unused-vars
 	BaseControl,
 	PanelBody,
 	SelectControl,
 	ToggleControl,
 	withNotices,
 	RangeControl,
+	// eslint-disable-next-line no-unused-vars
 	Spinner,
 } from '@wordpress/components';
 import {
@@ -490,7 +492,7 @@ function GalleryEdit( props ) {
 							hideCancelButton={ true }
 						/>
 					) }
-					{/* { ! imageSizeOptions && (
+					{ /* { ! imageSizeOptions && (
 						<BaseControl className={ 'gallery-image-sizes' }>
 							<BaseControl.VisualLabel>
 								{ __( 'Image size' ) }
@@ -500,7 +502,7 @@ function GalleryEdit( props ) {
 								{ __( 'Loading options…' ) }
 							</View>
 						</BaseControl>
-					) } */}
+					) } */ }
 				</PanelBody>
 			</InspectorControls>
 			{ noticeUI }
