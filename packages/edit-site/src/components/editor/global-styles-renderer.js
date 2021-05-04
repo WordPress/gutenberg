@@ -64,14 +64,14 @@ function getBlockPresetClasses( blockSelector, blockPresets = {} ) {
 			if ( ! classes ) {
 				return declarations;
 			}
-			classes.forEach( ( { classSuffix, propertyName } ) => {
-				const presets = get( blockPresets, path, [] );
-				presets.forEach( ( preset ) => {
+			const presets = get( blockPresets, path, [] );
+			presets.forEach( ( preset ) => {
+				classes.forEach( ( { classSuffix, propertyName } ) => {
 					const slug = preset.slug;
 					const value = preset[ valueKey ];
 					const classSelectorToUse = `.has-${ slug }-${ classSuffix }`;
 					const selectorToUse = `${ blockSelector }${ classSelectorToUse }`;
-					declarations += `${ selectorToUse } {${ propertyName }: ${ value };}`;
+					declarations += `${ selectorToUse }{${ propertyName }: ${ value } !important;}`;
 				} );
 			} );
 			return declarations;

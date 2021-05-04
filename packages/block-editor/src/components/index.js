@@ -28,6 +28,7 @@ export { BlockNavigationBlockFill as __experimentalBlockNavigationBlockFill } fr
 export { default as __experimentalBlockNavigationEditor } from './block-navigation/editor';
 export { default as __experimentalBlockNavigationTree } from './block-navigation/tree';
 export { default as __experimentalBlockVariationPicker } from './block-variation-picker';
+export { default as __experimentalBlockPatternSetup } from './block-pattern-setup';
 export { default as __experimentalBlockVariationTransforms } from './block-variation-transforms';
 export {
 	BlockVerticalAlignmentToolbar,
@@ -38,6 +39,7 @@ export { default as ButtonBlockerAppender } from './button-block-appender';
 export { default as ColorPalette } from './color-palette';
 export { default as ColorPaletteControl } from './color-palette/control';
 export { default as ContrastChecker } from './contrast-checker';
+export { default as __experimentalDuotoneControl } from './duotone-control';
 export { default as __experimentalGradientPicker } from './gradient-picker';
 export { default as __experimentalGradientPickerControl } from './gradient-picker/control';
 export { default as __experimentalGradientPickerPanel } from './gradient-picker/panel';
@@ -93,7 +95,6 @@ export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { useBlockProps } from './block-list/use-block-props';
-export { Block as __experimentalBlock } from './block-list/block-wrapper';
 export { LayoutStyle as __experimentalLayoutStyle } from './block-list/layout';
 export { default as BlockMover } from './block-mover';
 export { default as BlockPreview } from './block-preview';

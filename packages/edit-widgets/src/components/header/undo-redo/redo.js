@@ -1,18 +1,19 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { redo as redoIcon } from '@wordpress/icons';
+import { redo as redoIcon, undo as undoIcon } from '@wordpress/icons';
 import { displayShortcut } from '@wordpress/keycodes';
+import { store as coreStore } from '@wordpress/core-data';
 
 export default function RedoButton() {
-	const hasRedo = useSelect( ( select ) => select( 'core' ).hasRedo() );
-	const { redo } = useDispatch( 'core' );
+	const hasRedo = useSelect( ( select ) => select( coreStore ).hasRedo() );
+	const { redo } = useDispatch( coreStore );
 	return (
 		<ToolbarButton
-			icon={ redoIcon }
+			icon={ ! isRTL() ? redoIcon : undoIcon }
 			label={ __( 'Redo' ) }
 			shortcut={ displayShortcut.primaryShift( 'z' ) }
 			// If there are no undo levels we don't want to actually disable this

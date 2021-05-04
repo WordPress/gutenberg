@@ -1,15 +1,13 @@
 /**
- * External dependencies
- */
-import { Button, Divider, Heading, Spacer } from '@wp-g2/components';
-
-/**
  * Internal dependencies
  */
 import { Grid } from '../../grid';
-import { Text } from '../../text';
+import { Text } from '../../../text';
 import { VStack } from '../../v-stack';
 import { Card, CardBody, CardFooter } from '../index';
+import { Divider } from '../../divider';
+import { Heading } from '../../../heading';
+import Button from '../../../button';
 
 export default {
 	component: Card,
@@ -33,7 +31,6 @@ const ExampleCard = () => {
 						<Text>Code is Poetry</Text>
 					</VStack>
 				</CardBody>
-				<Spacer />
 				<Divider />
 				<CardFooter>
 					<Button>Action</Button>

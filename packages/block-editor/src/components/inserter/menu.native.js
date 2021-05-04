@@ -53,18 +53,11 @@ function InserterMenu( {
 		insertDefaultBlock,
 	} = useDispatch( blockEditorStore );
 
-	const {
-		items,
-		destinationRootClientId,
-		getBlockOrder,
-		getBlockCount,
-		canInsertBlockType,
-	} = useSelect( ( select ) => {
+	const { items, destinationRootClientId } = useSelect( ( select ) => {
 		const {
 			getInserterItems,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
-			...selectBlockEditorStore
 		} = select( blockEditorStore );
 
 		let targetRootClientId = rootClientId;
@@ -78,13 +71,12 @@ function InserterMenu( {
 		return {
 			items: getInserterItems( targetRootClientId ),
 			destinationRootClientId: targetRootClientId,
-			getBlockOrder: selectBlockEditorStore.getBlockOrder,
-			getBlockCount: selectBlockEditorStore.getBlockCount,
-			canInsertBlockType: selectBlockEditorStore.canInsertBlockType,
 		};
 	} );
-
-	const { getBlockType } = useSelect( ( select ) => select( blocksStore ) );
+	const { getBlockOrder, getBlockCount, canInsertBlockType } = useSelect(
+		blockEditorStore
+	);
+	const { getBlockType } = useSelect( blocksStore );
 
 	useEffect( () => {
 		// Show/Hide insertion point on Mount/Dismount

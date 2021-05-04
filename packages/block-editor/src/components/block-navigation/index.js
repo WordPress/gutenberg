@@ -32,7 +32,7 @@ export default function BlockNavigation( {
 			const _selectedBlockClientId = getSelectedBlockClientId();
 			const _rootBlocks = __unstableGetClientIdsTree();
 			const _rootBlock =
-				selectedBlockClientId && ! isArray( selectedBlockClientId )
+				_selectedBlockClientId && ! isArray( _selectedBlockClientId )
 					? __unstableGetClientIdWithClientIdsTree(
 							getBlockHierarchyRootClientId(
 								_selectedBlockClientId

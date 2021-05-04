@@ -1,20 +1,23 @@
 /**
  * External dependencies
  */
-import { css, ui } from '@wp-g2/styles';
+import { css } from 'emotion';
+
 /**
  * Internal dependencies
  */
 import { CardBody } from '../card';
+import * as ZIndex from '../../utils/z-index';
+import CONFIG from '../../utils/config-values';
 
 export const PopoverContent = css`
-	${ ui.zIndex( 'Popover', 10000 ) };
+	z-index: ${ ZIndex.Popover };
 	box-sizing: border-box;
 	opacity: 0;
 	outline: none;
 	position: relative;
 	transform-origin: center center;
-	transition: opacity ${ ui.get( 'transitionDurationFastest' ) } linear;
+	transition: opacity ${ CONFIG.transitionDurationFastest } linear;
 	width: 100%;
 
 	&[data-enter] {
@@ -28,7 +31,7 @@ export const PopoverContent = css`
 `;
 
 export const cardStyle = css`
-	${ CardBody } {
+	${ CardBody.selector } {
 		max-height: 80vh;
 	}
 `;

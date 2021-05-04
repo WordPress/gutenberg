@@ -58,6 +58,8 @@ The block editor allows themes to opt-in to slightly more opinionated styles for
 add_theme_support( 'wp-block-styles' );
 ```
 
+You can see the CSS that will be included in the [block library theme file](https://github.com/WordPress/gutenberg/blob/trunk/packages/block-library/src/theme.scss).
+
 ### Wide Alignment:
 
 Some blocks such as the image block have the possibility to define a "wide" or "full" alignment by adding the corresponding classname to the block's wrapper ( `alignwide` or `alignfull` ). A theme can opt-in for this feature by calling:
@@ -238,7 +240,9 @@ As an example for the regular font size, a theme may provide the following class
 }
 ```
 
-**Note:** The slugs `default` and `custom` are reserved and cannot be used by themes.
+<div class="callout callout-info">
+<strong>Note:</strong> The slugs `default` and `custom` are reserved and cannot be used by themes.
+</div>
 
 ### Disabling custom font sizes
 
@@ -395,7 +399,7 @@ Using the Gutenberg plugin (version 8.3 or later), link color control is availab
 add_theme_support('experimental-link-color');
 ```
 
-If a theme opts in, it should [define default link colors](https://developer.wordpress.org/block-editor/developers/themes/theme-json/#color-properties) in `experimental-theme.json` (or in its theme styles if no `experimental-theme.json` is present). For example:
+If a theme opts in, it should [define default link colors](/docs/how-to-guides/themes/theme-json.md#color-properties) in `experimental-theme.json` (or in its theme styles if no `experimental-theme.json` is present). For example:
 
 ```css
 {

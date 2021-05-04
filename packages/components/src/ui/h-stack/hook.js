@@ -1,19 +1,14 @@
 /**
- * External dependencies
- */
-import { hasNamespace, useContextSystem } from '@wp-g2/context';
-import { ui } from '@wp-g2/styles';
-import { getValidChildren } from '@wp-g2/utils';
-
-/**
  * Internal dependencies
  */
-import { FlexItem, useFlex } from '../flex';
+import { hasConnectNamespace, useContextSystem } from '../context';
+import { FlexItem, useFlex } from '../../flex';
 import { getAlignmentProps } from './utils';
+import { getValidChildren } from '../utils/get-valid-children';
 
 /**
  *
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
  */
 export function useHStack( props ) {
 	const {
@@ -31,17 +26,10 @@ export function useHStack( props ) {
 		// @ts-ignore
 		( /** @type {import('react').ReactElement} */ child, index ) => {
 			const _key = child.key || `hstack-${ index }`;
-			const _isSpacer = hasNamespace( child, [ 'Spacer' ] );
+			const _isSpacer = hasConnectNamespace( child, [ 'Spacer' ] );
 
 			if ( _isSpacer ) {
-				return (
-					<FlexItem
-						isBlock
-						key={ _key }
-						{ ...child.props }
-						{ ...ui.$( 'Spacer' ) }
-					/>
-				);
+				return <FlexItem isBlock key={ _key } { ...child.props } />;
 			}
 
 			return child;
