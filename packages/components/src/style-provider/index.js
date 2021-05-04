@@ -5,8 +5,14 @@ import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import memoize from 'memize';
 
+/**
+ * WordPress dependencies
+ */
+import { useInstanceId } from '@wordpress/compose';
+
 const memoizedCreateCacheWithContainer = memoize( ( container ) => {
-	return createCache( { container } );
+	const key = useInstanceId( container, 'wp-css' );
+	return createCache( { container, key } );
 } );
 
 export default function StyleProvider( { children, document } ) {
