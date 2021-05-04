@@ -240,7 +240,9 @@ As an example for the regular font size, a theme may provide the following class
 }
 ```
 
-**Note:** The slugs `default` and `custom` are reserved and cannot be used by themes.
+<div class="callout callout-info">
+<strong>Note:</strong> The slugs `default` and `custom` are reserved and cannot be used by themes.
+</div>
 
 ### Disabling custom font sizes
 
