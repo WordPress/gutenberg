@@ -167,6 +167,26 @@ export const __experimentalGetCoreBlocks = () => [
 	textColumns,
 	verse,
 	video,
+
+	// Theme blocks
+	siteLogo,
+	siteTagline,
+	siteTitle,
+
+	query,
+	queryLoop,
+	queryTitle,
+	queryPagination,
+	queryPaginationNext,
+	queryPaginationNumbers,
+	queryPaginationPrevious,
+
+	postTitle,
+	postContent,
+	postAuthor,
+	postDate,
+	postExcerpt,
+	postFeaturedImage,
 ];
 
 /**
@@ -218,21 +238,8 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					// Register Full Site Editing Blocks.
 					...( enableFSEBlocks
 						? [
-								siteLogo,
-								siteTagline,
-								siteTitle,
 								templatePart,
-								query,
-								queryLoop,
-								queryTitle,
-								queryPagination,
-								queryPaginationNext,
-								queryPaginationNumbers,
-								queryPaginationPrevious,
 								logInOut,
-								postTitle,
-								postContent,
-								postAuthor,
 								postComment,
 								postCommentAuthor,
 								postCommentContent,
@@ -241,9 +248,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postCommentsCount,
 								postCommentsForm,
 								postCommentsLink,
-								postDate,
-								postExcerpt,
-								postFeaturedImage,
 								postHierarchicalTerms,
 								postTags,
 								postNavigationLink,
