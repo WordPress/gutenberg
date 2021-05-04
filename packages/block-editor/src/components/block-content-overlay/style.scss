@@ -7,22 +7,23 @@
 		left: 0;
 		width: 100%;
 		height: 100%;
-		z-index: 100;
+		z-index: z-index(".block-editor-block-content-overlay .block-editor-block-content-overlay__overlay");
 		background: transparent;
 		border: none;
-		border-radius: 2px;
+		border-radius: $radius-block-ui;
 	}
 
 	&:hover:not(.parent-selected):not(.child-selected):not(.is-dragging-blocks) {
 		> .block-editor-block-content-overlay__overlay {
-			background: rgba(#007cba, 0.1);
+			background-color: var(--wp-admin-theme-color);
+			opacity: 0.1;
 			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 		}
 	}
 
 	&:not(.parent-selected):not(.child-selected):not(.is-dragging-blocks) .block-editor-block-content-overlay__content-wrapper {
 		* {
-			pointer-events: none !important;
+			pointer-events: none;
 		}
 	}
 
