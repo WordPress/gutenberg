@@ -267,7 +267,7 @@ Provides a unique instance ID.
 
 _Parameters_
 
--   _object_ `any`: Object reference to create an id for.
+-   _object_ `object`: Object reference to create an id for.
 -   _prefix_ `[string]`: Prefix for the unique id.
 -   _preferredId_ `[string]`: Default ID to use.
 
