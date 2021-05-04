@@ -19,6 +19,7 @@
 				"sticky": "",
 				"inherit": true
 			},
+			"tagName": "div",
 			"layout": {
 				"type": "list"
 			}
