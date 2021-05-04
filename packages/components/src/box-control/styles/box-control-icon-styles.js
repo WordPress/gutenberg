@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from '@emotion/core';
+import { css } from '@emotion/css';
 import styled from '@emotion/styled';
 
 export const Root = styled.span`
