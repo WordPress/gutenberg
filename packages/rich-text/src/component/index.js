@@ -9,7 +9,7 @@ import {
 	useMemo,
 	useLayoutEffect,
 } from '@wordpress/element';
-import { BACKSPACE, DELETE, ENTER, SPACE, ESCAPE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER, SPACE } from '@wordpress/keycodes';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
 import { useMergeRefs } from '@wordpress/compose';
 
@@ -35,6 +35,7 @@ import { useInlineWarning } from './use-inline-warning';
 import { insert } from '../insert';
 import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
+import { useUndoAutomaticChange } from './use-undo-automatic-change';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -401,21 +402,11 @@ function RichText(
 	function handleDelete( event ) {
 		const { keyCode } = event;
 
-		if (
-			keyCode !== DELETE &&
-			keyCode !== BACKSPACE &&
-			keyCode !== ESCAPE
-		) {
+		if ( event.defaultPrevented ) {
 			return;
 		}
 
-		if ( didAutomaticChange ) {
-			event.preventDefault();
-			undo();
-			return;
-		}
-
-		if ( keyCode === ESCAPE ) {
+		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
 			return;
 		}
 
@@ -941,6 +932,7 @@ function RichText(
 			ref,
 			useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
 			useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
+			useUndoAutomaticChange( { didAutomaticChange, undo } ),
 		] ),
 		style: defaultStyle,
 		className: 'rich-text',
