@@ -15,6 +15,18 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
+function toggleRichText( container, toggle ) {
+	Array.from( container.querySelectorAll( '.rich-text' ) ).forEach(
+		( node ) => {
+			if ( toggle ) {
+				node.setAttribute( 'contenteditable', true );
+			} else {
+				node.removeAttribute( 'contenteditable' );
+			}
+		}
+	);
+}
+
 /**
  * Returns for the deepest node at the start or end of a container node. Ignores
  * any text nodes that only contain HTML formatting whitespace.
@@ -108,6 +120,8 @@ export default function useMultiSelection( ref ) {
 		if ( length < 2 ) {
 			return;
 		}
+
+		toggleRichText( ref.current, false );
 
 		// These must be in the right DOM order.
 
