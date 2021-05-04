@@ -39,12 +39,7 @@ function IconButton( { icon, label, hint, style, ...props } ) {
 	);
 }
 
-function InserterSearchForm( {
-	value,
-	onChange,
-	onFocus,
-	onLayout = () => {},
-} ) {
+function InserterSearchForm( { value, onChange, onFocus } ) {
 	const [ isActive, setIsActive ] = useState( false );
 
 	const isIOS = Platform.OS === 'ios';
@@ -153,7 +148,6 @@ function InserterSearchForm( {
 				onActive( true );
 				inputRef.current.focus();
 			} }
-			onLayout={ onLayout }
 			activeOpacity={ 1 }
 		>
 			<View style={ inputContainerStyle }>
