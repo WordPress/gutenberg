@@ -6,6 +6,8 @@
  */
 
 .editor-styles-wrapper {
+	padding: 8px;
+
 	/**
 	* The following styles revert to the browser defaults overriding the WPAdmin styles.
 	* This is only needed while the block editor is not being loaded in an iframe.
@@ -14,14 +16,6 @@
 	font-size: initial;
 	line-height: initial;
 	color: initial;
-
-	& > .block-editor-writing-flow {
-		box-sizing: border-box;
-		padding: 8px;
-		width: 100%;
-		height: 100%;
-		overflow: auto;
-	}
 
 	// For full-wide blocks, we compensate for the base padding.
 	// These margins should match the padding value above.
