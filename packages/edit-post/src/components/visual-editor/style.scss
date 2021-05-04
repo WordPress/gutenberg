@@ -102,6 +102,10 @@
 	.wp-block-post-excerpt {
 		cursor: default !important;
 		caret-color: transparent;
+
+		&::selection {
+			background: transparent;
+		}
 	}
 
 	// Disable featured image uploading
