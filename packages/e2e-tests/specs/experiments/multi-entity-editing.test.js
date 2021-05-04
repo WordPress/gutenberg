@@ -284,5 +284,21 @@ describe( 'Multi-entity editor states', () => {
 			expect( await isEntityDirty( templatePartName ) ).toBe( false );
 			expect( await isEntityDirty( nestedTPName ) ).toBe( true );
 		} );
+
+		it( 'should not allow selecting template part content without parent selected', async () => {
+			// Try to select parent template first.
+			await canvas().click(
+				'.wp-block-template-part .wp-block[data-type="core/paragraph"]'
+			);
+			// Try to select and edit content of child template part.
+			await canvas().click(
+				'.wp-block-template-part .wp-block-template-part .wp-block[data-type="core/paragraph"]'
+			);
+			await page.keyboard.type( 'this shouldnt affect anything...' );
+
+			expect( await isEntityDirty( templateName ) ).toBe( false );
+			expect( await isEntityDirty( templatePartName ) ).toBe( false );
+			expect( await isEntityDirty( nestedTPName ) ).toBe( false );
+		} );
 	} );
 } );
