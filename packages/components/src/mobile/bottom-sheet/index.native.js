@@ -124,6 +124,8 @@ class BottomSheet extends Component {
 		const { duration, easing } = event;
 
 		if ( duration && easing ) {
+			// This layout animation is the same as the React Native's KeyboardAvoidingView component.
+			// Reference: https://github.com/facebook/react-native/blob/266b21baf35e052ff28120f79c06c4f6dddc51a9/Libraries/Components/Keyboard/KeyboardAvoidingView.js#L119-L128
 			const animationConfig = {
 				// We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m
 				duration: duration > 10 ? duration : 10,
