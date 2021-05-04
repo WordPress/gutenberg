@@ -14,25 +14,54 @@
  * @return string Returns the filtered post content of the current post.
  */
 function render_block_core_post_content( $attributes, $content, $block ) {
+	static $seen_ids = array();
+
 	if ( ! isset( $block->context['postId'] ) ) {
 		return '';
 	}
+
+	$post_id = $block->context['postId'];
+
+	if ( isset( $seen_ids[ $post_id ] ) ) {
+		if ( ! is_admin() ) {
+			trigger_error(
+				sprintf(
+					// translators: %s are the block attributes.
+					__( 'Could not render Post Content block with the attributes: <code>%s</code>. Block cannot be rendered inside itself.' ),
+					wp_json_encode( $attributes )
+				),
+				E_USER_WARNING
+			);
+		}
+
+		$is_debug = defined( 'WP_DEBUG' ) && WP_DEBUG &&
+			defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+		return $is_debug ?
+			// translators: Visible only in the front end, this warning takes the place of a faulty block.
+			__( '[block rendering halted]' ) :
+			'';
+	}
+
+	$seen_ids[ $post_id ] = true;
 
 	if ( ! in_the_loop() ) {
 		the_post();
 	}
 
-	$content = get_the_content( null, false, $block->context['postId'] );
+	$content = get_the_content( null, false, $post_id );
 
 	if ( empty( $content ) ) {
+		unset( $seen_ids[ $post_id ] );
 		return '';
 	}
 
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => 'entry-content' ) );
+	$content            = apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) );
+	unset( $seen_ids[ $post_id ] );
 
 	return (
 		'<div ' . $wrapper_attributes . '>' .
-			apply_filters( 'the_content', str_replace( ']]>', ']]&gt;', $content ) ) .
+			$content .
 		'</div>'
 	);
 }
