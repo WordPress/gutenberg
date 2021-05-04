@@ -1668,6 +1668,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/widgets",
+		"slug": "packages-widgets",
+		"markdown_source": "../packages/widgets/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/wordcount",
 		"slug": "packages-wordcount",
 		"markdown_source": "../packages/wordcount/README.md",

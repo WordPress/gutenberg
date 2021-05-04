@@ -6,6 +6,7 @@ import {
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
+import { registerLegacyWidgetVariations } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -33,6 +34,8 @@ export function initialize( editorName, blockEditorSettings ) {
 			enableLegacyWidgetBlock: true,
 		} );
 	}
+
+	registerLegacyWidgetVariations( blockEditorSettings );
 
 	wp.customize.sectionConstructor.sidebar = getSidebarSection();
 	wp.customize.controlConstructor.sidebar_block_editor = getSidebarControl(

@@ -80,6 +80,7 @@
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
+		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {

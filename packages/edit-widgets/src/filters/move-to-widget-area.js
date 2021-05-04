@@ -6,11 +6,11 @@ import { BlockControls } from '@wordpress/block-editor';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
+import { MoveToWidgetArea } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
  */
-import MoveToWidgetArea from '../components/move-to-widget-area';
 import { store as editWidgetsStore } from '../store';
 
 const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
