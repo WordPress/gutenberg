@@ -7,6 +7,7 @@ import { keyBy } from 'lodash';
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
+import { getWidgetIdFromBlock } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -68,8 +69,8 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
 				POST_TYPE,
 				buildWidgetAreaPostId( widgetArea.id )
 			);
-			const blockWidgetIds = post.blocks.map(
-				( block ) => block.attributes.__internalWidgetId
+			const blockWidgetIds = post.blocks.map( ( block ) =>
+				getWidgetIdFromBlock( block )
 			);
 			return blockWidgetIds.includes( widgetId );
 		} );

@@ -210,6 +210,8 @@ function gutenberg_get_legacy_widget_settings() {
 /**
  * Extends default editor settings with values supporting legacy widgets.
  *
+ * This can be removed when plugin support requires WordPress 5.8.0+.
+ *
  * @param array $settings Default editor settings.
  *
  * @return array Filtered editor settings.
@@ -217,7 +219,12 @@ function gutenberg_get_legacy_widget_settings() {
 function gutenberg_legacy_widget_settings( $settings ) {
 	return array_merge( $settings, gutenberg_get_legacy_widget_settings() );
 }
-add_filter( 'block_editor_settings', 'gutenberg_legacy_widget_settings' );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( function_exists( 'get_block_editor_settings' ) ) {
+	add_filter( 'block_editor_settings_all', 'gutenberg_legacy_widget_settings' );
+} else {
+	add_filter( 'block_editor_settings', 'gutenberg_legacy_widget_settings' );
+}
 
 /**
  * Function to enqueue admin-widgets as part of the block editor assets.

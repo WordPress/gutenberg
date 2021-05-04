@@ -11,9 +11,9 @@ import {
 import { __ } from '@wordpress/i18n';
 import { moveTo } from '@wordpress/icons';
 
-export default function MoveToSidebar( {
-	currentSidebar,
-	sidebars,
+export default function MoveToWidgetArea( {
+	currentWidgetAreaId,
+	widgetAreas,
 	onSelect,
 } ) {
 	return (
@@ -28,12 +28,14 @@ export default function MoveToSidebar( {
 						{ ( { onClose } ) => (
 							<MenuGroup label={ __( 'Move to' ) }>
 								<MenuItemsChoice
-									choices={ sidebars.map( ( sidebar ) => ( {
-										value: sidebar.id,
-										label: sidebar.name,
-										info: sidebar.description,
-									} ) ) }
-									value={ currentSidebar?.id }
+									choices={ widgetAreas.map(
+										( widgetArea ) => ( {
+											value: widgetArea.id,
+											label: widgetArea.name,
+											info: widgetArea.description,
+										} )
+									) }
+									value={ currentWidgetAreaId }
 									onSelect={ ( value ) => {
 										onSelect( value );
 										onClose();

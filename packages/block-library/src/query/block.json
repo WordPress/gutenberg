@@ -27,6 +27,10 @@
 				"inherit": true
 			}
 		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		},
 		"layout": {
 			"type": "object",
 			"default": {

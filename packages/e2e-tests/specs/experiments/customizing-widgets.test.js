@@ -54,49 +54,12 @@ describe( 'Widgets Customizer', () => {
 		} );
 		await footer1Section.click();
 
-		const documentTools = await find( {
-			role: 'toolbar',
-			name: 'Document tools',
-		} );
-
-		const addBlockButton = await find(
-			{
-				role: 'button',
-				name: 'Add block',
-			},
-			{ root: documentTools }
-		);
-		await addBlockButton.click();
-
-		const paragraphOption = await find( {
-			role: 'option',
-			name: 'Paragraph',
-		} );
-		await paragraphOption.click();
-
-		const addedParagraphBlock = await find( {
-			role: 'group',
-			name: /^Empty block/,
-		} );
-		await addedParagraphBlock.focus();
-
+		await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
-		await addBlockButton.click();
+		await waitForPreviewIframe();
 
-		const headingOption = await find( {
-			role: 'option',
-			name: 'Heading',
-		} );
-		await headingOption.click();
-
-		const addedHeadingBlock = await find( {
-			role: 'group',
-			name: 'Block: Heading',
-			level: 2,
-		} );
-		await addedHeadingBlock.focus();
-
+		await addBlock( 'Heading' );
 		await page.keyboard.type( 'My Heading' );
 
 		const inlineAddBlockButton = await find( {
@@ -137,13 +100,13 @@ describe( 'Widgets Customizer', () => {
 
 		await page.keyboard.type( 'My ' );
 
+		await waitForPreviewIframe();
+
 		const findOptions = {
-			get root() {
-				return find( {
-					name: 'Site Preview',
-					selector: 'iframe',
-				} );
-			},
+			root: await find( {
+				name: 'Site Preview',
+				selector: 'iframe',
+			} ),
 		};
 
 		// Expect the paragraph to be found in the preview iframe.
@@ -186,13 +149,7 @@ describe( 'Widgets Customizer', () => {
 		} );
 		await footer1Section.click();
 
-		const emptyBlock = await find( {
-			role: 'button',
-			name: 'Add block',
-			value: 'Type / to choose a block',
-		} );
-		await emptyBlock.focus();
-
+		await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
 
 		await showBlockToolbar();
@@ -281,15 +238,11 @@ describe( 'Widgets Customizer', () => {
 		} );
 		await footer1Section.click();
 
-		const emptyBlock = await find( {
-			role: 'button',
-			name: 'Add block',
-			value: 'Type / to choose a block',
-		} );
-		await emptyBlock.focus();
-
 		// We need to make some changes for the publish settings to appear.
+		await addBlock( 'Paragraph' );
 		await page.keyboard.type( 'First Paragraph' );
+
+		await waitForPreviewIframe();
 
 		const documentTools = await find( {
 			role: 'toolbar',
@@ -380,6 +333,105 @@ describe( 'Widgets Customizer', () => {
 			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
 		);
 	} );
+
+	it( 'should move focus to the block', async () => {
+		const widgetsPanel = await find( {
+			role: 'heading',
+			name: /Widgets/,
+			level: 3,
+		} );
+		await widgetsPanel.click();
+
+		const footer1Section = await find( {
+			role: 'heading',
+			name: /^Footer #1/,
+			level: 3,
+		} );
+		await footer1Section.click();
+
+		await addBlock( 'Paragraph' );
+		await page.keyboard.type( 'First Paragraph' );
+
+		await waitForPreviewIframe();
+
+		await addBlock( 'Heading' );
+		await page.keyboard.type( 'First Heading' );
+
+		// Navigate back to the parent panel.
+		const backButton = await find( { role: 'button', name: 'Back' } );
+		await backButton.click();
+
+		await waitForPreviewIframe();
+
+		const iframe = await find( {
+			name: 'Site Preview',
+			selector: 'iframe',
+		} );
+
+		const paragraphWidget = await find(
+			{
+				text: /First Paragraph/,
+				selector: '.widget',
+			},
+			{
+				root: iframe,
+			}
+		);
+
+		const editParagraphWidget = await find(
+			{
+				role: 'button',
+				name: 'Click to edit this widget.',
+			},
+			{
+				root: paragraphWidget,
+			}
+		);
+		await editParagraphWidget.click();
+
+		const firstParagraphBlock = await find( {
+			role: 'group',
+			name: 'Paragraph block',
+			text: 'First Paragraph',
+		} );
+		await expect( firstParagraphBlock ).toHaveFocus();
+
+		// Expect to focus on a already focused widget.
+		await editParagraphWidget.click();
+		await expect( firstParagraphBlock ).toHaveFocus();
+
+		const headingWidget = await find(
+			{
+				text: /First Heading/,
+				selector: '.widget',
+			},
+			{
+				root: iframe,
+			}
+		);
+
+		const editHeadingWidget = await find(
+			{
+				role: 'button',
+				name: 'Click to edit this widget.',
+			},
+			{
+				root: headingWidget,
+			}
+		);
+		await editHeadingWidget.click();
+
+		const headingBlock = await find( {
+			role: 'group',
+			name: 'Block: Heading',
+			text: 'First Heading',
+		} );
+		await expect( headingBlock ).toHaveFocus();
+
+		expect( console ).toHaveWarned(
+			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
+		);
+	} );
 } );
 
 async function setWidgetsCustomizerExperiment( enabled ) {
@@ -424,4 +476,45 @@ async function cleanupWidgets() {
 
 		widget = await page.$( '.widgets-sortables .widget' );
 	}
+}
+
+/**
+ * Wait when there's only one preview iframe.
+ * There could be a 2 iframes when it's changing from no widgets to
+ * adding a first widget to the sidebar,
+ */
+async function waitForPreviewIframe() {
+	await page.waitForFunction(
+		() =>
+			document.querySelectorAll( '[name^="customize-preview-"]' )
+				.length === 1
+	);
+}
+
+async function addBlock( blockName ) {
+	const addBlockButton = await find(
+		{
+			role: 'button',
+			name: 'Add block',
+		},
+		{
+			root: await find( {
+				role: 'toolbar',
+				name: 'Document tools',
+			} ),
+		}
+	);
+	await addBlockButton.click();
+
+	const blockOption = await find( {
+		role: 'option',
+		name: blockName,
+	} );
+	await blockOption.click();
+
+	const addedBlock = await find( {
+		role: 'group',
+		selector: '.is-selected[data-block]',
+	} );
+	await addedBlock.focus();
 }
