@@ -380,8 +380,10 @@ function gutenberg_register_theme_block_category( $categories ) {
 	);
 	return $categories;
 }
-
-add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( ! function_exists( 'get_default_block_categories' ) ) {
+	add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+}
 
 /**
  * Checks whether the current block type supports the feature requested.

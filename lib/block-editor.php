@@ -86,7 +86,7 @@ function gutenberg_get_block_categories( $editor_name_or_post ) {
 	 *
 	 * @param array[] $default_categories Array of categories for block types.
 	 */
-	$block_categories = apply_filters( "block_categories_{$editor_name}", $default_categories );
+	$block_categories = apply_filters( 'block_categories_all', $default_categories );
 	if ( 'post-editor' === $editor_name ) {
 		$post = is_object( $editor_name_or_post ) ? $editor_name_or_post : get_post();
 
@@ -99,7 +99,7 @@ function gutenberg_get_block_categories( $editor_name_or_post ) {
 		 * @param array[] $block_categories Array of categories for block types.
 		 * @param WP_Post $post             Post being loaded.
 		 */
-		$block_categories = apply_filters_deprecated( 'block_categories', array( $block_categories, $post ), '5.8.0', "block_categories_{$editor_name}" );
+		$block_categories = apply_filters_deprecated( 'block_categories', array( $block_categories, $post ), '5.8.0', 'block_categories_all' );
 	}
 
 	return $block_categories;
@@ -131,7 +131,7 @@ function gutenberg_get_allowed_block_types( $editor_name ) {
 	 * @param bool|array $allowed_block_types Array of block type slugs, or
 	 *                                        boolean to enable/disable all.
 	 */
-	$allowed_block_types = apply_filters( "allowed_block_types_{$editor_name}", $allowed_block_types );
+	$allowed_block_types = apply_filters( 'allowed_block_types_all', $allowed_block_types );
 	if ( 'post-editor' === $editor_name ) {
 		$post = get_post();
 
@@ -146,7 +146,7 @@ function gutenberg_get_allowed_block_types( $editor_name ) {
 		 *                                        boolean to enable/disable all.
 		 * @param WP_Post    $post                The post resource data.
 		 */
-		$allowed_block_types = apply_filters_deprecated( 'allowed_block_types', array( $allowed_block_types, $post ), '5.8.0', "allowed_block_types_{$editor_name}" );
+		$allowed_block_types = apply_filters_deprecated( 'allowed_block_types', array( $allowed_block_types, $post ), '5.8.0', 'allowed_block_types_all' );
 	}
 
 	return $allowed_block_types;
@@ -267,13 +267,13 @@ function gutenberg_get_block_editor_settings( $editor_name, $custom_settings = a
 	);
 
 	/**
-	 * Filters the settings to pass to the block editor for a given editor type.
+	 * Filters the settings to pass to the block editor for all editor types.
 	 *
 	 * @since 5.8.0
 	 *
 	 * @param array $editor_settings Default editor settings.
 	 */
-	$editor_settings = apply_filters( "block_editor_settings_{$editor_name}", $editor_settings );
+	$editor_settings = apply_filters( 'block_editor_settings_all', $editor_settings );
 	if ( 'post-editor' === $editor_name ) {
 		$post = get_post();
 
@@ -286,7 +286,7 @@ function gutenberg_get_block_editor_settings( $editor_name, $custom_settings = a
 		 * @param array   $editor_settings Default editor settings.
 		 * @param WP_Post $post            Post being edited.
 		 */
-		$editor_settings = apply_filters_deprecated( 'block_editor_settings', array( $editor_settings, $post ), '5.8.0', "block_editor_settings_{$editor_name}" );
+		$editor_settings = apply_filters_deprecated( 'block_editor_settings', array( $editor_settings, $post ), '5.8.0', 'block_editor_settings_all' );
 	}
 
 	return $editor_settings;
