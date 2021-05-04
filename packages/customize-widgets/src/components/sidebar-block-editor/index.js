@@ -54,10 +54,11 @@ export default function SidebarBlockEditor( {
 		}
 
 		return {
+			...blockEditorSettings,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			mediaUpload: mediaUploadBlockEditor,
 		};
-	}, [] );
+	}, [ hasUploadPermissions, blockEditorSettings ] );
 	const parentContainer = document.getElementById(
 		'customize-theme-controls'
 	);

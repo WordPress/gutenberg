@@ -27,7 +27,11 @@ function getWidgetId( block ) {
 function blockToWidget( block, existingWidget = null ) {
 	let widget;
 
-	if ( block.name === 'core/legacy-widget' ) {
+	const isValidLegacyWidgetBlock =
+		block.name === 'core/legacy-widget' &&
+		( block.attributes.id || block.attributes.instance );
+
+	if ( isValidLegacyWidgetBlock ) {
 		if ( block.attributes.id ) {
 			// Widget that does not extend WP_Widget.
 			widget = {
@@ -168,7 +172,7 @@ export default function useSidebarBlockEditor( sidebar ) {
 
 						// Bail out updates by returning the previous widgets.
 						// Deep equality is necessary until the block editor's internals changes.
-						if ( isEqual( nextBlock, prevBlock ) ) {
+						if ( isEqual( nextBlock, prevBlock ) && prevWidget ) {
 							return prevWidget;
 						}
 

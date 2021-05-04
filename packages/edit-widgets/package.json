@@ -49,6 +49,7 @@
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
+		"@wordpress/widgets": "file:../widgets",
 		"classnames": "^2.2.5",
 		"lodash": "^4.17.19",
 		"rememo": "^3.0.0",
