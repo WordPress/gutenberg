@@ -11,6 +11,11 @@ import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import { useMouseMoveTypingReset } from '../observe-typing';
+
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
 
@@ -178,7 +183,7 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 	return (
 		<iframe
 			{ ...props }
-			ref={ useMergeRefs( [ ref, setRef ] ) }
+			ref={ useMergeRefs( [ ref, setRef, useMouseMoveTypingReset() ] ) }
 			tabIndex="0"
 			title={ __( 'Editor canvas' ) }
 			name="editor-canvas"

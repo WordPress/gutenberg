@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { BlockList, ObserveTyping, WritingFlow } from '@wordpress/block-editor';
+import { BlockList, WritingFlow } from '@wordpress/block-editor';
 import { Spinner } from '@wordpress/components';
 
 export default function Editor( { isPending } ) {
@@ -12,9 +12,7 @@ export default function Editor( { isPending } ) {
 			) : (
 				<div className="editor-styles-wrapper">
 					<WritingFlow>
-						<ObserveTyping>
-							<BlockList />
-						</ObserveTyping>
+						<BlockList />
 					</WritingFlow>
 				</div>
 			) }

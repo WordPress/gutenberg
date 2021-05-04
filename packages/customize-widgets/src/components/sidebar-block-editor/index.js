@@ -13,7 +13,6 @@ import {
 	BlockList,
 	BlockSelectionClearer,
 	BlockInspector,
-	ObserveTyping,
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
 	__experimentalBlockSettingsMenuFirstItem,
@@ -85,9 +84,7 @@ export default function SidebarBlockEditor( {
 
 					<BlockSelectionClearer>
 						<WritingFlow>
-							<ObserveTyping>
-								<BlockList />
-							</ObserveTyping>
+							<BlockList />
 						</WritingFlow>
 					</BlockSelectionClearer>
 

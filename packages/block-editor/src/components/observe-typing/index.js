@@ -14,6 +14,7 @@ import {
 	ESCAPE,
 	TAB,
 } from '@wordpress/keycodes';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -248,10 +249,13 @@ export function useTypingObserver() {
 }
 
 function ObserveTyping( { children } ) {
+	deprecated( 'wp.blockEditor.ObserveTyping', {
+		hint: 'This behaviour is now built-in.',
+	} );
 	return <div ref={ useTypingObserver() }>{ children }</div>;
 }
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/observe-typing/README.md
+ * @deprecated
  */
 export default ObserveTyping;

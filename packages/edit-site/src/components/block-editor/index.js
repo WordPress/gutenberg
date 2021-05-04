@@ -14,8 +14,6 @@ import {
 	__experimentalBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
-	__unstableUseTypingObserver as useTypingObserver,
-	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
@@ -55,12 +53,10 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	);
 	const { setPage } = useDispatch( editSiteStore );
 	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
-	const ref = useMouseMoveTypingReset();
 	const contentRef = useRef();
 	const mergedRefs = useMergeRefs( [
 		contentRef,
 		useBlockSelectionClearer(),
-		useTypingObserver(),
 	] );
 
 	// Allow scrolling "through" popovers over the canvas. This is only called
@@ -107,7 +103,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 					style={ resizedCanvasStyles }
 					headHTML={ window.__editorStyles.html }
 					head={ <EditorStyles styles={ settings.styles } /> }
-					ref={ ref }
 					contentRef={ mergedRefs }
 				>
 					<WritingFlow>

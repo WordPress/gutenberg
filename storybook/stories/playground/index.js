@@ -8,7 +8,6 @@ import {
 	BlockList,
 	BlockInspector,
 	WritingFlow,
-	ObserveTyping,
 } from '@wordpress/block-editor';
 import { Popover, SlotFillProvider } from '@wordpress/components';
 import { registerCoreBlocks } from '@wordpress/block-library';
@@ -42,9 +41,7 @@ function App() {
 						<BlockEditorKeyboardShortcuts.Register />
 						<BlockEditorKeyboardShortcuts />
 						<WritingFlow>
-							<ObserveTyping>
-								<BlockList />
-							</ObserveTyping>
+							<BlockList />
 						</WritingFlow>
 					</div>
 					<Popover.Slot />

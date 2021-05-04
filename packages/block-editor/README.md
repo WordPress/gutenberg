@@ -19,7 +19,6 @@ import {
 	BlockEditorProvider,
 	BlockList,
 	WritingFlow,
-	ObserveTyping,
 } from '@wordpress/block-editor';
 import { SlotFillProvider, Popover } from '@wordpress/components';
 import { useState } from '@wordpress/element';
@@ -36,9 +35,7 @@ function MyEditorComponent() {
 			<SlotFillProvider>
 				<Popover.Slot name="block-toolbar" />
 				<WritingFlow>
-					<ObserveTyping>
-						<BlockList />
-					</ObserveTyping>
+					<BlockList />
 				</WritingFlow>
 				<Popover.Slot />
 			</SlotFillProvider>
@@ -467,9 +464,7 @@ Undocumented declaration.
 
 <a name="ObserveTyping" href="#ObserveTyping">#</a> **ObserveTyping**
 
-_Related_
-
--   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/observe-typing/README.md>
+> **Deprecated** 
 
 <a name="PanelColorSettings" href="#PanelColorSettings">#</a> **PanelColorSettings**
 
