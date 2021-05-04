@@ -4,11 +4,6 @@
 import { RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import { cleanEmptyObject } from './utils';
-
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 
@@ -25,19 +20,15 @@ export function BorderRadiusEdit( props ) {
 	} = props;
 
 	const onChange = ( newRadius ) => {
-		let newStyle = {
-			...style,
-			border: {
-				...style?.border,
-				radius: newRadius,
+		setAttributes( {
+			style: {
+				...style,
+				border: {
+					...style?.border,
+					radius: newRadius,
+				},
 			},
-		};
-
-		if ( newRadius === undefined ) {
-			newStyle = cleanEmptyObject( newStyle );
-		}
-
-		setAttributes( { style: newStyle } );
+		} );
 	};
 
 	return (
@@ -46,7 +37,7 @@ export function BorderRadiusEdit( props ) {
 			label={ __( 'Border radius' ) }
 			min={ MIN_BORDER_RADIUS_VALUE }
 			max={ MAX_BORDER_RADIUS_VALUE }
-			initialPosition={ 0 }
+			initialPosition=""
 			allowReset
 			onChange={ onChange }
 		/>
