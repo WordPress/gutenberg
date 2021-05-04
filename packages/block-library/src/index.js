@@ -186,6 +186,7 @@ export const __experimentalGetCoreBlocks = () => [
 	postDate,
 	postExcerpt,
 	postFeaturedImage,
+	postTerms,
 ];
 
 /**
@@ -247,7 +248,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postCommentsCount,
 								postCommentsForm,
 								postCommentsLink,
-								postTerms,
 								postNavigationLink,
 								termDescription,
 						  ]
