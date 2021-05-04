@@ -89,10 +89,9 @@ function block_core_home_link_build_css_font_sizes( $context ) {
  * Builds an array with classes and style for the li wrapper
  *
  * @param  array $context    Home link block context.
- * @param  array $attributes Home link block attributes.
  * @return array The li wrapper attributes.
  */
-function block_core_home_link_build_li_wrapper_attributes( $context, $attributes ) {
+function block_core_home_link_build_li_wrapper_attributes( $context ) {
 	$colors          = block_core_home_link_build_css_colors( $context );
 	$font_sizes      = block_core_home_link_build_css_font_sizes( $context );
 	$classes         = array_merge(
@@ -101,10 +100,6 @@ function block_core_home_link_build_li_wrapper_attributes( $context, $attributes
 	);
 	$style_attribute = ( $colors['inline_styles'] . $font_sizes['inline_styles'] );
 	$css_classes     = trim( implode( ' ', $classes ) );
-	$class_name      = ! empty( $attributes['className'] ) ? implode( ' ', (array) $attributes['className'] ) : false;
-	if ( false !== $class_name ) {
-		$css_classes .= ' ' . $class_name;
-	}
 
 	$wrapper_attributes = get_block_wrapper_attributes(
 		array(
@@ -112,6 +107,7 @@ function block_core_home_link_build_li_wrapper_attributes( $context, $attributes
 			'style' => $style_attribute,
 		)
 	);
+
 	return $wrapper_attributes;
 }
 
@@ -129,7 +125,7 @@ function render_block_core_home( $attributes, $content, $block ) {
 		return '';
 	}
 
-	$wrapper_attributes = block_core_home_link_build_li_wrapper_attributes( $block->context, $attributes );
+	$wrapper_attributes = block_core_home_link_build_li_wrapper_attributes( $block->context );
 
 	$html = '<li ' . $wrapper_attributes . '><a class="wp-block-home-link__content"';
 
