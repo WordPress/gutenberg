@@ -21,7 +21,7 @@ export const settings = {
 	icon: home,
 
 	description: createInterpolateElement(
-		_x( 'Link to <a>your homepage</a>.', 'block description' ),
+		_x( 'Link to <a>your homepage</a>', 'block description' ),
 		{ a: <ExternalLink href="options-reading.php" /> }
 	),
 
