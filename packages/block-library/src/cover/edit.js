@@ -253,7 +253,7 @@ function mediaPosition( { x, y } ) {
 const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 
 function CoverPlaceholder( {
-	hasBackground = false,
+	disableMediaButtons = false,
 	children,
 	noticeUI,
 	noticeOperations,
@@ -273,7 +273,7 @@ function CoverPlaceholder( {
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			notices={ noticeUI }
-			disableMediaButtons={ hasBackground }
+			disableMediaButtons={ disableMediaButtons }
 			onError={ ( message ) => {
 				removeAllNotices();
 				createErrorNotice( message );
@@ -665,6 +665,12 @@ function CoverEdit( {
 					/>
 				) }
 				{ isUploadingMedia && <Spinner /> }
+				<CoverPlaceholder
+					disableMediaButtons
+					noticeUI={ noticeUI }
+					onSelectMedia={ onSelectMedia }
+					noticeOperations={ noticeOperations }
+				/>
 				<div { ...innerBlocksProps } />
 			</div>
 		</>
