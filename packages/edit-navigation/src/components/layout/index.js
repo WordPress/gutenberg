@@ -92,7 +92,7 @@ export default function Layout( { blockEditorSettings } ) {
 		if ( ! selectedMenuId && menus?.length ) {
 			selectMenu( menus[ 0 ].id );
 		}
-	}, [] );
+	}, [ selectedMenuId, menus ] );
 
 	useMenuNotifications( selectedMenuId );
 
