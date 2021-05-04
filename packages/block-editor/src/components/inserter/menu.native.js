@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { LayoutAnimation, Platform, TouchableHighlight } from 'react-native';
+import { LayoutAnimation, TouchableHighlight } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -144,7 +144,7 @@ function InserterMenu( {
 
 	const onChangeSearch = useCallback(
 		( value ) => {
-			if ( Platform.OS === 'ios' && ! value ) {
+			if ( ! value ) {
 				LayoutAnimation.configureNext(
 					LayoutAnimation.Presets.easeInEaseOut
 				);
