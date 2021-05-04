@@ -73,6 +73,23 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 
 		// Break the loop if the block-template matches the template slug.
 		if ( $current_block_template_slug === $template_item_slug ) {
+
+			// if the theme is a child theme we want to check if a php template exists.
+			if ( is_child_theme() ) {
+
+				$has_php_template   = file_exists( get_stylesheet_directory() . '/' . $current_template_slug . '.php' );
+				$block_template     = _gutenberg_get_template_file( 'wp_template', $current_block_template_slug );
+				$has_block_template = false;
+
+				if ( null !== $block_template && wp_get_theme()->get_stylesheet() === $block_template['theme'] ) {
+					$has_block_template = true;
+				}
+				// and that a corresponding block template from the theme and not the parent doesn't exist.
+				if ( $has_php_template && ! $has_block_template ) {
+					return $template;
+				}
+			}
+
 			break;
 		}
 
