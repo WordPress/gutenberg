@@ -30,11 +30,12 @@ const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 		);
 
 		const { moveBlockToWidgetArea } = useDispatch( editWidgetsStore );
+		const hasMultipleWidgetAreas = widgetAreas?.length > 1;
 
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ props.name !== 'core/widget-area' && (
+				{ props.name !== 'core/widget-area' && hasMultipleWidgetAreas && (
 					<BlockControls>
 						<MoveToWidgetArea
 							widgetAreas={ widgetAreas }

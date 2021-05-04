@@ -24,6 +24,7 @@ const withMoveToSidebarToolbarItem = createHigherOrderComponent(
 		const widgetId = getWidgetIdFromBlock( props );
 		const sidebarControls = useSidebarControls();
 		const activeSidebarControl = useActiveSidebarControl();
+		const hasMultipleSidebars = sidebarControls?.length > 1;
 
 		function moveToSidebar( sidebarControlId ) {
 			const newSidebarControl = sidebarControls.find(
@@ -42,19 +43,22 @@ const withMoveToSidebarToolbarItem = createHigherOrderComponent(
 		return (
 			<>
 				<BlockEdit { ...props } />
-				<BlockControls>
-					<MoveToWidgetArea
-						widgetAreas={ sidebarControls.map(
-							( sidebarControl ) => ( {
-								id: sidebarControl.id,
-								name: sidebarControl.params.label,
-								description: sidebarControl.params.description,
-							} )
-						) }
-						currentWidgetAreaId={ activeSidebarControl?.id }
-						onSelect={ moveToSidebar }
-					/>
-				</BlockControls>
+				{ hasMultipleSidebars && (
+					<BlockControls>
+						<MoveToWidgetArea
+							widgetAreas={ sidebarControls.map(
+								( sidebarControl ) => ( {
+									id: sidebarControl.id,
+									name: sidebarControl.params.label,
+									description:
+										sidebarControl.params.description,
+								} )
+							) }
+							currentWidgetAreaId={ activeSidebarControl?.id }
+							onSelect={ moveToSidebar }
+						/>
+					</BlockControls>
+				) }
 			</>
 		);
 	},
