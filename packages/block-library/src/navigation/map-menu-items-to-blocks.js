@@ -46,7 +46,9 @@ export const menuItemToBlockAttributes = ( {
 } ) => {
 	return {
 		label: menuItemTitleField?.rendered || '',
-		type: object || 'custom',
+		...( object?.length && {
+			type: object,
+		} ),
 		kind: menuItemTypeField?.replace( '_', '-' ) || 'custom',
 		url: url || '',
 		...( xfn?.length &&
