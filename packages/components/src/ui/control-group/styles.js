@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from 'emotion';
+import { css } from '@emotion/css';
 
 export const first = css`
 	border-bottom-right-radius: 0;

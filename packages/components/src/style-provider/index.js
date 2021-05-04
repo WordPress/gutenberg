@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { CacheProvider } from '@emotion/core';
+import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import memoize from 'memize';
 
