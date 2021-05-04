@@ -172,7 +172,7 @@ export default function useSidebarBlockEditor( sidebar ) {
 
 						// Bail out updates by returning the previous widgets.
 						// Deep equality is necessary until the block editor's internals changes.
-						if ( isEqual( nextBlock, prevBlock ) ) {
+						if ( isEqual( nextBlock, prevBlock ) && prevWidget ) {
 							return prevWidget;
 						}
 
