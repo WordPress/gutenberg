@@ -9,7 +9,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import createControl from './create-control';
+import Control from './control';
 
 export default function Form( {
 	title,
@@ -31,7 +31,7 @@ export default function Form( {
 			return;
 		}
 
-		const control = createControl( {
+		const control = new Control( {
 			id,
 			idBase,
 			instance,
@@ -50,14 +50,9 @@ export default function Form( {
 				);
 			},
 		} );
-
 		ref.current.appendChild( control.element );
-
-		return () => {
-			ref.current.removeChild( control.element );
-			control.destroy();
-		};
-	}, [] );
+		return () => control.destroy();
+	}, [ id, idBase, instance, onChangeInstance, onChangeHasPreview ] );
 
 	return (
 		<div

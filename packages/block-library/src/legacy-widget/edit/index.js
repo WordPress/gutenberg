@@ -29,7 +29,6 @@ export default function Edit( props ) {
 	const { id, idBase } = props.attributes;
 	return (
 		<div { ...useBlockProps() }>
-			{ JSON.stringify( props.attributes ) }
 			{ ! id && ! idBase ? (
 				<Empty { ...props } />
 			) : (
