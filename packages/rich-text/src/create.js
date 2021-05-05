@@ -396,6 +396,24 @@ function createFromElement( {
 			continue;
 		}
 
+		if ( type === 'script' ) {
+			mergePair( accumulator, {
+				formats: [ , ],
+				replacements: [
+					{
+						type,
+						attributes: {
+							'data-rich-text-script':
+								node.getAttribute( 'data-rich-text-script' ) ||
+								encodeURIComponent( node.innerHTML ),
+						},
+					},
+				],
+				text: OBJECT_REPLACEMENT_CHARACTER,
+			} );
+			continue;
+		}
+
 		if ( type === 'br' ) {
 			accumulateSelection( accumulator, node, range, createEmptyValue() );
 			mergePair( accumulator, create( { text: '\n' } ) );
@@ -583,8 +601,12 @@ function getAttributes( { element } ) {
 			continue;
 		}
 
+		const safeName = name.startsWith( 'on' )
+			? 'data-disable-rich-text-' + name
+			: name;
+
 		accumulator = accumulator || {};
-		accumulator[ name ] = value;
+		accumulator[ safeName ] = value;
 	}
 
 	return accumulator;
