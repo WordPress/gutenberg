@@ -60,9 +60,15 @@ export default function CalendarEdit( { attributes } ) {
 
 	if ( ! hasPosts ) {
 		return (
-			<Placeholder icon={ icon } label={ __( 'Calendar' ) }>
-				{ ! hasPostsResolved ? <Spinner /> : __( 'No posts found.' ) }
-			</Placeholder>
+			<div { ...blockProps }>
+				<Placeholder icon={ icon } label={ __( 'Calendar' ) }>
+					{ ! hasPostsResolved ? (
+						<Spinner />
+					) : (
+						__( 'No posts found.' )
+					) }
+				</Placeholder>
+			</div>
 		);
 	}
 
