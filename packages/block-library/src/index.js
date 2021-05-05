@@ -90,8 +90,7 @@ import * as postCommentsLink from './post-comments-link';
 import * as postDate from './post-date';
 import * as postExcerpt from './post-excerpt';
 import * as postFeaturedImage from './post-featured-image';
-import * as postHierarchicalTerms from './post-hierarchical-terms';
-import * as postTags from './post-tags';
+import * as postTerms from './post-terms';
 import * as termDescription from './term-description';
 
 /**
@@ -187,6 +186,7 @@ export const __experimentalGetCoreBlocks = () => [
 	postDate,
 	postExcerpt,
 	postFeaturedImage,
+	postTerms,
 ];
 
 /**
@@ -248,8 +248,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 								postCommentsCount,
 								postCommentsForm,
 								postCommentsLink,
-								postHierarchicalTerms,
-								postTags,
 								postNavigationLink,
 								termDescription,
 						  ]
