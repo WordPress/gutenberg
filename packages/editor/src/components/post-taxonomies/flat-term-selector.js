@@ -7,9 +7,7 @@ import {
 	get,
 	invoke,
 	isEmpty,
-	map,
 	throttle,
-	unescape as lodashUnescapeString,
 	uniqBy,
 } from 'lodash';
 
@@ -19,12 +17,11 @@ import {
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import {
-	Button,
 	FormTokenField,
 	withFilters,
 	withSpokenMessages,
 } from '@wordpress/components';
-import { useSelect, withSelect, withDispatch } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { compose } from '@wordpress/compose';
 import apiFetch from '@wordpress/api-fetch';
@@ -34,6 +31,8 @@ import { addQueryArgs } from '@wordpress/url';
  * Internal dependencies
  */
 import { store as editorStore } from '../../store';
+import { unescapeString, unescapeTerm, unescapeTerms } from '../../utils/terms';
+import MostUsedTerms from './most-used-terms';
 
 /**
  * Module constants
@@ -46,40 +45,9 @@ const DEFAULT_QUERY = {
 	_fields: 'id,name,count',
 };
 
-// Lodash unescape function handles &#39; but not &#039; which may be return in some API requests.
-const unescapeString = ( arg ) => {
-	return lodashUnescapeString( arg.replace( '&#039;', "'" ) );
-};
 const isSameTermName = ( termA, termB ) =>
 	unescapeString( termA ).toLowerCase() ===
 	unescapeString( termB ).toLowerCase();
-
-/**
- * Returns a term object with name unescaped.
- * The unescape of the name property is done using lodash unescape function.
- *
- * @param {Object} term The term object to unescape.
- *
- * @return {Object} Term object with name property unescaped.
- */
-const unescapeTerm = ( term ) => {
-	return {
-		...term,
-		name: unescapeString( term.name ),
-	};
-};
-
-/**
- * Returns an array of term objects with names unescaped.
- * The unescape of each term is performed using the unescapeTerm function.
- *
- * @param {Object[]} terms Array of term objects to unescape.
- *
- * @return {Object[]} Array of term objects unescaped.
- */
-const unescapeTerms = ( terms ) => {
-	return map( terms, unescapeTerm );
-};
 
 const termNamesToIds = ( names, terms ) => {
 	return names.map(
@@ -87,47 +55,6 @@ const termNamesToIds = ( names, terms ) => {
 			find( terms, ( term ) => isSameTermName( term.name, termName ) ).id
 	);
 };
-
-function FlatTermSelectorMostUsed( { onSelect, taxonomy } ) {
-	const { terms, hasTerms } = useSelect( ( select ) => {
-		const mostUsedTerms = select( coreStore ).getEntityRecords(
-			'taxonomy',
-			taxonomy.slug,
-			DEFAULT_QUERY
-		);
-		return {
-			terms: mostUsedTerms,
-			hasTerms: mostUsedTerms?.length > 0,
-		};
-	}, [] );
-
-	const _terms = unescapeTerms( terms );
-
-	return (
-		<div className="editor-post-taxonomies__flat-term-most-used">
-			{ hasTerms && (
-				/*
-				 * Disable reason: The `list` ARIA role is redundant but
-				 * Safari+VoiceOver won't announce the list otherwise.
-				 */
-				/* eslint-disable jsx-a11y/no-redundant-roles */
-				<ul
-					role="list"
-					className="editor-post-taxonomies__flat-term-most-used-list"
-				>
-					{ _terms.map( ( term ) => (
-						<li key={ term.id }>
-							<Button isLink onClick={ () => onSelect( term ) }>
-								{ term.name }
-							</Button>
-						</li>
-					) ) }
-				</ul>
-				/* eslint-enable jsx-a11y/no-redundant-roles */
-			) }
-		</div>
-	);
-}
 
 class FlatTermSelector extends Component {
 	constructor() {
@@ -140,7 +67,6 @@ class FlatTermSelector extends Component {
 			loading: ! isEmpty( this.props.terms ),
 			availableTerms: [],
 			selectedTerms: [],
-			showMostUsed: false,
 		};
 	}
 
@@ -321,12 +247,7 @@ class FlatTermSelector extends Component {
 			return null;
 		}
 
-		const {
-			loading,
-			availableTerms,
-			selectedTerms,
-			showMostUsed,
-		} = this.state;
+		const { loading, availableTerms, selectedTerms } = this.state;
 		const termNames = availableTerms.map( ( term ) => term.name );
 		const newTermLabel = get(
 			taxonomy,
@@ -354,12 +275,6 @@ class FlatTermSelector extends Component {
 			singularName
 		);
 
-		const mostUsedTermsLabel = sprintf(
-			/* translators: %s: term name. */
-			_x( 'Choose from the most used %s', 'terms' ),
-			get( taxonomy, [ 'labels', 'name' ] )
-		);
-
 		return (
 			<>
 				<FormTokenField
@@ -376,21 +291,10 @@ class FlatTermSelector extends Component {
 						remove: removeTermLabel,
 					} }
 				/>
-				<Button
-					isLink
-					aria-expanded={ showMostUsed }
-					onClick={ () =>
-						this.setState( { showMostUsed: ! showMostUsed } )
-					}
-				>
-					{ mostUsedTermsLabel }
-				</Button>
-				{ showMostUsed && (
-					<FlatTermSelectorMostUsed
-						taxonomy={ taxonomy }
-						onSelect={ this.appendTerm }
-					/>
-				) }
+				<MostUsedTerms
+					taxonomy={ taxonomy }
+					onSelect={ this.appendTerm }
+				/>
 			</>
 		);
 	}
