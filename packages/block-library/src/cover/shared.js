@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { getBlobTypeByURL, isBlobURL } from '@wordpress/blob';
+import { useEffect } from '@wordpress/element';
 
 const POSITION_CLASSNAMES = {
 	'top left': 'is-position-top-left',
@@ -103,4 +104,26 @@ export function getPositionClassName( contentPosition ) {
 	if ( isContentPositionCenter( contentPosition ) ) return '';
 
 	return POSITION_CLASSNAMES[ contentPosition ];
+}
+
+/**
+ * Hook that enables style.ui.duotone attribute based on block attributes.
+ *
+ * @param {Object}   attributes    Block attributes.
+ * @param {Function} setAttributes Set block attributes.
+ */
+export function useDuotoneUI( attributes, setAttributes ) {
+	const duotoneHidden =
+		! attributes.url || attributes.isRepeated || attributes.isParallax;
+	useEffect( () => {
+		setAttributes( {
+			style: {
+				...attributes.style,
+				ui: {
+					...attributes.style?.ui,
+					duotoneHidden,
+				},
+			},
+		} );
+	}, [ duotoneHidden, setAttributes ] );
 }

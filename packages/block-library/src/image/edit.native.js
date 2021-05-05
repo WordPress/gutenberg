@@ -178,6 +178,18 @@ export class ImageEdit extends Component {
 				image.source_url;
 			this.props.setAttributes( { url } );
 		}
+		if ( previousProps.attributes.url !== this.props.attributes.url ) {
+			const { style, url } = this.props.attributes;
+			this.props.setAttributes( {
+				style: {
+					...style,
+					ui: {
+						...style?.ui,
+						duotoneHidden: ! url,
+					},
+				},
+			} );
+		}
 	}
 
 	static getDerivedStateFromProps( props, state ) {
