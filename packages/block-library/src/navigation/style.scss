@@ -26,8 +26,9 @@
 	}
 
 	// Menu item link.
-	.wp-block-pages-list__item__link,
-	.wp-block-navigation-link__content {
+	// The addition of :not(.wp-block-button_link) is necessary to override generic link colors from global styles.
+	.wp-block-pages-list__item__link:not(.wp-block-button_link),
+	.wp-block-navigation-link__content:not(.wp-block-button_link) {
 		// Inherit colors set by the block color definition.
 		color: inherit;
 		display: block;
