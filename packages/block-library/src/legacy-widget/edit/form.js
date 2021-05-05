@@ -21,13 +21,19 @@ export default function Form( {
 	onChangeHasPreview,
 } ) {
 	const ref = useRef();
+
+	// We only want to remount the control when the instance changes
+	// *externally*. For example, if the user performs an undo. To do this, we
+	// keep track of changes made to instance by the control itself and then
+	// ignore those.
 	const outgoingInstances = useRef( new Set() );
+	const incomingInstances = useRef( new Set() );
 
 	const { createNotice } = useDispatch( noticesStore );
 
 	useEffect( () => {
-		if ( outgoingInstances.current.has( instance ) ) {
-			outgoingInstances.current.delete( instance );
+		if ( incomingInstances.current.has( instance ) ) {
+			incomingInstances.current.delete( instance );
 			return;
 		}
 
@@ -36,7 +42,8 @@ export default function Form( {
 			idBase,
 			instance,
 			onChangeInstance( nextInstance ) {
-				outgoingInstances.current.add( nextInstance );
+				outgoingInstances.current.add( instance );
+				incomingInstances.current.add( nextInstance );
 				onChangeInstance( nextInstance );
 			},
 			onChangeHasPreview,
@@ -50,8 +57,17 @@ export default function Form( {
 				);
 			},
 		} );
+
 		ref.current.appendChild( control.element );
-		return () => control.destroy();
+
+		return () => {
+			if ( outgoingInstances.current.has( instance ) ) {
+				outgoingInstances.current.delete( instance );
+				return;
+			}
+
+			control.destroy();
+		};
 	}, [ id, idBase, instance, onChangeInstance, onChangeHasPreview ] );
 
 	return (
