@@ -101,7 +101,7 @@ export const generateAnchor = ( content, allHeadingAnchors ) => {
 	let i = 0;
 
 	// If the anchor already exists in another heading, append -i.
-	while ( allHeadingAnchors.includes( slug ) ) {
+	while ( allHeadingAnchors.includes( anchor ) ) {
 		i += 1;
 		anchor = slug + '-' + i;
 	}
