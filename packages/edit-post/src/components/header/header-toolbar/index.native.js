@@ -6,7 +6,7 @@ import { ScrollView, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { withViewportMatch } from '@wordpress/viewport';
@@ -29,6 +29,7 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import styles from './style.scss';
 import { store as editPostStore } from '../../../store';
+import Tooltip from '../../../../../components/src/focal-point-picker/tooltip';
 
 function HeaderToolbar( {
 	hasRedo,
@@ -41,6 +42,7 @@ function HeaderToolbar( {
 	onHideKeyboard,
 	isRTL,
 } ) {
+	const [ tooltipVisible, setTooltipVisible ] = useState( true );
 	const scrollViewRef = useRef( null );
 	const scrollToStart = () => {
 		scrollViewRef.current.scrollTo( { x: 0 } );
@@ -74,38 +76,65 @@ function HeaderToolbar( {
 	};
 
 	return (
-		<View
-			style={ getStylesFromColorScheme(
-				styles.container,
-				styles.containerDark
-			) }
+		<Tooltip
+			onPress={ () => setTooltipVisible( false ) }
+			visible={ tooltipVisible }
 		>
-			<ScrollView
-				ref={ scrollViewRef }
-				onContentSizeChange={ scrollToStart }
-				horizontal={ true }
-				showsHorizontalScrollIndicator={ false }
-				keyboardShouldPersistTaps="always"
-				alwaysBounceHorizontal={ false }
-				contentContainerStyle={ styles.scrollableContent }
+			<View
+				style={ getStylesFromColorScheme(
+					styles.container,
+					styles.containerDark
+				) }
 			>
-				<Inserter disabled={ ! showInserter } />
-				{ renderHistoryButtons() }
-				<BlockToolbar />
-			</ScrollView>
-			{ showKeyboardHideButton && (
-				<Toolbar passedStyle={ styles.keyboardHideContainer }>
-					<ToolbarButton
-						title={ __( 'Hide keyboard' ) }
-						icon={ keyboardClose }
-						onClick={ onHideKeyboard }
-						extraProps={ {
-							hint: __( 'Tap to hide the keyboard' ),
-						} }
-					/>
-				</Toolbar>
-			) }
-		</View>
+				{ /**
+				 * TODO: David
+				 *
+				 * This works, but requires manual placement of the label above the
+				 * reference. Cannot place tooltip inside of the ScrollView as elements
+				 * overflowing are hidden entirely. Do we need an alternative method?
+				 *
+				 * Additionally, there are issue with dismissing. Scrolling content
+				 * does not dismiss. Certain areas above the toolbar do not allow
+				 * scrolling, which may be unrelated.
+				 *
+				 * Also, verify that tapping to dismissing anywhere works. Is it
+				 * worthwhile creating an alternative API that matches the web's
+				 * Tooltip and relies up Modal? All tips for this project do not point
+				 * to content within a modal, so we don't have to worry about double
+				 * modals on iOS.
+				 */ }
+				<Tooltip.Label
+					align="left"
+					xOffset={ 5 }
+					text={ 'Tap to add content' }
+				/>
+				<ScrollView
+					ref={ scrollViewRef }
+					onContentSizeChange={ scrollToStart }
+					horizontal={ true }
+					showsHorizontalScrollIndicator={ false }
+					keyboardShouldPersistTaps="always"
+					alwaysBounceHorizontal={ false }
+					contentContainerStyle={ styles.scrollableContent }
+				>
+					<Inserter disabled={ ! showInserter } />
+					{ renderHistoryButtons() }
+					<BlockToolbar />
+				</ScrollView>
+				{ showKeyboardHideButton && (
+					<Toolbar passedStyle={ styles.keyboardHideContainer }>
+						<ToolbarButton
+							title={ __( 'Hide keyboard' ) }
+							icon={ keyboardClose }
+							onClick={ onHideKeyboard }
+							extraProps={ {
+								hint: __( 'Tap to hide the keyboard' ),
+							} }
+						/>
+					</Toolbar>
+				) }
+			</View>
+		</Tooltip>
 	);
 }
 
