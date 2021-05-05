@@ -6,7 +6,13 @@ import { Animated, Dimensions, View } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef, useMemo, useCallback } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { SegmentedControl } from '@wordpress/components';
 
@@ -26,8 +32,17 @@ function InserterTabs( {
 	showReusableBlocks,
 	tabIndex,
 } ) {
+	const [ windowWidth, setWindowWidth ] = useState(
+		Dimensions.get( 'window' ).width
+	);
 	const tabAnimation = useRef( new Animated.Value( 0 ) ).current;
 	const lastScrollEvents = useRef( [] ).current;
+
+	useEffect( () => {
+		Dimensions.addEventListener( 'change', onDimensionsChange );
+		return () =>
+			Dimensions.removeEventListener( 'change', onDimensionsChange );
+	}, [] );
 
 	useEffect( () => {
 		Animated.timing( tabAnimation, {
@@ -53,16 +68,17 @@ function InserterTabs( {
 		};
 	}, [ showReusableBlocks ] );
 
-	const { width } = Dimensions.get( 'window' );
 	const translateX = useMemo(
 		() =>
 			tabKeys.length > 1
 				? tabAnimation.interpolate( {
 						inputRange: tabKeys,
-						outputRange: tabKeys.map( ( key ) => key * -width ),
+						outputRange: tabKeys.map(
+							( key ) => key * -windowWidth
+						),
 				  } )
 				: tabAnimation,
-		[ tabAnimation, tabKeys ]
+		[ tabAnimation, tabKeys, windowWidth ]
 	);
 
 	function onScroll( event ) {
@@ -70,32 +86,38 @@ function InserterTabs( {
 		listProps.onScroll( event );
 	}
 
+	function onDimensionsChange() {
+		setWindowWidth( Dimensions.get( 'window' ).width );
+	}
+
 	return (
-		<Animated.View
-			style={ [
-				styles[ 'inserter-tabs__container' ],
-				{
-					width: width * tabKeys.length,
-					transform: [ { translateX } ],
-				},
-			] }
-		>
-			{ tabs.map( ( tab, index ) => (
-				<View
-					key={ `tab-${ index }` }
-					style={ [
-						styles[ 'inserter-tabs__item' ],
-						{ left: index * width },
-					] }
-				>
-					{ tab.component( {
-						rootClientId,
-						onSelect,
-						listProps: { ...listProps, onScroll },
-					} ) }
-				</View>
-			) ) }
-		</Animated.View>
+		<View style={ styles[ 'inserter-tabs__wrapper' ] }>
+			<Animated.View
+				style={ [
+					styles[ 'inserter-tabs__container' ],
+					{
+						width: windowWidth * tabKeys.length,
+						transform: [ { translateX } ],
+					},
+				] }
+			>
+				{ tabs.map( ( tab, index ) => (
+					<View
+						key={ `tab-${ index }` }
+						style={ [
+							styles[ 'inserter-tabs__item' ],
+							{ left: index * windowWidth },
+						] }
+					>
+						{ tab.component( {
+							rootClientId,
+							onSelect,
+							listProps: { ...listProps, onScroll },
+						} ) }
+					</View>
+				) ) }
+			</Animated.View>
+		</View>
 	);
 }
 
