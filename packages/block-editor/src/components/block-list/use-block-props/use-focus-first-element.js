@@ -6,7 +6,7 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useLayoutEffect, useRef } from '@wordpress/element';
 import { focus, isTextField, placeCaretAtHorizontalEdge } from '@wordpress/dom';
 import { useSelect } from '@wordpress/data';
 
@@ -63,7 +63,7 @@ export function useFocusFirstElement( clientId ) {
 	const ref = useRef();
 	const initialPosition = useInitialPosition( clientId );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( initialPosition === undefined || initialPosition === null ) {
 			return;
 		}
