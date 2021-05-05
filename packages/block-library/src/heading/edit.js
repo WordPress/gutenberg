@@ -39,6 +39,14 @@ function HeadingEdit( {
 	} );
 	const allHeadingAnchors = Anchors( clientId );
 
+	// Initially set anchor for headings that have content but no anchor set.
+	// This is used when transforming a block to heading, or for legacy anchors.
+	if ( ! attributes.anchor && content ) {
+		setAttributes( {
+			anchor: generateAnchor( content, allHeadingAnchors ),
+		} );
+	}
+
 	return (
 		<>
 			<BlockControls group="block">
