@@ -6,7 +6,7 @@ import { TextInput, View, TouchableHighlight } from 'react-native';
 /**
  * WordPress dependencies
  */
-import { useState, useRef, useCallback } from '@wordpress/element';
+import { useState, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 import { ToolbarButton } from '@wordpress/components';
@@ -22,7 +22,7 @@ import {
  */
 import styles from './style.scss';
 
-function InserterSearchForm( { value, onChange, onFocus } ) {
+function InserterSearchForm( { value, onChange } ) {
 	const [ isActive, setIsActive ] = useState( false );
 
 	const inputRef = useRef();
@@ -42,16 +42,6 @@ function InserterSearchForm( { value, onChange, onFocus } ) {
 		styles.searchFormPlaceholderDark
 	);
 
-	const onActive = useCallback(
-		( active ) => {
-			if ( onFocus ) {
-				onFocus( active );
-			}
-			setIsActive( active );
-		},
-		[ onFocus, setIsActive ]
-	);
-
 	return (
 		<TouchableHighlight accessible={ false }>
 			<View style={ searchFormStyle }>
@@ -62,7 +52,7 @@ function InserterSearchForm( { value, onChange, onFocus } ) {
 						onClick={ () => {
 							inputRef.current.blur();
 							onChange( '' );
-							onActive( false );
+							setIsActive( false );
 						} }
 					/>
 				) : (
@@ -71,7 +61,7 @@ function InserterSearchForm( { value, onChange, onFocus } ) {
 						icon={ searchIcon }
 						onClick={ () => {
 							inputRef.current.focus();
-							onActive( true );
+							setIsActive( true );
 						} }
 					/>
 				) }
@@ -80,7 +70,7 @@ function InserterSearchForm( { value, onChange, onFocus } ) {
 					style={ searchFormInputStyle }
 					placeholderTextColor={ placeholderStyle.color }
 					onChangeText={ onChange }
-					onFocus={ () => onActive( true ) }
+					onFocus={ () => setIsActive( true ) }
 					value={ value }
 					placeholder={ __( 'Search blocks' ) }
 				/>
