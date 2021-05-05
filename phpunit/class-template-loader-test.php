@@ -20,6 +20,11 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		gutenberg_register_wp_template_part_area_taxonomy();
 	}
 
+	public function tearDown() {
+		global $_wp_current_template_content;
+		unset( $_wp_current_template_content );
+	}
+
 	function test_gutenberg_page_home_block_template_takes_precedence_over_less_specific_block_templates() {
 		global $_wp_current_template_content;
 		$type                   = 'page';
@@ -33,7 +38,6 @@ class Template_Loader_Test extends WP_UnitTestCase {
 
 		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//page-home' );
 		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
-		unset( $_wp_current_template_content );
 	}
 
 	function test_gutenberg_page_block_template_takes_precedence() {
@@ -49,7 +53,6 @@ class Template_Loader_Test extends WP_UnitTestCase {
 
 		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//page' );
 		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
-		unset( $_wp_current_template_content );
 	}
 
 	function test_gutenberg_block_template_takes_precedence_over_equally_specific_php_template() {
@@ -63,7 +66,6 @@ class Template_Loader_Test extends WP_UnitTestCase {
 
 		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//index' );
 		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
-		unset( $_wp_current_template_content );
 	}
 
 	/**
@@ -82,6 +84,32 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		$this->assertEquals( $page_id_template_path, $resolved_template_path );
 	}
 
+	function test_gutenberg_child_theme_php_template_takes_precedence_over_equally_specific_parent_theme_block_template() {
+		$this->markTestIncomplete(
+			'This test has not been implemented yet.'
+		);
+	}
+
+	function test_gutenberg_child_theme_block_template_takes_precedence_over_equally_specific_parent_theme_php_template() {
+		global $_wp_current_template_content;
+		add_filter( 'template_directory', array( $this, 'change_template_directory' ), 10, 1 );
+
+		$page_template                   = 'page.php';
+		$parent_theme_page_template_path = get_template_directory() . '/' . $page_template;
+		$type                            = 'page';
+		$templates                       = array(
+			'page-slug-doesnt-exist.php',
+			'page-1.php',
+			'page.php',
+		);
+		$resolved_template_path          = gutenberg_override_query_template( $parent_theme_page_template_path, $type, $templates );
+		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
+
+		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//index' );
+		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
+		remove_filter( 'template_directory', array( $this, 'change_template_directory' ) );
+	}
+
 	/**
 	 * Regression: https://github.com/WordPress/gutenberg/issues/31399.
 	 */
@@ -97,5 +125,9 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		);
 		$resolved_template_path    = gutenberg_override_query_template( $custom_page_template_path, $type, $templates );
 		$this->assertEquals( $custom_page_template_path, $resolved_template_path );
+	}
+
+	function change_template_directory( $template_dir ) {
+		return $template_dir . '-parent';
 	}
 }
