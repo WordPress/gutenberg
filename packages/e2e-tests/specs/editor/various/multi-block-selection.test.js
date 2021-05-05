@@ -37,7 +37,7 @@ async function getSelectedFlatIndices() {
  */
 async function testNativeSelection() {
 	// Wait for the selection to update.
-	await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
+	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 	await page.evaluate( () => {
 		const selection = window.getSelection();
 		const elements = Array.from(

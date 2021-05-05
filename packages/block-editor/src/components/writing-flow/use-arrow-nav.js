@@ -156,10 +156,14 @@ export default function useArrowNav() {
 				: selectionAfterEndClientId;
 
 			if ( nextSelectionEndClientId ) {
-				multiSelect(
-					selectionStartClientId || selectedBlockClientId,
-					nextSelectionEndClientId
-				);
+				if ( selectionStartClientId === nextSelectionEndClientId ) {
+					selectBlock( nextSelectionEndClientId );
+				} else {
+					multiSelect(
+						selectionStartClientId || selectedBlockClientId,
+						nextSelectionEndClientId
+					);
+				}
 			}
 		}
 
@@ -239,6 +243,10 @@ export default function useArrowNav() {
 			// Abort if navigation has already been handled (e.g. RichText inline
 			// boundaries).
 			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			if ( ! isNav ) {
 				return;
 			}
 
