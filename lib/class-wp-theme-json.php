@@ -251,7 +251,7 @@ class WP_Theme_JSON {
 	);
 
 	const ELEMENTS = array(
-		'link' => 'a:not(.wp-block-button_link)',
+		'link' => 'a',
 		'h1'   => 'h1',
 		'h2'   => 'h2',
 		'h3'   => 'h3',
