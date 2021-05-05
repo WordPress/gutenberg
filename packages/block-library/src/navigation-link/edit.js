@@ -189,6 +189,7 @@ export const updateNavigationLinkBlockAttributes = (
 		? escape( title )
 		: originalLabel || escape( normalizedURL );
 
+	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
 	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
 
 	const isBuiltInType =
@@ -204,7 +205,7 @@ export const updateNavigationLinkBlockAttributes = (
 		...( undefined !== opensInNewTab && { opensInNewTab } ),
 		...( id && Number.isInteger( id ) && { id } ),
 		...( kind && { kind } ),
-		...( type && ! isCustomLink && { type } ),
+		...( type && type !== 'URL' && { type } ),
 	} );
 };
 

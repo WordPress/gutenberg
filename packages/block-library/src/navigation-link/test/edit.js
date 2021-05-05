@@ -259,6 +259,7 @@ describe( 'edit', () => {
 					label: 'mailto:foo@example.com',
 					kind: 'custom',
 					url: 'mailto:foo@example.com',
+					type: 'mailto',
 				} );
 			} );
 
@@ -280,6 +281,7 @@ describe( 'edit', () => {
 					label: '#foo',
 					kind: 'custom',
 					url: '#foo',
+					type: 'internal',
 				} );
 			} );
 
@@ -301,6 +303,7 @@ describe( 'edit', () => {
 					label: 'tel:5555555',
 					kind: 'custom',
 					url: 'tel:5555555',
+					type: 'tel',
 				} );
 			} );
 		} );
