@@ -692,8 +692,12 @@ function RichText(
 			// Sometimes the browser may set the selection on the placeholder
 			// element, in which case the caret is not visible. We need to set
 			// the caret before the placeholder if that's the case.
-			if ( oldRecord.text.length === 0 && start === 0 ) {
-				fixPlaceholderSelection( getWin() );
+			if ( oldRecord.text.length === 0 ) {
+				if ( start === 0 ) {
+					fixPlaceholderSelection( getWin() );
+				} else if ( ! start ) {
+					onSelectionChange( 0, 0 );
+				}
 			}
 
 			return;
