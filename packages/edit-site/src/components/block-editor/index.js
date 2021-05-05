@@ -11,7 +11,7 @@ import {
 	BlockInspector,
 	WritingFlow,
 	BlockList,
-	__experimentalBlockSettingsMenuFirstItem,
+	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
@@ -121,11 +121,11 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						/>
 					</WritingFlow>
 				</Iframe>
-				<__experimentalBlockSettingsMenuFirstItem>
+				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton onClick={ onClose } />
 					) }
-				</__experimentalBlockSettingsMenuFirstItem>
+				</__unstableBlockSettingsMenuFirstItem>
 			</div>
 		</BlockEditorProvider>
 	);

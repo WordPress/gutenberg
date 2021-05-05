@@ -253,21 +253,17 @@ function gutenberg_override_sidebar_params_for_block_widget( $arg ) {
 }
 
 /**
- * Registers the WP_Widget_Block widget
+ * Registers the WP_Widget_Block widget.
  */
-function gutenberg_register_widgets() {
-	if ( ! gutenberg_use_widgets_block_editor() ) {
-		return;
-	}
+function gutenberg_register_block_widget() {
+	global $pagenow;
 
 	register_widget( 'WP_Widget_Block' );
-	// By default every widget on widgets.php is wrapped with a <form>.
-	// This means that you can sometimes end up with invalid HTML, e.g. when
-	// one of the widgets is a Search block.
-	//
-	// To fix the problem, let's add a filter that moves the form below the actual
-	// widget content.
-	global $pagenow;
+
+	// By default every widget on widgets.php is wrapped with a <form>.  This
+	// means that you can sometimes end up with invalid HTML, e.g. when one of
+	// the widgets is a Search block. To fix the problem, let's add a filter
+	// that moves the form below the actual widget content.
 	if ( 'widgets.php' === $pagenow ) {
 		add_filter(
 			'dynamic_sidebar_params',
@@ -276,7 +272,7 @@ function gutenberg_register_widgets() {
 	}
 }
 
-add_action( 'widgets_init', 'gutenberg_register_widgets' );
+add_action( 'widgets_init', 'gutenberg_register_block_widget' );
 
 /**
  * Sets show_instance_in_rest to true on all of the core WP_Widget subclasses.
