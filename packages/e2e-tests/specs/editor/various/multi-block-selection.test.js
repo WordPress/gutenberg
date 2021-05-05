@@ -37,7 +37,7 @@ async function getSelectedFlatIndices() {
  */
 async function testNativeSelection() {
 	// Wait for the selection to update.
-	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+	await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
 	await page.evaluate( () => {
 		const selection = window.getSelection();
 		const elements = Array.from(
@@ -201,6 +201,7 @@ describe( 'Multi-block selection', () => {
 		await page.keyboard.press( 'ArrowUp' );
 		await pressKeyWithModifier( 'shift', 'ArrowDown' );
 
+		await page.waitForSelector( '.is-multi-selected' );
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 3, 4 ] );
 
@@ -216,11 +217,13 @@ describe( 'Multi-block selection', () => {
 
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
 
+		await page.waitForSelector( '.is-selected' );
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toBe( 3 );
 
 		await pressKeyWithModifier( 'shift', 'ArrowUp' );
 
+		await page.waitForSelector( '.is-multi-selected' );
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toEqual( [ 2, 3 ] );
 
@@ -236,6 +239,7 @@ describe( 'Multi-block selection', () => {
 
 		await pressKeyWithModifier( 'shift', 'ArrowDown' );
 
+		await page.waitForSelector( '.is-selected' );
 		await testNativeSelection();
 		expect( await getSelectedFlatIndices() ).toBe( 3 );
 	} );

@@ -6,7 +6,7 @@ import { find, reverse, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -153,7 +153,6 @@ export function getClosestTabbable(
  * @param {WPElement} props.children Children to be rendered.
  */
 export default function WritingFlow( { children } ) {
-	const container = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
 
@@ -190,17 +189,6 @@ export default function WritingFlow( { children } ) {
 	const { multiSelect, selectBlock, setNavigationMode } = useDispatch(
 		blockEditorStore
 	);
-
-	useEffect( () => {
-		if ( hasFinishedMultiSelection ) {
-			container.current.focus();
-		}
-	}, [ hasFinishedMultiSelection ] );
-
-	// This hook sets the selection after the user makes a multi-selection. For
-	// some browsers, like Safari, it is important that this happens AFTER
-	// setting focus on the multi-selection container above.
-	useMultiSelection( container );
 
 	const lastFocus = useRef();
 
@@ -267,7 +255,7 @@ export default function WritingFlow( { children } ) {
 			const closestTabbable = getClosestTabbable(
 				target,
 				isReverse,
-				container.current
+				node
 			);
 			return (
 				! closestTabbable || ! isInSameBlock( target, closestTabbable )
@@ -290,7 +278,7 @@ export default function WritingFlow( { children } ) {
 			const hasModifier =
 				isShift || event.ctrlKey || event.altKey || event.metaKey;
 			const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
-			const { ownerDocument } = container.current;
+			const { ownerDocument } = node;
 			const { defaultView } = ownerDocument;
 
 			if ( hasMultiSelection() ) {
@@ -443,7 +431,7 @@ export default function WritingFlow( { children } ) {
 				const closestTabbable = getClosestTabbable(
 					target,
 					isReverse,
-					container.current,
+					node,
 					true
 				);
 
@@ -464,7 +452,7 @@ export default function WritingFlow( { children } ) {
 				const closestTabbable = getClosestTabbable(
 					target,
 					isReverseDir,
-					container.current
+					node
 				);
 				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
 				event.preventDefault();
@@ -481,12 +469,14 @@ export default function WritingFlow( { children } ) {
 		};
 	}, [] );
 
+	const ref = useRef();
+
 	function onFocusCapture( event ) {
 		// Do not capture incoming focus if set by us in WritingFlow.
 		if ( noCapture.current ) {
 			noCapture.current = null;
 		} else if ( hasFinishedMultiSelection ) {
-			container.current.focus();
+			ref.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
 			lastFocus.current.focus();
 		} else {
@@ -494,7 +484,7 @@ export default function WritingFlow( { children } ) {
 
 			const isBefore =
 				// eslint-disable-next-line no-bitwise
-				event.target.compareDocumentPosition( container.current ) &
+				event.target.compareDocumentPosition( ref.current ) &
 				event.target.DOCUMENT_POSITION_FOLLOWING;
 			const action = isBefore ? 'findNext' : 'findPrevious';
 
@@ -514,7 +504,11 @@ export default function WritingFlow( { children } ) {
 				style={ PREVENT_SCROLL_ON_FOCUS }
 			/>
 			<div
-				ref={ useMergeRefs( [ container, refCallback ] ) }
+				ref={ useMergeRefs( [
+					ref,
+					refCallback,
+					useMultiSelection(),
+				] ) }
 				className="block-editor-writing-flow"
 				tabIndex={ hasFinishedMultiSelection ? '0' : undefined }
 				aria-label={

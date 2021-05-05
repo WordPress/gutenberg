@@ -135,8 +135,10 @@ describe( 'block deletion -', () => {
 			// Press the up arrow once to select the third and fourth blocks.
 			await pressKeyWithModifier( 'shift', 'ArrowUp' );
 
+			await page.waitForSelector( '.is-multi-selected' );
+			// Allow selection to be updated.
 			await page.evaluate(
-				() => new Promise( window.requestIdleCallback )
+				() => new Promise( window.requestAnimationFrame )
 			);
 
 			// Now that the block wrapper is selected, press backspace to delete it.
