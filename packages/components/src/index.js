@@ -102,6 +102,7 @@ export { default as SandBox } from './sandbox';
 export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
+export { Spacer as __experimentalSpacer } from './spacer';
 export { default as Spinner } from './spinner';
 export { default as TabPanel } from './tab-panel';
 export { Text as __experimentalText } from './text';
