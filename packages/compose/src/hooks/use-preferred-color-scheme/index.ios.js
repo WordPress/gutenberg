@@ -5,7 +5,7 @@ import { useDarkModeContext, eventEmitter } from 'react-native-dark-mode';
 
 // Conditional needed to pass UI Tests on CI
 if ( eventEmitter.setMaxListeners ) {
-	eventEmitter.setMaxListeners( 200 );
+	eventEmitter.setMaxListeners( 150 );
 }
 
 /**
