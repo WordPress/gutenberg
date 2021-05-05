@@ -6,16 +6,11 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	RichText,
-	useBlockProps,
-	InspectorControls,
-} from '@wordpress/block-editor';
-import { __, _x } from '@wordpress/i18n';
+import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
-import { ToggleControl } from '@wordpress/components';
 
 const preventDefault = ( event ) => event.preventDefault();
 
@@ -51,7 +46,7 @@ export default function HomeEdit( {
 		},
 	} );
 
-	const { label, opensInNewTab } = attributes;
+	const { label } = attributes;
 
 	useEffect( () => {
 		if ( label === undefined ) {
@@ -61,20 +56,6 @@ export default function HomeEdit( {
 
 	return (
 		<>
-			<InspectorControls>
-				<div className="wp-block-home-link__settings">
-					<h2 className="wp-block-home-link__settings_label">
-						{ _x( 'Settings', 'Home link settings' ) }
-					</h2>
-					<ToggleControl
-						label={ __( 'Open in new tab' ) }
-						checked={ opensInNewTab }
-						onChange={ () => {
-							setAttributes( { opensInNewTab: ! opensInNewTab } );
-						} }
-					/>
-				</div>
-			</InspectorControls>
 			<li { ...blockProps }>
 				<a
 					className="wp-block-home-link__content"

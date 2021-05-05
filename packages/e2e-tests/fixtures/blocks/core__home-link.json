@@ -4,8 +4,7 @@
 		"name": "core/home-link",
 		"isValid": true,
 		"attributes": {
-			"label": "Home",
-			"opensInNewTab": false
+			"label": "Home"
 		},
 		"innerBlocks": [],
 		"originalContent": ""

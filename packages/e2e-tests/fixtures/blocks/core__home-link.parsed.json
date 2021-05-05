@@ -2,8 +2,7 @@
 	{
 		"blockName": "core/home-link",
 		"attrs": {
-			"label": "Home",
-			"opensInNewTab": false
+			"label": "Home"
 		},
 		"innerBlocks": [],
 		"innerHTML": "",

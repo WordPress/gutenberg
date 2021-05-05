@@ -132,18 +132,6 @@ function render_block_core_home( $attributes, $content, $block ) {
 	// Start appending HTML attributes to anchor tag.
 	$html .= ' href="' . esc_url( home_url() ) . '"';
 
-	if ( isset( $attributes['opensInNewTab'] ) && true === $attributes['opensInNewTab'] ) {
-		$html .= ' target="_blank" ';
-	}
-
-	if ( isset( $attributes['rel'] ) ) {
-		$html .= ' rel="' . esc_attr( $attributes['rel'] ) . '"';
-	}
-
-	if ( isset( $attributes['title'] ) ) {
-		$html .= ' title="' . esc_attr( $attributes['title'] ) . '"';
-	}
-
 	// End appending HTML attributes to anchor tag.
 	$html .= '>';
 
