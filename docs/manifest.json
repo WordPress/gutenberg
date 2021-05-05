@@ -312,7 +312,7 @@
 		"parent": "themes"
 	},
 	{
-		"title": "Global Settings (theme.json)",
+		"title": "Global Settings & Styles (theme.json)",
 		"slug": "theme-json",
 		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
 		"parent": "themes"
