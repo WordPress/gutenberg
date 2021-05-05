@@ -5,8 +5,8 @@
 }
 
 .customize-control-sidebar_block_editor {
-	margin: 0 -12px -12px -12px;
-	padding: 12px;
+	margin: 0 ( -$grid-unit-15 ) ( -$grid-unit-15 ) ( -$grid-unit-15 );
+	padding: $grid-unit-15;
 	background: $white;
 	border-top: 1px solid #dcdcde;
 	border-bottom: 1px solid #dcdcde;
