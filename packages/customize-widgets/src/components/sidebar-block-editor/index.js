@@ -16,7 +16,7 @@ import {
 	ObserveTyping,
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
-	__experimentalBlockSettingsMenuFirstItem,
+	__unstableBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
 import { SlotFillProvider, Popover } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
@@ -101,14 +101,14 @@ export default function SidebarBlockEditor( {
 					) }
 				</SidebarEditorProvider>
 
-				<__experimentalBlockSettingsMenuFirstItem>
+				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton
 							inspector={ inspector }
 							closeMenu={ onClose }
 						/>
 					) }
-				</__experimentalBlockSettingsMenuFirstItem>
+				</__unstableBlockSettingsMenuFirstItem>
 
 				{
 					// We have to portal this to the parent of both the editor and the inspector,
