@@ -1,0 +1,47 @@
+.components-border-radius-control {
+	margin-bottom: $grid-unit-15;
+
+	legend {
+		padding-bottom: $grid-unit-05;
+	}
+
+	.components-border-radius-control__wrapper {
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+
+		> .components-unit-control-wrapper {
+			width: calc(50% - 26px);
+			margin-bottom: 0;
+		}
+
+		.components-range-control {
+			width: calc(50% - 26px);
+			margin-bottom: 0;
+
+			.components-base-control__field {
+				margin-bottom: 0;
+			}
+
+			.components-range-control__wrapper {
+				margin-right: 10px;
+			}
+		}
+
+		> span {
+			flex: 0 0 auto;
+		}
+	}
+
+	.components-border-radius-control__input-controls-wrapper {
+		display: flex;
+		width: 70%;
+		flex-wrap: wrap;
+
+		.components-unit-control-wrapper {
+			width: calc(50% - #{ $grid-unit-10 });
+			margin-bottom: $grid-unit-10;
+			margin-right: $grid-unit-10;
+		}
+	}
+}

@@ -34,6 +34,7 @@ export {
 	BlockVerticalAlignmentToolbar,
 	BlockVerticalAlignmentControl,
 } from './block-vertical-alignment-control';
+export { default as __experimentalBorderRadiusControl } from './border-radius-control';
 export { default as __experimentalBorderStyleControl } from './border-style-control';
 export {
 	// This is a typo, but kept here for back-compat.
