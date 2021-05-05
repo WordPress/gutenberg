@@ -10,13 +10,10 @@ This tutorial is up to date as of Gutenberg version 9.1.
 
 ## Table of Contents
 
-- [Create a block theme](#create-a-block-theme)
-	- [Table of Contents](#table-of-contents)
-	- [What is needed to create a block theme?](#what-is-needed-to-create-a-block-theme)
-		- [Required files and file structure](#required-files-and-file-structure)
-	- [Creating the theme](#creating-the-theme)
-		- [Creating the templates and template parts](#creating-the-templates-and-template-parts)
-		- [theme.json - Global styles](#themejson---global-styles)
+1.  [What is needed to create a block-theme?](#what-is-needed-to-create-a-block-theme)
+2.  [Creating the theme](#creating-the-theme)
+3.  [Creating the templates and template parts](#creating-the-templates-and-template-parts)
+4.  [theme.json - Global styles](#theme-json-global-styles)
 
 ## What is needed to create a block theme?
 
@@ -377,4 +374,5 @@ Below are the presets and styles combined:
 	}
 }
 ```
+
 
