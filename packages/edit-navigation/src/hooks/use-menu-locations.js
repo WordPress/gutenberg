@@ -11,7 +11,7 @@ import { merge } from 'lodash';
 /**
  * Internal dependencies
  */
-import { useMenuEntity, useSelectedMenuData } from './index';
+import { useMenuEntity, useSelectedMenuId } from './index';
 
 const locationsForMenuId = ( menuLocationsByName, id ) =>
 	Object.values( menuLocationsByName )
@@ -21,7 +21,7 @@ const locationsForMenuId = ( menuLocationsByName, id ) =>
 export default function useMenuLocations() {
 	const [ menuLocationsByName, setMenuLocationsByName ] = useState( null );
 
-	const { menuId } = useSelectedMenuData();
+	const [ menuId ] = useSelectedMenuId();
 	const { editMenuEntityRecord, menuEntityData } = useMenuEntity( menuId );
 	useEffect( () => {
 		let isMounted = true;

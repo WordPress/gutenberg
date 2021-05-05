@@ -1,5 +1,14 @@
 == Changelog ==
 
+= 10.5.4 =
+
+### Bug Fixes
+
+- Fix for template order logic. ([31478](https://github.com/WordPress/gutenberg/pull/31478))  ([31336](https://github.com/WordPress/gutenberg/pull/31336))
+
+
+
+
 = 10.5.3 =
 
 ## Bug Fixes

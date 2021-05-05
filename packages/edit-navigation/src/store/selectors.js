@@ -12,8 +12,18 @@ import { createRegistrySelector } from '@wordpress/data';
  * Internal dependencies
  */
 import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
-
 import { buildNavigationPostId } from './utils';
+
+/**
+ * Returns the selected menu ID.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {number} The selected menu ID.
+ */
+export function getSelectedMenuId( state ) {
+	return state.selectedMenuId ?? 0;
+}
 
 /**
  * Returns a "stub" navigation post reflecting the contents of menu with id=menuId. The
