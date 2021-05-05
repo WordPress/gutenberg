@@ -18,8 +18,6 @@ function blockToWidget( block, existingWidget = null ) {
 		block.name === 'core/legacy-widget' &&
 		( block.attributes.id || block.attributes.instance );
 
-	const { encoded, hash, raw, ...rest } = block.attributes.instance;
-
 	if ( isValidLegacyWidgetBlock ) {
 		if ( block.attributes.id ) {
 			// Widget that does not extend WP_Widget.
@@ -27,6 +25,8 @@ function blockToWidget( block, existingWidget = null ) {
 				id: block.attributes.id,
 			};
 		} else {
+			const { encoded, hash, raw, ...rest } = block.attributes.instance;
+
 			// Widget that extends WP_Widget.
 			widget = {
 				idBase: block.attributes.idBase,
