@@ -1,4 +1,4 @@
-# Global Settings (theme.json)
+# Global Settings & Styles (theme.json)
 
 <div class="callout callout-alert">
 These features are still experimental. “Experimental” means this is an early implementation subject to drastic and breaking changes.
@@ -8,18 +8,26 @@ Documentation has been shared early to surface what’s being worked on and invi
 
 This is documentation for the current direction and work in progress about how themes can hook into the various sub-systems that the Block Editor provides.
 
--   Rationale
-    -   Settings can be controlled per block
-    -   Some block styles are managed
-    -   CSS Custom Properties: presets & custom
--   Specification
-    -   Settings
-    -   Styles
-    -   Other theme metadata
--   FAQ
-    -   The naming schema of CSS Custom Properties
-    -   Why using -- as a separator?
-    -   How settings under "custom" create new CSS Custom Properties
+- Rationale
+    - Settings for the block editor
+    - Settings can be controlled per block
+    - Styles are managed
+    - CSS Custom Properties: presets & custom
+- Specification
+    - version
+    - settings
+        - Presets
+        - Custom
+    - styles
+        - Top-level
+        - Block-level
+        - Elements
+    - customTemplates
+    - templateParts
+- FAQ
+    - The naming schema of CSS Custom Properties
+    - Why using -- as a separator?
+    - How settings under "custom" create new CSS Custom Properties
 
 ## Rationale
 
@@ -27,13 +35,13 @@ The Block Editor API has evolved at different velocities and there are some grow
 
 This describes the current efforts to consolidate the various APIs related to styles into a single point – a `theme.json` file that should be located inside the root of the theme directory.
 
-### Global settings for the block editor
+### Settings for the block editor
 
 Instead of the proliferation of theme support flags or alternative methods, the `theme.json` files provides a canonical way to define the settings of the block editor. These settings includes things like:
 
 -   What customization options should be made available or hidden from the user.
 -   What are the default colors, font sizes... available to the user.
--   Defines the default layout of the editor. (widths and available alignments).
+-   Defines the default layout of the editor (widths and available alignments).
 
 ### Settings can be controlled per block
 
@@ -45,44 +53,43 @@ Examples of what can be achieved are:
 -   Enable font size UI controls for all blocks but the headings block.
 -   etc.
 
-### Some block styles are managed
+### Styles are managed
 
 By using the `theme.json` file to set style properties in a structured way, the Block Editor can "manage" the CSS that comes from different origins (user, theme, and core CSS). For example, if a theme and a user set the font size for paragraphs, we only enqueue the style coming from the user and not the theme's.
 
 Some of the advantages are:
 
--   Reduce the amount of CSS enqueued.
--   Prevent specificity wars.
+- Reduce the amount of CSS enqueued.
+- Prevent specificity wars.
 
-### CSS Custom Properties
+### CSS Custom Properties: presets & custom
 
-There are some areas of styling that would benefit from having shared values that can change across a site instantly.
+There are some areas of styling that would benefit from having shared values that can change across a site.
 
 To address this need, we've started to experiment with CSS Custom Properties, aka CSS Variables, in some places:
 
--   **Presets**: [color palettes](/docs/how-to-guides/themes/theme-support.md#block-color-palettes), [font sizes](/docs/how-to-guides/themes/theme-support.md#block-font-sizes), or [gradients](/docs/how-to-guides/themes/theme-support.md#block-gradient-presets) declared by the theme are converted to CSS Custom Properties and enqueued both the front-end and the editors.
+- **Presets**: [color palettes](/docs/how-to-guides/themes/theme-support.md#block-color-palettes), [font sizes](/docs/how-to-guides/themes/theme-support.md#block-font-sizes), or [gradients](/docs/how-to-guides/themes/theme-support.md#block-gradient-presets) declared by the theme are converted to CSS Custom Properties and enqueued both the front-end and the editors.
 
 {% codetabs %}
 {% Input %}
 
 ```json
 {
+	"version": 1,
 	"settings": {
-		"defaults": {
-			"color": {
-				"palette": [
-					{
-						"name": "Black",
-						"slug": "black",
-						"color": "#000000"
-					},
-					{
-						"name": "White",
-						"slug": "white",
-						"color": "#ffffff"
-					}
-				]
-			}
+		"color": {
+			"palette": [
+				{
+					"name": "Black",
+					"slug": "black",
+					"color": "#000000"
+				},
+				{
+					"name": "White",
+					"slug": "white",
+					"color": "#ffffff"
+				}
+			]
 		}
 	}
 }
@@ -106,13 +113,12 @@ body {
 
 ```json
 {
+	"version": 1,
 	"settings": {
-		"defaults": {
-			"custom": {
-				"line-height": {
-					"body": 1.7,
-					"heading": 1.3
-				}
+		"custom": {
+			"line-height": {
+				"body": 1.7,
+				"heading": 1.3
 			}
 		}
 	}
@@ -134,104 +140,99 @@ body {
 
 This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `theme.json`. Users, via the site editor, will also be also to override theme's or core's preferences via an user interface that is being worked on.
 
-The `theme.json` file declares how a theme wants the editor configured (`settings`) as well as the style properties it sets (`styles`).
-
-```
+```json
 {
-  "settings": { ... },
-  "styles": { ... }
+	"version": 1,
+	"settings": {},
+	"styles": {},
+	"customTemplates": {},
+	"templateParts": {}
 }
 ```
 
-Both settings and styles can contain subsections for any registered block. As a general rule, the names of these subsections will be the block names ― we call them "block selectors". For example, the paragraph block ―whose name is `core/paragraph`― can be addressed in the settings using the key (or "block selector") `core/paragraph`:
+### Version
 
-```
-{
-  "settings": {
-    "core/paragraph": { ... }
-  }
-}
-```
-
-There are a few cases in whiche a single block can represent different HTML markup. The heading block is one of these, as it represents h1 to h6 HTML elements. In these cases, the block will have as many block selectors as different markup variations ― `core/heading/h1`, `core/heading/h2`, etc, so they can be addressed separately:
-
-```
-{
-  "styles": {
-    "core/heading/h1": { ... },
-    // ...
-    "core/heading/h6": { ... },
-  }
-}
-```
-
-Additionally, there are two other block selectors: `root` and `defaults`. The `root` block selector represents the root of the site. The `defaults` block selector represents the defaults to be used by blocks if they don't declare anything.
+This field describes the format of the `theme.json` file and it's used to detect different versions and migrate them to the latest format.
 
 ### Settings
 
 The settings section has the following structure and default values:
 
-```
+```json
 {
-  "settings": {
-    "defaults": {
-      "layout": { /* Default layout to be used in the post editor */
-        "contentSize": "800px",
-        "wideSize": "1000px",
-      }
-      "border": {
-        "customColor": false, /* true to opt-in */
-        "customRadius": false,
-        "customStyle": false,
-        "customWidth": false
-      },
-      "color": {
-        "custom": true, /* false to opt-out, as in add_theme_support('disable-custom-colors') */
-        "customGradient": true, /* false to opt-out, as in add_theme_support('disable-custom-gradients') */
-        "duotone": [ ... ], /* duotone presets, a list of { "colors": [ "#000", "#FFF" ], "slug": "black-and-white", "name": "Black and White" } */
-        "gradients": [ ... ], /* gradient presets, as in add_theme_support('editor-gradient-presets', ... ) */
-        "link": false, /* true to opt-in, as in add_theme_support('experimental-link-color') */
-        "palette": [ ... ], /* color presets, as in add_theme_support('editor-color-palette', ... ) */
-      },
-      "custom": { ... },
-      "spacing": {
-        "customPadding": false, /* true to opt-in, as in add_theme_support('custom-spacing') */
-        "units": [ "px", "em", "rem", "vh", "vw" ], /* filter values, as in add_theme_support('custom-units', ... ) */
-      },
-      "typography": {
-        "customFontSize": true, /* false to opt-out, as in add_theme_support( 'disable-custom-font-sizes' ) */
-        "customFontWeight": true, /* false to opt-out */
-        "customFontStyle": true, /* false to opt-out */
-        "customLineHeight": false, /* true to opt-in, as in add_theme_support( 'custom-line-height' ) */
-        "dropCap": true, /* false to opt-out */
-        "fontFamilies": [ ... ], /* font family presets */
-        "fontSizes": [ ... ], /* font size presets, as in add_theme_support('editor-font-sizes', ... ) */
-      }
-    }
-  }
+	"version": 1,
+	"settings": {
+		"border": {
+			"customColor": false,
+			"customRadius": false,
+			"customStyle": false,
+			"customWidth": false,
+		},
+		"color": {
+			"custom": true, /* Supersedes add_theme_support('disable-custom-colors') */
+			"customGradient": true, /* Supersedes add_theme_support('disable-custom-gradients') */
+			"duotone": [], /* Duotone presets } */
+			"gradients": [], /* Gradient presets, supersedes add_theme_support('editor-gradient-presets', ... ) */
+			"link": false, /* Supersedes add_theme_support('experimental-link-color') */
+			"palette": [], /* Color presets, supersedes add_theme_support('editor-color-palette', ... ) */
+		},
+		"custom": {},
+		"layout": { /* Default layout to be used in the post editor */
+			"contentSize": "800px",
+			"wideSize": "1000px",
+		},
+		"spacing": {
+			"customPadding": false, /* Supersedes add_theme_support('custom-spacing') */
+			"units": [ "px", "em", "rem", "vh", "vw" ], /* filter values, as in add_theme_support('custom-units', ... ) */
+		},
+		"typography": {
+			"customFontSize": true, /* Supersedes add_theme_support( 'disable-custom-font-sizes' ) */
+			"customFontStyle": true,
+			"customFontWeight": true,
+			"customLineHeight": false, /* Supersedes add_theme_support( 'custom-line-height' ) */
+			"customTextDecorations": true,
+			"customTextTransforms": true,
+			"dropCap": true,
+			"fontFamilies": [],
+			"fontSizes": [], /* Font size presets, supersedes add_theme_support('editor-font-sizes', ... ) */
+		},
+		"blocks": {
+			"core/paragraph": {
+				"border": {},
+				"color": {},
+				"custom": {},
+				"layout": {},
+				"spacing": {},
+				"typography": {}
+			},
+			"core/heading": {},
+			"etc": {}
+		}
+	}
 }
 ```
 
-Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`.
+Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`. The settings declared at the top-level affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and configure all blocks at once.
 
-The block settings declared under the `defaults` block selector affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and quickly configure all blocks at once. To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the `defaults` section. If a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as set `settings.defaults.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
+To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the top-level section. For example, if a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as setting `settings.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
 
 Let's say a theme author wants to enable custom colors only for the paragraph block. This is how it can be done:
 
-```
+```json
 {
-  "settings": {
-    "defaults": {
-      "color": {
-        "custom": false // Disable it for all blocks.
-      }
-    },
-    "core/paragraph": {
-      "color": {
-        "custom": true // Paragraph overrides the setting.
-      }
-    }
-  }
+	"version": 1,
+	"settings": {
+		"color": {
+			"custom": false // Disable it for all blocks.
+		},
+		"blocks": {
+			"core/paragraph": {
+				"color": {
+					"custom": true // Paragraph overrides the setting.
+				}
+			}
+		}
+	}
 }
 ```
 
@@ -239,50 +240,105 @@ Note, however, that not all settings are relevant for all blocks. The settings s
 
 #### Presets
 
-Presets are part of the settings section. Each preset value will generate a CSS Custom Property that will be added to the new stylesheet, which follow this naming schema: `--wp--preset--{preset-category}--{preset-slug}`.
+Presets are part of the settings section. They are values that are shown to the user via some UI controls. By defining them via `theme.json` the engine can do more for themes, such as automatically translate the preset name or enqueue the corresponding CSS classes and custom properties.
 
-For example:
+The following presets can be defined via `theme.json`:
+
+- `color.duotone`: doesn't generate classes or custom properties.
+- `color.gradients`: generates a single class and custom property per preset value.
+- `color.palette`:
+    - generates 3 classes per preset value: color, background-color, and border-color.
+    - generates a single custom property per preset value
+- `typography.fontSizes`: generates a single class and custom property per preset value.
+- `typography.fontFamilies`: generates a single custom property per preset value.
+
+The naming schema for the classes and the custom properties is as follows:
+
+- Custom Properties: `--wp--preset--{preset-category}--{preset-slug}` such as `--wp--preset--color--black`
+- Classes: `.has-{preset-slug}-{preset-category}` such as `.has-black-color`.
 
 {% codetabs %}
 {% Input %}
 
 ```json
 {
+	"version": 1,
 	"settings": {
-		"defaults": {
-			"color": {
-				"palette": [
-					{
-						"slug": "strong-magenta",
-						"color": "#a156b4"
-					},
-					{
-						"slug": "very-dark-grey",
-						"color": "rgb(131, 12, 8)"
-					}
-				],
-				"gradients": [
-					{
-						"slug": "blush-bordeaux",
-						"gradient": "linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%)"
-					},
-					{
-						"slug": "blush-light-purple",
-						"gradient": "linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)"
-					}
-				]
-			},
-			"typography": {
-				"fontSizes": [
-					{
-						"slug": "normal",
-						"size": 16
-					},
-					{
-						"slug": "big",
-						"size": 32
-					}
-				]
+		"color": {
+			"duotone": [
+				{
+					"colors": [ "#000", "#FFF" ],
+					"slug": "black-and-white",
+					"name": "Black and White"
+				}
+			],
+			"gradients": [
+				{
+					"slug": "blush-bordeaux",
+					"gradient": "linear-gradient(135deg,rgb(254,205,165) 0%,rgb(254,45,45) 50%,rgb(107,0,62) 100%)",
+					"name": "Blush bordeaux"
+				},
+				{
+					"slug": "blush-light-purple",
+					"gradient": "linear-gradient(135deg,rgb(255,206,236) 0%,rgb(152,150,240) 100%)",
+					"name": "Blush light purple"
+				}
+			],
+			"palette": [
+				{
+					"slug": "strong-magenta",
+					"color": "#a156b4",
+					"name": "Strong magenta"
+				},
+				{
+					"slug": "very-dark-grey",
+					"color": "rgb(131, 12, 8)",
+					"name": "Very dark grey"
+				}
+			]
+		},
+		"typography": {
+			"fontFamilies": [
+				{
+					"fontFamily": "-apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Oxygen-Sans,Ubuntu,Cantarell, \"Helvetica Neue\",sans-serif",
+					"slug": "system-font",
+					"name": "System Font"
+				},
+				{
+					"fontFamily": "Helvetica Neue, Helvetica, Arial, sans-serif",
+					"slug": "helvetica-arial",
+					"name": "Helvetica or Arial"
+				}
+			],
+			"fontSizes": [
+				{
+					"slug": "normal",
+					"size": 16,
+					"name": "Normal"
+				},
+				{
+					"slug": "big",
+					"size": 32,
+					"name": "Big"
+				}
+			]
+		},
+		"blocks": {
+			"core/group": {
+				"color": {
+					"palette": [
+						{
+							"slug": "black",
+							"color": "#000000",
+							"name": "Black"
+						},
+						{
+							"slug": "white",
+							"color": "#ffffff",
+							"name": "White"
+						},
+					]
+				}
 			}
 		}
 	}
@@ -292,32 +348,55 @@ For example:
 {% Output %}
 
 ```css
+/* Top-level custom properties */
 body {
 	--wp--preset--color--strong-magenta: #a156b4;
-	--wp--preset--color--very-dark-gray: #444;
+	--wp--preset--color--very-dark-grey: #444;
+	--wp--preset--gradient--blush-bordeaux: linear-gradient( 135deg, rgb( 254, 205, 165 ) 0%, rgb( 254, 45, 45 ) 50%, rgb( 107, 0, 62 ) 100% );
+	--wp--preset--gradient--blush-light-purple: linear-gradient( 135deg, rgb( 255, 206, 236 ) 0%, rgb( 152, 150, 240 ) 100% );
 	--wp--preset--font-size--big: 32;
 	--wp--preset--font-size--normal: 16;
-	--wp--preset--gradient--blush-bordeaux: linear-gradient(
-		135deg,
-		rgb( 254, 205, 165 ) 0%,
-		rgb( 254, 45, 45 ) 50%,
-		rgb( 107, 0, 62 ) 100%
-	);
-	--wp--preset--gradient--blush-light-purple: linear-gradient(
-		135deg,
-		rgb( 255, 206, 236 ) 0%,
-		rgb( 152, 150, 240 ) 100%
-	);
+	--wp--preset--font-family--helvetica-arial: Helvetica Neue, Helvetica, Arial, sans-serif;
+	--wp--preset--font-family--system: -apple-system,BlinkMacSystemFont,\"Segoe UI\",Roboto,Oxygen-Sans,Ubuntu,Cantarell, \"Helvetica Neue\",sans-serif;
 }
+
+/* Block-level custom properties (bounded to the group block) */
+.wp-block-group {
+	--wp--preset--color--black: #000000;
+	--wp--preset--color--white: #ffffff;
+}
+
+/* Top-level classes */
+.has-strong-magenta-color { color: #a156b4 !important; }
+.has-strong-magenta-background-color { background-color: #a156b4 !important; }
+.has-strong-magenta-border-color { border-color: #a156b4 !important; }
+.has-very-dark-grey-color { color: #444 !important; }
+.has-very-dark-grey-background-color { background-color: #444 !important; }
+.has-very-dark-grey-border-color { border-color: #444 !important; }
+.has-blush-bordeaux-background { background: linear-gradient( 135deg, rgb( 254, 205, 165 ) 0%, rgb( 254, 45, 45 ) 50%, rgb( 107, 0, 62 ) 100% ) !important; }
+.has-blush-light-purple-background { background: linear-gradient( 135deg, rgb( 255, 206, 236 ) 0%, rgb( 152, 150, 240 ) 100% ) !important; }
+.has-big-font-size { font-size: 32; }
+.has-normal-font-size { font-size: 16; }
+
+/* Block-level classes (bounded to the group block) */
+.wp-block-group.has-black-color { color: #a156b4 !important; }
+.wp-block-group.has-black-background-color { background-color: #a156b4 !important; }
+.wp-block-group.has-black-border-color { border-color: #a156b4 !important; }
+.wp-block-group.has-white-color { color: #444 !important; }
+.wp-block-group.has-white-background-color { background-color: #444 !important; }
+.wp-block-group.has-white-border-color { border-color: #444 !important; }
+
 ```
 
 {% end %}
 
 To maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
 
-#### Free-form CSS Custom Properties
+Preset classes are attached to the content of a post by some user action. That's why the engine will add `!important` to these, because user styles should take precedence over theme styles.
 
-In addition to create CSS Custom Properties for the presets, the `theme.json` also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `settings.<some/block>.custom` section will be transformed to CSS Custom Properties following this naming schema: `--wp--custom--<variable-name>`.
+#### Custom
+
+In addition to create CSS Custom Properties for the presets, the `theme.json` also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `custom` field will be transformed to CSS Custom Properties following this naming schema: `--wp--custom--<variable-name>`.
 
 For example:
 
@@ -326,14 +405,20 @@ For example:
 
 ```json
 {
+	"version": 1,
 	"settings": {
-		"defaults": {
-			"custom": {
-				"base-font": 16,
-				"line-height": {
-					"small": 1.2,
-					"medium": 1.4,
-					"large": 1.8
+		"custom": {
+			"baseFont": 16,
+			"lineHeight": {
+				"small": 1.2,
+				"medium": 1.4,
+				"large": 1.8
+			}
+		},
+		"blocks": {
+			"core/group": {
+				"custom": {
+					"baseFont": 32
 				}
 			}
 		}
@@ -350,11 +435,14 @@ body {
 	--wp--custom--line-height--medium: 1.4;
 	--wp--custom--line-height--large: 1.8;
 }
+.wp-block-group {
+	--wp--custom--base-font: 32;
+}
 ```
 
 {% end %}
 
-Note that, the name of the variable is created by adding `--` in between each nesting level.
+Note that the name of the variable is created by adding `--` in between each nesting level and `camelCase` fields are transformed to `kebab-case`.
 
 ### Styles
 
@@ -362,69 +450,125 @@ Each block declares which style properties it exposes via the [block supports me
 
 ```json
 {
+	"version": 1,
 	"styles": {
-		"some/block/selector": {
-			"border": {
-				"color": "value",
-				"radius": "value",
-				"style": "value",
-				"width": "value"
+		"border": {
+			"color": "value",
+			"radius": "value",
+			"style": "value",
+			"width": "value"
+		},
+		"color": {
+			"background": "value",
+			"gradient": "value",
+			"text": "value"
+		},
+		"spacing": {
+			"padding": {
+				"top": "value",
+				"right": "value",
+				"bottom": "value",
+				"left": "value"
+			}
+		},
+		"typography": {
+			"fontFamily": "value",
+			"fontSize": "value",
+			"fontStyle": "value",
+			"fontWeight": "value",
+			"lineHeight": "value",
+			"textDecoration": "value",
+			"textTransform": "value"
+		},
+		"elements": {
+			"link": {
+				"border": {},
+				"color": {},
+				"spacing": {},
+				"typography": {},
 			},
-			"color": {
-				"background": "value",
-				"gradient": "value",
-				"link": "value",
-				"text": "value"
-			},
-			"spacing": {
-				"padding": {
-					"top": "value",
-					"right": "value",
-					"bottom": "value",
-					"left": "value"
+			"h1": {},
+			"h2": {},
+			"h3": {},
+			"h4": {},
+			"h5": {},
+			"h6": {}
+		},
+		"blocks": {
+			"core/group": {
+				"border": {},
+				"color": {},
+				"spacing": {},
+				"typography": {},
+				"elements": {
+					"link": {},
+					"h1": {},
+					"h2": {},
+					"h3": {},
+					"h4": {},
+					"h5": {},
+					"h6": {}
 				}
-			},
-			"typography": {
-				"fontFamily": "value",
-				"fontSize": "value",
-				"fontStyle": "value",
-				"fontWeight": "value",
-				"lineHeight": "value",
-				"textDecoration": "value",
-				"textTransform": "value"
 			}
 		}
 	}
 }
 ```
 
-For example:
+### Top-level styles
+
+Styles found at the top-level will be enqueued using the `body` selector.
 
 {% codetabs %}
 {% Input %}
 
 ```json
 {
+	"version": 1,
 	"styles": {
-		"root": {
-			"color": {
-				"text": "var(--wp--preset--color--primary)"
-			}
+		"color": {
+			"text": "var(--wp--preset--color--primary)"
+		}
+	}
+}
+```
+
+{% Output %}
+
+```css
+body {
+	color: var( --wp--preset--color--primary );
+}
+```
+
+{% end %}
+
+### Block styles
+
+Styles found within a block will be enqueued using the block selector.
+
+By default, the block selector is generated based on its name such as `.wp-block-<blockname-without-namespace>`. For example, `.wp-block-group` for the `core/group` block. There are some blocks that want to opt-out from this default behavior. They can do so by explicitely telling the system which selector to use for them via the `__experimentalSelector` key within the `supports` section of its `block.json` file.
+
+{% codetabs %}
+{% Input %}
+
+```json
+{
+	"version": 1,
+	"styles": {
+		"color": {
+			"text": "var(--wp--preset--color--primary)"
 		},
-		"core/heading/h1": {
-			"color": {
-				"text": "var(--wp--preset--color--primary)"
+		"blocks": {
+			"core/paragraph": {
+				"color": {
+					"text": "var(--wp--preset--color--secondary)"
+				}
 			},
-			"typography": {
-				"fontSize": "calc(1px * var(--wp--preset--font-size--huge))"
-			}
-		},
-		"core/heading/h4": {
-			"color": {
-				"text": "var(--wp--preset--color--secondary)"
-			},
-			"typography": {
-				"fontSize": "var(--wp--preset--font-size--normal)"
+			"core/group": {
+				"color": {
+					"text": "var(--wp--preset--color--tertiary)"
+				}
 			}
 		}
 	}
@@ -437,25 +581,105 @@ For example:
 body {
 	color: var( --wp--preset--color--primary );
 }
-h1 {
-	color: var( --wp--preset--color--primary );
-	font-size: calc( 1px * var( --wp--preset--font-size--huge ) );
-}
-h4 {
+p { /* The core/paragraph opts out from the default behaviour and uses p as a selector. */
 	color: var( --wp--preset--color--secondary );
-	font-size: calc( 1px * var( --wp--preset--font-size--normal ) );
+}
+.wp-block-group {
+	color: var( --wp--preset--color--tertiary );
 }
 ```
 
 {% end %}
 
-The `defaults` block selector can't be part of the `styles` section and will be ignored if it's present. The `root` block selector will generate a style rule with the `:root` CSS selector.
+#### Element styles
 
-### Other theme metadata
+In addition to top-level and block-level styles, there's the concept of elements that can used in both places. There's a closed set of them:
 
-There's a growing need to add more theme metadata to the theme.json. This section lists those other fields:
+- `link`: maps to the `a` CSS selector.
+- `h1`: maps to the `h1` CSS selector.
+- `h2`: maps to the `h2` CSS selector.
+- `h3`: maps to the `h3` CSS selector.
+- `h4`: maps to the `h4` CSS selector.
+- `h5`: maps to the `h5` CSS selector.
+- `h6`: maps to the `h6` CSS selector.
 
-**customTemplates**: within this field themes can list the custom templates present in the `block-templates` folder. For example, for a custom template named `my-custom-template.html`, the `theme.json` can declare what post types can use it and what's the title to show the user:
+If they're found in the top-level the element selector will be used. If they're found within a block, the selector to be used will be the element's appended to the corresponding block.
+
+{% codetabs %}
+{% Input %}
+
+```json
+{
+	"version": 1,
+	"styles": {
+		"typography": {
+			"fontSize": "var(--wp--preset--font-size--normal)"
+		},
+		"elements": {
+			"h1": {
+				"typography": {
+					"fontSize": "var(--wp--preset--font-size--huge)"
+				}
+			},
+			"h2": {
+				"typography": {
+					"fontSize": "var(--wp--preset--font-size--big)"
+				}
+			},
+			"h3": {
+				"typography": {
+					"fontSize": "var(--wp--preset--font-size--medium)"
+				}
+			}
+		},
+		"blocks": {
+			"core/group": {
+				"elements": {
+					"h2": {
+						"typography": {
+							"fontSize": "var(--wp--preset--font-size--small)"
+						}
+					},
+					"h3": {
+						"typography": {
+							"fontSize": "var(--wp--preset--font-size--smaller)"
+						}
+					}
+				}
+			}
+		}
+	}
+}
+```
+
+{% Output %}
+
+```css
+body {
+	font-size: var( --wp--preset--font-size--normal );
+}
+h1 {
+	font-size: var( --wp--preset--font-size--huge );
+}
+h2 {
+	font-size: var( --wp--preset--font-size--big );
+}
+h3 {
+	font-size: var( --wp--preset--font-size--medium );
+}
+.wp-block-group h2 {
+	font-size: var( --wp--preset--font-size--small );
+}
+.wp-block-group h3 {
+	font-size: var( --wp--preset--font-size--smaller );
+}
+```
+
+{% end %}
+
+### customTemplates
+
+Within this field themes can list the custom templates present in the `block-templates` folder. For example, for a custom template named `my-custom-template.html`, the `theme.json` can declare what post types can use it and what's the title to show the user:
 
 ```json
 {
@@ -473,7 +697,9 @@ There's a growing need to add more theme metadata to the theme.json. This sectio
 }
 ```
 
-**templateParts**: within this field themes can list the template parts present in the `block-template-parts` folder. For example, for a template part named `my-template-part.html`, the `theme.json` can declare the area term for the template part entity which is responsible for rendering the corresponding block variation (Header block, Footer block, etc.) in the editor. Defining this area term in the json will allow the setting to persist across all uses of that template part entity, as opposed to a block attribute that would only affect one block. Defining area as a block attribute is not recommended as this is only used 'behind the scenes' to aid in bridging the gap between placeholder flows and entity creation.
+### templateParts
+
+Within this field themes can list the template parts present in the `block-template-parts` folder. For example, for a template part named `my-template-part.html`, the `theme.json` can declare the area term for the template part entity which is responsible for rendering the corresponding block variation (Header block, Footer block, etc.) in the editor. Defining this area term in the json will allow the setting to persist across all uses of that template part entity, as opposed to a block attribute that would only affect one block. Defining area as a block attribute is not recommended as this is only used 'behind the scenes' to aid in bridging the gap between placeholder flows and entity creation.
 
 Currently block variations exist for "header" and "footer" values of the area term, any other values and template parts not defined in the json will default to the general template part block. Variations will be denoted by specific icons within the editor's interface, will default to the corresponding semantic HTML element for the wrapper (this can also be overridden by the `tagName` attribute set on the template part block), and will contextualize the template part allowing more custom flows in future editor improvements.
 
@@ -496,21 +722,21 @@ One thing you may have noticed is the naming schema used for the CSS Custom Prop
 
 **Presets** such as `--wp--preset--color--black` can be divided into the following chunks:
 
--   `--wp`: prefix to namespace the CSS variable.
--   `preset `: indicates is a CSS variable that belongs to the presets.
--   `color`: indicates which preset category the variable belongs to. It can be `color`, `font-size`, `gradients`.
--   `black`: the `slug` of the particular preset value.
+- `--wp`: prefix to namespace the CSS variable.
+- `preset `: indicates is a CSS variable that belongs to the presets.
+- `color`: indicates which preset category the variable belongs to. It can be `color`, `font-size`, `gradients`.
+- `black`: the `slug` of the particular preset value.
 
 **Custom** properties such as `--wp--custom--line-height--body`, which can be divided into the following chunks:
 
--   `--wp`: prefix to namespace the CSS variable.
--   `custom`: indicates is a "free-form" CSS variable created by the theme.
--   `line-height--body`: the result of converting the "custom" object keys into a string.
+- `--wp`: prefix to namespace the CSS variable.
+- `custom`: indicates is a "free-form" CSS variable created by the theme.
+- `line-height--body`: the result of converting the "custom" object keys into a string.
 
 The `--` as a separator has two functions:
 
--   Readibility, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
--   Parseability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
+- Readibility, for human understanding. It can be thought as similar to the BEM naming schema, it separates "categories".
+- Parseability, for machine understanding. Using a defined structure allows machines to understand the meaning of the property `--wp--preset--color--black`: it's a value bounded to the color preset whose slug is "black", which then gives us room to do more things with them.
 
 ### Why using `--` as a separator?
 
@@ -533,14 +759,13 @@ For example:
 
 ```json
 {
+	"version": 1,
 	"settings": {
-		"defaults": {
-			"custom": {
-				"lineHeight": {
-					"body": 1.7
-				},
-				"font-primary": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif"
-			}
+		"custom": {
+			"lineHeight": {
+				"body": 1.7
+			},
+			"font-primary": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif"
 		}
 	}
 }
@@ -559,18 +784,17 @@ body {
 
 A few notes about this process:
 
--   `camelCased` keys are transformed into its `kebab-case` form, as to follow the CSS property naming schema. Example: `lineHeight` is transformed into `line-height`.
--   Keys at different depth levels are separated by `--`. That's why `line-height` and `body` are separated by `--`.
--   You shouldn't use `--` in the names of the keys within the `custom` object. Example, **don't do** this:
+- `camelCased` keys are transformed into its `kebab-case` form, as to follow the CSS property naming schema. Example: `lineHeight` is transformed into `line-height`.
+- Keys at different depth levels are separated by `--`. That's why `line-height` and `body` are separated by `--`.
+- You shouldn't use `--` in the names of the keys within the `custom` object. Example, **don't do** this:
 
 ```json
 {
+	"version": 1,
 	"settings": {
-		"defaults": {
-			"custom": {
-				"line--height": {
-					"body": 1.7
-				}
+		"custom": {
+			"line--height": { // DO NOT DO THIS
+				"body": 1.7
 			}
 		}
 	}
