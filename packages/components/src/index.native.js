@@ -62,8 +62,8 @@ export * from './text';
 
 // Mobile Components
 export {
-	AutocompletionItemsFill,
-	AutocompletionItemsSlot,
+	__unstableAutocompletionItemsFill,
+	__unstableAutocompletionItemsSlot,
 } from './mobile/autocompletion-items';
 export { default as Autocomplete } from './autocomplete';
 export { default as BottomSheet } from './mobile/bottom-sheet';

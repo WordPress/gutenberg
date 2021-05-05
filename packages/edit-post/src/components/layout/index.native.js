@@ -15,7 +15,7 @@ import {
 	HTMLTextInput,
 	KeyboardAvoidingView,
 	NoticeList,
-	AutocompletionItemsSlot,
+	__unstableAutocompletionItemsSlot as AutocompletionItemsSlot,
 } from '@wordpress/components';
 import { AutosaveMonitor } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';

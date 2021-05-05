@@ -23,7 +23,10 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { Icon, AutocompletionItemsFill } from '@wordpress/components';
+import {
+	Icon,
+	__unstableAutocompletionItemsFill as AutocompletionItemsFill,
+} from '@wordpress/components';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 
 /**
