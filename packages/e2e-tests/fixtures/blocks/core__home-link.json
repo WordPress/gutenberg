@@ -5,9 +5,7 @@
 		"isValid": true,
 		"attributes": {
 			"label": "Home",
-			"opensInNewTab": true,
-			"rel": "nofollow",
-			"title": "title"
+			"opensInNewTab": false
 		},
 		"innerBlocks": [],
 		"originalContent": ""

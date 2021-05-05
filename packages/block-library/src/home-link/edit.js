@@ -15,7 +15,7 @@ import { __, _x } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { store as coreStore } from '@wordpress/core-data';
 import { useEffect } from '@wordpress/element';
-import { TextControl, ToggleControl } from '@wordpress/components';
+import { ToggleControl } from '@wordpress/components';
 
 const preventDefault = ( event ) => event.preventDefault();
 
@@ -51,7 +51,7 @@ export default function HomeEdit( {
 		},
 	} );
 
-	const { label, opensInNewTab, rel, title } = attributes;
+	const { label, opensInNewTab } = attributes;
 
 	useEffect( () => {
 		if ( label === undefined ) {
@@ -72,22 +72,6 @@ export default function HomeEdit( {
 						onChange={ () => {
 							setAttributes( { opensInNewTab: ! opensInNewTab } );
 						} }
-					/>
-					<TextControl
-						value={ title || '' }
-						onChange={ ( titleValue ) => {
-							setAttributes( { title: titleValue } );
-						} }
-						label={ __( 'Link title' ) }
-						autoComplete="off"
-					/>
-					<TextControl
-						value={ rel || '' }
-						onChange={ ( relValue ) => {
-							setAttributes( { rel: relValue } );
-						} }
-						label={ __( 'Link rel' ) }
-						autoComplete="off"
 					/>
 				</div>
 			</InspectorControls>

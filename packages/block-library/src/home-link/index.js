@@ -4,7 +4,6 @@
 import { _x } from '@wordpress/i18n';
 import { home } from '@wordpress/icons';
 import { createInterpolateElement } from '@wordpress/element';
-import { ExternalLink } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -21,8 +20,10 @@ export const settings = {
 	icon: home,
 
 	description: createInterpolateElement(
-		_x( 'Link to <a>your homepage</a>', 'block description' ),
-		{ a: <ExternalLink href="options-reading.php" /> }
+		_x( 'Link to <a>your homepage</a>.', 'block description' ),
+		//TODO: slot/fill to override link
+		// eslint-disable-next-line jsx-a11y/anchor-has-content
+		{ a: <a href="options-reading.php" /> }
 	),
 
 	edit,

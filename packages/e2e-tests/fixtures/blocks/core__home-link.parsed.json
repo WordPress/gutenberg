@@ -3,9 +3,7 @@
 		"blockName": "core/home-link",
 		"attrs": {
 			"label": "Home",
-			"opensInNewTab": true,
-			"rel": "nofollow",
-			"title": "title"
+			"opensInNewTab": false
 		},
 		"innerBlocks": [],
 		"innerHTML": "",
