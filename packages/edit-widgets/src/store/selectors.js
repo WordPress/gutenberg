@@ -196,3 +196,27 @@ export const getIsWidgetAreaOpen = ( state, clientId ) => {
 export function isInserterOpened( state ) {
 	return !! state.blockInserterPanel;
 }
+
+/**
+ * Returns true if a block can be inserted into a widget area.
+ *
+ * @param {Array}  state    The open state of the widget areas.
+ * @param {string} blockName The name of the block being inserted.
+ *
+ * @return {boolean} True if the block can be inserted in a widget area.
+ */
+export const canInsertBlockInWidgetArea = createRegistrySelector(
+	( select ) => ( state, blockName ) => {
+		// Widget areas are always top-level blocks, which getBlocks will return.
+		const widgetAreas = select( 'core/block-editor' ).getBlocks();
+
+		// Makes an assumption that a block that can be inserted into one
+		// widget area can be inserted into any widget area. Uses the first
+		// widget area for testing whether the block can be inserted.
+		const [ firstWidgetArea ] = widgetAreas;
+		return select( 'core/block-editor' ).canInsertBlockType(
+			blockName,
+			firstWidgetArea.clientId
+		);
+	}
+);
