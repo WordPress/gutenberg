@@ -40,7 +40,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		//wp_delete_post( self::$post->ID );
 	}
 
-	function test_gutenberg_page_block_template_takes_priority() {
+	function test_gutenberg_page_block_template_takes_precedence() {
 		global $_wp_current_template_content;
 		$type = 'page';
 		$templates = array(
@@ -56,8 +56,24 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		unset( $_wp_current_template_content );
 	}
 
+	function test_gutenberg_page_home_block_template_takes_precedence() {
+		global $_wp_current_template_content;
+		$type = 'page';
+		$templates = array(
+			'page-home.php', // The page-home.html block template actually exists in TT1 Blocks.
+			'page-1.php',
+			'page.php',
+		);
+		$resolved_template_path = gutenberg_override_query_template( $custom_page_template_path, $type, $templates );
+		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
+
+		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//page-home' );
+		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
+		unset( $_wp_current_template_content );
+	}
+
 	// Regression: https://github.com/WordPress/gutenberg/issues/31399
-	function test_gutenberg_custom_page_template_takes_priority() {
+	function test_gutenberg_custom_page_template_takes_precedence() {
 		$custom_page_template = 'templates/full-width.php';
 		$custom_page_template_path = get_stylesheet_directory() . '/' . $custom_page_template; 
 		$type = 'page';
