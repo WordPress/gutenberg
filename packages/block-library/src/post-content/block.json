@@ -1,7 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "core/post-content",
+	"title": "Post Content",
 	"category": "design",
+	"description": "Displays the contents of a post or page.",
+	"textdomain": "default",
 	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"align": [ "wide", "full" ],

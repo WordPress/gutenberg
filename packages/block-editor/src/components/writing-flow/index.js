@@ -32,7 +32,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { isInSameBlock, getBlockClientId } from '../../utils/dom';
+import { isInSameBlock } from '../../utils/dom';
 import useMultiSelection from './use-multi-selection';
 import { store as blockEditorStore } from '../../store';
 
@@ -188,43 +188,14 @@ export default function WritingFlow( { children } ) {
 		getFirstMultiSelectedBlockClientId,
 		getLastMultiSelectedBlockClientId,
 		getBlockOrder,
-		isSelectionEnabled,
-		getBlockSelectionStart,
 		getSettings,
 	} = useSelect( blockEditorStore );
 	const { multiSelect, selectBlock, setNavigationMode } = useDispatch(
 		blockEditorStore
 	);
 
-	function onMouseDown( event ) {
+	function onMouseDown() {
 		verticalRect.current = null;
-
-		// Multi-select blocks when Shift+clicking.
-		if (
-			isSelectionEnabled() &&
-			// The main button.
-			// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-			event.button === 0
-		) {
-			const clientId = getBlockClientId( event.target );
-
-			if ( clientId ) {
-				if ( event.shiftKey ) {
-					const blockSelectionStart = getBlockSelectionStart();
-					if ( blockSelectionStart !== clientId ) {
-						multiSelect( blockSelectionStart, clientId );
-						event.preventDefault();
-					}
-					// Allow user to escape out of a multi-selection to a singular
-					// selection of a block via click. This is handled here since
-					// focus handling excludes blocks when there is multiselection,
-					// as focus can be incurred by starting a multiselection (focus
-					// moved to first block's multi-controls).
-				} else if ( hasMultiSelection ) {
-					selectBlock( clientId );
-				}
-			}
-		}
 	}
 
 	function expandSelection( isReverse ) {

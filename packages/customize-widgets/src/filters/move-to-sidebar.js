@@ -6,95 +6,75 @@ import { without } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { BlockControls } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { createHigherOrderComponent } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
-
-const { wp } = window;
+import { MoveToWidgetArea, getWidgetIdFromBlock } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
  */
-import MoveToSidebar from '../components/move-to-sidebar';
-
-/**
- * Use the customize API to get the setting for the sidebar.
- * This returns a function that acts as a setter/getter in one for widget ids
- * in sidebars.
- *
- * @param {string} id The id of the sidebar
- *
- * @return {Function} A function that when called with no arguments, returns
- *                    an array of widgetIds for the sidebar. When called with
- *                    an array, sets that array as the widget ids for the
- *                    sidebar.
- */
-function getSidebarWidgetSetting( id ) {
-	return wp.customize( `sidebars_widgets[${ id }]` );
-}
-
-/**
- * Returns the sidebar object that the widget represented by the provided
- * widgetId belongs to.
- *
- * @param {string} widgetId A widget id
- *
- * @return {Object} Configuration of the sidebar that the widget is in.
- */
-function getSidebarForWidgetId( widgetId ) {
-	return wp.customize.Widgets.data.registeredSidebars.find( ( { id } ) => {
-		const sidebarWidgetsSetting = getSidebarWidgetSetting( id );
-		const sidebarWidgetIds = sidebarWidgetsSetting();
-		return sidebarWidgetIds.includes( widgetId );
-	} );
-}
-
-/**
- * Returns a list of the registered sidebars.
- *
- * @return {Object[]} An array of sidebar configurations objects.
- */
-function getSidebars() {
-	return wp.customize.Widgets.data.registeredSidebars;
-}
-
-/**
- * Moves a widget from one sidebar to another.
- *
- * @param {string} widgetId     The id of the widget to move.
- * @param {string} oldSidebarId The id of the sidebar to move from.
- * @param {string} newSidebarId The id of the sidebar to move to.
- */
-function moveToSidebar( widgetId, oldSidebarId, newSidebarId ) {
-	const oldSidebarWidgetsSetting = getSidebarWidgetSetting( oldSidebarId );
-	const newSidebarWidgetsSetting = getSidebarWidgetSetting( newSidebarId );
-
-	// Update the widgets in the old and new sidebars.
-	oldSidebarWidgetsSetting( without( oldSidebarWidgetsSetting(), widgetId ) );
-	newSidebarWidgetsSetting( [ ...newSidebarWidgetsSetting(), widgetId ] );
-}
+import {
+	useSidebarControls,
+	useActiveSidebarControl,
+} from '../components/sidebar-controls';
 
 const withMoveToSidebarToolbarItem = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { __internalWidgetId: widgetId } = props.attributes;
-		const currentSidebar = getSidebarForWidgetId( widgetId );
+		const widgetId = getWidgetIdFromBlock( props );
+		const sidebarControls = useSidebarControls();
+		const activeSidebarControl = useActiveSidebarControl();
+		const hasMultipleSidebars = sidebarControls?.length > 1;
+		const blockName = props.name;
+		const canInsertBlockInSidebar = useSelect(
+			( select ) => {
+				// Use an empty string to represent the root block list, which
+				// in the customizer editor represents a sidebar/widget area.
+				return select( blockEditorStore ).canInsertBlockType(
+					blockName,
+					''
+				);
+			},
+			[ blockName ]
+		);
+
+		function moveToSidebar( sidebarControlId ) {
+			const newSidebarControl = sidebarControls.find(
+				( sidebarControl ) => sidebarControl.id === sidebarControlId
+			);
+
+			const oldSetting = activeSidebarControl.setting;
+			const newSetting = newSidebarControl.setting;
+
+			oldSetting( without( oldSetting(), widgetId ) );
+			newSetting( [ ...newSetting(), widgetId ] );
+
+			newSidebarControl.expand();
+		}
 
 		return (
 			<>
 				<BlockEdit { ...props } />
-				<BlockControls>
-					<MoveToSidebar
-						sidebars={ getSidebars() }
-						currentSidebar={ currentSidebar }
-						onSelect={ ( newSidebarId ) => {
-							moveToSidebar(
-								widgetId,
-								currentSidebar.id,
-								newSidebarId
-							);
-						} }
-					/>
-				</BlockControls>
+				{ hasMultipleSidebars && canInsertBlockInSidebar && (
+					<BlockControls>
+						<MoveToWidgetArea
+							widgetAreas={ sidebarControls.map(
+								( sidebarControl ) => ( {
+									id: sidebarControl.id,
+									name: sidebarControl.params.label,
+									description:
+										sidebarControl.params.description,
+								} )
+							) }
+							currentWidgetAreaId={ activeSidebarControl?.id }
+							onSelect={ moveToSidebar }
+						/>
+					</BlockControls>
+				) }
 			</>
 		);
 	},

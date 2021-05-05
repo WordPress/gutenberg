@@ -1,9 +1,8 @@
 /**
  * Internal dependencies
  */
-import Flex from '../flex';
-import FlexItem from '../flex-item';
-import { View } from '../../view';
+import { Flex, FlexItem } from '../';
+import { View } from '../../ui/view';
 
 export default {
 	component: Flex,
