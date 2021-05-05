@@ -3,7 +3,8 @@
  */
 import { SVG, Path } from '@wordpress/primitives';
 
-const chevronBackIOS = (
+// Used for the back button of the iOS Bottom Sheet
+const chevronBack = (
 	<SVG
 		width="12"
 		height="21"
@@ -14,4 +15,4 @@ const chevronBackIOS = (
 	</SVG>
 );
 
-export default chevronBackIOS;
+export default chevronBack;
