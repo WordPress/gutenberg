@@ -1,40 +1,20 @@
 /**
- * External dependencies
- */
-import { find, reverse, first, last } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { useRef } from '@wordpress/element';
-import {
-	computeCaretRect,
-	focus,
-	isHorizontalEdge,
-	isVerticalEdge,
-	placeCaretAtHorizontalEdge,
-	placeCaretAtVerticalEdge,
-	isEntirelySelected,
-	isRTL,
-} from '@wordpress/dom';
-import {
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	TAB,
-	isKeyboardEvent,
-	ESCAPE,
-} from '@wordpress/keycodes';
+import { focus } from '@wordpress/dom';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
-import { isInSameBlock } from '../../utils/dom';
 import useMultiSelection from './use-multi-selection';
+import useArrowNav from './use-arrow-nav';
+import useTabNav from './use-tab-nav';
+import useSelectAll from './use-select-all';
+import useLastFocus from './use-last-focus';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -42,108 +22,6 @@ import { store as blockEditorStore } from '../../store';
  * element does not scroll the page.
  */
 const PREVENT_SCROLL_ON_FOCUS = { position: 'fixed' };
-
-function isFormElement( element ) {
-	const { tagName } = element;
-	return (
-		tagName === 'INPUT' ||
-		tagName === 'BUTTON' ||
-		tagName === 'SELECT' ||
-		tagName === 'TEXTAREA'
-	);
-}
-
-/**
- * Returns true if the element should consider edge navigation upon a keyboard
- * event of the given directional key code, or false otherwise.
- *
- * @param {Element} element     HTML element to test.
- * @param {number}  keyCode     KeyboardEvent keyCode to test.
- * @param {boolean} hasModifier Whether a modifier is pressed.
- *
- * @return {boolean} Whether element should consider edge navigation.
- */
-export function isNavigationCandidate( element, keyCode, hasModifier ) {
-	const isVertical = keyCode === UP || keyCode === DOWN;
-
-	// Currently, all elements support unmodified vertical navigation.
-	if ( isVertical && ! hasModifier ) {
-		return true;
-	}
-
-	// Native inputs should not navigate horizontally.
-	const { tagName } = element;
-	return tagName !== 'INPUT' && tagName !== 'TEXTAREA';
-}
-
-/**
- * Returns the optimal tab target from the given focused element in the
- * desired direction. A preference is made toward text fields, falling back
- * to the block focus stop if no other candidates exist for the block.
- *
- * @param {Element} target           Currently focused text field.
- * @param {boolean} isReverse        True if considering as the first field.
- * @param {Element} containerElement Element containing all blocks.
- * @param {boolean} onlyVertical     Whether to only consider tabbable elements
- *                                   that are visually above or under the
- *                                   target.
- *
- * @return {?Element} Optimal tab target, if one exists.
- */
-export function getClosestTabbable(
-	target,
-	isReverse,
-	containerElement,
-	onlyVertical
-) {
-	// Since the current focus target is not guaranteed to be a text field,
-	// find all focusables. Tabbability is considered later.
-	let focusableNodes = focus.focusable.find( containerElement );
-
-	if ( isReverse ) {
-		focusableNodes = reverse( focusableNodes );
-	}
-
-	// Consider as candidates those focusables after the current target.
-	// It's assumed this can only be reached if the target is focusable
-	// (on its keydown event), so no need to verify it exists in the set.
-	focusableNodes = focusableNodes.slice(
-		focusableNodes.indexOf( target ) + 1
-	);
-
-	let targetRect;
-
-	if ( onlyVertical ) {
-		targetRect = target.getBoundingClientRect();
-	}
-
-	function isTabCandidate( node ) {
-		// Not a candidate if the node is not tabbable.
-		if ( ! focus.tabbable.isTabbableIndex( node ) ) {
-			return false;
-		}
-
-		// Skip focusable elements such as links within content editable nodes.
-		if ( node.isContentEditable && node.contentEditable !== 'true' ) {
-			return false;
-		}
-
-		if ( onlyVertical ) {
-			const nodeRect = node.getBoundingClientRect();
-
-			if (
-				nodeRect.left >= targetRect.right ||
-				nodeRect.right <= targetRect.left
-			) {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	return find( focusableNodes, isTabCandidate );
-}
 
 /**
  * Handles selection and navigation across blocks. This component should be
@@ -153,13 +31,17 @@ export function getClosestTabbable(
  * @param {WPElement} props.children Children to be rendered.
  */
 export default function WritingFlow( { children } ) {
+	const ref = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
+	const lastFocus = useRef();
 
 	// Reference that holds the a flag for enabling or disabling
 	// capturing on the focus capture elements.
 	const noCapture = useRef();
 
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
+	const { setNavigationMode } = useDispatch( blockEditorStore );
 	const { hasFinishedMultiSelection, isNavigationMode } = useSelect(
 		( select ) => {
 			const selectors = select( blockEditorStore );
@@ -172,282 +54,6 @@ export default function WritingFlow( { children } ) {
 		},
 		[]
 	);
-	const {
-		getSelectedBlockClientId,
-		getMultiSelectedBlocksStartClientId,
-		getMultiSelectedBlocksEndClientId,
-		getPreviousBlockClientId,
-		getNextBlockClientId,
-		getFirstMultiSelectedBlockClientId,
-		getLastMultiSelectedBlockClientId,
-		getBlockOrder,
-		getSettings,
-		hasMultiSelection,
-	} = useSelect( blockEditorStore );
-	const { multiSelect, selectBlock, setNavigationMode } = useDispatch(
-		blockEditorStore
-	);
-
-	const lastFocus = useRef();
-
-	const refCallback = useRefEffect( ( node ) => {
-		// Here a DOMRect is stored while moving the caret vertically so vertical
-		// position of the start position can be restored. This is to recreate
-		// browser behaviour across blocks.
-		let verticalRect;
-
-		function onFocusOut( event ) {
-			lastFocus.current = event.target;
-		}
-
-		function onMouseDown() {
-			verticalRect = null;
-		}
-
-		function expandSelection( isReverse ) {
-			const selectedBlockClientId = getSelectedBlockClientId();
-			const selectionStartClientId = getMultiSelectedBlocksStartClientId();
-			const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-			const selectionBeforeEndClientId = getPreviousBlockClientId(
-				selectionEndClientId || selectedBlockClientId
-			);
-			const selectionAfterEndClientId = getNextBlockClientId(
-				selectionEndClientId || selectedBlockClientId
-			);
-			const nextSelectionEndClientId = isReverse
-				? selectionBeforeEndClientId
-				: selectionAfterEndClientId;
-
-			if ( nextSelectionEndClientId ) {
-				multiSelect(
-					selectionStartClientId || selectedBlockClientId,
-					nextSelectionEndClientId
-				);
-			}
-		}
-
-		function moveSelection( isReverse ) {
-			const selectedFirstClientId = getFirstMultiSelectedBlockClientId();
-			const selectedLastClientId = getLastMultiSelectedBlockClientId();
-			const focusedBlockClientId = isReverse
-				? selectedFirstClientId
-				: selectedLastClientId;
-
-			if ( focusedBlockClientId ) {
-				selectBlock( focusedBlockClientId );
-			}
-		}
-
-		/**
-		 * Returns true if the given target field is the last in its block which
-		 * can be considered for tab transition. For example, in a block with two
-		 * text fields, this would return true when reversing from the first of the
-		 * two fields, but false when reversing from the second.
-		 *
-		 * @param {Element} target    Currently focused text field.
-		 * @param {boolean} isReverse True if considering as the first field.
-		 *
-		 * @return {boolean} Whether field is at edge for tab transition.
-		 */
-		function isTabbableEdge( target, isReverse ) {
-			const closestTabbable = getClosestTabbable(
-				target,
-				isReverse,
-				node
-			);
-			return (
-				! closestTabbable || ! isInSameBlock( target, closestTabbable )
-			);
-		}
-
-		function onKeyDown( event ) {
-			const { keyCode, target } = event;
-			const isUp = keyCode === UP;
-			const isDown = keyCode === DOWN;
-			const isLeft = keyCode === LEFT;
-			const isRight = keyCode === RIGHT;
-			const isTab = keyCode === TAB;
-			const isEscape = keyCode === ESCAPE;
-			const isReverse = isUp || isLeft;
-			const isHorizontal = isLeft || isRight;
-			const isVertical = isUp || isDown;
-			const isNav = isHorizontal || isVertical;
-			const isShift = event.shiftKey;
-			const hasModifier =
-				isShift || event.ctrlKey || event.altKey || event.metaKey;
-			const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
-			const { ownerDocument } = node;
-			const { defaultView } = ownerDocument;
-
-			if ( hasMultiSelection() ) {
-				if ( keyCode === TAB ) {
-					// Disable focus capturing on the focus capture element, so it
-					// doesn't refocus this element and so it allows default behaviour
-					// (moving focus to the next tabbable element).
-					noCapture.current = true;
-
-					if ( isShift ) {
-						focusCaptureBeforeRef.current.focus();
-					} else {
-						focusCaptureAfterRef.current.focus();
-					}
-				} else if ( isNav ) {
-					const action = isShift ? expandSelection : moveSelection;
-					action( isReverse );
-					event.preventDefault();
-				}
-
-				return;
-			}
-
-			const selectedBlockClientId = getSelectedBlockClientId();
-
-			// In Edit mode, Tab should focus the first tabbable element after the
-			// content, which is normally the sidebar (with block controls) and
-			// Shift+Tab should focus the first tabbable element before the content,
-			// which is normally the block toolbar.
-			// Arrow keys can be used, and Tab and arrow keys can be used in
-			// Navigation mode (press Esc), to navigate through blocks.
-			if ( selectedBlockClientId ) {
-				if ( isTab ) {
-					const direction = isShift ? 'findPrevious' : 'findNext';
-					// Allow tabbing between form elements rendered in a block,
-					// such as inside a placeholder. Form elements are generally
-					// meant to be UI rather than part of the content. Ideally
-					// these are not rendered in the content and perhaps in the
-					// future they can be rendered in an iframe or shadow DOM.
-					if (
-						isFormElement( target ) &&
-						isFormElement( focus.tabbable[ direction ]( target ) )
-					) {
-						return;
-					}
-
-					const next = isShift
-						? focusCaptureBeforeRef
-						: focusCaptureAfterRef;
-
-					// Disable focus capturing on the focus capture element, so it
-					// doesn't refocus this block and so it allows default behaviour
-					// (moving focus to the next tabbable element).
-					noCapture.current = true;
-					next.current.focus();
-					return;
-				} else if ( isEscape ) {
-					setNavigationMode( true );
-				}
-			}
-
-			// When presing any key other than up or down, the initial vertical
-			// position must ALWAYS be reset. The vertical position is saved so it
-			// can be restored as well as possible on sebsequent vertical arrow key
-			// presses. It may not always be possible to restore the exact same
-			// position (such as at an empty line), so it wouldn't be good to
-			// compute the position right before any vertical arrow key press.
-			if ( ! isVertical ) {
-				verticalRect = null;
-			} else if ( ! verticalRect ) {
-				verticalRect = computeCaretRect( defaultView );
-			}
-
-			// Abort if navigation has already been handled (e.g. RichText inline
-			// boundaries).
-			if ( event.defaultPrevented ) {
-				return;
-			}
-
-			if ( ! isNav ) {
-				if (
-					isKeyboardEvent.primary( event, 'a' ) &&
-					isEntirelySelected( target )
-				) {
-					const blocks = getBlockOrder();
-					multiSelect( first( blocks ), last( blocks ) );
-					event.preventDefault();
-				}
-
-				return;
-			}
-
-			// Abort if our current target is not a candidate for navigation (e.g.
-			// preserve native input behaviors).
-			if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
-				return;
-			}
-
-			// In the case of RTL scripts, right means previous and left means next,
-			// which is the exact reverse of LTR.
-			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
-			const { keepCaretInsideBlock } = getSettings();
-
-			if ( isShift ) {
-				const selectionEndClientId = getMultiSelectedBlocksEndClientId();
-				const selectionBeforeEndClientId = getPreviousBlockClientId(
-					selectionEndClientId || selectedBlockClientId
-				);
-				const selectionAfterEndClientId = getNextBlockClientId(
-					selectionEndClientId || selectedBlockClientId
-				);
-
-				if (
-					// Ensure that there is a target block.
-					( ( isReverse && selectionBeforeEndClientId ) ||
-						( ! isReverse && selectionAfterEndClientId ) ) &&
-					isTabbableEdge( target, isReverse ) &&
-					isNavEdge( target, isReverse )
-				) {
-					// Shift key is down, and there is multi selection or we're at
-					// the end of the current block.
-					expandSelection( isReverse );
-					event.preventDefault();
-				}
-			} else if (
-				isVertical &&
-				isVerticalEdge( target, isReverse ) &&
-				! keepCaretInsideBlock
-			) {
-				const closestTabbable = getClosestTabbable(
-					target,
-					isReverse,
-					node,
-					true
-				);
-
-				if ( closestTabbable ) {
-					placeCaretAtVerticalEdge(
-						closestTabbable,
-						isReverse,
-						verticalRect
-					);
-					event.preventDefault();
-				}
-			} else if (
-				isHorizontal &&
-				defaultView.getSelection().isCollapsed &&
-				isHorizontalEdge( target, isReverseDir ) &&
-				! keepCaretInsideBlock
-			) {
-				const closestTabbable = getClosestTabbable(
-					target,
-					isReverseDir,
-					node
-				);
-				placeCaretAtHorizontalEdge( closestTabbable, isReverse );
-				event.preventDefault();
-			}
-		}
-
-		node.addEventListener( 'focusout', onFocusOut );
-		node.addEventListener( 'mousedown', onMouseDown );
-		node.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			node.removeEventListener( 'focusout', onFocusOut );
-			node.removeEventListener( 'mousedown', onMouseDown );
-			node.removeEventListener( 'keydown', onKeyDown );
-		};
-	}, [] );
-
-	const ref = useRef();
 
 	function onFocusCapture( event ) {
 		// Do not capture incoming focus if set by us in WritingFlow.
@@ -484,8 +90,15 @@ export default function WritingFlow( { children } ) {
 			<div
 				ref={ useMergeRefs( [
 					ref,
-					refCallback,
+					useLastFocus( lastFocus ),
 					useMultiSelection(),
+					useArrowNav(),
+					useSelectAll(),
+					useTabNav( {
+						focusCaptureBeforeRef,
+						focusCaptureAfterRef,
+						noCapture,
+					} ),
 				] ) }
 				className="block-editor-writing-flow"
 				tabIndex={ hasFinishedMultiSelection ? '0' : undefined }
