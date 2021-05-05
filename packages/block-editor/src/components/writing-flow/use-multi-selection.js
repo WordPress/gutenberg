@@ -128,6 +128,13 @@ export default function useMultiSelection() {
 			return;
 		}
 
+		// Removing the contenteditable attributes within the block editor is
+		// essential for selection to work across editable areas. The edible
+		// hosts are removed, allowing selection to be extended outside the DOM
+		// element. `multiSelect` sets a flag in the store so the rich text
+		// components are updated, but the rerender may happen asynchonously. To
+		// ensure the browser instantly removes the selection boundaries, we
+		// remove the contenteditable attributes manually.
 		toggleRichText( ref.current, false );
 
 		// For some browsers, like Safari, it is important that focus
