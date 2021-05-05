@@ -227,12 +227,12 @@ $color-control-label-height: 20px;
 
 	// Don't show the preview boxes for an empty nav block.
 	// Needs specificity to work for the navigation screen.
-	.is-selected &.wp-block-navigation-placeholder__preview {
+	.wp-block-navigation.is-selected &.wp-block-navigation-placeholder__preview {
 		display: none;
 	}
 
 	// ... but be present in larger contexts to size it correctly.
-	.is-selected .is-large & {
+	.wp-block-navigation.is-selected .is-large & {
 		display: flex;
 		opacity: 0;
 		width: 0;
@@ -265,7 +265,7 @@ $color-control-label-height: 20px;
 	width: 100%;
 
 	// Show when selected.
-	.is-selected & {
+	.wp-block-navigation.is-selected & {
 		display: flex;
 	}
 
