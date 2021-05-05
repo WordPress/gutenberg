@@ -52,7 +52,7 @@ function HeadingEdit( {
 		if ( generatedAnchor !== attributes.anchor ) {
 			setAttributes( { anchor: generatedAnchor } );
 		}
-	}, [ attributes.anchor, generatedAnchor ] );
+	}, [ content ] );
 
 	return (
 		<>
