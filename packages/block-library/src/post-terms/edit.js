@@ -71,7 +71,11 @@ export default function PostTermsEdit( {
 	}
 
 	if ( ! term ) {
-		return __( 'Post Terms block: no term specified.' );
+		return (
+			<div { ...blockProps }>
+				{ __( 'Post Terms block: no term specified.' ) }
+			</div>
+		);
 	}
 
 	return (
