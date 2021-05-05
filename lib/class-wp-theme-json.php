@@ -89,10 +89,10 @@ class WP_Theme_JSON {
 			'fontSize'       => null,
 			'fontStyle'      => null,
 			'fontWeight'     => null,
+			'letterSpacing'  => null,
 			'lineHeight'     => null,
 			'textDecoration' => null,
 			'textTransform'  => null,
-			'letterSpacing'  => null,
 		),
 	);
 
@@ -117,6 +117,7 @@ class WP_Theme_JSON {
 		),
 		'typography' => array(
 			'customFontSize'        => null,
+			'customLetterSpacing'   => null,
 			'customLineHeight'      => null,
 			'dropCap'               => null,
 			'fontFamilies'          => null,
@@ -125,7 +126,6 @@ class WP_Theme_JSON {
 			'customFontWeight'      => null,
 			'customTextDecorations' => null,
 			'customTextTransforms'  => null,
-			'customLetterSpacing'   => null,
 		),
 		'custom'     => null,
 		'layout'     => null,
@@ -258,6 +258,9 @@ class WP_Theme_JSON {
 		'font-weight'              => array(
 			'value' => array( 'typography', 'fontWeight' ),
 		),
+		'letter-spacing'           => array(
+			'value' => array( 'typography', 'letterSpacing' ),
+		),
 		'line-height'              => array(
 			'value' => array( 'typography', 'lineHeight' ),
 		),
@@ -270,9 +273,6 @@ class WP_Theme_JSON {
 		),
 		'text-transform'           => array(
 			'value' => array( 'typography', 'textTransform' ),
-		),
-		'letter-spacing'           => array(
-			'value' => array( 'typography', 'letterSpacing' ),
 		),
 	);
 
