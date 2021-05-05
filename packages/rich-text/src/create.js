@@ -601,7 +601,7 @@ function getAttributes( { element } ) {
 			continue;
 		}
 
-		const safeName = name.startsWith( 'on' )
+		const safeName = /^on/i.test( name )
 			? 'data-disable-rich-text-' + name
 			: name;
 
