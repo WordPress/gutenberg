@@ -50,7 +50,7 @@ function HeadingEdit( {
 	// Update anchor when the content changes.
 	useEffect( () => {
 		if ( generatedAnchor !== attributes.anchor ) {
-			setAttributes( { anchor: generatedAnchor } );
+			attributes.anchor = generatedAnchor;
 		}
 	}, [ attributes.anchor, generatedAnchor ] );
 
