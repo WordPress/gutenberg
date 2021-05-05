@@ -22,7 +22,7 @@ import EntityTypeList from './entity-type-list';
 const TRANSLATED_SITE_PROTPERTIES = {
 	title: __( 'Title' ),
 	description: __( 'Tagline' ),
-	sitelogo: __( 'Logo' ),
+	site_logo: __( 'Logo' ),
 	show_on_front: __( 'Show on front' ),
 	page_on_front: __( 'Page on front' ),
 };
