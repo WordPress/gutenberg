@@ -48,7 +48,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 			'page.php',
 		);
 		$resolved_template_path = gutenberg_override_query_template( $custom_page_template_path, $type, $templates );
-		$this->assertEquals( plugin_dir_path( __DIR__ ) . 'lib/template-canvas.php', $resolved_template_path );
+		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
 	}
 
 	function test_gutenberg_custom_page_template() {
