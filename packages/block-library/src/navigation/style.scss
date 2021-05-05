@@ -371,6 +371,7 @@
 	align-items: flex-start;
 	justify-content: flex-start;
 
+	// Overlay menu.
 	// Provide an opinionated default style for menu items inside.
 	// Inherit as much as we can regarding colors, fonts, sizes,
 	// but otherwise provide a baseline.
@@ -401,6 +402,12 @@
 			.wp-block-page-list {
 				flex-direction: column;
 			}
+		}
+
+		// Remove user-set background colors for items inside the overlay menu.
+		// Has to be !important to override global styles.
+		.wp-block-navigation-link.has-background {
+			background: transparent !important;
 		}
 	}
 
