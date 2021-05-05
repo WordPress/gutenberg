@@ -240,7 +240,7 @@ Saved templates have precedence over theme files. To use the updated theme files
 Now the theme has a basic site header and footer, but it does not display any content.
 To create a blog, a list of the latest posts, you would use the query and query loop blocks together.
 
-Wether you are using the site editor or editing theme files directly, open the index tempalte and add a query block.
+Wether you are using the site editor or editing theme files directly, open the index template and add a query block.
 
 When you place a query block in the editor, the query loop is used as an inner block.
 You have the option to start with an empty loop or include selected post blocks like a post title and featured image.
@@ -284,7 +284,7 @@ When you add the query, you also want to make sure that the post title block is 
 The block markup for a post title with the link enabled is: `<!-- wp:post-title {"isLink":true} /-->`
 
 Next, create a new template for displaying single posts.
-If you are editing theme files directly, create a file called single.html inside the block-templates folder.
+If you are editing theme files directly, create a file called `single.html` inside the block-templates folder.
 
 Add the site header and site footer template parts:
 
@@ -305,7 +305,7 @@ This will enable the width options for the inner blocks.
 <!-- wp:template-part {"slug":"footer"} /-->
 ```
 
-Add your preffered blocks inside the group block. Some of the new blocks that are available are:
+Add your preferred blocks inside the group block. Some new blocks that are available are:
 
 - Post content: `<!-- wp:post-content /-->`
 - Post title: `<!-- wp:post-title /-->`
