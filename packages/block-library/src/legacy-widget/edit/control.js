@@ -47,6 +47,11 @@ export default class Control {
 		this.onChangeHasPreview = onChangeHasPreview;
 		this.onError = onError;
 
+		// We can't use the real widget number as this is calculated by the
+		// server and we may not ever *actually* save this widget. Instead, use
+		// a fake but unique number.
+		this.number = ++lastNumber;
+
 		this.handleFormChange = debounce( this.saveForm.bind( this ), 200 );
 		this.handleFormSubmit = this.handleFormSubmit.bind( this );
 
@@ -73,11 +78,6 @@ export default class Control {
 	 * @access private
 	 */
 	initDOM() {
-		// We can't use the real widget number as this is calculated by the
-		// server and we may not ever *actually* save this widget. Instead, use
-		// a fake but unique number.
-		const number = ++lastNumber;
-
 		this.element = el( 'div', { class: 'widget open' }, [
 			el( 'div', { class: 'widget-inside' }, [
 				( this.form = el( 'form', { class: 'form', method: 'post' }, [
@@ -87,7 +87,7 @@ export default class Control {
 						class: 'widget-id',
 						type: 'hidden',
 						name: 'widget-id',
-						value: this.id ?? `${ this.idBase }-${ number }`,
+						value: this.id ?? `${ this.idBase }-${ this.number }`,
 					} ),
 					el( 'input', {
 						class: 'id_base',
@@ -111,7 +111,7 @@ export default class Control {
 						class: 'widget_number',
 						type: 'hidden',
 						name: 'widget_number',
-						value: this.idBase ? number.toString() : '',
+						value: this.idBase ? this.number.toString() : '',
 					} ),
 					( this.content = el( 'div', { class: 'widget-content' } ) ),
 					// Non-multi widgets can be saved via a Save button.
@@ -179,21 +179,23 @@ export default class Control {
 				const { form } = await saveWidget( this.id );
 				this.content.innerHTML = form;
 			} else if ( this.idBase ) {
-				const { form, preview } = await encodeWidget(
-					this.idBase,
-					this.instance
-				);
+				const { form, preview } = await encodeWidget( {
+					idBase: this.idBase,
+					instance: this.instance,
+					number: this.number,
+				} );
 				this.content.innerHTML = form;
 				this.hasPreview = ! isEmptyHTML( preview );
 
 				// If we don't have an instance, perform a save right away. This
 				// happens when creating a new Legacy Widget block.
 				if ( ! this.instance.hash ) {
-					const { instance } = await encodeWidget(
-						this.idBase,
-						this.instance,
-						serializeForm( this.form )
-					);
+					const { instance } = await encodeWidget( {
+						idBase: this.idBase,
+						instance: this.instance,
+						number: this.number,
+						formData: serializeForm( this.form ),
+					} );
 					this.instance = instance;
 				}
 			}
@@ -244,11 +246,12 @@ export default class Control {
 					] );
 				}
 			} else if ( this.idBase ) {
-				const { instance, preview } = await encodeWidget(
-					this.idBase,
-					this.instance,
-					formData
-				);
+				const { instance, preview } = await encodeWidget( {
+					idBase: this.idBase,
+					instance: this.instance,
+					number: this.number,
+					formData,
+				} );
 				this.instance = instance;
 				this.hasPreview = ! isEmptyHTML( preview );
 			}
@@ -338,12 +341,13 @@ async function saveWidget( id, formData = null ) {
 	return { form: widget.rendered_form };
 }
 
-async function encodeWidget( idBase, instance, formData = null ) {
+async function encodeWidget( { idBase, instance, number, formData = null } ) {
 	const response = await apiFetch( {
 		path: `/wp/v2/widget-types/${ idBase }/encode`,
 		method: 'POST',
 		data: {
 			instance,
+			number,
 			form_data: formData,
 		},
 	} );
