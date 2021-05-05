@@ -8,7 +8,28 @@ import { debounce } from 'lodash';
  */
 import apiFetch from '@wordpress/api-fetch';
 
+/**
+ * An API for creating and loading a widget control (a <div class="widget">
+ * element) that is compatible with most third party widget scripts. By not
+ * using React for this, we ensure that we have complete contorl over the DOM
+ * and do not accidentally remove any elements that a third party widget script
+ * has attached an event listener to.
+ *
+ * @property {Element} element The control's DOM element.
+ */
 export default class Control {
+	/**
+	 * Creates and loads a new control.
+	 *
+	 * @access public
+	 * @param {Object} params
+	 * @param {string} params.id
+	 * @param {string} params.idBase
+	 * @param {Object} params.instance
+	 * @param {Function} params.onChangeInstance
+	 * @param {Function} params.onChangeHasPreview
+	 * @param {Function} params.onError
+	 */
 	constructor( {
 		id,
 		idBase,
@@ -33,17 +54,34 @@ export default class Control {
 		this.loadContent();
 	}
 
+	/**
+	 * Clean up the control so that it can be garabge collected.
+	 *
+	 * @access public
+	 */
 	destroy() {
 		this.unbindEvents();
 		this.element.remove();
+		// TODO: How do we make third party widget scripts remove their event
+		// listeners?
 	}
 
+	/**
+	 * Creates the control's DOM structure.
+	 *
+	 * @access private
+	 */
 	initDOM() {
+		// We can't use the real widget number as this is calculated by the
+		// server and we may not ever *actually* save this widget. Instead, use
+		// a fake but unique number.
 		const number = ++lastNumber;
 
 		this.element = el( 'div', { class: 'widget open' }, [
 			el( 'div', { class: 'widget-inside' }, [
 				( this.form = el( 'form', { class: 'form', method: 'post' }, [
+					// These hidden form inputs are what most widgets' scripts
+					// use to access data about the widget.
 					el( 'input', {
 						class: 'widget-id',
 						type: 'hidden',
@@ -75,6 +113,7 @@ export default class Control {
 						value: this.idBase ? number.toString() : '',
 					} ),
 					( this.content = el( 'div', { class: 'widget-content' } ) ),
+					// Non-multi widgets can be saved via a Save button.
 					this.id &&
 						el( 'button', {
 							class: 'button is-primary',
@@ -85,7 +124,14 @@ export default class Control {
 		] );
 	}
 
+	/**
+	 * Adds the control's event listeners.
+	 *
+	 * @access private
+	 */
 	bindEvents() {
+		// Prefer jQuery 'change' event instead of the native 'change' event
+		// because many widgets use jQuery's event bus to trigger an update.
 		if ( window.jQuery ) {
 			const { jQuery: $ } = window;
 			$( this.form ).on( 'change', null, this.handleFormChange );
@@ -98,6 +144,11 @@ export default class Control {
 		}
 	}
 
+	/**
+	 * Removes the control's event listeners.
+	 *
+	 * @access private
+	 */
 	unbindEvents() {
 		if ( window.jQuery ) {
 			const { jQuery: $ } = window;
@@ -111,6 +162,12 @@ export default class Control {
 		}
 	}
 
+	/**
+	 * Fetches the widget's form HTML from the REST API and loads it into the
+	 * control's form.
+	 *
+	 * @access private
+	 */
 	async loadContent() {
 		try {
 			if ( this.id ) {
@@ -124,6 +181,8 @@ export default class Control {
 				this.content.innerHTML = form;
 				this.hasPreview = ! isEmptyHTML( preview );
 
+				// If we don't have an instance, perform a save right away. This
+				// happens when creating a new Legacy Widget block.
 				if ( ! this.instance.hash ) {
 					const { instance } = await encodeWidget(
 						this.idBase,
@@ -134,6 +193,11 @@ export default class Control {
 				}
 			}
 
+			// Trigger 'widget-added' when widget is ready. This event is what
+			// widgets' scripts use to initialize, attach events, etc. The event
+			// must be fired using jQuery's event bus as this is what widget
+			// scripts expect. If jQuery is not loaded, do nothing - some
+			// widgets will still work regardless.
 			if ( window.jQuery ) {
 				const { jQuery: $ } = window;
 				$( document ).trigger( 'widget-added', [ $( this.element ) ] );
@@ -143,11 +207,23 @@ export default class Control {
 		}
 	}
 
+	/**
+	 * Perform a save when the control's form is manually submitted.
+	 *
+	 * @access private
+	 * @param {Event} event
+	 */
 	handleFormSubmit( event ) {
 		event.preventDefault();
 		this.saveForm();
 	}
 
+	/**
+	 * Serialize the control's form, send it to the REST API, and update the
+	 * instance with the encoded instance that the REST API returns.
+	 *
+	 * @access private
+	 */
 	async saveForm() {
 		const formData = serializeForm( this.form );
 
@@ -176,10 +252,20 @@ export default class Control {
 		}
 	}
 
+	/**
+	 * The widget's instance object.
+	 *
+	 * @access private
+	 */
 	get instance() {
 		return this._instance;
 	}
 
+	/**
+	 * The widget's instance object.
+	 *
+	 * @access private
+	 */
 	set instance( instance ) {
 		if ( this._instance !== instance ) {
 			this._instance = instance;
@@ -187,10 +273,20 @@ export default class Control {
 		}
 	}
 
+	/**
+	 * Whether or not the widget can be previewed.
+	 *
+	 * @access public
+	 */
 	get hasPreview() {
 		return this._hasPreview;
 	}
 
+	/**
+	 * Whether or not the widget can be previewed.
+	 *
+	 * @access private
+	 */
 	set hasPreview( hasPreview ) {
 		if ( this._hasPreview !== hasPreview ) {
 			this._hasPreview = hasPreview;
