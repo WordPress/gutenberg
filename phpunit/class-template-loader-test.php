@@ -51,6 +51,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
 	}
 
+	// Regression: https://github.com/WordPress/gutenberg/issues/31399
 	function test_gutenberg_custom_page_template() {
 		$custom_page_template = 'templates/full-width.php';
 		$custom_page_template_path = get_stylesheet_directory() . '/' . $custom_page_template; 
