@@ -31,6 +31,7 @@ function blockToWidget( block, existingWidget = null ) {
 			widget = {
 				idBase: block.attributes.idBase,
 				instance: {
+					...existingWidget.instance,
 					encoded_serialized_instance: encoded,
 					instance_hash_key: hash,
 					raw_instance: raw,
