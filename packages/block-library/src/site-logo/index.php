@@ -25,7 +25,7 @@ function render_block_core_site_logo( $attributes ) {
 	$custom_logo = get_custom_logo();
 
 	if ( ! $attributes['isLink'] ) {
-		/* Remove the link */
+		// Remove the link.
 		$custom_logo = preg_replace( '#<a.*?>(.*?)</a>#i', '\1', $custom_logo );
 	}
 
