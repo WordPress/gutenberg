@@ -155,7 +155,7 @@ function gutenberg_customize_widgets_init() {
  * @return bool Filtered decision about loading block assets.
  */
 function gutenberg_widgets_customize_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
-	if ( is_callable( 'get_current_screen' ) && 'customize' === get_current_screen()->base ) {
+	if ( gutenberg_use_widgets_block_editor() && is_callable( 'get_current_screen' ) && 'customize' === get_current_screen()->base ) {
 		return true;
 	}
 
