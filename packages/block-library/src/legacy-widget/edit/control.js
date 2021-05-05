@@ -7,6 +7,7 @@ import { debounce } from 'lodash';
  * WordPress dependencies
  */
 import apiFetch from '@wordpress/api-fetch';
+import { __ } from '@wordpress/i18n';
 
 /**
  * An API for creating and loading a widget control (a <div class="widget">
@@ -115,10 +116,14 @@ export default class Control {
 					( this.content = el( 'div', { class: 'widget-content' } ) ),
 					// Non-multi widgets can be saved via a Save button.
 					this.id &&
-						el( 'button', {
-							class: 'button is-primary',
-							type: 'submit',
-						} ),
+						el(
+							'button',
+							{
+								class: 'button is-primary',
+								type: 'submit',
+							},
+							__( 'Save' )
+						),
 				] ) ),
 			] ),
 		] );
@@ -297,15 +302,19 @@ export default class Control {
 
 let lastNumber = 0;
 
-function el( tagName, attributes = {}, children = [] ) {
+function el( tagName, attributes = {}, content = null ) {
 	const element = document.createElement( tagName );
 	for ( const [ attribute, value ] of Object.entries( attributes ) ) {
 		element.setAttribute( attribute, value );
 	}
-	for ( const child of children ) {
-		if ( child ) {
-			element.appendChild( child );
+	if ( Array.isArray( content ) ) {
+		for ( const child of content ) {
+			if ( child ) {
+				element.appendChild( child );
+			}
 		}
+	} else if ( typeof content === 'string' ) {
+		element.innerText = content;
 	}
 	return element;
 }
