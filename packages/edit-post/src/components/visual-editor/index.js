@@ -19,7 +19,7 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
-	__experimentalBlockSettingsMenuFirstItem,
+	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
 	__unstableEditorStyles as EditorStyles,
@@ -162,11 +162,11 @@ export default function VisualEditor( { styles } ) {
 					</motion.div>
 				</AnimatePresence>
 			</motion.div>
-			<__experimentalBlockSettingsMenuFirstItem>
+			<__unstableBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
 				) }
-			</__experimentalBlockSettingsMenuFirstItem>
+			</__unstableBlockSettingsMenuFirstItem>
 		</motion.div>
 	);
 }
