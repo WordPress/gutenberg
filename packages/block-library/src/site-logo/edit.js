@@ -280,7 +280,7 @@ export default function LogoEdit( {
 			return;
 		}
 
-		setLogo( media.id.toString() );
+		setLogo( media.id );
 	};
 
 	const onUploadError = ( message ) => {
