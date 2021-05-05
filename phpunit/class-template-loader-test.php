@@ -72,7 +72,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		unset( $_wp_current_template_content );
 	}
 
-	function test_gutenberg_index_block_template_takes_precedence_over_index_php() {
+	function test_gutenberg_block_template_takes_precedence_over_equally_specific_php_template() {
 		global $_wp_current_template_content;
 		$type = 'index';
 		$templates = array(
