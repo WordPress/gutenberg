@@ -210,6 +210,8 @@ function gutenberg_get_legacy_widget_settings() {
 /**
  * Extends default editor settings with values supporting legacy widgets.
  *
+ * This can be removed when plugin support requires WordPress 5.8.0+.
+ *
  * @param array $settings Default editor settings.
  *
  * @return array Filtered editor settings.
@@ -217,7 +219,12 @@ function gutenberg_get_legacy_widget_settings() {
 function gutenberg_legacy_widget_settings( $settings ) {
 	return array_merge( $settings, gutenberg_get_legacy_widget_settings() );
 }
-add_filter( 'block_editor_settings', 'gutenberg_legacy_widget_settings' );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( function_exists( 'get_block_editor_settings' ) ) {
+	add_filter( 'block_editor_settings_all', 'gutenberg_legacy_widget_settings' );
+} else {
+	add_filter( 'block_editor_settings', 'gutenberg_legacy_widget_settings' );
+}
 
 /**
  * Function to enqueue admin-widgets as part of the block editor assets.
@@ -246,21 +253,17 @@ function gutenberg_override_sidebar_params_for_block_widget( $arg ) {
 }
 
 /**
- * Registers the WP_Widget_Block widget
+ * Registers the WP_Widget_Block widget.
  */
-function gutenberg_register_widgets() {
-	if ( ! gutenberg_use_widgets_block_editor() ) {
-		return;
-	}
+function gutenberg_register_block_widget() {
+	global $pagenow;
 
 	register_widget( 'WP_Widget_Block' );
-	// By default every widget on widgets.php is wrapped with a <form>.
-	// This means that you can sometimes end up with invalid HTML, e.g. when
-	// one of the widgets is a Search block.
-	//
-	// To fix the problem, let's add a filter that moves the form below the actual
-	// widget content.
-	global $pagenow;
+
+	// By default every widget on widgets.php is wrapped with a <form>.  This
+	// means that you can sometimes end up with invalid HTML, e.g. when one of
+	// the widgets is a Search block. To fix the problem, let's add a filter
+	// that moves the form below the actual widget content.
 	if ( 'widgets.php' === $pagenow ) {
 		add_filter(
 			'dynamic_sidebar_params',
@@ -269,7 +272,7 @@ function gutenberg_register_widgets() {
 	}
 }
 
-add_action( 'widgets_init', 'gutenberg_register_widgets' );
+add_action( 'widgets_init', 'gutenberg_register_block_widget' );
 
 /**
  * Sets show_instance_in_rest to true on all of the core WP_Widget subclasses.

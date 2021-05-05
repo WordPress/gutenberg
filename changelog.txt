@@ -1,5 +1,12 @@
 == Changelog ==
 
+= 10.5.3 =
+
+## Bug Fixes
+
+ - Fix the stylesheet loading order for non FSE themes.
+
+
 = 10.5.2 =
 
 ## Bug Fixes
