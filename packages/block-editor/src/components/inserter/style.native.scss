@@ -13,79 +13,35 @@
 	padding-top: 8;
 }
 
-.inserter-search-form__container {
+.searchForm {
 	height: 46px;
-	margin: 0 27px $grid-unit-10;
+	border-radius: 8px;
+	color: $gray-dark;
+	margin: $grid-unit-30;
+	background-color: $gray-light;
 	flex-direction: row;
 	justify-content: space-between;
 }
 
-.inserter-search-form__input-container {
-	height: 100%;
-	border-radius: $grid-unit;
-	flex-direction: row;
-	justify-content: space-between;
-	flex: 4;
-}
-
-.inserter-search-form__input-container--dark {
+.searchFormDark {
 	background-color: rgba($white, 0.07);
 }
 
-.inserter-search-form__form-input {
+.searchFormInput {
 	color: $gray-dark;
-	text-align: left;
-	font-size: 17px;
-	align-items: center;
+	flex: 2;
 }
 
-.inserter-search-form__form-input--dark {
+.searchFormInputDark {
 	color: $white;
 }
 
-.inserter-search-form__form-input-placeholder {
+.searchFormPlaceholder {
 	color: $gray;
 }
 
-.inserter-search-form__form-input-placeholder--dark {
+.searchFormPlaceholderDark {
 	color: rgba($white, 0.8);
-}
-
-.inserter-search-form__cancel-button {
-	height: 100%;
-	justify-content: center;
-	align-items: flex-start;
-	flex: 1;
-}
-
-.inserter-search-form__cancel-button-text {
-	color: $blue-wordpress;
-	font-size: 17px;
-	margin-left: 8px;
-}
-
-.inserter-search-form__icon {
-	margin: 0 12px;
-	justify-content: center;
-	width: 19px;
-	color: $gray;
-}
-
-.inserter-search-form__icon--dark {
-	color: $white;
-}
-
-.inserter-search-form__input-button {
-	justify-content: center;
-	width: 19px;
-}
-
-.inserter-search-form__input-button-left {
-	margin: 0 12px;
-}
-
-.inserter-search-form__input-button-right {
-	margin: 0 12px;
 }
 
 .inserter-tabs__wrapper {
