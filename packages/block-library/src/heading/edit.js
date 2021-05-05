@@ -14,7 +14,6 @@ import {
 	RichText,
 	useBlockProps,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
 
 /**
@@ -47,13 +46,6 @@ function HeadingEdit( {
 		content
 	);
 
-	// Update anchor when the content changes.
-	useEffect( () => {
-		if ( generatedAnchor !== attributes.anchor ) {
-			setAttributes( { anchor: generatedAnchor } );
-		}
-	}, [ attributes.anchor, generatedAnchor ] );
-
 	return (
 		<>
 			<BlockControls group="block">
@@ -74,7 +66,12 @@ function HeadingEdit( {
 				identifier="content"
 				tagName={ tagName }
 				value={ content }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
+				onChange={ ( value ) =>
+					setAttributes( {
+						content: value,
+						anchor: generatedAnchor,
+					} )
+				}
 				onMerge={ mergeBlocks }
 				onSplit={ ( value, isOriginal ) => {
 					let block;
