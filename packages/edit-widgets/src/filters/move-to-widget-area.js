@@ -16,25 +16,43 @@ import { store as editWidgetsStore } from '../store';
 const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
 		const widgetId = getWidgetIdFromBlock( props );
-		const { widgetAreas, currentWidgetAreaId } = useSelect(
+		const blockName = props.name;
+		const {
+			widgetAreas,
+			currentWidgetAreaId,
+			canInsertBlockInWidgetArea,
+		} = useSelect(
 			( select ) => {
+				// Component won't display for a widget area, so don't run selectors.
+				if ( blockName === 'core/widget-area' ) {
+					return {};
+				}
+
 				const selectors = select( editWidgetsStore );
 				return {
 					widgetAreas: selectors.getWidgetAreas(),
 					currentWidgetArea: widgetId
 						? selectors.getWidgetAreaForWidgetId( widgetId )?.id
 						: undefined,
+					canInsertBlockInWidgetArea: selectors.canInsertBlockInWidgetArea(
+						blockName
+					),
 				};
 			},
-			[ widgetId ]
+			[ widgetId, blockName ]
 		);
 
 		const { moveBlockToWidgetArea } = useDispatch( editWidgetsStore );
+		const hasMultipleWidgetAreas = widgetAreas?.length > 1;
+		const isMoveToWidgetAreaVisible =
+			blockName !== 'core/widget-area' &&
+			hasMultipleWidgetAreas &&
+			canInsertBlockInWidgetArea;
 
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ props.name !== 'core/widget-area' && (
+				{ isMoveToWidgetAreaVisible && (
 					<BlockControls>
 						<MoveToWidgetArea
 							widgetAreas={ widgetAreas }
