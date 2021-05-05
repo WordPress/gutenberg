@@ -49,8 +49,12 @@ export function BorderPanel( props ) {
 				title={ __( 'Border' ) }
 				initialOpen={ false }
 			>
-				{ isWidthSupported && <BorderWidthEdit { ...props } /> }
-				{ isStyleSupported && <BorderStyleEdit { ...props } /> }
+				{ ( isWidthSupported || isStyleSupported ) && (
+					<div className="block-editor-hooks__border-controls-row">
+						{ isWidthSupported && <BorderWidthEdit { ...props } /> }
+						{ isStyleSupported && <BorderStyleEdit { ...props } /> }
+					</div>
+				) }
 				{ isColorSupported && <BorderColorEdit { ...props } /> }
 				{ isRadiusSupported && <BorderRadiusEdit { ...props } /> }
 			</PanelBody>
