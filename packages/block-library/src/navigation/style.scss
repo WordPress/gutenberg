@@ -424,6 +424,7 @@
 
 		&.is-menu-open {
 			// Override breakpoint-inherited submenu rules.
+			.submenu-container.submenu-container.submenu-container.submenu-container,
 			.wp-block-navigation-link__container.wp-block-navigation-link__container.wp-block-navigation-link__container.wp-block-navigation-link__container {
 				left: 0;
 			}
