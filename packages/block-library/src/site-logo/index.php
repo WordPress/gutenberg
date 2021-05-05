@@ -30,10 +30,8 @@ function render_block_core_site_logo( $attributes ) {
 	}
 
 	if ( $attributes['isLink'] && '_blank' === $attributes['linkTarget'] ) {
-		/*
-		 * Add the link target after the rel="home".
-		 * Add an aria-label for informing that the page opens in a new tab.
-		*/
+		// Add the link target after the rel="home".
+		// Add an aria-label for informing that the page opens in a new tab.
 		$aria_label  = 'aria-label="' . esc_attr__( '(Home link, opens in a new tab)' ) . '"';
 		$custom_logo = str_replace( 'rel="home"', 'rel="home" target="' . $attributes['linkTarget'] . '"' . $aria_label, $custom_logo );
 	}
