@@ -303,6 +303,7 @@ $color-control-label-height: 20px;
 .wp-block-navigation-placeholder__actions {
 	display: flex;
 	font-size: $default-font-size;
+	font-family: $default-font;
 
 	.components-button.components-dropdown-menu__toggle.has-icon {
 		padding: ($grid-unit-15 / 2) $grid-unit-05 ($grid-unit-15 / 2) $grid-unit-15;
