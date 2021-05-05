@@ -361,12 +361,6 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-
-	/*
-		arbitrary, high z-index
-		@todo: find correct value in order to make sure
-		that this is always on top.
-	*/
 	z-index: 1;
 	align-items: flex-start;
 	justify-content: flex-start;
@@ -492,12 +486,6 @@
 
 // Always show submenus fully expanded inside the modal menu.
 .wp-block-navigation .wp-block-navigation__responsive-container.is-menu-open {
-	// This is clickable at the moment, though does not seem tabbable.
-	// @todo, verify that it doesnt' need a focus style.
-	&:focus {
-		outline: none;
-	}
-
 	.wp-block-page-list__submenu-icon,
 	.wp-block-navigation-link__submenu-icon {
 		display: none;
