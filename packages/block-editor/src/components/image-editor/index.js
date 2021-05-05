@@ -1,12 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { BlockControls } from '@wordpress/block-editor';
 import { ToolbarGroup, ToolbarItem } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import BlockControls from '../block-controls';
 import Cropper from './cropper';
 import ZoomDropdown from './zoom-dropdown';
 import AspectRatioDropdown from './aspect-ratio-dropdown';
