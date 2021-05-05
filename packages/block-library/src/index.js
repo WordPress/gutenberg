@@ -187,6 +187,8 @@ export const __experimentalGetCoreBlocks = () => [
 	postExcerpt,
 	postFeaturedImage,
 	postTerms,
+
+	logInOut,
 ];
 
 /**
@@ -239,7 +241,6 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					...( enableFSEBlocks
 						? [
 								templatePart,
-								logInOut,
 								postComment,
 								postCommentAuthor,
 								postCommentContent,
