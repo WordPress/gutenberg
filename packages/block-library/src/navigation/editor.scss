@@ -199,8 +199,6 @@ $color-control-label-height: 20px;
 	flex-wrap: nowrap;
 	width: 100%;
 	overflow: hidden;
-	transition: all 0.1s ease-in-out;
-	@include reduce-motion("transition");
 
 	// Style skeleton elements to mostly match the metrics of actual menu items.
 	// Needs specificity.
