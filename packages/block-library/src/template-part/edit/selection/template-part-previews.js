@@ -21,6 +21,7 @@ import {
 import { useAsyncList } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 function PreviewPlaceholder() {
 	return (
@@ -139,63 +140,98 @@ function TemplatePartSearchResults( {
 	filterValue,
 	onClose,
 	composite,
-	area,
 } ) {
-	const filteredTPs = useMemo( () => {
+	const { labelsByArea } = useSelect( ( select ) => {
+		const definedAreas = select(
+			editorStore
+		).__experimentalGetDefaultTemplatePartAreas();
+		const _labelsByArea = {};
+		definedAreas.forEach( ( item ) => {
+			_labelsByArea[ item.area ] = item.label;
+		} );
+		return {
+			labelsByArea: _labelsByArea,
+		};
+	} );
+	const { filteredTPs, groupedResults } = useMemo( () => {
 		// Filter based on value.
 		// Remove diacritics and convert to lowercase to normalize.
 		const normalizedFilterValue = deburr( filterValue ).toLowerCase();
 		const searchResults = templateParts.filter(
-			( { slug, theme } ) =>
-				slug.toLowerCase().includes( normalizedFilterValue ) ||
+			( { title: { rendered: title }, area } ) =>
+				deburr( title )
+					.toLowerCase()
+					.includes( normalizedFilterValue ) ||
 				// Since diacritics can be used in theme names, remove them for the comparison.
-				deburr( theme ).toLowerCase().includes( normalizedFilterValue )
+				deburr( labelsByArea[ area ] )
+					.toLowerCase()
+					.includes( normalizedFilterValue )
 		);
 		// Order based on value location.
 		searchResults.sort( ( a, b ) => {
-			// First prioritize index found in slug.
-			const indexInSlugA = a.slug
+			// First prioritize index found in title.
+			// Deburr for diacritics.
+			const indexInTitleA = deburr( a.title.rendered )
 				.toLowerCase()
 				.indexOf( normalizedFilterValue );
-			const indexInSlugB = b.slug
+			const indexInTitleB = deburr( b.title.rendered )
 				.toLowerCase()
 				.indexOf( normalizedFilterValue );
-			if ( indexInSlugA !== -1 && indexInSlugB !== -1 ) {
-				return indexInSlugA - indexInSlugB;
-			} else if ( indexInSlugA !== -1 ) {
+			if ( indexInTitleA !== -1 && indexInTitleB !== -1 ) {
+				return indexInTitleA - indexInTitleB;
+			} else if ( indexInTitleA !== -1 ) {
 				return -1;
-			} else if ( indexInSlugB !== -1 ) {
+			} else if ( indexInTitleB !== -1 ) {
 				return 1;
 			}
-			// Second prioritize index found in theme.
-			// Since diacritics can be used in theme names, remove them for the comparison.
+			// Second prioritize index found in area.
 			return (
-				deburr( a.theme )
+				deburr( labelsByArea[ a.area ] )
 					.toLowerCase()
 					.indexOf( normalizedFilterValue ) -
-				deburr( b.theme ).toLowerCase().indexOf( normalizedFilterValue )
+				deburr( labelsByArea[ b.area ] )
+					.toLowerCase()
+					.indexOf( normalizedFilterValue )
 			);
 		} );
-		return searchResults;
+		const _groupedResults = [];
+		for ( let i = 0; i < searchResults.length; i++ ) {
+			if (
+				i !== 0 &&
+				searchResults[ i ].area === searchResults[ i - 1 ].area
+			) {
+				_groupedResults[ _groupedResults.length - 1 ].push(
+					searchResults[ i ]
+				);
+			} else {
+				_groupedResults.push( [ searchResults[ i ] ] );
+			}
+		}
+		return {
+			filteredTPs: searchResults,
+			groupedResults: _groupedResults,
+		};
 	}, [ filterValue, templateParts ] );
 
 	const currentShownTPs = useAsyncList( filteredTPs );
 
-	return filteredTPs.map( ( templatePart ) => (
+	return groupedResults.map( ( group ) => (
 		<PanelGroup
-			key={ templatePart.id }
-			title={ templatePart.theme || __( 'Custom' ) }
+			key={ group[ 0 ].id }
+			title={ labelsByArea[ group[ 0 ].area ] || __( 'General' ) }
 		>
-			{ currentShownTPs.includes( templatePart ) ? (
-				<TemplatePartItem
-					key={ templatePart.id }
-					templatePart={ templatePart }
-					setAttributes={ setAttributes }
-					onClose={ onClose }
-					composite={ composite }
-				/>
-			) : (
-				<PreviewPlaceholder key={ templatePart.id } />
+			{ group.map( ( templatePart ) =>
+				currentShownTPs.includes( templatePart ) ? (
+					<TemplatePartItem
+						key={ templatePart.id }
+						templatePart={ templatePart }
+						setAttributes={ setAttributes }
+						onClose={ onClose }
+						composite={ composite }
+					/>
+				) : (
+					<PreviewPlaceholder key={ templatePart.id } />
+				)
 			) }
 		</PanelGroup>
 	) );
@@ -237,7 +273,6 @@ export default function TemplatePartPreviews( {
 					filterValue={ filterValue }
 					onClose={ onClose }
 					composite={ composite }
-					area={ area }
 				/>
 			</Composite>
 		);
