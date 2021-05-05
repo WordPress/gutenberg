@@ -25,14 +25,17 @@ function blockToWidget( block, existingWidget = null ) {
 				id: block.attributes.id,
 			};
 		} else {
+			const { encoded, hash, raw, ...rest } = block.attributes.instance;
+
 			// Widget that extends WP_Widget.
 			widget = {
 				idBase: block.attributes.idBase,
 				instance: {
-					encoded_serialized_instance:
-						block.attributes.instance.encoded,
-					instance_hash_key: block.attributes.instance.hash,
-					raw_instance: block.attributes.instance.raw,
+					...existingWidget.instance,
+					encoded_serialized_instance: encoded,
+					instance_hash_key: hash,
+					raw_instance: raw,
+					...rest,
 				},
 			};
 		}
@@ -55,17 +58,15 @@ function blockToWidget( block, existingWidget = null ) {
 	};
 }
 
-function widgetToBlock( {
-	id,
-	idBase,
-	number,
-	instance: {
+function widgetToBlock( { id, idBase, number, instance } ) {
+	let block;
+
+	const {
 		encoded_serialized_instance: encoded,
 		instance_hash_key: hash,
 		raw_instance: raw,
-	},
-} ) {
-	let block;
+		...rest
+	} = instance;
 
 	if ( idBase === 'block' ) {
 		const parsedBlocks = parse( raw.content );
@@ -80,6 +81,7 @@ function widgetToBlock( {
 				encoded,
 				hash,
 				raw,
+				...rest,
 			},
 		} );
 	} else {
