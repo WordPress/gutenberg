@@ -840,6 +840,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Heading",
+		"slug": "heading",
+		"markdown_source": "../packages/components/src/heading/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "NavigateRegions",
 		"slug": "navigate-regions",
 		"markdown_source": "../packages/components/src/higher-order/navigate-regions/README.md",
@@ -1137,6 +1143,12 @@
 		"title": "TreeSelect",
 		"slug": "tree-select",
 		"markdown_source": "../packages/components/src/tree-select/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Truncate",
+		"slug": "truncate",
+		"markdown_source": "../packages/components/src/truncate/README.md",
 		"parent": "components"
 	},
 	{
@@ -1653,6 +1665,12 @@
 		"title": "@wordpress/warning",
 		"slug": "packages-warning",
 		"markdown_source": "../packages/warning/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/widgets",
+		"slug": "packages-widgets",
+		"markdown_source": "../packages/widgets/README.md",
 		"parent": "packages"
 	},
 	{

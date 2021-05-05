@@ -21,7 +21,7 @@
 
 .edit-navigation-manage-locations__menu-entry {
 	display: flex;
-	align-items: end;
+	align-items: flex-end;
 	margin-bottom: $grid-unit-15;
 	margin-top: $grid-unit-15;
 	.components-custom-select-control,

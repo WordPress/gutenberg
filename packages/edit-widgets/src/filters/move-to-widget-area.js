@@ -6,41 +6,57 @@ import { BlockControls } from '@wordpress/block-editor';
 import { createHigherOrderComponent } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
+import { getWidgetIdFromBlock, MoveToWidgetArea } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
  */
-import MoveToWidgetArea from '../components/move-to-widget-area';
 import { store as editWidgetsStore } from '../store';
 
 const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { __internalWidgetId } = props.attributes;
-		const { widgetAreas, currentWidgetArea } = useSelect(
+		const widgetId = getWidgetIdFromBlock( props );
+		const blockName = props.name;
+		const {
+			widgetAreas,
+			currentWidgetAreaId,
+			canInsertBlockInWidgetArea,
+		} = useSelect(
 			( select ) => {
+				// Component won't display for a widget area, so don't run selectors.
+				if ( blockName === 'core/widget-area' ) {
+					return {};
+				}
+
 				const selectors = select( editWidgetsStore );
 				return {
 					widgetAreas: selectors.getWidgetAreas(),
-					currentWidgetArea: __internalWidgetId
-						? selectors.getWidgetAreaForWidgetId(
-								__internalWidgetId
-						  )
+					currentWidgetAreaId: widgetId
+						? selectors.getWidgetAreaForWidgetId( widgetId )?.id
 						: undefined,
+					canInsertBlockInWidgetArea: selectors.canInsertBlockInWidgetArea(
+						blockName
+					),
 				};
 			},
-			[ __internalWidgetId ]
+			[ widgetId, blockName ]
 		);
 
 		const { moveBlockToWidgetArea } = useDispatch( editWidgetsStore );
+		const hasMultipleWidgetAreas = widgetAreas?.length > 1;
+		const isMoveToWidgetAreaVisible =
+			blockName !== 'core/widget-area' &&
+			hasMultipleWidgetAreas &&
+			canInsertBlockInWidgetArea;
 
 		return (
 			<>
 				<BlockEdit { ...props } />
-				{ props.name !== 'core/widget-area' && (
+				{ isMoveToWidgetAreaVisible && (
 					<BlockControls>
 						<MoveToWidgetArea
 							widgetAreas={ widgetAreas }
-							currentWidgetArea={ currentWidgetArea }
+							currentWidgetAreaId={ currentWidgetAreaId }
 							onSelect={ ( widgetAreaId ) => {
 								moveBlockToWidgetArea(
 									props.clientId,

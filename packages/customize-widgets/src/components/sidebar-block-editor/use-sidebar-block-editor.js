@@ -9,39 +9,33 @@ import { omit, isEqual } from 'lodash';
 import { serialize, parse, createBlock } from '@wordpress/blocks';
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import isShallowEqual from '@wordpress/is-shallow-equal';
-
-function addWidgetIdToBlock( block, widgetId ) {
-	return {
-		...block,
-		attributes: {
-			...( block.attributes || {} ),
-			__internalWidgetId: widgetId,
-		},
-	};
-}
-
-function getWidgetId( block ) {
-	return block.attributes.__internalWidgetId;
-}
+import { getWidgetIdFromBlock, addWidgetIdToBlock } from '@wordpress/widgets';
 
 function blockToWidget( block, existingWidget = null ) {
 	let widget;
 
-	if ( block.name === 'core/legacy-widget' ) {
+	const isValidLegacyWidgetBlock =
+		block.name === 'core/legacy-widget' &&
+		( block.attributes.id || block.attributes.instance );
+
+	if ( isValidLegacyWidgetBlock ) {
 		if ( block.attributes.id ) {
 			// Widget that does not extend WP_Widget.
 			widget = {
 				id: block.attributes.id,
 			};
 		} else {
+			const { encoded, hash, raw, ...rest } = block.attributes.instance;
+
 			// Widget that extends WP_Widget.
 			widget = {
 				idBase: block.attributes.idBase,
 				instance: {
-					encoded_serialized_instance:
-						block.attributes.instance.encoded,
-					instance_hash_key: block.attributes.instance.hash,
-					raw_instance: block.attributes.instance.raw,
+					...existingWidget?.instance,
+					encoded_serialized_instance: encoded,
+					instance_hash_key: hash,
+					raw_instance: raw,
+					...rest,
 				},
 			};
 		}
@@ -64,17 +58,15 @@ function blockToWidget( block, existingWidget = null ) {
 	};
 }
 
-function widgetToBlock( {
-	id,
-	idBase,
-	number,
-	instance: {
+function widgetToBlock( { id, idBase, number, instance } ) {
+	let block;
+
+	const {
 		encoded_serialized_instance: encoded,
 		instance_hash_key: hash,
 		raw_instance: raw,
-	},
-} ) {
-	let block;
+		...rest
+	} = instance;
 
 	if ( idBase === 'block' ) {
 		const parsedBlocks = parse( raw.content );
@@ -89,6 +81,7 @@ function widgetToBlock( {
 				encoded,
 				hash,
 				raw,
+				...rest,
 			},
 		} );
 	} else {
@@ -118,7 +111,7 @@ export default function useSidebarBlockEditor( sidebar ) {
 				);
 				const prevBlocksMap = new Map(
 					prevBlocks.map( ( block ) => [
-						getWidgetId( block ),
+						getWidgetIdFromBlock( block ),
 						block,
 					] )
 				);
@@ -153,13 +146,13 @@ export default function useSidebarBlockEditor( sidebar ) {
 
 				const prevBlocksMap = new Map(
 					prevBlocks.map( ( block ) => [
-						getWidgetId( block ),
+						getWidgetIdFromBlock( block ),
 						block,
 					] )
 				);
 
 				const nextWidgets = nextBlocks.map( ( nextBlock ) => {
-					const widgetId = getWidgetId( nextBlock );
+					const widgetId = getWidgetIdFromBlock( nextBlock );
 
 					// Update existing widgets.
 					if ( widgetId && prevBlocksMap.has( widgetId ) ) {
@@ -168,7 +161,7 @@ export default function useSidebarBlockEditor( sidebar ) {
 
 						// Bail out updates by returning the previous widgets.
 						// Deep equality is necessary until the block editor's internals changes.
-						if ( isEqual( nextBlock, prevBlock ) ) {
+						if ( isEqual( nextBlock, prevBlock ) && prevWidget ) {
 							return prevWidget;
 						}
 

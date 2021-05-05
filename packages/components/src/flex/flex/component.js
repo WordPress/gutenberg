@@ -33,7 +33,12 @@ function Flex( props, forwardedRef ) {
  *
  * @example
  * ```jsx
- * import { Flex, FlexItem, FlexBlock, Text } from `@wordpress/components/ui`;
+ * import {
+ * 	__experimentalFlex as Flex,
+ * 	__experimentalFlexBlock as FlexBlock,
+ * 	__experimentalFlexItem as FlexItem,
+ * 	__experimentalText as Text
+ * } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (

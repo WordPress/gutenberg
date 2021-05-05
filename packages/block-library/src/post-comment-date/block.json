@@ -1,7 +1,11 @@
 {
 	"apiVersion": 2,
 	"name": "core/post-comment-date",
+	"title": "Post Comment Date",
 	"category": "design",
+	"parent": [ "core/post-comment" ],
+	"description": "Post comment date.",
+	"textdomain": "default",
 	"attributes": {
 		"format": {
 			"type": "string"
