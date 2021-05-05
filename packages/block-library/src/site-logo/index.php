@@ -25,7 +25,7 @@ function render_block_core_site_logo( $attributes ) {
 
 	$custom_logo = get_custom_logo();
 	if ( empty( $custom_logo ) ) {
-		return '';
+		return ''; // Return early if no custom logo is set, avoiding extraneous wrapper div.
 	}
 
 	$classnames = array();
