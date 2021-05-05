@@ -156,8 +156,6 @@ export default function WritingFlow( { children } ) {
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
 
-	const entirelySelected = useRef();
-
 	// Reference that holds the a flag for enabling or disabling
 	// capturing on the focus capture elements.
 	const noCapture = useRef();
@@ -352,42 +350,22 @@ export default function WritingFlow( { children } ) {
 				verticalRect = computeCaretRect( defaultView );
 			}
 
-			// This logic inside this condition needs to be checked before
-			// the check for event.defaultPrevented.
-			// The logic handles meta+a keypress and this event is default prevented
-			// by RichText.
-			if ( ! isNav ) {
-				// Set immediately before the meta+a combination can be pressed.
-				if ( isKeyboardEvent.primary( event ) ) {
-					entirelySelected.current = isEntirelySelected( target );
-				}
-
-				if ( isKeyboardEvent.primary( event, 'a' ) ) {
-					// When the target is contentEditable, selection will already
-					// have been set by the browser earlier in this call stack. We
-					// need check the previous result, otherwise all blocks will be
-					// selected right away.
-					if (
-						target.isContentEditable
-							? entirelySelected.current
-							: isEntirelySelected( target )
-					) {
-						const blocks = getBlockOrder();
-						multiSelect( first( blocks ), last( blocks ) );
-						event.preventDefault();
-					}
-
-					// After pressing primary + A we can assume isEntirelySelected is true.
-					// Calling right away isEntirelySelected after primary + A may still return false on some browsers.
-					entirelySelected.current = true;
-				}
-
-				return;
-			}
-
 			// Abort if navigation has already been handled (e.g. RichText inline
 			// boundaries).
 			if ( event.defaultPrevented ) {
+				return;
+			}
+
+			if ( ! isNav ) {
+				if (
+					isKeyboardEvent.primary( event, 'a' ) &&
+					isEntirelySelected( target )
+				) {
+					const blocks = getBlockOrder();
+					multiSelect( first( blocks ), last( blocks ) );
+					event.preventDefault();
+				}
+
 				return;
 			}
 
