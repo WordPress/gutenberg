@@ -89,7 +89,7 @@ const getSlug = ( content ) => {
  *
  * @return {string|null} Return the heading anchor.
  */
-const generateAnchor = ( content, allHeadingAnchors ) => {
+export const generateAnchor = ( content, allHeadingAnchors ) => {
 	const slug = getSlug( content );
 	// If slug is empty, then return null.
 	// Returning null instead of an empty string allows us to check again when the content changes.
@@ -112,19 +112,11 @@ const generateAnchor = ( content, allHeadingAnchors ) => {
 /**
  * Updates the anchor if required.
  *
- * @param {string} clientId    The block's client-ID.
- * @param {string} anchor      The heading anchor.
- * @param {string} prevContent The previous value of the content.
- * @param {string} content     The block content.
+ * @param {string} clientId The block's client-ID.
  *
  * @return {string} The anchor.
  */
-export default function useGeneratedAnchor(
-	clientId,
-	anchor,
-	prevContent,
-	content
-) {
+export const Anchors = ( clientId ) => {
 	const allHeadingAnchors = useSelect(
 		( select ) => {
 			const allBlocks = select( blockEditorStore ).getBlocks();
@@ -132,13 +124,5 @@ export default function useGeneratedAnchor(
 		},
 		[ clientId ]
 	);
-
-	if (
-		! anchor ||
-		'' === content ||
-		generateAnchor( prevContent, allHeadingAnchors ) === anchor
-	) {
-		return generateAnchor( content, allHeadingAnchors );
-	}
-	return anchor;
-}
+	return allHeadingAnchors;
+};

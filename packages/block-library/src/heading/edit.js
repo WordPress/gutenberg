@@ -13,17 +13,13 @@ import {
 	BlockControls,
 	RichText,
 	useBlockProps,
-	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { useEffect } from '@wordpress/element';
-import { usePrevious } from '@wordpress/compose';
-import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import HeadingLevelDropdown from './heading-level-dropdown';
-import useGeneratedAnchor from './autogenerate-anchors';
+import { Anchors, generateAnchor } from './autogenerate-anchors';
 
 function HeadingEdit( {
 	attributes,
@@ -41,24 +37,7 @@ function HeadingEdit( {
 		} ),
 		style: mergedStyle,
 	} );
-	const prevContent = usePrevious( content );
-	const generatedAnchor = useGeneratedAnchor(
-		clientId,
-		attributes.anchor,
-		prevContent,
-		content
-	);
-	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
-		blockEditorStore
-	);
-
-	// Update anchor when the content changes.
-	useEffect( () => {
-		if ( generatedAnchor !== attributes.anchor ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			setAttributes( { anchor: generatedAnchor } );
-		}
-	}, [ content ] );
+	const allHeadingAnchors = Anchors( clientId );
 
 	return (
 		<>
@@ -80,7 +59,24 @@ function HeadingEdit( {
 				identifier="content"
 				tagName={ tagName }
 				value={ content }
-				onChange={ ( value ) => setAttributes( { content: value } ) }
+				onChange={ ( value ) => {
+					const newAttrs = {
+						content: value,
+					};
+					if (
+						! attributes.anchor ||
+						! value ||
+						generateAnchor( content, allHeadingAnchors ) ===
+							attributes.anchor
+					) {
+						newAttrs.anchor = generateAnchor(
+							value,
+							allHeadingAnchors
+						);
+					}
+
+					setAttributes( newAttrs );
+				} }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value, isOriginal ) => {
 					let block;
