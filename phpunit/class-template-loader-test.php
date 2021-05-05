@@ -40,7 +40,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		//wp_delete_post( self::$post->ID );
 	}
 
-	function test_gutenberg_page_home_block_template_takes_precedence() {
+	function test_gutenberg_page_home_block_template_takes_precedence_over_less_specific_block_templates() {
 		global $_wp_current_template_content;
 		$type = 'page';
 		$templates = array(
@@ -102,7 +102,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 	}
 
 	// Regression: https://github.com/WordPress/gutenberg/issues/31399
-	function test_gutenberg_custom_page_template_takes_precedence() {
+	function test_gutenberg_custom_page_template_takes_precedence_over_all_other_templates() {
 		$custom_page_template = 'templates/full-width.php';
 		$custom_page_template_path = get_stylesheet_directory() . '/' . $custom_page_template; 
 		$type = 'page';
