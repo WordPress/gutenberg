@@ -25,11 +25,11 @@ This is documentation for the current direction and work in progress about how t
 
 The Block Editor API has evolved at different velocities and there are some growing pains, specially in areas that affect themes. Examples of this are: the ability to [control the editor programmatically](https://make.wordpress.org/core/2020/01/23/controlling-the-block-editor/), or [a block style system](https://github.com/WordPress/gutenberg/issues/9534) that facilitates user, theme, and core style preferences.
 
-This describes the current efforts to consolidate the various APIs related to styles into a single point – a `experimental-theme.json` file that should be located inside the root of the theme directory.
+This describes the current efforts to consolidate the various APIs related to styles into a single point – a `theme.json` file that should be located inside the root of the theme directory.
 
 ### Global settings for the block editor
 
-Instead of the proliferation of theme support flags or alternative methods, the `experimental-theme.json` files provides a canonical way to define the settings of the block editor. These settings includes things like:
+Instead of the proliferation of theme support flags or alternative methods, the `theme.json` files provides a canonical way to define the settings of the block editor. These settings includes things like:
 
 -   What customization options should be made available or hidden from the user.
 -   What are the default colors, font sizes... available to the user.
@@ -37,7 +37,7 @@ Instead of the proliferation of theme support flags or alternative methods, the 
 
 ### Settings can be controlled per block
 
-For more granularity, these settings also work at the block level in `experimental-theme.json`.
+For more granularity, these settings also work at the block level in `theme.json`.
 
 Examples of what can be achieved are:
 
@@ -47,7 +47,7 @@ Examples of what can be achieved are:
 
 ### Some block styles are managed
 
-By using the `experimental-theme.json` file to set style properties in a structured way, the Block Editor can "manage" the CSS that comes from different origins (user, theme, and core CSS). For example, if a theme and a user set the font size for paragraphs, we only enqueue the style coming from the user and not the theme's.
+By using the `theme.json` file to set style properties in a structured way, the Block Editor can "manage" the CSS that comes from different origins (user, theme, and core CSS). For example, if a theme and a user set the font size for paragraphs, we only enqueue the style coming from the user and not the theme's.
 
 Some of the advantages are:
 
@@ -132,9 +132,9 @@ body {
 
 ## Specification
 
-This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `experimental-theme.json`. Users, via the site editor, will also be also to override theme's or core's preferences via an user interface that is being worked on.
+This specification is the same for the three different origins that use this format: core, themes, and users. Themes can override core's defaults by creating a file called `theme.json`. Users, via the site editor, will also be also to override theme's or core's preferences via an user interface that is being worked on.
 
-The `experimental-theme.json` file declares how a theme wants the editor configured (`settings`) as well as the style properties it sets (`styles`).
+The `theme.json` file declares how a theme wants the editor configured (`settings`) as well as the style properties it sets (`styles`).
 
 ```
 {
@@ -214,7 +214,7 @@ The settings section has the following structure and default values:
 
 Each block can configure any of these settings separately, providing a more fine-grained control over what exists via `add_theme_support`.
 
-The block settings declared under the `defaults` block selector affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and quickly configure all blocks at once. To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the `defaults` section. If a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as set `settings.defaults.color.custom` to `false`. If the `experimental-theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
+The block settings declared under the `defaults` block selector affect to all blocks, unless a particular block overwrites it. It's a way to provide inheritance and quickly configure all blocks at once. To retain backward compatibility, the existing `add_theme_support` declarations that configure the block editor are retrofit in the proper categories for the `defaults` section. If a theme uses `add_theme_support('disable-custom-colors')`, it'll be the same as set `settings.defaults.color.custom` to `false`. If the `theme.json` contains any settings, these will take precedence over the values declared via `add_theme_support`.
 
 Let's say a theme author wants to enable custom colors only for the paragraph block. This is how it can be done:
 
@@ -235,7 +235,7 @@ Let's say a theme author wants to enable custom colors only for the paragraph bl
 }
 ```
 
-Note, however, that not all settings are relevant for all blocks. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `experimental-theme.json`.
+Note, however, that not all settings are relevant for all blocks. The settings section provides an opt-in/opt-out mechanism for themes, but it's the block's responsibility to add support for the features that are relevant to it. For example, if a block doesn't implement the `dropCap` feature, a theme can't enable it for such a block through `theme.json`.
 
 #### Presets
 
@@ -313,11 +313,11 @@ body {
 
 {% end %}
 
-To maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `experimental-theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
+To maintain backward compatibility, the presets declared via `add_theme_support` will also generate the CSS Custom Properties. If the `theme.json` contains any presets, these will take precedence over the ones declared via `add_theme_support`.
 
 #### Free-form CSS Custom Properties
 
-In addition to create CSS Custom Properties for the presets, the `experimental-theme.json` also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `settings.<some/block>.custom` section will be transformed to CSS Custom Properties following this naming schema: `--wp--custom--<variable-name>`.
+In addition to create CSS Custom Properties for the presets, the `theme.json` also allows for themes to create their own, so they don't have to be enqueued separately. Any values declared within the `settings.<some/block>.custom` section will be transformed to CSS Custom Properties following this naming schema: `--wp--custom--<variable-name>`.
 
 For example:
 
@@ -358,7 +358,7 @@ Note that, the name of the variable is created by adding `--` in between each ne
 
 ### Styles
 
-Each block declares which style properties it exposes via the [block supports mechanism](../block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor. Themes can use any style property via the `experimental-theme.json` for any block ― it's the theme's responsibility to verify that it works properly according to the block markup, etc.
+Each block declares which style properties it exposes via the [block supports mechanism](../block-api/block-supports.md). The support declarations are used to automatically generate the UI controls for the block in the editor. Themes can use any style property via the `theme.json` for any block ― it's the theme's responsibility to verify that it works properly according to the block markup, etc.
 
 ```json
 {
