@@ -22,8 +22,13 @@ function render_block_core_site_logo( $attributes ) {
 	};
 
 	add_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
+
 	$custom_logo = get_custom_logo();
-	$classnames  = array();
+	if ( empty( $custom_logo ) ) {
+		return '';
+	}
+
+	$classnames = array();
 	if ( ! empty( $attributes['className'] ) ) {
 		$classnames[] = $attributes['className'];
 	}
