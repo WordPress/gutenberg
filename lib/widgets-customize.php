@@ -81,8 +81,6 @@ function gutenberg_widgets_customize_add_unstable_instance( $args, $id ) {
 		$args['sanitize_callback'] = function( $value ) use ( $id_base ) {
 			global $wp_customize;
 
-			$value['is_widget_customizer_js_value'] = true;
-
 			if ( isset( $value['raw_instance'] ) ) {
 				$widget_object = gutenberg_get_widget_object( $id_base );
 				if ( ! empty( $widget_object->show_instance_in_rest ) ) {

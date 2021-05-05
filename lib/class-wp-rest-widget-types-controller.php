@@ -472,8 +472,10 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 				)
 			),
 			'instance' => array(
-				'encoded' => base64_encode( $serialized_instance ),
-				'hash'    => wp_hash( $serialized_instance ),
+				'encoded'                       => base64_encode( $serialized_instance ),
+				'hash'                          => wp_hash( $serialized_instance ),
+				'title'                         => $request['instance']['title'],
+				'is_widget_customizer_js_value' => $request['instance']['is_widget_customizer_js_value'],
 			),
 		);
 
