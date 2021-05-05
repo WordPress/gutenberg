@@ -12,9 +12,7 @@ import {
 	BlockControls,
 	Warning,
 	useBlockProps,
-	__experimentalBlockVariationPicker as BlockVariationPicker,
 } from '@wordpress/block-editor';
-import { store as blocksStore } from '@wordpress/blocks';
 import { Spinner } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
@@ -27,30 +25,11 @@ import useTermLinks from './use-term-links';
 
 export default function PostTermsEdit( {
 	attributes,
-	clientId,
 	context,
-	name,
 	setAttributes,
 } ) {
 	const { term, textAlign } = attributes;
 	const { postId, postType } = context;
-
-	const { blockType, defaultVariation, variations } = useSelect(
-		( select ) => {
-			const {
-				getBlockVariations,
-				getBlockType,
-				getDefaultBlockVariation,
-			} = select( blocksStore );
-
-			return {
-				blockType: getBlockType( name ),
-				defaultVariation: getDefaultBlockVariation( name, 'block' ),
-				variations: getBlockVariations( name, 'block' ),
-			};
-		},
-		[ clientId, name ]
-	);
 
 	const selectedTerm = useSelect(
 		( select ) => {
@@ -92,18 +71,7 @@ export default function PostTermsEdit( {
 	}
 
 	if ( ! term ) {
-		return (
-			<div { ...blockProps }>
-				<BlockVariationPicker
-					icon={ blockType?.icon?.src }
-					label={ blockType?.title }
-					onSelect={ ( variation = defaultVariation ) => {
-						setAttributes( variation.attributes );
-					} }
-					variations={ variations }
-				/>
-			</div>
-		);
+		return __( 'Post Terms block: no term specified.' );
 	}
 
 	return (
