@@ -136,6 +136,9 @@ describe( 'block deletion -', () => {
 			await pressKeyWithModifier( 'shift', 'ArrowUp' );
 
 			await page.waitForSelector( '.is-multi-selected' );
+			await page.evaluate(
+				() => new Promise( window.requestIdleCallback )
+			);
 
 			// Now that the block wrapper is selected, press backspace to delete it.
 			await page.keyboard.press( 'Backspace' );
