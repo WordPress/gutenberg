@@ -134,9 +134,9 @@ describe( 'edit', () => {
 				id: 4,
 				kind: 'taxonomy',
 				opensInNewTab: false,
-				title: 'PortfolioTag',
+				title: 'Portfolio Tag',
 				type: 'portfolio_tag',
-				url: 'http://wordpress.local/portfolio_tag/portfoliotag/',
+				url: 'http://wordpress.local/portfolio_tag/PortfolioTag/',
 			};
 			updateNavigationLinkBlockAttributes(
 				linkSuggestion,
@@ -146,9 +146,9 @@ describe( 'edit', () => {
 				id: 4,
 				kind: 'taxonomy',
 				opensInNewTab: false,
-				label: 'PortfolioTag',
+				label: 'Portfolio Tag',
 				type: 'portfolio_tag',
-				url: 'http://wordpress.local/portfolio_tag/portfoliotag/',
+				url: 'http://wordpress.local/portfolio_tag/PortfolioTag/',
 			} );
 		} );
 
@@ -158,10 +158,10 @@ describe( 'edit', () => {
 				id: 2,
 				kind: 'taxonomy',
 				opensInNewTab: false,
-				title: 'Portfolioz Category',
+				title: 'Portfolio Category',
 				type: 'portfolio_category',
 				url:
-					'http://wordpress.local/portfolio_category/portfolioz-category/',
+					'http://wordpress.local/portfolio_category/Portfolio-category/',
 			};
 			updateNavigationLinkBlockAttributes(
 				linkSuggestion,
@@ -171,10 +171,10 @@ describe( 'edit', () => {
 				id: 2,
 				kind: 'taxonomy',
 				opensInNewTab: false,
-				label: 'Portfolioz Category',
+				label: 'Portfolio Category',
 				type: 'portfolio_category',
 				url:
-					'http://wordpress.local/portfolio_category/portfolioz-category/',
+					'http://wordpress.local/portfolio_category/Portfolio-category/',
 			} );
 		} );
 
