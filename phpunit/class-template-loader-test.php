@@ -48,7 +48,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 			'page-1.php',
 			'page.php',
 		);
-		$resolved_template_path = gutenberg_override_query_template( $custom_page_template_path, $type, $templates );
+		$resolved_template_path = gutenberg_override_query_template( get_stylesheet_directory() . '/page-home.php', $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
 
 		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//page-home' );
@@ -64,7 +64,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 			'page-1.php',
 			'page.php',
 		);
-		$resolved_template_path = gutenberg_override_query_template( $custom_page_template_path, $type, $templates );
+		$resolved_template_path = gutenberg_override_query_template( get_stylesheet_directory() . '/page.php', $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
 
 		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//page' );
@@ -78,7 +78,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		$templates = array(
 			'index.php',
 		);
-		$resolved_template_path = gutenberg_override_query_template( $custom_page_template_path, $type, $templates );
+		$resolved_template_path = gutenberg_override_query_template( get_stylesheet_directory() . '/index.php', $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
 
 		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//index' );
