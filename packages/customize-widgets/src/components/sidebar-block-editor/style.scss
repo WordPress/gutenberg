@@ -3,11 +3,3 @@
 	// Appear over block placeholders, but under widgets page headings.
 	z-index: 8;
 }
-
-// Style the customizer accordion section with a white background.
-// This selector matches against the first part of the id, which is typically
-// postfixed with a number when there are multiple sidebars.
-#customize-theme-controls *[id^="sub-accordion-section-sidebar-widgets-sidebar"] {
-	min-height: 100%;
-	background-color: $white;
-}
