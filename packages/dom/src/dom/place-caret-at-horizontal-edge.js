@@ -13,14 +13,14 @@ import isRTL from './is-rtl';
 /**
  * Places the caret at start or end of a given element.
  *
- * @param {HTMLElement} container    Focusable element.
- * @param {boolean} isReverse    True for end, false for start.
- * @param {boolean} [mayUseScroll=false] Whether to allow scrolling.
+ * @param {HTMLElement} container           Focusable element.
+ * @param {boolean}     isReverse           True for end, false for start.
+ * @param {boolean}     [mayUseScroll=true] Whether to allow scrolling.
  */
 export default function placeCaretAtHorizontalEdge(
 	container,
 	isReverse,
-	mayUseScroll = false
+	mayUseScroll = true
 ) {
 	if ( ! container ) {
 		return;
