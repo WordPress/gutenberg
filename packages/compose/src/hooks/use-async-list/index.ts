@@ -1,4 +1,10 @@
 /**
+ * External dependencies
+ */
+// eslint-disable-next-line no-restricted-imports
+import type { Reducer } from 'react';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useReducer } from '@wordpress/element';
@@ -7,11 +13,11 @@ import { createQueue } from '@wordpress/priority-queue';
 /**
  * Returns the first items from list that are present on state.
  *
- * @param {Array} list  New array.
- * @param {Array} state Current state.
- * @return {Array} First items present iin state.
+ * @param list  New array.
+ * @param state Current state.
+ * @return First items present iin state.
  */
-function getFirstItemsPresentInState( list, state ) {
+function getFirstItemsPresentInState< T >( list: T[], state: T[] ): T[] {
 	const firstItems = [];
 
 	for ( let i = 0; i < list.length; i++ ) {
@@ -26,15 +32,22 @@ function getFirstItemsPresentInState( list, state ) {
 	return firstItems;
 }
 
+type ResetAction< T > = { type: 'reset'; list: T[] };
+type AppendAction< T > = { type: 'append'; item: T };
+
 /**
  * Reducer keeping track of a list of appended items.
  *
- * @param {Array}  state  Current state
- * @param {Object} action Action
+ * @template T
+ * @param state  Current state
+ * @param action Action
  *
- * @return {Array} update state.
+ * @return update state.
  */
-function listReducer( state, action ) {
+function listReducer< T >(
+	state: T[],
+	action: ResetAction< T > | AppendAction< T >
+): T[] {
 	if ( action.type === 'reset' ) {
 		return action.list;
 	}
@@ -50,11 +63,14 @@ function listReducer( state, action ) {
  * React hook returns an array which items get asynchronously appended from a source array.
  * This behavior is useful if we want to render a list of items asynchronously for performance reasons.
  *
- * @param {Array} list Source array.
- * @return {Array} Async array.
+ * @param list Source array.
+ * @return Async array.
  */
-function useAsyncList( list ) {
-	const [ current, dispatch ] = useReducer( listReducer, [] );
+function useAsyncList< T >( list: T[] ): T[] {
+	const [ current, dispatch ] = useReducer(
+		listReducer as Reducer< T[], ResetAction< T > | AppendAction< T > >,
+		[] as T[]
+	);
 
 	useEffect( () => {
 		// On reset, we keep the first items that were previously rendered.
@@ -64,7 +80,7 @@ function useAsyncList( list ) {
 			list: firstItems,
 		} );
 		const asyncQueue = createQueue();
-		const append = ( index ) => () => {
+		const append = ( index: number ) => () => {
 			if ( list.length <= index ) {
 				return;
 			}

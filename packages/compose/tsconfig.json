@@ -8,6 +8,7 @@
 		"src/higher-order/if-condition/**/*",
 		"src/higher-order/pure/**/*",
 		"src/higher-order/with-instance-id/**/*",
+		"src/hooks/use-async-list/**/*",
 		"src/hooks/use-instance-id/**/*",
 		"src/utils/**/*"
 	]
