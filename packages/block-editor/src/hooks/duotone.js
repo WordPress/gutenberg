@@ -10,6 +10,7 @@ import tinycolor from 'tinycolor2';
 import { getBlockSupport, hasBlockSupport } from '@wordpress/blocks';
 import { SVG } from '@wordpress/components';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
+import { useSelect } from '@wordpress/data';
 import { addFilter } from '@wordpress/hooks';
 import { useContext, createPortal } from '@wordpress/element';
 
@@ -22,6 +23,7 @@ import {
 	useSetting,
 } from '../components';
 import { Head } from '../components/block-list/head';
+import { store as blockEditorStore } from '../store';
 
 const EMPTY_ARRAY = [];
 
@@ -124,7 +126,7 @@ ${ selector } {
 	);
 }
 
-function DuotonePanel( { attributes, setAttributes } ) {
+function DuotonePanel( { attributes, setAttributes, clientId } ) {
 	const style = attributes?.style;
 	const duotone = style?.color?.duotone;
 
@@ -135,7 +137,15 @@ function DuotonePanel( { attributes, setAttributes } ) {
 		! useSetting( 'color.customDuotone' ) ||
 		( colorPalette?.length === 0 && disableCustomColors );
 
-	if ( duotonePalette?.length === 0 && disableCustomDuotone ) {
+	const disableDuotoneUI = useSelect( ( select ) => {
+		const { getDuotoneVisibility } = select( blockEditorStore );
+		return ! getDuotoneVisibility( clientId );
+	}, [] );
+
+	if (
+		disableDuotoneUI ||
+		( duotonePalette?.length === 0 && disableCustomDuotone )
+	) {
 		return null;
 	}
 

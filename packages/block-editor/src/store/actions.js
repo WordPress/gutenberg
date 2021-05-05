@@ -1404,3 +1404,20 @@ export function setHasControlledInnerBlocks(
 		clientId,
 	};
 }
+
+/**
+ * Returns an action object used in signalling that the duotone block controls
+ * visibility changed.
+ *
+ * @param {string}  clientId The selected block client ID.
+ * @param {boolean} isShown  If the duotone controls should be shown.
+ *
+ * @return {Object} Action object.
+ */
+export function showDuotoneControls( clientId, isShown ) {
+	return {
+		type: 'SHOW_DUOTONE_CONTROLS',
+		clientId,
+		isShown,
+	};
+}
