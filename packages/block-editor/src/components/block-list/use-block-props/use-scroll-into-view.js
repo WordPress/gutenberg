@@ -47,12 +47,23 @@ export function useScrollIntoView( clientId ) {
 			return;
 		}
 
-		const scrollContainer = getScrollContainer( extentNode );
+		let scrollContainer = getScrollContainer( extentNode );
 
-		// If there's no scroll container, it follows that there's no scrollbar
-		// and thus there's no need to try to scroll into view.
+		// If there's no scroll container, then we check whether the
+		// node is in an iframe. If it's in an iframe then we check
+		// if it's scrollable or not. If it's scrollable we proceed
+		// on and tell the `scrollIntoView` to scroll the iframe.
 		if ( ! scrollContainer ) {
-			return;
+			const { ownerDocument } = extentNode;
+			const isFramed = !! ownerDocument.defaultView?.frameElement;
+			const scrollingElement =
+				ownerDocument.scrollingElement || ownerDocument.body;
+			if (
+				isFramed &&
+				scrollingElement.scrollHeight > scrollingElement.clientHeight
+			) {
+				scrollContainer = ownerDocument.defaultView;
+			}
 		}
 
 		scrollIntoView( extentNode, scrollContainer, {
