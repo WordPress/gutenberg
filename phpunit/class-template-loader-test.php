@@ -40,11 +40,27 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		//wp_delete_post( self::$post->ID );
 	}
 
+	function test_gutenberg_page_home_block_template_takes_precedence() {
+		global $_wp_current_template_content;
+		$type = 'page';
+		$templates = array(
+			'page-home.php',
+			'page-1.php',
+			'page.php',
+		);
+		$resolved_template_path = gutenberg_override_query_template( $custom_page_template_path, $type, $templates );
+		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
+
+		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//page-home' );
+		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
+		unset( $_wp_current_template_content );
+	}
+
 	function test_gutenberg_page_block_template_takes_precedence() {
 		global $_wp_current_template_content;
 		$type = 'page';
 		$templates = array(
-			'page-slug.php',
+			'page-slug-doesnt-exist.php',
 			'page-1.php',
 			'page.php',
 		);
@@ -56,18 +72,16 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		unset( $_wp_current_template_content );
 	}
 
-	function test_gutenberg_page_home_block_template_takes_precedence() {
+	function test_gutenberg_index_block_template_takes_precedence_over_index_php() {
 		global $_wp_current_template_content;
-		$type = 'page';
+		$type = 'index';
 		$templates = array(
-			'page-home.php', // The page-home.html block template actually exists in TT1 Blocks.
-			'page-1.php',
-			'page.php',
+			'index.php',
 		);
 		$resolved_template_path = gutenberg_override_query_template( $custom_page_template_path, $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
 
-		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//page-home' );
+		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//index' );
 		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
 		unset( $_wp_current_template_content );
 	}
