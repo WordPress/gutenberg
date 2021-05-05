@@ -178,7 +178,7 @@ describe( 'edit', () => {
 			} );
 		} );
 
-		it( 'can update a post format', () => {
+		it( 'can update a post format and ignores id slug', () => {
 			const setAttributes = jest.fn();
 			const linkSuggestion = {
 				id: 'video',
@@ -192,6 +192,8 @@ describe( 'edit', () => {
 				linkSuggestion,
 				setAttributes
 			);
+			// post_format returns a slug ID value from the Search API
+			// we do not persist this ID since we expect this value to be a post or term ID
 			expect( setAttributes ).toHaveBeenCalledWith( {
 				kind: 'taxonomy',
 				opensInNewTab: false,
