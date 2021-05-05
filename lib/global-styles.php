@@ -81,6 +81,8 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 /**
  * Adds the necessary data for the Global Styles client UI to the block settings.
  *
+ * This can be removed when plugin support requires WordPress 5.8.0+.
+ *
  * @param array $settings Existing block editor settings.
  * @return array New block editor settings
  */
@@ -168,7 +170,13 @@ function gutenberg_experimental_global_styles_register_user_cpt() {
 }
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
-add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( function_exists( 'get_block_editor_settings' ) ) {
+	add_filter( 'block_editor_settings_all', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
+} else {
+	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
+
+}
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 
 
