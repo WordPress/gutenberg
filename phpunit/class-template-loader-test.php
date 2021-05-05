@@ -32,15 +32,16 @@ class Template_Loader_Test extends WP_UnitTestCase {
 				),
 			),
 		);
-		self::$post = self::factory()->post->create_and_get( $args );
-		wp_set_post_terms( self::$post->ID, get_stylesheet(), 'wp_theme' );
+		//self::$post = self::factory()->post->create_and_get( $args );
+		//wp_set_post_terms( self::$post->ID, get_stylesheet(), 'wp_theme' );
 	}
 
 	public static function wpTearDownAfterClass() {
-		wp_delete_post( self::$post->ID );
+		//wp_delete_post( self::$post->ID );
 	}
 
 	function test_gutenberg_page_template() {
+		global $_wp_current_template_content;
 		$type = 'page';
 		$templates = array(
 			'page-slug.php',
@@ -49,6 +50,10 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		);
 		$resolved_template_path = gutenberg_override_query_template( $custom_page_template_path, $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
+
+		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//page' );
+		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
+		unset( $_wp_current_template_content );
 	}
 
 	// Regression: https://github.com/WordPress/gutenberg/issues/31399
