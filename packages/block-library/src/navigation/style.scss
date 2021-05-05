@@ -392,12 +392,11 @@
 		.wp-block-navigation__container {
 			display: flex;
 			flex-direction: column;
-			max-width: 400px;
 			margin-left: auto;
 			margin-right: auto;
 			align-items: flex-start;
 			line-height: 48px;
-			padding: 48px 0;
+			padding: 0;
 
 			.wp-block-page-list {
 				flex-direction: column;
@@ -424,10 +423,9 @@
 		}
 
 		&.is-menu-open {
-			flex-direction: row;
-
-			.wp-block-navigation__container {
-				flex-direction: row;
+			// Override breakpoint-inherited submenu rules.
+			.wp-block-navigation-link__container.wp-block-navigation-link__container.wp-block-navigation-link__container.wp-block-navigation-link__container {
+				left: 0;
 			}
 		}
 	}
