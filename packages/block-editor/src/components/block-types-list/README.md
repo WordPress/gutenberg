@@ -49,7 +49,7 @@ Name of the list to be used as part of component's key.
 
 Extra `FlatList` props for customizing the list.
 
-On Mobile usually this component is rendered inside `BottomSheet` component, which already [generates these props](<(https://github.com/WordPress/gutenberg/blob/c3c514ba1123be5a7cf881c223c038cfc31b3f59/packages/components/src/mobile/bottom-sheet/index.native.js#L335-L354)>) for this component.
+On Mobile usually this component is rendered inside `BottomSheet` component, which already [generates these props](<(https://github.com/WordPress/gutenberg/blob/1ca1fe0c64dfe1a385221399fc94b0fb14f34199/packages/components/src/mobile/bottom-sheet/index.native.js#L355-L372)>) for this component.
 
 -   Type: `String`
 -   Required: No
