@@ -24,7 +24,7 @@ const DEFAULT_QUERY = {
 };
 
 export default function MostUsedTerms( { onSelect, taxonomy } ) {
-	const { _terms, hasTerms } = useSelect( ( select ) => {
+	const { _terms, showTerms } = useSelect( ( select ) => {
 		const mostUsedTerms = select( coreStore ).getEntityRecords(
 			'taxonomy',
 			taxonomy.slug,
@@ -32,11 +32,11 @@ export default function MostUsedTerms( { onSelect, taxonomy } ) {
 		);
 		return {
 			_terms: mostUsedTerms,
-			hasTerms: mostUsedTerms?.length > 0,
+			showTerms: mostUsedTerms?.length >= MAX_MOST_USED_TERMS,
 		};
 	}, [] );
 
-	if ( ! hasTerms ) {
+	if ( ! showTerms ) {
 		return null;
 	}
 
