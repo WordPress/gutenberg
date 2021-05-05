@@ -60,7 +60,7 @@ function gutenberg_widgets_init( $hook ) {
 
 	wp_add_inline_script(
 		'wp-blocks',
-		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( get_block_categories( 'widgets_editor' ) ) ),
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( gutenberg_get_block_categories( 'widgets_editor' ) ) ),
 		'after'
 	);
 
