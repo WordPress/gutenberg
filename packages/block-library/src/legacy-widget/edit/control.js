@@ -41,7 +41,7 @@ export default class Control {
 		this.id = id;
 		this.idBase = idBase;
 		this._instance = instance;
-		this._hasPreview = false;
+		this._hasPreview = null;
 		this.onChangeInstance = onChangeInstance;
 		this.onChangeHasPreview = onChangeHasPreview;
 		this.onError = onError;

@@ -78,7 +78,7 @@ function NotEmpty( {
 	clientId,
 	isSelected,
 } ) {
-	const [ hasPreview, setHasPreview ] = useState( false );
+	const [ hasPreview, setHasPreview ] = useState( null );
 
 	const {
 		widgetType,
@@ -118,7 +118,7 @@ function NotEmpty( {
 		);
 	}
 
-	if ( ! hasResolvedWidgetType || hasPreview === null ) {
+	if ( ! hasResolvedWidgetType ) {
 		return (
 			<Placeholder>
 				<Spinner />
@@ -172,16 +172,25 @@ function NotEmpty( {
 				onChangeHasPreview={ setHasPreview }
 			/>
 
-			{ idBase &&
-				( hasPreview ? (
-					<Preview
-						idBase={ idBase }
-						instance={ instance }
-						isVisible={ mode === 'preview' }
-					/>
-				) : (
-					mode === 'preview' && <NoPreview name={ widgetType.name } />
-				) ) }
+			{ idBase && (
+				<>
+					{ hasPreview === null && mode === 'preview' && (
+						<Placeholder>
+							<Spinner />
+						</Placeholder>
+					) }
+					{ hasPreview === true && (
+						<Preview
+							idBase={ idBase }
+							instance={ instance }
+							isVisible={ mode === 'preview' }
+						/>
+					) }
+					{ hasPreview === false && mode === 'preview' && (
+						<NoPreview name={ widgetType.name } />
+					) }
+				</>
+			) }
 		</>
 	);
 }
