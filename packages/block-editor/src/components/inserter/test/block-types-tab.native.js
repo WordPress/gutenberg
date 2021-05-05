@@ -16,6 +16,7 @@ import BlocksTypesTab from '../blocks-types-tab';
 import BlocksTypesList from '../../block-types-list';
 
 jest.mock( '../../block-types-list' );
+jest.mock( '../hooks/use-clipboard-block' );
 jest.mock( '@wordpress/data/src/components/use-select' );
 
 const selectMock = {
