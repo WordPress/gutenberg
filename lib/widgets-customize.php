@@ -112,6 +112,10 @@ function gutenberg_widgets_customize_add_unstable_instance( $args, $id ) {
  * Initialize the Gutenberg customize widgets page.
  */
 function gutenberg_customize_widgets_init() {
+	if ( ! gutenberg_use_widgets_block_editor() ) {
+		return;
+	}
+
 	$settings = array_merge(
 		gutenberg_get_default_block_editor_settings(),
 		gutenberg_get_legacy_widget_settings()
