@@ -1,20 +1,32 @@
 {
+	"version": 1,
 	"settings": {
-		"root": {
-			"color": {
-				"palette": [
-					{
-						"slug": "light",
-						"name": "Light",
-						"color": "#f5f7f9"
-					},
-					{
-						"slug": "dark",
-						"name": "Dark",
-						"color": "#000"
-					}
-				],
-				"custom": false
+		"color": {
+			"palette": [
+				{
+					"slug": "light",
+					"name": "Light",
+					"color": "#f5f7f9"
+				},
+				{
+					"slug": "dark",
+					"name": "Dark",
+					"color": "#000"
+				}
+			],
+			"custom": false
+		},
+		"blocks": {
+			"core/paragraph": {
+				"color": {
+					"palette": [
+						{
+							"slug": "light",
+							"name": "Light",
+							"color": "#f5f7f9"
+						}
+					]
+				}
 			}
 		}
 	},

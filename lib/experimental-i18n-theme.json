@@ -1,7 +1,6 @@
 {
 	"settings": {
-		"*": {
-			"typography": {
+		"typography": {
 				"fontSizes": [
 					{
 						"name": "Font size name"
@@ -32,8 +31,8 @@
 						"name": "Text decoration name"
 					}
 				]
-			},
-			"color": {
+		},
+		"color": {
 				"palette": [
 					{
 						"name": "Color name"
@@ -49,6 +48,53 @@
 						"name": "Duotone name"
 					}
 				]
+		},
+		"blocks": {
+			"*": {
+				"typography": {
+					"fontSizes": [
+						{
+							"name": "Font size name"
+						}
+					],
+					"fontStyles": [
+						{
+							"name": "Font style name"
+						}
+					],
+					"fontWeights": [
+						{
+							"name": "Font weight name"
+						}
+					],
+					"fontFamilies": [
+						{
+							"name": "Font family name"
+						}
+					],
+					"textTransforms": [
+						{
+							"name": "Text transform name"
+						}
+					],
+					"textDecorations": [
+						{
+							"name": "Text decoration name"
+						}
+					]
+				},
+				"color": {
+					"palette": [
+						{
+							"name": "Color name"
+						}
+					],
+					"gradients": [
+						{
+							"name": "Gradient name"
+						}
+					]
+				}
 			}
 		}
 	},
