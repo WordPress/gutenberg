@@ -3,3 +3,11 @@
 	// Appear over block placeholders, but under widgets page headings.
 	z-index: 8;
 }
+
+.customize-control-sidebar_block_editor {
+	margin: 0 ( -$grid-unit-15 ) ( -$grid-unit-15 ) ( -$grid-unit-15 );
+	padding: $grid-unit-15;
+	background: $white;
+	border-top: 1px solid #dcdcde;
+	border-bottom: 1px solid #dcdcde;
+}

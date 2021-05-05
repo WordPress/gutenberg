@@ -2,11 +2,11 @@
  * External dependencies
  */
 import { render, screen } from '@testing-library/react';
-import { Button } from '@wp-g2/components';
 
 /**
  * Internal dependencies
  */
+import Button from '../../../button';
 import { CardBody } from '../../card';
 import { Popover } from '../index';
 

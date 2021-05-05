@@ -26,6 +26,21 @@ import {
 	computeCustomizedAttribute,
 } from './utils';
 
+const { ajaxurl } = window;
+
+/**
+ * Returns an action object used to select menu.
+ *
+ * @param {number} menuId The menu ID.
+ * @return {Object} Action object.
+ */
+export function setSelectedMenuId( menuId ) {
+	return {
+		type: 'SET_SELECTED_MENU_ID',
+		menuId,
+	};
+}
+
 /**
  * Creates a menu item for every block that doesn't have an associated menuItem.
  * Requests POST /wp/v2/menu-items once for every menu item created.
@@ -184,7 +199,7 @@ function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
 	);
 
 	return yield apiFetch( {
-		url: '/wp-admin/admin-ajax.php',
+		url: ajaxurl || '/wp-admin/admin-ajax.php',
 		method: 'POST',
 		body,
 	} );

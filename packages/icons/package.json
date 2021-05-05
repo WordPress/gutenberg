@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/icons",
-	"version": "2.10.2",
+	"version": "2.10.3",
 	"description": "WordPress Icons package, based on dashicon.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,6 +19,9 @@
 	"sideEffects": false,
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
 	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",

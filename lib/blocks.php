@@ -144,7 +144,7 @@ function gutenberg_reregister_core_block_types() {
 				gutenberg_register_core_block_styles( $block_name );
 			}
 
-			require $blocks_dir . $file;
+			require_once $blocks_dir . $file;
 		}
 	}
 }
@@ -253,15 +253,21 @@ function gutenberg_maybe_inline_styles() {
 			$style['css'] = file_get_contents( $style['path'] );
 
 			// Set `src` to `false` and add styles inline.
-			$wp_styles->registered[ $style['handle'] ]->src              = false;
-			$wp_styles->registered[ $style['handle'] ]->extra['after'][] = $style['css'];
+			$wp_styles->registered[ $style['handle'] ]->src = false;
+			if ( empty( $wp_styles->registered[ $style['handle'] ]->extra['after'] ) ) {
+				$wp_styles->registered[ $style['handle'] ]->extra['after'] = array();
+			}
+			array_unshift( $wp_styles->registered[ $style['handle'] ]->extra['after'], $style['css'] );
 
 			// Add the styles size to the $total_inline_size var.
 			$total_inline_size += (int) $style['size'];
 		}
 	}
 }
+// Run for styles enqueued in <head>.
 add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
+// Run for late-loaded styles in the footer.
+add_action( 'wp_footer', 'gutenberg_maybe_inline_styles', 1 );
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it
@@ -374,8 +380,10 @@ function gutenberg_register_theme_block_category( $categories ) {
 	);
 	return $categories;
 }
-
-add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( ! function_exists( 'get_default_block_categories' ) ) {
+	add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+}
 
 /**
  * Checks whether the current block type supports the feature requested.

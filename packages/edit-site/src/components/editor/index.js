@@ -3,7 +3,12 @@
  */
 import { useEffect, useState, useMemo, useCallback } from '@wordpress/element';
 import { AsyncModeProvider, useSelect, useDispatch } from '@wordpress/data';
-import { SlotFillProvider, Popover, Button } from '@wordpress/components';
+import {
+	SlotFillProvider,
+	Popover,
+	Button,
+	Notice,
+} from '@wordpress/components';
 import { EntityProvider, store as coreStore } from '@wordpress/core-data';
 import { BlockContextProvider, BlockBreadcrumb } from '@wordpress/block-editor';
 import {
@@ -13,16 +18,17 @@ import {
 	store as interfaceStore,
 } from '@wordpress/interface';
 import {
+	EditorNotices,
 	EntitiesSavedStates,
 	UnsavedChangesWarning,
 	store as editorStore,
 } from '@wordpress/editor';
 import { __ } from '@wordpress/i18n';
 import { PluginArea } from '@wordpress/plugins';
+
 /**
  * Internal dependencies
  */
-import Notices from '../notices';
 import Header from '../header';
 import { SidebarComplementaryAreaFills } from '../sidebar';
 import BlockEditor from '../block-editor';
@@ -209,7 +215,7 @@ function Editor( { initialSettings } ) {
 										}
 										content={
 											<>
-												<Notices />
+												<EditorNotices />
 												{ template && (
 													<BlockEditor
 														setIsInserterOpen={
@@ -217,23 +223,32 @@ function Editor( { initialSettings } ) {
 														}
 													/>
 												) }
+												{ ! template &&
+													settings?.siteUrl &&
+													entityId && (
+														<Notice
+															status="warning"
+															isDismissible={
+																false
+															}
+														>
+															{ __(
+																"You attempted to edit an item that doesn't exist. Perhaps it was deleted?"
+															) }
+														</Notice>
+													) }
 												<KeyboardShortcuts />
 											</>
 										}
 										actions={
 											<>
-												<EntitiesSavedStates
-													isOpen={
-														isEntitiesSavedStatesOpen
-													}
-													close={
-														closeEntitiesSavedStates
-													}
-													isEntitiesSavedStatesOpen={
-														isEntitiesSavedStatesOpen
-													}
-												/>
-												{ ! isEntitiesSavedStatesOpen && (
+												{ isEntitiesSavedStatesOpen ? (
+													<EntitiesSavedStates
+														close={
+															closeEntitiesSavedStates
+														}
+													/>
+												) : (
 													<div className="edit-site-editor__toggle-save-panel">
 														<Button
 															isSecondary

@@ -2,13 +2,13 @@
  * External dependencies
  */
 import { render } from '@testing-library/react';
-import { ui } from '@wp-g2/styles';
 
 /**
  * Internal dependencies
  */
 import { View } from '../../view';
 import { Grid } from '..';
+import CONFIG from '../../../utils/config-values';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {
@@ -22,7 +22,7 @@ describe( 'props', () => {
 		expect( container.firstChild ).toHaveStyle( {
 			display: 'grid',
 			gridTemplateColumns: 'repeat(2,1fr)',
-			gap: `calc(${ ui.get( 'gridBase' ) } * 3)`,
+			gap: `calc( ${ CONFIG.gridBase } * 3 )`,
 		} );
 	} );
 
@@ -38,7 +38,7 @@ describe( 'props', () => {
 		expect( container.firstChild ).toHaveStyle( {
 			display: 'grid',
 			gridTemplateColumns: 'repeat(3,1fr)',
-			gap: `calc(${ ui.get( 'gridBase' ) } * 4)`,
+			gap: `calc( ${ CONFIG.gridBase } * 4 )`,
 		} );
 	} );
 
