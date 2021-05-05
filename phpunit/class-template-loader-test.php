@@ -18,26 +18,6 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		gutenberg_register_template_part_post_type();
 		gutenberg_register_wp_theme_taxonomy();
 		gutenberg_register_wp_template_part_area_taxonomy();
-
-		// Set up template post.
-		$args = array(
-			'post_type'    => 'wp_template',
-			'post_name'    => 'page',
-			'post_title'   => 'Page',
-			'post_content' => 'Content',
-			'post_excerpt' => 'Description of my template',
-			'tax_input'    => array(
-				'wp_theme' => array(
-					get_stylesheet(),
-				),
-			),
-		);
-		// self::$post = self::factory()->post->create_and_get( $args );
-		// wp_set_post_terms( self::$post->ID, get_stylesheet(), 'wp_theme' );
-	}
-
-	public static function wpTearDownAfterClass() {
-		// wp_delete_post( self::$post->ID );
 	}
 
 	function test_gutenberg_page_home_block_template_takes_precedence_over_less_specific_block_templates() {
@@ -86,9 +66,10 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		unset( $_wp_current_template_content );
 	}
 
-	// Covers https://github.com/WordPress/gutenberg/pull/29026
+	/**
+	 * Covers https://github.com/WordPress/gutenberg/pull/29026.
+	 */
 	function test_gutenberg_more_specific_php_template_takes_precedence_over_less_specific_block_template() {
-		global $_wp_current_template_content;
 		$page_id_template       = 'page-1.php';
 		$page_id_template_path  = get_stylesheet_directory() . '/' . $page_id_template;
 		$type                   = 'page';
@@ -101,7 +82,9 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		$this->assertEquals( $page_id_template_path, $resolved_template_path );
 	}
 
-	// Regression: https://github.com/WordPress/gutenberg/issues/31399
+	/**
+	 * Regression: https://github.com/WordPress/gutenberg/issues/31399.
+	 */
 	function test_gutenberg_custom_page_template_takes_precedence_over_all_other_templates() {
 		$custom_page_template      = 'templates/full-width.php';
 		$custom_page_template_path = get_stylesheet_directory() . '/' . $custom_page_template;
