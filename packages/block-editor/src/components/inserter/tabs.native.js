@@ -27,6 +27,7 @@ function InserterTabs( {
 	tabIndex,
 } ) {
 	const tabAnimation = useRef( new Animated.Value( 0 ) ).current;
+	const lastScrollEvents = useRef( [] ).current;
 
 	useEffect( () => {
 		Animated.timing( tabAnimation, {
@@ -34,6 +35,12 @@ function InserterTabs( {
 			toValue: tabIndex,
 			useNativeDriver: true,
 		} ).start();
+
+		// Notify upstream with the last scroll event of the current tab.
+		const lastScrollEvent = lastScrollEvents[ tabIndex ];
+		if ( lastScrollEvent ) {
+			listProps.onScroll( { nativeEvent: lastScrollEvent } );
+		}
 	}, [ tabIndex ] );
 
 	const { tabs, tabKeys } = useMemo( () => {
@@ -58,6 +65,11 @@ function InserterTabs( {
 		[ tabAnimation, tabKeys ]
 	);
 
+	function onScroll( event ) {
+		lastScrollEvents[ tabIndex ] = event.nativeEvent;
+		listProps.onScroll( event );
+	}
+
 	return (
 		<Animated.View
 			style={ [
@@ -79,7 +91,7 @@ function InserterTabs( {
 					{ tab.component( {
 						rootClientId,
 						onSelect,
-						listProps,
+						listProps: { ...listProps, onScroll },
 					} ) }
 				</View>
 			) ) }

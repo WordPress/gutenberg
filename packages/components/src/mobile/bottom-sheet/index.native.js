@@ -292,7 +292,7 @@ class BottomSheet extends Component {
 	onScroll( { nativeEvent } ) {
 		if ( this.isCloseToTop( nativeEvent ) ) {
 			this.setState( { bounces: false } );
-		} else if ( this.isCloseToBottom( nativeEvent ) ) {
+		} else {
 			this.setState( { bounces: true } );
 		}
 	}
