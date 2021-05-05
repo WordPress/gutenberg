@@ -63,6 +63,8 @@ export function useScrollIntoView( clientId ) {
 				scrollingElement.scrollHeight > scrollingElement.clientHeight
 			) {
 				scrollContainer = ownerDocument.defaultView;
+			} else {
+				return;
 			}
 		}
 
