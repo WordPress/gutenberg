@@ -49,7 +49,9 @@ function HeadingEdit( {
 
 	// Update anchor when the content changes.
 	useEffect( () => {
-		attributes.anchor = generatedAnchor;
+		if ( generatedAnchor !== attributes.anchor ) {
+			setAttributes( { anchor: generatedAnchor } );
+		}
 	}, [ attributes.anchor, generatedAnchor ] );
 
 	return (
