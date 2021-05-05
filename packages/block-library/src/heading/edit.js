@@ -15,6 +15,7 @@ import {
 	useBlockProps,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -38,32 +39,20 @@ function HeadingEdit( {
 		} ),
 		style: mergedStyle,
 	} );
+	const prevContent = usePrevious( content );
 	const generatedAnchor = useGeneratedAnchor(
 		clientId,
 		attributes.anchor,
+		prevContent,
 		content
 	);
 
 	// Update anchor when the content changes.
 	useEffect( () => {
-		if ( generatedAnchor && generatedAnchor.startsWith( 'wp-' ) ) {
+		if ( generatedAnchor !== attributes.anchor ) {
 			setAttributes( { anchor: generatedAnchor } );
 		}
-	}, [ generatedAnchor ] );
-
-	// Make sure manually-edited anchors don't have the `wp-` prefix.
-	// `wp-` marks an anchor as auto-generated.
-	useEffect( () => {
-		if (
-			attributes.anchor &&
-			generatedAnchor !== attributes.anchor &&
-			attributes.anchor.startsWith( 'wp-' )
-		) {
-			setAttributes( {
-				anchor: attributes.anchor.replace( 'wp-', '' ),
-			} );
-		}
-	}, [ attributes.anchor ] );
+	}, [ attributes.anchor, generatedAnchor ] );
 
 	return (
 		<>

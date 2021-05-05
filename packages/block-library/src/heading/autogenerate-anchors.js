@@ -84,13 +84,12 @@ const getSlug = ( content ) => {
 /**
  * Generate the anchor for a heading.
  *
- * @param {string}   anchor            The heading anchor.
  * @param {string}   content           The block content.
  * @param {string[]} allHeadingAnchors An array containing all headings anchors.
  *
  * @return {string|null} Return the heading anchor.
  */
-const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
+const generateAnchor = ( content, allHeadingAnchors ) => {
 	const slug = getSlug( content );
 	// If slug is empty, then return null.
 	// Returning null instead of an empty string allows us to check again when the content changes.
@@ -98,14 +97,13 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 		return null;
 	}
 
-	const baseAnchor = `wp-${ slug }`;
-	anchor = baseAnchor;
+	let anchor = slug;
 	let i = 0;
 
 	// If the anchor already exists in another heading, append -i.
-	while ( allHeadingAnchors.includes( anchor ) ) {
+	while ( allHeadingAnchors.includes( slug ) ) {
 		i += 1;
-		anchor = baseAnchor + '-' + i;
+		anchor = slug + '-' + i;
 	}
 
 	return anchor;
@@ -114,13 +112,19 @@ const generateAnchor = ( anchor, content, allHeadingAnchors ) => {
 /**
  * Updates the anchor if required.
  *
- * @param {string} clientId The block's client-ID.
- * @param {string} anchor   The heading anchor.
- * @param {string} content  The block content.
+ * @param {string} clientId    The block's client-ID.
+ * @param {string} anchor      The heading anchor.
+ * @param {string} prevContent The previous value of the content.
+ * @param {string} content     The block content.
  *
  * @return {string} The anchor.
  */
-export default function useGeneratedAnchor( clientId, anchor, content ) {
+export default function useGeneratedAnchor(
+	clientId,
+	anchor,
+	prevContent,
+	content
+) {
 	const allHeadingAnchors = useSelect(
 		( select ) => {
 			const allBlocks = select( blockEditorStore ).getBlocks();
@@ -128,7 +132,13 @@ export default function useGeneratedAnchor( clientId, anchor, content ) {
 		},
 		[ clientId ]
 	);
-	return ! anchor || anchor.startsWith( 'wp-' )
-		? generateAnchor( anchor, content, allHeadingAnchors )
-		: anchor;
+
+	if (
+		! anchor ||
+		'' === content ||
+		generateAnchor( prevContent, allHeadingAnchors ) === anchor
+	) {
+		return generateAnchor( content, allHeadingAnchors );
+	}
+	return anchor;
 }
