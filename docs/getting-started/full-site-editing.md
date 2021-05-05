@@ -59,4 +59,3 @@ See the [architecture document on templates](/docs/explanations/architecture/ful
 Instead of the proliferation of theme support flags or alternative methods, a new `theme.json` file is being used to define theme settings.
 
 See [documentation for theme.json](/docs/how-to-guides/themes/theme-json.md).
-

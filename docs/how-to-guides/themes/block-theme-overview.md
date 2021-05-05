@@ -138,4 +138,3 @@ remove_theme_support( 'block-templates' );
 
 -   [Full Site Editing](https://github.com/WordPress/gutenberg/labels/%5BFeature%5D%20Full%20Site%20Editing) label.
 -   [Theme Experiments](https://github.com/WordPress/theme-experiments) repository, full of block theme examples created by the WordPress community.
-

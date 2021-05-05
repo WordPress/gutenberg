@@ -399,7 +399,7 @@ Using the Gutenberg plugin (version 8.3 or later), link color control is availab
 add_theme_support('experimental-link-color');
 ```
 
-If a theme opts in, it should [define default link colors](https://developer.wordpress.org/block-editor/developers/themes/theme-json/#color-properties) in `theme.json` (or in its theme styles if no `theme.json` is present). For example:
+ If a theme opts in, it can [define link colors](/docs/how-to-guides/themes/theme-json.md#color-properties) by using the `theme.json`. If the theme doesn't use the `theme.json` it can configure the color of links by settings the value of the `--wp--style--color--link` CSS Custom Property such as:
 
 ```css
 :root {
