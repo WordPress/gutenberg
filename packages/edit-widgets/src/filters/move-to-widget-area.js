@@ -31,7 +31,7 @@ const withMoveToWidgetAreaToolbarItem = createHigherOrderComponent(
 				const selectors = select( editWidgetsStore );
 				return {
 					widgetAreas: selectors.getWidgetAreas(),
-					currentWidgetArea: widgetId
+					currentWidgetAreaId: widgetId
 						? selectors.getWidgetAreaForWidgetId( widgetId )?.id
 						: undefined,
 					canInsertBlockInWidgetArea: selectors.canInsertBlockInWidgetArea(
