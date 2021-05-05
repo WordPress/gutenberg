@@ -1,0 +1,10 @@
+.block-editor-hooks__border-controls {
+	.components-unit-control-wrapper {
+		margin-bottom: $grid-unit-30;
+
+		&:last-child {
+			margin-bottom: $grid-unit-10;
+		}
+	}
+}
+
