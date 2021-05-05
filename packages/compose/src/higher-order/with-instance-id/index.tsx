@@ -9,14 +9,14 @@ import type { ComponentType } from 'react';
  */
 import createHigherOrderComponent from '../../utils/create-higher-order-component';
 // eslint-disable-next-line no-duplicate-imports
-import type { PropRemovingHigherOrderComponent } from '../../utils/create-higher-order-component';
+import type { PropInjectingHigherOrderComponent } from '../../utils/create-higher-order-component';
 import useInstanceId from '../../hooks/use-instance-id';
 
 /**
  * A Higher Order Component used to be provide a unique instance ID by
  * component.
  */
-const withInstanceId: PropRemovingHigherOrderComponent< {
+const withInstanceId: PropInjectingHigherOrderComponent< {
 	instanceId: string | number;
 } > = createHigherOrderComponent(
 	< TProps extends { instanceId: string | number } >(

@@ -22,7 +22,7 @@ export type SimpleHigherOrderComponent = < TProps >(
 	Inner: ComponentType< TProps >
 ) => ComponentType< TProps >;
 
-export type PropRemovingHigherOrderComponent< TRemovedProps > = <
+export type PropInjectingHigherOrderComponent< TRemovedProps > = <
 	TProps extends TRemovedProps
 >(
 	Inner: ComponentType< TProps >

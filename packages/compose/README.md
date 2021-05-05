@@ -472,7 +472,7 @@ component.
 
 _Type_
 
--   `PropRemovingHigherOrderComponent< { instanceId: string | number; } >`
+-   `PropInjectingHigherOrderComponent< { instanceId: string | number; } >`
 
 <a name="withSafeTimeout" href="#withSafeTimeout">#</a> **withSafeTimeout**
 
