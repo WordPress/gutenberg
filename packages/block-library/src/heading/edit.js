@@ -13,9 +13,11 @@ import {
 	BlockControls,
 	RichText,
 	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { usePrevious } from '@wordpress/compose';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -46,10 +48,14 @@ function HeadingEdit( {
 		prevContent,
 		content
 	);
+	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
+		blockEditorStore
+	);
 
 	// Update anchor when the content changes.
 	useEffect( () => {
 		if ( generatedAnchor !== attributes.anchor ) {
+			__unstableMarkNextChangeAsNotPersistent();
 			setAttributes( { anchor: generatedAnchor } );
 		}
 	}, [ content ] );
