@@ -407,4 +407,4 @@ If a theme opts in, it should [define default link colors](https://developer.wor
 }
 ```
 
-The framework will take care of enqueing the necessary rules for this to work. Whether or not the theme supports `experimental-theme.json` the presets will also be enqueued as CSS Custom Properties, so themes can also use `--wp--style--color-link: var(--wp--preset--color--<color-slug>)`. See [the docs](/docs/how-to-guides/themes/theme-json.md#color-properties) for details.
+The framework will take care of enqueing the necessary rules for this to work. Whether or not the theme supports `theme.json` the presets will also be enqueued as CSS Custom Properties, so themes can also use `--wp--style--color-link: var(--wp--preset--color--<color-slug>)`. See [the docs](/docs/how-to-guides/themes/theme-json.md#color-properties) for details.
