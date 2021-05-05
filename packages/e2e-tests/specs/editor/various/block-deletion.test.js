@@ -135,6 +135,10 @@ describe( 'block deletion -', () => {
 			// Press the up arrow once to select the third and fourth blocks.
 			await pressKeyWithModifier( 'shift', 'ArrowUp' );
 
+			await page.evaluate(
+				() => new Promise( window.requestIdleCallback )
+			);
+
 			// Now that the block wrapper is selected, press backspace to delete it.
 			await page.keyboard.press( 'Backspace' );
 			expect( await getEditedPostContent() ).toMatchSnapshot();
