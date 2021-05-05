@@ -12,13 +12,12 @@ This tutorial is up to date with Gutenberg version 10.6.
 ## Table of Contents
 
 1.  [What is needed to create a block-theme?](#what-is-needed-to-create-a-block-theme)
-2.  [Creating the theme](#creating-the-theme)
+2.  [Theme setup](#theme-setup)
 3.  [Creating the templates and template parts](#creating-the-templates-and-template-parts)
 4.  [experimental-theme.json - Global styles](#experimental-theme-json-global-styles)
-5.  [Using query and loop blocks](#using-query-and-loop-blocks)
-6.  [Layouts](#layouts)
-7.  [Additional templates](#additional-templates)
-8.  [Creating custom templates](#creating-custom-templates)
+5.  [Layouts](#layouts)
+6.  [Custom templates](#custom-templates)
+7.  [Sharing your theme](#sharing-your-theme)
 
 ## What is needed to create a block theme?
 
@@ -54,7 +53,7 @@ theme
 	|__ ...
 ```
 
-## Creating the theme
+## Theme setup
 
 Create a new folder for your theme in `/wp-content/themes/`.
 Inside this folder, create the `block-templates` and `block-template-parts` folders.
@@ -235,6 +234,101 @@ Templates and template parts created or edited in the site editor are saved to t
 - Open index.html and update the slugs in the block markup.
 
 Saved templates have precedence over theme files. To use the updated theme files, go to Appearance > Templates/Template parts and delete the saved templates.
+
+#### Additional templates
+
+Now the theme has a basic site header and footer, but it does not display any content.
+To create a blog, a list of the latest posts, you would use the query and query loop blocks together.
+
+Wether you are using the site editor or editing theme files directly, open the index tempalte and add a query block.
+
+When you place a query block in the editor, the query loop is used as an inner block.
+You have the option to start with an empty loop or include selected post blocks like a post title and featured image.
+
+Example markup:
+
+```html
+<!-- wp:query  -->
+<div class="wp-block-query"><!-- wp:query-loop -->
+<!-- wp:post-title /-->
+<!-- wp:post-date /-->
+<!-- wp:post-excerpt /-->
+<!-- /wp:query-loop --></div>
+<!-- /wp:query -->
+```
+
+The pagination block that lets you navigate between pages of posts can only be used inside the query.
+It needs to be placed inside the query, but outside the loop:
+
+```html
+<!-- wp:query  -->
+<div class="wp-block-query"><!-- wp:query-loop -->
+<!-- wp:post-title /-->
+<!-- wp:post-date /-->
+<!-- wp:post-excerpt /-->
+<!-- /wp:query-loop -->
+
+<!-- wp:query-pagination -->
+<div class="wp-block-query-pagination">
+<!-- wp:query-pagination-previous /-->
+<!-- wp:query-pagination-numbers /-->
+<!-- wp:query-pagination-next /--></div>
+<!-- /wp:query-pagination -->
+
+</div>
+<!-- /wp:query -->
+```
+
+When you add the query, you also want to make sure that the post title block is a link, otherwise, you can not reach the single posts from the blog. The link option can be enabled in the block setting sidebar of the post title block.
+
+The block markup for a post title with the link enabled is: `<!-- wp:post-title {"isLink":true} /-->`
+
+Next, create a new template for displaying single posts.
+If you are editing theme files directly, create a file called single.html inside the block-templates folder.
+
+Add the site header and site footer template parts:
+
+```html
+<!-- wp:template-part {"slug":"header"} /-->
+
+<!-- wp:template-part {"slug":"footer"} /-->
+```
+
+Add a group block that will work as a container for your post.
+This will enable the width options for the inner blocks.
+
+```html
+<!-- wp:template-part {"slug":"header"} /-->
+<!-- wp:group -->
+<div class="wp-block-group"></div>
+<!-- /wp:group -->
+<!-- wp:template-part {"slug":"footer"} /-->
+```
+
+Add your preffered blocks inside the group block. Some of the new blocks that are available are:
+
+- Post content: `<!-- wp:post-content /-->`
+- Post title: `<!-- wp:post-title /-->`
+- Post author: `<!-- wp:post-author /-->`
+- Post date: `<!-- wp:post-date /-->`
+- Post featured image: `<!-- wp:post-featured-image /-->`
+- Post tags: `<!-- wp:post-tags /-->`
+- Post categories: `<!-- wp:post-hierarchical-terms "term":"category"} /-->`
+- Next and previous post: `<!-- wp:post-navigation-link /--><!-- wp:post-navigation-link {"type":"previous"} /-->`
+
+Save the HTML file, or save and export the post template if you are working in the site editor.
+
+Copy all the blocks and create a template for displaying pages.
+You can copy the single.html file as page.html inside the block-templates folder.
+Adjust the blocks for the page template, and save.
+
+If you preview your theme now, the blog, single posts, pages, archives and search results should display correctly,
+but without styling.
+
+If a theme does not use an archive or search result template, the index template will be used as a fallback.
+To make sure that the query block shows the correct results depending on the context, it has an attribute called `inherit` that filters the query automatically. This option is enabled by default.
+
+If you want, you can continue creating archives or search tempaltes, a 404 template, or adding comments to your post or pages.
 
 ## Experimental-theme.json - Global styles
 
@@ -466,11 +560,6 @@ There are three template areas to choose from: Header, footer, and general.
 ]
 ```
 
-## Using query and loop blocks
-
-
-
-
 ## Layouts
 
 The benefit of enabling the layout setting in experimental-theme.json is that you no longer need to add extra CSS for the alignments or widths. You can also set more precise widths to blocks inside containers.
@@ -487,10 +576,6 @@ If you place the image block inside a group block, the options depend on the lay
 - Without changes to the layout settings, you can align the image to the left, center, or right.
 - When the layout setting inherits the width from experimental-theme.json, you can set the image's width to default, wide or full width.
 - When the content width and wide width have been specified, the image's width is adjusted and can be set to default, wide or full width.
-
-## Additional templates
-
--We only created an index so far, create single, 404, search and archives.
 
 ## Creating custom templates
 
@@ -537,3 +622,10 @@ There is also an optional setting where you can decide which post types that can
 ```
 
 If you include more than one template, separate them with a comma.
+
+
+## Sharing your theme
+
+If you would like feedback on your theme and want to share it with others, you can submit it to
+the [theme experiments GitHub repository](https://github.com/WordPress/theme-experiments).
+
