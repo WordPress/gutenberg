@@ -39,13 +39,13 @@ const { compose: stylesCompose } = StyleSheet;
 
 const BackgroundView = ( { children } ) => {
 	const backgroundStyles = usePreferredColorSchemeStyle(
-		styles.background,
-		styles.backgroundDark
+		styles[ 'components-autocomplete__background' ],
+		styles[ 'components-autocomplete__background-dark' ]
 	);
 
 	return Platform.OS === 'ios' ? (
 		<BlurView
-			style={ styles.backgroundBlur }
+			style={ styles[ 'components-autocomplete__background-blur' ] }
 			blurType="prominent"
 			blurAmount={ 10 }
 		>
@@ -93,28 +93,28 @@ export function getAutoCompleterUI( autocompleter ) {
 		}, [ items, isVisible, text ] );
 
 		const activeItemStyles = usePreferredColorSchemeStyle(
-			styles.activeItem,
-			styles.activeItemDark
+			styles[ 'components-autocomplete__item-active' ],
+			styles[ 'components-autocomplete__item-active-dark' ]
 		);
 
 		const iconStyles = usePreferredColorSchemeStyle(
-			styles.icon,
-			styles.iconDark
+			styles[ 'components-autocomplete__icon' ],
+			styles[ 'components-autocomplete__icon-active-dark' ]
 		);
 
 		const activeIconStyles = usePreferredColorSchemeStyle(
-			styles.activeIcon,
-			styles.iconDark
+			styles[ 'components-autocomplete__icon-active ' ],
+			styles[ 'components-autocomplete__icon-active-dark' ]
 		);
 
 		const textStyles = usePreferredColorSchemeStyle(
-			styles.text,
-			styles.textDark
+			styles[ 'components-autocomplete__text' ],
+			styles[ 'components-autocomplete__text-dark' ]
 		);
 
 		const activeTextStyles = usePreferredColorSchemeStyle(
-			styles.activeText,
-			styles.activeTextDark
+			styles[ 'components-autocomplete__text-active' ],
+			styles[ 'components-autocomplete__text-active-dark' ]
 		);
 
 		const startAnimation = useCallback(
@@ -138,7 +138,10 @@ export function getAutoCompleterUI( autocompleter ) {
 				{
 					translateY: animationValue.interpolate( {
 						inputRange: [ 0, 1 ],
-						outputRange: [ styles.wrapper.height, 0 ],
+						outputRange: [
+							styles[ 'components-autocomplete' ].height,
+							0,
+						],
 					} ),
 				},
 			],
@@ -150,13 +153,15 @@ export function getAutoCompleterUI( autocompleter ) {
 
 		return (
 			<AutocompletionItemsFill>
-				<View style={ styles.wrapper }>
+				<View style={ styles[ 'components-autocomplete' ] }>
 					<Animated.View style={ contentStyles }>
 						<BackgroundView>
 							<ScrollView
 								ref={ scrollViewRef }
 								horizontal
-								contentContainerStyle={ styles.content }
+								contentContainerStyle={
+									styles[ 'components-autocomplete__content' ]
+								}
 								showsHorizontalScrollIndicator={ false }
 								keyboardShouldPersistTaps="always"
 								accessibilityLabel={
@@ -167,7 +172,9 @@ export function getAutoCompleterUI( autocompleter ) {
 								{ items.map( ( option, index ) => {
 									const isActive = index === selectedIndex;
 									const itemStyle = stylesCompose(
-										styles.item,
+										styles[
+											'components-autocomplete__item'
+										],
 										isActive && activeItemStyles
 									);
 									const textStyle = stylesCompose(
@@ -191,7 +198,13 @@ export function getAutoCompleterUI( autocompleter ) {
 												option?.value?.title
 											) }
 										>
-											<View style={ styles.icon }>
+											<View
+												style={
+													styles[
+														'components-autocomplete__icon'
+													]
+												}
+											>
 												<Icon
 													icon={
 														option?.value?.icon?.src
