@@ -134,7 +134,7 @@ function getSuggestionsQuery( type, kind ) {
 }
 
 /**
- * @typedef {'post-type'|'custom'|'taxonomy'} WPNavigationLinkKind
+ * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
  */
 
 /**
@@ -153,8 +153,7 @@ function getSuggestionsQuery( type, kind ) {
  */
 
 /**
- * OnChange handler that updates block attributes when a link suggestion is chosen, a url is updated, or
- * opensInNewTab is toggled
+ * Link Control onChange handler that updates block attributes when a setting is changed.
  *
  * @param {Object}                          updatedValue    New block attributes to update.
  * @param {Function}                        setAttributes   Block attribute update function.
