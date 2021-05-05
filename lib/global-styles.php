@@ -34,15 +34,6 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 
 	$stylesheet = $tree->get_stylesheet( $type );
 
-	if ( ( 'all' === $type || 'block_styles' === $type ) && WP_Theme_JSON_Resolver::theme_has_support() ) {
-		// To support all themes, we added in the block-library stylesheet
-		// a style rule such as .has-link-color a { color: var(--wp--style--color--link, #00e); }
-		// so that existing link colors themes used didn't break.
-		// We add this here to make it work for themes that opt-in to theme.json
-		// In the future, we may do this differently.
-		$stylesheet .= 'a{color:var(--wp--style--color--link, #00e);}';
-	}
-
 	if ( $can_use_cached ) {
 		// Cache for a minute.
 		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.

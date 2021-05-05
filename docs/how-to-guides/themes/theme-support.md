@@ -393,30 +393,18 @@ add_theme_support('custom-spacing');
 
 ## Experimental — Link color control
 
-Using the Gutenberg plugin (version 8.3 or later), link color control is available to the Paragraph, Heading, Group, Columns, and Media & Text blocks. This is off by default, and requires the theme to opt in by declaring support:
+Using the Gutenberg plugin (version 8.3 or later), link color control is available to a number of blocks including Paragraph, Heading, Group, Columns, and Media & Text blocks. This is off by default, and requires the theme to opt in by declaring support:
 
 ```php
 add_theme_support('experimental-link-color');
 ```
 
-If a theme opts in, it should [define default link colors](/docs/how-to-guides/themes/theme-json.md#color-properties) in `experimental-theme.json` (or in its theme styles if no `experimental-theme.json` is present). For example:
+If a theme opts in, it can [define link colors](/docs/how-to-guides/themes/theme-json.md#color-properties) by using the `experimental-theme.json`. If the theme doesn't use the `experimental-theme.json` it can configure the color of links by settings the value of the `--wp--style--color--link` CSS Custom Property such as:
 
 ```css
-{
-    "global": {
-        "styles": {
-            "color": {
-                "link": "hotpink"
-            }
-        }
-    }
+:root {
+	--wp--style--color--link: <value>;
 }
 ```
 
-If the theme styles the link color in its stylesheets (editor and front-end), it should ensure it maps to the `--wp--style--color--link` CSS variable:
-
-```css
-a {
-	color: var( --wp--style--color--link );
-}
-```
+The framework will take care of enqueing the necessary rules for this to work. Whether or not the theme supports `experimental-theme.json` the presets will also be enqueued as CSS Custom Properties, so themes can also use `--wp--style--color-link: var(--wp--preset--color--<color-slug>)`. See [the docs](/docs/how-to-guides/themes/theme-json.md#color-properties) for details.
