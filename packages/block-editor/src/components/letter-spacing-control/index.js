@@ -2,10 +2,6 @@
  * WordPress dependencies
  */
 import {
-	Button,
-	Flex,
-	FlexItem,
-	FlexBlock,
 	BaseControl,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
@@ -46,30 +42,13 @@ export default function LetterSpacingControl( { value, onChange } ) {
 			<BaseControl.VisualLabel>
 				{ __( 'Letter-spacing' ) }
 			</BaseControl.VisualLabel>
-			<Flex>
-				<FlexBlock>
-					<UnitControl
-						value={ value }
-						min={ -5 }
-						aria-label={ __( 'Letter-spacing' ) }
-						__unstableInputWidth="60px"
-						units={ CSS_UNITS }
-						onChange={ onChange }
-					/>
-				</FlexBlock>
-				<FlexItem>
-					<Button
-						className="block-editor-letter-spacing__reset-button"
-						isSecondary
-						disabled={ value === undefined }
-						onClick={ () => {
-							onChange( undefined );
-						} }
-					>
-						{ __( 'Reset' ) }
-					</Button>
-				</FlexItem>
-			</Flex>
+			<UnitControl
+				aria-label={ __( 'Letter-spacing' ) }
+				value={ value }
+				__unstableInputWidth="60px"
+				units={ CSS_UNITS }
+				onChange={ onChange }
+			/>
 		</BaseControl>
 	);
 }
