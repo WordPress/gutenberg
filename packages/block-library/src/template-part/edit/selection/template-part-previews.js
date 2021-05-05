@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, deburr } from 'lodash';
+import { deburr } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -102,20 +102,21 @@ function PanelGroup( { title, icon, children } ) {
 	);
 }
 
-function TemplatePartsByTheme( {
+function TemplatePartsByArea( {
 	templateParts,
 	setAttributes,
 	onClose,
 	composite,
+	area,
 } ) {
-	const templatePartsByTheme = useMemo( () => {
-		return Object.values( groupBy( templateParts, 'theme' ) );
-	}, [ templateParts ] );
+	const templatePartsByArea = useMemo( () => {
+		return templateParts.filter( ( item ) => item.area === area );
+	}, [ templateParts, area ] );
 	const currentShownTPs = useAsyncList( templateParts );
 
-	return templatePartsByTheme.map( ( templatePartList ) => (
-		<PanelGroup key={ templatePartList[ 0 ].theme }>
-			{ templatePartList.map( ( templatePart ) => {
+	return (
+		<PanelGroup>
+			{ templatePartsByArea.map( ( templatePart ) => {
 				return currentShownTPs.includes( templatePart ) ? (
 					<TemplatePartItem
 						key={ templatePart.id }
@@ -129,7 +130,7 @@ function TemplatePartsByTheme( {
 				);
 			} ) }
 		</PanelGroup>
-	) );
+	);
 }
 
 function TemplatePartSearchResults( {
@@ -138,6 +139,7 @@ function TemplatePartSearchResults( {
 	filterValue,
 	onClose,
 	composite,
+	area,
 } ) {
 	const filteredTPs = useMemo( () => {
 		// Filter based on value.
@@ -203,13 +205,17 @@ export default function TemplatePartPreviews( {
 	setAttributes,
 	filterValue,
 	onClose,
+	area,
 } ) {
 	const composite = useCompositeState();
 	const templateParts = useSelect( ( select ) => {
 		return (
 			select( coreStore ).getEntityRecords(
 				'postType',
-				'wp_template_part'
+				'wp_template_part',
+				{
+					per_page: -1,
+				}
 			) || []
 		);
 	}, [] );
@@ -231,6 +237,7 @@ export default function TemplatePartPreviews( {
 					filterValue={ filterValue }
 					onClose={ onClose }
 					composite={ composite }
+					area={ area }
 				/>
 			</Composite>
 		);
@@ -242,11 +249,12 @@ export default function TemplatePartPreviews( {
 			role="listbox"
 			aria-label={ __( 'List of template parts' ) }
 		>
-			<TemplatePartsByTheme
+			<TemplatePartsByArea
 				templateParts={ templateParts }
 				setAttributes={ setAttributes }
 				onClose={ onClose }
 				composite={ composite }
+				area={ area }
 			/>
 		</Composite>
 	);

@@ -42,7 +42,13 @@ export default function TemplatePartEdit( {
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { isResolved, innerBlocks, isMissing, defaultWrapper } = useSelect(
+	const {
+		isResolved,
+		innerBlocks,
+		isMissing,
+		defaultWrapper,
+		area,
+	} = useSelect(
 		( select ) => {
 			const { getEditedEntityRecord, hasFinishedResolution } = select(
 				coreStore
@@ -57,6 +63,8 @@ export default function TemplatePartEdit( {
 			const entityRecord = templatePartId
 				? getEditedEntityRecord( ...getEntityArgs )
 				: null;
+			const _area = entityRecord?.area || attributes.area;
+
 			const hasResolvedEntity = templatePartId
 				? hasFinishedResolution(
 						'getEditedEntityRecord',
@@ -66,16 +74,14 @@ export default function TemplatePartEdit( {
 
 			const defaultWrapperElement = select( editorStore )
 				.__experimentalGetDefaultTemplatePartAreas()
-				.find(
-					( { area } ) =>
-						area === ( entityRecord?.area || attributes.area )
-				)?.area_tag;
+				.find( ( { area: value } ) => value === _area )?.area_tag;
 
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isResolved: hasResolvedEntity,
 				isMissing: hasResolvedEntity && ! entityRecord,
 				defaultWrapper: defaultWrapperElement || 'div',
+				area: _area,
 			};
 		},
 		[ templatePartId, clientId ]
@@ -157,6 +163,7 @@ export default function TemplatePartEdit( {
 								<TemplatePartSelection
 									setAttributes={ setAttributes }
 									onClose={ onClose }
+									area={ area }
 								/>
 							) }
 						/>
