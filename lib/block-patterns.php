@@ -185,8 +185,6 @@ add_action(
 	'init',
 	function() {
 
-		$should_register_core_patterns = get_theme_support( 'core-block-patterns' );
-
 		$core_block_patterns = array(
 			'text-two-columns',
 			'two-buttons',
@@ -218,7 +216,7 @@ add_action(
 			'two-buttons',
 		);
 
-		if ( ! function_exists( 'unregister_block_pattern' ) ) {
+		if ( ! get_theme_support( 'core-block-patterns' ) || ! function_exists( 'unregister_block_pattern' ) ) {
 			return;
 		}
 
@@ -229,13 +227,11 @@ add_action(
 			}
 		}
 
-		if ( $should_register_core_patterns ) {
-			foreach ( $new_core_block_patterns as $core_block_pattern ) {
-				register_block_pattern(
-					'core/' . $core_block_pattern,
-					require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
-				);
-			}
+		foreach ( $new_core_block_patterns as $core_block_pattern ) {
+			register_block_pattern(
+				'core/' . $core_block_pattern,
+				require __DIR__ . '/block-patterns/' . $core_block_pattern . '.php'
+			);
 		}
 
 	}
