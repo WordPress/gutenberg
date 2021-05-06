@@ -158,7 +158,7 @@ export default class SidebarAdapter {
 
 	_removeWidget( widget ) {
 		const settingId = widgetIdToSettingId( widget.id );
-		this.allSettings.remove( settingId );
+		this.api.remove( settingId );
 	}
 
 	_updateWidget( widget ) {
