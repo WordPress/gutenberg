@@ -18,143 +18,143 @@ export interface SpacerProps {
 	/**
 	 * Adjusts all margins.
 	 */
-	m?: number;
+	margin?: number;
 	/**
 	 * Adjusts top and bottom margins.
 	 */
-	my?: number;
+	marginY?: number;
 	/**
 	 * Adjusts left and right margins.
 	 */
-	mx?: number;
+	marginX?: number;
 	/**
 	 * Adjusts top margins.
 	 */
-	mt?: number;
+	marginTop?: number;
 	/**
 	 * Adjusts bottom margins.
 	 *
 	 * @default 2
 	 */
-	mb?: number;
+	marginBottom?: number;
 	/**
 	 * Adjusts left margins.
 	 */
-	ml?: number;
+	marginLeft?: number;
 	/**
 	 * Adjusts right margins.
 	 */
-	mr?: number;
+	marginRight?: number;
 	/**
 	 * Adjusts all padding.
 	 */
-	p?: number;
+	padding?: number;
 	/**
 	 * Adjusts top and bottom padding.
 	 */
-	py?: number;
+	paddingY?: number;
 	/**
 	 * Adjusts left and right padding.
 	 */
-	px?: number;
+	paddingX?: number;
 	/**
 	 * Adjusts top padding.
 	 */
-	pt?: number;
+	paddingTop?: number;
 	/**
 	 * Adjusts bottom padding.
 	 */
-	pb?: number;
+	paddingBottom?: number;
 	/**
 	 * Adjusts left padding.
 	 */
-	pl?: number;
+	paddingLeft?: number;
 	/**
 	 * Adjusts right padding.
 	 */
-	pr?: number;
+	paddingRight?: number;
 }
 
 export function useSpacer( props: ViewOwnProps< SpacerProps, 'div' > ) {
 	const {
 		className,
-		m,
-		mb = 2,
-		ml,
-		mr,
-		mt,
-		mx,
-		my,
-		p,
-		pb,
-		pl,
-		pr,
-		pt,
-		px,
-		py,
+		margin,
+		marginBottom = 2,
+		marginLeft,
+		marginRight,
+		marginTop,
+		marginX,
+		marginY,
+		padding,
+		paddingBottom,
+		paddingLeft,
+		paddingRight,
+		paddingTop,
+		paddingX,
+		paddingY,
 		...otherProps
 	} = useContextSystem( props, 'Spacer' );
 
 	const classes = cx(
-		isDefined( mt ) &&
+		isDefined( marginTop ) &&
 			css`
-				margin-top: ${ space( mt ) };
+				margin-top: ${ space( marginTop ) };
 			`,
-		isDefined( mb ) &&
+		isDefined( marginBottom ) &&
 			css`
-				margin-bottom: ${ space( mb ) };
+				margin-bottom: ${ space( marginBottom ) };
 			`,
-		isDefined( ml ) &&
+		isDefined( marginLeft ) &&
 			css`
-				margin-left: ${ space( ml ) };
+				margin-left: ${ space( marginLeft ) };
 			`,
-		isDefined( mr ) &&
+		isDefined( marginRight ) &&
 			css`
-				margin-right: ${ space( mr ) };
+				margin-right: ${ space( marginRight ) };
 			`,
-		isDefined( mx ) &&
+		isDefined( marginX ) &&
 			css`
-				margin-left: ${ space( mx ) };
-				margin-right: ${ space( mx ) };
+				margin-left: ${ space( marginX ) };
+				margin-right: ${ space( marginX ) };
 			`,
-		isDefined( my ) &&
+		isDefined( marginY ) &&
 			css`
-				margin-bottom: ${ space( my ) };
-				margin-top: ${ space( my ) };
+				margin-bottom: ${ space( marginY ) };
+				margin-top: ${ space( marginY ) };
 			`,
-		isDefined( m ) &&
+		isDefined( margin ) &&
 			css`
-				margin: ${ space( m ) };
+				margin: ${ space( margin ) };
 			`,
-		isDefined( pt ) &&
+		isDefined( paddingTop ) &&
 			css`
-				padding-top: ${ space( pt ) };
+				padding-top: ${ space( paddingTop ) };
 			`,
-		isDefined( pb ) &&
+		isDefined( paddingBottom ) &&
 			css`
-				padding-bottom: ${ space( pb ) };
+				padding-bottom: ${ space( paddingBottom ) };
 			`,
-		isDefined( pl ) &&
+		isDefined( paddingLeft ) &&
 			css`
-				padding-left: ${ space( pl ) };
+				padding-left: ${ space( paddingLeft ) };
 			`,
-		isDefined( pr ) &&
+		isDefined( paddingRight ) &&
 			css`
-				padding-right: ${ space( pr ) };
+				padding-right: ${ space( paddingRight ) };
 			`,
-		isDefined( px ) &&
+		isDefined( paddingX ) &&
 			css`
-				padding-left: ${ space( px ) };
-				padding-right: ${ space( px ) };
+				padding-left: ${ space( paddingX ) };
+				padding-right: ${ space( paddingX ) };
 			`,
-		isDefined( py ) &&
+		isDefined( paddingY ) &&
 			css`
-				padding-bottom: ${ space( py ) };
-				padding-top: ${ space( py ) };
+				padding-bottom: ${ space( paddingY ) };
+				padding-top: ${ space( paddingY ) };
 			`,
-		isDefined( p ) &&
+		isDefined( padding ) &&
 			css`
-				padding: ${ space( p ) };
+				padding: ${ space( padding ) };
 			`,
 		className
 	);

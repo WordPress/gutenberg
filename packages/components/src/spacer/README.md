@@ -1,5 +1,7 @@
 # Spacer
 
+> **Experimental!**
+
 `Spacer` is a primitive layout component that providers inner (`padding`) or outer (`margin`) space in-between components. It can also be used to adaptively provide space within an `HStack` or `VStack`.
 
 ## Table of contents
@@ -31,85 +33,85 @@ function Example() {
 
 ## Props
 
-##### m
+##### margin
 
 **Type**: `number`
 
 Adjusts all margins.
 
-##### mb
+##### marginBottom
 
 **Type**: `number`
 
 Adjusts bottom margins.
 
-##### ml
+##### marginLeft
 
 **Type**: `number`
 
 Adjusts left margins.
 
-##### mr
+##### marginRight
 
 **Type**: `number`
 
 Adjusts right margins.
 
-##### mt
+##### marginTop
 
 **Type**: `number`
 
 Adjusts top margins.
 
-##### mx
+##### marginX
 
 **Type**: `number`
 
 Adjusts left and right margins.
 
-##### my
+##### marginY
 
 **Type**: `number`
 
 Adjusts top and bottom margins.
 
-##### p
+##### padding
 
 **Type**: `number`
 
 Adjusts all padding.
 
-##### pb
+##### paddingBottom
 
 **Type**: `number`
 
 Adjusts bottom padding.
 
-##### pl
+##### paddingLeft
 
 **Type**: `number`
 
 Adjusts left padding.
 
-##### pr
+##### paddingRight
 
 **Type**: `number`
 
 Adjusts right padding.
 
-##### pt
+##### paddingTop
 
 **Type**: `number`
 
 Adjusts top padding.
 
-##### px
+##### paddingX
 
 **Type**: `number`
 
 Adjusts left and right padding.
 
-##### py
+##### paddingY
 
 **Type**: `number`
 
