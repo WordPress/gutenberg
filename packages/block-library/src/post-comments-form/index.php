@@ -46,3 +46,18 @@ function register_block_core_post_comments_form() {
 	);
 }
 add_action( 'init', 'register_block_core_post_comments_form' );
+
+/**
+ * Use the button block classes for the form-submit button.
+ *
+ * @param array $fields The default comment form arguments.
+ *
+ * @return array Returns the modified fields.
+ */
+function gutenberg_comment_form_block_form_defaults( $fields ) {
+	$fields['submit_button'] = '<input name="%1$s" type="submit" id="%2$s" class="%3$s wp-block-button__link" value="%4$s" />';
+	$fields['submit_field']  = '<p class="form-submit wp-block-button">%1$s %2$s</p>';
+
+	return $fields;
+}
+add_filter( 'comment_form_defaults', 'gutenberg_comment_form_block_form_defaults' );
