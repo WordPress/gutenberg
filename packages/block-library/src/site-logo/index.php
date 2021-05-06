@@ -22,7 +22,12 @@ function render_block_core_site_logo( $attributes ) {
 	};
 
 	add_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
+
 	$custom_logo = get_custom_logo();
+
+	if ( empty( $custom_logo ) ) {
+		return ''; // Return early if no custom logo is set, avoiding extraneous wrapper div.
+	}
 
 	if ( ! $attributes['isLink'] ) {
 		// Remove the link.
