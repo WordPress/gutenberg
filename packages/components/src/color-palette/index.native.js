@@ -25,6 +25,7 @@ import ColorIndicator from '../color-indicator';
 import { colorsUtils } from '../mobile/color-settings/utils';
 
 const ANIMATION_DURATION = 200;
+const SEGMENTED_CONTROL_ANIMATION_DURATION_DELAY = 200;
 
 let customIndicatorWidth = 0;
 
@@ -97,10 +98,9 @@ function ColorPalette( {
 	const customText = __( 'Custom' );
 
 	useEffect( () => {
-		const delayedScroll = setTimeout(
-			resetScrollPosition,
-			ANIMATION_DURATION
-		);
+		const delayedScroll = setTimeout( () => {
+			resetScrollPosition();
+		}, SEGMENTED_CONTROL_ANIMATION_DURATION_DELAY );
 		return () => {
 			clearTimeout( delayedScroll );
 		};
