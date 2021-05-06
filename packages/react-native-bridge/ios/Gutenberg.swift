@@ -79,13 +79,18 @@ public class Gutenberg: NSObject {
             initialProps["capabilities"] = capabilities.toJSPayload()
         }
 
-        let editorTheme = dataSource.gutenbergEditorTheme()
-        if let colors = editorTheme?.colors {
-            initialProps["colors"] = colors
-        }
+        let editorSettings = dataSource.gutenbergEditorSettings()
+        if let rawGlobalStylesBaseStyles = editorSettings?.rawGlobalStylesBaseStyles {
+            initialProps["rawGlobalStylesBaseStyles"] = rawGlobalStylesBaseStyles
+        } else {
+            // We only need to include Colors and Gradients here if the Global Styles data wasn't provided
+            if let colors = editorSettings?.colors {
+                initialProps["colors"] = colors
+            }
 
-        if let gradients = editorTheme?.gradients {
-            initialProps["gradients"] = gradients
+            if let gradients = editorSettings?.gradients {
+                initialProps["gradients"] = gradients
+            }
         }
 
         return initialProps
@@ -184,19 +189,22 @@ public class Gutenberg: NSObject {
         bridgeModule.sendEventIfNeeded(.setFocusOnTitle, body: nil)
     }
 
-    public func updateTheme(_ editorTheme: GutenbergEditorTheme?) {
+    public func updateEditorSettings(_ editorSettings: GutenbergEditorSettings?) {
+        var settingsUpdates = [String : Any]()
+        if let rawGlobalStylesBaseStyles = editorSettings?.rawGlobalStylesBaseStyles {
+            settingsUpdates["rawGlobalStylesBaseStyles"] = rawGlobalStylesBaseStyles
+        } else {
+            // We only need to include Colors and Gradients here if the Global Styles data wasn't provided
+            if let colors = editorSettings?.colors {
+                settingsUpdates["colors"] = colors
+            }
 
-        var themeUpdates = [String : Any]()
-
-        if let colors = editorTheme?.colors {
-            themeUpdates["colors"] = colors
+            if let gradients = editorSettings?.gradients {
+                settingsUpdates["gradients"] = gradients
+            }
         }
 
-        if let gradients = editorTheme?.gradients {
-            themeUpdates["gradients"] = gradients
-        }
-
-        sendEvent(.updateTheme, body:themeUpdates)
+        sendEvent(.updateEditorSettings, body: settingsUpdates)
     }
 
     public func showNotice(_ message: String) {
