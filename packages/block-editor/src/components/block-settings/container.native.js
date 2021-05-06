@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	__experimentalUseEditorFeature as useEditorFeature,
+} from '@wordpress/block-editor';
 import {
 	BottomSheet,
 	ColorSettings,
@@ -29,6 +32,11 @@ function BottomSheetSettings( {
 	settings,
 	...props
 } ) {
+	const colorSettings = {
+		colors: useEditorFeature( 'color.palette' ) || settings.colors,
+		gradients: useEditorFeature( 'color.gradients' ) || settings.gradients,
+	};
+
 	return (
 		<BottomSheet
 			isVisible={ editorSidebarOpened }
@@ -53,7 +61,7 @@ function BottomSheetSettings( {
 				<BottomSheet.NavigationScreen
 					name={ blockSettingsScreens.color }
 				>
-					<ColorSettings defaultSettings={ settings } />
+					<ColorSettings defaultSettings={ colorSettings } />
 				</BottomSheet.NavigationScreen>
 				<BottomSheet.NavigationScreen
 					name={ blockSettingsScreens.focalPoint }
