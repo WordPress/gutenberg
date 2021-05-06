@@ -64,7 +64,7 @@ export const Gallery = ( props ) => {
 					return (
 						<li
 							className="blocks-gallery-item"
-							key={ img.id || img.url }
+							key={ img.id ? `${ img.id }-${ index }` : img.url }
 						>
 							<GalleryImage
 								url={ img.url }

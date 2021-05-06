@@ -1,17 +1,23 @@
-# VStack
+# HStack
 
-`VStack` (or Vertical Stack) is a layout component that arranges child elements in a vertical line.
+> **Experimental!**
+
+`HStack` (Horizontal Stack) arranges child elements in a horizontal line.
 
 ## Usage
 
-`VStack` can render anything inside.
+`HStack` can render anything inside.
 
 ```jsx
-import { VStack, Text, View } from '@wordpress/components/ui';
+import {
+	__experimentalHStack as HStack,
+	__experimentalText as Text,
+	__experimentalView as View,
+} from '@wordpress/components';
 
 function Example() {
 	return (
-		<VStack>
+		<HStack>
 			<View>
 				<Text>Code</Text>
 			</View>
@@ -21,7 +27,7 @@ function Example() {
 			<View>
 				<Text>Poetry</Text>
 			</View>
-		</VStack>
+		</HStack>
 	);
 }
 ```
@@ -30,7 +36,7 @@ function Example() {
 
 ##### alignment
 
-**Type**: `HStackAlignment`,`CSS['alignItems']`
+**Type**: `HStackAlignment` | `CSS[ 'alignItems' ]`
 
 Determines how the child elements are aligned.
 
@@ -80,12 +86,19 @@ Determines if children should wrap.
 
 ## Spacer
 
-When a `Spacer` is used within an `VStack`, the `Spacer` adaptively expands to take up the remaining space.
+When a `Spacer` is used within an `HStack`, the `Spacer` adaptively expands to take up the remaining space.
 
 ```jsx
+import {
+	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
+	__experimentalText as Text,
+	__experimentalView as View,
+} from '@wordpress/components';
+
 function Example() {
 	return (
-		<VStack>
+		<HStack>
 			<View>
 				<Text>Code</Text>
 			</View>
@@ -95,17 +108,24 @@ function Example() {
 			<View>
 				<Text>Poetry</Text>
 			</View>
-		</VStack>
+		</HStack>
 	);
 }
 ```
 
-`Spacer` can also be used in-between items to push them apart.
+`Spacer` also be used in-between items to push them apart.
 
 ```jsx
+import {
+	__experimentalHStack as HStack,
+	__experimentalSpacer as Spacer,
+	__experimentalText as Text,
+	__experimentalView as View,
+} from '@wordpress/components';
+
 function Example() {
 	return (
-		<VStack>
+		<HStack>
 			<View>
 				<Text>Code</Text>
 			</View>
@@ -116,7 +136,7 @@ function Example() {
 			<View>
 				<Text>Poetry</Text>
 			</View>
-		</VStack>
+		</HStack>
 	);
 }
 ```

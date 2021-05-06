@@ -39,7 +39,6 @@ function InserterMenu( {
 	insertionIndex,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ searchFormHeight, setSearchFormHeight ] = useState( 0 );
 	// eslint-disable-next-line no-undef
 	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
 
@@ -179,26 +178,22 @@ function InserterMenu( {
 		<BottomSheet
 			isVisible={ true }
 			onClose={ onClose }
-			hideHeader
+			header={
+				showSearchForm && (
+					<InserterSearchForm
+						onChange={ ( value ) => {
+							setFilterValue( value );
+						} }
+						value={ filterValue }
+					/>
+				)
+			}
 			hasNavigation
 			setMinHeightToMaxHeight={ showSearchForm }
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps, safeAreaBottomInset } ) => (
 					<View>
-						{ showSearchForm && (
-							<InserterSearchForm
-								onChange={ ( value ) => {
-									setFilterValue( value );
-								} }
-								value={ filterValue }
-								onLayout={ ( event ) => {
-									const { height } = event.nativeEvent.layout;
-									setSearchFormHeight( height );
-								} }
-							/>
-						) }
-
 						<InserterSearchResults
 							items={ getItems() }
 							onSelect={ ( item ) => {
@@ -208,7 +203,6 @@ function InserterMenu( {
 							{ ...{
 								listProps,
 								safeAreaBottomInset,
-								searchFormHeight,
 							} }
 						/>
 					</View>

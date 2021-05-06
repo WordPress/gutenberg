@@ -3,7 +3,7 @@
  */
 import { Grid } from '../../grid';
 import { Text } from '../../../text';
-import { VStack } from '../../v-stack';
+import { VStack } from '../../../v-stack';
 import { Card, CardBody, CardFooter } from '../index';
 import { Divider } from '../../divider';
 import { Heading } from '../../../heading';

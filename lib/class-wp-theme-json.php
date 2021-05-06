@@ -44,23 +44,22 @@ class WP_Theme_JSON {
 
 	const VALID_STYLES = array(
 		'border'     => array(
-			'radius' => null,
 			'color'  => null,
+			'radius' => null,
 			'style'  => null,
 			'width'  => null,
 		),
 		'color'      => array(
 			'background' => null,
 			'gradient'   => null,
-			'link'       => null,
 			'text'       => null,
 		),
 		'spacing'    => array(
 			'padding' => array(
-				'top'    => null,
-				'right'  => null,
 				'bottom' => null,
 				'left'   => null,
+				'right'  => null,
+				'top'    => null,
 			),
 		),
 		'typography' => array(
@@ -76,36 +75,36 @@ class WP_Theme_JSON {
 
 	const VALID_SETTINGS = array(
 		'border'     => array(
-			'customRadius' => null,
 			'customColor'  => null,
+			'customRadius' => null,
 			'customStyle'  => null,
 			'customWidth'  => null,
 		),
 		'color'      => array(
 			'custom'         => null,
 			'customGradient' => null,
+			'duotone'        => null,
 			'gradients'      => null,
 			'link'           => null,
 			'palette'        => null,
-			'duotone'        => null,
 		),
+		'custom'     => null,
+		'layout'     => null,
 		'spacing'    => array(
 			'customPadding' => null,
 			'units'         => null,
 		),
 		'typography' => array(
 			'customFontSize'        => null,
+			'customFontStyle'       => null,
+			'customFontWeight'      => null,
 			'customLineHeight'      => null,
+			'customTextDecorations' => null,
+			'customTextTransforms'  => null,
 			'dropCap'               => null,
 			'fontFamilies'          => null,
 			'fontSizes'             => null,
-			'customFontStyle'       => null,
-			'customFontWeight'      => null,
-			'customTextDecorations' => null,
-			'customTextTransforms'  => null,
 		),
-		'custom'     => null,
-		'layout'     => null,
 	);
 
 	/**
