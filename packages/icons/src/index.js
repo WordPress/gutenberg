@@ -27,7 +27,6 @@ export { default as capturePhoto } from './library/capture-photo';
 export { default as captureVideo } from './library/capture-video';
 export { default as category } from './library/category';
 export { default as chartBar } from './library/chart-bar';
-export { default as chartLine } from './library/chart-line';
 export { default as check } from './library/check';
 export { default as chevronDown } from './library/chevron-down';
 export { default as chevronLeft } from './library/chevron-left';
