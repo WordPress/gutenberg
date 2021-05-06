@@ -20,7 +20,7 @@ Find the section below based on what you are looking to contribute:
 
 ### Repository Management
 
-The Gutenberg project uses Github for managing code and tracking issues. Please see the following sections for the project methodologies using Github.
+The Gutenberg project uses GitHub for managing code and tracking issues. Please see the following sections for the project methodologies using GitHub.
 
 -   [Issue Management](/docs/contributors/repository-management.md#issues)
 
