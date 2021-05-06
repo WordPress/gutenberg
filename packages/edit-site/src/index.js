@@ -6,7 +6,10 @@ import {
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
 import { render } from '@wordpress/element';
-import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
+import {
+	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+	__experimentalFetchMenuCustomItems as fetchMenuCustomItems,
+} from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -25,6 +28,8 @@ import Editor from './components/editor';
 export function initialize( id, settings ) {
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
+	settings.__experimentalFetchMenuCustomItems = ( search, searchOptions ) =>
+		fetchMenuCustomItems( search, searchOptions, settings );
 	settings.__experimentalSpotlightEntityBlocks = [ 'core/template-part' ];
 
 	registerCoreBlocks();

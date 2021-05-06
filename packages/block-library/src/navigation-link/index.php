@@ -333,8 +333,7 @@ function register_block_core_navigation_link() {
 				'title'       => $item_type['title'],
 				'description' => '',
 				'attributes'  => array(
-					'type'        => $item_type['type'],
-					'suggestions' => apply_filters( 'customize_nav_menu_available_items', array(), $item_type['type'], $item_type['object'] ),
+					'type' => $item_type['type'],
 				),
 			);
 		}

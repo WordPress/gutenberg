@@ -11,7 +11,10 @@ import {
 	__experimentalGetCoreBlocks,
 	__experimentalRegisterExperimentalCoreBlocks,
 } from '@wordpress/block-library';
-import { __experimentalFetchLinkSuggestions as fetchLinkSuggestions } from '@wordpress/core-data';
+import {
+	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+	__experimentalFetchMenuCustomItems as fetchMenuCustomItems,
+} from '@wordpress/core-data';
 import {
 	registerLegacyWidgetBlock,
 	registerLegacyWidgetVariations,
@@ -44,6 +47,8 @@ export function initialize( id, settings ) {
 	registerBlock( widgetArea );
 	settings.__experimentalFetchLinkSuggestions = ( search, searchOptions ) =>
 		fetchLinkSuggestions( search, searchOptions, settings );
+	settings.__experimentalFetchMenuCustomItems = ( search, searchOptions ) =>
+		fetchMenuCustomItems( search, searchOptions, settings );
 	render(
 		<Layout blockEditorSettings={ settings } />,
 		document.getElementById( id )

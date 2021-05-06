@@ -228,7 +228,6 @@ export default function NavigationLinkEdit( {
 		rel,
 		title,
 		kind,
-		suggestions = [],
 	} = attributes;
 	const link = {
 		url,
@@ -243,6 +242,16 @@ export default function NavigationLinkEdit( {
 	const itemLabelPlaceholder = __( 'Add link…' );
 	const ref = useRef();
 
+	const isCustomItemType =
+		! [
+			'post',
+			'page',
+			'category',
+			'tag',
+			'post_format',
+			'custom',
+		].includes( type ) && ! [ 'taxonomy', 'post-type' ].includes( kind );
+
 	const {
 		isAtMaxNesting,
 		isParentOfSelectedBlock,
@@ -252,6 +261,7 @@ export default function NavigationLinkEdit( {
 		numberOfDescendants,
 		userCanCreatePages,
 		userCanCreatePosts,
+		fetchMenuCustomItems,
 	} = useSelect(
 		( select ) => {
 			const {
@@ -259,6 +269,7 @@ export default function NavigationLinkEdit( {
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
 				getBlockParentsByBlockName,
+				getSettings,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -291,6 +302,8 @@ export default function NavigationLinkEdit( {
 					'create',
 					'posts'
 				),
+				fetchMenuCustomItems: getSettings()
+					.__experimentalFetchMenuCustomItems,
 			};
 		},
 		[ clientId ]
@@ -450,19 +463,16 @@ export default function NavigationLinkEdit( {
 			missingText = __( 'Add a link' );
 	}
 
-	const fetchCustomItemTypeSuggestions = ( val ) => {
-		return Promise.resolve(
-			suggestions
-				.filter(
-					( item ) =>
-						val === '' || item.title.match( new RegExp( val, 'i' ) )
-				)
-				.map( ( item ) => ( {
+	const fetchCustomItemTypeSuggestions = ( search ) => {
+		return fetchMenuCustomItems( search, { type } ).then(
+			( customItems ) => {
+				return customItems.map( ( item ) => ( {
 					id: item.id,
 					title: item.title,
 					url: item.url,
 					type: 'URL',
-				} ) )
+				} ) );
+			}
 		);
 	};
 
@@ -587,9 +597,7 @@ export default function NavigationLinkEdit( {
 								value={ link }
 								showInitialSuggestions={ true }
 								withCreateSuggestion={
-									suggestions.length > 0
-										? false
-										: userCanCreate
+									isCustomItemType ? false : userCanCreate
 								}
 								createSuggestion={ handleCreate }
 								createSuggestionButtonText={ ( searchTerm ) => {
@@ -617,7 +625,7 @@ export default function NavigationLinkEdit( {
 									kind
 								) }
 								fetchSuggestions={
-									suggestions.length > 0
+									isCustomItemType
 										? fetchCustomItemTypeSuggestions
 										: null
 								}

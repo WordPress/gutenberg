@@ -47,6 +47,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Menus_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-menus-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Menu_Custom_Items_Controller' ) ) {
+		require_once __DIR__ . '/class-wp-rest-menu-custom-items-controller.php';
+	}
 	if ( ! class_exists( 'WP_REST_Menu_Items_Controller' ) ) {
 		require_once __DIR__ . '/class-wp-rest-menu-items-controller.php';
 	}
