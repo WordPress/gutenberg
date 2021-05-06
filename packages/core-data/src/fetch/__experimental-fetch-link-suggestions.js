@@ -140,7 +140,16 @@ const fetchLinkSuggestions = async (
 					type: 'post-format',
 					subtype,
 				} ),
-			} ).catch( () => [] )
+			} )
+				.then( ( results ) => {
+					return results.map( ( result ) => {
+						return {
+							...result,
+							meta: { kind: 'taxonomy', subtype },
+						};
+					} );
+				} )
+				.catch( () => [] )
 		);
 	}
 

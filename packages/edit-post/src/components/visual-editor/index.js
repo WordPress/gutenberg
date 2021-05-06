@@ -19,17 +19,19 @@ import {
 	__unstableUseTypewriter as useTypewriter,
 	__unstableUseClipboardHandler as useClipboardHandler,
 	__unstableUseTypingObserver as useTypingObserver,
-	__experimentalBlockSettingsMenuFirstItem,
+	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
 	__unstableEditorStyles as EditorStyles,
 	__experimentalUseEditorFeature as useEditorFeature,
 	__experimentalLayoutStyle as LayoutStyle,
+	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
+	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
-import { Popover, Button } from '@wordpress/components';
 import { useRef } from '@wordpress/element';
+import { Popover, Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -39,9 +41,44 @@ import { __ } from '@wordpress/i18n';
 import BlockInspectorButton from './block-inspector-button';
 import { store as editPostStore } from '../../store';
 
-export default function VisualEditor( { styles } ) {
-	const ref = useRef();
+function MaybeIframe( {
+	children,
+	contentRef,
+	isTemplateMode,
+	styles,
+	style,
+} ) {
+	const ref = useMouseMoveTypingReset();
 
+	if ( ! isTemplateMode ) {
+		return (
+			<>
+				<EditorStyles styles={ styles } />
+				<div
+					ref={ contentRef }
+					className="editor-styles-wrapper"
+					style={ { width: '100%', height: '100%', ...style } }
+				>
+					{ children }
+				</div>
+			</>
+		);
+	}
+
+	return (
+		<Iframe
+			headHTML={ window.__editorStyles.html }
+			head={ <EditorStyles styles={ styles } /> }
+			ref={ ref }
+			contentRef={ contentRef }
+			style={ { width: '100%', height: '100%', display: 'block' } }
+		>
+			{ children }
+		</Iframe>
+	);
+}
+
+export default function VisualEditor( { styles } ) {
 	const { deviceType, isTemplateMode } = useSelect( ( select ) => {
 		const {
 			isEditingTemplate,
@@ -60,22 +97,20 @@ export default function VisualEditor( { styles } ) {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().supportsLayout;
 	}, [] );
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 	const { setIsEditingTemplate } = useDispatch( editPostStore );
 	const desktopCanvasStyles = {
 		height: '100%',
 		width: '100%',
 		margin: 0,
-		// Add a constant padding for the typewritter effect. When typing at the
-		// bottom, there needs to be room to scroll up.
-		paddingBottom: hasMetaBoxes ? null : '40vh',
 	};
 	const templateModeStyles = {
 		...desktopCanvasStyles,
-		borderRadius: '2px',
+		borderRadius: '2px 2px 0 0',
 		border: '1px solid #ddd',
-		paddingBottom: null,
+		borderBottom: 0,
 	};
-	const resizedCanvasStyles = useResizeCanvas( deviceType );
+	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
 	const defaultLayout = useEditorFeature( 'layout' );
 	const { contentSize, wideSize } = defaultLayout || {};
 	const alignments =
@@ -90,7 +125,16 @@ export default function VisualEditor( { styles } ) {
 		animatedStyles = resizedCanvasStyles;
 	}
 
-	const mergedRefs = useMergeRefs( [
+	let paddingBottom;
+
+	// Add a constant padding for the typewritter effect. When typing at the
+	// bottom, there needs to be room to scroll up.
+	if ( ! hasMetaBoxes && ! resizedCanvasStyles && ! isTemplateMode ) {
+		paddingBottom = '40vh';
+	}
+
+	const ref = useRef();
+	const contentRef = useMergeRefs( [
 		ref,
 		useClipboardHandler(),
 		useCanvasClickRedirect(),
@@ -101,12 +145,27 @@ export default function VisualEditor( { styles } ) {
 
 	const blockSelectionClearerRef = useBlockSelectionClearer( true );
 
+	// Allow scrolling "through" popovers over the canvas. This is only called
+	// for as long as the pointer is over a popover. Do not use React events
+	// because it will bubble through portals.
+	const toolWrapperRef = useRefEffect( ( node ) => {
+		function onWheel( { deltaX, deltaY } ) {
+			ref.current.scrollBy( deltaX, deltaY );
+		}
+		node.addEventListener( 'wheel', onWheel );
+		return () => {
+			node.removeEventListener( 'wheel', onWheel );
+		};
+	}, [] );
+
 	return (
 		<motion.div
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
 			} ) }
-			animate={ isTemplateMode ? { padding: '48px' } : { padding: 0 } }
+			animate={
+				isTemplateMode ? { padding: '48px 48px 0' } : { padding: 0 }
+			}
 			ref={ blockSelectionClearerRef }
 		>
 			{ themeSupportsLayout && (
@@ -115,58 +174,66 @@ export default function VisualEditor( { styles } ) {
 					layout={ defaultLayout }
 				/>
 			) }
-			<EditorStyles styles={ styles } />
 			<VisualEditorGlobalKeyboardShortcuts />
-			<Popover.Slot name="block-toolbar" />
 			{ isTemplateMode && (
 				<Button
 					className="edit-post-visual-editor__exit-template-mode"
 					icon={ arrowLeft }
-					onClick={ () => setIsEditingTemplate( false ) }
+					onClick={ () => {
+						clearSelectedBlock();
+						setIsEditingTemplate( false );
+					} }
 				>
 					{ __( 'Back' ) }
 				</Button>
 			) }
 			<motion.div
-				ref={ mergedRefs }
-				className="editor-styles-wrapper"
+				ref={ toolWrapperRef }
 				animate={ animatedStyles }
 				initial={ desktopCanvasStyles }
 			>
-				<AnimatePresence>
-					<motion.div
-						key={ isTemplateMode ? 'template' : 'post' }
-						initial={ { opacity: 0 } }
-						animate={ { opacity: 1 } }
-					>
-						<WritingFlow>
-							{ ! isTemplateMode && (
-								<div className="edit-post-visual-editor__post-title-wrapper">
-									<PostTitle />
-								</div>
-							) }
-							<BlockList
-								__experimentalLayout={
-									themeSupportsLayout
-										? {
-												type: 'default',
-												// Find a way to inject this in the support flag code (hooks).
-												alignments: themeSupportsLayout
-													? alignments
-													: undefined,
-										  }
-										: undefined
-								}
-							/>
-						</WritingFlow>
-					</motion.div>
-				</AnimatePresence>
+				<Popover.Slot name="block-toolbar" />
+				<MaybeIframe
+					isTemplateMode={ isTemplateMode }
+					contentRef={ contentRef }
+					styles={ styles }
+					style={ { paddingBottom } }
+				>
+					<AnimatePresence>
+						<motion.div
+							key={ isTemplateMode ? 'template' : 'post' }
+							initial={ { opacity: 0 } }
+							animate={ { opacity: 1 } }
+						>
+							<WritingFlow>
+								{ ! isTemplateMode && (
+									<div className="edit-post-visual-editor__post-title-wrapper">
+										<PostTitle />
+									</div>
+								) }
+								<BlockList
+									__experimentalLayout={
+										themeSupportsLayout
+											? {
+													type: 'default',
+													// Find a way to inject this in the support flag code (hooks).
+													alignments: themeSupportsLayout
+														? alignments
+														: undefined,
+											  }
+											: undefined
+									}
+								/>
+							</WritingFlow>
+						</motion.div>
+					</AnimatePresence>
+				</MaybeIframe>
 			</motion.div>
-			<__experimentalBlockSettingsMenuFirstItem>
+			<__unstableBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
 				) }
-			</__experimentalBlockSettingsMenuFirstItem>
+			</__unstableBlockSettingsMenuFirstItem>
 		</motion.div>
 	);
 }

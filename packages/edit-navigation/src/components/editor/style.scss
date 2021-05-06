@@ -34,6 +34,8 @@
 				opacity: 1;
 				visibility: visible;
 				display: none;
+				right: auto;
+				box-sizing: border-box;
 			}
 
 			// Fix focus outlines.
@@ -47,8 +49,15 @@
 			}
 
 			// Menu items.
-			.wp-block-navigation-link__content {
+			// This needs high specificity to override inherited values.
+			&.wp-block-navigation-link.wp-block-navigation-link {
+				margin-right: 0;
+			}
+
+			.wp-block-navigation-link__content.wp-block-navigation-link__content.wp-block-navigation-link__content {
+				padding: 0.5em 1em;
 				margin-bottom: 6px;
+				margin-right: 0;
 				border-radius: $radius-block-ui;
 
 				&:hover {
@@ -75,6 +84,7 @@
 			background: $gray-100;
 			border-radius: $radius-block-ui;
 			pointer-events: none;
+			margin-right: 0;
 
 			.wp-block-pages-list__item {
 				color: $gray-700;

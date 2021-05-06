@@ -124,6 +124,8 @@ class BottomSheet extends Component {
 		const { duration, easing } = event;
 
 		if ( duration && easing ) {
+			// This layout animation is the same as the React Native's KeyboardAvoidingView component.
+			// Reference: https://github.com/facebook/react-native/blob/266b21baf35e052ff28120f79c06c4f6dddc51a9/Libraries/Components/Keyboard/KeyboardAvoidingView.js#L119-L128
 			const animationConfig = {
 				// We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m
 				duration: duration > 10 ? duration : 10,
@@ -183,11 +185,12 @@ class BottomSheet extends Component {
 			);
 		}
 
+		// 'Will' keyboard events are not available on Android.
+		// Reference: https://reactnative.dev/docs/0.61/keyboard#addlistener
 		this.keyboardShowListener = Keyboard.addListener(
 			Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
 			this.keyboardShow
 		);
-
 		this.keyboardHideListener = Keyboard.addListener(
 			Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
 			this.keyboardHide

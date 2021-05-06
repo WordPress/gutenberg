@@ -1,3 +1,5 @@
+exports.shortButtonText = 'Click Me';
+
 exports.shortText = `Rock music approaches at high velocity.`;
 
 exports.mediumText = `The finer continuum interprets the polynomial rabbit. When can the geology runs? An astronomer runs. Should a communist consent?`;

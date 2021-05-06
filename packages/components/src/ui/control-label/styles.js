@@ -1,17 +1,21 @@
 /**
  * External dependencies
  */
-import { css, getHighDpi, ui } from '@wp-g2/styles';
+import { css } from 'emotion';
 
-const lineHeight = `calc(${ ui.get( 'fontSize' ) } * 1.2)`;
-
-/* eslint-disable jsdoc/valid-types */
 /**
- * @param {Parameters<typeof ui.get>[0]} size The padding size.
+ * Internal dependencies
  */
-/* eslint-enable jsdoc/valid-types */
+import CONFIG from '../../utils/config-values';
+import { getHighDpi } from '../utils/get-high-dpi';
+
+const lineHeight = `calc(${ CONFIG.fontSize } * 1.2)`;
+
+/**
+ * @param {keyof CONFIG} size The padding size.
+ */
 function getPadding( size ) {
-	return `calc((${ ui.get( size ) } - ${ lineHeight }) / 2)`;
+	return `calc((${ CONFIG[ size ] } - ${ lineHeight }) / 2)`;
 }
 
 const highDpiAdjust = getHighDpi`
