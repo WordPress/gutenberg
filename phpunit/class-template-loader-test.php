@@ -115,7 +115,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 	 * Covers https://github.com/WordPress/gutenberg/pull/31123.
 	 */
 	function test_gutenberg_child_theme_php_template_takes_precedence_over_equally_specific_parent_theme_block_template() {
-		register_theme_directory( __DIR__ . '/fixtures/' );
+		register_theme_directory( __DIR__ . '/fixtures/themes/' );
 		switch_theme( 'tt1-blocks-child' );
 
 		$page_slug_template      = 'page-home.php';
