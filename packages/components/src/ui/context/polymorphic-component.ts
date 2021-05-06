@@ -29,7 +29,7 @@ export type PolymorphicComponent< T extends As, O > = {
 	): JSX.Element | null;
 	( props: PolymorphicComponentProps< O, T > ): JSX.Element | null;
 	displayName?: string;
-	selector: string;
+	selector: `.${ string }`;
 };
 
 export type CreatePolymorphicComponent< T extends As, P > = (

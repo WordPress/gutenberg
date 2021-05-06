@@ -24,7 +24,7 @@ import styled from '@emotion/styled';
  */
 // @ts-ignore
 const View = styled.div``;
-View.selector = 'components-view';
+View.selector = '.components-view';
 View.displayName = 'View';
 
 export default View;
