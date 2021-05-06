@@ -13,6 +13,7 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
+	Button,
 	ToggleControl,
 	PanelBody,
 	__experimentalUnitControl as UnitControl,
@@ -82,52 +83,72 @@ function LayoutPanel( { setAttributes, attributes } ) {
 					/>
 				) }
 				{ ! inherit && (
-					<div className="block-editor-hooks__layout-controls">
-						<div className="block-editor-hooks__layout-controls-unit">
-							<UnitControl
-								label={ __( 'Content' ) }
-								labelPosition="top"
-								__unstableInputWidth="80px"
-								value={ contentSize || wideSize || '' }
-								onChange={ ( nextWidth ) => {
-									nextWidth =
-										0 > parseFloat( nextWidth )
-											? '0'
-											: nextWidth;
+					<>
+						<div className="block-editor-hooks__layout-controls">
+							<div className="block-editor-hooks__layout-controls-unit">
+								<UnitControl
+									label={ __( 'Content' ) }
+									labelPosition="top"
+									__unstableInputWidth="80px"
+									value={ contentSize || wideSize || '' }
+									onChange={ ( nextWidth ) => {
+										nextWidth =
+											0 > parseFloat( nextWidth )
+												? '0'
+												: nextWidth;
+										setAttributes( {
+											layout: {
+												...layout,
+												contentSize: nextWidth,
+											},
+										} );
+									} }
+									units={ CSS_UNITS }
+								/>
+								<Icon icon={ positionCenter } />
+							</div>
+							<div className="block-editor-hooks__layout-controls-unit">
+								<UnitControl
+									label={ __( 'Wide' ) }
+									labelPosition="top"
+									__unstableInputWidth="80px"
+									value={ wideSize || contentSize || '' }
+									onChange={ ( nextWidth ) => {
+										nextWidth =
+											0 > parseFloat( nextWidth )
+												? '0'
+												: nextWidth;
+										setAttributes( {
+											layout: {
+												...layout,
+												wideSize: nextWidth,
+											},
+										} );
+									} }
+									units={ CSS_UNITS }
+								/>
+								<Icon icon={ stretchWide } />
+							</div>
+						</div>
+						<div className="block-editor-hooks__layout-controls-reset">
+							<Button
+								isSecondary
+								isSmall
+								disabled={ ! contentSize && ! wideSize }
+								onClick={ () =>
 									setAttributes( {
 										layout: {
-											...layout,
-											contentSize: nextWidth,
+											contentSize: undefined,
+											wideSize: undefined,
+											inherit: false,
 										},
-									} );
-								} }
-								units={ CSS_UNITS }
-							/>
-							<Icon icon={ positionCenter } />
+									} )
+								}
+							>
+								{ __( 'Reset' ) }
+							</Button>
 						</div>
-						<div className="block-editor-hooks__layout-controls-unit">
-							<UnitControl
-								label={ __( 'Wide' ) }
-								labelPosition="top"
-								__unstableInputWidth="80px"
-								value={ wideSize || contentSize || '' }
-								onChange={ ( nextWidth ) => {
-									nextWidth =
-										0 > parseFloat( nextWidth )
-											? '0'
-											: nextWidth;
-									setAttributes( {
-										layout: {
-											...layout,
-											wideSize: nextWidth,
-										},
-									} );
-								} }
-								units={ CSS_UNITS }
-							/>
-							<Icon icon={ stretchWide } />
-						</div>
-					</div>
+					</>
 				) }
 				<p className="block-editor-hooks__layout-controls-helptext">
 					{ __(
