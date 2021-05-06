@@ -326,7 +326,7 @@ function CoverEdit( {
 		url,
 		alt,
 		allowedBlocks,
-		templateLock = false,
+		templateLock,
 	} = attributes;
 	const {
 		gradientClass,
