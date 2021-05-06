@@ -9,12 +9,13 @@ import { compact, uniq } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
-import { external, Icon } from '@wordpress/icons';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
+import { StyledIcon } from './styles/external-link-styles';
 
 export function ExternalLink(
 	{ href, children, className, rel = '', ...additionalProps },
@@ -25,11 +26,11 @@ export function ExternalLink(
 	).join( ' ' );
 	const classes = classnames( 'components-external-link', className );
 	return (
+		/* eslint-disable react/jsx-no-target-blank */
 		<a
 			{ ...additionalProps }
 			className={ classes }
 			href={ href }
-			// eslint-disable-next-line react/jsx-no-target-blank
 			target="_blank"
 			rel={ rel }
 			ref={ ref }
@@ -41,11 +42,12 @@ export function ExternalLink(
 					__( '(opens in a new tab)' )
 				}
 			</VisuallyHidden>
-			<Icon
+			<StyledIcon
 				icon={ external }
 				className="components-external-link__icon"
 			/>
 		</a>
+		/* eslint-enable react/jsx-no-target-blank */
 	);
 }
 

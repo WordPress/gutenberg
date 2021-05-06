@@ -16,7 +16,7 @@ import { map, uniq } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef, useEffect, useState } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
@@ -24,7 +24,6 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 import styles from './style.scss';
 import ColorIndicator from '../color-indicator';
 import { colorsUtils } from '../mobile/color-settings/utils';
-import { performLayoutAnimation } from '../mobile/layout-animation';
 
 const ANIMATION_DURATION = 200;
 
@@ -40,12 +39,26 @@ function ColorPalette( {
 	currentSegment,
 	onCustomPress,
 	shouldEnableBottomSheetScroll,
+	shouldShowCustomIndicatorOption = true,
+	shouldShowCustomLabel = true,
+	shouldShowCustomVerticalSeparator = true,
+	customColorIndicatorStyles,
+	customIndicatorWrapperStyles,
 } ) {
 	const customSwatchGradients = [
-		'linear-gradient(120deg, rgba(255,0,0,.8), 0%, rgba(255,255,255,1) 70.71%)',
-		'linear-gradient(240deg, rgba(0,255,0,.8), 0%, rgba(0,255,0,0) 70.71%)',
-		'linear-gradient(360deg, rgba(0,0,255,.8), 0%, rgba(0,0,255,0) 70.71%)',
+		'linear-gradient(120deg, rgba(255,0,0,.8) 0%, rgba(255,255,255,1) 70.71%)',
+		'linear-gradient(240deg, rgba(0,255,0,.8) 0%, rgba(0,255,0,0) 70.71%)',
+		'linear-gradient(360deg, rgba(0,0,255,.8) 0%, rgba(0,0,255,0) 70.71%)',
 	];
+	const isCustomGradientColor = isGradientColor && isSelectedCustom();
+
+	const [
+		shouldShowCustomIndicator,
+		setShouldShowCustomIndicator,
+	] = useState(
+		shouldShowCustomIndicatorOption &&
+			( ! isGradientSegment || isCustomGradientColor )
+	);
 
 	const scrollViewRef = useRef();
 	const isIOS = Platform.OS === 'ios';
@@ -64,9 +77,17 @@ function ColorPalette( {
 	const customIndicatorColor = isGradientSegment
 		? activeColor
 		: customSwatchGradients;
-	const isCustomGradientColor = isGradientColor && isSelectedCustom();
-	const shouldShowCustomIndicator =
-		! isGradientSegment || isCustomGradientColor;
+
+	useEffect( () => {
+		setShouldShowCustomIndicator(
+			shouldShowCustomIndicatorOption &&
+				( ! isGradientSegment || isCustomGradientColor )
+		);
+	}, [
+		shouldShowCustomIndicatorOption,
+		isGradientSegment,
+		isCustomGradientColor,
+	] );
 
 	const accessibilityHint = isGradientSegment
 		? __( 'Navigates to customize the gradient' )
@@ -84,7 +105,8 @@ function ColorPalette( {
 	}, [ currentSegment ] );
 
 	function isSelectedCustom() {
-		const isWithinColors = activeColor && colors.includes( activeColor );
+		const isWithinColors =
+			activeColor && colors && colors.includes( activeColor );
 		if ( activeColor ) {
 			if ( isGradientSegment ) {
 				return isGradientColor && ! isWithinColors;
@@ -132,7 +154,6 @@ function ColorPalette( {
 			contentWidth - scrollPosition - customIndicatorWidth < width;
 
 		if ( isCustomGradientColor ) {
-			performLayoutAnimation();
 			if ( ! isIOS ) {
 				// Scroll position on Android doesn't adjust automatically when removing the last item from the horizontal list.
 				// https://github.com/facebook/react-native/issues/27504
@@ -184,6 +205,11 @@ function ColorPalette( {
 		styles.customTextDark
 	);
 
+	const customIndicatorWrapperStyle = [
+		styles.customIndicatorWrapper,
+		customIndicatorWrapperStyles,
+	];
+
 	return (
 		<ScrollView
 			contentContainerStyle={ styles.contentContainer }
@@ -202,56 +228,71 @@ function ColorPalette( {
 			{ colors.map( ( color ) => {
 				const scaleValue = isSelected( color ) ? scaleInterpolation : 1;
 				return (
-					<TouchableWithoutFeedback
-						onPress={ () => onColorPress( color ) }
-						key={ `${ color }-${ isSelected( color ) }` }
-						accessibilityRole={ 'button' }
-						accessibilityState={ { selected: isSelected( color ) } }
-						accessibilityHint={ color }
-					>
-						<Animated.View
-							style={ {
-								transform: [
-									{
-										scale: scaleValue,
-									},
-								],
+					<View key={ `${ color }-${ isSelected( color ) }` }>
+						<TouchableWithoutFeedback
+							onPress={ () => onColorPress( color ) }
+							accessibilityRole={ 'button' }
+							accessibilityState={ {
+								selected: isSelected( color ),
 							} }
+							accessibilityHint={ color }
 						>
-							<ColorIndicator
-								color={ color }
-								isSelected={ isSelected( color ) }
-								opacity={ opacity }
-								style={ styles.colorIndicator }
-							/>
-						</Animated.View>
-					</TouchableWithoutFeedback>
+							<Animated.View
+								style={ {
+									transform: [
+										{
+											scale: scaleValue,
+										},
+									],
+								} }
+							>
+								<ColorIndicator
+									color={ color }
+									isSelected={ isSelected( color ) }
+									opacity={ opacity }
+									style={ [
+										styles.colorIndicator,
+										customColorIndicatorStyles,
+									] }
+								/>
+							</Animated.View>
+						</TouchableWithoutFeedback>
+					</View>
 				);
 			} ) }
 			{ shouldShowCustomIndicator && (
 				<View
-					style={ styles.customIndicatorWrapper }
+					style={ customIndicatorWrapperStyle }
 					onLayout={ onCustomIndicatorLayout }
 				>
-					<View style={ verticalSeparatorStyle } />
+					{ shouldShowCustomVerticalSeparator && (
+						<View style={ verticalSeparatorStyle } />
+					) }
 					<TouchableWithoutFeedback
 						onPress={ onCustomPress }
 						accessibilityRole={ 'button' }
-						accessibilityState={ { selected: isSelectedCustom() } }
+						accessibilityState={ {
+							selected: isSelectedCustom(),
+						} }
 						accessibilityHint={ accessibilityHint }
 					>
-						<View style={ styles.customIndicatorWrapper }>
+						<View style={ customIndicatorWrapperStyle }>
 							<ColorIndicator
 								withCustomPicker={ ! isGradientSegment }
 								color={ customIndicatorColor }
 								isSelected={ isSelectedCustom() }
-								style={ styles.colorIndicator }
+								style={ [
+									styles.colorIndicator,
+									customColorIndicatorStyles,
+								] }
 							/>
-							<Text style={ customTextStyle }>
-								{ isIOS
-									? customText
-									: customText.toUpperCase() }
-							</Text>
+							{ shouldShowCustomLabel && (
+								<Text style={ customTextStyle }>
+									{ isIOS
+										? customText
+										: customText.toUpperCase() }
+								</Text>
+							) }
 						</View>
 					</TouchableWithoutFeedback>
 				</View>

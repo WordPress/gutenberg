@@ -1,47 +1,22 @@
 /**
  * Internal dependencies
  */
-import { common as commonEmbeds, others as otherEmbeds } from './core-embeds';
-import { embedContentIcon } from './icons';
-import { getEmbedBlockSettings } from './settings';
+import edit from './edit';
+import save from './save';
+import metadata from './block.json';
 import transforms from './transforms';
+import variations from './variations';
+import deprecated from './deprecated';
+import { embedContentIcon } from './icons';
 
-/**
- * WordPress dependencies
- */
-import { __, _x } from '@wordpress/i18n';
+const { name } = metadata;
+export { metadata, name };
 
-export const name = 'core/embed';
-
-export const settings = getEmbedBlockSettings( {
-	title: _x( 'Embed', 'block title' ),
-	description: __(
-		'Embed videos, images, tweets, audio, and other content from external sources.'
-	),
+export const settings = {
 	icon: embedContentIcon,
-	// Unknown embeds should not be responsive by default.
-	responsive: false,
+	edit,
+	save,
 	transforms,
-} );
-
-export const common = commonEmbeds.map( ( embedDefinition ) => {
-	const embedSettings = getEmbedBlockSettings( embedDefinition.settings );
-	return {
-		...embedDefinition,
-		settings: {
-			...embedSettings,
-			transforms,
-		},
-	};
-} );
-
-export const others = otherEmbeds.map( ( embedDefinition ) => {
-	const embedSettings = getEmbedBlockSettings( embedDefinition.settings );
-	return {
-		...embedDefinition,
-		settings: {
-			...embedSettings,
-			transforms,
-		},
-	};
-} );
+	variations,
+	deprecated,
+};

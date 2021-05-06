@@ -15,22 +15,12 @@ import { SVG } from '@wordpress/primitives';
 import Dashicon from '../dashicon';
 
 function Icon( { icon = null, size, ...additionalProps } ) {
-	// Dashicons should be 20x20 by default.
-	const dashiconSize = size || 20;
-
 	if ( 'string' === typeof icon ) {
-		return (
-			<Dashicon
-				icon={ icon }
-				size={ dashiconSize }
-				{ ...additionalProps }
-			/>
-		);
+		return <Dashicon icon={ icon } { ...additionalProps } />;
 	}
 
 	if ( icon && Dashicon === icon.type ) {
 		return cloneElement( icon, {
-			size: dashiconSize,
 			...additionalProps,
 		} );
 	}

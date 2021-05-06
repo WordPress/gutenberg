@@ -2,8 +2,13 @@
 	flex-direction: row;
 	height: $mobile-block-toolbar-height;
 	align-items: flex-start;
-	margin-left: 2px;
-	margin-right: 2px;
+	margin-left: $block-selected-margin;
+	margin-right: $block-selected-margin;
+}
+
+.toolbarFullWidth {
+	padding-left: $grid-unit-15;
+	padding-right: $grid-unit-15;
 }
 
 .spacer {

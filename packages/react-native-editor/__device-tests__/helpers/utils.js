@@ -1,21 +1,19 @@
 /**
  * External dependencies
  */
-import childProcess from 'child_process';
+const childProcess = require( 'child_process' );
 // eslint-disable-next-line import/no-extraneous-dependencies
-import wd from 'wd';
-import crypto from 'crypto';
-import path from 'path';
-import fs from 'fs';
-
+const wd = require( 'wd' );
+const crypto = require( 'crypto' );
+const path = require( 'path' );
 /**
  * Internal dependencies
  */
-import serverConfigs from './serverConfigs';
-import { iosServer, iosLocal, android } from './caps';
-import AppiumLocal from './appium-local';
+const serverConfigs = require( './serverConfigs' );
+const { iosServer, iosLocal, android } = require( './caps' );
+const AppiumLocal = require( './appium-local' );
 // eslint-disable-next-line import/no-extraneous-dependencies
-import _ from 'underscore';
+const _ = require( 'underscore' );
 
 // Platform setup
 const defaultPlatform = 'android';
@@ -29,7 +27,8 @@ const testEnvironment = process.env.TEST_ENV || defaultEnvironment;
 const defaultAndroidAppPath =
 	'./android/app/build/outputs/apk/debug/app-debug.apk';
 const defaultIOSAppPath =
-	'./ios/build/gutenberg/Build/Products/Release-iphonesimulator/GutenbergDemo.app';
+	'./ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app';
+const webDriverAgentPath = process.env.WDA_PATH || './ios/build/WDA';
 
 const localAndroidAppPath =
 	process.env.ANDROID_APP_PATH || defaultAndroidAppPath;
@@ -37,8 +36,6 @@ const localIOSAppPath = process.env.IOS_APP_PATH || defaultIOSAppPath;
 
 const localAppiumPort = serverConfigs.local.port; // Port to spawn appium process for local runs
 let appiumProcess;
-let iOSScreenRecordingProcess;
-let androidScreenRecordingProcess;
 
 const backspace = '\u0008';
 
@@ -59,118 +56,17 @@ const isLocalEnvironment = () => {
 	return testEnvironment.toLowerCase() === 'local';
 };
 
-const isMacOSEnvironment = () => {
-	return process.platform === 'darwin';
-};
+const getIOSPlatformVersions = () => {
+	const { runtimes = [] } = JSON.parse(
+		childProcess.execSync( 'xcrun simctl list runtimes --json' ).toString()
+	);
 
-const IOS_RECORDINGS_DIR = './ios-screen-recordings';
-const ANDROID_RECORDINGS_DIR = './android-screen-recordings';
-
-const getScreenRecordingFileNameBase = ( testPath, id ) => {
-	const suiteName = path.basename( testPath, '.test.js' );
-	return `${ suiteName }.${ id }`;
-};
-
-jasmine.getEnv().addReporter( {
-	specStarted: ( { testPath, id } ) => {
-		if ( ! isMacOSEnvironment() ) {
-			return;
-		}
-
-		const fileName =
-			getScreenRecordingFileNameBase( testPath, id ) + '.mp4';
-
-		if ( isAndroid() ) {
-			if ( ! fs.existsSync( ANDROID_RECORDINGS_DIR ) ) {
-				fs.mkdirSync( ANDROID_RECORDINGS_DIR );
-			}
-
-			androidScreenRecordingProcess = childProcess.spawn( 'adb', [
-				'shell',
-				'screenrecord',
-				'--verbose',
-				'--bit-rate',
-				'1M',
-				'--size',
-				'720x1280',
-				`/sdcard/${ fileName }`,
-			] );
-
-			androidScreenRecordingProcess.stderr.on( 'data', ( data ) => {
-				// eslint-disable-next-line no-console
-				console.log( `Android screen recording error => ${ data }` );
-			} );
-
-			return;
-		}
-
-		if ( ! fs.existsSync( IOS_RECORDINGS_DIR ) ) {
-			fs.mkdirSync( IOS_RECORDINGS_DIR );
-		}
-
-		iOSScreenRecordingProcess = childProcess.spawn(
-			'xcrun',
-			[
-				'simctl',
-				'io',
-				'booted',
-				'recordVideo',
-				'--mask=black',
-				'--force',
-				fileName,
-			],
-			{
-				cwd: IOS_RECORDINGS_DIR,
-			}
+	return runtimes
+		.reverse()
+		.filter(
+			( { name, isAvailable } ) => name.startsWith( 'iOS' ) && isAvailable
 		);
-	},
-	specDone: ( { testPath, id, status } ) => {
-		if ( ! isMacOSEnvironment() ) {
-			return;
-		}
-
-		const fileNameBase = getScreenRecordingFileNameBase( testPath, id );
-
-		if ( isAndroid() ) {
-			androidScreenRecordingProcess.kill( 'SIGINT' );
-			// wait for kill
-			childProcess.execSync( 'sleep 1' );
-
-			try {
-				childProcess.execSync(
-					`adb pull /sdcard/${ fileNameBase }.mp4 ${ ANDROID_RECORDINGS_DIR }`
-				);
-			} catch ( error ) {
-				// Some (old) Android devices don't support screen recording or
-				// sometimes the initial `should be able to see visual editor`
-				// tests are too fast and a recording is not generated. This is
-				// when `adb pull` can't find the recording file. In these cases
-				// we ignore the errors and keep running the tests.
-				// eslint-disable-next-line no-console
-				console.log(
-					`Android screen recording error => ${ error.stdout }`
-				);
-			}
-
-			const oldPath = `${ ANDROID_RECORDINGS_DIR }/${ fileNameBase }.mp4`;
-			const newPath = `${ ANDROID_RECORDINGS_DIR }/${ fileNameBase }.${ status }.mp4`;
-
-			if ( fs.existsSync( oldPath ) ) {
-				fs.renameSync( oldPath, newPath );
-			}
-			return;
-		}
-
-		iOSScreenRecordingProcess.kill( 'SIGINT' );
-
-		const oldPath = `${ IOS_RECORDINGS_DIR }/${ fileNameBase }.mp4`;
-		const newPath = `${ IOS_RECORDINGS_DIR }/${ fileNameBase }.${ status }.mp4`;
-
-		if ( fs.existsSync( oldPath ) ) {
-			fs.renameSync( oldPath, newPath );
-		}
-	},
-} );
+};
 
 // Initialises the driver and desired capabilities for appium
 const setupDriver = async () => {
@@ -222,7 +118,30 @@ const setupDriver = async () => {
 		desiredCaps.app = `sauce-storage:Gutenberg-${ safeBranchName }.app.zip`; // App should be preloaded to sauce storage, this can also be a URL
 		if ( isLocalEnvironment() ) {
 			desiredCaps = _.clone( iosLocal );
+
+			const iosPlatformVersions = getIOSPlatformVersions();
+			if ( iosPlatformVersions.length === 0 ) {
+				throw new Error(
+					'No iOS simulators available! Please verify that you have iOS simulators installed.'
+				);
+			}
+			// eslint-disable-next-line no-console
+			console.log(
+				'Available iOS platform versions:',
+				iosPlatformVersions.map( ( { name } ) => name )
+			);
+
+			if ( ! desiredCaps.platformVersion ) {
+				desiredCaps.platformVersion = iosPlatformVersions[ 0 ].version;
+
+				// eslint-disable-next-line no-console
+				console.log(
+					`Using iOS ${ desiredCaps.platformVersion } platform version`
+				);
+			}
+
 			desiredCaps.app = path.resolve( localIOSAppPath );
+			desiredCaps.derivedDataPath = path.resolve( webDriverAgentPath );
 		}
 	}
 
@@ -253,7 +172,7 @@ const stopDriver = async ( driver ) => {
 			.createHmac( 'md5', jobID )
 			.update( serverConfigs.sauce.auth )
 			.digest( 'hex' );
-		const jobURL = `https://saucelabs.com/jobs/${ jobID }?auth=${ hash }.`;
+		const jobURL = `https://saucelabs.com/jobs/${ jobID }?auth=${ hash }`;
 		// eslint-disable-next-line no-console
 		console.log( `You can view the video of this test run at ${ jobURL }` );
 	}
@@ -299,13 +218,17 @@ const clearTextBox = async ( driver, element ) => {
 	// We are double tapping on the text field and pressing backspace until all content is removed.
 	do {
 		originalText = await element.text();
-		const action = new wd.TouchAction( driver );
-		action.tap( { el: element, count: 2 } );
-		await action.perform();
+		await doubleTap( driver, element );
 		await element.type( '\b' );
 		text = await element.text();
 		// We compare with the original content and not empty because text always return any hint set on the element.
 	} while ( originalText !== text );
+};
+
+const doubleTap = async ( driver, element ) => {
+	const action = new wd.TouchAction( driver );
+	action.tap( { el: element, count: 2 } );
+	await action.perform();
 };
 
 const typeStringAndroid = async (
@@ -432,7 +355,12 @@ const tapPasteAboveElement = async ( driver, element ) => {
 
 // Starts from the middle of the screen or the element(if specified)
 // and swipes upwards
-const swipeUp = async ( driver, element = undefined ) => {
+const swipeUp = async (
+	driver,
+	element = undefined,
+	delay = 3000,
+	endYCoefficient = 0.5
+) => {
 	let size = await driver.getWindowSize();
 	let y = 0;
 	if ( element !== undefined ) {
@@ -444,18 +372,33 @@ const swipeUp = async ( driver, element = undefined ) => {
 	const startX = size.width / 2;
 	const startY = y + size.height / 3;
 	const endX = startX;
-	const endY = startY + startY * -1 * 0.5;
+	const endY = startY + startY * -1 * endYCoefficient;
 
+	await swipeFromTo(
+		driver,
+		{ x: startX, y: startY },
+		{ x: endX, y: endY },
+		delay
+	);
+};
+
+const defaultCoordinates = { x: 0, y: 0 };
+const swipeFromTo = async (
+	driver,
+	from = defaultCoordinates,
+	to = defaultCoordinates,
+	delay
+) => {
 	const action = await new wd.TouchAction( driver );
-	action.press( { x: startX, y: startY } );
-	action.wait( 3000 );
-	action.moveTo( { x: endX, y: endY } );
+	action.press( from );
+	action.wait( delay );
+	action.moveTo( to );
 	action.release();
 	await action.perform();
 };
 
 // Starts from the middle of the screen and swipes downwards
-const swipeDown = async ( driver ) => {
+const swipeDown = async ( driver, delay = 3000 ) => {
 	const size = await driver.getWindowSize();
 	const y = 0;
 
@@ -464,12 +407,12 @@ const swipeDown = async ( driver ) => {
 	const endX = startX;
 	const endY = startY - startY * -1 * 0.5;
 
-	const action = await new wd.TouchAction( driver );
-	action.press( { x: startX, y: startY } );
-	action.wait( 3000 );
-	action.moveTo( { x: endX, y: endY } );
-	action.release();
-	await action.perform();
+	await swipeFromTo(
+		driver,
+		{ x: startX, y: startY },
+		{ x: endX, y: endY },
+		delay
+	);
 };
 
 const toggleHtmlMode = async ( driver, toggleOn ) => {
@@ -477,14 +420,12 @@ const toggleHtmlMode = async ( driver, toggleOn ) => {
 		// Hit the "Menu" key
 		await driver.pressKeycode( 82 );
 
-		// Go at the end of the popup to hit the "Show html"
-		// TODO: c'mon, find a more robust way to hit that item! :(
-		for ( let i = 0; i < 10; i++ ) {
-			await driver.pressKeycode( 20 );
-		}
-
-		// hit Enter
-		await driver.pressKeycode( 66 );
+		const showHtmlButtonXpath =
+			'/hierarchy/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.FrameLayout/android.widget.LinearLayout/android.widget.FrameLayout/android.widget.ListView/android.widget.TextView[9]';
+		const showHtmlButton = await driver.elementByXPath(
+			showHtmlButtonXpath
+		);
+		await showHtmlButton.click();
 	} else {
 		const menuButton = await driver.elementByAccessibilityId( '...' );
 		await menuButton.click();
@@ -526,7 +467,9 @@ module.exports = {
 	tapPasteAboveElement,
 	swipeDown,
 	swipeUp,
+	swipeFromTo,
 	stopDriver,
 	toggleHtmlMode,
 	toggleOrientation,
+	doubleTap,
 };

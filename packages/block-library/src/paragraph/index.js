@@ -23,10 +23,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Paragraph' ),
-	description: __( 'Start with the building block of all narrative.' ),
 	icon,
-	keywords: [ __( 'text' ) ],
 	example: {
 		attributes: {
 			content: __(

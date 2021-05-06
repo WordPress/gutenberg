@@ -24,7 +24,15 @@ describe( 'Buttons', () => {
 		// Regression: https://github.com/WordPress/gutenberg/pull/19885
 		await insertBlock( 'Buttons' );
 		await pressKeyWithModifier( 'primary', 'k' );
+		await page.waitForFunction(
+			() => !! document.activeElement.closest( '.block-editor-url-input' )
+		);
 		await page.keyboard.press( 'Escape' );
+		await page.waitForFunction(
+			() =>
+				document.activeElement ===
+				document.querySelector( '.block-editor-rich-text__editable' )
+		);
 		await page.keyboard.type( 'WordPress' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

@@ -1,0 +1,62 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`flags warnings with invalid structure css snapshot matches warnings 1`] = `
+Array [
+  Object {
+    "column": 45,
+    "line": 7,
+    "rule": "block-closing-brace-newline-before",
+    "severity": "error",
+    "text": "Expected newline before \\"}\\" (block-closing-brace-newline-before)",
+  },
+  Object {
+    "column": 14,
+    "line": 7,
+    "rule": "block-opening-brace-newline-after",
+    "severity": "error",
+    "text": "Expected newline after \\"{\\" (block-opening-brace-newline-after)",
+  },
+  Object {
+    "column": 32,
+    "line": 7,
+    "rule": "declaration-block-semicolon-newline-after",
+    "severity": "error",
+    "text": "Expected newline after \\";\\" (declaration-block-semicolon-newline-after)",
+  },
+  Object {
+    "column": 12,
+    "line": 1,
+    "rule": "selector-list-comma-newline-after",
+    "severity": "error",
+    "text": "Expected newline after \\",\\" (selector-list-comma-newline-after)",
+  },
+  Object {
+    "column": 25,
+    "line": 1,
+    "rule": "selector-list-comma-newline-after",
+    "severity": "error",
+    "text": "Expected newline after \\",\\" (selector-list-comma-newline-after)",
+  },
+  Object {
+    "column": 3,
+    "line": 4,
+    "rule": "indentation",
+    "severity": "error",
+    "text": "Expected indentation of 0 tabs (indentation)",
+  },
+  Object {
+    "column": 3,
+    "line": 2,
+    "rule": "indentation",
+    "severity": "error",
+    "text": "Expected indentation of 1 tab (indentation)",
+  },
+  Object {
+    "column": 3,
+    "line": 3,
+    "rule": "indentation",
+    "severity": "error",
+    "text": "Expected indentation of 1 tab (indentation)",
+  },
+]
+`;

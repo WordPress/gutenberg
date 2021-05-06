@@ -5,7 +5,6 @@
 		"allowSyntheticDefaultImports": true,
 		"jsx": "preserve",
 		"target": "esnext",
-		"types": ["react", "node", "requestidlecallback"],
 		"module": "esnext",
 		"lib": [ "dom", "esnext" ],
 		"declaration": true,
@@ -16,14 +15,13 @@
 
 		/* Strict Type-Checking Options */
 		"strict": true,
-		"strictNullChecks": true,
-		"noImplicitAny": true,
 
 		/* Additional Checks */
 		"noUnusedLocals": true,
 		"noUnusedParameters": true,
 		"noImplicitReturns": true,
 		"noFallthroughCasesInSwitch": true,
+		"importsNotUsedAsValues": "error",
 
 		/* Module Resolution Options */
 		"moduleResolution": "node",
@@ -32,16 +30,17 @@
 		"esModuleInterop": false,
 		"resolveJsonModule": true,
 
-		"typeRoots": [ "./node_modules/@types" ]
+		"typeRoots": [ "./typings", "./node_modules/@types" ],
+		"types": []
 	},
 	"exclude": [
-		"**/benchmark",
-		"**/test/**",
-		"**/build/**",
-		"**/build-*/**",
 		"**/*.android.js",
 		"**/*.ios.js",
 		"**/*.native.js",
-		"./packages/**/react-native-*/**"
+		"**/benchmark",
+		"packages/*/build-*/**",
+		"packages/*/build/**",
+		"**/test/**",
+		"packages/**/react-native-*/**"
 	]
 }

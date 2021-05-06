@@ -1,11 +1,12 @@
 .components-placeholder.components-placeholder { // This needs specificity to override individual block styles.
+	box-sizing: border-box;
 	position: relative;
 	padding: 1em;
 	min-height: 200px;
 	width: 100%;
 	text-align: left;
 	margin: 0;
-	color: $dark-gray-primary;
+	color: $gray-900;
 
 	// Some editor styles unset this.
 	-moz-font-smoothing: subpixel-antialiased;
@@ -22,7 +23,7 @@
 	// Block UI appearance.
 	border-radius: $radius-block-ui;
 	background-color: $white;
-	box-shadow: inset 0 0 0 $border-width $dark-gray-primary;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
 	outline: 1px solid transparent; // Shown for Windows 10 High Contrast mode.
 
 	.components-base-control__label {
@@ -49,6 +50,11 @@
 	.block-editor-block-icon {
 		fill: currentColor;
 		margin-right: 1ch;
+	}
+
+	// Don't take up space if the label is empty.
+	&:empty {
+		display: none;
 	}
 }
 

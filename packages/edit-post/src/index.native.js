@@ -2,20 +2,16 @@
  * WordPress dependencies
  */
 import '@wordpress/core-data';
-import '@wordpress/block-editor';
-import '@wordpress/viewport';
-import '@wordpress/notices';
-import { registerCoreBlocks } from '@wordpress/block-library';
 import '@wordpress/format-library';
 import { render } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
-import './store';
+export { store } from './store';
 import Editor from './editor';
 
-let blocksRegistered = false;
+let editorInitialized = false;
 
 /**
  * Initializes the Editor and returns a componentProvider
@@ -26,13 +22,11 @@ let blocksRegistered = false;
  * @param {Object}  postId       ID of the post to edit (unused right now)
  */
 export function initializeEditor( id, postType, postId ) {
-	if ( blocksRegistered ) {
+	if ( editorInitialized ) {
 		return;
 	}
 
-	// register and setup blocks
-	registerCoreBlocks();
-	blocksRegistered = true;
+	editorInitialized = true;
 
 	render( <Editor postId={ postId } postType={ postType } />, id );
 }

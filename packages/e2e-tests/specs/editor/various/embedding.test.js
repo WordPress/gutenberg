@@ -171,7 +171,7 @@ describe( 'Embedding content', () => {
 	it( 'should render embeds in the correct state', async () => {
 		// Valid embed. Should render valid figure element.
 		await insertEmbed( 'https://twitter.com/notnownikki' );
-		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+		await page.waitForSelector( 'figure.wp-block-embed' );
 
 		// Valid provider; invalid content. Should render failed, edit state.
 		await insertEmbed( 'https://twitter.com/wooyaygutenberg123454312' );
@@ -197,17 +197,18 @@ describe( 'Embedding content', () => {
 		await insertEmbed(
 			'https://wordpress.org/gutenberg/handbook/block-api/attributes/'
 		);
-		await page.waitForSelector( 'figure.wp-block-embed-wordpress' );
+		await page.waitForSelector( 'figure.wp-block-embed' );
 
 		// Video content. Should render valid figure element, and include the
 		// aspect ratio class.
 		await insertEmbed( 'https://www.youtube.com/watch?v=lXMskKTw3Bc' );
 		await page.waitForSelector(
-			'figure.wp-block-embed-youtube.wp-embed-aspect-16-9'
+			'figure.wp-block-embed.is-type-video.wp-embed-aspect-16-9'
 		);
 
 		// Photo content. Should render valid figure element.
 		await insertEmbed( 'https://cloudup.com/cQFlxqtY4ob' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should allow the user to convert unembeddable URLs to a paragraph with a link in it', async () => {
@@ -229,7 +230,8 @@ describe( 'Embedding content', () => {
 	it( 'should retry embeds that could not be embedded with trailing slashes, without the trailing slashes', async () => {
 		await insertEmbed( 'https://twitter.com/notnownikki/' );
 		// The twitter block should appear correctly.
-		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+		await page.waitForSelector( 'figure.wp-block-embed' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should allow the user to try embedding a failed URL again', async () => {
@@ -256,7 +258,8 @@ describe( 'Embedding content', () => {
 			},
 		] );
 		await clickButton( 'Try again' );
-		await page.waitForSelector( 'figure.wp-block-embed-twitter' );
+		await page.waitForSelector( 'figure.wp-block-embed' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
 	it( 'should switch to the WordPress block correctly', async () => {
@@ -278,6 +281,6 @@ describe( 'Embedding content', () => {
 		await insertEmbed( postUrl );
 
 		// Check the block has become a WordPress block.
-		await page.waitForSelector( '.wp-block-embed-wordpress' );
+		await page.waitForSelector( 'figure.wp-block-embed' );
 	} );
 } );

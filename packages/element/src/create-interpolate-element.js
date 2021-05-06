@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { createElement, cloneElement, Fragment, isValidElement } from 'react';
+import { createElement, cloneElement, Fragment, isValidElement } from './react';
 
 /** @typedef {import('./react').WPElement} WPElement */
 

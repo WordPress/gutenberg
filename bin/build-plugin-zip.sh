@@ -99,7 +99,7 @@ done
 
 # Run the build.
 status "Installing dependencies... 📦"
-npm install
+npm ci
 status "Generating build... 👷‍♀️"
 npm run build
 
@@ -109,7 +109,14 @@ npm run build
 php bin/generate-gutenberg-php.php > gutenberg.tmp.php
 mv gutenberg.tmp.php gutenberg.php
 
-build_files=$(ls build/*/*.{js,css,asset.php} build/block-library/blocks/*.php build/block-library/blocks/*/block.json)
+build_files=$(
+	ls build/*/*.{js,css,asset.php} \
+	build/block-library/blocks/*.php \
+	build/block-library/blocks/*/block.json \
+	build/block-library/blocks/*/*.css \
+	build/edit-widgets/blocks/*/block.json \
+)
+
 
 # Generate the plugin zip file.
 status "Creating archive... 🎁"

@@ -5,10 +5,7 @@ export * from './autocompleters';
 export { default as AutosaveMonitor } from './autosave-monitor';
 export { default as DocumentOutline } from './document-outline';
 export { default as DocumentOutlineCheck } from './document-outline/check';
-export {
-	default as VisualEditorGlobalKeyboardShortcuts,
-	EditorGlobalKeyboardShortcuts,
-} from './global-keyboard-shortcuts/visual-editor-shortcuts';
+export { default as VisualEditorGlobalKeyboardShortcuts } from './global-keyboard-shortcuts/visual-editor-shortcuts';
 export { default as TextEditorGlobalKeyboardShortcuts } from './global-keyboard-shortcuts/text-editor-shortcuts';
 export { default as EditorKeyboardShortcutsRegister } from './global-keyboard-shortcuts/register-shortcuts';
 export { default as EditorHistoryRedo } from './editor-history/redo';
@@ -20,7 +17,7 @@ export { default as LocalAutosaveMonitor } from './local-autosave-monitor';
 export { default as PageAttributesCheck } from './page-attributes/check';
 export { default as PageAttributesOrder } from './page-attributes/order';
 export { default as PageAttributesParent } from './page-attributes/parent';
-export { default as PageTemplate } from './page-attributes/template';
+export { default as PageTemplate } from './post-template';
 export { default as PostAuthor } from './post-author';
 export { default as PostAuthorCheck } from './post-author/check';
 export { default as PostComments } from './post-comments';

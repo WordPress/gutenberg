@@ -1,64 +1,87 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill } from '@wordpress/components';
-import {
-	ComplementaryArea,
-	ComplementaryAreaMoreMenuItem,
-} from '@wordpress/interface';
+import { createSlotFill, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { cog, pencil } from '@wordpress/icons';
-import { Platform } from '@wordpress/element';
+import { cog, typography } from '@wordpress/icons';
+import { useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import DefaultSidebar from './default-sidebar';
+import GlobalStylesSidebar from './global-styles-sidebar';
+import { STORE_NAME } from '../../store/constants';
+import SettingsHeader from './settings-header';
+import TemplateCard from './template-card';
+import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
 );
 export const SidebarInspectorFill = InspectorFill;
-const BLOCK_INSPECTOR_ACTIVE_BY_DEFAULT = Platform.select( {
-	web: true,
-	native: false,
-} );
-
-const DefaultSidebar = ( { identifier, title, icon, children } ) => {
-	return (
-		<>
-			<ComplementaryArea
-				scope="core/edit-site"
-				identifier={ identifier }
-				title={ title }
-				icon={ icon }
-			>
-				{ children }
-			</ComplementaryArea>
-			<ComplementaryAreaMoreMenuItem
-				scope="core/edit-site"
-				identifier={ identifier }
-				icon={ icon }
-			>
-				{ title }
-			</ComplementaryAreaMoreMenuItem>
-		</>
-	);
-};
 
 export function SidebarComplementaryAreaFills() {
+	const { sidebar, isEditorSidebarOpened, hasBlockSelection } = useSelect(
+		( select ) => {
+			const _sidebar = select(
+				interfaceStore
+			).getActiveComplementaryArea( STORE_NAME );
+			const _isEditorSidebarOpened = [
+				SIDEBAR_BLOCK,
+				SIDEBAR_TEMPLATE,
+			].includes( _sidebar );
+			return {
+				sidebar: _sidebar,
+				isEditorSidebarOpened: _isEditorSidebarOpened,
+				hasBlockSelection: !! select(
+					blockEditorStore
+				).getBlockSelectionStart(),
+			};
+		},
+		[]
+	);
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	useEffect( () => {
+		if ( ! isEditorSidebarOpened ) return;
+		if ( hasBlockSelection ) {
+			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+		} else {
+			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
+		}
+	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+	let sidebarName = sidebar;
+	if ( ! isEditorSidebarOpened ) {
+		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
+	}
 	return (
 		<>
 			<DefaultSidebar
-				identifier="edit-site/block-inspector"
-				title={ __( 'Block Inspector' ) }
+				identifier={ sidebarName }
+				title={ __( 'Settings' ) }
 				icon={ cog }
-				isActiveByDefault={ BLOCK_INSPECTOR_ACTIVE_BY_DEFAULT }
+				closeLabel={ __( 'Close settings sidebar' ) }
+				header={ <SettingsHeader sidebarName={ sidebarName } /> }
+				headerClassName="edit-site-sidebar__panel-tabs"
 			>
-				<InspectorSlot bubblesVirtually />
+				{ sidebarName === SIDEBAR_TEMPLATE && (
+					<PanelBody>
+						<TemplateCard />
+					</PanelBody>
+				) }
+				{ sidebarName === SIDEBAR_BLOCK && (
+					<InspectorSlot bubblesVirtually />
+				) }
 			</DefaultSidebar>
-			<DefaultSidebar
+			<GlobalStylesSidebar
 				identifier="edit-site/global-styles"
 				title={ __( 'Global Styles' ) }
-				icon={ pencil }
-			>
-				<p>Global Styles area</p>
-			</DefaultSidebar>
+				closeLabel={ __( 'Close global styles sidebar' ) }
+				icon={ typography }
+			/>
 		</>
 	);
 }

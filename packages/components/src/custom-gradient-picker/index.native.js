@@ -13,8 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { colorsUtils } from '../mobile/color-settings/utils';
-import { performLayoutAnimation } from '../mobile/layout-animation';
-import { getGradientParsed } from './utils';
+import { getGradientAstWithDefault } from './utils';
 import { serializeGradient } from './serializer';
 import {
 	DEFAULT_LINEAR_GRADIENT_ANGLE,
@@ -22,14 +21,16 @@ import {
 } from './constants';
 import styles from './style.scss';
 
-function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
+function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
 	const [ gradientOrientation, setGradientOrientation ] = useState(
 		HORIZONTAL_GRADIENT_ORIENTATION
 	);
 
+	const [ currentColor, setCurrentColor ] = useState( currentValue );
+
 	const { getGradientType, gradients, gradientOptions } = colorsUtils;
-	const { gradientAST } = getGradientParsed( currentValue );
-	const gradientType = getGradientType( currentValue );
+	const gradientAST = getGradientAstWithDefault( currentColor );
+	const gradientType = getGradientType( currentColor );
 
 	function isLinearGradient( type ) {
 		return type === gradients.linear;
@@ -62,7 +63,7 @@ function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 
 	function onGradientTypeChange( type ) {
 		const gradientColor = getGradientColor( type );
-		performLayoutAnimation();
+		setCurrentColor( gradientColor );
 		setColor( gradientColor );
 	}
 
@@ -75,7 +76,8 @@ function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 			},
 		} );
 
-		if ( isGradientColor && gradientColor !== currentValue ) {
+		if ( isGradientColor && gradientColor !== currentColor ) {
+			setCurrentColor( gradientColor );
 			setColor( gradientColor );
 		}
 	}
@@ -87,7 +89,6 @@ function CustomGradientPicker( { currentValue, setColor, isGradientColor } ) {
 			DEFAULT_LINEAR_GRADIENT_ANGLE
 		);
 	}
-
 	return (
 		<>
 			<PanelBody title={ __( 'Gradient Type' ) }>

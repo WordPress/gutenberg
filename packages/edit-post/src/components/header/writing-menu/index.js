@@ -4,6 +4,7 @@
 import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -40,6 +41,7 @@ function WritingMenu() {
 				info={ __( 'Work without distraction' ) }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
 				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
+				shortcut={ displayShortcut.secondary( 'f' ) }
 			/>
 		</MenuGroup>
 	);

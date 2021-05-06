@@ -26,6 +26,7 @@ export default function MenuItemsChoice( {
 				key={ item.value }
 				role="menuitemradio"
 				icon={ isSelected && check }
+				info={ item.info }
 				isSelected={ isSelected }
 				shortcut={ item.shortcut }
 				className="components-menu-items-choice"
@@ -36,6 +37,7 @@ export default function MenuItemsChoice( {
 				} }
 				onMouseEnter={ () => onHover( item.value ) }
 				onMouseLeave={ () => onHover( null ) }
+				aria-label={ item[ 'aria-label' ] }
 			>
 				{ item.label }
 			</MenuItem>

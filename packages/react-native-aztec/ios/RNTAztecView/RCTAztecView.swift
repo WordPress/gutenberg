@@ -6,6 +6,7 @@ import UIKit
 class RCTAztecView: Aztec.TextView {
     @objc var onBackspace: RCTBubblingEventBlock? = nil
     @objc var onChange: RCTBubblingEventBlock? = nil
+    @objc var onKeyDown: RCTBubblingEventBlock? = nil
     @objc var onEnter: RCTBubblingEventBlock? = nil
     @objc var onFocus: RCTBubblingEventBlock? = nil
     @objc var onBlur: RCTBubblingEventBlock? = nil
@@ -14,6 +15,7 @@ class RCTAztecView: Aztec.TextView {
     @objc var onSelectionChange: RCTBubblingEventBlock? = nil
     @objc var minWidth: CGFloat = 0
     @objc var maxWidth: CGFloat = 0
+    @objc var triggerKeyCodes: NSArray?
 
     @objc var activeFormats: NSSet? = nil {
         didSet {
@@ -132,7 +134,8 @@ class RCTAztecView: Aztec.TextView {
         delegate = self
         textContainerInset = .zero
         contentInset = .zero
-        textContainer.lineFragmentPadding = 0        
+        textContainer.lineFragmentPadding = 0
+        frame.size = .zero
         addPlaceholder()
         textDragInteraction?.isEnabled = false
         storage.htmlConverter.characterToReplaceLastEmptyLine = Character(.zeroWidthSpace)
@@ -193,6 +196,14 @@ class RCTAztecView: Aztec.TextView {
             // This fixes the position of the label after "fixing" (partially) the constraints.
             placeholderHorizontalConstraint.constant = leftTextInsetInRTLLayout
         }
+    }
+
+    override func sizeThatFits(_ size: CGSize) -> CGSize {
+        // Set the Placeholder height as the minimum TextView height.
+        let minimumHeight = placeholderLabel.frame.height
+        let fittingSize = super.sizeThatFits(size)
+        let height = max(fittingSize.height, minimumHeight)
+        return CGSize(width: fittingSize.width, height: height)
     }
 
     func updateContentSizeInRN() {
@@ -308,6 +319,8 @@ class RCTAztecView: Aztec.TextView {
             return
         }
 
+        interceptTriggersKeyCodes(text)
+
         super.insertText(text)
         updatePlaceholderVisibility()
     }
@@ -342,12 +355,13 @@ class RCTAztecView: Aztec.TextView {
         }
 
         guard text == "\n",
-            let onEnter = onEnter else {
+            let onKeyDown = onKeyDown else {
                 return false
         }
 
-        let caretData = packCaretDataForRN()
-        onEnter(caretData)
+        var eventData = packCaretDataForRN()
+        eventData = add(keyTrigger: "\r", to: eventData)
+        onKeyDown(eventData)
         return true
     }
 
@@ -356,17 +370,42 @@ class RCTAztecView: Aztec.TextView {
             || (selectedRange.location == 0 && selectedRange.length == 0)
             || text.count == 1 // send backspace event when cleaning all characters
             || selectedRange == NSRange(location: 0, length: textStorage.length), // send backspace event when deleting all the text
-            let onBackspace = onBackspace else {
+            let onKeyDown = onKeyDown else {
                 return false
         }
         var range = selectedRange
         if text.count == 1 {
             range = NSRange(location: 0, length: textStorage.length)
         }
-        let caretData = packCaretDataForRN(overrideRange: range)
+        var caretData = packCaretDataForRN(overrideRange: range)
         onSelectionChange?(caretData)
-        onBackspace(caretData)
+        let backSpaceKeyCode:UInt8 = 8
+        caretData = add(keyCode: backSpaceKeyCode, to: caretData)
+        onKeyDown(caretData)
         return true
+    }
+
+    private func interceptTriggersKeyCodes(_ text: String) {
+        guard let keyCodes = triggerKeyCodes,
+            keyCodes.count > 0,
+            let onKeyDown = onKeyDown,
+            text.count == 1
+        else {
+            return
+        }
+        for value in keyCodes {
+            guard let keyString = value as? String,
+                let keyCode = keyString.first?.asciiValue,
+                text.contains(keyString)
+            else {
+                continue
+            }
+
+            var eventData = [AnyHashable:Any]()
+            eventData = add(keyCode: keyCode, to: eventData)
+            onKeyDown(eventData)
+            return
+        }
     }
 
     private func isNewLineBeforeSelectionAndNotEndOfContent() -> Bool {
@@ -429,10 +468,28 @@ class RCTAztecView: Aztec.TextView {
         return result
     }
 
+    func add(keyTrigger: String, to pack:[AnyHashable: Any]) -> [AnyHashable: Any] {
+        guard let keyCode = keyTrigger.first?.asciiValue else {
+            return pack
+        }
+        return add(keyCode: keyCode, to: pack)
+    }
+
+    func add(keyCode: UInt8, to pack:[AnyHashable: Any]) -> [AnyHashable: Any] {
+        var result = pack
+        result["keyCode"] = keyCode
+        return result
+    }
+
     // MARK: - RN Properties
 
     @objc
     func setContents(_ contents: NSDictionary) {
+
+        if let hexString = contents["linkTextColor"] as? String, let linkColor = UIColor(hexString: hexString), linkTextColor != linkColor {
+            linkTextColor = linkColor
+        }
+
         guard contents["eventCount"] == nil else {
             return
         }
@@ -493,9 +550,11 @@ class RCTAztecView: Aztec.TextView {
         }
     }
 
-    @objc var linkTextColor: UIColor {
+    var linkTextColor: UIColor {
         set {
-            linkTextAttributes = [.foregroundColor: newValue, .underlineStyle: NSNumber(value: NSUnderlineStyle.single.rawValue)]
+            let shadow = NSShadow()
+            shadow.shadowColor = newValue
+            linkTextAttributes = [.foregroundColor: newValue, .underlineStyle: NSNumber(value: NSUnderlineStyle.single.rawValue), .shadow: shadow]
         }
         get {
             return linkTextAttributes[.foregroundColor] as? UIColor ?? UIColor.blue

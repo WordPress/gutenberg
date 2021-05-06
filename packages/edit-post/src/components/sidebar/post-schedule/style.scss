@@ -1,8 +1,20 @@
 .edit-post-post-schedule {
 	width: 100%;
 	position: relative;
+	justify-content: left;
+
+	span {
+		display: block;
+		width: 45%;
+	}
 }
 
 .components-button.edit-post-post-schedule__toggle {
 	text-align: right;
+}
+
+// Zero out a blanket padding that is set on the popover component.
+// The datetime component has its own padding.
+.edit-post-post-schedule__dialog .components-popover__content > div {
+	padding: 0;
 }

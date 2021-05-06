@@ -1,36 +1,69 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
-	__experimentalAlignmentHookSettingsProvider as AlignmentHookSettingsProvider,
-	InnerBlocks,
-	__experimentalBlock as Block,
+	BlockControls,
+	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	JustifyContentControl,
 } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { name as buttonBlockName } from '../button/';
+import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
 
-// Inside buttons block alignment options are not supported.
-const alignmentHooksSetting = {
-	isEmbedButton: true,
-};
+function ButtonsEdit( {
+	attributes: { contentJustification, orientation },
+	setAttributes,
+} ) {
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `is-content-justification-${ contentJustification }` ]: contentJustification,
+			'is-vertical': orientation === 'vertical',
+		} ),
+	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		template: BUTTONS_TEMPLATE,
+		orientation,
+		__experimentalLayout: {
+			type: 'default',
+			alignments: [],
+		},
+		templateInsertUpdatesSelection: true,
+	} );
 
-function ButtonsEdit() {
+	const justifyControls =
+		orientation === 'vertical'
+			? [ 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right', 'space-between' ];
+
 	return (
-		<Block.div>
-			<AlignmentHookSettingsProvider value={ alignmentHooksSetting }>
-				<InnerBlocks
-					allowedBlocks={ ALLOWED_BLOCKS }
-					template={ BUTTONS_TEMPLATE }
-					__experimentalMoverDirection="horizontal"
+		<>
+			<BlockControls group="block">
+				<JustifyContentControl
+					allowedControls={ justifyControls }
+					value={ contentJustification }
+					onChange={ ( value ) =>
+						setAttributes( { contentJustification: value } )
+					}
+					popoverProps={ {
+						position: 'bottom right',
+						isAlternate: true,
+					} }
 				/>
-			</AlignmentHookSettingsProvider>
-		</Block.div>
+			</BlockControls>
+			<div { ...innerBlocksProps } />
+		</>
 	);
 }
 

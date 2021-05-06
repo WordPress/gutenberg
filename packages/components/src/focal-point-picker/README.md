@@ -9,35 +9,37 @@ Corresponding CSS: `background-position: 50% 10%;`
 
 ```jsx
 import { FocalPointPicker } from '@wordpress/components';
+import { useState } from '@wordpress/element';
 
-const MyFocalPointPicker = withState( {
-	focalPoint: {
+const Example = () => {
+	const [ focalPoint, setFocalPoint ] = useState( {
 		x: 0.5,
-		y: 0.5
-	},
-} )( ( { focalPoint, setState } ) => { 
+		y: 0.5,
+	} );
+
 	const url = '/path/to/image';
 	const dimensions = {
 		width: 400,
-		height: 100
+		height: 100,
 	};
-	return ( 
-		<FocalPointPicker 
-			url={ url }
-			dimensions={ dimensions }
-			value={ focalPoint }
-			onChange={ ( focalPoint ) => setState( { focalPoint } ) } 
-		/>
-	) 
-} );
 
-/* Example function to render the CSS styles based on Focal Point Picker value */
-const renderImageContainerWithFocalPoint = ( url, focalPoint ) => {
+	/* Example function to render the CSS styles based on Focal Point Picker value */
 	const style = {
-		backgroundImage: `url(${ url })` ,
-		backgroundPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`
-	}
-	return <div style={ style } />;
+		backgroundImage: `url(${ url })`,
+		backgroundPosition: `${ focalPoint.x * 100 }% ${ focalPoint.y * 100 }%`,
+	};
+
+	return (
+		<>
+			<FocalPointPicker
+				url={ url }
+				dimensions={ dimensions }
+				value={ focalPoint }
+				onChange={ ( focalPoint ) => setFocalPoint( { focalPoint } ) }
+			/>
+			<div style={ style } />
+		</>
+	);
 };
 ```
 
@@ -45,24 +47,50 @@ const renderImageContainerWithFocalPoint = ( url, focalPoint ) => {
 
 ### `url`
 
-- Type: `Text`
-- Required: Yes
-- Description: URL of the image to be displayed
+-   Type: `Text`
+-   Required: Yes
 
-### `dimensions`
+URL of the image or video to be displayed
 
-- Type: `Object`
-- Required: Yes
-- Description: An object describing the height and width of the image. Requires two paramaters: `height`, `width`.
+### `autoPlay`
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `true`
+
+Autoplays HTML5 video. This only applies to video sources (`url`).
 
 ### `value`
 
-- Type: `Object`
-- Required: Yes
-- Description: The focal point. Should be an object containing `x` and `y` params.
+-   Type: `Object`
+-   Required: Yes
+
+The focal point. Should be an object containing `x` and `y` params.
 
 ### `onChange`
 
-- Type: `Function`
-- Required: Yes
-- Description: Callback which is called when the focal point changes. 
+-   Type: `Function`
+-   Required: Yes
+
+Callback which is called when the focal point changes.
+
+### `onDrag`
+
+-   Type: `Function`
+-   Required: No
+
+Callback which is called repetitively during drag operations.
+
+### `onDragEnd`
+
+-   Type: `Function`
+-   Required: No
+
+Callback which is called at the end of drag operations.
+
+### `onDragStart`
+
+-   Type: `Function`
+-   Required: No
+
+Callback which is called at the start of drag operations.

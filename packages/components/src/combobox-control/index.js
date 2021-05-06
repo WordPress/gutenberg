@@ -1,126 +1,256 @@
 /**
  * External dependencies
  */
-import { useCombobox } from 'downshift';
 import classnames from 'classnames';
+import { noop, deburr } from 'lodash';
+/**
+ * WordPress dependencies
+ */
+import { __, _n, sprintf } from '@wordpress/i18n';
+import {
+	Component,
+	useState,
+	useMemo,
+	useRef,
+	useEffect,
+} from '@wordpress/element';
+import { useInstanceId } from '@wordpress/compose';
+import { ENTER, UP, DOWN, ESCAPE } from '@wordpress/keycodes';
+import { speak } from '@wordpress/a11y';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import { Button, Dashicon } from '../';
+import TokenInput from '../form-token-field/token-input';
+import SuggestionsList from '../form-token-field/suggestions-list';
+import BaseControl from '../base-control';
+import Button from '../button';
+import { Flex, FlexBlock, FlexItem } from '../flex';
+import withFocusOutside from '../higher-order/with-focus-outside';
 
-const itemToString = ( item ) => item && item.name;
-export default function ComboboxControl( {
-	className,
-	hideLabelFromVision,
-	label,
-	options: items,
-	onInputValueChange: onInputValueChange,
-	onChange: onSelectedItemChange,
-	value: _selectedItem,
-} ) {
-	const {
-		getLabelProps,
-		getToggleButtonProps,
-		getComboboxProps,
-		getInputProps,
-		getMenuProps,
-		getItemProps,
-		isOpen,
-		highlightedIndex,
-		selectedItem,
-	} = useCombobox( {
-		initialSelectedItem: items[ 0 ],
-		items,
-		itemToString,
-		onInputValueChange,
-		onSelectedItemChange,
-		selectedItem: _selectedItem,
-	} );
-	const menuProps = getMenuProps( {
-		className: 'components-combobox-control__menu',
-	} );
-	// We need this here, because the null active descendant is not
-	// fully ARIA compliant.
-	if (
-		menuProps[ 'aria-activedescendant' ] &&
-		menuProps[ 'aria-activedescendant' ].slice(
-			0,
-			'downshift-null'.length
-		) === 'downshift-null'
-	) {
-		delete menuProps[ 'aria-activedescendant' ];
+const DetectOutside = withFocusOutside(
+	class extends Component {
+		handleFocusOutside( event ) {
+			this.props.onFocusOutside( event );
+		}
+
+		render() {
+			return this.props.children;
+		}
 	}
+);
+
+function ComboboxControl( {
+	value,
+	label,
+	options,
+	onChange,
+	onFilterValueChange = noop,
+	hideLabelFromVision,
+	help,
+	allowReset = true,
+	className,
+	messages = {
+		selected: __( 'Item selected.' ),
+	},
+} ) {
+	const instanceId = useInstanceId( ComboboxControl );
+	const [ selectedSuggestion, setSelectedSuggestion ] = useState( null );
+	const [ isExpanded, setIsExpanded ] = useState( false );
+	const [ inputValue, setInputValue ] = useState( '' );
+	const inputContainer = useRef();
+	const currentOption = options.find( ( option ) => option.value === value );
+	const currentLabel = currentOption?.label ?? '';
+
+	const matchingSuggestions = useMemo( () => {
+		const startsWithMatch = [];
+		const containsMatch = [];
+		const match = deburr( inputValue.toLocaleLowerCase() );
+		options.forEach( ( option ) => {
+			const index = deburr( option.label )
+				.toLocaleLowerCase()
+				.indexOf( match );
+			if ( index === 0 ) {
+				startsWithMatch.push( option );
+			} else if ( index > 0 ) {
+				containsMatch.push( option );
+			}
+		} );
+
+		return startsWithMatch.concat( containsMatch );
+	}, [ inputValue, options, value ] );
+
+	const onSuggestionSelected = ( newSelectedSuggestion ) => {
+		onChange( newSelectedSuggestion.value );
+		speak( messages.selected, 'assertive' );
+		setSelectedSuggestion( newSelectedSuggestion );
+		setInputValue( '' );
+		setIsExpanded( false );
+	};
+
+	const handleArrowNavigation = ( offset = 1 ) => {
+		const index = matchingSuggestions.indexOf( selectedSuggestion );
+		let nextIndex = index + offset;
+		if ( nextIndex < 0 ) {
+			nextIndex = matchingSuggestions.length - 1;
+		} else if ( nextIndex >= matchingSuggestions.length ) {
+			nextIndex = 0;
+		}
+		setSelectedSuggestion( matchingSuggestions[ nextIndex ] );
+		setIsExpanded( true );
+	};
+
+	const onKeyDown = ( event ) => {
+		let preventDefault = false;
+
+		switch ( event.keyCode ) {
+			case ENTER:
+				if ( selectedSuggestion ) {
+					onSuggestionSelected( selectedSuggestion );
+					preventDefault = true;
+				}
+				break;
+			case UP:
+				handleArrowNavigation( -1 );
+				preventDefault = true;
+				break;
+			case DOWN:
+				handleArrowNavigation( 1 );
+				preventDefault = true;
+				break;
+			case ESCAPE:
+				setIsExpanded( false );
+				setSelectedSuggestion( null );
+				preventDefault = true;
+				event.stopPropagation();
+				break;
+			default:
+				break;
+		}
+
+		if ( preventDefault ) {
+			event.preventDefault();
+		}
+	};
+
+	const onFocus = () => {
+		setIsExpanded( true );
+		onFilterValueChange( '' );
+		setInputValue( '' );
+	};
+
+	const onFocusOutside = () => {
+		setIsExpanded( false );
+	};
+
+	const onInputChange = ( event ) => {
+		const text = event.value;
+		setInputValue( text );
+		onFilterValueChange( text );
+		setIsExpanded( true );
+	};
+
+	const handleOnReset = () => {
+		onChange( null );
+		inputContainer.current.input.focus();
+	};
+
+	// Announcements
+	useEffect( () => {
+		const hasMatchingSuggestions = matchingSuggestions.length > 0;
+		if ( isExpanded ) {
+			const message = hasMatchingSuggestions
+				? sprintf(
+						/* translators: %d: number of results. */
+						_n(
+							'%d result found, use up and down arrow keys to navigate.',
+							'%d results found, use up and down arrow keys to navigate.',
+							matchingSuggestions.length
+						),
+						matchingSuggestions.length
+				  )
+				: __( 'No results.' );
+
+			speak( message, 'polite' );
+		}
+	}, [ matchingSuggestions, isExpanded ] );
+
+	// Disable reason: There is no appropriate role which describes the
+	// input container intended accessible usability.
+	// TODO: Refactor click detection to use blur to stop propagation.
+	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div
-			className={ classnames( 'components-combobox-control', className ) }
-		>
-			{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control, jsx-a11y/label-has-for */ }
-			<label
-				{ ...getLabelProps( {
-					className: classnames(
-						'components-combobox-control__label',
-						{
-							'screen-reader-text': hideLabelFromVision,
-						}
-					),
-				} ) }
+		<DetectOutside onFocusOutside={ onFocusOutside }>
+			<BaseControl
+				className={ classnames(
+					className,
+					'components-combobox-control'
+				) }
+				tabIndex="-1"
+				label={ label }
+				id={ `components-form-token-input-${ instanceId }` }
+				hideLabelFromVision={ hideLabelFromVision }
+				help={ help }
 			>
-				{ label }
-			</label>
-			<div
-				{ ...getComboboxProps( {
-					className: 'components-combobox-control__button',
-				} ) }
-			>
-				<input
-					{ ...getInputProps( {
-						className: 'components-combobox-control__button-input',
-					} ) }
-				/>
-				<Button
-					{ ...getToggleButtonProps( {
-						// This is needed because some speech recognition software don't support `aria-labelledby`.
-						'aria-label': label,
-						'aria-labelledby': undefined,
-						className: 'components-combobox-control__button-button',
-					} ) }
+				<div
+					className="components-combobox-control__suggestions-container"
+					tabIndex="-1"
+					onKeyDown={ onKeyDown }
 				>
-					<Dashicon
-						icon="arrow-down-alt2"
-						className="components-combobox-control__button-icon"
-					/>
-				</Button>
-			</div>
-			<ul { ...menuProps }>
-				{ isOpen &&
-					items.map( ( item, index ) => (
-						// eslint-disable-next-line react/jsx-key
-						<li
-							{ ...getItemProps( {
-								item,
-								index,
-								key: item.key,
-								className: classnames(
-									'components-combobox-control__item',
-									{
-										'is-highlighted':
-											index === highlightedIndex,
-									}
-								),
-								style: item.style,
-							} ) }
-						>
-							{ item === selectedItem && (
-								<Dashicon
-									icon="saved"
-									className="components-combobox-control__item-icon"
+					<Flex>
+						<FlexBlock>
+							<TokenInput
+								className="components-combobox-control__input"
+								instanceId={ instanceId }
+								ref={ inputContainer }
+								value={ isExpanded ? inputValue : currentLabel }
+								aria-label={
+									currentLabel
+										? `${ currentLabel }, ${ label }`
+										: null
+								}
+								onFocus={ onFocus }
+								isExpanded={ isExpanded }
+								selectedSuggestionIndex={ matchingSuggestions.indexOf(
+									selectedSuggestion
+								) }
+								onChange={ onInputChange }
+							/>
+						</FlexBlock>
+						{ allowReset && (
+							<FlexItem>
+								<Button
+									className="components-combobox-control__reset"
+									icon={ closeSmall }
+									disabled={ ! value }
+									onClick={ handleOnReset }
+									label={ __( 'Reset' ) }
 								/>
+							</FlexItem>
+						) }
+					</Flex>
+					{ isExpanded && (
+						<SuggestionsList
+							instanceId={ instanceId }
+							match={ { label: inputValue } }
+							displayTransform={ ( suggestion ) =>
+								suggestion.label
+							}
+							suggestions={ matchingSuggestions }
+							selectedIndex={ matchingSuggestions.indexOf(
+								selectedSuggestion
 							) }
-							{ item.name }
-						</li>
-					) ) }
-			</ul>
-		</div>
+							onHover={ setSelectedSuggestion }
+							onSelect={ onSuggestionSelected }
+							scrollIntoView
+						/>
+					) }
+				</div>
+			</BaseControl>
+		</DetectOutside>
 	);
+	/* eslint-enable jsx-a11y/no-static-element-interactions */
 }
+
+export default ComboboxControl;

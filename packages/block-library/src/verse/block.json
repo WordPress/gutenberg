@@ -1,13 +1,19 @@
 {
+	"apiVersion": 2,
 	"name": "core/verse",
+	"title": "Verse",
 	"category": "text",
+	"description": "Insert poetry. Use special spacing formats. Or quote song lyrics.",
+	"keywords": [ "poetry", "poem" ],
+	"textdomain": "default",
 	"attributes": {
 		"content": {
 			"type": "string",
 			"source": "html",
 			"selector": "pre",
 			"default": "",
-			"__unstablePreserveWhiteSpace": true
+			"__unstablePreserveWhiteSpace": true,
+			"__experimentalRole": "content"
 		},
 		"textAlign": {
 			"type": "string"
@@ -15,6 +21,16 @@
 	},
 	"supports": {
 		"anchor": true,
-		"lightBlockWrapper": true
-	}
+		"color": {
+			"gradients": true,
+			"link": true
+		},
+		"__experimentalFontFamily": true,
+		"fontSize": true,
+		"spacing": {
+			"padding": true
+		}
+	},
+	"style": "wp-block-verse",
+	"editorStyle": "wp-block-verse-editor"
 }

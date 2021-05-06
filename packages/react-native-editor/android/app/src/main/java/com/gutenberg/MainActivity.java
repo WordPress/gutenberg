@@ -7,7 +7,7 @@ import androidx.annotation.Nullable;
 import com.facebook.react.ReactActivity;
 import com.facebook.react.ReactActivityDelegate;
 
-import org.wordpress.mobile.WPAndroidGlue.WPAndroidGlueCode;
+import org.wordpress.mobile.WPAndroidGlue.GutenbergProps;
 
 public class MainActivity extends ReactActivity {
 
@@ -28,8 +28,11 @@ public class MainActivity extends ReactActivity {
             protected Bundle getLaunchOptions() {
                 Bundle bundle = new Bundle();
                 Bundle capabilities = new Bundle();
-                capabilities.putBoolean(WPAndroidGlueCode.PROP_NAME_CAPABILITIES_MENTIONS, true);
-                bundle.putBundle(WPAndroidGlueCode.PROP_NAME_CAPABILITIES, capabilities);
+                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_MENTIONS, true);
+                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_XPOSTS, true);
+                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, true);
+                capabilities.putBoolean(GutenbergProps.PROP_CAPABILITIES_AUDIO_BLOCK, true);
+                bundle.putBundle(GutenbergProps.PROP_CAPABILITIES, capabilities);
                 return bundle;
             }
         };

@@ -1,17 +1,12 @@
 /**
  * Internal dependencies
  */
-import { common, others } from './core-embeds';
-import {
-	DEFAULT_EMBED_BLOCK,
-	WORDPRESS_EMBED_BLOCK,
-	ASPECT_RATIOS,
-} from './constants';
+import { ASPECT_RATIOS, WP_EMBED_TYPE } from './constants';
 
 /**
  * External dependencies
  */
-import { includes, kebabCase, toLower } from 'lodash';
+import { kebabCase } from 'lodash';
 import classnames from 'classnames/dedupe';
 import memoize from 'memize';
 
@@ -19,7 +14,31 @@ import memoize from 'memize';
  * WordPress dependencies
  */
 import { renderToString } from '@wordpress/element';
-import { createBlock, getBlockType } from '@wordpress/blocks';
+import {
+	createBlock,
+	getBlockType,
+	getBlockVariations,
+} from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import metadata from './block.json';
+
+const { name: DEFAULT_EMBED_BLOCK } = metadata;
+
+/** @typedef {import('@wordpress/blocks').WPBlockVariation} WPBlockVariation */
+
+/**
+ * Returns the embed block's information by matching the provided service provider
+ *
+ * @param {string} provider The embed block's provider
+ * @return {WPBlockVariation} The embed block's information
+ */
+export const getEmbedInfoByProvider = ( provider ) =>
+	getBlockVariations( DEFAULT_EMBED_BLOCK )?.find(
+		( { name } ) => name === provider
+	);
 
 /**
  * Returns true if any of the regular expressions match the URL.
@@ -28,36 +47,28 @@ import { createBlock, getBlockType } from '@wordpress/blocks';
  * @param {Array}    patterns The list of regular expressions to test agains.
  * @return {boolean} True if any of the regular expressions match the URL.
  */
-export const matchesPatterns = ( url, patterns = [] ) => {
-	return patterns.some( ( pattern ) => {
-		return url.match( pattern );
-	} );
-};
+export const matchesPatterns = ( url, patterns = [] ) =>
+	patterns.some( ( pattern ) => url.match( pattern ) );
 
 /**
- * Finds the block name that should be used for the URL, based on the
- * structure of the URL.
+ * Finds the block variation that should be used for the URL,
+ * based on the provided URL and the variation's patterns.
  *
  * @param {string}  url The URL to test.
- * @return {string} The name of the block that should be used for this URL, e.g. core-embed/twitter
+ * @return {WPBlockVariation} The block variation that should be used for this URL
  */
-export const findBlock = ( url ) => {
-	for ( const block of [ ...common, ...others ] ) {
-		if ( matchesPatterns( url, block.patterns ) ) {
-			return block.name;
-		}
-	}
-	return DEFAULT_EMBED_BLOCK;
-};
+export const findMoreSuitableBlock = ( url ) =>
+	getBlockVariations( DEFAULT_EMBED_BLOCK )?.find( ( { patterns } ) =>
+		matchesPatterns( url, patterns )
+	);
 
-export const isFromWordPress = ( html ) => {
-	return includes( html, 'class="wp-embedded-content"' );
-};
+export const isFromWordPress = ( html ) =>
+	html && html.includes( 'class="wp-embedded-content"' );
 
 export const getPhotoHtml = ( photo ) => {
 	// 100% width for the preview so it fits nicely into the document, some "thumbnails" are
 	// actually the full size photo. If thumbnails not found, use full image.
-	const imageUrl = photo.thumbnail_url ? photo.thumbnail_url : photo.url;
+	const imageUrl = photo.thumbnail_url || photo.url;
 	const photoPreview = (
 		<p>
 			<img src={ imageUrl } alt={ photo.title } width="100%" />
@@ -77,56 +88,88 @@ export const getPhotoHtml = ( photo ) => {
  * See `getAttributesFromPreview` in the generated embed edit component.
  *
  * @param {Object} props                  The block's props.
- * @param {Object} attributesFromPreview  Attributes generated from the block's most up to date preview.
+ * @param {Object} [attributesFromPreview]  Attributes generated from the block's most up to date preview.
  * @return {Object|undefined} A more suitable embed block if one exists.
  */
-export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
-	const { preview, name } = props;
-	const { url } = props.attributes;
+export const createUpgradedEmbedBlock = (
+	props,
+	attributesFromPreview = {}
+) => {
+	const { preview, attributes: { url, providerNameSlug, type } = {} } = props;
 
-	if ( ! url ) {
-		return;
-	}
+	if ( ! url || ! getBlockType( DEFAULT_EMBED_BLOCK ) ) return;
 
-	const matchingBlock = findBlock( url );
-
-	if ( ! getBlockType( matchingBlock ) ) {
-		return;
-	}
+	const matchedBlock = findMoreSuitableBlock( url );
 
 	// WordPress blocks can work on multiple sites, and so don't have patterns,
 	// so if we're in a WordPress block, assume the user has chosen it for a WordPress URL.
+	const isCurrentBlockWP =
+		providerNameSlug === 'wordpress' || type === WP_EMBED_TYPE;
+	// if current block is not WordPress and a more suitable block found
+	// that is different from the current one, create the new matched block
+	const shouldCreateNewBlock =
+		! isCurrentBlockWP &&
+		matchedBlock &&
+		( matchedBlock.attributes.providerNameSlug !== providerNameSlug ||
+			! providerNameSlug );
+	if ( shouldCreateNewBlock ) {
+		return createBlock( DEFAULT_EMBED_BLOCK, {
+			url,
+			...matchedBlock.attributes,
+		} );
+	}
+
+	const wpVariation = getBlockVariations( DEFAULT_EMBED_BLOCK )?.find(
+		( { name } ) => name === 'wordpress'
+	);
+
+	// We can't match the URL for WordPress embeds, we have to check the HTML instead.
 	if (
-		WORDPRESS_EMBED_BLOCK !== name &&
-		DEFAULT_EMBED_BLOCK !== matchingBlock
+		! wpVariation ||
+		! preview ||
+		! isFromWordPress( preview.html ) ||
+		isCurrentBlockWP
 	) {
-		// At this point, we have discovered a more suitable block for this url, so transform it.
-		if ( name !== matchingBlock ) {
-			return createBlock( matchingBlock, { url } );
-		}
+		return;
 	}
 
-	if ( preview ) {
-		const { html } = preview;
+	// This is not the WordPress embed block so transform it into one.
+	return createBlock( DEFAULT_EMBED_BLOCK, {
+		url,
+		...wpVariation.attributes,
+		// By now we have the preview, but when the new block first renders, it
+		// won't have had all the attributes set, and so won't get the correct
+		// type and it won't render correctly. So, we pass through the current attributes
+		// here so that the initial render works when we switch to the WordPress
+		// block. This only affects the WordPress block because it can't be
+		// rendered in the usual Sandbox (it has a sandbox of its own) and it
+		// relies on the preview to set the correct render type.
+		...attributesFromPreview,
+	} );
+};
 
-		// We can't match the URL for WordPress embeds, we have to check the HTML instead.
-		if ( isFromWordPress( html ) ) {
-			// If this is not the WordPress embed block, transform it into one.
-			if ( WORDPRESS_EMBED_BLOCK !== name ) {
-				return createBlock( WORDPRESS_EMBED_BLOCK, {
-					url,
-					// By now we have the preview, but when the new block first renders, it
-					// won't have had all the attributes set, and so won't get the correct
-					// type and it won't render correctly. So, we pass through the current attributes
-					// here so that the initial render works when we switch to the WordPress
-					// block. This only affects the WordPress block because it can't be
-					// rendered in the usual Sandbox (it has a sandbox of its own) and it
-					// relies on the preview to set the correct render type.
-					...attributesFromPreview,
-				} );
-			}
-		}
+/**
+ * Removes all previously set aspect ratio related classes and return the rest
+ * existing class names.
+ *
+ * @param {string} existingClassNames Any existing class names.
+ * @return {string} The class names without any aspect ratio related class.
+ */
+export const removeAspectRatioClasses = ( existingClassNames ) => {
+	if ( ! existingClassNames ) {
+		// Avoids extraneous work and also, by returning the same value as
+		// received, ensures the post is not dirtied by a change of the block
+		// attribute from `undefined` to an emtpy string.
+		return existingClassNames;
 	}
+	const aspectRatioClassNames = ASPECT_RATIOS.reduce(
+		( accumulator, { className } ) => {
+			accumulator[ className ] = false;
+			return accumulator;
+		},
+		{ 'wp-has-aspect-ratio': false }
+	);
+	return classnames( existingClassNames, aspectRatioClassNames );
 };
 
 /**
@@ -139,23 +182,11 @@ export const createUpgradedEmbedBlock = ( props, attributesFromPreview ) => {
  */
 export function getClassNames(
 	html,
-	existingClassNames = '',
+	existingClassNames,
 	allowResponsive = true
 ) {
 	if ( ! allowResponsive ) {
-		// Remove all of the aspect ratio related class names.
-		const aspectRatioClassNames = {
-			'wp-has-aspect-ratio': false,
-		};
-		for (
-			let ratioIndex = 0;
-			ratioIndex < ASPECT_RATIOS.length;
-			ratioIndex++
-		) {
-			const aspectRatioToRemove = ASPECT_RATIOS[ ratioIndex ];
-			aspectRatioClassNames[ aspectRatioToRemove.className ] = false;
-		}
-		return classnames( existingClassNames, aspectRatioClassNames );
+		return removeAspectRatioClasses( existingClassNames );
 	}
 
 	const previewDocument = document.implementation.createHTMLDocument( '' );
@@ -173,10 +204,19 @@ export function getClassNames(
 		) {
 			const potentialRatio = ASPECT_RATIOS[ ratioIndex ];
 			if ( aspectRatio >= potentialRatio.ratio ) {
-				return classnames( existingClassNames, {
-					[ potentialRatio.className ]: allowResponsive,
-					'wp-has-aspect-ratio': allowResponsive,
-				} );
+				// Evaluate the difference between actual aspect ratio and closest match.
+				// If the difference is too big, do not scale the embed according to aspect ratio.
+				const ratioDiff = aspectRatio - potentialRatio.ratio;
+				if ( ratioDiff > 0.1 ) {
+					// No close aspect ratio match found.
+					return removeAspectRatioClasses( existingClassNames );
+				}
+				// Close aspect ratio match found.
+				return classnames(
+					removeAspectRatioClasses( existingClassNames ),
+					potentialRatio.className,
+					'wp-has-aspect-ratio'
+				);
 			}
 		}
 	}
@@ -227,11 +267,11 @@ export const getAttributesFromPreview = memoize(
 		// because not all embed code gives us a provider name.
 		const { html, provider_name: providerName } = preview;
 		const providerNameSlug = kebabCase(
-			toLower( '' !== providerName ? providerName : title )
+			( providerName || title ).toLowerCase()
 		);
 
 		if ( isFromWordPress( html ) ) {
-			type = 'wp-embed';
+			type = WP_EMBED_TYPE;
 		}
 
 		if ( html || 'photo' === type ) {

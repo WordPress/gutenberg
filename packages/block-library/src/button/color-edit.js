@@ -7,8 +7,13 @@ import { pickBy, isEqual, isObject, identity, mapValues } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useState, useEffect, useRef, Platform } from '@wordpress/element';
-import { useSelect } from '@wordpress/data';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useMemo,
+	Platform,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -21,9 +26,16 @@ import {
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	ContrastChecker,
 	InspectorControls,
+	__experimentalUseEditorFeature as useEditorFeature,
 } from '@wordpress/block-editor';
 
+const EMPTY_ARRAY = [];
+
 const isWebPlatform = Platform.OS === 'web';
+
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
 
 // The code in this file is copied entirely from the "color" and "style" support flags
 // The flag can't be used at the moment because of the extra wrapper around
@@ -53,14 +65,10 @@ const cleanEmptyObject = ( object ) => {
 };
 
 function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
-	const { getComputedStyle, Node } = window;
-
 	const [ detectedBackgroundColor, setDetectedBackgroundColor ] = useState();
 	const [ detectedColor, setDetectedColor ] = useState();
 
-	const title = isWebPlatform
-		? __( 'Color settings' )
-		: __( 'Color Settings' );
+	const title = __( 'Color' );
 
 	useEffect( () => {
 		if ( isWebPlatform && ! enableContrastChecking ) {
@@ -79,7 +87,8 @@ function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
 		while (
 			backgroundColor === 'rgba(0, 0, 0, 0)' &&
 			backgroundColorNode.parentNode &&
-			backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
+			backgroundColorNode.parentNode.nodeType ===
+				backgroundColorNode.parentNode.ELEMENT_NODE
 		) {
 			backgroundColorNode = backgroundColorNode.parentNode;
 			backgroundColor = getComputedStyle( backgroundColorNode )
@@ -116,9 +125,9 @@ function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
  */
 function ColorEdit( props ) {
 	const { attributes } = props;
-	const { colors, gradients } = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings();
-	}, [] );
+	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
+	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
 	// synchronously causing our two callbacks to override changes
@@ -195,32 +204,43 @@ function ColorEdit( props ) {
 		};
 	};
 
+	const settings = useMemo( () => {
+		return [
+			{
+				label: __( 'Text color' ),
+				onColorChange: onChangeColor( 'text' ),
+				colorValue: getColorObjectByAttributeValues(
+					colors,
+					textColor,
+					style?.color?.text
+				).color,
+			},
+			{
+				label: __( 'Background color' ),
+				onColorChange: onChangeColor( 'background' ),
+				colorValue: getColorObjectByAttributeValues(
+					colors,
+					backgroundColor,
+					style?.color?.background
+				).color,
+				gradientValue,
+				onGradientChange: onChangeGradient,
+			},
+		];
+	}, [
+		colors,
+		textColor,
+		backgroundColor,
+		gradientValue,
+		style?.color?.text,
+		style?.color?.background,
+	] );
+
 	return (
 		<ColorPanel
 			enableContrastChecking={ ! gradient && ! style?.color?.gradient }
 			clientId={ props.clientId }
-			settings={ [
-				{
-					label: __( 'Text Color' ),
-					onColorChange: onChangeColor( 'text' ),
-					colorValue: getColorObjectByAttributeValues(
-						colors,
-						textColor,
-						style?.color?.text
-					).color,
-				},
-				{
-					label: __( 'Background Color' ),
-					onColorChange: onChangeColor( 'background' ),
-					colorValue: getColorObjectByAttributeValues(
-						colors,
-						backgroundColor,
-						style?.color?.background
-					).color,
-					gradientValue,
-					onGradientChange: onChangeGradient,
-				},
-			] }
+			settings={ settings }
 		/>
 	);
 }

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/rich-text",
-	"version": "3.19.0",
+	"version": "3.25.3",
 	"description": "Rich text value and manipulation API.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"rich-text"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/rich-text/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/rich-text/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -18,23 +18,27 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"sideEffects": [
-		"!((src|build|build-module)/component/**)"
+		"src/**/*.scss",
+		"{src,build,build-module}/{index.js,store/index.js}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/compose": "file:../compose",
 		"@wordpress/data": "file:../data",
-		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/escape-html": "file:../escape-html",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.15",
+		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
 		"rememo": "^3.0.0"
 	},

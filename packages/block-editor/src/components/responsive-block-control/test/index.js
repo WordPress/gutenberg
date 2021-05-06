@@ -118,7 +118,6 @@ describe( 'Basic rendering', () => {
 		expect( defaultControl ).not.toBeNull();
 		expect( toggleLabel ).not.toBeNull();
 		expect( toggleState ).toBe( true );
-		expect( container.innerHTML ).toMatchSnapshot();
 	} );
 
 	it( 'should not render without valid legend', () => {
@@ -363,7 +362,7 @@ describe( 'Default and Responsive modes', () => {
 		expect( responsiveControlGroup ).toBeNull();
 	} );
 
-	it( 'should render custom responsive controls when renderResponsiveControls prop is provided and in responsive mode ', () => {
+	it( 'should render custom responsive controls when renderResponsiveControls prop is provided and in responsive mode', () => {
 		const spyRenderDefaultControl = jest.fn();
 
 		const mockRenderResponsiveControls = jest.fn( ( viewports ) => {

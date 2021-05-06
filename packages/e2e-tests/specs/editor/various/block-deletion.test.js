@@ -31,7 +31,7 @@ const addThreeParagraphsToNewPost = async () => {
  * see: https://github.com/WordPress/gutenberg/pull/14908#discussion_r284725956
  */
 const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
-	await clickBlockToolbarButton( 'More options' );
+	await clickBlockToolbarButton( 'Options' );
 
 	let isRemoveButton = false;
 
@@ -45,7 +45,7 @@ const clickOnBlockSettingsMenuRemoveBlockButton = async () => {
 		await page.keyboard.press( 'Tab' );
 
 		isRemoveButton = await page.evaluate( () => {
-			return document.activeElement.innerText.includes( 'Remove Block' );
+			return document.activeElement.innerText.includes( 'Remove block' );
 		} );
 
 		// Stop looping once we find the button
@@ -189,6 +189,7 @@ describe( 'deleting all blocks', () => {
 
 		// Add and remove a block.
 		await insertBlock( 'Image' );
+		await page.waitForSelector( 'figure[data-type="core/image"]' );
 		await page.keyboard.press( 'Backspace' );
 
 		// Verify there is no selected block.

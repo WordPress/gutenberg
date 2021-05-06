@@ -1,6 +1,11 @@
 {
+	"apiVersion": 2,
 	"name": "core/video",
+	"title": "Video",
 	"category": "media",
+	"description": "Embed a video from your media library or upload a new one.",
+	"keywords": [ "movie" ],
+	"textdomain": "default",
 	"attributes": {
 		"autoplay": {
 			"type": "boolean",
@@ -59,11 +64,19 @@
 			"source": "attribute",
 			"selector": "video",
 			"attribute": "playsinline"
+		},
+		"tracks": {
+			"type": "array",
+			"items": {
+				"type": "object"
+			},
+			"default": []
 		}
 	},
 	"supports": {
 		"anchor": true,
-		"align": true,
-		"lightBlockWrapper": true
-	}
+		"align": true
+	},
+	"editorStyle": "wp-block-video-editor",
+	"style": "wp-block-video"
 }

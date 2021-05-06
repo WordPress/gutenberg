@@ -16,7 +16,8 @@ import {
 	MediaPlaceholder,
 	MediaReplaceFlow,
 	RichText,
-	__experimentalBlock as Block,
+	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -41,9 +42,9 @@ function AudioEdit( {
 	insertBlocksAfter,
 } ) {
 	const { id, autoplay, caption, loop, preload, src } = attributes;
-
+	const blockProps = useBlockProps();
 	const mediaUpload = useSelect( ( select ) => {
-		const { getSettings } = select( 'core/block-editor' );
+		const { getSettings } = select( blockEditorStore );
 		return getSettings().mediaUpload;
 	}, [] );
 
@@ -116,7 +117,7 @@ function AudioEdit( {
 	}
 	if ( ! src ) {
 		return (
-			<Block.div>
+			<div { ...blockProps }>
 				<MediaPlaceholder
 					icon={ <BlockIcon icon={ icon } /> }
 					onSelect={ onSelectAudio }
@@ -127,13 +128,13 @@ function AudioEdit( {
 					notices={ noticeUI }
 					onError={ onUploadError }
 				/>
-			</Block.div>
+			</div>
 		);
 	}
 
 	return (
 		<>
-			<BlockControls>
+			<BlockControls group="other">
 				<MediaReplaceFlow
 					mediaId={ id }
 					mediaURL={ src }
@@ -175,18 +176,20 @@ function AudioEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<Block.figure>
+			<figure { ...blockProps }>
 				{ /*
-					Disable the audio tag so the user clicking on it won't play the
+					Disable the audio tag if the block is not selected
+					so the user clicking on it won't play the
 					file or change the position slider when the controls are enabled.
 				*/ }
-				<Disabled>
+				<Disabled isDisabled={ ! isSelected }>
 					<audio controls="controls" src={ src } />
 				</Disabled>
 				{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 					<RichText
 						tagName="figcaption"
-						placeholder={ __( 'Write caption…' ) }
+						aria-label={ __( 'Audio caption text' ) }
+						placeholder={ __( 'Add caption' ) }
 						value={ caption }
 						onChange={ ( value ) =>
 							setAttributes( { caption: value } )
@@ -197,7 +200,7 @@ function AudioEdit( {
 						}
 					/>
 				) }
-			</Block.figure>
+			</figure>
 		</>
 	);
 }

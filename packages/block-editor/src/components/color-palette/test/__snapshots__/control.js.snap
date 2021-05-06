@@ -1,11 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColorPaletteControl matches the snapshot 1`] = `
+.emotion-2 {
+  font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
+  font-size: 13px;
+}
+
+.emotion-0 {
+  margin-bottom: 8px;
+}
+
+.components-panel__row .emotion-0 {
+  margin-bottom: inherit;
+}
+
 <div
-  className="components-base-control block-editor-color-gradient-control"
+  className="components-base-control block-editor-color-gradient-control emotion-2 emotion-3"
 >
   <div
-    className="components-base-control__field"
+    className="components-base-control__field emotion-0 emotion-1"
   >
     <fieldset>
       <legend>
@@ -32,40 +45,45 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
         className="components-circular-option-picker"
       >
         <div
-          className="components-circular-option-picker__option-wrapper"
+          className="components-circular-option-picker__swatches"
         >
-          <button
-            aria-label="Color: red"
-            aria-pressed={true}
-            className="components-button components-circular-option-picker__option is-pressed"
-            onBlur={[Function]}
-            onClick={[Function]}
-            onFocus={[Function]}
-            onMouseDown={[Function]}
-            onMouseEnter={[Function]}
-            onMouseLeave={[Function]}
-            style={
-              Object {
-                "backgroundColor": "#f00",
-                "color": "#f00",
-              }
-            }
-            type="button"
-          />
-          <svg
-            aria-hidden={true}
-            fill="#000000"
-            focusable={false}
-            height={24}
-            role="img"
-            viewBox="0 0 24 24"
-            width={24}
-            xmlns="http://www.w3.org/2000/svg"
+          <div
+            className="components-circular-option-picker__option-wrapper"
           >
-            <path
-              d="M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"
+            <button
+              aria-describedby={null}
+              aria-label="Color: red"
+              aria-pressed={true}
+              className="components-button components-circular-option-picker__option is-pressed"
+              onBlur={[Function]}
+              onClick={[Function]}
+              onFocus={[Function]}
+              onMouseDown={[Function]}
+              onMouseEnter={[Function]}
+              onMouseLeave={[Function]}
+              style={
+                Object {
+                  "backgroundColor": "#f00",
+                  "color": "#f00",
+                }
+              }
+              type="button"
             />
-          </svg>
+            <svg
+              aria-hidden={true}
+              fill="#000000"
+              focusable={false}
+              height={24}
+              role="img"
+              viewBox="0 0 24 24"
+              width={24}
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"
+              />
+            </svg>
+          </div>
         </div>
         <div
           className="components-circular-option-picker__custom-clear-wrapper"
@@ -74,7 +92,9 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             className="components-dropdown components-circular-option-picker__dropdown-link-action"
           >
             <button
+              aria-describedby={null}
               aria-expanded={false}
+              aria-haspopup="true"
               aria-label="Custom color picker"
               className="components-button is-link"
               onClick={[Function]}
@@ -84,6 +104,7 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
             </button>
           </div>
           <button
+            aria-describedby={null}
             className="components-button components-circular-option-picker__clear is-secondary is-small"
             onClick={[Function]}
             type="button"

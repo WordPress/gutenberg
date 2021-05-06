@@ -4,6 +4,7 @@
 import {
 	createNewPost,
 	searchForBlock,
+	insertBlockDirectoryBlock,
 	setUpResponseMocking,
 	getEditedPostContent,
 	createJSONResponse,
@@ -11,15 +12,13 @@ import {
 
 // Urls to mock
 const SEARCH_URLS = [
-	'/__experimental/block-directory/search',
-	`rest_route=${ encodeURIComponent(
-		'/__experimental/block-directory/search'
-	) }`,
+	'/wp/v2/block-directory/search',
+	`rest_route=${ encodeURIComponent( '/wp/v2/block-directory/search' ) }`,
 ];
 
 const INSTALL_URLS = [
-	'/__experimental/plugins',
-	`rest_route=${ encodeURIComponent( '/__experimental/plugins' ) }`,
+	'/wp/v2/plugins',
+	`rest_route=${ encodeURIComponent( '/wp/v2/plugins' ) }`,
 ];
 
 // Example Blocks
@@ -36,9 +35,10 @@ const MOCK_BLOCK1 = {
 	author: 'No Author',
 	icon: 'block-default',
 	assets: [
-		'fake_url.com/block.js', // we will mock this
+		'https://fake_url.com/block.js', // we will mock this
 	],
 	humanized_updated: '5 months ago',
+	links: {},
 };
 
 const MOCK_INSTALLED_BLOCK_PLUGIN_DETAILS = {
@@ -57,6 +57,13 @@ const MOCK_INSTALLED_BLOCK_PLUGIN_DETAILS = {
 	requires_wp: '',
 	requires_php: '',
 	text_domain: 'block-directory-test-block',
+	_links: {
+		self: [
+			{
+				href: '',
+			},
+		],
+	},
 };
 
 const MOCK_BLOCK2 = {
@@ -85,53 +92,21 @@ const block = `( function() {
 	} );
 } )();`;
 
-const MOCK_OPTIONS = {
-	namespace: '__experimental',
-	methods: [ 'GET' ],
-	endpoints: [
-		{
-			methods: [ 'GET' ],
-			args: {},
-		},
-	],
-	schema: {
-		$schema: 'http://json-schema.org/draft-04/schema#',
-		title: 'block-directory-item',
-		type: 'object',
-		properties: {},
-	},
-};
-
-const MOCK_OPTIONS_RESPONSE = {
-	match: ( request ) =>
-		matchUrl( request.url(), SEARCH_URLS ) &&
-		request.method() === 'OPTIONS',
-	onRequestMatch: async ( request ) => {
-		const response = {
-			content: 'application/json',
-			body: JSON.stringify( MOCK_OPTIONS ),
-			headers: {
-				Allow: 'GET',
-			},
-		};
-
-		return request.respond( response );
-	},
-};
-
 const MOCK_EMPTY_RESPONSES = [
-	MOCK_OPTIONS_RESPONSE,
 	{
-		match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
+		match: ( request ) =>
+			matchUrl( request.url(), SEARCH_URLS ) &&
+			request.method() === 'GET',
 		onRequestMatch: createJSONResponse( [] ),
 	},
 ];
 
 const MOCK_BLOCKS_RESPONSES = [
-	MOCK_OPTIONS_RESPONSE,
 	{
 		// Mock response for search with the block
-		match: ( request ) => matchUrl( request.url(), SEARCH_URLS ),
+		match: ( request ) =>
+			matchUrl( request.url(), SEARCH_URLS ) &&
+			request.method() === 'GET',
 		onRequestMatch: createJSONResponse( [ MOCK_BLOCK1, MOCK_BLOCK2 ] ),
 	},
 	{
@@ -147,6 +122,14 @@ const MOCK_BLOCKS_RESPONSES = [
 		onRequestMatch: createResponse(
 			Buffer.from( block, 'utf8' ),
 			'application/javascript; charset=utf-8'
+		),
+	},
+	{
+		// Mock the post-new page as requested via apiFetch for determining new CSS/JS assets.
+		match: ( request ) => request.url().includes( '/post-new.php' ),
+		onRequestMatch: createResponse(
+			`<html><head><script id="mock-block-js" src="${ MOCK_BLOCK1.assets[ 0 ] }"></script></head><body/></html>`,
+			'text/html; charset=UTF-8'
 		),
 	},
 ];
@@ -185,10 +168,12 @@ describe( 'adding blocks from block directory', () => {
 
 		const selectorContent = await page.evaluate(
 			() =>
-				document.querySelector( '.block-editor-inserter__block-list' )
+				document.querySelector( '.block-editor-inserter__main-area' )
 					.innerHTML
 		);
-		expect( selectorContent ).toContain( 'has-no-results' );
+		expect( selectorContent ).toContain(
+			'block-editor-inserter__no-results'
+		);
 	} );
 
 	it( 'Should be able to add (the first) block.', async () => {
@@ -196,18 +181,9 @@ describe( 'adding blocks from block directory', () => {
 		await setUpResponseMocking( MOCK_BLOCKS_RESPONSES );
 
 		// Search for the block via the inserter
-		await searchForBlock( MOCK_BLOCK1.title );
+		await insertBlockDirectoryBlock( MOCK_BLOCK1.title );
 
-		// Grab the first block in the list -> Needs to be the first one, the mock response expects it.
-		const addBtn = await page.waitForSelector(
-			'.block-directory-downloadable-blocks-list li:first-child button'
-		);
-
-		// Add the block
-		await addBtn.click();
-
-		// Delay to let block script load
-		await new Promise( ( resolve ) => setTimeout( resolve, 100 ) );
+		await page.waitForSelector( `div[data-type="${ MOCK_BLOCK1.name }"]` );
 
 		// The block will auto select and get added, make sure we see it in the content
 		expect( await getEditedPostContent() ).toMatchSnapshot();

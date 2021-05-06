@@ -3,23 +3,74 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
-import { hasBlockSupport } from '@wordpress/blocks';
+import { getBlockSupport } from '@wordpress/blocks';
 import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
+import useEditorFeature from '../components/use-editor-feature';
+import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
 import { cleanEmptyObject } from './utils';
 import { useCustomUnits } from '../components/unit-control';
 
-export const PADDING_SUPPORT_KEY = '__experimentalPadding';
+const isWeb = Platform.OS === 'web';
+const CSS_UNITS = [
+	{
+		value: '%',
+		label: isWeb ? '%' : __( 'Percentage (%)' ),
+		default: '',
+	},
+	{
+		value: 'px',
+		label: isWeb ? 'px' : __( 'Pixels (px)' ),
+		default: '',
+	},
+	{
+		value: 'em',
+		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
+		default: '',
+	},
+	{
+		value: 'rem',
+		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
+		default: '',
+	},
+	{
+		value: 'vw',
+		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
+		default: '',
+	},
+];
 
 /**
- * Inspector control panel containing the line height related configuration
+ * Determines if there is padding support.
+ *
+ * @param  {string|Object} blockType Block name or Block Type object.
+ * @return {boolean}                 Whether there is support.
+ */
+export function hasPaddingSupport( blockType ) {
+	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
+	return !! ( true === support || support?.padding );
+}
+
+/**
+ * Custom hook that checks if padding settings have been disabled.
+ *
+ * @param  {string} name The name of the block.
+ * @return {boolean}                 Whether padding setting is disabled.
+ */
+export function useIsPaddingDisabled( { name: blockName } = {} ) {
+	const isDisabled = ! useEditorFeature( 'spacing.customPadding' );
+	return ! hasPaddingSupport( blockName ) || isDisabled;
+}
+
+/**
+ * Inspector control panel containing the padding related configuration
  *
  * @param {Object} props
  *
- * @return {WPElement} Line height edit element.
+ * @return {WPElement} Padding edit element.
  */
 export function PaddingEdit( props ) {
 	const {
@@ -28,9 +79,10 @@ export function PaddingEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const units = useCustomUnits();
+	const units = useCustomUnits( CSS_UNITS );
+	const sides = useCustomSides( blockName, 'padding' );
 
-	if ( ! hasBlockSupport( blockName, PADDING_SUPPORT_KEY ) ) {
+	if ( ! hasPaddingSupport( blockName ) ) {
 		return null;
 	}
 
@@ -38,6 +90,7 @@ export function PaddingEdit( props ) {
 		const newStyle = {
 			...style,
 			spacing: {
+				...style?.spacing,
 				padding: next,
 			},
 		};
@@ -68,6 +121,7 @@ export function PaddingEdit( props ) {
 					onChange={ onChange }
 					onChangeShowVisualizer={ onChangeShowVisualizer }
 					label={ __( 'Padding' ) }
+					sides={ sides }
 					units={ units }
 				/>
 			</>
@@ -75,10 +129,3 @@ export function PaddingEdit( props ) {
 		native: null,
 	} );
 }
-
-export const paddingStyleMappings = {
-	paddingTop: [ 'spacing', 'padding', 'top' ],
-	paddingRight: [ 'spacing', 'padding', 'right' ],
-	paddingBottom: [ 'spacing', 'padding', 'bottom' ],
-	paddingLeft: [ 'spacing', 'padding', 'left' ],
-};

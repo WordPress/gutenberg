@@ -7,7 +7,7 @@ import { RichTextToolbarButton } from '@wordpress/block-editor';
 import { code as codeIcon } from '@wordpress/icons';
 
 const name = 'core/code';
-const title = __( 'Inline Code' );
+const title = __( 'Inline code' );
 
 export const code = {
 	name,

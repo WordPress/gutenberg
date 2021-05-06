@@ -1,27 +1,45 @@
 /**
  * External dependencies
  */
-import { invert, keyBy, omit } from 'lodash';
+import { invert } from 'lodash';
 import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import {
-	getNavigationPostForMenu,
-	getPendingActions,
-	isProcessingPost,
 	getMenuItemToClientIdMapping,
 	resolveMenuItems,
 	dispatch,
+	select,
 	apiFetch,
 } from './controls';
-import { menuItemsQuery } from './utils';
+import {
+	menuItemsQuery,
+	serializeProcessing,
+	computeCustomizedAttribute,
+} from './utils';
+
+const { ajaxurl } = window;
+
+/**
+ * Returns an action object used to select menu.
+ *
+ * @param {number} menuId The menu ID.
+ * @return {Object} Action object.
+ */
+export function setSelectedMenuId( menuId ) {
+	return {
+		type: 'SET_SELECTED_MENU_ID',
+		menuId,
+	};
+}
 
 /**
  * Creates a menu item for every block that doesn't have an associated menuItem.
@@ -33,10 +51,7 @@ import { menuItemsQuery } from './utils';
 export const createMissingMenuItems = serializeProcessing( function* ( post ) {
 	const menuId = post.meta.menuId;
 
-	const mapping = yield {
-		type: 'GET_MENU_ITEM_TO_CLIENT_ID_MAPPING',
-		postId: post.id,
-	};
+	const mapping = yield getMenuItemToClientIdMapping( post.id );
 	const clientIdToMenuId = invert( mapping );
 
 	const stack = [ post.blocks[ 0 ] ];
@@ -89,31 +104,57 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 	);
 
 	try {
-		const response = yield* batchSave(
+		// Save edits to the menu, like the menu name.
+		yield dispatch(
+			'core',
+			'saveEditedEntityRecord',
+			'root',
+			'menu',
+			menuId
+		);
+
+		const error = yield select(
+			'core',
+			'getLastEntitySaveError',
+			'root',
+			'menu',
+			menuId
+		);
+
+		if ( error ) {
+			throw new Error( error.message );
+		}
+
+		// Save blocks as menu items.
+		const batchSaveResponse = yield* batchSave(
 			menuId,
 			menuItemsByClientId,
 			post.blocks[ 0 ]
 		);
-		if ( ! response.success ) {
-			throw new Error();
+
+		if ( ! batchSaveResponse.success ) {
+			throw new Error( batchSaveResponse.data.message );
 		}
+
 		yield dispatch(
-			'core/notices',
+			noticesStore,
 			'createSuccessNotice',
 			__( 'Navigation saved.' ),
 			{
 				type: 'snackbar',
 			}
 		);
-	} catch ( e ) {
-		yield dispatch(
-			'core/notices',
-			'createErrorNotice',
-			__( 'There was an error.' ),
-			{
-				type: 'snackbar',
-			}
-		);
+	} catch ( saveError ) {
+		const errorMessage = saveError
+			? sprintf(
+					/* translators: %s: The text of an error message (potentially untranslated). */
+					__( "Unable to save: '%s'" ),
+					saveError.message
+			  )
+			: __( 'Unable to save: An error ocurred.' );
+		yield dispatch( noticesStore, 'createErrorNotice', errorMessage, {
+			type: 'snackbar',
+		} );
 	}
 } );
 
@@ -158,119 +199,8 @@ function* batchSave( menuId, menuItemsByClientId, navigationBlock ) {
 	);
 
 	return yield apiFetch( {
-		url: '/wp-admin/admin-ajax.php',
+		url: ajaxurl || '/wp-admin/admin-ajax.php',
 		method: 'POST',
 		body,
 	} );
-}
-
-function computeCustomizedAttribute( blocks, menuId, menuItemsByClientId ) {
-	const blocksList = blocksTreeToFlatList( blocks );
-	const dataList = blocksList.map( ( { block, parentId, position } ) =>
-		linkBlockToRequestItem( block, parentId, position )
-	);
-
-	// Create an object like { "nav_menu_item[12]": {...}} }
-	const computeKey = ( item ) => `nav_menu_item[${ item.id }]`;
-	const dataObject = keyBy( dataList, computeKey );
-
-	// Deleted menu items should be sent as false, e.g. { "nav_menu_item[13]": false }
-	for ( const clientId in menuItemsByClientId ) {
-		const key = computeKey( menuItemsByClientId[ clientId ] );
-		if ( ! ( key in dataObject ) ) {
-			dataObject[ key ] = false;
-		}
-	}
-
-	return JSON.stringify( dataObject );
-
-	function blocksTreeToFlatList( innerBlocks, parentId = 0 ) {
-		return innerBlocks.flatMap( ( block, index ) =>
-			[ { block, parentId, position: index + 1 } ].concat(
-				blocksTreeToFlatList(
-					block.innerBlocks,
-					getMenuItemForBlock( block )?.id
-				)
-			)
-		);
-	}
-
-	function linkBlockToRequestItem( block, parentId, position ) {
-		const menuItem = omit( getMenuItemForBlock( block ), 'menus', 'meta' );
-		return {
-			...menuItem,
-			position,
-			title: block.attributes?.label,
-			url: block.attributes.url,
-			original_title: '',
-			classes: ( menuItem.classes || [] ).join( ' ' ),
-			xfn: ( menuItem.xfn || [] ).join( ' ' ),
-			nav_menu_term_id: menuId,
-			menu_item_parent: parentId,
-			status: 'publish',
-			_invalid: false,
-		};
-	}
-
-	function getMenuItemForBlock( block ) {
-		return omit( menuItemsByClientId[ block.clientId ] || {}, '_links' );
-	}
-}
-
-/**
- * This wrapper guarantees serial execution of data processing actions.
- *
- * Examples:
- * * saveNavigationPost() needs to wait for all the missing items to be created.
- * * Concurrent createMissingMenuItems() could result in sending more requests than required.
- *
- * @param {Function} callback An action creator to wrap
- * @return {Function} Original callback wrapped in a serial execution context
- */
-function serializeProcessing( callback ) {
-	return function* ( post ) {
-		const postId = post.id;
-		const isProcessing = yield isProcessingPost( postId );
-
-		if ( isProcessing ) {
-			yield {
-				type: 'ENQUEUE_AFTER_PROCESSING',
-				postId,
-				action: callback,
-			};
-			return { status: 'pending' };
-		}
-		yield {
-			type: 'POP_PENDING_ACTION',
-			postId,
-			action: callback,
-		};
-
-		yield {
-			type: 'START_PROCESSING_POST',
-			postId,
-		};
-
-		try {
-			yield* callback( post );
-		} finally {
-			yield {
-				type: 'FINISH_PROCESSING_POST',
-				postId,
-				action: callback,
-			};
-
-			const pendingActions = yield getPendingActions( postId );
-			if ( pendingActions.length ) {
-				const serializedCallback = serializeProcessing(
-					pendingActions[ 0 ]
-				);
-
-				// re-fetch the post as running the callback() likely updated it
-				yield* serializedCallback(
-					yield getNavigationPostForMenu( post.meta.menuId )
-				);
-			}
-		}
-	};
 }

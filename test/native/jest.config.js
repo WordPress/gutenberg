@@ -36,8 +36,9 @@ module.exports = {
 	],
 	testPathIgnorePatterns: [
 		'/node_modules/',
-		'<rootDir>/wordpress/',
 		'/__device-tests__/',
+		'<rootDir>/.*/build/',
+		'<rootDir>/.*/build-module/',
 	],
 	testURL: 'http://localhost/',
 	// Add the `Libraries/Utilities` subfolder to the module directories, otherwise haste/jest doesn't find Platform.js on Travis,
@@ -49,6 +50,8 @@ module.exports = {
 	moduleNameMapper: {
 		// Mock the CSS modules. See https://facebook.github.io/jest/docs/en/webpack.html#handling-static-assets
 		'\\.(scss)$': '<rootDir>/' + configPath + '/__mocks__/styleMock.js',
+		'\\.(jpg|jpeg|png|gif|eot|otf|webp|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$':
+			'<rootDir>/' + configPath + '/__mocks__/fileMock.js',
 		[ `@wordpress\\/(${ transpiledPackageNames.join(
 			'|'
 		) })$` ]: '<rootDir>/packages/$1/src',
@@ -59,13 +62,12 @@ module.exports = {
 	haste: {
 		defaultPlatform: rnPlatform,
 		platforms: [ 'android', 'ios', 'native' ],
-		providesModuleNodeModules: [ 'react-native', 'react-native-svg' ],
 	},
 	transformIgnorePatterns: [
 		// This is required for now to have jest transform some of our modules
 		// See: https://github.com/wordpress-mobile/gutenberg-mobile/pull/257#discussion_r234978268
 		// There is no overloading in jest so we need to rewrite the config from react-native-jest-preset:
-		// https://github.com/facebook/react-native/blob/master/jest-preset.json#L20
+		// https://github.com/facebook/react-native/blob/HEAD/jest-preset.json#L20
 		'node_modules/(?!(simple-html-tokenizer|(jest-)?react-native|react-clone-referenced-element))',
 	],
 	snapshotSerializers: [ 'enzyme-to-json/serializer', 'jest-emotion' ],

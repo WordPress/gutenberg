@@ -1,0 +1,132 @@
+.edit-post-preferences-modal {
+	min-width: 360px;
+
+	// Better use the space on mobile.
+	width: 100%;
+	@include break-medium() {
+		width: auto;
+	}
+
+	@include break-small() {
+		height: calc(100% - #{$header-height} - #{$header-height});
+	}
+
+	.components-navigation {
+		background-color: $white;
+		margin: -#{$grid-unit-10};
+		padding: $grid-unit-10;
+		.components-navigation__menu {
+			margin: 0;
+			color: $gray-900;
+
+			.components-navigation__item {
+				color: $gray-900; // The inheritance of some items is quite strong, so we have to duplicate this one.
+
+				& > button {
+					color: inherit;
+					padding: 3px $grid-unit-20;
+					height: $grid-unit-60;
+					&:focus {
+						background: $gray-100;
+						font-weight: 500;
+					}
+					&:hover {
+						color: var(--wp-admin-theme-color);
+					}
+				}
+				.components-toggle-control__label {
+					color: inherit;
+				}
+			}
+			.components-navigation__menu-title-heading {
+				color: inherit;
+				border-bottom: 1px solid $gray-300;
+				padding-left: 0;
+				padding-right: 0;
+			}
+			.components-navigation__back-button {
+				color: inherit;
+				padding-left: 0;
+				&:hover {
+					color: var(--wp-admin-theme-color);
+				}
+			}
+			.edit-post-preferences-modal__custom-fields-confirmation-button {
+				width: auto;
+			}
+		}
+	}
+
+	.edit-post-preferences__tabs {
+		display: flex;
+		flex-direction: row;
+		.components-tab-panel__tabs {
+			width: 160px;
+			.components-tab-panel__tabs-item {
+				border-radius: $radius-block-ui;
+				font-weight: 400;
+				&.is-active {
+					background: $gray-100;
+					box-shadow: none;
+					font-weight: 500;
+				}
+				&:focus:not(:disabled) {
+					box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+				}
+			}
+		}
+		.components-tab-panel__tab-content {
+			width: 500px;
+			padding-left: $grid-unit-30;
+		}
+	}
+
+	&__section {
+		margin: 0 0 2.5rem 0;
+	}
+
+	&__section-title {
+		font-size: 0.9rem;
+		font-weight: 600;
+	}
+
+	&__option {
+		.components-base-control {
+			.components-base-control__field {
+				align-items: center;
+				display: flex;
+				margin-bottom: 0;
+
+				& > label {
+					flex-grow: 1;
+					padding: 0.6rem 0 0.6rem 10px;
+				}
+			}
+		}
+	}
+
+	&__custom-fields-confirmation-message,
+	&__custom-fields-confirmation-button {
+		margin: 0 0 0.6rem 48px;
+
+		@include break-medium() {
+			margin-left: 38px;
+		}
+		@include break-small() {
+			max-width: 300px;
+		}
+	}
+
+	.components-base-control__help {
+		margin: -$grid-unit-10 0 $grid-unit-10 58px;
+		font-size: $helptext-font-size;
+		font-style: normal;
+		color: $gray-700;
+	}
+	.edit-post-preferences-modal__section-description {
+		margin: -$grid-unit-10 0 $grid-unit-10 0;
+		font-size: $helptext-font-size;
+		font-style: normal;
+		color: $gray-700;
+	}
+}

@@ -34,7 +34,7 @@ program
 	.arguments( '[slug]' )
 	.option(
 		'-t, --template <name>',
-		'block template type name, allowed values: "es5", "esnext"',
+		'block template type name, allowed values: "es5", "esnext", or the name of an external npm package',
 		'esnext'
 	)
 	.option( '--namespace <value>', 'internal namespace for the block name' )
@@ -50,6 +50,7 @@ program
 		'--no-wp-scripts',
 		'disable integration with `@wordpress/scripts` package'
 	)
+	.option( '--wp-env', 'enable integration with `@wordpress/env` package' )
 	.action(
 		async (
 			slug,
@@ -60,6 +61,7 @@ program
 				template: templateName,
 				title,
 				wpScripts,
+				wpEnv,
 			}
 		) => {
 			await checkSystemRequirements( engines );
@@ -73,6 +75,7 @@ program
 						namespace,
 						title,
 						wpScripts,
+						wpEnv,
 					},
 					( value ) => value !== undefined
 				);
@@ -91,6 +94,8 @@ program
 						( { name } ) =>
 							! Object.keys( optionsValues ).includes( name )
 					);
+					log.info( '' );
+					log.info( "Let's customize your block:" );
 					const answers = await inquirer.prompt( prompts );
 					await scaffold( blockTemplate, {
 						...defaultValues,

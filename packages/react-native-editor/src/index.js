@@ -11,6 +11,15 @@ import { getTranslation } from '../i18n-cache';
 import initialHtml from './initial-html';
 import setupApiFetch from './api-fetch-setup';
 
+/**
+ * WordPress dependencies
+ */
+import {
+	validateThemeColors,
+	validateThemeGradients,
+} from '@wordpress/block-editor';
+import { dispatch } from '@wordpress/data';
+
 const reactNativeSetup = () => {
 	// Disable warnings as they disrupt the user experience in dev mode
 	// eslint-disable-next-line no-console
@@ -57,7 +66,14 @@ const setupInitHooks = () => {
 		'core/react-native-editor',
 		( props ) => {
 			const { capabilities = {} } = props;
-			let { initialData, initialTitle, postType } = props;
+			let {
+				initialData,
+				initialTitle,
+				postType,
+				featuredImageId,
+				colors,
+				gradients,
+			} = props;
 
 			if ( initialData === undefined && __DEV__ ) {
 				initialData = initialHtml;
@@ -69,18 +85,40 @@ const setupInitHooks = () => {
 				postType = 'post';
 			}
 
+			colors = validateThemeColors( colors );
+
+			gradients = validateThemeGradients( gradients );
+
 			return {
 				initialHtml: initialData,
 				initialHtmlModeEnabled: props.initialHtmlModeEnabled,
 				initialTitle,
 				postType,
+				featuredImageId,
 				capabilities,
-				colors: props.colors,
-				gradients: props.gradients,
+				colors,
+				gradients,
 			};
 		}
 	);
+
+	wpHooks.addAction(
+		'native.render',
+		'core/react-native-editor',
+		( props ) => {
+			const isAudioBlockEnabled =
+				props.capabilities && props.capabilities.audioBlock;
+
+			if ( isAudioBlockEnabled === true ) {
+				dispatch( 'core/edit-post' ).showBlockTypes( [ 'core/audio' ] );
+			} else {
+				dispatch( 'core/edit-post' ).hideBlockTypes( [ 'core/audio' ] );
+			}
+		}
+	);
 };
+
+let blocksRegistered = false;
 
 const setupLocale = ( locale, extraTranslations ) => {
 	const setLocaleData = require( '@wordpress/i18n' ).setLocaleData;
@@ -104,7 +142,19 @@ const setupLocale = ( locale, extraTranslations ) => {
 	if ( gutenbergTranslations || extraTranslations ) {
 		setLocaleData( translations );
 	}
+
+	if ( blocksRegistered ) {
+		return;
+	}
+
+	const registerCoreBlocks = require( '@wordpress/block-library' )
+		.registerCoreBlocks;
+	registerCoreBlocks();
+	blocksRegistered = true;
 };
 
-reactNativeSetup();
-gutenbergSetup();
+export { initialHtml as initialHtmlGutenberg };
+export function doGutenbergNativeSetup() {
+	reactNativeSetup();
+	gutenbergSetup();
+}

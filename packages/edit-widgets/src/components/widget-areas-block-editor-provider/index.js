@@ -6,55 +6,46 @@ import { defaultTo } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	DropZoneProvider,
-	SlotFillProvider,
-	FocusReturnProvider,
-} from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
-import { useSelect } from '@wordpress/data';
-import { useEffect, useMemo, useState } from '@wordpress/element';
-import { createBlock } from '@wordpress/blocks';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useMemo } from '@wordpress/element';
 import {
 	BlockEditorProvider,
 	BlockEditorKeyboardShortcuts,
 } from '@wordpress/block-editor';
+import { ReusableBlocksMenuItems } from '@wordpress/reusable-blocks';
 
 /**
  * Internal dependencies
  */
 import KeyboardShortcuts from '../keyboard-shortcuts';
-
-const EMPTY_ARRAY = [];
+import { useEntityBlockEditor } from '@wordpress/core-data';
+import { buildWidgetAreasPostId, KIND, POST_TYPE } from '../../store/utils';
+import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
+import { store as editWidgetsStore } from '../../store';
 
 export default function WidgetAreasBlockEditorProvider( {
 	blockEditorSettings,
+	children,
 	...props
 } ) {
-	const { areas, hasUploadPermissions } = useSelect( ( select ) => {
-		const { canUser, getEntityRecords } = select( 'core' );
-		return {
-			areas: getEntityRecords( 'root', 'widgetArea' ) || EMPTY_ARRAY,
+	const { hasUploadPermissions, reusableBlocks } = useSelect(
+		( select ) => ( {
 			hasUploadPermissions: defaultTo(
-				canUser( 'create', 'media' ),
+				select( 'core' ).canUser( 'create', 'media' ),
 				true
 			),
-		};
-	} );
-	const [ blocks, setBlocks ] = useState( [] );
-	useEffect( () => {
-		if ( ! areas || ! areas.length || blocks.length > 0 ) {
-			return;
-		}
-		setBlocks(
-			areas.map( ( { id, name } ) => {
-				return createBlock( 'core/widget-area', {
-					id,
-					name,
-				} );
-			} )
-		);
-	}, [ areas, blocks ] );
+			widgetAreas: select( editWidgetsStore ).getWidgetAreas(),
+			widgets: select( editWidgetsStore ).getWidgets(),
+			reusableBlocks: select( 'core' ).getEntityRecords(
+				'postType',
+				'wp_block'
+			),
+		} ),
+		[]
+	);
+	const { setIsInserterOpened } = useDispatch( editWidgetsStore );
 
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
@@ -69,27 +60,42 @@ export default function WidgetAreasBlockEditorProvider( {
 		}
 		return {
 			...blockEditorSettings,
+			__experimentalReusableBlocks: reusableBlocks,
 			mediaUpload: mediaUploadBlockEditor,
 			templateLock: 'all',
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
 		};
-	}, [ blockEditorSettings, hasUploadPermissions ] );
+	}, [
+		blockEditorSettings,
+		hasUploadPermissions,
+		reusableBlocks,
+		setIsInserterOpened,
+	] );
+
+	const widgetAreaId = useLastSelectedWidgetArea();
+
+	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
+		KIND,
+		POST_TYPE,
+		{ id: buildWidgetAreasPostId() }
+	);
 
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
-				<DropZoneProvider>
-					<FocusReturnProvider>
-						<BlockEditorProvider
-							value={ blocks }
-							onInput={ ( newBlocks ) => setBlocks( newBlocks ) }
-							onChange={ ( newBlocks ) => setBlocks( newBlocks ) }
-							settings={ settings }
-							{ ...props }
-						/>
-					</FocusReturnProvider>
-				</DropZoneProvider>
+				<BlockEditorProvider
+					value={ blocks }
+					onInput={ onInput }
+					onChange={ onChange }
+					settings={ settings }
+					useSubRegistry={ false }
+					{ ...props }
+				>
+					{ children }
+					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
+				</BlockEditorProvider>
 			</SlotFillProvider>
 		</>
 	);

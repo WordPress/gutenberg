@@ -18,10 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Media & Text' ),
-	description: __( 'Set media and words side-by-side for a richer layout.' ),
 	icon,
-	keywords: [ __( 'image' ), __( 'video' ) ],
 	example: {
 		attributes: {
 			mediaType: 'image',

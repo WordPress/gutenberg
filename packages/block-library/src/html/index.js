@@ -17,10 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Custom HTML' ),
-	description: __( 'Add custom HTML code and preview it as you edit.' ),
 	icon,
-	keywords: [ __( 'embed' ) ],
 	example: {
 		attributes: {
 			content:

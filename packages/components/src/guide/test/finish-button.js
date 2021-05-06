@@ -30,7 +30,7 @@ describe( 'FinishButton', () => {
 	it( 'receives focus on mount when nothing is focused', () => {
 		const focus = jest.fn();
 		create( <FinishButton />, {
-			createNodeMock: () => ( { focus } ),
+			createNodeMock: () => ( { focus, ownerDocument: document } ),
 		} );
 		expect( focus ).toHaveBeenCalled();
 	} );
@@ -42,7 +42,7 @@ describe( 'FinishButton', () => {
 
 		const focus = jest.fn();
 		create( <FinishButton />, {
-			createNodeMock: () => ( { focus } ),
+			createNodeMock: () => ( { focus, ownerDocument: document } ),
 		} );
 		expect( focus ).not.toHaveBeenCalled();
 	} );

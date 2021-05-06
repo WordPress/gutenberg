@@ -213,8 +213,7 @@ const MyRangeControl() {
 
 #### onChange
 
-A function that receives the new value.
-If allowReset is true, when onChange is called without any parameter passed it should reset the value.
+A function that receives the new value. The value will be less than `max` and more than `min` unless a reset (enabled by `allowReset`) has occurred. In which case the value will be either that of `resetFallbackValue` if it has been specified or otherwise `undefined`.
 
 -   Type: `function`
 -   Required: Yes
@@ -222,13 +221,21 @@ If allowReset is true, when onChange is called without any parameter passed it s
 
 #### min
 
-The minimum value accepted. If smaller values are inserted onChange will not be called and the value gets reverted when blur event fires.
+The minimum `value` allowed.
 
 -   Type: `Number`
 -   Required: No
+-   Default: 0
 -   Platform: Web | Mobile
 
 #### max
+
+The maximum `value` allowed.
+
+-   Type: `Number`
+-   Required: No
+-   Default: 100
+-   Platform: Web | Mobile
 
 #### railColor
 
@@ -237,12 +244,6 @@ Customizes the (background) color of the rail element.
 -   Type: `String`
 -   Required: No
 -   Platform: Web
-
-The maximum value accepted. If higher values are inserted onChange will not be called and the value gets reverted when blur event fires.
-
--   Type: `Number`
--   Required: No
--   Platform: Web | Mobile
 
 #### renderTooltipContent
 

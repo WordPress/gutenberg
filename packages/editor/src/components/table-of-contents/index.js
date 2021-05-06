@@ -6,20 +6,24 @@ import { Dropdown, Button } from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
 import { info } from '@wordpress/icons';
 import { forwardRef } from '@wordpress/element';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
 import TableOfContentsPanel from './panel';
 
-function TableOfContents( { hasOutlineItemsDisabled, ...props }, ref ) {
+function TableOfContents(
+	{ hasOutlineItemsDisabled, repositionDropdown, ...props },
+	ref
+) {
 	const hasBlocks = useSelect(
-		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
+		( select ) => !! select( blockEditorStore ).getBlockCount(),
 		[]
 	);
 	return (
 		<Dropdown
-			position="bottom"
+			position={ repositionDropdown ? 'middle right right' : 'bottom' }
 			className="table-of-contents"
 			contentClassName="table-of-contents__popover"
 			renderToggle={ ( { isOpen, onToggle } ) => (
@@ -29,7 +33,9 @@ function TableOfContents( { hasOutlineItemsDisabled, ...props }, ref ) {
 					onClick={ hasBlocks ? onToggle : undefined }
 					icon={ info }
 					aria-expanded={ isOpen }
-					label={ __( 'Content structure' ) }
+					aria-haspopup="true"
+					/* translators: button label text should, if possible, be under 16 characters. */
+					label={ __( 'Details' ) }
 					tooltipPosition="bottom"
 					aria-disabled={ ! hasBlocks }
 				/>

@@ -1,6 +1,101 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+## 2.3.0 (2021-04-29)
+
+### Enhancement
+
+-   Rename `format:js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
+-   Updated `.editorconfig` template files to work with automatic file formatting ([#30794](https://github.com/WordPress/gutenberg/pull/30794)).
+
+## 2.2.0 (2021-04-06)
+
+### Enhancement
+
+-   Scaffolded plugin requires WordPress 5.7 now ([#29757](https://github.com/WordPress/gutenberg/pull/29757)).
+
+### New Features
+
+-   Add new `theme` category to select for the block type ([#30089](https://github.com/WordPress/gutenberg/pull/30089)).
+
+## 2.1.0 (2021-03-17)
+
+### New Features
+
+-   Add a way to provide a default value in the template for `attributes` and `supports` Block API fields ([#28883](https://github.com/WordPress/gutenberg/pull/28883)).
+
+### Enhancement
+
+-   Block scaffolded with `esnext` template is now registered from `block.json` with the `register_block_type_from_metadata` helper ([#28883](https://github.com/WordPress/gutenberg/pull/28883)).
+
+### Bug Fixes
+
+-   Updated `check-node-version` to version `^4.1.0` that no longer processes unrelated engines ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).
+-   Fixed the background color used in the CSS file that was invalid on the front-end.
+
+## 2.0.1 (2021-02-01)
+
+### Bug Fix
+
+-   Extract the package name from the value passed as an external template ([#28383](https://github.com/WordPress/gutenberg/pull/28383)).
+
+## 2.0.0 (2021-01-21)
+
+### Breaking Changes
+
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
+
+### New Features
+
+-   Add support for handling static assets with the `assetsPath` field in the external template configuration ([#28038](https://github.com/WordPress/gutenberg/pull/28038)).
+-   Allow using locally installed packages with templates ([#28105](https://github.com/WordPress/gutenberg/pull/28105)).
+-   Add new CLI option `--wp-env` that lets users override the setting that template defines for integration with `@wordpress/env` package ([#28234](https://github.com/WordPress/gutenberg/pull/28234)).
+
+### Internal
+
+-   Update the demo included in the README file ([#28037](https://github.com/WordPress/gutenberg/pull/28037)).
+
+## 1.1.0 (2021-01-05)
+
+### New Feature
+
+-   Adds the `npmDependencies` field to the template configuration. It allows listing remote npm dependencies that will be installed in the scaffolded project ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
+-   Installs WordPress npm dependencies used in the `esnext` template during the scaffolding process ([#27880](https://github.com/WordPress/gutenberg/pull/27880)).
+
+### Bug Fix
+
+-   Print the block class name in the `save` method in scaffolded templates ([#27988](https://github.com/WordPress/gutenberg/pull/27988)).
+
+## 1.0.2 (2020-12-17)
+
+### Bug Fix
+
+-   Second attempt to fix support for external templates by using a temporary folder when downloading npm package.
+
+## 1.0.1 (2020-12-17)
+
+### Bug Fix
+
+-   Fix support for external templates hosted on npm.
+
+## 1.0.0 (2020-12-17)
+
+### Breaking Changes
+
+-   Set the minimum required version of WordPress to 5.6.0 to ensure that block is correctly registered with the [Block API version 2](https://make.wordpress.org/core/2020/11/18/block-api-version-2/) ([#26098](https://github.com/WordPress/gutenberg/pull/26098)).
+
+### New Features
+
+-   Added basic support for external templates hosted on npm ([#23712](https://github.com/WordPress/gutenberg/pull/23712)).
+-   Update templates to work with the [Block API version 2](https://make.wordpress.org/core/2020/11/18/block-api-version-2/) ([#26098](https://github.com/WordPress/gutenberg/pull/26098)).
+
+## 0.18.0 (2020-10-30)
+
+### Breaking Changes
+
+-   Update the list of available block categories to align with changes introduced in WordPress 5.5.0 (https://make.wordpress.org/core/2020/07/30/block-api-updates-in-5-5/).
+-   Set the minimum required version of WordPress to 5.5.0 to ensure that block is correctly registered with new block categories.
 
 ## 0.16.0 (2020-06-25)
 

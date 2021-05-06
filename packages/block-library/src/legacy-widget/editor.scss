@@ -1,35 +1,88 @@
-.wp-block-legacy-widget__edit-container {
+.wp-block-legacy-widget__edit-form {
+	background: $white;
+	border-radius: $radius-block-ui;
+	border: 1px solid $gray-900;
+	padding: $grid-unit-15 - 1px; //Subtract the border width.
+
+	.wp-block-legacy-widget__edit-form-title {
+		color: $black;
+		font-family: $default-font;
+		font-size: 14px;
+		font-weight: 600;
+		margin: 0 0 $grid-unit-15 0;
+	}
+
 	.widget-inside {
 		border: none;
-		display: block;
 		box-shadow: none;
+		display: block;
+		font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+
+		label {
+			font-size: $default-font-size;
+		}
+
+		label + .widefat {
+			margin-top: $grid-unit-15;
+		}
 	}
+
 	// Reset z-index set on https://github.com/WordPress/wordpress-develop/commit/f26d4d37351a55fd1fc5dad0f5fef8f0f964908c.
 	.widget.open {
 		z-index: 0;
 	}
 }
 
-.wp-block-legacy-widget__update-button {
-	margin-left: auto;
-	display: block;
+.wp-block-legacy-widget__edit-preview,
+.wp-block-legacy-widget__edit-no-preview {
+	cursor: pointer;
+
+	&:hover::after {
+		border-radius: $radius-block-ui;
+		border: 1px solid $gray-600;
+		bottom: 0;
+		content: "";
+		left: 0;
+		position: absolute;
+		right: 0;
+		top: 0;
+	}
 }
 
-.wp-block-legacy-widget__preview {
-	overflow: auto;
+.wp-block-legacy-widget__edit-preview.is-offscreen {
+	left: -9999px;
+	position: absolute;
+	top: 0;
+	width: 100%;
 }
 
-.wp-block-legacy-widget__preview,
-.wp-block-legacy-widget__edit-container,
-.wp-block-legacy-widget__edit-widget-title {
-	padding: $grid-unit-10 $block-padding;
+.wp-block-legacy-widget__edit-preview-iframe {
+	overflow: hidden;
+	width: 100%;
 }
 
-.wp-block-legacy-widget__edit-widget-title {
-	background: $light-gray-100;
-	color: $dark-gray-500;
-	font-family: $default-font;
+.wp-block-legacy-widget__edit-no-preview {
+	background: $gray-100;
+	padding: $grid-unit-10 $grid-unit-15;
 	font-size: $default-font-size;
-	padding: $grid-unit-10 $block-padding;
-	font-weight: 600;
+
+	h3 {
+		font-size: 14px;
+		font-weight: 600;
+		margin: $grid-unit-05 0;
+	}
+
+	p {
+		margin: $grid-unit-05 0;
+	}
+}
+
+.wp-block-legacy-widget-inspector-card {
+	// Padding left = an icon, some margin and some padding
+	padding: 0 $grid-unit-20 $grid-unit-20 ( $grid-unit-20 + $icon-size + $grid-unit-15 );
+}
+
+.interface-complementary-area .wp-block-legacy-widget-inspector-card__name {
+	margin: 0 0 5px;
+	font-weight: 500;
 }

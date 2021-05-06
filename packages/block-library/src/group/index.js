@@ -18,15 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Group' ),
 	icon,
-	description: __( 'A block that groups other blocks.' ),
-	keywords: [
-		__( 'container' ),
-		__( 'wrapper' ),
-		__( 'row' ),
-		__( 'section' ),
-	],
 	example: {
 		attributes: {
 			style: {

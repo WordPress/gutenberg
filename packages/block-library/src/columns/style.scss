@@ -1,6 +1,7 @@
 .wp-block-columns {
 	display: flex;
-	margin-bottom: $default-block-margin;
+	margin-bottom: 1.75em;
+	box-sizing: border-box;
 
 	// Responsiveness: Allow wrapping on mobile.
 	flex-wrap: wrap;
@@ -11,6 +12,21 @@
 
 	&.has-background {
 		padding: $block-bg-padding--v $block-bg-padding--h;
+	}
+
+	/**
+	* All Columns Alignment
+	*/
+	&.are-vertically-aligned-top {
+		align-items: flex-start;
+	}
+
+	&.are-vertically-aligned-center {
+		align-items: center;
+	}
+
+	&.are-vertically-aligned-bottom {
+		align-items: flex-end;
 	}
 }
 
@@ -32,16 +48,19 @@
 
 	// Between mobile and large viewports, allow 2 columns.
 	@media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium - 1) }) {
-		// As with mobile styles, this must be important since the Column
-		// assigns its own width as an inline style, which should take effect
-		// starting at `break-medium`.
-		flex-basis: calc(50% - #{$grid-unit-20}) !important;
-		flex-grow: 0;
+		// Only add two column styling if there are two or more columns
+		&:not(:only-child) {
+			// As with mobile styles, this must be important since the Column
+			// assigns its own width as an inline style, which should take effect
+			// starting at `break-medium`.
+			flex-basis: calc(50% - 1em) !important;
+			flex-grow: 0;
+		}
 
 		// Add space between the multiple columns. Themes can customize this if they wish to work differently.
 		// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 		&:nth-child(even) {
-			margin-left: $grid-unit-20 * 2;
+			margin-left: 2em;
 		}
 	}
 
@@ -65,32 +84,13 @@
 
 		// When columns are in a single row, add space before all except the first.
 		&:not(:first-child) {
-			margin-left: $grid-unit-20 * 2;
+			margin-left: 2em;
 		}
 	}
-}
 
-/**
- * All Columns Alignment
- */
-.wp-block-columns {
-	&.are-vertically-aligned-top {
-		align-items: flex-start;
-	}
-
-	&.are-vertically-aligned-center {
-		align-items: center;
-	}
-
-	&.are-vertically-aligned-bottom {
-		align-items: flex-end;
-	}
-}
-
-/**
- * Individual Column Alignment
- */
-.wp-block-column {
+	/**
+	* Individual Column Alignment
+	*/
 	&.is-vertically-aligned-top {
 		align-self: flex-start;
 	}

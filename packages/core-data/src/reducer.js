@@ -15,6 +15,7 @@ import isShallowEqual from '@wordpress/is-shallow-equal';
 import { ifMatchingAction, replaceAction } from './utils';
 import { reducer as queriedDataReducer } from './queried-data';
 import { defaultEntities, DEFAULT_ENTITY_KEY } from './entities';
+import { reducer as locksReducer } from './locks';
 
 /**
  * Reducer managing terms state. Keyed by taxonomy slug, the value is either
@@ -220,7 +221,14 @@ function entity( entityConfig ) {
 												'raw',
 												record[ key ]
 											)
-										)
+										) &&
+										// Sometimes the server alters the sent value which means
+										// we need to also remove the edits before the api request.
+										( ! action.persistedEdits ||
+											! isEqual(
+												edits[ key ],
+												action.persistedEdits[ key ]
+											) )
 									) {
 										acc[ key ] = edits[ key ];
 									}
@@ -270,6 +278,24 @@ function entity( entityConfig ) {
 									action.type === 'SAVE_ENTITY_RECORD_START',
 								error: action.error,
 								isAutosave: action.isAutosave,
+							},
+						};
+				}
+
+				return state;
+			},
+
+			deleting: ( state = {}, action ) => {
+				switch ( action.type ) {
+					case 'DELETE_ENTITY_RECORD_START':
+					case 'DELETE_ENTITY_RECORD_FINISH':
+						return {
+							...state,
+							[ action.recordId ]: {
+								pending:
+									action.type ===
+									'DELETE_ENTITY_RECORD_START',
+								error: action.error,
 							},
 						};
 				}
@@ -549,4 +575,5 @@ export default combineReducers( {
 	embedPreviews,
 	userPermissions,
 	autosaves,
+	locks: locksReducer,
 } );

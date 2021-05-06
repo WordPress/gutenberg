@@ -7,17 +7,22 @@ import { flow } from 'lodash';
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { MenuItem, withSpokenMessages } from '@wordpress/components';
+import { MenuItem } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
+import { speak } from '@wordpress/a11y';
 
-function FeatureToggle( {
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../../store';
+
+export default function FeatureToggle( {
 	feature,
 	label,
 	info,
 	messageActivated,
 	messageDeactivated,
-	speak,
 } ) {
 	const speakMessage = () => {
 		if ( isActive ) {
@@ -28,10 +33,10 @@ function FeatureToggle( {
 	};
 
 	const isActive = useSelect( ( select ) => {
-		return select( 'core/edit-site' ).isFeatureActive( feature );
+		return select( editSiteStore ).isFeatureActive( feature );
 	}, [] );
 
-	const { toggleFeature } = useDispatch( 'core/edit-site' );
+	const { toggleFeature } = useDispatch( editSiteStore );
 
 	return (
 		<MenuItem
@@ -48,5 +53,3 @@ function FeatureToggle( {
 		</MenuItem>
 	);
 }
-
-export default withSpokenMessages( FeatureToggle );

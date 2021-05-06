@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/edit-navigation",
-	"version": "1.2.0",
+	"version": "1.8.6",
 	"private": true,
 	"description": "Module for the Navigation page in WordPress.",
 	"author": "The WordPress Contributors",
@@ -11,7 +11,7 @@
 		"editor",
 		"navigation"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/edit-navigation/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/edit-navigation/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -20,15 +20,14 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
-	"sideEffects": [
-		"build-style/**",
-		"!((src|build|build-module)/components/**)"
-	],
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/block-editor": "file:../block-editor",
 		"@wordpress/block-library": "file:../block-library",
@@ -43,14 +42,16 @@
 		"@wordpress/hooks": "file:../hooks",
 		"@wordpress/html-entities": "file:../html-entities",
 		"@wordpress/i18n": "file:../i18n",
+		"@wordpress/icons": "file:../icons",
+		"@wordpress/interface": "file:../interface",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.15",
+		"lodash": "^4.17.19",
 		"rememo": "^3.0.0",
-		"uuid": "^7.0.2"
+		"uuid": "^8.3.0"
 	},
 	"publishConfig": {
 		"access": "public"

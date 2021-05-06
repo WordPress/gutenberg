@@ -8,11 +8,18 @@ exports[`PostPublishPanel should render the post-publish panel if the post is pu
     className="editor-post-publish-panel__header"
   >
     <ForwardRef(Button)
-      className="is-secondary"
+      icon={
+        <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z"
+          />
+        </SVG>
+      }
       label="Close panel"
-    >
-      Close
-    </ForwardRef(Button)>
+    />
   </div>
   <div
     className="editor-post-publish-panel__content"
@@ -39,11 +46,18 @@ exports[`PostPublishPanel should render the post-publish panel if the post is sc
     className="editor-post-publish-panel__header"
   >
     <ForwardRef(Button)
-      className="is-secondary"
+      icon={
+        <SVG
+          viewBox="0 0 24 24"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <Path
+            d="M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z"
+          />
+        </SVG>
+      }
       label="Close panel"
-    >
-      Close
-    </ForwardRef(Button)>
+    />
   </div>
   <div
     className="editor-post-publish-panel__content"
@@ -81,8 +95,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
       className="editor-post-publish-panel__header-cancel-button"
     >
       <ForwardRef(Button)
-        className="is-secondary"
-        label="Close panel"
+        isSecondary={true}
       >
         Cancel
       </ForwardRef(Button)>
@@ -91,7 +104,7 @@ exports[`PostPublishPanel should render the pre-publish panel if post status is 
   <div
     className="editor-post-publish-panel__content"
   >
-    <WithSelect(PostPublishPanelPrepublish) />
+    <PostPublishPanelPrepublish />
   </div>
   <div
     className="editor-post-publish-panel__footer"
@@ -122,8 +135,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
       className="editor-post-publish-panel__header-cancel-button"
     >
       <ForwardRef(Button)
-        className="is-secondary"
-        label="Close panel"
+        isSecondary={true}
       >
         Cancel
       </ForwardRef(Button)>
@@ -132,7 +144,7 @@ exports[`PostPublishPanel should render the pre-publish panel if the post is not
   <div
     className="editor-post-publish-panel__content"
   >
-    <WithSelect(PostPublishPanelPrepublish) />
+    <PostPublishPanelPrepublish />
   </div>
   <div
     className="editor-post-publish-panel__footer"
@@ -163,8 +175,7 @@ exports[`PostPublishPanel should render the spinner if the post is being saved 1
       className="editor-post-publish-panel__header-cancel-button"
     >
       <ForwardRef(Button)
-        className="is-secondary"
-        label="Close panel"
+        isSecondary={true}
       >
         Cancel
       </ForwardRef(Button)>

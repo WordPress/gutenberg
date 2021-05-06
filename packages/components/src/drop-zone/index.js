@@ -2,85 +2,69 @@
  * External dependencies
  */
 import classnames from 'classnames';
+import { includes } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { useContext, useEffect, useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { upload, Icon } from '@wordpress/icons';
+import { getFilesFromDataTransfer } from '@wordpress/dom';
+import { __experimentalUseDropZone as useDropZone } from '@wordpress/compose';
 
-/**
- * Internal dependencies
- */
-import { DropZoneConsumer, Context } from './provider';
-
-export function useDropZone( {
-	element,
-	onFilesDrop,
-	onHTMLDrop,
-	onDrop,
-	isDisabled,
-	withPosition,
-	__unstableIsRelative = false,
-} ) {
-	const { addDropZone, removeDropZone } = useContext( Context );
-	const [ state, setState ] = useState( {
-		isDraggingOverDocument: false,
-		isDraggingOverElement: false,
-		type: null,
-	} );
-
-	useEffect( () => {
-		if ( ! isDisabled ) {
-			const dropZone = {
-				element,
-				onDrop,
-				onFilesDrop,
-				onHTMLDrop,
-				setState,
-				withPosition,
-				isRelative: __unstableIsRelative,
-			};
-			addDropZone( dropZone );
-			return () => {
-				removeDropZone( dropZone );
-			};
-		}
-	}, [ isDisabled, onDrop, onFilesDrop, onHTMLDrop, withPosition ] );
-
-	return state;
-}
-
-const DropZone = ( props ) => (
-	<DropZoneConsumer>
-		{ ( { addDropZone, removeDropZone } ) => (
-			<DropZoneComponent
-				addDropZone={ addDropZone }
-				removeDropZone={ removeDropZone }
-				{ ...props }
-			/>
-		) }
-	</DropZoneConsumer>
-);
-
-function DropZoneComponent( {
+export default function DropZoneComponent( {
 	className,
 	label,
 	onFilesDrop,
 	onHTMLDrop,
 	onDrop,
 } ) {
-	const element = useRef();
-	const { isDraggingOverDocument, isDraggingOverElement, type } = useDropZone(
-		{
-			element,
-			onFilesDrop,
-			onHTMLDrop,
-			onDrop,
-			__unstableIsRelative: true,
-		}
-	);
+	const [ isDraggingOverDocument, setIsDraggingOverDocument ] = useState();
+	const [ isDraggingOverElement, setIsDraggingOverElement ] = useState();
+	const [ type, setType ] = useState();
+	const ref = useDropZone( {
+		onDrop( event ) {
+			const files = getFilesFromDataTransfer( event.dataTransfer );
+			const html = event.dataTransfer.getData( 'text/html' );
+
+			if ( files.length && onFilesDrop ) {
+				onFilesDrop( files );
+			} else if ( html && onHTMLDrop ) {
+				onHTMLDrop( html );
+			} else if ( onDrop ) {
+				onDrop( event );
+			}
+		},
+		onDragStart( event ) {
+			setIsDraggingOverDocument( true );
+
+			let _type = 'default';
+
+			if (
+				// Check for the types because sometimes the files themselves
+				// are only available on drop.
+				includes( event.dataTransfer.types, 'Files' ) ||
+				getFilesFromDataTransfer( event.dataTransfer ).length > 0
+			) {
+				_type = 'file';
+			} else if ( includes( event.dataTransfer.types, 'text/html' ) ) {
+				_type = 'html';
+			}
+
+			setType( _type );
+		},
+		onDragEnd() {
+			setIsDraggingOverDocument( false );
+			setType();
+		},
+		onDragEnter() {
+			setIsDraggingOverElement( true );
+		},
+		onDragLeave() {
+			setIsDraggingOverElement( false );
+		},
+	} );
 
 	let children;
 
@@ -89,7 +73,6 @@ function DropZoneComponent( {
 			<div className="components-drop-zone__content">
 				<Icon
 					icon={ upload }
-					size="40"
 					className="components-drop-zone__content-icon"
 				/>
 				<span className="components-drop-zone__content-text">
@@ -111,10 +94,8 @@ function DropZoneComponent( {
 	} );
 
 	return (
-		<div ref={ element } className={ classes }>
+		<div ref={ ref } className={ classes }>
 			{ children }
 		</div>
 	);
 }
-
-export default DropZone;

@@ -22,6 +22,10 @@ export class FullscreenMode extends Component {
 		if ( this.isSticky ) {
 			document.body.classList.add( 'sticky-menu' );
 		}
+
+		if ( this.props.isActive ) {
+			document.body.classList.remove( 'is-fullscreen-mode' );
+		}
 	}
 
 	componentDidUpdate( prevProps ) {

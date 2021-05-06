@@ -241,12 +241,26 @@ export function deviceType( state = 'Desktop', action ) {
 /**
  * Reducer tracking whether the inserter is open.
  *
+ * @param {boolean|Object} state
+ * @param {Object}         action
+ */
+function blockInserterPanel( state = false, action ) {
+	switch ( action.type ) {
+		case 'SET_IS_INSERTER_OPENED':
+			return action.value;
+	}
+	return state;
+}
+
+/**
+ * Reducer tracking whether the inserter is open.
+ *
  * @param {boolean} state
  * @param {Object}  action
  */
-function isInserterOpened( state = false, action ) {
+function isEditingTemplate( state = false, action ) {
 	switch ( action.type ) {
-		case 'SET_IS_INSERTER_OPENED':
+		case 'SET_IS_EDITING_TEMPLATE':
 			return action.value;
 	}
 	return state;
@@ -264,5 +278,6 @@ export default combineReducers( {
 	publishSidebarActive,
 	removedPanels,
 	deviceType,
-	isInserterOpened,
+	blockInserterPanel,
+	isEditingTemplate,
 } );

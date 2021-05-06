@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { MenuItem } from '@wordpress/components';
+import { MenuItem, VisuallyHidden } from '@wordpress/components';
+import { external } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { registerPlugin } from '@wordpress/plugins';
 import { addQueryArgs } from '@wordpress/url';
@@ -29,7 +30,7 @@ registerPlugin( 'edit-post', {
 									post_type: 'wp_block',
 								} ) }
 							>
-								{ __( 'Manage all reusable blocks' ) }
+								{ __( 'Manage Reusable blocks' ) }
 							</MenuItem>
 							<KeyboardShortcutsHelpMenuItem
 								onSelect={ onClose }
@@ -38,6 +39,7 @@ registerPlugin( 'edit-post', {
 							<CopyContentMenuItem />
 							<MenuItem
 								role="menuitem"
+								icon={ external }
 								href={ __(
 									'https://wordpress.org/support/article/wordpress-editor/'
 								) }
@@ -45,6 +47,12 @@ registerPlugin( 'edit-post', {
 								rel="noopener noreferrer"
 							>
 								{ __( 'Help' ) }
+								<VisuallyHidden as="span">
+									{
+										/* translators: accessibility text */
+										__( '(opens in a new tab)' )
+									}
+								</VisuallyHidden>
 							</MenuItem>
 						</>
 					) }

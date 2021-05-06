@@ -16,15 +16,15 @@ import {
 	DocumentationImage,
 	InserterIconImage,
 } from './images';
+import { store as editPostStore } from '../../store';
 
 export default function WelcomeGuide() {
 	const isActive = useSelect(
-		( select ) =>
-			select( 'core/edit-post' ).isFeatureActive( 'welcomeGuide' ),
+		( select ) => select( editPostStore ).isFeatureActive( 'welcomeGuide' ),
 		[]
 	);
 
-	const { toggleFeature } = useDispatch( 'core/edit-post' );
+	const { toggleFeature } = useDispatch( editPostStore );
 
 	if ( ! isActive ) {
 		return null;

@@ -8,20 +8,29 @@ import { escapeRegExp, find, map, debounce, deburr } from 'lodash';
  * WordPress dependencies
  */
 import {
-	Component,
 	renderToString,
+	useEffect,
 	useLayoutEffect,
 	useState,
 } from '@wordpress/element';
-import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import {
+	ENTER,
+	ESCAPE,
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	BACKSPACE,
+} from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { useInstanceId } from '@wordpress/compose';
 import {
 	create,
 	slice,
 	insert,
 	isCollapsed,
 	getTextContent,
+	useAnchorRef,
 } from '@wordpress/rich-text';
 
 /**
@@ -61,7 +70,7 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
  * @callback FnGetOptionLabel
  * @param {CompleterOption} option a completer option.
  *
- * @return {(string|Array.<(string|Component)>)} list of react components to render.
+ * @return {(string|Array.<(string|WPElement)>)} list of react components to render.
  */
 
 /**
@@ -134,11 +143,6 @@ function filterOptions( search, options = [], maxResults = 10 ) {
 	}
 
 	return filtered;
-}
-
-function getRange() {
-	const selection = window.getSelection();
-	return selection.rangeCount ? selection.getRangeAt( 0 ) : null;
 }
 
 const getAutoCompleterUI = ( autocompleter ) => {
@@ -227,8 +231,12 @@ const getAutoCompleterUI = ( autocompleter ) => {
 		onChangeOptions,
 		onSelect,
 		onReset,
+		value,
+		contentRef,
 	} ) {
 		const [ items ] = useItems( filterValue );
+		const anchorRef = useAnchorRef( { ref: contentRef, value } );
+
 		useLayoutEffect( () => {
 			onChangeOptions( items );
 		}, [ items ] );
@@ -243,7 +251,7 @@ const getAutoCompleterUI = ( autocompleter ) => {
 				onClose={ onReset }
 				position="top right"
 				className="components-autocomplete__popover"
-				anchorRef={ getRange() }
+				anchorRef={ anchorRef }
 			>
 				<div
 					id={ listBoxId }
@@ -277,31 +285,25 @@ const getAutoCompleterUI = ( autocompleter ) => {
 	return AutocompleterUI;
 };
 
-export class Autocomplete extends Component {
-	static getInitialState() {
-		return {
-			selectedIndex: 0,
-			filteredOptions: [],
-			filterValue: '',
-			autocompleter: null,
-			AutocompleterUI: null,
-		};
-	}
+function Autocomplete( {
+	children,
+	isSelected,
+	record,
+	onChange,
+	onReplace,
+	completers,
+	debouncedSpeak,
+	contentRef,
+} ) {
+	const instanceId = useInstanceId( Autocomplete );
+	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
+	const [ filteredOptions, setFilteredOptions ] = useState( [] );
+	const [ filterValue, setFilterValue ] = useState( '' );
+	const [ autocompleter, setAutocompleter ] = useState( null );
+	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
+	const [ backspacing, setBackspacing ] = useState( false );
 
-	constructor() {
-		super( ...arguments );
-
-		this.select = this.select.bind( this );
-		this.reset = this.reset.bind( this );
-		this.onChangeOptions = this.onChangeOptions.bind( this );
-		this.handleKeyDown = this.handleKeyDown.bind( this );
-
-		this.state = this.constructor.getInitialState();
-	}
-
-	insertCompletion( replacement ) {
-		const { autocompleter, filterValue } = this.state;
-		const { record, onChange } = this.props;
+	function insertCompletion( replacement ) {
 		const end = record.start;
 		const start =
 			end - autocompleter.triggerPrefix.length - filterValue.length;
@@ -310,9 +312,7 @@ export class Autocomplete extends Component {
 		onChange( insert( record, toInsert, start, end ) );
 	}
 
-	select( option ) {
-		const { onReplace } = this.props;
-		const { autocompleter, filterValue } = this.state;
+	function select( option ) {
 		const { getOptionCompletion } = autocompleter || {};
 
 		if ( option.isDisabled ) {
@@ -331,34 +331,37 @@ export class Autocomplete extends Component {
 			if ( 'replace' === action ) {
 				onReplace( [ value ] );
 			} else if ( 'insert-at-caret' === action ) {
-				this.insertCompletion( value );
+				insertCompletion( value );
 			}
 		}
 
 		// Reset autocomplete state after insertion rather than before
 		// so insertion events don't cause the completion menu to redisplay.
-		this.reset();
+		reset();
 	}
 
-	reset() {
-		this.setState( this.constructor.getInitialState() );
+	function reset() {
+		setSelectedIndex( 0 );
+		setFilteredOptions( [] );
+		setFilterValue( '' );
+		setAutocompleter( null );
+		setAutocompleterUI( null );
 	}
 
-	announce( filteredOptions ) {
-		const { debouncedSpeak } = this.props;
+	function announce( options ) {
 		if ( ! debouncedSpeak ) {
 			return;
 		}
-		if ( !! filteredOptions.length ) {
+		if ( !! options.length ) {
 			debouncedSpeak(
 				sprintf(
 					/* translators: %d: number of results. */
 					_n(
 						'%d result found, use up and down arrow keys to navigate.',
 						'%d results found, use up and down arrow keys to navigate.',
-						filteredOptions.length
+						options.length
 					),
-					filteredOptions.length
+					options.length
 				),
 				'assertive'
 			);
@@ -370,55 +373,52 @@ export class Autocomplete extends Component {
 	/**
 	 * Load options for an autocompleter.
 	 *
-	 * @param {Array} filteredOptions
+	 * @param {Array} options
 	 */
-	onChangeOptions( filteredOptions ) {
-		const selectedIndex =
-			filteredOptions.length === this.state.filteredOptions.length
-				? this.state.selectedIndex
-				: 0;
-		this.setState( {
-			filteredOptions,
-			selectedIndex,
-		} );
-		this.announce( filteredOptions );
+	function onChangeOptions( options ) {
+		setSelectedIndex(
+			options.length === filteredOptions.length ? selectedIndex : 0
+		);
+		setFilteredOptions( options );
+		announce( options );
 	}
 
-	handleKeyDown( event ) {
-		const { autocompleter, selectedIndex, filteredOptions } = this.state;
+	function handleKeyDown( event ) {
+		setBackspacing( event.keyCode === BACKSPACE );
+
 		if ( ! autocompleter ) {
 			return;
 		}
 		if ( filteredOptions.length === 0 ) {
 			return;
 		}
-		let nextSelectedIndex;
 		switch ( event.keyCode ) {
 			case UP:
-				nextSelectedIndex =
+				setSelectedIndex(
 					( selectedIndex === 0
 						? filteredOptions.length
-						: selectedIndex ) - 1;
-				this.setState( { selectedIndex: nextSelectedIndex } );
+						: selectedIndex ) - 1
+				);
 				break;
 
 			case DOWN:
-				nextSelectedIndex =
-					( selectedIndex + 1 ) % filteredOptions.length;
-				this.setState( { selectedIndex: nextSelectedIndex } );
+				setSelectedIndex(
+					( selectedIndex + 1 ) % filteredOptions.length
+				);
 				break;
 
 			case ESCAPE:
-				this.setState( { autocompleter: null } );
+				setAutocompleter( null );
+				setAutocompleterUI( null );
 				break;
 
 			case ENTER:
-				this.select( filteredOptions[ selectedIndex ] );
+				select( filteredOptions[ selectedIndex ] );
 				break;
 
 			case LEFT:
 			case RIGHT:
-				this.reset();
+				reset();
 				return;
 
 			default:
@@ -428,112 +428,145 @@ export class Autocomplete extends Component {
 		// Any handled keycode should prevent original behavior. This relies on
 		// the early return in the default case.
 		event.preventDefault();
+		event.stopPropagation();
 	}
 
-	componentDidUpdate( prevProps ) {
-		const { record, completers } = this.props;
-		const { record: prevRecord } = prevProps;
+	let textContent;
 
-		if ( isCollapsed( record ) ) {
-			const text = deburr( getTextContent( slice( record, 0 ) ) );
-			const prevText = deburr( getTextContent( slice( prevRecord, 0 ) ) );
+	if ( isCollapsed( record ) ) {
+		textContent = getTextContent( slice( record, 0 ) );
+	}
 
-			if ( text !== prevText ) {
-				const textAfterSelection = getTextContent(
-					slice( record, undefined, getTextContent( record ).length )
-				);
-				const autocompleter = find(
-					completers,
-					( { triggerPrefix, allowContext } ) => {
-						const index = text.lastIndexOf( triggerPrefix );
+	useEffect( () => {
+		if ( ! textContent ) {
+			return;
+		}
 
-						if ( index === -1 ) {
-							return false;
-						}
+		const text = deburr( textContent );
+		const textAfterSelection = getTextContent(
+			slice( record, undefined, getTextContent( record ).length )
+		);
+		const completer = find(
+			completers,
+			( { triggerPrefix, allowContext } ) => {
+				const index = text.lastIndexOf( triggerPrefix );
 
-						if (
-							allowContext &&
-							! allowContext(
-								text.slice( 0, index ),
-								textAfterSelection
-							)
-						) {
-							return false;
-						}
-
-						return /^\S*$/.test(
-							text.slice( index + triggerPrefix.length )
-						);
-					}
-				);
-
-				if ( ! autocompleter ) {
-					this.reset();
-					return;
+				if ( index === -1 ) {
+					return false;
 				}
 
-				const safeTrigger = escapeRegExp( autocompleter.triggerPrefix );
-				const match = text.match(
-					new RegExp( `${ safeTrigger }(\\S*)$` )
+				const textWithoutTrigger = text.slice(
+					index + triggerPrefix.length
 				);
-				const query = match && match[ 1 ];
-				this.setState( {
-					autocompleter,
-					AutocompleterUI:
-						autocompleter !== this.state.autocompleter
-							? getAutoCompleterUI( autocompleter )
-							: this.state.AutocompleterUI,
-					filterValue: query,
-				} );
+
+				const tooDistantFromTrigger = textWithoutTrigger.length > 50; // 50 chars seems to be a good limit.
+				// This is a final barrier to prevent the effect from completing with
+				// an extremely long string, which causes the editor to slow-down
+				// significantly. This could happen, for example, if `matchingWhileBackspacing`
+				// is true and one of the "words" end up being too long. If that's the case,
+				// it will be caught by this guard.
+				if ( tooDistantFromTrigger ) return false;
+
+				const mismatch = filteredOptions.length === 0;
+				const wordsFromTrigger = textWithoutTrigger.split( /\s/ );
+				// We need to allow the effect to run when not backspacing and if there
+				// was a mismatch. i.e when typing a trigger + the match string or when
+				// clicking in an existing trigger word on the page. We do that if we
+				// detect that we have one word from trigger in the current textual context.
+				//
+				// Ex.: "Some text @a" <-- "@a" will be detected as the trigger word and
+				// allow the effect to run. It will run until there's a mismatch.
+				const hasOneTriggerWord = wordsFromTrigger.length === 1;
+				// This is used to allow the effect to run when backspacing and if
+				// "touching" a word that "belongs" to a trigger. We consider a "trigger
+				// word" any word up to the limit of 3 from the trigger character.
+				// Anything beyond that is ignored if there's a mismatch. This allows
+				// us to "escape" a mismatch when backspacing, but still imposing some
+				// sane limits.
+				//
+				// Ex: "Some text @marcelo sekkkk" <--- "kkkk" caused a mismatch, but
+				// if the user presses backspace here, it will show the completion popup again.
+				const matchingWhileBackspacing =
+					backspacing && textWithoutTrigger.split( /\s/ ).length <= 3;
+
+				if (
+					mismatch &&
+					! ( matchingWhileBackspacing || hasOneTriggerWord )
+				) {
+					return false;
+				}
+
+				if (
+					allowContext &&
+					! allowContext( text.slice( 0, index ), textAfterSelection )
+				) {
+					return false;
+				}
+
+				if (
+					/^\s/.test( textWithoutTrigger ) ||
+					/\s\s+$/.test( textWithoutTrigger )
+				) {
+					return false;
+				}
+
+				return /[\u0000-\uFFFF]*$/.test( textWithoutTrigger );
 			}
-		}
-	}
-
-	render() {
-		const { children, instanceId, isSelected } = this.props;
-		const {
-			autocompleter,
-			selectedIndex,
-			filteredOptions,
-			AutocompleterUI,
-			filterValue,
-		} = this.state;
-		const { key: selectedKey = '' } =
-			filteredOptions[ selectedIndex ] || {};
-		const { className } = autocompleter || {};
-		const isExpanded = !! autocompleter && filteredOptions.length > 0;
-		const listBoxId = isExpanded
-			? `components-autocomplete-listbox-${ instanceId }`
-			: null;
-		const activeId = isExpanded
-			? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
-			: null;
-
-		return (
-			<>
-				{ children( {
-					isExpanded,
-					listBoxId,
-					activeId,
-					onKeyDown: this.handleKeyDown,
-				} ) }
-				{ isSelected && AutocompleterUI && (
-					<AutocompleterUI
-						className={ className }
-						filterValue={ filterValue }
-						instanceId={ instanceId }
-						listBoxId={ listBoxId }
-						selectedIndex={ selectedIndex }
-						onChangeOptions={ this.onChangeOptions }
-						onSelect={ this.select }
-						onReset={ this.onReset }
-					/>
-				) }
-			</>
 		);
-	}
+
+		if ( ! completer ) {
+			reset();
+			return;
+		}
+
+		const safeTrigger = escapeRegExp( completer.triggerPrefix );
+		const match = text
+			.slice( text.lastIndexOf( completer.triggerPrefix ) )
+			.match( new RegExp( `${ safeTrigger }([\u0000-\uFFFF]*)$` ) );
+		const query = match && match[ 1 ];
+
+		setAutocompleter( completer );
+		setAutocompleterUI( () =>
+			completer !== autocompleter
+				? getAutoCompleterUI( completer )
+				: AutocompleterUI
+		);
+		setFilterValue( query );
+	}, [ textContent ] );
+
+	const { key: selectedKey = '' } = filteredOptions[ selectedIndex ] || {};
+	const { className } = autocompleter || {};
+	const isExpanded = !! autocompleter && filteredOptions.length > 0;
+	const listBoxId = isExpanded
+		? `components-autocomplete-listbox-${ instanceId }`
+		: null;
+	const activeId = isExpanded
+		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
+		: null;
+
+	return (
+		<>
+			{ children( {
+				isExpanded,
+				listBoxId,
+				activeId,
+				onKeyDown: handleKeyDown,
+			} ) }
+			{ isSelected && AutocompleterUI && (
+				<AutocompleterUI
+					className={ className }
+					filterValue={ filterValue }
+					instanceId={ instanceId }
+					listBoxId={ listBoxId }
+					selectedIndex={ selectedIndex }
+					onChangeOptions={ onChangeOptions }
+					onSelect={ select }
+					value={ record }
+					contentRef={ contentRef }
+				/>
+			) }
+		</>
+	);
 }
 
-export default compose( [ withSpokenMessages, withInstanceId ] )(
-	Autocomplete
-);
+export default withSpokenMessages( Autocomplete );

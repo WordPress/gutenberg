@@ -12,7 +12,7 @@ import { Button } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { forwardRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -24,31 +24,32 @@ import {
 	chevronDown,
 } from '@wordpress/icons';
 import { getBlockMoverDescription } from './mover-description';
+import { store as blockEditorStore } from '../../store';
 
-const getArrowIcon = ( direction, orientation, isRTL ) => {
+const getArrowIcon = ( direction, orientation ) => {
 	if ( direction === 'up' ) {
 		if ( orientation === 'horizontal' ) {
-			return isRTL ? chevronRight : chevronLeft;
+			return isRTL() ? chevronRight : chevronLeft;
 		}
 		return chevronUp;
 	} else if ( direction === 'down' ) {
 		if ( orientation === 'horizontal' ) {
-			return isRTL ? chevronLeft : chevronRight;
+			return isRTL() ? chevronLeft : chevronRight;
 		}
 		return chevronDown;
 	}
 	return null;
 };
 
-const getMovementDirectionLabel = ( moveDirection, orientation, isRTL ) => {
+const getMovementDirectionLabel = ( moveDirection, orientation ) => {
 	if ( moveDirection === 'up' ) {
 		if ( orientation === 'horizontal' ) {
-			return isRTL ? __( 'Move right' ) : __( 'Move left' );
+			return isRTL() ? __( 'Move right' ) : __( 'Move left' );
 		}
 		return __( 'Move up' );
 	} else if ( moveDirection === 'down' ) {
 		if ( orientation === 'horizontal' ) {
-			return isRTL ? __( 'Move left' ) : __( 'Move right' );
+			return isRTL() ? __( 'Move left' ) : __( 'Move right' );
 		}
 		return __( 'Move down' );
 	}
@@ -57,12 +58,7 @@ const getMovementDirectionLabel = ( moveDirection, orientation, isRTL ) => {
 
 const BlockMoverButton = forwardRef(
 	(
-		{
-			clientIds,
-			direction,
-			__experimentalOrientation: orientation,
-			...props
-		},
+		{ clientIds, direction, orientation: moverOrientation, ...props },
 		ref
 	) => {
 		const instanceId = useInstanceId( BlockMoverButton );
@@ -75,8 +71,7 @@ const BlockMoverButton = forwardRef(
 			isFirst,
 			isLast,
 			firstIndex,
-			isRTL,
-			moverOrientation,
+			orientation = 'vertical',
 		} = useSelect(
 			( select ) => {
 				const {
@@ -84,9 +79,8 @@ const BlockMoverButton = forwardRef(
 					getBlockRootClientId,
 					getBlockOrder,
 					getBlock,
-					getSettings,
 					getBlockListSettings,
-				} = select( 'core/block-editor' );
+				} = select( blockEditorStore );
 				const normalizedClientIds = castArray( clientIds );
 				const firstClientId = first( normalizedClientIds );
 				const blockRootClientId = getBlockRootClientId( firstClientId );
@@ -102,7 +96,7 @@ const BlockMoverButton = forwardRef(
 				const block = getBlock( firstClientId );
 				const isFirstBlock = firstBlockIndex === 0;
 				const isLastBlock = lastBlockIndex === blockOrder.length - 1;
-				const { __experimentalMoverDirection = 'vertical' } =
+				const { orientation: blockListOrientation } =
 					getBlockListSettings( blockRootClientId ) || {};
 
 				return {
@@ -112,16 +106,14 @@ const BlockMoverButton = forwardRef(
 					firstIndex: firstBlockIndex,
 					isFirst: isFirstBlock,
 					isLast: isLastBlock,
-					isRTL: getSettings().isRTL,
-					moverOrientation:
-						orientation || __experimentalMoverDirection,
+					orientation: moverOrientation || blockListOrientation,
 				};
 			},
 			[ clientIds, direction ]
 		);
 
 		const { moveBlocksDown, moveBlocksUp } = useDispatch(
-			'core/block-editor'
+			blockEditorStore
 		);
 		const moverFunction =
 			direction === 'up' ? moveBlocksUp : moveBlocksDown;
@@ -143,11 +135,10 @@ const BlockMoverButton = forwardRef(
 						'block-editor-block-mover-button',
 						`is-${ direction }-button`
 					) }
-					icon={ getArrowIcon( direction, moverOrientation, isRTL ) }
+					icon={ getArrowIcon( direction, orientation ) }
 					label={ getMovementDirectionLabel(
 						direction,
-						moverOrientation,
-						isRTL
+						orientation
 					) }
 					aria-describedby={ descriptionId }
 					{ ...props }
@@ -165,8 +156,7 @@ const BlockMoverButton = forwardRef(
 						isFirst,
 						isLast,
 						direction === 'up' ? -1 : 1,
-						moverOrientation,
-						isRTL
+						orientation
 					) }
 				</span>
 			</>

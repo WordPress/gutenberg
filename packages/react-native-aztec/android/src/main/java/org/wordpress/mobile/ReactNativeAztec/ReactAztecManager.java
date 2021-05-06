@@ -3,8 +3,10 @@ package org.wordpress.mobile.ReactNativeAztec;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.text.LineBreaker;
 import android.os.Build;
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.core.graphics.ColorUtils;
 import androidx.core.util.Consumer;
 
@@ -39,11 +41,11 @@ import com.facebook.react.views.text.DefaultStyleValuesUtil;
 import com.facebook.react.views.text.ReactFontManager;
 import com.facebook.react.views.text.ReactTextUpdate;
 import com.facebook.react.views.textinput.ReactContentSizeChangedEvent;
-import com.facebook.react.views.textinput.ReactTextChangedEvent;
 import com.facebook.react.views.textinput.ReactTextInputEvent;
 import com.facebook.react.views.textinput.ReactTextInputManager;
 import com.facebook.react.views.textinput.ScrollWatcher;
 
+import org.wordpress.aztec.Constants;
 import org.wordpress.aztec.formatting.LinkFormatter;
 import org.wordpress.aztec.glideloader.GlideImageLoader;
 import org.wordpress.aztec.glideloader.GlideVideoThumbnailLoader;
@@ -76,6 +78,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     private static final String TAG = "ReactAztecText";
 
     private static final String BLOCK_TYPE_TAG_KEY = "tag";
+    private static final String LINK_TEXT_COLOR_KEY = "linkTextColor";
 
     @Nullable private final Consumer<Exception> exceptionLogger;
     @Nullable private final Consumer<String> breadcrumbLogger;
@@ -105,7 +108,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     protected ReactAztecText createViewInstance(ThemedReactContext reactContext) {
         ReactAztecText aztecText = new ReactAztecText(reactContext);
         aztecText.setFocusableInTouchMode(false);
-        aztecText.setFocusable(false);
+        aztecText.setEnabled(true);
         aztecText.setCalypsoMode(false);
         aztecText.setPadding(0, 0, 0, 0);
         // This is a temporary hack that sets the correct GB link color and underline
@@ -139,7 +142,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                                 MapBuilder.of(
                                         "bubbled", "onSubmitEditing", "captured", "onSubmitEditingCapture")))*/
                 .put(
-                        "topChange",
+                        "topAztecChange",
                         MapBuilder.of(
                                 "phasedRegistrationNames",
                                 MapBuilder.of("bubbled", "onChange")))
@@ -202,6 +205,11 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
 
     @ReactProp(name = "text")
     public void setText(ReactAztecText view, ReadableMap inputMap) {
+        if (inputMap.hasKey(LINK_TEXT_COLOR_KEY)) {
+            int color = Color.parseColor(inputMap.getString(LINK_TEXT_COLOR_KEY));
+            setLinkTextColor(view, color);
+        }
+
         if (!inputMap.hasKey("eventCount")) {
             setTextfromJS(view, inputMap.getString("text"), inputMap.getMap("selection"));
         } else {
@@ -209,7 +217,8 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             // force a 2nd setText from JS side to Native, just set a high eventCount
             int eventCount = inputMap.getInt("eventCount");
 
-            if (view.mNativeEventCount < eventCount) {
+            if (view.getEventCounter() < eventCount) {
+                view.setEventCounterSyncFromJS(eventCount);
                 setTextfromJS(view, inputMap.getString("text"), inputMap.getMap("selection"));
             }
         }
@@ -363,13 +372,26 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
     @ReactProp(name = ViewProps.TEXT_ALIGN)
     public void setTextAlign(ReactAztecText view, @Nullable String textAlign) {
         if ("justify".equals(textAlign)) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                view.setJustificationMode(Layout.JUSTIFICATION_MODE_INTER_WORD);
+            /*
+                JUSTIFICATION_MODE_XYZ constants were moved from Layout to LineBreaker in
+                SDK 29. The values of the constants haven't changed, but Lint is complaining that we
+                 can't use constants which were introduced in SDK 29 on older version. Separating
+                  the calls into two methods per SDK version annotated with RequiresApi was the
+                  only way how to make lint happy.
+             */
+            // Value is hardcoded because Lint is failing with a false positive "Unnecessary; SDK_INT is never < 21"
+            if (Build.VERSION.SDK_INT >= 29) {
+                setJustificationModeSdk29(view, LineBreaker.JUSTIFICATION_MODE_INTER_WORD);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                setJustificationModeSDK26(view, Layout.JUSTIFICATION_MODE_INTER_WORD);
             }
             view.setGravity(Gravity.START);
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                view.setJustificationMode(Layout.JUSTIFICATION_MODE_NONE);
+            // Value is hardcoded because Lint is failing with a false positive "Unnecessary; SDK_INT is never < 21"
+            if (Build.VERSION.SDK_INT >= 29) {
+                setJustificationModeSdk29(view, LineBreaker.JUSTIFICATION_MODE_NONE);
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                setJustificationModeSDK26(view, Layout.JUSTIFICATION_MODE_NONE);
             }
 
             if (textAlign == null || "auto".equals(textAlign)) {
@@ -386,12 +408,24 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
         }
     }
 
-    @ReactProp(name = "linkTextColor", customType = "Color")
-    public void setLinkTextColor(ReactAztecText view, @Nullable Integer color) {
-        view.setLinkFormatter(new LinkFormatter(view,
-                new LinkFormatter.LinkStyle(
-                        color, true)
-        ));
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void setJustificationModeSDK26(ReactAztecText view, int justificationModeInterWord) {
+        view.setJustificationMode(justificationModeInterWord);
+    }
+
+    // Value is hardcoded because Lint is failing with a false positive "Unnecessary; SDK_INT is never < 21"
+    @RequiresApi(api = 29)
+    private void setJustificationModeSdk29(ReactAztecText view, int justificationModeInterWord) {
+        view.setJustificationMode(justificationModeInterWord);
+    }
+
+    private void setLinkTextColor(ReactAztecText view, @Nullable Integer color) {
+        if (color != null && view.linkFormatter.getLinkStyle().getLinkColor() != color) {
+            view.setLinkFormatter(new LinkFormatter(view,
+                    new LinkFormatter.LinkStyle(
+                            color, true)
+            ));
+        }
     }
 
     /* End of the code taken from ReactTextInputManager */
@@ -567,7 +601,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
                         }
                     }
                 });
-        
+
         // Don't think we need to add setOnEditorActionListener here (intercept Enter for example), but
         // in case check ReactTextInputManager
     }
@@ -623,13 +657,15 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             // the text (minus the Enter char itself).
             if (!mEditText.isEnterPressedUnderway()) {
                 int currentEventCount = mEditText.incrementAndGetEventCounter();
+                boolean singleCharacterHasBeenAdded = count - before == 1;
                 // The event that contains the event counter and updates it must be sent first.
                 // TODO: t7936714 merge these events
                 mEventDispatcher.dispatchEvent(
-                        new ReactTextChangedEvent(
+                        new AztecReactTextChangedEvent(
                                 mEditText.getId(),
                                 mEditText.toHtml(mEditText.getText(), false),
-                                currentEventCount));
+                                currentEventCount,
+                                singleCharacterHasBeenAdded ? s.charAt(start + before) : null));
 
                 mEventDispatcher.dispatchEvent(
                         new ReactTextInputEvent(
@@ -642,7 +678,7 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
 
 
             if (mPreviousText.length() == 0
-                    && !TextUtils.isEmpty(newText)
+                    && !isTextEmpty(newText)
                     && !TextUtils.isEmpty(mEditText.getTagName())
                     && mEditText.getSelectedStyles().isEmpty()) {
 
@@ -656,9 +692,14 @@ public class ReactAztecManager extends BaseViewManager<ReactAztecText, LayoutSha
             }
         }
 
-        @Override
-        public void afterTextChanged(Editable s) {
+        // This accounts for the END_OF_BUFFER_MARKER that is added to blocks to maintain the styling, if the only char
+        // is the zero width marker then it is considered "empty"
+        private boolean isTextEmpty(String text) {
+            return text.length() == 0 || (text.length() == 1 && text.charAt(0) == Constants.INSTANCE.getEND_OF_BUFFER_MARKER());
         }
+
+        @Override
+        public void afterTextChanged(Editable s) {}
     }
 
     private class AztecContentSizeWatcher implements com.facebook.react.views.textinput.ContentSizeWatcher {

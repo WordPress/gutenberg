@@ -1,7 +1,7 @@
 {
 	"name": "@wordpress/editor",
-	"version": "9.19.0",
-	"description": "Building blocks for WordPress editors.",
+	"version": "9.26.3",
+	"description": "Enhanced block editor for WordPress posts.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
@@ -9,7 +9,7 @@
 		"gutenberg",
 		"editor"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/editor/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/editor/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -18,15 +18,19 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"sideEffects": [
 		"build-style/**",
-		"!((src|build|build-module)/(components|utils)/**)"
+		"src/**/*.scss",
+		"{src,build,build-module}/{index.js,store/index.js,hooks/**}"
 	],
 	"dependencies": {
-		"@babel/runtime": "^7.9.2",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/api-fetch": "file:../api-fetch",
 		"@wordpress/autop": "file:../autop",
 		"@wordpress/blob": "file:../blob",
@@ -49,17 +53,15 @@
 		"@wordpress/keycodes": "file:../keycodes",
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/notices": "file:../notices",
+		"@wordpress/reusable-blocks": "file:../reusable-blocks",
 		"@wordpress/rich-text": "file:../rich-text",
 		"@wordpress/server-side-render": "file:../server-side-render",
 		"@wordpress/url": "file:../url",
-		"@wordpress/viewport": "file:../viewport",
 		"@wordpress/wordcount": "file:../wordcount",
 		"classnames": "^2.2.5",
-		"lodash": "^4.17.15",
+		"lodash": "^4.17.19",
 		"memize": "^1.1.0",
-		"react-autosize-textarea": "^3.0.2",
-		"redux-optimist": "^1.0.0",
-		"refx": "^3.0.0",
+		"react-autosize-textarea": "^7.1.0",
 		"rememo": "^3.0.0"
 	},
 	"publishConfig": {

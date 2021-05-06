@@ -1,6 +1,11 @@
 {
+	"apiVersion": 2,
 	"name": "core/media-text",
+	"title": "Media & Text",
 	"category": "media",
+	"description": "Set media and words side-by-side for a richer layout.",
+	"keywords": [ "image", "video" ],
+	"textdomain": "default",
 	"attributes": {
 		"align": {
 			"type": "string",
@@ -63,6 +68,9 @@
 			"type": "number",
 			"default": 50
 		},
+		"mediaSizeSlug": {
+			"type": "string"
+		},
 		"isStackedOnMobile": {
 			"type": "boolean",
 			"default": true
@@ -79,15 +87,13 @@
 	},
 	"supports": {
 		"anchor": true,
-		"align": [
-			"wide",
-			"full"
-		],
+		"align": [ "wide", "full" ],
 		"html": false,
-		"lightBlockWrapper": true,
-		"__experimentalColor": {
+		"color": {
 			"gradients": true,
-			"linkColor": true
+			"link": true
 		}
-	}
+	},
+	"editorStyle": "wp-block-media-text-editor",
+	"style": "wp-block-media-text"
 }

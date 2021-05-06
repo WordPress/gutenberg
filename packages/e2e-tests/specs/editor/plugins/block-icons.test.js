@@ -12,7 +12,7 @@ import {
 } from '@wordpress/e2e-test-utils';
 
 const INSERTER_BUTTON_SELECTOR =
-	'.block-editor-inserter__block-list .block-editor-block-types-list__item';
+	'.block-editor-inserter__main-area .block-editor-block-types-list__item';
 const INSERTER_ICON_WRAPPER_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .block-editor-block-types-list__item-icon`;
 const INSERTER_ICON_SELECTOR = `${ INSERTER_BUTTON_SELECTOR } .block-editor-block-icon`;
 const INSPECTOR_ICON_SELECTOR = '.edit-post-sidebar .block-editor-block-icon';
@@ -46,7 +46,7 @@ async function selectFirstBlock() {
 }
 
 describe( 'Correctly Renders Block Icons on Inserter and Inspector', () => {
-	const dashIconRegex = /<svg.*?class=".*?dashicons-cart.*?">.*?<\/svg>/;
+	const dashIconRegex = /<span.*?class=".*?dashicons-cart.*?">.*?<\/span>/;
 	const circleString =
 		'<circle cx="10" cy="10" r="10" fill="red" stroke="blue" stroke-width="10"></circle>';
 	const svgIcon = new RegExp(

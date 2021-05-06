@@ -1,19 +1,12 @@
-.slider {
+.sliderIOS {
 	flex-grow: 1;
+	min-height: $grid-unit-60;
 }
 
-.sliderTextInput {
-	min-height: 25px;
-	align-self: center;
-	margin-left: 10px;
-	border-color: $light-gray-400;
-	padding-top: 0;
-	padding-bottom: 0;
-	text-align: center;
-}
-
-.sliderDarkTextInput {
-	border-color: $gray-70;
+.sliderAndroid {
+	flex-grow: 1;
+	min-height: $grid-unit-60;
+	margin-left: -6px;
 }
 
 .isSelected {
@@ -24,17 +17,24 @@
 .container {
 	flex-direction: row;
 	align-items: center;
-	min-height: 48px;
 }
 
 .cellContainerStyles {
+	margin-top: 13px;
 	flex-direction: column;
 	align-items: flex-start;
 }
 
-.cellRowStyles {
-	min-height: 48px;
-	margin-bottom: -13px;
-	width: 100%;
-	justify-content: space-between;
+.containerIOS {
+	padding-top: 6px;
+	padding-bottom: 6px;
+}
+
+.containerAndroid {
+	padding-top: 8px;
+	padding-bottom: 8px;
+}
+
+.valueStyle {
+	height: 0;
 }

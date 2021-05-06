@@ -2,7 +2,7 @@
 	/**
 	 * Registers a new block provided a unique name and an object defining its behavior.
 	 *
-	 * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
+	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
 	 */
 	var registerBlockType = wp.blocks.registerBlockType;
 
@@ -21,11 +21,23 @@
 	var __ = wp.i18n.__;
 
 	/**
+	 * This hook is used to mark the block wrapper element.
+	 *
+	 * @see https://developer.wordpress.org/block-editor/packages/packages-block-editor/#useBlockProps
+	 */
+	var useBlockProps = wp.blockEditor.useBlockProps;
+
+	/**
 	 * Every block starts by registering a new block type definition.
 	 *
-	 * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
+	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
 	 */
 	registerBlockType( '{{namespace}}/{{slug}}', {
+		/**
+		 * @see https://make.wordpress.org/core/2020/11/18/block-api-version-2/
+		 */
+		apiVersion: {{apiVersion}},
+
 		/**
 		 * This is the display title for your block, which can be translated with `i18n` functions.
 		 * The block inserter will show this name.
@@ -48,7 +60,7 @@
 		{{/description}}
 		/**
 		 * Blocks are grouped into categories to help users browse and discover them.
-		 * The categories provided by core are `common`, `embed`, `formatting`, `layout` and `widgets`.
+		 * The categories provided by core are `text`, `media`, `design`, `widgets`, and `embed`.
 		 */
 		category: '{{category}}',
 
@@ -74,14 +86,12 @@
 		 *
 		 * @see https://developer.wordpress.org/block-editor/developers/block-api/block-edit-save/#edit
 		 *
-		 * @param {Object} [props] Properties passed from the editor.
-		 *
 		 * @return {WPElement} Element to render.
 		 */
-		edit: function( props ) {
+		edit: function() {
 			return el(
 				'p',
-				{ className: props.className },
+				useBlockProps(),
 				__( '{{title}} – hello from the editor!', '{{textdomain}}' )
 			);
 		},
@@ -97,7 +107,7 @@
 		save: function() {
 			return el(
 				'p',
-				{},
+				useBlockProps.save(),
 				__( '{{title}} – hello from the saved content!', '{{textdomain}}' )
 			);
 		},

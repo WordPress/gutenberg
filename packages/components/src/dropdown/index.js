@@ -63,9 +63,10 @@ export default function Dropdown( {
 	 * in case when focus is moved to the modal dialog.
 	 */
 	function closeIfFocusOutside() {
+		const { ownerDocument } = containerRef.current;
 		if (
-			! containerRef.current.contains( document.activeElement ) &&
-			! document.activeElement.closest( '[role="dialog"]' )
+			! containerRef.current.contains( ownerDocument.activeElement ) &&
+			! ownerDocument.activeElement.closest( '[role="dialog"]' )
 		) {
 			close();
 		}
@@ -95,6 +96,9 @@ export default function Dropdown( {
 					headerTitle={ headerTitle }
 					focusOnMount={ focusOnMount }
 					{ ...popoverProps }
+					anchorRef={
+						popoverProps?.anchorRef ?? containerRef.current
+					}
 					className={ classnames(
 						'components-dropdown__content',
 						popoverProps ? popoverProps.className : undefined,

@@ -7,104 +7,103 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	ToolbarGroup,
-	__experimentalToolbarItem as ToolbarItem,
-} from '@wordpress/components';
+
+import { dragHandle } from '@wordpress/icons';
+import { ToolbarGroup, ToolbarItem, Button } from '@wordpress/components';
 import { getBlockType } from '@wordpress/blocks';
-import { Component } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import BlockDraggable from '../block-draggable';
 import { BlockMoverUpButton, BlockMoverDownButton } from './button';
+import { store as blockEditorStore } from '../../store';
 
-export class BlockMover extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			isFocused: false,
-		};
-		this.onFocus = this.onFocus.bind( this );
-		this.onBlur = this.onBlur.bind( this );
+function BlockMover( {
+	isFirst,
+	isLast,
+	clientIds,
+	isLocked,
+	isHidden,
+	rootClientId,
+	orientation,
+	hideDragHandle,
+} ) {
+	const [ isFocused, setIsFocused ] = useState( false );
+
+	const onFocus = () => setIsFocused( true );
+	const onBlur = () => setIsFocused( false );
+
+	if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
+		return null;
 	}
 
-	onFocus() {
-		this.setState( {
-			isFocused: true,
-		} );
-	}
+	const dragHandleLabel = __( 'Drag' );
 
-	onBlur() {
-		this.setState( {
-			isFocused: false,
-		} );
-	}
-
-	render() {
-		const {
-			isFirst,
-			isLast,
-			clientIds,
-			isLocked,
-			isHidden,
-			rootClientId,
-			__experimentalOrientation: orientation,
-		} = this.props;
-		const { isFocused } = this.state;
-		if ( isLocked || ( isFirst && isLast && ! rootClientId ) ) {
-			return null;
-		}
-
-		// We emulate a disabled state because forcefully applying the `disabled`
-		// attribute on the buttons while it has focus causes the screen to change
-		// to an unfocused state (body as active element) without firing blur on,
-		// the rendering parent, leaving it unable to react to focus out.
-		return (
-			<div
-				className={ classnames( 'block-editor-block-mover', {
-					'is-visible': isFocused || ! isHidden,
-					'is-horizontal': orientation === 'horizontal',
-				} ) }
-			>
-				<ToolbarGroup>
-					<ToolbarItem
-						onFocus={ this.onFocus }
-						onBlur={ this.onBlur }
-					>
-						{ ( itemProps ) => (
-							<BlockMoverUpButton
-								clientIds={ clientIds }
-								{ ...itemProps }
-							/>
-						) }
-					</ToolbarItem>
-					<ToolbarItem
-						onFocus={ this.onFocus }
-						onBlur={ this.onBlur }
-					>
-						{ ( itemProps ) => (
-							<BlockMoverDownButton
-								clientIds={ clientIds }
-								{ ...itemProps }
-							/>
-						) }
-					</ToolbarItem>
-				</ToolbarGroup>
-			</div>
-		);
-	}
+	// We emulate a disabled state because forcefully applying the `disabled`
+	// attribute on the buttons while it has focus causes the screen to change
+	// to an unfocused state (body as active element) without firing blur on,
+	// the rendering parent, leaving it unable to react to focus out.
+	return (
+		<div
+			className={ classnames( 'block-editor-block-mover', {
+				'is-visible': isFocused || ! isHidden,
+				'is-horizontal': orientation === 'horizontal',
+			} ) }
+		>
+			{ ! hideDragHandle && (
+				<BlockDraggable
+					clientIds={ clientIds }
+					cloneClassname="block-editor-block-mover__drag-clone"
+				>
+					{ ( draggableProps ) => (
+						<Button
+							icon={ dragHandle }
+							className="block-editor-block-mover__drag-handle"
+							aria-hidden="true"
+							label={ dragHandleLabel }
+							// Should not be able to tab to drag handle as this
+							// button can only be used with a pointer device.
+							tabIndex="-1"
+							{ ...draggableProps }
+						/>
+					) }
+				</BlockDraggable>
+			) }
+			<ToolbarGroup className="block-editor-block-mover__move-button-container">
+				<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
+					{ ( itemProps ) => (
+						<BlockMoverUpButton
+							clientIds={ clientIds }
+							{ ...itemProps }
+						/>
+					) }
+				</ToolbarItem>
+				<ToolbarItem onFocus={ onFocus } onBlur={ onBlur }>
+					{ ( itemProps ) => (
+						<BlockMoverDownButton
+							clientIds={ clientIds }
+							{ ...itemProps }
+						/>
+					) }
+				</ToolbarItem>
+			</ToolbarGroup>
+		</div>
+	);
 }
 
 export default withSelect( ( select, { clientIds } ) => {
 	const {
 		getBlock,
 		getBlockIndex,
+		getBlockListSettings,
 		getTemplateLock,
 		getBlockOrder,
 		getBlockRootClientId,
-	} = select( 'core/block-editor' );
+	} = select( blockEditorStore );
 	const normalizedClientIds = castArray( clientIds );
 	const firstClientId = first( normalizedClientIds );
 	const block = getBlock( firstClientId );
@@ -125,5 +124,6 @@ export default withSelect( ( select, { clientIds } ) => {
 		firstIndex,
 		isFirst,
 		isLast,
+		orientation: getBlockListSettings( rootClientId )?.orientation,
 	};
 } )( BlockMover );

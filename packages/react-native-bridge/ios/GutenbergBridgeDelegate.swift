@@ -1,24 +1,46 @@
-public struct MediaInfo {
+public struct MediaInfo: Encodable {
     public let id: Int32?
     public let url: String?
     public let type: String?
+    public let title: String?
     public let caption: String?
 
-    public init(id: Int32?, url: String?, type: String?, caption: String? = nil) {
+    public init(id: Int32?, url: String?, type: String?, caption: String? = nil, title: String? = nil) {
         self.id = id
         self.url = url
         self.type = type
         self.caption = caption
+        self.title = title
     }
 }
 
+/// Definition of capabilities to enable in the Block Editor
+public enum Capabilities: String {
+    case contactInfoBlock
+    case mediaFilesCollectionBlock
+    case mentions
+    case xposts
+    case unsupportedBlockEditor
+    case canEnableUnsupportedBlockEditor
+    case audioBlock
+}
+
+/// Wrapper for single block data
 public struct Block {
+    /// Gutenberg internal block ID
     public let id: String
+    /// Gutenberg internal block name
     public let name: String
+    /// User facing block name string (localized)
+    public let title: String
+    /// Block HTML content
     public let content: String
 
+    /// Creates a copy of the receiver modifying only its content field.
+    /// - Parameter newContent: The content for the new block instance.
+    /// - Returns: A new block instance with copied fields and new content.
     public func replacingContent(with newContent: String) -> Block {
-        Block(id: id, name: name, content: newContent)
+        Block(id: id, name: name, title: title, content: newContent)
     }
 }
 
@@ -62,7 +84,7 @@ extension Gutenberg.MediaSource {
     }
 }
 
-/// Ref. https://github.com/facebook/react-native/blob/master/Libraries/polyfills/console.js#L376
+/// Ref. https://github.com/facebook/react-native/blob/HEAD/Libraries/polyfills/console.js#L376
 public enum LogLevel: Int {
     case trace
     case info
@@ -80,6 +102,9 @@ extension LogLevel {
         case .warning: self = .warn
         case .error: self = .error
         case .fatal: self = .fatal
+        @unknown default:
+            assertionFailure("Unknown log level: \(rnLogLevel)")
+            self = .trace
         }
     }
 }
@@ -92,25 +117,6 @@ extension RCTLogLevel {
         case .warn: self = .warning
         case .error: self = .error
         case .fatal: self = .fatal
-        }
-    }
-}
-
-public enum GutenbergUserEvent {
-    
-    case editorSessionTemplateApply(_ template: String)
-    case editorSessionTemplatePreview(_ template: String)
-    
-    init?(event: String, properties:[AnyHashable: Any]?) {
-        switch event {
-        case "editor_session_template_apply":
-            guard let template = properties?["template"] as? String else { return nil }
-            self = .editorSessionTemplateApply(template)
-        case "editor_session_template_preview":
-            guard let template = properties?["template"] as? String else { return nil }
-            self = .editorSessionTemplatePreview(template)
-        default:
-            return nil
         }
     }
 }
@@ -190,10 +196,6 @@ public protocol GutenbergBridgeDelegate: class {
     /// Tells the delegate to display the media editor from a given URL
     ///
     func gutenbergDidRequestMediaEditor(with mediaUrl: URL, callback: @escaping MediaPickerDidPickMediaCallback)
-    
-    /// Tells the delegate that the editor needs to log a custom event
-    /// - Parameter event: The event key to be logged
-    func gutenbergDidLogUserEvent(_ event: GutenbergUserEvent)
 
     /// Tells the delegate that the editor needs to render an unsupported block
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block)
@@ -202,12 +204,32 @@ public protocol GutenbergBridgeDelegate: class {
     /// - Parameter callback: Completion handler to be called with an user mention or an error
     func gutenbergDidRequestMention(callback: @escaping (Swift.Result<String, NSError>) -> Void)
 
+	/// Tells the delegate that the editor requested a mention
+	/// - Parameter callback: Completion handler to be called with an xpost or an error
+	func gutenbergDidRequestXpost(callback: @escaping (Swift.Result<String, NSError>) -> Void)
+
     /// Tells the delegate that the editor requested to show the tooltip
-    func gutenbergDidRequestStarterPageTemplatesTooltipShown() -> Bool
-    
+    func gutenbergDidRequestFocalPointPickerTooltipShown() -> Bool
+
     /// Tells the delegate that the editor requested to set the tooltip's visibility
-    /// - Parameter tooltipShown: Tooltip's visibility value    
-    func gutenbergDidRequestSetStarterPageTemplatesTooltipShown(_ tooltipShown: Bool)
+    /// - Parameter tooltipShown: Tooltip's visibility value
+    func gutenbergDidRequestSetFocalPointPickerTooltipShown(_ tooltipShown: Bool)
+
+    func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType)
+
+    // Media Collection
+
+    /// Tells the delegate that a media collection block requested to reconnect with media save coordinator.
+    ///
+    func gutenbergDidRequestMediaSaveSync()
+
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String)
+
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]])
+
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]])
+
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]])
 }
 
 // MARK: - Optional GutenbergBridgeDelegate methods
@@ -216,4 +238,14 @@ public extension GutenbergBridgeDelegate {
     func gutenbergDidLoad() { }
     func gutenbergDidLayout() { }
     func gutenbergDidRequestUnsupportedBlockFallback(for block: Block) { }
+    func gutenbergDidSendButtonPressedAction(_ buttonType: Gutenberg.ActionButtonType) { }
+
+    // Media Collection
+
+    func gutenbergDidRequestMediaSaveSync() {}
+    func gutenbergDidRequestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String) { }
+    func gutenbergDidRequestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]]) { }
+    func gutenbergDidRequestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]]) { }
+    func gutenbergDidRequestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]]) { }
+    func gutenbergDidRequestMediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {}
 }

@@ -1,25 +1,44 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { __experimentalTreeGridCell as TreeGridCell } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import BlockNavigationLeaf from './leaf';
-import DescenderLines from './descender-lines';
+import Indentation from './indentation';
 import Inserter from '../inserter';
+import { store as blockEditorStore } from '../../store';
 
 export default function BlockNavigationAppender( {
 	parentBlockClientId,
 	position,
 	level,
 	rowCount,
-	terminatedLevels,
 	path,
 } ) {
+	const isDragging = useSelect(
+		( select ) => {
+			const { isBlockBeingDragged, isAncestorBeingDragged } = select(
+				blockEditorStore
+			);
+
+			return (
+				isBlockBeingDragged( parentBlockClientId ) ||
+				isAncestorBeingDragged( parentBlockClientId )
+			);
+		},
+		[ parentBlockClientId ]
+	);
 	const instanceId = useInstanceId( BlockNavigationAppender );
 	const descriptionId = `block-navigation-appender-row__description_${ instanceId }`;
 
@@ -32,6 +51,7 @@ export default function BlockNavigationAppender( {
 
 	return (
 		<BlockNavigationLeaf
+			className={ classnames( { 'is-dragging': isDragging } ) }
 			level={ level }
 			position={ position }
 			rowCount={ rowCount }
@@ -43,14 +63,10 @@ export default function BlockNavigationAppender( {
 			>
 				{ ( { ref, tabIndex, onFocus } ) => (
 					<div className="block-editor-block-navigation-appender__container">
-						<DescenderLines
-							level={ level }
-							isLastRow={ position === rowCount }
-							terminatedLevels={ terminatedLevels }
-						/>
+						<Indentation level={ level } />
 						<Inserter
 							rootClientId={ parentBlockClientId }
-							__experimentalSelectBlockOnInsert={ false }
+							__experimentalIsQuick
 							aria-describedby={ descriptionId }
 							toggleProps={ { ref, tabIndex, onFocus } }
 						/>

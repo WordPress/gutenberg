@@ -18,6 +18,7 @@ export const LinkControlSearchItem = ( {
 	onClick,
 	isURL = false,
 	searchTerm = '',
+	shouldShowType = false,
 } ) => {
 	return (
 		<Button
@@ -54,9 +55,10 @@ export const LinkControlSearchItem = ( {
 					{ isURL && __( 'Press ENTER to add this link' ) }
 				</span>
 			</span>
-			{ suggestion.type && (
+			{ shouldShowType && suggestion.type && (
 				<span className="block-editor-link-control__search-item-type">
-					{ suggestion.type }
+					{ /* Rename 'post_tag' to 'tag'. Ideally, the API would return the localised CPT or taxonomy label. */ }
+					{ suggestion.type === 'post_tag' ? 'tag' : suggestion.type }
 				</span>
 			) }
 		</Button>

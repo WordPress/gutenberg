@@ -22,6 +22,10 @@ figure.wp-block-image:not(.wp-block) {
 		margin-top: -9px;
 		margin-left: -9px;
 	}
+
+	&:not(.is-style-rounded) > div {
+		border-radius: inherit;
+	}
 }
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
@@ -52,6 +56,19 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
+.wp-block[data-align="left"],
+.wp-block[data-align="center"],
+.wp-block[data-align="right"] {
+	> .wp-block-image {
+		display: table;
+
+		> figcaption {
+			display: table-caption;
+			caption-side: bottom;
+		}
+	}
+}
+
 .wp-block[data-align="left"] > .wp-block-image {
 	margin-right: 1em;
 	margin-left: 0;
@@ -72,13 +89,13 @@ figure.wp-block-image:not(.wp-block) {
 	text-align: center;
 }
 
-.richimage__crop-area {
+.wp-block-image__crop-area {
 	position: relative;
 	max-width: 100%;
 	width: 100%;
 }
 
-.richimage__crop-icon {
+.wp-block-image__crop-icon {
 	padding: 0 8px;
 	min-width: 48px;
 	display: flex;
@@ -90,34 +107,33 @@ figure.wp-block-image:not(.wp-block) {
 	}
 }
 
-.richimage__zoom-control {
-	border: $border-width solid $dark-gray-primary;
-	border-radius: $radius-block-ui;
-	background-color: $white;
-	margin-top: $grid-unit-15;
-	margin-bottom: $grid-unit-15;
-	padding: $grid-unit-15 $grid-unit-15 $grid-unit-10;
-	line-height: 1;
-}
-
-// Make the toolbar dropdowns blend in.
-.components-toolbar.richimage-toolbar__dropdown { // Needs specificity.
-	padding: 0;
-	border-left: none;
-	border-right: none;
-
-	.components-icon-button.has-text svg {
-		margin-right: 0;
+.wp-block-image__zoom {
+	.components-popover__content {
+		overflow: visible;
+		min-width: 260px;
 	}
 
-	.components-dropdown-menu__indicator {
-		display: none;
+	.components-range-control {
+		flex: 1;
+	}
+
+	.components-base-control__field {
+		display: flex;
+		margin-bottom: 0;
+		flex-direction: column;
+		align-items: flex-start;
 	}
 }
 
-// Make icons 24x24 unscaled.
-.richimage-toolbar__dropdown > .components-button,
-.richimage-toolbar__dropdown,
-.richimage-toolbar__control {
-	padding: 6px;
+.wp-block-image__aspect-ratio {
+	height: $grid-unit-60 - $border-width - $border-width;
+	margin-bottom: -$grid-unit-10;
+	display: flex;
+	align-items: center;
+
+	.components-button {
+		width: $button-size;
+		padding-left: 0;
+		padding-right: 0;
+	}
 }

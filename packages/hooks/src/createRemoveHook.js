@@ -3,28 +3,35 @@
  */
 import validateNamespace from './validateNamespace.js';
 import validateHookName from './validateHookName.js';
-import { doAction } from './';
+
+/**
+ * @callback RemoveHook
+ * Removes the specified callback (or all callbacks) from the hook with a given hookName
+ * and namespace.
+ *
+ * @param {string} hookName  The name of the hook to modify.
+ * @param {string} namespace The unique namespace identifying the callback in the
+ *                           form `vendor/plugin/function`.
+ *
+ * @return {number | undefined} The number of callbacks removed.
+ */
 
 /**
  * Returns a function which, when invoked, will remove a specified hook or all
  * hooks by the given name.
  *
- * @param  {Object}   hooks      Stored hooks, keyed by hook name.
- * @param  {boolean}     removeAll  Whether to remove all callbacks for a hookName, without regard to namespace. Used to create `removeAll*` functions.
+ * @param  {import('.').Hooks}    hooks Hooks instance.
+ * @param  {import('.').StoreKey} storeKey
+ * @param  {boolean}              [removeAll=false] Whether to remove all callbacks for a hookName,
+ *                                                  without regard to namespace. Used to create
+ *                                                  `removeAll*` functions.
  *
- * @return {Function}            Function that removes hooks.
+ * @return {RemoveHook} Function that removes hooks.
  */
-function createRemoveHook( hooks, removeAll ) {
-	/**
-	 * Removes the specified callback (or all callbacks) from the hook with a
-	 * given hookName and namespace.
-	 *
-	 * @param {string}    hookName  The name of the hook to modify.
-	 * @param {string}    namespace The unique namespace identifying the callback in the form `vendor/plugin/function`.
-	 *
-	 * @return {number}             The number of callbacks removed.
-	 */
+function createRemoveHook( hooks, storeKey, removeAll = false ) {
 	return function removeHook( hookName, namespace ) {
+		const hooksStore = hooks[ storeKey ];
+
 		if ( ! validateHookName( hookName ) ) {
 			return;
 		}
@@ -34,21 +41,21 @@ function createRemoveHook( hooks, removeAll ) {
 		}
 
 		// Bail if no hooks exist by this name
-		if ( ! hooks[ hookName ] ) {
+		if ( ! hooksStore[ hookName ] ) {
 			return 0;
 		}
 
 		let handlersRemoved = 0;
 
 		if ( removeAll ) {
-			handlersRemoved = hooks[ hookName ].handlers.length;
-			hooks[ hookName ] = {
-				runs: hooks[ hookName ].runs,
+			handlersRemoved = hooksStore[ hookName ].handlers.length;
+			hooksStore[ hookName ] = {
+				runs: hooksStore[ hookName ].runs,
 				handlers: [],
 			};
 		} else {
 			// Try to find the specified callback to remove.
-			const handlers = hooks[ hookName ].handlers;
+			const handlers = hooksStore[ hookName ].handlers;
 			for ( let i = handlers.length - 1; i >= 0; i-- ) {
 				if ( handlers[ i ].namespace === namespace ) {
 					handlers.splice( i, 1 );
@@ -58,7 +65,7 @@ function createRemoveHook( hooks, removeAll ) {
 					// comes after the current callback, there's no problem;
 					// otherwise we need to decrease the execution index of any
 					// other runs by 1 to account for the removed element.
-					( hooks.__current || [] ).forEach( ( hookInfo ) => {
+					hooksStore.__current.forEach( ( hookInfo ) => {
 						if (
 							hookInfo.name === hookName &&
 							hookInfo.currentIndex >= i
@@ -69,8 +76,9 @@ function createRemoveHook( hooks, removeAll ) {
 				}
 			}
 		}
+
 		if ( hookName !== 'hookRemoved' ) {
-			doAction( 'hookRemoved', hookName, namespace );
+			hooks.doAction( 'hookRemoved', hookName, namespace );
 		}
 
 		return handlersRemoved;

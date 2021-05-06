@@ -13,7 +13,7 @@
 export function getQueryString( url ) {
 	let query;
 	try {
-		query = new URL( url ).search.substring( 1 );
+		query = new URL( url, 'http://example.com' ).search.substring( 1 );
 	} catch ( error ) {}
 
 	if ( query ) {

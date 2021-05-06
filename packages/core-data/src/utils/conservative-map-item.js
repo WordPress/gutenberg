@@ -33,5 +33,15 @@ export default function conservativeMapItem( item, nextItem ) {
 	if ( ! hasChanges ) {
 		return item;
 	}
+
+	// Only at this point, backfill properties from the original item which
+	// weren't explicitly set into the result above. This is an optimization
+	// to allow `hasChanges` to return early.
+	for ( const key in item ) {
+		if ( ! result.hasOwnProperty( key ) ) {
+			result[ key ] = item[ key ];
+		}
+	}
+
 	return result;
 }

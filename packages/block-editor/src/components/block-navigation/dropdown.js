@@ -1,27 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { Button, Dropdown, SVG, Path } from '@wordpress/components';
+import { Button, Dropdown } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { useCallback, forwardRef } from '@wordpress/element';
+import { listView } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import BlockNavigation from './';
-
-const MenuIcon = (
-	<SVG
-		xmlns="http://www.w3.org/2000/svg"
-		viewBox="0 0 24 24"
-		width="24"
-		height="24"
-	>
-		<Path d="M13.8 5.2H3v1.5h10.8V5.2zm-3.6 12v1.5H21v-1.5H10.2zm7.2-6H6.6v1.5h10.8v-1.5z" />
-	</SVG>
-);
+import { store as blockEditorStore } from '../../store';
 
 function BlockNavigationDropdownToggle( {
 	isEnabled,
@@ -40,7 +34,7 @@ function BlockNavigationDropdownToggle( {
 	);
 	const shortcut = useSelect(
 		( select ) =>
-			select( 'core/keyboard-shortcuts' ).getShortcutRepresentation(
+			select( keyboardShortcutsStore ).getShortcutRepresentation(
 				'core/edit-post/toggle-block-navigation'
 			),
 		[]
@@ -50,10 +44,12 @@ function BlockNavigationDropdownToggle( {
 		<Button
 			{ ...props }
 			ref={ innerRef }
-			icon={ MenuIcon }
+			icon={ listView }
 			aria-expanded={ isOpen }
+			aria-haspopup="true"
 			onClick={ isEnabled ? onToggle : undefined }
-			label={ __( 'Block navigation' ) }
+			/* translators: button label text should, if possible, be under 16 characters. */
+			label={ __( 'List view' ) }
 			className="block-editor-block-navigation"
 			shortcut={ shortcut }
 			aria-disabled={ ! isEnabled }
@@ -66,7 +62,7 @@ function BlockNavigationDropdown(
 	ref
 ) {
 	const hasBlocks = useSelect(
-		( select ) => !! select( 'core/block-editor' ).getBlockCount(),
+		( select ) => !! select( blockEditorStore ).getBlockCount(),
 		[]
 	);
 	const isEnabled = hasBlocks && ! isDisabled;
@@ -84,9 +80,8 @@ function BlockNavigationDropdown(
 					isEnabled={ isEnabled }
 				/>
 			) }
-			renderContent={ ( { onClose } ) => (
+			renderContent={ () => (
 				<BlockNavigation
-					onSelect={ onClose }
 					__experimentalFeatures={ __experimentalFeatures }
 				/>
 			) }

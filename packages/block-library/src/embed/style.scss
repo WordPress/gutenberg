@@ -1,6 +1,6 @@
 // Apply max-width to floated items that have no intrinsic width
-.wp-block[data-align="left"] > [data-type^="core-embed"],
-.wp-block[data-align="right"] > [data-type^="core-embed"],
+.wp-block[data-align="left"] > [data-type="core/embed"],
+.wp-block[data-align="right"] > [data-type="core/embed"],
 .wp-block-embed.alignleft,
 .wp-block-embed.alignright {
 	// Instagram widgets have a min-width of 326px, so go a bit beyond that.
@@ -13,16 +13,21 @@
 	}
 }
 
+// Supply a min-width when inside a cover block, to prevent it from collapsing.
+.wp-block-cover .wp-block-embed {
+	min-width: 320px;
+	min-height: 240px;
+}
+
 .wp-block-embed {
+	margin: 0 0 1em 0;
+
 	// Supply caption styles to embeds, even if the theme hasn't opted in.
 	// Reason being: the new markup, figcaptions, are not likely to be styled in the majority of existing themes,
 	// so we supply the styles so as to not appear broken or unstyled in those.
 	figcaption {
 		@include caption-style();
 	}
-	// The embed block is in a `figure` element, and many themes zero this out.
-	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
-	margin-bottom: 1em;
 
 	// Don't allow iframe to overflow it's container.
 	iframe {
@@ -74,8 +79,8 @@
 		padding-top: 100%; // 1 / 1 * 100
 	}
 
-	.wp-embed-aspect-9-6 .wp-block-embed__wrapper::before {
-		padding-top: 66.66%; // 6 / 9 * 100
+	.wp-embed-aspect-9-16 .wp-block-embed__wrapper::before {
+		padding-top: 177.77%; // 16 / 9 * 100
 	}
 
 	.wp-embed-aspect-1-2 .wp-block-embed__wrapper::before {

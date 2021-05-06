@@ -7,7 +7,7 @@ import { partial, noop, find } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
 /**
@@ -39,9 +39,7 @@ export default function TabPanel( {
 	onSelect = noop,
 } ) {
 	const instanceId = useInstanceId( TabPanel, 'tab-panel' );
-	const [ selected, setSelected ] = useState(
-		initialTabName || ( tabs.length > 0 ? tabs[ 0 ].name : null )
-	);
+	const [ selected, setSelected ] = useState( null );
 
 	const handleClick = ( tabKey ) => {
 		setSelected( tabKey );
@@ -51,9 +49,17 @@ export default function TabPanel( {
 	const onNavigate = ( childIndex, child ) => {
 		child.click();
 	};
-
 	const selectedTab = find( tabs, { name: selected } );
-	const selectedId = `${ instanceId }-${ selectedTab.name }`;
+	const selectedId = `${ instanceId }-${ selectedTab?.name ?? 'none' }`;
+
+	useEffect( () => {
+		const newSelectedTab = find( tabs, { name: selected } );
+		if ( ! newSelectedTab ) {
+			setSelected(
+				initialTabName || ( tabs.length > 0 ? tabs[ 0 ].name : null )
+			);
+		}
+	}, [ tabs ] );
 
 	return (
 		<div className={ className }>
@@ -84,6 +90,7 @@ export default function TabPanel( {
 			</NavigableMenu>
 			{ selectedTab && (
 				<div
+					key={ selectedId }
 					aria-labelledby={ selectedId }
 					role="tabpanel"
 					id={ `${ selectedId }-view` }

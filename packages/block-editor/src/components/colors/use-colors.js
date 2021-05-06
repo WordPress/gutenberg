@@ -25,17 +25,18 @@ import {
 import InspectorControls from '../inspector-controls';
 import { useBlockEditContext } from '../block-edit';
 import ColorPanel from './color-panel';
+import useEditorFeature from '../use-editor-feature';
+import { store as blockEditorStore } from '../../store';
 
-/**
- * Browser dependencies
- */
-const { getComputedStyle, Node } = window;
+function getComputedStyle( node ) {
+	return node.ownerDocument.defaultView.getComputedStyle( node );
+}
 
 const DEFAULT_COLORS = [];
 
 const COMMON_COLOR_LABELS = {
-	textColor: __( 'Text Color' ),
-	backgroundColor: __( 'Background Color' ),
+	textColor: __( 'Text color' ),
+	backgroundColor: __( 'Background color' ),
 };
 
 const InspectorControlsColorPanel = ( props ) => (
@@ -47,7 +48,7 @@ const InspectorControlsColorPanel = ( props ) => (
 export default function __experimentalUseColors(
 	colorConfigs,
 	{
-		panelTitle = __( 'Color settings' ),
+		panelTitle = __( 'Color' ),
 		colorPanelProps,
 		contrastCheckers,
 		panelChildren,
@@ -57,26 +58,23 @@ export default function __experimentalUseColors(
 			textColorTargetRef = targetRef,
 		} = {},
 	} = {
-		panelTitle: __( 'Color settings' ),
+		panelTitle: __( 'Color' ),
 	},
 	deps = []
 ) {
 	const { clientId } = useBlockEditContext();
-	const { attributes, settingsColors } = useSelect(
+	const settingsColors =
+		useEditorFeature( 'color.palette' ) || DEFAULT_COLORS;
+	const { attributes } = useSelect(
 		( select ) => {
-			const { getBlockAttributes, getSettings } = select(
-				'core/block-editor'
-			);
-			const colors = getSettings().colors;
+			const { getBlockAttributes } = select( blockEditorStore );
 			return {
 				attributes: getBlockAttributes( clientId ),
-				settingsColors:
-					! colors || colors === true ? DEFAULT_COLORS : colors,
 			};
 		},
 		[ clientId ]
 	);
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const setAttributes = useCallback(
 		( newAttributes ) => updateBlockAttributes( clientId, newAttributes ),
 		[ updateBlockAttributes, clientId ]
@@ -205,7 +203,8 @@ export default function __experimentalUseColors(
 			while (
 				backgroundColor === 'rgba(0, 0, 0, 0)' &&
 				backgroundColorNode.parentNode &&
-				backgroundColorNode.parentNode.nodeType === Node.ELEMENT_NODE
+				backgroundColorNode.parentNode.nodeType ===
+					backgroundColorNode.parentNode.ELEMENT_NODE
 			) {
 				backgroundColorNode = backgroundColorNode.parentNode;
 				backgroundColor = getComputedStyle( backgroundColorNode )

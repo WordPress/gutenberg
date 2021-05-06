@@ -1,11 +1,25 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
-export default function save() {
+export default function save( {
+	attributes: { contentJustification, orientation },
+} ) {
 	return (
-		<div>
+		<div
+			{ ...useBlockProps.save( {
+				className: classnames( {
+					[ `is-content-justification-${ contentJustification }` ]: contentJustification,
+					'is-vertical': orientation === 'vertical',
+				} ),
+			} ) }
+		>
 			<InnerBlocks.Content />
 		</div>
 	);

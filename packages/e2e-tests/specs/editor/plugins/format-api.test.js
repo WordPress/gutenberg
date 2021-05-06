@@ -29,7 +29,7 @@ describe( 'Using Format API', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'First paragraph' );
 		await pressKeyWithModifier( 'shiftAlt', 'ArrowLeft' );
-		await clickBlockToolbarButton( 'More rich text controls' );
+		await clickBlockToolbarButton( 'More' );
 		await clickButton( 'Custom Link' );
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

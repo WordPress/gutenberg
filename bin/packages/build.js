@@ -1,6 +1,7 @@
 /**
  * External dependencies
  */
+const fs = require( 'fs' );
 const path = require( 'path' );
 const glob = require( 'fast-glob' );
 const ProgressBar = require( 'progress' );
@@ -16,6 +17,10 @@ const files = process.argv.slice( 2 );
  */
 const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
 
+const stylesheetEntryPoints = glob.sync(
+	path.resolve( PACKAGES_DIR, '*/src/*.scss' )
+);
+
 /**
  * Get the package name for a specified file
  *
@@ -24,6 +29,57 @@ const PACKAGES_DIR = path.resolve( __dirname, '../../packages' );
  */
 function getPackageName( file ) {
 	return path.relative( PACKAGES_DIR, file ).split( path.sep )[ 0 ];
+}
+
+/**
+ * Parses all Sass import statements in a given file
+ *
+ * @param  {string} file File name
+ * @return {Array}       List of Import Statements in a file
+ */
+function parseImportStatements( file ) {
+	const fileContent = fs.readFileSync( file, 'utf8' );
+	return fileContent.toString().match( /@import "(.*?)"/g );
+}
+
+function isFileImportedInStyleEntry( file, importStatements ) {
+	const packageName = getPackageName( file );
+	const regex = new RegExp( `/${ packageName }/`, 'g' );
+
+	return (
+		importStatements &&
+		importStatements.find( ( importStatement ) =>
+			importStatement.match( regex )
+		)
+	);
+}
+
+/**
+ * Finds all stylesheet entry points that contain import statements
+ * that include the given file name
+ *
+ * @param  {string} file File name
+ * @return {Array}       List of entry points that import the styles from the file
+ */
+function findStyleEntriesThatImportFile( file ) {
+	const entriesWithImport = stylesheetEntryPoints.reduce(
+		( acc, entryPoint ) => {
+			const styleEntryImportStatements = parseImportStatements(
+				entryPoint
+			);
+
+			if (
+				isFileImportedInStyleEntry( file, styleEntryImportStatements )
+			) {
+				acc.push( entryPoint );
+			}
+
+			return acc;
+		},
+		[]
+	);
+
+	return entriesWithImport;
 }
 
 /**
@@ -58,7 +114,29 @@ function createStyleEntryTransform() {
 			const entries = await glob(
 				path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
 			);
+
+			// Account for the specific case where block styles in
+			// block-library package also need rebuilding.
+			if (
+				packageName === 'block-library' &&
+				[ 'style.scss', 'editor.scss' ].includes(
+					path.basename( file )
+				)
+			) {
+				entries.push( file );
+			}
+
 			entries.forEach( ( entry ) => this.push( entry ) );
+
+			// Find other stylesheets that need to be rebuilt because
+			// they import the styles that are being transformed
+			const styleEntries = findStyleEntriesThatImportFile( file );
+
+			// Rebuild stylesheets that import the styles being transformed
+			if ( styleEntries.length ) {
+				styleEntries.forEach( ( entry ) => stream.push( entry ) );
+			}
+
 			callback();
 		},
 	} );
@@ -109,7 +187,10 @@ let stream;
 
 if ( files.length ) {
 	stream = new Readable( { encoding: 'utf8' } );
-	files.forEach( ( file ) => stream.push( file ) );
+	files.forEach( ( file ) => {
+		stream.push( file );
+	} );
+
 	stream.push( null );
 	stream = stream
 		.pipe( createStyleEntryTransform() )
@@ -124,7 +205,14 @@ if ( files.length ) {
 	bar.tick( 0 );
 
 	stream = glob.stream(
-		[ `${ PACKAGES_DIR }/*/src/**/*.js`, `${ PACKAGES_DIR }/*/src/*.scss` ],
+		[
+			`${ PACKAGES_DIR }/*/src/**/*.{js,ts,tsx}`,
+			`${ PACKAGES_DIR }/*/src/*.scss`,
+			`${ PACKAGES_DIR }/block-library/src/**/*.js`,
+			`${ PACKAGES_DIR }/block-library/src/*/style.scss`,
+			`${ PACKAGES_DIR }/block-library/src/*/editor.scss`,
+			`${ PACKAGES_DIR }/block-library/src/*.scss`,
+		],
 		{
 			ignore: [
 				`**/benchmark/**`,

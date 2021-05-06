@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import {
+	clickMenuItem,
 	createNewPost,
 	clickBlockAppender,
 	clickBlockToolbarButton,
@@ -17,13 +18,10 @@ describe( 'invalid blocks', () => {
 		await clickBlockAppender();
 		await page.keyboard.type( 'hello' );
 
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 
 		// Change to HTML mode and close the options
-		const changeModeButton = await page.waitForXPath(
-			'//button[text()="Edit as HTML"]'
-		);
-		await changeModeButton.click();
+		await clickMenuItem( 'Edit as HTML' );
 
 		// Focus on the textarea and enter an invalid paragraph
 		await page.click(
@@ -36,8 +34,12 @@ describe( 'invalid blocks', () => {
 		expect( console ).toHaveErrored();
 		expect( console ).toHaveWarned();
 
-		// Click on the 'resolve' button
-		await page.click( '.block-editor-warning__actions button' );
+		// Click on the 'three-dots' menu toggle
+		await page.click(
+			'.block-editor-warning__actions button[aria-label="More options"]'
+		);
+
+		await clickMenuItem( 'Resolve' );
 
 		// Check we get the resolve modal with the appropriate contents
 		const htmlBlockContent = await page.$eval(

@@ -3,11 +3,12 @@
  */
 import { render, unmountComponentAtNode } from 'react-dom';
 import { act, Simulate } from 'react-dom/test-utils';
-import { first, last, nth, uniqueId } from 'lodash';
+import { queryByText, queryByRole } from '@testing-library/react';
+import { default as lodash, first, last, nth, uniqueId } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useState, useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
@@ -15,10 +16,20 @@ import { UP, DOWN, ENTER } from '@wordpress/keycodes';
 import LinkControl from '../';
 import { fauxEntitySuggestions, fetchFauxEntitySuggestions } from './fixtures';
 
+// Mock debounce() so that it runs instantly.
+lodash.debounce = jest.fn( ( callback ) => {
+	callback.cancel = jest.fn();
+	return callback;
+} );
+
 const mockFetchSearchSuggestions = jest.fn();
 
 jest.mock( '@wordpress/data/src/components/use-select', () => () => ( {
 	fetchSearchSuggestions: mockFetchSearchSuggestions,
+} ) );
+
+jest.mock( '@wordpress/data/src/components/use-dispatch', () => ( {
+	useDispatch: () => ( { saveEntityRecords: jest.fn() } ),
 } ) );
 
 /**
@@ -390,6 +401,33 @@ describe( 'Searching for a link', () => {
 			);
 		}
 	);
+
+	it( 'should not display a URL suggestion as a default fallback when noURLSuggestion is passed.', async () => {
+		act( () => {
+			render( <LinkControl noURLSuggestion />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: 'couldbeurlorentitysearchterm' },
+			} );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+
+		const searchResultElements = getSearchResults();
+
+		// We should see a search result for each of the expect search suggestions and nothing else
+		expect( searchResultElements ).toHaveLength(
+			fauxEntitySuggestions.length
+		);
+	} );
 } );
 
 describe( 'Manual link entry', () => {
@@ -556,11 +594,12 @@ describe( 'Default search suggestions', () => {
 			Simulate.click( currentLinkBtn );
 		} );
 
+		const searchInput = getURLInput();
+		searchInput.focus();
+
 		await eventLoopTick();
 
 		const searchResultElements = getSearchResults();
-
-		const searchInput = getURLInput();
 
 		// search input is set to the URL value
 		expect( searchInput.value ).toEqual( fauxEntitySuggestions[ 0 ].url );
@@ -671,7 +710,9 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			const createSuggestion = ( title ) =>
 				new Promise( ( resolve ) => {
-					resolver = resolve;
+					resolver = ( arg ) => {
+						resolve( arg );
+					};
 					resolvedEntity = {
 						title,
 						id: 123,
@@ -719,7 +760,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 			const createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'New page' )
+					result.innerHTML.includes( 'Create:' )
 				)
 			);
 
@@ -816,7 +857,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'New page' )
+				result.innerHTML.includes( 'Create:' )
 			)
 		);
 
@@ -889,7 +930,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		const form = container.querySelector( 'form' );
 		const createButton = first(
 			Array.from( searchResultElements ).filter( ( result ) =>
-				result.innerHTML.includes( 'New page' )
+				result.innerHTML.includes( 'Create:' )
 			)
 		);
 
@@ -919,6 +960,50 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 		);
 	} );
 
+	it( 'should allow customisation of button text', async () => {
+		const entityNameText = 'A new page to be created';
+
+		const LinkControlConsumer = () => {
+			return (
+				<LinkControl
+					createSuggestion={ () => {} }
+					createSuggestionButtonText="Custom suggestion text"
+				/>
+			);
+		};
+
+		act( () => {
+			render( <LinkControlConsumer />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = container.querySelector(
+			'input[aria-label="URL"]'
+		);
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, {
+				target: { value: entityNameText },
+			} );
+		} );
+
+		await eventLoopTick();
+
+		// TODO: select these by aria relationship to autocomplete rather than arbitrary selector.
+		const searchResultElements = container.querySelectorAll(
+			'[role="listbox"] [role="option"]'
+		);
+
+		const createButton = first(
+			Array.from( searchResultElements ).filter( ( result ) =>
+				result.innerHTML.includes( 'Custom suggestion text' )
+			)
+		);
+
+		expect( createButton ).not.toBeNull();
+	} );
+
 	describe( 'Do not show create option', () => {
 		it.each( [ [ undefined ], [ null ], [ false ] ] )(
 			'should not show not show an option to create an entity when "createSuggestion" handler is %s',
@@ -943,7 +1028,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 				);
 				const createButton = first(
 					Array.from( searchResultElements ).filter( ( result ) =>
-						result.innerHTML.includes( 'New page' )
+						result.innerHTML.includes( 'Create:' )
 					)
 				);
 
@@ -1068,7 +1153,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			);
 			let createButton = first(
 				Array.from( searchResultElements ).filter( ( result ) =>
-					result.innerHTML.includes( 'New page' )
+					result.innerHTML.includes( 'Create:' )
 				)
 			);
 
@@ -1083,7 +1168,7 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 			// This is a Notice component
 			// we allow selecting by className here as an edge case because the
 			// a11y is handled via `speak`.
-			// See: https://github.com/WordPress/gutenberg/tree/master/packages/a11y#speak.
+			// See: https://github.com/WordPress/gutenberg/tree/HEAD/packages/a11y#speak.
 			const errorNotice = container.querySelector(
 				'.block-editor-link-control__search-error'
 			);
@@ -1112,8 +1197,6 @@ describe( 'Creating Entities (eg: Posts, Pages)', () => {
 					result.innerHTML.includes( 'New page' )
 				)
 			);
-
-			expect( createButton ).not.toBeFalsy(); // shouldn't exist!
 		} );
 	} );
 } );
@@ -1142,10 +1225,9 @@ describe( 'Selecting links', () => {
 		expect( currentLinkHTML ).toEqual(
 			expect.stringContaining( selectedLink.title )
 		);
-		expect( currentLinkHTML ).toEqual(
-			expect.stringContaining( selectedLink.type )
-		);
-		expect( currentLinkHTML ).toEqual( expect.stringContaining( 'Edit' ) );
+		expect(
+			queryByRole( currentLink, 'button', { name: 'Edit' } )
+		).toBeTruthy();
 		expect( currentLinkAnchor ).not.toBeNull();
 	} );
 
@@ -1291,6 +1373,7 @@ describe( 'Selecting links', () => {
 
 				// Search Input UI
 				const searchInput = getURLInput();
+				searchInput.focus();
 				const form = container.querySelector( 'form' );
 
 				// Simulate searching for a term
@@ -1459,54 +1542,6 @@ describe( 'Selecting links', () => {
 			expect( mockFetchSearchSuggestions ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
-
-	it( 'does not forcefully regain focus if onChange handler had shifted it', () => {
-		// Regression: Previously, there had been issues where if `onChange`
-		// would programmatically shift focus, LinkControl would try to force it
-		// back, based on its internal logic to determine whether it had focus
-		// when finishing an edit occuring _before_ `onChange` having been run.
-		//
-		// See: https://github.com/WordPress/gutenberg/pull/19462
-
-		const LinkControlConsumer = () => {
-			const focusTarget = useRef();
-
-			return (
-				<>
-					<div tabIndex={ -1 } data-expected ref={ focusTarget } />
-					<LinkControl
-						onChange={ () => focusTarget.current.focus() }
-					/>
-				</>
-			);
-		};
-
-		act( () => {
-			render( <LinkControlConsumer />, container );
-		} );
-
-		// Change value.
-		const form = container.querySelector( 'form' );
-		const searchInput = getURLInput();
-
-		// Simulate searching for a term
-		act( () => {
-			Simulate.change( searchInput, {
-				target: { value: 'https://example.com' },
-			} );
-		} );
-		act( () => {
-			Simulate.keyDown( searchInput, { keyCode: ENTER } );
-		} );
-		act( () => {
-			Simulate.submit( form );
-		} );
-
-		const isExpectedFocusTarget = document.activeElement.hasAttribute(
-			'data-expected'
-		);
-		expect( isExpectedFocusTarget ).toBe( true );
-	} );
 } );
 
 describe( 'Addition Settings UI', () => {
@@ -1610,4 +1645,71 @@ describe( 'Addition Settings UI', () => {
 		expect( settingControlsInputs[ 0 ].checked ).toEqual( false );
 		expect( settingControlsInputs[ 1 ].checked ).toEqual( true );
 	} );
+} );
+
+describe( 'Post types', () => {
+	it( 'should display post type in search results of link', async () => {
+		const searchTerm = 'Hello world';
+
+		act( () => {
+			render( <LinkControl />, container );
+		} );
+
+		// Search Input UI
+		const searchInput = getURLInput();
+
+		// Simulate searching for a term
+		act( () => {
+			Simulate.change( searchInput, { target: { value: searchTerm } } );
+		} );
+
+		// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+		await eventLoopTick();
+
+		const searchResultElements = getSearchResults();
+
+		searchResultElements.forEach( ( resultItem, index ) => {
+			expect(
+				queryByText( resultItem, fauxEntitySuggestions[ index ].type )
+			).toBeTruthy();
+		} );
+	} );
+
+	it.each( [ 'page', 'post', 'tag', 'post_tag', 'category' ] )(
+		'should NOT display post type in search results of %s',
+		async ( postType ) => {
+			const searchTerm = 'Hello world';
+
+			act( () => {
+				render(
+					<LinkControl suggestionsQuery={ { type: postType } } />,
+					container
+				);
+			} );
+
+			// Search Input UI
+			const searchInput = getURLInput();
+
+			// Simulate searching for a term
+			act( () => {
+				Simulate.change( searchInput, {
+					target: { value: searchTerm },
+				} );
+			} );
+
+			// fetchFauxEntitySuggestions resolves on next "tick" of event loop
+			await eventLoopTick();
+
+			const searchResultElements = getSearchResults();
+
+			searchResultElements.forEach( ( resultItem, index ) => {
+				expect(
+					queryByText(
+						resultItem,
+						fauxEntitySuggestions[ index ].type
+					)
+				).toBeFalsy();
+			} );
+		}
+	);
 } );

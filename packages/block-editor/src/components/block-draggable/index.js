@@ -1,16 +1,17 @@
 /**
  * WordPress dependencies
  */
+import { getBlockType } from '@wordpress/blocks';
 import { Draggable } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useContext, useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * Internal dependencies
  */
 import BlockDraggableChip from './draggable-chip';
 import useScrollWhenDragging from './use-scroll-when-dragging';
-import { BlockNodes } from '../block-list/root-container';
+import { store as blockEditorStore } from '../../store';
 
 const BlockDraggable = ( {
 	children,
@@ -18,39 +19,38 @@ const BlockDraggable = ( {
 	cloneClassname,
 	onDragStart,
 	onDragEnd,
+	elementId,
 } ) => {
-	const { srcRootClientId, index, isDraggable } = useSelect(
+	const { srcRootClientId, isDraggable, icon } = useSelect(
 		( select ) => {
 			const {
-				getBlockIndex,
 				getBlockRootClientId,
 				getTemplateLock,
-			} = select( 'core/block-editor' );
+				getBlockName,
+			} = select( blockEditorStore );
 			const rootClientId = getBlockRootClientId( clientIds[ 0 ] );
 			const templateLock = rootClientId
 				? getTemplateLock( rootClientId )
 				: null;
+			const blockName = getBlockName( clientIds[ 0 ] );
 
 			return {
-				index: getBlockIndex( clientIds[ 0 ], rootClientId ),
 				srcRootClientId: rootClientId,
 				isDraggable: 'all' !== templateLock,
+				icon: getBlockType( blockName )?.icon,
 			};
 		},
 		[ clientIds ]
 	);
 	const isDragging = useRef( false );
-	const [ firstClientId ] = clientIds;
-	const blockNodes = useContext( BlockNodes );
-	const blockElement = blockNodes ? blockNodes[ firstClientId ] : undefined;
 	const [
 		startScrolling,
 		scrollOnDragOver,
 		stopScrolling,
-	] = useScrollWhenDragging( blockElement );
+	] = useScrollWhenDragging();
 
 	const { startDraggingBlocks, stopDraggingBlocks } = useDispatch(
-		'core/block-editor'
+		blockEditorStore
 	);
 
 	// Stop dragging blocks if the block draggable is unmounted
@@ -68,7 +68,6 @@ const BlockDraggable = ( {
 
 	const transferData = {
 		type: 'block',
-		srcIndex: index,
 		srcClientIds: clientIds,
 		srcRootClientId,
 	};
@@ -76,10 +75,11 @@ const BlockDraggable = ( {
 	return (
 		<Draggable
 			cloneClassname={ cloneClassname }
-			elementId={ `block-${ clientIds[ 0 ] }` }
+			elementId={ elementId }
+			__experimentalTransferDataType="wp-blocks"
 			transferData={ transferData }
 			onDragStart={ ( event ) => {
-				startDraggingBlocks();
+				startDraggingBlocks( clientIds );
 				isDragging.current = true;
 
 				startScrolling( event );
@@ -100,14 +100,14 @@ const BlockDraggable = ( {
 				}
 			} }
 			__experimentalDragComponent={
-				<BlockDraggableChip clientIds={ clientIds } />
+				<BlockDraggableChip count={ clientIds.length } icon={ icon } />
 			}
 		>
 			{ ( { onDraggableStart, onDraggableEnd } ) => {
 				return children( {
-					isDraggable: true,
-					onDraggableStart,
-					onDraggableEnd,
+					draggable: true,
+					onDragStart: onDraggableStart,
+					onDragEnd: onDraggableEnd,
 				} );
 			} }
 		</Draggable>

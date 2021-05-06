@@ -1,6 +1,11 @@
 {
+	"apiVersion": 2,
 	"name": "core/html",
+	"title": "Custom HTML",
 	"category": "widgets",
+	"description": "Add custom HTML code and preview it as you edit.",
+	"keywords": [ "embed" ],
+	"textdomain": "default",
 	"attributes": {
 		"content": {
 			"type": "string",
@@ -11,5 +16,6 @@
 		"customClassName": false,
 		"className": false,
 		"html": false
-	}
+	},
+	"editorStyle": "wp-block-html-editor"
 }

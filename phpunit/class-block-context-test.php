@@ -196,5 +196,4 @@ class Block_Context_Test extends WP_UnitTestCase {
 
 		$this->assertEquals( array( 'example' => 'ok' ), $provided_context[0] );
 	}
-
 }

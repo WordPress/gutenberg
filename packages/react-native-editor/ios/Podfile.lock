@@ -1,7 +1,7 @@
 PODS:
   - boost-for-react-native (1.63.0)
   - BVLinearGradient (2.5.6):
-    - React
+    - React-Core
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.61.5)
   - FBReactNativeSpec (0.61.5):
@@ -21,8 +21,8 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - Gutenberg (8.4.0-rc.1):
-    - React (= 0.61.5)
+  - Gutenberg (1.52.0):
+    - React-Core (= 0.61.5)
     - React-CoreModules (= 0.61.5)
     - React-RCTImage (= 0.61.5)
     - RNTAztecView
@@ -189,19 +189,23 @@ PODS:
     - React-cxxreact (= 0.61.5)
     - React-jsi (= 0.61.5)
   - React-jsinspector (0.61.5)
+  - react-native-blur (0.8.0):
+    - React-Core
   - react-native-get-random-values (1.4.0):
-    - React
+    - React-Core
   - react-native-keyboard-aware-scroll-view (0.8.8):
-    - React
+    - React-Core
   - react-native-safe-area (0.5.1):
-    - React
-  - react-native-slider (2.0.7):
-    - React
+    - React-Core
+  - react-native-safe-area-context (3.1.1):
+    - React-Core
+  - react-native-slider (3.0.2):
+    - React-Core
   - react-native-video (5.0.2):
-    - React
+    - React-Core
     - react-native-video/Video (= 5.0.2)
   - react-native-video/Video (5.0.2):
-    - React
+    - React-Core
   - React-RCTActionSheet (0.61.5):
     - React-Core/RCTActionSheetHeaders (= 0.61.5)
   - React-RCTAnimation (0.61.5):
@@ -238,13 +242,21 @@ PODS:
     - React-jsi (= 0.61.5)
     - ReactCommon/jscallinvoker (= 0.61.5)
   - ReactNativeDarkMode (0.0.10):
-    - React
-  - RNSVG (9.13.6-gb):
-    - React
-  - RNTAztecView (0.1.11):
     - React-Core
-    - WordPress-Aztec-iOS (~> 1.19.2)
-  - WordPress-Aztec-iOS (1.19.2)
+  - RNCMaskedView (0.1.10-wp):
+    - React-Core
+  - RNGestureHandler (1.6.0):
+    - React-Core
+  - RNReanimated (1.9.0):
+    - React-Core
+  - RNScreens (2.9.0):
+    - React-Core
+  - RNSVG (9.13.6-gb):
+    - React-Core
+  - RNTAztecView (1.52.0):
+    - React-Core
+    - WordPress-Aztec-iOS (~> 1.19.4)
+  - WordPress-Aztec-iOS (1.19.4)
   - Yoga (1.14.0)
 
 DEPENDENCIES:
@@ -266,9 +278,11 @@ DEPENDENCIES:
   - React-jsi (from `../../../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../../../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
+  - "react-native-blur (from `../../../node_modules/@react-native-community/blur`)"
   - react-native-get-random-values (from `../../../node_modules/react-native-get-random-values`)
   - react-native-keyboard-aware-scroll-view (from `../../../node_modules/react-native-keyboard-aware-scroll-view`)
   - react-native-safe-area (from `../../../node_modules/react-native-safe-area`)
+  - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
   - "react-native-slider (from `../../../node_modules/@react-native-community/slider`)"
   - react-native-video (from `../../../node_modules/react-native-video`)
   - React-RCTActionSheet (from `../../../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -283,6 +297,10 @@ DEPENDENCIES:
   - ReactCommon/jscallinvoker (from `../../../node_modules/react-native/ReactCommon`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
   - ReactNativeDarkMode (from `../../../node_modules/react-native-dark-mode`)
+  - "RNCMaskedView (from `../../../node_modules/@react-native-community/masked-view`)"
+  - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
+  - RNReanimated (from `../../../node_modules/react-native-reanimated`)
+  - RNScreens (from `../../../node_modules/react-native-screens`)
   - RNSVG (from `../../../node_modules/react-native-svg`)
   - RNTAztecView (from `../../react-native-aztec/RNTAztecView.podspec`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
@@ -325,12 +343,16 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../../../node_modules/react-native/ReactCommon/jsinspector"
+  react-native-blur:
+    :path: "../../../node_modules/@react-native-community/blur"
   react-native-get-random-values:
     :path: "../../../node_modules/react-native-get-random-values"
   react-native-keyboard-aware-scroll-view:
     :path: "../../../node_modules/react-native-keyboard-aware-scroll-view"
   react-native-safe-area:
     :path: "../../../node_modules/react-native-safe-area"
+  react-native-safe-area-context:
+    :path: "../../../node_modules/react-native-safe-area-context"
   react-native-slider:
     :path: "../../../node_modules/@react-native-community/slider"
   react-native-video:
@@ -357,6 +379,14 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon"
   ReactNativeDarkMode:
     :path: "../../../node_modules/react-native-dark-mode"
+  RNCMaskedView:
+    :path: "../../../node_modules/@react-native-community/masked-view"
+  RNGestureHandler:
+    :path: "../../../node_modules/react-native-gesture-handler"
+  RNReanimated:
+    :path: "../../../node_modules/react-native-reanimated"
+  RNScreens:
+    :path: "../../../node_modules/react-native-screens"
   RNSVG:
     :path: "../../../node_modules/react-native-svg"
   RNTAztecView:
@@ -366,13 +396,13 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BVLinearGradient: 60a475b2edfe7707deda00278cb8ce9bfe70e669
+  BVLinearGradient: 48f1964a78bddfae412d1aac5f386c2949fe0306
   DoubleConversion: 5805e889d232975c086db112ece9ed034df7a0b2
   FBLazyVector: aaeaf388755e4f29cd74acbc9e3b8da6d807c37f
   FBReactNativeSpec: 118d0d177724c2d67f08a59136eb29ef5943ec75
   Folly: 30e7936e1c45c08d884aa59369ed951a8e68cf51
   glog: 1f3da668190260b06b429bb211bfbee5cd790c28
-  Gutenberg: f7055103da8a673d813ecec75875d973e3d25445
+  Gutenberg: 84ebca67faec24fa0f6fdc7d07f009ee81916cb3
   RCTRequired: b153add4da6e7dbc44aebf93f3cf4fcae392ddf1
   RCTTypeSafety: 9aa1b91d7f9310fc6eadc3cf95126ffe818af320
   React: b6a59ef847b2b40bb6e0180a97d0ca716969ac78
@@ -382,11 +412,13 @@ SPEC CHECKSUMS:
   React-jsi: cb2cd74d7ccf4cffb071a46833613edc79cdf8f7
   React-jsiexecutor: d5525f9ed5f782fdbacb64b9b01a43a9323d2386
   React-jsinspector: fa0ecc501688c3c4c34f28834a76302233e29dc0
-  react-native-get-random-values: 8940331a943a46c165d3ed05802c09c392f8dd46
-  react-native-keyboard-aware-scroll-view: ffa9152671fec9a571197ed2d02e0fcb90206e60
-  react-native-safe-area: e8230b0017d76c00de6b01e2412dcf86b127c6a3
-  react-native-slider: f81b89fa0c1f9a65742d33f889a194ca6653a985
-  react-native-video: 961749da457e73bf0b5565edfbaffc25abfb8974
+  react-native-blur: ef741a08d020010ba65e411be0ab82d1d325e7ad
+  react-native-get-random-values: 03edb8dcc2d3f43e55aa67ea13b61b6723bbf047
+  react-native-keyboard-aware-scroll-view: 6cb84879bf07e4cc1caed18b11fb928e142adac6
+  react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
+  react-native-safe-area-context: c8da723dcddabe15afe95c9d31c56a0cf2b0141c
+  react-native-slider: 2e42dc91e7ab8b35a9c7f2eb3532729a41d0dbe2
+  react-native-video: b8767f54061e475ddd38c22375f46f4d93e5fdfd
   React-RCTActionSheet: 600b4d10e3aea0913b5a92256d2719c0cdd26d76
   React-RCTAnimation: 791a87558389c80908ed06cc5dfc5e7920dfa360
   React-RCTBlob: d89293cc0236d9cb0933d85e430b0bbe81ad1d72
@@ -397,12 +429,16 @@ SPEC CHECKSUMS:
   React-RCTText: 9ccc88273e9a3aacff5094d2175a605efa854dbe
   React-RCTVibration: a49a1f42bf8f5acf1c3e297097517c6b3af377ad
   ReactCommon: 198c7c8d3591f975e5431bec1b0b3b581aa1c5dd
-  ReactNativeDarkMode: f61376360c5d983907e5c316e8e1c853a8c2f348
-  RNSVG: 68a534a5db06dcbdaebfd5079349191598caef7b
-  RNTAztecView: b4c945bdc156b98dbf5c8a676def6c7736efa337
-  WordPress-Aztec-iOS: d01bf0c5e150ae6a046f06ba63b7cc2762061c0b
+  ReactNativeDarkMode: 6d807bc8373b872472c8541fc3341817d979a6fb
+  RNCMaskedView: 66caacf33c86eaa7d22b43178dd998257d5c2e4d
+  RNGestureHandler: 7a377d0580c9f07df99e590bbcefd616ee0e2626
+  RNReanimated: f05baf4cd76b6eab2e4d7e2b244424960b968918
+  RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
+  RNSVG: 46c4b680fe18237fa01eb7d7b311d77618fde31f
+  RNTAztecView: e752cfd696ff6db49be94a8aeca032d2f4a3227e
+  WordPress-Aztec-iOS: 870c93297849072aadfc2223e284094e73023e82
   Yoga: f2a7cd4280bfe2cca5a7aed98ba0eb3d1310f18b
 
-PODFILE CHECKSUM: c8a36f1dc00b0194bc4eb8fad6ae0c674a2dfd2b
+PODFILE CHECKSUM: 2629b71d4cbcf6e76c50ab316a3dd51fc0515bc7
 
 COCOAPODS: 1.8.4

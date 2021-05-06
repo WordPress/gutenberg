@@ -22,11 +22,11 @@ Only one option in a radio group can be selected and active at a time. Selecting
 
 Radio groups should:
 
-- **Be clearly and accurately labeled.**
-- **Clearly communicate that clicking or tapping will trigger an action.**
-- **Use established colors appropriately.** For example, only use red buttons for actions that are difficult or impossible to undo.
-- **Have consistent locations in the interface.**
-- **Have a default option already selected.**
+-   **Be clearly and accurately labeled.**
+-   **Clearly communicate that clicking or tapping will trigger an action.**
+-   **Use established colors appropriately.** For example, only use red buttons for actions that are difficult or impossible to undo.
+-   **Have consistent locations in the interface.**
+-   **Have a default option already selected.**
 
 ### States
 
@@ -51,7 +51,7 @@ import { useState } from '@wordpress/element';
 const MyControlledRadioRadioGroup = () => {
 	const [ checked, setChecked ] = useState( '25' );
 	return (
-		<RadioGroup accessibilityLabel="Width" onChange={ setChecked } checked={ checked }>
+		<RadioGroup label="Width" onChange={ setChecked } checked={ checked }>
 			<Radio value="25">25%</Radio>
 			<Radio value="50">50%</Radio>
 			<Radio value="75">75%</Radio>
@@ -66,12 +66,15 @@ const MyControlledRadioRadioGroup = () => {
 When using the RadioGroup component as an uncontrolled component, the default value can be set with the `defaultChecked` prop.
 
 ```jsx
-import { Radio, RadioGroup } from '@wordpress/components';
+import {
+	__experimentalRadio as Radio,
+	__experimentalRadioGroup as RadioGroup,
+} from '@wordpress/components';
 import { useState } from '@wordpress/element';
 
 const MyUncontrolledRadioRadioGroup = () => {
 	return (
-		<RadioGroup accessibilityLabel="Width" defaultChecked="25">
+		<RadioGroup label="Width" defaultChecked="25">
 			<Radio value="25">25%</Radio>
 			<Radio value="50">50%</Radio>
 			<Radio value="75">75%</Radio>
@@ -83,5 +86,5 @@ const MyUncontrolledRadioRadioGroup = () => {
 
 ## Related components
 
-- For simple buttons that are related, use a `ButtonGroup` component.
-- For traditional radio options, use a `RadioControl` component.
+-   For simple buttons that are related, use a `ButtonGroup` component.
+-   For traditional radio options, use a `RadioControl` component.

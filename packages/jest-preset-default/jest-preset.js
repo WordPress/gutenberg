@@ -21,18 +21,10 @@ module.exports = {
 		'**/test/*.[jt]s',
 		'**/?(*.)test.[jt]s',
 	],
-	testPathIgnorePatterns: [ '/node_modules/', '<rootDir>/wordpress/' ],
+	testPathIgnorePatterns: [ '/node_modules/', '<rootDir>/vendor/' ],
 	timers: 'fake',
 	transform: {
 		'^.+\\.[jt]sx?$': require.resolve( 'babel-jest' ),
 	},
 	verbose: true,
-	reporters:
-		'TRAVIS' in process.env && 'CI' in process.env
-			? [
-					require.resolve(
-						'@wordpress/jest-preset-default/scripts/travis-fold-passes-reporter.js'
-					),
-			  ]
-			: undefined,
 };

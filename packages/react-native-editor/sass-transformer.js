@@ -36,7 +36,7 @@ const fs = require( 'fs' );
 const path = require( 'path' );
 
 // eslint-disable-next-line import/no-extraneous-dependencies
-const sass = require( 'node-sass' );
+const sass = require( 'sass' );
 // eslint-disable-next-line import/no-extraneous-dependencies
 const css2rn = require( 'css-to-react-native-transform' ).default;
 
@@ -48,9 +48,9 @@ const autoImportIncludePaths = [
 	path.join( path.dirname( __filename ), '../base-styles' ),
 ];
 const autoImportAssets = [
+	'_variables.scss',
 	'_colors.scss',
 	'_breakpoints.scss',
-	'_variables.scss',
 	'_native.scss',
 	'_mixins.scss',
 	'_animations.scss',

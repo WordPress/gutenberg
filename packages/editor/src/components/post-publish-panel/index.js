@@ -17,6 +17,7 @@ import {
 } from '@wordpress/components';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -80,11 +81,9 @@ export class PostPublishPanel extends Component {
 					{ isPostPublish ? (
 						<Button
 							onClick={ onClose }
+							icon={ closeSmall }
 							label={ __( 'Close panel' ) }
-							className="is-secondary"
-						>
-							{ __( 'Close' ) }
-						</Button>
+						/>
 					) : (
 						<>
 							<div className="editor-post-publish-panel__header-publish-button">
@@ -96,11 +95,7 @@ export class PostPublishPanel extends Component {
 								/>
 							</div>
 							<div className="editor-post-publish-panel__header-cancel-button">
-								<Button
-									onClick={ onClose }
-									label={ __( 'Close panel' ) }
-									className="is-secondary"
-								>
+								<Button onClick={ onClose } isSecondary>
 									{ __( 'Cancel' ) }
 								</Button>
 							</div>

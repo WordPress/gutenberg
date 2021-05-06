@@ -18,7 +18,7 @@ const Example = () => {
 
 	return (
 		<BoxControl
-			value={ value }
+			values={ values }
 			onChange={ ( nextValues ) => setValues( nextValues ) }
 		/>
 	);
@@ -48,7 +48,7 @@ const Example = () => {
 	return (
 		<>
 			<BoxControl
-				value={ value }
+				values={ values }
 				onChange={ ( nextValues ) => setValues( nextValues ) }
 			/>
 			<Visualizer>
@@ -80,7 +80,7 @@ const Example = () => {
 	return (
 		<>
 			<BoxControl
-				value={ value }
+				values={ values }
 				onChange={ ( nextValues ) => setValues( nextValues ) }
 			/>
 			<div style={ { position: 'relative' } }>
@@ -122,6 +122,13 @@ A callback function for visualizer changes, based on input hover interactions.
 
 -   Type: `Function`
 -   Required: Yes
+
+### sides
+
+Collection of sides to allow control of. If omitted or empty, all sides will be available.
+
+-   Type: `Array<Object>`
+-   Required: No
 
 ### units
 

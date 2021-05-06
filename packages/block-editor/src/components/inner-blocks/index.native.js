@@ -20,6 +20,8 @@ import BlockList from '../block-list';
 import { useBlockEditContext } from '../block-edit/context';
 import useBlockSync from '../provider/use-block-sync';
 import { BlockContextProvider } from '../block-context';
+import { defaultLayout, LayoutProvider } from '../block-list/layout';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * InnerBlocks is a component which allows a single block to have multiple blocks
@@ -36,7 +38,7 @@ function UncontrolledInnerBlocks( props ) {
 		template,
 		templateLock,
 		templateInsertUpdatesSelection,
-		__experimentalMoverDirection,
+		orientation,
 		renderAppender,
 		renderFooterAppender,
 		parentWidth,
@@ -48,10 +50,13 @@ function UncontrolledInnerBlocks( props ) {
 		marginVertical,
 		marginHorizontal,
 		horizontalAlignment,
+		filterInnerBlocks,
+		blockWidth,
+		__experimentalLayout: layout = defaultLayout,
 	} = props;
 
 	const block = useSelect(
-		( select ) => select( 'core/block-editor' ).getBlock( clientId ),
+		( select ) => select( blockEditorStore ).getBlock( clientId ),
 		[ clientId ]
 	) || { innerBlocks: [] };
 
@@ -72,7 +77,7 @@ function UncontrolledInnerBlocks( props ) {
 			renderAppender={ renderAppender }
 			renderFooterAppender={ renderFooterAppender }
 			withFooter={ false }
-			__experimentalMoverDirection={ __experimentalMoverDirection }
+			orientation={ orientation }
 			parentWidth={ parentWidth }
 			horizontalAlignment={ horizontalAlignment }
 			horizontal={ horizontal }
@@ -80,6 +85,8 @@ function UncontrolledInnerBlocks( props ) {
 			contentStyle={ contentStyle }
 			onAddBlock={ onAddBlock }
 			onDeleteBlock={ onDeleteBlock }
+			filterInnerBlocks={ filterInnerBlocks }
+			blockWidth={ blockWidth }
 		/>
 	);
 
@@ -89,9 +96,11 @@ function UncontrolledInnerBlocks( props ) {
 		const context = getBlockContext( block.attributes, blockType );
 
 		blockList = (
-			<BlockContextProvider value={ context }>
-				{ blockList }
-			</BlockContextProvider>
+			<LayoutProvider value={ layout }>
+				<BlockContextProvider value={ context }>
+					{ blockList }
+				</BlockContextProvider>
+			</LayoutProvider>
 		);
 	}
 
@@ -144,6 +153,6 @@ InnerBlocks.Content = withBlockContentContext( ( { BlockContent } ) => (
 ) );
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
 export default InnerBlocks;

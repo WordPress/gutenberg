@@ -1,12 +1,10 @@
 const ios = {
 	browserName: '',
 	platformName: 'iOS',
-	platformVersion: '13.4',
-	deviceName: 'iPhone 11',
 	os: 'iOS',
 	deviceOrientation: 'portrait',
 	automationName: 'XCUITest',
-	appiumVersion: '1.16.0', // SauceLabs requires appiumVersion to be specified.
+	appiumVersion: '1.18.3', // Sauce Labs requires appiumVersion to be specified.
 	app: undefined, // will be set later, locally this is relative to root of project
 	processArguments: {
 		args: [ 'uitesting' ],
@@ -15,13 +13,14 @@ const ios = {
 
 exports.iosLocal = {
 	...ios,
-	platformVersion: '13.4',
 	deviceName: 'iPhone 11',
+	wdaLaunchTimeout: 240000,
+	usePrebuiltWDA: true,
 };
 
 exports.iosServer = {
 	...ios,
-	platformVersion: '13.0',
+	platformVersion: '14.0', // Supported Sauce Labs platforms can be found here: https://saucelabs.com/rest/v1/info/platforms/appium
 	deviceName: 'iPhone 11 Simulator',
 };
 
@@ -35,6 +34,6 @@ exports.android = {
 	appPackage: 'com.gutenberg',
 	appActivity: 'com.gutenberg.MainActivity',
 	deviceOrientation: 'portrait',
-	appiumVersion: '1.16.0',
+	appiumVersion: '1.18.1',
 	app: undefined,
 };

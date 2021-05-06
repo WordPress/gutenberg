@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { mapMarker as icon } from '@wordpress/icons';
 
 /**
@@ -14,7 +13,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Site Title' ),
 	icon,
 	edit,
 };

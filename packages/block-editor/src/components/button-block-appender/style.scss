@@ -6,10 +6,16 @@
 	padding: $grid-unit-10;
 	width: 100%;
 	height: auto;
-	color: $dark-gray-primary;
-	box-shadow: inset 0 0 0 $border-width $dark-gray-primary;
+	color: $gray-900;
+	box-shadow: inset 0 0 0 $border-width $gray-900;
+
+	.is-dark-theme & {
+		color: $light-gray-placeholder;
+		box-shadow: inset 0 0 0 $border-width $light-gray-placeholder;
+	}
 
 	&:hover {
+		color: var(--wp-admin-theme-color);
 		box-shadow: inset 0 0 0 $border-width var(--wp-admin-theme-color);
 	}
 
@@ -25,19 +31,13 @@
 	&.block-list-appender__toggle {
 		display: flex;
 		flex-direction: row;
-		color: $dark-gray-primary;
 		box-shadow: none;
-		height: 24px;
-		padding: 0;
-		margin-left: $grid-unit-10;
-
-		&:active {
-			color: $white;
-		}
+		height: $icon-size;
+		width: $icon-size;
 
 		& > svg {
-			width: 24px;
-			background-color: $dark-gray-primary;
+			width: $icon-size;
+			background-color: $gray-900;
 			color: $white;
 			border-radius: $radius-block-ui;
 		}

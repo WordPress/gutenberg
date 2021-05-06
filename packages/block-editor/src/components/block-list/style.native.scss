@@ -7,11 +7,18 @@
 .horizontalContentContainer {
 	flex-direction: row;
 	flex-wrap: wrap;
-	justify-content: space-between;
+	justify-content: flex-start;
 	align-items: stretch;
-	max-width: $content-width;
 	overflow: visible;
 	width: 100%;
+}
+
+.horizontalContentContainerStretch {
+	justify-content: space-evenly;
+}
+
+.horizontalContentContainerCenter {
+	justify-content: center;
 }
 
 .switch {

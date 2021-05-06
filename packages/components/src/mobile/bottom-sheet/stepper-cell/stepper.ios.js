@@ -22,6 +22,8 @@ function Stepper( {
 	onPressInIncrement,
 	onPressOut,
 	value,
+	children,
+	shouldDisplayTextInput,
 } ) {
 	const valueStyle = getStylesFromColorScheme(
 		styles.value,
@@ -34,7 +36,10 @@ function Stepper( {
 
 	return (
 		<View style={ styles.container }>
-			<Text style={ valueStyle }>{ value }</Text>
+			{ ! shouldDisplayTextInput && (
+				<Text style={ valueStyle }>{ value }</Text>
+			) }
+			{ children }
 			<TouchableOpacity
 				disabled={ isMinValue }
 				onPressIn={ onPressInDecrement }

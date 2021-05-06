@@ -1,12 +1,13 @@
 .wp-block-separator {
 	border: none;
-	border-bottom: 2px solid $dark-gray-100;
+	border-bottom: 2px solid currentColor;
 	margin-left: auto;
 	margin-right: auto;
+	opacity: 0.4;
 
 	// Default, thin style
 	&:not(.is-style-wide):not(.is-style-dots) {
-		max-width: 100px;
+		width: 100px;
 	}
 
 	&.has-background:not(.is-style-dots) {

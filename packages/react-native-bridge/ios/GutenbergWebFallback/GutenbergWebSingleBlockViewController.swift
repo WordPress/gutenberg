@@ -41,9 +41,7 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
     open override func viewDidLoad() {
         super.viewDidLoad()
         webView.navigationDelegate = self
-        if #available(iOS 13.0, *) {
-            isModalInPresentation = true
-        }
+        isModalInPresentation = true
         addNavigationBarElements()
         addCoverView()
         loadWebView()
@@ -52,6 +50,29 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
     open func getRequest(for webView: WKWebView, completion: @escaping (URLRequest) -> Void) {
         let request = URLRequest(url: URL(string: "https://wordpress.org/gutenberg/")!)
         completion(request)
+    }
+
+    /// Requests a set of JS Scripts to be added to the web view when the page has started loading.
+    /// - Returns: Array of all the scripts to be added
+    open func onPageLoadScripts() -> [WKUserScript] {
+        return []
+    }
+
+    /// Requests a set of JS Scripts to be added to the web view when Gutenberg has been initialized.
+    /// - Returns: Array of all the scripts to be added
+    open func onGutenbergReadyScripts() -> [WKUserScript] {
+        return []
+    }
+
+    /// Called when Gutenberg Web editor is loaded in the web view.
+    /// If overriden, is required to call super.onGutenbergReady()
+    open func onGutenbergReady() {
+        onGutenbergReadyScripts().forEach(evaluateJavascript)
+        evaluateJavascript(jsInjection.preventAutosavesScript)
+        evaluateJavascript(jsInjection.insertBlockScript)
+        DispatchQueue.main.async { [weak self] in
+            self?.removeCoverViewAnimated()
+        }
     }
 
     public func cleanUp() {
@@ -82,16 +103,12 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
         navigationItem.rightBarButtonItem = saveButton
         navigationItem.leftBarButtonItem = cancelButton
         let localizedTitle = NSLocalizedString("Edit %@ block", comment: "Title of Gutenberg WEB editor running on a Web View. %@ is the localized block name.")
-        title = String(format: localizedTitle, block.name)
+        title = String(format: localizedTitle, block.title)
     }
 
     func addCoverView() {
         webView.addSubview(coverView)
-        if #available(iOS 13.0, *) {
-            coverView.backgroundColor = UIColor.systemBackground
-        } else {
-            coverView.backgroundColor = .white
-        }
+        coverView.backgroundColor = UIColor.systemBackground
         coverView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             coverView.leadingAnchor.constraint(equalTo: webView.leadingAnchor),
@@ -101,7 +118,7 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
         ])
     }
 
-    func removeCoverViewAnimated() {
+    public func removeCoverViewAnimated() {
         UIView.animate(withDuration: 1, animations: {
             self.coverView.alpha = 0
         }) { _ in
@@ -112,7 +129,7 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
 
     private func evaluateJavascript(_ script: WKUserScript) {
         webView.evaluateJavaScript(script.source) { (response, error) in
-            if let response = response {
+            if let response = response as? String, response.isEmpty == false {
                 print("\(response)")
             }
             if let error = error {
@@ -127,20 +144,14 @@ open class GutenbergWebSingleBlockViewController: UIViewController {
 }
 
 extension GutenbergWebSingleBlockViewController: WKNavigationDelegate {
-    public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        if !isWPOrg && navigationResponse.response.url?.absoluteString.contains("/wp-admin/post-new.php") ?? false {
-            evaluateJavascript(jsInjection.insertBlockScript)
-        }
-        decisionHandler(.allow)
-    }
-
-    public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+    open func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
         // At this point, user scripts are not loaded yet, so we need to inject the
         // script that inject css manually before actually injecting the css.
         evaluateJavascript(jsInjection.injectCssScript)
         evaluateJavascript(jsInjection.injectEditorCssScript)
         evaluateJavascript(jsInjection.injectWPBarsCssScript)
         evaluateJavascript(jsInjection.injectLocalStorageScript)
+        onPageLoadScripts().forEach(evaluateJavascript)
     }
 
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -148,10 +159,7 @@ extension GutenbergWebSingleBlockViewController: WKNavigationDelegate {
         // Injectic Editor specific CSS when everything is loaded to avoid overwritting parameters if gutenberg CSS load later.
         evaluateJavascript(jsInjection.preventAutosavesScript)
         evaluateJavascript(jsInjection.injectEditorCssScript)
-        if isWPOrg {
-            evaluateJavascript(jsInjection.insertBlockScript)
-        }
-        removeCoverViewAnimated()
+        evaluateJavascript(jsInjection.gutenbergObserverScript)
     }
 }
 
@@ -173,6 +181,8 @@ extension GutenbergWebSingleBlockViewController: WKScriptMessageHandler {
             delegate?.webController(controller: self, didLog: body)
         case .htmlPostContent:
             save(body)
+        case .gutenbergReady:
+            onGutenbergReady()
         }
     }
 }

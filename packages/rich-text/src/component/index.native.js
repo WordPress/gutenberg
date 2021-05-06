@@ -8,8 +8,11 @@
  */
 import RCTAztecView from '@wordpress/react-native-aztec';
 import { View, Platform } from 'react-native';
-import { addMention } from '@wordpress/react-native-bridge';
-import { get, pickBy } from 'lodash';
+import {
+	showUserSuggestions,
+	showXpostSuggestions,
+} from '@wordpress/react-native-bridge';
+import { get, pickBy, debounce, isString } from 'lodash';
 import memize from 'memize';
 
 /**
@@ -17,29 +20,25 @@ import memize from 'memize';
  */
 import { BlockFormatControls } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
-import {
-	Toolbar,
-	ToolbarButton,
-	withSiteCapabilities,
-	isMentionsSupported,
-} from '@wordpress/components';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { childrenBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
-import { BACKSPACE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { isURL } from '@wordpress/url';
-import { Icon, atSymbol } from '@wordpress/icons';
+import { atSymbol, plus } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
+import { useFormatTypes } from './use-format-types';
 import FormatEdit from './format-edit';
 import { applyFormat } from '../apply-format';
 import { getActiveFormat } from '../get-active-format';
 import { getActiveFormats } from '../get-active-formats';
 import { insert } from '../insert';
+import { getTextContent } from '../get-text-content';
 import { isEmpty, isEmptyLine } from '../is-empty';
 import { create } from '../create';
 import { toHTMLString } from '../to-html-string';
@@ -47,6 +46,7 @@ import { removeLineSeparator } from '../remove-line-separator';
 import { isCollapsed } from '../is-collapsed';
 import { remove } from '../remove';
 import styles from './style.scss';
+import ToolbarButtonWithOptions from './toolbar-button-with-options';
 
 const unescapeSpaces = ( text ) => {
 	return text.replace( /&nbsp;|&#160;/gi, ' ' );
@@ -57,6 +57,8 @@ const gutenbergFormatNamesToAztec = {
 	'core/italic': 'italic',
 	'core/strikethrough': 'strikethrough',
 };
+
+const EMPTY_PARAGRAPH_TAGS = '<p></p>';
 
 export class RichText extends Component {
 	constructor( {
@@ -79,7 +81,9 @@ export class RichText extends Component {
 
 		this.isIOS = Platform.OS === 'ios';
 		this.createRecord = this.createRecord.bind( this );
-		this.onChange = this.onChange.bind( this );
+		this.restoreParagraphTags = this.restoreParagraphTags.bind( this );
+		this.onChangeFromAztec = this.onChangeFromAztec.bind( this );
+		this.onKeyDown = this.onKeyDown.bind( this );
 		this.handleEnter = this.handleEnter.bind( this );
 		this.handleDelete = this.handleDelete.bind( this );
 		this.onPaste = this.onPaste.bind( this );
@@ -91,7 +95,7 @@ export class RichText extends Component {
 		this.formatToValue = memize( this.formatToValue.bind( this ), {
 			maxSize: 1,
 		} );
-
+		this.debounceCreateUndoLevel = debounce( this.onCreateUndoLevel, 1000 );
 		// This prevents a bug in Aztec which triggers onSelectionChange twice on format change
 		this.onSelectionChange = this.onSelectionChange.bind( this );
 		this.onSelectionChangeFromAztec = this.onSelectionChangeFromAztec.bind(
@@ -99,7 +103,26 @@ export class RichText extends Component {
 		);
 		this.valueToFormat = this.valueToFormat.bind( this );
 		this.getHtmlToRender = this.getHtmlToRender.bind( this );
+		this.handleSuggestionFunc = this.handleSuggestionFunc.bind( this );
+		this.handleUserSuggestion = this.handleSuggestionFunc(
+			showUserSuggestions,
+			'@'
+		).bind( this );
+		this.handleXpostSuggestion = this.handleSuggestionFunc(
+			showXpostSuggestions,
+			'+'
+		).bind( this );
+		this.suggestionOptions = this.suggestionOptions.bind( this );
 		this.insertString = this.insertString.bind( this );
+		this.convertFontSizeFromString = this.convertFontSizeFromString.bind(
+			this
+		);
+		this.manipulateEventCounterToForceNativeToRefresh = this.manipulateEventCounterToForceNativeToRefresh.bind(
+			this
+		);
+		this.shouldDropEventFromAztec = this.shouldDropEventFromAztec.bind(
+			this
+		);
 		this.state = {
 			activeFormats: [],
 			selectedFormat: null,
@@ -204,7 +227,7 @@ export class RichText extends Component {
 
 	insertString( record, string ) {
 		if ( record && string ) {
-			this.lastEventCount = undefined;
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			const toInsert = insert( record, string );
 			this.onFormatChange( toInsert );
 		}
@@ -257,10 +280,21 @@ export class RichText extends Component {
 			.replace( closingTagRegexp, '' );
 	}
 
+	// Fix for crash https://github.com/wordpress-mobile/gutenberg-mobile/issues/2991
+	convertFontSizeFromString( fontSize ) {
+		return fontSize && isString( fontSize ) && fontSize.endsWith( 'px' )
+			? parseFloat( fontSize.substring( 0, fontSize.length - 2 ) )
+			: fontSize;
+	}
+
 	/*
 	 * Handles any case where the content of the AztecRN instance has changed
 	 */
-	onChange( event ) {
+	onChangeFromAztec( event ) {
+		if ( this.shouldDropEventFromAztec( event, 'onChange' ) ) {
+			return;
+		}
+
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
@@ -279,14 +313,29 @@ export class RichText extends Component {
 		const contentWithoutRootTag = this.removeRootTagsProduceByAztec(
 			unescapeSpaces( event.nativeEvent.text )
 		);
+		let formattedContent = contentWithoutRootTag;
+		if ( ! this.isIOS ) {
+			formattedContent = this.restoreParagraphTags(
+				contentWithoutRootTag,
+				this.multilineTag
+			);
+		}
 
-		const refresh = this.value !== contentWithoutRootTag;
-		this.value = contentWithoutRootTag;
+		this.debounceCreateUndoLevel();
+		const refresh = this.value !== formattedContent;
+		this.value = formattedContent;
 
 		// we don't want to refresh if our goal is just to create a record
 		if ( refresh ) {
-			this.props.onChange( contentWithoutRootTag );
+			this.props.onChange( formattedContent );
 		}
+	}
+
+	restoreParagraphTags( value, tag ) {
+		if ( tag === 'p' && ( ! value || ! value.startsWith( '<p>' ) ) ) {
+			return '<p>' + value + '</p>';
+		}
+		return value;
 	}
 
 	/*
@@ -297,7 +346,20 @@ export class RichText extends Component {
 		this.lastAztecEventType = 'content size change';
 	}
 
+	onKeyDown( event ) {
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		this.handleDelete( event );
+		this.handleEnter( event );
+		this.handleTriggerKeyCodes( event );
+	}
+
 	handleEnter( event ) {
+		if ( event.keyCode !== ENTER ) {
+			return;
+		}
 		const { onEnter } = this.props;
 
 		if ( ! onEnter ) {
@@ -313,7 +375,15 @@ export class RichText extends Component {
 	}
 
 	handleDelete( event ) {
-		const keyCode = BACKSPACE; // TODO : should we differentiate BACKSPACE and DELETE?
+		if ( this.shouldDropEventFromAztec( event, 'handleDelete' ) ) {
+			return;
+		}
+
+		const { keyCode } = event;
+
+		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
+			return;
+		}
 		const isReverse = keyCode === BACKSPACE;
 
 		const { onDelete, __unstableMultilineTag: multilineTag } = this.props;
@@ -364,6 +434,68 @@ export class RichText extends Component {
 
 		event.preventDefault();
 		this.lastAztecEventType = 'input';
+	}
+
+	handleTriggerKeyCodes( event ) {
+		const { keyCode } = event;
+		const triggeredOption = this.suggestionOptions().find( ( option ) => {
+			const triggeredKeyCode = option.triggerChar.charCodeAt( 0 );
+			return triggeredKeyCode === keyCode;
+		} );
+
+		if ( triggeredOption ) {
+			const record = this.getRecord();
+			const text = getTextContent( record );
+			// Only respond to the trigger if the selection is on the start of text or line
+			// or if the character before is a space
+			const useTrigger =
+				text.length === 0 ||
+				record.start === 0 ||
+				text.charAt( record.start - 1 ) === '\n' ||
+				text.charAt( record.start - 1 ) === ' ';
+
+			if ( useTrigger && triggeredOption.onClick ) {
+				triggeredOption.onClick();
+			} else {
+				this.insertString( record, triggeredOption.triggerChar );
+			}
+		}
+	}
+
+	suggestionOptions() {
+		const { areMentionsSupported, areXPostsSupported } = this.props;
+		const allOptions = [
+			{
+				supported: areMentionsSupported,
+				title: __( 'Insert mention' ),
+				onClick: this.handleUserSuggestion,
+				triggerChar: '@',
+				value: 'mention',
+				label: __( 'Mention' ),
+				icon: atSymbol,
+			},
+			{
+				supported: areXPostsSupported,
+				title: __( 'Insert crosspost' ),
+				onClick: this.handleXpostSuggestion,
+				triggerChar: '+',
+				value: 'crosspost',
+				label: __( 'Crosspost' ),
+				icon: plus,
+			},
+		];
+		return allOptions.filter( ( op ) => op.supported );
+	}
+
+	handleSuggestionFunc( suggestionFunction, prefix ) {
+		return () => {
+			const record = this.getRecord();
+			suggestionFunction()
+				.then( ( suggestion ) => {
+					this.insertString( record, `${ prefix }${ suggestion } ` );
+				} )
+				.catch( () => {} );
+		};
 	}
 
 	/**
@@ -474,7 +606,22 @@ export class RichText extends Component {
 		this.props.onSelectionChange( start, end );
 	}
 
+	shouldDropEventFromAztec( event, logText ) {
+		const shouldDrop =
+			! this.isIOS && event.nativeEvent.eventCount <= this.lastEventCount;
+		if ( shouldDrop ) {
+			window.console.log(
+				`Dropping ${ logText } from Aztec as its event counter is older than latest sent to the native side. Got ${ event.nativeEvent.eventCount } but lastEventCount is ${ this.lastEventCount }.`
+			);
+		}
+		return shouldDrop;
+	}
+
 	onSelectionChangeFromAztec( start, end, text, event ) {
+		if ( this.shouldDropEventFromAztec( event, 'onSelectionChange' ) ) {
+			return;
+		}
+
 		// `end` can be less than `start` on iOS
 		// Let's fix that here so `rich-text/slice` can work properly
 		const realStart = Math.min( start, end );
@@ -549,13 +696,28 @@ export class RichText extends Component {
 		return value;
 	}
 
+	manipulateEventCounterToForceNativeToRefresh() {
+		if ( this.isIOS ) {
+			this.lastEventCount = undefined;
+			return;
+		}
+
+		if ( typeof this.lastEventCount !== 'undefined' ) {
+			this.lastEventCount += 100; // bump by a hundred, hopefully native hasn't bombarded the JS side in the meantime.
+		} else {
+			window.console.warn(
+				"Tried to bump the RichText native event counter but was 'undefined'. Aborting bump."
+			);
+		}
+	}
+
 	shouldComponentUpdate( nextProps ) {
 		if (
 			nextProps.tagName !== this.props.tagName ||
 			nextProps.reversed !== this.props.reversed ||
 			nextProps.start !== this.props.start
 		) {
-			this.lastEventCount = undefined;
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			this.value = undefined;
 			return true;
 		}
@@ -585,7 +747,7 @@ export class RichText extends Component {
 				this.needsSelectionUpdate = true;
 			}
 
-			this.lastEventCount = undefined; // force a refresh on the native side
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 		}
 
 		if ( ! this.comesFromAztec ) {
@@ -597,7 +759,7 @@ export class RichText extends Component {
 				nextProps.__unstableIsSelected
 			) {
 				this.needsSelectionUpdate = true;
-				this.lastEventCount = undefined; // force a refresh on the native side
+				this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			}
 		}
 
@@ -622,7 +784,7 @@ export class RichText extends Component {
 	}
 
 	componentWillUnmount() {
-		if ( this._editor.isFocused() && this.props.shouldBlurOnUnmount ) {
+		if ( this._editor.isFocused() ) {
 			this._editor.blur();
 		}
 	}
@@ -630,7 +792,6 @@ export class RichText extends Component {
 	componentDidUpdate( prevProps ) {
 		if ( this.props.value !== this.value ) {
 			this.value = this.props.value;
-			this.lastEventCount = undefined;
 		}
 		const { __unstableIsSelected: isSelected } = this.props;
 
@@ -654,12 +815,15 @@ export class RichText extends Component {
 		let value = this.valueToFormat( record );
 
 		if ( value === undefined ) {
-			this.lastEventCount = undefined; // force a refresh on the native side
+			this.manipulateEventCounterToForceNativeToRefresh(); // force a refresh on the native side
 			value = '';
 		}
 		// On android if content is empty we need to send no content or else the placeholder will not show.
-		if ( ! this.isIOS && value === '' ) {
-			return value;
+		if (
+			! this.isIOS &&
+			( value === '' || value === EMPTY_PARAGRAPH_TAGS )
+		) {
+			return '';
 		}
 
 		if ( tagName ) {
@@ -672,7 +836,7 @@ export class RichText extends Component {
 					extraAttributes += ` start=${ this.props.start }`;
 				}
 			}
-			value = `<${ tagName } ${ extraAttributes }>${ value }</${ tagName }>`;
+			value = `<${ tagName }${ extraAttributes }>${ value }</${ tagName }>`;
 		}
 		return value;
 	}
@@ -688,8 +852,8 @@ export class RichText extends Component {
 			maxWidth,
 			formatTypes,
 			parentBlockStyles,
-			withoutInteractiveFormatting,
-			capabilities,
+			accessibilityLabel,
+			disableEditingMenu = false,
 		} = this.props;
 
 		const record = this.getRecord();
@@ -757,9 +921,14 @@ export class RichText extends Component {
 			maxWidth && this.state.width && maxWidth - this.state.width < 10
 				? maxWidth
 				: this.state.width;
+		const containerStyles = style?.padding &&
+			style?.backgroundColor && {
+				padding: style.padding,
+				backgroundColor: style.backgroundColor,
+			};
 
 		return (
-			<View>
+			<View style={ containerStyles }>
 				{ children &&
 					children( {
 						isSelected,
@@ -768,6 +937,7 @@ export class RichText extends Component {
 						onFocus: () => {},
 					} ) }
 				<RCTAztecView
+					accessibilityLabel={ accessibilityLabel }
 					ref={ ( ref ) => {
 						this._editor = ref;
 
@@ -787,6 +957,7 @@ export class RichText extends Component {
 						text: html,
 						eventCount: this.lastEventCount,
 						selection,
+						linkTextColor: defaultTextDecorationColor,
 					} }
 					placeholder={ this.props.placeholder }
 					placeholderTextColor={
@@ -794,11 +965,13 @@ export class RichText extends Component {
 						defaultPlaceholderTextColor
 					}
 					deleteEnter={ this.props.deleteEnter }
-					onChange={ this.onChange }
+					onChange={ this.onChangeFromAztec }
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
-					onEnter={ this.handleEnter }
-					onBackspace={ this.handleDelete }
+					onKeyDown={ this.onKeyDown }
+					triggerKeyCodes={ this.suggestionOptions().map(
+						( op ) => op.triggerChar
+					) }
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }
@@ -812,15 +985,16 @@ export class RichText extends Component {
 						( parentBlockStyles && parentBlockStyles.color ) ||
 						defaultColor
 					}
-					linkTextColor={ defaultTextDecorationColor }
 					maxImagesWidth={ 200 }
 					fontFamily={ this.props.fontFamily || defaultFontFamily }
 					fontSize={
-						this.props.fontSize || ( style && style.fontSize )
+						this.props.fontSize ||
+						( style &&
+							this.convertFontSizeFromString( style.fontSize ) )
 					}
 					fontWeight={ this.props.fontWeight }
 					fontStyle={ this.props.fontStyle }
-					disableEditingMenu={ this.props.disableEditingMenu }
+					disableEditingMenu={ disableEditingMenu }
 					isMultiline={ this.isMultiline }
 					textAlign={ this.props.textAlign }
 					{ ...( this.isIOS ? { maxWidth } : {} ) }
@@ -833,41 +1007,13 @@ export class RichText extends Component {
 						<FormatEdit
 							formatTypes={ formatTypes }
 							value={ record }
-							withoutInteractiveFormatting={
-								withoutInteractiveFormatting
-							}
 							onChange={ this.onFormatChange }
 							onFocus={ () => {} }
 						/>
 						<BlockFormatControls>
-							{
-								// eslint-disable-next-line no-undef
-								__DEV__ && isMentionsSupported( capabilities ) && (
-									<Toolbar>
-										<ToolbarButton
-											title={ __( 'Insert mention' ) }
-											icon={ <Icon icon={ atSymbol } /> }
-											onClick={ () => {
-												addMention()
-													.then(
-														( mentionUserId ) => {
-															let stringToInsert = `@${ mentionUserId }`;
-															if ( this.isIOS ) {
-																stringToInsert +=
-																	' ';
-															}
-															this.insertString(
-																record,
-																stringToInsert
-															);
-														}
-													)
-													.catch( () => {} );
-											} }
-										/>
-									</Toolbar>
-								)
-							}
+							<ToolbarButtonWithOptions
+								options={ this.suggestionOptions() }
+							/>
 						</BlockFormatControls>
 					</>
 				) }
@@ -882,19 +1028,35 @@ RichText.defaultProps = {
 	tagName: 'div',
 };
 
+const withFormatTypes = ( WrappedComponent ) => ( props ) => {
+	const { formatTypes } = useFormatTypes( {
+		clientId: props.clientId,
+		identifier: props.identifier,
+		withoutInteractiveFormatting: props.withoutInteractiveFormatting,
+	} );
+
+	return <WrappedComponent { ...props } formatTypes={ formatTypes } />;
+};
+
 export default compose( [
 	withSelect( ( select, { clientId } ) => {
-		const { getBlockParents, getBlock } = select( 'core/block-editor' );
+		const { getBlockParents, getBlock, getSettings } = select(
+			'core/block-editor'
+		);
 		const parents = getBlockParents( clientId, true );
 		const parentBlock = parents ? getBlock( parents[ 0 ] ) : undefined;
-		const parentBlockStyles =
-			get( parentBlock, [ 'attributes', 'childrenStyles' ] ) || {};
+		const parentBlockStyles = get( parentBlock, [
+			'attributes',
+			'childrenStyles',
+		] );
 
 		return {
-			formatTypes: select( 'core/rich-text' ).getFormatTypes(),
+			areMentionsSupported:
+				getSettings( 'capabilities' ).mentions === true,
+			areXPostsSupported: getSettings( 'capabilities' ).xposts === true,
 			...{ parentBlockStyles },
 		};
 	} ),
 	withPreferredColorScheme,
-	withSiteCapabilities,
+	withFormatTypes,
 ] )( RichText );

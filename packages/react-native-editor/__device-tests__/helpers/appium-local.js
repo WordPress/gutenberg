@@ -1,10 +1,10 @@
 /**
  * External dependencies
  */
-import childProcess from 'child_process';
+const childProcess = require( 'child_process' );
 
 // Spawns an appium process
-export const start = ( localAppiumPort ) =>
+const start = ( localAppiumPort ) =>
 	new Promise( ( resolve, reject ) => {
 		const appium = childProcess.spawn( 'appium', [
 			'--port',
@@ -40,14 +40,14 @@ export const start = ( localAppiumPort ) =>
 		} );
 	} );
 
-export const stop = async ( appium ) => {
+const stop = async ( appium ) => {
 	if ( ! appium ) {
 		return;
 	}
 	await appium.kill( 'SIGINT' );
 };
 
-export default {
+module.exports = {
 	start,
 	stop,
 };

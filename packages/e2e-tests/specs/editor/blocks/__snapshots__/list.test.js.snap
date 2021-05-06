@@ -308,12 +308,6 @@ exports[`List should undo asterisk transform with backspace 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`List should undo asterisk transform with backspace after mouse move 1`] = `
-"<!-- wp:paragraph -->
-<p>* </p>
-<!-- /wp:paragraph -->"
-`;
-
 exports[`List should undo asterisk transform with backspace after selection changes 1`] = `
 "<!-- wp:paragraph -->
 <p>* </p>
@@ -321,6 +315,12 @@ exports[`List should undo asterisk transform with backspace after selection chan
 `;
 
 exports[`List should undo asterisk transform with backspace after selection changes without requestIdleCallback 1`] = `
+"<!-- wp:paragraph -->
+<p>* </p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`List should undo asterisk transform with backspace setting isTyping state 1`] = `
 "<!-- wp:paragraph -->
 <p>* </p>
 <!-- /wp:paragraph -->"

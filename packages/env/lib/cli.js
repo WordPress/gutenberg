@@ -6,11 +6,13 @@ const chalk = require( 'chalk' );
 const ora = require( 'ora' );
 const yargs = require( 'yargs' );
 const terminalLink = require( 'terminal-link' );
+const { execSync } = require( 'child_process' );
 
 /**
  * Internal dependencies
  */
 const env = require( './env' );
+const parseXdebugMode = require( './parse-xdebug-mode' );
 
 // Colors
 const boldWhite = chalk.bold.white;
@@ -47,7 +49,7 @@ const withSpinner = ( command ) => ( ...args ) => {
 				'out' in error
 			) {
 				// Error is a docker-compose error. That means something docker-related failed.
-				// https://github.com/PDMLab/docker-compose/blob/master/src/index.ts
+				// https://github.com/PDMLab/docker-compose/blob/HEAD/src/index.ts
 				spinner.fail( 'Error while running docker-compose command.' );
 				if ( error.out ) {
 					process.stdout.write( error.out );
@@ -62,7 +64,6 @@ const withSpinner = ( command ) => ( ...args ) => {
 					typeof error === 'string' ? error : error.message
 				);
 				// Disable reason: Using console.error() means we get a stack trace.
-				// eslint-disable-next-line no-console
 				console.error( error );
 				process.exit( 1 );
 			} else {
@@ -74,6 +75,16 @@ const withSpinner = ( command ) => ( ...args ) => {
 };
 
 module.exports = function cli() {
+	// Do nothing if Docker is unavailable.
+	try {
+		execSync( 'docker info', { stdio: 'ignore' } );
+	} catch {
+		console.error(
+			chalk.red( 'Could not connect to Docker. Is it running?' )
+		);
+		process.exit( 1 );
+	}
+
 	yargs.usage( wpPrimary( '$0 <command>' ) );
 	yargs.option( 'debug', {
 		type: 'boolean',
@@ -90,9 +101,22 @@ module.exports = function cli() {
 			) }} (override with WP_ENV_PORT) and tests on port {bold.underline ${ terminalLink(
 				'8889',
 				'http://localhost:8889'
-			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file.`
+			) }} (override with WP_ENV_TESTS_PORT). The current working directory must be a WordPress installation, a plugin, a theme, or contain a .wp-env.json file. After first install, use the '--update' flag to download updates to mapped sources and to re-apply WordPress configuration options.`
 		),
-		() => {},
+		( args ) => {
+			args.option( 'update', {
+				type: 'boolean',
+				describe:
+					'Download source updates and apply WordPress configuration.',
+				default: false,
+			} );
+			args.option( 'xdebug', {
+				describe:
+					'Enables Xdebug. If not passed, Xdebug is turned off. If no modes are set, uses "debug". You may set multiple Xdebug modes by passing them in a comma-separated list: `--xdebug=develop,coverage`. See https://xdebug.org/docs/all_settings#mode for information about Xdebug modes.',
+				coerce: parseXdebugMode,
+				type: 'string',
+			} );
+		},
 		withSpinner( env.start )
 	);
 	yargs.command(
@@ -117,7 +141,7 @@ module.exports = function cli() {
 		withSpinner( env.clean )
 	);
 	yargs.command(
-		'logs',
+		'logs [environment]',
 		'displays PHP and Docker logs for given WordPress environment.',
 		( args ) => {
 			args.positional( 'environment', {
@@ -140,7 +164,7 @@ module.exports = function cli() {
 	);
 	yargs.command(
 		'run <container> [command..]',
-		'Runs an arbitrary command in one of the underlying Docker containers. For example, it can be useful for running wp cli commands. You can also use it to open shell sessions like bash and the WordPress shell in the WordPress instance. For example, `wp-env run cli bash` will open bash in the development WordPress instance.',
+		'Runs an arbitrary command in one of the underlying Docker containers. The "container" param should reference one of the underlying Docker services like "development", "tests", or "cli". To run a wp-cli command, use the "cli" or "tests-cli" service. You can also use this command to open shell sessions like bash and the WordPress shell in the WordPress instance. For example, `wp-env run cli bash` will open bash in the development WordPress instance. When using long commands with arguments and quotation marks, you need to wrap the "command" param in quotation marks. For example: `wp-env run tests-cli "wp post create --post_type=page --post_title=\'Test\'"` will create a post on the tests WordPress instance.',
 		( args ) => {
 			args.positional( 'container', {
 				type: 'string',

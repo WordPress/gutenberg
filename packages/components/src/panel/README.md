@@ -142,6 +142,21 @@ Whether or not the panel will start open.
 -   Required: No
 -   Default: true
 
+###### children
+
+The rendered children. If the children is a `Function`, it will be called with an object with the `opened` property and return its value.
+
+-   Type: `React.ReactNode | Function`
+-   Required: No
+
+###### buttonProps
+
+Props that are passed to the `Button` component in the `PanelBodyTitle` within the panel body.
+
+-   Type: `Object`
+-   Required: No
+-   Default: `{}`
+
 ---
 
 #### PanelRow
@@ -156,6 +171,12 @@ The class that will be added with `components-panel__row`. to the classes of the
 
 -   Type: `String`
 -   Required: No
+
+##### Ref
+
+PanelRow accepts a forwarded ref that will be added to the wrapper div. Usage:
+
+`<PanelRow className="edit-post-post-schedule" ref={ anchorRef }>`
 
 ---
 

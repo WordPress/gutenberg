@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { forwardRef } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -19,34 +20,34 @@ import ToolbarContainer from './toolbar-container';
  *
  * To add controls, simply pass `ToolbarButton` components as children.
  *
- * @param {Object} props                                    Component props.
- * @param {string} [props.className]                        Class to set on the container div.
- * @param {string} [props.__experimentalAccessibilityLabel] ARIA label for toolbar container.
- * @param {Object} ref                                      React Element ref.
+ * @param {Object} props Component props.
+ * @param {string} [props.className] Class to set on the container div.
+ * @param {string} [props.label] ARIA label for toolbar container.
+ * @param {Object} ref React Element ref.
  */
-function Toolbar(
-	{ className, __experimentalAccessibilityLabel, ...props },
-	ref
-) {
-	if ( __experimentalAccessibilityLabel ) {
-		return (
-			<ToolbarContainer
-				// `ToolbarGroup` already uses components-toolbar for compatibility reasons
-				className={ classnames(
-					'components-accessible-toolbar',
-					className
-				) }
-				accessibilityLabel={ __experimentalAccessibilityLabel }
-				ref={ ref }
-				{ ...props }
-			/>
-		);
+function Toolbar( { className, label, ...props }, ref ) {
+	if ( ! label ) {
+		deprecated( 'Using Toolbar without label prop', {
+			since: '5.6',
+			alternative: 'ToolbarGroup component',
+			link:
+				'https://developer.wordpress.org/block-editor/components/toolbar/',
+		} );
+		return <ToolbarGroup { ...props } className={ className } />;
 	}
-	// When the __experimentalAccessibilityLabel prop is not passed, Toolbar will
-	// fallback to ToolbarGroup. This should be deprecated as soon as the new API
-	// gets stable.
-	// See https://github.com/WordPress/gutenberg/pull/20008#issuecomment-624503410
-	return <ToolbarGroup { ...props } className={ className } />;
+	// `ToolbarGroup` already uses components-toolbar for compatibility reasons
+	const finalClassName = classnames(
+		'components-accessible-toolbar',
+		className
+	);
+	return (
+		<ToolbarContainer
+			className={ finalClassName }
+			label={ label }
+			ref={ ref }
+			{ ...props }
+		/>
+	);
 }
 
 export default forwardRef( Toolbar );

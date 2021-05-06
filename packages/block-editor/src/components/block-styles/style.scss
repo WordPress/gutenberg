@@ -16,7 +16,7 @@
 	flex-direction: column;
 
 	&:focus {
-		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color);
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 
 		// Windows High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
@@ -32,7 +32,8 @@
 		}
 
 		.block-editor-block-styles__item-preview {
-			border: 2px solid $dark-gray-primary;
+			margin: 0;
+			border: 2px solid $gray-900;
 		}
 	}
 }
@@ -41,6 +42,7 @@
 .block-editor-block-styles__item-preview {
 	outline: $border-width solid transparent; // Shown in Windows High Contrast mode.
 	padding: 0;
+	margin: 2px;
 	border-radius: $radius-block-ui;
 	display: flex;
 	overflow: hidden;
@@ -48,6 +50,7 @@
 	align-items: center;
 	flex-grow: 1;
 	min-height: 80px;
+	max-height: 160px;
 }
 
 .block-editor-block-switcher__styles__menugroup {

@@ -29,16 +29,16 @@ export default function BoxUnitControl( {
 	} );
 
 	return (
-		<UnitControlWrapper aria-label={ label } { ...bindHoverGesture() }>
+		<UnitControlWrapper { ...bindHoverGesture() }>
 			<Tooltip text={ label }>
 				<UnitControl
+					aria-label={ label }
 					className="component-box-control__unit-control"
 					hideHTMLArrows
 					isFirst={ isFirst }
 					isLast={ isLast }
 					isOnly={ isOnly }
 					isPressEnterToChange
-					isFloatingLabel
 					isResetValueOnUnitChange={ false }
 					value={ value }
 					{ ...props }
@@ -51,9 +51,17 @@ export default function BoxUnitControl( {
 function Tooltip( { children, text } ) {
 	if ( ! text ) return children;
 
+	/**
+	 * Wrapping the children in a `<div />` as Tooltip as it attempts
+	 * to render the <UnitControl />. Using a plain `<div />` appears to
+	 * resolve this issue.
+	 *
+	 * Originally discovered and referenced here:
+	 * https://github.com/WordPress/gutenberg/pull/24966#issuecomment-685875026
+	 */
 	return (
 		<BaseTooltip text={ text } position="top">
-			{ children }
+			<div>{ children }</div>
 		</BaseTooltip>
 	);
 }

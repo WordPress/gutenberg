@@ -18,7 +18,7 @@ import { chevronDown } from '@wordpress/icons';
  */
 import Button from '../button';
 import TextControl from '../text-control';
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
 import { isValidHex } from './utils';
 
 /* Wrapper for TextControl, only used to handle intermediate state while typing. */
@@ -175,11 +175,12 @@ export class Inputs extends Component {
 				</div>
 			);
 		} else if ( this.state.view === 'rgb' ) {
+			const legend = disableAlpha
+				? __( 'Color value in RGB' )
+				: __( 'Color value in RGBA' );
 			return (
 				<fieldset>
-					<VisuallyHidden as="legend">
-						{ __( 'Color value in RGB' ) }
-					</VisuallyHidden>
+					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input
 							source={ this.state.view }
@@ -228,11 +229,12 @@ export class Inputs extends Component {
 				</fieldset>
 			);
 		} else if ( this.state.view === 'hsl' ) {
+			const legend = disableAlpha
+				? __( 'Color value in HSL' )
+				: __( 'Color value in HSLA' );
 			return (
 				<fieldset>
-					<VisuallyHidden as="legend">
-						{ __( 'Color value in HSL' ) }
-					</VisuallyHidden>
+					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input
 							source={ this.state.view }

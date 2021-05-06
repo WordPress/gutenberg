@@ -8,6 +8,7 @@ import { createRegistryControl } from '@wordpress/data';
  * Internal dependencies
  */
 import { menuItemsQuery } from './utils';
+import { STORE_NAME } from './constants';
 
 /**
  * Trigger an API Fetch request.
@@ -72,7 +73,7 @@ export function getMenuItemToClientIdMapping( postId ) {
 export function getNavigationPostForMenu( menuId ) {
 	return {
 		type: 'SELECT',
-		registryName: 'core/edit-navigation',
+		registryName: STORE_NAME,
 		selectorName: 'getNavigationPostForMenu',
 		args: [ menuId ],
 	};
@@ -147,7 +148,8 @@ const controls = {
 
 	IS_PROCESSING_POST: createRegistryControl(
 		( registry ) => ( { postId } ) => {
-			return getState( registry ).processingQueue[ postId ]?.inProgress;
+			return !! getState( registry ).processingQueue[ postId ]
+				?.inProgress;
 		}
 	),
 
@@ -165,14 +167,11 @@ const controls = {
 
 	RESOLVE_MENU_ITEMS: createRegistryControl(
 		( registry ) => ( { query } ) => {
-			return registry
-				.__experimentalResolveSelect( 'core' )
-				.getMenuItems( query );
+			return registry.resolveSelect( 'core' ).getMenuItems( query );
 		}
 	),
 };
 
-const getState = ( registry ) =>
-	registry.stores[ 'core/edit-navigation' ].store.getState();
+const getState = ( registry ) => registry.stores[ STORE_NAME ].store.getState();
 
 export default controls;

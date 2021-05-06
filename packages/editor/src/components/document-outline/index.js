@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 import { create, getTextContent } from '@wordpress/rich-text';
+import { store as blockEditorStore } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -39,27 +40,23 @@ const multipleH1Headings = [
 
 /**
  * Returns an array of heading blocks enhanced with the following properties:
- * path    - An array of blocks that are ancestors of the heading starting from a top-level node.
- *           Can be an empty array if the heading is a top-level node (is not nested inside another block).
  * level   - An integer with the heading level.
  * isEmpty - Flag indicating if the heading has no content.
  *
  * @param {?Array} blocks An array of blocks.
- * @param {?Array} path   An array of blocks that are ancestors of the blocks passed as blocks.
  *
  * @return {Array} An array of heading blocks enhanced with the properties described above.
  */
-const computeOutlineHeadings = ( blocks = [], path = [] ) => {
+const computeOutlineHeadings = ( blocks = [] ) => {
 	return flatMap( blocks, ( block = {} ) => {
 		if ( block.name === 'core/heading' ) {
 			return {
 				...block,
-				path,
 				level: block.attributes.level,
 				isEmpty: isEmptyHeading( block ),
 			};
 		}
-		return computeOutlineHeadings( block.innerBlocks, [ ...path, block ] );
+		return computeOutlineHeadings( block.innerBlocks );
 	} );
 };
 
@@ -119,7 +116,6 @@ export const DocumentOutline = ( {
 							key={ index }
 							level={ `H${ item.level }` }
 							isValid={ isValid }
-							path={ item.path }
 							isDisabled={ hasOutlineItemsDisabled }
 							href={ `#block-${ item.clientId }` }
 							onSelect={ onSelect }
@@ -149,7 +145,7 @@ export const DocumentOutline = ( {
 
 export default compose(
 	withSelect( ( select ) => {
-		const { getBlocks } = select( 'core/block-editor' );
+		const { getBlocks } = select( blockEditorStore );
 		const { getEditedPostAttribute } = select( 'core/editor' );
 		const { getPostType } = select( 'core' );
 		const postType = getPostType( getEditedPostAttribute( 'type' ) );

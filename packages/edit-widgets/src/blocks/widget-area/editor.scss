@@ -1,0 +1,27 @@
+.wp-block[data-type="core/widget-area"] {
+	max-width: $widget-area-width;
+	margin-left: auto;
+	margin-right: auto;
+
+	.components-panel__body > .components-panel__body-title {
+		font-family: $default-font;
+
+		// Remove default hover background in panel title. See #25752.
+		&:hover {
+			background: inherit;
+		}
+	}
+}
+
+// Add some spacing above the inner blocks so that the block toolbar doesn't
+// overlap the panel header.
+.wp-block-widget-area > .components-panel__body > div > .block-editor-inner-blocks {
+	padding-top: $grid-unit-30;
+
+	// Ensure the widget area block lists have a minimum height so that it doesn't
+	// collapse to zero height when it has no blocks. When that happens the block
+	// can't be used as a drop target.
+	> .block-editor-block-list__layout {
+		min-height: $grid-unit-40;
+	}
+}

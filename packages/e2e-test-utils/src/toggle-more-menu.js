@@ -3,6 +3,6 @@
  */
 export async function toggleMoreMenu() {
 	await expect( page ).toClick(
-		'.edit-post-more-menu [aria-label="More tools & options"]'
+		'.edit-post-more-menu [aria-label="Options"]'
 	);
 }

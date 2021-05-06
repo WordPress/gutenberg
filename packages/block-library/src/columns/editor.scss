@@ -2,6 +2,8 @@
 // cascade into columns.
 .wp-block-columns .wp-block {
 	max-width: none;
+	margin-left: 0;
+	margin-right: 0;
 }
 
 // To do: remove horizontal margin override by the editor.

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { shortcode as icon } from '@wordpress/icons';
 
 /**
@@ -17,10 +16,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Shortcode' ),
-	description: __(
-		'Insert additional custom elements with a WordPress shortcode.'
-	),
 	icon,
 	transforms,
 	edit,

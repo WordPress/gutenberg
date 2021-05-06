@@ -18,17 +18,17 @@ import { Context } from './context';
  * It acts similarly to the `useContext` react hook.
  *
  * Note: Generally speaking, `useRegistry` is a low level hook that in most cases
- * won't be needed for implementation. Most interactions with the wp.data api
- * can be performed via the `useSelect` hook,  or the `withSelect` and
+ * won't be needed for implementation. Most interactions with the `@wordpress/data`
+ * API can be performed via the `useSelect` hook,  or the `withSelect` and
  * `withDispatch` higher order components.
  *
  * @example
  * ```js
- * const {
+ * import {
  *   RegistryProvider,
  *   createRegistry,
  *   useRegistry,
- * } = wp.data
+ * } from '@wordpress/data';
  *
  * const registry = createRegistry( {} );
  *

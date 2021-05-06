@@ -20,6 +20,24 @@
 	}
 }
 
+.block-editor-block-switcher__toggle-text {
+	margin-left: $grid-unit-10;
+
+	// Account for double label when show-text-buttons is set.
+	.show-icon-labels & {
+		display: none;
+	}
+}
+
+.show-icon-labels .block-editor-block-toolbar .block-editor-block-switcher .components-button.has-icon::after {
+	font-size: 14px;
+}
+
+// Indent the popover to match the button position.
+.block-editor-block-switcher__popover {
+	margin-left: 6px;
+}
+
 .components-button.block-editor-block-switcher__no-switcher-icon {
 	width: $block-toolbar-height;
 
@@ -36,7 +54,7 @@
 	// Since it's not clickable, though, don't show a hover state.
 	&,
 	.block-editor-block-icon.has-colors {
-		color: $dark-gray-primary !important;
+		color: $gray-900;
 	}
 }
 
@@ -46,8 +64,6 @@
 .block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__no-switcher-icon.has-icon.has-icon,
 .block-editor-block-toolbar .components-toolbar-group .components-button.block-editor-block-switcher__toggle.has-icon.has-icon,
 .block-editor-block-toolbar .components-toolbar .components-button.block-editor-block-switcher__toggle.has-icon.has-icon {
-	padding: 0;
-
 	.block-editor-block-icon {
 		height: 100%;
 		position: relative;
@@ -77,7 +93,6 @@
 	padding: 0;
 
 	.components-menu-group {
-		padding: $grid-unit-20;
 		margin: 0;
 	}
 }
@@ -98,7 +113,7 @@
 	}
 
 	.components-panel__body + .components-panel__body {
-		border-top: $border-width solid $light-gray-500;
+		border-top: $border-width solid $gray-200;
 	}
 }
 
@@ -125,7 +140,7 @@
 
 	.components-popover__content {
 		box-shadow: none;
-		border: $border-width solid $dark-gray-primary;
+		border: $border-width solid $gray-900;
 		background: $white;
 		border-radius: $radius-block-ui;
 	}
@@ -133,13 +148,14 @@
 	.block-editor-block-switcher__preview {
 		width: 300px;
 		height: auto;
+		max-height: 500px;
 		padding: $grid-unit-20;
 	}
 }
 
 .block-editor-block-switcher__preview-title {
 	margin-bottom: $grid-unit-15;
-	color: $medium-gray-text;
+	color: $gray-700;
 	text-transform: uppercase;
 	font-size: 11px;
 	font-weight: 500;
@@ -147,17 +163,14 @@
 
 // The block switcher in the contextual toolbar should be bigger.
 .block-editor-block-contextual-toolbar {
-	.components-button.block-editor-block-switcher__toggle,
-	.components-button.block-editor-block-switcher__no-switcher-icon {
-		height: $grid-unit-60;
-	}
-
 	.components-button.block-editor-block-switcher__no-switcher-icon {
 		width: $grid-unit-60;
 	}
 
 	.components-button.block-editor-block-switcher__no-switcher-icon,
 	.components-button.block-editor-block-switcher__toggle {
+		height: $grid-unit-60;
+
 		.block-editor-block-icon,
 		.block-editor-block-switcher__transform {
 			width: $block-toolbar-height;
@@ -166,6 +179,45 @@
 
 		.block-editor-block-switcher__transform {
 			padding: $grid-unit-15;
+		}
+	}
+}
+
+.block-editor-block-switcher__preview-patterns-container {
+	padding-bottom: $grid-unit-20;
+
+	.block-editor-block-switcher__preview-patterns-container-list__list-item {
+		margin-top: $grid-unit-20;
+
+		.block-editor-block-preview__container {
+			cursor: pointer;
+		}
+
+		.block-editor-block-switcher__preview-patterns-container-list__item {
+			height: 100%;
+			border-radius: $radius-block-ui;
+			transition: all 0.05s ease-in-out;
+			position: relative;
+			border: $border-width solid transparent;
+
+			&:hover,
+			&:focus {
+				box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+
+				// Windows High Contrast mode will show this outline, but not the box-shadow.
+				outline: 2px solid transparent;
+			}
+
+			&:hover {
+				box-shadow: inset 0 0 0 1px $white, 0 0 0 var(--wp-admin-border-width-focus) $gray-900;
+			}
+
+			.block-editor-block-switcher__preview-patterns-container-list__item-title {
+				padding: $grid-unit-05;
+				font-size: 12px;
+				text-align: center;
+				cursor: pointer;
+			}
 		}
 	}
 }

@@ -205,18 +205,18 @@
 .components-color-picker__saturation-pointer:focus {
 	box-shadow:
 		0 0 0 2px #fff,
-		0 0 0 4px $blue-medium-500,
-		0 0 5px 0 $blue-medium-500,
+		0 0 0 4px var(--wp-admin-theme-color),
+		0 0 5px 0 var(--wp-admin-theme-color),
 		inset 0 0 1px 1px rgba(0, 0, 0, 0.3),
 		0 0 1px 2px rgba(0, 0, 0, 0.4);
 }
 
 .components-color-picker__hue-pointer:focus,
 .components-color-picker__alpha-pointer:focus {
-	border-color: $blue-medium-500;
+	border-color: var(--wp-admin-theme-color);
 	box-shadow:
-		0 0 0 2px $blue-medium-500,
-		0 0 3px 0 $blue-medium-500;
+		0 0 0 2px var(--wp-admin-theme-color),
+		0 0 3px 0 var(--wp-admin-theme-color);
 	outline: 2px solid transparent;
 	outline-offset: -2px;
 }
@@ -227,6 +227,7 @@
 	padding-top: 16px;
 	display: flex;
 	align-items: flex-end;
+	min-width: 255px;
 
 	fieldset {
 		flex: 1;
@@ -236,7 +237,8 @@
 	}
 
 	.components-color-picker__inputs-fields .components-text-control__input[type="number"] {
-		padding: 6px 8px;
+		padding: 6px 3px;
+		margin: 0;
 	}
 }
 
@@ -256,7 +258,7 @@
 	}
 
 	.components-base-control__field {
-		margin: 0 4px;
+		margin: 0 2px;
 	}
 }
 

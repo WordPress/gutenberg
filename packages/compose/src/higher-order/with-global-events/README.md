@@ -1,12 +1,13 @@
-withGlobalEvents
-================
+# withGlobalEvents
+
+**Deprecated**
 
 `withGlobalEvents` is a higher-order component used to facilitate responding to global events, where one would otherwise use `window.addEventListener`.
 
 On behalf of the consuming developer, the higher-order component manages:
 
-- Unbinding when the component unmounts.
-- Binding at most a single event handler for the entire application.
+-   Unbinding when the component unmounts.
+-   Binding at most a single event handler for the entire application.
 
 ## Usage
 

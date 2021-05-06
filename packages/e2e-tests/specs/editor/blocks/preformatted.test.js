@@ -3,10 +3,10 @@
  */
 import {
 	clickBlockToolbarButton,
+	clickMenuItem,
 	getEditedPostContent,
 	createNewPost,
 	insertBlock,
-	clickButton,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'Preformatted', () => {
@@ -22,13 +22,13 @@ describe( 'Preformatted', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await clickBlockToolbarButton( 'More options' );
-		await clickButton( 'Convert to Blocks' );
+		await clickBlockToolbarButton( 'Options' );
+		await clickMenuItem( 'Convert to Blocks' );
 		// Once it's edited, it should be saved as BR tags.
 		await page.keyboard.type( '0' );
 		await page.keyboard.press( 'Enter' );
-		await clickBlockToolbarButton( 'More options' );
-		await clickButton( 'Edit as HTML' );
+		await clickBlockToolbarButton( 'Options' );
+		await clickMenuItem( 'Edit as HTML' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
@@ -45,5 +45,17 @@ describe( 'Preformatted', () => {
 		await page.keyboard.press( 'Backspace' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	it( 'should delete block when backspace in an empty preformatted', async () => {
+		await insertBlock( 'Preformatted' );
+
+		await page.keyboard.type( 'a' );
+
+		await page.keyboard.press( 'Backspace' );
+		await page.keyboard.press( 'Backspace' );
+
+		// Expect preformatted block to be deleted.
+		expect( await getEditedPostContent() ).toBe( '' );
 	} );
 } );

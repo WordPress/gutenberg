@@ -1,8 +1,4 @@
-/**
- * Internal dependencies
- */
-import './store';
-
+export { store } from './store';
 export { applyFormat } from './apply-format';
 export { concat } from './concat';
 export { create } from './create';
@@ -35,6 +31,8 @@ export { indentListItems as __unstableIndentListItems } from './indent-list-item
 export { outdentListItems as __unstableOutdentListItems } from './outdent-list-items';
 export { changeListType as __unstableChangeListType } from './change-list-type';
 export { createElement as __unstableCreateElement } from './create-element';
+
+export { useAnchorRef } from './component/use-anchor-ref';
 
 export { default as __experimentalRichText } from './component';
 export { default as __unstableFormatEdit } from './component/format-edit';

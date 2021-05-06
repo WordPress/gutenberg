@@ -1,7 +1,16 @@
 /**
  * External dependencies
  */
-import { find, get, has, map, pick, mapValues, includes, some } from 'lodash';
+import {
+	find,
+	get,
+	has,
+	isString,
+	pick,
+	mapValues,
+	includes,
+	some,
+} from 'lodash';
 import createSelector from 'rememo';
 
 /**
@@ -11,11 +20,14 @@ import {
 	getFreeformContentHandlerName,
 	getDefaultBlockName,
 	isUnmodifiedDefaultBlock,
+	__unstableSerializeAndClean,
 } from '@wordpress/blocks';
 import { isInTheFuture, getDate } from '@wordpress/date';
 import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
+import { Platform } from '@wordpress/element';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -23,14 +35,13 @@ import deprecated from '@wordpress/deprecated';
 import { PREFERENCES_DEFAULTS } from './defaults';
 import {
 	EDIT_MERGE_PROPERTIES,
-	POST_UPDATE_TRANSACTION_ID,
 	PERMALINK_POSTNAME_REGEX,
 	ONE_MINUTE_IN_MS,
 	AUTOSAVE_PROPERTIES,
 } from './constants';
 import { getPostRawValue } from './reducer';
-import serializeBlocks from './utils/serialize-blocks';
 import { cleanForSlug } from '../utils/url';
+import { getTemplatePartIcon } from './utils/get-template-part-icon';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -144,12 +155,6 @@ export const isEditedPostDirty = createRegistrySelector(
  */
 export const hasNonPostEntityChanges = createRegistrySelector(
 	( select ) => ( state ) => {
-		const enableFullSiteEditing = getEditorSettings( state )
-			.__experimentalEnableFullSiteEditing;
-		if ( ! enableFullSiteEditing ) {
-			return false;
-		}
-
 		const dirtyEntityRecords = select(
 			'core'
 		).__experimentalGetDirtyEntityRecords();
@@ -302,6 +307,7 @@ export const getReferenceByDistinctEdits = createRegistrySelector(
 		deprecated(
 			"`wp.data.select( 'core/editor' ).getReferenceByDistinctEdits`",
 			{
+				since: '5.4',
 				alternative:
 					"`wp.data.select( 'core' ).getReferenceByDistinctEdits`",
 			}
@@ -545,7 +551,8 @@ export function isEditedPostSaveable( state ) {
 	return (
 		!! getEditedPostAttribute( state, 'title' ) ||
 		!! getEditedPostAttribute( state, 'excerpt' ) ||
-		! isEditedPostEmpty( state )
+		! isEditedPostEmpty( state ) ||
+		Platform.OS === 'native'
 	);
 }
 
@@ -680,9 +687,9 @@ export const isEditedPostAutosaveable = createRegistrySelector(
  */
 export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
 	deprecated( "`wp.data.select( 'core/editor' ).getAutosave()`", {
+		since: '5.3',
 		alternative:
 			"`wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
-		plugin: 'Gutenberg',
 	} );
 
 	const postType = getCurrentPostType( state );
@@ -708,9 +715,9 @@ export const getAutosave = createRegistrySelector( ( select ) => ( state ) => {
  */
 export const hasAutosave = createRegistrySelector( ( select ) => ( state ) => {
 	deprecated( "`wp.data.select( 'core/editor' ).hasAutosave()`", {
+		since: '5.3',
 		alternative:
 			"`!! wp.data.select( 'core' ).getAutosave( postType, postId, userId )`",
-		plugin: 'Gutenberg',
 	} );
 
 	const postType = getCurrentPostType( state );
@@ -753,7 +760,12 @@ export function isEditedPostBeingScheduled( state ) {
 export function isEditedPostDateFloating( state ) {
 	const date = getEditedPostAttribute( state, 'date' );
 	const modified = getEditedPostAttribute( state, 'modified' );
-	const status = getEditedPostAttribute( state, 'status' );
+
+	// This should be the status of the persisted post
+	// It shouldn't use the "edited" status otherwise it breaks the
+	// infered post data floating status
+	// See https://github.com/WordPress/gutenberg/issues/28083
+	const status = getCurrentPost( state ).status;
 	if (
 		status === 'draft' ||
 		status === 'auto-draft' ||
@@ -889,19 +901,28 @@ export function getEditedPostPreviewLink( state ) {
 export function getSuggestedPostFormat( state ) {
 	const blocks = getEditorBlocks( state );
 
+	if ( blocks.length > 2 ) return null;
+
 	let name;
 	// If there is only one block in the content of the post grab its name
 	// so we can derive a suitable post format from it.
 	if ( blocks.length === 1 ) {
 		name = blocks[ 0 ].name;
+		// check for core/embed `video` and `audio` eligible suggestions
+		if ( name === 'core/embed' ) {
+			const provider = blocks[ 0 ].attributes?.providerNameSlug;
+			if ( [ 'youtube', 'vimeo' ].includes( provider ) ) {
+				name = 'core/video';
+			} else if ( [ 'spotify', 'soundcloud' ].includes( provider ) ) {
+				name = 'core/audio';
+			}
+		}
 	}
 
 	// If there are two blocks in the content and the last one is a text blocks
 	// grab the name of the first one to also suggest a post format from it.
-	if ( blocks.length === 2 ) {
-		if ( blocks[ 1 ].name === 'core/paragraph' ) {
-			name = blocks[ 0 ].name;
-		}
+	if ( blocks.length === 2 && blocks[ 1 ].name === 'core/paragraph' ) {
+		name = blocks[ 0 ].name;
 	}
 
 	// We only convert to default post formats in core.
@@ -914,16 +935,12 @@ export function getSuggestedPostFormat( state ) {
 		case 'core/gallery':
 			return 'gallery';
 		case 'core/video':
-		case 'core-embed/youtube':
-		case 'core-embed/vimeo':
 			return 'video';
 		case 'core/audio':
-		case 'core-embed/spotify':
-		case 'core-embed/soundcloud':
 			return 'audio';
+		default:
+			return null;
 	}
-
-	return null;
 }
 
 /**
@@ -938,7 +955,7 @@ export function getSuggestedPostFormat( state ) {
  */
 export function getBlocksForSerialization( state ) {
 	deprecated( '`core/editor` getBlocksForSerialization selector', {
-		plugin: 'Gutenberg',
+		since: '5.3',
 		alternative: 'getEditorBlocks',
 		hint: 'Blocks serialization pre-processing occurs at save time',
 	} );
@@ -982,7 +999,7 @@ export const getEditedPostContent = createRegistrySelector(
 			if ( typeof record.content === 'function' ) {
 				return record.content( record );
 			} else if ( record.blocks ) {
-				return serializeBlocks( record.blocks );
+				return __unstableSerializeAndClean( record.blocks );
 			} else if ( record.content ) {
 				return record.content;
 			}
@@ -992,93 +1009,6 @@ export const getEditedPostContent = createRegistrySelector(
 );
 
 /**
- * Returns the reusable block with the given ID.
- *
- * @param {Object}        state Global application state.
- * @param {number|string} ref   The reusable block's ID.
- *
- * @return {Object} The reusable block, or null if none exists.
- */
-export const __experimentalGetReusableBlock = createSelector(
-	( state, ref ) => {
-		const block = state.reusableBlocks.data[ ref ];
-		if ( ! block ) {
-			return null;
-		}
-
-		const isTemporary = isNaN( parseInt( ref ) );
-
-		return {
-			...block,
-			id: isTemporary ? ref : +ref,
-			isTemporary,
-		};
-	},
-	( state, ref ) => [ state.reusableBlocks.data[ ref ] ]
-);
-
-/**
- * Returns whether or not the reusable block with the given ID is being saved.
- *
- * @param {Object} state Global application state.
- * @param {string} ref   The reusable block's ID.
- *
- * @return {boolean} Whether or not the reusable block is being saved.
- */
-export function __experimentalIsSavingReusableBlock( state, ref ) {
-	return state.reusableBlocks.isSaving[ ref ] || false;
-}
-
-/**
- * Returns true if the reusable block with the given ID is being fetched, or
- * false otherwise.
- *
- * @param {Object} state Global application state.
- * @param {string} ref   The reusable block's ID.
- *
- * @return {boolean} Whether the reusable block is being fetched.
- */
-export function __experimentalIsFetchingReusableBlock( state, ref ) {
-	return !! state.reusableBlocks.isFetching[ ref ];
-}
-
-/**
- * Returns an array of all reusable blocks.
- *
- * @param {Object} state Global application state.
- *
- * @return {Array} An array of all reusable blocks.
- */
-export const __experimentalGetReusableBlocks = createSelector(
-	( state ) => {
-		return map( state.reusableBlocks.data, ( value, ref ) =>
-			__experimentalGetReusableBlock( state, ref )
-		);
-	},
-	( state ) => [ state.reusableBlocks.data ]
-);
-
-/**
- * Returns state object prior to a specified optimist transaction ID, or `null`
- * if the transaction corresponding to the given ID cannot be found.
- *
- * @param {Object} state         Current global application state.
- * @param {Object} transactionId Optimist transaction ID.
- *
- * @return {Object} Global application state prior to transaction.
- */
-export function getStateBeforeOptimisticTransaction( state, transactionId ) {
-	const transaction = find(
-		state.optimist,
-		( entry ) =>
-			entry.beforeState &&
-			get( entry.action, [ 'optimist', 'id' ] ) === transactionId
-	);
-
-	return transaction ? transaction.beforeState : null;
-}
-
-/**
  * Returns true if the post is being published, or false otherwise.
  *
  * @param {Object} state Global application state.
@@ -1086,28 +1016,10 @@ export function getStateBeforeOptimisticTransaction( state, transactionId ) {
  * @return {boolean} Whether post is being published.
  */
 export function isPublishingPost( state ) {
-	if ( ! isSavingPost( state ) ) {
-		return false;
-	}
-
-	// Saving is optimistic, so assume that current post would be marked as
-	// published if publishing
-	if ( ! isCurrentPostPublished( state ) ) {
-		return false;
-	}
-
-	// Use post update transaction ID to retrieve the state prior to the
-	// optimistic transaction
-	const stateBeforeRequest = getStateBeforeOptimisticTransaction(
-		state,
-		POST_UPDATE_TRANSACTION_ID
-	);
-
-	// Consider as publishing when current post prior to request was not
-	// considered published
 	return (
-		!! stateBeforeRequest &&
-		! isCurrentPostPublished( null, stateBeforeRequest.currentPost )
+		isSavingPost( state ) &&
+		! isCurrentPostPublished( state ) &&
+		getEditedPostAttribute( state, 'status' ) === 'publish'
 	);
 }
 
@@ -1197,28 +1109,6 @@ export function getPermalinkParts( state ) {
 		postName,
 		suffix,
 	};
-}
-
-/**
- * Returns true if an optimistic transaction is pending commit, for which the
- * before state satisfies the given predicate function.
- *
- * @param {Object}   state     Editor state.
- * @param {Function} predicate Function given state, returning true if match.
- *
- * @return {boolean} Whether predicate matches for some history.
- */
-export function inSomeHistory( state, predicate ) {
-	const { optimist } = state;
-
-	// In recursion, optimist state won't exist. Assume exhausted options.
-	if ( ! optimist ) {
-		return false;
-	}
-
-	return optimist.some(
-		( { beforeState } ) => beforeState && predicate( beforeState )
-	);
 }
 
 /**
@@ -1342,9 +1232,16 @@ export function getEditorBlocks( state ) {
  *
  * @param {Object} state
  * @return {WPBlockSelection} The selection start.
+ *
+ * @deprecated since Gutenberg 10.0.0.
  */
 export function getEditorSelectionStart( state ) {
-	return getEditedPostAttribute( state, 'selectionStart' );
+	deprecated( "select('core/editor').getEditorSelectionStart", {
+		since: '10.0',
+		plugin: 'Gutenberg',
+		alternative: "select('core/editor').getEditorSelection",
+	} );
+	return getEditedPostAttribute( state, 'selection' )?.selectionStart;
 }
 
 /**
@@ -1352,9 +1249,26 @@ export function getEditorSelectionStart( state ) {
  *
  * @param {Object} state
  * @return {WPBlockSelection} The selection end.
+ *
+ * @deprecated since Gutenberg 10.0.0.
  */
 export function getEditorSelectionEnd( state ) {
-	return getEditedPostAttribute( state, 'selectionEnd' );
+	deprecated( "select('core/editor').getEditorSelectionStart", {
+		since: '10.0',
+		plugin: 'Gutenberg',
+		alternative: "select('core/editor').getEditorSelection",
+	} );
+	return getEditedPostAttribute( state, 'selection' )?.selectionEnd;
+}
+
+/**
+ * Returns the current selection.
+ *
+ * @param {Object} state
+ * @return {WPBlockSelection} The selection end.
+ */
+export function getEditorSelection( state ) {
+	return getEditedPostAttribute( state, 'selection' );
 }
 
 /**
@@ -1382,9 +1296,38 @@ export function getEditorSettings( state ) {
  * Backward compatibility
  */
 
+/**
+ * Returns state object prior to a specified optimist transaction ID, or `null`
+ * if the transaction corresponding to the given ID cannot be found.
+ *
+ * @deprecated since Gutenberg 9.7.0.
+ */
+export function getStateBeforeOptimisticTransaction() {
+	deprecated( "select('core/editor').getStateBeforeOptimisticTransaction", {
+		since: '5.7',
+		hint: 'No state history is kept on this store anymore',
+	} );
+
+	return null;
+}
+/**
+ * Returns true if an optimistic transaction is pending commit, for which the
+ * before state satisfies the given predicate function.
+ *
+ * @deprecated since Gutenberg 9.7.0.
+ */
+export function inSomeHistory() {
+	deprecated( "select('core/editor').inSomeHistory", {
+		since: '5.7',
+		hint: 'No state history is kept on this store anymore',
+	} );
+	return false;
+}
+
 function getBlockEditorSelector( name ) {
 	return createRegistrySelector( ( select ) => ( state, ...args ) => {
 		deprecated( "`wp.data.select( 'core/editor' )." + name + '`', {
+			since: '5.3',
 			alternative: "`wp.data.select( 'core/block-editor' )." + name + '`',
 		} );
 
@@ -1717,3 +1660,82 @@ export const hasInserterItems = getBlockEditorSelector( 'hasInserterItems' );
 export const getBlockListSettings = getBlockEditorSelector(
 	'getBlockListSettings'
 );
+
+/**
+ * Returns the default template types.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Object} The template types.
+ */
+export function __experimentalGetDefaultTemplateTypes( state ) {
+	return getEditorSettings( state )?.defaultTemplateTypes;
+}
+
+/**
+ * Returns the default template part areas.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} The template part areas.
+ */
+export const __experimentalGetDefaultTemplatePartAreas = createSelector(
+	( state ) => {
+		const areas =
+			getEditorSettings( state )?.defaultTemplatePartAreas || [];
+		return areas?.map( ( item ) => {
+			return { ...item, icon: getTemplatePartIcon( item.icon ) };
+		} );
+	},
+	( state ) => [ getEditorSettings( state )?.defaultTemplatePartAreas ]
+);
+
+/**
+ * Returns a default template type searched by slug.
+ *
+ * @param {Object} state Global application state.
+ * @param {string} slug The template type slug.
+ *
+ * @return {Object} The template type.
+ */
+export const __experimentalGetDefaultTemplateType = createSelector(
+	( state, slug ) =>
+		find( __experimentalGetDefaultTemplateTypes( state ), { slug } ) || {},
+	( state, slug ) => [ __experimentalGetDefaultTemplateTypes( state ), slug ]
+);
+
+/**
+ * Given a template entity, return information about it which is ready to be
+ * rendered, such as the title, description, and icon.
+ *
+ * @param {Object} state Global application state.
+ * @param {Object} template The template for which we need information.
+ * @return {Object} Information about the template, including title, description, and icon.
+ */
+export function __experimentalGetTemplateInfo( state, template ) {
+	if ( ! template ) {
+		return {};
+	}
+
+	const { excerpt, slug, title, area } = template;
+	const {
+		title: defaultTitle,
+		description: defaultDescription,
+	} = __experimentalGetDefaultTemplateType( state, slug );
+
+	const templateTitle = isString( title ) ? title : title?.rendered;
+	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
+	const templateIcon =
+		__experimentalGetDefaultTemplatePartAreas( state ).find(
+			( item ) => area === item.area
+		)?.icon || layout;
+
+	return {
+		title:
+			templateTitle && templateTitle !== slug
+				? templateTitle
+				: defaultTitle || slug,
+		description: templateDescription || defaultDescription,
+		icon: templateIcon,
+	};
+}

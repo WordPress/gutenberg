@@ -38,20 +38,6 @@ describe( 'Icon', () => {
 		);
 	} );
 
-	it( 'renders a dashicon by slug and with a default size of 20', () => {
-		const wrapper = shallow( <Icon icon="format-image" /> );
-
-		expect( wrapper.find( 'Dashicon' ).prop( 'size' ) ).toBe( 20 );
-	} );
-
-	it( 'renders a dashicon by element and with a default size of 20', () => {
-		const wrapper = shallow(
-			<Icon icon={ <Dashicon icon="format-image" /> } />
-		);
-
-		expect( wrapper.find( 'Dashicon' ).prop( 'size' ) ).toBe( 20 );
-	} );
-
 	it( 'renders a function', () => {
 		const wrapper = shallow( <Icon icon={ () => <span /> } /> );
 
@@ -130,6 +116,11 @@ describe( 'Icon', () => {
 					// Custom logic for SVG elements tested separately.
 					//
 					// See: `renders an svg element and passes the size as its width and height`
+					return;
+				}
+
+				if ( [ 'dashicon', 'dashicon element' ].includes( label ) ) {
+					// `size` prop isn't passed through, since dashicon doesn't accept it.
 					return;
 				}
 

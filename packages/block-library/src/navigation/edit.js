@@ -1,34 +1,23 @@
 /**
  * External dependencies
  */
-import { upperFirst } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import {
 	InnerBlocks,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	InspectorControls,
+	JustifyToolbar,
 	BlockControls,
-	FontSizePicker,
-	withFontSizes,
-	__experimentalUseColors,
-	__experimentalBlock as Block,
+	useBlockProps,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	useSelect,
-	useDispatch,
-	withSelect,
-	withDispatch,
-} from '@wordpress/data';
-import {
-	PanelBody,
-	ToggleControl,
-	Toolbar,
-	ToolbarGroup,
-} from '@wordpress/components';
+import { useDispatch, withSelect, withDispatch } from '@wordpress/data';
+import { PanelBody, ToggleControl, ToolbarGroup } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { __ } from '@wordpress/i18n';
 
@@ -36,215 +25,147 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import useBlockNavigator from './use-block-navigator';
-import BlockColorsStyleSelector from './block-colors-selector';
-import * as navIcons from './icons';
+
 import NavigationPlaceholder from './placeholder';
+import PlaceholderPreview from './placeholder-preview';
+
+const ALLOWED_BLOCKS = [
+	'core/navigation-link',
+	'core/search',
+	'core/social-links',
+	'core/page-list',
+	'core/spacer',
+];
+
+const LAYOUT = {
+	type: 'default',
+	alignments: [],
+};
 
 function Navigation( {
 	selectedBlockHasDescendants,
 	attributes,
+	setAttributes,
 	clientId,
-	fontSize,
 	hasExistingNavItems,
 	isImmediateParentOfSelectedBlock,
 	isSelected,
-	setAttributes,
-	setFontSize,
 	updateInnerBlocks,
 	className,
+	hasSubmenuIndicatorSetting = true,
+	hasItemJustificationControls = true,
 } ) {
-	//
-	// HOOKS
-	//
-	const ref = useRef();
+	const [ isPlaceholderShown, setIsPlaceholderShown ] = useState(
+		! hasExistingNavItems
+	);
 
-	const { selectBlock } = useDispatch( 'core/block-editor' );
-	const { TextColor, BackgroundColor, ColorPanel } = __experimentalUseColors(
-		[
-			{ name: 'textColor', property: 'color' },
-			{ name: 'backgroundColor', className: 'has-background' },
-		],
-		{
-			contrastCheckers: [
-				{
-					backgroundColor: true,
-					textColor: true,
-					fontSize: fontSize.size,
-				},
-			],
-			colorDetector: { targetRef: ref },
-			colorPanelProps: {
-				initialOpen: true,
-			},
-		},
-		[ fontSize.size ]
-	);
-	const isNavigationManagementScreen = useSelect(
-		( select ) =>
-			select( 'core/block-editor' ).getSettings()
-				.__experimentalNavigationScreen
-	);
+	const { selectBlock } = useDispatch( blockEditorStore );
+
+	const blockProps = useBlockProps( {
+		className: classnames( className, {
+			[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
+			'is-vertical': attributes.orientation === 'vertical',
+		} ),
+	} );
 
 	const { navigatorToolbarButton, navigatorModal } = useBlockNavigator(
 		clientId
 	);
 
-	//
-	// HANDLERS
-	//
-	function handleItemsAlignment( align ) {
-		return () => {
-			const itemsJustification =
-				attributes.itemsJustification === align ? undefined : align;
-			setAttributes( {
-				itemsJustification,
-			} );
-		};
-	}
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-navigation__container',
+		},
+		{
+			allowedBlocks: ALLOWED_BLOCKS,
+			orientation: attributes.orientation || 'horizontal',
+			renderAppender:
+				( isImmediateParentOfSelectedBlock &&
+					! selectedBlockHasDescendants ) ||
+				isSelected
+					? InnerBlocks.DefaultAppender
+					: false,
+			__experimentalAppenderTagName: 'li',
+			__experimentalCaptureToolbars: true,
+			// Template lock set to false here so that the Nav
+			// Block on the experimental menus screen does not
+			// inherit templateLock={ 'all' }.
+			templateLock: false,
+			__experimentalLayout: LAYOUT,
+			placeholder: <PlaceholderPreview />,
+		}
+	);
 
-	// If we don't have existing items then show the Placeholder
-	if ( ! hasExistingNavItems ) {
+	if ( isPlaceholderShown ) {
 		return (
-			<Block.div>
+			<div { ...blockProps }>
 				<NavigationPlaceholder
-					ref={ ref }
 					onCreate={ ( blocks, selectNavigationBlock ) => {
+						setIsPlaceholderShown( false );
 						updateInnerBlocks( blocks );
 						if ( selectNavigationBlock ) {
 							selectBlock( clientId );
 						}
 					} }
 				/>
-			</Block.div>
+			</div>
 		);
 	}
 
-	const blockInlineStyles = {
-		fontSize: fontSize.size ? fontSize.size + 'px' : undefined,
-	};
+	const justifyAllowedControls =
+		attributes.orientation === 'vertical'
+			? [ 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right', 'space-between' ];
 
-	const blockClassNames = classnames( className, {
-		[ `items-justified-${ attributes.itemsJustification }` ]: attributes.itemsJustification,
-		[ fontSize.class ]: fontSize.class,
-		'is-vertical': attributes.orientation === 'vertical',
-	} );
-
-	// UI State: rendered Block UI
 	return (
 		<>
 			<BlockControls>
-				<Toolbar
-					icon={
-						attributes.itemsJustification
-							? navIcons[
-									`justify${ upperFirst(
-										attributes.itemsJustification
-									) }Icon`
-							  ]
-							: navIcons.justifyLeftIcon
-					}
-					label={ __( 'Change items justification' ) }
-					isCollapsed
-					controls={ [
-						{
-							icon: navIcons.justifyLeftIcon,
-							title: __( 'Justify items left' ),
-							isActive: 'left' === attributes.itemsJustification,
-							onClick: handleItemsAlignment( 'left' ),
-						},
-						{
-							icon: navIcons.justifyCenterIcon,
-							title: __( 'Justify items center' ),
-							isActive:
-								'center' === attributes.itemsJustification,
-							onClick: handleItemsAlignment( 'center' ),
-						},
-						{
-							icon: navIcons.justifyRightIcon,
-							title: __( 'Justify items right' ),
-							isActive: 'right' === attributes.itemsJustification,
-							onClick: handleItemsAlignment( 'right' ),
-						},
-					] }
-				/>
-				{ ! isNavigationManagementScreen && (
-					<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
+				{ hasItemJustificationControls && (
+					<JustifyToolbar
+						value={ attributes.itemsJustification }
+						allowedControls={ justifyAllowedControls }
+						onChange={ ( value ) =>
+							setAttributes( { itemsJustification: value } )
+						}
+						popoverProps={ {
+							position: 'bottom right',
+							isAlternate: true,
+						} }
+					/>
 				) }
-
-				<BlockColorsStyleSelector
-					TextColor={ TextColor }
-					BackgroundColor={ BackgroundColor }
-				>
-					{ ColorPanel }
-				</BlockColorsStyleSelector>
+				<ToolbarGroup>{ navigatorToolbarButton }</ToolbarGroup>
 			</BlockControls>
 			{ navigatorModal }
 			<InspectorControls>
-				<PanelBody title={ __( 'Text settings' ) }>
-					<FontSizePicker
-						value={ fontSize.size }
-						onChange={ setFontSize }
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Display settings' ) }>
-					<ToggleControl
-						checked={ attributes.showSubmenuIcon }
-						onChange={ ( value ) => {
-							setAttributes( { showSubmenuIcon: value } );
-						} }
-						label={ __( 'Show submenu indicator icons' ) }
-					/>
-				</PanelBody>
-			</InspectorControls>
-			<TextColor>
-				<BackgroundColor>
-					<Block.nav
-						className={ blockClassNames }
-						style={ blockInlineStyles }
-					>
-						<InnerBlocks
-							ref={ ref }
-							allowedBlocks={ [ 'core/navigation-link' ] }
-							renderAppender={
-								( isImmediateParentOfSelectedBlock &&
-									! selectedBlockHasDescendants ) ||
-								isSelected
-									? InnerBlocks.DefaultAppender
-									: false
-							}
-							templateInsertUpdatesSelection={ false }
-							__experimentalMoverDirection={
-								attributes.orientation || 'horizontal'
-							}
-							__experimentalTagName="ul"
-							__experimentalAppenderTagName="li"
-							__experimentalPassedProps={ {
-								className: 'wp-block-navigation__container',
+				{ hasSubmenuIndicatorSetting && (
+					<PanelBody title={ __( 'Display settings' ) }>
+						<ToggleControl
+							checked={ attributes.showSubmenuIcon }
+							onChange={ ( value ) => {
+								setAttributes( {
+									showSubmenuIcon: value,
+								} );
 							} }
-							__experimentalCaptureToolbars={ true }
-							// Template lock set to false here so that the Nav
-							// Block on the experimental menus screen does not
-							// inherit templateLock={ 'all' }.
-							templateLock={ false }
+							label={ __( 'Show submenu indicator icons' ) }
 						/>
-					</Block.nav>
-				</BackgroundColor>
-			</TextColor>
+					</PanelBody>
+				) }
+			</InspectorControls>
+			<nav { ...blockProps }>
+				<ul { ...innerBlocksProps } />
+			</nav>
 		</>
 	);
 }
 
 export default compose( [
-	withFontSizes( 'fontSize' ),
 	withSelect( ( select, { clientId } ) => {
-		const innerBlocks = select( 'core/block-editor' ).getBlocks( clientId );
+		const innerBlocks = select( blockEditorStore ).getBlocks( clientId );
 		const {
 			getClientIdsOfDescendants,
 			hasSelectedInnerBlock,
 			getSelectedBlockClientId,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		const isImmediateParentOfSelectedBlock = hasSelectedInnerBlock(
 			clientId,
 			false
@@ -265,9 +186,10 @@ export default compose( [
 				if ( blocks?.length === 0 ) {
 					return false;
 				}
-				dispatch( 'core/block-editor' ).replaceInnerBlocks(
+				dispatch( blockEditorStore ).replaceInnerBlocks(
 					clientId,
-					blocks
+					blocks,
+					true
 				);
 			},
 		};

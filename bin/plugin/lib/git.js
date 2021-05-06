@@ -1,7 +1,8 @@
+// @ts-nocheck
 /**
  * External dependencies
  */
-const SimpleGit = require( 'simple-git/promise' );
+const SimpleGit = require( 'simple-git' );
 
 /**
  * Internal dependencies
@@ -62,6 +63,7 @@ async function createLocalBranch( gitWorkingDirectoryPath, branchName ) {
  */
 async function checkoutRemoteBranch( gitWorkingDirectoryPath, branchName ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
+	await simpleGit.fetch( 'origin', branchName );
 	await simpleGit.checkout( branchName );
 }
 
@@ -124,7 +126,7 @@ async function resetLocalBranchAgainstOrigin(
 }
 
 /**
- * Cherry-picks a commit into master
+ * Cherry-picks a commit into trunk
  *
  * @param {string} gitWorkingDirectoryPath Local repository path.
  * @param {string} commitHash Branch Name
@@ -134,7 +136,7 @@ async function cherrypickCommitIntoBranch(
 	commitHash
 ) {
 	const simpleGit = SimpleGit( gitWorkingDirectoryPath );
-	await simpleGit.checkout( 'master' );
+	await simpleGit.checkout( 'trunk' );
 	await simpleGit.raw( [ 'cherry-pick', commitHash ] );
 }
 

@@ -24,11 +24,11 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     @objc
     func provideToNative_Html(_ html: String, title: String, changed: Bool, contentInfo: [String:Int]) {
         DispatchQueue.main.async {
-            let info = ContentInfo.decode(from: contentInfo)            
+            let info = ContentInfo.decode(from: contentInfo)
             self.delegate?.gutenbergDidProvideHTML(title: title, html: html, changed: changed, contentInfo: info)
         }
     }
-    
+
     @objc
     func requestMediaPickFrom(_ source: String, filter: [String]?, allowMultipleSelection: Bool, callback: @escaping RCTResponseSenderBlock) {
         let mediaSource = getMediaSource(withId: source)
@@ -60,9 +60,9 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
     }
 
     @objc
-    func requestUnsupportedBlockFallback(_ content: String, blockId: String, blockName: String) {
+    func requestUnsupportedBlockFallback(_ content: String, blockId: String, blockName: String, blockTitle: String) {
         DispatchQueue.main.async {
-            let block = Block(id: blockId, name: blockName, content: content)
+            let block = Block(id: blockId, name: blockName, title: blockTitle, content: content)
             self.delegate?.gutenbergDidRequestUnsupportedBlockFallback(for: block)
         }
     }
@@ -93,7 +93,7 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
                 guard let mediaInfo = mediaInfo else {
                     callback(nil)
                     return
-                }                
+                }
                 callback([mediaInfo.id as Any, mediaInfo.url as Any])
             })
         }
@@ -259,15 +259,9 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             sendEvent(withName: event.rawValue, body: body)
         }
     }
-    
-    @objc
-    func logUserEvent(_ event: String, properties: [AnyHashable: Any]?) {
-        guard let logEvent = GutenbergUserEvent(event: event, properties: properties) else { return }
-        self.delegate?.gutenbergDidLogUserEvent(logEvent)
-    }
 
     @objc
-    func addMention(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+    func showUserSuggestions(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
         self.delegate?.gutenbergDidRequestMention(callback: { (result) in
             switch result {
             case .success(let mention):
@@ -275,22 +269,96 @@ public class RNReactNativeGutenbergBridge: RCTEventEmitter {
             case .failure(let error):
                 rejecter(error.domain, "\(error.code)", error)
             }
-        })        
+        })
+    }
+
+	@objc
+	func showXpostSuggestions(_ resolver: @escaping RCTPromiseResolveBlock, rejecter: @escaping RCTPromiseRejectBlock) {
+		self.delegate?.gutenbergDidRequestXpost(callback: { (result) in
+			switch result {
+			case .success(let mention):
+				resolver([mention])
+			case .failure(let error):
+				rejecter(error.domain, "\(error.code)", error)
+			}
+		})
+	}
+
+    @objc
+    func requestMediaFilesEditorLoad(_ mediaFiles: [[String: Any]], blockId: String) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesEditorLoad(mediaFiles, blockId: blockId)
+        }
     }
 
     @objc
-    func requestStarterPageTemplatesTooltipShown(_ callback: @escaping RCTResponseSenderBlock) {
-        callback([self.delegate?.gutenbergDidRequestStarterPageTemplatesTooltipShown() ?? false])
+    func requestMediaFilesFailedRetryDialog(_ mediaFiles: [[String: Any]]) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesFailedRetryDialog(mediaFiles)
+        }
     }
-    
+
     @objc
-    func setStarterPageTemplatesTooltipShown(_ tooltipShown: Bool) {
-        self.delegate?.gutenbergDidRequestSetStarterPageTemplatesTooltipShown(tooltipShown)
+    func requestMediaFilesUploadCancelDialog(_ mediaFiles: [[String: Any]]) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesUploadCancelDialog(mediaFiles)
+        }
+    }
+
+    @objc
+    func requestMediaFilesSaveCancelDialog(_ mediaFiles: [[String: Any]]) {
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidRequestMediaFilesSaveCancelDialog(mediaFiles)
+        }
+    }
+
+    @objc
+    func mediaSaveSync() {
+        DispatchQueue.main.async {
+            if self.hasObservers {
+                self.delegate?.gutenbergDidRequestMediaSaveSync()
+            }
+        }
+	}
+
+    @objc
+    func requestFocalPointPickerTooltipShown(_ callback: @escaping RCTResponseSenderBlock) {
+        callback([self.delegate?.gutenbergDidRequestFocalPointPickerTooltipShown() ?? false])
+    }
+
+    @objc
+    func setFocalPointPickerTooltipShown(_ tooltipShown: Bool) {
+        self.delegate?.gutenbergDidRequestSetFocalPointPickerTooltipShown(tooltipShown)
+    }
+
+    @objc
+    func mediaFilesBlockReplaceSync(_ mediaFiles: [[String: Any]], clientId: String) {
+        DispatchQueue.main.async {
+            if self.hasObservers {
+                self.delegate?.gutenbergDidRequestMediaFilesBlockReplaceSync(mediaFiles, clientId: clientId)
+            }
+        }
+    }
+
+    @objc
+    func actionButtonPressed(_ buttonType: String) {
+        guard let button = Gutenberg.ActionButtonType(rawValue: buttonType) else {
+            return
+        }
+        DispatchQueue.main.async {
+            self.delegate?.gutenbergDidSendButtonPressedAction(button)
+        }
     }
 
 }
 
 // MARK: - RCTBridgeModule delegate
+
+public extension Gutenberg {
+    public enum ActionButtonType: String {
+        case missingBlockAlertActionButton = "missing_block_alert_action_button"
+    }
+}
 
 extension RNReactNativeGutenbergBridge {
     enum EventName: String, CaseIterable {
@@ -303,6 +371,9 @@ extension RNReactNativeGutenbergBridge {
         case mediaAppend
         case updateTheme
         case replaceBlock
+        case updateCapabilities
+        case showNotice
+        case mediaSave
     }
 
     public override func supportedEvents() -> [String]! {
@@ -343,23 +414,17 @@ extension RNReactNativeGutenbergBridge {
     }
 }
 
-extension RNReactNativeGutenbergBridge {
-    enum MediaKey {
-        static let id = "id"
-        static let url = "url"
-        static let type = "type"
-        static let caption = "caption"
-    }
-}
-
 extension MediaInfo {
-
+    /// Dynamically wraps up all properties into a Json Object to be sent to JS Side.
     func encodeForJS() -> [String: Any] {
-        return [
-            RNReactNativeGutenbergBridge.MediaKey.id: id as Any,
-            RNReactNativeGutenbergBridge.MediaKey.url: url as Any,
-            RNReactNativeGutenbergBridge.MediaKey.type: type as Any,
-            RNReactNativeGutenbergBridge.MediaKey.caption: caption as Any
-        ]
+        guard
+            let data = try? JSONEncoder().encode(self),
+            let jsonObject = try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else
+        {
+            assertionFailure("Encoding of MediaInfo failed")
+            return [String: Any]()
+        }
+
+        return jsonObject
     }
 }

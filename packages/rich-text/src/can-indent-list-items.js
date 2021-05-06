@@ -3,10 +3,12 @@
  */
 import { getLineIndex } from './get-line-index';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Checks if the selected list item can be indented.
  *
- * @param {Object} value Value to check.
+ * @param {RichTextValue} value Value to check.
  *
  * @return {boolean} Whether or not the selected list item can be indented.
  */

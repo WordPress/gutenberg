@@ -1,7 +1,14 @@
 {
+	"apiVersion": 2,
 	"name": "core/post-excerpt",
+	"title": "Post Excerpt",
 	"category": "design",
+	"description": "Display a post's excerpt.",
+	"textdomain": "default",
 	"attributes": {
+		"textAlign": {
+			"type": "string"
+		},
 		"wordCount": {
 			"type": "number",
 			"default": 55
@@ -14,10 +21,16 @@
 			"default": true
 		}
 	},
-	"usesContext": [
-		"postId"
-	],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
-		"html": false
-	}
+		"html": false,
+		"fontSize": true,
+		"color": {
+			"gradients": true,
+			"link": true
+		},
+		"lineHeight": true
+	},
+	"editorStyle": "wp-block-post-excerpt-editor",
+	"style": "wp-block-post-excerpt"
 }

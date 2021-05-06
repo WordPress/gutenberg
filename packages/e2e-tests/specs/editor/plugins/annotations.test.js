@@ -4,19 +4,15 @@
 import {
 	activatePlugin,
 	clickBlockToolbarButton,
+	clickMenuItem,
 	clickOnMoreMenuItem,
 	createNewPost,
 	deactivatePlugin,
 } from '@wordpress/e2e-test-utils';
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
-	await clickBlockToolbarButton( 'More options' );
-	const itemButton = (
-		await page.$x(
-			`//*[contains(@class, "block-editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]`
-		)
-	 )[ 0 ];
-	await itemButton.click();
+	await clickBlockToolbarButton( 'Options' );
+	await clickMenuItem( buttonLabel );
 };
 
 const ANNOTATIONS_SELECTOR = '.annotation-text-e2e-tests';

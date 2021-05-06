@@ -25,6 +25,14 @@ If true, the unit `<select>` is hidden.
 -   Required: No
 -   Default: `false`
 
+### isPressEnterToChange
+
+If true, the `ENTER` key press is required in order to trigger an `onChange`. If enabled, a change is also triggered when tabbing away (`onBlur`).
+
+-   Type: `Boolean`
+-   Required: No
+-   Default: `false`
+
 ### isUnitSelectTabbable
 
 Determines if the unit `<select>` is tabbable.
@@ -32,6 +40,20 @@ Determines if the unit `<select>` is tabbable.
 -   Type: `Boolean`
 -   Required: No
 -   Default: `true`
+
+### label
+
+If this property is added, a label will be generated using label property as the content.
+
+-   Type: `String`
+-   Required: No
+
+### labelPosition
+
+The position of the label (`top`, `side`, `bottom`, or `edge`).
+
+-   Type: `String`
+-   Required: No
 
 ### onChange
 
@@ -78,6 +100,25 @@ Collection of available units.
 
 -   Type: `Array<Object>`
 -   Required: No
+
+Example:
+
+```jsx
+import { __experimentalUnitControl as UnitControl } from '@wordpress/block-editor/';
+
+const Example = () => {
+	const [ value, setValue ] = useState( '10px' );
+	const units = [
+		{ value: 'px', label: 'px', default: 0 },
+		{ value: '%', label: '%', default: 10 },
+		{ value: 'em', label: 'em', default: 0 },
+	];
+
+	return <UnitControl onChange={ setValue } value={ value } />;
+};
+```
+
+A `default` value for (in the example above, `10` for `%`), if defined, is set as the new `value` when a unit changes. This is helpful in scenarios where changing a unit may cause drastic results, such as changing from `px` to `vh`.
 
 ### value
 

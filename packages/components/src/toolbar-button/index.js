@@ -30,8 +30,6 @@ function ToolbarButton(
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( ! accessibleToolbarState ) {
-		// This should be deprecated when <Toolbar __experimentalAccessibilityLabel="label">
-		// becomes stable.
 		return (
 			<ToolbarButtonContainer className={ containerClassName }>
 				<Button
@@ -52,7 +50,7 @@ function ToolbarButton(
 					) }
 					isPressed={ isActive }
 					disabled={ isDisabled }
-					data-experimental-toolbar-item
+					data-toolbar-item
 					{ ...extraProps }
 					{ ...props }
 				>

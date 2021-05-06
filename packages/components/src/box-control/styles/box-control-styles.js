@@ -40,6 +40,7 @@ export const Layout = styled( Flex )`
 	position: relative;
 	height: 100%;
 	width: 100%;
+	justify-content: flex-start;
 `;
 
 const unitControlBorderRadiusStyles = ( { isFirst, isLast, isOnly } ) => {

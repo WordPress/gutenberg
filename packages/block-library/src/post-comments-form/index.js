@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { postCommentsForm as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -13,6 +13,6 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Post Comments Form' ),
+	icon,
 	edit,
 };

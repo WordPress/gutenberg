@@ -1,22 +1,24 @@
 <?php
 /**
- * Plugin Name:     {{title}}
+ * Plugin Name:       {{title}}
 {{#description}}
- * Description:     {{description}}
+ * Description:       {{description}}
 {{/description}}
- * Version:         {{version}}
+ * Requires at least: 5.7
+ * Requires PHP:      7.0
+ * Version:           {{version}}
 {{#author}}
- * Author:          {{author}}
+ * Author:            {{author}}
 {{/author}}
 {{#license}}
- * License:         {{license}}
+ * License:           {{license}}
 {{/license}}
 {{#licenseURI}}
- * License URI:     {{{licenseURI}}}
+ * License URI:       {{{licenseURI}}}
 {{/licenseURI}}
- * Text Domain:     {{textdomain}}
+ * Text Domain:       {{textdomain}}
  *
- * @package         {{namespace}}
+ * @package           {{namespace}}
  */
 
 /**
@@ -26,19 +28,21 @@
  * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/applying-styles-with-stylesheets/
  */
 function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
-	$dir = dirname( __FILE__ );
+	$dir = __DIR__;
 
 	$index_js = 'index.js';
 	wp_register_script(
 		'{{namespace}}-{{slug}}-block-editor',
 		plugins_url( $index_js, __FILE__ ),
 		array(
+			'wp-block-editor',
 			'wp-blocks',
 			'wp-i18n',
 			'wp-element',
 		),
 		filemtime( "$dir/$index_js" )
 	);
+	wp_set_script_translations( '{{namespace}}-{{slug}}-block-editor', '{{textdomain}}' );
 
 	$editor_css = 'editor.css';
 	wp_register_style(
@@ -56,10 +60,13 @@ function {{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init() {
 		filemtime( "$dir/$style_css" )
 	);
 
-	register_block_type( '{{namespace}}/{{slug}}', array(
-		'editor_script' => '{{namespace}}-{{slug}}-block-editor',
-		'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
-		'style'         => '{{namespace}}-{{slug}}-block',
-	) );
+	register_block_type(
+		'{{namespace}}/{{slug}}',
+		array(
+			'editor_script' => '{{namespace}}-{{slug}}-block-editor',
+			'editor_style'  => '{{namespace}}-{{slug}}-block-editor',
+			'style'         => '{{namespace}}-{{slug}}-block',
+		)
+	);
 }
 add_action( 'init', '{{namespaceSnakeCase}}_{{slugSnakeCase}}_block_init' );

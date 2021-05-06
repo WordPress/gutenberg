@@ -4,24 +4,30 @@ exports[`MenuItem should match snapshot when all props provided 1`] = `
 <ForwardRef(Button)
   aria-checked={true}
   className="components-menu-item__button my-class"
-  icon={
-    <SVG
-      className="components-menu-items__item-icon"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <Path
-        d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
-      />
-    </SVG>
-  }
   onClick={[Function]}
   role="menuitemcheckbox"
 >
-  My item
+  <span
+    className="components-menu-item__item"
+  >
+    My item
+  </span>
   <Shortcut
     className="components-menu-item__shortcut"
     shortcut="mod+shift+alt+w"
+  />
+  <Icon
+    icon={
+      <SVG
+        className="components-menu-items__item-icon"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
+        />
+      </SVG>
+    }
   />
 </ForwardRef(Button)>
 `;
@@ -32,13 +38,21 @@ exports[`MenuItem should match snapshot when info is provided 1`] = `
   role="menuitem"
 >
   <span
-    className="components-menu-item__info-wrapper"
+    className="components-menu-item__item"
   >
-    My item
     <span
-      className="components-menu-item__info"
+      className="components-menu-item__info-wrapper"
     >
-      Extended description of My Item
+      <span
+        className="components-menu-item__item"
+      >
+        My item
+      </span>
+      <span
+        className="components-menu-item__info"
+      >
+        Extended description of My Item
+      </span>
     </span>
   </span>
   <Shortcut
@@ -50,24 +64,30 @@ exports[`MenuItem should match snapshot when info is provided 1`] = `
 exports[`MenuItem should match snapshot when isSelected and role are optionally provided 1`] = `
 <ForwardRef(Button)
   className="components-menu-item__button my-class"
-  icon={
-    <SVG
-      className="components-menu-items__item-icon"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <Path
-        d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
-      />
-    </SVG>
-  }
   onClick={[Function]}
   role="menuitem"
 >
-  My item
+  <span
+    className="components-menu-item__item"
+  >
+    My item
+  </span>
   <Shortcut
     className="components-menu-item__shortcut"
     shortcut="mod+shift+alt+w"
+  />
+  <Icon
+    icon={
+      <SVG
+        className="components-menu-items__item-icon"
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M4 9v1.5h16V9H4zm12 5.5h4V13h-4v1.5zm-6 0h4V13h-4v1.5zm-6 0h4V13H4v1.5z"
+        />
+      </SVG>
+    }
   />
 </ForwardRef(Button)>
 `;
@@ -77,7 +97,11 @@ exports[`MenuItem should match snapshot when only label provided 1`] = `
   className="components-menu-item__button"
   role="menuitem"
 >
-  My item
+  <span
+    className="components-menu-item__item"
+  >
+    My item
+  </span>
   <Shortcut
     className="components-menu-item__shortcut"
   />

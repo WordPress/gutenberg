@@ -37,7 +37,7 @@ const transforms = {
 		{
 			type: 'block',
 			isMultiBlock: true,
-			blocks: [ 'core/paragraph' ],
+			blocks: [ 'core/paragraph', 'core/heading' ],
 			transform: ( blockAttributes ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
@@ -67,7 +67,7 @@ const transforms = {
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/quote' ],
+			blocks: [ 'core/quote', 'core/pullquote' ],
 			transform: ( { value, anchor } ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
@@ -159,9 +159,43 @@ const transforms = {
 		},
 		{
 			type: 'block',
+			blocks: [ 'core/heading' ],
+			transform: ( { values } ) =>
+				split(
+					create( {
+						html: values,
+						multilineTag: 'li',
+						multilineWrapperTags: [ 'ul', 'ol' ],
+					} ),
+					__UNSTABLE_LINE_SEPARATOR
+				).map( ( piece ) =>
+					createBlock( 'core/heading', {
+						content: toHTMLString( { value: piece } ),
+					} )
+				),
+		},
+		{
+			type: 'block',
 			blocks: [ 'core/quote' ],
 			transform: ( { values, anchor } ) => {
 				return createBlock( 'core/quote', {
+					value: toHTMLString( {
+						value: create( {
+							html: values,
+							multilineTag: 'li',
+							multilineWrapperTags: [ 'ul', 'ol' ],
+						} ),
+						multilineTag: 'p',
+					} ),
+					anchor,
+				} );
+			},
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/pullquote' ],
+			transform: ( { values, anchor } ) => {
+				return createBlock( 'core/pullquote', {
 					value: toHTMLString( {
 						value: create( {
 							html: values,

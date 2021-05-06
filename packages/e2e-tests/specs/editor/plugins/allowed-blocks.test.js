@@ -29,7 +29,6 @@ describe( 'Allowed Blocks Filter', () => {
 			await page.$x( `//button//span[contains(text(), 'Paragraph')]` )
 		 )[ 0 ];
 		expect( paragraphBlockButton ).not.toBeNull();
-		await paragraphBlockButton.click();
 
 		// The gallery block is not available.
 		await searchForBlock( 'Gallery' );

@@ -25,7 +25,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
-import TouchableRipple from './ripple.native.js';
+import TouchableRipple from './ripple';
 
 class BottomSheetCell extends Component {
 	constructor( props ) {
@@ -38,15 +38,18 @@ class BottomSheetCell extends Component {
 		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind(
 			this
 		);
+
+		this.isCurrent = false;
 	}
 
-	componentDidUpdate() {
-		if ( this.state.isEditingValue ) {
+	componentDidUpdate( prevProps, prevState ) {
+		if ( ! prevState.isEditingValue && this.state.isEditingValue ) {
 			this._valueTextInput.focus();
 		}
 	}
 
 	componentDidMount() {
+		this.isCurrent = true;
 		AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
 			this.handleScreenReaderToggled
@@ -54,12 +57,15 @@ class BottomSheetCell extends Component {
 
 		AccessibilityInfo.isScreenReaderEnabled().then(
 			( isScreenReaderEnabled ) => {
-				this.setState( { isScreenReaderEnabled } );
+				if ( this.isCurrent ) {
+					this.setState( { isScreenReaderEnabled } );
+				}
 			}
 		);
 	}
 
 	componentWillUnmount() {
+		this.isCurrent = false;
 		AccessibilityInfo.removeEventListener(
 			'screenReaderChanged',
 			this.handleScreenReaderToggled
@@ -91,6 +97,7 @@ class BottomSheetCell extends Component {
 			disabled = false,
 			activeOpacity,
 			onPress,
+			onLongPress,
 			label,
 			value,
 			valuePlaceholder = '',
@@ -151,6 +158,11 @@ class BottomSheetCell extends Component {
 			styles.cellRowContainer,
 			cellRowContainerStyle,
 		];
+
+		const isInteractive =
+			isValueEditable ||
+			onPress !== undefined ||
+			onLongPress !== undefined;
 
 		const onCellPress = () => {
 			if ( isValueEditable ) {
@@ -248,6 +260,9 @@ class BottomSheetCell extends Component {
 		};
 
 		const getAccessibilityLabel = () => {
+			if ( accessible === false ) {
+				return;
+			}
 			if ( accessibilityLabel || ! showValue ) {
 				return accessibilityLabel || label;
 			}
@@ -298,9 +313,10 @@ class BottomSheetCell extends Component {
 						  __( 'Double tap to edit this value' )
 						: accessibilityHint
 				}
-				disabled={ disabled }
+				disabled={ disabled || ! isInteractive }
 				activeOpacity={ opacity }
 				onPress={ onCellPress }
+				onLongPress={ onLongPress }
 				style={ [ styles.clipToBounds, style ] }
 				borderless={ borderless }
 			>
@@ -316,7 +332,7 @@ class BottomSheetCell extends Component {
 									<Icon
 										icon={ icon }
 										size={ 24 }
-										color={ iconStyle.color }
+										fill={ iconStyle.color }
 										isPressed={ false }
 									/>
 									<View
@@ -326,9 +342,13 @@ class BottomSheetCell extends Component {
 									/>
 								</View>
 							) }
-							<Text style={ [ defaultLabelStyle, labelStyle ] }>
-								{ label }
-							</Text>
+							{ label && (
+								<Text
+									style={ [ defaultLabelStyle, labelStyle ] }
+								>
+									{ label }
+								</Text>
+							) }
 						</View>
 						{ customActionButton && (
 							<TouchableOpacity

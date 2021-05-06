@@ -1,11 +1,13 @@
 {
+	"apiVersion": 2,
 	"name": "core/navigation",
+	"title": "Navigation",
 	"category": "design",
+	"description": "A collection of blocks that allow visitors to get around your site.",
+	"keywords": [ "menu", "navigation", "links" ],
+	"textdomain": "default",
 	"attributes": {
 		"orientation": {
-			"type": "string"
-		},
-		"className": {
 			"type": "string"
 		},
 		"textColor": {
@@ -26,12 +28,6 @@
 		"rgbBackgroundColor": {
 			"type": "string"
 		},
-		"fontSize": {
-			"type": "string"
-		},
-		"customFontSize": {
-			"type": "number"
-		},
 		"itemsJustification": {
 			"type": "string"
 		},
@@ -40,14 +36,31 @@
 			"default": true
 		}
 	},
+	"providesContext": {
+		"textColor": "textColor",
+		"customTextColor": "customTextColor",
+		"backgroundColor": "backgroundColor",
+		"customBackgroundColor": "customBackgroundColor",
+		"fontSize": "fontSize",
+		"customFontSize": "customFontSize",
+		"showSubmenuIcon": "showSubmenuIcon",
+		"style": "style",
+		"orientation": "orientation"
+	},
 	"supports": {
-		"align": [
-			"wide",
-			"full"
-		],
+		"align": [ "wide", "full" ],
 		"anchor": true,
 		"html": false,
 		"inserter": true,
-		"lightBlockWrapper": true
-	}
+		"fontSize": true,
+		"lineHeight": true,
+		"__experimentalFontStyle": true,
+		"__experimentalFontWeight": true,
+		"__experimentalTextTransform": true,
+		"color": true,
+		"__experimentalFontFamily": true,
+		"__experimentalTextDecoration": true
+	},
+	"editorStyle": "wp-block-navigation-editor",
+	"style": "wp-block-navigation"
 }

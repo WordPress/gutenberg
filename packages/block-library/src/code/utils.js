@@ -4,11 +4,6 @@
 import { flow } from 'lodash';
 
 /**
- * WordPress dependencies
- */
-import { escapeEditableHTML } from '@wordpress/escape-html';
-
-/**
  * Escapes ampersands, shortcodes, and links.
  *
  * @param {string} content The content of a code block.
@@ -16,7 +11,6 @@ import { escapeEditableHTML } from '@wordpress/escape-html';
  */
 export function escape( content ) {
 	return flow(
-		escapeEditableHTML,
 		escapeOpeningSquareBrackets,
 		escapeProtocolInIsolatedUrls
 	)( content || '' );

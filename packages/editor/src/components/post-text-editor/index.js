@@ -7,31 +7,26 @@ import Textarea from 'react-autosize-textarea';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
+import { useState } from '@wordpress/element';
 import { parse } from '@wordpress/blocks';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { withInstanceId, compose } from '@wordpress/compose';
+import { useDispatch, useSelect } from '@wordpress/data';
+import { useInstanceId } from '@wordpress/compose';
 import { VisuallyHidden } from '@wordpress/components';
 
-export class PostTextEditor extends Component {
-	constructor() {
-		super( ...arguments );
+export default function PostTextEditor() {
+	const postContent = useSelect(
+		( select ) => select( 'core/editor' ).getEditedPostContent(),
+		[]
+	);
 
-		this.edit = this.edit.bind( this );
-		this.stopEditing = this.stopEditing.bind( this );
+	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
 
-		this.state = {};
-	}
+	const [ value, setValue ] = useState( postContent );
+	const [ isDirty, setIsDirty ] = useState( false );
+	const instanceId = useInstanceId( PostTextEditor );
 
-	static getDerivedStateFromProps( props, state ) {
-		if ( state.isDirty ) {
-			return null;
-		}
-
-		return {
-			value: props.value,
-			isDirty: false,
-		};
+	if ( ! isDirty && value !== postContent ) {
+		setValue( postContent );
 	}
 
 	/**
@@ -45,68 +40,44 @@ export class PostTextEditor extends Component {
 	 *
 	 * @param {Event} event Change event.
 	 */
-	edit( event ) {
-		const value = event.target.value;
-		this.props.onChange( value );
-		this.setState( { value, isDirty: true } );
-	}
+	const onChange = ( event ) => {
+		const newValue = event.target.value;
+		editPost( { content: newValue } );
+		setValue( newValue );
+		setIsDirty( true );
+	};
 
 	/**
 	 * Function called when the user has completed their edits, responsible for
 	 * ensuring that changes, if made, are surfaced to the onPersist prop
 	 * callback and resetting dirty state.
 	 */
-	stopEditing() {
-		if ( this.state.isDirty ) {
-			this.props.onPersist( this.state.value );
-			this.setState( { isDirty: false } );
+	const stopEditing = () => {
+		if ( isDirty ) {
+			const blocks = parse( value );
+			resetEditorBlocks( blocks );
+			setIsDirty( false );
 		}
-	}
+	};
 
-	render() {
-		const { value } = this.state;
-		const { instanceId } = this.props;
-		return (
-			<>
-				<VisuallyHidden
-					as="label"
-					htmlFor={ `post-content-${ instanceId }` }
-				>
-					{ __( 'Type text or HTML' ) }
-				</VisuallyHidden>
-				<Textarea
-					autoComplete="off"
-					dir="auto"
-					value={ value }
-					onChange={ this.edit }
-					onBlur={ this.stopEditing }
-					className="editor-post-text-editor"
-					id={ `post-content-${ instanceId }` }
-					placeholder={ __( 'Start writing with text or HTML' ) }
-				/>
-			</>
-		);
-	}
+	return (
+		<>
+			<VisuallyHidden
+				as="label"
+				htmlFor={ `post-content-${ instanceId }` }
+			>
+				{ __( 'Type text or HTML' ) }
+			</VisuallyHidden>
+			<Textarea
+				autoComplete="off"
+				dir="auto"
+				value={ value }
+				onChange={ onChange }
+				onBlur={ stopEditing }
+				className="editor-post-text-editor"
+				id={ `post-content-${ instanceId }` }
+				placeholder={ __( 'Start writing with text or HTML' ) }
+			/>
+		</>
+	);
 }
-
-export default compose( [
-	withSelect( ( select ) => {
-		const { getEditedPostContent } = select( 'core/editor' );
-		return {
-			value: getEditedPostContent(),
-		};
-	} ),
-	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
-		return {
-			onChange( content ) {
-				editPost( { content } );
-			},
-			onPersist( content ) {
-				const blocks = parse( content );
-				resetEditorBlocks( blocks );
-			},
-		};
-	} ),
-	withInstanceId,
-] )( PostTextEditor );

@@ -1,14 +1,29 @@
 /**
+ * WordPress dependencies
+ */
+import { store as blocksStore } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
+
+/**
  * Internal dependencies
  */
 import { installBlockType, uninstallBlockType } from '../actions';
 
 describe( 'actions', () => {
-	const endpoint = '/wp-json/__experimental/plugins/block/block';
+	const pluginEndpoint =
+		'https://example.com/wp-json/wp/v2/plugins/block/block';
 	const item = {
 		id: 'block/block',
 		name: 'Test Block',
 		assets: [ 'script.js' ],
+		links: {
+			'wp:install-plugin': [
+				{
+					href:
+						'https://example.com/wp-json/wp/v2/plugins?slug=waves',
+				},
+			],
+		},
 	};
 	const plugin = {
 		plugin: 'block/block.php',
@@ -18,57 +33,72 @@ describe( 'actions', () => {
 		_links: {
 			self: [
 				{
-					href: endpoint,
+					href: pluginEndpoint,
 				},
 			],
 		},
 	};
 
 	describe( 'installBlockType', () => {
+		const block = item;
 		it( 'should install a block successfully', () => {
-			const generator = installBlockType( item );
+			const generator = installBlockType( block );
 
 			expect( generator.next().value ).toEqual( {
-				type: 'SET_ERROR_NOTICE',
-				blockId: item.id,
-				notice: false,
+				type: 'CLEAR_ERROR_NOTICE',
+				blockId: block.id,
 			} );
 
 			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
-				blockId: item.id,
+				blockId: block.id,
 				isInstalling: true,
 			} );
 
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
 				request: {
-					path: '__experimental/plugins',
+					path: 'wp/v2/plugins',
 					method: 'POST',
 				},
 			} );
 
-			const itemWithEndpoint = { ...item, endpoint };
 			expect( generator.next( plugin ).value ).toEqual( {
 				type: 'ADD_INSTALLED_BLOCK_TYPE',
-				item: itemWithEndpoint,
+				item: {
+					...block,
+					links: {
+						...block.links,
+						self: [
+							{
+								href: pluginEndpoint,
+							},
+						],
+					},
+				},
 			} );
 
 			expect( generator.next().value ).toEqual( {
 				type: 'LOAD_ASSETS',
-				assets: item.assets,
+				assets: block.assets,
 			} );
 
 			expect( generator.next().value ).toEqual( {
 				args: [],
 				selectorName: 'getBlockTypes',
-				storeKey: 'core/blocks',
-				type: 'SELECT',
+				storeKey: blocksStore.name,
+				type: '@@data/SELECT',
 			} );
 
-			expect( generator.next( [ item ] ).value ).toEqual( {
+			expect( generator.next( [ block ] ).value ).toMatchObject( {
+				type: '@@data/DISPATCH',
+				actionName: 'createInfoNotice',
+				storeKey: noticesStore,
+			} );
+
+			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
-				blockId: item.id,
+				blockId: block.id,
 				isInstalling: false,
 			} );
 
@@ -78,51 +108,92 @@ describe( 'actions', () => {
 			} );
 		} );
 
-		it( 'should set an error if the plugin has no assets', () => {
-			const generator = installBlockType( { ...item, assets: [] } );
+		it( 'should activate an inactive block plugin successfully', () => {
+			const inactiveBlock = {
+				...block,
+				links: {
+					...block.links,
+					'wp:plugin': [
+						{
+							href: pluginEndpoint,
+						},
+					],
+				},
+			};
+			const generator = installBlockType( inactiveBlock );
 
 			expect( generator.next().value ).toEqual( {
-				type: 'SET_ERROR_NOTICE',
-				blockId: item.id,
-				notice: false,
-			} );
-
-			expect( generator.next().value ).toMatchObject( {
-				type: 'SET_ERROR_NOTICE',
-				blockId: item.id,
-			} );
-
-			expect( generator.next().value ).toEqual( {
-				type: 'SET_INSTALLING_BLOCK',
-				blockId: item.id,
-				isInstalling: false,
-			} );
-
-			expect( generator.next() ).toEqual( {
-				value: false,
-				done: true,
-			} );
-		} );
-
-		it( "should set an error if the plugin can't install", () => {
-			const generator = installBlockType( item );
-
-			expect( generator.next().value ).toEqual( {
-				type: 'SET_ERROR_NOTICE',
-				blockId: item.id,
-				notice: false,
+				type: 'CLEAR_ERROR_NOTICE',
+				blockId: inactiveBlock.id,
 			} );
 
 			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
-				blockId: item.id,
+				blockId: inactiveBlock.id,
 				isInstalling: true,
 			} );
 
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
 				request: {
-					path: '__experimental/plugins',
+					url: pluginEndpoint,
+					method: 'PUT',
+				},
+			} );
+
+			expect( generator.next( plugin ).value ).toEqual( {
+				type: 'ADD_INSTALLED_BLOCK_TYPE',
+				item: inactiveBlock,
+			} );
+
+			expect( generator.next().value ).toEqual( {
+				type: 'LOAD_ASSETS',
+				assets: inactiveBlock.assets,
+			} );
+
+			expect( generator.next().value ).toEqual( {
+				args: [],
+				selectorName: 'getBlockTypes',
+				storeKey: blocksStore.name,
+				type: '@@data/SELECT',
+			} );
+
+			expect( generator.next( [ inactiveBlock ] ).value ).toMatchObject( {
+				type: '@@data/DISPATCH',
+				actionName: 'createInfoNotice',
+				storeKey: noticesStore,
+			} );
+
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				blockId: inactiveBlock.id,
+				isInstalling: false,
+			} );
+
+			expect( generator.next() ).toEqual( {
+				value: true,
+				done: true,
+			} );
+		} );
+
+		it( "should set an error if the plugin can't install", () => {
+			const generator = installBlockType( block );
+
+			expect( generator.next().value ).toEqual( {
+				type: 'CLEAR_ERROR_NOTICE',
+				blockId: block.id,
+			} );
+
+			expect( generator.next().value ).toEqual( {
+				type: 'SET_INSTALLING_BLOCK',
+				blockId: block.id,
+				isInstalling: true,
+			} );
+
+			expect( generator.next().value ).toMatchObject( {
+				type: 'API_FETCH',
+				request: {
+					path: 'wp/v2/plugins',
 					method: 'POST',
 				},
 			} );
@@ -134,12 +205,18 @@ describe( 'actions', () => {
 			};
 			expect( generator.throw( apiError ).value ).toMatchObject( {
 				type: 'SET_ERROR_NOTICE',
-				blockId: item.id,
+				blockId: block.id,
+			} );
+
+			expect( generator.next().value ).toMatchObject( {
+				type: '@@data/DISPATCH',
+				actionName: 'createErrorNotice',
+				storeKey: noticesStore,
 			} );
 
 			expect( generator.next().value ).toEqual( {
 				type: 'SET_INSTALLING_BLOCK',
-				blockId: item.id,
+				blockId: block.id,
 				isInstalling: false,
 			} );
 
@@ -151,16 +228,26 @@ describe( 'actions', () => {
 	} );
 
 	describe( 'uninstallBlockType', () => {
-		const itemWithEndpoint = { ...item, endpoint };
+		const block = {
+			...item,
+			links: {
+				...item.links,
+				self: [
+					{
+						href: pluginEndpoint,
+					},
+				],
+			},
+		};
 
 		it( 'should uninstall a block successfully', () => {
-			const generator = uninstallBlockType( itemWithEndpoint );
+			const generator = uninstallBlockType( block );
 
 			// First the deactivation step
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
 				request: {
-					url: endpoint,
+					url: pluginEndpoint,
 					method: 'PUT',
 				},
 			} );
@@ -169,14 +256,14 @@ describe( 'actions', () => {
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
 				request: {
-					url: endpoint,
+					url: pluginEndpoint,
 					method: 'DELETE',
 				},
 			} );
 
 			expect( generator.next().value ).toEqual( {
 				type: 'REMOVE_INSTALLED_BLOCK_TYPE',
-				item: itemWithEndpoint,
+				item: block,
 			} );
 
 			expect( generator.next() ).toEqual( {
@@ -186,12 +273,12 @@ describe( 'actions', () => {
 		} );
 
 		it( "should set a global notice if the plugin can't be deleted", () => {
-			const generator = uninstallBlockType( itemWithEndpoint );
+			const generator = uninstallBlockType( block );
 
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
 				request: {
-					url: endpoint,
+					url: pluginEndpoint,
 					method: 'PUT',
 				},
 			} );
@@ -199,7 +286,7 @@ describe( 'actions', () => {
 			expect( generator.next().value ).toMatchObject( {
 				type: 'API_FETCH',
 				request: {
-					url: endpoint,
+					url: pluginEndpoint,
 					method: 'DELETE',
 				},
 			} );
@@ -211,9 +298,9 @@ describe( 'actions', () => {
 				data: null,
 			};
 			expect( generator.throw( apiError ).value ).toMatchObject( {
-				type: 'DISPATCH',
+				type: '@@data/DISPATCH',
 				actionName: 'createErrorNotice',
-				storeKey: 'core/notices',
+				storeKey: noticesStore,
 			} );
 
 			expect( generator.next() ).toEqual( {

@@ -3,36 +3,34 @@
  */
 import { useEffect } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
+import {
+	useShortcut,
+	store as keyboardShortcutsStore,
+} from '@wordpress/keyboard-shortcuts';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
+
 function KeyboardShortcuts() {
-	const {
-		getBlockSelectionStart,
-		getEditorMode,
-		isEditorSidebarOpened,
-		richEditingEnabled,
-		codeEditingEnabled,
-	} = useSelect( ( select ) => {
-		const settings = select( 'core/editor' ).getEditorSettings();
-		return {
-			getBlockSelectionStart: select( 'core/block-editor' )
-				.getBlockSelectionStart,
-			getEditorMode: select( 'core/edit-post' ).getEditorMode,
-			isEditorSidebarOpened: select( 'core/edit-post' )
-				.isEditorSidebarOpened,
-			richEditingEnabled: settings.richEditingEnabled,
-			codeEditingEnabled: settings.codeEditingEnabled,
-		};
-	} );
+	const { getBlockSelectionStart } = useSelect( 'core/block-editor' );
+	const { getEditorMode, isEditorSidebarOpened } = useSelect( editPostStore );
+	const isModeToggleDisabled = useSelect( ( select ) => {
+		const { richEditingEnabled, codeEditingEnabled } = select(
+			'core/editor'
+		).getEditorSettings();
+		return ! richEditingEnabled || ! codeEditingEnabled;
+	}, [] );
 
 	const {
 		switchEditorMode,
 		openGeneralSidebar,
 		closeGeneralSidebar,
 		toggleFeature,
-	} = useDispatch( 'core/edit-post' );
-	const { registerShortcut } = useDispatch( 'core/keyboard-shortcuts' );
+	} = useDispatch( editPostStore );
+	const { registerShortcut } = useDispatch( keyboardShortcutsStore );
 
 	useEffect( () => {
 		registerShortcut( {
@@ -58,7 +56,7 @@ function KeyboardShortcuts() {
 		registerShortcut( {
 			name: 'core/edit-post/toggle-block-navigation',
 			category: 'global',
-			description: __( 'Open the block navigation menu.' ),
+			description: __( 'Open the block list view.' ),
 			keyCombination: {
 				modifier: 'access',
 				character: 'o',
@@ -127,7 +125,7 @@ function KeyboardShortcuts() {
 		},
 		{
 			bindGlobal: true,
-			isDisabled: ! richEditingEnabled || ! codeEditingEnabled,
+			isDisabled: isModeToggleDisabled,
 		}
 	);
 

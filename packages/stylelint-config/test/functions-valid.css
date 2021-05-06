@@ -1,0 +1,7 @@
+/* function-name-case */
+
+a {
+	width: calc(5% - 10em);
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr="#1e8cbe", endColorstr="#0074a2", GradientType=0);
+	filter: progid:DXImageTransform.Microsoft.Alpha(opacity=100);
+}

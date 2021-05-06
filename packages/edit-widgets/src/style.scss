@@ -1,9 +1,11 @@
 @import "../../interface/src/style.scss";
 
-@import "./components/customizer-edit-widgets-initializer/style.scss";
+@import "./blocks/widget-area/editor.scss";
 @import "./components/header/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/notices/style.scss";
+@import "./components/layout/style.scss";
+@import "./components/widget-areas-block-editor-content/style.scss";
 
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations
@@ -11,7 +13,8 @@ html.wp-toolbar {
 	background: $white;
 }
 
-body.gutenberg_page_gutenberg-widgets {
+body.appearance_page_gutenberg-widgets,
+body.widgets-php {
 	@include wp-admin-reset( ".blocks-widgets-container" );
 }
 
@@ -39,18 +42,8 @@ body.gutenberg_page_gutenberg-widgets {
 		min-height: calc(100vh - #{ $admin-bar-height });
 	}
 
-	> .components-navigate-regions {
-		height: 100%;
-	}
-
-	&.is-in-customizer {
-		min-height: initial;
-		position: initial;
-	}
-
-
 	.interface-interface-skeleton__content {
-		background-color: #f1f1f1;
+		background-color: $gray-100;
 	}
 }
 
@@ -62,6 +55,5 @@ body.gutenberg_page_gutenberg-widgets {
 .edit-widgets-sidebar .components-button.interface-complementary-area__pin-unpin-item {
 	display: none;
 }
-
 
 @include wordpress-admin-schemes();

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Font Size Picker should apply a custom font size using the font size input 1`] = `
-"<!-- wp:paragraph {\\"style\\":{\\"typography\\":{\\"fontSize\\":23}}} -->
+"<!-- wp:paragraph {\\"style\\":{\\"typography\\":{\\"fontSize\\":\\"23px\\"}}} -->
 <p style=\\"font-size:23px\\">Paragraph to be made \\"small\\"</p>
 <!-- /wp:paragraph -->"
 `;

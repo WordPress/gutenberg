@@ -27,26 +27,148 @@ describe( 'Preloading Middleware', () => {
 		} );
 	} );
 
-	it( 'should return the preloaded data if provided', () => {
-		const body = {
-			status: 'this is the preloaded response',
-		};
-		const preloadedData = {
-			'wp/v2/posts': {
-				body,
-			},
-		};
-		const preloadingMiddleware = createPreloadingMiddleware(
-			preloadedData
-		);
-		const requestOptions = {
-			method: 'GET',
-			path: 'wp/v2/posts',
-		};
+	describe( 'given preloaded data', () => {
+		describe( 'when data is requested from a preloaded endpoint', () => {
+			describe( 'and it is requested for the first time', () => {
+				it( 'should return the preloaded data', () => {
+					const body = {
+						status: 'this is the preloaded response',
+					};
+					const preloadedData = {
+						'wp/v2/posts': {
+							body,
+						},
+					};
+					const preloadingMiddleware = createPreloadingMiddleware(
+						preloadedData
+					);
+					const requestOptions = {
+						method: 'GET',
+						path: 'wp/v2/posts',
+					};
 
-		const response = preloadingMiddleware( requestOptions );
-		return response.then( ( value ) => {
-			expect( value ).toEqual( body );
+					const response = preloadingMiddleware( requestOptions );
+					return response.then( ( value ) => {
+						expect( value ).toEqual( body );
+					} );
+				} );
+			} );
+
+			describe( 'and it has already been requested', () => {
+				it( 'should not return the preloaded data', () => {
+					const body = {
+						status: 'this is the preloaded response',
+					};
+					const preloadedData = {
+						'wp/v2/posts': {
+							body,
+						},
+					};
+					const preloadingMiddleware = createPreloadingMiddleware(
+						preloadedData
+					);
+					const requestOptions = {
+						method: 'GET',
+						path: 'wp/v2/posts',
+					};
+					const nextSpy = jest.fn();
+
+					preloadingMiddleware( requestOptions, nextSpy );
+					expect( nextSpy ).not.toHaveBeenCalled();
+					preloadingMiddleware( requestOptions, nextSpy );
+					expect( nextSpy ).toHaveBeenCalled();
+				} );
+			} );
+
+			describe( 'and the OPTIONS request has a parse flag', () => {
+				it( 'should return the full response if parse: false', () => {
+					const data = {
+						body: {
+							status: 'this is the preloaded response',
+						},
+						headers: {
+							Allow: 'GET, POST',
+						},
+					};
+
+					const preloadedData = {
+						OPTIONS: {
+							'wp/v2/posts': data,
+						},
+					};
+
+					const preloadingMiddleware = createPreloadingMiddleware(
+						preloadedData
+					);
+
+					const requestOptions = {
+						method: 'OPTIONS',
+						path: 'wp/v2/posts',
+						parse: false,
+					};
+
+					const response = preloadingMiddleware( requestOptions );
+					return response.then( ( value ) => {
+						expect( value ).toEqual( data );
+					} );
+				} );
+
+				it( 'should return only the response body if parse: true', () => {
+					const body = {
+						status: 'this is the preloaded response',
+					};
+
+					const preloadedData = {
+						OPTIONS: {
+							'wp/v2/posts': {
+								body,
+								headers: {
+									Allow: 'GET, POST',
+								},
+							},
+						},
+					};
+
+					const preloadingMiddleware = createPreloadingMiddleware(
+						preloadedData
+					);
+
+					const requestOptions = {
+						method: 'OPTIONS',
+						path: 'wp/v2/posts',
+						parse: true,
+					};
+
+					const response = preloadingMiddleware( requestOptions );
+					return response.then( ( value ) => {
+						expect( value ).toEqual( body );
+					} );
+				} );
+			} );
+		} );
+
+		describe( 'when the requested data is not from a preloaded endpoint', () => {
+			it( 'should not return preloaded data', () => {
+				const body = {
+					status: 'this is the preloaded response',
+				};
+				const preloadedData = {
+					'wp/v2/posts': {
+						body,
+					},
+				};
+				const preloadingMiddleware = createPreloadingMiddleware(
+					preloadedData
+				);
+				const requestOptions = {
+					method: 'GET',
+					path: 'wp/v2/fake_resource',
+				};
+				const nextSpy = jest.fn();
+
+				preloadingMiddleware( requestOptions, nextSpy );
+				expect( nextSpy ).toHaveBeenCalled();
+			} );
 		} );
 	} );
 
@@ -83,7 +205,7 @@ describe( 'Preloading Middleware', () => {
 			[ 'method empty', { [ method ]: {} } ],
 		] )( '%s', ( label, preloadedData ) => {
 			it( 'should move to the next middleware if no preloaded data', () => {
-				const prelooadingMiddleware = createPreloadingMiddleware(
+				const preloadingMiddleware = createPreloadingMiddleware(
 					preloadedData
 				);
 				const requestOptions = {
@@ -96,7 +218,7 @@ describe( 'Preloading Middleware', () => {
 					return true;
 				};
 
-				const ret = prelooadingMiddleware( requestOptions, callback );
+				const ret = preloadingMiddleware( requestOptions, callback );
 				expect( ret ).toBe( true );
 			} );
 		} );

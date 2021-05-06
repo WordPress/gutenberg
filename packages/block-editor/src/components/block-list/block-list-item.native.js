@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View } from 'react-native';
+import { View, Dimensions } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -9,35 +9,137 @@ import { View } from 'react-native';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { ReadableContentView } from '@wordpress/components';
+import { ReadableContentView, alignmentHelpers } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
+import styles from './block-list-item.native.scss';
+import { store as blockEditorStore } from '../../store';
 
 const stretchStyle = {
 	flex: 1,
 };
 
 export class BlockListItem extends Component {
+	getMarginHorizontal() {
+		const {
+			blockAlignment,
+			marginHorizontal,
+			parentBlockAlignment,
+			hasParents,
+			blockName,
+			parentBlockName,
+			parentWidth,
+			blockWidth,
+		} = this.props;
+		const {
+			isFullWidth,
+			isWideWidth,
+			isWider,
+			isContainerRelated,
+		} = alignmentHelpers;
+
+		if ( isFullWidth( blockAlignment ) ) {
+			if ( ! hasParents ) {
+				return 0;
+			}
+			return marginHorizontal;
+		}
+		if ( isWideWidth( blockAlignment ) ) {
+			return marginHorizontal;
+		}
+
+		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
+
+		if (
+			isFullWidth( parentBlockAlignment ) &&
+			! isWider( blockWidth, 'medium' )
+		) {
+			if (
+				isContainerRelated( blockName ) ||
+				isWider( screenWidth, 'mobile' )
+			) {
+				return marginHorizontal;
+			}
+			return marginHorizontal * 2;
+		}
+
+		if (
+			isContainerRelated( parentBlockName ) &&
+			! isContainerRelated( blockName )
+		) {
+			const isScreenWidthEqual = parentWidth === screenWidth;
+			if ( isScreenWidthEqual || isWider( screenWidth, 'mobile' ) ) {
+				return marginHorizontal * 2;
+			}
+		}
+
+		return marginHorizontal;
+	}
+
+	getContentStyles( readableContentViewStyle ) {
+		const {
+			blockAlignment,
+			blockName,
+			hasParents,
+			parentBlockName,
+		} = this.props;
+		const { isFullWidth, isContainerRelated } = alignmentHelpers;
+
+		return [
+			readableContentViewStyle,
+			isFullWidth( blockAlignment ) &&
+				! hasParents && {
+					width: styles.fullAlignment.width,
+				},
+			! blockAlignment &&
+				hasParents &&
+				! isContainerRelated( parentBlockName ) &&
+				isContainerRelated( blockName ) && {
+					paddingHorizontal: styles.fullAlignmentPadding.paddingLeft,
+				},
+		];
+	}
+
 	render() {
 		const {
+			blockAlignment,
 			clientId,
 			isReadOnly,
 			shouldShowInsertionPointBefore,
 			shouldShowInsertionPointAfter,
 			contentResizeMode,
 			shouldShowInnerBlockAppender,
+			parentWidth,
+			marginHorizontal,
+			blockName,
+			blockWidth,
 			...restProps
 		} = this.props;
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
+		const { isContainerRelated } = alignmentHelpers;
+
+		if ( ! blockWidth ) {
+			return null;
+		}
+
 		return (
-			<ReadableContentView style={ readableContentViewStyle }>
+			<ReadableContentView
+				align={ blockAlignment }
+				style={ [
+					readableContentViewStyle,
+					isContainerRelated( blockName ) &&
+						parentWidth && {
+							maxWidth: parentWidth + 2 * marginHorizontal,
+						},
+				] }
+			>
 				<View
-					style={ readableContentViewStyle }
+					style={ this.getContentStyles( readableContentViewStyle ) }
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
 				>
 					{ shouldShowInsertionPointBefore && (
@@ -47,7 +149,10 @@ export class BlockListItem extends Component {
 						key={ clientId }
 						showTitle={ false }
 						clientId={ clientId }
+						parentWidth={ parentWidth }
 						{ ...restProps }
+						marginHorizontal={ this.getMarginHorizontal() }
+						blockWidth={ blockWidth }
 					/>
 					{ ! shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter && (
@@ -67,7 +172,9 @@ export default compose( [
 				getBlockInsertionPoint,
 				isBlockInsertionPointVisible,
 				getSettings,
-			} = select( 'core/block-editor' );
+				getBlockParents,
+				__unstableGetBlockWithoutInnerBlocks,
+			} = select( blockEditorStore );
 
 			const blockClientIds = getBlockOrder( rootClientId );
 			const insertionPoint = getBlockInsertionPoint();
@@ -92,10 +199,27 @@ export default compose( [
 
 			const isReadOnly = getSettings().readOnly;
 
+			const block = __unstableGetBlockWithoutInnerBlocks( clientId );
+			const { attributes, name } = block || {};
+			const { align } = attributes || {};
+			const parents = getBlockParents( clientId, true );
+			const hasParents = !! parents.length;
+			const parentBlock = hasParents
+				? __unstableGetBlockWithoutInnerBlocks( parents[ 0 ] )
+				: {};
+			const { align: parentBlockAlignment } =
+				parentBlock?.attributes || {};
+			const { name: parentBlockName } = parentBlock || {};
+
 			return {
 				shouldShowInsertionPointBefore,
 				shouldShowInsertionPointAfter,
 				isReadOnly,
+				hasParents,
+				blockAlignment: align,
+				parentBlockAlignment,
+				blockName: name,
+				parentBlockName,
 			};
 		}
 	),

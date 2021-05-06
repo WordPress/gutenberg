@@ -332,6 +332,10 @@ export const EXPECTED_TRANSFORMS = {
 		originalBlock: 'Shortcode',
 		availableTransforms: [ 'Group' ],
 	},
+	'core__site-tagline': {
+		availableTransforms: [ 'Group' ],
+		originalBlock: 'Site Tagline',
+	},
 	'core__site-title': {
 		availableTransforms: [ 'Group' ],
 		originalBlock: 'Site Title',
@@ -510,6 +514,10 @@ export const EXPECTED_TRANSFORMS = {
 	},
 	'core__table__scope-attribute': {
 		originalBlock: 'Table',
+		availableTransforms: [ 'Group' ],
+	},
+	'core__table-of-contents': {
+		originalBlock: 'Table of Contents',
 		availableTransforms: [ 'Group' ],
 	},
 	'core__tag-cloud': {

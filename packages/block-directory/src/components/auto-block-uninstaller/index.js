@@ -4,17 +4,23 @@
 import { unregisterBlockType } from '@wordpress/blocks';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useEffect } from '@wordpress/element';
+import { store as editorStore } from '@wordpress/editor';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockDirectoryStore } from '../../store';
 
 export default function AutoBlockUninstaller() {
-	const { uninstallBlockType } = useDispatch( 'core/block-directory' );
+	const { uninstallBlockType } = useDispatch( blockDirectoryStore );
 
 	const shouldRemoveBlockTypes = useSelect( ( select ) => {
-		const { isAutosavingPost, isSavingPost } = select( 'core/editor' );
+		const { isAutosavingPost, isSavingPost } = select( editorStore );
 		return isSavingPost() && ! isAutosavingPost();
 	}, [] );
 
 	const unusedBlockTypes = useSelect(
-		( select ) => select( 'core/block-directory' ).getUnusedBlockTypes(),
+		( select ) => select( blockDirectoryStore ).getUnusedBlockTypes(),
 		[]
 	);
 

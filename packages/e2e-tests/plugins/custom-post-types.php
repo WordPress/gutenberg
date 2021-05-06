@@ -106,3 +106,27 @@ function hierarchical_without_title_cpt() {
 }
 add_action( 'init', 'hierarchical_without_title_cpt' );
 
+/**
+ * Registers a custom post type that includes a legacy block in `template`.
+ */
+function legacy_block_in_template_cpt() {
+	register_post_type(
+		'leg_block_in_tpl',
+		array(
+			'label'              => 'Legacy block in template',
+			'show_in_rest'       => true,
+			'public'             => true,
+			'publicly_queryable' => true,
+			'supports'           => array( 'title', 'editor', 'revisions' ),
+			'show_ui'            => true,
+			'show_in_menu'       => true,
+			'template'           => array(
+				array(
+					'core-embed/wordpress-tv',
+					array( 'className' => 'wordpress_video' ),
+				),
+			),
+		)
+	);
+}
+add_action( 'init', 'legacy_block_in_template_cpt' );

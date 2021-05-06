@@ -3,7 +3,7 @@
  */
 import { EntitiesSavedStates, PostPublishPanel } from '@wordpress/editor';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { Button } from '@wordpress/components';
+import { Button, createSlotFill } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useCallback } from '@wordpress/element';
 /**
@@ -11,6 +11,11 @@ import { useCallback } from '@wordpress/element';
  */
 import PluginPostPublishPanel from '../sidebar/plugin-post-publish-panel';
 import PluginPrePublishPanel from '../sidebar/plugin-pre-publish-panel';
+import { store as editPostStore } from '../../store';
+
+const { Fill, Slot } = createSlotFill( 'ActionsPanel' );
+
+export const ActionsPanelFill = Fill;
 
 export default function ActionsPanel( {
 	setEntitiesSavedStatesCallback,
@@ -18,7 +23,7 @@ export default function ActionsPanel( {
 	isEntitiesSavedStatesOpen,
 } ) {
 	const { closePublishSidebar, togglePublishSidebar } = useDispatch(
-		'core/edit-post'
+		editPostStore
 	);
 	const {
 		publishSidebarOpened,
@@ -28,10 +33,10 @@ export default function ActionsPanel( {
 	} = useSelect( ( select ) => {
 		return {
 			publishSidebarOpened: select(
-				'core/edit-post'
+				editPostStore
 			).isPublishSidebarOpened(),
-			hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-			isSavingMetaBoxes: select( 'core/edit-post' ).isSavingMetaBoxes(),
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			isSavingMetaBoxes: select( editPostStore ).isSavingMetaBoxes(),
 			hasNonPostEntityChanges: select(
 				'core/editor'
 			).hasNonPostEntityChanges(),
@@ -88,10 +93,10 @@ export default function ActionsPanel( {
 	// always mounted to retain its own component state (such as checkboxes).
 	return (
 		<>
-			<EntitiesSavedStates
-				isOpen={ isEntitiesSavedStatesOpen }
-				close={ closeEntitiesSavedStates }
-			/>
+			{ isEntitiesSavedStatesOpen && (
+				<EntitiesSavedStates close={ closeEntitiesSavedStates } />
+			) }
+			<Slot bubblesVirtually />
 			{ ! isEntitiesSavedStatesOpen && unmountableContent }
 		</>
 	);

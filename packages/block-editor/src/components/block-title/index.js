@@ -1,8 +1,23 @@
 /**
+ * External dependencies
+ */
+import { truncate } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { getBlockType } from '@wordpress/blocks';
+import {
+	getBlockType,
+	__experimentalGetBlockLabel as getBlockLabel,
+	isReusableBlock,
+} from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
+import useBlockDisplayInformation from '../use-block-display-information';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Renders the block's configured title as a string, or empty if the title
@@ -20,25 +35,43 @@ import { getBlockType } from '@wordpress/blocks';
  * @return {?string} Block title.
  */
 export default function BlockTitle( { clientId } ) {
-	const name = useSelect(
+	const { attributes, name, reusableBlockTitle } = useSelect(
 		( select ) => {
 			if ( ! clientId ) {
-				return null;
+				return {};
 			}
-			const { getBlockName } = select( 'core/block-editor' );
-			return getBlockName( clientId );
+			const {
+				getBlockName,
+				getBlockAttributes,
+				__experimentalGetReusableBlockTitle,
+			} = select( blockEditorStore );
+			const blockName = getBlockName( clientId );
+			if ( ! blockName ) {
+				return {};
+			}
+			const isReusable = isReusableBlock( getBlockType( blockName ) );
+			return {
+				attributes: getBlockAttributes( clientId ),
+				name: blockName,
+				reusableBlockTitle:
+					isReusable &&
+					__experimentalGetReusableBlockTitle(
+						getBlockAttributes( clientId ).ref
+					),
+			};
 		},
 		[ clientId ]
 	);
 
-	if ( ! name ) {
-		return null;
-	}
-
+	const blockInformation = useBlockDisplayInformation( clientId );
+	if ( ! name || ! blockInformation ) return null;
 	const blockType = getBlockType( name );
-	if ( ! blockType ) {
-		return null;
+	const label = reusableBlockTitle || getBlockLabel( blockType, attributes );
+	// Label will fallback to the title if no label is defined for the current
+	// label context. If the label is defined we prioritize it over possible
+	// possible block variation title match.
+	if ( label !== blockType.title ) {
+		return truncate( label, { length: 35 } );
 	}
-
-	return blockType.title;
+	return blockInformation.title;
 }

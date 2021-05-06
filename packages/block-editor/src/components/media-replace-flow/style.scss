@@ -15,11 +15,12 @@
 	margin-left: 4px;
 }
 
-.block-editor-media-replace-flow__media-upload-menu {
-	margin-bottom: $grid-unit-20;
-}
-
 .block-editor-media-flow__url-input {
+	border-top: $border-width solid $gray-900;
+	margin-top: $grid-unit-15;
+	margin-right: -$grid-unit-15;
+	margin-left: -$grid-unit-15;
+	padding: $grid-unit-15 $grid-unit-30 0;
 
 	.block-editor-media-replace-flow__image-url-label {
 		top: $grid-unit-20;

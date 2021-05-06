@@ -40,6 +40,24 @@ exports[`Multi-block selection should copy and paste 3`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Multi-block selection should copy multiple blocks 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>2</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Multi-block selection should cut and paste 1`] = `""`;
 
 exports[`Multi-block selection should cut and paste 2`] = `
@@ -137,5 +155,9 @@ exports[`Multi-block selection should set attributes for multiple paragraphs 1`]
 exports[`Multi-block selection should use selection direction to determine vertical edge 1`] = `
 "<!-- wp:paragraph -->
 <p>1<br>2.</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>3</p>
 <!-- /wp:paragraph -->"
 `;

@@ -9,13 +9,13 @@
 @import "./gallery/theme.scss";
 @import "./image/theme.scss";
 @import "./pullquote/theme.scss";
-@import "./navigation/theme.scss";
 @import "./quote/theme.scss";
 @import "./search/theme.scss";
 @import "./group/theme.scss";
 @import "./separator/theme.scss";
 @import "./table/theme.scss";
 @import "./video/theme.scss";
+@import "./template-part/theme.scss";
 
 // This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
 #end-resizable-editor-section {

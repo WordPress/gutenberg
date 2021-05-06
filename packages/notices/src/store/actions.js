@@ -40,6 +40,12 @@ import { DEFAULT_CONTEXT, DEFAULT_STATUS } from './constants';
  *                                                             readers.
  * @param {Array<WPNoticeAction>} [options.actions]            User actions to be
  *                                                             presented with notice.
+ * @param {Object}                [options.icon]               An icon displayed with the notice.
+ * @param {boolean}               [options.explicitDismiss]    Whether the notice includes
+ *                                                             an explict dismiss button and
+ *                                                             can't be dismissed by clicking
+ *                                                             the body of the notice.
+ * @param {Function}              [options.onDismiss]          Called when the notice is dismissed.
  *
  * @return {Object} Action object.
  */
@@ -52,6 +58,9 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 		actions = [],
 		type = 'default',
 		__unstableHTML,
+		icon = null,
+		explicitDismiss = false,
+		onDismiss = null,
 	} = options;
 
 	// The supported value shape of content is currently limited to plain text
@@ -71,6 +80,9 @@ export function createNotice( status = DEFAULT_STATUS, content, options = {} ) {
 			isDismissible,
 			actions,
 			type,
+			icon,
+			explicitDismiss,
+			onDismiss,
 		},
 	};
 }
