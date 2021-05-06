@@ -15,8 +15,7 @@
 
 	&:hover:not(.parent-selected):not(.child-selected):not(.is-dragging-blocks) {
 		> .block-editor-block-content-overlay__overlay {
-			background-color: var(--wp-admin-theme-color);
-			opacity: 0.1;
+			background: rgba(var(--wp-admin-theme-color--rgb), 0.1);
 			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 		}
 	}
