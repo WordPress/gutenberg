@@ -3,7 +3,7 @@
 At its simplest, a block in the WordPress block editor is a JSON object with a specific set of properties.
 
 <div class="callout callout-info">
-<strong>Note:</strong> Block development uses ESNext syntax, this refers to the latest JavaScript standard. If this is unfamiliar, review the <a href="/docs/how-to-guides/javascript/esnext-js.md">ESNext syntax documentation</a> to familiarize yourself with the newer syntax.
+<strong>Note:</strong> Block development uses ESNext syntax, this refers to the latest JavaScript standard. If this is unfamiliar, review the <a href="https://developer.wordpress.org/block-editor/how-to-guides/javascript/esnext-js/">ESNext syntax documentation</a> to familiarize yourself with the newer syntax.
 </div>
 
 The javascript part is done in the `src/index.js` file.
