@@ -68,18 +68,15 @@ class NativeEditorProvider extends Component {
 
 	componentDidMount() {
 		const { capabilities, colors, gradients } = this.props;
-		const isFSETheme = GLOBAL_STYLES_DATA?.isFSETheme;
+		const globalStyles =
+			GLOBAL_STYLES_DATA?.__experimentalGlobalStylesBaseStyles; // this will be passed through props
 
 		this.props.updateSettings( {
 			...capabilities,
 			// Set theme colors for the editor
 			...( colors ? { colors } : {} ),
 			...( gradients ? { gradients } : {} ),
-			...( isFSETheme
-				? getGlobalStyles(
-						GLOBAL_STYLES_DATA?.__experimentalGlobalStylesBaseStyles
-				  )
-				: {} ),
+			...( globalStyles ? getGlobalStyles( globalStyles ) : {} ),
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
