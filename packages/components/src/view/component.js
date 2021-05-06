@@ -19,8 +19,12 @@ import styled from '@emotion/styled';
  * 	);
  * }
  * ```
+ *
+ * @type {import('../context').PolymorphicComponent<'div', {}>}
  */
+// @ts-ignore
 const View = styled.div``;
+View.selector = 'components-view';
 View.displayName = 'View';
 
 export default View;
