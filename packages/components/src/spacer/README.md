@@ -9,7 +9,11 @@
 `Spacer` comes with a bunch of shorthand props to adjust `margin` and `padding`. The values of these props work as a multiplier to the library's grid system (base of `4px`).
 
 ```jsx
-import { Spacer } from '@wordpress/components';
+import {
+	__experimentalSpacer as Spacer,
+	__experimentalHeading as Heading,
+	__experimentalView as View
+} from '@wordpress/components';
 
 function Example() {
 	return (
