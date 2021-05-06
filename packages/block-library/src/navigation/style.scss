@@ -397,9 +397,10 @@
 			}
 		}
 
-		// Remove user-set background colors for items inside the overlay menu.
+		// Remove background colors for items inside the overlay menu.
 		// Has to be !important to override global styles.
-		.wp-block-navigation-link.has-background {
+		.wp-block-pages-list__item,
+		.wp-block-navigation-link {
 			background: transparent !important;
 		}
 	}

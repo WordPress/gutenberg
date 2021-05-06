@@ -348,7 +348,7 @@ $color-control-label-height: 20px;
 		top: $admin-bar-height-big + $header-height + $block-toolbar-height;
 
 		@include break-medium() {
-			top: $header-height;
+			top: $header-height + $border-width;
 		}
 	}
 }
