@@ -108,7 +108,7 @@ function TemplatePartsByArea( {
 	setAttributes,
 	onClose,
 	composite,
-	area,
+	area = 'uncategorized',
 } ) {
 	const templatePartsByArea = useMemo( () => {
 		return templateParts.filter( ( item ) => item.area === area );
