@@ -81,7 +81,7 @@ function ColorPalette( {
 	useEffect( () => {
 		if ( scrollViewRef.current ) {
 			if ( isSelectedCustom() ) {
-				scrollViewRef.current.scrollToEnd();
+				scrollToEndWithDelay();
 			} else {
 				scrollViewRef.current.scrollTo( { x: 0, y: 0 } );
 			}
@@ -164,8 +164,17 @@ function ColorPalette( {
 	function onContentSizeChange( width ) {
 		contentWidth = width;
 		if ( isSelectedCustom() && scrollViewRef.current ) {
-			scrollViewRef.current.scrollToEnd( { animated: ! isIOS } );
+			scrollToEndWithDelay();
 		}
+	}
+
+	function scrollToEndWithDelay() {
+		const delayedScroll = setTimeout( () => {
+			scrollViewRef.current.scrollToEnd();
+		}, ANIMATION_DURATION );
+		return () => {
+			clearTimeout( delayedScroll );
+		};
 	}
 
 	function onCustomIndicatorLayout( { nativeEvent } ) {
