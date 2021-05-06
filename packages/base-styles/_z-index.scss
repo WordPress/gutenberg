@@ -81,9 +81,6 @@ $z-layers: (
 	".block-editor-block-pattern-setup .{next,previous}-slide": 101,
 	".block-editor-block-pattern-setup .active-slide": 102,
 
-	// Block content clickthrough overlay
-	".block-editor-block-content-overlay .block-editor-block-content-overlay__overlay": 100,
-
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
 	".interface-interface-skeleton__sidebar": 100000,
