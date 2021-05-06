@@ -112,11 +112,10 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// In the site editor, the user can change styles, so the client
 	// needs the ability to create them. Hence, we pass it some data
 	// for this: base styles (core+theme) and the ID of the user CPT.
-	$screen = get_current_screen();
 	if (
-		! empty( $screen ) &&
+		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
-		gutenberg_is_edit_site_page( $screen->id ) &&
+		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
 		WP_Theme_JSON_Resolver::theme_has_support() &&
 		gutenberg_supports_block_templates()
 	) {
