@@ -102,7 +102,7 @@ const Cover = ( {
 		customOverlayColor,
 		minHeightUnit = 'px',
 		allowedBlocks,
-		templateLock = false,
+		templateLock,
 	} = attributes;
 	const [ isScreenReaderEnabled, setIsScreenReaderEnabled ] = useState(
 		false
