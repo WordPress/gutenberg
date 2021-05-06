@@ -53,7 +53,6 @@ export { default as desktop } from './library/desktop';
 export { default as dragHandle } from './library/drag-handle';
 export { default as download } from './library/download';
 export { default as edit } from './library/edit';
-export { default as expand } from './library/expand';
 export { default as external } from './library/external';
 export { default as file } from './library/file';
 export { default as flipHorizontal } from './library/flip-horizontal';
