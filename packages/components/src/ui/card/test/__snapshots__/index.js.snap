@@ -11,8 +11,8 @@ Snapshot Diff:
         title="WordPress.org"
       />
       <div
--       class="css-yc36db-InnerBody components-card-inner-body css-1mm2cvy-View egi4jkx0"
-+       class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View egi4jkx0"
+-       class="css-yc36db-InnerBody components-card-inner-body css-1mm2cvy-View em57xhy0"
++       class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
         data-wp-c16t="true"
 -       data-wp-component="CardInnerBody"
 +       data-wp-component="CardBody"
@@ -20,7 +20,7 @@ Snapshot Diff:
         Code is Poetry.
       </div>
       <div
-        class="components-flex components-card-footer css-g6s6xo-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View egi4jkx0"
+        class="components-flex components-card-footer css-g6s6xo-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View em57xhy0"
 `;
 
 exports[`props should render correctly 1`] = `
@@ -257,19 +257,19 @@ Snapshot Diff:
 
 @@ -6,16 +6,16 @@
     <div
-      class="css-1mm2cvy-View egi4jkx0"
+      class="css-1mm2cvy-View em57xhy0"
     />
     <div
       aria-hidden="true"
--     class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View egi4jkx0"
-+     class="components-elevation css-xtff41-Elevation css-1mm2cvy-View egi4jkx0"
+-     class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View em57xhy0"
++     class="components-elevation css-xtff41-Elevation css-1mm2cvy-View em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Elevation"
     />
     <div
       aria-hidden="true"
--     class="components-elevation css-1ajhhcx-Elevation css-1mm2cvy-View egi4jkx0"
-+     class="components-elevation css-hdn3qt-Elevation css-1mm2cvy-View egi4jkx0"
+-     class="components-elevation css-1ajhhcx-Elevation css-1mm2cvy-View em57xhy0"
++     class="components-elevation css-hdn3qt-Elevation css-1mm2cvy-View em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Elevation"
     />
