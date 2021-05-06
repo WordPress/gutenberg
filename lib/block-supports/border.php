@@ -57,7 +57,13 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		isset( $block_attributes['style']['border']['radius'] )
 	) {
 		$border_radius = $block_attributes['style']['border']['radius'];
-		$styles[]      = sprintf( 'border-radius: %s;', $border_radius );
+
+		// This check handles original unitless implementation.
+		if ( is_numeric( $border_radius ) ) {
+			$border_radius .= 'px';
+		}
+
+		$styles[] = sprintf( 'border-radius: %s;', $border_radius );
 	}
 
 	// Border style.
@@ -75,7 +81,13 @@ function gutenberg_apply_border_support( $block_type, $block_attributes ) {
 		isset( $block_attributes['style']['border']['width'] )
 	) {
 		$border_width = $block_attributes['style']['border']['width'];
-		$styles[]     = sprintf( 'border-width: %s;', $border_width );
+
+		// This check handles original unitless implementation.
+		if ( is_numeric( $border_width ) ) {
+			$border_width .= 'px';
+		}
+
+		$styles[] = sprintf( 'border-width: %s;', $border_width );
 	}
 
 	// Border color.
