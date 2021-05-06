@@ -89,6 +89,11 @@ module.exports = {
 						message:
 							'Please use `combineReducers` from `@wordpress/data` instead.',
 					},
+					{
+						name: 'puppeteer-testing-library',
+						message:
+							'`puppeteer-testing-library` is still experimental.',
+					},
 				],
 			},
 		],
@@ -204,7 +209,7 @@ module.exports = {
 			},
 		},
 		{
-			files: [ 'bin/**/*.js' ],
+			files: [ 'bin/**/*.js', 'packages/env/**' ],
 			rules: {
 				'no-console': 'off',
 			},

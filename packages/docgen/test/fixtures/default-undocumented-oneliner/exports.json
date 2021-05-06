@@ -12,10 +12,7 @@
 			"column": 29
 		}
 	},
-	"range": [
-		34,
-		63
-	],
+	"range": [ 34, 63 ],
 	"declaration": {
 		"type": "FunctionDeclaration",
 		"start": 49,
@@ -30,10 +27,7 @@
 				"column": 29
 			}
 		},
-		"range": [
-			49,
-			63
-		],
+		"range": [ 49, 63 ],
 		"id": null,
 		"generator": false,
 		"expression": false,
@@ -53,10 +47,7 @@
 					"column": 29
 				}
 			},
-			"range": [
-				60,
-				63
-			],
+			"range": [ 60, 63 ],
 			"body": []
 		}
 	},
@@ -66,10 +57,7 @@
 			"value": " This comment should be ignored",
 			"start": 0,
 			"end": 33,
-			"range": [
-				0,
-				33
-			],
+			"range": [ 0, 33 ],
 			"loc": {
 				"start": {
 					"line": 1,

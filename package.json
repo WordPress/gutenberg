@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "10.3.0-rc.1",
+	"version": "10.6.0-rc.1",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -80,6 +80,7 @@
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
+		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
@@ -91,14 +92,15 @@
 		"@babel/traverse": "7.13.0",
 		"@octokit/rest": "16.26.0",
 		"@octokit/webhooks": "7.1.0",
-		"@storybook/addon-a11y": "6.2.0-rc.8",
-		"@storybook/addon-docs": "6.2.0-rc.8",
-		"@storybook/addon-knobs": "6.2.0-rc.8",
-		"@storybook/addon-storysource": "6.2.0-rc.8",
-		"@storybook/addon-viewport": "6.2.0-rc.8",
-		"@storybook/react": "6.2.0-rc.8",
+		"@storybook/addon-a11y": "6.2.5",
+		"@storybook/addon-docs": "6.2.5",
+		"@storybook/addon-knobs": "6.2.5",
+		"@storybook/addon-storysource": "6.2.5",
+		"@storybook/addon-viewport": "6.2.5",
+		"@storybook/react": "6.2.5",
 		"@testing-library/jest-dom": "5.11.9",
 		"@testing-library/react": "11.2.2",
+		"@testing-library/react-native": "7.1.0",
 		"@types/classnames": "2.2.10",
 		"@types/eslint": "6.8.0",
 		"@types/estree": "0.0.44",
@@ -149,11 +151,11 @@
 		"babel-plugin-react-native-platform-specific-extensions": "1.1.1",
 		"babel-plugin-transform-remove-console": "6.9.4",
 		"benchmark": "2.1.4",
-		"browserslist": "4.15.0",
+		"browserslist": "4.16.5",
 		"chalk": "4.0.0",
 		"commander": "4.1.0",
 		"concurrently": "3.5.0",
-		"copy-webpack-plugin": "4.5.2",
+		"copy-webpack-plugin": "5.1.2",
 		"cross-env": "3.2.4",
 		"css-loader": "5.1.3",
 		"cssnano": "4.1.10",
@@ -193,7 +195,7 @@
 		"react-test-renderer": "16.13.1",
 		"rimraf": "3.0.2",
 		"rtlcss": "2.6.2",
-		"sass": "1.26.11",
+		"sass": "1.26.12",
 		"sass-loader": "10.1.1",
 		"semver": "7.3.2",
 		"simple-git": "^2.35.0",
@@ -229,6 +231,7 @@
 		"fixtures:clean": "rimraf \"packages/e2e-tests/fixtures/blocks/*.+(json|serialized.html)\"",
 		"fixtures:generate": "cross-env GENERATE_MISSING_FIXTURES=y npm run test-unit",
 		"fixtures:regenerate": "npm run fixtures:clean && npm run fixtures:generate",
+		"format": "wp-scripts format",
 		"format-js": "wp-scripts format-js",
 		"format-php": "wp-env run composer run-script format",
 		"lint": "concurrently \"npm run lint-lockfile\" \"npm run lint-js\" \"npm run lint-pkg-json\" \"npm run lint-css\"",
@@ -248,7 +251,7 @@
 		"prepublishOnly": "npm run clean:package-types && npm run build:packages",
 		"publish:check": "lerna updated",
 		"publish:patch": "lerna publish --dist-tag patch",
-		"publish:prod": "lerna publish",
+		"publish:latest": "lerna publish",
 		"test": "npm run lint && npm run test-unit",
 		"test:create-block": "./bin/test-create-block.sh",
 		"test-e2e": "wp-scripts test-e2e --config packages/e2e-tests/jest.config.js",
@@ -291,8 +294,8 @@
 		"*.scss": [
 			"wp-scripts lint-style"
 		],
-		"*.{js,ts,tsx}": [
-			"wp-scripts format-js",
+		"*.{js,ts,tsx,yml}": [
+			"wp-scripts format",
 			"wp-scripts lint-js"
 		],
 		"{docs/{toc.json,tool/*.js},packages/{*/README.md,components/src/*/**/README.md}}": [

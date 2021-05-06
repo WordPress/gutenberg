@@ -17,9 +17,9 @@ wp_enqueue_script(
 ```
 
 After the dependency is declared, you can access the module in your JavaScript code using the global `wp` like so:
+
 ```js
 const { PlainText } = wp.editor;
-
 ```
 
 ## Using the Packages via npm
@@ -35,6 +35,5 @@ npm install @wordpress/block-editor --save
 Once installed, you can access the component in your code using:
 
 ```js
-import { PlainText }  from '@wordpress/block-editor';
+import { PlainText } from '@wordpress/block-editor';
 ```
-

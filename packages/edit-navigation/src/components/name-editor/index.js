@@ -9,8 +9,9 @@ import { useEffect, useRef, useContext } from '@wordpress/element';
 import { TextControl } from '@wordpress/components';
 import {
 	IsMenuNameControlFocusedContext,
+	untitledMenu,
 	useMenuEntity,
-	useSelectedMenuData,
+	useSelectedMenuId,
 } from '../../hooks';
 
 export function NameEditor() {
@@ -18,8 +19,15 @@ export function NameEditor() {
 		IsMenuNameControlFocusedContext
 	);
 
-	const { menuId } = useSelectedMenuData();
-	const { editMenuName, editedMenuName } = useMenuEntity( menuId );
+	const [ menuId ] = useSelectedMenuId();
+	const { editedMenu, editMenuEntityRecord, menuEntityData } = useMenuEntity(
+		menuId
+	);
+	const editedMenuName = menuId && editedMenu.name;
+
+	const editMenuName = ( name = untitledMenu ) =>
+		editMenuEntityRecord( ...menuEntityData, { name } );
+
 	const inputRef = useRef();
 	useEffect( () => {
 		if ( isMenuNameEditFocused ) inputRef.current.focus();
@@ -35,9 +43,7 @@ export function NameEditor() {
 				onBlur={ () => setIsMenuNameEditFocused( false ) }
 				className="edit-navigation-name-editor__text-control"
 				value={ editedMenuName }
-				onChange={ ( value ) => {
-					editMenuName( value );
-				} }
+				onChange={ editMenuName }
 			/>
 		</>
 	);

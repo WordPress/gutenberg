@@ -217,9 +217,9 @@ function gutenberg_register_vendor_scripts( $scripts ) {
 	gutenberg_register_vendor_script(
 		$scripts,
 		'object-fit-polyfill',
-		'https://unpkg.com/objectFitPolyfill@2.3.0/dist/objectFitPolyfill.min.js',
+		'https://unpkg.com/objectFitPolyfill@2.3.5/dist/objectFitPolyfill.min.js',
 		array(),
-		'2.3.0'
+		'2.3.5'
 	);
 }
 add_action( 'wp_default_scripts', 'gutenberg_register_vendor_scripts' );
@@ -360,6 +360,11 @@ function gutenberg_register_packages_styles( $styles ) {
 		'wp-reusable-blocks',
 	);
 
+	// Only load the default layout and margin styles for themes without theme.json file.
+	if ( ! WP_Theme_JSON_Resolver::theme_has_support() ) {
+		$wp_edit_blocks_dependencies[] = 'wp-editor-classic-layout-styles';
+	}
+
 	global $editor_styles;
 	if ( ! is_array( $editor_styles ) || count( $editor_styles ) === 0 ) {
 		// Include opinionated block styles if no $editor_styles are declared, so the editor never appears broken.
@@ -370,10 +375,19 @@ function gutenberg_register_packages_styles( $styles ) {
 		$styles,
 		'wp-reset-editor-styles',
 		gutenberg_url( 'build/block-library/reset.css' ),
-		array(),
+		array( 'common', 'forms' ), // Make sure the reset is loaded after the default WP Adminn styles.
 		$version
 	);
 	$styles->add_data( 'wp-reset-editor-styles', 'rtl', 'replace' );
+
+	gutenberg_override_style(
+		$styles,
+		'wp-editor-classic-layout-styles',
+		gutenberg_url( 'build/edit-post/classic.css' ),
+		array(),
+		$version
+	);
+	$styles->add_data( 'wp-editor-classic-layout-styles', 'rtl', 'replace' );
 
 	gutenberg_override_style(
 		$styles,
@@ -606,6 +620,8 @@ function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = arra
 /**
  * Extends block editor settings to remove the Gutenberg's `editor-styles.css`;
  *
+ * This can be removed when plugin support requires WordPress 5.8.0+.
+ *
  * @param array $settings Default editor settings.
  *
  * @return array Filtered editor settings.
@@ -615,38 +631,39 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 		$settings['styles'] = array();
 	} else {
 		/*
-		 * The styles setting is an array of CSS strings, so there is no direct
-		 * way to find the default styles. To maximize stability, load (again)
-		 * the default styles from disk and find its place in the array.
-		 *
-		 * See: https://github.com/WordPress/wordpress-develop/blob/5.0.3/src/wp-admin/edit-form-blocks.php#L168-L175
+		 * WordPress versions prior to 5.8 include a legacy editor styles file
+		 * that need to be removed.
+		 * This code can be removed from the Gutenberg plugin when the supported WP
+		 * version is 5.8
 		 */
+		$default_styles_file = is_rtl() ?
+			ABSPATH . WPINC . '/css/dist/editor/editor-styles-rtl.css' :
+			ABSPATH . WPINC . '/css/dist/editor/editor-styles.css';
 
-		$default_styles = file_get_contents(
-			is_rtl() ?
-				ABSPATH . WPINC . '/css/dist/editor/editor-styles-rtl.css' :
-				ABSPATH . WPINC . '/css/dist/editor/editor-styles.css'
-		);
+		if ( file_exists( $default_styles_file ) ) {
+			$default_styles = file_get_contents(
+				$default_styles_file
+			);
 
-		/*
-		 * Iterate backwards from the end of the array since the preferred
-		 * insertion point in case not found is prepended as first entry.
-		 */
-		for ( $i = count( $settings['styles'] ) - 1; $i >= 0; $i-- ) {
-			if ( isset( $settings['styles'][ $i ]['css'] ) &&
-					$default_styles === $settings['styles'][ $i ]['css'] ) {
-				break;
+			/*
+			* Iterate backwards from the end of the array since the preferred
+			* insertion point in case not found is prepended as first entry.
+			*/
+			for ( $i = count( $settings['styles'] ) - 1; $i >= 0; $i-- ) {
+				if ( isset( $settings['styles'][ $i ]['css'] ) &&
+						$default_styles === $settings['styles'][ $i ]['css'] ) {
+					break;
+				}
+			}
+
+			if ( isset( $i ) && $i >= 0 ) {
+				unset( $settings['styles'][ $i ] );
 			}
 		}
 	}
 
-	// Substitute default styles if found. Otherwise, prepend to setting array.
-	if ( isset( $i ) && $i >= 0 ) {
-		unset( $settings['styles'][ $i ] );
-	}
-
 	// Remove the default font editor styles for FSE themes.
-	if ( gutenberg_is_fse_theme() ) {
+	if ( WP_Theme_JSON_Resolver::theme_has_support() ) {
 		foreach ( $settings['styles'] as $j => $style ) {
 			if ( 0 === strpos( $style['css'], 'body { font-family:' ) ) {
 				unset( $settings['styles'][ $j ] );
@@ -656,24 +673,36 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( function_exists( 'get_block_editor_settings' ) ) {
+	add_filter( 'block_editor_settings_all', 'gutenberg_extend_block_editor_styles' );
+} else {
+	add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
+}
 
 /**
  * Adds a flag to the editor settings to know whether we're in FSE theme or not.
+ *
+ * This can be removed when plugin support requires WordPress 5.8.0+.
  *
  * @param array $settings Default editor settings.
  *
  * @return array Filtered editor settings.
  */
 function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings ) {
-	$settings['isFSETheme'] = gutenberg_is_fse_theme();
+	$settings['supportsTemplateMode'] = gutenberg_supports_block_templates();
 
 	// Enable the new layout options for themes with a theme.json file.
 	$settings['supportsLayout'] = WP_Theme_JSON_Resolver::theme_has_support();
 
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( function_exists( 'get_block_editor_settings' ) ) {
+	add_filter( 'block_editor_settings_all', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
+} else {
+	add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
+}
 
 /**
  * Sets the editor styles to be consumed by JS.
@@ -711,6 +740,8 @@ function gutenberg_extend_block_editor_styles_html() {
 	echo "<script>window.__editorStyles = $editor_styles</script>";
 }
 add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
+add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
+add_action( 'admin_footer-post-new.php', 'gutenberg_extend_block_editor_styles_html' );
 
 /**
  * Adds a polyfill for object-fit in environments which do not support it.

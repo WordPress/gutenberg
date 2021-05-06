@@ -1,6 +1,6 @@
 ## Alignment Control
 
-The `AlignmentControl` component renders a dropdown mmmenu that displays alignment options for the selected block.
+The `AlignmentControl` component renders a dropdown menu that displays alignment options for the selected block.
 
 This component is mostly used for blocks that display text, such as Heading, Paragraph, Post Author, Post Comments, Verse, Quote, Post Title, etc... And the available alignment options are `left`, `center` or `right` alignment.
 
@@ -31,22 +31,24 @@ const MyAlignmentToolbar = () => (
 	</BlockControls>
 );
 ```
+
 _Note:_ In this example that we render `AlignmentControl` as a child of the `BlockControls` component.
 
 ### Props
 
 ### `value`
-* **Type:** `String`
-* **Default:** `undefined`
-* **Options:**: `left`, `center`, `right`
+
+-   **Type:** `String`
+-   **Default:** `undefined`
+-   **Options:**: `left`, `center`, `right`
 
 The current value of the alignment setting. You may only choose from the `Options` listed above.
 
 ### `onChange`
-* **Type:** `Function`
+
+-   **Type:** `Function`
 
 A callback function invoked when the toolbar's alignment value is changed via an interaction with any of the toolbar's buttons. Called with the new alignment value (ie: `left`, `center`, `right`, `undefined`) as the only argument.
-
 
 ## Related components
 

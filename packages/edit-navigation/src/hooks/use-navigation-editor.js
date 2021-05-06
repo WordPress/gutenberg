@@ -1,12 +1,17 @@
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+
 /**
  * Internal dependencies
  */
 import { store as editNavigationStore } from '../store';
+import { useSelectedMenuId } from './index';
 
 const getMenusData = ( select ) => {
 	const selectors = select( 'core' );
@@ -27,24 +32,31 @@ export default function useNavigationEditor() {
 		true,
 		false,
 	].map( ( bool ) => () => setIsManageLocationsModalOpen( bool ) );
-	const { deleteMenu: _deleteMenu } = useDispatch( 'core' );
-	const [ selectedMenuId, setSelectedMenuId ] = useState( null );
+	const { deleteMenu: _deleteMenu } = useDispatch( coreStore );
+	const [ selectedMenuId, setSelectedMenuId ] = useSelectedMenuId();
 	const [ hasFinishedInitialLoad, setHasFinishedInitialLoad ] = useState(
 		false
 	);
-
 	const { menus, hasLoadedMenus } = useSelect( getMenusData, [] );
+
+	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
+	const isMenuBeingDeleted = useSelect(
+		( select ) =>
+			select( coreStore ).isDeletingEntityRecord(
+				'root',
+				'menu',
+				selectedMenuId
+			),
+		[ selectedMenuId ]
+	);
+	const selectedMenuName =
+		menus?.find( ( { id } ) => id === selectedMenuId )?.name || '';
+
 	useEffect( () => {
 		if ( hasLoadedMenus ) {
 			setHasFinishedInitialLoad( true );
 		}
 	}, [ hasLoadedMenus ] );
-
-	useEffect( () => {
-		if ( ! selectedMenuId && menus?.length ) {
-			setSelectedMenuId( menus[ 0 ].id );
-		}
-	}, [ selectedMenuId, menus ] );
 
 	const navigationPost = useSelect(
 		( select ) => {
@@ -63,20 +75,35 @@ export default function useNavigationEditor() {
 			force: true,
 		} );
 		if ( didDeleteMenu ) {
-			setSelectedMenuId( null );
+			setSelectedMenuId( 0 );
+			createInfoNotice(
+				sprintf(
+					// translators: %s: the name of a menu.
+					__( '"%s" menu has been deleted' ),
+					selectedMenuName
+				),
+				{
+					type: 'snackbar',
+					isDismissible: true,
+				}
+			);
+		} else {
+			createErrorNotice( __( 'Menu deletion unsuccessful' ) );
 		}
 	};
 
 	return {
 		menus,
+		hasLoadedMenus,
+		hasFinishedInitialLoad,
 		selectedMenuId,
 		navigationPost,
+		isMenuBeingDeleted,
 		selectMenu: setSelectedMenuId,
 		deleteMenu,
-		hasFinishedInitialLoad,
-		hasLoadedMenus,
 		openManageLocationsModal,
 		closeManageLocationsModal,
 		isManageLocationsModalOpen,
+		isMenuSelected: !! selectedMenuId,
 	};
 }

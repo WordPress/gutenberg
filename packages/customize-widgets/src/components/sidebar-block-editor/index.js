@@ -1,56 +1,64 @@
 /**
+ * External dependencies
+ */
+import { defaultTo } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { useReducer, createPortal } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
+import { useSelect } from '@wordpress/data';
+import { useMemo, createPortal } from '@wordpress/element';
 import {
-	BlockEditorProvider,
 	BlockList,
 	BlockSelectionClearer,
+	BlockInspector,
 	ObserveTyping,
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
-	__experimentalBlockSettingsMenuFirstItem,
+	__unstableBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
-import {
-	DropZoneProvider,
-	SlotFillProvider,
-	Popover,
-} from '@wordpress/components';
+import { SlotFillProvider, Popover } from '@wordpress/components';
+import { uploadMedia } from '@wordpress/media-utils';
 
 /**
  * Internal dependencies
  */
-import Inspector, { BlockInspectorButton } from '../inspector';
-import useSidebarBlockEditor from './use-sidebar-block-editor';
+import BlockInspectorButton from '../block-inspector-button';
+import Header from '../header';
+import useInserter from '../inserter/use-inserter';
+import SidebarEditorProvider from './sidebar-editor-provider';
 
-const inspectorOpenStateReducer = ( state, action ) => {
-	switch ( action ) {
-		case 'OPEN':
-			return {
-				open: true,
-				busy: true,
+export default function SidebarBlockEditor( {
+	blockEditorSettings,
+	sidebar,
+	inserter,
+	inspector,
+} ) {
+	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
+	const hasUploadPermissions = useSelect(
+		( select ) =>
+			defaultTo( select( coreStore ).canUser( 'create', 'media' ), true ),
+		[]
+	);
+	const settings = useMemo( () => {
+		let mediaUploadBlockEditor;
+		if ( hasUploadPermissions ) {
+			mediaUploadBlockEditor = ( { onError, ...argumentsObject } ) => {
+				uploadMedia( {
+					wpAllowedMimeTypes: blockEditorSettings.allowedMimeTypes,
+					onError: ( { message } ) => onError( message ),
+					...argumentsObject,
+				} );
 			};
-		case 'TRANSITION_END':
-			return {
-				...state,
-				busy: false,
-			};
-		case 'CLOSE':
-			return {
-				open: false,
-				busy: true,
-			};
-		default:
-			throw new Error( 'Unexpected action' );
-	}
-};
+		}
 
-export default function SidebarBlockEditor( { sidebar } ) {
-	const [ blocks, onInput, onChange ] = useSidebarBlockEditor( sidebar );
-	const [
-		{ open: isInspectorOpened, busy: isInspectorAnimating },
-		setInspectorOpenState,
-	] = useReducer( inspectorOpenStateReducer, { open: false, busy: false } );
+		return {
+			...blockEditorSettings,
+			__experimentalSetIsInserterOpened: setIsInserterOpened,
+			mediaUpload: mediaUploadBlockEditor,
+		};
+	}, [ hasUploadPermissions, blockEditorSettings ] );
 	const parentContainer = document.getElementById(
 		'customize-theme-controls'
 	);
@@ -59,56 +67,54 @@ export default function SidebarBlockEditor( { sidebar } ) {
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
 			<SlotFillProvider>
-				<DropZoneProvider>
-					<div hidden={ isInspectorOpened && ! isInspectorAnimating }>
-						<BlockEditorProvider
-							value={ blocks }
-							onInput={ onInput }
-							onChange={ onChange }
-							useSubRegistry={ false }
-						>
-							<BlockEditorKeyboardShortcuts />
+				<SidebarEditorProvider
+					sidebar={ sidebar }
+					settings={ settings }
+				>
+					<BlockEditorKeyboardShortcuts />
 
-							<BlockSelectionClearer>
-								<WritingFlow>
-									<ObserveTyping>
-										<BlockList />
-									</ObserveTyping>
-								</WritingFlow>
-							</BlockSelectionClearer>
-						</BlockEditorProvider>
+					<Header
+						inserter={ inserter }
+						isInserterOpened={ isInserterOpened }
+						setIsInserterOpened={ setIsInserterOpened }
+					/>
 
+					<div className="customize-widgets__contextual-toolbar-wrapper">
 						<Popover.Slot name="block-toolbar" />
 					</div>
 
+					<BlockSelectionClearer>
+						<WritingFlow>
+							<ObserveTyping>
+								<BlockList />
+							</ObserveTyping>
+						</WritingFlow>
+					</BlockSelectionClearer>
+
 					{ createPortal(
-						<Inspector
-							isOpened={ isInspectorOpened }
-							isAnimating={ isInspectorAnimating }
-							setInspectorOpenState={ setInspectorOpenState }
-						/>,
-						parentContainer
+						// This is a temporary hack to prevent button component inside <BlockInspector>
+						// from submitting form when type="button" is not specified.
+						<form onSubmit={ ( event ) => event.preventDefault() }>
+							<BlockInspector />
+						</form>,
+						inspector.contentContainer[ 0 ]
 					) }
+				</SidebarEditorProvider>
 
-					<__experimentalBlockSettingsMenuFirstItem>
-						{ ( { onClose } ) => (
-							<BlockInspectorButton
-								onClick={ () => {
-									// Open the inspector,
-									setInspectorOpenState( 'OPEN' );
-									// Then close the dropdown menu.
-									onClose();
-								} }
-							/>
-						) }
-					</__experimentalBlockSettingsMenuFirstItem>
+				<__unstableBlockSettingsMenuFirstItem>
+					{ ( { onClose } ) => (
+						<BlockInspectorButton
+							inspector={ inspector }
+							closeMenu={ onClose }
+						/>
+					) }
+				</__unstableBlockSettingsMenuFirstItem>
 
-					{
-						// We have to portal this to the parent of both the editor and the inspector,
-						// so that the popovers will appear above both of them.
-						createPortal( <Popover.Slot />, parentContainer )
-					}
-				</DropZoneProvider>
+				{
+					// We have to portal this to the parent of both the editor and the inspector,
+					// so that the popovers will appear above both of them.
+					createPortal( <Popover.Slot />, parentContainer )
+				}
 			</SlotFillProvider>
 		</>
 	);

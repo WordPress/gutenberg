@@ -123,6 +123,13 @@ A callback function for visualizer changes, based on input hover interactions.
 -   Type: `Function`
 -   Required: Yes
 
+### sides
+
+Collection of sides to allow control of. If omitted or empty, all sides will be available.
+
+-   Type: `Array<Object>`
+-   Required: No
+
 ### units
 
 Collection of available units which are compatible with [UnitControl](../unit-control).

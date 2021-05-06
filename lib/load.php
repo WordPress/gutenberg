@@ -9,6 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( 'Silence is golden.' );
 }
 
+require_once __DIR__ . '/init.php';
 require_once __DIR__ . '/upgrade.php';
 
 /**
@@ -61,6 +62,9 @@ if ( class_exists( 'WP_REST_Controller' ) ) {
 	if ( ! class_exists( 'WP_REST_Templates_Controller' ) ) {
 		require_once __DIR__ . '/full-site-editing/class-wp-rest-templates-controller.php';
 	}
+	if ( ! class_exists( 'WP_REST_Block_Editor_Settings_Controller' ) ) {
+		require_once dirname( __FILE__ ) . '/class-wp-rest-block-editor-settings-controller.php';
+	}
 	/**
 	* End: Include for phase 2
 	*/
@@ -88,6 +92,8 @@ if ( ! class_exists( 'WP_Block_Template ' ) ) {
 
 // These are used by some FSE features
 // as well as global styles.
+require __DIR__ . '/interface-wp-theme-json-schema.php';
+require __DIR__ . '/class-wp-theme-json-schema-v0.php';
 require __DIR__ . '/class-wp-theme-json.php';
 require __DIR__ . '/class-wp-theme-json-resolver.php';
 
@@ -103,6 +109,7 @@ require __DIR__ . '/full-site-editing/edit-site-page.php';
 require __DIR__ . '/full-site-editing/edit-site-export.php';
 
 require __DIR__ . '/blocks.php';
+require __DIR__ . '/block-editor.php';
 require __DIR__ . '/block-patterns.php';
 require __DIR__ . '/client-assets.php';
 require __DIR__ . '/demo.php';
@@ -122,3 +129,5 @@ require __DIR__ . '/block-supports/typography.php';
 require __DIR__ . '/block-supports/custom-classname.php';
 require __DIR__ . '/block-supports/border.php';
 require __DIR__ . '/block-supports/layout.php';
+require __DIR__ . '/block-supports/padding.php';
+require __DIR__ . '/block-supports/duotone.php';

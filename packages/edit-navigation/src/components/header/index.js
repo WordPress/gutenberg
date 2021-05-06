@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { find } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { DropdownMenu } from '@wordpress/components';
@@ -15,15 +10,17 @@ import { __, sprintf } from '@wordpress/i18n';
  */
 import SaveButton from './save-button';
 import MenuSwitcher from '../menu-switcher';
+import { useMenuEntity } from '../../hooks';
 
 export default function Header( {
+	isMenuSelected,
 	menus,
 	selectedMenuId,
 	onSelectMenu,
 	isPending,
 	navigationPost,
 } ) {
-	const selectedMenu = find( menus, { id: selectedMenuId } );
+	const { editedMenu: selectedMenu } = useMenuEntity( selectedMenuId );
 	const menuName = selectedMenu ? selectedMenu.name : undefined;
 	let actionHeaderText;
 
@@ -40,8 +37,6 @@ export default function Header( {
 		actionHeaderText = __( 'No menus available' );
 	}
 
-	const hasMenus = !! menus?.length;
-
 	return (
 		<div className="edit-navigation-header">
 			<div className="edit-navigation-header__title-subtitle">
@@ -49,10 +44,10 @@ export default function Header( {
 					{ __( 'Navigation' ) }
 				</h1>
 				<h2 className="edit-navigation-header__subtitle">
-					{ hasMenus && actionHeaderText }
+					{ isMenuSelected && actionHeaderText }
 				</h2>
 			</div>
-			{ hasMenus && (
+			{ isMenuSelected && (
 				<div className="edit-navigation-header__actions">
 					<DropdownMenu
 						icon={ null }

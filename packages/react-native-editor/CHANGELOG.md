@@ -11,11 +11,37 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.52.0
+
+-   [***] Search block now available on mobile! [https://github.com/WordPress/gutenberg/pull/30783]
+-   [*] Image block: Add a "featured" banner. (Android only) [#30806]
+-   [**] The media upload options of the Image, Video and Gallery block automatically opens when the respective block is inserted. [#29546]
+-   [**] The media upload options of the File and Audio block automatically opens when the respective block is inserted. [#31025]
+-   [*] Fixed a bug where the Search block was stealing focus from the Image block upon updating image asset [#31393]
+
+## 1.51.1
+
+-   [*] Updates relative block-support asset path [#31184]
+
+## 1.51.0
+
+-   [*] Image block: Improve text entry for long alt text. [#29670]
+-   [*] a11y: Bug fix: Allow stepper cell to be selected by screenreader [#30694]
+
+## 1.50.1
+
+-   [x] Truncate rangecell screenreader decimals] [#30678]
+-   [x] Fix Quote block citation [#30548]
+-   [xx] Fix crash from non-adjustable unit RangeCell a11y activation [#30636]
+-   [xx] Fix Unsupported Block Editor on Android [#30650]
+
+## 1.50.0
+
 -   [***] a11y: Screenreader improvements for the UnitControl component [#29741]
 
 ## 1.49.0
 
-* [*] Remove the cancel button from settings options (Android only) [https://github.com/WordPress/gutenberg/pull/29599]
+-   [*] Remove the cancel button from settings options (Android only) [https://github.com/WordPress/gutenberg/pull/29599]
 
 ## 1.48.0
 

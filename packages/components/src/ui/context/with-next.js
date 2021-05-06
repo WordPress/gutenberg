@@ -1,7 +1,8 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { contextConnect, useContextSystem } from '@wp-g2/context';
+import { contextConnect } from './context-connect';
+import { useContextSystem } from './use-context-system';
 
 /**
  * @template {{}} TCurrentProps

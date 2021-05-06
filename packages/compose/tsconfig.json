@@ -1,0 +1,14 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types"
+	},
+	"include": [
+		"src/higher-order/if-condition/**/*",
+		"src/higher-order/pure/**/*",
+		"src/higher-order/with-instance-id/**/*",
+		"src/hooks/use-instance-id/**/*",
+		"src/utils/**/*"
+	]
+}

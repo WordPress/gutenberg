@@ -18,7 +18,7 @@ import Button from '../button';
 import ColorPicker from '../color-picker';
 import Dropdown from '../dropdown';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
 
 import {
 	addControlPoint,
@@ -109,6 +109,8 @@ function ControlPointButton( {
 }
 
 function ControlPoints( {
+	disableRemove,
+	disableAlpha,
 	gradientPickerDomRef,
 	ignoreMarkerPosition,
 	value: controlPoints,
@@ -223,6 +225,7 @@ function ControlPoints( {
 					renderContent={ ( { onClose } ) => (
 						<>
 							<ColorPicker
+								disableAlpha={ disableAlpha }
 								color={ point.color }
 								onChangeComplete={ ( { color } ) => {
 									onChange(
@@ -234,21 +237,23 @@ function ControlPoints( {
 									);
 								} }
 							/>
-							<Button
-								className="components-custom-gradient-picker__remove-control-point"
-								onClick={ () => {
-									onChange(
-										removeControlPoint(
-											controlPoints,
-											index
-										)
-									);
-									onClose();
-								} }
-								isLink
-							>
-								{ __( 'Remove Control Point' ) }
-							</Button>
+							{ ! disableRemove && (
+								<Button
+									className="components-custom-gradient-picker__remove-control-point"
+									onClick={ () => {
+										onChange(
+											removeControlPoint(
+												controlPoints,
+												index
+											)
+										);
+										onClose();
+									} }
+									isLink
+								>
+									{ __( 'Remove Control Point' ) }
+								</Button>
+							) }
 						</>
 					) }
 					popoverProps={ COLOR_POPOVER_PROPS }
@@ -264,6 +269,7 @@ function InsertPoint( {
 	onOpenInserter,
 	onCloseInserter,
 	insertPosition,
+	disableAlpha,
 } ) {
 	const [ alreadyInsertedPoint, setAlreadyInsertedPoint ] = useState( false );
 	return (
@@ -297,6 +303,7 @@ function InsertPoint( {
 			) }
 			renderContent={ () => (
 				<ColorPicker
+					disableAlpha={ disableAlpha }
 					onChangeComplete={ ( { color } ) => {
 						if ( ! alreadyInsertedPoint ) {
 							onChange(

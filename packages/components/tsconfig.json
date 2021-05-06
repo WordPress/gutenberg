@@ -10,24 +10,31 @@
 		{ "path": "../element" },
 		{ "path": "../hooks" },
 		{ "path": "../icons" },
+		{ "path": "../is-shallow-equal" },
 		{ "path": "../primitives" },
-		{ "path": "../react-i18n" }
+		{ "path": "../react-i18n" },
+		{ "path": "../warning" }
 	],
 	"include": [
 		"src/animate/**/*",
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
+		"src/draggable/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
+		"src/scroll-lock/**/*",
 		"src/shortcut/**/*",
 		"src/spinner/**/*",
 		"src/tip/**/*",
+		"src/truncate/**/*",
 		"src/ui/**/*",
 		"src/utils/**/*",
 		"src/visually-hidden/**/*",
 		"src/text/**/*",
 		"src/grid/**/*",
-		"src/__next/**/*"
+		"src/__next/**/*",
+		"src/h-stack/**/*",
+		"src/v-stack/**/*"
 	],
 	"exclude": [
 		"src/**/*.android.js",

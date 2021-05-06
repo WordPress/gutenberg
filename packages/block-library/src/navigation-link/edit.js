@@ -46,6 +46,11 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import { ItemSubmenuIcon } from './icons';
+import { name } from './block.json';
+
+const ALLOWED_BLOCKS = [ 'core/navigation-link', 'core/spacer' ];
+
+const MAX_NESTING = 5;
 
 /**
  * A React hook to determine if it's dragging within the target element.
@@ -115,6 +120,8 @@ function getSuggestionsQuery( type, kind ) {
 			return { type: 'term', subtype: 'category' };
 		case 'tag':
 			return { type: 'term', subtype: 'post_tag' };
+		case 'post_format':
+			return { type: 'post-format' };
 		default:
 			if ( kind === 'taxonomy' ) {
 				return { type: 'term', subtype: type };
@@ -125,6 +132,82 @@ function getSuggestionsQuery( type, kind ) {
 			return {};
 	}
 }
+
+/**
+ * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
+ */
+
+/**
+ * Navigation Link Block Attributes
+ *
+ * @typedef {Object} WPNavigationLinkBlockAttributes
+ *
+ * @property {string}                [label]          Link text.
+ * @property {WPNavigationLinkKind}  [kind]           Kind is used to differentiate between term and post ids to check post draft status.
+ * @property {string}                [type]           The type such as post, page, tag, category and other custom types.
+ * @property {string}                [rel]            The relationship of the linked URL.
+ * @property {number}                [id]             A post or term id.
+ * @property {boolean}               [opensInNewTab]  Sets link target to _blank when true.
+ * @property {string}                [url]            Link href.
+ * @property {string}                [title]          Link title attribute.
+ */
+
+/**
+ * Link Control onChange handler that updates block attributes when a setting is changed.
+ *
+ * @param {Object}                          updatedValue    New block attributes to update.
+ * @param {Function}                        setAttributes   Block attribute update function.
+ * @param {WPNavigationLinkBlockAttributes} blockAttributes Current block attributes.
+ *
+ */
+export const updateNavigationLinkBlockAttributes = (
+	updatedValue = {},
+	setAttributes,
+	blockAttributes = {}
+) => {
+	const {
+		label: originalLabel = '',
+		kind: originalKind = '',
+		type: originalType = '',
+	} = blockAttributes;
+	const {
+		title = '',
+		url = '',
+		opensInNewTab,
+		id,
+		kind: newKind = originalKind,
+		type: newType = originalType,
+	} = updatedValue;
+
+	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
+	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
+	const escapeTitle =
+		title !== '' &&
+		normalizedTitle !== normalizedURL &&
+		originalLabel !== title;
+	const label = escapeTitle
+		? escape( title )
+		: originalLabel || escape( normalizedURL );
+
+	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
+	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
+
+	const isBuiltInType =
+		[ 'post', 'page', 'tag', 'category' ].indexOf( type ) > -1;
+
+	const isCustomLink =
+		( ! newKind && ! isBuiltInType ) || newKind === 'custom';
+	const kind = isCustomLink ? 'custom' : newKind;
+
+	setAttributes( {
+		...( url && { url: encodeURI( url ) } ),
+		...( label && { label } ),
+		...( undefined !== opensInNewTab && { opensInNewTab } ),
+		...( id && Number.isInteger( id ) && { id } ),
+		...( kind && { kind } ),
+		...( type && type !== 'URL' && { type } ),
+	} );
+};
 
 export default function NavigationLinkEdit( {
 	attributes,
@@ -160,6 +243,7 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const {
+		isAtMaxNesting,
 		isParentOfSelectedBlock,
 		isImmediateParentOfSelectedBlock,
 		hasDescendants,
@@ -173,6 +257,7 @@ export default function NavigationLinkEdit( {
 				getClientIdsOfDescendants,
 				hasSelectedInnerBlock,
 				getSelectedBlockClientId,
+				getBlockParentsByBlockName,
 			} = select( blockEditorStore );
 
 			const selectedBlockId = getSelectedBlockClientId();
@@ -181,6 +266,9 @@ export default function NavigationLinkEdit( {
 				.length;
 
 			return {
+				isAtMaxNesting:
+					getBlockParentsByBlockName( clientId, name ).length >=
+					MAX_NESTING,
 				isParentOfSelectedBlock: hasSelectedInnerBlock(
 					clientId,
 					true
@@ -285,9 +373,10 @@ export default function NavigationLinkEdit( {
 
 		return {
 			id: page.id,
-			postType,
+			type: postType,
 			title: page.title.rendered,
 			url: page.link,
+			kind: 'post-type',
 		};
 	}
 
@@ -320,7 +409,7 @@ export default function NavigationLinkEdit( {
 			} ),
 		},
 		{
-			allowedBlocks: [ 'core/navigation-link', 'core/spacer' ],
+			allowedBlocks: ALLOWED_BLOCKS,
 			renderAppender:
 				( isSelected && hasDescendants ) ||
 				( isImmediateParentOfSelectedBlock &&
@@ -378,12 +467,14 @@ export default function NavigationLinkEdit( {
 						shortcut={ displayShortcut.primary( 'k' ) }
 						onClick={ () => setIsLinkOpen( true ) }
 					/>
-					<ToolbarButton
-						name="submenu"
-						icon={ addSubmenu }
-						title={ __( 'Add submenu' ) }
-						onClick={ insertLinkBlock }
-					/>
+					{ ! isAtMaxNesting && (
+						<ToolbarButton
+							name="submenu"
+							icon={ addSubmenu }
+							title={ __( 'Add submenu' ) }
+							onClick={ insertLinkBlock }
+						/>
+					) }
 				</ToolbarGroup>
 			</BlockControls>
 			<InspectorControls>
@@ -448,7 +539,6 @@ export default function NavigationLinkEdit( {
 							}
 							aria-label={ __( 'Navigation link text' ) }
 							placeholder={ itemLabelPlaceholder }
-							keepPlaceholderOnFocus
 							withoutInteractiveFormatting
 							allowedFormats={ [
 								'core/bold',
@@ -505,39 +595,12 @@ export default function NavigationLinkEdit( {
 									type,
 									kind
 								) }
-								onChange={ ( {
-									title: newTitle = '',
-									url: newURL = '',
-									opensInNewTab: newOpensInNewTab,
-									id,
-								} = {} ) =>
-									setAttributes( {
-										url: encodeURI( newURL ),
-										label: ( () => {
-											const normalizedTitle = newTitle.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											const normalizedURL = newURL.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											if (
-												newTitle !== '' &&
-												normalizedTitle !==
-													normalizedURL &&
-												label !== newTitle
-											) {
-												return escape( newTitle );
-											} else if ( label ) {
-												return label;
-											}
-											// If there's no label, add the URL.
-											return escape( normalizedURL );
-										} )(),
-										opensInNewTab: newOpensInNewTab,
-										id,
-									} )
+								onChange={ ( updatedValue ) =>
+									updateNavigationLinkBlockAttributes(
+										updatedValue,
+										setAttributes,
+										attributes
+									)
 								}
 							/>
 						</Popover>
