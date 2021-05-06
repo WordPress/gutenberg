@@ -110,19 +110,18 @@ export const generateAnchor = ( content, allHeadingAnchors ) => {
 };
 
 /**
- * Updates the anchor if required.
+ * Retrieves and returns all heading anchors.
  *
  * @param {string} clientId The block's client-ID.
  *
- * @return {string} The anchor.
+ * @return {string[]} The array of heading anchors.
  */
-export const Anchors = ( clientId ) => {
-	const allHeadingAnchors = useSelect(
+export const useAllHeadingAnchors = ( clientId ) => {
+	return useSelect(
 		( select ) => {
 			const allBlocks = select( blockEditorStore ).getBlocks();
 			return getAllHeadingAnchors( allBlocks, clientId );
 		},
 		[ clientId ]
 	);
-	return allHeadingAnchors;
 };

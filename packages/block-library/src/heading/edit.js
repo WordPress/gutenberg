@@ -7,6 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { useEffect } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
 import {
 	AlignmentControl,
@@ -19,7 +20,7 @@ import {
  * Internal dependencies
  */
 import HeadingLevelDropdown from './heading-level-dropdown';
-import { Anchors, generateAnchor } from './autogenerate-anchors';
+import { useAllHeadingAnchors, generateAnchor } from './autogenerate-anchors';
 
 function HeadingEdit( {
 	attributes,
@@ -29,7 +30,7 @@ function HeadingEdit( {
 	mergedStyle,
 	clientId,
 } ) {
-	const { textAlign, content, level, placeholder } = attributes;
+	const { textAlign, content, level, placeholder, anchor } = attributes;
 	const tagName = 'h' + level;
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -37,15 +38,29 @@ function HeadingEdit( {
 		} ),
 		style: mergedStyle,
 	} );
-	const allHeadingAnchors = Anchors( clientId );
+	const allHeadingAnchors = useAllHeadingAnchors( clientId );
 
 	// Initially set anchor for headings that have content but no anchor set.
 	// This is used when transforming a block to heading, or for legacy anchors.
-	if ( ! attributes.anchor && content ) {
-		setAttributes( {
-			anchor: generateAnchor( content, allHeadingAnchors ),
-		} );
-	}
+	useEffect( () => {
+		if ( ! anchor && content ) {
+			setAttributes( {
+				anchor: generateAnchor( content, allHeadingAnchors ),
+			} );
+		}
+	}, [ allHeadingAnchors ] );
+
+	const onContentChange = ( value ) => {
+		const newAttrs = { content: value };
+		if (
+			! anchor ||
+			! value ||
+			generateAnchor( content, allHeadingAnchors ) === anchor
+		) {
+			newAttrs.anchor = generateAnchor( value, allHeadingAnchors );
+		}
+		setAttributes( newAttrs );
+	};
 
 	return (
 		<>
@@ -67,24 +82,7 @@ function HeadingEdit( {
 				identifier="content"
 				tagName={ tagName }
 				value={ content }
-				onChange={ ( value ) => {
-					const newAttrs = {
-						content: value,
-					};
-					if (
-						! attributes.anchor ||
-						! value ||
-						generateAnchor( content, allHeadingAnchors ) ===
-							attributes.anchor
-					) {
-						newAttrs.anchor = generateAnchor(
-							value,
-							allHeadingAnchors
-						);
-					}
-
-					setAttributes( newAttrs );
-				} }
+				onChange={ onContentChange }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value, isOriginal ) => {
 					let block;
