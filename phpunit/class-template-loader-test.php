@@ -18,6 +18,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		// Without this filter, get_template_directory() would erroneously return the default theme path
 		// (wp-content/themes/) for `test-theme` (rather than ./fixtures/themes/). Maybe a WP bug?
 		add_filter( 'template_directory', array( __CLASS__, 'change_theme_directory' ), 10, 2 );
+		add_filter( 'stylesheet_directory', array( __CLASS__, 'change_theme_directory' ), 10, 2 );
 
 		switch_theme( 'test-theme' );
 		gutenberg_register_template_post_type();
@@ -44,6 +45,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 
 	public static function wpTearDownAfterClass() {
 		wp_delete_post( self::$post->ID );
+		remove_filter( 'stylesheet_directory', array( __CLASS__, 'change_theme_directory' ) );
 		remove_filter( 'template_directory', array( __CLASS__, 'change_theme_directory' ) );
 	}
 
@@ -62,9 +64,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		);
 		$resolved_template_path = gutenberg_override_query_template( get_stylesheet_directory() . '/page-home.php', $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
-
-		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//page-home' );
-		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
+		$this->assertStringEqualsFile( get_stylesheet_directory() . '/block-templates/page-home.html', $_wp_current_template_content );
 	}
 
 	function test_gutenberg_page_block_template_takes_precedence() {
@@ -77,9 +77,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		);
 		$resolved_template_path = gutenberg_override_query_template( get_stylesheet_directory() . '/page.php', $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
-
-		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//page' );
-		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
+		$this->assertStringEqualsFile( get_stylesheet_directory() . '/block-templates/page.html', $_wp_current_template_content );
 	}
 
 	function test_gutenberg_block_template_takes_precedence_over_equally_specific_php_template() {
@@ -90,9 +88,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		);
 		$resolved_template_path = gutenberg_override_query_template( get_stylesheet_directory() . '/index.php', $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
-
-		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//index' );
-		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
+		$this->assertStringEqualsFile( get_stylesheet_directory() . '/block-templates/index.html', $_wp_current_template_content );
 	}
 
 	/**
@@ -153,9 +149,8 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		);
 		$resolved_template_path          = gutenberg_override_query_template( $parent_theme_page_template_path, $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
+		$this->assertStringEqualsFile( get_stylesheet_directory() . '/block-templates/page-1.html', $_wp_current_template_content );
 
-		$expected_template = gutenberg_get_block_file_template( get_stylesheet() . '//page-1' );
-		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
 		switch_theme( 'test-theme' );
 	}
 
@@ -193,9 +188,7 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		);
 		$resolved_template_path     = gutenberg_override_query_template( $page_template_path, $type, $templates );
 		$this->assertEquals( gutenberg_dir_path() . 'lib/template-canvas.php', $resolved_template_path );
-
-		$expected_template = gutenberg_get_block_template( get_stylesheet() . '//' . $custom_page_block_template );
-		$this->assertEquals( $expected_template->content, $_wp_current_template_content );
+		$this->assertEquals( self::$post->post_content, $_wp_current_template_content );
 	}
 
 	static function change_theme_directory( $theme_dir, $theme ) {
