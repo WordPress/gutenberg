@@ -25,6 +25,7 @@
 		"src/scroll-lock/**/*",
 		"src/shortcut/**/*",
 		"src/spinner/**/*",
+		"src/spacer/**/*",
 		"src/tip/**/*",
 		"src/truncate/**/*",
 		"src/ui/**/*",
