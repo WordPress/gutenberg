@@ -44,7 +44,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
     private static final String EVENT_NAME_NOTIFY_MODAL_CLOSED = "notifyModalClosed";
     private static final String EVENT_NAME_PREFERRED_COLOR_SCHEME = "preferredColorScheme";
     private static final String EVENT_NAME_MEDIA_REPLACE_BLOCK = "replaceBlock";
-    private static final String EVENT_NAME_UPDATE_THEME = "updateTheme";
+    private static final String EVENT_NAME_UPDATE_EDITOR_SETTINGS = "updateEditorSettings";
     private static final String EVENT_NAME_SHOW_NOTICE = "showNotice";
 
     private static final String MAP_KEY_UPDATE_HTML = "html";
@@ -153,7 +153,7 @@ public class RNReactNativeGutenbergBridgeModule extends ReactContextBaseJavaModu
             writableMap.putArray(MAP_KEY_THEME_UPDATE_GRADIENTS, Arguments.fromList((ArrayList)gradients));
         }
 
-        emitToJS(EVENT_NAME_UPDATE_THEME, writableMap);
+        emitToJS(EVENT_NAME_UPDATE_EDITOR_SETTINGS, writableMap);
     }
 
     @ReactMethod
