@@ -104,6 +104,8 @@ export default function VisualEditor( { styles } ) {
 		height: '100%',
 		width: '100%',
 		margin: 0,
+		display: 'flex',
+		flexFlow: 'column',
 	};
 	const templateModeStyles = {
 		...desktopCanvasStyles,
