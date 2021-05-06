@@ -395,15 +395,17 @@ class WP_Theme_JSON_Resolver {
 	 * for the paragraph block, and the theme has done it as well,
 	 * the user preference wins.
 	 *
-	 * @param array  $theme_support_data Existing block editor settings.
-	 *                                   Empty array by default.
+	 * @param array  $settings Existing block editor settings.
+	 *                         Empty array by default.
 	 * @param string $origin To what level should we merge data.
 	 *                       Valid values are 'theme' or 'user'.
 	 *                       Default is 'user'.
 	 *
 	 * @return WP_Theme_JSON
 	 */
-	public static function get_merged_data( $theme_support_data = array(), $origin = 'user' ) {
+	public static function get_merged_data( $settings = array(), $origin = 'user' ) {
+		$theme_support_data = WP_Theme_JSON::get_from_editor_settings( $settings );
+
 		$result = new WP_Theme_JSON();
 		$result->merge( self::get_core_data() );
 		$result->merge( self::get_theme_data( $theme_support_data ) );
