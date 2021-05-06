@@ -38,7 +38,10 @@ const transforms = {
 					{},
 					// Loop the selected buttons
 					buttons.map( ( attributes ) => {
-						const element = createElement( attributes.content );
+						const element = createElement(
+							document,
+							attributes.content
+						);
 						// Remove any HTML tags
 						const text = element.innerText || '';
 						// Get first url
@@ -53,7 +56,10 @@ const transforms = {
 				),
 			isMatch: ( paragraphs ) => {
 				return paragraphs.every( ( attributes ) => {
-					const element = createElement( attributes.content );
+					const element = createElement(
+						document,
+						attributes.content
+					);
 					const text = element.innerText || '';
 					const links = element.querySelectorAll( 'a' );
 					return text.length <= 30 && links.length <= 1;

@@ -397,7 +397,7 @@ function createFromElement( {
 		}
 
 		if ( type === 'script' ) {
-			mergePair( accumulator, {
+			const value = {
 				formats: [ , ],
 				replacements: [
 					{
@@ -410,7 +410,9 @@ function createFromElement( {
 					},
 				],
 				text: OBJECT_REPLACEMENT_CHARACTER,
-			} );
+			};
+			accumulateSelection( accumulator, node, range, value );
+			mergePair( accumulator, value );
 			continue;
 		}
 
