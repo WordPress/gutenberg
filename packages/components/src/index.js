@@ -66,6 +66,7 @@ export { default as __experimentalCustomGradientPicker } from './custom-gradient
 export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
 export { Heading as __experimentalHeading } from './heading';
+export { HStack as __experimentalHStack } from './h-stack';
 export { default as Icon } from './icon';
 export { default as IconButton } from './button/deprecated';
 export { default as __experimentalInputControl } from './input-control';
@@ -124,7 +125,8 @@ export {
 export { default as TreeSelect } from './tree-select';
 export { Truncate as __experimentalTruncate } from './truncate';
 export { default as __experimentalUnitControl } from './unit-control';
-export { default as VisuallyHidden } from './visually-hidden';
+export { VisuallyHidden } from './visually-hidden';
+export { VStack as __experimentalVStack } from './v-stack';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {
 	createSlotFill,
