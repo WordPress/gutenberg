@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { DropdownMenu } from '@wordpress/components';
+import { ToolbarDropdownMenu } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 
 /**
@@ -24,11 +24,10 @@ export default function LevelControl( { level, onChange } ) {
 		};
 	} );
 	return (
-		<DropdownMenu
+		<ToolbarDropdownMenu
 			label={ __( 'Change heading level' ) }
 			icon={ <LevelIcon level={ level } /> }
 			controls={ allControls }
-			isToolbarButton
 		/>
 	);
 }

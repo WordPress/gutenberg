@@ -1116,6 +1116,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToolbarDropdownMenu",
+		"slug": "toolbar-dropdown-menu",
+		"markdown_source": "../packages/components/src/toolbar-dropdown-menu/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToolbarGroup",
 		"slug": "toolbar-group",
 		"markdown_source": "../packages/components/src/toolbar-group/README.md",
