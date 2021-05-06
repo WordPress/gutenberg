@@ -84,10 +84,29 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		$this->assertEquals( $page_id_template_path, $resolved_template_path );
 	}
 
+	/**
+	 * If a theme is a child of a block-based parent theme but has php templates for some of its pages,
+	 * a php template of the child will take precedence over the parent's block template if they have
+	 * otherwise equal specificity.
+	 *
+	 * Covers https://github.com/WordPress/gutenberg/pull/31123.
+	 */
 	function test_gutenberg_child_theme_php_template_takes_precedence_over_equally_specific_parent_theme_block_template() {
-		$this->markTestIncomplete(
-			'This test has not been implemented yet.'
+		register_theme_directory( __DIR__ . '/fixtures/' );
+		switch_theme( 'tt1-blocks-child' );
+
+		$page_slug_template      = 'page-home.php';
+		$page_slug_template_path = get_stylesheet_directory() . '/' . $page_slug_template;
+		$type                    = 'page';
+		$templates               = array(
+			'page-home.php',
+			'page-1.php',
+			'page.php',
 		);
+		$resolved_template_path  = gutenberg_override_query_template( $page_slug_template_path, $type, $templates );
+		$this->assertEquals( $page_slug_template_path, $resolved_template_path );
+
+		switch_theme( 'tt1-blocks' );
 	}
 
 	function test_gutenberg_child_theme_block_template_takes_precedence_over_equally_specific_parent_theme_php_template() {
