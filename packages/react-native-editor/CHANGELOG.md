@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Bottom-sheet: Add custom header [#30291]
 
 ## 1.52.0
 
