@@ -48,40 +48,35 @@ function InserterMenu( {
 		insertDefaultBlock,
 	} = useDispatch( blockEditorStore );
 
-	const {
-		items,
-		destinationRootClientId,
-		hasReusableBlocks,
-		showReusableBlocks,
-	} = useSelect( ( select ) => {
-		const {
-			getInserterItems,
-			getBlockRootClientId,
-			getBlockSelectionEnd,
-			getSettings,
-		} = select( blockEditorStore );
+	const { items, destinationRootClientId, showReusableBlocks } = useSelect(
+		( select ) => {
+			const {
+				getInserterItems,
+				getBlockRootClientId,
+				getBlockSelectionEnd,
+			} = select( blockEditorStore );
 
-		let targetRootClientId = rootClientId;
-		if ( ! targetRootClientId && ! clientId && ! isAppender ) {
-			const end = getBlockSelectionEnd();
-			if ( end ) {
-				targetRootClientId = getBlockRootClientId( end ) || undefined;
+			let targetRootClientId = rootClientId;
+			if ( ! targetRootClientId && ! clientId && ! isAppender ) {
+				const end = getBlockSelectionEnd();
+				if ( end ) {
+					targetRootClientId =
+						getBlockRootClientId( end ) || undefined;
+				}
 			}
+
+			const allItems = getInserterItems( targetRootClientId );
+			const reusableBlockItems = allItems.filter(
+				( { category } ) => category === REUSABLE_BLOCKS_CATEGORY
+			);
+
+			return {
+				items: allItems,
+				destinationRootClientId: targetRootClientId,
+				showReusableBlocks: !! reusableBlockItems.length,
+			};
 		}
-
-		const allItems = getInserterItems( targetRootClientId );
-		const reusableBlockItems = allItems.filter(
-			( { category } ) => category === REUSABLE_BLOCKS_CATEGORY
-		);
-
-		return {
-			items: allItems,
-			destinationRootClientId: targetRootClientId,
-			hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
-				?.length,
-			showReusableBlocks: !! reusableBlockItems.length,
-		};
-	} );
+	);
 
 	const { getBlockOrder, getBlockCount } = useSelect( blockEditorStore );
 
@@ -177,7 +172,7 @@ function InserterMenu( {
 							value={ filterValue }
 						/>
 					) }
-					{ showTabs && ! filterValue && hasReusableBlocks && (
+					{ showTabs && ! filterValue && (
 						<InserterTabs.Control
 							onChangeTab={ setTabIndex }
 							showReusableBlocks={ showReusableBlocks }
