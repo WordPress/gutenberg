@@ -3,6 +3,7 @@
  */
 import { createBlock } from '@wordpress/blocks';
 import {
+	Placeholder,
 	Button,
 	DropdownMenu,
 	MenuGroup,
@@ -162,7 +163,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
 	return (
-		<div className="wp-block-navigation-placeholder">
+		<Placeholder className="wp-block-navigation-placeholder">
 			<PlaceholderPreview />
 
 			<div className="wp-block-navigation-placeholder__controls">
@@ -181,7 +182,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 						</div>
 						{ hasMenus ? (
 							<DropdownMenu
-								text={ __( 'Existing menu' ) }
+								text={ __( 'Add existing menu' ) }
 								icon={ chevronDown }
 								toggleProps={ toggleProps }
 							>
@@ -222,7 +223,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 					</div>
 				) }
 			</div>
-		</div>
+		</Placeholder>
 	);
 }
 
