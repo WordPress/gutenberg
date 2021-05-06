@@ -197,7 +197,7 @@ const SiteLogo = ( {
 						disabled={ ! isResizable }
 					/>
 					<ToggleControl
-						label={ __( 'Make image a link to home' ) }
+						label={ __( 'Link image to home' ) }
 						onChange={ () => setAttributes( { isLink: ! isLink } ) }
 						checked={ isLink }
 					/>
