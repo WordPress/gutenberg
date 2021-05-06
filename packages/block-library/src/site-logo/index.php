@@ -27,7 +27,7 @@ function render_block_core_site_logo( $attributes ) {
 
 	if ( empty( $custom_logo ) ) {
 		return ''; // Return early if no custom logo is set, avoiding extraneous wrapper div.
-  }
+	}
 
 	if ( ! $attributes['isLink'] ) {
 		// Remove the link.
