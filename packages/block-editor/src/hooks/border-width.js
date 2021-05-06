@@ -43,7 +43,7 @@ export const BorderWidthEdit = ( props ) => {
 			},
 		};
 
-		if ( newWidth === undefined ) {
+		if ( newWidth === undefined || newWidth === '' ) {
 			newStyle = cleanEmptyObject( newStyle );
 		}
 

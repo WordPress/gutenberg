@@ -43,7 +43,7 @@ export function BorderRadiusEdit( props ) {
 			},
 		};
 
-		if ( newRadius === undefined ) {
+		if ( newRadius === undefined || newRadius === '' ) {
 			newStyle = cleanEmptyObject( newStyle );
 		}
 
