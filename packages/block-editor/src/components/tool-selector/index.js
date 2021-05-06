@@ -52,13 +52,13 @@ function ToolSelector( props, ref ) {
 					aria-haspopup="true"
 					onClick={ onToggle }
 					/* translators: button label text should, if possible, be under 16 characters. */
-					label={ __( 'Modes' ) }
+					label={ __( 'Tools' ) }
 				/>
 			) }
 			position="bottom right"
 			renderContent={ () => (
 				<>
-					<NavigableMenu role="menu" aria-label={ __( 'Modes' ) }>
+					<NavigableMenu role="menu" aria-label={ __( 'Tools' ) }>
 						<MenuItemsChoice
 							value={ isNavigationTool ? 'select' : 'edit' }
 							onSelect={ onSwitchMode }
@@ -86,7 +86,7 @@ function ToolSelector( props, ref ) {
 					</NavigableMenu>
 					<div className="block-editor-tool-selector__help">
 						{ __(
-							'Tools offer different interactions for block selection & editing. To select, press Escape, to go back to editing, press Enter.'
+							'Tools provide different interactions for selecting, navigating, and editing blocks. Toggle between select and edit by pressing Escape and Enter.'
 						) }
 					</div>
 				</>
