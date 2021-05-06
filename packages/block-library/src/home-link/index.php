@@ -120,7 +120,7 @@ function block_core_home_link_build_li_wrapper_attributes( $context ) {
  *
  * @return string Returns the post content with the home url added.
  */
-function render_block_core_home( $attributes, $content, $block ) {
+function render_block_core_home_link( $attributes, $content, $block ) {
 	if ( empty( $attributes['label'] ) ) {
 		return '';
 	}
@@ -164,15 +164,15 @@ function render_block_core_home( $attributes, $content, $block ) {
 /**
  * Register the home block
  *
- * @uses render_block_core_home()
+ * @uses render_block_core_home_link()
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
-function register_block_core_home() {
+function register_block_core_home_link() {
 	register_block_type_from_metadata(
 		__DIR__ . '/home-link',
 		array(
-			'render_callback' => 'render_block_core_home',
+			'render_callback' => 'render_block_core_home_link',
 		)
 	);
 }
-add_action( 'init', 'register_block_core_home' );
+add_action( 'init', 'register_block_core_home_link' );
