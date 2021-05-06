@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { contextConnect } from '../context';
 import { Elevation } from '../elevation';
-import { View } from '../view';
+import { View } from '../../view';
 import * as styles from './styles';
 import { useCard } from './hook';
 import CONFIG from '../../utils/config-values';

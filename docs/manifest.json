@@ -1188,6 +1188,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "View",
+		"slug": "view",
+		"markdown_source": "../packages/components/src/view/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "VisuallyHidden",
 		"slug": "visually-hidden",
 		"markdown_source": "../packages/components/src/visually-hidden/README.md",

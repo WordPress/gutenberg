@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { Flex, FlexItem } from '../';
-import { View } from '../../ui/view';
+import { View } from '../../view';
 
 export default {
 	component: Flex,
