@@ -2,6 +2,7 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
+import { createElement } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -37,12 +38,11 @@ const transforms = {
 					{},
 					// Loop the selected buttons
 					buttons.map( ( attributes ) => {
+						const element = createElement( attributes.content );
 						// Remove any HTML tags
-						const div = document.createElement( 'div' );
-						div.innerHTML = attributes.content;
-						const text = div.innerText || '';
+						const text = element.innerText || '';
 						// Get first url
-						const link = div.querySelector( 'a' );
+						const link = element.querySelector( 'a' );
 						const url = link?.getAttribute( 'href' );
 						// Create singular button in the buttons block
 						return createBlock( 'core/button', {
@@ -53,10 +53,9 @@ const transforms = {
 				),
 			isMatch: ( paragraphs ) => {
 				return paragraphs.every( ( attributes ) => {
-					const div = document.createElement( 'div' );
-					div.innerHTML = attributes.content;
-					const text = div.innerText || '';
-					const links = div.querySelectorAll( 'a' );
+					const element = createElement( attributes.content );
+					const text = element.innerText || '';
+					const links = element.querySelectorAll( 'a' );
 					return text.length <= 30 && links.length <= 1;
 				} );
 			},

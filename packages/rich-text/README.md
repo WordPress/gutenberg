@@ -91,6 +91,23 @@ _Returns_
 
 -   `RichTextValue`: A rich text value.
 
+<a name="createElement" href="#createElement">#</a> **createElement**
+
+Parse the given HTML into a body element.
+
+Note: The current implementation will return a shared reference, reset on
+each call to `createElement`. Therefore, you should not hold a reference to
+the value to operate upon asynchronously, as it may have unexpected results.
+
+_Parameters_
+
+-   _document_ `HTMLDocument`: The HTML document to use to parse.
+-   _html_ `string`: The HTML to parse.
+
+_Returns_
+
+-   `HTMLBodyElement`: Body element with parsed HTML.
+
 <a name="getActiveFormat" href="#getActiveFormat">#</a> **getActiveFormat**
 
 Gets the format object by type at the start of the selection. This can be
