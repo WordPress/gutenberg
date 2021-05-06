@@ -25,14 +25,26 @@ function render_block_core_site_title( $attributes ) {
 		$tag_name = 0 === $attributes['level'] ? 'p' : 'h' . $attributes['level'];
 	}
 
-	$link               = sprintf( '<a href="%1$s" rel="home">%2$s</a>', get_bloginfo( 'url' ), $site_title );
+	$title = $site_title;
+
+	if ( $attributes['isLink'] ) {
+		$link_attrs = array(
+			'href="' . get_bloginfo( 'url' ) . '"',
+			'rel="home"',
+		);
+		if ( '_blank' === $attributes['linkTarget'] ) {
+			$link_attrs[] = 'target="_blank"';
+			$link_attrs[] = 'aria-label="' . esc_attr__( '(opens in a new tab)' ) . '"';
+		}
+		$title = sprintf( '<a %1$s>%2$s</a>', implode( ' ', $link_attrs ), $site_title );
+	}
 	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $align_class_name ) );
 
 	return sprintf(
 		'<%1$s %2$s>%3$s</%1$s>',
 		$tag_name,
 		$wrapper_attributes,
-		$link
+		$title
 	);
 }
 

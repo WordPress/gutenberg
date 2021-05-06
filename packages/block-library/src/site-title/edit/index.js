@@ -12,9 +12,11 @@ import { __ } from '@wordpress/i18n';
 import {
 	RichText,
 	AlignmentControl,
+	InspectorControls,
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { ToggleControl, PanelBody } from '@wordpress/components';
 import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
@@ -27,7 +29,7 @@ export default function SiteTitleEdit( {
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { level, textAlign } = attributes;
+	const { level, textAlign, isLink, linkTarget } = attributes;
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
 	const { canUserEdit, readOnlyTitle } = useSelect( ( select ) => {
 		const { canUser, getEntityRecord } = select( coreStore );
@@ -48,7 +50,7 @@ export default function SiteTitleEdit( {
 	const siteTitleContent = canUserEdit ? (
 		<TagName { ...blockProps }>
 			<RichText
-				tagName="a"
+				tagName={ isLink ? 'a' : 'div' }
 				aria-label={ __( 'Site title text' ) }
 				placeholder={ __( 'Write site title…' ) }
 				value={ title || readOnlyTitle }
@@ -62,12 +64,18 @@ export default function SiteTitleEdit( {
 		</TagName>
 	) : (
 		<TagName { ...blockProps }>
-			<a
-				href="#site-title-pseudo-link"
-				onClick={ ( event ) => event.preventDefault() }
-			>
-				{ readOnlyTitle || __( 'Site Title placeholder' ) }
-			</a>
+			{ isLink ? (
+				<a
+					href="#site-title-pseudo-link"
+					onClick={ ( event ) => event.preventDefault() }
+				>
+					{ readOnlyTitle || __( 'Site Title placeholder' ) }
+				</a>
+			) : (
+				<div style={ { display: 'inline-block' } }>
+					{ title || readOnlyTitle }
+				</div>
+			) }
 		</TagName>
 	);
 	return (
@@ -86,6 +94,28 @@ export default function SiteTitleEdit( {
 					} }
 				/>
 			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ __( 'Link settings' ) }>
+					<ToggleControl
+						label={ __( 'Make title link to home' ) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+					{ isLink && (
+						<>
+							<ToggleControl
+								label={ __( 'Open in new tab' ) }
+								onChange={ ( value ) =>
+									setAttributes( {
+										linkTarget: value ? '_blank' : '_self',
+									} )
+								}
+								checked={ linkTarget === '_blank' }
+							/>
+						</>
+					) }
+				</PanelBody>
+			</InspectorControls>
 			{ siteTitleContent }
 		</>
 	);
