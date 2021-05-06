@@ -69,6 +69,9 @@ class Template_Loader_Test extends WP_UnitTestCase {
 	}
 
 	/**
+	 * In a hybrid theme, a PHP template of higher specificity will take precedence over a block template
+	 * with lower specificity.
+	 *
 	 * Covers https://github.com/WordPress/gutenberg/pull/29026.
 	 */
 	function test_gutenberg_more_specific_php_template_takes_precedence_over_less_specific_block_template() {
