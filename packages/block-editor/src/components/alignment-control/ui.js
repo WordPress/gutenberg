@@ -7,7 +7,7 @@ import { find } from 'lodash';
  * WordPress dependencies
  */
 import { __, isRTL } from '@wordpress/i18n';
-import { DropdownMenu, ToolbarGroup } from '@wordpress/components';
+import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import { alignLeft, alignRight, alignCenter } from '@wordpress/icons';
 
 const DEFAULT_ALIGNMENT_CONTROLS = [
@@ -41,7 +41,6 @@ function AlignmentUI( {
 	describedBy = __( 'Change text alignment' ),
 	isCollapsed = true,
 	isToolbar,
-	isToolbarButton = true,
 } ) {
 	function applyOrUnset( align ) {
 		return () => onChange( value === align ? undefined : align );
@@ -57,8 +56,8 @@ function AlignmentUI( {
 		return isRTL() ? alignRight : alignLeft;
 	}
 
-	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
-	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
+	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
+	const extraProps = isToolbar ? { isCollapsed } : {};
 
 	return (
 		<UIComponent
