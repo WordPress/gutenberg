@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { VStack } from '../v-stack';
+import { VStack } from '../../v-stack';
 import { View } from '../view';
 import { Heading } from '../../heading';
 import { Divider } from '../divider';

@@ -1,14 +1,14 @@
 /**
  * Internal dependencies
  */
-import { hasConnectNamespace, useContextSystem } from '../context';
-import { FlexItem, useFlex } from '../../flex';
+import { hasConnectNamespace, useContextSystem } from '../ui/context';
+import { FlexItem, useFlex } from '../flex';
 import { getAlignmentProps } from './utils';
-import { getValidChildren } from '../utils/get-valid-children';
+import { getValidChildren } from '../ui/utils/get-valid-children';
 
 /**
  *
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'div'>} props
  */
 export function useHStack( props ) {
 	const {

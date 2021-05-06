@@ -5,7 +5,7 @@ import { Grid } from '../grid';
 import { Surface } from '../surface';
 import { Text } from '../../text';
 import { View } from '../view';
-import { VStack } from '../v-stack';
+import { VStack } from '../../v-stack';
 
 const Container = ( { children } ) => (
 	<div

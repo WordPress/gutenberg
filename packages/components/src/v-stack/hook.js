@@ -1,12 +1,12 @@
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
+import { useContextSystem } from '../ui/context';
 import { useHStack } from '../h-stack';
 
 /**
  *
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'div'>} props
  */
 export function useVStack( props ) {
 	const { expanded = false, ...otherProps } = useContextSystem(

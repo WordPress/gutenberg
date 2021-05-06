@@ -1,8 +1,8 @@
 /**
  * Internal dependencies
  */
-import { View } from '../../view';
-import { HStack } from '../index';
+import { View } from '../../ui/view';
+import { HStack } from '..';
 
 export default {
 	component: HStack,

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../utils';
+import { createComponent } from '../ui/utils';
 import { useHStack } from './hook';
 
 /**
@@ -11,7 +11,11 @@ import { useHStack } from './hook';
  *
  * @example
  * ```jsx
- * import { HStack, Text, View } from `@wordpress/components/ui`;
+ * import {
+ * 	__experimentalHStack as HStack,
+ * 	__experimentalText as Text,
+ * 	__experimentalView as View,
+ * } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (

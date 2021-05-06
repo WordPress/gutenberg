@@ -32,7 +32,9 @@
 		"src/visually-hidden/**/*",
 		"src/text/**/*",
 		"src/grid/**/*",
-		"src/__next/**/*"
+		"src/__next/**/*",
+		"src/h-stack/**/*",
+		"src/v-stack/**/*"
 	],
 	"exclude": [
 		"src/**/*.android.js",
