@@ -22,7 +22,6 @@ export { default as brush } from './library/brush';
 export { default as button } from './library/button';
 export { default as buttons } from './library/buttons';
 export { default as calendar } from './library/calendar';
-export { default as camera } from './library/camera';
 export { default as cancelCircleFilled } from './library/cancel-circle-filled';
 export { default as capturePhoto } from './library/capture-photo';
 export { default as captureVideo } from './library/capture-video';
