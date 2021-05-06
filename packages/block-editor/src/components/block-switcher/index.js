@@ -77,7 +77,11 @@ function BlockSwitcherDropDown( { onClose, blocks, clientIds } ) {
 		! hasPatternTransformation;
 	return (
 		<div className="block-editor-block-switcher__container">
-			{ nothingToShow && __( 'No transformations' ) }
+			{ nothingToShow && (
+				<p className="block-editor-block-switcher__empty">
+					{ __( 'No transforms.' ) }
+				</p>
+			) }
 			{ hasPatternTransformation && (
 				<PatternTransformationsMenu
 					blocks={ blocks }

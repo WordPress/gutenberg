@@ -221,3 +221,11 @@
 		}
 	}
 }
+
+// When no transforms are available.
+.block-editor-block-switcher__empty {
+	// Match padding for items in More menu.
+	padding: $grid-unit-15 + $grid-unit-10;
+	margin: 0;
+	color: $gray-700;
+}
