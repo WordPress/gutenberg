@@ -21,6 +21,7 @@ import InserterTabs from './tabs';
 import styles from './style.scss';
 
 const MIN_ITEMS_FOR_SEARCH = 2;
+const REUSABLE_BLOCKS_CATEGORY = 'reusable';
 
 function InserterMenu( {
 	onSelect,
@@ -47,32 +48,40 @@ function InserterMenu( {
 		insertDefaultBlock,
 	} = useDispatch( blockEditorStore );
 
-	const { items, destinationRootClientId, hasReusableBlocks } = useSelect(
-		( select ) => {
-			const {
-				getInserterItems,
-				getBlockRootClientId,
-				getBlockSelectionEnd,
-				getSettings,
-			} = select( blockEditorStore );
+	const {
+		items,
+		destinationRootClientId,
+		hasReusableBlocks,
+		showReusableBlocks,
+	} = useSelect( ( select ) => {
+		const {
+			getInserterItems,
+			getBlockRootClientId,
+			getBlockSelectionEnd,
+			getSettings,
+		} = select( blockEditorStore );
 
-			let targetRootClientId = rootClientId;
-			if ( ! targetRootClientId && ! clientId && ! isAppender ) {
-				const end = getBlockSelectionEnd();
-				if ( end ) {
-					targetRootClientId =
-						getBlockRootClientId( end ) || undefined;
-				}
+		let targetRootClientId = rootClientId;
+		if ( ! targetRootClientId && ! clientId && ! isAppender ) {
+			const end = getBlockSelectionEnd();
+			if ( end ) {
+				targetRootClientId = getBlockRootClientId( end ) || undefined;
 			}
-
-			return {
-				items: getInserterItems( targetRootClientId ),
-				destinationRootClientId: targetRootClientId,
-				hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
-					?.length,
-			};
 		}
-	);
+
+		const allItems = getInserterItems( targetRootClientId );
+		const reusableBlockItems = allItems.filter(
+			( { category } ) => category === REUSABLE_BLOCKS_CATEGORY
+		);
+
+		return {
+			items: allItems,
+			destinationRootClientId: targetRootClientId,
+			hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
+				?.length,
+			showReusableBlocks: !! reusableBlockItems.length,
+		};
+	} );
 
 	const { getBlockOrder, getBlockCount } = useSelect( blockEditorStore );
 
@@ -153,8 +162,6 @@ function InserterMenu( {
 		},
 		[ setFilterValue ]
 	);
-
-	const showReusableBlocks = ! rootClientId;
 
 	return (
 		<BottomSheet
