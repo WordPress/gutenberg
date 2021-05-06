@@ -6,36 +6,36 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { View } from '../../view';
-import { VStack } from '../index';
+import { View } from '../../ui/view';
+import { HStack } from '..';
 
 describe( 'props', () => {
 	test( 'should render correctly', () => {
 		const { container } = render(
-			<VStack>
+			<HStack>
 				<View />
 				<View />
-			</VStack>
+			</HStack>
 		);
 		expect( container.firstChild ).toMatchSnapshot();
 	} );
 
 	test( 'should render alignment', () => {
 		const { container } = render(
-			<VStack alignment="center">
+			<HStack alignment="center">
 				<View />
 				<View />
-			</VStack>
+			</HStack>
 		);
 		expect( container.firstChild ).toMatchSnapshot();
 	} );
 
 	test( 'should render spacing', () => {
 		const { container } = render(
-			<VStack spacing={ 5 }>
+			<HStack spacing={ 5 }>
 				<View />
 				<View />
-			</VStack>
+			</HStack>
 		);
 		expect( container.firstChild ).toMatchSnapshot();
 	} );

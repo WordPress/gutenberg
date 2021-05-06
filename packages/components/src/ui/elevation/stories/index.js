@@ -9,7 +9,7 @@ import { number } from '@storybook/addon-knobs';
 import { Elevation } from '../index';
 import { Grid } from '../../grid';
 import { View } from '../../view';
-import { HStack } from '../../h-stack';
+import { HStack } from '../../../h-stack';
 import { Divider } from '../../divider';
 import {
 	ExampleGrid,
