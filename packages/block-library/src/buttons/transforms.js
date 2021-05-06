@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { createElement } from '@wordpress/rich-text';
+import { __unstableCreateElement as createElement } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies

@@ -2,7 +2,6 @@ export { store } from './store';
 export { applyFormat } from './apply-format';
 export { concat } from './concat';
 export { create } from './create';
-export { createElement } from './create-element';
 export { getActiveFormat } from './get-active-format';
 export { getActiveObject } from './get-active-object';
 export { getTextContent } from './get-text-content';
