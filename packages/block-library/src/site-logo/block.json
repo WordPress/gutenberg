@@ -22,7 +22,9 @@
 		}
 	},
 	"supports": {
-		"html": false
+		"html": false,
+		"align": true,
+		"alignWide": false
 	},
 	"styles": [
 		{
