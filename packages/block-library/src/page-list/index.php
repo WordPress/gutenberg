@@ -67,11 +67,7 @@ function block_core_page_list_build_css_colors( $context ) {
 	$has_picked_overlay_text_color = array_key_exists( 'customOverlayTextColor', $context );
 
 	// If it has a text color.
-	if ( $has_named_overlay_text_color
-	     || $has_picked_overlay_text_color
-		 || $has_named_text_color
-		 || $has_picked_text_color
-		 || $has_named_text_color ) {
+	if ( $has_named_overlay_text_color || $has_picked_overlay_text_color ) {
 		$colors['overlay_css_classes'][] = 'has-text-color';
 	}
 
@@ -80,12 +76,6 @@ function block_core_page_list_build_css_colors( $context ) {
 		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', $context['overlayTextColor'] );
 	} elseif ( $has_picked_overlay_text_color ) {
 		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $context['customOverlayTextColor'] );
-	} elseif ( $has_named_text_color ) {
-		$colors['overlay_css_classes'][] = sprintf( 'has-%s-color', $context['textColor'] );
-	} elseif ( $has_picked_text_color ) {
-		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $context['customTextColor'] );
-	} elseif ( $has_custom_text_color ) {
-		$colors['overlay_inline_styles'] .= sprintf( 'color: %s;', $context['style']['color']['text'] );
 	}
 
 	// Overlay background colors
@@ -93,11 +83,7 @@ function block_core_page_list_build_css_colors( $context ) {
 	$has_picked_overlay_background_color = array_key_exists( 'customOverlayBackgroundColor', $context );
 
 	// If has background color.
-	if ( $has_named_overlay_background_color
-		|| $has_picked_overlay_background_color
-		|| $has_named_background_color
-		|| $has_picked_text_color
-		|| $has_picked_background_color ) {
+	if ( $has_named_overlay_background_color || $has_picked_overlay_background_color ) {
 		$colors['overlay_css_classes'][] = 'has-background';
 	}
 
@@ -105,12 +91,6 @@ function block_core_page_list_build_css_colors( $context ) {
 		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', $context['overlayBackgroundColor'] );
 	} elseif ( $has_picked_overlay_background_color ) {
 		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $context['customOverlayBackgroundColor'] );
-	} elseif ( $has_named_background_color ) {
-		$colors['overlay_css_classes'][] = sprintf( 'has-%s-background-color', $context['backgroundColor'] );
-	} elseif ( $has_picked_background_color ) {
-		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $context['customBackgroundColor'] );
-	} elseif ( $has_custom_background_color ) {
-		$colors['overlay_inline_styles'] .= sprintf( 'background-color: %s;', $context['style']['color']['background'] );
 	}
 
 	return $colors;
