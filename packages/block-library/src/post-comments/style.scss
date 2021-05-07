@@ -4,17 +4,45 @@
 		list-style: none;
 		margin: 0;
 		padding: 0;
-	}
 
-	.comment-author {
-		.avatar {
-			float: left;
-			margin-right: 10px;
+		.comment {
+			font-size: 0.875em;
+			line-height: 1.8;
+			margin-bottom: 1em;
+			min-height: 2.25em;
+			padding-left: 3.25em;
+
+			p {
+				margin: 0.36em 0 1.4em;
+			}
 		}
 	}
 
+	.comment-author {
+		line-height: 1.5;
+		margin-left: -3.25em;
+
+		.avatar {
+			border-radius: 1.5em;
+			display: block;
+			float: left;
+			height: 2.5em;
+			margin-right: 0.75em;
+			width: 2.5em;
+		}
+
+		cite {
+			font-style: normal;
+		}
+	}
+
+	.comment-meta {
+		line-height: 1.5;
+		margin-left: -3.25em;
+	}
+
 	.comment-body .commentmetadata {
-		font-size: 0.8em;
+		font-size: 0.75em;
 	}
 
 	.comment-form-comment,
@@ -29,5 +57,9 @@
 	.comment-form-comment textarea {
 		box-sizing: border-box;
 		width: 100%;
+	}
+
+	.reply {
+		font-size: 0.75em;
 	}
 }
