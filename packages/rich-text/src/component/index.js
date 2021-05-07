@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -129,6 +134,7 @@ function fixPlaceholderSelection( defaultView ) {
 function RichText(
 	{
 		tagName: TagName = 'div',
+		className,
 		value = '',
 		selectionStart,
 		selectionEnd,
@@ -539,8 +545,11 @@ function RichText(
 			return;
 		}
 
-		onCreateUndoLevel();
 		lastHistoryValue.current = _value.current;
+
+		if ( onCreateUndoLevel ) {
+			onCreateUndoLevel();
+		}
 	}
 
 	const isComposing = useRef( false );
@@ -935,7 +944,7 @@ function RichText(
 			useUndoAutomaticChange( { didAutomaticChange, undo } ),
 		] ),
 		style: defaultStyle,
-		className: 'rich-text',
+		className: classnames( 'rich-text', className ),
 		onPaste: handlePaste,
 		onInput: handleInput,
 		onCompositionStart: handleCompositionStart,

@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import TextareaAutosize from 'react-autosize-textarea';
 import classnames from 'classnames';
 
 /**
@@ -10,12 +9,10 @@ import classnames from 'classnames';
 import { __ } from '@wordpress/i18n';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { decodeEntities } from '@wordpress/html-entities';
-import { ENTER } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { VisuallyHidden } from '@wordpress/components';
-import { useInstanceId } from '@wordpress/compose';
 import { pasteHandler } from '@wordpress/blocks';
 import { store as blockEditorStore } from '@wordpress/block-editor';
+import { __experimentalRichText as RichText } from '@wordpress/rich-text';
 
 /**
  * Internal dependencies
@@ -28,7 +25,6 @@ import PostTypeSupportCheck from '../post-type-support-check';
 const REGEXP_NEWLINES = /[\r\n]+/g;
 
 export default function PostTitle() {
-	const instanceId = useInstanceId( PostTitle );
 	const ref = useRef();
 	const [ isSelected, setIsSelected ] = useState( false );
 	const { editPost } = useDispatch( 'core/editor' );
@@ -102,15 +98,8 @@ export default function PostTitle() {
 		setIsSelected( false );
 	}
 
-	function onChange( event ) {
-		onUpdate( event.target.value.replace( REGEXP_NEWLINES, ' ' ) );
-	}
-
-	function onKeyDown( event ) {
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-			onEnterPress();
-		}
+	function onChange( value ) {
+		onUpdate( value.replace( REGEXP_NEWLINES, ' ' ) );
 	}
 
 	function onPaste( event ) {
@@ -175,25 +164,37 @@ export default function PostTitle() {
 	);
 	const decodedPlaceholder = decodeEntities( placeholder );
 
+	const [ selection, setSelection ] = useState( {} );
+
 	return (
 		<PostTypeSupportCheck supportKeys="title">
 			<div className={ className }>
-				<VisuallyHidden
-					as="label"
-					htmlFor={ `post-title-${ instanceId }` }
-				>
-					{ decodedPlaceholder || __( 'Add title' ) }
-				</VisuallyHidden>
-				<TextareaAutosize
+				<RichText
 					ref={ ref }
-					id={ `post-title-${ instanceId }` }
+					tagName="h1"
+					__unstableDisableFormats
+					preserveWhiteSpace
 					className="editor-post-title__input"
 					value={ title }
 					onChange={ onChange }
+					selectionStart={ selection.start }
+					selectionEnd={ selection.end }
+					onSelectionChange={ ( newStart, newEnd ) => {
+						setSelection( ( sel ) => {
+							const { start, end } = sel;
+							if ( start === newStart && end === newEnd ) {
+								return sel;
+							}
+							return {
+								start: newStart,
+								end: newEnd,
+							};
+						} );
+					} }
 					placeholder={ decodedPlaceholder || __( 'Add title' ) }
 					onFocus={ onSelect }
 					onBlur={ onUnselect }
-					onKeyDown={ onKeyDown }
+					onEnter={ onEnterPress }
 					onKeyPress={ onUnselect }
 					onPaste={ onPaste }
 				/>
