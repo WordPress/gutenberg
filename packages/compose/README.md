@@ -127,11 +127,11 @@ This behavior is useful if we want to render a list of items asynchronously for 
 
 _Parameters_
 
--   _list_ `Array`: Source array.
+-   _list_ `T[]`: Source array.
 
 _Returns_
 
--   `Array`: Async array.
+-   `T[]`: Async array.
 
 <a name="useConstrainedTabbing" href="#useConstrainedTabbing">#</a> **useConstrainedTabbing**
 
