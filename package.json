@@ -103,6 +103,7 @@
 		"@testing-library/react": "11.2.2",
 		"@testing-library/react-native": "7.1.0",
 		"@types/classnames": "2.2.10",
+		"@types/clipboard": "2.0.1",
 		"@types/eslint": "6.8.0",
 		"@types/estree": "0.0.44",
 		"@types/highlight-words-core": "1.2.0",
