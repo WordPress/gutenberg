@@ -85,21 +85,21 @@ function gutenberg_override_query_template( $template, $type, array $templates )
 		$templates = array_slice( $templates, 0, $index + 1 );
 	}
 
-	$current_template = gutenberg_resolve_template( $type, $templates );
+	$block_template = gutenberg_resolve_template( $type, $templates );
 
-	if ( $current_template ) {
-		if ( empty( $current_template->content ) && is_user_logged_in() ) {
+	if ( $block_template ) {
+		if ( empty( $block_template->content ) && is_user_logged_in() ) {
 			$_wp_current_template_content =
 			sprintf(
 				/* translators: %s: Template title */
 				__( 'Empty template: %s', 'gutenberg' ),
-				$current_template->title
+				$block_template->title
 			);
-		} elseif ( ! empty( $current_template->content ) ) {
-			$_wp_current_template_content = $current_template->content;
+		} elseif ( ! empty( $block_template->content ) ) {
+			$_wp_current_template_content = $block_template->content;
 		}
 		if ( isset( $_GET['_wp-find-template'] ) ) {
-			wp_send_json_success( $current_template );
+			wp_send_json_success( $block_template );
 		}
 	} else {
 		if ( $template ) {
