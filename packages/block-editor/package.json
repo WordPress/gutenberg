@@ -64,6 +64,7 @@
 		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
+		"react-easy-crop": "^3.0.0",
 		"react-spring": "^8.0.19",
 		"redux-multi": "^0.1.12",
 		"rememo": "^3.0.0",
