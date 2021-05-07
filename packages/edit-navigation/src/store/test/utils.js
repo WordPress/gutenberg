@@ -851,7 +851,7 @@ describe( 'Mapping block attributes and menu item fields', () => {
 			expect( actual ).toEqual(
 				expect.objectContaining( {
 					label: '',
-					type: 'custom',
+					url: '',
 					kind: 'custom',
 				} )
 			);
