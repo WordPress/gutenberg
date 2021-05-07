@@ -119,7 +119,7 @@ This commands adds the latest version of `glob` as a development dependency to t
 
 ## Maintaining a Public API
 
-It's very important to have a good plan for what a new package will include. All constants, methods, and components exposed from the package will ultimately become part of the public API in WordPress core (exposed via the `wp` global - eg: `wp.blockEditor`) and as such will need to support indefinitely. You should be very selective in what is exposed by your package and ensure it is well documented.
+It's very important to have a good plan for what a new package will include. All constants, methods, and components exposed from the package will ultimately become part of the public API in WordPress core (exposed via the `wp` global - eg: `wp.blockEditor`) and as such will need to be supported indefinitely. You should be very selective in what is exposed by your package and ensure it is well documented.
 
 ## Maintaining API documentation
 
