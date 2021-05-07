@@ -10,6 +10,9 @@ import {
 	pressKeyWithModifier,
 	saveDraft,
 	showBlockToolbar,
+	openPreviewPage,
+	selectBlockByClientId,
+	getAllBlocks,
 } from '@wordpress/e2e-test-utils';
 
 /**
@@ -252,6 +255,27 @@ async function addLinkBlock() {
 		"//*[contains(@class, 'block-editor-inserter__quick-inserter')]//*[text()='Custom Link']"
 	);
 	await linkButton.click();
+}
+
+async function toggleSidebar() {
+	await page.click(
+		'.edit-post-header__settings button[aria-label="Settings"]'
+	);
+}
+
+async function turnResponsivenessOn() {
+	const blocks = await getAllBlocks();
+
+	await selectBlockByClientId( blocks[ 0 ].clientId );
+	await toggleSidebar();
+
+	const [ responsivenessToggleButton ] = await page.$x(
+		'//label[text()[contains(.,"Enable responsive menu")]]'
+	);
+
+	await responsivenessToggleButton.click();
+
+	await saveDraft();
 }
 
 beforeEach( async () => {
@@ -526,20 +550,27 @@ describe( 'Navigation', () => {
 			},
 		] );
 
-		const isScriptLoaded = await page.evaluate(
+		// Create first block at the start in order to enable preview.
+		await insertBlock( 'Navigation' );
+		await saveDraft();
+
+		const previewPage = await openPreviewPage();
+		const isScriptLoaded = await previewPage.evaluate(
 			() =>
-				null !== document.querySelector( 'script[src*="frontend.js"]' )
+				null !==
+				document.querySelector(
+					'script[src*="navigation/frontend.js"]'
+				)
 		);
 
 		expect( isScriptLoaded ).toBe( false );
 
-		await insertBlock( 'Navigation' );
 		await createNavBlockWithAllPages();
 		await insertBlock( 'Navigation' );
 		await createNavBlockWithAllPages();
-		await saveDraft();
+		await turnResponsivenessOn();
 
-		await page.reload( {
+		await previewPage.reload( {
 			waitFor: [ 'networkidle0', 'domcontentloaded' ],
 		} );
 
@@ -547,13 +578,64 @@ describe( 'Navigation', () => {
 			Count instances of the tag to make sure that it's been loaded only once,
 			regardless of the number of navigation blocks present.
 		*/
-		const tagCount = await page.evaluate(
+		const tagCount = await previewPage.evaluate(
 			() =>
 				Array.from(
-					document.querySelectorAll( 'script[src*="frontend.js"]' )
+					document.querySelectorAll(
+						'script[src*="navigation/frontend.js"]'
+					)
 				).length
 		);
 
 		expect( tagCount ).toBe( 1 );
+	} );
+
+	it( 'loads frontend code only if responsiveness is turned on', async () => {
+		await mockPagesResponse( [
+			{
+				title: 'Home',
+				slug: 'home',
+			},
+			{
+				title: 'About',
+				slug: 'about',
+			},
+			{
+				title: 'Contact Us',
+				slug: 'contact',
+			},
+		] );
+
+		await insertBlock( 'Navigation' );
+		await saveDraft();
+
+		const previewPage = await openPreviewPage();
+		let isScriptLoaded = await previewPage.evaluate(
+			() =>
+				null !==
+				document.querySelector(
+					'script[src*="navigation/frontend.js"]'
+				)
+		);
+
+		expect( isScriptLoaded ).toBe( false );
+
+		await createNavBlockWithAllPages();
+
+		await turnResponsivenessOn();
+
+		await previewPage.reload( {
+			waitFor: [ 'networkidle0', 'domcontentloaded' ],
+		} );
+
+		isScriptLoaded = await previewPage.evaluate(
+			() =>
+				null !==
+				document.querySelector(
+					'script[src*="navigation/frontend.js"]'
+				)
+		);
+
+		expect( isScriptLoaded ).toBe( true );
 	} );
 } );
