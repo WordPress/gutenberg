@@ -26,26 +26,28 @@ export default function ResponsiveWrapper( props ) {
 
 	return (
 		<>
-			<Button
-				aria-haspopup="true"
-				aria-expanded={ props.isOpen }
-				aria-label={ __( 'Open menu' ) }
-				className="wp-block-navigation__responsive-container-open"
-				onClick={ () => props.onToggle( true ) }
-			>
-				<SVG
-					xmlns="http://www.w3.org/2000/svg"
-					viewBox="0 0 24 24"
-					width="24"
-					height="24"
-					role="img"
-					aria-hidden="true"
-					focusable="false"
+			{ ! props.isOpen && (
+				<Button
+					aria-haspopup="true"
+					aria-expanded={ props.isOpen }
+					aria-label={ __( 'Open menu' ) }
+					className="wp-block-navigation__responsive-container-open"
+					onClick={ () => props.onToggle( true ) }
 				>
-					<Rect x="4" y="7.5" width="16" height="1.5" />
-					<Rect x="4" y="15" width="16" height="1.5" />
-				</SVG>
-			</Button>
+					<SVG
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						width="24"
+						height="24"
+						role="img"
+						aria-hidden="true"
+						focusable="false"
+					>
+						<Rect x="4" y="7.5" width="16" height="1.5" />
+						<Rect x="4" y="15" width="16" height="1.5" />
+					</SVG>
+				</Button>
+			) }
 
 			<div
 				className={ responsiveContainerClasses }
