@@ -35,7 +35,7 @@ function Card( props, forwardedRef ) {
 
 	return (
 		<View { ...otherProps } ref={ forwardedRef }>
-			<View css={ styles.Content }>{ children }</View>
+			<View className={ styles.Content }>{ children }</View>
 			<Elevation
 				className={ elevationClassName }
 				isInteractive={ false }

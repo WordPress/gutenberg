@@ -17,7 +17,7 @@ export const _default = () => {
 				<View>Item</View>
 			</Flex>
 			<Flex direction={ [ 'column', 'row' ] } gap={ 3 }>
-				<View css={ { width: '180px' } }>Item</View>
+				<View style={ { width: '180px' } }>Item</View>
 				<FlexItem isBlock>
 					<View>Item</View>
 				</FlexItem>
