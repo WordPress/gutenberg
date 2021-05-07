@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { sortBy } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { createBlock, parse } from '@wordpress/blocks';
@@ -91,7 +96,8 @@ export const menuItemToBlockAttributes = ( {
  * @return {WPBlock[]} An array of blocks.
  */
 export default function mapMenuItemsToBlocks( menuItems ) {
-	return menuItems.map( ( menuItem ) => {
+	const sortedItems = sortBy( menuItems, 'menu_order' );
+	return sortedItems.map( ( menuItem ) => {
 		if ( menuItem.type === 'block' ) {
 			const [ block ] = parse( menuItem.content.raw );
 
