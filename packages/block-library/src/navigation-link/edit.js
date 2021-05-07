@@ -243,6 +243,7 @@ export default function NavigationLinkEdit( {
 	const ref = useRef();
 
 	const isCustomItemType =
+		typeof type !== 'undefined' &&
 		! [
 			'post',
 			'page',
@@ -250,7 +251,8 @@ export default function NavigationLinkEdit( {
 			'tag',
 			'post_format',
 			'custom',
-		].includes( type ) && ! [ 'taxonomy', 'post-type' ].includes( kind );
+		].includes( type ) &&
+		! [ 'taxonomy', 'post-type' ].includes( kind );
 
 	const {
 		isAtMaxNesting,
