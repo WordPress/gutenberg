@@ -7,7 +7,13 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
+import {
+	useState,
+	useCallback,
+	useRef,
+	useEffect,
+	useMemo,
+} from '@wordpress/element';
 import { isUnmodifiedDefaultBlock } from '@wordpress/blocks';
 import { Popover } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
@@ -111,6 +117,22 @@ function BlockPopover( {
 	const lastSelectedElement = useBlockElement( lastClientId );
 	const capturingElement = useBlockElement( capturingClientId );
 
+	let node = selectedElement;
+
+	// The sticky boundary element should be the boundary at which the
+	// the block toolbar becomes sticky when the block scolls out of view.
+	// In case of an iframe, this should be the iframe boundary, otherwise
+	// the scroll container.
+	const stickyBoundaryElement = useMemo( () => {
+		if ( ! node ) return;
+		const { ownerDocument } = node;
+		return (
+			ownerDocument.defaultView.frameElement ||
+			getScrollContainer( node ) ||
+			ownerDocument.body
+		);
+	}, [ node ] );
+
 	if (
 		! shouldShowBreadcrumb &&
 		! shouldShowContextualToolbar &&
@@ -119,8 +141,6 @@ function BlockPopover( {
 	) {
 		return null;
 	}
-
-	let node = selectedElement;
 
 	if ( ! node ) {
 		return null;
@@ -160,16 +180,6 @@ function BlockPopover( {
 	const popoverPosition = showEmptyBlockSideInserter
 		? 'top left right'
 		: 'top right left';
-	const { ownerDocument } = node;
-	const stickyBoundaryElement = showEmptyBlockSideInserter
-		? undefined
-		: // The sticky boundary element should be the boundary at which the
-		  // the block toolbar becomes sticky when the block scolls out of view.
-		  // In case of an iframe, this should be the iframe boundary, otherwise
-		  // the scroll container.
-		  ownerDocument.defaultView.frameElement ||
-		  getScrollContainer( node ) ||
-		  ownerDocument.body;
 
 	return (
 		<Popover
@@ -179,7 +189,9 @@ function BlockPopover( {
 			focusOnMount={ false }
 			anchorRef={ anchorRef }
 			className="block-editor-block-list__block-popover"
-			__unstableStickyBoundaryElement={ stickyBoundaryElement }
+			__unstableStickyBoundaryElement={
+				showEmptyBlockSideInserter ? undefined : stickyBoundaryElement
+			}
 			__unstableSlotName="block-toolbar"
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
