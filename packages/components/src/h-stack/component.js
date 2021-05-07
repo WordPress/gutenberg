@@ -14,21 +14,14 @@ import { useHStack } from './hook';
  * import {
  * 	__experimentalHStack as HStack,
  * 	__experimentalText as Text,
- * 	__experimentalView as View,
  * } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (
  * 		<HStack>
- * 			<View>
- * 				<Text>Code</Text>
- * 			</View>
- * 			<View>
- * 				<Text>is</Text>
- * 			</View>
- * 			<View>
- * 				<Text>Poetry</Text>
- * 			</View>
+ * 			<Text>Code</Text>
+ * 			<Text>is</Text>
+ * 			<Text>Poetry</Text>
  * 		</HStack>
  * 	);
  * }
