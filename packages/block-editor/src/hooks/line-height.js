@@ -8,7 +8,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
  */
 import LineHeightControl from '../components/line-height-control';
 import { cleanEmptyObject } from './utils';
-import useEditorFeature from '../components/use-editor-feature';
+import useThemeSetting from '../components/use-theme-setting';
 
 export const LINE_HEIGHT_SUPPORT_KEY = 'lineHeight';
 
@@ -56,7 +56,7 @@ export function LineHeightEdit( props ) {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsLineHeightDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useEditorFeature( 'typography.customLineHeight' );
+	const isDisabled = ! useThemeSetting( 'typography.customLineHeight' );
 
 	return (
 		! hasBlockSupport( blockName, LINE_HEIGHT_SUPPORT_KEY ) || isDisabled

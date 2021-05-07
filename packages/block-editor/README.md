@@ -654,6 +654,25 @@ _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
 
+<a name="useThemeSetting" href="#useThemeSetting">#</a> **useThemeSetting**
+
+Hook that retrieves the theme setting.
+It works with nested objects using by finding the value at path.
+
+_Usage_
+
+```js
+const isEnabled = useThemeSetting( 'typography.dropCap' );
+```
+
+_Parameters_
+
+-   _path_ `string`: The path to the setting.
+
+_Returns_
+
+-   `any`: Returns the value defined for the setting.
+
 <a name="validateThemeColors" href="#validateThemeColors">#</a> **validateThemeColors**
 
 Given an array of theme colors checks colors for validity

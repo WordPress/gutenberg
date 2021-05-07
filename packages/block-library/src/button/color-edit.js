@@ -26,7 +26,7 @@ import {
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
 	ContrastChecker,
 	InspectorControls,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useThemeSetting,
 } from '@wordpress/block-editor';
 
 const EMPTY_ARRAY = [];
@@ -125,8 +125,8 @@ function ColorPanel( { settings, clientId, enableContrastChecking = true } ) {
  */
 function ColorEdit( props ) {
 	const { attributes } = props;
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+	const colors = useThemeSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const gradients = useThemeSetting( 'color.gradients' ) || EMPTY_ARRAY;
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground

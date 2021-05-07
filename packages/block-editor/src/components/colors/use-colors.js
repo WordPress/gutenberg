@@ -25,7 +25,7 @@ import {
 import InspectorControls from '../inspector-controls';
 import { useBlockEditContext } from '../block-edit';
 import ColorPanel from './color-panel';
-import useEditorFeature from '../use-editor-feature';
+import useThemeSetting from '../use-theme-setting';
 import { store as blockEditorStore } from '../../store';
 
 function getComputedStyle( node ) {
@@ -63,8 +63,7 @@ export default function __experimentalUseColors(
 	deps = []
 ) {
 	const { clientId } = useBlockEditContext();
-	const settingsColors =
-		useEditorFeature( 'color.palette' ) || DEFAULT_COLORS;
+	const settingsColors = useThemeSetting( 'color.palette' ) || DEFAULT_COLORS;
 	const { attributes } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );

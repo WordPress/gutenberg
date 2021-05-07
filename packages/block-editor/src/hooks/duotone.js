@@ -18,7 +18,7 @@ import { addFilter } from '@wordpress/hooks';
 import {
 	BlockControls,
 	__experimentalDuotoneControl as DuotoneControl,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useThemeSetting,
 } from '../components';
 
 /**
@@ -123,8 +123,8 @@ function DuotonePanel( { attributes, setAttributes } ) {
 	const style = attributes?.style;
 	const duotone = style?.color?.duotone;
 
-	const duotonePalette = useEditorFeature( 'color.duotone' );
-	const colorPalette = useEditorFeature( 'color.palette' );
+	const duotonePalette = useThemeSetting( 'color.duotone' );
+	const colorPalette = useThemeSetting( 'color.palette' );
 
 	return (
 		<BlockControls group="block">

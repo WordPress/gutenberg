@@ -103,12 +103,12 @@ function getPresetMetadataFromStyleProperty( styleProperty ) {
 export const LINK_COLOR = '--wp--style--color--link';
 export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`;
 
-export function useEditorFeature( featurePath, blockName = '' ) {
+export function useThemeSetting( path, blockName = '' ) {
 	const settings = useSelect( ( select ) => {
 		return select( editSiteStore ).getSettings();
 	} );
-	const topLevelPath = `__experimentalFeatures.${ featurePath }`;
-	const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ featurePath }`;
+	const topLevelPath = `__experimentalFeatures.${ path }`;
+	const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
 	return get( settings, blockPath ) ?? get( settings, topLevelPath );
 }
 

@@ -28,7 +28,7 @@ import {
 } from '../components/gradients';
 import { cleanEmptyObject } from './utils';
 import ColorPanel from './color-panel';
-import useEditorFeature from '../components/use-editor-feature';
+import useThemeSetting from '../components/use-theme-setting';
 
 export const COLOR_SUPPORT_KEY = 'color';
 const EMPTY_ARRAY = [];
@@ -214,9 +214,9 @@ const getLinkColorFromAttributeValue = ( colors, value ) => {
  */
 export function ColorEdit( props ) {
 	const { name: blockName, attributes } = props;
-	const isLinkColorEnabled = useEditorFeature( 'color.link' );
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+	const isLinkColorEnabled = useThemeSetting( 'color.link' );
+	const colors = useThemeSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const gradients = useThemeSetting( 'color.gradients' ) || EMPTY_ARRAY;
 
 	// Shouldn't be needed but right now the ColorGradientsPanel
 	// can trigger both onChangeColor and onChangeBackground
@@ -386,7 +386,7 @@ export const withColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { backgroundColor, textColor } = attributes;
-		const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
+		const colors = useThemeSetting( 'color.palette' ) || EMPTY_ARRAY;
 		if ( ! hasColorSupport( name ) || shouldSkipSerialization( name ) ) {
 			return <BlockListBlock { ...props } />;
 		}

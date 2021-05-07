@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useEditorFeature } from '../editor/utils';
+import { useThemeSetting } from '../editor/utils';
 
 export function useHasTypographyPanel( { supports, name } ) {
 	const hasLineHeight = useHasLineHeightControl( { supports, name } );
@@ -24,17 +24,17 @@ export function useHasTypographyPanel( { supports, name } ) {
 
 function useHasLineHeightControl( { supports, name } ) {
 	return (
-		useEditorFeature( 'typography.customLineHeight', name ) &&
+		useThemeSetting( 'typography.customLineHeight', name ) &&
 		supports.includes( 'lineHeight' )
 	);
 }
 
 function useHasAppearanceControl( { supports, name } ) {
 	const hasFontStyles =
-		useEditorFeature( 'typography.customFontStyle', name ) &&
+		useThemeSetting( 'typography.customFontStyle', name ) &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useEditorFeature( 'typography.customFontWeight', name ) &&
+		useThemeSetting( 'typography.customFontWeight', name ) &&
 		supports.includes( 'fontWeight' );
 	return hasFontStyles || hasFontWeights;
 }
@@ -44,17 +44,17 @@ export default function TypographyPanel( {
 	getStyle,
 	setStyle,
 } ) {
-	const fontSizes = useEditorFeature( 'typography.fontSizes', name );
-	const disableCustomFontSizes = ! useEditorFeature(
+	const fontSizes = useThemeSetting( 'typography.fontSizes', name );
+	const disableCustomFontSizes = ! useThemeSetting(
 		'typography.customFontSize',
 		name
 	);
-	const fontFamilies = useEditorFeature( 'typography.fontFamilies', name );
+	const fontFamilies = useThemeSetting( 'typography.fontFamilies', name );
 	const hasFontStyles =
-		useEditorFeature( 'typography.customFontStyle', name ) &&
+		useThemeSetting( 'typography.customFontStyle', name ) &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useEditorFeature( 'typography.customFontWeight', name ) &&
+		useThemeSetting( 'typography.customFontWeight', name ) &&
 		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
 	const hasAppearanceControl = useHasAppearanceControl( { supports, name } );

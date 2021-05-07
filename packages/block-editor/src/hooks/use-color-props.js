@@ -15,7 +15,7 @@ import {
 	__experimentalGetGradientClass,
 	getGradientValueBySlug,
 } from '../components/gradients';
-import useEditorFeature from '../components/use-editor-feature';
+import useThemeSetting from '../components/use-theme-setting';
 
 // The code in this file has largely been lifted from the color block support
 // hook.
@@ -82,8 +82,8 @@ export function getColorClassesAndStyles( attributes ) {
 export function useColorProps( attributes ) {
 	const { backgroundColor, textColor, gradient } = attributes;
 
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
-	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
+	const colors = useThemeSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const gradients = useThemeSetting( 'color.gradients' ) || EMPTY_ARRAY;
 
 	const colorProps = getColorClassesAndStyles( attributes );
 

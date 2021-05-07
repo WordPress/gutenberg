@@ -24,7 +24,7 @@ import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
 	__unstableEditorStyles as EditorStyles,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useThemeSetting,
 	__experimentalLayoutStyle as LayoutStyle,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
@@ -114,7 +114,7 @@ export default function VisualEditor( { styles } ) {
 		borderBottom: 0,
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
-	const defaultLayout = useEditorFeature( 'layout' );
+	const defaultLayout = useThemeSetting( 'layout' );
 	const { contentSize, wideSize } = defaultLayout || {};
 	const alignments =
 		contentSize || wideSize
