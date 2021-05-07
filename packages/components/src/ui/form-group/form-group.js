@@ -3,7 +3,7 @@
  */
 import { contextConnect } from '../context';
 import { Grid } from '../../grid';
-import { View } from '../view';
+import { View } from '../../view';
 import FormGroupContent from './form-group-content';
 import { useFormGroup } from './use-form-group';
 

@@ -9,7 +9,7 @@ import styled from '@emotion/styled';
  *
  * @example
  * ```jsx
- * import { View } from `@wordpress/components/ui`;
+ * import { View } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (

@@ -9,14 +9,17 @@ import useGrid from './hook';
  *
  * @example
  * ```jsx
- * import { __experimentalGrid as Grid, __experimentalView as View } from `@wordpress/components`;
+ * import {
+ * 	__experimentalGrid as Grid,
+ * 	__experimentalText as Text
+ * } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (
  * 		<Grid columns={ 3 }>
- * 			<View>Code</View>
- * 			<View>is</View>
- * 			<View>Poetry</View>
+ * 			<Text>Code</Text>
+ * 			<Text>is</Text>
+ * 			<Text>Poetry</Text>
  * 		</Grid>
  * 	);
  * }
