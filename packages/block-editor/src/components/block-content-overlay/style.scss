@@ -2,6 +2,12 @@
 	max-width: none;
 }
 
+// Show overlay color when block is highlighted by list veiw.
+.wp-block.is-highlighted > .block-editor-block-content-overlay > .block-editor-block-content-overlay__overlay {
+	background: rgba(var(--wp-admin-theme-color--rgb), 0.1);
+	box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
+}
+
 .block-editor-block-content-overlay {
 	position: relative;
 
