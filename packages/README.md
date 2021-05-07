@@ -18,7 +18,8 @@ When creating a new package, you need to provide at least the following:
     	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/package-name/README.md",
     	"repository": {
     		"type": "git",
-    		"url": "https://github.com/WordPress/gutenberg.git"
+    		"url": "https://github.com/WordPress/gutenberg.git",
+    		"directory": "packages/package-name"
     	},
     	"bugs": {
     		"url": "https://github.com/WordPress/gutenberg/issues"
