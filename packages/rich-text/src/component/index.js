@@ -489,6 +489,12 @@ function RichText(
 	function handleSpace( event ) {
 		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 
+		// Allow space characters to be typed in a <summary>.
+		if ( keyCode === SPACE && TagName === 'summary' ) {
+			handleChange( insert( createRecord(), ' ' ) );
+			return;
+		}
+
 		if (
 			// Only override when no modifiers are pressed.
 			shiftKey ||
