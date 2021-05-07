@@ -7,7 +7,7 @@ import { memo } from '@wordpress/element';
  * Internal dependencies
  */
 import { ControlLabel } from '../control-label';
-import VisuallyHidden from '../../visually-hidden';
+import { VisuallyHidden } from '../../visually-hidden';
 
 /**
  * @param {import('../context').ViewOwnProps<import('./types').FormGroupLabelProps, 'label'>} props

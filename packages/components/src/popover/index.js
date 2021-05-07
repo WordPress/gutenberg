@@ -53,9 +53,10 @@ function computeAnchorRect(
 			return;
 		}
 
+		const rect = getAnchorRect( anchorRefFallback.current );
 		return offsetIframe(
-			getAnchorRect( anchorRefFallback.current ),
-			anchorRefFallback.current.ownerDocument
+			rect,
+			rect.ownerDocument || anchorRefFallback.current.ownerDocument
 		);
 	}
 

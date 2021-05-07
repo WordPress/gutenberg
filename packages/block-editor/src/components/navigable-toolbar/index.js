@@ -62,7 +62,8 @@ function useIsAccessibleToolbar( ref ) {
 		if ( ! onlyToolbarItem ) {
 			deprecated( 'Using custom components as toolbar controls', {
 				since: '5.6',
-				alternative: 'ToolbarItem or ToolbarButton components',
+				alternative:
+					'ToolbarItem, ToolbarButton or ToolbarDropdownMenu components',
 				link:
 					'https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols',
 			} );

@@ -76,7 +76,7 @@ export default function ManageLocations( {
 							sprintf(
 								// translators: menu name.
 								__( 'Currently using %s' ),
-								menuOnLocation.description
+								menuOnLocation.name
 							)
 						}
 					/>

@@ -2,15 +2,16 @@
  * External dependencies
  */
 import {
-	Text,
-	View,
-	Platform,
-	PanResponder,
 	Dimensions,
 	Keyboard,
-	StatusBar,
+	LayoutAnimation,
+	PanResponder,
+	Platform,
 	ScrollView,
+	StatusBar,
+	Text,
 	TouchableHighlight,
+	View,
 } from 'react-native';
 import Modal from 'react-native-modal';
 import SafeArea from 'react-native-safe-area';
@@ -43,6 +44,8 @@ import BottomSheetSubSheet from './sub-sheet';
 import NavigationHeader from './navigation-header';
 import { BottomSheetProvider } from './bottom-sheet-context';
 
+const DEFAULT_LAYOUT_ANIMATION = LayoutAnimation.Presets.easeInEaseOut;
+
 class BottomSheet extends Component {
 	constructor() {
 		super( ...arguments );
@@ -58,6 +61,7 @@ class BottomSheet extends Component {
 		this.setIsFullScreen = this.setIsFullScreen.bind( this );
 
 		this.onDimensionsChange = this.onDimensionsChange.bind( this );
+		this.onHeaderLayout = this.onHeaderLayout.bind( this );
 		this.onCloseBottomSheet = this.onCloseBottomSheet.bind( this );
 		this.onHandleClosingBottomSheet = this.onHandleClosingBottomSheet.bind(
 			this
@@ -66,15 +70,19 @@ class BottomSheet extends Component {
 		this.onHandleHardwareButtonPress = this.onHandleHardwareButtonPress.bind(
 			this
 		);
-		this.keyboardWillShow = this.keyboardWillShow.bind( this );
-		this.keyboardDidHide = this.keyboardDidHide.bind( this );
+		this.keyboardShow = this.keyboardShow.bind( this );
+		this.keyboardHide = this.keyboardHide.bind( this );
+
+		this.headerHeight = 0;
+		this.keyboardHeight = 0;
+		this.lastLayoutAnimation = null;
+		this.lastLayoutAnimationFinished = false;
 
 		this.state = {
 			safeAreaBottomInset: 0,
 			safeAreaTopInset: 0,
 			bounces: false,
 			maxHeight: 0,
-			keyboardHeight: 0,
 			scrollEnabled: true,
 			isScrolling: false,
 			handleClosingBottomSheet: null,
@@ -89,16 +97,83 @@ class BottomSheet extends Component {
 		Dimensions.addEventListener( 'change', this.onDimensionsChange );
 	}
 
-	keyboardWillShow( e ) {
-		const { height } = e.endCoordinates;
+	keyboardShow( e ) {
+		if ( ! this.props.isVisible ) {
+			return;
+		}
 
-		this.setState( { keyboardHeight: height }, () =>
-			this.onSetMaxHeight()
-		);
+		const { height } = e.endCoordinates;
+		this.keyboardHeight = height;
+		this.performKeyboardLayoutAnimation( e );
+		this.onSetMaxHeight();
+		this.props.onKeyboardShow?.();
 	}
 
-	keyboardDidHide() {
-		this.setState( { keyboardHeight: 0 }, () => this.onSetMaxHeight() );
+	keyboardHide( e ) {
+		if ( ! this.props.isVisible ) {
+			return;
+		}
+
+		this.keyboardHeight = 0;
+		this.performKeyboardLayoutAnimation( e );
+		this.onSetMaxHeight();
+		this.props.onKeyboardHide?.();
+	}
+
+	performKeyboardLayoutAnimation( event ) {
+		const { duration, easing } = event;
+
+		if ( duration && easing ) {
+			// This layout animation is the same as the React Native's KeyboardAvoidingView component.
+			// Reference: https://github.com/facebook/react-native/blob/266b21baf35e052ff28120f79c06c4f6dddc51a9/Libraries/Components/Keyboard/KeyboardAvoidingView.js#L119-L128
+			const animationConfig = {
+				// We have to pass the duration equal to minimal accepted duration defined here: RCTLayoutAnimation.m
+				duration: duration > 10 ? duration : 10,
+				type: LayoutAnimation.Types[ easing ] || 'keyboard',
+			};
+			const layoutAnimation = {
+				duration: animationConfig.duration,
+				update: animationConfig,
+				create: {
+					...animationConfig,
+					property: LayoutAnimation.Properties.opacity,
+				},
+				delete: {
+					...animationConfig,
+					property: LayoutAnimation.Properties.opacity,
+				},
+			};
+			this.lastLayoutAnimationFinished = false;
+			LayoutAnimation.configureNext( layoutAnimation, () => {
+				this.lastLayoutAnimationFinished = true;
+			} );
+			this.lastLayoutAnimation = layoutAnimation;
+		} else {
+			this.performRegularLayoutAnimation( {
+				useLastLayoutAnimation: false,
+			} );
+		}
+	}
+
+	performRegularLayoutAnimation( { useLastLayoutAnimation } ) {
+		// On Android, we should prevent triggering multiple layout animations at the same time because it can produce visual glitches.
+		if (
+			Platform.OS === 'android' &&
+			this.lastLayoutAnimation &&
+			! this.lastLayoutAnimationFinished
+		) {
+			return;
+		}
+
+		const layoutAnimation = useLastLayoutAnimation
+			? this.lastLayoutAnimation || DEFAULT_LAYOUT_ANIMATION
+			: DEFAULT_LAYOUT_ANIMATION;
+
+		this.lastLayoutAnimationFinished = false;
+		LayoutAnimation.configureNext( layoutAnimation, () => {
+			this.lastLayoutAnimationFinished = true;
+		} );
+		this.lastLayoutAnimation = layoutAnimation;
 	}
 
 	componentDidMount() {
@@ -110,14 +185,15 @@ class BottomSheet extends Component {
 			);
 		}
 
-		this.keyboardWillShowListener = Keyboard.addListener(
-			'keyboardWillShow',
-			this.keyboardWillShow
+		// 'Will' keyboard events are not available on Android.
+		// Reference: https://reactnative.dev/docs/0.61/keyboard#addlistener
+		this.keyboardShowListener = Keyboard.addListener(
+			Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
+			this.keyboardShow
 		);
-
-		this.keyboardDidHideListener = Keyboard.addListener(
-			'keyboardDidHide',
-			this.keyboardDidHide
+		this.keyboardHideListener = Keyboard.addListener(
+			Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide',
+			this.keyboardHide
 		);
 
 		this.safeAreaEventSubscription = SafeArea.addEventListener(
@@ -128,8 +204,8 @@ class BottomSheet extends Component {
 	}
 
 	componentWillUnmount() {
-		this.keyboardWillShowListener.remove();
-		this.keyboardDidHideListener.remove();
+		this.keyboardShowListener.remove();
+		this.keyboardHideListener.remove();
 		if ( this.androidModalClosedSubscription ) {
 			this.androidModalClosedSubscription.remove();
 		}
@@ -163,7 +239,7 @@ class BottomSheet extends Component {
 
 	onSetMaxHeight() {
 		const { height, width } = Dimensions.get( 'window' );
-		const { safeAreaBottomInset, keyboardHeight } = this.state;
+		const { safeAreaBottomInset } = this.state;
 		const statusBarHeight =
 			Platform.OS === 'android' ? StatusBar.currentHeight : 0;
 
@@ -171,8 +247,9 @@ class BottomSheet extends Component {
 		const maxHeightWithOpenKeyboard =
 			0.95 *
 			( Dimensions.get( 'window' ).height -
-				keyboardHeight -
-				statusBarHeight );
+				this.keyboardHeight -
+				statusBarHeight -
+				this.headerHeight );
 
 		// On horizontal mode `maxHeight` has to be set on 90% of width
 		if ( width > height ) {
@@ -193,6 +270,15 @@ class BottomSheet extends Component {
 	onDimensionsChange() {
 		this.onSetMaxHeight();
 		this.setState( { bounces: false } );
+	}
+
+	onHeaderLayout( { nativeEvent } ) {
+		const { height } = nativeEvent.layout;
+		this.headerHeight = height;
+		this.performRegularLayoutAnimation( {
+			useLastLayoutAnimation: true,
+		} );
+		this.onSetMaxHeight();
 	}
 
 	isCloseToBottom( { layoutMeasurement, contentOffset, contentSize } ) {
@@ -293,6 +379,7 @@ class BottomSheet extends Component {
 			isVisible,
 			leftButton,
 			rightButton,
+			header,
 			hideHeader,
 			style = {},
 			contentStyle = {},
@@ -375,16 +462,18 @@ class BottomSheet extends Component {
 
 		const getHeader = () => (
 			<>
-				<View style={ styles.bottomSheetHeader }>
-					<View style={ styles.flex }>{ leftButton }</View>
-					<Text
-						style={ bottomSheetHeaderTitleStyle }
-						maxFontSizeMultiplier={ 3 }
-					>
-						{ title }
-					</Text>
-					<View style={ styles.flex }>{ rightButton }</View>
-				</View>
+				{ header || (
+					<View style={ styles.bottomSheetHeader }>
+						<View style={ styles.flex }>{ leftButton }</View>
+						<Text
+							style={ bottomSheetHeaderTitleStyle }
+							maxFontSizeMultiplier={ 3 }
+						>
+							{ title }
+						</Text>
+						<View style={ styles.flex }>{ rightButton }</View>
+					</View>
+				) }
 				{ withHeaderSeparator && <View style={ styles.separator } /> }
 			</>
 		);
@@ -434,10 +523,12 @@ class BottomSheet extends Component {
 					} }
 					keyboardVerticalOffset={ -safeAreaBottomInset }
 				>
-					{ ! ( Platform.OS === 'android' && isFullScreen ) && (
-						<View style={ styles.dragIndicator } />
-					) }
-					{ ! hideHeader && getHeader() }
+					<View onLayout={ this.onHeaderLayout }>
+						{ ! ( Platform.OS === 'android' && isFullScreen ) && (
+							<View style={ styles.dragIndicator } />
+						) }
+						{ ! hideHeader && getHeader() }
+					</View>
 					<WrapperView
 						{ ...( hasNavigation
 							? { style: listProps.style }

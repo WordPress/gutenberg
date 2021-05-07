@@ -30,7 +30,12 @@ function gutenberg_extend_post_editor_settings( $settings ) {
 
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_post_editor_settings' );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( function_exists( 'get_block_editor_settings' ) ) {
+	add_filter( 'block_editor_settings_all', 'gutenberg_extend_post_editor_settings' );
+} else {
+	add_filter( 'block_editor_settings', 'gutenberg_extend_post_editor_settings' );
+}
 
 /**
  * Initialize a block-based editor.

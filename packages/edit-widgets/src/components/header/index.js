@@ -6,12 +6,10 @@ import { __, _x } from '@wordpress/i18n';
 import { Button, ToolbarItem } from '@wordpress/components';
 import {
 	BlockNavigationDropdown,
-	BlockToolbar,
 	NavigableToolbar,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { PinnedItems } from '@wordpress/interface';
-import { useViewportMatch } from '@wordpress/compose';
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
@@ -26,7 +24,6 @@ import { store as editWidgetsStore } from '../../store';
 
 function Header() {
 	const inserterButton = useRef();
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const widgetAreaClientId = useLastSelectedWidgetArea();
 	const isLastSelectedWidgetAreaOpen = useSelect(
 		( select ) =>
@@ -101,11 +98,6 @@ function Header() {
 					<PinnedItems.Slot scope="core/edit-widgets" />
 				</div>
 			</div>
-			{ ! isLargeViewport && (
-				<div className="edit-widgets-header__block-toolbar">
-					<BlockToolbar hideDragHandle />
-				</div>
-			) }
 		</>
 	);
 }

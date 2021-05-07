@@ -5,6 +5,7 @@ import {
 	getNavigationPostForMenu,
 	hasResolvedNavigationPost,
 	getMenuItemForClientId,
+	getSelectedMenuId,
 } from '../selectors';
 import {
 	NAVIGATION_POST_KIND,
@@ -128,5 +129,17 @@ describe( 'getMenuItemForClientId', () => {
 		expect( getMenuItem ).toHaveBeenCalledWith( '123' );
 
 		getMenuItemForClientId.registry = defaultRegistry;
+	} );
+} );
+
+describe( 'getSelectedMenuId', () => {
+	it( 'returns default selected menu ID (zero)', () => {
+		const state = {};
+		expect( getSelectedMenuId( state ) ).toBe( 0 );
+	} );
+
+	it( 'returns selected menu ID', () => {
+		const state = { selectedMenuId: 10 };
+		expect( getSelectedMenuId( state ) ).toBe( 10 );
 	} );
 } );

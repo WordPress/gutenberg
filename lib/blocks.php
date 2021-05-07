@@ -21,6 +21,7 @@ function gutenberg_reregister_core_block_types() {
 				'code',
 				'column',
 				'columns',
+				'cover',
 				'gallery',
 				'group',
 				'heading',
@@ -51,7 +52,6 @@ function gutenberg_reregister_core_block_types() {
 				'block.php'                     => 'core/block',
 				'calendar.php'                  => 'core/calendar',
 				'categories.php'                => 'core/categories',
-				'cover.php'                     => 'core/cover',
 				'file.php'                      => 'core/file',
 				'latest-comments.php'           => 'core/latest-comments',
 				'latest-posts.php'              => 'core/latest-posts',
@@ -78,9 +78,8 @@ function gutenberg_reregister_core_block_types() {
 				'post-date.php'                 => 'core/post-date',
 				'post-excerpt.php'              => 'core/post-excerpt',
 				'post-featured-image.php'       => 'core/post-featured-image',
-				'post-hierarchical-terms.php'   => 'core/post-hierarchical-terms',
+				'post-terms.php'                => 'core/post-terms',
 				'post-navigation-link.php'      => 'core/post-navigation-link',
-				'post-tags.php'                 => 'core/post-tags',
 				'post-title.php'                => 'core/post-title',
 				'query.php'                     => 'core/query',
 				'query-loop.php'                => 'core/query-loop',
@@ -380,8 +379,10 @@ function gutenberg_register_theme_block_category( $categories ) {
 	);
 	return $categories;
 }
-
-add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( ! function_exists( 'get_default_block_categories' ) ) {
+	add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+}
 
 /**
  * Checks whether the current block type supports the feature requested.

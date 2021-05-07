@@ -1,7 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "core/post-navigation-link",
+	"title": "Post Navigation Link",
 	"category": "design",
+	"description": "Displays the next or previous post link that is adjacent to the current post.",
+	"textdomain": "default",
 	"attributes": {
 		"textAlign": {
 			"type": "string"
