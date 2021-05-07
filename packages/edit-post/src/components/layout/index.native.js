@@ -16,7 +16,7 @@ import {
 	KeyboardAvoidingView,
 	NoticeList,
 } from '@wordpress/components';
-import { AutosaveMonitor } from '@wordpress/editor';
+import { AutosaveMonitor, store as editorStore } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
 
 /**
@@ -163,7 +163,7 @@ class Layout extends Component {
 export default compose( [
 	withSelect( ( select ) => {
 		const { __unstableIsEditorReady: isEditorReady } = select(
-			'core/editor'
+			editorStore
 		);
 		const { getEditorMode } = select( editPostStore );
 		return {
