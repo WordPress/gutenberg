@@ -164,8 +164,16 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$modal_unique_id = uniqid();
 
+	if ( ! isset( $attributes['isResponsive'] ) || false === $attributes['isResponsive'] ) {
+		return sprintf(
+			'<nav %1$s><ul class="wp-block-navigation__container">%2$s</ul></nav>',
+			$wrapper_attributes,
+			$inner_blocks_html
+		);
+	}
+
 	// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive.
-	$responsive_container_markup = isset( $attributes['isResponsive'] ) && true === $attributes['isResponsive'] ? sprintf(
+	$responsive_container_markup = sprintf(
 		'<button aria-expanded="false" aria-haspopup="true" aria-label="Open menu" class="wp-block-navigation__responsive-container-open" data-micromodal-trigger="modal-%2$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
 			<div class="wp-block-navigation__responsive-container" id="modal-%2$s" aria-hidden="true">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
@@ -179,7 +187,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 			</div>',
 		$inner_blocks_html,
 		$modal_unique_id
-	) : sprintf( '<ul class="wp-block-navigation__container">%1$s</ul>', $inner_blocks_html );
+	);
 
 	return sprintf(
 		'<nav %1$s>%2$s</nav>',
