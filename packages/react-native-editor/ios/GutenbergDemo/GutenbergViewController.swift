@@ -294,7 +294,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return ExampleAttachmentDelegate()
     }
 
-    func gutenbergEditorTheme() -> GutenbergEditorTheme? {
+    func gutenbergEditorSettings() -> GutenbergEditorSettings? {
         return nil
     }
 
