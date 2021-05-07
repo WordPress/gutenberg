@@ -194,7 +194,7 @@ function TemplatePartSearchResults( {
 					.indexOf( normalizedFilterValue )
 			);
 		} );
-		// Group filtered resutls together if their neighbors share the same area.
+		// Group filtered results together if their neighbors share the same area.
 		// This helps not show redundant panel groups side by side in the results.
 		const _groupedResults = [];
 		for ( let i = 0; i < searchResults.length; i++ ) {
