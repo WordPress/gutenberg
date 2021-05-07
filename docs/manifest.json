@@ -744,6 +744,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Divider",
+		"slug": "divider",
+		"markdown_source": "../packages/components/src/divider/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Draggable",
 		"slug": "draggable",
 		"markdown_source": "../packages/components/src/draggable/README.md",
