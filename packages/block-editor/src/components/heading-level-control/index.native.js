@@ -14,13 +14,19 @@ const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
 /** @typedef {import('@wordpress/element').WPComponent} WPComponent */
 
 /**
+ * @typedef WPHeadingLevelControlOptions
+ *
+ * @property {boolean} [addParagraphLevel=false] Append paragraph option with zero level to the available levels.
+ */
+
+/**
  * HeadingLevelControl props.
  *
  * @typedef WPHeadingLevelControlProps
  *
  * @property {number} value The chosen heading level.
  * @property {(newValue:number)=>any} onChange Callback to run when toolbar value is changed.
- * @property {boolean} isParagraphAllowed Append paragraph option with zero level to available levels.
+ * @property {WPHeadingLevelControlOptions} options Additional options passed to the component.
  */
 
 /**
@@ -37,9 +43,9 @@ const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
 export default function HeadingLevelControl( {
 	value,
 	onChange,
-	isParagraphAllowed = false,
+	options: { addParagraphLevel = false } = {},
 } ) {
-	const levels = ! isParagraphAllowed
+	const levels = ! addParagraphLevel
 		? HEADING_LEVELS
 		: [ ...HEADING_LEVELS, 0 ];
 	const allControls = levels.map( ( currentLevel ) => {

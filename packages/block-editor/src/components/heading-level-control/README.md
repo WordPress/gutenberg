@@ -22,6 +22,7 @@ const MyHeadingLevelControl = ( { attributes, setAttributes } ) => (
 			onChange={ ( next ) => {
 				setAttributes( { level: next } );
 			} }
+			options={ { addParagraphLevel: true } }
 		/>
 	</BlockControls>
 );
@@ -32,7 +33,7 @@ const MyHeadingLevelControl = ( { attributes, setAttributes } ) => (
 #### `value`
 
 -   **Type:** `Number`
--   **Options:**: `1`, `2`, `3`, `4`, `5`, `6` and `0` if `isParagraphAllowed` is set to `true`
+-   **Options:**: `1`, `2`, `3`, `4`, `5`, `6` and `0` if `options.addParagraphLevel` is set to `true`
 
 The current selected level of the block. Only the `Options` listed above are supported.
 
@@ -43,13 +44,12 @@ The current selected level of the block. Only the `Options` listed above are sup
 
 A callback function invoked when the toolbar's heading value is changed via an interaction with any of the toolbar's buttons. Called with the new level value as the only argument.
 
-#### `isParagraphAllowed`
+#### `options`
 
--   **Type:** `Boolean`
--   **Default:** `false`
+-   **Type:** `Object`
 -   **Required:** No
 
-Append `paragraph` option with `zero(0)` level to the available levels.
+Additional options passed to the `HeadingLevelControl` component. Available options are `addParagraphLevel` which appends a paragraph option with `zero(0)` level to the available levels and it defaults to `false`.
 
 ## Related components
 

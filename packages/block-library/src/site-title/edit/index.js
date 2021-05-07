@@ -38,7 +38,7 @@ export default function SiteTitleEdit( {
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}
-					isParagraphAllowed
+					options={ { addParagraphLevel: true } }
 				/>
 				<AlignmentControl
 					value={ textAlign }
