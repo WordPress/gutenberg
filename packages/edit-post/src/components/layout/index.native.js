@@ -15,6 +15,7 @@ import {
 	HTMLTextInput,
 	KeyboardAvoidingView,
 	NoticeList,
+	Tooltip,
 } from '@wordpress/components';
 import { AutosaveMonitor, store as editorStore } from '@wordpress/editor';
 import { sendNativeEditorDidLayout } from '@wordpress/react-native-bridge';
@@ -155,6 +156,7 @@ class Layout extends Component {
 						<BottomSheetSettings />
 					</KeyboardAvoidingView>
 				) }
+				<Tooltip.Slot />
 			</SafeAreaView>
 		);
 	}
