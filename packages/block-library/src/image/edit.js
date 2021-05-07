@@ -320,7 +320,7 @@ export function ImageEdit( {
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				value={ { id, src } }
 				mediaPreview={ mediaPreview }
-				disableMediaButtons={ url }
+				disableMediaButtons={ temporaryURL || url }
 			/>
 		</figure>
 	);

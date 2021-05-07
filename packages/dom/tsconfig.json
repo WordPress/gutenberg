@@ -2,27 +2,10 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"rootDir": "src",
-		"declarationDir": "build-types"
+		"declarationDir": "build-types",
+		"types": [ "gutenberg-env" ]
 	},
 	"include": [
-		"src/data-transfer.js",
-		"src/dom/caret-range-from-point.js",
-		"src/dom/clean-node-list.js",
-		"src/dom/compute-caret-rect.js",
-		"src/dom/document-has-selection.js",
-		"src/dom/document-has-text-selection.js",
-		"src/dom/get-rectangle-from-range.js",
-		"src/dom/is-empty.js",
-		"src/dom/is-element.js",
-		"src/dom/is-html-input-element.js",
-		"src/dom/is-number-input.js",
-		"src/dom/is-text-field.js",
-		"src/dom/insert-after.js",
-		"src/dom/remove.js",
-		"src/dom/unwrap.js",
-		"src/utils/**/*",
-		"src/focusable.js",
-		"src/phrasing-content.js",
-		"src/tabbable.js",
+		"src/**/*"
 	]
 }

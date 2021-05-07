@@ -62,6 +62,15 @@ export function subscribeUpdateHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'updateHtml', callback );
 }
 
+export function subscribeFeaturedImageIdNativeUpdated( callback ) {
+	return isAndroid
+		? gutenbergBridgeEvents.addListener(
+				'featuredImageIdNativeUpdated',
+				callback
+		  )
+		: undefined;
+}
+
 /**
  * Request to subscribe to mediaUpload events
  *
@@ -116,8 +125,11 @@ export function subscribeAndroidModalClosed( callback ) {
 		: undefined;
 }
 
-export function subscribeUpdateTheme( callback ) {
-	return gutenbergBridgeEvents.addListener( 'updateTheme', callback );
+export function subscribeEditorSettingsTheme( callback ) {
+	return gutenbergBridgeEvents.addListener(
+		'updateEditorSettings',
+		callback
+	);
 }
 
 export function subscribePreferredColorScheme( callback ) {

@@ -1,9 +1,8 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0.emotion-0 {
-  border-color: rgba(0, 0, 0, 0.1);
-  border-color: var(--wp-g2-color-divider);
+.emotion-0 {
+  border-color: rgba(0,0,0,0.1);
   border-width: 0 0 1px 0;
   height: 0;
   margin: 0;
@@ -12,9 +11,9 @@ exports[`props should render correctly 1`] = `
 
 <hr
   aria-orientation="horizontal"
-  class="emotion-0 components-divider wp-components-divider ic-d9awm7"
-  data-g2-c16t="true"
-  data-g2-component="Divider"
+  class="emotion-0 components-divider"
+  data-wp-c16t="true"
+  data-wp-component="Divider"
   role="separator"
 />
 `;
@@ -26,12 +25,12 @@ Snapshot Diff:
 
 @@ -2,10 +2,8 @@
     Object {
-      "border-color": "var(--wp-g2-color-divider)",
+      "border-color": "rgba(0,0,0,0.1)",
       "border-width": "0 0 1px 0",
       "height": "0",
       "margin": "0",
--     "margin-bottom": "calc(var(--wp-g2-grid-base) * 7)",
--     "margin-top": "calc(var(--wp-g2-grid-base) * 7)",
+-     "margin-bottom": "calc(4px * 7)",
+-     "margin-top": "calc(4px * 7)",
       "width": "auto",
     },
   ]
@@ -44,11 +43,11 @@ Snapshot Diff:
 
 @@ -2,9 +2,8 @@
     Object {
-      "border-color": "var(--wp-g2-color-divider)",
+      "border-color": "rgba(0,0,0,0.1)",
       "border-width": "0 0 1px 0",
       "height": "0",
       "margin": "0",
--     "margin-bottom": "calc(var(--wp-g2-grid-base) * 5)",
+-     "margin-bottom": "calc(4px * 5)",
       "width": "auto",
     },
   ]
@@ -61,11 +60,11 @@ Snapshot Diff:
 
 @@ -2,9 +2,8 @@
     Object {
-      "border-color": "var(--wp-g2-color-divider)",
+      "border-color": "rgba(0,0,0,0.1)",
       "border-width": "0 0 1px 0",
       "height": "0",
       "margin": "0",
--     "margin-top": "calc(var(--wp-g2-grid-base) * 5)",
+-     "margin-top": "calc(4px * 5)",
       "width": "auto",
     },
   ]

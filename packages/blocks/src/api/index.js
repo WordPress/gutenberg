@@ -108,6 +108,7 @@ export { getCategories, setCategories, updateCategory } from './categories';
 // children of another block.
 export {
 	registerBlockType,
+	registerBlockTypeFromMetadata,
 	registerBlockCollection,
 	unregisterBlockType,
 	setFreeformContentHandlerName,
@@ -141,6 +142,7 @@ export {
 	getBlockLabel as __experimentalGetBlockLabel,
 	getAccessibleBlockLabel as __experimentalGetAccessibleBlockLabel,
 	__experimentalSanitizeBlockAttributes,
+	__experimentalGetBlockAttributesNamesByRole,
 } from './utils';
 
 // Templates are, in a general sense, a basic collection of block nodes with any

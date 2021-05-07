@@ -160,7 +160,7 @@ class BottomSheetRangeCell extends Component {
 				__( '%1$s. %2$s is %3$s %4$s.' ),
 				cellProps.label,
 				settingLabel,
-				value,
+				toFixed( value, decimalNum ),
 				unitLabel
 			);
 		};
@@ -214,6 +214,7 @@ class BottomSheetRangeCell extends Component {
 						<View style={ containerStyle }>
 							{ preview }
 							<Slider
+								testID={ `Slider ${ cellProps.label }` }
 								value={ sliderValue }
 								defaultValue={ defaultValue }
 								disabled={ disabled }

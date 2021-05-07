@@ -7,7 +7,7 @@ Allow users to control the width & height of an image.
 Render a ImageSizeControl.
 
 ```jsx
-import { ImageSizeControl } from '@wordpress/components';
+import { __experimentalImageSizeControl as ImageSizeControl } from '@wordpress/block-editor';
 import { withState } from '@wordpress/compose';
 
 const MyImageSizeControl = withState( {
@@ -38,36 +38,36 @@ The component accepts the following props:
 
 The currently-selected image size slug (`thumbnail`, `large`, etc). This is used by the parent component to get the specific image, which is used to populate `imageHeight` & `imageWidth`. This is not required, but necessary when `imageSizeOptions` is used.
 
-- Type: `string`
-- Required: No
+-   Type: `string`
+-   Required: No
 
 ### height
 
 The height of the image when displayed.
 
-- Type: `number`
-- Required: No
+-   Type: `number`
+-   Required: No
 
 ### width
 
 The width of the image when displayed.
 
-- Type: `number`
-- Required: No
+-   Type: `number`
+-   Required: No
 
 ### onChange
 
 The function called when the image size changes. It is passed an object with `{ width, height }` (potentially just one if only one dimension changed).
 
-- Type: `Function`
-- Required: Yes
+-   Type: `Function`
+-   Required: Yes
 
 ### onChangeImage
 
 The function called when a new image size is selected. It is passed the `slug` as an argument. This is not required, but necessary when `imageSizeOptions` is used.
 
-- Type: `Function`
-- Required: No
+-   Type: `Function`
+-   Required: No
 
 ### imageSizeOptions
 
@@ -83,26 +83,26 @@ An array of image size slugs and labels. Should be of the format:
 
 If not provided, the "Image Size" dropdown is not displayed.
 
-- Type: `array`
-- Required: No
+-   Type: `array`
+-   Required: No
 
 ### isResizable
 
 A boolean control for showing the resize fields "Image Dimensions". Set this to false if you want images to always be the fixed size of the selected image.
 
-- Type: `boolean`
-- Required: No
+-   Type: `boolean`
+-   Required: No
 
 ### imageWidth
 
 The width of the currently selected image, used for calculating the percentage sizes. This will likely be updated when the image size slug changes, but does not control the image display (that's the `width` prop).
 
-- Type: `number`
-- Required: Yes
+-   Type: `number`
+-   Required: Yes
 
 ### imageHeight
 
 The height of the currently selected image, used for calculating the percentage sizes. This will likely be updated when the image size slug changes, but does not control the image display (that's the `height` prop).
 
-- Type: `number`
-- Required: Yes
+-   Type: `number`
+-   Required: Yes

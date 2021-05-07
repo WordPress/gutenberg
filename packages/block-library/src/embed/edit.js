@@ -8,8 +8,8 @@ import {
 	getAttributesFromPreview,
 	getEmbedInfoByProvider,
 } from './util';
-import { settings } from './index';
 import EmbedControls from './embed-controls';
+import { embedContentIcon } from './icons';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
@@ -22,11 +22,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
+import { View } from '@wordpress/primitives';
 
 function getResponsiveHelp( checked ) {
 	return checked
@@ -54,8 +55,8 @@ const EmbedEdit = ( props ) => {
 	} = props;
 
 	const defaultEmbedInfo = {
-		title: settings.title,
-		icon: settings.icon,
+		title: _x( 'Embed', 'block title' ),
+		icon: embedContentIcon,
 	};
 	const { icon, title } =
 		getEmbedInfoByProvider( providerNameSlug ) || defaultEmbedInfo;
@@ -179,9 +180,9 @@ const EmbedEdit = ( props ) => {
 
 	if ( fetching ) {
 		return (
-			<div { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedLoading />
-			</div>
+			</View>
 		);
 	}
 
@@ -192,7 +193,7 @@ const EmbedEdit = ( props ) => {
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
 	if ( showEmbedPlaceholder ) {
 		return (
-			<div { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedPlaceholder
 					icon={ icon }
 					label={ label }
@@ -214,7 +215,7 @@ const EmbedEdit = ( props ) => {
 						] );
 					} }
 				/>
-			</div>
+			</View>
 		);
 	}
 
@@ -244,7 +245,7 @@ const EmbedEdit = ( props ) => {
 				toggleResponsive={ toggleResponsive }
 				switchBackToURLInput={ () => setIsEditingURL( true ) }
 			/>
-			<div { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedPreview
 					preview={ preview }
 					previewable={ previewable }
@@ -260,7 +261,7 @@ const EmbedEdit = ( props ) => {
 					label={ label }
 					insertBlocksAfter={ insertBlocksAfter }
 				/>
-			</div>
+			</View>
 		</>
 	);
 };

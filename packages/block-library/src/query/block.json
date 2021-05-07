@@ -1,7 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "core/query",
+	"title": "Query",
 	"category": "design",
+	"description": "Displays a list of posts as a result of a query.",
+	"textdomain": "default",
 	"attributes": {
 		"queryId": {
 			"type": "number"
@@ -24,6 +27,10 @@
 				"inherit": true
 			}
 		},
+		"tagName": {
+			"type": "string",
+			"default": "div"
+		},
 		"layout": {
 			"type": "object",
 			"default": {
@@ -37,6 +44,7 @@
 		"layout": "layout"
 	},
 	"supports": {
+		"align": [ "wide", "full" ],
 		"html": false
 	},
 	"editorStyle": "wp-block-query-editor"

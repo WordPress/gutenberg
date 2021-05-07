@@ -8,7 +8,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeSetTitle,
 	subscribeMediaAppend,
 	subscribeReplaceBlock,
-	subscribeUpdateTheme,
+	subscribeUpdateEditorSettings,
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
 } from '@wordpress/react-native-bridge';
@@ -26,6 +26,7 @@ import { applyFilters } from '@wordpress/hooks';
 import {
 	validateThemeColors,
 	validateThemeGradients,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { getGlobalStyles } from '@wordpress/components';
 
@@ -123,15 +124,17 @@ class NativeEditorProvider extends Component {
 			}
 		);
 
-		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
-			( theme ) => {
+		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
+			( editorSettings ) => {
 				// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
+				editorSettings.colors = validateThemeColors(
+					editorSettings.colors
+				);
+				editorSettings.gradients = validateThemeGradients(
+					editorSettings.gradients
+				);
 
-				theme.colors = validateThemeColors( theme.colors );
-
-				theme.gradients = validateThemeGradients( theme.gradients );
-
-				this.props.updateSettings( theme );
+				this.props.updateSettings( editorSettings );
 			}
 		);
 
@@ -173,8 +176,8 @@ class NativeEditorProvider extends Component {
 			this.subscriptionParentMediaAppend.remove();
 		}
 
-		if ( this.subscriptionParentUpdateTheme ) {
-			this.subscriptionParentUpdateTheme.remove();
+		if ( this.subscriptionParentUpdateEditorSettings ) {
+			this.subscriptionParentUpdateEditorSettings.remove();
 		}
 
 		if ( this.subscriptionParentUpdateCapabilities ) {
@@ -289,7 +292,7 @@ export default compose( [
 			getBlockIndex,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
@@ -310,7 +313,7 @@ export default compose( [
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
-		} = dispatch( 'core/block-editor' );
+		} = dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
 		const { createSuccessNotice } = dispatch( 'core/notices' );
