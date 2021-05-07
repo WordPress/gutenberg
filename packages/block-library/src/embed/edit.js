@@ -52,6 +52,7 @@ const EmbedEdit = ( props ) => {
 		onReplace,
 		setAttributes,
 		insertBlocksAfter,
+		onFocus,
 	} = props;
 
 	const defaultEmbedInfo = {
@@ -195,10 +196,11 @@ const EmbedEdit = ( props ) => {
 	const showEmbedPlaceholder = ! preview || cannotEmbed || isEditingURL;
 	if ( showEmbedPlaceholder ) {
 		return (
-			<View style={ { flex: 1 } } { ...blockProps }>
+			<View { ...blockProps }>
 				<EmbedPlaceholder
 					icon={ icon }
 					label={ label }
+					onFocus={ onFocus }
 					onSubmit={ ( event ) => {
 						if ( event ) {
 							event.preventDefault();
