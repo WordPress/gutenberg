@@ -141,7 +141,7 @@ function GalleryEdit( props ) {
 	useEffect( () => {
 		newImages?.forEach( ( newImage ) => {
 			updateBlockAttributes( newImage.clientId, {
-				...buildImageAttributes( false, newImage ),
+				...buildImageAttributes( false, newImage.attributes ),
 				id: newImage.id,
 			} );
 		} );
@@ -191,13 +191,21 @@ function GalleryEdit( props ) {
 		if ( existingBlock ) {
 			return existingBlock.attributes;
 		}
+
+		let newClassName;
+		if ( image.className && image.className !== '' ) {
+			newClassName = image.className;
+		} else {
+			newClassName = preferredStyle
+				? `is-style-${ preferredStyle }`
+				: undefined;
+		}
+
 		return {
 			...pickRelevantMediaFiles( image, sizeSlug ),
 			...getHrefAndDestination( image, linkTo ),
 			...getUpdatedLinkTargetSettings( linkTarget, attributes ),
-			className: preferredStyle
-				? `is-style-${ preferredStyle }`
-				: undefined,
+			className: newClassName,
 			sizeSlug,
 		};
 	}
@@ -279,6 +287,7 @@ function GalleryEdit( props ) {
 				id: image.id,
 				url: image.url,
 				caption: image.caption,
+				alt: image.alt,
 			} );
 		} );
 
