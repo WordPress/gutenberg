@@ -32,7 +32,7 @@ import {
 import { useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -148,19 +148,6 @@ export default function VisualEditor( { styles } ) {
 
 	const blockSelectionClearerRef = useBlockSelectionClearer( true );
 
-	// Allow scrolling "through" popovers over the canvas. This is only called
-	// for as long as the pointer is over a popover. Do not use React events
-	// because it will bubble through portals.
-	const toolWrapperRef = useRefEffect( ( node ) => {
-		function onWheel( { deltaX, deltaY } ) {
-			ref.current.scrollBy( deltaX, deltaY );
-		}
-		node.addEventListener( 'wheel', onWheel );
-		return () => {
-			node.removeEventListener( 'wheel', onWheel );
-		};
-	}, [] );
-
 	return (
 		<motion.div
 			className={ classnames( 'edit-post-visual-editor', {
@@ -191,11 +178,10 @@ export default function VisualEditor( { styles } ) {
 				</Button>
 			) }
 			<motion.div
-				ref={ toolWrapperRef }
 				animate={ animatedStyles }
 				initial={ desktopCanvasStyles }
 			>
-				<BlockTools>
+				<BlockTools __unstableContentRef={ ref }>
 					<MaybeIframe
 						isTemplateMode={ isTemplateMode }
 						contentRef={ contentRef }
