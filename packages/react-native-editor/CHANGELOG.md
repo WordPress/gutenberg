@@ -11,6 +11,10 @@ For each user feature we should also add a importance categorization label  to i
 
 ## Unreleased
 
+## 1.52.1
+
+- [*] Fixes for the generated localized strings files.
+
 ## 1.52.0
 
 -   [***] Search block now available on mobile! [https://github.com/WordPress/gutenberg/pull/30783]
