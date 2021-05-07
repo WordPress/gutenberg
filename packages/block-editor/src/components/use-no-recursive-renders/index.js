@@ -41,7 +41,8 @@ function addToBlockType( renderedBlocks, blockName, uniqueId ) {
  * tree. Blocks susceptible to recursion can use this hook in their `Edit`
  * function to prevent said recursion.
  *
- * @param {*} uniqueId Any value that acts as a unique identifier for a block instance.
+ * @param {*}      uniqueId  Any value that acts as a unique identifier for a block instance.
+ * @param {string} blockName Optional block name.
  *
  * @return {[boolean, Function]} A tuple of:
  *                               - a boolean describing whether the provided id
@@ -49,9 +50,10 @@ function addToBlockType( renderedBlocks, blockName, uniqueId ) {
  *                               - a React context provider to be used to wrap
  *                                 other elements.
  */
-export default function useNoRecursiveRenders( uniqueId ) {
+export default function useNoRecursiveRenders( uniqueId, blockName = '' ) {
 	const previouslyRenderedBlocks = useContext( RenderedRefsContext );
-	const { name: blockName } = useBlockEditContext();
+	const { name } = useBlockEditContext();
+	blockName = blockName || name;
 	const hasAlreadyRendered = Boolean(
 		previouslyRenderedBlocks[ blockName ]?.has( uniqueId )
 	);
