@@ -20,6 +20,7 @@
 		"src/base-control/**/*",
 		"src/dashicon/**/*",
 		"src/draggable/**/*",
+		"src/elevation/**/*",
 		"src/flex/**/*",
 		"src/form-group/**/*",
 		"src/scroll-lock/**/*",

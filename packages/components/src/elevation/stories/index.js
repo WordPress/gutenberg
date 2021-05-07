@@ -7,15 +7,15 @@ import { number } from '@storybook/addon-knobs';
  * Internal dependencies
  */
 import { Elevation } from '../index';
-import { Grid } from '../../../grid';
-import { View } from '../../../view';
-import { HStack } from '../../../h-stack';
-import { Divider } from '../../../divider';
+import { Grid } from '../../grid';
+import { View } from '../../view';
+import { HStack } from '../../h-stack';
+import { Divider } from '../../divider';
 import {
 	ExampleGrid,
 	ExampleGridItem,
 	ExampleMetaContent,
-} from '../../__storybook-utils';
+} from '../../ui/__storybook-utils';
 
 /**
  * WordPress dependencies
@@ -24,7 +24,7 @@ import { useCallback } from '@wordpress/element';
 
 export default {
 	component: Elevation,
-	title: 'G2 Components (Experimental)/Elevation',
+	title: 'Components (Experimental)/Elevation',
 };
 
 const ElevationWrapper = ( { children } ) => (
