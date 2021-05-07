@@ -57,6 +57,8 @@ When creating a new package, you need to provide at least the following:
     Initial release.
     ```
 
+To ensure your package is recognised, you should also _manually_ add your new package to the root `package.json` file and then run `npm install` to update the dependencies.
+
 ## Managing Dependencies
 
 There are two types of dependencies that you might want to add to one of the existing WordPress packages.
@@ -114,6 +116,10 @@ npm install glob --save-dev
 ```
 
 This commands adds the latest version of `glob` as a development dependency to the `package.json` file. It has to be executed from the root of the project.
+
+## Maintaining a Public API
+
+It's very important to have a good plan for what a new package will include. All constants, methods, and components exposed from the package will ultimately become part of the public API in WordPress core (exposed via the `wp` global - eg: `wp.blockEditor`) and as such will need to support indefinitely. You should be very selective in what is exposed by your package and ensure it is well documented.
 
 ## Maintaining API documentation
 
