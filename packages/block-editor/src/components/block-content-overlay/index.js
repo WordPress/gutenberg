@@ -17,6 +17,7 @@ import classnames from 'classnames';
 export default function BlockContentOverlay( { clientId, children } ) {
 	const baseClassName = 'block-editor-block-content-overlay';
 	const [ isOverlayActive, setIsOverlayActive ] = useState( true );
+	const [ isHovered, setIsHovered ] = useState( false );
 
 	const { isSelected, hasChildSelected, isDraggingBlocks } = useSelect(
 		( select ) => {
@@ -44,14 +45,21 @@ export default function BlockContentOverlay( { clientId, children } ) {
 		if ( ! isSelected && ! hasChildSelected && ! isOverlayActive ) {
 			setIsOverlayActive( true );
 		}
-	}, [ isSelected, hasChildSelected, isOverlayActive ] );
+		if ( isSelected && ! isHovered ) {
+			setIsOverlayActive( false );
+		}
+	}, [ isSelected, hasChildSelected, isOverlayActive, isHovered ] );
 
 	// Disabled because the overlay div doesn't actually have a role or functionality
 	// as far as the user is concerned. We're just catching the first click so that
 	// the block can be selected without interacting with its contents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
-		<div className={ classes }>
+		<div
+			className={ classes }
+			onMouseEnter={ () => setIsHovered( true ) }
+			onMouseLeave={ () => setIsHovered( false ) }
+		>
 			{ ( ( isOverlayActive && ! hasChildSelected ) ||
 				isDraggingBlocks ) && (
 				<div
