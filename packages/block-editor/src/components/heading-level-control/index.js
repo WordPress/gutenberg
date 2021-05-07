@@ -29,7 +29,7 @@ const POPOVER_PROPS = {
  *
  * @typedef WPHeadingLevelControlProps
  *
- * @property {number} selectedLevel The chosen heading level.
+ * @property {number} value The chosen heading level.
  * @property {(newValue:number)=>any} onChange Callback to run when toolbar value is changed.
  * @property {boolean} isParagraphAllowed Append paragraph option with zero level to the available levels.
  */
@@ -46,7 +46,7 @@ const POPOVER_PROPS = {
  * @return {WPComponent} The Heading Level Control Dropdown.
  */
 export default function HeadingLevelControl( {
-	selectedLevel,
+	value,
 	onChange,
 	isParagraphAllowed = false,
 } ) {
@@ -54,7 +54,7 @@ export default function HeadingLevelControl( {
 		? HEADING_LEVELS
 		: [ ...HEADING_LEVELS, 0 ];
 	const allControls = levels.map( ( currentLevel ) => {
-		const isActive = currentLevel === selectedLevel;
+		const isActive = currentLevel === value;
 		return {
 			icon: (
 				<HeadingLevelIcon
@@ -89,7 +89,7 @@ export default function HeadingLevelControl( {
 					<ToolbarButton
 						aria-expanded={ isOpen }
 						aria-haspopup="true"
-						icon={ <HeadingLevelIcon level={ selectedLevel } /> }
+						icon={ <HeadingLevelIcon level={ value } /> }
 						label={ __( 'Change heading level' ) }
 						onClick={ onToggle }
 						onKeyDown={ openOnArrowDown }

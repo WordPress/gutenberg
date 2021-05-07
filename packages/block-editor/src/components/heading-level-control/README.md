@@ -29,7 +29,7 @@ const MyHeadingLevelControl = ( { attributes, setAttributes } ) => (
 
 ### Props
 
-#### `selectedLevel`
+#### `value`
 
 -   **Type:** `Number`
 -   **Options:**: `1`, `2`, `3`, `4`, `5`, `6` and `0` if `isParagraphAllowed` is set to `true`

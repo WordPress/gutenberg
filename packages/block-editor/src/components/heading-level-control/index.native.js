@@ -18,7 +18,7 @@ const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
  *
  * @typedef WPHeadingLevelControlProps
  *
- * @property {number} selectedLevel The chosen heading level.
+ * @property {number} value The chosen heading level.
  * @property {(newValue:number)=>any} onChange Callback to run when toolbar value is changed.
  * @property {boolean} isParagraphAllowed Append paragraph option with zero level to available levels.
  */
@@ -35,7 +35,7 @@ const HEADING_LEVELS = [ 1, 2, 3, 4, 5, 6 ];
  * @return {WPComponent} The Heading Level Control Dropdown.
  */
 export default function HeadingLevelControl( {
-	selectedLevel,
+	value,
 	onChange,
 	isParagraphAllowed = false,
 } ) {
@@ -43,7 +43,7 @@ export default function HeadingLevelControl( {
 		? HEADING_LEVELS
 		: [ ...HEADING_LEVELS, 0 ];
 	const allControls = levels.map( ( currentLevel ) => {
-		const isActive = currentLevel === selectedLevel;
+		const isActive = currentLevel === value;
 		return {
 			icon: (
 				<HeadingLevelIcon
@@ -65,7 +65,7 @@ export default function HeadingLevelControl( {
 
 	return (
 		<ToolbarDropdownMenu
-			icon={ <HeadingLevelIcon level={ selectedLevel } /> }
+			icon={ <HeadingLevelIcon level={ value } /> }
 			controls={ allControls }
 			label={ __( 'Change heading level' ) }
 		/>

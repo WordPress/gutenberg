@@ -97,7 +97,7 @@ export default function PostTitleEdit( {
 		<>
 			<BlockControls group="block">
 				<HeadingLevelControl
-					selectedLevel={ level }
+					value={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}
