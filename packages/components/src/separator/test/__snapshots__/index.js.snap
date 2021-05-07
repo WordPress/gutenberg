@@ -1,0 +1,78 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render correctly 1`] = `
+.emotion-0 {
+  border-color: rgba(0,0,0,0.1);
+  border-width: 0 0 1px 0;
+  height: 0;
+  margin: 0;
+  width: auto;
+  margin-bottom: calc(4px * 3);
+  margin-top: calc(4px * 3);
+}
+
+<hr
+  aria-orientation="horizontal"
+  class="components-divider components-separator emotion-0"
+  data-wp-c16t="true"
+  data-wp-component="Separator"
+  role="separator"
+/>
+`;
+
+exports[`props should render margin 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+@@ -2,10 +2,10 @@
+    Object {
+      "border-color": "rgba(0,0,0,0.1)",
+      "border-width": "0 0 1px 0",
+      "height": "0",
+      "margin": "0",
+-     "margin-bottom": "calc(4px * 7)",
+-     "margin-top": "calc(4px * 7)",
++     "margin-bottom": "calc(4px * 3)",
++     "margin-top": "calc(4px * 3)",
+      "width": "auto",
+    },
+  ]
+`;
+
+exports[`props should render marginBottom 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+@@ -2,10 +2,10 @@
+    Object {
+      "border-color": "rgba(0,0,0,0.1)",
+      "border-width": "0 0 1px 0",
+      "height": "0",
+      "margin": "0",
+-     "margin-bottom": "calc(4px * 5)",
++     "margin-bottom": "calc(4px * 3)",
+      "margin-top": "calc(4px * 3)",
+      "width": "auto",
+    },
+  ]
+`;
+
+exports[`props should render marginTop 1`] = `
+Snapshot Diff:
+- Received styles
++ Base styles
+
+@@ -3,9 +3,9 @@
+      "border-color": "rgba(0,0,0,0.1)",
+      "border-width": "0 0 1px 0",
+      "height": "0",
+      "margin": "0",
+      "margin-bottom": "calc(4px * 3)",
+-     "margin-top": "calc(4px * 5)",
++     "margin-top": "calc(4px * 3)",
+      "width": "auto",
+    },
+  ]
+`;
