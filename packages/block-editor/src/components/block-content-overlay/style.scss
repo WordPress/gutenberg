@@ -1,5 +1,9 @@
 .block-editor-block-content-overlay {
 	position: relative;
+	// Fixes extra width from block margin on classic themes.
+	max-width: var(--responsive--aligndefault-width);
+	margin-right: auto;
+	margin-left: auto;
 
 	.block-editor-block-content-overlay__overlay {
 		position: absolute;
