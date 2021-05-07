@@ -174,11 +174,11 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive.
 	$responsive_container_markup = sprintf(
-		'<button aria-expanded="false" aria-haspopup="true" aria-label="Open menu" class="wp-block-navigation__responsive-container-open" data-micromodal-trigger="modal-%2$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
+		'<button aria-expanded="false" aria-haspopup="true" aria-label="%3$s" class="wp-block-navigation__responsive-container-open" data-micromodal-trigger="modal-%2$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
 			<div class="wp-block-navigation__responsive-container" id="modal-%2$s" aria-hidden="true">
 				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
 					<div class="wp-block-navigation__responsive-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-%2$s-title" >
-							<button aria-label="Close menu" data-micromodal-close class="wp-block-navigation__responsive-container-close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg></button>
+							<button aria-label="%4$s" data-micromodal-close class="wp-block-navigation__responsive-container-close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg></button>
 						<div class="wp-block-navigation__responsive-container-content" id="modal-%2$s-content">
 							<ul class="wp-block-navigation__container">%1$s</ul>
 						</div>
@@ -186,7 +186,9 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 				</div>
 			</div>',
 		$inner_blocks_html,
-		$modal_unique_id
+		$modal_unique_id,
+		__( 'Open menu' ), // Open button label.
+		__( 'Close menu' ) // Close button label.
 	);
 
 	return sprintf(

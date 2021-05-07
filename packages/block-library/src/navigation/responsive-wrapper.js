@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { close, Icon } from '@wordpress/icons';
 import { Button } from '@wordpress/components';
 import { SVG, Rect } from '@wordpress/primitives';
+import { __ } from '@wordpress/i18n';
 
 export default function ResponsiveWrapper( props ) {
 	if ( ! props.isResponsive ) {
@@ -28,7 +29,7 @@ export default function ResponsiveWrapper( props ) {
 			<Button
 				aria-haspopup="true"
 				aria-expanded={ props.isOpen }
-				aria-label="Close menu"
+				aria-label={ __( 'Open menu' ) }
 				className="wp-block-navigation__responsive-container-open"
 				onClick={ () => props.onToggle( true ) }
 			>
@@ -63,7 +64,7 @@ export default function ResponsiveWrapper( props ) {
 					>
 						<Button
 							className="wp-block-navigation__responsive-container-close"
-							aria-label="Close menu"
+							aria-label={ __( 'Close menu' ) }
 							onClick={ () => props.onToggle( false ) }
 						>
 							<Icon icon={ close } />
