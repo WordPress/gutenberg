@@ -105,6 +105,7 @@ export { default as BlockSettingsMenu } from './block-settings-menu';
 export { default as BlockSettingsMenuControls } from './block-settings-menu-controls';
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
+export { default as BlockTools } from './block-tools';
 export {
 	default as CopyHandler,
 	useClipboardHandler as __unstableUseClipboardHandler,
