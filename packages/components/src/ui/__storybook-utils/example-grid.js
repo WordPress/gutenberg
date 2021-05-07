@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Grid } from '../grid';
+import { Grid } from '../../grid';
 import { Surface } from '../surface';
 import { Text } from '../../text';
 import { View } from '../view';

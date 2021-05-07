@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../utils';
+import { createComponent } from '../ui/utils';
 import useGrid from './hook';
 
 /**
@@ -9,7 +9,7 @@ import useGrid from './hook';
  *
  * @example
  * ```jsx
- * import { Grid, View } from `@wordpress/components/ui`;
+ * import { __experimentalGrid as Grid, __experimentalView as View } from `@wordpress/components`;
  *
  * function Example() {
  * 	return (

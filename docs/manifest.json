@@ -834,6 +834,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Grid",
+		"slug": "grid",
+		"markdown_source": "../packages/components/src/grid/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Guide",
 		"slug": "guide",
 		"markdown_source": "../packages/components/src/guide/README.md",
