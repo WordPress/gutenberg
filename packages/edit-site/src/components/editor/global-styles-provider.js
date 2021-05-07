@@ -87,32 +87,25 @@ const getBlockMetadata = ( blockTypes ) => {
 	blockTypes.forEach( ( blockType ) => {
 		const name = blockType.name;
 		const supports = extractSupportKeys( blockType?.supports );
-		const hasSupport = supports.length > 0;
 
-		if ( hasSupport ) {
-			const selector =
-				blockType?.supports?.__experimentalSelector ??
-				'.wp-block-' + name.replace( 'core/', '' ).replace( '/', '-' );
-
-			const blockSelectors = selector.split( ',' );
-			const elements = [];
-			Object.keys( ELEMENTS ).forEach( ( key ) => {
-				const elementSelector = [];
-				blockSelectors.forEach( ( blockSelector ) => {
-					elementSelector.push(
-						blockSelector + ' ' + ELEMENTS[ key ]
-					);
-				} );
-				elements[ key ] = elementSelector.join( ',' );
+		const selector =
+			blockType?.supports?.__experimentalSelector ??
+			'.wp-block-' + name.replace( 'core/', '' ).replace( '/', '-' );
+		const blockSelectors = selector.split( ',' );
+		const elements = [];
+		Object.keys( ELEMENTS ).forEach( ( key ) => {
+			const elementSelector = [];
+			blockSelectors.forEach( ( blockSelector ) => {
+				elementSelector.push( blockSelector + ' ' + ELEMENTS[ key ] );
 			} );
-
-			result[ name ] = {
-				name,
-				selector,
-				supports,
-				elements,
-			};
-		}
+			elements[ key ] = elementSelector.join( ',' );
+		} );
+		result[ name ] = {
+			name,
+			selector,
+			supports,
+			elements,
+		};
 	} );
 
 	return result;
