@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
-import { DropdownMenu } from '@wordpress/components';
+import { ToolbarDropdownMenu } from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -64,7 +64,7 @@ export default function HeadingLevelControl( {
 	} );
 
 	return (
-		<DropdownMenu
+		<ToolbarDropdownMenu
 			icon={ <HeadingLevelIcon level={ selectedLevel } /> }
 			controls={ allControls }
 			label={ __( 'Change heading level' ) }
