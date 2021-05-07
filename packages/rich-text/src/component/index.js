@@ -660,8 +660,28 @@ function RichText(
 			return;
 		}
 
-		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
-			return;
+		const { ownerDocument } = ref.current;
+
+		if ( ownerDocument.activeElement !== ref.current ) {
+			const { defaultView } = ownerDocument;
+			const { anchorNode, focusNode } = defaultView.getSelection();
+
+			if ( isSelected ) {
+				return;
+			}
+
+			const isSelectionWithin =
+				ref.current.contains( anchorNode ) &&
+				ref.current.contains( focusNode );
+
+			if ( ! isSelectionWithin ) {
+				return;
+			}
+
+			// Safari won't set focus on interactive editable elements, so if
+			// selection appears within the editable container, set focus and
+			// selection internally.
+			ref.current.focus();
 		}
 
 		if ( event.type !== 'selectionchange' && ! isSelected ) {
