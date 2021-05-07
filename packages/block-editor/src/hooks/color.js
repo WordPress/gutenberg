@@ -327,7 +327,7 @@ export function ColorEdit( props ) {
 				...( hasTextColorSupport( blockName )
 					? [
 							{
-								label: __( 'Text Color' ),
+								label: __( 'Text color' ),
 								onColorChange: onChangeColor( 'text' ),
 								colorValue: getColorObjectByAttributeValues(
 									colors,
@@ -340,7 +340,7 @@ export function ColorEdit( props ) {
 				...( hasBackground || hasGradient
 					? [
 							{
-								label: __( 'Background Color' ),
+								label: __( 'Background color' ),
 								onColorChange: hasBackground
 									? onChangeColor( 'background' )
 									: undefined,

@@ -1,5 +1,4 @@
 export default {
-	isFSETheme: true,
 	__experimentalGlobalStylesBaseStyles: {
 		settings: {
 			color: {
@@ -105,9 +104,6 @@ export default {
 						name: 'Red to Purple',
 					},
 				],
-				custom: true,
-				link: true,
-				customGradient: true,
 			},
 		},
 		styles: {
@@ -122,6 +118,7 @@ export default {
 					},
 				},
 			},
+			blocks: {},
 		},
 	},
 };

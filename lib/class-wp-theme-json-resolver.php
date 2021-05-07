@@ -49,6 +49,13 @@ class WP_Theme_JSON_Resolver {
 	private static $user_custom_post_type_id = null;
 
 	/**
+	 * Structure to hold i18n metadata.
+	 *
+	 * @var Array
+	 */
+	private static $theme_json_i18n = null;
+
+	/**
 	 * Processes a file that adheres to the theme.json
 	 * schema and returns an array with its contents,
 	 * or a void array if none found.
@@ -143,12 +150,11 @@ class WP_Theme_JSON_Resolver {
 	 * @return array An array of theme.json fields that are translatable and the keys that are translatable
 	 */
 	public static function get_fields_to_translate() {
-		static $theme_json_i18n = null;
-		if ( null === $theme_json_i18n ) {
-			$file_structure  = self::read_json_file( __DIR__ . '/experimental-i18n-theme.json' );
-			$theme_json_i18n = self::extract_paths_to_translate( $file_structure );
+		if ( null === self::$theme_json_i18n ) {
+			$file_structure        = self::read_json_file( __DIR__ . '/experimental-i18n-theme.json' );
+			self::$theme_json_i18n = self::extract_paths_to_translate( $file_structure );
 		}
-		return $theme_json_i18n;
+		return self::$theme_json_i18n;
 	}
 
 	/**
@@ -195,13 +201,13 @@ class WP_Theme_JSON_Resolver {
 			/*
 			 * We need to process the paths that include '*' separately.
 			 * One example of such a path would be:
-			 * [ 'settings', '*', 'color', 'palette' ]
+			 * [ 'settings', 'blocks', '*', 'color', 'palette' ]
 			 */
 			$nodes_to_iterate = array_keys( $path, '*', true );
 			if ( ! empty( $nodes_to_iterate ) ) {
 				/*
 				 * At the moment, we only need to support one '*' in the path, so take it directly.
-				 * - base will be [ 'settings' ]
+				 * - base will be [ 'settings', 'blocks' ]
 				 * - data will be [ 'color', 'palette' ]
 				 */
 				$base_path = array_slice( $path, 0, $nodes_to_iterate[0] );
@@ -213,7 +219,7 @@ class WP_Theme_JSON_Resolver {
 						continue;
 					}
 
-					// Whole path will be [ 'settings', 'core/paragraph', 'color', 'palette' ].
+					// Whole path will be [ 'settings', 'blocks', 'core/paragraph', 'color', 'palette' ].
 					$whole_path       = array_merge( $base_path, array( $node_name ), $data_path );
 					$translated_array = self::translate_theme_json_chunk( $array_to_translate, $key, $context, $domain );
 					gutenberg_experimental_set( $theme_json, $whole_path, $translated_array );
@@ -266,7 +272,11 @@ class WP_Theme_JSON_Resolver {
 	 */
 	public static function get_theme_data( $theme_support_data = array() ) {
 		if ( null === self::$theme ) {
-			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
+			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json' ) );
+			// Fallback to experimental-theme.json.
+			if ( empty( $theme_json_data ) ) {
+				$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
+			}
 			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			self::$theme     = new WP_Theme_JSON( $theme_json_data );
 		}
@@ -318,7 +328,7 @@ class WP_Theme_JSON_Resolver {
 		} elseif ( $should_create_cpt ) {
 			$cpt_post_id = wp_insert_post(
 				array(
-					'post_content' => '{}',
+					'post_content' => '{"version": ' . WP_Theme_JSON::LATEST_SCHEMA . ', "isGlobalStylesUserThemeJSON": true }',
 					'post_status'  => 'publish',
 					'post_title'   => __( 'Custom Styles', 'default' ),
 					'post_type'    => $post_type_filter,
@@ -461,7 +471,11 @@ class WP_Theme_JSON_Resolver {
 	 */
 	public static function theme_has_support() {
 		if ( ! isset( self::$theme_has_support ) ) {
-			self::$theme_has_support = (bool) self::get_file_path_from_theme( 'experimental-theme.json' );
+			self::$theme_has_support = (bool) self::get_file_path_from_theme( 'theme.json' );
+			if ( ! self::$theme_has_support ) {
+				// Fallback to experimental-theme.json.
+				self::$theme_has_support = (bool) self::get_file_path_from_theme( 'experimental-theme.json' );
+			}
 		}
 
 		return self::$theme_has_support;
@@ -494,4 +508,18 @@ class WP_Theme_JSON_Resolver {
 		return $located;
 	}
 
+	/**
+	 * Cleans the cached data so it can be recalculated.
+	 */
+	public static function clean_cached_data() {
+		self::$core                     = null;
+		self::$theme                    = null;
+		self::$user                     = null;
+		self::$user_custom_post_type_id = null;
+		self::$theme_has_support        = null;
+		self::$theme_json_i18n          = null;
+	}
+
 }
+
+add_action( 'switch_theme', array( 'WP_Theme_JSON_Resolver', 'clean_cached_data' ) );

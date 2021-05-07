@@ -14,19 +14,14 @@ import {
 	NavigableToolbar,
 	BlockNavigationDropdown,
 	ToolSelector,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
 	TableOfContents,
 	EditorHistoryRedo,
 	EditorHistoryUndo,
 } from '@wordpress/editor';
-import {
-	Button,
-	DropdownMenu,
-	ToolbarItem,
-	MenuItemsChoice,
-	MenuGroup,
-} from '@wordpress/components';
+import { Button, ToolbarItem } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
@@ -46,14 +41,13 @@ function HeaderToolbar() {
 		isTextModeEnabled,
 		previewDeviceType,
 		showIconLabels,
-		isNavigationTool,
 		isTemplateMode,
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 		return {
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
@@ -75,14 +69,11 @@ function HeaderToolbar() {
 			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
-			isNavigationTool: select( 'core/block-editor' ).isNavigationMode(),
 			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const isWideViewport = useViewportMatch( 'wide' );
-	const isSmallViewport = useViewportMatch( 'small', '<' );
-	const { setNavigationMode } = useDispatch( 'core/block-editor' );
 
 	const displayBlockToolbar =
 		! isLargeViewport || previewDeviceType !== 'Desktop' || hasFixedToolbar;
@@ -92,10 +83,6 @@ function HeaderToolbar() {
 		  __( 'Document and block tools' )
 		: /* translators: accessibility text for the editor toolbar when Top Toolbar is off */
 		  __( 'Document tools' );
-
-	const onSwitchMode = ( mode ) => {
-		setNavigationMode( mode === 'edit' ? false : true );
-	};
 
 	const overflowItems = (
 		<>
@@ -172,50 +159,6 @@ function HeaderToolbar() {
 						/>
 						{ overflowItems }
 					</>
-				) }
-				{ ! isWideViewport && ! isSmallViewport && showIconLabels && (
-					<DropdownMenu
-						position="bottom right"
-						label={
-							/* translators: button label text should, if possible, be under 16
-characters. */
-							__( 'Tools' )
-						}
-					>
-						{ () => (
-							<div className="edit-post-header__dropdown">
-								<MenuGroup label={ __( 'Modes' ) }>
-									<MenuItemsChoice
-										value={
-											isNavigationTool ? 'select' : 'edit'
-										}
-										onSelect={ onSwitchMode }
-										choices={ [
-											{
-												value: 'edit',
-												label: __( 'Edit' ),
-											},
-											{
-												value: 'select',
-												label: __( 'Select' ),
-											},
-										] }
-									/>
-								</MenuGroup>
-								<MenuGroup label={ __( 'Edit' ) }>
-									<EditorHistoryUndo
-										showTooltip={ ! showIconLabels }
-										isTertiary={ showIconLabels }
-									/>
-									<EditorHistoryRedo
-										showTooltip={ ! showIconLabels }
-										isTertiary={ showIconLabels }
-									/>
-								</MenuGroup>
-								<MenuGroup>{ overflowItems }</MenuGroup>
-							</div>
-						) }
-					</DropdownMenu>
 				) }
 			</div>
 

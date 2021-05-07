@@ -10,6 +10,7 @@
 @import "./components/block-icon/style.scss";
 @import "./components/block-inspector/style.scss";
 @import "./components/block-list/style.scss";
+@import "./components/block-tools/style.scss";
 @import "./components/block-list-appender/style.scss";
 @import "./components/block-breadcrumb/style.scss";
 @import "./components/block-card/style.scss";
@@ -26,11 +27,14 @@
 @import "./components/block-switcher/style.scss";
 @import "./components/block-types-list/style.scss";
 @import "./components/block-variation-picker/style.scss";
+@import "./components/block-pattern-setup/style.scss";
 @import "./components/block-variation-transforms/style.scss";
+@import "./components/border-style-control/style.scss";
 @import "./components/button-block-appender/style.scss";
 @import "./components/colors-gradients/style.scss";
 @import "./components/contrast-checker/style.scss";
 @import "./components/default-block-appender/style.scss";
+@import "./components/duotone-control/style.scss";
 @import "./components/font-appearance-control/style.scss";
 @import "./components/justify-content-control/style.scss";
 @import "./components/link-control/style.scss";

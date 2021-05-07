@@ -13,10 +13,7 @@ import { ResizableBox } from '@wordpress/components';
 
 const Edit = ( props ) => {
 	const {
-		attributes: {
-			height,
-			width,
-		},
+		attributes: { height, width },
 		setAttributes,
 		toggleSelection,
 	} = props;
@@ -51,13 +48,13 @@ const Edit = ( props ) => {
 			} }
 		/>
 	);
-}
+};
 ```
 
 ### Props
 
-Name | Type | Default | Description
---- | --- | --- | ---
-`showHandle` | `bool` | `false` | Determines of the resize handles are visible.
+| Name         | Type   | Default | Description                                   |
+| ------------ | ------ | ------- | --------------------------------------------- |
+| `showHandle` | `bool` | `false` | Determines of the resize handles are visible. |
 
 For additional props, check out [re-resizable](https://github.com/bokuweb/re-resizable#props).

@@ -138,6 +138,12 @@ export function computePopoverXAxisPosition(
 	if ( boundaryElement ) {
 		const boundaryRect = boundaryElement.getBoundingClientRect();
 		popoverLeft = Math.min( popoverLeft, boundaryRect.right - width );
+
+		// Avoid the popover being position beyond the left boundary if the
+		// direction is left to right.
+		if ( ! isRTL() ) {
+			popoverLeft = Math.max( popoverLeft, 0 );
+		}
 	}
 
 	return {

@@ -27,7 +27,7 @@ import { addQueryArgs } from '@wordpress/url';
 import { createRegistrySelector } from '@wordpress/data';
 import deprecated from '@wordpress/deprecated';
 import { Platform } from '@wordpress/element';
-import { layout, header, footer } from '@wordpress/icons';
+import { layout } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -41,6 +41,7 @@ import {
 } from './constants';
 import { getPostRawValue } from './reducer';
 import { cleanForSlug } from '../utils/url';
+import { getTemplatePartIcon } from './utils/get-template-part-icon';
 
 /**
  * Shared reference to an empty object for cases where it is important to avoid
@@ -1672,6 +1673,24 @@ export function __experimentalGetDefaultTemplateTypes( state ) {
 }
 
 /**
+ * Returns the default template part areas.
+ *
+ * @param {Object} state Global application state.
+ *
+ * @return {Array} The template part areas.
+ */
+export const __experimentalGetDefaultTemplatePartAreas = createSelector(
+	( state ) => {
+		const areas =
+			getEditorSettings( state )?.defaultTemplatePartAreas || [];
+		return areas?.map( ( item ) => {
+			return { ...item, icon: getTemplatePartIcon( item.icon ) };
+		} );
+	},
+	( state ) => [ getEditorSettings( state )?.defaultTemplatePartAreas ]
+);
+
+/**
  * Returns a default template type searched by slug.
  *
  * @param {Object} state Global application state.
@@ -1706,11 +1725,10 @@ export function __experimentalGetTemplateInfo( state, template ) {
 
 	const templateTitle = isString( title ) ? title : title?.rendered;
 	const templateDescription = isString( excerpt ) ? excerpt : excerpt?.raw;
-	const iconsByArea = {
-		footer,
-		header,
-	};
-	const templateIcon = iconsByArea[ area ] || layout;
+	const templateIcon =
+		__experimentalGetDefaultTemplatePartAreas( state ).find(
+			( item ) => area === item.area
+		)?.icon || layout;
 
 	return {
 		title:

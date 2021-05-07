@@ -1,22 +1,13 @@
 [
-    {
-        "blockName": "core/heading",
-        "attrs": {
-            "textColor": "accent"
-        },
-        "innerBlocks": [],
-        "innerHTML": "\n<h2 class=\"has-accent-color\">text</h2>\n",
-        "innerContent": [
-            "\n<h2 class=\"has-accent-color\">text</h2>\n"
-        ]
-    },
-    {
-        "blockName": null,
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "\n",
-        "innerContent": [
-            "\n"
-        ]
-    }
+	{
+		"blockName": "core/heading",
+		"attrs": {
+			"textColor": "accent"
+		},
+		"innerBlocks": [],
+		"innerHTML": "\n<h2 class=\"has-accent-color\">text</h2>\n",
+		"innerContent": [
+			"\n<h2 class=\"has-accent-color\">text</h2>\n"
+		]
+	}
 ]

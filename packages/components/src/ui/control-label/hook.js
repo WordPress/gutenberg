@@ -1,18 +1,18 @@
 /**
  * External dependencies
  */
-import { useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
+import { cx } from 'emotion';
 
 /**
  * Internal dependencies
  */
+import { useContextSystem } from '../context';
 import { useFormGroupContextId } from '../form-group';
-import { useText } from '../text';
+import { useText } from '../../text';
 import * as styles from './styles';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'label'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').Props, 'label'>} props
  */
 export function useControlLabel( props ) {
 	const {
@@ -32,7 +32,7 @@ export function useControlLabel( props ) {
 	const htmlFor = useFormGroupContextId( htmlForProp );
 	const classes = cx(
 		styles.ControlLabel,
-		styles[ size ],
+		styles[ /** @type {'small' | 'medium' | 'large'} */ ( size ) ],
 		className,
 		isBlock ? styles.block : styles.inline
 	);

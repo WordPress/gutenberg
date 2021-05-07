@@ -67,7 +67,6 @@ export function getBlockColors( blockStyleAttributes, defaultColors ) {
 	return blockStyles;
 }
 
-// To-do add tests
 export function parseColorVariables( styles, colorPalette ) {
 	const stylesBase = JSON.stringify( styles );
 	const colorPrefixRegex = /var\(--wp--preset--color--(.*?)\)/g;
@@ -94,7 +93,7 @@ export function getGlobalStyles( baseStyles ) {
 		...( palette || gradients
 			? {
 					__experimentalFeatures: {
-						defaults: { color: { palette, gradients } },
+						color: { palette, gradients },
 					},
 			  }
 			: {} ),

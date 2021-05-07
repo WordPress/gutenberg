@@ -8,7 +8,7 @@ import RNReactNativeGutenbergBridge, {
 	subscribeSetTitle,
 	subscribeMediaAppend,
 	subscribeReplaceBlock,
-	subscribeUpdateTheme,
+	subscribeUpdateEditorSettings,
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
 } from '@wordpress/react-native-bridge';
@@ -26,6 +26,7 @@ import { applyFilters } from '@wordpress/hooks';
 import {
 	validateThemeColors,
 	validateThemeGradients,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { getGlobalStyles } from '@wordpress/components';
 
@@ -50,7 +51,7 @@ const postTypeEntities = [
  * Internal dependencies
  */
 import EditorProvider from './index.js';
-import GLOBAL_STYLES_DATA from './theme_data';
+import GLOBAL_STYLES_DATA from './theme_data'; // TO-DO: Remove
 
 class NativeEditorProvider extends Component {
 	constructor() {
@@ -68,18 +69,15 @@ class NativeEditorProvider extends Component {
 
 	componentDidMount() {
 		const { capabilities, colors, gradients } = this.props;
-		const isFSETheme = GLOBAL_STYLES_DATA?.isFSETheme;
+		const globalStyles =
+			GLOBAL_STYLES_DATA?.__experimentalGlobalStylesBaseStyles; // TO-DO: Remove
 
 		this.props.updateSettings( {
 			...capabilities,
 			// Set theme colors for the editor
 			...( colors ? { colors } : {} ),
 			...( gradients ? { gradients } : {} ),
-			...( isFSETheme
-				? getGlobalStyles(
-						GLOBAL_STYLES_DATA?.__experimentalGlobalStylesBaseStyles
-				  )
-				: {} ),
+			...( globalStyles ? getGlobalStyles( globalStyles ) : {} ), // TO-DO: Remove
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
@@ -126,15 +124,23 @@ class NativeEditorProvider extends Component {
 			}
 		);
 
-		this.subscriptionParentUpdateTheme = subscribeUpdateTheme(
-			( theme ) => {
-				// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
+		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
+			( editorSettings ) => {
+				const {
+					colors: updatedColors,
+					gradients: updatedGradients,
+					rawGlobalStylesBaseStyles,
+				} = editorSettings;
+				const updatedSettings = {
+					// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
+					colors: validateThemeColors( updatedColors ),
+					gradients: validateThemeGradients( updatedGradients ),
+					...( rawGlobalStylesBaseStyles
+						? getGlobalStyles( rawGlobalStylesBaseStyles )
+						: {} ),
+				};
 
-				theme.colors = validateThemeColors( theme.colors );
-
-				theme.gradients = validateThemeGradients( theme.gradients );
-
-				this.props.updateSettings( theme );
+				this.props.updateSettings( updatedSettings );
 			}
 		);
 
@@ -176,8 +182,8 @@ class NativeEditorProvider extends Component {
 			this.subscriptionParentMediaAppend.remove();
 		}
 
-		if ( this.subscriptionParentUpdateTheme ) {
-			this.subscriptionParentUpdateTheme.remove();
+		if ( this.subscriptionParentUpdateEditorSettings ) {
+			this.subscriptionParentUpdateEditorSettings.remove();
 		}
 
 		if ( this.subscriptionParentUpdateCapabilities ) {
@@ -292,7 +298,7 @@ export default compose( [
 			getBlockIndex,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
@@ -313,7 +319,7 @@ export default compose( [
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
-		} = dispatch( 'core/block-editor' );
+		} = dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
 		const { createSuccessNotice } = dispatch( 'core/notices' );

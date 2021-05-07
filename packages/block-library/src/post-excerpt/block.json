@@ -1,7 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "core/post-excerpt",
+	"title": "Post Excerpt",
 	"category": "design",
+	"description": "Display a post's excerpt.",
+	"textdomain": "default",
 	"attributes": {
 		"textAlign": {
 			"type": "string"
@@ -18,10 +21,7 @@
 			"default": true
 		}
 	},
-	"usesContext": [
-		"postId",
-		"postType"
-	],
+	"usesContext": [ "postId", "postType" ],
 	"supports": {
 		"html": false,
 		"fontSize": true,

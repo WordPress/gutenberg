@@ -26,9 +26,12 @@ import { useBlockClassNames } from './use-block-class-names';
 import { useBlockDefaultClassName } from './use-block-default-class-name';
 import { useBlockCustomClassName } from './use-block-custom-class-name';
 import { useBlockMovingModeClassNames } from './use-block-moving-mode-class-names';
-import { useEventHandlers } from './use-event-handlers';
+import { useFocusHandler } from './use-focus-handler';
+import { useEventHandlers } from './use-selected-block-event-handlers';
 import { useNavModeExit } from './use-nav-mode-exit';
-import { useBlockNodes } from './use-block-nodes';
+import { useScrollIntoView } from './use-scroll-into-view';
+import { useBlockRefProvider } from './use-block-refs';
+import { useMultiSelection } from './use-multi-selection';
 import { store as blockEditorStore } from '../../../store';
 
 /**
@@ -102,7 +105,11 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	const mergedRefs = useMergeRefs( [
 		props.ref,
 		useFocusFirstElement( clientId ),
-		useBlockNodes( clientId ),
+		// Must happen after focus because we check for focus in the block.
+		useScrollIntoView( clientId ),
+		useBlockRefProvider( clientId ),
+		useFocusHandler( clientId ),
+		useMultiSelection( clientId ),
 		useEventHandlers( clientId ),
 		useNavModeExit( clientId ),
 		useIsHovered(),

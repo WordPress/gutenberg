@@ -28,7 +28,10 @@ import DocumentActions from './document-actions';
 import TemplateDetails from '../template-details';
 import { store as editSiteStore } from '../../store';
 
-export default function Header( { openEntitiesSavedStates } ) {
+export default function Header( {
+	openEntitiesSavedStates,
+	isEntitiesSavedStatesOpen,
+} ) {
 	const inserterButton = useRef();
 	const {
 		deviceType,
@@ -39,6 +42,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 		isInserterOpen,
 		isListViewOpen,
 		listViewShortcut,
+		isLoaded,
 	} = useSelect( ( select ) => {
 		const {
 			__experimentalGetPreviewDeviceType,
@@ -61,10 +65,12 @@ export default function Header( { openEntitiesSavedStates } ) {
 			'wp_template' === postType
 				? getTemplateInfo( record ).title
 				: record?.slug;
+		const _isLoaded = !! postId;
 
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			entityTitle: _entityTitle,
+			isLoaded: _isLoaded,
 			hasFixedToolbar: isFeatureActive( 'fixedToolbar' ),
 			template: record,
 			templateType: postType,
@@ -143,6 +149,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 					<DocumentActions
 						entityTitle={ entityTitle }
 						entityLabel="template"
+						isLoaded={ isLoaded }
 					>
 						{ ( { onClose } ) => (
 							<TemplateDetails
@@ -156,6 +163,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 					<DocumentActions
 						entityTitle={ entityTitle }
 						entityLabel="template part"
+						isLoaded={ isLoaded }
 					/>
 				) }
 			</div>
@@ -168,6 +176,7 @@ export default function Header( { openEntitiesSavedStates } ) {
 					/>
 					<SaveButton
 						openEntitiesSavedStates={ openEntitiesSavedStates }
+						isEntitiesSavedStatesOpen={ isEntitiesSavedStatesOpen }
 					/>
 					<PinnedItems.Slot scope="core/edit-site" />
 					<MoreMenu />
