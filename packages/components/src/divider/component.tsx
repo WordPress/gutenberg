@@ -21,7 +21,7 @@ import { contextConnect, useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
 import type { ViewOwnProps } from '../ui/context';
 import * as styles from './styles';
-import { space } from '../utils/space';
+import { space } from '../ui/utils/space';
 
 export interface DividerProps extends SeparatorProps {
 	/**
