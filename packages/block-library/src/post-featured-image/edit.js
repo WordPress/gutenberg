@@ -112,7 +112,7 @@ function PostFeaturedImageDisplay( {
 					/>
 				) }
 			</BlockControls>
-			<div { ...useBlockProps() }>{ image }</div>
+			<figure { ...useBlockProps() }>{ image }</figure>
 		</>
 	);
 }
