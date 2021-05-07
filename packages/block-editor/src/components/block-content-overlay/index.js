@@ -45,7 +45,8 @@ export default function BlockContentOverlay( { clientId, children } ) {
 		if ( ! isSelected && ! hasChildSelected && ! isOverlayActive ) {
 			setIsOverlayActive( true );
 		}
-		if ( isSelected && ! isHovered ) {
+		// If selected by another source (list view, etc.) dismiss the overlay.
+		if ( isSelected && ! isHovered && isOverlayActive ) {
 			setIsOverlayActive( false );
 		}
 	}, [ isSelected, hasChildSelected, isOverlayActive, isHovered ] );
