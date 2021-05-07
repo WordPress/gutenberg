@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { DropdownMenu, ToolbarGroup } from '@wordpress/components';
+import { ToolbarDropdownMenu, ToolbarGroup } from '@wordpress/components';
 import {
 	positionCenter,
 	positionLeft,
@@ -51,7 +51,6 @@ function BlockAlignmentUI( {
 	controls,
 	isToolbar,
 	isCollapsed = true,
-	isToolbarButton = true,
 } ) {
 	const enabledControls = useAvailableAlignments( controls );
 	if ( enabledControls.length === 0 ) {
@@ -66,8 +65,8 @@ function BlockAlignmentUI( {
 	const defaultAlignmentControl =
 		BLOCK_ALIGNMENTS_CONTROLS[ DEFAULT_CONTROL ];
 
-	const UIComponent = isToolbar ? ToolbarGroup : DropdownMenu;
-	const extraProps = isToolbar ? { isCollapsed } : { isToolbarButton };
+	const UIComponent = isToolbar ? ToolbarGroup : ToolbarDropdownMenu;
+	const extraProps = isToolbar ? { isCollapsed } : {};
 
 	return (
 		<UIComponent

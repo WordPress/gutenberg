@@ -66,6 +66,7 @@ export { default as __experimentalCustomGradientPicker } from './custom-gradient
 export { default as Guide } from './guide';
 export { default as GuidePage } from './guide/page';
 export { Heading as __experimentalHeading } from './heading';
+export { HStack as __experimentalHStack } from './h-stack';
 export { default as Icon } from './icon';
 export { default as IconButton } from './button/deprecated';
 export { default as __experimentalInputControl } from './input-control';
@@ -101,6 +102,7 @@ export { default as SandBox } from './sandbox';
 export { default as SelectControl } from './select-control';
 export { default as Snackbar } from './snackbar';
 export { default as SnackbarList } from './snackbar/list';
+export { Spacer as __experimentalSpacer } from './spacer';
 export { default as Spinner } from './spinner';
 export { default as TabPanel } from './tab-panel';
 export { Text as __experimentalText } from './text';
@@ -111,6 +113,7 @@ export { default as Tip } from './tip';
 export { default as ToggleControl } from './toggle-control';
 export { default as Toolbar } from './toolbar';
 export { default as ToolbarButton } from './toolbar-button';
+export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
 export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as ToolbarItem } from './toolbar-item';
@@ -124,7 +127,8 @@ export {
 export { default as TreeSelect } from './tree-select';
 export { Truncate as __experimentalTruncate } from './truncate';
 export { default as __experimentalUnitControl } from './unit-control';
-export { default as VisuallyHidden } from './visually-hidden';
+export { VisuallyHidden } from './visually-hidden';
+export { VStack as __experimentalVStack } from './v-stack';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {
 	createSlotFill,

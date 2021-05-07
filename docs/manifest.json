@@ -312,7 +312,7 @@
 		"parent": "themes"
 	},
 	{
-		"title": "Global Settings (theme.json)",
+		"title": "Global Settings & Styles (theme.json)",
 		"slug": "theme-json",
 		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
 		"parent": "themes"
@@ -840,6 +840,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "HStack",
+		"slug": "h-stack",
+		"markdown_source": "../packages/components/src/h-stack/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Heading",
 		"slug": "heading",
 		"markdown_source": "../packages/components/src/heading/README.md",
@@ -1062,6 +1068,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Spacer",
+		"slug": "spacer",
+		"markdown_source": "../packages/components/src/spacer/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Spinner",
 		"slug": "spinner",
 		"markdown_source": "../packages/components/src/spinner/README.md",
@@ -1110,6 +1122,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ToolbarDropdownMenu",
+		"slug": "toolbar-dropdown-menu",
+		"markdown_source": "../packages/components/src/toolbar-dropdown-menu/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ToolbarGroup",
 		"slug": "toolbar-group",
 		"markdown_source": "../packages/components/src/toolbar-group/README.md",
@@ -1155,6 +1173,12 @@
 		"title": "UnitControl",
 		"slug": "unit-control",
 		"markdown_source": "../packages/components/src/unit-control/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "VStack",
+		"slug": "v-stack",
+		"markdown_source": "../packages/components/src/v-stack/README.md",
 		"parent": "components"
 	},
 	{

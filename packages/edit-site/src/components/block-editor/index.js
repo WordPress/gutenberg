@@ -11,7 +11,8 @@ import {
 	BlockInspector,
 	WritingFlow,
 	BlockList,
-	__experimentalBlockSettingsMenuFirstItem,
+	BlockTools,
+	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
@@ -19,7 +20,6 @@ import {
 	__unstableEditorStyles as EditorStyles,
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
@@ -102,30 +102,31 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<BlockInspector />
 			</SidebarInspectorFill>
 			<div className="edit-site-visual-editor" ref={ toolWrapperRef }>
-				<Popover.Slot name="block-toolbar" />
-				<Iframe
-					style={ resizedCanvasStyles }
-					headHTML={ window.__editorStyles.html }
-					head={ <EditorStyles styles={ settings.styles } /> }
-					ref={ ref }
-					contentRef={ mergedRefs }
-				>
-					<WritingFlow>
-						<BlockList
-							className="edit-site-block-editor__block-list"
-							__experimentalLayout={ {
-								type: 'default',
-								// At the root level of the site editor, no alignments should be allowed.
-								alignments: [],
-							} }
-						/>
-					</WritingFlow>
-				</Iframe>
-				<__experimentalBlockSettingsMenuFirstItem>
+				<BlockTools>
+					<Iframe
+						style={ resizedCanvasStyles }
+						headHTML={ window.__editorStyles.html }
+						head={ <EditorStyles styles={ settings.styles } /> }
+						ref={ ref }
+						contentRef={ mergedRefs }
+					>
+						<WritingFlow>
+							<BlockList
+								className="edit-site-block-editor__block-list"
+								__experimentalLayout={ {
+									type: 'default',
+									// At the root level of the site editor, no alignments should be allowed.
+									alignments: [],
+								} }
+							/>
+						</WritingFlow>
+					</Iframe>
+				</BlockTools>
+				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton onClick={ onClose } />
 					) }
-				</__experimentalBlockSettingsMenuFirstItem>
+				</__unstableBlockSettingsMenuFirstItem>
 			</div>
 		</BlockEditorProvider>
 	);

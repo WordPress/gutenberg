@@ -51,6 +51,7 @@ function BlockPopover( {
 	isValid,
 	isEmptyDefaultBlock,
 	capturingClientId,
+	__unstablePopoverSlot,
 } ) {
 	const {
 		isNavigationMode,
@@ -180,7 +181,9 @@ function BlockPopover( {
 			anchorRef={ anchorRef }
 			className="block-editor-block-list__block-popover"
 			__unstableStickyBoundaryElement={ stickyBoundaryElement }
-			__unstableSlotName="block-toolbar"
+			// Render in the old slot if needed for backward compatibility,
+			// otherwise render in place (not in the the default popover slot).
+			__unstableSlotName={ __unstablePopoverSlot || null }
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
@@ -293,7 +296,7 @@ function wrapperSelector( select ) {
 	};
 }
 
-export default function WrappedBlockPopover() {
+export default function WrappedBlockPopover( { __unstablePopoverSlot } ) {
 	const selected = useSelect( wrapperSelector, [] );
 
 	if ( ! selected ) {
@@ -320,6 +323,7 @@ export default function WrappedBlockPopover() {
 			isValid={ isValid }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
 			capturingClientId={ capturingClientId }
+			__unstablePopoverSlot={ __unstablePopoverSlot }
 		/>
 	);
 }

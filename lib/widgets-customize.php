@@ -134,14 +134,41 @@ function gutenberg_customize_widgets_init() {
 			'editor_settings' => $settings,
 		)
 	);
+
+	wp_add_inline_script(
+		'wp-blocks',
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( gutenberg_get_block_categories( 'widgets_customizer' ) ) ),
+		'after'
+	);
+
 	wp_enqueue_script( 'wp-customize-widgets' );
 	wp_enqueue_style( 'wp-customize-widgets' );
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-format-library' );
+	do_action( 'enqueue_block_editor_assets' );
+}
+
+/**
+ * Tells the script loader to load the scripts and styles of custom block on widgets editor screen.
+ *
+ * @param bool $is_block_editor_screen Current decision about loading block assets.
+ * @return bool Filtered decision about loading block assets.
+ */
+function gutenberg_widgets_customize_load_block_editor_scripts_and_styles( $is_block_editor_screen ) {
+	if (
+		gutenberg_use_widgets_block_editor() &&
+		is_callable( 'get_current_screen' ) &&
+		'customize' === get_current_screen()->base
+	) {
+		return true;
+	}
+
+	return $is_block_editor_screen;
 }
 
 if ( gutenberg_is_experiment_enabled( 'gutenberg-widgets-in-customizer' ) ) {
 	add_action( 'customize_register', 'gutenberg_widgets_customize_register' );
 	add_filter( 'widget_customizer_setting_args', 'gutenberg_widgets_customize_add_unstable_instance', 10, 2 );
 	add_action( 'customize_controls_enqueue_scripts', 'gutenberg_customize_widgets_init' );
+	add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_customize_load_block_editor_scripts_and_styles' );
 }

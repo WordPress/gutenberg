@@ -133,6 +133,82 @@ function getSuggestionsQuery( type, kind ) {
 	}
 }
 
+/**
+ * @typedef {'post-type'|'custom'|'taxonomy'|'post-type-archive'} WPNavigationLinkKind
+ */
+
+/**
+ * Navigation Link Block Attributes
+ *
+ * @typedef {Object} WPNavigationLinkBlockAttributes
+ *
+ * @property {string}                [label]          Link text.
+ * @property {WPNavigationLinkKind}  [kind]           Kind is used to differentiate between term and post ids to check post draft status.
+ * @property {string}                [type]           The type such as post, page, tag, category and other custom types.
+ * @property {string}                [rel]            The relationship of the linked URL.
+ * @property {number}                [id]             A post or term id.
+ * @property {boolean}               [opensInNewTab]  Sets link target to _blank when true.
+ * @property {string}                [url]            Link href.
+ * @property {string}                [title]          Link title attribute.
+ */
+
+/**
+ * Link Control onChange handler that updates block attributes when a setting is changed.
+ *
+ * @param {Object}                          updatedValue    New block attributes to update.
+ * @param {Function}                        setAttributes   Block attribute update function.
+ * @param {WPNavigationLinkBlockAttributes} blockAttributes Current block attributes.
+ *
+ */
+export const updateNavigationLinkBlockAttributes = (
+	updatedValue = {},
+	setAttributes,
+	blockAttributes = {}
+) => {
+	const {
+		label: originalLabel = '',
+		kind: originalKind = '',
+		type: originalType = '',
+	} = blockAttributes;
+	const {
+		title = '',
+		url = '',
+		opensInNewTab,
+		id,
+		kind: newKind = originalKind,
+		type: newType = originalType,
+	} = updatedValue;
+
+	const normalizedTitle = title.replace( /http(s?):\/\//gi, '' );
+	const normalizedURL = url.replace( /http(s?):\/\//gi, '' );
+	const escapeTitle =
+		title !== '' &&
+		normalizedTitle !== normalizedURL &&
+		originalLabel !== title;
+	const label = escapeTitle
+		? escape( title )
+		: originalLabel || escape( normalizedURL );
+
+	// In https://github.com/WordPress/gutenberg/pull/24670 we decided to use "tag" in favor of "post_tag"
+	const type = newType === 'post_tag' ? 'tag' : newType.replace( '-', '_' );
+
+	const isBuiltInType =
+		[ 'post', 'page', 'tag', 'category' ].indexOf( type ) > -1;
+
+	const isCustomLink =
+		( ! newKind && ! isBuiltInType ) || newKind === 'custom';
+	const kind = isCustomLink ? 'custom' : newKind;
+
+	setAttributes( {
+		...( url && { url: encodeURI( url ) } ),
+		...( label && { label } ),
+		...( undefined !== opensInNewTab && { opensInNewTab } ),
+		...( id && Number.isInteger( id ) && { id } ),
+		...( kind && { kind } ),
+		...( type && type !== 'URL' && { type } ),
+	} );
+};
+
 export default function NavigationLinkEdit( {
 	attributes,
 	isSelected,
@@ -519,55 +595,13 @@ export default function NavigationLinkEdit( {
 									type,
 									kind
 								) }
-								onChange={ ( {
-									title: newTitle = '',
-									url: newURL = '',
-									opensInNewTab: newOpensInNewTab,
-									id: newId,
-									kind: newKind = '',
-									type: newType = '',
-								} = {} ) => {
-									setAttributes( {
-										url: encodeURI( newURL ),
-										label: ( () => {
-											const normalizedTitle = newTitle.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											const normalizedURL = newURL.replace(
-												/http(s?):\/\//gi,
-												''
-											);
-											if (
-												newTitle !== '' &&
-												normalizedTitle !==
-													normalizedURL &&
-												label !== newTitle
-											) {
-												return escape( newTitle );
-											} else if ( label ) {
-												return label;
-											}
-											// If there's no label, add the URL.
-											return escape( normalizedURL );
-										} )(),
-										opensInNewTab: newOpensInNewTab,
-										// `id` represents the DB ID of the entity which this link represents (eg: Post ID).
-										// Therefore we must not inadvertently set it to `undefined` if the `onChange` is called with no `id` value.
-										// This is possible when a setting changes such as the `opensInNewTab`.
-										...( newId && {
-											id: newId,
-										} ),
-										...( newKind && {
-											kind: newKind,
-										} ),
-										...( newType &&
-											newType !== 'URL' &&
-											newType !== 'post-format' && {
-												type: newType,
-											} ),
-									} );
-								} }
+								onChange={ ( updatedValue ) =>
+									updateNavigationLinkBlockAttributes(
+										updatedValue,
+										setAttributes,
+										attributes
+									)
+								}
 							/>
 						</Popover>
 					) }

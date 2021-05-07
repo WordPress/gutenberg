@@ -34,15 +34,6 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 
 	$stylesheet = $tree->get_stylesheet( $type );
 
-	if ( ( 'all' === $type || 'block_styles' === $type ) && WP_Theme_JSON_Resolver::theme_has_support() ) {
-		// To support all themes, we added in the block-library stylesheet
-		// a style rule such as .has-link-color a { color: var(--wp--style--color--link, #00e); }
-		// so that existing link colors themes used didn't break.
-		// We add this here to make it work for themes that opt-in to theme.json
-		// In the future, we may do this differently.
-		$stylesheet .= 'a{color:var(--wp--style--color--link, #00e);}';
-	}
-
 	if ( $can_use_cached ) {
 		// Cache for a minute.
 		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
@@ -121,11 +112,10 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// In the site editor, the user can change styles, so the client
 	// needs the ability to create them. Hence, we pass it some data
 	// for this: base styles (core+theme) and the ID of the user CPT.
-	$screen = get_current_screen();
 	if (
-		! empty( $screen ) &&
+		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
-		gutenberg_is_edit_site_page( $screen->id ) &&
+		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
 		WP_Theme_JSON_Resolver::theme_has_support() &&
 		gutenberg_supports_block_templates()
 	) {

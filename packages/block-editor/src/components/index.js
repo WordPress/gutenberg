@@ -87,7 +87,7 @@ export { default as withColorContext } from './color-palette/with-color-context'
  * Content Related Components
  */
 
-export { default as __experimentalBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
+export { default as __unstableBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
 export { default as __experimentalInserterMenuExtension } from './inserter-menu-extension';
 export { default as __experimentalPreviewOptions } from './preview-options';
 export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
@@ -105,6 +105,7 @@ export { default as BlockSettingsMenu } from './block-settings-menu';
 export { default as BlockSettingsMenuControls } from './block-settings-menu-controls';
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
+export { default as BlockTools } from './block-tools';
 export {
 	default as CopyHandler,
 	useClipboardHandler as __unstableUseClipboardHandler,

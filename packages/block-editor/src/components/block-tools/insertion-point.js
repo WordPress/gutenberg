@@ -26,7 +26,7 @@ import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-
 
 export const InsertionPointOpenRef = createContext();
 
-function InsertionPointPopover() {
+function InsertionPointPopover( { __unstablePopoverSlot } ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
 	const ref = useRef();
@@ -117,6 +117,7 @@ function InsertionPointPopover() {
 	}, [ previousElement, nextElement ] );
 
 	const getAnchorRect = useCallback( () => {
+		const { ownerDocument } = previousElement;
 		const previousRect = previousElement.getBoundingClientRect();
 		const nextRect = nextElement
 			? nextElement.getBoundingClientRect()
@@ -128,6 +129,7 @@ function InsertionPointPopover() {
 					left: previousRect.right,
 					right: previousRect.left,
 					bottom: nextRect ? nextRect.top : previousRect.bottom,
+					ownerDocument,
 				};
 			}
 
@@ -136,6 +138,7 @@ function InsertionPointPopover() {
 				left: previousRect.left,
 				right: previousRect.right,
 				bottom: nextRect ? nextRect.top : previousRect.bottom,
+				ownerDocument,
 			};
 		}
 
@@ -145,6 +148,7 @@ function InsertionPointPopover() {
 				left: nextRect ? nextRect.right : previousRect.left,
 				right: previousRect.left,
 				bottom: previousRect.bottom,
+				ownerDocument,
 			};
 		}
 
@@ -153,6 +157,7 @@ function InsertionPointPopover() {
 			left: previousRect.right,
 			right: nextRect ? nextRect.left : previousRect.right,
 			bottom: previousRect.bottom,
+			ownerDocument,
 		};
 	}, [ previousElement, nextElement ] );
 
@@ -205,7 +210,9 @@ function InsertionPointPopover() {
 			getAnchorRect={ getAnchorRect }
 			focusOnMount={ false }
 			className="block-editor-block-list__insertion-point-popover"
-			__unstableSlotName="block-toolbar"
+			// Render in the old slot if needed for backward compatibility,
+			// otherwise render in place (not in the the default popover slot).
+			__unstableSlotName={ __unstablePopoverSlot || null }
 		>
 			<div
 				ref={ ref }
