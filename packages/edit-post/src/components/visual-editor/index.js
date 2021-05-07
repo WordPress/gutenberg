@@ -14,6 +14,7 @@ import {
 import {
 	WritingFlow,
 	BlockList,
+	BlockTools,
 	store as blockEditorStore,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypewriter as useTypewriter,
@@ -29,7 +30,7 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
-import { Popover, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
@@ -103,6 +104,8 @@ export default function VisualEditor( { styles } ) {
 		height: '100%',
 		width: '100%',
 		margin: 0,
+		display: 'flex',
+		flexFlow: 'column',
 	};
 	const templateModeStyles = {
 		...desktopCanvasStyles,
@@ -192,42 +195,43 @@ export default function VisualEditor( { styles } ) {
 				animate={ animatedStyles }
 				initial={ desktopCanvasStyles }
 			>
-				<Popover.Slot name="block-toolbar" />
-				<MaybeIframe
-					isTemplateMode={ isTemplateMode }
-					contentRef={ contentRef }
-					styles={ styles }
-					style={ { paddingBottom } }
-				>
-					<AnimatePresence>
-						<motion.div
-							key={ isTemplateMode ? 'template' : 'post' }
-							initial={ { opacity: 0 } }
-							animate={ { opacity: 1 } }
-						>
-							<WritingFlow>
-								{ ! isTemplateMode && (
-									<div className="edit-post-visual-editor__post-title-wrapper">
-										<PostTitle />
-									</div>
-								) }
-								<BlockList
-									__experimentalLayout={
-										themeSupportsLayout
-											? {
-													type: 'default',
-													// Find a way to inject this in the support flag code (hooks).
-													alignments: themeSupportsLayout
-														? alignments
-														: undefined,
-											  }
-											: undefined
-									}
-								/>
-							</WritingFlow>
-						</motion.div>
-					</AnimatePresence>
-				</MaybeIframe>
+				<BlockTools>
+					<MaybeIframe
+						isTemplateMode={ isTemplateMode }
+						contentRef={ contentRef }
+						styles={ styles }
+						style={ { paddingBottom } }
+					>
+						<AnimatePresence>
+							<motion.div
+								key={ isTemplateMode ? 'template' : 'post' }
+								initial={ { opacity: 0 } }
+								animate={ { opacity: 1 } }
+							>
+								<WritingFlow>
+									{ ! isTemplateMode && (
+										<div className="edit-post-visual-editor__post-title-wrapper">
+											<PostTitle />
+										</div>
+									) }
+									<BlockList
+										__experimentalLayout={
+											themeSupportsLayout
+												? {
+														type: 'default',
+														// Find a way to inject this in the support flag code (hooks).
+														alignments: themeSupportsLayout
+															? alignments
+															: undefined,
+												  }
+												: undefined
+										}
+									/>
+								</WritingFlow>
+							</motion.div>
+						</AnimatePresence>
+					</MaybeIframe>
+				</BlockTools>
 			</motion.div>
 			<__unstableBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
