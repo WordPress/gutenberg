@@ -6,17 +6,17 @@ import { number } from '@storybook/addon-knobs';
 /**
  * Internal dependencies
  */
-import { View } from '../../view';
+import { View } from '../../ui/view';
 import { Grid } from '..';
 
 export default {
 	component: Grid,
-	title: 'G2 Components (Experimental)/Grid',
+	title: 'Components (Experimental)/Grid',
 };
 
 const Item = ( props ) => (
 	<View
-		css={ {
+		style={ {
 			borderRadius: 8,
 			background: '#eee',
 			padding: 8,

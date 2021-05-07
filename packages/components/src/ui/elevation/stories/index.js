@@ -7,7 +7,7 @@ import { number } from '@storybook/addon-knobs';
  * Internal dependencies
  */
 import { Elevation } from '../index';
-import { Grid } from '../../grid';
+import { Grid } from '../../../grid';
 import { View } from '../../view';
 import { HStack } from '../../../h-stack';
 import { Divider } from '../../divider';
