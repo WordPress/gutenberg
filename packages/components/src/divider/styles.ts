@@ -6,7 +6,7 @@ import { css } from 'emotion';
 /**
  * Internal dependencies
  */
-import CONFIG from '../../utils/config-values';
+import CONFIG from '../utils/config-values';
 
 export const Divider = css`
 	border-color: ${ CONFIG.colorDivider };

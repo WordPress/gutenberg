@@ -5,7 +5,7 @@ import { Divider } from '..';
 
 export default {
 	component: Divider,
-	title: 'G2 Components (Experimental)/Divider',
+	title: 'Components (Experimental)/Divider',
 };
 
 export const _default = () => {
