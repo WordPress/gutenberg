@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { Grid } from '../../grid';
+import { Grid } from '../../../grid';
 import { Text } from '../../../text';
 import { VStack } from '../../../v-stack';
 import { Card, CardBody, CardFooter } from '../index';

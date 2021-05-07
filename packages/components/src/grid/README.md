@@ -1,11 +1,13 @@
-# Grid (Experimental)
+# Grid
+
+> **Experimental!**
 
 `Grid` is a primitive layout component that can arrange content in a grid configuration.
 
 ## Usage
 
 ```jsx
-import { Grid, View } from '@wordpress/components/ui';
+import { __experimentalGrid as Grid, __experimentalView as View } from '@wordpress/components';
 
 function Example() {
 	return (

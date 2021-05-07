@@ -566,12 +566,12 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * @param array $declarations Holds the existing declarations.
 	 * @param array $styles Styles to process.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $declarations, $styles ) {
+	private static function compute_style_properties( $styles ) {
+		$declarations = array();
 		if ( empty( $styles ) ) {
 			return $declarations;
 		}
@@ -835,7 +835,7 @@ class WP_Theme_JSON {
 
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$selector     = $metadata['selector'];
-			$declarations = self::compute_style_properties( array(), $node );
+			$declarations = self::compute_style_properties( $node );
 
 			$is_link_element = self::is_link_element( $metadata['selector'] );
 			if ( ! $is_link_element ) {
@@ -1220,7 +1220,7 @@ class WP_Theme_JSON {
 	 */
 	private static function remove_insecure_styles( $input, $selector ) {
 		$output       = array();
-		$declarations = self::compute_style_properties( array(), $input );
+		$declarations = self::compute_style_properties( $input );
 		// To be removed once the user styles
 		// no longer use the --wp--style--color--link.
 		if ( self::is_link_element( $selector ) ) {

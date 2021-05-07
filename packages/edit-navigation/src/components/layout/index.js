@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
+	BlockTools,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
 import { Popover, SlotFillProvider, Spinner } from '@wordpress/components';
@@ -37,7 +38,6 @@ import NavigationEditorShortcuts from './shortcuts';
 import Sidebar from './sidebar';
 import Header from '../header';
 import Notices from '../notices';
-import BlockToolbar from './block-toolbar';
 import Editor from '../editor';
 import InspectorAdditions from '../inspector-additions';
 import { store as editNavigationStore } from '../../store';
@@ -47,7 +47,7 @@ const interfaceLabels = {
 	header: __( 'Navigation top bar' ),
 	/* translators: accessibility text for the navigation screen content landmark region. */
 	body: __( 'Navigation menu blocks' ),
-	/* translators: accessibility text for the widgets screen settings landmark region. */
+	/* translators: accessibility text for the navigation screen settings landmark region. */
 	sidebar: __( 'Navigation settings' ),
 };
 
@@ -163,10 +163,7 @@ export default function Layout( { blockEditorSettings } ) {
 											/>
 										) }
 									{ isBlockEditorReady && (
-										<>
-											<BlockToolbar
-												isFixed={ ! isLargeViewport }
-											/>
+										<BlockTools>
 											<div
 												className="edit-navigation-layout__content-area"
 												ref={ contentAreaRef }
@@ -196,7 +193,7 @@ export default function Layout( { blockEditorSettings } ) {
 													}
 												/>
 											</div>
-										</>
+										</BlockTools>
 									) }
 								</>
 							}
