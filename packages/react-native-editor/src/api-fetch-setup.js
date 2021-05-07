@@ -6,7 +6,7 @@ import apiFetch from '@wordpress/api-fetch';
 
 // Please add only wp.org API paths here!
 const SUPPORTED_ENDPOINTS = [
-	/wp\/v2\/(media|categories)\/?\d*?.*/i,
+	/wp\/v2\/(media|categories|blocks)\/?\d*?.*/i,
 	/wp\/v2\/search\?.*/i,
 ];
 

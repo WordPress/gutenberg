@@ -1,6 +1,98 @@
-<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/master/packages#maintaining-changelogs. -->
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
 
 ## Unreleased
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+-   The bundled `puppeteer-core` (`^5.5.0`) dependency has been upgraded to version `^9.0.0`. Puppeteer uses Chromium v91 instead of Chromium v88. See the full list of breaking changes of [9.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v9.0.0) and lower versions ([#31138](https://github.com/WordPress/gutenberg/pull/31138)).
+
+### New Features
+
+-   Include a Jest Reporter that formats test results for GitHub Actions annotations ([#31041](https://github.com/WordPress/gutenberg/pull/31041)).
+-   Have the `format` command ignore files listed in a `.prettierignore` file, add a fallback `.prettierignore` to the package ([30844](https://github.com/WordPress/gutenberg/pull/30844)).
+-   The e2e tests are now using [`jest-circus`](https://github.com/facebook/jest/tree/master/packages/jest-circus) as the test runner. This enable us to capture screenshots at the time the tests failed. The unit tests are also using the same test runner for consistency ([#28449](https://github.com/WordPress/gutenberg/pull/28449), [#31178](https://github.com/WordPress/gutenberg/pull/31178)).
+
+### Bug Fix
+
+-   Add `postcss` as a dependency to ensure that the correct version gets installed.
+
+## 15.0.0 (2021-04-29)
+
+### Breaking Changes
+
+-   Rename `format-js` script to `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
+-   Include YAML files when formatting files with `format` ([#30240](https://github.com/WordPress/gutenberg/pull/30240)).
+-   The bundled `css-loader` dependency has been updated from requiring `^3.5.2` to requiring `^5.1.3` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `mini-css-extract-plugin` dependency has been updated from requiring `^0.9.0` to requiring `^1.3.9` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `postcss-loader` dependency has been updated from requiring `^3.0.0` to requiring `^4.2.0` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `sass-loader` dependency has been updated from requiring `^8.0.2` to requiring `^10.1.1` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `thread-loader` dependency has been updated from requiring `^2.1.3` to requiring `^3.0.1` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+-   The bundled `url-loader` dependency has been updated from requiring `^3.0.0` to requiring `^4.1.1` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+
+### New Features
+
+-   `build` and `start` command now bundle files ending with `.module.css` as CSS modules and extracts `style.module.css` ([#29182](https://github.com/WordPress/gutenberg/pull/29182)).
+
+### Enhancements
+
+-   The bundled `webpack` dependency has been updated from requiring `4.42.0` to requiring `^4.46.0` ([#27821](https://github.com/WordPress/gutenberg/pull/27821)).
+
+## 14.1.0 (2021-04-06)
+
+### Enhancements
+
+-   The bundled `babel-loader` dependency has been updated from requiring `^8.1.0` to requiring `^8.2.2` ([#30018](https://github.com/WordPress/gutenberg/pull/30018)).
+
+## 14.0.0 (2021-03-17)
+
+### Breaking Changes
+
+-   Lint TypeScript files as part of `lint-js`. [#27143](https://github.com/WordPress/gutenberg/pull/27143)
+
+### New Features
+
+-   Default `check-engines` command to the `engines` config in `package.json` file of the current project ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).
+
+### Enhancements
+
+-   Make `check-licenses` command compatible with npm v7 ([#28909](https://github.com/WordPress/gutenberg/pull/28909)).
+-   Add `Python 2.0` to non-GPL compatible OSS licenses allowed for development in `check-licenses` command ([#29968](https://github.com/WordPress/gutenberg/pull/28968)).
+-   Updated `check-node-version` to version `^4.1.0` that no longer processes unrelated engines with `check-engines` command ([#29066](https://github.com/WordPress/gutenberg/pull/29066)).
+-   Replace `jest-puppeteer` with the forked version of `jest-environment-puppeteer` to use `puppeteer-core` directly ([#29418](https://github.com/WordPress/gutenberg/pull/29418)).
+
+## 13.0.0 (2021-01-21)
+
+### Breaking Changes
+
+-   Increase the minimum Node.js version to 12 ([#27934](https://github.com/WordPress/gutenberg/pull/27934)).
+-   The bundled `jest` dependency has been updated to the next major version `^26.6.3` (see [Breaking Changes](https://jestjs.io/blog/2020/05/05/jest-26), [#27956](https://github.com/WordPress/gutenberg/pull/27956)).
+-   The bundled `@wordpress/eslint-plugin` dependency has been updated to the next major version `^8.0.0`. There are new ESLint rules enabled in the recommended config used by `lint-js` command.
+-   The bundled `stylelint-config-wordpress` dependency has been replaced with `@wordpress/stylelint-config` (#27810)[https://github.com/WordPress/gutenberg/pull/27810].
+-   The bundled `puppeteer-core` (`3.0.0`) dependency has been upgraded to version `5.5.0`. Puppeteer uses Chromium v88 instead of Chromium v71. See the full list of breaking changes of [4.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v4.0.0) and [5.0.0](https://github.com/puppeteer/puppeteer/releases/tag/v5.0.0).
+
+### Enhancements
+
+-   `wordpress` subfolder is no longer ignored when detecting files for testing, linting or formatting.
+-   The bundled `eslint` dependency has been updated from requiring `^7.1.0` to requiring `^7.17.0` ([#27965](https://github.com/WordPress/gutenberg/pull/27965)).
+-   Make it possible to transpile `.jsx` files with `build` and `start` commands ([#28002](https://github.com/WordPress/gutenberg/pull/28002)).
+-   Add support for static assets (fonts and images) for `build` and `start` commands ([#28043](https://github.com/WordPress/gutenberg/pull/28043)).
+
+### Bug Fix
+
+-   Ensure that `check-engines` uses the same default version of Node.js and npm as this package ([#28143](https://github.com/WordPress/gutenberg/pull/28143)).
+-   Prevent translation function names from being mangled to ensure stings are extracted ([#28231](https://github.com/WordPress/gutenberg/pull/28231)).
+
+### Internal
+
+-   The bundled `webpack-bundle-analyzer` dependency has been updated from requiring `^3.6.1` to requiring `^4.2.0`.
+
+## 12.6.1 (2021-01-05)
+
+### Bug Fix
+
+-   Fix multiple build (`build` command) runtimes conflicting when using globals ([#27985](https://github.com/WordPress/gutenberg/pull/27985)).
 
 ## 12.6.0 (2020-12-17)
 

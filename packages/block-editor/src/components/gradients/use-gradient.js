@@ -14,6 +14,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { useBlockEditContext } from '../block-edit';
 import useEditorFeature from '../use-editor-feature';
+import { store as blockEditorStore } from '../../store';
 
 const EMPTY_ARRAY = [];
 
@@ -69,7 +70,7 @@ export function __experimentalUseGradient( {
 	const gradients = useEditorFeature( 'color.gradients' ) || EMPTY_ARRAY;
 	const { gradient, customGradient } = useSelect(
 		( select ) => {
-			const { getBlockAttributes } = select( 'core/block-editor' );
+			const { getBlockAttributes } = select( blockEditorStore );
 			const attributes = getBlockAttributes( clientId ) || {};
 			return {
 				customGradient: attributes[ customGradientAttribute ],
@@ -79,7 +80,7 @@ export function __experimentalUseGradient( {
 		[ clientId, gradientAttribute, customGradientAttribute ]
 	);
 
-	const { updateBlockAttributes } = useDispatch( 'core/block-editor' );
+	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 	const setGradient = useCallback(
 		( newGradientValue ) => {
 			const slug = getGradientSlugByValue( gradients, newGradientValue );

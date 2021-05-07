@@ -19,9 +19,9 @@ Array [
   Object {
     "column": 15,
     "line": 12,
-    "rule": "declaration-property-unit-whitelist",
+    "rule": "declaration-property-unit-allowed-list",
     "severity": "error",
-    "text": "Unexpected unit \\"em\\" for property \\"line-height\\" (declaration-property-unit-whitelist)",
+    "text": "Unexpected unit \\"em\\" for property \\"line-height\\" (declaration-property-unit-allowed-list)",
   },
   Object {
     "column": 15,

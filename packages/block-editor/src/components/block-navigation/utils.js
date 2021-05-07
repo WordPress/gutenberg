@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { isArray } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -11,3 +16,17 @@ export const getBlockPositionDescription = ( position, siblingCount, level ) =>
 		siblingCount,
 		level
 	);
+
+/**
+ * Returns true if the client ID occurs within the block selection or multi-selection,
+ * or false otherwise.
+ *
+ * @param {string}          clientId               Block client ID.
+ * @param {string|string[]} selectedBlockClientIds Selected block client ID, or an array of multi-selected blocks client IDs.
+ *
+ * @return {boolean} Whether the block is in multi-selection set.
+ */
+export const isClientIdSelected = ( clientId, selectedBlockClientIds ) =>
+	isArray( selectedBlockClientIds ) && selectedBlockClientIds.length
+		? selectedBlockClientIds.indexOf( clientId ) !== -1
+		: selectedBlockClientIds === clientId;

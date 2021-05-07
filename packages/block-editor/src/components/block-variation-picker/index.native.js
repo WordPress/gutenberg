@@ -32,11 +32,12 @@ import { useMemo } from '@wordpress/element';
  * Internal dependencies
  */
 import styles from './style.scss';
+import { store as blockEditorStore } from '../../store';
 
 const hitSlop = { top: 22, bottom: 22, left: 22, right: 22 };
 
 function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
-	const { replaceInnerBlocks } = useDispatch( 'core/block-editor' );
+	const { replaceInnerBlocks } = useDispatch( blockEditorStore );
 	const isIOS = Platform.OS === 'ios';
 
 	const cancelButtonStyle = usePreferredColorSchemeStyle(
@@ -76,38 +77,41 @@ function BlockVariationPicker( { isVisible, onClose, clientId, variations } ) {
 		onClose();
 	};
 
-	return (
-		<BottomSheet
-			isVisible={ isVisible }
-			onClose={ onClose }
-			title={ __( 'Select a layout' ) }
-			contentStyle={ styles.contentStyle }
-			leftButton={ leftButton }
-		>
-			<ScrollView
-				horizontal
-				showsHorizontalScrollIndicator={ false }
-				contentContainerStyle={ styles.contentContainerStyle }
-				style={ styles.containerStyle }
+	return useMemo(
+		() => (
+			<BottomSheet
+				isVisible={ isVisible }
+				onClose={ onClose }
+				title={ __( 'Select a layout' ) }
+				contentStyle={ styles.contentStyle }
+				leftButton={ leftButton }
 			>
-				{ variations.map( ( v ) => {
-					return (
-						<InserterButton
-							item={ v }
-							key={ v.name }
-							onSelect={ () => onVariationSelect( v ) }
-						/>
-					);
-				} ) }
-			</ScrollView>
-			<PanelBody>
-				<FooterMessageControl
-					label={ __(
-						'Note: Column layout may vary between themes and screen sizes'
-					) }
-				/>
-			</PanelBody>
-		</BottomSheet>
+				<ScrollView
+					horizontal
+					showsHorizontalScrollIndicator={ false }
+					contentContainerStyle={ styles.contentContainerStyle }
+					style={ styles.containerStyle }
+				>
+					{ variations.map( ( v ) => {
+						return (
+							<InserterButton
+								item={ v }
+								key={ v.name }
+								onSelect={ () => onVariationSelect( v ) }
+							/>
+						);
+					} ) }
+				</ScrollView>
+				<PanelBody>
+					<FooterMessageControl
+						label={ __(
+							'Note: Column layout may vary between themes and screen sizes'
+						) }
+					/>
+				</PanelBody>
+			</BottomSheet>
+		),
+		[ variations, isVisible, onClose ]
 	);
 }
 

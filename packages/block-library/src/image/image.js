@@ -14,7 +14,6 @@ import {
 	Spinner,
 	TextareaControl,
 	TextControl,
-	ToolbarGroup,
 	ToolbarButton,
 } from '@wordpress/components';
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
@@ -27,13 +26,20 @@ import {
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
+	store as blockEditorStore,
+	BlockAlignmentControl,
 } from '@wordpress/block-editor';
 import { useEffect, useState, useRef } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
-import { createBlock } from '@wordpress/blocks';
-import { crop, upload } from '@wordpress/icons';
+import {
+	createBlock,
+	getBlockType,
+	switchToBlockType,
+} from '@wordpress/blocks';
+import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -56,6 +62,7 @@ function getFilename( url ) {
 }
 
 export default function Image( {
+	temporaryURL,
 	attributes: {
 		url = '',
 		alt,
@@ -83,14 +90,19 @@ export default function Image( {
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
-	const { image, multiImageSelection } = useSelect(
+	const { block, currentId, image, multiImageSelection } = useSelect(
 		( select ) => {
-			const { getMedia } = select( 'core' );
-			const { getMultiSelectedBlockClientIds, getBlockName } = select(
-				'core/block-editor'
-			);
+			const { getMedia } = select( coreStore );
+			const {
+				getMultiSelectedBlockClientIds,
+				getBlockName,
+				getSelectedBlock,
+				getSelectedBlockClientId,
+			} = select( blockEditorStore );
 			const multiSelectedClientIds = getMultiSelectedBlockClientIds();
 			return {
+				block: getSelectedBlock(),
+				currentId: getSelectedBlockClientId(),
 				image: id && isSelected ? getMedia( id ) : null,
 				multiImageSelection:
 					multiSelectedClientIds.length &&
@@ -104,7 +116,7 @@ export default function Image( {
 	);
 	const { imageEditing, imageSizes, maxWidth, mediaUpload } = useSelect(
 		( select ) => {
-			const { getSettings } = select( 'core/block-editor' );
+			const { getSettings } = select( blockEditorStore );
 			return pick( getSettings(), [
 				'imageEditing',
 				'imageSizes',
@@ -113,7 +125,7 @@ export default function Image( {
 			] );
 		}
 	);
-	const { toggleSelection } = useDispatch( 'core/block-editor' );
+	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
 	);
@@ -131,6 +143,9 @@ export default function Image( {
 		),
 		( { name, slug } ) => ( { value: slug, label: name } )
 	);
+
+	// Check if the cover block is registered.
+	const coverBlockExists = !! getBlockType( 'core/cover' );
 
 	useEffect( () => {
 		if ( ! isSelected ) {
@@ -245,6 +260,16 @@ export default function Image( {
 		} );
 	}
 
+	function updateAlignment( nextAlign ) {
+		const extraUpdatedAttributes = [ 'wide', 'full' ].includes( nextAlign )
+			? { width: undefined, height: undefined }
+			: {};
+		setAttributes( {
+			...extraUpdatedAttributes,
+			align: nextAlign,
+		} );
+	}
+
 	useEffect( () => {
 		if ( ! isSelected ) {
 			setIsEditingImage( false );
@@ -256,40 +281,52 @@ export default function Image( {
 
 	const controls = (
 		<>
-			<BlockControls>
+			<BlockControls group="block">
+				<BlockAlignmentControl
+					value={ align }
+					onChange={ updateAlignment }
+				/>
 				{ ! multiImageSelection && ! isEditingImage && (
-					<ToolbarGroup>
-						<ImageURLInputUI
-							url={ href || '' }
-							onChangeUrl={ onSetHref }
-							linkDestination={ linkDestination }
-							mediaUrl={ ( image && image.source_url ) || url }
-							mediaLink={ image && image.link }
-							linkTarget={ linkTarget }
-							linkClass={ linkClass }
-							rel={ rel }
-						/>
-					</ToolbarGroup>
+					<ImageURLInputUI
+						url={ href || '' }
+						onChangeUrl={ onSetHref }
+						linkDestination={ linkDestination }
+						mediaUrl={ ( image && image.source_url ) || url }
+						mediaLink={ image && image.link }
+						linkTarget={ linkTarget }
+						linkClass={ linkClass }
+						rel={ rel }
+					/>
 				) }
 				{ allowCrop && (
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ () => setIsEditingImage( true ) }
-							icon={ crop }
-							label={ __( 'Crop' ) }
-						/>
-					</ToolbarGroup>
+					<ToolbarButton
+						onClick={ () => setIsEditingImage( true ) }
+						icon={ crop }
+						label={ __( 'Crop' ) }
+					/>
 				) }
 				{ externalBlob && (
-					<ToolbarGroup>
-						<ToolbarButton
-							onClick={ uploadExternal }
-							icon={ upload }
-							label={ __( 'Upload external image' ) }
-						/>
-					</ToolbarGroup>
+					<ToolbarButton
+						onClick={ uploadExternal }
+						icon={ upload }
+						label={ __( 'Upload external image' ) }
+					/>
 				) }
-				{ ! multiImageSelection && ! isEditingImage && (
+				{ ! multiImageSelection && coverBlockExists && (
+					<ToolbarButton
+						icon={ overlayText }
+						label={ __( 'Add text over image' ) }
+						onClick={ () =>
+							replaceBlocks(
+								currentId,
+								switchToBlockType( block, 'core/cover' )
+							)
+						}
+					/>
+				) }
+			</BlockControls>
+			{ ! multiImageSelection && ! isEditingImage && (
+				<BlockControls group="other">
 					<MediaReplaceFlow
 						mediaId={ id }
 						mediaURL={ url }
@@ -299,8 +336,8 @@ export default function Image( {
 						onSelectURL={ onSelectURL }
 						onError={ onUploadError }
 					/>
-				) }
-			</BlockControls>
+				</BlockControls>
+			) }
 			<InspectorControls>
 				<PanelBody title={ __( 'Image settings' ) }>
 					{ ! multiImageSelection && (
@@ -378,7 +415,7 @@ export default function Image( {
 		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 		<>
 			<img
-				src={ url }
+				src={ temporaryURL || url }
 				alt={ defaultedAlt }
 				onClick={ onImageClick }
 				onError={ () => onImageError() }
@@ -391,7 +428,7 @@ export default function Image( {
 					);
 				} }
 			/>
-			{ isBlobURL( url ) && <Spinner /> }
+			{ temporaryURL && <Spinner /> }
 		</>
 		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
 	);
@@ -473,7 +510,10 @@ export default function Image( {
 
 		img = (
 			<ResizableBox
-				size={ { width, height } }
+				size={ {
+					width: width ?? 'auto',
+					height: height ?? 'auto',
+				} }
 				showHandle={ isSelected }
 				minWidth={ minWidth }
 				maxWidth={ maxWidthBuffer }
@@ -513,14 +553,16 @@ export default function Image( {
 			isEditing={ isEditingImage }
 			onFinishEditing={ () => setIsEditingImage( false ) }
 		>
-			{ controls }
+			{ /* Hide controls during upload to avoid component remount,
+				which causes duplicated image upload. */ }
+			{ ! temporaryURL && controls }
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
 					ref={ captionRef }
 					tagName="figcaption"
 					aria-label={ __( 'Image caption text' ) }
-					placeholder={ __( 'Write caption…' ) }
+					placeholder={ __( 'Add caption' ) }
 					value={ caption }
 					unstableOnFocus={ onFocusCaption }
 					onChange={ ( value ) =>

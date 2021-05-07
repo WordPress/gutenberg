@@ -39,11 +39,13 @@ export const defaultEntities = [
 		kind: 'root',
 		key: 'slug',
 		baseURL: '/wp/v2/types',
+		baseURLParams: { context: 'edit' },
 	},
 	{
 		name: 'media',
 		kind: 'root',
 		baseURL: '/wp/v2/media',
+		baseURLParams: { context: 'edit' },
 		plural: 'mediaItems',
 		label: __( 'Media' ),
 	},
@@ -52,6 +54,7 @@ export const defaultEntities = [
 		kind: 'root',
 		key: 'slug',
 		baseURL: '/wp/v2/taxonomies',
+		baseURLParams: { context: 'edit' },
 		plural: 'taxonomies',
 		label: __( 'Taxonomy' ),
 	},
@@ -67,21 +70,32 @@ export const defaultEntities = [
 		name: 'widget',
 		kind: 'root',
 		baseURL: '/wp/v2/widgets',
+		baseURLParams: { context: 'edit' },
 		plural: 'widgets',
 		transientEdits: { blocks: true },
 		label: __( 'Widgets' ),
+	},
+	{
+		name: 'widgetType',
+		kind: 'root',
+		baseURL: '/wp/v2/widget-types',
+		baseURLParams: { context: 'edit' },
+		plural: 'widgetTypes',
+		label: __( 'Widget types' ),
 	},
 	{
 		label: __( 'User' ),
 		name: 'user',
 		kind: 'root',
 		baseURL: '/wp/v2/users',
+		baseURLParams: { context: 'edit' },
 		plural: 'users',
 	},
 	{
 		name: 'comment',
 		kind: 'root',
 		baseURL: '/wp/v2/comments',
+		baseURLParams: { context: 'edit' },
 		plural: 'comments',
 		label: __( 'Comment' ),
 	},
@@ -89,6 +103,7 @@ export const defaultEntities = [
 		name: 'menu',
 		kind: 'root',
 		baseURL: '/__experimental/menus',
+		baseURLParams: { context: 'edit' },
 		plural: 'menus',
 		label: __( 'Menu' ),
 	},
@@ -96,6 +111,7 @@ export const defaultEntities = [
 		name: 'menuItem',
 		kind: 'root',
 		baseURL: '/__experimental/menu-items',
+		baseURLParams: { context: 'edit' },
 		plural: 'menuItems',
 		label: __( 'Menu Item' ),
 	},
@@ -103,6 +119,7 @@ export const defaultEntities = [
 		name: 'menuLocation',
 		kind: 'root',
 		baseURL: '/__experimental/menu-locations',
+		baseURLParams: { context: 'edit' },
 		plural: 'menuLocations',
 		label: __( 'Menu Location' ),
 		key: 'name',
@@ -115,47 +132,14 @@ export const kinds = [
 ];
 
 /**
- * Returns a function to be used to retrieve the title of a given post type record.
- *
- * @param {string} postTypeName PostType name.
- * @return {Function} getTitle.
- */
-export const getPostTypeTitle = ( postTypeName ) => ( record ) => {
-	if ( [ 'wp_template_part', 'wp_template' ].includes( postTypeName ) ) {
-		return (
-			record?.title?.rendered || record?.title || startCase( record.slug )
-		);
-	}
-	return record?.title?.rendered || record?.title || String( record.id );
-};
-
-/**
  * Returns a function to be used to retrieve extra edits to apply before persisting a post type.
  *
- * @param {string} postTypeName PostType name.
- * @return {Function} prePersistHandler.
+ * @param {Object} persistedRecord Already persisted Post
+ * @param {Object} edits Edits.
+ * @return {Object} Updated edits.
  */
-export const getPostTypePrePersistHandler = ( postTypeName ) => (
-	persistedRecord,
-	edits
-) => {
+export const prePersistPostType = ( persistedRecord, edits ) => {
 	const newEdits = {};
-
-	// Fix template titles.
-	if (
-		[ 'wp_template', 'wp_template_part' ].includes( postTypeName ) &&
-		! edits.title &&
-		! persistedRecord.title
-	) {
-		newEdits.title = persistedRecord
-			? getPostTypeTitle( postTypeName )( persistedRecord )
-			: edits.slug;
-	}
-
-	// Templates and template parts can only be published.
-	if ( [ 'wp_template', 'wp_template_part' ].includes( postTypeName ) ) {
-		newEdits.status = 'publish';
-	}
 
 	if ( persistedRecord?.status === 'auto-draft' ) {
 		// Saving an auto-draft should create a draft by default.
@@ -185,19 +169,25 @@ export const getPostTypePrePersistHandler = ( postTypeName ) => (
 function* loadPostTypeEntities() {
 	const postTypes = yield apiFetch( { path: '/wp/v2/types?context=edit' } );
 	return map( postTypes, ( postType, name ) => {
+		const isTemplate = [ 'wp_template', 'wp_template_part' ].includes(
+			name
+		);
 		return {
 			kind: 'postType',
 			baseURL: '/wp/v2/' + postType.rest_base,
+			baseURLParams: { context: 'edit' },
 			name,
 			label: postType.labels.singular_name,
 			transientEdits: {
 				blocks: true,
-				selectionStart: true,
-				selectionEnd: true,
+				selection: true,
 			},
 			mergedEdits: { meta: true },
-			getTitle: getPostTypeTitle( name ),
-			__unstablePrePersist: getPostTypePrePersistHandler( name ),
+			getTitle: ( record ) =>
+				record?.title?.rendered ||
+				record?.title ||
+				( isTemplate ? startCase( record.slug ) : String( record.id ) ),
+			__unstablePrePersist: isTemplate ? undefined : prePersistPostType,
 		};
 	} );
 }
@@ -215,6 +205,7 @@ function* loadTaxonomyEntities() {
 		return {
 			kind: 'taxonomy',
 			baseURL: '/wp/v2/' + taxonomy.rest_base,
+			baseURLParams: { context: 'edit' },
 			name,
 			label: taxonomy.labels.singular_name,
 		};

@@ -97,7 +97,7 @@ export const builtinControls = {
 		( registry ) => ( { storeKey, selectorName, args } ) => {
 			const method = registry.select( storeKey )[ selectorName ]
 				.hasResolver
-				? '__experimentalResolveSelect'
+				? 'resolveSelect'
 				: 'select';
 			return registry[ method ]( storeKey )[ selectorName ]( ...args );
 		}

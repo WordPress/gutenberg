@@ -83,6 +83,7 @@ describe( 'controls', () => {
 					.hasFinishedResolution( 'getItems' );
 				if ( isFinished ) {
 					const items = registry.select( 'store' ).getItems();
+					// eslint-disable-next-line jest/no-conditional-expect
 					expect( items ).toEqual( [ 1, 2, 3 ] );
 				}
 				resolve();
@@ -182,7 +183,7 @@ describe( 'controls', () => {
 				const testDispatch = () =>
 					registry.dispatch( 'store' ).normalShouldFail();
 				expect( testDispatch ).toThrow(
-					'Actions must be plain objects. Use custom middleware for async actions.'
+					"Actions must be plain objects. Instead, the actual type was: 'number'"
 				);
 			}
 		);
@@ -229,7 +230,7 @@ describe( 'controls', () => {
 				.dispatch( 'store' )
 				.withPromiseAndNonAction();
 			await expect( dispatchedAction ).rejects.toThrow(
-				'Actions must be plain objects. Use custom middleware for async actions.'
+				"Actions must be plain objects. Instead, the actual type was: 'number'."
 			);
 		} );
 	} );

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { pageBreak as icon } from '@wordpress/icons';
 
 /**
@@ -17,10 +16,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Page Break' ),
-	description: __( 'Separate your content into a multi-page experience.' ),
 	icon,
-	keywords: [ __( 'next page' ), __( 'pagination' ) ],
 	example: {},
 	transforms,
 	edit,

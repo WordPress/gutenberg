@@ -129,7 +129,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 	// The added specificity is needed to override.
 	&:focus:not(:disabled) {
-		box-shadow: 0 0 0 $border-width-focus var(--wp-admin-theme-color) inset;
+		box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color) inset;
 	}
 
 	&.is-selected {
@@ -151,7 +151,7 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.block-editor-link-control__search-item-header {
 		display: block;
-		margin-right: $grid-unit-30;
+		margin-right: $grid-unit-10;
 		overflow: hidden;
 		white-space: nowrap;
 	}
@@ -163,8 +163,15 @@ $block-editor-link-control-number-of-actions: 1;
 
 	.block-editor-link-control__search-item-info,
 	.block-editor-link-control__search-item-title {
-		max-width: 230px;
 		overflow: hidden;
+		text-overflow: ellipsis;
+		padding-right: $grid-unit-30;
+
+		.components-external-link__icon {
+			position: absolute;
+			right: 0;
+			margin-top: 0;
+		}
 	}
 
 	.block-editor-link-control__search-item-title {
@@ -234,12 +241,16 @@ $block-editor-link-control-number-of-actions: 1;
 }
 
 .block-editor-link-control__settings {
-	border-top: 1px solid $gray-300;
+	border-top: $border-width solid $gray-300;
 	margin: 0;
 	padding: $grid-unit-20 $grid-unit-30;
 
 	:last-child {
 		margin-bottom: 0;
+	}
+
+	.is-alternate & {
+		border-top: $border-width solid $gray-900;
 	}
 }
 

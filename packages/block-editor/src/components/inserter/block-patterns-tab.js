@@ -18,12 +18,14 @@ import usePatternsState from './hooks/use-patterns-state';
 import BlockPatternList from '../block-patterns-list';
 
 function BlockPatternsCategory( {
+	rootClientId,
 	onInsert,
 	selectedCategory,
 	onClickCategory,
 } ) {
 	const [ allPatterns, allCategories, onClick ] = usePatternsState(
-		onInsert
+		onInsert,
+		rootClientId
 	);
 
 	// Remove any empty categories
@@ -31,7 +33,7 @@ function BlockPatternsCategory( {
 		() =>
 			allCategories.filter( ( category ) =>
 				allPatterns.some( ( pattern ) =>
-					pattern.categories.includes( category.name )
+					pattern.categories?.includes( category.name )
 				)
 			),
 		[ allPatterns, allCategories ]
@@ -103,7 +105,6 @@ function BlockPatternsCategory( {
 		<>
 			{ !! currentCategoryPatterns.length && (
 				<PatternInserterPanel
-					title={ patternCategory.title }
 					selectedCategory={ patternCategory }
 					patternCategories={ populatedCategories }
 					onClickCategory={ onClickCategory }
@@ -112,6 +113,9 @@ function BlockPatternsCategory( {
 						shownPatterns={ currentShownPatterns }
 						blockPatterns={ currentCategoryPatterns }
 						onClickPattern={ onClick }
+						label={ patternCategory.label }
+						orientation="vertical"
+						isDraggable
 					/>
 				</PatternInserterPanel>
 			) }
@@ -119,9 +123,15 @@ function BlockPatternsCategory( {
 	);
 }
 
-function BlockPatternsTabs( { onInsert, onClickCategory, selectedCategory } ) {
+function BlockPatternsTabs( {
+	rootClientId,
+	onInsert,
+	onClickCategory,
+	selectedCategory,
+} ) {
 	return (
 		<BlockPatternsCategory
+			rootClientId={ rootClientId }
 			selectedCategory={ selectedCategory }
 			onInsert={ onInsert }
 			onClickCategory={ onClickCategory }

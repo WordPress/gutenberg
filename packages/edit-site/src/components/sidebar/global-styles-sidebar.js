@@ -6,7 +6,12 @@ import { map, sortBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, PanelBody, TabPanel } from '@wordpress/components';
+import {
+	Button,
+	PanelBody,
+	TabPanel,
+	__unstableComponentSystemProvider as ComponentSystemProvider,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 import { useMemo } from '@wordpress/element';
@@ -19,47 +24,66 @@ import {
 	useGlobalStylesReset,
 } from '../editor/global-styles-provider';
 import DefaultSidebar from './default-sidebar';
-import { GLOBAL_CONTEXT_NAME } from '../editor/utils';
 import {
 	default as TypographyPanel,
 	useHasTypographyPanel,
 } from './typography-panel';
+import { default as BorderPanel, useHasBorderPanel } from './border-panel';
 import { default as ColorPanel, useHasColorPanel } from './color-panel';
+import { default as SpacingPanel, useHasSpacingPanel } from './spacing-panel';
 
 function GlobalStylesPanel( {
 	wrapperPanelTitle,
 	context,
-	getStyleProperty,
-	setStyleProperty,
+	getStyle,
+	setStyle,
 	getSetting,
 	setSetting,
 } ) {
+	const hasBorderPanel = useHasBorderPanel( context );
 	const hasColorPanel = useHasColorPanel( context );
 	const hasTypographyPanel = useHasTypographyPanel( context );
+	const hasSpacingPanel = useHasSpacingPanel( context );
 
-	if ( ! hasColorPanel && ! hasTypographyPanel ) {
+	if ( ! hasColorPanel && ! hasTypographyPanel && ! hasSpacingPanel ) {
 		return null;
 	}
 
 	const content = (
-		<>
+		<ComponentSystemProvider
+			__unstableNextInclude={ [ 'WPComponentsFontSizePicker' ] }
+		>
 			{ hasTypographyPanel && (
 				<TypographyPanel
 					context={ context }
-					getStyleProperty={ getStyleProperty }
-					setStyleProperty={ setStyleProperty }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
 				/>
 			) }
 			{ hasColorPanel && (
 				<ColorPanel
 					context={ context }
-					getStyleProperty={ getStyleProperty }
-					setStyleProperty={ setStyleProperty }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
 					getSetting={ getSetting }
 					setSetting={ setSetting }
 				/>
 			) }
-		</>
+			{ hasSpacingPanel && (
+				<SpacingPanel
+					context={ context }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
+				/>
+			) }
+			{ hasBorderPanel && (
+				<BorderPanel
+					context={ context }
+					getStyle={ getStyle }
+					setStyle={ setStyle }
+				/>
+			) }
+		</ComponentSystemProvider>
 	);
 	if ( ! wrapperPanelTitle ) {
 		return content;
@@ -71,65 +95,48 @@ function GlobalStylesPanel( {
 	);
 }
 
-function getPanelTitle( context ) {
-	/*
-	 * We use the block's name as the panel title.
-	 *
-	 * Some blocks (eg: core/heading) can represent different
-	 * contexts (eg: core/heading/h1, core/heading/h2).
-	 * For those, we attach the selector (h1) after the block's name.
-	 *
-	 * The title can't be accessed in the server,
-	 * as it's translatable and the block.json doesn't
-	 * have it yet.
-	 */
-	const blockType = getBlockType( context.blockName );
+function getPanelTitle( blockName ) {
+	const blockType = getBlockType( blockName );
+
 	// Protect against blocks that aren't registered
 	// eg: widget-area
 	if ( blockType === undefined ) {
-		return blockType;
+		return blockName;
 	}
 
-	let panelTitle = blockType.title;
-	if ( 'object' === typeof blockType?.supports?.__experimentalSelector ) {
-		panelTitle += ` (${ context.title })`;
-	}
-	return panelTitle;
+	return blockType.title;
 }
 
 function GlobalStylesBlockPanels( {
-	contexts,
-	getStyleProperty,
-	setStyleProperty,
+	blocks,
+	getStyle,
+	setStyle,
 	getSetting,
 	setSetting,
 } ) {
 	const panels = useMemo(
 		() =>
 			sortBy(
-				map( contexts, ( context, name ) => {
+				map( blocks, ( block, name ) => {
 					return {
-						context,
+						block,
 						name,
-						wrapperPanelTitle: getPanelTitle( context ),
+						wrapperPanelTitle: getPanelTitle( name ),
 					};
 				} ),
 				( { wrapperPanelTitle } ) => wrapperPanelTitle
 			),
-		[ contexts ]
+		[ blocks ]
 	);
 
-	return map( panels, ( { context, name, wrapperPanelTitle } ) => {
-		if ( name === GLOBAL_CONTEXT_NAME ) {
-			return null;
-		}
+	return map( panels, ( { block, name, wrapperPanelTitle } ) => {
 		return (
 			<GlobalStylesPanel
 				key={ 'panel-' + name }
 				wrapperPanelTitle={ wrapperPanelTitle }
-				context={ { ...context, name } }
-				getStyleProperty={ getStyleProperty }
-				setStyleProperty={ setStyleProperty }
+				context={ block }
+				getStyle={ getStyle }
+				setStyle={ setStyle }
 				getSetting={ getSetting }
 				setSetting={ setSetting }
 			/>
@@ -144,15 +151,16 @@ export default function GlobalStylesSidebar( {
 	closeLabel,
 } ) {
 	const {
-		contexts,
-		getStyleProperty,
-		setStyleProperty,
+		root,
+		blocks,
+		getStyle,
+		setStyle,
 		getSetting,
 		setSetting,
 	} = useGlobalStylesContext();
 	const [ canRestart, onReset ] = useGlobalStylesReset();
 
-	if ( typeof contexts !== 'object' || ! contexts?.[ GLOBAL_CONTEXT_NAME ] ) {
+	if ( typeof blocks !== 'object' || ! root ) {
 		// No sidebar is shown.
 		return null;
 	}
@@ -181,7 +189,7 @@ export default function GlobalStylesSidebar( {
 		>
 			<TabPanel
 				tabs={ [
-					{ name: 'global', title: __( 'Global' ) },
+					{ name: 'root', title: __( 'Root' ) },
 					{ name: 'block', title: __( 'By Block Type' ) },
 				] }
 			>
@@ -190,9 +198,9 @@ export default function GlobalStylesSidebar( {
 					if ( 'block' === tab.name ) {
 						return (
 							<GlobalStylesBlockPanels
-								contexts={ contexts }
-								getStyleProperty={ getStyleProperty }
-								setStyleProperty={ setStyleProperty }
+								blocks={ blocks }
+								getStyle={ getStyle }
+								setStyle={ setStyle }
 								getSetting={ getSetting }
 								setSetting={ setSetting }
 							/>
@@ -201,12 +209,9 @@ export default function GlobalStylesSidebar( {
 					return (
 						<GlobalStylesPanel
 							hasWrapper={ false }
-							context={ {
-								...contexts[ GLOBAL_CONTEXT_NAME ],
-								name: GLOBAL_CONTEXT_NAME,
-							} }
-							getStyleProperty={ getStyleProperty }
-							setStyleProperty={ setStyleProperty }
+							context={ root }
+							getStyle={ getStyle }
+							setStyle={ setStyle }
 							getSetting={ getSetting }
 							setSetting={ setSetting }
 						/>

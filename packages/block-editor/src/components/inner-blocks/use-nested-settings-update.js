@@ -1,9 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect } from '@wordpress/element';
+import { useLayoutEffect, useMemo } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import isShallowEqual from '@wordpress/is-shallow-equal';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 /**
  * This hook is a side effect which updates the block-editor store when changes
@@ -30,18 +35,18 @@ export default function useNestedSettingsUpdate(
 	captureToolbars,
 	orientation
 ) {
-	const { updateBlockListSettings } = useDispatch( 'core/block-editor' );
+	const { updateBlockListSettings } = useDispatch( blockEditorStore );
 
 	const { blockListSettings, parentLock } = useSelect(
 		( select ) => {
 			const rootClientId = select(
-				'core/block-editor'
+				blockEditorStore
 			).getBlockRootClientId( clientId );
 			return {
 				blockListSettings: select(
-					'core/block-editor'
+					blockEditorStore
 				).getBlockListSettings( clientId ),
-				parentLock: select( 'core/block-editor' ).getTemplateLock(
+				parentLock: select( blockEditorStore ).getTemplateLock(
 					rootClientId
 				),
 			};
@@ -49,9 +54,13 @@ export default function useNestedSettingsUpdate(
 		[ clientId ]
 	);
 
+	// Memoize as inner blocks implementors often pass a new array on every
+	// render.
+	const _allowedBlocks = useMemo( () => allowedBlocks, allowedBlocks );
+
 	useLayoutEffect( () => {
 		const newSettings = {
-			allowedBlocks,
+			allowedBlocks: _allowedBlocks,
 			templateLock:
 				templateLock === undefined ? parentLock : templateLock,
 		};
@@ -72,7 +81,7 @@ export default function useNestedSettingsUpdate(
 	}, [
 		clientId,
 		blockListSettings,
-		allowedBlocks,
+		_allowedBlocks,
 		templateLock,
 		parentLock,
 		captureToolbars,

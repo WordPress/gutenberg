@@ -9,10 +9,14 @@ import { writeFileSync } from 'fs';
  */
 import {
 	trashAllPosts,
-	visitAdminPage,
 	activateTheme,
+	canvas,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
+
+/**
+ * Internal dependencies
+ */
+import { siteEditor } from '../../experimental-features';
 
 jest.setTimeout( 1000000 );
 
@@ -38,12 +42,7 @@ describe( 'Site Editor Performance', () => {
 			inserterHover: [],
 		};
 
-		await visitAdminPage(
-			'admin.php',
-			addQueryArgs( '', {
-				page: 'gutenberg-edit-site',
-			} ).slice( 1 )
-		);
+		await siteEditor.visit();
 
 		let i = 3;
 
@@ -51,7 +50,11 @@ describe( 'Site Editor Performance', () => {
 		while ( i-- ) {
 			const startTime = new Date();
 			await page.reload();
-			await page.waitForSelector( '.wp-block', { timeout: 120000 } );
+			await page.waitForSelector( '.edit-site-visual-editor', {
+				timeout: 120000,
+			} );
+			await canvas().waitForSelector( '.wp-block', { timeout: 120000 } );
+
 			results.load.push( new Date() - startTime );
 		}
 

@@ -1,0 +1,5 @@
+.customize-control-sidebar_block_editor .block-editor-block-list__block-popover {
+	position: fixed;
+	// Appear over block placeholders, but under widgets page headings.
+	z-index: 8;
+}

@@ -1,11 +1,11 @@
 {
 	"apiVersion": 2,
 	"name": "core/template-part",
-	"category": "design",
+	"title": "Template Part",
+	"category": "theme",
+	"description": "Edit the different global regions of your site, like the header, footer, sidebar, or create your own.",
+	"textdomain": "default",
 	"attributes": {
-		"postId": {
-			"type": "number"
-		},
 		"slug": {
 			"type": "string"
 		},
@@ -13,8 +13,10 @@
 			"type": "string"
 		},
 		"tagName": {
-			"type": "string",
-			"default": "div"
+			"type": "string"
+		},
+		"area": {
+			"type": "string"
 		}
 	},
 	"supports": {
@@ -23,7 +25,11 @@
 		"color": {
 			"gradients": true,
 			"link": true
-		}
+		},
+		"spacing": {
+			"padding": true
+		},
+		"__experimentalLayout": true
 	},
 	"editorStyle": "wp-block-template-part-editor"
 }

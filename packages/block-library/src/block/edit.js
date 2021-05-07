@@ -2,103 +2,107 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEntityBlockEditor } from '@wordpress/core-data';
-import { useCallback } from '@wordpress/element';
+import {
+	useEntityBlockEditor,
+	useEntityProp,
+	store as coreStore,
+} from '@wordpress/core-data';
 import {
 	Placeholder,
 	Spinner,
-	Disabled,
 	ToolbarGroup,
 	ToolbarButton,
+	TextControl,
+	PanelBody,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import {
-	BlockEditorProvider,
-	WritingFlow,
-	BlockList,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
+	InnerBlocks,
 	BlockControls,
+	InspectorControls,
 	useBlockProps,
+	Warning,
 } from '@wordpress/block-editor';
-import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
+import { ungroup } from '@wordpress/icons';
 
-/**
- * Internal dependencies
- */
-import ReusableBlockEditPanel from './edit-panel';
-
-export default function ReusableBlockEdit( {
-	attributes: { ref },
-	clientId,
-	isSelected,
-} ) {
-	const recordArgs = [ 'postType', 'wp_block', ref ];
-
-	const {
-		reusableBlock,
-		hasResolved,
-		isEditing,
-		isSaving,
-		canUserUpdate,
-		settings,
-	} = useSelect(
-		( select ) => ( {
-			reusableBlock: select( 'core' ).getEditedEntityRecord(
-				...recordArgs
-			),
-			hasResolved: select( 'core' ).hasFinishedResolution(
-				'getEditedEntityRecord',
-				recordArgs
-			),
-			isSaving: select( 'core' ).isSavingEntityRecord( ...recordArgs ),
-			canUserUpdate: select( 'core' ).canUser( 'update', 'blocks', ref ),
-			isEditing: select(
-				reusableBlocksStore
-			).__experimentalIsEditingReusableBlock( clientId ),
-			settings: select( 'core/block-editor' ).getSettings(),
-		} ),
-		[ ref, clientId ]
+export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
+	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
+		ref
 	);
-
-	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
-	const { editEntityRecord, saveEditedEntityRecord } = useDispatch( 'core' );
-	const { __experimentalSetEditingReusableBlock } = useDispatch(
-		reusableBlocksStore
-	);
-	const setIsEditing = useCallback(
-		( value ) => {
-			__experimentalSetEditingReusableBlock( clientId, value );
+	const { isMissing, hasResolved } = useSelect(
+		( select ) => {
+			const persistedBlock = select( coreStore ).getEntityRecord(
+				'postType',
+				'wp_block',
+				ref
+			);
+			const hasResolvedBlock = select(
+				coreStore
+			).hasFinishedResolution( 'getEntityRecord', [
+				'postType',
+				'wp_block',
+				ref,
+			] );
+			return {
+				hasResolved: hasResolvedBlock,
+				isMissing: hasResolvedBlock && ! persistedBlock,
+			};
 		},
-		[ clientId ]
+		[ ref, clientId ]
 	);
 
 	const {
 		__experimentalConvertBlockToStatic: convertBlockToStatic,
 	} = useDispatch( reusableBlocksStore );
 
-	const { createSuccessNotice, createErrorNotice } = useDispatch(
-		noticesStore
-	);
-	const save = useCallback( async function () {
-		try {
-			await saveEditedEntityRecord( ...recordArgs );
-			createSuccessNotice( __( 'Block updated.' ), {
-				type: 'snackbar',
-			} );
-		} catch ( error ) {
-			createErrorNotice( error.message, {
-				type: 'snackbar',
-			} );
-		}
-	}, recordArgs );
-
 	const [ blocks, onInput, onChange ] = useEntityBlockEditor(
 		'postType',
 		'wp_block',
 		{ id: ref }
 	);
+	const [ title, setTitle ] = useEntityProp(
+		'postType',
+		'wp_block',
+		'title',
+		ref
+	);
+
+	const innerBlocksProps = useInnerBlocksProps(
+		{},
+		{
+			value: blocks,
+			onInput,
+			onChange,
+			renderAppender: blocks?.length
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
+		}
+	);
 
 	const blockProps = useBlockProps();
+
+	if ( hasAlreadyRendered ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Block cannot be rendered inside itself.' ) }
+				</Warning>
+			</div>
+		);
+	}
+
+	if ( isMissing ) {
+		return (
+			<div { ...blockProps }>
+				<Warning>
+					{ __( 'Block has been deleted or is unavailable.' ) }
+				</Warning>
+			</div>
+		);
+	}
 
 	if ( ! hasResolved ) {
 		return (
@@ -110,75 +114,32 @@ export default function ReusableBlockEdit( {
 		);
 	}
 
-	if ( ! reusableBlock ) {
-		return (
-			<div { ...blockProps }>
-				<Placeholder>
-					{ __( 'Block has been deleted or is unavailable.' ) }
-				</Placeholder>
-			</div>
-		);
-	}
-
-	/**
-	 * Clear the selected block when focus moves to the reusable block list.
-	 * These blocks are in different stores and only one block should be
-	 * selected at a time.
-	 */
-	function onFocus() {
-		clearSelectedBlock();
-	}
-
-	let element = (
-		<BlockEditorProvider
-			value={ blocks }
-			onInput={ onInput }
-			onChange={ onChange }
-			settings={ settings }
-		>
-			<div className="block-editor-block-list__block" onFocus={ onFocus }>
-				<WritingFlow>
-					<BlockList />
-				</WritingFlow>
-			</div>
-		</BlockEditorProvider>
-	);
-
-	if ( ! isEditing ) {
-		element = <Disabled>{ element }</Disabled>;
-	}
-
 	return (
-		<div { ...blockProps }>
-			<BlockControls>
-				<ToolbarGroup>
-					<ToolbarButton
-						onClick={ () => convertBlockToStatic( clientId ) }
-					>
-						{ __( 'Convert to regular blocks' ) }
-					</ToolbarButton>
-				</ToolbarGroup>
-			</BlockControls>
-
-			<div className="block-library-block__reusable-block-container">
-				{ ( isSelected || isEditing ) && (
-					<ReusableBlockEditPanel
-						isEditing={ isEditing }
-						title={ reusableBlock.title }
-						isSaving={ isSaving }
-						isEditDisabled={ ! canUserUpdate }
-						onEdit={ () => setIsEditing( true ) }
-						onChangeTitle={ ( title ) =>
-							editEntityRecord( ...recordArgs, { title } )
-						}
-						onSave={ () => {
-							save();
-							setIsEditing( false );
-						} }
-					/>
-				) }
-				{ element }
+		<RecursionProvider>
+			<div { ...blockProps }>
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ () => convertBlockToStatic( clientId ) }
+							label={ __( 'Convert to regular blocks' ) }
+							icon={ ungroup }
+							showTooltip
+						/>
+					</ToolbarGroup>
+				</BlockControls>
+				<InspectorControls>
+					<PanelBody>
+						<TextControl
+							label={ __( 'Name' ) }
+							value={ title }
+							onChange={ setTitle }
+						/>
+					</PanelBody>
+				</InspectorControls>
+				<div className="block-library-block__reusable-block-container">
+					{ <div { ...innerBlocksProps } /> }
+				</div>
 			</div>
-		</div>
+		</RecursionProvider>
 	);
 }

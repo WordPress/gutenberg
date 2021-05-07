@@ -16,6 +16,7 @@
 		flex-direction: column;
 		justify-content: center;
 		position: relative;
+		align-self: flex-start;
 
 		// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
 		width: calc(50% - 1em);
@@ -77,6 +78,8 @@
 	// Cropped
 	&.is-cropped .blocks-gallery-image,
 	&.is-cropped .blocks-gallery-item {
+		align-self: inherit;
+
 		a,
 		img {
 			// IE11 doesn't support object-fit, so just make sure images aren't skewed.

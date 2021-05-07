@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { loop } from '@wordpress/icons';
 
 /**
@@ -15,9 +14,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Query Loop' ),
 	icon: loop,
 	edit,
 	save,
-	parent: [ 'core/query' ],
 };

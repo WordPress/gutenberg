@@ -34,7 +34,7 @@ async function sleep( durationInSeconds ) {
 	// `waitFor`, which isn't apt for the use case, when provided an integer,
 	// of waiting for a given amount of time.
 	// eslint-disable-next-line no-restricted-syntax
-	await page.waitFor( durationInSeconds * 1000 );
+	await page.waitForTimeout( durationInSeconds * 1000 );
 }
 
 async function clearSessionStorage() {

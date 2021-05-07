@@ -5,8 +5,14 @@ import {
 	getNavigationPostForMenu,
 	hasResolvedNavigationPost,
 	getMenuItemForClientId,
+	getSelectedMenuId,
 } from '../selectors';
-import { KIND, POST_TYPE, buildNavigationPostId } from '../utils';
+import {
+	NAVIGATION_POST_KIND,
+	NAVIGATION_POST_POST_TYPE,
+} from '../../constants';
+
+import { buildNavigationPostId } from '../utils';
 
 describe( 'getNavigationPostForMenu', () => {
 	it( 'gets navigation post for menu', () => {
@@ -29,8 +35,8 @@ describe( 'getNavigationPostForMenu', () => {
 
 		expect( registry.select ).toHaveBeenCalledWith( 'core' );
 		expect( getEditedEntityRecord ).toHaveBeenCalledWith(
-			KIND,
-			POST_TYPE,
+			NAVIGATION_POST_KIND,
+			NAVIGATION_POST_POST_TYPE,
 			buildNavigationPostId( menuId )
 		);
 
@@ -83,7 +89,11 @@ describe( 'hasResolvedNavigationPost', () => {
 		expect( registry.select ).toHaveBeenCalledWith( 'core' );
 		expect( hasFinishedResolution ).toHaveBeenCalledWith(
 			'getEntityRecord',
-			[ KIND, POST_TYPE, buildNavigationPostId( menuId ) ]
+			[
+				NAVIGATION_POST_KIND,
+				NAVIGATION_POST_POST_TYPE,
+				buildNavigationPostId( menuId ),
+			]
 		);
 
 		hasResolvedNavigationPost.registry = defaultRegistry;
@@ -119,5 +129,17 @@ describe( 'getMenuItemForClientId', () => {
 		expect( getMenuItem ).toHaveBeenCalledWith( '123' );
 
 		getMenuItemForClientId.registry = defaultRegistry;
+	} );
+} );
+
+describe( 'getSelectedMenuId', () => {
+	it( 'returns default selected menu ID (zero)', () => {
+		const state = {};
+		expect( getSelectedMenuId( state ) ).toBe( 0 );
+	} );
+
+	it( 'returns selected menu ID', () => {
+		const state = { selectedMenuId: 10 };
+		expect( getSelectedMenuId( state ) ).toBe( 10 );
 	} );
 } );

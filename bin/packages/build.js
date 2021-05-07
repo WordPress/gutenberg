@@ -114,6 +114,18 @@ function createStyleEntryTransform() {
 			const entries = await glob(
 				path.resolve( PACKAGES_DIR, packageName, 'src/*.scss' )
 			);
+
+			// Account for the specific case where block styles in
+			// block-library package also need rebuilding.
+			if (
+				packageName === 'block-library' &&
+				[ 'style.scss', 'editor.scss' ].includes(
+					path.basename( file )
+				)
+			) {
+				entries.push( file );
+			}
+
 			entries.forEach( ( entry ) => this.push( entry ) );
 
 			// Find other stylesheets that need to be rebuilt because
@@ -194,7 +206,7 @@ if ( files.length ) {
 
 	stream = glob.stream(
 		[
-			`${ PACKAGES_DIR }/*/src/**/*.js`,
+			`${ PACKAGES_DIR }/*/src/**/*.{js,ts,tsx}`,
 			`${ PACKAGES_DIR }/*/src/*.scss`,
 			`${ PACKAGES_DIR }/block-library/src/**/*.js`,
 			`${ PACKAGES_DIR }/block-library/src/*/style.scss`,

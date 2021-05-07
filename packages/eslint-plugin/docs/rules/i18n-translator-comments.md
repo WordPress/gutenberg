@@ -1,6 +1,6 @@
 # Enforce adding translator comments (i18n-translator-comments)
 
-If using [translation functions](https://github.com/WordPress/gutenberg/blob/master/packages/i18n/README.md#api) with placeholders in them,
+If using [translation functions](https://github.com/WordPress/gutenberg/blob/HEAD/packages/i18n/README.md#api) with placeholders in them,
 they need accompanying translator comments.
 
 ## Rule details
@@ -12,10 +12,7 @@ var color = '';
 sprintf( __( 'Color: %s' ), color );
 
 var address = '';
-sprintf(
-	__( 'Address: %s' ),
-	address
-);
+sprintf( __( 'Address: %s' ), address );
 
 // translators: %s: Name
 var name = '';
@@ -33,6 +30,6 @@ var address = '';
 sprintf(
 	// translators: %s: Address.
 	__( 'Address: %s' ),
-	address,
+	address
 );
 ```

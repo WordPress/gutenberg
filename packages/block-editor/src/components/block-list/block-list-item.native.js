@@ -17,38 +17,13 @@ import { ReadableContentView, alignmentHelpers } from '@wordpress/components';
 import BlockListBlock from './block';
 import BlockInsertionPoint from './insertion-point';
 import styles from './block-list-item.native.scss';
+import { store as blockEditorStore } from '../../store';
 
 const stretchStyle = {
 	flex: 1,
 };
 
-const {
-	isFullWidth,
-	isWideWidth,
-	isWider,
-	isContainerRelated,
-} = alignmentHelpers;
-
 export class BlockListItem extends Component {
-	constructor() {
-		super( ...arguments );
-
-		this.onLayout = this.onLayout.bind( this );
-
-		this.state = {
-			blockWidth: 0,
-		};
-	}
-
-	onLayout( { nativeEvent } ) {
-		const { layout } = nativeEvent;
-		const { blockWidth } = this.state;
-
-		if ( blockWidth !== layout.width ) {
-			this.setState( { blockWidth: layout.width } );
-		}
-	}
-
 	getMarginHorizontal() {
 		const {
 			blockAlignment,
@@ -58,8 +33,14 @@ export class BlockListItem extends Component {
 			blockName,
 			parentBlockName,
 			parentWidth,
+			blockWidth,
 		} = this.props;
-		const { blockWidth } = this.state;
+		const {
+			isFullWidth,
+			isWideWidth,
+			isWider,
+			isContainerRelated,
+		} = alignmentHelpers;
 
 		if ( isFullWidth( blockAlignment ) ) {
 			if ( ! hasParents ) {
@@ -106,6 +87,7 @@ export class BlockListItem extends Component {
 			hasParents,
 			parentBlockName,
 		} = this.props;
+		const { isFullWidth, isContainerRelated } = alignmentHelpers;
 
 		return [
 			readableContentViewStyle,
@@ -134,10 +116,17 @@ export class BlockListItem extends Component {
 			parentWidth,
 			marginHorizontal,
 			blockName,
+			blockWidth,
 			...restProps
 		} = this.props;
 		const readableContentViewStyle =
 			contentResizeMode === 'stretch' && stretchStyle;
+		const { isContainerRelated } = alignmentHelpers;
+
+		if ( ! blockWidth ) {
+			return null;
+		}
+
 		return (
 			<ReadableContentView
 				align={ blockAlignment }
@@ -152,7 +141,6 @@ export class BlockListItem extends Component {
 				<View
 					style={ this.getContentStyles( readableContentViewStyle ) }
 					pointerEvents={ isReadOnly ? 'box-only' : 'auto' }
-					onLayout={ this.onLayout }
 				>
 					{ shouldShowInsertionPointBefore && (
 						<BlockInsertionPoint />
@@ -164,6 +152,7 @@ export class BlockListItem extends Component {
 						parentWidth={ parentWidth }
 						{ ...restProps }
 						marginHorizontal={ this.getMarginHorizontal() }
+						blockWidth={ blockWidth }
 					/>
 					{ ! shouldShowInnerBlockAppender() &&
 						shouldShowInsertionPointAfter && (
@@ -185,7 +174,7 @@ export default compose( [
 				getSettings,
 				getBlockParents,
 				__unstableGetBlockWithoutInnerBlocks,
-			} = select( 'core/block-editor' );
+			} = select( blockEditorStore );
 
 			const blockClientIds = getBlockOrder( rootClientId );
 			const insertionPoint = getBlockInsertionPoint();

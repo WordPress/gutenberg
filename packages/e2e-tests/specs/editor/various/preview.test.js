@@ -46,16 +46,21 @@ async function waitForPreviewNavigation( previewPage ) {
 /**
  * Enables or disables the custom fields option.
  *
- * Note that this is implemented separately from the `toggleScreenOptions`
+ * Note that this is implemented separately from the `togglePreferencesOption`
  * utility, since the custom fields option triggers a page reload and requires
  * extra async logic to wait for navigation to complete.
  *
  * @param {boolean} shouldBeChecked If true, turns the option on. If false, off.
  */
 async function toggleCustomFieldsOption( shouldBeChecked ) {
-	const checkboxXPath =
-		'//*[contains(@class, "edit-post-preferences-modal")]//label[contains(text(), "Custom fields")]';
+	const baseXPath = '//*[contains(@class, "edit-post-preferences-modal")]';
+	const paneslXPath = `${ baseXPath }//button[contains(text(), "Panels")]`;
+	const checkboxXPath = `${ baseXPath }//label[contains(text(), "Custom fields")]`;
 	await clickOnMoreMenuItem( 'Preferences' );
+	await page.waitForXPath( paneslXPath );
+	const [ tabHandle ] = await page.$x( paneslXPath );
+	await tabHandle.click();
+
 	await page.waitForXPath( checkboxXPath );
 	const [ checkboxHandle ] = await page.$x( checkboxXPath );
 

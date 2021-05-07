@@ -6,11 +6,10 @@ import { __, _x } from '@wordpress/i18n';
 import { Button, ToolbarItem } from '@wordpress/components';
 import {
 	BlockNavigationDropdown,
-	BlockToolbar,
 	NavigableToolbar,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { PinnedItems } from '@wordpress/interface';
-import { useViewportMatch } from '@wordpress/compose';
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
 
@@ -21,25 +20,25 @@ import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
+import { store as editWidgetsStore } from '../../store';
 
 function Header() {
 	const inserterButton = useRef();
-	const isLargeViewport = useViewportMatch( 'medium' );
 	const widgetAreaClientId = useLastSelectedWidgetArea();
 	const isLastSelectedWidgetAreaOpen = useSelect(
 		( select ) =>
-			select( 'core/edit-widgets' ).getIsWidgetAreaOpen(
+			select( editWidgetsStore ).getIsWidgetAreaOpen(
 				widgetAreaClientId
 			),
 		[ widgetAreaClientId ]
 	);
 	const isInserterOpened = useSelect( ( select ) =>
-		select( 'core/edit-widgets' ).isInserterOpened()
+		select( editWidgetsStore ).isInserterOpened()
 	);
 	const { setIsWidgetAreaOpen, setIsInserterOpened } = useDispatch(
-		'core/edit-widgets'
+		editWidgetsStore
 	);
-	const { selectBlock } = useDispatch( 'core/block-editor' );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const handleClick = () => {
 		if ( isInserterOpened ) {
 			// Focusing the inserter button closes the inserter popover
@@ -89,8 +88,8 @@ function Header() {
 								'Generic label for block inserter button'
 							) }
 						/>
-						<ToolbarItem as={ UndoButton } />
-						<ToolbarItem as={ RedoButton } />
+						<UndoButton />
+						<RedoButton />
 						<ToolbarItem as={ BlockNavigationDropdown } />
 					</NavigableToolbar>
 				</div>
@@ -99,11 +98,6 @@ function Header() {
 					<PinnedItems.Slot scope="core/edit-widgets" />
 				</div>
 			</div>
-			{ ! isLargeViewport && (
-				<div className="edit-widgets-header__block-toolbar">
-					<BlockToolbar hideDragHandle />
-				</div>
-			) }
 		</>
 	);
 }

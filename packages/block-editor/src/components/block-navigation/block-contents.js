@@ -16,6 +16,7 @@ import { useBlockNavigationContext } from './context';
 import BlockNavigationBlockSlot from './block-slot';
 import BlockNavigationBlockSelectButton from './block-select-button';
 import BlockDraggable from '../block-draggable';
+import { store as blockEditorStore } from '../../store';
 
 const BlockNavigationBlockContents = forwardRef(
 	(
@@ -47,7 +48,7 @@ const BlockNavigationBlockContents = forwardRef(
 					getBlockRootClientId,
 					hasBlockMovingClientId,
 					getSelectedBlockClientId,
-				} = select( 'core/block-editor' );
+				} = select( blockEditorStore );
 				return {
 					rootClientId: getBlockRootClientId( clientId ) || '',
 					blockMovingClientId: hasBlockMovingClientId(),

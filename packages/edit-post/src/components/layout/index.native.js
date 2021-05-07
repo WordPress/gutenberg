@@ -9,12 +9,7 @@ import SafeArea from 'react-native-safe-area';
  */
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
-import {
-	BottomSheetSettings,
-	__experimentalPageTemplatePicker,
-	__experimentalWithPageTemplatePicker,
-	FloatingToolbar,
-} from '@wordpress/block-editor';
+import { BottomSheetSettings, FloatingToolbar } from '@wordpress/block-editor';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
 import {
 	HTMLTextInput,
@@ -81,7 +76,12 @@ class Layout extends Component {
 
 	setHeightState( event ) {
 		const { height } = event.nativeEvent.layout;
-		this.setState( { rootViewHeight: height }, sendNativeEditorDidLayout );
+		if ( height !== this.state.rootViewHeight ) {
+			this.setState(
+				{ rootViewHeight: height },
+				sendNativeEditorDidLayout
+			);
+		}
 	}
 
 	renderHTML() {
@@ -99,12 +99,7 @@ class Layout extends Component {
 	}
 
 	render() {
-		const {
-			getStylesFromColorScheme,
-			isTemplatePickerAvailable,
-			isTemplatePickerVisible,
-			mode,
-		} = this.props;
+		const { getStylesFromColorScheme, mode } = this.props;
 
 		const isHtmlView = mode === 'text';
 
@@ -155,11 +150,6 @@ class Layout extends Component {
 						style={ toolbarKeyboardAvoidingViewStyle }
 						withAnimatedHeight
 					>
-						{ isTemplatePickerAvailable && (
-							<__experimentalPageTemplatePicker
-								visible={ isTemplatePickerVisible }
-							/>
-						) }
 						{ Platform.OS === 'ios' && <FloatingToolbar /> }
 						<Header />
 						<BottomSheetSettings />
@@ -176,13 +166,10 @@ export default compose( [
 			'core/editor'
 		);
 		const { getEditorMode } = select( editPostStore );
-		const { getSettings } = select( 'core/block-editor' );
 		return {
 			isReady: isEditorReady(),
 			mode: getEditorMode(),
-			modalLayoutPicker: getSettings( 'capabilities' ).modalLayoutPicker,
 		};
 	} ),
 	withPreferredColorScheme,
-	__experimentalWithPageTemplatePicker,
 ] )( Layout );

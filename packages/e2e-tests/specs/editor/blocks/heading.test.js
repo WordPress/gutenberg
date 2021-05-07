@@ -14,7 +14,7 @@ describe( 'Heading', () => {
 	const COLOR_INPUT_FIELD_SELECTOR =
 		'.components-color-palette__picker .components-text-control__input';
 	const COLOR_PANEL_TOGGLE_X_SELECTOR =
-		"//button[./span[contains(text(),'Color settings')]]";
+		"//button[./span[contains(text(),'Color')]]";
 
 	beforeEach( async () => {
 		await createNewPost();
@@ -67,7 +67,7 @@ describe( 'Heading', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'it should correctly apply custom colors', async () => {
+	it( 'should correctly apply custom colors', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '### Heading' );
 		const colorPanelToggle = await page.waitForXPath(
@@ -91,7 +91,7 @@ describe( 'Heading', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'it should correctly apply named colors', async () => {
+	it( 'should correctly apply named colors', async () => {
 		await clickBlockAppender();
 		await page.keyboard.type( '## Heading' );
 		const [ colorPanelToggle ] = await page.$x(

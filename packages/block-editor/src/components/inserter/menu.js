@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
+import { useState, useCallback, useMemo } from '@wordpress/element';
 import { VisuallyHidden } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -18,16 +18,17 @@ import ReusableBlocksTab from './reusable-blocks-tab';
 import InserterSearchResults from './search-results';
 import useInsertionPoint from './hooks/use-insertion-point';
 import InserterTabs from './tabs';
+import { store as blockEditorStore } from '../../store';
 
 function InserterMenu( {
 	rootClientId,
 	clientId,
 	isAppender,
-	__experimentalSelectBlockOnInsert,
 	__experimentalInsertionIndex,
 	onSelect,
 	showInserterHelpPanel,
 	showMostUsedBlocks,
+	shouldFocusBlock = true,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ hoveredItem, setHoveredItem ] = useState( null );
@@ -43,77 +44,128 @@ function InserterMenu( {
 		rootClientId,
 		clientId,
 		isAppender,
-		selectBlockOnInsert: __experimentalSelectBlockOnInsert,
 		insertionIndex: __experimentalInsertionIndex,
+		shouldFocusBlock,
 	} );
-	const { hasPatterns, hasReusableBlocks } = useSelect( ( select ) => {
-		const {
-			__experimentalBlockPatterns,
-			__experimentalReusableBlocks,
-		} = select( 'core/block-editor' ).getSettings();
+	const { showPatterns, hasReusableBlocks } = useSelect(
+		( select ) => {
+			const { __experimentalGetAllowedPatterns, getSettings } = select(
+				blockEditorStore
+			);
 
-		return {
-			hasPatterns: !! __experimentalBlockPatterns?.length,
-			hasReusableBlocks: !! __experimentalReusableBlocks?.length,
-		};
-	}, [] );
+			return {
+				showPatterns:
+					! destinationRootClientId ||
+					!! __experimentalGetAllowedPatterns(
+						destinationRootClientId
+					).length,
+				hasReusableBlocks: !! getSettings().__experimentalReusableBlocks
+					?.length,
+			};
+		},
+		[ destinationRootClientId ]
+	);
 
-	const showPatterns = ! destinationRootClientId && hasPatterns;
+	const onInsert = useCallback(
+		( blocks, meta, shouldForceFocusBlock ) => {
+			onInsertBlocks( blocks, meta, shouldForceFocusBlock );
+			onSelect();
+		},
+		[ onInsertBlocks, onSelect ]
+	);
 
-	const onInsert = ( blocks ) => {
-		onInsertBlocks( blocks );
-		onSelect();
-	};
+	const onInsertPattern = useCallback(
+		( blocks, patternName ) => {
+			onInsertBlocks( blocks, { patternName } );
+			onSelect();
+		},
+		[ onInsertBlocks, onSelect ]
+	);
 
-	const onInsertPattern = ( blocks, patternName ) => {
-		onInsertBlocks( blocks, { patternName } );
-		onSelect();
-	};
+	const onHover = useCallback(
+		( item ) => {
+			onToggleInsertionPoint( !! item );
+			setHoveredItem( item );
+		},
+		[ onToggleInsertionPoint, setHoveredItem ]
+	);
 
-	const onHover = ( item ) => {
-		onToggleInsertionPoint( !! item );
-		setHoveredItem( item );
-	};
+	const onClickPatternCategory = useCallback(
+		( patternCategory ) => {
+			setSelectedPatternCategory( patternCategory );
+		},
+		[ setSelectedPatternCategory ]
+	);
 
-	const onClickPatternCategory = ( patternCategory ) => {
-		setSelectedPatternCategory( patternCategory );
-	};
-
-	const blocksTab = (
-		<>
-			<div className="block-editor-inserter__block-list">
-				<BlockTypesTab
-					rootClientId={ destinationRootClientId }
-					onInsert={ onInsert }
-					onHover={ onHover }
-					showMostUsedBlocks={ showMostUsedBlocks }
-				/>
-			</div>
-			{ showInserterHelpPanel && (
-				<div className="block-editor-inserter__tips">
-					<VisuallyHidden as="h2">
-						{ __( 'A tip for using the block editor' ) }
-					</VisuallyHidden>
-					<Tips />
+	const blocksTab = useMemo(
+		() => (
+			<>
+				<div className="block-editor-inserter__block-list">
+					<BlockTypesTab
+						rootClientId={ destinationRootClientId }
+						onInsert={ onInsert }
+						onHover={ onHover }
+						showMostUsedBlocks={ showMostUsedBlocks }
+					/>
 				</div>
-			) }
-		</>
+				{ showInserterHelpPanel && (
+					<div className="block-editor-inserter__tips">
+						<VisuallyHidden as="h2">
+							{ __( 'A tip for using the block editor' ) }
+						</VisuallyHidden>
+						<Tips />
+					</div>
+				) }
+			</>
+		),
+		[
+			destinationRootClientId,
+			onInsert,
+			onHover,
+			filterValue,
+			showMostUsedBlocks,
+			showInserterHelpPanel,
+		]
 	);
 
-	const patternsTab = (
-		<BlockPatternsTabs
-			onInsert={ onInsertPattern }
-			onClickCategory={ onClickPatternCategory }
-			selectedCategory={ selectedPatternCategory }
-		/>
+	const patternsTab = useMemo(
+		() => (
+			<BlockPatternsTabs
+				rootClientId={ destinationRootClientId }
+				onInsert={ onInsertPattern }
+				onClickCategory={ onClickPatternCategory }
+				selectedCategory={ selectedPatternCategory }
+			/>
+		),
+		[
+			destinationRootClientId,
+			onInsertPattern,
+			onClickPatternCategory,
+			selectedPatternCategory,
+		]
 	);
 
-	const reusableBlocksTab = (
-		<ReusableBlocksTab
-			rootClientId={ destinationRootClientId }
-			onInsert={ onInsert }
-			onHover={ onHover }
-		/>
+	const reusableBlocksTab = useMemo(
+		() => (
+			<ReusableBlocksTab
+				rootClientId={ destinationRootClientId }
+				onInsert={ onInsert }
+				onHover={ onHover }
+			/>
+		),
+		[ destinationRootClientId, onInsert, onHover ]
+	);
+
+	const getCurrentTab = useCallback(
+		( tab ) => {
+			if ( tab.name === 'blocks' ) {
+				return blocksTab;
+			} else if ( tab.name === 'patterns' ) {
+				return patternsTab;
+			}
+			return reusableBlocksTab;
+		},
+		[ blocksTab, patternsTab, reusableBlocksTab ]
 	);
 
 	return (
@@ -127,6 +179,7 @@ function InserterMenu( {
 							setFilterValue( value );
 						} }
 						value={ filterValue }
+						label={ __( 'Search for blocks and patterns' ) }
 						placeholder={ __( 'Search' ) }
 					/>
 					{ !! filterValue && (
@@ -137,10 +190,11 @@ function InserterMenu( {
 							rootClientId={ rootClientId }
 							clientId={ clientId }
 							isAppender={ isAppender }
-							selectBlockOnInsert={
-								__experimentalSelectBlockOnInsert
+							__experimentalInsertionIndex={
+								__experimentalInsertionIndex
 							}
 							showBlockDirectory
+							shouldFocusBlock={ shouldFocusBlock }
 						/>
 					) }
 					{ ! filterValue && ( showPatterns || hasReusableBlocks ) && (
@@ -148,14 +202,7 @@ function InserterMenu( {
 							showPatterns={ showPatterns }
 							showReusableBlocks={ hasReusableBlocks }
 						>
-							{ ( tab ) => {
-								if ( tab.name === 'blocks' ) {
-									return blocksTab;
-								} else if ( tab.name === 'patterns' ) {
-									return patternsTab;
-								}
-								return reusableBlocksTab;
-							} }
+							{ getCurrentTab }
 						</InserterTabs>
 					) }
 					{ ! filterValue &&

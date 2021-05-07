@@ -19,7 +19,7 @@ const {
 	hasPostCSSConfig,
 } = require( './config' );
 const { fromProjectRoot, fromConfigRoot, hasProjectFile } = require( './file' );
-const { hasPackageProp } = require( './package' );
+const { getPackageProp, hasPackageProp } = require( './package' );
 
 module.exports = {
 	fromProjectRoot,
@@ -27,16 +27,17 @@ module.exports = {
 	getArgFromCLI,
 	getArgsFromCLI,
 	getFileArgsFromCLI,
-	getNodeArgsFromCLI,
-	getWebpackArgs,
-	hasBabelConfig,
-	hasArgInCLI,
-	hasFileArgInCLI,
 	getJestOverrideConfigFile,
+	getNodeArgsFromCLI,
+	getPackageProp,
+	getWebpackArgs,
+	hasArgInCLI,
+	hasBabelConfig,
+	hasFileArgInCLI,
 	hasJestConfig,
 	hasPackageProp,
-	hasPrettierConfig,
 	hasPostCSSConfig,
+	hasPrettierConfig,
 	hasProjectFile,
 	spawnScript,
 };

@@ -113,6 +113,7 @@ describe( 'List', () => {
 		await clickBlockAppender();
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( '* ' );
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 		await page.keyboard.press( 'ArrowUp' );
 		await page.keyboard.press( 'ArrowDown' );
 		await page.keyboard.press( 'Backspace' );
@@ -194,7 +195,7 @@ describe( 'List', () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
-		await clickBlockToolbarButton( 'Indent list item' );
+		await clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'two' );
 		await transformBlockTo( 'Paragraph' );
 
@@ -276,7 +277,7 @@ describe( 'List', () => {
 		await insertBlock( 'List' );
 		await page.keyboard.type( 'one' );
 		await page.keyboard.press( 'Enter' );
-		await clickBlockToolbarButton( 'Indent list item' );
+		await clickBlockToolbarButton( 'Indent' );
 		await page.keyboard.type( 'two' );
 		await page.keyboard.press( 'Enter' );
 		await page.keyboard.type( 'three' );
@@ -296,7 +297,7 @@ describe( 'List', () => {
 	it( 'should change the base list type', async () => {
 		await insertBlock( 'List' );
 		const button = await page.waitForSelector(
-			'button[aria-label="Convert to ordered list"]'
+			'button[aria-label="Ordered"]'
 		);
 		await button.click();
 
@@ -310,7 +311,7 @@ describe( 'List', () => {
 		await pressKeyWithModifier( 'primary', 'm' );
 		await page.keyboard.type( '1' );
 
-		await clickBlockToolbarButton( 'Convert to ordered list' );
+		await clickBlockToolbarButton( 'Ordered' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

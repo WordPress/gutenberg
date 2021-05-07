@@ -11,7 +11,6 @@ gutenberg.zip
 *.log
 phpcs.xml
 yarn.lock
-/wordpress
 /artifacts
 
 .cache

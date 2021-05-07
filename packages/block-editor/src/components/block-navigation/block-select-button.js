@@ -6,10 +6,6 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalGetBlockLabel as getBlockLabel,
-	getBlockType,
-} from '@wordpress/blocks';
 import { Button, VisuallyHidden } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { forwardRef } from '@wordpress/element';
@@ -19,13 +15,15 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import BlockIcon from '../block-icon';
+import Indentation from './indentation';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { getBlockPositionDescription } from './utils';
+import BlockTitle from '../block-title';
 
 function BlockNavigationBlockSelectButton(
 	{
 		className,
-		block: { clientId, name, attributes },
+		block: { clientId },
 		isSelected,
 		onClick,
 		position,
@@ -42,12 +40,6 @@ function BlockNavigationBlockSelectButton(
 	const blockInformation = useBlockDisplayInformation( clientId );
 	const instanceId = useInstanceId( BlockNavigationBlockSelectButton );
 	const descriptionId = `block-navigation-block-select-button__${ instanceId }`;
-	const blockType = getBlockType( name );
-	const blockLabel = getBlockLabel( blockType, attributes );
-	// If label is defined we prioritize it over possible possible
-	// block variation match title.
-	const blockDisplayName =
-		blockLabel !== blockType.title ? blockLabel : blockInformation?.title;
 	const blockPositionDescription = getBlockPositionDescription(
 		position,
 		siblingBlockCount,
@@ -70,8 +62,9 @@ function BlockNavigationBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 			>
-				<BlockIcon icon={ blockInformation.icon } showColors />
-				{ blockDisplayName }
+				<Indentation level={ level } />
+				<BlockIcon icon={ blockInformation?.icon } showColors />
+				<BlockTitle clientId={ clientId } />
 				{ isSelected && (
 					<VisuallyHidden>
 						{ __( '(selected block)' ) }

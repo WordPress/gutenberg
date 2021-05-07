@@ -1,0 +1,19 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"compilerOptions": {
+		"rootDir": "src",
+		"declarationDir": "build-types",
+	},
+	"references": [
+		{ "path": "../element" },
+		{ "path": "../priority-queue" },
+	],
+	"include": [
+		"src/higher-order/if-condition/**/*",
+		"src/higher-order/pure/**/*",
+		"src/higher-order/with-instance-id/**/*",
+		"src/hooks/use-async-list/**/*",
+		"src/hooks/use-instance-id/**/*",
+		"src/utils/**/*"
+	]
+}

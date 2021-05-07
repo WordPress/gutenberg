@@ -13,7 +13,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import { colorsUtils } from '../mobile/color-settings/utils';
-import { getGradientParsed } from './utils';
+import { getGradientAstWithDefault } from './utils';
 import { serializeGradient } from './serializer';
 import {
 	DEFAULT_LINEAR_GRADIENT_ANGLE,
@@ -29,7 +29,7 @@ function CustomGradientPicker( { setColor, currentValue, isGradientColor } ) {
 	const [ currentColor, setCurrentColor ] = useState( currentValue );
 
 	const { getGradientType, gradients, gradientOptions } = colorsUtils;
-	const { gradientAST } = getGradientParsed( currentColor );
+	const gradientAST = getGradientAstWithDefault( currentColor );
 	const gradientType = getGradientType( currentColor );
 
 	function isLinearGradient( type ) {

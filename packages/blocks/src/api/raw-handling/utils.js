@@ -85,12 +85,12 @@ export function getBlockContentSchema( context ) {
 }
 
 /**
- * Checks wether HTML can be considered plain text. That is, it does not contain
+ * Checks whether HTML can be considered plain text. That is, it does not contain
  * any elements that are not line breaks.
  *
  * @param {string} HTML The HTML to check.
  *
- * @return {boolean} Wether the HTML can be considered plain text.
+ * @return {boolean} Whether the HTML can be considered plain text.
  */
 export function isPlain( HTML ) {
 	return ! /<(?!br[ />])/i.test( HTML );

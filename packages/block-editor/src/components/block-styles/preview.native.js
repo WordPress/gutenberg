@@ -71,7 +71,7 @@ function StylePreview( { onPress, isActive, style, url } ) {
 			return (
 				<Animated.View
 					style={ [ outlineStyle, { opacity }, styles[ name ] ] }
-					key={ outlineStyle }
+					key={ outlineStyle.borderColor }
 				/>
 			);
 		} );

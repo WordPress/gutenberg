@@ -2,37 +2,47 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useEffect, useRef } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 
-export function useBlockSelectionClearer( ref ) {
-	const hasSelection = useSelect( ( select ) => {
-		const { hasSelectedBlock, hasMultiSelection } = select(
-			'core/block-editor'
-		);
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
-		return hasSelectedBlock() || hasMultiSelection();
-	} );
-	const { clearSelectedBlock } = useDispatch( 'core/block-editor' );
+export function useBlockSelectionClearer( onlySelfClicks = false ) {
+	const { hasSelectedBlock, hasMultiSelection } = useSelect(
+		blockEditorStore
+	);
+	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
-	useEffect( () => {
-		if ( ! hasSelection ) {
-			return;
-		}
+	return useRefEffect(
+		( node ) => {
+			function onMouseDown( event ) {
+				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
+					return;
+				}
 
-		function onFocus() {
-			clearSelectedBlock();
-		}
+				// Only handle clicks on the canvas, not the content.
+				if (
+					event.target.closest( '.wp-block' ) ||
+					( onlySelfClicks && event.target !== node )
+				) {
+					return;
+				}
 
-		ref.current.addEventListener( 'focus', onFocus );
+				clearSelectedBlock();
+			}
 
-		return () => {
-			ref.current.removeEventListener( 'focus', onFocus );
-		};
-	}, [ hasSelection, clearSelectedBlock ] );
+			node.addEventListener( 'mousedown', onMouseDown );
+
+			return () => {
+				node.removeEventListener( 'mousedown', onMouseDown );
+			};
+		},
+		[ hasSelectedBlock, hasMultiSelection, clearSelectedBlock ]
+	);
 }
 
 export default function BlockSelectionClearer( props ) {
-	const ref = useRef();
-	useBlockSelectionClearer( ref );
-	return <div tabIndex={ -1 } ref={ ref } { ...props } />;
+	return <div ref={ useBlockSelectionClearer() } { ...props } />;
 }

@@ -11,26 +11,29 @@ const path = require( 'path' );
 const nodeModulesDir = path.join( __dirname, '../', 'node_modules' );
 
 const fetchRNPackageDirs = ( dir ) => {
-	const dirList = fs.readdirSync( dir );
+	const dirList = fs.readdirSync( dir, { withFileTypes: true } );
 	const packageDirs = [];
-	dirList.forEach( ( packageName ) => {
-		const packageDir = path.join( dir, packageName );
-		if ( packageName.startsWith( '@' ) ) {
-			packageDirs.push( ...fetchRNPackageDirs( packageDir ) );
-		} else {
-			const files = fs.readdirSync( packageDir );
-			const podSpecs = files.filter( ( file ) =>
-				file.toLowerCase().endsWith( '.podspec' )
-			);
-			if ( podSpecs.length > 0 ) {
-				packageDirs.push( {
-					dir: packageDir,
-					files: podSpecs,
-					package: packageName,
-				} );
+	dirList
+		.filter( ( file ) => file.isDirectory() )
+		.map( ( file ) => file.name )
+		.forEach( ( packageName ) => {
+			const packageDir = path.join( dir, packageName );
+			if ( packageName.startsWith( '@' ) ) {
+				packageDirs.push( ...fetchRNPackageDirs( packageDir ) );
+			} else {
+				const files = fs.readdirSync( packageDir );
+				const podSpecs = files.filter( ( file ) =>
+					file.toLowerCase().endsWith( '.podspec' )
+				);
+				if ( podSpecs.length > 0 ) {
+					packageDirs.push( {
+						dir: packageDir,
+						files: podSpecs,
+						package: packageName,
+					} );
+				}
 			}
-		}
-	} );
+		} );
 	return packageDirs;
 };
 

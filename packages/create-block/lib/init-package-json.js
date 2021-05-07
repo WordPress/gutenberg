@@ -37,7 +37,7 @@ module.exports = async ( {
 				main: wpScripts && 'build/index.js',
 				scripts: wpScripts && {
 					build: 'wp-scripts build',
-					'format:js': 'wp-scripts format-js',
+					format: 'wp-scripts format',
 					'lint:css': 'wp-scripts lint-style',
 					'lint:js': 'wp-scripts lint-js',
 					start: 'wp-scripts start',

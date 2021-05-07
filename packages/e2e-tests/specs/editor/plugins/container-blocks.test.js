@@ -52,7 +52,7 @@ describe( 'InnerBlocks Template Sync', () => {
 		await switchEditorModeTo( 'Visual' );
 	};
 
-	it( 'Ensures blocks without locking are kept intact even if they do not match the template ', async () => {
+	it( 'Ensures blocks without locking are kept intact even if they do not match the template', async () => {
 		await insertBlockAndAddParagraphInside(
 			'Test Inner Blocks no locking',
 			'test/test-inner-blocks-no-locking'
@@ -60,11 +60,25 @@ describe( 'InnerBlocks Template Sync', () => {
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 
-	it( 'Removes blocks that are not expected by the template if a lock all exists ', async () => {
+	it( 'Removes blocks that are not expected by the template if a lock all exists', async () => {
 		await insertBlockAndAddParagraphInside(
 			'Test InnerBlocks locking all',
 			'test/test-inner-blocks-locking-all'
 		);
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	// Test for regressions of https://github.com/WordPress/gutenberg/issues/27897.
+	it( `Synchronizes blocks if lock 'all' is set and the template prop is changed`, async () => {
+		// Insert the template and assert that the template has its initial value.
+		await insertBlock( 'Test Inner Blocks update locked template' );
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
+		// Trigger a template update and assert that a second block is now present.
+		const [ button ] = await page.$x(
+			`//button[contains(text(), 'Update template')]`
+		);
+		await button.click();
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
 

@@ -16,7 +16,10 @@ import Sandbox from '../';
 describe( 'Sandbox', () => {
 	const TestWrapper = () => {
 		const [ html, setHtml ] = useState(
-			'<iframe class="mock-iframe" src="https://super.embed"></iframe>'
+			// MuatationObserver implementation from JSDom does not work as intended
+			// with iframes so we need to ignore it for the time being.
+			'<script type="text/javascript">window.MutationObserver = null;</script>' +
+				'<iframe class="mock-iframe" src="https://super.embed"></iframe>'
 		);
 
 		const updateHtml = () => {
@@ -34,19 +37,6 @@ describe( 'Sandbox', () => {
 			</div>
 		);
 	};
-
-	beforeAll( () => {
-		// MuatationObserver implmentation from JSDom does not work as intended
-		// with iframes so we need to ignore it for the time being.
-		jest.spyOn(
-			global.MutationObserver.prototype,
-			'observe'
-		).mockImplementation( () => {} );
-	} );
-
-	afterAll( () => {
-		global.MutationObserver.prototype.mockReset();
-	} );
 
 	it( 'should rerender with new emdeded content if html prop changes', () => {
 		let result;

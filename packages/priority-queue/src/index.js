@@ -96,6 +96,9 @@ export const createQueue = () => {
 			const callback = /** @type {WPPriorityQueueCallback} */ ( elementsMap.get(
 				nextElement
 			) );
+			// If errors with undefined callbacks are encountered double check that all of your useSelect calls
+			// have all dependecies set correctly in second parameter. Missing dependencies can cause unexpected
+			// loops and race conditions in the queue.
 			callback();
 			elementsMap.delete( nextElement );
 		} while ( hasTimeRemaining() );

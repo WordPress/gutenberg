@@ -9,6 +9,7 @@ import { flatMap, isEmpty, isFunction } from 'lodash';
  */
 import { DOWN } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
+import { menu } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,7 +38,7 @@ function DropdownMenu( {
 	children,
 	className,
 	controls,
-	icon = 'menu',
+	icon = menu,
 	label,
 	popoverProps,
 	toggleProps,
@@ -51,15 +52,15 @@ function DropdownMenu( {
 } ) {
 	if ( menuLabel ) {
 		deprecated( '`menuLabel` prop in `DropdownComponent`', {
+			since: '5.3',
 			alternative: '`menuProps` object and its `aria-label` property',
-			plugin: 'Gutenberg',
 		} );
 	}
 
 	if ( position ) {
 		deprecated( '`position` prop in `DropdownComponent`', {
+			since: '5.3',
 			alternative: '`popoverProps` object and its `position` property',
-			plugin: 'Gutenberg',
 		} );
 	}
 

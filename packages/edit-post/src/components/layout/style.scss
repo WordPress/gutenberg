@@ -57,20 +57,15 @@
 	}
 }
 
-.interface-interface-skeleton__sidebar > div {
-	height: 100%;
-	padding-bottom: $grid-unit-60;
-}
-
 .edit-post-layout .editor-post-publish-panel__header-publish-button {
 	justify-content: center;
 }
 
 
 .edit-post-layout__toggle-publish-panel,
-.edit-post-layout__toogle-sidebar-panel,
+.edit-post-layout__toggle-sidebar-panel,
 .edit-post-layout__toggle-entities-saved-states-panel {
-	z-index: z-index(".edit-post-layout__toogle-sidebar-panel");
+	z-index: z-index(".edit-post-layout__toggle-sidebar-panel");
 	position: fixed !important; // Need to override the default relative positionning
 	top: -9999em;
 	bottom: auto;
@@ -92,7 +87,7 @@
 }
 
 .edit-post-layout .interface-interface-skeleton__content {
-	background-color: $gray-400;
+	background-color: $gray-800;
 }
 
 .edit-post-layout__inserter-panel {

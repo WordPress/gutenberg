@@ -14,7 +14,7 @@ import { external } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
 import { StyledIcon } from './styles/external-link-styles';
 
 export function ExternalLink(
@@ -26,11 +26,11 @@ export function ExternalLink(
 	).join( ' ' );
 	const classes = classnames( 'components-external-link', className );
 	return (
+		/* eslint-disable react/jsx-no-target-blank */
 		<a
 			{ ...additionalProps }
 			className={ classes }
 			href={ href }
-			// eslint-disable-next-line react/jsx-no-target-blank
 			target="_blank"
 			rel={ rel }
 			ref={ ref }
@@ -47,6 +47,7 @@ export function ExternalLink(
 				className="components-external-link__icon"
 			/>
 		</a>
+		/* eslint-enable react/jsx-no-target-blank */
 	);
 }
 

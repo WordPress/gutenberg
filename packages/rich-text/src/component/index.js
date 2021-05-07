@@ -9,17 +9,9 @@ import {
 	useMemo,
 	useLayoutEffect,
 } from '@wordpress/element';
-import {
-	BACKSPACE,
-	DELETE,
-	ENTER,
-	LEFT,
-	RIGHT,
-	SPACE,
-	ESCAPE,
-} from '@wordpress/keycodes';
-import deprecated from '@wordpress/deprecated';
+import { BACKSPACE, DELETE, ENTER, SPACE } from '@wordpress/keycodes';
 import { getFilesFromDataTransfer } from '@wordpress/dom';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -41,6 +33,9 @@ import { useFormatTypes } from './use-format-types';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useInlineWarning } from './use-inline-warning';
 import { insert } from '../insert';
+import { useCopyHandler } from './use-copy-handler';
+import { useFormatBoundaries } from './use-format-boundaries';
+import { useUndoAutomaticChange } from './use-undo-automatic-change';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -82,11 +77,17 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 const whiteSpace = 'pre-wrap';
 
 /**
+ * A minimum width of 1px will prevent the rich text container from collapsing
+ * to 0 width and hiding the caret. This is useful for inline containers.
+ */
+const minWidth = '1px';
+
+/**
  * Default style object for the editable element.
  *
  * @type {Object<string,string>}
  */
-const defaultStyle = { whiteSpace };
+const defaultStyle = { whiteSpace, minWidth };
 
 const EMPTY_ACTIVE_FORMATS = [];
 
@@ -144,8 +145,6 @@ function RichText(
 		onSelectionChange,
 		onChange,
 		unstableOnFocus: onFocus,
-		setFocusedElement,
-		instanceId,
 		clientId,
 		identifier,
 		__unstableMultilineTag: multilineTag,
@@ -162,8 +161,9 @@ function RichText(
 		__unstableOnCreateUndoLevel: onCreateUndoLevel,
 		__unstableIsSelected: isSelected,
 	},
-	ref
+	forwardedRef
 ) {
+	const ref = useRef();
 	const [ activeFormats = [], setActiveFormats ] = useState();
 	const {
 		formatTypes,
@@ -174,6 +174,8 @@ function RichText(
 	} = useFormatTypes( {
 		clientId,
 		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats,
 	} );
 
 	// For backward compatibility, fall back to tagName if it's a string.
@@ -375,12 +377,14 @@ function RichText(
 
 		if ( onPaste ) {
 			const files = getFilesFromDataTransfer( clipboardData );
+			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
 
 			onPaste( {
 				value: removeEditorOnlyFormats( record.current ),
 				onChange: handleChange,
 				html,
 				plainText,
+				isInternal,
 				files: [ ...files ],
 				activeFormats,
 			} );
@@ -398,21 +402,11 @@ function RichText(
 	function handleDelete( event ) {
 		const { keyCode } = event;
 
-		if (
-			keyCode !== DELETE &&
-			keyCode !== BACKSPACE &&
-			keyCode !== ESCAPE
-		) {
+		if ( event.defaultPrevented ) {
 			return;
 		}
 
-		if ( didAutomaticChange ) {
-			event.preventDefault();
-			undo();
-			return;
-		}
-
-		if ( keyCode === ESCAPE ) {
+		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
 			return;
 		}
 
@@ -527,133 +521,6 @@ function RichText(
 		event.preventDefault();
 	}
 
-	/**
-	 * Handles horizontal keyboard navigation when no modifiers are pressed. The
-	 * navigation is handled separately to move correctly around format
-	 * boundaries.
-	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
-	 */
-	function handleHorizontalNavigation( event ) {
-		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-
-		if (
-			// Only override left and right keys without modifiers pressed.
-			shiftKey ||
-			altKey ||
-			metaKey ||
-			ctrlKey ||
-			( keyCode !== LEFT && keyCode !== RIGHT )
-		) {
-			return;
-		}
-
-		const {
-			text,
-			formats,
-			start,
-			end,
-			activeFormats: currentActiveFormats = [],
-		} = record.current;
-		const collapsed = isCollapsed( record.current );
-		// To do: ideally, we should look at visual position instead.
-		const { direction } = getWin().getComputedStyle( ref.current );
-		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
-		const isReverse = event.keyCode === reverseKey;
-
-		// If the selection is collapsed and at the very start, do nothing if
-		// navigating backward.
-		// If the selection is collapsed and at the very end, do nothing if
-		// navigating forward.
-		if ( collapsed && currentActiveFormats.length === 0 ) {
-			if ( start === 0 && isReverse ) {
-				return;
-			}
-
-			if ( end === text.length && ! isReverse ) {
-				return;
-			}
-		}
-
-		// If the selection is not collapsed, let the browser handle collapsing
-		// the selection for now. Later we could expand this logic to set
-		// boundary positions if needed.
-		if ( ! collapsed ) {
-			return;
-		}
-
-		// In all other cases, prevent default behaviour.
-		event.preventDefault();
-
-		const formatsBefore = formats[ start - 1 ] || EMPTY_ACTIVE_FORMATS;
-		const formatsAfter = formats[ start ] || EMPTY_ACTIVE_FORMATS;
-
-		let newActiveFormatsLength = currentActiveFormats.length;
-		let source = formatsAfter;
-
-		if ( formatsBefore.length > formatsAfter.length ) {
-			source = formatsBefore;
-		}
-
-		// If the amount of formats before the caret and after the caret is
-		// different, the caret is at a format boundary.
-		if ( formatsBefore.length < formatsAfter.length ) {
-			if (
-				! isReverse &&
-				currentActiveFormats.length < formatsAfter.length
-			) {
-				newActiveFormatsLength++;
-			}
-
-			if (
-				isReverse &&
-				currentActiveFormats.length > formatsBefore.length
-			) {
-				newActiveFormatsLength--;
-			}
-		} else if ( formatsBefore.length > formatsAfter.length ) {
-			if (
-				! isReverse &&
-				currentActiveFormats.length > formatsAfter.length
-			) {
-				newActiveFormatsLength--;
-			}
-
-			if (
-				isReverse &&
-				currentActiveFormats.length < formatsBefore.length
-			) {
-				newActiveFormatsLength++;
-			}
-		}
-
-		if ( newActiveFormatsLength !== currentActiveFormats.length ) {
-			const newActiveFormats = source.slice( 0, newActiveFormatsLength );
-			const newValue = {
-				...record.current,
-				activeFormats: newActiveFormats,
-			};
-			record.current = newValue;
-			applyRecord( newValue );
-			setActiveFormats( newActiveFormats );
-			return;
-		}
-
-		const newPos = start + ( isReverse ? -1 : 1 );
-		const newActiveFormats = isReverse ? formatsBefore : formatsAfter;
-		const newValue = {
-			...record.current,
-			start: newPos,
-			end: newPos,
-			activeFormats: newActiveFormats,
-		};
-
-		record.current = newValue;
-		applyRecord( newValue );
-		onSelectionChange( newPos, newPos );
-		setActiveFormats( newActiveFormats );
-	}
-
 	function handleKeyDown( event ) {
 		if ( event.defaultPrevented ) {
 			return;
@@ -662,7 +529,6 @@ function RichText(
 		handleDelete( event );
 		handleEnter( event );
 		handleSpace( event );
-		handleHorizontalNavigation( event );
 	}
 
 	const lastHistoryValue = useRef( value );
@@ -837,8 +703,11 @@ function RichText(
 			...oldRecord,
 			start,
 			end,
-			// Allow `getActiveFormats` to get new `activeFormats`.
-			activeFormats: undefined,
+			// _newActiveFormats may be set on arrow key navigation to control
+			// the right boundary position. If undefined, getActiveFormats will
+			// give the active formats according to the browser.
+			activeFormats: oldRecord._newActiveFormats,
+			_newActiveFormats: undefined,
 		};
 
 		const newActiveFormats = getActiveFormats(
@@ -937,12 +806,6 @@ function RichText(
 	 * documented, as the current requirements where it is used are subject to
 	 * future refactoring following `isSelected` handling.
 	 *
-	 * In contrast with `setFocusedElement`, this is only triggered in response
-	 * to focus within the contenteditable field, whereas `setFocusedElement`
-	 * is triggered on focus within any `RichText` descendent element.
-	 *
-	 * @see setFocusedElement
-	 *
 	 * @private
 	 */
 	function handleFocus() {
@@ -984,13 +847,6 @@ function RichText(
 		rafId.current = getWin().requestAnimationFrame( handleSelectionChange );
 
 		getDoc().addEventListener( 'selectionchange', handleSelectionChange );
-
-		if ( setFocusedElement ) {
-			deprecated( 'wp.blockEditor.RichText setFocusedElement prop', {
-				alternative: 'selection state from the block editor store.',
-			} );
-			setFocusedElement( instanceId );
-		}
 	}
 
 	function handleBlur() {
@@ -1071,7 +927,13 @@ function RichText(
 		role: 'textbox',
 		'aria-multiline': true,
 		'aria-label': placeholder,
-		ref,
+		ref: useMergeRefs( [
+			forwardedRef,
+			ref,
+			useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
+			useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
+			useUndoAutomaticChange( { didAutomaticChange, undo } ),
+		] ),
 		style: defaultStyle,
 		className: 'rich-text',
 		onPaste: handlePaste,
@@ -1102,10 +964,6 @@ function RichText(
 		<>
 			{ isSelected && (
 				<FormatEdit
-					allowedFormats={ allowedFormats }
-					withoutInteractiveFormatting={
-						withoutInteractiveFormatting
-					}
 					value={ record.current }
 					onChange={ handleChange }
 					onFocus={ focus }

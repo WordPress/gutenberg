@@ -8,35 +8,20 @@
 /**
  * Load the page templates in Gutenberg.
  *
- * @param array    $templates Page templates.
- * @param WP_Theme $theme     WP_Theme instance.
- * @param WP_Post  $post      The post being edited, provided for context, or null.
+ * @param array $templates Page templates.
  * @return array (Maybe) modified page templates array.
  */
-function gutenberg_load_block_page_templates( $templates, $theme, $post ) {
-	if ( ! gutenberg_is_fse_theme() ) {
+function gutenberg_load_block_page_templates( $templates ) {
+	if ( ! gutenberg_supports_block_templates() ) {
 		return $templates;
-	}
-	$config_file = locate_template( 'experimental-theme.json' );
-	if ( ! file_exists( $config_file ) ) {
-		return $templates;
-	}
-	$data           = json_decode(
-		file_get_contents( $config_file ),
-		true
-	);
-	$page_templates = array();
-	if ( isset( $data['pageTemplates'] ) ) {
-		foreach ( $data['pageTemplates']  as $key => $page_template ) {
-			if ( ( ! isset( $page_template['postTypes'] ) && 'page' === $post->post_type ) ||
-				( isset( $page_template['postTypes'] ) && in_array( $post->post_type, $page_template['postTypes'], true ) )
-			) {
-				$page_templates[ $key ] = $page_template['title'];
-			}
-		}
 	}
 
-	return $page_templates;
+	$block_templates = gutenberg_get_block_templates( array(), 'wp_template' );
+	foreach ( $block_templates as $template ) {
+		// TODO: exclude templates that are not concerned by the current post type.
+		$templates[ $template->slug ] = $template->title;
+	}
+
+	return $templates;
 }
-add_filter( 'theme_post_templates', 'gutenberg_load_block_page_templates', 10, 3 );
-add_filter( 'theme_page_templates', 'gutenberg_load_block_page_templates', 10, 3 );
+add_filter( 'theme_templates', 'gutenberg_load_block_page_templates' );

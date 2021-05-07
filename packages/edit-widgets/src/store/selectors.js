@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { invert, keyBy } from 'lodash';
+import { keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
+import { getWidgetIdFromBlock } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -19,6 +20,7 @@ import {
 	POST_TYPE,
 	WIDGET_AREA_ENTITY_TYPE,
 } from './utils';
+import { STORE_NAME as editWidgetsStoreName } from './constants';
 
 export const getWidgets = createRegistrySelector( ( select ) => () => {
 	const widgets = select( 'core' ).getEntityRecords(
@@ -38,7 +40,7 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
  */
 export const getWidget = createRegistrySelector(
 	( select ) => ( state, id ) => {
-		const widgets = select( 'core/edit-widgets' ).getWidgets();
+		const widgets = select( editWidgetsStoreName ).getWidgets();
 		return widgets[ id ];
 	}
 );
@@ -52,38 +54,32 @@ export const getWidgetAreas = createRegistrySelector( ( select ) => () => {
 	);
 } );
 
-export const getWidgetIdForClientId = ( state, clientId ) => {
-	const widgetIdToClientId = state.mapping;
-	const clientIdToWidgetId = invert( widgetIdToClientId );
-	return clientIdToWidgetId[ clientId ];
-};
-
 /**
- * Returns widgetArea containing a block identify by given clientId
+ * Returns widgetArea containing a block identify by given widgetId
  *
- * @param {string} clientId The ID of the block.
+ * @param {string} widgetId The ID of the widget.
  * @return {Object} Containing widget area.
  */
-export const getWidgetAreaForClientId = createRegistrySelector(
-	( select ) => ( state, clientId ) => {
-		const widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
-		for ( const widgetArea of widgetAreas ) {
+export const getWidgetAreaForWidgetId = createRegistrySelector(
+	( select ) => ( state, widgetId ) => {
+		const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
+		return widgetAreas.find( ( widgetArea ) => {
 			const post = select( 'core' ).getEditedEntityRecord(
 				KIND,
 				POST_TYPE,
 				buildWidgetAreaPostId( widgetArea.id )
 			);
-			const clientIds = post.blocks.map( ( block ) => block.clientId );
-			if ( clientIds.includes( clientId ) ) {
-				return widgetArea;
-			}
-		}
+			const blockWidgetIds = post.blocks.map( ( block ) =>
+				getWidgetIdFromBlock( block )
+			);
+			return blockWidgetIds.includes( widgetId );
+		} );
 	}
 );
 
 export const getEditedWidgetAreas = createRegistrySelector(
 	( select ) => ( state, ids ) => {
-		let widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+		let widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
 		if ( ! widgetAreas ) {
 			return [];
 		}
@@ -119,7 +115,7 @@ export const getEditedWidgetAreas = createRegistrySelector(
 export const getReferenceWidgetBlocks = createRegistrySelector(
 	( select ) => ( state, referenceWidgetName = null ) => {
 		const results = [];
-		const widgetAreas = select( 'core/edit-widgets' ).getWidgetAreas();
+		const widgetAreas = select( editWidgetsStoreName ).getWidgetAreas();
 		for ( const _widgetArea of widgetAreas ) {
 			const post = select( 'core' ).getEditedEntityRecord(
 				KIND,
@@ -142,7 +138,7 @@ export const getReferenceWidgetBlocks = createRegistrySelector(
 );
 
 export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
-	const widgetAreasIds = select( 'core/edit-widgets' )
+	const widgetAreasIds = select( editWidgetsStoreName )
 		.getWidgetAreas()
 		?.map( ( { id } ) => id );
 	if ( ! widgetAreasIds ) {
@@ -161,7 +157,7 @@ export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
 	}
 
 	const widgetIds = [
-		...Object.keys( select( 'core/edit-widgets' ).getWidgets() ),
+		...Object.keys( select( editWidgetsStoreName ).getWidgets() ),
 		undefined, // account for new widgets without an ID
 	];
 	for ( const id of widgetIds ) {
@@ -198,5 +194,29 @@ export const getIsWidgetAreaOpen = ( state, clientId ) => {
  * @return {boolean} Whether the inserter is opened.
  */
 export function isInserterOpened( state ) {
-	return state.isInserterOpened;
+	return !! state.blockInserterPanel;
 }
+
+/**
+ * Returns true if a block can be inserted into a widget area.
+ *
+ * @param {Array}  state    The open state of the widget areas.
+ * @param {string} blockName The name of the block being inserted.
+ *
+ * @return {boolean} True if the block can be inserted in a widget area.
+ */
+export const canInsertBlockInWidgetArea = createRegistrySelector(
+	( select ) => ( state, blockName ) => {
+		// Widget areas are always top-level blocks, which getBlocks will return.
+		const widgetAreas = select( 'core/block-editor' ).getBlocks();
+
+		// Makes an assumption that a block that can be inserted into one
+		// widget area can be inserted into any widget area. Uses the first
+		// widget area for testing whether the block can be inserted.
+		const [ firstWidgetArea ] = widgetAreas;
+		return select( 'core/block-editor' ).canInsertBlockType(
+			blockName,
+			firstWidgetArea.clientId
+		);
+	}
+);

@@ -15,8 +15,7 @@
 		font-family: $default-font;
 		font-size: $default-font-size;
 		color: $gray-900;
-		margin: 0 0 1em;
-
+		margin: 0;
 	}
 
 	// Required extra-specifity to override paragraph block styles.
@@ -35,6 +34,7 @@
 
 	.block-editor-warning__actions {
 		display: flex;
+		margin-top: 1em;
 	}
 
 	.block-editor-warning__action {

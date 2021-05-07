@@ -17,14 +17,8 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
 	__experimentalLibrary as Library,
-	__unstableUseEditorStyles as useEditorStyles,
 } from '@wordpress/block-editor';
-import {
-	Button,
-	ScrollLock,
-	Popover,
-	__unstableUseDrop as useDrop,
-} from '@wordpress/components';
+import { Button, ScrollLock, Popover } from '@wordpress/components';
 import {
 	useViewportMatch,
 	__experimentalUseDialog as useDialog,
@@ -35,8 +29,9 @@ import {
 	ComplementaryArea,
 	FullscreenMode,
 	InterfaceSkeleton,
+	store as interfaceStore,
 } from '@wordpress/interface';
-import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { close } from '@wordpress/icons';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
 
@@ -71,7 +66,7 @@ const interfaceLabels = {
 	footer: __( 'Editor footer' ),
 };
 
-function Layout( { settings } ) {
+function Layout( { styles } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
 	const {
@@ -91,15 +86,18 @@ function Layout( { settings } ) {
 		hasBlockSelected,
 		showMostUsedBlocks,
 		isInserterOpened,
+		insertionPoint,
 		showIconLabels,
 		hasReducedUI,
+		showBlockBreadcrumbs,
 	} = useSelect( ( select ) => {
+		const editorSettings = select( 'core/editor' ).getEditorSettings();
 		return {
 			hasFixedToolbar: select( editPostStore ).isFeatureActive(
 				'fixedToolbar'
 			),
 			sidebarIsOpened: !! (
-				select( 'core/interface' ).getActiveComplementaryArea(
+				select( interfaceStore ).getActiveComplementaryArea(
 					editPostStore.name
 				) || select( editPostStore ).isPublishSidebarOpened()
 			),
@@ -110,9 +108,11 @@ function Layout( { settings } ) {
 				'mostUsedBlocks'
 			),
 			isInserterOpened: select( editPostStore ).isInserterOpened(),
+			insertionPoint: select(
+				editPostStore
+			).__experimentalGetInsertionPoint(),
 			mode: select( editPostStore ).getEditorMode(),
-			isRichEditingEnabled: select( 'core/editor' ).getEditorSettings()
-				.richEditingEnabled,
+			isRichEditingEnabled: editorSettings.richEditingEnabled,
 			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
 			previousShortcut: select(
 				keyboardShortcutsStore
@@ -127,6 +127,9 @@ function Layout( { settings } ) {
 			),
 			hasReducedUI: select( editPostStore ).isFeatureActive(
 				'reducedUI'
+			),
+			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
+				'showBlockBreadcrumbs'
 			),
 		};
 	}, [] );
@@ -168,10 +171,6 @@ function Layout( { settings } ) {
 		},
 		[ entitiesSavedStatesCallback ]
 	);
-	const ref = useRef();
-
-	useDrop( ref );
-	useEditorStyles( ref, settings.styles );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
 		onClose: () => setIsInserterOpened( false ),
 	} );
@@ -187,7 +186,6 @@ function Layout( { settings } ) {
 			<EditorKeyboardShortcutsRegister />
 			<SettingsSidebar />
 			<InterfaceSkeleton
-				ref={ ref }
 				className={ className }
 				labels={ interfaceLabels }
 				header={
@@ -217,11 +215,11 @@ function Layout( { settings } ) {
 								<Library
 									showMostUsedBlocks={ showMostUsedBlocks }
 									showInserterHelpPanel
-									onSelect={ () => {
-										if ( isMobileViewport ) {
-											setIsInserterOpened( false );
-										}
-									} }
+									shouldFocusBlock={ isMobileViewport }
+									rootClientId={ insertionPoint.rootClientId }
+									__experimentalInsertionIndex={
+										insertionPoint.insertionIndex
+									}
 								/>
 							</div>
 						</div>
@@ -231,10 +229,10 @@ function Layout( { settings } ) {
 					( ! isMobileViewport || sidebarIsOpened ) && (
 						<>
 							{ ! isMobileViewport && ! sidebarIsOpened && (
-								<div className="edit-post-layout__toogle-sidebar-panel">
+								<div className="edit-post-layout__toggle-sidebar-panel">
 									<Button
 										isSecondary
-										className="edit-post-layout__toogle-sidebar-panel-button"
+										className="edit-post-layout__toggle-sidebar-panel-button"
 										onClick={ openSidebarPanel }
 										aria-expanded={ false }
 									>
@@ -255,7 +253,7 @@ function Layout( { settings } ) {
 							<TextEditor />
 						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
-							<VisualEditor />
+							<VisualEditor styles={ styles } />
 						) }
 						<div className="edit-post-layout__metaboxes">
 							<MetaBoxes location="normal" />
@@ -268,6 +266,7 @@ function Layout( { settings } ) {
 				}
 				footer={
 					! hasReducedUI &&
+					showBlockBreadcrumbs &&
 					! isMobileViewport &&
 					isRichEditingEnabled &&
 					mode === 'visual' && (

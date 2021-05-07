@@ -2,7 +2,7 @@
 	/**
 	 * Registers a new block provided a unique name and an object defining its behavior.
 	 *
-	 * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
+	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
 	 */
 	var registerBlockType = wp.blocks.registerBlockType;
 
@@ -30,7 +30,7 @@
 	/**
 	 * Every block starts by registering a new block type definition.
 	 *
-	 * @see https://developer.wordpress.org/block-editor/developers/block-api/#registering-a-block
+	 * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/
 	 */
 	registerBlockType( '{{namespace}}/{{slug}}', {
 		/**
@@ -60,7 +60,7 @@
 		{{/description}}
 		/**
 		 * Blocks are grouped into categories to help users browse and discover them.
-		 * The categories provided by core are `common`, `embed`, `formatting`, `layout` and `widgets`.
+		 * The categories provided by core are `text`, `media`, `design`, `widgets`, and `embed`.
 		 */
 		category: '{{category}}',
 
@@ -107,7 +107,7 @@
 		save: function() {
 			return el(
 				'p',
-				{},
+				useBlockProps.save(),
 				__( '{{title}} – hello from the saved content!', '{{textdomain}}' )
 			);
 		},

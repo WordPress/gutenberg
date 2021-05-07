@@ -22,12 +22,12 @@ describe( 'Preformatted', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Convert to Blocks' );
 		// Once it's edited, it should be saved as BR tags.
 		await page.keyboard.type( '0' );
 		await page.keyboard.press( 'Enter' );
-		await clickBlockToolbarButton( 'More options' );
+		await clickBlockToolbarButton( 'Options' );
 		await clickMenuItem( 'Edit as HTML' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();

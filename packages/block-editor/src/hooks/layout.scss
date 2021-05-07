@@ -1,0 +1,23 @@
+.block-editor-hooks__layout-controls {
+	display: flex;
+	margin-bottom: $grid-unit-20;
+
+	.block-editor-hooks__layout-controls-unit {
+		display: flex;
+		margin-right: $grid-unit-30;
+
+		svg {
+			margin: auto 0 $grid-unit-05 $grid-unit-10;
+		}
+	}
+}
+
+.block-editor-hooks__layout-controls-reset {
+	display: flex;
+	justify-content: flex-end;
+	margin-bottom: $grid-unit-30;
+}
+
+.block-editor-hooks__layout-controls-helptext {
+	font-size: $helptext-font-size;
+}

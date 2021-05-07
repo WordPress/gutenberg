@@ -138,6 +138,12 @@ export function computePopoverXAxisPosition(
 	if ( boundaryElement ) {
 		const boundaryRect = boundaryElement.getBoundingClientRect();
 		popoverLeft = Math.min( popoverLeft, boundaryRect.right - width );
+
+		// Avoid the popover being position beyond the left boundary if the
+		// direction is left to right.
+		if ( ! isRTL() ) {
+			popoverLeft = Math.max( popoverLeft, 0 );
+		}
 	}
 
 	return {
@@ -319,4 +325,30 @@ export function computePopoverPosition(
 		...xAxisPosition,
 		...yAxisPosition,
 	};
+}
+
+/**
+ * Offsets the given rect by the position of the iframe that contains the element.
+ * If the owner document is not in an iframe then it returns with the original rect.
+ *
+ * @param {DOMRect} rect bounds of the element
+ * @param {Document} ownerDocument document of the element
+ *
+ * @return {DOMRect} offsetted bounds
+ */
+export function offsetIframe( rect, ownerDocument ) {
+	const { defaultView } = ownerDocument;
+	const { frameElement } = defaultView;
+
+	if ( ! frameElement ) {
+		return rect;
+	}
+
+	const iframeRect = frameElement.getBoundingClientRect();
+	return new defaultView.DOMRect(
+		rect.left + iframeRect.left,
+		rect.top + iframeRect.top,
+		rect.width,
+		rect.height
+	);
 }

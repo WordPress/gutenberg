@@ -35,8 +35,8 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 
 		const html = await editorPage.getHtmlContent();
 
-		expect( testData.blockInsertionHtml.toLowerCase() ).toBe(
-			html.toLowerCase()
+		expect( html.toLowerCase() ).toBe(
+			testData.blockInsertionHtml.toLowerCase()
 		);
 
 		// wait for the block editor to load and for accessibility ids to update
@@ -118,8 +118,8 @@ describe( 'Gutenberg Editor tests for Block insertion', () => {
 		await paragraphBlockElement.click();
 		const html = await editorPage.getHtmlContent();
 
-		expect( testData.blockInsertionHtmlFromTitle.toLowerCase() ).toBe(
-			html.toLowerCase()
+		expect( html.toLowerCase() ).toBe(
+			testData.blockInsertionHtmlFromTitle.toLowerCase()
 		);
 	} );
 } );

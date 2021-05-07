@@ -19,11 +19,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Columns' ),
 	icon,
-	description: __(
-		'Add a block that displays content in multiple columns, then add whatever content blocks you’d like.'
-	),
 	variations,
 	example: {
 		innerBlocks: [

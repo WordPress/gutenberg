@@ -13,7 +13,6 @@ import {
 	FormFileUpload,
 	NavigableMenu,
 	MenuItem,
-	ToolbarGroup,
 	ToolbarButton,
 	Dropdown,
 	withFilters,
@@ -30,6 +29,7 @@ import { store as noticesStore } from '@wordpress/notices';
 import MediaUpload from '../media-upload';
 import MediaUploadCheck from '../media-upload/check';
 import LinkControl from '../link-control';
+import { store as blockEditorStore } from '../../store';
 
 const MediaReplaceFlow = ( {
 	mediaURL,
@@ -45,7 +45,7 @@ const MediaReplaceFlow = ( {
 } ) => {
 	const [ mediaURLValue, setMediaURLValue ] = useState( mediaURL );
 	const mediaUpload = useSelect( ( select ) => {
-		return select( 'core/block-editor' ).getSettings().mediaUpload;
+		return select( blockEditorStore ).getSettings().mediaUpload;
 	}, [] );
 	const editMediaButtonRef = createRef();
 	const errorNoticeID = uniqueId(
@@ -118,17 +118,15 @@ const MediaReplaceFlow = ( {
 			popoverProps={ POPOVER_PROPS }
 			contentClassName="block-editor-media-replace-flow__options"
 			renderToggle={ ( { isOpen, onToggle } ) => (
-				<ToolbarGroup className="media-replace-flow">
-					<ToolbarButton
-						ref={ editMediaButtonRef }
-						aria-expanded={ isOpen }
-						aria-haspopup="true"
-						onClick={ onToggle }
-						onKeyDown={ openOnArrowDown }
-					>
-						{ name }
-					</ToolbarButton>
-				</ToolbarGroup>
+				<ToolbarButton
+					ref={ editMediaButtonRef }
+					aria-expanded={ isOpen }
+					aria-haspopup="true"
+					onClick={ onToggle }
+					onKeyDown={ openOnArrowDown }
+				>
+					{ name }
+				</ToolbarButton>
 			) }
 			renderContent={ ( { onClose } ) => (
 				<>

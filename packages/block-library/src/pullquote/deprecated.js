@@ -11,6 +11,7 @@ import {
 	getColorClassName,
 	getColorObjectByAttributeValues,
 	RichText,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { select } from '@wordpress/data';
 
@@ -208,7 +209,7 @@ const deprecated = [
 				// as there is no expectation that themes create classes that set border colors.
 			} else if ( mainColor ) {
 				const colors = get(
-					select( 'core/block-editor' ).getSettings(),
+					select( blockEditorStore ).getSettings(),
 					[ 'colors' ],
 					[]
 				);

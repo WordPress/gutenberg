@@ -3,18 +3,18 @@
  */
 import {
 	createNewPost,
+	disablePrePublishChecks,
 	insertBlock,
 	publishPost,
-	visitAdminPage,
 	trashAllPosts,
 	activateTheme,
+	clickButton,
 } from '@wordpress/e2e-test-utils';
-import { addQueryArgs } from '@wordpress/url';
 
 /**
  * Internal dependencies
  */
-import { navigationPanel } from '../../experimental-features';
+import { navigationPanel, siteEditor } from '../../experimental-features';
 
 describe( 'Multi-entity save flow', () => {
 	// Selectors - usable between Post/Site editors.
@@ -22,7 +22,7 @@ describe( 'Multi-entity save flow', () => {
 	const checkboxInputSelector = '.components-checkbox-control__input';
 	const entitiesSaveSelector = '.editor-entities-saved-states__save-button';
 	const templatePartSelector = '*[data-type="core/template-part"]';
-	const activatedTemplatePartSelector = `${ templatePartSelector } .block-editor-block-list__layout`;
+	const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 	const savePanelSelector = '.entities-saved-states__panel';
 	const closePanelButtonSelector =
 		'.editor-post-publish-panel__header-cancel-button button';
@@ -113,10 +113,6 @@ describe( 'Multi-entity save flow', () => {
 
 			// Should trigger multi-entity save button once template part edited.
 			await assertMultiSaveEnabled();
-			// TODO: Remove when toolbar supports text fields
-			expect( console ).toHaveWarnedWith(
-				'Using custom components as toolbar controls is deprecated. Please use ToolbarItem or ToolbarButton components instead. See: https://developer.wordpress.org/block-editor/components/toolbar-button/#inside-blockcontrols'
-			);
 
 			// Should only have save panel a11y button active after child entities edited.
 			await assertExistance( publishA11ySelector, false );
@@ -174,6 +170,48 @@ describe( 'Multi-entity save flow', () => {
 			await assertMultiSaveEnabled();
 			await assertExistance( saveA11ySelector, true );
 		} );
+
+		it( 'Site blocks should save individually', async () => {
+			await createNewPost();
+			await disablePrePublishChecks();
+
+			await insertBlock( 'Site Title' );
+			// Ensure title is retrieved before typing.
+			await page.waitForXPath( '//a[contains(text(), "gutenberg")]' );
+			await page.keyboard.type( '...' );
+			await insertBlock( 'Site Tagline' );
+			// Ensure tagline is retrieved before typing.
+			await page.waitForXPath(
+				'//p[contains(text(), "Just another WordPress site")]'
+			);
+			await page.keyboard.type( '...' );
+
+			await clickButton( 'Publish' );
+			await page.waitForSelector( savePanelSelector );
+			let checkboxInputs = await page.$$( checkboxInputSelector );
+			expect( checkboxInputs ).toHaveLength( 3 );
+
+			await checkboxInputs[ 1 ].click();
+			await page.click( entitiesSaveSelector );
+
+			await clickButton( 'Update…' );
+			await page.waitForSelector( savePanelSelector );
+			checkboxInputs = await page.$$( checkboxInputSelector );
+			expect( checkboxInputs ).toHaveLength( 1 );
+
+			// Reset site entity to default value to not affect other tests.
+			await page.evaluate( () => {
+				wp.data
+					.dispatch( 'core' )
+					.editEntityRecord( 'root', 'site', undefined, {
+						title: 'gutenberg',
+						description: 'Just another WordPress site',
+					} );
+				wp.data
+					.dispatch( 'core' )
+					.saveEditedEntityRecord( 'root', 'site', undefined );
+			} );
+		} );
 	} );
 
 	describe( 'Site Editor', () => {
@@ -185,21 +223,21 @@ describe( 'Multi-entity save flow', () => {
 
 		it( 'Save flow should work as expected', async () => {
 			// Navigate to site editor.
-			const query = addQueryArgs( '', {
-				page: 'gutenberg-edit-site',
-			} ).slice( 1 );
-			await visitAdminPage( 'admin.php', query );
+			await siteEditor.visit();
 
-			// Ensure we are on 'front-page' demo template.
+			// Ensure we are on 'index' template.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
 			await navigationPanel.navigate( 'Templates' );
-			await navigationPanel.clickItemByText( 'Front Page' );
-			await navigationPanel.close();
+			await navigationPanel.clickItemByText( 'Index' );
 
-			// Click the first block so that the template part inserts in the right place.
-			const firstBlock = await page.$( '.wp-block' );
-			await firstBlock.click();
+			// Select the header template part via list view.
+			await page.click( 'button[aria-label="List View"]' );
+			const headerTemplatePartListViewButton = await page.waitForXPath(
+				'//button[contains(@class, "block-editor-block-navigation-block-select-button")][contains(., "Header")]'
+			);
+			headerTemplatePartListViewButton.click();
+			await page.click( 'button[aria-label="Close list view sidebar"]' );
 
 			// Insert something to dirty the editor.
 			await insertBlock( 'Paragraph' );

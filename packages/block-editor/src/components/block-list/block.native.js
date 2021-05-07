@@ -2,15 +2,17 @@
  * External dependencies
  */
 import { View, Text, TouchableWithoutFeedback, Dimensions } from 'react-native';
+import { pick } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
+import { Component, createRef, useMemo } from '@wordpress/element';
 import {
 	GlobalStylesContext,
 	getMergedGlobalStyles,
 	alignmentHelpers,
+	useGlobalStyles,
 } from '@wordpress/components';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -27,9 +29,9 @@ import styles from './block.scss';
 import BlockEdit from '../block-edit';
 import BlockInvalidWarning from './block-invalid-warning';
 import BlockMobileToolbar from '../block-mobile-toolbar';
+import { store as blockEditorStore } from '../../store';
 
-const { isFullWidth, isWider, isContainerRelated } = alignmentHelpers;
-
+const emptyArray = [];
 function BlockForType( {
 	attributes,
 	clientId,
@@ -40,53 +42,56 @@ function BlockForType( {
 	mergeBlocks,
 	name,
 	onBlockFocus,
-	onCaretVerticalPositionChange,
 	onChange,
 	onDeleteBlock,
 	onReplace,
 	parentWidth,
 	wrapperProps,
+	blockWidth,
 } ) {
-	const defaultColors = useEditorFeature( 'color.palette' ) || [];
+	const defaultColors = useEditorFeature( 'color.palette' ) || emptyArray;
+	const globalStyle = useGlobalStyles();
+	const mergedStyle = useMemo( () => {
+		return getMergedGlobalStyles(
+			globalStyle,
+			wrapperProps.style,
+			attributes,
+			defaultColors
+		);
+	}, [
+		defaultColors,
+		globalStyle,
+		// I couldn't simply use attributes and wrapperProps.styles as a dependency because they are almost always a new reference.
+		// Thanks to the JSON.stringify we check if the value is the same instead of reference.
+		JSON.stringify( wrapperProps.style ),
+		JSON.stringify(
+			pick( attributes, GlobalStylesContext.BLOCK_STYLE_ATTRIBUTES )
+		),
+	] );
 
 	return (
-		<GlobalStylesContext.Consumer>
-			{ ( globalStyle ) => {
-				const mergedStyle = getMergedGlobalStyles(
-					globalStyle,
-					wrapperProps.style,
-					attributes,
-					defaultColors
-				);
-
-				return (
-					<GlobalStylesContext.Provider value={ mergedStyle }>
-						<BlockEdit
-							name={ name }
-							isSelected={ isSelected }
-							attributes={ attributes }
-							setAttributes={ onChange }
-							onFocus={ onBlockFocus }
-							onReplace={ onReplace }
-							insertBlocksAfter={ insertBlocksAfter }
-							mergeBlocks={ mergeBlocks }
-							onCaretVerticalPositionChange={
-								onCaretVerticalPositionChange
-							}
-							// Block level styles
-							wrapperProps={ wrapperProps }
-							// inherited styles merged with block level styles
-							mergedStyle={ mergedStyle }
-							clientId={ clientId }
-							parentWidth={ parentWidth }
-							contentStyle={ contentStyle }
-							onDeleteBlock={ onDeleteBlock }
-						/>
-						<View onLayout={ getBlockWidth } />
-					</GlobalStylesContext.Provider>
-				);
-			} }
-		</GlobalStylesContext.Consumer>
+		<GlobalStylesContext.Provider value={ mergedStyle }>
+			<BlockEdit
+				name={ name }
+				isSelected={ isSelected }
+				attributes={ attributes }
+				setAttributes={ onChange }
+				onFocus={ onBlockFocus }
+				onReplace={ onReplace }
+				insertBlocksAfter={ insertBlocksAfter }
+				mergeBlocks={ mergeBlocks }
+				// Block level styles
+				wrapperProps={ wrapperProps }
+				// inherited styles merged with block level styles
+				mergedStyle={ mergedStyle }
+				clientId={ clientId }
+				parentWidth={ parentWidth }
+				contentStyle={ contentStyle }
+				onDeleteBlock={ onDeleteBlock }
+				blockWidth={ blockWidth }
+			/>
+			<View onLayout={ getBlockWidth } />
+		</GlobalStylesContext.Provider>
 	);
 }
 
@@ -99,7 +104,7 @@ class BlockListBlock extends Component {
 		this.getBlockWidth = this.getBlockWidth.bind( this );
 
 		this.state = {
-			blockWidth: 0,
+			blockWidth: this.props.blockWidth - 2 * this.props.marginHorizontal,
 		};
 
 		this.anchorNodeRef = createRef();
@@ -126,18 +131,24 @@ class BlockListBlock extends Component {
 		const { blockWidth } = this.state;
 		const layoutWidth = Math.floor( layout.width );
 
+		if ( ! blockWidth || ! layoutWidth ) {
+			return;
+		}
+
 		if ( blockWidth !== layoutWidth ) {
 			this.setState( { blockWidth: layoutWidth } );
 		}
 	}
 
 	getBlockForType() {
+		const { blockWidth } = this.state;
 		return (
 			<BlockForType
 				{ ...this.props }
 				onBlockFocus={ this.onFocus }
 				insertBlocksAfter={ this.insertBlocksAfter }
 				getBlockWidth={ this.getBlockWidth }
+				blockWidth={ blockWidth }
 			/>
 		);
 	}
@@ -182,7 +193,7 @@ class BlockListBlock extends Component {
 			attributes,
 			order + 1
 		);
-
+		const { isFullWidth, isWider, isContainerRelated } = alignmentHelpers;
 		const accessible = ! ( isSelected || isInnerBlockSelected );
 		const screenWidth = Math.floor( Dimensions.get( 'window' ).width );
 		const isScreenWidthEqual = blockWidth === screenWidth;
@@ -301,7 +312,7 @@ export default compose( [
 			getLowestCommonAncestorWithSelectedBlock,
 			getBlockParents,
 			hasSelectedInnerBlock,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const order = getBlockIndex( clientId, rootClientId );
 		const isSelected = isBlockSelected( clientId );
@@ -368,7 +379,7 @@ export default compose( [
 			replaceBlocks,
 			selectBlock,
 			updateBlockAttributes,
-		} = dispatch( 'core/block-editor' );
+		} = dispatch( blockEditorStore );
 
 		return {
 			mergeBlocks( forward ) {
@@ -376,7 +387,7 @@ export default compose( [
 				const {
 					getPreviousBlockClientId,
 					getNextBlockClientId,
-				} = select( 'core/block-editor' );
+				} = select( blockEditorStore );
 
 				if ( forward ) {
 					const nextBlockClientId = getNextBlockClientId( clientId );

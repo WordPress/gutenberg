@@ -10,6 +10,7 @@ const supportedPaths = [
 	'wp/v2/media/',
 	'wp/v2/media?context=edit&_locale=user',
 	'wp/v2/categories/',
+	'wp/v2/blocks/28?_locale=user',
 ];
 
 const unsupportedPaths = [

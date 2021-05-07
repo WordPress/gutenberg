@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef, createContext, useState } from '@wordpress/element';
+import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -15,39 +15,63 @@ import { useRef, createContext, useState } from '@wordpress/element';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import useBlockDropZone from '../use-block-drop-zone';
-import useInsertionPoint from './insertion-point';
-import BlockPopover from './block-popover';
+import { useInBetweenInserter } from './use-in-between-inserter';
+import { store as blockEditorStore } from '../../store';
+import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
+import { LayoutProvider, defaultLayout } from './layout';
+import BlockToolsBackCompat from '../block-tools/back-compat';
 
-/**
- * If the block count exceeds the threshold, we disable the reordering animation
- * to avoid laginess.
- */
-const BLOCK_ANIMATION_THRESHOLD = 200;
-
-export const BlockNodes = createContext();
-export const SetBlockNodes = createContext();
-
-export default function BlockList( { className } ) {
-	const ref = useRef();
-	const [ blockNodes, setBlockNodes ] = useState( {} );
-	const insertionPoint = useInsertionPoint( ref );
-
+function Root( { className, children } ) {
+	const isLargeViewport = useViewportMatch( 'medium' );
+	const {
+		isTyping,
+		isOutlineMode,
+		isFocusMode,
+		isNavigationMode,
+	} = useSelect( ( select ) => {
+		const {
+			isTyping: _isTyping,
+			getSettings,
+			isNavigationMode: _isNavigationMode,
+		} = select( blockEditorStore );
+		const { outlineMode, focusMode } = getSettings();
+		return {
+			isTyping: _isTyping(),
+			isOutlineMode: outlineMode,
+			isFocusMode: focusMode,
+			isNavigationMode: _isNavigationMode(),
+		};
+	}, [] );
 	return (
-		<BlockNodes.Provider value={ blockNodes }>
-			{ insertionPoint }
-			<BlockPopover />
-			<div
-				ref={ ref }
-				className={ classnames(
-					'block-editor-block-list__layout is-root-container',
-					className
-				) }
-			>
-				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems wrapperRef={ ref } />
-				</SetBlockNodes.Provider>
-			</div>
-		</BlockNodes.Provider>
+		<div
+			ref={ useMergeRefs( [
+				useBlockDropZone(),
+				useInBetweenInserter(),
+			] ) }
+			className={ classnames(
+				'block-editor-block-list__layout is-root-container',
+				className,
+				{
+					'is-typing': isTyping,
+					'is-outline-mode': isOutlineMode,
+					'is-focus-mode': isFocusMode && isLargeViewport,
+					'is-navigate-mode': isNavigationMode,
+				}
+			) }
+		>
+			{ children }
+		</div>
+	);
+}
+
+export default function BlockList( { className, __experimentalLayout } ) {
+	usePreParsePatterns();
+	return (
+		<BlockToolsBackCompat>
+			<Root className={ className }>
+				<BlockListItems __experimentalLayout={ __experimentalLayout } />
+			</Root>
+		</BlockToolsBackCompat>
 	);
 }
 
@@ -56,36 +80,20 @@ function Items( {
 	rootClientId,
 	renderAppender,
 	__experimentalAppenderTagName,
-	wrapperRef,
+	__experimentalLayout: layout = defaultLayout,
 } ) {
 	function selector( select ) {
 		const {
 			getBlockOrder,
-			getBlockListSettings,
-			getSettings,
 			getSelectedBlockClientId,
 			getMultiSelectedBlockClientIds,
 			hasMultiSelection,
-			getGlobalBlockCount,
-			isTyping,
-			__experimentalGetActiveBlockIdByBlockNames,
-		} = select( 'core/block-editor' );
-
-		// Determine if there is an active entity area to spotlight.
-		const activeEntityBlockId = __experimentalGetActiveBlockIdByBlockNames(
-			getSettings().__experimentalSpotlightEntityBlocks
-		);
-
+		} = select( blockEditorStore );
 		return {
 			blockClientIds: getBlockOrder( rootClientId ),
 			selectedBlockClientId: getSelectedBlockClientId(),
 			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			orientation: getBlockListSettings( rootClientId )?.orientation,
 			hasMultiSelection: hasMultiSelection(),
-			enableAnimation:
-				! isTyping() &&
-				getGlobalBlockCount() <= BLOCK_ANIMATION_THRESHOLD,
-			activeEntityBlockId,
 		};
 	}
 
@@ -93,27 +101,15 @@ function Items( {
 		blockClientIds,
 		selectedBlockClientId,
 		multiSelectedBlockClientIds,
-		orientation,
 		hasMultiSelection,
-		enableAnimation,
-		activeEntityBlockId,
 	} = useSelect( selector, [ rootClientId ] );
 
-	const dropTargetIndex = useBlockDropZone( {
-		element: wrapperRef,
-		rootClientId,
-	} );
-
-	const isAppenderDropTarget = dropTargetIndex === blockClientIds.length;
-
 	return (
-		<>
+		<LayoutProvider value={ layout }>
 			{ blockClientIds.map( ( clientId, index ) => {
 				const isBlockInSelection = hasMultiSelection
 					? multiSelectedBlockClientIds.includes( clientId )
 					: selectedBlockClientId === clientId;
-
-				const isDropTarget = dropTargetIndex === index;
 
 				return (
 					<AsyncModeProvider
@@ -127,15 +123,6 @@ function Items( {
 							// to avoid being impacted by the async mode
 							// otherwise there might be a small delay to trigger the animation.
 							index={ index }
-							enableAnimation={ enableAnimation }
-							className={ classnames( {
-								'is-drop-target': isDropTarget,
-								'is-dropping-horizontally':
-									isDropTarget &&
-									orientation === 'horizontal',
-								'has-active-entity': activeEntityBlockId,
-							} ) }
-							activeEntityBlockId={ activeEntityBlockId }
 						/>
 					</AsyncModeProvider>
 				);
@@ -145,13 +132,8 @@ function Items( {
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
 				renderAppender={ renderAppender }
-				className={ classnames( {
-					'is-drop-target': isAppenderDropTarget,
-					'is-dropping-horizontally':
-						isAppenderDropTarget && orientation === 'horizontal',
-				} ) }
 			/>
-		</>
+		</LayoutProvider>
 	);
 }
 

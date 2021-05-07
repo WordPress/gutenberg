@@ -1,20 +1,40 @@
 .wp-block-file {
+	.wp-block[data-align="left"] > &,
+	.wp-block[data-align="right"] > & {
+		// Stop file block from collapsing when floated.
+		height: auto;
+	}
+
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: space-between;
 	align-items: center;
 	margin-bottom: 0;
+
+	.components-resizable-box__container {
+		margin-bottom: 1em;
+	}
+
+	.wp-block-file__preview {
+		margin-bottom: 1em;
+		width: 100%;
+		height: 100%;
+	}
+
+	.wp-block-file__preview-overlay {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+	}
 
 	.wp-block-file__content-wrapper {
 		flex-grow: 1;
 	}
 
-	.wp-block-file__textlink {
-		display: inline-block;
+	a {
 		min-width: 1em;
-
-		&:focus {
-			box-shadow: none;
-		}
 	}
 
 	.wp-block-file__button-richtext-wrapper {

@@ -79,4 +79,16 @@ describe( 'getQueryParts', () => {
 			include: null,
 		} );
 	} );
+
+	it( 'encodes stable string key with fields parameters', () => {
+		const parts = getQueryParts( { _fields: [ 'id', 'title' ] } );
+
+		expect( parts ).toEqual( {
+			page: 1,
+			perPage: 10,
+			stableKey: '_fields=id%2Ctitle',
+			fields: [ 'id', 'title' ],
+			include: null,
+		} );
+	} );
 } );

@@ -9,7 +9,11 @@ import { has } from 'lodash';
 import deprecated from '@wordpress/deprecated';
 import { controls } from '@wordpress/data';
 import { apiFetch } from '@wordpress/data-controls';
-import { parse, synchronizeBlocksWithTemplate } from '@wordpress/blocks';
+import {
+	parse,
+	synchronizeBlocksWithTemplate,
+	__unstableSerializeAndClean,
+} from '@wordpress/blocks';
 import { store as noticesStore } from '@wordpress/notices';
 
 /**
@@ -21,7 +25,6 @@ import {
 	getNotificationArgumentsForSaveFail,
 	getNotificationArgumentsForTrashFail,
 } from './utils/notice-builder';
-import serializeBlocks from './utils/serialize-blocks';
 
 /**
  * Returns an action generator used in signalling that editor has initialized with
@@ -74,27 +77,6 @@ export function* setupEditor( post, edits, template ) {
 }
 
 /**
- * Initiliazes an FSE template into the core-data store.
- * We could avoid this action entirely by having a fallback if the edit is undefined.
- *
- * @param {Object} template  Template object.
- */
-export function* __unstableSetupTemplate( template ) {
-	const blocks = parse( template.content.raw );
-	yield controls.dispatch(
-		'core',
-		'editEntityRecord',
-		'postType',
-		template.type,
-		template.id,
-		{
-			blocks,
-		},
-		{ __unstableShouldCreateUndoLevel: false }
-	);
-}
-
-/**
  * Returns an action object signalling that the editor is being destroyed and
  * that any necessary state or side-effect cleanup should occur.
  *
@@ -132,8 +114,8 @@ export function resetPost( post ) {
  */
 export function* resetAutosave( newAutosave ) {
 	deprecated( 'resetAutosave action (`core/editor` store)', {
+		since: '5.3',
 		alternative: 'receiveAutosaves action (`core` store)',
-		plugin: 'Gutenberg',
 	} );
 
 	const postId = yield controls.select( STORE_NAME, 'getCurrentPostId' );
@@ -179,6 +161,7 @@ export function __experimentalRequestPostUpdateFinish( options = {} ) {
  */
 export function updatePost() {
 	deprecated( "wp.data.dispatch( 'core/editor' ).updatePost", {
+		since: '5.7',
 		alternative: 'User the core entitires store instead',
 	} );
 	return {
@@ -611,12 +594,8 @@ export function unlockPostAutosaving( lockName ) {
  * @yield {Object} Action object
  */
 export function* resetEditorBlocks( blocks, options = {} ) {
-	const {
-		__unstableShouldCreateUndoLevel,
-		selectionStart,
-		selectionEnd,
-	} = options;
-	const edits = { blocks, selectionStart, selectionEnd };
+	const { __unstableShouldCreateUndoLevel, selection } = options;
+	const edits = { blocks, selection };
 
 	if ( __unstableShouldCreateUndoLevel !== false ) {
 		const { id, type } = yield controls.select(
@@ -645,7 +624,7 @@ export function* resetEditorBlocks( blocks, options = {} ) {
 		// to make sure the edit makes the post dirty and creates
 		// a new undo level.
 		edits.content = ( { blocks: blocksForSerialization = [] } ) =>
-			serializeBlocks( blocksForSerialization );
+			__unstableSerializeAndClean( blocksForSerialization );
 	}
 	yield* editPost( edits );
 }
@@ -671,6 +650,7 @@ export function updateEditorSettings( settings ) {
 const getBlockEditorAction = ( name ) =>
 	function* ( ...args ) {
 		deprecated( "`wp.data.dispatch( 'core/editor' )." + name + '`', {
+			since: '5.3',
 			alternative:
 				"`wp.data.dispatch( 'core/block-editor' )." + name + '`',
 		} );

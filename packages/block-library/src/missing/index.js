@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { getBlockType } from '@wordpress/blocks';
 
 /**
@@ -17,8 +16,6 @@ export { metadata, name };
 
 export const settings = {
 	name,
-	title: __( 'Unsupported' ),
-	description: __( 'Your site doesn’t include support for this block.' ),
 	__experimentalLabel( attributes, { context } ) {
 		if ( context === 'accessibility' ) {
 			const { originalName } = attributes;

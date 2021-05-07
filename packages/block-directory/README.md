@@ -12,13 +12,13 @@ Install the module
 npm install @wordpress/block-directory --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Usage
 
 This package builds a standalone JS file. When loaded on a page with the block editor, it extends the block inserter to search for blocks from WordPress.org.
 
-To do this, it uses the `__experimentalInserterMenuExtension`, a slot-fill area hooked into the block types list. When the user runs a search and there are no results currently installed, it fires off a request to WordPress.org for matching blocks. These are listed for the user to install with a one-click process that [installs, activates, and injects the block into the post.](./src/store/actions.js#L49) When the post is saved, if the block was not used, it will be [silently uninstalled](./src/store/actions.js#L129) to avoid clutter.
+To do this, it uses the `__unstableInserterMenuExtension`, a slot-fill area hooked into the block types list. When the user runs a search and there are no results currently installed, it fires off a request to WordPress.org for matching blocks. These are listed for the user to install with a one-click process that [installs, activates, and injects the block into the post.](./src/store/actions.js#L49) When the post is saved, if the block was not used, it will be [silently uninstalled](./src/store/actions.js#L129) to avoid clutter.
 
 See also the API endpoints for searching WordPress.org: `/wp/v2/block-directory/search`, and installing & activating plugins: `/wp/v2/plugins/`.
 
@@ -172,7 +172,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|boolean)`: The error text, or false if no error.
+-   `string|boolean`: The error text, or false if no error.
 
 <a name="getErrorNotices" href="#getErrorNotices">#</a> **getErrorNotices**
 

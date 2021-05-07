@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { createReduxStore, register } from '@wordpress/data';
+import { createReduxStore, registerStore } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -16,7 +16,7 @@ import { STORE_NAME } from './constants';
 /**
  * Block editor data store configuration.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#registerStore
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#registerStore
  *
  * @type {Object}
  */
@@ -26,15 +26,18 @@ const storeConfig = {
 	selectors,
 	resolvers,
 	actions,
+	persist: [ 'selectedMenuId' ],
 };
 
 /**
  * Store definition for the edit navigation namespace.
  *
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/data/README.md#createReduxStore
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
  *
  * @type {Object}
  */
 export const store = createReduxStore( STORE_NAME, storeConfig );
 
-register( store );
+// Once we build a more generic persistence plugin that works across types of stores
+// we'd be able to replace this with a register call.
+registerStore( STORE_NAME, storeConfig );

@@ -1,7 +1,6 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
 import { column as icon } from '@wordpress/icons';
 
 /**
@@ -17,9 +16,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Column' ),
 	icon,
-	description: __( 'A single column within a columns block.' ),
 	edit,
 	save,
 	deprecated,

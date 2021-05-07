@@ -29,6 +29,7 @@ export default function PreformattedEdit( {
 			placeholder={ __( 'Write preformatted text…' ) }
 			onMerge={ mergeBlocks }
 			{ ...blockProps }
+			__unstablePastePlainText
 		/>
 	);
 }

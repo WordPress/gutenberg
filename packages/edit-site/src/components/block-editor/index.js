@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useRef } from '@wordpress/element';
 import { useEntityBlockEditor } from '@wordpress/core-data';
 import {
 	BlockEditorProvider,
@@ -10,9 +10,17 @@ import {
 	__experimentalLinkControl,
 	BlockInspector,
 	WritingFlow,
-	ObserveTyping,
 	BlockList,
+	BlockTools,
+	__unstableBlockSettingsMenuFirstItem,
+	__experimentalUseResizeCanvas as useResizeCanvas,
+	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
+	__unstableUseTypingObserver as useTypingObserver,
+	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
+	__unstableEditorStyles as EditorStyles,
+	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -20,17 +28,23 @@ import {
 import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
+import { store as editSiteStore } from '../../store';
+import BlockInspectorButton from './block-inspector-button';
 
 export default function BlockEditor( { setIsInserterOpen } ) {
-	const { settings, templateType, page } = useSelect(
+	const { settings, templateType, page, deviceType } = useSelect(
 		( select ) => {
-			const { getSettings, getEditedPostType, getPage } = select(
-				'core/edit-site'
-			);
+			const {
+				getSettings,
+				getEditedPostType,
+				getPage,
+				__experimentalGetPreviewDeviceType,
+			} = select( editSiteStore );
 			return {
 				settings: getSettings( setIsInserterOpen ),
 				templateType: getEditedPostType(),
 				page: getPage(),
+				deviceType: __experimentalGetPreviewDeviceType(),
 			};
 		},
 		[ setIsInserterOpen ]
@@ -39,8 +53,29 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 		'postType',
 		templateType
 	);
+	const { setPage } = useDispatch( editSiteStore );
+	const resizedCanvasStyles = useResizeCanvas( deviceType, true );
+	const ref = useMouseMoveTypingReset();
+	const contentRef = useRef();
+	const mergedRefs = useMergeRefs( [
+		contentRef,
+		useBlockSelectionClearer(),
+		useTypingObserver(),
+	] );
 
-	const { setPage } = useDispatch( 'core/edit-site' );
+	// Allow scrolling "through" popovers over the canvas. This is only called
+	// for as long as the pointer is over a popover. Do not use React events
+	// because it will bubble through portals.
+	const toolWrapperRef = useRefEffect( ( node ) => {
+		function onWheel( { deltaX, deltaY } ) {
+			contentRef.current.scrollBy( deltaX, deltaY );
+		}
+		node.addEventListener( 'wheel', onWheel );
+		return () => {
+			node.addEventListener( 'wheel', onWheel );
+		};
+	}, [] );
+
 	return (
 		<BlockEditorProvider
 			settings={ settings }
@@ -66,12 +101,32 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="editor-styles-wrapper edit-site-block-editor__editor-styles-wrapper">
-				<WritingFlow>
-					<ObserveTyping>
-						<BlockList className="edit-site-block-editor__block-list" />
-					</ObserveTyping>
-				</WritingFlow>
+			<div className="edit-site-visual-editor" ref={ toolWrapperRef }>
+				<BlockTools>
+					<Iframe
+						style={ resizedCanvasStyles }
+						headHTML={ window.__editorStyles.html }
+						head={ <EditorStyles styles={ settings.styles } /> }
+						ref={ ref }
+						contentRef={ mergedRefs }
+					>
+						<WritingFlow>
+							<BlockList
+								className="edit-site-block-editor__block-list"
+								__experimentalLayout={ {
+									type: 'default',
+									// At the root level of the site editor, no alignments should be allowed.
+									alignments: [],
+								} }
+							/>
+						</WritingFlow>
+					</Iframe>
+				</BlockTools>
+				<__unstableBlockSettingsMenuFirstItem>
+					{ ( { onClose } ) => (
+						<BlockInspectorButton onClick={ onClose } />
+					) }
+				</__unstableBlockSettingsMenuFirstItem>
 			</div>
 		</BlockEditorProvider>
 	);

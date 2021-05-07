@@ -1,6 +1,6 @@
 <?php
 /**
- * Bootstraping the Gutenberg widgets page.
+ * Bootstrapping the Gutenberg widgets page.
  *
  * @package gutenberg
  */
@@ -28,23 +28,14 @@ function the_gutenberg_widgets() {
  * @param string $hook Page.
  */
 function gutenberg_widgets_init( $hook ) {
-	if ( 'widgets.php' === $hook ) {
-		wp_enqueue_style( 'wp-block-library' );
-		wp_enqueue_style( 'wp-block-library-theme' );
-		wp_add_inline_style(
-			'wp-block-library-theme',
-			'.block-widget-form .widget-control-save { display: none; }'
-		);
-		return;
-	}
 	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets' ), true ) ) {
 		return;
 	}
 
-	$initializer_name = 'initialize';
+	add_filter( 'admin_body_class', 'gutenberg_widgets_editor_add_admin_body_classes' );
 
 	$settings = array_merge(
-		gutenberg_get_common_block_editor_settings(),
+		gutenberg_get_default_block_editor_settings(),
 		gutenberg_get_legacy_widget_settings()
 	);
 
@@ -54,40 +45,23 @@ function gutenberg_widgets_init( $hook ) {
 	$settings = gutenberg_experimental_global_styles_settings( $settings );
 	$settings = gutenberg_extend_block_editor_styles( $settings );
 
-	$preload_paths = array(
-		array( '/wp/v2/media', 'OPTIONS' ),
-		'/wp/v2/sidebars?context=edit&per_page=-1',
-		'/wp/v2/widgets?context=edit&per_page=-1',
-	);
-	$preload_data  = array_reduce(
-		$preload_paths,
-		'rest_preload_api_request',
-		array()
-	);
-	wp_add_inline_script(
-		'wp-api-fetch',
-		sprintf(
-			'wp.apiFetch.use( wp.apiFetch.createPreloadingMiddleware( %s ) );',
-			wp_json_encode( $preload_data )
-		),
-		'after'
-	);
-
-	wp_add_inline_script(
-		'wp-edit-widgets',
-		sprintf(
-			'wp.domReady( function() {
-				wp.editWidgets.%s( "widgets-editor", %s );
-			} );',
-			$initializer_name,
-			wp_json_encode( $settings )
+	gutenberg_initialize_editor(
+		'widgets_editor',
+		'edit-widgets',
+		array(
+			'preload_paths'   => array(
+				array( '/wp/v2/media', 'OPTIONS' ),
+				'/wp/v2/sidebars?context=edit&per_page=-1',
+				'/wp/v2/widgets?context=edit&per_page=-1&_embed=about',
+			),
+			'editor_settings' => $settings,
 		)
 	);
 
-	// Preload server-registered block schemas.
 	wp_add_inline_script(
 		'wp-blocks',
-		'wp.blocks.unstable__bootstrapServerSideBlockDefinitions(' . wp_json_encode( get_block_editor_server_block_settings() ) . ');'
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( gutenberg_get_block_categories( 'widgets_editor' ) ) ),
+		'after'
 	);
 
 	wp_enqueue_script( 'wp-edit-widgets' );
@@ -95,6 +69,7 @@ function gutenberg_widgets_init( $hook ) {
 	wp_enqueue_script( 'wp-format-library' );
 	wp_enqueue_style( 'wp-edit-widgets' );
 	wp_enqueue_style( 'wp-format-library' );
+	do_action( 'enqueue_block_editor_assets' );
 }
 add_action( 'admin_enqueue_scripts', 'gutenberg_widgets_init' );
 
@@ -115,14 +90,15 @@ function gutenberg_widgets_editor_load_block_editor_scripts_and_styles( $is_bloc
 add_filter( 'should_load_block_editor_scripts_and_styles', 'gutenberg_widgets_editor_load_block_editor_scripts_and_styles' );
 
 /**
- * Show responsive embeds correctly on the widgets screen by adding the wp-embed-responsive class.
+ * Adds admin classes necessary for the block-based widgets screen.
+ *
+ * - Adds `block-editor-page` editor body class to allow directly styling the admin pages that are based on the block editor.
+ * - Shows responsive embeds correctly on the widgets screen by adding the `wp-embed-responsive` class.
  *
  * @param string $classes existing admin body classes.
  *
- * @return string admin body classes including the wp-embed-responsive class.
+ * @return string admin body classes including the `block-editor-page` and `wp-embed-responsive` classes.
  */
-function gutenberg_widgets_editor_add_responsive_embed_body_class( $classes ) {
-	return "$classes wp-embed-responsive";
+function gutenberg_widgets_editor_add_admin_body_classes( $classes ) {
+	return "$classes block-editor-page wp-embed-responsive";
 }
-
-add_filter( 'admin_body_class', 'gutenberg_widgets_editor_add_responsive_embed_body_class' );

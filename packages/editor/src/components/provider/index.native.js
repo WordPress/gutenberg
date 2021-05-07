@@ -33,6 +33,7 @@ import { applyFilters } from '@wordpress/hooks';
 import {
 	validateThemeColors,
 	validateThemeGradients,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 
 const postTypeEntities = [
@@ -45,8 +46,7 @@ const postTypeEntities = [
 	...postTypeEntity,
 	transientEdits: {
 		blocks: true,
-		selectionStart: true,
-		selectionEnd: true,
+		selection: true,
 	},
 	mergedEdits: {
 		meta: true,
@@ -146,7 +146,7 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentShowNotice = subscribeShowNotice(
 			( payload ) => {
-				this.props.createInfoNotice( payload.message );
+				this.props.createSuccessNotice( payload.message );
 			}
 		);
 	}
@@ -292,7 +292,7 @@ export default compose( [
 			getBlockIndex,
 			getSelectedBlockClientId,
 			getGlobalBlockCount,
-		} = select( 'core/block-editor' );
+		} = select( blockEditorStore );
 
 		const selectedBlockClientId = getSelectedBlockClientId();
 		return {
@@ -307,24 +307,23 @@ export default compose( [
 		};
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { editPost, resetEditorBlocks, createInfoNotice } = dispatch(
-			'core/editor'
-		);
+		const { editPost, resetEditorBlocks } = dispatch( 'core/editor' );
 		const {
 			updateSettings,
 			clearSelectedBlock,
 			insertBlock,
 			replaceBlock,
-		} = dispatch( 'core/block-editor' );
+		} = dispatch( blockEditorStore );
 		const { switchEditorMode } = dispatch( 'core/edit-post' );
 		const { addEntities, receiveEntityRecords } = dispatch( 'core' );
+		const { createSuccessNotice } = dispatch( 'core/notices' );
 
 		return {
 			updateSettings,
 			addEntities,
 			clearSelectedBlock,
 			insertBlock,
-			createInfoNotice,
+			createSuccessNotice,
 			editTitle( title ) {
 				editPost( { title } );
 			},

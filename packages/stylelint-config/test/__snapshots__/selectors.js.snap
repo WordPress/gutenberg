@@ -5,9 +5,9 @@ Array [
   Object {
     "column": 15,
     "line": 18,
-    "rule": "declaration-property-unit-whitelist",
+    "rule": "declaration-property-unit-allowed-list",
     "severity": "error",
-    "text": "Unexpected unit \\"%\\" for property \\"line-height\\" (declaration-property-unit-whitelist)",
+    "text": "Unexpected unit \\"%\\" for property \\"line-height\\" (declaration-property-unit-allowed-list)",
   },
   Object {
     "column": 1,
