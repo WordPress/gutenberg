@@ -1,7 +1,8 @@
 /**
  * WordPress dependencies
  */
-import { useSelect, useDispatch } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
+import { useState, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -15,6 +16,8 @@ import classnames from 'classnames';
 
 export default function BlockContentOverlay( { clientId, children } ) {
 	const baseClassName = 'block-editor-block-content-overlay';
+	const [ isOverlayActive, setIsOverlayActive ] = useState( true );
+
 	const { isSelected, hasChildSelected, isDraggingBlocks } = useSelect(
 		( select ) => {
 			const {
@@ -30,13 +33,18 @@ export default function BlockContentOverlay( { clientId, children } ) {
 		},
 		[ clientId ]
 	);
-	const selectBlock = useDispatch( blockEditorStore ).selectBlock;
 
 	const classes = classnames( baseClassName, {
-		'parent-selected': isSelected,
+		'overlay-active': isOverlayActive,
 		'child-selected': hasChildSelected,
 		'is-dragging-blocks': isDraggingBlocks,
 	} );
+
+	useEffect( () => {
+		if ( ! isSelected && ! hasChildSelected && ! isOverlayActive ) {
+			setIsOverlayActive( true );
+		}
+	}, [ isSelected, hasChildSelected, isOverlayActive ] );
 
 	// Disabled because the overlay div doesn't actually have a role or functionality
 	// as far as the user is concerned. We're just catching the first click so that
@@ -44,11 +52,11 @@ export default function BlockContentOverlay( { clientId, children } ) {
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<div className={ classes }>
-			{ ( ( ! isSelected && ! hasChildSelected ) ||
+			{ ( ( isOverlayActive && ! hasChildSelected ) ||
 				isDraggingBlocks ) && (
 				<div
 					className={ `${ baseClassName }__overlay` }
-					onMouseUp={ () => selectBlock( clientId ) }
+					onMouseUp={ () => setIsOverlayActive( false ) }
 				/>
 			) }
 			<div className={ `${ baseClassName }__content-wrapper` }>

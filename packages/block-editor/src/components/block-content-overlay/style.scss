@@ -1,9 +1,9 @@
+.editor-styles-wrapper .wp-block .block-editor-block-content-overlay {
+	max-width: none;
+}
+
 .block-editor-block-content-overlay {
 	position: relative;
-	// Fixes extra width from block margin on classic themes.
-	max-width: var(--responsive--aligndefault-width);
-	margin-right: auto;
-	margin-left: auto;
 
 	.block-editor-block-content-overlay__overlay {
 		position: absolute;
@@ -16,14 +16,14 @@
 		border-radius: $radius-block-ui;
 	}
 
-	&:hover:not(.parent-selected):not(.child-selected):not(.is-dragging-blocks) {
+	&.overlay-active:hover:not(.child-selected):not(.is-dragging-blocks) {
 		> .block-editor-block-content-overlay__overlay {
 			background: rgba(var(--wp-admin-theme-color--rgb), 0.1);
 			box-shadow: 0 0 0 $border-width var(--wp-admin-theme-color);
 		}
 	}
 
-	&:not(.parent-selected):not(.child-selected):not(.is-dragging-blocks) .block-editor-block-content-overlay__content-wrapper {
+	&.overlay-active:not(.child-selected):not(.is-dragging-blocks) .block-editor-block-content-overlay__content-wrapper {
 		* {
 			pointer-events: none;
 		}

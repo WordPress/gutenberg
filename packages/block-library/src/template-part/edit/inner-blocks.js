@@ -50,8 +50,10 @@ export default function TemplatePartInnerBlocks( {
 	} );
 
 	return (
-		<BlockContentOverlay clientId={ clientId }>
-			<TagName { ...innerBlocksProps } />
-		</BlockContentOverlay>
+		<TagName { ...blockProps }>
+			<BlockContentOverlay clientId={ clientId }>
+				<div { ...innerBlocksProps } />
+			</BlockContentOverlay>
+		</TagName>
 	);
 }

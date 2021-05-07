@@ -117,34 +117,32 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 
 	return (
 		<RecursionProvider>
-			<BlockContentOverlay clientId={ clientId }>
-				<div { ...blockProps }>
-					<BlockControls>
-						<ToolbarGroup>
-							<ToolbarButton
-								onClick={ () =>
-									convertBlockToStatic( clientId )
-								}
-								label={ __( 'Convert to regular blocks' ) }
-								icon={ ungroup }
-								showTooltip
-							/>
-						</ToolbarGroup>
-					</BlockControls>
-					<InspectorControls>
-						<PanelBody>
-							<TextControl
-								label={ __( 'Name' ) }
-								value={ title }
-								onChange={ setTitle }
-							/>
-						</PanelBody>
-					</InspectorControls>
+			<div { ...blockProps }>
+				<BlockControls>
+					<ToolbarGroup>
+						<ToolbarButton
+							onClick={ () => convertBlockToStatic( clientId ) }
+							label={ __( 'Convert to regular blocks' ) }
+							icon={ ungroup }
+							showTooltip
+						/>
+					</ToolbarGroup>
+				</BlockControls>
+				<InspectorControls>
+					<PanelBody>
+						<TextControl
+							label={ __( 'Name' ) }
+							value={ title }
+							onChange={ setTitle }
+						/>
+					</PanelBody>
+				</InspectorControls>
+				<BlockContentOverlay clientId={ clientId }>
 					<div className="block-library-block__reusable-block-container">
 						{ <div { ...innerBlocksProps } /> }
 					</div>
-				</div>
-			</BlockContentOverlay>
+				</BlockContentOverlay>
+			</div>
 		</RecursionProvider>
 	);
 }
