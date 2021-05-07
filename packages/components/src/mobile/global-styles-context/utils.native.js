@@ -93,7 +93,7 @@ export function getGlobalStyles( baseStyles ) {
 		...( palette || gradients
 			? {
 					__experimentalFeatures: {
-						defaults: { color: { palette, gradients } },
+						color: { palette, gradients },
 					},
 			  }
 			: {} ),

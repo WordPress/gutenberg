@@ -196,9 +196,7 @@ describe( 'getGlobalStyles', () => {
 		expect( globalStyles ).toEqual(
 			expect.objectContaining( {
 				__experimentalFeatures: {
-					defaults: {
-						color: { palette: GLOBAL_STYLES_PALETTE, gradients },
-					},
+					color: { palette: GLOBAL_STYLES_PALETTE, gradients },
 				},
 				__experimentalGlobalStylesBaseStyles: PARSED_GLOBAL_STYLES,
 			} )

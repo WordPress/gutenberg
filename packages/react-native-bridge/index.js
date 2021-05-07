@@ -125,7 +125,7 @@ export function subscribeAndroidModalClosed( callback ) {
 		: undefined;
 }
 
-export function subscribeEditorSettingsTheme( callback ) {
+export function subscribeUpdateEditorSettings( callback ) {
 	return gutenbergBridgeEvents.addListener(
 		'updateEditorSettings',
 		callback
