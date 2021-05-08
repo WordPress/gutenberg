@@ -34,6 +34,7 @@ import { useBoundaryStyle } from './use-boundary-style';
 import { useInlineWarning } from './use-inline-warning';
 import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
+import { useSelectObject } from './use-select-object';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { usePasteHandler } from './use-paste-handler';
 
@@ -652,32 +653,6 @@ function RichText(
 		}
 	}
 
-	/**
-	 * Select object when they are clicked. The browser will not set any
-	 * selection when clicking e.g. an image.
-	 *
-	 * @param {WPSyntheticEvent} event Synthetic mousedown or touchstart event.
-	 */
-	function handlePointerDown( event ) {
-		const { target } = event;
-
-		// If the child element has no text content, it must be an object.
-		if ( target === ref.current || target.textContent ) {
-			return;
-		}
-
-		const { parentNode } = target;
-		const index = Array.from( parentNode.childNodes ).indexOf( target );
-		const range = getDoc().createRange();
-		const selection = getWin().getSelection();
-
-		range.setStart( target.parentNode, index );
-		range.setEnd( target.parentNode, index + 1 );
-
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
-
 	const rafId = useRef();
 
 	/**
@@ -817,6 +792,7 @@ function RichText(
 			useBoundaryStyle( { activeFormats } ),
 			useInlineWarning(),
 			useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
+			useSelectObject(),
 			useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
 			useUndoAutomaticChange( { didAutomaticChange, undo } ),
 			usePasteHandler( {
@@ -837,8 +813,6 @@ function RichText(
 		onKeyDown: handleKeyDown,
 		onFocus: handleFocus,
 		onBlur: handleBlur,
-		onMouseDown: handlePointerDown,
-		onTouchStart: handlePointerDown,
 		// Selection updates must be done at these events as they
 		// happen before the `selectionchange` event. In some cases,
 		// the `selectionchange` event may not even fire, for
