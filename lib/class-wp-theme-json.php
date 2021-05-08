@@ -99,7 +99,7 @@ class WP_Theme_JSON {
 			'customFontSize'        => null,
 			'customFontStyle'       => null,
 			'customFontWeight'      => null,
-      'customLetterSpacing'   => null,
+			'customLetterSpacing'   => null,
 			'customLineHeight'      => null,
 			'customTextDecorations' => null,
 			'customTextTransforms'  => null,
