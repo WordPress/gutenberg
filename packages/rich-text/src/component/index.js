@@ -30,6 +30,7 @@ import { updateFormats } from '../update-formats';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isEmptyLine } from '../is-empty';
 import { useFormatTypes } from './use-format-types';
+import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useInlineWarning } from './use-inline-warning';
 import { insert } from '../insert';
@@ -53,41 +54,6 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 	'insertHorizontalRule',
 	'insertLink',
 ] );
-
-/**
- * In HTML, leading and trailing spaces are not visible, and multiple spaces
- * elsewhere are visually reduced to one space. This rule prevents spaces from
- * collapsing so all space is visible in the editor and can be removed. It also
- * prevents some browsers from inserting non-breaking spaces at the end of a
- * line to prevent the space from visually disappearing. Sometimes these non
- * breaking spaces can linger in the editor causing unwanted non breaking spaces
- * in between words. If also prevent Firefox from inserting a trailing `br` node
- * to visualise any trailing space, causing the element to be saved.
- *
- * > Authors are encouraged to set the 'white-space' property on editing hosts
- * > and on markup that was originally created through these editing mechanisms
- * > to the value 'pre-wrap'. Default HTML whitespace handling is not well
- * > suited to WYSIWYG editing, and line wrapping will not work correctly in
- * > some corner cases if 'white-space' is left at its default value.
- *
- * https://html.spec.whatwg.org/multipage/interaction.html#best-practices-for-in-page-editors
- *
- * @type {string}
- */
-const whiteSpace = 'pre-wrap';
-
-/**
- * A minimum width of 1px will prevent the rich text container from collapsing
- * to 0 width and hiding the caret. This is useful for inline containers.
- */
-const minWidth = '1px';
-
-/**
- * Default style object for the editable element.
- *
- * @type {Object<string,string>}
- */
-const defaultStyle = { whiteSpace, minWidth };
 
 const EMPTY_ACTIVE_FORMATS = [];
 
@@ -930,11 +896,13 @@ function RichText(
 		ref: useMergeRefs( [
 			forwardedRef,
 			ref,
+			useDefaultStyle(),
+			useBoundaryStyle( { activeFormats } ),
+			useInlineWarning(),
 			useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
 			useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
 			useUndoAutomaticChange( { didAutomaticChange, undo } ),
 		] ),
-		style: defaultStyle,
 		className: 'rich-text',
 		onPaste: handlePaste,
 		onInput: handleInput,
@@ -956,9 +924,6 @@ function RichText(
 		contentEditable: disabled ? undefined : true,
 		suppressContentEditableWarning: ! disabled,
 	};
-
-	useBoundaryStyle( { ref, activeFormats } );
-	useInlineWarning( { ref } );
 
 	return (
 		<>

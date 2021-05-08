@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { contextConnect } from '../context';
 import { Elevation } from '../elevation';
-import { View } from '../view';
+import { View } from '../../view';
 import * as styles from './styles';
 import { useCard } from './hook';
 import CONFIG from '../../utils/config-values';
@@ -35,7 +35,7 @@ function Card( props, forwardedRef ) {
 
 	return (
 		<View { ...otherProps } ref={ forwardedRef }>
-			<View css={ styles.Content }>{ children }</View>
+			<View className={ styles.Content }>{ children }</View>
 			<Elevation
 				className={ elevationClassName }
 				isInteractive={ false }

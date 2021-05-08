@@ -660,12 +660,12 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * @param array $declarations Holds the existing declarations.
 	 * @param array $settings Settings to process.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_preset_vars( $declarations, $settings ) {
+	private static function compute_preset_vars( $settings ) {
+		$declarations = array();
 		foreach ( self::PRESETS_METADATA as $preset ) {
 			$values = _wp_array_get( $settings, $preset['path'], array() );
 			foreach ( $values as $value ) {
@@ -691,12 +691,12 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * @param array $declarations Holds the existing declarations.
 	 * @param array $settings Settings to process.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_theme_vars( $declarations, $settings ) {
+	private static function compute_theme_vars( $settings ) {
+		$declarations  = array();
 		$custom_values = _wp_array_get( $settings, array( 'custom' ), array() );
 		$css_vars      = self::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
@@ -776,9 +776,7 @@ class WP_Theme_JSON {
 			$selector = $metadata['selector'];
 
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$declarations = array();
-			$declarations = self::compute_preset_vars( array(), $node );
-			$declarations = self::compute_theme_vars( $declarations, $node );
+			$declarations = array_merge( self::compute_preset_vars( $node ), self::compute_theme_vars( $node ) );
 
 			$stylesheet .= self::to_ruleset( $selector, $declarations );
 		}

@@ -6,7 +6,7 @@ import { render } from '@testing-library/react';
 /**
  * Internal dependencies
  */
-import { View } from '../../ui/view';
+import { View } from '../../view';
 import { Grid } from '..';
 import CONFIG from '../../utils/config-values';
 
