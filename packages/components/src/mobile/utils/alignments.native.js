@@ -16,8 +16,6 @@ export const WIDE_ALIGNMENTS = {
 		'core/column',
 		'core/buttons',
 		'core/button',
-		'jetpack/layout-grid-column',
-		'jetpack/layout-grid',
 	],
 	excludeBlocks: [ 'core/heading' ],
 	notInnerContainers: [
@@ -43,7 +41,6 @@ const isWider = ( width, breakpoint ) =>
 	width > ALIGNMENT_BREAKPOINTS[ breakpoint ];
 
 const isContainerRelated = ( blockName ) => {
-	
 	if ( WIDE_ALIGNMENTS.notInnerContainers.includes( blockName ) ) {
 		return false;
 	}
@@ -57,7 +54,10 @@ const isContainerRelated = ( blockName ) => {
 		blockType?.parent?.some( ( parent ) => {
 			const blockTypeParent = getBlockType( parent );
 			const blockAlignParent = blockTypeParent?.supports?.align;
-			return Array.isArray( blockAlignParent ) && blockAlignParent.includes( 'full' );
+			return (
+				Array.isArray( blockAlignParent ) &&
+				blockAlignParent.includes( 'full' )
+			);
 		} )
 	) {
 		return true;
