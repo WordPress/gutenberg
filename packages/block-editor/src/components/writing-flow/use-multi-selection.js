@@ -91,13 +91,8 @@ export default function useMultiSelection() {
 		const { ownerDocument } = ref.current;
 		const { defaultView } = ownerDocument;
 
-		if ( isMultiSelecting ) {
-			return;
-		}
-
-		if ( ! hasMultiSelection ) {
-			if ( ! selectedBlockClientId ) {
-				toggleRichText( ref.current, true );
+		if ( ! hasMultiSelection || isMultiSelecting ) {
+			if ( ! selectedBlockClientId || isMultiSelecting ) {
 				return;
 			}
 
@@ -118,7 +113,6 @@ export default function useMultiSelection() {
 				}
 			}
 
-			toggleRichText( ref.current, true );
 			return;
 		}
 
