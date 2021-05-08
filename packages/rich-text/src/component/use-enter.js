@@ -10,6 +10,10 @@ export function useEnter( props ) {
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
+			if ( event.defaultPrevented ) {
+				return;
+			}
+
 			if ( event.keyCode !== ENTER ) {
 				return;
 			}
