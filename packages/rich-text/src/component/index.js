@@ -361,10 +361,6 @@ function RichText(
 
 		const { start, end, activeFormats: newActiveFormats = [] } = newRecord;
 
-		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
-			changeHandler( newRecord.formats, newRecord.text );
-		} );
-
 		_value.current = valueToFormat( newRecord );
 		record.current = newRecord;
 
@@ -373,6 +369,10 @@ function RichText(
 		onSelectionChange( start, end );
 		onChange( _value.current );
 		setActiveFormats( newActiveFormats );
+
+		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
+			changeHandler( newRecord.formats, newRecord.text );
+		} );
 
 		if ( ! withoutHistory ) {
 			createUndoLevel();
