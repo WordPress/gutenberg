@@ -6,7 +6,7 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useLayoutEffect, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -14,6 +14,18 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
+
+function toggleRichText( container, toggle ) {
+	Array.from( container.querySelectorAll( '.rich-text' ) ).forEach(
+		( node ) => {
+			if ( toggle ) {
+				node.setAttribute( 'contenteditable', true );
+			} else {
+				node.removeAttribute( 'contenteditable' );
+			}
+		}
+	);
+}
 
 /**
  * Returns for the deepest node at the start or end of a container node. Ignores
@@ -57,7 +69,8 @@ function selector( select ) {
 	};
 }
 
-export default function useMultiSelection( ref ) {
+export default function useMultiSelection() {
+	const ref = useRef();
 	const {
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
@@ -74,12 +87,18 @@ export default function useMultiSelection( ref ) {
 	 * When the component updates, and there is multi selection, we need to
 	 * select the entire block contents.
 	 */
-	useEffect( () => {
+	useLayoutEffect( () => {
 		const { ownerDocument } = ref.current;
 		const { defaultView } = ownerDocument;
 
-		if ( ! hasMultiSelection || isMultiSelecting ) {
-			if ( ! selectedBlockClientId || isMultiSelecting ) {
+		if ( isMultiSelecting ) {
+			return;
+		}
+
+		if ( ! hasMultiSelection ) {
+			toggleRichText( ref.current, true );
+
+			if ( ! selectedBlockClientId ) {
 				return;
 			}
 
@@ -109,11 +128,23 @@ export default function useMultiSelection( ref ) {
 			return;
 		}
 
-		// These must be in the right DOM order.
+		// Removing the contenteditable attributes within the block editor is
+		// essential for selection to work across editable areas. The edible
+		// hosts are removed, allowing selection to be extended outside the DOM
+		// element. `multiSelect` sets a flag in the store so the rich text
+		// components are updated, but the rerender may happen asynchonously. To
+		// ensure the browser instantly removes the selection boundaries, we
+		// remove the contenteditable attributes manually.
+		toggleRichText( ref.current, false );
+
+		// For some browsers, like Safari, it is important that focus
+		// happens BEFORE selection.
+		ref.current.focus();
 
 		const selection = defaultView.getSelection();
 		const range = ownerDocument.createRange();
 
+		// These must be in the right DOM order.
 		// The most stable way to select the whole block contents is to start
 		// and end at the deepest points.
 		const startNode = getDeepestNode( startRef.current, 'start' );
@@ -131,4 +162,6 @@ export default function useMultiSelection( ref ) {
 		selectBlock,
 		selectedBlockClientId,
 	] );
+
+	return ref;
 }

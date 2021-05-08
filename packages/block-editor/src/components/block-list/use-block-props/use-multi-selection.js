@@ -166,7 +166,6 @@ export function useMultiSelection( clientId ) {
 				if ( event.shiftKey ) {
 					const blockSelectionStart = getBlockSelectionStart();
 					if ( blockSelectionStart !== clientId ) {
-						toggleRichText( node, false );
 						multiSelect( blockSelectionStart, clientId );
 						event.preventDefault();
 					}
