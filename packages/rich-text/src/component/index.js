@@ -9,7 +9,7 @@ import {
 	useMemo,
 	useLayoutEffect,
 } from '@wordpress/element';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -35,6 +35,7 @@ import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { usePasteHandler } from './use-paste-handler';
 import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
+import { useEnter } from './use-enter';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -296,36 +297,12 @@ function RichText(
 		event.preventDefault();
 	}
 
-	/**
-	 * Triggers the `onEnter` prop on keydown.
-	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
-	 */
-	function handleEnter( event ) {
-		if ( event.keyCode !== ENTER ) {
-			return;
-		}
-
-		event.preventDefault();
-
-		if ( ! onEnter ) {
-			return;
-		}
-
-		onEnter( {
-			value: removeEditorOnlyFormats( createRecord() ),
-			onChange: handleChange,
-			shiftKey: event.shiftKey,
-		} );
-	}
-
 	function handleKeyDown( event ) {
 		if ( event.defaultPrevented ) {
 			return;
 		}
 
 		handleDelete( event );
-		handleEnter( event );
 	}
 
 	const lastHistoryValue = useRef( value );
@@ -450,6 +427,12 @@ function RichText(
 			useSelectObject(),
 			useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
 			useUndoAutomaticChange( { didAutomaticChange, undo } ),
+			useEnter( {
+				onEnter,
+				removeEditorOnlyFormats,
+				createRecord,
+				handleChange,
+			} ),
 			useIndentListItemOnSpace( {
 				multilineTag,
 				multilineRootTag,
