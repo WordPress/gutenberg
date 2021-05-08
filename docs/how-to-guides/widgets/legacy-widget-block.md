@@ -1,12 +1,14 @@
-# Ensuring compatibility with the Legacy Widget block
+# About the Legacy Widget block
 
-The Legacy Widget block allows users to add, edit and preview third party widgets that are registered by plugins and widgets that were added using the old Widgets Editor.
+The Legacy Widget block allows users to add, edit and preview third party widgets that are registered by plugins and widgets that were added using the classic Widgets Editor.
 
 Third party widgets can be added by inserting a Legacy Widget block using the block inserter and selecting the widget from the block's dropdown.
 
 Third party widgets may also be added by searching for the name of the widget in the block inserter and selecting the widget. A variation of the Legacy Widget block will be inserted.
 
-## The `widget-added` event
+## Compatibility with the Legacy Widget block
+
+### The `widget-added` event
 
 The Legacy Widget block will display the widget's form in a way similar to the Customizer, and so is compatible with most third party widgets.
 
@@ -27,7 +29,7 @@ For example, a widget might want to show a "Password" field when the "Change pas
 
 Note that all of the widget's event handlers are added in the `widget-added` callback.
 
-## Displaying "No preview available."
+### Displaying "No preview available."
 
 The Legacy Widget block will display a preview of the widget when the Legacy Widget block is not selected.
 
@@ -52,13 +54,13 @@ class ExampleWidget extends WP_Widget {
 }
 ```
 
-## Allowing migration to a block
+### Allowing migration to a block
 
 You can allow users to easily migrate a Legacy Widget block containing a specific widget to a block or multiple blocks. This allows plugin authors to phase out their widgets in favour of blocks which are more intuitive and can be used in more places.
 
 The following steps show how to do this.
 
-### 1) Display the widget's instance in the REST API
+#### 1) Display the widget's instance in the REST API
 
 First, we need to tell WordPress that it is OK to display your widget's instance array in the REST API.
 
@@ -79,7 +81,7 @@ class ExampleWidget extends WP_Widget {
 
 This allows the block editor and other REST API clients to see your widget's instance array by accessing `instance.raw` in the REST API response.
 
-### 2) Add a block transform
+#### 2) Add a block transform
 
 Now, we can define a [block transform](https://developer.wordpress.org/block-editor/reference-guides/block-api/block-transforms/) which tells the block editor what to replace the Legacy Widget block containing your widget with.
 
@@ -108,7 +110,7 @@ transforms: {
 },
 ```
 
-### 3) Hide the widget from the Legacy Widget block
+#### 3) Hide the widget from the Legacy Widget block
 
 As a final touch, we can tell the Legacy Widget block to hide your widget from the "Select widget" dropdown and from the block inserter. This encourages users to use the block that replaces your widget.
 

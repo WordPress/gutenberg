@@ -1,4 +1,4 @@
-# Restoring the old Widgets Editor
+# Restoring the classic Widgets Editor
 
 There are several ways to disable the new Widgets Block Editor.
 
