@@ -38,8 +38,14 @@
 		"typography": {
 			"fontSize": true,
 			"lineHeight": true,
-			"__experimentalFontFamily": true
-		}
+			"__experimentalFontFamily": true,
+			"__experimentalFontWeight": true,
+			"__experimentalFontStyle": true,
+			"__experimentalTextTransform": true
+		},
+		"fontSize": true,
+		"lineHeight": true,
+		"__experimentalFontFamily": true
 	},
 	"style": "wp-block-post-title"
 }
