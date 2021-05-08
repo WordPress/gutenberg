@@ -444,13 +444,13 @@
 		"parent": "widgets"
 	},
 	{
-		"title": "Restoring the old Widgets Editor",
+		"title": "Restoring the classic Widgets Editor",
 		"slug": "opting-out",
 		"markdown_source": "../docs/how-to-guides/widgets/opting-out.md",
 		"parent": "widgets"
 	},
 	{
-		"title": "Ensuring compatibility with the Legacy Widget block",
+		"title": "About the Legacy Widget block",
 		"slug": "legacy-widget-block",
 		"markdown_source": "../docs/how-to-guides/widgets/legacy-widget-block.md",
 		"parent": "widgets"
