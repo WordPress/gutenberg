@@ -6,7 +6,7 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useLayoutEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -87,7 +87,7 @@ export default function useMultiSelection() {
 	 * When the component updates, and there is multi selection, we need to
 	 * select the entire block contents.
 	 */
-	useLayoutEffect( () => {
+	useEffect( () => {
 		const { ownerDocument } = ref.current;
 		const { defaultView } = ownerDocument;
 
