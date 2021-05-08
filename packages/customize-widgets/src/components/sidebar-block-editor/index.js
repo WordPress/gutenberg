@@ -19,7 +19,6 @@ import {
 	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
-import { Popover } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
 
 /**
