@@ -6,7 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import {
+	useRef,
+	useState,
+	useLayoutEffect,
+	forwardRef,
+} from '@wordpress/element';
 import { getRectangleFromRange } from '@wordpress/dom';
 import { ESCAPE } from '@wordpress/keycodes';
 import deprecated from '@wordpress/deprecated';
@@ -223,36 +228,39 @@ function getAnchorDocument( anchor ) {
 	return anchor.ownerDocument;
 }
 
-const Popover = ( {
-	headerTitle,
-	onClose,
-	onKeyDown,
-	children,
-	className,
-	noArrow = true,
-	isAlternate,
-	// Disable reason: We generate the `...contentProps` rest as remainder
-	// of props which aren't explicitly handled by this component.
-	/* eslint-disable no-unused-vars */
-	position = 'bottom right',
-	range,
-	focusOnMount = 'firstElement',
-	anchorRef,
-	shouldAnchorIncludePadding,
-	anchorRect,
-	getAnchorRect,
-	expandOnMobile,
-	animate = true,
-	onClickOutside,
-	onFocusOutside,
-	__unstableStickyBoundaryElement,
-	__unstableSlotName = SLOT_NAME,
-	__unstableObserveElement,
-	__unstableBoundaryParent,
-	__unstableForcePosition,
-	/* eslint-enable no-unused-vars */
-	...contentProps
-} ) => {
+const Popover = (
+	{
+		headerTitle,
+		onClose,
+		onKeyDown,
+		children,
+		className,
+		noArrow = true,
+		isAlternate,
+		// Disable reason: We generate the `...contentProps` rest as remainder
+		// of props which aren't explicitly handled by this component.
+		/* eslint-disable no-unused-vars */
+		position = 'bottom right',
+		range,
+		focusOnMount = 'firstElement',
+		anchorRef,
+		shouldAnchorIncludePadding,
+		anchorRect,
+		getAnchorRect,
+		expandOnMobile,
+		animate = true,
+		onClickOutside,
+		onFocusOutside,
+		__unstableStickyBoundaryElement,
+		__unstableSlotName = SLOT_NAME,
+		__unstableObserveElement,
+		__unstableBoundaryParent,
+		__unstableForcePosition,
+		/* eslint-enable no-unused-vars */
+		...contentProps
+	},
+	ref
+) => {
 	const anchorRefFallback = useRef( null );
 	const contentRef = useRef( null );
 	const containerRef = useRef();
@@ -474,6 +482,7 @@ const Popover = ( {
 	const focusOnMountRef = useFocusOnMount( focusOnMount );
 	const focusOutsideProps = useFocusOutside( handleOnFocusOutside );
 	const mergedRefs = useMergeRefs( [
+		ref,
 		containerRef,
 		focusOnMount ? constrainedTabbingRef : null,
 		focusOnMount ? focusReturnRef : null,
@@ -616,10 +625,19 @@ const Popover = ( {
 	return <span ref={ anchorRefFallback }>{ content }</span>;
 };
 
-const PopoverContainer = Popover;
+const PopoverContainer = forwardRef( Popover );
 
-PopoverContainer.Slot = ( { name = SLOT_NAME } ) => (
-	<Slot bubblesVirtually name={ name } className="popover-slot" />
-);
+function PopoverSlot( { name = SLOT_NAME }, ref ) {
+	return (
+		<Slot
+			bubblesVirtually
+			name={ name }
+			className="popover-slot"
+			ref={ ref }
+		/>
+	);
+}
+
+PopoverContainer.Slot = forwardRef( PopoverSlot );
 
 export default PopoverContainer;

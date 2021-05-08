@@ -23,6 +23,7 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { usePopoverScroll } from './use-popover-scroll';
 
 function selector( select ) {
 	const {
@@ -52,6 +53,7 @@ function BlockPopover( {
 	isEmptyDefaultBlock,
 	capturingClientId,
 	__unstablePopoverSlot,
+	__unstableContentRef,
 } ) {
 	const {
 		isNavigationMode,
@@ -111,6 +113,8 @@ function BlockPopover( {
 	const selectedElement = useBlockElement( clientId );
 	const lastSelectedElement = useBlockElement( lastClientId );
 	const capturingElement = useBlockElement( capturingClientId );
+
+	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 
 	if (
 		! shouldShowBreadcrumb &&
@@ -174,6 +178,7 @@ function BlockPopover( {
 
 	return (
 		<Popover
+			ref={ popoverScrollRef }
 			noArrow
 			animate={ false }
 			position={ popoverPosition }
@@ -296,7 +301,10 @@ function wrapperSelector( select ) {
 	};
 }
 
-export default function WrappedBlockPopover( { __unstablePopoverSlot } ) {
+export default function WrappedBlockPopover( {
+	__unstablePopoverSlot,
+	__unstableContentRef,
+} ) {
 	const selected = useSelect( wrapperSelector, [] );
 
 	if ( ! selected ) {
@@ -324,6 +332,7 @@ export default function WrappedBlockPopover( { __unstablePopoverSlot } ) {
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
 			capturingClientId={ capturingClientId }
 			__unstablePopoverSlot={ __unstablePopoverSlot }
+			__unstableContentRef={ __unstableContentRef }
 		/>
 	);
 }
