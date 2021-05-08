@@ -96,9 +96,8 @@ export default function useMultiSelection() {
 		}
 
 		if ( ! hasMultiSelection ) {
-			toggleRichText( ref.current, true );
-
 			if ( ! selectedBlockClientId ) {
+				toggleRichText( ref.current, true );
 				return;
 			}
 
@@ -119,6 +118,7 @@ export default function useMultiSelection() {
 				}
 			}
 
+			toggleRichText( ref.current, true );
 			return;
 		}
 
@@ -128,6 +128,10 @@ export default function useMultiSelection() {
 			return;
 		}
 
+		// For some browsers, like Safari, it is important that focus
+		// happens BEFORE selection.
+		ref.current.focus();
+
 		// Removing the contenteditable attributes within the block editor is
 		// essential for selection to work across editable areas. The edible
 		// hosts are removed, allowing selection to be extended outside the DOM
@@ -136,10 +140,6 @@ export default function useMultiSelection() {
 		// ensure the browser instantly removes the selection boundaries, we
 		// remove the contenteditable attributes manually.
 		toggleRichText( ref.current, false );
-
-		// For some browsers, like Safari, it is important that focus
-		// happens BEFORE selection.
-		ref.current.focus();
 
 		const selection = defaultView.getSelection();
 		const range = ownerDocument.createRange();
