@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { getBlockType } from '@wordpress/blocks';
+
 export const WIDE_ALIGNMENTS = {
 	alignments: {
 		wide: 'wide',
@@ -11,8 +16,15 @@ export const WIDE_ALIGNMENTS = {
 		'core/column',
 		'core/buttons',
 		'core/button',
+		'jetpack/layout-grid-column',
+		'jetpack/layout-grid',
 	],
 	excludeBlocks: [ 'core/heading' ],
+	notInnerContainers: [
+		'core/separator',
+		'core/media-text',
+		'core/pullquote',
+	],
 };
 
 export const ALIGNMENT_BREAKPOINTS = {
@@ -30,8 +42,29 @@ const isWideWidth = ( align ) => align === WIDE_ALIGNMENTS.alignments.wide;
 const isWider = ( width, breakpoint ) =>
 	width > ALIGNMENT_BREAKPOINTS[ breakpoint ];
 
-const isContainerRelated = ( blockName ) =>
-	WIDE_ALIGNMENTS.innerContainers.includes( blockName );
+const isContainerRelated = ( blockName ) => {
+	
+	if ( WIDE_ALIGNMENTS.notInnerContainers.includes( blockName ) ) {
+		return false;
+	}
+	const blockType = getBlockType( blockName );
+	const blockAlign = blockType?.supports?.align;
+	if ( Array.isArray( blockAlign ) && blockAlign.includes( 'full' ) ) {
+		return true; // The block support align
+	}
+
+	if (
+		blockType?.parent?.some( ( parent ) => {
+			const blockTypeParent = getBlockType( parent );
+			const blockAlignParent = blockTypeParent?.supports?.align;
+			return Array.isArray( blockAlignParent ) && blockAlignParent.includes( 'full' );
+		} )
+	) {
+		return true;
+	}
+
+	return false;
+};
 
 export const alignmentHelpers = {
 	isFullWidth,
