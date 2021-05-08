@@ -5,6 +5,15 @@ import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as blockEditorStore } from '@wordpress/block-editor';
 
+/**
+ * We can't just use <BlockSelectionClearer> because the customizer has
+ * many root nodes rather than just one in the post editor.
+ * We need to listen to the focus events in all those roots, and also in
+ * the preview iframe.
+ *
+ * @param {Object} sidebarControl The sidebar control instance.
+ * @param {Object} popoverRef The ref object of the popover node container.
+ */
 export default function useClearSelectedBlock( sidebarControl, popoverRef ) {
 	const { hasSelectedBlock, hasMultiSelection } = useSelect(
 		blockEditorStore
