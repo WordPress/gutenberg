@@ -432,6 +432,30 @@
 		"parent": "how-to-guides"
 	},
 	{
+		"title": "Widgets",
+		"slug": "widgets",
+		"markdown_source": "../docs/how-to-guides/widgets/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Widgets Block Editor overview",
+		"slug": "overview",
+		"markdown_source": "../docs/how-to-guides/widgets/overview.md",
+		"parent": "widgets"
+	},
+	{
+		"title": "Restoring the classic Widgets Editor",
+		"slug": "opting-out",
+		"markdown_source": "../docs/how-to-guides/widgets/opting-out.md",
+		"parent": "widgets"
+	},
+	{
+		"title": "About the Legacy Widget block",
+		"slug": "legacy-widget-block",
+		"markdown_source": "../docs/how-to-guides/widgets/legacy-widget-block.md",
+		"parent": "widgets"
+	},
+	{
 		"title": "Reference Guides",
 		"slug": "reference-guides",
 		"markdown_source": "../docs/reference-guides/README.md",
