@@ -9,7 +9,7 @@ import {
 	useMemo,
 	useLayoutEffect,
 } from '@wordpress/element';
-import { BACKSPACE, DELETE, ENTER, SPACE } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -22,8 +22,6 @@ import { toHTMLString } from '../to-html-string';
 import { remove } from '../remove';
 import { removeFormat } from '../remove-format';
 import { isCollapsed } from '../is-collapsed';
-import { LINE_SEPARATOR } from '../special-characters';
-import { indentListItems } from '../indent-list-items';
 import { getActiveFormats } from '../get-active-formats';
 import { updateFormats } from '../update-formats';
 import { removeLineSeparator } from '../remove-line-separator';
@@ -37,6 +35,7 @@ import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { usePasteHandler } from './use-paste-handler';
+import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -365,46 +364,6 @@ function RichText(
 		} );
 	}
 
-	/**
-	 * Indents list items on space keydown.
-	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
-	 */
-	function handleSpace( event ) {
-		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-
-		if (
-			// Only override when no modifiers are pressed.
-			shiftKey ||
-			altKey ||
-			metaKey ||
-			ctrlKey ||
-			keyCode !== SPACE ||
-			multilineTag !== 'li'
-		) {
-			return;
-		}
-
-		const currentValue = createRecord();
-
-		if ( ! isCollapsed( currentValue ) ) {
-			return;
-		}
-
-		const { text, start } = currentValue;
-		const characterBefore = text[ start - 1 ];
-
-		// The caret must be at the start of a line.
-		if ( characterBefore && characterBefore !== LINE_SEPARATOR ) {
-			return;
-		}
-
-		handleChange(
-			indentListItems( currentValue, { type: multilineRootTag } )
-		);
-		event.preventDefault();
-	}
-
 	function handleKeyDown( event ) {
 		if ( event.defaultPrevented ) {
 			return;
@@ -412,7 +371,6 @@ function RichText(
 
 		handleDelete( event );
 		handleEnter( event );
-		handleSpace( event );
 	}
 
 	const lastHistoryValue = useRef( value );
@@ -795,6 +753,12 @@ function RichText(
 			useSelectObject(),
 			useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
 			useUndoAutomaticChange( { didAutomaticChange, undo } ),
+			useIndentListItemOnSpace( {
+				multilineTag,
+				multilineRootTag,
+				createRecord,
+				handleChange,
+			} ),
 			usePasteHandler( {
 				isSelected,
 				disableFormats,
