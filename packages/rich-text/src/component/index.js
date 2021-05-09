@@ -6,7 +6,6 @@ import {
 	useEffect,
 	useRef,
 	useState,
-	useMemo,
 	useLayoutEffect,
 } from '@wordpress/element';
 import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
@@ -104,14 +103,6 @@ function RichText(
 		multilineRootTag = TagName;
 	}
 
-	function getDoc() {
-		return ref.current.ownerDocument;
-	}
-
-	function getWin() {
-		return getDoc().defaultView;
-	}
-
 	/**
 	 * Converts the outside data structure to our internal representation.
 	 *
@@ -189,19 +180,11 @@ function RichText(
 		return toHTMLString( { value: val, multilineTag, preserveWhiteSpace } );
 	}
 
-	// Internal values are updated synchronously, unlike props and state.
-	const _value = useRef( value );
-	const record = useRef(
-		useMemo( () => {
-			const initialRecord = formatToValue( value );
-			initialRecord.start = selectionStart;
-			initialRecord.end = selectionEnd;
-			return initialRecord;
-		}, [] )
-	);
-
 	function createRecord() {
-		const selection = getWin().getSelection();
+		const {
+			ownerDocument: { defaultView },
+		} = ref.current;
+		const selection = defaultView.getSelection();
 		const range =
 			selection.rangeCount > 0 ? selection.getRangeAt( 0 ) : null;
 
@@ -328,7 +311,20 @@ function RichText(
 		handleEnter( event );
 	}
 
+	// Internal values are updated synchronously, unlike props and state.
+	const _value = useRef( value );
+	const record = useRef();
 	const lastHistoryValue = useRef( value );
+
+	function setRecordFromProps() {
+		record.current = formatToValue( value );
+		record.current.start = selectionStart;
+		record.current.end = selectionEnd;
+	}
+
+	if ( ! record.current ) {
+		setRecordFromProps();
+	}
 
 	function createUndoLevel() {
 		// If the content is the same, no level needs to be created.
@@ -339,8 +335,6 @@ function RichText(
 		onCreateUndoLevel();
 		lastHistoryValue.current = _value.current;
 	}
-
-	const didMount = useRef( false );
 
 	/**
 	 * Sync the value to global state. The node tree and selection will also be
@@ -379,19 +373,23 @@ function RichText(
 		}
 	}
 
-	function applyFromProps() {
+	function applyFromProps( { domOnly } = {} ) {
 		_value.current = value;
-		record.current = formatToValue( value );
-		record.current.start = selectionStart;
-		record.current.end = selectionEnd;
-		applyRecord( record.current );
+		setRecordFromProps();
+		applyRecord( record.current, { domOnly } );
 	}
 
-	useEffect( () => {
+	const didMount = useRef( false );
+
+	useLayoutEffect( () => {
 		if ( didMount.current ) {
 			applyFromProps();
+		} else {
+			applyFromProps( { domOnly: true } );
 		}
-	}, [ TagName, placeholder ] );
+
+		didMount.current = true;
+	}, [ TagName, placeholder, ...dependencies ] );
 
 	useEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
@@ -418,17 +416,6 @@ function RichText(
 			};
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
-
-	useEffect( () => {
-		if ( didMount.current ) {
-			applyFromProps();
-		}
-	}, dependencies );
-
-	useLayoutEffect( () => {
-		applyRecord( record.current, { domOnly: true } );
-		didMount.current = true;
-	}, [] );
 
 	function focus() {
 		ref.current.focus();
