@@ -6,12 +6,21 @@
 		width: 600px;
 	}
 
+	.components-modal__content {
+		padding: 0;
+		margin-top: 0;
+		border-radius: $radius-block-ui;
+
+		&::before {
+			content: none;
+		}
+	}
+
 	.components-modal__header {
 		background: none;
 		border-bottom: none;
-		width: 100%;
 		padding: 0;
-		margin: 0;
+		position: sticky;
 
 		.components-button {
 			align-self: flex-start;
@@ -75,10 +84,6 @@
 			min-width: 20px;
 			margin: -6px 0;
 		}
-	}
-
-	.components-modal__content {
-		padding: 0;
 	}
 }
 
