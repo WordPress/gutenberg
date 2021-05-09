@@ -389,13 +389,7 @@ function RichText(
 		}
 
 		didMount.current = true;
-	}, [ TagName, placeholder, ...dependencies ] );
-
-	useEffect( () => {
-		if ( didMount.current && value !== _value.current ) {
-			applyFromProps();
-		}
-	}, [ value ] );
+	}, [ TagName, placeholder, value, ...dependencies ] );
 
 	useEffect( () => {
 		if ( ! didMount.current ) {
