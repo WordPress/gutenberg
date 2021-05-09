@@ -9,16 +9,7 @@ import {
 	useMemo,
 	useLayoutEffect,
 } from '@wordpress/element';
-import {
-	BACKSPACE,
-	DELETE,
-	ENTER,
-	LEFT,
-	RIGHT,
-	SPACE,
-	ESCAPE,
-} from '@wordpress/keycodes';
-import { getFilesFromDataTransfer } from '@wordpress/dom';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -31,17 +22,20 @@ import { toHTMLString } from '../to-html-string';
 import { remove } from '../remove';
 import { removeFormat } from '../remove-format';
 import { isCollapsed } from '../is-collapsed';
-import { LINE_SEPARATOR } from '../special-characters';
-import { indentListItems } from '../indent-list-items';
 import { getActiveFormats } from '../get-active-formats';
 import { updateFormats } from '../update-formats';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isEmptyLine } from '../is-empty';
 import { useFormatTypes } from './use-format-types';
+import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useInlineWarning } from './use-inline-warning';
-import { insert } from '../insert';
 import { useCopyHandler } from './use-copy-handler';
+import { useFormatBoundaries } from './use-format-boundaries';
+import { useSelectObject } from './use-select-object';
+import { useUndoAutomaticChange } from './use-undo-automatic-change';
+import { usePasteHandler } from './use-paste-handler';
+import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -59,41 +53,6 @@ const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
 	'insertHorizontalRule',
 	'insertLink',
 ] );
-
-/**
- * In HTML, leading and trailing spaces are not visible, and multiple spaces
- * elsewhere are visually reduced to one space. This rule prevents spaces from
- * collapsing so all space is visible in the editor and can be removed. It also
- * prevents some browsers from inserting non-breaking spaces at the end of a
- * line to prevent the space from visually disappearing. Sometimes these non
- * breaking spaces can linger in the editor causing unwanted non breaking spaces
- * in between words. If also prevent Firefox from inserting a trailing `br` node
- * to visualise any trailing space, causing the element to be saved.
- *
- * > Authors are encouraged to set the 'white-space' property on editing hosts
- * > and on markup that was originally created through these editing mechanisms
- * > to the value 'pre-wrap'. Default HTML whitespace handling is not well
- * > suited to WYSIWYG editing, and line wrapping will not work correctly in
- * > some corner cases if 'white-space' is left at its default value.
- *
- * https://html.spec.whatwg.org/multipage/interaction.html#best-practices-for-in-page-editors
- *
- * @type {string}
- */
-const whiteSpace = 'pre-wrap';
-
-/**
- * A minimum width of 1px will prevent the rich text container from collapsing
- * to 0 width and hiding the caret. This is useful for inline containers.
- */
-const minWidth = '1px';
-
-/**
- * Default style object for the editable element.
- *
- * @type {Object<string,string>}
- */
-const defaultStyle = { whiteSpace, minWidth };
 
 const EMPTY_ACTIVE_FORMATS = [];
 
@@ -316,88 +275,6 @@ function RichText(
 	}
 
 	/**
-	 * Handles a paste event.
-	 *
-	 * Saves the pasted data as plain text in `pastedPlainText`.
-	 *
-	 * @param {ClipboardEvent} event The paste event.
-	 */
-	function handlePaste( event ) {
-		if ( ! isSelected ) {
-			event.preventDefault();
-			return;
-		}
-
-		const { clipboardData } = event;
-
-		let plainText = '';
-		let html = '';
-
-		// IE11 only supports `Text` as an argument for `getData` and will
-		// otherwise throw an invalid argument error, so we try the standard
-		// arguments first, then fallback to `Text` if they fail.
-		try {
-			plainText = clipboardData.getData( 'text/plain' );
-			html = clipboardData.getData( 'text/html' );
-		} catch ( error1 ) {
-			try {
-				html = clipboardData.getData( 'Text' );
-			} catch ( error2 ) {
-				// Some browsers like UC Browser paste plain text by default and
-				// don't support clipboardData at all, so allow default
-				// behaviour.
-				return;
-			}
-		}
-
-		event.preventDefault();
-
-		// Allows us to ask for this information when we get a report.
-		window.console.log( 'Received HTML:\n\n', html );
-		window.console.log( 'Received plain text:\n\n', plainText );
-
-		if ( disableFormats ) {
-			handleChange( insert( record.current, plainText ) );
-			return;
-		}
-
-		const transformed = formatTypes.reduce(
-			( accumlator, { __unstablePasteRule } ) => {
-				// Only allow one transform.
-				if ( __unstablePasteRule && accumlator === record.current ) {
-					accumlator = __unstablePasteRule( record.current, {
-						html,
-						plainText,
-					} );
-				}
-
-				return accumlator;
-			},
-			record.current
-		);
-
-		if ( transformed !== record.current ) {
-			handleChange( transformed );
-			return;
-		}
-
-		if ( onPaste ) {
-			const files = getFilesFromDataTransfer( clipboardData );
-			const isInternal = clipboardData.getData( 'rich-text' ) === 'true';
-
-			onPaste( {
-				value: removeEditorOnlyFormats( record.current ),
-				onChange: handleChange,
-				html,
-				plainText,
-				isInternal,
-				files: [ ...files ],
-				activeFormats,
-			} );
-		}
-	}
-
-	/**
 	 * Handles delete on keydown:
 	 * - outdent list items,
 	 * - delete content if everything is selected,
@@ -408,21 +285,11 @@ function RichText(
 	function handleDelete( event ) {
 		const { keyCode } = event;
 
-		if (
-			keyCode !== DELETE &&
-			keyCode !== BACKSPACE &&
-			keyCode !== ESCAPE
-		) {
+		if ( event.defaultPrevented ) {
 			return;
 		}
 
-		if ( didAutomaticChange ) {
-			event.preventDefault();
-			undo();
-			return;
-		}
-
-		if ( keyCode === ESCAPE ) {
+		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
 			return;
 		}
 
@@ -497,162 +364,6 @@ function RichText(
 		} );
 	}
 
-	/**
-	 * Indents list items on space keydown.
-	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
-	 */
-	function handleSpace( event ) {
-		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-
-		if (
-			// Only override when no modifiers are pressed.
-			shiftKey ||
-			altKey ||
-			metaKey ||
-			ctrlKey ||
-			keyCode !== SPACE ||
-			multilineTag !== 'li'
-		) {
-			return;
-		}
-
-		const currentValue = createRecord();
-
-		if ( ! isCollapsed( currentValue ) ) {
-			return;
-		}
-
-		const { text, start } = currentValue;
-		const characterBefore = text[ start - 1 ];
-
-		// The caret must be at the start of a line.
-		if ( characterBefore && characterBefore !== LINE_SEPARATOR ) {
-			return;
-		}
-
-		handleChange(
-			indentListItems( currentValue, { type: multilineRootTag } )
-		);
-		event.preventDefault();
-	}
-
-	/**
-	 * Handles horizontal keyboard navigation when no modifiers are pressed. The
-	 * navigation is handled separately to move correctly around format
-	 * boundaries.
-	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
-	 */
-	function handleHorizontalNavigation( event ) {
-		const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
-
-		if (
-			// Only override left and right keys without modifiers pressed.
-			shiftKey ||
-			altKey ||
-			metaKey ||
-			ctrlKey ||
-			( keyCode !== LEFT && keyCode !== RIGHT )
-		) {
-			return;
-		}
-
-		const {
-			text,
-			formats,
-			start,
-			end,
-			activeFormats: currentActiveFormats = [],
-		} = record.current;
-		const collapsed = isCollapsed( record.current );
-		// To do: ideally, we should look at visual position instead.
-		const { direction } = getWin().getComputedStyle( ref.current );
-		const reverseKey = direction === 'rtl' ? RIGHT : LEFT;
-		const isReverse = event.keyCode === reverseKey;
-
-		// If the selection is collapsed and at the very start, do nothing if
-		// navigating backward.
-		// If the selection is collapsed and at the very end, do nothing if
-		// navigating forward.
-		if ( collapsed && currentActiveFormats.length === 0 ) {
-			if ( start === 0 && isReverse ) {
-				return;
-			}
-
-			if ( end === text.length && ! isReverse ) {
-				return;
-			}
-		}
-
-		// If the selection is not collapsed, let the browser handle collapsing
-		// the selection for now. Later we could expand this logic to set
-		// boundary positions if needed.
-		if ( ! collapsed ) {
-			return;
-		}
-
-		const formatsBefore = formats[ start - 1 ] || EMPTY_ACTIVE_FORMATS;
-		const formatsAfter = formats[ start ] || EMPTY_ACTIVE_FORMATS;
-
-		let newActiveFormatsLength = currentActiveFormats.length;
-		let source = formatsAfter;
-
-		if ( formatsBefore.length > formatsAfter.length ) {
-			source = formatsBefore;
-		}
-
-		// If the amount of formats before the caret and after the caret is
-		// different, the caret is at a format boundary.
-		if ( formatsBefore.length < formatsAfter.length ) {
-			if (
-				! isReverse &&
-				currentActiveFormats.length < formatsAfter.length
-			) {
-				newActiveFormatsLength++;
-			}
-
-			if (
-				isReverse &&
-				currentActiveFormats.length > formatsBefore.length
-			) {
-				newActiveFormatsLength--;
-			}
-		} else if ( formatsBefore.length > formatsAfter.length ) {
-			if (
-				! isReverse &&
-				currentActiveFormats.length > formatsAfter.length
-			) {
-				newActiveFormatsLength--;
-			}
-
-			if (
-				isReverse &&
-				currentActiveFormats.length < formatsBefore.length
-			) {
-				newActiveFormatsLength++;
-			}
-		}
-
-		if ( newActiveFormatsLength === currentActiveFormats.length ) {
-			record.current._newActiveFormats = isReverse
-				? formatsBefore
-				: formatsAfter;
-			return;
-		}
-
-		event.preventDefault();
-
-		const newActiveFormats = source.slice( 0, newActiveFormatsLength );
-		const newValue = {
-			...record.current,
-			activeFormats: newActiveFormats,
-		};
-		record.current = newValue;
-		applyRecord( newValue );
-		setActiveFormats( newActiveFormats );
-	}
-
 	function handleKeyDown( event ) {
 		if ( event.defaultPrevented ) {
 			return;
@@ -660,8 +371,6 @@ function RichText(
 
 		handleDelete( event );
 		handleEnter( event );
-		handleSpace( event );
-		handleHorizontalNavigation( event );
 	}
 
 	const lastHistoryValue = useRef( value );
@@ -902,32 +611,6 @@ function RichText(
 		}
 	}
 
-	/**
-	 * Select object when they are clicked. The browser will not set any
-	 * selection when clicking e.g. an image.
-	 *
-	 * @param {WPSyntheticEvent} event Synthetic mousedown or touchstart event.
-	 */
-	function handlePointerDown( event ) {
-		const { target } = event;
-
-		// If the child element has no text content, it must be an object.
-		if ( target === ref.current || target.textContent ) {
-			return;
-		}
-
-		const { parentNode } = target;
-		const index = Array.from( parentNode.childNodes ).indexOf( target );
-		const range = getDoc().createRange();
-		const selection = getWin().getSelection();
-
-		range.setStart( target.parentNode, index );
-		range.setEnd( target.parentNode, index + 1 );
-
-		selection.removeAllRanges();
-		selection.addRange( range );
-	}
-
 	const rafId = useRef();
 
 	/**
@@ -1063,19 +746,37 @@ function RichText(
 		ref: useMergeRefs( [
 			forwardedRef,
 			ref,
+			useDefaultStyle(),
+			useBoundaryStyle( { activeFormats } ),
+			useInlineWarning(),
 			useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
+			useSelectObject(),
+			useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
+			useUndoAutomaticChange( { didAutomaticChange, undo } ),
+			useIndentListItemOnSpace( {
+				multilineTag,
+				multilineRootTag,
+				createRecord,
+				handleChange,
+			} ),
+			usePasteHandler( {
+				isSelected,
+				disableFormats,
+				handleChange,
+				record,
+				formatTypes,
+				onPaste,
+				removeEditorOnlyFormats,
+				activeFormats,
+			} ),
 		] ),
-		style: defaultStyle,
 		className: 'rich-text',
-		onPaste: handlePaste,
 		onInput: handleInput,
 		onCompositionStart: handleCompositionStart,
 		onCompositionEnd: handleCompositionEnd,
 		onKeyDown: handleKeyDown,
 		onFocus: handleFocus,
 		onBlur: handleBlur,
-		onMouseDown: handlePointerDown,
-		onTouchStart: handlePointerDown,
 		// Selection updates must be done at these events as they
 		// happen before the `selectionchange` event. In some cases,
 		// the `selectionchange` event may not even fire, for
@@ -1087,9 +788,6 @@ function RichText(
 		contentEditable: disabled ? undefined : true,
 		suppressContentEditableWarning: ! disabled,
 	};
-
-	useBoundaryStyle( { ref, activeFormats } );
-	useInlineWarning( { ref } );
 
 	return (
 		<>

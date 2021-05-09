@@ -1,19 +1,23 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useLayoutEffect, useContext } from '@wordpress/element';
+import {
+	useRef,
+	useLayoutEffect,
+	useContext,
+	forwardRef,
+} from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import SlotFillContext from './slot-fill-context';
 
-export default function Slot( {
-	name,
-	fillProps = {},
-	as: Component = 'div',
-	...props
-} ) {
+function Slot(
+	{ name, fillProps = {}, as: Component = 'div', ...props },
+	forwardedRef
+) {
 	const registry = useContext( SlotFillContext );
 	const ref = useRef();
 
@@ -34,5 +38,9 @@ export default function Slot( {
 		registry.updateSlot( name, fillProps );
 	} );
 
-	return <Component ref={ ref } { ...props } />;
+	return (
+		<Component ref={ useMergeRefs( [ forwardedRef, ref ] ) } { ...props } />
+	);
 }
+
+export default forwardRef( Slot );

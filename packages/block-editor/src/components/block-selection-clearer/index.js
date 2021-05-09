@@ -10,22 +10,18 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 
 export function useBlockSelectionClearer( onlySelfClicks = false ) {
-	const hasSelection = useSelect( ( select ) => {
-		const { hasSelectedBlock, hasMultiSelection } = select(
-			blockEditorStore
-		);
-
-		return hasSelectedBlock() || hasMultiSelection();
-	} );
+	const { hasSelectedBlock, hasMultiSelection } = useSelect(
+		blockEditorStore
+	);
 	const { clearSelectedBlock } = useDispatch( blockEditorStore );
 
 	return useRefEffect(
 		( node ) => {
-			if ( ! hasSelection ) {
-				return;
-			}
-
 			function onMouseDown( event ) {
+				if ( ! hasSelectedBlock() && ! hasMultiSelection() ) {
+					return;
+				}
+
 				// Only handle clicks on the canvas, not the content.
 				if (
 					event.target.closest( '.wp-block' ) ||
@@ -43,7 +39,7 @@ export function useBlockSelectionClearer( onlySelfClicks = false ) {
 				node.removeEventListener( 'mousedown', onMouseDown );
 			};
 		},
-		[ hasSelection, clearSelectedBlock ]
+		[ hasSelectedBlock, hasMultiSelection, clearSelectedBlock ]
 	);
 }
 

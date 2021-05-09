@@ -9,12 +9,12 @@ import { useScrollable } from './hook';
  *
  * @example
  * ```jsx
- * import { Scrollable, View } from `@wordpress/components/ui`;
+ * import { Scrollable } from `@wordpress/components/ui`;
  
  * function Example() {
  * 	return (
  * 		<Scrollable style={ { maxHeight: 200 } }>
- * 			<View style={ { height: 500 } }>...</View>
+ * 			<div style={ { height: 500 } }>...</div>
  * 		</Scrollable>
  * 	);
  * }
