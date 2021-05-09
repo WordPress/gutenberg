@@ -14,6 +14,10 @@ export function useEnter( props ) {
 				return;
 			}
 
+			if ( element.hasAttribute( 'aria-autocomplete' ) ) {
+				return;
+			}
+
 			if ( event.keyCode !== ENTER ) {
 				return;
 			}
