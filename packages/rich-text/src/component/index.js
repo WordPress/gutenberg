@@ -381,10 +381,14 @@ function RichText(
 
 	const didMount = useRef( false );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( didMount.current ) {
 			applyFromProps();
+		} else {
+			applyFromProps( { domOnly: true } );
 		}
+
+		didMount.current = true;
 	}, [ TagName, placeholder, ...dependencies ] );
 
 	useEffect( () => {
@@ -412,11 +416,6 @@ function RichText(
 			};
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
-
-	useLayoutEffect( () => {
-		applyFromProps( { domOnly: true } );
-		didMount.current = true;
-	}, [] );
 
 	function focus() {
 		ref.current.focus();
