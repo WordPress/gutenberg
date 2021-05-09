@@ -6,6 +6,7 @@
 .block-editor-block-compare {
 	overflow: auto;
 	height: auto;
+	width: auto;
 
 	@include break-small() {
 		max-height: 70%;
@@ -23,6 +24,7 @@
 		width: 50%;
 		padding: 0 $grid-unit-20 0 0;
 		min-width: 200px;
+		max-width: 600px;
 
 		button {
 			float: right;
