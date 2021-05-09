@@ -4,24 +4,6 @@
 	}
 }
 
-.edit-post-manage-blocks-modal .components-modal__content {
-	padding-bottom: 0;
-	display: flex;
-	flex-direction: column;
-}
-
-.edit-post-manage-blocks-modal .components-modal__header {
-	flex-shrink: 0;
-	margin-bottom: 0;
-}
-
-.edit-post-manage-blocks-modal__content {
-	display: flex;
-	flex-direction: column;
-	flex: 0 1 100%;
-	min-height: 0;
-}
-
 .edit-post-manage-blocks-modal__no-results {
 	font-style: italic;
 	padding: 24px 0;
@@ -46,13 +28,14 @@
 }
 
 .edit-post-manage-blocks-modal__disabled-blocks-count {
-	border-top: 1px solid $gray-300;
-	margin-left: -$grid-unit-30;
-	margin-right: -$grid-unit-30;
+	border: 1px solid $gray-300;
+	border-width: 1px 0;
+	margin-left: -$grid-unit-40;
+	margin-right: -$grid-unit-40;
 	padding-top: 0.6rem;
 	padding-bottom: 0.6rem;
-	padding-left: $grid-unit-30;
-	padding-right: $grid-unit-30;
+	padding-left: $grid-unit-40;
+	padding-right: $grid-unit-40;
 	background-color: $gray-100;
 }
 
@@ -85,14 +68,14 @@
 	margin-top: 0;
 }
 
+.edit-post-manage-blocks-modal__category-title,
+.edit-post-manage-blocks-modal__checklist-item {
+	border-bottom: 1px solid $gray-300;
+}
+
 .edit-post-manage-blocks-modal__checklist-item {
 	margin-bottom: 0;
 	padding-left: $grid-unit-20;
-	border-top: 1px solid $gray-300;
-
-	&:last-child {
-		border-bottom: 1px solid $gray-300;
-	}
 
 	.components-base-control__field {
 		align-items: center;
@@ -119,11 +102,10 @@
 }
 
 .edit-post-manage-blocks-modal__results {
-	height: 100%;
-	overflow: auto;
-	margin-left: -$grid-unit-40;
-	margin-right: -$grid-unit-40;
-	padding-left: $grid-unit-40;
-	padding-right: $grid-unit-40;
 	border-top: $border-width solid $gray-300;
+}
+
+// Remove the top border from results when adjacent to the disabled block count
+.edit-post-manage-blocks-modal__disabled-blocks-count + .edit-post-manage-blocks-modal__results {
+	border-top-width: 0;
 }
