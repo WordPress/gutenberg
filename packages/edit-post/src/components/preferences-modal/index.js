@@ -145,38 +145,40 @@ export default function PreferencesModal() {
 				),
 			},
 			{
-				name: 'block-manager',
-				tabLabel: __( 'Block Manager' ),
-				content: (
-					<Section
-						title={ __( 'Show/Hide blocks from the inserter.' ) }
-					>
-						<BlockManager />
-					</Section>
-				),
-			},
-			{
 				name: 'blocks',
 				tabLabel: __( 'Blocks' ),
 				content: (
-					<Section
-						title={ __( 'Choose how you interact with blocks' ) }
-					>
-						<EnableFeature
-							featureName="mostUsedBlocks"
-							help={ __(
-								'Places the most frequent blocks in the block library.'
+					<>
+						<Section
+							title={ __(
+								'Choose how you interact with blocks'
 							) }
-							label={ __( 'Show most used blocks' ) }
-						/>
-						<EnableFeature
-							featureName="keepCaretInsideBlock"
-							help={ __(
-								'Aids screen readers by stopping text caret from leaving blocks.'
+						>
+							<EnableFeature
+								featureName="mostUsedBlocks"
+								help={ __(
+									'Places the most frequent blocks in the block library.'
+								) }
+								label={ __( 'Show most used blocks' ) }
+							/>
+							<EnableFeature
+								featureName="keepCaretInsideBlock"
+								help={ __(
+									'Aids screen readers by stopping text caret from leaving blocks.'
+								) }
+								label={ __(
+									'Contain text cursor inside block'
+								) }
+							/>
+						</Section>
+						<Section
+							title={ __(
+								'Show/Hide blocks from the inserter.'
 							) }
-							label={ __( 'Contain text cursor inside block' ) }
-						/>
-					</Section>
+						>
+							<BlockManager />
+						</Section>
+					</>
 				),
 			},
 			{
