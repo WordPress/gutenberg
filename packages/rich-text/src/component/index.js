@@ -221,7 +221,7 @@ function RichText(
 			event.preventDefault();
 			if ( onEnter ) {
 				onEnter( {
-					value: removeEditorOnlyFormats( createRecord() ),
+					value: removeEditorOnlyFormats( record.current ),
 					onChange: handleChange,
 					shiftKey: event.shiftKey,
 				} );
