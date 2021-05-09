@@ -81,7 +81,7 @@
 		}
 	}
 
-	&__section {
+	&__section:not(:last-child) {
 		margin: 0 0 2.5rem 0;
 	}
 
