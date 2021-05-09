@@ -22,8 +22,6 @@ import { toHTMLString } from '../to-html-string';
 import { remove } from '../remove';
 import { removeFormat } from '../remove-format';
 import { isCollapsed } from '../is-collapsed';
-import { getActiveFormats } from '../get-active-formats';
-import { updateFormats } from '../update-formats';
 import { removeLineSeparator } from '../remove-line-separator';
 import { isEmptyLine } from '../is-empty';
 import { useFormatTypes } from './use-format-types';
@@ -36,25 +34,9 @@ import { useSelectObject } from './use-select-object';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { usePasteHandler } from './use-paste-handler';
 import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
+import { useInputAndSelection } from './use-input-and-selection';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
-
-/**
- * All inserting input types that would insert HTML into the DOM.
- *
- * @see https://www.w3.org/TR/input-events-2/#interface-InputEvent-Attributes
- *
- * @type {Set}
- */
-const INSERTION_INPUT_TYPES_TO_IGNORE = new Set( [
-	'insertParagraph',
-	'insertOrderedList',
-	'insertUnorderedList',
-	'insertHorizontalRule',
-	'insertLink',
-] );
-
-const EMPTY_ACTIVE_FORMATS = [];
 
 function createPrepareEditableTree( fns ) {
 	return ( value ) =>
@@ -62,33 +44,6 @@ function createPrepareEditableTree( fns ) {
 			( accumulator, fn ) => fn( accumulator, value.text ),
 			value.formats
 		);
-}
-
-/**
- * If the selection is set on the placeholder element, collapse the selection to
- * the start (before the placeholder).
- *
- * @param {Window} defaultView
- */
-function fixPlaceholderSelection( defaultView ) {
-	const selection = defaultView.getSelection();
-	const { anchorNode, anchorOffset } = selection;
-
-	if ( anchorNode.nodeType !== anchorNode.ELEMENT_NODE ) {
-		return;
-	}
-
-	const targetNode = anchorNode.childNodes[ anchorOffset ];
-
-	if (
-		! targetNode ||
-		targetNode.nodeType !== targetNode.ELEMENT_NODE ||
-		! targetNode.getAttribute( 'data-rich-text-placeholder' )
-	) {
-		return;
-	}
-
-	selection.collapseToStart();
 }
 
 function RichText(
@@ -385,194 +340,7 @@ function RichText(
 		lastHistoryValue.current = _value.current;
 	}
 
-	const isComposing = useRef( false );
-	const timeout = useRef();
-
-	/**
-	 * Handle input on the next selection change event.
-	 *
-	 * @param {WPSyntheticEvent} event Synthetic input event.
-	 */
-	function handleInput( event ) {
-		// Do not trigger a change if characters are being composed. Browsers
-		// will usually emit a final `input` event when the characters are
-		// composed.
-		// As of December 2019, Safari doesn't support nativeEvent.isComposing.
-		if ( isComposing.current ) {
-			return;
-		}
-
-		let inputType;
-
-		if ( event ) {
-			inputType = event.inputType;
-		}
-
-		if ( ! inputType && event && event.nativeEvent ) {
-			inputType = event.nativeEvent.inputType;
-		}
-
-		// The browser formatted something or tried to insert HTML.
-		// Overwrite it. It will be handled later by the format library if
-		// needed.
-		if (
-			inputType &&
-			( inputType.indexOf( 'format' ) === 0 ||
-				INSERTION_INPUT_TYPES_TO_IGNORE.has( inputType ) )
-		) {
-			applyRecord( record.current );
-			return;
-		}
-
-		const currentValue = createRecord();
-		const { start, activeFormats: oldActiveFormats = [] } = record.current;
-
-		// Update the formats between the last and new caret position.
-		const change = updateFormats( {
-			value: currentValue,
-			start,
-			end: currentValue.start,
-			formats: oldActiveFormats,
-		} );
-
-		handleChange( change, { withoutHistory: true } );
-
-		// Create an undo level when input stops for over a second.
-		getWin().clearTimeout( timeout.current );
-		timeout.current = getWin().setTimeout( createUndoLevel, 1000 );
-
-		// Only run input rules when inserting text.
-		if ( inputType !== 'insertText' ) {
-			return;
-		}
-
-		if ( allowPrefixTransformations && inputRule ) {
-			inputRule( change, valueToFormat );
-		}
-
-		const transformed = formatTypes.reduce(
-			( accumlator, { __unstableInputRule } ) => {
-				if ( __unstableInputRule ) {
-					accumlator = __unstableInputRule( accumlator );
-				}
-
-				return accumlator;
-			},
-			change
-		);
-
-		if ( transformed !== change ) {
-			createUndoLevel();
-			handleChange( { ...transformed, activeFormats: oldActiveFormats } );
-			markAutomaticChange();
-		}
-	}
-
-	function handleCompositionStart() {
-		isComposing.current = true;
-		// Do not update the selection when characters are being composed as
-		// this rerenders the component and might distroy internal browser
-		// editing state.
-		getDoc().removeEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
-	}
-
-	function handleCompositionEnd() {
-		isComposing.current = false;
-		// Ensure the value is up-to-date for browsers that don't emit a final
-		// input event after composition.
-		handleInput( { inputType: 'insertText' } );
-		// Tracking selection changes can be resumed.
-		getDoc().addEventListener( 'selectionchange', handleSelectionChange );
-	}
-
 	const didMount = useRef( false );
-
-	/**
-	 * Syncs the selection to local state. A callback for the `selectionchange`
-	 * native events, `keyup`, `mouseup` and `touchend` synthetic events, and
-	 * animation frames after the `focus` event.
-	 *
-	 * @param {Event|WPSyntheticEvent|DOMHighResTimeStamp} event
-	 */
-	function handleSelectionChange( event ) {
-		if ( ! ref.current ) {
-			return;
-		}
-
-		if ( ref.current.ownerDocument.activeElement !== ref.current ) {
-			return;
-		}
-
-		if ( event.type !== 'selectionchange' && ! isSelected ) {
-			return;
-		}
-
-		if ( disabled ) {
-			return;
-		}
-
-		// In case of a keyboard event, ignore selection changes during
-		// composition.
-		if ( isComposing.current ) {
-			return;
-		}
-
-		const { start, end, text } = createRecord();
-		const oldRecord = record.current;
-
-		// Fallback mechanism for IE11, which doesn't support the input event.
-		// Any input results in a selection change.
-		if ( text !== oldRecord.text ) {
-			handleInput();
-			return;
-		}
-
-		if ( start === oldRecord.start && end === oldRecord.end ) {
-			// Sometimes the browser may set the selection on the placeholder
-			// element, in which case the caret is not visible. We need to set
-			// the caret before the placeholder if that's the case.
-			if ( oldRecord.text.length === 0 && start === 0 ) {
-				fixPlaceholderSelection( getWin() );
-			}
-
-			return;
-		}
-
-		const newValue = {
-			...oldRecord,
-			start,
-			end,
-			// _newActiveFormats may be set on arrow key navigation to control
-			// the right boundary position. If undefined, getActiveFormats will
-			// give the active formats according to the browser.
-			activeFormats: oldRecord._newActiveFormats,
-			_newActiveFormats: undefined,
-		};
-
-		const newActiveFormats = getActiveFormats(
-			newValue,
-			EMPTY_ACTIVE_FORMATS
-		);
-
-		// Update the value with the new active formats.
-		newValue.activeFormats = newActiveFormats;
-
-		if ( ! isCaretWithinFormattedText && newActiveFormats.length ) {
-			onEnterFormattedText();
-		} else if ( isCaretWithinFormattedText && ! newActiveFormats.length ) {
-			onExitFormattedText();
-		}
-
-		// It is important that the internal value is updated first,
-		// otherwise the value will be wrong on render!
-		record.current = newValue;
-		applyRecord( newValue, { domOnly: true } );
-		onSelectionChange( start, end );
-		setActiveFormats( newActiveFormats );
-	}
 
 	/**
 	 * Sync the value to global state. The node tree and selection will also be
@@ -593,10 +361,6 @@ function RichText(
 
 		const { start, end, activeFormats: newActiveFormats = [] } = newRecord;
 
-		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
-			changeHandler( newRecord.formats, newRecord.text );
-		} );
-
 		_value.current = valueToFormat( newRecord );
 		record.current = newRecord;
 
@@ -606,70 +370,13 @@ function RichText(
 		onChange( _value.current );
 		setActiveFormats( newActiveFormats );
 
+		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
+			changeHandler( newRecord.formats, newRecord.text );
+		} );
+
 		if ( ! withoutHistory ) {
 			createUndoLevel();
 		}
-	}
-
-	const rafId = useRef();
-
-	/**
-	 * Handles a focus event on the contenteditable field, calling the
-	 * `unstableOnFocus` prop callback if one is defined. The callback does not
-	 * receive any arguments.
-	 *
-	 * This is marked as a private API and the `unstableOnFocus` prop is not
-	 * documented, as the current requirements where it is used are subject to
-	 * future refactoring following `isSelected` handling.
-	 *
-	 * @private
-	 */
-	function handleFocus() {
-		if ( onFocus ) {
-			onFocus();
-		}
-
-		if ( ! isSelected ) {
-			// We know for certain that on focus, the old selection is invalid.
-			// It will be recalculated on the next mouseup, keyup, or touchend
-			// event.
-			const index = undefined;
-
-			record.current = {
-				...record.current,
-				start: index,
-				end: index,
-				activeFormats: EMPTY_ACTIVE_FORMATS,
-			};
-			onSelectionChange( index, index );
-			setActiveFormats( EMPTY_ACTIVE_FORMATS );
-		} else {
-			onSelectionChange( record.current.start, record.current.end );
-			setActiveFormats(
-				getActiveFormats(
-					{
-						...record.current,
-						activeFormats: undefined,
-					},
-					EMPTY_ACTIVE_FORMATS
-				)
-			);
-		}
-
-		// Update selection as soon as possible, which is at the next animation
-		// frame. The event listener for selection changes may be added too late
-		// at this point, but this focus event is still too early to calculate
-		// the selection.
-		rafId.current = getWin().requestAnimationFrame( handleSelectionChange );
-
-		getDoc().addEventListener( 'selectionchange', handleSelectionChange );
-	}
-
-	function handleBlur() {
-		getDoc().removeEventListener(
-			'selectionchange',
-			handleSelectionChange
-		);
 	}
 
 	function applyFromProps() {
@@ -720,17 +427,7 @@ function RichText(
 
 	useLayoutEffect( () => {
 		applyRecord( record.current, { domOnly: true } );
-
 		didMount.current = true;
-
-		return () => {
-			getDoc().removeEventListener(
-				'selectionchange',
-				handleSelectionChange
-			);
-			getWin().cancelAnimationFrame( rafId.current );
-			getWin().clearTimeout( timeout.current );
-		};
 	}, [] );
 
 	function focus() {
@@ -769,21 +466,29 @@ function RichText(
 				removeEditorOnlyFormats,
 				activeFormats,
 			} ),
+			useInputAndSelection( {
+				record,
+				applyRecord,
+				createRecord,
+				handleChange,
+				createUndoLevel,
+				allowPrefixTransformations,
+				inputRule,
+				valueToFormat,
+				formatTypes,
+				markAutomaticChange,
+				isSelected,
+				disabled,
+				isCaretWithinFormattedText,
+				onEnterFormattedText,
+				onExitFormattedText,
+				onSelectionChange,
+				setActiveFormats,
+			} ),
 		] ),
 		className: 'rich-text',
-		onInput: handleInput,
-		onCompositionStart: handleCompositionStart,
-		onCompositionEnd: handleCompositionEnd,
 		onKeyDown: handleKeyDown,
-		onFocus: handleFocus,
-		onBlur: handleBlur,
-		// Selection updates must be done at these events as they
-		// happen before the `selectionchange` event. In some cases,
-		// the `selectionchange` event may not even fire, for
-		// example when the window receives focus again on click.
-		onKeyUp: handleSelectionChange,
-		onMouseUp: handleSelectionChange,
-		onTouchEnd: handleSelectionChange,
+		onFocus,
 		// Do not set the attribute if disabled.
 		contentEditable: disabled ? undefined : true,
 		suppressContentEditableWarning: ! disabled,
