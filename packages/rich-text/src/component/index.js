@@ -313,8 +313,18 @@ function RichText(
 
 	// Internal values are updated synchronously, unlike props and state.
 	const _value = useRef( value );
-	const record = useRef( {} );
+	const record = useRef();
 	const lastHistoryValue = useRef( value );
+
+	function setRecordFromProps() {
+		record.current = formatToValue( value );
+		record.current.start = selectionStart;
+		record.current.end = selectionEnd;
+	}
+
+	if ( ! record.current ) {
+		setRecordFromProps();
+	}
 
 	function createUndoLevel() {
 		// If the content is the same, no level needs to be created.
@@ -363,11 +373,9 @@ function RichText(
 		}
 	}
 
-	function applyFromProps( { domOnly } ) {
+	function applyFromProps( { domOnly } = {} ) {
 		_value.current = value;
-		record.current = formatToValue( value );
-		record.current.start = selectionStart;
-		record.current.end = selectionEnd;
+		setRecordFromProps();
 		applyRecord( record.current, { domOnly } );
 	}
 
