@@ -86,6 +86,9 @@
 		}
 	}
 
+	// Match the parent selector button.
+	margin-left: -$border-width;
+
 	// Compensate for width of block switcher.
 	.block-editor-block-mover {
 		margin-left: -$grid-unit-15 / 2;
