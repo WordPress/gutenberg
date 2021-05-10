@@ -12,7 +12,7 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import items from './fixtures';
-import BlocksTypesTab from '../blocks-types-tab';
+import BlockTypesTab from '../block-types-tab';
 import BlocksTypesList from '../../block-types-list';
 
 jest.mock( '../../block-types-list' );
@@ -26,7 +26,7 @@ const selectMock = {
 	getClipboard: jest.fn(),
 };
 
-describe( 'BlocksTypesTab component', () => {
+describe( 'BlockTypesTab component', () => {
 	beforeEach( () => {
 		useSelect.mockImplementation( ( callback ) =>
 			callback( () => selectMock )
@@ -35,7 +35,7 @@ describe( 'BlocksTypesTab component', () => {
 
 	it( 'renders without crashing', () => {
 		const component = shallow(
-			<BlocksTypesTab
+			<BlockTypesTab
 				rootClientId={ 0 }
 				onSelect={ jest.fn() }
 				listProps={ {} }
@@ -51,7 +51,7 @@ describe( 'BlocksTypesTab component', () => {
 			( { category } ) => category !== 'reusable'
 		);
 		const component = shallow(
-			<BlocksTypesTab
+			<BlockTypesTab
 				rootClientId={ 0 }
 				onSelect={ jest.fn() }
 				listProps={ {} }

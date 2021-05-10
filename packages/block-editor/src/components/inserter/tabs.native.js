@@ -19,7 +19,7 @@ import { SegmentedControl } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import BlocksTypesTab from './blocks-types-tab';
+import BlockTypesTab from './block-types-tab';
 import ReusableBlocksTab from './reusable-blocks-tab';
 import styles from './style.scss';
 
@@ -148,7 +148,7 @@ function TabsControl( { onChangeTab, showReusableBlocks } ) {
 InserterTabs.Control = TabsControl;
 
 InserterTabs.TABS = [
-	{ name: 'blocks', title: __( 'Blocks' ), component: BlocksTypesTab },
+	{ name: 'blocks', title: __( 'Blocks' ), component: BlockTypesTab },
 	{ name: 'reusable', title: __( 'Reusable' ), component: ReusableBlocksTab },
 ];
 
