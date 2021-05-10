@@ -20,10 +20,10 @@ export default function safeHTML( html ) {
 		if ( element.tagName === 'SCRIPT' ) {
 			remove( element );
 		} else {
-			const length = element.attributes.length;
+			let index = element.attributes.length;
 
-			for ( let i = 0; i < length; i++ ) {
-				const { name: key } = element.attributes[ i ];
+			while ( index-- ) {
+				const { name: key } = element.attributes[ index ];
 
 				if ( key.startsWith( 'on' ) ) {
 					element.removeAttribute( key );

@@ -52,7 +52,7 @@ describe( 'invalid blocks', () => {
 		);
 	} );
 
-	it( 'should not alert', async () => {
+	it( 'should not alert from on* attribute', async () => {
 		let hasAlert = false;
 
 		page.on( 'dialog', () => {
@@ -64,6 +64,29 @@ describe( 'invalid blocks', () => {
 			<!-- wp:paragraph -->
 			<p>aaaa <img src onerror=alert(1)></x dde></x>1
 			<!-- /wp:paragraph -->
+			`
+		);
+
+		// Give the browser time to show the alert.
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		expect( console ).toHaveWarned();
+		expect( console ).toHaveErrored();
+		expect( hasAlert ).toBe( false );
+	} );
+
+	it( 'should not alert from script tag', async () => {
+		let hasAlert = false;
+
+		page.on( 'dialog', () => {
+			hasAlert = true;
+		} );
+
+		await setPostContent(
+			`
+			<!-- wp:shortcode -->
+			<animate onbegin=alert(1) attributeName=x dur=1s><script>alert("EVIL");</script><style>@keyframes x{}</style><a style="animation-name:x" onanimationstart="alert(2)"></a>
+			<!-- /wp:shortcode -->
 			`
 		);
 
