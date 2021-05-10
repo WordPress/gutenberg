@@ -54,6 +54,7 @@ import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
 import { useNativeProps } from './use-native-props';
 import { store as blockEditorStore } from '../../store';
+import { useUndoAutomaticChange } from './use-undo-automatic-change';
 
 const wrapperClasses = 'block-editor-rich-text';
 const classes = 'block-editor-rich-text__editable';
@@ -241,6 +242,11 @@ function Element( {
 		}
 	}
 
+	const mergedRefs = useMergeRefs( [
+		useUndoAutomaticChange(),
+		richTextRef,
+	] );
+
 	return (
 		<TagName
 			// Overridable props.
@@ -248,7 +254,7 @@ function Element( {
 			aria-multiline={ true }
 			aria-label={ placeholder }
 			{ ...props }
-			ref={ richTextRef }
+			ref={ mergedRefs }
 			// Do not set the attribute if disabled.
 			contentEditable={ disabled ? undefined : true }
 			suppressContentEditableWarning={ ! disabled }
@@ -327,16 +333,12 @@ function RichTextWrapper(
 		const {
 			getSelectionStart,
 			getSelectionEnd,
-			getSettings,
-			didAutomaticChange,
 			__unstableGetBlockWithoutInnerBlocks,
 			isMultiSelecting,
 			hasMultiSelection,
 		} = select( blockEditorStore );
-
 		const selectionStart = getSelectionStart();
 		const selectionEnd = getSelectionEnd();
-		const { __experimentalUndo: undo } = getSettings();
 
 		let isSelected;
 
@@ -366,9 +368,7 @@ function RichTextWrapper(
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
-			didAutomaticChange: didAutomaticChange(),
 			disabled: isMultiSelecting() || hasMultiSelection(),
-			undo,
 			...extraProps,
 		};
 	};
@@ -379,9 +379,7 @@ function RichTextWrapper(
 		selectionStart,
 		selectionEnd,
 		isSelected,
-		didAutomaticChange,
 		disabled,
-		undo,
 		shouldBlurOnUnmount,
 	} = useSelect( selector );
 	const {
@@ -679,8 +677,6 @@ function RichTextWrapper(
 			__unstableMultilineTag={ multilineTag }
 			__unstableOnCreateUndoLevel={ __unstableMarkLastChangeAsPersistent }
 			__unstableMarkAutomaticChange={ __unstableMarkAutomaticChange }
-			__unstableDidAutomaticChange={ didAutomaticChange }
-			__unstableUndo={ undo }
 			__unstableDisableFormats={ disableFormats }
 			preserveWhiteSpace={ preserveWhiteSpace }
 			unstableOnFocus={ unstableOnFocus }
