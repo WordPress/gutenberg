@@ -20,6 +20,8 @@ import { cloneElement, useState, useRef, useEffect } from '@wordpress/element';
 import { createSlotFill } from '../slot-fill';
 import styles from './style.scss';
 
+const RIGHT_ALIGN_ARROW_OFFSET = 16;
+
 const { Fill, Slot } = createSlotFill( 'Tooltip' );
 
 const Tooltip = ( {
@@ -33,6 +35,12 @@ const Tooltip = ( {
 	const [ , horizontalPosition = 'center' ] = position.split( ' ' );
 	const [ visible, setVisible ] = useState( initialVisible );
 	const [ referenceLayout, setReferenceLayout ] = useState( {
+		height: 0,
+		width: 0,
+		x: 0,
+		y: 0,
+	} );
+	const [ tooltipLayout, setTooltipLayout ] = useState( {
 		height: 0,
 		width: 0,
 		x: 0,
@@ -53,20 +61,24 @@ const Tooltip = ( {
 		} ).start();
 	};
 
+	const positionStyles = {
+		left:
+			referenceLayout.x +
+			Math.floor( referenceLayout.width / 2 ) -
+			( horizontalPosition === 'right'
+				? RIGHT_ALIGN_ARROW_OFFSET
+				: Math.floor( tooltipLayout.width / 2 ) ),
+		top: referenceLayout.y - tooltipLayout.height - 10,
+		position: 'absolute',
+	};
 	const tooltipStyles = [
 		styles.tooltip,
 		{
 			elevation: 2,
-			left: referenceLayout.x,
 			shadowColor: styles.tooltip__shadow?.color,
 			shadowOffset: { height: 2, width: 0 },
 			shadowOpacity: 0.25,
 			shadowRadius: 2,
-			top: referenceLayout.y,
-			transform: [
-				{ translateX: horizontalPosition === 'center' ? '-50%' : 0 },
-				{ translateY: '-100%' },
-			],
 		},
 		horizontalPosition === 'right' && styles[ 'tooltip--rightAlign' ],
 	];
@@ -86,37 +98,56 @@ const Tooltip = ( {
 		horizontalPosition === 'right' &&
 			styles[ 'tooltip__arrow--rightAlign' ],
 	];
+	let to;
 
 	const getReferenceElementPosition = () => {
-		referenceElementRef.current.measure(
-			( x, y, width, height, pageX, pageY ) => {
-				setReferenceLayout( { width, height, x: pageX, y: pageY } );
-			}
-		);
+		clearTimeout( to );
+		// Timeout used allow render to occur before calculating layout
+		to = setTimeout( () => {
+			referenceElementRef.current.measure(
+				( _x, _y, width, height, pageX, pageY ) => {
+					setReferenceLayout( {
+						...referenceLayout,
+						width,
+						height,
+						x: pageX,
+						y: pageY,
+					} );
+				}
+			);
+		}, 0 );
 	};
+
+	const getTooltipLayout = ( { nativeEvent } ) =>
+		setTooltipLayout( nativeEvent.layout );
 
 	return (
 		<>
+			{ cloneElement( children, {
+				ref: referenceElementRef,
+				onLayout: getReferenceElementPosition,
+			} ) }
 			{ visible && (
 				<Fill>
 					<TouchableWithoutFeedback
 						onPress={ () => setVisible( false ) }
 					>
-						<Animated.View style={ animationStyles }>
+						{ /* <Animated.View style={ animationStyles }> */ }
+						<View
+							onLayout={ getTooltipLayout }
+							style={ positionStyles }
+						>
 							<View style={ tooltipStyles }>
 								<Text style={ styles.tooltip__text }>
 									{ text }
 								</Text>
 								<View style={ arrowStyles } />
 							</View>
-						</Animated.View>
+						</View>
+						{ /* </Animated.View> */ }
 					</TouchableWithoutFeedback>
 				</Fill>
 			) }
-			{ cloneElement( children, {
-				ref: referenceElementRef,
-				onLayout: getReferenceElementPosition,
-			} ) }
 		</>
 	);
 };

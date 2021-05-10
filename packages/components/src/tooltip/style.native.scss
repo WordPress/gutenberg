@@ -2,15 +2,14 @@ $tooltipColor: #121212;
 $tooltipArrowSize: 6px;
 $tooltipArrowOffset: -( $tooltipArrowSize - 1 );
 
+// .container {
+// 	position: absolute;
+// 	z-index: 1;
+// }
+
 .tooltip {
 	background-color: $tooltipColor;
 	border-radius: 4px;
-	position: absolute;
-	z-index: 1;
-}
-
-.tooltip--rightAlign {
-	left: 0;
 }
 
 .tooltip__shadow {

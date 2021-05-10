@@ -94,7 +94,10 @@ function HeaderToolbar( {
 					text={ __( 'Tap to add content' ) }
 					visible={ true }
 				>
-					<Inserter disabled={ ! showInserter } />
+					{ /* TODO(David): Wrapper View added as quick way to avoid the need to forward refs */ }
+					<View style={ { alignItems: 'center' } }>
+						<Inserter disabled={ ! showInserter } />
+					</View>
 				</Tooltip>
 				{ renderHistoryButtons() }
 				<BlockToolbar />
