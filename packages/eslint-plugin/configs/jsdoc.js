@@ -106,6 +106,14 @@ module.exports = {
 		'jsdoc/require-returns': 'off',
 		'jsdoc/check-access': 'error',
 		'jsdoc/check-alignment': 'error',
+		'jsdoc/check-line-alignment': [
+			'warn',
+			'always',
+			{
+				tags: [ 'param', 'arg', 'argument', 'property', 'prop' ],
+				preserveMainDescriptionPostDelimiter: true,
+			},
+		],
 		'jsdoc/check-param-names': 'error',
 		'jsdoc/check-property-names': 'error',
 		'jsdoc/check-tag-names': 'error',
