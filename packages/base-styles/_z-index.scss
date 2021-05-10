@@ -72,6 +72,9 @@ $z-layers: (
 	// The toolbar, when contextual, should be above any adjacent nested block click overlays.
 	".block-editor-block-contextual-toolbar": 61,
 
+	// Ensures content overlay appears higher than resize containers used for image/video/etc.
+	".block-editor-block-content-overlay__overlay": 10,
+
 	// The block mover, particularly in nested contexts,
 	// should overlap most block content.
 	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 61,

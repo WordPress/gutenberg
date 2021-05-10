@@ -17,6 +17,7 @@
 		background: transparent;
 		border: none;
 		border-radius: $radius-block-ui;
+		z-index: z-index(".block-editor-block-content-overlay__overlay");
 	}
 
 	&:hover:not(.is-dragging-blocks),
