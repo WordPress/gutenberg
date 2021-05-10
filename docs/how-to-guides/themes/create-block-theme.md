@@ -210,7 +210,7 @@ and copy the block markup from the code editor mode to your theme files.
 
 ### Template creation in the site editor
 
-Open the Site Editor from the WordPress admin menu. The default view is the blank index.html template.
+Open the Site Editor from the WordPress admin menu. The default view is the blank index template.
 
 Open the Add block menu and select and place a new template part. The block will have the default name "Untitled Template Part".
 
@@ -237,16 +237,16 @@ are saved to the database as custom post types. To export them as theme files, f
 
 - In the site editor, open the "More tools and options" menu.
 - Select the Export option to download a zip file containing the files. Unzip the files.
-- Copy the updated index.html file from theme/block-templates/ to your themes block-templates folder.
-- Copy template part one and two from theme/block-template-parts/ to your themes block-template-parts folder.
-- Rename the template parts to header.html and footer.html, respectively.
-- Open index.html and update the template part slugs in the block markup.
+- Copy the updated `index.html` file from `theme/block-templates/` to your themes `block-templates` folder.
+- Copy template part one and two from `theme/block-template-parts/` to your themes `block-template-part` folder.
+- Rename the template parts to `header.html` and `footer.html`, respectively.
+- Open `index.html` and update the template part slugs in the block markup.
 
 Saved templates have precedence over theme files. To use the updated theme files, go to Appearance > Templates/Template parts and delete the saved templates.
 
-#### Additional templates
+### Additional templates
 
-##### Blog
+#### Blog
 
 Now the theme has a basic site header and footer, but it does not display any content.
 To create a blog, a list of the latest posts, you will use the query and query loop blocks.
@@ -266,11 +266,14 @@ You can read more about the layout setting later in this tutorial.
 ```
 
 Change the `<div>` in the group block to a `<main>` element using the `tagName` attribute.
+
+```html
 <!-- wp:template-part {"slug":"header","tagName":"header"} /-->
 <!-- wp:group {"layout":{"inherit":true},"tagName":"main"} -->
 <main class="wp-block-group"></main>
 <!-- /wp:group -->
 <!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
+```
 
 In the editor, you can change the element from div to main under Advanced in the block setting sidebar.
 
@@ -311,7 +314,7 @@ It needs to be placed inside the query, but outside the loop:
 <!-- /wp:query -->
 ```
 
-##### Posts and pages
+#### Posts and pages
 
 Next, create a new template for displaying single posts.
 If you are editing theme files directly, create a file called `single.html` inside the block-templates folder.
@@ -348,10 +351,10 @@ Add your preferred blocks inside the group block. Some new blocks that are avail
 Save the HTML file, or save and export the post template if you are working in the site editor.
 
 Copy all the blocks and create a template for displaying pages.
-Optionally you can copy the single.html file as page.html inside the block-templates folder.
+Optionally you can copy the `single.html` file as `page.html` inside the block-templates folder.
 Adjust the blocks for the page template, and save.
 
-##### Archives
+#### Archives
 
 If a theme does not use an archive or search result template, the index template will be used as a fallback.
 To make sure that the query block shows the correct results, it has an attribute called `inherit`.
@@ -438,6 +441,7 @@ To enable border styles, add a `border` object under `settings` with the followi
 			"customWidth": true
 		}
 	}
+}
 ```
 
 To enable link colors, add a `color` setting and set `link` to true:
@@ -456,9 +460,10 @@ To enable link colors, add a `color` setting and set `link` to true:
 			"link": true,
 		}
 	}
+}
 ```
 
-If you wanted to disable gradients, which are enabled by default, you would set `gradient` to false:
+If you want to disable gradients, which are enabled by default, you would set `gradient` to false:
 
 ```json
 {
@@ -475,6 +480,7 @@ If you wanted to disable gradients, which are enabled by default, you would set 
 			"gradient": false
 		}
 	}
+}
 ```
 
 To enable padding and custom spacing units, include a setting for spacing:
@@ -498,6 +504,7 @@ To enable padding and custom spacing units, include a setting for spacing:
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		}
 	}
+}
 ```
 
 ### Content width and theme support for wide and full-width blocks
@@ -654,7 +661,7 @@ Under `styles`, create a new section called `blocks`:
 }
 ```
 
-Add the names of the block that you want to set defaults for:
+Add the names of the blocks that you want to set defaults for:
 
 ```json
 "blocks": {
@@ -685,7 +692,7 @@ Add the typography setting, and set the fontSize value to the preset that you cr
 		"typography": {
 			"fontSize": "var(--wp--preset--font-size--large)"
 		}
-	},
+	}
 }
 ```
 
@@ -697,34 +704,34 @@ With the `elements` setting, you can set defaults for HTML elements in two diffe
 Example: Setting a font color to all `<H2>` headings, regardless of if the heading is a site title, post title, or heading block.
 
 ```json
-	"styles": {
-		"elements": {
-			"h2": {
-				"color": {
-					"text": "var(--wp--preset--color--medium-blue)"
-				}
+"styles": {
+	"elements": {
+		"h2": {
+			"color": {
+				"text": "var(--wp--preset--color--medium-blue)"
 			}
 		}
 	}
+}
 ```
 
 Add a default link text color:
 
 ```json
-	"styles": {
-		"elements": {
-			"h2": {
-				"color": {
-					"text": "var(--wp--preset--color--medium-blue)"
-				}
-			},
-			"link": {
-				"color": {
-					"text": "var(--wp--preset--color--dark-grey)"
-				}
+"styles": {
+	"elements": {
+		"h2": {
+			"color": {
+				"text": "var(--wp--preset--color--medium-blue)"
+			}
+		},
+		"link": {
+			"color": {
+				"text": "var(--wp--preset--color--dark-grey)"
 			}
 		}
 	}
+}
 ```
 
 - Elements inside blocks
@@ -733,7 +740,7 @@ Example: If you set a background color to a post excerpt block, that background 
 You can set a background to the optional "read more" link in the post excerpt block using elements:
 `Styles > blocks > the name of the block > elements > element > attribute`
 
-Since we have enabled custom padding, we can add padding within the spacing attribute to make the background color more visible.
+Since the theme has custom padding enabled, you can add padding within the spacing attribute to make the background color more visible:
 
 ```JSON
 "styles": {
@@ -788,7 +795,7 @@ The benefit of enabling the layout setting in theme.json is that you no longer n
 
 The first thing you need to know is that blocks have different options available depending on if you are using the block editor or the site editor.
 When you are working in the block editor, your blocks are already placed inside a container.
-In the site editor, you can choose to use a container like a group or template part block.
+In the site editor, you can choose to add a container like a group or template part block.
 
 If you place an image block in the canvas of the site editor, it will not have any alignment or width options,
 and it will be positioned to the left.
