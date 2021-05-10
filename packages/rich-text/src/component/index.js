@@ -67,9 +67,6 @@ function RichText(
 		__unstableMarkAutomaticChange: markAutomaticChange,
 		__unstableAllowPrefixTransformations: allowPrefixTransformations,
 		__unstableUndo: undo,
-		__unstableIsCaretWithinFormattedText: isCaretWithinFormattedText,
-		__unstableOnEnterFormattedText: onEnterFormattedText,
-		__unstableOnExitFormattedText: onExitFormattedText,
 		__unstableOnCreateUndoLevel: onCreateUndoLevel,
 		__unstableIsSelected: isSelected,
 	},
@@ -368,9 +365,6 @@ function RichText(
 				markAutomaticChange,
 				isSelected,
 				disabled,
-				isCaretWithinFormattedText,
-				onEnterFormattedText,
-				onExitFormattedText,
 				onSelectionChange,
 				setActiveFormats,
 			} ),
@@ -401,7 +395,7 @@ function RichText(
 					onFocus: focus,
 					editableProps,
 					editableTagName: TagName,
-					activeFormats,
+					hasActiveFormats: activeFormats.length,
 					removeEditorOnlyFormats,
 				} ) }
 			{ ! children && <TagName { ...editableProps } /> }
