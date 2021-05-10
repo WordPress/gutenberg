@@ -96,6 +96,7 @@ describe( 'Font Size Picker', () => {
 
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
+		await page.keyboard.press( 'Tab' );
 
 		await page.keyboard.press( 'Enter' );
 

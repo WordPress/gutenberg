@@ -32,7 +32,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { isInSameBlock, getBlockClientId } from '../../utils/dom';
+import { isInSameBlock } from '../../utils/dom';
 import useMultiSelection from './use-multi-selection';
 import { store as blockEditorStore } from '../../store';
 
@@ -155,7 +155,6 @@ export default function WritingFlow( { children } ) {
 	const container = useRef();
 	const focusCaptureBeforeRef = useRef();
 	const focusCaptureAfterRef = useRef();
-	const multiSelectionContainer = useRef();
 
 	const entirelySelected = useRef();
 
@@ -188,43 +187,14 @@ export default function WritingFlow( { children } ) {
 		getFirstMultiSelectedBlockClientId,
 		getLastMultiSelectedBlockClientId,
 		getBlockOrder,
-		isSelectionEnabled,
-		getBlockSelectionStart,
 		getSettings,
 	} = useSelect( blockEditorStore );
 	const { multiSelect, selectBlock, setNavigationMode } = useDispatch(
 		blockEditorStore
 	);
 
-	function onMouseDown( event ) {
+	function onMouseDown() {
 		verticalRect.current = null;
-
-		// Multi-select blocks when Shift+clicking.
-		if (
-			isSelectionEnabled() &&
-			// The main button.
-			// https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button
-			event.button === 0
-		) {
-			const clientId = getBlockClientId( event.target );
-
-			if ( clientId ) {
-				if ( event.shiftKey ) {
-					const blockSelectionStart = getBlockSelectionStart();
-					if ( blockSelectionStart !== clientId ) {
-						multiSelect( blockSelectionStart, clientId );
-						event.preventDefault();
-					}
-					// Allow user to escape out of a multi-selection to a singular
-					// selection of a block via click. This is handled here since
-					// focus handling excludes blocks when there is multiselection,
-					// as focus can be incurred by starting a multiselection (focus
-					// moved to first block's multi-controls).
-				} else if ( hasMultiSelection ) {
-					selectBlock( clientId );
-				}
-			}
-		}
 	}
 
 	function expandSelection( isReverse ) {
@@ -312,6 +282,28 @@ export default function WritingFlow( { children } ) {
 		const isNavEdge = isVertical ? isVerticalEdge : isHorizontalEdge;
 		const { ownerDocument } = container.current;
 		const { defaultView } = ownerDocument;
+
+		if ( hasMultiSelection ) {
+			if ( keyCode === TAB ) {
+				// Disable focus capturing on the focus capture element, so it
+				// doesn't refocus this element and so it allows default behaviour
+				// (moving focus to the next tabbable element).
+				noCapture.current = true;
+
+				if ( isShift ) {
+					focusCaptureBeforeRef.current.focus();
+				} else {
+					focusCaptureAfterRef.current.focus();
+				}
+			} else if ( isNav ) {
+				const action = isShift ? expandSelection : moveSelection;
+				action( isReverse );
+				event.preventDefault();
+			}
+
+			return;
+		}
+
 		const selectedBlockClientId = getSelectedBlockClientId();
 
 		// In Edit mode, Tab should focus the first tabbable element after the
@@ -469,38 +461,9 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
-	function onMultiSelectKeyDown( event ) {
-		const { keyCode, shiftKey } = event;
-		const isUp = keyCode === UP;
-		const isDown = keyCode === DOWN;
-		const isLeft = keyCode === LEFT;
-		const isRight = keyCode === RIGHT;
-		const isReverse = isUp || isLeft;
-		const isHorizontal = isLeft || isRight;
-		const isVertical = isUp || isDown;
-		const isNav = isHorizontal || isVertical;
-
-		if ( keyCode === TAB ) {
-			// Disable focus capturing on the focus capture element, so it
-			// doesn't refocus this element and so it allows default behaviour
-			// (moving focus to the next tabbable element).
-			noCapture.current = true;
-
-			if ( shiftKey ) {
-				focusCaptureBeforeRef.current.focus();
-			} else {
-				focusCaptureAfterRef.current.focus();
-			}
-		} else if ( isNav ) {
-			const action = shiftKey ? expandSelection : moveSelection;
-			action( isReverse );
-			event.preventDefault();
-		}
-	}
-
 	useEffect( () => {
 		if ( hasMultiSelection && ! isMultiSelecting ) {
-			multiSelectionContainer.current.focus();
+			container.current.focus();
 		}
 	}, [ hasMultiSelection, isMultiSelecting ] );
 
@@ -527,7 +490,7 @@ export default function WritingFlow( { children } ) {
 		if ( noCapture.current ) {
 			noCapture.current = null;
 		} else if ( hasMultiSelection ) {
-			multiSelectionContainer.current.focus();
+			container.current.focus();
 		} else if ( getSelectedBlockClientId() ) {
 			lastFocus.current.focus();
 		} else {
@@ -558,21 +521,16 @@ export default function WritingFlow( { children } ) {
 				style={ PREVENT_SCROLL_ON_FOCUS }
 			/>
 			<div
-				ref={ multiSelectionContainer }
+				ref={ container }
+				className="block-editor-writing-flow"
+				onKeyDown={ onKeyDown }
+				onMouseDown={ onMouseDown }
 				tabIndex={ hasMultiSelection ? '0' : undefined }
 				aria-label={
 					hasMultiSelection
 						? __( 'Multiple selected blocks' )
 						: undefined
 				}
-				style={ PREVENT_SCROLL_ON_FOCUS }
-				onKeyDown={ onMultiSelectKeyDown }
-			/>
-			<div
-				ref={ container }
-				className="block-editor-writing-flow"
-				onKeyDown={ onKeyDown }
-				onMouseDown={ onMouseDown }
 			>
 				{ children }
 			</div>

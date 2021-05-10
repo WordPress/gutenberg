@@ -64,34 +64,6 @@
 	}
 }
 
-.edit-navigation-layout__block-toolbar {
-	// Make the fixed toolbar appear in a similar position to the floating toolbar.
-	// Take the spacing for the floating toolbar, then subtract the toolbar height and
-	// the gap between the content area and the toolbar.
-	margin-top: $navigation-editor-spacing-top - $block-toolbar-height - $grid-unit-15;
-
-	.block-editor-block-toolbar {
-		background: $white;
-		border: $border-width solid $gray-900;
-		border-radius: $radius-block-ui;
-		max-width: $navigation-editor-width;
-		margin: auto;
-		overflow-y: hidden;
-	}
-
-	.components-toolbar,
-	.components-toolbar-group {
-		border-right-color: $gray-900;
-
-		.components-toolbar,
-		.components-toolbar-group {
-			border-width: 0;
-		}
-	}
-
-	height: $block-toolbar-height;
-}
-
 .edit-navigation-empty-state {
 	max-width: $navigation-editor-width;
 	margin-left: auto;

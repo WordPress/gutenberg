@@ -13,7 +13,7 @@ import { useMemo } from '@wordpress/element';
  */
 import { contextConnect, useContextSystem } from '../context';
 import { Scrollable } from '../scrollable';
-import { View } from '../view';
+import { View } from '../../view';
 import * as styles from './styles';
 
 /**

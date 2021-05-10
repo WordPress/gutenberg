@@ -34,15 +34,6 @@ function gutenberg_experimental_global_styles_get_stylesheet( $tree, $type = 'al
 
 	$stylesheet = $tree->get_stylesheet( $type );
 
-	if ( ( 'all' === $type || 'block_styles' === $type ) && WP_Theme_JSON_Resolver::theme_has_support() ) {
-		// To support all themes, we added in the block-library stylesheet
-		// a style rule such as .has-link-color a { color: var(--wp--style--color--link, #00e); }
-		// so that existing link colors themes used didn't break.
-		// We add this here to make it work for themes that opt-in to theme.json
-		// In the future, we may do this differently.
-		$stylesheet .= 'a{color:var(--wp--style--color--link, #00e);}';
-	}
-
 	if ( $can_use_cached ) {
 		// Cache for a minute.
 		// This cache doesn't need to be any longer, we only want to avoid spikes on high-traffic sites.
@@ -63,10 +54,8 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	$settings           = gutenberg_get_default_block_editor_settings();
-	$theme_support_data = WP_Theme_JSON::get_from_editor_settings( $settings );
-
-	$all = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data );
+	$settings = gutenberg_get_default_block_editor_settings();
+	$all      = WP_Theme_JSON_Resolver::get_merged_data( $settings );
 
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
 	if ( empty( $stylesheet ) ) {
@@ -81,21 +70,12 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 /**
  * Adds the necessary data for the Global Styles client UI to the block settings.
  *
+ * This can be removed when plugin support requires WordPress 5.8.0+.
+ *
  * @param array $settings Existing block editor settings.
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	$theme_support_data = WP_Theme_JSON::get_from_editor_settings( $settings );
-	unset( $settings['colors'] );
-	unset( $settings['disableCustomColors'] );
-	unset( $settings['disableCustomFontSizes'] );
-	unset( $settings['disableCustomGradients'] );
-	unset( $settings['enableCustomLineHeight'] );
-	unset( $settings['enableCustomUnits'] );
-	unset( $settings['enableCustomSpacing'] );
-	unset( $settings['fontSizes'] );
-	unset( $settings['gradients'] );
-
 	$origin = 'theme';
 	if (
 		WP_Theme_JSON_Resolver::theme_has_support() &&
@@ -104,7 +84,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		// Only lookup for the user data if we need it.
 		$origin = 'user';
 	}
-	$tree = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, $origin );
+	$tree = WP_Theme_JSON_Resolver::get_merged_data( $settings, $origin );
 
 	// STEP 1: ADD FEATURES
 	//
@@ -119,16 +99,15 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	// In the site editor, the user can change styles, so the client
 	// needs the ability to create them. Hence, we pass it some data
 	// for this: base styles (core+theme) and the ID of the user CPT.
-	$screen = get_current_screen();
 	if (
-		! empty( $screen ) &&
+		is_callable( 'get_current_screen' ) &&
 		function_exists( 'gutenberg_is_edit_site_page' ) &&
-		gutenberg_is_edit_site_page( $screen->id ) &&
+		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
 		WP_Theme_JSON_Resolver::theme_has_support() &&
 		gutenberg_supports_block_templates()
 	) {
 		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
-		$base_styles = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
+		$base_styles = WP_Theme_JSON_Resolver::get_merged_data( $settings, 'theme' )->get_raw_data();
 
 		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseStyles']   = $base_styles;
@@ -151,6 +130,16 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		);
 	}
 
+	unset( $settings['colors'] );
+	unset( $settings['disableCustomColors'] );
+	unset( $settings['disableCustomFontSizes'] );
+	unset( $settings['disableCustomGradients'] );
+	unset( $settings['enableCustomLineHeight'] );
+	unset( $settings['enableCustomUnits'] );
+	unset( $settings['enableCustomSpacing'] );
+	unset( $settings['fontSizes'] );
+	unset( $settings['gradients'] );
+
 	return $settings;
 }
 
@@ -168,7 +157,13 @@ function gutenberg_experimental_global_styles_register_user_cpt() {
 }
 
 add_action( 'init', 'gutenberg_experimental_global_styles_register_user_cpt' );
-add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( function_exists( 'get_block_editor_settings' ) ) {
+	add_filter( 'block_editor_settings_all', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
+} else {
+	add_filter( 'block_editor_settings', 'gutenberg_experimental_global_styles_settings', PHP_INT_MAX );
+
+}
 add_action( 'wp_enqueue_scripts', 'gutenberg_experimental_global_styles_enqueue_assets' );
 
 

@@ -9,7 +9,7 @@ import { Tooltip as ReakitTooltip } from 'reakit';
  * Internal dependencies
  */
 import { contextConnect, useContextSystem } from '../context';
-import { View } from '../view';
+import { View } from '../../view';
 import { useTooltipContext } from './context';
 import * as styles from './styles';
 

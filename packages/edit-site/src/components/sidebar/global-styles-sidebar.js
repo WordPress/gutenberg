@@ -24,7 +24,6 @@ import {
 	useGlobalStylesReset,
 } from '../editor/global-styles-provider';
 import DefaultSidebar from './default-sidebar';
-import { ROOT_BLOCK_NAME } from '../editor/utils';
 import {
 	default as TypographyPanel,
 	useHasTypographyPanel,
@@ -96,34 +95,20 @@ function GlobalStylesPanel( {
 	);
 }
 
-function getPanelTitle( context ) {
-	/*
-	 * We use the block's name as the panel title.
-	 *
-	 * Some blocks (eg: core/heading) can represent different
-	 * contexts (eg: core/heading/h1, core/heading/h2).
-	 * For those, we attach the selector (h1) after the block's name.
-	 *
-	 * The title can't be accessed in the server,
-	 * as it's translatable and the block.json doesn't
-	 * have it yet.
-	 */
-	const blockType = getBlockType( context.blockName );
+function getPanelTitle( blockName ) {
+	const blockType = getBlockType( blockName );
+
 	// Protect against blocks that aren't registered
 	// eg: widget-area
 	if ( blockType === undefined ) {
-		return blockType;
+		return blockName;
 	}
 
-	let panelTitle = blockType.title;
-	if ( context?.title ) {
-		panelTitle += ` (${ context.title })`;
-	}
-	return panelTitle;
+	return blockType.title;
 }
 
 function GlobalStylesBlockPanels( {
-	contexts,
+	blocks,
 	getStyle,
 	setStyle,
 	getSetting,
@@ -132,27 +117,24 @@ function GlobalStylesBlockPanels( {
 	const panels = useMemo(
 		() =>
 			sortBy(
-				map( contexts, ( context, name ) => {
+				map( blocks, ( block, name ) => {
 					return {
-						context,
+						block,
 						name,
-						wrapperPanelTitle: getPanelTitle( context ),
+						wrapperPanelTitle: getPanelTitle( name ),
 					};
 				} ),
 				( { wrapperPanelTitle } ) => wrapperPanelTitle
 			),
-		[ contexts ]
+		[ blocks ]
 	);
 
-	return map( panels, ( { context, name, wrapperPanelTitle } ) => {
-		if ( name === ROOT_BLOCK_NAME ) {
-			return null;
-		}
+	return map( panels, ( { block, name, wrapperPanelTitle } ) => {
 		return (
 			<GlobalStylesPanel
 				key={ 'panel-' + name }
 				wrapperPanelTitle={ wrapperPanelTitle }
-				context={ { ...context, name } }
+				context={ block }
 				getStyle={ getStyle }
 				setStyle={ setStyle }
 				getSetting={ getSetting }
@@ -169,7 +151,8 @@ export default function GlobalStylesSidebar( {
 	closeLabel,
 } ) {
 	const {
-		contexts,
+		root,
+		blocks,
 		getStyle,
 		setStyle,
 		getSetting,
@@ -177,7 +160,7 @@ export default function GlobalStylesSidebar( {
 	} = useGlobalStylesContext();
 	const [ canRestart, onReset ] = useGlobalStylesReset();
 
-	if ( typeof contexts !== 'object' || ! contexts?.[ ROOT_BLOCK_NAME ] ) {
+	if ( typeof blocks !== 'object' || ! root ) {
 		// No sidebar is shown.
 		return null;
 	}
@@ -215,7 +198,7 @@ export default function GlobalStylesSidebar( {
 					if ( 'block' === tab.name ) {
 						return (
 							<GlobalStylesBlockPanels
-								contexts={ contexts }
+								blocks={ blocks }
 								getStyle={ getStyle }
 								setStyle={ setStyle }
 								getSetting={ getSetting }
@@ -226,10 +209,7 @@ export default function GlobalStylesSidebar( {
 					return (
 						<GlobalStylesPanel
 							hasWrapper={ false }
-							context={ {
-								...contexts[ ROOT_BLOCK_NAME ],
-								name: ROOT_BLOCK_NAME,
-							} }
+							context={ root }
 							getStyle={ getStyle }
 							setStyle={ setStyle }
 							getSetting={ getSetting }
