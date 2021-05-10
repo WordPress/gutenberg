@@ -51,7 +51,7 @@ export default function useMenuLocations() {
 
 			setMenuLocationsByName( newMenuLocationsByName );
 
-			const activeMenuId = oldMenuId || newMenuId;
+			const activeMenuId = newMenuId || oldMenuId;
 			editMenuEntityRecord( ...menuEntityData, {
 				locations: locationsForMenuId(
 					newMenuLocationsByName,
