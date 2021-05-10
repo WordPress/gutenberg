@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { deburr } from 'lodash';
+import { groupBy, deburr } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -109,29 +109,42 @@ function TemplatePartsByArea( {
 	onClose,
 	composite,
 	area = 'uncategorized',
+	labelsByArea,
 } ) {
 	const templatePartsByArea = useMemo( () => {
-		return templateParts.filter( ( item ) => item.area === area );
+		return Object.values( groupBy( templateParts, 'area' ) );
 	}, [ templateParts, area ] );
 	const currentShownTPs = useAsyncList( templateParts );
 
-	return (
-		<PanelGroup>
-			{ templatePartsByArea.map( ( templatePart ) => {
-				return currentShownTPs.includes( templatePart ) ? (
-					<TemplatePartItem
-						key={ templatePart.id }
-						templatePart={ templatePart }
-						setAttributes={ setAttributes }
-						onClose={ onClose }
-						composite={ composite }
-					/>
-				) : (
-					<PreviewPlaceholder key={ templatePart.id } />
-				);
-			} ) }
-		</PanelGroup>
-	);
+	return templatePartsByArea.map( ( templatePartList ) => {
+		// Only return corresponding area if block/entity is not uncategorized/general version.
+		if ( 'uncategorized' !== area && templatePartList[ 0 ].area !== area ) {
+			return null;
+		}
+		return (
+			<PanelGroup
+				key={ templatePartList[ 0 ].area }
+				title={
+					labelsByArea[ templatePartList[ 0 ].area ] ||
+					__( 'General' )
+				}
+			>
+				{ templatePartList.map( ( templatePart ) => {
+					return currentShownTPs.includes( templatePart ) ? (
+						<TemplatePartItem
+							key={ templatePart.id }
+							templatePart={ templatePart }
+							setAttributes={ setAttributes }
+							onClose={ onClose }
+							composite={ composite }
+						/>
+					) : (
+						<PreviewPlaceholder key={ templatePart.id } />
+					);
+				} ) }
+			</PanelGroup>
+		);
+	} );
 }
 
 function TemplatePartSearchResults( {
@@ -140,19 +153,8 @@ function TemplatePartSearchResults( {
 	filterValue,
 	onClose,
 	composite,
+	labelsByArea,
 } ) {
-	const { labelsByArea } = useSelect( ( select ) => {
-		const definedAreas = select(
-			editorStore
-		).__experimentalGetDefaultTemplatePartAreas();
-		const _labelsByArea = {};
-		definedAreas.forEach( ( item ) => {
-			_labelsByArea[ item.area ] = item.label;
-		} );
-		return {
-			labelsByArea: _labelsByArea,
-		};
-	} );
 	const { filteredTPs, groupedResults } = useMemo( () => {
 		// Filter based on value.
 		// Remove diacritics and convert to lowercase to normalize.
@@ -246,16 +248,29 @@ export default function TemplatePartPreviews( {
 	area,
 } ) {
 	const composite = useCompositeState();
-	const templateParts = useSelect( ( select ) => {
-		return (
+
+	const { templateParts, labelsByArea } = useSelect( ( select ) => {
+		const _templateParts =
 			select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_template_part',
 				{
 					per_page: -1,
 				}
-			) || []
-		);
+			) || [];
+
+		const definedAreas = select(
+			editorStore
+		).__experimentalGetDefaultTemplatePartAreas();
+		const _labelsByArea = {};
+		definedAreas.forEach( ( item ) => {
+			_labelsByArea[ item.area ] = item.label;
+		} );
+
+		return {
+			templateParts: _templateParts,
+			labelsByArea: _labelsByArea,
+		};
 	}, [] );
 
 	if ( ! templateParts || ! templateParts.length ) {
@@ -275,6 +290,7 @@ export default function TemplatePartPreviews( {
 					filterValue={ filterValue }
 					onClose={ onClose }
 					composite={ composite }
+					labelsByArea={ labelsByArea }
 				/>
 			</Composite>
 		);
@@ -292,6 +308,7 @@ export default function TemplatePartPreviews( {
 				onClose={ onClose }
 				composite={ composite }
 				area={ area }
+				labelsByArea={ labelsByArea }
 			/>
 		</Composite>
 	);
