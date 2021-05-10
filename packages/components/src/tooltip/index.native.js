@@ -21,6 +21,7 @@ import { createSlotFill } from '../slot-fill';
 import styles from './style.scss';
 
 const RIGHT_ALIGN_ARROW_OFFSET = 16;
+const TOOLTIP_VERTICAL_OFFSET = 2;
 
 const { Fill, Slot } = createSlotFill( 'Tooltip' );
 
@@ -68,7 +69,7 @@ const Tooltip = ( {
 			( horizontalPosition === 'right'
 				? RIGHT_ALIGN_ARROW_OFFSET
 				: Math.floor( tooltipLayout.width / 2 ) ),
-		top: referenceLayout.y - tooltipLayout.height - 10,
+		top: referenceLayout.y - tooltipLayout.height - TOOLTIP_VERTICAL_OFFSET,
 		position: 'absolute',
 	};
 	const tooltipStyles = [
@@ -132,19 +133,19 @@ const Tooltip = ( {
 					<TouchableWithoutFeedback
 						onPress={ () => setVisible( false ) }
 					>
-						{ /* <Animated.View style={ animationStyles }> */ }
 						<View
 							onLayout={ getTooltipLayout }
 							style={ positionStyles }
 						>
-							<View style={ tooltipStyles }>
-								<Text style={ styles.tooltip__text }>
-									{ text }
-								</Text>
-								<View style={ arrowStyles } />
-							</View>
+							<Animated.View style={ animationStyles }>
+								<View style={ tooltipStyles }>
+									<Text style={ styles.tooltip__text }>
+										{ text }
+									</Text>
+									<View style={ arrowStyles } />
+								</View>
+							</Animated.View>
 						</View>
-						{ /* </Animated.View> */ }
 					</TouchableWithoutFeedback>
 				</Fill>
 			) }
