@@ -127,11 +127,11 @@ This behavior is useful if we want to render a list of items asynchronously for 
 
 _Parameters_
 
--   _list_ `Array`: Source array.
+-   _list_ `T[]`: Source array.
 
 _Returns_
 
--   `Array`: Async array.
+-   `T[]`: Async array.
 
 <a name="useConstrainedTabbing" href="#useConstrainedTabbing">#</a> **useConstrainedTabbing**
 
@@ -267,9 +267,9 @@ Provides a unique instance ID.
 
 _Parameters_
 
--   _object_ `Object`: Object reference to create an id for.
--   _prefix_ `string`: Prefix for the unique id.
--   _preferredId_ `string`: Default ID to use.
+-   _object_ `object`: Object reference to create an id for.
+-   _prefix_ `[string]`: Prefix for the unique id.
+-   _preferredId_ `[string]`: Default ID to use.
 
 _Returns_
 
@@ -470,13 +470,9 @@ _Returns_
 A Higher Order Component used to be provide a unique instance ID by
 component.
 
-_Parameters_
+_Type_
 
--   _WrappedComponent_ `WPComponent`: The wrapped component.
-
-_Returns_
-
--   `WPComponent`: Component with an instanceId prop.
+-   `PropInjectingHigherOrderComponent< { instanceId: string | number; } >`
 
 <a name="withSafeTimeout" href="#withSafeTimeout">#</a> **withSafeTimeout**
 

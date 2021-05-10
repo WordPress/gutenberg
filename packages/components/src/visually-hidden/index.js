@@ -1,2 +1,2 @@
-export { default } from './component';
-export * from './hook';
+export { default as VisuallyHidden } from './component';
+export { useVisuallyHidden } from './hook';

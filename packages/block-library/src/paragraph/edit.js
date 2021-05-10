@@ -7,7 +7,11 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { __, _x, isRTL } from '@wordpress/i18n';
-import { DropdownMenu, PanelBody, ToggleControl } from '@wordpress/components';
+import {
+	ToolbarDropdownMenu,
+	PanelBody,
+	ToggleControl,
+} from '@wordpress/components';
 import {
 	AlignmentControl,
 	BlockControls,
@@ -24,8 +28,7 @@ const name = 'core/paragraph';
 function ParagraphRTLControl( { direction, setDirection } ) {
 	return (
 		isRTL() && (
-			<DropdownMenu
-				isToolbarButton
+			<ToolbarDropdownMenu
 				controls={ [
 					{
 						icon: formatLtr,

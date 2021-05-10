@@ -14,10 +14,10 @@ import { useSelect } from '@wordpress/data';
  * Internal dependencies
  */
 import NavigableToolbar from '../navigable-toolbar';
-import { BlockToolbar } from '../';
+import BlockToolbar from '../block-toolbar';
 import { store as blockEditorStore } from '../../store';
 
-function BlockContextualToolbar( { focusOnMount, ...props } ) {
+function BlockContextualToolbar( { focusOnMount, isFixed, ...props } ) {
 	const { blockType, hasParents } = useSelect( ( select ) => {
 		const {
 			getBlockName,
@@ -43,20 +43,19 @@ function BlockContextualToolbar( { focusOnMount, ...props } ) {
 	// Shifts the toolbar to make room for the parent block selector.
 	const classes = classnames( 'block-editor-block-contextual-toolbar', {
 		'has-parent': hasParents,
+		'is-fixed': isFixed,
 	} );
 
 	return (
-		<div className="block-editor-block-contextual-toolbar-wrapper">
-			<NavigableToolbar
-				focusOnMount={ focusOnMount }
-				className={ classes }
-				/* translators: accessibility text for the block toolbar */
-				aria-label={ __( 'Block tools' ) }
-				{ ...props }
-			>
-				<BlockToolbar />
-			</NavigableToolbar>
-		</div>
+		<NavigableToolbar
+			focusOnMount={ focusOnMount }
+			className={ classes }
+			/* translators: accessibility text for the block toolbar */
+			aria-label={ __( 'Block tools' ) }
+			{ ...props }
+		>
+			<BlockToolbar hideDragHandle={ isFixed } />
+		</NavigableToolbar>
 	);
 }
 

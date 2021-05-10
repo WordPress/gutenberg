@@ -11,8 +11,8 @@ Snapshot Diff:
         title="WordPress.org"
       />
       <div
--       class="css-yc36db-InnerBody components-card-inner-body css-1mm2cvy-View egi4jkx0"
-+       class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View egi4jkx0"
+-       class="css-yc36db-InnerBody components-card-inner-body css-1mm2cvy-View em57xhy0"
++       class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
         data-wp-c16t="true"
 -       data-wp-component="CardInnerBody"
 +       data-wp-component="CardBody"
@@ -20,11 +20,15 @@ Snapshot Diff:
         Code is Poetry.
       </div>
       <div
-        class="components-flex components-card-footer css-g6s6xo-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View egi4jkx0"
+        class="components-flex components-card-footer css-g6s6xo-Flex-ItemsRow-borderRadius-headerFooter-medium css-1mm2cvy-View em57xhy0"
 `;
 
 exports[`props should render correctly 1`] = `
-.emotion-17 {
+.emotion-9 {
+  height: 100%;
+}
+
+.emotion-18 {
   background-color: #fff;
   color: #000;
   position: relative;
@@ -166,7 +170,7 @@ exports[`props should render correctly 1`] = `
   border-bottom-right-radius: 2px;
 }
 
-.emotion-11 {
+.emotion-12 {
   background: transparent;
   display: block;
   margin: 0 !important;
@@ -185,7 +189,7 @@ exports[`props should render correctly 1`] = `
   border-radius: 2px;
 }
 
-.emotion-14 {
+.emotion-15 {
   background: transparent;
   display: block;
   margin: 0 !important;
@@ -205,12 +209,12 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface components-card emotion-17 emotion-1 emotion-2"
+  class="components-surface components-card emotion-18 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Card"
 >
   <div
-    class="emotion-1 emotion-2"
+    class="emotion-9 emotion-1 emotion-2"
   >
     <div
       class="components-flex components-card-header emotion-0 emotion-1 emotion-2"
@@ -237,13 +241,13 @@ exports[`props should render correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
-    class="components-elevation emotion-11 emotion-1 emotion-2"
+    class="components-elevation emotion-12 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
   <div
     aria-hidden="true"
-    class="components-elevation emotion-14 emotion-1 emotion-2"
+    class="components-elevation emotion-15 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
@@ -257,19 +261,19 @@ Snapshot Diff:
 
 @@ -6,16 +6,16 @@
     <div
-      class="css-1mm2cvy-View egi4jkx0"
+      class="css-l50fc7-Content css-1mm2cvy-View em57xhy0"
     />
     <div
       aria-hidden="true"
--     class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View egi4jkx0"
-+     class="components-elevation css-xtff41-Elevation css-1mm2cvy-View egi4jkx0"
+-     class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View em57xhy0"
++     class="components-elevation css-xtff41-Elevation css-1mm2cvy-View em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Elevation"
     />
     <div
       aria-hidden="true"
--     class="components-elevation css-1ajhhcx-Elevation css-1mm2cvy-View egi4jkx0"
-+     class="components-elevation css-hdn3qt-Elevation css-1mm2cvy-View egi4jkx0"
+-     class="components-elevation css-1ajhhcx-Elevation css-1mm2cvy-View em57xhy0"
++     class="components-elevation css-hdn3qt-Elevation css-1mm2cvy-View em57xhy0"
       data-wp-c16t="true"
       data-wp-component="Elevation"
     />

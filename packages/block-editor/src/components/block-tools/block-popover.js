@@ -23,6 +23,7 @@ import BlockContextualToolbar from './block-contextual-toolbar';
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { usePopoverScroll } from './use-popover-scroll';
 
 function selector( select ) {
 	const {
@@ -51,6 +52,8 @@ function BlockPopover( {
 	isValid,
 	isEmptyDefaultBlock,
 	capturingClientId,
+	__unstablePopoverSlot,
+	__unstableContentRef,
 } ) {
 	const {
 		isNavigationMode,
@@ -110,6 +113,8 @@ function BlockPopover( {
 	const selectedElement = useBlockElement( clientId );
 	const lastSelectedElement = useBlockElement( lastClientId );
 	const capturingElement = useBlockElement( capturingClientId );
+
+	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
 
 	if (
 		! shouldShowBreadcrumb &&
@@ -173,6 +178,7 @@ function BlockPopover( {
 
 	return (
 		<Popover
+			ref={ popoverScrollRef }
 			noArrow
 			animate={ false }
 			position={ popoverPosition }
@@ -180,7 +186,9 @@ function BlockPopover( {
 			anchorRef={ anchorRef }
 			className="block-editor-block-list__block-popover"
 			__unstableStickyBoundaryElement={ stickyBoundaryElement }
-			__unstableSlotName="block-toolbar"
+			// Render in the old slot if needed for backward compatibility,
+			// otherwise render in place (not in the the default popover slot).
+			__unstableSlotName={ __unstablePopoverSlot || null }
 			__unstableBoundaryParent
 			// Observe movement for block animations (especially horizontal).
 			__unstableObserveElement={ node }
@@ -293,7 +301,10 @@ function wrapperSelector( select ) {
 	};
 }
 
-export default function WrappedBlockPopover() {
+export default function WrappedBlockPopover( {
+	__unstablePopoverSlot,
+	__unstableContentRef,
+} ) {
 	const selected = useSelect( wrapperSelector, [] );
 
 	if ( ! selected ) {
@@ -320,6 +331,8 @@ export default function WrappedBlockPopover() {
 			isValid={ isValid }
 			isEmptyDefaultBlock={ isEmptyDefaultBlock }
 			capturingClientId={ capturingClientId }
+			__unstablePopoverSlot={ __unstablePopoverSlot }
+			__unstableContentRef={ __unstableContentRef }
 		/>
 	);
 }

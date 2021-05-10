@@ -272,7 +272,11 @@ class WP_Theme_JSON_Resolver {
 	 */
 	public static function get_theme_data( $theme_support_data = array() ) {
 		if ( null === self::$theme ) {
-			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
+			$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'theme.json' ) );
+			// Fallback to experimental-theme.json.
+			if ( empty( $theme_json_data ) ) {
+				$theme_json_data = self::read_json_file( self::get_file_path_from_theme( 'experimental-theme.json' ) );
+			}
 			$theme_json_data = self::translate( $theme_json_data, wp_get_theme()->get( 'TextDomain' ) );
 			self::$theme     = new WP_Theme_JSON( $theme_json_data );
 		}
@@ -391,15 +395,17 @@ class WP_Theme_JSON_Resolver {
 	 * for the paragraph block, and the theme has done it as well,
 	 * the user preference wins.
 	 *
-	 * @param array  $theme_support_data Existing block editor settings.
-	 *                                   Empty array by default.
+	 * @param array  $settings Existing block editor settings.
+	 *                         Empty array by default.
 	 * @param string $origin To what level should we merge data.
 	 *                       Valid values are 'theme' or 'user'.
 	 *                       Default is 'user'.
 	 *
 	 * @return WP_Theme_JSON
 	 */
-	public static function get_merged_data( $theme_support_data = array(), $origin = 'user' ) {
+	public static function get_merged_data( $settings = array(), $origin = 'user' ) {
+		$theme_support_data = WP_Theme_JSON::get_from_editor_settings( $settings );
+
 		$result = new WP_Theme_JSON();
 		$result->merge( self::get_core_data() );
 		$result->merge( self::get_theme_data( $theme_support_data ) );
@@ -467,7 +473,11 @@ class WP_Theme_JSON_Resolver {
 	 */
 	public static function theme_has_support() {
 		if ( ! isset( self::$theme_has_support ) ) {
-			self::$theme_has_support = (bool) self::get_file_path_from_theme( 'experimental-theme.json' );
+			self::$theme_has_support = (bool) self::get_file_path_from_theme( 'theme.json' );
+			if ( ! self::$theme_has_support ) {
+				// Fallback to experimental-theme.json.
+				self::$theme_has_support = (bool) self::get_file_path_from_theme( 'experimental-theme.json' );
+			}
 		}
 
 		return self::$theme_has_support;

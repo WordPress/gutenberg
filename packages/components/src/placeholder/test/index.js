@@ -113,7 +113,7 @@ describe( 'Placeholder', () => {
 		it( 'should not assign modifier class in first-pass `null` width from `useResizeObserver`', () => {
 			useResizeObserver.mockReturnValue( [
 				<div key="1" />,
-				{ width: 320 },
+				{ width: 480 },
 			] );
 
 			const placeholder = shallow( <Placeholder /> );
