@@ -27,6 +27,8 @@
 	display: flex;
 	border: none;
 	width: 100%;
+	align-items: center;
+	margin: -4px 0;
 
 	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
 		border-radius: 2px;
@@ -42,6 +44,18 @@
 
 		&.is-pressed {
 			background: $gray-900;
+		}
+	}
+
+	.components-button.has-icon.customize-widgets-editor-history-button {
+		padding: 0;
+		width: 32px;
+		height: 32px;
+		min-width: 32px;
+
+		&::before {
+			left: 0;
+			right: 0;
 		}
 	}
 }

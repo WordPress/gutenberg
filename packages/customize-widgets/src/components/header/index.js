@@ -58,7 +58,7 @@ function Header( {
 						// See: https://github.com/WordPress/gutenberg/issues/3486
 						aria-disabled={ ! hasUndo }
 						onClick={ sidebar.undo }
-						className="editor-history__undo"
+						className="customize-widgets-editor-history-button"
 					/>
 					<ToolbarButton
 						icon={ ! isRTL() ? redoIcon : undoIcon }
@@ -70,7 +70,7 @@ function Header( {
 						// See: https://github.com/WordPress/gutenberg/issues/3486
 						aria-disabled={ ! hasRedo }
 						onClick={ sidebar.redo }
-						className="editor-history__redo"
+						className="customize-widgets-editor-history-button"
 					/>
 
 					<ToolbarButton
