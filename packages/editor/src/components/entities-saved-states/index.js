@@ -6,12 +6,13 @@ import { some, groupBy } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Button, withFocusReturn } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useCallback, useRef, useEffect } from '@wordpress/element';
-import { close as closeIcon } from '@wordpress/icons';
+import { useState, useCallback, useRef } from '@wordpress/element';
 import { store as coreStore } from '@wordpress/core-data';
+import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
+import { close as closeIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -26,14 +27,8 @@ const TRANSLATED_SITE_PROTPERTIES = {
 	page_on_front: __( 'Page on front' ),
 };
 
-function EntitiesSavedStates( { isOpen, close } ) {
+export default function EntitiesSavedStates( { close } ) {
 	const saveButtonRef = useRef();
-	useEffect( () => {
-		if ( isOpen ) {
-			// Focus the save button when the saved states panel is opened
-			saveButtonRef.current?.focus();
-		}
-	}, [ isOpen ] );
 	const { dirtyEntityRecords } = useSelect( ( select ) => {
 		const dirtyRecords = select(
 			coreStore
@@ -133,8 +128,16 @@ function EntitiesSavedStates( { isOpen, close } ) {
 	// its own will use the event object in place of the expected saved entities.
 	const dismissPanel = useCallback( () => close(), [ close ] );
 
-	return isOpen ? (
-		<div className="entities-saved-states__panel">
+	const [ saveDialogRef, saveDialogProps ] = useDialog( {
+		onClose: () => dismissPanel(),
+	} );
+
+	return (
+		<div
+			ref={ saveDialogRef }
+			{ ...saveDialogProps }
+			className="entities-saved-states__panel"
+		>
 			<div className="entities-saved-states__panel-header">
 				<Button
 					ref={ saveButtonRef }
@@ -150,8 +153,8 @@ function EntitiesSavedStates( { isOpen, close } ) {
 					{ __( 'Save' ) }
 				</Button>
 				<Button
-					onClick={ dismissPanel }
 					icon={ closeIcon }
+					onClick={ dismissPanel }
 					label={ __( 'Close panel' ) }
 				/>
 			</div>
@@ -177,7 +180,5 @@ function EntitiesSavedStates( { isOpen, close } ) {
 				);
 			} ) }
 		</div>
-	) : null;
+	);
 }
-
-export default withFocusReturn( EntitiesSavedStates );

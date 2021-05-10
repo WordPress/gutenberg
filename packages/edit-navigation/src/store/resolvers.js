@@ -11,14 +11,10 @@ import { parse, createBlock } from '@wordpress/blocks';
 /**
  * Internal dependencies
  */
-import {
-	NAVIGATION_POST_KIND,
-	NAVIGATION_POST_POST_TYPE,
-	NEW_TAB_TARGET_ATTRIBUTE,
-} from '../constants';
+import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 
 import { resolveMenuItems, dispatch } from './controls';
-import { buildNavigationPostId } from './utils';
+import { buildNavigationPostId, menuItemToBlockAttributes } from './utils';
 
 /**
  * Creates a "stub" navigation post reflecting the contents of menu with id=menuId. The
@@ -106,6 +102,7 @@ function createNavigationBlock( menuItems ) {
 		}
 
 		const sortedItems = sortBy( items, 'menu_order' );
+
 		for ( const item of sortedItems ) {
 			let menuItemInnerBlocks = [];
 			if ( itemsByParentID[ item.id ]?.length ) {
@@ -145,17 +142,7 @@ function convertMenuItemToBlock( menuItem, innerBlocks = [] ) {
 		return createBlock( block.name, block.attributes, innerBlocks );
 	}
 
-	const attributes = {
-		label: menuItem.title.rendered,
-		url: menuItem.url,
-		title: menuItem.attr_title,
-		className: menuItem.classes.join( ' ' ),
-		description: menuItem.description,
-		rel: menuItem.xfn.join( ' ' ),
-		...( menuItem.target === NEW_TAB_TARGET_ATTRIBUTE && {
-			opensInNewTab: true,
-		} ),
-	};
+	const attributes = menuItemToBlockAttributes( menuItem );
 
 	return createBlock( 'core/navigation-link', attributes, innerBlocks );
 }

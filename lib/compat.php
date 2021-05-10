@@ -14,7 +14,7 @@
  * @return bool
  */
 function gutenberg_should_load_separate_block_assets() {
-	$load_separate_styles = gutenberg_supports_block_templates();
+	$load_separate_styles = gutenberg_is_fse_theme();
 	/**
 	 * Determine if separate styles will be loaded for blocks on-render or not.
 	 *

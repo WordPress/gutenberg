@@ -17,7 +17,6 @@ This tutorial is up to date with Gutenberg version 10.6.
 4.  [Theme.json - Global styles](#theme-json-global-styles)
 5.  [Layouts](#layouts)
 6.  [Custom templates](#custom-templates)
-7.  [Sharing your theme](#sharing-your-theme)
 
 ## What is needed to create a block theme?
 
@@ -311,15 +310,6 @@ It needs to be placed inside the query, but outside the loop:
 </div>
 <!-- /wp:query -->
 ```
-
-When you add the query for the blog, you also want to make sure that the post title block is a link.
-Otherwise, you can not reach the single posts from the blog.
-The link option can be enabled in the block setting sidebar of the post title block.
-
-The block markup for a post title with the link enabled is: `<!-- wp:post-title {"isLink":true} /-->`
-
-To create a "read more" text link for the post excerpt block, you need to enable the `moreText` option and add a text:
-`<!-- wp:post-excerpt {"moreText":"Continue reading"} /-->`
 
 ##### Posts and pages
 
@@ -809,7 +799,7 @@ If you place the image block inside a group block, the options depend on the lay
 - When the layout setting inherits the width from theme.json, you can set the image's width to default, wide or full width.
 - When the content width and wide width have been specified, the image's width is adjusted and can be set to default, wide or full width.
 
-## Creating custom templates
+## Custom templates
 
 Custom templates for posts, pages, and custom post types can be created by adding additional HTML files inside the
 `block-templates` folder.

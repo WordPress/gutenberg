@@ -10,12 +10,11 @@ import { useContext } from '@wordpress/element';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
-import { InsertionPointOpenRef } from './insertion-point';
+import { InsertionPointOpenRef } from '../block-tools/insertion-point';
 
 export function useInBetweenInserter() {
 	const openRef = useContext( InsertionPointOpenRef );
 	const {
-		getBlockInsertionPoint,
 		getBlockListSettings,
 		getBlockRootClientId,
 		getBlockIndex,
@@ -68,7 +67,7 @@ export function useInBetweenInserter() {
 				const offsetLeft = event.clientX - rect.left;
 
 				const children = Array.from( event.target.children );
-				const nextElement = children.find( ( blockEl ) => {
+				let element = children.find( ( blockEl ) => {
 					return (
 						( blockEl.classList.contains( 'wp-block' ) &&
 							orientation === 'vertical' &&
@@ -78,8 +77,6 @@ export function useInBetweenInserter() {
 							blockEl.offsetLeft > offsetLeft )
 					);
 				} );
-
-				let element = nextElement || children[ children.length - 1 ];
 
 				if ( ! element ) {
 					return;
@@ -117,11 +114,20 @@ export function useInBetweenInserter() {
 					return;
 				}
 
-				showInsertionPoint(
-					rootClientId,
-					getBlockIndex( clientId, rootClientId ),
-					{ __unstableWithInserter: true }
-				);
+				const index = getBlockIndex( clientId, rootClientId );
+
+				// Don't show the in-between inserter before the first block in
+				// the list (preserves the original behaviour).
+				if ( index === 0 ) {
+					if ( isBlockInsertionPointVisible() ) {
+						hideInsertionPoint();
+					}
+					return;
+				}
+
+				showInsertionPoint( rootClientId, index, {
+					__unstableWithInserter: true,
+				} );
 			}
 
 			node.addEventListener( 'mousemove', onMouseMove );
@@ -132,7 +138,6 @@ export function useInBetweenInserter() {
 		},
 		[
 			openRef,
-			getBlockInsertionPoint,
 			getBlockListSettings,
 			getBlockRootClientId,
 			getBlockIndex,

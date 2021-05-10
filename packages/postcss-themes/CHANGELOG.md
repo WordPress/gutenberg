@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 4.0.0 (2021-04-29)
+
 ### Breaking Changes
 
 -   The bundled `postcss` dependency requiring `^7.0.32` has been replaced with a peer dependency requiring `^8.0.0` (see [Breaking Changes](https://github.com/postcss/postcss/releases/tag/8.0.0), [#27821](https://github.com/WordPress/gutenberg/pull/27821)).
