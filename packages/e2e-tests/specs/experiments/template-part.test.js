@@ -94,6 +94,15 @@ describe( 'Template Part', () => {
 			expect( paragraphInTemplatePart ).not.toBeNull();
 		}
 
+		async function awaitHeaderAndFooterLoad() {
+			await canvas().waitForSelector(
+				'.wp-block-template-part.site-header.block-editor-block-list__layout'
+			);
+			await canvas().waitForSelector(
+				'.wp-block-template-part.site-footer.block-editor-block-list__layout'
+			);
+		}
+
 		it( 'Should load customizations when in a template even if only the slug and theme attributes are set.', async () => {
 			await updateHeader( 'Header Template Part 123' );
 
@@ -164,9 +173,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert selected block to template part', async () => {
-			await canvas().waitForSelector(
-				'.wp-block-template-part.block-editor-block-list__layout'
-			);
+			await awaitHeaderAndFooterLoad();
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part.block-editor-block-list__layout'
 			);
@@ -204,9 +211,7 @@ describe( 'Template Part', () => {
 		} );
 
 		it( 'Should convert multiple selected blocks to template part', async () => {
-			await canvas().waitForSelector(
-				'.wp-block-template-part.block-editor-block-list__layout'
-			);
+			await awaitHeaderAndFooterLoad();
 			const initialTemplateParts = await canvas().$$(
 				'.wp-block-template-part.block-editor-block-list__layout'
 			);
