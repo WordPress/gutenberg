@@ -104,6 +104,7 @@ module.exports = {
 		'jsdoc/require-jsdoc': 'off',
 		'jsdoc/require-param-description': 'off',
 		'jsdoc/require-returns': 'off',
+		'jsdoc/require-yields': 'off',
 		'jsdoc/check-access': 'error',
 		'jsdoc/check-alignment': 'error',
 		'jsdoc/check-line-alignment': [
