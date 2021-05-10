@@ -413,6 +413,8 @@ describe( 'RichText', () => {
 		// Create a new paragraph.
 		await page.keyboard.press( 'Enter' );
 
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
 		// Paste the colored text.
 		await pressKeyWithModifier( 'primary', 'v' );
 
