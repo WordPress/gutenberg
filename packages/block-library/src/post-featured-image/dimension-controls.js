@@ -15,13 +15,18 @@ import { Platform } from '@wordpress/element';
 const isWeb = Platform.OS === 'web';
 const CSS_UNITS = [
 	{
+		value: 'px',
+		label: isWeb ? 'px' : __( 'Pixels (px)' ),
+		default: '',
+	},
+	{
 		value: '%',
 		label: isWeb ? '%' : __( 'Percentage (%)' ),
 		default: '',
 	},
 	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
+		value: 'vw',
+		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
 		default: '',
 	},
 	{
@@ -32,11 +37,6 @@ const CSS_UNITS = [
 	{
 		value: 'rem',
 		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-	},
-	{
-		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
 		default: '',
 	},
 ];
@@ -50,7 +50,7 @@ const SCALE_OPTIONS = [
 		value: 'contain',
 	},
 	{
-		label: _x( 'Fill', 'Scale option for Image dimension control' ),
+		label: _x( 'Stretch', 'Scale option for Image dimension control' ),
 		value: 'fill',
 	},
 ];
