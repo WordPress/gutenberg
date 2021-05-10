@@ -158,12 +158,20 @@ function InserterMenu( {
 		[ setFilterValue ]
 	);
 
+	const onKeyboardShow = useCallback( () => setShowTabs( false ), [
+		setShowTabs,
+	] );
+
+	const onKeyboardHide = useCallback( () => setShowTabs( true ), [
+		setShowTabs,
+	] );
+
 	return (
 		<BottomSheet
 			isVisible={ true }
 			onClose={ onClose }
-			onKeyboardShow={ () => setShowTabs( false ) }
-			onKeyboardHide={ () => setShowTabs( true ) }
+			onKeyboardShow={ onKeyboardShow }
+			onKeyboardHide={ onKeyboardHide }
 			header={
 				<>
 					{ showSearchForm && (
