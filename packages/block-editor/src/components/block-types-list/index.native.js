@@ -44,9 +44,9 @@ export default function BlockTypesList( { name, items, onSelect, listProps } ) {
 	}
 
 	function onLayout() {
+		const columnStyle = styles[ 'block-types-list__column' ];
 		const sumLeftRightPadding =
-			styles.columnPadding.paddingLeft +
-			styles.columnPadding.paddingRight;
+			columnStyle.paddingLeft + columnStyle.paddingRight;
 
 		const bottomSheetWidth = BottomSheet.getWidth();
 		const containerTotalWidth = bottomSheetWidth - sumLeftRightPadding;
@@ -78,7 +78,9 @@ export default function BlockTypesList( { name, items, onSelect, listProps } ) {
 			initialNumToRender={ 3 }
 			ItemSeparatorComponent={ () => (
 				<TouchableWithoutFeedback accessible={ false }>
-					<View style={ styles.rowSeparator } />
+					<View
+						style={ styles[ 'block-types-list__row-separator' ] }
+					/>
 				</TouchableWithoutFeedback>
 			) }
 			keyExtractor={ ( item ) => item.id }
