@@ -19,21 +19,21 @@ describe( 'props', () => {
 	} );
 
 	test( 'should render marginTop', () => {
-		const { container } = render( <Divider mt={ 5 } /> );
+		const { container } = render( <Divider marginTop={ 5 } /> );
 		expect( container.firstChild ).toMatchStyleDiffSnapshot(
 			base.container.firstChild
 		);
 	} );
 
 	test( 'should render marginBottom', () => {
-		const { container } = render( <Divider mb={ 5 } /> );
+		const { container } = render( <Divider marginBottom={ 5 } /> );
 		expect( container.firstChild ).toMatchStyleDiffSnapshot(
 			base.container.firstChild
 		);
 	} );
 
 	test( 'should render margin', () => {
-		const { container } = render( <Divider m={ 7 } /> );
+		const { container } = render( <Divider margin={ 7 } /> );
 		expect( container.firstChild ).toMatchStyleDiffSnapshot(
 			base.container.firstChild
 		);

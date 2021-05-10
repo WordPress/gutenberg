@@ -274,10 +274,14 @@ class BottomSheet extends Component {
 
 	onHeaderLayout( { nativeEvent } ) {
 		const { height } = nativeEvent.layout;
+		// The layout animation should only be triggered if the header
+		// height has changed after being mounted.
+		if ( this.headerHeight !== 0 && height !== this.headerHeight ) {
+			this.performRegularLayoutAnimation( {
+				useLastLayoutAnimation: true,
+			} );
+		}
 		this.headerHeight = height;
-		this.performRegularLayoutAnimation( {
-			useLastLayoutAnimation: true,
-		} );
 		this.onSetMaxHeight();
 	}
 

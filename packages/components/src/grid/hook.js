@@ -11,13 +11,13 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { useContextSystem } from '../context';
+import { useContextSystem } from '../ui/context';
 import { getAlignmentProps } from './utils';
-import { useResponsiveValue } from '../utils/use-responsive-value';
-import CONFIG from '../../utils/config-values';
+import { useResponsiveValue } from '../ui/utils/use-responsive-value';
+import CONFIG from '../utils/config-values';
 
 /**
- * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../ui/context').ViewOwnProps<import('./types').Props, 'div'>} props
  */
 export default function useGrid( props ) {
 	const {

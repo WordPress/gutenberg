@@ -23,10 +23,14 @@ import { isRTL } from '@wordpress/i18n';
 import Inserter from '../inserter';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockElement as useBlockElement } from '../block-list/use-block-props/use-block-refs';
+import { usePopoverScroll } from './use-popover-scroll';
 
 export const InsertionPointOpenRef = createContext();
 
-function InsertionPointPopover( { __unstablePopoverSlot } ) {
+function InsertionPointPopover( {
+	__unstablePopoverSlot,
+	__unstableContentRef,
+} ) {
 	const { selectBlock } = useDispatch( blockEditorStore );
 	const openRef = useContext( InsertionPointOpenRef );
 	const ref = useRef();
@@ -161,6 +165,8 @@ function InsertionPointPopover( { __unstablePopoverSlot } ) {
 		};
 	}, [ previousElement, nextElement ] );
 
+	const popoverScrollRef = usePopoverScroll( __unstableContentRef );
+
 	if ( ! previousElement ) {
 		return null;
 	}
@@ -205,6 +211,7 @@ function InsertionPointPopover( { __unstablePopoverSlot } ) {
 	// See: https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus
 	return (
 		<Popover
+			ref={ popoverScrollRef }
 			noArrow
 			animate={ false }
 			getAnchorRect={ getAnchorRect }
@@ -253,7 +260,11 @@ function InsertionPointPopover( { __unstablePopoverSlot } ) {
 	/* eslint-enable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 }
 
-export default function InsertionPoint( { children } ) {
+export default function InsertionPoint( {
+	children,
+	__unstablePopoverSlot,
+	__unstableContentRef,
+} ) {
 	const isVisible = useSelect( ( select ) => {
 		const { isMultiSelecting, isBlockInsertionPointVisible } = select(
 			blockEditorStore
@@ -264,7 +275,12 @@ export default function InsertionPoint( { children } ) {
 
 	return (
 		<InsertionPointOpenRef.Provider value={ useRef( false ) }>
-			{ isVisible && <InsertionPointPopover /> }
+			{ isVisible && (
+				<InsertionPointPopover
+					__unstablePopoverSlot={ __unstablePopoverSlot }
+					__unstableContentRef={ __unstableContentRef }
+				/>
+			) }
 			{ children }
 		</InsertionPointOpenRef.Provider>
 	);

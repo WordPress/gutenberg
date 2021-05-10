@@ -1,4 +1,6 @@
-# View (Experimental)
+# View
+
+> **Experimental!**
 
 `View` is a core component that renders everything in the library. It is the principle component in the entire library.
 
@@ -7,7 +9,10 @@
 ## Usage
 
 ```jsx
-import { Text, View } from '@wordpress/components/ui';
+import {
+	__experimentalText as Text,
+	__experimentalView as View
+} from '@wordpress/components';
 
 function Example() {
 	return (

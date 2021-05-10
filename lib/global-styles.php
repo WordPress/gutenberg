@@ -54,10 +54,8 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	$settings           = gutenberg_get_default_block_editor_settings();
-	$theme_support_data = WP_Theme_JSON::get_from_editor_settings( $settings );
-
-	$all = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data );
+	$settings = gutenberg_get_default_block_editor_settings();
+	$all      = WP_Theme_JSON_Resolver::get_merged_data( $settings );
 
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
 	if ( empty( $stylesheet ) ) {
@@ -78,17 +76,6 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	$theme_support_data = WP_Theme_JSON::get_from_editor_settings( $settings );
-	unset( $settings['colors'] );
-	unset( $settings['disableCustomColors'] );
-	unset( $settings['disableCustomFontSizes'] );
-	unset( $settings['disableCustomGradients'] );
-	unset( $settings['enableCustomLineHeight'] );
-	unset( $settings['enableCustomUnits'] );
-	unset( $settings['enableCustomSpacing'] );
-	unset( $settings['fontSizes'] );
-	unset( $settings['gradients'] );
-
 	$origin = 'theme';
 	if (
 		WP_Theme_JSON_Resolver::theme_has_support() &&
@@ -97,7 +84,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		// Only lookup for the user data if we need it.
 		$origin = 'user';
 	}
-	$tree = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, $origin );
+	$tree = WP_Theme_JSON_Resolver::get_merged_data( $settings, $origin );
 
 	// STEP 1: ADD FEATURES
 	//
@@ -120,7 +107,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		gutenberg_supports_block_templates()
 	) {
 		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
-		$base_styles = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
+		$base_styles = WP_Theme_JSON_Resolver::get_merged_data( $settings, 'theme' )->get_raw_data();
 
 		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
 		$settings['__experimentalGlobalStylesBaseStyles']   = $base_styles;
@@ -142,6 +129,16 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 			'css' => gutenberg_experimental_global_styles_get_stylesheet( $tree, 'block_styles' ),
 		);
 	}
+
+	unset( $settings['colors'] );
+	unset( $settings['disableCustomColors'] );
+	unset( $settings['disableCustomFontSizes'] );
+	unset( $settings['disableCustomGradients'] );
+	unset( $settings['enableCustomLineHeight'] );
+	unset( $settings['enableCustomUnits'] );
+	unset( $settings['enableCustomSpacing'] );
+	unset( $settings['fontSizes'] );
+	unset( $settings['gradients'] );
 
 	return $settings;
 }
