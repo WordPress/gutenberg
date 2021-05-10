@@ -176,6 +176,12 @@ $z-layers: (
 	// Needs to be higher than .components-circular-option-picker__option.is-pressed.
 	".components-circular-option-picker__option.is-pressed + svg": 2,
 	".edit-navigation-layout__overlay": 999,
+
+	// Appear under the customizer heading UI, but over anything else.
+	".customize-widgets__topbar": 8,
+
+	// Appear under the topbar.
+	".customize-widgets__block-toolbar": 7,
 );
 
 @function z-index( $key ) {
