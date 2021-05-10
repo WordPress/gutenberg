@@ -8,6 +8,7 @@ import apiFetch from '@wordpress/api-fetch';
 const SUPPORTED_ENDPOINTS = [
 	/wp\/v2\/(media|categories|blocks)\/?\d*?.*/i,
 	/wp\/v2\/search\?.*/i,
+	/oembed\/1\.0\/proxy\?.*/i,
 ];
 
 const setTimeoutPromise = ( delay ) =>
