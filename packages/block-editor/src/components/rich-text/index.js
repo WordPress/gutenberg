@@ -121,8 +121,8 @@ function Element( {
 	onKeyDown,
 	value,
 	onChange,
-	editableProps,
-	TagName,
+	richTextRef,
+	tagName: TagName = 'div',
 	hasActiveFormats,
 	removeEditorOnlyFormats,
 	onReplace,
@@ -134,6 +134,9 @@ function Element( {
 	onMerge,
 	onRemove,
 	props,
+	placeholder,
+	disabled,
+	unstableOnFocus,
 } ) {
 	const { isCaretWithinFormattedText } = useSelect( blockEditorStore );
 	const {
@@ -240,24 +243,20 @@ function Element( {
 
 	return (
 		<TagName
-			{ ...editableProps }
+			// Overridable props.
+			role="textbox"
+			aria-multiline={ true }
+			aria-label={ placeholder }
 			{ ...props }
-			style={
-				props.style
-					? {
-							...props.style,
-							...editableProps.style,
-					  }
-					: editableProps.style
-			}
-			className={ classnames(
-				classes,
-				props.className,
-				editableProps.className
-			) }
+			ref={ richTextRef }
+			// Do not set the attribute if disabled.
+			contentEditable={ disabled ? undefined : true }
+			suppressContentEditableWarning={ ! disabled }
+			className={ classnames( classes, props.className, 'rich-text' ) }
 			aria-autocomplete={ listBoxId ? 'list' : undefined }
 			aria-owns={ listBoxId }
 			aria-activedescendant={ activeId }
+			onFocus={ unstableOnFocus }
 			onKeyDown={ ( event ) => {
 				onKeyDown( event );
 				_onKeyDown( event );
@@ -725,8 +724,7 @@ function RichTextWrapper(
 				value,
 				onChange,
 				onFocus,
-				editableProps,
-				editableTagName: TagName,
+				ref,
 				hasActiveFormats,
 				removeEditorOnlyFormats,
 			} ) => (
@@ -755,8 +753,8 @@ function RichTextWrapper(
 									onKeyDown,
 									value,
 									onChange,
-									editableProps,
-									TagName,
+									richTextRef: ref,
+									tagName,
 									hasActiveFormats,
 									removeEditorOnlyFormats,
 									onReplace,
@@ -769,6 +767,9 @@ function RichTextWrapper(
 									onMerge,
 									onRemove,
 									props,
+									placeholder,
+									disabled,
+									unstableOnFocus,
 								} }
 							/>
 						) }

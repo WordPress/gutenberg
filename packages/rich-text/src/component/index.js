@@ -42,7 +42,7 @@ function createPrepareEditableTree( fns ) {
 
 function RichText(
 	{
-		tagName: TagName = 'div',
+		tagName = 'div',
 		value = '',
 		selectionStart,
 		selectionEnd,
@@ -56,7 +56,6 @@ function RichText(
 		format = 'string',
 		onSelectionChange,
 		onChange,
-		unstableOnFocus: onFocus,
 		clientId,
 		identifier,
 		__unstableMultilineTag: multilineTag,
@@ -89,8 +88,8 @@ function RichText(
 
 	// For backward compatibility, fall back to tagName if it's a string.
 	// tagName can now be a component for light blocks.
-	if ( ! multilineRootTag && typeof TagName === 'string' ) {
-		multilineRootTag = TagName;
+	if ( ! multilineRootTag && typeof tagName === 'string' ) {
+		multilineRootTag = tagName;
 	}
 
 	/**
@@ -281,7 +280,7 @@ function RichText(
 		}
 
 		didMount.current = true;
-	}, [ TagName, placeholder, ...dependencies ] );
+	}, [ tagName, placeholder, ...dependencies ] );
 
 	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
@@ -316,65 +315,54 @@ function RichText(
 		applyRecord( record.current );
 	}
 
-	const editableProps = {
-		// Overridable props.
-		role: 'textbox',
-		'aria-multiline': true,
-		'aria-label': placeholder,
-		ref: useMergeRefs( [
-			forwardedRef,
-			ref,
-			useDefaultStyle(),
-			useBoundaryStyle( { activeFormats } ),
-			useInlineWarning(),
-			useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
-			useSelectObject(),
-			useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
-			useUndoAutomaticChange( { didAutomaticChange, undo } ),
-			useDelete( {
-				createRecord,
-				handleChange,
-				multilineTag,
-			} ),
-			useIndentListItemOnSpace( {
-				multilineTag,
-				multilineRootTag,
-				createRecord,
-				handleChange,
-			} ),
-			usePasteHandler( {
-				isSelected,
-				disableFormats,
-				handleChange,
-				record,
-				formatTypes,
-				onPaste,
-				removeEditorOnlyFormats,
-				activeFormats,
-			} ),
-			useInputAndSelection( {
-				record,
-				applyRecord,
-				createRecord,
-				handleChange,
-				createUndoLevel,
-				allowPrefixTransformations,
-				inputRule,
-				valueToFormat,
-				formatTypes,
-				markAutomaticChange,
-				isSelected,
-				disabled,
-				onSelectionChange,
-				setActiveFormats,
-			} ),
-		] ),
-		className: 'rich-text',
-		onFocus,
-		// Do not set the attribute if disabled.
-		contentEditable: disabled ? undefined : true,
-		suppressContentEditableWarning: ! disabled,
-	};
+	const mergedRefs = useMergeRefs( [
+		forwardedRef,
+		ref,
+		useDefaultStyle(),
+		useBoundaryStyle( { activeFormats } ),
+		useInlineWarning(),
+		useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
+		useSelectObject(),
+		useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
+		useUndoAutomaticChange( { didAutomaticChange, undo } ),
+		useDelete( {
+			createRecord,
+			handleChange,
+			multilineTag,
+		} ),
+		useIndentListItemOnSpace( {
+			multilineTag,
+			multilineRootTag,
+			createRecord,
+			handleChange,
+		} ),
+		usePasteHandler( {
+			isSelected,
+			disableFormats,
+			handleChange,
+			record,
+			formatTypes,
+			onPaste,
+			removeEditorOnlyFormats,
+			activeFormats,
+		} ),
+		useInputAndSelection( {
+			record,
+			applyRecord,
+			createRecord,
+			handleChange,
+			createUndoLevel,
+			allowPrefixTransformations,
+			inputRule,
+			valueToFormat,
+			formatTypes,
+			markAutomaticChange,
+			isSelected,
+			disabled,
+			onSelectionChange,
+			setActiveFormats,
+		} ),
+	] );
 
 	return (
 		<>
@@ -387,18 +375,15 @@ function RichText(
 					forwardedRef={ ref }
 				/>
 			) }
-			{ children &&
-				children( {
-					isSelected,
-					value: record.current,
-					onChange: handleChange,
-					onFocus: focus,
-					editableProps,
-					editableTagName: TagName,
-					hasActiveFormats: activeFormats.length,
-					removeEditorOnlyFormats,
-				} ) }
-			{ ! children && <TagName { ...editableProps } /> }
+			{ children( {
+				isSelected,
+				value: record.current,
+				onChange: handleChange,
+				onFocus: focus,
+				ref: mergedRefs,
+				hasActiveFormats: activeFormats.length,
+				removeEditorOnlyFormats,
+			} ) }
 		</>
 	);
 }
