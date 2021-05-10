@@ -3,7 +3,6 @@
  */
 import {
 	forwardRef,
-	useEffect,
 	useRef,
 	useState,
 	useLayoutEffect,
@@ -326,13 +325,13 @@ function RichText(
 		didMount.current = true;
 	}, [ TagName, placeholder, ...dependencies ] );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
 			applyFromProps();
 		}
 	}, [ value ] );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! didMount.current ) {
 			return;
 		}
