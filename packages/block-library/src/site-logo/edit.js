@@ -260,11 +260,13 @@ export default function LogoEdit( {
 			'root',
 			'site'
 		);
-		const mediaItem = select( coreStore ).getEntityRecord(
-			'root',
-			'media',
-			siteSettings.site_logo
-		);
+		const mediaItem = siteSettings.site_logo
+			? select( coreStore ).getEntityRecord(
+					'root',
+					'media',
+					siteSettings.site_logo
+			  )
+			: null;
 		return {
 			mediaItemData: mediaItem && {
 				url: mediaItem.source_url,
