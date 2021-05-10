@@ -291,15 +291,6 @@ export function useInputAndSelection( props ) {
 				setActiveFormats( EMPTY_ACTIVE_FORMATS );
 			} else {
 				onSelectionChange( record.current.start, record.current.end );
-				setActiveFormats(
-					getActiveFormats(
-						{
-							...record.current,
-							activeFormats: undefined,
-						},
-						EMPTY_ACTIVE_FORMATS
-					)
-				);
 			}
 
 			// Update selection as soon as possible, which is at the next animation
