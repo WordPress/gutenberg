@@ -13,7 +13,7 @@ import { useSelect } from '@wordpress/data';
  */
 import items from './fixtures';
 import BlockTypesTab from '../block-types-tab';
-import BlocksTypesList from '../../block-types-list';
+import BlockTypesList from '../../block-types-list';
 
 jest.mock( '../../block-types-list' );
 jest.mock( '../hooks/use-clipboard-block' );
@@ -57,7 +57,7 @@ describe( 'BlockTypesTab component', () => {
 				listProps={ {} }
 			/>
 		);
-		expect( component.find( BlocksTypesList ).prop( 'items' ) ).toEqual(
+		expect( component.find( BlockTypesList ).prop( 'items' ) ).toEqual(
 			blockItems
 		);
 	} );
