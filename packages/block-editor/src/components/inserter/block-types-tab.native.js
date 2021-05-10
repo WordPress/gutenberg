@@ -12,7 +12,7 @@ import { store as blockEditorStore } from '../../store';
 
 const NON_BLOCK_CATEGORIES = [ 'reusable' ];
 
-function BlocksTab( { onSelect, rootClientId, listProps } ) {
+function BlockTypesTab( { onSelect, rootClientId, listProps } ) {
 	const clipboardBlock = useClipboardBlock( rootClientId );
 
 	const { items } = useSelect(
@@ -43,4 +43,4 @@ function BlocksTab( { onSelect, rootClientId, listProps } ) {
 	);
 }
 
-export default BlocksTab;
+export default BlockTypesTab;
