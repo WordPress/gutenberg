@@ -683,7 +683,6 @@ function RichTextWrapper(
 			__unstableUndo={ undo }
 			__unstableDisableFormats={ disableFormats }
 			preserveWhiteSpace={ preserveWhiteSpace }
-			disabled={ disabled }
 			unstableOnFocus={ unstableOnFocus }
 			__unstableAllowPrefixTransformations={
 				__unstableAllowPrefixTransformations

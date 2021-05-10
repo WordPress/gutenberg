@@ -177,7 +177,6 @@ export function useInputAndSelection( props ) {
 				applyRecord,
 				createRecord,
 				isSelected,
-				disabled,
 				onSelectionChange,
 				setActiveFormats,
 			} = propsRef.current;
@@ -186,7 +185,10 @@ export function useInputAndSelection( props ) {
 				return;
 			}
 
-			if ( disabled ) {
+			// Check if the implementor disabled editing. `contentEditable`
+			// does disable input, but not text selection, so we must ignore
+			// selection changes.
+			if ( element.contentEditable !== 'true' ) {
 				return;
 			}
 
