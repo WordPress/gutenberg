@@ -36,10 +36,12 @@ import {
 	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	toHTMLString,
 	slice,
+	isCollapsed,
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
 import { regexp } from '@wordpress/shortcode';
+import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -270,23 +272,6 @@ function RichTextWrapper(
 		[ clientId, identifier ]
 	);
 
-	const onDelete = useCallback(
-		( { value, isReverse } ) => {
-			if ( onMerge ) {
-				onMerge( ! isReverse );
-			}
-
-			// Only handle remove on Backspace. This serves dual-purpose of being
-			// an intentional user interaction distinguishing between Backspace and
-			// Delete to remove the empty field, but also to avoid merge & remove
-			// causing destruction of two fields (merge, then removed merged).
-			if ( onRemove && isEmpty( value ) && isReverse ) {
-				onRemove( ! isReverse );
-			}
-		},
-		[ onMerge, onRemove ]
-	);
-
 	/**
 	 * Signals to the RichText owner that the block can be replaced with two
 	 * blocks as a result of splitting the block by pressing enter, or with
@@ -366,62 +351,6 @@ function RichTextWrapper(
 			onReplace( blocks, indexToSelect, initialPosition );
 		},
 		[ onReplace, onSplit, multilineTag, onSplitMiddle ]
-	);
-
-	const onEnter = useCallback(
-		( { value, onChange, shiftKey } ) => {
-			const canSplit = onReplace && onSplit;
-
-			if ( onReplace ) {
-				const transforms = getBlockTransforms( 'from' ).filter(
-					( { type } ) => type === 'enter'
-				);
-				const transformation = findTransform( transforms, ( item ) => {
-					return item.regExp.test( value.text );
-				} );
-
-				if ( transformation ) {
-					onReplace( [
-						transformation.transform( { content: value.text } ),
-					] );
-					__unstableMarkAutomaticChange();
-				}
-			}
-
-			if ( multiline ) {
-				if ( shiftKey ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( value, '\n' ) );
-					}
-				} else if ( canSplit && isEmptyLine( value ) ) {
-					splitValue( value );
-				} else {
-					onChange( insertLineSeparator( value ) );
-				}
-			} else {
-				const { text, start, end } = value;
-				const canSplitAtEnd =
-					onSplitAtEnd && start === end && end === text.length;
-
-				if ( shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( value, '\n' ) );
-					}
-				} else if ( ! canSplit && canSplitAtEnd ) {
-					onSplitAtEnd();
-				} else if ( canSplit ) {
-					splitValue( value );
-				}
-			}
-		},
-		[
-			onReplace,
-			onSplit,
-			__unstableMarkAutomaticChange,
-			multiline,
-			splitValue,
-			onSplitAtEnd,
-		]
 	);
 
 	const onPaste = useCallback(
@@ -598,8 +527,6 @@ function RichTextWrapper(
 			placeholder={ placeholder }
 			allowedFormats={ adjustedAllowedFormats }
 			withoutInteractiveFormatting={ withoutInteractiveFormatting }
-			onEnter={ onEnter }
-			onDelete={ onDelete }
 			onPaste={ onPaste }
 			__unstableIsSelected={ isSelected }
 			__unstableInputRule={ inputRule }
@@ -656,55 +583,153 @@ function RichTextWrapper(
 				onFocus,
 				editableProps,
 				editableTagName: TagName,
-			} ) => (
-				<>
-					{ children && children( { value, onChange, onFocus } ) }
-					{ nestedIsSelected && hasFormats && (
-						<FormatToolbarContainer
-							inline={ inlineToolbar }
-							anchorRef={ fallbackRef.current }
-						/>
-					) }
-					{ nestedIsSelected && <RemoveBrowserShortcuts /> }
-					<Autocomplete
-						onReplace={ onReplace }
-						completers={ autocompleters }
-						record={ value }
-						onChange={ onChange }
-						isSelected={ nestedIsSelected }
-						contentRef={ fallbackRef }
-					>
-						{ ( { listBoxId, activeId, onKeyDown } ) => (
-							<TagName
-								{ ...editableProps }
-								{ ...props }
-								style={
-									props.style
-										? {
-												...props.style,
-												...editableProps.style,
-										  }
-										: editableProps.style
+				activeFormats,
+				removeEditorOnlyFormats,
+			} ) => {
+				function _onKeyDown( event ) {
+					const { keyCode } = event;
+
+					if ( event.defaultPrevented ) {
+						return;
+					}
+
+					if ( event.keyCode === ENTER ) {
+						event.preventDefault();
+
+						const _value = removeEditorOnlyFormats( value );
+						const canSplit = onReplace && onSplit;
+
+						if ( onReplace ) {
+							const transforms = getBlockTransforms(
+								'from'
+							).filter( ( { type } ) => type === 'enter' );
+							const transformation = findTransform(
+								transforms,
+								( item ) => {
+									return item.regExp.test( _value.text );
 								}
-								className={ classnames(
-									classes,
-									props.className,
-									editableProps.className
-								) }
-								aria-autocomplete={
-									listBoxId ? 'list' : undefined
+							);
+
+							if ( transformation ) {
+								onReplace( [
+									transformation.transform( {
+										content: _value.text,
+									} ),
+								] );
+								__unstableMarkAutomaticChange();
+							}
+						}
+
+						if ( multiline ) {
+							if ( event.shiftKey ) {
+								if ( ! disableLineBreaks ) {
+									onChange( insert( _value, '\n' ) );
 								}
-								aria-owns={ listBoxId }
-								aria-activedescendant={ activeId }
-								onKeyDown={ ( event ) => {
-									onKeyDown( event );
-									editableProps.onKeyDown( event );
-								} }
+							} else if ( canSplit && isEmptyLine( _value ) ) {
+								splitValue( _value );
+							} else {
+								onChange( insertLineSeparator( _value ) );
+							}
+						} else {
+							const { text, start, end } = _value;
+							const canSplitAtEnd =
+								onSplitAtEnd &&
+								start === end &&
+								end === text.length;
+
+							if (
+								event.shiftKey ||
+								( ! canSplit && ! canSplitAtEnd )
+							) {
+								if ( ! disableLineBreaks ) {
+									onChange( insert( _value, '\n' ) );
+								}
+							} else if ( ! canSplit && canSplitAtEnd ) {
+								onSplitAtEnd();
+							} else if ( canSplit ) {
+								splitValue( _value );
+							}
+						}
+					} else if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+						const { start, end, text } = value;
+						const isReverse = keyCode === BACKSPACE;
+
+						// Only process delete if the key press occurs at an uncollapsed edge.
+						if (
+							! isCollapsed( value ) ||
+							activeFormats.length ||
+							( isReverse && start !== 0 ) ||
+							( ! isReverse && end !== text.length )
+						) {
+							return;
+						}
+
+						if ( onMerge ) {
+							onMerge( ! isReverse );
+						}
+
+						// Only handle remove on Backspace. This serves dual-purpose of being
+						// an intentional user interaction distinguishing between Backspace and
+						// Delete to remove the empty field, but also to avoid merge & remove
+						// causing destruction of two fields (merge, then removed merged).
+						if ( onRemove && isEmpty( value ) && isReverse ) {
+							onRemove( ! isReverse );
+						}
+
+						event.preventDefault();
+					}
+				}
+
+				return (
+					<>
+						{ children && children( { value, onChange, onFocus } ) }
+						{ nestedIsSelected && hasFormats && (
+							<FormatToolbarContainer
+								inline={ inlineToolbar }
+								anchorRef={ fallbackRef.current }
 							/>
 						) }
-					</Autocomplete>
-				</>
-			) }
+						{ nestedIsSelected && <RemoveBrowserShortcuts /> }
+						<Autocomplete
+							onReplace={ onReplace }
+							completers={ autocompleters }
+							record={ value }
+							onChange={ onChange }
+							isSelected={ nestedIsSelected }
+							contentRef={ fallbackRef }
+						>
+							{ ( { listBoxId, activeId, onKeyDown } ) => (
+								<TagName
+									{ ...editableProps }
+									{ ...props }
+									style={
+										props.style
+											? {
+													...props.style,
+													...editableProps.style,
+											  }
+											: editableProps.style
+									}
+									className={ classnames(
+										classes,
+										props.className,
+										editableProps.className
+									) }
+									aria-autocomplete={
+										listBoxId ? 'list' : undefined
+									}
+									aria-owns={ listBoxId }
+									aria-activedescendant={ activeId }
+									onKeyDown={ ( event ) => {
+										onKeyDown( event );
+										_onKeyDown( event );
+									} }
+								/>
+							) }
+						</Autocomplete>
+					</>
+				);
+			} }
 		</RichText>
 	);
 
