@@ -65,7 +65,6 @@ function RichText(
 		__unstableMarkAutomaticChange: markAutomaticChange,
 		__unstableAllowPrefixTransformations: allowPrefixTransformations,
 		__unstableUndo: undo,
-		__unstableOnCreateUndoLevel: onCreateUndoLevel,
 		__unstableIsSelected: isSelected,
 	},
 	forwardedRef
@@ -203,7 +202,6 @@ function RichText(
 	// Internal values are updated synchronously, unlike props and state.
 	const _value = useRef( value );
 	const record = useRef();
-	const lastHistoryValue = useRef( value );
 
 	function setRecordFromProps() {
 		record.current = formatToValue( value );
@@ -215,26 +213,13 @@ function RichText(
 		setRecordFromProps();
 	}
 
-	function createUndoLevel() {
-		// If the content is the same, no level needs to be created.
-		if ( lastHistoryValue.current === _value.current ) {
-			return;
-		}
-
-		onCreateUndoLevel();
-		lastHistoryValue.current = _value.current;
-	}
-
 	/**
 	 * Sync the value to global state. The node tree and selection will also be
 	 * updated if differences are found.
 	 *
-	 * @param {Object}  newRecord         The record to sync and apply.
-	 * @param {Object}  $2                Named options.
-	 * @param {boolean} $2.withoutHistory If true, no undo level will be
-	 *                                    created.
+	 * @param {Object} newRecord The record to sync and apply.
 	 */
-	function handleChange( newRecord, { withoutHistory } = {} ) {
+	function handleChange( newRecord ) {
 		if ( disableFormats ) {
 			newRecord.formats = Array( newRecord.text.length );
 			newRecord.replacements = Array( newRecord.text.length );
@@ -256,10 +241,6 @@ function RichText(
 		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
 			changeHandler( newRecord.formats, newRecord.text );
 		} );
-
-		if ( ! withoutHistory ) {
-			createUndoLevel();
-		}
 	}
 
 	function applyFromProps( { domOnly } = {} ) {
@@ -350,7 +331,6 @@ function RichText(
 			applyRecord,
 			createRecord,
 			handleChange,
-			createUndoLevel,
 			allowPrefixTransformations,
 			inputRule,
 			valueToFormat,

@@ -14,6 +14,7 @@ import {
 	useCallback,
 	forwardRef,
 	useEffect,
+	useLayoutEffect,
 } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -120,6 +121,7 @@ function Element( {
 	activeId,
 	onKeyDown,
 	value,
+	html,
 	onChange,
 	richTextRef,
 	tagName: TagName = 'div',
@@ -143,6 +145,7 @@ function Element( {
 		enterFormattedText,
 		exitFormattedText,
 		__unstableMarkAutomaticChange,
+		__unstableMarkLastChangeAsPersistent,
 	} = useDispatch( blockEditorStore );
 
 	useEffect( () => {
@@ -154,6 +157,29 @@ function Element( {
 			exitFormattedText();
 		}
 	}, [ hasActiveFormats ] );
+
+	const previousText = useRef();
+
+	// Must be set synchronously to make sure it applies to the last change.
+	useLayoutEffect( () => {
+		if ( ! previousText ) {
+			return;
+		}
+
+		// Text input, so don't create an undo level for every character.
+		// Create an undo level after 1 second of no input.
+		if ( previousText !== value.text ) {
+			const timeout = window.setTimeout( () => {
+				__unstableMarkLastChangeAsPersistent();
+			}, 1000 );
+			previousText.current = value.text;
+			return () => {
+				window.clearTimeout( timeout );
+			};
+		}
+
+		__unstableMarkLastChangeAsPersistent();
+	}, [ html ] );
 
 	function _onKeyDown( event ) {
 		const { keyCode } = event;
@@ -384,11 +410,9 @@ function RichTextWrapper(
 		undo,
 		shouldBlurOnUnmount,
 	} = useSelect( selector );
-	const {
-		__unstableMarkLastChangeAsPersistent,
-		selectionChange,
-		__unstableMarkAutomaticChange,
-	} = useDispatch( blockEditorStore );
+	const { selectionChange, __unstableMarkAutomaticChange } = useDispatch(
+		blockEditorStore
+	);
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -677,7 +701,6 @@ function RichTextWrapper(
 			__unstableIsSelected={ isSelected }
 			__unstableInputRule={ inputRule }
 			__unstableMultilineTag={ multilineTag }
-			__unstableOnCreateUndoLevel={ __unstableMarkLastChangeAsPersistent }
 			__unstableMarkAutomaticChange={ __unstableMarkAutomaticChange }
 			__unstableDidAutomaticChange={ didAutomaticChange }
 			__unstableUndo={ undo }
@@ -750,6 +773,7 @@ function RichTextWrapper(
 									listBoxId,
 									activeId,
 									onKeyDown,
+									html: adjustedValue,
 									value,
 									onChange,
 									richTextRef: ref,
