@@ -30,6 +30,7 @@ import {
 } from '@wordpress/blocks';
 import { SVG, Rect, G, Path } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
+import { parse as stageOneParse } from '@wordpress/block-serialization-default-parser';
 
 /**
  * A block selection object.
@@ -1793,7 +1794,11 @@ const checkAllowListRecursive = ( blocks, allowedBlockTypes ) => {
 	while ( blocksQueue.length > 0 ) {
 		const block = blocksQueue.shift();
 
-		const isAllowed = checkAllowList( allowedBlockTypes, block.name, true );
+		const isAllowed = checkAllowList(
+			allowedBlockTypes,
+			block.name || block.blockName,
+			true
+		);
 		if ( ! isAllowed ) {
 			return false;
 		}
@@ -1813,30 +1818,31 @@ export const __experimentalGetParsedPattern = createSelector(
 		if ( ! pattern ) {
 			return null;
 		}
-
-		const blocks = parse( pattern.content );
-		const { allowedBlockTypes } = getSettings( state );
-		const isAllowed = checkAllowListRecursive( blocks, allowedBlockTypes );
-
 		return {
 			...pattern,
-			blocks,
-			isAllowed,
+			blocks: parse( pattern.content ),
 		};
 	},
-	( state ) => [
-		state.settings.__experimentalBlockPatterns,
-		state.settings.allowedBlockTypes,
-	]
+	( state ) => [ state.settings.__experimentalBlockPatterns ]
 );
 
-export const __experimentalGetAvailableParsedPatterns = createSelector(
+export const __experimentalGetAvailableStageOneParsedPatterns = createSelector(
 	( state ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
-		const parsedPatterns = patterns.map( ( { name } ) =>
-			__experimentalGetParsedPattern( state, name )
-		);
-		return parsedPatterns.filter( ( { isAllowed } ) => isAllowed );
+		const { allowedBlockTypes } = getSettings( state );
+		return patterns
+			.map( ( pattern ) => ( {
+				...pattern,
+				stageOneBlocks: stageOneParse( pattern.content ),
+			} ) )
+			.filter( ( { stageOneBlocks } ) => {
+				const isAllowed = checkAllowListRecursive(
+					stageOneBlocks,
+					allowedBlockTypes
+				);
+
+				return isAllowed;
+			} );
 	},
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
@@ -1850,18 +1856,18 @@ export const __experimentalGetAvailableParsedPatterns = createSelector(
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional target root client ID.
  *
- * @return {Array?} The list of allowed block types.
+ * @return {Array?} The list of allowed patterns.
  */
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
-		const availableParsedPatterns = __experimentalGetAvailableParsedPatterns(
+		const availableParsedPatterns = __experimentalGetAvailableStageOneParsedPatterns(
 			state
 		);
 		const patternsAllowed = filter(
 			availableParsedPatterns,
-			( { blocks } ) =>
-				blocks.every( ( { name } ) =>
-					canInsertBlockType( state, name, rootClientId )
+			( { stageOneBlocks } ) =>
+				stageOneBlocks.every( ( { blockName } ) =>
+					canInsertBlockType( state, blockName, rootClientId )
 				)
 		);
 		return patternsAllowed;
