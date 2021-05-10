@@ -33,6 +33,15 @@ export default function ImageSizeControl( {
 		};
 	}
 
+	// Normalize the changed dimension before passing it on.
+	function normalizeDimension( dimension ) {
+		const parsedDimension = parseInt( dimension, 10 );
+
+		return isNaN( parsedDimension ) || parsedDimension <= 0
+			? undefined
+			: parsedDimension;
+	}
+
 	return (
 		<>
 			{ ! isEmpty( imageSizeOptions ) && (
@@ -56,7 +65,9 @@ export default function ImageSizeControl( {
 							value={ width ?? imageWidth ?? '' }
 							min={ 1 }
 							onChange={ ( value ) =>
-								onChange( { width: parseInt( value, 10 ) } )
+								onChange( {
+									width: normalizeDimension( value ),
+								} )
 							}
 						/>
 						<TextControl
@@ -67,7 +78,7 @@ export default function ImageSizeControl( {
 							min={ 1 }
 							onChange={ ( value ) =>
 								onChange( {
-									height: parseInt( value, 10 ),
+									height: normalizeDimension( value ),
 								} )
 							}
 						/>
