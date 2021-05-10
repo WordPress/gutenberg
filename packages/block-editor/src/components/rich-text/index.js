@@ -162,13 +162,14 @@ function Element( {
 
 	// Must be set synchronously to make sure it applies to the last change.
 	useLayoutEffect( () => {
-		if ( ! previousText ) {
+		if ( ! previousText.current ) {
+			previousText.current = value.text;
 			return;
 		}
 
 		// Text input, so don't create an undo level for every character.
 		// Create an undo level after 1 second of no input.
-		if ( previousText !== value.text ) {
+		if ( previousText.current !== value.text ) {
 			const timeout = window.setTimeout( () => {
 				__unstableMarkLastChangeAsPersistent();
 			}, 1000 );
@@ -179,7 +180,7 @@ function Element( {
 		}
 
 		__unstableMarkLastChangeAsPersistent();
-	}, [ html ] );
+	}, [ html, hasActiveFormats ] );
 
 	function _onKeyDown( event ) {
 		const { keyCode } = event;
