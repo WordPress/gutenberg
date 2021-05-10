@@ -20,7 +20,6 @@ export function useIndentListItemOnSpace( props ) {
 			const { keyCode, shiftKey, altKey, metaKey, ctrlKey } = event;
 			const {
 				multilineTag,
-				multilineRootTag,
 				createRecord,
 				handleChange,
 			} = propsRef.current;
@@ -52,7 +51,9 @@ export function useIndentListItemOnSpace( props ) {
 			}
 
 			handleChange(
-				indentListItems( currentValue, { type: multilineRootTag } )
+				indentListItems( currentValue, {
+					type: element.tagName.toLowerCase(),
+				} )
 			);
 			event.preventDefault();
 		}
