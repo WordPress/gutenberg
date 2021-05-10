@@ -38,6 +38,15 @@ function InserterTabs( {
 	const tabAnimation = useRef( new Animated.Value( 0 ) ).current;
 	const lastScrollEvents = useRef( [] ).current;
 
+	function onScroll( event ) {
+		lastScrollEvents[ tabIndex ] = event.nativeEvent;
+		listProps.onScroll( event );
+	}
+
+	function onDimensionsChange() {
+		setWindowWidth( Dimensions.get( 'window' ).width );
+	}
+
 	useEffect( () => {
 		Dimensions.addEventListener( 'change', onDimensionsChange );
 		return () =>
@@ -81,26 +90,17 @@ function InserterTabs( {
 		[ tabAnimation, tabKeys, windowWidth ]
 	);
 
-	function onScroll( event ) {
-		lastScrollEvents[ tabIndex ] = event.nativeEvent;
-		listProps.onScroll( event );
-	}
-
-	function onDimensionsChange() {
-		setWindowWidth( Dimensions.get( 'window' ).width );
-	}
+	const containerStyle = [
+		styles[ 'inserter-tabs__container' ],
+		{
+			width: windowWidth * tabKeys.length,
+			transform: [ { translateX } ],
+		},
+	];
 
 	return (
 		<View style={ styles[ 'inserter-tabs__wrapper' ] }>
-			<Animated.View
-				style={ [
-					styles[ 'inserter-tabs__container' ],
-					{
-						width: windowWidth * tabKeys.length,
-						transform: [ { translateX } ],
-					},
-				] }
-			>
+			<Animated.View style={ containerStyle }>
 				{ tabs.map( ( tab, index ) => (
 					<View
 						key={ `tab-${ index }` }
