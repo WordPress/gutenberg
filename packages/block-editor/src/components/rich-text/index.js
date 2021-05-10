@@ -300,7 +300,6 @@ function RichTextWrapper(
 		disableLineBreaks,
 		unstableOnFocus,
 		__unstableAllowPrefixTransformations,
-		__unstableMultilineRootTag,
 		// Native props.
 		__unstableMobileNoFocusOnMount,
 		deleteEnter,
@@ -683,7 +682,6 @@ function RichTextWrapper(
 			__unstableAllowPrefixTransformations={
 				__unstableAllowPrefixTransformations
 			}
-			__unstableMultilineRootTag={ __unstableMultilineRootTag }
 			// Native props.
 			{ ...nativeProps }
 			blockIsSelected={

@@ -7,7 +7,7 @@ import {
 	useState,
 	useLayoutEffect,
 } from '@wordpress/element';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -41,7 +41,6 @@ function createPrepareEditableTree( fns ) {
 
 function RichText(
 	{
-		tagName = 'div',
 		value = '',
 		selectionStart,
 		selectionEnd,
@@ -57,7 +56,6 @@ function RichText(
 		clientId,
 		identifier,
 		__unstableMultilineTag: multilineTag,
-		__unstableMultilineRootTag: multilineRootTag,
 		__unstableDisableFormats: disableFormats,
 		__unstableInputRule: inputRule,
 		__unstableMarkAutomaticChange: markAutomaticChange,
@@ -81,12 +79,6 @@ function RichText(
 		withoutInteractiveFormatting,
 		allowedFormats,
 	} );
-
-	// For backward compatibility, fall back to tagName if it's a string.
-	// tagName can now be a component for light blocks.
-	if ( ! multilineRootTag && typeof tagName === 'string' ) {
-		multilineRootTag = tagName;
-	}
 
 	/**
 	 * Converts the outside data structure to our internal representation.
@@ -269,17 +261,6 @@ function RichText(
 
 	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
-		if ( didMount.current ) {
-			applyFromProps();
-		} else {
-			applyFromProps( { domOnly: true } );
-		}
-
-		didMount.current = true;
-	}, [ tagName, placeholder, ...dependencies ] );
-
-	// Value updates must happen synchonously to avoid overwriting newer values.
-	useLayoutEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
 			applyFromProps();
 		}
@@ -327,7 +308,6 @@ function RichText(
 		} ),
 		useIndentListItemOnSpace( {
 			multilineTag,
-			multilineRootTag,
 			createRecord,
 			handleChange,
 		} ),
@@ -356,6 +336,15 @@ function RichText(
 			onSelectionChange,
 			setActiveFormats,
 		} ),
+		useRefEffect( () => {
+			if ( didMount.current ) {
+				applyFromProps();
+			} else {
+				applyFromProps( { domOnly: true } );
+			}
+
+			didMount.current = true;
+		}, [ placeholder, ...dependencies ] ),
 	] );
 
 	return (
