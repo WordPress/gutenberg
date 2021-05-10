@@ -20,7 +20,7 @@ export const settings = {
 			'Displays and allows editing the name of the site. The site title usually appears in the browser title bar, in search results, and more. Also available in <a>Settings > General</a>.'
 		),
 		// eslint-disable-next-line jsx-a11y/anchor-has-content
-		{ a: <a href="options-general.php" target="_blank" /> }
+		{ a: <a href="options-general.php" /> }
 	),
 	icon,
 	edit,
