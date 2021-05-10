@@ -1,7 +1,11 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-11 {
+.emotion-3 {
+  height: 100%;
+}
+
+.emotion-12 {
   background-color: #fff;
   color: #000;
   position: relative;
@@ -10,7 +14,7 @@ exports[`props should render correctly 1`] = `
   border-radius: 2px;
 }
 
-.emotion-11 .components-card-body {
+.emotion-12 .components-card-body {
   max-height: 80vh;
 }
 
@@ -60,7 +64,7 @@ exports[`props should render correctly 1`] = `
   border-bottom-right-radius: 2px;
 }
 
-.emotion-5 {
+.emotion-6 {
   background: transparent;
   display: block;
   margin: 0 !important;
@@ -79,7 +83,7 @@ exports[`props should render correctly 1`] = `
   border-radius: 2px;
 }
 
-.emotion-8 {
+.emotion-9 {
   background: transparent;
   display: block;
   margin: 0 !important;
@@ -99,12 +103,12 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-surface components-card emotion-11 emotion-1 emotion-2"
+  class="components-surface components-card emotion-12 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Card"
 >
   <div
-    class="emotion-1 emotion-2"
+    class="emotion-3 emotion-1 emotion-2"
   >
     <iframe
       aria-hidden="true"
@@ -123,13 +127,13 @@ exports[`props should render correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
-    class="components-elevation emotion-5 emotion-1 emotion-2"
+    class="components-elevation emotion-6 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
   <div
     aria-hidden="true"
-    class="components-elevation emotion-8 emotion-1 emotion-2"
+    class="components-elevation emotion-9 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
@@ -145,7 +149,7 @@ Snapshot Diff:
   <div
 -   aria-label="show"
 +   aria-label="popover-base-popover"
-    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View egi4jkx0"
+    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View em57xhy0"
     data-dialog="true"
     data-wp-c16t="true"
     data-wp-component="Popover"
@@ -155,7 +159,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View egi4jkx0"
+      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
 `;
 
 exports[`props should render without content 1`] = `
@@ -167,7 +171,7 @@ Snapshot Diff:
   <div
 -   aria-label="popover-contentless-popover"
 +   aria-label="popover-base-popover"
-    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View egi4jkx0"
+    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View em57xhy0"
     data-dialog="true"
     data-wp-c16t="true"
     data-wp-component="Popover"
@@ -177,7 +181,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View egi4jkx0"
+      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
 @@ -21,10 +21,17 @@
           frameborder="0"
           src="about:blank"
@@ -185,7 +189,7 @@ Snapshot Diff:
           tabindex="-1"
         />
 +       <div
-+         class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View egi4jkx0"
++         class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
 +         data-wp-c16t="true"
 +         data-wp-component="CardBody"
 +       >
@@ -194,6 +198,6 @@ Snapshot Diff:
       </div>
       <div
         aria-hidden="true"
-        class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View egi4jkx0"
+        class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View em57xhy0"
         data-wp-c16t="true"
 `;

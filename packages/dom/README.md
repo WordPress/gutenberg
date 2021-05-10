@@ -261,7 +261,7 @@ _Parameters_
 
 _Returns_
 
--   `element is HTMLElement`: True if the element is an text field, false if not.
+-   `node is HTMLElement`: True if the element is an text field, false if not.
 
 <a name="isVerticalEdge" href="#isVerticalEdge">#</a> **isVerticalEdge**
 

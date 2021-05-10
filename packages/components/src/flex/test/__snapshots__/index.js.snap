@@ -6,16 +6,16 @@ Snapshot Diff:
 + Second value
 
 @@ -7,14 +7,10 @@
-      class="components-flex-item css-1636tkh-Item css-1mm2cvy-View egi4jkx0"
+      class="components-flex-item css-1636tkh-Item css-1mm2cvy-View em57xhy0"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
     />
     <div
--     class="css-1mm2cvy-View egi4jkx0"
+-     class="css-1mm2cvy-View em57xhy0"
 -   />
 -   <div />
 -   <div
-      class="components-flex-item components-flex-block css-1fgvc79-Item-block css-1mm2cvy-View egi4jkx0"
+      class="components-flex-item components-flex-block css-1fgvc79-Item-block css-1mm2cvy-View em57xhy0"
       data-wp-c16t="true"
       data-wp-component="FlexBlock"
     />

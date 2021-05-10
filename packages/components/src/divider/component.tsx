@@ -17,60 +17,69 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
-import { contextConnect, useContextSystem } from '../context';
+import { contextConnect, useContextSystem } from '../ui/context';
 // eslint-disable-next-line no-duplicate-imports
-import type { ViewOwnProps } from '../context';
+import type { ViewOwnProps } from '../ui/context';
 import * as styles from './styles';
-import { space } from '../utils/space';
+import { space } from '../ui/utils/space';
 
 export interface DividerProps extends SeparatorProps {
 	/**
 	 * Adjusts all margins.
 	 */
-	m?: number;
+	margin?: number;
 	/**
 	 * Adjusts top margins.
 	 */
-	mt?: number;
+	marginTop?: number;
 	/**
 	 * Adjusts bottom margins.
 	 */
-	mb?: number;
+	marginBottom?: number;
 }
 
 function Divider(
 	props: ViewOwnProps< DividerProps, 'hr' >,
 	forwardedRef: Ref< any >
 ) {
-	const { className, m, mb, mt, ...otherProps } = useContextSystem(
-		props,
-		'Divider'
-	);
+	const {
+		className,
+		margin,
+		marginBottom,
+		marginTop,
+		...otherProps
+	} = useContextSystem( props, 'Divider' );
 
 	const classes = useMemo( () => {
 		const sx: Record< string, string > = {};
 
-		if ( typeof m !== 'undefined' ) {
-			sx.m = css`
-				margin-bottom: ${ space( m ) };
-				margin-top: ${ space( m ) };
+		if ( typeof margin !== 'undefined' ) {
+			sx.margin = css`
+				margin-bottom: ${ space( margin ) };
+				margin-top: ${ space( margin ) };
 			`;
 		} else {
-			if ( typeof mt !== 'undefined' ) {
-				sx.mt = css`
-					margin-top: ${ space( mt ) };
+			if ( typeof marginTop !== 'undefined' ) {
+				sx.marginTop = css`
+					margin-top: ${ space( marginTop ) };
 				`;
 			}
 
-			if ( typeof mb !== 'undefined' ) {
-				sx.mb = css`
-					margin-bottom: ${ space( mb ) };
+			if ( typeof marginBottom !== 'undefined' ) {
+				sx.marginBottom = css`
+					margin-bottom: ${ space( marginBottom ) };
 				`;
 			}
 		}
 
-		return cx( styles.Divider, sx.mb, sx.mt, sx.m, className );
-	}, [ className, m, mb, mt ] );
+		return cx(
+			styles.Divider,
+			sx.marginBottom,
+			sx.marginTop,
+			sx.margin,
+			className
+		);
+	}, [ className, margin, marginBottom, marginTop ] );
 
 	return (
 		<Separator
@@ -87,7 +96,10 @@ function Divider(
  *
  * @example
  * ```js
- * import { Divider, FormGroup, ListGroup } from `@wordpress/components/ui`;
+ * import {
+ *     __experimentalDivider as Divider,
+ *     __experimentalText as Text }
+ * from `@wordpress/components`;
  *
  * function Example() {
  * 	return (

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { View } from '../../ui/view';
+import { View } from '../../view';
 import { HStack } from '..';
 
 export default {
