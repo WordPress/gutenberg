@@ -44,6 +44,14 @@ export const menuItemToBlockAttributes = ( {
 	type: menuItemTypeField,
 	target,
 } ) => {
+	// For historical reasons, the `core/navigation-link` variation type is `tag`
+	// whereas WP Core expects `post_tag` as the `object` type.
+	// To avoid writing a block migration we perform a conversion here.
+	// See also inverse equivalent in `blockAttributesToMenuItem`.
+	if ( object && object === 'post_tag' ) {
+		object = 'tag';
+	}
+
 	return {
 		label: menuItemTitleField?.rendered || '',
 		...( object?.length && {

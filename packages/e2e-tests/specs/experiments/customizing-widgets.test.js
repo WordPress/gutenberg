@@ -432,6 +432,72 @@ describe( 'Widgets Customizer', () => {
 			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
 		);
 	} );
+
+	it( 'should clear block selection', async () => {
+		const widgetsPanel = await find( {
+			role: 'heading',
+			name: /Widgets/,
+			level: 3,
+		} );
+		await widgetsPanel.click();
+
+		const footer1Section = await find( {
+			role: 'heading',
+			name: /^Footer #1/,
+			level: 3,
+		} );
+		await footer1Section.click();
+
+		const paragraphBlock = await addBlock( 'Paragraph' );
+		await page.keyboard.type( 'First Paragraph' );
+		await showBlockToolbar();
+
+		const sectionHeading = await find( {
+			role: 'heading',
+			name: 'Customizing ▸ Widgets Footer #1',
+			level: 3,
+		} );
+		await sectionHeading.click();
+
+		// Expect clicking on the section title should clear the selection.
+		await expect( {
+			role: 'toolbar',
+			name: 'Block tools',
+		} ).not.toBeFound();
+
+		await paragraphBlock.focus();
+		await showBlockToolbar();
+
+		const preview = await page.$( '#customize-preview' );
+		await preview.click();
+
+		// Expect clicking on the preview iframe should clear the selection.
+		await expect( {
+			role: 'toolbar',
+			name: 'Block tools',
+		} ).not.toBeFound();
+
+		await paragraphBlock.focus();
+		await showBlockToolbar();
+
+		const editorContainer = await page.$(
+			'#customize-control-sidebars_widgets-sidebar-1'
+		);
+		const { x, y, width, height } = await editorContainer.boundingBox();
+		// Simulate Clicking on the empty space at the end of the editor.
+		await page.mouse.click( x + width / 2, y + height + 10 );
+
+		// Expect clicking on the empty space at the end of the editor
+		// should clear the selection.
+		await expect( {
+			role: 'toolbar',
+			name: 'Block tools',
+		} ).not.toBeFound();
+
+		expect( console ).toHaveWarned(
+			"The page delivered both an 'X-Frame-Options' header and a 'Content-Security-Policy' header with a 'frame-ancestors' directive. Although the 'X-Frame-Options' header alone would have blocked embedding, it has been ignored."
+		);
+	} );
 } );
 
 async function setWidgetsCustomizerExperiment( enabled ) {
@@ -517,4 +583,6 @@ async function addBlock( blockName ) {
 		selector: '.is-selected[data-block]',
 	} );
 	await addedBlock.focus();
+
+	return addedBlock;
 }
