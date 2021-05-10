@@ -57,7 +57,7 @@ The width of the image when displayed.
 
 ### onChange
 
-The function called when the image size changes. It is passed an object with `{ width, height }` (potentially just one if only one dimension changed).
+The function called when the image size changes. It is passed an object with `{ width, height }` (potentially just one if only one dimension changed). If the dimension value is invalid, the property value is set to `undefined`.
 
 -   Type: `Function`
 -   Required: Yes
