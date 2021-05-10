@@ -20,12 +20,13 @@
 	background: #f0f0f1;
 	border-bottom: 1px solid $gray-200;
 
-	z-index: z-index(".customize-widgets__topbar");
+	z-index: z-index( '.customize-widgets__topbar' );
 }
 
 .customize-widgets-header-toolbar {
 	display: flex;
 	border: none;
+	width: 100%;
 
 	.customize-widgets-header-toolbar__inserter-toggle.components-button.has-icon {
 		border-radius: 2px;
@@ -33,7 +34,7 @@
 		padding: 0;
 		min-width: $grid-unit-30;
 		height: $grid-unit-30;
-		margin: $grid-unit-15 0 $grid-unit-15;
+		margin: $grid-unit-15 0 $grid-unit-15 auto;
 
 		&::before {
 			content: none;

@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { debounce } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import { settingIdToWidgetId } from '../../utils';
@@ -42,12 +47,13 @@ export default class SidebarAdapter {
 			),
 		];
 		this.historyIndex = 0;
+		this.historySubscribers = new Set();
+		// Debounce the input for 1 second.
+		this._pushHistoryDebounce = debounce( this._pushHistory, 1000 );
 
 		this.setting.bind( this._handleSettingChange.bind( this ) );
 		this.api.bind( 'change', this._handleAllSettingsChange.bind( this ) );
 
-		this.canUndo = this.canUndo.bind( this );
-		this.canRedo = this.canRedo.bind( this );
 		this.undo = this.undo.bind( this );
 		this.redo = this.redo.bind( this );
 	}
@@ -82,6 +88,8 @@ export default class SidebarAdapter {
 			),
 		];
 		this.historyIndex += 1;
+
+		this.historySubscribers.forEach( ( listener ) => listener() );
 	}
 
 	_handleSettingChange() {
@@ -247,7 +255,7 @@ export default class SidebarAdapter {
 	setWidgets( nextWidgets ) {
 		const addedWidgetIds = this._updateWidgets( nextWidgets );
 
-		this._pushHistory();
+		this._pushHistoryDebounce();
 
 		return addedWidgetIds;
 	}
@@ -255,11 +263,11 @@ export default class SidebarAdapter {
 	/**
 	 * Undo/Redo related features
 	 */
-	canUndo() {
+	hasUndo() {
 		return this.historyIndex > 0;
 	}
 
-	canRedo() {
+	hasRedo() {
 		return this.historyIndex < this.history.length - 1;
 	}
 
@@ -273,10 +281,12 @@ export default class SidebarAdapter {
 		this._updateWidgets( widgets );
 
 		this._emit( currentWidgets, this.getWidgets() );
+
+		this.historySubscribers.forEach( ( listener ) => listener() );
 	}
 
 	undo() {
-		if ( ! this.canUndo() ) {
+		if ( ! this.hasUndo() ) {
 			return;
 		}
 
@@ -284,10 +294,18 @@ export default class SidebarAdapter {
 	}
 
 	redo() {
-		if ( ! this.canRedo() ) {
+		if ( ! this.hasRedo() ) {
 			return;
 		}
 
 		this._seek( this.historyIndex + 1 );
+	}
+
+	subscribeHistory( listener ) {
+		this.historySubscribers.add( listener );
+
+		return () => {
+			this.historySubscribers.delete( listener );
+		};
 	}
 }
