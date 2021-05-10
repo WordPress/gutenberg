@@ -52,13 +52,15 @@ describe( 'invalid blocks', () => {
 		);
 	} );
 
-	it( 'should not alert from on* attribute', async () => {
+	it( 'should strip potentially malicious on* attributes', async () => {
 		let hasAlert = false;
 
 		page.on( 'dialog', () => {
 			hasAlert = true;
 		} );
 
+		// The paragraph block contains invalid HTML, which causes it to be an
+		// invalid block.
 		await setPostContent(
 			`
 			<!-- wp:paragraph -->
@@ -75,13 +77,15 @@ describe( 'invalid blocks', () => {
 		expect( hasAlert ).toBe( false );
 	} );
 
-	it( 'should not alert from script tag', async () => {
+	it( 'should strip potentially malicious script tags', async () => {
 		let hasAlert = false;
 
 		page.on( 'dialog', () => {
 			hasAlert = true;
 		} );
 
+		// The shortcode block contains invalid HTML, which causes it to be an
+		// invalid block.
 		await setPostContent(
 			`
 			<!-- wp:shortcode -->
