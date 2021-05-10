@@ -8,6 +8,7 @@ import {
 	get,
 	has,
 	isEmpty,
+	isString,
 	kebabCase,
 	map,
 	omit,
@@ -78,12 +79,25 @@ export function getInlineStyles( styles = {} ) {
 		const subPaths = STYLE_PROPERTY[ propKey ].properties;
 		// Ignore styles on elements because they are handled on the server.
 		if ( has( styles, path ) && 'elements' !== first( path ) ) {
-			if ( !! subPaths ) {
-				subPaths.forEach( ( suffix ) => {
-					output[
-						propKey + capitalize( suffix )
-					] = compileStyleValue( get( styles, [ ...path, suffix ] ) );
-				} );
+			// Checking if style value is a string allows for shorthand css
+			// option and backwards compatibility for border radius support.
+			const styleValue = get( styles, path );
+
+			if ( !! subPaths && ! isString( styleValue ) ) {
+				if ( Array.isArray( subPaths ) ) {
+					subPaths.forEach( ( suffix ) => {
+						output[
+							propKey + capitalize( suffix )
+						] = compileStyleValue( get( styleValue, [ suffix ] ) );
+					} );
+				} else {
+					Object.entries( subPaths ).forEach( ( entry ) => {
+						const [ name, suffix ] = entry;
+						output[ name ] = compileStyleValue(
+							get( styleValue, [ suffix ] )
+						);
+					} );
+				}
 			} else {
 				output[ propKey ] = compileStyleValue( get( styles, path ) );
 			}

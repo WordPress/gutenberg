@@ -41,4 +41,24 @@ describe( 'getInlineStyles', () => {
 			paddingTop: '10px',
 		} );
 	} );
+
+	it( 'should return individual border radius styles', () => {
+		expect(
+			getInlineStyles( {
+				border: {
+					radius: {
+						topLeft: '10px',
+						topRight: '0.5rem',
+						bottomLeft: '0.5em',
+						bottomRight: '1em',
+					},
+				},
+			} )
+		).toEqual( {
+			borderTopLeftRadius: '10px',
+			borderTopRightRadius: '0.5rem',
+			borderBottomLeftRadius: '0.5em',
+			borderBottomRightRadius: '1em',
+		} );
+	} );
 } );

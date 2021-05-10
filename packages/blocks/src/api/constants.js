@@ -33,6 +33,12 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	borderRadius: {
 		value: [ 'border', 'radius' ],
 		support: [ '__experimentalBorder', 'radius' ],
+		properties: {
+			borderTopLeftRadius: 'topLeft',
+			borderTopRightRadius: 'topRight',
+			borderBottomLeftRadius: 'bottomLeft',
+			borderBottomRightRadius: 'bottomRight',
+		},
 	},
 	borderStyle: {
 		value: [ 'border', 'style' ],
