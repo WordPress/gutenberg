@@ -7,6 +7,7 @@ import {
 	forEach,
 	get,
 	isEmpty,
+	isString,
 	kebabCase,
 	pickBy,
 	reduce,
@@ -134,24 +135,44 @@ function getStylesDeclarations( blockStyles = {} ) {
 			if ( first( pathToValue ) === 'elements' ) {
 				return declarations;
 			}
-			if ( !! properties ) {
-				properties.forEach( ( prop ) => {
-					if (
-						! get( blockStyles, [ ...pathToValue, prop ], false )
-					) {
-						// Do not create a declaration
-						// for sub-properties that don't have any value.
-						return;
-					}
-					const cssProperty = kebabCase(
-						`${ key }${ capitalize( prop ) }`
-					);
-					declarations.push(
-						`${ cssProperty }: ${ compileStyleValue(
-							get( blockStyles, [ ...pathToValue, prop ] )
-						) }`
-					);
-				} );
+
+			const styleValue = get( blockStyles, pathToValue );
+
+			if ( !! properties && ! isString( styleValue ) ) {
+				if ( Array.isArray( properties ) ) {
+					properties.forEach( ( prop ) => {
+						if ( ! get( styleValue, [ prop ], false ) ) {
+							// Do not create a declaration
+							// for sub-properties that don't have any value.
+							return;
+						}
+						const cssProperty = kebabCase(
+							`${ key }${ capitalize( prop ) }`
+						);
+						declarations.push(
+							`${ cssProperty }: ${ compileStyleValue(
+								get( styleValue, [ prop ] )
+							) }`
+						);
+					} );
+				} else {
+					Object.entries( properties ).forEach( ( entry ) => {
+						const [ name, prop ] = entry;
+
+						if ( ! get( styleValue, [ prop ], false ) ) {
+							// Do not create a declaration
+							// for sub-properties that don't have any value.
+							return;
+						}
+
+						const cssProperty = kebabCase( name );
+						declarations.push(
+							`${ cssProperty }: ${ compileStyleValue(
+								get( styleValue, [ prop ] )
+							) }`
+						);
+					} );
+				}
 			} else if ( get( blockStyles, pathToValue, false ) ) {
 				const cssProperty = key.startsWith( '--' )
 					? key
