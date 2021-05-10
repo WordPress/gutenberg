@@ -74,33 +74,31 @@ const Tooltip = ( {
 	};
 	const tooltipStyles = [
 		styles.tooltip,
+		horizontalPosition === 'right' && styles[ 'tooltip--rightAlign' ],
 		{
 			elevation: 2,
+			opacity: animationValue,
 			shadowColor: styles.tooltip__shadow?.color,
 			shadowOffset: { height: 2, width: 0 },
 			shadowOpacity: 0.25,
 			shadowRadius: 2,
+			transform: [
+				{
+					translateY: animationValue.interpolate( {
+						inputRange: [ 0, 1 ],
+						outputRange: [ visible ? 4 : -8, -8 ],
+					} ),
+				},
+			],
 		},
-		horizontalPosition === 'right' && styles[ 'tooltip--rightAlign' ],
 	];
-	const animationStyles = {
-		opacity: animationValue,
-		transform: [
-			{
-				translateY: animationValue.interpolate( {
-					inputRange: [ 0, 1 ],
-					outputRange: [ visible ? 4 : -8, -8 ],
-				} ),
-			},
-		],
-	};
 	const arrowStyles = [
 		styles.tooltip__arrow,
 		horizontalPosition === 'right' &&
 			styles[ 'tooltip__arrow--rightAlign' ],
 	];
-	let to;
 
+	let to;
 	const getReferenceElementPosition = () => {
 		clearTimeout( to );
 		// Timeout used allow render to occur before calculating layout
@@ -118,7 +116,6 @@ const Tooltip = ( {
 			);
 		}, 0 );
 	};
-
 	const getTooltipLayout = ( { nativeEvent } ) =>
 		setTooltipLayout( nativeEvent.layout );
 
@@ -137,13 +134,11 @@ const Tooltip = ( {
 							onLayout={ getTooltipLayout }
 							style={ positionStyles }
 						>
-							<Animated.View style={ animationStyles }>
-								<View style={ tooltipStyles }>
-									<Text style={ styles.tooltip__text }>
-										{ text }
-									</Text>
-									<View style={ arrowStyles } />
-								</View>
+							<Animated.View style={ tooltipStyles }>
+								<Text style={ styles.tooltip__text }>
+									{ text }
+								</Text>
+								<View style={ arrowStyles } />
 							</Animated.View>
 						</View>
 					</TouchableWithoutFeedback>
@@ -153,13 +148,6 @@ const Tooltip = ( {
 	);
 };
 
-Tooltip.Slot = ( { children, ...rest } ) => {
-	return (
-		<>
-			{ children }
-			<Slot { ...rest } />
-		</>
-	);
-};
+Tooltip.Slot = Slot;
 
 export default Tooltip;
