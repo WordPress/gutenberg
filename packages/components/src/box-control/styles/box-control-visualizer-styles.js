@@ -7,7 +7,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { color, rtl } from '../../utils/style-mixins';
+import { COLORS, rtl } from '../../utils';
 
 const containerPositionStyles = ( { isPositionAbsolute } ) => {
 	if ( ! isPositionAbsolute ) return '';
@@ -31,8 +31,8 @@ export const Container = styled.div`
 
 export const Side = styled.div`
 	box-sizing: border-box;
-	background: ${ color( 'blue.wordpress.700' ) };
-	background: ${ color( 'ui.theme' ) };
+	background: ${ COLORS.blue.wordpress[ 700 ] };
+	background: ${ COLORS.ui.theme };
 	filter: brightness( 1 );
 	opacity: 0;
 	position: absolute;

@@ -6,7 +6,7 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { font, space, color } from '../../utils';
+import { font, space, COLORS } from '../../utils';
 
 export const Wrapper = styled.div`
 	font-family: ${ font( 'default.fontFamily' ) };
@@ -29,5 +29,5 @@ export const StyledLabel = styled.label`
 export const StyledHelp = styled.p`
 	font-size: ${ font( 'helpText.fontSize' ) };
 	font-style: normal;
-	color: ${ color( 'mediumGray.text' ) };
+	color: ${ COLORS.mediumGray.text };
 `;

@@ -8,13 +8,13 @@ import { css } from '@emotion/core';
  */
 import { reduceMotion } from '../reduce-motion';
 import { config } from '../config';
-import { color } from '../colors';
+import { COLORS } from '../colors-values';
 
 export const inputStyleNeutral = css`
 	box-shadow: 0 0 0 transparent;
 	transition: box-shadow 0.1s linear;
 	border-radius: ${ config( 'radiusBlockUi' ) };
-	border: ${ config( 'borderWidth' ) } solid ${ color( 'ui.border' ) };
+	border: ${ config( 'borderWidth' ) } solid ${ COLORS.ui.border };
 	${ reduceMotion( 'transition' ) }
 `;
 
