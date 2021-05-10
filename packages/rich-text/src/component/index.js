@@ -18,11 +18,8 @@ import FormatEdit from './format-edit';
 import { create } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
-import { remove } from '../remove';
 import { removeFormat } from '../remove-format';
 import { isCollapsed } from '../is-collapsed';
-import { removeLineSeparator } from '../remove-line-separator';
-import { isEmptyLine } from '../is-empty';
 import { useFormatTypes } from './use-format-types';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
@@ -34,6 +31,7 @@ import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { usePasteHandler } from './use-paste-handler';
 import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
+import { useDelete } from './use-delete';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
@@ -212,103 +210,40 @@ function RichText(
 		} );
 	}
 
-	/**
-	 * Handles delete on keydown:
-	 * - outdent list items,
-	 * - delete content if everything is selected,
-	 * - trigger the onDelete prop when selection is uncollapsed and at an edge.
-	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
-	 */
-	function handleDelete( event ) {
-		const { keyCode } = event;
-
-		if ( event.defaultPrevented ) {
-			return;
-		}
-
-		if ( keyCode !== DELETE && keyCode !== BACKSPACE ) {
-			return;
-		}
-
-		const currentValue = createRecord();
-		const { start, end, text } = currentValue;
-		const isReverse = keyCode === BACKSPACE;
-
-		// Always handle full content deletion ourselves.
-		if ( start === 0 && end !== 0 && end === text.length ) {
-			handleChange( remove( currentValue ) );
-			event.preventDefault();
-			return;
-		}
-
-		if ( multilineTag ) {
-			let newValue;
-
-			// Check to see if we should remove the first item if empty.
-			if (
-				isReverse &&
-				currentValue.start === 0 &&
-				currentValue.end === 0 &&
-				isEmptyLine( currentValue )
-			) {
-				newValue = removeLineSeparator( currentValue, ! isReverse );
-			} else {
-				newValue = removeLineSeparator( currentValue, isReverse );
-			}
-
-			if ( newValue ) {
-				handleChange( newValue );
-				event.preventDefault();
-				return;
-			}
-		}
-
-		// Only process delete if the key press occurs at an uncollapsed edge.
-		if (
-			! onDelete ||
-			! isCollapsed( currentValue ) ||
-			activeFormats.length ||
-			( isReverse && start !== 0 ) ||
-			( ! isReverse && end !== text.length )
-		) {
-			return;
-		}
-
-		onDelete( { isReverse, value: currentValue } );
-		event.preventDefault();
-	}
-
-	/**
-	 * Triggers the `onEnter` prop on keydown.
-	 *
-	 * @param {WPSyntheticEvent} event A synthetic keyboard event.
-	 */
-	function handleEnter( event ) {
-		if ( event.keyCode !== ENTER ) {
-			return;
-		}
-
-		event.preventDefault();
-
-		if ( ! onEnter ) {
-			return;
-		}
-
-		onEnter( {
-			value: removeEditorOnlyFormats( createRecord() ),
-			onChange: handleChange,
-			shiftKey: event.shiftKey,
-		} );
-	}
-
 	function handleKeyDown( event ) {
 		if ( event.defaultPrevented ) {
 			return;
 		}
 
-		handleDelete( event );
-		handleEnter( event );
+		const { keyCode } = event;
+
+		if ( event.keyCode === ENTER ) {
+			event.preventDefault();
+			if ( onEnter ) {
+				onEnter( {
+					value: removeEditorOnlyFormats( record.current ),
+					onChange: handleChange,
+					shiftKey: event.shiftKey,
+				} );
+			}
+		} else if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+			const { start, end, text } = record.current;
+			const isReverse = keyCode === BACKSPACE;
+
+			// Only process delete if the key press occurs at an uncollapsed edge.
+			if (
+				! onDelete ||
+				! isCollapsed( record.current ) ||
+				activeFormats.length ||
+				( isReverse && start !== 0 ) ||
+				( ! isReverse && end !== text.length )
+			) {
+				return;
+			}
+
+			onDelete( { isReverse, value: record.current } );
+			event.preventDefault();
+		}
 	}
 
 	// Internal values are updated synchronously, unlike props and state.
@@ -437,6 +372,11 @@ function RichText(
 			useSelectObject(),
 			useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
 			useUndoAutomaticChange( { didAutomaticChange, undo } ),
+			useDelete( {
+				createRecord,
+				handleChange,
+				multilineTag,
+			} ),
 			useIndentListItemOnSpace( {
 				multilineTag,
 				multilineRootTag,
