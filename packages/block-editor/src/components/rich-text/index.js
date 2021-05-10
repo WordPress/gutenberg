@@ -589,6 +589,10 @@ function RichTextWrapper(
 				function _onKeyDown( event ) {
 					const { keyCode } = event;
 
+					if ( event.defaultPrevented ) {
+						return;
+					}
+
 					if ( event.keyCode === ENTER ) {
 						event.preventDefault();
 
