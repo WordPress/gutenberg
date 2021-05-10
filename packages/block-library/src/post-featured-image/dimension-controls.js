@@ -59,7 +59,6 @@ const DimensionControls = ( {
 	attributes: { width, height, scale },
 	setAttributes,
 } ) => {
-	const dimensionsAreSet = width && height;
 	const onDimensionChange = ( dimension, nextValue ) => {
 		setAttributes( {
 			[ dimension ]: parseFloat( nextValue ) < 0 ? '0' : nextValue,
@@ -92,7 +91,7 @@ const DimensionControls = ( {
 					/>
 				</FlexItem>
 			</Flex>
-			{ dimensionsAreSet && (
+			{ !! height && (
 				<>
 					<BaseControl
 						aria-label={ scaleLabel }

@@ -38,17 +38,14 @@ function render_block_core_post_featured_image( $attributes, $content, $block ) 
 		$wrapper_attributes = get_block_wrapper_attributes( array( 'style' => "width:{$attributes['width']};" ) );
 	}
 
-	$image_styles = '';
 	if ( $has_height ) {
 		$image_styles = "height:{$attributes['height']};";
-	}
-	if ( $has_height && $has_width && ! empty( $attributes['scale'] ) ) {
-		$image_styles .= "object-fit:{$attributes['scale']};";
-	}
-
-	if ( $image_styles ) {
+		if ( ! empty( $attributes['scale'] ) ) {
+			$image_styles .= "object-fit:{$attributes['scale']};";
+		}
 		$featured_image = str_replace( 'src=', "style='$image_styles' src=", $featured_image );
 	}
+
 	return "<figure $wrapper_attributes>$featured_image</figure>";
 }
 
