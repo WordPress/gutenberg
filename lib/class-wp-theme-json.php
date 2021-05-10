@@ -1135,20 +1135,9 @@ class WP_Theme_JSON {
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $metadata ) {
 			foreach ( $properties as $property_path ) {
-				$paths   = array();
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-
-				foreach ( $paths as $path ) {
-					$node = _wp_array_get( $incoming_data, $path, array() );
-					if ( empty( $node ) ) {
-						continue;
-					}
-
+				$path = array_merge( $metadata['path'], $property_path );
+				$node = _wp_array_get( $incoming_data, $path, array() );
+				if ( ! empty( $node ) ) {
 					gutenberg_experimental_set( $this->theme_json, $path, $node );
 				}
 			}
