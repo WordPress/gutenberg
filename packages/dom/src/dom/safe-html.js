@@ -14,16 +14,18 @@ export default function safeHTML( html ) {
 	const { body } = document.implementation.createHTMLDocument( '' );
 	body.innerHTML = html;
 	const elements = body.getElementsByTagName( '*' );
+	let elementIndex = elements.length;
 
-	// @ts-ignore
-	for ( const element of elements ) {
+	while ( elementIndex-- ) {
+		const element = elements[ elementIndex ];
+
 		if ( element.tagName === 'SCRIPT' ) {
 			remove( element );
 		} else {
-			let index = element.attributes.length;
+			let attributeIndex = element.attributes.length;
 
-			while ( index-- ) {
-				const { name: key } = element.attributes[ index ];
+			while ( attributeIndex-- ) {
+				const { name: key } = element.attributes[ attributeIndex ];
 
 				if ( key.startsWith( 'on' ) ) {
 					element.removeAttribute( key );
