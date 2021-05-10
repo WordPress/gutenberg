@@ -19,17 +19,24 @@ export default function BlockContentOverlay( { clientId, children } ) {
 	const [ isOverlayActive, setIsOverlayActive ] = useState( true );
 	const [ isHovered, setIsHovered ] = useState( false );
 
-	const { isSelected, hasChildSelected, isDraggingBlocks } = useSelect(
+	const {
+		isSelected,
+		hasChildSelected,
+		isDraggingBlocks,
+		isParentHighlighted,
+	} = useSelect(
 		( select ) => {
 			const {
 				isBlockSelected,
 				hasSelectedInnerBlock,
 				isDraggingBlocks: _isDraggingBlocks,
+				isBlockHighlighted,
 			} = select( blockEditorStore );
 			return {
 				isSelected: isBlockSelected( clientId ),
 				hasChildSelected: hasSelectedInnerBlock( clientId, true ),
 				isDraggingBlocks: _isDraggingBlocks(),
+				isParentHighlighted: isBlockHighlighted( clientId ),
 			};
 		},
 		[ clientId ]
@@ -37,6 +44,7 @@ export default function BlockContentOverlay( { clientId, children } ) {
 
 	const classes = classnames( baseClassName, {
 		'overlay-active': isOverlayActive,
+		'parent-highlighted': isParentHighlighted,
 		'child-selected': hasChildSelected,
 		'is-dragging-blocks': isDraggingBlocks,
 	} );
