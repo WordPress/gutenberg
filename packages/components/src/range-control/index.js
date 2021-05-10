@@ -7,7 +7,7 @@ import { clamp, isFinite, noop } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __, isRTL } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { useRef, useState, forwardRef } from '@wordpress/element';
 import { useInstanceId } from '@wordpress/compose';
 
@@ -18,6 +18,7 @@ import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
 import { color } from '../utils/colors';
+import { isDocumentRTL as isRTL } from '../utils/rtl';
 import { floatClamp, useControlledRangeValue } from './utils';
 import InputRange from './input-range';
 import RangeRail from './rail';
