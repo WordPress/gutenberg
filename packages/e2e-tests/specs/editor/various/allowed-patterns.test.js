@@ -9,12 +9,13 @@ import {
 	toggleGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
-const isPatternAvailable = async ( name ) => {
+const checkPatternExistance = async ( name, available = true ) => {
 	await searchForPattern( name );
-	const elements = await page.$x(
-		`//div[@role = 'option']//div[contains(text(), '${ name }')]`
+	const patternElement = await page.waitForXPath(
+		`//div[@role = 'option']//div[contains(text(), '${ name }')]`,
+		{ timeout: 5000, visible: available, hidden: ! available }
 	);
-	const patternExists = elements.length > 0;
+	const patternExists = !! patternElement;
 	await toggleGlobalBlockInserter();
 	return patternExists;
 };
@@ -28,18 +29,18 @@ const TEST_PATTERNS = [
 describe( 'Allowed Patterns', () => {
 	beforeAll( async () => {
 		await activatePlugin( 'gutenberg-test-allowed-patterns' );
+		await createNewPost();
 	} );
 	afterAll( async () => {
 		await deactivatePlugin( 'gutenberg-test-allowed-patterns' );
-	} );
-	beforeEach( async () => {
-		await createNewPost();
 	} );
 
 	describe( 'Disable blocks plugin disabled', () => {
 		for ( const [ patternName ] of TEST_PATTERNS ) {
 			it( `should show test pattern "${ patternName }"`, async () => {
-				expect( await isPatternAvailable( patternName ) ).toBe( true );
+				expect( await checkPatternExistance( patternName, true ) ).toBe(
+					true
+				);
 			} );
 		}
 	} );
@@ -49,6 +50,7 @@ describe( 'Allowed Patterns', () => {
 			await activatePlugin(
 				'gutenberg-test-allowed-patterns-disable-blocks'
 			);
+			await createNewPost();
 		} );
 		afterAll( async () => {
 			await deactivatePlugin(
@@ -60,9 +62,12 @@ describe( 'Allowed Patterns', () => {
 			it( `should${
 				shouldBeAvailable ? '' : ' not'
 			} show test "pattern ${ patternName }"`, async () => {
-				expect( await isPatternAvailable( patternName ) ).toBe(
-					shouldBeAvailable
-				);
+				expect(
+					await checkPatternExistance(
+						patternName,
+						shouldBeAvailable
+					)
+				).toBe( shouldBeAvailable );
 			} );
 		}
 	} );
