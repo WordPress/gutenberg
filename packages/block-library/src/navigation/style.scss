@@ -399,6 +399,8 @@
 
 		// Remove background colors for items inside the overlay menu.
 		// Has to be !important to override global styles.
+		.wp-block-pages-list__item .submenu-container,
+		.wp-block-navigation-link .wp-block-navigation-link__container,
 		.wp-block-pages-list__item,
 		.wp-block-navigation-link {
 			background: transparent !important;
