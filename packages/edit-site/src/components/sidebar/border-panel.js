@@ -2,10 +2,15 @@
  * WordPress dependencies
  */
 import {
+	__experimentalBorderRadiusControl as BorderRadiusControl,
 	__experimentalBorderStyleControl as BorderStyleControl,
 	__experimentalColorGradientControl as ColorGradientControl,
 } from '@wordpress/block-editor';
-import { PanelBody, RangeControl } from '@wordpress/components';
+import {
+	PanelBody,
+	__experimentalUnitControl as UnitControl,
+} from '@wordpress/components';
+import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -13,14 +18,16 @@ import { __ } from '@wordpress/i18n';
  */
 import { useSetting } from '../editor/utils';
 
-const MIN_BORDER_RADIUS_VALUE = 0;
-const MAX_BORDER_RADIUS_VALUE = 50;
 const MIN_BORDER_WIDTH = 0;
-const MAX_BORDER_WIDTH = 50;
 
 // Defining empty array here instead of inline avoids unnecessary re-renders of
 // color control.
 const EMPTY_ARRAY = [];
+const CSS_UNITS = [
+	{ value: 'px', label: 'px', default: '' },
+	{ value: 'em', label: 'em', default: '' },
+	{ value: 'rem', label: 'rem', default: '' },
+];
 
 export function useHasBorderPanel( { supports, name } ) {
 	const controls = [
@@ -61,28 +68,32 @@ function useHasBorderWidthControl( { supports, name } ) {
 	);
 }
 
+function parseUnit( cssValue ) {
+	const value = String( cssValue ).trim();
+	const unitMatch = value.match( /[\d.\-\+]*\s*(.*)/ )[ 1 ];
+	const unit = unitMatch !== undefined ? unitMatch.toLowerCase() : '';
+	const currentUnit = CSS_UNITS.find( ( item ) => item.value === unit );
+
+	return currentUnit?.value || 'px';
+}
+
 export default function BorderPanel( {
 	context: { supports, name },
 	getStyle,
 	setStyle,
 } ) {
+	// Border width.
+	const hasBorderWidth = useHasBorderWidthControl( { supports, name } );
+	const borderWidthValue = getStyle( name, 'borderWidth' );
+
+	// Step value is maintained in state so step is appropriate for current unit
+	// even when current width value is undefined.
+	const initialStep = parseUnit( borderWidthValue ) === 'px' ? 1 : 0.25;
+	const [ step, setStep ] = useState( initialStep );
+
 	// Border style.
 	const hasBorderStyle = useHasBorderStyleControl( { supports, name } );
 	const borderStyle = getStyle( name, 'borderStyle' );
-
-	// Border width.
-	const hasBorderWidth = useHasBorderWidthControl( { supports, name } );
-	const borderWidthValue = parseInt(
-		getStyle( name, 'borderWidth' ) || 0,
-		10
-	);
-
-	// Border radius.
-	const hasBorderRadius = useHasBorderRadiusControl( { supports, name } );
-	const borderRadiusValue = parseInt(
-		getStyle( name, 'borderRadius' ) || 0,
-		10
-	);
 
 	// Border color.
 	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
@@ -91,43 +102,42 @@ export default function BorderPanel( {
 	const hasBorderColor = useHasBorderColorControl( { supports, name } );
 	const borderColor = getStyle( name, 'borderColor' );
 
+	// Border radius.
+	const hasBorderRadius = useHasBorderRadiusControl( { supports, name } );
+	const borderRadiusValues = getStyle( name, 'borderRadius' );
+
 	return (
 		<PanelBody title={ __( 'Border' ) } initialOpen={ true }>
-			{ hasBorderStyle && (
-				<BorderStyleControl
-					value={ borderStyle }
-					onChange={ ( value ) =>
-						setStyle( name, 'borderStyle', value )
-					}
-				/>
-			) }
-			{ hasBorderWidth && (
-				<RangeControl
-					value={ borderWidthValue }
-					label={ __( 'Width' ) }
-					min={ MIN_BORDER_WIDTH }
-					max={ MAX_BORDER_WIDTH }
-					initialPosition={ borderWidthValue }
-					allowReset
-					onChange={ ( value ) => {
-						const widthStyle = value ? `${ value }px` : undefined;
-						setStyle( name, 'borderWidth', widthStyle );
-					} }
-				/>
-			) }
-			{ hasBorderRadius && (
-				<RangeControl
-					value={ borderRadiusValue }
-					label={ __( 'Radius' ) }
-					min={ MIN_BORDER_RADIUS_VALUE }
-					max={ MAX_BORDER_RADIUS_VALUE }
-					initialPosition={ borderRadiusValue }
-					allowReset
-					onChange={ ( value ) => {
-						const radiusStyle = value ? `${ value }px` : undefined;
-						setStyle( name, 'borderRadius', radiusStyle );
-					} }
-				/>
+			{ ( hasBorderWidth || hasBorderStyle ) && (
+				<div className="edit-site-global-styles-sidebar__border-controls-row">
+					{ hasBorderWidth && (
+						<UnitControl
+							value={ borderWidthValue }
+							label={ __( 'Width' ) }
+							min={ MIN_BORDER_WIDTH }
+							onChange={ ( value ) => {
+								setStyle(
+									name,
+									'borderWidth',
+									value || undefined
+								);
+							} }
+							onUnitChange={ ( newUnit ) => {
+								setStep( newUnit === 'px' ? 1 : 0.25 );
+							} }
+							step={ step }
+							units={ CSS_UNITS }
+						/>
+					) }
+					{ hasBorderStyle && (
+						<BorderStyleControl
+							value={ borderStyle }
+							onChange={ ( value ) =>
+								setStyle( name, 'borderStyle', value )
+							}
+						/>
+					) }
+				</div>
 			) }
 			{ hasBorderColor && (
 				<ColorGradientControl
@@ -139,6 +149,14 @@ export default function BorderPanel( {
 					disableCustomGradients={ disableCustomGradients }
 					onColorChange={ ( value ) =>
 						setStyle( name, 'borderColor', value )
+					}
+				/>
+			) }
+			{ hasBorderRadius && (
+				<BorderRadiusControl
+					values={ borderRadiusValues }
+					onChange={ ( value ) =>
+						setStyle( name, 'borderRadius', value )
 					}
 				/>
 			) }
