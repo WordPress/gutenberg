@@ -44,27 +44,38 @@ const isContainerRelated = ( blockName ) => {
 	if ( WIDE_ALIGNMENTS.notInnerContainers.includes( blockName ) ) {
 		return false;
 	}
-	const blockType = getBlockType( blockName );
-	const blockAlign = blockType?.supports?.align;
-	if ( Array.isArray( blockAlign ) && blockAlign.includes( 'full' ) ) {
-		return true; // The block support align
-	}
 
-	if (
-		blockType?.parent?.some( ( parent ) => {
-			const blockTypeParent = getBlockType( parent );
-			const blockAlignParent = blockTypeParent?.supports?.align;
-			return (
-				Array.isArray( blockAlignParent ) &&
-				blockAlignParent.includes( 'full' )
-			);
-		} )
-	) {
+	if ( hasFullWidthSupport( blockName ) ) {
 		return true;
 	}
 
-	return false;
+	return hasParentFullWidthSupport( blockName );
 };
+
+/**
+ * Whether the block has support for full width alignment.
+ *
+ * @param {string} blockName
+ * @return {boolean} Return whether the block supports full width alignment.
+ */
+function hasFullWidthSupport( blockName ) {
+	const blockType = getBlockType( blockName );
+	const blockAlign = blockType?.supports?.align;
+	return (
+		!! Array.isArray( blockAlign ) &&
+		blockAlign.includes( WIDE_ALIGNMENTS.alignments.full )
+	);
+}
+/**
+ * Whether the block's parent has support for full width alignment.
+ *
+ * @param {string} blockName
+ * @return {boolean} Return whether the block's parent supports full width alignment.
+ */
+function hasParentFullWidthSupport( blockName ) {
+	const blockType = getBlockType( blockName );
+	return !! blockType?.parent?.some( hasFullWidthSupport );
+}
 
 export const alignmentHelpers = {
 	isFullWidth,
