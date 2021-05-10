@@ -6,6 +6,7 @@ import {
 	createNewPost,
 	clickBlockAppender,
 	clickBlockToolbarButton,
+	setPostContent,
 } from '@wordpress/e2e-test-utils';
 
 describe( 'invalid blocks', () => {
@@ -49,5 +50,28 @@ describe( 'invalid blocks', () => {
 		expect( htmlBlockContent ).toEqual(
 			'<p>hello</p><p>invalid paragraph'
 		);
+	} );
+
+	it( 'should not alert', async () => {
+		let hasAlert = false;
+
+		page.on( 'dialog', () => {
+			hasAlert = true;
+		} );
+
+		await setPostContent(
+			`
+			<!-- wp:paragraph -->
+			<p>aaaa <img src onerror=alert(1)></x dde></x>1
+			<!-- /wp:paragraph -->
+			`
+		);
+
+		// Give the browser time to show the alert.
+		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+
+		expect( console ).toHaveWarned();
+		expect( console ).toHaveErrored();
+		expect( hasAlert ).toBe( false );
 	} );
 } );
