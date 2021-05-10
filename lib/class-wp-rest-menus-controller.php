@@ -219,16 +219,14 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	protected function prepare_links( $term ) {
 		$links = parent::prepare_links( $term );
 
-		$locations = get_nav_menu_locations();
+		$locations = $this->get_menu_locations( $term->term_id );
 		$rest_base = 'menu-locations';
-		foreach ( $locations as $menu_name => $menu_id ) {
-			if ( $term->term_id === $menu_id ) {
-				$url                                        = rest_url( sprintf( '__experimental/%s/%s', $rest_base, $menu_name ) );
-				$links['https://api.w.org/menu-location'][] = array(
-					'href'       => $url,
-					'embeddable' => true,
-				);
-			}
+		foreach ( $locations as $location ) {
+			$url                                        = rest_url( sprintf( '__experimental/%s/%s', $rest_base, $location ) );
+			$links['https://api.w.org/menu-location'][] = array(
+				'href'       => $url,
+				'embeddable' => true,
+			);
 		}
 
 		return $links;
