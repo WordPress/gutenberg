@@ -1079,29 +1079,46 @@ class WP_Theme_JSON {
 	 */
 	public function merge( $incoming ) {
 		$incoming_data    = $incoming->get_raw_data();
-		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
+		$existing_data    = $this->theme_json;
 
 		// The array_replace_recursive algorithm merges at the leaf level.
 		// For leaf values that are arrays it will use the numeric indexes for replacement.
-		// In those cases, what we want is to use the incoming value, if it exists.
-		//
-		// These are the cases that have array values at the leaf levels.
-		$properties   = array();
-		$properties[] = array( 'color', 'palette' );
-		$properties[] = array( 'color', 'gradients' );
-		$properties[] = array( 'custom' );
-		$properties[] = array( 'spacing', 'units' );
-		$properties[] = array( 'typography', 'fontSizes' );
-		$properties[] = array( 'typography', 'fontFamilies' );
+		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
+
+		// There are a few cases in which we want to merge things differently
+		// from what array_replace_recursive does.
+
+		// Some incoming properties should replace the existing.
+		$to_replace   = array();
+		$to_replace[] = array( 'custom' );
+		$to_replace[] = array( 'spacing', 'units' );
+		$to_replace[] = array( 'typography', 'fontSizes' );
+		$to_replace[] = array( 'typography', 'fontFamilies' );
+
+		// Some others should be appended to the existing.
+		$to_append   = array();
+		$to_append[] = array( 'color', 'palette' );
+		$to_append[] = array( 'color', 'gradients' );
 
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $metadata ) {
-			foreach ( $properties as $property_path ) {
-				$path = array_merge( $metadata['path'], $property_path );
+			foreach ( $to_replace as $path_to_replace ) {
+				$path = array_merge( $metadata['path'], $path_to_replace );
 				$node = _wp_array_get( $incoming_data, $path, array() );
 				if ( ! empty( $node ) ) {
 					gutenberg_experimental_set( $this->theme_json, $path, $node );
 				}
+			}
+			foreach ( $to_append as $path_to_append ) {
+				$path          = array_merge( $metadata['path'], $path_to_append );
+				$incoming_node = _wp_array_get( $incoming_data, $path, array() );
+				$existing_node = _wp_array_get( $existing_data, $path, array() );
+
+				if ( empty( $incoming_node ) && empty( $existing_data ) ) {
+					continue;
+				}
+
+				gutenberg_experimental_set( $this->theme_json, $path, array_merge( $existing_node, $incoming_node ) );
 			}
 		}
 
