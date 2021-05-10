@@ -1,5 +1,6 @@
 .customize-widgets-header {
 	position: sticky;
+	top: 0;
 
 	// Offset the customizer's sidebar padding.
 	margin: -15px ( -$grid-unit-15 ) 0 ( -$grid-unit-15 );
@@ -8,6 +9,9 @@
 	// Match the customizer grey background.
 	background: #f0f0f1;
 	border-bottom: 1px solid $gray-200;
+
+	// Ensure widget UI doesn't overlap when scrolling
+	z-index: 8;
 }
 
 .customize-widgets-header-toolbar {
