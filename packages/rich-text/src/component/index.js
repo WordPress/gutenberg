@@ -292,7 +292,7 @@ function RichText(
 		}
 	}, [ value ] );
 
-	useEffect( () => {
+	useLayoutEffect( () => {
 		if ( ! didMount.current ) {
 			return;
 		}
