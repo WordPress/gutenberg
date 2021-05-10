@@ -3,12 +3,10 @@
  */
 import {
 	forwardRef,
-	useEffect,
 	useRef,
 	useState,
 	useLayoutEffect,
 } from '@wordpress/element';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { useMergeRefs } from '@wordpress/compose';
 
 /**
@@ -19,7 +17,6 @@ import { create } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { removeFormat } from '../remove-format';
-import { isCollapsed } from '../is-collapsed';
 import { useFormatTypes } from './use-format-types';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
@@ -57,8 +54,6 @@ function RichText(
 		preserveWhiteSpace,
 		onPaste,
 		format = 'string',
-		onDelete,
-		onEnter,
 		onSelectionChange,
 		onChange,
 		unstableOnFocus: onFocus,
@@ -210,42 +205,6 @@ function RichText(
 		} );
 	}
 
-	function handleKeyDown( event ) {
-		if ( event.defaultPrevented ) {
-			return;
-		}
-
-		const { keyCode } = event;
-
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-			if ( onEnter ) {
-				onEnter( {
-					value: removeEditorOnlyFormats( record.current ),
-					onChange: handleChange,
-					shiftKey: event.shiftKey,
-				} );
-			}
-		} else if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			const { start, end, text } = record.current;
-			const isReverse = keyCode === BACKSPACE;
-
-			// Only process delete if the key press occurs at an uncollapsed edge.
-			if (
-				! onDelete ||
-				! isCollapsed( record.current ) ||
-				activeFormats.length ||
-				( isReverse && start !== 0 ) ||
-				( ! isReverse && end !== text.length )
-			) {
-				return;
-			}
-
-			onDelete( { isReverse, value: record.current } );
-			event.preventDefault();
-		}
-	}
-
 	// Internal values are updated synchronously, unlike props and state.
 	const _value = useRef( value );
 	const record = useRef();
@@ -316,6 +275,7 @@ function RichText(
 
 	const didMount = useRef( false );
 
+	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
 		if ( didMount.current ) {
 			applyFromProps();
@@ -326,13 +286,15 @@ function RichText(
 		didMount.current = true;
 	}, [ TagName, placeholder, ...dependencies ] );
 
-	useEffect( () => {
+	// Value updates must happen synchonously to avoid overwriting newer values.
+	useLayoutEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
 			applyFromProps();
 		}
 	}, [ value ] );
 
-	useEffect( () => {
+	// Value updates must happen synchonously to avoid overwriting newer values.
+	useLayoutEffect( () => {
 		if ( ! didMount.current ) {
 			return;
 		}
@@ -414,7 +376,6 @@ function RichText(
 			} ),
 		] ),
 		className: 'rich-text',
-		onKeyDown: handleKeyDown,
 		onFocus,
 		// Do not set the attribute if disabled.
 		contentEditable: disabled ? undefined : true,
@@ -440,6 +401,8 @@ function RichText(
 					onFocus: focus,
 					editableProps,
 					editableTagName: TagName,
+					activeFormats,
+					removeEditorOnlyFormats,
 				} ) }
 			{ ! children && <TagName { ...editableProps } /> }
 		</>
