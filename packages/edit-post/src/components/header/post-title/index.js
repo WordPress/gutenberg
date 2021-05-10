@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editorStore } from '@wordpress/editor';
 import { useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
@@ -11,14 +11,32 @@ import {
 	Dropdown,
 	Button,
 	VisuallyHidden,
+	TextControl,
 	__experimentalText as Text,
 } from '@wordpress/components';
 
 /**
- * Internal dependencies
+ * External dependencies
  */
+import { noop } from 'lodash';
+
+const EditPostTitlePanel = ( { entityTitle, onChange = noop } ) => {
+	return (
+		<div className="edit-post-title-panel">
+			<TextControl
+				className=""
+				label={ __( 'Title' ) }
+				value={ entityTitle ?? '' }
+				min={ 1 }
+				onChange={ onChange }
+			/>
+		</div>
+	);
+};
 
 function PostTitle() {
+	const { editPost } = useDispatch( editorStore );
+
 	const { entityTitle, entityLabel } = useSelect(
 		( select ) => ( {
 			entityTitle: select( editorStore ).getEditedPostAttribute(
@@ -49,7 +67,7 @@ function PostTitle() {
 				>
 					<VisuallyHidden as="span">
 						{ sprintf(
-							/* translators: %s: the entity being edited, like "template"*/
+							/* translators: %s: the entity being edited, like "post"*/
 							__( 'Editing %s:' ),
 							entityLabel
 						) }
@@ -87,7 +105,12 @@ function PostTitle() {
 					) }
 					contentClassName="edit-post-title-actions__info-dropdown"
 					renderContent={ () => (
-						<span>{ __( 'Nothing here yet.' ) }</span>
+						<EditPostTitlePanel
+							entityTitle={ entityTitle }
+							onChange={ ( value ) =>
+								editPost( { title: value } )
+							}
+						/>
 					) }
 				/>
 			</div>
