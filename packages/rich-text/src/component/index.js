@@ -315,6 +315,7 @@ function RichText(
 
 	const didMount = useRef( false );
 
+	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
 		if ( didMount.current ) {
 			applyFromProps();
@@ -325,12 +326,14 @@ function RichText(
 		didMount.current = true;
 	}, [ TagName, placeholder, ...dependencies ] );
 
+	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
 			applyFromProps();
 		}
 	}, [ value ] );
 
+	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
 		if ( ! didMount.current ) {
 			return;
