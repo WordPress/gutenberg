@@ -141,7 +141,7 @@ export function addSaveProps( props, blockType, attributes ) {
 		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
 	} );
 
-	let typographyFeaturesToRemove = [];
+	let typographyFeaturesToOmit = [];
 	if (
 		getBlockSupport(
 			blockType,
@@ -149,7 +149,7 @@ export function addSaveProps( props, blockType, attributes ) {
 		)
 	) {
 		// Font size is handled separately.
-		typographyFeaturesToRemove = without(
+		typographyFeaturesToOmit = without(
 			TYPOGRAPHY_SUPPORT_KEYS,
 			FONT_SIZE_SUPPORT_KEY
 		);
@@ -158,15 +158,15 @@ export function addSaveProps( props, blockType, attributes ) {
 	if (
 		getBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
 	) {
-		typographyFeaturesToRemove = [
-			...typographyFeaturesToRemove,
+		typographyFeaturesToOmit = [
+			...typographyFeaturesToOmit,
 			FONT_SIZE_SUPPORT_KEY,
 		];
 	}
 
 	const { typography, ...otherStyle } = filteredStyle;
 	filteredStyle = {
-		typography: omit( typography, typographyFeaturesToRemove ),
+		typography: omit( typography, typographyFeaturesToOmit ),
 		...otherStyle,
 	};
 
