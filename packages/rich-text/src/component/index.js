@@ -24,7 +24,6 @@ import { useInlineWarning } from './use-inline-warning';
 import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
-import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { usePasteHandler } from './use-paste-handler';
 import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
@@ -60,11 +59,9 @@ function RichText(
 		__unstableMultilineTag: multilineTag,
 		__unstableMultilineRootTag: multilineRootTag,
 		__unstableDisableFormats: disableFormats,
-		__unstableDidAutomaticChange: didAutomaticChange,
 		__unstableInputRule: inputRule,
 		__unstableMarkAutomaticChange: markAutomaticChange,
 		__unstableAllowPrefixTransformations: allowPrefixTransformations,
-		__unstableUndo: undo,
 		__unstableOnCreateUndoLevel: onCreateUndoLevel,
 		__unstableIsSelected: isSelected,
 	},
@@ -323,7 +320,6 @@ function RichText(
 		useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
 		useSelectObject(),
 		useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
-		useUndoAutomaticChange( { didAutomaticChange, undo } ),
 		useDelete( {
 			createRecord,
 			handleChange,
