@@ -213,57 +213,70 @@ class WP_Theme_JSON_Gutenberg {
 	 * - 'value': path to the value in theme.json and block attributes.
 	 */
 	const PROPERTIES_METADATA = array(
-		'background'       => array(
+		'background'           => array(
 			'value' => array( 'color', 'gradient' ),
 		),
-		'background-color' => array(
+		'background-color'     => array(
 			'value' => array( 'color', 'background' ),
 		),
-		'border-radius'    => array(
+		'border-radius'        => array(
 			'value' => array( 'border', 'radius' ),
 		),
-		'border-color'     => array(
+		// This is deliberately separate to the border-radius entry above.
+		// It allows for backwards compatible shorthand e.g. border-radius: 10px
+		// while below provides a means to explicitly set the CSS property name
+		// where the flat array configuration approach builds an incorrect name.
+		'corner-border-radius' => array(
+			'value'      => array( 'border', 'radius' ),
+			'properties' => array(
+				'border-top-left-radius'     => 'topLeft',
+				'border-top-right-radius'    => 'topRight',
+				'border-bottom-left-radius'  => 'bottomLeft',
+				'border-bottom-right-radius' => 'bottomRight',
+			),
+		),
+		'border-color'         => array(
 			'value' => array( 'border', 'color' ),
 		),
-		'border-width'     => array(
+		'border-width'         => array(
 			'value' => array( 'border', 'width' ),
 		),
-		'border-style'     => array(
+		'border-style'         => array(
 			'value' => array( 'border', 'style' ),
 		),
-		'color'            => array(
+		'color'                => array(
 			'value' => array( 'color', 'text' ),
 		),
-		'font-family'      => array(
+		'font-family'          => array(
 			'value' => array( 'typography', 'fontFamily' ),
 		),
-		'font-size'        => array(
+		'font-size'            => array(
 			'value' => array( 'typography', 'fontSize' ),
 		),
-		'font-style'       => array(
+		'font-style'           => array(
 			'value' => array( 'typography', 'fontStyle' ),
 		),
-		'font-weight'      => array(
+		'font-weight'          => array(
 			'value' => array( 'typography', 'fontWeight' ),
 		),
-		'letter-spacing'   => array(
+		'letter-spacing'       => array(
 			'value' => array( 'typography', 'letterSpacing' ),
 		),
-		'line-height'      => array(
+		'line-height'          => array(
 			'value' => array( 'typography', 'lineHeight' ),
 		),
-		'margin'           => array(
+		'margin'               => array(
 			'value'      => array( 'spacing', 'margin' ),
 			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
-		'padding'          => array(
+		'padding'              => array(
 			'value'      => array( 'spacing', 'padding' ),
 			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
-		'text-decoration'  => array(
+		'text-decoration'      => array(
 			'value' => array( 'typography', 'textDecoration' ),
 		),
-		'text-transform'   => array(
+		'text-transform'       => array(
 			'value' => array( 'typography', 'textTransform' ),
 		),
 	);
@@ -388,8 +401,12 @@ class WP_Theme_JSON_Gutenberg {
 			foreach ( self::PROPERTIES_METADATA as $key => $metadata ) {
 				$to_property[ $key ] = $key;
 				if ( self::has_properties( $metadata ) ) {
-					foreach ( $metadata['properties'] as $property ) {
-						$to_property[ $key . '-' . $property ] = $key;
+					foreach ( $metadata['properties'] as $name => $property ) {
+						if ( is_numeric( $name ) ) {
+							$to_property[ $key . '-' . $property ] = $key;
+						} else {
+							$to_property[ $name ] = $key;
+						}
 					}
 				}
 			}
@@ -556,7 +573,7 @@ class WP_Theme_JSON_Gutenberg {
 	private static function get_property_value( $styles, $path ) {
 		$value = _wp_array_get( $styles, $path, '' );
 
-		if ( '' === $value ) {
+		if ( '' === $value || is_array( $value ) ) {
 			return $value;
 		}
 
@@ -618,9 +635,10 @@ class WP_Theme_JSON_Gutenberg {
 			// they contain multiple values instead of a single one.
 			// An example of this is the padding property.
 			if ( self::has_properties( $metadata ) ) {
-				foreach ( $metadata['properties'] as $property ) {
-					$properties[] = array(
-						'name'  => $name . '-' . $property,
+				foreach ( $metadata['properties'] as $key => $property ) {
+					$property_name = is_numeric( $key ) ? $name . '-' . $property : $key;
+					$properties[]  = array(
+						'name'  => $property_name,
 						'value' => array_merge( $metadata['value'], array( $property ) ),
 					);
 				}
@@ -634,7 +652,7 @@ class WP_Theme_JSON_Gutenberg {
 
 		foreach ( $properties as $prop ) {
 			$value = self::get_property_value( $styles, $prop['value'] );
-			if ( empty( $value ) ) {
+			if ( empty( $value ) || is_array( $value ) ) {
 				continue;
 			}
 
