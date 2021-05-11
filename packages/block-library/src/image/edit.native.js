@@ -54,6 +54,7 @@ import {
 	textColor,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -694,7 +695,7 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		return {
 			closeSettingsBottomSheet() {
-				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+				dispatch( editPostStore ).closeGeneralSidebar();
 			},
 		};
 	} ),
