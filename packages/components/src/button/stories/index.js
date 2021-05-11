@@ -126,7 +126,7 @@ export const destructiveLink = () => {
 	const label = text( 'Label', 'Destructive Link' );
 
 	return (
-		<Button isDestructive isLink>
+		<Button isDestructive variant="link">
 			{ label }
 		</Button>
 	);

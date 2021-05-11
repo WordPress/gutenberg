@@ -25,6 +25,7 @@ function useDeprecatedProps( {
 	isPrimary,
 	isSecondary,
 	isTertiary,
+	isLink,
 	variant,
 	...otherProps
 } ) {
@@ -63,6 +64,14 @@ function useDeprecatedProps( {
 		computedVariant ??= 'secondary';
 	}
 
+	if ( isLink ) {
+		deprecated( 'Button isLink prop', {
+			since: '5.9',
+			alternative: 'variant="link"',
+		} );
+
+		computedVariant ??= 'link';
+	}
 	return {
 		...otherProps,
 		variant: computedVariant,
@@ -76,7 +85,6 @@ export function Button( props, ref ) {
 		isSmall,
 		isPressed,
 		isBusy,
-		isLink,
 		isDestructive,
 		className,
 		disabled,
@@ -102,7 +110,7 @@ export function Button( props, ref ) {
 		'is-tertiary': variant === 'tertiary',
 		'is-pressed': isPressed,
 		'is-busy': isBusy,
-		'is-link': isLink,
+		'is-link': variant === 'link',
 		'is-destructive': isDestructive,
 		'has-text': !! icon && !! children,
 		'has-icon': !! icon,

@@ -177,14 +177,6 @@ Indicates activity while a action is being performed.
 -   Required: No
 -   Default: `false`
 
-#### isLink
-
-Renders a button with an anchor style.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
 #### focus
 
 Whether the button is focused.

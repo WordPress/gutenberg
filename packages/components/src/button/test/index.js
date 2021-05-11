@@ -57,6 +57,16 @@ describe( 'Button', () => {
 			expect( button.hasClass( 'is-tertiary' ) ).toBe( true );
 		} );
 
+		it( 'should render a button element with is-link class', () => {
+			const button = shallow( <Button variant="link" /> ).find(
+				'button'
+			);
+			expect( button.hasClass( 'is-primary' ) ).toBe( false );
+			expect( button.hasClass( 'is-secondary' ) ).toBe( false );
+			expect( button.hasClass( 'is-tertiary' ) ).toBe( false );
+			expect( button.hasClass( 'is-link' ) ).toBe( true );
+		} );
+
 		it( 'should render a button element with is-pressed without button class', () => {
 			const button = shallow( <Button isPressed /> ).find( 'button' );
 			expect( button.hasClass( 'is-pressed' ) ).toBe( true );
