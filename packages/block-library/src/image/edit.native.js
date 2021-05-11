@@ -442,6 +442,11 @@ export class ImageEdit extends Component {
 			styles.featuredButtonDark
 		);
 
+		const setFeaturedButtonStyle = getStylesFromColorScheme(
+			styles.setFeaturedButton,
+			styles.setFeaturedButtonDark
+		);
+
 		return (
 			<>
 				{
@@ -460,6 +465,7 @@ export class ImageEdit extends Component {
 									label={ __( 'Set as Featured Image ' ) }
 									labelStyle={ [
 										featuredButtonStyle,
+										setFeaturedButtonStyle,
 									] }
 								/>
 							) }
