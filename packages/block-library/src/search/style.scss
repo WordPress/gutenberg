@@ -1,5 +1,4 @@
 .wp-block-search {
-
 	.wp-block-search__button {
 		background: #f7f7f7;
 		border: 1px solid #ccc;
@@ -60,8 +59,14 @@
 		}
 	}
 
+	&.wp-block-search__button-behavior-expand {
+		.wp-block-search__input {
+			opacity: 0.5;
+			// TODO handle show/hide
+		}
+	}
+
 	&.aligncenter .wp-block-search__inside-wrapper {
 		margin: auto;
 	}
 }
-
