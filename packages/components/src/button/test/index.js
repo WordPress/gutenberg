@@ -30,19 +30,31 @@ describe( 'Button', () => {
 		} );
 
 		it( 'should render a button element with is-primary class', () => {
-			const button = shallow( <Button isPrimary /> ).find( 'button' );
+			const button = shallow( <Button variant="primary" /> ).find(
+				'button'
+			);
 			expect( button.hasClass( 'is-large' ) ).toBe( false );
 			expect( button.hasClass( 'is-primary' ) ).toBe( true );
 		} );
 
-		it( 'should render a button element with is-small class', () => {
-			const button = shallow( <Button isSecondary isSmall /> ).find(
-				'button'
-			);
+		it( 'should render a button element with is-secondary and is-small class', () => {
+			const button = shallow(
+				<Button variant="secondary" isSmall />
+			).find( 'button' );
 			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
 			expect( button.hasClass( 'is-large' ) ).toBe( false );
 			expect( button.hasClass( 'is-small' ) ).toBe( true );
 			expect( button.hasClass( 'is-primary' ) ).toBe( false );
+		} );
+
+		it( 'should render a button element with is-tertiary class', () => {
+			const button = shallow( <Button variant="tertiary" /> ).find(
+				'button'
+			);
+			expect( button.hasClass( 'is-large' ) ).toBe( false );
+			expect( button.hasClass( 'is-primary' ) ).toBe( false );
+			expect( button.hasClass( 'is-secondary' ) ).toBe( false );
+			expect( button.hasClass( 'is-tertiary' ) ).toBe( true );
 		} );
 
 		it( 'should render a button element with is-pressed without button class', () => {
