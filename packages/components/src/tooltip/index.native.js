@@ -50,8 +50,6 @@ const Tooltip = ( {
 	const [ tooltipLayout, setTooltipLayout ] = useState( {
 		height: 0,
 		width: 0,
-		x: 0,
-		y: 0,
 	} );
 	const { onHandleScreenTouch } = useContext( TooltipContext );
 
@@ -128,9 +126,8 @@ const Tooltip = ( {
 			referenceElementRef.current.measure(
 				( _x, _y, width, height, pageX, pageY ) => {
 					setReferenceLayout( {
-						...referenceLayout,
-						width,
 						height,
+						width,
 						x: pageX,
 						y: pageY,
 					} );
@@ -138,8 +135,10 @@ const Tooltip = ( {
 			);
 		}, 0 );
 	};
-	const getTooltipLayout = ( { nativeEvent } ) =>
-		setTooltipLayout( nativeEvent.layout );
+	const getTooltipLayout = ( { nativeEvent } ) => {
+		const { height, width } = nativeEvent.layout;
+		setTooltipLayout( { height, width } );
+	};
 
 	return (
 		<>
