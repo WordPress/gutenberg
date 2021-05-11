@@ -22,24 +22,14 @@ import usePreferredColorScheme from '../use-preferred-color-scheme';
  * // On dark mode:
  * // => { 'block_element' : { padding: 10, backgroundColor: 'black' } }
  * @param {Object} styles
- * @param {Object} platformStyles
  * @param {string} darkModifier
  * @return {Object} the combined styles depending on the current color scheme
  */
 const usePreferredColorSchemeStyleBem = (
 	styles,
-	platformStyles = {},
 	darkModifier = 'dark'
 ) => {
 	const colorScheme = usePreferredColorScheme();
-
-	// Merge platform specific styles
-	for ( const selector in platformStyles ) {
-		styles[ selector ] = {
-			...styles[ selector ],
-			...platformStyles[ selector ],
-		};
-	}
 
 	if ( colorScheme !== 'dark' ) {
 		return styles;

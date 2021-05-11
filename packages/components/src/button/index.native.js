@@ -24,7 +24,15 @@ import Tooltip from '../tooltip';
 import Icon from '../icon';
 
 import baseStyles from './styles';
-import basePlatformStyles from './buttonStyles';
+import platformStyles from './buttonStyles';
+
+ // Merge platform specific styles
+for ( const selector in platformStyles ) {
+  baseStyles[ selector ] = {
+    ...baseStyles[ selector ],
+    ...platformStyles[ selector ],
+  };
+}
 
 export function Button( props ) {
 	const {
@@ -45,7 +53,6 @@ export function Button( props ) {
 		shortcut,
 		tooltipPosition,
 		styles = {},
-		platformStyles = {},
 	} = props;
 
 	const colorScheme = usePreferredColorScheme();
@@ -54,7 +61,6 @@ export function Button( props ) {
 
 	const themedStyle = usePreferredColorSchemeStyleBem(
 		{ ...baseStyles, ...styles },
-		{ ...basePlatformStyles, ...platformStyles }
 	);
 
 	/* eslint-disable dot-notation */
@@ -156,17 +162,16 @@ export function Button( props ) {
 		</TouchableOpacity>
 	);
 
-
 	if ( useTooltip ) {
 		return (
-		<Tooltip
-			text={ label }
-			shortcut={ shortcut }
-			position={ tooltipPosition }
-		>
-			{ button }
-		</Tooltip>
-		)
+			<Tooltip
+				text={ label }
+				shortcut={ shortcut }
+				position={ tooltipPosition }
+			>
+				{ button }
+			</Tooltip>
+		);
 	}
 
 	return button;
