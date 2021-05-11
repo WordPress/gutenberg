@@ -168,9 +168,7 @@ function Navigation( {
 			<nav { ...blockProps }>
 				<ResponsiveWrapper
 					id={ clientId }
-					onToggle={ ( value ) =>
-						setResponsiveMenuVisibility( value )
-					}
+					onToggle={ setResponsiveMenuVisibility }
 					isOpen={ isResponsiveMenuOpen }
 					isResponsive={ attributes.isResponsive }
 				>
