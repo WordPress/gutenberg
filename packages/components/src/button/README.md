@@ -137,29 +137,13 @@ If provided, renders `a` instead of `button`.
 -   Required: No
 -   Default: `undefined`
 
-#### isSecondary
+#### variant
 
-Renders a default button style.
+Specifies the button's style. The accepted values are `'primary'` (the primary button styles), `'secondary'` (the default button styles) and `'tertiary'` (the text-based button styles).
 
--   Type: `Boolean`
+-   Type: `String`
 -   Required: No
--   Default: `false`
-
-#### isPrimary
-
-Renders a primary button style.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
-
-#### isTertiary
-
-Renders a text-based button style.
-
--   Type: `Boolean`
--   Required: No
--   Default: `false`
+-   Default: `undefined`
 
 #### isDestructive
 
