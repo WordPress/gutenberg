@@ -28,8 +28,8 @@ There are two files that are required to activate any theme: `index.php` and `st
 For the plugin to recognize that a block theme is active, the theme must also include an `index.html` template
 inside a folder called `block-templates`.
 
-The theme may optionally include a functions.php file and a [theme.json file](/docs/how-to-guides/themes/theme-json.md) to manage global styles.
-Template parts are optional. If they are included they must be placed inside a `block-template-parts` folder:
+The theme may optionally include a `functions.php` file and a [theme.json file](/docs/how-to-guides/themes/theme-json.md) to manage global styles.
+Template parts are optional. If they are included they must be placed inside a `block-template-parts` folder.
 
 File structure:
 ```
@@ -75,18 +75,16 @@ Use it to make something cool, have fun, and share what you've learned with othe
 */
 ```
 
-Create an `index.php` file.
-This file is used as a fallback if the theme is activated without Gutenberg.
-You may leave the file empty for this tutorial.
+Create a blank `index.php` file. This file is used as a fallback if the theme is activated without Gutenberg.
 
 Inside the `block-templates` folder, create a blank `index.html` file.
 
 Optionally, create a `functions.php` file.
 In this file, you can enqueue `style.css`, include additional files, enable an editor stylesheet and add theme support.
 
-The theme support is more limited than in a classic theme because you will add most of the theme support in the
-`theme.json` file.
-The title tag is already enabled for all block themes, and it is no longer necesarry to enqueue the comment reply script because it is included with the comments block.
+<div class="callout callout-tip">
+You will add most of the theme support in the `theme.json` file. The title tag is already enabled for all block themes, and it is no longer necesarry to enqueue the comment reply script because it is included with the comments block.
+</div>
 
 ```php
 <?php
@@ -142,22 +140,22 @@ theme
 
 Before continuing, install and activate your theme.
 
-There are three ways to create templates and template parts:
+There are several ways to create templates and template parts:
 
 - Manually, by creating HTML files containing block markup.
 - Using the site editor.
 - Using the template editing mode in the block editor.
 
-The differences are explained below.
+The fourth way is temporary and involves going to the Appearance menu > Templates, and is not recommended because of it's limitations.
 
 ### Manual template creation
 
 Create two template part files called `footer.html` and `header.html` and place them inside the `block-template-parts` folder.
 
-When you add blocks manually to your HTML files, you will start with an HTML comment that includes the block name prefixed with `wp:`.
-There are both self-closing and multi-line blocks:
+When you add blocks manually to your HTML files, start with an HTML comment that includes the block name prefixed with `wp:`.
+There are both self-closing and multi-line blocks as shown in the example below.
 
-Add the site title to `header.html`:
+Add the site title block to `header.html`:
 
 ```html
 <!-- wp:site-title /-->
@@ -171,7 +169,7 @@ Add a credit text to `footer.html`:
 <!-- /wp:paragraph -->
 ```
 
-The blocks are self-containing; the opening tag and the closing tag must be in the same template.
+Blocks are self-containing; the opening tag and the closing tag must be in the same template.
 You would not be able to place an opening tag for a group block in a header template and close it in a footer template.
 
 Open `index.html` and include the template parts by adding two HTML comments.
@@ -186,7 +184,7 @@ Inside the HTML comment, add two curly brackets and the key, `slug`, together wi
 <!-- wp:template-part {"slug":"footer"} /-->
 ```
 
-The template part uses a `<div>` by default. Add the `tagName` attribute to change their HTML element to header and footer:
+Template parts use a `<div>` tag by default. Add the `tagName` attribute to change the HTML element to `<header>` and `<footer>`:
 
 ```html
 <!-- wp:template-part {"slug":"header","tagName":"header"} /-->
@@ -202,11 +200,12 @@ All block attributes are placed inside these curly brackets. If you wanted the p
 <!-- /wp:paragraph -->
 ```
 
-The HTML element that wraps the block content also needs to use the corresponding CSS class: `has-text-align-center`.
+The HTML element that wraps the block content also uses the corresponding CSS class: `has-text-align-center`.
 
-Tip:
-When you are not sure what the correct block markup is, you can add the block in the block editor
+<div class="callout callout-tip">
+If you are not sure what the correct block markup is, you can add the block in the block editor
 and copy the block markup from the code editor mode to your theme files.
+</div>
 
 ### Template creation in the site editor
 
@@ -214,7 +213,7 @@ Open the Site Editor from the WordPress admin menu. The default view is the blan
 
 Open the Add block menu and select and place a new template part. The block will have the default name "Untitled Template Part".
 
-Open the advanced section of the block settings sidebar and make the following changes:
+Open the **Advanced** section of the block settings sidebar and make the following changes:
 Change the title and area to Header, and the HTML element to `<header>`.
 
 Add a site title block to the header template part, and a paragraph to the footer.
@@ -226,36 +225,38 @@ Save the changes. You will be asked if you want to save the template part, the i
 The template editing mode is a way to edit the website without the complexity of the site editor interface.
 It is more limited than the site editor because you can not create, select or navigate between templates in this view.
 
-You can access the template editing mode via the block editor.
-When the document settings sidebar is open, locate the Template panel below Status & Visibility.
-Here you will find information about the current template, and you can create a new blank template or change to an existing template.
+You access the template editing mode via the block editor.
+Create a new post or page. Next, open the document settings sidebar and locate the **Template** panel below **Status & Visibility**.
+Here you will find information about the current template and a list of existing templates to choose from.
+Create a new template by selecting the **New** link.
+Edit and save the template in the same way as in the site editor.
 
 ### Exporting
 
 Templates and template parts that have been created or edited in the site editor or template editing mode
 are saved to the database as custom post types. To export them as theme files, follow these steps:
 
-- In the site editor, open the "More tools and options" menu.
-- Select the Export option to download a zip file containing the files. Unzip the files.
-- Copy the updated `index.html` file from `theme/block-templates/` to your themes `block-templates` folder.
-- Copy template part one and two from `theme/block-template-parts/` to your themes `block-template-part` folder.
+- In the site editor, open the **More tools and options** menu.
+- Select the **Export** option to download a zip file containing the files. Unpack the files.
+- Copy the updated `index.html` file from `theme/block-templates/` to your theme's `block-templates` folder.
+- Copy template part one and two from `theme/block-template-parts/` to your theme's `block-template-part` folder.
 - Rename the template parts to `header.html` and `footer.html`, respectively.
 - Open `index.html` and update the template part slugs in the block markup.
 
-Saved templates have precedence over theme files. To use the updated theme files, go to Appearance > Templates/Template parts and delete the saved templates.
+Saved templates have precedence over theme files. To use the updated theme files, go to **Appearance > Templates** and
+**Appearance > Template parts** and delete the saved templates.
 
 ### Additional templates
 
 #### Blog
 
 Now the theme has a basic site header and footer, but it does not display any content.
-To create a blog, a list of the latest posts, you will use the query and query loop blocks.
+To create a list of posts, you will use the query and query loop blocks.
 
 Wether you are using the site editor or editing theme files directly, open the index template.
 
-First, add a group block that will work as a container for your posts.
+First, add a group block that will work as a container for the posts.
 Next, enable the width options for the blocks inside this group using `"layout":{"inherit":true}`.
-You can read more about the layout setting later in this tutorial.
 
 ```html
 <!-- wp:template-part {"slug":"header","tagName":"header"} /-->
@@ -265,7 +266,7 @@ You can read more about the layout setting later in this tutorial.
 <!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
 ```
 
-Change the `<div>` in the group block to a `<main>` element using the `tagName` attribute.
+Change the `<div>` in the group block to a `<main>` element using the `tagName` attribute:
 
 ```html
 <!-- wp:template-part {"slug":"header","tagName":"header"} /-->
@@ -275,7 +276,7 @@ Change the `<div>` in the group block to a `<main>` element using the `tagName` 
 <!-- wp:template-part {"slug":"footer","tagName":"footer"} /-->
 ```
 
-In the editor, you can change the element from div to main under Advanced in the block setting sidebar.
+If you are using one of the editors, change the element from `<div>` to `<main>` under **Advanced** in the block setting sidebar.
 
 Add a query block inside the group.
 When you place a query block in the editor, the query loop is used as an inner block and you have the option to start with an empty loop or include selected post blocks like a post title and featured image.
@@ -292,8 +293,7 @@ Example markup:
 <!-- /wp:query -->
 ```
 
-The query pagination block that lets you navigate between pages of posts can only be used inside the query.
-It needs to be placed inside the query, but outside the loop:
+The query pagination block can only be used inside the query. Place it inside the query, but outside the loop:
 
 ```html
 <!-- wp:query -->
@@ -351,17 +351,17 @@ Add your preferred blocks inside the group block. Some new blocks that are avail
 Save the HTML file, or save and export the post template if you are working in the site editor.
 
 Copy all the blocks and create a template for displaying pages.
-Optionally you can copy the `single.html` file as `page.html` inside the block-templates folder.
+Optionally, save a copy of `single.html` as `page.html` inside the block-templates folder.
 Adjust the blocks for the page template, and save.
 
 #### Archives
 
-If a theme does not use an archive or search result template, the index template will be used as a fallback.
+If a theme does not have an archive or search result template, the index template will be used as a fallback.
 To make sure that the query block shows the correct results, it has an attribute called `inherit`.
-Inherit is enabled by default and filters the query depending on what page you are viewing.
+Inherit is enabled by default and filters the query depending on the page that you are viewing.
 
-You can continue by creating an archive or category template by copying the index file.
-Add a title to the archive page with the archive title block. This is a variation of the query title block:
+If you like you can continue creating an archive or category template by copying the index file and
+adding a title using the archive title block. This is a variation of the query title block:
 `<!-- wp:query-title {"type":"archive"} /-->`
 
 ## Theme.json - Global styles
@@ -371,7 +371,7 @@ Add a title to the archive page with the archive title block. This is a variatio
 Style settings are converted to CSS custom properties and enqueued for the editor and the front,
 reducing the need for the theme to enqueue block styles.
 
-To make the most out of this tutorial please read the [documentation for global styles](/docs/how-to-guides/themes/theme-json.md).
+To make the most out of this tutorial, read the [documentation for global styles](/docs/how-to-guides/themes/theme-json.md).
 
 [Learn more about the JSON format (external link)](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Objects/JSON)
 
@@ -415,17 +415,19 @@ Remember to separate the objects with a comma.
 
 ### Enabling and disabling features
 
-For a list of features that can be enabled or disabled, please see the [documentation for theme.json](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/#settings).
+For a list of features that can be enabled or disabled, see the [documentation for theme.json](https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-json/#settings).
 
 There are two different ways that a block can support a feature:
 
 - By displaying a control in the block settings sidebar.
-- By allowing defaults to be set using theme.json.
+- By allowing defaults to be set using `theme.json`.
 
-Note: It is not possible to add controls to a block that does not support them by using theme.json.
+<div class="callout callout-tip">
+It is not possible to add controls to a block that does not support them by using theme.json.
+</div>
 
 Example:
-A block that does not have support for border controls, can have a default border set inside the theme.json file,
+A block that does not have support for border controls, can have a default border set inside the `theme.json` file,
 as long as the border feature is enabled.
 
 To enable border styles, add a `border` object under `settings` with the following attributes and values:
@@ -463,7 +465,32 @@ To enable link colors, add a `color` setting and set `link` to true:
 }
 ```
 
-If you want to disable gradients, which are enabled by default, you would set `gradient` to false:
+To enable padding and custom spacing units, include a setting for spacing:
+
+```json
+{
+	"version": 1,
+	"settings": {
+		"border": {
+			"customColor": true,
+			"customRadius": true,
+			"customStyle": true,
+			"customWidth": true
+		},
+		"color": {
+			"link": true
+		},
+		"spacing": {
+			"customPadding": true,
+			"units": [ "px", "em", "rem", "vh", "vw" ]
+		}
+	}
+}
+```
+
+#### Disabling features
+
+If you want to disable gradients, which are enabled by default, set `gradient` to false:
 
 ```json
 {
@@ -479,42 +506,22 @@ If you want to disable gradients, which are enabled by default, you would set `g
 			"link": true,
 			"gradient": false
 		}
+		...
 	}
 }
 ```
 
-To enable padding and custom spacing units, include a setting for spacing:
 
-```json
-{
-	"version": 1,
-	"settings": {
-		"border": {
-			"customColor": true,
-			"customRadius": true,
-			"customStyle": true,
-			"customWidth": true
-		},
-		"color": {
-			"link": true,
-			"gradients": false
-		},
-		"spacing": {
-			"customPadding": true,
-			"units": [ "px", "em", "rem", "vh", "vw" ]
-		}
-	}
-}
-```
 
 ### Content width and theme support for wide and full-width blocks
 
-This enables the layout setting for group blocks and template parts, and replaces `add_theme_support( 'align-wide' );`.
+The `layout` setting enables width settings for group blocks and template parts
+and replaces `add_theme_support( 'align-wide' );`.
 
-With this setting, inner blocks can use (inherit) the widths that you set in the theme.json file, or use a custom value
+With this setting, inner blocks can use (inherit) the widths that you set in the `theme.json` file, or use a custom value
 defined by the user.
 
-Add a `layout` option under `settings`. The keys used by layout are:
+The keys used by `layout` are:
 
 - `contentSize` Default width for the blocks.
 - `wideSize` Wide width.
@@ -526,6 +533,7 @@ The example uses pixels, but you can use any valid CSS value and unit.
 {
 	"version": 1,
 	"settings": {
+		...
 		"layout": {
 			"contentSize": "840px",
 			"wideSize": "1100px"
@@ -539,21 +547,20 @@ The example uses pixels, but you can use any valid CSS value and unit.
 This is the equivalent of `add_theme_support( 'editor-color-palette' )`.
 You can add multiple color palettes: a default palette for all blocks, and color palettes specific to a block type.
 
-The keys used by palette are:
+The keys used by `palette` are:
 
 - `slug` A unique identifier for the color.
 - `color` The hex color value.
-- `name` The visible name in the editor.
+- `name` The visible name in the editor. Optional.
 
-The name attribute is optional.
-You can add mutliple colors as an array using square brackets `[]`.
-
-Inside `settings`, under `color`, add a default color palette:
+Multiple colors are added as an array using square brackets: `[]`.
+Add a default color palette inside `settings`, under `color`:
 
 ```json
 {
 	"version": 1,
 	"settings": {
+		...
 		"color": {
 			"palette": [
 				{
@@ -624,7 +631,7 @@ To add custom font sizes, create a new section called `typography` under `settin
 }
 ```
 
-The keys used by `fontSizes are:
+The keys used by `fontSizes` are:
 
 - `slug` A unique identifier for the size.
 - `size` The size value. This can be unitless or use any valid CSS value.
@@ -652,8 +659,8 @@ The keys used by `fontSizes are:
 }
 ```
 
-And to apply a size to a block, you can follow these steps:
-Under `styles`, create a new section called `blocks`:
+To apply a size to a block, follow these steps:
+Create a new section called `blocks` under `styles`
 
 ```json
 "blocks": {
@@ -661,7 +668,7 @@ Under `styles`, create a new section called `blocks`:
 }
 ```
 
-Add the names of the blocks that you want to set defaults for:
+Add the names of the blocks that you want to set defaults for
 
 ```json
 "blocks": {
@@ -674,7 +681,7 @@ Add the names of the blocks that you want to set defaults for:
 }
 ```
 
-Add the typography setting, and set the fontSize value to the preset that you created:
+Add the `typography` setting, and set the `fontSize` value to the preset that you created
 
 ```json
 "blocks": {
@@ -698,10 +705,11 @@ Add the typography setting, and set the fontSize value to the preset that you cr
 
 ### Elements
 
-With the `elements` setting, you can set defaults for HTML elements in two different ways:
+With the `elements` setting, you can set defaults for HTML elements on the website and inside blocks.
 
-- Elements on the website
-Example: Setting a font color to all `<H2>` headings, regardless of if the heading is a site title, post title, or heading block.
+#### Elements on the website
+
+Set a font color to all `<H2>` headings, regardless of if the heading is a site title, post title, or heading block:
 
 ```json
 "styles": {
@@ -734,13 +742,15 @@ Add a default link text color:
 }
 ```
 
-- Elements inside blocks
+#### Elements inside blocks
+
 Some blocks have more than one element, or have different elements depending on settings.
+
 Example: If you set a background color to a post excerpt block, that background affects the entire block.
 You can set a background to the optional "read more" link in the post excerpt block using elements:
 `Styles > blocks > the name of the block > elements > element > attribute`
 
-Since the theme has custom padding enabled, you can add padding within the spacing attribute to make the background color more visible:
+Since the theme has custom padding enabled, you can add `padding` within the `spacing` attribute to make the background color more visible:
 
 ```JSON
 "styles": {
@@ -791,7 +801,7 @@ There are three template areas to choose from: Header, footer, and general.
 
 ## Layouts
 
-The benefit of enabling the layout setting in theme.json is that you no longer need to add extra CSS for the alignments or widths. You can also set more precise widths to blocks inside containers.
+The benefit of enabling the layout setting in `theme.json` is that you no longer need to add extra CSS for alignments or widths. You can also set more precise widths to blocks inside containers.
 
 The first thing you need to know is that blocks have different options available depending on if you are using the block editor or the site editor.
 When you are working in the block editor, your blocks are already placed inside a container.
@@ -802,22 +812,19 @@ and it will be positioned to the left.
 
 If you place the image block inside a group block, the options depend on the layout settings in the group block.
 
-- Without changes to the layout settings, you can align the image to the left, center, or right.
-- When the layout setting inherits the width from theme.json, you can set the image's width to default, wide or full width.
+- Without changes to the layout settings, you have the option to align the image to the left, center, or right.
+- When the layout setting inherits the width from `theme.json`, you can set the image's width to default, wide or full width.
 - When the content width and wide width have been specified, the image's width is adjusted and can be set to default, wide or full width.
 
 ## Custom templates
 
-Custom templates for posts, pages, and custom post types can be created by adding additional HTML files inside the
+Custom templates for posts, pages, and custom post types are created by adding additional HTML files inside the
 `block-templates` folder.
+In a classic theme, templates are identified with a file header. In a block theme, you list templates in the `theme.json` file. All templates that are listed in the `customTemplates` section of `theme.json` are selectable in the site editor.
 
-In a classic theme, templates are identified with a file header. In a block theme, you list templates in the theme.json file.
+If you want to assign the template to a post or page in the block editor, the template's file name needs to be prefixed with either `post-` or `page-`.
 
-All templates that are listed in the customTemplates section of theme.json will be selectable in the site editor.
-
-If you want to assign the template to a post or page in the block editor, the template's file name needs to be prefixed with either post or page.
-
-First, create a section called `customTemplates` at the root level of theme.json.
+First, create a section called `customTemplates` at the root level of `theme.json`.
 This section has two required keys:
 `Name`, which is the name of the template file without the file ending.
 `title`, which is the visible title of the template in the editors.
@@ -831,8 +838,8 @@ This section has two required keys:
 ]
 ```
 
-There is also an optional setting where you can decide which post types that can use the template.
-`postTypes`, followed by the name of the post type.
+There is also an optional setting where you decide which post types that can use the template.
+The key is `postTypes`, followed by the name of the post type:
 
 ```json
 "customTemplates": [
