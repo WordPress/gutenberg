@@ -9,7 +9,6 @@ import { omit } from 'lodash';
  */
 import {
 	RawHTML,
-	Platform,
 	useRef,
 	useCallback,
 	forwardRef,
@@ -21,7 +20,6 @@ import {
 	children as childrenSource,
 	getBlockTransforms,
 	findTransform,
-	isUnmodifiedDefaultBlock,
 } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
@@ -52,7 +50,6 @@ import { useBlockEditContext } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
-import { useNativeProps } from './use-native-props';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
 
@@ -300,23 +297,6 @@ function RichTextWrapper(
 		disableLineBreaks,
 		unstableOnFocus,
 		__unstableAllowPrefixTransformations,
-		// Native props.
-		__unstableMobileNoFocusOnMount,
-		deleteEnter,
-		placeholderTextColor,
-		textAlign,
-		selectionColor,
-		tagsToEliminate,
-		rootTagsToEliminate,
-		disableEditingMenu,
-		fontSize,
-		fontFamily,
-		fontWeight,
-		fontStyle,
-		minWidth,
-		maxWidth,
-		onBlur,
-		setRef,
 		...props
 	},
 	forwardedRef
@@ -326,13 +306,11 @@ function RichTextWrapper(
 	identifier = identifier || instanceId;
 
 	const fallbackRef = useRef();
-	const { clientId, isSelected: blockIsSelected } = useBlockEditContext();
-	const nativeProps = useNativeProps();
+	const { clientId } = useBlockEditContext();
 	const selector = ( select ) => {
 		const {
 			getSelectionStart,
 			getSelectionEnd,
-			__unstableGetBlockWithoutInnerBlocks,
 			isMultiSelecting,
 			hasMultiSelection,
 		} = select( blockEditorStore );
@@ -349,38 +327,19 @@ function RichTextWrapper(
 			isSelected = selectionStart.clientId === clientId;
 		}
 
-		let extraProps = {};
-		if ( Platform.OS === 'native' ) {
-			// If the block of this RichText is unmodified then it's a candidate for replacing when adding a new block.
-			// In order to fix https://github.com/wordpress-mobile/gutenberg-mobile/issues/1126, let's blur on unmount in that case.
-			// This apparently assumes functionality the BlockHlder actually
-			const block =
-				clientId && __unstableGetBlockWithoutInnerBlocks( clientId );
-			const shouldBlurOnUnmount =
-				block && isSelected && isUnmodifiedDefaultBlock( block );
-			extraProps = {
-				shouldBlurOnUnmount,
-			};
-		}
-
 		return {
 			selectionStart: isSelected ? selectionStart.offset : undefined,
 			selectionEnd: isSelected ? selectionEnd.offset : undefined,
 			isSelected,
 			disabled: isMultiSelecting() || hasMultiSelection(),
-			...extraProps,
 		};
 	};
 	// This selector must run on every render so the right selection state is
 	// retreived from the store on merge.
 	// To do: fix this somehow.
-	const {
-		selectionStart,
-		selectionEnd,
-		isSelected,
-		disabled,
-		shouldBlurOnUnmount,
-	} = useSelect( selector );
+	const { selectionStart, selectionEnd, isSelected, disabled } = useSelect(
+		selector
+	);
 	const {
 		__unstableMarkLastChangeAsPersistent,
 		selectionChange,
@@ -682,35 +641,6 @@ function RichTextWrapper(
 			__unstableAllowPrefixTransformations={
 				__unstableAllowPrefixTransformations
 			}
-			// Native props.
-			{ ...nativeProps }
-			blockIsSelected={
-				originalIsSelected !== undefined
-					? originalIsSelected
-					: blockIsSelected
-			}
-			shouldBlurOnUnmount={ shouldBlurOnUnmount }
-			__unstableMobileNoFocusOnMount={ __unstableMobileNoFocusOnMount }
-			deleteEnter={ deleteEnter }
-			placeholderTextColor={ placeholderTextColor }
-			textAlign={ textAlign }
-			selectionColor={ selectionColor }
-			tagsToEliminate={ tagsToEliminate }
-			rootTagsToEliminate={ rootTagsToEliminate }
-			disableEditingMenu={ disableEditingMenu }
-			fontSize={ fontSize }
-			fontFamily={ fontFamily }
-			fontWeight={ fontWeight }
-			fontStyle={ fontStyle }
-			minWidth={ minWidth }
-			maxWidth={ maxWidth }
-			onBlur={ onBlur }
-			setRef={ setRef }
-			// Props to be set on the editable container are destructured on the
-			// element itself for web (see below), but passed through rich text
-			// for native.
-			id={ props.id }
-			style={ props.style }
 		>
 			{ ( {
 				isSelected: nestedIsSelected,
