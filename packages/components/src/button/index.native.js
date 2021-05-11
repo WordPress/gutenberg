@@ -2,7 +2,6 @@
  * External dependencies
  */
 import { TouchableOpacity, Text, View } from 'react-native';
-import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -81,17 +80,7 @@ export function Button( props ) {
 	);
 
 	const iconColor = themedStyle[ 'button__icon' ]?.color;
-
 	/* eslint-enable dot-notation */
-
-	const states = [];
-	if ( isPressed ) {
-		states.push( 'selected' );
-	}
-
-	if ( isDisabled ) {
-		states.push( 'disabled' );
-	}
 
 	const newChildren = Children.map( children, ( child ) => {
 		return child
@@ -102,20 +91,25 @@ export function Button( props ) {
 			: child;
 	} );
 
-	// Should show the tooltip if...
-	const shouldShowTooltip =
-		! isDisabled &&
-		// an explicit tooltip is passed or...
-		( ( showTooltip && label ) ||
-			// there's a shortcut or...
-			shortcut ||
-			// there's a label and...
-			( !! label &&
-				// the children are empty and...
-				( ! children ||
-					( isArray( children ) && ! children.length ) ) &&
-				// the tooltip is not explicitly disabled.
-				false !== showTooltip ) );
+	const useTooltip = useMemo( () => {
+		// Do not use if disabled.
+		if ( isDisabled ) {
+			return false;
+		}
+
+		// Use if a shortcut is explicitly passed (ignore showTooltip or label).
+		if ( shortcut ) {
+			return true;
+		}
+
+		// Don't use if there isn't a label or is explicitly disabled.
+		if ( ! label || showTooltip === false ) {
+			return false;
+		}
+
+		// Use a tooltip if there are no children or explicitly enabled.
+		return Children.count( children ) === 0 || showTooltip;
+	}, [ isDisabled, shortcut, label, showTooltip, children ] );
 
 	const renderIcon = useCallback( () => {
 		if ( ! icon ) {
@@ -136,12 +130,12 @@ export function Button( props ) {
 		return <Icon { ...iconProps } />;
 	}, [ icon, iconSize, iconColor, colorScheme, isPressed ] );
 
-	const element = (
+	const button = (
 		<TouchableOpacity
 			activeOpacity={ 0.7 }
 			accessible={ true }
 			accessibilityLabel={ label }
-			accessibilityStates={ states }
+			accessibilityState={ { selected: isPressed, disabled: isDisabled } }
 			accessibilityRole={ 'button' }
 			accessibilityHint={ hint }
 			onPress={ onClick }
@@ -162,19 +156,20 @@ export function Button( props ) {
 		</TouchableOpacity>
 	);
 
-	if ( ! shouldShowTooltip ) {
-		return element;
-	}
 
-	return (
+	if ( useTooltip ) {
+		return (
 		<Tooltip
 			text={ label }
 			shortcut={ shortcut }
 			position={ tooltipPosition }
 		>
-			{ element }
+			{ button }
 		</Tooltip>
-	);
+		)
+	}
+
+	return button;
 }
 
 export default Button;
