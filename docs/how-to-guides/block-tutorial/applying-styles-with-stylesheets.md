@@ -13,15 +13,10 @@ import { useBlockProps } from '@wordpress/block-editor';
 
 registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 	apiVersion: 2,
-
 	title: 'Example: Stylesheets',
-
 	icon: 'universal-access-alt',
-
 	category: 'design',
-
 	example: {},
-
 	edit() {
 		const blockProps = useBlockProps();
 
@@ -31,7 +26,6 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 			</p>
 		);
 	},
-
 	save() {
 		const blockProps = useBlockProps.save();
 
