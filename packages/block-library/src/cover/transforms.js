@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { createBlock } from '@wordpress/blocks';
+import {
+	createBlock,
+	createBlocksFromInnerBlocksTemplate,
+} from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -57,9 +60,11 @@ const transforms = {
 			blocks: [ 'core/group' ],
 			isMatch: ( { backgroundColor, gradient, style } ) => {
 				/*
-				 * Make sure the group has a background, since if the cover block is
-				 * created without one, it displays the "placeholder" state,
-				 * which makes it look like it has no contents.
+				 * Make this transformation available only if the Group has background
+				 * or gradient set, because otherwise `Cover` block displays a Placeholder.
+				 *
+				 * This helps avoid arbitrary decisions about the Cover block's background
+				 * and user confusion about the existence of previous content.
 				 */
 				return (
 					backgroundColor ||
@@ -72,21 +77,6 @@ const transforms = {
 				{ align, anchor, backgroundColor, gradient, style },
 				innerBlocks
 			) => {
-				/*
-				 * Clone the blocks to be transformed.
-				 * Failing to create new block references causes the original blocks
-				 * to be replaced in the switchToBlockType call thereby meaning they
-				 * are removed both from their original location and within the
-				 * new cover block.
-				 */
-				const coverInnerBlocks = innerBlocks.map( ( block ) => {
-					return createBlock(
-						block.name,
-						block.attributes,
-						block.innerBlocks
-					);
-				} );
-
 				return createBlock(
 					'core/cover',
 					{
@@ -97,7 +87,7 @@ const transforms = {
 						gradient,
 						customGradient: style?.color?.gradient,
 					},
-					coverInnerBlocks
+					createBlocksFromInnerBlocksTemplate( innerBlocks )
 				);
 			},
 		},
