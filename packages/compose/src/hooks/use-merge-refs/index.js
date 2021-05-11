@@ -42,13 +42,13 @@ export default function useMergeRefs( refs ) {
 	// which case the ref callbacks will already have been called.
 	useLayoutEffect( () => {
 		if ( didElementChange.current === false ) {
-			for ( const [ index, ref ] of refs.entries() ) {
+			refs.forEach( ( ref, index ) => {
 				const previousRef = previousRefs.current[ index ];
 				if ( ref !== previousRef ) {
 					assignRef( previousRef, null );
 					assignRef( ref, element.current );
 				}
-			}
+			} );
 		}
 
 		previousRefs.current = refs;
