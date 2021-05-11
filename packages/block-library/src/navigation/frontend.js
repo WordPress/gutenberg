@@ -13,7 +13,7 @@ function navigationToggleModal( modal ) {
 	const isHidden = 'true' === modal.getAttribute( 'aria-hidden' );
 	triggerButton.setAttribute( 'aria-expanded', ! isHidden );
 	closeButton.setAttribute( 'aria-expanded', ! isHidden );
-	modal.classList.toggle( 'has-modal-open' );
+	modal.classList.toggle( 'has-modal-open', ! isHidden );
 }
 
 MicroModal.init( {
