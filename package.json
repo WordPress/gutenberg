@@ -70,7 +70,6 @@
 		"@wordpress/react-i18n": "file:packages/react-i18n",
 		"@wordpress/react-native-aztec": "file:packages/react-native-aztec",
 		"@wordpress/react-native-bridge": "file:packages/react-native-bridge",
-		"@wordpress/react-native-editor": "file:packages/react-native-editor",
 		"@wordpress/redux-routine": "file:packages/redux-routine",
 		"@wordpress/reusable-blocks": "file:packages/reusable-blocks",
 		"@wordpress/rich-text": "file:packages/rich-text",
@@ -80,9 +79,7 @@
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
-		"@wordpress/wordcount": "file:packages/wordcount",
-		"fbjs": "3.0.0",
-		"react-native-video": "git+https://github.com/wordpress-mobile/react-native-video.git#97792c7737b234fe48840d443a9b3135711e5df7"
+		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
 		"@actions/core": "1.2.6",
