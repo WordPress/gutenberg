@@ -61,7 +61,7 @@
 		"@wordpress/viewport": "file:../viewport",
 		"classnames": "^2.2.5",
 		"fast-average-color": "4.3.0",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"moment": "^2.22.1",
 		"react-easy-crop": "^3.0.0",

@@ -43,7 +43,7 @@
 		"@wordpress/media-utils": "file:../media-utils",
 		"@wordpress/widgets": "file:../widgets",
 		"classnames": "^2.2.6",
-		"lodash": "^4.17.19"
+		"lodash": "^4.17.21"
 	},
 	"publishConfig": {
 		"access": "public"

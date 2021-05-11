@@ -39,7 +39,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/url": "file:../url",
-		"lodash": "^4.17.19"
+		"lodash": "^4.17.21"
 	},
 	"publishConfig": {
 		"access": "public"
