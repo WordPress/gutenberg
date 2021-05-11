@@ -1,6 +1,6 @@
 # Applying Styles From a Stylesheet
 
-In the previous section, the block had applied its own styles by an inline `style` attribute. While this might be adequate for very simple components, you will quickly find that it becomes easier to write your styles by extracting them to a separate stylesheet file.
+In the [previous section](/docs/how-to-guides/block-tutorial/writing-your-first-block-type.md), the block had applied its own styles by an inline `style` attribute. While this might be adequate for very simple components, you will quickly find that it becomes easier to write your styles by extracting them to a separate stylesheet file.
 
 The editor will automatically generate a class name for each block type to simplify styling. It can be accessed from the object argument passed to the edit and save functions. In this section, we will create a stylesheet to use that class name.
 
