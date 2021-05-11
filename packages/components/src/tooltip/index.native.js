@@ -37,6 +37,7 @@ const Tooltip = ( {
 	visible: initialVisible = false,
 } ) => {
 	const referenceElementRef = useRef( null );
+	const referenceMeasureTimeout = useRef( null );
 	const animationValue = useRef( new Animated.Value( 0 ) ).current;
 	const [ , horizontalPosition = 'center' ] = position.split( ' ' );
 	const [ visible, setVisible ] = useState( initialVisible );
@@ -118,11 +119,10 @@ const Tooltip = ( {
 			styles[ 'tooltip__arrow--rightAlign' ],
 	];
 
-	let to;
 	const getReferenceElementPosition = () => {
-		clearTimeout( to );
+		clearTimeout( referenceMeasureTimeout.current );
 		// Timeout used allow render to occur before calculating layout
-		to = setTimeout( () => {
+		referenceMeasureTimeout.current = setTimeout( () => {
 			referenceElementRef.current.measure(
 				( _x, _y, width, height, pageX, pageY ) => {
 					setReferenceLayout( {
