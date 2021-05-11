@@ -164,7 +164,7 @@ function UnitControl(
 	 * If no step prop has been passed, lookup the active unit and
 	 * try to get step from `units`, or default to a value of `1`
 	 */
-	if ( ! step ) {
+	if ( ! step && units ) {
 		const activeUnit = units.find( ( option ) => option.value === unit );
 		step = activeUnit?.step ?? 1;
 	}
