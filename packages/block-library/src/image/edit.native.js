@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { View, TouchableWithoutFeedback, Platform } from 'react-native';
 import { isEmpty, get, find, map } from 'lodash';
 
 /**
@@ -432,7 +432,14 @@ export class ImageEdit extends Component {
 	}
 
 	getSetFeaturedButton( isFeaturedImage ) {
+		// eslint-disable-next-line no-unused-vars
+		const androidOnly = Platform.OS === 'android';
+
 		return (
+			<>
+				{
+					// eslint-disable-next-line no-undef
+					androidOnly && (
 						<PanelBody>
 							{ isFeaturedImage ? (
 								<BottomSheet.Cell
@@ -444,6 +451,9 @@ export class ImageEdit extends Component {
 								/>
 							) }
 						</PanelBody>
+					)
+				}
+			</>
 		);
 	}
 
