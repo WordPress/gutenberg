@@ -39,7 +39,6 @@ import {
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
-import { regexp } from '@wordpress/shortcode';
 
 /**
  * Internal dependencies
@@ -51,66 +50,15 @@ import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
 import { useNativeProps } from './use-native-props';
 import { store as blockEditorStore } from '../../store';
+import {
+	addActiveFormats,
+	getMultilineTag,
+	getAllowedFormats,
+	isShortcode,
+} from './utils';
 
 const wrapperClasses = 'block-editor-rich-text';
 const classes = 'block-editor-rich-text__editable';
-
-function addActiveFormats( value, activeFormats ) {
-	if ( activeFormats.length ) {
-		let index = value.formats.length;
-
-		while ( index-- ) {
-			value.formats[ index ] = [
-				...activeFormats,
-				...( value.formats[ index ] || [] ),
-			];
-		}
-	}
-}
-
-/**
- * Get the multiline tag based on the multiline prop.
- *
- * @param {?(string|boolean)} multiline The multiline prop.
- *
- * @return {?string} The multiline tag.
- */
-function getMultilineTag( multiline ) {
-	if ( multiline !== true && multiline !== 'p' && multiline !== 'li' ) {
-		return;
-	}
-
-	return multiline === true ? 'p' : multiline;
-}
-
-function getAllowedFormats( {
-	allowedFormats,
-	formattingControls,
-	disableFormats,
-} ) {
-	if ( disableFormats ) {
-		return getAllowedFormats.EMPTY_ARRAY;
-	}
-
-	if ( ! allowedFormats && ! formattingControls ) {
-		return;
-	}
-
-	if ( allowedFormats ) {
-		return allowedFormats;
-	}
-
-	deprecated( 'wp.blockEditor.RichText formattingControls prop', {
-		since: '5.4',
-		alternative: 'allowedFormats',
-	} );
-
-	return formattingControls.map( ( name ) => `core/${ name }` );
-}
-
-getAllowedFormats.EMPTY_ARRAY = [];
-
-const isShortcode = ( text ) => regexp( '.*' ).test( text );
 
 function RichTextWrapper(
 	{
