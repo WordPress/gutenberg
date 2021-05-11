@@ -14,6 +14,7 @@ import {
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { usePrevious } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -39,6 +40,7 @@ const Tooltip = ( {
 	const animationValue = useRef( new Animated.Value( 0 ) ).current;
 	const [ , horizontalPosition = 'center' ] = position.split( ' ' );
 	const [ visible, setVisible ] = useState( initialVisible );
+	const previousVisible = usePrevious( visible );
 	const [ referenceLayout, setReferenceLayout ] = useState( {
 		height: 0,
 		width: 0,
@@ -62,7 +64,14 @@ const Tooltip = ( {
 	}, [ visible ] );
 
 	useEffect( () => {
-		startAnimation();
+		if (
+			// Initial render and visibility enabled, animate show
+			( typeof previousVisible === 'undefined' && visible ) ||
+			// Previously visible, animate hide
+			( previousVisible && previousVisible !== visible )
+		) {
+			startAnimation();
+		}
 	}, [ visible ] );
 
 	const startAnimation = () => {
@@ -138,6 +147,7 @@ const Tooltip = ( {
 				ref: referenceElementRef,
 				onLayout: getReferenceElementPosition,
 			} ) }
+			{ /* TODO(David): Animation out does not work as this immediately removes the element. */ }
 			{ visible && (
 				<Fill>
 					<View
