@@ -246,6 +246,10 @@ export function requestImageUploadCancel( mediaId ) {
 	return RNReactNativeGutenbergBridge.requestImageUploadCancel( mediaId );
 }
 
+export function setFeaturedImage( mediaId ) {
+	return RNReactNativeGutenbergBridge.setFeaturedImage( mediaId );
+}
+
 export function getOtherMediaOptions( filter, callback ) {
 	return RNReactNativeGutenbergBridge.getOtherMediaOptions(
 		filter,
