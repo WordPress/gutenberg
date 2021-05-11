@@ -16,6 +16,42 @@
 			"selector": "figcaption",
 			"default": ""
 		},
+		"secondaryBackgroundColor": {
+			"type": "string"
+		},
+		"customSecondaryBackgroundColor": {
+			"type": "string"
+		},
+		"secondaryTextColor": {
+			"type": "string"
+		},
+		"customSecondaryTextColor": {
+			"type": "string"
+		},
+		"headerBackgroundColor": {
+			"type": "string"
+		},
+		"customHeaderBackgroundColor": {
+			"type": "string"
+		},
+		"headerTextColor": {
+			"type": "string"
+		},
+		"customHeaderTextColor": {
+			"type": "string"
+		},
+		"footerBackgroundColor": {
+			"type": "string"
+		},
+		"customFooterBackgroundColor": {
+			"type": "string"
+		},
+		"footerTextColor": {
+			"type": "string"
+		},
+		"customFooterTextColor": {
+			"type": "string"
+		},
 		"head": {
 			"type": "array",
 			"default": [],

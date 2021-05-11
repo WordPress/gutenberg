@@ -61,6 +61,7 @@
 		border-spacing: 0;
 		border-collapse: inherit;
 		background-color: transparent;
+		border-bottom: 1px solid $gray-100;
 
 		tbody tr:nth-child(odd) {
 			background-color: $gray-100;
@@ -95,7 +96,16 @@
 			border-color: transparent;
 		}
 
-		border-bottom: 1px solid $gray-100;
+		// Force user selected colors while stripe style is active.
+		table.has-text-color {
+			thead,
+			tfoot,
+			tbody {
+				tr:not(.has-text-color) {
+					color: currentColor;
+				}
+			}
+		}
 	}
 
 	// Border Styles

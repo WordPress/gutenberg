@@ -13,6 +13,11 @@ import {
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { getColorProps } from './utils';
+
 export default function save( { attributes } ) {
 	const { hasFixedLayout, head, body, foot, caption } = attributes;
 	const isEmpty = ! head.length && ! body.length && ! foot.length;
@@ -21,14 +26,37 @@ export default function save( { attributes } ) {
 		return null;
 	}
 
+	const blockProps = useBlockProps.save();
+	const isStripedStyle = blockProps.className.includes( 'is-style-stripes' );
+
 	const colorProps = getColorClassesAndStyles( attributes );
 	const borderProps = getBorderClassesAndStyles( attributes );
+	const headerProps = getColorProps( 'header', attributes );
+	const stripedProps = getColorProps( 'secondary', attributes );
+	const footerProps = getColorProps( 'footer', attributes );
 
 	const classes = classnames( colorProps.className, borderProps.className, {
 		'has-fixed-layout': hasFixedLayout,
 	} );
 
 	const hasCaption = ! RichText.isEmpty( caption );
+
+	const getRowProps = ( name, rowIndex ) => {
+		if ( name === 'head' ) {
+			return headerProps;
+		}
+
+		if ( name === 'foot' ) {
+			return footerProps;
+		}
+
+		// Striped styling only applies to table body.
+		if ( isStripedStyle && rowIndex % 2 === 0 ) {
+			return stripedProps;
+		}
+
+		return {};
+	};
 
 	const Section = ( { type, rows } ) => {
 		if ( ! rows.length ) {
@@ -40,7 +68,7 @@ export default function save( { attributes } ) {
 		return (
 			<Tag>
 				{ rows.map( ( { cells }, rowIndex ) => (
-					<tr key={ rowIndex }>
+					<tr key={ rowIndex } { ...getRowProps( type, rowIndex ) }>
 						{ cells.map(
 							( { content, tag, scope, align }, cellIndex ) => {
 								const cellClasses = classnames( {
@@ -72,7 +100,7 @@ export default function save( { attributes } ) {
 	};
 
 	return (
-		<figure { ...useBlockProps.save() }>
+		<figure { ...blockProps }>
 			<table
 				className={ classes === '' ? undefined : classes }
 				style={ { ...colorProps.style, ...borderProps.style } }
