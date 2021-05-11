@@ -146,16 +146,17 @@ module.exports = {
 			const isMinified = name.indexOf( '.min' ) !== -1;
 
 			const dirName = isMinified ? name.split( '.' )[ 0 ] : name;
+			const ext = isMinified ? '.min.js' : '.js';
 
 			/*
 			 * If the file being built is a Core Block's frontend file,
 			 * we build it in the block's directory.
 			 */
 			if ( rawRequest && rawRequest.includes( '/frontend.js' ) ) {
-				return `./build/block-library/blocks/${ dirName }/${ name }.js`;
+				return `./build/block-library/blocks/${ dirName }/frontend${ ext }`;
 			}
 
-			return `./build/${ dirName }/${ name }.js`;
+			return `./build/${ dirName }/index${ ext }`;
 		},
 		path: __dirname,
 		library: [ 'wp', '[camelName]' ],
