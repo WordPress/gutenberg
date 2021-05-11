@@ -118,46 +118,47 @@ class Layout extends Component {
 		};
 
 		return (
-			<SafeAreaView
-				style={ getStylesFromColorScheme(
-					styles.container,
-					styles.containerDark
-				) }
-				onLayout={ this.onRootViewLayout }
-			>
-				<AutosaveMonitor disableIntervalChecks />
-				<View
+			<Tooltip.Slot>
+				<SafeAreaView
 					style={ getStylesFromColorScheme(
-						styles.background,
-						styles.backgroundDark
+						styles.container,
+						styles.containerDark
 					) }
+					onLayout={ this.onRootViewLayout }
 				>
-					{ isHtmlView ? this.renderHTML() : this.renderVisual() }
-					{ ! isHtmlView && Platform.OS === 'android' && (
-						<FloatingToolbar />
-					) }
-					<NoticeList />
-				</View>
-				<View
-					style={ {
-						flex: 0,
-						flexBasis: marginBottom,
-						height: marginBottom,
-					} }
-				/>
-				{ ! isHtmlView && (
-					<KeyboardAvoidingView
-						parentHeight={ this.state.rootViewHeight }
-						style={ toolbarKeyboardAvoidingViewStyle }
-						withAnimatedHeight
+					<AutosaveMonitor disableIntervalChecks />
+					<View
+						style={ getStylesFromColorScheme(
+							styles.background,
+							styles.backgroundDark
+						) }
 					>
-						{ Platform.OS === 'ios' && <FloatingToolbar /> }
-						<Header />
-						<BottomSheetSettings />
-					</KeyboardAvoidingView>
-				) }
-				<Tooltip.Slot />
-			</SafeAreaView>
+						{ isHtmlView ? this.renderHTML() : this.renderVisual() }
+						{ ! isHtmlView && Platform.OS === 'android' && (
+							<FloatingToolbar />
+						) }
+						<NoticeList />
+					</View>
+					<View
+						style={ {
+							flex: 0,
+							flexBasis: marginBottom,
+							height: marginBottom,
+						} }
+					/>
+					{ ! isHtmlView && (
+						<KeyboardAvoidingView
+							parentHeight={ this.state.rootViewHeight }
+							style={ toolbarKeyboardAvoidingViewStyle }
+							withAnimatedHeight
+						>
+							{ Platform.OS === 'ios' && <FloatingToolbar /> }
+							<Header />
+							<BottomSheetSettings />
+						</KeyboardAvoidingView>
+					) }
+				</SafeAreaView>
+			</Tooltip.Slot>
 		);
 	}
 }

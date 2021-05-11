@@ -1,18 +1,19 @@
 /**
  * External dependencies
  */
-import {
-	Animated,
-	Easing,
-	Text,
-	TouchableWithoutFeedback,
-	View,
-} from 'react-native';
+import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 
 /**
  * WordPress dependencies
  */
-import { cloneElement, useState, useRef, useEffect } from '@wordpress/element';
+import {
+	cloneElement,
+	createContext,
+	useContext,
+	useEffect,
+	useRef,
+	useState,
+} from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -23,6 +24,9 @@ import styles from './style.scss';
 const RIGHT_ALIGN_ARROW_OFFSET = 16;
 const TOOLTIP_VERTICAL_OFFSET = 2;
 
+const TooltipContext = createContext( {
+	onHandleScreenTouch: () => {},
+} );
 const { Fill, Slot } = createSlotFill( 'Tooltip' );
 
 const Tooltip = ( {
@@ -47,6 +51,17 @@ const Tooltip = ( {
 		x: 0,
 		y: 0,
 	} );
+	const { onHandleScreenTouch } = useContext( TooltipContext );
+
+	// Register callback to dismiss the tooltip whenever the screen is touched
+	useEffect( () => {
+		onHandleScreenTouch( () => {
+			// TODO(David): This is invoked, but the state update never triggers a
+			// re-render. Why? Stale values?
+			setVisible( false );
+		} );
+		return () => onHandleScreenTouch( null );
+	}, [ visible, initialVisible ] );
 
 	useEffect( () => {
 		startAnimation();
@@ -127,27 +142,48 @@ const Tooltip = ( {
 			} ) }
 			{ visible && (
 				<Fill>
-					<TouchableWithoutFeedback
-						onPress={ () => setVisible( false ) }
+					<View
+						onLayout={ getTooltipLayout }
+						style={ positionStyles }
 					>
-						<View
-							onLayout={ getTooltipLayout }
-							style={ positionStyles }
-						>
-							<Animated.View style={ tooltipStyles }>
-								<Text style={ styles.tooltip__text }>
-									{ text }
-								</Text>
-								<View style={ arrowStyles } />
-							</Animated.View>
-						</View>
-					</TouchableWithoutFeedback>
+						<Animated.View style={ tooltipStyles }>
+							<Text style={ styles.tooltip__text }>{ text }</Text>
+							<View style={ arrowStyles } />
+						</Animated.View>
+					</View>
 				</Fill>
 			) }
 		</>
 	);
 };
 
-Tooltip.Slot = Slot;
+const TooltipSlot = ( { children, ...rest } ) => {
+	const [ handleScreenTouch, setHandleScreenTouch ] = useState( null );
+	const onHandleScreenTouch = ( callback ) => {
+		// Must use function to set state below as `callback` is a function itself
+		setHandleScreenTouch( () => callback );
+	};
+	const handleTouchStart = () => {
+		if ( handleScreenTouch ) {
+			handleScreenTouch();
+			setHandleScreenTouch( null );
+		}
+	};
+
+	return (
+		<TooltipContext.Provider value={ { onHandleScreenTouch } }>
+			<View
+				onTouchStart={ handleTouchStart }
+				pointerEvents="box-none"
+				style={ StyleSheet.absoluteFill }
+			>
+				{ children }
+				<Slot { ...rest } />
+			</View>
+		</TooltipContext.Provider>
+	);
+};
+
+Tooltip.Slot = TooltipSlot;
 
 export default Tooltip;
