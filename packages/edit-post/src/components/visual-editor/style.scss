@@ -38,10 +38,6 @@
 	> * {
 		cursor: auto;
 	}
-
-	> div {
-		min-height: 100%;
-	}
 }
 
 // Ideally this wrapper div is not needed but if we want to match the positioning of blocks
@@ -73,4 +69,10 @@
 	&:hover {
 		color: $gray-100;
 	}
+}
+
+.edit-post-visual-editor__content-area {
+	width: 100%;
+	height: 100%;
+	position: relative;
 }

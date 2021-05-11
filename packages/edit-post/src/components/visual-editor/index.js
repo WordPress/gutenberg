@@ -60,7 +60,7 @@ function MaybeIframe( {
 				<div
 					ref={ contentRef }
 					className="editor-styles-wrapper"
-					style={ { width: '100%', height: '100%', ...style } }
+					style={ style }
 				>
 					{ children }
 				</div>
@@ -167,14 +167,10 @@ export default function VisualEditor( { styles } ) {
 	);
 
 	return (
-		<motion.div
+		<div
 			className={ classnames( 'edit-post-visual-editor', {
 				'is-template-mode': isTemplateMode,
 			} ) }
-			animate={
-				isTemplateMode ? { padding: '48px 48px 0' } : { padding: 0 }
-			}
-			ref={ blockSelectionClearerRef }
 		>
 			{ themeSupportsLayout && (
 				<LayoutStyle
@@ -183,67 +179,75 @@ export default function VisualEditor( { styles } ) {
 				/>
 			) }
 			<VisualEditorGlobalKeyboardShortcuts />
-			{ isTemplateMode && (
-				<Button
-					className="edit-post-visual-editor__exit-template-mode"
-					icon={ arrowLeft }
-					onClick={ () => {
-						clearSelectedBlock();
-						setIsEditingTemplate( false );
+			<BlockTools __unstableContentRef={ ref }>
+				<motion.div
+					className="edit-post-visual-editor__content-area"
+					animate={ {
+						padding: isTemplateMode ? '48px 48px 0' : '0',
 					} }
+					ref={ blockSelectionClearerRef }
 				>
-					{ __( 'Back' ) }
-				</Button>
-			) }
-			<motion.div
-				animate={ animatedStyles }
-				initial={ desktopCanvasStyles }
-			>
-				<BlockTools __unstableContentRef={ ref }>
-					<MaybeIframe
-						isTemplateMode={ isTemplateMode }
-						contentRef={ contentRef }
-						styles={ styles }
-						style={ { paddingBottom } }
+					{ isTemplateMode && (
+						<Button
+							className="edit-post-visual-editor__exit-template-mode"
+							icon={ arrowLeft }
+							onClick={ () => {
+								clearSelectedBlock();
+								setIsEditingTemplate( false );
+							} }
+						>
+							{ __( 'Back' ) }
+						</Button>
+					) }
+					<motion.div
+						animate={ animatedStyles }
+						initial={ desktopCanvasStyles }
 					>
-						<AnimatePresence>
-							<motion.div
-								key={ isTemplateMode ? 'template' : 'post' }
-								initial={ { opacity: 0 } }
-								animate={ { opacity: 1 } }
-							>
-								<WritingFlow>
-									{ ! isTemplateMode && (
-										<div className="edit-post-visual-editor__post-title-wrapper">
-											<PostTitle />
-										</div>
-									) }
-									<RecursionProvider>
-										<BlockList
-											__experimentalLayout={
-												themeSupportsLayout
-													? {
-															type: 'default',
-															// Find a way to inject this in the support flag code (hooks).
-															alignments: themeSupportsLayout
-																? alignments
-																: undefined,
-													  }
-													: undefined
-											}
-										/>
-									</RecursionProvider>
-								</WritingFlow>
-							</motion.div>
-						</AnimatePresence>
-					</MaybeIframe>
-				</BlockTools>
-			</motion.div>
+						<MaybeIframe
+							isTemplateMode={ isTemplateMode }
+							contentRef={ contentRef }
+							styles={ styles }
+							style={ { paddingBottom } }
+						>
+							<AnimatePresence>
+								<motion.div
+									key={ isTemplateMode ? 'template' : 'post' }
+									initial={ { opacity: 0 } }
+									animate={ { opacity: 1 } }
+								>
+									<WritingFlow>
+										{ ! isTemplateMode && (
+											<div className="edit-post-visual-editor__post-title-wrapper">
+												<PostTitle />
+											</div>
+										) }
+										<RecursionProvider>
+											<BlockList
+												__experimentalLayout={
+													themeSupportsLayout
+														? {
+																type: 'default',
+																// Find a way to inject this in the support flag code (hooks).
+																alignments: themeSupportsLayout
+																	? alignments
+																	: undefined,
+														  }
+														: undefined
+												}
+											/>
+										</RecursionProvider>
+									</WritingFlow>
+								</motion.div>
+							</AnimatePresence>
+						</MaybeIframe>
+					</motion.div>
+				</motion.div>
+			</BlockTools>
 			<__unstableBlockSettingsMenuFirstItem>
 				{ ( { onClose } ) => (
 					<BlockInspectorButton onClick={ onClose } />
 				) }
 			</__unstableBlockSettingsMenuFirstItem>
-		</motion.div>
+		</div>
 	);
 }
