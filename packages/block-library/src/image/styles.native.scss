@@ -30,3 +30,14 @@
 	padding-right: 0;
 	padding-bottom: $grid-unit;
 }
+
+.featuredButton {
+	border-top-width: $border-width;
+	border-top-color: $light-gray-400;
+	padding: $grid-unit-20;
+	text-align: center;
+}
+
+.featuredButtonDark {
+	border-top-color: $gray-70;
+}
