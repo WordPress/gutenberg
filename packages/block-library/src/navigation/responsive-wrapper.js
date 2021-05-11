@@ -11,28 +11,34 @@ import { Button } from '@wordpress/components';
 import { SVG, Rect } from '@wordpress/primitives';
 import { __ } from '@wordpress/i18n';
 
-export default function ResponsiveWrapper( props ) {
-	if ( ! props.isResponsive ) {
-		return props.children;
+export default function ResponsiveWrapper( {
+	children,
+	id,
+	isOpen,
+	isResponsive,
+	onToggle,
+} ) {
+	if ( ! isResponsive ) {
+		return children;
 	}
 	const responsiveContainerClasses = classnames(
 		'wp-block-navigation__responsive-container',
 		{
-			'is-menu-open': props.isOpen,
+			'is-menu-open': isOpen,
 		}
 	);
 
-	const modalId = `${ props.id }-modal`;
+	const modalId = `${ id }-modal`;
 
 	return (
 		<>
-			{ ! props.isOpen && (
+			{ ! isOpen && (
 				<Button
 					aria-haspopup="true"
-					aria-expanded={ props.isOpen }
+					aria-expanded={ isOpen }
 					aria-label={ __( 'Open menu' ) }
 					className="wp-block-navigation__responsive-container-open"
-					onClick={ () => props.onToggle( true ) }
+					onClick={ () => onToggle( true ) }
 				>
 					<SVG
 						xmlns="http://www.w3.org/2000/svg"
@@ -52,7 +58,7 @@ export default function ResponsiveWrapper( props ) {
 			<div
 				className={ responsiveContainerClasses }
 				id={ modalId }
-				aria-hidden={ ! props.isOpen }
+				aria-hidden={ ! isOpen }
 			>
 				<div
 					className="wp-block-navigation__responsive-close"
@@ -67,7 +73,7 @@ export default function ResponsiveWrapper( props ) {
 						<Button
 							className="wp-block-navigation__responsive-container-close"
 							aria-label={ __( 'Close menu' ) }
-							onClick={ () => props.onToggle( false ) }
+							onClick={ () => onToggle( false ) }
 						>
 							<Icon icon={ close } />
 						</Button>
@@ -75,7 +81,7 @@ export default function ResponsiveWrapper( props ) {
 							className="wp-block-navigation__responsive-container-content"
 							id={ `${ modalId }-content` }
 						>
-							{ props.children }
+							{ children }
 						</div>
 					</div>
 				</div>

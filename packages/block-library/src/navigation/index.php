@@ -120,14 +120,12 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	}
 
 	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
-
-	$script_path                 = __DIR__ . '/navigation/frontend.js';
 	$should_load_frontend_script = $attributes['isResponsive'] && ! wp_script_is( 'core_block_navigation_load_frontend_scripts' );
 
 	if ( $should_load_frontend_script ) {
 		wp_enqueue_script(
 			'core_block_navigation_load_frontend_scripts',
-			plugins_url( 'frontend.js', $script_path ),
+			plugins_url( 'frontend.js', __DIR__ . '/navigation/frontend.js' ),
 			array(),
 			false,
 			true
@@ -164,6 +162,8 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 
 	$modal_unique_id = uniqid();
 
+	// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive,
+	// return early if they don't.
 	if ( ! isset( $attributes['isResponsive'] ) || false === $attributes['isResponsive'] ) {
 		return sprintf(
 			'<nav %1$s><ul class="wp-block-navigation__container">%2$s</ul></nav>',
@@ -172,7 +172,6 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 		);
 	}
 
-	// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive.
 	$responsive_container_markup = sprintf(
 		'<button aria-expanded="false" aria-haspopup="true" aria-label="%3$s" class="wp-block-navigation__responsive-container-open" data-micromodal-trigger="modal-%1$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
 			<div class="wp-block-navigation__responsive-container" id="modal-%1$s" aria-hidden="true">
