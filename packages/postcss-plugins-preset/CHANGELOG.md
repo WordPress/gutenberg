@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 3.0.0 (2021-04-29)
+
 ### Breaking Changes
 
 -   The bundled `autoprefixer` dependency has been updated from requiring `^9.8.6` to requiring `^10.2.5` (see [Breaking Changes](https://github.com/postcss/autoprefixer/releases/tag/10.0.0), [#27821](https://github.com/WordPress/gutenberg/pull/27821)).

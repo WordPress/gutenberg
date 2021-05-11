@@ -15,12 +15,11 @@ import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import useBlockDropZone from '../use-block-drop-zone';
-import InsertionPoint from './insertion-point';
 import { useInBetweenInserter } from './use-in-between-inserter';
-import BlockPopover from './block-popover';
 import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
+import BlockToolsBackCompat from '../block-tools/back-compat';
 
 function Root( { className, children } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -68,12 +67,11 @@ function Root( { className, children } ) {
 export default function BlockList( { className, __experimentalLayout } ) {
 	usePreParsePatterns();
 	return (
-		<InsertionPoint>
-			<BlockPopover />
+		<BlockToolsBackCompat>
 			<Root className={ className }>
 				<BlockListItems __experimentalLayout={ __experimentalLayout } />
 			</Root>
-		</InsertionPoint>
+		</BlockToolsBackCompat>
 	);
 }
 

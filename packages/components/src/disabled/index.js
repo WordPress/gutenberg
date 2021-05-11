@@ -20,7 +20,8 @@ import { focus } from '@wordpress/dom';
  */
 import { StyledWrapper } from './styles/disabled-styles';
 
-const { Consumer, Provider } = createContext( false );
+const Context = createContext( false );
+const { Consumer, Provider } = Context;
 
 /**
  * Names of control nodes which qualify for disabled behavior.
@@ -111,6 +112,7 @@ function Disabled( { className, children, isDisabled = true, ...props } ) {
 	);
 }
 
+Disabled.Context = Context;
 Disabled.Consumer = Consumer;
 
 export default Disabled;

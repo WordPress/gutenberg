@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { createBlock } from '@wordpress/blocks';
 import { group as icon } from '@wordpress/icons';
 
@@ -18,15 +18,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Group', 'block title' ),
 	icon,
-	description: __( 'Combine blocks into a group.' ),
-	keywords: [
-		__( 'container' ),
-		__( 'wrapper' ),
-		__( 'row' ),
-		__( 'section' ),
-	],
 	example: {
 		attributes: {
 			style: {

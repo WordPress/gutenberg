@@ -9,20 +9,20 @@ import { BlockControls } from '@wordpress/block-editor';
  */
 import {
 	untitledMenu,
-	useMenuEntity,
-	useSelectedMenuData,
+	useSelectedMenuId,
+	useMenuEntityProp,
 	IsMenuNameControlFocusedContext,
 } from '../../hooks';
 
 import { sprintf, __ } from '@wordpress/i18n';
 export default function NameDisplay() {
-	const { menuId } = useSelectedMenuData();
-	const { editedMenu } = useMenuEntity( menuId );
+	const [ menuId ] = useSelectedMenuId();
+	const [ name ] = useMenuEntityProp( 'name', menuId );
 	const [ , setIsMenuNameEditFocused ] = useContext(
 		IsMenuNameControlFocusedContext
 	);
 
-	const menuName = editedMenu?.name ?? untitledMenu;
+	const menuName = name ?? untitledMenu;
 
 	return (
 		<BlockControls>

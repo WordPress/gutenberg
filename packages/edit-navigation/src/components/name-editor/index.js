@@ -2,16 +2,16 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
+import { TextControl } from '@wordpress/components';
 import { useEffect, useRef, useContext } from '@wordpress/element';
+
 /**
  * Internal dependencies
  */
-import { TextControl } from '@wordpress/components';
 import {
 	IsMenuNameControlFocusedContext,
-	untitledMenu,
-	useMenuEntity,
-	useSelectedMenuData,
+	useMenuEntityProp,
+	useSelectedMenuId,
 } from '../../hooks';
 
 export function NameEditor() {
@@ -19,19 +19,14 @@ export function NameEditor() {
 		IsMenuNameControlFocusedContext
 	);
 
-	const { menuId } = useSelectedMenuData();
-	const { editedMenu, editMenuEntityRecord, menuEntityData } = useMenuEntity(
-		menuId
-	);
-	const editedMenuName = menuId && editedMenu.name;
-
-	const editMenuName = ( name = untitledMenu ) =>
-		editMenuEntityRecord( ...menuEntityData, { name } );
+	const [ menuId ] = useSelectedMenuId();
+	const [ name, setName ] = useMenuEntityProp( 'name', menuId );
 
 	const inputRef = useRef();
 	useEffect( () => {
 		if ( isMenuNameEditFocused ) inputRef.current.focus();
 	}, [ isMenuNameEditFocused ] );
+
 	return (
 		<>
 			<TextControl
@@ -42,8 +37,8 @@ export function NameEditor() {
 				label={ __( 'Name' ) }
 				onBlur={ () => setIsMenuNameEditFocused( false ) }
 				className="edit-navigation-name-editor__text-control"
-				value={ editedMenuName }
-				onChange={ editMenuName }
+				value={ name }
+				onChange={ setName }
 			/>
 		</>
 	);

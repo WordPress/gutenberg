@@ -198,6 +198,19 @@ describe( 'Multi-entity save flow', () => {
 			await page.waitForSelector( savePanelSelector );
 			checkboxInputs = await page.$$( checkboxInputSelector );
 			expect( checkboxInputs ).toHaveLength( 1 );
+
+			// Reset site entity to default value to not affect other tests.
+			await page.evaluate( () => {
+				wp.data
+					.dispatch( 'core' )
+					.editEntityRecord( 'root', 'site', undefined, {
+						title: 'gutenberg',
+						description: 'Just another WordPress site',
+					} );
+				wp.data
+					.dispatch( 'core' )
+					.saveEditedEntityRecord( 'root', 'site', undefined );
+			} );
 		} );
 	} );
 

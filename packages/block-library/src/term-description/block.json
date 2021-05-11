@@ -1,7 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "core/term-description",
+	"title": "Term Description",
 	"category": "design",
+	"description": "Display the description of categories, tags and custom taxonomies when viewing an archive.",
+	"textdomain": "default",
 	"attributes": {
 		"textAlign": {
 			"type": "string"
