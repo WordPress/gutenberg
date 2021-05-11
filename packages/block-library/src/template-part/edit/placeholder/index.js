@@ -3,11 +3,11 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
-import { useDispatch } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { Placeholder, Dropdown, Button } from '@wordpress/components';
-import { blockDefault } from '@wordpress/icons';
 import { serialize } from '@wordpress/blocks';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -27,6 +27,19 @@ export default function TemplatePartPlaceholder( {
 } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.initial );
+
+	const { areasByName } = useSelect( ( select ) => {
+		const definedAreas = select(
+			editorStore
+		).__experimentalGetDefaultTemplatePartAreas();
+		const _areasByName = {};
+		definedAreas.forEach( ( item ) => {
+			_areasByName[ item.area ] = item;
+		} );
+		return {
+			areasByName: _areasByName,
+		};
+	} );
 
 	const onCreate = useCallback(
 		async ( startingBlocks = [] ) => {
@@ -61,8 +74,15 @@ export default function TemplatePartPlaceholder( {
 		<>
 			{ step === PLACEHOLDER_STEPS.initial && (
 				<Placeholder
-					icon={ blockDefault }
-					label={ __( 'Template Part' ) }
+					icon={
+						areasByName[ area ]?.icon ||
+						areasByName.uncategorized.icon
+					}
+					label={
+						areasByName[ area ]?.label
+							? areasByName[ area ].label
+							: __( 'Template Part' )
+					}
 					instructions={ __(
 						'Create a new template part or pick an existing one from the list.'
 					) }
