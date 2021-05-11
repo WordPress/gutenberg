@@ -94,7 +94,7 @@ const SecondaryColorControls = ( {
 	}
 
 	// Don't display color controls for Native or if there aren't any needed.
-	if ( Platform.OS !== 'web' && ! activeColors.length ) {
+	if ( Platform.OS !== 'web' || ! activeColors.length ) {
 		return null;
 	}
 
