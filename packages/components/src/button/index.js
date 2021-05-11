@@ -38,14 +38,6 @@ function useDeprecatedProps( {
 
 		computedVariant ??= 'primary';
 	}
-	if ( isSecondary ) {
-		deprecated( 'Button isSecondary prop', {
-			since: '5.9',
-			alternative: 'variant="secondary"',
-		} );
-
-		computedVariant ??= 'secondary';
-	}
 	if ( isTertiary ) {
 		deprecated( 'Button isTertiary prop', {
 			since: '5.9',
@@ -53,6 +45,14 @@ function useDeprecatedProps( {
 		} );
 
 		computedVariant ??= 'tertiary';
+	}
+	if ( isSecondary ) {
+		deprecated( 'Button isSecondary prop', {
+			since: '5.9',
+			alternative: 'variant="secondary"',
+		} );
+
+		computedVariant ??= 'secondary';
 	}
 	if ( isDefault ) {
 		deprecated( 'Button isDefault prop', {
