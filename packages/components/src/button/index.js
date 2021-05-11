@@ -19,17 +19,63 @@ import VisuallyHidden from '../visually-hidden';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
+// TODO: add JSDOCS
+function useDeprecatedProps( {
+	isDefault,
+	isPrimary,
+	isSecondary,
+	isTertiary,
+	variant,
+	...otherProps
+} ) {
+	let computedVariant = variant;
+
+	if ( isPrimary ) {
+		deprecated( 'Button isPrimary prop', {
+			since: '5.9',
+			alternative: 'variant="primary"',
+		} );
+
+		computedVariant ??= 'primary';
+	}
+	if ( isSecondary ) {
+		deprecated( 'Button isSecondary prop', {
+			since: '5.9',
+			alternative: 'variant="secondary"',
+		} );
+
+		computedVariant ??= 'secondary';
+	}
+	if ( isTertiary ) {
+		deprecated( 'Button isTertiary prop', {
+			since: '5.9',
+			alternative: 'variant="tertiary"',
+		} );
+
+		computedVariant ??= 'tertiary';
+	}
+	if ( isDefault ) {
+		deprecated( 'Button isDefault prop', {
+			since: '5.4',
+			alternative: 'variant="secondary"',
+		} );
+
+		computedVariant ??= 'secondary';
+	}
+
+	return {
+		...otherProps,
+		variant: computedVariant,
+	};
+}
+
 export function Button( props, ref ) {
 	const {
 		href,
 		target,
-		isPrimary,
 		isSmall,
-		isTertiary,
 		isPressed,
 		isBusy,
-		isDefault,
-		isSecondary,
 		isLink,
 		isDestructive,
 		className,
@@ -43,23 +89,17 @@ export function Button( props, ref ) {
 		label,
 		children,
 		text,
+		variant,
 		__experimentalIsFocusable: isFocusable,
 		describedBy,
 		...additionalProps
-	} = props;
-
-	if ( isDefault ) {
-		deprecated( 'Button isDefault prop', {
-			since: '5.4',
-			alternative: 'isSecondary',
-		} );
-	}
+	} = useDeprecatedProps( props );
 
 	const classes = classnames( 'components-button', className, {
-		'is-secondary': isDefault || isSecondary,
-		'is-primary': isPrimary,
+		'is-secondary': variant === 'secondary',
+		'is-primary': variant === 'primary',
 		'is-small': isSmall,
-		'is-tertiary': isTertiary,
+		'is-tertiary': variant === 'tertiary',
 		'is-pressed': isPressed,
 		'is-busy': isBusy,
 		'is-link': isLink,
