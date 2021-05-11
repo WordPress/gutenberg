@@ -46,7 +46,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { getProtocol, hasQueryArg } from '@wordpress/url';
 import { doAction, hasAction } from '@wordpress/hooks';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
+import { withSelect, withDispatch } from '@wordpress/data';
 import {
 	image as placeholderIcon,
 	replace,
@@ -434,7 +434,9 @@ export class ImageEdit extends Component {
 	}
 
 	onSetFeatured( mediaId ) {
+		const { closeSettingsBottomSheet } = this.props;
 		setFeaturedImage( mediaId );
+		closeSettingsBottomSheet();
 	}
 
 	getSetFeaturedButton( isFeaturedImage ) {
@@ -687,6 +689,13 @@ export default compose( [
 				clientId,
 				'inserter_menu'
 			),
+		};
+	} ),
+	withDispatch( ( dispatch ) => {
+		return {
+			closeSettingsBottomSheet() {
+				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+			},
 		};
 	} ),
 	withPreferredColorScheme,
