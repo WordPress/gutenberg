@@ -9,7 +9,7 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import useThemeSetting from '../components/use-theme-setting';
+import useSetting from '../components/use-setting';
 import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
 import { cleanEmptyObject } from './utils';
 import { useCustomUnits } from '../components/unit-control';
@@ -32,7 +32,7 @@ export function hasMarginSupport( blockType ) {
  * @return {boolean}     Whether margin setting is disabled.
  */
 export function useIsMarginDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useThemeSetting( 'spacing.customMargin' );
+	const isDisabled = ! useSetting( 'spacing.customMargin' );
 	return ! hasMarginSupport( blockName ) || isDisabled;
 }
 

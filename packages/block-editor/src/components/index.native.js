@@ -49,7 +49,7 @@ export { default as BlockCaption } from './block-caption';
 export { default as Caption } from './caption';
 export { default as PanelColorSettings } from './panel-color-settings';
 export { default as __experimentalPanelColorGradientSettings } from './colors-gradients/panel-color-gradient-settings';
-export { default as useThemeSetting } from './use-theme-setting';
+export { default as useSetting } from './use-setting';
 export { default as __experimentalUseNoRecursiveRenders } from './use-no-recursive-renders';
 export { default as Warning } from './warning';
 

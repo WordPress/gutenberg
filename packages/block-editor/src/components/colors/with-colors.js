@@ -18,7 +18,7 @@ import {
 	getColorObjectByAttributeValues,
 	getMostReadableColor,
 } from './utils';
-import useThemeSetting from '../use-theme-setting';
+import useSetting from '../use-setting';
 
 const DEFAULT_COLORS = [];
 
@@ -47,7 +47,7 @@ const withCustomColorPalette = ( colorsArray ) =>
 const withEditorColorPalette = () =>
 	createHigherOrderComponent(
 		( WrappedComponent ) => ( props ) => {
-			const colors = useThemeSetting( 'color.palette' ) || DEFAULT_COLORS;
+			const colors = useSetting( 'color.palette' ) || DEFAULT_COLORS;
 			return <WrappedComponent { ...props } colors={ colors } />;
 		},
 		'withEditorColorPalette'

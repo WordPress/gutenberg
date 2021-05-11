@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useThemeSetting } from '../editor/utils';
+import { useSetting } from '../editor/utils';
 
 export function useHasTypographyPanel( { supports, name } ) {
 	const hasLineHeight = useHasLineHeightControl( { supports, name } );
@@ -24,17 +24,17 @@ export function useHasTypographyPanel( { supports, name } ) {
 
 function useHasLineHeightControl( { supports, name } ) {
 	return (
-		useThemeSetting( 'typography.customLineHeight', name ) &&
+		useSetting( 'typography.customLineHeight', name ) &&
 		supports.includes( 'lineHeight' )
 	);
 }
 
 function useHasAppearanceControl( { supports, name } ) {
 	const hasFontStyles =
-		useThemeSetting( 'typography.customFontStyle', name ) &&
+		useSetting( 'typography.customFontStyle', name ) &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useThemeSetting( 'typography.customFontWeight', name ) &&
+		useSetting( 'typography.customFontWeight', name ) &&
 		supports.includes( 'fontWeight' );
 	return hasFontStyles || hasFontWeights;
 }
@@ -44,17 +44,17 @@ export default function TypographyPanel( {
 	getStyle,
 	setStyle,
 } ) {
-	const fontSizes = useThemeSetting( 'typography.fontSizes', name );
-	const disableCustomFontSizes = ! useThemeSetting(
+	const fontSizes = useSetting( 'typography.fontSizes', name );
+	const disableCustomFontSizes = ! useSetting(
 		'typography.customFontSize',
 		name
 	);
-	const fontFamilies = useThemeSetting( 'typography.fontFamilies', name );
+	const fontFamilies = useSetting( 'typography.fontFamilies', name );
 	const hasFontStyles =
-		useThemeSetting( 'typography.customFontStyle', name ) &&
+		useSetting( 'typography.customFontStyle', name ) &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useThemeSetting( 'typography.customFontWeight', name ) &&
+		useSetting( 'typography.customFontWeight', name ) &&
 		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
 	const hasAppearanceControl = useHasAppearanceControl( { supports, name } );

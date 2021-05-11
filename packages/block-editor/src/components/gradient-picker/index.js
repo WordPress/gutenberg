@@ -6,13 +6,13 @@ import { __experimentalGradientPicker as GradientPicker } from '@wordpress/compo
 /**
  * Internal dependencies
  */
-import useThemeSetting from '../use-theme-setting';
+import useSetting from '../use-setting';
 
 const EMPTY_ARRAY = [];
 
 function GradientPickerWithGradients( props ) {
-	const gradients = useThemeSetting( 'color.gradients' ) || EMPTY_ARRAY;
-	const disableCustomGradients = ! useThemeSetting( 'color.customGradient' );
+	const gradients = useSetting( 'color.gradients' ) || EMPTY_ARRAY;
+	const disableCustomGradients = ! useSetting( 'color.customGradient' );
 
 	return (
 		<GradientPicker

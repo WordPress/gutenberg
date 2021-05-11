@@ -12,7 +12,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import useThemeSetting from '../use-theme-setting';
+import useSetting from '../use-setting';
 
 export default function FontFamilyControl( {
 	value = '',
@@ -20,7 +20,7 @@ export default function FontFamilyControl( {
 	fontFamilies,
 	...props
 } ) {
-	const blockLevelFontFamilies = useThemeSetting( 'typography.fontFamilies' );
+	const blockLevelFontFamilies = useSetting( 'typography.fontFamilies' );
 	if ( ! fontFamilies ) {
 		fontFamilies = blockLevelFontFamilies;
 	}

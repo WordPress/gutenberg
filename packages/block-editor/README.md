@@ -654,15 +654,15 @@ _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
 
-<a name="useThemeSetting" href="#useThemeSetting">#</a> **useThemeSetting**
+<a name="useSetting" href="#useSetting">#</a> **useSetting**
 
-Hook that retrieves the theme setting.
+Hook that retrieves the editor setting.
 It works with nested objects using by finding the value at path.
 
 _Usage_
 
 ```js
-const isEnabled = useThemeSetting( 'typography.dropCap' );
+const isEnabled = useSetting( 'typography.dropCap' );
 ```
 
 _Parameters_

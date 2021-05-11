@@ -7,7 +7,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import TextTransformControl from '../components/text-transform-control';
-import useThemeSetting from '../components/use-theme-setting';
+import useSetting from '../components/use-setting';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -64,8 +64,6 @@ export function useIsTextTransformDisabled( { name: blockName } = {} ) {
 		blockName,
 		TEXT_TRANSFORM_SUPPORT_KEY
 	);
-	const hasTextTransforms = useThemeSetting(
-		'typography.customTextTransforms'
-	);
+	const hasTextTransforms = useSetting( 'typography.customTextTransforms' );
 	return notSupported || ! hasTextTransforms;
 }

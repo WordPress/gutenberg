@@ -10,7 +10,7 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
-import useThemeSetting from '../components/use-theme-setting';
+import useSetting from '../components/use-setting';
 import { BorderColorEdit } from './border-color';
 import { BorderRadiusEdit } from './border-radius';
 import { BorderStyleEdit } from './border-style';
@@ -23,19 +23,19 @@ export function BorderPanel( props ) {
 	const isSupported = hasBorderSupport( props.name );
 
 	const isColorSupported =
-		useThemeSetting( 'border.customColor' ) &&
+		useSetting( 'border.customColor' ) &&
 		hasBorderSupport( props.name, 'color' );
 
 	const isRadiusSupported =
-		useThemeSetting( 'border.customRadius' ) &&
+		useSetting( 'border.customRadius' ) &&
 		hasBorderSupport( props.name, 'radius' );
 
 	const isStyleSupported =
-		useThemeSetting( 'border.customStyle' ) &&
+		useSetting( 'border.customStyle' ) &&
 		hasBorderSupport( props.name, 'style' );
 
 	const isWidthSupported =
-		useThemeSetting( 'border.customWidth' ) &&
+		useSetting( 'border.customWidth' ) &&
 		hasBorderSupport( props.name, 'width' );
 
 	if ( isDisabled || ! isSupported ) {
@@ -103,10 +103,10 @@ export function shouldSkipSerialization( blockType ) {
  */
 const useIsBorderDisabled = () => {
 	const configs = [
-		! useThemeSetting( 'border.customColor' ),
-		! useThemeSetting( 'border.customRadius' ),
-		! useThemeSetting( 'border.customStyle' ),
-		! useThemeSetting( 'border.customWidth' ),
+		! useSetting( 'border.customColor' ),
+		! useSetting( 'border.customRadius' ),
+		! useSetting( 'border.customStyle' ),
+		! useSetting( 'border.customWidth' ),
 	];
 
 	return configs.every( Boolean );

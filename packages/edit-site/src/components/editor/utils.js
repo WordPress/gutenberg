@@ -103,7 +103,7 @@ function getPresetMetadataFromStyleProperty( styleProperty ) {
 export const LINK_COLOR = '--wp--style--color--link';
 export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`;
 
-export function useThemeSetting( path, blockName = '' ) {
+export function useSetting( path, blockName = '' ) {
 	const settings = useSelect( ( select ) => {
 		return select( editSiteStore ).getSettings();
 	} );

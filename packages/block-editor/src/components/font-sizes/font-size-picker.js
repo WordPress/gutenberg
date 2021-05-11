@@ -6,13 +6,11 @@ import { FontSizePicker as BaseFontSizePicker } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import useThemeSetting from '../use-theme-setting';
+import useSetting from '../use-setting';
 
 function FontSizePicker( props ) {
-	const fontSizes = useThemeSetting( 'typography.fontSizes' );
-	const disableCustomFontSizes = ! useThemeSetting(
-		'typography.customFontSize'
-	);
+	const fontSizes = useSetting( 'typography.fontSizes' );
+	const disableCustomFontSizes = ! useSetting( 'typography.customFontSize' );
 
 	return (
 		<BaseFontSizePicker

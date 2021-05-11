@@ -13,10 +13,10 @@ import { __ } from '@wordpress/i18n';
  * Internal dependencies
  */
 import GradientPicker from './control';
-import useThemeSetting from '../use-theme-setting';
+import useSetting from '../use-setting';
 
 export default function GradientPanel( props ) {
-	const gradients = useThemeSetting( 'color.gradients' );
+	const gradients = useSetting( 'color.gradients' );
 	if ( isEmpty( gradients ) ) {
 		return null;
 	}

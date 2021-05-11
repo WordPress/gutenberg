@@ -50,7 +50,7 @@ const deprecatedFlags = {
 };
 
 /**
- * Hook that retrieves the theme setting.
+ * Hook that retrieves the editor setting.
  * It works with nested objects using by finding the value at path.
  *
  * @param {string} path The path to the setting.
@@ -59,10 +59,10 @@ const deprecatedFlags = {
  *
  * @example
  * ```js
- * const isEnabled = useThemeSetting( 'typography.dropCap' );
+ * const isEnabled = useSetting( 'typography.dropCap' );
  * ```
  */
-export default function useThemeSetting( path ) {
+export default function useSetting( path ) {
 	const { name: blockName } = useBlockEditContext();
 
 	const setting = useSelect(

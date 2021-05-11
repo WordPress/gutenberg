@@ -19,7 +19,7 @@ import {
 	getColorObjectByColorValue,
 	getColorObjectByAttributeValues,
 } from '../components/colors';
-import useThemeSetting from '../components/use-theme-setting';
+import useSetting from '../components/use-setting';
 import { hasBorderSupport, shouldSkipSerialization } from './border';
 import { cleanEmptyObject } from './utils';
 
@@ -44,9 +44,9 @@ export function BorderColorEdit( props ) {
 		attributes: { borderColor, style },
 		setAttributes,
 	} = props;
-	const colors = useThemeSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const disableCustomColors = ! useThemeSetting( 'color.custom' );
-	const disableCustomGradients = ! useThemeSetting( 'color.customGradient' );
+	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const disableCustomColors = ! useSetting( 'color.custom' );
+	const disableCustomGradients = ! useSetting( 'color.customGradient' );
 
 	const onChangeColor = ( value ) => {
 		const colorObject = getColorObjectByColorValue( colors, value );
@@ -180,7 +180,7 @@ export const withBorderColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
 		const { name, attributes } = props;
 		const { borderColor } = attributes;
-		const colors = useThemeSetting( 'color.palette' ) || EMPTY_ARRAY;
+		const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 
 		if (
 			! hasBorderSupport( name, 'color' ) ||

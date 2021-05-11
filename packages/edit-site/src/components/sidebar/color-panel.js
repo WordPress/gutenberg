@@ -7,7 +7,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { LINK_COLOR, useThemeSetting } from '../editor/utils';
+import { LINK_COLOR, useSetting } from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
 
 export function useHasColorPanel( { supports } ) {
@@ -26,13 +26,10 @@ export default function ColorPanel( {
 	getSetting,
 	setSetting,
 } ) {
-	const colors = useThemeSetting( 'color.palette', name );
-	const disableCustomColors = ! useThemeSetting( 'color.custom', name );
-	const gradients = useThemeSetting( 'color.gradients', name );
-	const disableCustomGradients = ! useThemeSetting(
-		'color.customGradient',
-		name
-	);
+	const colors = useSetting( 'color.palette', name );
+	const disableCustomColors = ! useSetting( 'color.custom', name );
+	const gradients = useSetting( 'color.gradients', name );
+	const disableCustomGradients = ! useSetting( 'color.customGradient', name );
 
 	const settings = [];
 

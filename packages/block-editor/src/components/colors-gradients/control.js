@@ -23,7 +23,7 @@ import { sprintf, __ } from '@wordpress/i18n';
  */
 import { getColorObjectByColorValue } from '../colors';
 import { __experimentalGetGradientObjectByGradientValue } from '../gradients';
-import useThemeSetting from '../use-theme-setting';
+import useSetting from '../use-setting';
 
 // translators: first %s: the color name or value (e.g. red or #ff0000)
 const colorIndicatorAriaLabel = __( '(Color: %s)' );
@@ -177,12 +177,10 @@ function ColorGradientControlInner( {
 
 function ColorGradientControlSelect( props ) {
 	const colorGradientSettings = {};
-	colorGradientSettings.colors = useThemeSetting( 'color.palette' );
-	colorGradientSettings.gradients = useThemeSetting( 'color.gradients' );
-	colorGradientSettings.disableCustomColors = ! useThemeSetting(
-		'color.custom'
-	);
-	colorGradientSettings.disableCustomGradients = ! useThemeSetting(
+	colorGradientSettings.colors = useSetting( 'color.palette' );
+	colorGradientSettings.gradients = useSetting( 'color.gradients' );
+	colorGradientSettings.disableCustomColors = ! useSetting( 'color.custom' );
+	colorGradientSettings.disableCustomGradients = ! useSetting(
 		'color.customGradient'
 	);
 
