@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] Bottom-sheet: Add custom header [#30291]
 -   [*] Fixes color picker rendering bug when scrolling [#30994]
+-   [*] Disabled featured image banner on iOS. [#31681]
 
 ## 1.52.1
 
