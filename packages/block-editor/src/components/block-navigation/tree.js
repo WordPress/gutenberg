@@ -16,6 +16,8 @@ import useBlockNavigationClientIds from './use-block-navigation-client-ids';
 import useBlockNavigationDropZone from './use-block-navigation-drop-zone';
 import { store as blockEditorStore } from '../../store';
 
+const noop = () => {};
+
 /**
  * Wrap `BlockNavigationRows` with `TreeGrid`. BlockNavigationRows is a
  * recursive component (it renders itself), so this ensures TreeGrid is only
@@ -33,7 +35,7 @@ import { store as blockEditorStore } from '../../store';
 export default function BlockNavigationTree( {
 	blocks,
 	showOnlyCurrentHierarchy,
-	onSelect = () => {},
+	onSelect = noop,
 	selectedBlockClientIds,
 	__experimentalFeatures,
 	__experimentalPersistentListViewFeatures,
