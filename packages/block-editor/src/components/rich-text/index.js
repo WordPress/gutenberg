@@ -7,13 +7,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	RawHTML,
-	useRef,
-	useCallback,
-	forwardRef,
-	useEffect,
-} from '@wordpress/element';
+import { RawHTML, useRef, useCallback, forwardRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	pasteHandler,
@@ -23,7 +17,7 @@ import {
 } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
-	__experimentalRichText as RichText,
+	__unstableUseRichText as useRichText,
 	__unstableCreateElement,
 	isEmpty,
 	__unstableIsEmptyLine as isEmptyLine,
@@ -44,13 +38,14 @@ import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 /**
  * Internal dependencies
  */
-import Autocomplete from '../autocomplete';
+import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
+import { useCaretInFormat } from './use-caret-in-format';
 import {
 	addActiveFormats,
 	getMultilineTag,
@@ -58,168 +53,10 @@ import {
 	isShortcode,
 } from './utils';
 
-const wrapperClasses = 'block-editor-rich-text';
-const classes = 'block-editor-rich-text__editable';
-
-function Element( {
-	listBoxId,
-	activeId,
-	onKeyDown,
-	value,
-	onChange,
-	richTextRef,
-	tagName: TagName = 'div',
-	hasActiveFormats,
-	removeEditorOnlyFormats,
-	onReplace,
-	onSplit,
-	multiline,
-	disableLineBreaks,
-	splitValue,
-	onSplitAtEnd,
-	onMerge,
-	onRemove,
-	props,
-	placeholder,
-	disabled,
-	unstableOnFocus,
-} ) {
-	const { isCaretWithinFormattedText } = useSelect( blockEditorStore );
-	const {
-		enterFormattedText,
-		exitFormattedText,
-		__unstableMarkAutomaticChange,
-	} = useDispatch( blockEditorStore );
-
-	useEffect( () => {
-		if ( hasActiveFormats ) {
-			if ( ! isCaretWithinFormattedText() ) {
-				enterFormattedText();
-			}
-		} else if ( isCaretWithinFormattedText() ) {
-			exitFormattedText();
-		}
-	}, [ hasActiveFormats ] );
-
-	function _onKeyDown( event ) {
-		const { keyCode } = event;
-
-		if ( event.defaultPrevented ) {
-			return;
-		}
-
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-
-			const _value = removeEditorOnlyFormats( value );
-			const canSplit = onReplace && onSplit;
-
-			if ( onReplace ) {
-				const transforms = getBlockTransforms( 'from' ).filter(
-					( { type } ) => type === 'enter'
-				);
-				const transformation = findTransform( transforms, ( item ) => {
-					return item.regExp.test( _value.text );
-				} );
-
-				if ( transformation ) {
-					onReplace( [
-						transformation.transform( {
-							content: _value.text,
-						} ),
-					] );
-					__unstableMarkAutomaticChange();
-				}
-			}
-
-			if ( multiline ) {
-				if ( event.shiftKey ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( canSplit && isEmptyLine( _value ) ) {
-					splitValue( _value );
-				} else {
-					onChange( insertLineSeparator( _value ) );
-				}
-			} else {
-				const { text, start, end } = _value;
-				const canSplitAtEnd =
-					onSplitAtEnd && start === end && end === text.length;
-
-				if ( event.shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( ! canSplit && canSplitAtEnd ) {
-					onSplitAtEnd();
-				} else if ( canSplit ) {
-					splitValue( _value );
-				}
-			}
-		} else if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			const { start, end, text } = value;
-			const isReverse = keyCode === BACKSPACE;
-
-			// Only process delete if the key press occurs at an uncollapsed edge.
-			if (
-				! isCollapsed( value ) ||
-				hasActiveFormats ||
-				( isReverse && start !== 0 ) ||
-				( ! isReverse && end !== text.length )
-			) {
-				return;
-			}
-
-			if ( onMerge ) {
-				onMerge( ! isReverse );
-			}
-
-			// Only handle remove on Backspace. This serves dual-purpose of being
-			// an intentional user interaction distinguishing between Backspace and
-			// Delete to remove the empty field, but also to avoid merge & remove
-			// causing destruction of two fields (merge, then removed merged).
-			if ( onRemove && isEmpty( value ) && isReverse ) {
-				onRemove( ! isReverse );
-			}
-
-			event.preventDefault();
-		}
-	}
-
-	const mergedRefs = useMergeRefs( [
-		useUndoAutomaticChange(),
-		richTextRef,
-	] );
-
-	return (
-		<TagName
-			// Overridable props.
-			role="textbox"
-			aria-multiline={ true }
-			aria-label={ placeholder }
-			{ ...props }
-			ref={ mergedRefs }
-			// Do not set the attribute if disabled.
-			contentEditable={ disabled ? undefined : true }
-			suppressContentEditableWarning={ ! disabled }
-			className={ classnames( classes, props.className, 'rich-text' ) }
-			aria-autocomplete={ listBoxId ? 'list' : undefined }
-			aria-owns={ listBoxId }
-			aria-activedescendant={ activeId }
-			onFocus={ unstableOnFocus }
-			onKeyDown={ ( event ) => {
-				onKeyDown( event );
-				_onKeyDown( event );
-			} }
-		/>
-	);
-}
-
 function RichTextWrapper(
 	{
 		children,
-		tagName,
+		tagName = 'div',
 		value: originalValue,
 		onChange: originalOnChange,
 		isSelected: originalIsSelected,
@@ -253,7 +90,7 @@ function RichTextWrapper(
 
 	identifier = identifier || instanceId;
 
-	const fallbackRef = useRef();
+	const anchorRef = useRef();
 	const { clientId } = useBlockEditContext();
 	const selector = ( select ) => {
 		const {
@@ -561,93 +398,173 @@ function RichTextWrapper(
 		[ onReplace, __unstableMarkAutomaticChange ]
 	);
 
-	const mergedRef = useMergeRefs( [ forwardedRef, fallbackRef ] );
+	const {
+		value,
+		onChange,
+		onFocus,
+		ref: richTextRef,
+		hasActiveFormats,
+		removeEditorOnlyFormats,
+		children: richTextChildren,
+	} = useRichText( {
+		clientId,
+		identifier,
+		value: adjustedValue,
+		onChange: adjustedOnChange,
+		selectionStart,
+		selectionEnd,
+		onSelectionChange,
+		placeholder,
+		allowedFormats: adjustedAllowedFormats,
+		withoutInteractiveFormatting,
+		onPaste,
+		__unstableIsSelected: isSelected,
+		__unstableInputRule: inputRule,
+		__unstableMultilineTag: multilineTag,
+		__unstableOnCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
+		__unstableMarkAutomaticChange,
+		__unstableDisableFormats: disableFormats,
+		preserveWhiteSpace,
+		__unstableAllowPrefixTransformations,
+	} );
+	const autocompleteProps = useBlockEditorAutocompleteProps( {
+		onReplace,
+		completers: autocompleters,
+		record: value,
+		onChange,
+	} );
 
-	const content = (
-		<RichText
-			clientId={ clientId }
-			identifier={ identifier }
-			ref={ mergedRef }
-			value={ adjustedValue }
-			onChange={ adjustedOnChange }
-			selectionStart={ selectionStart }
-			selectionEnd={ selectionEnd }
-			onSelectionChange={ onSelectionChange }
-			tagName={ tagName }
-			placeholder={ placeholder }
-			allowedFormats={ adjustedAllowedFormats }
-			withoutInteractiveFormatting={ withoutInteractiveFormatting }
-			onPaste={ onPaste }
-			__unstableIsSelected={ isSelected }
-			__unstableInputRule={ inputRule }
-			__unstableMultilineTag={ multilineTag }
-			__unstableOnCreateUndoLevel={ __unstableMarkLastChangeAsPersistent }
-			__unstableMarkAutomaticChange={ __unstableMarkAutomaticChange }
-			__unstableDisableFormats={ disableFormats }
-			preserveWhiteSpace={ preserveWhiteSpace }
-			unstableOnFocus={ unstableOnFocus }
-			__unstableAllowPrefixTransformations={
-				__unstableAllowPrefixTransformations
+	useCaretInFormat( hasActiveFormats );
+
+	function onKeyDown( event ) {
+		const { keyCode } = event;
+
+		if ( event.defaultPrevented ) {
+			return;
+		}
+
+		if ( event.keyCode === ENTER ) {
+			event.preventDefault();
+
+			const _value = removeEditorOnlyFormats( value );
+			const canSplit = onReplace && onSplit;
+
+			if ( onReplace ) {
+				const transforms = getBlockTransforms( 'from' ).filter(
+					( { type } ) => type === 'enter'
+				);
+				const transformation = findTransform( transforms, ( item ) => {
+					return item.regExp.test( _value.text );
+				} );
+
+				if ( transformation ) {
+					onReplace( [
+						transformation.transform( {
+							content: _value.text,
+						} ),
+					] );
+					__unstableMarkAutomaticChange();
+				}
 			}
-		>
-			{ ( {
-				isSelected: nestedIsSelected,
-				value,
-				onChange,
-				onFocus,
-				ref,
-				hasActiveFormats,
-				removeEditorOnlyFormats,
-			} ) => (
-				<>
-					{ children && children( { value, onChange, onFocus } ) }
-					{ nestedIsSelected && hasFormats && (
-						<FormatToolbarContainer
-							inline={ inlineToolbar }
-							anchorRef={ fallbackRef.current }
-						/>
-					) }
-					{ nestedIsSelected && <RemoveBrowserShortcuts /> }
-					<Autocomplete
-						onReplace={ onReplace }
-						completers={ autocompleters }
-						record={ value }
-						onChange={ onChange }
-						isSelected={ nestedIsSelected }
-						contentRef={ fallbackRef }
-					>
-						{ ( { listBoxId, activeId, onKeyDown } ) => (
-							<Element
-								{ ...{
-									listBoxId,
-									activeId,
-									onKeyDown,
-									value,
-									onChange,
-									richTextRef: ref,
-									tagName,
-									hasActiveFormats,
-									removeEditorOnlyFormats,
-									onReplace,
-									onSplit,
-									__unstableMarkAutomaticChange,
-									multiline,
-									disableLineBreaks,
-									splitValue,
-									onSplitAtEnd,
-									onMerge,
-									onRemove,
-									props,
-									placeholder,
-									disabled,
-									unstableOnFocus,
-								} }
-							/>
-						) }
-					</Autocomplete>
-				</>
+
+			if ( multiline ) {
+				if ( event.shiftKey ) {
+					if ( ! disableLineBreaks ) {
+						onChange( insert( _value, '\n' ) );
+					}
+				} else if ( canSplit && isEmptyLine( _value ) ) {
+					splitValue( _value );
+				} else {
+					onChange( insertLineSeparator( _value ) );
+				}
+			} else {
+				const { text, start, end } = _value;
+				const canSplitAtEnd =
+					onSplitAtEnd && start === end && end === text.length;
+
+				if ( event.shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
+					if ( ! disableLineBreaks ) {
+						onChange( insert( _value, '\n' ) );
+					}
+				} else if ( ! canSplit && canSplitAtEnd ) {
+					onSplitAtEnd();
+				} else if ( canSplit ) {
+					splitValue( _value );
+				}
+			}
+		} else if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+			const { start, end, text } = value;
+			const isReverse = keyCode === BACKSPACE;
+
+			// Only process delete if the key press occurs at an uncollapsed edge.
+			if (
+				! isCollapsed( value ) ||
+				hasActiveFormats ||
+				( isReverse && start !== 0 ) ||
+				( ! isReverse && end !== text.length )
+			) {
+				return;
+			}
+
+			if ( onMerge ) {
+				onMerge( ! isReverse );
+			}
+
+			// Only handle remove on Backspace. This serves dual-purpose of being
+			// an intentional user interaction distinguishing between Backspace and
+			// Delete to remove the empty field, but also to avoid merge & remove
+			// causing destruction of two fields (merge, then removed merged).
+			if ( onRemove && isEmpty( value ) && isReverse ) {
+				onRemove( ! isReverse );
+			}
+
+			event.preventDefault();
+		}
+	}
+
+	const TagName = tagName;
+	const content = (
+		<>
+			{ children && children( { value, onChange, onFocus } ) }
+			{ isSelected && <RemoveBrowserShortcuts /> }
+			{ isSelected && autocompleteProps.children }
+			{ isSelected && richTextChildren }
+			{ isSelected && hasFormats && (
+				<FormatToolbarContainer
+					inline={ inlineToolbar }
+					anchorRef={ anchorRef.current }
+				/>
 			) }
-		</RichText>
+			<TagName
+				// Overridable props.
+				role="textbox"
+				aria-multiline={ true }
+				aria-label={ placeholder }
+				{ ...props }
+				{ ...autocompleteProps }
+				ref={ useMergeRefs( [
+					autocompleteProps.ref,
+					props.ref,
+					richTextRef,
+					useUndoAutomaticChange(),
+					anchorRef,
+					forwardedRef,
+				] ) }
+				// Do not set the attribute if disabled.
+				contentEditable={ disabled ? undefined : true }
+				suppressContentEditableWarning={ ! disabled }
+				className={ classnames(
+					'block-editor-rich-text__editable',
+					props.className,
+					'rich-text'
+				) }
+				onFocus={ unstableOnFocus }
+				onKeyDown={ ( event ) => {
+					autocompleteProps.onKeyDown( event );
+					onKeyDown( event );
+				} }
+			/>
+		</>
 	);
 
 	if ( ! wrapperClassName ) {
@@ -659,11 +576,8 @@ function RichTextWrapper(
 		alternative: 'className prop or create your own wrapper div',
 	} );
 
-	return (
-		<div className={ classnames( wrapperClasses, wrapperClassName ) }>
-			{ content }
-		</div>
-	);
+	const className = classnames( 'block-editor-rich-text', wrapperClassName );
+	return <div className={ className }>{ content }</div>;
 }
 
 const ForwardedRichTextContainer = forwardRef( RichTextWrapper );
