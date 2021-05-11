@@ -536,6 +536,8 @@ class WP_REST_Menus_Controller extends WP_REST_Terms_Controller {
 	/**
 	 * Returns names of the locations assigned to the menu.
 	 *
+	 * @since 5.8.0
+	 *
 	 * @param int $menu_id The menu id.
 	 *
 	 * @return string[] $menu_locations The locations assigned to the menu.
