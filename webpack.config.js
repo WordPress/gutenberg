@@ -92,6 +92,7 @@ const createEntrypoints = () => {
 
 		return {
 			...entries,
+			[ blockName + '.min' ]: scriptPath,
 			[ blockName ]: scriptPath,
 		};
 	}, {} );
@@ -99,6 +100,7 @@ const createEntrypoints = () => {
 	const packageEntries = gutenbergPackages.reduce( ( memo, packageName ) => {
 		return {
 			...memo,
+			[ packageName + '.min' ]: `./packages/${ packageName }`,
 			[ packageName ]: `./packages/${ packageName }`,
 		};
 	}, {} );
@@ -113,6 +115,7 @@ module.exports = {
 			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
 		minimizer: [
 			new TerserPlugin( {
+				test: /\.min\.js$/,
 				cache: true,
 				parallel: true,
 				sourceMap: mode !== 'production',
@@ -139,16 +142,20 @@ module.exports = {
 			const { chunk } = data;
 			const { entryModule } = chunk;
 			const { rawRequest } = entryModule;
+			const { name } = chunk;
+			const isMinified = name.indexOf( '.min' ) !== -1;
+
+			const dirName = isMinified ? name.split( '.' )[ 0 ] : name;
 
 			/*
 			 * If the file being built is a Core Block's frontend file,
 			 * we build it in the block's directory.
 			 */
 			if ( rawRequest && rawRequest.includes( '/frontend.js' ) ) {
-				return `./build/block-library/blocks/[name]/frontend.js`;
+				return `./build/block-library/blocks/${ dirName }/${ name }.js`;
 			}
 
-			return './build/[name]/index.js';
+			return `./build/${ dirName }/${ name }.js`;
 		},
 		path: __dirname,
 		library: [ 'wp', '[camelName]' ],
