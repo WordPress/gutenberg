@@ -433,12 +433,12 @@ export class ImageEdit extends Component {
 		this.onSetSizeSlug( newValue );
 	}
 
-	onSetFeatured() {
-		setFeaturedImage();
+	onSetFeatured( mediaId ) {
+		setFeaturedImage( mediaId );
 	}
 
 	getSetFeaturedButton( isFeaturedImage ) {
-		const { getStylesFromColorScheme } = this.props;
+		const { attributes, getStylesFromColorScheme } = this.props;
 
 		// eslint-disable-next-line no-unused-vars
 		const androidOnly = Platform.OS === 'android';
@@ -466,7 +466,7 @@ export class ImageEdit extends Component {
 										featuredButtonStyle,
 										styles.removeFeaturedButton,
 									] }
-									onPress={ () => this.onSetFeatured() }
+									onPress={ () => this.onSetFeatured( 0 ) }
 								/>
 							) : (
 								<BottomSheet.Cell
@@ -475,7 +475,9 @@ export class ImageEdit extends Component {
 										featuredButtonStyle,
 										setFeaturedButtonStyle,
 									] }
-									onPress={ () => this.onSetFeatured() }
+									onPress={ () =>
+										this.onSetFeatured( attributes.id )
+									}
 								/>
 							) }
 						</PanelBody>
