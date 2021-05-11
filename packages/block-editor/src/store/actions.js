@@ -802,8 +802,10 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 		blocksWithTheSameType[ 0 ].attributes
 	);
 
+	let newAttributeKey, newOffset;
+
 	if ( canRestoreTextSelection ) {
-		const newAttributeKey = findKey(
+		newAttributeKey = findKey(
 			updatedAttributes,
 			( v ) =>
 				typeof v === 'string' &&
@@ -821,7 +823,7 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 			multilineWrapperTags,
 			preserveWhiteSpace,
 		} );
-		const newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
+		newOffset = convertedValue.text.indexOf( START_OF_SELECTED_AREA );
 		const newValue = remove( convertedValue, newOffset, newOffset + 1 );
 		const newHtml = toHTMLString( {
 			value: newValue,
@@ -830,13 +832,6 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 		} );
 
 		updatedAttributes[ newAttributeKey ] = newHtml;
-
-		yield selectionChange(
-			blockA.clientId,
-			newAttributeKey,
-			newOffset,
-			newOffset
-		);
 	}
 
 	yield* replaceBlocks(
@@ -852,6 +847,15 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 			...blocksWithTheSameType.slice( 1 ),
 		]
 	);
+
+	if ( canRestoreTextSelection ) {
+		yield selectionChange(
+			blockA.clientId,
+			newAttributeKey,
+			newOffset,
+			newOffset
+		);
+	}
 }
 
 /**
