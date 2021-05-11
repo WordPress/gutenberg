@@ -26,6 +26,7 @@ export { default as useViewportMatch } from './hooks/use-viewport-match';
 export { default as useAsyncList } from './hooks/use-async-list';
 export { default as usePreferredColorScheme } from './hooks/use-preferred-color-scheme';
 export { default as usePreferredColorSchemeStyle } from './hooks/use-preferred-color-scheme-style';
+export { default as usePreferredColorSchemeStyleBem } from './hooks/use-preferred-color-scheme-style-bem';
 export { default as useResizeObserver } from './hooks/use-resize-observer';
 export { default as useDebounce } from './hooks/use-debounce';
 export { default as useMergeRefs } from './hooks/use-merge-refs';
