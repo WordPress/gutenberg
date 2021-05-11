@@ -5,9 +5,13 @@
  */
 import {
 	camelCase,
+	isArray,
+	isEmpty,
 	isFunction,
 	isNil,
+	isObject,
 	isPlainObject,
+	isString,
 	mapKeys,
 	omit,
 	pick,
@@ -20,11 +24,13 @@ import {
  */
 import { applyFilters } from '@wordpress/hooks';
 import { select, dispatch } from '@wordpress/data';
+import { _x } from '@wordpress/i18n';
 import { blockDefault } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import i18nBlockSchema from './i18n-block.json';
 import { isValidIcon, normalizeIconObject } from './utils';
 import { DEPRECATED_ENTRY_KEYS } from './constants';
 import { store as blocksStore } from '../store';
@@ -308,6 +314,115 @@ export function registerBlockType( name, settings ) {
 	dispatch( blocksStore ).addBlockTypes( settings );
 
 	return settings;
+}
+
+/**
+ * Translates block settings provided with metadata using the i18n schema.
+ *
+ * @param {string|string[]|Object[]} i18nSchema    I18n schema for the block setting.
+ * @param {string|string[]|Object[]} settingValue  Value for the block setting.
+ * @param {string}                   textdomain    Textdomain to use with translations.
+ *
+ * @return {string|string[]|Object[]} Translated setting.
+ */
+function translateBlockSettingUsingI18nSchema(
+	i18nSchema,
+	settingValue,
+	textdomain
+) {
+	if ( isString( i18nSchema ) && isString( settingValue ) ) {
+		// eslint-disable-next-line @wordpress/i18n-no-variables, @wordpress/i18n-text-domain
+		return _x( settingValue, i18nSchema, textdomain );
+	}
+	if (
+		isArray( i18nSchema ) &&
+		! isEmpty( i18nSchema ) &&
+		isArray( settingValue )
+	) {
+		return settingValue.map( ( value ) =>
+			translateBlockSettingUsingI18nSchema(
+				i18nSchema[ 0 ],
+				value,
+				textdomain
+			)
+		);
+	}
+	if (
+		isObject( i18nSchema ) &&
+		! isEmpty( i18nSchema ) &&
+		isObject( settingValue )
+	) {
+		return Object.keys( settingValue ).reduce( ( accumulator, key ) => {
+			if ( ! i18nSchema[ key ] ) {
+				accumulator[ key ] = settingValue[ key ];
+				return accumulator;
+			}
+			accumulator[ key ] = translateBlockSettingUsingI18nSchema(
+				i18nSchema[ key ],
+				settingValue[ key ],
+				textdomain
+			);
+			return accumulator;
+		}, {} );
+	}
+	return settingValue;
+}
+
+/**
+ * Registers a new block provided from metadata stored in `block.json` file.
+ * It uses `registerBlockType` internally.
+ *
+ * @see registerBlockType
+ *
+ * @param {Object} metadata            Block metadata loaded from `block.json`.
+ * @param {string} metadata.name       Block name.
+ * @param {string} metadata.textdomain Textdomain to use with translations.
+ * @param {Object} additionalSettings  Additional block settings.
+ *
+ * @return {?WPBlock} The block, if it has been successfully registered;
+ *                    otherwise `undefined`.
+ */
+export function registerBlockTypeFromMetadata(
+	{ name, textdomain, ...metadata },
+	additionalSettings
+) {
+	const allowedFields = [
+		'apiVersion',
+		'title',
+		'category',
+		'parent',
+		'icon',
+		'description',
+		'keywords',
+		'attributes',
+		'providesContext',
+		'usesContext',
+		'supports',
+		'styles',
+		'example',
+		'variations',
+	];
+
+	const settings = pick( metadata, allowedFields );
+
+	if ( textdomain ) {
+		Object.keys( i18nBlockSchema ).forEach( ( key ) => {
+			if ( ! settings[ key ] ) {
+				return;
+			}
+			settings[ key ] = translateBlockSettingUsingI18nSchema(
+				i18nBlockSchema[ key ],
+				settings[ key ],
+				textdomain
+			);
+		} );
+	}
+
+	unstable__bootstrapServerSideBlockDefinitions( {
+		[ name ]: settings,
+	} );
+
+	return registerBlockType( name, additionalSettings );
 }
 
 /**

@@ -1,7 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "core/post-author",
+	"title": "Post Author",
 	"category": "design",
+	"description": "Add the author of this post.",
+	"textdomain": "default",
 	"attributes": {
 		"textAlign": {
 			"type": "string"

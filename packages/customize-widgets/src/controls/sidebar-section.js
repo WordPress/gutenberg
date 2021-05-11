@@ -32,6 +32,9 @@ export default function getSidebarSection() {
 				}
 			);
 			customize.section.add( this.inspector );
+			this.contentContainer[ 0 ].classList.add(
+				'customize-widgets__sidebar-section'
+			);
 		}
 		hasSubSectionOpened() {
 			return this.inspector.expanded();
@@ -44,6 +47,7 @@ export default function getSidebarSection() {
 					controls.forEach( ( control ) => {
 						control.onChangeSectionExpanded( expanded, args );
 					} );
+					_args.completeCallback?.();
 				},
 			};
 

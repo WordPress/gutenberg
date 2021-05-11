@@ -39,7 +39,7 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden"
+            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -           id="color-picker-saturation-4"
 +           id="color-picker-saturation-3"
           >
@@ -86,7 +86,7 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden"
+                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -                 id="components-color-picker__hue-description-4"
 +                 id="components-color-picker__hue-description-3"
                 >
@@ -161,7 +161,7 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden"
+            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -           id="color-picker-saturation-8"
 +           id="color-picker-saturation-7"
           >
@@ -208,7 +208,7 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden"
+                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -                 id="components-color-picker__hue-description-8"
 +                 id="components-color-picker__hue-description-7"
                 >
@@ -283,7 +283,7 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden"
+            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -           id="color-picker-saturation-10"
 +           id="color-picker-saturation-9"
           >
@@ -330,7 +330,7 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden"
+                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -                 id="components-color-picker__hue-description-10"
 +                 id="components-color-picker__hue-description-9"
                 >
@@ -405,7 +405,7 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden"
+            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -           id="color-picker-saturation-6"
 +           id="color-picker-saturation-5"
           >
@@ -452,7 +452,7 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden"
+                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -                 id="components-color-picker__hue-description-6"
 +                 id="components-color-picker__hue-description-5"
                 >
@@ -511,7 +511,7 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden"
+            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -           id="color-picker-saturation-2"
 +           id="color-picker-saturation-1"
           >
@@ -537,7 +537,7 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden"
+                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -                 id="components-color-picker__hue-description-2"
 +                 id="components-color-picker__hue-description-1"
                 >
@@ -574,20 +574,56 @@ Snapshot Diff:
 `;
 
 exports[`ColorPicker should render color picker 1`] = `
-.emotion-4 {
+.emotion-0 {
+  border: 0;
+  -webkit-clip: rect( 1px,1px,1px,1px );
+  clip: rect( 1px,1px,1px,1px );
+  -webkit-clip-path: inset( 50% );
+  -webkit-clip-path: inset( 50% );
+  clip-path: inset( 50% );
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  width: 1px;
+  word-wrap: normal !important;
+}
+
+.emotion-0:focus {
+  background-color: #edeff0;
+  -webkit-clip: auto !important;
+  clip: auto !important;
+  -webkit-clip-path: none;
+  clip-path: none;
+  color: #444;
+  display: block;
+  font-size: 1em;
+  height: auto;
+  left: 5px;
+  line-height: normal;
+  padding: 15px 23px 14px;
+  -webkit-text-decoration: none;
+  text-decoration: none;
+  top: 5px;
+  width: auto;
+  z-index: 100000;
+}
+
+.emotion-10 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-2 {
+.emotion-8 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-2 {
+.components-panel__row .emotion-8 {
   margin-bottom: inherit;
 }
 
-.emotion-0 {
+.emotion-6 {
   display: inline-block;
   margin-bottom: 8px;
 }
@@ -631,7 +667,7 @@ exports[`ColorPicker should render color picker 1`] = `
           type="button"
         />
         <div
-          className="components-visually-hidden"
+          className="components-visually-hidden emotion-0 emotion-1 emotion-2"
           id="color-picker-saturation-0"
         >
           Use your arrow keys to change the base color. Move up to lighten the color, down to darken, left to decrease saturation, and right to increase saturation.
@@ -691,7 +727,7 @@ exports[`ColorPicker should render color picker 1`] = `
                 tabIndex="0"
               />
               <p
-                className="components-visually-hidden"
+                className="components-visually-hidden emotion-0 emotion-1 emotion-2"
                 id="components-color-picker__hue-description-0"
               >
                 Move the arrow left or right to change hue.
@@ -708,13 +744,13 @@ exports[`ColorPicker should render color picker 1`] = `
         className="components-color-picker__inputs-fields"
       >
         <div
-          className="components-base-control components-color-picker__inputs-field emotion-4 emotion-5"
+          className="components-base-control components-color-picker__inputs-field emotion-10 emotion-11"
         >
           <div
-            className="components-base-control__field emotion-2 emotion-3"
+            className="components-base-control__field emotion-8 emotion-9"
           >
             <label
-              className="components-base-control__label emotion-0 emotion-1"
+              className="components-base-control__label emotion-6 emotion-7"
               htmlFor="inspector-text-control-0"
             >
               Color value in hexadecimal

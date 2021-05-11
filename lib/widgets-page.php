@@ -28,15 +28,6 @@ function the_gutenberg_widgets() {
  * @param string $hook Page.
  */
 function gutenberg_widgets_init( $hook ) {
-	if ( 'widgets.php' === $hook ) {
-		wp_enqueue_style( 'wp-block-library' );
-		wp_enqueue_style( 'wp-block-library-theme' );
-		wp_add_inline_style(
-			'wp-block-library-theme',
-			'.wp-block-widget-textarea { width: 100%; min-height: 5em; margin: 8px 0 16px 0; }'
-		);
-		return;
-	}
 	if ( ! in_array( $hook, array( 'appearance_page_gutenberg-widgets' ), true ) ) {
 		return;
 	}
@@ -65,6 +56,12 @@ function gutenberg_widgets_init( $hook ) {
 			),
 			'editor_settings' => $settings,
 		)
+	);
+
+	wp_add_inline_script(
+		'wp-blocks',
+		sprintf( 'wp.blocks.setCategories( %s );', wp_json_encode( gutenberg_get_block_categories( 'widgets_editor' ) ) ),
+		'after'
 	);
 
 	wp_enqueue_script( 'wp-edit-widgets' );

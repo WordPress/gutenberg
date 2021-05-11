@@ -20,6 +20,7 @@ function gutenberg_add_template_loader_filters() {
 		add_filter( str_replace( '-', '', $template_type ) . '_template', 'gutenberg_override_query_template', 20, 3 );
 	}
 }
+
 add_action( 'wp_loaded', 'gutenberg_add_template_loader_filters' );
 
 /**
@@ -66,13 +67,35 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 	$current_template = gutenberg_resolve_template( $type, $templates );
 
 	// Allow falling back to a PHP template if it has a higher priority than the block template.
-	$current_template_slug       = basename( $template, '.php' );
+	$current_template_slug       = str_replace(
+		array( trailingslashit( get_stylesheet_directory() ), trailingslashit( get_template_directory() ), '.php' ),
+		'',
+		$template
+	);
 	$current_block_template_slug = is_object( $current_template ) ? $current_template->slug : false;
 	foreach ( $templates as $template_item ) {
+
 		$template_item_slug = gutenberg_strip_php_suffix( $template_item );
 
 		// Break the loop if the block-template matches the template slug.
 		if ( $current_block_template_slug === $template_item_slug ) {
+
+			// if the theme is a child theme we want to check if a php template exists.
+			if ( is_child_theme() ) {
+
+				$has_php_template   = file_exists( get_stylesheet_directory() . '/' . $current_template_slug . '.php' );
+				$block_template     = _gutenberg_get_template_file( 'wp_template', $current_block_template_slug );
+				$has_block_template = false;
+
+				if ( null !== $block_template && wp_get_theme()->get_stylesheet() === $block_template['theme'] ) {
+					$has_block_template = true;
+				}
+				// and that a corresponding block template from the theme and not the parent doesn't exist.
+				if ( $has_php_template && ! $has_block_template ) {
+					return $template;
+				}
+			}
+
 			break;
 		}
 
@@ -129,7 +152,7 @@ function gutenberg_override_query_template( $template, $type, array $templates =
 }
 
 /**
- * Return the correct 'wp_template' to render fot the request template type.
+ * Return the correct 'wp_template' to render for the request template type.
  *
  * Accepts an optional $template_hierarchy argument as a hint.
  *

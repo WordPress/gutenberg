@@ -108,6 +108,7 @@ export { getCategories, setCategories, updateCategory } from './categories';
 // children of another block.
 export {
 	registerBlockType,
+	registerBlockTypeFromMetadata,
 	registerBlockCollection,
 	unregisterBlockType,
 	setFreeformContentHandlerName,

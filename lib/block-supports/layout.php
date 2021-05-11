@@ -42,7 +42,7 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$used_layout = $block['attrs']['layout'];
 	if ( isset( $used_layout['inherit'] ) && $used_layout['inherit'] ) {
 		$tree           = WP_Theme_JSON_Resolver::get_merged_data( array(), 'theme' );
-		$default_layout = _wp_array_get( $tree->get_settings(), array( 'defaults', 'layout' ) );
+		$default_layout = _wp_array_get( $tree->get_settings(), array( 'layout' ) );
 		if ( ! $default_layout ) {
 			return $block_content;
 		}

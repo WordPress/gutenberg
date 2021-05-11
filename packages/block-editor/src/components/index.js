@@ -87,14 +87,13 @@ export { default as withColorContext } from './color-palette/with-color-context'
  * Content Related Components
  */
 
-export { default as __experimentalBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
-export { default as __experimentalInserterMenuExtension } from './inserter-menu-extension';
+export { default as __unstableBlockSettingsMenuFirstItem } from './block-settings-menu/block-settings-menu-first-item';
+export { default as __unstableInserterMenuExtension } from './inserter-menu-extension';
 export { default as __experimentalPreviewOptions } from './preview-options';
 export { default as __experimentalUseResizeCanvas } from './use-resize-canvas';
 export { default as BlockInspector } from './block-inspector';
 export { default as BlockList } from './block-list';
 export { useBlockProps } from './block-list/use-block-props';
-export { Block as __experimentalBlock } from './block-list/block-wrapper';
 export { LayoutStyle as __experimentalLayoutStyle } from './block-list/layout';
 export { default as BlockMover } from './block-mover';
 export { default as BlockPreview } from './block-preview';
@@ -106,6 +105,7 @@ export { default as BlockSettingsMenu } from './block-settings-menu';
 export { default as BlockSettingsMenuControls } from './block-settings-menu-controls';
 export { default as BlockTitle } from './block-title';
 export { default as BlockToolbar } from './block-toolbar';
+export { default as BlockTools } from './block-tools';
 export {
 	default as CopyHandler,
 	useClipboardHandler as __unstableUseClipboardHandler,

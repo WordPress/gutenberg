@@ -1,6 +1,7 @@
 .edit-post-visual-editor {
 	position: relative;
-
+	display: flex;
+	flex-flow: column;
 
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.
@@ -65,4 +66,11 @@
 	position: absolute;
 	top: $grid-unit-10;
 	left: $grid-unit-10;
+	color: $white;
+
+	&:active:not([aria-disabled="true"]),
+	&:focus:not([aria-disabled="true"]),
+	&:hover {
+		color: $gray-100;
+	}
 }
