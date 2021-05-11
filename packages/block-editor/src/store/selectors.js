@@ -1830,19 +1830,17 @@ const __experimentalGetAllAllowedPatterns = createSelector(
 	( state ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
 		const { allowedBlockTypes } = getSettings( state );
-		return patterns
-			.map( ( pattern ) => ( {
-				...pattern,
-				stageOneBlocks: stageOneParse( pattern.content ),
-			} ) )
-			.filter( ( { stageOneBlocks } ) => {
-				const isAllowed = checkAllowListRecursive(
-					stageOneBlocks,
-					allowedBlockTypes
-				);
-
-				return isAllowed;
-			} );
+		const parsedPatterns = patterns.map( ( pattern ) => ( {
+			...pattern,
+			// We use the Stage I parser here for performance reasons.
+			// Since we only need the structure of the parsed content,
+			// Stage I parsing is enough here.
+			stageOneBlocks: stageOneParse( pattern.content ),
+		} ) );
+		const allowedPatterns = parsedPatterns.filter( ( { stageOneBlocks } ) =>
+			checkAllowListRecursive( stageOneBlocks, allowedBlockTypes )
+		);
+		return allowedPatterns;
 	},
 	( state ) => [
 		state.settings.__experimentalBlockPatterns,
