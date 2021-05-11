@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	BaseControl,
-	__experimentalUnitControl as UnitControl,
-} from '@wordpress/components';
+import { __experimentalUnitControl as UnitControl } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
@@ -38,17 +35,12 @@ const CSS_UNITS = [
  */
 export default function LetterSpacingControl( { value, onChange } ) {
 	return (
-		<BaseControl className="block-editor-letter-spacing-control">
-			<BaseControl.VisualLabel>
-				{ __( 'Letter-spacing' ) }
-			</BaseControl.VisualLabel>
-			<UnitControl
-				aria-label={ __( 'Letter-spacing' ) }
-				value={ value }
-				__unstableInputWidth="60px"
-				units={ CSS_UNITS }
-				onChange={ onChange }
-			/>
-		</BaseControl>
+		<UnitControl
+			label={ __( 'Letter-spacing' ) }
+			value={ value }
+			__unstableInputWidth="60px"
+			units={ CSS_UNITS }
+			onChange={ onChange }
+		/>
 	);
 }
