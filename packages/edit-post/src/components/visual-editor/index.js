@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
 	VisualEditorGlobalKeyboardShortcuts,
 	PostTitle,
+	store as editorStore,
 } from '@wordpress/editor';
 import {
 	WritingFlow,
@@ -28,6 +29,7 @@ import {
 	__experimentalLayoutStyle as LayoutStyle,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
@@ -80,14 +82,25 @@ function MaybeIframe( {
 }
 
 export default function VisualEditor( { styles } ) {
-	const { deviceType, isTemplateMode } = useSelect( ( select ) => {
+	const {
+		deviceType,
+		isTemplateMode,
+		wrapperBlockName,
+		wrapperUniqueId,
+	} = useSelect( ( select ) => {
 		const {
 			isEditingTemplate,
 			__experimentalGetPreviewDeviceType,
 		} = select( editPostStore );
+		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isTemplateMode: isEditingTemplate(),
+			wrapperBlockName:
+				getCurrentPostType() === 'wp_block'
+					? 'core/block'
+					: 'core/post-content',
+			wrapperUniqueId: getCurrentPostId(),
 		};
 	}, [] );
 	const hasMetaBoxes = useSelect(
@@ -148,6 +161,11 @@ export default function VisualEditor( { styles } ) {
 
 	const blockSelectionClearerRef = useBlockSelectionClearer( true );
 
+	const [ , RecursionProvider ] = useNoRecursiveRenders(
+		wrapperUniqueId,
+		wrapperBlockName
+	);
+
 	return (
 		<motion.div
 			className={ classnames( 'edit-post-visual-editor', {
@@ -200,19 +218,21 @@ export default function VisualEditor( { styles } ) {
 											<PostTitle />
 										</div>
 									) }
-									<BlockList
-										__experimentalLayout={
-											themeSupportsLayout
-												? {
-														type: 'default',
-														// Find a way to inject this in the support flag code (hooks).
-														alignments: themeSupportsLayout
-															? alignments
-															: undefined,
-												  }
-												: undefined
-										}
-									/>
+									<RecursionProvider>
+										<BlockList
+											__experimentalLayout={
+												themeSupportsLayout
+													? {
+															type: 'default',
+															// Find a way to inject this in the support flag code (hooks).
+															alignments: themeSupportsLayout
+																? alignments
+																: undefined,
+													  }
+													: undefined
+											}
+										/>
+									</RecursionProvider>
 								</WritingFlow>
 							</motion.div>
 						</AnimatePresence>
