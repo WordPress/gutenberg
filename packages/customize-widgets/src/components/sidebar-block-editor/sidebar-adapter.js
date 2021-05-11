@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * Internal dependencies
  */
 import { settingIdToWidgetId } from '../../utils';
@@ -32,6 +27,32 @@ function widgetIdToSettingId( widgetId ) {
 	return `widget_${ idBase }`;
 }
 
+function debounce( leading, callback, timeout ) {
+	let isLeading = false;
+	let timerID;
+
+	function debounced( ...args ) {
+		const result = ( isLeading ? callback : leading ).apply( this, args );
+
+		isLeading = true;
+
+		clearTimeout( timerID );
+
+		timerID = setTimeout( () => {
+			isLeading = false;
+		}, timeout );
+
+		return result;
+	}
+
+	debounced.cancel = () => {
+		isLeading = false;
+		clearTimeout( timerID );
+	};
+
+	return debounced;
+}
+
 export default class SidebarAdapter {
 	constructor( setting, api ) {
 		this.setting = setting;
@@ -49,7 +70,11 @@ export default class SidebarAdapter {
 		this.historyIndex = 0;
 		this.historySubscribers = new Set();
 		// Debounce the input for 1 second.
-		this._pushHistoryDebounce = debounce( this._pushHistory, 1000 );
+		this._debounceSetHistory = debounce(
+			this._pushHistory,
+			this._replaceHistory,
+			1000
+		);
 
 		this.setting.bind( this._handleSettingChange.bind( this ) );
 		this.api.bind( 'change', this._handleAllSettingsChange.bind( this ) );
@@ -90,6 +115,14 @@ export default class SidebarAdapter {
 		this.historyIndex += 1;
 
 		this.historySubscribers.forEach( ( listener ) => listener() );
+	}
+
+	_replaceHistory() {
+		this.history[
+			this.historyIndex
+		] = this._getWidgetIds().map( ( widgetId ) =>
+			this.getWidget( widgetId )
+		);
 	}
 
 	_handleSettingChange() {
@@ -255,7 +288,7 @@ export default class SidebarAdapter {
 	setWidgets( nextWidgets ) {
 		const addedWidgetIds = this._updateWidgets( nextWidgets );
 
-		this._pushHistoryDebounce();
+		this._debounceSetHistory();
 
 		return addedWidgetIds;
 	}
@@ -283,6 +316,7 @@ export default class SidebarAdapter {
 		this._emit( currentWidgets, this.getWidgets() );
 
 		this.historySubscribers.forEach( ( listener ) => listener() );
+		this._debounceSetHistory.cancel();
 	}
 
 	undo() {
