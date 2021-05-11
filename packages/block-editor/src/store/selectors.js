@@ -1826,7 +1826,7 @@ export const __experimentalGetParsedPattern = createSelector(
 	( state ) => [ state.settings.__experimentalBlockPatterns ]
 );
 
-export const __experimentalGetAvailableStageOneParsedPatterns = createSelector(
+const __experimentalGetAllAllowedPatterns = createSelector(
 	( state ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
 		const { allowedBlockTypes } = getSettings( state );
@@ -1860,7 +1860,7 @@ export const __experimentalGetAvailableStageOneParsedPatterns = createSelector(
  */
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
-		const availableParsedPatterns = __experimentalGetAvailableStageOneParsedPatterns(
+		const availableParsedPatterns = __experimentalGetAllAllowedPatterns(
 			state
 		);
 		const patternsAllowed = filter(
