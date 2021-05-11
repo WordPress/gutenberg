@@ -168,6 +168,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
 
 	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+		wp_deregister_style( "wp-block-{$block_name}" );
 		wp_register_style(
 			"wp-block-{$block_name}",
 			gutenberg_url( $style_path ),
@@ -181,6 +182,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 	}
 
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
+		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(
 			"wp-block-{$block_name}-editor",
 			gutenberg_url( $editor_style_path ),
@@ -196,9 +198,16 @@ function gutenberg_register_core_block_styles( $block_name ) {
  *
  * Optimizes performance and sustainability of styles by inlining smaller stylesheets.
  *
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
+ *
  * @return void
  */
 function gutenberg_maybe_inline_styles() {
+
+	// Early exit if the "wp_maybe_inline_styles" function exists.
+	if ( function_exists( 'wp_maybe_inline_styles' ) ) {
+		return;
+	}
 
 	$total_inline_limit = 20000;
 	/**
