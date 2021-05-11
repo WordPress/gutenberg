@@ -1,12 +1,13 @@
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 const message =
 	'RichText cannot be used with an inline container. Please use a different display property.';
 
-export function useInlineWarning( { ref } ) {
+export function useInlineWarning() {
+	const ref = useRef();
 	useEffect( () => {
 		if ( process.env.NODE_ENV === 'development' ) {
 			const target = ref.current;
@@ -19,4 +20,5 @@ export function useInlineWarning( { ref } ) {
 			}
 		}
 	}, [] );
+	return ref;
 }

@@ -12,8 +12,6 @@ import { useSelect } from '@wordpress/data';
 import { store as editSiteStore } from '../../store';
 
 /* Supporting data */
-export const ALL_BLOCKS_NAME = 'defaults';
-export const ALL_BLOCKS_SELECTOR = 'body';
 export const ROOT_BLOCK_NAME = 'root';
 export const ROOT_BLOCK_SELECTOR = 'body';
 export const ROOT_BLOCK_SUPPORTS = [
@@ -29,6 +27,15 @@ export const ROOT_BLOCK_SUPPORTS = [
 	'textDecoration',
 	'textTransform',
 ];
+export const ELEMENTS = {
+	link: 'a',
+	h1: 'h1',
+	h2: 'h2',
+	h3: 'h3',
+	h4: 'h4',
+	h5: 'h5',
+	h6: 'h6',
+};
 
 export const PRESET_METADATA = [
 	{
@@ -96,40 +103,43 @@ function getPresetMetadataFromStyleProperty( styleProperty ) {
 export const LINK_COLOR = '--wp--style--color--link';
 export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`;
 
-export function useEditorFeature( featurePath, blockName = ALL_BLOCKS_NAME ) {
+export function useSetting( path, blockName = '' ) {
 	const settings = useSelect( ( select ) => {
 		return select( editSiteStore ).getSettings();
 	} );
-	return (
-		get(
-			settings,
-			`__experimentalFeatures.${ blockName }.${ featurePath }`
-		) ??
-		get(
-			settings,
-			`__experimentalFeatures.${ ALL_BLOCKS_NAME }.${ featurePath }`
-		)
-	);
+	const topLevelPath = `__experimentalFeatures.${ path }`;
+	const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
+	return get( settings, blockPath ) ?? get( settings, topLevelPath );
 }
 
-export function getPresetVariable( styles, blockName, propertyName, value ) {
+export function getPresetVariable( styles, context, propertyName, value ) {
 	if ( ! value ) {
 		return value;
 	}
-	const presetData = getPresetMetadataFromStyleProperty( propertyName );
-	if ( ! presetData ) {
+
+	const metadata = getPresetMetadataFromStyleProperty( propertyName );
+	if ( ! metadata ) {
+		// The property doesn't have preset data
+		// so the value should be returned as it is.
 		return value;
 	}
-	const { valueKey, path, cssVarInfix } = presetData;
-	const presets =
-		get( styles, [ 'settings', blockName, ...path ] ) ??
-		get( styles, [ 'settings', ALL_BLOCKS_NAME, ...path ] );
-	const presetObject = find( presets, ( preset ) => {
-		return preset[ valueKey ] === value;
-	} );
+
+	const basePath =
+		ROOT_BLOCK_NAME === context
+			? [ 'settings' ]
+			: [ 'settings', 'blocks', context ];
+	const { valueKey, path: propertyPath, cssVarInfix } = metadata;
+	const presets = get( styles, [ ...basePath, ...propertyPath ] );
+	const presetObject = find(
+		presets,
+		( preset ) => preset[ valueKey ] === value
+	);
 	if ( ! presetObject ) {
+		// Value wasn't found in the presets,
+		// so it must be a custom value.
 		return value;
 	}
+
 	return `var:preset|${ cssVarInfix }|${ presetObject.slug }`;
 }
 
@@ -140,31 +150,32 @@ function getValueFromPresetVariable(
 	[ presetType, slug ]
 ) {
 	presetType = camelCase( presetType );
-	const presetData = getPresetMetadataFromStyleProperty( presetType );
-	if ( ! presetData ) {
+	const metadata = getPresetMetadataFromStyleProperty( presetType );
+	if ( ! metadata ) {
 		return variable;
 	}
+
 	const presets =
-		get( styles, [ 'settings', blockName, ...presetData.path ] ) ??
-		get( styles, [ 'settings', ALL_BLOCKS_NAME, ...presetData.path ] );
+		get( styles, [ 'settings', 'blocks', blockName, ...metadata.path ] ) ??
+		get( styles, [ 'settings', ...metadata.path ] );
 	if ( ! presets ) {
 		return variable;
 	}
-	const presetObject = find( presets, ( preset ) => {
-		return preset.slug === slug;
-	} );
+
+	const presetObject = find( presets, ( preset ) => preset.slug === slug );
 	if ( presetObject ) {
-		const { valueKey } = presetData;
+		const { valueKey } = metadata;
 		const result = presetObject[ valueKey ];
 		return getValueFromVariable( styles, blockName, result );
 	}
+
 	return variable;
 }
 
 function getValueFromCustomVariable( styles, blockName, variable, path ) {
 	const result =
-		get( styles, [ 'settings', blockName, 'custom', ...path ] ) ??
-		get( styles, [ 'settings', ALL_BLOCKS_NAME, 'custom', ...path ] );
+		get( styles, [ 'settings', 'blocks', blockName, 'custom', ...path ] ) ??
+		get( styles, [ 'settings', 'custom', ...path ] );
 	if ( ! result ) {
 		return variable;
 	}
@@ -176,6 +187,7 @@ export function getValueFromVariable( styles, blockName, variable ) {
 	if ( ! variable || ! isString( variable ) ) {
 		return variable;
 	}
+
 	let parsedVar;
 	const INTERNAL_REFERENCE_PREFIX = 'var:';
 	const CSS_REFERENCE_PREFIX = 'var(--wp--';
@@ -192,6 +204,7 @@ export function getValueFromVariable( styles, blockName, variable ) {
 			.slice( CSS_REFERENCE_PREFIX.length, -CSS_REFERENCE_SUFFIX.length )
 			.split( '--' );
 	} else {
+		// Value is raw.
 		return variable;
 	}
 

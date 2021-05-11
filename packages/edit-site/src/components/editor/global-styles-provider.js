@@ -24,18 +24,17 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	ALL_BLOCKS_NAME,
-	ALL_BLOCKS_SELECTOR,
+	ELEMENTS,
 	ROOT_BLOCK_NAME,
 	ROOT_BLOCK_SELECTOR,
 	ROOT_BLOCK_SUPPORTS,
 	getValueFromVariable,
 	getPresetVariable,
 } from './utils';
-import getGlobalStyles from './global-styles-renderer';
+import { toCustomProperties, toStyles } from './global-styles-renderer';
 import { store as editSiteStore } from '../../store';
 
-const EMPTY_CONTENT = { isGlobalStylesUserThemeJSON: true };
+const EMPTY_CONTENT = { isGlobalStylesUserThemeJSON: true, version: 1 };
 const EMPTY_CONTENT_STRING = JSON.stringify( EMPTY_CONTENT );
 
 const GlobalStylesContext = createContext( {
@@ -82,49 +81,31 @@ const extractSupportKeys = ( supports ) => {
 	return supportKeys;
 };
 
-const getContexts = ( blockTypes ) => {
-	const result = {
-		[ ROOT_BLOCK_NAME ]: {
-			selector: ROOT_BLOCK_SELECTOR,
-			supports: ROOT_BLOCK_SUPPORTS,
-		},
-		[ ALL_BLOCKS_NAME ]: {
-			selector: ALL_BLOCKS_SELECTOR,
-			supports: [], // by being an empty array, the styles subtree will be ignored
-		},
-	};
+const getBlockMetadata = ( blockTypes ) => {
+	const result = {};
 
-	// Add contexts from block metadata.
 	blockTypes.forEach( ( blockType ) => {
-		const blockName = blockType.name;
-		const blockSelector = blockType?.supports?.__experimentalSelector;
+		const name = blockType.name;
 		const supports = extractSupportKeys( blockType?.supports );
-		const hasSupport = supports.length > 0;
 
-		if ( hasSupport && typeof blockSelector === 'string' ) {
-			result[ blockName ] = {
-				selector: blockSelector,
-				supports,
-				blockName,
-			};
-		} else if ( hasSupport && typeof blockSelector === 'object' ) {
-			Object.keys( blockSelector ).forEach( ( key ) => {
-				result[ key ] = {
-					selector: blockSelector[ key ].selector,
-					supports,
-					blockName,
-					title: blockSelector[ key ].title,
-					attributes: blockSelector[ key ].attributes,
-				};
+		const selector =
+			blockType?.supports?.__experimentalSelector ??
+			'.wp-block-' + name.replace( 'core/', '' ).replace( '/', '-' );
+		const blockSelectors = selector.split( ',' );
+		const elements = [];
+		Object.keys( ELEMENTS ).forEach( ( key ) => {
+			const elementSelector = [];
+			blockSelectors.forEach( ( blockSelector ) => {
+				elementSelector.push( blockSelector + ' ' + ELEMENTS[ key ] );
 			} );
-		} else if ( hasSupport ) {
-			const suffix = blockName.replace( 'core/', '' ).replace( '/', '-' );
-			result[ blockName ] = {
-				selector: '.wp-block-' + suffix,
-				supports,
-				blockName,
-			};
-		}
+			elements[ key ] = elementSelector.join( ',' );
+		} );
+		result[ name ] = {
+			name,
+			selector,
+			supports,
+			elements,
+		};
 	} );
 
 	return result;
@@ -140,13 +121,21 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 	} );
 	const { updateSettings } = useDispatch( editSiteStore );
 
-	const contexts = useMemo( () => getContexts( blockTypes ), [ blockTypes ] );
+	const blocks = useMemo( () => getBlockMetadata( blockTypes ), [
+		blockTypes,
+	] );
 
 	const { __experimentalGlobalStylesBaseStyles: themeStyles } = settings;
 	const { userStyles, mergedStyles } = useMemo( () => {
 		let newUserStyles;
 		try {
 			newUserStyles = content ? JSON.parse( content ) : EMPTY_CONTENT;
+
+			// At the moment, we ignore previous user config that
+			// is in a different version than the theme config.
+			if ( newUserStyles?.version !== baseStyles?.version ) {
+				newUserStyles = EMPTY_CONTENT;
+			}
 		} catch ( e ) {
 			/* eslint-disable no-console */
 			console.error( 'User data is not JSON' );
@@ -160,9 +149,9 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 		if ( ! newUserStyles.isGlobalStylesUserThemeJSON ) {
 			newUserStyles = EMPTY_CONTENT;
 		}
-		// TODO: we probably want to check here that the shape is what we want
-		// This is, settings & styles are top-level keys, or perhaps a version.
-		// As to avoid merging trees that are different.
+
+		// At this point, the version schema of the theme & user
+		// is the same, so we can merge them.
 		const newMergedStyles = mergeWith(
 			{},
 			baseStyles,
@@ -178,33 +167,52 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 
 	const nextValue = useMemo(
 		() => ( {
-			contexts,
-			getSetting: ( context, path ) =>
-				get( userStyles?.settings?.[ context ], path ),
-			setSetting: ( context, path, newValue ) => {
+			root: {
+				name: ROOT_BLOCK_NAME,
+				selector: ROOT_BLOCK_SELECTOR,
+				supports: ROOT_BLOCK_SUPPORTS,
+				elements: ELEMENTS,
+			},
+			blocks,
+			getSetting: ( context, propertyPath ) => {
+				const path =
+					context === ROOT_BLOCK_NAME
+						? propertyPath
+						: [ 'blocks', context, ...propertyPath ];
+				get( userStyles?.settings, path );
+			},
+			setSetting: ( context, propertyPath, newValue ) => {
 				const newContent = { ...userStyles };
-				let contextSettings = newContent?.settings?.[ context ];
-				if ( ! contextSettings ) {
-					contextSettings = {};
-					set( newContent, [ 'settings', context ], contextSettings );
+				const path =
+					context === ROOT_BLOCK_NAME
+						? [ 'settings' ]
+						: [ 'settings', 'blocks', context ];
+
+				let newSettings = get( newContent, path );
+				if ( ! newSettings ) {
+					newSettings = {};
+					set( newContent, path, newSettings );
 				}
-				set( contextSettings, path, newValue );
+				set( newSettings, propertyPath, newValue );
+
 				setContent( JSON.stringify( newContent ) );
 			},
 			getStyle: ( context, propertyName, origin = 'merged' ) => {
+				const propertyPath =
+					STYLE_PROPERTY[ propertyName ].valueGlobal ??
+					STYLE_PROPERTY[ propertyName ].value;
+				const path =
+					context === ROOT_BLOCK_NAME
+						? propertyPath
+						: [ 'blocks', context, ...propertyPath ];
+
 				if ( origin === 'theme' ) {
-					const value = get(
-						themeStyles?.styles?.[ context ],
-						STYLE_PROPERTY[ propertyName ].value
-					);
+					const value = get( themeStyles?.styles, path );
 					return getValueFromVariable( themeStyles, context, value );
 				}
 
 				if ( origin === 'user' ) {
-					const value = get(
-						userStyles?.styles?.[ context ],
-						STYLE_PROPERTY[ propertyName ].value
-					);
+					const value = get( userStyles?.styles, path );
 
 					// We still need to use merged styles here because the
 					// presets used to resolve user variable may be defined a
@@ -212,22 +220,28 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					return getValueFromVariable( mergedStyles, context, value );
 				}
 
-				const value = get(
-					mergedStyles?.styles?.[ context ],
-					STYLE_PROPERTY[ propertyName ].value
-				);
+				const value = get( mergedStyles?.styles, path );
 				return getValueFromVariable( mergedStyles, context, value );
 			},
 			setStyle: ( context, propertyName, newValue ) => {
 				const newContent = { ...userStyles };
-				let contextStyles = newContent?.styles?.[ context ];
-				if ( ! contextStyles ) {
-					contextStyles = {};
-					set( newContent, [ 'styles', context ], contextStyles );
+
+				const path =
+					ROOT_BLOCK_NAME === context
+						? [ 'styles' ]
+						: [ 'styles', 'blocks', context ];
+				const propertyPath =
+					STYLE_PROPERTY[ propertyName ].valueGlobal ??
+					STYLE_PROPERTY[ propertyName ].value;
+
+				let newStyles = get( newContent, path );
+				if ( ! newStyles ) {
+					newStyles = {};
+					set( newContent, path, newStyles );
 				}
 				set(
-					contextStyles,
-					STYLE_PROPERTY[ propertyName ].value,
+					newStyles,
+					propertyPath,
 					getPresetVariable(
 						mergedStyles,
 						context,
@@ -235,6 +249,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 						newValue
 					)
 				);
+
 				setContent( JSON.stringify( newContent ) );
 			},
 		} ),
@@ -242,34 +257,28 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 	);
 
 	useEffect( () => {
-		const newStyles = settings.styles.filter(
+		const nonGlobalStyles = settings.styles.filter(
 			( style ) => ! style.isGlobalStyles
 		);
+		const customProperties = toCustomProperties( mergedStyles, blocks );
+		const globalStyles = toStyles( mergedStyles, blocks );
 		updateSettings( {
 			...settings,
 			styles: [
-				...newStyles,
+				...nonGlobalStyles,
 				{
-					css: getGlobalStyles(
-						contexts,
-						mergedStyles,
-						'cssVariables'
-					),
+					css: customProperties,
 					isGlobalStyles: true,
 					__experimentalNoWrapper: true,
 				},
 				{
-					css: getGlobalStyles(
-						contexts,
-						mergedStyles,
-						'blockStyles'
-					),
+					css: globalStyles,
 					isGlobalStyles: true,
 				},
 			],
 			__experimentalFeatures: mergedStyles.settings,
 		} );
-	}, [ contexts, mergedStyles ] );
+	}, [ blocks, mergedStyles ] );
 
 	return (
 		<GlobalStylesContext.Provider value={ nextValue }>

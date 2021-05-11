@@ -50,3 +50,4 @@ if [ $? -ne 0 ]; then
     echo "Failed to publish 'react-native-bridge' version '$VERSION'."
     exit 1
 fi
+
