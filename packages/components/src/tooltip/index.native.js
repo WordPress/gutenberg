@@ -179,6 +179,8 @@ const TooltipSlot = ( { children, ...rest } ) => {
 	};
 
 	return (
+		// TODO(David): We may should avoid new object generation for value in the
+		// render. https://reactjs.org/docs/context.html#caveats
 		<TooltipContext.Provider value={ { onHandleScreenTouch } }>
 			<View
 				onTouchStart={ handleTouchStart }
