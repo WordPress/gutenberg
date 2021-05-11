@@ -13,7 +13,7 @@ import { plusCircle } from '@wordpress/icons';
  * Internal dependencies
  */
 import ButtonWithForwardedRef, { Button } from '../';
-import VisuallyHidden from '../../visually-hidden';
+import { VisuallyHidden } from '../../visually-hidden';
 
 describe( 'Button', () => {
 	describe( 'basic rendering', () => {

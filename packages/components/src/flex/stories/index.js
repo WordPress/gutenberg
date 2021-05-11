@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { Flex, FlexItem } from '../';
-import { View } from '../../ui/view';
+import { View } from '../../view';
 
 export default {
 	component: Flex,
@@ -17,7 +17,7 @@ export const _default = () => {
 				<View>Item</View>
 			</Flex>
 			<Flex direction={ [ 'column', 'row' ] } gap={ 3 }>
-				<View css={ { width: '180px' } }>Item</View>
+				<View style={ { width: '180px' } }>Item</View>
 				<FlexItem isBlock>
 					<View>Item</View>
 				</FlexItem>

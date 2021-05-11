@@ -399,7 +399,7 @@ Using the Gutenberg plugin (version 8.3 or later), link color control is availab
 add_theme_support('experimental-link-color');
 ```
 
-If a theme opts in, it can [define link colors](/docs/how-to-guides/themes/theme-json.md#color-properties) by using the `experimental-theme.json`. If the theme doesn't use the `experimental-theme.json` it can configure the color of links by settings the value of the `--wp--style--color--link` CSS Custom Property such as:
+ If a theme opts in, it can [define link colors](/docs/how-to-guides/themes/theme-json.md#color-properties) by using the `theme.json`. If the theme doesn't use the `theme.json` it can configure the color of links by settings the value of the `--wp--style--color--link` CSS Custom Property such as:
 
 ```css
 :root {
@@ -407,4 +407,4 @@ If a theme opts in, it can [define link colors](/docs/how-to-guides/themes/theme
 }
 ```
 
-The framework will take care of enqueing the necessary rules for this to work. Whether or not the theme supports `experimental-theme.json` the presets will also be enqueued as CSS Custom Properties, so themes can also use `--wp--style--color-link: var(--wp--preset--color--<color-slug>)`. See [the docs](/docs/how-to-guides/themes/theme-json.md#color-properties) for details.
+The framework will take care of enqueing the necessary rules for this to work. Whether or not the theme supports `theme.json` the presets will also be enqueued as CSS Custom Properties, so themes can also use `--wp--style--color-link: var(--wp--preset--color--<color-slug>)`. See [the docs](/docs/how-to-guides/themes/theme-json.md#color-properties) for details.

@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
 import { Label as BaseLabel } from './styles/input-control-styles';
 
 export default function Label( {

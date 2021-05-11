@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useEditorFeature } from '../editor/utils';
+import { useSetting } from '../editor/utils';
 
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
@@ -35,28 +35,28 @@ export function useHasBorderPanel( { supports, name } ) {
 
 function useHasBorderColorControl( { supports, name } ) {
 	return (
-		useEditorFeature( 'border.customColor', name ) &&
+		useSetting( 'border.customColor', name ) &&
 		supports.includes( 'borderColor' )
 	);
 }
 
 function useHasBorderRadiusControl( { supports, name } ) {
 	return (
-		useEditorFeature( 'border.customRadius', name ) &&
+		useSetting( 'border.customRadius', name ) &&
 		supports.includes( 'borderRadius' )
 	);
 }
 
 function useHasBorderStyleControl( { supports, name } ) {
 	return (
-		useEditorFeature( 'border.customStyle', name ) &&
+		useSetting( 'border.customStyle', name ) &&
 		supports.includes( 'borderStyle' )
 	);
 }
 
 function useHasBorderWidthControl( { supports, name } ) {
 	return (
-		useEditorFeature( 'border.customWidth', name ) &&
+		useSetting( 'border.customWidth', name ) &&
 		supports.includes( 'borderWidth' )
 	);
 }
@@ -85,9 +85,9 @@ export default function BorderPanel( {
 	);
 
 	// Border color.
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
-	const disableCustomColors = ! useEditorFeature( 'color.custom' );
-	const disableCustomGradients = ! useEditorFeature( 'color.customGradient' );
+	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
+	const disableCustomColors = ! useSetting( 'color.custom' );
+	const disableCustomGradients = ! useSetting( 'color.customGradient' );
 	const hasBorderColor = useHasBorderColorControl( { supports, name } );
 	const borderColor = getStyle( name, 'borderColor' );
 
