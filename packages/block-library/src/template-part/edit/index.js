@@ -164,6 +164,7 @@ export default function TemplatePartEdit( {
 									setAttributes={ setAttributes }
 									onClose={ onClose }
 									area={ area }
+									templatePartId={ templatePartId }
 								/>
 							) }
 						/>

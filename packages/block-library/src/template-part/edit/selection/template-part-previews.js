@@ -111,23 +111,37 @@ function TemplatePartsByArea( {
 	area = 'uncategorized',
 	labelsByArea,
 } ) {
+	const templatePartsToShow =
+		templateParts.filter(
+			( templatePart ) =>
+				'uncategorized' === area || templatePart.area === area
+		) || [];
 	const templatePartsByArea = useMemo( () => {
-		return Object.values( groupBy( templateParts, 'area' ) );
+		return Object.values( groupBy( templatePartsToShow, 'area' ) );
 	}, [ templateParts, area ] );
+
 	const currentShownTPs = useAsyncList( templateParts );
 
+	if ( ! templatePartsToShow.length ) {
+		return (
+			<PanelGroup
+				title={ `${ __( 'Area' ) }: ${ labelsByArea[ area ] }` }
+			>
+				{ __(
+					'There are no other template parts of this area. If you are looking for another type of template part, try searchnig for it using the input above.'
+				) }
+			</PanelGroup>
+		);
+	}
+
 	return templatePartsByArea.map( ( templatePartList ) => {
-		// Only return corresponding area if block/entity is not uncategorized/general version.
-		if ( 'uncategorized' !== area && templatePartList[ 0 ].area !== area ) {
-			return null;
-		}
 		return (
 			<PanelGroup
 				key={ templatePartList[ 0 ].area }
-				title={
+				title={ `${ __( 'Area' ) }: ${
 					labelsByArea[ templatePartList[ 0 ].area ] ||
 					__( 'General' )
-				}
+				}` }
 			>
 				{ templatePartList.map( ( templatePart ) => {
 					return currentShownTPs.includes( templatePart ) ? (
@@ -222,7 +236,9 @@ function TemplatePartSearchResults( {
 	return groupedResults.map( ( group ) => (
 		<PanelGroup
 			key={ group[ 0 ].id }
-			title={ labelsByArea[ group[ 0 ].area ] || __( 'General' ) }
+			title={ `${ __( 'Area' ) }: ${
+				labelsByArea[ group[ 0 ].area ] || __( 'General' )
+			}` }
 		>
 			{ group.map( ( templatePart ) =>
 				currentShownTPs.includes( templatePart ) ? (
@@ -246,18 +262,24 @@ export default function TemplatePartPreviews( {
 	filterValue,
 	onClose,
 	area,
+	templatePartId,
 } ) {
 	const composite = useCompositeState();
 
 	const { templateParts, labelsByArea } = useSelect( ( select ) => {
-		const _templateParts =
+		const _templateParts = (
 			select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_template_part',
 				{
 					per_page: -1,
 				}
-			) || [];
+			) || []
+		).filter(
+			( templatePart ) =>
+				`${ templatePart.theme }//${ templatePart.slug }` !==
+				templatePartId
+		);
 
 		const definedAreas = select(
 			editorStore
@@ -274,7 +296,11 @@ export default function TemplatePartPreviews( {
 	}, [] );
 
 	if ( ! templateParts || ! templateParts.length ) {
-		return null;
+		return (
+			<PanelGroup>
+				{ __( 'There are no existing template parts to select.' ) }
+			</PanelGroup>
+		);
 	}
 
 	if ( filterValue ) {
