@@ -185,7 +185,7 @@
 		"nock": "12.0.3",
 		"node-watch": "0.7.0",
 		"patch-package": "6.2.2",
-		"postcss": "8.2.2",
+		"postcss": "8.2.15",
 		"postcss-loader": "4.2.0",
 		"prettier": "npm:wp-prettier@2.2.1-beta-1",
 		"progress": "2.0.3",
