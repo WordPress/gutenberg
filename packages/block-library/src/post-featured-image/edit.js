@@ -119,10 +119,14 @@ function PostFeaturedImageDisplay( {
 
 const PostFeaturedImageWithNotices = withNotices( PostFeaturedImageDisplay );
 
-export default function PostFeaturedImageEdit( props ) {
+const OutofContextPlaceholder = () => {
 	const blockProps = useBlockProps();
+	return <div { ...blockProps }>{ placeholderChip }</div>;
+};
+
+export default function PostFeaturedImageEdit( props ) {
 	if ( ! props.context?.postId ) {
-		return <div { ...blockProps }>{ placeholderChip }</div>;
+		return <OutofContextPlaceholder />;
 	}
 	return <PostFeaturedImageWithNotices { ...props } />;
 }
