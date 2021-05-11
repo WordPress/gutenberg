@@ -209,6 +209,7 @@
 			]
 		},
 		"spacing": {
+			"customMargin": false,
 			"customPadding": false,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},

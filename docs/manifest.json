@@ -522,6 +522,12 @@
 		"parent": "block-api"
 	},
 	{
+		"title": "Styles",
+		"slug": "block-styles",
+		"markdown_source": "../docs/reference-guides/block-api/block-styles.md",
+		"parent": "block-api"
+	},
+	{
 		"title": "Supports",
 		"slug": "block-supports",
 		"markdown_source": "../docs/reference-guides/block-api/block-supports.md",
