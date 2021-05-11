@@ -1,21 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 import { useRefEffect } from '@wordpress/compose';
 import { BACKSPACE, DELETE, ESCAPE } from '@wordpress/keycodes';
 
-export function useUndoAutomaticChange( props ) {
-	const propsRef = useRef( props );
-	propsRef.current = props;
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
+
+export function useUndoAutomaticChange() {
+	const { didAutomaticChange, getSettings } = useSelect( blockEditorStore );
 	return useRefEffect( ( element ) => {
 		function onKeyDown( event ) {
 			const { keyCode } = event;
-			const { didAutomaticChange, undo } = propsRef.current;
-
-			if ( ! didAutomaticChange || ! undo ) {
-				return;
-			}
 
 			if (
 				keyCode !== DELETE &&
@@ -25,8 +24,12 @@ export function useUndoAutomaticChange( props ) {
 				return;
 			}
 
+			if ( ! didAutomaticChange() ) {
+				return;
+			}
+
 			event.preventDefault();
-			undo();
+			getSettings().__experimentalUndo();
 		}
 
 		element.addEventListener( 'keydown', onKeyDown );

@@ -55,6 +55,12 @@ class WP_Theme_JSON {
 			'text'       => null,
 		),
 		'spacing'    => array(
+			'margin'  => array(
+				'top'    => null,
+				'right'  => null,
+				'bottom' => null,
+				'left'   => null,
+			),
 			'padding' => array(
 				'bottom' => null,
 				'left'   => null,
@@ -91,6 +97,7 @@ class WP_Theme_JSON {
 		'custom'     => null,
 		'layout'     => null,
 		'spacing'    => array(
+			'customMargin'  => null,
 			'customPadding' => null,
 			'units'         => null,
 		),
@@ -236,6 +243,10 @@ class WP_Theme_JSON {
 		),
 		'line-height'              => array(
 			'value' => array( 'typography', 'lineHeight' ),
+		),
+		'margin'                   => array(
+			'value'      => array( 'spacing', 'margin' ),
+			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
 		'padding'                  => array(
 			'value'      => array( 'spacing', 'padding' ),
@@ -1135,20 +1146,9 @@ class WP_Theme_JSON {
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $metadata ) {
 			foreach ( $properties as $property_path ) {
-				$paths   = array();
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-
-				foreach ( $paths as $path ) {
-					$node = _wp_array_get( $incoming_data, $path, array() );
-					if ( empty( $node ) ) {
-						continue;
-					}
-
+				$path = array_merge( $metadata['path'], $property_path );
+				$node = _wp_array_get( $incoming_data, $path, array() );
+				if ( ! empty( $node ) ) {
 					gutenberg_experimental_set( $this->theme_json, $path, $node );
 				}
 			}
