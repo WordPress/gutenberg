@@ -107,7 +107,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	const isLoading = isResolvingPages || isResolvingMenus;
 
 	const createFromMenu = useCallback( () => {
-		const blocks = menuItemsToBlocks( menuItems );
+		const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
 		const selectNavigationBlock = true;
 		onCreate( blocks, selectNavigationBlock );
 	} );

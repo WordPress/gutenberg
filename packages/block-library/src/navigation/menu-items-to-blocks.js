@@ -21,9 +21,7 @@ export default function menuItemsToBlocks( menuItems ) {
 	}
 
 	const menuTree = createDataTree( menuItems );
-	const { innerBlocks } = mapMenuItemsToBlocks( menuTree );
-
-	return innerBlocks;
+	return mapMenuItemsToBlocks( menuTree );
 }
 
 /**
