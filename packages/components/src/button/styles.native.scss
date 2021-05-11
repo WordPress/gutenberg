@@ -1,0 +1,45 @@
+.button__container {
+	flex: 1;
+	padding: 3px;
+	justify-content: center;
+	align-items: center;
+}
+
+.button__button--inactive {
+	flex: 1;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+}
+
+.button__button--active {
+	flex: 1;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	border-radius: 6px;
+	border-color: #2e4453;
+	background-color: #2e4453;
+}
+
+.button__subscript--inactive {
+	color: #7b9ab1; // $toolbar-button
+	font-weight: bold;
+	font-size: 13px;
+	align-self: flex-end;
+	margin-left: -3px;
+	margin-bottom: 0;
+}
+
+.button__subscript--inactive-dark {
+	color: #a7aaad; // $gray_20
+}
+
+.button__subscript--active {
+	color: $white;
+	font-weight: bold;
+	font-size: 13px;
+	align-self: flex-end;
+	margin-left: -3px;
+	margin-bottom: 0;
+}

@@ -1,20 +1,22 @@
 /**
  * External dependencies
  */
-import {
-	StyleSheet,
-	TouchableOpacity,
-	Text,
-	View,
-	Platform,
-} from 'react-native';
+import { TouchableOpacity, Text, View } from 'react-native';
 import { isArray } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import {
+	Children,
+	cloneElement,
+	useMemo,
+	useCallback,
+} from '@wordpress/element';
+import {
+	usePreferredColorScheme,
+	usePreferredColorSchemeStyleBem,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -22,55 +24,8 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import Tooltip from '../tooltip';
 import Icon from '../icon';
 
-const isAndroid = Platform.OS === 'android';
-const marginBottom = isAndroid ? -0.5 : 0;
-const marginLeft = -3;
-
-const styles = StyleSheet.create( {
-	container: {
-		flex: 1,
-		padding: 3,
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	buttonInactive: {
-		flex: 1,
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center',
-	},
-	fixedRatio: {
-		aspectRatio: 1,
-	},
-	buttonActive: {
-		flex: 1,
-		flexDirection: 'row',
-		justifyContent: 'center',
-		alignItems: 'center',
-		borderRadius: 6,
-		borderColor: '#2e4453',
-		backgroundColor: '#2e4453',
-	},
-	subscriptInactive: {
-		color: '#7b9ab1', // $toolbar-button
-		fontWeight: 'bold',
-		fontSize: 13,
-		alignSelf: 'flex-end',
-		marginLeft,
-		marginBottom,
-	},
-	subscriptInactiveDark: {
-		color: '#a7aaad', // $gray_20
-	},
-	subscriptActive: {
-		color: 'white',
-		fontWeight: 'bold',
-		fontSize: 13,
-		alignSelf: 'flex-end',
-		marginLeft,
-		marginBottom,
-	},
-} );
+import baseStyles from './styles';
+import basePlatformStyles from './buttonStyles';
 
 export function Button( props ) {
 	const {
@@ -80,7 +35,6 @@ export function Button( props ) {
 		disabled,
 		hint,
 		fixedRatio = true,
-		getStylesFromColorScheme,
 		isPressed,
 		'aria-disabled': ariaDisabled,
 		'data-subscript': subscript,
@@ -91,15 +45,44 @@ export function Button( props ) {
 		label,
 		shortcut,
 		tooltipPosition,
+		styles = {},
+		platformStyles = {},
 	} = props;
+
+	const colorScheme = usePreferredColorScheme();
 
 	const isDisabled = ariaDisabled || disabled;
 
-	const buttonViewStyle = {
-		opacity: isDisabled ? 0.3 : 1,
-		...( fixedRatio && styles.fixedRatio ),
-		...( isPressed ? styles.buttonActive : styles.buttonInactive ),
-	};
+	const themedStyle = usePreferredColorSchemeStyleBem(
+		{ ...baseStyles, ...styles },
+		{ ...basePlatformStyles, ...platformStyles }
+	);
+
+	/* eslint-disable dot-notation */
+	const containerStyle = themedStyle[ 'button__container' ];
+
+	const buttonStyle = useMemo(
+		() => ( {
+			opacity: isDisabled ? 0.3 : 1,
+			...( fixedRatio && { aspectRatio: 1 } ),
+			...( isPressed
+				? themedStyle[ 'button__button--active' ]
+				: themedStyle[ 'button__button--inactive' ] ),
+		} ),
+		[ fixedRatio, isDisabled, isPressed ]
+	);
+
+	const subscriptStyle = useMemo(
+		() =>
+			isPressed
+				? themedStyle[ 'button__subscript--active' ]
+				: themedStyle[ 'button__subscript--inactive' ],
+		[ isPressed ]
+	);
+
+	const iconColor = themedStyle[ 'button__icon' ]?.color;
+
+	/* eslint-enable dot-notation */
 
 	const states = [];
 	if ( isPressed ) {
@@ -110,15 +93,10 @@ export function Button( props ) {
 		states.push( 'disabled' );
 	}
 
-	const subscriptInactive = getStylesFromColorScheme(
-		styles.subscriptInactive,
-		styles.subscriptInactiveDark
-	);
-
 	const newChildren = Children.map( children, ( child ) => {
 		return child
 			? cloneElement( child, {
-					colorScheme: props.preferredColorScheme,
+					colorScheme,
 					isPressed,
 			  } )
 			: child;
@@ -139,12 +117,24 @@ export function Button( props ) {
 				// the tooltip is not explicitly disabled.
 				false !== showTooltip ) );
 
-	const newIcon = icon
-		? cloneElement( <Icon icon={ icon } size={ iconSize } />, {
-				colorScheme: props.preferredColorScheme,
-				isPressed,
-		  } )
-		: null;
+	const renderIcon = useCallback( () => {
+		if ( ! icon ) {
+			return null;
+		}
+		const iconProps = {
+			icon,
+			colorScheme,
+			isPressed,
+			size: iconSize,
+		};
+
+		if ( iconColor ) {
+			props.fill = iconColor;
+			props.color = iconColor;
+		}
+
+		return <Icon { ...iconProps } />;
+	}, [ icon, iconSize, iconColor, colorScheme, isPressed ] );
 
 	const element = (
 		<TouchableOpacity
@@ -156,24 +146,16 @@ export function Button( props ) {
 			accessibilityHint={ hint }
 			onPress={ onClick }
 			onLongPress={ onLongPress }
-			style={ styles.container }
+			style={ containerStyle }
 			disabled={ isDisabled }
 			testID={ testID }
 		>
-			<View style={ buttonViewStyle }>
+			<View style={ buttonStyle }>
 				<View style={ { flexDirection: 'row' } }>
-					{ newIcon }
+					{ renderIcon() }
 					{ newChildren }
 					{ subscript && (
-						<Text
-							style={
-								isPressed
-									? styles.subscriptActive
-									: subscriptInactive
-							}
-						>
-							{ subscript }
-						</Text>
+						<Text style={ subscriptStyle }>{ subscript }</Text>
 					) }
 				</View>
 			</View>
@@ -195,4 +177,4 @@ export function Button( props ) {
 	);
 }
 
-export default withPreferredColorScheme( Button );
+export default Button;
