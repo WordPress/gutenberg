@@ -233,7 +233,7 @@ export default function LogoEdit( {
 	const [ logoUrl, setLogoUrl ] = useState();
 	const [ error, setError ] = useState();
 	const ref = useRef();
-	const { mediaItemData, sitelogo, url } = useSelect( ( select ) => {
+	const { mediaItemData, siteLogo, url } = useSelect( ( select ) => {
 		const siteSettings = select( coreStore ).getEditedEntityRecord(
 			'root',
 			'site'
@@ -241,14 +241,14 @@ export default function LogoEdit( {
 		const mediaItem = select( coreStore ).getEntityRecord(
 			'root',
 			'media',
-			siteSettings.sitelogo
+			siteSettings.site_logo
 		);
 		return {
 			mediaItemData: mediaItem && {
 				url: mediaItem.source_url,
 				alt: mediaItem.alt_text,
 			},
-			sitelogo: siteSettings.sitelogo,
+			siteLogo: siteSettings.site_logo,
 			url: siteSettings.url,
 		};
 	}, [] );
@@ -256,7 +256,7 @@ export default function LogoEdit( {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const setLogo = ( newValue ) =>
 		editEntityRecord( 'root', 'site', undefined, {
-			sitelogo: newValue,
+			site_logo: newValue,
 		} );
 
 	let alt = null;
@@ -274,13 +274,13 @@ export default function LogoEdit( {
 
 		if ( ! media.id && media.url ) {
 			// This is a temporary blob image
-			setLogo( '' );
-			setError();
+			setLogo( undefined );
+			setError( null );
 			setLogoUrl( media.url );
 			return;
 		}
 
-		setLogo( media.id.toString() );
+		setLogo( media.id );
 	};
 
 	const onUploadError = ( message ) => {
@@ -301,7 +301,7 @@ export default function LogoEdit( {
 
 	const label = __( 'Site Logo' );
 	let logoImage;
-	if ( sitelogo === undefined ) {
+	if ( siteLogo === undefined ) {
 		logoImage = <Spinner />;
 	}
 
