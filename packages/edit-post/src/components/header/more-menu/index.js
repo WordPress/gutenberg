@@ -35,7 +35,7 @@ const MoreMenu = ( { showIconLabels } ) => {
 			popoverProps={ POPOVER_PROPS }
 			toggleProps={ {
 				showTooltip: ! showIconLabels,
-				isTertiary: showIconLabels,
+				...( showIconLabels && { variant: 'tertiary' } ),
 				...TOGGLE_PROPS,
 			} }
 		>

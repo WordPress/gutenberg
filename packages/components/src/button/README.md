@@ -112,7 +112,7 @@ Renders a button with default style.
 ```jsx
 import { Button } from '@wordpress/components';
 
-const MyButton = () => <Button isSecondary>Click me!</Button>;
+const MyButton = () => <Button variant="secondary">Click me!</Button>;
 ```
 
 ### Props
@@ -139,7 +139,7 @@ If provided, renders `a` instead of `button`.
 
 #### variant
 
-Specifies the button's style. The accepted values are `'primary'` (the primary button styles), `'secondary'` (the default button styles) and `'tertiary'` (the text-based button styles).
+Specifies the button's style. The accepted values are `'primary'` (the primary button styles), `'secondary'` (the default button styles), `'tertiary'` (the text-based button styles), and `'link'` (the link button styles).
 
 -   Type: `String`
 -   Required: No
