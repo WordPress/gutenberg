@@ -55,13 +55,11 @@ const Tooltip = ( {
 
 	// Register callback to dismiss the tooltip whenever the screen is touched
 	useEffect( () => {
-		onHandleScreenTouch( () => {
-			// TODO(David): This is invoked, but the state update never triggers a
-			// re-render. Why? Stale values?
-			setVisible( false );
-		} );
+		if ( visible ) {
+			onHandleScreenTouch( () => setVisible( false ) );
+		}
 		return () => onHandleScreenTouch( null );
-	}, [ visible, initialVisible ] );
+	}, [ visible ] );
 
 	useEffect( () => {
 		startAnimation();
