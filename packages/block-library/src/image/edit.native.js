@@ -432,8 +432,15 @@ export class ImageEdit extends Component {
 	}
 
 	getSetFeaturedButton( isFeaturedImage ) {
+		const { getStylesFromColorScheme } = this.props;
+
 		// eslint-disable-next-line no-unused-vars
 		const androidOnly = Platform.OS === 'android';
+
+		const featuredButtonStyle = getStylesFromColorScheme(
+			styles.featuredButton,
+			styles.featuredButtonDark
+		);
 
 		return (
 			<>
@@ -444,10 +451,16 @@ export class ImageEdit extends Component {
 							{ isFeaturedImage ? (
 								<BottomSheet.Cell
 									label={ __( 'Remove as Featured Image ' ) }
+									labelStyle={ [
+										featuredButtonStyle,
+									] }
 								/>
 							) : (
 								<BottomSheet.Cell
 									label={ __( 'Set as Featured Image ' ) }
+									labelStyle={ [
+										featuredButtonStyle,
+									] }
 								/>
 							) }
 						</PanelBody>
