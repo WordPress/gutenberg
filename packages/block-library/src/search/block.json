@@ -37,6 +37,9 @@
 		"buttonUseIcon": {
 			"type": "boolean",
 			"default": false
+		},
+		"buttonBehavior": {
+			"type": "string"
 		}
 	},
 	"supports": {
