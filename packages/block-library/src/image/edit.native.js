@@ -458,6 +458,7 @@ export class ImageEdit extends Component {
 									label={ __( 'Remove as Featured Image ' ) }
 									labelStyle={ [
 										featuredButtonStyle,
+										styles.removeFeaturedButton,
 									] }
 								/>
 							) : (
