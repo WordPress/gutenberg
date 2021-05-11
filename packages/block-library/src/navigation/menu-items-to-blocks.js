@@ -9,6 +9,89 @@ import { sortBy } from 'lodash';
 import { createBlock, parse } from '@wordpress/blocks';
 
 /**
+ * Internal dependencies
+ */
+import createDataTree from './create-data-tree';
+
+/**
+ * Convert a flat menu item structure to a nested blocks structure.
+ *
+ * @param {Object[]} menuItems An array of menu items.
+ *
+ * @return {WPBlock[]} An array of blocks.
+ */
+export default function menuItemsToBlocks( menuItems ) {
+	if ( ! menuItems ) {
+		return null;
+	}
+
+	const menuTree = createDataTree( menuItems );
+	const { innerBlocks } = mapMenuItemsToBlocks( menuTree );
+
+	return innerBlocks;
+}
+
+/**
+ * A recursive function that maps menu item nodes to blocks.
+ *
+ * @param {WPNavMenuItem[]} menuItems An array of WPNavMenuItem items.
+ * @return {Object} Object containing innerBlocks and mapping.
+ */
+function mapMenuItemsToBlocks( menuItems ) {
+	let mapping = {};
+
+	// The menuItem should be in menu_order sort order.
+	const sortedItems = sortBy( menuItems, 'menu_order' );
+
+	const innerBlocks = sortedItems.map( ( menuItem ) => {
+		if ( menuItem.type === 'block' ) {
+			const [ block ] = parse( menuItem.content.raw );
+
+			if ( ! block ) {
+				return createBlock( 'core/freeform', {
+					content: menuItem.content,
+				} );
+			}
+
+			return block;
+		}
+
+		const attributes = menuItemToBlockAttributes( menuItem );
+
+		// If there are children recurse to build those nested blocks.
+		const {
+			innerBlocks: nestedBlocks = [], // alias to avoid shadowing
+			mapping: nestedMapping = {}, // alias to avoid shadowing
+		} = menuItem.children?.length
+			? mapMenuItemsToBlocks( menuItem.children )
+			: {};
+
+		// Update parent mapping with nested mapping.
+		mapping = {
+			...mapping,
+			...nestedMapping,
+		};
+
+		// Create block with nested "innerBlocks".
+		const block = createBlock(
+			'core/navigation-link',
+			attributes,
+			nestedBlocks
+		);
+
+		// Create mapping for menuItem -> block
+		mapping[ menuItem.id ] = block.clientId;
+
+		return block;
+	} );
+
+	return {
+		innerBlocks,
+		mapping,
+	};
+}
+
+/**
  * A WP nav_menu_item object.
  * For more documentation on the individual fields present on a menu item please see:
  * https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/nav-menu.php#L789
@@ -35,7 +118,7 @@ import { createBlock, parse } from '@wordpress/blocks';
  * @param {WPNavMenuItem} menuItem the menu item to be converted to block attributes.
  * @return {Object} the block attributes converted from the WPNavMenuItem item.
  */
-export const menuItemToBlockAttributes = ( {
+function menuItemToBlockAttributes( {
 	title: menuItemTitleField,
 	xfn,
 	classes,
@@ -48,7 +131,7 @@ export const menuItemToBlockAttributes = ( {
 	url,
 	type: menuItemTypeField,
 	target,
-} ) => {
+} ) {
 	// For historical reasons, the `core/navigation-link` variation type is `tag`
 	// whereas WP Core expects `post_tag` as the `object` type.
 	// To avoid writing a block migration we perform a conversion here.
@@ -87,35 +170,4 @@ export const menuItemToBlockAttributes = ( {
 			opensInNewTab: true,
 		} ),
 	};
-};
-
-/**
- * A recursive function that maps menu item nodes to blocks.
- *
- * @param {Object[]} menuItems An array of menu items.
- * @return {WPBlock[]} An array of blocks.
- */
-export default function mapMenuItemsToBlocks( menuItems ) {
-	const sortedItems = sortBy( menuItems, 'menu_order' );
-	return sortedItems.map( ( menuItem ) => {
-		if ( menuItem.type === 'block' ) {
-			const [ block ] = parse( menuItem.content.raw );
-
-			if ( ! block ) {
-				return createBlock( 'core/freeform', {
-					content: menuItem.content,
-				} );
-			}
-
-			return block;
-		}
-
-		const attributes = menuItemToBlockAttributes( menuItem );
-
-		const innerBlocks = menuItem.children?.length
-			? mapMenuItemsToBlocks( menuItem.children )
-			: [];
-
-		return createBlock( 'core/navigation-link', attributes, innerBlocks );
-	} );
 }

@@ -26,7 +26,7 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 
 import PlaceholderPreview from './placeholder-preview';
-import convertMenuItemsToBlocks from './convert-menu-items-to-blocks';
+import menuItemsToBlocks from './menu-items-to-blocks';
 
 function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
@@ -107,7 +107,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	const isLoading = isResolvingPages || isResolvingMenus;
 
 	const createFromMenu = useCallback( () => {
-		const blocks = convertMenuItemsToBlocks( menuItems );
+		const blocks = menuItemsToBlocks( menuItems );
 		const selectNavigationBlock = true;
 		onCreate( blocks, selectNavigationBlock );
 	} );
