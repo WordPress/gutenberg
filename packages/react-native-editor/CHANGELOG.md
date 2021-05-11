@@ -12,6 +12,7 @@ For each user feature we should also add a importance categorization label  to i
 ## Unreleased
 -   [*] Bottom-sheet: Add custom header [#30291]
 -   [*] Fixes color picker rendering bug when scrolling [#30994]
+-   [*] Image block: "Set as featured" button within image block settings. (Android only) [#31705]
 
 ## 1.52.1
 
