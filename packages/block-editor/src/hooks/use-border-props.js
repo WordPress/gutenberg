@@ -11,7 +11,7 @@ import {
 	getColorClassName,
 	getColorObjectByAttributeValues,
 } from '../components/colors';
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 
 // This utility is intended to assist where the serialization of the border
 // block support is being skipped for a block but the border related CSS classes
@@ -55,7 +55,7 @@ export function getBorderClassesAndStyles( { borderColor, style } ) {
  * @return {Object}            ClassName & style props from border block support.
  */
 export function useBorderProps( attributes ) {
-	const colors = useEditorFeature( 'color.palette' ) || EMPTY_ARRAY;
+	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
 	const borderProps = getBorderClassesAndStyles( attributes );
 
 	// Force inline style to apply border color when themes do not load their

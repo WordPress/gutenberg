@@ -6,7 +6,7 @@ import { useSelect } from '@wordpress/data';
 import {
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useSetting,
 	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 	store as blockEditorStore,
 	Warning,
@@ -18,7 +18,7 @@ function Content( { layout, postType, postId } ) {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings()?.supportsLayout;
 	}, [] );
-	const defaultLayout = useEditorFeature( 'layout' ) || {};
+	const defaultLayout = useSetting( 'layout' ) || {};
 	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
 	const { contentSize, wideSize } = usedLayout;
 	const alignments =
