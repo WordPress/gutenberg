@@ -25,10 +25,7 @@ import usePreferredColorScheme from '../use-preferred-color-scheme';
  * @param {string} darkModifier
  * @return {Object} the combined styles depending on the current color scheme
  */
-const usePreferredColorSchemeStyleBem = (
-	styles,
-	darkModifier = 'dark'
-) => {
+const usePreferredColorSchemeStyleBem = ( styles, darkModifier = 'dark' ) => {
 	const colorScheme = usePreferredColorScheme();
 
 	if ( colorScheme !== 'dark' ) {

@@ -26,12 +26,12 @@ import Icon from '../icon';
 import baseStyles from './styles';
 import platformStyles from './buttonStyles';
 
- // Merge platform specific styles
+// Merge platform specific styles
 for ( const selector in platformStyles ) {
-  baseStyles[ selector ] = {
-    ...baseStyles[ selector ],
-    ...platformStyles[ selector ],
-  };
+	baseStyles[ selector ] = {
+		...baseStyles[ selector ],
+		...platformStyles[ selector ],
+	};
 }
 
 export function Button( props ) {
@@ -59,9 +59,10 @@ export function Button( props ) {
 
 	const isDisabled = ariaDisabled || disabled;
 
-	const themedStyle = usePreferredColorSchemeStyleBem(
-		{ ...baseStyles, ...styles },
-	);
+	const themedStyle = usePreferredColorSchemeStyleBem( {
+		...baseStyles,
+		...styles,
+	} );
 
 	/* eslint-disable dot-notation */
 	const containerStyle = themedStyle[ 'button__container' ];
