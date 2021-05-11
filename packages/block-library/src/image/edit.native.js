@@ -24,6 +24,7 @@ import {
 	Image,
 	WIDE_ALIGNMENTS,
 	LinkSettingsNavigation,
+	BottomSheet,
 	BottomSheetTextControl,
 	FooterMessageLink,
 	Badge,
@@ -430,6 +431,22 @@ export class ImageEdit extends Component {
 		this.onSetSizeSlug( newValue );
 	}
 
+	getSetFeaturedButton( isFeaturedImage ) {
+		return (
+						<PanelBody>
+							{ isFeaturedImage ? (
+								<BottomSheet.Cell
+									label={ __( 'Remove as Featured Image ' ) }
+								/>
+							) : (
+								<BottomSheet.Cell
+									label={ __( 'Set as Featured Image ' ) }
+								/>
+							) }
+						</PanelBody>
+		);
+	}
+
 	render() {
 		const { isCaptionSelected } = this.state;
 		const {
@@ -487,6 +504,7 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
+				{ this.getSetFeaturedButton( isFeaturedImage ) }
 			</InspectorControls>
 		);
 
