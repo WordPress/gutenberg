@@ -39,6 +39,7 @@ function useDeprecatedProps( {
 
 		computedVariant ??= 'primary';
 	}
+
 	if ( isTertiary ) {
 		deprecated( 'Button isTertiary prop', {
 			since: '5.9',
@@ -47,6 +48,7 @@ function useDeprecatedProps( {
 
 		computedVariant ??= 'tertiary';
 	}
+
 	if ( isSecondary ) {
 		deprecated( 'Button isSecondary prop', {
 			since: '5.9',
@@ -55,6 +57,7 @@ function useDeprecatedProps( {
 
 		computedVariant ??= 'secondary';
 	}
+
 	if ( isDefault ) {
 		deprecated( 'Button isDefault prop', {
 			since: '5.4',
@@ -72,6 +75,7 @@ function useDeprecatedProps( {
 
 		computedVariant ??= 'link';
 	}
+
 	return {
 		...otherProps,
 		variant: computedVariant,
