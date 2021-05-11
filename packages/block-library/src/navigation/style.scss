@@ -435,15 +435,6 @@
 	color: #000;
 }
 
-// Hide empty paragraph tags caused by wpautop.
-// @todo, need to not output them in the first place.
-.wp-block-navigation > p,
-.wp-block-navigation__responsive-container [data-micromodal-close] > p,
-.wp-block-navigation__responsive-container [role="dialog"] > p,
-.wp-block-navigation__responsive-container > p {
-	display: none;
-}
-
 // Menu and close buttons.
 .wp-block-navigation__responsive-container-open,
 .wp-block-navigation__responsive-container-close {
