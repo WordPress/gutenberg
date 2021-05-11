@@ -60,10 +60,15 @@
 	}
 
 	&.wp-block-search__button-behavior-expand {
-		.wp-block-search__input {
-			opacity: 0.5;
-			// TODO handle show/hide
-		}
+		overflow: hidden;
+
+		// .wp-block-search__input {
+		// }
+
+		// &.wp-block-search__is-selected {
+		// 	.wp-block-search__input {
+		// 	}
+		// }
 	}
 
 	&.aligncenter .wp-block-search__inside-wrapper {
