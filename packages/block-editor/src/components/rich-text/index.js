@@ -9,26 +9,17 @@ import { omit } from 'lodash';
  */
 import { RawHTML, useRef, useCallback, forwardRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	children as childrenSource,
-	getBlockTransforms,
-	findTransform,
-} from '@wordpress/blocks';
+import { children as childrenSource } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
 	__unstableCreateElement,
 	isEmpty,
-	__unstableIsEmptyLine as isEmptyLine,
-	insert,
-	__unstableInsertLineSeparator as insertLineSeparator,
 	split,
 	toHTMLString,
-	isCollapsed,
 	removeFormat,
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -44,6 +35,7 @@ import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
 import { useInputRules } from './use-input-rules';
 import { useFormatTypes } from './use-format-types';
+import { useEnterDeleteHandler } from './use-enter-delete-handler';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
 
@@ -312,93 +304,6 @@ function RichTextWrapper(
 	useCaretInFormat( hasActiveFormats );
 	useMarkPersistent( { hasActiveFormats, html: adjustedValue, value } );
 
-	function onKeyDown( event ) {
-		const { keyCode } = event;
-
-		if ( event.defaultPrevented ) {
-			return;
-		}
-
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-
-			const _value = { ...value };
-			_value.formats = removeEditorOnlyFormats( value );
-			const canSplit = onReplace && onSplit;
-
-			if ( onReplace ) {
-				const transforms = getBlockTransforms( 'from' ).filter(
-					( { type } ) => type === 'enter'
-				);
-				const transformation = findTransform( transforms, ( item ) => {
-					return item.regExp.test( _value.text );
-				} );
-
-				if ( transformation ) {
-					onReplace( [
-						transformation.transform( {
-							content: _value.text,
-						} ),
-					] );
-					__unstableMarkAutomaticChange();
-				}
-			}
-
-			if ( multiline ) {
-				if ( event.shiftKey ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( canSplit && isEmptyLine( _value ) ) {
-					splitValue( _value );
-				} else {
-					onChange( insertLineSeparator( _value ) );
-				}
-			} else {
-				const { text, start, end } = _value;
-				const canSplitAtEnd =
-					onSplitAtEnd && start === end && end === text.length;
-
-				if ( event.shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( ! canSplit && canSplitAtEnd ) {
-					onSplitAtEnd();
-				} else if ( canSplit ) {
-					splitValue( _value );
-				}
-			}
-		} else if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			const { start, end, text } = value;
-			const isReverse = keyCode === BACKSPACE;
-
-			// Only process delete if the key press occurs at an uncollapsed edge.
-			if (
-				! isCollapsed( value ) ||
-				hasActiveFormats ||
-				( isReverse && start !== 0 ) ||
-				( ! isReverse && end !== text.length )
-			) {
-				return;
-			}
-
-			if ( onMerge ) {
-				onMerge( ! isReverse );
-			}
-
-			// Only handle remove on Backspace. This serves dual-purpose of being
-			// an intentional user interaction distinguishing between Backspace and
-			// Delete to remove the empty field, but also to avoid merge & remove
-			// causing destruction of two fields (merge, then removed merged).
-			if ( onRemove && isEmpty( value ) && isReverse ) {
-				onRemove( ! isReverse );
-			}
-
-			event.preventDefault();
-		}
-	}
-
 	const TagName = tagName;
 	const content = (
 		<>
@@ -439,6 +344,21 @@ function RichTextWrapper(
 						onReplace,
 					} ),
 					useUndoAutomaticChange(),
+					useEnterDeleteHandler( {
+						removeEditorOnlyFormats,
+						value,
+						onReplace,
+						onSplit,
+						__unstableMarkAutomaticChange,
+						multiline,
+						onChange,
+						disableLineBreaks,
+						splitValue,
+						onSplitAtEnd,
+						hasActiveFormats,
+						onMerge,
+						onRemove,
+					} ),
 					usePasteHandler( {
 						isSelected,
 						disableFormats,
@@ -466,10 +386,6 @@ function RichTextWrapper(
 					'rich-text'
 				) }
 				onFocus={ unstableOnFocus }
-				onKeyDown={ ( event ) => {
-					autocompleteProps.onKeyDown( event );
-					onKeyDown( event );
-				} }
 			/>
 		</>
 	);
