@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { Animated, Dimensions, View } from 'react-native';
+import { Animated, View } from 'react-native';
 
 /**
  * WordPress dependencies
@@ -32,26 +32,21 @@ function InserterTabs( {
 	showReusableBlocks,
 	tabIndex,
 } ) {
-	const [ windowWidth, setWindowWidth ] = useState(
-		Dimensions.get( 'window' ).width
-	);
 	const tabAnimation = useRef( new Animated.Value( 0 ) ).current;
 	const lastScrollEvents = useRef( [] ).current;
+	const [ wrapperWidth, setWrapperWidth ] = useState( 0 );
 
 	function onScroll( event ) {
 		lastScrollEvents[ tabIndex ] = event.nativeEvent;
 		listProps.onScroll( event );
 	}
 
-	function onDimensionsChange() {
-		setWindowWidth( Dimensions.get( 'window' ).width );
-	}
-
-	useEffect( () => {
-		Dimensions.addEventListener( 'change', onDimensionsChange );
-		return () =>
-			Dimensions.removeEventListener( 'change', onDimensionsChange );
-	}, [] );
+	const onWrapperLayout = useCallback(
+		( { nativeEvent } ) => {
+			setWrapperWidth( nativeEvent.layout.width );
+		},
+		[ setWrapperWidth ]
+	);
 
 	useEffect( () => {
 		Animated.timing( tabAnimation, {
@@ -83,30 +78,33 @@ function InserterTabs( {
 				? tabAnimation.interpolate( {
 						inputRange: tabKeys,
 						outputRange: tabKeys.map(
-							( key ) => key * -windowWidth
+							( key ) => key * -wrapperWidth
 						),
 				  } )
 				: tabAnimation,
-		[ tabAnimation, tabKeys, windowWidth ]
+		[ tabAnimation, tabKeys, wrapperWidth ]
 	);
 
 	const containerStyle = [
 		styles[ 'inserter-tabs__container' ],
 		{
-			width: windowWidth * tabKeys.length,
+			width: wrapperWidth * tabKeys.length,
 			transform: [ { translateX } ],
 		},
 	];
 
 	return (
-		<View style={ styles[ 'inserter-tabs__wrapper' ] }>
+		<View
+			style={ styles[ 'inserter-tabs__wrapper' ] }
+			onLayout={ onWrapperLayout }
+		>
 			<Animated.View style={ containerStyle }>
 				{ tabs.map( ( tab, index ) => (
 					<View
 						key={ `tab-${ index }` }
 						style={ [
 							styles[ 'inserter-tabs__item' ],
-							{ left: index * windowWidth },
+							{ left: index * wrapperWidth },
 						] }
 					>
 						{ tab.component( {
