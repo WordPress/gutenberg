@@ -18,7 +18,7 @@ import {
 	InspectorControls,
 	RichText,
 	useBlockProps,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useSetting,
 } from '@wordpress/block-editor';
 import { createBlock } from '@wordpress/blocks';
 import { formatLtr } from '@wordpress/icons';
@@ -55,7 +55,7 @@ function ParagraphBlock( {
 	clientId,
 } ) {
 	const { align, content, direction, dropCap, placeholder } = attributes;
-	const isDropCapFeatureEnabled = useEditorFeature( 'typography.dropCap' );
+	const isDropCapFeatureEnabled = useSetting( 'typography.dropCap' );
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			'has-drop-cap': dropCap,

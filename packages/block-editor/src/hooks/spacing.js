@@ -10,6 +10,7 @@ import { getBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import InspectorControls from '../components/inspector-controls';
+import { MarginEdit, hasMarginSupport, useIsMarginDisabled } from './margin';
 import {
 	PaddingEdit,
 	hasPaddingSupport,
@@ -36,13 +37,14 @@ export function SpacingPanel( props ) {
 		<InspectorControls key="spacing">
 			<PanelBody title={ __( 'Spacing' ) }>
 				<PaddingEdit { ...props } />
+				<MarginEdit { ...props } />
 			</PanelBody>
 		</InspectorControls>
 	);
 }
 
 /**
- * Determine whether there is block support for padding.
+ * Determine whether there is block support for padding or margins.
  *
  * @param {string} blockName Block name.
  * @return {boolean}         Whether there is support.
@@ -52,7 +54,7 @@ export function hasSpacingSupport( blockName ) {
 		return false;
 	}
 
-	return hasPaddingSupport( blockName );
+	return hasPaddingSupport( blockName ) || hasMarginSupport( blockName );
 }
 
 /**
@@ -63,8 +65,9 @@ export function hasSpacingSupport( blockName ) {
  */
 const useIsSpacingDisabled = ( props = {} ) => {
 	const paddingDisabled = useIsPaddingDisabled( props );
+	const marginDisabled = useIsMarginDisabled( props );
 
-	return paddingDisabled;
+	return paddingDisabled && marginDisabled;
 };
 
 /**
