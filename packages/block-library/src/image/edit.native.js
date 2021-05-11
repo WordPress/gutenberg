@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { View, TouchableWithoutFeedback } from 'react-native';
+import { View, TouchableWithoutFeedback, Platform } from 'react-native';
 import { isEmpty, get, find, map } from 'lodash';
 
 /**
@@ -448,7 +448,9 @@ export class ImageEdit extends Component {
 			imageDefaultSize,
 		] );
 
-		const isFeaturedImage = featuredImageId === attributes.id;
+		// Disabled on iOS until https://github.com/WordPress/gutenberg/pull/31345 is merged in to provide iOS bridge support.
+		const isFeaturedImage =
+			featuredImageId === attributes.id && Platform.OS === 'android';
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
