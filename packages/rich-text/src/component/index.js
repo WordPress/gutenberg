@@ -1,12 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	forwardRef,
-	useRef,
-	useState,
-	useLayoutEffect,
-} from '@wordpress/element';
+import { useRef, useState, useLayoutEffect } from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
@@ -39,32 +34,28 @@ function createPrepareEditableTree( fns ) {
 		);
 }
 
-function RichText(
-	{
-		value = '',
-		selectionStart,
-		selectionEnd,
-		children,
-		allowedFormats,
-		withoutInteractiveFormatting,
-		placeholder,
-		preserveWhiteSpace,
-		onPaste,
-		format = 'string',
-		onSelectionChange,
-		onChange,
-		clientId,
-		identifier,
-		__unstableMultilineTag: multilineTag,
-		__unstableDisableFormats: disableFormats,
-		__unstableInputRule: inputRule,
-		__unstableMarkAutomaticChange: markAutomaticChange,
-		__unstableAllowPrefixTransformations: allowPrefixTransformations,
-		__unstableOnCreateUndoLevel: onCreateUndoLevel,
-		__unstableIsSelected: isSelected,
-	},
-	forwardedRef
-) {
+export function useRichText( {
+	value = '',
+	selectionStart,
+	selectionEnd,
+	allowedFormats,
+	withoutInteractiveFormatting,
+	placeholder,
+	preserveWhiteSpace,
+	onPaste,
+	format = 'string',
+	onSelectionChange,
+	onChange,
+	clientId,
+	identifier,
+	__unstableMultilineTag: multilineTag,
+	__unstableDisableFormats: disableFormats,
+	__unstableInputRule: inputRule,
+	__unstableMarkAutomaticChange: markAutomaticChange,
+	__unstableAllowPrefixTransformations: allowPrefixTransformations,
+	__unstableOnCreateUndoLevel: onCreateUndoLevel,
+	__unstableIsSelected: isSelected,
+} ) {
 	const ref = useRef();
 	const [ activeFormats = [], setActiveFormats ] = useState();
 	const {
@@ -293,7 +284,6 @@ function RichText(
 	}
 
 	const mergedRefs = useMergeRefs( [
-		forwardedRef,
 		ref,
 		useDefaultStyle(),
 		useBoundaryStyle( { activeFormats } ),
@@ -347,32 +337,24 @@ function RichText(
 		}, [ placeholder, ...dependencies ] ),
 	] );
 
-	return (
-		<>
-			{ isSelected && (
-				<FormatEdit
-					value={ record.current }
-					onChange={ handleChange }
-					onFocus={ focus }
-					formatTypes={ formatTypes }
-					forwardedRef={ ref }
-				/>
-			) }
-			{ children( {
-				isSelected,
-				value: record.current,
-				onChange: handleChange,
-				onFocus: focus,
-				ref: mergedRefs,
-				hasActiveFormats: activeFormats.length,
-				removeEditorOnlyFormats,
-			} ) }
-		</>
-	);
+	return {
+		isSelected,
+		value: record.current,
+		onChange: handleChange,
+		onFocus: focus,
+		ref: mergedRefs,
+		hasActiveFormats: activeFormats.length,
+		removeEditorOnlyFormats,
+		children: isSelected && (
+			<FormatEdit
+				value={ record.current }
+				onChange={ handleChange }
+				onFocus={ focus }
+				formatTypes={ formatTypes }
+				forwardedRef={ ref }
+			/>
+		),
+	};
 }
 
-/**
- * Renders a rich content input, providing users with the option to format the
- * content.
- */
-export default forwardRef( RichText );
+export default function __experimentalRichText() {}
