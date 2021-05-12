@@ -303,10 +303,8 @@ function RichTextWrapper(
 		onChange,
 	} );
 
-	const hasActiveFormats =
-		value.activeFormats && !! value.activeFormats.length;
-	useCaretInFormat( hasActiveFormats );
-	useMarkPersistent( { hasActiveFormats, html: adjustedValue, value } );
+	useCaretInFormat( { value } );
+	useMarkPersistent( { html: adjustedValue, value } );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;
@@ -368,6 +366,8 @@ function RichTextWrapper(
 		} else if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			const { start, end, text } = value;
 			const isReverse = keyCode === BACKSPACE;
+			const hasActiveFormats =
+				value.activeFormats && !! value.activeFormats.length;
 
 			// Only process delete if the key press occurs at an uncollapsed edge.
 			if (

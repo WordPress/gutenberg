@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import { useRef, useLayoutEffect } from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
@@ -37,7 +37,6 @@ export function useRichText( {
 	__unstableAddInvisibleFormats,
 } ) {
 	const ref = useRef();
-	const [ activeFormats = [], setActiveFormats ] = useState();
 
 	function createRecord() {
 		const {
@@ -121,13 +120,7 @@ export function useRichText( {
 
 		record.current = newRecord;
 
-		const {
-			start,
-			end,
-			formats,
-			text,
-			activeFormats: newActiveFormats = [],
-		} = newRecord;
+		const { start, end, formats, text } = newRecord;
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
@@ -136,7 +129,6 @@ export function useRichText( {
 			__unstableFormats: formats,
 			__unstableText: text,
 		} );
-		setActiveFormats( newActiveFormats );
 	}
 
 	function applyFromProps( { domOnly } = {} ) {
@@ -182,11 +174,11 @@ export function useRichText( {
 	const mergedRefs = useMergeRefs( [
 		ref,
 		useDefaultStyle(),
-		useBoundaryStyle( { activeFormats } ),
+		useBoundaryStyle( { record } ),
 		useInlineWarning(),
 		useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
 		useSelectObject(),
-		useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
+		useFormatBoundaries( { record, applyRecord } ),
 		useDelete( {
 			createRecord,
 			handleChange,
@@ -204,7 +196,6 @@ export function useRichText( {
 			handleChange,
 			isSelected,
 			onSelectionChange,
-			setActiveFormats,
 		} ),
 		useRefEffect( () => {
 			if ( didMount.current ) {

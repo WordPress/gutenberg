@@ -138,7 +138,6 @@ export function useInputAndSelection( props ) {
 				createRecord,
 				isSelected,
 				onSelectionChange,
-				setActiveFormats,
 			} = propsRef.current;
 
 			if ( event.type !== 'selectionchange' && ! isSelected ) {
@@ -203,7 +202,6 @@ export function useInputAndSelection( props ) {
 			record.current = newValue;
 			applyRecord( newValue, { domOnly: true } );
 			onSelectionChange( start, end );
-			setActiveFormats( newActiveFormats );
 		}
 
 		function onCompositionStart() {
