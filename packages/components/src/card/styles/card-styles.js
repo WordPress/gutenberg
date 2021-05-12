@@ -12,18 +12,18 @@ import { HorizontalRule } from '@wordpress/primitives';
  * Internal dependencies
  */
 import { Flex } from '../../flex';
-import { color, space } from '../../utils/style-mixins';
+import { COLORS, space } from '../../utils';
 
 export const styleProps = {
-	borderColor: color( 'lightGray.500' ),
+	borderColor: COLORS.lightGray[ 500 ],
 	borderRadius: '3px',
-	backgroundShady: color( 'lightGray.200' ),
+	backgroundShady: COLORS.lightGray[ 200 ],
 };
 
 const { borderColor, borderRadius, backgroundShady } = styleProps;
 
 export const CardUI = styled.div`
-	background: ${ color( 'white' ) };
+	background: ${ COLORS.white };
 	box-sizing: border-box;
 	border-radius: ${ borderRadius };
 	border: 1px solid ${ borderColor };
