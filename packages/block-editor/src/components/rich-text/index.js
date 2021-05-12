@@ -24,7 +24,6 @@ import {
 	__unstableInsertLineSeparator as insertLineSeparator,
 	split,
 	toHTMLString,
-	slice,
 	isCollapsed,
 	removeFormat,
 } from '@wordpress/rich-text';
@@ -42,6 +41,7 @@ import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { useCaretInFormat } from './use-caret-in-format';
 import { usePasteHandler } from './use-paste-handler';
+import { useInputRules } from './use-input-rules';
 import { useFormatTypes } from './use-format-types';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
@@ -233,44 +233,6 @@ function RichTextWrapper(
 		[ onReplace, onSplit, multilineTag, onSplitMiddle ]
 	);
 
-	const inputRule = useCallback(
-		( value, valueToFormat ) => {
-			if ( ! onReplace ) {
-				return;
-			}
-
-			const { start, text } = value;
-			const characterBefore = text.slice( start - 1, start );
-
-			// The character right before the caret must be a plain space.
-			if ( characterBefore !== ' ' ) {
-				return;
-			}
-
-			const trimmedTextBefore = text.slice( 0, start ).trim();
-			const prefixTransforms = getBlockTransforms( 'from' ).filter(
-				( { type } ) => type === 'prefix'
-			);
-			const transformation = findTransform(
-				prefixTransforms,
-				( { prefix } ) => {
-					return trimmedTextBefore === prefix;
-				}
-			);
-
-			if ( ! transformation ) {
-				return;
-			}
-
-			const content = valueToFormat( slice( value, start, text.length ) );
-			const block = transformation.transform( content );
-
-			onReplace( [ block ] );
-			__unstableMarkAutomaticChange();
-		},
-		[ onReplace, __unstableMarkAutomaticChange ]
-	);
-
 	const {
 		formatTypes,
 		prepareHandlers,
@@ -333,14 +295,12 @@ function RichTextWrapper(
 		onSelectionChange,
 		placeholder,
 		__unstableIsSelected: isSelected,
-		__unstableInputRule: inputRule,
 		__unstableMultilineTag: multilineTag,
 		__unstableOnCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
 		__unstableMarkAutomaticChange,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
 		__unstableAllowPrefixTransformations,
-		formatTypes,
 		prepareHandlers,
 		valueHandlers,
 		changeHandlers,
@@ -477,6 +437,15 @@ function RichTextWrapper(
 					autocompleteProps.ref,
 					props.ref,
 					richTextRef,
+					useInputRules( {
+						value,
+						onChange,
+						__unstableAllowPrefixTransformations,
+						formatTypes,
+						onReplace,
+						__unstableMarkAutomaticChange,
+						__unstableMarkLastChangeAsPersistent,
+					} ),
 					useUndoAutomaticChange(),
 					usePasteHandler( {
 						isSelected,
