@@ -2,45 +2,17 @@
  * WordPress dependencies
  */
 import { store as coreDataStore } from '@wordpress/core-data';
-import { store as editorStore } from '@wordpress/editor';
-import { store as blocksStore } from '@wordpress/blocks';
-import { dispatch, select, subscribe } from '@wordpress/data';
+import { select } from '@wordpress/data';
+import * as icons from '@wordpress/icons';
+import { addFilter } from '@wordpress/hooks';
 
-const unsubscribe = subscribe( () => {
-	const definedVariations = select(
-		editorStore
-	).__experimentalGetDefaultTemplatePartAreas();
-
-	const templatePartBlockType = select( blocksStore ).getBlockType(
-		'core/template-part'
-	);
-
-	if ( ! ( definedVariations?.length && templatePartBlockType ) ) {
-		return;
+function enhanceTemplatePartVariations( settings, name ) {
+	if ( name !== 'core/template-part' ) {
+		return settings;
 	}
-	unsubscribe();
 
-	const variations = definedVariations
-		.filter( ( { area } ) => 'uncategorized' !== area )
-		.map( ( { area, label, description, icon } ) => {
-			return {
-				name: area,
-				title: label,
-				description,
-				icon,
-				attributes: { area },
-				scope: [ 'inserter' ],
-			};
-		} );
-
-	/**
-	 * Add `isActive` function to all `Template Part` variations, if not defined.
-	 * `isActive` function is used to find a variation match from a created
-	 *  Block by providing its attributes.
-	 */
-	variations.forEach( ( variation ) => {
-		if ( variation.isActive ) return;
-		variation.isActive = ( blockAttributes, variationAttributes ) => {
+	if ( settings.variations ) {
+		const isActive = ( blockAttributes, variationAttributes ) => {
 			const { area, theme, slug } = blockAttributes;
 			// We first check the `area` block attribute which is set during insertion.
 			// This property is removed on the creation of a template part.
@@ -55,10 +27,27 @@ const unsubscribe = subscribe( () => {
 			);
 			return entity?.area === variationAttributes.area;
 		};
-	} );
 
-	dispatch( blocksStore ).addBlockVariations(
-		'core/template-part',
-		variations
-	);
-} );
+		const variations = settings.variations.map( ( variation ) => {
+			return {
+				...variation,
+				...( ! variation.isActive && { isActive } ),
+				...( typeof variation.icon === 'string' && {
+					icon: icons[ variation.icon ],
+				} ),
+			};
+		} );
+
+		return {
+			...settings,
+			variations,
+		};
+	}
+	return settings;
+}
+
+addFilter(
+	'blocks.registerBlockType',
+	'core/template-part',
+	enhanceTemplatePartVariations
+);
