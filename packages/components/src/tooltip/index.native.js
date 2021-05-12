@@ -41,6 +41,8 @@ const Tooltip = ( {
 	const animationValue = useRef( new Animated.Value( 0 ) ).current;
 	const [ , horizontalPosition = 'center' ] = position.split( ' ' );
 	const [ visible, setVisible ] = useState( initialVisible );
+	const [ animating, setAnimating ] = useState( false );
+	const hidden = ! visible && ! animating;
 	const previousVisible = usePrevious( visible );
 	const [ referenceLayout, setReferenceLayout ] = useState( {
 		height: 0,
@@ -57,7 +59,10 @@ const Tooltip = ( {
 	// Register callback to dismiss the tooltip whenever the screen is touched
 	useEffect( () => {
 		if ( visible ) {
-			onHandleScreenTouch( () => setVisible( false ) );
+			onHandleScreenTouch( () => {
+				setAnimating( true );
+				setVisible( false );
+			} );
 		}
 		return () => onHandleScreenTouch( null );
 	}, [ visible ] );
@@ -69,9 +74,10 @@ const Tooltip = ( {
 			// Previously visible, animate hide
 			( previousVisible && previousVisible !== visible )
 		) {
+			setAnimating( true );
 			startAnimation();
 		}
-	}, [ visible ] );
+	}, [ animating, visible ] );
 
 	const startAnimation = () => {
 		Animated.timing( animationValue, {
@@ -80,7 +86,9 @@ const Tooltip = ( {
 			useNativeDriver: true,
 			delay: visible ? 500 : 0,
 			easing: Easing.out( Easing.quad ),
-		} ).start();
+		} ).start( () => {
+			setAnimating( false );
+		} );
 	};
 
 	const positionStyles = {
@@ -146,8 +154,7 @@ const Tooltip = ( {
 				ref: referenceElementRef,
 				onLayout: getReferenceElementPosition,
 			} ) }
-			{ /* TODO(David): Animation out does not work as this immediately removes the element. */ }
-			{ visible && (
+			{ ! hidden && (
 				<Fill>
 					<View
 						onLayout={ getTooltipLayout }
