@@ -22,7 +22,6 @@ export function usePasteHandler( props ) {
 				record,
 				formatTypes,
 				onPaste,
-				removeEditorOnlyFormats,
 				activeFormats,
 			} = propsRef.current;
 
@@ -93,7 +92,7 @@ export function usePasteHandler( props ) {
 					clipboardData.getData( 'rich-text' ) === 'true';
 
 				onPaste( {
-					value: removeEditorOnlyFormats( record.current ),
+					value: record.current,
 					onChange: handleChange,
 					html,
 					plainText,

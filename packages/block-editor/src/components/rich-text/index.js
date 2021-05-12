@@ -30,6 +30,7 @@ import {
 	toHTMLString,
 	slice,
 	isCollapsed,
+	removeFormat,
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
 import { isURL } from '@wordpress/url';
@@ -46,6 +47,7 @@ import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { useCaretInFormat } from './use-caret-in-format';
+import { useFormatTypes } from './use-format-types';
 import {
 	addActiveFormats,
 	getMultilineTag,
@@ -399,24 +401,67 @@ function RichTextWrapper(
 	);
 
 	const {
+		formatTypes,
+		prepareHandlers,
+		valueHandlers,
+		changeHandlers,
+		dependencies,
+	} = useFormatTypes( {
+		clientId,
+		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats: adjustedAllowedFormats,
+	} );
+
+	function addEditorOnlyFormats( value ) {
+		return valueHandlers.reduce(
+			( accumulator, fn ) => fn( accumulator, value.text ),
+			value.formats
+		);
+	}
+
+	function removeEditorOnlyFormats( value ) {
+		formatTypes.forEach( ( formatType ) => {
+			// Remove formats created by prepareEditableTree, because they are editor only.
+			if ( formatType.__experimentalCreatePrepareEditableTree ) {
+				value = removeFormat(
+					value,
+					formatType.name,
+					0,
+					value.text.length
+				);
+			}
+		} );
+
+		return value.formats;
+	}
+
+	function addInvisibleFormats( value ) {
+		return prepareHandlers.reduce(
+			( accumulator, fn ) => fn( accumulator, value.text ),
+			value.formats
+		);
+	}
+
+	const {
 		value,
 		onChange,
 		onFocus,
 		ref: richTextRef,
 		hasActiveFormats,
-		removeEditorOnlyFormats,
 		children: richTextChildren,
 	} = useRichText( {
-		clientId,
-		identifier,
 		value: adjustedValue,
-		onChange: adjustedOnChange,
+		onChange( html, { __unstableFormats, __unstableText } ) {
+			adjustedOnChange( html );
+			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
+				changeHandler( __unstableFormats, __unstableText );
+			} );
+		},
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
 		placeholder,
-		allowedFormats: adjustedAllowedFormats,
-		withoutInteractiveFormatting,
 		onPaste,
 		__unstableIsSelected: isSelected,
 		__unstableInputRule: inputRule,
@@ -426,6 +471,14 @@ function RichTextWrapper(
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
 		__unstableAllowPrefixTransformations,
+		formatTypes,
+		prepareHandlers,
+		valueHandlers,
+		changeHandlers,
+		dependencies,
+		__unstableAfterParse: addEditorOnlyFormats,
+		__unstableBeforeSerialize: removeEditorOnlyFormats,
+		__unstableAddInvisibleFormats: addInvisibleFormats,
 	} );
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
 		onReplace,

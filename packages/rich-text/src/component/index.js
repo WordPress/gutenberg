@@ -11,8 +11,6 @@ import FormatEdit from './format-edit';
 import { create } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
-import { removeFormat } from '../remove-format';
-import { useFormatTypes } from './use-format-types';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
 import { useInlineWarning } from './use-inline-warning';
@@ -26,28 +24,16 @@ import { useDelete } from './use-delete';
 
 /** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
 
-function createPrepareEditableTree( fns ) {
-	return ( value ) =>
-		fns.reduce(
-			( accumulator, fn ) => fn( accumulator, value.text ),
-			value.formats
-		);
-}
-
 export function useRichText( {
 	value = '',
 	selectionStart,
 	selectionEnd,
-	allowedFormats,
-	withoutInteractiveFormatting,
 	placeholder,
 	preserveWhiteSpace,
 	onPaste,
 	format = 'string',
 	onSelectionChange,
 	onChange,
-	clientId,
-	identifier,
 	__unstableMultilineTag: multilineTag,
 	__unstableDisableFormats: disableFormats,
 	__unstableInputRule: inputRule,
@@ -55,21 +41,14 @@ export function useRichText( {
 	__unstableAllowPrefixTransformations: allowPrefixTransformations,
 	__unstableOnCreateUndoLevel: onCreateUndoLevel,
 	__unstableIsSelected: isSelected,
+	formatTypes,
+	dependencies,
+	__unstableAfterParse,
+	__unstableBeforeSerialize,
+	__unstableAddInvisibleFormats,
 } ) {
 	const ref = useRef();
 	const [ activeFormats = [], setActiveFormats ] = useState();
-	const {
-		formatTypes,
-		prepareHandlers,
-		valueHandlers,
-		changeHandlers,
-		dependencies,
-	} = useFormatTypes( {
-		clientId,
-		identifier,
-		withoutInteractiveFormatting,
-		allowedFormats,
-	} );
 
 	/**
 	 * Converts the outside data structure to our internal representation.
@@ -91,8 +70,6 @@ export function useRichText( {
 			return string;
 		}
 
-		const prepare = createPrepareEditableTree( valueHandlers );
-
 		const result = create( {
 			html: string,
 			multilineTag,
@@ -101,30 +78,9 @@ export function useRichText( {
 			preserveWhiteSpace,
 		} );
 
-		result.formats = prepare( result );
+		result.formats = __unstableAfterParse( result );
 
 		return result;
-	}
-
-	/**
-	 * Removes editor only formats from the value.
-	 *
-	 * Editor only formats are applied using `prepareEditableTree`, so we need to
-	 * remove them before converting the internal state
-	 *
-	 * @param {Object} val The internal rich-text value.
-	 *
-	 * @return {Object} A new rich-text value.
-	 */
-	function removeEditorOnlyFormats( val ) {
-		formatTypes.forEach( ( formatType ) => {
-			// Remove formats created by prepareEditableTree, because they are editor only.
-			if ( formatType.__experimentalCreatePrepareEditableTree ) {
-				val = removeFormat( val, formatType.name, 0, val.text.length );
-			}
-		} );
-
-		return val;
 	}
 
 	/**
@@ -139,11 +95,11 @@ export function useRichText( {
 			return val.text;
 		}
 
-		val = removeEditorOnlyFormats( val );
-
 		if ( format !== 'string' ) {
 			return;
 		}
+
+		val.formats = __unstableBeforeSerialize( val );
 
 		return toHTMLString( { value: val, multilineTag, preserveWhiteSpace } );
 	}
@@ -174,7 +130,7 @@ export function useRichText( {
 			multilineTag,
 			multilineWrapperTags:
 				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
-			prepareEditableTree: createPrepareEditableTree( prepareHandlers ),
+			prepareEditableTree: __unstableAddInvisibleFormats,
 			__unstableDomOnly: domOnly,
 			placeholder,
 		} );
@@ -222,7 +178,13 @@ export function useRichText( {
 
 		applyRecord( newRecord );
 
-		const { start, end, activeFormats: newActiveFormats = [] } = newRecord;
+		const {
+			start,
+			end,
+			formats,
+			text,
+			activeFormats: newActiveFormats = [],
+		} = newRecord;
 
 		_value.current = valueToFormat( newRecord );
 		record.current = newRecord;
@@ -230,12 +192,11 @@ export function useRichText( {
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
 		onSelectionChange( start, end );
-		onChange( _value.current );
-		setActiveFormats( newActiveFormats );
-
-		Object.values( changeHandlers ).forEach( ( changeHandler ) => {
-			changeHandler( newRecord.formats, newRecord.text );
+		onChange( _value.current, {
+			__unstableFormats: formats,
+			__unstableText: text,
 		} );
+		setActiveFormats( newActiveFormats );
 
 		if ( ! withoutHistory ) {
 			createUndoLevel();
@@ -308,7 +269,6 @@ export function useRichText( {
 			record,
 			formatTypes,
 			onPaste,
-			removeEditorOnlyFormats,
 			activeFormats,
 		} ),
 		useInputAndSelection( {
@@ -344,7 +304,6 @@ export function useRichText( {
 		onFocus: focus,
 		ref: mergedRefs,
 		hasActiveFormats: activeFormats.length,
-		removeEditorOnlyFormats,
 		children: isSelected && (
 			<FormatEdit
 				value={ record.current }
