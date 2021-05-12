@@ -15,3 +15,4 @@ import './layout';
 export { useCustomSides } from './spacing';
 export { getBorderClassesAndStyles, useBorderProps } from './use-border-props';
 export { getColorClassesAndStyles, useColorProps } from './use-color-props';
+export { useSpacingProps } from './use-spacing-props';
