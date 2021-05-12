@@ -711,7 +711,7 @@ export function* mergeBlocks( firstBlockClientId, secondBlockClientId ) {
 
 	// Only focus the previous block if it's not mergeable
 	if ( ! blockAType.merge ) {
-		yield selectBlock( blockA.clientId );
+		yield selectBlock( blockA.clientId, -1 );
 		return;
 	}
 

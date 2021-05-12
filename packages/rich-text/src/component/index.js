@@ -74,6 +74,11 @@ export function useRichText( {
 	// Internal values are updated synchronously, unlike props and state.
 	const _value = useRef( value );
 	const record = useRef();
+	const previousRecord = useRef( {} );
+
+	useLayoutEffect( () => {
+		previousRecord.current = record.current;
+	}, [ record.current ] );
 
 	function setRecordFromProps() {
 		_value.current = value;
@@ -95,6 +100,15 @@ export function useRichText( {
 
 	if ( ! record.current ) {
 		setRecordFromProps();
+	} else if (
+		selectionStart !== record.current.start ||
+		selectionEnd !== record.current.end
+	) {
+		record.current = {
+			...record.current,
+			start: selectionStart,
+			end: selectionEnd,
+		};
 	}
 
 	/**
@@ -161,16 +175,10 @@ export function useRichText( {
 
 		if (
 			isSelected &&
-			( selectionStart !== record.current.start ||
-				selectionEnd !== record.current.end )
+			( selectionStart !== previousRecord.current.start ||
+				selectionEnd !== previousRecord.current.end )
 		) {
 			applyFromProps();
-		} else {
-			record.current = {
-				...record.current,
-				start: selectionStart,
-				end: selectionEnd,
-			};
 		}
 	}, [ selectionStart, selectionEnd, isSelected ] );
 
