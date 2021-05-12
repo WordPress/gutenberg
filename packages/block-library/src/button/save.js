@@ -10,6 +10,7 @@ import {
 	RichText,
 	useBlockProps,
 	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
+	__experimentalGetSpacingClassesAndStyles as getSpacingClassesAndStyles,
 } from '@wordpress/block-editor';
 
 export default function save( { attributes, className } ) {
@@ -30,6 +31,7 @@ export default function save( { attributes, className } ) {
 
 	const borderRadius = style?.border?.radius;
 	const colorProps = getColorClassesAndStyles( attributes );
+	const spacingProps = getSpacingClassesAndStyles( attributes );
 	const buttonClasses = classnames(
 		'wp-block-button__link',
 		colorProps.className,
@@ -40,6 +42,7 @@ export default function save( { attributes, className } ) {
 	const buttonStyle = {
 		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
 		...colorProps.style,
+		...spacingProps.style,
 	};
 
 	// The use of a `title` attribute here is soft-deprecated, but still applied
