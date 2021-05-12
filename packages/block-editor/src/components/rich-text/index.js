@@ -466,10 +466,7 @@ function RichTextWrapper(
 					'rich-text'
 				) }
 				onFocus={ unstableOnFocus }
-				onKeyDown={ ( event ) => {
-					autocompleteProps.onKeyDown( event );
-					onKeyDown( event );
-				} }
+				onKeyDown={ onKeyDown }
 			/>
 		</>
 	);
