@@ -76,6 +76,22 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
+	// Set what is the context for this data request.
+	$context = 'all';
+	if (
+		is_callable( 'get_current_screen' ) &&
+		function_exists( 'gutenberg_is_edit_site_page' ) &&
+		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
+		WP_Theme_JSON_Resolver::theme_has_support() &&
+		gutenberg_supports_block_templates()
+	) {
+		$context = 'site-editor';
+	}
+
+	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+		$context = 'rest-request';
+	}
+
 	$origin = 'theme';
 	if (
 		WP_Theme_JSON_Resolver::theme_has_support() &&
@@ -84,52 +100,36 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		// Only lookup for the user data if we need it.
 		$origin = 'user';
 	}
-	$tree = WP_Theme_JSON_Resolver::get_merged_data( $settings, $origin );
+	$consolidated = WP_Theme_JSON_Resolver::get_merged_data( $settings, $origin );
 
-	// STEP 1: ADD FEATURES
-	//
-	// These need to be always added to the editor settings,
-	// even for themes that don't support theme.json.
-	// An example of this is that the presets are configured
-	// from the theme support data.
-	$settings['__experimentalFeatures'] = $tree->get_settings();
-
-	// STEP 2 - IF EDIT-SITE, ADD DATA REQUIRED FOR GLOBAL STYLES SIDEBAR
-	//
-	// In the site editor, the user can change styles, so the client
-	// needs the ability to create them. Hence, we pass it some data
-	// for this: base styles (core+theme) and the ID of the user CPT.
-	if (
-		is_callable( 'get_current_screen' ) &&
-		function_exists( 'gutenberg_is_edit_site_page' ) &&
-		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
-		WP_Theme_JSON_Resolver::theme_has_support() &&
-		gutenberg_supports_block_templates()
-	) {
-		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
-		$base_styles = WP_Theme_JSON_Resolver::get_merged_data( $settings, 'theme' )->get_raw_data();
-
-		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
-		$settings['__experimentalGlobalStylesBaseStyles']   = $base_styles;
-	} elseif (
-		WP_Theme_JSON_Resolver::theme_has_support() ||
-		get_theme_support( 'experimental-link-color' ) // link color support needs the presets CSS variables regardless of the presence of theme.json file.
-	) {
-		// STEP 3 - ADD STYLES IF THEME HAS SUPPORT
-		//
-		// If we are in a block editor context, but not in edit-site,
-		// we add the styles via the settings, so the editor knows that
-		// some of these should be added the wrapper class,
-		// as if they were added via add_editor_styles.
-		$settings['styles'][] = array(
-			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $tree, 'css_variables' ),
-			'__experimentalNoWrapper' => true,
-		);
-		$settings['styles'][] = array(
-			'css' => gutenberg_experimental_global_styles_get_stylesheet( $tree, 'block_styles' ),
-		);
+	if ( 'rest-request' === $context ) {
+		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
 	}
 
+	if ( 'site-editor' === $context ) {
+		$theme       = WP_Theme_JSON_Resolver::get_merged_data( $settings, 'theme' );
+		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
+
+		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
+		$settings['__experimentalGlobalStylesBaseStyles']   = $theme->get_raw_data();
+	}
+
+	if (
+		'site-editor' != $context &&
+		'rest-request' != $context &&
+		( WP_Theme_JSON_Resolver::theme_has_support() || get_theme_support( 'experimental-link-color' ) )
+	) {
+		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
+		$css_variables = array(
+			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
+			'__experimentalNoWrapper' => true,
+		);
+
+		$settings['styles'][]               = $css_variables;
+		$settings['styles'][]               = $block_styles;
+	}
+
+	$settings['__experimentalFeatures'] = $consolidated->get_settings();
 	unset( $settings['colors'] );
 	unset( $settings['disableCustomColors'] );
 	unset( $settings['disableCustomFontSizes'] );
