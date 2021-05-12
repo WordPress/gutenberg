@@ -7,9 +7,22 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { useViewportMatch } from '@wordpress/compose';
-import { DropdownMenu, MenuGroup, MenuItem, Slot } from '@wordpress/components';
+import {
+	__experimentalUseSlot as useSlot,
+	createSlotFill,
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+} from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { check } from '@wordpress/icons';
+
+const {
+	Fill: PluginPreviewMenuFill,
+	Slot: PluginPreviewMenuSlot,
+} = createSlotFill( 'PluginPreviewOptionsMenu' );
+
+export { PluginPreviewMenuFill };
 
 /*
  * coreDeviceTypes: An array of strings. The strings returned represent
@@ -32,6 +45,7 @@ export default function PreviewOptions( {
 	deviceType,
 	setDeviceType,
 } ) {
+	const slot = useSlot( PluginPreviewMenuSlot.__unstableName );
 	const isMobile = useViewportMatch( 'small', '<' );
 	if ( isMobile ) return null;
 
@@ -82,13 +96,16 @@ export default function PreviewOptions( {
 						</MenuItem>
 					</MenuGroup>
 
-					<Slot name="core/block-editor/plugin-preview-menu">
-						{ ( fills ) =>
-							! fills || fills.length === 0 ? null : (
-								<MenuGroup>{ fills }</MenuGroup>
-							)
-						}
-					</Slot>
+					{ slot?.fills?.length && (
+						<MenuGroup>
+							<PluginPreviewMenuSlot
+								fillProps={ {
+									deviceType,
+									setDeviceType,
+								} }
+							/>
+						</MenuGroup>
+					) }
 
 					{ children }
 				</>
