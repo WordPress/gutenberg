@@ -191,6 +191,14 @@ class Template_Loader_Test extends WP_UnitTestCase {
 		$this->assertEquals( self::$post->post_content, $_wp_current_template_content );
 	}
 
+	/**
+	 * Regression: https://github.com/WordPress/gutenberg/issues/31652.
+	 */
+	function test_gutenberg_template_remains_unchanged_if_templates_array_is_empty() {
+		$resolved_template_path = gutenberg_override_query_template( '', 'search', array() );
+		$this->assertEquals( '', $resolved_template_path );
+	}
+
 	static function change_theme_directory( $theme_dir, $theme ) {
 		return __DIR__ . '/fixtures/themes/' . $theme;
 	}

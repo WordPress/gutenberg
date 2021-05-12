@@ -62,7 +62,7 @@ function get_template_hierarchy( $template_type ) {
  * @param array  $templates A list of template candidates, in descending order of priority.
  * @return string The path to the Full Site Editing template canvas file.
  */
-function gutenberg_override_query_template( $template, $type, array $templates = array() ) {
+function gutenberg_override_query_template( $template, $type, array $templates ) {
 	global $_wp_current_template_content;
 	$current_template = gutenberg_resolve_template( $type, $templates );
 
@@ -163,17 +163,13 @@ function gutenberg_override_query_template( $template, $type, array $templates =
  *  @type int[] A list of template parts IDs for the template.
  * }
  */
-function gutenberg_resolve_template( $template_type, $template_hierarchy = array() ) {
+function gutenberg_resolve_template( $template_type, $template_hierarchy ) {
 	if ( ! $template_type ) {
 		return null;
 	}
 
 	if ( empty( $template_hierarchy ) ) {
-		if ( 'index' === $template_type ) {
-			$template_hierarchy = get_template_hierarchy( 'index' );
-		} else {
-			$template_hierarchy = array_merge( get_template_hierarchy( $template_type ), get_template_hierarchy( 'index' ) );
-		}
+		$template_hierarchy = array( $template_type );
 	}
 
 	$slugs = array_map(
