@@ -18,7 +18,7 @@ import Button from '../button';
 import ColorPicker from '../color-picker';
 import Dropdown from '../dropdown';
 import KeyboardShortcuts from '../keyboard-shortcuts';
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
 
 import {
 	addControlPoint,

@@ -177,7 +177,12 @@
 				]
 			},
 			{ "docs/how-to-guides/accessibility.md": [] },
-			{ "docs/how-to-guides/internationalization.md": [] }
+			{ "docs/how-to-guides/internationalization.md": [] },
+			{ "docs/how-to-guides/widgets/README.md": [
+				{ "docs/how-to-guides/widgets/overview.md": [] },
+				{ "docs/how-to-guides/widgets/opting-out.md": [] },
+				{ "docs/how-to-guides/widgets/legacy-widget-block.md": [] }
+			] }
 		]
 	},
 	{
@@ -205,6 +210,7 @@
 					{
 						"docs/reference-guides/block-api/block-registration.md": []
 					},
+					{ "docs/reference-guides/block-api/block-styles.md": [] },
 					{ "docs/reference-guides/block-api/block-supports.md": [] },
 					{
 						"docs/reference-guides/block-api/block-templates.md": []

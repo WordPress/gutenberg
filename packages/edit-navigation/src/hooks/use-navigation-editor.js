@@ -1,14 +1,17 @@
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useState, useEffect } from '@wordpress/element';
+import { store as noticesStore } from '@wordpress/notices';
+import { store as coreStore } from '@wordpress/core-data';
+
 /**
  * Internal dependencies
  */
 import { store as editNavigationStore } from '../store';
-import { store as noticesStore } from '@wordpress/notices';
-import { __, sprintf } from '@wordpress/i18n';
+import { useSelectedMenuId } from './index';
 
 const getMenusData = ( select ) => {
 	const selectors = select( 'core' );
@@ -29,18 +32,17 @@ export default function useNavigationEditor() {
 		true,
 		false,
 	].map( ( bool ) => () => setIsManageLocationsModalOpen( bool ) );
-	const { deleteMenu: _deleteMenu } = useDispatch( 'core' );
-	const [ selectedMenuId, setSelectedMenuId ] = useState( null );
+	const { deleteMenu: _deleteMenu } = useDispatch( coreStore );
+	const [ selectedMenuId, setSelectedMenuId ] = useSelectedMenuId();
 	const [ hasFinishedInitialLoad, setHasFinishedInitialLoad ] = useState(
 		false
 	);
 	const { menus, hasLoadedMenus } = useSelect( getMenusData, [] );
-	const [ isMenuSelected, setIsMenuSelected ] = useState( true );
 
 	const { createErrorNotice, createInfoNotice } = useDispatch( noticesStore );
 	const isMenuBeingDeleted = useSelect(
 		( select ) =>
-			select( 'core' ).isDeletingEntityRecord(
+			select( coreStore ).isDeletingEntityRecord(
 				'root',
 				'menu',
 				selectedMenuId
@@ -73,7 +75,7 @@ export default function useNavigationEditor() {
 			force: true,
 		} );
 		if ( didDeleteMenu ) {
-			setSelectedMenuId( null );
+			setSelectedMenuId( 0 );
 			createInfoNotice(
 				sprintf(
 					// translators: %s: the name of a menu.
@@ -90,9 +92,6 @@ export default function useNavigationEditor() {
 		}
 	};
 
-	useEffect( () => setIsMenuSelected( selectedMenuId !== null ), [
-		selectedMenuId,
-	] );
 	return {
 		menus,
 		hasLoadedMenus,
@@ -105,6 +104,6 @@ export default function useNavigationEditor() {
 		openManageLocationsModal,
 		closeManageLocationsModal,
 		isManageLocationsModalOpen,
-		isMenuSelected,
+		isMenuSelected: !! selectedMenuId,
 	};
 }

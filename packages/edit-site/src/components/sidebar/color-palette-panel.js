@@ -13,7 +13,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useEditorFeature, ALL_BLOCKS_NAME } from '../editor/utils';
+import { useSetting } from '../editor/utils';
 import { store as editSiteStore } from '../../store';
 
 /**
@@ -32,7 +32,7 @@ export default function ColorPalettePanel( {
 	getSetting,
 	setSetting,
 } ) {
-	const colors = useEditorFeature( 'color.palette', contextName );
+	const colors = useSetting( 'color.palette', contextName );
 	const userColors = getSetting( contextName, 'color.palette' );
 	const immutableColorSlugs = useSelect(
 		( select ) => {
@@ -40,17 +40,12 @@ export default function ColorPalettePanel( {
 				.__experimentalGlobalStylesBaseStyles;
 			const basePalette =
 				get( baseStyles, [
+					'settings',
+					'blocks',
 					contextName,
-					'settings',
 					'color',
 					'palette',
-				] ) ??
-				get( baseStyles, [
-					ALL_BLOCKS_NAME,
-					'settings',
-					'color',
-					'palette',
-				] );
+				] ) ?? get( baseStyles, [ 'settings', 'color', 'palette' ] );
 			if ( ! basePalette ) {
 				return EMPTY_ARRAY;
 			}

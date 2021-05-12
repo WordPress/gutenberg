@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import { button as icon } from '@wordpress/icons';
 
 /**
@@ -17,12 +17,7 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: _x( 'Button', 'block title' ),
-	description: __(
-		'Prompt visitors to take action with a button-style link.'
-	),
 	icon,
-	keywords: [ __( 'link' ) ],
 	example: {
 		attributes: {
 			className: 'is-style-fill',
@@ -30,10 +25,6 @@ export const settings = {
 			text: __( 'Call to Action' ),
 		},
 	},
-	styles: [
-		{ name: 'fill', label: __( 'Fill' ), isDefault: true },
-		{ name: 'outline', label: __( 'Outline' ) },
-	],
 	edit,
 	save,
 	deprecated,
