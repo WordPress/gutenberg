@@ -127,7 +127,7 @@ function gutenberg_override_translation_file( $file, $handle ) {
 	}
 
 	// Ignore scripts that are not found in the expected `build/` location.
-	$script_path = gutenberg_dir_path() . 'build/' . substr( $handle, 3 ) . '/index.js';
+	$script_path = gutenberg_dir_path() . 'build/' . substr( $handle, 3 ) . '/index.min.js';
 	if ( ! file_exists( $script_path ) ) {
 		return $file;
 	}
@@ -237,9 +237,9 @@ function gutenberg_register_packages_scripts( $scripts ) {
 	// else (for development or test) default to use the current time.
 	$default_version = defined( 'GUTENBERG_VERSION' ) && ! ( defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ) ? GUTENBERG_VERSION : time();
 
-	foreach ( glob( gutenberg_dir_path() . 'build/*/index.js' ) as $path ) {
+	foreach ( glob( gutenberg_dir_path() . 'build/*/index.min.js' ) as $path ) {
 		// Prefix `wp-` to package directory to get script handle.
-		// For example, `…/build/a11y/index.js` becomes `wp-a11y`.
+		// For example, `…/build/a11y/index.min.js` becomes `wp-a11y`.
 		$handle = 'wp-' . basename( dirname( $path ) );
 
 		// Replace `.js` extension with `.asset.php` to find the generated dependencies file.

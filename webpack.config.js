@@ -28,6 +28,7 @@ const { dependencies } = require( './package' );
 const {
 	NODE_ENV: mode = 'development',
 	WP_DEVTOOL: devtool = mode === 'production' ? false : 'source-map',
+	MINIMIZE,
 } = process.env;
 
 const WORDPRESS_NAMESPACE = '@wordpress/';
@@ -113,6 +114,7 @@ module.exports = {
 			mode === 'production' && ! process.env.WP_BUNDLE_ANALYZER,
 		minimizer: [
 			new TerserPlugin( {
+				test: /\.min\.js$/,
 				cache: true,
 				parallel: true,
 				sourceMap: mode !== 'production',
@@ -140,15 +142,17 @@ module.exports = {
 			const { entryModule } = chunk;
 			const { rawRequest } = entryModule;
 
+			const extension = MINIMIZE ? '.min.js' : '.js';
+
 			/*
 			 * If the file being built is a Core Block's frontend file,
 			 * we build it in the block's directory.
 			 */
 			if ( rawRequest && rawRequest.includes( '/frontend.js' ) ) {
-				return `./build/block-library/blocks/[name]/frontend.js`;
+				return `./build/block-library/blocks/[name]/frontend${ extension }`;
 			}
 
-			return './build/[name]/index.js';
+			return `./build/[name]/index${ extension }`;
 		},
 		path: __dirname,
 		library: [ 'wp', '[camelName]' ],
