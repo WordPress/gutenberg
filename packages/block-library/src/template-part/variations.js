@@ -4,9 +4,8 @@
 import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
 import * as icons from '@wordpress/icons';
-import { addFilter } from '@wordpress/hooks';
 
-function enhanceTemplatePartVariations( settings, name ) {
+export function enhanceTemplatePartVariations( settings, name ) {
 	if ( name !== 'core/template-part' ) {
 		return settings;
 	}
@@ -45,9 +44,3 @@ function enhanceTemplatePartVariations( settings, name ) {
 	}
 	return settings;
 }
-
-addFilter(
-	'blocks.registerBlockType',
-	'core/template-part',
-	enhanceTemplatePartVariations
-);
