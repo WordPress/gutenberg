@@ -17,6 +17,10 @@
 		"instance": {
 			"type": "object",
 			"default": null
+		},
+		"isWide": {
+			"type": "boolean",
+			"default": false
 		}
 	},
 	"supports": {

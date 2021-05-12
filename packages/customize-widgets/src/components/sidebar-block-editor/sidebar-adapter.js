@@ -252,6 +252,11 @@ export default class SidebarAdapter {
 		const settingId = widgetIdToSettingId( widgetId );
 		const setting = this.api( settingId );
 
+		const isWide = wp.customize.Widgets.data.availableWidgets.filter(
+			// eslint-disable-next-line camelcase
+			( { id_base } ) => id_base === idBase
+		)[ 0 ].is_wide;
+
 		if ( ! setting ) {
 			return null;
 		}
@@ -267,6 +272,7 @@ export default class SidebarAdapter {
 			idBase,
 			number,
 			instance,
+			isWide,
 		};
 
 		this.widgetsCache.set( instance, widget );

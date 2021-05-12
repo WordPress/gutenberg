@@ -5,7 +5,8 @@ import { useRef, useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import { store as noticesStore } from '@wordpress/notices';
 import { __ } from '@wordpress/i18n';
-
+import { Popover } from '@wordpress/components';
+import { useViewportMatch } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
@@ -17,6 +18,7 @@ export default function Form( {
 	id,
 	idBase,
 	instance,
+	isWide,
 	onChangeInstance,
 	onChangeHasPreview,
 } ) {
@@ -69,6 +71,24 @@ export default function Form( {
 			control.destroy();
 		};
 	}, [ id, idBase, instance, onChangeInstance, onChangeHasPreview ] );
+
+	const isMediumLargeViewport = useViewportMatch( 'small' );
+
+	if ( isWide && isMediumLargeViewport ) {
+		return (
+			<Popover focusOnMount={ false } position="bottom left">
+				<div
+					ref={ ref }
+					className="wp-block-legacy-widget__edit-form"
+					hidden={ ! isVisible }
+				>
+					<h3 className="wp-block-legacy-widget__edit-form-title">
+						{ title }
+					</h3>
+				</div>
+			</Popover>
+		);
+	}
 
 	return (
 		<div

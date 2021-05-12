@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import {
@@ -26,9 +31,16 @@ import NoPreview from './no-preview';
 import ConvertToBlocksButton from './convert-to-blocks-button';
 
 export default function Edit( props ) {
-	const { id, idBase } = props.attributes;
+	const { id, idBase, isWide } = props.attributes;
+
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			'is-wide-widget': isWide,
+		} ),
+	} );
+
 	return (
-		<div { ...useBlockProps() }>
+		<div { ...blockProps }>
 			{ ! id && ! idBase ? (
 				<Empty { ...props } />
 			) : (
@@ -73,7 +85,7 @@ function Empty( { attributes: { id, idBase }, setAttributes } ) {
 }
 
 function NotEmpty( {
-	attributes: { id, idBase, instance },
+	attributes: { id, idBase, instance, isWide },
 	setAttributes,
 	clientId,
 	isSelected,
@@ -168,6 +180,7 @@ function NotEmpty( {
 				id={ id }
 				idBase={ idBase }
 				instance={ instance }
+				isWide={ isWide }
 				onChangeInstance={ setInstance }
 				onChangeHasPreview={ setHasPreview }
 			/>
