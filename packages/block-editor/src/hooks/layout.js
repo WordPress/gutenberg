@@ -28,6 +28,7 @@ import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
+import { useCustomUnits } from '../components/unit-control';
 
 const isWeb = Platform.OS === 'web';
 const CSS_UNITS = [
@@ -67,6 +68,8 @@ function LayoutPanel( { setAttributes, attributes } ) {
 		return getSettings().supportsLayout;
 	}, [] );
 
+	const units = useCustomUnits( CSS_UNITS, 'layout.units' );
+
 	if ( ! themeSupportsLayout ) {
 		return null;
 	}
@@ -103,7 +106,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 											},
 										} );
 									} }
-									units={ CSS_UNITS }
+									units={ units }
 								/>
 								<Icon icon={ positionCenter } />
 							</div>
@@ -125,7 +128,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 											},
 										} );
 									} }
-									units={ CSS_UNITS }
+									units={ units }
 								/>
 								<Icon icon={ stretchWide } />
 							</div>
