@@ -51,7 +51,7 @@ function RichTextWrapper(
 	{
 		children,
 		tagName = 'div',
-		value: originalValue,
+		value: originalValue = '',
 		onChange: originalOnChange,
 		isSelected: originalIsSelected,
 		multiline,
@@ -517,11 +517,6 @@ ForwardedRichTextContainer.Content = ( {
 
 ForwardedRichTextContainer.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
-};
-
-ForwardedRichTextContainer.Content.defaultProps = {
-	format: 'string',
-	value: '',
 };
 
 /**

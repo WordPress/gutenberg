@@ -26,7 +26,6 @@ export function useRichText( {
 	selectionEnd,
 	placeholder,
 	preserveWhiteSpace,
-	format = 'string',
 	onSelectionChange,
 	onChange,
 	__unstableMultilineTag: multilineTag,
@@ -39,60 +38,6 @@ export function useRichText( {
 } ) {
 	const ref = useRef();
 	const [ activeFormats = [], setActiveFormats ] = useState();
-
-	/**
-	 * Converts the outside data structure to our internal representation.
-	 *
-	 * @param {*} string The outside value, data type depends on props.
-	 *
-	 * @return {Object} An internal rich-text value.
-	 */
-	function formatToValue( string ) {
-		if ( disableFormats ) {
-			return {
-				text: string,
-				formats: Array( string.length ),
-				replacements: Array( string.length ),
-			};
-		}
-
-		if ( format !== 'string' ) {
-			return string;
-		}
-
-		const result = create( {
-			html: string,
-			multilineTag,
-			multilineWrapperTags:
-				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
-			preserveWhiteSpace,
-		} );
-
-		result.formats = __unstableAfterParse( result );
-
-		return result;
-	}
-
-	/**
-	 * Converts the internal value to the external data format.
-	 *
-	 * @param {Object} val The internal rich-text value.
-	 *
-	 * @return {*} The external data format, data type depends on props.
-	 */
-	function valueToFormat( val ) {
-		if ( disableFormats ) {
-			return val.text;
-		}
-
-		if ( format !== 'string' ) {
-			return;
-		}
-
-		val.formats = __unstableBeforeSerialize( val );
-
-		return toHTMLString( { value: val, multilineTag, preserveWhiteSpace } );
-	}
 
 	function createRecord() {
 		const {
@@ -131,7 +76,19 @@ export function useRichText( {
 	const record = useRef();
 
 	function setRecordFromProps() {
-		record.current = formatToValue( value );
+		_value.current = value;
+		record.current = create( {
+			html: value,
+			multilineTag,
+			multilineWrapperTags:
+				multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
+			preserveWhiteSpace,
+		} );
+		if ( disableFormats ) {
+			record.current.formats = Array( value.length );
+			record.current.replacements = Array( value.length );
+		}
+		record.current.formats = __unstableAfterParse( record.current );
 		record.current.start = selectionStart;
 		record.current.end = selectionEnd;
 	}
@@ -147,12 +104,22 @@ export function useRichText( {
 	 * @param {Object} newRecord The record to sync and apply.
 	 */
 	function handleChange( newRecord ) {
+		applyRecord( newRecord );
+
 		if ( disableFormats ) {
-			newRecord.formats = Array( newRecord.text.length );
-			newRecord.replacements = Array( newRecord.text.length );
+			_value.current = newRecord.text;
+		} else {
+			_value.current = toHTMLString( {
+				value: {
+					...newRecord,
+					formats: __unstableBeforeSerialize( newRecord ),
+				},
+				multilineTag,
+				preserveWhiteSpace,
+			} );
 		}
 
-		applyRecord( newRecord );
+		record.current = newRecord;
 
 		const {
 			start,
@@ -161,9 +128,6 @@ export function useRichText( {
 			text,
 			activeFormats: newActiveFormats = [],
 		} = newRecord;
-
-		_value.current = valueToFormat( newRecord );
-		record.current = newRecord;
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
@@ -176,7 +140,6 @@ export function useRichText( {
 	}
 
 	function applyFromProps( { domOnly } = {} ) {
-		_value.current = value;
 		setRecordFromProps();
 		applyRecord( record.current, { domOnly } );
 	}
