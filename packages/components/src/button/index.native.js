@@ -13,7 +13,7 @@ import { isArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement, forwardRef } from '@wordpress/element';
+import { Children, cloneElement } from '@wordpress/element';
 import {
 	usePreferredColorScheme,
 	usePreferredColorSchemeStyle,
@@ -75,7 +75,7 @@ const styles = StyleSheet.create( {
 	},
 } );
 
-export function Button( props, ref ) {
+export function Button( props ) {
 	const {
 		children,
 		onClick,
@@ -93,7 +93,6 @@ export function Button( props, ref ) {
 		label,
 		shortcut,
 		tooltipPosition,
-		onLayout,
 	} = props;
 	const preferredColorScheme = usePreferredColorScheme();
 
@@ -163,8 +162,6 @@ export function Button( props, ref ) {
 			style={ styles.container }
 			disabled={ isDisabled }
 			testID={ testID }
-			onLayout={ onLayout }
-			ref={ ref }
 		>
 			<View style={ buttonViewStyle }>
 				<View style={ { flexDirection: 'row' } }>
@@ -195,10 +192,11 @@ export function Button( props, ref ) {
 			text={ label }
 			shortcut={ shortcut }
 			position={ tooltipPosition }
+			visible={ showTooltip === true }
 		>
 			{ element }
 		</Tooltip>
 	);
 }
 
-export default forwardRef( Button );
+export default Button;

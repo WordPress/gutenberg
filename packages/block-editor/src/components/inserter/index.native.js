@@ -8,12 +8,7 @@ import { delay } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	Dropdown,
-	ToolbarButton,
-	Picker,
-	Tooltip,
-} from '@wordpress/components';
+import { Dropdown, ToolbarButton, Picker } from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -43,31 +38,31 @@ const defaultRenderToggle = ( {
 	style,
 	onLongPress,
 } ) => (
-	<Tooltip
-		position="top right"
-		text={ __( 'Tap to add content' ) }
-		visible={ canViewEditorOnboarding }
-	>
-		<ToolbarButton
-			title={ __( 'Add block' ) }
-			icon={
-				<Icon
-					icon={ plusCircleFilled }
-					style={ style }
-					color={ style.color }
-				/>
-			}
-			onClick={ onToggle }
-			extraProps={ {
-				hint: __( 'Double tap to add a block' ),
-				// testID is present to disambiguate this element for native UI tests. It's not
-				// usually required for components. See: https://git.io/JeQ7G.
-				testID: 'add-block-button',
-				onLongPress,
-			} }
-			isDisabled={ disabled }
-		/>
-	</Tooltip>
+	<ToolbarButton
+		title={
+			canViewEditorOnboarding
+				? __( 'Tap to add content' )
+				: __( 'Add block' )
+		}
+		icon={
+			<Icon
+				icon={ plusCircleFilled }
+				style={ style }
+				color={ style.color }
+			/>
+		}
+		showTooltip={ canViewEditorOnboarding }
+		tooltipPosition="top right"
+		onClick={ onToggle }
+		extraProps={ {
+			hint: __( 'Double tap to add a block' ),
+			// testID is present to disambiguate this element for native UI tests. It's not
+			// usually required for components. See: https://git.io/JeQ7G.
+			testID: 'add-block-button',
+			onLongPress,
+		} }
+		isDisabled={ disabled }
+	/>
 );
 
 export class Inserter extends Component {
