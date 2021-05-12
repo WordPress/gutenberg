@@ -7,7 +7,13 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RawHTML, useRef, useCallback, forwardRef } from '@wordpress/element';
+import {
+	RawHTML,
+	useRef,
+	useCallback,
+	forwardRef,
+	useLayoutEffect,
+} from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	children as childrenSource,
@@ -296,7 +302,6 @@ function RichTextWrapper(
 		placeholder,
 		__unstableIsSelected: isSelected,
 		__unstableMultilineTag: multilineTag,
-		__unstableOnCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
 		__unstableDependencies: dependencies,
@@ -312,6 +317,30 @@ function RichTextWrapper(
 	} );
 
 	useCaretInFormat( hasActiveFormats );
+
+	const previousText = useRef();
+
+	// Must be set synchronously to make sure it applies to the last change.
+	useLayoutEffect( () => {
+		if ( ! previousText.current ) {
+			previousText.current = value.text;
+			return;
+		}
+
+		// Text input, so don't create an undo level for every character.
+		// Create an undo level after 1 second of no input.
+		if ( previousText.current !== value.text ) {
+			const timeout = window.setTimeout( () => {
+				__unstableMarkLastChangeAsPersistent();
+			}, 1000 );
+			previousText.current = value.text;
+			return () => {
+				window.clearTimeout( timeout );
+			};
+		}
+
+		__unstableMarkLastChangeAsPersistent();
+	}, [ adjustedValue, hasActiveFormats ] );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;

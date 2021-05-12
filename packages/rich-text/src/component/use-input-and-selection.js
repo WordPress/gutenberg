@@ -63,7 +63,6 @@ export function useInputAndSelection( props ) {
 
 		let isComposing = false;
 		let rafId;
-		let timeout;
 
 		function onInput( event ) {
 			// Do not trigger a change if characters are being composed.
@@ -90,7 +89,6 @@ export function useInputAndSelection( props ) {
 				applyRecord,
 				createRecord,
 				handleChange,
-				createUndoLevel,
 			} = propsRef.current;
 
 			// The browser formatted something or tried to insert HTML.
@@ -119,11 +117,7 @@ export function useInputAndSelection( props ) {
 				formats: oldActiveFormats,
 			} );
 
-			handleChange( change, { withoutHistory: true } );
-
-			// Create an undo level when input stops for over a second.
-			defaultView.clearTimeout( timeout );
-			timeout = defaultView.setTimeout( createUndoLevel, 1000 );
+			handleChange( change );
 		}
 
 		/**
@@ -309,7 +303,6 @@ export function useInputAndSelection( props ) {
 				handleSelectionChange
 			);
 			defaultView.cancelAnimationFrame( rafId );
-			defaultView.clearTimeout( timeout );
 		};
 	}, [] );
 }
