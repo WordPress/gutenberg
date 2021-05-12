@@ -705,7 +705,7 @@ Add the `typography` setting, and set the `fontSize` value to the preset that yo
 
 ### Elements
 
-With the `elements` setting, you can set defaults for HTML elements on the website and inside blocks.
+With the `elements` setting, you can set defaults for links and headings on the website and inside blocks.
 
 #### Elements on the website
 
