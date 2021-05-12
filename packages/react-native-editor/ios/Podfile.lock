@@ -1,7 +1,5 @@
 PODS:
   - boost-for-react-native (1.63.0)
-  - BVLinearGradient (2.5.6):
-    - React-Core
   - DoubleConversion (1.1.6)
   - FBLazyVector (0.64.0)
   - FBReactNativeSpec (0.64.0):
@@ -210,23 +208,6 @@ PODS:
     - React-jsi (= 0.64.0)
     - React-perflogger (= 0.64.0)
   - React-jsinspector (0.64.0)
-  - react-native-blur (0.8.0):
-    - React-Core
-  - react-native-get-random-values (1.4.0):
-    - React-Core
-  - react-native-keyboard-aware-scroll-view (0.8.8):
-    - React-Core
-  - react-native-safe-area (0.5.1):
-    - React-Core
-  - react-native-safe-area-context (3.1.1):
-    - React-Core
-  - react-native-slider (3.0.2):
-    - React-Core
-  - react-native-video (5.0.2):
-    - React-Core
-    - react-native-video/Video (= 5.0.2)
-  - react-native-video/Video (5.0.2):
-    - React-Core
   - React-perflogger (0.64.0)
   - React-RCTActionSheet (0.64.0):
     - React-Core/RCTActionSheetHeaders (= 0.64.0)
@@ -291,18 +272,6 @@ PODS:
     - React-cxxreact (= 0.64.0)
     - React-jsi (= 0.64.0)
     - React-perflogger (= 0.64.0)
-  - ReactNativeDarkMode (0.0.10):
-    - React-Core
-  - RNCMaskedView (0.1.10-wp):
-    - React-Core
-  - RNGestureHandler (1.6.0):
-    - React-Core
-  - RNReanimated (1.9.0):
-    - React-Core
-  - RNScreens (2.9.0):
-    - React-Core
-  - RNSVG (9.13.6-gb):
-    - React-Core
   - RNTAztecView (1.51.1):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.4)
@@ -310,7 +279,6 @@ PODS:
   - Yoga (1.14.0)
 
 DEPENDENCIES:
-  - BVLinearGradient (from `../../../node_modules/react-native-linear-gradient`)
   - DoubleConversion (from `../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec`)
   - FBLazyVector (from `../../../node_modules/react-native/Libraries/FBLazyVector`)
   - FBReactNativeSpec (from `../../../node_modules/react-native/React/FBReactNativeSpec`)
@@ -329,13 +297,6 @@ DEPENDENCIES:
   - React-jsi (from `../../../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../../../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../../../node_modules/react-native/ReactCommon/jsinspector`)
-  - "react-native-blur (from `../../../node_modules/@react-native-community/blur`)"
-  - react-native-get-random-values (from `../../../node_modules/react-native-get-random-values`)
-  - react-native-keyboard-aware-scroll-view (from `../../../node_modules/react-native-keyboard-aware-scroll-view`)
-  - react-native-safe-area (from `../../../node_modules/react-native-safe-area`)
-  - react-native-safe-area-context (from `../../../node_modules/react-native-safe-area-context`)
-  - "react-native-slider (from `../../../node_modules/@react-native-community/slider`)"
-  - react-native-video (from `../../../node_modules/react-native-video`)
   - React-perflogger (from `../../../node_modules/react-native/ReactCommon/reactperflogger`)
   - React-RCTActionSheet (from `../../../node_modules/react-native/Libraries/ActionSheetIOS`)
   - React-RCTAnimation (from `../../../node_modules/react-native/Libraries/NativeAnimation`)
@@ -348,12 +309,6 @@ DEPENDENCIES:
   - React-RCTVibration (from `../../../node_modules/react-native/Libraries/Vibration`)
   - React-runtimeexecutor (from `../../../node_modules/react-native/ReactCommon/runtimeexecutor`)
   - ReactCommon/turbomodule/core (from `../../../node_modules/react-native/ReactCommon`)
-  - ReactNativeDarkMode (from `../../../node_modules/react-native-dark-mode`)
-  - "RNCMaskedView (from `../../../node_modules/@react-native-community/masked-view`)"
-  - RNGestureHandler (from `../../../node_modules/react-native-gesture-handler`)
-  - RNReanimated (from `../../../node_modules/react-native-reanimated`)
-  - RNScreens (from `../../../node_modules/react-native-screens`)
-  - RNSVG (from `../../../node_modules/react-native-svg`)
   - RNTAztecView (from `../../react-native-aztec`)
   - Yoga (from `../../../node_modules/react-native/ReactCommon/yoga`)
 
@@ -363,8 +318,6 @@ SPEC REPOS:
     - WordPress-Aztec-iOS
 
 EXTERNAL SOURCES:
-  BVLinearGradient:
-    :path: "../../../node_modules/react-native-linear-gradient"
   DoubleConversion:
     :podspec: "../../../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec"
   FBLazyVector:
@@ -397,20 +350,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../../../node_modules/react-native/ReactCommon/jsinspector"
-  react-native-blur:
-    :path: "../../../node_modules/@react-native-community/blur"
-  react-native-get-random-values:
-    :path: "../../../node_modules/react-native-get-random-values"
-  react-native-keyboard-aware-scroll-view:
-    :path: "../../../node_modules/react-native-keyboard-aware-scroll-view"
-  react-native-safe-area:
-    :path: "../../../node_modules/react-native-safe-area"
-  react-native-safe-area-context:
-    :path: "../../../node_modules/react-native-safe-area-context"
-  react-native-slider:
-    :path: "../../../node_modules/@react-native-community/slider"
-  react-native-video:
-    :path: "../../../node_modules/react-native-video"
   React-perflogger:
     :path: "../../../node_modules/react-native/ReactCommon/reactperflogger"
   React-RCTActionSheet:
@@ -435,18 +374,6 @@ EXTERNAL SOURCES:
     :path: "../../../node_modules/react-native/ReactCommon/runtimeexecutor"
   ReactCommon:
     :path: "../../../node_modules/react-native/ReactCommon"
-  ReactNativeDarkMode:
-    :path: "../../../node_modules/react-native-dark-mode"
-  RNCMaskedView:
-    :path: "../../../node_modules/@react-native-community/masked-view"
-  RNGestureHandler:
-    :path: "../../../node_modules/react-native-gesture-handler"
-  RNReanimated:
-    :path: "../../../node_modules/react-native-reanimated"
-  RNScreens:
-    :path: "../../../node_modules/react-native-screens"
-  RNSVG:
-    :path: "../../../node_modules/react-native-svg"
   RNTAztecView:
     :path: "../../react-native-aztec"
   Yoga:
@@ -454,7 +381,6 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  BVLinearGradient: 48f1964a78bddfae412d1aac5f386c2949fe0306
   DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 49cbe4b43e445b06bf29199b6ad2057649e4c8f5
   FBReactNativeSpec: 420ad7ff87adc491b45199891c72ea531fa4926e
@@ -471,13 +397,6 @@ SPEC CHECKSUMS:
   React-jsi: 74341196d9547cbcbcfa4b3bbbf03af56431d5a1
   React-jsiexecutor: 06a9c77b56902ae7ffcdd7a4905f664adc5d237b
   React-jsinspector: 0ae35a37b20d5e031eb020a69cc5afdbd6406301
-  react-native-blur: ef741a08d020010ba65e411be0ab82d1d325e7ad
-  react-native-get-random-values: 03edb8dcc2d3f43e55aa67ea13b61b6723bbf047
-  react-native-keyboard-aware-scroll-view: 6cb84879bf07e4cc1caed18b11fb928e142adac6
-  react-native-safe-area: c9cf765aa2dd96159476a99633e7d462ce5bb94f
-  react-native-safe-area-context: c8da723dcddabe15afe95c9d31c56a0cf2b0141c
-  react-native-slider: 2e42dc91e7ab8b35a9c7f2eb3532729a41d0dbe2
-  react-native-video: b8767f54061e475ddd38c22375f46f4d93e5fdfd
   React-perflogger: 9c547d8f06b9bf00cb447f2b75e8d7f19b7e02af
   React-RCTActionSheet: 3080b6e12e0e1a5b313c8c0050699b5c794a1b11
   React-RCTAnimation: 3f96f21a497ae7dabf4d2f150ee43f906aaf516f
@@ -490,16 +409,10 @@ SPEC CHECKSUMS:
   React-RCTVibration: 0fd6b21751a33cb72fce1a4a33ab9678416d307a
   React-runtimeexecutor: cad74a1eaa53ee6e7a3620231939d8fe2c6afcf0
   ReactCommon: cfe2b7fd20e0dbd2d1185cd7d8f99633fbc5ff05
-  ReactNativeDarkMode: 6d807bc8373b872472c8541fc3341817d979a6fb
-  RNCMaskedView: 66caacf33c86eaa7d22b43178dd998257d5c2e4d
-  RNGestureHandler: 7a377d0580c9f07df99e590bbcefd616ee0e2626
-  RNReanimated: f05baf4cd76b6eab2e4d7e2b244424960b968918
-  RNScreens: 953633729a42e23ad0c93574d676b361e3335e8b
-  RNSVG: 46c4b680fe18237fa01eb7d7b311d77618fde31f
   RNTAztecView: 838a741e7a6528ccab0e3a8dc55e807a95b76b2f
   WordPress-Aztec-iOS: 870c93297849072aadfc2223e284094e73023e82
   Yoga: 8c8436d4171c87504c648ae23b1d81242bdf3bbf
 
-PODFILE CHECKSUM: 28fb859958404c6f475b269ea61da24cdb38043f
+PODFILE CHECKSUM: 690f94c2af63f6fc84fcb8873ad71ee38737e2c6
 
 COCOAPODS: 1.10.1
