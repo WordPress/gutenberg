@@ -30,7 +30,7 @@ import {
 } from '@wordpress/blocks';
 import { SVG, Rect, G, Path } from '@wordpress/components';
 import { Platform } from '@wordpress/element';
-import { parse as stageOneParse } from '@wordpress/block-serialization-default-parser';
+import { parse as parseBlocks } from '@wordpress/block-serialization-default-parser';
 
 /**
  * A block selection object.
@@ -1826,19 +1826,21 @@ export const __experimentalGetParsedPattern = createSelector(
 	( state ) => [ state.settings.__experimentalBlockPatterns ]
 );
 
-const __experimentalGetAllAllowedPatterns = createSelector(
+const getAllAllowedPatterns = createSelector(
 	( state ) => {
 		const patterns = state.settings.__experimentalBlockPatterns;
 		const { allowedBlockTypes } = getSettings( state );
 		const parsedPatterns = patterns.map( ( pattern ) => ( {
 			...pattern,
-			// We use the Stage I parser here for performance reasons.
-			// Since we only need the structure of the parsed content,
-			// Stage I parsing is enough here.
-			stageOneBlocks: stageOneParse( pattern.content ),
+			// We only need the overall block structure of the pattern. So, for
+			// performance reasons, we can parse the pattern's content using
+			// the raw blocks parser, also known as the "stage I" block parser.
+			// This is about 250x faster than the full parse that the Block API
+			// offers.
+			blockNodes: parseBlocks( pattern.content ),
 		} ) );
-		const allowedPatterns = parsedPatterns.filter( ( { stageOneBlocks } ) =>
-			checkAllowListRecursive( stageOneBlocks, allowedBlockTypes )
+		const allowedPatterns = parsedPatterns.filter( ( { blockNodes } ) =>
+			checkAllowListRecursive( blockNodes, allowedBlockTypes )
 		);
 		return allowedPatterns;
 	},
@@ -1849,7 +1851,7 @@ const __experimentalGetAllAllowedPatterns = createSelector(
 );
 
 /**
- * Returns the list of allowed patterns for inner blocks children
+ * Returns the list of allowed patterns for inner blocks children.
  *
  * @param {Object}  state        Editor state.
  * @param {?string} rootClientId Optional target root client ID.
@@ -1858,13 +1860,11 @@ const __experimentalGetAllAllowedPatterns = createSelector(
  */
 export const __experimentalGetAllowedPatterns = createSelector(
 	( state, rootClientId = null ) => {
-		const availableParsedPatterns = __experimentalGetAllAllowedPatterns(
-			state
-		);
+		const availableParsedPatterns = getAllAllowedPatterns( state );
 		const patternsAllowed = filter(
 			availableParsedPatterns,
-			( { stageOneBlocks } ) =>
-				stageOneBlocks.every( ( { blockName } ) =>
+			( { blockNodes } ) =>
+				blockNodes.every( ( { blockName } ) =>
 					canInsertBlockType( state, blockName, rootClientId )
 				)
 		);
