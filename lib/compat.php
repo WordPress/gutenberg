@@ -11,10 +11,22 @@
 /**
  * Determine if the current theme needs to load separate block styles or not.
  *
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
+ *
  * @return bool
  */
 function gutenberg_should_load_separate_block_assets() {
-	$load_separate_styles = gutenberg_is_fse_theme();
+	if ( function_exists( 'should_load_separate_core_block_assets' ) ) {
+		return should_load_separate_core_block_assets();
+	}
+
+	if ( is_admin() || is_feed() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		return false;
+	}
+
+	// The `separate_core_block_assets` filter was added in WP 5.8.
+	$load_separate_styles = apply_filters( 'separate_core_block_assets', gutenberg_is_fse_theme() );
+
 	/**
 	 * Determine if separate styles will be loaded for blocks on-render or not.
 	 *
@@ -24,6 +36,21 @@ function gutenberg_should_load_separate_block_assets() {
 	 */
 	return apply_filters( 'load_separate_block_assets', $load_separate_styles );
 }
+
+/**
+ * Opt-in to separate styles loading for block themes in WordPress 5.8.
+ *
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
+ */
+add_filter(
+	'separate_core_block_assets',
+	function( $load_separate_styles ) {
+		if ( function_exists( 'gutenberg_is_fse_theme' ) && gutenberg_is_fse_theme() ) {
+			return true;
+		}
+		return $load_separate_styles;
+	}
+);
 
 /**
  * Remove the `wp_enqueue_registered_block_scripts_and_styles` hook if needed.

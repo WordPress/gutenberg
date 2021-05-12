@@ -17,7 +17,10 @@ export {
 	getAnimateClassName as __unstableGetAnimateClassName,
 } from './animate';
 export { default as AnglePickerControl } from './angle-picker-control';
-export { default as Autocomplete } from './autocomplete';
+export {
+	default as Autocomplete,
+	useAutocompleteProps as __unstableUseAutocompleteProps,
+} from './autocomplete';
 export { default as BaseControl } from './base-control';
 export { default as __experimentalBoxControl } from './box-control';
 export { default as Button } from './button';
