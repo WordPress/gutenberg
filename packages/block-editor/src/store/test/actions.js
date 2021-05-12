@@ -1187,7 +1187,7 @@ describe( 'actions', () => {
 			fulfillment.next();
 			expect( fulfillment.next( blockA ) ).toEqual( {
 				done: false,
-				value: selectBlock( 'chicken' ),
+				value: selectBlock( 'chicken', -1 ),
 			} );
 			expect( fulfillment.next( blockA ).done ).toEqual( true );
 		} );
@@ -1236,15 +1236,6 @@ describe( 'actions', () => {
 				attributeKey: 'content',
 				offset: 0,
 			} );
-			// selectionChange
-			fulfillment.next(
-				selectionChange(
-					blockA.clientId,
-					'content',
-					'chicken'.length + 1,
-					'chicken'.length + 1
-				)
-			);
 			fulfillment.next();
 			fulfillment.next();
 			expect( fulfillment.next( blockA ).value ).toMatchObject( {
@@ -1258,6 +1249,15 @@ describe( 'actions', () => {
 					},
 				],
 			} );
+			fulfillment.next();
+			expect( fulfillment.next().value ).toEqual(
+				selectionChange(
+					blockA.clientId,
+					'content',
+					'chicken'.length + 1,
+					'chicken'.length + 1
+				)
+			);
 		} );
 
 		it( 'should not merge the blocks have different types without transformation', () => {
@@ -1382,22 +1382,11 @@ describe( 'actions', () => {
 				storeKey: blockEditorStoreName,
 				type: '@@data/SELECT',
 			} );
-			expect(
-				fulfillment.next( {
-					clientId: blockB.clientId,
-					attributeKey: 'content2',
-					offset: 0,
-				} ).value
-			).toEqual(
-				selectionChange(
-					blockA.clientId,
-					'content',
-					'chicken'.length + 1,
-					'chicken'.length + 1
-				)
-			);
-
-			fulfillment.next();
+			fulfillment.next( {
+				clientId: blockB.clientId,
+				attributeKey: 'content2',
+				offset: 0,
+			} );
 			fulfillment.next();
 			fulfillment.next();
 			expect( fulfillment.next( blockA ).value ).toMatchObject( {
@@ -1411,6 +1400,15 @@ describe( 'actions', () => {
 					},
 				],
 			} );
+			fulfillment.next();
+			expect( fulfillment.next().value ).toEqual(
+				selectionChange(
+					blockA.clientId,
+					'content',
+					'chicken'.length + 1,
+					'chicken'.length + 1
+				)
+			);
 		} );
 	} );
 
