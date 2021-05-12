@@ -31,7 +31,6 @@
 		"__experimentalFontFamily": true,
 		"__experimentalTextTransform": true,
 		"__experimentalFontStyle": true,
-		"__experimentalFontWeight": true,
-		"__experimentalTextDecoration": true
+		"__experimentalFontWeight": true
 	}
 }
