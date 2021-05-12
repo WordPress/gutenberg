@@ -120,18 +120,24 @@ function HeaderToolbar( {
 }
 
 export default compose( [
-	withSelect( ( select ) => ( {
-		hasRedo: select( editorStore ).hasEditorRedo(),
-		hasUndo: select( editorStore ).hasEditorUndo(),
-		// This setting (richEditingEnabled) should not live in the block editor's setting.
-		showInserter:
-			select( editPostStore ).getEditorMode() === 'visual' &&
-			select( editorStore ).getEditorSettings().richEditingEnabled,
-		isTextModeEnabled: select( editPostStore ).getEditorMode() === 'text',
-		isRTL: select( blockEditorStore ).getSettings().isRTL,
-		canViewEditorOnboarding: select( blockEditorStore ).getSettings()
-			.canViewEditorOnboarding,
-	} ) ),
+	withSelect( ( select ) => {
+		const { hasEditorRedo, hasEditorUndo, getEditorSettings } = select(
+			editorStore
+		);
+		const { getEditorMode } = select( editPostStore );
+		const { getSettings } = select( blockEditorStore );
+		return {
+			hasRedo: hasEditorRedo(),
+			hasUndo: hasEditorUndo(),
+			// This setting (richEditingEnabled) should not live in the block editor's setting.
+			showInserter:
+				getEditorMode() === 'visual' &&
+				getEditorSettings().richEditingEnabled,
+			isTextModeEnabled: getEditorMode() === 'text',
+			isRTL: getSettings().isRTL,
+			canViewEditorOnboarding: getSettings().canViewEditorOnboarding,
+		};
+	} ),
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock } = dispatch( blockEditorStore );
 		const { togglePostTitleSelection } = dispatch( editorStore );
