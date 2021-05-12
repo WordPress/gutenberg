@@ -50,19 +50,19 @@ const deprecatedFlags = {
 };
 
 /**
- * Hook that retrieves the setting for the given editor feature.
+ * Hook that retrieves the editor setting.
  * It works with nested objects using by finding the value at path.
  *
- * @param {string} featurePath The path to the feature.
+ * @param {string} path The path to the setting.
  *
  * @return {any} Returns the value defined for the setting.
  *
  * @example
  * ```js
- * const isEnabled = useEditorFeature( 'typography.dropCap' );
+ * const isEnabled = useSetting( 'typography.dropCap' );
  * ```
  */
-export default function useEditorFeature( featurePath ) {
+export default function useSetting( path ) {
 	const { name: blockName } = useBlockEditContext();
 
 	const setting = useSelect(
@@ -71,8 +71,8 @@ export default function useEditorFeature( featurePath ) {
 
 			// 1 - Use __experimental features, if available.
 			// We cascade to the all value if the block one is not available.
-			const defaultsPath = `__experimentalFeatures.${ featurePath }`;
-			const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ featurePath }`;
+			const defaultsPath = `__experimentalFeatures.${ path }`;
+			const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
 			const experimentalFeaturesResult =
 				get( settings, blockPath ) ?? get( settings, defaultsPath );
 			if ( experimentalFeaturesResult !== undefined ) {
@@ -80,8 +80,8 @@ export default function useEditorFeature( featurePath ) {
 			}
 
 			// 2 - Use deprecated settings, otherwise.
-			const deprecatedSettingsValue = deprecatedFlags[ featurePath ]
-				? deprecatedFlags[ featurePath ]( settings )
+			const deprecatedSettingsValue = deprecatedFlags[ path ]
+				? deprecatedFlags[ path ]( settings )
 				: undefined;
 			if ( deprecatedSettingsValue !== undefined ) {
 				return deprecatedSettingsValue;
@@ -91,9 +91,9 @@ export default function useEditorFeature( featurePath ) {
 			// This is only necessary to support typography.dropCap.
 			// when __experimentalFeatures are not present (core without plugin).
 			// To remove when __experimentalFeatures are ported to core.
-			return featurePath === 'typography.dropCap' ? true : undefined;
+			return path === 'typography.dropCap' ? true : undefined;
 		},
-		[ blockName, featurePath ]
+		[ blockName, path ]
 	);
 
 	return setting;

@@ -12,7 +12,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import { cleanEmptyObject } from './utils';
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 import FontFamilyControl from '../components/font-family';
 
 export const FONT_FAMILY_SUPPORT_KEY = '__experimentalFontFamily';
@@ -35,7 +35,7 @@ export function FontFamilyEdit( {
 	setAttributes,
 	attributes: { style = {} },
 } ) {
-	const fontFamilies = useEditorFeature( 'typography.fontFamilies' );
+	const fontFamilies = useSetting( 'typography.fontFamilies' );
 	const isDisable = useIsFontFamilyDisabled( { name } );
 
 	if ( isDisable ) {
@@ -82,7 +82,7 @@ export function FontFamilyEdit( {
  * @return {boolean} Whether setting is disabled.
  */
 export function useIsFontFamilyDisabled( { name } ) {
-	const fontFamilies = useEditorFeature( 'typography.fontFamilies' );
+	const fontFamilies = useSetting( 'typography.fontFamilies' );
 	return (
 		! fontFamilies ||
 		fontFamilies.length === 0 ||
