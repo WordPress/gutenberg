@@ -1,5 +1,5 @@
-$tooltipColor: #121212;
-$tooltipArrowSize: 6px;
+$tooltipColor: #2c2c2d;
+$tooltipArrowSize: 8px;
 $tooltipArrowOffset: -( $tooltipArrowSize - 1 );
 
 .tooltip {
@@ -13,7 +13,8 @@ $tooltipArrowOffset: -( $tooltipArrowSize - 1 );
 
 .tooltip__text {
 	color: $white;
-	padding: 12px 16px;
+	font-size: 14px;
+	padding: 16px 14px;
 }
 
 .tooltip__arrow {
