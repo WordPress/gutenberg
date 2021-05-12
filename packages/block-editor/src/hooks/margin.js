@@ -49,11 +49,10 @@ export function MarginEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const isDisabled = useIsMarginDisabled( props );
 	const units = useCustomUnits();
 	const sides = useCustomSides( blockName, 'margin' );
 
-	if ( ! hasMarginSupport( blockName ) || isDisabled ) {
+	if ( useIsMarginDisabled( { name: blockName } ) ) {
 		return null;
 	}
 

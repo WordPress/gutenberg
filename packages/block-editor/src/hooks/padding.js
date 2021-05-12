@@ -79,11 +79,10 @@ export function PaddingEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const isDisabled = useIsPaddingDisabled( props );
 	const units = useCustomUnits( CSS_UNITS );
 	const sides = useCustomSides( blockName, 'padding' );
 
-	if ( ! hasPaddingSupport( blockName ) || isDisabled ) {
+	if ( useIsPaddingDisabled( { name: blockName } ) ) {
 		return null;
 	}
 
