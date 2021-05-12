@@ -13,14 +13,14 @@ import { __, _x, sprintf } from '@wordpress/i18n';
 import Cell from './cell';
 
 export default function BottomSheetSwitchCell( props ) {
-	const { value, onValueChange, help, ...cellProps } = props;
+	const { value, onValueChange, ...cellProps } = props;
 
 	const onPress = () => {
 		onValueChange( ! value );
 	};
 
 	const getAccessibilityLabel = () => {
-		if ( isEmpty( help ) ) {
+		if ( isEmpty( cellProps.help ) ) {
 			return value
 				? sprintf(
 						/* translators: accessibility text. Switch setting ON state. %s: Switch title. */
@@ -38,13 +38,13 @@ export default function BottomSheetSwitchCell( props ) {
 					/* translators: accessibility text. Switch setting ON state. %1: Switch title, %2: switch help. */
 					_x( '%1$s, %2$s. On', 'switch control' ),
 					cellProps.label,
-					help
+					cellProps.help
 			  )
 			: sprintf(
 					/* translators: accessibility text. Switch setting OFF state. %1: Switch title, %2: switch help. */
 					_x( '%1$s, %2$s. Off', 'switch control' ),
 					cellProps.label,
-					help
+					cellProps.help
 			  );
 	};
 
