@@ -11,6 +11,7 @@ import {
 	createContext,
 	useContext,
 	useEffect,
+	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
@@ -180,11 +181,11 @@ const TooltipSlot = ( { children, ...rest } ) => {
 			setHandleScreenTouch( null );
 		}
 	};
+	// Memoize context value to avoid unnecessary rerenders of the Provider's children
+	const value = useMemo( () => ( { onHandleScreenTouch } ) );
 
 	return (
-		// TODO(David): We may should avoid new object generation for value in the
-		// render. https://reactjs.org/docs/context.html#caveats
-		<TooltipContext.Provider value={ { onHandleScreenTouch } }>
+		<TooltipContext.Provider value={ value }>
 			<View
 				onTouchStart={ handleTouchStart }
 				pointerEvents="box-none"
