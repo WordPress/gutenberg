@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { mapMenuItemsToBlocks } from '../resolvers';
+import menuItemsToBlocks from '../menu-items-to-blocks';
 
 /**
  * WordPress dependencies
@@ -34,7 +34,7 @@ describe( 'converting menu items to blocks', () => {
 	} );
 
 	it( 'converts an flat structure of menu item objects to blocks', () => {
-		let { innerBlocks: actual } = mapMenuItemsToBlocks( [
+		let { innerBlocks: actual } = menuItemsToBlocks( [
 			{
 				id: 1,
 				title: {
@@ -88,7 +88,7 @@ describe( 'converting menu items to blocks', () => {
 	} );
 
 	it( 'converts an nested structure of menu item objects to nested blocks', () => {
-		let { innerBlocks: actual } = mapMenuItemsToBlocks( [
+		let { innerBlocks: actual } = menuItemsToBlocks( [
 			{
 				id: 1,
 				title: {
@@ -251,12 +251,12 @@ describe( 'converting menu items to blocks', () => {
 	} );
 
 	it( 'respects menu order when converting to blocks', () => {
-		let { innerBlocks: actual } = mapMenuItemsToBlocks( [
+		let { innerBlocks: actual } = menuItemsToBlocks( [
 			{
 				id: 1,
 				title: {
-					raw: 'Ordered 4th',
-					rendered: 'Ordered 4th',
+					raw: 'Ordered 5th',
+					rendered: 'Ordered 5th',
 				},
 				url: 'http://localhost:8889/item-1/',
 				attr_title: '',
@@ -273,8 +273,8 @@ describe( 'converting menu items to blocks', () => {
 			{
 				id: 2,
 				title: {
-					raw: 'Ordered 1st',
-					rendered: 'Ordered 1st',
+					raw: 'Ordered 2nd',
+					rendered: 'Ordered 2nd',
 				},
 				url: 'http://localhost:8889/',
 				attr_title: '',
@@ -291,8 +291,8 @@ describe( 'converting menu items to blocks', () => {
 			{
 				id: 3,
 				title: {
-					raw: 'Ordered 3rd',
-					rendered: 'Ordered 3rd',
+					raw: 'Ordered 4th',
+					rendered: 'Ordered 4th',
 				},
 				url: 'http://localhost:8889/',
 				attr_title: '',
@@ -309,8 +309,8 @@ describe( 'converting menu items to blocks', () => {
 			{
 				id: 4,
 				title: {
-					raw: 'Ordered 2nd',
-					rendered: 'Ordered 2nd',
+					raw: 'Ordered 3rd',
+					rendered: 'Ordered 3rd',
 				},
 				url: 'http://localhost:8889/',
 				attr_title: '',
@@ -320,6 +320,24 @@ describe( 'converting menu items to blocks', () => {
 				object: 'custom',
 				parent: 0,
 				menu_order: 20,
+				target: '',
+				classes: [ '' ],
+				xfn: [ '' ],
+			},
+			{
+				id: 5,
+				title: {
+					raw: 'Ordered 1st',
+					rendered: 'Ordered 1st',
+				},
+				url: 'http://localhost:8889/',
+				attr_title: '',
+				description: '',
+				type: 'custom',
+				type_label: 'Custom Link',
+				object: 'custom',
+				parent: 0,
+				menu_order: 0, // capturing 0 edge case.
 				target: '',
 				classes: [ '' ],
 				xfn: [ '' ],
@@ -353,11 +371,17 @@ describe( 'converting menu items to blocks', () => {
 					label: 'Ordered 4th',
 				} ),
 			} ),
+			expect.objectContaining( {
+				name: 'core/navigation-link',
+				attributes: expect.objectContaining( {
+					label: 'Ordered 5th',
+				} ),
+			} ),
 		] );
 	} );
 
 	it( 'returns an empty array when menu items argument is an empty array', () => {
-		const { innerBlocks: actual } = mapMenuItemsToBlocks( [] );
+		const { innerBlocks: actual } = menuItemsToBlocks( [] );
 		expect( actual ).toEqual( [] );
 	} );
 } );
