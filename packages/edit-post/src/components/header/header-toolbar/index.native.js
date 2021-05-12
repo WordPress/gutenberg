@@ -31,6 +31,7 @@ import styles from './style.scss';
 import { store as editPostStore } from '../../../store';
 
 function HeaderToolbar( {
+	canViewEditorOnboarding,
 	hasRedo,
 	hasUndo,
 	redo,
@@ -92,7 +93,7 @@ function HeaderToolbar( {
 				<Tooltip
 					position="top right"
 					text={ __( 'Tap to add content' ) }
-					visible={ true }
+					visible={ canViewEditorOnboarding }
 				>
 					{ /* TODO(David): Wrapper View added as quick way to avoid the need to forward refs */ }
 					<View style={ { alignItems: 'center' } }>
@@ -128,6 +129,8 @@ export default compose( [
 			select( editorStore ).getEditorSettings().richEditingEnabled,
 		isTextModeEnabled: select( editPostStore ).getEditorMode() === 'text',
 		isRTL: select( blockEditorStore ).getSettings().isRTL,
+		canViewEditorOnboarding: select( blockEditorStore ).getSettings()
+			.canViewEditorOnboarding,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock } = dispatch( blockEditorStore );
