@@ -20,6 +20,7 @@ import {
 	select,
 	apiFetch,
 } from './controls';
+import { NAVIGATION_POST_KIND, NAVIGATION_POST_POST_TYPE } from '../constants';
 import {
 	menuItemsQuery,
 	serializeProcessing,
@@ -135,6 +136,16 @@ export const saveNavigationPost = serializeProcessing( function* ( post ) {
 		if ( ! batchSaveResponse.success ) {
 			throw new Error( batchSaveResponse.data.message );
 		}
+
+		// Clear "stub" navigation post edits to avoid a false "dirty" state.
+		yield dispatch(
+			'core',
+			'receiveEntityRecords',
+			NAVIGATION_POST_KIND,
+			NAVIGATION_POST_POST_TYPE,
+			[ post ],
+			undefined
+		);
 
 		yield dispatch(
 			noticesStore,
