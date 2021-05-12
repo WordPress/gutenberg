@@ -9,7 +9,7 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 /**
  * Internal dependencies
  */
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
 import { cleanEmptyObject } from './utils';
 import { useCustomUnits } from '../components/unit-control';
@@ -61,7 +61,7 @@ export function hasPaddingSupport( blockType ) {
  * @return {boolean}                 Whether padding setting is disabled.
  */
 export function useIsPaddingDisabled( { name: blockName } = {} ) {
-	const isDisabled = ! useEditorFeature( 'spacing.customPadding' );
+	const isDisabled = ! useSetting( 'spacing.customPadding' );
 	return ! hasPaddingSupport( blockName ) || isDisabled;
 }
 
@@ -82,7 +82,7 @@ export function PaddingEdit( props ) {
 	const units = useCustomUnits( CSS_UNITS );
 	const sides = useCustomSides( blockName, 'padding' );
 
-	if ( ! hasPaddingSupport( blockName ) ) {
+	if ( useIsPaddingDisabled( props ) ) {
 		return null;
 	}
 

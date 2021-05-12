@@ -7,7 +7,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import TextDecorationControl from '../components/text-decoration-control';
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -64,9 +64,7 @@ export function useIsTextDecorationDisabled( { name: blockName } = {} ) {
 		blockName,
 		TEXT_DECORATION_SUPPORT_KEY
 	);
-	const hasTextDecoration = useEditorFeature(
-		'typography.customTextDecorations'
-	);
+	const hasTextDecoration = useSetting( 'typography.customTextDecorations' );
 
 	return notSupported || ! hasTextDecoration;
 }
