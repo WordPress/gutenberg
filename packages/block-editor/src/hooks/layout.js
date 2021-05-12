@@ -26,7 +26,7 @@ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
  */
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
 
 const isWeb = Platform.OS === 'web';
@@ -61,7 +61,7 @@ const CSS_UNITS = [
 function LayoutPanel( { setAttributes, attributes } ) {
 	const { layout = {} } = attributes;
 	const { wideSize, contentSize, inherit = false } = layout;
-	const defaultLayout = useEditorFeature( 'layout' );
+	const defaultLayout = useSetting( 'layout' );
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().supportsLayout;
@@ -215,7 +215,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const { name, attributes } = props;
 		const supportLayout = hasBlockSupport( name, '__experimentalLayout' );
 		const id = useInstanceId( BlockListBlock );
-		const defaultLayout = useEditorFeature( 'layout' ) || {};
+		const defaultLayout = useSetting( 'layout' ) || {};
 		if ( ! supportLayout ) {
 			return <BlockListBlock { ...props } />;
 		}

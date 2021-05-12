@@ -93,6 +93,7 @@ export default function TemplatePartPlaceholder( {
 							<TemplatePartSelection
 								setAttributes={ setAttributes }
 								onClose={ onClose }
+								area={ area }
 							/>
 						) }
 					/>

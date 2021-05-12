@@ -25,6 +25,7 @@
 		"src/scroll-lock/**/*",
 		"src/shortcut/**/*",
 		"src/spinner/**/*",
+		"src/spacer/**/*",
 		"src/tip/**/*",
 		"src/truncate/**/*",
 		"src/ui/**/*",
@@ -34,7 +35,8 @@
 		"src/grid/**/*",
 		"src/__next/**/*",
 		"src/h-stack/**/*",
-		"src/v-stack/**/*"
+		"src/v-stack/**/*",
+		"src/view/**/*"
 	],
 	"exclude": [
 		"src/**/*.android.js",
