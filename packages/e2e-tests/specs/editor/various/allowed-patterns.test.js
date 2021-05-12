@@ -9,7 +9,7 @@ import {
 	toggleGlobalBlockInserter,
 } from '@wordpress/e2e-test-utils';
 
-const checkPatternExistance = async ( name, available = true ) => {
+const checkPatternExistence = async ( name, available = true ) => {
 	await searchForPattern( name );
 	const patternElement = await page.waitForXPath(
 		`//div[@role = 'option']//div[contains(text(), '${ name }')]`,
@@ -38,7 +38,7 @@ describe( 'Allowed Patterns', () => {
 	describe( 'Disable blocks plugin disabled', () => {
 		for ( const [ patternName ] of TEST_PATTERNS ) {
 			it( `should show test pattern "${ patternName }"`, async () => {
-				expect( await checkPatternExistance( patternName, true ) ).toBe(
+				expect( await checkPatternExistence( patternName, true ) ).toBe(
 					true
 				);
 			} );
@@ -63,7 +63,7 @@ describe( 'Allowed Patterns', () => {
 				shouldBeAvailable ? '' : ' not'
 			} show test "pattern ${ patternName }"`, async () => {
 				expect(
-					await checkPatternExistance(
+					await checkPatternExistence(
 						patternName,
 						shouldBeAvailable
 					)
