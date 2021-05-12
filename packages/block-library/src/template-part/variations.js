@@ -11,7 +11,11 @@ const unsubscribe = subscribe( () => {
 		editorStore
 	).__experimentalGetDefaultTemplatePartAreas();
 
-	if ( ! definedVariations?.length ) {
+	const templatePartBlockType = select( blocksStore ).getBlockType(
+		'core/template-part'
+	);
+
+	if ( ! ( definedVariations?.length && templatePartBlockType ) ) {
 		return;
 	}
 	unsubscribe();
