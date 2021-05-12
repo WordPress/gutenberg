@@ -110,4 +110,9 @@
 	&.is-vertically-aligned-bottom {
 		width: 100%;
 	}
+
+	// Use of !important is required to remove border support styles.
+	&:last-child {
+		border-right: none !important;
+	}
 }
