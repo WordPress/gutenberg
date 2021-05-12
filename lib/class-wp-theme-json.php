@@ -73,6 +73,7 @@ class WP_Theme_JSON {
 			'fontSize'       => null,
 			'fontStyle'      => null,
 			'fontWeight'     => null,
+			'letterSpacing'  => null,
 			'lineHeight'     => null,
 			'textDecoration' => null,
 			'textTransform'  => null,

@@ -15,6 +15,9 @@ import {
 	isLetterSpacingDefined,
 } from './utils';
 
+const MIN_LETTER_SPACING = -5;
+const MAX_LETTER_SPACING = 10;
+
 export default function LetterSpacingControl( {
 	value: letterSpacing,
 	onChange,
@@ -36,7 +39,7 @@ export default function LetterSpacingControl( {
 	};
 
 	const handleOnChange = ( nextValue ) => {
-		// Set the next value without modification if lineHeight has been defined
+		// Set the next value without modification if letter spacing has been defined
 		if ( isDefined ) {
 			onChange( nextValue );
 			return;
@@ -67,7 +70,7 @@ export default function LetterSpacingControl( {
 	const value = isDefined ? letterSpacing : RESET_VALUE;
 
 	return (
-		<div className="block-editor-line-height-control">
+		<div className="block-editor-letter-spacing-control">
 			<TextControl
 				autoComplete="off"
 				onKeyDown={ handleOnKeyDown }
@@ -77,7 +80,8 @@ export default function LetterSpacingControl( {
 				step={ STEP }
 				type="number"
 				value={ value }
-				min={ 0 }
+				min={ MIN_LETTER_SPACING }
+				max={ MAX_LETTER_SPACING }
 			/>
 		</div>
 	);

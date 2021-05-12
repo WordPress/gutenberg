@@ -26,6 +26,7 @@ function gutenberg_register_typography_support( $block_type ) {
 	$has_typography_support = $has_font_size_support
 		|| $has_font_weight_support
 		|| $has_font_style_support
+		|| $has_letter_spacing_support
 		|| $has_line_height_support
 		|| $has_text_transform_support
 		|| $has_text_decoration_support;
@@ -135,11 +136,6 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 
 	// Letter Spacing.
 	if ( $has_letter_spacing_support ) {
-/*		$has_letter_spacing = isset( $block_attributes['style']['typography']['letterSpacing'] );
-		// Apply letter spacing.
-		if ( $has_letter_spacing ) {
-			$styles[] = sprintf( 'letter-spacing: %s;', $block_attributes['style']['typography']['letterSpacing'] );
-		}*/
 		$letter_spacing_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'letterSpacing', 'letter-spacing' );
 		if ( $letter_spacing_style ) {
 			$styles[] = $letter_spacing_style;

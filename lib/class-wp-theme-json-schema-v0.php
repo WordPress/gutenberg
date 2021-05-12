@@ -82,6 +82,7 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 				'fontSize'       => null,
 				'fontStyle'      => null,
 				'fontWeight'     => null,
+				'letterSpacing'  => null,
 				'lineHeight'     => null,
 				'textDecoration' => null,
 				'textTransform'  => null,

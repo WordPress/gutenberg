@@ -38,6 +38,7 @@ export function useIsLetterSpacingDisabled( { name: blockName } = {} ) {
 export function LetterSpacingEdit( props ) {
 	const {
 		attributes: { style },
+		setAttributes,
 	} = props;
 
 	if ( useIsLetterSpacingDisabled( props ) ) {
@@ -49,17 +50,18 @@ export function LetterSpacingEdit( props ) {
 			...style,
 			typography: {
 				...style?.typography,
-				letterSpacing: newLetterSpacingValue,
+				letterSpacing: parseInt( newLetterSpacingValue, 10 ),
 			},
 		};
-		props.setAttributes( {
+
+		setAttributes( {
 			style: cleanEmptyObject( newStyle ),
 		} );
 	};
 
 	return (
 		<LetterSpacingControl
-			value={ style?.typography?.lineHeight }
+			value={ style?.typography?.letterSpacing }
 			onChange={ onChange }
 		/>
 	);

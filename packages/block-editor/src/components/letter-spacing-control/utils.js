@@ -1,5 +1,5 @@
-export const BASE_DEFAULT_VALUE = 1.5;
-export const STEP = 0.1;
+export const BASE_DEFAULT_VALUE = 0;
+export const STEP = 1;
 /**
  * There are varying value types within LetterSpacingControl:
  *

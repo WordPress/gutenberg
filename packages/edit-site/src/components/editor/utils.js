@@ -23,6 +23,7 @@ export const ROOT_BLOCK_SUPPORTS = [
 	'fontSize',
 	'fontStyle',
 	'fontWeight',
+	'letterSpacing',
 	'lineHeight',
 	'textDecoration',
 	'textTransform',
