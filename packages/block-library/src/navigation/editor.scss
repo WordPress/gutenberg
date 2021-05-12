@@ -11,29 +11,6 @@
 		margin-left: 0;
 		padding-left: 0;
 	}
-
-	// Unset horizontal and vertical margin rules from editor normalization stylesheet.
-	// Both margin-left: auto; and margin-right: auto; from .wp-block, and also
-	// margin: revert; from .editor-styles-wrapper ul li.
-	.block-editor-block-list__block {
-		margin: 0;
-
-		// This CSS provides a little spacing between blocks.
-		// It matches a rule in style.scss exactly, but needs higher specificity due to the unsetting of inherited styles above.
-		&.wp-block-navigation-link {
-			margin: 0 0.5em 0 0;
-		}
-
-		&.has-child .block-editor-block-list__block.wp-block-navigation-link {
-			margin: 0;
-		}
-
-		// Margin of right-most margin should be zero, for right aligned or justified items.
-		&.wp-block-pages-list__item:last-child,
-		&.wp-block-navigation-link:last-child {
-			margin-right: 0;
-		}
-	}
 }
 
 
@@ -188,11 +165,22 @@ $color-control-label-height: 20px;
  * Setup state
  */
 
-// Ensure that an empty block has space around the appender.
-.wp-block-navigation-placeholder,
-.wp-block-navigation-placeholder__preview,
-.is-selected .wp-block-navigation__container {
-	min-height: $grid-unit-05 + $grid-unit-05 + $button-size;
+// Unstyle some inherited placeholder component styles.
+.components-placeholder.wp-block-navigation-placeholder {
+	outline: none;
+	padding: 0;
+	box-shadow: none;
+	background: none;
+	min-height: 0;
+
+	// Needed for the preview menu items to match actual menu items.
+	.components-placeholder__fieldset {
+		font-size: inherit;
+	}
+
+	.components-placeholder__fieldset .components-button {
+		margin-bottom: 0;
+	}
 }
 
 // Spinner.
@@ -208,17 +196,24 @@ $color-control-label-height: 20px;
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	transition: all 0.1s ease-in-out;
-	@include reduce-motion("transition");
+	flex-wrap: nowrap;
+	width: 100%;
+	overflow: hidden;
 
-	// Style skeleton elements.
+	// Style skeleton elements to mostly match the metrics of actual menu items.
 	// Needs specificity.
 	.wp-block-navigation-link.wp-block-navigation-link {
-		border-radius: $radius-block-ui;
-		background: currentColor;
+		position: relative;
 		min-width: 72px;
-		height: $grid-unit-20;
-		margin: $grid-unit-15 $grid-unit-30 $grid-unit-15 0;
+
+		&::before {
+			display: block;
+			content: "";
+			border-radius: $radius-block-ui;
+			background: currentColor;
+			height: $grid-unit-20;
+			width: 100%;
+		}
 	}
 
 	svg {
@@ -230,22 +225,25 @@ $color-control-label-height: 20px;
 		opacity: 0.3;
 	}
 
-	.is-selected & {
-		// Don't show the preview boxes for an empty nav block.
-		opacity: 0;
+	// Don't show the preview boxes for an empty nav block.
+	// Needs specificity to work for the navigation screen.
+	.wp-block-navigation.is-selected &.wp-block-navigation-placeholder__preview {
+		display: none;
+	}
 
-		// Need to show the placeholder box above the preview boxes.
-		position: absolute;
-		top: 0;
-		right: 0;
-		bottom: 0;
-		left: 0;
+	// ... but be present in larger contexts to size it correctly.
+	.wp-block-navigation.is-selected .is-large & {
+		display: flex;
+		opacity: 0;
+		width: 0;
+		overflow: hidden;
+		flex-wrap: nowrap;
 	}
 }
 
 // Selected state.
 .wp-block-navigation-placeholder__controls {
-	padding: $grid-unit-05 $grid-unit-10;
+	padding: $grid-unit-10;
 	border-radius: $radius-block-ui;
 	background-color: $white;
 	box-shadow: inset 0 0 0 $border-width $gray-900;
@@ -255,6 +253,11 @@ $color-control-label-height: 20px;
 	position: relative;
 	z-index: 1;
 
+	// Adjust padding for when shown horizontally.
+	.is-large & {
+		padding: $grid-unit-05 $grid-unit-10;
+	}
+
 	// If an ancestor has a text-decoration property applied, it is inherited regardless of
 	// the specificity of a child element. Only pulling the child out of the flow fixes it.
 	// See also https://www.w3.org/TR/CSS21/text.html#propdef-text-decoration.
@@ -262,11 +265,13 @@ $color-control-label-height: 20px;
 	width: 100%;
 
 	// Show when selected.
-	.is-selected & {
+	.wp-block-navigation.is-selected & {
 		display: flex;
 	}
 
-	// Vertical navigation.
+	// Show stacked for the vertical navigation, or small placeholders.
+	.is-small &,
+	.is-medium &,
 	.is-vertical & {
 		.wp-block-navigation-placeholder__actions {
 			flex-direction: column;
@@ -286,12 +291,12 @@ $color-control-label-height: 20px;
 	// Block title
 	.wp-block-navigation-placeholder__actions__indicator {
 		margin-right: $grid-unit-15;
-		padding: ($grid-unit-15 / 2) 0;
+		padding: 0;
 		align-items: center;
 		justify-content: flex-start;
-		display: none;
+		line-height: 0;
 
-		// line up with the icon in the toolbar.
+		// Line up with the icon in the toolbar.
 		margin-left: $grid-unit-05 + $border-width;
 
 		svg {
@@ -303,7 +308,9 @@ $color-control-label-height: 20px;
 			margin-left: 0;
 		}
 
-		@include break-small {
+		// Show only in big placeholders.
+		display: none;
+		.is-large & {
 			display: inline-flex;
 		}
 	}
@@ -325,6 +332,7 @@ $color-control-label-height: 20px;
 .wp-block-navigation-placeholder__actions {
 	display: flex;
 	font-size: $default-font-size;
+	font-family: $default-font;
 
 	.components-button.components-dropdown-menu__toggle.has-icon {
 		padding: ($grid-unit-15 / 2) $grid-unit-05 ($grid-unit-15 / 2) $grid-unit-15;

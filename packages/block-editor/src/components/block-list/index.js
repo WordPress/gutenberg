@@ -7,8 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useRef, createContext, useState } from '@wordpress/element';
-import { useViewportMatch } from '@wordpress/compose';
+import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -16,23 +15,13 @@ import { useViewportMatch } from '@wordpress/compose';
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
 import useBlockDropZone from '../use-block-drop-zone';
-import useInsertionPoint from './insertion-point';
-import BlockPopover from './block-popover';
+import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
-import { useScrollSelectionIntoView } from '../selection-scroll-into-view';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
+import BlockToolsBackCompat from '../block-tools/back-compat';
 
-export const BlockNodes = createContext();
-export const SetBlockNodes = createContext();
-
-export default function BlockList( { className, __experimentalLayout } ) {
-	const ref = useRef();
-	const [ blockNodes, setBlockNodes ] = useState( {} );
-	const insertionPoint = useInsertionPoint( ref );
-	useScrollSelectionIntoView( ref );
-	usePreParsePatterns();
-
+function Root( { className, children } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		isTyping,
@@ -53,32 +42,36 @@ export default function BlockList( { className, __experimentalLayout } ) {
 			isNavigationMode: _isNavigationMode(),
 		};
 	}, [] );
-
 	return (
-		<BlockNodes.Provider value={ blockNodes }>
-			{ insertionPoint }
-			<BlockPopover />
-			<div
-				ref={ ref }
-				className={ classnames(
-					'block-editor-block-list__layout is-root-container',
-					className,
-					{
-						'is-typing': isTyping,
-						'is-outline-mode': isOutlineMode,
-						'is-focus-mode': isFocusMode && isLargeViewport,
-						'is-navigate-mode': isNavigationMode,
-					}
-				) }
-			>
-				<SetBlockNodes.Provider value={ setBlockNodes }>
-					<BlockListItems
-						wrapperRef={ ref }
-						__experimentalLayout={ __experimentalLayout }
-					/>
-				</SetBlockNodes.Provider>
-			</div>
-		</BlockNodes.Provider>
+		<div
+			ref={ useMergeRefs( [
+				useBlockDropZone(),
+				useInBetweenInserter(),
+			] ) }
+			className={ classnames(
+				'block-editor-block-list__layout is-root-container',
+				className,
+				{
+					'is-typing': isTyping,
+					'is-outline-mode': isOutlineMode,
+					'is-focus-mode': isFocusMode && isLargeViewport,
+					'is-navigate-mode': isNavigationMode,
+				}
+			) }
+		>
+			{ children }
+		</div>
+	);
+}
+
+export default function BlockList( { className, __experimentalLayout } ) {
+	usePreParsePatterns();
+	return (
+		<BlockToolsBackCompat>
+			<Root className={ className }>
+				<BlockListItems __experimentalLayout={ __experimentalLayout } />
+			</Root>
+		</BlockToolsBackCompat>
 	);
 }
 
@@ -88,7 +81,6 @@ function Items( {
 	renderAppender,
 	__experimentalAppenderTagName,
 	__experimentalLayout: layout = defaultLayout,
-	wrapperRef,
 } ) {
 	function selector( select ) {
 		const {
@@ -111,11 +103,6 @@ function Items( {
 		multiSelectedBlockClientIds,
 		hasMultiSelection,
 	} = useSelect( selector, [ rootClientId ] );
-
-	useBlockDropZone( {
-		element: wrapperRef,
-		rootClientId,
-	} );
 
 	return (
 		<LayoutProvider value={ layout }>

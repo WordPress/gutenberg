@@ -6,7 +6,7 @@ import { defaultTo } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { DropZoneProvider, SlotFillProvider } from '@wordpress/components';
+import { SlotFillProvider } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useMemo } from '@wordpress/element';
@@ -85,21 +85,17 @@ export default function WidgetAreasBlockEditorProvider( {
 			<BlockEditorKeyboardShortcuts.Register />
 			<KeyboardShortcuts.Register />
 			<SlotFillProvider>
-				<DropZoneProvider>
-					<BlockEditorProvider
-						value={ blocks }
-						onInput={ onInput }
-						onChange={ onChange }
-						settings={ settings }
-						useSubRegistry={ false }
-						{ ...props }
-					>
-						{ children }
-						<ReusableBlocksMenuItems
-							rootClientId={ widgetAreaId }
-						/>
-					</BlockEditorProvider>
-				</DropZoneProvider>
+				<BlockEditorProvider
+					value={ blocks }
+					onInput={ onInput }
+					onChange={ onChange }
+					settings={ settings }
+					useSubRegistry={ false }
+					{ ...props }
+				>
+					{ children }
+					<ReusableBlocksMenuItems rootClientId={ widgetAreaId } />
+				</BlockEditorProvider>
 			</SlotFillProvider>
 		</>
 	);

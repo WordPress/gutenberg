@@ -185,6 +185,12 @@ export default function PreferencesModal() {
 									panelName="post-link"
 								/>
 							) }
+							{ isViewable && (
+								<EnablePanelOption
+									label={ __( 'Template' ) }
+									panelName="template"
+								/>
+							) }
 							<PostTaxonomies
 								taxonomyWrapper={ ( content, taxonomy ) => (
 									<EnablePanelOption

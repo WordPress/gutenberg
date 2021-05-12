@@ -2,12 +2,12 @@
 
 exports[`adding patterns should insert a block pattern 1`] = `
 "<!-- wp:buttons {\\"contentJustification\\":\\"center\\"} -->
-<div class=\\"wp-block-buttons is-content-justification-center\\"><!-- wp:button {\\"style\\":{\\"color\\":{\\"background\\":\\"#ba0c49\\",\\"text\\":\\"#fffffa\\"},\\"border\\":{\\"radius\\":2}}} -->
-<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link has-text-color has-background\\" style=\\"border-radius:2px;background-color:#ba0c49;color:#fffffa\\">Download now</a></div>
+<div class=\\"wp-block-buttons is-content-justification-center\\"><!-- wp:button {\\"style\\":{\\"border\\":{\\"radius\\":0}}} -->
+<div class=\\"wp-block-button\\"><a class=\\"wp-block-button__link no-border-radius\\">Our Work</a></div>
 <!-- /wp:button -->
 
-<!-- wp:button {\\"style\\":{\\"color\\":{\\"text\\":\\"#ba0c49\\"},\\"border\\":{\\"radius\\":2}},\\"className\\":\\"is-style-outline\\"} -->
-<div class=\\"wp-block-button is-style-outline\\"><a class=\\"wp-block-button__link has-text-color\\" style=\\"border-radius:2px;color:#ba0c49\\">About Cervantes</a></div>
+<!-- wp:button {\\"style\\":{\\"border\\":{\\"radius\\":1}},\\"className\\":\\"is-style-outline\\"} -->
+<div class=\\"wp-block-button is-style-outline\\"><a class=\\"wp-block-button__link\\" style=\\"border-radius:1px\\">Where We Are</a></div>
 <!-- /wp:button --></div>
 <!-- /wp:buttons -->"
 `;

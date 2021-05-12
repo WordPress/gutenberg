@@ -1,18 +1,14 @@
 /**
- * External dependencies
- */
-import { contextConnect } from '@wp-g2/context';
-
-/**
  * Internal dependencies
  */
-import { Grid } from '../grid';
-import { View } from '../view';
+import { contextConnect } from '../context';
+import { Grid } from '../../grid';
+import { View } from '../../view';
 import FormGroupContent from './form-group-content';
 import { useFormGroup } from './use-form-group';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FormGroupProps, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').FormGroupProps, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function FormGroup( props, forwardedRef ) {

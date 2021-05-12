@@ -102,7 +102,7 @@ _Parameters_
 
 _Returns_
 
--   `?Node`: Offset parent.
+-   `Node | null`: Offset parent.
 
 <a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
 
@@ -178,7 +178,7 @@ Returns true if there is no possibility of selection.
 
 _Parameters_
 
--   _element_ `Element`: The element to check.
+-   _element_ `HTMLElement`: The element to check.
 
 _Returns_
 
@@ -226,6 +226,18 @@ _Returns_
 
 -   `boolean`: True if phrasing content, false if not.
 
+<a name="isRTL" href="#isRTL">#</a> **isRTL**
+
+Whether the element's text direction is right-to-left.
+
+_Parameters_
+
+-   _element_ `Element`: The element to check.
+
+_Returns_
+
+-   `boolean`: True if rtl, false if ltr.
+
 <a name="isTextContent" href="#isTextContent">#</a> **isTextContent**
 
 _Parameters_
@@ -249,7 +261,7 @@ _Parameters_
 
 _Returns_
 
--   `element is HTMLElement`: True if the element is an text field, false if not.
+-   `node is HTMLElement`: True if the element is an text field, false if not.
 
 <a name="isVerticalEdge" href="#isVerticalEdge">#</a> **isVerticalEdge**
 
@@ -272,7 +284,6 @@ _Parameters_
 
 -   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: True for end, false for start.
--   _mayUseScroll_ `[boolean]`: Whether to allow scrolling.
 
 <a name="placeCaretAtVerticalEdge" href="#placeCaretAtVerticalEdge">#</a> **placeCaretAtVerticalEdge**
 

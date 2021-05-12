@@ -11,6 +11,7 @@ import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	store as coreStore,
 	__experimentalFetchLinkSuggestions as fetchLinkSuggestions,
+	__experimentalFetchRemoteUrlData as fetchRemoteUrlData,
 } from '@wordpress/core-data';
 
 /**
@@ -107,6 +108,8 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 			__experimentalReusableBlocks: reusableBlocks,
 			__experimentalFetchLinkSuggestions: ( search, searchOptions ) =>
 				fetchLinkSuggestions( search, searchOptions, settings ),
+			__experimentalFetchRemoteUrlData: ( url ) =>
+				fetchRemoteUrlData( url ),
 			__experimentalCanUserUseUnfilteredHTML: canUseUnfilteredHTML,
 			__experimentalUndo: undo,
 			__experimentalShouldInsertAtTheTop: isTitleSelected,

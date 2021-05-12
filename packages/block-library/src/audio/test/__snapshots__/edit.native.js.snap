@@ -30,7 +30,6 @@ exports[`Audio block renders audio block error state without crashing 1`] = `
         ]
       }
     />
-    Modal
     <View
       accessible={true}
       focusable={true}
@@ -177,7 +176,6 @@ exports[`Audio block renders audio file without crashing 1`] = `
         ]
       }
     />
-    Modal
     <View
       accessible={true}
       focusable={true}
@@ -350,7 +348,6 @@ exports[`Audio block renders placeholder without crashing 1`] = `
         ]
       }
     >
-      Modal
       <View
         style={
           Object {

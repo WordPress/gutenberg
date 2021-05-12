@@ -26,7 +26,7 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './styles.scss';
 import platformStyles from './cellStyles.scss';
-import TouchableRipple from './ripple.native.js';
+import TouchableRipple from './ripple';
 
 const isIOS = Platform.OS === 'ios';
 class BottomSheetCell extends Component {
@@ -40,6 +40,8 @@ class BottomSheetCell extends Component {
 		this.handleScreenReaderToggled = this.handleScreenReaderToggled.bind(
 			this
 		);
+
+		this.isCurrent = false;
 	}
 
 	componentDidUpdate( prevProps, prevState ) {
@@ -49,6 +51,7 @@ class BottomSheetCell extends Component {
 	}
 
 	componentDidMount() {
+		this.isCurrent = true;
 		AccessibilityInfo.addEventListener(
 			'screenReaderChanged',
 			this.handleScreenReaderToggled
@@ -56,12 +59,15 @@ class BottomSheetCell extends Component {
 
 		AccessibilityInfo.isScreenReaderEnabled().then(
 			( isScreenReaderEnabled ) => {
-				this.setState( { isScreenReaderEnabled } );
+				if ( this.isCurrent ) {
+					this.setState( { isScreenReaderEnabled } );
+				}
 			}
 		);
 	}
 
 	componentWillUnmount() {
+		this.isCurrent = false;
 		AccessibilityInfo.removeEventListener(
 			'screenReaderChanged',
 			this.handleScreenReaderToggled
@@ -155,6 +161,11 @@ class BottomSheetCell extends Component {
 			styles.cellRowContainer,
 			cellRowContainerStyle,
 		];
+
+		const isInteractive =
+			isValueEditable ||
+			onPress !== undefined ||
+			onLongPress !== undefined;
 
 		const onCellPress = () => {
 			if ( isValueEditable ) {
@@ -252,6 +263,9 @@ class BottomSheetCell extends Component {
 		};
 
 		const getAccessibilityLabel = () => {
+			if ( accessible === false ) {
+				return;
+			}
 			if ( accessibilityLabel || ! showValue ) {
 				return accessibilityLabel || label;
 			}
@@ -306,7 +320,7 @@ class BottomSheetCell extends Component {
 						  __( 'Double tap to edit this value' )
 						: accessibilityHint
 				}
-				disabled={ disabled }
+				disabled={ disabled || ! isInteractive }
 				activeOpacity={ opacity }
 				onPress={ onCellPress }
 				onLongPress={ onLongPress }

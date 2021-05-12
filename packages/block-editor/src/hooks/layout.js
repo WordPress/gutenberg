@@ -13,6 +13,7 @@ import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
 import { useSelect } from '@wordpress/data';
 import {
+	Button,
 	ToggleControl,
 	PanelBody,
 	__experimentalUnitControl as UnitControl,
@@ -25,7 +26,7 @@ import { Icon, positionCenter, stretchWide } from '@wordpress/icons';
  */
 import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
 
 const isWeb = Platform.OS === 'web';
@@ -60,7 +61,7 @@ const CSS_UNITS = [
 function LayoutPanel( { setAttributes, attributes } ) {
 	const { layout = {} } = attributes;
 	const { wideSize, contentSize, inherit = false } = layout;
-	const defaultLayout = useEditorFeature( 'layout' );
+	const defaultLayout = useSetting( 'layout' );
 	const themeSupportsLayout = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().supportsLayout;
@@ -82,52 +83,72 @@ function LayoutPanel( { setAttributes, attributes } ) {
 					/>
 				) }
 				{ ! inherit && (
-					<div className="block-editor-hooks__layout-controls">
-						<div className="block-editor-hooks__layout-controls-unit">
-							<UnitControl
-								label={ __( 'Content' ) }
-								labelPosition="top"
-								__unstableInputWidth="80px"
-								value={ contentSize || wideSize || '' }
-								onChange={ ( nextWidth ) => {
-									nextWidth =
-										0 > parseFloat( nextWidth )
-											? '0'
-											: nextWidth;
+					<>
+						<div className="block-editor-hooks__layout-controls">
+							<div className="block-editor-hooks__layout-controls-unit">
+								<UnitControl
+									label={ __( 'Content' ) }
+									labelPosition="top"
+									__unstableInputWidth="80px"
+									value={ contentSize || wideSize || '' }
+									onChange={ ( nextWidth ) => {
+										nextWidth =
+											0 > parseFloat( nextWidth )
+												? '0'
+												: nextWidth;
+										setAttributes( {
+											layout: {
+												...layout,
+												contentSize: nextWidth,
+											},
+										} );
+									} }
+									units={ CSS_UNITS }
+								/>
+								<Icon icon={ positionCenter } />
+							</div>
+							<div className="block-editor-hooks__layout-controls-unit">
+								<UnitControl
+									label={ __( 'Wide' ) }
+									labelPosition="top"
+									__unstableInputWidth="80px"
+									value={ wideSize || contentSize || '' }
+									onChange={ ( nextWidth ) => {
+										nextWidth =
+											0 > parseFloat( nextWidth )
+												? '0'
+												: nextWidth;
+										setAttributes( {
+											layout: {
+												...layout,
+												wideSize: nextWidth,
+											},
+										} );
+									} }
+									units={ CSS_UNITS }
+								/>
+								<Icon icon={ stretchWide } />
+							</div>
+						</div>
+						<div className="block-editor-hooks__layout-controls-reset">
+							<Button
+								isSecondary
+								isSmall
+								disabled={ ! contentSize && ! wideSize }
+								onClick={ () =>
 									setAttributes( {
 										layout: {
-											...layout,
-											contentSize: nextWidth,
+											contentSize: undefined,
+											wideSize: undefined,
+											inherit: false,
 										},
-									} );
-								} }
-								units={ CSS_UNITS }
-							/>
-							<Icon icon={ positionCenter } />
+									} )
+								}
+							>
+								{ __( 'Reset' ) }
+							</Button>
 						</div>
-						<div className="block-editor-hooks__layout-controls-unit">
-							<UnitControl
-								label={ __( 'Wide' ) }
-								labelPosition="top"
-								__unstableInputWidth="80px"
-								value={ wideSize || contentSize || '' }
-								onChange={ ( nextWidth ) => {
-									nextWidth =
-										0 > parseFloat( nextWidth )
-											? '0'
-											: nextWidth;
-									setAttributes( {
-										layout: {
-											...layout,
-											wideSize: nextWidth,
-										},
-									} );
-								} }
-								units={ CSS_UNITS }
-							/>
-							<Icon icon={ stretchWide } />
-						</div>
-					</div>
+					</>
 				) }
 				<p className="block-editor-hooks__layout-controls-helptext">
 					{ __(
@@ -194,7 +215,7 @@ export const withLayoutStyles = createHigherOrderComponent(
 		const { name, attributes } = props;
 		const supportLayout = hasBlockSupport( name, '__experimentalLayout' );
 		const id = useInstanceId( BlockListBlock );
-		const defaultLayout = useEditorFeature( 'layout' ) || {};
+		const defaultLayout = useSetting( 'layout' ) || {};
 		if ( ! supportLayout ) {
 			return <BlockListBlock { ...props } />;
 		}

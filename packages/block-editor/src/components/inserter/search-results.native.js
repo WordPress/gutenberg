@@ -27,7 +27,6 @@ function InserterSearchResults( {
 	onSelect,
 	listProps,
 	safeAreaBottomInset,
-	searchFormHeight = 0,
 } ) {
 	const [ numberOfColumns, setNumberOfColumns ] = useState( MIN_COL_NUM );
 	const [ itemWidth, setItemWidth ] = useState();
@@ -104,8 +103,7 @@ function InserterSearchResults( {
 					...listProps.contentContainerStyle,
 					{
 						paddingBottom:
-							( safeAreaBottomInset ||
-								styles.list.paddingBottom ) + searchFormHeight,
+							safeAreaBottomInset || styles.list.paddingBottom,
 					},
 				] }
 			/>

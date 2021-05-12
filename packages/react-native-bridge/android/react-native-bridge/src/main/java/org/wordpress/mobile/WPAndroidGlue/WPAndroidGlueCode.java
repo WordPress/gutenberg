@@ -956,6 +956,10 @@ public class WPAndroidGlueCode {
         mDeferredEventEmitter.onMediaIdChanged(oldId, newId, oldUrl);
     }
 
+    public void sendToJSFeaturedImageId(int mediaId) {
+        mDeferredEventEmitter.sendToJSFeaturedImageId(mediaId);
+    }
+
     public void replaceUnsupportedBlock(String content, String blockId) {
         if (mReplaceUnsupportedBlockCallback != null) {
             mReplaceUnsupportedBlockCallback.replaceUnsupportedBlock(content, blockId);

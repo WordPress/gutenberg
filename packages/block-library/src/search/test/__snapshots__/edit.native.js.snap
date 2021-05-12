@@ -7,8 +7,7 @@ exports[`Search Block renders block with button inside option 1`] = `
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    accessibilityHint="Double tap to edit label text"
-    accessibilityLabel="Search block label. Current text is Search"
+    accessibilityLabel="search-block-label"
     accessibilityRole="none"
     accessible={true}
   >
@@ -69,12 +68,12 @@ exports[`Search Block renders block with button inside option 1`] = `
       Array [
         undefined,
         undefined,
+        false,
       ]
     }
   >
     <View
-      accessibilityHint="Double tap to edit placeholder text"
-      accessibilityLabel="Search input field. No custom placeholder set"
+      accessibilityLabel="search-block-input"
       accessibilityRole="none"
       accessible={true}
     >
@@ -83,7 +82,7 @@ exports[`Search Block renders block with button inside option 1`] = `
         className="wp-block-search__input"
         ellipsizeMode="tail"
         fontFamily="serif"
-        isSelected={true}
+        isSelected={false}
         label={null}
         numberOfLines={1}
         onBlur={[Function]}
@@ -94,19 +93,26 @@ exports[`Search Block renders block with button inside option 1`] = `
         scrollEnabled={false}
         style={
           Array [
-            undefined,
             false,
+            undefined,
           ]
         }
         underlineColorAndroid="transparent"
       />
     </View>
-    <View>
+    <View
+      style={
+        Array [
+          undefined,
+          false,
+        ]
+      }
+    >
       <View
-        accessibilityHint="Double tap to edit button text"
-        accessibilityLabel="Search button. Current button text is Search Button"
+        accessibilityLabel="search-block-button"
         accessibilityRole="none"
         accessible={true}
+        onLayout={[Function]}
       >
         <View>
           <RCTAztecView
@@ -145,7 +151,7 @@ exports[`Search Block renders block with button inside option 1`] = `
             style={
               Object {
                 "backgroundColor": undefined,
-                "maxWidth": undefined,
+                "maxWidth": NaN,
                 "minHeight": 0,
               }
             }
@@ -174,8 +180,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    accessibilityHint="Double tap to edit label text"
-    accessibilityLabel="Search block label. Current text is Search"
+    accessibilityLabel="search-block-label"
     accessibilityRole="none"
     accessible={true}
   >
@@ -236,12 +241,12 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
       Array [
         undefined,
         false,
+        false,
       ]
     }
   >
     <View
-      accessibilityHint="Double tap to edit placeholder text"
-      accessibilityLabel="Search input field. No custom placeholder set"
+      accessibilityLabel="search-block-input"
       accessibilityRole="none"
       accessible={true}
     >
@@ -250,7 +255,7 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         className="wp-block-search__input"
         ellipsizeMode="tail"
         fontFamily="serif"
-        isSelected={true}
+        isSelected={false}
         label={null}
         numberOfLines={1}
         onBlur={[Function]}
@@ -268,7 +273,14 @@ exports[`Search Block renders block with icon button option matches snapshot 1`]
         underlineColorAndroid="transparent"
       />
     </View>
-    <View>
+    <View
+      style={
+        Array [
+          undefined,
+          false,
+        ]
+      }
+    >
       Svg
     </View>
   </View>
@@ -286,12 +298,12 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
       Array [
         undefined,
         false,
+        false,
       ]
     }
   >
     <View
-      accessibilityHint="Double tap to edit placeholder text"
-      accessibilityLabel="Search input field. No custom placeholder set"
+      accessibilityLabel="search-block-input"
       accessibilityRole="none"
       accessible={true}
     >
@@ -300,7 +312,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         className="wp-block-search__input"
         ellipsizeMode="tail"
         fontFamily="serif"
-        isSelected={true}
+        isSelected={false}
         label={null}
         numberOfLines={1}
         onBlur={[Function]}
@@ -318,12 +330,19 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
         underlineColorAndroid="transparent"
       />
     </View>
-    <View>
+    <View
+      style={
+        Array [
+          undefined,
+          false,
+        ]
+      }
+    >
       <View
-        accessibilityHint="Double tap to edit button text"
-        accessibilityLabel="Search button. Current button text is Search Button"
+        accessibilityLabel="search-block-button"
         accessibilityRole="none"
         accessible={true}
+        onLayout={[Function]}
       >
         <View>
           <RCTAztecView
@@ -362,7 +381,7 @@ exports[`Search Block renders block with label hidden matches snapshot 1`] = `
             style={
               Object {
                 "backgroundColor": undefined,
-                "maxWidth": undefined,
+                "maxWidth": NaN,
                 "minHeight": 0,
               }
             }
@@ -391,8 +410,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    accessibilityHint="Double tap to edit label text"
-    accessibilityLabel="Search block label. Current text is Search"
+    accessibilityLabel="search-block-label"
     accessibilityRole="none"
     accessible={true}
   >
@@ -453,12 +471,12 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
       Array [
         undefined,
         false,
+        false,
       ]
     }
   >
     <View
-      accessibilityHint="Double tap to edit placeholder text"
-      accessibilityLabel="Search input field. No custom placeholder set"
+      accessibilityLabel="search-block-input"
       accessibilityRole="none"
       accessible={true}
     >
@@ -467,7 +485,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         className="wp-block-search__input"
         ellipsizeMode="tail"
         fontFamily="serif"
-        isSelected={true}
+        isSelected={false}
         label={null}
         numberOfLines={1}
         onBlur={[Function]}
@@ -485,12 +503,19 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
         underlineColorAndroid="transparent"
       />
     </View>
-    <View>
+    <View
+      style={
+        Array [
+          undefined,
+          false,
+        ]
+      }
+    >
       <View
-        accessibilityHint="Double tap to edit button text"
-        accessibilityLabel="Search button. Current button text is Search Button"
+        accessibilityLabel="search-block-button"
         accessibilityRole="none"
         accessible={true}
+        onLayout={[Function]}
       >
         <View>
           <RCTAztecView
@@ -529,7 +554,7 @@ exports[`Search Block renders with default configuration matches snapshot 1`] = 
             style={
               Object {
                 "backgroundColor": undefined,
-                "maxWidth": undefined,
+                "maxWidth": NaN,
                 "minHeight": 0,
               }
             }
@@ -558,8 +583,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
   importantForAccessibility="no-hide-descendants"
 >
   <View
-    accessibilityHint="Double tap to edit label text"
-    accessibilityLabel="Search block label. Current text is Search"
+    accessibilityLabel="search-block-label"
     accessibilityRole="none"
     accessible={true}
   >
@@ -616,8 +640,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
     </View>
   </View>
   <View
-    accessibilityHint="Double tap to edit placeholder text"
-    accessibilityLabel="Search input field. No custom placeholder set"
+    accessibilityLabel="search-block-input"
     accessibilityRole="none"
     accessible={true}
   >
@@ -626,7 +649,7 @@ exports[`Search Block renders with no-button option matches snapshot 1`] = `
       className="wp-block-search__input"
       ellipsizeMode="tail"
       fontFamily="serif"
-      isSelected={true}
+      isSelected={false}
       label={null}
       numberOfLines={1}
       onBlur={[Function]}

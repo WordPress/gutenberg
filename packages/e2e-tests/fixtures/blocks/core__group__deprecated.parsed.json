@@ -11,7 +11,9 @@
 				"attrs": {},
 				"innerBlocks": [],
 				"innerHTML": "\n\t<p>test</p>\n\t",
-				"innerContent": [ "\n\t<p>test</p>\n\t" ]
+				"innerContent": [
+					"\n\t<p>test</p>\n\t"
+				]
 			}
 		],
 		"innerHTML": "\n<div class=\"wp-block-group alignfull has-lighter-blue-background-color has-background\" id=\"test-id\">\n\t\n</div>\n",
@@ -20,12 +22,5 @@
 			null,
 			"\n</div>\n"
 		]
-	},
-	{
-		"blockName": null,
-		"attrs": {},
-		"innerBlocks": [],
-		"innerHTML": "\n",
-		"innerContent": [ "\n" ]
 	}
 ]

@@ -21,7 +21,7 @@ import {
 import { plus } from '@wordpress/icons';
 import { useState, useCallback, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { InspectorControls, MediaUpload } from '@wordpress/block-editor';
+import { MediaUpload } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -134,7 +134,7 @@ function Controls( {
 	const focalPointHint = ! hasParallax && ! displayPlaceholder && (
 		<Icon
 			icon={ plus }
-			size={ styles.focalPointHint.width }
+			size={ styles.focalPointHint?.width }
 			style={ [
 				styles.focalPointHint,
 				focalPointPosition( focalPoint ),
@@ -184,7 +184,7 @@ function Controls( {
 									url={ url }
 									height="100%"
 									style={ imagePreviewStyles }
-									width={ styles.image.width }
+									width={ styles.image?.width }
 								/>
 							) }
 							{ VIDEO_BACKGROUND_TYPE === backgroundType && (
@@ -251,7 +251,7 @@ function Controls( {
 	);
 
 	return (
-		<InspectorControls>
+		<>
 			<PanelBody title={ __( 'Media' ) }>
 				<MediaUpload
 					allowedTypes={ ALLOWED_MEDIA_TYPES }
@@ -297,7 +297,7 @@ function Controls( {
 					key={ minHeightUnit }
 				/>
 			</PanelBody>
-		</InspectorControls>
+		</>
 	);
 }
 

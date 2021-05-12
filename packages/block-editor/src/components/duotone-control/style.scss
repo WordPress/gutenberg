@@ -1,0 +1,26 @@
+.block-editor-duotone-control__popover {
+	.components-popover__content {
+		border: $border-width solid $gray-900;
+		min-width: 214px;
+	}
+
+	.components-circular-option-picker {
+		padding: $grid-unit-15;
+	}
+
+	.components-menu-group__label {
+		padding: $grid-unit-15 $grid-unit-15 0 $grid-unit-15;
+		width: 100%;
+	}
+}
+
+.block-editor-duotone-control__popover > .components-popover__content {
+	// Matches 8 swatches in width.
+	width: 334px;
+}
+
+// Better align the popover under the swatch.
+// @todo: when the positioning for popovers gets refactored, this can presumably be removed.
+.block-editor-duotone-control__popover:not([data-y-axis="middle"][data-x-axis="right"]) > .components-popover__content {
+	margin-left: -14px;
+}

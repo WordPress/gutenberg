@@ -12,13 +12,9 @@ import {
 	getColorClassName,
 	useBlockProps,
 	__experimentalGetGradientClass,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
-
-/**
- * Internal dependencies
- */
-import getColorAndStyleProps from './color-props';
 
 const migrateBorderRadius = ( attributes ) => {
 	const { borderRadius, ...newAttributes } = attributes;
@@ -161,7 +157,7 @@ const deprecated = [
 				url,
 				width,
 			} = attributes;
-			const colorProps = getColorAndStyleProps( attributes );
+			const colorProps = getColorClassesAndStyles( attributes );
 			const buttonClasses = classnames(
 				'wp-block-button__link',
 				colorProps.className,
@@ -256,7 +252,7 @@ const deprecated = [
 				url,
 				width,
 			} = attributes;
-			const colorProps = getColorAndStyleProps( attributes );
+			const colorProps = getColorClassesAndStyles( attributes );
 			const buttonClasses = classnames(
 				'wp-block-button__link',
 				colorProps.className,

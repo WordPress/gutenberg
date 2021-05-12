@@ -72,7 +72,6 @@
 
 .wp-block-navigation-link__placeholder {
 	position: relative;
-	cursor: pointer;
 
 	// Provide a little margin to show each placeholder as a separate unit.
 	margin: 2px;
@@ -80,6 +79,14 @@
 	.wp-block-navigation-link__placeholder-text {
 		font-family: $default-font;
 		font-size: $default-font-size;
+		padding-left: 4px;
+		padding-right: 4px;
+
+	}
+
+	// This needs extra specificity.
+	&.wp-block-navigation-link__content {
+		cursor: pointer;
 	}
 
 	&::before {

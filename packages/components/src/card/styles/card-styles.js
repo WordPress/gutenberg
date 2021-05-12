@@ -11,7 +11,7 @@ import { HorizontalRule } from '@wordpress/primitives';
 /**
  * Internal dependencies
  */
-import Flex from '../../flex';
+import { Flex } from '../../flex';
 import { color, space } from '../../utils/style-mixins';
 
 export const styleProps = {

@@ -62,6 +62,15 @@ export function subscribeUpdateHtml( callback ) {
 	return gutenbergBridgeEvents.addListener( 'updateHtml', callback );
 }
 
+export function subscribeFeaturedImageIdNativeUpdated( callback ) {
+	return isAndroid
+		? gutenbergBridgeEvents.addListener(
+				'featuredImageIdNativeUpdated',
+				callback
+		  )
+		: undefined;
+}
+
 /**
  * Request to subscribe to mediaUpload events
  *

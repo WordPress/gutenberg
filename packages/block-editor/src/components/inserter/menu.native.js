@@ -39,7 +39,6 @@ function InserterMenu( {
 	insertionIndex,
 } ) {
 	const [ filterValue, setFilterValue ] = useState( '' );
-	const [ searchFormHeight, setSearchFormHeight ] = useState( 0 );
 	// eslint-disable-next-line no-undef
 	const [ showSearchForm, setShowSearchForm ] = useState( __DEV__ );
 
@@ -53,18 +52,11 @@ function InserterMenu( {
 		insertDefaultBlock,
 	} = useDispatch( blockEditorStore );
 
-	const {
-		items,
-		destinationRootClientId,
-		getBlockOrder,
-		getBlockCount,
-		canInsertBlockType,
-	} = useSelect( ( select ) => {
+	const { items, destinationRootClientId } = useSelect( ( select ) => {
 		const {
 			getInserterItems,
 			getBlockRootClientId,
 			getBlockSelectionEnd,
-			...selectBlockEditorStore
 		} = select( blockEditorStore );
 
 		let targetRootClientId = rootClientId;
@@ -78,13 +70,12 @@ function InserterMenu( {
 		return {
 			items: getInserterItems( targetRootClientId ),
 			destinationRootClientId: targetRootClientId,
-			getBlockOrder: selectBlockEditorStore.getBlockOrder,
-			getBlockCount: selectBlockEditorStore.getBlockCount,
-			canInsertBlockType: selectBlockEditorStore.canInsertBlockType,
 		};
 	} );
-
-	const { getBlockType } = useSelect( ( select ) => select( blocksStore ) );
+	const { getBlockOrder, getBlockCount, canInsertBlockType } = useSelect(
+		blockEditorStore
+	);
+	const { getBlockType } = useSelect( blocksStore );
 
 	useEffect( () => {
 		// Show/Hide insertion point on Mount/Dismount
@@ -133,7 +124,13 @@ function InserterMenu( {
 				innerBlocks
 			);
 
-			insertBlock( newBlock, insertionIndex, destinationRootClientId );
+			insertBlock(
+				newBlock,
+				insertionIndex,
+				destinationRootClientId,
+				true,
+				{ source: 'inserter_menu' }
+			);
 		},
 		[ insertBlock, destinationRootClientId, insertionIndex ]
 	);
@@ -181,26 +178,22 @@ function InserterMenu( {
 		<BottomSheet
 			isVisible={ true }
 			onClose={ onClose }
-			hideHeader
+			header={
+				showSearchForm && (
+					<InserterSearchForm
+						onChange={ ( value ) => {
+							setFilterValue( value );
+						} }
+						value={ filterValue }
+					/>
+				)
+			}
 			hasNavigation
 			setMinHeightToMaxHeight={ showSearchForm }
 		>
 			<BottomSheetConsumer>
 				{ ( { listProps, safeAreaBottomInset } ) => (
 					<View>
-						{ showSearchForm && (
-							<InserterSearchForm
-								onChange={ ( value ) => {
-									setFilterValue( value );
-								} }
-								value={ filterValue }
-								onLayout={ ( event ) => {
-									const { height } = event.nativeEvent.layout;
-									setSearchFormHeight( height );
-								} }
-							/>
-						) }
-
 						<InserterSearchResults
 							items={ getItems() }
 							onSelect={ ( item ) => {
@@ -210,7 +203,6 @@ function InserterMenu( {
 							{ ...{
 								listProps,
 								safeAreaBottomInset,
-								searchFormHeight,
 							} }
 						/>
 					</View>

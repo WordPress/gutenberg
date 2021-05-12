@@ -6,22 +6,26 @@ import { useInstanceId } from '@wordpress/compose';
 import { useEffect } from '@wordpress/element';
 import {
 	BlockControls,
+	InspectorAdvancedControls,
 	useBlockProps,
 	store as blockEditorStore,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	__experimentalBlockPatternSetup as BlockPatternSetup,
 } from '@wordpress/block-editor';
+import { SelectControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import QueryToolbar from './query-toolbar';
 import QueryInspectorControls from './query-inspector-controls';
-import QueryBlockSetup from './query-block-setup';
+import QueryPlaceholder from './query-placeholder';
 import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
 const TEMPLATE = [ [ 'core/query-loop' ] ];
 export function QueryContent( { attributes, setAttributes } ) {
-	const { queryId, query, layout } = attributes;
+	const { queryId, query, layout, tagName: TagName = 'div' } = attributes;
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
@@ -80,10 +84,41 @@ export function QueryContent( { attributes, setAttributes } ) {
 					setLayout={ updateLayout }
 				/>
 			</BlockControls>
-			<div { ...blockProps }>
+			<InspectorAdvancedControls>
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<aside>', value: 'aside' },
+					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
+				/>
+			</InspectorAdvancedControls>
+			<TagName { ...blockProps }>
 				<div { ...innerBlocksProps } />
-			</div>
+			</TagName>
 		</>
+	);
+}
+
+function QueryPatternSetup( props ) {
+	const { clientId, name: blockName } = props;
+	const blockProps = useBlockProps();
+	// `startBlankComponent` is what to render when clicking `Start blank`
+	// or if no matched patterns are found.
+	return (
+		<div { ...blockProps }>
+			<BlockPatternSetup
+				blockName={ blockName }
+				clientId={ clientId }
+				startBlankComponent={ <QueryPlaceholder { ...props } /> }
+			/>
+		</div>
 	);
 }
 
@@ -94,7 +129,7 @@ const QueryEdit = ( props ) => {
 			!! select( blockEditorStore ).getBlocks( clientId ).length,
 		[ clientId ]
 	);
-	const Component = hasInnerBlocks ? QueryContent : QueryBlockSetup;
+	const Component = hasInnerBlocks ? QueryContent : QueryPatternSetup;
 	return <Component { ...props } />;
 };
 
