@@ -15,7 +15,6 @@
 ### Internal
 
 -   `Flex`, `FlexBlock`, and `FlexItem` components have been re-written from the ground up ([#31297](https://github.com/WordPress/gutenberg/pull/31297)).
--   `color()` utility function has been removed, in favour of accessing color values directly ([#31661](https://github.com/WordPress/gutenberg/pull/31661))
 
 ## 13.0.0 (2021-03-17)
 
