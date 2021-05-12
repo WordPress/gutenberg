@@ -35,8 +35,7 @@
 		"fontSize": true,
 		"lineHeight": true,
 		"__experimentalSelector": "h1,h2,h3,h4,h5,h6",
-		"__unstablePasteTextInline": true,
-		"__experimentalLetterSpacing": true
+		"__unstablePasteTextInline": true
 	},
 	"editorStyle": "wp-block-heading-editor",
 	"style": "wp-block-heading"

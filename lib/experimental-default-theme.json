@@ -175,8 +175,7 @@
 		"typography": {
 			"dropCap": true,
 			"customFontSize": true,
-			"customLetterSpacing": true,
-			"customLineHeight": true,
+			"customLineHeight": false,
 			"customFontStyle": true,
 			"customFontWeight": true,
 			"customTextTransforms": true,
@@ -216,9 +215,9 @@
 		},
 		"border": {
 			"customColor": false,
-			"customRadius": true,
+			"customRadius": false,
 			"customStyle": false,
-			"customWidth": true
+			"customWidth": false
 		},
 		"blocks": {
 			"core/button": {
