@@ -134,7 +134,7 @@ function build_template_part_block_variations() {
 	$variations    = array();
 	$defined_areas = gutenberg_get_allowed_template_part_areas();
 	foreach ( $defined_areas as $area ) {
-		if ( $area['area'] !== 'uncategorized' ) {
+		if ( 'uncategorized' !== $area['area'] ) {
 			$variations[] = array(
 				'name'        => $area['area'],
 				'title'       => $area['label'],
