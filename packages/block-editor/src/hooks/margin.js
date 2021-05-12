@@ -52,7 +52,7 @@ export function MarginEdit( props ) {
 	const units = useCustomUnits();
 	const sides = useCustomSides( blockName, 'margin' );
 
-	if ( ! hasMarginSupport( blockName ) ) {
+	if ( useIsMarginDisabled( props ) ) {
 		return null;
 	}
 
