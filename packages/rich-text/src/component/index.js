@@ -20,8 +20,6 @@ import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
 
-/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
-
 export function useRichText( {
 	value = '',
 	selectionStart,
@@ -33,7 +31,6 @@ export function useRichText( {
 	onChange,
 	__unstableMultilineTag: multilineTag,
 	__unstableDisableFormats: disableFormats,
-	__unstableOnCreateUndoLevel: onCreateUndoLevel,
 	__unstableIsSelected: isSelected,
 	__unstableDependencies,
 	__unstableAfterParse,
@@ -132,7 +129,6 @@ export function useRichText( {
 	// Internal values are updated synchronously, unlike props and state.
 	const _value = useRef( value );
 	const record = useRef();
-	const lastHistoryValue = useRef( value );
 
 	function setRecordFromProps() {
 		record.current = formatToValue( value );
@@ -144,26 +140,13 @@ export function useRichText( {
 		setRecordFromProps();
 	}
 
-	function createUndoLevel() {
-		// If the content is the same, no level needs to be created.
-		if ( lastHistoryValue.current === _value.current ) {
-			return;
-		}
-
-		onCreateUndoLevel();
-		lastHistoryValue.current = _value.current;
-	}
-
 	/**
 	 * Sync the value to global state. The node tree and selection will also be
 	 * updated if differences are found.
 	 *
-	 * @param {Object}  newRecord         The record to sync and apply.
-	 * @param {Object}  $2                Named options.
-	 * @param {boolean} $2.withoutHistory If true, no undo level will be
-	 *                                    created.
+	 * @param {Object} newRecord The record to sync and apply.
 	 */
-	function handleChange( newRecord, { withoutHistory } = {} ) {
+	function handleChange( newRecord ) {
 		if ( disableFormats ) {
 			newRecord.formats = Array( newRecord.text.length );
 			newRecord.replacements = Array( newRecord.text.length );
@@ -190,10 +173,6 @@ export function useRichText( {
 			__unstableText: text,
 		} );
 		setActiveFormats( newActiveFormats );
-
-		if ( ! withoutHistory ) {
-			createUndoLevel();
-		}
 	}
 
 	function applyFromProps( { domOnly } = {} ) {
@@ -260,7 +239,6 @@ export function useRichText( {
 			applyRecord,
 			createRecord,
 			handleChange,
-			createUndoLevel,
 			isSelected,
 			onSelectionChange,
 			setActiveFormats,

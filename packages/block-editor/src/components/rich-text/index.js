@@ -40,6 +40,7 @@ import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { useCaretInFormat } from './use-caret-in-format';
+import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
 import { useInputRules } from './use-input-rules';
 import { useFormatTypes } from './use-format-types';
@@ -118,11 +119,9 @@ function RichTextWrapper(
 	const { selectionStart, selectionEnd, isSelected, disabled } = useSelect(
 		selector
 	);
-	const {
-		__unstableMarkLastChangeAsPersistent,
-		selectionChange,
-		__unstableMarkAutomaticChange,
-	} = useDispatch( blockEditorStore );
+	const { selectionChange, __unstableMarkAutomaticChange } = useDispatch(
+		blockEditorStore
+	);
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -296,7 +295,6 @@ function RichTextWrapper(
 		placeholder,
 		__unstableIsSelected: isSelected,
 		__unstableMultilineTag: multilineTag,
-		__unstableOnCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
 		__unstableDependencies: dependencies,
@@ -312,6 +310,7 @@ function RichTextWrapper(
 	} );
 
 	useCaretInFormat( hasActiveFormats );
+	useMarkPersistent( { hasActiveFormats, html: adjustedValue, value } );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;
