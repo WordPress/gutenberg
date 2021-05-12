@@ -119,6 +119,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$data = $this->add_additional_fields_to_object(
 			array(
 				'title' => $this->get_title( $remote_url_response ),
+				'icon'  => $this->get_icon( $remote_url_response ),
 			),
 			$request
 		);
@@ -213,6 +214,20 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$title = isset( $match_title[1] ) ? trim( $match_title[1] ) : '';
 
 		return $title;
+	}
+
+	/**
+	 * Parses the <title> contents from the provided HTML
+	 *
+	 * @param string $html the HTML from the remote website at URL.
+	 * @return string the title tag contents (maybe empty).
+	 */
+	private function get_icon( $html ) {
+		preg_match( '/<link.*href="(.*\.ico).*".*\/>/i', $html, $matches );
+
+		$icon = isset( $matches[1] ) ? trim( $matches[1] ) : '';
+
+		return $icon;
 	}
 
 	/**
