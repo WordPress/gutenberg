@@ -8,7 +8,12 @@ import { delay } from 'lodash';
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Dropdown, ToolbarButton, Picker } from '@wordpress/components';
+import {
+	Dropdown,
+	ToolbarButton,
+	Picker,
+	Tooltip,
+} from '@wordpress/components';
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
@@ -31,26 +36,38 @@ import { store as blockEditorStore } from '../../store';
 
 const VOICE_OVER_ANNOUNCEMENT_DELAY = 1000;
 
-const defaultRenderToggle = ( { onToggle, disabled, style, onLongPress } ) => (
-	<ToolbarButton
-		title={ __( 'Add block' ) }
-		icon={
-			<Icon
-				icon={ plusCircleFilled }
-				style={ style }
-				color={ style.color }
-			/>
-		}
-		onClick={ onToggle }
-		extraProps={ {
-			hint: __( 'Double tap to add a block' ),
-			// testID is present to disambiguate this element for native UI tests. It's not
-			// usually required for components. See: https://git.io/JeQ7G.
-			testID: 'add-block-button',
-			onLongPress,
-		} }
-		isDisabled={ disabled }
-	/>
+const defaultRenderToggle = ( {
+	canViewEditorOnboarding,
+	onToggle,
+	disabled,
+	style,
+	onLongPress,
+} ) => (
+	<Tooltip
+		position="top right"
+		text={ __( 'Tap to add content' ) }
+		visible={ canViewEditorOnboarding }
+	>
+		<ToolbarButton
+			title={ __( 'Add block' ) }
+			icon={
+				<Icon
+					icon={ plusCircleFilled }
+					style={ style }
+					color={ style.color }
+				/>
+			}
+			onClick={ onToggle }
+			extraProps={ {
+				hint: __( 'Double tap to add a block' ),
+				// testID is present to disambiguate this element for native UI tests. It's not
+				// usually required for components. See: https://git.io/JeQ7G.
+				testID: 'add-block-button',
+				onLongPress,
+			} }
+			isDisabled={ disabled }
+		/>
+	</Tooltip>
 );
 
 export class Inserter extends Component {
@@ -188,6 +205,7 @@ export class Inserter extends Component {
 	 */
 	renderToggle( { onToggle, isOpen } ) {
 		const {
+			canViewEditorOnboarding,
 			disabled,
 			renderToggle = defaultRenderToggle,
 			getStylesFromColorScheme,
@@ -234,6 +252,7 @@ export class Inserter extends Component {
 		return (
 			<>
 				{ renderToggle( {
+					canViewEditorOnboarding,
 					onToggle: onPress,
 					isOpen,
 					disabled,
@@ -301,6 +320,7 @@ export default compose( [
 			getBlockOrder,
 			getBlockIndex,
 			getBlock,
+			getSettings,
 		} = select( blockEditorStore );
 
 		const end = getBlockSelectionEnd();
@@ -321,8 +341,6 @@ export default compose( [
 			: undefined;
 
 		function getDefaultInsertionIndex() {
-			const { getSettings } = select( blockEditorStore );
-
 			const {
 				__experimentalShouldInsertAtTheTop: shouldInsertAtTheTop,
 			} = getSettings();
@@ -365,6 +383,8 @@ export default compose( [
 		const insertionIndexEnd = endOfRootIndex;
 
 		return {
+			canViewEditorOnboarding: select( blockEditorStore ).getSettings()
+				.canViewEditorOnboarding,
 			destinationRootClientId,
 			insertionIndexDefault: getDefaultInsertionIndex(),
 			insertionIndexBefore,

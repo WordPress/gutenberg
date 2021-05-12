@@ -13,8 +13,11 @@ import { isArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Children, cloneElement } from '@wordpress/element';
-import { withPreferredColorScheme } from '@wordpress/compose';
+import { Children, cloneElement, forwardRef } from '@wordpress/element';
+import {
+	usePreferredColorScheme,
+	usePreferredColorSchemeStyle,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -72,7 +75,7 @@ const styles = StyleSheet.create( {
 	},
 } );
 
-export function Button( props ) {
+export function Button( props, ref ) {
 	const {
 		children,
 		onClick,
@@ -80,7 +83,6 @@ export function Button( props ) {
 		disabled,
 		hint,
 		fixedRatio = true,
-		getStylesFromColorScheme,
 		isPressed,
 		'aria-disabled': ariaDisabled,
 		'data-subscript': subscript,
@@ -91,7 +93,9 @@ export function Button( props ) {
 		label,
 		shortcut,
 		tooltipPosition,
+		onLayout,
 	} = props;
+	const preferredColorScheme = usePreferredColorScheme();
 
 	const isDisabled = ariaDisabled || disabled;
 
@@ -110,7 +114,7 @@ export function Button( props ) {
 		states.push( 'disabled' );
 	}
 
-	const subscriptInactive = getStylesFromColorScheme(
+	const subscriptInactive = usePreferredColorSchemeStyle(
 		styles.subscriptInactive,
 		styles.subscriptInactiveDark
 	);
@@ -118,7 +122,7 @@ export function Button( props ) {
 	const newChildren = Children.map( children, ( child ) => {
 		return child
 			? cloneElement( child, {
-					colorScheme: props.preferredColorScheme,
+					colorScheme: preferredColorScheme,
 					isPressed,
 			  } )
 			: child;
@@ -141,7 +145,7 @@ export function Button( props ) {
 
 	const newIcon = icon
 		? cloneElement( <Icon icon={ icon } size={ iconSize } />, {
-				colorScheme: props.preferredColorScheme,
+				colorScheme: preferredColorScheme,
 				isPressed,
 		  } )
 		: null;
@@ -159,6 +163,8 @@ export function Button( props ) {
 			style={ styles.container }
 			disabled={ isDisabled }
 			testID={ testID }
+			onLayout={ onLayout }
+			ref={ ref }
 		>
 			<View style={ buttonViewStyle }>
 				<View style={ { flexDirection: 'row' } }>
@@ -195,4 +201,4 @@ export function Button( props ) {
 	);
 }
 
-export default withPreferredColorScheme( Button );
+export default forwardRef( Button );

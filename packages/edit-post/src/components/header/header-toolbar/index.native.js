@@ -16,7 +16,7 @@ import {
 	BlockToolbar,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import { Toolbar, ToolbarButton, Tooltip } from '@wordpress/components';
+import { Toolbar, ToolbarButton } from '@wordpress/components';
 import {
 	keyboardClose,
 	undo as undoIcon,
@@ -31,7 +31,6 @@ import styles from './style.scss';
 import { store as editPostStore } from '../../../store';
 
 function HeaderToolbar( {
-	canViewEditorOnboarding,
 	hasRedo,
 	hasUndo,
 	redo,
@@ -90,16 +89,7 @@ function HeaderToolbar( {
 				alwaysBounceHorizontal={ false }
 				contentContainerStyle={ styles.scrollableContent }
 			>
-				<Tooltip
-					position="top right"
-					text={ __( 'Tap to add content' ) }
-					visible={ canViewEditorOnboarding }
-				>
-					{ /* TODO(David): Wrapper View added as quick way to avoid the need to forward refs */ }
-					<View style={ { alignItems: 'center' } }>
-						<Inserter disabled={ ! showInserter } />
-					</View>
-				</Tooltip>
+				<Inserter disabled={ ! showInserter } />
 				{ renderHistoryButtons() }
 				<BlockToolbar />
 			</ScrollView>
@@ -129,8 +119,6 @@ export default compose( [
 			select( editorStore ).getEditorSettings().richEditingEnabled,
 		isTextModeEnabled: select( editPostStore ).getEditorMode() === 'text',
 		isRTL: select( blockEditorStore ).getSettings().isRTL,
-		canViewEditorOnboarding: select( blockEditorStore ).getSettings()
-			.canViewEditorOnboarding,
 	} ) ),
 	withDispatch( ( dispatch ) => {
 		const { clearSelectedBlock } = dispatch( blockEditorStore );
