@@ -7,13 +7,7 @@ import { omit } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	RawHTML,
-	useRef,
-	useCallback,
-	forwardRef,
-	useLayoutEffect,
-} from '@wordpress/element';
+import { RawHTML, useRef, useCallback, forwardRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
 	children as childrenSource,
@@ -46,6 +40,7 @@ import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { useCaretInFormat } from './use-caret-in-format';
+import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
 import { useInputRules } from './use-input-rules';
 import { useFormatTypes } from './use-format-types';
@@ -124,11 +119,9 @@ function RichTextWrapper(
 	const { selectionStart, selectionEnd, isSelected, disabled } = useSelect(
 		selector
 	);
-	const {
-		__unstableMarkLastChangeAsPersistent,
-		selectionChange,
-		__unstableMarkAutomaticChange,
-	} = useDispatch( blockEditorStore );
+	const { selectionChange, __unstableMarkAutomaticChange } = useDispatch(
+		blockEditorStore
+	);
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -317,30 +310,7 @@ function RichTextWrapper(
 	} );
 
 	useCaretInFormat( hasActiveFormats );
-
-	const previousText = useRef();
-
-	// Must be set synchronously to make sure it applies to the last change.
-	useLayoutEffect( () => {
-		if ( ! previousText.current ) {
-			previousText.current = value.text;
-			return;
-		}
-
-		// Text input, so don't create an undo level for every character.
-		// Create an undo level after 1 second of no input.
-		if ( previousText.current !== value.text ) {
-			const timeout = window.setTimeout( () => {
-				__unstableMarkLastChangeAsPersistent();
-			}, 1000 );
-			previousText.current = value.text;
-			return () => {
-				window.clearTimeout( timeout );
-			};
-		}
-
-		__unstableMarkLastChangeAsPersistent();
-	}, [ adjustedValue, hasActiveFormats ] );
+	useMarkPersistent( { hasActiveFormats, html: adjustedValue, value } );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;
