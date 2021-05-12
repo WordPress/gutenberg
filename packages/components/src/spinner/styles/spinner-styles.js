@@ -7,7 +7,7 @@ import { keyframes } from '@emotion/core';
 /**
  * Internal dependencies
  */
-import { color, config } from '../../utils';
+import { COLORS, config } from '../../utils';
 
 const spinAnimation = keyframes`
 	from {
@@ -25,7 +25,7 @@ const topLeft = `calc( ( ${ config( 'spinnerSize' ) } - ${ config(
 
 export const StyledSpinner = styled.span`
 	display: inline-block;
-	background-color: ${ color( 'gray.600' ) };
+	background-color: ${ COLORS.gray[ 600 ] };
 	width: ${ config( 'spinnerSize' ) };
 	height: ${ config( 'spinnerSize' ) };
 	opacity: 0.7;
@@ -36,7 +36,7 @@ export const StyledSpinner = styled.span`
 	&::before {
 		content: '';
 		position: absolute;
-		background-color: ${ color( 'white' ) };
+		background-color: ${ COLORS.white };
 		top: ${ topLeft };
 		left: ${ topLeft };
 		width: calc( ${ config( 'spinnerSize' ) } / 4.5 );
