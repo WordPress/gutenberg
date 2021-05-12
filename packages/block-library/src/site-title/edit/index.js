@@ -26,7 +26,7 @@ export default function SiteTitleEdit( {
 	setAttributes,
 	insertBlocksAfter,
 } ) {
-	const { level, textAlign, style: { typography } = {} } = attributes;
+	const { level, textAlign } = attributes;
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
 	const TagName = level === 0 ? 'p' : `h${ level }`;
 	const blockProps = useBlockProps( {
@@ -34,13 +34,6 @@ export default function SiteTitleEdit( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
 		} ),
 	} );
-
-	// Text decoration is not applied to a nested inline block so need to pass this down to
-	// richtext child element.
-	const textDecoration = typography?.textDecoration
-		? typography?.textDecoration
-		: undefined;
-
 	return (
 		<>
 			<BlockControls group="block">
@@ -60,10 +53,7 @@ export default function SiteTitleEdit( {
 			<TagName { ...blockProps }>
 				<RichText
 					tagName="a"
-					style={ {
-						display: 'inline-block',
-						textDecoration,
-					} }
+					style={ { display: 'inline-block' } }
 					aria-label={ __( 'Site title text' ) }
 					placeholder={ __( 'Write site title…' ) }
 					value={ title }
