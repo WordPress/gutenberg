@@ -275,13 +275,7 @@ function RichTextWrapper(
 		);
 	}
 
-	const {
-		value,
-		onChange,
-		onFocus,
-		ref: richTextRef,
-		hasActiveFormats,
-	} = useRichText( {
+	const { value, onChange, onFocus, ref: richTextRef } = useRichText( {
 		value: adjustedValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
 			adjustedOnChange( html );
@@ -309,6 +303,8 @@ function RichTextWrapper(
 		onChange,
 	} );
 
+	const hasActiveFormats =
+		value.activeFormats && !! value.activeFormats.length;
 	useCaretInFormat( hasActiveFormats );
 	useMarkPersistent( { hasActiveFormats, html: adjustedValue, value } );
 

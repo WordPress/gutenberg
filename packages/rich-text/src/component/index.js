@@ -222,7 +222,6 @@ export function useRichText( {
 		onChange: handleChange,
 		onFocus: focus,
 		ref: mergedRefs,
-		hasActiveFormats: activeFormats.length,
 	};
 }
 
