@@ -31,12 +31,17 @@ function filterUnitsWithSettings( settings = [], units = [] ) {
 /**
  * Custom hook to retrieve and consolidate units setting from add_theme_support().
  *
- * @param {Array} units Collection of available units.
+ * @param {Array}  units Collection of available units.
+ * @param {string} unitsSetting The setting for custom units.
  *
  * @return {Array} Filtered units based on settings.
  */
-export function useCustomUnits( units ) {
-	const availableUnits = useSetting( 'spacing.units' );
+export function useCustomUnits( units, unitsSetting ) {
+	unitsSetting = unitsSetting || 'spacing.units';
+	const availableUnits = useSetting( unitsSetting );
+	if ( undefined === availableUnits ) {
+		return units;
+	}
 	const usedUnits = filterUnitsWithSettings(
 		! availableUnits ? [] : availableUnits,
 		units
