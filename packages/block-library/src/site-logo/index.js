@@ -14,9 +14,5 @@ export { metadata, name };
 
 export const settings = {
 	icon,
-	supports: {
-		align: true,
-		alignWide: false,
-	},
 	edit,
 };

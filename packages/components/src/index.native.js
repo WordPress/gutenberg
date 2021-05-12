@@ -20,6 +20,7 @@ export { default as ToolbarButton } from './toolbar-button';
 export { default as __experimentalToolbarContext } from './toolbar-context';
 export { default as ToolbarGroup } from './toolbar-group';
 export { default as ToolbarItem } from './toolbar-item';
+export { default as ToolbarDropdownMenu } from './toolbar-dropdown-menu';
 export { default as Icon } from './icon';
 export { default as Spinner } from './spinner';
 export {
