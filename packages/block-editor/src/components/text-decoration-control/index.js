@@ -2,10 +2,15 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { formatStrikethrough, formatUnderline } from '@wordpress/icons';
+import { formatStrikethrough, formatUnderline, none } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 const TEXT_DECORATIONS = [
+	{
+		name: __( 'None' ),
+		value: 'none',
+		icon: none,
+	},
 	{
 		name: __( 'Underline' ),
 		value: 'underline',
@@ -45,7 +50,8 @@ export default function TextDecorationControl( { value, onChange } ) {
 										: textDecoration.value
 								)
 							}
-							aria-label={ textDecoration.name }
+							label={ textDecoration.name }
+							showTooltip
 						/>
 					);
 				} ) }

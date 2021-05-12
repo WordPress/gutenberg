@@ -123,6 +123,7 @@ export { default as moreHorizontalMobile } from './library/more-horizontal-mobil
 export { default as moreVertical } from './library/more-vertical';
 export { default as moveTo } from './library/move-to';
 export { default as navigation } from './library/navigation';
+export { default as none } from './library/none';
 export { default as overlayText } from './library/overlay-text';
 export { default as pageBreak } from './library/page-break';
 export { default as customLink } from './library/custom-link';
