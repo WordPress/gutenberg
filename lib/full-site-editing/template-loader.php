@@ -104,7 +104,9 @@ function gutenberg_override_query_template( $template, $type, array $templates )
 	} else {
 		if ( $template ) {
 			return $template;
-		} elseif ( 'index' === $type ) {
+		}
+
+		if ( 'index' === $type ) {
 			if ( isset( $_GET['_wp-find-template'] ) ) {
 				wp_send_json_error( array( 'message' => __( 'No matching template found.', 'gutenberg' ) ) );
 			}
