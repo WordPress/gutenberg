@@ -19,6 +19,11 @@ import InspectorControls from '../components/inspector-controls';
 import TextDecorationAndTransformEdit from '../components/text-decoration-and-transform';
 
 import {
+	LETTER_SPACING_SUPPORT_KEY,
+	LetterSpacingEdit,
+	useIsLetterSpacingDisabled,
+} from './letter-spacing';
+import {
 	LINE_HEIGHT_SUPPORT_KEY,
 	LineHeightEdit,
 	useIsLineHeightDisabled,
@@ -49,6 +54,7 @@ import {
 } from './text-transform';
 
 export const TYPOGRAPHY_SUPPORT_KEYS = [
+	LETTER_SPACING_SUPPORT_KEY,
 	LINE_HEIGHT_SUPPORT_KEY,
 	FONT_SIZE_SUPPORT_KEY,
 	FONT_STYLE_SUPPORT_KEY,
@@ -74,6 +80,7 @@ export function TypographyPanel( props ) {
 					<FontSizeEdit { ...props } />
 					<FontAppearanceEdit { ...props } />
 					<LineHeightEdit { ...props } />
+					<LetterSpacingEdit { ...props } />
 					<TextDecorationAndTransformEdit { ...props } />
 				</ComponentSystemProvider>
 			</PanelBody>
@@ -94,6 +101,7 @@ function useIsTypographyDisabled( props = {} ) {
 	const configs = [
 		useIsFontAppearanceDisabled( props ),
 		useIsFontSizeDisabled( props ),
+		useIsLetterSpacingDisabled( props ),
 		useIsLineHeightDisabled( props ),
 		useIsFontFamilyDisabled( props ),
 		useIsTextDecorationDisabled( props ),

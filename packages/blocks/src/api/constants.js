@@ -62,6 +62,10 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 		value: [ 'typography', 'fontWeight' ],
 		support: [ '__experimentalFontWeight' ],
 	},
+	letterSpacing: {
+		value: [ 'typography', 'letterSpacing' ],
+		support: [ '__experimentalLetterSpacing' ],
+	},
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],
 		support: [ 'lineHeight' ],

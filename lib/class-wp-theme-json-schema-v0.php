@@ -114,6 +114,7 @@ class WP_Theme_JSON_Schema_V0 implements WP_Theme_JSON_Schema {
 				'customFontStyle'       => null,
 				'customFontWeight'      => null,
 				'customTextDecorations' => null,
+				'customLetterSpacing'   => null,
 				'customTextTransforms'  => null,
 			),
 			'custom'     => null,

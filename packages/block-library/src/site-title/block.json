@@ -28,6 +28,7 @@
 		},
 		"fontSize": true,
 		"lineHeight": true,
+	    "__experimentalLetterSpacing": true,
 		"__experimentalFontFamily": true,
 		"__experimentalTextTransform": true
 	}

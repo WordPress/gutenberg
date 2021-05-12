@@ -206,7 +206,8 @@
 					"slug": "huge",
 					"size": "42px"
 				}
-			]
+			],
+		    "customLetterSpacing": true
 		},
 		"spacing": {
 			"customMargin": false,
