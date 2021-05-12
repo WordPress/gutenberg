@@ -21,12 +21,6 @@ import { enhanceTemplatePartVariations } from './variations';
 const { name } = metadata;
 export { metadata, name };
 
-addFilter(
-	'blocks.registerBlockType',
-	'core/template-part',
-	enhanceTemplatePartVariations
-);
-
 export const settings = {
 	icon: layout,
 	__experimentalLabel: ( { slug, theme } ) => {
@@ -49,3 +43,10 @@ export const settings = {
 	},
 	edit,
 };
+
+// Importing this file includes side effects. This is whitelisted in block-library/package.json under sideEffects
+addFilter(
+	'blocks.registerBlockType',
+	'core/template-part',
+	enhanceTemplatePartVariations
+);
