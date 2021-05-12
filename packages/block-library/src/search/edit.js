@@ -89,11 +89,19 @@ export default function SearchEdit( {
 
 		if ( isSelected ) {
 			searchFieldRef.current.style.marginLeft = 0;
-			//console.log( searchFieldRef.current.offsetWidth );
+			const resetWidth = setTimeout( () => {
+				searchFieldRef.current.style.flexGrow = '1';
+				searchFieldRef.current.style.width = `${ width }${ widthUnit }`;
+				clearTimeout( resetWidth );
+			}, 300 );
 		} else {
+			searchFieldRef.current.style.width = `${ searchFieldRef.current.offsetWidth }px`;
+			searchFieldRef.current.style.flexGrow = '0';
 			searchFieldRef.current.style.marginLeft = `-${ searchFieldRef.current.offsetWidth }px`;
+			searchFieldRef.current.style.transitionDuration = '300ms';
+			searchFieldRef.current.style.transitionProperty = 'margin-left';
 		}
-	}, [ searchFieldRef ] );
+	} );
 
 	const units = useCustomUnits( {
 		availableUnits: [ '%', 'px' ],
