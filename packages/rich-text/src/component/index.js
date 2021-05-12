@@ -7,7 +7,6 @@ import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
-import FormatEdit from './format-edit';
 import { create } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
@@ -17,7 +16,6 @@ import { useInlineWarning } from './use-inline-warning';
 import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
-import { usePasteHandler } from './use-paste-handler';
 import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
 import { useDelete } from './use-delete';
@@ -30,7 +28,6 @@ export function useRichText( {
 	selectionEnd,
 	placeholder,
 	preserveWhiteSpace,
-	onPaste,
 	format = 'string',
 	onSelectionChange,
 	onChange,
@@ -262,15 +259,6 @@ export function useRichText( {
 			createRecord,
 			handleChange,
 		} ),
-		usePasteHandler( {
-			isSelected,
-			disableFormats,
-			handleChange,
-			record,
-			formatTypes,
-			onPaste,
-			activeFormats,
-		} ),
 		useInputAndSelection( {
 			record,
 			applyRecord,
@@ -298,21 +286,11 @@ export function useRichText( {
 	] );
 
 	return {
-		isSelected,
 		value: record.current,
 		onChange: handleChange,
 		onFocus: focus,
 		ref: mergedRefs,
 		hasActiveFormats: activeFormats.length,
-		children: isSelected && (
-			<FormatEdit
-				value={ record.current }
-				onChange={ handleChange }
-				onFocus={ focus }
-				formatTypes={ formatTypes }
-				forwardedRef={ ref }
-			/>
-		),
 	};
 }
 
