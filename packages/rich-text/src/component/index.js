@@ -35,7 +35,7 @@ export function useRichText( {
 	__unstableDisableFormats: disableFormats,
 	__unstableOnCreateUndoLevel: onCreateUndoLevel,
 	__unstableIsSelected: isSelected,
-	dependencies,
+	__unstableDependencies,
 	__unstableAfterParse,
 	__unstableBeforeSerialize,
 	__unstableAddInvisibleFormats,
@@ -273,7 +273,7 @@ export function useRichText( {
 			}
 
 			didMount.current = true;
-		}, [ placeholder, ...dependencies ] ),
+		}, [ placeholder, ...__unstableDependencies ] ),
 	] );
 
 	return {

@@ -5,17 +5,23 @@ import { useRef } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { slice, toHTMLString } from '@wordpress/rich-text';
 import { getBlockTransforms, findTransform } from '@wordpress/blocks';
+import { useDispatch } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 export function useInputRules( props ) {
+	const {
+		__unstableMarkLastChangeAsPersistent,
+		__unstableMarkAutomaticChange,
+	} = useDispatch( blockEditorStore );
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
 		function inputRule() {
-			const {
-				value,
-				onReplace,
-				__unstableMarkAutomaticChange,
-			} = propsRef.current;
+			const { value, onReplace } = propsRef.current;
 
 			if ( ! onReplace ) {
 				return;
@@ -60,8 +66,6 @@ export function useInputRules( props ) {
 				onChange,
 				__unstableAllowPrefixTransformations,
 				formatTypes,
-				__unstableMarkAutomaticChange,
-				__unstableMarkLastChangeAsPersistent,
 			} = propsRef.current;
 
 			// Only run input rules when inserting text.
