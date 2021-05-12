@@ -27,31 +27,50 @@ import { sprintf, __ } from '@wordpress/i18n';
  */
 import { CSS_UNITS } from '../columns/utils';
 
-function ColumnEdit( {
-	attributes: { verticalAlignment, width, templateLock = false },
-	setAttributes,
-	clientId,
-} ) {
+function ColumnEdit( { attributes, setAttributes, clientId } ) {
+	const { verticalAlignment, width, templateLock = false } = attributes;
+
 	const classes = classnames( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
-	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
+	const {
+		columnsIds,
+		hasChildBlocks,
+		rootClientId,
+		rootAttributes,
+	} = useSelect(
 		( select ) => {
-			const { getBlockOrder, getBlockRootClientId } = select(
+			const { getBlock, getBlockOrder, getBlockRootClientId } = select(
 				blockEditorStore
 			);
 
 			const rootId = getBlockRootClientId( clientId );
+			const rootBlock = getBlock( rootId );
 
 			return {
 				hasChildBlocks: getBlockOrder( clientId ).length > 0,
 				rootClientId: rootId,
+				rootAttributes: rootBlock?.attributes,
 				columnsIds: getBlockOrder( rootId ),
 			};
 		},
 		[ clientId ]
 	);
+
+	const columnsCount = columnsIds.length;
+	const currentColumnPosition = columnsIds.indexOf( clientId ) + 1;
+
+	const styles = {};
+	if ( widthWithUnit ) {
+		styles.flexBasis = widthWithUnit;
+	}
+	if (
+		rootAttributes?.style?.spacing?.padding?.left &&
+		currentColumnPosition !== 1
+	) {
+		styles.marginLeft = rootAttributes?.style?.spacing?.padding?.left;
+	}
 
 	const { updateBlockAttributes } = useDispatch( blockEditorStore );
 
@@ -67,11 +86,8 @@ function ColumnEdit( {
 	const widthWithUnit = Number.isFinite( width ) ? width + '%' : width;
 	const blockProps = useBlockProps( {
 		className: classes,
-		style: widthWithUnit ? { flexBasis: widthWithUnit } : undefined,
+		style: styles,
 	} );
-
-	const columnsCount = columnsIds.length;
-	const currentColumnPosition = columnsIds.indexOf( clientId ) + 1;
 
 	const label = sprintf(
 		/* translators: 1: Block label (i.e. "Block: Column"), 2: Position of the selected block, 3: Total number of sibling blocks of the same type */

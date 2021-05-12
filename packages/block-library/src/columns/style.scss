@@ -42,6 +42,10 @@
 	// Prevent the columns from growing wider than their distributed sizes.
 	min-width: 0;
 
+	&.has-background {
+		padding: $block-bg-padding--v $block-bg-padding--h;
+	}
+
 	// Prevent long unbroken words from overflowing.
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
