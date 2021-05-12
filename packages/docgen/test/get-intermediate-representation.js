@@ -23,15 +23,18 @@ describe( 'Intermediate Representation', () => {
 				null,
 				JSON.parse( token )
 			);
-			expect( ir ).toHaveLength( 1 );
-			expect( ir[ 0 ] ).toEqual( {
-				path: null,
-				name: 'default',
-				description: 'Undocumented declaration.',
-				tags: [],
-				lineStart: 3,
-				lineEnd: 3,
-			} );
+			expect( ir ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Undocumented declaration.",
+			    "lineEnd": 3,
+			    "lineStart": 3,
+			    "name": "default",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 		} );
 		it( 'default export on one line', () => {
 			const tokenOneliner = fs.readFileSync(
@@ -45,15 +48,18 @@ describe( 'Intermediate Representation', () => {
 				null,
 				JSON.parse( tokenOneliner )
 			);
-			expect( irOneliner ).toHaveLength( 1 );
-			expect( irOneliner[ 0 ] ).toEqual( {
-				path: null,
-				name: 'default',
-				description: 'Undocumented declaration.',
-				tags: [],
-				lineStart: 2,
-				lineEnd: 2,
-			} );
+			expect( irOneliner ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Undocumented declaration.",
+			    "lineEnd": 2,
+			    "lineStart": 2,
+			    "name": "default",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 		} );
 	} );
 
@@ -71,15 +77,18 @@ describe( 'Intermediate Representation', () => {
 					null,
 					JSON.parse( tokenClassAnonymous )
 				);
-				expect( irClassAnonymous ).toHaveLength( 1 );
-				expect( irClassAnonymous[ 0 ] ).toEqual( {
-					path: null,
-					name: 'default',
-					description: 'Class declaration example.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
+				expect( irClassAnonymous ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Class declaration example.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "default",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 			it( 'named class', () => {
 				const tokenClassNamed = fs.readFileSync(
@@ -93,15 +102,18 @@ describe( 'Intermediate Representation', () => {
 					null,
 					JSON.parse( tokenClassNamed )
 				);
-				expect( irClassNamed ).toHaveLength( 1 );
-				expect( irClassNamed[ 0 ] ).toEqual( {
-					path: null,
-					name: 'default',
-					description: 'Class declaration example.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
+				expect( irClassNamed ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Class declaration example.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "default",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 			it( 'anonymous function', () => {
 				const tokenFnAnonymous = fs.readFileSync(
@@ -115,15 +127,18 @@ describe( 'Intermediate Representation', () => {
 					null,
 					JSON.parse( tokenFnAnonymous )
 				);
-				expect( irFnAnonymous ).toHaveLength( 1 );
-				expect( irFnAnonymous[ 0 ] ).toEqual( {
-					path: null,
-					name: 'default',
-					description: 'Function declaration example.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
+				expect( irFnAnonymous ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Function declaration example.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "default",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 			it( 'named function', () => {
 				const tokenFnNamed = fs.readFileSync(
@@ -137,14 +152,18 @@ describe( 'Intermediate Representation', () => {
 					null,
 					JSON.parse( tokenFnNamed )
 				);
-				expect( irFnNamed[ 0 ] ).toEqual( {
-					path: null,
-					name: 'default',
-					description: 'Function declaration example.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
+				expect( irFnNamed ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Function declaration example.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "default",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 			it( 'variable', () => {
 				const tokenVariable = fs.readFileSync(
@@ -158,14 +177,18 @@ describe( 'Intermediate Representation', () => {
 					null,
 					JSON.parse( tokenVariable )
 				);
-				expect( irVar[ 0 ] ).toEqual( {
-					path: null,
-					name: 'default',
-					description: 'Variable declaration example.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
+				expect( irVar ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Variable declaration example.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "default",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 		} );
 		describe( 'named export', () => {
@@ -181,22 +204,25 @@ describe( 'Intermediate Representation', () => {
 					null,
 					JSON.parse( tokenClass )
 				);
-				expect( irNamedClass ).toHaveLength( 1 );
-				expect( irNamedClass[ 0 ] ).toEqual( {
-					path: null,
-					name: 'MyDeclaration',
-					description: 'My declaration example.',
-					tags: [
-						{
-							tag: 'type',
-							type: 'MyDeclaration',
-							name: '',
-							description: '',
-						},
-					],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
+				expect( irNamedClass ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "My declaration example.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "MyDeclaration",
+			    "path": null,
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": "MyDeclaration",
+			      },
+			    ],
+			  },
+			]
+		` );
 			} );
 			it( 'named function', () => {
 				const tokenFn = fs.readFileSync(
@@ -210,15 +236,18 @@ describe( 'Intermediate Representation', () => {
 					null,
 					JSON.parse( tokenFn )
 				);
-				expect( irNamedFn ).toHaveLength( 1 );
-				expect( irNamedFn[ 0 ] ).toEqual( {
-					path: null,
-					name: 'myDeclaration',
-					description: 'My declaration example.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
+				expect( irNamedFn ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "My declaration example.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "myDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 			it( 'named variable', () => {
 				const tokenVariable = fs.readFileSync(
@@ -232,15 +261,18 @@ describe( 'Intermediate Representation', () => {
 					null,
 					JSON.parse( tokenVariable )
 				);
-				expect( irNamedVar ).toHaveLength( 1 );
-				expect( irNamedVar[ 0 ] ).toEqual( {
-					path: null,
-					name: 'myDeclaration',
-					description: 'My declaration example.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
+				expect( irNamedVar ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "My declaration example.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "myDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 			it( 'named variables', () => {
 				const tokenVariables = fs.readFileSync(
@@ -254,23 +286,26 @@ describe( 'Intermediate Representation', () => {
 					null,
 					JSON.parse( tokenVariables )
 				);
-				expect( irNamedVars ).toHaveLength( 2 );
-				expect( irNamedVars[ 0 ] ).toEqual( {
-					path: null,
-					name: 'firstDeclaration',
-					description: 'My declaration example.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 5,
-				} );
-				expect( irNamedVars[ 1 ] ).toEqual( {
-					path: null,
-					name: 'secondDeclaration',
-					description: 'My declaration example.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 5,
-				} );
+				expect( irNamedVars ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "My declaration example.",
+			    "lineEnd": 5,
+			    "lineStart": 4,
+			    "name": "firstDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			  Object {
+			    "description": "My declaration example.",
+			    "lineEnd": 5,
+			    "lineStart": 4,
+			    "name": "secondDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 		} );
 	} );
@@ -297,22 +332,25 @@ describe( 'Intermediate Representation', () => {
 					JSON.parse( token ),
 					JSON.parse( ast )
 				);
-				expect( irDefaultId ).toHaveLength( 1 );
-				expect( irDefaultId[ 0 ] ).toEqual( {
-					path: null,
-					name: 'default',
-					description: 'Class declaration example.',
-					tags: [
-						{
-							tag: 'type',
-							type: 'ClassDeclaration',
-							name: '',
-							description: '',
-						},
-					],
-					lineStart: 6,
-					lineEnd: 6,
-				} );
+				expect( irDefaultId ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Class declaration example.",
+			    "lineEnd": 6,
+			    "lineStart": 6,
+			    "name": "default",
+			    "path": null,
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": "ClassDeclaration",
+			      },
+			    ],
+			  },
+			]
+		` );
 			} );
 			it( 'named function', () => {
 				const namedExport = fs.readFileSync(
@@ -334,28 +372,35 @@ describe( 'Intermediate Representation', () => {
 					JSON.parse( namedExport )[ 0 ],
 					JSON.parse( namedExportAST )
 				);
-				expect( irDefaultNamed0 ).toHaveLength( 1 );
-				expect( irDefaultNamed0[ 0 ] ).toEqual( {
-					path: null,
-					name: 'functionDeclaration',
-					description: 'Function declaration example.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
+				expect( irDefaultNamed0 ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Function declaration example.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "functionDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 				const irDefaultNamed1 = getIntermediateRepresentation(
 					null,
 					JSON.parse( namedExport )[ 1 ],
 					JSON.parse( namedExportAST )
 				);
-				expect( irDefaultNamed1[ 0 ] ).toEqual( {
-					path: null,
-					name: 'default',
-					description: 'Function declaration example.',
-					tags: [],
-					lineStart: 6,
-					lineEnd: 6,
-				} );
+				expect( irDefaultNamed1 ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Function declaration example.",
+			    "lineEnd": 6,
+			    "lineStart": 6,
+			    "name": "default",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 		} );
 
@@ -380,15 +425,18 @@ describe( 'Intermediate Representation', () => {
 					JSON.parse( token ),
 					JSON.parse( ast )
 				);
-				expect( irNamedId ).toHaveLength( 1 );
-				expect( irNamedId[ 0 ] ).toEqual( {
-					path: null,
-					name: 'myDeclaration',
-					description: 'My declaration example.',
-					tags: [],
-					lineStart: 6,
-					lineEnd: 6,
-				} );
+				expect( irNamedId ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "My declaration example.",
+			    "lineEnd": 6,
+			    "lineStart": 6,
+			    "name": "myDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 			it( 'named identifier with destructuring', () => {
 				const tokenObject = fs.readFileSync(
@@ -410,15 +458,18 @@ describe( 'Intermediate Representation', () => {
 					JSON.parse( tokenObject ),
 					JSON.parse( astObject )
 				);
-				expect( irNamedIdDestructuring ).toHaveLength( 1 );
-				expect( irNamedIdDestructuring[ 0 ] ).toEqual( {
-					path: null,
-					name: 'myDeclaration',
-					description: 'My declaration example.',
-					tags: [],
-					lineStart: 6,
-					lineEnd: 6,
-				} );
+				expect( irNamedIdDestructuring ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "My declaration example.",
+			    "lineEnd": 6,
+			    "lineStart": 6,
+			    "name": "myDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 			it( 'named identifiers', () => {
 				const tokens = fs.readFileSync(
@@ -440,38 +491,41 @@ describe( 'Intermediate Representation', () => {
 					JSON.parse( tokens ),
 					JSON.parse( asts )
 				);
-				expect( irIds ).toHaveLength( 3 );
-				expect( irIds[ 0 ] ).toEqual( {
-					path: null,
-					name: 'functionDeclaration',
-					description: 'Function declaration example.',
-					tags: [],
-					lineStart: 16,
-					lineEnd: 16,
-				} );
-				expect( irIds[ 1 ] ).toEqual( {
-					path: null,
-					name: 'variableDeclaration',
-					description: 'Variable declaration example.',
-					tags: [],
-					lineStart: 16,
-					lineEnd: 16,
-				} );
-				expect( irIds[ 2 ] ).toEqual( {
-					path: null,
-					name: 'ClassDeclaration',
-					description: 'Class declaration example.',
-					tags: [
-						{
-							tag: 'type',
-							type: 'ClassDeclaration',
-							name: '',
-							description: '',
-						},
-					],
-					lineStart: 16,
-					lineEnd: 16,
-				} );
+				expect( irIds ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Function declaration example.",
+			    "lineEnd": 16,
+			    "lineStart": 16,
+			    "name": "functionDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			  Object {
+			    "description": "Variable declaration example.",
+			    "lineEnd": 16,
+			    "lineStart": 16,
+			    "name": "variableDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			  Object {
+			    "description": "Class declaration example.",
+			    "lineEnd": 16,
+			    "lineStart": 16,
+			    "name": "ClassDeclaration",
+			    "path": null,
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": "ClassDeclaration",
+			      },
+			    ],
+			  },
+			]
+		` );
 			} );
 			it( 'named identifiers and inline', () => {
 				const foo = fs.readFileSync(
@@ -493,43 +547,50 @@ describe( 'Intermediate Representation', () => {
 					JSON.parse( foo )[ 0 ],
 					JSON.parse( bar )
 				);
-				expect( irIdInline0 ).toHaveLength( 2 );
-				expect( irIdInline0[ 0 ] ).toEqual( {
-					path: null,
-					name: 'functionDeclaration',
-					description: 'Function declaration example.',
-					tags: [],
-					lineStart: 11,
-					lineEnd: 11,
-				} );
-				expect( irIdInline0[ 1 ] ).toEqual( {
-					path: null,
-					name: 'ClassDeclaration',
-					description: 'Class declaration example.',
-					tags: [
-						{
-							tag: 'type',
-							type: 'ClassDeclaration',
-							name: '',
-							description: '',
-						},
-					],
-					lineStart: 11,
-					lineEnd: 11,
-				} );
+				expect( irIdInline0 ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Function declaration example.",
+			    "lineEnd": 11,
+			    "lineStart": 11,
+			    "name": "functionDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			  Object {
+			    "description": "Class declaration example.",
+			    "lineEnd": 11,
+			    "lineStart": 11,
+			    "name": "ClassDeclaration",
+			    "path": null,
+			    "tags": Array [
+			      Object {
+			        "description": "",
+			        "name": "",
+			        "tag": "type",
+			        "type": "ClassDeclaration",
+			      },
+			    ],
+			  },
+			]
+		` );
 				const irIdInline1 = getIntermediateRepresentation(
 					null,
 					JSON.parse( foo )[ 1 ],
 					JSON.parse( bar )
 				);
-				expect( irIdInline1[ 0 ] ).toEqual( {
-					path: null,
-					name: 'variableDeclaration',
-					description: 'Variable declaration example.',
-					tags: [],
-					lineStart: 16,
-					lineEnd: 16,
-				} );
+				expect( irIdInline1 ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Variable declaration example.",
+			    "lineEnd": 16,
+			    "lineStart": 16,
+			    "name": "variableDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 		} );
 	} );
@@ -560,31 +621,34 @@ describe( 'Intermediate Representation', () => {
 					{ body: [] },
 					getModuleImportNamed
 				);
-				expect( ir ).toHaveLength( 3 );
-				expect( ir[ 0 ] ).toEqual( {
-					path: null,
-					name: 'functionDeclaration',
-					description: 'Function declaration example.',
-					tags: [],
-					lineStart: 2,
-					lineEnd: 2,
-				} );
-				expect( ir[ 1 ] ).toEqual( {
-					path: null,
-					name: 'variableDeclaration',
-					description: 'Variable declaration example.',
-					tags: [],
-					lineStart: 3,
-					lineEnd: 3,
-				} );
-				expect( ir[ 2 ] ).toEqual( {
-					path: null,
-					name: 'ClassDeclaration',
-					description: 'Class declaration example.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
+				expect( ir ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Function declaration example.",
+			    "lineEnd": 2,
+			    "lineStart": 2,
+			    "name": "functionDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			  Object {
+			    "description": "Variable declaration example.",
+			    "lineEnd": 3,
+			    "lineStart": 3,
+			    "name": "variableDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			  Object {
+			    "description": "Class declaration example.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "ClassDeclaration",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 		} );
 
@@ -613,15 +677,18 @@ describe( 'Intermediate Representation', () => {
 					{ body: [] },
 					getModule
 				);
-				expect( irNamedDefault ).toHaveLength( 1 );
-				expect( irNamedDefault[ 0 ] ).toEqual( {
-					path: null,
-					name: 'default',
-					description: 'Module declaration.',
-					tags: [],
-					lineStart: 1,
-					lineEnd: 1,
-				} );
+				expect( irNamedDefault ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Module declaration.",
+			    "lineEnd": 1,
+			    "lineStart": 1,
+			    "name": "default",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 			it( 'renamed', () => {
 				const tokenDefaultExported = fs.readFileSync(
@@ -637,15 +704,18 @@ describe( 'Intermediate Representation', () => {
 					{ body: [] },
 					getModule
 				);
-				expect( irNamedDefaultExported ).toHaveLength( 1 );
-				expect( irNamedDefaultExported[ 0 ] ).toEqual( {
-					path: null,
-					name: 'moduleName',
-					description: 'Module declaration.',
-					tags: [],
-					lineStart: 1,
-					lineEnd: 1,
-				} );
+				expect( irNamedDefaultExported ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Module declaration.",
+			    "lineEnd": 1,
+			    "lineStart": 1,
+			    "name": "moduleName",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 		} );
 
@@ -671,31 +741,34 @@ describe( 'Intermediate Representation', () => {
 					{ body: [] },
 					getModule
 				);
-				expect( irNamespace ).toHaveLength( 3 );
-				expect( irNamespace[ 0 ] ).toEqual( {
-					path: null,
-					name: 'MyClass',
-					description: 'Named class.',
-					tags: [],
-					lineStart: 1,
-					lineEnd: 1,
-				} );
-				expect( irNamespace[ 1 ] ).toEqual( {
-					path: null,
-					name: 'myFunction',
-					description: 'Named function.',
-					tags: [],
-					lineStart: 1,
-					lineEnd: 1,
-				} );
-				expect( irNamespace[ 2 ] ).toEqual( {
-					path: null,
-					name: 'myVariable',
-					description: 'Named variable.',
-					tags: [],
-					lineStart: 1,
-					lineEnd: 1,
-				} );
+				expect( irNamespace ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Named class.",
+			    "lineEnd": 1,
+			    "lineStart": 1,
+			    "name": "MyClass",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			  Object {
+			    "description": "Named function.",
+			    "lineEnd": 1,
+			    "lineStart": 1,
+			    "name": "myFunction",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			  Object {
+			    "description": "Named variable.",
+			    "lineEnd": 1,
+			    "lineStart": 1,
+			    "name": "myVariable",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 			it( 'exports with comment', () => {
 				const tokenCommented = fs.readFileSync(
@@ -711,31 +784,34 @@ describe( 'Intermediate Representation', () => {
 					{ body: [] },
 					getModule
 				);
-				expect( irNamespaceCommented ).toHaveLength( 3 );
-				expect( irNamespaceCommented[ 0 ] ).toEqual( {
-					path: null,
-					name: 'MyClass',
-					description: 'Named class.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
-				expect( irNamespaceCommented[ 1 ] ).toEqual( {
-					path: null,
-					name: 'myFunction',
-					description: 'Named function.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
-				expect( irNamespaceCommented[ 2 ] ).toEqual( {
-					path: null,
-					name: 'myVariable',
-					description: 'Named variable.',
-					tags: [],
-					lineStart: 4,
-					lineEnd: 4,
-				} );
+				expect( irNamespaceCommented ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Named class.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "MyClass",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			  Object {
+			    "description": "Named function.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "myFunction",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			  Object {
+			    "description": "Named variable.",
+			    "lineEnd": 4,
+			    "lineStart": 4,
+			    "name": "myVariable",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 		} );
 	} );
@@ -773,15 +849,18 @@ describe( 'Intermediate Representation', () => {
 					JSON.parse( astDefault ),
 					getModuleDefault
 				);
-				expect( irDefault ).toHaveLength( 1 );
-				expect( irDefault[ 0 ] ).toEqual( {
-					path: null,
-					name: 'default',
-					description: 'Function declaration.',
-					tags: [],
-					lineStart: 3,
-					lineEnd: 3,
-				} );
+				expect( irDefault ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Function declaration.",
+			    "lineEnd": 3,
+			    "lineStart": 3,
+			    "name": "default",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 			it( 'named import', () => {
 				const tokenNamed = fs.readFileSync(
@@ -814,15 +893,18 @@ describe( 'Intermediate Representation', () => {
 					JSON.parse( astNamed ),
 					getModuleNamed
 				);
-				expect( irNamed ).toHaveLength( 1 );
-				expect( irNamed[ 0 ] ).toEqual( {
-					path: null,
-					name: 'default',
-					description: 'Function declaration.',
-					tags: [],
-					lineStart: 3,
-					lineEnd: 3,
-				} );
+				expect( irNamed ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Function declaration.",
+			    "lineEnd": 3,
+			    "lineStart": 3,
+			    "name": "default",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 		} );
 
@@ -870,15 +952,18 @@ describe( 'Intermediate Representation', () => {
 					JSON.parse( astImportNamespace ),
 					getModuleImportNamespace
 				);
-				expect( ir ).toHaveLength( 1 );
-				expect( ir[ 0 ] ).toEqual( {
-					path: null,
-					name: 'variables',
-					description: 'Undocumented declaration.',
-					tags: [],
-					lineStart: 3,
-					lineEnd: 3,
-				} );
+				expect( ir ).toMatchInlineSnapshot( `
+			Array [
+			  Object {
+			    "description": "Undocumented declaration.",
+			    "lineEnd": 3,
+			    "lineStart": 3,
+			    "name": "variables",
+			    "path": null,
+			    "tags": Array [],
+			  },
+			]
+		` );
 			} );
 		} );
 	} );

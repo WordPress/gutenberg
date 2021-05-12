@@ -17,7 +17,7 @@ import { useInstanceId } from '@wordpress/compose';
 import BaseControl from '../base-control';
 import Button from '../button';
 import Icon from '../icon';
-import { color } from '../utils/colors';
+import { COLORS } from '../utils';
 import { floatClamp, useControlledRangeValue } from './utils';
 import InputRange from './input-range';
 import RangeRail from './rail';
@@ -41,7 +41,7 @@ function RangeControl(
 		beforeIcon,
 		className,
 		currentInput,
-		color: colorProp = color( 'ui.theme' ),
+		color: colorProp = COLORS.ui.theme,
 		disabled = false,
 		help,
 		initialPosition,

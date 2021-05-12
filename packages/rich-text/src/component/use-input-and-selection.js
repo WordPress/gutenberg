@@ -63,7 +63,6 @@ export function useInputAndSelection( props ) {
 
 		let isComposing = false;
 		let rafId;
-		let timeout;
 
 		function onInput( event ) {
 			// Do not trigger a change if characters are being composed.
@@ -90,12 +89,6 @@ export function useInputAndSelection( props ) {
 				applyRecord,
 				createRecord,
 				handleChange,
-				createUndoLevel,
-				allowPrefixTransformations,
-				inputRule,
-				valueToFormat,
-				formatTypes,
-				markAutomaticChange,
 			} = propsRef.current;
 
 			// The browser formatted something or tried to insert HTML.
@@ -124,40 +117,7 @@ export function useInputAndSelection( props ) {
 				formats: oldActiveFormats,
 			} );
 
-			handleChange( change, { withoutHistory: true } );
-
-			// Create an undo level when input stops for over a second.
-			defaultView.clearTimeout( timeout );
-			timeout = defaultView.setTimeout( createUndoLevel, 1000 );
-
-			// Only run input rules when inserting text.
-			if ( inputType !== 'insertText' ) {
-				return;
-			}
-
-			if ( allowPrefixTransformations && inputRule ) {
-				inputRule( change, valueToFormat );
-			}
-
-			const transformed = formatTypes.reduce(
-				( accumlator, { __unstableInputRule } ) => {
-					if ( __unstableInputRule ) {
-						accumlator = __unstableInputRule( accumlator );
-					}
-
-					return accumlator;
-				},
-				change
-			);
-
-			if ( transformed !== change ) {
-				createUndoLevel();
-				handleChange( {
-					...transformed,
-					activeFormats: oldActiveFormats,
-				} );
-				markAutomaticChange();
-			}
+			handleChange( change );
 		}
 
 		/**
@@ -343,7 +303,6 @@ export function useInputAndSelection( props ) {
 				handleSelectionChange
 			);
 			defaultView.cancelAnimationFrame( rafId );
-			defaultView.clearTimeout( timeout );
 		};
 	}, [] );
 }

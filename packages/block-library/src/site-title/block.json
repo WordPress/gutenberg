@@ -23,7 +23,8 @@
 			"link": true
 		},
 		"spacing": {
-			"padding": true
+			"padding": true,
+			"margin": true
 		},
 		"fontSize": true,
 		"lineHeight": true,

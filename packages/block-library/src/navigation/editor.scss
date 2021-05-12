@@ -346,3 +346,76 @@ $color-control-label-height: 20px;
 		margin-right: $grid-unit-15;
 	}
 }
+
+
+/**
+ * Mobile menu.
+ */
+
+// These needs extra specificity in the editor.
+.wp-block-navigation__responsive-container:not(.is-menu-open) {
+	.components-button.wp-block-navigation__responsive-container-close {
+		@include break-small {
+			display: none;
+		}
+	}
+}
+.components-button.wp-block-navigation__responsive-container-open {
+	@include break-small {
+		display: none;
+	}
+}
+
+// Emulate the fullscreen editing inside the editor.
+.wp-block-navigation__responsive-container.is-menu-open {
+	position: fixed;
+
+	// Handle top position.
+	// For now, the editing of menu items in the mobile view only happens <600px.
+	// That means we only have to consider the big adminbar height (<783px).
+	// And in that view we also know that the toolbar is stacked.
+	body.admin-bar & {
+		top: $admin-bar-height-big + $header-height + $block-toolbar-height;
+
+		@include break-medium() {
+			top: $header-height + $border-width;
+		}
+	}
+}
+
+// Without this, the block cannot be selected, nor does the right container get focus.
+// @todo: this is disruptive. Ideally we can retire a few of the containers,
+// so focus is applied naturally on the block container.
+// It's important the right container has focus, otherwise you can't press
+// "Delete" to remove the block.
+.wp-block-navigation__responsive-close {
+	@include break-small() {
+		pointer-events: none;
+
+		.wp-block-navigation__responsive-container-close,
+		.block-editor-block-list__layout * {
+			pointer-events: all;
+		}
+	}
+
+	// Page List items should remain inert.
+	.wp-block-pages-list__item__link {
+		pointer-events: none;
+	}
+}
+
+// The menu and close buttons need higher specificity in the editor.
+.components-button.wp-block-navigation__responsive-container-open.wp-block-navigation__responsive-container-open,
+.components-button.wp-block-navigation__responsive-container-close.wp-block-navigation__responsive-container-close {
+	padding: 0;
+	height: auto;
+	color: inherit;
+}
+
+// Customize the mobile editing.
+// This can be revisited in the future, but for now, inherit design from the parent.
+.is-menu-open .wp-block-navigation__responsive-container-content * {
+	.block-list-appender {
+		margin-top: $grid-unit-20;
+	}
+}
