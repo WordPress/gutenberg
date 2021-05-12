@@ -148,25 +148,22 @@ const Tooltip = ( {
 		setTooltipLayout( { height, width } );
 	};
 
-	return (
+	return hidden ? (
+		children
+	) : (
 		<>
 			{ cloneElement( children, {
 				ref: referenceElementRef,
 				onLayout: getReferenceElementPosition,
 			} ) }
-			{ ! hidden && (
-				<Fill>
-					<View
-						onLayout={ getTooltipLayout }
-						style={ positionStyles }
-					>
-						<Animated.View style={ tooltipStyles }>
-							<Text style={ styles.tooltip__text }>{ text }</Text>
-							<View style={ arrowStyles } />
-						</Animated.View>
-					</View>
-				</Fill>
-			) }
+			<Fill>
+				<View onLayout={ getTooltipLayout } style={ positionStyles }>
+					<Animated.View style={ tooltipStyles }>
+						<Text style={ styles.tooltip__text }>{ text }</Text>
+						<View style={ arrowStyles } />
+					</Animated.View>
+				</View>
+			</Fill>
 		</>
 	);
 };
