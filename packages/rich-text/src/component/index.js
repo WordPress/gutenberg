@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useLayoutEffect } from '@wordpress/element';
+import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
@@ -36,6 +36,7 @@ export function useRichText( {
 	__unstableBeforeSerialize,
 	__unstableAddInvisibleFormats,
 } ) {
+	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const ref = useRef();
 
 	function createRecord() {
@@ -129,6 +130,7 @@ export function useRichText( {
 			__unstableFormats: formats,
 			__unstableText: text,
 		} );
+		forceRender();
 	}
 
 	function applyFromProps( { domOnly } = {} ) {
