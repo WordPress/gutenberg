@@ -38,7 +38,6 @@ const Tooltip = ( {
 	visible: initialVisible = false,
 } ) => {
 	const referenceElementRef = useRef( null );
-	const referenceMeasureTimeoutRef = useRef( null );
 	const animationValue = useRef( new Animated.Value( 0 ) ).current;
 	const [ , horizontalPosition = 'center' ] = position.split( ' ' );
 	const [ visible, setVisible ] = useState( initialVisible );
@@ -129,9 +128,12 @@ const Tooltip = ( {
 	];
 
 	const getReferenceElementPosition = () => {
-		clearTimeout( referenceMeasureTimeoutRef.current );
-		// Timeout used allow render to occur before calculating layout
-		referenceMeasureTimeoutRef.current = setTimeout( () => {
+		if ( ! referenceElementRef.current ) {
+			return;
+		}
+		// rAF allows render to complete before calculating layout
+		// eslint-disable-next-line no-undef
+		requestAnimationFrame( () => {
 			referenceElementRef.current.measure(
 				( _x, _y, width, height, pageX, pageY ) => {
 					setReferenceLayout( {
@@ -142,7 +144,7 @@ const Tooltip = ( {
 					} );
 				}
 			);
-		}, 0 );
+		} );
 	};
 	const getTooltipLayout = ( { nativeEvent } ) => {
 		const { height, width } = nativeEvent.layout;
