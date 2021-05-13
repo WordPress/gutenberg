@@ -77,8 +77,9 @@ export function useRichText( {
 	const didMount = !! record.current;
 	const hasContentChanged = value !== _value.current;
 	const hasSelectionChanged =
-		selectionStart !== record.current.start ||
-		selectionEnd !== record.current.end;
+		record.current &&
+		( selectionStart !== record.current.start ||
+			selectionEnd !== record.current.end );
 
 	if ( hasContentChanged ) {
 		record.current = create( {
@@ -98,6 +99,19 @@ export function useRichText( {
 	record.current.start = selectionStart;
 	record.current.end = selectionEnd;
 	_value.current = value;
+
+	useLayoutEffect( () => {
+		if (
+			// Apply only after the element has mounted, which will be done in the
+			// ref callback below.
+			didMount &&
+			// Reapply if the content has changed or the selection has changed AND
+			// it is selected.
+			( hasContentChanged || ( hasSelectionChanged && isSelected ) )
+		) {
+			applyRecord( record.current );
+		}
+	} );
 
 	/**
 	 * Sync the value to global state. The node tree and selection will also be
@@ -135,17 +149,6 @@ export function useRichText( {
 		forceRender();
 	}
 
-	// Should have no dependecies, because e.g. hasSelectionChanged could remain
-	// the same, yet need to be applied.
-	useLayoutEffect( () => {
-		if (
-			didMount &&
-			( hasContentChanged || ( hasSelectionChanged && isSelected ) )
-		) {
-			applyRecord( record.current );
-		}
-	} );
-
 	function focus() {
 		ref.current.focus();
 		applyRecord( record.current );
@@ -179,7 +182,6 @@ export function useRichText( {
 		} ),
 		useRefEffect( () => {
 			applyRecord( record.current );
-			didMount.current = true;
 		}, [ placeholder, ...__unstableDependencies ] ),
 	] );
 
