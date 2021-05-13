@@ -17,11 +17,9 @@ import {
 	isEmpty,
 	split,
 	toHTMLString,
-	isCollapsed,
 	removeFormat,
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -37,6 +35,7 @@ import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
 import { useInputRules } from './use-input-rules';
 import { useEnter } from './use-enter';
+import { useDelete } from './use-delete';
 import { useFormatTypes } from './use-format-types';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
@@ -298,45 +297,6 @@ function RichTextWrapper(
 	useCaretInFormat( { value } );
 	useMarkPersistent( { html: adjustedValue, value } );
 
-	function onKeyDown( event ) {
-		const { keyCode } = event;
-
-		if ( event.defaultPrevented ) {
-			return;
-		}
-
-		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			const { start, end, text } = value;
-			const isReverse = keyCode === BACKSPACE;
-			const hasActiveFormats =
-				value.activeFormats && !! value.activeFormats.length;
-
-			// Only process delete if the key press occurs at an uncollapsed edge.
-			if (
-				! isCollapsed( value ) ||
-				hasActiveFormats ||
-				( isReverse && start !== 0 ) ||
-				( ! isReverse && end !== text.length )
-			) {
-				return;
-			}
-
-			if ( onMerge ) {
-				onMerge( ! isReverse );
-			}
-
-			// Only handle remove on Backspace. This serves dual-purpose of being
-			// an intentional user interaction distinguishing between Backspace and
-			// Delete to remove the empty field, but also to avoid merge & remove
-			// causing destruction of two fields (merge, then removed merged).
-			if ( onRemove && isEmpty( value ) && isReverse ) {
-				onRemove( ! isReverse );
-			}
-
-			event.preventDefault();
-		}
-	}
-
 	const TagName = tagName;
 	const content = (
 		<>
@@ -377,6 +337,7 @@ function RichTextWrapper(
 						onReplace,
 					} ),
 					useUndoAutomaticChange(),
+					useDelete( { value, onMerge, onRemove } ),
 					usePasteHandler( {
 						isSelected,
 						disableFormats,
@@ -415,7 +376,6 @@ function RichTextWrapper(
 					'rich-text'
 				) }
 				onFocus={ unstableOnFocus }
-				onKeyDown={ onKeyDown }
 			/>
 		</>
 	);
