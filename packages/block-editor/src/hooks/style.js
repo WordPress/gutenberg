@@ -3,10 +3,11 @@
  */
 import {
 	capitalize,
+	find,
 	get,
 	has,
+	isEqual,
 	omit,
-	omitBy,
 	startsWith,
 	without,
 } from 'lodash';
@@ -107,22 +108,6 @@ function addAttribute( settings ) {
 }
 
 /**
- * Filters a style object returning only the keys
- * that are serializable for a given block.
- *
- * @param {Object} style Input style object to filter.
- * @param {Object} blockSupports Info about block supports.
- * @return {Object} Filtered style.
- */
-export function omitKeysNotToSerialize( style, blockSupports ) {
-	return omitBy(
-		style,
-		( value, key ) =>
-			!! blockSupports[ key ]?.__experimentalSkipSerialization
-	);
-}
-
-/**
  * Override props assigned to save component to inject the CSS variables definition.
  *
  * @param  {Object} props      Additional props applied to save element
@@ -135,43 +120,62 @@ export function addSaveProps( props, blockType, attributes ) {
 		return props;
 	}
 
-	const { style } = attributes;
-	let filteredStyle = omitKeysNotToSerialize( style, {
-		border: getBlockSupport( blockType, BORDER_SUPPORT_KEY ),
-		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
+	let { style } = attributes;
+
+	const skipSerializationPaths = [
+		{
+			indicator: [
+				BORDER_SUPPORT_KEY,
+				'__experimentalSkipSerialization',
+			],
+			value: [ 'border' ],
+		},
+		{
+			indicator: [ COLOR_SUPPORT_KEY, '__experimentalSkipSerialization' ],
+			value: [ COLOR_SUPPORT_KEY ],
+		},
+		{
+			indicator: '__experimentalSkipFontSizeSerialization',
+			skipvalueSerialization: [ 'typography', 'fontSize' ],
+		},
+		{
+			indicator: '__experimentalSkipTypographySerialization',
+			value: without(
+				TYPOGRAPHY_SUPPORT_KEYS,
+				FONT_SIZE_SUPPORT_KEY
+			).map(
+				( feature ) =>
+					find( STYLE_PROPERTY, ( property ) =>
+						isEqual( property.support, [ feature ] )
+					)?.value
+			),
+		},
+	];
+
+	skipSerializationPaths.forEach( ( { indicator, value } ) => {
+		if ( Array.isArray( indicator ) && indicator.length ) {
+			if (
+				indicator.length === 1 &&
+				! getBlockSupport( blockType, indicator[ 0 ] )
+			) {
+				return;
+			}
+			if (
+				! getBlockSupport( blockType, indicator[ 0 ] )?.[
+					indicator[ 1 ]
+				]
+			) {
+				return;
+			}
+		} else if ( ! getBlockSupport( blockType, indicator ) ) {
+			return;
+		}
+
+		style = omit( style, value );
 	} );
 
-	let typographyFeaturesToOmit = [];
-	if (
-		getBlockSupport(
-			blockType,
-			'__experimentalSkipTypographySerialization'
-		)
-	) {
-		// Font size is handled separately.
-		typographyFeaturesToOmit = without(
-			TYPOGRAPHY_SUPPORT_KEYS,
-			FONT_SIZE_SUPPORT_KEY
-		);
-	}
-
-	if (
-		getBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
-	) {
-		typographyFeaturesToOmit = [
-			...typographyFeaturesToOmit,
-			FONT_SIZE_SUPPORT_KEY,
-		];
-	}
-
-	const { typography, ...otherStyle } = filteredStyle;
-	filteredStyle = {
-		typography: omit( typography, typographyFeaturesToOmit ),
-		...otherStyle,
-	};
-
 	props.style = {
-		...getInlineStyles( filteredStyle ),
+		...getInlineStyles( style ),
 		...props.style,
 	};
 
