@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createBlock,
-	createBlocksFromInnerBlocksTemplate,
-} from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
@@ -87,7 +84,7 @@ const transforms = {
 						gradient,
 						customGradient: style?.color?.gradient,
 					},
-					createBlocksFromInnerBlocksTemplate( innerBlocks )
+					innerBlocks
 				);
 			},
 		},
