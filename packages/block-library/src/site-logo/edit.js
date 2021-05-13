@@ -16,6 +16,7 @@ import {
 	RangeControl,
 	ResizableBox,
 	Spinner,
+	ToggleControl,
 } from '@wordpress/components';
 import { useViewportMatch } from '@wordpress/compose';
 import {
@@ -46,7 +47,7 @@ const ACCEPT_MEDIA_STRING = 'image/*';
 
 const SiteLogo = ( {
 	alt,
-	attributes: { align, width, height },
+	attributes: { align, width, height, isLink, linkTarget },
 	containerRef,
 	isSelected,
 	setAttributes,
@@ -59,7 +60,7 @@ const SiteLogo = ( {
 	const isResizable = ! isWideAligned && isLargeViewport;
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const { toggleSelection } = useDispatch( blockEditorStore );
-	const classes = classnames( {
+	const classes = classnames( 'custom-logo-link', {
 		'is-transient': isBlobURL( logoUrl ),
 	} );
 	const { maxWidth, title } = useSelect( ( select ) => {
@@ -83,34 +84,37 @@ const SiteLogo = ( {
 	}
 
 	const img = (
-		// Disable reason: Image itself is not meant to be interactive, but
-		// should direct focus to block.
-		/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
-		<a
-			href={ siteUrl }
-			className={ classes }
-			rel="home"
-			title={ title }
-			onClick={ ( event ) => event.preventDefault() }
-		>
-			<span className="custom-logo-link">
-				<img
-					className="custom-logo"
-					src={ logoUrl }
-					alt={ alt }
-					onLoad={ ( event ) => {
-						setNaturalSize(
-							pick( event.target, [
-								'naturalWidth',
-								'naturalHeight',
-							] )
-						);
-					} }
-				/>
-			</span>
-		</a>
-		/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+		<img
+			className="custom-logo"
+			src={ logoUrl }
+			alt={ alt }
+			onLoad={ ( event ) => {
+				setNaturalSize(
+					pick( event.target, [ 'naturalWidth', 'naturalHeight' ] )
+				);
+			} }
+		/>
 	);
+
+	let imgWrapper = img;
+
+	// Disable reason: Image itself is not meant to be interactive, but
+	// should direct focus to block.
+	if ( isLink ) {
+		imgWrapper = (
+			/* eslint-disable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+			<a
+				href={ siteUrl }
+				className={ classes }
+				rel="home"
+				title={ title }
+				onClick={ ( event ) => event.preventDefault() }
+			>
+				{ img }
+			</a>
+			/* eslint-enable jsx-a11y/no-noninteractive-element-interactions, jsx-a11y/click-events-have-key-events */
+		);
+	}
 
 	let imageWidthWithinContainer;
 
@@ -120,7 +124,7 @@ const SiteLogo = ( {
 	}
 
 	if ( ! isResizable || ! imageWidthWithinContainer ) {
-		return <div style={ { width, height } }>{ img }</div>;
+		return <div style={ { width, height } }>{ imgWrapper }</div>;
 	}
 
 	const currentWidth = width || imageWidthWithinContainer;
@@ -192,6 +196,24 @@ const SiteLogo = ( {
 						value={ width || '' }
 						disabled={ ! isResizable }
 					/>
+					<ToggleControl
+						label={ __( 'Link image to home' ) }
+						onChange={ () => setAttributes( { isLink: ! isLink } ) }
+						checked={ isLink }
+					/>
+					{ isLink && (
+						<>
+							<ToggleControl
+								label={ __( 'Open in new tab' ) }
+								onChange={ ( value ) =>
+									setAttributes( {
+										linkTarget: value ? '_blank' : '_self',
+									} )
+								}
+								checked={ linkTarget === '_blank' }
+							/>
+						</>
+					) }
 				</PanelBody>
 			</InspectorControls>
 			<ResizableBox
@@ -217,7 +239,7 @@ const SiteLogo = ( {
 					} );
 				} }
 			>
-				{ img }
+				{ imgWrapper }
 			</ResizableBox>
 		</>
 	);
@@ -233,7 +255,7 @@ export default function LogoEdit( {
 	const [ logoUrl, setLogoUrl ] = useState();
 	const [ error, setError ] = useState();
 	const ref = useRef();
-	const { mediaItemData, sitelogo, url } = useSelect( ( select ) => {
+	const { mediaItemData, siteLogo, url } = useSelect( ( select ) => {
 		const siteSettings = select( coreStore ).getEditedEntityRecord(
 			'root',
 			'site'
@@ -241,14 +263,14 @@ export default function LogoEdit( {
 		const mediaItem = select( coreStore ).getEntityRecord(
 			'root',
 			'media',
-			siteSettings.sitelogo
+			siteSettings.site_logo
 		);
 		return {
 			mediaItemData: mediaItem && {
 				url: mediaItem.source_url,
 				alt: mediaItem.alt_text,
 			},
-			sitelogo: siteSettings.sitelogo,
+			siteLogo: siteSettings.site_logo,
 			url: siteSettings.url,
 		};
 	}, [] );
@@ -256,7 +278,7 @@ export default function LogoEdit( {
 	const { editEntityRecord } = useDispatch( coreStore );
 	const setLogo = ( newValue ) =>
 		editEntityRecord( 'root', 'site', undefined, {
-			sitelogo: newValue,
+			site_logo: newValue,
 		} );
 
 	let alt = null;
@@ -274,13 +296,13 @@ export default function LogoEdit( {
 
 		if ( ! media.id && media.url ) {
 			// This is a temporary blob image
-			setLogo( '' );
-			setError();
+			setLogo( undefined );
+			setError( null );
 			setLogoUrl( media.url );
 			return;
 		}
 
-		setLogo( media.id.toString() );
+		setLogo( media.id );
 	};
 
 	const onUploadError = ( message ) => {
@@ -301,7 +323,7 @@ export default function LogoEdit( {
 
 	const label = __( 'Site Logo' );
 	let logoImage;
-	if ( sitelogo === undefined ) {
+	if ( siteLogo === undefined ) {
 		logoImage = <Spinner />;
 	}
 

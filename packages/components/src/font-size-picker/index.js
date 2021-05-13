@@ -17,7 +17,7 @@ import Button from '../button';
 import RangeControl from '../range-control';
 import UnitControl from '../unit-control';
 import CustomSelectControl from '../custom-select-control';
-import VisuallyHidden from '../visually-hidden';
+import { VisuallyHidden } from '../visually-hidden';
 
 const DEFAULT_FONT_SIZE = 'default';
 const CUSTOM_FONT_SIZE = 'custom';

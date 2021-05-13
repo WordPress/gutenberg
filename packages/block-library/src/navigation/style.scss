@@ -4,6 +4,7 @@
 // The CSS lives here so that it is output even if you only use a
 // Page List block inside your navigation block.
 .wp-block-navigation {
+	position: relative;
 	// Normalize list styles.
 	ul,
 	ul li {
@@ -303,28 +304,36 @@
 	margin: 0;
 	padding-left: 0;
 
-	// Horizontal layout
-	display: flex;
-	flex-wrap: wrap;
+	// Only hide the menu by default if responsiveness is active.
+	.is-responsive {
+		display: none;
+	}
 
-	// Vertical layout
-	.is-vertical & {
-		display: block;
-		flex-direction: column;
-		align-items: flex-start;
+	@include break-small() {
+		// Horizontal layout
+		display: flex;
+		flex-wrap: wrap;
+
+		// Vertical layout
+		.is-vertical & {
+			display: block;
+			flex-direction: column;
+			align-items: flex-start;
+		}
 	}
 }
 
 // Justification.
-.items-justified-center > ul {
+// These target the named container class to work even with the additional mobile menu containers.
+.items-justified-center .wp-block-navigation__container {
 	justify-content: center;
 }
 
-.items-justified-right > ul {
+.items-justified-right .wp-block-navigation__container {
 	justify-content: flex-end;
 }
 
-.items-justified-space-between > ul {
+.items-justified-space-between .wp-block-navigation__container {
 	justify-content: space-between;
 }
 
@@ -341,4 +350,160 @@
 		margin-right: 0;
 		justify-content: flex-end;
 	}
+}
+
+/**
+ * Mobile menu.
+ */
+
+.wp-block-navigation__responsive-container {
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
+	align-items: flex-start;
+	justify-content: flex-start;
+
+	// Overlay menu.
+	// Provide an opinionated default style for menu items inside.
+	// Inherit as much as we can regarding colors, fonts, sizes,
+	// but otherwise provide a baseline.
+	// In a future version, we can explore more customizability.
+	&.is-menu-open {
+		display: flex;
+		flex-direction: column;
+
+		// Allow modal to scroll.
+		overflow: auto;
+
+		// Give it a z-index just higher than the adminbar.
+		z-index: 100000;
+
+		padding: 24px;
+		background-color: inherit;
+
+		.wp-block-navigation__container {
+			display: flex;
+			flex-direction: column;
+			margin-left: auto;
+			margin-right: auto;
+			align-items: flex-start;
+			line-height: 48px;
+			padding: 0;
+
+			.wp-block-page-list {
+				flex-direction: column;
+			}
+		}
+
+		// Remove background colors for items inside the overlay menu.
+		// Has to be !important to override global styles.
+		.wp-block-pages-list__item .submenu-container,
+		.wp-block-navigation-link .wp-block-navigation-link__container,
+		.wp-block-pages-list__item,
+		.wp-block-navigation-link {
+			background: transparent !important;
+		}
+	}
+
+	@include break-small() {
+		&:not(.is-menu-open) {
+			display: flex;
+			flex-direction: row;
+			position: relative;
+			background-color: inherit;
+
+			.wp-block-navigation__responsive-container-close {
+				display: none;
+			}
+		}
+
+		&.is-menu-open {
+			// Override breakpoint-inherited submenu rules.
+			.submenu-container.submenu-container.submenu-container.submenu-container,
+			.wp-block-navigation-link__container.wp-block-navigation-link__container.wp-block-navigation-link__container.wp-block-navigation-link__container {
+				left: 0;
+			}
+		}
+	}
+}
+
+// Default menu background and font color.
+.wp-block-navigation:not(.has-background) .wp-block-navigation__responsive-container.is-menu-open {
+	background-color: #fff;
+	color: #000;
+}
+
+// Menu and close buttons.
+.wp-block-navigation__responsive-container-open,
+.wp-block-navigation__responsive-container-close {
+	vertical-align: middle;
+	cursor: pointer;
+	color: currentColor;
+	background: transparent;
+	border: none;
+	margin: 0;
+	padding: 0;
+
+	svg {
+		fill: currentColor;
+		pointer-events: none;
+		display: block;
+		width: 24px;
+		height: 24px;
+	}
+}
+
+// Button to open the menu.
+.wp-block-navigation__responsive-container-open {
+	@include break-small {
+		display: none;
+	}
+}
+
+// Button to close the menus.
+.wp-block-navigation__responsive-container-close {
+	position: absolute;
+	top: 24px;
+	right: 24px;
+	z-index: 2; // Needs to be above the modal z index itself.
+}
+
+// The menu adds a wrapping container.
+.is-menu-open .wp-block-navigation__responsive-close,
+.is-menu-open .wp-block-navigation__responsive-dialog,
+.is-menu-open .wp-block-navigation__responsive-container-content {
+	width: 100%;
+	height: 100%;
+}
+
+// Always show submenus fully expanded inside the modal menu.
+.wp-block-navigation .wp-block-navigation__responsive-container.is-menu-open {
+	.wp-block-page-list__submenu-icon,
+	.wp-block-navigation-link__submenu-icon {
+		display: none;
+	}
+
+	.has-child .submenu-container,
+	.has-child .wp-block-navigation-link__container {
+		position: relative;
+		opacity: 1;
+		visibility: visible;
+
+		padding: 0 0 0 32px;
+		border: none;
+	}
+
+	.wp-block-navigation-link,
+	.wp-block-pages-list__item {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+}
+
+html.has-modal-open {
+	overflow: hidden;
 }

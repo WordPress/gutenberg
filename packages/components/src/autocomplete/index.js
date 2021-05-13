@@ -12,6 +12,7 @@ import {
 	useEffect,
 	useLayoutEffect,
 	useState,
+	useRef,
 } from '@wordpress/element';
 import {
 	ENTER,
@@ -23,7 +24,7 @@ import {
 	BACKSPACE,
 } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
+import { useInstanceId, useDebounce } from '@wordpress/compose';
 import {
 	create,
 	slice,
@@ -32,13 +33,13 @@ import {
 	getTextContent,
 	useAnchorRef,
 } from '@wordpress/rich-text';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import Popover from '../popover';
-import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 /**
  * A raw completer option.
@@ -285,17 +286,15 @@ const getAutoCompleterUI = ( autocompleter ) => {
 	return AutocompleterUI;
 };
 
-function Autocomplete( {
-	children,
-	isSelected,
+function useAutocomplete( {
 	record,
 	onChange,
 	onReplace,
 	completers,
-	debouncedSpeak,
 	contentRef,
 } ) {
-	const instanceId = useInstanceId( Autocomplete );
+	const debouncedSpeak = useDebounce( speak, 500 );
+	const instanceId = useInstanceId( useAutocomplete );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
 	const [ filteredOptions, setFilteredOptions ] = useState( [] );
 	const [ filterValue, setFilterValue ] = useState( '' );
@@ -544,29 +543,49 @@ function Autocomplete( {
 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
 		: null;
 
+	return {
+		listBoxId,
+		activeId,
+		onKeyDown: handleKeyDown,
+		popover: AutocompleterUI && (
+			<AutocompleterUI
+				className={ className }
+				filterValue={ filterValue }
+				instanceId={ instanceId }
+				listBoxId={ listBoxId }
+				selectedIndex={ selectedIndex }
+				onChangeOptions={ onChangeOptions }
+				onSelect={ select }
+				value={ record }
+				contentRef={ contentRef }
+			/>
+		),
+	};
+}
+
+export function useAutocompleteProps( options ) {
+	const ref = useRef();
+	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
+		...options,
+		contentRef: ref,
+	} );
+
+	return {
+		ref,
+		children: popover,
+		onKeyDown,
+		'aria-autocomplete': listBoxId ? 'list' : undefined,
+		'aria-owns': listBoxId,
+		'aria-activedescendant': activeId,
+	};
+}
+
+export default function Autocomplete( { children, isSelected, ...options } ) {
+	const { popover, ...props } = useAutocomplete( options );
 	return (
 		<>
-			{ children( {
-				isExpanded,
-				listBoxId,
-				activeId,
-				onKeyDown: handleKeyDown,
-			} ) }
-			{ isSelected && AutocompleterUI && (
-				<AutocompleterUI
-					className={ className }
-					filterValue={ filterValue }
-					instanceId={ instanceId }
-					listBoxId={ listBoxId }
-					selectedIndex={ selectedIndex }
-					onChangeOptions={ onChangeOptions }
-					onSelect={ select }
-					value={ record }
-					contentRef={ contentRef }
-				/>
-			) }
+			{ children( props ) }
+			{ isSelected && popover }
 		</>
 	);
 }
-
-export default withSpokenMessages( Autocomplete );

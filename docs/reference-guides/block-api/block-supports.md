@@ -497,6 +497,7 @@ supports: {
 -   Type: `Object`
 -   Default value: null
 -   Subproperties:
+    -   `margin`: type `boolean` or `array`, default value `false`
     -   `padding`: type `boolean` or `array`, default value `false`
 
 This value signals that a block supports some of the CSS style properties related to spacing. When it does, the block editor will show UI controls for the user to set their values, if [the theme declares support](/docs/how-to-guides/themes/theme-support.md#cover-block-padding).
@@ -504,6 +505,7 @@ This value signals that a block supports some of the CSS style properties relate
 ```js
 supports: {
     spacing: {
+        margin: true,  // Enable margin UI control.
         padding: true, // Enable padding UI control.
     }
 }
@@ -511,12 +513,13 @@ supports: {
 
 When the block declares support for a specific spacing property, the attributes definition is extended to include the `style` attribute.
 
--   `style`: attribute of `object` type with no default assigned. This is added when `padding` support is declared. It stores the custom values set by the user.
+-   `style`: attribute of `object` type with no default assigned. This is added when `margin` or `padding` support is declared. It stores the custom values set by the user.
 
 ```js
 supports: {
     spacing: {
-        padding: [ 'top', 'bottom' ], // Enable padding for arbitrary sides.
+        margin: [ 'top', 'bottom' ], // Enable margin for arbitrary sides.
+        padding: true,               // Enable padding for all sides.
     }
 }
 ```
