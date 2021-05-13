@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useCallback, useState } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { Placeholder, Dropdown, Button } from '@wordpress/components';
@@ -14,6 +14,11 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import TemplatePartSelection from '../selection';
 import PatternsSetup from './patterns-setup';
+
+/**
+ * External dependencies
+ */
+import { find } from 'lodash';
 
 const PLACEHOLDER_STEPS = {
 	initial: 1,
@@ -28,18 +33,19 @@ export default function TemplatePartPlaceholder( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.initial );
 
-	const { areasByName } = useSelect( ( select ) => {
+	const { areaIcon, areaLabel } = useSelect( ( select ) => {
 		const definedAreas = select(
 			editorStore
 		).__experimentalGetDefaultTemplatePartAreas();
-		const _areasByName = {};
-		definedAreas.forEach( ( item ) => {
-			_areasByName[ item.area ] = item;
-		} );
+
+		const selectedArea = find( definedAreas, { area } );
+		const defaultArea = find( definedAreas, { area: 'uncategorized' } );
+
 		return {
-			areasByName: _areasByName,
+			areaIcon: selectedArea?.icon || defaultArea?.icon,
+			areaLabel: selectedArea?.label || __( 'Template Part' ),
 		};
-	} );
+	}, [] );
 
 	const onCreate = useCallback(
 		async ( startingBlocks = [] ) => {
@@ -74,17 +80,12 @@ export default function TemplatePartPlaceholder( {
 		<>
 			{ step === PLACEHOLDER_STEPS.initial && (
 				<Placeholder
-					icon={
-						areasByName[ area ]?.icon ||
-						areasByName.uncategorized.icon
-					}
-					label={
-						areasByName[ area ]?.label
-							? areasByName[ area ].label
-							: __( 'Template Part' )
-					}
-					instructions={ __(
-						'Create a new template part or pick an existing one from the list.'
+					icon={ areaIcon }
+					label={ areaLabel }
+					instructions={ sprintf(
+						// Translators: %s as template part area title ("Header", "Footer", etc.).
+						'Create a new %s or pick an existing one from the list.',
+						areaLabel
 					) }
 				>
 					<Dropdown
@@ -105,7 +106,11 @@ export default function TemplatePartPlaceholder( {
 										setStep( PLACEHOLDER_STEPS.patterns )
 									}
 								>
-									{ __( 'New template part' ) }
+									{ sprintf(
+										// Translators: %s as template part area title ("Header", "Footer", etc.).
+										'New %s',
+										areaLabel
+									) }
 								</Button>
 							</>
 						) }
