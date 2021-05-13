@@ -34,7 +34,7 @@ export default function TemplatePartEdit( {
 	clientId,
 } ) {
 	const { slug, theme, tagName, layout = {} } = attributes;
-	const templatePartId = createTemplatePartId( slug, theme );
+	const templatePartId = createTemplatePartId( theme, slug );
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		templatePartId

@@ -281,8 +281,8 @@ export default function TemplatePartPreviews( {
 		).filter(
 			( templatePart ) =>
 				createTemplatePartId(
-					templatePart.slug,
-					templatePart.theme
+					templatePart.theme,
+					templatePart.slug
 				) !== templatePartId
 		);
 
