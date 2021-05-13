@@ -27,7 +27,7 @@ import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
-import { useCustomUnits } from '../components/use-custom-units';
+import { useCustomUnits } from '../components/unit-control';
 
 function LayoutPanel( { setAttributes, attributes } ) {
 	const { layout = {} } = attributes;

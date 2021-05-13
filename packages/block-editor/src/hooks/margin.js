@@ -12,7 +12,7 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 import useSetting from '../components/use-setting';
 import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
 import { cleanEmptyObject } from './utils';
-import { useCustomUnits } from '../components/use-custom-units';
+import { useCustomUnits } from '../components/unit-control';
 
 /**
  * Determines if there is margin support.
