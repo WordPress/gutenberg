@@ -340,7 +340,9 @@ function RichTextWrapper(
 	const TagName = tagName;
 	const content = (
 		<>
-			{ children && children( { value, onChange, onFocus } ) }
+			{ isSelected &&
+				children &&
+				children( { value, onChange, onFocus } ) }
 			{ isSelected && <RemoveBrowserShortcuts /> }
 			{ isSelected && autocompleteProps.children }
 			{ isSelected && (
