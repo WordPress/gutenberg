@@ -136,7 +136,8 @@ const I18N_HOOK_REGEXP = /^i18n\.(n?gettext|has_translation)(_|$)/;
  * @param {LocaleData} [initialData]    Locale data configuration.
  * @param {string}     [initialDomain]  Domain for which configuration applies.
  * @param {Hooks} [hooks]     Hooks implementation.
- * @return {I18n}                       I18n instance
+ *
+ * @return {I18n} I18n instance.
  */
 export const createI18n = ( initialData, initialDomain, hooks ) => {
 	/**

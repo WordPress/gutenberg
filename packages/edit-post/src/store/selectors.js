@@ -44,8 +44,9 @@ export const isEditorSidebarOpened = createRegistrySelector(
 /**
  * Returns true if the plugin sidebar is opened.
  *
- * @param {Object} state Global application state
- * @return {boolean}     Whether the plugin sidebar is opened.
+ * @param {Object} state Global application state.
+ *
+ * @return {boolean} Whether the plugin sidebar is opened.
  */
 export const isPluginSidebarOpened = createRegistrySelector(
 	( select ) => () => {

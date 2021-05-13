@@ -32,7 +32,7 @@ const ICON_COLORS = [ '#191e23', '#f8f9f9' ];
  *
  * @param  {WPBlock} block Block Object
  *
- * @return {boolean}       Whether the block is an unmodified default block
+ * @return {boolean} Whether the block is an unmodified default block
  */
 export function isUnmodifiedDefaultBlock( block ) {
 	const defaultBlockName = getDefaultBlockName();

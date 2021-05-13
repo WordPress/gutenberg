@@ -100,7 +100,8 @@ export function BorderPanel( props ) {
  *
  * @param  {string} blockName Block name.
  * @param  {string} feature   Border feature to check support for.
- * @return {boolean}          Whether there is support.
+ *
+ * @return {boolean} Whether there is support.
  */
 export function hasBorderSupport( blockName, feature = 'any' ) {
 	if ( Platform.OS !== 'web' ) {
@@ -129,7 +130,8 @@ export function hasBorderSupport( blockName, feature = 'any' ) {
  * Check whether serialization of border classes and styles should be skipped.
  *
  * @param  {string|Object} blockType Block name or block type object.
- * @return {boolean}                 Whether serialization of border properties should occur.
+ *
+ * @return {boolean} Whether serialization of border properties should occur.
  */
 export function shouldSkipSerialization( blockType ) {
 	const support = getBlockSupport( blockType, BORDER_SUPPORT_KEY );

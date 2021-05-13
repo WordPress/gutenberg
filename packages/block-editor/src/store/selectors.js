@@ -1232,7 +1232,8 @@ export function isValidTemplate( state ) {
  * Returns the defined block template
  *
  * @param {boolean} state
- * @return {?Array}        Block Template
+ *
+ * @return {?Array} Block Template.
  */
 export function getTemplate( state ) {
 	return state.settings.template;
@@ -2131,7 +2132,7 @@ function getReusableBlocks( state ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {boolean}     Is navigation mode enabled.
+ * @return {boolean} Is navigation mode enabled.
  */
 export function isNavigationMode( state ) {
 	return state.isNavigationMode;
@@ -2142,7 +2143,7 @@ export function isNavigationMode( state ) {
  *
  * @param {Object} state Editor state.
  *
- * @return {string}     Client Id of moving block.
+ * @return {string} Client Id of moving block.
  */
 export function hasBlockMovingClientId( state ) {
 	return state.hasBlockMovingClientId;

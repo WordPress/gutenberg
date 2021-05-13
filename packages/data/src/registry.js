@@ -63,7 +63,7 @@ export function createRegistry( storeConfigs = {}, parent = null ) {
 	 *
 	 * @param {Function}   listener Listener function.
 	 *
-	 * @return {Function}           Unsubscribe function.
+	 * @return {Function} Unsubscribe function.
 	 */
 	const subscribe = ( listener ) => {
 		listeners.push( listener );

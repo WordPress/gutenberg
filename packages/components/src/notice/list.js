@@ -17,7 +17,8 @@ import Notice from './';
  * @param  {Function} $0.onRemove  Function called when a notice should be removed / dismissed.
  * @param  {Object}   $0.className Name of the class used by the component.
  * @param  {Object}   $0.children  Array of children to be rendered inside the notice list.
- * @return {Object}                The rendered notices list.
+ *
+ * @return {Object} The rendered notices list.
  */
 function NoticeList( { notices, onRemove = noop, className, children } ) {
 	const removeNotice = ( id ) => () => onRemove( id );

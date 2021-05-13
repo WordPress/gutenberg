@@ -17,7 +17,8 @@ const MIN_BORDER_WIDTH = 0;
  * Inspector control for configuring border width property.
  *
  * @param  {Object} props  Block properties.
- * @return {WPElement}     Border width edit element.
+ *
+ * @return {WPElement} Border width edit element.
  */
 export const BorderWidthEdit = ( props ) => {
 	const {

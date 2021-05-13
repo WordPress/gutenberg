@@ -41,7 +41,7 @@ const BORDER_STYLES = [
  * @param  {Object}   props.onChange Handler for changing border style selection.
  * @param  {Object}   props.value    Currently selected border style value.
  *
- * @return {WPElement}      Custom border style select control.
+ * @return {WPElement} Custom border style select control.
  */
 export default function BorderStyleControl( { onChange, value } ) {
 	const style = BORDER_STYLES.find( ( option ) => option.key === value );

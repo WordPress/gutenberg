@@ -20,7 +20,8 @@ import { cleanEmptyObject } from './utils';
  * Determines if there is padding support.
  *
  * @param  {string|Object} blockType Block name or Block Type object.
- * @return {boolean}                 Whether there is support.
+ *
+ * @return {boolean} Whether there is support.
  */
 export function hasPaddingSupport( blockType ) {
 	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
@@ -31,7 +32,8 @@ export function hasPaddingSupport( blockType ) {
  * Custom hook that checks if padding settings have been disabled.
  *
  * @param  {string} name The name of the block.
- * @return {boolean}                 Whether padding setting is disabled.
+ *
+ * @return {boolean} Whether padding setting is disabled.
  */
 export function useIsPaddingDisabled( { name: blockName } = {} ) {
 	const isDisabled = ! useSetting( 'spacing.customPadding' );

@@ -8,7 +8,8 @@ import { cleanEmptyObject } from './utils';
  * Inspector control for configuring border style property.
  *
  * @param  {Object} props  Block properties.
- * @return {WPElement}     Border style edit element.
+ *
+ * @return {WPElement} Border style edit element.
  */
 export const BorderStyleEdit = ( props ) => {
 	const {

@@ -21,7 +21,7 @@ import { getBlockType } from './registration';
  * @param {Array} blocks    Block list.
  * @param {Array} template  Block template.
  *
- * @return {boolean}        Whether the list of blocks matches a templates
+ * @return {boolean} Whether the list of blocks matches a templates.
  */
 export function doBlocksMatchTemplate( blocks = [], template = [] ) {
 	return (
@@ -47,7 +47,7 @@ export function doBlocksMatchTemplate( blocks = [], template = [] ) {
  * @param {Array} blocks    Block list.
  * @param {Array} template  Block template.
  *
- * @return {Array}          Updated Block list.
+ * @return {Array} Updated Block list.
  */
 export function synchronizeBlocksWithTemplate( blocks = [], template ) {
 	// If no template is provided, return blocks unmodified.

@@ -52,7 +52,8 @@ const htmlSplitRegex = ( () => {
  * Separate HTML elements and comments from the text.
  *
  * @param  {string} input The text which has to be formatted.
- * @return {string[]}        The formatted text.
+ *
+ * @return {string[]} The formatted text.
  */
 function htmlSplit( input ) {
 	const parts = [];
@@ -83,7 +84,8 @@ function htmlSplit( input ) {
  *
  * @param  {string}                haystack     The text which has to be formatted.
  * @param  {Record<string,string>} replacePairs In the form {from: 'to', …}.
- * @return {string}                             The formatted text.
+ *
+ * @return {string} The formatted text.
  */
 function replaceInHtmlTags( haystack, replacePairs ) {
 	// Find all elements.
@@ -133,7 +135,7 @@ function replaceInHtmlTags( haystack, replacePairs ) {
  * autop( 'my text' ); // "<p>my text</p>"
  * ```
  *
- * @return {string}         Text which has been converted into paragraph tags.
+ * @return {string} Text which has been converted into paragraph tags.
  */
 export function autop( text, br = true ) {
 	const preTags = [];
@@ -336,7 +338,7 @@ export function autop( text, br = true ) {
  * removep( '<p>my text</p>' ); // "my text"
  * ```
  *
- * @return {string}      The content with stripped paragraph tags.
+ * @return {string} The content with stripped paragraph tags.
  */
 export function removep( html ) {
 	const blocklist =

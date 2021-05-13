@@ -291,7 +291,8 @@ function mapSelectors( selectors, store ) {
  *
  * @param {Object} actions    Actions to register.
  * @param {Object} store      The redux store to which the actions should be mapped.
- * @return {Object}           Actions mapped to the redux store provided.
+ *
+ * @return {Object} Actions mapped to the redux store provided.
  */
 function mapActions( actions, store ) {
 	const createBoundAction = ( action ) => ( ...args ) => {
@@ -306,7 +307,8 @@ function mapActions( actions, store ) {
  *
  * @param {Object} selectors Selectors to map.
  * @param {Object} store     The redux store the selectors select from.
- * @return {Object}          Selectors mapped to their resolution functions.
+ *
+ * @return {Object} Selectors mapped to their resolution functions.
  */
 function mapResolveSelectors( selectors, store ) {
 	return mapValues(

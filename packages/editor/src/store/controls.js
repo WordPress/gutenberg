@@ -9,7 +9,8 @@
  *
  * @param {string}  postId     Post ID.
  * @param {boolean} isPostNew  Whether post new.
- * @return {string}            sessionStorage key
+ *
+ * @return {string} sessionStorage key
  */
 function postKey( postId, isPostNew ) {
 	return `wp-autosave-block-editor-post-${

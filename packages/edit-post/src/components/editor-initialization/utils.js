@@ -6,7 +6,8 @@
  * @param  {Function} listener Listener.
  * @param  {boolean}  initial  Flags whether listener should be invoked on
  *                             initial call.
- * @return {Function}          Listener creator.
+ *
+ * @return {Function} Listener creator.
  */
 export const onChangeListener = ( selector, listener, initial = false ) => {
 	let previousValue = selector();

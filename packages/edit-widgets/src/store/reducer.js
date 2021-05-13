@@ -28,9 +28,10 @@ const createWithInitialState = ( initialState ) => ( reducer ) => {
 /**
  * Controls the open state of the widget areas.
  *
- * @param {Object} state   Redux state
- * @param {Object} action  Redux action
- * @return {Array}         Updated state
+ * @param {Object} state   Redux state.
+ * @param {Object} action  Redux action.
+ *
+ * @return {Array} Updated state.
  */
 export function widgetAreasOpenState( state = {}, action ) {
 	const { type } = action;

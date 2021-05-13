@@ -59,7 +59,8 @@ const FONT_WEIGHTS = [
  * Control to display unified font style and weight options.
  *
  * @param  {Object}   props Component props.
- * @return {WPElement}      Font appearance control.
+ *
+ * @return {WPElement} Font appearance control.
  */
 export default function FontAppearanceControl( props ) {
 	const {

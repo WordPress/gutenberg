@@ -23,8 +23,8 @@ import {
  *                                             format.
  * @param  {boolean} $1.boundaryClass          Whether or not to apply a boundary
  *                                             class.
- * @return {Object}                            Information to be used for
- *                                             element creation.
+ *
+ * @return {Object} Information to be used for element creation.
  */
 function fromFormat( {
 	type,

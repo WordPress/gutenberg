@@ -58,7 +58,8 @@ export function getValuesFromColors( colors = [] ) {
  * @param  {string} props.selector Selector to apply the filter to.
  * @param  {string} props.id       Unique id for this duotone filter.
  * @param  {Values} props.values   R, G, and B values to filter with.
- * @return {WPElement}             Duotone element.
+ *
+ * @return {WPElement} Duotone element.
  */
 function DuotoneFilter( { selector, id, values } ) {
 	const stylesheet = `
@@ -153,8 +154,9 @@ function DuotonePanel( { attributes, setAttributes } ) {
  * Filters registered block settings, extending attributes to include
  * the `duotone` attribute.
  *
- * @param  {Object} settings Original block settings
- * @return {Object}          Filtered block settings
+ * @param  {Object} settings Original block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 function addDuotoneAttributes( settings ) {
 	if ( ! hasBlockSupport( settings, 'color.__experimentalDuotone' ) ) {
@@ -178,8 +180,9 @@ function addDuotoneAttributes( settings ) {
  * Override the default edit UI to include toolbar controls for duotone if the
  * block supports duotone.
  *
- * @param  {Function} BlockEdit Original component
- * @return {Function}           Wrapped component
+ * @param  {Function} BlockEdit Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 const withDuotoneControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
@@ -201,8 +204,9 @@ const withDuotoneControls = createHigherOrderComponent(
 /**
  * Override the default block element to include duotone styles.
  *
- * @param  {Function} BlockListBlock Original component
- * @return {Function}                Wrapped component
+ * @param  {Function} BlockListBlock Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 const withDuotoneStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {

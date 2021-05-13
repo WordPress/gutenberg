@@ -4,7 +4,7 @@
  * @param  {string} namespace The namespace to validate - should take the form
  *                            `vendor/plugin/function`.
  *
- * @return {boolean}             Whether the namespace is valid.
+ * @return {boolean} Whether the namespace is valid.
  */
 function validateNamespace( namespace ) {
 	if ( 'string' !== typeof namespace || '' === namespace ) {

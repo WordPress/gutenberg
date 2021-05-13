@@ -42,7 +42,8 @@ export function getAvailableBlockFixturesBasenames() {
  * Reads a block fixture file, trims the contents and returns an object containing filename and file (contents) properties.
  *
  * @param  {string}                                   basename The filename of the fixture file without the  file extension.
- * @return {{filename: string, file: (string|null)}}           An object containing the filename + extension, and the trimmed contents of that file.
+ *
+ * @return {{filename: string, file: (string|null)}} An object containing the filename + extension, and the trimmed contents of that file.
  */
 export function getBlockFixtureHTML( basename ) {
 	const filename = `${ basename }.html`;

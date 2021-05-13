@@ -33,7 +33,8 @@ const TEXT_TRANSFORMS = [
  * @param  {Object}   props                Component props.
  * @param  {string}   props.value          Currently selected text transform.
  * @param  {Function} props.onChange       Handles change in text transform selection.
- * @return {WPElement}                     Text transform control.
+ *
+ * @return {WPElement} Text transform control.
  */
 export default function TextTransformControl( { value, onChange } ) {
 	return (

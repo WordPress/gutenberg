@@ -52,7 +52,8 @@ export function getBorderClassesAndStyles( { borderColor, style } ) {
  * reflected when themes do not load their color stylesheets in the editor.
  *
  * @param  {Object} attributes Block attributes.
- * @return {Object}            ClassName & style props from border block support.
+ *
+ * @return {Object} ClassName & style props from border block support.
  */
 export function useBorderProps( attributes ) {
 	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;

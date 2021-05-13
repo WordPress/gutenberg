@@ -290,7 +290,8 @@ function* trySaveWidgetArea( widgetAreaId ) {
  *
  * @param  {number} clientId  Client id.
  * @param  {number} widgetId  Widget id.
- * @return {Object}           Action.
+ *
+ * @return {Object} Action.
  */
 export function setWidgetIdForClientId( clientId, widgetId ) {
 	return {
@@ -304,7 +305,8 @@ export function setWidgetIdForClientId( clientId, widgetId ) {
  * Sets the open state of all the widget areas.
  *
  * @param  {Object} widgetAreasOpenState The open states of all the widget areas.
- * @return {Object}                      Action.
+ *
+ * @return {Object} Action.
  */
 export function setWidgetAreasOpenState( widgetAreasOpenState ) {
 	return {
@@ -318,7 +320,8 @@ export function setWidgetAreasOpenState( widgetAreasOpenState ) {
  *
  * @param  {string}  clientId   The clientId of the widget area.
  * @param  {boolean} isOpen     Whether the widget area should be opened.
- * @return {Object}             Action.
+ *
+ * @return {Object} Action.
  */
 export function setIsWidgetAreaOpen( clientId, isOpen ) {
 	return {

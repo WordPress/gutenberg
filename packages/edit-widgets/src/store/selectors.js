@@ -37,8 +37,9 @@ export const getWidgets = createRegistrySelector( ( select ) => () => {
 /**
  * Returns API widget data for a particular widget ID.
  *
- * @param  {number} id  Widget ID
- * @return {Object}     API widget data for a particular widget ID.
+ * @param  {number} id  Widget ID.
+ *
+ * @return {Object} API widget data for a particular widget ID.
  */
 export const getWidget = createRegistrySelector(
 	( select ) => ( state, id ) => {
@@ -181,7 +182,8 @@ export const isSavingWidgetAreas = createRegistrySelector( ( select ) => () => {
  *
  * @param {Array}  state    The open state of the widget areas.
  * @param {string} clientId The clientId of the widget area.
- * @return {boolean}        True if the widget area is open.
+ *
+ * @return {boolean} True if the widget area is open.
  */
 export const getIsWidgetAreaOpen = ( state, clientId ) => {
 	const { widgetAreasOpenState } = state;

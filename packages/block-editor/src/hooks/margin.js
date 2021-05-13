@@ -20,7 +20,8 @@ import { cleanEmptyObject } from './utils';
  * Determines if there is margin support.
  *
  * @param  {string|Object} blockType Block name or Block Type object.
- * @return {boolean}                 Whether there is support.
+ *
+ * @return {boolean} Whether there is support.
  */
 export function hasMarginSupport( blockType ) {
 	const support = getBlockSupport( blockType, SPACING_SUPPORT_KEY );
@@ -31,7 +32,8 @@ export function hasMarginSupport( blockType ) {
  * Custom hook that checks if margin settings have been disabled.
  *
  * @param  {string} name The name of the block.
- * @return {boolean}     Whether margin setting is disabled.
+ *
+ * @return {boolean} Whether margin setting is disabled.
  */
 export function useIsMarginDisabled( { name: blockName } = {} ) {
 	const isDisabled = ! useSetting( 'spacing.customMargin' );
@@ -42,7 +44,8 @@ export function useIsMarginDisabled( { name: blockName } = {} ) {
  * Inspector control panel containing the margin related configuration
  *
  * @param  {Object} props Block props.
- * @return {WPElement}    Margin edit element.
+ *
+ * @return {WPElement} Margin edit element.
  */
 export function MarginEdit( props ) {
 	const {

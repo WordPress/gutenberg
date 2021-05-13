@@ -566,7 +566,7 @@ export function hasRedo( state ) {
  *
  * @param {Object} state Data state.
  *
- * @return {Object}      The current theme.
+ * @return {Object} The current theme.
  */
 export function getCurrentTheme( state ) {
 	return state.themes[ state.currentTheme ];
@@ -577,7 +577,7 @@ export function getCurrentTheme( state ) {
  *
  * @param {Object} state Data state.
  *
- * @return {*}           Index data.
+ * @return {*} Index data.
  */
 export function getThemeSupports( state ) {
 	return state.themeSupports;

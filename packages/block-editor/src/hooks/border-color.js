@@ -37,7 +37,8 @@ const EMPTY_ARRAY = [];
  * matter.
  *
  * @param  {Object} props Block properties.
- * @return {WPElement}    Border color edit element.
+ *
+ * @return {WPElement} Border color edit element.
  */
 export function BorderColorEdit( props ) {
 	const {
@@ -85,7 +86,8 @@ export function BorderColorEdit( props ) {
  * `borderColor` if needed.
  *
  * @param  {Object} settings Original block settings.
- * @return {Object}          Updated block settings.
+ *
+ * @return {Object} Updated block settings.
  */
 function addAttributes( settings ) {
 	if ( ! hasBorderSupport( settings, 'color' ) ) {
@@ -114,8 +116,9 @@ function addAttributes( settings ) {
  *
  * @param  {Object} props      Additional props applied to save element.
  * @param  {Object} blockType  Block type definition.
- * @param  {Object} attributes Block's attributes
- * @return {Object}            Filtered props to apply to save element.
+ * @param  {Object} attributes Block's attributes.
+ *
+ * @return {Object} Filtered props to apply to save element.
  */
 function addSaveProps( props, blockType, attributes ) {
 	if (
@@ -145,7 +148,8 @@ function addSaveProps( props, blockType, attributes ) {
  * classnames to the block edit wrapper.
  *
  * @param {Object} settings Original block settings.
- * @return {Object}         Filtered block settings.
+ *
+ * @return {Object} Filtered block settings.
  */
 function addEditProps( settings ) {
 	if (
@@ -173,8 +177,9 @@ function addEditProps( settings ) {
  * This adds inline styles for color palette colors.
  * Ideally, this is not needed and themes should load their palettes on the editor.
  *
- * @param  {Function} BlockListBlock Original component
- * @return {Function}                Wrapped component
+ * @param  {Function} BlockListBlock Original component.
+ *
+ * @return {Function} Wrapped component.
  */
 export const withBorderColorPaletteStyles = createHigherOrderComponent(
 	( BlockListBlock ) => ( props ) => {
