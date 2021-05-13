@@ -1,3 +1,5 @@
+$vertical-tabs-width: 160px;
+
 .edit-post-preferences-modal {
 	// To keep modal dimensions consistent as subsections are navigated, width
 	// and height are used instead of max-(width/height).
@@ -15,10 +17,26 @@
 		height: 50%;
 	}
 
+	// Clears spacing to flush fit the navigation component to the modal edges.
+	@media (max-width: #{ ($break-medium - 1) }) {
+		.components-modal__content {
+			padding: 0;
+
+			&::before {
+				content: none;
+			}
+		}
+	}
+
 	.components-navigation {
 		background-color: $white;
-		margin: -#{$grid-unit-10};
-		padding: $grid-unit-10;
+		padding: 0;
+
+		> * {
+			// Matches spacing cleared from the modal content element.
+			padding: $grid-unit-30 $grid-unit-40;
+		}
+
 		.components-navigation__menu {
 			margin: 0;
 			color: $gray-900;
@@ -30,6 +48,9 @@
 					color: inherit;
 					padding: 3px $grid-unit-20;
 					height: $grid-unit-60;
+					// Aligns button text instead of button box.
+					margin: 0 #{-$grid-unit-20};
+					width: calc(#{$grid-unit-40} + 100%);
 					&:focus {
 						background: $gray-100;
 						font-weight: 500;
@@ -62,13 +83,12 @@
 	}
 
 	.edit-post-preferences__tabs {
-		display: flex;
-		flex-direction: row;
 		.components-tab-panel__tabs {
-			position: sticky;
-			top: 90px;
-			align-self: start;
-			width: 160px;
+			position: absolute;
+			top: $header-height + $grid-unit-30;
+			// Aligns button text instead of button box.
+			left: $grid-unit-20;
+			width: $vertical-tabs-width;
 			.components-tab-panel__tabs-item {
 				border-radius: $radius-block-ui;
 				font-weight: 400;
@@ -83,8 +103,8 @@
 			}
 		}
 		.components-tab-panel__tab-content {
-			width: 500px;
 			padding-left: $grid-unit-30;
+			margin-left: $vertical-tabs-width;
 		}
 	}
 
