@@ -2,7 +2,7 @@
  * Internal dependencies
  */
 import { blockNames } from './pages/editor-page';
-import { isAndroid, backspace, clickBeginningOfElement } from './helpers/utils';
+import { isAndroid } from './helpers/utils';
 import { slashInserter, shortText } from './helpers/test-data';
 
 const ANIMATION_TIME = 200;
@@ -53,14 +53,10 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		expect( slashInserterElement ).toBeTruthy();
 
 		// Remove / character
-		await clickBeginningOfElement(
-			editorPage.driver,
-			paragraphBlockElement
-		);
 		await editorPage.typeTextToParagraphBlock(
 			paragraphBlockElement,
-			shortText + backspace,
-			true
+			`\b ${ shortText }`,
+			false
 		);
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
