@@ -48,7 +48,8 @@
 		vertical-align: initial;
 	}
 
-	// These are flex items and aligned
+	// When it has better support, this can be replaces with column-gap
+	// since these are flex items.
 	margin-right: $grid-unit-10;
 }
 
