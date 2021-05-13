@@ -180,7 +180,7 @@ const BlockPatternSetup = ( {
 				onBlockPatternSelect={ () => {
 					const { blocks } = select(
 						blockEditorStore
-					).__experimentalGetAllowedPatterns(
+					).__experimentalGetParsedPattern(
 						patterns[ activeSlide ].name
 					);
 					onPatternSelectCallback( blocks );
