@@ -24,6 +24,9 @@
 		"color": {
 			"gradients": true,
 			"link": true
+		},
+		"spacing": {
+			"padding": true
 		}
 	}
 }
