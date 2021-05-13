@@ -10,6 +10,7 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Disabled featured image banner on iOS. [#31681]
 
 ## 1.52.1
 
