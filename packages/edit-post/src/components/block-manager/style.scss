@@ -1,6 +1,6 @@
 .edit-post-block-manager__no-results {
 	font-style: italic;
-	padding: 24px 0;
+	padding: $grid-unit-30 0;
 	text-align: center;
 }
 
@@ -24,13 +24,21 @@
 .edit-post-block-manager__disabled-blocks-count {
 	border: 1px solid $gray-300;
 	border-width: 1px 0;
-	margin-left: -$grid-unit-40;
-	margin-right: -$grid-unit-40;
-	padding-top: 0.6rem;
-	padding-bottom: 0.6rem;
-	padding-left: $grid-unit-40;
-	padding-right: $grid-unit-40;
-	background-color: $gray-100;
+	// Cover up horizontal areas off the sides of the box rectangle
+	box-shadow: -$grid-unit-40 0 0 0 $white, $grid-unit-40 0 0 0 $white;
+	padding: $grid-unit-10;
+	background-color: $white;
+	text-align: center;
+	font-style: italic;
+	position: sticky;
+	// When sticking, tuck the top border beneath the modal header border
+	top: -1px;
+	z-index: z-index(".edit-post-block-manager__disabled-blocks-count");
+
+	// Stick the category titles to the bottom
+	~ .edit-post-block-manager__results .edit-post-block-manager__category-title {
+		top: 35px;
+	}
 }
 
 .edit-post-block-manager__category {
@@ -86,7 +94,7 @@
 		align-items: center;
 		justify-content: space-between;
 		flex-grow: 1;
-		padding: 0.6rem 0 0.6rem 10px;
+		padding: $grid-unit-10 0;
 	}
 
 	.block-editor-block-icon {

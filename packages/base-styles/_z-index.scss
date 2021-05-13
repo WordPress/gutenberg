@@ -164,6 +164,8 @@ $z-layers: (
 
 	// Make sure block manager sticky category titles appear above the options
 	".edit-post-block-manager__category-title": 1,
+	// And block manager sticky disabled block count is higher still
+	".edit-post-block-manager__disabled-blocks-count": 2,
 
 	// Needs to be higher than any other element as this is an overlay to catch all events
 	".components-tooltip .event-catcher": 100002,
