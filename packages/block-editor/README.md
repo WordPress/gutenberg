@@ -668,6 +668,7 @@ const isEnabled = useSetting( 'typography.dropCap' );
 _Parameters_
 
 -   _path_ `string`: The path to the setting.
+-   _name_ `string`: The block name. Leave empty to use name from useBlockEditContext.
 
 _Returns_
 

@@ -54,6 +54,7 @@ const deprecatedFlags = {
  * It works with nested objects using by finding the value at path.
  *
  * @param {string} path The path to the setting.
+ * @param {string} name The block name. Leave empty to use name from useBlockEditContext.
  *
  * @return {any} Returns the value defined for the setting.
  *
@@ -62,8 +63,9 @@ const deprecatedFlags = {
  * const isEnabled = useSetting( 'typography.dropCap' );
  * ```
  */
-export default function useSetting( path ) {
+export default function useSetting( path, name = '' ) {
 	const { name: blockName } = useBlockEditContext();
+	const _blockName = '' === name ? blockName : name;
 
 	const setting = useSelect(
 		( select ) => {
@@ -72,7 +74,7 @@ export default function useSetting( path ) {
 			// 1 - Use __experimental features, if available.
 			// We cascade to the all value if the block one is not available.
 			const defaultsPath = `__experimentalFeatures.${ path }`;
-			const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
+			const blockPath = `__experimentalFeatures.blocks.${ _blockName }.${ path }`;
 			const experimentalFeaturesResult =
 				get( settings, blockPath ) ?? get( settings, defaultsPath );
 			if ( experimentalFeaturesResult !== undefined ) {
@@ -93,7 +95,7 @@ export default function useSetting( path ) {
 			// To remove when __experimentalFeatures are ported to core.
 			return path === 'typography.dropCap' ? true : undefined;
 		},
-		[ blockName, path ]
+		[ _blockName, path ]
 	);
 
 	return setting;
