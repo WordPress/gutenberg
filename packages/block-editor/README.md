@@ -654,6 +654,18 @@ _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
 
+<a name="useCustomUnits" href="#useCustomUnits">#</a> **useCustomUnits**
+
+Custom hook to retrieve and consolidate units setting from add_theme_support().
+
+_Parameters_
+
+-   _units_ `Array`: Collection of available units.
+
+_Returns_
+
+-   `Array`: Filtered units based on settings.
+
 <a name="useSetting" href="#useSetting">#</a> **useSetting**
 
 Hook that retrieves the editor setting.
