@@ -183,8 +183,6 @@ class GalleryImage extends Component {
 					src={ url }
 					alt={ alt }
 					data-id={ id }
-					onClick={ this.onSelectImage }
-					onFocus={ this.onSelectImage }
 					onKeyDown={ this.onRemoveImage }
 					tabIndex="0"
 					aria-label={ ariaLabel }
@@ -201,7 +199,12 @@ class GalleryImage extends Component {
 		} );
 
 		return (
-			<figure className={ className }>
+			// eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-noninteractive-element-interactions
+			<figure
+				className={ className }
+				onClick={ this.onSelectImage }
+				onFocus={ this.onSelectImage }
+			>
 				{ ! isEditing && ( href ? <a href={ href }>{ img }</a> : img ) }
 				{ isEditing && (
 					<MediaPlaceholder
