@@ -93,8 +93,20 @@ export function useRichText( {
 		record.current.end = selectionEnd;
 	}
 
+	const hadSelectionUpdate = useRef( false );
+
 	if ( ! record.current ) {
 		setRecordFromProps();
+	} else if (
+		selectionStart !== record.current.start ||
+		selectionEnd !== record.current.end
+	) {
+		hadSelectionUpdate.current = isSelected;
+		record.current = {
+			...record.current,
+			start: selectionStart,
+			end: selectionEnd,
+		};
 	}
 
 	/**
@@ -155,24 +167,12 @@ export function useRichText( {
 
 	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
-		if ( ! didMount.current ) {
+		if ( ! hadSelectionUpdate ) {
 			return;
 		}
 
-		if (
-			isSelected &&
-			( selectionStart !== record.current.start ||
-				selectionEnd !== record.current.end )
-		) {
-			applyFromProps();
-		} else {
-			record.current = {
-				...record.current,
-				start: selectionStart,
-				end: selectionEnd,
-			};
-		}
-	}, [ selectionStart, selectionEnd, isSelected ] );
+		applyFromProps();
+	}, [ hadSelectionUpdate ] );
 
 	function focus() {
 		ref.current.focus();
