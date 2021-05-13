@@ -138,11 +138,13 @@ export function useRichText( {
 	const shouldApply =
 		didMount && ( hasContentChanged || hasSelectionChanged );
 
+	// Should have no dependecies, because `shouldApply` could remain the same,
+	// but still need to be applied after a new render.
 	useLayoutEffect( () => {
 		if ( shouldApply ) {
 			applyRecord( record.current );
 		}
-	}, [ shouldApply ] );
+	} );
 
 	function focus() {
 		ref.current.focus();
