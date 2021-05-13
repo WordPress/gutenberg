@@ -9,31 +9,19 @@ import { omit } from 'lodash';
  */
 import { RawHTML, useRef, useCallback, forwardRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	pasteHandler,
-	children as childrenSource,
-	getBlockTransforms,
-	findTransform,
-} from '@wordpress/blocks';
+import { children as childrenSource } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
 	__unstableCreateElement,
 	isEmpty,
-	__unstableIsEmptyLine as isEmptyLine,
-	insert,
-	__unstableInsertLineSeparator as insertLineSeparator,
-	create,
-	replace,
 	split,
-	__UNSTABLE_LINE_SEPARATOR as LINE_SEPARATOR,
 	toHTMLString,
-	slice,
 	isCollapsed,
+	removeFormat,
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { isURL } from '@wordpress/url';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -41,23 +29,23 @@ import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
 import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
-import { filePasteHandler } from './file-paste-handler';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { useCaretInFormat } from './use-caret-in-format';
-import {
-	addActiveFormats,
-	getMultilineTag,
-	getAllowedFormats,
-	isShortcode,
-} from './utils';
+import { useMarkPersistent } from './use-mark-persistent';
+import { usePasteHandler } from './use-paste-handler';
+import { useInputRules } from './use-input-rules';
+import { useEnter } from './use-enter';
+import { useFormatTypes } from './use-format-types';
+import FormatEdit from './format-edit';
+import { getMultilineTag, getAllowedFormats } from './utils';
 
 function RichTextWrapper(
 	{
 		children,
 		tagName = 'div',
-		value: originalValue,
+		value: originalValue = '',
 		onChange: originalOnChange,
 		isSelected: originalIsSelected,
 		multiline,
@@ -125,11 +113,7 @@ function RichTextWrapper(
 	const { selectionStart, selectionEnd, isSelected, disabled } = useSelect(
 		selector
 	);
-	const {
-		__unstableMarkLastChangeAsPersistent,
-		selectionChange,
-		__unstableMarkAutomaticChange,
-	} = useDispatch( blockEditorStore );
+	const { selectionChange } = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -240,192 +224,69 @@ function RichTextWrapper(
 		[ onReplace, onSplit, multilineTag, onSplitMiddle ]
 	);
 
-	const onPaste = useCallback(
-		( {
-			value,
-			onChange,
-			html,
-			plainText,
-			isInternal,
-			files,
-			activeFormats,
-		} ) => {
-			// If the data comes from a rich text instance, we can directly use it
-			// without filtering the data. The filters are only meant for externally
-			// pasted content and remove inline styles.
-			if ( isInternal ) {
-				const pastedValue = create( {
-					html,
-					multilineTag,
-					multilineWrapperTags:
-						multilineTag === 'li' ? [ 'ul', 'ol' ] : undefined,
-					preserveWhiteSpace,
-				} );
-				addActiveFormats( pastedValue, activeFormats );
-				onChange( insert( value, pastedValue ) );
-				return;
-			}
-
-			if ( pastePlainText ) {
-				onChange( insert( value, create( { text: plainText } ) ) );
-				return;
-			}
-
-			// Only process file if no HTML is present.
-			// Note: a pasted file may have the URL as plain text.
-			if ( files && files.length && ! html ) {
-				const content = pasteHandler( {
-					HTML: filePasteHandler( files ),
-					mode: 'BLOCKS',
-					tagName,
-					preserveWhiteSpace,
-				} );
-
-				// Allows us to ask for this information when we get a report.
-				// eslint-disable-next-line no-console
-				window.console.log( 'Received items:\n\n', files );
-
-				if ( onReplace && isEmpty( value ) ) {
-					onReplace( content );
-				} else {
-					splitValue( value, content );
-				}
-
-				return;
-			}
-
-			let mode = onReplace && onSplit ? 'AUTO' : 'INLINE';
-
-			// Force the blocks mode when the user is pasting
-			// on a new line & the content resembles a shortcode.
-			// Otherwise it's going to be detected as inline
-			// and the shortcode won't be replaced.
-			if (
-				mode === 'AUTO' &&
-				isEmpty( value ) &&
-				isShortcode( plainText )
-			) {
-				mode = 'BLOCKS';
-			}
-
-			if (
-				__unstableEmbedURLOnPaste &&
-				isEmpty( value ) &&
-				isURL( plainText.trim() )
-			) {
-				mode = 'BLOCKS';
-			}
-
-			const content = pasteHandler( {
-				HTML: html,
-				plainText,
-				mode,
-				tagName,
-				preserveWhiteSpace,
-			} );
-
-			if ( typeof content === 'string' ) {
-				let valueToInsert = create( { html: content } );
-
-				addActiveFormats( valueToInsert, activeFormats );
-
-				// If the content should be multiline, we should process text
-				// separated by a line break as separate lines.
-				if ( multilineTag ) {
-					valueToInsert = replace(
-						valueToInsert,
-						/\n+/g,
-						LINE_SEPARATOR
-					);
-				}
-
-				onChange( insert( value, valueToInsert ) );
-			} else if ( content.length > 0 ) {
-				if ( onReplace && isEmpty( value ) ) {
-					onReplace( content, content.length - 1, -1 );
-				} else {
-					splitValue( value, content );
-				}
-			}
-		},
-		[
-			tagName,
-			onReplace,
-			onSplit,
-			splitValue,
-			__unstableEmbedURLOnPaste,
-			multilineTag,
-			preserveWhiteSpace,
-			pastePlainText,
-		]
-	);
-
-	const inputRule = useCallback(
-		( value, valueToFormat ) => {
-			if ( ! onReplace ) {
-				return;
-			}
-
-			const { start, text } = value;
-			const characterBefore = text.slice( start - 1, start );
-
-			// The character right before the caret must be a plain space.
-			if ( characterBefore !== ' ' ) {
-				return;
-			}
-
-			const trimmedTextBefore = text.slice( 0, start ).trim();
-			const prefixTransforms = getBlockTransforms( 'from' ).filter(
-				( { type } ) => type === 'prefix'
-			);
-			const transformation = findTransform(
-				prefixTransforms,
-				( { prefix } ) => {
-					return trimmedTextBefore === prefix;
-				}
-			);
-
-			if ( ! transformation ) {
-				return;
-			}
-
-			const content = valueToFormat( slice( value, start, text.length ) );
-			const block = transformation.transform( content );
-
-			onReplace( [ block ] );
-			__unstableMarkAutomaticChange();
-		},
-		[ onReplace, __unstableMarkAutomaticChange ]
-	);
-
 	const {
-		value,
-		onChange,
-		onFocus,
-		ref: richTextRef,
-		hasActiveFormats,
-		removeEditorOnlyFormats,
-		children: richTextChildren,
-	} = useRichText( {
+		formatTypes,
+		prepareHandlers,
+		valueHandlers,
+		changeHandlers,
+		dependencies,
+	} = useFormatTypes( {
 		clientId,
 		identifier,
+		withoutInteractiveFormatting,
+		allowedFormats: adjustedAllowedFormats,
+	} );
+
+	function addEditorOnlyFormats( value ) {
+		return valueHandlers.reduce(
+			( accumulator, fn ) => fn( accumulator, value.text ),
+			value.formats
+		);
+	}
+
+	function removeEditorOnlyFormats( value ) {
+		formatTypes.forEach( ( formatType ) => {
+			// Remove formats created by prepareEditableTree, because they are editor only.
+			if ( formatType.__experimentalCreatePrepareEditableTree ) {
+				value = removeFormat(
+					value,
+					formatType.name,
+					0,
+					value.text.length
+				);
+			}
+		} );
+
+		return value.formats;
+	}
+
+	function addInvisibleFormats( value ) {
+		return prepareHandlers.reduce(
+			( accumulator, fn ) => fn( accumulator, value.text ),
+			value.formats
+		);
+	}
+
+	const { value, onChange, onFocus, ref: richTextRef } = useRichText( {
 		value: adjustedValue,
-		onChange: adjustedOnChange,
+		onChange( html, { __unstableFormats, __unstableText } ) {
+			adjustedOnChange( html );
+			Object.values( changeHandlers ).forEach( ( changeHandler ) => {
+				changeHandler( __unstableFormats, __unstableText );
+			} );
+		},
 		selectionStart,
 		selectionEnd,
 		onSelectionChange,
 		placeholder,
-		allowedFormats: adjustedAllowedFormats,
-		withoutInteractiveFormatting,
-		onPaste,
 		__unstableIsSelected: isSelected,
-		__unstableInputRule: inputRule,
 		__unstableMultilineTag: multilineTag,
-		__unstableOnCreateUndoLevel: __unstableMarkLastChangeAsPersistent,
-		__unstableMarkAutomaticChange,
 		__unstableDisableFormats: disableFormats,
 		preserveWhiteSpace,
-		__unstableAllowPrefixTransformations,
+		__unstableDependencies: dependencies,
+		__unstableAfterParse: addEditorOnlyFormats,
+		__unstableBeforeSerialize: removeEditorOnlyFormats,
+		__unstableAddInvisibleFormats: addInvisibleFormats,
 	} );
 	const autocompleteProps = useBlockEditorAutocompleteProps( {
 		onReplace,
@@ -434,7 +295,8 @@ function RichTextWrapper(
 		onChange,
 	} );
 
-	useCaretInFormat( hasActiveFormats );
+	useCaretInFormat( { value } );
+	useMarkPersistent( { html: adjustedValue, value } );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;
@@ -443,58 +305,11 @@ function RichTextWrapper(
 			return;
 		}
 
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-
-			const _value = removeEditorOnlyFormats( value );
-			const canSplit = onReplace && onSplit;
-
-			if ( onReplace ) {
-				const transforms = getBlockTransforms( 'from' ).filter(
-					( { type } ) => type === 'enter'
-				);
-				const transformation = findTransform( transforms, ( item ) => {
-					return item.regExp.test( _value.text );
-				} );
-
-				if ( transformation ) {
-					onReplace( [
-						transformation.transform( {
-							content: _value.text,
-						} ),
-					] );
-					__unstableMarkAutomaticChange();
-				}
-			}
-
-			if ( multiline ) {
-				if ( event.shiftKey ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( canSplit && isEmptyLine( _value ) ) {
-					splitValue( _value );
-				} else {
-					onChange( insertLineSeparator( _value ) );
-				}
-			} else {
-				const { text, start, end } = _value;
-				const canSplitAtEnd =
-					onSplitAtEnd && start === end && end === text.length;
-
-				if ( event.shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( ! canSplit && canSplitAtEnd ) {
-					onSplitAtEnd();
-				} else if ( canSplit ) {
-					splitValue( _value );
-				}
-			}
-		} else if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			const { start, end, text } = value;
 			const isReverse = keyCode === BACKSPACE;
+			const hasActiveFormats =
+				value.activeFormats && !! value.activeFormats.length;
 
 			// Only process delete if the key press occurs at an uncollapsed edge.
 			if (
@@ -528,7 +343,15 @@ function RichTextWrapper(
 			{ children && children( { value, onChange, onFocus } ) }
 			{ isSelected && <RemoveBrowserShortcuts /> }
 			{ isSelected && autocompleteProps.children }
-			{ isSelected && richTextChildren }
+			{ isSelected && (
+				<FormatEdit
+					value={ value }
+					onChange={ onChange }
+					onFocus={ onFocus }
+					formatTypes={ formatTypes }
+					forwardedRef={ anchorRef }
+				/>
+			) }
 			{ isSelected && hasFormats && (
 				<FormatToolbarContainer
 					inline={ inlineToolbar }
@@ -546,7 +369,40 @@ function RichTextWrapper(
 					autocompleteProps.ref,
 					props.ref,
 					richTextRef,
+					useInputRules( {
+						value,
+						onChange,
+						__unstableAllowPrefixTransformations,
+						formatTypes,
+						onReplace,
+					} ),
 					useUndoAutomaticChange(),
+					usePasteHandler( {
+						isSelected,
+						disableFormats,
+						onChange,
+						value,
+						formatTypes,
+						tagName,
+						onReplace,
+						onSplit,
+						splitValue,
+						__unstableEmbedURLOnPaste,
+						multilineTag,
+						preserveWhiteSpace,
+						pastePlainText,
+					} ),
+					useEnter( {
+						removeEditorOnlyFormats,
+						value,
+						onReplace,
+						onSplit,
+						multiline,
+						onChange,
+						disableLineBreaks,
+						splitValue,
+						onSplitAtEnd,
+					} ),
 					anchorRef,
 					forwardedRef,
 				] ) }
@@ -559,10 +415,7 @@ function RichTextWrapper(
 					'rich-text'
 				) }
 				onFocus={ unstableOnFocus }
-				onKeyDown={ ( event ) => {
-					autocompleteProps.onKeyDown( event );
-					onKeyDown( event );
-				} }
+				onKeyDown={ onKeyDown }
 			/>
 		</>
 	);
@@ -610,11 +463,6 @@ ForwardedRichTextContainer.Content = ( {
 
 ForwardedRichTextContainer.isEmpty = ( value ) => {
 	return ! value || value.length === 0;
-};
-
-ForwardedRichTextContainer.Content.defaultProps = {
-	format: 'string',
-	value: '',
 };
 
 /**

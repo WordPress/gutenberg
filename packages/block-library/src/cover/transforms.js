@@ -52,6 +52,42 @@ const transforms = {
 					]
 				),
 		},
+		{
+			type: 'block',
+			blocks: [ 'core/group' ],
+			isMatch: ( { backgroundColor, gradient, style } ) => {
+				/*
+				 * Make this transformation available only if the Group has background
+				 * or gradient set, because otherwise `Cover` block displays a Placeholder.
+				 *
+				 * This helps avoid arbitrary decisions about the Cover block's background
+				 * and user confusion about the existence of previous content.
+				 */
+				return (
+					backgroundColor ||
+					style?.color?.background ||
+					style?.color?.gradient ||
+					gradient
+				);
+			},
+			transform: (
+				{ align, anchor, backgroundColor, gradient, style },
+				innerBlocks
+			) => {
+				return createBlock(
+					'core/cover',
+					{
+						align,
+						anchor,
+						overlayColor: backgroundColor,
+						customOverlayColor: style?.color?.background,
+						gradient,
+						customGradient: style?.color?.gradient,
+					},
+					innerBlocks
+				);
+			},
+		},
 	],
 	to: [
 		{
