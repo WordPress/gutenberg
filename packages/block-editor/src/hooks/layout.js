@@ -7,7 +7,6 @@ import { has } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { Platform } from '@wordpress/element';
 import { createHigherOrderComponent, useInstanceId } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { hasBlockSupport } from '@wordpress/blocks';
@@ -28,35 +27,7 @@ import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
-
-const isWeb = Platform.OS === 'web';
-const CSS_UNITS = [
-	{
-		value: '%',
-		label: isWeb ? '%' : __( 'Percentage (%)' ),
-		default: '',
-	},
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-	},
-	{
-		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
-		default: '',
-	},
-];
+import { useCustomUnits } from '../components/use-custom-units';
 
 function LayoutPanel( { setAttributes, attributes } ) {
 	const { layout = {} } = attributes;
@@ -66,6 +37,11 @@ function LayoutPanel( { setAttributes, attributes } ) {
 		const { getSettings } = select( blockEditorStore );
 		return getSettings().supportsLayout;
 	}, [] );
+
+	const units = useCustomUnits( {
+		settingPath: 'layout.units',
+		defaultUnits: [ '%', 'px', 'em', 'rem', 'vw' ],
+	} );
 
 	if ( ! themeSupportsLayout ) {
 		return null;
@@ -103,7 +79,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 											},
 										} );
 									} }
-									units={ CSS_UNITS }
+									units={ units }
 								/>
 								<Icon icon={ positionCenter } />
 							</div>
@@ -125,7 +101,7 @@ function LayoutPanel( { setAttributes, attributes } ) {
 											},
 										} );
 									} }
-									units={ CSS_UNITS }
+									units={ units }
 								/>
 								<Icon icon={ stretchWide } />
 							</div>
