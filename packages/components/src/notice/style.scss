@@ -81,3 +81,17 @@
 		margin-top: $grid-unit-10;
 	}
 }
+
+.components-notice__actions {
+	display: flex;
+	flex-wrap: wrap;
+
+	// Fallback until there is better support on
+	// Safari on iOS and Samsung Internet
+	margin-right: $grid-unit-15;
+
+	@supports ( gap: 10px ) {
+		margin-right: 0;
+		gap: $grid-unit-15;
+	}
+}
