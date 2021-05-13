@@ -27,6 +27,13 @@ import { store as editorStore } from '@wordpress/editor';
  */
 import { createTemplatePartId } from '../utils/create-template-part-id';
 
+function getAreaGroupTitle( areaLabel ) {
+	return sprintf(
+		// Translators: %s for the area the template part is assigned to (Header, Footer, General, etc.)
+		__( 'Area: %s' ),
+		areaLabel
+	);
+}
 function PreviewPlaceholder() {
 	return (
 		<div
@@ -133,13 +140,29 @@ function TemplatePartsByArea( {
 
 	const currentShownTPs = useAsyncList( templatePartsToShow );
 
+	if ( ! templatePartsToShow.length ) {
+		return (
+			<PanelGroup
+				title={ getAreaGroupTitle(
+					labelsByArea[ area ] || labelsByArea.uncategorized
+				) }
+			>
+				{ sprintf(
+					// Translators: %s for the template part variation ("Header", "Footer", "Template Part").
+					'There is no other %s available. If you are looking for another type of template part, try searching for it using the input above.',
+					area && area !== 'uncategorized'
+						? labelsByArea[ area ] || area
+						: __( 'Template Part' )
+				) }
+			</PanelGroup>
+		);
+	}
+
 	return templatePartsByArea.map( ( templatePartList ) => {
 		return (
 			<PanelGroup
 				key={ templatePartList[ 0 ].area }
-				title={ sprintf(
-					// Translators: for the area the template part is assigned to (Header, Footer, General, etc.)
-					__( 'Area: %s' ),
+				title={ getAreaGroupTitle(
 					labelsByArea[ templatePartList[ 0 ].area ] ||
 						labelsByArea.uncategorized
 				) }
@@ -237,9 +260,7 @@ function TemplatePartSearchResults( {
 	return groupedResults.map( ( group ) => (
 		<PanelGroup
 			key={ group[ 0 ].id }
-			title={ sprintf(
-				// Translators: for the area the template part is assigned to (Header, Footer, General, etc.)
-				__( 'Area: %s' ),
+			title={ getAreaGroupTitle(
 				labelsByArea[ group[ 0 ].area ] || labelsByArea.uncategorized
 			) }
 		>
