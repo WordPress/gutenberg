@@ -34,7 +34,9 @@ export function useFocusHandler( clientId ) {
 				// getting data through `useSelect` asynchronously.
 				if ( isBlockSelected( clientId ) ) {
 					// Potentially change selection away from rich text.
-					selectionChange( clientId );
+					if ( ! event.target.isContentEditable ) {
+						selectionChange( clientId );
+					}
 					return;
 				}
 
