@@ -660,7 +660,10 @@ Custom hook to retrieve and consolidate units setting from add_theme_support().
 
 _Parameters_
 
--   _units_ `Array`: Collection of available units.
+-   _args_ `Object`: An object containing units, settingPath & defaultUnits.
+-   _args.units_ `Object`: Collection of available units.
+-   _args.settingPath_ `string`: The setting path. Defaults to 'spacing.units'.
+-   _args.defaultUnits_ `Array`: Array of default units.
 
 _Returns_
 

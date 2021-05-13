@@ -9,7 +9,10 @@ import { __experimentalUnitControl as BaseUnitControl } from '@wordpress/compone
 import { useCustomUnits } from '../use-custom-units';
 
 export default function UnitControl( { units: unitsProp, ...props } ) {
-	const units = useCustomUnits( unitsProp );
+	const units = useCustomUnits( {
+		settingPath: 'spacing.units',
+		units: unitsProp,
+	} );
 
 	return <BaseUnitControl units={ units } { ...props } />;
 }

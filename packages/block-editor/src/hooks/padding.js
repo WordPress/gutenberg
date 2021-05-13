@@ -14,35 +14,6 @@ import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
 import { cleanEmptyObject } from './utils';
 import { useCustomUnits } from '../components/use-custom-units';
 
-const isWeb = Platform.OS === 'web';
-const CSS_UNITS = [
-	{
-		value: '%',
-		label: isWeb ? '%' : __( 'Percentage (%)' ),
-		default: '',
-	},
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-	},
-	{
-		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
-		default: '',
-	},
-];
-
 /**
  * Determines if there is padding support.
  *
@@ -79,7 +50,10 @@ export function PaddingEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const units = useCustomUnits( CSS_UNITS );
+	const units = useCustomUnits( {
+		settingPath: 'spacing.units',
+		defaultUnits: [ '%', 'px', 'em', 'rem', 'vw' ],
+	} );
 	const sides = useCustomSides( blockName, 'padding' );
 
 	if ( useIsPaddingDisabled( props ) ) {
