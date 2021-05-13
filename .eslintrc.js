@@ -48,6 +48,7 @@ module.exports = {
 		jsdoc: {
 			mode: 'typescript',
 		},
+		'import/resolver': '@wordpress/eslint-import-resolver',
 	},
 	rules: {
 		'jest/expect-expect': 'off',

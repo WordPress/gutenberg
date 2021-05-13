@@ -15,6 +15,7 @@ module.exports = {
 			version: 'detect',
 			flowVersion: '0.92.0',
 		},
+		'import/resolver': '@wordpress/eslint-import-resolver',
 	},
 	rules: {
 		'no-restricted-syntax': [
