@@ -30,7 +30,6 @@ export function useRichText( {
 	onChange,
 	__unstableMultilineTag: multilineTag,
 	__unstableDisableFormats: disableFormats,
-	__unstableIsSelected: isSelected,
 	__unstableDependencies,
 	__unstableAfterParse,
 	__unstableBeforeSerialize,
@@ -94,6 +93,8 @@ export function useRichText( {
 	}
 
 	const hadSelectionUpdate = useRef( false );
+	const isSelected =
+		selectionStart !== undefined && selectionEnd !== undefined;
 
 	if ( ! record.current ) {
 		setRecordFromProps();
