@@ -172,7 +172,9 @@ export default function PreferencesModal() {
 							/>
 						</Section>
 						<Section
-							title={ __( 'Show/Hide blocks from the inserter' ) }
+							title={ __(
+								'Manage visibility of blocks in the inserter'
+							) }
 						>
 							<BlockManager />
 						</Section>

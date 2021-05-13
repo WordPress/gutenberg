@@ -45,8 +45,8 @@ function BlockManager( {
 					{ sprintf(
 						/* translators: %d: number of blocks. */
 						_n(
-							'%d block is disabled.',
-							'%d blocks are disabled.',
+							'%d block is hidden.',
+							'%d blocks are hidden.',
 							numberOfHiddenBlocks
 						),
 						numberOfHiddenBlocks
