@@ -11,6 +11,7 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
+	useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/block-editor';
 import {
@@ -41,7 +42,6 @@ import {
 	toggleLabel,
 } from './icons';
 import {
-	CSS_UNITS,
 	PC_WIDTH_DEFAULT,
 	PX_WIDTH_DEFAULT,
 	MIN_WIDTH,
@@ -75,6 +75,11 @@ export default function SearchEdit( {
 	const borderRadius = style?.border?.radius;
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
+
+	const units = useCustomUnits( {
+		defaultUnits: [ '%', 'px' ],
+		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
+	} );
 
 	const getBlockClassNames = () => {
 		return classnames(
@@ -278,7 +283,7 @@ export default function SearchEdit( {
 							style={ { maxWidth: 80 } }
 							value={ `${ width }${ widthUnit }` }
 							unit={ widthUnit }
-							units={ CSS_UNITS }
+							units={ units }
 						/>
 
 						<ButtonGroup
