@@ -135,13 +135,13 @@ export function useRichText( {
 		forceRender();
 	}
 
-	const shouldApply =
-		didMount && ( hasContentChanged || hasSelectionChanged );
-
-	// Should have no dependecies, because `shouldApply` could remain the same,
-	// but still need to be applied after a new render.
+	// Should have no dependecies, because e.g. hasSelectionChanged could remain
+	// the same, yet need to be applied.
 	useLayoutEffect( () => {
-		if ( shouldApply ) {
+		if (
+			didMount &&
+			( hasContentChanged || ( hasSelectionChanged && isSelected ) )
+		) {
 			applyRecord( record.current );
 		}
 	} );
