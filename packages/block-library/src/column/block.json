@@ -20,6 +20,10 @@
 	"supports": {
 		"anchor": true,
 		"reusable": false,
-		"html": false
+		"html": false,
+		"color": {
+			"gradients": true,
+			"link": true
+		}
 	}
 }

@@ -108,4 +108,8 @@
 	&.is-vertically-aligned-bottom {
 		width: 100%;
 	}
+
+	&.has-background {
+		padding: $block-bg-padding--v $block-bg-padding--h;
+	}
 }
