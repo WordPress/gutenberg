@@ -80,7 +80,7 @@ export default function TemplatePartEdit( {
 			);
 			const _enableSelection = templatePartId
 				? matchingReplacements?.length > 1
-				: matchingReplacements?.length;
+				: matchingReplacements?.length > 0;
 
 			const hasResolvedEntity = templatePartId
 				? hasFinishedResolution(
