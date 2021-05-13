@@ -34,6 +34,11 @@
 	margin: $grid-unit-05 #{ $button-size-small + $border-width } $grid-unit-05 0;
 }
 
+.components-notice__actions {
+	display: flex;
+	flex-wrap: wrap;
+}
+
 .components-notice__action.components-button {
 	&,
 	&.is-link {
@@ -42,6 +47,9 @@
 	&.is-secondary {
 		vertical-align: initial;
 	}
+
+	// These are flex items and aligned
+	margin-right: $grid-unit-10;
 }
 
 .components-notice__dismiss {
@@ -79,19 +87,6 @@
 		display: block;
 		margin-left: 0;
 		margin-top: $grid-unit-10;
-	}
-}
-
-.components-notice__actions {
-	display: flex;
-	flex-wrap: wrap;
-
-	// Fallback until there is better support on
-	// Safari on iOS and Samsung Internet
-	margin-right: $grid-unit-15;
-
-	@supports ( gap: 10px ) {
-		margin-right: 0;
-		gap: $grid-unit-15;
+		margin-right: $grid-unit-10;
 	}
 }
