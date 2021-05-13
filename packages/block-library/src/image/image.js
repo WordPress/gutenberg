@@ -87,7 +87,6 @@ export default function Image( {
 	onSelectURL,
 	onUploadError,
 	containerRef,
-	clientId,
 } ) {
 	const captionRef = useRef();
 	const prevUrl = usePrevious( url );
@@ -108,8 +107,8 @@ export default function Image( {
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
-						( _clientId ) =>
-							getBlockName( _clientId ) === 'core/image'
+						( clientId ) =>
+							getBlockName( clientId ) === 'core/image'
 					),
 			};
 		},
@@ -126,9 +125,7 @@ export default function Image( {
 			] );
 		}
 	);
-	const { replaceBlocks, toggleSelection, selectionChange } = useDispatch(
-		blockEditorStore
-	);
+	const { replaceBlocks, toggleSelection } = useDispatch( blockEditorStore );
 	const { createErrorNotice, createSuccessNotice } = useDispatch(
 		noticesStore
 	);
@@ -401,7 +398,6 @@ export default function Image( {
 			<img
 				src={ temporaryURL || url }
 				alt={ defaultedAlt }
-				onClick={ () => selectionChange( clientId ) }
 				onError={ () => onImageError() }
 				onLoad={ ( event ) => {
 					setNaturalSize(
