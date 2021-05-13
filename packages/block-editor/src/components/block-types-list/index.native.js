@@ -2,10 +2,11 @@
  * External dependencies
  */
 import {
-	FlatList,
-	View,
-	TouchableWithoutFeedback,
 	Dimensions,
+	FlatList,
+	StyleSheet,
+	TouchableWithoutFeedback,
+	View,
 } from 'react-native';
 
 /**
@@ -68,6 +69,10 @@ export default function BlockTypesList( { name, items, onSelect, listProps } ) {
 		}
 	}
 
+	const contentContainerStyle = StyleSheet.flatten(
+		listProps.contentContainerStyle
+	);
+
 	return (
 		<FlatList
 			onLayout={ onLayout }
@@ -95,6 +100,13 @@ export default function BlockTypesList( { name, items, onSelect, listProps } ) {
 				/>
 			) }
 			{ ...listProps }
+			contentContainerStyle={ {
+				...contentContainerStyle,
+				paddingBottom: Math.max(
+					listProps.safeAreaBottomInset,
+					contentContainerStyle.paddingBottom
+				),
+			} }
 		/>
 	);
 }
