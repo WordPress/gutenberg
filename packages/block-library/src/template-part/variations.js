@@ -3,11 +3,38 @@
  */
 import { store as coreDataStore } from '@wordpress/core-data';
 import { select } from '@wordpress/data';
-import * as icons from '@wordpress/icons';
+import {
+	header as headerIcon,
+	footer as footerIcon,
+	sidebar as sidebarIcon,
+	layout as layoutIcon,
+} from '@wordpress/icons';
+
+/**
+ * Internal dependencies
+ */
+import fallbackVariations from './fallback-variations';
+
+function getTemplatePartIcon( iconName ) {
+	if ( 'header' === iconName ) {
+		return headerIcon;
+	} else if ( 'footer' === iconName ) {
+		return footerIcon;
+	} else if ( 'sidebar' === iconName ) {
+		return sidebarIcon;
+	}
+	return layoutIcon;
+}
 
 export function enhanceTemplatePartVariations( settings, name ) {
 	if ( name !== 'core/template-part' ) {
 		return settings;
+	}
+
+	// WordPress versions pre-5.8 do not support server side variation registration.
+	// So we must register the fallback variations until those versions are no longer supported.
+	if ( ! settings.variations ) {
+		return { ...settings, variations: fallbackVariations };
 	}
 
 	if ( settings.variations ) {
@@ -32,7 +59,7 @@ export function enhanceTemplatePartVariations( settings, name ) {
 				...variation,
 				...( ! variation.isActive && { isActive } ),
 				...( typeof variation.icon === 'string' && {
-					icon: icons[ variation.icon ],
+					icon: getTemplatePartIcon( variation.icon ),
 				} ),
 			};
 		} );
