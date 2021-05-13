@@ -167,12 +167,13 @@ export function useRichText( {
 
 	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
-		if ( ! hadSelectionUpdate ) {
+		if ( ! hadSelectionUpdate.current ) {
 			return;
 		}
 
 		applyFromProps();
-	}, [ hadSelectionUpdate ] );
+		hadSelectionUpdate.current = false;
+	}, [ hadSelectionUpdate.current ] );
 
 	function focus() {
 		ref.current.focus();
