@@ -72,11 +72,15 @@ export function useRichText( {
 	}
 
 	// Internal values are updated synchronously, unlike props and state.
-	const _value = useRef( value );
+	const _value = useRef();
 	const record = useRef();
+	const didMount = !! record.current;
+	const hasContentChanged = value !== _value.current;
+	const hasSelectionChanged =
+		selectionStart !== record.current.start ||
+		selectionEnd !== record.current.end;
 
-	function setRecordFromProps() {
-		_value.current = value;
+	if ( hasContentChanged ) {
 		record.current = create( {
 			html: value,
 			multilineTag,
@@ -89,25 +93,11 @@ export function useRichText( {
 			record.current.replacements = Array( value.length );
 		}
 		record.current.formats = __unstableAfterParse( record.current );
-		record.current.start = selectionStart;
-		record.current.end = selectionEnd;
 	}
 
-	const hadSelectionUpdate = useRef( false );
-
-	if ( ! record.current ) {
-		setRecordFromProps();
-	} else if (
-		selectionStart !== record.current.start ||
-		selectionEnd !== record.current.end
-	) {
-		hadSelectionUpdate.current = isSelected;
-		record.current = {
-			...record.current,
-			start: selectionStart,
-			end: selectionEnd,
-		};
-	}
+	record.current.start = selectionStart;
+	record.current.end = selectionEnd;
+	_value.current = value;
 
 	/**
 	 * Sync the value to global state. The node tree and selection will also be
@@ -145,29 +135,14 @@ export function useRichText( {
 		forceRender();
 	}
 
-	function applyFromProps( { domOnly } = {} ) {
-		setRecordFromProps();
-		applyRecord( record.current, { domOnly } );
-	}
+	const shouldApply =
+		didMount && ( hasContentChanged || hasSelectionChanged );
 
-	const didMount = useRef( false );
-
-	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
-		if ( didMount.current && value !== _value.current ) {
-			applyFromProps();
+		if ( shouldApply ) {
+			applyRecord( record.current );
 		}
-	}, [ value ] );
-
-	// Value updates must happen synchonously to avoid overwriting newer values.
-	useLayoutEffect( () => {
-		if ( ! hadSelectionUpdate.current ) {
-			return;
-		}
-
-		applyFromProps();
-		hadSelectionUpdate.current = false;
-	}, [ hadSelectionUpdate.current ] );
+	}, [ shouldApply ] );
 
 	function focus() {
 		ref.current.focus();
@@ -201,12 +176,7 @@ export function useRichText( {
 			onSelectionChange,
 		} ),
 		useRefEffect( () => {
-			if ( didMount.current ) {
-				applyFromProps();
-			} else {
-				applyFromProps( { domOnly: true } );
-			}
-
+			applyRecord( record.current );
 			didMount.current = true;
 		}, [ placeholder, ...__unstableDependencies ] ),
 	] );
