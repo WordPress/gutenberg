@@ -1,15 +1,8 @@
 /**
  * WordPress dependencies
  */
-import {
-	forwardRef,
-	useEffect,
-	useRef,
-	useState,
-	useLayoutEffect,
-} from '@wordpress/element';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
-import { useMergeRefs } from '@wordpress/compose';
+import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -19,7 +12,6 @@ import { create } from '../create';
 import { apply } from '../to-dom';
 import { toHTMLString } from '../to-html-string';
 import { removeFormat } from '../remove-format';
-import { isCollapsed } from '../is-collapsed';
 import { useFormatTypes } from './use-format-types';
 import { useDefaultStyle } from './use-default-style';
 import { useBoundaryStyle } from './use-boundary-style';
@@ -27,7 +19,6 @@ import { useInlineWarning } from './use-inline-warning';
 import { useCopyHandler } from './use-copy-handler';
 import { useFormatBoundaries } from './use-format-boundaries';
 import { useSelectObject } from './use-select-object';
-import { useUndoAutomaticChange } from './use-undo-automatic-change';
 import { usePasteHandler } from './use-paste-handler';
 import { useIndentListItemOnSpace } from './use-indent-list-item-on-space';
 import { useInputAndSelection } from './use-input-and-selection';
@@ -43,43 +34,28 @@ function createPrepareEditableTree( fns ) {
 		);
 }
 
-function RichText(
-	{
-		tagName: TagName = 'div',
-		value = '',
-		selectionStart,
-		selectionEnd,
-		children,
-		allowedFormats,
-		withoutInteractiveFormatting,
-		placeholder,
-		disabled,
-		preserveWhiteSpace,
-		onPaste,
-		format = 'string',
-		onDelete,
-		onEnter,
-		onSelectionChange,
-		onChange,
-		unstableOnFocus: onFocus,
-		clientId,
-		identifier,
-		__unstableMultilineTag: multilineTag,
-		__unstableMultilineRootTag: multilineRootTag,
-		__unstableDisableFormats: disableFormats,
-		__unstableDidAutomaticChange: didAutomaticChange,
-		__unstableInputRule: inputRule,
-		__unstableMarkAutomaticChange: markAutomaticChange,
-		__unstableAllowPrefixTransformations: allowPrefixTransformations,
-		__unstableUndo: undo,
-		__unstableIsCaretWithinFormattedText: isCaretWithinFormattedText,
-		__unstableOnEnterFormattedText: onEnterFormattedText,
-		__unstableOnExitFormattedText: onExitFormattedText,
-		__unstableOnCreateUndoLevel: onCreateUndoLevel,
-		__unstableIsSelected: isSelected,
-	},
-	forwardedRef
-) {
+export function useRichText( {
+	value = '',
+	selectionStart,
+	selectionEnd,
+	allowedFormats,
+	withoutInteractiveFormatting,
+	placeholder,
+	preserveWhiteSpace,
+	onPaste,
+	format = 'string',
+	onSelectionChange,
+	onChange,
+	clientId,
+	identifier,
+	__unstableMultilineTag: multilineTag,
+	__unstableDisableFormats: disableFormats,
+	__unstableInputRule: inputRule,
+	__unstableMarkAutomaticChange: markAutomaticChange,
+	__unstableAllowPrefixTransformations: allowPrefixTransformations,
+	__unstableOnCreateUndoLevel: onCreateUndoLevel,
+	__unstableIsSelected: isSelected,
+} ) {
 	const ref = useRef();
 	const [ activeFormats = [], setActiveFormats ] = useState();
 	const {
@@ -94,12 +70,6 @@ function RichText(
 		withoutInteractiveFormatting,
 		allowedFormats,
 	} );
-
-	// For backward compatibility, fall back to tagName if it's a string.
-	// tagName can now be a component for light blocks.
-	if ( ! multilineRootTag && typeof TagName === 'string' ) {
-		multilineRootTag = TagName;
-	}
 
 	/**
 	 * Converts the outside data structure to our internal representation.
@@ -210,42 +180,6 @@ function RichText(
 		} );
 	}
 
-	function handleKeyDown( event ) {
-		if ( event.defaultPrevented ) {
-			return;
-		}
-
-		const { keyCode } = event;
-
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-			if ( onEnter ) {
-				onEnter( {
-					value: removeEditorOnlyFormats( record.current ),
-					onChange: handleChange,
-					shiftKey: event.shiftKey,
-				} );
-			}
-		} else if ( keyCode === DELETE || keyCode === BACKSPACE ) {
-			const { start, end, text } = record.current;
-			const isReverse = keyCode === BACKSPACE;
-
-			// Only process delete if the key press occurs at an uncollapsed edge.
-			if (
-				! onDelete ||
-				! isCollapsed( record.current ) ||
-				activeFormats.length ||
-				( isReverse && start !== 0 ) ||
-				( ! isReverse && end !== text.length )
-			) {
-				return;
-			}
-
-			onDelete( { isReverse, value: record.current } );
-			event.preventDefault();
-		}
-	}
-
 	// Internal values are updated synchronously, unlike props and state.
 	const _value = useRef( value );
 	const record = useRef();
@@ -316,23 +250,15 @@ function RichText(
 
 	const didMount = useRef( false );
 
+	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
-		if ( didMount.current ) {
-			applyFromProps();
-		} else {
-			applyFromProps( { domOnly: true } );
-		}
-
-		didMount.current = true;
-	}, [ TagName, placeholder, ...dependencies ] );
-
-	useEffect( () => {
 		if ( didMount.current && value !== _value.current ) {
 			applyFromProps();
 		}
 	}, [ value ] );
 
-	useEffect( () => {
+	// Value updates must happen synchonously to avoid overwriting newer values.
+	useLayoutEffect( () => {
 		if ( ! didMount.current ) {
 			return;
 		}
@@ -357,97 +283,78 @@ function RichText(
 		applyRecord( record.current );
 	}
 
-	const editableProps = {
-		// Overridable props.
-		role: 'textbox',
-		'aria-multiline': true,
-		'aria-label': placeholder,
-		ref: useMergeRefs( [
-			forwardedRef,
-			ref,
-			useDefaultStyle(),
-			useBoundaryStyle( { activeFormats } ),
-			useInlineWarning(),
-			useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
-			useSelectObject(),
-			useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
-			useUndoAutomaticChange( { didAutomaticChange, undo } ),
-			useDelete( {
-				createRecord,
-				handleChange,
-				multilineTag,
-			} ),
-			useIndentListItemOnSpace( {
-				multilineTag,
-				multilineRootTag,
-				createRecord,
-				handleChange,
-			} ),
-			usePasteHandler( {
-				isSelected,
-				disableFormats,
-				handleChange,
-				record,
-				formatTypes,
-				onPaste,
-				removeEditorOnlyFormats,
-				activeFormats,
-			} ),
-			useInputAndSelection( {
-				record,
-				applyRecord,
-				createRecord,
-				handleChange,
-				createUndoLevel,
-				allowPrefixTransformations,
-				inputRule,
-				valueToFormat,
-				formatTypes,
-				markAutomaticChange,
-				isSelected,
-				disabled,
-				isCaretWithinFormattedText,
-				onEnterFormattedText,
-				onExitFormattedText,
-				onSelectionChange,
-				setActiveFormats,
-			} ),
-		] ),
-		className: 'rich-text',
-		onKeyDown: handleKeyDown,
-		onFocus,
-		// Do not set the attribute if disabled.
-		contentEditable: disabled ? undefined : true,
-		suppressContentEditableWarning: ! disabled,
-	};
+	const mergedRefs = useMergeRefs( [
+		ref,
+		useDefaultStyle(),
+		useBoundaryStyle( { activeFormats } ),
+		useInlineWarning(),
+		useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
+		useSelectObject(),
+		useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
+		useDelete( {
+			createRecord,
+			handleChange,
+			multilineTag,
+		} ),
+		useIndentListItemOnSpace( {
+			multilineTag,
+			createRecord,
+			handleChange,
+		} ),
+		usePasteHandler( {
+			isSelected,
+			disableFormats,
+			handleChange,
+			record,
+			formatTypes,
+			onPaste,
+			removeEditorOnlyFormats,
+			activeFormats,
+		} ),
+		useInputAndSelection( {
+			record,
+			applyRecord,
+			createRecord,
+			handleChange,
+			createUndoLevel,
+			allowPrefixTransformations,
+			inputRule,
+			valueToFormat,
+			formatTypes,
+			markAutomaticChange,
+			isSelected,
+			onSelectionChange,
+			setActiveFormats,
+		} ),
+		useRefEffect( () => {
+			if ( didMount.current ) {
+				applyFromProps();
+			} else {
+				applyFromProps( { domOnly: true } );
+			}
 
-	return (
-		<>
-			{ isSelected && (
-				<FormatEdit
-					value={ record.current }
-					onChange={ handleChange }
-					onFocus={ focus }
-					formatTypes={ formatTypes }
-					forwardedRef={ ref }
-				/>
-			) }
-			{ children &&
-				children( {
-					isSelected,
-					value: record.current,
-					onChange: handleChange,
-					onFocus: focus,
-					editableProps,
-					editableTagName: TagName,
-				} ) }
-			{ ! children && <TagName { ...editableProps } /> }
-		</>
-	);
+			didMount.current = true;
+		}, [ placeholder, ...dependencies ] ),
+	] );
+
+	return {
+		isSelected,
+		value: record.current,
+		onChange: handleChange,
+		onFocus: focus,
+		ref: mergedRefs,
+		hasActiveFormats: activeFormats.length,
+		removeEditorOnlyFormats,
+		children: isSelected && (
+			<FormatEdit
+				value={ record.current }
+				onChange={ handleChange }
+				onFocus={ focus }
+				formatTypes={ formatTypes }
+				forwardedRef={ ref }
+			/>
+		),
+	};
 }
 
-/**
- * Renders a rich content input, providing users with the option to format the
- * content.
- */
-export default forwardRef( RichText );
+export default function __experimentalRichText() {}

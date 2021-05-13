@@ -21,12 +21,12 @@ export default function WidgetAreasBlockEditorContent( {
 	blockEditorSettings,
 } ) {
 	return (
-		<div className="edit-widgets-block-editor editor-styles-wrapper">
-			<EditorStyles styles={ blockEditorSettings.styles } />
+		<BlockTools>
 			<KeyboardShortcuts />
 			<BlockEditorKeyboardShortcuts />
 			<Notices />
-			<BlockTools>
+			<div className="edit-widgets-block-editor editor-styles-wrapper">
+				<EditorStyles styles={ blockEditorSettings.styles } />
 				<BlockSelectionClearer>
 					<WritingFlow>
 						<ObserveTyping>
@@ -34,7 +34,7 @@ export default function WidgetAreasBlockEditorContent( {
 						</ObserveTyping>
 					</WritingFlow>
 				</BlockSelectionClearer>
-			</BlockTools>
-		</div>
+			</div>
+		</BlockTools>
 	);
 }

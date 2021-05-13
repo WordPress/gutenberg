@@ -31,8 +31,9 @@
 	}
 
 	.edit-navigation-layout__content-area {
-		// Add some margin above the fixed mobile toolbar.
-		padding-top: $grid-unit-15;
+		// The 10px match that of similar settings pages.
+		padding: $grid-unit-15 10px 10px 10px;
+
 		@include break-medium() {
 			// Provide space for the floating block toolbar.
 			padding-top: $navigation-editor-spacing-top;
@@ -60,6 +61,14 @@
 		// Hide the toggle as the sidebar should be permanently open.
 		.interface-complementary-area-header {
 			display: none;
+		}
+	}
+
+	.edit-navigation-header {
+		background: $white;
+
+		@include break-medium() {
+			background: transparent;
 		}
 	}
 }
