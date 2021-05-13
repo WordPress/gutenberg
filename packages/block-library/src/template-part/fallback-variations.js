@@ -15,8 +15,8 @@ const fallbackVariations = [
 			'The Header template defines a page area that typically contains a title, logo, and main navigation.'
 		),
 		attributes: { area: 'header' },
+		scope: [ 'inserter' ],
 	},
-
 	{
 		name: 'footer',
 		icon: footerIcon,
@@ -25,6 +25,7 @@ const fallbackVariations = [
 			'The Footer template defines a page area that typically contains site credits, social links, or any other combination of blocks.'
 		),
 		attributes: { area: 'footer' },
+		scope: [ 'inserter' ],
 	},
 ];
 

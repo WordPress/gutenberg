@@ -33,7 +33,7 @@ export function enhanceTemplatePartVariations( settings, name ) {
 
 	// WordPress versions pre-5.8 do not support server side variation registration.
 	// So we must register the fallback variations until those versions are no longer supported.
-	if ( ! settings.variations ) {
+	if ( ! ( settings.variations && settings.variations.length ) ) {
 		return { ...settings, variations: fallbackVariations };
 	}
 
