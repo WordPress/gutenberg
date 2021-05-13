@@ -15,12 +15,12 @@ import { layout } from '@wordpress/icons';
  */
 import metadata from './block.json';
 import edit from './edit';
-import variations from './variations';
+import setupVariations from './variations';
 
 const { name } = metadata;
 export { metadata, name };
 
-variations();
+setupVariations();
 
 export const settings = {
 	icon: layout,

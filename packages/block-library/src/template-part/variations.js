@@ -6,7 +6,7 @@ import { store as editorStore } from '@wordpress/editor';
 import { store as blocksStore } from '@wordpress/blocks';
 import { dispatch, select, subscribe } from '@wordpress/data';
 
-export default function subscribeToCreateVatiations() {
+export default function setupVatiations() {
 	// Subscribe to wait for the variation definitions to initialize in the editor store.
 	const unsubscribe = subscribe( () => {
 		const definedVariations = select(
