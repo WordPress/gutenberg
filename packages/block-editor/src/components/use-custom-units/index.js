@@ -15,7 +15,61 @@ const isWeb = Platform.OS === 'web';
  * An array of all available CSS length units.
  */
 export const CSS_UNITS = [
-	// Absolute length/size units
+	{
+		value: '%',
+		label: isWeb ? '%' : __( 'Percentage (%)' ),
+		default: '',
+	},
+	{
+		value: 'px',
+		label: isWeb ? 'px' : __( 'Pixels (px)' ),
+		default: '',
+	},
+	{
+		value: 'em',
+		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
+		default: '',
+	},
+	{
+		value: 'rem',
+		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
+		default: '',
+	},
+	{
+		value: 'vw',
+		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
+		default: '',
+	},
+	{
+		value: 'vh',
+		label: isWeb ? 'vh' : __( 'Viewport height (vh)' ),
+		default: '',
+	},
+	{
+		value: 'vmin',
+		label: isWeb ? 'vmin' : __( 'Viewport smallest dimension (vmin)' ),
+		default: '',
+	},
+	{
+		value: 'vmax',
+		label: isWeb ? 'vmax' : __( 'Viewport largest dimension (vmax)' ),
+		default: '',
+	},
+	{
+		value: 'ch',
+		label: isWeb ? 'ch' : __( 'Width of the zero (0) character (ch)' ),
+		default: '',
+	},
+	{
+		value: 'ex',
+		label: isWeb ? 'ex' : __( 'x-height of the font (ex)' ),
+		default: '',
+	},
+	{
+		value: 'lh',
+		label: isWeb ? 'lh' : __( 'Relative to the line-height (lh)' ),
+		default: '',
+	},
 	{
 		value: 'cm',
 		label: isWeb ? 'cm' : __( 'Centimeters (cm)' ),
@@ -44,63 +98,6 @@ export const CSS_UNITS = [
 	{
 		value: 'pt',
 		label: isWeb ? 'pt' : __( 'Points (pt)' ),
-		default: '',
-	},
-	{
-		value: 'px',
-		label: isWeb ? 'px' : __( 'Pixels (px)' ),
-		default: '',
-	},
-
-	// Relative length/size units.
-	{
-		value: '%',
-		label: isWeb ? '%' : __( 'Percentage (%)' ),
-		default: '',
-	},
-	{
-		value: 'em',
-		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
-		default: '',
-	},
-	{
-		value: 'ex',
-		label: isWeb ? 'ex' : __( 'x-height of the font (ex)' ),
-		default: '',
-	},
-	{
-		value: 'ch',
-		label: isWeb ? 'ch' : __( 'Width of the zero (0) character (ch)' ),
-		default: '',
-	},
-	{
-		value: 'rem',
-		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
-		default: '',
-	},
-	{
-		value: 'lh',
-		label: isWeb ? 'lh' : __( 'Relative to the line-height (lh)' ),
-		default: '',
-	},
-	{
-		value: 'vw',
-		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
-		default: '',
-	},
-	{
-		value: 'vh',
-		label: isWeb ? 'vh' : __( 'Viewport height (vh)' ),
-		default: '',
-	},
-	{
-		value: 'vmin',
-		label: isWeb ? 'vmin' : __( 'Viewport smallest dimension (vmin)' ),
-		default: '',
-	},
-	{
-		value: 'vmax',
-		label: isWeb ? 'vmax' : __( 'Viewport largest dimension (vmax)' ),
 		default: '',
 	},
 ];
