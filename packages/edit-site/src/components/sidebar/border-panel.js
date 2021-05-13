@@ -9,6 +9,11 @@ import {
 import { PanelBody, RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
+
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
 const MIN_BORDER_WIDTH = 0;
@@ -31,28 +36,28 @@ export function useHasBorderPanel( { supports, name } ) {
 
 function useHasBorderColorControl( { supports, name } ) {
 	return (
-		useSetting( 'border.customColor', name ) &&
+		useSetting( 'border.customColor', name, editSiteStore ) &&
 		supports.includes( 'borderColor' )
 	);
 }
 
 function useHasBorderRadiusControl( { supports, name } ) {
 	return (
-		useSetting( 'border.customRadius', name ) &&
+		useSetting( 'border.customRadius', name, editSiteStore ) &&
 		supports.includes( 'borderRadius' )
 	);
 }
 
 function useHasBorderStyleControl( { supports, name } ) {
 	return (
-		useSetting( 'border.customStyle', name ) &&
+		useSetting( 'border.customStyle', name, editSiteStore ) &&
 		supports.includes( 'borderStyle' )
 	);
 }
 
 function useHasBorderWidthControl( { supports, name } ) {
 	return (
-		useSetting( 'border.customWidth', name ) &&
+		useSetting( 'border.customWidth', name, editSiteStore ) &&
 		supports.includes( 'borderWidth' )
 	);
 }
@@ -81,9 +86,18 @@ export default function BorderPanel( {
 	);
 
 	// Border color.
-	const colors = useSetting( 'color.palette' ) || EMPTY_ARRAY;
-	const disableCustomColors = ! useSetting( 'color.custom' );
-	const disableCustomGradients = ! useSetting( 'color.customGradient' );
+	const colors =
+		useSetting( 'color.palette', '', editSiteStore ) || EMPTY_ARRAY;
+	const disableCustomColors = ! useSetting(
+		'color.custom',
+		'',
+		editSiteStore
+	);
+	const disableCustomGradients = ! useSetting(
+		'color.customGradient',
+		'',
+		editSiteStore
+	);
 	const hasBorderColor = useHasBorderColorControl( { supports, name } );
 	const borderColor = getStyle( name, 'borderColor' );
 

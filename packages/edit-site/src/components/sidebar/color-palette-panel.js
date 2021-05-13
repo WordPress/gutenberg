@@ -32,7 +32,7 @@ export default function ColorPalettePanel( {
 	getSetting,
 	setSetting,
 } ) {
-	const colors = useSetting( 'color.palette', contextName );
+	const colors = useSetting( 'color.palette', contextName, editSiteStore );
 	const userColors = getSetting( contextName, 'color.palette' );
 	const immutableColorSlugs = useSelect(
 		( select ) => {

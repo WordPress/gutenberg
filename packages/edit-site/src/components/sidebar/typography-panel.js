@@ -10,6 +10,11 @@ import {
 import { PanelBody, FontSizePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
+
 export function useHasTypographyPanel( { supports, name } ) {
 	const hasLineHeight = useHasLineHeightControl( { supports, name } );
 	const hasFontAppearance = useHasAppearanceControl( { supports, name } );
@@ -20,17 +25,17 @@ export function useHasTypographyPanel( { supports, name } ) {
 
 function useHasLineHeightControl( { supports, name } ) {
 	return (
-		useSetting( 'typography.customLineHeight', name ) &&
+		useSetting( 'typography.customLineHeight', name, editSiteStore ) &&
 		supports.includes( 'lineHeight' )
 	);
 }
 
 function useHasAppearanceControl( { supports, name } ) {
 	const hasFontStyles =
-		useSetting( 'typography.customFontStyle', name ) &&
+		useSetting( 'typography.customFontStyle', name, editSiteStore ) &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useSetting( 'typography.customFontWeight', name ) &&
+		useSetting( 'typography.customFontWeight', name, editSiteStore ) &&
 		supports.includes( 'fontWeight' );
 	return hasFontStyles || hasFontWeights;
 }
@@ -40,17 +45,22 @@ export default function TypographyPanel( {
 	getStyle,
 	setStyle,
 } ) {
-	const fontSizes = useSetting( 'typography.fontSizes', name );
+	const fontSizes = useSetting( 'typography.fontSizes', name, editSiteStore );
 	const disableCustomFontSizes = ! useSetting(
 		'typography.customFontSize',
-		name
+		name,
+		editSiteStore
 	);
-	const fontFamilies = useSetting( 'typography.fontFamilies', name );
+	const fontFamilies = useSetting(
+		'typography.fontFamilies',
+		name,
+		editSiteStore
+	);
 	const hasFontStyles =
-		useSetting( 'typography.customFontStyle', name ) &&
+		useSetting( 'typography.customFontStyle', name, editSiteStore ) &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useSetting( 'typography.customFontWeight', name ) &&
+		useSetting( 'typography.customFontWeight', name, editSiteStore ) &&
 		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
 	const hasAppearanceControl = useHasAppearanceControl( { supports, name } );

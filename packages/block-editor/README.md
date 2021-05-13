@@ -669,6 +669,7 @@ _Parameters_
 
 -   _path_ `string`: The path to the setting.
 -   _name_ `string`: The block name. Leave empty to use name from useBlockEditContext.
+-   _store_ `Object`: The store. Defaults to blockEditorStore if empty.
 
 _Returns_
 

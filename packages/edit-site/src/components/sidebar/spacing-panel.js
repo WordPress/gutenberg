@@ -12,6 +12,11 @@ import {
 	__experimentalUseCustomSides as useCustomSides,
 } from '@wordpress/block-editor';
 
+/**
+ * Internal dependencies
+ */
+import { store as editSiteStore } from '../../store';
+
 const isWeb = Platform.OS === 'web';
 const CSS_UNITS = [
 	{
@@ -49,13 +54,13 @@ export function useHasSpacingPanel( context ) {
 }
 
 function useHasPadding( { name, supports } ) {
-	const settings = useSetting( 'spacing.customPadding', name );
+	const settings = useSetting( 'spacing.customPadding', name, editSiteStore );
 
 	return settings && supports.includes( 'padding' );
 }
 
 function useHasMargin( { name, supports } ) {
-	const settings = useSetting( 'spacing.customMargin', name );
+	const settings = useSetting( 'spacing.customMargin', name, editSiteStore );
 
 	return settings && supports.includes( 'margin' );
 }
@@ -67,7 +72,11 @@ function filterUnitsWithSettings( settings = [], units = [] ) {
 }
 
 function useCustomUnits( { units, contextName } ) {
-	const availableUnits = useSetting( 'spacing.units', contextName );
+	const availableUnits = useSetting(
+		'spacing.units',
+		contextName,
+		editSiteStore
+	);
 	const usedUnits = filterUnitsWithSettings(
 		! availableUnits ? [] : availableUnits,
 		units

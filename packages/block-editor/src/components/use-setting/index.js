@@ -53,8 +53,9 @@ const deprecatedFlags = {
  * Hook that retrieves the editor setting.
  * It works with nested objects using by finding the value at path.
  *
- * @param {string} path The path to the setting.
- * @param {string} name The block name. Leave empty to use name from useBlockEditContext.
+ * @param {string} path  The path to the setting.
+ * @param {string} name  The block name. Leave empty to use name from useBlockEditContext.
+ * @param {Object} store The store. Defaults to blockEditorStore if empty.
  *
  * @return {any} Returns the value defined for the setting.
  *
@@ -63,13 +64,15 @@ const deprecatedFlags = {
  * const isEnabled = useSetting( 'typography.dropCap' );
  * ```
  */
-export default function useSetting( path, name = '' ) {
+export default function useSetting( path, name = '', store ) {
 	const { name: blockName } = useBlockEditContext();
 	const _blockName = '' === name ? blockName : name;
 
+	store = store || blockEditorStore;
+
 	const setting = useSelect(
 		( select ) => {
-			const settings = select( blockEditorStore ).getSettings();
+			const settings = select( store ).getSettings();
 
 			// 1 - Use __experimental features, if available.
 			// We cascade to the all value if the block one is not available.
