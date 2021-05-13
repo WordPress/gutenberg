@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch } from '@wordpress/data';
+import { select, useDispatch, useSelect } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 import {
 	VisuallyHidden,
@@ -72,7 +72,12 @@ const SetupContent = ( {
 
 function BlockPattern( { pattern, onSelect, composite } ) {
 	const baseClassName = 'block-editor-block-pattern-setup-list';
-	const { blocks, title, description, viewportWidth = 700 } = pattern;
+	const { name, title, description, viewportWidth = 700 } = pattern;
+	const { blocks } = useSelect(
+		( _select ) =>
+			_select( blockEditorStore ).__experimentalGetParsedPattern( name ),
+		[ name ]
+	);
 	const descriptionId = useInstanceId(
 		BlockPattern,
 		`${ baseClassName }__item-description`
@@ -108,7 +113,12 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 }
 
 function BlockPatternSlide( { className, pattern } ) {
-	const { blocks, title, description } = pattern;
+	const { name, title, description } = pattern;
+	const { blocks } = useSelect(
+		( _select ) =>
+			_select( blockEditorStore ).__experimentalGetParsedPattern( name ),
+		[ name ]
+	);
 	const descriptionId = useInstanceId(
 		BlockPatternSlide,
 		'block-editor-block-pattern-setup-list__item-description'
@@ -168,7 +178,12 @@ const BlockPatternSetup = ( {
 					setActiveSlide( ( active ) => active - 1 );
 				} }
 				onBlockPatternSelect={ () => {
-					onPatternSelectCallback( patterns[ activeSlide ].blocks );
+					const { blocks } = select(
+						blockEditorStore
+					).__experimentalGetAllowedPatterns(
+						patterns[ activeSlide ].name
+					);
+					onPatternSelectCallback( blocks );
 				} }
 				onStartBlank={ () => {
 					setShowBlank( true );
