@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import { find } from 'lodash';
+
+/**
  * WordPress dependencies
  */
 import { __, sprintf } from '@wordpress/i18n';
@@ -15,11 +20,6 @@ import { store as editorStore } from '@wordpress/editor';
 import TemplatePartSelection from '../selection';
 import PatternsSetup from './patterns-setup';
 
-/**
- * External dependencies
- */
-import { find } from 'lodash';
-
 const PLACEHOLDER_STEPS = {
 	initial: 1,
 	patterns: 2,
@@ -33,19 +33,22 @@ export default function TemplatePartPlaceholder( {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.initial );
 
-	const { areaIcon, areaLabel } = useSelect( ( select ) => {
-		const definedAreas = select(
-			editorStore
-		).__experimentalGetDefaultTemplatePartAreas();
+	const { areaIcon, areaLabel } = useSelect(
+		( select ) => {
+			const definedAreas = select(
+				editorStore
+			).__experimentalGetDefaultTemplatePartAreas();
 
-		const selectedArea = find( definedAreas, { area } );
-		const defaultArea = find( definedAreas, { area: 'uncategorized' } );
+			const selectedArea = find( definedAreas, { area } );
+			const defaultArea = find( definedAreas, { area: 'uncategorized' } );
 
-		return {
-			areaIcon: selectedArea?.icon || defaultArea?.icon,
-			areaLabel: selectedArea?.label || __( 'Template Part' ),
-		};
-	}, [] );
+			return {
+				areaIcon: selectedArea?.icon || defaultArea?.icon,
+				areaLabel: selectedArea?.label || __( 'Template Part' ),
+			};
+		},
+		[ area ]
+	);
 
 	const onCreate = useCallback(
 		async ( startingBlocks = [] ) => {
