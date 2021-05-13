@@ -3,38 +3,25 @@
  */
 import menuItemsToBlocks from '../menu-items-to-blocks';
 
-/**
- * WordPress dependencies
- */
-import { registerBlockType, unregisterBlockType } from '@wordpress/blocks';
-import {
-	metadata,
-	settings,
-	name,
-} from '../../../../block-library/src/navigation-link/index';
+// Mock createBlock to avoid creating the blocks in test environment.
+jest.mock( '@wordpress/blocks', () => {
+	const blocks = jest.requireActual( '@wordpress/blocks' );
 
-function stripClientIdsFromBlocks( blocks ) {
-	return blocks.map( ( block ) => {
-		block.clientId = null;
-		delete block.clientId;
-		return block;
-	} );
-}
+	return {
+		...blocks,
+		createBlock( name, attributes, innerBlocks ) {
+			return {
+				name,
+				attributes,
+				innerBlocks,
+			};
+		},
+	};
+} );
 
 describe( 'converting menu items to blocks', () => {
-	beforeAll( () => {
-		registerBlockType( name, {
-			...metadata,
-			...settings,
-		} );
-	} );
-
-	afterAll( () => {
-		unregisterBlockType( name );
-	} );
-
 	it( 'converts an flat structure of menu item objects to blocks', () => {
-		let { innerBlocks: actual } = menuItemsToBlocks( [
+		const { innerBlocks: actual } = menuItemsToBlocks( [
 			{
 				id: 1,
 				title: {
@@ -73,8 +60,6 @@ describe( 'converting menu items to blocks', () => {
 			},
 		] );
 
-		actual = stripClientIdsFromBlocks( actual );
-
 		expect( actual ).toEqual( [
 			expect.objectContaining( {
 				name: 'core/navigation-link',
@@ -88,7 +73,7 @@ describe( 'converting menu items to blocks', () => {
 	} );
 
 	it( 'converts an nested structure of menu item objects to nested blocks', () => {
-		let { innerBlocks: actual } = menuItemsToBlocks( [
+		const { innerBlocks: actual } = menuItemsToBlocks( [
 			{
 				id: 1,
 				title: {
@@ -199,8 +184,6 @@ describe( 'converting menu items to blocks', () => {
 			},
 		] );
 
-		actual = stripClientIdsFromBlocks( actual );
-
 		expect( actual ).toEqual( [
 			expect.objectContaining( {
 				name: 'core/navigation-link',
@@ -251,7 +234,7 @@ describe( 'converting menu items to blocks', () => {
 	} );
 
 	it( 'respects menu order when converting to blocks', () => {
-		let { innerBlocks: actual } = menuItemsToBlocks( [
+		const { innerBlocks: actual } = menuItemsToBlocks( [
 			{
 				id: 1,
 				title: {
@@ -343,8 +326,6 @@ describe( 'converting menu items to blocks', () => {
 				xfn: [ '' ],
 			},
 		] );
-
-		actual = stripClientIdsFromBlocks( actual );
 
 		expect( actual ).toEqual( [
 			expect.objectContaining( {
