@@ -32,6 +32,7 @@ import {
 	withColors,
 	ColorPalette,
 	useBlockProps,
+	useCustomUnits,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
@@ -54,7 +55,6 @@ import {
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 	COVER_MIN_HEIGHT,
-	CSS_UNITS,
 	backgroundImageStyles,
 	dimRatioToClass,
 	isContentPositionCenter,
@@ -97,6 +97,11 @@ function CoverHeightInput( {
 	const inputId = `block-cover-height-input-${ instanceId }`;
 	const isPx = unit === 'px';
 
+	const units = useCustomUnits( {
+		defaultUnits: [ 'px', 'em', 'rem', 'vw', 'vh' ],
+		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
+	} );
+
 	const handleOnChange = ( unprocessedValue ) => {
 		const inputValue =
 			unprocessedValue !== ''
@@ -135,7 +140,7 @@ function CoverHeightInput( {
 				step="1"
 				style={ { maxWidth: 80 } }
 				unit={ unit }
-				units={ CSS_UNITS }
+				units={ units }
 				value={ inputValue }
 			/>
 		</BaseControl>

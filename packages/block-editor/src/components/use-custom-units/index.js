@@ -123,10 +123,16 @@ function filterUnitsWithSettings( settings = [], units = [] ) {
  * @param {Object} args.units        Collection of available units.
  * @param {string} args.settingPath  The setting path. Defaults to 'spacing.units'.
  * @param {Array}  args.defaultUnits Array of default units.
+ * @param {Object} args.defaultValues Collection of default values for defined units. Example: { px: '350', em: '15' }.
  *
  * @return {Array} Filtered units based on settings.
  */
-export const useCustomUnits = ( { units, settingPath, defaultUnits } ) => {
+export const useCustomUnits = ( {
+	units,
+	settingPath,
+	defaultUnits,
+	defaultValues,
+} ) => {
 	defaultUnits = defaultUnits || [];
 	units = units || CSS_UNITS;
 	const availableUnits = useSetting( settingPath ) || defaultUnits;
@@ -134,6 +140,14 @@ export const useCustomUnits = ( { units, settingPath, defaultUnits } ) => {
 		! availableUnits ? [] : availableUnits,
 		units
 	);
+
+	if ( defaultValues ) {
+		usedUnits.forEach( ( unit, i ) => {
+			if ( defaultValues[ unit.value ] ) {
+				usedUnits[ i ].default = defaultValues[ unit.value ];
+			}
+		} );
+	}
 
 	return usedUnits.length === 0 ? false : usedUnits;
 };

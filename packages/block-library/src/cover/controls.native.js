@@ -21,7 +21,7 @@ import {
 import { plus } from '@wordpress/icons';
 import { useState, useCallback, useRef } from '@wordpress/element';
 import { usePreferredColorSchemeStyle } from '@wordpress/compose';
-import { MediaUpload } from '@wordpress/block-editor';
+import { useCustomUnits, MediaUpload } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -35,7 +35,6 @@ import {
 	COVER_MIN_HEIGHT,
 	COVER_MAX_HEIGHT,
 	COVER_DEFAULT_HEIGHT,
-	CSS_UNITS,
 	IMAGE_BACKGROUND_TYPE,
 	VIDEO_BACKGROUND_TYPE,
 } from './shared';
@@ -67,6 +66,11 @@ function Controls( {
 		},
 		[ minHeight ]
 	);
+
+	const units = useCustomUnits( {
+		defaultUnits: [ 'px', 'em', 'rem', 'vw', 'vh' ],
+		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
+	} );
 
 	const onOpacityChange = useCallback( ( value ) => {
 		setAttributes( { dimRatio: value } );
@@ -292,7 +296,7 @@ function Controls( {
 					value={ CONTAINER_HEIGHT }
 					onChange={ onHeightChange }
 					onUnitChange={ onChangeUnit }
-					units={ CSS_UNITS }
+					units={ units }
 					style={ styles.rangeCellContainer }
 					key={ minHeightUnit }
 				/>

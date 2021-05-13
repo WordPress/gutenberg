@@ -664,6 +664,7 @@ _Parameters_
 -   _args.units_ `Object`: Collection of available units.
 -   _args.settingPath_ `string`: The setting path. Defaults to 'spacing.units'.
 -   _args.defaultUnits_ `Array`: Array of default units.
+-   _args.defaultValues_ `Object`: Collection of default values for defined units. Example: { px: '350', em: '15' }.
 
 _Returns_
 
