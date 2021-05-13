@@ -60,7 +60,7 @@
 		"react-native": "0.64.0",
 		"react-native-codegen": "^0.0.7",
 		"react-native-dark-mode": "git+https://github.com/wordpress-mobile/react-native-dark-mode.git#f09bf1480e7b34536413ab3300f29e4375edb2c6",
-		"react-native-gesture-handler": "git+https://github.com/wordpress-mobile/react-native-gesture-handler.git#3d08638bf9e24cf70e003259b6a55385857224d3",
+		"react-native-gesture-handler": "git+https://github.com/wordpress-mobile/react-native-gesture-handler.git#6c83188fb0078bb5c966e7cce2084bc64f6c6ea6",
 		"react-native-get-random-values": "git+https://github.com/wordpress-mobile/react-native-get-random-values.git#f03f2c16414aff4ea76064dcd00a9e3c6efc838d",
 		"react-native-hr": "git+https://github.com/Riglerr/react-native-hr.git#2d01a5cf77212d100e8b99e0310cce5234f977b3",
 		"react-native-hsv-color-picker": "git+https://github.com/wordpress-mobile/react-native-hsv-color-picker",
