@@ -14,6 +14,7 @@ import {
 	useBlockProps,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	store as blockEditorStore,
+	useCustomUnits,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -22,11 +23,6 @@ import {
 import { useSelect, useDispatch } from '@wordpress/data';
 import { sprintf, __ } from '@wordpress/i18n';
 
-/**
- * Internal dependencies
- */
-import { CSS_UNITS } from '../columns/utils';
-
 function ColumnEdit( {
 	attributes: { verticalAlignment, width, templateLock = false },
 	setAttributes,
@@ -34,6 +30,11 @@ function ColumnEdit( {
 } ) {
 	const classes = classnames( 'block-core-columns', {
 		[ `is-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
+	} );
+
+	const units = useCustomUnits( {
+		settingPath: 'layout.units',
+		defaultUnits: [ '%', 'px', 'em', 'rem', 'vw' ],
 	} );
 
 	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(
@@ -111,7 +112,7 @@ function ColumnEdit( {
 								0 > parseFloat( nextWidth ) ? '0' : nextWidth;
 							setAttributes( { width: nextWidth } );
 						} }
-						units={ CSS_UNITS }
+						units={ units }
 					/>
 				</PanelBody>
 			</InspectorControls>

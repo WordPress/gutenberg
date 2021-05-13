@@ -22,6 +22,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	BlockVariationPicker,
+	useCustomUnits,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
@@ -49,7 +50,6 @@ import {
 	getWidths,
 	getWidthWithUnit,
 	isPercentageUnit,
-	CSS_UNITS,
 } from './utils';
 import {
 	getColumnsInRow,
@@ -104,6 +104,11 @@ function ColumnsEditContainer( {
 
 	const { verticalAlignment, align } = attributes;
 	const { width } = sizes || {};
+
+	const units = useCustomUnits( {
+		settingPath: 'layout.units',
+		defaultUnits: [ '%', 'px', 'em', 'rem', 'vw' ],
+	} );
 
 	useEffect( () => {
 		if ( columnCount === 0 ) {
@@ -211,7 +216,7 @@ function ColumnsEditContainer( {
 						onChangeWidth( nextWidth, valueUnit, column.clientId );
 					} }
 					unit={ valueUnit }
-					units={ CSS_UNITS }
+					units={ units }
 					preview={
 						<ColumnsPreview
 							columnWidths={ getWidths( innerWidths, false ) }
