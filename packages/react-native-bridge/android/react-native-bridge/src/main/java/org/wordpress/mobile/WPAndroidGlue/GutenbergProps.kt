@@ -33,8 +33,10 @@ data class GutenbergProps @JvmOverloads constructor(
         editorTheme?.also { theme ->
             theme.getSerializable(PROP_COLORS)?.let { putSerializable(PROP_COLORS, it) }
             theme.getSerializable(PROP_GRADIENTS)?.let { putSerializable(PROP_GRADIENTS, it) }
-            theme.getSerializable(PROP_GLOBAL_STYLES)
-                    ?.let { putSerializable(PROP_GLOBAL_STYLES, it) }
+            theme.getSerializable(PROP_STYLES)
+                    ?.let { putSerializable(PROP_STYLES, it) }
+            theme.getSerializable(PROP_FEATURES)
+                    ?.let { putSerializable(PROP_FEATURES, it) }
         }
     }
 
@@ -65,7 +67,8 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_TRANSLATIONS = "translations"
         private const val PROP_COLORS = "colors"
         private const val PROP_GRADIENTS = "gradients"
-        private const val PROP_GLOBAL_STYLES = "rawGlobalStylesBaseStyles"
+        private const val PROP_STYLES = "rawStyles"
+        private const val PROP_FEATURES = "rawFeatures"
 
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"
