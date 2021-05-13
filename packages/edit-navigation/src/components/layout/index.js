@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import {
 	BlockEditorKeyboardShortcuts,
 	BlockEditorProvider,
+	BlockTools,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 } from '@wordpress/block-editor';
 import { Popover, SlotFillProvider, Spinner } from '@wordpress/components';
@@ -28,7 +29,6 @@ import { __ } from '@wordpress/i18n';
 import UnselectedMenuState from './unselected-menu-state';
 import {
 	IsMenuNameControlFocusedContext,
-	MenuIdContext,
 	useNavigationEditor,
 	useNavigationBlockEditor,
 	useMenuNotifications,
@@ -38,9 +38,9 @@ import NavigationEditorShortcuts from './shortcuts';
 import Sidebar from './sidebar';
 import Header from '../header';
 import Notices from '../notices';
-import BlockToolbar from './block-toolbar';
 import Editor from '../editor';
 import InspectorAdditions from '../inspector-additions';
+import UnsavedChangesWarning from './unsaved-changes-warning';
 import { store as editNavigationStore } from '../../store';
 
 const interfaceLabels = {
@@ -48,7 +48,7 @@ const interfaceLabels = {
 	header: __( 'Navigation top bar' ),
 	/* translators: accessibility text for the navigation screen content landmark region. */
 	body: __( 'Navigation menu blocks' ),
-	/* translators: accessibility text for the widgets screen settings landmark region. */
+	/* translators: accessibility text for the navigation screen settings landmark region. */
 	sidebar: __( 'Navigation settings' ),
 };
 
@@ -80,15 +80,6 @@ export default function Layout( { blockEditorSettings } ) {
 		navigationPost
 	);
 
-	const [ isMenuLoaded, setIsMenuLoaded ] = useState( false );
-
-	useEffect( () => {
-		if ( ! isMenuLoaded && menus?.length ) {
-			setIsMenuLoaded( true );
-			selectMenu( menus[ 0 ].id );
-		}
-	}, [ menus ] );
-
 	const { hasSidebarEnabled } = useSelect(
 		( select ) => ( {
 			hasSidebarEnabled: !! select(
@@ -102,7 +93,7 @@ export default function Layout( { blockEditorSettings } ) {
 		if ( ! selectedMenuId && menus?.length ) {
 			selectMenu( menus[ 0 ].id );
 		}
-	}, [] );
+	}, [ selectedMenuId, menus ] );
 
 	useMenuNotifications( selectedMenuId );
 
@@ -136,106 +127,87 @@ export default function Layout( { blockEditorSettings } ) {
 					} }
 					useSubRegistry={ false }
 				>
-					<MenuIdContext.Provider value={ selectedMenuId }>
-						<IsMenuNameControlFocusedContext.Provider
-							value={ useMemo(
-								() => [
-									isMenuNameControlFocused,
-									setIsMenuNameControlFocused,
-								],
-								[ isMenuNameControlFocused ]
-							) }
-						>
-							<InterfaceSkeleton
-								className={ classnames(
-									'edit-navigation-layout',
-									{
-										'has-permanent-sidebar': hasPermanentSidebar,
-									}
-								) }
-								labels={ interfaceLabels }
-								header={
-									<Header
-										isMenuSelected={ isMenuSelected }
-										isPending={ ! hasLoadedMenus }
-										menus={ menus }
-										selectedMenuId={ selectedMenuId }
-										onSelectMenu={ selectMenu }
-										navigationPost={ navigationPost }
-									/>
-								}
-								content={
-									<>
-										{ ! hasFinishedInitialLoad && (
-											<Spinner />
-										) }
+					<IsMenuNameControlFocusedContext.Provider
+						value={ useMemo(
+							() => [
+								isMenuNameControlFocused,
+								setIsMenuNameControlFocused,
+							],
+							[ isMenuNameControlFocused ]
+						) }
+					>
+						<InterfaceSkeleton
+							className={ classnames( 'edit-navigation-layout', {
+								'has-permanent-sidebar': hasPermanentSidebar,
+							} ) }
+							labels={ interfaceLabels }
+							header={
+								<Header
+									isMenuSelected={ isMenuSelected }
+									isPending={ ! hasLoadedMenus }
+									menus={ menus }
+									selectedMenuId={ selectedMenuId }
+									onSelectMenu={ selectMenu }
+									navigationPost={ navigationPost }
+								/>
+							}
+							content={
+								<>
+									{ ! hasFinishedInitialLoad && <Spinner /> }
 
-										{ ! isMenuSelected &&
-											hasFinishedInitialLoad && (
-												<UnselectedMenuState
-													onSelectMenu={ selectMenu }
-													onCreate={ selectMenu }
-													menus={ menus }
+									{ ! isMenuSelected &&
+										hasFinishedInitialLoad && (
+											<UnselectedMenuState
+												onSelectMenu={ selectMenu }
+												onCreate={ selectMenu }
+												menus={ menus }
+											/>
+										) }
+									{ isBlockEditorReady && (
+										<BlockTools>
+											<div
+												className="edit-navigation-layout__content-area"
+												ref={ contentAreaRef }
+											>
+												<Editor
+													isPending={
+														! hasLoadedMenus
+													}
+													blocks={ blocks }
 												/>
-											) }
-										{ isBlockEditorReady && (
-											<>
-												<BlockToolbar
-													isFixed={
-														! isLargeViewport
+												<InspectorAdditions
+													isManageLocationsModalOpen={
+														isManageLocationsModalOpen
+													}
+													openManageLocationsModal={
+														openManageLocationsModal
+													}
+													closeManageLocationsModal={
+														closeManageLocationsModal
+													}
+													onSelectMenu={ selectMenu }
+													menus={ menus }
+													menuId={ selectedMenuId }
+													onDeleteMenu={ deleteMenu }
+													isMenuBeingDeleted={
+														isMenuBeingDeleted
 													}
 												/>
-												<div
-													className="edit-navigation-layout__content-area"
-													ref={ contentAreaRef }
-												>
-													<Editor
-														isPending={
-															! hasLoadedMenus
-														}
-														blocks={ blocks }
-													/>
-													<InspectorAdditions
-														isManageLocationsModalOpen={
-															isManageLocationsModalOpen
-														}
-														openManageLocationsModal={
-															openManageLocationsModal
-														}
-														closeManageLocationsModal={
-															closeManageLocationsModal
-														}
-														onSelectMenu={
-															selectMenu
-														}
-														menus={ menus }
-														menuId={
-															selectedMenuId
-														}
-														onDeleteMenu={
-															deleteMenu
-														}
-														isMenuBeingDeleted={
-															isMenuBeingDeleted
-														}
-													/>
-												</div>
-											</>
-										) }
-									</>
-								}
-								sidebar={
-									( hasPermanentSidebar ||
-										hasSidebarEnabled ) && (
-										<ComplementaryArea.Slot scope="core/edit-navigation" />
-									)
-								}
-							/>
-							<Sidebar
-								hasPermanentSidebar={ hasPermanentSidebar }
-							/>
-						</IsMenuNameControlFocusedContext.Provider>
-					</MenuIdContext.Provider>
+											</div>
+										</BlockTools>
+									) }
+								</>
+							}
+							sidebar={
+								( hasPermanentSidebar ||
+									hasSidebarEnabled ) && (
+									<ComplementaryArea.Slot scope="core/edit-navigation" />
+								)
+							}
+						/>
+						<Sidebar hasPermanentSidebar={ hasPermanentSidebar } />
+					</IsMenuNameControlFocusedContext.Provider>
+					<UnsavedChangesWarning />
 				</BlockEditorProvider>
 				<Popover.Slot />
 			</SlotFillProvider>

@@ -43,8 +43,8 @@ export function LayoutStyle( { selector, layout = {} } ) {
 			? `
 				${ appendSelectors( selector, '> *' ) } {
 					max-width: ${ contentSize ?? wideSize };
-					margin-left: auto;
-					margin-right: auto;
+					margin-left: auto !important;
+					margin-right: auto !important;
 				}
 
 				${ appendSelectors( selector, '> [data-align="wide"]' ) }  {

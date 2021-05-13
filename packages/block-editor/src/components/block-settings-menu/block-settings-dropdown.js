@@ -22,7 +22,7 @@ import { useCopyToClipboard } from '@wordpress/compose';
 import BlockActions from '../block-actions';
 import BlockModeToggle from './block-mode-toggle';
 import BlockHTMLConvertButton from './block-html-convert-button';
-import __experimentalBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
+import __unstableBlockSettingsMenuFirstItem from './block-settings-menu-first-item';
 import BlockSettingsMenuControls from '../block-settings-menu-controls';
 
 const POPOVER_PROPS = {
@@ -105,7 +105,7 @@ export function BlockSettingsDropdown( {
 					{ ( { onClose } ) => (
 						<>
 							<MenuGroup>
-								<__experimentalBlockSettingsMenuFirstItem.Slot
+								<__unstableBlockSettingsMenuFirstItem.Slot
 									fillProps={ { onClose } }
 								/>
 								{ count === 1 && (

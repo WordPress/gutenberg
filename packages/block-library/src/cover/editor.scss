@@ -105,3 +105,9 @@
 		font-size: $default-font-size;
 	}
 }
+
+// Remove the parallax fixed background when in the patterns preview panel as it
+// doesn't work with the transforms that are applied to resize the block in that context.
+.block-editor-block-patterns-list__list-item .has-parallax.wp-block-cover {
+	background-attachment: scroll;
+}

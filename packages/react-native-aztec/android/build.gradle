@@ -82,10 +82,10 @@ repositories {
     google()
 
     maven { url "https://jitpack.io" }
-    maven { url "https://a8c-libs.s3.amazonaws.com/android" }
+    maven { url "https://a8c-libs.s3.amazonaws.com/android/hermes-mirror" }
 
     if (willPublishReactNativeAztecBinary) {
-        maven { url "https://dl.bintray.com/wordpress-mobile/react-native-mirror/" }
+        maven { url "https://a8c-libs.s3.amazonaws.com/android/react-native-mirror" }
     } else {
         maven { url("$rootDir/../../../node_modules/react-native/android") }
     }

@@ -45,49 +45,89 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 
 		$expected = array(
 			array(
-				'path'    => array( 'settings', '*', 'typography', 'fontSizes' ),
+				'path'    => array( 'settings', 'typography', 'fontSizes' ),
 				'key'     => 'name',
 				'context' => 'Font size name',
 			),
 			array(
-				'path'    => array( 'settings', '*', 'typography', 'fontStyles' ),
+				'path'    => array( 'settings', 'typography', 'fontStyles' ),
 				'key'     => 'name',
 				'context' => 'Font style name',
 			),
 			array(
-				'path'    => array( 'settings', '*', 'typography', 'fontWeights' ),
+				'path'    => array( 'settings', 'typography', 'fontWeights' ),
 				'key'     => 'name',
 				'context' => 'Font weight name',
 			),
 			array(
-				'path'    => array( 'settings', '*', 'typography', 'fontFamilies' ),
+				'path'    => array( 'settings', 'typography', 'fontFamilies' ),
 				'key'     => 'name',
 				'context' => 'Font family name',
 			),
 			array(
-				'path'    => array( 'settings', '*', 'typography', 'textTransforms' ),
+				'path'    => array( 'settings', 'typography', 'textTransforms' ),
 				'key'     => 'name',
 				'context' => 'Text transform name',
 			),
 			array(
-				'path'    => array( 'settings', '*', 'typography', 'textDecorations' ),
+				'path'    => array( 'settings', 'typography', 'textDecorations' ),
 				'key'     => 'name',
 				'context' => 'Text decoration name',
 			),
 			array(
-				'path'    => array( 'settings', '*', 'color', 'palette' ),
+				'path'    => array( 'settings', 'color', 'palette' ),
 				'key'     => 'name',
 				'context' => 'Color name',
 			),
 			array(
-				'path'    => array( 'settings', '*', 'color', 'gradients' ),
+				'path'    => array( 'settings', 'color', 'gradients' ),
 				'key'     => 'name',
 				'context' => 'Gradient name',
 			),
 			array(
-				'path'    => array( 'settings', '*', 'color', 'duotone' ),
+				'path'    => array( 'settings', 'color', 'duotone' ),
 				'key'     => 'name',
 				'context' => 'Duotone name',
+			),
+			array(
+				'path'    => array( 'settings', 'blocks', '*', 'typography', 'fontSizes' ),
+				'key'     => 'name',
+				'context' => 'Font size name',
+			),
+			array(
+				'path'    => array( 'settings', 'blocks', '*', 'typography', 'fontStyles' ),
+				'key'     => 'name',
+				'context' => 'Font style name',
+			),
+			array(
+				'path'    => array( 'settings', 'blocks', '*', 'typography', 'fontWeights' ),
+				'key'     => 'name',
+				'context' => 'Font weight name',
+			),
+			array(
+				'path'    => array( 'settings', 'blocks', '*', 'typography', 'fontFamilies' ),
+				'key'     => 'name',
+				'context' => 'Font family name',
+			),
+			array(
+				'path'    => array( 'settings', 'blocks', '*', 'typography', 'textTransforms' ),
+				'key'     => 'name',
+				'context' => 'Text transform name',
+			),
+			array(
+				'path'    => array( 'settings', 'blocks', '*', 'typography', 'textDecorations' ),
+				'key'     => 'name',
+				'context' => 'Text decoration name',
+			),
+			array(
+				'path'    => array( 'settings', 'blocks', '*', 'color', 'palette' ),
+				'key'     => 'name',
+				'context' => 'Color name',
+			),
+			array(
+				'path'    => array( 'settings', 'blocks', '*', 'color', 'gradients' ),
+				'key'     => 'name',
+				'context' => 'Gradient name',
 			),
 			array(
 				'path'    => array( 'customTemplates' ),
@@ -112,22 +152,37 @@ class WP_Theme_JSON_Resolver_Test extends WP_UnitTestCase {
 
 		$this->assertSame( wp_get_theme()->get( 'TextDomain' ), 'fse' );
 		$this->assertSame(
-			$actual->get_settings()['root']['color'],
 			array(
-				'palette' => array(
-					array(
-						'slug'  => 'light',
-						'name'  => 'Jasny',
-						'color' => '#f5f7f9',
+				'color'  => array(
+					'palette' => array(
+						array(
+							'slug'  => 'light',
+							'name'  => 'Jasny',
+							'color' => '#f5f7f9',
+						),
+						array(
+							'slug'  => 'dark',
+							'name'  => 'Ciemny',
+							'color' => '#000',
+						),
 					),
-					array(
-						'slug'  => 'dark',
-						'name'  => 'Ciemny',
-						'color' => '#000',
+					'custom'  => false,
+				),
+				'blocks' => array(
+					'core/paragraph' => array(
+						'color' => array(
+							'palette' => array(
+								array(
+									'slug'  => 'light',
+									'name'  => 'Jasny',
+									'color' => '#f5f7f9',
+								),
+							),
+						),
 					),
 				),
-				'custom'  => false,
-			)
+			),
+			$actual->get_settings()
 		);
 		$this->assertSame(
 			$actual->get_custom_templates(),
