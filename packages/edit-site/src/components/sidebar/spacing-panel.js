@@ -7,12 +7,10 @@ import {
 	__experimentalBoxControl as BoxControl,
 	PanelBody,
 } from '@wordpress/components';
-import { __experimentalUseCustomSides as useCustomSides } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
-import { useSetting } from '../editor/utils';
+import {
+	useSetting,
+	__experimentalUseCustomSides as useCustomSides,
+} from '@wordpress/block-editor';
 
 const isWeb = Platform.OS === 'web';
 const CSS_UNITS = [

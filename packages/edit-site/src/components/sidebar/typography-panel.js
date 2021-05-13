@@ -2,17 +2,13 @@
  * WordPress dependencies
  */
 import {
+	useSetting,
 	LineHeightControl,
 	__experimentalFontFamilyControl as FontFamilyControl,
 	__experimentalFontAppearanceControl as FontAppearanceControl,
 } from '@wordpress/block-editor';
 import { PanelBody, FontSizePicker } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { useSetting } from '../editor/utils';
 
 export function useHasTypographyPanel( { supports, name } ) {
 	const hasLineHeight = useHasLineHeightControl( { supports, name } );

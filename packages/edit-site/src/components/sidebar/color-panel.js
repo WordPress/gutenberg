@@ -1,13 +1,16 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
+import {
+	useSetting,
+	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { LINK_COLOR, useSetting } from '../editor/utils';
+import { LINK_COLOR } from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
 
 export function useHasColorPanel( { supports } ) {

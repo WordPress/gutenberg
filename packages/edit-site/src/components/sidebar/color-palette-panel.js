@@ -9,11 +9,11 @@ import { get } from 'lodash';
 import { __experimentalColorEdit as ColorEdit } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
+import { useSetting } from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { useSetting } from '../editor/utils';
 import { store as editSiteStore } from '../../store';
 
 /**

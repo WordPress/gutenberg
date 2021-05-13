@@ -2,16 +2,12 @@
  * WordPress dependencies
  */
 import {
+	useSetting,
 	__experimentalBorderStyleControl as BorderStyleControl,
 	__experimentalColorGradientControl as ColorGradientControl,
 } from '@wordpress/block-editor';
 import { PanelBody, RangeControl } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-
-/**
- * Internal dependencies
- */
-import { useSetting } from '../editor/utils';
 
 const MIN_BORDER_RADIUS_VALUE = 0;
 const MAX_BORDER_RADIUS_VALUE = 50;
