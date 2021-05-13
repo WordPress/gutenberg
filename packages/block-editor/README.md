@@ -18,6 +18,7 @@ _This package assumes that your code will run in an **ES2015+** environment. If 
 import {
 	BlockEditorProvider,
 	BlockList,
+	BlockTools,
 	WritingFlow,
 	ObserveTyping,
 } from '@wordpress/block-editor';
@@ -34,12 +35,13 @@ function MyEditorComponent() {
 			onChange={ ( blocks ) => updateBlocks( blocks ) }
 		>
 			<SlotFillProvider>
-				<Popover.Slot name="block-toolbar" />
-				<WritingFlow>
-					<ObserveTyping>
-						<BlockList />
-					</ObserveTyping>
-				</WritingFlow>
+				<BlockTools>
+					<WritingFlow>
+						<ObserveTyping>
+							<BlockList />
+						</ObserveTyping>
+					</WritingFlow>
+				</BlockTools>
 				<Popover.Slot />
 			</SlotFillProvider>
 		</BlockEditorProvider>
@@ -225,6 +227,18 @@ _Returns_
 <a name="BlockToolbar" href="#BlockToolbar">#</a> **BlockToolbar**
 
 Undocumented declaration.
+
+<a name="BlockTools" href="#BlockTools">#</a> **BlockTools**
+
+Renders block tools (the block toolbar, select/navigation mode toolbar, the
+insertion point and a slot for the inline rich text toolbar). Must be wrapped
+around the block content and editor styles wrapper or iframe.
+
+_Parameters_
+
+-   _$0_ `Object`: Props.
+-   _$0.children_ `Object`: The block content and style container.
+-   _$0.\_\_unstableContentRef_ `Object`: Ref holding the content scroll container.
 
 <a name="BlockVerticalAlignmentControl" href="#BlockVerticalAlignmentControl">#</a> **BlockVerticalAlignmentControl**
 
@@ -639,6 +653,25 @@ _Parameters_
 _Returns_
 
 -   `Object`: Props to pass to the element to mark as a block.
+
+<a name="useSetting" href="#useSetting">#</a> **useSetting**
+
+Hook that retrieves the editor setting.
+It works with nested objects using by finding the value at path.
+
+_Usage_
+
+```js
+const isEnabled = useSetting( 'typography.dropCap' );
+```
+
+_Parameters_
+
+-   _path_ `string`: The path to the setting.
+
+_Returns_
+
+-   `any`: Returns the value defined for the setting.
 
 <a name="validateThemeColors" href="#validateThemeColors">#</a> **validateThemeColors**
 

@@ -13,7 +13,7 @@ This tutorial is up to date as of Gutenberg version 9.1.
 1.  [What is needed to create a block-theme?](#what-is-needed-to-create-a-block-theme)
 2.  [Creating the theme](#creating-the-theme)
 3.  [Creating the templates and template parts](#creating-the-templates-and-template-parts)
-4.  [experimental-theme.json - Global styles](#experimental-theme-json-global-styles)
+4.  [theme.json - Global styles](#theme-json-global-styles)
 
 ## What is needed to create a block theme?
 
@@ -27,7 +27,7 @@ Each template or template part contains the [block grammar](/docs/explanations/a
 
 A block theme requires an `index.php` file, an index template file, a `style.css` file, and a `functions.php` file.
 
-The theme may optionally include an [experimental-theme.json file](/docs/how-to-guides/themes/theme-json.md) to manage global styles. You decide what additional templates and template parts to include in your theme.
+The theme may optionally include an [theme.json file](/docs/how-to-guides/themes/theme-json.md) to manage global styles. You decide what additional templates and template parts to include in your theme.
 
 Templates are placed inside the `block-templates` folder, and template parts are placed inside the `block-template-parts` folder:
 
@@ -36,7 +36,7 @@ theme
 |__ style.css
 |__ functions.php
 |__ index.php
-|__ experimental-theme.json
+|__ theme.json
 |__ block-templates
 	|__ index.html
 	|__ single.html
@@ -179,9 +179,9 @@ If you used a different theme name, adjust the value for the theme text domain.
 
 Eventually, you will be able to create and combine templates and template parts directly in the site editor.
 
-### Experimental-theme.json - Global styles
+### theme.json - Global styles
 
-The purpose of the `experimental-theme.json` file is to make it easier to style blocks by setting defaults.
+The purpose of the `theme.json` file is to make it easier to style blocks by setting defaults.
 
 It is used to:
 
@@ -191,13 +191,13 @@ It is used to:
 
 [The documentation for global styles contains a list of available block and style combinations.](/docs/how-to-guides/themes/theme-json.md)
 
-Create a file called `experimental-theme.json` and save it inside the main folder.
+Create a file called `theme.json` and save it inside the main folder.
 
 CSS variables are generated using **Global presets**. The variables are added to the `:root` on the front, and to the `.editor-styles-wrapper` class in the editor.
 
 Styles that are added to the themes `style.css` file or an editor style sheet are loaded after global styles.
 
-Add the following global presets to the `experimental-theme.json` file:
+Add the following global presets to the `theme.json` file:
 
 ```
 {

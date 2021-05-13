@@ -494,12 +494,14 @@ export class ImageEdit extends Component {
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
-		const isFeaturedImage = featuredImageId === attributes.id;
-
 		const sizeOptionsValid = find( this.sizeOptions, [
 			'value',
 			imageDefaultSize,
 		] );
+
+		const isFeaturedImage =
+			typeof featuredImageId !== 'undefined' &&
+			featuredImageId === attributes.id;
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>

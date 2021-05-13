@@ -1,6 +1,7 @@
 .edit-post-visual-editor {
 	position: relative;
-
+	display: flex;
+	flex-flow: column;
 
 	// The button element easily inherits styles that are meant for the editor style.
 	// These rules enhance the specificity to reduce that inheritance.

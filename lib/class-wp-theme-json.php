@@ -44,23 +44,28 @@ class WP_Theme_JSON {
 
 	const VALID_STYLES = array(
 		'border'     => array(
-			'radius' => null,
 			'color'  => null,
+			'radius' => null,
 			'style'  => null,
 			'width'  => null,
 		),
 		'color'      => array(
 			'background' => null,
 			'gradient'   => null,
-			'link'       => null,
 			'text'       => null,
 		),
 		'spacing'    => array(
-			'padding' => array(
+			'margin'  => array(
 				'top'    => null,
 				'right'  => null,
 				'bottom' => null,
 				'left'   => null,
+			),
+			'padding' => array(
+				'bottom' => null,
+				'left'   => null,
+				'right'  => null,
+				'top'    => null,
 			),
 		),
 		'typography' => array(
@@ -76,36 +81,37 @@ class WP_Theme_JSON {
 
 	const VALID_SETTINGS = array(
 		'border'     => array(
-			'customRadius' => null,
 			'customColor'  => null,
+			'customRadius' => null,
 			'customStyle'  => null,
 			'customWidth'  => null,
 		),
 		'color'      => array(
 			'custom'         => null,
 			'customGradient' => null,
+			'duotone'        => null,
 			'gradients'      => null,
 			'link'           => null,
 			'palette'        => null,
-			'duotone'        => null,
 		),
+		'custom'     => null,
+		'layout'     => null,
 		'spacing'    => array(
+			'customMargin'  => null,
 			'customPadding' => null,
 			'units'         => null,
 		),
 		'typography' => array(
 			'customFontSize'        => null,
+			'customFontStyle'       => null,
+			'customFontWeight'      => null,
 			'customLineHeight'      => null,
+			'customTextDecorations' => null,
+			'customTextTransforms'  => null,
 			'dropCap'               => null,
 			'fontFamilies'          => null,
 			'fontSizes'             => null,
-			'customFontStyle'       => null,
-			'customFontWeight'      => null,
-			'customTextDecorations' => null,
-			'customTextTransforms'  => null,
 		),
-		'custom'     => null,
-		'layout'     => null,
 	);
 
 	/**
@@ -237,6 +243,10 @@ class WP_Theme_JSON {
 		),
 		'line-height'              => array(
 			'value' => array( 'typography', 'lineHeight' ),
+		),
+		'margin'                   => array(
+			'value'      => array( 'spacing', 'margin' ),
+			'properties' => array( 'top', 'right', 'bottom', 'left' ),
 		),
 		'padding'                  => array(
 			'value'      => array( 'spacing', 'padding' ),
@@ -567,12 +577,12 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * @param array $declarations Holds the existing declarations.
 	 * @param array $styles Styles to process.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $declarations, $styles ) {
+	private static function compute_style_properties( $styles ) {
+		$declarations = array();
 		if ( empty( $styles ) ) {
 			return $declarations;
 		}
@@ -661,12 +671,12 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * @param array $declarations Holds the existing declarations.
 	 * @param array $settings Settings to process.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_preset_vars( $declarations, $settings ) {
+	private static function compute_preset_vars( $settings ) {
+		$declarations = array();
 		foreach ( self::PRESETS_METADATA as $preset ) {
 			$values = _wp_array_get( $settings, $preset['path'], array() );
 			foreach ( $values as $value ) {
@@ -692,12 +702,12 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * @param array $declarations Holds the existing declarations.
 	 * @param array $settings Settings to process.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_theme_vars( $declarations, $settings ) {
+	private static function compute_theme_vars( $settings ) {
+		$declarations  = array();
 		$custom_values = _wp_array_get( $settings, array( 'custom' ), array() );
 		$css_vars      = self::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
@@ -777,9 +787,7 @@ class WP_Theme_JSON {
 			$selector = $metadata['selector'];
 
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
-			$declarations = array();
-			$declarations = self::compute_preset_vars( array(), $node );
-			$declarations = self::compute_theme_vars( $declarations, $node );
+			$declarations = array_merge( self::compute_preset_vars( $node ), self::compute_theme_vars( $node ) );
 
 			$stylesheet .= self::to_ruleset( $selector, $declarations );
 		}
@@ -836,7 +844,7 @@ class WP_Theme_JSON {
 
 			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
 			$selector     = $metadata['selector'];
-			$declarations = self::compute_style_properties( array(), $node );
+			$declarations = self::compute_style_properties( $node );
 
 			$is_link_element = self::is_link_element( $metadata['selector'] );
 			if ( ! $is_link_element ) {
@@ -1138,20 +1146,9 @@ class WP_Theme_JSON {
 		$nodes = self::get_setting_nodes( $this->theme_json );
 		foreach ( $nodes as $metadata ) {
 			foreach ( $properties as $property_path ) {
-				$paths   = array();
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-				$paths[] = array_merge( $metadata['path'], $property_path );
-
-				foreach ( $paths as $path ) {
-					$node = _wp_array_get( $incoming_data, $path, array() );
-					if ( empty( $node ) ) {
-						continue;
-					}
-
+				$path = array_merge( $metadata['path'], $property_path );
+				$node = _wp_array_get( $incoming_data, $path, array() );
+				if ( ! empty( $node ) ) {
 					gutenberg_experimental_set( $this->theme_json, $path, $node );
 				}
 			}
@@ -1221,7 +1218,7 @@ class WP_Theme_JSON {
 	 */
 	private static function remove_insecure_styles( $input, $selector ) {
 		$output       = array();
-		$declarations = self::compute_style_properties( array(), $input );
+		$declarations = self::compute_style_properties( $input );
 		// To be removed once the user styles
 		// no longer use the --wp--style--color--link.
 		if ( self::is_link_element( $selector ) ) {
