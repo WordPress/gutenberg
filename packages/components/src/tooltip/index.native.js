@@ -1,7 +1,14 @@
 /**
  * External dependencies
  */
-import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
+import {
+	Animated,
+	Easing,
+	Keyboard,
+	StyleSheet,
+	Text,
+	View,
+} from 'react-native';
 
 /**
  * WordPress dependencies
@@ -31,6 +38,25 @@ const TooltipContext = createContext( {
 } );
 const { Fill, Slot } = createSlotFill( 'Tooltip' );
 
+const useKeyboardVisibility = () => {
+	const [ keyboardVisible, setKeyboardVisible ] = useState( false );
+
+	useEffect( () => {
+		const didShowListener = Keyboard.addListener( 'keyboardDidShow', () =>
+			setKeyboardVisible( true )
+		);
+		const didHideListener = Keyboard.addListener( 'keyboardDidHide', () =>
+			setKeyboardVisible( false )
+		);
+		return () => {
+			didShowListener.remove();
+			didHideListener.remove();
+		};
+	}, [] );
+
+	return keyboardVisible;
+};
+
 const Tooltip = ( {
 	children,
 	position = 'top',
@@ -55,6 +81,7 @@ const Tooltip = ( {
 		width: 0,
 	} );
 	const { onHandleScreenTouch } = useContext( TooltipContext );
+	const keyboardVisible = useKeyboardVisibility();
 
 	// Register callback to dismiss the tooltip whenever the screen is touched
 	useEffect( () => {
@@ -150,6 +177,8 @@ const Tooltip = ( {
 		const { height, width } = nativeEvent.layout;
 		setTooltipLayout( { height, width } );
 	};
+
+	useEffect( getReferenceElementPosition, [ keyboardVisible ] );
 
 	return hidden ? (
 		children
