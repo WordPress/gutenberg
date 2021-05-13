@@ -24,6 +24,7 @@ export default function TemplatePartPlaceholder( {
 	area,
 	clientId,
 	setAttributes,
+	enableSelection,
 } ) {
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const [ step, setStep ] = useState( PLACEHOLDER_STEPS.initial );
@@ -72,13 +73,15 @@ export default function TemplatePartPlaceholder( {
 						position="bottom right left"
 						renderToggle={ ( { isOpen, onToggle } ) => (
 							<>
-								<Button
-									isPrimary
-									onClick={ onToggle }
-									aria-expanded={ isOpen }
-								>
-									{ __( 'Choose existing' ) }
-								</Button>
+								{ enableSelection && (
+									<Button
+										isPrimary
+										onClick={ onToggle }
+										aria-expanded={ isOpen }
+									>
+										{ __( 'Choose existing' ) }
+									</Button>
+								) }
 								<Button
 									isTertiary
 									onClick={ () =>

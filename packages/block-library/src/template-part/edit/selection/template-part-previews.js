@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, deburr } from 'lodash';
+import { groupBy, deburr, flatten } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,6 +22,10 @@ import { useAsyncList } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+/**
+ * Internal dependencies
+ */
+import { createTemplatePartId } from '../utils/create-template-part-id';
 
 function PreviewPlaceholder() {
 	return (
@@ -111,37 +115,34 @@ function TemplatePartsByArea( {
 	area = 'uncategorized',
 	labelsByArea,
 } ) {
-	const templatePartsToShow =
-		templateParts.filter(
-			( templatePart ) =>
-				'uncategorized' === area || templatePart.area === area
-		) || [];
-	const templatePartsByArea = useMemo( () => {
-		return Object.values( groupBy( templatePartsToShow, 'area' ) );
+	const { templatePartsByArea, templatePartsToShow } = useMemo( () => {
+		const _templatePartsToShow =
+			templateParts.filter(
+				( templatePart ) =>
+					'uncategorized' === area || templatePart.area === area
+			) || [];
+		const _templatePartsByArea = Object.values(
+			groupBy( _templatePartsToShow, 'area' )
+		);
+		const orderedTemplatePartsToShow = flatten( _templatePartsToShow );
+		return {
+			templatePartsByArea: _templatePartsByArea,
+			templatePartsToShow: orderedTemplatePartsToShow,
+		};
 	}, [ templateParts, area ] );
 
-	const currentShownTPs = useAsyncList( templateParts );
-
-	if ( ! templatePartsToShow.length ) {
-		return (
-			<PanelGroup
-				title={ `${ __( 'Area' ) }: ${ labelsByArea[ area ] }` }
-			>
-				{ __(
-					'There are no other template parts of this area. If you are looking for another type of template part, try searchnig for it using the input above.'
-				) }
-			</PanelGroup>
-		);
-	}
+	const currentShownTPs = useAsyncList( templatePartsToShow );
 
 	return templatePartsByArea.map( ( templatePartList ) => {
 		return (
 			<PanelGroup
 				key={ templatePartList[ 0 ].area }
-				title={ `${ __( 'Area' ) }: ${
+				title={ sprintf(
+					// Translators: for the area the template part is assigned to (Header, Footer, General, etc.)
+					__( 'Area: %s' ),
 					labelsByArea[ templatePartList[ 0 ].area ] ||
-					__( 'General' )
-				}` }
+						labelsByArea.uncategorized
+				) }
 			>
 				{ templatePartList.map( ( templatePart ) => {
 					return currentShownTPs.includes( templatePart ) ? (
@@ -236,9 +237,11 @@ function TemplatePartSearchResults( {
 	return groupedResults.map( ( group ) => (
 		<PanelGroup
 			key={ group[ 0 ].id }
-			title={ `${ __( 'Area' ) }: ${
-				labelsByArea[ group[ 0 ].area ] || __( 'General' )
-			}` }
+			title={ sprintf(
+				// Translators: for the area the template part is assigned to (Header, Footer, General, etc.)
+				__( 'Area: %s' ),
+				labelsByArea[ group[ 0 ].area ] || labelsByArea.uncategorized
+			) }
 		>
 			{ group.map( ( templatePart ) =>
 				currentShownTPs.includes( templatePart ) ? (
@@ -277,8 +280,10 @@ export default function TemplatePartPreviews( {
 			) || []
 		).filter(
 			( templatePart ) =>
-				`${ templatePart.theme }//${ templatePart.slug }` !==
-				templatePartId
+				createTemplatePartId(
+					templatePart.slug,
+					templatePart.theme
+				) !== templatePartId
 		);
 
 		const definedAreas = select(
