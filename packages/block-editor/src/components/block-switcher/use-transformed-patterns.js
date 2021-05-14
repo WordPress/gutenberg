@@ -3,11 +3,13 @@
  */
 import { useMemo } from '@wordpress/element';
 import { cloneBlock } from '@wordpress/blocks';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { getMatchingBlockByName, getRetainedBlockAttributes } from './utils';
+import { store as blockEditorStore } from '../../store';
 
 /**
  * Mutate the matched block's attributes by getting
@@ -94,9 +96,19 @@ export const getPatternTransformedBlocks = (
  */
 // TODO tests
 const useTransformedPatterns = ( patterns, selectedBlocks ) => {
+	const parsedPatterns = useSelect(
+		( select ) =>
+			patterns.map( ( { name } ) =>
+				select( blockEditorStore ).__experimentalGetParsedPattern(
+					name
+				)
+			),
+		[ patterns ]
+	);
+
 	return useMemo(
 		() =>
-			patterns.reduce( ( accumulator, _pattern ) => {
+			parsedPatterns.reduce( ( accumulator, _pattern ) => {
 				const transformedBlocks = getPatternTransformedBlocks(
 					selectedBlocks,
 					_pattern.blocks
@@ -109,7 +121,7 @@ const useTransformedPatterns = ( patterns, selectedBlocks ) => {
 				}
 				return accumulator;
 			}, [] ),
-		[ patterns, selectedBlocks ]
+		[ parsedPatterns, selectedBlocks ]
 	);
 };
 
