@@ -510,4 +510,70 @@ describe( 'Navigation editor', () => {
 			expect( menuNameButtonText ).toBe( oldName );
 		} );
 	} );
+
+	describe( 'Change detections', () => {
+		beforeEach( async () => {
+			const menuPostResponse = {
+				id: 4,
+				description: '',
+				name: 'Main',
+				slug: 'main-menu',
+				meta: [],
+				auto_add: false,
+			};
+
+			await setUpResponseMocking( [
+				...getMenuMocks( {
+					GET: [ menuPostResponse ],
+					POST: menuPostResponse,
+				} ),
+				...getMenuItemMocks( { GET: [] } ),
+			] );
+
+			await visitNavigationEditor();
+
+			// Select the navigation block, so inspector controls are visible.
+			const navigationBlock = await page.waitForSelector(
+				'div[aria-label="Block: Navigation"]'
+			);
+			await navigationBlock.click();
+		} );
+
+		afterEach( async () => {
+			await setUpResponseMocking( [] );
+		} );
+
+		async function assertIsDirty( isDirty ) {
+			let hadDialog = false;
+
+			function handleOnDialog() {
+				hadDialog = true;
+			}
+
+			try {
+				page.on( 'dialog', handleOnDialog );
+				await page.reload();
+
+				// Ensure whether it was expected that dialog was encountered.
+				expect( hadDialog ).toBe( isDirty );
+			} catch ( error ) {
+				throw error;
+			} finally {
+				page.removeListener( 'dialog', handleOnDialog );
+			}
+		}
+
+		it( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
+			assertIsDirty( false );
+		} );
+
+		it( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
+			await page.type(
+				'.edit-navigation-name-editor__text-control input',
+				' Menu'
+			);
+
+			assertIsDirty( true );
+		} );
+	} );
 } );

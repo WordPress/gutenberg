@@ -24,25 +24,9 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import createDataTree from './create-data-tree';
-import mapMenuItemsToBlocks from './map-menu-items-to-blocks';
+
 import PlaceholderPreview from './placeholder-preview';
-
-/**
- * Convert a flat menu item structure to a nested blocks structure.
- *
- * @param {Object[]} menuItems An array of menu items.
- *
- * @return {WPBlock[]} An array of blocks.
- */
-function convertMenuItemsToBlocks( menuItems ) {
-	if ( ! menuItems ) {
-		return null;
-	}
-
-	const menuTree = createDataTree( menuItems );
-	return mapMenuItemsToBlocks( menuTree );
-}
+import menuItemsToBlocks from './menu-items-to-blocks';
 
 function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
@@ -123,7 +107,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	const isLoading = isResolvingPages || isResolvingMenus;
 
 	const createFromMenu = useCallback( () => {
-		const blocks = convertMenuItemsToBlocks( menuItems );
+		const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
 		const selectNavigationBlock = true;
 		onCreate( blocks, selectNavigationBlock );
 	} );
