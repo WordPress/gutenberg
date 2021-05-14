@@ -210,14 +210,14 @@ function register_gutenberg_patterns() {
 			'categories'    => array( 'page-header' ),
 			'blockTypes' => array( 'core/template-part/header' ),
 			'content'    => '<!-- wp:columns {"verticalAlignment":"center","align":"full"} -->
-							<div class="wp-block-columns alignfull are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"33.34%"} -->
-							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.34%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right"} /--></div>
+							<div class="wp-block-columns alignfull are-vertically-aligned-center"><!-- wp:column {"verticalAlignment":"center","width":"50%"} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:50%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right"} /--></div>
 							<!-- /wp:column -->
 							<!-- wp:column {"verticalAlignment":"center","width":"120px"} -->
 							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:120px"><!-- wp:site-logo {"width":80,"className":"is-style-rounded"} /--></div>
 							<!-- /wp:column -->
-							<!-- wp:column {"verticalAlignment":"center","width":"33.33%"} -->
-							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"left"} /--></div>
+							<!-- wp:column {"verticalAlignment":"center","width":"50%"} -->
+							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:50%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"left"} /--></div>
 							<!-- /wp:column --></div>
 							<!-- /wp:columns -->',
 		)
@@ -288,13 +288,39 @@ function register_gutenberg_patterns() {
 	);
 
 	register_block_pattern(
+		'template-part/header-large-image',
+		array(
+			'title'      => __( 'Header with large image', 'gutenberg' ),
+			'categories'    => array( 'page-header' ),
+			'blockTypes' => array( 'core/template-part/header' ),
+			'content'    => '<!-- wp:cover {"url":"https://s.w.org/images/core/5.8/architecture-04.jpg","id":2588,"customOverlayColor":"#f0f0f0","minHeight":700,"align":"full"} -->
+							<div class="wp-block-cover alignfull has-background-dim" style="background-color:#f0f0f0;min-height:700px"><img class="wp-block-cover__image-background wp-image-2588" alt="" src="https://s.w.org/images/core/5.8/architecture-04.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:spacer {"height":150} -->
+							<div style="height:150px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer -->
+
+							<!-- wp:site-logo {"align":"center"} /-->
+
+							<!-- wp:site-title {"textAlign":"center","style":{"typography":{"fontSize":"48px","textTransform":"capitalize","lineHeight":"1.1"},"spacing":{"padding":{"top":"0px","right":"0px","bottom":"0px","left":"0px"}}}} /-->
+
+							<!-- wp:site-tagline {"textAlign":"center","style":{"color":{"text":"#000000"},"spacing":{"padding":{"bottom":"30px","top":"0px","right":"0px","left":"0px"}}}} /-->
+
+							<!-- wp:spacer {"height":150} -->
+							<div style="height:150px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer -->
+
+							<!-- wp:navigation {"orientation":"horizontal","itemsJustification":"center","style":{"color":{"text":"#000000"}}} /--></div></div>
+							<!-- /wp:cover -->',
+		)
+	);
+
+	register_block_pattern(
 		'template-part/footer-navigation-credit',
 		array(
 			'title'      => __( 'Footer with navigation and credit line', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
-			'content'    => '<!-- wp:columns {"align":"full","style":{"color":{"background":"#000000","text":"#ffffff"}}} -->
-							<div class="wp-block-columns alignfull has-text-color has-background" style="background-color:#000000;color:#ffffff"><!-- wp:column -->
+			'content'    => '<!-- wp:columns {"verticalAlignment":"center","align":"full","style":{"color":{"background":"#000000","text":"#ffffff"}}} -->
+							<div class="wp-block-columns alignfull are-vertically-aligned-center has-text-color has-background" style="background-color:#000000;color:#ffffff"><!-- wp:column -->
 							<div class="wp-block-column"><!-- wp:navigation {"orientation":"horizontal","fontSize":"normal"} /--></div>
 							<!-- /wp:column -->
 							<!-- wp:column -->
