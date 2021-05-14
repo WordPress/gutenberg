@@ -169,6 +169,14 @@ export const ItemBaseUI = styled.li`
 		&:focus:not( [aria-disabled='true'] ):active,
 		&:active:not( [aria-disabled='true'] ):active {
 			color: #ddd;
+
+			span {
+				color: #ddd;
+			}
+		}
+
+		span {
+			color: ${ G2.lightGray.ui };
 		}
 	}
 
@@ -179,6 +187,10 @@ export const ItemBaseUI = styled.li`
 		button,
 		a {
 			color: ${ UI.textDark };
+
+			span {
+				color: ${ UI.textDark };
+			}
 		}
 	}
 
