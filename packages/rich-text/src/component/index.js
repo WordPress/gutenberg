@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useState, useLayoutEffect } from '@wordpress/element';
+import { useRef, useLayoutEffect, useReducer } from '@wordpress/element';
 import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
@@ -36,8 +36,8 @@ export function useRichText( {
 	__unstableBeforeSerialize,
 	__unstableAddInvisibleFormats,
 } ) {
+	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const ref = useRef();
-	const [ activeFormats = [], setActiveFormats ] = useState();
 
 	function createRecord() {
 		const {
@@ -93,8 +93,20 @@ export function useRichText( {
 		record.current.end = selectionEnd;
 	}
 
+	const hadSelectionUpdate = useRef( false );
+
 	if ( ! record.current ) {
 		setRecordFromProps();
+	} else if (
+		selectionStart !== record.current.start ||
+		selectionEnd !== record.current.end
+	) {
+		hadSelectionUpdate.current = isSelected;
+		record.current = {
+			...record.current,
+			start: selectionStart,
+			end: selectionEnd,
+		};
 	}
 
 	/**
@@ -121,13 +133,7 @@ export function useRichText( {
 
 		record.current = newRecord;
 
-		const {
-			start,
-			end,
-			formats,
-			text,
-			activeFormats: newActiveFormats = [],
-		} = newRecord;
+		const { start, end, formats, text } = newRecord;
 
 		// Selection must be updated first, so it is recorded in history when
 		// the content change happens.
@@ -136,7 +142,7 @@ export function useRichText( {
 			__unstableFormats: formats,
 			__unstableText: text,
 		} );
-		setActiveFormats( newActiveFormats );
+		forceRender();
 	}
 
 	function applyFromProps( { domOnly } = {} ) {
@@ -155,24 +161,13 @@ export function useRichText( {
 
 	// Value updates must happen synchonously to avoid overwriting newer values.
 	useLayoutEffect( () => {
-		if ( ! didMount.current ) {
+		if ( ! hadSelectionUpdate.current ) {
 			return;
 		}
 
-		if (
-			isSelected &&
-			( selectionStart !== record.current.start ||
-				selectionEnd !== record.current.end )
-		) {
-			applyFromProps();
-		} else {
-			record.current = {
-				...record.current,
-				start: selectionStart,
-				end: selectionEnd,
-			};
-		}
-	}, [ selectionStart, selectionEnd, isSelected ] );
+		applyFromProps();
+		hadSelectionUpdate.current = false;
+	}, [ hadSelectionUpdate.current ] );
 
 	function focus() {
 		ref.current.focus();
@@ -182,11 +177,11 @@ export function useRichText( {
 	const mergedRefs = useMergeRefs( [
 		ref,
 		useDefaultStyle(),
-		useBoundaryStyle( { activeFormats } ),
+		useBoundaryStyle( { record } ),
 		useInlineWarning(),
 		useCopyHandler( { record, multilineTag, preserveWhiteSpace } ),
 		useSelectObject(),
-		useFormatBoundaries( { record, applyRecord, setActiveFormats } ),
+		useFormatBoundaries( { record, applyRecord } ),
 		useDelete( {
 			createRecord,
 			handleChange,
@@ -204,7 +199,6 @@ export function useRichText( {
 			handleChange,
 			isSelected,
 			onSelectionChange,
-			setActiveFormats,
 		} ),
 		useRefEffect( () => {
 			if ( didMount.current ) {
@@ -222,7 +216,6 @@ export function useRichText( {
 		onChange: handleChange,
 		onFocus: focus,
 		ref: mergedRefs,
-		hasActiveFormats: activeFormats.length,
 	};
 }
 

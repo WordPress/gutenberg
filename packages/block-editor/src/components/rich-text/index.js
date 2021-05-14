@@ -9,26 +9,19 @@ import { omit } from 'lodash';
  */
 import { RawHTML, useRef, useCallback, forwardRef } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
-import {
-	children as childrenSource,
-	getBlockTransforms,
-	findTransform,
-} from '@wordpress/blocks';
+import { children as childrenSource } from '@wordpress/blocks';
 import { useInstanceId, useMergeRefs } from '@wordpress/compose';
 import {
 	__unstableUseRichText as useRichText,
 	__unstableCreateElement,
 	isEmpty,
-	__unstableIsEmptyLine as isEmptyLine,
-	insert,
-	__unstableInsertLineSeparator as insertLineSeparator,
 	split,
 	toHTMLString,
 	isCollapsed,
 	removeFormat,
 } from '@wordpress/rich-text';
 import deprecated from '@wordpress/deprecated';
-import { BACKSPACE, DELETE, ENTER } from '@wordpress/keycodes';
+import { BACKSPACE, DELETE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -43,6 +36,7 @@ import { useCaretInFormat } from './use-caret-in-format';
 import { useMarkPersistent } from './use-mark-persistent';
 import { usePasteHandler } from './use-paste-handler';
 import { useInputRules } from './use-input-rules';
+import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
@@ -119,9 +113,7 @@ function RichTextWrapper(
 	const { selectionStart, selectionEnd, isSelected, disabled } = useSelect(
 		selector
 	);
-	const { selectionChange, __unstableMarkAutomaticChange } = useDispatch(
-		blockEditorStore
-	);
+	const { selectionChange } = useDispatch( blockEditorStore );
 	const multilineTag = getMultilineTag( multiline );
 	const adjustedAllowedFormats = getAllowedFormats( {
 		allowedFormats,
@@ -275,13 +267,7 @@ function RichTextWrapper(
 		);
 	}
 
-	const {
-		value,
-		onChange,
-		onFocus,
-		ref: richTextRef,
-		hasActiveFormats,
-	} = useRichText( {
+	const { value, onChange, onFocus, ref: richTextRef } = useRichText( {
 		value: adjustedValue,
 		onChange( html, { __unstableFormats, __unstableText } ) {
 			adjustedOnChange( html );
@@ -309,8 +295,8 @@ function RichTextWrapper(
 		onChange,
 	} );
 
-	useCaretInFormat( hasActiveFormats );
-	useMarkPersistent( { hasActiveFormats, html: adjustedValue, value } );
+	useCaretInFormat( { value } );
+	useMarkPersistent( { html: adjustedValue, value } );
 
 	function onKeyDown( event ) {
 		const { keyCode } = event;
@@ -319,59 +305,11 @@ function RichTextWrapper(
 			return;
 		}
 
-		if ( event.keyCode === ENTER ) {
-			event.preventDefault();
-
-			const _value = { ...value };
-			_value.formats = removeEditorOnlyFormats( value );
-			const canSplit = onReplace && onSplit;
-
-			if ( onReplace ) {
-				const transforms = getBlockTransforms( 'from' ).filter(
-					( { type } ) => type === 'enter'
-				);
-				const transformation = findTransform( transforms, ( item ) => {
-					return item.regExp.test( _value.text );
-				} );
-
-				if ( transformation ) {
-					onReplace( [
-						transformation.transform( {
-							content: _value.text,
-						} ),
-					] );
-					__unstableMarkAutomaticChange();
-				}
-			}
-
-			if ( multiline ) {
-				if ( event.shiftKey ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( canSplit && isEmptyLine( _value ) ) {
-					splitValue( _value );
-				} else {
-					onChange( insertLineSeparator( _value ) );
-				}
-			} else {
-				const { text, start, end } = _value;
-				const canSplitAtEnd =
-					onSplitAtEnd && start === end && end === text.length;
-
-				if ( event.shiftKey || ( ! canSplit && ! canSplitAtEnd ) ) {
-					if ( ! disableLineBreaks ) {
-						onChange( insert( _value, '\n' ) );
-					}
-				} else if ( ! canSplit && canSplitAtEnd ) {
-					onSplitAtEnd();
-				} else if ( canSplit ) {
-					splitValue( _value );
-				}
-			}
-		} else if ( keyCode === DELETE || keyCode === BACKSPACE ) {
+		if ( keyCode === DELETE || keyCode === BACKSPACE ) {
 			const { start, end, text } = value;
 			const isReverse = keyCode === BACKSPACE;
+			const hasActiveFormats =
+				value.activeFormats && !! value.activeFormats.length;
 
 			// Only process delete if the key press occurs at an uncollapsed edge.
 			if (
@@ -402,7 +340,9 @@ function RichTextWrapper(
 	const TagName = tagName;
 	const content = (
 		<>
-			{ children && children( { value, onChange, onFocus } ) }
+			{ isSelected &&
+				children &&
+				children( { value, onChange, onFocus } ) }
 			{ isSelected && <RemoveBrowserShortcuts /> }
 			{ isSelected && autocompleteProps.children }
 			{ isSelected && (
@@ -454,6 +394,17 @@ function RichTextWrapper(
 						preserveWhiteSpace,
 						pastePlainText,
 					} ),
+					useEnter( {
+						removeEditorOnlyFormats,
+						value,
+						onReplace,
+						onSplit,
+						multiline,
+						onChange,
+						disableLineBreaks,
+						splitValue,
+						onSplitAtEnd,
+					} ),
 					anchorRef,
 					forwardedRef,
 				] ) }
@@ -466,10 +417,7 @@ function RichTextWrapper(
 					'rich-text'
 				) }
 				onFocus={ unstableOnFocus }
-				onKeyDown={ ( event ) => {
-					autocompleteProps.onKeyDown( event );
-					onKeyDown( event );
-				} }
+				onKeyDown={ onKeyDown }
 			/>
 		</>
 	);

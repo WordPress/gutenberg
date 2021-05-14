@@ -129,9 +129,9 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 				),
 
 				'__experimentalFeatures'                 => array(
-					'description' => __( 'Active theme settings and default values.', 'gutenberg' ),
+					'description' => __( 'Settings consolidated from core, theme, and user origins.', 'gutenberg' ),
 					'type'        => 'object',
-					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor' ),
+					'context'     => array( 'post-editor', 'site-editor', 'widgets-editor', 'mobile' ),
 				),
 
 				'__experimentalGlobalStylesUserEntityId' => array(
@@ -144,6 +144,12 @@ class WP_REST_Block_Editor_Settings_Controller extends WP_REST_Controller {
 					'description' => __( 'Global styles settings.', 'gutenberg' ),
 					'type'        => 'object',
 					'context'     => array( 'site-editor' ),
+				),
+
+				'__experimentalStyles'                 => array(
+					'description' => __( 'Styles consolidated from core, theme, and user origins.', 'gutenberg' ),
+					'type'        => 'object',
+					'context'     => array( 'mobile' ),
 				),
 
 				'alignWide'                              => array(

@@ -6,7 +6,7 @@ import { find, reverse, first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import {
 	computeCaretRect,
 	focus,
@@ -28,12 +28,14 @@ import {
 } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
+import { useMergeRefs } from '@wordpress/compose';
 
 /**
  * Internal dependencies
  */
 import { isInSameBlock } from '../../utils/dom';
 import useMultiSelection from './use-multi-selection';
+import useLastFocus from './use-last-focus';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -167,17 +169,13 @@ export default function WritingFlow( { children } ) {
 	// browser behaviour across blocks.
 	const verticalRect = useRef();
 
-	const { hasMultiSelection, isMultiSelecting, isNavigationMode } = useSelect(
-		( select ) => {
-			const selectors = select( blockEditorStore );
-			return {
-				hasMultiSelection: selectors.hasMultiSelection(),
-				isMultiSelecting: selectors.isMultiSelecting(),
-				isNavigationMode: selectors.isNavigationMode(),
-			};
-		},
-		[]
-	);
+	const { hasMultiSelection, isNavigationMode } = useSelect( ( select ) => {
+		const selectors = select( blockEditorStore );
+		return {
+			hasMultiSelection: selectors.hasMultiSelection(),
+			isNavigationMode: selectors.isNavigationMode(),
+		};
+	}, [] );
 	const {
 		getSelectedBlockClientId,
 		getMultiSelectedBlocksStartClientId,
@@ -461,29 +459,7 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
-	useEffect( () => {
-		if ( hasMultiSelection && ! isMultiSelecting ) {
-			container.current.focus();
-		}
-	}, [ hasMultiSelection, isMultiSelecting ] );
-
-	// This hook sets the selection after the user makes a multi-selection. For
-	// some browsers, like Safari, it is important that this happens AFTER
-	// setting focus on the multi-selection container above.
-	useMultiSelection( container );
-
 	const lastFocus = useRef();
-
-	useEffect( () => {
-		function onFocusOut( event ) {
-			lastFocus.current = event.target;
-		}
-
-		container.current.addEventListener( 'focusout', onFocusOut );
-		return () => {
-			container.current.removeEventListener( 'focusout', onFocusOut );
-		};
-	}, [] );
 
 	function onFocusCapture( event ) {
 		// Do not capture incoming focus if set by us in WritingFlow.
@@ -521,7 +497,11 @@ export default function WritingFlow( { children } ) {
 				style={ PREVENT_SCROLL_ON_FOCUS }
 			/>
 			<div
-				ref={ container }
+				ref={ useMergeRefs( [
+					container,
+					useLastFocus( lastFocus ),
+					useMultiSelection(),
+				] ) }
 				className="block-editor-writing-flow"
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
