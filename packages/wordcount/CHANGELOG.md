@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Enhancement
+
+-   Adjusted count logic to recognize also numbers as words ([#27288](https://github.com/WordPress/gutenberg/pull/27288)).
+
 ## 3.0.0 (2021-05-14)
 
 ### Breaking Changes
