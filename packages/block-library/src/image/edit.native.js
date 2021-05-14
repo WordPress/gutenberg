@@ -400,7 +400,6 @@ export class ImageEdit extends Component {
 				rel={ mappedAttributes.rel }
 				label={ mappedAttributes.label }
 				linkTarget={ mappedAttributes.linkTarget }
-				attributes={ mappedAttributes }
 				onClose={ this.dismissSheet }
 				setAttributes={ this.setMappedAttributes }
 				withBottomSheet={ false }
