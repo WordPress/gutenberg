@@ -214,7 +214,7 @@ function register_gutenberg_patterns() {
 							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:50%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right"} /--></div>
 							<!-- /wp:column -->
 							<!-- wp:column {"verticalAlignment":"center","width":"120px"} -->
-							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:120px"><!-- wp:site-logo {"width":80,"className":"is-style-rounded"} /--></div>
+							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:120px"><!-- wp:site-logo {"align":"center","width":80,"className":"is-style-rounded"} /--></div>
 							<!-- /wp:column -->
 							<!-- wp:column {"verticalAlignment":"center","width":"50%"} -->
 							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:50%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"left"} /--></div>
@@ -288,13 +288,13 @@ function register_gutenberg_patterns() {
 	);
 
 	register_block_pattern(
-		'template-part/header-tagline-and-image',
+		'template-part/centered-header-background-color',
 		array(
-			'title'      => __( 'Header with tagline and image', 'gutenberg' ),
+			'title'      => __( 'Centered page header with background color', 'gutenberg' ),
 			'categories'    => array( 'page-header' ),
 			'blockTypes' => array( 'core/template-part/header' ),
-			'content'    => '<!-- wp:cover {"url":"https://s.w.org/images/core/5.8/architecture-04.jpg","id":2588,"customOverlayColor":"#f0f0f0","minHeight":700,"align":"full"} -->
-							<div class="wp-block-cover alignfull has-background-dim" style="background-color:#f0f0f0;min-height:700px"><img class="wp-block-cover__image-background wp-image-2588" alt="" src="https://s.w.org/images/core/5.8/architecture-04.jpg" data-object-fit="cover"/><div class="wp-block-cover__inner-container"><!-- wp:spacer {"height":150} -->
+			'content'    => '<!-- wp:group {"align":"full","style":{"color":{"background":"#f8f8f8"},"spacing":{"padding":{"top":"2em","right":"2em","bottom":"2em","left":"2em"}}}} -->
+							<div class="wp-block-group alignfull has-background" style="background-color:#f8f8f8;padding-top:2em;padding-right:2em;padding-bottom:2em;padding-left:2em"><!-- wp:spacer {"height":150} -->
 							<div style="height:150px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer -->
 
@@ -308,8 +308,8 @@ function register_gutenberg_patterns() {
 							<div style="height:150px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer -->
 
-							<!-- wp:navigation {"orientation":"horizontal","itemsJustification":"center","style":{"color":{"text":"#000000"}}} /--></div></div>
-							<!-- /wp:cover -->',
+							<!-- wp:navigation {"orientation":"horizontal","itemsJustification":"center","style":{"color":{"text":"#000000"}}} /--></div>
+							<!-- /wp:group -->',
 		)
 	);
 
@@ -332,7 +332,11 @@ function register_gutenberg_patterns() {
 
 							<!-- wp:site-title {"style":{"typography":{"textTransform":"capitalize","fontSize":"84px","lineHeight":"1.0"}}} /-->
 
-							<!-- wp:navigation {"orientation":"horizontal","color":{"text":"#161616"}},"style":{"typography":{"textTransform":"uppercase"}},"fontSize":"normal"} /--></div></div>
+							<!-- wp:navigation {"orientation":"horizontal","color":{"text":"#161616"}},"style":{"typography":{"textTransform":"uppercase"}},"fontSize":"normal"} /-->
+
+							<!-- wp:spacer {"height":50} -->
+							<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer --></div></div>
 							<!-- /wp:media-text -->',
 		)
 	);
@@ -362,7 +366,7 @@ function register_gutenberg_patterns() {
 			'title'      => __( 'Centered footer with navigation and social links', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
-			'content'    => '<!-- wp:navigation {"orientation":"horizontal","fontSize":"normal"} /-->
+			'content'    => '<!-- wp:navigation {"orientation":"horizontal","itemsJustification":"center","fontSize":"normal"} /-->
 
 							<!-- wp:spacer {"height":10} -->
 							<div style="height:10px" aria-hidden="true" class="wp-block-spacer"></div>
