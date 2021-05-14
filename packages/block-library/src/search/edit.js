@@ -55,6 +55,7 @@ import {
 const DEFAULT_INNER_PADDING = 4;
 const BUTTON_BEHAVIOR_EXPAND = 'expand-searchfield';
 const BUTTON_BEHAVIOR_LINK = 'search-page-link';
+const SEARCHFIELD_ANIMATION_DURATION = 300; //ms
 
 export default function SearchEdit( {
 	className,
@@ -81,27 +82,52 @@ export default function SearchEdit( {
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const searchFieldRef = useRef();
+	const buttonRef = useRef();
+
+	useEffect( () => {
+		if ( isSelected ) {
+			showSearchField();
+		} else {
+			hideSearchField();
+		}
+	}, [ isSelected ] );
 
 	useEffect( () => {
 		if ( 'button-only' !== buttonPosition ) {
-			return;
-		}
-
-		if ( isSelected ) {
-			searchFieldRef.current.style.marginLeft = 0;
-			const resetWidth = setTimeout( () => {
-				searchFieldRef.current.style.flexGrow = '1';
-				searchFieldRef.current.style.width = `${ width }${ widthUnit }`;
-				clearTimeout( resetWidth );
-			}, 300 );
+			showSearchField( false );
 		} else {
-			searchFieldRef.current.style.width = `${ searchFieldRef.current.offsetWidth }px`;
-			searchFieldRef.current.style.flexGrow = '0';
-			searchFieldRef.current.style.marginLeft = `-${ searchFieldRef.current.offsetWidth }px`;
-			searchFieldRef.current.style.transitionDuration = '300ms';
-			searchFieldRef.current.style.transitionProperty = 'margin-left';
+			hideSearchField();
 		}
-	} );
+	}, [ buttonPosition ] );
+
+	const hideSearchField = () => {
+		searchFieldRef.current.style.width = `${ searchFieldRef.current.offsetWidth }px`;
+		searchFieldRef.current.style.flexGrow = '0';
+		searchFieldRef.current.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
+		searchFieldRef.current.style.transitionProperty = 'margin-left';
+
+		const offset =
+			searchFieldRef.current.offsetWidth +
+			parseInt(
+				window.getComputedStyle( searchFieldRef.current ).marginRight
+			) +
+			parseInt( window.getComputedStyle( buttonRef.current ).marginLeft );
+
+		searchFieldRef.current.style.marginLeft = `-${ offset }px`;
+	};
+
+	const showSearchField = ( animate = true ) => {
+		const duration = animate ? SEARCHFIELD_ANIMATION_DURATION : 0;
+
+		searchFieldRef.current.style.marginLeft = 0;
+		searchFieldRef.current.style.transitionDuration = `${ duration }ms`;
+
+		const resetWidth = setTimeout( () => {
+			searchFieldRef.current.style.flexGrow = '1';
+			searchFieldRef.current.style.width = `${ width }${ widthUnit }`;
+			clearTimeout( resetWidth );
+		}, duration );
+	};
 
 	const units = useCustomUnits( {
 		availableUnits: [ '%', 'px' ],
@@ -195,6 +221,8 @@ export default function SearchEdit( {
 						icon={ search }
 						className="wp-block-search__button"
 						style={ { borderRadius } }
+						onClick={ showSearchField }
+						ref={ buttonRef }
 					/>
 				) }
 
@@ -209,6 +237,8 @@ export default function SearchEdit( {
 						onChange={ ( html ) =>
 							setAttributes( { buttonText: html } )
 						}
+						onClick={ showSearchField }
+						ref={ buttonRef }
 					/>
 				) }
 			</>
@@ -274,6 +304,7 @@ export default function SearchEdit( {
 										setAttributes( {
 											buttonPosition: 'button-only',
 										} );
+
 										onClose();
 									} }
 								>

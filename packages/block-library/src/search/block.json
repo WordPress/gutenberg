@@ -39,7 +39,8 @@
 			"default": false
 		},
 		"buttonBehavior": {
-			"type": "string"
+			"type": "string",
+			"default": "expand-searchfield"
 		}
 	},
 	"supports": {
