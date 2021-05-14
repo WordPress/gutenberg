@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { select, useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 import {
 	VisuallyHidden,
@@ -72,12 +72,7 @@ const SetupContent = ( {
 
 function BlockPattern( { pattern, onSelect, composite } ) {
 	const baseClassName = 'block-editor-block-pattern-setup-list';
-	const { name, title, description, viewportWidth = 700 } = pattern;
-	const { blocks } = useSelect(
-		( _select ) =>
-			_select( blockEditorStore ).__experimentalGetParsedPattern( name ),
-		[ name ]
-	);
+	const { blocks, title, description, viewportWidth = 700 } = pattern;
 	const descriptionId = useInstanceId(
 		BlockPattern,
 		`${ baseClassName }__item-description`
@@ -178,12 +173,7 @@ const BlockPatternSetup = ( {
 					setActiveSlide( ( active ) => active - 1 );
 				} }
 				onBlockPatternSelect={ () => {
-					const { blocks } = select(
-						blockEditorStore
-					).__experimentalGetParsedPattern(
-						patterns[ activeSlide ].name
-					);
-					onPatternSelectCallback( blocks );
+					onPatternSelectCallback( patterns[ activeSlide ].blocks );
 				} }
 				onStartBlank={ () => {
 					setShowBlank( true );
