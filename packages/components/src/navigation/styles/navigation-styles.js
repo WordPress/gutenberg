@@ -222,6 +222,7 @@ export const ItemBadgeUI = styled.span`
 
 export const ItemTitleUI = styled( Text )`
 	${ () => ( isRTL() ? 'margin-left: auto;' : 'margin-right: auto;' ) }
+	color: ${ G2.lightGray.ui };
 	font-size: 14px;
 	line-height: 20px;
 `;
