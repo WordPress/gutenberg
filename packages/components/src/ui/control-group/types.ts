@@ -12,7 +12,7 @@ import type { FlexProps } from '../../flex/types';
 export type ControlGroupContext = {
 	isFirst?: boolean;
 	isLast?: boolean;
-	isMidde?: boolean;
+	isMiddle?: boolean;
 	isOnly?: boolean;
 	isVertical?: boolean;
 	styles?: string;
