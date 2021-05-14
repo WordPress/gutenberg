@@ -21,6 +21,7 @@ function gutenberg_reregister_core_block_types() {
 				'code',
 				'column',
 				'columns',
+				'cover',
 				'gallery',
 				'group',
 				'heading',
@@ -51,7 +52,6 @@ function gutenberg_reregister_core_block_types() {
 				'block.php'                     => 'core/block',
 				'calendar.php'                  => 'core/calendar',
 				'categories.php'                => 'core/categories',
-				'cover.php'                     => 'core/cover',
 				'file.php'                      => 'core/file',
 				'latest-comments.php'           => 'core/latest-comments',
 				'latest-posts.php'              => 'core/latest-posts',
@@ -78,9 +78,8 @@ function gutenberg_reregister_core_block_types() {
 				'post-date.php'                 => 'core/post-date',
 				'post-excerpt.php'              => 'core/post-excerpt',
 				'post-featured-image.php'       => 'core/post-featured-image',
-				'post-hierarchical-terms.php'   => 'core/post-hierarchical-terms',
+				'post-terms.php'                => 'core/post-terms',
 				'post-navigation-link.php'      => 'core/post-navigation-link',
-				'post-tags.php'                 => 'core/post-tags',
 				'post-title.php'                => 'core/post-title',
 				'query.php'                     => 'core/query',
 				'query-loop.php'                => 'core/query-loop',
@@ -144,7 +143,7 @@ function gutenberg_reregister_core_block_types() {
 				gutenberg_register_core_block_styles( $block_name );
 			}
 
-			require $blocks_dir . $file;
+			require_once $blocks_dir . $file;
 		}
 	}
 }
@@ -169,6 +168,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 	$editor_style_path = "build/block-library/blocks/$block_name/style-editor.css";
 
 	if ( file_exists( gutenberg_dir_path() . $style_path ) ) {
+		wp_deregister_style( "wp-block-{$block_name}" );
 		wp_register_style(
 			"wp-block-{$block_name}",
 			gutenberg_url( $style_path ),
@@ -182,6 +182,7 @@ function gutenberg_register_core_block_styles( $block_name ) {
 	}
 
 	if ( file_exists( gutenberg_dir_path() . $editor_style_path ) ) {
+		wp_deregister_style( "wp-block-{$block_name}-editor" );
 		wp_register_style(
 			"wp-block-{$block_name}-editor",
 			gutenberg_url( $editor_style_path ),
@@ -197,9 +198,16 @@ function gutenberg_register_core_block_styles( $block_name ) {
  *
  * Optimizes performance and sustainability of styles by inlining smaller stylesheets.
  *
+ * @todo Remove this function when the minimum supported version is WordPress 5.8.
+ *
  * @return void
  */
 function gutenberg_maybe_inline_styles() {
+
+	// Early exit if the "wp_maybe_inline_styles" function exists.
+	if ( function_exists( 'wp_maybe_inline_styles' ) ) {
+		return;
+	}
 
 	$total_inline_limit = 20000;
 	/**
@@ -253,15 +261,21 @@ function gutenberg_maybe_inline_styles() {
 			$style['css'] = file_get_contents( $style['path'] );
 
 			// Set `src` to `false` and add styles inline.
-			$wp_styles->registered[ $style['handle'] ]->src              = false;
-			$wp_styles->registered[ $style['handle'] ]->extra['after'][] = $style['css'];
+			$wp_styles->registered[ $style['handle'] ]->src = false;
+			if ( empty( $wp_styles->registered[ $style['handle'] ]->extra['after'] ) ) {
+				$wp_styles->registered[ $style['handle'] ]->extra['after'] = array();
+			}
+			array_unshift( $wp_styles->registered[ $style['handle'] ]->extra['after'], $style['css'] );
 
 			// Add the styles size to the $total_inline_size var.
 			$total_inline_size += (int) $style['size'];
 		}
 	}
 }
+// Run for styles enqueued in <head>.
 add_action( 'wp_head', 'gutenberg_maybe_inline_styles', 1 );
+// Run for late-loaded styles in the footer.
+add_action( 'wp_footer', 'gutenberg_maybe_inline_styles', 1 );
 
 /**
  * Complements the implementation of block type `core/social-icon`, whether it
@@ -374,8 +388,10 @@ function gutenberg_register_theme_block_category( $categories ) {
 	);
 	return $categories;
 }
-
-add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( ! function_exists( 'get_default_block_categories' ) ) {
+	add_filter( 'block_categories', 'gutenberg_register_theme_block_category' );
+}
 
 /**
  * Checks whether the current block type supports the feature requested.

@@ -11,7 +11,7 @@
 <dd>The abstract term used to describe units of markup that, composed together, form the content or layout of a webpage. The idea combines concepts of what in WordPress today we achieve with shortcodes, custom HTML, and embed discovery into a single consistent API and user experience.</dd>
 
 <dt>Block Based Theme</dt>
-<dd>A theme built in block forward way that allows Full Site Editing to work. The core of a block-based theme are its block templates and block template parts. To date, block-based theme templates have been HTML files of block markup that map to templates from the standard WordPress template hierarchy. </dd>
+<dd>A theme built in block forward way that allows Full Site Editing to work. The core of a block theme are its block templates and block template parts. To date, block theme templates have been HTML files of block markup that map to templates from the standard WordPress template hierarchy. </dd>
 
 <dt>Block categories</dt>
 <dd>These are not a WordPress taxonomy, but instead used internally to sort blocks in the Block Library.</dd>

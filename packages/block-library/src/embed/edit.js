@@ -8,8 +8,8 @@ import {
 	getAttributesFromPreview,
 	getEmbedInfoByProvider,
 } from './util';
-import { settings } from './index';
 import EmbedControls from './embed-controls';
+import { embedContentIcon } from './icons';
 import EmbedLoading from './embed-loading';
 import EmbedPlaceholder from './embed-placeholder';
 import EmbedPreview from './embed-preview';
@@ -22,7 +22,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { __, sprintf } from '@wordpress/i18n';
+import { __, _x, sprintf } from '@wordpress/i18n';
 import { useState, useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
@@ -55,8 +55,8 @@ const EmbedEdit = ( props ) => {
 	} = props;
 
 	const defaultEmbedInfo = {
-		title: settings.title,
-		icon: settings.icon,
+		title: _x( 'Embed', 'block title' ),
+		icon: embedContentIcon,
 	};
 	const { icon, title } =
 		getEmbedInfoByProvider( providerNameSlug ) || defaultEmbedInfo;

@@ -7,7 +7,11 @@ import { store as noticesStore } from '@wordpress/notices';
 /**
  * Internal dependencies
  */
-import { createMissingMenuItems, saveNavigationPost } from '../actions';
+import {
+	createMissingMenuItems,
+	saveNavigationPost,
+	setSelectedMenuId,
+} from '../actions';
 import {
 	resolveMenuItems,
 	getMenuItemToClientIdMapping,
@@ -620,5 +624,15 @@ describe( 'saveNavigationPost', () => {
 				}
 			)
 		);
+	} );
+} );
+
+describe( 'setSelectedMenuId', () => {
+	it( 'should return the SET_SELECTED_MENU_ID action', () => {
+		const menuId = 1;
+		expect( setSelectedMenuId( menuId ) ).toEqual( {
+			type: 'SET_SELECTED_MENU_ID',
+			menuId,
+		} );
 	} );
 } );

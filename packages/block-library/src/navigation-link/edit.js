@@ -523,10 +523,10 @@ export default function NavigationLinkEdit( {
 									title: newTitle = '',
 									url: newURL = '',
 									opensInNewTab: newOpensInNewTab,
-									id,
+									id: newId,
 									kind: newKind = '',
 									type: newType = '',
-								} = {} ) =>
+								} = {} ) => {
 									setAttributes( {
 										url: encodeURI( newURL ),
 										label: ( () => {
@@ -552,7 +552,12 @@ export default function NavigationLinkEdit( {
 											return escape( normalizedURL );
 										} )(),
 										opensInNewTab: newOpensInNewTab,
-										id,
+										// `id` represents the DB ID of the entity which this link represents (eg: Post ID).
+										// Therefore we must not inadvertently set it to `undefined` if the `onChange` is called with no `id` value.
+										// This is possible when a setting changes such as the `opensInNewTab`.
+										...( newId && {
+											id: newId,
+										} ),
 										...( newKind && {
 											kind: newKind,
 										} ),
@@ -561,8 +566,8 @@ export default function NavigationLinkEdit( {
 											newType !== 'post-format' && {
 												type: newType,
 											} ),
-									} )
-								}
+									} );
+								} }
 							/>
 						</Popover>
 					) }

@@ -16,7 +16,7 @@ import {
 	ObserveTyping,
 	WritingFlow,
 	BlockEditorKeyboardShortcuts,
-	__experimentalBlockSettingsMenuFirstItem,
+	__unstableBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
 import { SlotFillProvider, Popover } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
@@ -54,10 +54,11 @@ export default function SidebarBlockEditor( {
 		}
 
 		return {
+			...blockEditorSettings,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			mediaUpload: mediaUploadBlockEditor,
 		};
-	}, [] );
+	}, [ hasUploadPermissions, blockEditorSettings ] );
 	const parentContainer = document.getElementById(
 		'customize-theme-controls'
 	);
@@ -78,6 +79,10 @@ export default function SidebarBlockEditor( {
 						setIsInserterOpened={ setIsInserterOpened }
 					/>
 
+					<div className="customize-widgets__contextual-toolbar-wrapper">
+						<Popover.Slot name="block-toolbar" />
+					</div>
+
 					<BlockSelectionClearer>
 						<WritingFlow>
 							<ObserveTyping>
@@ -85,27 +90,25 @@ export default function SidebarBlockEditor( {
 							</ObserveTyping>
 						</WritingFlow>
 					</BlockSelectionClearer>
+
+					{ createPortal(
+						// This is a temporary hack to prevent button component inside <BlockInspector>
+						// from submitting form when type="button" is not specified.
+						<form onSubmit={ ( event ) => event.preventDefault() }>
+							<BlockInspector />
+						</form>,
+						inspector.contentContainer[ 0 ]
+					) }
 				</SidebarEditorProvider>
 
-				<Popover.Slot name="block-toolbar" />
-
-				{ createPortal(
-					// This is a temporary hack to prevent button component inside <BlockInspector>
-					// from submitting form when type="button" is not specified.
-					<form onSubmit={ ( event ) => event.preventDefault() }>
-						<BlockInspector />
-					</form>,
-					inspector.contentContainer[ 0 ]
-				) }
-
-				<__experimentalBlockSettingsMenuFirstItem>
+				<__unstableBlockSettingsMenuFirstItem>
 					{ ( { onClose } ) => (
 						<BlockInspectorButton
 							inspector={ inspector }
 							closeMenu={ onClose }
 						/>
 					) }
-				</__experimentalBlockSettingsMenuFirstItem>
+				</__unstableBlockSettingsMenuFirstItem>
 
 				{
 					// We have to portal this to the parent of both the editor and the inspector,

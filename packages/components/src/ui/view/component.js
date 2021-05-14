@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { BaseView } from '@wp-g2/styles';
+import styled from '@emotion/styled';
 
 /**
  * `View` is a core component that renders everything in the library.
@@ -20,7 +20,7 @@ import { BaseView } from '@wp-g2/styles';
  * }
  * ```
  */
-const View = BaseView;
+const View = styled.div``;
 View.displayName = 'View';
 
 export default View;

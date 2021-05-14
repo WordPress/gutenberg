@@ -81,7 +81,25 @@ export function processingQueue( state, action ) {
 	return state || {};
 }
 
+/**
+ * Reducer keeping track of selected menu ID.
+ *
+ * @param {number} state  Current state.
+ * @param {Object} action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function selectedMenuId( state = 0, action ) {
+	switch ( action.type ) {
+		case 'SET_SELECTED_MENU_ID':
+			return action.menuId;
+	}
+
+	return state;
+}
+
 export default combineReducers( {
 	mapping,
 	processingQueue,
+	selectedMenuId,
 } );

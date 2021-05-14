@@ -72,6 +72,12 @@
 		"parent": "create-block"
 	},
 	{
+		"title": "Full Site Editing",
+		"slug": "full-site-editing",
+		"markdown_source": "../docs/getting-started/full-site-editing.md",
+		"parent": "handbook"
+	},
+	{
 		"title": "Glossary",
 		"slug": "glossary",
 		"markdown_source": "../docs/getting-started/glossary.md",
@@ -288,16 +294,28 @@
 		"parent": "block-tutorial"
 	},
 	{
-		"title": "Feature Flags",
-		"slug": "feature-flags",
-		"markdown_source": "../docs/how-to-guides/feature-flags.md",
-		"parent": "how-to-guides"
-	},
-	{
-		"title": "Theming for the Block Editor",
+		"title": "Themes",
 		"slug": "themes",
 		"markdown_source": "../docs/how-to-guides/themes/README.md",
 		"parent": "how-to-guides"
+	},
+	{
+		"title": "Block Theme",
+		"slug": "block-theme-overview",
+		"markdown_source": "../docs/how-to-guides/themes/block-theme-overview.md",
+		"parent": "themes"
+	},
+	{
+		"title": "Create a block theme",
+		"slug": "create-block-theme",
+		"markdown_source": "../docs/how-to-guides/themes/create-block-theme.md",
+		"parent": "themes"
+	},
+	{
+		"title": "Global Settings & Styles (theme.json)",
+		"slug": "theme-json",
+		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
+		"parent": "themes"
 	},
 	{
 		"title": "Theme Support",
@@ -306,22 +324,10 @@
 		"parent": "themes"
 	},
 	{
-		"title": "Themes & Block Editor: experimental theme.json",
-		"slug": "theme-json",
-		"markdown_source": "../docs/how-to-guides/themes/theme-json.md",
-		"parent": "themes"
-	},
-	{
-		"title": "Creating a block-based theme",
-		"slug": "block-based-theme",
-		"markdown_source": "../docs/how-to-guides/block-based-theme/README.md",
+		"title": "Feature Flags",
+		"slug": "feature-flags",
+		"markdown_source": "../docs/how-to-guides/feature-flags.md",
 		"parent": "how-to-guides"
-	},
-	{
-		"title": "Adding blocks to your theme",
-		"slug": "block-based-themes-2-adding-blocks",
-		"markdown_source": "../docs/how-to-guides/block-based-theme/block-based-themes-2-adding-blocks.md",
-		"parent": "block-based-theme"
 	},
 	{
 		"title": "Backward Compatibility",
@@ -762,15 +768,33 @@
 		"parent": "components"
 	},
 	{
+		"title": "DuotonePicker",
+		"slug": "duotone-picker",
+		"markdown_source": "../packages/components/src/duotone-picker/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ExternalLink",
 		"slug": "external-link",
 		"markdown_source": "../packages/components/src/external-link/README.md",
 		"parent": "components"
 	},
 	{
+		"title": "FlexBlock",
+		"slug": "flex-block",
+		"markdown_source": "../packages/components/src/flex/flex-block/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "FlexItem",
+		"slug": "flex-item",
+		"markdown_source": "../packages/components/src/flex/flex-item/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Flex",
 		"slug": "flex",
-		"markdown_source": "../packages/components/src/flex/README.md",
+		"markdown_source": "../packages/components/src/flex/flex/README.md",
 		"parent": "components"
 	},
 	{
@@ -813,6 +837,12 @@
 		"title": "Guide",
 		"slug": "guide",
 		"markdown_source": "../packages/components/src/guide/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Heading",
+		"slug": "heading",
+		"markdown_source": "../packages/components/src/heading/README.md",
 		"parent": "components"
 	},
 	{
@@ -1113,6 +1143,12 @@
 		"title": "TreeSelect",
 		"slug": "tree-select",
 		"markdown_source": "../packages/components/src/tree-select/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Truncate",
+		"slug": "truncate",
+		"markdown_source": "../packages/components/src/truncate/README.md",
 		"parent": "components"
 	},
 	{
@@ -1629,6 +1665,12 @@
 		"title": "@wordpress/warning",
 		"slug": "packages-warning",
 		"markdown_source": "../packages/warning/README.md",
+		"parent": "packages"
+	},
+	{
+		"title": "@wordpress/widgets",
+		"slug": "packages-widgets",
+		"markdown_source": "../packages/widgets/README.md",
 		"parent": "packages"
 	},
 	{

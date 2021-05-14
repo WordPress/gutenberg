@@ -11,7 +11,7 @@ import {
 	IsMenuNameControlFocusedContext,
 	untitledMenu,
 	useMenuEntity,
-	useSelectedMenuData,
+	useSelectedMenuId,
 } from '../../hooks';
 
 export function NameEditor() {
@@ -19,7 +19,7 @@ export function NameEditor() {
 		IsMenuNameControlFocusedContext
 	);
 
-	const { menuId } = useSelectedMenuData();
+	const [ menuId ] = useSelectedMenuId();
 	const { editedMenu, editMenuEntityRecord, menuEntityData } = useMenuEntity(
 		menuId
 	);

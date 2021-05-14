@@ -320,7 +320,7 @@ Blocks are able to provide base structural CSS styles, and themes can add styles
 
 Other features, like the new _wide_ and _full-wide_ alignment options, are simply CSS classes applied to blocks that offer this alignment. We are looking at how a theme can opt in to this feature, for example using `add_theme_support`.
 
-This is currently a work in progress and we recommend reviewing the [block based theme documentation](/docs/how-to-guides/block-based-theme/README.md) to learn more.
+This is currently a work in progress and we recommend reviewing the [block based theme documentation](/docs/how-to-guides/themes/block-theme-overview.md) to learn more.
 
 ## What are block variations? Are they the same as block styles?
 

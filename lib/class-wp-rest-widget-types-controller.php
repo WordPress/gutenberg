@@ -419,9 +419,13 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			);
 		}
 
-		// Set the widget's number to 1 so that the `id` attributes in the HTML
-		// that we return are predictable.
-		$widget_object->_set( 1 );
+		// Set the widget's number so that the id attributes in the HTML that we
+		// return are predictable.
+		if ( isset( $request['number'] ) && is_numeric( $request['number'] ) ) {
+			$widget_object->_set( (int) $request['number'] );
+		} else {
+			$widget_object->_set( -1 );
+		}
 
 		if ( isset( $request['instance']['encoded'], $request['instance']['hash'] ) ) {
 			$serialized_instance = base64_decode( $request['instance']['encoded'] );
@@ -456,6 +460,58 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			);
 		}
 
+		$serialized_instance = serialize( $instance );
+
+		$response = array(
+			'form'     => trim(
+				$this->get_widget_form(
+					$widget_object,
+					$instance
+				)
+			),
+			'preview'  => trim(
+				$this->get_widget_preview(
+					$widget_object,
+					$instance
+				)
+			),
+			'instance' => array(
+				'encoded' => base64_encode( $serialized_instance ),
+				'hash'    => wp_hash( $serialized_instance ),
+			),
+		);
+
+		if ( ! empty( $widget_object->show_instance_in_rest ) ) {
+			// Use new stdClass so that JSON result is {} and not [].
+			$response['instance']['raw'] = empty( $instance ) ? new stdClass : $instance;
+		}
+
+		return rest_ensure_response( $response );
+	}
+
+	/**
+	 * Returns the output of WP_Widget::widget() when called with the provided
+	 * instance. Used by encode_form_data() to preview a widget.
+
+	 * @param WP_Widget $widget_object Widget object to call widget() on.
+	 * @param array     $instance Widget instance settings.
+	 * @return string
+	 */
+	private function get_widget_preview( $widget_object, $instance ) {
+		ob_start();
+		the_widget( get_class( $widget_object ), $instance );
+		return ob_get_clean();
+	}
+
+	/**
+	 * Returns the output of WP_Widget::form() when called with the provided
+	 * instance. Used by encode_form_data() to preview a widget's form.
+	 *
+	 * @param WP_Widget $widget_object Widget object to call widget() on.
+	 * @param array     $instance Widget instance settings.
+	 * @return string
+	 */
+	private function get_widget_form( $widget_object, $instance ) {
 		ob_start();
 
 		/** This filter is documented in wp-includes/class-wp-widget.php */
@@ -475,24 +531,7 @@ class WP_REST_Widget_Types_Controller extends WP_REST_Controller {
 			);
 		}
 
-		$form = ob_get_clean();
-
-		$serialized_instance = serialize( $instance );
-
-		$response = array(
-			'form'     => trim( $form ),
-			'instance' => array(
-				'encoded' => base64_encode( $serialized_instance ),
-				'hash'    => wp_hash( $serialized_instance ),
-			),
-		);
-
-		if ( ! empty( $widget_object->show_instance_in_rest ) ) {
-			// Use new stdClass so that JSON result is {} and not [].
-			$response['instance']['raw'] = empty( $instance ) ? new stdClass : $instance;
-		}
-
-		return rest_ensure_response( $response );
+		return ob_get_clean();
 	}
 
 	/**

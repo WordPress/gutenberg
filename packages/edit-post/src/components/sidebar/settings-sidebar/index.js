@@ -1,7 +1,10 @@
 /**
  * WordPress dependencies
  */
-import { BlockInspector } from '@wordpress/block-editor';
+import {
+	BlockInspector,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { cog } from '@wordpress/icons';
 import { Platform } from '@wordpress/element';
 import { store as keyboardShortcutsStore } from '@wordpress/keyboard-shortcuts';
@@ -51,7 +54,7 @@ const SettingsSidebar = () => {
 					sidebar
 				)
 			) {
-				if ( select( 'core/block-editor' ).getBlockSelectionStart() ) {
+				if ( select( blockEditorStore ).getBlockSelectionStart() ) {
 					sidebar = 'edit-post/block';
 				}
 				sidebar = 'edit-post/document';

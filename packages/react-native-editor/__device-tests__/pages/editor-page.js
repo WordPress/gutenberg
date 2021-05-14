@@ -240,6 +240,19 @@ class EditorPage {
 		}
 	}
 
+	async openBlockSettings( block ) {
+		await block.click();
+
+		const settingsButton = await block.elementByAccessibilityId(
+			'Open Settings'
+		);
+		await settingsButton.click();
+	}
+
+	async dismissBottomSheet() {
+		return await swipeDown( this.driver );
+	}
+
 	// =========================
 	// Block toolbar functions
 	// =========================
@@ -582,6 +595,66 @@ class EditorPage {
 	}
 
 	// =============================
+	// Search Block functions
+	// =============================
+
+	async getSearchBlockTextElement( testID ) {
+		const child = await this.driver.elementByAccessibilityId( testID );
+
+		if ( isAndroid() ) {
+			// Get the child EditText element of the ViewGroup returned by
+			// elementByAccessibilityId.
+			return await child.elementByClassName( 'android.widget.EditText' );
+		}
+
+		return child;
+	}
+
+	async sendTextToSearchBlockChild( testID, text ) {
+		const textViewElement = await this.getSearchBlockTextElement( testID );
+		return await typeString( this.driver, textViewElement, text );
+	}
+
+	async toggleHideSearchLabelSetting( block ) {
+		await this.openBlockSettings( block );
+
+		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
+
+		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Hide search heading")]`;
+		return await this.driver
+			.elementByXPath( locator )
+			.click()
+			.sleep( isAndroid() ? 200 : 0 );
+	}
+
+	async changeSearchButtonPositionSetting( block, buttonPosition ) {
+		await this.openBlockSettings( block );
+
+		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeButton';
+
+		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Button position")]`;
+		await this.driver.elementByXPath( locator ).click();
+
+		const optionMenuButtonLocator = `${ elementName }[contains(@${ this.accessibilityIdXPathAttrib }, "${ buttonPosition }")]`;
+		return await this.driver
+			.elementByXPath( optionMenuButtonLocator )
+			.click()
+			.sleep( isAndroid() ? 500 : 200 ); // sleep a little longer due to multiple menus
+	}
+
+	async toggleSearchIconOnlySetting( block ) {
+		await this.openBlockSettings( block );
+
+		const elementName = isAndroid() ? '//*' : '//XCUIElementTypeOther';
+
+		const locator = `${ elementName }[starts-with(@${ this.accessibilityIdXPathAttrib }, "Use icon button")]`;
+		return await this.driver
+			.elementByXPath( locator )
+			.click()
+			.sleep( isAndroid() ? 200 : 0 );
+	}
+
+	// =============================
 	// Unsupported Block functions
 	// =============================
 
@@ -644,6 +717,7 @@ const blockNames = {
 	verse: 'Verse',
 	file: 'File',
 	audio: 'Audio',
+	search: 'Search',
 };
 
 module.exports = { initializeEditorPage, blockNames };

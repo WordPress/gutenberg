@@ -1,6 +1,8 @@
 # Annotations
 
-**Note: This API is experimental, that means it is subject to non-backward compatible changes or removal in any future version.**
+<div class="callout callout-alert">
+<strong>Note:</strong> This API is experimental, that means it is subject to non-backward compatible changes or removal in any future version.
+</div>
 
 Annotations are a way to highlight a specific piece in a post created with the block editor. Examples of this include commenting on a piece of text and spellchecking. Both can use the annotations API to mark a piece of text.
 

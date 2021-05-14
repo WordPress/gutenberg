@@ -78,6 +78,7 @@ export default function BlockNavigationBlock( {
 	const {
 		__experimentalFeatures: withExperimentalFeatures,
 		__experimentalPersistentListViewFeatures: withExperimentalPersistentListViewFeatures,
+		isTreeGridMounted,
 	} = useBlockNavigationContext();
 	const blockNavigationBlockSettingsClassName = classnames(
 		'block-editor-block-navigation-block__menu-cell',
@@ -88,7 +89,11 @@ export default function BlockNavigationBlock( {
 	// only focus the selected list item on mount; otherwise the list would always
 	// try to steal the focus from the editor canvas.
 	useEffect( () => {
-		if ( withExperimentalPersistentListViewFeatures && isSelected ) {
+		if (
+			withExperimentalPersistentListViewFeatures &&
+			! isTreeGridMounted &&
+			isSelected
+		) {
 			cellRef.current.focus();
 		}
 	}, [] );

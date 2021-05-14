@@ -11,6 +11,7 @@ import {
 	BlockInspector,
 	WritingFlow,
 	BlockList,
+	__unstableBlockSettingsMenuFirstItem,
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseBlockSelectionClearer as useBlockSelectionClearer,
 	__unstableUseTypingObserver as useTypingObserver,
@@ -19,7 +20,7 @@ import {
 	__unstableIframe as Iframe,
 } from '@wordpress/block-editor';
 import { Popover } from '@wordpress/components';
-import { useMergeRefs } from '@wordpress/compose';
+import { useMergeRefs, useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -28,6 +29,7 @@ import TemplatePartConverter from '../template-part-converter';
 import NavigateToLink from '../navigate-to-link';
 import { SidebarInspectorFill } from '../sidebar';
 import { store as editSiteStore } from '../../store';
+import BlockInspectorButton from './block-inspector-button';
 
 export default function BlockEditor( { setIsInserterOpen } ) {
 	const { settings, templateType, page, deviceType } = useSelect(
@@ -62,10 +64,17 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 	] );
 
 	// Allow scrolling "through" popovers over the canvas. This is only called
-	// for as long as the pointer is over a popover.
-	function onWheel( { deltaX, deltaY } ) {
-		contentRef.current.scrollBy( deltaX, deltaY );
-	}
+	// for as long as the pointer is over a popover. Do not use React events
+	// because it will bubble through portals.
+	const toolWrapperRef = useRefEffect( ( node ) => {
+		function onWheel( { deltaX, deltaY } ) {
+			contentRef.current.scrollBy( deltaX, deltaY );
+		}
+		node.addEventListener( 'wheel', onWheel );
+		return () => {
+			node.addEventListener( 'wheel', onWheel );
+		};
+	}, [] );
 
 	return (
 		<BlockEditorProvider
@@ -92,7 +101,7 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 			<SidebarInspectorFill>
 				<BlockInspector />
 			</SidebarInspectorFill>
-			<div className="edit-site-visual-editor" onWheel={ onWheel }>
+			<div className="edit-site-visual-editor" ref={ toolWrapperRef }>
 				<Popover.Slot name="block-toolbar" />
 				<Iframe
 					style={ resizedCanvasStyles }
@@ -112,6 +121,11 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 						/>
 					</WritingFlow>
 				</Iframe>
+				<__unstableBlockSettingsMenuFirstItem>
+					{ ( { onClose } ) => (
+						<BlockInspectorButton onClick={ onClose } />
+					) }
+				</__unstableBlockSettingsMenuFirstItem>
 			</div>
 		</BlockEditorProvider>
 	);

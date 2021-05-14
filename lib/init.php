@@ -36,7 +36,8 @@ function gutenberg_menu() {
 			__( 'Widgets', 'gutenberg' ),
 			'edit_theme_options',
 			'gutenberg-widgets',
-			'the_gutenberg_widgets'
+			'the_gutenberg_widgets',
+			2
 		);
 		remove_submenu_page( 'themes.php', 'widgets.php' );
 	}

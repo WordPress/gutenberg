@@ -18,13 +18,16 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"types": "build-types",
 	"dependencies": {
 		"@babel/runtime": "^7.13.10",
-		"lodash": "^4.17.19"
+		"lodash": "^4.17.21"
 	},
 	"publishConfig": {
 		"access": "public"

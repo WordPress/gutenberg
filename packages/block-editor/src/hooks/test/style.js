@@ -23,6 +23,9 @@ describe( 'getInlineStyles', () => {
 					style: 'dotted',
 					color: '#21759b',
 				},
+				spacing: {
+					padding: { top: '10px' },
+				},
 			} )
 		).toEqual( {
 			backgroundColor: 'black',
@@ -33,6 +36,7 @@ describe( 'getInlineStyles', () => {
 			color: 'red',
 			lineHeight: 1.5,
 			fontSize: 10,
+			paddingTop: '10px',
 		} );
 	} );
 } );

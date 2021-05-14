@@ -1,18 +1,18 @@
 /**
  * External dependencies
  */
-import { useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
-import { getValidChildren } from '@wp-g2/utils';
+import { cx } from 'emotion';
 
 /**
  * Internal dependencies
  */
+import { getValidChildren } from '../utils/get-valid-children';
+import { useContextSystem } from '../context';
 import { ControlGroupContext } from './context';
 import * as styles from './styles';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').Props, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').Props, 'div'>} props
  */
 export function useControlGroup( props ) {
 	const {

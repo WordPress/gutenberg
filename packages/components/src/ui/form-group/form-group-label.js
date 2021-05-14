@@ -10,7 +10,7 @@ import { ControlLabel } from '../control-label';
 import VisuallyHidden from '../../visually-hidden';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').FormGroupLabelProps, 'label'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').FormGroupLabelProps, 'label'>} props
  * @return {JSX.Element | null} The form group's label.
  */
 function FormGroupLabel( { children, id, labelHidden = false, ...props } ) {
@@ -18,7 +18,7 @@ function FormGroupLabel( { children, id, labelHidden = false, ...props } ) {
 
 	if ( labelHidden ) {
 		return (
-			<VisuallyHidden as="label" htmlFor={ id }>
+			<VisuallyHidden as="label" htmlFor={ id?.toString() }>
 				{ children }
 			</VisuallyHidden>
 		);

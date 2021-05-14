@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { css } from '@wp-g2/styles';
+import { css } from 'emotion';
 
 export const first = css`
 	border-bottom-right-radius: 0;
