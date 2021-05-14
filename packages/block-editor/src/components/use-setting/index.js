@@ -49,6 +49,18 @@ const deprecatedFlags = {
 	'spacing.customPadding': ( settings ) => settings.enableCustomSpacing,
 };
 
+const filterColorsFromCoreOrigin = ( path, colors ) => {
+	if ( path !== 'color.palette' && path !== 'color.gradients' ) {
+		return colors;
+	}
+
+	if ( ! Array.isArray( colors ) ) {
+		return colors;
+	}
+
+	return colors.filter( ( color ) => color?.origin !== 'core' );
+};
+
 /**
  * Hook that retrieves the editor setting.
  * It works with nested objects using by finding the value at path.
@@ -76,7 +88,10 @@ export default function useSetting( path ) {
 			const experimentalFeaturesResult =
 				get( settings, blockPath ) ?? get( settings, defaultsPath );
 			if ( experimentalFeaturesResult !== undefined ) {
-				return experimentalFeaturesResult;
+				return filterColorsFromCoreOrigin(
+					path,
+					experimentalFeaturesResult
+				);
 			}
 
 			// 2 - Use deprecated settings, otherwise.
@@ -84,7 +99,10 @@ export default function useSetting( path ) {
 				? deprecatedFlags[ path ]( settings )
 				: undefined;
 			if ( deprecatedSettingsValue !== undefined ) {
-				return deprecatedSettingsValue;
+				return filterColorsFromCoreOrigin(
+					path,
+					deprecatedSettingsValue
+				);
 			}
 
 			// 3 - Fall back for typography.dropCap:
