@@ -127,7 +127,7 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 
 	$wrapper_attributes = block_core_home_link_build_li_wrapper_attributes( $block->context );
 
-	$html = '<li ' . $wrapper_attributes . '><a class="wp-block-home-link__content"';
+	$html = '<div ' . $wrapper_attributes . '><a class="wp-block-home-link__content"';
 
 	// Start appending HTML attributes to anchor tag.
 	$html .= ' href="' . esc_url( home_url() ) . '"';
@@ -157,7 +157,7 @@ function render_block_core_home_link( $attributes, $content, $block ) {
 		);
 	}
 
-	$html .= '</a></li>';
+	$html .= '</a></div>';
 	return $html;
 }
 

@@ -166,7 +166,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 	// return early if they don't.
 	if ( ! isset( $attributes['isResponsive'] ) || false === $attributes['isResponsive'] ) {
 		return sprintf(
-			'<nav %1$s><ul class="wp-block-navigation__container">%2$s</ul></nav>',
+			'<nav %1$s><div class="wp-block-navigation__container">%2$s</div></nav>',
 			$wrapper_attributes,
 			$inner_blocks_html
 		);
@@ -179,7 +179,7 @@ function render_block_core_navigation( $attributes, $content, $block ) {
 					<div class="wp-block-navigation__responsive-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-%1$s-title" >
 							<button aria-label="%4$s" data-micromodal-close class="wp-block-navigation__responsive-container-close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg></button>
 						<div class="wp-block-navigation__responsive-container-content" id="modal-%1$s-content">
-							<ul class="wp-block-navigation__container">%2$s</ul>
+							<div class="wp-block-navigation__container">%2$s</div>
 						</div>
 					</div>
 				</div>

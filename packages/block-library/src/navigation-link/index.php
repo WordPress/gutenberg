@@ -146,7 +146,7 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 			'style' => $style_attribute,
 		)
 	);
-	$html               = '<li ' . $wrapper_attributes . '>' .
+	$html               = '<div ' . $wrapper_attributes . '>' .
 		'<a class="wp-block-navigation-link__content" ';
 
 	// Start appending HTML attributes to anchor tag.
@@ -214,12 +214,12 @@ function render_block_core_navigation_link( $attributes, $content, $block ) {
 		}
 
 		$html .= sprintf(
-			'<ul class="wp-block-navigation-link__container">%s</ul>',
+			'<div class="wp-block-navigation-link__container">%s</div>',
 			$inner_blocks_html
 		);
 	}
 
-	$html .= '</li>';
+	$html .= '</div>';
 
 	return $html;
 }

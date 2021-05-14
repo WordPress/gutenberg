@@ -5,14 +5,6 @@
 // Page List block inside your navigation block.
 .wp-block-navigation {
 	position: relative;
-	// Normalize list styles.
-	ul,
-	ul li {
-		list-style: none;
-
-		// Overrides generic ".entry-content li" styles on the front end.
-		padding: 0;
-	}
 
 	// Menu item container.
 	.wp-block-pages-list__item,
@@ -299,11 +291,6 @@
 	// Vertically center child blocks, like Social Links or Search.
 	align-items: center;
 
-	// Reset the default list styles
-	list-style: none;
-	margin: 0;
-	padding-left: 0;
-
 	// Only hide the menu by default if responsiveness is active.
 	.is-responsive {
 		display: none;
@@ -338,11 +325,11 @@
 }
 
 // Vertical justification.
-.is-vertical.items-justified-center > ul {
+.is-vertical.items-justified-center > div {
 	align-items: center;
 }
 
-.is-vertical.items-justified-right > ul {
+.is-vertical.items-justified-right > div {
 	align-items: flex-end;
 
 	.wp-block-navigation-link,

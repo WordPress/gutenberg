@@ -507,7 +507,7 @@ export default function NavigationLinkEdit( {
 					/>
 				</PanelBody>
 			</InspectorControls>
-			<li { ...blockProps }>
+			<div { ...blockProps }>
 				{ /* eslint-disable jsx-a11y/anchor-is-valid */ }
 				<a className={ classes }>
 					{ /* eslint-enable */ }
@@ -611,8 +611,8 @@ export default function NavigationLinkEdit( {
 						<ItemSubmenuIcon />
 					</span>
 				) }
-				<ul { ...innerBlocksProps } />
-			</li>
+				<div { ...innerBlocksProps } />
+			</div>
 		</Fragment>
 	);
 }
