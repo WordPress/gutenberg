@@ -277,6 +277,7 @@ describe( 'Template Part', () => {
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
+			await page.waitForXPath( chooseExistingButtonSelector );
 			const [ createNewButton ] = await page.$x(
 				createNewButtonSelector
 			);
