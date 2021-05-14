@@ -3554,7 +3554,7 @@ describe( 'selectors', () => {
 					__experimentalGetPatternTransformItems( state, blocks )
 				).toEqual( [] );
 			} );
-			it( 'when is inner block controller', () => {
+			it( 'when a selected block has controlled inner blocks', () => {
 				const blocks = [
 					{ name: 'core/test-block-a', innerBlocks: [] },
 					{
