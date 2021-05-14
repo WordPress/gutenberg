@@ -2,7 +2,7 @@
 	"apiVersion": 2,
 	"name": "core/image",
 	"category": "media",
-	"usesContext": [ "allowResize", "isGrouped" ],
+	"usesContext": [ "allowResize", "isGrouped", "imageCrop" ],
 	"attributes": {
 		"align": {
 			"type": "string"

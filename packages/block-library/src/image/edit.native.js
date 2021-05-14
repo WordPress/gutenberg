@@ -542,8 +542,7 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
-			isGallery,
-			imageCrop,
+			context: { isGrouped = false, imageCrop = false },
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
@@ -613,7 +612,7 @@ export class ImageEdit extends Component {
 			wide: 'center',
 		};
 
-		const additionalImageProps = isGallery
+		const additionalImageProps = isGrouped
 			? {
 					height: '100%',
 					resizeMode: imageCrop ? 'cover' : 'contain',
@@ -653,10 +652,7 @@ export class ImageEdit extends Component {
 							} ) => {
 								return (
 									<View
-										style={
-											this.props.isGallery &&
-											styles.isGallery
-										}
+										style={ isGrouped && styles.isGallery }
 									>
 										<Image
 											align={
