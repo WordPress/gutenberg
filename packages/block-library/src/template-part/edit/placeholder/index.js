@@ -83,7 +83,9 @@ export default function TemplatePartPlaceholder( {
 									</Button>
 								) }
 								<Button
-									isTertiary
+									{ ...( enableSelection
+										? { isTertiary: true }
+										: { isPrimary: true } ) }
 									onClick={ () =>
 										setStep( PLACEHOLDER_STEPS.patterns )
 									}
