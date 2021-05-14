@@ -9,6 +9,7 @@ import { get, filter, map, last, pick, includes } from 'lodash';
 import { isBlobURL } from '@wordpress/blob';
 import {
 	ExternalLink,
+	Fill,
 	PanelBody,
 	ResizableBox,
 	Spinner,
@@ -19,6 +20,7 @@ import {
 import { useViewportMatch, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
+	AlignmentControl,
 	BlockControls,
 	InspectorControls,
 	InspectorAdvancedControls,
@@ -68,6 +70,7 @@ export default function Image( {
 		alt,
 		caption,
 		align,
+		alignCaption,
 		id,
 		href,
 		rel,
@@ -394,6 +397,17 @@ export default function Image( {
 		</>
 	);
 
+	const captionControls = (
+		<Fill name="RichText.ToolbarControls.text-color">
+			<AlignmentControl
+				value={ alignCaption }
+				onChange={ ( newAlignCaption ) =>
+					setAttributes( { alignCaption: newAlignCaption } )
+				}
+			/>
+		</Fill>
+	);
+
 	const filename = getFilename( url );
 	let defaultedAlt;
 
@@ -557,6 +571,7 @@ export default function Image( {
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
 			{ img }
+			{ isSelected && captionControls }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
 					ref={ captionRef }

@@ -54,6 +54,18 @@
 		margin-right: auto;
 	}
 
+	&.align-caption-left > figcaption {
+		text-align: left;
+	}
+
+	&.align-caption-right > figcaption {
+		text-align: right;
+	}
+
+	&.align-caption-center > figcaption {
+		text-align: center;
+	}
+
 	// Supply caption styles to images, even if the theme hasn't opted in.
 	// Reason being: the new markup, <figcaptions>, are not likely to be styled in the majority of existing themes,
 	// so we supply the styles so as to not appear broken or unstyled in those themes.
