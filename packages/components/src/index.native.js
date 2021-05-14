@@ -48,7 +48,7 @@ export { default as QueryControls } from './query-controls';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
 export { default as RadioControl } from './radio-control';
-export { default as UnitControl } from './unit-control';
+export { default as UnitControl, useCustomUnits } from './unit-control';
 export { default as Disabled } from './disabled';
 
 // Higher-Order Components
