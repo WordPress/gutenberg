@@ -106,7 +106,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						),
 					),
 					'blocks'   => array(
-						'core/group'      => array(
+						'core/group'     => array(
 							'elements' => array(
 								'link' => array(
 									'color' => array(
@@ -121,7 +121,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 								),
 							),
 						),
-						'core/heading'    => array(
+						'core/heading'   => array(
 							'color'    => array(
 								'text' => '#123456',
 							),
@@ -138,7 +138,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 							),
 						),
 						'core/post-date' => array(
-							'color' => array(
+							'color'    => array(
 								'text' => '#123456',
 							),
 							'elements' => array(

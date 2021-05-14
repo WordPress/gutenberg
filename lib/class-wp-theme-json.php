@@ -1264,7 +1264,7 @@ class WP_Theme_JSON {
 	 * @return boolean
 	 */
 	private static function is_link_element( $selector ) {
-		if ( $selector === self::ELEMENTS['link'] ) {
+		if ( self::ELEMENTS['link'] === $selector ) {
 			return true;
 		}
 
@@ -1284,7 +1284,7 @@ class WP_Theme_JSON {
 	 * @return string
 	 */
 	private static function without_link_selector( $selector ) {
-		if ( $selector === self::ELEMENTS['link'] ) {
+		if ( self::ELEMENTS['link'] === $selector ) {
 			return $selector;
 		}
 
