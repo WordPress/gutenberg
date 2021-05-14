@@ -22,7 +22,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 
 		return (
 			<p { ...blockProps }>
-				Hello World, step 2 (from the editor, in green).
+				Hello World (from the editor, in green).
 			</p>
 		);
 	},
@@ -31,7 +31,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 
 		return (
 			<p { ...blockProps }>
-				Hello World, step 2 (from the frontend, in red).
+				Hello World (from the frontend, in red).
 			</p>
 		);
 	},
@@ -55,7 +55,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 			return el(
 				'p',
 				blockProps,
-				'Hello World, step 2 (from the editor, in green).'
+				'Hello World (from the editor, in green).'
 			);
 		},
 		save: function () {
@@ -63,7 +63,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 			return el(
 				'p',
 				blockProps,
-				'Hello World, step 2 (from the frontend, in red).'
+				'Hello World (from the frontend, in red).'
 			);
 		},
 	} );
