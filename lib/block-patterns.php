@@ -364,6 +364,10 @@ function register_gutenberg_patterns() {
 			'blockTypes' => array( 'core/template-part/footer' ),
 			'content'    => '<!-- wp:navigation {"orientation":"horizontal","fontSize":"normal"} /-->
 
+							<!-- wp:spacer {"height":10} -->
+							<div style="height:10px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer -->
+
 							<!-- wp:social-links {"className":"items-justified-center"} -->
 							<ul class="wp-block-social-links items-justified-center"><!-- wp:social-link {"url":"#","service":"twitter"} /-->
 
@@ -402,7 +406,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:column -->
 							<!-- wp:column {"verticalAlignment":"bottom","width":"66.67%"} -->
 							<div class="wp-block-column is-vertically-aligned-bottom" style="flex-basis:66.67%"><!-- wp:paragraph {"align":"right","fontSize":"extra-small"} -->
-							<p class="has-text-align-right has-extra-small-font-size">' . esc_html__( '© 2021 Nature, The Earth', 'default' ) . '</p>
+							<p class="has-text-align-right has-extra-small-font-size">' . esc_html__( '© 2021 The Earth', 'default' ) . '</p>
 							<!-- /wp:paragraph --></div>
 							<!-- /wp:column --></div>
 							<!-- /wp:columns -->
@@ -425,13 +429,13 @@ function register_gutenberg_patterns() {
 							<p><strong>ABOUT US</strong></p>
 							<!-- /wp:paragraph -->
 							<!-- wp:paragraph -->
-							<p>' . esc_html__( 'Shape & Form has been around since 2003. Its current iteration includes a photography blog, an art gallery dedicated to found geometric shapes, and a store that sells t-shirts.', 'default' ) . '</p>
+							<p>' . esc_html__( 'This website has been around since 2003. Its current iteration includes a photography blog, an art gallery dedicated to found geometric shapes, and a store that sells t-shirts.', 'default' ) . '</p>
 							<!-- /wp:paragraph -->
 							<!-- wp:spacer {"height":200} -->
 							<div style="height:200px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer -->
 							<!-- wp:paragraph {"fontSize":"extra-small"} -->
-							<p class="has-extra-small-font-size">' . esc_html__( '© Shape & Form', 'default' ) . '</p>
+							<p class="has-extra-small-font-size">' . esc_html__( '© The Earth', 'default' ) . '</p>
 							<!-- /wp:paragraph --></div>
 							<!-- /wp:column -->
 							<!-- wp:column {"width":"33.33%"} -->
