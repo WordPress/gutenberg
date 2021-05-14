@@ -56,11 +56,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import {
-	getUpdatedLinkTargetSettings,
-	getImageSizeAttributes,
-	getUrl,
-} from './utils';
+import { getUpdatedLinkTargetSettings, getImageSizeAttributes } from './utils';
 
 import {
 	LINK_DESTINATION_CUSTOM,
@@ -174,46 +170,10 @@ export class ImageEdit extends Component {
 	}
 
 	componentDidUpdate( previousProps ) {
-		const { image, attributes, context, setAttributes } = this.props;
-		const { inheritedAttributes } = attributes;
+		const { image, attributes, setAttributes } = this.props;
 		if ( ! previousProps.image && image ) {
 			const url = getUrlForSlug( image, attributes ) || image.source_url;
 			setAttributes( { url } );
-		}
-		// TODO use `useParentAttributes` instead after refactor to function component
-		if (
-			previousProps.image !== image ||
-			previousProps.context?.linkTo !== context?.linkTo
-		) {
-			if ( inheritedAttributes?.linkDestination && image ) {
-				const href = getUrl( image, context?.linkTo );
-				if ( href !== previousProps.attributes.href ) {
-					setAttributes( {
-						href,
-						linkDestination: context?.linkTo,
-					} );
-				}
-			}
-		}
-		if ( previousProps.context?.linkTarget !== context?.linkTarget ) {
-			if ( inheritedAttributes.linkTarget ) {
-				setAttributes( {
-					linkTarget: context?.linkTarget,
-				} );
-			}
-		}
-
-		if ( previousProps.context?.sizeSlug !== context?.sizeSlug ) {
-			if ( inheritedAttributes.sizeSlug ) {
-				const sizeAttributes = getImageSizeAttributes(
-					image,
-					context?.sizeSlug
-				);
-
-				setAttributes( {
-					...sizeAttributes,
-				} );
-			}
 		}
 	}
 
@@ -311,13 +271,7 @@ export class ImageEdit extends Component {
 	}
 
 	onSetLinkDestination( href ) {
-		const { inheritedAttributes } = this.props.attributes;
 		this.props.setAttributes( {
-			inheritedAttributes: {
-				...inheritedAttributes,
-				linkDestination: false,
-				linkTarget: false,
-			},
 			linkDestination: LINK_DESTINATION_CUSTOM,
 			href,
 		} );
@@ -333,7 +287,6 @@ export class ImageEdit extends Component {
 
 	onSetSizeSlug( sizeSlug ) {
 		const { image, setAttributes } = this.props;
-		const { inheritedAttributes } = this.props.attributes;
 
 		const url = getUrlForSlug( image, { sizeSlug } );
 		if ( ! url ) {
@@ -344,14 +297,6 @@ export class ImageEdit extends Component {
 			width: undefined,
 			height: undefined,
 			sizeSlug,
-			...( inheritedAttributes?.sizeSlug
-				? {
-						inheritedAttributes: {
-							...inheritedAttributes,
-							sizeSlug: false,
-						},
-				  }
-				: {} ),
 		} );
 	}
 
@@ -404,11 +349,6 @@ export class ImageEdit extends Component {
 
 			additionalAttributes = {
 				...additionalAttributes,
-				inheritedAttributes: {
-					linkDestination: true,
-					linkTarget: true,
-					sizeSlug: true,
-				},
 				...parentSizeAttributes,
 			};
 		}
@@ -453,22 +393,17 @@ export class ImageEdit extends Component {
 	}
 
 	setMappedAttributes( { url: href, ...restAttributes } ) {
-		const { setAttributes, attributes: inheritedAttributes } = this.props;
+		const { setAttributes } = this.props;
 
-		const additionalAttributes = {
-			inheritedAttributes: {
-				...inheritedAttributes,
-				linkDestination: false,
-				linkTarget: false,
-			},
-			linkDestination: LINK_DESTINATION_CUSTOM,
-		};
 		return href === undefined
-			? setAttributes( restAttributes, ...additionalAttributes )
+			? setAttributes( {
+					...restAttributes,
+					linkDestination: LINK_DESTINATION_CUSTOM,
+			  } )
 			: setAttributes( {
 					...restAttributes,
 					href,
-					...additionalAttributes,
+					linkDestination: LINK_DESTINATION_CUSTOM,
 			  } );
 	}
 
