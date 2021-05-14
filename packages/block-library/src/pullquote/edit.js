@@ -7,7 +7,7 @@ import { includes } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { __, isRTL } from '@wordpress/i18n';
 import { Platform, useEffect, useRef } from '@wordpress/element';
 import {
 	RichText,
@@ -57,6 +57,15 @@ function PullQuoteEdit( {
 			? { ...style, backgroundColor: mainColor.color }
 			: { ...style, borderColor: mainColor.color },
 	};
+
+	// The default and the solid color styles align text differently when `textAlign`
+	// is undefined, so we need to make sure the placeholder icon on the `AlignmentToolbar`
+	// reflects with the default alignment properly.
+	function pullQuoteTextAlignPlaceholder() {
+		// The solid color style aligns text to the side, not center.
+		const solidColorStyleAlign = isRTL() ? 'right' : 'left';
+		return isSolidColorStyle ? solidColorStyleAlign : 'center';
+	}
 
 	function pullQuoteMainColorSetter( colorValue ) {
 		const needTextColor =
@@ -163,6 +172,7 @@ function PullQuoteEdit( {
 			<BlockControls>
 				<AlignmentToolbar
 					value={ textAlign }
+					placeholder={ pullQuoteTextAlignPlaceholder() }
 					onChange={ ( nextTextAlign ) =>
 						setAttributes( { textAlign: nextTextAlign } )
 					}
