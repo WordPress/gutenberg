@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef } from '@wordpress/element';
+import { useRef, useReducer } from '@wordpress/element';
 import { useRefEffect } from '@wordpress/compose';
 import { LEFT, RIGHT } from '@wordpress/keycodes';
 
@@ -13,6 +13,7 @@ import { isCollapsed } from '../is-collapsed';
 const EMPTY_ACTIVE_FORMATS = [];
 
 export function useFormatBoundaries( props ) {
+	const [ , forceRender ] = useReducer( () => ( {} ) );
 	const propsRef = useRef( props );
 	propsRef.current = props;
 	return useRefEffect( ( element ) => {
@@ -30,7 +31,7 @@ export function useFormatBoundaries( props ) {
 				return;
 			}
 
-			const { record, applyRecord, setActiveFormats } = propsRef.current;
+			const { record, applyRecord } = propsRef.current;
 			const {
 				text,
 				formats,
@@ -125,7 +126,7 @@ export function useFormatBoundaries( props ) {
 			};
 			record.current = newValue;
 			applyRecord( newValue );
-			setActiveFormats( newActiveFormats );
+			forceRender();
 		}
 
 		element.addEventListener( 'keydown', onKeyDown );

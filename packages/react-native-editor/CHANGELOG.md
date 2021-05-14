@@ -13,6 +13,17 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Bottom-sheet: Add custom header [#30291]
 -   [*] Fixes color picker rendering bug when scrolling [#30994]
 -   [*] Add enableCaching param to fetch request on Android [#31186]
+-   [*] Disabled featured image banner on iOS. [#31681]
+
+## 1.52.1
+
+- [*] Fixes for the generated localized strings files.
+
+## 1.52.0
+
+## 1.52.2
+
+-   [*] Disabled featured image banner on iOS. [#31681]
 
 ## 1.52.1
 
