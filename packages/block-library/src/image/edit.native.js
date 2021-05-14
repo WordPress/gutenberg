@@ -453,30 +453,31 @@ export class ImageEdit extends Component {
 			styles.setFeaturedButtonDark
 		);
 
+		const setFeaturedButton = () => (
+			<BottomSheet.Cell
+				label={ __( 'Remove as Featured Image ' ) }
+				labelStyle={ [
+					featuredButtonStyle,
+					styles.removeFeaturedButton,
+				] }
+				onPress={ () => this.onSetFeatured( 0 ) }
+			/>
+		);
+
+		const removeFeaturedButton = () => (
+			<BottomSheet.Cell
+				label={ __( 'Set as Featured Image ' ) }
+				labelStyle={ [ featuredButtonStyle, setFeaturedButtonStyle ] }
+				onPress={ () => this.onSetFeatured( attributes.id ) }
+			/>
+		);
+
 		return (
 			<>
 				<PanelBody>
-					{ isFeaturedImage ? (
-						<BottomSheet.Cell
-							label={ __( 'Remove as Featured Image ' ) }
-							labelStyle={ [
-								featuredButtonStyle,
-								styles.removeFeaturedButton,
-							] }
-							onPress={ () => this.onSetFeatured( 0 ) }
-						/>
-					) : (
-						<BottomSheet.Cell
-							label={ __( 'Set as Featured Image ' ) }
-							labelStyle={ [
-								featuredButtonStyle,
-								setFeaturedButtonStyle,
-							] }
-							onPress={ () =>
-								this.onSetFeatured( attributes.id )
-							}
-						/>
-					) }
+					{ isFeaturedImage
+						? setFeaturedButton()
+						: removeFeaturedButton() }
 				</PanelBody>
 			</>
 		);
