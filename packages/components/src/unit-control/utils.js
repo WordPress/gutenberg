@@ -76,12 +76,6 @@ export const ALL_CSS_UNITS = [
 		a11yLabel: __( 'x-height of the font (ex)' ),
 	},
 	{
-		value: 'lh',
-		label: isWeb ? 'lh' : __( 'Relative to the line-height (lh)' ),
-		default: '',
-		a11yLabel: __( 'Relative to the line-height (lh)' ),
-	},
-	{
 		value: 'cm',
 		label: isWeb ? 'cm' : __( 'Centimeters (cm)' ),
 		default: '',
@@ -92,12 +86,6 @@ export const ALL_CSS_UNITS = [
 		label: isWeb ? 'mm' : __( 'Millimeters (mm)' ),
 		default: '',
 		a11yLabel: __( 'Millimeters (mm)' ),
-	},
-	{
-		value: 'Q',
-		label: isWeb ? 'Q' : __( 'Quarter-millimeters (Q)' ),
-		default: '',
-		a11yLabel: __( 'Quarter-millimeters (Q)' ),
 	},
 	{
 		value: 'in',
