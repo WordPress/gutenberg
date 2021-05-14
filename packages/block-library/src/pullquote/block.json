@@ -20,6 +20,9 @@
 			"default": "",
 			"__experimentalRole": "content"
 		},
+		"textAlign": {
+			"type": "string"
+		},
 		"mainColor": {
 			"type": "string"
 		},

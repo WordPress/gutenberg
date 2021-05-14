@@ -12,6 +12,8 @@ import { Platform, useEffect, useRef } from '@wordpress/element';
 import {
 	RichText,
 	ContrastChecker,
+	AlignmentToolbar,
+	BlockControls,
 	InspectorControls,
 	withColors,
 	PanelColorSettings,
@@ -33,7 +35,7 @@ import { SOLID_COLOR_CLASS } from './shared';
 function PullQuoteEdit( {
 	colorUtils,
 	textColor,
-	attributes: { value, citation },
+	attributes: { value, citation, textAlign },
 	setAttributes,
 	setTextColor,
 	setMainColor,
@@ -108,12 +110,13 @@ function PullQuoteEdit( {
 					style={ {
 						color: textColor.color,
 					} }
-					className={
-						textColor.color &&
-						classnames( 'has-text-color', {
+					className={ classnames( {
+						[ `has-text-align-${ textAlign }` ]: textAlign,
+						...( textColor.color && {
+							'has-text-color': true,
 							[ textColor.class ]: textColor.class,
-						} )
-					}
+						} ),
+					} ) }
 				>
 					<RichText
 						identifier="value"
@@ -157,6 +160,14 @@ function PullQuoteEdit( {
 					) }
 				</BlockQuote>
 			</Figure>
+			<BlockControls>
+				<AlignmentToolbar
+					value={ textAlign }
+					onChange={ ( nextTextAlign ) =>
+						setAttributes( { textAlign: nextTextAlign } )
+					}
+				/>
+			</BlockControls>
 			{ Platform.OS === 'web' && (
 				<InspectorControls>
 					<PanelColorSettings

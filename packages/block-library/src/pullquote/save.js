@@ -26,10 +26,12 @@ export default function save( { attributes } ) {
 		customTextColor,
 		value,
 		citation,
+		textAlign,
 		className,
 	} = attributes;
 
 	const isSolidColorStyle = includes( className, SOLID_COLOR_CLASS );
+	const isTextColorSet = Boolean( textColor || customTextColor );
 
 	let figureClasses, figureStyles;
 
@@ -56,11 +58,13 @@ export default function save( { attributes } ) {
 	}
 
 	const blockquoteTextColorClass = getColorClassName( 'color', textColor );
-	const blockquoteClasses =
-		( textColor || customTextColor ) &&
-		classnames( 'has-text-color', {
+	const blockquoteClasses = classnames( {
+		[ `has-text-align-${ textAlign }` ]: textAlign,
+		...( isTextColorSet && {
+			'has-text-color': true,
 			[ blockquoteTextColorClass ]: blockquoteTextColorClass,
-		} );
+		} ),
+	} );
 
 	const blockquoteStyles = blockquoteTextColorClass
 		? undefined
