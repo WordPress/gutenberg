@@ -252,4 +252,41 @@ describe( 'Button', () => {
 			expect( ref.current.type ).toBe( 'button' );
 		} );
 	} );
+
+	describe( 'deprecated props', () => {
+		it( 'should warn when the isPrimary prop is passed', () => {
+			const button = shallow( <Button isPrimary /> ).find( 'button' );
+			expect( button.hasClass( 'is-primary' ) ).toBe( true );
+
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'should warn when the isSecondary prop is passed', () => {
+			const button = shallow( <Button isSecondary /> ).find( 'button' );
+			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
+
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'should warn when the isTertiary prop is passed', () => {
+			const button = shallow( <Button isTertiary /> ).find( 'button' );
+			expect( button.hasClass( 'is-tertiary' ) ).toBe( true );
+
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'should warn when the isLink prop is passed', () => {
+			const button = shallow( <Button isLink /> ).find( 'button' );
+			expect( button.hasClass( 'is-link' ) ).toBe( true );
+
+			expect( console ).toHaveWarned();
+		} );
+
+		it( 'should warn when the isDefault prop is passed', () => {
+			const button = shallow( <Button isDefault /> ).find( 'button' );
+			expect( button.hasClass( 'is-secondary' ) ).toBe( true );
+
+			expect( console ).toHaveWarned();
+		} );
+	} );
 } );
