@@ -443,9 +443,6 @@ export class ImageEdit extends Component {
 	getSetFeaturedButton( isFeaturedImage ) {
 		const { attributes, getStylesFromColorScheme } = this.props;
 
-		// eslint-disable-next-line no-unused-vars
-		const androidOnly = Platform.OS === 'android';
-
 		const featuredButtonStyle = getStylesFromColorScheme(
 			styles.featuredButton,
 			styles.featuredButtonDark
@@ -458,34 +455,29 @@ export class ImageEdit extends Component {
 
 		return (
 			<>
-				{
-					// eslint-disable-next-line no-undef
-					androidOnly && (
-						<PanelBody>
-							{ isFeaturedImage ? (
-								<BottomSheet.Cell
-									label={ __( 'Remove as Featured Image ' ) }
-									labelStyle={ [
-										featuredButtonStyle,
-										styles.removeFeaturedButton,
-									] }
-									onPress={ () => this.onSetFeatured( 0 ) }
-								/>
-							) : (
-								<BottomSheet.Cell
-									label={ __( 'Set as Featured Image ' ) }
-									labelStyle={ [
-										featuredButtonStyle,
-										setFeaturedButtonStyle,
-									] }
-									onPress={ () =>
-										this.onSetFeatured( attributes.id )
-									}
-								/>
-							) }
-						</PanelBody>
-					)
-				}
+				<PanelBody>
+					{ isFeaturedImage ? (
+						<BottomSheet.Cell
+							label={ __( 'Remove as Featured Image ' ) }
+							labelStyle={ [
+								featuredButtonStyle,
+								styles.removeFeaturedButton,
+							] }
+							onPress={ () => this.onSetFeatured( 0 ) }
+						/>
+					) : (
+						<BottomSheet.Cell
+							label={ __( 'Set as Featured Image ' ) }
+							labelStyle={ [
+								featuredButtonStyle,
+								setFeaturedButtonStyle,
+							] }
+							onPress={ () =>
+								this.onSetFeatured( attributes.id )
+							}
+						/>
+					) }
+				</PanelBody>
 			</>
 		);
 	}
@@ -511,6 +503,9 @@ export class ImageEdit extends Component {
 		const isFeaturedImage =
 			typeof featuredImageId !== 'undefined' &&
 			featuredImageId === attributes.id;
+
+		// eslint-disable-next-line no-unused-vars
+		const androidOnly = Platform.OS === 'android';
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -549,7 +544,7 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ this.getSetFeaturedButton( isFeaturedImage ) }
+				{ androidOnly && this.getSetFeaturedButton( isFeaturedImage ) }
 			</InspectorControls>
 		);
 
