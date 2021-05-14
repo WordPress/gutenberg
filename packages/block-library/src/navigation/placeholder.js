@@ -10,7 +10,7 @@ import {
 	MenuItem,
 	Spinner,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
+
 import {
 	forwardRef,
 	useCallback,
@@ -19,12 +19,11 @@ import {
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { navigation, chevronDown, Icon } from '@wordpress/icons';
-import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-
+import useNavigationEntities from './use-navigation-entities';
 import PlaceholderPreview from './placeholder-preview';
 import menuItemsToBlocks from './menu-items-to-blocks';
 
@@ -34,76 +33,15 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ isCreatingFromMenu, setIsCreatingFromMenu ] = useState( false );
 
 	const {
-		pages,
 		isResolvingPages,
-		hasResolvedPages,
 		menus,
 		isResolvingMenus,
-		hasResolvedMenus,
 		menuItems,
 		hasResolvedMenuItems,
-	} = useSelect(
-		( select ) => {
-			const {
-				getEntityRecords,
-				getMenus,
-				getMenuItems,
-				isResolving,
-				hasFinishedResolution,
-			} = select( coreStore );
-			const pagesParameters = [
-				'postType',
-				'page',
-				{
-					parent: 0,
-					order: 'asc',
-					orderby: 'id',
-					per_page: -1,
-				},
-			];
-			const menusParameters = [ { per_page: -1 } ];
-			const hasSelectedMenu = selectedMenu !== undefined;
-			const menuItemsParameters = hasSelectedMenu
-				? [
-						{
-							menus: selectedMenu,
-							per_page: -1,
-						},
-				  ]
-				: undefined;
+		hasPages,
+		hasMenus,
+	} = useNavigationEntities( selectedMenu );
 
-			return {
-				pages: getEntityRecords( ...pagesParameters ),
-				isResolvingPages: isResolving(
-					'getEntityRecords',
-					pagesParameters
-				),
-				hasResolvedPages: hasFinishedResolution(
-					'getEntityRecords',
-					pagesParameters
-				),
-				menus: getMenus( ...menusParameters ),
-				isResolvingMenus: isResolving( 'getMenus', menusParameters ),
-				hasResolvedMenus: hasFinishedResolution(
-					'getMenus',
-					menusParameters
-				),
-				menuItems: hasSelectedMenu
-					? getMenuItems( ...menuItemsParameters )
-					: undefined,
-				hasResolvedMenuItems: hasSelectedMenu
-					? hasFinishedResolution(
-							'getMenuItems',
-							menuItemsParameters
-					  )
-					: false,
-			};
-		},
-		[ selectedMenu ]
-	);
-
-	const hasPages = !! ( hasResolvedPages && pages?.length );
-	const hasMenus = !! ( hasResolvedMenus && menus?.length );
 	const isLoading = isResolvingPages || isResolvingMenus;
 
 	const createFromMenu = useCallback( () => {
