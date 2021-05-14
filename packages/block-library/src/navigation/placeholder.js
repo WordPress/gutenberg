@@ -20,13 +20,13 @@ import {
 import { __ } from '@wordpress/i18n';
 import { navigation, chevronDown, Icon } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { menuItemsToBlocks } from '@wordpress/menus';
 
 /**
  * Internal dependencies
  */
 
 import PlaceholderPreview from './placeholder-preview';
-import menuItemsToBlocks from './menu-items-to-blocks';
 
 function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();

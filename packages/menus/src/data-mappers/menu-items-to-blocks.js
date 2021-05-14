@@ -15,7 +15,7 @@ import { createBlock, parse } from '@wordpress/blocks';
  *
  * @return {WPBlock[]} An array of blocks.
  */
-export default function menuItemsToBlocks( menuItems ) {
+export function menuItemsToBlocks( menuItems ) {
 	if ( ! menuItems ) {
 		return null;
 	}

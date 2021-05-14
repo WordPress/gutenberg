@@ -46,6 +46,7 @@
 		"@wordpress/interface": "file:../interface",
 		"@wordpress/keyboard-shortcuts": "file:../keyboard-shortcuts",
 		"@wordpress/media-utils": "file:../media-utils",
+		"@wordpress/menus": "file:../menus",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/url": "file:../url",
 		"classnames": "^2.2.5",

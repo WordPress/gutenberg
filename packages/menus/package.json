@@ -4,7 +4,9 @@
 	"description": "WordPress Menus and Navigation components.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
-	"keywords": [ "wordpress" ],
+	"keywords": [
+		"wordpress"
+	],
 	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/menus/README.md",
 	"repository": {
 		"type": "git",
@@ -18,7 +20,9 @@
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.13.10"
+		"@babel/runtime": "^7.13.10",
+		"@wordpress/blocks": "file:../blocks",
+		"lodash": "^4.17.21"
 	},
 	"publishConfig": {
 		"access": "public"
