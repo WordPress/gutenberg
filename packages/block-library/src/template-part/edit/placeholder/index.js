@@ -87,7 +87,7 @@ export default function TemplatePartPlaceholder( {
 					label={ areaLabel }
 					instructions={ sprintf(
 						// Translators: %s as template part area title ("Header", "Footer", etc.).
-						'Create a new %s or pick an existing one from the list.',
+						'Choose an existing %s or create a new one.',
 						areaLabel
 					) }
 				>
