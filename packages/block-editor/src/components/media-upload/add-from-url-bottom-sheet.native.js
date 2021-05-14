@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import { isEmpty } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -27,18 +22,10 @@ const AddFromUrlBottomSheet = ( { value, onClose, isVisible } ) => {
 	const { createErrorNotice } = useDispatch( noticesStore );
 
 	function onCloseWithUrl() {
-		if ( ! isEmpty( url ) ) {
-			if ( isURL( url ) ) {
-				onClose( { url } );
-				console.log(url);
-
-			} else {
-				createErrorNotice(
-					__( 'Invalid URL. Please enter a valid URL.' )
-				);
-				onClose( {} );
-			}
+		if ( isURL( url ) ) {
+			onClose( { url } );
 		} else {
+			createErrorNotice( __( 'Invalid URL. Please enter a valid URL.' ) );
 			onClose( {} );
 		}
 	}
