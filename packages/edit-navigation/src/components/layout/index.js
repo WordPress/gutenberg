@@ -40,6 +40,7 @@ import Header from '../header';
 import Notices from '../notices';
 import Editor from '../editor';
 import InspectorAdditions from '../inspector-additions';
+import UnsavedChangesWarning from './unsaved-changes-warning';
 import { store as editNavigationStore } from '../../store';
 
 const interfaceLabels = {
@@ -206,6 +207,7 @@ export default function Layout( { blockEditorSettings } ) {
 						/>
 						<Sidebar hasPermanentSidebar={ hasPermanentSidebar } />
 					</IsMenuNameControlFocusedContext.Provider>
+					<UnsavedChangesWarning />
 				</BlockEditorProvider>
 				<Popover.Slot />
 			</SlotFillProvider>
