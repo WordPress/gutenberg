@@ -297,7 +297,7 @@ describe( 'Template Part', () => {
 			await createNewPost();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
-			const [ chooseExistingButton ] = await page.$x(
+			const chooseExistingButton = await page.waitForXPath(
 				chooseExistingButtonSelector
 			);
 			await chooseExistingButton.click();
