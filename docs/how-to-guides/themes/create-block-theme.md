@@ -14,7 +14,7 @@ This tutorial is up to date with Gutenberg version 10.6.
 1.  [What is needed to create a block-theme?](#what-is-needed-to-create-a-block-theme)
 2.  [Theme setup](#theme-setup)
 3.  [Creating the templates and template parts](#creating-the-templates-and-template-parts)
-4.  [Theme.json - Global styles](#theme-json---global-styles)
+4.  [Theme.json - Global styles](#themejson---global-styles)
 5.  [Layouts](#layouts)
 6.  [Custom templates](#custom-templates)
 
