@@ -17,15 +17,7 @@ import {
 	isEntirelySelected,
 	isRTL,
 } from '@wordpress/dom';
-import {
-	UP,
-	DOWN,
-	LEFT,
-	RIGHT,
-	TAB,
-	isKeyboardEvent,
-	ESCAPE,
-} from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
@@ -35,24 +27,8 @@ import { useMergeRefs } from '@wordpress/compose';
  */
 import { isInSameBlock } from '../../utils/dom';
 import useMultiSelection from './use-multi-selection';
-import useLastFocus from './use-last-focus';
+import useTabNav from './use-tab-nav';
 import { store as blockEditorStore } from '../../store';
-
-/**
- * Useful for positioning an element within the viewport so focussing the
- * element does not scroll the page.
- */
-const PREVENT_SCROLL_ON_FOCUS = { position: 'fixed' };
-
-function isFormElement( element ) {
-	const { tagName } = element;
-	return (
-		tagName === 'INPUT' ||
-		tagName === 'BUTTON' ||
-		tagName === 'SELECT' ||
-		tagName === 'TEXTAREA'
-	);
-}
 
 /**
  * Returns true if the element should consider edge navigation upon a keyboard
@@ -155,27 +131,17 @@ export function getClosestTabbable(
  */
 export default function WritingFlow( { children } ) {
 	const container = useRef();
-	const focusCaptureBeforeRef = useRef();
-	const focusCaptureAfterRef = useRef();
-
 	const entirelySelected = useRef();
-
-	// Reference that holds the a flag for enabling or disabling
-	// capturing on the focus capture elements.
-	const noCapture = useRef();
 
 	// Here a DOMRect is stored while moving the caret vertically so vertical
 	// position of the start position can be restored. This is to recreate
 	// browser behaviour across blocks.
 	const verticalRect = useRef();
 
-	const { hasMultiSelection, isNavigationMode } = useSelect( ( select ) => {
-		const selectors = select( blockEditorStore );
-		return {
-			hasMultiSelection: selectors.hasMultiSelection(),
-			isNavigationMode: selectors.isNavigationMode(),
-		};
-	}, [] );
+	const hasMultiSelection = useSelect(
+		( select ) => select( blockEditorStore ).hasMultiSelection(),
+		[]
+	);
 	const {
 		getSelectedBlockClientId,
 		getMultiSelectedBlocksStartClientId,
@@ -187,9 +153,7 @@ export default function WritingFlow( { children } ) {
 		getBlockOrder,
 		getSettings,
 	} = useSelect( blockEditorStore );
-	const { multiSelect, selectBlock, setNavigationMode } = useDispatch(
-		blockEditorStore
-	);
+	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
 
 	function onMouseDown() {
 		verticalRect.current = null;
@@ -268,8 +232,6 @@ export default function WritingFlow( { children } ) {
 		const isDown = keyCode === DOWN;
 		const isLeft = keyCode === LEFT;
 		const isRight = keyCode === RIGHT;
-		const isTab = keyCode === TAB;
-		const isEscape = keyCode === ESCAPE;
 		const isReverse = isUp || isLeft;
 		const isHorizontal = isLeft || isRight;
 		const isVertical = isUp || isDown;
@@ -282,62 +244,13 @@ export default function WritingFlow( { children } ) {
 		const { defaultView } = ownerDocument;
 
 		if ( hasMultiSelection ) {
-			if ( keyCode === TAB ) {
-				// Disable focus capturing on the focus capture element, so it
-				// doesn't refocus this element and so it allows default behaviour
-				// (moving focus to the next tabbable element).
-				noCapture.current = true;
-
-				if ( isShift ) {
-					focusCaptureBeforeRef.current.focus();
-				} else {
-					focusCaptureAfterRef.current.focus();
-				}
-			} else if ( isNav ) {
+			if ( isNav ) {
 				const action = isShift ? expandSelection : moveSelection;
 				action( isReverse );
 				event.preventDefault();
 			}
 
 			return;
-		}
-
-		const selectedBlockClientId = getSelectedBlockClientId();
-
-		// In Edit mode, Tab should focus the first tabbable element after the
-		// content, which is normally the sidebar (with block controls) and
-		// Shift+Tab should focus the first tabbable element before the content,
-		// which is normally the block toolbar.
-		// Arrow keys can be used, and Tab and arrow keys can be used in
-		// Navigation mode (press Esc), to navigate through blocks.
-		if ( selectedBlockClientId ) {
-			if ( isTab ) {
-				const direction = isShift ? 'findPrevious' : 'findNext';
-				// Allow tabbing between form elements rendered in a block,
-				// such as inside a placeholder. Form elements are generally
-				// meant to be UI rather than part of the content. Ideally
-				// these are not rendered in the content and perhaps in the
-				// future they can be rendered in an iframe or shadow DOM.
-				if (
-					isFormElement( target ) &&
-					isFormElement( focus.tabbable[ direction ]( target ) )
-				) {
-					return;
-				}
-
-				const next = isShift
-					? focusCaptureBeforeRef
-					: focusCaptureAfterRef;
-
-				// Disable focus capturing on the focus capture element, so it
-				// doesn't refocus this block and so it allows default behaviour
-				// (moving focus to the next tabbable element).
-				noCapture.current = true;
-				next.current.focus();
-				return;
-			} else if ( isEscape ) {
-				setNavigationMode( true );
-			}
 		}
 
 		// When presing any key other than up or down, the initial vertical
@@ -403,6 +316,7 @@ export default function WritingFlow( { children } ) {
 		const { keepCaretInsideBlock } = getSettings();
 
 		if ( isShift ) {
+			const selectedBlockClientId = getSelectedBlockClientId();
 			const selectionEndClientId = getMultiSelectedBlocksEndClientId();
 			const selectionBeforeEndClientId = getPreviousBlockClientId(
 				selectionEndClientId || selectedBlockClientId
@@ -459,49 +373,16 @@ export default function WritingFlow( { children } ) {
 		}
 	}
 
-	const lastFocus = useRef();
-
-	function onFocusCapture( event ) {
-		// Do not capture incoming focus if set by us in WritingFlow.
-		if ( noCapture.current ) {
-			noCapture.current = null;
-		} else if ( hasMultiSelection ) {
-			container.current.focus();
-		} else if ( getSelectedBlockClientId() ) {
-			lastFocus.current.focus();
-		} else {
-			setNavigationMode( true );
-
-			const isBefore =
-				// eslint-disable-next-line no-bitwise
-				event.target.compareDocumentPosition( container.current ) &
-				event.target.DOCUMENT_POSITION_FOLLOWING;
-			const action = isBefore ? 'findNext' : 'findPrevious';
-
-			focus.tabbable[ action ]( event.target ).focus();
-		}
-	}
-
-	// Don't allow tabbing to this element in Navigation mode.
-	const focusCaptureTabIndex = ! isNavigationMode ? '0' : undefined;
+	const [ before, ref, after ] = useTabNav();
 
 	// Disable reason: Wrapper itself is non-interactive, but must capture
 	// bubbling events from children to determine focus transition intents.
 	/* eslint-disable jsx-a11y/no-static-element-interactions */
 	return (
 		<>
+			{ before }
 			<div
-				ref={ focusCaptureBeforeRef }
-				tabIndex={ focusCaptureTabIndex }
-				onFocus={ onFocusCapture }
-				style={ PREVENT_SCROLL_ON_FOCUS }
-			/>
-			<div
-				ref={ useMergeRefs( [
-					container,
-					useLastFocus( lastFocus ),
-					useMultiSelection(),
-				] ) }
+				ref={ useMergeRefs( [ ref, container, useMultiSelection() ] ) }
 				className="block-editor-writing-flow"
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
@@ -514,12 +395,7 @@ export default function WritingFlow( { children } ) {
 			>
 				{ children }
 			</div>
-			<div
-				ref={ focusCaptureAfterRef }
-				tabIndex={ focusCaptureTabIndex }
-				onFocus={ onFocusCapture }
-				style={ PREVENT_SCROLL_ON_FOCUS }
-			/>
+			{ after }
 		</>
 	);
 	/* eslint-enable jsx-a11y/no-static-element-interactions */
