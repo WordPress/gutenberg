@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useDispatch, useSelect } from '@wordpress/data';
+import { useDispatch } from '@wordpress/data';
 import { cloneBlock } from '@wordpress/blocks';
 import {
 	VisuallyHidden,
@@ -108,12 +108,7 @@ function BlockPattern( { pattern, onSelect, composite } ) {
 }
 
 function BlockPatternSlide( { className, pattern } ) {
-	const { name, title, description } = pattern;
-	const { blocks } = useSelect(
-		( _select ) =>
-			_select( blockEditorStore ).__experimentalGetParsedPattern( name ),
-		[ name ]
-	);
+	const { blocks, title, description } = pattern;
 	const descriptionId = useInstanceId(
 		BlockPatternSlide,
 		'block-editor-block-pattern-setup-list__item-description'
