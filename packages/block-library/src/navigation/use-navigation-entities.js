@@ -34,37 +34,31 @@ export default function useNavigationEntities( menuId ) {
 }
 
 function useMenuEntities() {
-	const {
-		menus,
-		isResolvingMenus,
-		hasResolvedMenus,
-		menuItems,
-		hasResolvedMenuItems,
-		hasMenus,
-	} = useSelect( ( select ) => {
-		const { getMenus, isResolving, hasFinishedResolution } = select(
-			coreStore
-		);
+	const { menus, isResolvingMenus, hasResolvedMenus, hasMenus } = useSelect(
+		( select ) => {
+			const { getMenus, isResolving, hasFinishedResolution } = select(
+				coreStore
+			);
 
-		const menusParameters = [ { per_page: -1 } ];
+			const menusParameters = [ { per_page: -1 } ];
 
-		return {
-			menus: getMenus( ...menusParameters ),
-			isResolvingMenus: isResolving( 'getMenus', menusParameters ),
-			hasResolvedMenus: hasFinishedResolution(
-				'getMenus',
-				menusParameters
-			),
-			hasMenus: !! ( hasResolvedMenus && menus?.length ),
-		};
-	}, [] );
+			return {
+				menus: getMenus( ...menusParameters ),
+				isResolvingMenus: isResolving( 'getMenus', menusParameters ),
+				hasResolvedMenus: hasFinishedResolution(
+					'getMenus',
+					menusParameters
+				),
+				hasMenus: !! ( hasResolvedMenus && menus?.length ),
+			};
+		},
+		[]
+	);
 
 	return {
 		menus,
 		isResolvingMenus,
 		hasResolvedMenus,
-		menuItems,
-		hasResolvedMenuItems,
 		hasMenus,
 	};
 }
