@@ -384,7 +384,7 @@ describe( 'Navigation editor', () => {
 	describe( 'Menu name editor', () => {
 		const initialMenuName = 'Main Menu';
 		const navigationNameEditorSelector =
-			'.block-editor-block-inspector .edit-navigation-name-editor__text-control';
+			'.edit-navigation-name-editor__text-control';
 		const inputSelector = `${ navigationNameEditorSelector } input`;
 		let navigatorNameEditor, input;
 		beforeEach( async () => {
