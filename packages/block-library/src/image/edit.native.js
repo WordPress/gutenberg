@@ -56,7 +56,7 @@ import { store as coreStore } from '@wordpress/core-data';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import { getUpdatedLinkTargetSettings, getImageSizeAttributes } from './utils';
+import { getUpdatedLinkTargetSettings } from './utils';
 
 import {
 	LINK_DESTINATION_CUSTOM,
@@ -302,16 +302,12 @@ export class ImageEdit extends Component {
 
 	onSelectMediaUploadOption( media ) {
 		const { imageDefaultSize } = this.props;
-		const { id, url, linkDestination: destination } = this.props.attributes;
-		const { context } = this.props;
+		const { id, url, destination } = this.props.attributes;
 		const mediaAttributes = {
 			id: media.id,
 			url: media.url,
 			caption: media.caption,
 		};
-
-		// Check if default link setting, or the one inherited from parent block should be used.
-		const linkDestination = context?.linkTo ? context.linkTo : destination;
 
 		let additionalAttributes;
 		// Reset the dimension attributes if changing to a different image.
@@ -327,7 +323,7 @@ export class ImageEdit extends Component {
 		}
 
 		let href;
-		switch ( linkDestination ) {
+		switch ( destination ) {
 			case LINK_DESTINATION_MEDIA:
 				href = media.url;
 				break;
@@ -337,26 +333,9 @@ export class ImageEdit extends Component {
 		}
 		mediaAttributes.href = href;
 
-		if ( ! isEmpty( context ) ) {
-			const parentSizeAttributes = getImageSizeAttributes(
-				media,
-				context.sizeSlug
-			);
-
-			if ( context.linkTarget ) {
-				additionalAttributes.linkTarget = context.linkTarget;
-			}
-
-			additionalAttributes = {
-				...additionalAttributes,
-				...parentSizeAttributes,
-			};
-		}
-
 		this.props.setAttributes( {
 			...mediaAttributes,
 			...additionalAttributes,
-			linkDestination,
 		} );
 	}
 
@@ -652,16 +631,12 @@ export default compose( [
 		const {
 			attributes: { id, url },
 			isSelected,
-			context,
 		} = props;
 		const { imageSizes, imageDefaultSize } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
-		const { linkTo: parentLinkDestination, sizeSlug: parentSizeSlug } =
-			context || {};
 
 		const shouldGetMedia =
-			( ( isSelected || parentLinkDestination || parentSizeSlug ) &&
-				isNotFileUrl ) ||
+			( isSelected && isNotFileUrl ) ||
 			// Edge case to update the image after uploading if the block gets unselected
 			// Check if it's the original image and not the resized one with queryparams
 			( ! isSelected &&
