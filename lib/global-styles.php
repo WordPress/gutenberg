@@ -107,7 +107,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 	$consolidated = WP_Theme_JSON_Resolver::get_merged_data( $settings, $origin );
 
-	if ( 'mobile' === $context ) {
+	if ( WP_Theme_JSON_Resolver::theme_has_support() && 'mobile' === $context ) {
 		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
 	}
 
