@@ -3,7 +3,7 @@
  */
 import { __ } from '@wordpress/i18n';
 import { compose } from '@wordpress/compose';
-import { getDefaultBlockName } from '@wordpress/blocks';
+import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 import { decodeEntities } from '@wordpress/html-entities';
 import { withSelect, withDispatch } from '@wordpress/data';
 
@@ -26,6 +26,8 @@ export function DefaultBlockAppender( {
 	showPrompt,
 	placeholder,
 	rootClientId,
+	tagName: TagName = 'p',
+	withInserter = true,
 } ) {
 	if ( isLocked || ! isVisible ) {
 		return null;
@@ -34,30 +36,38 @@ export function DefaultBlockAppender( {
 	const value =
 		decodeEntities( placeholder ) || __( 'Type / to choose a block' );
 
+	const tagName = (
+		<TagName
+			tabIndex="0"
+			// Only necessary for `useCanvasClickRedirect` to consider it
+			// as a target. Ideally it should consider any tabbable target,
+			// but the inserter is rendered in place while it should be
+			// rendered in a popover, just like it does for an empty
+			// paragraph block.
+			contentEditable
+			suppressContentEditableWarning
+			// We want this element to be styled as a paragraph by themes.
+			// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
+			role="button"
+			aria-label={ __( 'Add block' ) }
+			// The wp-block className is important for editor styles.
+			className="wp-block block-editor-default-block-appender__content"
+			onFocus={ onAppend }
+		>
+			{ showPrompt ? value : ZWNBSP }
+		</TagName>
+	);
+
+	if ( ! withInserter ) {
+		return tagName;
+	}
+
 	return (
 		<div
 			data-root-client-id={ rootClientId || '' }
 			className="block-editor-default-block-appender"
 		>
-			<p
-				tabIndex="0"
-				// Only necessary for `useCanvasClickRedirect` to consider it
-				// as a target. Ideally it should consider any tabbable target,
-				// but the inserter is rendered in place while it should be
-				// rendered in a popover, just like it does for an empty
-				// paragraph block.
-				contentEditable
-				suppressContentEditableWarning
-				// We want this element to be styled as a paragraph by themes.
-				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
-				role="button"
-				aria-label={ __( 'Add block' ) }
-				// The wp-block className is important for editor styles.
-				className="wp-block block-editor-default-block-appender__content"
-				onFocus={ onAppend }
-			>
-				{ showPrompt ? value : ZWNBSP }
-			</p>
+			{ tagName }
 			<Inserter
 				rootClientId={ rootClientId }
 				position="bottom right"
@@ -89,19 +99,24 @@ export default compose(
 			isVisible: isEmpty || ! isLastBlockDefault || ! isLastBlockValid,
 			showPrompt: isEmpty,
 			isLocked: !! getTemplateLock( ownProps.rootClientId ),
-			placeholder: bodyPlaceholder,
+			placeholder: ownProps.placeholder || bodyPlaceholder,
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const { insertDefaultBlock, startTyping } = dispatch(
-			blockEditorStore
-		);
+		const { insertBlock, startTyping } = dispatch( blockEditorStore );
 
 		return {
 			onAppend() {
-				const { rootClientId } = ownProps;
+				const { rootClientId, blockName } = ownProps;
 
-				insertDefaultBlock( undefined, rootClientId );
+				const defaultBlockName = blockName || getDefaultBlockName();
+				if ( ! defaultBlockName ) {
+					return;
+				}
+
+				const block = createBlock( defaultBlockName );
+
+				insertBlock( block, undefined, rootClientId );
 				startTyping();
 			},
 		};

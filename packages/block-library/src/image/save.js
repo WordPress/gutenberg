@@ -7,13 +7,12 @@ import { isEmpty } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { RichText, useBlockProps } from '@wordpress/block-editor';
+import { InnerBlocks, useBlockProps } from '@wordpress/block-editor';
 
 export default function save( { attributes } ) {
 	const {
 		url,
 		alt,
-		caption,
 		align,
 		href,
 		rel,
@@ -59,9 +58,7 @@ export default function save( { attributes } ) {
 			) : (
 				image
 			) }
-			{ ! RichText.isEmpty( caption ) && (
-				<RichText.Content tagName="figcaption" value={ caption } />
-			) }
+			<InnerBlocks.Content />
 		</>
 	);
 

@@ -30,7 +30,7 @@ figure.wp-block-image:not(.wp-block) {
 
 // This is necessary for the editor resize handles to accurately work on a non-floated, non-resized, small image.
 .wp-block-image .components-resizable-box__container {
-	display: inline-block;
+	display: block;
 	img {
 		display: block;
 		width: inherit;
