@@ -159,7 +159,6 @@ function BlockListBlock( {
 
 	const value = {
 		clientId,
-		isSelected,
 		// The wp-block className is important for editor styles.
 		className: classnames( className, { 'wp-block': ! isAligned } ),
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
