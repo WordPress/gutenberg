@@ -1,19 +1,25 @@
 /**
  * WordPress dependencies
  */
-import { BlockInspector } from '@wordpress/block-editor';
-import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import { useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import {
+	BlockInspector,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import {
 	ComplementaryArea,
 	store as interfaceStore,
 } from '@wordpress/interface';
-import { __ } from '@wordpress/i18n';
 import { cog } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import MenuSettings from './menu-settings';
+import ManageLocations from './manage-locations';
+import DeleteMenu from './delete-menu';
 import {
 	COMPLEMENTARY_AREA_SCOPE,
 	COMPLEMENTARY_AREA_ID,
@@ -43,7 +49,25 @@ function useTogglePermanentSidebar( hasPermanentSidebar ) {
 	] );
 }
 
-export default function Sidebar( { hasPermanentSidebar } ) {
+export default function Sidebar( {
+	menuId,
+	menus,
+	isMenuBeingDeleted,
+	onDeleteMenu,
+	onSelectMenu,
+	isManageLocationsModalOpen,
+	closeManageLocationsModal,
+	openManageLocationsModal,
+	hasPermanentSidebar,
+} ) {
+	const { isGeneralNavigation } = useSelect( ( select ) => {
+		const selectedBlock = select( blockEditorStore ).getSelectedBlock();
+
+		return {
+			isGeneralNavigation: selectedBlock?.name !== 'core/navigation-link',
+		};
+	}, [] );
+
 	useTogglePermanentSidebar( hasPermanentSidebar );
 
 	return (
@@ -59,7 +83,25 @@ export default function Sidebar( { hasPermanentSidebar } ) {
 			header={ <></> }
 			isPinnable={ ! hasPermanentSidebar }
 		>
-			<BlockInspector />
+			{ isGeneralNavigation ? (
+				<>
+					<MenuSettings menuId={ menuId } />
+					<ManageLocations
+						menus={ menus }
+						selectedMenuId={ menuId }
+						onSelectMenu={ onSelectMenu }
+						isModalOpen={ isManageLocationsModalOpen }
+						closeModal={ closeManageLocationsModal }
+						openModal={ openManageLocationsModal }
+					/>
+					<DeleteMenu
+						onDeleteMenu={ onDeleteMenu }
+						isMenuBeingDeleted={ isMenuBeingDeleted }
+					/>
+				</>
+			) : (
+				<BlockInspector />
+			) }
 		</ComplementaryArea>
 	);
 }

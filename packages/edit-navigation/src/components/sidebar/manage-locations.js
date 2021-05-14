@@ -1,14 +1,15 @@
 /**
  * WordPress dependencies
  */
+import { __, sprintf } from '@wordpress/i18n';
 import {
+	Button,
+	CheckboxControl,
+	Modal,
+	PanelBody,
 	Spinner,
 	SelectControl,
-	CheckboxControl,
-	Button,
-	Modal,
 } from '@wordpress/components';
-import { __, sprintf } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
@@ -124,7 +125,7 @@ export default function ManageLocations( {
 	) );
 
 	return (
-		<>
+		<PanelBody title={ __( 'Theme locations' ) }>
 			<div className="edit-navigation-manage-locations__theme-location-text-main">
 				{ themeLocationCountTextMain }
 			</div>
@@ -151,6 +152,6 @@ export default function ManageLocations( {
 					{ menuLocationCard }
 				</Modal>
 			) }
-		</>
+		</PanelBody>
 	);
 }

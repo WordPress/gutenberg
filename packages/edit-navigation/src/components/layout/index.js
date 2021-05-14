@@ -39,7 +39,6 @@ import Sidebar from '../sidebar';
 import Header from '../header';
 import Notices from '../notices';
 import Editor from '../editor';
-import InspectorAdditions from '../inspector-additions';
 import UnsavedChangesWarning from './unsaved-changes-warning';
 import { store as editNavigationStore } from '../../store';
 
@@ -175,24 +174,6 @@ export default function Layout( { blockEditorSettings } ) {
 													}
 													blocks={ blocks }
 												/>
-												<InspectorAdditions
-													isManageLocationsModalOpen={
-														isManageLocationsModalOpen
-													}
-													openManageLocationsModal={
-														openManageLocationsModal
-													}
-													closeManageLocationsModal={
-														closeManageLocationsModal
-													}
-													onSelectMenu={ selectMenu }
-													menus={ menus }
-													menuId={ selectedMenuId }
-													onDeleteMenu={ deleteMenu }
-													isMenuBeingDeleted={
-														isMenuBeingDeleted
-													}
-												/>
 											</div>
 										</BlockTools>
 									) }
@@ -205,7 +186,23 @@ export default function Layout( { blockEditorSettings } ) {
 								)
 							}
 						/>
-						<Sidebar hasPermanentSidebar={ hasPermanentSidebar } />
+						<Sidebar
+							onSelectMenu={ selectMenu }
+							menus={ menus }
+							menuId={ selectedMenuId }
+							onDeleteMenu={ deleteMenu }
+							isMenuBeingDeleted={ isMenuBeingDeleted }
+							hasPermanentSidebar={ hasPermanentSidebar }
+							isManageLocationsModalOpen={
+								isManageLocationsModalOpen
+							}
+							openManageLocationsModal={
+								openManageLocationsModal
+							}
+							closeManageLocationsModal={
+								closeManageLocationsModal
+							}
+						/>
 					</IsMenuNameControlFocusedContext.Provider>
 					<UnsavedChangesWarning />
 				</BlockEditorProvider>
