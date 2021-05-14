@@ -40,6 +40,7 @@ function useMenuEntities() {
 		hasResolvedMenus,
 		menuItems,
 		hasResolvedMenuItems,
+		hasMenus,
 	} = useSelect( ( select ) => {
 		const { getMenus, isResolving, hasFinishedResolution } = select(
 			coreStore
@@ -54,6 +55,7 @@ function useMenuEntities() {
 				'getMenus',
 				menusParameters
 			),
+			hasMenus: !! ( hasResolvedMenus && menus?.length ),
 		};
 	}, [] );
 
@@ -63,7 +65,7 @@ function useMenuEntities() {
 		hasResolvedMenus,
 		menuItems,
 		hasResolvedMenuItems,
-		hasMenus: !! ( hasResolvedMenus && menus?.length ),
+		hasMenus,
 	};
 }
 
@@ -104,7 +106,7 @@ function useMenuItemEntities( menuId ) {
 }
 
 function usePageEntities() {
-	const { pages, isResolvingPages, hasResolvedPages } = useSelect(
+	const { pages, isResolvingPages, hasResolvedPages, hasPages } = useSelect(
 		( select ) => {
 			const {
 				getEntityRecords,
@@ -133,6 +135,7 @@ function usePageEntities() {
 					'getEntityRecords',
 					pagesParameters
 				),
+				hasPages: !! ( hasResolvedPages && pages?.length ),
 			};
 		},
 		[]
@@ -142,6 +145,6 @@ function usePageEntities() {
 		pages,
 		isResolvingPages,
 		hasResolvedPages,
-		hasPages: !! ( hasResolvedPages && pages?.length ),
+		hasPages,
 	};
 }
