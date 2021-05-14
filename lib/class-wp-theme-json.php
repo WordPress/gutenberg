@@ -828,7 +828,7 @@ class WP_Theme_JSON {
 	 * @return string The new stylesheet.
 	 */
 	private function get_block_styles( $style_nodes, $setting_nodes ) {
-		$block_rules = self::ELEMENTS['link'] . '{color: var(--wp--style--color--link);}';
+		$block_rules = self::ELEMENTS['link'] . '{color: var(--wp--style--color--link, #00e);}';
 		foreach ( $style_nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
 				continue;

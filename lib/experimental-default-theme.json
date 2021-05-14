@@ -225,14 +225,5 @@
 				}
 			}
 		}
-	},
-	"styles": {
-		"elements": {
-			"link": {
-				"color": {
-					"text": "#00E"
-				}
-			}
-		}
 	}
 }
