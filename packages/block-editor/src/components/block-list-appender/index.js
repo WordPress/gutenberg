@@ -9,6 +9,7 @@ import classnames from 'classnames';
  */
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -22,22 +23,26 @@ function BlockListAppender( {
 	rootClientId,
 	canInsertDefaultBlock,
 	isLocked,
-	renderAppender,
-	renderAppenderAsFunction,
+	renderAppender: CustomAppender, // Deprecated.
+	appender,
 	className,
 	selectedBlockClientId,
 	tagName: TagName = 'div',
 } ) {
-	if ( isLocked || renderAppender === false ) {
+	if ( CustomAppender ) {
+		deprecated( 'renderAppender prop of the BlockListAppender component', {
+			since: '5.7',
+			alternative: 'appender prop of the BlockListAppender component',
+		} );
+	}
+
+	if ( isLocked || appender === false || CustomAppender === false ) {
 		return null;
 	}
 
-	let appender;
-	if ( renderAppender ) {
-		if ( ! renderAppenderAsFunction ) {
-			const CustomAppender = renderAppender;
-			appender = <CustomAppender />;
-		}
+	let blockAppender;
+	if ( appender || CustomAppender ) {
+		blockAppender = appender || <CustomAppender />;
 	} else {
 		const isDocumentAppender = ! rootClientId;
 		const isParentSelected = selectedBlockClientId === rootClientId;
@@ -57,7 +62,7 @@ function BlockListAppender( {
 		if ( canInsertDefaultBlock ) {
 			// Render the default block appender when renderAppender has not been
 			// provided and the context supports use of the default appender.
-			appender = (
+			blockAppender = (
 				<DefaultBlockAppender
 					rootClientId={ rootClientId }
 					lastBlockClientId={ last( blockClientIds ) }
@@ -66,7 +71,7 @@ function BlockListAppender( {
 		} else {
 			// Fallback in the case no renderAppender has been provided and the
 			// default block can't be inserted.
-			appender = (
+			blockAppender = (
 				<ButtonBlockAppender
 					rootClientId={ rootClientId }
 					className="block-list-appender__toggle"
@@ -91,9 +96,7 @@ function BlockListAppender( {
 				className
 			) }
 		>
-			{ renderAppender && renderAppenderAsFunction
-				? renderAppender()
-				: appender }
+			{ blockAppender }
 		</TagName>
 	);
 }
