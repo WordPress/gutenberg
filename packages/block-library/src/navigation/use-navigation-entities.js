@@ -55,7 +55,7 @@ function useMenuEntities() {
 				menusParameters
 			),
 		};
-	} );
+	}, [] );
 
 	return {
 		menus,
@@ -134,7 +134,8 @@ function usePageEntities() {
 					pagesParameters
 				),
 			};
-		}
+		},
+		[]
 	);
 
 	return {
