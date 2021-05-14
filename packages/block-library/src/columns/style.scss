@@ -29,7 +29,7 @@
 		align-items: flex-end;
 	}
 
-	&:not(.is-not-stacked-on-mobile) .wp-block-column {
+	&:not(.is-not-stacked-on-mobile) > .wp-block-column {
 		@media (max-width: #{ ($break-small - 1) }) {
 			// Responsiveness: Show at most one columns on mobile. This must be
 			// important since the Column assigns its own width as an inline style.
@@ -79,7 +79,7 @@
 		}
 	}
 
-	&.is-not-stacked-on-mobile .wp-block-column {
+	&.is-not-stacked-on-mobile > .wp-block-column {
 		// Available space should be divided equally amongst columns.
 		flex-basis: 0;
 		flex-grow: 1;
