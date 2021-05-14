@@ -8,7 +8,7 @@ import { View, Dimensions } from 'react-native';
  */
 import { withSelect } from '@wordpress/data';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
-import { useEffect, useState, useCallback } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import {
 	InnerBlocks,
 	BlockControls,
@@ -111,30 +111,24 @@ function ColumnEdit( {
 		onChangeWidth( nextWidth );
 	};
 
-	const renderAppender = useCallback( () => {
-		const { width: columnWidth } = contentStyle[ clientId ];
-		const isFullWidth = columnWidth === screenWidth;
-
-		if ( isSelected ) {
-			return (
-				<View
-					style={ [
-						styles.columnAppender,
-						isFullWidth && styles.fullwidthColumnAppender,
-						isFullWidth &&
-							hasChildren &&
-							styles.fullwidthHasInnerColumnAppender,
-						! isFullWidth &&
-							hasChildren &&
-							styles.hasInnerColumnAppender,
-					] }
-				>
-					<InnerBlocks.ButtonBlockAppender />
-				</View>
-			);
-		}
-		return null;
-	}, [ contentStyle[ clientId ], screenWidth, isSelected, hasChildren ] );
+	const { width: columnWidth } = contentStyle[ clientId ];
+	const isFullWidth = columnWidth === screenWidth;
+	const appender = isSelected ? (
+		<View
+			style={ [
+				styles.columnAppender,
+				isFullWidth && styles.fullwidthColumnAppender,
+				isFullWidth &&
+					hasChildren &&
+					styles.fullwidthHasInnerColumnAppender,
+				! isFullWidth && hasChildren && styles.hasInnerColumnAppender,
+			] }
+		>
+			<InnerBlocks.ButtonBlockAppender />
+		</View>
+	) : (
+		false
+	);
 
 	if ( ! isSelected && ! hasChildren ) {
 		return (
@@ -210,7 +204,7 @@ function ColumnEdit( {
 				] }
 			>
 				<InnerBlocks
-					renderAppender={ renderAppender }
+					appender={ appender }
 					parentWidth={ contentStyle[ clientId ].width }
 					blockWidth={ blockWidth }
 				/>

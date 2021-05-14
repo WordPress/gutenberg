@@ -131,18 +131,13 @@ function ColumnsEditContainer( {
 		}
 	}, [ width, columnCount ] );
 
-	const renderAppender = () => {
-		if ( isSelected ) {
-			return (
-				<View style={ isFullWidth( align ) && styles.columnAppender }>
-					<InnerBlocks.ButtonBlockAppender
-						onAddBlock={ onAddBlock }
-					/>
-				</View>
-			);
-		}
-		return null;
-	};
+	const appender = isSelected ? (
+		<View style={ isFullWidth( align ) && styles.columnAppender }>
+			<InnerBlocks.ButtonBlockAppender onAddBlock={ onAddBlock } />
+		</View>
+	) : (
+		false
+	);
 
 	const contentWidths = useMemo(
 		() =>
@@ -270,7 +265,7 @@ function ColumnsEditContainer( {
 				{ resizeListener }
 				{ width && (
 					<InnerBlocks
-						renderAppender={ renderAppender }
+						appender={ appender }
 						orientation={
 							columnsInRow > 1 ? 'horizontal' : undefined
 						}

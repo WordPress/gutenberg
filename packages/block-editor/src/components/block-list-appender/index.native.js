@@ -8,6 +8,7 @@ import { last } from 'lodash';
  */
 import { withSelect } from '@wordpress/data';
 import { getDefaultBlockName } from '@wordpress/blocks';
+import deprecated from '@wordpress/deprecated';
 
 /**
  * Internal dependencies
@@ -22,10 +23,22 @@ function BlockListAppender( {
 	canInsertDefaultBlock,
 	isLocked,
 	renderAppender: CustomAppender,
+	appender,
 	showSeparator,
 } ) {
+	if ( undefined !== CustomAppender ) {
+		deprecated( 'renderAppender prop of the BlockListAppender component', {
+			since: '5.7',
+			alternative: 'appender prop of the BlockListAppender component',
+		} );
+	}
+
 	if ( isLocked ) {
 		return null;
+	}
+
+	if ( appender ) {
+		return appender;
 	}
 
 	if ( CustomAppender ) {
