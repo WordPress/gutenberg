@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "5.3.3",
+	"version": "6.0.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -34,6 +34,7 @@
 		"@babel/runtime": "^7.13.10",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/blob": "file:../blob",
+		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",

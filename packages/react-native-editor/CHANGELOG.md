@@ -14,6 +14,11 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Fixes color picker rendering bug when scrolling [#30994]
 -   [*] Add enableCaching param to fetch request on Android [#31186]
 -   [*] Image block: "Set as featured" button within image block settings. (Android only) [#31705]
+-   [***] Add reusable blocks to the inserter menu. [#28495]
+
+## 1.52.2
+
+-   [*] Disabled featured image banner on iOS. [#31681]
 
 ## 1.52.1
 

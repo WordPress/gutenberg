@@ -40,7 +40,7 @@ export const KeyboardAvoidingView = ( {
 
 	const animatedHeight = useRef( new Animated.Value( MIN_HEIGHT ) ).current;
 
-	const { height: fullHeight } = Dimensions.get( 'window' );
+	const { height: fullHeight } = Dimensions.get( 'screen' );
 	const keyboardVerticalOffset = fullHeight - parentHeight;
 
 	useEffect( () => {
