@@ -1,6 +1,6 @@
 {
 	"name": "gutenberg",
-	"version": "10.5.0",
+	"version": "10.6.0",
 	"private": true,
 	"description": "A new WordPress editor experience.",
 	"author": "The WordPress Contributors",
@@ -80,6 +80,7 @@
 		"@wordpress/url": "file:packages/url",
 		"@wordpress/viewport": "file:packages/viewport",
 		"@wordpress/warning": "file:packages/warning",
+		"@wordpress/widgets": "file:packages/widgets",
 		"@wordpress/wordcount": "file:packages/wordcount"
 	},
 	"devDependencies": {
@@ -176,7 +177,7 @@
 		"jsdom": "16.4.0",
 		"lerna": "3.22.1",
 		"lint-staged": "9.2.5",
-		"lodash": "4.17.19",
+		"lodash": "4.17.21",
 		"make-dir": "3.0.0",
 		"metro": "0.58.0",
 		"metro-react-native-babel-preset": "0.59.0",
@@ -185,7 +186,7 @@
 		"nock": "12.0.3",
 		"node-watch": "0.7.0",
 		"patch-package": "6.2.2",
-		"postcss": "8.2.2",
+		"postcss": "8.2.15",
 		"postcss-loader": "4.2.0",
 		"prettier": "npm:wp-prettier@2.2.1-beta-1",
 		"progress": "2.0.3",

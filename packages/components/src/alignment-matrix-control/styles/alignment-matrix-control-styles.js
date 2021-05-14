@@ -7,7 +7,7 @@ import { css } from '@emotion/core';
 /**
  * Internal dependencies
  */
-import { color, reduceMotion } from '../../utils/style-mixins';
+import { COLORS, reduceMotion } from '../../utils';
 
 export const rootBase = () => {
 	return css`
@@ -43,11 +43,9 @@ export const Row = styled.div`
 `;
 
 const pointActive = ( { isActive } ) => {
-	const boxShadow = isActive ? `0 0 0 2px ${ color( 'black' ) }` : null;
-	const pointColor = isActive ? color( 'black' ) : color( 'lightGray.800' );
-	const pointColorHover = isActive
-		? color( 'black' )
-		: color( 'blue.medium.focus' );
+	const boxShadow = isActive ? `0 0 0 2px ${ COLORS.black }` : null;
+	const pointColor = isActive ? COLORS.black : COLORS.lightGray[ 800 ];
+	const pointColorHover = isActive ? COLORS.black : COLORS.blue.medium.focus;
 
 	return css`
 		box-shadow: ${ boxShadow };

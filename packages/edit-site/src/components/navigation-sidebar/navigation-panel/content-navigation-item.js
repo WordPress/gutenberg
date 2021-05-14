@@ -15,8 +15,15 @@ import { NavigationPanelPreviewFill } from '..';
 import TemplatePreview from './template-preview';
 import { store as editSiteStore } from '../../../store';
 
-const getTitle = ( entity ) =>
-	entity.taxonomy ? entity.name : entity?.title?.rendered;
+const getTitle = ( entity ) => {
+	const title = entity.taxonomy ? entity.name : entity?.title?.rendered;
+
+	// Make sure encoded characters are displayed as the characters they represent.
+	const titleElement = document.createElement( 'div' );
+	titleElement.innerHTML = title;
+
+	return titleElement.textContent || titleElement.innerText || '';
+};
 
 export default function ContentNavigationItem( { item } ) {
 	const [ isPreviewVisible, setIsPreviewVisible ] = useState( false );

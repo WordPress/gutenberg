@@ -12,7 +12,7 @@ PODS:
     - React-jsi (= 0.64.0)
     - ReactCommon/turbomodule/core (= 0.64.0)
   - glog (0.3.5)
-  - Gutenberg (1.51.1):
+  - Gutenberg (1.52.1):
     - React-Core (= 0.64.0)
     - React-CoreModules (= 0.64.0)
     - React-RCTImage (= 0.64.0)
@@ -302,8 +302,8 @@ PODS:
   - RNScreens (2.9.0):
     - React
   - RNSVG (9.13.6-gb):
-    - React
-  - RNTAztecView (1.51.1):
+    - React-Core
+  - RNTAztecView (1.52.1):
     - React-Core
     - WordPress-Aztec-iOS (~> 1.19.4)
   - WordPress-Aztec-iOS (1.19.4)

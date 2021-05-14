@@ -53,7 +53,7 @@ Install the module
 npm install @wordpress/compose --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## API
 
@@ -81,39 +81,44 @@ name, returns the enhanced component augmented with a generated displayName.
 
 _Parameters_
 
--   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
+-   _mapComponentToEnhancedComponent_ `HigherOrderComponent< TInnerProps, TOuterProps >`: Function mapping component to enhanced component.
 -   _modifierName_ `string`: Seed name from which to generated display name.
 
 _Returns_
 
--   `WPComponent`: Component class with generated display name assigned.
+-   `HigherOrderComponent< TInnerProps, TOuterProps >`: Component class with generated display name assigned.
 
 <a name="ifCondition" href="#ifCondition">#</a> **ifCondition**
 
 Higher-order component creator, creating a new component which renders if
 the given condition is satisfied or with the given optional prop name.
 
+_Usage_
+
+```ts
+type Props = { foo: string };
+const Component = ( props: Props ) => <div>{ props.foo }</div>;
+const ConditionalComponent = ifCondition( ( props: Props ) => props.foo.length !== 0 )( Component );
+<ConditionalComponent foo="" />; // => null
+<ConditionalComponent foo="bar" />; // => <div>bar</div>;
+```
+
 _Parameters_
 
--   _predicate_ `Function`: Function to test condition.
+-   _predicate_ `( props: TProps ) => boolean`: Function to test condition.
 
 _Returns_
 
--   `Function`: Higher-order component.
+-   `HigherOrderComponent< TProps, TProps >`: Higher-order component.
 
 <a name="pure" href="#pure">#</a> **pure**
 
 Given a component returns the enhanced component augmented with a component
 only rerendering when its props/state change
 
-_Parameters_
+_Type_
 
--   _mapComponentToEnhancedComponent_ `Function`: Function mapping component to enhanced component.
--   _modifierName_ `string`: Seed name from which to generated display name.
-
-_Returns_
-
--   `WPComponent`: Component class with generated display name assigned.
+-   `SimpleHigherOrderComponent`
 
 <a name="useAsyncList" href="#useAsyncList">#</a> **useAsyncList**
 
@@ -122,11 +127,11 @@ This behavior is useful if we want to render a list of items asynchronously for 
 
 _Parameters_
 
--   _list_ `Array`: Source array.
+-   _list_ `T[]`: Source array.
 
 _Returns_
 
--   `Array`: Async array.
+-   `T[]`: Async array.
 
 <a name="useConstrainedTabbing" href="#useConstrainedTabbing">#</a> **useConstrainedTabbing**
 
@@ -262,9 +267,9 @@ Provides a unique instance ID.
 
 _Parameters_
 
--   _object_ `Object`: Object reference to create an id for.
--   _prefix_ `string`: Prefix for the unique id.
--   _preferredId_ `string`: Default ID to use.
+-   _object_ `object`: Object reference to create an id for.
+-   _prefix_ `[string]`: Prefix for the unique id.
+-   _preferredId_ `[string]`: Default ID to use.
 
 _Returns_
 
@@ -354,7 +359,7 @@ callback will be called multiple times for the same node.
 
 _Parameters_
 
--   _calllback_ `Function`: Callback with ref as argument.
+-   _callback_ `Function`: Callback with ref as argument.
 -   _dependencies_ `Array`: Dependencies of the callback.
 
 _Returns_
@@ -465,13 +470,9 @@ _Returns_
 A Higher Order Component used to be provide a unique instance ID by
 component.
 
-_Parameters_
+_Type_
 
--   _WrappedComponent_ `WPComponent`: The wrapped component.
-
-_Returns_
-
--   `WPComponent`: Component with an instanceId prop.
+-   `PropInjectingHigherOrderComponent< { instanceId: string | number; } >`
 
 <a name="withSafeTimeout" href="#withSafeTimeout">#</a> **withSafeTimeout**
 

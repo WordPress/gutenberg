@@ -14,6 +14,7 @@ export const DEPRECATED_ENTRY_KEYS = [
 
 export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	'--wp--style--color--link': {
+		valueGlobal: [ 'elements', 'link', 'color', 'text' ],
 		value: [ 'color', 'link' ],
 		support: [ 'color', 'link' ],
 	},
@@ -64,6 +65,11 @@ export const __EXPERIMENTAL_STYLE_PROPERTY = {
 	lineHeight: {
 		value: [ 'typography', 'lineHeight' ],
 		support: [ 'lineHeight' ],
+	},
+	margin: {
+		value: [ 'spacing', 'margin' ],
+		support: [ 'spacing', 'margin' ],
+		properties: [ 'top', 'right', 'bottom', 'left' ],
 	},
 	padding: {
 		value: [ 'spacing', 'padding' ],
