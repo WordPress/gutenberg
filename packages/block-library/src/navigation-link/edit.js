@@ -538,14 +538,16 @@ export default function NavigationLinkEdit( {
 		},
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
-			renderAppender:
+			appender:
 				( isSelected && hasDescendants ) ||
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
 				// Show the appender while dragging to allow inserting element between item and the appender.
-				hasDescendants
-					? InnerBlocks.DefaultAppender
-					: false,
+				hasDescendants ? (
+					<InnerBlocks.DefaultAppender />
+				) : (
+					false
+				),
 		}
 	);
 

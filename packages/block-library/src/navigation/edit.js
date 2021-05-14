@@ -152,12 +152,14 @@ function Navigation( {
 		{
 			allowedBlocks: ALLOWED_BLOCKS,
 			orientation: attributes.orientation,
-			renderAppender:
+			appender:
 				( isImmediateParentOfSelectedBlock &&
 					! selectedBlockHasDescendants ) ||
-				isSelected
-					? InnerBlocks.DefaultAppender
-					: false,
+				isSelected ? (
+					<InnerBlocks.DefaultAppender />
+				) : (
+					false
+				),
 			// Ensure block toolbar is not too far removed from item
 			// being edited when in vertical mode.
 			// see: https://github.com/WordPress/gutenberg/pull/34615.

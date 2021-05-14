@@ -7,7 +7,7 @@
 
 	const allowedBlocks = [ 'core/quote', 'core/video' ];
 
-	function myCustomAppender() {
+	function MyCustomAppender() {
 		return el(
 			'div',
 			{ className: 'my-custom-awesome-appender' },
@@ -16,7 +16,7 @@
 		);
 	}
 
-	function emptyBlockAppender() {
+	function EmptyBlockAppender() {
 		return el(
 			'div',
 			{ className: 'my-dynamic-blocks-appender' },
@@ -29,7 +29,7 @@
 		);
 	}
 
-	function singleBlockAppender() {
+	function SingleBlockAppender() {
 		return el(
 			'div',
 			{ className: 'my-dynamic-blocks-appender' },
@@ -42,7 +42,7 @@
 		);
 	}
 
-	function multipleBlockAppender() {
+	function MultipleBlockAppender() {
 		return el(
 			'div',
 			{ className: 'my-dynamic-blocks-appender' },
@@ -55,7 +55,7 @@
 	}
 
 	registerBlockType( 'test/inner-blocks-render-appender', {
-		title: 'InnerBlocks renderAppender',
+		title: 'InnerBlocks appender',
 		icon: 'carrot',
 		category: 'text',
 
@@ -65,7 +65,7 @@
 				{ style: { outline: '1px solid gray', padding: 5 } },
 				el( InnerBlocks, {
 					allowedBlocks,
-					renderAppender: myCustomAppender,
+					appender: el( MyCustomAppender ),
 				} )
 			);
 		},
@@ -79,8 +79,8 @@
 		},
 	} );
 
-	registerBlockType( 'test/inner-blocks-render-appender-dynamic', {
-		title: 'InnerBlocks renderAppender dynamic',
+	registerBlockType( 'test/inner-blocks-appender-dynamic', {
+		title: 'InnerBlocks appender dynamic',
 		icon: 'carrot',
 		category: 'text',
 
@@ -95,16 +95,16 @@
 				},
 				[ props.clientId ]
 			);
-			let renderAppender;
+			let appender;
 			switch ( numberOfChildren ) {
 				case 0:
-					renderAppender = emptyBlockAppender;
+					appender = el( EmptyBlockAppender );
 					break;
 				case 1:
-					renderAppender = singleBlockAppender;
+					appender = el( SingleBlockAppender );
 					break;
 				default:
-					renderAppender = multipleBlockAppender;
+					appender = el( MultipleBlockAppender );
 					break;
 			}
 			return el(
@@ -112,7 +112,7 @@
 				{ style: { outline: '1px solid gray', padding: 5 } },
 				el( InnerBlocks, {
 					allowedBlocks,
-					renderAppender,
+					appender,
 				} )
 			);
 		},
