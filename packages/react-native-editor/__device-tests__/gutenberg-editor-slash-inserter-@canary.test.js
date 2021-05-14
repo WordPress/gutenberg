@@ -53,11 +53,19 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		expect( slashInserterElement ).toBeTruthy();
 
 		// Remove / character
-		await editorPage.typeTextToParagraphBlock(
-			paragraphBlockElement,
-			`\b ${ shortText }`,
-			false
-		);
+		if ( isAndroid() ) {
+			await editorPage.typeTextToParagraphBlock(
+				paragraphBlockElement,
+				`${ shortText }`,
+				true
+			);
+		} else {
+			await editorPage.typeTextToParagraphBlock(
+				paragraphBlockElement,
+				`\b ${ shortText }`,
+				false
+			);
+		}
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
 		// Check if the slash inserter UI exists
