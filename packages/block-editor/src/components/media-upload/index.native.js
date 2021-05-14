@@ -1,11 +1,13 @@
 /**
+ * Internal dependencies
+ */
+import AddFromUrlBottomSheet from './add-from-url-bottom-sheet';
+/**
  * External dependencies
  */
-import { Platform } from 'react-native';
+import { View, Platform } from 'react-native';
 
-import { delay } from 'lodash';
-
-import prompt from 'react-native-prompt-android';
+import { delay, isEmpty } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -46,6 +48,7 @@ export class MediaUpload extends Component {
 		this.getAllSources = this.getAllSources.bind( this );
 		this.state = {
 			otherMediaOptions: [],
+			isAddFromUrlBottomsheetVisible: false,
 		};
 	}
 
@@ -186,25 +189,29 @@ export class MediaUpload extends Component {
 		} = this.props;
 
 		if ( value === 'URL' ) {
-			prompt(
-				__( 'Type a URL' ), // title
-				undefined, // message
-				[
-					{
-						text: __( 'Cancel' ),
-						style: 'cancel',
-					},
-					{
-						text: __( 'Apply' ),
-						onPress: ( url ) => onSelectURL( url ),
-					},
-				], // buttons
-				'plain-text', // type
-				undefined, // defaultValue
-				'url' // keyboardType
-			);
+			this.setState( { isAddFromUrlBottomsheetVisible: true } );
 			return;
 		}
+		// if ( value === 'URL' ) {
+		// 	prompt(
+		// 		__( 'Type a URL' ), // title
+		// 		undefined, // message
+		// 		[
+		// 			{
+		// 				text: __( 'Cancel' ),
+		// 				style: 'cancel',
+		// 			},
+		// 			{
+		// 				text: __( 'Apply' ),
+		// 				onPress: ( url ) => onSelectURL( url ),
+		// 			},
+		// 		], // buttons
+		// 		'plain-text', // type
+		// 		undefined, // defaultValue
+		// 		'url' // keyboardType
+		// 	);
+		// 	return;
+		// }
 
 		const mediaSource = this.getAllSources()
 			.filter( ( source ) => source.value === value )
@@ -221,7 +228,12 @@ export class MediaUpload extends Component {
 	}
 
 	render() {
-		const { allowedTypes = [], isReplacingMedia, multiple } = this.props;
+		const {
+			allowedTypes = [],
+			isReplacingMedia,
+			multiple,
+			onSelectURL,
+		} = this.props;
 		const isOneType = allowedTypes.length === 1;
 		const isImage = isOneType && allowedTypes.includes( MEDIA_TYPE_IMAGE );
 		const isVideo = isOneType && allowedTypes.includes( MEDIA_TYPE_VIDEO );
@@ -270,13 +282,26 @@ export class MediaUpload extends Component {
 		}
 
 		const getMediaOptions = () => (
-			<Picker
-				title={ pickerTitle }
-				hideCancelButton
-				ref={ ( instance ) => ( this.picker = instance ) }
-				options={ this.getMediaOptionsItems() }
-				onChange={ this.onPickerSelect }
-			/>
+			<View>
+				{ this.state.isAddFromUrlBottomsheetVisible && (
+					<AddFromUrlBottomSheet
+						onClose={ ( {url} ) => {
+							this.setState( {
+								isAddFromUrlBottomsheetVisible: false,
+							} );
+							onSelectURL(url);
+						} }
+						isVisible={ this.state.isAddFromUrlBottomsheetVisible }
+					/>
+				) }
+				<Picker
+					title={ pickerTitle }
+					hideCancelButton
+					ref={ ( instance ) => ( this.picker = instance ) }
+					options={ this.getMediaOptionsItems() }
+					onChange={ this.onPickerSelect }
+				/>
+			</View>
 		);
 
 		return this.props.render( {
