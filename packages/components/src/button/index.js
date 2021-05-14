@@ -32,29 +32,14 @@ function useDeprecatedProps( {
 	let computedVariant = variant;
 
 	if ( isPrimary ) {
-		deprecated( 'Button isPrimary prop', {
-			since: '5.9',
-			alternative: 'variant="primary"',
-		} );
-
 		computedVariant ??= 'primary';
 	}
 
 	if ( isTertiary ) {
-		deprecated( 'Button isTertiary prop', {
-			since: '5.9',
-			alternative: 'variant="tertiary"',
-		} );
-
 		computedVariant ??= 'tertiary';
 	}
 
 	if ( isSecondary ) {
-		deprecated( 'Button isSecondary prop', {
-			since: '5.9',
-			alternative: 'variant="secondary"',
-		} );
-
 		computedVariant ??= 'secondary';
 	}
 
@@ -68,11 +53,6 @@ function useDeprecatedProps( {
 	}
 
 	if ( isLink ) {
-		deprecated( 'Button isLink prop', {
-			since: '5.9',
-			alternative: 'variant="link"',
-		} );
-
 		computedVariant ??= 'link';
 	}
 
