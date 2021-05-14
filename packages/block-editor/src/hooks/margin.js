@@ -14,6 +14,35 @@ import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
 import { cleanEmptyObject } from './utils';
 import { useCustomUnits } from '../components/unit-control';
 
+const isWeb = Platform.OS === 'web';
+const CSS_UNITS = [
+	{
+		value: '%',
+		label: isWeb ? '%' : __( 'Percentage (%)' ),
+		default: '',
+	},
+	{
+		value: 'px',
+		label: isWeb ? 'px' : __( 'Pixels (px)' ),
+		default: '',
+	},
+	{
+		value: 'em',
+		label: isWeb ? 'em' : __( 'Relative to parent font size (em)' ),
+		default: '',
+	},
+	{
+		value: 'rem',
+		label: isWeb ? 'rem' : __( 'Relative to root font size (rem)' ),
+		default: '',
+	},
+	{
+		value: 'vw',
+		label: isWeb ? 'vw' : __( 'Viewport width (vw)' ),
+		default: '',
+	},
+];
+
 /**
  * Determines if there is margin support.
  *
@@ -49,10 +78,10 @@ export function MarginEdit( props ) {
 		setAttributes,
 	} = props;
 
-	const units = useCustomUnits();
+	const units = useCustomUnits( CSS_UNITS );
 	const sides = useCustomSides( blockName, 'margin' );
 
-	if ( ! hasMarginSupport( blockName ) ) {
+	if ( useIsMarginDisabled( props ) ) {
 		return null;
 	}
 

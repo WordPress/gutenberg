@@ -292,7 +292,7 @@ export const toStyles = ( tree, blockSelectors ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 
-	let ruleset = `${ ELEMENTS.link }{color: var(--wp--style--color--link);}`;
+	let ruleset = `${ ELEMENTS.link }{color: var(--wp--style--color--link, #00e);}`;
 	nodesWithStyles.forEach( ( { selector, styles } ) => {
 		const declarations = getStylesDeclarations( styles );
 

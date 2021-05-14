@@ -41,7 +41,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
-import { withDispatch } from '@wordpress/data';
+import { withDispatch, useSelect } from '@wordpress/data';
 import { cover as icon } from '@wordpress/icons';
 import { isBlobURL } from '@wordpress/blob';
 
@@ -253,7 +253,7 @@ function mediaPosition( { x, y } ) {
 const isTemporaryMedia = ( id, url ) => ! id && isBlobURL( url );
 
 function CoverPlaceholder( {
-	hasBackground = false,
+	disableMediaButtons = false,
 	children,
 	noticeUI,
 	noticeOperations,
@@ -273,7 +273,7 @@ function CoverPlaceholder( {
 			accept="image/*,video/*"
 			allowedTypes={ ALLOWED_MEDIA_TYPES }
 			notices={ noticeUI }
-			disableMediaButtons={ hasBackground }
+			disableMediaButtons={ disableMediaButtons }
 			onError={ ( message ) => {
 				removeAllNotices();
 				createErrorNotice( message );
@@ -286,6 +286,7 @@ function CoverPlaceholder( {
 
 function CoverEdit( {
 	attributes,
+	clientId,
 	isSelected,
 	noticeUI,
 	noticeOperations,
@@ -409,6 +410,13 @@ function CoverEdit( {
 		styleOfRef[ property ] = mediaPosition( value );
 	};
 
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			select( blockEditorStore ).getBlock( clientId ).innerBlocks.length >
+			0,
+		[ clientId ]
+	);
+
 	const controls = (
 		<>
 			<BlockControls group="block">
@@ -420,12 +428,12 @@ function CoverEdit( {
 							contentPosition: nextPosition,
 						} )
 					}
-					isDisabled={ ! hasBackground }
+					isDisabled={ ! hasInnerBlocks }
 				/>
 				<FullHeightAlignmentControl
 					isActive={ isMinFullHeight }
 					onToggle={ toggleMinFullHeight }
-					isDisabled={ ! hasBackground }
+					isDisabled={ ! hasInnerBlocks }
 				/>
 			</BlockControls>
 			<BlockControls group="other">
@@ -551,7 +559,7 @@ function CoverEdit( {
 		}
 	);
 
-	if ( ! hasBackground ) {
+	if ( ! hasInnerBlocks && ! hasBackground ) {
 		return (
 			<>
 				{ controls }
@@ -658,7 +666,7 @@ function CoverEdit( {
 				) }
 				{ isUploadingMedia && <Spinner /> }
 				<CoverPlaceholder
-					hasBackground={ hasBackground }
+					disableMediaButtons
 					noticeUI={ noticeUI }
 					onSelectMedia={ onSelectMedia }
 					noticeOperations={ noticeOperations }
