@@ -28,27 +28,50 @@ import { store as coreStore } from '@wordpress/core-data';
 export default function useNavigationEntities( menuId ) {
 	return {
 		...usePageEntities(),
-		...useMenuEntities( menuId ),
+		...useMenuEntities(),
+		...useMenuItemEntities( menuId ),
 	};
 }
 
-function useMenuEntities( menuId ) {
+function useMenuEntities() {
 	const {
 		menus,
 		isResolvingMenus,
 		hasResolvedMenus,
 		menuItems,
 		hasResolvedMenuItems,
-	} = useSelect(
-		( select ) => {
-			const {
-				getMenus,
-				getMenuItems,
-				isResolving,
-				hasFinishedResolution,
-			} = select( coreStore );
+	} = useSelect( ( select ) => {
+		const { getMenus, isResolving, hasFinishedResolution } = select(
+			coreStore
+		);
 
-			const menusParameters = [ { per_page: -1 } ];
+		const menusParameters = [ { per_page: -1 } ];
+
+		return {
+			menus: getMenus( ...menusParameters ),
+			isResolvingMenus: isResolving( 'getMenus', menusParameters ),
+			hasResolvedMenus: hasFinishedResolution(
+				'getMenus',
+				menusParameters
+			),
+		};
+	} );
+
+	return {
+		menus,
+		isResolvingMenus,
+		hasResolvedMenus,
+		menuItems,
+		hasResolvedMenuItems,
+		hasMenus: !! ( hasResolvedMenus && menus?.length ),
+	};
+}
+
+function useMenuItemEntities( menuId ) {
+	const { menuItems, hasResolvedMenuItems } = useSelect(
+		( select ) => {
+			const { getMenuItems, hasFinishedResolution } = select( coreStore );
+
 			const hasSelectedMenu = menuId !== undefined;
 			const menuItemsParameters = hasSelectedMenu
 				? [
@@ -60,12 +83,6 @@ function useMenuEntities( menuId ) {
 				: undefined;
 
 			return {
-				menus: getMenus( ...menusParameters ),
-				isResolvingMenus: isResolving( 'getMenus', menusParameters ),
-				hasResolvedMenus: hasFinishedResolution(
-					'getMenus',
-					menusParameters
-				),
 				menuItems: hasSelectedMenu
 					? getMenuItems( ...menuItemsParameters )
 					: undefined,
@@ -81,12 +98,8 @@ function useMenuEntities( menuId ) {
 	);
 
 	return {
-		menus,
-		isResolvingMenus,
-		hasResolvedMenus,
 		menuItems,
 		hasResolvedMenuItems,
-		hasMenus: !! ( hasResolvedMenus && menus?.length ),
 	};
 }
 
