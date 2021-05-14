@@ -58,10 +58,11 @@ const BLOCK_ANIMATION_THRESHOLD = 200;
  * @return {Object} Props to pass to the element to mark as a block.
  */
 export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
-	const { clientId, index, className, wrapperProps = {} } = useContext(
+	const { clientId, className, wrapperProps = {} } = useContext(
 		BlockListBlockContext
 	);
 	const {
+		index,
 		mode,
 		name,
 		blockTitle,
@@ -71,6 +72,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	} = useSelect(
 		( select ) => {
 			const {
+				getBlockIndex,
 				getBlockMode,
 				getBlockName,
 				isTyping,
@@ -86,6 +88,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isAncestorMultiSelected( clientId );
 			const blockName = getBlockName( clientId );
 			return {
+				index: getBlockIndex( clientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
 				blockTitle: getBlockType( blockName ).title,
