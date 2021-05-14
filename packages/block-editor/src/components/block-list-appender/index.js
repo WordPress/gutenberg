@@ -60,7 +60,7 @@ function BlockListAppender( {
 		}
 
 		if ( canInsertDefaultBlock ) {
-			// Render the default block appender when renderAppender has not been
+			// Render the default block appender when appender has not been
 			// provided and the context supports use of the default appender.
 			blockAppender = (
 				<DefaultBlockAppender
@@ -69,7 +69,7 @@ function BlockListAppender( {
 				/>
 			);
 		} else {
-			// Fallback in the case no renderAppender has been provided and the
+			// Fallback in the case no appender has been provided and the
 			// default block can't be inserted.
 			blockAppender = (
 				<ButtonBlockAppender
