@@ -14,7 +14,7 @@ This tutorial is up to date with Gutenberg version 10.6.
 1.  [What is needed to create a block-theme?](#what-is-needed-to-create-a-block-theme)
 2.  [Theme setup](#theme-setup)
 3.  [Creating the templates and template parts](#creating-the-templates-and-template-parts)
-4.  [Theme.json - Global styles](#theme-json-global-styles)
+4.  [Theme.json - Global styles](#theme-json---global-styles)
 5.  [Layouts](#layouts)
 6.  [Custom templates](#custom-templates)
 
@@ -50,7 +50,8 @@ theme
 ## Theme setup
 
 Create a new folder for your theme in `/wp-content/themes/`.
-Inside this folder, create the `block-templates` and `block-template-parts` folders.
+
+Inside the theme folder, create the `block-templates` and `block-template-parts` folders.
 
 Create a `style.css` file. The file header in the `style.css` file has [the same items you would use in a classic theme](https://developer.wordpress.org/themes/basics/main-stylesheet-style-css/#explanations).
 
@@ -820,9 +821,11 @@ If you place the image block inside a group block, the options depend on the lay
 
 Custom templates for posts, pages, and custom post types are created by adding additional HTML files inside the
 `block-templates` folder.
-In a classic theme, templates are identified with a file header. In a block theme, you list templates in the `theme.json` file. All templates that are listed in the `customTemplates` section of `theme.json` are selectable in the site editor.
+In a classic theme, templates are identified with a file header. In a block theme, you list templates in the `theme.json` file.
 
-If you want to assign the template to a post or page in the block editor, the template's file name needs to be prefixed with either `post-` or `page-`.
+All templates that are listed in the `customTemplates` section of `theme.json` are selectable in the site editor.
+
+For templates to be editable in the template editing mode, the template's file name needs to be prefixed with either `post-` or `page-`.
 
 First, create a section called `customTemplates` at the root level of `theme.json`.
 This section has two required keys:
