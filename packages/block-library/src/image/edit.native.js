@@ -453,22 +453,8 @@ export class ImageEdit extends Component {
 	}
 
 	setMappedAttributes( { url: href, ...restAttributes } ) {
-		const { setAttributes } = this.props;
-		return href === undefined
-			? setAttributes( restAttributes )
-			: setAttributes( { ...restAttributes, href } );
-	}
+		const { setAttributes, attributes: inheritedAttributes } = this.props;
 
-	getLinkSettings() {
-		const { isLinkSheetVisible } = this.state;
-		const {
-			attributes: {
-				href: url,
-				inheritedAttributes,
-				...unMappedAttributes
-			},
-			setAttributes,
-		} = this.props;
 		const additionalAttributes = {
 			inheritedAttributes: {
 				...inheritedAttributes,
@@ -477,31 +463,21 @@ export class ImageEdit extends Component {
 			},
 			linkDestination: LINK_DESTINATION_CUSTOM,
 		};
-		const mappedAttributes = { ...unMappedAttributes, url };
-		const setMappedAttributes = ( { url: href, ...restAttributes } ) =>
-			href === undefined
-				? setAttributes( restAttributes, ...additionalAttributes )
-				: setAttributes( {
-						...restAttributes,
-						href,
-						...additionalAttributes,
-				  } );
+		return href === undefined
+			? setAttributes( restAttributes, ...additionalAttributes )
+			: setAttributes( {
+					...restAttributes,
+					href,
+					...additionalAttributes,
+			  } );
+	}
 
-		const options = {
-			url: {
-				label: __( 'Image Link URL' ),
-				placeholder: __( 'Add URL' ),
-				autoFocus: false,
-				autoFill: true,
-			},
-			openInNewTab: {
-				label: __( 'Open in new tab' ),
-			},
-			linkRel: {
-				label: __( 'Link Rel' ),
-				placeholder: __( 'None' ),
-			},
-		};
+	getLinkSettings() {
+		const { isLinkSheetVisible } = this.state;
+		const {
+			attributes: { href: url, ...unMappedAttributes },
+		} = this.props;
+		const mappedAttributes = { ...unMappedAttributes, url };
 
 		return (
 			<LinkSettingsNavigation
@@ -513,11 +489,9 @@ export class ImageEdit extends Component {
 				attributes={ mappedAttributes }
 				onClose={ this.dismissSheet }
 				setAttributes={ this.setMappedAttributes }
-				setAttributes={ setMappedAttributes }
 				withBottomSheet={ false }
 				hasPicker
 				options={ this.linkSettingsOptions }
-				options={ options }
 				showIcon={ false }
 			/>
 		);
