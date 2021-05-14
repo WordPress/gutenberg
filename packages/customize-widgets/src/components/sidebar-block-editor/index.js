@@ -30,6 +30,7 @@ import useInserter from '../inserter/use-inserter';
 import SidebarEditorProvider from './sidebar-editor-provider';
 import { store as customizeWidgetsStore } from '../../store';
 import WelcomeGuide from '../welcome-guide';
+import KeyboardShortcuts from '../keyboard-shortcuts';
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -93,9 +94,15 @@ export default function SidebarBlockEditor( {
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
+			<KeyboardShortcuts.Register />
 
 			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
 				<BlockEditorKeyboardShortcuts />
+				<KeyboardShortcuts
+					undo={ sidebar.undo }
+					redo={ sidebar.redo }
+					save={ sidebar.save }
+				/>
 
 				<Header
 					sidebar={ sidebar }

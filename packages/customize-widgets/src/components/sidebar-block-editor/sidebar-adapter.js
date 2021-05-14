@@ -81,6 +81,7 @@ export default class SidebarAdapter {
 
 		this.undo = this.undo.bind( this );
 		this.redo = this.redo.bind( this );
+		this.save = this.save.bind( this );
 	}
 
 	subscribe( callback ) {
@@ -341,5 +342,9 @@ export default class SidebarAdapter {
 		return () => {
 			this.historySubscribers.delete( listener );
 		};
+	}
+
+	save() {
+		this.api.previewer.save();
 	}
 }
