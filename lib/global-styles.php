@@ -88,9 +88,12 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$context = 'site-editor';
 	}
 
-	// So far, only mobile will use the endpoint.
-	// However, we should be more specific here.
-	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
+	if (
+		defined( 'REST_REQUEST' ) &&
+		REST_REQUEST &&
+		isset( $_GET['context'] ) &&
+		'mobile' === $_GET['context']
+	) {
 		$context = 'mobile';
 	}
 
