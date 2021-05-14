@@ -64,9 +64,13 @@ export default function TemplatePartPlaceholder( {
 				<Placeholder
 					icon={ blockDefault }
 					label={ __( 'Template Part' ) }
-					instructions={ __(
-						'Create a new template part or pick an existing one from the list.'
-					) }
+					instructions={
+						enableSelection
+							? __(
+									'Create a new template part or pick an existing one from the list.'
+							  )
+							: __( 'Create a new template part.' )
+					}
 				>
 					<Dropdown
 						contentClassName="wp-block-template-part__placeholder-preview-dropdown-content"
