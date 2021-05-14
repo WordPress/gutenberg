@@ -40,13 +40,8 @@ export const KeyboardAvoidingView = ( {
 
 	const animatedHeight = useRef( new Animated.Value( MIN_HEIGHT ) ).current;
 
-	const isLandscape = () => {
-		const dim = Dimensions.get( 'screen' );
-		return dim.width >= dim.height;
-	};
-
 	const { height: fullHeight } = Dimensions.get( 'window' );
-	const keyboardVerticalOffset = isLandscape ? 0 : fullHeight - parentHeight;
+	const keyboardVerticalOffset = fullHeight - parentHeight;
 
 	useEffect( () => {
 		SafeArea.getSafeAreaInsetsForRootView().then(
