@@ -21,6 +21,7 @@ import {
 import { useAsyncList } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 function PreviewPlaceholder() {
 	return (
@@ -102,21 +103,129 @@ function PanelGroup( { title, icon, children } ) {
 	);
 }
 
-function TemplatePartsByTheme( {
+function TemplatePartsByArea( {
 	templateParts,
 	setAttributes,
 	onClose,
 	composite,
+	area = 'uncategorized',
+	labelsByArea,
 } ) {
-	const templatePartsByTheme = useMemo( () => {
-		return Object.values( groupBy( templateParts, 'theme' ) );
-	}, [ templateParts ] );
+	const templatePartsByArea = useMemo( () => {
+		return Object.values( groupBy( templateParts, 'area' ) );
+	}, [ templateParts, area ] );
 	const currentShownTPs = useAsyncList( templateParts );
 
-	return templatePartsByTheme.map( ( templatePartList ) => (
-		<PanelGroup key={ templatePartList[ 0 ].theme }>
-			{ templatePartList.map( ( templatePart ) => {
-				return currentShownTPs.includes( templatePart ) ? (
+	return templatePartsByArea.map( ( templatePartList ) => {
+		// Only return corresponding area if block/entity is not uncategorized/general version.
+		if ( 'uncategorized' !== area && templatePartList[ 0 ].area !== area ) {
+			return null;
+		}
+		return (
+			<PanelGroup
+				key={ templatePartList[ 0 ].area }
+				title={
+					labelsByArea[ templatePartList[ 0 ].area ] ||
+					__( 'General' )
+				}
+			>
+				{ templatePartList.map( ( templatePart ) => {
+					return currentShownTPs.includes( templatePart ) ? (
+						<TemplatePartItem
+							key={ templatePart.id }
+							templatePart={ templatePart }
+							setAttributes={ setAttributes }
+							onClose={ onClose }
+							composite={ composite }
+						/>
+					) : (
+						<PreviewPlaceholder key={ templatePart.id } />
+					);
+				} ) }
+			</PanelGroup>
+		);
+	} );
+}
+
+function TemplatePartSearchResults( {
+	templateParts,
+	setAttributes,
+	filterValue,
+	onClose,
+	composite,
+	labelsByArea,
+} ) {
+	const { filteredTPs, groupedResults } = useMemo( () => {
+		// Filter based on value.
+		// Remove diacritics and convert to lowercase to normalize.
+		const normalizedFilterValue = deburr( filterValue ).toLowerCase();
+		const searchResults = templateParts.filter(
+			( { title: { rendered: title }, area } ) =>
+				deburr( title )
+					.toLowerCase()
+					.includes( normalizedFilterValue ) ||
+				// Since diacritics can be used in theme names, remove them for the comparison.
+				deburr( labelsByArea[ area ] )
+					.toLowerCase()
+					.includes( normalizedFilterValue )
+		);
+		// Order based on value location.
+		searchResults.sort( ( a, b ) => {
+			// First prioritize index found in title.
+			// Deburr for diacritics.
+			const indexInTitleA = deburr( a.title.rendered )
+				.toLowerCase()
+				.indexOf( normalizedFilterValue );
+			const indexInTitleB = deburr( b.title.rendered )
+				.toLowerCase()
+				.indexOf( normalizedFilterValue );
+			if ( indexInTitleA !== -1 && indexInTitleB !== -1 ) {
+				return indexInTitleA - indexInTitleB;
+			} else if ( indexInTitleA !== -1 ) {
+				return -1;
+			} else if ( indexInTitleB !== -1 ) {
+				return 1;
+			}
+			// Second prioritize index found in area.
+			return (
+				deburr( labelsByArea[ a.area ] )
+					.toLowerCase()
+					.indexOf( normalizedFilterValue ) -
+				deburr( labelsByArea[ b.area ] )
+					.toLowerCase()
+					.indexOf( normalizedFilterValue )
+			);
+		} );
+		// Group filtered results together if their neighbors share the same area.
+		// This helps not show redundant panel groups side by side in the results.
+		const _groupedResults = [];
+		for ( let i = 0; i < searchResults.length; i++ ) {
+			if (
+				i !== 0 &&
+				searchResults[ i ].area === searchResults[ i - 1 ].area
+			) {
+				_groupedResults[ _groupedResults.length - 1 ].push(
+					searchResults[ i ]
+				);
+			} else {
+				_groupedResults.push( [ searchResults[ i ] ] );
+			}
+		}
+		return {
+			filteredTPs: searchResults,
+			groupedResults: _groupedResults,
+		};
+	}, [ filterValue, templateParts ] );
+
+	const currentShownTPs = useAsyncList( filteredTPs );
+
+	return groupedResults.map( ( group ) => (
+		<PanelGroup
+			key={ group[ 0 ].id }
+			title={ labelsByArea[ group[ 0 ].area ] || __( 'General' ) }
+		>
+			{ group.map( ( templatePart ) =>
+				currentShownTPs.includes( templatePart ) ? (
 					<TemplatePartItem
 						key={ templatePart.id }
 						templatePart={ templatePart }
@@ -126,74 +235,7 @@ function TemplatePartsByTheme( {
 					/>
 				) : (
 					<PreviewPlaceholder key={ templatePart.id } />
-				);
-			} ) }
-		</PanelGroup>
-	) );
-}
-
-function TemplatePartSearchResults( {
-	templateParts,
-	setAttributes,
-	filterValue,
-	onClose,
-	composite,
-} ) {
-	const filteredTPs = useMemo( () => {
-		// Filter based on value.
-		// Remove diacritics and convert to lowercase to normalize.
-		const normalizedFilterValue = deburr( filterValue ).toLowerCase();
-		const searchResults = templateParts.filter(
-			( { slug, theme } ) =>
-				slug.toLowerCase().includes( normalizedFilterValue ) ||
-				// Since diacritics can be used in theme names, remove them for the comparison.
-				deburr( theme ).toLowerCase().includes( normalizedFilterValue )
-		);
-		// Order based on value location.
-		searchResults.sort( ( a, b ) => {
-			// First prioritize index found in slug.
-			const indexInSlugA = a.slug
-				.toLowerCase()
-				.indexOf( normalizedFilterValue );
-			const indexInSlugB = b.slug
-				.toLowerCase()
-				.indexOf( normalizedFilterValue );
-			if ( indexInSlugA !== -1 && indexInSlugB !== -1 ) {
-				return indexInSlugA - indexInSlugB;
-			} else if ( indexInSlugA !== -1 ) {
-				return -1;
-			} else if ( indexInSlugB !== -1 ) {
-				return 1;
-			}
-			// Second prioritize index found in theme.
-			// Since diacritics can be used in theme names, remove them for the comparison.
-			return (
-				deburr( a.theme )
-					.toLowerCase()
-					.indexOf( normalizedFilterValue ) -
-				deburr( b.theme ).toLowerCase().indexOf( normalizedFilterValue )
-			);
-		} );
-		return searchResults;
-	}, [ filterValue, templateParts ] );
-
-	const currentShownTPs = useAsyncList( filteredTPs );
-
-	return filteredTPs.map( ( templatePart ) => (
-		<PanelGroup
-			key={ templatePart.id }
-			title={ templatePart.theme || __( 'Custom' ) }
-		>
-			{ currentShownTPs.includes( templatePart ) ? (
-				<TemplatePartItem
-					key={ templatePart.id }
-					templatePart={ templatePart }
-					setAttributes={ setAttributes }
-					onClose={ onClose }
-					composite={ composite }
-				/>
-			) : (
-				<PreviewPlaceholder key={ templatePart.id } />
+				)
 			) }
 		</PanelGroup>
 	) );
@@ -203,15 +245,32 @@ export default function TemplatePartPreviews( {
 	setAttributes,
 	filterValue,
 	onClose,
+	area,
 } ) {
 	const composite = useCompositeState();
-	const templateParts = useSelect( ( select ) => {
-		return (
+
+	const { templateParts, labelsByArea } = useSelect( ( select ) => {
+		const _templateParts =
 			select( coreStore ).getEntityRecords(
 				'postType',
-				'wp_template_part'
-			) || []
-		);
+				'wp_template_part',
+				{
+					per_page: -1,
+				}
+			) || [];
+
+		const definedAreas = select(
+			editorStore
+		).__experimentalGetDefaultTemplatePartAreas();
+		const _labelsByArea = {};
+		definedAreas.forEach( ( item ) => {
+			_labelsByArea[ item.area ] = item.label;
+		} );
+
+		return {
+			templateParts: _templateParts,
+			labelsByArea: _labelsByArea,
+		};
 	}, [] );
 
 	if ( ! templateParts || ! templateParts.length ) {
@@ -231,6 +290,7 @@ export default function TemplatePartPreviews( {
 					filterValue={ filterValue }
 					onClose={ onClose }
 					composite={ composite }
+					labelsByArea={ labelsByArea }
 				/>
 			</Composite>
 		);
@@ -242,11 +302,13 @@ export default function TemplatePartPreviews( {
 			role="listbox"
 			aria-label={ __( 'List of template parts' ) }
 		>
-			<TemplatePartsByTheme
+			<TemplatePartsByArea
 				templateParts={ templateParts }
 				setAttributes={ setAttributes }
 				onClose={ onClose }
 				composite={ composite }
+				area={ area }
+				labelsByArea={ labelsByArea }
 			/>
 		</Composite>
 	);

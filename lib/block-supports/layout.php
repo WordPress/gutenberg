@@ -53,18 +53,24 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$content_size = isset( $used_layout['contentSize'] ) ? $used_layout['contentSize'] : null;
 	$wide_size    = isset( $used_layout['wideSize'] ) ? $used_layout['wideSize'] : null;
 
+	$all_max_width_value       = $content_size ? $content_size : $wide_size;
+	$all_max_width_declaration = "max-width: $all_max_width_value";
+
+	$wide_max_width_value       = $wide_size ? $wide_size : $content_size;
+	$wide_max_width_declaration = "max-width: $wide_max_width_value";
+
 	$style = '';
 	if ( $content_size || $wide_size ) {
 		ob_start();
 		?>
 			<?php echo '.wp-container-' . $id; ?> > * {
-				max-width: <?php echo $content_size ? $content_size : $wide_size; ?>;
-				margin-left: auto;
-				margin-right: auto;
+				<?php echo esc_html( safecss_filter_attr( $all_max_width_declaration ) ); ?>;
+				margin-left: auto !important;
+				margin-right: auto !important;
 			}
 
 			<?php echo '.wp-container-' . $id; ?> > .alignwide {
-				max-width: <?php echo $wide_size ? $wide_size : $content_size; ?>;
+				<?php echo esc_html( safecss_filter_attr( $wide_max_width_declaration ) ); ?>;
 			}
 
 			<?php echo '.wp-container-' . $id; ?> .alignfull {

@@ -36,8 +36,9 @@ async function getSelectedFlatIndices() {
  * Tests if the native selection matches the block selection.
  */
 async function testNativeSelection() {
-	// Wait for the selection to update.
-	await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
+	// Wait for the selection to update and async mode to update classes of
+	// deselected blocks.
+	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 	await page.evaluate( () => {
 		const selection = window.getSelection();
 		const elements = Array.from(

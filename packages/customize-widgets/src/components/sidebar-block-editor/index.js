@@ -11,6 +11,7 @@ import { useSelect } from '@wordpress/data';
 import { useMemo, createPortal } from '@wordpress/element';
 import {
 	BlockList,
+	BlockTools,
 	BlockSelectionClearer,
 	BlockInspector,
 	ObserveTyping,
@@ -18,7 +19,6 @@ import {
 	BlockEditorKeyboardShortcuts,
 	__unstableBlockSettingsMenuFirstItem,
 } from '@wordpress/block-editor';
-import { SlotFillProvider, Popover } from '@wordpress/components';
 import { uploadMedia } from '@wordpress/media-utils';
 
 /**
@@ -59,30 +59,21 @@ export default function SidebarBlockEditor( {
 			mediaUpload: mediaUploadBlockEditor,
 		};
 	}, [ hasUploadPermissions, blockEditorSettings ] );
-	const parentContainer = document.getElementById(
-		'customize-theme-controls'
-	);
 
 	return (
 		<>
 			<BlockEditorKeyboardShortcuts.Register />
-			<SlotFillProvider>
-				<SidebarEditorProvider
-					sidebar={ sidebar }
-					settings={ settings }
-				>
-					<BlockEditorKeyboardShortcuts />
 
-					<Header
-						inserter={ inserter }
-						isInserterOpened={ isInserterOpened }
-						setIsInserterOpened={ setIsInserterOpened }
-					/>
+			<SidebarEditorProvider sidebar={ sidebar } settings={ settings }>
+				<BlockEditorKeyboardShortcuts />
 
-					<div className="customize-widgets__contextual-toolbar-wrapper">
-						<Popover.Slot name="block-toolbar" />
-					</div>
+				<Header
+					inserter={ inserter }
+					isInserterOpened={ isInserterOpened }
+					setIsInserterOpened={ setIsInserterOpened }
+				/>
 
+				<BlockTools>
 					<BlockSelectionClearer>
 						<WritingFlow>
 							<ObserveTyping>
@@ -90,32 +81,26 @@ export default function SidebarBlockEditor( {
 							</ObserveTyping>
 						</WritingFlow>
 					</BlockSelectionClearer>
+				</BlockTools>
 
-					{ createPortal(
-						// This is a temporary hack to prevent button component inside <BlockInspector>
-						// from submitting form when type="button" is not specified.
-						<form onSubmit={ ( event ) => event.preventDefault() }>
-							<BlockInspector />
-						</form>,
-						inspector.contentContainer[ 0 ]
-					) }
-				</SidebarEditorProvider>
+				{ createPortal(
+					// This is a temporary hack to prevent button component inside <BlockInspector>
+					// from submitting form when type="button" is not specified.
+					<form onSubmit={ ( event ) => event.preventDefault() }>
+						<BlockInspector />
+					</form>,
+					inspector.contentContainer[ 0 ]
+				) }
+			</SidebarEditorProvider>
 
-				<__unstableBlockSettingsMenuFirstItem>
-					{ ( { onClose } ) => (
-						<BlockInspectorButton
-							inspector={ inspector }
-							closeMenu={ onClose }
-						/>
-					) }
-				</__unstableBlockSettingsMenuFirstItem>
-
-				{
-					// We have to portal this to the parent of both the editor and the inspector,
-					// so that the popovers will appear above both of them.
-					createPortal( <Popover.Slot />, parentContainer )
-				}
-			</SlotFillProvider>
+			<__unstableBlockSettingsMenuFirstItem>
+				{ ( { onClose } ) => (
+					<BlockInspectorButton
+						inspector={ inspector }
+						closeMenu={ onClose }
+					/>
+				) }
+			</__unstableBlockSettingsMenuFirstItem>
 		</>
 	);
 }
