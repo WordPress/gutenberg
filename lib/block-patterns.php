@@ -271,7 +271,7 @@ function register_gutenberg_patterns() {
 							<!-- wp:columns {"align":"wide"} -->
 							<div class="wp-block-columns alignwide"><!-- wp:column {"width":"75%"} -->
 							<div class="wp-block-column" style="flex-basis:75%"><!-- wp:heading {"style":{"typography":{"fontSize":"48px"}}} -->
-							<h2 style="font-size:48px">' . esc_html__( 'A stable climate, a sustainable diverse life, and a source of culture.', 'default' ) . '</h2>
+							<h2 style="font-size:48px">' . esc_html__( 'Our natural environment provides endless opportunities for adventure.', 'default' ) . '</h2>
 							<!-- /wp:heading -->
 
 							<!-- wp:button {"style":{"color":{"text":"#000000","background":"#ffffff"},"border":{"radius":0}}} -->
@@ -288,9 +288,9 @@ function register_gutenberg_patterns() {
 	);
 
 	register_block_pattern(
-		'template-part/header-large-image',
+		'template-part/header-tagline-and-image',
 		array(
-			'title'      => __( 'Header with large image', 'gutenberg' ),
+			'title'      => __( 'Header with tagline and image', 'gutenberg' ),
 			'categories'    => array( 'page-header' ),
 			'blockTypes' => array( 'core/template-part/header' ),
 			'content'    => '<!-- wp:cover {"url":"https://s.w.org/images/core/5.8/architecture-04.jpg","id":2588,"customOverlayColor":"#f0f0f0","minHeight":700,"align":"full"} -->
@@ -310,6 +310,30 @@ function register_gutenberg_patterns() {
 
 							<!-- wp:navigation {"orientation":"horizontal","itemsJustification":"center","style":{"color":{"text":"#000000"}}} /--></div></div>
 							<!-- /wp:cover -->',
+		)
+	);
+
+	register_block_pattern(
+		'template-part/modern-header-with-image-on-the-right',
+		array(
+			'title'      => __( 'Modern header with image on the right', 'gutenberg' ),
+			'categories'    => array( 'page-header' ),
+			'blockTypes' => array( 'core/template-part/header' ),
+			'content'    => '<!-- wp:media-text {"align":"full","mediaPosition":"right","mediaId":2589,"mediaLink":"https://s.w.org/images/core/5.8/nature-above-02.jpg","mediaType":"image","imageFill":true,"style":{"color":{"background":"#fffbee","text":"#000000"}}} -->
+							<div class="wp-block-media-text alignfull has-media-on-the-right is-stacked-on-mobile is-image-fill has-text-color has-background" style="background-color:#fffbee;color:#000000"><figure class="wp-block-media-text__media" style="background-image:url(https://s.w.org/images/core/5.8/nature-above-02.jpg);background-position:50% 50%"><img src="https://s.w.org/images/core/5.8/nature-above-02.jpg" alt="" class="wp-image-2589 size-full"/></figure><div class="wp-block-media-text__content"><!-- wp:spacer {"height":50} -->
+							<div style="height:50px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer -->
+
+							<!-- wp:site-logo {"className":"is-style-default"} /-->
+
+							<!-- wp:spacer {"height":400} -->
+							<div style="height:400px" aria-hidden="true" class="wp-block-spacer"></div>
+							<!-- /wp:spacer -->
+
+							<!-- wp:site-title {"style":{"typography":{"textTransform":"capitalize","fontSize":"84px","lineHeight":"1.0"}}} /-->
+
+							<!-- wp:navigation {"orientation":"horizontal","color":{"text":"#161616"}},"style":{"typography":{"textTransform":"uppercase"}},"fontSize":"normal"} /--></div></div>
+							<!-- /wp:media-text -->',
 		)
 	);
 
@@ -339,12 +363,21 @@ function register_gutenberg_patterns() {
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
 			'content'    => '<!-- wp:navigation {"orientation":"horizontal","fontSize":"normal"} /-->
+
+							<!-- wp:social-links {"className":"items-justified-center"} -->
+							<ul class="wp-block-social-links items-justified-center"><!-- wp:social-link {"url":"#","service":"twitter"} /-->
+
+							<!-- wp:social-link {"url":"#","service":"instagram"} /-->
+
+							<!-- wp:social-link {"url":"#","service":"mail"} /--></ul>
+							<!-- /wp:social-links -->
+
 							<!-- wp:spacer {"height":10} -->
 							<div style="height:10px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer -->
+
 							<!-- wp:paragraph {"align":"center","style":{"typography":{"fontSize":"16px"}}} -->
 							<p class="has-text-align-center" style="font-size:16px">' . esc_html__( 'Powered by WordPress', 'default' ) . '</p>
-							<!-- /wp:paragraph -->
 							<!-- /wp:paragraph -->',
 		)
 	);
@@ -359,7 +392,7 @@ function register_gutenberg_patterns() {
 							<div class="wp-block-group alignfull has-background" style="background-color:#e7ecde"><!-- wp:spacer {"height":10} -->
 							<div style="height:10px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer -->
-							<!-- wp:latest-posts {"postsToShow":3,"displayPostContent":true,"excerptLength":12,"postLayout":"grid","displayFeaturedImage":true,"featuredImageSizeWidth":150,"featuredImageSizeHeight":150,"addLinkToFeaturedImage":true} /-->
+							<!-- wp:latest-posts {"postsToShow":3,"displayPostContent":true,"excerptLength":12,"postLayout":"grid","displayFeaturedImage":true,"featuredImageSizeSlug":"large","addLinkToFeaturedImage":true} /-->
 							<!-- wp:spacer {"height":20} -->
 							<div style="height:20px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer -->
@@ -386,8 +419,8 @@ function register_gutenberg_patterns() {
 			'title'      => __( 'Modern footer with description and logo', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
-			'content'    => '<!-- wp:columns {"align":"full","style":{"color":{"background":"#f8f4e4"}}} -->
-							<div class="wp-block-columns alignfull has-background" style="background-color:#f8f4e4"><!-- wp:column {"width":"33%"} -->
+			'content'    => '<!-- wp:columns {"align":"full","style":{"color":{"background":"#fffbee"}}} -->
+							<div class="wp-block-columns alignfull has-background" style="background-color:#fffbee"><!-- wp:column {"width":"33%"} -->
 							<div class="wp-block-column" style="flex-basis:33%"><!-- wp:paragraph -->
 							<p><strong>ABOUT US</strong></p>
 							<!-- /wp:paragraph -->
