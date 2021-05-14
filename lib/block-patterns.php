@@ -430,7 +430,7 @@ function register_gutenberg_patterns() {
 			'content'    => '<!-- wp:columns {"align":"full","style":{"color":{"background":"#fffbee"}}} -->
 							<div class="wp-block-columns alignfull has-background" style="background-color:#fffbee"><!-- wp:column {"width":"33%"} -->
 							<div class="wp-block-column" style="flex-basis:33%"><!-- wp:paragraph -->
-							<p><strong>ABOUT US</strong></p>
+							<p><strong>' . esc_html__( 'ABOUT US', 'default' ) . '</strong></p>
 							<!-- /wp:paragraph -->
 							<!-- wp:paragraph -->
 							<p>' . esc_html__( 'This website has been around since 2003. Its current iteration includes a photography blog, an art gallery dedicated to found geometric shapes, and a store that sells t-shirts.', 'default' ) . '</p>
