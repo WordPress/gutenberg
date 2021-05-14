@@ -62,6 +62,7 @@
 		"@wordpress/keycodes": "file:packages/keycodes",
 		"@wordpress/list-reusable-blocks": "file:packages/list-reusable-blocks",
 		"@wordpress/media-utils": "file:packages/media-utils",
+		"@wordpress/menus": "file:packages/menus",
 		"@wordpress/notices": "file:packages/notices",
 		"@wordpress/nux": "file:packages/nux",
 		"@wordpress/plugins": "file:packages/plugins",
