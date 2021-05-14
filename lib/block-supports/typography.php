@@ -91,65 +91,63 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	if ( ! $skip_typography_serialization ) {
-		// Font Family.
-		if ( $has_font_family_support ) {
-			$has_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
-			// Apply required class and style.
-			if ( $has_font_family ) {
-				$font_family = $block_attributes['style']['typography']['fontFamily'];
-				if ( strpos( $font_family, 'var:preset|font-family' ) !== false ) {
-					// Get the name from the string and add proper styles.
-					$index_to_splice  = strrpos( $font_family, '|' ) + 1;
-					$font_family_name = substr( $font_family, $index_to_splice );
-					$styles[]         = sprintf( 'font-family: var(--wp--preset--font-family--%s);', $font_family_name );
-				} else {
-					$styles[] = sprintf( 'font-family: %s;', $block_attributes['style']['typography']['fontFamily'] );
-				}
+	// Font Family.
+	if ( $has_font_family_support && ! $skip_typography_serialization ) {
+		$has_font_family = isset( $block_attributes['style']['typography']['fontFamily'] );
+		// Apply required class and style.
+		if ( $has_font_family ) {
+			$font_family = $block_attributes['style']['typography']['fontFamily'];
+			if ( strpos( $font_family, 'var:preset|font-family' ) !== false ) {
+				// Get the name from the string and add proper styles.
+				$index_to_splice  = strrpos( $font_family, '|' ) + 1;
+				$font_family_name = substr( $font_family, $index_to_splice );
+				$styles[]         = sprintf( 'font-family: var(--wp--preset--font-family--%s);', $font_family_name );
+			} else {
+				$styles[] = sprintf( 'font-family: %s;', $block_attributes['style']['typography']['fontFamily'] );
 			}
 		}
+	}
 
-		// Font style.
-		if ( $has_font_style_support ) {
-			// Apply font style.
-			$font_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontStyle', 'font-style' );
-			if ( $font_style ) {
-				$styles[] = $font_style;
-			}
+	// Font style.
+	if ( $has_font_style_support && ! $skip_typography_serialization ) {
+		// Apply font style.
+		$font_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontStyle', 'font-style' );
+		if ( $font_style ) {
+			$styles[] = $font_style;
 		}
+	}
 
-		// Font weight.
-		if ( $has_font_weight_support ) {
-			// Apply font weight.
-			$font_weight = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontWeight', 'font-weight' );
-			if ( $font_weight ) {
-				$styles[] = $font_weight;
-			}
+	// Font weight.
+	if ( $has_font_weight_support && ! $skip_typography_serialization ) {
+		// Apply font weight.
+		$font_weight = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'fontWeight', 'font-weight' );
+		if ( $font_weight ) {
+			$styles[] = $font_weight;
 		}
+	}
 
-		// Line Height.
-		if ( $has_line_height_support ) {
-			$has_line_height = isset( $block_attributes['style']['typography']['lineHeight'] );
-			// Add the style (no classes for line-height).
-			if ( $has_line_height ) {
-				$styles[] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
-			}
+	// Line Height.
+	if ( $has_line_height_support && ! $skip_typography_serialization ) {
+		$has_line_height = isset( $block_attributes['style']['typography']['lineHeight'] );
+		// Add the style (no classes for line-height).
+		if ( $has_line_height ) {
+			$styles[] = sprintf( 'line-height: %s;', $block_attributes['style']['typography']['lineHeight'] );
 		}
+	}
 
-		// Text Decoration.
-		if ( $has_text_decoration_support ) {
-			$text_decoration_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textDecoration', 'text-decoration' );
-			if ( $text_decoration_style ) {
-				$styles[] = $text_decoration_style;
-			}
+	// Text Decoration.
+	if ( $has_text_decoration_support && ! $skip_typography_serialization ) {
+		$text_decoration_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textDecoration', 'text-decoration' );
+		if ( $text_decoration_style ) {
+			$styles[] = $text_decoration_style;
 		}
+	}
 
-		// Text Transform.
-		if ( $has_text_transform_support ) {
-			$text_transform_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textTransform', 'text-transform' );
-			if ( $text_transform_style ) {
-				$styles[] = $text_transform_style;
-			}
+	// Text Transform.
+	if ( $has_text_transform_support && ! $skip_typography_serialization ) {
+		$text_transform_style = gutenberg_typography_get_css_variable_inline_style( $block_attributes, 'textTransform', 'text-transform' );
+		if ( $text_transform_style ) {
+			$styles[] = $text_transform_style;
 		}
 	}
 
