@@ -35,7 +35,7 @@ import {
 } from '../../hooks';
 import ErrorBoundary from '../error-boundary';
 import NavigationEditorShortcuts from './shortcuts';
-import Sidebar from './sidebar';
+import Sidebar from '../sidebar';
 import Header from '../header';
 import Notices from '../notices';
 import Editor from '../editor';
