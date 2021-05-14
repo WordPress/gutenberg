@@ -4,7 +4,10 @@
 import { __ } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
-import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
+import {
+	useCustomUnits,
+	__experimentalBoxControl as BoxControl,
+} from '@wordpress/components';
 
 /**
  * Internal dependencies
@@ -12,7 +15,6 @@ import { __experimentalBoxControl as BoxControl } from '@wordpress/components';
 import useSetting from '../components/use-setting';
 import { SPACING_SUPPORT_KEY, useCustomSides } from './spacing';
 import { cleanEmptyObject } from './utils';
-import { useCustomUnits } from '../components/unit-control';
 
 /**
  * Determines if there is margin support.
@@ -50,8 +52,13 @@ export function MarginEdit( props ) {
 	} = props;
 
 	const units = useCustomUnits( {
-		settingPath: 'spacing.units',
-		defaultUnits: [ '%', 'px', 'em', 'rem', 'vw' ],
+		availableUnits: useSetting( 'spacing.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
 	} );
 	const sides = useCustomSides( blockName, 'margin' );
 

@@ -12,11 +12,12 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	useBlockProps,
+	useSetting,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	store as blockEditorStore,
-	useCustomUnits,
 } from '@wordpress/block-editor';
 import {
+	useCustomUnits,
 	PanelBody,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
@@ -33,8 +34,13 @@ function ColumnEdit( {
 	} );
 
 	const units = useCustomUnits( {
-		settingPath: 'layout.units',
-		defaultUnits: [ '%', 'px', 'em', 'rem', 'vw' ],
+		availableUnits: useSetting( 'layout.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
 	} );
 
 	const { columnsIds, hasChildBlocks, rootClientId } = useSelect(

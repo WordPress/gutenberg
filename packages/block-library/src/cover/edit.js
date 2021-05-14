@@ -20,6 +20,7 @@ import {
 	Spinner,
 	ToggleControl,
 	withNotices,
+	useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';
@@ -32,7 +33,7 @@ import {
 	withColors,
 	ColorPalette,
 	useBlockProps,
-	useCustomUnits,
+	useSetting,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalUseGradient,
 	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
@@ -98,7 +99,13 @@ function CoverHeightInput( {
 	const isPx = unit === 'px';
 
 	const units = useCustomUnits( {
-		defaultUnits: [ 'px', 'em', 'rem', 'vw', 'vh' ],
+		availableUnits: useSetting( 'spacing.units' ) || [
+			'px',
+			'em',
+			'rem',
+			'vw',
+			'vh',
+		],
 		defaultValues: { px: '430', em: '20', rem: '20', vw: '20', vh: '50' },
 	} );
 

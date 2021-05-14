@@ -15,6 +15,7 @@ import {
 	Button,
 	ToggleControl,
 	PanelBody,
+	useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
@@ -27,7 +28,6 @@ import { store as blockEditorStore } from '../store';
 import { InspectorControls } from '../components';
 import useSetting from '../components/use-setting';
 import { LayoutStyle } from '../components/block-list/layout';
-import { useCustomUnits } from '../components/unit-control';
 
 function LayoutPanel( { setAttributes, attributes } ) {
 	const { layout = {} } = attributes;
@@ -39,8 +39,13 @@ function LayoutPanel( { setAttributes, attributes } ) {
 	}, [] );
 
 	const units = useCustomUnits( {
-		settingPath: 'layout.units',
-		defaultUnits: [ '%', 'px', 'em', 'rem', 'vw' ],
+		availableUnits: useSetting( 'layout.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
 	} );
 
 	if ( ! themeSupportsLayout ) {

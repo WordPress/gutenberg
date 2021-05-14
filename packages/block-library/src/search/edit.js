@@ -11,7 +11,6 @@ import {
 	BlockControls,
 	InspectorControls,
 	RichText,
-	useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/block-editor';
 import {
@@ -25,6 +24,7 @@ import {
 	ResizableBox,
 	PanelBody,
 	BaseControl,
+	useCustomUnits,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { search } from '@wordpress/icons';
@@ -77,7 +77,7 @@ export default function SearchEdit( {
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 
 	const units = useCustomUnits( {
-		defaultUnits: [ '%', 'px' ],
+		availableUnits: [ '%', 'px' ],
 		defaultValues: { '%': PC_WIDTH_DEFAULT, px: PX_WIDTH_DEFAULT },
 	} );
 

@@ -15,7 +15,7 @@ import {
 	BlockVerticalAlignmentToolbar,
 	InspectorControls,
 	store as blockEditorStore,
-	useCustomUnits,
+	useSetting,
 } from '@wordpress/block-editor';
 import {
 	PanelBody,
@@ -23,6 +23,7 @@ import {
 	UnitControl,
 	getValueAndUnit,
 	alignmentHelpers,
+	useCustomUnits,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**
@@ -64,8 +65,13 @@ function ColumnEdit( {
 	const [ widthUnit, setWidthUnit ] = useState( valueUnit || '%' );
 
 	const units = useCustomUnits( {
-		settingPath: 'layout.units',
-		defaultUnits: [ '%', 'px', 'em', 'rem', 'vw' ],
+		availableUnits: useSetting( 'layout.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
 	} );
 
 	const updateAlignment = ( alignment ) => {

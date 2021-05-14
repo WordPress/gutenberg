@@ -15,6 +15,7 @@ import {
 	getValueAndUnit,
 	GlobalStylesContext,
 	alignmentHelpers,
+	useCustomUnits,
 } from '@wordpress/components';
 import {
 	InspectorControls,
@@ -22,7 +23,7 @@ import {
 	BlockControls,
 	BlockVerticalAlignmentToolbar,
 	BlockVariationPicker,
-	useCustomUnits,
+	useSetting,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { withDispatch, useSelect } from '@wordpress/data';
@@ -106,8 +107,13 @@ function ColumnsEditContainer( {
 	const { width } = sizes || {};
 
 	const units = useCustomUnits( {
-		settingPath: 'layout.units',
-		defaultUnits: [ '%', 'px', 'em', 'rem', 'vw' ],
+		availableUnits: useSetting( 'layout.units' ) || [
+			'%',
+			'px',
+			'em',
+			'rem',
+			'vw',
+		],
 	} );
 
 	useEffect( () => {
