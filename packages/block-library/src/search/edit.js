@@ -85,6 +85,9 @@ export default function SearchEdit( {
 	const unitControlInstanceId = useInstanceId( UnitControl );
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const isButtonPositionInside = 'button-inside' === buttonPosition;
+	const isButtonPositionOutside = 'button-outside' === buttonPosition;
+	const hasNoButton = 'no-button' === buttonPosition;
+	const hasOnlyButton = 'button-only' === buttonPosition;
 
 	const units = useCustomUnits( {
 		availableUnits: [ '%', 'px' ],
@@ -98,19 +101,15 @@ export default function SearchEdit( {
 			isButtonPositionInside
 				? 'wp-block-search__button-inside'
 				: undefined,
-			'button-outside' === buttonPosition
+			isButtonPositionOutside
 				? 'wp-block-search__button-outside'
 				: undefined,
-			'no-button' === buttonPosition
-				? 'wp-block-search__no-button'
-				: undefined,
-			'button-only' === buttonPosition
-				? 'wp-block-search__button-only'
-				: undefined,
-			! buttonUseIcon && 'no-button' !== buttonPosition
+			hasNoButton ? 'wp-block-search__no-button' : undefined,
+			hasOnlyButton ? 'wp-block-search__button-only' : undefined,
+			! buttonUseIcon && ! hasNoButton
 				? 'wp-block-search__text-button'
 				: undefined,
-			buttonUseIcon && 'no-button' !== buttonPosition
+			buttonUseIcon && ! hasNoButton
 				? 'wp-block-search__icon-button'
 				: undefined
 		);
@@ -166,26 +165,26 @@ export default function SearchEdit( {
 	};
 
 	const getResizableSides = () => {
-		if ( 'button-only' === buttonPosition ) {
+		if ( hasOnlyButton ) {
 			return {};
 		}
 
 		return {
-			right: align === 'right' ? false : true,
-			left: align === 'right' ? true : false,
+			right: align !== 'right',
+			left: align === 'right',
 		};
 	};
 
 	const renderTextField = () => {
+		// If the input is inside the wrapper, the wrapper gets the border color styles/classes, not the input control.
 		const textFieldClasses = classnames(
 			'wp-block-search__input',
-			! isButtonPositionInside ? borderProps.className : undefined
+			isButtonPositionInside ? undefined : borderProps.className
 		);
-		// If the button is inside the wrapper, the wrapper gets the border styles, not the input control.
-		const textFieldStyles = {
-			borderRadius: ! isButtonPositionInside ? borderRadius : undefined,
-			borderColor: ! isButtonPositionInside ? borderColor : undefined,
-		};
+		const textFieldStyles = isButtonPositionInside
+			? { borderRadius }
+			: borderProps.style;
+
 		return (
 			<input
 				className={ textFieldClasses }
@@ -206,24 +205,29 @@ export default function SearchEdit( {
 	};
 
 	const renderButton = () => {
+		// If the button is inside the wrapper, the wrapper gets the border color styles/classes, not the button.
 		const buttonClasses = classnames(
 			'wp-block-search__button',
-			borderProps.className
+			isButtonPositionInside ? undefined : borderProps.className
 		);
+		const buttonStyles = isButtonPositionInside
+			? { borderRadius }
+			: borderProps.style;
+
 		return (
 			<>
 				{ buttonUseIcon && (
 					<Button
 						icon={ search }
 						className={ buttonClasses }
-						style={ { borderRadius, borderColor } }
+						style={ buttonStyles }
 					/>
 				) }
 
 				{ ! buttonUseIcon && (
 					<RichText
 						className={ buttonClasses }
-						style={ { borderRadius, borderColor } }
+						style={ buttonStyles }
 						aria-label={ __( 'Button text' ) }
 						placeholder={ __( 'Add button text…' ) }
 						withoutInteractiveFormatting
@@ -256,7 +260,7 @@ export default function SearchEdit( {
 						label={ __( 'Change button position' ) }
 						controls={ buttonPositionControls }
 					/>
-					{ 'no-button' !== buttonPosition && (
+					{ ! hasNoButton && (
 						<ToolbarButton
 							title={ __( 'Use button with icon' ) }
 							icon={ buttonWithIcon }
@@ -351,7 +355,7 @@ export default function SearchEdit( {
 
 		const isNonZeroBorderRadius = parseInt( borderRadius, 10 ) !== 0;
 
-		if ( 'button-inside' === buttonPosition && isNonZeroBorderRadius ) {
+		if ( isButtonPositionInside && isNonZeroBorderRadius ) {
 			// We have button inside wrapper and a border radius value to apply.
 			// Add default padding so we don't get "fat" corners.
 			//
@@ -434,16 +438,15 @@ export default function SearchEdit( {
 				} }
 				showHandle={ isSelected }
 			>
-				{ ( isButtonPositionInside ||
-					'button-outside' === buttonPosition ) && (
+				{ ( isButtonPositionInside || isButtonPositionOutside ) && (
 					<>
 						{ renderTextField() }
 						{ renderButton() }
 					</>
 				) }
 
-				{ 'button-only' === buttonPosition && renderButton() }
-				{ 'no-button' === buttonPosition && renderTextField() }
+				{ hasOnlyButton && renderButton() }
+				{ hasNoButton && renderTextField() }
 			</ResizableBox>
 		</div>
 	);

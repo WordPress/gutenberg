@@ -87,7 +87,8 @@ function render_block_core_search( $attributes ) {
 		}
 
 		$button_markup = sprintf(
-'			<button type="submit" class="wp-block-search__button %s" %s>%s</button>',			$button_classes,
+	'<button type="submit" class="wp-block-search__button %s" %s>%s</button>',
+			$button_classes,
 			$inline_styles['shared'],
 			$button_internal_markup
 		);
@@ -100,7 +101,7 @@ function render_block_core_search( $attributes ) {
 		$inline_styles['wrapper'],
 		$input_markup . $button_markup
 	);
-$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+	$wrapper_attributes   = get_block_wrapper_attributes( array( 'class' => $classnames ) );
 
 	return sprintf(
 		'<form role="search" method="get" action="%s" %s>%s</form>',
