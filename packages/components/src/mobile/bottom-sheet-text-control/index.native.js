@@ -74,7 +74,12 @@ const BottomSheetTextControl = ( {
 					screen={ label }
 					leftButtonOnPress={ goBack }
 				/>
-				<PanelBody style={ horizontalBorderStyle }>
+				<PanelBody
+					style={ [
+						horizontalBorderStyle,
+						styles.textEditorContainer,
+					] }
+				>
 					<TextInput
 						label={ label }
 						onChangeText={ ( text ) => onChangeText( text ) }

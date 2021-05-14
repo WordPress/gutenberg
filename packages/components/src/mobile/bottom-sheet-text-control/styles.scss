@@ -1,10 +1,16 @@
 .textEditor {
 	min-height: 80px;
 	max-height: 200px;
+	padding-top: 0;
+	padding-bottom: 14px;
 }
 
 .textEditorDark {
 	color: $white;
+}
+
+.textEditorContainer {
+	padding-top: 14px;
 }
 
 .textFooternote {
