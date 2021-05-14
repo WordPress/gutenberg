@@ -27,7 +27,7 @@ describe( 'Multi-entity save flow', () => {
 	const closePanelButtonSelector =
 		'.editor-post-publish-panel__header-cancel-button button';
 	const createNewButtonSelector =
-		'//button[contains(text(), "New Template Part")]';
+		'//button[contains(text(), "New template part")]';
 
 	// Reusable assertions across Post/Site editors.
 	const assertAllBoxesChecked = async () => {

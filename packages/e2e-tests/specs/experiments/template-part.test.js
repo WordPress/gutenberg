@@ -268,7 +268,7 @@ describe( 'Template Part', () => {
 		const activatedTemplatePartSelector = `${ templatePartSelector }.block-editor-block-list__layout`;
 		const testContentSelector = `//p[contains(., "${ testContent }")]`;
 		const createNewButtonSelector =
-			'//button[contains(text(), "New Template Part")]';
+			'//button[contains(text(), "New template part")]';
 		const chooseExistingButtonSelector =
 			'//button[contains(text(), "Choose existing")]';
 

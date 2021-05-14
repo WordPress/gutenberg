@@ -31,7 +31,7 @@ const createTemplatePart = async (
 	// Create new template part.
 	await insertBlock( 'Template Part' );
 	const [ createNewButton ] = await page.$x(
-		'//button[contains(text(), "New Template Part")]'
+		'//button[contains(text(), "New template part")]'
 	);
 	await createNewButton.click();
 	await page.waitForSelector(

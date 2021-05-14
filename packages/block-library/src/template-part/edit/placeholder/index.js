@@ -88,7 +88,7 @@ export default function TemplatePartPlaceholder( {
 					instructions={ sprintf(
 						// Translators: %s as template part area title ("Header", "Footer", etc.).
 						'Choose an existing %s or create a new one.',
-						areaLabel
+						areaLabel.toLowerCase()
 					) }
 				>
 					<Dropdown
@@ -112,7 +112,7 @@ export default function TemplatePartPlaceholder( {
 									{ sprintf(
 										// Translators: %s as template part area title ("Header", "Footer", etc.).
 										'New %s',
-										areaLabel
+										areaLabel.toLowerCase()
 									) }
 								</Button>
 							</>
