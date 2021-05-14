@@ -24,7 +24,12 @@ import {
 	BACKSPACE,
 } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useInstanceId, useDebounce } from '@wordpress/compose';
+import {
+	useInstanceId,
+	useDebounce,
+	useMergeRefs,
+	useRefEffect,
+} from '@wordpress/compose';
 import {
 	create,
 	slice,
@@ -565,15 +570,26 @@ function useAutocomplete( {
 
 export function useAutocompleteProps( options ) {
 	const ref = useRef();
+	const onKeyDownRef = useRef();
 	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
 		...options,
 		contentRef: ref,
 	} );
-
+	onKeyDownRef.current = onKeyDown;
 	return {
-		ref,
+		ref: useMergeRefs( [
+			ref,
+			useRefEffect( ( element ) => {
+				function _onKeyDown( event ) {
+					onKeyDownRef.current( event );
+				}
+				element.addEventListener( 'keydown', _onKeyDown );
+				return () => {
+					element.removeEventListener( 'keydown', _onKeyDown );
+				};
+			}, [] ),
+		] ),
 		children: popover,
-		onKeyDown,
 		'aria-autocomplete': listBoxId ? 'list' : undefined,
 		'aria-owns': listBoxId,
 		'aria-activedescendant': activeId,
