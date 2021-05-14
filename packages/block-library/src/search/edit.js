@@ -335,6 +335,9 @@ export default function SearchEdit( {
 
 			{ showLabel && (
 				<RichText
+					style={ {
+						width: `${ width }${ widthUnit }`,
+					} }
 					className="wp-block-search__label"
 					aria-label={ __( 'Label text' ) }
 					placeholder={ __( 'Add label…' ) }

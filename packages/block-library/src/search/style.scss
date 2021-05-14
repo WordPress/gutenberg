@@ -18,6 +18,30 @@
 		}
 	}
 
+	&.alignright {
+		float: unset;
+		display: flex;
+		align-items: flex-end;
+		flex-direction: column;
+		margin-left: 0;
+	}
+
+	&.alignleft {
+		float: unset;
+		display: flex;
+		align-items: flex-start;
+		flex-direction: column;
+		margin-left: 0;
+	}
+
+	&.aligncenter {
+		float: unset;
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+		margin-left: 0;
+	}
+
 	.wp-block-search__inside-wrapper {
 		display: flex;
 		flex: auto;

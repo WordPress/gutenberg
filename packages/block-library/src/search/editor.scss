@@ -1,8 +1,36 @@
 .wp-block[data-align="center"] {
 	.wp-block-search {
+		float: unset;
+		display: flex;
+		align-items: center;
+		flex-direction: column;
+		margin-left: 0;
 		.wp-block-search__inside-wrapper {
 			margin: auto;
 		}
+	}
+}
+
+.wp-block[data-align="right"] {
+	.wp-block-search {
+		float: unset;
+		display: flex;
+		align-items: flex-end;
+		flex-direction: column;
+		margin-left: 0;
+	}
+	.wp-block-search__label {
+		min-width: 220px !important;
+	}
+}
+
+.wp-block[data-align="left"] {
+	.wp-block-search {
+		float: unset;
+		display: flex;
+		align-items: flex-start;
+		flex-direction: column;
+		margin-left: 0;
 	}
 }
 

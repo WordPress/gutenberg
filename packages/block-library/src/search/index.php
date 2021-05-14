@@ -41,14 +41,16 @@ function render_block_core_search( $attributes ) {
 	if ( $show_label ) {
 		if ( ! empty( $attributes['label'] ) ) {
 			$label_markup = sprintf(
-				'<label for="%s" class="wp-block-search__label">%s</label>',
+				'<label for="%s" class="wp-block-search__label" %s>%s</label>',
 				$input_id,
-				$attributes['label']
+				$inline_styles['wrapper'],
+				$attributes['label'],
 			);
 		} else {
 			$label_markup = sprintf(
-				'<label for="%s" class="wp-block-search__label screen-reader-text">%s</label>',
+				'<label for="%s" class="wp-block-search__label screen-reader-text" %s>%s</label>',
 				$input_id,
+				$inline_styles['wrapper'],
 				__( 'Search' )
 			);
 		}
