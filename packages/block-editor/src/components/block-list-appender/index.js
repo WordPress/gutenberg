@@ -29,7 +29,7 @@ function BlockListAppender( {
 	selectedBlockClientId,
 	tagName: TagName = 'div',
 } ) {
-	if ( CustomAppender ) {
+	if ( undefined !== CustomAppender ) {
 		deprecated( 'renderAppender prop of the BlockListAppender component', {
 			since: '5.7',
 			alternative: 'appender prop of the BlockListAppender component',
