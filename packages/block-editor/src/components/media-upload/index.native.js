@@ -7,7 +7,7 @@ import AddFromUrlBottomSheet from './add-from-url-bottom-sheet';
  */
 import { View, Platform } from 'react-native';
 
-import { delay, isEmpty } from 'lodash';
+import { delay } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -181,37 +181,12 @@ export class MediaUpload extends Component {
 	}
 
 	onPickerSelect( value ) {
-		const {
-			allowedTypes = [],
-			onSelect,
-			onSelectURL,
-			multiple = false,
-		} = this.props;
+		const { allowedTypes = [], onSelect, multiple = false } = this.props;
 
 		if ( value === 'URL' ) {
 			this.setState( { isAddFromUrlBottomsheetVisible: true } );
 			return;
 		}
-		// if ( value === 'URL' ) {
-		// 	prompt(
-		// 		__( 'Type a URL' ), // title
-		// 		undefined, // message
-		// 		[
-		// 			{
-		// 				text: __( 'Cancel' ),
-		// 				style: 'cancel',
-		// 			},
-		// 			{
-		// 				text: __( 'Apply' ),
-		// 				onPress: ( url ) => onSelectURL( url ),
-		// 			},
-		// 		], // buttons
-		// 		'plain-text', // type
-		// 		undefined, // defaultValue
-		// 		'url' // keyboardType
-		// 	);
-		// 	return;
-		// }
 
 		const mediaSource = this.getAllSources()
 			.filter( ( source ) => source.value === value )
@@ -285,11 +260,11 @@ export class MediaUpload extends Component {
 			<View>
 				{ this.state.isAddFromUrlBottomsheetVisible && (
 					<AddFromUrlBottomSheet
-						onClose={ ( {url} ) => {
+						onClose={ ( { url } ) => {
 							this.setState( {
 								isAddFromUrlBottomsheetVisible: false,
 							} );
-							onSelectURL(url);
+							onSelectURL( url );
 						} }
 						isVisible={ this.state.isAddFromUrlBottomsheetVisible }
 					/>
