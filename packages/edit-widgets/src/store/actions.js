@@ -4,6 +4,8 @@
 import { __, sprintf } from '@wordpress/i18n';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as interfaceStore } from '@wordpress/interface';
+import { getWidgetIdFromBlock } from '@wordpress/widgets';
+
 /**
  * Internal dependencies
  */
@@ -101,6 +103,11 @@ export function* saveWidgetArea( widgetAreaId ) {
 		buildWidgetAreaPostId( widgetAreaId )
 	);
 
+	// Get all widgets from this area
+	const areaWidgets = Object.values( widgets ).filter(
+		( { sidebar } ) => sidebar === widgetAreaId
+	);
+
 	// Remove all duplicate reference widget instances
 	const usedReferenceWidgets = [];
 	const widgetsBlocks = post.blocks.filter( ( { attributes: { id } } ) => {
@@ -113,12 +120,20 @@ export function* saveWidgetArea( widgetAreaId ) {
 		return true;
 	} );
 
+	// Get all widgets that have been deleted
+	const deletedWidgets = areaWidgets.filter(
+		( { id } ) =>
+			! widgetsBlocks.some(
+				( widgetBlock ) => getWidgetIdFromBlock( widgetBlock ) === id
+			)
+	);
+
 	const batchMeta = [];
 	const batchTasks = [];
 	const sidebarWidgetsIds = [];
 	for ( let i = 0; i < widgetsBlocks.length; i++ ) {
 		const block = widgetsBlocks[ i ];
-		const widgetId = block.attributes.__internalWidgetId;
+		const widgetId = getWidgetIdFromBlock( block );
 		const oldWidget = widgets[ widgetId ];
 		const widget = transformBlockToWidget( block, oldWidget );
 		// We'll replace the null widgetId after save, but we track it here
@@ -168,14 +183,31 @@ export function* saveWidgetArea( widgetAreaId ) {
 			clientId: block.clientId,
 		} );
 	}
+	for ( const widget of deletedWidgets ) {
+		batchTasks.push( ( { deleteEntityRecord } ) =>
+			deleteEntityRecord( 'root', 'widget', widget.id, {
+				force: true,
+			} )
+		);
+	}
 
 	const records = yield dispatch( 'core', '__experimentalBatch', batchTasks );
+	const preservedRecords = records.filter(
+		( record ) => ! record.hasOwnProperty( 'deleted' )
+	);
 
 	const failedWidgetNames = [];
 
-	for ( let i = 0; i < records.length; i++ ) {
-		const widget = records[ i ];
+	for ( let i = 0; i < preservedRecords.length; i++ ) {
+		const widget = preservedRecords[ i ];
 		const { block, position } = batchMeta[ i ];
+
+		yield dispatch(
+			'core/block-editor',
+			'updateBlockAttributes',
+			block.clientId,
+			{ __internalWidgetId: widget.id }
+		);
 
 		const error = yield select(
 			'core',

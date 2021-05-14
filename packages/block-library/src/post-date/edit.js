@@ -80,7 +80,14 @@ export default function PostDateEdit( { attributes, context, setAttributes } ) {
 		__( 'No Date' )
 	);
 	if ( isLink && date ) {
-		postDate = <a href="#post-date-pseudo-link">{ postDate }</a>;
+		postDate = (
+			<a
+				href="#post-date-pseudo-link"
+				onClick={ ( event ) => event.preventDefault() }
+			>
+				{ postDate }
+			</a>
+		);
 	}
 	return (
 		<>

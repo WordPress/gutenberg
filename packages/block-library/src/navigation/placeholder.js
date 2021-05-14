@@ -1,13 +1,9 @@
 /**
- * External dependencies
- */
-import { some } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { createBlock, parse } from '@wordpress/blocks';
+import { createBlock } from '@wordpress/blocks';
 import {
+	Placeholder,
 	Button,
 	DropdownMenu,
 	MenuGroup,
@@ -28,75 +24,9 @@ import { store as coreStore } from '@wordpress/core-data';
 /**
  * Internal dependencies
  */
-import createDataTree from './create-data-tree';
+
 import PlaceholderPreview from './placeholder-preview';
-
-/**
- * A recursive function that maps menu item nodes to blocks.
- *
- * @param {Object[]} menuItems An array of menu items.
- * @return {WPBlock[]} An array of blocks.
- */
-function mapMenuItemsToBlocks( menuItems ) {
-	return menuItems.map( ( menuItem ) => {
-		if ( menuItem.type === 'block' ) {
-			const [ block ] = parse( menuItem.content.raw );
-
-			if ( ! block ) {
-				return createBlock( 'core/freeform', {
-					content: menuItem.content,
-				} );
-			}
-
-			return block;
-		}
-
-		const attributes = {
-			label: ! menuItem.title.rendered
-				? __( '(no title)' )
-				: menuItem.title.rendered,
-			opensInNewTab: menuItem.target === '_blank',
-		};
-
-		if ( menuItem.url ) {
-			attributes.url = menuItem.url;
-		}
-
-		if ( menuItem.description ) {
-			attributes.description = menuItem.description;
-		}
-
-		if ( menuItem.xfn?.length && some( menuItem.xfn ) ) {
-			attributes.rel = menuItem.xfn.join( ' ' );
-		}
-
-		if ( menuItem.classes?.length && some( menuItem.classes ) ) {
-			attributes.className = menuItem.classes.join( ' ' );
-		}
-
-		const innerBlocks = menuItem.children?.length
-			? mapMenuItemsToBlocks( menuItem.children )
-			: [];
-
-		return createBlock( 'core/navigation-link', attributes, innerBlocks );
-	} );
-}
-
-/**
- * Convert a flat menu item structure to a nested blocks structure.
- *
- * @param {Object[]} menuItems An array of menu items.
- *
- * @return {WPBlock[]} An array of blocks.
- */
-function convertMenuItemsToBlocks( menuItems ) {
-	if ( ! menuItems ) {
-		return null;
-	}
-
-	const menuTree = createDataTree( menuItems );
-	return mapMenuItemsToBlocks( menuTree );
-}
+import menuItemsToBlocks from './menu-items-to-blocks';
 
 function NavigationPlaceholder( { onCreate }, ref ) {
 	const [ selectedMenu, setSelectedMenu ] = useState();
@@ -177,7 +107,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	const isLoading = isResolvingPages || isResolvingMenus;
 
 	const createFromMenu = useCallback( () => {
-		const blocks = convertMenuItemsToBlocks( menuItems );
+		const { innerBlocks: blocks } = menuItemsToBlocks( menuItems );
 		const selectNavigationBlock = true;
 		onCreate( blocks, selectNavigationBlock );
 	} );
@@ -217,7 +147,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 		className: 'wp-block-navigation-placeholder__actions__dropdown',
 	};
 	return (
-		<div className="wp-block-navigation-placeholder">
+		<Placeholder className="wp-block-navigation-placeholder">
 			<PlaceholderPreview />
 
 			<div className="wp-block-navigation-placeholder__controls">
@@ -236,7 +166,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 						</div>
 						{ hasMenus ? (
 							<DropdownMenu
-								text={ __( 'Existing menu' ) }
+								text={ __( 'Add existing menu' ) }
 								icon={ chevronDown }
 								toggleProps={ toggleProps }
 							>
@@ -277,7 +207,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 					</div>
 				) }
 			</div>
-		</div>
+		</Placeholder>
 	);
 }
 

@@ -1,7 +1,10 @@
 {
 	"apiVersion": 2,
 	"name": "core/site-title",
+	"title": "Site Title",
 	"category": "design",
+	"description": "Displays and allows editing the name of the site. The site title usually appears in the browser title bar, in search results, and more. Also available in Settings > General.",
+	"textdomain": "default",
 	"attributes": {
 		"level": {
 			"type": "number",
@@ -20,11 +23,14 @@
 			"link": true
 		},
 		"spacing": {
-			"padding": true
+			"padding": true,
+			"margin": true
 		},
 		"fontSize": true,
 		"lineHeight": true,
 		"__experimentalFontFamily": true,
-		"__experimentalTextTransform": true
+		"__experimentalTextTransform": true,
+		"__experimentalFontStyle": true,
+		"__experimentalFontWeight": true
 	}
 }

@@ -16,7 +16,7 @@ import type {
 	ElementTypeFromViewOwnProps,
 	ViewOwnProps,
 } from '../context';
-import { View } from '../view';
+import { View } from '../../view';
 
 interface Options< A extends As, P extends ViewOwnProps< {}, A > > {
 	as: A;

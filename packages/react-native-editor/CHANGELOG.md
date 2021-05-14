@@ -10,6 +10,16 @@ For each user feature we should also add a importance categorization label  to i
 -->
 
 ## Unreleased
+-   [*] Bottom-sheet: Add custom header [#30291]
+-   [*] Fixes color picker rendering bug when scrolling [#30994]
+-   [*] Add enableCaching param to fetch request on Android [#31186]
+-   [*] Disabled featured image banner on iOS. [#31681]
+
+## 1.52.1
+
+- [*] Fixes for the generated localized strings files.
+
+## 1.52.0
 
 ## 1.52.2
 
@@ -25,6 +35,7 @@ For each user feature we should also add a importance categorization label  to i
 -   [*] Image block: Add a "featured" banner. (Android only) [#30806]
 -   [**] The media upload options of the Image, Video and Gallery block automatically opens when the respective block is inserted. [#29546]
 -   [**] The media upload options of the File and Audio block automatically opens when the respective block is inserted. [#31025]
+-   [*] Fixed a bug where the Search block was stealing focus from the Image block upon updating image asset [#31393]
 
 ## 1.51.1
 

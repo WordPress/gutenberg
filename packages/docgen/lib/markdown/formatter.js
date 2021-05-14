@@ -118,8 +118,8 @@ module.exports = (
 				'Type',
 				getSymbolTagsByName( symbol, 'type' ),
 				( tag ) =>
-					`\n- ${ getTypeOutput( tag ) } ${ cleanSpaces(
-						`${ tag.name } ${ tag.description }`
+					`\n- ${ getTypeOutput( tag ) }${ cleanSpaces(
+						` ${ tag.name } ${ tag.description }`
 					) }`,
 				docs
 			);

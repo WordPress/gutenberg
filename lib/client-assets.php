@@ -620,6 +620,8 @@ function gutenberg_register_vendor_script( $scripts, $handle, $src, $deps = arra
 /**
  * Extends block editor settings to remove the Gutenberg's `editor-styles.css`;
  *
+ * This can be removed when plugin support requires WordPress 5.8.0+.
+ *
  * @param array $settings Default editor settings.
  *
  * @return array Filtered editor settings.
@@ -671,10 +673,17 @@ function gutenberg_extend_block_editor_styles( $settings ) {
 
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( function_exists( 'get_block_editor_settings' ) ) {
+	add_filter( 'block_editor_settings_all', 'gutenberg_extend_block_editor_styles' );
+} else {
+	add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_styles' );
+}
 
 /**
  * Adds a flag to the editor settings to know whether we're in FSE theme or not.
+ *
+ * This can be removed when plugin support requires WordPress 5.8.0+.
  *
  * @param array $settings Default editor settings.
  *
@@ -688,7 +697,12 @@ function gutenberg_extend_block_editor_settings_with_fse_theme_flag( $settings )
 
 	return $settings;
 }
-add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
+// This can be removed when plugin support requires WordPress 5.8.0+.
+if ( function_exists( 'get_block_editor_settings' ) ) {
+	add_filter( 'block_editor_settings_all', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
+} else {
+	add_filter( 'block_editor_settings', 'gutenberg_extend_block_editor_settings_with_fse_theme_flag' );
+}
 
 /**
  * Sets the editor styles to be consumed by JS.
@@ -726,6 +740,8 @@ function gutenberg_extend_block_editor_styles_html() {
 	echo "<script>window.__editorStyles = $editor_styles</script>";
 }
 add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
+add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
+add_action( 'admin_footer-post-new.php', 'gutenberg_extend_block_editor_styles_html' );
 
 /**
  * Adds a polyfill for object-fit in environments which do not support it.

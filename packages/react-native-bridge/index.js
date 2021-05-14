@@ -275,7 +275,10 @@ export function requestMediaEditor( mediaUrl, callback ) {
 	);
 }
 
-export function fetchRequest( path ) {
+export function fetchRequest( path, enableCaching = true ) {
+	if ( isAndroid ) {
+		return RNReactNativeGutenbergBridge.fetchRequest( path, enableCaching );
+	}
 	return RNReactNativeGutenbergBridge.fetchRequest( path );
 }
 
