@@ -57,9 +57,9 @@ const CreateNewPostLink = ( { type } ) => {
 };
 
 // Helper function to get the term id based on user input in terms `FormTokenField`.
-const getTermIdByTermValue = ( termsMapedByName, termValue ) => {
+const getTermIdByTermValue = ( termsMappedByName, termValue ) => {
 	// First we check for exact match by `term.id` or case sensitive `term.name` match.
-	const termId = termValue?.id || termsMapedByName[ termValue ]?.id;
+	const termId = termValue?.id || termsMappedByName[ termValue ]?.id;
 	if ( termId ) return termId;
 	/**
 	 * Here we make an extra check for entered terms in a non case sensitive way,
@@ -71,9 +71,9 @@ const getTermIdByTermValue = ( termsMapedByName, termValue ) => {
 	 * In this edge case we always apply the first match from the terms list.
 	 */
 	const termValueLower = termValue.toLocaleLowerCase();
-	for ( const term in termsMapedByName ) {
+	for ( const term in termsMappedByName ) {
 		if ( term.toLocaleLowerCase() === termValueLower ) {
-			return termsMapedByName[ term ].id;
+			return termsMappedByName[ term ].id;
 		}
 	}
 };
