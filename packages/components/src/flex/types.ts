@@ -56,7 +56,7 @@ export type FlexProps = {
 	/**
 	 * The children elements.
 	 */
-	children?: React.ReactNode;
+	children: React.ReactNode;
 	/**
 	 * @deprecated
 	 */
@@ -77,12 +77,7 @@ export type FlexItemProps = {
 	/**
 	 * The children elements.
 	 */
-	children?: React.ReactNode;
+	children: React.ReactNode;
 };
 
-export type FlexBlockProps = Omit< FlexItemProps, 'isBlock' > & {
-	/**
-	 * The children elements.
-	 */
-	children?: React.ReactNode;
-};
+export type FlexBlockProps = Omit< FlexItemProps, 'isBlock' >;

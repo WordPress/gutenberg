@@ -37,6 +37,7 @@ export type Props = PopperProps & {
 	baseId?: string;
 	/**
 	 * Content to render within the `Popover` floating label.
+	 * [TODO: is this used at all?]
 	 */
 	content?: ReactNode;
 	/**
@@ -75,11 +76,11 @@ export type Props = PopperProps & {
 	/**
 	 * The children elements.
 	 */
-	children?: React.ReactNode;
+	children: React.ReactNode;
 };
 
 export type ContentProps = {
 	elevation?: number;
 	maxWidth?: CSSProperties[ 'maxWidth' ];
-	children?: React.ReactNode;
+	children: React.ReactNode;
 };

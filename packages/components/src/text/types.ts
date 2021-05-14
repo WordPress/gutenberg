@@ -103,8 +103,4 @@ export interface Props extends TruncateProps {
 	 * Letters or words within `Text` can be highlighted using `highlightWords`.
 	 */
 	highlightWords?: string[];
-	/**
-	 * The children elements.
-	 */
-	children?: React.ReactNode;
 }

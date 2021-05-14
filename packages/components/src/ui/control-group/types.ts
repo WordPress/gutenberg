@@ -26,5 +26,5 @@ export type Props = Pick< FlexProps, 'direction' > & {
 	/**
 	 * The children elements.
 	 */
-	children?: React.ReactNode;
+	children: React.ReactNode;
 };

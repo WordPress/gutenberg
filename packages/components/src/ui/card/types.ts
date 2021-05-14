@@ -54,7 +54,7 @@ export type CardBodyProps = {
 	/**
 	 * The children elements.
 	 */
-	children?: React.ReactNode;
+	children: React.ReactNode;
 };
 
 export type CardHeaderSize = 'medium' | 'small' | 'xSmall';
@@ -69,7 +69,7 @@ export type CardHeaderProps = {
 	/**
 	 * The children elements.
 	 */
-	children?: React.ReactNode;
+	children: React.ReactNode;
 };
 
 export type CardFooterProps = CardHeaderProps & {

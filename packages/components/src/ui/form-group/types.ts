@@ -13,7 +13,6 @@ import type { Props as GridProps } from '../../grid/types';
 export type FormGroupLabelProps = ControlLabelProps & {
 	labelHidden?: boolean;
 	id?: ReactText;
-	children?: React.ReactNode;
 };
 
 export type FormGroupContentProps = FormGroupLabelProps & {

@@ -16,5 +16,5 @@ export type Props = {
 	/**
 	 * The children elements.
 	 */
-	children?: React.ReactNode;
+	children: React.ReactNode;
 };

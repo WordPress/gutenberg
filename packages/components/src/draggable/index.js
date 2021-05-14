@@ -17,7 +17,7 @@ const bodyClass = 'is-dragging-components-draggable';
 
 /**
  * @typedef Props
- * @property {(props: RenderProp) => JSX.Element | null} children Children.
+ * @property {(props: RenderProp) => JSX.Element | null} children Children. TODO: any action needed here?
  * @property {(event: import('react').DragEvent) => void} [onDragStart] Callback when dragging starts.
  * @property {(event: import('react').DragEvent) => void} [onDragOver] Callback when dragging happens over the document.
  * @property {(event: import('react').DragEvent) => void} [onDragEnd] Callback when dragging ends.
