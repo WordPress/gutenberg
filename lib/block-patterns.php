@@ -357,9 +357,9 @@ function register_gutenberg_patterns() {
 	);
 
 	register_block_pattern(
-		'template-part/footer-centered-navigation',
+		'template-part/footer-centered-navigation-social',
 		array(
-			'title'      => __( 'Centered footer with navigation', 'gutenberg' ),
+			'title'      => __( 'Centered footer with navigation and social links', 'gutenberg' ),
 			'categories'    => array( 'page-footer' ),
 			'blockTypes' => array( 'core/template-part/footer' ),
 			'content'    => '<!-- wp:navigation {"orientation":"horizontal","fontSize":"normal"} /-->
