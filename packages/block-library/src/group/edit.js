@@ -52,9 +52,9 @@ function GroupEdit( { attributes, setAttributes, clientId } ) {
 			: { className: 'wp-block-group__inner-container' },
 		{
 			templateLock,
-			renderAppender: hasInnerBlocks
-				? undefined
-				: InnerBlocks.ButtonBlockAppender,
+			appender: hasInnerBlocks ? undefined : (
+				<InnerBlocks.ButtonBlockAppender />
+			),
 			__experimentalLayout: _layout,
 		}
 	);

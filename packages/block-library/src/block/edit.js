@@ -79,9 +79,9 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 			value: blocks,
 			onInput,
 			onChange,
-			renderAppender: blocks?.length
-				? undefined
-				: InnerBlocks.ButtonBlockAppender,
+			appender: blocks?.length ? undefined : (
+				<InnerBlocks.ButtonBlockAppender />
+			),
 		}
 	);
 

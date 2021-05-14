@@ -34,7 +34,7 @@ export default function WidgetAreaInnerBlocks() {
 			onInput,
 			onChange,
 			templateLock: false,
-			renderAppender: InnerBlocks.ButtonBlockAppender,
+			appender: <InnerBlocks.DefaultBlockAppender />,
 		}
 	);
 
