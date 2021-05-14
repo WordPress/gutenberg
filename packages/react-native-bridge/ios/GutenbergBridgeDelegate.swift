@@ -24,6 +24,7 @@ public enum Capabilities: String {
     case canEnableUnsupportedBlockEditor
     case audioBlock
     case reusableBlock
+    case canViewEditorOnboarding
 }
 
 /// Wrapper for single block data
