@@ -254,7 +254,7 @@ Saved templates have precedence over theme files. To use the updated theme files
 Now the theme has a basic site header and footer, but it does not display any content.
 To create a list of posts, you will use the query and query loop blocks.
 
-Wether you are using the site editor or editing theme files directly, open the index template.
+Whether you are using the site editor or editing theme files directly, open the index template.
 
 First, add a group block that will work as a container for the posts.
 Next, enable the width options for the blocks inside this group using `"layout":{"inherit":true}`.
