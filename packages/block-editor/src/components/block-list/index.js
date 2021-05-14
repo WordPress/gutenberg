@@ -8,6 +8,7 @@ import classnames from 'classnames';
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
 import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
+import { createContext, useState, useMemo } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -20,6 +21,8 @@ import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 import BlockToolsBackCompat from '../block-tools/back-compat';
+
+export const IntersectionObserver = createContext();
 
 function Root( { className, children } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -82,39 +85,51 @@ function Items( {
 	__experimentalAppenderTagName,
 	__experimentalLayout: layout = defaultLayout,
 } ) {
-	function selector( select ) {
-		const {
-			getBlockOrder,
-			getSelectedBlockClientId,
-			getMultiSelectedBlockClientIds,
-			hasMultiSelection,
-		} = select( blockEditorStore );
-		return {
-			blockClientIds: getBlockOrder( rootClientId ),
-			selectedBlockClientId: getSelectedBlockClientId(),
-			multiSelectedBlockClientIds: getMultiSelectedBlockClientIds(),
-			hasMultiSelection: hasMultiSelection(),
-		};
-	}
+	const [ intersectingBlocks, setIntersectingBlocks ] = useState( new Set() );
+	const intersectionObserver = useMemo( () => {
+		const { IntersectionObserver: Observer } = window;
 
-	const {
-		blockClientIds,
-		selectedBlockClientId,
-		multiSelectedBlockClientIds,
-		hasMultiSelection,
-	} = useSelect( selector, [ rootClientId ] );
+		if ( ! Observer ) {
+			return;
+		}
+
+		return new Observer( ( entries ) => {
+			setIntersectingBlocks( ( oldIntersectingBlocks ) => {
+				const newIntersectingBlocks = new Set( oldIntersectingBlocks );
+				for ( const entry of entries ) {
+					const clientId = entry.target.getAttribute( 'data-block' );
+					const action = entry.isIntersecting ? 'add' : 'delete';
+					newIntersectingBlocks[ action ]( clientId );
+				}
+				return newIntersectingBlocks;
+			} );
+		} );
+	}, [ setIntersectingBlocks ] );
+	const { order, selectedBlocks } = useSelect(
+		( select ) => {
+			const { getBlockOrder, getSelectedBlockClientIds } = select(
+				blockEditorStore
+			);
+			return {
+				order: getBlockOrder( rootClientId ),
+				selectedBlocks: getSelectedBlockClientIds(),
+			};
+		},
+		[ rootClientId ]
+	);
 
 	return (
 		<LayoutProvider value={ layout }>
-			{ blockClientIds.map( ( clientId, index ) => {
-				const isBlockInSelection = hasMultiSelection
-					? multiSelectedBlockClientIds.includes( clientId )
-					: selectedBlockClientId === clientId;
-
-				return (
+			<IntersectionObserver.Provider value={ intersectionObserver }>
+				{ order.map( ( clientId, index ) => (
 					<AsyncModeProvider
 						key={ clientId }
-						value={ ! isBlockInSelection }
+						value={
+							// Only provide data asynchronously if the block is
+							// not visible and not selected.
+							! intersectingBlocks.has( clientId ) &&
+							! selectedBlocks.includes( clientId )
+						}
 					>
 						<BlockListBlock
 							rootClientId={ rootClientId }
@@ -125,9 +140,9 @@ function Items( {
 							index={ index }
 						/>
 					</AsyncModeProvider>
-				);
-			} ) }
-			{ blockClientIds.length < 1 && placeholder }
+				) ) }
+			</IntersectionObserver.Provider>
+			{ order.length < 1 && placeholder }
 			<BlockListAppender
 				tagName={ __experimentalAppenderTagName }
 				rootClientId={ rootClientId }
