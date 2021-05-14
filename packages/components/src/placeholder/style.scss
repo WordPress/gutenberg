@@ -14,7 +14,7 @@
 	-webkit-font-smoothing: subpixel-antialiased;
 
 	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-	@supports ( position: sticky ) {
+	@supports (position: sticky) {
 		display: flex;
 		flex-direction: column;
 		justify-content: center;
