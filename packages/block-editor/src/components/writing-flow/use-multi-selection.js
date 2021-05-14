@@ -15,18 +15,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
-function toggleRichText( container, toggle ) {
-	Array.from( container.querySelectorAll( '.rich-text' ) ).forEach(
-		( node ) => {
-			if ( toggle ) {
-				node.setAttribute( 'contenteditable', true );
-			} else {
-				node.removeAttribute( 'contenteditable' );
-			}
-		}
-	);
-}
-
 /**
  * Returns for the deepest node at the start or end of a container node. Ignores
  * any text nodes that only contain HTML formatting whitespace.
@@ -125,15 +113,6 @@ export default function useMultiSelection() {
 		// For some browsers, like Safari, it is important that focus
 		// happens BEFORE selection.
 		ref.current.focus();
-
-		// Removing the contenteditable attributes within the block editor is
-		// essential for selection to work across editable areas. The edible
-		// hosts are removed, allowing selection to be extended outside the DOM
-		// element. `multiSelect` sets a flag in the store so the rich text
-		// components are updated, but the rerender may happen asynchonously. To
-		// ensure the browser instantly removes the selection boundaries, we
-		// remove the contenteditable attributes manually.
-		toggleRichText( ref.current, false );
 
 		const selection = defaultView.getSelection();
 		const range = ownerDocument.createRange();
