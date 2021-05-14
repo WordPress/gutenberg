@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import menuItemsToBlocks from '../menu-items-to-blocks';
+import { menuItemsToBlocks } from '../menu-items-to-blocks';
 
 // Mock createBlock to avoid creating the blocks in test environment.
 jest.mock( '@wordpress/blocks', () => {

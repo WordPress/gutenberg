@@ -1584,6 +1584,12 @@
 		"parent": "packages"
 	},
 	{
+		"title": "@wordpress/menus",
+		"slug": "packages-menus",
+		"markdown_source": "../packages/menus/README.md",
+		"parent": "packages"
+	},
+	{
 		"title": "@wordpress/notices",
 		"slug": "packages-notices",
 		"markdown_source": "../packages/notices/README.md",

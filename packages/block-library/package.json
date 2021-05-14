@@ -52,6 +52,7 @@
 		"@wordpress/icons": "file:../icons",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
 		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/menus": "file:../menus",
 		"@wordpress/notices": "file:../notices",
 		"@wordpress/primitives": "file:../primitives",
 		"@wordpress/reusable-blocks": "file:../reusable-blocks",

@@ -9,13 +9,12 @@ import { sortBy } from 'lodash';
 import { createBlock, parse } from '@wordpress/blocks';
 
 /**
- * Convert a flat menu item structure to a nested blocks structure.
+ * Converts a flat menu item structure to a nested blocks structure and provides a mapping object between Menu Item IDs and Block clientIds.
  *
  * @param {Object[]} menuItems An array of menu items.
- *
- * @return {WPBlock[]} An array of blocks.
+ * @return {{ innerBlocks: WPBlock[], mapping: {} }} a collection of blocks and an object containing mapping between menuItem.id and block.clientId
  */
-export default function menuItemsToBlocks( menuItems ) {
+export function menuItemsToBlocks( menuItems ) {
 	if ( ! menuItems ) {
 		return null;
 	}
@@ -25,10 +24,10 @@ export default function menuItemsToBlocks( menuItems ) {
 }
 
 /**
- * A recursive function that maps menu item nodes to blocks.
+ * A recursive function that maps menu item nodes to blocks and creates a mapping object between Menu Item IDs and Block clientIds.
  *
  * @param {WPNavMenuItem[]} menuItems An array of WPNavMenuItem items.
- * @return {Object} Object containing innerBlocks and mapping.
+ * @return {{ innerBlocks: WPBlock[], mapping: {} }} a collection of blocks and an object containing mapping between menuItem.id and block.clientId
  */
 function mapMenuItemsToBlocks( menuItems ) {
 	let mapping = {};
