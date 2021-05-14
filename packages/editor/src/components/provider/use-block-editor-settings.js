@@ -49,7 +49,7 @@ function useBlockEditorSettings( settings, hasTemplate ) {
 				 * Unbounded queries are not supported on native so as a workaround, we set per_page with the maximum value that native version can handle.
 				 * Related issue: https://github.com/wordpress-mobile/gutenberg-mobile/issues/2661
 				 */
-				{ per_page: Platform.select( { web: -1, native: 10 } ) }
+				{ per_page: Platform.select( { web: -1, native: 100 } ) }
 			),
 			hasUploadPermissions: defaultTo(
 				canUser( 'create', 'media' ),

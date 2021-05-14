@@ -6,7 +6,7 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -57,7 +57,8 @@ function selector( select ) {
 	};
 }
 
-export default function useMultiSelection( ref ) {
+export default function useMultiSelection() {
+	const ref = useRef();
 	const {
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
@@ -109,11 +110,14 @@ export default function useMultiSelection( ref ) {
 			return;
 		}
 
-		// These must be in the right DOM order.
+		// For some browsers, like Safari, it is important that focus
+		// happens BEFORE selection.
+		ref.current.focus();
 
 		const selection = defaultView.getSelection();
 		const range = ownerDocument.createRange();
 
+		// These must be in the right DOM order.
 		// The most stable way to select the whole block contents is to start
 		// and end at the deepest points.
 		const startNode = getDeepestNode( startRef.current, 'start' );
@@ -131,4 +135,6 @@ export default function useMultiSelection( ref ) {
 		selectBlock,
 		selectedBlockClientId,
 	] );
+
+	return ref;
 }

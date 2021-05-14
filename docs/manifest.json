@@ -432,6 +432,30 @@
 		"parent": "how-to-guides"
 	},
 	{
+		"title": "Widgets",
+		"slug": "widgets",
+		"markdown_source": "../docs/how-to-guides/widgets/README.md",
+		"parent": "how-to-guides"
+	},
+	{
+		"title": "Widgets Block Editor overview",
+		"slug": "overview",
+		"markdown_source": "../docs/how-to-guides/widgets/overview.md",
+		"parent": "widgets"
+	},
+	{
+		"title": "Restoring the classic Widgets Editor",
+		"slug": "opting-out",
+		"markdown_source": "../docs/how-to-guides/widgets/opting-out.md",
+		"parent": "widgets"
+	},
+	{
+		"title": "About the Legacy Widget block",
+		"slug": "legacy-widget-block",
+		"markdown_source": "../docs/how-to-guides/widgets/legacy-widget-block.md",
+		"parent": "widgets"
+	},
+	{
 		"title": "Reference Guides",
 		"slug": "reference-guides",
 		"markdown_source": "../docs/reference-guides/README.md",
@@ -495,6 +519,12 @@
 		"title": "Registration",
 		"slug": "block-registration",
 		"markdown_source": "../docs/reference-guides/block-api/block-registration.md",
+		"parent": "block-api"
+	},
+	{
+		"title": "Styles",
+		"slug": "block-styles",
+		"markdown_source": "../docs/reference-guides/block-api/block-styles.md",
 		"parent": "block-api"
 	},
 	{
@@ -744,6 +774,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "Divider",
+		"slug": "divider",
+		"markdown_source": "../packages/components/src/divider/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "Draggable",
 		"slug": "draggable",
 		"markdown_source": "../packages/components/src/draggable/README.md",
@@ -831,6 +867,12 @@
 		"title": "FormTokenField",
 		"slug": "form-token-field",
 		"markdown_source": "../packages/components/src/form-token-field/README.md",
+		"parent": "components"
+	},
+	{
+		"title": "Grid",
+		"slug": "grid",
+		"markdown_source": "../packages/components/src/grid/README.md",
 		"parent": "components"
 	},
 	{

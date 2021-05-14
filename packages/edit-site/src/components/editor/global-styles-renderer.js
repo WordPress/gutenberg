@@ -173,17 +173,19 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 			selector: ROOT_BLOCK_SELECTOR,
 		} );
 	}
-	forEach( tree.styles?.elements, ( value, index ) => {
-		nodes.push( {
-			styles: value,
-			selector: ELEMENTS[ index ],
-		} );
+	forEach( tree.styles?.elements, ( value, key ) => {
+		if ( !! value && !! ELEMENTS[ key ] ) {
+			nodes.push( {
+				styles: value,
+				selector: ELEMENTS[ key ],
+			} );
+		}
 	} );
 
 	// Iterate over blocks: they can have styles & elements.
 	forEach( tree.styles?.blocks, ( node, blockName ) => {
 		const blockStyles = pickStyleKeys( node );
-		if ( !! blockStyles ) {
+		if ( !! blockStyles && !! blockSelectors?.[ blockName ]?.selector ) {
 			nodes.push( {
 				styles: blockStyles,
 				selector: blockSelectors[ blockName ].selector,
@@ -191,10 +193,16 @@ export const getNodesWithStyles = ( tree, blockSelectors ) => {
 		}
 
 		forEach( node?.elements, ( value, elementName ) => {
-			nodes.push( {
-				styles: value,
-				selector: blockSelectors[ blockName ].elements[ elementName ],
-			} );
+			if (
+				!! value &&
+				!! blockSelectors?.[ blockName ]?.elements?.[ elementName ]
+			) {
+				nodes.push( {
+					styles: value,
+					selector:
+						blockSelectors[ blockName ].elements[ elementName ],
+				} );
+			}
 		} );
 	} );
 
@@ -284,7 +292,7 @@ export const toStyles = ( tree, blockSelectors ) => {
 	const nodesWithStyles = getNodesWithStyles( tree, blockSelectors );
 	const nodesWithSettings = getNodesWithSettings( tree, blockSelectors );
 
-	let ruleset = `${ ELEMENTS.link }{color: var(--wp--style--color--link);}`;
+	let ruleset = `${ ELEMENTS.link }{color: var(--wp--style--color--link, #00e);}`;
 	nodesWithStyles.forEach( ( { selector, styles } ) => {
 		const declarations = getStylesDeclarations( styles );
 

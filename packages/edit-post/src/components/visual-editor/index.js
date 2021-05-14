@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
 	VisualEditorGlobalKeyboardShortcuts,
 	PostTitle,
+	store as editorStore,
 } from '@wordpress/editor';
 import {
 	WritingFlow,
@@ -24,15 +25,16 @@ import {
 	__experimentalUseResizeCanvas as useResizeCanvas,
 	__unstableUseCanvasClickRedirect as useCanvasClickRedirect,
 	__unstableEditorStyles as EditorStyles,
-	__experimentalUseEditorFeature as useEditorFeature,
+	useSetting,
 	__experimentalLayoutStyle as LayoutStyle,
 	__unstableUseMouseMoveTypingReset as useMouseMoveTypingReset,
 	__unstableIframe as Iframe,
+	__experimentalUseNoRecursiveRenders as useNoRecursiveRenders,
 } from '@wordpress/block-editor';
 import { useRef } from '@wordpress/element';
 import { Button } from '@wordpress/components';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useMergeRefs, useRefEffect } from '@wordpress/compose';
+import { useMergeRefs } from '@wordpress/compose';
 import { arrowLeft } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
@@ -80,14 +82,25 @@ function MaybeIframe( {
 }
 
 export default function VisualEditor( { styles } ) {
-	const { deviceType, isTemplateMode } = useSelect( ( select ) => {
+	const {
+		deviceType,
+		isTemplateMode,
+		wrapperBlockName,
+		wrapperUniqueId,
+	} = useSelect( ( select ) => {
 		const {
 			isEditingTemplate,
 			__experimentalGetPreviewDeviceType,
 		} = select( editPostStore );
+		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isTemplateMode: isEditingTemplate(),
+			wrapperBlockName:
+				getCurrentPostType() === 'wp_block'
+					? 'core/block'
+					: 'core/post-content',
+			wrapperUniqueId: getCurrentPostId(),
 		};
 	}, [] );
 	const hasMetaBoxes = useSelect(
@@ -114,7 +127,7 @@ export default function VisualEditor( { styles } ) {
 		borderBottom: 0,
 	};
 	const resizedCanvasStyles = useResizeCanvas( deviceType, isTemplateMode );
-	const defaultLayout = useEditorFeature( 'layout' );
+	const defaultLayout = useSetting( 'layout' );
 	const { contentSize, wideSize } = defaultLayout || {};
 	const alignments =
 		contentSize || wideSize
@@ -148,18 +161,10 @@ export default function VisualEditor( { styles } ) {
 
 	const blockSelectionClearerRef = useBlockSelectionClearer( true );
 
-	// Allow scrolling "through" popovers over the canvas. This is only called
-	// for as long as the pointer is over a popover. Do not use React events
-	// because it will bubble through portals.
-	const toolWrapperRef = useRefEffect( ( node ) => {
-		function onWheel( { deltaX, deltaY } ) {
-			ref.current.scrollBy( deltaX, deltaY );
-		}
-		node.addEventListener( 'wheel', onWheel );
-		return () => {
-			node.removeEventListener( 'wheel', onWheel );
-		};
-	}, [] );
+	const [ , RecursionProvider ] = useNoRecursiveRenders(
+		wrapperUniqueId,
+		wrapperBlockName
+	);
 
 	return (
 		<motion.div
@@ -191,11 +196,10 @@ export default function VisualEditor( { styles } ) {
 				</Button>
 			) }
 			<motion.div
-				ref={ toolWrapperRef }
 				animate={ animatedStyles }
 				initial={ desktopCanvasStyles }
 			>
-				<BlockTools>
+				<BlockTools __unstableContentRef={ ref }>
 					<MaybeIframe
 						isTemplateMode={ isTemplateMode }
 						contentRef={ contentRef }
@@ -214,19 +218,21 @@ export default function VisualEditor( { styles } ) {
 											<PostTitle />
 										</div>
 									) }
-									<BlockList
-										__experimentalLayout={
-											themeSupportsLayout
-												? {
-														type: 'default',
-														// Find a way to inject this in the support flag code (hooks).
-														alignments: themeSupportsLayout
-															? alignments
-															: undefined,
-												  }
-												: undefined
-										}
-									/>
+									<RecursionProvider>
+										<BlockList
+											__experimentalLayout={
+												themeSupportsLayout
+													? {
+															type: 'default',
+															// Find a way to inject this in the support flag code (hooks).
+															alignments: themeSupportsLayout
+																? alignments
+																: undefined,
+													  }
+													: undefined
+											}
+										/>
+									</RecursionProvider>
 								</WritingFlow>
 							</motion.div>
 						</AnimatePresence>

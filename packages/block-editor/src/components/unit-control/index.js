@@ -6,7 +6,7 @@ import { __experimentalUnitControl as BaseUnitControl } from '@wordpress/compone
 /**
  * Internal dependencies
  */
-import useEditorFeature from '../use-editor-feature';
+import useSetting from '../use-setting';
 
 export default function UnitControl( { units: unitsProp, ...props } ) {
 	const units = useCustomUnits( unitsProp );
@@ -36,7 +36,7 @@ function filterUnitsWithSettings( settings = [], units = [] ) {
  * @return {Array} Filtered units based on settings.
  */
 export function useCustomUnits( units ) {
-	const availableUnits = useEditorFeature( 'spacing.units' );
+	const availableUnits = useSetting( 'spacing.units' );
 	const usedUnits = filterUnitsWithSettings(
 		! availableUnits ? [] : availableUnits,
 		units
