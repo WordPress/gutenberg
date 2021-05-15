@@ -2,14 +2,18 @@
  * WordPress dependencies
  */
 import { Button } from '@wordpress/components';
-import { formatStrikethrough, formatUnderline, none } from '@wordpress/icons';
+import {
+	formatStrikethrough,
+	formatUnderline,
+	smallDash,
+} from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 const TEXT_DECORATIONS = [
 	{
-		name: __( 'None' ),
-		value: 'none',
-		icon: none,
+		name: __( 'Default' ),
+		value: undefined,
+		icon: smallDash,
 	},
 	{
 		name: __( 'Underline' ),
@@ -46,7 +50,7 @@ export default function TextDecorationControl( { value, onChange } ) {
 							onClick={ () =>
 								onChange(
 									textDecoration.value === value
-										? undefined
+										? 'none'
 										: textDecoration.value
 								)
 							}
