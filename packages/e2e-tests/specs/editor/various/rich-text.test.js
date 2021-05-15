@@ -404,11 +404,17 @@ describe( 'RichText', () => {
 		await page.keyboard.press( 'Tab' );
 		await pressKeyWithModifier( 'primary', 'a' );
 
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
 		// Copy the colored text.
 		await pressKeyWithModifier( 'primary', 'c' );
 
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+
 		// Collapsed the selection to the end.
 		await page.keyboard.press( 'ArrowRight' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
 
 		// Create a new paragraph.
 		await page.keyboard.press( 'Enter' );

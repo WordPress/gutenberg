@@ -97,6 +97,24 @@ exports[`RichText should preserve internal formatting 1`] = `
 exports[`RichText should preserve internal formatting 2`] = `
 "<!-- wp:paragraph -->
 <p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should preserve internal formatting 3`] = `
+"<!-- wp:paragraph -->
+<p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should preserve internal formatting 4`] = `
+"<!-- wp:paragraph -->
+<p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should preserve internal formatting 5`] = `
+"<!-- wp:paragraph -->
+<p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:paragraph -->
@@ -104,7 +122,7 @@ exports[`RichText should preserve internal formatting 2`] = `
 <!-- /wp:paragraph -->"
 `;
 
-exports[`RichText should preserve internal formatting 3`] = `
+exports[`RichText should preserve internal formatting 6`] = `
 "<!-- wp:paragraph -->
 <p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
 <!-- /wp:paragraph -->
