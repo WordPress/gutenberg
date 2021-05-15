@@ -121,7 +121,7 @@ function Items( {
 	return (
 		<LayoutProvider value={ layout }>
 			<IntersectionObserver.Provider value={ intersectionObserver }>
-				{ order.map( ( clientId, index ) => (
+				{ order.map( ( clientId ) => (
 					<AsyncModeProvider
 						key={ clientId }
 						value={
@@ -134,10 +134,6 @@ function Items( {
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
-							// This prop is explicitely computed and passed down
-							// to avoid being impacted by the async mode
-							// otherwise there might be a small delay to trigger the animation.
-							index={ index }
 						/>
 					</AsyncModeProvider>
 				) ) }
