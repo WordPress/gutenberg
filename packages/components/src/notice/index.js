@@ -88,36 +88,38 @@ function Notice( {
 		<div className={ classes }>
 			<div className="components-notice__content">
 				{ children }
-				{ actions.map(
-					(
-						{
-							className: buttonCustomClasses,
-							label,
-							isPrimary,
-							noDefaultClasses = false,
-							onClick,
-							url,
-						},
-						index
-					) => {
-						return (
-							<Button
-								key={ index }
-								href={ url }
-								isPrimary={ isPrimary }
-								isSecondary={ ! noDefaultClasses && ! url }
-								isLink={ ! noDefaultClasses && !! url }
-								onClick={ url ? undefined : onClick }
-								className={ classnames(
-									'components-notice__action',
-									buttonCustomClasses
-								) }
-							>
-								{ label }
-							</Button>
-						);
-					}
-				) }
+				<div className="components-notice__actions">
+					{ actions.map(
+						(
+							{
+								className: buttonCustomClasses,
+								label,
+								isPrimary,
+								noDefaultClasses = false,
+								onClick,
+								url,
+							},
+							index
+						) => {
+							return (
+								<Button
+									key={ index }
+									href={ url }
+									isPrimary={ isPrimary }
+									isSecondary={ ! noDefaultClasses && ! url }
+									isLink={ ! noDefaultClasses && !! url }
+									onClick={ url ? undefined : onClick }
+									className={ classnames(
+										'components-notice__action',
+										buttonCustomClasses
+									) }
+								>
+									{ label }
+								</Button>
+							);
+						}
+					) }
+				</div>
 			</div>
 			{ isDismissible && (
 				<Button
