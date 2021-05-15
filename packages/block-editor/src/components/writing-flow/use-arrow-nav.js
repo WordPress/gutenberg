@@ -49,9 +49,9 @@ export function isNavigationCandidate( element, keyCode, hasModifier ) {
 }
 
 /**
- * Returns the optimal tab target from the given focused element in the
- * desired direction. A preference is made toward text fields, falling back
- * to the block focus stop if no other candidates exist for the block.
+ * Returns the optimal tab target from the given focused element in the desired
+ * direction. A preference is made toward text fields, falling back to the block
+ * focus stop if no other candidates exist for the block.
  *
  * @param {Element} target           Currently focused text field.
  * @param {boolean} isReverse        True if considering as the first field.
@@ -68,17 +68,17 @@ export function getClosestTabbable(
 	containerElement,
 	onlyVertical
 ) {
-	// Since the current focus target is not guaranteed to be a text field,
-	// find all focusables. Tabbability is considered later.
+	// Since the current focus target is not guaranteed to be a text field, find
+	// all focusables. Tabbability is considered later.
 	let focusableNodes = focus.focusable.find( containerElement );
 
 	if ( isReverse ) {
 		focusableNodes = reverse( focusableNodes );
 	}
 
-	// Consider as candidates those focusables after the current target.
-	// It's assumed this can only be reached if the target is focusable
-	// (on its keydown event), so no need to verify it exists in the set.
+	// Consider as candidates those focusables after the current target. It's
+	// assumed this can only be reached if the target is focusable (on its
+	// keydown event), so no need to verify it exists in the set.
 	focusableNodes = focusableNodes.slice(
 		focusableNodes.indexOf( target ) + 1
 	);
@@ -131,9 +131,9 @@ export default function useArrowNav() {
 	} = useSelect( blockEditorStore );
 	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
 	return useRefEffect( ( node ) => {
-		// Here a DOMRect is stored while moving the caret vertically so vertical
-		// position of the start position can be restored. This is to recreate
-		// browser behaviour across blocks.
+		// Here a DOMRect is stored while moving the caret vertically so
+		// vertical position of the start position can be restored. This is to
+		// recreate browser behaviour across blocks.
 		let verticalRect;
 
 		function onMouseDown() {
@@ -180,9 +180,9 @@ export default function useArrowNav() {
 
 		/**
 		 * Returns true if the given target field is the last in its block which
-		 * can be considered for tab transition. For example, in a block with two
-		 * text fields, this would return true when reversing from the first of the
-		 * two fields, but false when reversing from the second.
+		 * can be considered for tab transition. For example, in a block with
+		 * two text fields, this would return true when reversing from the first
+		 * of the two fields, but false when reversing from the second.
 		 *
 		 * @param {Element} target    Currently focused text field.
 		 * @param {boolean} isReverse True if considering as the first field.
@@ -228,19 +228,20 @@ export default function useArrowNav() {
 			}
 
 			// When presing any key other than up or down, the initial vertical
-			// position must ALWAYS be reset. The vertical position is saved so it
-			// can be restored as well as possible on sebsequent vertical arrow key
-			// presses. It may not always be possible to restore the exact same
-			// position (such as at an empty line), so it wouldn't be good to
-			// compute the position right before any vertical arrow key press.
+			// position must ALWAYS be reset. The vertical position is saved so
+			// it can be restored as well as possible on sebsequent vertical
+			// arrow key presses. It may not always be possible to restore the
+			// exact same position (such as at an empty line), so it wouldn't be
+			// good to compute the position right before any vertical arrow key
+			// press.
 			if ( ! isVertical ) {
 				verticalRect = null;
 			} else if ( ! verticalRect ) {
 				verticalRect = computeCaretRect( defaultView );
 			}
 
-			// Abort if navigation has already been handled (e.g. RichText inline
-			// boundaries).
+			// Abort if navigation has already been handled (e.g. RichText
+			// inline boundaries).
 			if ( event.defaultPrevented ) {
 				return;
 			}
@@ -249,14 +250,14 @@ export default function useArrowNav() {
 				return;
 			}
 
-			// Abort if our current target is not a candidate for navigation (e.g.
-			// preserve native input behaviors).
+			// Abort if our current target is not a candidate for navigation
+			// (e.g. preserve native input behaviors).
 			if ( ! isNavigationCandidate( target, keyCode, hasModifier ) ) {
 				return;
 			}
 
-			// In the case of RTL scripts, right means previous and left means next,
-			// which is the exact reverse of LTR.
+			// In the case of RTL scripts, right means previous and left means
+			// next, which is the exact reverse of LTR.
 			const isReverseDir = isRTL( target ) ? ! isReverse : isReverse;
 			const { keepCaretInsideBlock } = getSettings();
 			const selectedBlockClientId = getSelectedBlockClientId();
@@ -277,8 +278,8 @@ export default function useArrowNav() {
 					isTabbableEdge( target, isReverse ) &&
 					isNavEdge( target, isReverse )
 				) {
-					// Shift key is down, and there is multi selection or we're at
-					// the end of the current block.
+					// Shift key is down, and there is multi selection or we're
+					// at the end of the current block.
 					expandSelection( isReverse );
 					event.preventDefault();
 				}
