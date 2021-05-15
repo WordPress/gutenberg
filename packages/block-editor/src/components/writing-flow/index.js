@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { find, reverse } from 'lodash';
+import { find, reverse, first, last } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -14,9 +14,10 @@ import {
 	isVerticalEdge,
 	placeCaretAtHorizontalEdge,
 	placeCaretAtVerticalEdge,
+	isEntirelySelected,
 	isRTL,
 } from '@wordpress/dom';
-import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import { UP, DOWN, LEFT, RIGHT, isKeyboardEvent } from '@wordpress/keycodes';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
@@ -27,7 +28,6 @@ import { useMergeRefs } from '@wordpress/compose';
 import { isInSameBlock } from '../../utils/dom';
 import useMultiSelection from './use-multi-selection';
 import useTabNav from './use-tab-nav';
-import useSelectAll from './use-select-all';
 import { store as blockEditorStore } from '../../store';
 
 /**
@@ -131,6 +131,7 @@ export function getClosestTabbable(
  */
 export default function WritingFlow( { children } ) {
 	const container = useRef();
+	const entirelySelected = useRef();
 
 	// Here a DOMRect is stored while moving the caret vertically so vertical
 	// position of the start position can be restored. This is to recreate
@@ -149,6 +150,7 @@ export default function WritingFlow( { children } ) {
 		getNextBlockClientId,
 		getFirstMultiSelectedBlockClientId,
 		getLastMultiSelectedBlockClientId,
+		getBlockOrder,
 		getSettings,
 	} = useSelect( blockEditorStore );
 	const { multiSelect, selectBlock } = useDispatch( blockEditorStore );
@@ -263,7 +265,36 @@ export default function WritingFlow( { children } ) {
 			verticalRect.current = computeCaretRect( defaultView );
 		}
 
+		// This logic inside this condition needs to be checked before
+		// the check for event.nativeEvent.defaultPrevented.
+		// The logic handles meta+a keypress and this event is default prevented
+		// by RichText.
 		if ( ! isNav ) {
+			// Set immediately before the meta+a combination can be pressed.
+			if ( isKeyboardEvent.primary( event ) ) {
+				entirelySelected.current = isEntirelySelected( target );
+			}
+
+			if ( isKeyboardEvent.primary( event, 'a' ) ) {
+				// When the target is contentEditable, selection will already
+				// have been set by the browser earlier in this call stack. We
+				// need check the previous result, otherwise all blocks will be
+				// selected right away.
+				if (
+					target.isContentEditable
+						? entirelySelected.current
+						: isEntirelySelected( target )
+				) {
+					const blocks = getBlockOrder();
+					multiSelect( first( blocks ), last( blocks ) );
+					event.preventDefault();
+				}
+
+				// After pressing primary + A we can assume isEntirelySelected is true.
+				// Calling right away isEntirelySelected after primary + A may still return false on some browsers.
+				entirelySelected.current = true;
+			}
+
 			return;
 		}
 
@@ -351,12 +382,7 @@ export default function WritingFlow( { children } ) {
 		<>
 			{ before }
 			<div
-				ref={ useMergeRefs( [
-					ref,
-					container,
-					useMultiSelection(),
-					useSelectAll(),
-				] ) }
+				ref={ useMergeRefs( [ ref, container, useMultiSelection() ] ) }
 				className="block-editor-writing-flow"
 				onKeyDown={ onKeyDown }
 				onMouseDown={ onMouseDown }
