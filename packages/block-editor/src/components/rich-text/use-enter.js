@@ -78,7 +78,7 @@ export function useEnter( props ) {
 					}
 				} else if ( canSplit && isEmptyLine( _value ) ) {
 					splitValue( {
-						record: _value,
+						value: _value,
 						onReplace,
 						onSplit,
 						onSplitMiddle,
@@ -100,7 +100,7 @@ export function useEnter( props ) {
 					onSplitAtEnd();
 				} else if ( canSplit ) {
 					splitValue( {
-						record: _value,
+						value: _value,
 						onReplace,
 						onSplit,
 						onSplitMiddle,

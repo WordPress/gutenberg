@@ -10,7 +10,7 @@ import { isEmpty, split, toHTMLString } from '@wordpress/rich-text';
  * instance.
  */
 export function splitValue( {
-	record,
+	value,
 	pastedBlocks = [],
 	onReplace,
 	onSplit,
@@ -22,7 +22,7 @@ export function splitValue( {
 	}
 
 	const blocks = [];
-	const [ before, after ] = split( record );
+	const [ before, after ] = split( value );
 	const hasPastedBlocks = pastedBlocks.length > 0;
 	let lastPastedBlockIndex = -1;
 
