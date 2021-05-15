@@ -159,7 +159,7 @@ Modal.defaultProps = {
 	bodyOpenClassName: 'modal-open',
 	role: 'dialog',
 	title: null,
-	focusOnMount: true,
+	focusOnMount: 'firstElement',
 	shouldCloseOnEsc: true,
 	shouldCloseOnClickOutside: true,
 	isDismissible: true,

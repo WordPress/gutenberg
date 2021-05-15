@@ -78,6 +78,46 @@ class ModalFrame extends Component {
 	constructor() {
 		super( ...arguments );
 		this.handleFocusOutside = this.handleFocusOutside.bind( this );
+<<<<<<< HEAD
+=======
+		this.focusFirstTabbable = this.focusFirstTabbable.bind( this );
+		this.focusOnMount = this.focusOnMount.bind( this );
+	}
+
+	/**
+	 * Focuses the container or first tabbable element based on props.focusOnMount.
+	 */
+	componentDidMount() {
+		// Focus on mount
+		if ( this.props.focusOnMount ) {
+			this.focusOnMount();
+		}
+	}
+
+	/**
+	 * Handle focus on mount.
+	 */
+
+	focusOnMount() {
+		if ( this.props.focusOnMount === 'firstElement' ) {
+			this.focusFirstTabbable();
+		} else {
+			this.containerRef.current.focus();
+		}			
+	}
+
+	/**
+	 * Focuses the first tabbable element.
+	 */
+	focusFirstTabbable() {
+		const tabbables = focus.tabbable.find( this.containerRef.current );
+		if ( tabbables.length ) {
+			tabbables[ 0 ].focus();
+		} else {
+			this.containerRef.current.focus();
+		}
+		return true;
+>>>>>>> 93e0cff0be (Allow the focusOnMount prop to be either boolean or string)
 	}
 
 	/**
