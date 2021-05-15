@@ -17,6 +17,7 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockBreadcrumb,
 	__experimentalLibrary as Library,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import { Button, ScrollLock, Popover } from '@wordpress/components';
 import {
@@ -69,6 +70,8 @@ const interfaceLabels = {
 function Layout( { styles } ) {
 	const isMobileViewport = useViewportMatch( 'medium', '<' );
 	const isHugeViewport = useViewportMatch( 'huge', '>=' );
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const {
 		openGeneralSidebar,
 		closeGeneralSidebar,
@@ -172,7 +175,10 @@ function Layout( { styles } ) {
 		[ entitiesSavedStatesCallback ]
 	);
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
+		onClose: () => {
+			setIsInserterOpened( false );
+			selectBlock( getSelectedBlockClientId(), 0 );
+		},
 	} );
 
 	return (

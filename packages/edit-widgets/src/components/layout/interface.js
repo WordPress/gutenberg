@@ -7,7 +7,10 @@ import {
 	useViewportMatch,
 } from '@wordpress/compose';
 import { close } from '@wordpress/icons';
-import { __experimentalLibrary as Library } from '@wordpress/block-editor';
+import {
+	__experimentalLibrary as Library,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { useEffect } from '@wordpress/element';
 import { useDispatch, useSelect } from '@wordpress/data';
 import {
@@ -41,7 +44,8 @@ function Interface( { blockEditorSettings } ) {
 		editWidgetsStore
 	);
 	const { rootClientId, insertionIndex } = useWidgetLibraryInsertionPoint();
-
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const { hasSidebarEnabled, isInserterOpened } = useSelect(
 		( select ) => ( {
 			hasSidebarEnabled: !! select(
@@ -66,7 +70,10 @@ function Interface( { blockEditorSettings } ) {
 	}, [ isInserterOpened, isHugeViewport ] );
 
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
+		onClose: () => {
+			setIsInserterOpened( false );
+			selectBlock( getSelectedBlockClientId(), 0 );
+		},
 	} );
 
 	return (

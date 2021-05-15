@@ -59,23 +59,6 @@ export async function toggleGlobalBlockInserter() {
 }
 
 /**
- * Moves focus to the selected block.
- */
-async function focusSelectedBlock() {
-	// Ideally there shouuld be a UI way to do this. (Focus the selected block)
-	await page.evaluate( () => {
-		wp.data
-			.dispatch( 'core/block-editor' )
-			.selectBlock(
-				wp.data
-					.select( 'core/block-editor' )
-					.getSelectedBlockClientId(),
-				0
-			);
-	} );
-}
-
-/**
  * Retrieves the document container by css class and checks to make sure the document's active element is within it
  */
 async function waitForInserterCloseAndContentFocus() {
@@ -156,7 +139,7 @@ export async function insertBlock( searchTerm ) {
 		`//button//span[contains(text(), '${ searchTerm }')]`
 	);
 	await insertButton.click();
-	await focusSelectedBlock();
+	await page.keyboard.press( 'Escape' );
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
 }
@@ -173,7 +156,7 @@ export async function insertPattern( searchTerm ) {
 		`//div[@role = 'option']//div[contains(text(), '${ searchTerm }')]`
 	);
 	await insertButton.click();
-	await focusSelectedBlock();
+	await page.keyboard.press( 'Escape' );
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
 }
@@ -191,7 +174,7 @@ export async function insertReusableBlock( searchTerm ) {
 		`//button//span[contains(text(), '${ searchTerm }')]`
 	);
 	await insertButton.click();
-	await focusSelectedBlock();
+	await page.keyboard.press( 'Escape' );
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
 	// We should wait until the block is loaded
@@ -221,7 +204,7 @@ export async function insertBlockDirectoryBlock( searchTerm ) {
 				'.block-directory-downloadable-blocks-list button:first-child.is-busy'
 			)
 	);
-	await focusSelectedBlock();
+	await page.keyboard.press( 'Escape' );
 	// We should wait until the inserter closes and the focus moves to the content.
 	await waitForInserterCloseAndContentFocus();
 }
