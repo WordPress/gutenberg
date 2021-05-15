@@ -9,43 +9,27 @@ import classnames from 'classnames';
 import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationBackButton as NavigationBackButton,
-	__experimentalNavigationGroup as NavigationGroup,
-	__experimentalNavigationItem as NavigationItem,
-	__experimentalNavigationMenu as NavigationMenu,
 } from '@wordpress/components';
-import { usePrevious } from '@wordpress/compose';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState, useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { ESCAPE } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
  */
-import ContentPagesMenu from './menus/content-pages';
-import ContentCategoriesMenu from './menus/content-categories';
-import ContentPostsMenu from './menus/content-posts';
-import TemplatesMenu from './menus/templates';
-import TemplatePartsMenu from './menus/template-parts';
+import SiteMenu from './menus';
 import MainDashboardButton from '../../main-dashboard-button';
 import { store as editSiteStore } from '../../../store';
-import {
-	MENU_ROOT,
-	MENU_TEMPLATE_PARTS,
-	MENU_TEMPLATES,
-	MENU_CONTENT_CATEGORIES,
-	MENU_CONTENT_PAGES,
-	MENU_CONTENT_POSTS,
-} from './constants';
+import { MENU_ROOT } from './constants';
 
 const NavigationPanel = ( { isOpen } ) => {
-	const [ contentActiveMenu, setContentActiveMenu ] = useState( MENU_ROOT );
 	const {
 		page: { context: { postType, postId } = {} } = {},
 		editedPostId,
 		editedPostType,
-		templatesActiveMenu,
+		activeMenu,
 		siteTitle,
 	} = useSelect( ( select ) => {
 		const {
@@ -63,23 +47,23 @@ const NavigationPanel = ( { isOpen } ) => {
 			page: getPage(),
 			editedPostId: getEditedPostId(),
 			editedPostType: getEditedPostType(),
-			templatesActiveMenu: getNavigationPanelActiveMenu(),
+			activeMenu: getNavigationPanelActiveMenu(),
 			siteTitle: siteData.name,
 		};
 	}, [] );
 
-	const { setNavigationPanelActiveMenu } = useDispatch( editSiteStore );
+	const {
+		setNavigationPanelActiveMenu: setActive,
+		setIsNavigationPanelOpened,
+	} = useDispatch( editSiteStore );
 
-	const isTemplateActiveRoot = templatesActiveMenu === MENU_ROOT;
-	const isContentActiveRoot = contentActiveMenu === MENU_ROOT;
-	let activeMenu;
 	let activeItem;
-	if ( isTemplateActiveRoot && isContentActiveRoot ) {
-		activeMenu = MENU_ROOT;
-	} else {
-		[ activeMenu, activeItem ] = isTemplateActiveRoot
-			? [ contentActiveMenu, `${ postType }-${ postId }` ]
-			: [ templatesActiveMenu, `${ editedPostType }-${ editedPostId }` ];
+	if ( activeMenu !== MENU_ROOT ) {
+		if ( activeMenu.startsWith( 'content' ) ) {
+			activeItem = `${ postType }-${ postId }`;
+		} else {
+			activeItem = `${ editedPostType }-${ editedPostId }`;
+		}
 	}
 
 	// Ensures focus is moved to the panel area when it is activated
@@ -89,18 +73,7 @@ const NavigationPanel = ( { isOpen } ) => {
 		if ( isOpen ) {
 			panelRef.current.focus();
 		}
-	}, [ templatesActiveMenu ] );
-
-	// Resets the content menu to its root whenever the navigation opens to avoid
-	// having it stuck on a sub-menu, interfering with the normal navigation behavior.
-	const prevIsOpen = usePrevious( isOpen );
-	useEffect( () => {
-		if ( contentActiveMenu !== MENU_ROOT && isOpen && ! prevIsOpen ) {
-			setContentActiveMenu( MENU_ROOT );
-		}
-	}, [ contentActiveMenu, isOpen ] );
-
-	const { setIsNavigationPanelOpened } = useDispatch( editSiteStore );
+	}, [ activeMenu, isOpen ] );
 
 	const closeOnEscape = ( event ) => {
 		if ( event.keyCode === ESCAPE ) {
@@ -125,21 +98,11 @@ const NavigationPanel = ( { isOpen } ) => {
 						{ siteTitle }
 					</div>
 				</div>
-
 				<div className="edit-site-navigation-panel__scroll-container">
 					<Navigation
 						activeItem={ activeItem }
 						activeMenu={ activeMenu }
-						onActivateMenu={ ( menu ) => {
-							if ( menu === MENU_ROOT ) {
-								setNavigationPanelActiveMenu( menu );
-								setContentActiveMenu( menu );
-							} else if ( menu.startsWith( MENU_TEMPLATES ) ) {
-								setNavigationPanelActiveMenu( menu );
-							} else {
-								setContentActiveMenu( menu );
-							}
-						} }
+						onActivateMenu={ setActive }
 					>
 						{ activeMenu === MENU_ROOT && (
 							<MainDashboardButton.Slot>
@@ -150,43 +113,7 @@ const NavigationPanel = ( { isOpen } ) => {
 								/>
 							</MainDashboardButton.Slot>
 						) }
-
-						<NavigationMenu>
-							<NavigationGroup title={ __( 'Theme' ) }>
-								<NavigationItem
-									title={ __( 'Templates' ) }
-									navigateToMenu={ MENU_TEMPLATES }
-								/>
-								<NavigationItem
-									title={ __( 'Template Parts' ) }
-									navigateToMenu={ MENU_TEMPLATE_PARTS }
-								/>
-							</NavigationGroup>
-
-							<NavigationGroup title={ __( 'Content' ) }>
-								<NavigationItem
-									title={ __( 'Pages' ) }
-									navigateToMenu={ MENU_CONTENT_PAGES }
-								/>
-
-								<NavigationItem
-									title={ __( 'Categories' ) }
-									navigateToMenu={ MENU_CONTENT_CATEGORIES }
-								/>
-
-								<NavigationItem
-									title={ __( 'Posts' ) }
-									navigateToMenu={ MENU_CONTENT_POSTS }
-								/>
-							</NavigationGroup>
-						</NavigationMenu>
-
-						<TemplatesMenu />
-						<TemplatePartsMenu />
-
-						<ContentPagesMenu />
-						<ContentCategoriesMenu />
-						<ContentPostsMenu />
+						<SiteMenu />
 					</Navigation>
 				</div>
 			</div>
