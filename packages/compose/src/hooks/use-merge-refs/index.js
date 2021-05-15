@@ -30,7 +30,7 @@ function assignRef( ref, value ) {
 export default function useMergeRefs( refs ) {
 	const element = useRef();
 	const didElementChange = useRef( false );
-	const previousRefs = useRef();
+	const previousRefs = useRef( [] );
 	const currentRefs = useRef( refs );
 
 	// Update on render before the ref callback is called, so the ref callback
