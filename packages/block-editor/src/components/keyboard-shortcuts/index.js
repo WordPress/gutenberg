@@ -20,30 +20,23 @@ import { store as blockEditorStore } from '../../store';
 
 function KeyboardShortcuts() {
 	// Shortcuts Logic
-	const { clientIds, rootBlocksClientIds, rootClientId } = useSelect(
-		( select ) => {
-			const {
-				getSelectedBlockClientIds,
-				getBlockOrder,
-				getBlockRootClientId,
-			} = select( blockEditorStore );
-			const selectedClientIds = getSelectedBlockClientIds();
-			const [ firstClientId ] = selectedClientIds;
-			return {
-				clientIds: selectedClientIds,
-				rootBlocksClientIds: getBlockOrder(),
-				rootClientId: getBlockRootClientId( firstClientId ),
-			};
-		},
-		[]
-	);
+	const { clientIds, rootClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientIds, getBlockRootClientId } = select(
+			blockEditorStore
+		);
+		const selectedClientIds = getSelectedBlockClientIds();
+		const [ firstClientId ] = selectedClientIds;
+		return {
+			clientIds: selectedClientIds,
+			rootClientId: getBlockRootClientId( firstClientId ),
+		};
+	}, [] );
 
 	const {
 		duplicateBlocks,
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		multiSelect,
 		clearSelectedBlock,
 		moveBlocksUp,
 		moveBlocksDown,
@@ -143,20 +136,6 @@ function KeyboardShortcuts() {
 	);
 
 	useShortcut(
-		'core/block-editor/select-all',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				multiSelect(
-					first( rootBlocksClientIds ),
-					last( rootBlocksClientIds )
-				);
-			},
-			[ rootBlocksClientIds, multiSelect ]
-		)
-	);
-
-	useShortcut(
 		'core/block-editor/unselect',
 		useCallback(
 			( event ) => {
@@ -234,18 +213,6 @@ function KeyboardShortcutsRegister() {
 					character: 'backspace',
 				},
 			],
-		} );
-
-		registerShortcut( {
-			name: 'core/block-editor/select-all',
-			category: 'selection',
-			description: __(
-				'Select all text when typing. Press again to select all blocks.'
-			),
-			keyCombination: {
-				modifier: 'primary',
-				character: 'a',
-			},
 		} );
 
 		registerShortcut( {

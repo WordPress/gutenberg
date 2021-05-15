@@ -17,23 +17,47 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 
 export default function useSelectAll() {
-	const { getBlockOrder } = useSelect( blockEditorStore );
+	const {
+		getBlockOrder,
+		getSelectedBlockClientIds,
+		getBlockRootClientId,
+	} = useSelect( blockEditorStore );
 	const { multiSelect } = useDispatch( blockEditorStore );
 
 	return useRefEffect( ( node ) => {
 		function onKeyDown( event ) {
 			if (
-				isKeyboardEvent.primary( event, 'a' ) &&
-				isEntirelySelected( event.target )
+				! isKeyboardEvent.primary( event, 'a' ) ||
+				! isEntirelySelected( event.target )
 			) {
-				const blocks = getBlockOrder();
-				const firstClientId = first( blocks );
-				const lastClientId = last( blocks );
-				if ( firstClientId !== lastClientId ) {
-					multiSelect( firstClientId, lastClientId );
-					event.preventDefault();
-				}
+				return;
 			}
+
+			const selectedClientIds = getSelectedBlockClientIds();
+
+			if ( ! selectedClientIds.length ) {
+				return;
+			}
+
+			const [ firstSelectedClientId ] = selectedClientIds;
+			const rootClientId = getBlockRootClientId( firstSelectedClientId );
+			let blockClientIds = getBlockOrder( rootClientId );
+
+			if ( selectedClientIds.length === blockClientIds.length ) {
+				blockClientIds = getBlockOrder(
+					getBlockRootClientId( rootClientId )
+				);
+			}
+
+			const firstClientId = first( blockClientIds );
+			const lastClientId = last( blockClientIds );
+
+			if ( firstClientId === lastClientId ) {
+				return;
+			}
+
+			multiSelect( firstClientId, lastClientId );
+			event.preventDefault();
 		}
 
 		node.addEventListener( 'keydown', onKeyDown );
