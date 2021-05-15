@@ -33,8 +33,8 @@ const CreateNewPostLink = ( {
  */
 const queryTopInspectorControls = createHigherOrderComponent(
 	( BlockEdit ) => ( props ) => {
-		const { name } = props;
-		if ( name !== 'core/query' ) {
+		const { name, isSelected } = props;
+		if ( name !== 'core/query' || ! isSelected ) {
 			return <BlockEdit key="edit" { ...props } />;
 		}
 
