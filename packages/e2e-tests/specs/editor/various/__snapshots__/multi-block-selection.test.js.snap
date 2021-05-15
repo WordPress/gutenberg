@@ -70,6 +70,16 @@ exports[`Multi-block selection should cut and paste 2`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Multi-block selection should not multi select single block 1`] = `
+"<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Multi-block selection should only trigger multi-selection when at the end 1`] = `
 "<!-- wp:paragraph -->
 <p>1.</p>
