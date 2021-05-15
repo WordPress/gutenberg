@@ -64,19 +64,7 @@ export async function toggleGlobalBlockInserter() {
 async function focusSelectedBlock() {
 	// Wait for the block to be inserted and selected.
 	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
-	await canvas().focus( '.is-selected' );
-}
-
-/**
- * Retrieves the document container by css class and checks to make sure the document's active element is within it
- */
-async function waitForInserterCloseAndContentFocus() {
-	await canvas().waitForFunction(
-		() =>
-			document.activeElement.closest(
-				'.block-editor-block-list__layout'
-			) !== null
-	);
+	await canvas().click( '.is-selected' );
 }
 
 /**
@@ -149,8 +137,6 @@ export async function insertBlock( searchTerm ) {
 	);
 	await insertButton.click();
 	await focusSelectedBlock();
-	// We should wait until the inserter closes and the focus moves to the content.
-	await waitForInserterCloseAndContentFocus();
 }
 
 /**
@@ -166,8 +152,6 @@ export async function insertPattern( searchTerm ) {
 	);
 	await insertButton.click();
 	await focusSelectedBlock();
-	// We should wait until the inserter closes and the focus moves to the content.
-	await waitForInserterCloseAndContentFocus();
 }
 
 /**
@@ -184,8 +168,6 @@ export async function insertReusableBlock( searchTerm ) {
 	);
 	await insertButton.click();
 	await focusSelectedBlock();
-	// We should wait until the inserter closes and the focus moves to the content.
-	await waitForInserterCloseAndContentFocus();
 	// We should wait until the block is loaded
 	await page.waitForXPath(
 		'//*[@class="block-library-block__reusable-block-container"]'
@@ -214,6 +196,4 @@ export async function insertBlockDirectoryBlock( searchTerm ) {
 			)
 	);
 	await focusSelectedBlock();
-	// We should wait until the inserter closes and the focus moves to the content.
-	await waitForInserterCloseAndContentFocus();
 }
