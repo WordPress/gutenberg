@@ -540,7 +540,9 @@ export class ImageEdit extends Component {
 				<PanelBody title={ __( 'Link Settings' ) }>
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
-				{ androidOnly && this.getSetFeaturedButton( isFeaturedImage ) }
+				{ androidOnly &&
+					typeof attributes.id !== 'undefined' &&
+					this.getSetFeaturedButton( isFeaturedImage ) }
 			</InspectorControls>
 		);
 
