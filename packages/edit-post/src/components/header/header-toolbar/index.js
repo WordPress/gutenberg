@@ -23,6 +23,7 @@ import { useRef } from '@wordpress/element';
  * Internal dependencies
  */
 import TemplateTitle from '../template-title';
+import PostTitle from '../post-title';
 import { store as editPostStore } from '../../../store';
 
 function HeaderToolbar() {
@@ -33,6 +34,7 @@ function HeaderToolbar() {
 		isInserterOpened,
 		isTextModeEnabled,
 		showIconLabels,
+		isTemplateMode,
 	} = useSelect( ( select ) => {
 		const {
 			hasInserterItems,
@@ -54,6 +56,7 @@ function HeaderToolbar() {
 			showIconLabels: select( editPostStore ).isFeatureActive(
 				'showIconLabels'
 			),
+			isTemplateMode: select( editPostStore ).isEditingTemplate(),
 		};
 	}, [] );
 	const isLargeViewport = useViewportMatch( 'medium' );
@@ -140,7 +143,9 @@ function HeaderToolbar() {
 				) }
 			</div>
 
-			<TemplateTitle />
+			<div className="edit-post-header-toolbar__middle">
+				{ isTemplateMode ? <TemplateTitle /> : <PostTitle /> }
+			</div>
 		</NavigableToolbar>
 	);
 }
