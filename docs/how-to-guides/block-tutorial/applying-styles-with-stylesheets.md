@@ -22,7 +22,7 @@ registerBlockType( 'gutenberg-examples/example-02-stylesheets', {
 
 	example: {},
 
-	edit() {
+	edit(props) {
 		const blockProps = useBlockProps();
 
 		return (
