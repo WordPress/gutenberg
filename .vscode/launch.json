@@ -9,6 +9,23 @@
 			"pathMappings": {
 				"/var/www/html/wp-content/plugins/gutenberg": "${workspaceRoot}/"
 			}
+		},
+		{
+			"type": "node",
+			"request": "launch",
+			"name": "Debug current e2e test",
+			"program": "${workspaceRoot}/node_modules/@wordpress/scripts/bin/wp-scripts.js",
+			"args": [
+				"test-e2e",
+				"--config=${workspaceRoot}/packages/e2e-tests/jest.config.js",
+				"--verbose=true",
+				"--runInBand",
+				"--watch",
+				"${file}"
+			],
+			"console": "integratedTerminal",
+			"internalConsoleOptions": "neverOpen",
+			"trace": "all"
 		}
 	]
 }
