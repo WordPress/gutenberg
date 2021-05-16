@@ -138,6 +138,10 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 	const isSmallScreen = useViewportMatch( 'medium', '<' );
 	const hasOverlay = useSelect(
 		( select ) => {
+			if ( ! clientId ) {
+				return;
+			}
+
 			const {
 				getBlockName,
 				isBlockSelected,
@@ -161,6 +165,7 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 			rootClientId: clientId,
 		} ),
 	] );
+
 	const InnerBlocks =
 		options.value && options.onChange
 			? ControlledInnerBlocks
@@ -176,7 +181,11 @@ export function useInnerBlocksProps( props = {}, options = {} ) {
 				'has-overlay': hasOverlay,
 			}
 		),
-		children: <InnerBlocks { ...options } clientId={ clientId } />,
+		children: clientId ? (
+			<InnerBlocks { ...options } clientId={ clientId } />
+		) : (
+			<BlockListItems { ...options } />
+		),
 	};
 }
 

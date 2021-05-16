@@ -7,7 +7,7 @@ import classnames from 'classnames';
  * WordPress dependencies
  */
 import { AsyncModeProvider, useSelect } from '@wordpress/data';
-import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 import { createContext, useState, useMemo } from '@wordpress/element';
 
 /**
@@ -15,16 +15,20 @@ import { createContext, useState, useMemo } from '@wordpress/element';
  */
 import BlockListBlock from './block';
 import BlockListAppender from '../block-list-appender';
-import useBlockDropZone from '../use-block-drop-zone';
 import { useInBetweenInserter } from './use-in-between-inserter';
 import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 import BlockToolsBackCompat from '../block-tools/back-compat';
+import { useInnerBlocksProps } from '../inner-blocks';
+import {
+	BlockEditContextProvider,
+	DEFAULT_BLOCK_EDIT_CONTEXT,
+} from '../block-edit/context';
 
 export const IntersectionObserver = createContext();
 
-function Root( { className, children } ) {
+function Root( { className, __experimentalLayout } ) {
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const {
 		isTyping,
@@ -45,35 +49,31 @@ function Root( { className, children } ) {
 			isNavigationMode: _isNavigationMode(),
 		};
 	}, [] );
-	return (
-		<div
-			ref={ useMergeRefs( [
-				useBlockDropZone(),
-				useInBetweenInserter(),
-			] ) }
-			className={ classnames(
-				'block-editor-block-list__layout is-root-container',
-				className,
-				{
-					'is-typing': isTyping,
-					'is-outline-mode': isOutlineMode,
-					'is-focus-mode': isFocusMode && isLargeViewport,
-					'is-navigate-mode': isNavigationMode,
-				}
-			) }
-		>
-			{ children }
-		</div>
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			ref: useInBetweenInserter(),
+			className: classnames( 'is-root-container', className, {
+				'is-typing': isTyping,
+				'is-outline-mode': isOutlineMode,
+				'is-focus-mode': isFocusMode && isLargeViewport,
+				'is-navigate-mode': isNavigationMode,
+			} ),
+		},
+		{ __experimentalLayout }
 	);
+	return <div { ...innerBlocksProps } />;
 }
 
 export default function BlockList( { className, __experimentalLayout } ) {
 	usePreParsePatterns();
 	return (
 		<BlockToolsBackCompat>
-			<Root className={ className }>
-				<BlockListItems __experimentalLayout={ __experimentalLayout } />
-			</Root>
+			<BlockEditContextProvider value={ DEFAULT_BLOCK_EDIT_CONTEXT }>
+				<Root
+					className={ className }
+					__experimentalLayout={ __experimentalLayout }
+				/>
+			</BlockEditContextProvider>
 		</BlockToolsBackCompat>
 	);
 }
