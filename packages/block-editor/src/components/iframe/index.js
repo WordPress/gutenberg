@@ -54,6 +54,11 @@ function styleSheetsCompat( doc ) {
 		);
 
 		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Stylesheet ${ ownerNode.id } should be added as an editor style.`,
+				ownerNode
+			);
 			doc.head.appendChild( ownerNode.cloneNode( true ) );
 		}
 	} );

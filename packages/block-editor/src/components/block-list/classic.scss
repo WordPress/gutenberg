@@ -1,3 +1,7 @@
+.editor-styles-wrapper {
+	background: $white;
+}
+
 // This needs specificity to override the editor styles.
 .editor-styles-wrapper .wp-block {
 	margin-left: auto;

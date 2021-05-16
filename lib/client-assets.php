@@ -711,6 +711,7 @@ function gutenberg_extend_block_editor_styles_html() {
 	$handles = array(
 		'wp-block-editor',
 		'wp-block-library',
+		'wp-block-library-theme',
 		'wp-edit-blocks',
 	);
 
