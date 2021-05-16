@@ -27,8 +27,12 @@ export default function useSelectAll() {
 				isEntirelySelected( event.target )
 			) {
 				const blocks = getBlockOrder();
-				multiSelect( first( blocks ), last( blocks ) );
-				event.preventDefault();
+				const firstClientId = first( blocks );
+				const lastClientId = last( blocks );
+				if ( firstClientId !== lastClientId ) {
+					multiSelect( firstClientId, lastClientId );
+					event.preventDefault();
+				}
 			}
 		}
 
