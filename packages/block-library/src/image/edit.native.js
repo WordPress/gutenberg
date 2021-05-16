@@ -443,11 +443,6 @@ export class ImageEdit extends Component {
 	getSetFeaturedButton( isFeaturedImage ) {
 		const { attributes, getStylesFromColorScheme } = this.props;
 
-		const featuredButtonStyle = getStylesFromColorScheme(
-			styles.featuredButton,
-			styles.featuredButtonDark
-		);
-
 		const setFeaturedButtonStyle = getStylesFromColorScheme(
 			styles.setFeaturedButton,
 			styles.setFeaturedButtonDark
@@ -457,7 +452,7 @@ export class ImageEdit extends Component {
 			<BottomSheet.Cell
 				label={ __( 'Remove as Featured Image ' ) }
 				labelStyle={ [
-					featuredButtonStyle,
+					setFeaturedButtonStyle,
 					styles.removeFeaturedButton,
 				] }
 				onPress={ () => this.onSetFeatured( 0 ) }
@@ -467,7 +462,7 @@ export class ImageEdit extends Component {
 		const removeFeaturedButton = () => (
 			<BottomSheet.Cell
 				label={ __( 'Set as Featured Image ' ) }
-				labelStyle={ [ featuredButtonStyle, setFeaturedButtonStyle ] }
+				labelStyle={ setFeaturedButtonStyle }
 				onPress={ () => this.onSetFeatured( attributes.id ) }
 			/>
 		);
