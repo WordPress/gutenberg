@@ -159,7 +159,7 @@ export default function VisualEditor( { styles } ) {
 		useBlockSelectionClearer(),
 	] );
 
-	const blockSelectionClearerRef = useBlockSelectionClearer( true );
+	const blockSelectionClearerRef = useBlockSelectionClearer();
 
 	const [ , RecursionProvider ] = useNoRecursiveRenders(
 		wrapperUniqueId,
