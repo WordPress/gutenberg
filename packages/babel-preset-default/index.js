@@ -1,3 +1,8 @@
+/**
+ * External dependencies
+ */
+const browserslist = require( 'browserslist' );
+
 module.exports = ( api ) => {
 	let wpBuildOpts = {};
 	const isWPBuild = ( name ) =>
@@ -27,7 +32,9 @@ module.exports = ( api ) => {
 		} else {
 			opts.modules = false;
 			opts.targets = {
-				browsers: require( '@wordpress/browserslist-config' ),
+				browsers:
+					browserslist.findConfig( '.' )?.defaults ||
+					require( '@wordpress/browserslist-config' ),
 			};
 		}
 
