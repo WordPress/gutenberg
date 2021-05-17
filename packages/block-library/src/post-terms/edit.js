@@ -59,7 +59,7 @@ export default function PostTermsEdit( {
 	const blockProps = useBlockProps( {
 		className: classnames( {
 			[ `has-text-align-${ textAlign }` ]: textAlign,
-			[ `taxonomy-${ term } `]: term,
+			[ `taxonomy-${ term }` ]: term,
 		} ),
 	} );
 
