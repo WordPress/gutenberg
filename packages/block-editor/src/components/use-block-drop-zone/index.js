@@ -144,6 +144,11 @@ export default function useBlockDropZone( {
 			// https://developer.mozilla.org/en-US/docs/Web/API/Event/currentTarget
 			throttled( event, event.currentTarget );
 		},
+		onDragLeave() {
+			throttled.cancel();
+			hideInsertionPoint();
+			setTargetBlockIndex( null );
+		},
 		onDragEnd() {
 			throttled.cancel();
 			hideInsertionPoint();
