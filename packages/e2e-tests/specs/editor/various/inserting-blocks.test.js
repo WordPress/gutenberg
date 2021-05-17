@@ -304,10 +304,10 @@ describe( 'Inserting blocks', () => {
 			inserterMenuInputSelector
 		);
 		inserterMenuSearchInput.type( 'cover' );
-		// Wait for the search results to load after typing the full search
-		// term. Previously this test would sometimes accidentally tab to the
-		// button for a code block.
-		await page.evaluate( () => new Promise( window.requestIdleCallback ) );
+		// Wait for the search results to load (Cover block).
+		await page.waitForSelector(
+			'.block-editor-block-types-list__item.editor-block-list-item-cover'
+		);
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
