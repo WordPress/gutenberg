@@ -11,11 +11,23 @@ import { plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import Inserter from '../inserter';
+import useScrollGesture from '../../hooks/use-scroll-gesture';
+
+function onScrollUp() {
+	console.log( 'scrolled up' );
+}
+
+function onScrollDown() {
+	console.log( 'scrolled down' );
+}
 
 function Header( { inserter, isInserterOpened, setIsInserterOpened } ) {
 	return (
 		<>
-			<div className="customize-widgets-header">
+			<div
+				className="customize-widgets-header"
+				ref={ useScrollGesture( { onScrollUp, onScrollDown } ) }
+			>
 				<NavigableToolbar
 					className="customize-widgets-header-toolbar"
 					aria-label={ __( 'Document tools' ) }
