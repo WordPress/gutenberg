@@ -41,8 +41,8 @@ jobs:
             - name: Lint JavaScript and Styles
               run: npm run lint
 
-            - name: Build and type checking
-              run: npm run build
+            - name: Type checking
+              run: npm run build:package-types
 
             - name: Check local changes
               run: npm run check-local-changes
