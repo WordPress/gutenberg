@@ -63,6 +63,38 @@ When rendered on the front-end, the blocks are [`parse`d from the `content` fiel
 
 If the user switches to a theme that does not support block menus, or disables this functionality, non-link blocks are no longer rendered on the frontend. Care is taken, however, to ensure that users can still see their data on the existing Menus screen.
 
+## Block to Menu Item mapping
+
+The Navigation Editor needs to be able to map navigation items in two directions:
+
+1. `nav_menu_item`s to Blocks - when displaying an existing navigation.
+2. Blocks to `nav_menu_item`s - when _saving_ an navigation being editing in the Navigation screen.
+
+To understand this fully, one must first appreciate that WordPress maps raw `nav_menu_item` posts to Menu item _objects_. These have various properties which map to block attributes as follows:
+
+| Property           |                                                Description                                                |               Equivalent Block Attribute               |
+| :----------------- | :-------------------------------------------------------------------------------------------------------: | :----------------------------------------------------: |
+| `ID`               |                         The term_id if the menu item represents a taxonomy term.                          |                      Not mapped.                       |
+| `attr_title`       |                        The title attribute of the link element for this menu item.                        |                        `title`                         |
+| `classes`          |                The array of class attribute values for the link element of this menu item.                |                      `classNames`                      |
+| `db_id`            |          The DB ID of this item as a nav_menu_item object, if it exists (0 if it doesn't exist).          |                      Not mapped.                       |
+| `description`      |                                    The description of this menu item.                                     |                     `description`                      |
+| `menu_item_parent` |           The DB ID of the nav_menu_item that is this item's menu parent, if any. 0 otherwise.            | Not mapped.<sup>[1](#menu_item_menu_item_parent)</sup> |
+| `object`           |          The type of object originally represented, such as 'category', 'post', or 'attachment'.          |                         `type`                         |
+| `object_id`        | The DB ID of the original object this menu item represents, e.g. ID for posts and term_id for categories. |                          `id`                          |
+| `post_parent`      |                  The DB ID of the original object's parent object, if any (0 otherwise).                  |                      Not mapped.                       |
+| `post_title`       |                   A "no title" label if menu item represents a post that lacks a title.                   |                      Not mapped.                       |
+| `target`           |                       The target attribute of the link element for this menu item.                        |    `opensInNewTab`<sup>[2](#menu_item_target)</sup>    |
+| `title`            |                                       The title of this menu item.                                        |                        `label`                         |
+| `type`             |             The family of objects originally represented, such as 'post_type' or 'taxonomy'.              |                         `kind`                         |
+| `type_label`       |                        The singular label used to describe this type of menu item.                        |                      Not mapped.                       |
+| `url`              |                                  The URL to which this menu item points.                                  |                         `url`                          |
+| `xfn`              |                       The XFN relationship expressed in the link of this menu item.                       |                         `rel`                          |
+| `\_invalid`        |                     Whether the menu item represents an object that no longer exists.                     |                      Not mapped.                       |
+
+-   [<a name="menu_item_menu_item_parent">1</a>] - the parent -> child relationship is expressed in block via the `innerBlocks` attribute and is therefore not required as a explicit block attribute.
+-   [<a name="menu_item_target">2</a>] - applies only if the value of the `target` field is `_blank`.
+
 ## Hooks
 
 `useMenuItems` and `useNavigationBlock` hooks are the central part of this package. They bridge the gap between the API and the block editor interface:
@@ -106,7 +138,7 @@ return (
 
 -   **Link block** - the basic `core/navigation-link` block which is the standard block used to add links within navigations.
 -   **Navigation block** - the root `core/navigation` block which can be used both with the Navigation Editor and outside (eg: Post / Site Editor).
--   **Navigation Editor screen** - the new screen provided by Gutenberg to allow the user to edit navigations using a block-based UI.
+-   **Navigation editor / screen** - the new screen provided by Gutenberg to allow the user to edit navigations using a block-based UI.
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
