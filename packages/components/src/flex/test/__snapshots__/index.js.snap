@@ -6,7 +6,7 @@ Snapshot Diff:
 + Second value
 
 @@ -7,14 +7,10 @@
-      class="components-flex-item css-1636tkh-Item css-1mm2cvy-View em57xhy0"
+      class="components-flex-item css-1o3e1r5-Item-sx-Base css-1mm2cvy-View em57xhy0"
       data-wp-c16t="true"
       data-wp-component="FlexItem"
     />
@@ -15,7 +15,7 @@ Snapshot Diff:
 -   />
 -   <div />
 -   <div
-      class="components-flex-item components-flex-block css-1fgvc79-Item-block css-1mm2cvy-View em57xhy0"
+      class="components-flex-item components-flex-block css-12rtc5p-Item-sx-Base-block css-1mm2cvy-View em57xhy0"
       data-wp-c16t="true"
       data-wp-component="FlexBlock"
     />
@@ -27,13 +27,12 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
-@@ -1,16 +1,16 @@
+@@ -1,15 +1,15 @@
   Array [
     Object {
 -     "-ms-flex-align": "flex-start",
 +     "-ms-flex-align": "center",
       "-ms-flex-direction": "row",
-      "-ms-flex-pack": "justify",
 -     "-webkit-align-items": "flex-start",
 -     "-webkit-box-align": "flex-start",
 +     "-webkit-align-items": "center",
@@ -52,14 +51,6 @@ Snapshot Diff:
 
 exports[`props should render correctly 1`] = `
 .emotion-0 {
-  display: block;
-  max-height: 100%;
-  max-width: 100%;
-  min-height: 0;
-  min-width: 0;
-}
-
-.emotion-6 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -73,20 +64,27 @@ exports[`props should render correctly 1`] = `
   flex-direction: row;
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
   justify-content: space-between;
   width: 100%;
 }
 
-.emotion-6 > * + *:not(marquee) {
+.emotion-0>*+*:not(marquee) {
   margin-left: calc(4px * 2);
 }
 
-.emotion-6 > * {
+.emotion-0>* {
   min-width: 0;
 }
 
 .emotion-3 {
+  display: block;
+  max-height: 100%;
+  max-width: 100%;
+  min-height: 0;
+  min-width: 0;
+}
+
+.emotion-6 {
   display: block;
   max-height: 100%;
   max-width: 100%;
@@ -98,17 +96,17 @@ exports[`props should render correctly 1`] = `
 }
 
 <div
-  class="components-flex emotion-6 emotion-1 emotion-2"
+  class="components-flex emotion-0 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Flex"
 >
   <div
-    class="components-flex-item emotion-0 emotion-1 emotion-2"
+    class="components-flex-item emotion-3 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="FlexItem"
   />
   <div
-    class="components-flex-item components-flex-block emotion-3 emotion-1 emotion-2"
+    class="components-flex-item components-flex-block emotion-6 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="FlexBlock"
   />
@@ -125,7 +123,6 @@ Snapshot Diff:
       "-ms-flex-align": "center",
       "-ms-flex-direction": "row",
 -     "-ms-flex-pack": "start",
-+     "-ms-flex-pack": "justify",
       "-webkit-align-items": "center",
       "-webkit-box-align": "center",
 -     "-webkit-box-pack": "start",
@@ -140,6 +137,7 @@ Snapshot Diff:
 +     "justify-content": "space-between",
       "width": "100%",
     },
+    Object {},
   ]
 `;
 

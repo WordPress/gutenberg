@@ -1,24 +1,24 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render correctly 1`] = `
-.emotion-3 {
-  height: 100%;
-}
-
-.emotion-12 {
+.emotion-0 {
   background-color: #fff;
   color: #000;
   position: relative;
-  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   outline: none;
   border-radius: 2px;
 }
 
-.emotion-12 .components-card-body {
+.emotion-0 .components-card-body {
   max-height: 80vh;
 }
 
-.emotion-0 {
+.emotion-3 {
+  height: 100%;
+}
+
+.emotion-6 {
   height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
@@ -27,83 +27,84 @@ exports[`props should render correctly 1`] = `
   padding: calc(4px * 3) calc(4px * 3);
 }
 
-@media only screen and ( min-device-width:40em ) {
-  .emotion-0::-webkit-scrollbar {
+@media only screen and ( min-device-width: 40em ) {
+  .emotion-6::-webkit-scrollbar {
     height: 12px;
     width: 12px;
   }
 
-  .emotion-0::-webkit-scrollbar-track {
+  .emotion-6::-webkit-scrollbar-track {
     background-color: transparent;
   }
 
-  .emotion-0::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.04);
+  .emotion-6::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.04);
     border-radius: 8px;
   }
 
-  .emotion-0::-webkit-scrollbar-thumb {
+  .emotion-6::-webkit-scrollbar-thumb {
+    -webkit-background-clip: padding-box;
     background-clip: padding-box;
-    background-color: rgba(0,0,0,0.2);
-    border: 2px solid rgba( 0,0,0,0 );
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba( 0, 0, 0, 0 );
     border-radius: 7px;
   }
 
-  .emotion-0:hover::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.5);
+  .emotion-6:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.5);
   }
 }
 
-.emotion-0:first-of-type {
+.emotion-6:first-of-type {
   border-top-left-radius: 2px;
   border-top-right-radius: 2px;
 }
 
-.emotion-0:last-of-type {
+.emotion-6:last-of-type {
   border-bottom-left-radius: 2px;
   border-bottom-right-radius: 2px;
-}
-
-.emotion-6 {
-  background: transparent;
-  display: block;
-  margin: 0 !important;
-  pointer-events: none;
-  position: absolute;
-  will-change: box-shadow;
-  border-radius: inherit;
-  bottom: 0;
-  box-shadow: 0 1px 2px 0 rgba(0 ,0,0,0.05);
-  opacity: 1;
-  left: 0;
-  right: 0;
-  top: 0;
-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
-  border-radius: 2px;
 }
 
 .emotion-9 {
   background: transparent;
   display: block;
-  margin: 0 !important;
+  margin: 0!important;
   pointer-events: none;
   position: absolute;
   will-change: box-shadow;
   border-radius: inherit;
   bottom: 0;
-  box-shadow: 0 5px 10px 0 rgba(0 ,0,0,0.25);
+  box-shadow: 0 1px 2px 0 rgba(0 ,0, 0, 0.05);
   opacity: 1;
   left: 0;
   right: 0;
   top: 0;
-  -webkit-transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
-  transition: box-shadow 200ms cubic-bezier(0.08,0.52,0.52,1);
+  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+  border-radius: 2px;
+}
+
+.emotion-12 {
+  background: transparent;
+  display: block;
+  margin: 0!important;
+  pointer-events: none;
+  position: absolute;
+  will-change: box-shadow;
+  border-radius: inherit;
+  bottom: 0;
+  box-shadow: 0 5px 10px 0 rgba(0 ,0, 0, 0.25);
+  opacity: 1;
+  left: 0;
+  right: 0;
+  top: 0;
+  -webkit-transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
+  transition: box-shadow 200ms cubic-bezier(0.08, 0.52, 0.52, 1);
   border-radius: 2px;
 }
 
 <div
-  class="components-surface components-card emotion-12 emotion-1 emotion-2"
+  class="components-surface components-card emotion-0 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="Card"
 >
@@ -118,7 +119,7 @@ exports[`props should render correctly 1`] = `
       tabindex="-1"
     />
     <div
-      class="components-scrollable components-card-body emotion-0 emotion-1 emotion-2"
+      class="components-scrollable components-card-body emotion-6 emotion-1 emotion-2"
       data-wp-c16t="true"
       data-wp-component="CardBody"
     >
@@ -127,13 +128,13 @@ exports[`props should render correctly 1`] = `
   </div>
   <div
     aria-hidden="true"
-    class="components-elevation emotion-6 emotion-1 emotion-2"
+    class="components-elevation emotion-9 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
   <div
     aria-hidden="true"
-    class="components-elevation emotion-9 emotion-1 emotion-2"
+    class="components-elevation emotion-12 emotion-1 emotion-2"
     data-wp-c16t="true"
     data-wp-component="Elevation"
   />
@@ -149,7 +150,7 @@ Snapshot Diff:
   <div
 -   aria-label="show"
 +   aria-label="popover-base-popover"
-    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View em57xhy0"
+    class="components-popover-content components-popover css-mlsx58-PopoverContent-classes css-1mm2cvy-View em57xhy0"
     data-dialog="true"
     data-wp-c16t="true"
     data-wp-component="Popover"
@@ -159,7 +160,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
+      class="components-surface components-card css-vg3gx-Surface-getBorders-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
 `;
 
 exports[`props should render without content 1`] = `
@@ -171,7 +172,7 @@ Snapshot Diff:
   <div
 -   aria-label="popover-contentless-popover"
 +   aria-label="popover-base-popover"
-    class="components-popover-content components-popover css-u2yev2-PopoverContent-classes css-1mm2cvy-View em57xhy0"
+    class="components-popover-content components-popover css-mlsx58-PopoverContent-classes css-1mm2cvy-View em57xhy0"
     data-dialog="true"
     data-wp-c16t="true"
     data-wp-component="Popover"
@@ -181,7 +182,7 @@ Snapshot Diff:
     tabindex="-1"
   >
     <div
-      class="components-surface components-card css-12tfxmr-Surface-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
+      class="components-surface components-card css-vg3gx-Surface-getBorders-primary-Card-rounded-cardStyle css-1mm2cvy-View em57xhy0"
 @@ -21,10 +21,17 @@
           frameborder="0"
           src="about:blank"
@@ -189,7 +190,7 @@ Snapshot Diff:
           tabindex="-1"
         />
 +       <div
-+         class="components-scrollable components-card-body css-1kkgl6g-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
++         class="components-scrollable components-card-body css-sefkol-Scrollable-scrollableScrollbar-scrollY-Body-borderRadius css-1mm2cvy-View em57xhy0"
 +         data-wp-c16t="true"
 +         data-wp-component="CardBody"
 +       >
@@ -198,6 +199,6 @@ Snapshot Diff:
       </div>
       <div
         aria-hidden="true"
-        class="components-elevation css-109wvzr-Elevation css-1mm2cvy-View em57xhy0"
+        class="components-elevation css-1446wzr-Elevation-sx-Base-elevationClassName css-1mm2cvy-View em57xhy0"
         data-wp-c16t="true"
 `;

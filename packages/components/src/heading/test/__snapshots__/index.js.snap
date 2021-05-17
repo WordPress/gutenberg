@@ -25,6 +25,7 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
+@@ -1,10 +1,10 @@
   Array [
     Object {
       "color": "#050505",
@@ -35,7 +36,7 @@ Snapshot Diff:
       "line-height": "1.2",
       "margin": "0",
     },
-  ]
+    Object {},
 `;
 
 exports[`props should render level as a string 1`] = `
@@ -43,6 +44,7 @@ Snapshot Diff:
 - Received styles
 + Base styles
 
+@@ -1,10 +1,10 @@
   Array [
     Object {
       "color": "#050505",
@@ -53,5 +55,5 @@ Snapshot Diff:
       "line-height": "1.2",
       "margin": "0",
     },
-  ]
+    Object {},
 `;

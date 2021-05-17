@@ -7,7 +7,7 @@ exports[`props should render correctly 1`] = `
   overflow-y: auto;
 }
 
-@media only screen and ( min-device-width:40em ) {
+@media only screen and ( min-device-width: 40em ) {
   .emotion-0::-webkit-scrollbar {
     height: 12px;
     width: 12px;
@@ -18,19 +18,20 @@ exports[`props should render correctly 1`] = `
   }
 
   .emotion-0::-webkit-scrollbar-track {
-    background: rgba(0,0,0,0.04);
+    background: rgba(0, 0, 0, 0.04);
     border-radius: 8px;
   }
 
   .emotion-0::-webkit-scrollbar-thumb {
+    -webkit-background-clip: padding-box;
     background-clip: padding-box;
-    background-color: rgba(0,0,0,0.2);
-    border: 2px solid rgba( 0,0,0,0 );
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 2px solid rgba( 0, 0, 0, 0 );
     border-radius: 7px;
   }
 
   .emotion-0:hover::-webkit-scrollbar-thumb {
-    background-color: rgba(0,0,0,0.5);
+    background-color: rgba(0, 0, 0, 0.5);
   }
 }
 
@@ -50,13 +51,11 @@ Snapshot Diff:
 
   Array [
     Object {
--     "-moz-scroll-behavior": "smooth",
--     "-ms-scroll-behavior": "smooth",
--     "-webkit-scroll-behavior": "smooth",
       "height": "100%",
       "overflow-x": "hidden",
       "overflow-y": "auto",
 -     "scroll-behavior": "smooth",
     },
+    Object {},
   ]
 `;

@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`props should render alignment 1`] = `
-.emotion-4 {
+.emotion-0 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -14,35 +14,35 @@ exports[`props should render alignment 1`] = `
   -ms-flex-direction: column;
   flex-direction: column;
   -webkit-box-pack: center;
-  -webkit-justify-content: center;
   -ms-flex-pack: center;
+  -webkit-justify-content: center;
   justify-content: center;
 }
 
-.emotion-4 > * + *:not(marquee) {
+.emotion-0>*+*:not(marquee) {
   margin-top: calc(4px * 2);
 }
 
-.emotion-4 > * {
+.emotion-0>* {
   min-height: 0;
 }
 
 <div
-  class="components-flex components-h-stack components-v-stack emotion-4 emotion-0 emotion-1"
+  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="VStack"
 >
   <div
-    class="emotion-0 emotion-1"
+    class="emotion-1 emotion-2"
   />
   <div
-    class="emotion-0 emotion-1"
+    class="emotion-1 emotion-2"
   />
 </div>
 `;
 
 exports[`props should render correctly 1`] = `
-.emotion-4 {
+.emotion-0 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -56,34 +56,33 @@ exports[`props should render correctly 1`] = `
   flex-direction: column;
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
   justify-content: space-between;
 }
 
-.emotion-4 > * + *:not(marquee) {
+.emotion-0>*+*:not(marquee) {
   margin-top: calc(4px * 2);
 }
 
-.emotion-4 > * {
+.emotion-0>* {
   min-height: 0;
 }
 
 <div
-  class="components-flex components-h-stack components-v-stack emotion-4 emotion-0 emotion-1"
+  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="VStack"
 >
   <div
-    class="emotion-0 emotion-1"
+    class="emotion-1 emotion-2"
   />
   <div
-    class="emotion-0 emotion-1"
+    class="emotion-1 emotion-2"
   />
 </div>
 `;
 
 exports[`props should render spacing 1`] = `
-.emotion-4 {
+.emotion-0 {
   display: -webkit-box;
   display: -webkit-flex;
   display: -ms-flexbox;
@@ -97,28 +96,27 @@ exports[`props should render spacing 1`] = `
   flex-direction: column;
   -webkit-box-pack: justify;
   -webkit-justify-content: space-between;
-  -ms-flex-pack: justify;
   justify-content: space-between;
 }
 
-.emotion-4 > * + *:not(marquee) {
+.emotion-0>*+*:not(marquee) {
   margin-top: calc(4px * 5);
 }
 
-.emotion-4 > * {
+.emotion-0>* {
   min-height: 0;
 }
 
 <div
-  class="components-flex components-h-stack components-v-stack emotion-4 emotion-0 emotion-1"
+  class="components-flex components-h-stack components-v-stack emotion-0 emotion-1 emotion-2"
   data-wp-c16t="true"
   data-wp-component="VStack"
 >
   <div
-    class="emotion-0 emotion-1"
+    class="emotion-1 emotion-2"
   />
   <div
-    class="emotion-0 emotion-1"
+    class="emotion-1 emotion-2"
   />
 </div>
 `;

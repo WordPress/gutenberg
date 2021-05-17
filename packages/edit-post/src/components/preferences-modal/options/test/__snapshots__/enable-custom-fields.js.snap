@@ -1,16 +1,16 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation message when toggled on 1`] = `
-.emotion-2 {
+.emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-2 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-0 {
+.components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
 
@@ -18,10 +18,10 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
   className="edit-post-preferences-modal__option"
 >
   <div
-    className="components-base-control components-toggle-control emotion-2 emotion-3"
+    className="components-base-control components-toggle-control emotion-0 emotion-1"
   >
     <div
-      className="components-base-control__field emotion-0 emotion-1"
+      className="components-base-control__field emotion-2 emotion-3"
     >
       <span
         className="components-form-toggle is-checked"
@@ -64,16 +64,16 @@ exports[`EnableCustomFieldsOption renders a checked checkbox and a confirmation 
 `;
 
 exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields are enabled 1`] = `
-.emotion-2 {
+.emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-2 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-0 {
+.components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
 
@@ -81,10 +81,10 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
   className="edit-post-preferences-modal__option"
 >
   <div
-    className="components-base-control components-toggle-control emotion-2 emotion-3"
+    className="components-base-control components-toggle-control emotion-0 emotion-1"
   >
     <div
-      className="components-base-control__field emotion-0 emotion-1"
+      className="components-base-control__field emotion-2 emotion-3"
     >
       <span
         className="components-form-toggle is-checked"
@@ -113,16 +113,16 @@ exports[`EnableCustomFieldsOption renders a checked checkbox when custom fields 
 `;
 
 exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmation message when toggled off 1`] = `
-.emotion-2 {
+.emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-2 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-0 {
+.components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
 
@@ -130,10 +130,10 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
   className="edit-post-preferences-modal__option"
 >
   <div
-    className="components-base-control components-toggle-control emotion-2 emotion-3"
+    className="components-base-control components-toggle-control emotion-0 emotion-1"
   >
     <div
-      className="components-base-control__field emotion-0 emotion-1"
+      className="components-base-control__field emotion-2 emotion-3"
     >
       <span
         className="components-form-toggle"
@@ -176,16 +176,16 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox and a confirmati
 `;
 
 exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fields are disabled 1`] = `
-.emotion-2 {
+.emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
 
-.emotion-0 {
+.emotion-2 {
   margin-bottom: 8px;
 }
 
-.components-panel__row .emotion-0 {
+.components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
 
@@ -193,10 +193,10 @@ exports[`EnableCustomFieldsOption renders an unchecked checkbox when custom fiel
   className="edit-post-preferences-modal__option"
 >
   <div
-    className="components-base-control components-toggle-control emotion-2 emotion-3"
+    className="components-base-control components-toggle-control emotion-0 emotion-1"
   >
     <div
-      className="components-base-control__field emotion-0 emotion-1"
+      className="components-base-control__field emotion-2 emotion-3"
     >
       <span
         className="components-form-toggle"
