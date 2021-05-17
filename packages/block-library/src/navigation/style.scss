@@ -460,8 +460,26 @@
 
 // Button to open the menu.
 .wp-block-navigation__responsive-container-open {
+	display: flex;
+
 	@include break-small {
 		display: none;
+	}
+
+	// Justify the button.
+	.items-justified-left & {
+		margin-left: 0;
+		margin-right: auto;
+	}
+
+	.items-justified-center & {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.items-justified-right & {
+		margin-left: auto;
+		margin-right: 0;
 	}
 }
 
