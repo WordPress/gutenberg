@@ -36,7 +36,7 @@ module.exports = {
 	},
 	snapshotSerializers: [
 		'enzyme-to-json/serializer',
-		'@emotion/jest',
+		'@emotion/jest/serializer',
 		'snapshot-diff/serializer',
 	],
 	watchPlugins: [
