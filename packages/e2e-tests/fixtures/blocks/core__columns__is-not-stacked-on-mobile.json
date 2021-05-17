@@ -4,7 +4,7 @@
 		"name": "core/columns",
 		"isValid": true,
 		"attributes": {
-			"isStackedOnMobile": true,
+			"isStackedOnMobile": false,
 			"backgroundColor": "secondary"
 		},
 		"innerBlocks": [
@@ -71,6 +71,6 @@
 				"originalContent": "<div class=\"wp-block-column\">\n\t\t\n\t\t\n\t</div>"
 			}
 		],
-		"originalContent": "<div class=\"wp-block-columns has-background has-secondary-background-color\">\n\t\n\t\n</div>"
+		"originalContent": "<div class=\"wp-block-columns is-not-stacked-on-mobile has-secondary-background-color has-background\">\n\t\n\t\n</div>"
 	}
 ]
