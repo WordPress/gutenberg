@@ -1,0 +1,48 @@
+.emptyStateContainer {
+	flex: 1;
+	height: 142;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	background-color: $gray-lighten-30;
+	padding-left: 12;
+	padding-right: 12;
+	padding-top: 12;
+	padding-bottom: 12;
+	border-top-left-radius: 4;
+	border-top-right-radius: 4;
+	border-bottom-left-radius: 4;
+	border-bottom-right-radius: 4;
+}
+
+.emptyStateContainerDark {
+	background-color: $background-dark-secondary;
+}
+
+.emptyStateTitle {
+	text-align: center;
+	margin-top: 4;
+	margin-bottom: 16;
+	font-size: 14;
+	color: #2e4453;
+}
+
+.emptyStateTitleDark {
+	color: $white;
+}
+
+.emptyStateDescription {
+	width: 100%;
+	text-align: center;
+	color: $blue-wordpress;
+	font-size: 14;
+	font-weight: 500;
+}
+
+.modalIcon {
+	width: 24px;
+	height: 24px;
+	justify-content: center;
+	align-items: center;
+	fill: $gray-dark;
+}

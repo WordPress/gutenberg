@@ -1,9 +1,9 @@
 /**
  * WordPress dependencies
  */
-import { Popover } from '@wordpress/components';
 import {
 	BlockList,
+	BlockTools,
 	BlockEditorKeyboardShortcuts,
 	BlockSelectionClearer,
 	WritingFlow,
@@ -21,19 +21,20 @@ export default function WidgetAreasBlockEditorContent( {
 	blockEditorSettings,
 } ) {
 	return (
-		<div className="edit-widgets-block-editor editor-styles-wrapper">
-			<EditorStyles styles={ blockEditorSettings.styles } />
+		<BlockTools>
 			<KeyboardShortcuts />
 			<BlockEditorKeyboardShortcuts />
 			<Notices />
-			<Popover.Slot name="block-toolbar" />
-			<BlockSelectionClearer>
-				<WritingFlow>
-					<ObserveTyping>
-						<BlockList className="edit-widgets-main-block-list" />
-					</ObserveTyping>
-				</WritingFlow>
-			</BlockSelectionClearer>
-		</div>
+			<div className="edit-widgets-block-editor editor-styles-wrapper">
+				<EditorStyles styles={ blockEditorSettings.styles } />
+				<BlockSelectionClearer>
+					<WritingFlow>
+						<ObserveTyping>
+							<BlockList className="edit-widgets-main-block-list" />
+						</ObserveTyping>
+					</WritingFlow>
+				</BlockSelectionClearer>
+			</div>
+		</BlockTools>
 	);
 }

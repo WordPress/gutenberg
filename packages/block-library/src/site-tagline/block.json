@@ -17,6 +17,7 @@
 			"gradients": true
 		},
 		"spacing": {
+			"margin": true,
 			"padding": true
 		},
 		"fontSize": true,

@@ -2,9 +2,9 @@
  * Internal dependencies
  */
 import { VStack } from '../../v-stack';
-import { View } from '../view';
+import { View } from '../../view';
 import { Heading } from '../../heading';
-import { Divider } from '../divider';
+import { Divider } from '../../divider';
 
 function Page( { title = 'Component', children } ) {
 	return (

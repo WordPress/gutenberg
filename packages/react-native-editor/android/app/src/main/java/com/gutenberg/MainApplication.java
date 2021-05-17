@@ -176,7 +176,7 @@ public class MainApplication extends Application implements ReactApplication, Gu
             }
 
             @Override
-            public void performRequest(String path, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
+            public void performRequest(String path, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {}
 
             @Override
             public void gutenbergDidRequestUnsupportedBlockFallback(ReplaceUnsupportedBlockCallback replaceUnsupportedBlockCallback,

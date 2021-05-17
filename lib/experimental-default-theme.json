@@ -210,6 +210,7 @@
 			]
 		},
 		"spacing": {
+			"customMargin": false,
 			"customPadding": false,
 			"units": [ "px", "em", "rem", "vh", "vw" ]
 		},
@@ -223,15 +224,6 @@
 			"core/button": {
 				"border": {
 					"customRadius": true
-				}
-			}
-		}
-	},
-	"styles": {
-		"elements": {
-			"link": {
-				"color": {
-					"text": "#00E"
 				}
 			}
 		}

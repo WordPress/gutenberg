@@ -6,7 +6,7 @@ import { first, last } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 
 /**
@@ -14,6 +14,18 @@ import { useSelect, useDispatch } from '@wordpress/data';
  */
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
+
+function toggleRichText( container, toggle ) {
+	Array.from( container.querySelectorAll( '.rich-text' ) ).forEach(
+		( node ) => {
+			if ( toggle ) {
+				node.setAttribute( 'contenteditable', true );
+			} else {
+				node.removeAttribute( 'contenteditable' );
+			}
+		}
+	);
+}
 
 /**
  * Returns for the deepest node at the start or end of a container node. Ignores
@@ -57,7 +69,8 @@ function selector( select ) {
 	};
 }
 
-export default function useMultiSelection( ref ) {
+export default function useMultiSelection() {
+	const ref = useRef();
 	const {
 		isMultiSelecting,
 		multiSelectedBlockClientIds,
@@ -109,15 +122,23 @@ export default function useMultiSelection( ref ) {
 			return;
 		}
 
-		// These must be in the right DOM order.
+		// For some browsers, like Safari, it is important that focus happens
+		// BEFORE selection.
+		ref.current.focus();
 
 		const selection = defaultView.getSelection();
 		const range = ownerDocument.createRange();
 
+		// These must be in the right DOM order.
 		// The most stable way to select the whole block contents is to start
 		// and end at the deepest points.
 		const startNode = getDeepestNode( startRef.current, 'start' );
 		const endNode = getDeepestNode( endRef.current, 'end' );
+
+		// While rich text will be disabled with a delay when there is a multi
+		// selection, we must do it immediately because it's not possible to set
+		// selection across editable hosts.
+		toggleRichText( ref.current, false );
 
 		range.setStartBefore( startNode );
 		range.setEndAfter( endNode );
@@ -131,4 +152,6 @@ export default function useMultiSelection( ref ) {
 		selectBlock,
 		selectedBlockClientId,
 	] );
+
+	return ref;
 }

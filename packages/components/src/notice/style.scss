@@ -34,6 +34,11 @@
 	margin: $grid-unit-05 #{ $button-size-small + $border-width } $grid-unit-05 0;
 }
 
+.components-notice__actions {
+	display: flex;
+	flex-wrap: wrap;
+}
+
 .components-notice__action.components-button {
 	&,
 	&.is-link {
@@ -42,6 +47,10 @@
 	&.is-secondary {
 		vertical-align: initial;
 	}
+
+	// When it has better support, this can be replaced
+	// with column-gap since these are flex items.
+	margin-right: $grid-unit-10;
 }
 
 .components-notice__dismiss {

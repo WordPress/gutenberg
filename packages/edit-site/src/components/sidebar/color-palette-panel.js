@@ -13,7 +13,7 @@ import { useSelect } from '@wordpress/data';
 /**
  * Internal dependencies
  */
-import { useEditorFeature } from '../editor/utils';
+import { useSetting } from '../editor/utils';
 import { store as editSiteStore } from '../../store';
 
 /**
@@ -32,7 +32,7 @@ export default function ColorPalettePanel( {
 	getSetting,
 	setSetting,
 } ) {
-	const colors = useEditorFeature( 'color.palette', contextName );
+	const colors = useSetting( 'color.palette', contextName );
 	const userColors = getSetting( contextName, 'color.palette' );
 	const immutableColorSlugs = useSelect(
 		( select ) => {
