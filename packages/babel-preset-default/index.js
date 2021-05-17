@@ -31,9 +31,10 @@ module.exports = ( api ) => {
 			};
 		} else {
 			opts.modules = false;
+			const browserslistConfig = browserslist.findConfig( '.' ) || {};
 			opts.targets = {
 				browsers:
-					browserslist.findConfig( '.' )?.defaults ||
+					browserslistConfig.defaults ||
 					require( '@wordpress/browserslist-config' ),
 			};
 		}
