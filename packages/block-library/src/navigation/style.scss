@@ -352,6 +352,7 @@
 	}
 }
 
+
 /**
  * Mobile menu.
  */
@@ -472,7 +473,11 @@
 	z-index: 2; // Needs to be above the modal z index itself.
 }
 
-// The menu adds a wrapping container.
+// The menu adds wrapping containers.
+.wp-block-navigation__responsive-close {
+	width: 100%;
+}
+
 .is-menu-open .wp-block-navigation__responsive-close,
 .is-menu-open .wp-block-navigation__responsive-dialog,
 .is-menu-open .wp-block-navigation__responsive-container-content {
