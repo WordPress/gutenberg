@@ -253,10 +253,18 @@
 		}
 
 		// Submenu indentation when there's no background.
+		// It should align with the text above.
 		left: -1em;
 		top: 100%;
 
-		// Indentation for all submenus.
+		// Indentation when no background on small viewports.
+		// It should align with the parent menu above.
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			left: -1px;
+		}
+
+		// Indentation for all submenus on large viewports.
 		@include break-medium {
 			.submenu-container,
 			.wp-block-navigation-link__container {
@@ -267,10 +275,18 @@
 	}
 
 	// Submenu indentation when there's a background.
+	// It should align with menu item itself.
 	&.has-background .has-child .submenu-container,
 	&.has-background .has-child .wp-block-navigation-link__container {
 		left: 0;
 		top: 100%;
+
+		// Indentation when there's a background on small viewports.
+		// It should align with the parent menu above.
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			left: 0;
+		}
 
 		// There's no border on submenus when there are backgrounds.
 		@include break-medium {
