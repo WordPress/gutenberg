@@ -16,17 +16,23 @@ npm install @wordpress/babel-preset-default --save-dev
 
 ### Usage
 
-There are a number of methods to configure Babel. See [Babel's Configuration documentation](https://babeljs.io/docs/en/configuration) for more information. To use this preset, simply reference `@wordpress/default` in the `presets` option in your Babel configuration.
+There are a number of methods to configure Babel. See [Babel's Configuration documentation](https://babeljs.io/docs/en/configuration) for more information. To use this preset, simply reference `@wordpress/babel-preset-default` in the `presets` option in your Babel configuration.
 
 For example, using `.babelrc`:
 
 ```json
 {
-	"presets": [ "@wordpress/default" ]
+	"presets": [ "@wordpress/babel-preset-default" ]
 }
 ```
 
-#### Extending Configuration
+### Options
+
+#### `ignoreBrowserslistConfig` (`boolean`, default `true`)
+
+Set to `false` to to enable searching for any browserslist files or referencing the browserslist key inside `package.json`. By default `@wordpress/browserslist-config` is used.
+
+### Extending Configuration
 
 This preset is an opinionated configuration. If you would like to add to or change this configuration, you can do so by expanding your Babel configuration to include plugins or presets which override those included through this preset. It may help to familiarize yourself [the implementation of the configuration](https://github.com/WordPress/gutenberg/blob/HEAD/packages/babel-preset-default/index.js) to see which specific plugins are enabled by default through this preset.
 

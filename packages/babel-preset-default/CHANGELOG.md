@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### New Features
+
+-   Added `ignoreBrowserslistConfig` option to enable searching for any browserslist files or referencing the browserslist key inside package.json.
+
 ## 6.0.0 (2021-05-14)
 
 ### Breaking Changes

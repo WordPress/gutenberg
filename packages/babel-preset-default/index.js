@@ -1,4 +1,4 @@
-module.exports = ( api ) => {
+module.exports = ( api, opts = { ignoreBrowserslistConfig: true } ) => {
 	let wpBuildOpts = {};
 	const isWPBuild = ( name ) =>
 		[ 'WP_BUILD_MAIN', 'WP_BUILD_MODULE' ].some(
@@ -16,26 +16,29 @@ module.exports = ( api ) => {
 	} );
 
 	const getPresetEnv = () => {
-		const opts = {
+		const presetEnvOpts = {
 			include: [ 'proposal-nullish-coalescing-operator' ],
 		};
 
 		if ( isTestEnv ) {
-			opts.targets = {
+			presetEnvOpts.targets = {
 				node: 'current',
 			};
 		} else {
-			opts.modules = false;
-			opts.targets = {
-				browsers: require( '@wordpress/browserslist-config' ),
-			};
+			presetEnvOpts.modules = false;
+			// Set up target only if Babel should not search for the project's browserslist config.
+			if ( false !== opts.ignoreBrowserslistConfig ) {
+				presetEnvOpts.targets = {
+					browsers: require( '@wordpress/browserslist-config' ),
+				};
+			}
 		}
 
 		if ( isWPBuild( wpBuildOpts.name ) ) {
-			opts.modules = wpBuildOpts.modules;
+			presetEnvOpts.modules = wpBuildOpts.modules;
 		}
 
-		return [ require.resolve( '@babel/preset-env' ), opts ];
+		return [ require.resolve( '@babel/preset-env' ), presetEnvOpts ];
 	};
 
 	const maybeGetPluginTransformRuntime = () => {
@@ -43,16 +46,19 @@ module.exports = ( api ) => {
 			return undefined;
 		}
 
-		const opts = {
+		const pluginTransformRuntimeOpts = {
 			helpers: true,
 			useESModules: false,
 		};
 
 		if ( wpBuildOpts.name === 'WP_BUILD_MODULE' ) {
-			opts.useESModules = wpBuildOpts.useESModules;
+			pluginTransformRuntimeOpts.useESModules = wpBuildOpts.useESModules;
 		}
 
-		return [ require.resolve( '@babel/plugin-transform-runtime' ), opts ];
+		return [
+			require.resolve( '@babel/plugin-transform-runtime' ),
+			pluginTransformRuntimeOpts,
+		];
 	};
 
 	return {
