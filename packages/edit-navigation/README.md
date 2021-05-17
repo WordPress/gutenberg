@@ -24,6 +24,8 @@ initialize( '#navigation-editor-root', blockEditorSettings );
 
 By default, the Navigation Editor screen allows users to create and edit complex navigations using a block-based UI. The aim is to supercede [the current Menus screen](https://codex.wordpress.org/WordPress_Menu_User_Guide) by providing a superior experience whilst retaining backwards compatibility.
 
+The editing experience is provided as a block editor wrapper around the core functionality of the **Navigation _block_**. Features of the block are disabled/enhanced as necessary to provide an experience appropriate to editing a navigation outside of a Full Site Editing context.
+
 ## Modes
 
 The Navigation Editor has two "modes" for _persistence_ ("saving" navigations) and _rendering_:
