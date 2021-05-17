@@ -10,3 +10,4 @@ export * from './shortcut';
 export * from './spinner';
 export * from './v-stack';
 export * from './view';
+export * from './visually-hidden';
