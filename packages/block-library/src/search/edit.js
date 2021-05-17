@@ -85,6 +85,10 @@ export default function SearchEdit( {
 	const buttonRef = useRef();
 
 	useEffect( () => {
+		if ( 'button-only' !== buttonPosition ) {
+			return;
+		}
+
 		if ( isSelected ) {
 			showSearchField();
 		} else {
@@ -161,7 +165,7 @@ export default function SearchEdit( {
 			buttonUseIcon && 'no-button' !== buttonPosition
 				? 'wp-block-search__icon-button'
 				: undefined,
-			isSelected ? 'wp-block-search__is-selected' : undefined
+			isSelected ? undefined : 'wp-block-search__is-deselected'
 		);
 	};
 
@@ -193,32 +197,27 @@ export default function SearchEdit( {
 	};
 
 	const hideSearchField = () => {
-		searchFieldRef.current.style.width = `${ searchFieldRef.current.offsetWidth }px`;
-		searchFieldRef.current.style.flexGrow = '0';
-		searchFieldRef.current.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
-		searchFieldRef.current.style.transitionProperty = 'margin-left';
+		const wrapper = searchFieldRef.current.offsetParent;
+		const searchField = searchFieldRef.current;
+		const button = buttonRef.current;
 
-		const offset =
-			searchFieldRef.current.offsetWidth +
-			parseInt(
-				window.getComputedStyle( searchFieldRef.current ).marginRight
-			) +
-			parseInt( window.getComputedStyle( buttonRef.current ).marginLeft );
-
-		searchFieldRef.current.style.marginLeft = `-${ offset }px`;
+		searchField.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
+		wrapper.style.width = `${ button.offsetWidth }px`;
+		wrapper.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
 	};
 
 	const showSearchField = ( animate = true ) => {
+		const wrapper = searchFieldRef.current.offsetParent;
+		const searchField = searchFieldRef.current;
 		const duration = animate ? SEARCHFIELD_ANIMATION_DURATION : 0;
-
-		searchFieldRef.current.style.marginLeft = 0;
-		searchFieldRef.current.style.transitionDuration = `${ duration }ms`;
-
 		const resetWidth = setTimeout( () => {
-			searchFieldRef.current.style.flexGrow = '1';
-			searchFieldRef.current.style.width = `${ width }${ widthUnit }`;
+			searchField.style.width = `${ width }${ widthUnit }`;
+
 			clearTimeout( resetWidth );
 		}, duration );
+
+		searchField.style.transitionDuration = `${ duration }ms`;
+		wrapper.style.width = `${ width }${ widthUnit }`;
 	};
 
 	const renderTextField = () => {

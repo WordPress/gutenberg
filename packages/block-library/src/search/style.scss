@@ -62,13 +62,25 @@
 	&.wp-block-search__button-behavior-expand {
 		overflow: hidden;
 
-		.wp-block-search__input {
-			flex-grow: 1;
+		.wp-block-search__inside-wrapper {
+			overflow: hidden;
+			transition-property: width;
 		}
 
-		&.wp-block-search__is-selected {
+		.wp-block-search__input {
+			transition-property: width;
+		}
+
+		// !important here to override inline styles on button only deselected view.
+		&.wp-block-search__is-deselected {
+			.wp-block-search__inside-wrapper {
+				min-width: 0 !important;
+			}
 			.wp-block-search__input {
-				//	flex-grow: 1;
+				width: 0 !important;
+				min-width: 0 !important;
+				padding: 0 !important;
+				border: none !important;
 			}
 		}
 	}
