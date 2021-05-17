@@ -390,6 +390,14 @@ function CoverEdit( {
 		minHeight: temporaryMinHeight || minHeightWithUnit || undefined,
 	};
 
+	const gradientStyle = {
+		background: gradientValue,
+	};
+
+	const backgroundStyle = {
+		backgroundColor: overlayColor.color,
+	};
+
 	const mediaStyle = {
 		objectPosition:
 			focalPoint && isImgElement
@@ -634,14 +642,24 @@ function CoverEdit( {
 					} }
 					showHandle={ isSelected }
 				/>
-				{ url && gradientValue && dimRatio !== 0 && (
+				{ overlayColor.color && ! gradientValue && dimRatio !== 0 && (
+					<span
+						aria-hidden="true"
+						className={ classnames(
+							'wp-block-cover__background',
+							classes
+						) }
+						style={ backgroundStyle }
+					/>
+				) }
+				{ gradientValue && ! overlayColor.color && dimRatio !== 0 && (
 					<span
 						aria-hidden="true"
 						className={ classnames(
 							'wp-block-cover__gradient-background',
 							classes
 						) }
-						style={ { backgroundImage: gradientValue } }
+						style={ gradientStyle }
 					/>
 				) }
 				{ url && isImageBackground && isImgElement && (

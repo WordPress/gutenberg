@@ -48,15 +48,6 @@
 		background-color: $black;
 	}
 
-	&.has-background-dim::before {
-		content: "";
-		background-color: inherit;
-	}
-
-	.has-background-dim .wp-block-cover__background {
-		background-color: $black;
-	}
-
 	.has-background-dim:not(.has-background-gradient),
 	.wp-block-cover__gradient-background,
 	.wp-block-cover__background {
