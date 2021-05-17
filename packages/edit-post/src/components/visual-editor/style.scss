@@ -33,12 +33,6 @@
 	// color doesn't show through.
 	background-color: $white;
 	flex: 1;
-
-	cursor: text;
-
-	> * {
-		cursor: auto;
-	}
 }
 
 // Ideally this wrapper div is not needed but if we want to match the positioning of blocks
