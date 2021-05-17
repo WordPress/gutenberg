@@ -82,6 +82,13 @@ export default function useDropZone( {
 					maybeDragStart
 				);
 
+				// Note that `dragend` doesn't fire consistently for file and
+				// HTML drag events where the drag origin is outside the browser
+				// window. In Firefox it may also not fire if the originating
+				// node is removed.
+				ownerDocument.addEventListener( 'dragend', maybeDragEnd );
+				ownerDocument.addEventListener( 'mousemove', maybeDragEnd );
+
 				if ( onDragStartRef.current ) {
 					onDragStartRef.current( event );
 				}
@@ -168,6 +175,8 @@ export default function useDropZone( {
 				isDragging = false;
 
 				ownerDocument.addEventListener( 'dragenter', maybeDragStart );
+				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
+				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
 
 				if ( onDragEndRef.current ) {
 					onDragEndRef.current( event );
@@ -178,12 +187,6 @@ export default function useDropZone( {
 			element.addEventListener( 'dragenter', onDragEnter );
 			element.addEventListener( 'dragover', onDragOver );
 			element.addEventListener( 'dragleave', onDragLeave );
-			// Note that `dragend` doesn't fire consistently for file and HTML
-			// drag events where the drag origin is outside the browser window.
-			// In Firefox it may also not fire if the originating node is
-			// removed.
-			ownerDocument.addEventListener( 'dragend', maybeDragEnd );
-			ownerDocument.addEventListener( 'mouseup', maybeDragEnd );
 			// The `dragstart` event doesn't fire if the drag started outside
 			// the document.
 			ownerDocument.addEventListener( 'dragenter', maybeDragStart );
@@ -194,7 +197,7 @@ export default function useDropZone( {
 				element.removeEventListener( 'dragover', onDragOver );
 				element.removeEventListener( 'dragleave', onDragLeave );
 				ownerDocument.removeEventListener( 'dragend', maybeDragEnd );
-				ownerDocument.removeEventListener( 'mouseup', maybeDragEnd );
+				ownerDocument.removeEventListener( 'mousemove', maybeDragEnd );
 				ownerDocument.addEventListener( 'dragenter', maybeDragStart );
 			};
 		},

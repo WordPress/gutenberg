@@ -36,7 +36,6 @@ function InsertionPointPopover( {
 	const ref = useRef();
 	const {
 		orientation,
-		isHidden,
 		previousClientId,
 		nextClientId,
 		rootClientId,
@@ -45,10 +44,6 @@ function InsertionPointPopover( {
 		const {
 			getBlockOrder,
 			getBlockListSettings,
-			getMultiSelectedBlockClientIds,
-			getSelectedBlockClientId,
-			hasMultiSelection,
-			getSettings,
 			getBlockInsertionPoint,
 		} = select( blockEditorStore );
 		const insertionPoint = getBlockInsertionPoint();
@@ -66,9 +61,6 @@ function InsertionPointPopover( {
 		const next = isLast
 			? null
 			: blockOrder[ blockOrder.indexOf( previous ) + 1 ];
-		const { hasReducedUI } = getSettings();
-		const multiSelectedBlockClientIds = getMultiSelectedBlockClientIds();
-		const selectedBlockClientId = getSelectedBlockClientId();
 		const blockOrientation =
 			getBlockListSettings( targetRootClientId )?.orientation ||
 			'vertical';
@@ -76,13 +68,6 @@ function InsertionPointPopover( {
 		return {
 			previousClientId: previous,
 			nextClientId: next,
-			isHidden:
-				hasReducedUI ||
-				( hasMultiSelection()
-					? next && multiSelectedBlockClientIds.includes( next )
-					: next &&
-					  blockOrientation === 'vertical' &&
-					  next === selectedBlockClientId ),
 			orientation: blockOrientation,
 			clientId: targetClientId,
 			rootClientId: targetRootClientId,
@@ -193,14 +178,7 @@ function InsertionPointPopover( {
 	// Only show the inserter when there's a `nextElement` (a block after the
 	// insertion point). At the end of the block list the trailing appender
 	// should serve the purpose of inserting blocks.
-	const showInsertionPointInserter =
-		! isHidden && nextElement && isInserterShown;
-
-	// Show the indicator if the insertion point inserter is visible, or if
-	// the `showInsertionPoint` state is `true`. The latter is generally true
-	// when hovering blocks for insertion in the block library.
-	const showInsertionPointIndicator =
-		showInsertionPointInserter || ! isHidden;
+	const showInsertionPointInserter = nextElement && isInserterShown;
 
 	/* eslint-disable jsx-a11y/no-static-element-interactions, jsx-a11y/click-events-have-key-events */
 	// While ideally it would be enough to capture the
@@ -231,9 +209,7 @@ function InsertionPointPopover( {
 				} ) }
 				style={ style }
 			>
-				{ showInsertionPointIndicator && (
-					<div className="block-editor-block-list__insertion-point-indicator" />
-				) }
+				<div className="block-editor-block-list__insertion-point-indicator" />
 				{ showInsertionPointInserter && (
 					<div
 						className={ classnames(
@@ -266,11 +242,7 @@ export default function InsertionPoint( {
 	__unstableContentRef,
 } ) {
 	const isVisible = useSelect( ( select ) => {
-		const { isMultiSelecting, isBlockInsertionPointVisible } = select(
-			blockEditorStore
-		);
-
-		return isBlockInsertionPointVisible() && ! isMultiSelecting();
+		return select( blockEditorStore ).isBlockInsertionPointVisible();
 	}, [] );
 
 	return (
