@@ -3,7 +3,10 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { Button } from '@wordpress/components';
-import { __experimentalLibrary as Library } from '@wordpress/block-editor';
+import {
+	__experimentalLibrary as Library,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 import { close } from '@wordpress/icons';
 import {
 	useViewportMatch,
@@ -21,10 +24,14 @@ export default function InserterSidebar() {
 		( select ) => select( editSiteStore ).__experimentalGetInsertionPoint(),
 		[]
 	);
-
+	const { getSelectedBlockClientId } = useSelect( blockEditorStore );
+	const { selectBlock } = useDispatch( blockEditorStore );
 	const isMobile = useViewportMatch( 'medium', '<' );
 	const [ inserterDialogRef, inserterDialogProps ] = useDialog( {
-		onClose: () => setIsInserterOpened( false ),
+		onClose: () => {
+			setIsInserterOpened( false );
+			selectBlock( getSelectedBlockClientId(), 0 );
+		},
 	} );
 
 	return (
