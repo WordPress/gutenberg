@@ -22,7 +22,7 @@ initialize( '#navigation-editor-root', blockEditorSettings );
 
 ## Purpose
 
-By default, the Navigation Editor screen allows users to create and edit complex navigations using a block-based UI. The aim is to supercede the current Menus screen by providing a superior experience whilst retaining backwards compatibility.
+By default, the Navigation Editor screen allows users to create and edit complex navigations using a block-based UI. The aim is to supercede [the current Menus screen](https://codex.wordpress.org/WordPress_Menu_User_Guide) by providing a superior experience whilst retaining backwards compatibility.
 
 ## Modes
 
@@ -159,7 +159,7 @@ return (
 -   **Link block** - the basic `core/navigation-link` block which is the standard block used to add links within navigations.
 -   **Navigation block** - the root `core/navigation` block which can be used both with the Navigation Editor and outside (eg: Post / Site Editor).
 -   **Navigation editor / screen** - the new screen provided by Gutenberg to allow the user to edit navigations using a block-based UI.
-
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
+-   **Menus screen** - the current/existing [interface/screen for managing Menus](https://codex.wordpress.org/WordPress_Menu_User_Guide) in WordPress WPAdmin.
+    _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
