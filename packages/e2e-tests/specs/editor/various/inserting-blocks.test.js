@@ -374,7 +374,7 @@ describe( 'Inserting blocks', () => {
 
 		// The inserter panel should've closed.
 		const inserterPanels = await page.$$(
-			'.edit-post-layout__inserter-panel'
+			'.edit-post-editor__inserter-panel'
 		);
 		expect( inserterPanels.length ).toBe( 0 );
 
