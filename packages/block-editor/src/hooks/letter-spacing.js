@@ -65,9 +65,7 @@ export function useIsLetterSpacingDisabled( { name: blockName } = {} ) {
 		blockName,
 		LETTER_SPACING_SUPPORT_KEY
 	);
-	const hasLetterSpacing = useSetting(
-		'typography.customLetterSpacing'
-	);
+	const hasLetterSpacing = useSetting( 'typography.customLetterSpacing' );
 
 	return notSupported || ! hasLetterSpacing;
 }
