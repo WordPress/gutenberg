@@ -53,8 +53,6 @@ This unlocks significant additional capabilities in the Navigation Editor. For e
 -   `core/social`.
 -   `core/search`.
 
-These are persisted as a `nav_menu_item` post with a type of `block` and when rendered on the frontend these are parsed and rendered as _blocks_.
-
 #### Technical Implementation details
 
 By default, `core/navigation-link` items are serialized and persisted as `nav_menu_item` posts. No serialized block HTML is stored for these standard link blocks.
@@ -106,9 +104,9 @@ return (
 
 ## Glossary
 
--   Link block - refers to the basic `core/navigation-link` block which is the standard block used to add links within navigations.
--   Navigation block - refers to the root `core/navigation` block which can be used both with the Navigation Editor and outside (eg: Post / Site Editor).
--   Navigation Editor screen - the new screen provided by Gutenberg to allow the user to edit navigations using a block-based UI.
+-   **Link block** - the basic `core/navigation-link` block which is the standard block used to add links within navigations.
+-   **Navigation block** - the root `core/navigation` block which can be used both with the Navigation Editor and outside (eg: Post / Site Editor).
+-   **Navigation Editor screen** - the new screen provided by Gutenberg to allow the user to edit navigations using a block-based UI.
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
