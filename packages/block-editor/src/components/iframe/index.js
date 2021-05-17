@@ -6,6 +6,8 @@ import {
 	createPortal,
 	useCallback,
 	forwardRef,
+	useLayoutEffect,
+	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
@@ -126,19 +128,7 @@ function setBodyClassName( doc ) {
 	}
 }
 
-/**
- * Sets the document head and default styles.
- *
- * @param {Document} doc  Document to set the head for.
- * @param {string}   head HTML to set as the head.
- */
-function setHead( doc, head ) {
-	doc.head.innerHTML =
-		// Body margin must be overridable by themes.
-		'<style>body{margin:0}</style>' + head;
-}
-
-function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
+function Iframe( { contentRef, children, head, ...props }, ref ) {
 	const [ iframeDocument, setIframeDocument ] = useState();
 
 	const clearerRef = useBlockSelectionClearer();
@@ -161,9 +151,7 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 				contentRef.current = body;
 			}
 
-			setHead( contentDocument, headHTML );
 			setBodyClassName( contentDocument );
-			styleSheetsCompat( contentDocument );
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
 			setIframeDocument( contentDocument );
@@ -182,6 +170,34 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 			setDocumentIfReady();
 		} );
 	}, [] );
+
+	useLayoutEffect( () => {
+		if ( iframeDocument ) {
+			styleSheetsCompat( iframeDocument );
+		}
+	}, [ iframeDocument ] );
+
+	const { html } = window.__editorStyles;
+	const assets = useMemo( () => {
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = html;
+		return Array.from( doc.body.children );
+	}, [ html ] );
+
+	head = (
+		<>
+			<style>{ 'body{margin:0}' }</style>
+			{ assets.map(
+				( { tagName: TagName, src, href, id, rel, media }, index ) => (
+					<TagName
+						{ ...{ src, href, id, rel, media } }
+						key={ index }
+					/>
+				)
+			) }
+			{ head }
+		</>
+	);
 
 	return (
 		<iframe

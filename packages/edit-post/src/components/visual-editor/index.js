@@ -70,7 +70,6 @@ function MaybeIframe( {
 
 	return (
 		<Iframe
-			headHTML={ window.__editorStyles.html }
 			head={ <EditorStyles styles={ styles } /> }
 			ref={ ref }
 			contentRef={ contentRef }

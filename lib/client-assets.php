@@ -708,7 +708,8 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
  * Sets the editor styles to be consumed by JS.
  */
 function gutenberg_extend_block_editor_styles_html() {
-	$handles = array(
+	$script_handles = array();
+	$handles        = array(
 		'wp-block-editor',
 		'wp-block-library',
 		'wp-edit-blocks',
@@ -724,6 +725,10 @@ function gutenberg_extend_block_editor_styles_html() {
 		if ( ! empty( $block_type->editor_style ) ) {
 			$handles[] = $block_type->editor_style;
 		}
+
+		if ( ! empty( $block_type->script ) ) {
+			$script_handles[] = $block_type->script;
+		}
 	}
 
 	$handles = array_unique( $handles );
@@ -734,6 +739,13 @@ function gutenberg_extend_block_editor_styles_html() {
 	wp_styles()->done = array();
 	wp_styles()->do_items( $handles );
 	wp_styles()->done = $done;
+
+	$script_handles = array_unique( $script_handles );
+	$done           = wp_scripts()->done;
+
+	wp_scripts()->done = array();
+	wp_scripts()->do_items( $script_handles );
+	wp_scripts()->done = $done;
 
 	$editor_styles = wp_json_encode( array( 'html' => ob_get_clean() ) );
 
