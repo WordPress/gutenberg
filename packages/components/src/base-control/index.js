@@ -6,7 +6,7 @@ import classnames from 'classnames';
 /**
  * Internal dependencies
  */
-import { VisuallyHidden } from '../visually-hidden';
+import VisuallyHidden from '../visually-hidden';
 import {
 	Wrapper,
 	StyledField,
