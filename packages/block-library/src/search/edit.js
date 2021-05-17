@@ -192,6 +192,35 @@ export default function SearchEdit( {
 		};
 	};
 
+	const hideSearchField = () => {
+		searchFieldRef.current.style.width = `${ searchFieldRef.current.offsetWidth }px`;
+		searchFieldRef.current.style.flexGrow = '0';
+		searchFieldRef.current.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
+		searchFieldRef.current.style.transitionProperty = 'margin-left';
+
+		const offset =
+			searchFieldRef.current.offsetWidth +
+			parseInt(
+				window.getComputedStyle( searchFieldRef.current ).marginRight
+			) +
+			parseInt( window.getComputedStyle( buttonRef.current ).marginLeft );
+
+		searchFieldRef.current.style.marginLeft = `-${ offset }px`;
+	};
+
+	const showSearchField = ( animate = true ) => {
+		const duration = animate ? SEARCHFIELD_ANIMATION_DURATION : 0;
+
+		searchFieldRef.current.style.marginLeft = 0;
+		searchFieldRef.current.style.transitionDuration = `${ duration }ms`;
+
+		const resetWidth = setTimeout( () => {
+			searchFieldRef.current.style.flexGrow = '1';
+			searchFieldRef.current.style.width = `${ width }${ widthUnit }`;
+			clearTimeout( resetWidth );
+		}, duration );
+	};
+
 	const renderTextField = () => {
 		return (
 			<input
