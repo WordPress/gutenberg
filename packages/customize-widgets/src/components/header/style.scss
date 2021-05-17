@@ -1,7 +1,4 @@
 .customize-widgets-header {
-	position: sticky;
-	top: 0;
-
 	@include break-medium() {
 		// The mobile fixed block toolbar should be snug under the header.
 		margin-bottom: $grid-unit-60 + $default-block-margin;
