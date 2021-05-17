@@ -187,14 +187,15 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 	head = (
 		<>
 			<style>{ 'body{margin:0}' }</style>
-			{ assets.map(
-				( { tagName: TagName, src, href, id, rel, media }, index ) => (
+			{ assets.map( ( { tagName, src, href, id, rel, media }, index ) => {
+				const TagName = tagName.toLowerCase();
+				return (
 					<TagName
 						{ ...{ src, href, id, rel, media } }
 						key={ index }
 					/>
-				)
-			) }
+				);
+			} ) }
 			{ head }
 		</>
 	);
