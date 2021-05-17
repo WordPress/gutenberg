@@ -26,6 +26,7 @@ function MenuIndex( {
 	menu,
 	onAnimationEnd,
 	onMenuChange,
+	isPresentational,
 } ) {
 	const navigationTree = useCreateNavigationTree();
 	const context = {
@@ -40,8 +41,9 @@ function MenuIndex( {
 	};
 	return (
 		<div
-			key={ menu }
+			aria-hidden={ isPresentational }
 			className={ className || '' }
+			key={ menu }
 			onAnimationEnd={ onAnimationEnd }
 		>
 			<NavigationContext.Provider value={ context }>
@@ -75,6 +77,7 @@ export default function Navigation( {
 					type: 'slide-out',
 					origin: slideInOrigin,
 				} ),
+				isPresentational: true,
 				onAnimationEnd: () => setPrevious( null ),
 			};
 			setPrevious( <MenuIndex { ...props } /> );
