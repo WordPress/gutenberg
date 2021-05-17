@@ -89,7 +89,7 @@
 		"postrn-bundle": "cd ../.. && patch-package --reverse --patch-dir packages/react-native-editor/metro-patch",
 		"prebundle": "npm run i18n-cache:force",
 		"bundle": "npm run bundle:android && npm run bundle:ios",
-		"bundle:android": "mkdir -p bundle/android && npm run rn-bundle -- --platform android --dev false --entry-file index.js --assets-dest bundle/android --bundle-output bundle/android/App.text.js --sourcemap-output bundle/android/App.text.js.map && ./gutenberg/node_modules/hermes-engine/`node -e \"const platform=require('os').platform();console.log(platform === 'darwin' ? 'osx-bin' : (platform === 'linux' ? 'linux64-bin' : (platform === 'win32' ? 'win64-bin' : 'unsupported-os')));\"`/hermes -emit-binary -O -out bundle/android/App.js bundle/android/App.text.js -output-source-map",
+		"bundle:android": "mkdir -p bundle/android && npm run rn-bundle -- --platform android --dev false --entry-file index.js --assets-dest bundle/android --bundle-output bundle/android/App.text.js --sourcemap-output bundle/android/App.text.js.map && ./../../node_modules/hermes-engine/`node -e \"const platform=require('os').platform();console.log(platform === 'darwin' ? 'osx-bin' : (platform === 'linux' ? 'linux64-bin' : (platform === 'win32' ? 'win64-bin' : 'unsupported-os')));\"`/hermesc -emit-binary -O -out bundle/android/App.js bundle/android/App.text.js -output-source-map",
 		"bundle:ios": "mkdir -p bundle/ios && npm run rn-bundle -- --platform ios --dev false --entry-file index.js --assets-dest bundle/ios --bundle-output bundle/ios/App.js --sourcemap-output bundle/ios/App.js.map",
 		"i18n-cache": "node i18n-cache/index.js",
 		"i18n-cache:force": "cross-env REFRESH_I18N_CACHE=1 node i18n-cache/index.js",
