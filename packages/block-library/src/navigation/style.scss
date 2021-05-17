@@ -97,12 +97,12 @@
 			color: inherit;
 			position: absolute;
 			z-index: 2;
-			display: flex;
 			flex-direction: column;
 			align-items: normal;
 			min-width: 200px;
 
 			// Hide until hover or focus within.
+			display: none;
 			opacity: 0;
 			transition: opacity 0.1s linear;
 			visibility: hidden;
@@ -146,17 +146,19 @@
 		}
 
 		// Separating out hover and focus-within so hover works again on IE: https://davidwalsh.name/css-focus-within#comment-513401
-		// We will need to replace focus-within with a JS solution for IE keyboard support.
+		// We don't actually have to support this anymore, but it's easy to keep for now.
 
 		// Custom menu items.
 		// Show submenus on hover.
 		&:hover > .wp-block-navigation-link__container {
+			display: flex;
 			visibility: visible;
 			opacity: 1;
 		}
 
 		// Keep submenus open when focus is within.
 		&:focus-within > .wp-block-navigation-link__container {
+			display: flex;
 			visibility: visible;
 			opacity: 1;
 		}

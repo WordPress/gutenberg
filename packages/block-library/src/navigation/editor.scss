@@ -43,6 +43,7 @@
 	&.is-selected,
 	&.has-child-selected {
 		> .wp-block-navigation-link__container {
+			display: flex;
 			opacity: 1;
 			visibility: visible;
 		}
