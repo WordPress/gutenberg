@@ -304,10 +304,10 @@ describe( 'Inserting blocks', () => {
 			inserterMenuInputSelector
 		);
 		inserterMenuSearchInput.type( 'cover' );
-		// Wait for the search results to load (Cover block).
 		await page.waitForSelector(
-			'.block-editor-block-types-list__item.editor-block-list-item-cover'
+			'.block-editor-block-types-list .editor-block-list-item-cover'
 		);
+		// clicking may be too quick and may select a detached node.
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Enter' );
