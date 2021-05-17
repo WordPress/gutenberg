@@ -59,12 +59,12 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$style = '';
 	if ( $content_size || $wide_size ) {
 		$style  = ".wp-container-$id > * {";
-		$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
+		$style .= 'max-width: ' . esc_html( wp_strip_all_tags( $all_max_width_value ) ) . ';';
 		$style .= 'margin-left: auto !important;';
 		$style .= 'margin-right: auto !important;';
 		$style .= '}';
 
-		$style .= ".wp-container-$id > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
+		$style .= ".wp-container-$id > .alignwide { max-width: " . esc_html( wp_strip_all_tags( $wide_max_width_value ) ) . ';}';
 
 		$style .= ".wp-container-$id .alignfull { max-width: none; }";
 	}
