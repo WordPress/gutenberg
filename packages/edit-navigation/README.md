@@ -22,12 +22,14 @@ initialize( '#navigation-editor-root', blockEditorSettings );
 
 ## Purpose
 
-By default, the Navigation Editor screen creates block based representations of menus allows users to create and edit complex menus using block-based UI.
+By default, the Navigation Editor screen allows users to create and edit complex navigations using a block-based UI. The aim is to supercede the current Menus screen by providing a superior experience whilst retaining backwards compatibility.
 
-In addition to this the Navigation Editor has two "modes" for _persistence_ ("saving" navigations) and _rendering_:
+## Modes
 
-1. Default - navigations are saved to the _existing_ (post type powered) Menus system and rendered using standard Walker classes.
-2. Block-based - navigations continue to be _saved_ using the existing post type system, but non-link blocks are saved (see technical implementation) and _rendered_ as blocks to provide access to the full power of the Navigation block (with some tradeoffs in terms of backwards compatibility).
+The Navigation Editor has two "modes" for _persistence_ ("saving" navigations) and _rendering_:
+
+1. **Default** - navigations are saved to the _existing_ (post type powered) Menus system and rendered using standard Walker classes.
+2. **Block-based** (opt _in_) - navigations continue to be _saved_ using the existing post type system, but non-link blocks are saved (see technical implementation) and _rendered_ as blocks to provide access to the full power of the Navigation block (with some tradeoffs in terms of backwards compatibility).
 
 ### Default Mode
 
@@ -37,15 +39,15 @@ Moreover, when the navigation is rendered on the front of the site the system co
 
 ### Block-based Mode
 
-If desired, themes are able to opt into _rendering_ complete block-based menus. This allows for arbitrarily complex Navigation block structures to be used in an existing theme whilst still ensuring the navigation data is still _saved_ to the existing (post type powered) Menus system.
+If desired, themes are able to opt into _rendering_ complete block-based menus using the Navigation Editor. This allows for arbitrarily complex navigation block structures to be used in an existing theme whilst still ensuring the navigation data is still _saved_ to the existing (post type powered) Menus system.
 
-Themes can opt into this by declaring:
+Themes can opt into this behaviour by declaring:
 
 ```php
 add_theme_support( 'block-nav-menus' );
 ```
 
-This unlocks significant additional capabilities in the Navigation Editor. For example, by default, the Navigation Editor screen only allows link blocks to be inserted into a navigation. When a theme opts into `block-nav-menus` however, users are able to add non-link blocks to a navigation using the Navigation Editor screen, including:
+This unlocks significant additional capabilities in the Navigation Editor. For example, by default, [the Navigation Editor screen only allows _link_ (`core/navigation-link`) blocks to be inserted into a navigation](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/packages/edit-navigation/src/filters/disable-inserting-non-navigation-blocks.js). When a theme opts into `block-nav-menus` however, users are able to add non-link blocks to a navigation using the Navigation Editor screen, including:
 
 -   `core/navigation-link`.
 -   `core/social`.
@@ -55,11 +57,11 @@ These are persisted as a `nav_menu_item` post with a type of `block` and when re
 
 #### Technical Implementation details
 
-By default, `core/navigation-link` items are serialized and persisted as `nav_menu_item` posts. No serialized block HTML is stored for link blocks.
+By default, `core/navigation-link` items are serialized and persisted as `nav_menu_item` posts. No serialized block HTML is stored for these standard link blocks.
 
-Non-link navigation items however, are persisted as `nav_menu_items` with a special `type` of `block`. These items have an _additional_ `content` field which is used to store the serialized block markup.
+_Non_-link navigation items however, are [persisted as `nav_menu_items` with a special `type` of `block`](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/packages/edit-navigation/src/store/utils.js#L159-L166). These items have an [_additional_ `content` field which is used to store the serialized block markup](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L71-L101).
 
-When rendered on the front-end, the blocks are `parse`d from the `content` field and rendered as blocks.
+When rendered on the front-end, the blocks are [`parse`d from the `content` field](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L191-L203) and [rendered as blocks](https://github.com/WordPress/gutenberg/blob/7fcd57c9a62c232899e287f6d96416477d810d5e/lib/navigation.php#L103-L135).
 
 If the user switches to a theme that does not support block menus, or disables this functionality, non-link blocks are no longer rendered on the frontend. Care is taken, however, to ensure that users can still see their data on the existing Menus screen.
 
@@ -101,6 +103,12 @@ return (
 	</BlockEditorProvider>
 );
 ```
+
+## Glossary
+
+-   Link block - refers to the basic `core/navigation-link` block which is the standard block used to add links within navigations.
+-   Navigation block - refers to the root `core/navigation` block which can be used both with the Navigation Editor and outside (eg: Post / Site Editor).
+-   Navigation Editor screen - the new screen provided by Gutenberg to allow the user to edit navigations using a block-based UI.
 
 _This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
