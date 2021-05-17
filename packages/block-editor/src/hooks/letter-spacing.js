@@ -7,7 +7,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import LetterSpacingControl from '../components/letter-spacing-control';
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -65,7 +65,7 @@ export function useIsLetterSpacingDisabled( { name: blockName } = {} ) {
 		blockName,
 		LETTER_SPACING_SUPPORT_KEY
 	);
-	const hasLetterSpacing = useEditorFeature(
+	const hasLetterSpacing = useSetting(
 		'typography.customLetterSpacing'
 	);
 

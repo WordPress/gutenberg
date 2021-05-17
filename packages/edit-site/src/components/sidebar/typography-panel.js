@@ -46,7 +46,7 @@ function useHasAppearanceControl( { supports, name } ) {
 
 function useHasLetterSpacingControl( { supports, name } ) {
 	return (
-		useEditorFeature( 'typography.customLetterSpacing', name ) &&
+		useSetting( 'typography.customLetterSpacing', name ) &&
 		supports.includes( 'letterSpacing' )
 	);
 }
