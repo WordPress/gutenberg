@@ -11,9 +11,11 @@ exports.resolve = function ( source, file, config ) {
 
 		let entryFile;
 		try {
-			entryFile = require.resolve( `../${ packageName }` );
+			entryFile = require.resolve( `../../packages/${ packageName }` );
 		} catch {
-			entryFile = require.resolve( `../${ packageName }/src/index.js` );
+			entryFile = require.resolve(
+				`../../packages/${ packageName }/src/index.js`
+			);
 		}
 
 		return {

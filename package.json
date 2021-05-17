@@ -129,7 +129,6 @@
 		"@wordpress/e2e-test-utils": "file:packages/e2e-test-utils",
 		"@wordpress/e2e-tests": "file:packages/e2e-tests",
 		"@wordpress/env": "file:packages/env",
-		"@wordpress/eslint-import-resolver": "file:packages/eslint-import-resolver",
 		"@wordpress/eslint-plugin": "file:packages/eslint-plugin",
 		"@wordpress/jest-console": "file:packages/jest-console",
 		"@wordpress/jest-preset-default": "file:packages/jest-preset-default",

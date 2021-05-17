@@ -1482,12 +1482,6 @@
 		"parent": "packages"
 	},
 	{
-		"title": "@wordpress/eslint-import-resolver",
-		"slug": "packages-eslint-import-resolver",
-		"markdown_source": "../packages/eslint-import-resolver/README.md",
-		"parent": "packages"
-	},
-	{
 		"title": "@wordpress/eslint-plugin",
 		"slug": "packages-eslint-plugin",
 		"markdown_source": "../packages/eslint-plugin/README.md",
