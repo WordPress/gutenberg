@@ -321,7 +321,11 @@
 		}
 	}
 
-	&.is-insertion-point-visible,
+	// Hide the block toolbar if the insertion point is shown.
+	&.is-insertion-point-visible {
+		visibility: hidden;
+	}
+
 	.is-dragging-components-draggable & {
 		opacity: 0;
 		// Use a minimal duration to delay hiding the element, see hide-during-dragging animation for more details.

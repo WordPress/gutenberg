@@ -34,7 +34,6 @@ function selector( select ) {
 		isCaretWithinFormattedText,
 		getSettings,
 		getLastMultiSelectedBlockClientId,
-		isBlockInsertionPointVisible,
 	} = select( blockEditorStore );
 	return {
 		isNavigationMode: isNavigationMode(),
@@ -44,7 +43,6 @@ function selector( select ) {
 		hasMultiSelection: hasMultiSelection(),
 		hasFixedToolbar: getSettings().hasFixedToolbar,
 		lastClientId: getLastMultiSelectedBlockClientId(),
-		isInsertionPointVisible: isBlockInsertionPointVisible(),
 	};
 }
 
@@ -65,8 +63,25 @@ function BlockPopover( {
 		hasMultiSelection,
 		hasFixedToolbar,
 		lastClientId,
-		isInsertionPointVisible,
 	} = useSelect( selector, [] );
+	const isInsertionPointVisible = useSelect(
+		( select ) => {
+			const {
+				isBlockInsertionPointVisible,
+				getBlockInsertionPoint,
+				getBlockOrder,
+			} = select( blockEditorStore );
+
+			if ( ! isBlockInsertionPointVisible() ) {
+				return false;
+			}
+
+			const insertionPoint = getBlockInsertionPoint();
+			const order = getBlockOrder( insertionPoint.rootClientId );
+			return order[ insertionPoint.index ] === clientId;
+		},
+		[ clientId ]
+	);
 	const isLargeViewport = useViewportMatch( 'medium' );
 	const [ isToolbarForced, setIsToolbarForced ] = useState( false );
 	const [ isInserterShown, setIsInserterShown ] = useState( false );
