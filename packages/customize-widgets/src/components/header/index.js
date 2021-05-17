@@ -13,12 +13,19 @@ import { plus } from '@wordpress/icons';
 import Inserter from '../inserter';
 import useScrollGesture from '../../hooks/use-scroll-gesture';
 
-function onScrollUp() {
-	console.log( 'scrolled up' );
+function onScrollUp( { deltaY }, node ) {
+	// Transition the node's top style between an offscreen position and 0,
+	// offsetting by the scroll deltaY.
+	const offset = parseInt( node.style.top || 0, 10 ) - deltaY;
+	node.style.top = `${ Math.min( 0, offset ) }px`;
 }
 
-function onScrollDown() {
-	console.log( 'scrolled down' );
+function onScrollDown( { deltaY }, node ) {
+	// Transition the node's top style between 0 and an offscreen position
+	// (calculated using the node's height), offsetting by the scroll deltaY.
+	const nodeRect = node.getBoundingClientRect();
+	const offset = parseInt( node.style.top || 0, 10 ) - deltaY;
+	node.style.top = `${ Math.max( -nodeRect.height, offset ) }px`;
 }
 
 function Header( { inserter, isInserterOpened, setIsInserterOpened } ) {

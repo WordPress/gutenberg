@@ -8,10 +8,9 @@ import { useRef } from '@wordpress/element';
 export default function useScrollGesture( { onScrollUp, onScrollDown } ) {
 	const scrollContainer = useRef();
 	const lastScrollContainerPosition = useRef();
-	const lastDirection = useRef();
 
 	return useRefEffect( ( node ) => {
-		function revealOnScroll( { deltaY } ) {
+		function onWheel( event ) {
 			if ( ! scrollContainer.current ) {
 				scrollContainer.current = getScrollContainer( node );
 				if ( scrollContainer.current ) {
@@ -20,34 +19,31 @@ export default function useScrollGesture( { onScrollUp, onScrollDown } ) {
 				}
 			}
 
-			// Check that the element's scroll container was scrolled.
+			// Check that it was the element's scroll container
+			// that was scrolled.
 			if (
 				scrollContainer.current &&
 				lastScrollContainerPosition.current !==
 					scrollContainer.scrollTop
 			) {
-				if ( deltaY > 0 && lastDirection.current !== 'down' ) {
-					lastDirection.current = 'down';
-					onScrollDown( node );
+				const { deltaY } = event;
+				if ( deltaY > 0 ) {
+					onScrollDown( event, node );
 				}
 
-				if ( deltaY < 0 && lastDirection.current !== 'up' ) {
-					lastDirection.current = 'up';
-					onScrollUp( node );
+				if ( deltaY < 0 ) {
+					onScrollUp( event, node );
 				}
 			}
 		}
 
 		if ( node ) {
-			node.ownerDocument.addEventListener( 'wheel', revealOnScroll );
+			node.ownerDocument.addEventListener( 'wheel', onWheel );
 		}
 
 		return () => {
 			if ( node ) {
-				node.ownerDocument.removeEventListener(
-					'wheel',
-					revealOnScroll
-				);
+				node.ownerDocument.removeEventListener( 'wheel', onWheel );
 			}
 		};
 	}, [] );
