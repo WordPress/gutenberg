@@ -35,7 +35,11 @@ export default function ManageLocations( {
 	}
 
 	if ( ! menuLocations.length ) {
-		return <p>{ __( 'There are no available menu locations.' ) }</p>;
+		return (
+			<PanelBody title={ __( 'Theme locations' ) }>
+				<p>{ __( 'There are no available menu locations.' ) }</p>
+			</PanelBody>
+		);
 	}
 
 	const themeLocationCountTextMain = sprintf(
