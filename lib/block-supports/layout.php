@@ -53,46 +53,29 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$content_size = isset( $used_layout['contentSize'] ) ? $used_layout['contentSize'] : null;
 	$wide_size    = isset( $used_layout['wideSize'] ) ? $used_layout['wideSize'] : null;
 
-	$all_max_width_value       = $content_size ? $content_size : $wide_size;
-	$all_max_width_declaration = "max-width: $all_max_width_value";
+	$all_max_width_value  = $content_size ? $content_size : $wide_size;
+	$wide_max_width_value = $wide_size ? $wide_size : $content_size;
 
-	$wide_max_width_value       = $wide_size ? $wide_size : $content_size;
-	$wide_max_width_declaration = "max-width: $wide_max_width_value";
+	// Make sure there is a single CSS rule, and all tags are stripped for security.
+	// TODO: Use `safecss_filter_attr` instead - once https://core.trac.wordpress.org/ticket/46197 is patched.
+	$all_max_width_value  = wp_strip_all_tags( explode( ';', $all_max_width_value )[0] );
+	$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
 
 	$style = '';
 	if ( $content_size || $wide_size ) {
-		ob_start();
-		?>
-			<?php echo '.wp-container-' . $id; ?> > * {
-				<?php echo esc_html( safecss_filter_attr( $all_max_width_declaration ) ); ?>;
-				margin-left: auto !important;
-				margin-right: auto !important;
-			}
+		$style  = ".wp-container-$id > * {";
+		$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
+		$style .= 'margin-left: auto !important;';
+		$style .= 'margin-right: auto !important;';
+		$style .= '}';
 
-			<?php echo '.wp-container-' . $id; ?> > .alignwide {
-				<?php echo esc_html( safecss_filter_attr( $wide_max_width_declaration ) ); ?>;
-			}
+		$style .= ".wp-container-$id > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
 
-			<?php echo '.wp-container-' . $id; ?> .alignfull {
-				max-width: none;
-			}
-		<?php
-		$style = ob_get_clean();
+		$style .= ".wp-container-$id .alignfull { max-width: none; }";
 	}
 
-	ob_start();
-	?>
-		<?php echo '.wp-container-' . $id; ?> .alignleft {
-			float: left;
-			margin-right: 2em;
-		}
-
-		<?php echo '.wp-container-' . $id; ?> .alignright {
-			float: right;
-			margin-left: 2em;
-		}
-	<?php
-	$style .= ob_get_clean();
+	$style .= ".wp-container-$id .alignleft { float: left; margin-right: 2em; }";
+	$style .= ".wp-container-$id .alignright { float: right; margin-left: 2em; }";
 
 	// This assumes the hook only applies to blocks with a single wrapper.
 	// I think this is a reasonable limitation for that particular hook.
