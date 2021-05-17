@@ -56,15 +56,19 @@ function gutenberg_render_layout_support_flag( $block_content, $block ) {
 	$all_max_width_value  = $content_size ? $content_size : $wide_size;
 	$wide_max_width_value = $wide_size ? $wide_size : $content_size;
 
+	// Make sure we only have a single CSS rule and strip all tags for security.
+	$all_max_width_value  = wp_strip_all_tags( explode( ';', $all_max_width_value )[0] );
+	$wide_max_width_value = wp_strip_all_tags( explode( ';', $wide_max_width_value )[0] );
+
 	$style = '';
 	if ( $content_size || $wide_size ) {
 		$style  = ".wp-container-$id > * {";
-		$style .= 'max-width: ' . esc_html( wp_strip_all_tags( $all_max_width_value ) ) . ';';
+		$style .= 'max-width: ' . esc_html( $all_max_width_value ) . ';';
 		$style .= 'margin-left: auto !important;';
 		$style .= 'margin-right: auto !important;';
 		$style .= '}';
 
-		$style .= ".wp-container-$id > .alignwide { max-width: " . esc_html( wp_strip_all_tags( $wide_max_width_value ) ) . ';}';
+		$style .= ".wp-container-$id > .alignwide { max-width: " . esc_html( $wide_max_width_value ) . ';}';
 
 		$style .= ".wp-container-$id .alignfull { max-width: none; }";
 	}
