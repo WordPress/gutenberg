@@ -22,6 +22,7 @@ Snapshot Diff:
 -     "margin": "calc(4px * 5)",
       "margin-bottom": "calc(4px * 2)",
     },
+    Object {},
   ]
 `;
 
@@ -35,6 +36,7 @@ Snapshot Diff:
 -     "margin-bottom": "calc(4px * 5)",
 +     "margin-bottom": "calc(4px * 2)",
     },
+    Object {},
   ]
 `;
 
@@ -48,6 +50,7 @@ Snapshot Diff:
       "margin-bottom": "calc(4px * 2)",
 -     "margin-left": "calc(4px * 5)",
     },
+    Object {},
   ]
 `;
 
@@ -61,6 +64,7 @@ Snapshot Diff:
       "margin-bottom": "calc(4px * 2)",
 -     "margin-right": "calc(4px * 5)",
     },
+    Object {},
   ]
 `;
 
@@ -74,6 +78,7 @@ Snapshot Diff:
       "margin-bottom": "calc(4px * 2)",
 -     "margin-top": "calc(4px * 5)",
     },
+    Object {},
   ]
 `;
 
@@ -88,6 +93,7 @@ Snapshot Diff:
 -     "margin-left": "calc(4px * 5)",
 -     "margin-right": "calc(4px * 5)",
     },
+    Object {},
   ]
 `;
 
@@ -102,6 +108,7 @@ Snapshot Diff:
 -     "margin-top": "calc(4px * 5)",
 +     "margin-bottom": "calc(4px * 2)",
     },
+    Object {},
   ]
 `;
 
@@ -115,6 +122,7 @@ Snapshot Diff:
       "margin-bottom": "calc(4px * 2)",
 -     "padding": "calc(4px * 5)",
     },
+    Object {},
   ]
 `;
 
@@ -128,6 +136,7 @@ Snapshot Diff:
       "margin-bottom": "calc(4px * 2)",
 -     "padding-bottom": "calc(4px * 5)",
     },
+    Object {},
   ]
 `;
 
@@ -141,6 +150,7 @@ Snapshot Diff:
       "margin-bottom": "calc(4px * 2)",
 -     "padding-left": "calc(4px * 5)",
     },
+    Object {},
   ]
 `;
 
@@ -154,6 +164,7 @@ Snapshot Diff:
       "margin-bottom": "calc(4px * 2)",
 -     "padding-right": "calc(4px * 5)",
     },
+    Object {},
   ]
 `;
 
@@ -167,6 +178,7 @@ Snapshot Diff:
       "margin-bottom": "calc(4px * 2)",
 -     "padding-top": "calc(4px * 5)",
     },
+    Object {},
   ]
 `;
 
@@ -181,6 +193,7 @@ Snapshot Diff:
 -     "padding-left": "calc(4px * 5)",
 -     "padding-right": "calc(4px * 5)",
     },
+    Object {},
   ]
 `;
 
@@ -195,5 +208,6 @@ Snapshot Diff:
 -     "padding-bottom": "calc(4px * 5)",
 -     "padding-top": "calc(4px * 5)",
     },
+    Object {},
   ]
 `;

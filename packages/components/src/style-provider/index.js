@@ -4,14 +4,11 @@
 import { CacheProvider } from '@emotion/react';
 import createCache from '@emotion/cache';
 import memoize from 'memize';
-
-/**
- * WordPress dependencies
- */
-import { useInstanceId } from '@wordpress/compose';
+import * as uuid from 'uuid';
 
 const memoizedCreateCacheWithContainer = memoize( ( container ) => {
-	const key = useInstanceId( container, 'wp-css' );
+	// emotion only accepts alphabetical and hyphenated keys so we just strip the numbers from the UUID. It _should_ be fine.
+	const key = uuid.v4().replace( /[0-9]/g, '' );
 	return createCache( { container, key } );
 } );
 

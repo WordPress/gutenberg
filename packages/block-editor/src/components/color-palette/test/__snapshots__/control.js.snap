@@ -1,7 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`ColorPaletteControl matches the snapshot 1`] = `
-.emotion-2 {
+.emotion-0 {
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen-Sans,Ubuntu,Cantarell,'Helvetica Neue',sans-serif;
   font-size: 13px;
 }
@@ -10,15 +10,15 @@ exports[`ColorPaletteControl matches the snapshot 1`] = `
   margin-bottom: calc(4px * 2);
 }
 
-.components-panel__row .emotion-0 {
+.components-panel__row .emotion-2 {
   margin-bottom: inherit;
 }
 
 <div
-  className="components-base-control block-editor-color-gradient-control emotion-2 emotion-3"
+  className="components-base-control block-editor-color-gradient-control emotion-0 emotion-1"
 >
   <div
-    className="components-base-control__field emotion-0 emotion-1"
+    className="components-base-control__field emotion-2 emotion-3"
   >
     <fieldset>
       <legend>

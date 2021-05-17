@@ -42,9 +42,9 @@ export default function useGrid( props ) {
 	const row = useResponsiveValue( rowsAsArray );
 
 	const gridTemplateColumns =
-		templateColumns || ( !! columns && `repeat(${ column }, 1fr)` );
+		templateColumns || ( !! columns && `repeat( ${ column }, 1fr )` );
 	const gridTemplateRows =
-		templateRows || ( !! rows && `repeat(${ row }, 1fr)` );
+		templateRows || ( !! rows && `repeat( ${ row }, 1fr )` );
 
 	const classes = useMemo( () => {
 		const alignmentProps = getAlignmentProps( alignment );
