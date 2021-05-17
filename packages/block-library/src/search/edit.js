@@ -30,7 +30,7 @@ import {
 import { useInstanceId } from '@wordpress/compose';
 import { search } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
-import { useRef, useEffect, useState } from '@wordpress/element';
+import { useRef, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -83,7 +83,6 @@ export default function SearchEdit( {
 	const unitControlInputId = `wp-block-search__width-${ unitControlInstanceId }`;
 	const searchFieldRef = useRef();
 	const buttonRef = useRef();
-	const [ isClosed, setIsClosed ] = useState( false );
 
 	useEffect( () => {
 		if ( 'button-only' !== buttonPosition ) {
@@ -166,7 +165,7 @@ export default function SearchEdit( {
 			buttonUseIcon && 'no-button' !== buttonPosition
 				? 'wp-block-search__icon-button'
 				: undefined,
-			isClosed ? 'wp-block-search__is-closed' : undefined
+			isSelected ? undefined : 'wp-block-search__is-deselected'
 		);
 	};
 
@@ -202,11 +201,6 @@ export default function SearchEdit( {
 		const searchField = searchFieldRef.current;
 		const button = buttonRef.current;
 
-		const delayIsClosed = setTimeout( () => {
-			setIsClosed( true );
-			clearTimeout( delayIsClosed );
-		}, SEARCHFIELD_ANIMATION_DURATION / 2 );
-
 		searchField.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
 		wrapper.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
 
@@ -224,7 +218,6 @@ export default function SearchEdit( {
 			clearTimeout( resetWidth );
 		}, duration );
 
-		setIsClosed( false );
 		searchField.style.transitionDuration = `${ duration }ms`;
 		wrapper.style.width = `${ width }${ widthUnit }`;
 	};

@@ -65,18 +65,16 @@
 		.wp-block-search__inside-wrapper {
 			overflow: hidden;
 			transition-property: width;
+			min-width: 0 !important;
 		}
 
 		// !important here to override inline styles on button only deselected view.
-		&.wp-block-search__is-closed {
-			.wp-block-search__inside-wrapper {
-				min-width: 0 !important;
-			}
+		&.wp-block-search__is-deselected {
 			.wp-block-search__input {
 				width: 0 !important;
 				min-width: 0 !important;
 				padding: 0 !important;
-				border-left: none !important;
+				border-left-width: 0 !important;
 			}
 		}
 	}
