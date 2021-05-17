@@ -187,7 +187,8 @@
 	// This needs high specificity.
 	&.wp-block-navigation.items-justified-space-between > .submenu-container > .has-child:last-child,
 	&.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
-	&.wp-block-navigation.items-justified-right .has-child {
+	&.wp-block-navigation.items-justified-right > .submenu-container .has-child,
+	&.wp-block-navigation.items-justified-right > .wp-block-navigation__container .has-child {
 
 		// First submenu.
 		.submenu-container,
