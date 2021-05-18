@@ -7,7 +7,6 @@ import {
 	MenuItem,
 	VisuallyHidden,
 } from '@wordpress/components';
-import { useSelect } from '@wordpress/data';
 import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
 import { external, moreVertical } from '@wordpress/icons';
@@ -19,7 +18,6 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
  */
 import FeatureToggle from './feature-toggle';
 import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
-import { store as editWidgetsStore } from '../../store';
 
 const POPOVER_PROPS = {
 	className: 'edit-widgets-more-menu__content',
@@ -34,13 +32,6 @@ export default function MoreMenu() {
 		isKeyboardShortcutsModalActive,
 		setIsKeyboardShortcutsModalVisible,
 	] = useState( false );
-	const showIconLabels = useSelect(
-		( select ) =>
-			select( editWidgetsStore ).__unstableIsFeatureActive(
-				'showIconLabels'
-			),
-		[]
-	);
 	const toggleKeyboardShortcutsModal = () =>
 		setIsKeyboardShortcutsModalVisible( ! isKeyboardShortcutsModalActive );
 
@@ -60,11 +51,7 @@ export default function MoreMenu() {
 				/* translators: button label text should, if possible, be under 16 characters. */
 				label={ __( 'Options' ) }
 				popoverProps={ POPOVER_PROPS }
-				toggleProps={ {
-					showTooltip: ! showIconLabels,
-					isTertiary: showIconLabels,
-					...TOGGLE_PROPS,
-				} }
+				toggleProps={ TOGGLE_PROPS }
 			>
 				{ () => (
 					<>
