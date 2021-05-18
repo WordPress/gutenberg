@@ -119,6 +119,9 @@ export default function VisualEditor( { styles } ) {
 		margin: 0,
 		display: 'flex',
 		flexFlow: 'column',
+		// Default background color so that grey
+		// .edit-post-editor-regions__content color doesn't show through.
+		background: 'white',
 	};
 	const templateModeStyles = {
 		...desktopCanvasStyles,
