@@ -272,7 +272,21 @@ Undocumented declaration.
 
 <a name="coreDeviceTypes" href="#coreDeviceTypes">#</a> **coreDeviceTypes**
 
-Undocumented declaration.
+An array of strings that represent `deviceType` values that belong to the
+block editor core system.
+
+When the `deviceType` returned by `__experimentalGetPreviewDeviceType()`, is
+one of these values, the built-in `VisualEditor` is responsible for rendering
+a preview of that type.
+
+When the `deviceType` is something other than one of the `coreDeviceTypes`,
+we are rendering a custom preview registered by the
+`<PluginPreviewMenuItem />` and `<PluginPreview />` components, and defer to
+a `<Slot />` filled by the plugin to draw the preview.
+
+_Type_
+
+-   `Array`
 
 <a name="createCustomColorsHOC" href="#createCustomColorsHOC">#</a> **createCustomColorsHOC**
 
