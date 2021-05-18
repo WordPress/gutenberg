@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { createComponent } from '../ui/utils';
+import { createComponent } from '../utils';
 import { useVisuallyHidden } from './hook';
 
 /**
@@ -10,12 +10,12 @@ import { useVisuallyHidden } from './hook';
  *
  * @example
  * ```jsx
- * import { VisuallyHidden } from `@wordpress/components`;
+ * import { View, VisuallyHidden } from `@wordpress/components/ui`;
  *
  * function Example() {
  * 	return (
  * 		<VisuallyHidden>
- * 			<label>Code is Poetry</label>
+ * 			<View as="label">Code is Poetry</View>
  * 		</VisuallyHidden>
  * 	);
  * }

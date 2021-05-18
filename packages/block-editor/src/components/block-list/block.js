@@ -79,7 +79,6 @@ function BlockListBlock( {
 	onInsertBlocksAfter,
 	onMerge,
 	toggleSelection,
-	index,
 } ) {
 	const { removeBlock } = useDispatch( blockEditorStore );
 	const onRemove = useCallback( () => removeBlock( clientId ), [ clientId ] );
@@ -160,8 +159,6 @@ function BlockListBlock( {
 
 	const value = {
 		clientId,
-		isSelected,
-		index,
 		// The wp-block className is important for editor styles.
 		className: classnames( className, { 'wp-block': ! isAligned } ),
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
