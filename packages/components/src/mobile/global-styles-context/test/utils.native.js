@@ -33,25 +33,6 @@ const GLOBAL_STYLES_PALETTE = [
 ];
 
 const DEFAULT_GLOBAL_STYLES = {
-	settings: {
-		color: {
-			palette: GLOBAL_STYLES_PALETTE,
-			gradients: [
-				{
-					slug: 'purple-to-blue',
-					gradient:
-						'linear-gradient(160deg, var(--wp--preset--color--purple), var(--wp--preset--color--blue))',
-					name: 'Purple to Blue',
-				},
-				{
-					slug: 'green-to-purple',
-					gradient:
-						'linear-gradient(160deg, var(--wp--preset--color--green), var(--wp--preset--color--purple))',
-					name: 'Green to Purple',
-				},
-			],
-		},
-	},
 	styles: {
 		color: {
 			background: 'var(--wp--preset--color--green)',
@@ -67,24 +48,27 @@ const DEFAULT_GLOBAL_STYLES = {
 	},
 };
 
-const PARSED_GLOBAL_STYLES = {
-	settings: {
-		color: {
-			palette: GLOBAL_STYLES_PALETTE,
-			gradients: [
-				{
-					slug: 'purple-to-blue',
-					gradient: 'linear-gradient(160deg, #D1D1E4, #D1DFE4)',
-					name: 'Purple to Blue',
-				},
-				{
-					slug: 'green-to-purple',
-					gradient: 'linear-gradient(160deg, #D1E4DD, #D1D1E4)',
-					name: 'Green to Purple',
-				},
-			],
-		},
+const DEFAULT_FEATURES = {
+	color: {
+		palette: GLOBAL_STYLES_PALETTE,
+		gradients: [
+			{
+				slug: 'purple-to-blue',
+				gradient:
+					'linear-gradient(160deg, var(--wp--preset--color--purple), var(--wp--preset--color--blue))',
+				name: 'Purple to Blue',
+			},
+			{
+				slug: 'green-to-purple',
+				gradient:
+					'linear-gradient(160deg, var(--wp--preset--color--green), var(--wp--preset--color--purple))',
+				name: 'Green to Purple',
+			},
+		],
 	},
+};
+
+const PARSED_GLOBAL_STYLES = {
 	styles: {
 		color: {
 			background: '#D1E4DD',
@@ -179,7 +163,7 @@ describe( 'getBlockColors', () => {
 describe( 'parseColorVariables', () => {
 	it( 'returns the parsed colors values correctly', () => {
 		const blockColors = parseColorVariables(
-			DEFAULT_GLOBAL_STYLES,
+			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
 			GLOBAL_STYLES_PALETTE
 		);
 		expect( blockColors ).toEqual(
@@ -190,8 +174,14 @@ describe( 'parseColorVariables', () => {
 
 describe( 'getGlobalStyles', () => {
 	it( 'returns the global styles data correctly', () => {
-		const globalStyles = getGlobalStyles( DEFAULT_GLOBAL_STYLES );
-		const gradients = PARSED_GLOBAL_STYLES.settings.color.gradients;
+		const globalStyles = getGlobalStyles(
+			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
+			JSON.stringify( DEFAULT_FEATURES )
+		);
+		const gradients = parseColorVariables(
+			JSON.stringify( DEFAULT_FEATURES ),
+			GLOBAL_STYLES_PALETTE
+		)?.color?.gradients;
 
 		expect( globalStyles ).toEqual(
 			expect.objectContaining( {
