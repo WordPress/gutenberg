@@ -177,7 +177,7 @@ export default compose( [
 		const { getEditorMode } = select( editPostStore );
 		const { getSettings } = select( blockEditorStore );
 		const globalStyles = getSettings()?.__experimentalGlobalStylesBaseStyles
-			?.styles?.color;
+			?.color;
 
 		return {
 			isReady: isEditorReady(),
