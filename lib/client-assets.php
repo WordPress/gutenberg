@@ -740,16 +740,27 @@ function gutenberg_extend_block_editor_styles_html() {
 	wp_styles()->do_items( $handles );
 	wp_styles()->done = $done;
 
+	$styles = ob_get_clean();
+
 	$script_handles = array_unique( $script_handles );
 	$done           = wp_scripts()->done;
+
+	ob_start();
 
 	wp_scripts()->done = array();
 	wp_scripts()->do_items( $script_handles );
 	wp_scripts()->done = $done;
 
-	$editor_styles = wp_json_encode( array( 'html' => ob_get_clean() ) );
+	$scripts = ob_get_clean();
 
-	echo "<script>window.__editorStyles = $editor_styles</script>";
+	$editor_styles = wp_json_encode(
+		array(
+			'styles'  => $styles,
+			'scripts' => $scripts,
+		)
+	);
+
+	echo "<script>window.__editorAssets = $editor_styles</script>";
 }
 add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
 add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );

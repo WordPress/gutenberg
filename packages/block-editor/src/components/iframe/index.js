@@ -128,9 +128,29 @@ function setBodyClassName( doc ) {
 	}
 }
 
+function useParsedAssets( html ) {
+	return useMemo( () => {
+		const doc = document.implementation.createHTMLDocument( '' );
+		doc.body.innerHTML = html;
+		return Array.from( doc.body.children );
+	}, [ html ] );
+}
+
+async function loadScript( doc, { id, src } ) {
+	return new Promise( ( resolve, reject ) => {
+		const script = doc.createElement( 'script' );
+		script.id = id;
+		script.src = src;
+		script.onload = () => resolve();
+		script.onerror = () => reject();
+		doc.head.appendChild( script );
+	} );
+}
+
 function Iframe( { contentRef, children, head, ...props }, ref ) {
 	const [ iframeDocument, setIframeDocument ] = useState();
-
+	const styles = useParsedAssets( window.__editorAssets.styles );
+	const scripts = useParsedAssets( window.__editorAssets.scripts );
 	const clearerRef = useBlockSelectionClearer();
 	const setRef = useCallback( ( node ) => {
 		if ( ! node ) {
@@ -158,6 +178,12 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 			clearerRef( documentElement );
 			clearerRef( body );
 
+			scripts.reduce(
+				( promise, script ) =>
+					promise.then( () => loadScript( contentDocument, script ) ),
+				Promise.resolve()
+			);
+
 			return true;
 		}
 
@@ -177,23 +203,13 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 		}
 	}, [ iframeDocument ] );
 
-	const { html } = window.__editorStyles;
-	const assets = useMemo( () => {
-		const doc = document.implementation.createHTMLDocument( '' );
-		doc.body.innerHTML = html;
-		return Array.from( doc.body.children );
-	}, [ html ] );
-
 	head = (
 		<>
 			<style>{ 'body{margin:0}' }</style>
-			{ assets.map( ( { tagName, src, href, id, rel, media }, index ) => {
+			{ styles.map( ( { tagName, href, id, rel, media }, index ) => {
 				const TagName = tagName.toLowerCase();
 				return (
-					<TagName
-						{ ...{ src, href, id, rel, media } }
-						key={ index }
-					/>
+					<TagName { ...{ href, id, rel, media } } key={ index } />
 				);
 			} ) }
 			{ head }
