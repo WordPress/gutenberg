@@ -9,21 +9,17 @@ import { store as interfaceStore } from '@wordpress/interface';
 /**
  * Internal dependencies
  */
-import {
-	SIDEBAR_BLOCK,
-	SIDEBAR_NAVIGATION,
-	SIDEBAR_SCOPE,
-} from '../../constants';
+import { SIDEBAR_BLOCK, SIDEBAR_MENU, SIDEBAR_SCOPE } from '../../constants';
 
 export default function SidebarHeader( { sidebarName } ) {
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
 	const openMenuSettings = () =>
-		enableComplementaryArea( SIDEBAR_SCOPE, SIDEBAR_NAVIGATION );
+		enableComplementaryArea( SIDEBAR_SCOPE, SIDEBAR_MENU );
 	const openBlockSettings = () =>
 		enableComplementaryArea( SIDEBAR_SCOPE, SIDEBAR_BLOCK );
 
 	const [ menuAriaLabel, menuActiveClass ] =
-		sidebarName === SIDEBAR_NAVIGATION
+		sidebarName === SIDEBAR_MENU
 			? // translators: ARIA label for the Menu sidebar tab, selected.
 			  [ __( 'Menu (selected)' ), 'is-active' ]
 			: // translators: ARIA label for the Menu Settings Sidebar tab, not selected.

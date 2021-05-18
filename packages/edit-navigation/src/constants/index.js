@@ -34,11 +34,11 @@ export const NAVIGATION_POST_POST_TYPE = 'postType';
 export const SIDEBAR_SCOPE = 'core/edit-navigation';
 
 /**
- * The identifier of the editor's navigation complementary area.
+ * The identifier of the editor's menu complementary area.
  *
  * @type {string}
  */
-export const SIDEBAR_NAVIGATION = 'edit-navigation/navigation';
+export const SIDEBAR_MENU = 'edit-navigation/menu';
 
 /**
  * The identifier of the editor's block complementary area.

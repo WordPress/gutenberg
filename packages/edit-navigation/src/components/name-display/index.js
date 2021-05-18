@@ -17,7 +17,7 @@ import {
 	useMenuEntityProp,
 	IsMenuNameControlFocusedContext,
 } from '../../hooks';
-import { SIDEBAR_SCOPE, SIDEBAR_NAVIGATION } from '../../constants';
+import { SIDEBAR_SCOPE, SIDEBAR_MENU } from '../../constants';
 
 export default function NameDisplay() {
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
@@ -39,10 +39,7 @@ export default function NameDisplay() {
 						menuName
 					) }
 					onClick={ () => {
-						enableComplementaryArea(
-							SIDEBAR_SCOPE,
-							SIDEBAR_NAVIGATION
-						);
+						enableComplementaryArea( SIDEBAR_SCOPE, SIDEBAR_MENU );
 						setIsMenuNameEditFocused( true );
 					} }
 				>
