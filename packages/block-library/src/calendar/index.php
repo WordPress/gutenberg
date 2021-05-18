@@ -13,7 +13,12 @@
  * @return string Returns the block content.
  */
 function render_block_core_calendar( $attributes ) {
-	global $monthnum, $year;
+	global $monthnum, $year, $wpdb;
+
+	$has_posts = $wpdb->get_var( "SELECT 1 as test FROM $wpdb->posts WHERE post_type = 'post' AND post_status = 'publish' LIMIT 1" );
+	if ( ! $has_posts ) {
+		return '';
+	}
 
 	$previous_monthnum = $monthnum;
 	$previous_year     = $year;
