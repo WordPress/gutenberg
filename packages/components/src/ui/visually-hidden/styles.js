@@ -2,11 +2,10 @@
  * External dependencies
  */
 import { css } from 'emotion';
-
 /**
  * Internal dependencies
  */
-import { COLORS } from '../utils/colors-values';
+import { COLORS } from '../../utils/colors-values';
 
 export const VisuallyHidden = css`
 	border: 0;
