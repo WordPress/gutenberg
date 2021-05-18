@@ -30,7 +30,11 @@ export default function WidgetAreasBlockEditorProvider( {
 	children,
 	...props
 } ) {
-	const { hasUploadPermissions, reusableBlocks } = useSelect(
+	const {
+		hasUploadPermissions,
+		reusableBlocks,
+		isFixedToolbarActive,
+	} = useSelect(
 		( select ) => ( {
 			hasUploadPermissions: defaultTo(
 				select( 'core' ).canUser( 'create', 'media' ),
@@ -42,6 +46,9 @@ export default function WidgetAreasBlockEditorProvider( {
 				'postType',
 				'wp_block'
 			),
+			isFixedToolbarActive: select(
+				editWidgetsStore
+			).__unstableIsFeatureActive( 'fixedToolbar' ),
 		} ),
 		[]
 	);
@@ -61,12 +68,14 @@ export default function WidgetAreasBlockEditorProvider( {
 		return {
 			...blockEditorSettings,
 			__experimentalReusableBlocks: reusableBlocks,
+			hasFixedToolbar: isFixedToolbarActive,
 			mediaUpload: mediaUploadBlockEditor,
 			templateLock: 'all',
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 		};
 	}, [
 		blockEditorSettings,
+		isFixedToolbarActive,
 		hasUploadPermissions,
 		reusableBlocks,
 		setIsInserterOpened,

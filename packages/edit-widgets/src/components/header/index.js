@@ -19,6 +19,7 @@ import { useRef } from '@wordpress/element';
 import SaveButton from '../save-button';
 import UndoButton from './undo-redo/undo';
 import RedoButton from './undo-redo/redo';
+import MoreMenu from '../more-menu';
 import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area';
 import { store as editWidgetsStore } from '../../store';
 
@@ -96,6 +97,7 @@ function Header() {
 				<div className="edit-widgets-header__actions">
 					<SaveButton />
 					<PinnedItems.Slot scope="core/edit-widgets" />
+					<MoreMenu />
 				</div>
 			</div>
 		</>
