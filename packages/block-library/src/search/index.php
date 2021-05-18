@@ -37,6 +37,7 @@ function render_block_core_search( $attributes ) {
 	$input_markup     = '';
 	$button_markup    = '';
 	$inline_styles    = styles_for_block_core_search( $attributes );
+	$color_classes   = get_color_classes_for_block_core_search( $attributes );
 	$is_button_inside = ! empty( $attributes['buttonPosition'] ) &&
 		'button-inside' === $attributes['buttonPosition'];
 	// Border color classes need to be applied to the elements that have a border color.
@@ -66,14 +67,17 @@ function render_block_core_search( $attributes ) {
 			$input_classes,
 			esc_attr( get_search_query() ),
 			esc_attr( $attributes['placeholder'] ),
-			$inline_styles['shared']
+			$inline_styles['input']
 		);
 	}
 
 	if ( $show_button ) {
 		$button_internal_markup = '';
-		$button_classes         = ! $is_button_inside ? $border_color_classes : '';
+		$button_classes         = $color_classes;
 
+		if ( $is_button_inside ) {
+			$button_classes .= $border_color_classes;
+		}
 		if ( ! $use_icon_button ) {
 			if ( ! empty( $attributes['buttonText'] ) ) {
 				$button_internal_markup = $attributes['buttonText'];
@@ -89,7 +93,7 @@ function render_block_core_search( $attributes ) {
 		$button_markup = sprintf(
 			'<button type="submit" class="wp-block-search__button %s" %s>%s</button>',
 			$button_classes,
-			$inline_styles['shared'],
+			$inline_styles['button'],
 			$button_internal_markup
 		);
 	}
@@ -179,6 +183,8 @@ function classnames_for_block_core_search( $attributes ) {
 function styles_for_block_core_search( $attributes ) {
 	$shared_styles  = array();
 	$wrapper_styles = array();
+	$button_styles  = array();
+	$input_styles   = array();
 
 	// Add width styles.
 	$has_width   = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
@@ -262,7 +268,8 @@ function styles_for_block_core_search( $attributes ) {
 	}
 
 	return array(
-		'shared'  => ! empty( $shared_styles ) ? sprintf( ' style="%s"', implode( ' ', $shared_styles ) ) : '',
+		'input'   => ! empty( $input_styles ) ? sprintf( ' style="%s"', implode( ' ', $input_styles ) ) : '',
+		'button'  => ! empty( $button_styles ) ? sprintf( ' style="%s"', implode( ' ', $button_styles ) ) : '',
 		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', implode( ' ', $wrapper_styles ) ) : '',
 	);
 }
@@ -282,4 +289,35 @@ function get_border_color_classes_for_block_core_search( $attributes ) {
 		$border_color_classes = 'has-border-color';
 	}
 	return $border_color_classes;
+}
+
+/**
+ * Returns color classnames depending on whether there are named or custom text and background colors.
+ *
+ * @param array $attributes The block attributes.
+ *
+ * @return string The color classnames to be applied to the block elements.
+ */
+function get_color_classes_for_block_core_search( $attributes ) {
+	$classnames = array();
+
+	// Text color.
+	$has_custom_text_color = ! empty( $attributes['style']['color']['text'] );
+	if ( ! empty( $attributes['textColor'] ) ) {
+		$classnames[] = sprintf( 'has-text-color has-%s-color', $attributes['textColor'] );
+	} elseif( $has_custom_text_color ) {
+		// If there's no 'textColor' text string but there is a custom text color style, still add the generic `has-text-color` class.
+		$classnames[] = 'has-text-color';
+	}
+
+	// Background color.
+	$has_custom_background_color = ! empty( $attributes['style']['color']['background'] );
+	if ( ! empty( $attributes['backgroundColor'] ) ) {
+		$classnames[] = sprintf( 'has-background has-%s-background-color', $attributes['backgroundColor'] );
+	} elseif ( $has_custom_background_color ) {
+		// If there's no 'backgroundColor' text string but there is a custom background color style, still add the generic `has-background` class.
+		$classnames[] = 'has-background';
+	}
+
+	return implode( ' ', $classnames );
 }
