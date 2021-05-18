@@ -197,7 +197,7 @@ function register_gutenberg_patterns() {
 							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:site-title {"fontSize":"normal"} /--></div>
 							<!-- /wp:column -->
 							<!-- wp:column {"verticalAlignment":"center","width":"66.66%"} -->
-							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:66.66%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right"} /--></div>
+							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:66.66%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right","isResponsive":true} /--></div>
 							<!-- /wp:column --></div>
 							<!-- /wp:columns -->',
 		)
@@ -231,7 +231,7 @@ function register_gutenberg_patterns() {
 			'blockTypes' => array( 'core/template-part/header' ),
 			'content'    => '<!-- wp:columns {"verticalAlignment":"center","align":"full","style":{"color":{"background":"#e7ecde"}}} -->
 							<div class="wp-block-columns alignfull are-vertically-aligned-center has-background" style="background-color:#e7ecde"><!-- wp:column {"verticalAlignment":"center","width":"33.33%"} -->
-							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"left"} /--></div>
+							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"left","isResponsive":true} /--></div>
 							<!-- /wp:column -->
 							<!-- wp:column {"verticalAlignment":"center","width":"33.33%"} -->
 							<div class="wp-block-column is-vertically-aligned-center" style="flex-basis:33.33%"><!-- wp:site-title {"textAlign":"center"} /--></div>
@@ -260,7 +260,7 @@ function register_gutenberg_patterns() {
 							<!-- /wp:column -->
 
 							<!-- wp:column -->
-							<div class="wp-block-column"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right","fontSize":"normal"} /--></div>
+							<div class="wp-block-column"><!-- wp:navigation {"orientation":"horizontal","itemsJustification":"right","fontSize":"normal","isResponsive":true} /--></div>
 							<!-- /wp:column --></div>
 							<!-- /wp:columns -->
 
@@ -308,7 +308,7 @@ function register_gutenberg_patterns() {
 							<div style="height:150px" aria-hidden="true" class="wp-block-spacer"></div>
 							<!-- /wp:spacer -->
 
-							<!-- wp:navigation {"orientation":"horizontal","itemsJustification":"center","style":{"color":{"text":"#000000"}}} /--></div>
+							<!-- wp:navigation {"orientation":"horizontal","itemsJustification":"center","style":{"color":{"text":"#000000"}},"isResponsive":true} /--></div>
 							<!-- /wp:group -->',
 		)
 	);
