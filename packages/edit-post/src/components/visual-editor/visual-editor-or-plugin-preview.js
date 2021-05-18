@@ -1,25 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
-import { Slot } from '@wordpress/components';
-import { coreDeviceTypes } from '@wordpress/block-editor';
+import { __experimentalUseSlot as useSlot, Slot } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import VisualEditor from './index';
 
-function VisualEditorOrPluginPreview() {
-	const deviceType = useSelect( ( select ) => {
-		return select( 'core/edit-post' ).__experimentalGetPreviewDeviceType();
-	}, [] );
+function VisualEditorOrPluginPreview( { previewId, ...props } ) {
+	const slotName = `core/block-editor/plugin-preview/${ previewId }`;
+	const slot = useSlot( slotName );
 
-	if ( ! coreDeviceTypes.includes( deviceType ) ) {
-		return (
-			<Slot name={ 'core/block-editor/plugin-preview/' + deviceType } />
-		);
+	if ( slot?.fills?.length === 0 ) {
+		return <VisualEditor { ...props } />;
 	}
-	return <VisualEditor />;
+
+	return <Slot name={ slotName } fillProps={ props } />;
 }
 export default VisualEditorOrPluginPreview;
