@@ -28,6 +28,8 @@ export default function placeCaretAtVerticalEdge(
 		return;
 	}
 
+	container.focus();
+
 	// Offset by a buffer half the height of the caret rect. This is needed
 	// because caretRangeFromPoint may default to the end of the selection if
 	// offset is too close to the edge. It's unclear how to precisely calculate
@@ -66,11 +68,6 @@ export default function placeCaretAtVerticalEdge(
 	assertIsDefined( defaultView, 'defaultView' );
 	const selection = defaultView.getSelection();
 	assertIsDefined( selection, 'selection' );
-	selection.removeAllRanges();
-	selection.addRange( range );
-	container.focus();
-	// Editable was already focussed, it goes back to old range...
-	// This fixes it.
 	selection.removeAllRanges();
 	selection.addRange( range );
 }

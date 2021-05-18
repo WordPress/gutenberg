@@ -21,6 +21,7 @@ import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 import BlockToolsBackCompat from '../block-tools/back-compat';
+import { useBlockSelectionClearer } from '../block-selection-clearer';
 
 export const IntersectionObserver = createContext();
 
@@ -48,6 +49,7 @@ function Root( { className, children } ) {
 	return (
 		<div
 			ref={ useMergeRefs( [
+				useBlockSelectionClearer(),
 				useBlockDropZone(),
 				useInBetweenInserter(),
 			] ) }
@@ -121,7 +123,7 @@ function Items( {
 	return (
 		<LayoutProvider value={ layout }>
 			<IntersectionObserver.Provider value={ intersectionObserver }>
-				{ order.map( ( clientId, index ) => (
+				{ order.map( ( clientId ) => (
 					<AsyncModeProvider
 						key={ clientId }
 						value={
@@ -134,10 +136,6 @@ function Items( {
 						<BlockListBlock
 							rootClientId={ rootClientId }
 							clientId={ clientId }
-							// This prop is explicitely computed and passed down
-							// to avoid being impacted by the async mode
-							// otherwise there might be a small delay to trigger the animation.
-							index={ index }
 						/>
 					</AsyncModeProvider>
 				) ) }
