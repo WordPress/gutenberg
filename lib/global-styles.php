@@ -92,7 +92,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		defined( 'REST_REQUEST' ) &&
 		REST_REQUEST &&
 		isset( $_GET['context'] ) &&
-		'mobile' === $_GET['context']
+		'mobile' === $_GET['context'] &&
+		WP_Theme_JSON_Resolver::theme_has_support()
 	) {
 		$context = 'mobile';
 	}
@@ -107,7 +108,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 	$consolidated = WP_Theme_JSON_Resolver::get_merged_data( $settings, $origin );
 
-	if ( WP_Theme_JSON_Resolver::theme_has_support() && 'mobile' === $context ) {
+	if ( 'mobile' === $context ) {
 		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
 	}
 
