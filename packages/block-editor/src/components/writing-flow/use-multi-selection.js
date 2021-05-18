@@ -15,6 +15,18 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import { store as blockEditorStore } from '../../store';
 import { __unstableUseBlockRef as useBlockRef } from '../block-list/use-block-props/use-block-refs';
 
+function toggleRichText( container, toggle ) {
+	Array.from( container.querySelectorAll( '.rich-text' ) ).forEach(
+		( node ) => {
+			if ( toggle ) {
+				node.setAttribute( 'contenteditable', true );
+			} else {
+				node.removeAttribute( 'contenteditable' );
+			}
+		}
+	);
+}
+
 /**
  * Returns for the deepest node at the start or end of a container node. Ignores
  * any text nodes that only contain HTML formatting whitespace.
@@ -110,8 +122,8 @@ export default function useMultiSelection() {
 			return;
 		}
 
-		// For some browsers, like Safari, it is important that focus
-		// happens BEFORE selection.
+		// For some browsers, like Safari, it is important that focus happens
+		// BEFORE selection.
 		ref.current.focus();
 
 		const selection = defaultView.getSelection();
@@ -122,6 +134,11 @@ export default function useMultiSelection() {
 		// and end at the deepest points.
 		const startNode = getDeepestNode( startRef.current, 'start' );
 		const endNode = getDeepestNode( endRef.current, 'end' );
+
+		// While rich text will be disabled with a delay when there is a multi
+		// selection, we must do it immediately because it's not possible to set
+		// selection across editable hosts.
+		toggleRichText( ref.current, false );
 
 		range.setStartBefore( startNode );
 		range.setEndAfter( endNode );
