@@ -32,10 +32,10 @@ function _gutenberg_get_template_paths( $base_directory ) {
  * @access private
  * @internal
  *
- * @param array  $template_type wp_template or wp_template_part.
+ * @param string $template_type wp_template or wp_template_part.
  * @param string $slug template slug.
  *
- * @return array Template.
+ * @return array|null Template.
  */
 function _gutenberg_get_template_file( $template_type, $slug ) {
 	$template_base_paths = array(
