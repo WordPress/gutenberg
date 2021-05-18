@@ -22,7 +22,6 @@ import {
 	RangeControl,
 	QueryControls,
 } from '@wordpress/components';
-import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -236,7 +235,7 @@ class LatestPostsEdit extends Component {
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { openGeneralSidebar } = dispatch( editPostStore );
+		const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 
 		return {
 			openGeneralSidebar: () => openGeneralSidebar( 'edit-post/block' ),

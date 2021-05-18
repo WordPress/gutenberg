@@ -36,7 +36,6 @@ import {
 import { useResizeObserver } from '@wordpress/compose';
 import { createBlock } from '@wordpress/blocks';
 import { columns } from '@wordpress/icons';
-import { store as editPostStore } from '@wordpress/edit-post';
 /**
  * Internal dependencies
  */
@@ -455,7 +454,7 @@ const ColumnsEdit = ( props ) => {
 				getBlockParents,
 				getBlockAttributes,
 			} = select( blockEditorStore );
-			const { isEditorSidebarOpened } = select( editPostStore );
+			const { isEditorSidebarOpened } = select( 'core/edit-post' );
 			const innerBlocks = getBlocks( clientId );
 
 			const isContentEmpty = map(
