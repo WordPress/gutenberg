@@ -84,7 +84,7 @@ class WP_REST_Pattern_Directory_Controller extends WP_REST_Controller {
 	 * @return WP_Error|WP_REST_Response Response object on success, or WP_Error object on failure.
 	 */
 	public function get_items( $request ) {
-		$query_args  = array( 'per_page' => 100 );
+		$query_args  = array();
 		$category_id = $request['category'];
 		$keyword_id  = $request['keyword'];
 		$search_term = $request['search'];
