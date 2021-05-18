@@ -1078,8 +1078,8 @@ class WP_Theme_JSON {
 	 * @param WP_Theme_JSON $incoming Data to merge.
 	 */
 	public function merge( $incoming ) {
-		$incoming_data    = $incoming->get_raw_data();
-		$existing_data    = $this->theme_json;
+		$incoming_data = $incoming->get_raw_data();
+		$existing_data = $this->theme_json;
 
 		// The array_replace_recursive algorithm merges at the leaf level.
 		// For leaf values that are arrays it will use the numeric indexes for replacement.
