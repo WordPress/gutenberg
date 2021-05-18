@@ -1,8 +1,9 @@
 /**
  * WordPress dependencies
  */
+import { useSelect } from '@wordpress/data';
 import { ExternalLink, Guide } from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
 
 /**
@@ -15,6 +16,7 @@ import {
 	DocumentationImage,
 	InserterIconImage,
 } from './images';
+import { store as editWidgetsStore } from '../../store';
 
 export default function WelcomeGuide() {
 	// const isActive = useSelect(
@@ -27,6 +29,23 @@ export default function WelcomeGuide() {
 	// if ( ! isActive ) {
 	// 	return null;
 	// }
+
+	const widgetAreas = useSelect( ( select ) =>
+		select( editWidgetsStore ).getWidgetAreas( { per_page: -1 } )
+	);
+
+	const isEntirelyBlockWidgets = widgetAreas?.every(
+		( widgetArea ) =>
+			widgetArea.id === 'wp_inactive_widgets' ||
+			widgetArea.widgets.every( ( widgetId ) =>
+				widgetId.startsWith( 'block-' )
+			)
+	);
+
+	const numWidgetAreas =
+		widgetAreas?.filter(
+			( widgetArea ) => widgetArea.id !== 'wp_inactive_widgets'
+		).length ?? 0;
 
 	return (
 		<Guide
@@ -42,25 +61,45 @@ export default function WelcomeGuide() {
 							<h1 className="edit-widgets-welcome-guide__heading">
 								{ __( 'Welcome to block Widgets' ) }
 							</h1>
-							<p className="edit-widgets-welcome-guide__text">
-								{ __(
-									'You can now add any block to your site’s widget areas. Don’t worry, all of your favorite widgets still work flawlessly.'
-								) }
-							</p>
-							<p className="edit-widgets-welcome-guide__text">
-								<strong>
-									{ __(
-										'Want to stick with the old widgets?'
-									) }
-								</strong>{ ' ' }
-								<ExternalLink
-									href={ __(
-										'https://wordpress.org/plugins/classic-widgets/'
-									) }
-								>
-									{ __( 'Get the Classic Widgets plugin.' ) }
-								</ExternalLink>
-							</p>
+							{ isEntirelyBlockWidgets ? (
+								<>
+									<p className="edit-widgets-welcome-guide__text">
+										{ sprintf(
+											// Translators: %s: Number of block areas in the current theme.
+											_n(
+												'Your theme provides %s “block” area for you to add and edit content. Try adding a search bar, social icons, or other types of blocks here and see how they’ll look on your site.',
+												'Your theme provides %s different “block” areas for you to add and edit content. Try adding a search bar, social icons, or other types of blocks here and see how they’ll look on your site.',
+												numWidgetAreas
+											),
+											numWidgetAreas
+										) }
+									</p>
+								</>
+							) : (
+								<>
+									<p className="edit-widgets-welcome-guide__text">
+										{ __(
+											'You can now add any block to your site’s widget areas. Don’t worry, all of your favorite widgets still work flawlessly.'
+										) }
+									</p>
+									<p className="edit-widgets-welcome-guide__text">
+										<strong>
+											{ __(
+												'Want to stick with the old widgets?'
+											) }
+										</strong>{ ' ' }
+										<ExternalLink
+											href={ __(
+												'https://wordpress.org/plugins/classic-widgets/'
+											) }
+										>
+											{ __(
+												'Get the Classic Widgets plugin.'
+											) }
+										</ExternalLink>
+									</p>
+								</>
+							) }
 						</>
 					),
 				},
