@@ -9,23 +9,21 @@ An important thing to keep at top of mind when reviewing these principles is tha
 When applied, sometimes these principles build on each other much like the idea of constructing a house with a foundation, walls and roof. However, other times the application of the principles results in something that is more similar to a tapestry where threads of each principle are embedded together and evident in the finished feature or design of the project.
 
 
-## Aim for delightful, consistent, accessible user interfaces for empowering content creation and expression.
+## A canvas for expression.
 
 _“Optimize for the user” (Matias - [Gutenberg or the Ship of Theseus](https://matiasventura.com/post/gutenberg-or-the-ship-of-theseus/))_
 
-Each of the words in this principle are deliberate:
+The block canvas is the primary interface and brings about the expectation of *direct* manipulation. Blocks can define multiple states, variations, and can mutate. The canvas of the block should:
 
+### Guide users around interacting with the content.
 
-### Delightful
+For this, the interface needs to welcome exploration and to be able to teach its affordances intuitively. It should result in experiences producing "aha!" moments when users create their content (see [here for an example](https://twitter.com/colemank83/status/1371846826664591364)).
 
-The user interfaces should “get out of the way” and support the user in creating their content. They should lead to experiences where the user (in the vernacular of Marie Kondo) _finds delight_ with each new thing they discover they can do or accomplish.
+Interactive tools should be contextual when needed, and focus on supporting the user in creating their content - present when needed and getting out of the way when not.
 
+### Uniformity within diversity
 
-### Consistent
-
-Any interfaces are consistently applied. Users should be able to _rely on muscle memory and learned patterns_ as they become familiar with how it works.
-
-This also applies to learning _where to find_ different elements that the user might interact with in creating their content.
+Learning the ingredients of the interface happens once, but scales to hundreds of blocks. Users should be able to *rely on muscle memory and learned patterns* as they become more familiar with the interface.
 
 
 ### Accessible
