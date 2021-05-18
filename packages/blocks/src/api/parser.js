@@ -476,8 +476,11 @@ export function createBlockWithFallback( blockNode ) {
 
 	// Blocks that don't have a registered handler are considered freeform.
 	const freeformContentFallbackBlock = getFreeformContentHandlerName();
+
+	const isV2Gallery = 'core/gallery' === originalName && attributes.imageCount !== undefined;
+
 	const unregisteredFallbackBlock =
-		getUnregisteredTypeHandlerName() || freeformContentFallbackBlock;
+		getUnregisteredTypeHandlerName() || freeformContentFallbackBlock || isV2Gallery;
 
 	attributes = attributes || {};
 
