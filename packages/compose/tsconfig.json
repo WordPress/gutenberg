@@ -17,6 +17,7 @@
 		"src/hooks/use-async-list/**/*",
 		"src/hooks/use-constrained-tabbing/**/*",
 		"src/hooks/use-instance-id/**/*",
+		"src/hooks/use-focus-return/**/*",
 		"src/utils/**/*"
 	]
 }

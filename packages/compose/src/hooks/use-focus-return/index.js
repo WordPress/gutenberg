@@ -9,8 +9,8 @@ import { useRef, useEffect, useCallback } from '@wordpress/element';
  * previously focused element when closed.
  * The current hook implements the returning behavior.
  *
- * @param {Function?} onFocusReturn Overrides the default return behavior.
- * @return {Function} Element Ref.
+ * @param {() => void} [onFocusReturn] Overrides the default return behavior.
+ * @return {import('react').RefCallback<HTMLElement>} Element Ref.
  *
  * @example
  * ```js
@@ -28,7 +28,9 @@ import { useRef, useEffect, useCallback } from '@wordpress/element';
  * ```
  */
 function useFocusReturn( onFocusReturn ) {
+	/** @type {import('react').MutableRefObject<undefined | Node>} */
 	const ref = useRef();
+	/** @type {import('react').MutableRefObject<undefined | HTMLElement>} */
 	const focusedBeforeMount = useRef();
 	const onFocusReturnRef = useRef( onFocusReturn );
 	useEffect( () => {
@@ -45,13 +47,15 @@ function useFocusReturn( onFocusReturn ) {
 				return;
 			}
 
-			focusedBeforeMount.current = node.ownerDocument.activeElement;
+			focusedBeforeMount.current =
+				/** @type {HTMLElement | null} */ ( node.ownerDocument
+					.activeElement ) || undefined;
 		} else if ( focusedBeforeMount.current ) {
-			const isFocused = ref.current.contains(
-				ref.current.ownerDocument.activeElement
+			const isFocused = ref.current?.contains(
+				ref.current?.ownerDocument?.activeElement ?? null
 			);
 
-			if ( ref.current.isConnected && ! isFocused ) {
+			if ( ref.current?.isConnected && ! isFocused ) {
 				return;
 			}
 
@@ -62,7 +66,7 @@ function useFocusReturn( onFocusReturn ) {
 			if ( onFocusReturnRef.current ) {
 				onFocusReturnRef.current();
 			} else {
-				focusedBeforeMount.current.focus();
+				focusedBeforeMount.current?.focus();
 			}
 		}
 	}, [] );
