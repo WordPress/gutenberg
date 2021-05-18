@@ -100,7 +100,7 @@ export default function SearchEdit( {
 		} else {
 			showSearchField();
 		}
-	}, [ buttonPosition, isSearchFieldHidden ] );
+	}, [ buttonPosition, isSearchFieldHidden, buttonUseIcon ] );
 
 	useEffect( () => {
 		if ( 'button-only' === buttonPosition && ! isSelected ) {
@@ -111,7 +111,7 @@ export default function SearchEdit( {
 	}, [ isSelected ] );
 
 	useEffect( () => {
-		if ( 'button-only' !== buttonPosition ) {
+		if ( 'button-only' !== buttonPosition || ! isSelected ) {
 			return;
 		}
 
