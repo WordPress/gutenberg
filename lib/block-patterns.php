@@ -185,10 +185,9 @@ function register_gutenberg_patterns() {
 }
 
 /**
- * Deactivate the legacy patterns bundled with WordPress, and add new block patterns for testing.
- * More details in the trac issue (https://core.trac.wordpress.org/ticket/52846).
+ * Deactivate the legacy patterns bundled with WordPress.
  */
-function update_core_patterns() {
+function remove_core_patterns() {
 	$core_block_patterns = array(
 		'text-two-columns',
 		'two-buttons',
@@ -202,16 +201,18 @@ function update_core_patterns() {
 		'quote',
 	);
 
-	if ( ! function_exists( 'unregister_block_pattern' ) ) {
-		return;
-	}
-
 	foreach ( $core_block_patterns as $core_block_pattern ) {
 		unregister_block_pattern( 'core/' . $core_block_pattern );
 	}
+}
 
+/**
+ * Import patterns from wordpress.org/patterns.
+ */
+function load_remote_patterns() {
 	$request = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
-	$request->set_param( 'keyword', 11 ); // 11 is the ID for "core".
+	$core_keyword_id = 11; // 11 is the ID for "core".
+	$request->set_param( 'keyword', $core_keyword_id );
 	$response = rest_do_request( $request );
 	if ( $response->is_error() ) {
 		return;
@@ -223,13 +224,24 @@ function update_core_patterns() {
 	}
 }
 
+
 add_action(
 	'init',
 	function() {
 		if ( ! get_theme_support( 'core-block-patterns' ) || ! function_exists( 'unregister_block_pattern' ) ) {
 			return;
 		}
+		remove_core_patterns();
 		register_gutenberg_patterns();
-		update_core_patterns();
+	}
+);
+
+add_action(
+	'current_screen',
+	function( $current_screen ) {
+		$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
+		if ( $current_screen->is_block_editor || $is_site_editor ) {
+			load_remote_patterns();
+		}
 	}
 );
