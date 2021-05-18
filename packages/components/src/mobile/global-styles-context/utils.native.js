@@ -66,3 +66,38 @@ export function getBlockColors( blockStyleAttributes, defaultColors ) {
 
 	return blockStyles;
 }
+
+export function parseColorVariables( styles, colorPalette ) {
+	const stylesBase = styles;
+	const colorPrefixRegex = /var\(--wp--preset--color--(.*?)\)/g;
+
+	return stylesBase
+		? JSON.parse(
+				stylesBase?.replace( colorPrefixRegex, ( _$1, $2 ) => {
+					const mappedColor = find( colorPalette, {
+						slug: $2,
+					} );
+					return mappedColor?.color;
+				} )
+		  )
+		: styles;
+}
+
+export function getGlobalStyles( rawStyles, rawFeatures ) {
+	const features = JSON.parse( rawFeatures );
+	const palette = features?.color?.palette;
+	const gradients = parseColorVariables( rawFeatures, palette )?.color
+		?.gradients;
+	const globalStyles = parseColorVariables( rawStyles, palette );
+
+	return {
+		...( palette || gradients
+			? {
+					__experimentalFeatures: {
+						color: { palette, gradients },
+					},
+			  }
+			: {} ),
+		__experimentalGlobalStylesBaseStyles: globalStyles,
+	};
+}

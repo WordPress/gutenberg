@@ -1,13 +1,88 @@
 /**
  * Internal dependencies
  */
-import { getBlockPaddings, getBlockColors } from '../utils';
+import {
+	getBlockPaddings,
+	getBlockColors,
+	parseColorVariables,
+	getGlobalStyles,
+} from '../utils';
 
 const DEFAULT_COLORS = [
 	{ color: '#cd2653', name: 'Accent Color', slug: 'accent' },
 	{ color: '#000000', name: 'Primary', slug: 'primary' },
 	{ color: '#6d6d6d', name: 'Secondary', slug: 'secondary' },
 ];
+
+const GLOBAL_STYLES_PALETTE = [
+	{
+		slug: 'green',
+		color: '#D1E4DD',
+		name: 'Green',
+	},
+	{
+		slug: 'blue',
+		color: '#D1DFE4',
+		name: 'Blue',
+	},
+	{
+		slug: 'purple',
+		color: '#D1D1E4',
+		name: 'Purple',
+	},
+];
+
+const DEFAULT_GLOBAL_STYLES = {
+	styles: {
+		color: {
+			background: 'var(--wp--preset--color--green)',
+			text: 'var(--wp--preset--color--blue)',
+		},
+		elements: {
+			link: {
+				color: {
+					text: 'var(--wp--preset--color--purple)',
+				},
+			},
+		},
+	},
+};
+
+const DEFAULT_FEATURES = {
+	color: {
+		palette: GLOBAL_STYLES_PALETTE,
+		gradients: [
+			{
+				slug: 'purple-to-blue',
+				gradient:
+					'linear-gradient(160deg, var(--wp--preset--color--purple), var(--wp--preset--color--blue))',
+				name: 'Purple to Blue',
+			},
+			{
+				slug: 'green-to-purple',
+				gradient:
+					'linear-gradient(160deg, var(--wp--preset--color--green), var(--wp--preset--color--purple))',
+				name: 'Green to Purple',
+			},
+		],
+	},
+};
+
+const PARSED_GLOBAL_STYLES = {
+	styles: {
+		color: {
+			background: '#D1E4DD',
+			text: '#D1DFE4',
+		},
+		elements: {
+			link: {
+				color: {
+					text: '#D1D1E4',
+				},
+			},
+		},
+	},
+};
 
 describe( 'getBlockPaddings', () => {
 	const PADDING = 12;
@@ -80,6 +155,40 @@ describe( 'getBlockColors', () => {
 		expect( blockColors ).toEqual(
 			expect.objectContaining( {
 				color: '#4ddddd',
+			} )
+		);
+	} );
+} );
+
+describe( 'parseColorVariables', () => {
+	it( 'returns the parsed colors values correctly', () => {
+		const blockColors = parseColorVariables(
+			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
+			GLOBAL_STYLES_PALETTE
+		);
+		expect( blockColors ).toEqual(
+			expect.objectContaining( PARSED_GLOBAL_STYLES )
+		);
+	} );
+} );
+
+describe( 'getGlobalStyles', () => {
+	it( 'returns the global styles data correctly', () => {
+		const globalStyles = getGlobalStyles(
+			JSON.stringify( DEFAULT_GLOBAL_STYLES ),
+			JSON.stringify( DEFAULT_FEATURES )
+		);
+		const gradients = parseColorVariables(
+			JSON.stringify( DEFAULT_FEATURES ),
+			GLOBAL_STYLES_PALETTE
+		)?.color?.gradients;
+
+		expect( globalStyles ).toEqual(
+			expect.objectContaining( {
+				__experimentalFeatures: {
+					color: { palette: GLOBAL_STYLES_PALETTE, gradients },
+				},
+				__experimentalGlobalStylesBaseStyles: PARSED_GLOBAL_STYLES,
 			} )
 		);
 	} );

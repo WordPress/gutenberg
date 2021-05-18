@@ -1,7 +1,4 @@
 /**
- * External dependencies
- */
-/**
  * WordPress dependencies
  */
 import RNReactNativeGutenbergBridge, {
@@ -15,10 +12,6 @@ import RNReactNativeGutenbergBridge, {
 	subscribeUpdateCapabilities,
 	subscribeShowNotice,
 } from '@wordpress/react-native-bridge';
-
-/**
- * WordPress dependencies
- */
 import { Component } from '@wordpress/element';
 import { count as wordCount } from '@wordpress/wordcount';
 import {
@@ -35,6 +28,7 @@ import {
 	validateThemeGradients,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { getGlobalStyles } from '@wordpress/components';
 
 const postTypeEntities = [
 	{ name: 'post', baseURL: '/wp/v2/posts' },
@@ -128,15 +122,22 @@ class NativeEditorProvider extends Component {
 
 		this.subscriptionParentUpdateEditorSettings = subscribeUpdateEditorSettings(
 			( editorSettings ) => {
-				// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
-				editorSettings.colors = validateThemeColors(
-					editorSettings.colors
-				);
-				editorSettings.gradients = validateThemeGradients(
-					editorSettings.gradients
-				);
+				const {
+					colors: updatedColors,
+					gradients: updatedGradients,
+					rawFeatures,
+					rawStyles,
+				} = editorSettings;
+				const updatedSettings = {
+					// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
+					colors: validateThemeColors( updatedColors ),
+					gradients: validateThemeGradients( updatedGradients ),
+					...( rawStyles
+						? getGlobalStyles( rawStyles, rawFeatures )
+						: {} ),
+				};
 
-				this.props.updateSettings( editorSettings );
+				this.props.updateSettings( updatedSettings );
 			}
 		);
 
