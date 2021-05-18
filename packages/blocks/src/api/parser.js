@@ -482,9 +482,6 @@ export function createBlockWithFallback( blockNode ) {
 	const unregisteredFallbackBlock =
 		getUnregisteredTypeHandlerName() || freeformContentFallbackBlock || isV2Gallery;
 
-	console.log('isV2Gallery',isV2Gallery);
-	console.log('unregisteredFallbackBlock',unregisteredFallbackBlock);
-
 	attributes = attributes || {};
 
 	// Trim content to avoid creation of intermediary freeform segments.
