@@ -216,6 +216,18 @@ function KeyboardShortcutsRegister() {
 		} );
 
 		registerShortcut( {
+			name: 'core/block-editor/select-all',
+			category: 'selection',
+			description: __(
+				'Select all text when typing. Press again to select all blocks.'
+			),
+			keyCombination: {
+				modifier: 'primary',
+				character: 'a',
+			},
+		} );
+
+		registerShortcut( {
 			name: 'core/block-editor/unselect',
 			category: 'selection',
 			description: __( 'Clear selection.' ),

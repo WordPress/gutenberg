@@ -7,9 +7,9 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { isEntirelySelected } from '@wordpress/dom';
-import { isKeyboardEvent } from '@wordpress/keycodes';
+import { useRef, useCallback } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useRefEffect } from '@wordpress/compose';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
@@ -17,6 +17,7 @@ import { useRefEffect } from '@wordpress/compose';
 import { store as blockEditorStore } from '../../store';
 
 export default function useSelectAll() {
+	const ref = useRef();
 	const {
 		getBlockOrder,
 		getSelectedBlockClientIds,
@@ -24,45 +25,44 @@ export default function useSelectAll() {
 	} = useSelect( blockEditorStore );
 	const { multiSelect } = useDispatch( blockEditorStore );
 
-	return useRefEffect( ( node ) => {
-		function onKeyDown( event ) {
-			if (
-				! isKeyboardEvent.primary( event, 'a' ) ||
-				! isEntirelySelected( event.target )
-			) {
-				return;
-			}
+	const callback = useCallback( ( event ) => {
+		const selectedClientIds = getSelectedBlockClientIds();
 
-			const selectedClientIds = getSelectedBlockClientIds();
-
-			if ( ! selectedClientIds.length ) {
-				return;
-			}
-
-			const [ firstSelectedClientId ] = selectedClientIds;
-			const rootClientId = getBlockRootClientId( firstSelectedClientId );
-			let blockClientIds = getBlockOrder( rootClientId );
-
-			if ( selectedClientIds.length === blockClientIds.length ) {
-				blockClientIds = getBlockOrder(
-					getBlockRootClientId( rootClientId )
-				);
-			}
-
-			const firstClientId = first( blockClientIds );
-			const lastClientId = last( blockClientIds );
-
-			if ( firstClientId === lastClientId ) {
-				return;
-			}
-
-			multiSelect( firstClientId, lastClientId );
-			event.preventDefault();
+		if ( ! selectedClientIds.length ) {
+			return;
 		}
 
-		node.addEventListener( 'keydown', onKeyDown );
-		return () => {
-			node.removeEventListener( 'keydown', onKeyDown );
-		};
+		if (
+			selectedClientIds.length === 1 &&
+			! isEntirelySelected( event.target )
+		) {
+			return;
+		}
+
+		const [ firstSelectedClientId ] = selectedClientIds;
+		const rootClientId = getBlockRootClientId( firstSelectedClientId );
+		let blockClientIds = getBlockOrder( rootClientId );
+
+		if ( selectedClientIds.length === blockClientIds.length ) {
+			blockClientIds = getBlockOrder(
+				getBlockRootClientId( rootClientId )
+			);
+		}
+
+		const firstClientId = first( blockClientIds );
+		const lastClientId = last( blockClientIds );
+
+		if ( firstClientId === lastClientId ) {
+			return;
+		}
+
+		multiSelect( firstClientId, lastClientId );
+		event.preventDefault();
 	}, [] );
+
+	useShortcut( 'core/block-editor/select-all', callback, {
+		target: ref,
+	} );
+
+	return ref;
 }
