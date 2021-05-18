@@ -17,6 +17,7 @@ import {
 /**
  * Internal dependencies
  */
+import SidebarHeader from './sidebar-header';
 import MenuSettings from './menu-settings';
 import ManageLocations from './manage-locations';
 import DeleteMenu from './delete-menu';
@@ -37,24 +38,23 @@ export default function Sidebar( {
 	openManageLocationsModal,
 	hasPermanentSidebar,
 } ) {
-	const { sidebarName, hasBlockSelection, hasSidebarEnabled } = useSelect(
+	const { sidebar, hasBlockSelection, hasSidebarEnabled } = useSelect(
 		( select ) => {
-			const sidebar = select( interfaceStore ).getActiveComplementaryArea(
-				SIDEBAR_SCOPE
-			);
-			const blockSelection = select(
-				blockEditorStore
-			).getBlockSelectionStart();
+			const _sidebar = select(
+				interfaceStore
+			).getActiveComplementaryArea( SIDEBAR_SCOPE );
+
+			const _hasSidebarEnabled = [
+				SIDEBAR_NAVIGATION,
+				SIDEBAR_BLOCK,
+			].includes( _sidebar );
 
 			return {
-				sidebarName: blockSelection
-					? SIDEBAR_BLOCK
-					: SIDEBAR_NAVIGATION,
-				hasBlockSelection: blockSelection,
-				hasSidebarEnabled: [
-					SIDEBAR_NAVIGATION,
-					SIDEBAR_BLOCK,
-				].includes( sidebar ),
+				sidebar: _sidebar,
+				hasBlockSelection: !! select(
+					blockEditorStore
+				).getBlockSelectionStart(),
+				hasSidebarEnabled: _hasSidebarEnabled,
 			};
 		},
 		[]
@@ -73,6 +73,11 @@ export default function Sidebar( {
 		}
 	}, [ hasBlockSelection, hasSidebarEnabled ] );
 
+	let sidebarName = sidebar;
+	if ( ! hasSidebarEnabled ) {
+		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_NAVIGATION;
+	}
+
 	return (
 		<ComplementaryArea
 			className="edit-navigation-sidebar"
@@ -83,7 +88,8 @@ export default function Sidebar( {
 			identifier={ sidebarName }
 			icon={ cog }
 			isActiveByDefault={ hasPermanentSidebar }
-			header={ <></> }
+			header={ <SidebarHeader sidebarName={ sidebarName } /> }
+			headerClassName="edit-navigation-sidebar__panel-tabs"
 			isPinnable={ ! hasPermanentSidebar }
 		>
 			{ sidebarName === SIDEBAR_NAVIGATION && (
