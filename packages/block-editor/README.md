@@ -508,7 +508,7 @@ screen when this "custom preview" is chosen from the preview menu.
 _Parameters_
 
 -   _props_ `Object`: Component properties.
--   _props.previewId_ `string`: The internal name of this custom preview. Must match the _previewId_ given to `PluginPreviewMenuItem`.
+-   _props.previewId_ `string`: The internal name of this custom preview. Must match the `previewId` given to `PluginPreviewMenuItem`.
 -   _props.children_ `WPElement`: Children to be rendered.
 
 <a name="PluginPreviewMenuItem" href="#PluginPreviewMenuItem">#</a> **PluginPreviewMenuItem**
@@ -520,8 +520,10 @@ inside the preview menu. Typically a single string is good enough.
 _Parameters_
 
 -   _props_ `Object`: Component properties.
--   _props.previewId_ `string`: The internal name of this custom preview. Must match the _previewId_ given to `PluginPreview`.
 -   _props.children_ `WPElement`: Children to be rendered.
+-   _props.icon_ `WPIcon`: Menu item icon to be rendered.
+-   _props.onClick_ `Function`: Menu item click handler, e.g. for previews that do not register slot fills.
+-   _props.previewId_ `string`: The internal name of this custom preview. Must match the _previewId_ given to `PluginPreview`.
 
 <a name="PreserveScrollInReorder" href="#PreserveScrollInReorder">#</a> **PreserveScrollInReorder**
 
