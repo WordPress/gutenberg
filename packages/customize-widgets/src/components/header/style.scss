@@ -1,3 +1,21 @@
+.customize-widgets-header {
+	@include break-medium() {
+		// The mobile fixed block toolbar should be snug under the header.
+		margin-bottom: $grid-unit-60 + $default-block-margin;
+	}
+
+	// Offset the customizer's sidebar padding.
+	// Provide enough bottom margin to ensure the floating block toolbar isn't overlapped.
+	margin: -15px ( -$grid-unit-15 ) ( 0 ) ( -$grid-unit-15 );
+	padding: $grid-unit-15;
+
+	// Match the customizer grey background.
+	background: #f0f0f1;
+	border-bottom: 1px solid $gray-200;
+
+	z-index: z-index(".customize-widgets__topbar");
+}
+
 .customize-widgets-header-toolbar {
 	display: flex;
 	border: none;
