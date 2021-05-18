@@ -191,20 +191,27 @@ export default function SearchEdit( {
 		wrapper.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
 
 		wrapper.style.width = `${ button.offsetWidth }px`;
+
+		const removeTransitions = setTimeout( () => {
+			wrapper.style.transitionDuration = 'unset';
+
+			clearTimeout( removeTransitions );
+		}, SEARCHFIELD_ANIMATION_DURATION );
 	};
 
-	const showSearchField = ( animate = true ) => {
+	const showSearchField = () => {
 		const wrapper = searchFieldRef.current.offsetParent;
 		const searchField = searchFieldRef.current;
-		const duration = animate ? SEARCHFIELD_ANIMATION_DURATION : 0;
 
 		const resetWidth = setTimeout( () => {
 			searchField.style.width = `${ width }${ widthUnit }`;
+			wrapper.style.transitionDuration = 'unset';
 
 			clearTimeout( resetWidth );
-		}, duration );
+		}, SEARCHFIELD_ANIMATION_DURATION );
 
-		searchField.style.transitionDuration = `${ duration }ms`;
+		searchField.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
+		wrapper.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
 		wrapper.style.width = `${ width }${ widthUnit }`;
 	};
 
