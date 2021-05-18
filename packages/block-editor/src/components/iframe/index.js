@@ -6,7 +6,7 @@ import {
 	createPortal,
 	useCallback,
 	forwardRef,
-	useLayoutEffect,
+	useEffect,
 	useMemo,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -197,7 +197,7 @@ function Iframe( { contentRef, children, head, ...props }, ref ) {
 		} );
 	}, [] );
 
-	useLayoutEffect( () => {
+	useEffect( () => {
 		if ( iframeDocument ) {
 			styleSheetsCompat( iframeDocument );
 		}
