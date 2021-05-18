@@ -292,6 +292,7 @@ $color-control-label-height: 20px;
 	// Both selected and vertical.
 	.is-selected.is-vertical & {
 		display: inline-flex; // This makes the white box not take up all available space.
+		padding: $grid-unit-15;
 	}
 
 	.wp-block-navigation-placeholder__icon {
