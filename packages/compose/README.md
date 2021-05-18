@@ -350,11 +350,11 @@ return <div ref={ mergedRefs } />;
 
 _Parameters_
 
--   _refs_ `Array<RefObject|RefCallback>`: The refs to be merged.
+-   _refs_ `Array<T>`: The refs to be merged.
 
 _Returns_
 
--   `RefCallback`: The merged ref callback.
+-   `import('react').Ref<TypeFromRef<T>>`: The merged ref callback.
 
 <a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
 
