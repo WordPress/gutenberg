@@ -75,6 +75,7 @@ export default function SearchEdit( {
 		buttonPosition,
 		buttonUseIcon,
 		buttonBehavior,
+		isSearchFieldHidden,
 		style,
 	} = attributes;
 
@@ -89,20 +90,20 @@ export default function SearchEdit( {
 			return;
 		}
 
-		if ( isSelected ) {
-			showSearchField();
-		} else {
+		if ( isSearchFieldHidden ) {
 			hideSearchField();
+		} else {
+			showSearchField();
 		}
-	}, [ isSelected ] );
+	}, [ buttonPosition, isSearchFieldHidden ] );
 
 	useEffect( () => {
-		if ( 'button-only' !== buttonPosition ) {
-			showSearchField( false );
-		} else {
-			hideSearchField();
+		if ( 'button-only' === buttonPosition && ! isSelected ) {
+			setAttributes( {
+				isSearchFieldHidden: true,
+			} );
 		}
-	}, [ buttonPosition ] );
+	}, [ isSelected ] );
 
 	const hideSearchField = () => {
 		searchFieldRef.current.style.width = `${ searchFieldRef.current.offsetWidth }px`;
@@ -153,19 +154,23 @@ export default function SearchEdit( {
 			'button-only' === buttonPosition
 				? 'wp-block-search__button-only'
 				: undefined,
-			BUTTON_BEHAVIOR_EXPAND === buttonBehavior
+			'button-only' === buttonPosition &&
+				BUTTON_BEHAVIOR_EXPAND === buttonBehavior
 				? 'wp-block-search__button-behavior-expand'
 				: undefined,
-			BUTTON_BEHAVIOR_LINK === buttonBehavior
+			'button-only' === buttonPosition &&
+				BUTTON_BEHAVIOR_LINK === buttonBehavior
 				? 'wp-block-search__button-behavior-link'
+				: undefined,
+			'button-only' === buttonPosition && isSearchFieldHidden
+				? 'wp-block-search__searchfield-hidden'
 				: undefined,
 			! buttonUseIcon && 'no-button' !== buttonPosition
 				? 'wp-block-search__text-button'
 				: undefined,
 			buttonUseIcon && 'no-button' !== buttonPosition
 				? 'wp-block-search__icon-button'
-				: undefined,
-			isSelected ? undefined : 'wp-block-search__is-deselected'
+				: undefined
 		);
 	};
 
@@ -251,7 +256,11 @@ export default function SearchEdit( {
 						icon={ search }
 						className="wp-block-search__button"
 						style={ { borderRadius } }
-						onClick={ showSearchField }
+						onClick={ () => {
+							setAttributes( {
+								isSearchFieldHidden: ! isSearchFieldHidden,
+							} );
+						} }
 						ref={ buttonRef }
 					/>
 				) }
@@ -267,7 +276,11 @@ export default function SearchEdit( {
 						onChange={ ( html ) =>
 							setAttributes( { buttonText: html } )
 						}
-						onClick={ showSearchField }
+						onClick={ () => {
+							setAttributes( {
+								isSearchFieldHidden: ! isSearchFieldHidden,
+							} );
+						} }
 						ref={ buttonRef }
 					/>
 				) }
@@ -333,6 +346,7 @@ export default function SearchEdit( {
 									onClick={ () => {
 										setAttributes( {
 											buttonPosition: 'button-only',
+											isSearchFieldHidden: true,
 										} );
 
 										onClose();
@@ -351,6 +365,7 @@ export default function SearchEdit( {
 							onClick={ () => {
 								setAttributes( {
 									buttonUseIcon: ! buttonUseIcon,
+									isSearchFieldHidden: true,
 								} );
 							} }
 							className={

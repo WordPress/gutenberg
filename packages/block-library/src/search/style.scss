@@ -69,7 +69,7 @@
 		}
 
 		// !important here to override inline styles on button only deselected view.
-		&.wp-block-search__is-deselected {
+		&.wp-block-search__searchfield-hidden {
 			.wp-block-search__input {
 				width: 0 !important;
 				min-width: 0 !important;
