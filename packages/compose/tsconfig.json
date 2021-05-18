@@ -19,6 +19,7 @@
 		"src/hooks/use-debounce/**/*",
 		"src/hooks/use-instance-id/**/*",
 		"src/hooks/use-focus-return/**/*",
+		"src/hooks/use-previous/**/*",
 		"src/utils/**/*"
 	]
 }
