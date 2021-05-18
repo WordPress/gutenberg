@@ -26,7 +26,6 @@ import { BACKSPACE, DELETE } from '@wordpress/keycodes';
  */
 import { useBlockEditorAutocompleteProps } from '../autocomplete';
 import { useBlockEditContext } from '../block-edit';
-import { RemoveBrowserShortcuts } from './remove-browser-shortcuts';
 import FormatToolbarContainer from './format-toolbar-container';
 import { store as blockEditorStore } from '../../store';
 import { useUndoAutomaticChange } from './use-undo-automatic-change';
@@ -36,6 +35,7 @@ import { usePasteHandler } from './use-paste-handler';
 import { useInputRules } from './use-input-rules';
 import { useEnter } from './use-enter';
 import { useFormatTypes } from './use-format-types';
+import { useRemoveBrowserShortcuts } from './use-remove-browser-shortcuts';
 import FormatEdit from './format-edit';
 import { getMultilineTag, getAllowedFormats } from './utils';
 
@@ -283,13 +283,14 @@ function RichTextWrapper(
 		}
 	}
 
+	const removeBrowserShortcutsRef = useRemoveBrowserShortcuts();
+
 	const TagName = tagName;
 	const content = (
 		<>
 			{ isSelected &&
 				children &&
 				children( { value, onChange, onFocus } ) }
-			{ isSelected && <RemoveBrowserShortcuts /> }
 			{ isSelected && autocompleteProps.children }
 			{ isSelected && (
 				<FormatEdit
@@ -314,6 +315,7 @@ function RichTextWrapper(
 				{ ...props }
 				{ ...autocompleteProps }
 				ref={ useMergeRefs( [
+					isSelected && removeBrowserShortcutsRef,
 					autocompleteProps.ref,
 					props.ref,
 					richTextRef,

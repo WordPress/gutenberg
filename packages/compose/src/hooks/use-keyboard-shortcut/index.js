@@ -14,6 +14,7 @@ import { useEffect } from '@wordpress/element';
  * Internal dependencies
  */
 import useFreshRef from '../use-fresh-ref';
+import useRefEffect from '../use-ref-effect';
 
 /**
  * A block selection object.
@@ -42,6 +43,52 @@ function isAppleOS( _window = window ) {
 	);
 }
 
+function maybeError( shortcut ) {
+	const keys = shortcut.split( '+' );
+	// Determines whether a key is a modifier by the length of the string.
+	// E.g. if I add a pass a shortcut Shift+Cmd+M, it'll determine that
+	// the modifiers are Shift and Cmd because they're not a single character.
+	const modifiers = new Set( keys.filter( ( value ) => value.length > 1 ) );
+	const hasAlt = modifiers.has( 'alt' );
+	const hasShift = modifiers.has( 'shift' );
+
+	// This should be better moved to the shortcut registration instead.
+	if (
+		isAppleOS() &&
+		( ( modifiers.size === 1 && hasAlt ) ||
+			( modifiers.size === 2 && hasAlt && hasShift ) )
+	) {
+		throw new Error(
+			`Cannot bind ${ shortcut }. Alt and Shift+Alt modifiers are reserved for character input.`
+		);
+	}
+}
+
+/**
+ * Attach a keyboard shortcut handler.
+ *
+ * @param {string[]|string} shortcuts  Keyboard Shortcuts.
+ * @param {Function}        callback   Shortcut callback.
+ */
+export function useKeyboardShortcutRef( shortcuts, callback ) {
+	const currentCallback = useFreshRef( callback );
+	return useRefEffect(
+		( element ) => {
+			const mousetrap = new Mousetrap( element );
+			castArray( shortcuts ).forEach( ( shortcut ) => {
+				maybeError( shortcut );
+				mousetrap.bind( shortcut, ( ...args ) =>
+					currentCallback.current( ...args )
+				);
+			} );
+			return () => {
+				mousetrap.reset();
+			};
+		},
+		[ shortcuts ]
+	);
+}
+
 /**
  * Attach a keyboard shortcut handler.
  *
@@ -67,26 +114,7 @@ function useKeyboardShortcut(
 		}
 		const mousetrap = new Mousetrap( target ? target.current : document );
 		castArray( shortcuts ).forEach( ( shortcut ) => {
-			const keys = shortcut.split( '+' );
-			// Determines whether a key is a modifier by the length of the string.
-			// E.g. if I add a pass a shortcut Shift+Cmd+M, it'll determine that
-			// the modifiers are Shift and Cmd because they're not a single character.
-			const modifiers = new Set(
-				keys.filter( ( value ) => value.length > 1 )
-			);
-			const hasAlt = modifiers.has( 'alt' );
-			const hasShift = modifiers.has( 'shift' );
-
-			// This should be better moved to the shortcut registration instead.
-			if (
-				isAppleOS() &&
-				( ( modifiers.size === 1 && hasAlt ) ||
-					( modifiers.size === 2 && hasAlt && hasShift ) )
-			) {
-				throw new Error(
-					`Cannot bind ${ shortcut }. Alt and Shift+Alt modifiers are reserved for character input.`
-				);
-			}
+			maybeError( shortcut );
 
 			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
 			mousetrap[ bindFn ](

@@ -23,7 +23,10 @@ export { default as __experimentalUseFocusOutside } from './hooks/use-focus-outs
 export { default as useFocusReturn } from './hooks/use-focus-return';
 export { default as useInstanceId } from './hooks/use-instance-id';
 export { default as useIsomorphicLayoutEffect } from './hooks/use-isomorphic-layout-effect';
-export { default as useKeyboardShortcut } from './hooks/use-keyboard-shortcut';
+export {
+	default as useKeyboardShortcut,
+	useKeyboardShortcutRef as __unstableUseKeyboardShortcutRef,
+} from './hooks/use-keyboard-shortcut';
 export { default as useMediaQuery } from './hooks/use-media-query';
 export { default as usePrevious } from './hooks/use-previous';
 export { default as useReducedMotion } from './hooks/use-reduced-motion';
