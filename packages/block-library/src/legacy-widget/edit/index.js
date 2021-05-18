@@ -31,7 +31,8 @@ import NoPreview from './no-preview';
 import ConvertToBlocksButton from './convert-to-blocks-button';
 
 export default function Edit( props ) {
-	const { id, idBase, isWide } = props.attributes;
+	const { id, idBase } = props.attributes;
+	const { isWide = false } = props;
 
 	const blockProps = useBlockProps( {
 		className: classnames( {
@@ -44,7 +45,7 @@ export default function Edit( props ) {
 			{ ! id && ! idBase ? (
 				<Empty { ...props } />
 			) : (
-				<NotEmpty { ...props } />
+				<NotEmpty { ...props } isWide={ isWide } />
 			) }
 		</div>
 	);
@@ -85,10 +86,11 @@ function Empty( { attributes: { id, idBase }, setAttributes } ) {
 }
 
 function NotEmpty( {
-	attributes: { id, idBase, instance, isWide },
+	attributes: { id, idBase, instance },
 	setAttributes,
 	clientId,
 	isSelected,
+	isWide,
 } ) {
 	const [ hasPreview, setHasPreview ] = useState( null );
 

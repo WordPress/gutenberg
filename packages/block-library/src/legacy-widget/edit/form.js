@@ -76,17 +76,20 @@ export default function Form( {
 
 	if ( isWide && isMediumLargeViewport ) {
 		return (
-			<Popover focusOnMount={ false } position="bottom left">
-				<div
-					ref={ ref }
-					className="wp-block-legacy-widget__edit-form"
-					hidden={ ! isVisible }
-				>
+			<div className="wp-block-legacy-widget__container">
+				{ isVisible && (
 					<h3 className="wp-block-legacy-widget__edit-form-title">
 						{ title }
 					</h3>
-				</div>
-			</Popover>
+				) }
+				<Popover focusOnMount={ false } position="middle left">
+					<div
+						ref={ ref }
+						className="wp-block-legacy-widget__edit-form"
+						hidden={ ! isVisible }
+					></div>
+				</Popover>
+			</div>
 		);
 	}
 
