@@ -29,7 +29,6 @@ import { useRef, useState } from '@wordpress/element';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as reusableBlocksStore } from '@wordpress/reusable-blocks';
 import { store as coreStore } from '@wordpress/core-data';
-import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -360,7 +359,7 @@ export default compose(
 				replaceBlocks,
 				clearSelectedBlock,
 			} = dispatch( blockEditorStore );
-			const { openGeneralSidebar } = dispatch( editPostStore );
+			const { openGeneralSidebar } = dispatch( 'core/edit-post' );
 			const { getBlockSelectionEnd, getBlock } = select(
 				blockEditorStore
 			);
