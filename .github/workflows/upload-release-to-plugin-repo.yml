@@ -104,9 +104,7 @@ jobs:
 
             - name: Get previous stable version
               id: get_previous_stable_version
-              env:
-                  STABLE_TAG_REGEX: 'Stable tag: \K${{ env.STABLE_VERSION_REGEX }}'
-              run: echo ::set-output name=stable_version::$(grep -oP "${STABLE_TAG_REGEX}" ./trunk/readme.txt)
+              run: echo ::set-output name=stable_version::$(awk -F ':\ ' '$1 == "Stable tag" {print $2}' ./trunk/readme.txt)
 
             - name: Delete everything
               working-directory: ./trunk
