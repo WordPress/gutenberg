@@ -54,10 +54,8 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
 		return;
 	}
 
-	$settings           = gutenberg_get_default_block_editor_settings();
-	$theme_support_data = WP_Theme_JSON::get_from_editor_settings( $settings );
-
-	$all = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data );
+	$settings = gutenberg_get_default_block_editor_settings();
+	$all      = WP_Theme_JSON_Resolver::get_merged_data( $settings );
 
 	$stylesheet = gutenberg_experimental_global_styles_get_stylesheet( $all );
 	if ( empty( $stylesheet ) ) {
@@ -78,16 +76,26 @@ function gutenberg_experimental_global_styles_enqueue_assets() {
  * @return array New block editor settings
  */
 function gutenberg_experimental_global_styles_settings( $settings ) {
-	$theme_support_data = WP_Theme_JSON::get_from_editor_settings( $settings );
-	unset( $settings['colors'] );
-	unset( $settings['disableCustomColors'] );
-	unset( $settings['disableCustomFontSizes'] );
-	unset( $settings['disableCustomGradients'] );
-	unset( $settings['enableCustomLineHeight'] );
-	unset( $settings['enableCustomUnits'] );
-	unset( $settings['enableCustomSpacing'] );
-	unset( $settings['fontSizes'] );
-	unset( $settings['gradients'] );
+	// Set what is the context for this data request.
+	$context = 'all';
+	if (
+		is_callable( 'get_current_screen' ) &&
+		function_exists( 'gutenberg_is_edit_site_page' ) &&
+		gutenberg_is_edit_site_page( get_current_screen()->id ) &&
+		WP_Theme_JSON_Resolver::theme_has_support() &&
+		gutenberg_supports_block_templates()
+	) {
+		$context = 'site-editor';
+	}
+
+	if (
+		defined( 'REST_REQUEST' ) &&
+		REST_REQUEST &&
+		isset( $_GET['context'] ) &&
+		'mobile' === $_GET['context']
+	) {
+		$context = 'mobile';
+	}
 
 	$origin = 'theme';
 	if (
@@ -97,52 +105,45 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		// Only lookup for the user data if we need it.
 		$origin = 'user';
 	}
-	$tree = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, $origin );
+	$consolidated = WP_Theme_JSON_Resolver::get_merged_data( $settings, $origin );
 
-	// STEP 1: ADD FEATURES
-	//
-	// These need to be always added to the editor settings,
-	// even for themes that don't support theme.json.
-	// An example of this is that the presets are configured
-	// from the theme support data.
-	$settings['__experimentalFeatures'] = $tree->get_settings();
+	if ( 'mobile' === $context ) {
+		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
+	}
 
-	// STEP 2 - IF EDIT-SITE, ADD DATA REQUIRED FOR GLOBAL STYLES SIDEBAR
-	//
-	// In the site editor, the user can change styles, so the client
-	// needs the ability to create them. Hence, we pass it some data
-	// for this: base styles (core+theme) and the ID of the user CPT.
-	$screen = get_current_screen();
-	if (
-		! empty( $screen ) &&
-		function_exists( 'gutenberg_is_edit_site_page' ) &&
-		gutenberg_is_edit_site_page( $screen->id ) &&
-		WP_Theme_JSON_Resolver::theme_has_support() &&
-		gutenberg_supports_block_templates()
-	) {
+	if ( 'site-editor' === $context ) {
+		$theme       = WP_Theme_JSON_Resolver::get_merged_data( $settings, 'theme' );
 		$user_cpt_id = WP_Theme_JSON_Resolver::get_user_custom_post_type_id();
-		$base_styles = WP_Theme_JSON_Resolver::get_merged_data( $theme_support_data, 'theme' )->get_raw_data();
 
 		$settings['__experimentalGlobalStylesUserEntityId'] = $user_cpt_id;
-		$settings['__experimentalGlobalStylesBaseStyles']   = $base_styles;
-	} elseif (
-		WP_Theme_JSON_Resolver::theme_has_support() ||
-		get_theme_support( 'experimental-link-color' ) // link color support needs the presets CSS variables regardless of the presence of theme.json file.
+		$settings['__experimentalGlobalStylesBaseStyles']   = $theme->get_raw_data();
+	}
+
+	if (
+		'site-editor' !== $context &&
+		'mobile' !== $context &&
+		( WP_Theme_JSON_Resolver::theme_has_support() || get_theme_support( 'experimental-link-color' ) )
 	) {
-		// STEP 3 - ADD STYLES IF THEME HAS SUPPORT
-		//
-		// If we are in a block editor context, but not in edit-site,
-		// we add the styles via the settings, so the editor knows that
-		// some of these should be added the wrapper class,
-		// as if they were added via add_editor_styles.
-		$settings['styles'][] = array(
-			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $tree, 'css_variables' ),
+		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );
+		$css_variables = array(
+			'css'                     => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'css_variables' ),
 			'__experimentalNoWrapper' => true,
 		);
-		$settings['styles'][] = array(
-			'css' => gutenberg_experimental_global_styles_get_stylesheet( $tree, 'block_styles' ),
-		);
+
+		$settings['styles'][] = $css_variables;
+		$settings['styles'][] = $block_styles;
 	}
+
+	$settings['__experimentalFeatures'] = $consolidated->get_settings();
+	unset( $settings['colors'] );
+	unset( $settings['disableCustomColors'] );
+	unset( $settings['disableCustomFontSizes'] );
+	unset( $settings['disableCustomGradients'] );
+	unset( $settings['enableCustomLineHeight'] );
+	unset( $settings['enableCustomUnits'] );
+	unset( $settings['enableCustomSpacing'] );
+	unset( $settings['fontSizes'] );
+	unset( $settings['gradients'] );
 
 	return $settings;
 }

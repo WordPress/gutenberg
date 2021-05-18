@@ -80,17 +80,9 @@ public class Gutenberg: NSObject {
         }
 
         let editorSettings = dataSource.gutenbergEditorSettings()
-        if let rawGlobalStylesBaseStyles = editorSettings?.rawGlobalStylesBaseStyles {
-            initialProps["rawGlobalStylesBaseStyles"] = rawGlobalStylesBaseStyles
-        } else {
-            // We only need to include Colors and Gradients here if the Global Styles data wasn't provided
-            if let colors = editorSettings?.colors {
-                initialProps["colors"] = colors
-            }
-
-            if let gradients = editorSettings?.gradients {
-                initialProps["gradients"] = gradients
-            }
+        let settingsUpdates = properties(from: editorSettings)
+        initialProps.merge(properties(from: editorSettings)) { (intialProp, settingsUpdates) -> Any in
+            settingsUpdates
         }
 
         return initialProps
@@ -190,21 +182,31 @@ public class Gutenberg: NSObject {
     }
 
     public func updateEditorSettings(_ editorSettings: GutenbergEditorSettings?) {
-        var settingsUpdates = [String : Any]()
-        if let rawGlobalStylesBaseStyles = editorSettings?.rawGlobalStylesBaseStyles {
-            settingsUpdates["rawGlobalStylesBaseStyles"] = rawGlobalStylesBaseStyles
-        } else {
-            // We only need to include Colors and Gradients here if the Global Styles data wasn't provided
-            if let colors = editorSettings?.colors {
-                settingsUpdates["colors"] = colors
-            }
+        let settingsUpdates = properties(from: editorSettings)
+        sendEvent(.updateEditorSettings, body: settingsUpdates)
+    }
 
-            if let gradients = editorSettings?.gradients {
-                settingsUpdates["gradients"] = gradients
-            }
+    private func properties(from editorSettings: GutenbergEditorSettings?) -> [String : Any] {
+        var settingsUpdates = [String : Any]()
+        settingsUpdates["isFSETheme"] = editorSettings?.isFSETheme ?? false
+
+        if let rawStyles = editorSettings?.rawStyles {
+            settingsUpdates["rawStyles"] = rawStyles
         }
 
-        sendEvent(.updateEditorSettings, body: settingsUpdates)
+        if let rawFeatures = editorSettings?.rawFeatures {
+            settingsUpdates["rawFeatures"] = rawFeatures
+        }
+
+        if let colors = editorSettings?.colors {
+            settingsUpdates["colors"] = colors
+        }
+
+        if let gradients = editorSettings?.gradients {
+            settingsUpdates["gradients"] = gradients
+        }
+
+        return settingsUpdates
     }
 
     public func showNotice(_ message: String) {

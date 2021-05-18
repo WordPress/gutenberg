@@ -6,7 +6,7 @@ import { cx } from 'emotion';
 /**
  * Internal dependencies
  */
-import { View } from '../view';
+import { View } from '../../view';
 import { contextConnect, useContextSystem } from '../context';
 import * as styles from './styles';
 

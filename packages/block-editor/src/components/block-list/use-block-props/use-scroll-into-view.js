@@ -47,7 +47,9 @@ export function useScrollIntoView( clientId ) {
 			return;
 		}
 
-		const scrollContainer = getScrollContainer( extentNode );
+		const scrollContainer =
+			getScrollContainer( extentNode ) ||
+			extentNode.ownerDocument.defaultView;
 
 		// If there's no scroll container, it follows that there's no scrollbar
 		// and thus there's no need to try to scroll into view.
