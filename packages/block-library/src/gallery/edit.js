@@ -295,6 +295,10 @@ function GalleryEdit( props ) {
 			: __( 'Thumbnails are not cropped.' );
 	}
 
+	function onFocusGalleryCaption() {
+		setSelectedImage();
+	}
+
 	function setImageAttributes( index, newAttributes ) {
 		if ( ! images[ index ] ) {
 			return;
@@ -462,6 +466,7 @@ function GalleryEdit( props ) {
 				onSelectImage={ onSelectImage }
 				onDeselectImage={ onDeselectImage }
 				onSetImageAttributes={ setImageAttributes }
+				onFocusGalleryCaption={ onFocusGalleryCaption }
 				blockProps={ blockProps }
 			/>
 		</>
