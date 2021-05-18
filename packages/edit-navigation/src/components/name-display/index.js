@@ -17,10 +17,7 @@ import {
 	useMenuEntityProp,
 	IsMenuNameControlFocusedContext,
 } from '../../hooks';
-import {
-	COMPLEMENTARY_AREA_SCOPE,
-	COMPLEMENTARY_AREA_ID,
-} from '../../constants';
+import { SIDEBAR_SCOPE, SIDEBAR_NAVIGATION } from '../../constants';
 
 export default function NameDisplay() {
 	const { enableComplementaryArea } = useDispatch( interfaceStore );
@@ -43,8 +40,8 @@ export default function NameDisplay() {
 					) }
 					onClick={ () => {
 						enableComplementaryArea(
-							COMPLEMENTARY_AREA_SCOPE,
-							COMPLEMENTARY_AREA_ID
+							SIDEBAR_SCOPE,
+							SIDEBAR_NAVIGATION
 						);
 						setIsMenuNameEditFocused( true );
 					} }

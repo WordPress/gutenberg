@@ -30,7 +30,7 @@ export default function ManageLocations( {
 		toggleMenuLocationAssignment,
 	} = useMenuLocations();
 
-	if ( ! menuLocations ) {
+	if ( ! menuLocations || ! menus?.length ) {
 		return <Spinner />;
 	}
 
