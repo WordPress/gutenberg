@@ -496,6 +496,8 @@ export class ImageEdit extends Component {
 			imageDefaultSize,
 		] );
 
+		const canImageBeFeatured = typeof attributes.id !== 'undefined';
+
 		const isFeaturedImage =
 			typeof featuredImageId !== 'undefined' &&
 			featuredImageId === attributes.id;
@@ -541,7 +543,7 @@ export class ImageEdit extends Component {
 					{ this.getLinkSettings( true ) }
 				</PanelBody>
 				{ androidOnly &&
-					typeof attributes.id !== 'undefined' &&
+					canImageBeFeatured &&
 					this.getSetFeaturedButton( isFeaturedImage ) }
 			</InspectorControls>
 		);
