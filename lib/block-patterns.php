@@ -216,7 +216,7 @@ function update_core_patterns() {
 		'heading',
 		'three-images-gallery',
 		'text-two-columns',
-		'media-text-arquitecture',
+		'media-text-architecture',
 		'two-buttons',
 	);
 
