@@ -9,10 +9,8 @@
 		height: auto;
 	}
 
-	&.alignwide,
-	&.alignfull {
-		img {
-			width: 100%;
-		}
+	&.alignwide img,
+	&.alignfull img {
+		width: 100%;
 	}
 }
