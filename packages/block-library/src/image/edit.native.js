@@ -52,6 +52,7 @@ import {
 	textColor,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
@@ -603,7 +604,7 @@ export default compose( [
 		const { getSettings, wasBlockJustInserted } = select(
 			blockEditorStore
 		);
-		const { getEditedPostAttribute } = select( 'core/editor' );
+		const { getEditedPostAttribute } = select( editorStore );
 		const {
 			attributes: { id, url },
 			isSelected,

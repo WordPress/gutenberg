@@ -28,6 +28,7 @@ import {
 import { Component } from '@wordpress/element';
 import { withSelect, withDispatch } from '@wordpress/data';
 import { link } from '@wordpress/icons';
+import { store as editPostStore } from '@wordpress/edit-post';
 
 /**
  * Internal dependencies
@@ -521,7 +522,7 @@ export default compose( [
 	withInstanceId,
 	withGradient,
 	withSelect( ( select, { clientId, isSelected } ) => {
-		const { isEditorSidebarOpened } = select( 'core/edit-post' );
+		const { isEditorSidebarOpened } = select( editPostStore );
 		const { getBlockCount, getBlockRootClientId, getSettings } = select(
 			blockEditorStore
 		);
@@ -539,7 +540,7 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		return {
 			closeSettingsBottomSheet() {
-				dispatch( 'core/edit-post' ).closeGeneralSidebar();
+				dispatch( editPostStore ).closeGeneralSidebar();
 			},
 		};
 	} ),
