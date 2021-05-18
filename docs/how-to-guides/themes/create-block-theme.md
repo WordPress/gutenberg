@@ -15,9 +15,8 @@ This tutorial is up to date with Gutenberg version 10.6.
 2.  [Theme setup](#theme-setup)
 3.  [Creating the templates and template parts](#creating-the-templates-and-template-parts)
 4.  [Theme.json - Global styles](#themejson---global-styles)
-5.  [Layouts](#layouts)
-6.  [Custom templates](#custom-templates)
-7.  [Example themes](#example-themes)
+5.  [Custom templates](#custom-templates)
+6.  [Example themes](#example-themes)
 
 ## What is needed to create a block theme?
 
@@ -522,8 +521,8 @@ If you want to disable gradients, which are enabled by default, set `gradient` t
 The `layout` setting enables width settings for group blocks and template parts
 and replaces `add_theme_support( 'align-wide' );`.
 
-With this setting, inner blocks can use (inherit) the widths that you set in the `theme.json` file, or use a custom value
-defined by the user.
+The benefit of enabling the layout setting in `theme.json` is that you no longer need to add extra CSS for
+block alignments or widths. You can also set more precise widths to blocks inside containers.
 
 The keys used by `layout` are:
 
@@ -803,23 +802,6 @@ There are three template areas to choose from: Header, footer, and general.
 ]
 ```
 
-## Layouts
-
-The benefit of enabling the layout setting in `theme.json` is that you no longer need to add extra CSS for alignments or widths. You can also set more precise widths to blocks inside containers.
-
-The first thing you need to know is that blocks have different options available depending on if you are using the block editor or the site editor.
-When you are working in the block editor, your blocks are already placed inside a container.
-In the site editor, you can choose to add a container like a group or template part block.
-
-If you place an image block in the canvas of the site editor, it will not have any alignment or width options,
-and it will be positioned to the left.
-
-If you place the image block inside a group block, the options depend on the layout settings in the group block.
-
-- Without changes to the layout settings, you have the option to align the image to the left, center, or right.
-- When the layout setting inherits the width from `theme.json`, you can set the image's width to default, wide or full width.
-- When the content width and wide width have been specified, the image's width is adjusted and can be set to default, wide or full width.
-
 ## Custom templates
 
 Custom templates for posts, pages, and custom post types are created by adding additional HTML files inside the
@@ -864,6 +846,7 @@ The key is `postTypes`, followed by the name of the post type:
 ```
 
 ## Example themes
+
 You can find a basic starter theme called "emptytheme" and other example themes
 on the [Experimental themes GitHub repository](https://github.com/WordPress/theme-experiments).
 When using a theme as reference, take note of which Gutenberg version the theme is built for,
