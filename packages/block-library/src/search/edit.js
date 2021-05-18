@@ -189,7 +189,6 @@ export default function SearchEdit( {
 
 		searchField.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
 		wrapper.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
-
 		wrapper.style.width = `${ button.offsetWidth }px`;
 
 		const removeTransitions = setTimeout( () => {
@@ -203,16 +202,16 @@ export default function SearchEdit( {
 		const wrapper = searchFieldRef.current.offsetParent;
 		const searchField = searchFieldRef.current;
 
-		const resetWidth = setTimeout( () => {
-			searchField.style.width = `${ width }${ widthUnit }`;
-			wrapper.style.transitionDuration = 'unset';
-
-			clearTimeout( resetWidth );
-		}, SEARCHFIELD_ANIMATION_DURATION );
-
 		searchField.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
 		wrapper.style.transitionDuration = `${ SEARCHFIELD_ANIMATION_DURATION }ms`;
 		wrapper.style.width = `${ width }${ widthUnit }`;
+
+		const removeTransitions = setTimeout( () => {
+			searchField.style.width = `${ width }${ widthUnit }`;
+			wrapper.style.transitionDuration = 'unset';
+
+			clearTimeout( removeTransitions );
+		}, SEARCHFIELD_ANIMATION_DURATION );
 	};
 
 	const renderTextField = () => {
