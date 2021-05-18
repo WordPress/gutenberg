@@ -354,7 +354,7 @@ _Parameters_
 
 _Returns_
 
--   `import('react').Ref<TypeFromRef<T>>`: The merged ref callback.
+-   `import('react').RefCallback<TypeFromRef<T>>`: The merged ref callback.
 
 <a name="usePrevious" href="#usePrevious">#</a> **usePrevious**
 

@@ -66,7 +66,7 @@ function assignRef( ref, value ) {
  * @template {import('react').Ref<any>} T
  * @param {Array<T>} refs The refs to be merged.
  *
- * @return {import('react').Ref<TypeFromRef<T>>} The merged ref callback.
+ * @return {import('react').RefCallback<TypeFromRef<T>>} The merged ref callback.
  */
 export default function useMergeRefs( refs ) {
 	const element = useRef();
