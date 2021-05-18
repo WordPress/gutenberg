@@ -83,3 +83,9 @@
 		margin: auto;
 	}
 }
+
+.wp-block[data-align="right"] .wp-block-search__button-behavior-expand {
+	.wp-block-search__inside-wrapper {
+		float: right;
+	}
+}
