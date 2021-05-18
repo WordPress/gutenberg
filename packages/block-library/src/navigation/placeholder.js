@@ -62,7 +62,7 @@ function NavigationPlaceholder( { onCreate }, ref ) {
 	};
 
 	const onCreateEmptyMenu = () => {
-		onCreate( [] );
+		onCreate( [ createBlock( 'core/navigation-link-list' ) ] );
 	};
 
 	const onCreateAllPages = () => {

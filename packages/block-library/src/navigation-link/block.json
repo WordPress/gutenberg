@@ -3,9 +3,7 @@
 	"name": "core/navigation-link",
 	"title": "Custom Link",
 	"category": "design",
-	"parent": [
-		"core/navigation"
-	],
+	"parent": [ "core/navigation-link-list" ],
 	"description": "Add a page, link, or another item to your navigation.",
 	"textdomain": "default",
 	"attributes": {
