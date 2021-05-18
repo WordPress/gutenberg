@@ -9,6 +9,11 @@ import { includes } from 'lodash';
 import { useCallback, useEffect, useRef } from '@wordpress/element';
 
 /**
+ * Internal dependencies
+ */
+import useFreshRef from '../use-fresh-ref';
+
+/**
  * Input types which are classified as button types, for use in considering
  * whether element is a (focus-normalized) button.
  *
@@ -92,10 +97,7 @@ function isFocusNormalizedButton( eventTarget ) {
  *                                   outside that element.
  */
 export default function useFocusOutside( onFocusOutside ) {
-	const currentOnFocusOutside = useRef( onFocusOutside );
-	useEffect( () => {
-		currentOnFocusOutside.current = onFocusOutside;
-	}, [ onFocusOutside ] );
+	const currentOnFocusOutside = useFreshRef( onFocusOutside );
 
 	const preventBlurCheck = useRef( false );
 

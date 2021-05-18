@@ -1,7 +1,12 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useCallback } from '@wordpress/element';
+import { useRef, useCallback } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import useFreshRef from '../use-fresh-ref';
 
 /**
  * When opening modals/sidebars/dialogs, the focus
@@ -30,10 +35,7 @@ import { useRef, useEffect, useCallback } from '@wordpress/element';
 function useFocusReturn( onFocusReturn ) {
 	const ref = useRef();
 	const focusedBeforeMount = useRef();
-	const onFocusReturnRef = useRef( onFocusReturn );
-	useEffect( () => {
-		onFocusReturnRef.current = onFocusReturn;
-	}, [ onFocusReturn ] );
+	const onFocusReturnRef = useFreshRef( onFocusReturn );
 
 	return useCallback( ( node ) => {
 		if ( node ) {

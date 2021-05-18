@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useEffect } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import {
 	useShortcut,
 	store as keyboardShortcutsStore,
@@ -55,9 +55,9 @@ function KeyboardShortcuts() {
 
 	useShortcut(
 		'core/edit-site/toggle-list-view',
-		useCallback( () => {
+		() => {
 			setIsListViewOpened( ! isListViewOpen );
-		}, [ isListViewOpen, setIsListViewOpened ] ),
+		},
 		{ bindGlobal: true }
 	);
 

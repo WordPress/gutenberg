@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useCallback, useState, useRef, useEffect } from '@wordpress/element';
+import { useState, useRef, useEffect } from '@wordpress/element';
 import {
 	createHigherOrderComponent,
 	useKeyboardShortcut,
@@ -37,8 +37,8 @@ export function useNavigateRegions( ref, shortcuts = defaultShortcuts ) {
 		nextRegion.focus();
 		setIsFocusingRegions( true );
 	}
-	const focusPrevious = useCallback( () => focusRegion( -1 ), [] );
-	const focusNext = useCallback( () => focusRegion( 1 ), [] );
+	const focusPrevious = () => focusRegion( -1 );
+	const focusNext = () => focusRegion( 1 );
 
 	useKeyboardShortcut( shortcuts.previous, focusPrevious, {
 		bindGlobal: true,

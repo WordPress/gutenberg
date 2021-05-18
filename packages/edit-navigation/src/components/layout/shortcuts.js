@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useEffect, useCallback } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
 import { useDispatch } from '@wordpress/data';
 import {
 	useShortcut,
@@ -12,10 +12,10 @@ import { __ } from '@wordpress/i18n';
 function NavigationEditorShortcuts( { saveBlocks } ) {
 	useShortcut(
 		'core/edit-navigation/save-menu',
-		useCallback( ( event ) => {
+		( event ) => {
 			event.preventDefault();
 			saveBlocks();
-		} ),
+		},
 		{
 			bindGlobal: true,
 		}
