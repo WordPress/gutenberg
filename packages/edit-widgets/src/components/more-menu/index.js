@@ -79,6 +79,10 @@ export default function MoreMenu() {
 							>
 								{ __( 'Keyboard shortcuts' ) }
 							</MenuItem>
+							<FeatureToggle
+								feature="welcomeGuide"
+								label={ __( 'Welcome Guide' ) }
+							/>
 							<MenuItem
 								role="menuitem"
 								icon={ external }

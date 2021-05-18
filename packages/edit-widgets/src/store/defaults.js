@@ -3,5 +3,4 @@ export const PREFERENCES_DEFAULTS = {
 		fixedToolbar: false,
 		welcomeGuide: true,
 	},
-	hiddenBlockTypes: [],
 };
