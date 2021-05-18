@@ -39,7 +39,7 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
+            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -           id="color-picker-saturation-4"
 +           id="color-picker-saturation-3"
           >
@@ -86,7 +86,7 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
+                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -                 id="components-color-picker__hue-description-4"
 +                 id="components-color-picker__hue-description-3"
                 >
@@ -161,7 +161,7 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
+            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -           id="color-picker-saturation-8"
 +           id="color-picker-saturation-7"
           >
@@ -208,7 +208,7 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
+                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -                 id="components-color-picker__hue-description-8"
 +                 id="components-color-picker__hue-description-7"
                 >
@@ -283,7 +283,7 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
+            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -           id="color-picker-saturation-10"
 +           id="color-picker-saturation-9"
           >
@@ -330,7 +330,7 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
+                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -                 id="components-color-picker__hue-description-10"
 +                 id="components-color-picker__hue-description-9"
                 >
@@ -405,7 +405,7 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
+            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -           id="color-picker-saturation-6"
 +           id="color-picker-saturation-5"
           >
@@ -452,7 +452,7 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
+                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -                 id="components-color-picker__hue-description-6"
 +                 id="components-color-picker__hue-description-5"
                 >
@@ -511,7 +511,7 @@ Snapshot Diff:
             type="button"
           />
           <div
-            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
+            className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -           id="color-picker-saturation-2"
 +           id="color-picker-saturation-1"
           >
@@ -537,7 +537,7 @@ Snapshot Diff:
                   tabIndex="0"
                 />
                 <p
-                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View egi4jkx0"
+                  className="components-visually-hidden css-1r162ic-VisuallyHidden css-1mm2cvy-View em57xhy0"
 -                 id="components-color-picker__hue-description-2"
 +                 id="components-color-picker__hue-description-1"
                 >

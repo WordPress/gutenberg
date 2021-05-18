@@ -16,7 +16,8 @@ data class GutenbergProps @JvmOverloads constructor(
     val editorTheme: Bundle?,
     val translations: Bundle,
     val isDarkMode: Boolean,
-    val htmlModeEnabled: Boolean
+    val htmlModeEnabled: Boolean,
+    val canViewEditorOnboarding: Boolean
 ) {
 
     fun getInitialProps(bundle: Bundle?) = (bundle ?: Bundle()).apply {
@@ -33,8 +34,10 @@ data class GutenbergProps @JvmOverloads constructor(
         editorTheme?.also { theme ->
             theme.getSerializable(PROP_COLORS)?.let { putSerializable(PROP_COLORS, it) }
             theme.getSerializable(PROP_GRADIENTS)?.let { putSerializable(PROP_GRADIENTS, it) }
-            theme.getSerializable(PROP_GLOBAL_STYLES)
-                    ?.let { putSerializable(PROP_GLOBAL_STYLES, it) }
+            theme.getSerializable(PROP_STYLES)
+                    ?.let { putSerializable(PROP_STYLES, it) }
+            theme.getSerializable(PROP_FEATURES)
+                    ?.let { putSerializable(PROP_FEATURES, it) }
         }
     }
 
@@ -46,6 +49,7 @@ data class GutenbergProps @JvmOverloads constructor(
         putBoolean(PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR, enableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR, canEnableUnsupportedBlockEditor)
         putBoolean(PROP_CAPABILITIES_AUDIO_BLOCK, enableAudioBlock)
+        putBoolean(PROP_CAPABILITIES_CAN_VIEW_EDITOR_ONBOARDING, canViewEditorOnboarding)
     }
 
     companion object {
@@ -65,7 +69,8 @@ data class GutenbergProps @JvmOverloads constructor(
         private const val PROP_TRANSLATIONS = "translations"
         private const val PROP_COLORS = "colors"
         private const val PROP_GRADIENTS = "gradients"
-        private const val PROP_GLOBAL_STYLES = "rawGlobalStylesBaseStyles"
+        private const val PROP_STYLES = "rawStyles"
+        private const val PROP_FEATURES = "rawFeatures"
 
         const val PROP_CAPABILITIES = "capabilities"
         const val PROP_CAPABILITIES_CONTACT_INFO_BLOCK = "contactInfoBlock"
@@ -75,5 +80,6 @@ data class GutenbergProps @JvmOverloads constructor(
         const val PROP_CAPABILITIES_UNSUPPORTED_BLOCK_EDITOR = "unsupportedBlockEditor"
         const val PROP_CAPABILITIES_CAN_ENABLE_UNSUPPORTED_BLOCK_EDITOR = "canEnableUnsupportedBlockEditor"
         const val PROP_CAPABILITIES_AUDIO_BLOCK = "audioBlock"
+        const val PROP_CAPABILITIES_CAN_VIEW_EDITOR_ONBOARDING = "canViewEditorOnboarding"
     }
 }

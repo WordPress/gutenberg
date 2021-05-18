@@ -46,7 +46,7 @@ exports[`Navigation Creating from existing Pages allows a navigation block to be
 
 exports[`Navigation allows an empty navigation block to be created and manually populated using a mixture of internal and external links 1`] = `
 "<!-- wp:navigation {\\"orientation\\":\\"horizontal\\"} -->
-<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"id\\":\\"https://wordpress.org\\",\\"url\\":\\"https://wordpress.org\\"} /-->
+<!-- wp:navigation-link {\\"label\\":\\"WP\\",\\"url\\":\\"https://wordpress.org\\",\\"kind\\":\\"custom\\"} /-->
 
 <!-- wp:navigation-link {\\"label\\":\\"Contact\\",\\"type\\":\\"page\\",\\"id\\":1,\\"url\\":\\"https://this/is/a/test/search/get-in-touch\\",\\"kind\\":\\"post-type\\"} /-->
 <!-- /wp:navigation -->"

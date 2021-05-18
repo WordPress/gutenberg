@@ -311,7 +311,6 @@ class WP_Theme_JSON_Resolver {
 	private static function get_user_data_from_custom_post_type( $should_create_cpt = false, $post_status_filter = array( 'publish' ) ) {
 		$user_cpt         = array();
 		$post_type_filter = 'wp_global_styles';
-		$post_name_filter = 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() );
 		$recent_posts     = wp_get_recent_posts(
 			array(
 				'numberposts' => 1,
@@ -319,7 +318,13 @@ class WP_Theme_JSON_Resolver {
 				'order'       => 'desc',
 				'post_type'   => $post_type_filter,
 				'post_status' => $post_status_filter,
-				'name'        => $post_name_filter,
+				'tax_query'   => array(
+					array(
+						'taxonomy' => 'wp_theme',
+						'field'    => 'name',
+						'terms'    => wp_get_theme()->get_stylesheet(),
+					),
+				),
 			)
 		);
 
@@ -332,7 +337,10 @@ class WP_Theme_JSON_Resolver {
 					'post_status'  => 'publish',
 					'post_title'   => __( 'Custom Styles', 'default' ),
 					'post_type'    => $post_type_filter,
-					'post_name'    => $post_name_filter,
+					'post_name'    => 'wp-global-styles-' . urlencode( wp_get_theme()->get_stylesheet() ),
+					'tax_input'    => array(
+						'wp_theme' => array( wp_get_theme()->get_stylesheet() ),
+					),
 				),
 				true
 			);
@@ -395,15 +403,17 @@ class WP_Theme_JSON_Resolver {
 	 * for the paragraph block, and the theme has done it as well,
 	 * the user preference wins.
 	 *
-	 * @param array  $theme_support_data Existing block editor settings.
-	 *                                   Empty array by default.
+	 * @param array  $settings Existing block editor settings.
+	 *                         Empty array by default.
 	 * @param string $origin To what level should we merge data.
 	 *                       Valid values are 'theme' or 'user'.
 	 *                       Default is 'user'.
 	 *
 	 * @return WP_Theme_JSON
 	 */
-	public static function get_merged_data( $theme_support_data = array(), $origin = 'user' ) {
+	public static function get_merged_data( $settings = array(), $origin = 'user' ) {
+		$theme_support_data = WP_Theme_JSON::get_from_editor_settings( $settings );
+
 		$result = new WP_Theme_JSON();
 		$result->merge( self::get_core_data() );
 		$result->merge( self::get_theme_data( $theme_support_data ) );

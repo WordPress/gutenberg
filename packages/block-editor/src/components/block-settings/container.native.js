@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	InspectorControls,
-	__experimentalUseEditorFeature as useEditorFeature,
-} from '@wordpress/block-editor';
+import { InspectorControls, useSetting } from '@wordpress/block-editor';
 import {
 	BottomSheet,
 	ColorSettings,
@@ -33,8 +30,8 @@ function BottomSheetSettings( {
 	...props
 } ) {
 	const colorSettings = {
-		colors: useEditorFeature( 'color.palette' ) || settings.colors,
-		gradients: useEditorFeature( 'color.gradients' ) || settings.gradients,
+		colors: useSetting( 'color.palette' ) || settings.colors,
+		gradients: useSetting( 'color.gradients' ) || settings.gradients,
 	};
 
 	return (

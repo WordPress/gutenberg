@@ -22,8 +22,26 @@ function render_block_core_site_logo( $attributes ) {
 	};
 
 	add_filter( 'wp_get_attachment_image_src', $adjust_width_height_filter );
+
 	$custom_logo = get_custom_logo();
-	$classnames  = array();
+
+	if ( empty( $custom_logo ) ) {
+		return ''; // Return early if no custom logo is set, avoiding extraneous wrapper div.
+	}
+
+	if ( ! $attributes['isLink'] ) {
+		// Remove the link.
+		$custom_logo = preg_replace( '#<a.*?>(.*?)</a>#i', '\1', $custom_logo );
+	}
+
+	if ( $attributes['isLink'] && '_blank' === $attributes['linkTarget'] ) {
+		// Add the link target after the rel="home".
+		// Add an aria-label for informing that the page opens in a new tab.
+		$aria_label  = 'aria-label="' . esc_attr__( '(Home link, opens in a new tab)' ) . '"';
+		$custom_logo = str_replace( 'rel="home"', 'rel="home" target="' . $attributes['linkTarget'] . '"' . $aria_label, $custom_logo );
+	}
+
+	$classnames = array();
 	if ( ! empty( $attributes['className'] ) ) {
 		$classnames[] = $attributes['className'];
 	}
@@ -66,8 +84,8 @@ add_action( 'init', 'register_block_core_site_logo' );
  * @return string The site logo if set.
  */
 function override_custom_logo_theme_mod( $custom_logo ) {
-	$sitelogo = get_option( 'sitelogo' );
-	return false === $sitelogo ? $custom_logo : $sitelogo;
+	$site_logo = get_option( 'site_logo' );
+	return false === $site_logo ? $custom_logo : $site_logo;
 }
 
 /**
@@ -81,9 +99,9 @@ function sync_site_logo_to_theme_mod( $custom_logo ) {
 	// Delete the option when the custom logo does not exist or was removed.
 	// This step ensures the option stays in sync.
 	if ( empty( $custom_logo ) ) {
-		delete_option( 'sitelogo' );
+		delete_option( 'site_logo' );
 	} else {
-		update_option( 'sitelogo', $custom_logo );
+		update_option( 'site_logo', $custom_logo );
 	}
 	return $custom_logo;
 }
@@ -94,12 +112,12 @@ function sync_site_logo_to_theme_mod( $custom_logo ) {
 function register_block_core_site_logo_setting() {
 	register_setting(
 		'general',
-		'sitelogo',
+		'site_logo',
 		array(
 			'show_in_rest' => array(
-				'name' => 'sitelogo',
+				'name' => 'site_logo',
 			),
-			'type'         => 'string',
+			'type'         => 'integer',
 			'description'  => __( 'Site logo.' ),
 		)
 	);

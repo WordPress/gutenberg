@@ -51,7 +51,6 @@ const postTypeEntities = [
  * Internal dependencies
  */
 import EditorProvider from './index.js';
-import GLOBAL_STYLES_DATA from './theme_data'; // TO-DO: Remove
 
 class NativeEditorProvider extends Component {
 	constructor() {
@@ -69,15 +68,12 @@ class NativeEditorProvider extends Component {
 
 	componentDidMount() {
 		const { capabilities, colors, gradients } = this.props;
-		const globalStyles =
-			GLOBAL_STYLES_DATA?.__experimentalGlobalStylesBaseStyles; // TO-DO: Remove
 
 		this.props.updateSettings( {
 			...capabilities,
 			// Set theme colors for the editor
 			...( colors ? { colors } : {} ),
 			...( gradients ? { gradients } : {} ),
-			...( globalStyles ? getGlobalStyles( globalStyles ) : {} ), // TO-DO: Remove
 		} );
 
 		this.subscriptionParentGetHtml = subscribeParentGetHtml( () => {
@@ -129,14 +125,15 @@ class NativeEditorProvider extends Component {
 				const {
 					colors: updatedColors,
 					gradients: updatedGradients,
-					rawGlobalStylesBaseStyles,
+					rawFeatures,
+					rawStyles,
 				} = editorSettings;
 				const updatedSettings = {
 					// Reset the colors and gradients in case one theme was set with custom items and then updated to a theme without custom elements.
 					colors: validateThemeColors( updatedColors ),
 					gradients: validateThemeGradients( updatedGradients ),
-					...( rawGlobalStylesBaseStyles
-						? getGlobalStyles( rawGlobalStylesBaseStyles )
+					...( rawStyles
+						? getGlobalStyles( rawStyles, rawFeatures )
 						: {} ),
 				};
 

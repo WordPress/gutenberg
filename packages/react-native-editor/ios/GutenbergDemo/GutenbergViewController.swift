@@ -286,7 +286,8 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
             .unsupportedBlockEditor: unsupportedBlockEnabled,
             .canEnableUnsupportedBlockEditor: unsupportedBlockCanBeActivated,
             .mediaFilesCollectionBlock: true,
-            .audioBlock: true
+            .audioBlock: true,
+            .canViewEditorOnboarding: false
         ]
     }
 
@@ -294,7 +295,7 @@ extension GutenbergViewController: GutenbergBridgeDataSource {
         return ExampleAttachmentDelegate()
     }
 
-    func gutenbergEditorTheme() -> GutenbergEditorTheme? {
+    func gutenbergEditorSettings() -> GutenbergEditorSettings? {
         return nil
     }
 

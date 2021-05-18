@@ -68,7 +68,7 @@ export function getBlockColors( blockStyleAttributes, defaultColors ) {
 }
 
 export function parseColorVariables( styles, colorPalette ) {
-	const stylesBase = JSON.stringify( styles );
+	const stylesBase = styles;
 	const colorPrefixRegex = /var\(--wp--preset--color--(.*?)\)/g;
 
 	return stylesBase
@@ -83,11 +83,12 @@ export function parseColorVariables( styles, colorPalette ) {
 		: styles;
 }
 
-export function getGlobalStyles( baseStyles ) {
-	const colorSettings = baseStyles?.settings?.color;
-	const palette = colorSettings?.palette;
-	const globalStyles = parseColorVariables( baseStyles, palette );
-	const gradients = globalStyles?.settings?.color?.gradients;
+export function getGlobalStyles( rawStyles, rawFeatures ) {
+	const features = JSON.parse( rawFeatures );
+	const palette = features?.color?.palette;
+	const gradients = parseColorVariables( rawFeatures, palette )?.color
+		?.gradients;
+	const globalStyles = parseColorVariables( rawStyles, palette );
 
 	return {
 		...( palette || gradients
