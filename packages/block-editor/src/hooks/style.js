@@ -4,6 +4,7 @@
 import {
 	capitalize,
 	find,
+	forEach,
 	get,
 	has,
 	isEqual,
@@ -107,29 +108,22 @@ function addAttribute( settings ) {
 	return settings;
 }
 
-const skipSerializationPaths = [
-	{
-		indicator: `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization`,
-		path: [ 'border' ],
-	},
-	{
-		indicator: `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization`,
-		path: [ COLOR_SUPPORT_KEY ],
-	},
-	{
-		indicator: `__experimentalSkipFontSizeSerialization`,
-		path: [ 'typography', 'fontSize' ],
-	},
-	{
-		indicator: `__experimentalSkipTypographySerialization`,
-		path: without( TYPOGRAPHY_SUPPORT_KEYS, FONT_SIZE_SUPPORT_KEY ).map(
-			( feature ) =>
-				find( STYLE_PROPERTY, ( property ) =>
-					isEqual( property.support, [ feature ] )
-				)?.value
-		),
-	},
-];
+const skipSerializationPaths = {
+	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
+	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		COLOR_SUPPORT_KEY,
+	],
+	[ `__experimentalSkipFontSizeSerialization` ]: [ 'typography', 'fontSize' ],
+	[ `__experimentalSkipTypographySerialization` ]: without(
+		TYPOGRAPHY_SUPPORT_KEYS,
+		FONT_SIZE_SUPPORT_KEY
+	).map(
+		( feature ) =>
+			find( STYLE_PROPERTY, ( property ) =>
+				isEqual( property.support, [ feature ] )
+			)?.value
+	),
+};
 
 /**
  * Override props assigned to save component to inject the CSS variables definition.
@@ -146,7 +140,7 @@ export function addSaveProps( props, blockType, attributes ) {
 
 	let { style } = attributes;
 
-	skipSerializationPaths.forEach( ( { indicator, path } ) => {
+	forEach( skipSerializationPaths, ( path, indicator ) => {
 		if ( getBlockSupport( blockType, indicator ) ) {
 			style = omit( style, path );
 		}
