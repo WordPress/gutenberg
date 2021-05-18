@@ -1114,7 +1114,7 @@ class WP_Theme_JSON {
 				$incoming_node = _wp_array_get( $incoming_data, $path, array() );
 				$existing_node = _wp_array_get( $existing_data, $path, array() );
 
-				if ( empty( $incoming_node ) && empty( $existing_data ) ) {
+				if ( empty( $incoming_node ) && empty( $existing_node ) ) {
 					continue;
 				}
 
