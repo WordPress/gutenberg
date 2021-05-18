@@ -482,6 +482,9 @@ export function createBlockWithFallback( blockNode ) {
 	const unregisteredFallbackBlock =
 		getUnregisteredTypeHandlerName() || freeformContentFallbackBlock || isV2Gallery;
 
+	console.log('isV2Gallery',isV2Gallery);
+	console.log('unregisteredFallbackBlock',unregisteredFallbackBlock);
+
 	attributes = attributes || {};
 
 	// Trim content to avoid creation of intermediary freeform segments.
@@ -600,6 +603,8 @@ export function createBlockWithFallback( blockNode ) {
 				getSaveContent( blockType, block.attributes ),
 				block.originalContent
 			);
+		} else if ( isV2Gallery ){
+			console.info('V2 Gallery block detected')
 		} else {
 			block.validationIssues.forEach( ( { log, args } ) =>
 				log( ...args )
