@@ -110,6 +110,23 @@ export default function MoreMenu() {
 								</VisuallyHidden>
 							</MenuItem>
 						</MenuGroup>
+						<MenuGroup>
+							<FeatureToggle
+								feature="keepCaretInsideBlock"
+								label={ __(
+									'Contain text cursor inside block'
+								) }
+								info={ __(
+									'Aids screen readers by stopping text caret from leaving blocks.'
+								) }
+								messageActivated={ __(
+									'Contain text cursor inside block activated'
+								) }
+								messageDeactivated={ __(
+									'Contain text cursor inside block deactivated'
+								) }
+							/>
+						</MenuGroup>
 					</>
 				) }
 			</DropdownMenu>

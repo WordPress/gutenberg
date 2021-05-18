@@ -34,6 +34,7 @@ export default function WidgetAreasBlockEditorProvider( {
 		hasUploadPermissions,
 		reusableBlocks,
 		isFixedToolbarActive,
+		keepCaretInsideBlock,
 	} = useSelect(
 		( select ) => ( {
 			hasUploadPermissions: defaultTo(
@@ -49,6 +50,9 @@ export default function WidgetAreasBlockEditorProvider( {
 			isFixedToolbarActive: select(
 				editWidgetsStore
 			).__unstableIsFeatureActive( 'fixedToolbar' ),
+			keepCaretInsideBlock: select(
+				editWidgetsStore
+			).__unstableIsFeatureActive( 'keepCaretInsideBlock' ),
 		} ),
 		[]
 	);
@@ -69,6 +73,7 @@ export default function WidgetAreasBlockEditorProvider( {
 			...blockEditorSettings,
 			__experimentalReusableBlocks: reusableBlocks,
 			hasFixedToolbar: isFixedToolbarActive,
+			keepCaretInsideBlock,
 			mediaUpload: mediaUploadBlockEditor,
 			templateLock: 'all',
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
@@ -76,6 +81,7 @@ export default function WidgetAreasBlockEditorProvider( {
 	}, [
 		blockEditorSettings,
 		isFixedToolbarActive,
+		keepCaretInsideBlock,
 		hasUploadPermissions,
 		reusableBlocks,
 		setIsInserterOpened,
