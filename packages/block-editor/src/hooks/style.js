@@ -109,7 +109,7 @@ function addAttribute( settings ) {
 
 const skipSerializationPaths = [
 	{
-		indicator: `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization'`,
+		indicator: `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization`,
 		path: [ 'border' ],
 	},
 	{
