@@ -28,7 +28,7 @@ import { useRef, useEffect, useCallback } from '@wordpress/element';
  * ```
  */
 function useFocusReturn( onFocusReturn ) {
-	/** @type {import('react').MutableRefObject<undefined | Node>} */
+	/** @type {import('react').MutableRefObject<undefined | HTMLElement>} */
 	const ref = useRef();
 	/** @type {import('react').MutableRefObject<undefined | HTMLElement>} */
 	const focusedBeforeMount = useRef();
@@ -52,7 +52,7 @@ function useFocusReturn( onFocusReturn ) {
 					.activeElement ) || undefined;
 		} else if ( focusedBeforeMount.current ) {
 			const isFocused = ref.current?.contains(
-				ref.current?.ownerDocument?.activeElement ?? null
+				ref.current?.ownerDocument.activeElement ?? null
 			);
 
 			if ( ref.current?.isConnected && ! isFocused ) {
