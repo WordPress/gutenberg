@@ -85,7 +85,6 @@ function Layout( { styles } ) {
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
-		previewId,
 	} = useSelect( ( select ) => {
 		const editorSettings = select( editorStore ).getEditorSettings();
 		return {
@@ -122,9 +121,6 @@ function Layout( { styles } ) {
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
-			previewId: select(
-				editPostStore
-			).__experimentalGetPreviewDeviceType(),
 		};
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -229,10 +225,7 @@ function Layout( { styles } ) {
 							<TextEditor />
 						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
-							<VisualEditorOrPluginPreview
-								styles={ styles }
-								previewId={ previewId }
-							/>
+							<VisualEditorOrPluginPreview styles={ styles } />
 						) }
 						<div className="edit-post-layout__metaboxes">
 							<MetaBoxes location="normal" />
