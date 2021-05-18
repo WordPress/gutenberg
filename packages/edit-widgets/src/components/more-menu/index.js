@@ -1,15 +1,24 @@
 /**
  * WordPress dependencies
  */
-import { DropdownMenu, MenuGroup } from '@wordpress/components';
+import {
+	DropdownMenu,
+	MenuGroup,
+	MenuItem,
+	VisuallyHidden,
+} from '@wordpress/components';
 import { useSelect } from '@wordpress/data';
+import { useState } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { moreVertical } from '@wordpress/icons';
+import { external, moreVertical } from '@wordpress/icons';
+import { displayShortcut } from '@wordpress/keycodes';
+import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
 /**
  * Internal dependencies
  */
 import FeatureToggle from './feature-toggle';
+import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 import { store as editWidgetsStore } from '../../store';
 
 const POPOVER_PROPS = {
@@ -21,12 +30,26 @@ const TOGGLE_PROPS = {
 };
 
 export default function MoreMenu() {
+	const [
+		isKeyboardShortcutsModalActive,
+		setIsKeyboardShortcutsModalVisible,
+	] = useState( false );
 	const showIconLabels = useSelect(
 		( select ) =>
 			select( editWidgetsStore ).__unstableIsFeatureActive(
 				'showIconLabels'
 			),
 		[]
+	);
+	const toggleKeyboardShortcutsModal = () =>
+		setIsKeyboardShortcutsModalVisible( ! isKeyboardShortcutsModalActive );
+
+	useShortcut(
+		'core/edit-post/keyboard-shortcuts',
+		toggleKeyboardShortcutsModal,
+		{
+			bindGlobal: true,
+		}
 	);
 
 	return (
@@ -44,21 +67,56 @@ export default function MoreMenu() {
 				} }
 			>
 				{ () => (
-					<MenuGroup label={ _x( 'View', 'noun' ) }>
-						<FeatureToggle
-							feature="fixedToolbar"
-							label={ __( 'Top toolbar' ) }
-							info={ __(
-								'Access all block and document tools in a single place'
-							) }
-							messageActivated={ __( 'Top toolbar activated' ) }
-							messageDeactivated={ __(
-								'Top toolbar deactivated'
-							) }
-						/>
-					</MenuGroup>
+					<>
+						<MenuGroup label={ _x( 'View', 'noun' ) }>
+							<FeatureToggle
+								feature="fixedToolbar"
+								label={ __( 'Top toolbar' ) }
+								info={ __(
+									'Access all block and document tools in a single place'
+								) }
+								messageActivated={ __(
+									'Top toolbar activated'
+								) }
+								messageDeactivated={ __(
+									'Top toolbar deactivated'
+								) }
+							/>
+						</MenuGroup>
+						<MenuGroup label={ __( 'Tools' ) }>
+							<MenuItem
+								onClick={ () => {
+									setIsKeyboardShortcutsModalVisible( true );
+								} }
+								shortcut={ displayShortcut.access( 'h' ) }
+							>
+								{ __( 'Keyboard shortcuts' ) }
+							</MenuItem>
+							<MenuItem
+								role="menuitem"
+								icon={ external }
+								href={ __(
+									'https://wordpress.org/support/article/wordpress-editor/'
+								) }
+								target="_blank"
+								rel="noopener noreferrer"
+							>
+								{ __( 'Help' ) }
+								<VisuallyHidden as="span">
+									{
+										/* translators: accessibility text */
+										__( '(opens in a new tab)' )
+									}
+								</VisuallyHidden>
+							</MenuItem>
+						</MenuGroup>
+					</>
 				) }
 			</DropdownMenu>
+			<KeyboardShortcutHelpModal
+				isModalActive={ isKeyboardShortcutsModalActive }
+				toggleModal={ toggleKeyboardShortcutsModal }
+			/>
 		</>
 	);
 }
