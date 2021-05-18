@@ -1,6 +1,6 @@
 // Consider the block appender to be a child block of its own, which also has
 // this class. Cannot be `.wp-block` because it is used for alignment wrappers.
-const BLOCK_SELECTOR = '.block-editor-block-list__block';
+const BLOCK_SELECTOR = '.wp-block';
 
 /**
  * Returns true if two elements are contained within the same block.

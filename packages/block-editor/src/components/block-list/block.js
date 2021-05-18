@@ -160,7 +160,7 @@ function BlockListBlock( {
 	const value = {
 		clientId,
 		// The wp-block className is important for editor styles.
-		className: classnames( className, { 'wp-block': ! isAligned } ),
+		className,
 		wrapperProps: omit( wrapperProps, [ 'data-align' ] ),
 	};
 	const memoizedValue = useMemo( () => value, Object.values( value ) );
