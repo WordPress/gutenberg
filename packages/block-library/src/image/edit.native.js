@@ -468,13 +468,11 @@ export class ImageEdit extends Component {
 		);
 
 		return (
-			<>
-				<PanelBody>
-					{ isFeaturedImage
-						? setFeaturedButton()
-						: removeFeaturedButton() }
-				</PanelBody>
-			</>
+			<PanelBody>
+				{ isFeaturedImage
+					? setFeaturedButton()
+					: removeFeaturedButton() }
+			</PanelBody>
 		);
 	}
 
