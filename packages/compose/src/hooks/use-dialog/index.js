@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useRef, useEffect, useCallback } from '@wordpress/element';
+import { useCallback } from '@wordpress/element';
 import { ESCAPE } from '@wordpress/keycodes';
 
 /**
@@ -12,6 +12,7 @@ import useFocusOnMount from '../use-focus-on-mount';
 import useFocusReturn from '../use-focus-return';
 import useFocusOutside from '../use-focus-outside';
 import useMergeRefs from '../use-merge-refs';
+import useFreshRef from '../use-fresh-ref';
 
 /**
  * Returns a ref and props to apply to a dialog wrapper to enable the following behaviors:
@@ -23,10 +24,7 @@ import useMergeRefs from '../use-merge-refs';
  * @param {Object} options Dialog Options.
  */
 function useDialog( options ) {
-	const onClose = useRef();
-	useEffect( () => {
-		onClose.current = options.onClose;
-	}, [ options.onClose ] );
+	const onClose = useFreshRef( options.onClose );
 	const constrainedTabbingRef = useConstrainedTabbing();
 	const focusOnMountRef = useFocusOnMount();
 	const focusReturnRef = useFocusReturn();

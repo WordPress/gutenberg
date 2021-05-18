@@ -1,20 +1,10 @@
 /**
- * WordPress dependencies
- */
-import { useRef } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import useRefEffect from '../use-ref-effect';
+import useFreshRef from '../use-fresh-ref';
 
 /** @typedef {import('@wordpress/element').RefCallback} RefCallback */
-
-function useFreshRef( value ) {
-	const ref = useRef();
-	ref.current = value;
-	return ref;
-}
 
 /**
  * A hook to facilitate drag and drop handling.

@@ -7,7 +7,7 @@ import { first, last } from 'lodash';
  * WordPress dependencies
  */
 import { isEntirelySelected } from '@wordpress/dom';
-import { useRef, useCallback } from '@wordpress/element';
+import { useRef } from '@wordpress/element';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useShortcut } from '@wordpress/keyboard-shortcuts';
 
@@ -25,7 +25,7 @@ export default function useSelectAll() {
 	} = useSelect( blockEditorStore );
 	const { multiSelect } = useDispatch( blockEditorStore );
 
-	const callback = useCallback( ( event ) => {
+	const callback = ( event ) => {
 		const selectedClientIds = getSelectedBlockClientIds();
 
 		if ( ! selectedClientIds.length ) {
@@ -60,7 +60,7 @@ export default function useSelectAll() {
 
 		multiSelect( firstClientId, lastClientId );
 		event.preventDefault();
-	}, [] );
+	};
 
 	useShortcut( 'core/block-editor/select-all', callback, {
 		target: ref,
