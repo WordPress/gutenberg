@@ -454,7 +454,7 @@ export default function LatestPostsEdit( { attributes, setAttributes } ) {
 	return (
 		<div>
 			{ inspectorControls }
-			<BlockControls>
+			<BlockControls group="block">
 				<ToolbarGroup controls={ layoutControls } />
 			</BlockControls>
 			<ul { ...blockProps }>

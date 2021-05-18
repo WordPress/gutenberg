@@ -1,6 +1,7 @@
 /**
  * WordPress dependencies
  */
+import { BlockControls } from '@wordpress/block-editor';
 import {
 	ToolbarGroup,
 	Dropdown,
@@ -39,7 +40,7 @@ export default function QueryToolbar( {
 	return (
 		<>
 			{ ! query.inherit && (
-				<ToolbarGroup>
+				<BlockControls group="block">
 					<Dropdown
 						contentClassName="block-library-query-toolbar__popover"
 						renderToggle={ ( { onToggle } ) => (
@@ -106,7 +107,7 @@ export default function QueryToolbar( {
 							</>
 						) }
 					/>
-				</ToolbarGroup>
+				</BlockControls>
 			) }
 			<ToolbarGroup controls={ layoutControls } />
 		</>
