@@ -1,5 +1,3 @@
-
-
 # Gutenberg Principles
 
 This document has been written so that those contributing to the Gutenberg project can have some understanding of what guides decisions around what is included in the project (or not).
@@ -11,13 +9,13 @@ When applied, sometimes these principles build on each other much like the idea 
 
 ## A canvas for expression.
 
-_“Optimize for the user” (Matias - [Gutenberg or the Ship of Theseus](https://matiasventura.com/post/gutenberg-or-the-ship-of-theseus/))_
+_“Optimize for the user” (Matías - [Gutenberg or the Ship of Theseus](https://matiasventura.com/post/gutenberg-or-the-ship-of-theseus/))_
 
 The block canvas is the primary interface and brings about the expectation of *direct* manipulation. Blocks can define multiple states, variations, and can mutate. The canvas of the block should:
 
 ### Guide users around interacting with the content.
 
-For this, the interface needs to welcome exploration and to be able to teach its affordances intuitively. It should result in experiences producing "aha!" moments when users create their content (see [here for an example](https://twitter.com/colemank83/status/1371846826664591364)).
+For this, the interface needs to welcome exploration and to be able to teach its affordances intuitively. It should result in experiences producing empowering "aha!" moments when users interact with it (see [here for an example](https://twitter.com/colemank83/status/1371846826664591364)).
 
 Interactive tools should be contextual when needed, and focus on supporting the user in creating their content - present when needed and getting out of the way when not.
 
@@ -25,20 +23,11 @@ Interactive tools should be contextual when needed, and focus on supporting the 
 
 Learning the ingredients of the interface happens once, but scales to hundreds of blocks. Users should be able to *rely on muscle memory and learned patterns* as they become more familiar with the interface.
 
-
 ### Accessible
 
 Being accessible is a holistic principle that embraces not only the desire that _everyone can work with Gutenberg interfaces no matter their ability_ but also that the improvements made are _equitable_ and improve the experience for _every_ user. This is a lofty challenge and definitely hard balance to get right - but already there is fruit being born in the improvements that have been made to the user interface over the last few years.
 
 Modern web application development brings its own set of accessibility problems around standards and consistent application between browsers which often requires some unique solutions that might not be apparent on the first attempt. So we acknowledge that accessibility is not something that can be implemented statically but instead is an ongoing part of the interface creation and refinement.
-
-
-### Empowering
-
-With delightful, consistent, and accessible interfaces we are aiming for empowering users to try and do things that they assumed were beyond their capabilities and reach before. We strive for those “Aha” moments of surprise and wonder as folks discover how they can unleash their creativity.
-
-Example: https://twitter.com/colemank83/status/1371846826664591364
-
 
 ## Curated Extensibility
 
@@ -57,7 +46,7 @@ Extensibility interfaces in Gutenberg favor:
 
 ## Progressive Complexity
 
-_“On the Layers of the Onion”_ (Matias - Gutenberg or the Ship of Theseus)
+_“On the Layers of the Onion”_ (Matías - [Gutenberg or the Ship of Theseus](https://matiasventura.com/post/gutenberg-or-the-ship-of-theseus/))
 
 There are two perspectives for this principle:
 
@@ -88,11 +77,11 @@ This also embraces the promise of the Web where content is replicable in multipl
 
 Imagine a world where content created by Gutenberg can be consumed and read _anywhere_. This is largely why at the heart of the block structure, the format is largely an enhancement on top of HTML.
 
-“Ultimately, choosing HTML means that — as with a painting or a sculpture — the editor’s final artefact is the canonical format of the content, not a byproduct thereof.” (The Language of Gutenberg - Miguel).
+“Ultimately, choosing HTML means that — as with a painting or a sculpture — the editor’s final artefact is the canonical format of the content, not a byproduct thereof.” (The Language of Gutenberg](https://lamda.blog/2018/04/22/the-language-of-gutenberg/) - Miguel).
 
 This manifests in letting machines do what machines are good for, and preserve content in a format that is readable to users.
 
-Finally, the principle of ubiquitous and safe adoption is found in the way Gutenberg is being developed _incrementally_. WordPress powers over 40% of the Web and the changes that GB brings cannot happen overnight (Gutenberg or the ship of Theseus - Matías)
+Finally, the principle of ubiquitous and safe adoption is found in the way Gutenberg is being developed _incrementally_. WordPress powers over 40% of the Web and the changes that GB brings cannot happen overnight (Matías - [Gutenberg or the Ship of Theseus](https://matiasventura.com/post/gutenberg-or-the-ship-of-theseus/))
 
 
 ## Resources
