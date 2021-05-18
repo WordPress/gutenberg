@@ -93,7 +93,12 @@ function render_block_core_search( $attributes ) {
 		$inline_styles['wrapper'],
 		$input_markup . $button_markup
 	);
-	$wrapper_attributes = get_block_wrapper_attributes( array( 'class' => $classnames ) );
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => $classnames,
+			'style' => $inline_styles['block'],
+		)
+	);
 
 	return sprintf(
 		'<form role="search" method="get" action="%s" %s>%s</form>',
@@ -169,19 +174,33 @@ function classnames_for_block_core_search( $attributes ) {
  * @return array Style HTML attribute.
  */
 function styles_for_block_core_search( $attributes ) {
+	$block_styles   = '';
 	$shared_styles  = array();
 	$wrapper_styles = array();
+
+	$has_side_alignment = ! empty( $attributes['align'] ) &&
+		( 'left' === $attributes['align'] || 'right' === $attributes['align'] );
 
 	// Add width styles.
 	$has_width   = ! empty( $attributes['width'] ) && ! empty( $attributes['widthUnit'] );
 	$button_only = ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'];
 
 	if ( $has_width && ! $button_only ) {
-		$wrapper_styles[] = sprintf(
-			'width: %d%s;',
-			esc_attr( $attributes['width'] ),
-			esc_attr( $attributes['widthUnit'] )
-		);
+		if ( $has_side_alignment ) {
+			// If block is aligned the width style must go on the root block
+			// element for it to be the correct size.
+			$block_styles = sprintf(
+				'width: %d%s;',
+				esc_attr( $attributes['width'] ),
+				esc_attr( $attributes['widthUnit'] )
+			);
+		} else {
+			$wrapper_styles[] = sprintf(
+				'width: %d%s;',
+				esc_attr( $attributes['width'] ),
+				esc_attr( $attributes['widthUnit'] )
+			);
+		}
 	}
 
 	// Add border radius styles.
@@ -207,6 +226,7 @@ function styles_for_block_core_search( $attributes ) {
 	}
 
 	return array(
+		'block'   => $block_styles,
 		'shared'  => ! empty( $shared_styles ) ? sprintf( ' style="%s"', implode( ' ', $shared_styles ) ) : '',
 		'wrapper' => ! empty( $wrapper_styles ) ? sprintf( ' style="%s"', implode( ' ', $wrapper_styles ) ) : '',
 	);
