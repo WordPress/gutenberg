@@ -60,16 +60,19 @@
 	}
 
 	&.wp-block-search__button-behavior-expand {
-		overflow: hidden;
-
 		.wp-block-search__inside-wrapper {
-			overflow: hidden;
 			transition-property: width;
 			min-width: 0 !important;
 		}
 
 		// !important here to override inline styles on button only deselected view.
 		&.wp-block-search__searchfield-hidden {
+			overflow: hidden;
+
+			.wp-block-search__inside-wrapper {
+				overflow: hidden;
+			}
+
 			.wp-block-search__input {
 				width: 0 !important;
 				min-width: 0 !important;
