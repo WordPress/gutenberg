@@ -17,6 +17,7 @@ This tutorial is up to date with Gutenberg version 10.6.
 4.  [Theme.json - Global styles](#themejson---global-styles)
 5.  [Layouts](#layouts)
 6.  [Custom templates](#custom-templates)
+7.  [Example themes](#example-themes)
 
 ## What is needed to create a block theme?
 
@@ -50,6 +51,7 @@ theme
 ## Theme setup
 
 Create a new folder for your theme in `/wp-content/themes/`.
+In this example, the folder name is `fse-tutorial`.
 
 Inside the theme folder, create the `block-templates` and `block-template-parts` folders.
 
@@ -84,7 +86,7 @@ Optionally, create a `functions.php` file.
 In this file, you can enqueue `style.css`, include additional files, enable an editor stylesheet and add theme support.
 
 <div class="callout callout-tip">
-You will add most of the theme support in the `theme.json` file. The title tag is already enabled for all block themes, and it is no longer necesarry to enqueue the comment reply script because it is included with the comments block.
+You will add most of the theme support in the `theme.json` file. The title tag is already enabled for all block themes, and it is no longer necessarry to enqueue the comment reply script because it is included with the comments block.
 </div>
 
 ```php
@@ -95,7 +97,7 @@ if ( ! function_exists( 'fse_tutorial_theme_setup' ) ) :
 	 *
 	 * Note that this function is hooked into the after_setup_theme hook, which runs
 	 * before the init hook. The init hook is too late for some features, such as indicating
-	 * support post thumbnails.
+	 * support for post thumbnails.
 	 */
 	function fse_tutorial_theme_setup() {
 		/**
@@ -147,11 +149,11 @@ There are several ways to create templates and template parts:
 - Using the site editor.
 - Using the template editing mode in the block editor.
 
-The fourth way is temporary and involves going to the Appearance menu > Templates, and is not recommended because of it's limitations.
+The fourth way is temporary and involves going to the Appearance menu > Templates, and is not recommended because of its limitations.
 
 ### Manual template creation
 
-Create two template part files called `footer.html` and `header.html` and place them inside the `block-template-parts` folder.
+Create two template part files called `header.html` and `footer.html` and place them inside the `block-template-parts` folder.
 
 When you add blocks manually to your HTML files, start with an HTML comment that includes the block name prefixed with `wp:`.
 There are both self-closing and multi-line blocks as shown in the example below.
@@ -175,7 +177,7 @@ You would not be able to place an opening tag for a group block in a header temp
 
 Open `index.html` and include the template parts by adding two HTML comments.
 The HTML comments start with `wp:template-part`, which is the name of the template part block.
-Each template part is identified by the slug, the name of the file without the file ending.
+Each template part is identified by the slug, the name of the file without the file extension.
 
 Inside the HTML comment, add two curly brackets and the key, `slug`, together with the name of the template part:
 
@@ -212,14 +214,15 @@ and copy the block markup from the code editor mode to your theme files.
 
 Open the Site Editor from the WordPress admin menu. The default view is the blank index template.
 
-Open the Add block menu and select and place a new template part. The block will have the default name "Untitled Template Part".
-
+Insert a new template part block. The block will have the default name "Untitled Template Part".
 Open the **Advanced** section of the block settings sidebar and make the following changes:
 Change the title and area to Header, and the HTML element to `<header>`.
 
-Add a site title block to the header template part, and a paragraph to the footer.
+Repeat the process for the site footer: Change the title and area to Footer, and the HTML element to `<footer>`.
 
-Save the changes. You will be asked if you want to save the template part, the index template, or both. Choose both. Repeat the process and add a footer template part.
+Add a site title block to the header template part, and a paragraph to the footer.
+Save the changes. You will be asked if you want to save the two template parts, the index template, or all three.
+Confirm that the checkboxes are correct and save all three.
 
 ### Template editing mode
 
@@ -227,7 +230,7 @@ The template editing mode is a way to edit the website without the complexity of
 It is more limited than the site editor because you can not create, select or navigate between templates in this view.
 
 You access the template editing mode via the block editor.
-Create a new post or page. Next, open the document settings sidebar and locate the **Template** panel below **Status & Visibility**.
+Create a new post or page. Next, open the document settings sidebar and locate the **Template** panel below **Status & visibility**.
 Here you will find information about the current template and a list of existing templates to choose from.
 Create a new template by selecting the **New** link.
 Edit and save the template in the same way as in the site editor.
@@ -240,7 +243,7 @@ are saved to the database as custom post types. To export them as theme files, f
 - In the site editor, open the **More tools and options** menu.
 - Select the **Export** option to download a zip file containing the files. Unpack the files.
 - Copy the updated `index.html` file from `theme/block-templates/` to your theme's `block-templates` folder.
-- Copy template part one and two from `theme/block-template-parts/` to your theme's `block-template-part` folder.
+- Copy template part one and two from `theme/block-template-parts/` to your theme's `block-template-parts` folder.
 - Rename the template parts to `header.html` and `footer.html`, respectively.
 - Open `index.html` and update the template part slugs in the block markup.
 
@@ -782,7 +785,7 @@ Since the theme has custom padding enabled, you can add `padding` within the `sp
 
 In the templeParts section, assign the two template parts that you created to their template areas.
 Add two keys:
--`name`, the file name of the template part file without the file ending,
+-`name`, the file name of the template part file without the file extension,
 -`area`, the name of the template area.
 
 There are three template areas to choose from: Header, footer, and general.
@@ -859,3 +862,11 @@ The key is `postTypes`, followed by the name of the post type:
 	}
 ]
 ```
+
+## Example themes
+You can find a basic starter theme called "emptytheme" and other example themes
+on the [Experimental themes GitHub repository](https://github.com/WordPress/theme-experiments).
+When using a theme as reference, take note of which Gutenberg version the theme is built for,
+because the experimental features are updated frequently.
+
+The theme directory lists block themes under the tag [full site editing](https://wordpress.org/themes/tags/full-site-editing/).
