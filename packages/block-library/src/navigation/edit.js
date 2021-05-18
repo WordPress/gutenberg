@@ -78,24 +78,29 @@ function Navigation( {
 		clientId
 	);
 
-	const innerBlocksProps = useInnerBlocksProps( blockProps, {
-		allowedBlocks: ALLOWED_BLOCKS,
-		orientation: attributes.orientation || 'horizontal',
-		renderAppender:
-			( isImmediateParentOfSelectedBlock &&
-				! selectedBlockHasDescendants ) ||
-			isSelected
-				? InnerBlocks.DefaultAppender
-				: false,
-		__experimentalAppenderTagName: 'li',
-		__experimentalCaptureToolbars: true,
-		// Template lock set to false here so that the Nav
-		// Block on the experimental menus screen does not
-		// inherit templateLock={ 'all' }.
-		templateLock: false,
-		__experimentalLayout: LAYOUT,
-		placeholder: <PlaceholderPreview />,
-	} );
+	const innerBlocksProps = useInnerBlocksProps(
+		{
+			className: 'wp-block-navigation__container',
+		},
+		{
+			allowedBlocks: ALLOWED_BLOCKS,
+			orientation: attributes.orientation || 'horizontal',
+			renderAppender:
+				( isImmediateParentOfSelectedBlock &&
+					! selectedBlockHasDescendants ) ||
+				isSelected
+					? InnerBlocks.DefaultAppender
+					: false,
+			__experimentalAppenderTagName: 'li',
+			__experimentalCaptureToolbars: true,
+			// Template lock set to false here so that the Nav
+			// Block on the experimental menus screen does not
+			// inherit templateLock={ 'all' }.
+			templateLock: false,
+			__experimentalLayout: LAYOUT,
+			placeholder: <PlaceholderPreview />,
+		}
+	);
 
 	if ( isPlaceholderShown ) {
 		return (
@@ -161,14 +166,14 @@ function Navigation( {
 					</PanelBody>
 				) }
 			</InspectorControls>
-			<nav { ...innerBlocksProps }>
+			<nav { ...blockProps }>
 				<ResponsiveWrapper
 					id={ clientId }
 					onToggle={ setResponsiveMenuVisibility }
 					isOpen={ isResponsiveMenuOpen }
 					isResponsive={ attributes.isResponsive }
 				>
-					<ul { ...innerBlocksProps }></ul>
+					<div { ...innerBlocksProps }></div>
 				</ResponsiveWrapper>
 			</nav>
 		</>
