@@ -29,7 +29,7 @@ import { useState } from '@wordpress/element';
  * Internal dependencies
  */
 import styles from './styles.scss';
-import { parseAudioUrl } from './audio-url-parser';
+import { parseAudioUrl } from './audio-url-parser.native';
 
 const isIOS = Platform.OS === 'ios';
 

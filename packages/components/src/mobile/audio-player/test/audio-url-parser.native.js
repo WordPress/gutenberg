@@ -1,7 +1,7 @@
 /**
  * Internal dependencies
  */
-import { parseAudioUrl } from '../audio-url-parser';
+import { parseAudioUrl } from '../audio-url-parser.native';
 
 const supportedAudioUrlsWithExtensions = [
 	'https://www.mp3.com/file.mp3?key1=value1&key2=value2#anchorforsomereason',
