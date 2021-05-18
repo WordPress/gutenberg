@@ -85,8 +85,7 @@ function Layout( { styles } ) {
 		showIconLabels,
 		hasReducedUI,
 		showBlockBreadcrumbs,
-		isTemplateMode,
-		documentLabel,
+		previewId,
 	} = useSelect( ( select ) => {
 		const { getEditorSettings, getPostTypeLabel } = select( editorStore );
 		const editorSettings = getEditorSettings();
@@ -125,8 +124,9 @@ function Layout( { styles } ) {
 			showBlockBreadcrumbs: select( editPostStore ).isFeatureActive(
 				'showBlockBreadcrumbs'
 			),
-			// translators: Default label for the Document in the Block Breadcrumb.
-			documentLabel: postTypeLabel || _x( 'Document', 'noun' ),
+			previewId: select(
+				editPostStore
+			).__experimentalGetPreviewDeviceType(),
 		};
 	}, [] );
 	const className = classnames( 'edit-post-layout', 'is-mode-' + mode, {
@@ -228,7 +228,10 @@ function Layout( { styles } ) {
 							<TextEditor />
 						) }
 						{ isRichEditingEnabled && mode === 'visual' && (
-							<VisualEditorOrPluginPreview styles={ styles } />
+							<VisualEditorOrPluginPreview
+								styles={ styles }
+								previewId={ previewId }
+							/>
 						) }
 						{ ! isTemplateMode && (
 							<div className="edit-post-layout__metaboxes">

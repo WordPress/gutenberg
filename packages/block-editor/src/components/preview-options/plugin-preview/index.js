@@ -15,7 +15,7 @@ import { Fill } from '@wordpress/components';
 export default function PluginPreview( { children, previewId, ...props } ) {
 	return (
 		<Fill
-			name={ 'core/block-editor/plugin-preview/' + previewId }
+			name={ `core/block-editor/plugin-preview/${ previewId }` }
 			{ ...props }
 		>
 			{ children }
