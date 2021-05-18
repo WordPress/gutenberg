@@ -292,6 +292,7 @@ $color-control-label-height: 20px;
 	// Both selected and vertical.
 	.is-selected.is-vertical & {
 		display: inline-flex; // This makes the white box not take up all available space.
+		padding: $grid-unit-15;
 	}
 
 	.wp-block-navigation-placeholder__icon {
@@ -386,7 +387,7 @@ $color-control-label-height: 20px;
 	// That means we only have to consider the big adminbar height (<783px).
 	// And in that view we also know that the toolbar is stacked.
 	body.admin-bar & {
-		top: $admin-bar-height-big + $header-height + $block-toolbar-height;
+		top: $admin-bar-height-big + $header-height + $block-toolbar-height + $border-width;
 
 		@include break-medium() {
 			top: $header-height + $border-width;
