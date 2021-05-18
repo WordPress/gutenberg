@@ -19,15 +19,10 @@ For each user feature we should also add a importance categorization label  to i
 -   [***] Add reusable blocks to the inserter menu. [#28495]
 -   [*] The BottomSheet Cell component now supports the help prop so that a hint can be supplied to all Cell based components. [#30885]
 
-
 ## 1.52.2
 
 -   [*] Disabled featured image banner on iOS. [#31681]
 -   [*] Fix missing title for some unsupported blocks [#31743]
-
-## 1.52.2
-
--   [*] Disabled featured image banner on iOS. [#31681]
 
 ## 1.52.1
 
