@@ -836,7 +836,7 @@ class WP_Theme_JSON {
 	 * @return string The new stylesheet.
 	 */
 	private function get_block_styles( $style_nodes, $setting_nodes ) {
-		$block_rules = self::ELEMENTS['link'] . '{color: var(--wp--style--color--link);}';
+		$block_rules = self::ELEMENTS['link'] . '{color: var(--wp--style--color--link, #00e);}';
 		foreach ( $style_nodes as $metadata ) {
 			if ( null === $metadata['selector'] ) {
 				continue;
@@ -1264,8 +1264,12 @@ class WP_Theme_JSON {
 	 * @return boolean
 	 */
 	private static function is_link_element( $selector ) {
+		if ( self::ELEMENTS['link'] === $selector ) {
+			return true;
+		}
+
 		$result = true;
-		if ( false === stripos( $selector, self::ELEMENTS['link'] ) ) {
+		if ( false === stripos( $selector, ' ' . self::ELEMENTS['link'] ) ) {
 			$result = false;
 		}
 
@@ -1280,13 +1284,15 @@ class WP_Theme_JSON {
 	 * @return string
 	 */
 	private static function without_link_selector( $selector ) {
-		$result = str_ireplace( self::ELEMENTS['link'], '', $selector );
-
-		if ( '' === trim( $result ) ) {
-			return self::ROOT_BLOCK_SELECTOR;
+		if ( self::ELEMENTS['link'] === $selector ) {
+			return $selector;
 		}
 
-		return $result;
+		// The selector consist of "<something> <element_selector>".
+		// It can be compounded as well: "<one> <element_selector>, <two> <element_selector>, etc".
+		//
+		// We want to return "<something>" or "<one>, <two>, etc".
+		return str_ireplace( ' ' . self::ELEMENTS['link'], '', $selector );
 	}
 
 	/**

@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/jest-puppeteer-axe",
-	"version": "3.0.3",
+	"version": "3.0.4",
 	"description": "Axe API integration with Jest and Puppeteer.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",

@@ -19,6 +19,7 @@ import { useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import { store as blockEditorStore } from '../../store';
+import { splitValue } from './split-value';
 
 export function useEnter( props ) {
 	const { __unstableMarkAutomaticChange } = useDispatch( blockEditorStore );
@@ -35,10 +36,10 @@ export function useEnter( props ) {
 				value,
 				onReplace,
 				onSplit,
-				multiline,
+				onSplitMiddle,
+				multilineTag,
 				onChange,
 				disableLineBreaks,
-				splitValue,
 				onSplitAtEnd,
 			} = propsRef.current;
 
@@ -70,13 +71,19 @@ export function useEnter( props ) {
 				}
 			}
 
-			if ( multiline ) {
+			if ( multilineTag ) {
 				if ( event.shiftKey ) {
 					if ( ! disableLineBreaks ) {
 						onChange( insert( _value, '\n' ) );
 					}
 				} else if ( canSplit && isEmptyLine( _value ) ) {
-					splitValue( _value );
+					splitValue( {
+						value: _value,
+						onReplace,
+						onSplit,
+						onSplitMiddle,
+						multilineTag,
+					} );
 				} else {
 					onChange( insertLineSeparator( _value ) );
 				}
@@ -92,7 +99,13 @@ export function useEnter( props ) {
 				} else if ( ! canSplit && canSplitAtEnd ) {
 					onSplitAtEnd();
 				} else if ( canSplit ) {
-					splitValue( _value );
+					splitValue( {
+						value: _value,
+						onReplace,
+						onSplit,
+						onSplitMiddle,
+						multilineTag,
+					} );
 				}
 			}
 		}
