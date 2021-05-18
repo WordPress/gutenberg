@@ -210,14 +210,19 @@ function remove_core_patterns() {
  * Import patterns from wordpress.org/patterns.
  */
 function load_remote_patterns() {
-	$request = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
-	$core_keyword_id = 11; // 11 is the ID for "core".
-	$request->set_param( 'keyword', $core_keyword_id );
-	$response = rest_do_request( $request );
-	if ( $response->is_error() ) {
-		return;
+	$patterns = get_transient( 'gutenberg_remote_block_patterns' );
+	if ( ! $patterns ) {
+		$request = new WP_REST_Request( 'GET', '/__experimental/pattern-directory/patterns' );
+		$core_keyword_id = 11; // 11 is the ID for "core".
+		$request->set_param( 'keyword', $core_keyword_id );
+		$response = rest_do_request( $request );
+		if ( $response->is_error() ) {
+			return;
+		}
+		$patterns = $response->get_data();
+		set_transient( 'gutenberg_remote_block_patterns', $patterns, HOUR_IN_SECONDS );
 	}
-	$patterns = $response->get_data();
+
 	foreach ( $patterns as $settings ) {
 		$pattern_name = 'core/' . sanitize_title( $settings['title'] );
 		register_block_pattern( $pattern_name, (array) $settings );
