@@ -1,5 +1,5 @@
 // Consider the block appender to be a child block of its own, which also has
-// this class. Cannot be `.wp-block` because it is used for alignment wrappers.
+// this class.
 const BLOCK_SELECTOR = '.wp-block';
 
 /**

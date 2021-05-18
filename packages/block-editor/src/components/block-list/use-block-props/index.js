@@ -138,7 +138,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-type': name,
 		'data-title': blockTitle,
 		className: classnames(
-			'wp-block',
+			// The wp-block className is important for editor styles.
+			'wp-block block-editor-block-list__block',
 			className,
 			props.className,
 			wrapperProps.className,

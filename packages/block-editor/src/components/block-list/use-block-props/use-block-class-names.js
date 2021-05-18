@@ -49,7 +49,7 @@ export function useBlockClassNames( clientId ) {
 			const activeEntityBlockId = getActiveBlockIdByBlockNames(
 				spotlightEntityBlocks
 			);
-			return classnames( 'block-editor-block-list__block', {
+			return classnames( {
 				'is-selected': isSelected,
 				'is-highlighted': isBlockHighlighted( clientId ),
 				'is-multi-selected': isBlockMultiSelected( clientId ),
