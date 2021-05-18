@@ -107,7 +107,7 @@ export default function KeyboardShortcutHelpModal( {
 		>
 			<ShortcutSection
 				className="edit-post-keyboard-shortcut-help-modal__main-shortcuts"
-				shortcuts={ [ 'core/edit-post/keyboard-shortcuts' ] }
+				shortcuts={ [ 'core/edit-widgets/keyboard-shortcuts' ] }
 			/>
 			<ShortcutCategorySection
 				title={ __( 'Global shortcuts' ) }

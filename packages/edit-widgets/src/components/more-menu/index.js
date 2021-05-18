@@ -45,7 +45,7 @@ export default function MoreMenu() {
 		setIsKeyboardShortcutsModalVisible( ! isKeyboardShortcutsModalActive );
 
 	useShortcut(
-		'core/edit-post/keyboard-shortcuts',
+		'core/edit-widgets/keyboard-shortcuts',
 		toggleKeyboardShortcutsModal,
 		{
 			bindGlobal: true,
