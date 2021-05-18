@@ -15,11 +15,15 @@ import { coreDeviceTypes, PluginPreviewMenuFill } from '../index';
  * inside the preview menu. Typically a single string is good enough.
  *
  * @param {Object}    props           Component properties.
- * @param {string}    props.previewId The internal name of this custom preview. Must match the _previewId_ given to `PluginPreview`.
  * @param {WPElement} props.children  Children to be rendered.
+ * @param {WPIcon}    props.icon      Menu item icon to be rendered.
+ * @param {Function}  props.onClick   Menu item click handler, e.g. for previews that do not register slot fills.
+ * @param {string}    props.previewId The internal name of this custom preview. Must match the _previewId_ given to `PluginPreview`.
  */
 export default function PluginPreviewMenuItem( {
 	children,
+	icon,
+	onClick,
 	previewId,
 	...props
 } ) {
@@ -28,11 +32,19 @@ export default function PluginPreviewMenuItem( {
 	}
 
 	return (
-		<PluginPreviewMenuFill { ...props }>
+		<PluginPreviewMenuFill>
 			{ ( { deviceType, setDeviceType } ) => (
 				<MenuItem
-					onClick={ () => setDeviceType( previewId ) }
-					icon={ deviceType === previewId && check }
+					onClick={ ( ...args ) => {
+						if ( previewId ) {
+							setDeviceType( previewId );
+						}
+						if ( onClick ) {
+							onClick( ...args );
+						}
+					} }
+					icon={ icon || ( deviceType === previewId && check ) }
+					{ ...props }
 				>
 					{ children }
 				</MenuItem>
