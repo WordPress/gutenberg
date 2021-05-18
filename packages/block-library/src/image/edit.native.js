@@ -499,8 +499,7 @@ export class ImageEdit extends Component {
 		const canImageBeFeatured = typeof attributes.id !== 'undefined';
 
 		const isFeaturedImage =
-			typeof featuredImageId !== 'undefined' &&
-			featuredImageId === attributes.id;
+			canImageBeFeatured && featuredImageId === attributes.id;
 
 		// eslint-disable-next-line no-unused-vars
 		const androidOnly = Platform.OS === 'android';
