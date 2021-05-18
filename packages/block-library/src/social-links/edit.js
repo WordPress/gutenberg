@@ -14,7 +14,7 @@ import {
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	useBlockProps,
 	InspectorControls,
-	JustifyToolbar,
+	JustifyContentControl,
 	ContrastChecker,
 	PanelColorSettings,
 	withColors,
@@ -114,8 +114,8 @@ export function SocialLinksEdit( props ) {
 
 	return (
 		<Fragment>
-			<BlockControls>
-				<JustifyToolbar
+			<BlockControls group="block">
+				<JustifyContentControl
 					allowedControls={ [
 						'left',
 						'center',

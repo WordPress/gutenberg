@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { useEntityProp } from '@wordpress/core-data';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	useBlockProps,
 	BlockControls,
 	RichText,
@@ -29,8 +29,8 @@ export default function SiteTaglineEdit( { attributes, setAttributes } ) {
 	} );
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
+			<BlockControls group="block">
+				<AlignmentControl
 					onChange={ ( newAlign ) =>
 						setAttributes( { textAlign: newAlign } )
 					}

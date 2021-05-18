@@ -12,7 +12,7 @@ import {
 	BlockControls,
 	RichText,
 	BlockIcon,
-	AlignmentToolbar,
+	AlignmentControl,
 	useBlockProps,
 	__experimentalUseColorProps as useColorProps,
 	__experimentalUseBorderProps as useBorderProps,
@@ -25,7 +25,6 @@ import {
 	Placeholder,
 	TextControl,
 	ToggleControl,
-	ToolbarGroup,
 	ToolbarItem,
 } from '@wordpress/components';
 import {
@@ -429,21 +428,19 @@ function TableEdit( {
 	return (
 		<figure { ...useBlockProps() }>
 			{ ! isEmpty && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<DropdownMenu
-									hasArrowIndicator
-									icon={ table }
-									toggleProps={ toggleProps }
-									label={ __( 'Edit table' ) }
-									controls={ tableControls }
-								/>
-							) }
-						</ToolbarItem>
-					</ToolbarGroup>
-					<AlignmentToolbar
+				<BlockControls group="block">
+					<ToolbarItem>
+						{ ( toggleProps ) => (
+							<DropdownMenu
+								hasArrowIndicator
+								icon={ table }
+								toggleProps={ toggleProps }
+								label={ __( 'Edit table' ) }
+								controls={ tableControls }
+							/>
+						) }
+					</ToolbarItem>
+					<AlignmentControl
 						label={ __( 'Change column alignment' ) }
 						alignmentControls={ ALIGNMENT_CONTROLS }
 						value={ getCellAlignment() }
