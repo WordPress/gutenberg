@@ -107,6 +107,30 @@ function addAttribute( settings ) {
 	return settings;
 }
 
+const skipSerializationPaths = [
+	{
+		indicator: `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization'`,
+		path: [ 'border' ],
+	},
+	{
+		indicator: `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization`,
+		path: [ COLOR_SUPPORT_KEY ],
+	},
+	{
+		indicator: `__experimentalSkipFontSizeSerialization`,
+		path: [ 'typography', 'fontSize' ],
+	},
+	{
+		indicator: `__experimentalSkipTypographySerialization`,
+		path: without( TYPOGRAPHY_SUPPORT_KEYS, FONT_SIZE_SUPPORT_KEY ).map(
+			( feature ) =>
+				find( STYLE_PROPERTY, ( property ) =>
+					isEqual( property.support, [ feature ] )
+				)?.value
+		),
+	},
+];
+
 /**
  * Override props assigned to save component to inject the CSS variables definition.
  *
@@ -122,56 +146,10 @@ export function addSaveProps( props, blockType, attributes ) {
 
 	let { style } = attributes;
 
-	const skipSerializationPaths = [
-		{
-			indicator: [
-				BORDER_SUPPORT_KEY,
-				'__experimentalSkipSerialization',
-			],
-			value: [ 'border' ],
-		},
-		{
-			indicator: [ COLOR_SUPPORT_KEY, '__experimentalSkipSerialization' ],
-			value: [ COLOR_SUPPORT_KEY ],
-		},
-		{
-			indicator: '__experimentalSkipFontSizeSerialization',
-			skipvalueSerialization: [ 'typography', 'fontSize' ],
-		},
-		{
-			indicator: '__experimentalSkipTypographySerialization',
-			value: without(
-				TYPOGRAPHY_SUPPORT_KEYS,
-				FONT_SIZE_SUPPORT_KEY
-			).map(
-				( feature ) =>
-					find( STYLE_PROPERTY, ( property ) =>
-						isEqual( property.support, [ feature ] )
-					)?.value
-			),
-		},
-	];
-
-	skipSerializationPaths.forEach( ( { indicator, value } ) => {
-		if ( Array.isArray( indicator ) && indicator.length ) {
-			if (
-				indicator.length === 1 &&
-				! getBlockSupport( blockType, indicator[ 0 ] )
-			) {
-				return;
-			}
-			if (
-				! getBlockSupport( blockType, indicator[ 0 ] )?.[
-					indicator[ 1 ]
-				]
-			) {
-				return;
-			}
-		} else if ( ! getBlockSupport( blockType, indicator ) ) {
-			return;
+	skipSerializationPaths.forEach( ( { indicator, path } ) => {
+		if ( getBlockSupport( blockType, indicator ) ) {
+			style = omit( style, path );
 		}
-
-		style = omit( style, value );
 	} );
 
 	props.style = {
