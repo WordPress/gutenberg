@@ -8,7 +8,7 @@ import classnames from 'classnames';
  */
 import { createPortal } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { Button, ToolbarItem } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { NavigableToolbar } from '@wordpress/block-editor';
 import { plus } from '@wordpress/icons';
 
@@ -35,8 +35,7 @@ function Header( {
 					className="customize-widgets-header-toolbar"
 					aria-label={ __( 'Document tools' ) }
 				>
-					<ToolbarItem
-						as={ Button }
+					<ToolbarButton
 						className="customize-widgets-header-toolbar__inserter-toggle"
 						isPressed={ isInserterOpened }
 						isPrimary

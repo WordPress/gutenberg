@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	DropdownMenu,
+	ToolbarDropdownMenu,
 	MenuGroup,
 	MenuItem,
 	VisuallyHidden,
@@ -45,7 +45,7 @@ export default function MoreMenu() {
 
 	return (
 		<>
-			<DropdownMenu
+			<ToolbarDropdownMenu
 				className="customize-widgets-more-menu"
 				icon={ moreVertical }
 				/* translators: button label text should, if possible, be under 16 characters. */
@@ -120,7 +120,7 @@ export default function MoreMenu() {
 						</MenuGroup>
 					</>
 				) }
-			</DropdownMenu>
+			</ToolbarDropdownMenu>
 			<KeyboardShortcutHelpModal
 				isModalActive={ isKeyboardShortcutsModalActive }
 				toggleModal={ toggleKeyboardShortcutsModal }
