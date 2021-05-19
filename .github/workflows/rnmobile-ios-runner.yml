@@ -21,64 +21,61 @@ jobs:
               with:
                   node-version: 14.x
 
-            - name: Setup tmate session
-              uses: mxschmitt/action-tmate@v3
-
             # - name: Restore npm cache
             #   uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
             #   with:
             #       path: ~/.npm
             #       key: ${{ runner.os }}-npm-${{ hashFiles('package-lock.json') }}
 
-            # - run: npm ci
+            - run: npm ci
 
-            # - name: Prepare build cache key
-            #   run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
+            - name: Prepare build cache key
+              run: find package-lock.json packages/react-native-editor/ios packages/react-native-aztec/ios packages/react-native-bridge/ios -type f -print0 | sort -z | xargs -0 shasum | tee ios-checksums.txt
 
-            # - name: Restore build cache
-            #   uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
-            #   with:
-            #       path: |
-            #           packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app
-            #           packages/react-native-editor/ios/build/WDA
-            #       key: ${{ runner.os }}-ios-build-${{ matrix.xcode }}-${{ hashFiles('ios-checksums.txt') }}
+            - name: Restore build cache
+              uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
+              with:
+                  path: |
+                      packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app
+                      packages/react-native-editor/ios/build/WDA
+                  key: ${{ runner.os }}-ios-build-${{ matrix.xcode }}-${{ hashFiles('ios-checksums.txt') }}
 
-            # - name: Restore pods cache
-            #   uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
-            #   with:
-            #       path: |
-            #           packages/react-native-editor/ios/Pods
-            #           ~/Library/Caches/CocoaPods
-            #           ~/.cocoapods/repos/trunk
-            #           packages/react-native-editor/ios/vendor
-            #       key: ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-${{ hashFiles('package-lock.json') }}
+            - name: Restore pods cache
+              uses: actions/cache@26968a09c0ea4f3e233fdddbafd1166051a095f6 # v2.1.4
+              with:
+                  path: |
+                      packages/react-native-editor/ios/Pods
+                      ~/Library/Caches/CocoaPods
+                      ~/.cocoapods/repos/trunk
+                      packages/react-native-editor/ios/vendor
+                  key: ${{ runner.os }}-pods-${{ hashFiles('packages/react-native-editor/ios/Gemfile.lock') }}-${{ hashFiles('packages/react-native-editor/ios/Podfile.lock') }}-${{ hashFiles('package-lock.json') }}
 
-            # - name: Bundle iOS
-            #   run: npm run native test:e2e:bundle:ios
+            - name: Bundle iOS
+              run: npm run native test:e2e:bundle:ios
 
-            # - name: Switch Xcode version to ${{ matrix.xcode }}
-            #   run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.xcode }}.app
+            - name: Switch Xcode version to ${{ matrix.xcode }}
+              run: sudo xcode-select --switch /Applications/Xcode_${{ matrix.xcode }}.app
 
-            # - name: Build (if needed)
-            #   run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || npm run native test:e2e:build-app:ios
+            - name: Build (if needed)
+              run: test -e packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/GutenbergDemo || npm run native test:e2e:build-app:ios
 
-            # - name: Build Web Driver Agent (if needed)
-            #   run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
+            - name: Build Web Driver Agent (if needed)
+              run: test -d packages/react-native-editor/ios/build/WDA || npm run native test:e2e:build-wda
 
-            # - name: Run iOS Device Tests
-            #   run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
+            - name: Run iOS Device Tests
+              run: TEST_RN_PLATFORM=ios npm run native device-tests:local  ${{ matrix.native-test-name }}
 
-            # - name: Prepare build cache
-            #   run: rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
+            - name: Prepare build cache
+              run: rm packages/react-native-editor/ios/build/GutenbergDemo/Build/Products/Release-iphonesimulator/GutenbergDemo.app/main.jsbundle
 
-            # - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
-            #   if: always()
-            #   with:
-            #       name: ios-screen-recordings
-            #       path: packages/react-native-editor/ios-screen-recordings
+            - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              if: always()
+              with:
+                  name: ios-screen-recordings
+                  path: packages/react-native-editor/ios-screen-recordings
 
-            # - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
-            #   if: always()
-            #   with:
-            #       name: appium-logs
-            #       path: packages/react-native-editor/appium-out.log
+            - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              if: always()
+              with:
+                  name: appium-logs
+                  path: packages/react-native-editor/appium-out.log
