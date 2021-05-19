@@ -93,13 +93,19 @@ export default function VisualEditor( { styles } ) {
 			__experimentalGetPreviewDeviceType,
 		} = select( editPostStore );
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+		const _isTemplateMode = isEditingTemplate();
+		let _wrapperBlockName;
+
+		if ( getCurrentPostType() === 'wp_block' ) {
+			_wrapperBlockName = 'core/block';
+		} else if ( ! _isTemplateMode ) {
+			_wrapperBlockName = 'core/post-content';
+		}
+
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
-			isTemplateMode: isEditingTemplate(),
-			wrapperBlockName:
-				getCurrentPostType() === 'wp_block'
-					? 'core/block'
-					: 'core/post-content',
+			isTemplateMode: _isTemplateMode,
+			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 		};
 	}, [] );
