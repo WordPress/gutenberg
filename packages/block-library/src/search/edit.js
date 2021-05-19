@@ -24,7 +24,7 @@ import {
 	ResizableBox,
 	PanelBody,
 	BaseControl,
-	useCustomUnits,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { useInstanceId } from '@wordpress/compose';
 import { search } from '@wordpress/icons';

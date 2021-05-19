@@ -20,7 +20,7 @@ import {
 	Spinner,
 	ToggleControl,
 	withNotices,
-	useCustomUnits,
+	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 import { compose, withInstanceId, useInstanceId } from '@wordpress/compose';

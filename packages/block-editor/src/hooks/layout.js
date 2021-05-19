@@ -15,7 +15,7 @@ import {
 	Button,
 	ToggleControl,
 	PanelBody,
-	useCustomUnits,
+	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';

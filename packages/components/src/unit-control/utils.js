@@ -257,6 +257,8 @@ function filterUnitsWithSettings( settings = [], units = [] ) {
 
 /**
  * Custom hook to retrieve and consolidate units setting from add_theme_support().
+ * TODO: ideally this hook shouldn't be needed
+ * https://github.com/WordPress/gutenberg/pull/31822#discussion_r633280823
  *
  * @param {Object} args                An object containing units, settingPath & defaultUnits.
  * @param {Object} args.units          Collection of available units.

@@ -23,7 +23,7 @@ import {
 	UnitControl,
 	getValueAndUnit,
 	alignmentHelpers,
-	useCustomUnits,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 /**

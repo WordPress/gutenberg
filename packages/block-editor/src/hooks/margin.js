@@ -5,7 +5,7 @@ import { __ } from '@wordpress/i18n';
 import { Platform } from '@wordpress/element';
 import { getBlockSupport } from '@wordpress/blocks';
 import {
-	useCustomUnits,
+	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalBoxControl as BoxControl,
 } from '@wordpress/components';
 

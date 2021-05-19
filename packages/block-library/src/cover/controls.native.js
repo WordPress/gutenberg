@@ -17,7 +17,7 @@ import {
 	TextControl,
 	BottomSheet,
 	ToggleControl,
-	useCustomUnits,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import { plus } from '@wordpress/icons';
 import { useState, useCallback, useRef } from '@wordpress/element';

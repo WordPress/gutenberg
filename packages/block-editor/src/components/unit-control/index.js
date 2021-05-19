@@ -2,7 +2,7 @@
  * WordPress dependencies
  */
 import {
-	useCustomUnits,
+	__experimentalUseCustomUnits as useCustomUnits,
 	__experimentalUnitControl as BaseUnitControl,
 } from '@wordpress/components';
 

@@ -133,7 +133,7 @@ export { default as TreeSelect } from './tree-select';
 export { Truncate as __experimentalTruncate } from './truncate';
 export {
 	default as __experimentalUnitControl,
-	useCustomUnits,
+	useCustomUnits as __experimentalUseCustomUnits,
 } from './unit-control';
 export { default as VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';

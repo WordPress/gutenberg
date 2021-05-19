@@ -15,7 +15,7 @@ import {
 	getValueAndUnit,
 	GlobalStylesContext,
 	alignmentHelpers,
-	useCustomUnits,
+	__experimentalUseCustomUnits as useCustomUnits,
 } from '@wordpress/components';
 import {
 	InspectorControls,

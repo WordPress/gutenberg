@@ -17,7 +17,7 @@ import {
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
 import {
-	useCustomUnits,
+	__experimentalUseCustomUnits as useCustomUnits,
 	PanelBody,
 	__experimentalUnitControl as UnitControl,
 } from '@wordpress/components';
