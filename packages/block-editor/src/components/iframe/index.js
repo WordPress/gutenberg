@@ -140,9 +140,13 @@ async function loadScript( doc, { id, src } ) {
 	return new Promise( ( resolve, reject ) => {
 		const script = doc.createElement( 'script' );
 		script.id = id;
-		script.src = src;
-		script.onload = () => resolve();
-		script.onerror = () => reject();
+		if ( src ) {
+			script.src = src;
+			script.onload = () => resolve();
+			script.onerror = () => reject();
+		} else {
+			resolve();
+		}
 		doc.head.appendChild( script );
 	} );
 }

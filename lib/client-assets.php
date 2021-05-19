@@ -753,14 +753,14 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	$scripts = ob_get_clean();
 
-	$editor_styles = wp_json_encode(
+	$editor_assets = wp_json_encode(
 		array(
 			'styles'  => $styles,
 			'scripts' => $scripts,
 		)
 	);
 
-	echo "<script>window.__editorAssets = $editor_styles</script>";
+	echo "<script>window.__editorAssets = $editor_assets</script>";
 }
 add_action( 'admin_footer-toplevel_page_gutenberg-edit-site', 'gutenberg_extend_block_editor_styles_html' );
 add_action( 'admin_footer-post.php', 'gutenberg_extend_block_editor_styles_html' );
