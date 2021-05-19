@@ -79,3 +79,9 @@ jobs:
               with:
                   name: appium-logs
                   path: packages/react-native-editor/appium-out.log
+
+            - uses: actions/upload-artifact@e448a9b857ee2131e752b06002bf0e093c65e571 # v2.2.2
+              if: always()
+              with:
+                  name: npm-logs
+                  path: /Users/runner/.npm/_logs/*
