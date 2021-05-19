@@ -261,15 +261,16 @@ export default function LogoEdit( {
 				'root',
 				'site'
 			);
-			const mediaItem = siteSettings[
-				`theme_mods_${ siteSettings.stylesheet }`
-			].custom_logo
+
+			const themeModOptionName = `theme_mods_${ siteSettings.stylesheet }`;
+
+			siteSettings[ themeModOptionName ] =
+				siteSettings[ themeModOptionName ] || {};
+			const mediaItem = siteSettings[ themeModOptionName ].custom_logo
 				? select( coreStore ).getEntityRecord(
 						'root',
 						'media',
-						siteSettings[
-							`theme_mods_${ siteSettings.stylesheet }`
-						].custom_logo
+						siteSettings[ themeModOptionName ].custom_logo
 				  )
 				: null;
 			return {
@@ -277,9 +278,7 @@ export default function LogoEdit( {
 					url: mediaItem.source_url,
 					alt: mediaItem.alt_text,
 				},
-				siteLogo:
-					siteSettings[ `theme_mods_${ siteSettings.stylesheet }` ]
-						.custom_logo,
+				siteLogo: siteSettings[ themeModOptionName ].custom_logo,
 				url: siteSettings.url,
 				stylesheet: siteSettings.stylesheet,
 			};
