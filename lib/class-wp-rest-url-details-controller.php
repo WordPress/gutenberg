@@ -281,21 +281,20 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	/**
 	 * Parses the Open Graph Image from the provided HTML.
 	 *
+	 * See: https://ogp.me/.
+	 *
 	 * @param string $html the HTML from the remote website at URL.
 	 * @param string $url the target website URL.
 	 * @return string the OG image (maybe empty).
 	 */
 	private function get_image( $html, $url ) {
-		preg_match( '|<meta.*?property="og:image.*?".*?content="(.*?)".*?\/?>|is', $html, $matches );
+		preg_match( '|<meta.*?property="og:image[:url]*?".*?content="(.*?)".*?\/?>|is', $html, $matches );
 
 		$image = isset( $matches[1] ) && is_string( $matches[1] ) ? trim( $matches[1] ) : '';
 
 		// Attempt to convert relative URLs to absolute.
 		if ( ! empty( $image ) ) {
-			$parsed = parse_url( $image );
-			if ( empty( $parsed['host'] ) ) {
-				$image = $url . $image;
-			}
+			$image = \WP_Http::make_absolute_url( $image, $url );
 		}
 
 		return $image;
