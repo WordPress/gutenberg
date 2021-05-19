@@ -500,7 +500,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$method     = $this->get_reflective_method( 'get_title' );
 		$result     = $method->invoke(
 			$controller,
-			$html,
+			$this->wrap_html_in_doc( $html ),
 		);
 		$this->assertEquals( $expected_title, $result );
 	}
@@ -528,24 +528,26 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$method     = $this->get_reflective_method( 'get_icon' );
 		$result     = $method->invoke(
 			$controller,
-			$html,
+			$this->wrap_html_in_doc( $html ),
 			$target_url
 		);
 		$this->assertEquals( $expected_icon, $result );
 	}
 
 
+
+
 	public function provide_get_icon_data() {
 		return array(
-			'default' => array(
+			'default'               => array(
 				'<link rel="shortcut icon" href="https://wordpress.org/favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
 			),
-			'with_query_string' => array(
+			'with_query_string'     => array(
 				'<link rel="shortcut icon" href="https://wordpress.org/favicon.ico?somequerystring=foo&another=bar" />',
 				'https://wordpress.org/favicon.ico?somequerystring=foo&another=bar',
 			),
-			'relative_url' => array(
+			'relative_url'          => array(
 				'<link rel="shortcut icon" href="/favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
 			),
@@ -553,15 +555,15 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 				'<link rel="shortcut icon" href="favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
 			),
-			'rel_reverse_order' => array(
+			'rel_reverse_order'     => array(
 				'<link rel="icon shortcut" href="https://wordpress.org/favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
 			),
-			'rel_icon_only' => array(
+			'rel_icon_only'         => array(
 				'<link rel="icon" href="https://wordpress.org/favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
 			),
-			'rel_shortcut_only' => array(
+			'rel_shortcut_only'     => array(
 				'<link rel="icon" href="https://wordpress.org/favicon.ico" />',
 				'https://wordpress.org/favicon.ico',
 			),
@@ -649,6 +651,19 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			'success'     => $should_200 ? 1 : 0,
 			'body'        => 'success' === $result_type ? file_get_contents( __DIR__ . '/fixtures/example-website.html' ) : '',
 		);
+	}
+
+	private function wrap_html_in_doc( $html ) {
+		$start = '<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+<head>';
+		$end   = '</head>
+<body>
+	<h1>Example Website</h1>
+    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+</body>
+</html>';
+		return $start . $html . $end;
 	}
 
 	/**
