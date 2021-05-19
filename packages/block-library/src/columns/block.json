@@ -17,6 +17,10 @@
 		"color": {
 			"gradients": true,
 			"link": true
+		},
+		"spacing": {
+			"margin": [ "left" ],
+			"__experimentalSkipSerialization": true
 		}
 	},
 	"editorStyle": "wp-block-columns-editor",

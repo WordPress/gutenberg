@@ -32,6 +32,7 @@
 
 .wp-block-column {
 	flex-grow: 1;
+	box-sizing: border-box;
 
 	@media (max-width: #{ ($break-small - 1) }) {
 		// Responsiveness: Show at most one columns on mobile. This must be
@@ -53,14 +54,14 @@
 			// As with mobile styles, this must be important since the Column
 			// assigns its own width as an inline style, which should take effect
 			// starting at `break-medium`.
-			flex-basis: calc(50% - 1em) !important;
+			flex-basis: calc(50% - (var(--wp-block-columns--margin-left, 2em) / 2)) !important;
 			flex-grow: 0;
 		}
 
 		// Add space between the multiple columns. Themes can customize this if they wish to work differently.
 		// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 		&:nth-child(even) {
-			margin-left: 2em;
+			margin-left: var(--wp-block-columns--margin-left, 2em);
 		}
 	}
 
@@ -84,7 +85,7 @@
 
 		// When columns are in a single row, add space before all except the first.
 		&:not(:first-child) {
-			margin-left: 2em;
+			margin-left: var(--wp-block-columns--margin-left, 2em);
 		}
 	}
 

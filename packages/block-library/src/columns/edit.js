@@ -53,7 +53,7 @@ function ColumnsEditContainer( {
 	updateColumns,
 	clientId,
 } ) {
-	const { verticalAlignment } = attributes;
+	const { style, verticalAlignment } = attributes;
 
 	const { count } = useSelect(
 		( select ) => {
@@ -68,8 +68,18 @@ function ColumnsEditContainer( {
 		[ `are-vertically-aligned-${ verticalAlignment }` ]: verticalAlignment,
 	} );
 
+	const marginValues = style?.spacing?.margin;
+
+	const styles = {
+		[ `--wp-block-columns--margin-top` ]: marginValues?.top,
+		[ `--wp-block-columns--margin-right` ]: marginValues?.right,
+		[ `--wp-block-columns--margin-bottom` ]: marginValues?.bottom,
+		[ `--wp-block-columns--margin-left` ]: marginValues?.left,
+	};
+
 	const blockProps = useBlockProps( {
 		className: classes,
+		style: styles,
 	} );
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		allowedBlocks: ALLOWED_BLOCKS,
@@ -113,7 +123,7 @@ const ColumnsEditContainerWrapper = withDispatch(
 		/**
 		 * Update all child Column blocks with a new vertical alignment setting
 		 * based on whatever alignment is passed in. This allows change to parent
-		 * to overide anything set on a individual column basis.
+		 * to override anything set on a individual column basis.
 		 *
 		 * @param {string} verticalAlignment the vertical alignment setting
 		 */

@@ -10,14 +10,14 @@
 @include break-small() {
 	.editor-styles-wrapper
 	.block-editor-block-list__block.wp-block-column:nth-child(even) {
-		margin-left: $grid-unit-20 * 2;
+		margin-left: var(--wp-block-columns--margin-left, #{ $grid-unit-20 * 2 });
 	}
 }
 
 @include break-medium() {
 	.editor-styles-wrapper
 	.block-editor-block-list__block.wp-block-column:not(:first-child) {
-		margin-left: $grid-unit-20 * 2;
+		margin-left: var(--wp-block-columns--margin-left, #{ $grid-unit-20 * 2 });
 	}
 }
 
