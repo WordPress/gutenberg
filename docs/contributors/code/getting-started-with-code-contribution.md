@@ -103,13 +103,16 @@ You can access the Dashboard at: `http://localhost:8888/wp-admin/` using **Usern
 
 To access the MySQL database on the `wp-env` instance you will first need the connection details. To do this:
 
-1. In a terminal, navigate to your local Gutenberg repo
-2. Run `npm run wp-env start` - information about the MySQL port should be logged into the terminal. For example:
+1. In a terminal, navigate to your local Gutenberg repo.
+2. Run `npm run wp-env start` - various information about the `wp-env` environment should be logged into the terminal.
+
+3. In the output from step 2, look for information about the _MySQL_ port:
+   For example:
 
 > MySQL is listening on port {MYSQL_PORT_NUMBER}
 
-3. Copy / make a note of this port number (note this will change each time `wp-env` restarts).
-4. You can now connect to the MySQL instance using the following details being sure to replace `{MYSQL_PORT_NUMBER}` with the port number from step two.
+4. Copy / make a note of this port number (note this will change each time `wp-env` restarts).
+5. You can now connect to the MySQL instance using the following details being sure to replace `{MYSQL_PORT_NUMBER}` with the port number from step three.
 
 ```
 Host: 127.0.0.1
