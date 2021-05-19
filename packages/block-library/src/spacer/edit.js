@@ -6,29 +6,122 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { InspectorControls } from '@wordpress/block-editor';
-import { BaseControl, PanelBody, ResizableBox } from '@wordpress/components';
+import {
+	InspectorControls,
+	useBlockProps,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { PanelBody, ResizableBox, RangeControl } from '@wordpress/components';
 import { compose, withInstanceId } from '@wordpress/compose';
 import { withDispatch } from '@wordpress/data';
+import { useState, useEffect } from '@wordpress/element';
+import { View } from '@wordpress/primitives';
 
-const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId, onResizeStart, onResizeStop } ) => {
-	const { height } = attributes;
-	const id = `block-spacer-height-input-${ instanceId }`;
-	const [ inputHeightValue, setInputHeightValue ] = useState( height );
+const MIN_SPACER_HEIGHT = 1;
+const MAX_SPACER_HEIGHT = 500;
 
-	return (
-		<>
+const MIN_SPACER_WIDTH = 1;
+const MAX_SPACER_WIDTH = 500;
+
+const SpacerEdit = ( {
+	attributes,
+	isSelected,
+	setAttributes,
+	onResizeStart,
+	onResizeStop,
+	context,
+} ) => {
+	const { orientation } = context;
+	const [ isResizing, setIsResizing ] = useState( false );
+	const { height, width } = attributes;
+	const updateHeight = ( value ) => {
+		setAttributes( {
+			height: value,
+		} );
+	};
+	const updateWidth = ( value ) => {
+		setAttributes( {
+			width: value,
+		} );
+	};
+
+	const handleOnResizeStart = ( ...args ) => {
+		onResizeStart( ...args );
+		setIsResizing( true );
+	};
+
+	const handleOnVerticalResizeStop = ( event, direction, elt, delta ) => {
+		onResizeStop();
+		const spacerHeight = Math.min(
+			parseInt( height + delta.height, 10 ),
+			MAX_SPACER_HEIGHT
+		);
+		updateHeight( spacerHeight );
+		setIsResizing( false );
+	};
+
+	const handleOnHorizontalResizeStop = ( event, direction, elt, delta ) => {
+		onResizeStop();
+		const spacerWidth = Math.min(
+			parseInt( width + delta.width, 10 ),
+			MAX_SPACER_WIDTH
+		);
+		updateWidth( spacerWidth );
+		setIsResizing( false );
+	};
+
+	const resizableBoxWithOrientation = ( blockOrientation ) => {
+		if ( blockOrientation === 'horizontal' ) {
+			return (
+				<ResizableBox
+					className={ classnames(
+						'block-library-spacer__resize-container',
+						'resize-horizontal',
+						{
+							'is-selected': isSelected,
+						}
+					) }
+					size={ {
+						width,
+						height: 24,
+					} }
+					minWidth={ MIN_SPACER_WIDTH }
+					enable={ {
+						top: false,
+						right: true,
+						bottom: false,
+						left: false,
+						topRight: false,
+						bottomRight: false,
+						bottomLeft: false,
+						topLeft: false,
+					} }
+					onResizeStart={ handleOnResizeStart }
+					onResizeStop={ handleOnHorizontalResizeStop }
+					showHandle={ isSelected }
+					__experimentalShowTooltip={ true }
+					__experimentalTooltipProps={ {
+						axis: 'x',
+						position: 'corner',
+						isVisible: isResizing,
+					} }
+				/>
+			);
+		}
+
+		return (
 			<ResizableBox
 				className={ classnames(
 					'block-library-spacer__resize-container',
-					{ 'is-selected': isSelected },
+					{
+						'is-selected': isSelected,
+					}
 				) }
 				size={ {
 					height,
 				} }
-				minHeight="20"
+				minHeight={ MIN_SPACER_HEIGHT }
 				enable={ {
 					top: false,
 					right: false,
@@ -39,42 +132,51 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId, onResi
 					bottomLeft: false,
 					topLeft: false,
 				} }
-				onResizeStart={ onResizeStart }
-				onResizeStop={ ( event, direction, elt, delta ) => {
-					onResizeStop();
-					const spacerHeight = parseInt( height + delta.height, 10 );
-					setAttributes( {
-						height: spacerHeight,
-					} );
-					setInputHeightValue( spacerHeight );
+				onResizeStart={ handleOnResizeStart }
+				onResizeStop={ handleOnVerticalResizeStop }
+				showHandle={ isSelected }
+				__experimentalShowTooltip={ true }
+				__experimentalTooltipProps={ {
+					axis: 'y',
+					position: 'bottom',
+					isVisible: isResizing,
 				} }
 			/>
+		);
+	};
+
+	useEffect( () => {
+		if ( orientation === 'horizontal' && ! width ) {
+			updateWidth( 72 );
+			updateHeight( 0 );
+		}
+	}, [] );
+
+	return (
+		<>
+			<View { ...useBlockProps() }>
+				{ resizableBoxWithOrientation( orientation ) }
+			</View>
 			<InspectorControls>
-				<PanelBody title={ __( 'Spacer Settings' ) }>
-					<BaseControl label={ __( 'Height in pixels' ) } id={ id }>
-						<input
-							type="number"
-							id={ id }
-							onChange={ ( event ) => {
-								let spacerHeight = parseInt( event.target.value, 10 );
-								setInputHeightValue( spacerHeight );
-								if ( isNaN( spacerHeight ) ) {
-									// Set spacer height to default size and input box to empty string
-									setInputHeightValue( '' );
-									spacerHeight = 100;
-								} else if ( spacerHeight < 20 ) {
-									// Set spacer height to minimum size
-									spacerHeight = 20;
-								}
-								setAttributes( {
-									height: spacerHeight,
-								} );
-							} }
-							value={ inputHeightValue }
-							min="20"
-							step="10"
+				<PanelBody title={ __( 'Spacer settings' ) }>
+					{ orientation === 'horizontal' && (
+						<RangeControl
+							label={ __( 'Width in pixels' ) }
+							min={ MIN_SPACER_WIDTH }
+							max={ Math.max( MAX_SPACER_WIDTH, width ) }
+							value={ width }
+							onChange={ updateWidth }
 						/>
-					</BaseControl>
+					) }
+					{ orientation !== 'horizontal' && (
+						<RangeControl
+							label={ __( 'Height in pixels' ) }
+							min={ MIN_SPACER_HEIGHT }
+							max={ Math.max( MAX_SPACER_HEIGHT, height ) }
+							value={ height }
+							onChange={ updateHeight }
+						/>
+					) }
 				</PanelBody>
 			</InspectorControls>
 		</>
@@ -83,7 +185,7 @@ const SpacerEdit = ( { attributes, isSelected, setAttributes, instanceId, onResi
 
 export default compose( [
 	withDispatch( ( dispatch ) => {
-		const { toggleSelection } = dispatch( 'core/block-editor' );
+		const { toggleSelection } = dispatch( blockEditorStore );
 
 		return {
 			onResizeStart: () => toggleSelection( false ),

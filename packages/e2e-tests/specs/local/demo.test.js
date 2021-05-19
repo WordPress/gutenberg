@@ -4,6 +4,7 @@
 import {
 	createEmbeddingMatcher,
 	createJSONResponse,
+	createNewPost,
 	setUpResponseMocking,
 	visitAdminPage,
 } from '@wordpress/e2e-test-utils';
@@ -19,13 +20,20 @@ const MOCK_VIMEO_RESPONSE = {
 
 describe( 'new editor state', () => {
 	beforeAll( async () => {
+		// First, make sure that the block editor is properly configured.
+		await createNewPost();
+
 		await setUpResponseMocking( [
 			{
 				match: createEmbeddingMatcher( 'https://vimeo.com/22439234' ),
 				onRequestMatch: createJSONResponse( MOCK_VIMEO_RESPONSE ),
 			},
 		] );
-		await visitAdminPage( 'post-new.php', 'gutenberg-demo' );
+
+		await Promise.all( [
+			visitAdminPage( 'post-new.php', 'gutenberg-demo' ),
+			page.waitForNavigation( { waitUntil: 'networkidle0' } ),
+		] );
 	} );
 
 	it( 'content should load, making the post dirty', async () => {
@@ -34,9 +42,9 @@ describe( 'new editor state', () => {
 			return select( 'core/editor' ).isEditedPostDirty();
 		} );
 		expect( isDirty ).toBeTruthy();
-	} );
 
-	it( 'should be immediately saveable', async () => {
+		await page.waitForSelector( 'button.editor-post-save-draft' );
+
 		expect( await page.$( 'button.editor-post-save-draft' ) ).toBeTruthy();
 	} );
 } );

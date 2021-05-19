@@ -14,7 +14,7 @@ import {
 
 const SIDEBAR_SELECTOR = '.edit-post-sidebar';
 const ACTIVE_SIDEBAR_TAB_SELECTOR = '.edit-post-sidebar__panel-tab.is-active';
-const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Document';
+const ACTIVE_SIDEBAR_BUTTON_TEXT = 'Post';
 
 describe( 'Sidebar', () => {
 	afterEach( () => {
@@ -26,15 +26,18 @@ describe( 'Sidebar', () => {
 		await clearLocalStorage();
 		await createNewPost();
 		await enableFocusLossObservation();
-		const { nodesCount, content, height, width } = await page.$$eval( ACTIVE_SIDEBAR_TAB_SELECTOR, ( nodes ) => {
-			const firstNode = nodes[ 0 ];
-			return {
-				nodesCount: nodes.length,
-				content: firstNode.innerText,
-				height: firstNode.offsetHeight,
-				width: firstNode.offsetWidth,
-			};
-		} );
+		const { nodesCount, content, height, width } = await page.$$eval(
+			ACTIVE_SIDEBAR_TAB_SELECTOR,
+			( nodes ) => {
+				const firstNode = nodes[ 0 ];
+				return {
+					nodesCount: nodes.length,
+					content: firstNode.innerText,
+					height: firstNode.offsetHeight,
+					width: firstNode.offsetWidth,
+				};
+			}
+		);
 
 		// should have only one active sidebar tab.
 		expect( nodesCount ).toBe( 1 );
@@ -84,8 +87,7 @@ describe( 'Sidebar', () => {
 
 		await setBrowserViewport( 'large' );
 
-		const sidebarsDesktop = await page.$$( SIDEBAR_SELECTOR );
-		expect( sidebarsDesktop ).toHaveLength( 1 );
+		await page.waitForSelector( SIDEBAR_SELECTOR );
 	} );
 
 	it( 'should preserve tab order while changing active tab', async () => {
@@ -97,36 +99,41 @@ describe( 'Sidebar', () => {
 		await pressKeyWithModifier( 'ctrl', '`' );
 		await pressKeyWithModifier( 'ctrl', '`' );
 
-		// Tab lands at first (presumed selected) option "Document".
+		// Tab lands at first (presumed selected) option "Post".
 		await page.keyboard.press( 'Tab' );
-		const isActiveDocumentTab = await page.evaluate( () => (
-			document.activeElement.textContent === 'Document' &&
-			document.activeElement.classList.contains( 'is-active' )
-		) );
+		const isActiveDocumentTab = await page.evaluate(
+			() =>
+				document.activeElement.textContent === 'Post' &&
+				document.activeElement.classList.contains( 'is-active' )
+		);
 		expect( isActiveDocumentTab ).toBe( true );
 
 		// Tab into and activate "Block".
 		await page.keyboard.press( 'Tab' );
 		await page.keyboard.press( 'Space' );
-		const isActiveBlockTab = await page.evaluate( () => (
-			document.activeElement.textContent === 'Block' &&
-			document.activeElement.classList.contains( 'is-active' )
-		) );
+		const isActiveBlockTab = await page.evaluate(
+			() =>
+				document.activeElement.textContent === 'Block' &&
+				document.activeElement.classList.contains( 'is-active' )
+		);
 		expect( isActiveBlockTab ).toBe( true );
 	} );
 
 	it( 'should be possible to programmatically remove Document Settings panels', async () => {
 		await createNewPost();
 		await enableFocusLossObservation();
-
 		await openDocumentSettingsSidebar();
 
 		expect( await findSidebarPanelWithTitle( 'Categories' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Tags' ) ).toBeDefined();
-		expect( await findSidebarPanelWithTitle( 'Featured image' ) ).toBeDefined();
+		expect(
+			await findSidebarPanelWithTitle( 'Featured image' )
+		).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeDefined();
 		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeDefined();
-		expect( await findSidebarPanelWithTitle( 'Status & visibility' ) ).toBeDefined();
+		expect(
+			await findSidebarPanelWithTitle( 'Status & visibility' )
+		).toBeDefined();
 
 		await page.evaluate( () => {
 			const { removeEditorPanel } = wp.data.dispatch( 'core/edit-post' );
@@ -139,11 +146,27 @@ describe( 'Sidebar', () => {
 			removeEditorPanel( 'post-status' );
 		} );
 
-		expect( await findSidebarPanelWithTitle( 'Categories' ) ).toBeUndefined();
-		expect( await findSidebarPanelWithTitle( 'Tags' ) ).toBeUndefined();
-		expect( await findSidebarPanelWithTitle( 'Featured image' ) ).toBeUndefined();
-		expect( await findSidebarPanelWithTitle( 'Excerpt' ) ).toBeUndefined();
-		expect( await findSidebarPanelWithTitle( 'Discussion' ) ).toBeUndefined();
-		expect( await findSidebarPanelWithTitle( 'Status & visibility' ) ).toBeUndefined();
+		const getPanelToggleSelector = ( panelTitle ) => {
+			return `//div[contains(@class, "edit-post-sidebar")]//button[contains(@class, "components-panel__body-toggle") and contains(text(),"${ panelTitle }")]`;
+		};
+
+		expect(
+			await page.$x( getPanelToggleSelector( 'Categories' ) )
+		).toEqual( [] );
+		expect( await page.$x( getPanelToggleSelector( 'Tags' ) ) ).toEqual(
+			[]
+		);
+		expect(
+			await page.$x( getPanelToggleSelector( 'Featured image' ) )
+		).toEqual( [] );
+		expect( await page.$x( getPanelToggleSelector( 'Excerpt' ) ) ).toEqual(
+			[]
+		);
+		expect(
+			await page.$x( getPanelToggleSelector( 'Discussion' ) )
+		).toEqual( [] );
+		expect(
+			await page.$x( getPanelToggleSelector( 'Status & visibility' ) )
+		).toEqual( [] );
 	} );
 } );

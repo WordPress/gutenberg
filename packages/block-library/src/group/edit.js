@@ -1,71 +1,86 @@
 /**
- * External dependencies
- */
-import classnames from 'classnames';
-
-/**
  * WordPress dependencies
  */
-import { withSelect } from '@wordpress/data';
-import { compose } from '@wordpress/compose';
-import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 import {
-	InspectorControls,
 	InnerBlocks,
-	PanelColorSettings,
-	withColors,
+	useBlockProps,
+	InspectorAdvancedControls,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	useSetting,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
+import { SelectControl } from '@wordpress/components';
+import { __ } from '@wordpress/i18n';
 
-function GroupEdit( {
-	className,
-	setBackgroundColor,
-	backgroundColor,
-	hasInnerBlocks,
-} ) {
-	const styles = {
-		backgroundColor: backgroundColor.color,
-	};
-
-	const classes = classnames( className, backgroundColor.class, {
-		'has-background': !! backgroundColor.color,
-	} );
+function GroupEdit( { attributes, setAttributes, clientId } ) {
+	const { hasInnerBlocks, themeSupportsLayout } = useSelect(
+		( select ) => {
+			const { getBlock, getSettings } = select( blockEditorStore );
+			const block = getBlock( clientId );
+			return {
+				hasInnerBlocks: !! ( block && block.innerBlocks.length ),
+				themeSupportsLayout: getSettings()?.supportsLayout,
+			};
+		},
+		[ clientId ]
+	);
+	const defaultLayout = useSetting( 'layout' ) || {};
+	const { tagName: TagName = 'div', templateLock, layout = {} } = attributes;
+	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const { contentSize, wideSize } = usedLayout;
+	const alignments =
+		contentSize || wideSize
+			? [ 'wide', 'full' ]
+			: [ 'left', 'center', 'right' ];
+	const blockProps = useBlockProps();
+	const innerBlocksProps = useInnerBlocksProps(
+		themeSupportsLayout
+			? blockProps
+			: { className: 'wp-block-group__inner-container' },
+		{
+			templateLock,
+			renderAppender: hasInnerBlocks
+				? undefined
+				: InnerBlocks.ButtonBlockAppender,
+			__experimentalLayout: {
+				type: 'default',
+				// Find a way to inject this in the support flag code (hooks).
+				alignments: themeSupportsLayout ? alignments : undefined,
+			},
+		}
+	);
 
 	return (
 		<>
-			<InspectorControls>
-				<PanelColorSettings
-					title={ __( 'Color Settings' ) }
-					colorSettings={ [
-						{
-							value: backgroundColor.color,
-							onChange: setBackgroundColor,
-							label: __( 'Background Color' ),
-						},
+			<InspectorAdvancedControls>
+				<SelectControl
+					label={ __( 'HTML element' ) }
+					options={ [
+						{ label: __( 'Default (<div>)' ), value: 'div' },
+						{ label: '<header>', value: 'header' },
+						{ label: '<main>', value: 'main' },
+						{ label: '<section>', value: 'section' },
+						{ label: '<article>', value: 'article' },
+						{ label: '<aside>', value: 'aside' },
+						{ label: '<footer>', value: 'footer' },
 					] }
+					value={ TagName }
+					onChange={ ( value ) =>
+						setAttributes( { tagName: value } )
+					}
 				/>
-			</InspectorControls>
-			<div className={ classes } style={ styles }>
-				<div className="wp-block-group__inner-container">
-					<InnerBlocks
-						renderAppender={ ! hasInnerBlocks && InnerBlocks.ButtonBlockAppender }
-					/>
-				</div>
-			</div>
+			</InspectorAdvancedControls>
+			{ themeSupportsLayout && <TagName { ...innerBlocksProps } /> }
+			{ /* Ideally this is not needed but it's there for backward compatibility reason
+				to keep this div for themes that might rely on its presence */ }
+			{ ! themeSupportsLayout && (
+				<TagName { ...blockProps }>
+					<div { ...innerBlocksProps } />
+				</TagName>
+			) }
 		</>
 	);
 }
 
-export default compose( [
-	withColors( 'backgroundColor' ),
-	withSelect( ( select, { clientId } ) => {
-		const {
-			getBlock,
-		} = select( 'core/block-editor' );
-
-		const block = getBlock( clientId );
-
-		return {
-			hasInnerBlocks: !! ( block && block.innerBlocks.length ),
-		};
-	} ),
-] )( GroupEdit );
+export default GroupEdit;

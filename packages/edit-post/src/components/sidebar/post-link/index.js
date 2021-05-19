@@ -14,6 +14,11 @@ import { cleanForSlug } from '@wordpress/editor';
 import { safeDecodeURIComponent } from '@wordpress/url';
 
 /**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
+/**
  * Module Constants
  */
 const PANEL_NAME = 'post-link';
@@ -23,27 +28,30 @@ function PostLink( {
 	onTogglePanel,
 	isEditable,
 	postLink,
-	permalinkParts,
+	permalinkPrefix,
+	permalinkSuffix,
 	editPermalink,
 	forceEmptyField,
 	setState,
-	postTitle,
 	postSlug,
-	postID,
 	postTypeLabel,
 } ) {
-	const { prefix, suffix } = permalinkParts;
 	let prefixElement, postNameElement, suffixElement;
-	const currentSlug = safeDecodeURIComponent( postSlug ) || cleanForSlug( postTitle ) || postID;
 	if ( isEditable ) {
-		prefixElement = prefix && (
-			<span className="edit-post-post-link__link-prefix">{ prefix }</span>
+		prefixElement = permalinkPrefix && (
+			<span className="edit-post-post-link__link-prefix">
+				{ permalinkPrefix }
+			</span>
 		);
-		postNameElement = currentSlug && (
-			<span className="edit-post-post-link__link-post-name">{ currentSlug }</span>
+		postNameElement = postSlug && (
+			<span className="edit-post-post-link__link-post-name">
+				{ postSlug }
+			</span>
 		);
-		suffixElement = suffix && (
-			<span className="edit-post-post-link__link-suffix">{ suffix }</span>
+		suffixElement = permalinkSuffix && (
+			<span className="edit-post-post-link__link-suffix">
+				{ permalinkSuffix }
+			</span>
 		);
 	}
 
@@ -57,7 +65,7 @@ function PostLink( {
 				<div className="editor-post-link">
 					<TextControl
 						label={ __( 'URL Slug' ) }
-						value={ forceEmptyField ? '' : currentSlug }
+						value={ forceEmptyField ? '' : postSlug }
 						onChange={ ( newValue ) => {
 							editPermalink( newValue );
 							// When we delete the field the permalink gets
@@ -88,29 +96,31 @@ function PostLink( {
 						} }
 					/>
 					<p>
-						{ __( 'The last part of the URL.' ) }
-						{ ' ' }
+						{ __( 'The last part of the URL.' ) }{ ' ' }
 						<ExternalLink href="https://wordpress.org/support/article/writing-posts/#post-field-descriptions">
 							{ __( 'Read about permalinks' ) }
 						</ExternalLink>
 					</p>
 				</div>
 			) }
-			<p className="edit-post-post-link__preview-label">
+			<h3 className="edit-post-post-link__preview-label">
 				{ postTypeLabel || __( 'View post' ) }
-			</p>
+			</h3>
 			<div className="edit-post-post-link__preview-link-container">
 				<ExternalLink
 					className="edit-post-post-link__link"
 					href={ postLink }
 					target="_blank"
 				>
-					{ isEditable ?
-						( <>
-							{ prefixElement }{ postNameElement }{ suffixElement }
-						</> ) :
+					{ isEditable ? (
+						<>
+							{ prefixElement }
+							{ postNameElement }
+							{ suffixElement }
+						</>
+					) : (
 						postLink
-					}
+					) }
 				</ExternalLink>
 			</div>
 		</PanelBody>
@@ -120,46 +130,43 @@ function PostLink( {
 export default compose( [
 	withSelect( ( select ) => {
 		const {
-			isEditedPostNew,
 			isPermalinkEditable,
 			getCurrentPost,
 			isCurrentPostPublished,
 			getPermalinkParts,
 			getEditedPostAttribute,
+			getEditedPostSlug,
 		} = select( 'core/editor' );
-		const {
-			isEditorPanelEnabled,
-			isEditorPanelOpened,
-		} = select( 'core/edit-post' );
-		const {
-			getPostType,
-		} = select( 'core' );
+		const { isEditorPanelEnabled, isEditorPanelOpened } = select(
+			editPostStore
+		);
+		const { getPostType } = select( 'core' );
 
-		const { link, id } = getCurrentPost();
+		const { link } = getCurrentPost();
 
 		const postTypeName = getEditedPostAttribute( 'type' );
 		const postType = getPostType( postTypeName );
+		const permalinkParts = getPermalinkParts();
 
 		return {
-			isNew: isEditedPostNew(),
 			postLink: link,
 			isEditable: isPermalinkEditable(),
 			isPublished: isCurrentPostPublished(),
 			isOpened: isEditorPanelOpened( PANEL_NAME ),
-			permalinkParts: getPermalinkParts(),
 			isEnabled: isEditorPanelEnabled( PANEL_NAME ),
 			isViewable: get( postType, [ 'viewable' ], false ),
-			postTitle: getEditedPostAttribute( 'title' ),
-			postSlug: getEditedPostAttribute( 'slug' ),
-			postID: id,
+			postSlug: safeDecodeURIComponent( getEditedPostSlug() ),
 			postTypeLabel: get( postType, [ 'labels', 'view_item' ] ),
+			hasPermalinkParts: !! permalinkParts,
+			permalinkPrefix: permalinkParts?.prefix,
+			permalinkSuffix: permalinkParts?.suffix,
 		};
 	} ),
-	ifCondition( ( { isEnabled, isNew, postLink, isViewable, permalinkParts } ) => {
-		return isEnabled && ! isNew && postLink && isViewable && permalinkParts;
+	ifCondition( ( { isEnabled, postLink, isViewable, hasPermalinkParts } ) => {
+		return isEnabled && postLink && isViewable && hasPermalinkParts;
 	} ),
 	withDispatch( ( dispatch ) => {
-		const { toggleEditorPanelOpened } = dispatch( 'core/edit-post' );
+		const { toggleEditorPanelOpened } = dispatch( editPostStore );
 		const { editPost } = dispatch( 'core/editor' );
 		return {
 			onTogglePanel: () => toggleEditorPanelOpened( PANEL_NAME ),

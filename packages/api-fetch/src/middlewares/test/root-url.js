@@ -14,7 +14,9 @@ describe( 'Root URL middleware', () => {
 			path: '/wp/v2/posts',
 		};
 		const callback = ( options ) => {
-			expect( options.url ).toBe( 'http://wp.org/wp-admin/rest/wp/v2/posts' );
+			expect( options.url ).toBe(
+				'http://wp.org/wp-admin/rest/wp/v2/posts'
+			);
 		};
 
 		rootURLMiddleware( requestOptions, callback );

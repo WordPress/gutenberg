@@ -6,9 +6,7 @@ import { count } from '../';
 
 const mockData = {
 	l10n: {
-		shortcodes: [
-			'shortcode',
-		],
+		shortcodes: [ 'shortcode' ],
 	},
 };
 
@@ -45,9 +43,16 @@ describe( 'WordCounter', () => {
 		{
 			message: 'Punctuation.',
 			string: 'It’s two three \u2026 4?',
-			words: 3,
+			words: 4,
 			characters_excluding_spaces: 15,
 			characters_including_spaces: 19,
+		},
+		{
+			message: 'Numbers as word',
+			string: 'Should be 4 words',
+			words: 4,
+			characters_excluding_spaces: 14,
+			characters_including_spaces: 17,
 		},
 		{
 			message: 'Em dash.',
@@ -100,7 +105,11 @@ describe( 'WordCounter', () => {
 		},
 	];
 
-	const types = [ 'words', 'characters_excluding_spaces', 'characters_including_spaces' ];
+	const types = [
+		'words',
+		'characters_excluding_spaces',
+		'characters_including_spaces',
+	];
 
 	dataProvider.forEach( ( item ) => {
 		types.forEach( ( type ) => {
@@ -111,4 +120,3 @@ describe( 'WordCounter', () => {
 		} );
 	} );
 } );
-

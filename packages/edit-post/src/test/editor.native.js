@@ -1,7 +1,6 @@
 /**
  * External dependencies
  */
-import RNReactNativeGutenbergBridge from 'react-native-gutenberg-bridge';
 import { mount } from 'enzyme';
 import { act } from 'react-dom/test-utils';
 
@@ -9,6 +8,7 @@ import { act } from 'react-dom/test-utils';
  * WordPress dependencies
  */
 import { registerCoreBlocks } from '@wordpress/block-library';
+import RNReactNativeGutenbergBridge from '@wordpress/react-native-bridge';
 // Force register 'core/editor' store.
 import { store } from '@wordpress/editor'; // eslint-disable-line no-unused-vars
 
@@ -40,8 +40,12 @@ describe( 'Editor', () => {
 		} );
 		appContainer.unmount();
 
-		expect( RNReactNativeGutenbergBridge.editorDidMount ).toHaveBeenCalledTimes( 1 );
-		expect( RNReactNativeGutenbergBridge.editorDidMount ).toHaveBeenCalledWith( [ 'core/notablock' ] );
+		expect(
+			RNReactNativeGutenbergBridge.editorDidMount
+		).toHaveBeenCalledTimes( 1 );
+		expect(
+			RNReactNativeGutenbergBridge.editorDidMount
+		).toHaveBeenCalledWith( [ 'core/notablock' ] );
 	} );
 } );
 
@@ -53,6 +57,7 @@ const renderEditorWith = ( content ) => {
 			initialHtmlModeEnabled={ false }
 			initialTitle={ '' }
 			postType="post"
+			postId="1"
 		/>
 	);
 };

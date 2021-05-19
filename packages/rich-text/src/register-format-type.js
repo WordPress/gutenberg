@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { select, dispatch } from '@wordpress/data';
-
+/**
+ * Internal dependencies
+ */
+import { store as richTextStore } from './store';
 /**
  * @typedef {Object} WPFormat
  *
@@ -23,8 +26,8 @@ import { select, dispatch } from '@wordpress/data';
  * @param {string}   name                 Format name.
  * @param {WPFormat} settings             Format settings.
  *
- * @return {WPFormat|undefined} The format, if it has been successfully registered;
- *                              otherwise `undefined`.
+ * @return {WPFormat|undefined} The format, if it has been successfully
+ *                              registered; otherwise `undefined`.
  */
 export function registerFormatType( name, settings ) {
 	settings = {
@@ -33,9 +36,7 @@ export function registerFormatType( name, settings ) {
 	};
 
 	if ( typeof settings.name !== 'string' ) {
-		window.console.error(
-			'Format names must be strings.'
-		);
+		window.console.error( 'Format names must be strings.' );
 		return;
 	}
 
@@ -46,25 +47,21 @@ export function registerFormatType( name, settings ) {
 		return;
 	}
 
-	if ( select( 'core/rich-text' ).getFormatType( settings.name ) ) {
+	if ( select( richTextStore ).getFormatType( settings.name ) ) {
 		window.console.error(
 			'Format "' + settings.name + '" is already registered.'
 		);
 		return;
 	}
 
-	if (
-		typeof settings.tagName !== 'string' ||
-		settings.tagName === ''
-	) {
-		window.console.error(
-			'Format tag names must be a string.'
-		);
+	if ( typeof settings.tagName !== 'string' || settings.tagName === '' ) {
+		window.console.error( 'Format tag names must be a string.' );
 		return;
 	}
 
 	if (
-		( typeof settings.className !== 'string' || settings.className === '' ) &&
+		( typeof settings.className !== 'string' ||
+			settings.className === '' ) &&
 		settings.className !== null
 	) {
 		window.console.error(
@@ -81,8 +78,9 @@ export function registerFormatType( name, settings ) {
 	}
 
 	if ( settings.className === null ) {
-		const formatTypeForBareElement = select( 'core/rich-text' )
-			.getFormatTypeForBareElement( settings.tagName );
+		const formatTypeForBareElement = select(
+			richTextStore
+		).getFormatTypeForBareElement( settings.tagName );
 
 		if ( formatTypeForBareElement ) {
 			window.console.error(
@@ -91,8 +89,9 @@ export function registerFormatType( name, settings ) {
 			return;
 		}
 	} else {
-		const formatTypeForClassName = select( 'core/rich-text' )
-			.getFormatTypeForClassName( settings.className );
+		const formatTypeForClassName = select(
+			richTextStore
+		).getFormatTypeForClassName( settings.className );
 
 		if ( formatTypeForClassName ) {
 			window.console.error(
@@ -111,19 +110,19 @@ export function registerFormatType( name, settings ) {
 
 	if ( 'keywords' in settings && settings.keywords.length > 3 ) {
 		window.console.error(
-			'The format "' + settings.name + '" can have a maximum of 3 keywords.'
+			'The format "' +
+				settings.name +
+				'" can have a maximum of 3 keywords.'
 		);
 		return;
 	}
 
 	if ( typeof settings.title !== 'string' ) {
-		window.console.error(
-			'Format titles must be strings.'
-		);
+		window.console.error( 'Format titles must be strings.' );
 		return;
 	}
 
-	dispatch( 'core/rich-text' ).addFormatTypes( settings );
+	dispatch( richTextStore ).addFormatTypes( settings );
 
 	return settings;
 }

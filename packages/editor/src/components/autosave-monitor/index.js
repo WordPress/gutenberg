@@ -5,64 +5,74 @@ import { Component } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { withSelect, withDispatch } from '@wordpress/data';
 
+/**
+ * AutosaveMonitor invokes `props.autosave()` within at most `interval` seconds after an unsaved change is detected.
+ *
+ * The logic is straightforward: a check is performed every `props.interval` seconds. If any changes are detected, `props.autosave()` is called.
+ * The time between the change and the autosave varies but is no larger than `props.interval` seconds. Refer to the code below for more details, such as
+ * the specific way of detecting changes.
+ *
+ * There are two caveats:
+ * * If `props.isAutosaveable` happens to be false at a time of checking for changes, the check is retried every second.
+ * * The timer may be disabled by setting `props.disableIntervalChecks` to `true`. In that mode, any change will immediately trigger `props.autosave()`.
+ */
 export class AutosaveMonitor extends Component {
+	constructor( props ) {
+		super( props );
+		this.needsAutosave = !! ( props.isDirty && props.isAutosaveable );
+	}
+
+	componentDidMount() {
+		if ( ! this.props.disableIntervalChecks ) {
+			this.setAutosaveTimer();
+		}
+	}
+
 	componentDidUpdate( prevProps ) {
-		const { isDirty, editsReference, isAutosaveable, isAutosaving } = this.props;
-
-		// The edits reference is held for comparison to avoid scheduling an
-		// autosave if an edit has not been made since the last autosave
-		// completion. This is assigned when the autosave completes, and reset
-		// when an edit occurs.
-		//
-		// See: https://github.com/WordPress/gutenberg/issues/12318
-
-		if ( editsReference !== prevProps.editsReference ) {
-			this.didAutosaveForEditsReference = false;
+		if ( this.props.disableIntervalChecks ) {
+			if ( this.props.editsReference !== prevProps.editsReference ) {
+				this.props.autosave();
+			}
+			return;
 		}
 
-		if ( ! isAutosaving && prevProps.isAutosaving ) {
-			this.didAutosaveForEditsReference = true;
+		if ( ! this.props.isDirty ) {
+			this.needsAutosave = false;
+			return;
 		}
 
-		if (
-			prevProps.isDirty !== isDirty ||
-			prevProps.isAutosaveable !== isAutosaveable ||
-			prevProps.editsReference !== editsReference
-		) {
-			this.toggleTimer(
-				isDirty &&
-				isAutosaveable &&
-				! this.didAutosaveForEditsReference
-			);
+		if ( this.props.isAutosaving && ! prevProps.isAutosaving ) {
+			this.needsAutosave = false;
+			return;
+		}
+
+		if ( this.props.editsReference !== prevProps.editsReference ) {
+			this.needsAutosave = true;
 		}
 	}
 
 	componentWillUnmount() {
-		this.toggleTimer( false );
+		clearTimeout( this.timerId );
 	}
 
-	toggleTimer( isPendingSave ) {
-		const { interval, shouldThrottle = false } = this.props;
+	setAutosaveTimer( timeout = this.props.interval * 1000 ) {
+		this.timerId = setTimeout( () => {
+			this.autosaveTimerHandler();
+		}, timeout );
+	}
 
-		// By default, AutosaveMonitor will wait for a pause in editing before
-		// autosaving. In other words, its action is "debounced".
-		//
-		// The `shouldThrottle` props allows overriding this behaviour, thus
-		// making the autosave action "throttled".
-		if ( ! shouldThrottle && this.pendingSave ) {
-			clearTimeout( this.pendingSave );
-			delete this.pendingSave;
+	autosaveTimerHandler() {
+		if ( ! this.props.isAutosaveable ) {
+			this.setAutosaveTimer( 1000 );
+			return;
 		}
 
-		if ( isPendingSave && ! ( shouldThrottle && this.pendingSave ) ) {
-			this.pendingSave = setTimeout(
-				() => {
-					this.props.autosave();
-					delete this.pendingSave;
-				},
-				interval * 1000
-			);
+		if ( this.needsAutosave ) {
+			this.needsAutosave = false;
+			this.props.autosave();
 		}
+
+		this.setAutosaveTimer();
 	}
 
 	render() {
@@ -72,9 +82,7 @@ export class AutosaveMonitor extends Component {
 
 export default compose( [
 	withSelect( ( select, ownProps ) => {
-		const {
-			getReferenceByDistinctEdits,
-		} = select( 'core' );
+		const { getReferenceByDistinctEdits } = select( 'core' );
 
 		const {
 			isEditedPostDirty,
@@ -86,9 +94,9 @@ export default compose( [
 		const { interval = getEditorSettings().autosaveInterval } = ownProps;
 
 		return {
+			editsReference: getReferenceByDistinctEdits(),
 			isDirty: isEditedPostDirty(),
 			isAutosaveable: isEditedPostAutosaveable(),
-			editsReference: getReferenceByDistinctEdits(),
 			isAutosaving: isAutosavingPost(),
 			interval,
 		};

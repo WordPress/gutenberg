@@ -1,49 +1,40 @@
 /**
  * WordPress dependencies
  */
-import {
-	useState,
-} from '@wordpress/element';
-import {
-	Button,
-	SVG,
-	Path,
-	Modal,
-} from '@wordpress/components';
+import { useState } from '@wordpress/element';
+import { ToolbarButton, Modal } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { listView } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import BlockNavigationList from './block-navigation-list';
 
-const NavigatorIcon = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
-		<Path d="M5 5H3v2h2V5zm3 8h11v-2H8v2zm9-8H6v2h11V5zM7 11H5v2h2v-2zm0 8h2v-2H7v2zm3-2v2h11v-2H10z" />
-	</SVG>
-);
-
-export default function useBlockNavigator( clientId ) {
+export default function useBlockNavigator( clientId, __experimentalFeatures ) {
 	const [ isNavigationListOpen, setIsNavigationListOpen ] = useState( false );
 
 	const navigatorToolbarButton = (
-		<Button
+		<ToolbarButton
 			className="components-toolbar__control"
-			label={ __( 'Open block navigator' ) }
+			label={ __( 'Open block navigation' ) }
 			onClick={ () => setIsNavigationListOpen( true ) }
-			icon={ NavigatorIcon }
+			icon={ listView }
 		/>
 	);
 
 	const navigatorModal = isNavigationListOpen && (
 		<Modal
-			title={ __( 'Block Navigator' ) }
+			title={ __( 'Navigation' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ () => {
 				setIsNavigationListOpen( false );
 			} }
 		>
-			<BlockNavigationList clientId={ clientId } />
+			<BlockNavigationList
+				clientId={ clientId }
+				__experimentalFeatures={ __experimentalFeatures }
+			/>
 		</Modal>
 	);
 

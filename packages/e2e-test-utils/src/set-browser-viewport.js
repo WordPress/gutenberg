@@ -43,9 +43,10 @@ const PREDEFINED_DIMENSIONS = {
  * @param {WPViewport} viewport Viewport name or dimensions object to assign.
  */
 export async function setBrowserViewport( viewport ) {
-	const dimensions = typeof viewport === 'string' ?
-		PREDEFINED_DIMENSIONS[ viewport ] :
-		viewport;
+	const dimensions =
+		typeof viewport === 'string'
+			? PREDEFINED_DIMENSIONS[ viewport ]
+			: viewport;
 
 	await page.setViewport( dimensions );
 	await waitForWindowDimensions( dimensions.width, dimensions.height );

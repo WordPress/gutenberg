@@ -12,19 +12,23 @@ import { withPreferredColorScheme } from '@wordpress/compose';
 import WebPreformattedEdit from './edit.js';
 import styles from './styles.scss';
 
-function PreformattedEdit( props ) {
+export function PreformattedEdit( props ) {
 	const { getStylesFromColorScheme } = props;
-	const richTextStyle = getStylesFromColorScheme( styles.wpRichTextLight, styles.wpRichTextDark );
-	const wpBlockPreformatted = getStylesFromColorScheme( styles.wpBlockPreformattedLight, styles.wpBlockPreformattedDark );
+	const richTextStyle = getStylesFromColorScheme(
+		styles.wpRichTextLight,
+		styles.wpRichTextDark
+	);
+	const wpBlockPreformatted = getStylesFromColorScheme(
+		styles.wpBlockPreformattedLight,
+		styles.wpBlockPreformattedDark
+	);
 	const propsWithStyle = {
 		...props,
 		style: richTextStyle,
 	};
 	return (
-		<View style={ wpBlockPreformatted } >
-			<WebPreformattedEdit
-				{ ...propsWithStyle }
-			/>
+		<View style={ wpBlockPreformatted }>
+			<WebPreformattedEdit { ...propsWithStyle } />
 		</View>
 	);
 }

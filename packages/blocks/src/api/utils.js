@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { every, has, isFunction, isString } from 'lodash';
+import { every, has, isFunction, isString, reduce } from 'lodash';
 import { default as tinycolor, mostReadable } from 'tinycolor2';
 
 /**
@@ -9,7 +9,7 @@ import { default as tinycolor, mostReadable } from 'tinycolor2';
  */
 import { Component, isValidElement } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import { stripHTML } from '@wordpress/dom';
+import { __unstableStripHTML as stripHTML } from '@wordpress/dom';
 
 /**
  * Internal dependencies
@@ -52,8 +52,10 @@ export function isUnmodifiedDefaultBlock( block ) {
 	const newDefaultBlock = isUnmodifiedDefaultBlock.block;
 	const blockType = getBlockType( defaultBlockName );
 
-	return every( blockType.attributes, ( value, key ) =>
-		newDefaultBlock.attributes[ key ] === block.attributes[ key ]
+	return every(
+		blockType.attributes,
+		( value, key ) =>
+			newDefaultBlock.attributes[ key ] === block.attributes[ key ]
 	);
 }
 
@@ -66,11 +68,12 @@ export function isUnmodifiedDefaultBlock( block ) {
  */
 
 export function isValidIcon( icon ) {
-	return !! icon && (
-		isString( icon ) ||
-		isValidElement( icon ) ||
-		isFunction( icon ) ||
-		icon instanceof Component
+	return (
+		!! icon &&
+		( isString( icon ) ||
+			isValidElement( icon ) ||
+			isFunction( icon ) ||
+			icon instanceof Component )
 	);
 }
 
@@ -95,11 +98,13 @@ export function normalizeIconObject( icon ) {
 
 		return {
 			...icon,
-			foreground: icon.foreground ? icon.foreground : mostReadable(
-				tinyBgColor,
-				ICON_COLORS,
-				{ includeFallbackColors: true, level: 'AA', size: 'large' }
-			).toHexString(),
+			foreground: icon.foreground
+				? icon.foreground
+				: mostReadable( tinyBgColor, ICON_COLORS, {
+						includeFallbackColors: true,
+						level: 'AA',
+						size: 'large',
+				  } ).toHexString(),
 			shadowColor: tinyBgColor.setAlpha( 0.3 ).toRgbString(),
 		};
 	}
@@ -135,10 +140,7 @@ export function normalizeBlockType( blockTypeOrName ) {
  * @return {string} The block label.
  */
 export function getBlockLabel( blockType, attributes, context = 'visual' ) {
-	const {
-		__experimentalLabel: getLabel,
-		title,
-	} = blockType;
+	const { __experimentalLabel: getLabel, title } = blockType;
 
 	const label = getLabel && getLabel( attributes, { context } );
 
@@ -162,7 +164,12 @@ export function getBlockLabel( blockType, attributes, context = 'visual' ) {
  *
  * @return {string} The block label.
  */
-export function getAccessibleBlockLabel( blockType, attributes, position, direction = 'vertical' ) {
+export function getAccessibleBlockLabel(
+	blockType,
+	attributes,
+	position,
+	direction = 'vertical'
+) {
 	// `title` is already localized, `label` is a user-supplied value.
 	const { title } = blockType;
 	const label = getBlockLabel( blockType, attributes, 'accessibility' );
@@ -177,7 +184,7 @@ export function getAccessibleBlockLabel( blockType, attributes, position, direct
 	if ( hasPosition && direction === 'vertical' ) {
 		if ( hasLabel ) {
 			return sprintf(
-				/* translators: accessibility text. %1: The block title, %2: The block row number, %3: The block label.. */
+				/* translators: accessibility text. 1: The block title. 2: The block row number. 3: The block label.. */
 				__( '%1$s Block. Row %2$d. %3$s' ),
 				title,
 				position,
@@ -186,15 +193,15 @@ export function getAccessibleBlockLabel( blockType, attributes, position, direct
 		}
 
 		return sprintf(
-			/* translators: accessibility text. %s: The block title, %d The block row number. */
-			__( '%s Block. Row %d' ),
+			/* translators: accessibility text. 1: The block title. 2: The block row number. */
+			__( '%1$s Block. Row %2$d' ),
 			title,
-			position,
+			position
 		);
 	} else if ( hasPosition && direction === 'horizontal' ) {
 		if ( hasLabel ) {
 			return sprintf(
-				/* translators: accessibility text. %1: The block title, %2: The block column number, %3: The block label.. */
+				/* translators: accessibility text. 1: The block title. 2: The block column number. 3: The block label.. */
 				__( '%1$s Block. Column %2$d. %3$s' ),
 				title,
 				position,
@@ -203,10 +210,10 @@ export function getAccessibleBlockLabel( blockType, attributes, position, direct
 		}
 
 		return sprintf(
-			/* translators: accessibility text. %s: The block title, %d The block column number. */
-			__( '%s Block. Column %d' ),
+			/* translators: accessibility text. 1: The block title. 2: The block column number. */
+			__( '%1$s Block. Column %2$d' ),
 			title,
-			position,
+			position
 		);
 	}
 
@@ -223,5 +230,67 @@ export function getAccessibleBlockLabel( blockType, attributes, position, direct
 		/* translators: accessibility text. %s: The block title. */
 		__( '%s Block' ),
 		title
+	);
+}
+
+/**
+ * Ensure attributes contains only values defined by block type, and merge
+ * default values for missing attributes.
+ *
+ * @param {string} name       The block's name.
+ * @param {Object} attributes The block's attributes.
+ * @return {Object} The sanitized attributes.
+ */
+export function __experimentalSanitizeBlockAttributes( name, attributes ) {
+	// Get the type definition associated with a registered block.
+	const blockType = getBlockType( name );
+
+	if ( undefined === blockType ) {
+		throw new Error( `Block type '${ name }' is not registered.` );
+	}
+
+	return reduce(
+		blockType.attributes,
+		( accumulator, schema, key ) => {
+			const value = attributes[ key ];
+
+			if ( undefined !== value ) {
+				accumulator[ key ] = value;
+			} else if ( schema.hasOwnProperty( 'default' ) ) {
+				accumulator[ key ] = schema.default;
+			}
+
+			if ( [ 'node', 'children' ].indexOf( schema.source ) !== -1 ) {
+				// Ensure value passed is always an array, which we're expecting in
+				// the RichText component to handle the deprecated value.
+				if ( typeof accumulator[ key ] === 'string' ) {
+					accumulator[ key ] = [ accumulator[ key ] ];
+				} else if ( ! Array.isArray( accumulator[ key ] ) ) {
+					accumulator[ key ] = [];
+				}
+			}
+
+			return accumulator;
+		},
+		{}
+	);
+}
+
+/**
+ * Filter block attributes by `role` and return their names.
+ *
+ * @param {string} name Block attribute's name.
+ * @param {string} role The role of a block attribute.
+ *
+ * @return {string[]} The attribute names that have the provided role.
+ */
+export function __experimentalGetBlockAttributesNamesByRole( name, role ) {
+	const attributes = getBlockType( name )?.attributes;
+	if ( ! attributes ) return [];
+	const attributesNames = Object.keys( attributes );
+	if ( ! role ) return attributesNames;
+	return attributesNames.filter(
+		( attributeName ) =>
+			attributes[ attributeName ]?.__experimentalRole === role
 	);
 }

@@ -1,18 +1,18 @@
 {
 	"name": "@wordpress/jest-preset-default",
-	"version": "5.3.1",
+	"version": "7.0.4",
 	"description": "Default Jest preset for WordPress development.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"jest",
-		"jest-preset",
 		"preset",
 		"react",
 		"enzyme"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/jest-preset-default/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/jest-preset-default/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -22,7 +22,7 @@
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
 	"engines": {
-		"node": ">=8"
+		"node": ">=12"
 	},
 	"files": [
 		"scripts",
@@ -31,15 +31,14 @@
 	],
 	"main": "index.js",
 	"dependencies": {
-		"@jest/reporters": "^24.8.0",
 		"@wordpress/jest-console": "file:../jest-console",
-		"babel-jest": "^24.7.1",
-		"enzyme": "^3.9.0",
-		"enzyme-adapter-react-16": "^1.10.0",
-		"enzyme-to-json": "^3.3.5"
+		"babel-jest": "^26.6.3",
+		"enzyme": "^3.11.0",
+		"enzyme-adapter-react-16": "^1.15.2",
+		"enzyme-to-json": "^3.4.4"
 	},
 	"peerDependencies": {
-		"jest": ">=24"
+		"jest": ">=26"
 	},
 	"publishConfig": {
 		"access": "public"

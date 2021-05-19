@@ -12,6 +12,7 @@
 	width: 36px;
 	margin: auto;
 	margin-top: 6px;
+	margin-bottom: 6px;
 	border-radius: 2px;
 }
 
@@ -25,12 +26,12 @@
 	background-color: $gray-70;
 }
 
-.emptyHeaderSpace {
-	height: 14;
+.emptyHeader {
+	margin-top: $grid-unit-20 / 2;
 }
 
 .background {
-	background-color: $white;
+	background-color: $modal-background;
 	border-top-right-radius: 8px;
 	border-top-left-radius: 8px;
 	width: 100%;
@@ -39,34 +40,21 @@
 }
 
 .backgroundDark {
-	background-color: $background-dark-elevated;
+	background-color: $modal-background-dark;
+}
+
+.backgroundFullScreen {
+	border-top-right-radius: 0;
+	border-top-left-radius: 0;
+	padding-top: 8;
 }
 
 .content {
 	padding: 0 16px 0 16px;
 }
 
-.head {
-	flex-direction: row;
-	width: 100%;
-	margin-bottom: 5px;
-	justify-content: space-between;
-	align-items: center;
-	align-content: center;
-	min-height: 48;
-}
-
-.title {
-	color: $dark-gray-600;
-	font-size: 18px;
-	font-weight: 600;
-	text-align: center;
-}
-
-.titleContainer {
-	justify-content: center;
-	flex: 2;
-	align-content: center;
+.scrollableContent {
+	padding-bottom: 20px;
 }
 
 // Button
@@ -91,6 +79,7 @@
 	flex-direction: row;
 	min-height: 48;
 	align-items: center;
+	justify-content: space-between;
 }
 
 .clipToBounds {
@@ -110,36 +99,33 @@
 .cellRowContainer {
 	flex-direction: row;
 	align-items: center;
-	flex-shrink: 1;
-}
-
-.cellIcon {
-	padding-right: 0;
+	flex-shrink: 0;
 }
 
 .cellLabel {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	margin-right: 12px;
+	flex-shrink: 1;
 }
 
 .cellLabelCentered {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	flex: 1;
 	text-align: center;
 }
 
 .cellLabelLeftAlignNoIcon {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	flex: 1;
-	margin-left: 12px;
+	margin-left: 0;
 }
 
 .cellValue {
 	font-size: 17px;
-	color: #2e4453;
+	color: $gray-dark;
 	text-align: right;
 	flex: 1;
 }
@@ -158,4 +144,152 @@
 
 .iconDark {
 	color: #c3c4c7;
+}
+
+// Footer Message Cell
+
+.footerMessageCell {
+	font-size: 12px;
+	color: $gray;
+	flex: 1;
+}
+
+// Color Cell
+
+.colorCircle {
+	width: 2 * $grid-unit-20;
+	height: 2 * $grid-unit-20;
+	border-radius: $grid-unit-20;
+}
+
+// Radio Cell
+
+.selectedIcon {
+	color: $blue-50;
+}
+
+.selectedIconDark {
+	color: $blue-30;
+}
+
+// Range Text Input
+
+.verticalBorder {
+	border-right-width: 1px;
+	text-align: center;
+	border-color: $light-gray-400;
+}
+
+.verticalBorderDark {
+	border-color: $gray-70;
+}
+
+.textInputContainer {
+	flex-direction: row;
+	margin-left: $grid-unit;
+}
+
+.textInput {
+	min-height: 25px;
+	border-color: $light-gray-400;
+	padding-top: 4px;
+	padding-bottom: 4px;
+	text-align: center;
+	color: $gray-dark;
+}
+
+.textInputDark {
+	border-color: $gray-70;
+	color: $white;
+}
+
+// Navigation Header
+
+.bottomSheetHeader {
+	flex-direction: row;
+	align-items: center;
+	padding-right: $grid-unit-20;
+	padding-left: $grid-unit-20;
+	min-height: 44px;
+}
+
+.bottomSheetBackButton {
+	flex-direction: row;
+	align-items: center;
+	flex: 1;
+}
+
+.bottomSheetApplyButton {
+	flex-direction: row;
+	justify-content: flex-end;
+	flex: 1;
+}
+
+.chevronLeftIcon {
+	color: $blue-50;
+	margin-left: -11px;
+}
+
+.chevronLeftIconDark {
+	color: $blue-30;
+}
+
+.bottomSheetHeaderTitle {
+	color: $light-primary;
+	text-align: center;
+	font-weight: 600;
+	font-size: 16px;
+	flex: 2;
+}
+
+.bottomSheetHeaderTitleDark {
+	color: $dark-primary;
+}
+
+.bottomSheetButtonText {
+	color: $blue-50;
+	font-size: 16px;
+}
+
+.bottomSheetButtonTextDark {
+	color: $blue-30;
+}
+
+.bottomSheetRightSpace {
+	flex: 1;
+}
+
+.arrowLeftIcon {
+	color: $gray-60;
+}
+
+.arrowLeftIconDark {
+	color: $dark-secondary;
+}
+
+// used in both light and dark modes
+.placeholderColor {
+	color: #87a6bc;
+}
+
+.applyButton {
+	color: $blue-50;
+	font-size: 17px;
+}
+
+.applyButtonDark {
+	color: $blue-30;
+}
+
+.flex {
+	flex: 1;
+}
+
+.cellHelpLabel {
+	font-size: $default-font-size;
+	padding-bottom: $grid-unit-15;
+}
+
+.cellHelpLabelIOS {
+	padding-bottom: $grid-unit-10;
 }

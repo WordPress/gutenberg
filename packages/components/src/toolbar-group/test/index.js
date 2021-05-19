@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { mount } from 'enzyme';
+import { fireEvent, render } from '@testing-library/react';
 
 /**
  * Internal dependencies
@@ -11,13 +11,15 @@ import ToolbarGroup from '../';
 describe( 'ToolbarGroup', () => {
 	describe( 'basic rendering', () => {
 		it( 'should render an empty node, when controls are not passed', () => {
-			const wrapper = mount( <ToolbarGroup /> );
-			expect( wrapper.html() ).toBeNull();
+			const { container } = render( <ToolbarGroup /> );
+
+			expect( container.innerHTML ).toBe( '' );
 		} );
 
 		it( 'should render an empty node, when controls are empty', () => {
-			const wrapper = mount( <ToolbarGroup controls={ [] } /> );
-			expect( wrapper.html() ).toBeNull();
+			const { container } = render( <ToolbarGroup controls={ [] } /> );
+
+			expect( container.innerHTML ).toBe( '' );
 		} );
 
 		it( 'should render a list of controls with buttons', () => {
@@ -30,13 +32,16 @@ describe( 'ToolbarGroup', () => {
 					isActive: false,
 				},
 			];
-			const wrapper = mount( <ToolbarGroup controls={ controls } /> );
-			const button = wrapper.find( '[aria-label="WordPress"]' ).hostNodes();
-			expect( button.props() ).toMatchObject( {
-				'aria-label': 'WordPress',
-				'aria-pressed': false,
-				type: 'button',
-			} );
+
+			const { getByLabelText } = render(
+				<ToolbarGroup controls={ controls } />
+			);
+
+			const toolbarButton = getByLabelText( 'WordPress' );
+			expect( toolbarButton.getAttribute( 'aria-pressed' ) ).toBe(
+				'false'
+			);
+			expect( toolbarButton.getAttribute( 'type' ) ).toBe( 'button' );
 		} );
 
 		it( 'should render a list of controls with buttons and active control', () => {
@@ -49,24 +54,29 @@ describe( 'ToolbarGroup', () => {
 					isActive: true,
 				},
 			];
-			const wrapper = mount( <ToolbarGroup controls={ controls } /> );
-			const button = wrapper.find( '[aria-label="WordPress"]' ).hostNodes();
-			expect( button.props() ).toMatchObject( {
-				'aria-label': 'WordPress',
-				'aria-pressed': true,
-				type: 'button',
-			} );
+
+			const { getByLabelText } = render(
+				<ToolbarGroup controls={ controls } />
+			);
+
+			const toolbarButton = getByLabelText( 'WordPress' );
+			expect( toolbarButton.getAttribute( 'aria-pressed' ) ).toBe(
+				'true'
+			);
+			expect( toolbarButton.getAttribute( 'type' ) ).toBe( 'button' );
 		} );
 
 		it( 'should render a nested list of controls with separator between', () => {
 			const controls = [
-				[ // First set
+				[
+					// First set
 					{
 						icon: 'wordpress',
 						title: 'WordPress',
 					},
 				],
-				[ // Second set
+				[
+					// Second set
 					{
 						icon: 'wordpress',
 						title: 'WordPress',
@@ -74,12 +84,15 @@ describe( 'ToolbarGroup', () => {
 				],
 			];
 
-			const wrapper = mount( <ToolbarGroup controls={ controls } /> );
-			const buttons = wrapper.find( 'button' ).hostNodes();
-			const hasLeftDivider = wrapper.find( '.has-left-divider' ).hostNodes();
+			const { container, getAllByRole } = render(
+				<ToolbarGroup controls={ controls } />
+			);
+
+			const buttons = getAllByRole( 'button' );
 			expect( buttons ).toHaveLength( 2 );
-			expect( hasLeftDivider ).toHaveLength( 1 );
-			expect( hasLeftDivider.html() ).toContain( buttons.at( 1 ).html() );
+			expect(
+				container.querySelector( '.has-left-divider button' )
+			).toBe( buttons[ 1 ] );
 		} );
 
 		it( 'should call the clickHandler on click.', () => {
@@ -92,9 +105,11 @@ describe( 'ToolbarGroup', () => {
 					isActive: true,
 				},
 			];
-			const wrapper = mount( <ToolbarGroup controls={ controls } /> );
-			const button = wrapper.find( '[aria-label="WordPress"]' ).hostNodes();
-			button.simulate( 'click' );
+			const { getByLabelText } = render(
+				<ToolbarGroup controls={ controls } />
+			);
+
+			fireEvent.click( getByLabelText( 'WordPress' ) );
 			expect( clickHandler ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );

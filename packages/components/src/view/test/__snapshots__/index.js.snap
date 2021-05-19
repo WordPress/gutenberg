@@ -1,0 +1,41 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`props should render as another element 1`] = `
+<p
+  class="css-1mm2cvy-View emotion-0"
+>
+  <span />
+</p>
+`;
+
+exports[`props should render correctly 1`] = `
+<div
+  class="css-1mm2cvy-View emotion-0"
+>
+  <span />
+</div>
+`;
+
+exports[`props should render with custom styles (Array) 1`] = `
+<p
+  class="css-1mm2cvy-View emotion-0"
+>
+  <span />
+</p>
+`;
+
+exports[`props should render with custom styles (object) 1`] = `
+<p
+  class="css-1mm2cvy-View emotion-0"
+>
+  <span />
+</p>
+`;
+
+exports[`props should render with custom styles (string) 1`] = `
+<p
+  class="css-1mm2cvy-View emotion-0"
+>
+  <span />
+</p>
+`;

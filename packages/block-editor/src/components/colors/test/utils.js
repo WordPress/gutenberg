@@ -17,7 +17,15 @@ describe( 'color utils', () => {
 			];
 			const customColor = '#ffffff';
 
-			expect( getColorObjectByAttributeValues( colors, undefined, customColor ) ).toEqual( { color: customColor } );
+			expect(
+				getColorObjectByAttributeValues(
+					colors,
+					undefined,
+					customColor
+				)
+			).toEqual( {
+				color: customColor,
+			} );
 		} );
 
 		it( 'should return the custom color object when definedColor was not found', () => {
@@ -29,7 +37,15 @@ describe( 'color utils', () => {
 			const definedColor = 'purple';
 			const customColor = '#ffffff';
 
-			expect( getColorObjectByAttributeValues( colors, definedColor, customColor ) ).toEqual( { color: customColor } );
+			expect(
+				getColorObjectByAttributeValues(
+					colors,
+					definedColor,
+					customColor
+				)
+			).toEqual( {
+				color: customColor,
+			} );
 		} );
 
 		it( 'should return the found color object', () => {
@@ -41,7 +57,15 @@ describe( 'color utils', () => {
 			const definedColor = 'blue';
 			const customColor = '#ffffff';
 
-			expect( getColorObjectByAttributeValues( colors, definedColor, customColor ) ).toEqual( { slug: 'blue' } );
+			expect(
+				getColorObjectByAttributeValues(
+					colors,
+					definedColor,
+					customColor
+				)
+			).toEqual( {
+				slug: 'blue',
+			} );
 		} );
 	} );
 
@@ -53,7 +77,9 @@ describe( 'color utils', () => {
 				{ slug: 'blue', color: '#0000ff' },
 			];
 
-			expect( getColorObjectByColorValue( colors, '#ffffff' ) ).toBeUndefined();
+			expect(
+				getColorObjectByColorValue( colors, '#ffffff' )
+			).toBeUndefined();
 		} );
 
 		it( 'should return a color object for the given color value', () => {
@@ -63,21 +89,30 @@ describe( 'color utils', () => {
 				{ slug: 'blue', color: '#0000ff' },
 			];
 
-			expect( getColorObjectByColorValue( colors, '#00ff00' ) ).toEqual( { slug: 'green', color: '#00ff00' } );
+			expect( getColorObjectByColorValue( colors, '#00ff00' ) ).toEqual( {
+				slug: 'green',
+				color: '#00ff00',
+			} );
 		} );
 	} );
 
 	describe( 'getColorClassName', () => {
 		it( 'should return undefined if colorContextName is missing', () => {
-			expect( getColorClassName( undefined, 'Light Purple' ) ).toBeUndefined();
+			expect(
+				getColorClassName( undefined, 'Light Purple' )
+			).toBeUndefined();
 		} );
 
 		it( 'should return undefined if colorSlug is missing', () => {
-			expect( getColorClassName( 'background', undefined ) ).toBeUndefined();
+			expect(
+				getColorClassName( 'background', undefined )
+			).toBeUndefined();
 		} );
 
 		it( 'should return a class name with the color slug in kebab case', () => {
-			expect( getColorClassName( 'background', 'Light Purple' ) ).toBe( 'has-light-purple-background' );
+			expect( getColorClassName( 'background', 'Light Purple' ) ).toBe(
+				'has-light-purple-background'
+			);
 		} );
 	} );
 } );

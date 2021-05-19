@@ -9,24 +9,32 @@ import { compact, uniq } from 'lodash';
  */
 import { __ } from '@wordpress/i18n';
 import { forwardRef } from '@wordpress/element';
+import { external } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import Dashicon from '../dashicon';
 import VisuallyHidden from '../visually-hidden';
+import { StyledIcon } from './styles/external-link-styles';
 
-export function ExternalLink( { href, children, className, rel = '', ...additionalProps }, ref ) {
-	rel = uniq( compact( [
-		...rel.split( ' ' ),
-		'external',
-		'noreferrer',
-		'noopener',
-	] ) ).join( ' ' );
+export function ExternalLink(
+	{ href, children, className, rel = '', ...additionalProps },
+	ref
+) {
+	rel = uniq(
+		compact( [ ...rel.split( ' ' ), 'external', 'noreferrer', 'noopener' ] )
+	).join( ' ' );
 	const classes = classnames( 'components-external-link', className );
 	return (
-		// eslint-disable-next-line react/jsx-no-target-blank
-		<a { ...additionalProps } className={ classes } href={ href } target="_blank" rel={ rel } ref={ ref }>
+		/* eslint-disable react/jsx-no-target-blank */
+		<a
+			{ ...additionalProps }
+			className={ classes }
+			href={ href }
+			target="_blank"
+			rel={ rel }
+			ref={ ref }
+		>
 			{ children }
 			<VisuallyHidden as="span">
 				{
@@ -34,8 +42,12 @@ export function ExternalLink( { href, children, className, rel = '', ...addition
 					__( '(opens in a new tab)' )
 				}
 			</VisuallyHidden>
-			<Dashicon icon="external" className="components-external-link__icon" />
+			<StyledIcon
+				icon={ external }
+				className="components-external-link__icon"
+			/>
 		</a>
+		/* eslint-enable react/jsx-no-target-blank */
 	);
 }
 

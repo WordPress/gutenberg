@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createBlock,
-	getBlockAttributes,
-} from '@wordpress/blocks';
+import { createBlock, getBlockAttributes } from '@wordpress/blocks';
 import {
 	__UNSTABLE_LINE_SEPARATOR,
 	create,
@@ -40,35 +37,44 @@ const transforms = {
 		{
 			type: 'block',
 			isMultiBlock: true,
-			blocks: [ 'core/paragraph' ],
+			blocks: [ 'core/paragraph', 'core/heading' ],
 			transform: ( blockAttributes ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
-						value: join( blockAttributes.map( ( { content } ) => {
-							const value = create( { html: content } );
+						value: join(
+							blockAttributes.map( ( { content } ) => {
+								const value = create( { html: content } );
 
-							if ( blockAttributes.length > 1 ) {
-								return value;
-							}
+								if ( blockAttributes.length > 1 ) {
+									return value;
+								}
 
-							// When converting only one block, transform
-							// every line to a list item.
-							return replace( value, /\n/g, __UNSTABLE_LINE_SEPARATOR );
-						} ), __UNSTABLE_LINE_SEPARATOR ),
+								// When converting only one block, transform
+								// every line to a list item.
+								return replace(
+									value,
+									/\n/g,
+									__UNSTABLE_LINE_SEPARATOR
+								);
+							} ),
+							__UNSTABLE_LINE_SEPARATOR
+						),
 						multilineTag: 'li',
 					} ),
+					anchor: blockAttributes.anchor,
 				} );
 			},
 		},
 		{
 			type: 'block',
-			blocks: [ 'core/quote' ],
-			transform: ( { value } ) => {
+			blocks: [ 'core/quote', 'core/pullquote' ],
+			transform: ( { value, anchor } ) => {
 				return createBlock( 'core/list', {
 					values: toHTMLString( {
 						value: create( { html: value, multilineTag: 'p' } ),
 						multilineTag: 'li',
 					} ),
+					anchor,
 				} );
 			},
 		},
@@ -82,6 +88,7 @@ const transforms = {
 			transform( node ) {
 				const attributes = {
 					ordered: node.nodeName === 'OL',
+					anchor: node.id === '' ? undefined : node.id,
 				};
 
 				if ( attributes.ordered ) {
@@ -137,21 +144,40 @@ const transforms = {
 			type: 'block',
 			blocks: [ 'core/paragraph' ],
 			transform: ( { values } ) =>
-				split( create( {
-					html: values,
-					multilineTag: 'li',
-					multilineWrapperTags: [ 'ul', 'ol' ],
-				} ), __UNSTABLE_LINE_SEPARATOR )
-					.map( ( piece ) =>
-						createBlock( 'core/paragraph', {
-							content: toHTMLString( { value: piece } ),
-						} )
-					),
+				split(
+					create( {
+						html: values,
+						multilineTag: 'li',
+						multilineWrapperTags: [ 'ul', 'ol' ],
+					} ),
+					__UNSTABLE_LINE_SEPARATOR
+				).map( ( piece ) =>
+					createBlock( 'core/paragraph', {
+						content: toHTMLString( { value: piece } ),
+					} )
+				),
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/heading' ],
+			transform: ( { values } ) =>
+				split(
+					create( {
+						html: values,
+						multilineTag: 'li',
+						multilineWrapperTags: [ 'ul', 'ol' ],
+					} ),
+					__UNSTABLE_LINE_SEPARATOR
+				).map( ( piece ) =>
+					createBlock( 'core/heading', {
+						content: toHTMLString( { value: piece } ),
+					} )
+				),
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/quote' ],
-			transform: ( { values } ) => {
+			transform: ( { values, anchor } ) => {
 				return createBlock( 'core/quote', {
 					value: toHTMLString( {
 						value: create( {
@@ -161,6 +187,24 @@ const transforms = {
 						} ),
 						multilineTag: 'p',
 					} ),
+					anchor,
+				} );
+			},
+		},
+		{
+			type: 'block',
+			blocks: [ 'core/pullquote' ],
+			transform: ( { values, anchor } ) => {
+				return createBlock( 'core/pullquote', {
+					value: toHTMLString( {
+						value: create( {
+							html: values,
+							multilineTag: 'li',
+							multilineWrapperTags: [ 'ul', 'ol' ],
+						} ),
+						multilineTag: 'p',
+					} ),
+					anchor,
 				} );
 			},
 		},

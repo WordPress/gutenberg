@@ -4,15 +4,15 @@
 import {
 	activatePlugin,
 	clickBlockToolbarButton,
+	clickMenuItem,
 	clickOnMoreMenuItem,
 	createNewPost,
 	deactivatePlugin,
 } from '@wordpress/e2e-test-utils';
 
 const clickOnBlockSettingsMenuItem = async ( buttonLabel ) => {
-	await clickBlockToolbarButton( 'More options' );
-	const itemButton = ( await page.$x( `//*[contains(@class, "block-editor-block-settings-menu__popover")]//button[contains(text(), '${ buttonLabel }')]` ) )[ 0 ];
-	await itemButton.click();
+	await clickBlockToolbarButton( 'Options' );
+	await clickMenuItem( buttonLabel );
 };
 
 const ANNOTATIONS_SELECTOR = '.annotation-text-e2e-tests';
@@ -47,9 +47,13 @@ describe( 'Using Plugins API', () => {
 		await page.keyboard.type( end + '' );
 
 		// Click add annotation button.
-		const addAnnotationButton = ( await page.$x( "//button[contains(text(), 'Add annotation')]" ) )[ 0 ];
+		const addAnnotationButton = (
+			await page.$x( "//button[contains(text(), 'Add annotation')]" )
+		 )[ 0 ];
 		await addAnnotationButton.click();
-		await page.evaluate( () => document.querySelector( '[contenteditable]' ).focus() );
+		await page.evaluate( () =>
+			document.querySelector( '[contenteditable]' ).focus()
+		);
 	}
 
 	/**
@@ -59,9 +63,13 @@ describe( 'Using Plugins API', () => {
 	 */
 	async function removeAnnotations() {
 		// Click remove annotations button.
-		const addAnnotationButton = ( await page.$x( "//button[contains(text(), 'Remove annotations')]" ) )[ 0 ];
+		const addAnnotationButton = (
+			await page.$x( "//button[contains(text(), 'Remove annotations')]" )
+		 )[ 0 ];
 		await addAnnotationButton.click();
-		await page.evaluate( () => document.querySelector( '[contenteditable]' ).focus() );
+		await page.evaluate( () =>
+			document.querySelector( '[contenteditable]' ).focus()
+		);
 	}
 
 	/**
@@ -91,7 +99,9 @@ describe( 'Using Plugins API', () => {
 
 	describe( 'Annotations', () => {
 		it( 'Allows a block to be annotated', async () => {
-			await page.keyboard.type( 'Title' + '\n' + 'Paragraph to annotate' );
+			await page.keyboard.type(
+				'Title' + '\n' + 'Paragraph to annotate'
+			);
 
 			await clickOnMoreMenuItem( 'Annotations Sidebar' );
 
@@ -108,7 +118,9 @@ describe( 'Using Plugins API', () => {
 
 			await clickOnBlockSettingsMenuItem( 'Edit as HTML' );
 
-			const htmlContent = await page.$$( '.block-editor-block-list__block-html-textarea' );
+			const htmlContent = await page.$$(
+				'.block-editor-block-list__block-html-textarea'
+			);
 			const html = await page.evaluate( ( el ) => {
 				return el.innerHTML;
 			}, htmlContent[ 0 ] );

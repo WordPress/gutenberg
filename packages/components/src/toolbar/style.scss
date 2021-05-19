@@ -1,55 +1,105 @@
 .components-accessible-toolbar {
-	// Required for IE11.
 	display: inline-flex;
-
-	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
-	@supports (position: sticky) {
-		display: flex;
-	}
-
+	border: $border-width solid $gray-900;
+	border-radius: $radius-block-ui;
 	flex-shrink: 0;
+
+	& > .components-toolbar-group:last-child {
+		border-right: none;
+	}
 }
 
-// We should extract this to a separate component.
-.components-tab-button {
-	padding: 3px;
-	color: $dark-gray-500;
-	height: $icon-button-size;
-	font-weight: 500;
+.components-accessible-toolbar,
+.components-toolbar {
+	.components-button {
+		position: relative;
+		height: $block-toolbar-height;
+		z-index: 1;
 
-	&.is-pressed,
-	&.is-pressed:hover {
-		color: $white;
-	}
+		// Give all buttons extra padding to fit text.
+		padding-left: $grid-unit-20;
+		padding-right: $grid-unit-20;
 
-	&:disabled {
-		cursor: default;
-	}
+		// Don't show the focus inherited by the Button component.
+		&:focus:enabled {
+			box-shadow: none;
+			outline: none;
+		}
 
-	& > span {
-		border: $border-width solid transparent;
-		padding: 0 6px;
-		box-sizing: content-box;
-		height: 28px;
-		line-height: 28px;
-	}
+		// Focus and toggle pseudo elements.
+		&::before {
+			content: "";
+			position: absolute;
+			display: block;
+			border-radius: $radius-block-ui;
+			height: $grid-unit-40;
 
-	&:hover > span,
-	&:focus > span {
-		color: $dark-gray-500;
-	}
+			// Position the focus rectangle.
+			left: $grid-unit-10;
+			right: $grid-unit-10;
+			z-index: -1;
 
-	&:not(:disabled) {
-		&.is-pressed > span,
-		&:hover > span,
-		&:focus > span {
-			border: $border-width solid $dark-gray-500;
+			// Animate in.
+			animation: components-button__appear-animation 0.1s ease;
+			animation-fill-mode: forwards;
+			@include reduce-motion("animation");
+		}
+
+		svg {
+			position: relative;
+
+			// Center the icon inside.
+			margin-left: auto;
+			margin-right: auto;
+		}
+
+		// Toggled style.
+		&.is-pressed {
+			background: transparent;
+
+			&:hover {
+				background: transparent;
+			}
+
+			&::before {
+				background: $gray-900;
+			}
+		}
+
+		// Focus style.
+		&:focus::before {
+			@include block-toolbar-button-style__focus();
+		}
+
+		// Ensure the icon buttons remain square.
+		&.has-icon {
+			// Reduce the default padding when a button only has an icon.
+			padding-left: $grid-unit-10;
+			padding-right: $grid-unit-10;
+			min-width: $block-toolbar-height;
+			justify-content: center;
+		}
+
+		// @todo: We should extract the tabs styles to the tabs component itself
+		&.components-tab-button {
+			font-weight: 500;
+
+			span {
+				display: inline-block;
+				padding-left: 0;
+				padding-right: 0;
+				position: relative;
+			}
 		}
 	}
+}
 
-	&.is-pressed > span,
-	&.is-pressed:hover > span {
-		background-color: $dark-gray-500;
-		color: $white;
+
+@keyframes components-button__appear-animation {
+	from {
+		transform: scaleY(0);
+	}
+	to {
+		transform: scaleY(1);
 	}
 }

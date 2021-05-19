@@ -1,20 +1,48 @@
 .components-guide {
+	$image-height: 300px;
+	$image-width: 320px;
+
+	@include break-small() {
+		width: 600px;
+	}
+
 	.components-modal__header {
 		background: none;
 		border-bottom: none;
+		width: 100%;
+		padding: 0;
+		margin: 0;
 
 		.components-button {
 			align-self: flex-start;
-			margin-top: $grid-size-xlarge;
+			margin: $grid-unit-10 $grid-unit-10 0 0;
 			position: static;
+
+			&:hover {
+				svg {
+					fill: #fff;
+				}
+			}
 		}
 	}
 
 	&__container {
 		display: flex;
 		flex-direction: column;
+		justify-content: space-between;
 		margin-top: -$header-height;
 		min-height: 100%;
+	}
+
+	&__page {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		position: relative;
+
+		@include break-small() {
+			min-height: $image-height;
+		}
 	}
 
 	&__footer {
@@ -22,35 +50,50 @@
 		display: flex;
 		height: 30px;
 		justify-content: center;
-		margin: auto 0 $grid-size-xlarge 0;
+		margin: 0 0 $grid-unit-30 0;
+		padding: 0 $grid-unit-40;
 		position: relative;
 		width: 100%;
 
-		@include break-small() {
-			margin: $grid-size-xlarge 0 0;
+		@media (max-width: $break-small) {
+			position: absolute;
+			bottom: 0;
 		}
 	}
 
 	&__page-control {
 		margin: 0;
+		text-align: center;
 
 		li {
 			display: inline-block;
-			margin: 0 2px;
+			margin: 0;
 		}
 
 		.components-button {
 			height: 30px;
+			min-width: 20px;
+			margin: -6px 0;
 		}
+	}
+
+	.components-modal__content {
+		padding: 0;
 	}
 }
 
 .components-modal__frame.components-guide {
+	border: none;
+	min-width: 312px;
+	height: 80vh;
+	max-height: 575px;
+
 	@media (max-width: $break-small) {
-		bottom: 15%;
-		left: $grid-size-xlarge;
-		right: $grid-size-xlarge;
-		top: 15%;
+		bottom: 5%;
+		left: $grid-unit-20;
+		right: $grid-unit-20;
+		top: 5%;
+		margin: 0 auto;
 	}
 }
 
@@ -64,55 +107,33 @@
 
 	&.components-guide__back-button,
 	&.components-guide__forward-button {
-		font-size: 0;
+		font-size: $default-font-size;
 		padding: 4px 2px;
 
 		&.has-text svg {
 			margin: 0;
 		}
 
-		@include break-small() {
-			font-size: $default-font-size;
+		&:hover {
+			text-decoration: underline;
 		}
 	}
 
 	&.components-guide__back-button {
-		left: 0;
-
-		@include break-small() {
-			padding: 4px 8px 4px 2px;
-
-			&.has-text svg {
-				margin-right: 4px;
-			}
-		}
+		left: $grid-unit-40;
 	}
 
 	&.components-guide__forward-button {
-		right: 0;
-
-		@include break-small() {
-			padding: 4px 2px 4px 8px;
-
-			&.has-text svg {
-				margin-left: 4px;
-				order: 1;
-			}
-		}
+		right: $grid-unit-40;
+		color: #1386bf;
+		font-weight: bold;
 	}
 
 	&.components-guide__finish-button {
-		display: none;
-		right: 0;
-
-		@include break-small() {
-			display: block;
-		}
+		right: $grid-unit-40;
 	}
 
 	&.components-guide__inline-finish-button {
-		@include break-small() {
-			display: none;
-		}
+		display: none;
 	}
 }

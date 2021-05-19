@@ -1,7 +1,18 @@
+@import "../../interface/src/style.scss";
+
 @import "./components/block-editor/style.scss";
 @import "./components/header/style.scss";
-@import "./components/notices/style.scss";
+@import "./components/header/document-actions/style.scss";
+@import "./components/header/more-menu/style.scss";
+@import "./components/navigation-sidebar/navigation-toggle/style.scss";
+@import "./components/navigation-sidebar/navigation-panel/style.scss";
 @import "./components/sidebar/style.scss";
+@import "./components/sidebar/settings-header/style.scss";
+@import "./components/sidebar/template-card/style.scss";
+@import "./components/editor/style.scss";
+@import "./components/template-details/style.scss";
+@import "./components/template-part-converter/style.scss";
+@import "./components/secondary-sidebar/style.scss";
 
 // In order to use mix-blend-mode, this element needs to have an explicitly set background-color.
 // We scope it to .wp-toolbar to be wp-admin only, to prevent bleed into other implementations.
@@ -9,7 +20,7 @@ html.wp-toolbar {
 	background: $white;
 }
 
-body.gutenberg_page_gutenberg-edit-site {
+body.toplevel_page_gutenberg-edit-site {
 	@include wp-admin-reset(".edit-site");
 }
 
@@ -36,8 +47,14 @@ body.gutenberg_page_gutenberg-edit-site {
 		min-height: calc(100vh - #{$admin-bar-height});
 	}
 
-	> .components-navigate-regions {
-		height: 100%;
+	// Todo: Remove this rule when edit site gets support
+	// for opening unpinned sidebar items.
+	.interface-complementary-area__pin-unpin-item.components-button {
+		display: none;
+	}
+
+	.interface-interface-skeleton__content {
+		background-color: $gray-400;
 	}
 }
 
@@ -56,3 +73,5 @@ body.gutenberg_page_gutenberg-edit-site {
 		opacity: 1;
 	}
 }
+
+@include wordpress-admin-schemes();

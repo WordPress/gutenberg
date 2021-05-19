@@ -2,12 +2,10 @@
  * External dependencies
  */
 import classnames from 'classnames';
-
 /**
  * WordPress dependencies
  */
-import { useContext } from '@wordpress/element';
-
+import { useContext, forwardRef } from '@wordpress/element';
 /**
  * Internal dependencies
  */
@@ -16,23 +14,28 @@ import ToolbarItem from '../toolbar-item';
 import ToolbarContext from '../toolbar-context';
 import ToolbarButtonContainer from './toolbar-button-container';
 
-function ToolbarButton( {
-	containerClassName,
-	className,
-	extraProps,
-	children,
-	...props
-} ) {
+function ToolbarButton(
+	{
+		containerClassName,
+		className,
+		extraProps,
+		children,
+		title,
+		isActive,
+		isDisabled,
+		...props
+	},
+	ref
+) {
 	const accessibleToolbarState = useContext( ToolbarContext );
 
 	if ( ! accessibleToolbarState ) {
-		// This should be deprecated when <Toolbar __experimentalAccessibilityLabel="label">
-		// becomes stable.
 		return (
 			<ToolbarButtonContainer className={ containerClassName }>
 				<Button
+					ref={ ref }
 					icon={ props.icon }
-					label={ props.title }
+					label={ title }
 					shortcut={ props.shortcut }
 					data-subscript={ props.subscript }
 					onClick={ ( event ) => {
@@ -41,12 +44,18 @@ function ToolbarButton( {
 							props.onClick( event );
 						}
 					} }
-					className={ classnames( 'components-toolbar__control', className ) }
-					isPressed={ props.isActive }
-					disabled={ props.isDisabled }
+					className={ classnames(
+						'components-toolbar__control',
+						className
+					) }
+					isPressed={ isActive }
+					disabled={ isDisabled }
+					data-toolbar-item
 					{ ...extraProps }
-				/>
-				{ children }
+					{ ...props }
+				>
+					{ children }
+				</Button>
 			</ToolbarButtonContainer>
 		);
 	}
@@ -57,11 +66,22 @@ function ToolbarButton( {
 	return (
 		<ToolbarItem
 			className={ classnames( 'components-toolbar-button', className ) }
+			{ ...extraProps }
 			{ ...props }
+			ref={ ref }
 		>
-			{ ( toolbarItemProps ) => <Button { ...toolbarItemProps }>{ children }</Button> }
+			{ ( toolbarItemProps ) => (
+				<Button
+					label={ title }
+					isPressed={ isActive }
+					disabled={ isDisabled }
+					{ ...toolbarItemProps }
+				>
+					{ children }
+				</Button>
+			) }
 		</ToolbarItem>
 	);
 }
 
-export default ToolbarButton;
+export default forwardRef( ToolbarButton );

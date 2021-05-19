@@ -1,12 +1,32 @@
 .wp-block-columns {
 	display: flex;
-	margin-bottom: $default-block-margin;
+	margin-bottom: 1.75em;
+	box-sizing: border-box;
 
 	// Responsiveness: Allow wrapping on mobile.
 	flex-wrap: wrap;
 
 	@include break-medium() {
 		flex-wrap: nowrap;
+	}
+
+	&.has-background {
+		padding: $block-bg-padding--v $block-bg-padding--h;
+	}
+
+	/**
+	* All Columns Alignment
+	*/
+	&.are-vertically-aligned-top {
+		align-items: flex-start;
+	}
+
+	&.are-vertically-aligned-center {
+		align-items: center;
+	}
+
+	&.are-vertically-aligned-bottom {
+		align-items: flex-end;
 	}
 }
 
@@ -26,49 +46,51 @@
 	word-break: break-word; // For back-compat.
 	overflow-wrap: break-word; // New standard.
 
-	@include break-small() {
-
-		// Beyond mobile, allow 2 columns.
-		flex-basis: calc(50% - #{$grid-size-large});
-		flex-grow: 0;
+	// Between mobile and large viewports, allow 2 columns.
+	@media (min-width: #{ ($break-small) }) and (max-width: #{ ($break-medium - 1) }) {
+		// Only add two column styling if there are two or more columns
+		&:not(:only-child) {
+			// As with mobile styles, this must be important since the Column
+			// assigns its own width as an inline style, which should take effect
+			// starting at `break-medium`.
+			flex-basis: calc(50% - 1em) !important;
+			flex-grow: 0;
+		}
 
 		// Add space between the multiple columns. Themes can customize this if they wish to work differently.
 		// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
 		&:nth-child(even) {
-			margin-left: $grid-size-large * 2;
+			margin-left: 2em;
 		}
 	}
 
+	// At large viewports, show all columns horizontally.
 	@include break-medium() {
+		// Available space should be divided equally amongst columns without an
+		// assigned width. This is achieved by assigning a flex basis that is
+		// consistent (equal), would not cause the sum total of column widths to
+		// exceed 100%, and which would cede to a column with an assigned width.
+		// The `flex-grow` allows columns to maximally and equally occupy space
+		// remaining after subtracting the space occupied by columns with
+		// explicit widths (if any exist).
+		flex-basis: 0;
+		flex-grow: 1;
+
+		// Columns with an explicitly-assigned width should maintain their
+		// `flex-basis` width and not grow.
+		&[style*="flex-basis"] {
+			flex-grow: 0;
+		}
 
 		// When columns are in a single row, add space before all except the first.
 		&:not(:first-child) {
-			margin-left: $grid-size-large * 2;
+			margin-left: 2em;
 		}
 	}
-}
 
-/**
- * All Columns Alignment
- */
-.wp-block-columns {
-	&.are-vertically-aligned-top {
-		align-items: flex-start;
-	}
-
-	&.are-vertically-aligned-center {
-		align-items: center;
-	}
-
-	&.are-vertically-aligned-bottom {
-		align-items: flex-end;
-	}
-}
-
-/**
- * Individual Column Alignment
- */
-.wp-block-column {
+	/**
+	* Individual Column Alignment
+	*/
 	&.is-vertically-aligned-top {
 		align-self: flex-start;
 	}
@@ -79,5 +101,11 @@
 
 	&.is-vertically-aligned-bottom {
 		align-self: flex-end;
+	}
+
+	&.is-vertically-aligned-top,
+	&.is-vertically-aligned-center,
+	&.is-vertically-aligned-bottom {
+		width: 100%;
 	}
 }

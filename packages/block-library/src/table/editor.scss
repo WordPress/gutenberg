@@ -1,7 +1,11 @@
-.block-editor-block-list__block[data-type="core/table"] {
-	&[data-align="left"],
-	&[data-align="right"],
-	&[data-align="center"] {
+.wp-block-table {
+
+	// Remove default <figure> style.
+	margin: 0;
+
+	.wp-block[data-align="left"] > &,
+	.wp-block[data-align="right"] > &,
+	.wp-block[data-align="center"] > & {
 		// Stop table block from collapsing when tables are floated.
 		height: auto;
 
@@ -16,22 +20,12 @@
 		}
 	}
 
-	&[data-align="center"] {
+	.wp-block[data-align="center"] > & {
 		text-align: initial;
 
 		table {
 			margin: 0 auto;
 		}
-	}
-}
-
-
-.wp-block-table {
-	// Remove default <figure> style.
-	margin: 0;
-
-	table {
-		border-collapse: collapse;
 	}
 
 	td,
@@ -41,8 +35,8 @@
 
 	td.is-selected,
 	th.is-selected {
-		border-color: $blue-medium-500;
-		box-shadow: inset 0 0 0 1px $blue-medium-500;
+		border-color: var(--wp-admin-theme-color);
+		box-shadow: inset 0 0 0 1px var(--wp-admin-theme-color);
 		border-style: double;
 	}
 
@@ -51,20 +45,36 @@
 	}
 }
 
-// Extra specificity to override default Placeholder styles.
-.wp-block-table__placeholder-form.wp-block-table__placeholder-form {
-	.wp-block-table__placeholder-input {
-		width: $grid-size * 14;
-		margin-right: $grid-size;
-		margin-bottom: 0;
+.blocks-table__placeholder-form.blocks-table__placeholder-form {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
 
-		input {
-			height: $icon-button-size;
-		}
+	> * {
+		margin-bottom: $grid-unit-10;
 	}
 
-	.wp-block-table__placeholder-button {
-		margin-top: auto;
-		margin-right: auto;
+	@include break-medium() {
+		flex-direction: row;
+		align-items: flex-end;
+
+		> * {
+			margin-bottom: 0;
+		}
+	}
+}
+
+.blocks-table__placeholder-input {
+	width: $grid-unit-10 * 14;
+	margin-right: $grid-unit-10;
+	margin-bottom: 0;
+
+	input {
+		height: $button-size;
+	}
+
+
+	.components-base-control__field {
+		margin-bottom: 0;
 	}
 }

@@ -6,7 +6,8 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { useState, Children } from '@wordpress/element';
+import { useState, useEffect, Children } from '@wordpress/element';
+import deprecated from '@wordpress/deprecated';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -16,15 +17,33 @@ import Modal from '../modal';
 import KeyboardShortcuts from '../keyboard-shortcuts';
 import Button from '../button';
 import PageControl from './page-control';
-import { BackButtonIcon, ForwardButtonIcon } from './icons';
 import FinishButton from './finish-button';
 
-export default function Guide( { children, className, contentLabel, finishButtonText, onFinish } ) {
+export default function Guide( {
+	children,
+	className,
+	contentLabel,
+	finishButtonText,
+	onFinish,
+	pages = [],
+} ) {
 	const [ currentPage, setCurrentPage ] = useState( 0 );
 
-	const numberOfPages = Children.count( children );
+	useEffect( () => {
+		if ( Children.count( children ) ) {
+			deprecated( 'Passing children to <Guide>', {
+				since: '5.5',
+				alternative: 'the `pages` prop',
+			} );
+		}
+	}, [ children ] );
+
+	if ( Children.count( children ) ) {
+		pages = Children.map( children, ( child ) => ( { content: child } ) );
+	}
+
 	const canGoBack = currentPage > 0;
-	const canGoForward = currentPage < numberOfPages - 1;
+	const canGoForward = currentPage < pages.length - 1;
 
 	const goBack = () => {
 		if ( canGoBack ) {
@@ -38,7 +57,7 @@ export default function Guide( { children, className, contentLabel, finishButton
 		}
 	};
 
-	if ( numberOfPages === 0 ) {
+	if ( pages.length === 0 ) {
 		return null;
 	}
 
@@ -48,44 +67,50 @@ export default function Guide( { children, className, contentLabel, finishButton
 			contentLabel={ contentLabel }
 			onRequestClose={ onFinish }
 		>
-
-			<KeyboardShortcuts key={ currentPage } shortcuts={ {
-				left: goBack,
-				right: goForward,
-			} } />
+			<KeyboardShortcuts
+				key={ currentPage }
+				shortcuts={ {
+					left: goBack,
+					right: goForward,
+				} }
+			/>
 
 			<div className="components-guide__container">
+				<div className="components-guide__page">
+					{ pages[ currentPage ].image }
 
-				{ children[ currentPage ] }
+					{ pages.length > 1 && (
+						<PageControl
+							currentPage={ currentPage }
+							numberOfPages={ pages.length }
+							setCurrentPage={ setCurrentPage }
+						/>
+					) }
 
-				{ ! canGoForward && (
-					<FinishButton
-						className="components-guide__inline-finish-button"
-						onClick={ onFinish }
-					>
-						{ finishButtonText || __( 'Finish' ) }
-					</FinishButton>
-				) }
+					{ pages[ currentPage ].content }
+
+					{ ! canGoForward && (
+						<FinishButton
+							className="components-guide__inline-finish-button"
+							onClick={ onFinish }
+						>
+							{ finishButtonText || __( 'Finish' ) }
+						</FinishButton>
+					) }
+				</div>
 
 				<div className="components-guide__footer">
 					{ canGoBack && (
 						<Button
 							className="components-guide__back-button"
-							icon={ <BackButtonIcon /> }
 							onClick={ goBack }
 						>
 							{ __( 'Previous' ) }
 						</Button>
 					) }
-					<PageControl
-						currentPage={ currentPage }
-						numberOfPages={ numberOfPages }
-						setCurrentPage={ setCurrentPage }
-					/>
 					{ canGoForward && (
 						<Button
 							className="components-guide__forward-button"
-							icon={ <ForwardButtonIcon /> }
 							onClick={ goForward }
 						>
 							{ __( 'Next' ) }
@@ -100,9 +125,7 @@ export default function Guide( { children, className, contentLabel, finishButton
 						</FinishButton>
 					) }
 				</div>
-
 			</div>
-
 		</Modal>
 	);
 }

@@ -10,11 +10,15 @@ export function isInDefaultBlock() {
 		if ( ! activeElement ) {
 			return false;
 		}
-		const closestElementWithDataTpe = activeElement.closest( '[data-type]' );
+		const closestElementWithDataTpe = activeElement.closest(
+			'[data-type]'
+		);
 		if ( ! closestElementWithDataTpe ) {
 			return false;
 		}
-		const activeBlockName = closestElementWithDataTpe.getAttribute( 'data-type' );
+		const activeBlockName = closestElementWithDataTpe.getAttribute(
+			'data-type'
+		);
 		const defaultBlockName = window.wp.blocks.getDefaultBlockName();
 
 		return activeBlockName === defaultBlockName;

@@ -10,6 +10,11 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { withSelect } from '@wordpress/data';
 
 /**
+ * Internal dependencies
+ */
+import { store } from './store';
+
+/**
  * Higher-order component creator, creating a new component which renders with
  * the given prop names, where the value passed to the underlying component is
  * the result of the query assigned as the object's value.
@@ -32,13 +37,14 @@ import { withSelect } from '@wordpress/data';
  *
  * @return {Function} Higher-order component.
  */
-const withViewportMatch = ( queries ) => createHigherOrderComponent(
-	withSelect( ( select ) => {
-		return mapValues( queries, ( query ) => {
-			return select( 'core/viewport' ).isViewportMatch( query );
-		} );
-	} ),
-	'withViewportMatch'
-);
+const withViewportMatch = ( queries ) =>
+	createHigherOrderComponent(
+		withSelect( ( select ) => {
+			return mapValues( queries, ( query ) => {
+				return select( store ).isViewportMatch( query );
+			} );
+		} ),
+		'withViewportMatch'
+	);
 
 export default withViewportMatch;

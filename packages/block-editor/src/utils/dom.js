@@ -1,91 +1,53 @@
-/**
- * Given a block client ID, returns the corresponding DOM node for the block,
- * if exists. As much as possible, this helper should be avoided, and used only
- * in cases where isolated behaviors need remote access to a block node.
- *
- * @param {string} clientId Block client ID.
- * @param {Element} scope an optional DOM Element to which the selector should be scoped
- *
- * @return {Element} Block DOM node.
- */
-export function getBlockDOMNode( clientId ) {
-	return document.getElementById( 'block-' + clientId );
-}
-
-export function getBlockPreviewContainerDOMNode( clientId ) {
-	const domNode = getBlockDOMNode( clientId );
-
-	if ( ! domNode ) {
-		return;
-	}
-
-	return domNode.firstChild || domNode;
-}
-
-/**
- * Returns true if the given HTMLElement is a block focus stop. Blocks without
- * their own text fields rely on the focus stop to be keyboard navigable.
- *
- * @param {HTMLElement} element Element to test.
- *
- * @return {boolean} Whether element is a block focus stop.
- */
-export function isBlockFocusStop( element ) {
-	return element.classList.contains( 'block-editor-block-list__block' );
-}
+// Consider the block appender to be a child block of its own, which also has
+// this class.
+const BLOCK_SELECTOR = '.wp-block';
 
 /**
  * Returns true if two elements are contained within the same block.
  *
- * @param {HTMLElement} a First element.
- * @param {HTMLElement} b Second element.
+ * @param {Element} a First element.
+ * @param {Element} b Second element.
  *
  * @return {boolean} Whether elements are in the same block.
  */
 export function isInSameBlock( a, b ) {
-	return a.closest( '.block-editor-block-list__block' ) === b.closest( '.block-editor-block-list__block' );
+	return a.closest( BLOCK_SELECTOR ) === b.closest( BLOCK_SELECTOR );
 }
 
 /**
- * Returns true if an elements is considered part of the block and not its children.
+ * Returns true if an element is considered part of the block and not its
+ * children.
  *
- * @param {HTMLElement} blockElement Block container element.
- * @param {HTMLElement} element      Element.
+ * @param {Element} blockElement Block container element.
+ * @param {Element} element      Element.
  *
- * @return {boolean} Whether element is in the block Element but not its children.
+ * @return {boolean} Whether element is in the block Element but not its
+ *                   children.
  */
 export function isInsideRootBlock( blockElement, element ) {
-	const innerBlocksContainer = blockElement.querySelector( '.block-editor-block-list__layout' );
-	return blockElement.contains( element ) && (
-		! innerBlocksContainer || ! innerBlocksContainer.contains( element )
-	);
-}
-
-/**
- * Returns true if the given HTMLElement contains inner blocks (an InnerBlocks
- * element).
- *
- * @param {HTMLElement} element Element to test.
- *
- * @return {boolean} Whether element contains inner blocks.
- */
-export function hasInnerBlocksContext( element ) {
-	return !! element.querySelector( '.block-editor-block-list__layout' );
+	const parentBlock = element.closest( BLOCK_SELECTOR );
+	return parentBlock === blockElement;
 }
 
 /**
  * Finds the block client ID given any DOM node inside the block.
  *
- * @param {Node} node DOM node.
+ * @param {Node?} node DOM node.
  *
- * @return {string|undefined} Client ID or undefined if the node is not part of a block.
+ * @return {string|undefined} Client ID or undefined if the node is not part of
+ *                            a block.
  */
 export function getBlockClientId( node ) {
-	if ( node.nodeType !== node.ELEMENT_NODE ) {
-		node = node.parentElement;
+	while ( node && node.nodeType !== node.ELEMENT_NODE ) {
+		node = node.parentNode;
 	}
 
-	const blockNode = node.closest( '.wp-block' );
+	if ( ! node ) {
+		return;
+	}
+
+	const elementNode = /** @type {Element} */ ( node );
+	const blockNode = elementNode.closest( BLOCK_SELECTOR );
 
 	if ( ! blockNode ) {
 		return;

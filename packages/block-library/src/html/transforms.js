@@ -1,21 +1,18 @@
+/**
+ * WordPress dependencies
+ */
+import { createBlock } from '@wordpress/blocks';
+
 const transforms = {
 	from: [
 		{
-			type: 'raw',
-			isMatch: ( node ) => node.nodeName === 'FIGURE' && !! node.querySelector( 'iframe' ),
-			schema: ( { phrasingContentSchema } ) => ( {
-				figure: {
-					require: [ 'iframe' ],
-					children: {
-						iframe: {
-							attributes: [ 'src', 'allowfullscreen', 'height', 'width' ],
-						},
-						figcaption: {
-							children: phrasingContentSchema,
-						},
-					},
-				},
-			} ),
+			type: 'block',
+			blocks: [ 'core/code' ],
+			transform: ( { content } ) => {
+				return createBlock( 'core/html', {
+					content,
+				} );
+			},
 		},
 	],
 };

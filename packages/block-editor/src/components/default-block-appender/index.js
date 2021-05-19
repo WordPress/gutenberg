@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import TextareaAutosize from 'react-autosize-textarea';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
@@ -16,6 +11,13 @@ import { withSelect, withDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import Inserter from '../inserter';
+import { store as blockEditorStore } from '../../store';
+
+/**
+ * Zero width non-breaking space, used as padding for the paragraph when it is
+ * empty.
+ */
+export const ZWNBSP = '\ufeff';
 
 export function DefaultBlockAppender( {
 	isLocked,
@@ -29,47 +31,57 @@ export function DefaultBlockAppender( {
 		return null;
 	}
 
-	const value = decodeEntities( placeholder ) || __( 'Start writing or type / to choose a block' );
-
-	// The appender "button" is in-fact a text field so as to support
-	// transitions by WritingFlow occurring by arrow key press. WritingFlow
-	// only supports tab transitions into text fields and to the block focus
-	// boundary.
-	//
-	// See: https://github.com/WordPress/gutenberg/issues/4829#issuecomment-374213658
-	//
-	// If it were ever to be made to be a proper `button` element, it is
-	// important to note that `onFocus` alone would not be sufficient to
-	// capture click events, notably in Firefox.
-	//
-	// See: https://gist.github.com/cvrebert/68659d0333a578d75372
-
-	// The wp-block className is important for editor styles.
+	const value =
+		decodeEntities( placeholder ) || __( 'Type / to choose a block' );
 
 	return (
 		<div
 			data-root-client-id={ rootClientId || '' }
-			className="wp-block block-editor-default-block-appender"
+			className="block-editor-default-block-appender"
 		>
-			<TextareaAutosize
+			<p
+				tabIndex="0"
+				// Only necessary for `useCanvasClickRedirect` to consider it
+				// as a target. Ideally it should consider any tabbable target,
+				// but the inserter is rendered in place while it should be
+				// rendered in a popover, just like it does for an empty
+				// paragraph block.
+				contentEditable
+				suppressContentEditableWarning
+				// We want this element to be styled as a paragraph by themes.
+				// eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role
 				role="button"
 				aria-label={ __( 'Add block' ) }
-				className="block-editor-default-block-appender__content"
-				readOnly
+				// The wp-block className is important for editor styles.
+				className="wp-block block-editor-default-block-appender__content"
 				onFocus={ onAppend }
-				value={ showPrompt ? value : '' }
+			>
+				{ showPrompt ? value : ZWNBSP }
+			</p>
+			<Inserter
+				rootClientId={ rootClientId }
+				position="bottom right"
+				isAppender
+				__experimentalIsQuick
 			/>
-			<Inserter rootClientId={ rootClientId } position="top right" isAppender />
 		</div>
 	);
 }
 
 export default compose(
 	withSelect( ( select, ownProps ) => {
-		const { getBlockCount, getBlockName, isBlockValid, getSettings, getTemplateLock } = select( 'core/block-editor' );
+		const {
+			getBlockCount,
+			getBlockName,
+			isBlockValid,
+			getSettings,
+			getTemplateLock,
+		} = select( blockEditorStore );
 
 		const isEmpty = ! getBlockCount( ownProps.rootClientId );
-		const isLastBlockDefault = getBlockName( ownProps.lastBlockClientId ) === getDefaultBlockName();
+		const isLastBlockDefault =
+			getBlockName( ownProps.lastBlockClientId ) ===
+			getDefaultBlockName();
 		const isLastBlockValid = isBlockValid( ownProps.lastBlockClientId );
 		const { bodyPlaceholder } = getSettings();
 
@@ -81,10 +93,9 @@ export default compose(
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const {
-			insertDefaultBlock,
-			startTyping,
-		} = dispatch( 'core/block-editor' );
+		const { insertDefaultBlock, startTyping } = dispatch(
+			blockEditorStore
+		);
 
 		return {
 			onAppend() {
@@ -94,5 +105,5 @@ export default compose(
 				startTyping();
 			},
 		};
-	} ),
+	} )
 )( DefaultBlockAppender );

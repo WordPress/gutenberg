@@ -1,13 +1,15 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
-import { Button } from '@wordpress/components';
-import {
-	PostPreviewButton,
-	PostSavedState,
-} from '@wordpress/editor';
-import { useSelect, useDispatch } from '@wordpress/data';
+import { PostSavedState, PostPreviewButton } from '@wordpress/editor';
+import { useSelect } from '@wordpress/data';
+import { PinnedItems } from '@wordpress/interface';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -15,33 +17,49 @@ import { useSelect, useDispatch } from '@wordpress/data';
 import FullscreenModeClose from './fullscreen-mode-close';
 import HeaderToolbar from './header-toolbar';
 import MoreMenu from './more-menu';
-import PinnedPlugins from './pinned-plugins';
 import PostPublishButtonOrToggle from './post-publish-button-or-toggle';
+import { default as DevicePreview } from '../device-preview';
+import MainDashboardButton from './main-dashboard-button';
+import { store as editPostStore } from '../../store';
 
-function Header() {
+function Header( { setEntitiesSavedStatesCallback } ) {
 	const {
-		shortcut,
 		hasActiveMetaboxes,
-		isEditorSidebarOpened,
 		isPublishSidebarOpened,
 		isSaving,
-		getBlockSelectionStart,
-	} = useSelect( ( select ) => ( {
-		shortcut: select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-sidebar' ),
-		hasActiveMetaboxes: select( 'core/edit-post' ).hasMetaBoxes(),
-		isEditorSidebarOpened: select( 'core/edit-post' ).isEditorSidebarOpened(),
-		isPublishSidebarOpened: select( 'core/edit-post' ).isPublishSidebarOpened(),
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
-		getBlockSelectionStart: select( 'core/block-editor' ).getBlockSelectionStart,
-	} ), [] );
-	const { openGeneralSidebar, closeGeneralSidebar } = useDispatch( 'core/edit-post' );
+		showIconLabels,
+		hasReducedUI,
+	} = useSelect(
+		( select ) => ( {
+			hasActiveMetaboxes: select( editPostStore ).hasMetaBoxes(),
+			isPublishSidebarOpened: select(
+				editPostStore
+			).isPublishSidebarOpened(),
+			isSaving: select( editPostStore ).isSavingMetaBoxes(),
+			showIconLabels: select( editPostStore ).isFeatureActive(
+				'showIconLabels'
+			),
+			hasReducedUI: select( editPostStore ).isFeatureActive(
+				'reducedUI'
+			),
+		} ),
+		[]
+	);
 
-	const toggleGeneralSidebar = isEditorSidebarOpened ?
-		closeGeneralSidebar :
-		() => openGeneralSidebar( getBlockSelectionStart() ? 'edit-post/block' : 'edit-post/document' );
+	const isLargeViewport = useViewportMatch( 'large' );
+
+	const classes = classnames( 'edit-post-header', {
+		'has-reduced-ui': hasReducedUI,
+	} );
 
 	return (
-		<div className="edit-post-header">
+		<div className={ classes }>
+			<MainDashboardButton.Slot>
+				<FullscreenModeClose />
+			</MainDashboardButton.Slot>
+			<div className="edit-post-header__toolbar">
+				<HeaderToolbar />
+			</div>
 			<div className="edit-post-header__settings">
 				{ ! isPublishSidebarOpened && (
 					// This button isn't completely hidden by the publish sidebar.
@@ -52,8 +70,10 @@ function Header() {
 					<PostSavedState
 						forceIsDirty={ hasActiveMetaboxes }
 						forceIsSaving={ isSaving }
+						showIconLabels={ showIconLabels }
 					/>
 				) }
+				<DevicePreview />
 				<PostPreviewButton
 					forceIsAutosaveable={ hasActiveMetaboxes }
 					forcePreviewLink={ isSaving ? null : undefined }
@@ -61,21 +81,19 @@ function Header() {
 				<PostPublishButtonOrToggle
 					forceIsDirty={ hasActiveMetaboxes }
 					forceIsSaving={ isSaving }
+					setEntitiesSavedStatesCallback={
+						setEntitiesSavedStatesCallback
+					}
 				/>
-				<Button
-					icon="admin-generic"
-					label={ __( 'Settings' ) }
-					onClick={ toggleGeneralSidebar }
-					isPressed={ isEditorSidebarOpened }
-					aria-expanded={ isEditorSidebarOpened }
-					shortcut={ shortcut }
-				/>
-				<PinnedPlugins.Slot />
-				<MoreMenu />
-			</div>
-			<div className="edit-post-header__toolbar">
-				<FullscreenModeClose />
-				<HeaderToolbar />
+				{ ( isLargeViewport || ! showIconLabels ) && (
+					<>
+						<PinnedItems.Slot scope="core/edit-post" />
+						<MoreMenu showIconLabels={ showIconLabels } />
+					</>
+				) }
+				{ showIconLabels && ! isLargeViewport && (
+					<MoreMenu showIconLabels={ showIconLabels } />
+				) }
 			</div>
 		</div>
 	);

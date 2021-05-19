@@ -81,4 +81,29 @@ module.exports = {
 	infoSheetIcon: {
 		color: 'gray',
 	},
+	blockToolbar: {
+		height: 44,
+	},
+	headerToolbar: {
+		height: 44,
+	},
+	blockBorder: {
+		width: 1,
+	},
+	defaultBlock: {
+		marginTop: 16,
+	},
+	scrollableContent: {
+		paddingBottom: 20,
+	},
+	buttonText: {
+		color: 'white',
+	},
+	placeholderTextColor: {
+		color: 'white',
+	},
+	defaultButton: {
+		paddingLeft: 10,
+		paddingRight: 10,
+	},
 };

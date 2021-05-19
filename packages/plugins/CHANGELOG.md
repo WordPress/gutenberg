@@ -1,3 +1,22 @@
+<!-- Learn how to maintain this file at https://github.com/WordPress/gutenberg/tree/HEAD/packages#maintaining-changelogs. -->
+
+## Unreleased
+
+## 3.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+
+## 2.25.0 (2021-03-17)
+
+### New Features
+
+-   Add optional `settings.scope` field in the `registerPlugin` function ([#27438](https://github.com/WordPress/gutenberg/pull/27438)).
+-   Add optional `scope` param in the `getPlugins` function([#27438](https://github.com/WordPress/gutenberg/pull/27438)).
+-   Add optional `scope` prop in the `PluginArea` component ([#27438](https://github.com/WordPress/gutenberg/pull/27438)).
+
 ## 2.0.10 (2019-01-03)
 
 ## 2.0.9 (2018-11-15)
@@ -16,4 +35,4 @@
 
 ### Breaking Change
 
-- Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)).  If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.
+-   Change how required built-ins are polyfilled with Babel 7 ([#9171](https://github.com/WordPress/gutenberg/pull/9171)). If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods.

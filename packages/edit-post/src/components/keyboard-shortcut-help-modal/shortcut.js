@@ -10,12 +10,16 @@ import { Fragment } from '@wordpress/element';
 import { displayShortcutList, shortcutAriaLabel } from '@wordpress/keycodes';
 
 function KeyCombination( { keyCombination, forceAriaLabel } ) {
-	const shortcut = keyCombination.modifier ?
-		displayShortcutList[ keyCombination.modifier ]( keyCombination.character ) :
-		keyCombination.character;
-	const ariaLabel = keyCombination.modifier ?
-		shortcutAriaLabel[ keyCombination.modifier ]( keyCombination.character ) :
-		keyCombination.character;
+	const shortcut = keyCombination.modifier
+		? displayShortcutList[ keyCombination.modifier ](
+				keyCombination.character
+		  )
+		: keyCombination.character;
+	const ariaLabel = keyCombination.modifier
+		? shortcutAriaLabel[ keyCombination.modifier ](
+				keyCombination.character
+		  )
+		: keyCombination.character;
 
 	return (
 		<kbd
@@ -24,11 +28,7 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 		>
 			{ castArray( shortcut ).map( ( character, index ) => {
 				if ( character === '+' ) {
-					return (
-						<Fragment key={ index }>
-							{ character }
-						</Fragment>
-					);
+					return <Fragment key={ index }>{ character }</Fragment>;
 				}
 
 				return (
@@ -51,9 +51,16 @@ function Shortcut( { description, keyCombination, aliases = [], ariaLabel } ) {
 				{ description }
 			</div>
 			<div className="edit-post-keyboard-shortcut-help-modal__shortcut-term">
-				<KeyCombination keyCombination={ keyCombination } forceAriaLabel={ ariaLabel } />
+				<KeyCombination
+					keyCombination={ keyCombination }
+					forceAriaLabel={ ariaLabel }
+				/>
 				{ aliases.map( ( alias, index ) => (
-					<KeyCombination keyCombination={ alias } forceAriaLabel={ ariaLabel } key={ index } />
+					<KeyCombination
+						keyCombination={ alias }
+						forceAriaLabel={ ariaLabel }
+						key={ index }
+					/>
 				) ) }
 			</div>
 		</>

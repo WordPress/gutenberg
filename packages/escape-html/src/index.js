@@ -77,7 +77,9 @@ export function escapeLessThan( value ) {
  * @return {string} Escaped attribute value.
  */
 export function escapeAttribute( value ) {
-	return __unstableEscapeGreaterThan( escapeQuotationMark( escapeAmpersand( value ) ) );
+	return __unstableEscapeGreaterThan(
+		escapeQuotationMark( escapeAmpersand( value ) )
+	);
 }
 
 /**

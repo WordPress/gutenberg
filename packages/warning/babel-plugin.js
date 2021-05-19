@@ -28,13 +28,21 @@ function babelPlugin( { types: t } ) {
 
 	const nodeEnvCheckExpression = t.binaryExpression(
 		'!==',
-		t.memberExpression( processEnvExpression, t.identifier( 'NODE_ENV' ), false ),
+		t.memberExpression(
+			processEnvExpression,
+			t.identifier( 'NODE_ENV' ),
+			false
+		),
 		t.stringLiteral( 'production' )
 	);
 
 	const logicalExpression = t.logicalExpression(
 		'&&',
-		t.logicalExpression( '&&', typeofProcessExpression, processEnvExpression ),
+		t.logicalExpression(
+			'&&',
+			typeofProcessExpression,
+			processEnvExpression
+		),
 		nodeEnvCheckExpression
 	);
 
@@ -42,7 +50,8 @@ function babelPlugin( { types: t } ) {
 		visitor: {
 			ImportDeclaration( path, state ) {
 				const { node } = path;
-				const isThisPackageImport = node.source.value.indexOf( pkg.name ) !== -1;
+				const isThisPackageImport =
+					node.source.value.indexOf( pkg.name ) !== -1;
 
 				if ( ! isThisPackageImport ) {
 					return;
@@ -76,7 +85,9 @@ function babelPlugin( { types: t } ) {
 					path.replaceWith(
 						t.ifStatement(
 							logicalExpression,
-							t.blockStatement( [ t.expressionStatement( node ) ] )
+							t.blockStatement( [
+								t.expressionStatement( node ),
+							] )
 						)
 					);
 				}

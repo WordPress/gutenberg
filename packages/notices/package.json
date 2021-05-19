@@ -1,14 +1,15 @@
 {
 	"name": "@wordpress/notices",
-	"version": "1.11.0",
+	"version": "3.0.0",
 	"description": "State management for notices.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"notices"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/notices/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/notices/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -17,14 +18,17 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.13.10",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/data": "file:../data",
-		"lodash": "^4.17.15"
+		"lodash": "^4.17.21"
 	},
 	"publishConfig": {
 		"access": "public"

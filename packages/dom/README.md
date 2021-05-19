@@ -18,23 +18,73 @@ npm install @wordpress/dom --save
 
 Get the rectangle for the selection in a container.
 
+_Parameters_
+
+-   _win_ `Window`: The window of the selection.
+
 _Returns_
 
--   `?DOMRect`: The rectangle.
+-   `DOMRect | null`: The rectangle.
 
 <a name="documentHasSelection" href="#documentHasSelection">#</a> **documentHasSelection**
 
-Check wether the current document has a selection.
-This checks both for focus in an input field and general text selection.
+Check whether the current document has a selection. This checks for both
+focus in an input field and general text selection.
+
+_Parameters_
+
+-   _doc_ `Document`: The document to check.
 
 _Returns_
 
 -   `boolean`: True if there is selection, false if not.
 
+<a name="documentHasTextSelection" href="#documentHasTextSelection">#</a> **documentHasTextSelection**
+
+Check whether the current document has selected text. This applies to ranges
+of text in the document, and not selection inside <input> and <textarea>
+elements.
+
+See: <https://developer.mozilla.org/en-US/docs/Web/API/Window/getSelection#Related_objects>.
+
+_Parameters_
+
+-   _doc_ `Document`: The document to check.
+
+_Returns_
+
+-   `boolean`: True if there is selection, false if not.
+
+<a name="documentHasUncollapsedSelection" href="#documentHasUncollapsedSelection">#</a> **documentHasUncollapsedSelection**
+
+Check whether the current document has any sort of selection. This includes
+ranges of text across elements and any selection inside <input> and
+<textarea> elements.
+
+_Parameters_
+
+-   _doc_ `Document`: The document to check.
+
+_Returns_
+
+-   `boolean`: Whether there is any sort of "selection" in the document.
+
 <a name="focus" href="#focus">#</a> **focus**
 
 Object grouping `focusable` and `tabbable` utils
 under the keys with the same name.
+
+<a name="getFilesFromDataTransfer" href="#getFilesFromDataTransfer">#</a> **getFilesFromDataTransfer**
+
+Gets all files from a DataTransfer object.
+
+_Parameters_
+
+-   _dataTransfer_ `DataTransfer`: DataTransfer object to inspect.
+
+_Returns_
+
+-   `File[]`: An array containing all files.
 
 <a name="getOffsetParent" href="#getOffsetParent">#</a> **getOffsetParent**
 
@@ -52,7 +102,23 @@ _Parameters_
 
 _Returns_
 
--   `?Node`: Offset parent.
+-   `Node | null`: Offset parent.
+
+<a name="getPhrasingContentSchema" href="#getPhrasingContentSchema">#</a> **getPhrasingContentSchema**
+
+Get schema of possible paths for phrasing content.
+
+_Related_
+
+-   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
+
+_Parameters_
+
+-   _context_ `[string]`: Set to "paste" to exclude invisible elements and sensitive data.
+
+_Returns_
+
+-   `Partial<ContentSchema>`: Schema.
 
 <a name="getRectangleFromRange" href="#getRectangleFromRange">#</a> **getRectangleFromRange**
 
@@ -72,11 +138,11 @@ Given a DOM node, finds the closest scrollable container node.
 
 _Parameters_
 
--   _node_ `Element`: Node from which to start.
+-   _node_ `Element | null`: Node from which to start.
 
 _Returns_
 
--   `?Element`: Scrollable container node, if found.
+-   `Element | undefined`: Scrollable container node, if found.
 
 <a name="insertAfter" href="#insertAfter">#</a> **insertAfter**
 
@@ -85,12 +151,25 @@ the latter.
 
 _Parameters_
 
--   _newNode_ `Element`: Node to be inserted.
--   _referenceNode_ `Element`: Node after which to perform the insertion.
+-   _newNode_ `Node`: Node to be inserted.
+-   _referenceNode_ `Node`: Node after which to perform the insertion.
 
 _Returns_
 
 -   `void`: 
+
+<a name="isEmpty" href="#isEmpty">#</a> **isEmpty**
+
+Recursively checks if an element is empty. An element is not empty if it
+contains text or contains elements with attributes such as images.
+
+_Parameters_
+
+-   _element_ `Element`: The element to check.
+
+_Returns_
+
+-   `boolean`: Whether or not the element is empty.
 
 <a name="isEntirelySelected" href="#isEntirelySelected">#</a> **isEntirelySelected**
 
@@ -99,7 +178,7 @@ Returns true if there is no possibility of selection.
 
 _Parameters_
 
--   _element_ `Element`: The element to check.
+-   _element_ `HTMLElement`: The element to check.
 
 _Returns_
 
@@ -118,6 +197,57 @@ _Returns_
 
 -   `boolean`: True if at the horizontal edge, false if not.
 
+<a name="isNumberInput" href="#isNumberInput">#</a> **isNumberInput**
+
+Check whether the given element is an input field of type number
+and has a valueAsNumber
+
+_Parameters_
+
+-   _node_ `Node`: The HTML node.
+
+_Returns_
+
+-   `node is HTMLInputElement`: True if the node is input and holds a number.
+
+<a name="isPhrasingContent" href="#isPhrasingContent">#</a> **isPhrasingContent**
+
+Find out whether or not the given node is phrasing content.
+
+_Related_
+
+-   <https://developer.mozilla.org/en-US/docs/Web/Guide/HTML/Content_categories#Phrasing_content>
+
+_Parameters_
+
+-   _node_ `Node`: The node to test.
+
+_Returns_
+
+-   `boolean`: True if phrasing content, false if not.
+
+<a name="isRTL" href="#isRTL">#</a> **isRTL**
+
+Whether the element's text direction is right-to-left.
+
+_Parameters_
+
+-   _element_ `Element`: The element to check.
+
+_Returns_
+
+-   `boolean`: True if rtl, false if ltr.
+
+<a name="isTextContent" href="#isTextContent">#</a> **isTextContent**
+
+_Parameters_
+
+-   _node_ `Node`: 
+
+_Returns_
+
+-   `boolean`: Node is text content
+
 <a name="isTextField" href="#isTextField">#</a> **isTextField**
 
 Check whether the given element is a text field, where text field is defined
@@ -127,11 +257,11 @@ See: <https://html.spec.whatwg.org/#textFieldSelection>
 
 _Parameters_
 
--   _element_ `HTMLElement`: The HTML element.
+-   _node_ `Node`: The HTML element.
 
 _Returns_
 
--   `boolean`: True if the element is an text field, false if not.
+-   `node is HTMLElement`: True if the element is an text field, false if not.
 
 <a name="isVerticalEdge" href="#isVerticalEdge">#</a> **isVerticalEdge**
 
@@ -152,7 +282,7 @@ Places the caret at start or end of a given element.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: True for end, false for start.
 
 <a name="placeCaretAtVerticalEdge" href="#placeCaretAtVerticalEdge">#</a> **placeCaretAtVerticalEdge**
@@ -161,7 +291,7 @@ Places the caret at the top or bottom of a given element.
 
 _Parameters_
 
--   _container_ `Element`: Focusable element.
+-   _container_ `HTMLElement`: Focusable element.
 -   _isReverse_ `boolean`: True for bottom, false for top.
 -   _rect_ `[DOMRect]`: The rectangle to position the caret with.
 -   _mayUseScroll_ `[boolean]`: True to allow scrolling, false to disallow.
@@ -172,11 +302,25 @@ Given a DOM node, removes it from the DOM.
 
 _Parameters_
 
--   _node_ `Element`: Node to be removed.
+-   _node_ `Node`: Node to be removed.
 
 _Returns_
 
 -   `void`: 
+
+<a name="removeInvalidHTML" href="#removeInvalidHTML">#</a> **removeInvalidHTML**
+
+Given a schema, unwraps or removes nodes, attributes and classes on HTML.
+
+_Parameters_
+
+-   _HTML_ `string`: The HTML to clean up.
+-   _schema_ `import('./clean-node-list').Schema`: Schema for the HTML.
+-   _inline_ `boolean`: Whether to clean for inline mode.
+
+_Returns_
+
+-   `string`: The cleaned up HTML.
 
 <a name="replace" href="#replace">#</a> **replace**
 
@@ -203,18 +347,6 @@ _Parameters_
 _Returns_
 
 -   `Element`: The new node.
-
-<a name="stripHTML" href="#stripHTML">#</a> **stripHTML**
-
-Removes any HTML tags from the provided string.
-
-_Parameters_
-
--   _html_ `string`: The string containing html.
-
-_Returns_
-
--   `string`: The text content with any html removed.
 
 <a name="unwrap" href="#unwrap">#</a> **unwrap**
 

@@ -29,19 +29,19 @@ import Snackbar from './';
 function SnackbarList( { notices, className, children, onRemove = noop } ) {
 	const isReducedMotion = useReducedMotion();
 	const [ refMap ] = useState( () => new WeakMap() );
-	const transitions = useTransition(
-		notices,
-		( notice ) => notice.id,
-		{
-			from: { opacity: 0, height: 0 },
-			enter: ( item ) => async ( next ) => await next( { opacity: 1, height: refMap.get( item ).offsetHeight } ),
-			leave: () => async ( next ) => {
-				await next( { opacity: 0 } );
-				await next( { height: 0 } );
-			},
-			immediate: isReducedMotion,
-		}
-	);
+	const transitions = useTransition( notices, ( notice ) => notice.id, {
+		from: { opacity: 0, height: 0 },
+		enter: ( item ) => async ( next ) =>
+			await next( {
+				opacity: 1,
+				height: refMap.get( item ).offsetHeight,
+			} ),
+		leave: () => async ( next ) => {
+			await next( { opacity: 0 } );
+			await next( { height: 0 } );
+		},
+		immediate: isReducedMotion,
+	} );
 
 	className = classnames( 'components-snackbar-list', className );
 	const removeNotice = ( notice ) => () => onRemove( notice.id );

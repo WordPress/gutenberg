@@ -6,23 +6,23 @@ import { escapeRegExp } from 'lodash';
 /**
  * WordPress dependencies
  */
-import {
-	__experimentalCreateInterpolateElement,
-} from '@wordpress/element';
+import { createInterpolateElement } from '@wordpress/element';
 
 const TextHighlight = ( { text = '', highlight = '' } ) => {
-	if ( ! highlight.trim() ) {
+	const trimmedHighlightText = highlight.trim();
+
+	if ( ! trimmedHighlightText ) {
 		return text;
 	}
 
-	const regex = new RegExp( `(${ escapeRegExp( highlight ) })`, 'gi' );
-
-	return __experimentalCreateInterpolateElement(
-		text.replace( regex, '<mark>$&</mark>' ),
-		{
-			mark: <mark />,
-		}
+	const regex = new RegExp(
+		`(${ escapeRegExp( trimmedHighlightText ) })`,
+		'gi'
 	);
+
+	return createInterpolateElement( text.replace( regex, '<mark>$&</mark>' ), {
+		mark: <mark />,
+	} );
 };
 
 export default TextHighlight;

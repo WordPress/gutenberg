@@ -16,10 +16,11 @@ import { CheckboxControl } from '@wordpress/components';
  */
 import BlockTypesChecklist from './checklist';
 import EditPostSettings from '../edit-post-settings';
+import { store as editPostStore } from '../../store';
 
 function BlockManagerCategory( {
 	instanceId,
-	category,
+	title,
 	blockTypes,
 	hiddenBlockTypes,
 	toggleVisible,
@@ -27,17 +28,14 @@ function BlockManagerCategory( {
 } ) {
 	const settings = useContext( EditPostSettings );
 	const { allowedBlockTypes } = settings;
-	const filteredBlockTypes = useMemo(
-		() => {
-			if ( allowedBlockTypes === true ) {
-				return blockTypes;
-			}
-			return blockTypes.filter( ( { name } ) => {
-				return includes( allowedBlockTypes || [], name );
-			} );
-		},
-		[ allowedBlockTypes, blockTypes ]
-	);
+	const filteredBlockTypes = useMemo( () => {
+		if ( allowedBlockTypes === true ) {
+			return blockTypes;
+		}
+		return blockTypes.filter( ( { name } ) => {
+			return includes( allowedBlockTypes || [], name );
+		} );
+	}, [ allowedBlockTypes, blockTypes ] );
 
 	if ( ! filteredBlockTypes.length ) {
 		return null;
@@ -48,7 +46,8 @@ function BlockManagerCategory( {
 		...hiddenBlockTypes
 	);
 
-	const titleId = 'edit-post-manage-blocks-modal__category-title-' + instanceId;
+	const titleId =
+		'edit-post-manage-blocks-modal__category-title-' + instanceId;
 
 	const isAllChecked = checkedBlockNames.length === filteredBlockTypes.length;
 
@@ -72,7 +71,7 @@ function BlockManagerCategory( {
 				onChange={ toggleAllVisible }
 				className="edit-post-manage-blocks-modal__category-title"
 				aria-checked={ ariaChecked }
-				label={ <span id={ titleId }>{ category.title }</span> }
+				label={ <span id={ titleId }>{ title }</span> }
 			/>
 			<BlockTypesChecklist
 				blockTypes={ filteredBlockTypes }
@@ -86,17 +85,14 @@ function BlockManagerCategory( {
 export default compose( [
 	withInstanceId,
 	withSelect( ( select ) => {
-		const { getPreference } = select( 'core/edit-post' );
+		const { getPreference } = select( editPostStore );
 
 		return {
 			hiddenBlockTypes: getPreference( 'hiddenBlockTypes' ),
 		};
 	} ),
 	withDispatch( ( dispatch, ownProps ) => {
-		const {
-			showBlockTypes,
-			hideBlockTypes,
-		} = dispatch( 'core/edit-post' );
+		const { showBlockTypes, hideBlockTypes } = dispatch( editPostStore );
 
 		return {
 			toggleVisible( blockName, nextIsChecked ) {

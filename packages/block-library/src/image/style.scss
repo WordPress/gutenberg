@@ -1,10 +1,12 @@
 .wp-block-image {
-	// The image block is in a `figure` element, and many themes zero this out.
-	// This rule explicitly sets it, to ensure at least some bottom-margin in the flow.
-	margin-bottom: 1em;
+	margin: 0 0 1em 0;
 
 	img {
 		max-width: 100%;
+	}
+
+	&:not(.is-style-rounded) img {
+		border-radius: inherit;
 	}
 
 	&.aligncenter {
@@ -16,17 +18,10 @@
 		width: 100%;
 	}
 
-	// Floats get an extra wrapping <div> element, so the <figure> becomes a child.
 	.alignleft,
 	.alignright,
-	.aligncenter,
-	&.is-resized {
+	.aligncenter {
 		display: table;
-
-		// The figure is born with left and right margin.
-		// We remove this by default, and then customize it for left, right, and center.
-		margin-left: 0;
-		margin-right: 0;
 
 		> figcaption {
 			display: table-caption;
@@ -38,14 +33,20 @@
 		/*rtl:ignore*/
 		float: left;
 		/*rtl:ignore*/
+		margin-left: 0;
 		margin-right: 1em;
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
 	}
 
 	.alignright {
 		/*rtl:ignore*/
 		float: right;
 		/*rtl:ignore*/
+		margin-right: 0;
 		margin-left: 1em;
+		margin-top: 0.5em;
+		margin-bottom: 0.5em;
 	}
 
 	.aligncenter {
@@ -59,32 +60,36 @@
 	figcaption {
 		@include caption-style();
 	}
-}
 
-// Variations
-.is-style-rounded img {
-	// We use an absolute pixel to prevent the oval shape that a value of 50% would give
-	// to rectangular images. A pill-shape is better than otherwise.
-	border-radius: 9999px;
-}
-
-// The following variation is deprecated.
-// The CSS is kept here for the time being, to support blocks using the old variation.
-.is-style-circle-mask img {
-	// We use an absolute pixel to prevent the oval shape that a value of 50% would give
-	// to rectangular images. A pill-shape is better than otherwise.
-	border-radius: 9999px;
-
-	// If a browser supports it, we will switch to using a circular SVG mask.
-	// The stylelint override is necessary to use the SVG inline here.
-	@supports (mask-image: none) or (-webkit-mask-image: none) {
-		/* stylelint-disable */
-		mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/></svg>');
-		/* stylelint-enable */
-		mask-mode: alpha;
-		mask-repeat: no-repeat;
-		mask-size: contain;
-		mask-position: center;
-		border-radius: 0;
+	// Variations
+	&.is-style-rounded img {
+		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
+		// to rectangular images. A pill-shape is better than otherwise.
+		border-radius: 9999px;
 	}
+
+	// The following variation is deprecated.
+	// The CSS is kept here for the time being, to support blocks using the old variation.
+	&.is-style-circle-mask img {
+		// We use an absolute pixel to prevent the oval shape that a value of 50% would give
+		// to rectangular images. A pill-shape is better than otherwise.
+		border-radius: 9999px;
+
+		// If a browser supports it, we will switch to using a circular SVG mask.
+		// The stylelint override is necessary to use the SVG inline here.
+		@supports (mask-image: none) or (-webkit-mask-image: none) {
+			/* stylelint-disable */
+			mask-image: url('data:image/svg+xml;utf8,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="50"/></svg>');
+			/* stylelint-enable */
+			mask-mode: alpha;
+			mask-repeat: no-repeat;
+			mask-size: contain;
+			mask-position: center;
+			border-radius: 0;
+		}
+	}
+}
+
+.wp-block-image figure {
+	margin: 0;
 }

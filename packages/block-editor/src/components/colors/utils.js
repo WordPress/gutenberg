@@ -16,7 +16,11 @@ import tinycolor from 'tinycolor2';
  *                   the color object exactly as set by the theme or editor defaults is returned.
  *                   Otherwise, an object that just sets the color is defined.
  */
-export const getColorObjectByAttributeValues = ( colors, definedColor, customColor ) => {
+export const getColorObjectByAttributeValues = (
+	colors,
+	definedColor,
+	customColor
+) => {
 	if ( definedColor ) {
 		const colorObj = find( colors, { slug: definedColor } );
 
@@ -68,8 +72,7 @@ export function getColorClassName( colorContextName, colorSlug ) {
  * @return {string} String with the color value of the most readable color.
  */
 export function getMostReadableColor( colors, colorValue ) {
-	return tinycolor.mostReadable(
-		colorValue,
-		map( colors, 'color' )
-	).toHexString();
+	return tinycolor
+		.mostReadable( colorValue, map( colors, 'color' ) )
+		.toHexString();
 }

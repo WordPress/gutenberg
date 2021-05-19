@@ -1,20 +1,17 @@
 .components-form-token-field__input-container {
+	@include input-control();
 	display: flex;
 	flex-wrap: wrap;
-	align-items: flex-start;
+	align-items: center;
 	width: 100%;
-	margin: 0 0 $grid-size 0;
-	padding: $grid-size-small;
-	background-color: $white;
-	border: $border-width solid $light-gray-700;
-	color: $dark-gray-700;
+	margin: 0 0 $grid-unit-10 0;
+	padding: $grid-unit-05/2 $grid-unit-05;
 	cursor: text;
 
-	@include input-style__neutral();
 
 	&.is-disabled {
-		background: $light-gray-500;
-		border-color: $light-gray-700;
+		background: $gray-300;
+		border-color: $gray-300;
 	}
 
 	&.is-active {
@@ -24,15 +21,24 @@
 	// Token input
 	input[type="text"].components-form-token-field__input {
 		display: inline-block;
+		flex: 1;
+		font-size: 16px;
 		width: 100%;
 		max-width: 100%;
-		margin: 2px 0 2px 8px;
+		margin-left: 4px;
 		padding: 0;
 		min-height: 24px;
+		min-width: 50px;
 		background: inherit;
 		border: 0;
-		color: $dark-gray-800;
+		color: $gray-900;
 		box-shadow: none;
+
+		// Resolves Zooming on iOS devices
+		// https://github.com/WordPress/gutenberg/issues/27405
+		@include break-small() {
+			font-size: 13px;
+		}
 
 		&:focus,
 		.components-form-token-field.is-active & {
@@ -47,11 +53,13 @@
 
 .components-form-token-field__label {
 	display: inline-block;
-	margin-bottom: $grid-size-small;
+	margin-bottom: $grid-unit-05;
 }
 
 .components-form-token-field__help {
-	font-style: italic;
+	font-size: $helptext-font-size;
+	font-style: normal;
+	color: $gray-700;
 }
 
 // Tokens
@@ -59,8 +67,8 @@
 	font-size: $default-font-size;
 	display: flex;
 	margin: 2px 4px 2px 0;
-	color: $dark-gray-700;
-	overflow: hidden;
+	color: $gray-900;
+	max-width: 100%;
 
 	&.is-success {
 		.components-form-token-field__token-text,
@@ -79,7 +87,7 @@
 	&.is-validating {
 		.components-form-token-field__token-text,
 		.components-form-token-field__remove-token {
-			color: $dark-gray-500;
+			color: $gray-700;
 		}
 	}
 
@@ -89,12 +97,12 @@
 
 		.components-form-token-field__token-text {
 			background: transparent;
-			color: theme(secondary);
+			color: var(--wp-admin-theme-color);
 		}
 
 		.components-form-token-field__remove-token {
 			background: transparent;
-			color: $dark-gray-500;
+			color: $gray-700;
 			position: absolute;
 			top: 1px;
 			right: 0;
@@ -116,7 +124,7 @@
 
 		&.is-validating {
 			.components-form-token-field__token-text {
-				color: $dark-gray-800;
+				color: $gray-900;
 			}
 		}
 	}
@@ -133,14 +141,15 @@
 	display: inline-block;
 	line-height: 24px;
 	height: auto;
-	background: $light-gray-500;
+	background: $gray-300;
+	min-width: unset;
 	transition: all 0.2s cubic-bezier(0.4, 1, 0.4, 1);
 	@include reduce-motion;
 }
 
 .components-form-token-field__token-text {
-	border-radius: 12px 0 0 12px;
-	padding: 0 4px 0 8px;
+	border-radius: 2px 0 0 2px;
+	padding: 0 0 0 8px;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -148,14 +157,14 @@
 
 .components-form-token-field__remove-token.components-button {
 	cursor: pointer;
-	border-radius: 0 12px 12px 0;
+	border-radius: 0 2px 2px 0;
 	padding: 0 2px;
-	color: $dark-gray-500;
+	color: $gray-900;
 	line-height: 10px;
 	overflow: initial;
 
 	&:hover {
-		color: $dark-gray-700;
+		color: $gray-900;
 	}
 }
 
@@ -164,24 +173,25 @@
 	flex: 1 0 100%;
 	min-width: 100%;
 	max-height: 9em;
-	overflow-y: scroll;
+	overflow-y: auto;
 	transition: all 0.15s ease-in-out;
 	@include reduce-motion("transition");
 	list-style: none;
-	border-top: $border-width solid $dark-gray-300;
-	margin: $grid-size-small (-$grid-size-small) (-$grid-size-small);
-	padding-top: 3px;
+	border-top: $border-width solid $gray-700;
+	margin: $grid-unit-05 (-$grid-unit-05) (-$grid-unit-05);
+	padding: 0;
 }
 
 .components-form-token-field__suggestion {
-	color: $dark-gray-500;
+	color: $gray-700;
 	display: block;
 	font-size: $default-font-size;
 	padding: 4px 8px;
+	margin: 0;
 	cursor: pointer;
 
 	&.is-selected {
-		background: $blue-dark-900;
+		background: var(--wp-admin-theme-color);
 		color: $white;
 	}
 }

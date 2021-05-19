@@ -4,16 +4,21 @@
 import classnames from 'classnames';
 
 /**
+ * WordPress dependencies
+ */
+import { Icon, check } from '@wordpress/icons';
+
+/**
  * Internal dependencies
  */
 import Button from '../button';
 import Dropdown from '../dropdown';
 import Tooltip from '../tooltip';
-import Dashicon from '../dashicon';
 
 function Option( {
 	className,
 	isSelected,
+	selectedIconProps,
 	tooltipText,
 	...additionalProps
 } ) {
@@ -22,18 +27,24 @@ function Option( {
 			isPressed={ isSelected }
 			className={ classnames(
 				className,
-				'components-circular-option-picker__option',
+				'components-circular-option-picker__option'
 			) }
 			{ ...additionalProps }
 		/>
 	);
 	return (
 		<div className="components-circular-option-picker__option-wrapper">
-			{ tooltipText ?
-				( <Tooltip text={ tooltipText }>{ optionButton }</Tooltip> ) :
+			{ tooltipText ? (
+				<Tooltip text={ tooltipText }>{ optionButton }</Tooltip>
+			) : (
 				optionButton
-			}
-			{ isSelected && <Dashicon icon="saved" /> }
+			) }
+			{ isSelected && (
+				<Icon
+					icon={ check }
+					{ ...( selectedIconProps ? selectedIconProps : {} ) }
+				/>
+			) }
 		</div>
 	);
 }
@@ -53,6 +64,7 @@ function DropdownLinkAction( {
 			renderToggle={ ( { isOpen, onToggle } ) => (
 				<Button
 					aria-expanded={ isOpen }
+					aria-haspopup="true"
 					onClick={ onToggle }
 					isLink
 					{ ...buttonProps }
@@ -65,11 +77,7 @@ function DropdownLinkAction( {
 	);
 }
 
-function ButtonAction( {
-	className,
-	children,
-	...additionalProps
-} ) {
+function ButtonAction( { className, children, ...additionalProps } ) {
 	return (
 		<Button
 			className={ classnames(
@@ -92,8 +100,15 @@ export default function CircularOptionPicker( {
 	children,
 } ) {
 	return (
-		<div className={ classnames( 'components-circular-option-picker', className ) }>
-			{ options }
+		<div
+			className={ classnames(
+				'components-circular-option-picker',
+				className
+			) }
+		>
+			<div className="components-circular-option-picker__swatches">
+				{ options }
+			</div>
 			{ children }
 			{ actions && (
 				<div className="components-circular-option-picker__custom-clear-wrapper">

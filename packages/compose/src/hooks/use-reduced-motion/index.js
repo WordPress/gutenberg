@@ -18,8 +18,8 @@ const IS_IE =
  * @return {boolean} Reduced motion preference value.
  */
 const useReducedMotion =
-	process.env.FORCE_REDUCED_MOTION || IS_IE ?
-		() => true :
-		() => useMediaQuery( '(prefers-reduced-motion: reduce)' );
+	process.env.FORCE_REDUCED_MOTION || IS_IE
+		? () => true
+		: () => useMediaQuery( '(prefers-reduced-motion: reduce)' );
 
 export default useReducedMotion;

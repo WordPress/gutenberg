@@ -1,25 +1,12 @@
 /**
  * External dependencies
  */
-import TestUtils from 'react-dom/test-utils';
-
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
+import { act, render } from '@testing-library/react';
 
 /**
  * Internal dependencies
  */
 import Popover from '../';
-
-jest.useFakeTimers();
-
-class PopoverWrapper extends Component {
-	render() {
-		return <Popover { ...this.props } />;
-	}
-}
 
 describe( 'Popover', () => {
 	afterEach( () => {
@@ -34,51 +21,50 @@ describe( 'Popover', () => {
 		document.dispatchEvent( new window.KeyboardEvent( 'keydown' ) );
 		document.dispatchEvent( new window.KeyboardEvent( 'keyup' ) );
 
+		expect( document.activeElement ).toBe( document.body );
+
 		// An ideal test here would mount with an input child and focus the
 		// child, but in context of JSDOM the inputs are not visible and
 		// are therefore skipped as tabbable, defaulting to popover.
-		let wrapper;
-		TestUtils.act( () => {
-			wrapper = TestUtils.renderIntoDocument( <PopoverWrapper /> );
+		let result;
+		act( () => {
+			result = render( <Popover /> );
 
 			jest.advanceTimersByTime( 1 );
-
-			const content = TestUtils.findRenderedDOMComponentWithClass(
-				wrapper,
-				'components-popover__content'
-			);
-			expect( document.activeElement ).toBe( content );
 		} );
+
+		expect( document.activeElement ).toBe(
+			result.container.querySelector( '.components-popover' )
+		);
 	} );
 
 	it( 'should allow focus-on-open behavior to be disabled', () => {
-		const activeElement = document.activeElement;
-		TestUtils.act( () => {
-			TestUtils.renderIntoDocument( <Popover focusOnMount={ false } /> );
+		expect( document.activeElement ).toBe( document.body );
+
+		act( () => {
+			render( <Popover focusOnMount={ false } /> );
 
 			jest.advanceTimersByTime( 1 );
-
-			expect( document.activeElement ).toBe( activeElement );
 		} );
+
+		expect( document.activeElement ).toBe( document.body );
 	} );
 
 	it( 'should render content', () => {
-		let wrapper;
-		TestUtils.act( () => {
-			wrapper = TestUtils.renderIntoDocument( <PopoverWrapper>Hello</PopoverWrapper> );
+		let result;
+		act( () => {
+			result = render( <Popover>Hello</Popover> );
 		} );
-		const content = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'span' );
 
-		expect( content ).toMatchSnapshot();
+		expect( result.container.querySelector( 'span' ) ).toMatchSnapshot();
 	} );
 
 	it( 'should pass additional props to portaled element', () => {
-		let wrapper;
-		TestUtils.act( () => {
-			wrapper = TestUtils.renderIntoDocument( <PopoverWrapper role="tooltip">Hello</PopoverWrapper> );
+		let result;
+		act( () => {
+			result = render( <Popover role="tooltip">Hello</Popover> );
 		} );
-		const content = TestUtils.findRenderedDOMComponentWithTag( wrapper, 'span' );
 
-		expect( content ).toMatchSnapshot();
+		expect( result.container.querySelector( 'span' ) ).toMatchSnapshot();
 	} );
 } );

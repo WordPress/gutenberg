@@ -1,7 +1,6 @@
 .wp-block-pullquote {
+	margin: 0 0 1em 0;
 	padding: 3em 0;
-	margin-left: 0;
-	margin-right: 0;
 	text-align: center;
 
 	&.alignleft,
@@ -9,12 +8,12 @@
 		max-width: $content-width / 2;
 
 		p {
-			font-size: 20px;
+			font-size: 1.25em;
 		}
 	}
 
 	p {
-		font-size: 28px;
+		font-size: 1.75em;
 		line-height: 1.6;
 	}
 
@@ -43,7 +42,7 @@
 		p {
 			margin-top: 0;
 			margin-bottom: 0;
-			font-size: 32px;
+			font-size: 2em;
 		}
 
 		cite {

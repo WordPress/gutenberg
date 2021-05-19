@@ -26,7 +26,10 @@ class Listener {
 	}
 
 	remove( eventType, instance ) {
-		this.listeners[ eventType ] = without( this.listeners[ eventType ], instance );
+		this.listeners[ eventType ] = without(
+			this.listeners[ eventType ],
+			instance
+		);
 
 		if ( ! this.listeners[ eventType ].length ) {
 			// Removing last listener for this type, so unbind event.

@@ -1,157 +1,26 @@
-.edit-post-sidebar {
-	background: $white;
-	color: $dark-gray-500;
-	overflow: visible;
-
-	@include break-small() {
-		z-index: auto;
-		height: 100%;
-		overflow: visible;
-		-webkit-overflow-scrolling: touch;
-	}
-
-	@include break-medium() {
-		width: $sidebar-width;
-	}
-
-	> .components-panel {
-		border-left: none;
-		border-right: none;
-		overflow: auto;
-		-webkit-overflow-scrolling: touch;
-		height: auto;
-		max-height: calc(100vh - #{ $admin-bar-height-big + $panel-header-height });
-		margin-top: -1px;
-		margin-bottom: -1px;
-		position: relative;
-
-		@include break-small() {
-			overflow: visible;
-			height: auto;
-			max-height: none;
-		}
-	}
-
-	> .components-panel .components-panel__header {
-		position: fixed;
-		z-index: z-index(".components-panel__header");
-		top: 0;
-		left: 0;
-		right: 0;
-		height: $panel-header-height;
-
-		@include break-small() {
-			position: inherit;
-			top: auto;
-			left: auto;
-			right: auto;
-		}
-	}
-
-	p {
-		margin-top: 0;
-	}
-
-	h2,
-	h3 {
-		font-size: $default-font-size;
-		color: $dark-gray-500;
-		margin-bottom: 1.5em;
-	}
-
-	hr {
-		border-top: none;
-		border-bottom: 1px solid $light-gray-500;
-		margin: 1.5em 0;
-	}
-
-	div.components-toolbar {
-		box-shadow: none;
-		margin-bottom: 1.5em;
-		&:last-child {
-			margin-bottom: 0;
-		}
-	}
-
-	p + div.components-toolbar {
-		margin-top: -1em;
-	}
-
-	.block-editor-skip-to-selected-block:focus {
-		top: auto;
-		right: 10px;
-		bottom: 10px;
-		left: auto;
-	}
-}
-
-/* Text Editor specific */
-.components-panel__header.edit-post-sidebar__header {
-	background: $white;
-	padding-right: $panel-padding / 2;
-
-	.edit-post-sidebar__title {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-		width: 100%;
-	}
-
-	@include break-medium() {
-		display: none;
-	}
-}
-
 .components-panel__header.edit-post-sidebar__panel-tabs {
 	justify-content: flex-start;
 	padding-left: 0;
-	padding-right: $grid-size-small;
+	padding-right: $grid-unit-20;
 	border-top: 0;
 	margin-top: 0;
 
+	ul {
+		display: flex;
+	}
+	li {
+		margin: 0;
+	}
+
 	.components-button.has-icon {
 		display: none;
-		margin-left: auto;
+		margin: 0 0 0 auto;
+		padding: 0;
+		min-width: $icon-size;
+		height: $icon-size;
 
 		@include break-medium() {
 			display: flex;
 		}
-	}
-}
-
-.edit-post-sidebar__panel-tab {
-	background: transparent;
-	border: none;
-	border-radius: 0;
-	box-shadow: none;
-	cursor: pointer;
-	height: 50px;
-	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
-	margin-left: 0;
-	font-weight: 400;
-	@include square-style__neutral;
-	transition: box-shadow 0.1s linear;
-	@include reduce-motion("transition");
-
-	&.is-active {
-		box-shadow: inset 0 -3px theme(outlines);
-		font-weight: 600;
-		position: relative;
-
-		// This border appears in Windows High Contrast mode instead of the box-shadow.
-		&::before {
-			content: "";
-			position: absolute;
-			top: 0;
-			bottom: 1px;
-			right: 0;
-			left: 0;
-			border-bottom: 3px solid transparent;
-		}
-	}
-
-	&:focus:not(:disabled) {
-		@include square-style__focus;
-		box-shadow: none;
 	}
 }

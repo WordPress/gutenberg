@@ -7,21 +7,21 @@ import { once, uniqueId, omit } from 'lodash';
  * WordPress dependencies
  */
 import { useCallback, useEffect, useRef } from '@wordpress/element';
-import { ifCondition } from '@wordpress/compose';
+import { ifCondition, usePrevious } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
  */
 import AutosaveMonitor from '../autosave-monitor';
-import {
-	localAutosaveGet,
-	localAutosaveClear,
-} from '../../store/controls';
+import { localAutosaveGet, localAutosaveClear } from '../../store/controls';
 
-const requestIdleCallback = window.requestIdleCallback ? window.requestIdleCallback : window.requestAnimationFrame;
+const requestIdleCallback = window.requestIdleCallback
+	? window.requestIdleCallback
+	: window.requestAnimationFrame;
 
 /**
  * Function which returns true if the current environment supports browser
@@ -46,21 +46,24 @@ const hasSessionStorageSupport = once( () => {
  * restore a local autosave, if one exists.
  */
 function useAutosaveNotice() {
-	const {
-		postId,
-		getEditedPostAttribute,
-		hasRemoteAutosave,
-	} = useSelect( ( select ) => ( {
-		postId: select( 'core/editor' ).getCurrentPostId(),
-		getEditedPostAttribute: select( 'core/editor' ).getEditedPostAttribute,
-		hasRemoteAutosave: !! select( 'core/editor' ).getEditorSettings().autosave,
-	} ), [] );
+	const { postId, isEditedPostNew, hasRemoteAutosave } = useSelect(
+		( select ) => ( {
+			postId: select( 'core/editor' ).getCurrentPostId(),
+			isEditedPostNew: select( 'core/editor' ).isEditedPostNew(),
+			getEditedPostAttribute: select( 'core/editor' )
+				.getEditedPostAttribute,
+			hasRemoteAutosave: !! select( 'core/editor' ).getEditorSettings()
+				.autosave,
+		} ),
+		[]
+	);
+	const { getEditedPostAttribute } = useSelect( 'core/editor' );
 
-	const { createWarningNotice, removeNotice } = useDispatch( 'core/notices' );
+	const { createWarningNotice, removeNotice } = useDispatch( noticesStore );
 	const { editPost, resetEditorBlocks } = useDispatch( 'core/editor' );
 
 	useEffect( () => {
-		let localAutosave = localAutosaveGet( postId );
+		let localAutosave = localAutosaveGet( postId, isEditedPostNew );
 		if ( ! localAutosave ) {
 			return;
 		}
@@ -84,7 +87,7 @@ function useAutosaveNotice() {
 
 			if ( ! hasDifference ) {
 				// If there is no difference, it can be safely ejected from storage.
-				localAutosaveClear( postId );
+				localAutosaveClear( postId, isEditedPostNew );
 				return;
 			}
 		}
@@ -94,20 +97,25 @@ function useAutosaveNotice() {
 		}
 
 		const noticeId = uniqueId( 'wpEditorAutosaveRestore' );
-		createWarningNotice( __( 'The backup of this post in your browser is different from the version below.' ), {
-			id: noticeId,
-			actions: [
-				{
-					label: __( 'Restore the backup' ),
-					onClick() {
-						editPost( omit( edits, [ 'content' ] ) );
-						resetEditorBlocks( parse( edits.content ) );
-						removeNotice( noticeId );
+		createWarningNotice(
+			__(
+				'The backup of this post in your browser is different from the version below.'
+			),
+			{
+				id: noticeId,
+				actions: [
+					{
+						label: __( 'Restore the backup' ),
+						onClick() {
+							editPost( omit( edits, [ 'content' ] ) );
+							resetEditorBlocks( parse( edits.content ) );
+							removeNotice( noticeId );
+						},
 					},
-				},
-			],
-		} );
-	}, [ postId ] );
+				],
+			}
+		);
+	}, [ isEditedPostNew, postId ] );
 }
 
 /**
@@ -116,52 +124,67 @@ function useAutosaveNotice() {
 function useAutosavePurge() {
 	const {
 		postId,
+		isEditedPostNew,
 		isDirty,
 		isAutosaving,
 		didError,
-	} = useSelect( ( select ) => ( {
-		postId: select( 'core/editor' ).getCurrentPostId(),
-		isDirty: select( 'core/editor' ).isEditedPostDirty(),
-		isAutosaving: select( 'core/editor' ).isAutosavingPost(),
-		didError: select( 'core/editor' ).didPostSaveRequestFail(),
-	} ), [] );
+	} = useSelect(
+		( select ) => ( {
+			postId: select( 'core/editor' ).getCurrentPostId(),
+			isEditedPostNew: select( 'core/editor' ).isEditedPostNew(),
+			isDirty: select( 'core/editor' ).isEditedPostDirty(),
+			isAutosaving: select( 'core/editor' ).isAutosavingPost(),
+			didError: select( 'core/editor' ).didPostSaveRequestFail(),
+		} ),
+		[]
+	);
 
 	const lastIsDirty = useRef( isDirty );
 	const lastIsAutosaving = useRef( isAutosaving );
 
 	useEffect( () => {
 		if (
-			! didError && (
-				( lastIsAutosaving.current && ! isAutosaving ) ||
-				( lastIsDirty.current && ! isDirty )
-			)
+			! didError &&
+			( ( lastIsAutosaving.current && ! isAutosaving ) ||
+				( lastIsDirty.current && ! isDirty ) )
 		) {
-			localAutosaveClear( postId );
+			localAutosaveClear( postId, isEditedPostNew );
 		}
 
 		lastIsDirty.current = isDirty;
 		lastIsAutosaving.current = isAutosaving;
 	}, [ isDirty, isAutosaving, didError ] );
+
+	// Once the isEditedPostNew changes from true to false, let's clear the auto-draft autosave.
+	const wasEditedPostNew = usePrevious( isEditedPostNew );
+	const prevPostId = usePrevious( postId );
+	useEffect( () => {
+		if ( prevPostId === postId && wasEditedPostNew && ! isEditedPostNew ) {
+			localAutosaveClear( postId, true );
+		}
+	}, [ isEditedPostNew, postId ] );
 }
 
 function LocalAutosaveMonitor() {
-	const { __experimentalLocalAutosave } = useDispatch( 'core/editor' );
-	const autosave = useCallback( () => {
-		requestIdleCallback( __experimentalLocalAutosave );
+	const { autosave } = useDispatch( 'core/editor' );
+	const deferedAutosave = useCallback( () => {
+		requestIdleCallback( () => autosave( { local: true } ) );
 	}, [] );
 	useAutosaveNotice();
 	useAutosavePurge();
 
-	const { localAutosaveInterval } = useSelect( ( select ) => ( {
-		localAutosaveInterval: select( 'core/editor' )
-			.getEditorSettings().__experimentalLocalAutosaveInterval,
-	} ), [] );
+	const { localAutosaveInterval } = useSelect(
+		( select ) => ( {
+			localAutosaveInterval: select( 'core/editor' ).getEditorSettings()
+				.__experimentalLocalAutosaveInterval,
+		} ),
+		[]
+	);
 
 	return (
 		<AutosaveMonitor
 			interval={ localAutosaveInterval }
-			autosave={ autosave }
-			shouldThrottle
+			autosave={ deferedAutosave }
 		/>
 	);
 }

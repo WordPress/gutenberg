@@ -36,6 +36,10 @@
 	&.is-from-left {
 		transform: translateX(+100%);
 	}
+
+	&.is-from-right {
+		transform: translateX(-100%);
+	}
 }
 
 @keyframes components-animate__slide-in-animation {

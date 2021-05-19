@@ -1,11 +1,8 @@
-module.exports = function( api ) {
+module.exports = ( api ) => {
 	api.cache( true );
 
 	return {
 		presets: [ '@wordpress/babel-preset-default' ],
-		plugins: [
-			'babel-plugin-emotion',
-			'babel-plugin-inline-json-import',
-		],
+		plugins: [ 'babel-plugin-emotion', 'babel-plugin-inline-json-import' ],
 	};
 };

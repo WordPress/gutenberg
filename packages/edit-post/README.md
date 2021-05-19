@@ -12,7 +12,7 @@ Install the module
 npm install @wordpress/edit-post
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Extending the post editor UI
 
@@ -72,8 +72,8 @@ function MyPluginBlockSettingsMenuItem() {
 
 ```jsx
 // Using ESNext syntax
-import { __ } from wp.i18n;
-import { PluginBlockSettingsMenuItem } from wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginBlockSettingsMenuItem } from '@wordpress/edit-post';
 
 const doOnClick = ( ) => {
     // To be called when the user clicks the menu item.
@@ -81,9 +81,9 @@ const doOnClick = ( ) => {
 
 const MyPluginBlockSettingsMenuItem = () => (
     <PluginBlockSettingsMenuItem
-		allowedBlocks=[ 'core/paragraph' ]
+		allowedBlocks={ [ 'core/paragraph' ] }
 		icon='dashicon-name'
-		label=__( 'Menu item text' )
+		label={ __( 'Menu item text' ) }
 		onClick={ doOnClick } />
 );
 ```
@@ -91,10 +91,12 @@ const MyPluginBlockSettingsMenuItem = () => (
 _Parameters_
 
 -   _props_ `Object`: Component props.
--   _props.allowedBlocks_ `[Array]`: An array containing a list of block names for which the item should be shown. If not present, it'll be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the whitelist.
+-   _props.allowedBlocks_ `[Array]`: An array containing a list of block names for which the item should be shown. If not present, it'll be rendered for any block. If multiple blocks are selected, it'll be shown if and only if all of them are in the allowed list.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element.
 -   _props.label_ `string`: The menu item text.
 -   _props.onClick_ `Function`: Callback function to be executed when the user click the menu item.
+-   _props.small_ `[boolean]`: Whether to render the label or not.
+-   _props.role_ `[string]`: The ARIA role for the menu item.
 
 _Returns_
 
@@ -131,8 +133,8 @@ registerPlugin( 'my-document-setting-plugin', {
 
 ```jsx
 // Using ESNext syntax
-const { registerPlugin } = wp.plugins;
-const { PluginDocumentSettingPanel } = wp.editPost;
+import { registerPlugin } from '@wordpress/plugins';
+import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
 
 const MyDocumentSettingTest = () => (
 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
@@ -166,6 +168,7 @@ _Usage_
 // Using ES5 syntax
 var __ = wp.i18n.__;
 var PluginMoreMenuItem = wp.editPost.PluginMoreMenuItem;
+var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
 
 function onButtonClick() {
 	alert( 'Button clicked.' );
@@ -175,18 +178,19 @@ function MyButtonMoreMenuItem() {
 	return wp.element.createElement(
 		PluginMoreMenuItem,
 		{
-			icon: 'smiley',
-			onClick: onButtonClick
+			icon: moreIcon,
+			onClick: onButtonClick,
 		},
 		__( 'My button title' )
-	)
+	);
 }
 ```
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginMoreMenuItem } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginMoreMenuItem } from '@wordpress/edit-post';
+import { more } from '@wordpress/icons';
 
 function onButtonClick() {
 	alert( 'Button clicked.' );
@@ -194,7 +198,7 @@ function onButtonClick() {
 
 const MyButtonMoreMenuItem = () => (
 	<PluginMoreMenuItem
-		icon="smiley"
+		icon={ more }
 		onClick={ onButtonClick }
 	>
 		{ __( 'My button title' ) }
@@ -241,8 +245,8 @@ function MyPluginPostPublishPanel() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginPostPublishPanel } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginPostPublishPanel } from '@wordpress/edit-post';
 
 const MyPluginPostPublishPanel = () => (
 	<PluginPostPublishPanel
@@ -293,8 +297,8 @@ function MyPluginPostStatusInfo() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginPostStatusInfo } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginPostStatusInfo } from '@wordpress/edit-post';
 
 const MyPluginPostStatusInfo = () => (
 	<PluginPostStatusInfo
@@ -309,6 +313,7 @@ _Parameters_
 
 -   _props_ `Object`: Component properties.
 -   _props.className_ `[string]`: An optional class name added to the row.
+-   _props.children_ `WPElement`: Children to be rendered.
 
 _Returns_
 
@@ -341,8 +346,8 @@ function MyPluginPrePublishPanel() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginPrePublishPanel } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginPrePublishPanel } from '@wordpress/edit-post';
 
 const MyPluginPrePublishPanel = () => (
 	<PluginPrePublishPanel
@@ -370,6 +375,7 @@ _Returns_
 <a name="PluginSidebar" href="#PluginSidebar">#</a> **PluginSidebar**
 
 Renders a sidebar when activated. The contents within the `PluginSidebar` will appear as content within the sidebar.
+It also automatically renders a corresponding `PluginSidebarMenuItem` component when `isPinnable` flag is set to `true`.
 If you wish to display the sidebar, you can with use the `PluginSidebarMoreMenuItem` component or the `wp.data.dispatch` API:
 
 ```js
@@ -388,6 +394,7 @@ var __ = wp.i18n.__;
 var el = wp.element.createElement;
 var PanelBody = wp.components.PanelBody;
 var PluginSidebar = wp.editPost.PluginSidebar;
+var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
 
 function MyPluginSidebar() {
 	return el(
@@ -395,7 +402,7 @@ function MyPluginSidebar() {
 			{
 				name: 'my-sidebar',
 				title: 'My sidebar title',
-				icon: 'smiley',
+				icon: moreIcon,
 			},
 			el(
 				PanelBody,
@@ -408,15 +415,16 @@ function MyPluginSidebar() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PanelBody } = wp.components;
-const { PluginSidebar } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PanelBody } from '@wordpress/components';
+import { PluginSidebar } from '@wordpress/edit-post';
+import { more } from '@wordpress/icons';
 
 const MyPluginSidebar = () => (
 	<PluginSidebar
 		name="my-sidebar"
 		title="My sidebar title"
-		icon="smiley"
+		icon={ more }
 	>
 		<PanelBody>
 			{ __( 'My sidebar content' ) }
@@ -431,12 +439,8 @@ _Parameters_
 -   _props.name_ `string`: A string identifying the sidebar. Must be unique for every sidebar registered within the scope of your plugin.
 -   _props.className_ `[string]`: An optional class name added to the sidebar body.
 -   _props.title_ `string`: Title displayed at the top of the sidebar.
--   _props.isPinnable_ `[boolean]`: Whether to allow to pin sidebar to toolbar.
+-   _props.isPinnable_ `[boolean]`: Whether to allow to pin sidebar to the toolbar. When set to `true` it also automatically renders a corresponding menu item.
 -   _props.icon_ `[WPBlockTypeIconRender]`: The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
-
-_Returns_
-
--   `WPComponent`: Plugin sidebar component.
 
 <a name="PluginSidebarMoreMenuItem" href="#PluginSidebarMoreMenuItem">#</a> **PluginSidebarMoreMenuItem**
 
@@ -450,13 +454,14 @@ _Usage_
 // Using ES5 syntax
 var __ = wp.i18n.__;
 var PluginSidebarMoreMenuItem = wp.editPost.PluginSidebarMoreMenuItem;
+var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
 
 function MySidebarMoreMenuItem() {
 	return wp.element.createElement(
 		PluginSidebarMoreMenuItem,
 		{
 			target: 'my-sidebar',
-			icon: 'smiley',
+			icon: moreIcon,
 		},
 		__( 'My sidebar title' )
 	)
@@ -465,13 +470,14 @@ function MySidebarMoreMenuItem() {
 
 ```jsx
 // Using ESNext syntax
-const { __ } = wp.i18n;
-const { PluginSidebarMoreMenuItem } = wp.editPost;
+import { __ } from '@wordpress/i18n';
+import { PluginSidebarMoreMenuItem } from '@wordpress/edit-post';
+import { more } from '@wordpress/icons';
 
 const MySidebarMoreMenuItem = () => (
 	<PluginSidebarMoreMenuItem
 		target="my-sidebar"
-		icon="smiley"
+		icon={ more }
 	>
 		{ __( 'My sidebar title' ) }
 	</PluginSidebarMoreMenuItem>
@@ -501,6 +507,18 @@ _Parameters_
 -   _target_ `Element`: DOM node in which editor is rendered.
 -   _settings_ `?Object`: Editor settings object.
 -   _initialEdits_ `Object`: Programmatic edits to apply initially, to be considered as non-user-initiated (bypass for unsaved changes prompt).
+
+<a name="store" href="#store">#</a> **store**
+
+Store definition for the edit post namespace.
+
+_Related_
+
+-   <https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore>
+
+_Type_
+
+-   `Object`
 
 
 <!-- END TOKEN(Autogenerated API docs) -->

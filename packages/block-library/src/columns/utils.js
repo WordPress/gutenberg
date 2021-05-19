@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { findIndex, sumBy, merge, mapValues } from 'lodash';
+import { sumBy, merge, mapValues } from 'lodash';
 
 /**
  * Returns a column width attribute value rounded to standard precision.
@@ -11,29 +11,12 @@ import { findIndex, sumBy, merge, mapValues } from 'lodash';
  *
  * @return {number} Value rounded to standard precision.
  */
-export const toWidthPrecision = ( value ) =>
-	Number.isFinite( value ) ?
-		parseFloat( value.toFixed( 2 ) ) :
-		undefined;
-
-/**
- * Returns the considered adjacent to that of the specified `clientId` for
- * resizing consideration. Adjacent blocks are those occurring after, except
- * when the given block is the last block in the set. For the last block, the
- * behavior is reversed.
- *
- * @param {WPBlock[]} blocks   Block objects.
- * @param {string}    clientId Client ID to consider for adjacent blocks.
- *
- * @return {WPBlock[]} Adjacent block objects.
- */
-export function getAdjacentBlocks( blocks, clientId ) {
-	const index = findIndex( blocks, { clientId } );
-	const isLastBlock = index === blocks.length - 1;
-
-	return isLastBlock ? blocks.slice( 0, index ) : blocks.slice( index + 1 );
-}
-
+export const toWidthPrecision = ( value ) => {
+	const unitlessValue = parseFloat( value );
+	return Number.isFinite( unitlessValue )
+		? parseFloat( unitlessValue.toFixed( 2 ) )
+		: undefined;
+};
 /**
  * Returns an effective width for a given block. An effective width is equal to
  * its attribute value if set, or a computed value assuming equal distribution.
@@ -57,8 +40,13 @@ export function getEffectiveColumnWidth( block, totalBlockCount ) {
  *
  * @return {number} Total width occupied by blocks.
  */
-export function getTotalColumnsWidth( blocks, totalBlockCount = blocks.length ) {
-	return sumBy( blocks, ( block ) => getEffectiveColumnWidth( block, totalBlockCount ) );
+export function getTotalColumnsWidth(
+	blocks,
+	totalBlockCount = blocks.length
+) {
+	return sumBy( blocks, ( block ) =>
+		getEffectiveColumnWidth( block, totalBlockCount )
+	);
 }
 
 /**
@@ -89,15 +77,17 @@ export function getColumnWidths( blocks, totalBlockCount = blocks.length ) {
  *
  * @return {Object<string,number>} Redistributed column widths.
  */
-export function getRedistributedColumnWidths( blocks, availableWidth, totalBlockCount = blocks.length ) {
+export function getRedistributedColumnWidths(
+	blocks,
+	availableWidth,
+	totalBlockCount = blocks.length
+) {
 	const totalWidth = getTotalColumnsWidth( blocks, totalBlockCount );
-	const difference = availableWidth - totalWidth;
-	const adjustment = difference / blocks.length;
 
-	return mapValues(
-		getColumnWidths( blocks, totalBlockCount ),
-		( width ) => toWidthPrecision( width + adjustment ),
-	);
+	return mapValues( getColumnWidths( blocks, totalBlockCount ), ( width ) => {
+		const newWidth = ( availableWidth * width ) / totalWidth;
+		return toWidthPrecision( newWidth );
+	} );
 }
 
 /**
@@ -108,8 +98,15 @@ export function getRedistributedColumnWidths( blocks, availableWidth, totalBlock
  *
  * @return {boolean} Whether columns have explicit widths.
  */
-export function hasExplicitColumnWidths( blocks ) {
-	return blocks.some( ( block ) => Number.isFinite( block.attributes.width ) );
+export function hasExplicitPercentColumnWidths( blocks ) {
+	return blocks.every( ( block ) => {
+		const blockWidth = block.attributes.width;
+		return Number.isFinite(
+			blockWidth?.endsWith?.( '%' )
+				? parseFloat( blockWidth )
+				: blockWidth
+		);
+	} );
 }
 
 /**
@@ -122,9 +119,57 @@ export function hasExplicitColumnWidths( blocks ) {
  * @return {WPBlock[]} blocks Mapped block objects.
  */
 export function getMappedColumnWidths( blocks, widths ) {
-	return blocks.map( ( block ) => merge( {}, block, {
-		attributes: {
-			width: widths[ block.clientId ],
-		},
-	} ) );
+	return blocks.map( ( block ) =>
+		merge( {}, block, {
+			attributes: {
+				width: widths[ block.clientId ],
+			},
+		} )
+	);
+}
+
+/**
+ * Returns an array with columns widths values, parsed or no depends on `withParsing` flag.
+ *
+ * @param {WPBlock[]} blocks			Block objects.
+ * @param {?boolean} withParsing 	Whether value has to be parsed.
+ *
+ * @return {Array<number,string>} Column widths.
+ */
+export function getWidths( blocks, withParsing = true ) {
+	return blocks.map( ( innerColumn ) => {
+		const innerColumnWidth =
+			innerColumn.attributes.width || 100 / blocks.length;
+
+		return withParsing ? parseFloat( innerColumnWidth ) : innerColumnWidth;
+	} );
+}
+
+/**
+ * Returns a column width with unit.
+ *
+ * @param {string} width	Column width.
+ * @param {string} unit 	Column width unit.
+ *
+ * @return {string} Column width with unit.
+ */
+export function getWidthWithUnit( width, unit ) {
+	width = 0 > parseFloat( width ) ? '0' : width;
+
+	if ( isPercentageUnit( unit ) ) {
+		width = Math.min( width, 100 );
+	}
+
+	return `${ width }${ unit }`;
+}
+
+/**
+ * Returns a boolean whether passed unit is percentage
+ *
+ * @param {string} unit Column width unit.
+ *
+ * @return {boolean} 	Whether unit is '%'.
+ */
+export function isPercentageUnit( unit ) {
+	return unit === '%';
 }

@@ -4,8 +4,17 @@ exports[`MoreMenu should match snapshot 1`] = `
 <MoreMenu>
   <DropdownMenu
     className="edit-post-more-menu"
-    icon="ellipsis"
-    label="More tools & options"
+    icon={
+      <SVG
+        viewBox="0 0 24 24"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <Path
+          d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
+        />
+      </SVG>
+    }
+    label="Options"
     popoverProps={
       Object {
         "className": "edit-post-more-menu__content",
@@ -14,6 +23,8 @@ exports[`MoreMenu should match snapshot 1`] = `
     }
     toggleProps={
       Object {
+        "isTertiary": undefined,
+        "showTooltip": true,
         "tooltipPosition": "bottom",
       }
     }
@@ -36,8 +47,17 @@ exports[`MoreMenu should match snapshot 1`] = `
           aria-expanded={false}
           aria-haspopup="true"
           className="components-dropdown-menu__toggle"
-          icon="ellipsis"
-          label="More tools & options"
+          icon={
+            <SVG
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <Path
+                d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
+              />
+            </SVG>
+          }
+          label="Options"
           onClick={[Function]}
           onKeyDown={[Function]}
           showTooltip={true}
@@ -45,12 +65,13 @@ exports[`MoreMenu should match snapshot 1`] = `
         >
           <Tooltip
             position="bottom"
-            text="More tools & options"
+            text="Options"
           >
             <button
+              aria-describedby={null}
               aria-expanded={false}
               aria-haspopup="true"
-              aria-label="More tools & options"
+              aria-label="Options"
               className="components-button components-dropdown-menu__toggle has-icon"
               onBlur={[Function]}
               onClick={[Function]}
@@ -62,43 +83,42 @@ exports[`MoreMenu should match snapshot 1`] = `
               type="button"
             >
               <Icon
-                icon="ellipsis"
-                key="0,0"
-              >
-                <Dashicon
-                  icon="ellipsis"
-                  size={20}
-                >
+                icon={
                   <SVG
-                    aria-hidden={true}
-                    className="dashicon dashicons-ellipsis"
-                    focusable="false"
-                    height={20}
-                    role="img"
-                    viewBox="0 0 20 20"
-                    width={20}
+                    viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <svg
-                      aria-hidden="true"
-                      className="dashicon dashicons-ellipsis"
-                      focusable="false"
-                      height={20}
-                      role="img"
-                      viewBox="0 0 20 20"
-                      width={20}
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <Path
-                        d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                      >
-                        <path
-                          d="M5 10c0 1.1-.9 2-2 2s-2-.9-2-2 .9-2 2-2 2 .9 2 2zm12-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm-7 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"
-                        />
-                      </Path>
-                    </svg>
+                    <Path
+                      d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
+                    />
                   </SVG>
-                </Dashicon>
+                }
+                key="0,0"
+              >
+                <SVG
+                  height={24}
+                  viewBox="0 0 24 24"
+                  width={24}
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <svg
+                    aria-hidden={true}
+                    focusable={false}
+                    height={24}
+                    role="img"
+                    viewBox="0 0 24 24"
+                    width={24}
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <Path
+                      d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
+                    >
+                      <path
+                        d="M13 19h-2v-2h2v2zm0-6h-2v-2h2v2zm0-6h-2V5h2v2z"
+                      />
+                    </Path>
+                  </svg>
+                </SVG>
               </Icon>
             </button>
           </Tooltip>

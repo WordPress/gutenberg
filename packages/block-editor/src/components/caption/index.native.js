@@ -6,6 +6,7 @@ import { View } from 'react-native';
 /**
  * WordPress dependencies
  */
+import { createBlock } from '@wordpress/blocks';
 import { RichText } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -17,14 +18,19 @@ const Caption = ( {
 	onBlur,
 	onChange,
 	onFocus,
-	placeholder = __( 'Write caption…' ),
+	placeholder = __( 'Add caption' ),
 	placeholderTextColor,
 	shouldDisplay = true,
 	style,
 	value,
+	insertBlocksAfter = () => {},
 } ) => (
 	<View
-		accessibilityLabel={ accessibilityLabelCreator ? accessibilityLabelCreator( value ) : undefined }
+		accessibilityLabel={
+			accessibilityLabelCreator
+				? accessibilityLabelCreator( value )
+				: undefined
+		}
 		accessibilityRole="button"
 		accessible={ accessible }
 		style={ { flex: 1, display: shouldDisplay ? 'flex' : 'none' } }
@@ -45,6 +51,10 @@ const Caption = ( {
 			underlineColorAndroid="transparent"
 			unstableOnFocus={ onFocus }
 			value={ value }
+			__unstableOnSplitAtEnd={ () =>
+				insertBlocksAfter( createBlock( 'core/paragraph' ) )
+			}
+			deleteEnter={ true }
 		/>
 	</View>
 );

@@ -22,3 +22,30 @@
 	margin-left: 0;
 	margin-right: 0;
 }
+
+.innerBlocks {
+	margin-bottom: $block-edge-to-content;
+}
+
+.fullWidth {
+	margin-left: $block-edge-to-content;
+	margin-right: $block-edge-to-content;
+}
+
+.groupAppender {
+	margin-left: $grid-unit-20;
+	margin-right: $grid-unit-20;
+}
+
+.wideGroupAppender {
+	margin-left: $grid-unit-10;
+	margin-right: $grid-unit-10;
+}
+
+.hasBackgroundAppender {
+	padding-bottom: $grid-unit-30;
+}
+
+.isLastInnerBlockSelected {
+	padding-bottom: 0;
+}

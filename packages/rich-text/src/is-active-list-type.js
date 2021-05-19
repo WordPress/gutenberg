@@ -4,13 +4,15 @@
 
 import { getLineIndex } from './get-line-index';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
- * Wether or not the selected list has the given tag name.
+ * Whether or not the selected list has the given tag name.
  *
- * @param {Object}  value    The value to check.
- * @param {string}  type     The tag name the list should have.
- * @param {string}  rootType The current root tag name, to compare with in case
- *                           nothing is selected.
+ * @param {RichTextValue} value    The value to check.
+ * @param {string}        type     The tag name the list should have.
+ * @param {string}        rootType The current root tag name, to compare with in
+ *                                 case nothing is selected.
  *
  * @return {boolean} True if the current list type matches `type`, false if not.
  */

@@ -1,84 +1,155 @@
-@include break-small() {
-	.block-editor-block-contextual-toolbar:not([data-align="wide"]):not([data-align="full"])
-	.block-editor-block-mover:not(.is-horizontal) {
-		display: block;
-		position: absolute;
-		top: $block-toolbar-height;
-		left: - $block-side-ui-width - 10;
-		opacity: 0;
-		background: $white;
-		border: 1px solid $dark-opacity-light-800;
-		border-radius: $radius-round-rectangle;
-		transition: box-shadow 0.2s ease-out;
-		@include reduce-motion("transition");
+.block-editor-block-mover-button__description {
+	display: none;
+}
 
-		&.is-visible {
-			@include edit-post__fade-in-animation;
+.block-editor-block-mover-button.has-icon {
+	padding: 0;
+}
+
+// Show the mover in a single button under the contextual toolbar.
+.block-editor-block-mover {
+	display: inline-flex;
+	flex-direction: row;
+
+	.block-editor-block-mover__move-button-container,
+	.components-toolbar {
+		flex: 1;
+
+		// Increase touch targets on mobile.
+		flex-direction: row;
+		border-right: none !important;
+
+		@include break-small() {
+			flex-direction: column;
+		}
+	}
+
+	&.is-horizontal .block-editor-block-mover__move-button-container,
+	&.is-horizontal .components-toolbar {
+		flex-direction: row;
+	}
+
+	.block-editor-block-mover-button {
+		&.block-editor-block-mover-button {
+			padding-right: 0;
+			padding-left: 0;
+			min-width: $button-size;
 		}
 
-		.block-editor-block-mover__control {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			padding: 0;
-			border: none;
+		@include break-small() {
+			// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
+			height: $block-toolbar-height/2;
+			width: $block-toolbar-height - $grid-unit-15 / 2;
+			padding-right: $grid-unit-15 - $border-width !important;
+			padding-left: $grid-unit-15 / 2 !important;
 
-			// Carefully adjust the size of the side UI to fit one paragraph of text (56px).
-			width: $block-side-ui-width;
-			height: $icon-button-size-small;
+			// Extra specificity to override standard toolbar button styles.
+			&.block-editor-block-mover-button {
+				min-width: $block-toolbar-height - $grid-unit-15 / 2;
+			}
+		}
 
+		// Focus style.
+		// Overrides .components-toolbar-group styles
+		&::before {
+			@include break-small() {
+				left: $grid-unit-10 !important;
+				right: $grid-unit-10 !important;
+			}
+		}
+	}
+
+	.block-editor-block-mover__drag-handle {
+		width: $button-size-small;
+		cursor: grab;
+
+		// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
+		min-width: $button-size-small !important;
+		padding: 0 !important;
+
+		&:focus::before {
+			left: 0 !important;
+			right: 0 !important;
+		}
+	}
+
+	// Position the icons correctly.
+	@include break-small() {
+		.components-toolbar-group .block-editor-block-mover-button,
+		.components-toolbar .block-editor-block-mover-button {
+			margin: 0 auto 0 0;
+		}
+
+		// Up button.
+		.components-toolbar-group .block-editor-block-mover-button.is-up-button,
+		.components-toolbar .block-editor-block-mover-button.is-up-button {
+			// Focus style.
+			&::before {
+				bottom: 0;
+				height: calc(100% - #{ $border-width });
+			}
+		}
+
+		// Down button.
+		.components-toolbar-group .block-editor-block-mover-button.is-down-button,
+		.components-toolbar .block-editor-block-mover-button.is-down-button {
+			// Focus style.
+			&::before {
+				top: 0;
+				height: calc(100% - #{ $border-width });
+			}
+		}
+	}
+
+	// Mover is horizontal.
+	&.is-horizontal {
+		.block-editor-block-mover-button.has-icon {
+			height: $block-toolbar-height;
+			// Overrides .components-toolbar-group styles
+			width: $block-toolbar-height / 2;
+			padding-left: 0;
+			padding-right: 0;
+
+			// Focus style.
+			&::before {
+				top: $border-width;
+				bottom: $border-width;
+				min-width: 0;
+				width: auto;
+				height: auto;
+			}
+		}
+
+		// Position the icons correctly.
+		.block-editor-block-mover-button.is-up-button.has-icon {
 			svg {
-				width: $block-side-ui-width;
-				height: $icon-button-size-small;
-				padding: #{ ($block-side-ui-width - $icon-button-size-small) / 2 } #{ ($block-side-ui-width - 18px) / 2 }; // This makes the SVG fill the whole available area, without scaling the artwork.
+				margin-left: 0;
+				margin-right: -$grid-unit-10;
+				margin-bottom: 0;
 			}
 
-			&[aria-disabled="true"] {
-				cursor: default;
-				pointer-events: none;
-				color: $dark-opacity-300;
+			// Focus style.
+			// Overrides .components-toolbar-group styles
+			&::before {
+				left: 0 !important;
+				right: 0 !important;
+			}
+		}
+
+		.block-editor-block-mover-button.is-down-button.has-icon {
+			svg {
+				margin-left: -$grid-unit-10;
+				margin-right: 0;
+				margin-top: 0;
 			}
 
-			color: $dark-opacity-300;
-
-			&:focus:not(:disabled) {
-				background-color: transparent;
+			// Focus style.
+			// Overrides .components-toolbar-group styles
+			&::before {
+				left: 0 !important;
+				right: 0 !important;
+				width: calc(100% + #{ $border-width });
 			}
 		}
 	}
-}
-
-// Don't add negative vertical margin for wide, fullwide, or mobile.
-// @todo: simplify this selector.
-@include break-small() {
-	.block-editor-block-list__block:not([data-align="wide"]):not([data-align="full"]) .block-editor-block-mover:not(.is-horizontal) {
-		margin-top: 0;
-	}
-}
-
-.block-editor-block-mover__control-drag-handle {
-	cursor: move; // Fallback for IE/Edge < 14
-	cursor: grab;
-	fill: currentColor;
-
-	&,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active,
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):focus {
-		box-shadow: none;
-		background: none;
-		color: $dark-opacity-500;
-	}
-
-	&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):active {
-		cursor: grabbing;
-	}
-}
-
-.block-editor-block-mover__description {
-	display: none;
-}
-
-.block-editor-block-mover.is-horizontal .block-editor-block-mover__control-drag-handle {
-	display: none;
 }

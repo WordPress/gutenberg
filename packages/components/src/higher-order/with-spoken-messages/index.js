@@ -1,45 +1,26 @@
 /**
- * External dependencies
- */
-import { debounce } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { createHigherOrderComponent, useDebounce } from '@wordpress/compose';
 import { speak } from '@wordpress/a11y';
-import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
- * A Higher Order Component used to be provide a unique instance ID by
- * component.
+ * A Higher Order Component used to be provide speak and debounced speak
+ * functions.
  *
- * @param {WPComponent} WrappedComponent  The wrapped component.
+ * @see https://developer.wordpress.org/block-editor/packages/packages-a11y/#speak
  *
- * @return {WPComponent} The component to be rendered.
+ * @param {WPComponent} Component The component to be wrapped.
+ *
+ * @return {WPComponent} The wrapped component.
  */
-export default createHigherOrderComponent( ( WrappedComponent ) => {
-	return class extends Component {
-		constructor() {
-			super( ...arguments );
-			this.debouncedSpeak = debounce( this.speak.bind( this ), 500 );
-		}
-
-		speak( message, type = 'polite' ) {
-			speak( message, type );
-		}
-
-		componentWillUnmount() {
-			this.debouncedSpeak.cancel();
-		}
-
-		render() {
-			return (
-				<WrappedComponent { ...this.props }
-					speak={ this.speak }
-					debouncedSpeak={ this.debouncedSpeak }
-				/>
-			);
-		}
-	};
-}, 'withSpokenMessages' );
+export default createHigherOrderComponent(
+	( Component ) => ( props ) => (
+		<Component
+			{ ...props }
+			speak={ speak }
+			debouncedSpeak={ useDebounce( speak, 500 ) }
+		/>
+	),
+	'withSpokenMessages'
+);

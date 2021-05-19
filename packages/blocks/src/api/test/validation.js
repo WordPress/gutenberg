@@ -8,6 +8,7 @@ import {
 	getTextWithCollapsedWhitespace,
 	getMeaningfulAttributePairs,
 	isEquivalentTextTokens,
+	getNormalizedLength,
 	getNormalizedStyleValue,
 	getStyleProperties,
 	isEqualAttributesOfName,
@@ -18,6 +19,7 @@ import {
 	isValidBlockContent,
 	isClosedByToken,
 } from '../validation';
+import { createLogger } from '../validation/logger';
 import {
 	registerBlockType,
 	unregisterBlockType,
@@ -28,7 +30,7 @@ import {
 describe( 'validation', () => {
 	const defaultBlockSettings = {
 		save: ( { attributes } ) => attributes.fruit,
-		category: 'common',
+		category: 'text',
 		title: 'block title',
 	};
 	beforeAll( () => {
@@ -62,7 +64,9 @@ describe( 'validation', () => {
 		} );
 
 		it( 'returns false for an invalid character reference', () => {
-			const result = isValidCharacterReference( ' Test</h2><h2>Test &amp' );
+			const result = isValidCharacterReference(
+				' Test</h2><h2>Test &amp'
+			);
 
 			expect( result ).toBe( false );
 		} );
@@ -70,7 +74,9 @@ describe( 'validation', () => {
 
 	describe( 'DecodeEntityParser', () => {
 		it( 'can be constructed', () => {
-			expect( new DecodeEntityParser() instanceof DecodeEntityParser ).toBe( true );
+			expect(
+				new DecodeEntityParser() instanceof DecodeEntityParser
+			).toBe( true );
 		} );
 
 		it( 'returns parse as decoded value', () => {
@@ -140,7 +146,7 @@ describe( 'validation', () => {
 		it( 'should return false if not equal with collapsed whitespace', () => {
 			const isEqual = isEquivalentTextTokens(
 				{ chars: '  a \t  b \n c' },
-				{ chars: 'a \n c \t b  ' },
+				{ chars: 'a \n c \t b  ' }
 			);
 
 			expect( console ).toHaveWarned();
@@ -150,10 +156,36 @@ describe( 'validation', () => {
 		it( 'should return true if equal with collapsed whitespace', () => {
 			const isEqual = isEquivalentTextTokens(
 				{ chars: '  a \t  b \n c' },
-				{ chars: 'a \n b \t c  ' },
+				{ chars: 'a \n b \t c  ' }
 			);
 
 			expect( isEqual ).toBe( true );
+		} );
+	} );
+
+	describe( 'getNormalizedLength()', () => {
+		it( 'omits unit from zero px length', () => {
+			const normalizedLength = getNormalizedLength( '0px' );
+
+			expect( normalizedLength ).toBe( '0' );
+		} );
+
+		it( 'retains unit in non-zero px length', () => {
+			const normalizedLength = getNormalizedLength( '50px' );
+
+			expect( normalizedLength ).toBe( '50px' );
+		} );
+
+		it( 'omits unit from zero percentage', () => {
+			const normalizedLength = getNormalizedLength( '0%' );
+
+			expect( normalizedLength ).toBe( '0' );
+		} );
+
+		it( 'retains unit in non-zero percentage', () => {
+			const normalizedLength = getNormalizedLength( '50%' );
+
+			expect( normalizedLength ).toBe( '50%' );
 		} );
 	} );
 
@@ -163,7 +195,25 @@ describe( 'validation', () => {
 				'url( "https://wordpress.org/img.png" )'
 			);
 
-			expect( normalizedValue ).toBe( 'url(https://wordpress.org/img.png)' );
+			expect( normalizedValue ).toBe(
+				'url(https://wordpress.org/img.png)'
+			);
+		} );
+
+		it( 'omits length units from zero values', () => {
+			const normalizedValue = getNormalizedStyleValue(
+				'44% 0% 18em 0em'
+			);
+
+			expect( normalizedValue ).toBe( '44% 0 18em 0' );
+		} );
+
+		it( 'leaves zero values in calc() expressions alone', () => {
+			const normalizedValue = getNormalizedStyleValue(
+				'calc(0em + 5px)'
+			);
+
+			expect( normalizedValue ).toBe( 'calc(0em + 5px)' );
 		} );
 	} );
 
@@ -185,7 +235,7 @@ describe( 'validation', () => {
 			it( 'ignores ordering', () => {
 				const isEqual = isEqualAttributesOfName.class(
 					'a b c',
-					'b a c',
+					'b a c'
 				);
 
 				expect( isEqual ).toBe( true );
@@ -194,7 +244,7 @@ describe( 'validation', () => {
 			it( 'ignores whitespace', () => {
 				const isEqual = isEqualAttributesOfName.class(
 					'a  b    c',
-					'b   a c',
+					'b   a c'
 				);
 
 				expect( isEqual ).toBe( true );
@@ -203,7 +253,7 @@ describe( 'validation', () => {
 			it( 'returns false if not equal', () => {
 				const isEqual = isEqualAttributesOfName.class(
 					'a b c',
-					'b a c d',
+					'b a c d'
 				);
 
 				expect( isEqual ).toBe( false );
@@ -232,10 +282,7 @@ describe( 'validation', () => {
 
 		describe( 'boolean attributes', () => {
 			it( 'returns true if both present', () => {
-				const isEqual = isEqualAttributesOfName.controls(
-					'true',
-					''
-				);
+				const isEqual = isEqualAttributesOfName.controls( 'true', '' );
 
 				expect( isEqual ).toBe( true );
 			} );
@@ -245,12 +292,13 @@ describe( 'validation', () => {
 	describe( 'isEqualTagAttributePairs()', () => {
 		it( 'returns false if not equal pairs', () => {
 			const isEqual = isEqualTagAttributePairs(
-				[
-					[ 'class', 'b   a c' ],
-				],
+				[ [ 'class', 'b   a c' ] ],
 				[
 					[ 'class', 'c  a b' ],
-					[ 'style', 'background-image: url( "https://wordpress.org/img.png" ); color: red;' ],
+					[
+						'style',
+						'background-image: url( "https://wordpress.org/img.png" ); color: red;',
+					],
 				]
 			);
 
@@ -262,12 +310,18 @@ describe( 'validation', () => {
 			const isEqual = isEqualTagAttributePairs(
 				[
 					[ 'class', 'b   a c' ],
-					[ 'style', 'color: red;  background-image: url( "https://wordpress.org/img.png" );' ],
+					[
+						'style',
+						'color: red;  background-image: url( "https://wordpress.org/img.png" );',
+					],
 					[ 'controls', '' ],
 				],
 				[
 					[ 'class', 'c  a b' ],
-					[ 'style', 'background-image: url( "https://wordpress.org/img.png" ); color: red;' ],
+					[
+						'style',
+						'background-image: url( "https://wordpress.org/img.png" ); color: red;',
+					],
 					[ 'controls', 'true' ],
 				]
 			);
@@ -309,15 +363,16 @@ describe( 'validation', () => {
 				const isEqual = isEqualTokensOfType.StartTag(
 					{
 						tagName: 'p',
-						attributes: [
-							[ 'class', 'b   a c' ],
-						],
+						attributes: [ [ 'class', 'b   a c' ] ],
 					},
 					{
 						tagName: 'p',
 						attributes: [
 							[ 'class', 'c  a b' ],
-							[ 'style', 'background-image: url( "https://wordpress.org/img.png" ); color: red;' ],
+							[
+								'style',
+								'background-image: url( "https://wordpress.org/img.png" ); color: red;',
+							],
 						],
 					}
 				);
@@ -332,14 +387,20 @@ describe( 'validation', () => {
 						tagName: 'p',
 						attributes: [
 							[ 'class', 'b   a c' ],
-							[ 'style', 'color: red;  background-image: url( "https://wordpress.org/img.png" );' ],
+							[
+								'style',
+								'color: red;  background-image: url( "https://wordpress.org/img.png" );',
+							],
 						],
 					},
 					{
 						tagName: 'p',
 						attributes: [
 							[ 'class', 'c  a b' ],
-							[ 'style', 'background-image: url( "https://wordpress.org/img.png" ); color: red;' ],
+							[
+								'style',
+								'background-image: url( "https://wordpress.org/img.png" ); color: red;',
+							],
 						],
 					}
 				);
@@ -384,9 +445,7 @@ describe( 'validation', () => {
 		} );
 
 		it( 'returns undefined if token options exhausted', () => {
-			const tokens = [
-				{ type: 'Chars', chars: '   \n\t' },
-			];
+			const tokens = [ { type: 'Chars', chars: '   \n\t' } ];
 
 			const token = getNextNonWhitespaceToken( tokens );
 
@@ -399,7 +458,7 @@ describe( 'validation', () => {
 		it( 'should return true if self-closed token is closed by an end token', () => {
 			const isClosed = isClosedByToken(
 				{ type: 'StartTag', tagName: 'div', selfClosing: true },
-				{ type: 'EndTag', tagName: 'div' },
+				{ type: 'EndTag', tagName: 'div' }
 			);
 
 			expect( isClosed ).toBe( true );
@@ -408,7 +467,7 @@ describe( 'validation', () => {
 		it( 'should return false if open token is not closed by an end token', () => {
 			const isClosed = isClosedByToken(
 				{ type: 'StartTag', tagName: 'div', selfClosing: false },
-				{ type: 'EndTag', tagName: 'div' },
+				{ type: 'EndTag', tagName: 'div' }
 			);
 
 			expect( isClosed ).toBe( false );
@@ -417,7 +476,7 @@ describe( 'validation', () => {
 		it( 'should return false if self-closed token has a different name to the end token', () => {
 			const isClosed = isClosedByToken(
 				{ type: 'StartTag', tagName: 'div', selfClosing: true },
-				{ type: 'EndTag', tagName: 'span' },
+				{ type: 'EndTag', tagName: 'span' }
 			);
 
 			expect( isClosed ).toBe( false );
@@ -426,7 +485,7 @@ describe( 'validation', () => {
 		it( 'should return false if self-closed token is not closed by a start token', () => {
 			const isClosed = isClosedByToken(
 				{ type: 'StartTag', tagName: 'div', selfClosing: true },
-				{ type: 'StartTag', tagName: 'div' },
+				{ type: 'StartTag', tagName: 'div' }
 			);
 
 			expect( isClosed ).toBe( false );
@@ -435,7 +494,7 @@ describe( 'validation', () => {
 		it( 'should return false if self-closed token is not closed by an undefined token', () => {
 			const isClosed = isClosedByToken(
 				{ type: 'StartTag', tagName: 'div', selfClosing: true },
-				undefined,
+				undefined
 			);
 
 			expect( isClosed ).toBe( false );
@@ -443,6 +502,15 @@ describe( 'validation', () => {
 	} );
 
 	describe( 'isEquivalentHTML()', () => {
+		it( 'should return true for identical markup', () => {
+			const isEquivalent = isEquivalentHTML(
+				'<div>Hello <span class="b">World!</span></div>',
+				'<div>Hello <span class="b">World!</span></div>'
+			);
+
+			expect( isEquivalent ).toBe( true );
+		} );
+
 		it( 'should return false for effectively inequivalent html', () => {
 			const isEquivalent = isEquivalentHTML(
 				'<div>Hello <span class="b">World!</span></div>',
@@ -544,10 +612,7 @@ describe( 'validation', () => {
 		} );
 
 		it( 'should return false when difference of data- attribute', () => {
-			const isEquivalent = isEquivalentHTML(
-				'<div data-foo>',
-				'<div>'
-			);
+			const isEquivalent = isEquivalentHTML( '<div data-foo>', '<div>' );
 
 			expect( console ).toHaveWarned();
 			expect( isEquivalent ).toBe( false );
@@ -582,10 +647,7 @@ describe( 'validation', () => {
 		} );
 
 		it( 'should return true when comparing empty strings', () => {
-			const isEquivalent = isEquivalentHTML(
-				'',
-				'',
-			);
+			const isEquivalent = isEquivalentHTML( '', '' );
 
 			expect( isEquivalent ).toBe( true );
 		} );
@@ -593,7 +655,7 @@ describe( 'validation', () => {
 		it( 'should return false if supplied malformed HTML', () => {
 			const isEquivalent = isEquivalentHTML(
 				'<blockquote class="wp-block-quote">fsdfsdfsd<p>fdsfsdfsdd</pfd fd fd></blockquote>',
-				'<blockquote class="wp-block-quote">fsdfsdfsd<p>fdsfsdfsdd</p></blockquote>',
+				'<blockquote class="wp-block-quote">fsdfsdfsd<p>fdsfsdfsdd</p></blockquote>'
 			);
 
 			expect( console ).toHaveWarned();
@@ -603,7 +665,7 @@ describe( 'validation', () => {
 		it( 'should return false if supplied two sets of malformed HTML', () => {
 			const isEquivalent = isEquivalentHTML(
 				'<div>fsdfsdfsd<p>fdsfsdfsdd</pfd fd fd></div>',
-				'<blockquote>fsdfsdfsd<p>fdsfsdfsdd</p a></blockquote>',
+				'<blockquote>fsdfsdfsd<p>fdsfsdfsdd</p a></blockquote>'
 			);
 
 			expect( console ).toHaveWarned();
@@ -698,6 +760,14 @@ describe( 'validation', () => {
 			);
 
 			expect( isValid ).toBe( true );
+		} );
+	} );
+
+	describe( 'createLogger()', () => {
+		it( 'creates logger that pre-processes string substitutions', () => {
+			createLogger().warning( '%o', { foo: 'bar' } );
+
+			expect( console ).toHaveWarnedWith( "{ foo: 'bar' }" );
 		} );
 	} );
 } );

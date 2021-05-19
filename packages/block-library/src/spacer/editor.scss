@@ -1,8 +1,33 @@
-.block-library-spacer__resize-container.is-selected {
-	background: $light-gray-200;
+.block-editor-block-list__block[data-type="core/spacer"] {
+	// This generates an invisible field above the spacer, which makes its minimum clickable-to-select height larger.
+	&::before {
+		content: "";
+		display: block;
+		position: absolute;
+		width: 100%;
+		height: $button-size-small;
+		transform: translateY(-#{$button-size-small / 2});
+	}
+}
+
+.wp-block-spacer.is-hovered .block-library-spacer__resize-container,
+.block-library-spacer__resize-container.has-show-handle {
+	background: rgba($black, 0.1);
+
+	.is-dark-theme & {
+		background: rgba($white, 0.15);
+	}
 }
 
 .block-library-spacer__resize-container {
 	clear: both;
-	margin-bottom: $default-block-margin;
+
+	// Don't show the horizontal indicator.
+	.components-resizable-box__handle::before {
+		content: none;
+	}
+
+	&.resize-horizontal {
+		margin-bottom: 0;
+	}
 }

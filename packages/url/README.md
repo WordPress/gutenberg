@@ -10,7 +10,7 @@ Install the module
 npm install @wordpress/url --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Usage
 
@@ -31,11 +31,41 @@ const newURL = addQueryArgs( 'https://google.com', { q: 'test' } ); // https://g
 _Parameters_
 
 -   _url_ `[string]`: URL to which arguments should be appended. If omitted, only the resulting querystring is returned.
--   _args_ `Object`: Query arguments to apply to URL.
+-   _args_ `[Object]`: Query arguments to apply to URL.
 
 _Returns_
 
 -   `string`: URL with arguments applied.
+
+<a name="buildQueryString" href="#buildQueryString">#</a> **buildQueryString**
+
+Generates URL-encoded query string using input query data.
+
+It is intended to behave equivalent as PHP's `http_build_query`, configured
+with encoding type PHP_QUERY_RFC3986 (spaces as `%20`).
+
+_Usage_
+
+```js
+const queryString = buildQueryString( {
+   simple: 'is ok',
+   arrays: [ 'are', 'fine', 'too' ],
+   objects: {
+      evenNested: {
+         ok: 'yes',
+      },
+   },
+} );
+// "simple=is%20ok&arrays%5B0%5D=are&arrays%5B1%5D=fine&arrays%5B2%5D=too&objects%5BevenNested%5D%5Bok%5D=yes"
+```
+
+_Parameters_
+
+-   _data_ `Record<string,*>`: Data to encode.
+
+_Returns_
+
+-   `string`: Query string.
 
 <a name="cleanForSlug" href="#cleanForSlug">#</a> **cleanForSlug**
 
@@ -44,11 +74,11 @@ Performs some basic cleanup of a string for use as a post slug.
 This replicates some of what `sanitize_title()` does in WordPress core, but
 is only designed to approximate what the slug will be.
 
-Converts whitespace, periods, forward slashes and underscores to hyphens.
 Converts Latin-1 Supplement and Latin Extended-A letters to basic Latin
-letters. Removes combining diacritical marks. Converts remaining string
-to lowercase. It does not touch octets, HTML entities, or other encoded
-characters.
+letters. Removes combining diacritical marks. Converts whitespace, periods,
+and forward slashes to hyphens. Removes any remaining non-word characters
+except hyphens. Converts remaining string to lowercase. It does not account
+for octets, HTML entities, or other encoded characters.
 
 _Parameters_
 
@@ -66,11 +96,13 @@ _Usage_
 
 ```js
 const displayUrl = filterURLForDisplay( 'https://www.wordpress.org/gutenberg/' ); // wordpress.org/gutenberg
+const imageUrl = filterURLForDisplay( 'https://www.wordpress.org/wp-content/uploads/img.png', 20 ); // …ent/uploads/img.png
 ```
 
 _Parameters_
 
 -   _url_ `string`: Original URL.
+-   _maxLength_ `number|null`: URL length.
 
 _Returns_
 
@@ -93,7 +125,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The authority part of the URL.
+-   `string|void`: The authority part of the URL.
 
 <a name="getFragment" href="#getFragment">#</a> **getFragment**
 
@@ -112,7 +144,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The fragment part of the URL.
+-   `string|void`: The fragment part of the URL.
 
 <a name="getPath" href="#getPath">#</a> **getPath**
 
@@ -131,7 +163,26 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The path part of the URL.
+-   `string|void`: The path part of the URL.
+
+<a name="getPathAndQueryString" href="#getPathAndQueryString">#</a> **getPathAndQueryString**
+
+Returns the path part and query string part of the URL.
+
+_Usage_
+
+```js
+const pathAndQueryString1 = getPathAndQueryString( 'http://localhost:8080/this/is/a/test?query=true' ); // '/this/is/a/test?query=true'
+const pathAndQueryString2 = getPathAndQueryString( 'https://wordpress.org/help/faq/' ); // '/help/faq'
+```
+
+_Parameters_
+
+-   _url_ `string`: The full URL.
+
+_Returns_
+
+-   `string`: The path part and query string part of the URL.
 
 <a name="getProtocol" href="#getProtocol">#</a> **getProtocol**
 
@@ -150,7 +201,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The protocol part of the URL.
+-   `string|void`: The protocol part of the URL.
 
 <a name="getQueryArg" href="#getQueryArg">#</a> **getQueryArg**
 
@@ -169,7 +220,27 @@ _Parameters_
 
 _Returns_
 
--   `(QueryArgParsed|undefined)`: Query arg value.
+-   `QueryArgParsed|void`: Query arg value.
+
+<a name="getQueryArgs" href="#getQueryArgs">#</a> **getQueryArgs**
+
+Returns an object of query arguments of the given URL. If the given URL is
+invalid or has no querystring, an empty object is returned.
+
+_Usage_
+
+```js
+const foo = getQueryArgs( 'https://wordpress.org?foo=bar&bar=baz' );
+// { "foo": "bar", "bar": "baz" }
+```
+
+_Parameters_
+
+-   _url_ `string`: URL.
+
+_Returns_
+
+-   `QueryArgs`: Query args object.
 
 <a name="getQueryString" href="#getQueryString">#</a> **getQueryString**
 
@@ -178,8 +249,7 @@ Returns the query string part of the URL.
 _Usage_
 
 ```js
-const queryString1 = getQueryString( 'http://localhost:8080/this/is/a/test?query=true#fragment' ); // 'query=true'
-const queryString2 = getQueryString( 'https://wordpress.org#fragment?query=false&search=hello' ); // 'query=false&search=hello'
+const queryString = getQueryString( 'http://localhost:8080/this/is/a/test?query=true#fragment' ); // 'query=true'
 ```
 
 _Parameters_
@@ -188,7 +258,7 @@ _Parameters_
 
 _Returns_
 
--   `(string|void)`: The query string part of the URL.
+-   `string|void`: The query string part of the URL.
 
 <a name="hasQueryArg" href="#hasQueryArg">#</a> **hasQueryArg**
 
@@ -230,6 +300,11 @@ _Returns_
 <a name="isURL" href="#isURL">#</a> **isURL**
 
 Determines whether the given string looks like a URL.
+
+_Related_
+
+-   <https://url.spec.whatwg.org/>
+-   <https://url.spec.whatwg.org/#valid-url-string>
 
 _Usage_
 

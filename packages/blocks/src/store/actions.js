@@ -3,6 +3,8 @@
  */
 import { castArray } from 'lodash';
 
+/** @typedef {import('../api/registration').WPBlockVariation} WPBlockVariation */
+
 /**
  * Returns an action object used in signalling that block types have been added.
  *
@@ -64,33 +66,33 @@ export function removeBlockStyles( blockName, styleNames ) {
 }
 
 /**
- * Returns an action object used in signalling that new block patterns have been added.
+ * Returns an action object used in signalling that new block variations have been added.
  *
- * @param {string}                          blockName Block name.
- * @param {WPBlockPattern|WPBlockPattern[]} patterns  Block patterns.
+ * @param {string}                              blockName  Block name.
+ * @param {WPBlockVariation|WPBlockVariation[]} variations Block variations.
  *
  * @return {Object} Action object.
  */
-export function __experimentalAddBlockPatterns( blockName, patterns ) {
+export function addBlockVariations( blockName, variations ) {
 	return {
-		type: 'ADD_BLOCK_PATTERNS',
-		patterns: castArray( patterns ),
+		type: 'ADD_BLOCK_VARIATIONS',
+		variations: castArray( variations ),
 		blockName,
 	};
 }
 
 /**
- * Returns an action object used in signalling that block patterns have been removed.
+ * Returns an action object used in signalling that block variations have been removed.
  *
- * @param {string}          blockName    Block name.
- * @param {string|string[]} patternNames Block pattern names.
+ * @param {string}          blockName      Block name.
+ * @param {string|string[]} variationNames Block variation names.
  *
  * @return {Object} Action object.
  */
-export function __experimentalRemoveBlockPatterns( blockName, patternNames ) {
+export function removeBlockVariations( blockName, variationNames ) {
 	return {
-		type: 'REMOVE_BLOCK_PATTERNS',
-		patternNames: castArray( patternNames ),
+		type: 'REMOVE_BLOCK_VARIATIONS',
+		variationNames: castArray( variationNames ),
 		blockName,
 	};
 }

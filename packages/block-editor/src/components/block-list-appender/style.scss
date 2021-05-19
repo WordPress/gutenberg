@@ -1,25 +1,55 @@
 // These styles are only applied to the appender when it appears inside of a block.
 // Otherwise the default appender may be improperly positioned in some themes.
 .block-editor-block-list__block .block-list-appender {
-	margin: $block-padding 0;
+	align-self: center;
+	padding: 0;
+	list-style: none;
 
-	// Add additional margin to the appender when inside a group with a background color.
-	// If changing this, be sure to sync up with group/editor.scss line 13.
-	.has-background & {
-		margin: ($block-padding*2 + $block-spacing) $block-padding;
+	// Themes sometimes apply a max-width to all elements classed blocks.
+	&.wp-block {
+		max-width: none;
+	}
+
+	// Add a little left margin when used horizontally.
+	// The right margin should be set to auto, so as to not shift layout in flex containers.
+	margin: 0 auto 0 $grid-unit-10;
+
+	// ... unless it's the only child.
+	&:first-child {
+		margin-left: 0;
+	}
+
+	.block-editor-default-block-appender {
+		margin: $grid-unit-10 0;
+	}
+
+	// Animate appearance.
+	.block-list-appender__toggle {
+		padding: 0;
+		opacity: 1;
+		transform: scale(1);
+		transition: all 0.1s ease;
+		@include reduce-motion("transition");
 	}
 }
 
-.block-list-appender.is-drop-target > div::before {
-	content: "";
-	position: absolute;
-	right: -$block-padding;
-	left: -$block-padding;
-	top: -$block-padding;
-	bottom: -$block-padding;
-	border: 3px solid theme(primary);
+// For vertical flex containers, a 100% width ensures correct alignment.
+.is-vertical .block-list-appender {
+	width: $icon-size;
+	margin-right: auto;
+	margin-top: $grid-unit-15;
+	margin-left: $grid-unit-15;
 }
 
 .block-list-appender > .block-editor-inserter {
 	display: block;
+}
+
+// Hide the nested appender unless parent or child is selected.
+// This selector targets unselected blocks that have only a single nesting level.
+.block-editor-block-list__block:not(.is-selected):not(.has-child-selected):not(.block-editor-block-list__layout) {
+	.block-editor-block-list__layout > .block-list-appender .block-list-appender__toggle {
+		opacity: 0;
+		transform: scale(0);
+	}
 }

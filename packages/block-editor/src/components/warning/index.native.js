@@ -15,15 +15,32 @@ import { normalizeIconObject } from '@wordpress/blocks';
  */
 import styles from './style.scss';
 
-function Warning( { title, message, icon, iconClass, preferredColorScheme, getStylesFromColorScheme, ...viewProps } ) {
+function Warning( {
+	title,
+	message,
+	icon,
+	iconClass,
+	preferredColorScheme,
+	getStylesFromColorScheme,
+	...viewProps
+} ) {
 	icon = icon && normalizeIconObject( icon );
 	const internalIconClass = 'warning-icon' + '-' + preferredColorScheme;
-	const titleStyle = getStylesFromColorScheme( styles.title, styles.titleDark );
-	const messageStyle = getStylesFromColorScheme( styles.message, styles.messageDark );
+	const titleStyle = getStylesFromColorScheme(
+		styles.title,
+		styles.titleDark
+	);
+	const messageStyle = getStylesFromColorScheme(
+		styles.message,
+		styles.messageDark
+	);
 
 	return (
 		<View
-			style={ getStylesFromColorScheme( styles.container, styles.containerDark ) }
+			style={ getStylesFromColorScheme(
+				styles.container,
+				styles.containerDark
+			) }
 			{ ...viewProps }
 		>
 			{ icon && (
@@ -34,12 +51,8 @@ function Warning( { title, message, icon, iconClass, preferredColorScheme, getSt
 					/>
 				</View>
 			) }
-			{ title && (
-				<Text style={ titleStyle }>{ title }</Text>
-			) }
-			{ message && (
-				<Text style={ messageStyle }>{ message }</Text>
-			) }
+			{ title && <Text style={ titleStyle }>{ title }</Text> }
+			{ message && <Text style={ messageStyle }>{ message }</Text> }
 		</View>
 	);
 }

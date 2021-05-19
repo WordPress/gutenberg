@@ -8,14 +8,16 @@ import { noop, get, omit, pick } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { addFilter, removeAllFilters } from '@wordpress/hooks';
+import { addFilter, removeAllFilters, removeFilter } from '@wordpress/hooks';
 import { select } from '@wordpress/data';
+import { blockDefault as blockIcon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import {
 	registerBlockType,
+	registerBlockTypeFromMetadata,
 	registerBlockCollection,
 	unregisterBlockCollection,
 	unregisterBlockType,
@@ -34,12 +36,16 @@ import {
 	isReusableBlock,
 	serverSideBlockDefinitions,
 	unstable__bootstrapServerSideBlockDefinitions, // eslint-disable-line camelcase
-	DEFAULT_BLOCK_TYPE_SETTINGS,
 } from '../registration';
 import { DEPRECATED_ENTRY_KEYS } from '../constants';
+import { store as blocksStore } from '../../store';
 
 describe( 'blocks', () => {
-	const defaultBlockSettings = { save: noop, category: 'common', title: 'block title' };
+	const defaultBlockSettings = {
+		save: noop,
+		category: 'text',
+		title: 'block title',
+	};
 
 	beforeAll( () => {
 		// Initialize the block store.
@@ -59,60 +65,87 @@ describe( 'blocks', () => {
 	describe( 'registerBlockType()', () => {
 		it( 'should reject numbers', () => {
 			const block = registerBlockType( 999 );
-			expect( console ).toHaveErroredWith( 'Block names must be strings.' );
+			expect( console ).toHaveErroredWith(
+				'Block names must be strings.'
+			);
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks without a namespace', () => {
 			const block = registerBlockType( 'doing-it-wrong' );
-			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			expect( console ).toHaveErroredWith(
+				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
+			);
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with too many namespaces', () => {
 			const block = registerBlockType( 'doing/it/wrong' );
-			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			expect( console ).toHaveErroredWith(
+				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
+			);
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with invalid characters', () => {
 			const block = registerBlockType( 'still/_doing_it_wrong' );
-			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			expect( console ).toHaveErroredWith(
+				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
+			);
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with uppercase characters', () => {
 			const block = registerBlockType( 'Core/Paragraph' );
-			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			expect( console ).toHaveErroredWith(
+				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
+			);
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks not starting with a letter', () => {
-			const block = registerBlockType( 'my-plugin/4-fancy-block', defaultBlockSettings );
-			expect( console ).toHaveErroredWith( 'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block' );
+			const block = registerBlockType(
+				'my-plugin/4-fancy-block',
+				defaultBlockSettings
+			);
+			expect( console ).toHaveErroredWith(
+				'Block names must contain a namespace prefix, include only lowercase alphanumeric characters or dashes, and start with a letter. Example: my-plugin/my-custom-block'
+			);
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should accept valid block names', () => {
-			const block = registerBlockType( 'my-plugin/fancy-block-4', defaultBlockSettings );
+			const block = registerBlockType(
+				'my-plugin/fancy-block-4',
+				defaultBlockSettings
+			);
 			expect( console ).not.toHaveErrored();
 			expect( block ).toEqual( {
 				name: 'my-plugin/fancy-block-4',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
+				providesContext: {},
+				usesContext: [],
 				keywords: [],
+				supports: {},
+				styles: [],
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 			} );
 		} );
 
 		it( 'should prohibit registering the same block twice', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
-			const block = registerBlockType( 'core/test-block', defaultBlockSettings );
-			expect( console ).toHaveErroredWith( 'Block "core/test-block" is already registered.' );
+			const block = registerBlockType(
+				'core/test-block',
+				defaultBlockSettings
+			);
+			expect( console ).toHaveErroredWith(
+				'Block "core/test-block" is already registered.'
+			);
 			expect( block ).toBeUndefined();
 		} );
 
@@ -123,67 +156,128 @@ describe( 'blocks', () => {
 				keywords: [],
 				save: 'invalid',
 			} );
-			expect( console ).toHaveErroredWith( 'The "save" property must be a valid function.' );
+			expect( console ).toHaveErroredWith(
+				'The "save" property must be a valid function.'
+			);
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with an invalid edit function', () => {
-			const blockType = { save: noop, edit: 'not-a-function', category: 'common', title: 'block title' },
-				block = registerBlockType( 'my-plugin/fancy-block-6', blockType );
-			expect( console ).toHaveErroredWith( 'The "edit" property must be a valid function.' );
+			const blockType = {
+					save: noop,
+					edit: 'not-a-function',
+					category: 'text',
+					title: 'block title',
+				},
+				block = registerBlockType(
+					'my-plugin/fancy-block-6',
+					blockType
+				);
+			expect( console ).toHaveErroredWith(
+				'The "edit" property must be a valid function.'
+			);
 			expect( block ).toBeUndefined();
 		} );
 
-		it( 'should reject blocks without category', () => {
-			const blockType = { settingName: 'settingValue', save: noop, title: 'block title' },
-				block = registerBlockType( 'my-plugin/fancy-block-8', blockType );
-			expect( console ).toHaveErroredWith( 'The block "my-plugin/fancy-block-8" must have a category.' );
-			expect( block ).toBeUndefined();
+		it( 'should canonicalize legacy block category.', () => {
+			const blockType = {
+					save: noop,
+					category: 'common',
+					title: 'block title',
+				},
+				block = registerBlockType(
+					'my-plugin/fancy-block-9',
+					blockType
+				);
+			expect( block.category ).toBe( 'text' );
 		} );
 
-		it( 'should reject blocks with non registered category.', () => {
-			const blockType = { save: noop, category: 'custom-category-slug', title: 'block title' },
-				block = registerBlockType( 'my-plugin/fancy-block-9', blockType );
-			expect( console ).toHaveErroredWith( 'The block "my-plugin/fancy-block-9" must have a registered category.' );
-			expect( block ).toBeUndefined();
+		it( 'should unset category of blocks with non registered category.', () => {
+			const blockType = {
+					save: noop,
+					category: 'custom-category-slug',
+					title: 'block title',
+				},
+				block = registerBlockType(
+					'my-plugin/fancy-block-9',
+					blockType
+				);
+			expect( console ).toHaveWarnedWith(
+				'The block "my-plugin/fancy-block-9" is registered with an invalid category "custom-category-slug".'
+			);
+			expect( block ).not.toBeUndefined();
+			expect( block.category ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks without title', () => {
-			const blockType = { settingName: 'settingValue', save: noop, category: 'common' },
-				block = registerBlockType( 'my-plugin/fancy-block-9', blockType );
-			expect( console ).toHaveErroredWith( 'The block "my-plugin/fancy-block-9" must have a title.' );
+			const blockType = {
+					settingName: 'settingValue',
+					save: noop,
+					category: 'text',
+				},
+				block = registerBlockType(
+					'my-plugin/fancy-block-9',
+					blockType
+				);
+			expect( console ).toHaveErroredWith(
+				'The block "my-plugin/fancy-block-9" must have a title.'
+			);
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject blocks with empty titles', () => {
-			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: '' },
-				block = registerBlockType( 'my-plugin/fancy-block-10', blockType );
-			expect( console ).toHaveErroredWith( 'The block "my-plugin/fancy-block-10" must have a title.' );
+			const blockType = {
+					settingName: 'settingValue',
+					save: noop,
+					category: 'text',
+					title: '',
+				},
+				block = registerBlockType(
+					'my-plugin/fancy-block-10',
+					blockType
+				);
+			expect( console ).toHaveErroredWith(
+				'The block "my-plugin/fancy-block-10" must have a title.'
+			);
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should reject titles which are not strings', () => {
-			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 12345 },
-				block = registerBlockType( 'my-plugin/fancy-block-11', blockType );
-			expect( console ).toHaveErroredWith( 'Block titles must be strings.' );
+			const blockType = {
+					settingName: 'settingValue',
+					save: noop,
+					category: 'text',
+					title: 12345,
+				},
+				block = registerBlockType(
+					'my-plugin/fancy-block-11',
+					blockType
+				);
+			expect( console ).toHaveErroredWith(
+				'Block titles must be strings.'
+			);
 			expect( block ).toBeUndefined();
 		} );
 
 		it( 'should assign default settings', () => {
 			registerBlockType( 'core/test-block-with-defaults', {
 				title: 'block title',
-				category: 'common',
+				category: 'text',
 			} );
 
 			expect( getBlockType( 'core/test-block-with-defaults' ) ).toEqual( {
 				name: 'core/test-block-with-defaults',
 				title: 'block title',
-				category: 'common',
+				category: 'text',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
+				providesContext: {},
+				usesContext: [],
 				keywords: [],
+				supports: {},
+				styles: [],
 				save: expect.any( Function ),
 			} );
 		} );
@@ -194,34 +288,152 @@ describe( 'blocks', () => {
 				'core/test-block-with-attributes': { attributes },
 			} );
 
-			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
-			registerBlockType( 'core/test-block-with-attributes', blockType );
-			expect( getBlockType( 'core/test-block-with-attributes' ) ).toEqual( {
-				name: 'core/test-block-with-attributes',
+			const blockType = {
 				settingName: 'settingValue',
 				save: noop,
-				category: 'common',
+				category: 'text',
+				title: 'block title',
+			};
+			registerBlockType( 'core/test-block-with-attributes', blockType );
+			expect( getBlockType( 'core/test-block-with-attributes' ) ).toEqual(
+				{
+					name: 'core/test-block-with-attributes',
+					settingName: 'settingValue',
+					save: noop,
+					category: 'text',
+					title: 'block title',
+					icon: {
+						src: blockIcon,
+					},
+					attributes: {
+						ok: {
+							type: 'boolean',
+						},
+					},
+					providesContext: {},
+					usesContext: [],
+					keywords: [],
+					supports: {},
+					styles: [],
+				}
+			);
+		} );
+
+		it( 'should skip null values returned from the server', () => {
+			const blockName = 'core/test-block-with-null-server-values';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					icon: null,
+					category: null,
+					parent: null,
+					attributes: null,
+					example: null,
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				name: blockName,
+				save: expect.any( Function ),
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
-				attributes: {
-					ok: {
-						type: 'boolean',
-					},
-				},
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
 				keywords: [],
+				supports: {},
+				styles: [],
+			} );
+		} );
+
+		it( 'should map incompatible keys returned from the server', () => {
+			const blockName = 'core/test-block-with-incompatible-keys';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					api_version: 2,
+					provides_context: {
+						fontSize: 'fontSize',
+					},
+					uses_context: [ 'textColor' ],
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				apiVersion: 2,
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				icon: {
+					src: blockIcon,
+				},
+				attributes: {},
+				providesContext: {
+					fontSize: 'fontSize',
+				},
+				usesContext: [ 'textColor' ],
+				keywords: [],
+				supports: {},
+				styles: [],
+			} );
+		} );
+
+		// This test can be removed once the polyfill for apiVersion gets removed.
+		it( 'should apply apiVersion on the client when not set on the server', () => {
+			const blockName = 'core/test-block-back-compat';
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					category: 'widgets',
+				},
+			} );
+			unstable__bootstrapServerSideBlockDefinitions( {
+				[ blockName ]: {
+					apiVersion: 2,
+					category: 'ignored',
+				},
+			} );
+
+			const blockType = {
+				title: 'block title',
+			};
+			registerBlockType( blockName, blockType );
+			expect( getBlockType( blockName ) ).toEqual( {
+				apiVersion: 2,
+				name: blockName,
+				save: expect.any( Function ),
+				title: 'block title',
+				category: 'widgets',
+				icon: {
+					src: blockIcon,
+				},
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
 		it( 'should validate the icon', () => {
 			const blockType = {
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 				icon: { chicken: 'ribs' },
 			};
-			const block = registerBlockType( 'core/test-block-icon-normalize-element', blockType );
+			const block = registerBlockType(
+				'core/test-block-icon-normalize-element',
+				blockType
+			);
 			expect( console ).toHaveErrored();
 			expect( block ).toBeUndefined();
 		} );
@@ -229,126 +441,211 @@ describe( 'blocks', () => {
 		it( 'should normalize the icon containing an element', () => {
 			const blockType = {
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
-				icon: ( <svg width="20" height="20" viewBox="0 0 20 20">
-					<circle cx="10" cy="10" r="10"
-						fill="red" stroke="blue" strokeWidth="10" />
-				</svg> ),
+				icon: (
+					<svg width="20" height="20" viewBox="0 0 20 20">
+						<circle
+							cx="10"
+							cy="10"
+							r="10"
+							fill="red"
+							stroke="blue"
+							strokeWidth="10"
+						/>
+					</svg>
+				),
 			};
-			registerBlockType( 'core/test-block-icon-normalize-element', blockType );
-			expect( getBlockType( 'core/test-block-icon-normalize-element' ) ).toEqual( {
+			registerBlockType(
+				'core/test-block-icon-normalize-element',
+				blockType
+			);
+			expect(
+				getBlockType( 'core/test-block-icon-normalize-element' )
+			).toEqual( {
 				name: 'core/test-block-icon-normalize-element',
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 				icon: {
-					src: ( <svg width="20" height="20" viewBox="0 0 20 20">
-						<circle cx="10" cy="10" r="10"
-							fill="red" stroke="blue" strokeWidth="10" />
-					</svg> ),
+					src: (
+						<svg width="20" height="20" viewBox="0 0 20 20">
+							<circle
+								cx="10"
+								cy="10"
+								r="10"
+								fill="red"
+								stroke="blue"
+								strokeWidth="10"
+							/>
+						</svg>
+					),
 				},
 				attributes: {},
+				providesContext: {},
+				usesContext: [],
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
 		it( 'should normalize the icon containing a string', () => {
 			const blockType = {
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 				icon: 'foo',
 			};
-			registerBlockType( 'core/test-block-icon-normalize-string', blockType );
-			expect( getBlockType( 'core/test-block-icon-normalize-string' ) ).toEqual( {
+			registerBlockType(
+				'core/test-block-icon-normalize-string',
+				blockType
+			);
+			expect(
+				getBlockType( 'core/test-block-icon-normalize-string' )
+			).toEqual( {
 				name: 'core/test-block-icon-normalize-string',
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 				icon: {
 					src: 'foo',
 				},
 				attributes: {},
+				providesContext: {},
+				usesContext: [],
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
 		it( 'should normalize the icon containing a function', () => {
 			const MyTestIcon = () => {
-				return <svg width="20" height="20" viewBox="0 0 20 20">
-					<circle cx="10" cy="10" r="10"
-						fill="red" stroke="blue" strokeWidth="10" />
-				</svg>;
+				return (
+					<svg width="20" height="20" viewBox="0 0 20 20">
+						<circle
+							cx="10"
+							cy="10"
+							r="10"
+							fill="red"
+							stroke="blue"
+							strokeWidth="10"
+						/>
+					</svg>
+				);
 			};
 			const blockType = {
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 				icon: MyTestIcon,
 			};
-			registerBlockType( 'core/test-block-icon-normalize-function', blockType );
-			expect( getBlockType( 'core/test-block-icon-normalize-function' ) ).toEqual( {
+			registerBlockType(
+				'core/test-block-icon-normalize-function',
+				blockType
+			);
+			expect(
+				getBlockType( 'core/test-block-icon-normalize-function' )
+			).toEqual( {
 				name: 'core/test-block-icon-normalize-function',
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 				icon: {
 					src: MyTestIcon,
 				},
 				attributes: {},
+				providesContext: {},
+				usesContext: [],
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
 		it( 'should correctly register an icon with background and a custom svg', () => {
 			const blockType = {
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 				icon: {
 					background: '#f00',
-					src: ( <svg width="20" height="20" viewBox="0 0 20 20">
-						<circle cx="10" cy="10" r="10"
-							fill="red" stroke="blue" strokeWidth="10" />
-					</svg> ),
+					src: (
+						<svg width="20" height="20" viewBox="0 0 20 20">
+							<circle
+								cx="10"
+								cy="10"
+								r="10"
+								fill="red"
+								stroke="blue"
+								strokeWidth="10"
+							/>
+						</svg>
+					),
 				},
 			};
-			registerBlockType( 'core/test-block-icon-normalize-background', blockType );
-			expect( getBlockType( 'core/test-block-icon-normalize-background' ) ).toEqual( {
+			registerBlockType(
+				'core/test-block-icon-normalize-background',
+				blockType
+			);
+			expect(
+				getBlockType( 'core/test-block-icon-normalize-background' )
+			).toEqual( {
 				name: 'core/test-block-icon-normalize-background',
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 				icon: {
 					background: '#f00',
 					foreground: '#191e23',
 					shadowColor: 'rgba(255, 0, 0, 0.3)',
-					src: ( <svg width="20" height="20" viewBox="0 0 20 20">
-						<circle cx="10" cy="10" r="10"
-							fill="red" stroke="blue" strokeWidth="10" />
-					</svg> ),
+					src: (
+						<svg width="20" height="20" viewBox="0 0 20 20">
+							<circle
+								cx="10"
+								cy="10"
+								r="10"
+								fill="red"
+								stroke="blue"
+								strokeWidth="10"
+							/>
+						</svg>
+					),
 				},
 				attributes: {},
+				providesContext: {},
+				usesContext: [],
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
 		it( 'should store a copy of block type', () => {
-			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
+			const blockType = {
+				settingName: 'settingValue',
+				save: noop,
+				category: 'text',
+				title: 'block title',
+			};
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			blockType.mutated = true;
 			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
 				name: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
+				providesContext: {},
+				usesContext: [],
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
@@ -358,23 +655,41 @@ describe( 'blocks', () => {
 			} );
 
 			it( 'should reject valid blocks when they become invalid after executing filter', () => {
-				addFilter( 'blocks.registerBlockType', 'core/blocks/without-title', ( settings ) => {
-					return {
-						...settings,
-						title: '',
-					};
-				} );
-				const block = registerBlockType( 'my-plugin/fancy-block-12', defaultBlockSettings );
-				expect( console ).toHaveErroredWith( 'The block "my-plugin/fancy-block-12" must have a title.' );
+				addFilter(
+					'blocks.registerBlockType',
+					'core/blocks/without-title',
+					( settings ) => {
+						return {
+							...settings,
+							title: '',
+						};
+					}
+				);
+				const block = registerBlockType(
+					'my-plugin/fancy-block-12',
+					defaultBlockSettings
+				);
+				expect( console ).toHaveErroredWith(
+					'The block "my-plugin/fancy-block-12" must have a title.'
+				);
 				expect( block ).toBeUndefined();
 			} );
 
 			it( 'should reject blocks which become invalid after executing filter which does not return a plain object', () => {
-				addFilter( 'blocks.registerBlockType', 'core/blocks/without-save', ( settings ) => {
-					return [ settings ];
-				} );
-				const block = registerBlockType( 'my-plugin/fancy-block-13', defaultBlockSettings );
-				expect( console ).toHaveErroredWith( 'Block settings must be a valid object.' );
+				addFilter(
+					'blocks.registerBlockType',
+					'core/blocks/without-save',
+					( settings ) => {
+						return [ settings ];
+					}
+				);
+				const block = registerBlockType(
+					'my-plugin/fancy-block-13',
+					defaultBlockSettings
+				);
+				expect( console ).toHaveErroredWith(
+					'Block settings must be a valid object.'
+				);
 				expect( block ).toBeUndefined();
 			} );
 
@@ -397,44 +712,214 @@ describe( 'blocks', () => {
 				};
 
 				let i = 0;
-				addFilter( 'blocks.registerBlockType', 'core/blocks/without-title', ( settings ) => {
-					// Verify that for deprecations, the filter is called with a merge of pre-filter
-					// settings with deprecation keys omitted and the deprecation entry.
-					if ( i > 0 ) {
-						expect( settings ).toEqual( {
-							...omit(
-								{
-									name,
-									...DEFAULT_BLOCK_TYPE_SETTINGS,
-									...get( serverSideBlockDefinitions, name ),
-									...blockSettingsWithDeprecations,
+				addFilter(
+					'blocks.registerBlockType',
+					'core/blocks/without-title',
+					( settings ) => {
+						// Verify that for deprecations, the filter is called with a merge of pre-filter
+						// settings with deprecation keys omitted and the deprecation entry.
+						if ( i > 0 ) {
+							// eslint-disable-next-line jest/no-conditional-expect
+							expect( settings ).toEqual( {
+								...omit(
+									{
+										name,
+										icon: blockIcon,
+										attributes: {},
+										providesContext: {},
+										usesContext: [],
+										keywords: [],
+										supports: {},
+										styles: [],
+										save: () => null,
+										...get(
+											serverSideBlockDefinitions,
+											name
+										),
+										...blockSettingsWithDeprecations,
+									},
+									DEPRECATED_ENTRY_KEYS
+								),
+								...blockSettingsWithDeprecations.deprecated[
+									i - 1
+								],
+							} );
+						}
+						i++;
+
+						return {
+							...settings,
+							attributes: {
+								...settings.attributes,
+								id: {
+									type: 'string',
 								},
-								DEPRECATED_ENTRY_KEYS
-							),
-							...blockSettingsWithDeprecations.deprecated[ i - 1 ],
-						} );
-					}
-					i++;
-
-					return {
-						...settings,
-						attributes: {
-							...settings.attributes,
-							id: {
-								type: 'string',
 							},
-						},
-					};
-				} );
+						};
+					}
+				);
 
-				const block = registerBlockType( name, blockSettingsWithDeprecations );
+				const block = registerBlockType(
+					name,
+					blockSettingsWithDeprecations
+				);
 
 				expect( block.attributes.id ).toEqual( { type: 'string' } );
 				block.deprecated.forEach( ( deprecation ) => {
-					expect( deprecation.attributes.id ).toEqual( { type: 'string' } );
+					expect( deprecation.attributes.id ).toEqual( {
+						type: 'string',
+					} );
 					// Verify that the deprecation's keys are a subset of deprecation keys.
-					expect( deprecation ).toEqual( pick( deprecation, DEPRECATED_ENTRY_KEYS ) );
+					expect( deprecation ).toEqual(
+						pick( deprecation, DEPRECATED_ENTRY_KEYS )
+					);
 				} );
+			} );
+
+			it( 'should update block attributes separately for each block when they use a default set', () => {
+				addFilter(
+					'blocks.registerBlockType',
+					'core/blocks/shared-defaults',
+					( settings, name ) => {
+						if ( name === 'my-plugin/test-block-1' ) {
+							settings.attributes.newlyAddedAttribute = {
+								type: String,
+							};
+						}
+						return settings;
+					}
+				);
+				const block1 = registerBlockType(
+					'my-plugin/test-block-1',
+					defaultBlockSettings
+				);
+				const block2 = registerBlockType(
+					'my-plugin/test-block-2',
+					defaultBlockSettings
+				);
+				// Only attributes of block1 are supposed to be edited by the filter thus it must differ from block2.
+				expect( block1.attributes ).not.toEqual( block2.attributes );
+			} );
+		} );
+	} );
+
+	describe( 'registerBlockTypeFromMetadata', () => {
+		test( 'registers block from metadata', () => {
+			const Edit = () => 'test';
+			const block = registerBlockTypeFromMetadata(
+				{
+					name: 'test/block-from-metadata',
+					title: 'Block from metadata',
+					category: 'text',
+					icon: 'palmtree',
+					variations: [
+						{
+							name: 'variation',
+							title: 'Variation Title',
+							description: 'Variation description',
+							keywords: [ 'variation' ],
+						},
+					],
+				},
+				{
+					edit: Edit,
+					save: noop,
+				}
+			);
+			expect( block ).toEqual( {
+				name: 'test/block-from-metadata',
+				title: 'Block from metadata',
+				category: 'text',
+				icon: {
+					src: 'palmtree',
+				},
+				keywords: [],
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				supports: {},
+				styles: [],
+				variations: [
+					{
+						name: 'variation',
+						title: 'Variation Title',
+						description: 'Variation description',
+						keywords: [ 'variation' ],
+					},
+				],
+				edit: Edit,
+				save: noop,
+			} );
+		} );
+		test( 'registers block from metadata with translation', () => {
+			addFilter(
+				'i18n.gettext_with_context_test',
+				'test/mark-as-translated',
+				( value ) => value + ' (translated)'
+			);
+
+			const Edit = () => 'test';
+			const block = registerBlockTypeFromMetadata(
+				{
+					name: 'test/block-from-metadata-i18n',
+					title: 'I18n title from metadata',
+					description: 'I18n description from metadata',
+					keywords: [ 'i18n', 'metadata' ],
+					styles: [
+						{
+							name: 'i18n-style',
+							label: 'I18n Style Label',
+						},
+					],
+					variations: [
+						{
+							name: 'i18n-variation',
+							title: 'I18n Variation Title',
+							description: 'I18n variation description',
+							keywords: [ 'variation' ],
+						},
+					],
+					textdomain: 'test',
+					icon: 'palmtree',
+				},
+				{
+					edit: Edit,
+					save: noop,
+				}
+			);
+			removeFilter(
+				'i18n.gettext_with_context_test',
+				'test/mark-as-translated'
+			);
+
+			expect( block ).toEqual( {
+				name: 'test/block-from-metadata-i18n',
+				title: 'I18n title from metadata (translated)',
+				description: 'I18n description from metadata (translated)',
+				icon: {
+					src: 'palmtree',
+				},
+				keywords: [ 'i18n (translated)', 'metadata (translated)' ],
+				attributes: {},
+				providesContext: {},
+				usesContext: [],
+				supports: {},
+				styles: [
+					{
+						name: 'i18n-style',
+						label: 'I18n Style Label (translated)',
+					},
+				],
+				variations: [
+					{
+						name: 'i18n-variation',
+						title: 'I18n Variation Title (translated)',
+						description: 'I18n variation description (translated)',
+						keywords: [ 'variation (translated)' ],
+					},
+				],
+				edit: Edit,
+				save: noop,
 			} );
 		} );
 	} );
@@ -443,7 +928,9 @@ describe( 'blocks', () => {
 		it( 'creates a new block collection', () => {
 			registerBlockCollection( 'core', { title: 'Core' } );
 
-			expect( select( 'core/blocks' ).getCollections() ).toEqual( { core: { title: 'Core', icon: undefined } } );
+			expect( select( blocksStore ).getCollections() ).toEqual( {
+				core: { title: 'Core', icon: undefined },
+			} );
 		} );
 	} );
 
@@ -453,14 +940,18 @@ describe( 'blocks', () => {
 			registerBlockCollection( 'core2', { title: 'Core2' } );
 			unregisterBlockCollection( 'core' );
 
-			expect( select( 'core/blocks' ).getCollections() ).toEqual( { core2: { title: 'Core2', icon: undefined } } );
+			expect( select( blocksStore ).getCollections() ).toEqual( {
+				core2: { title: 'Core2', icon: undefined },
+			} );
 		} );
 	} );
 
 	describe( 'unregisterBlockType()', () => {
 		it( 'should fail if a block is not registered', () => {
 			const oldBlock = unregisterBlockType( 'core/test-block' );
-			expect( console ).toHaveErroredWith( 'Block "core/test-block" is not registered.' );
+			expect( console ).toHaveErroredWith(
+				'Block "core/test-block" is not registered.'
+			);
 			expect( oldBlock ).toBeUndefined();
 		} );
 
@@ -470,13 +961,18 @@ describe( 'blocks', () => {
 				{
 					name: 'core/test-block',
 					save: noop,
-					category: 'common',
+					category: 'text',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: blockIcon,
 					},
 					attributes: {},
+					providesContext: {},
+					usesContext: [],
 					keywords: [],
+					supports: {},
+					styles: [],
+					variations: [],
 				},
 			] );
 			const oldBlock = unregisterBlockType( 'core/test-block' );
@@ -484,13 +980,17 @@ describe( 'blocks', () => {
 			expect( oldBlock ).toEqual( {
 				name: 'core/test-block',
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
+				providesContext: {},
+				usesContext: [],
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 			expect( getBlockTypes() ).toEqual( [] );
 		} );
@@ -514,7 +1014,9 @@ describe( 'blocks', () => {
 		it( 'assigns unknown type handler', () => {
 			setUnregisteredTypeHandlerName( 'core/test-block' );
 
-			expect( getUnregisteredTypeHandlerName() ).toBe( 'core/test-block' );
+			expect( getUnregisteredTypeHandlerName() ).toBe(
+				'core/test-block'
+			);
 		} );
 	} );
 
@@ -558,30 +1060,43 @@ describe( 'blocks', () => {
 			expect( getBlockType( 'core/test-block' ) ).toEqual( {
 				name: 'core/test-block',
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
+				providesContext: {},
+				usesContext: [],
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 
 		it( 'should return all block type elements', () => {
-			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
+			const blockType = {
+				settingName: 'settingValue',
+				save: noop,
+				category: 'text',
+				title: 'block title',
+			};
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockType( 'core/test-block-with-settings' ) ).toEqual( {
 				name: 'core/test-block-with-settings',
 				settingName: 'settingValue',
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'block title',
 				icon: {
-					src: 'block-default',
+					src: blockIcon,
 				},
 				attributes: {},
+				providesContext: {},
+				usesContext: [],
 				keywords: [],
+				supports: {},
+				styles: [],
 			} );
 		} );
 	} );
@@ -593,31 +1108,46 @@ describe( 'blocks', () => {
 
 		it( 'should return all registered blocks', () => {
 			registerBlockType( 'core/test-block', defaultBlockSettings );
-			const blockType = { settingName: 'settingValue', save: noop, category: 'common', title: 'block title' };
+			const blockType = {
+				settingName: 'settingValue',
+				save: noop,
+				category: 'text',
+				title: 'block title',
+			};
 			registerBlockType( 'core/test-block-with-settings', blockType );
 			expect( getBlockTypes() ).toEqual( [
 				{
 					name: 'core/test-block',
 					save: noop,
-					category: 'common',
+					category: 'text',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: blockIcon,
 					},
 					attributes: {},
+					providesContext: {},
+					usesContext: [],
 					keywords: [],
+					supports: {},
+					styles: [],
+					variations: [],
 				},
 				{
 					name: 'core/test-block-with-settings',
 					settingName: 'settingValue',
 					save: noop,
-					category: 'common',
+					category: 'text',
 					title: 'block title',
 					icon: {
-						src: 'block-default',
+						src: blockIcon,
 					},
 					attributes: {},
+					providesContext: {},
+					usesContext: [],
 					keywords: [],
+					supports: {},
+					styles: [],
+					variations: [],
 				},
 			] );
 		} );
@@ -632,7 +1162,9 @@ describe( 'blocks', () => {
 				},
 			} );
 
-			expect( getBlockSupport( 'core/test-block', 'foo' ) ).toBe( undefined );
+			expect( getBlockSupport( 'core/test-block', 'foo' ) ).toBe(
+				undefined
+			);
 		} );
 
 		it( 'should return block supports value', () => {
@@ -654,7 +1186,9 @@ describe( 'blocks', () => {
 				},
 			} );
 
-			expect( getBlockSupport( 'core/test-block', 'foo', true ) ).toBe( true );
+			expect( getBlockSupport( 'core/test-block', 'foo', true ) ).toBe(
+				true
+			);
 		} );
 	} );
 
@@ -684,7 +1218,9 @@ describe( 'blocks', () => {
 				},
 			} );
 
-			expect( hasBlockSupport( 'core/test-block', 'foo', true ) ).toBe( true );
+			expect( hasBlockSupport( 'core/test-block', 'foo', true ) ).toBe(
+				true
+			);
 		} );
 
 		it( 'should return true if block type supports', () => {

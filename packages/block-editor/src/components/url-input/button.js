@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { Button } from '@wordpress/components';
+import { link, keyboardReturn, arrowLeft } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -37,13 +38,13 @@ class URLInputButton extends Component {
 		return (
 			<div className="block-editor-url-input__button">
 				<Button
-					icon="admin-links"
+					icon={ link }
 					label={ buttonLabel }
 					onClick={ this.toggle }
 					className="components-toolbar__control"
 					isPressed={ !! url }
 				/>
-				{ expanded &&
+				{ expanded && (
 					<form
 						className="block-editor-url-input__button-modal"
 						onSubmit={ this.submitLink }
@@ -51,25 +52,28 @@ class URLInputButton extends Component {
 						<div className="block-editor-url-input__button-modal-line">
 							<Button
 								className="block-editor-url-input__back"
-								icon="arrow-left-alt"
+								icon={ arrowLeft }
 								label={ __( 'Close' ) }
 								onClick={ this.toggle }
 							/>
-							<URLInput value={ url || '' } onChange={ onChange } />
+							<URLInput
+								value={ url || '' }
+								onChange={ onChange }
+							/>
 							<Button
-								icon="editor-break"
+								icon={ keyboardReturn }
 								label={ __( 'Submit' ) }
 								type="submit"
 							/>
 						</div>
 					</form>
-				}
+				) }
 			</div>
 		);
 	}
 }
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/url-input/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/url-input/README.md
  */
 export default URLInputButton;

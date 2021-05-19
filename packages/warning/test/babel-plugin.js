@@ -20,7 +20,7 @@ function compare( input, output, options = {} ) {
 	expect( code ).toEqual( output );
 }
 
-describe( 'babel-plugin', function() {
+describe( 'babel-plugin', () => {
 	it( 'should replace warning calls with import declaration', () => {
 		compare(
 			join(
@@ -35,10 +35,7 @@ describe( 'babel-plugin', function() {
 	} );
 
 	it( 'should not replace warning calls without import declaration', () => {
-		compare(
-			'warning("a");',
-			'warning("a");'
-		);
+		compare( 'warning("a");', 'warning("a");' );
 	} );
 
 	it( 'should replace warning calls without import declaration with plugin options', () => {
@@ -55,7 +52,7 @@ describe( 'babel-plugin', function() {
 				'import warning from "@wordpress/warning";',
 				'warning("a");',
 				'warning("b");',
-				'warning("c");',
+				'warning("c");'
 			),
 			join(
 				'import warning from "@wordpress/warning";',
@@ -72,7 +69,7 @@ describe( 'babel-plugin', function() {
 				'import warn from "@wordpress/warning";',
 				'warn("a");',
 				'warn("b");',
-				'warn("c");',
+				'warn("c");'
 			),
 			join(
 				'import warn from "@wordpress/warning";',
@@ -83,13 +80,13 @@ describe( 'babel-plugin', function() {
 		);
 	} );
 
-	it( 'should identify warning callee name by ', () => {
+	it( 'should identify warning callee name by', () => {
 		compare(
 			join(
 				'import warn from "@wordpress/warning";',
 				'warn("a");',
 				'warn("b");',
-				'warn("c");',
+				'warn("c");'
 			),
 			join(
 				'import warn from "@wordpress/warning";',

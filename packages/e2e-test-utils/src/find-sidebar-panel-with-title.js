@@ -1,8 +1,3 @@
-/**
- * External dependencies
- */
-import { first } from 'lodash';
-
 /** @typedef {import('puppeteer').ElementHandle} ElementHandle */
 
 /**
@@ -13,8 +8,7 @@ import { first } from 'lodash';
  * @return {Promise<ElementHandle|undefined>} Object that represents an in-page DOM element.
  */
 export async function findSidebarPanelWithTitle( panelTitle ) {
-	const classSelect = ( className ) => `[contains(concat(" ", @class, " "), " ${ className } ")]`;
-	const buttonSelector = `//div${ classSelect( 'edit-post-sidebar' ) }//button${ classSelect( 'components-button' ) }${ classSelect( 'components-panel__body-toggle' ) }[contains(text(),"${ panelTitle }")]`;
-	const panelSelector = `${ buttonSelector }/ancestor::*[contains(concat(" ", @class, " "), " components-panel__body ")]`;
-	return first( await page.$x( panelSelector ) );
+	const panelToggleSelector = `//div[contains(@class, "edit-post-sidebar")]//button[contains(@class, "components-panel__body-toggle") and contains(text(),"${ panelTitle }")]`;
+	const panelSelector = `${ panelToggleSelector }/ancestor::*[contains(concat(" ", @class, " "), " components-panel__body ")]`;
+	return await page.waitForXPath( panelSelector );
 }

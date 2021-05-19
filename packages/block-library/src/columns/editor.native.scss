@@ -1,0 +1,17 @@
+.columnsContainer {
+	min-width: $block-edge-to-content *  2;
+	margin-left: $block-edge-to-content;
+}
+
+.innerBlocksSelected {
+	margin-bottom: $block-edge-to-content;
+}
+
+.columnMargin {
+	margin: $block-edge-to-content / 2;
+}
+
+.columnAppender {
+	margin-left: $grid-unit-20;
+	margin-right: $grid-unit-20;
+}

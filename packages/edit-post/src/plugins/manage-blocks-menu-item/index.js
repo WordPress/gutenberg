@@ -5,6 +5,11 @@ import { MenuItem } from '@wordpress/components';
 import { withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
+
 export function ManageBlocksMenuItem( { openModal } ) {
 	return (
 		<MenuItem
@@ -18,9 +23,7 @@ export function ManageBlocksMenuItem( { openModal } ) {
 }
 
 export default withDispatch( ( dispatch ) => {
-	const {
-		openModal,
-	} = dispatch( 'core/edit-post' );
+	const { openModal } = dispatch( editPostStore );
 
 	return {
 		openModal,

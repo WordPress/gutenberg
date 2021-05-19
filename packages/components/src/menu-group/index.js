@@ -13,6 +13,7 @@ export function MenuGroup( {
 	children,
 	className = '',
 	label,
+	hideSeparator,
 } ) {
 	const instanceId = useInstanceId( MenuGroup );
 
@@ -21,14 +22,13 @@ export function MenuGroup( {
 	}
 
 	const labelId = `components-menu-group-label-${ instanceId }`;
-	const classNames = classnames(
-		className,
-		'components-menu-group'
-	);
+	const classNames = classnames( className, 'components-menu-group', {
+		'has-hidden-separator': hideSeparator,
+	} );
 
 	return (
 		<div className={ classNames }>
-			{ label &&
+			{ label && (
 				<div
 					className="components-menu-group__label"
 					id={ labelId }
@@ -36,7 +36,7 @@ export function MenuGroup( {
 				>
 					{ label }
 				</div>
-			}
+			) }
 			<div role="group" aria-labelledby={ label ? labelId : null }>
 				{ children }
 			</div>

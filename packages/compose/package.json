@@ -1,15 +1,17 @@
 {
 	"name": "@wordpress/compose",
-	"version": "3.10.0",
+	"version": "4.0.0",
 	"description": "WordPress higher-order components (HOCs).",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
-		"React",
-		"hoc"
+		"gutenberg",
+		"react",
+		"hoc",
+		"hooks"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/compose/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/compose/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -18,16 +20,27 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.13.10",
+		"@wordpress/deprecated": "file:../deprecated",
+		"@wordpress/dom": "file:../dom",
 		"@wordpress/element": "file:../element",
 		"@wordpress/is-shallow-equal": "file:../is-shallow-equal",
-		"lodash": "^4.17.15",
-		"mousetrap": "^1.6.2"
+		"@wordpress/keycodes": "file:../keycodes",
+		"@wordpress/priority-queue": "file:../priority-queue",
+		"clipboard": "^2.0.1",
+		"lodash": "^4.17.21",
+		"memize": "^1.1.0",
+		"mousetrap": "^1.6.5",
+		"react-resize-aware": "^3.1.0",
+		"use-memo-one": "^1.1.1"
 	},
 	"publishConfig": {
 		"access": "public"

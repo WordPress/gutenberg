@@ -9,6 +9,11 @@ import { Dimensions } from 'react-native';
  */
 import { dispatch } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store } from './store';
+
 const matchWidth = ( operator, breakpoint ) => {
 	const { width } = Dimensions.get( 'window' );
 	if ( operator === 'max-width' ) {
@@ -21,16 +26,20 @@ const matchWidth = ( operator, breakpoint ) => {
 
 const addDimensionsEventListener = ( breakpoints, operators ) => {
 	const setIsMatching = () => {
-		const matches = reduce( breakpoints, ( result, width, name ) => {
-			forEach( operators, ( condition, operator ) => {
-				const key = [ operator, name ].join( ' ' );
-				result[ key ] = matchWidth( condition, width );
-			} );
+		const matches = reduce(
+			breakpoints,
+			( result, width, name ) => {
+				forEach( operators, ( condition, operator ) => {
+					const key = [ operator, name ].join( ' ' );
+					result[ key ] = matchWidth( condition, width );
+				} );
 
-			return result;
-		}, {} );
+				return result;
+			},
+			{}
+		);
 
-		dispatch( 'core/viewport' ).setIsMatching( matches );
+		dispatch( store ).setIsMatching( matches );
 	};
 
 	Dimensions.addEventListener( 'change', setIsMatching );

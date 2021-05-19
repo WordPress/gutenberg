@@ -6,17 +6,20 @@ import { LINE_SEPARATOR } from './special-characters';
 import { getLineIndex } from './get-line-index';
 import { getParentLineIndex } from './get-parent-line-index';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./create').RichTextFormat} RichTextFormat */
+
 /**
  * Changes the list type of the selected indented list, if any. Looks at the
  * currently selected list item and takes the parent list, then changes the list
  * type of this list. When multiple lines are selected, the parent lists are
  * takes and changed.
  *
- * @param {Object} value     Value to change.
- * @param {Object} newFormat The new list format object. Choose between
- *                           `{ type: 'ol' }` and `{ type: 'ul' }`.
+ * @param {RichTextValue}  value     Value to change.
+ * @param {RichTextFormat} newFormat The new list format object. Choose between
+ *                                   `{ type: 'ol' }` and `{ type: 'ul' }`.
  *
- * @return {Object} The changed value.
+ * @return {RichTextValue} The changed value.
  */
 export function changeListType( value, newFormat ) {
 	const { text, replacements, start, end } = value;
@@ -44,9 +47,11 @@ export function changeListType( value, newFormat ) {
 		}
 
 		changed = true;
-		newReplacements[ index ] = newReplacements[ index ].map( ( format, i ) => {
-			return i < startCount || i > endCount ? format : newFormat;
-		} );
+		newReplacements[ index ] = newReplacements[ index ].map(
+			( format, i ) => {
+				return i < startCount || i > endCount ? format : newFormat;
+			}
+		);
 	}
 
 	if ( ! changed ) {

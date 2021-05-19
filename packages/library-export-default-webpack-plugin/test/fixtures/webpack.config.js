@@ -1,5 +1,5 @@
 /**
- * Internal dependencies
+ * WordPress dependencies
  */
 const LibraryExportDefaultPlugin = require( '@wordpress/library-export-default-webpack-plugin' );
 
@@ -16,7 +16,5 @@ module.exports = {
 		library: [ 'wp', '[name]' ],
 		libraryTarget: 'global',
 	},
-	plugins: [
-		new LibraryExportDefaultPlugin( [ 'boo' ] ),
-	],
+	plugins: [ new LibraryExportDefaultPlugin( [ 'boo' ] ) ],
 };

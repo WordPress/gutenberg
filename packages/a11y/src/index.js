@@ -6,24 +6,33 @@ import domReady from '@wordpress/dom-ready';
 /**
  * Internal dependencies
  */
-import addContainer from './addContainer';
+import addIntroText from './add-intro-text';
+import addContainer from './add-container';
 import clear from './clear';
-import filterMessage from './filterMessage';
+import filterMessage from './filter-message';
 
 /**
  * Create the live regions.
  */
-export const setup = function() {
+export function setup() {
+	const introText = document.getElementById( 'a11y-speak-intro-text' );
+	const containerAssertive = document.getElementById(
+		'a11y-speak-assertive'
+	);
 	const containerPolite = document.getElementById( 'a11y-speak-polite' );
-	const containerAssertive = document.getElementById( 'a11y-speak-assertive' );
+
+	if ( introText === null ) {
+		addIntroText();
+	}
+
+	if ( containerAssertive === null ) {
+		addContainer( 'assertive' );
+	}
 
 	if ( containerPolite === null ) {
 		addContainer( 'polite' );
 	}
-	if ( containerAssertive === null ) {
-		addContainer( 'assertive' );
-	}
-};
+}
 
 /**
  * Run setup on domReady.
@@ -32,11 +41,10 @@ domReady( setup );
 
 /**
  * Allows you to easily announce dynamic interface updates to screen readers using ARIA live regions.
- * This module is inspired by the `speak` function in wp-a11y.js
+ * This module is inspired by the `speak` function in `wp-a11y.js`.
  *
- * @param {string} message  The message to be announced by Assistive Technologies.
- * @param {string} ariaLive Optional. The politeness level for aria-live. Possible values:
- *                          polite or assertive. Default polite.
+ * @param {string} message  The message to be announced by assistive technologies.
+ * @param {string} [ariaLive] The politeness level for aria-live; default: 'polite'.
  *
  * @example
  * ```js
@@ -49,18 +57,32 @@ domReady( setup );
  * speak( 'The message you want to send to the ARIA live region', 'assertive' );
  * ```
  */
-export const speak = function( message, ariaLive ) {
-	// Clear previous messages to allow repeated strings being read out.
+export function speak( message, ariaLive ) {
+	/*
+	 * Clear previous messages to allow repeated strings being read out and hide
+	 * the explanatory text from assistive technologies.
+	 */
 	clear();
 
 	message = filterMessage( message );
 
+	const introText = document.getElementById( 'a11y-speak-intro-text' );
+	const containerAssertive = document.getElementById(
+		'a11y-speak-assertive'
+	);
 	const containerPolite = document.getElementById( 'a11y-speak-polite' );
-	const containerAssertive = document.getElementById( 'a11y-speak-assertive' );
 
-	if ( containerAssertive && 'assertive' === ariaLive ) {
+	if ( containerAssertive && ariaLive === 'assertive' ) {
 		containerAssertive.textContent = message;
 	} else if ( containerPolite ) {
 		containerPolite.textContent = message;
 	}
-};
+
+	/*
+	 * Make the explanatory text available to assistive technologies by removing
+	 * the 'hidden' HTML attribute.
+	 */
+	if ( introText ) {
+		introText.removeAttribute( 'hidden' );
+	}
+}

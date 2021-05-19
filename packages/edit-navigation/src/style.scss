@@ -1,0 +1,18 @@
+$navigation-editor-width: 420px;
+$navigation-editor-spacing-top: $grid-unit-50 * 2;
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+@import "./components/add-menu/style.scss";
+@import "../../interface/src/style.scss";
+@import "./components/editor/style.scss";
+@import "./components/error-boundary/style.scss";
+@import "./components/header/style.scss";
+@import "./components/inspector-additions/style.scss";
+@import "./components/layout/style.scss";
+@import "./components/menu-switcher/style.scss";
+@import "./components/notices/style.scss";

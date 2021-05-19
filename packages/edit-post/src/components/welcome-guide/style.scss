@@ -1,55 +1,45 @@
 .edit-post-welcome-guide {
-	$image-height: 300px;
-	$image-width: 320px;
+	$image-height: 240px;
+	$image-width: 312px;
+	width: 312px;
 
-	&__page {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		position: relative;
+	&__image {
+		background: #00a0d2;
+		height: 240px;
+		margin: 0 0 $grid-unit-20;
 
-		@include break-small() {
-			min-height: $image-height;
-			padding-left: $image-width + $grid-size-xlarge;
+		&__prm-r {
+			display: none;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			&__prm-r {
+				display: block;
+			}
+
+			&__prm-np {
+				display: none;
+			}
 		}
 	}
 
 	&__heading {
-		font-family: $editor-font;
-		font-size: 21px;
+		font-family: $default-font;
+		font-size: 24px;
 		line-height: 1.4;
-		margin: $grid-size 0;
-	}
-
-	&__image {
-		background: #66c6e4;
-		border-radius: $radius-round-rectangle;
-		height: 200px;
-		margin: $grid-size 0;
-
-		@include break-small() {
-			position: absolute;
-			left: 0;
-			top: 50%;
-			height: $image-height;
-			width: $image-width;
-			margin-top: -0.5 * $image-height;
-		}
+		margin: $grid-unit-20 0 $grid-unit-20 0;
+		padding: 0 $grid-unit-40;
 	}
 
 	&__text {
-		font-size: $editor-font-size;
+		font-size: $default-font-size;
 		line-height: 1.4;
-		margin: $grid-size 0;
+		margin: 0 0 $grid-unit-30 0;
+		padding: 0 $grid-unit-40;
 	}
 
 	&__inserter-icon {
 		margin: 0 4px;
-		position: relative;
-		top: 4px;
-	}
-
-	@include break-small() {
-		width: 600px;
+		vertical-align: text-top;
 	}
 }

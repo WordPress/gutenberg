@@ -9,6 +9,7 @@ import { noop } from 'lodash';
  */
 import { useInstanceId } from '@wordpress/compose';
 import { __, sprintf } from '@wordpress/i18n';
+import { closeSmall } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -61,13 +62,15 @@ export default function Token( {
 				className="components-form-token-field__token-text"
 				id={ `components-form-token-field__token-text-${ instanceId }` }
 			>
-				<VisuallyHidden as="span">{ termPositionAndCount }</VisuallyHidden>
+				<VisuallyHidden as="span">
+					{ termPositionAndCount }
+				</VisuallyHidden>
 				<span aria-hidden="true">{ transformedValue }</span>
 			</span>
 
 			<Button
 				className="components-form-token-field__remove-token"
-				icon="dismiss"
+				icon={ closeSmall }
 				onClick={ ! disabled && onClick }
 				label={ messages.remove }
 				aria-describedby={ `components-form-token-field__token-text-${ instanceId }` }

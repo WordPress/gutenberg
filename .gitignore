@@ -2,6 +2,7 @@
 build
 build-module
 build-style
+build-types
 node_modules
 gutenberg.zip
 
@@ -10,10 +11,15 @@ gutenberg.zip
 *.log
 phpcs.xml
 yarn.lock
-/wordpress
+/artifacts
 
-playground/dist
 .cache
+*.tsbuildinfo
 
 # Report generated from jest-junit
 test/native/junit.xml
+
+# Local overrides
+.wp-env.override.json
+phpunit.xml
+phpunit-watcher.yml

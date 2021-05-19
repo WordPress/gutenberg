@@ -12,32 +12,9 @@
 		outline: 1px solid transparent;
 	}
 
-	textarea.block-editor-default-block-appender__content { // Needs specificity in order to override input field styles from WP-admin styles.
-		font-family: $editor-font;
-		font-size: $editor-font-size; // It should match the default paragraph size.
-		border: none;
-		background: none;
-		box-shadow: none;
-		display: block;
-		cursor: text;
-		width: 100%;
-		outline: $border-width solid transparent;
-		transition: 0.2s outline;
-		@include reduce-motion("transition");
-		resize: none;
-		margin-top: $default-block-margin;
-		margin-bottom: $default-block-margin;
-
-		// Emulate the dimensions of a paragraph block.
-		// On mobile and in nested contexts, the plus to add blocks shows up on the right.
-		// The rightmost padding makes sure it doesn't overlap text.
-		padding: 0 #{ $block-padding + $icon-button-size } 0 $block-padding;
-
-		// Use opacity to work in various editor styles.
-		color: $dark-opacity-300;
-		.is-dark-theme & {
-			color: $light-opacity-300;
-		}
+	.block-editor-default-block-appender__content {
+		// Set the opacity of the initial block appender to the same as placeholder text in an empty Paragraph block.
+		opacity: 0.62;
 	}
 
 	// Dropzone.
@@ -46,45 +23,22 @@
 	}
 }
 
-// Ensure that the height of the first appender, and the one between blocks, is the same as text.
-.block-editor-default-block-appender__content {
-	min-height: $empty-paragraph-height / 2;
-	line-height: $editor-line-height;
-}
-
 // Empty / default block side inserter.
-.block-editor-block-list__empty-block-inserter, // Empty paragraph
-.block-editor-default-block-appender .block-editor-inserter { // Empty appender
+.block-editor-block-list__empty-block-inserter.block-editor-block-list__empty-block-inserter, // Empty paragraph, needs specificity to override inherited popover styles.
+.block-editor-default-block-appender .block-editor-inserter { // Empty appender.
 	position: absolute;
 	top: 0;
-
-	// Change the size of the buttons to match that of the default paragraph height.
-	.components-button.has-icon {
-		width: $block-side-ui-width;
-		height: $block-side-ui-width;
-		padding: 0;
-	}
-
-	.components-button svg {
-		display: block;
-		margin: auto;
-	}
+	height: $button-size-small + $grid-unit-10;
 
 	.block-editor-inserter__toggle {
 		margin-right: 0;
-
-		// Hide the box shadow that appears on hover.
-		// All the :not() rules are needed to override default Button styles.
-		&:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):hover {
-			box-shadow: none;
-		}
 	}
 }
 
 // Left side.
 .block-editor-block-list__empty-block-inserter,
 .block-editor-default-block-appender .block-editor-inserter {
-	right: $grid-size; // Show to the right on mobile.
+	right: $grid-unit-10; // Show to the right on mobile.
 
 	@include break-small {
 		display: flex;
@@ -93,26 +47,5 @@
 
 	&:disabled {
 		display: none;
-	}
-
-	.block-editor-inserter__toggle {
-		border-radius: 50%;
-		width: $block-side-ui-width;
-		height: $block-side-ui-width;
-		padding: 0;
-
-		// Use opacity to work in various editor styles.
-		&:not(:hover) {
-			color: $dark-opacity-500;
-			.is-dark-theme & {
-				color: $light-opacity-500;
-			}
-		}
-	}
-}
-
-.block-editor-default-block-appender .block-editor-inserter {
-	@include break-small {
-		align-items: center;
 	}
 }

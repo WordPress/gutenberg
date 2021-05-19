@@ -20,24 +20,27 @@ export function PublishButtonLabel( {
 	hasNonPostEntityChanges,
 } ) {
 	if ( isPublishing ) {
+		/* translators: button label text should, if possible, be under 16 characters. */
 		return __( 'Publishing…' );
 	} else if ( isPublished && isSaving && ! isAutosaving ) {
+		/* translators: button label text should, if possible, be under 16 characters. */
 		return __( 'Updating…' );
 	} else if ( isBeingScheduled && isSaving && ! isAutosaving ) {
+		/* translators: button label text should, if possible, be under 16 characters. */
 		return __( 'Scheduling…' );
 	}
 
 	if ( ! hasPublishAction ) {
-		return hasNonPostEntityChanges ?
-			__( 'Submit for Review…' ) :
-			__( 'Submit for Review' );
+		return hasNonPostEntityChanges
+			? __( 'Submit for Review…' )
+			: __( 'Submit for Review' );
 	} else if ( isPublished ) {
 		return hasNonPostEntityChanges ? __( 'Update…' ) : __( 'Update' );
 	} else if ( isBeingScheduled ) {
 		return hasNonPostEntityChanges ? __( 'Schedule…' ) : __( 'Schedule' );
 	}
 
-	return hasNonPostEntityChanges ? __( 'Publish…' ) : __( 'Publish' );
+	return __( 'Publish' );
 }
 
 export default compose( [
@@ -56,7 +59,11 @@ export default compose( [
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			isSaving: forceIsSaving || isSavingPost(),
 			isPublishing: isPublishingPost(),
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: get(
+				getCurrentPost(),
+				[ '_links', 'wp:action-publish' ],
+				false
+			),
 			postType: getCurrentPostType(),
 			isAutosaving: isAutosavingPost(),
 		};

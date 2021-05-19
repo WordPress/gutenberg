@@ -8,7 +8,7 @@ import { includes, castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect } from '@wordpress/element';
+import { useEffect, useRef } from '@wordpress/element';
 
 /**
  * A block selection object.
@@ -31,8 +31,10 @@ import { useEffect } from '@wordpress/element';
 function isAppleOS( _window = window ) {
 	const { platform } = _window.navigator;
 
-	return platform.indexOf( 'Mac' ) !== -1 ||
-		includes( [ 'iPad', 'iPhone' ], platform );
+	return (
+		platform.indexOf( 'Mac' ) !== -1 ||
+		includes( [ 'iPad', 'iPhone' ], platform )
+	);
 }
 
 /**
@@ -42,12 +44,21 @@ function isAppleOS( _window = window ) {
  * @param {Function}                callback   Shortcut callback.
  * @param {WPKeyboardShortcutConfig} options    Shortcut options.
  */
-function useKeyboardShortcut( shortcuts, callback, {
-	bindGlobal = false,
-	eventName = 'keydown',
-	isDisabled = false, // This is important for performance considerations.
-	target,
-} = {} ) {
+function useKeyboardShortcut(
+	shortcuts,
+	callback,
+	{
+		bindGlobal = false,
+		eventName = 'keydown',
+		isDisabled = false, // This is important for performance considerations.
+		target,
+	} = {}
+) {
+	const currentCallback = useRef( callback );
+	useEffect( () => {
+		currentCallback.current = callback;
+	}, [ callback ] );
+
 	useEffect( () => {
 		if ( isDisabled ) {
 			return;
@@ -58,28 +69,35 @@ function useKeyboardShortcut( shortcuts, callback, {
 			// Determines whether a key is a modifier by the length of the string.
 			// E.g. if I add a pass a shortcut Shift+Cmd+M, it'll determine that
 			// the modifiers are Shift and Cmd because they're not a single character.
-			const modifiers = new Set( keys.filter( ( value ) => value.length > 1 ) );
+			const modifiers = new Set(
+				keys.filter( ( value ) => value.length > 1 )
+			);
 			const hasAlt = modifiers.has( 'alt' );
 			const hasShift = modifiers.has( 'shift' );
 
 			// This should be better moved to the shortcut registration instead.
 			if (
-				isAppleOS() && (
-					( modifiers.size === 1 && hasAlt ) ||
-					( modifiers.size === 2 && hasAlt && hasShift )
-				)
+				isAppleOS() &&
+				( ( modifiers.size === 1 && hasAlt ) ||
+					( modifiers.size === 2 && hasAlt && hasShift ) )
 			) {
-				throw new Error( `Cannot bind ${ shortcut }. Alt and Shift+Alt modifiers are reserved for character input.` );
+				throw new Error(
+					`Cannot bind ${ shortcut }. Alt and Shift+Alt modifiers are reserved for character input.`
+				);
 			}
 
 			const bindFn = bindGlobal ? 'bindGlobal' : 'bind';
-			mousetrap[ bindFn ]( shortcut, callback, eventName );
+			mousetrap[ bindFn ](
+				shortcut,
+				( ...args ) => currentCallback.current( ...args ),
+				eventName
+			);
 		} );
 
 		return () => {
 			mousetrap.reset();
 		};
-	}, [ shortcuts, bindGlobal, eventName, callback, target, isDisabled ] );
+	}, [ shortcuts, bindGlobal, eventName, target, isDisabled ] );
 }
 
 export default useKeyboardShortcut;

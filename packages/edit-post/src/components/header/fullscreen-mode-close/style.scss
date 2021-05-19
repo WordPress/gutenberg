@@ -1,14 +1,59 @@
-.edit-post-fullscreen-mode-close__toolbar {
+// Developer notes: these rules are duplicated for the site editor.
+// They need to be updated in both places.
+
+.edit-post-fullscreen-mode-close.has-icon {
 	// Do not show the toolbar icon on small screens,
 	// when Fullscreen Mode is not an option in the "More" menu.
 	display: none;
 
 	@include break-medium() {
 		display: flex;
-		border-top: 0;
-		border-bottom: 0;
-		border-left: 0;
-		margin: -9px 10px -8px -10px;
-		padding: 9px 10px;
+		align-items: center;
+		align-self: stretch;
+		border: none;
+		background: #23282e; // WP-admin gray.
+		color: $white;
+		border-radius: 0;
+		height: $header-height + $border-width;
+		width: $header-height;
+		position: relative;
+		margin-bottom: - $border-width;
+
+		&:active {
+			color: $white;
+		}
+
+		&:focus {
+			box-shadow: none;
+		}
+
+		&::before {
+			transition: box-shadow 0.1s ease;
+			@include reduce-motion("transition");
+			content: "";
+			display: block;
+			position: absolute;
+			top: 9px;
+			right: 9px;
+			bottom: 9px;
+			left: 9px;
+			border-radius: $radius-block-ui + $border-width + $border-width;
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) #23282e;
+		}
+
+		// Hover color.
+		&:hover::before {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) $gray-700;
+		}
+
+		// Lightened spot color focus.
+		&:focus::before {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) rgba($white, 0.1), inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
 	}
+}
+
+.edit-post-fullscreen-mode-close_site-icon {
+	width: $button-size;
+	border-radius: $radius-block-ui;
 }

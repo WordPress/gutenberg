@@ -1,7 +1,127 @@
-.wp-block-buttons .wp-block-button {
-	display: inline-block;
-	margin: $grid-size-small;
+// This variable is repeated across Button, Buttons, and Buttons editor styles.
+$blocks-block__margin: 0.5em;
+
+.wp-block-buttons {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	column-gap: $blocks-block__margin;
+
+	&.is-vertical {
+		flex-direction: column;
+		> .wp-block-button {
+			/*rtl:ignore*/
+			margin-right: 0;
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+	}
+
+	// Increased specificity to override blocks default margin.
+	> .wp-block-button {
+		display: inline-block;
+		/*rtl:ignore*/
+		margin-left: 0;
+		/*rtl:ignore*/
+		margin-right: $blocks-block__margin;
+		margin-bottom: $blocks-block__margin;
+
+		&:last-child {
+			/*rtl:ignore*/
+			margin-right: 0;
+		}
+	}
+
+	&.is-content-justification-left {
+		justify-content: flex-start;
+		&.is-vertical {
+			align-items: flex-start;
+		}
+	}
+
+	&.is-content-justification-center {
+		justify-content: center;
+		&.is-vertical {
+			align-items: center;
+		}
+	}
+
+	&.is-content-justification-right {
+		justify-content: flex-end;
+
+		> .wp-block-button {
+			/*rtl:ignore*/
+			margin-left: $blocks-block__margin;
+			/*rtl:ignore*/
+			margin-right: 0;
+
+			&:first-child {
+				/*rtl:ignore*/
+				margin-left: 0;
+			}
+		}
+
+		&.is-vertical {
+			align-items: flex-end;
+		}
+	}
+
+	&.is-content-justification-space-between {
+		justify-content: space-between;
+	}
+
+	// Kept for backward compatibility.
+	&.aligncenter {
+		text-align: center;
+	}
+	&.alignleft .wp-block-button {
+		/*rtl:ignore*/
+		margin-left: 0;
+		/*rtl:ignore*/
+		margin-right: $blocks-block__margin;
+
+		&:last-child {
+			/*rtl:ignore*/
+			margin-right: 0;
+		}
+	}
+	&.alignright .wp-block-button {
+		/*rtl:ignore*/
+		margin-right: 0;
+		/*rtl:ignore*/
+		margin-left: $blocks-block__margin;
+
+		&:first-child {
+			/*rtl:ignore*/
+			margin-left: 0;
+		}
+	}
+
+	// Back compat: Inner button blocks previously had their own alignment
+	// options. Forcing them to 100% width in the flex container replicates
+	// that these were block level elements that took up the full width.
+	//
+	// This back compat rule is ignored if the user decides to use the
+	// newer justification options on the button block, hence the :not.
+	//
+	// Disable the stylelint rule, otherwise this selector is ugly!
+	/* stylelint-disable indentation */
+	&:not(
+		.is-content-justification-space-between,
+		.is-content-justification-right,
+		.is-content-justification-left,
+		.is-content-justification-center
+	) .wp-block-button.aligncenter {
+	/* stylelint-enable indentation */
+		margin-left: auto;
+		margin-right: auto;
+		margin-bottom: $blocks-block__margin;
+		width: 100%;
+	}
 }
-.wp-block-buttons.aligncenter {
+
+// Legacy buttons that did not come in a wrapping container.
+.wp-block-button.aligncenter {
 	text-align: center;
 }

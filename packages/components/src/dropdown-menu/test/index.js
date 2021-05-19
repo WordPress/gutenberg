@@ -1,18 +1,26 @@
 /**
  * External dependencies
  */
-import { shallow, mount } from 'enzyme';
+import { fireEvent, render } from '@testing-library/react';
 
 /**
  * WordPress dependencies
  */
 import { DOWN } from '@wordpress/keycodes';
+import { arrowLeft, arrowRight, arrowUp, arrowDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import DropdownMenu from '../';
-import { Button, MenuItem, NavigableMenu } from '../../';
+import { MenuItem } from '../../';
+
+function getMenuToggleButton( container ) {
+	return container.querySelector( '.components-dropdown-menu__toggle' );
+}
+function getNavigableMenu( container ) {
+	return container.querySelector( '.components-dropdown-menu__menu' );
+}
 
 describe( 'DropdownMenu', () => {
 	const children = ( { onClose } ) => <MenuItem onClick={ onClose } />;
@@ -22,22 +30,22 @@ describe( 'DropdownMenu', () => {
 		controls = [
 			{
 				title: 'Up',
-				icon: 'arrow-up-alt',
+				icon: arrowUp,
 				onClick: jest.fn(),
 			},
 			{
 				title: 'Right',
-				icon: 'arrow-right-alt',
+				icon: arrowRight,
 				onClick: jest.fn(),
 			},
 			{
 				title: 'Down',
-				icon: 'arrow-down-alt',
+				icon: arrowDown,
 				onClick: jest.fn(),
 			},
 			{
 				title: 'Left',
-				icon: 'arrow-left-alt',
+				icon: arrowLeft,
 				onClick: jest.fn(),
 			},
 		];
@@ -45,47 +53,60 @@ describe( 'DropdownMenu', () => {
 
 	describe( 'basic rendering', () => {
 		it( 'should render a null element when neither controls nor children are assigned', () => {
-			const wrapper = shallow( <DropdownMenu /> );
+			const { container } = render( <DropdownMenu /> );
 
-			expect( wrapper.type() ).toBeNull();
+			expect( container.firstChild ).toBeNull();
 		} );
 
 		it( 'should render a null element when controls are empty and children is not specified', () => {
-			const wrapper = shallow( <DropdownMenu controls={ [] } /> );
+			const { container } = render( <DropdownMenu controls={ [] } /> );
 
-			expect( wrapper.type() ).toBeNull();
+			expect( container.firstChild ).toBeNull();
 		} );
 
 		it( 'should open menu on arrow down (controls)', () => {
-			const wrapper = mount( <DropdownMenu controls={ controls } /> );
-			const button = wrapper.find( Button ).filter( '.components-dropdown-menu__toggle' );
+			const {
+				container: { firstChild: dropdownMenuContainer },
+			} = render( <DropdownMenu controls={ controls } /> );
 
-			button.simulate( 'keydown', {
+			const button = getMenuToggleButton( dropdownMenuContainer );
+			button.focus();
+			fireEvent.keyDown( button, {
+				keyCode: DOWN,
 				stopPropagation: () => {},
 				preventDefault: () => {},
-				keyCode: DOWN,
 			} );
+			const menu = getNavigableMenu( dropdownMenuContainer );
+			expect( menu ).toBeTruthy();
 
-			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 1 );
-			expect( wrapper.find( Button ).filter( '.components-dropdown-menu__menu-item' ) ).toHaveLength( controls.length );
+			expect(
+				dropdownMenuContainer.querySelectorAll(
+					'.components-dropdown-menu__menu-item'
+				)
+			).toHaveLength( controls.length );
 		} );
 
 		it( 'should open menu on arrow down (children)', () => {
-			const wrapper = mount( <DropdownMenu children={ children } /> );
-			const button = wrapper.find( Button ).filter( '.components-dropdown-menu__toggle' );
+			const {
+				container: { firstChild: dropdownMenuContainer },
+			} = render( <DropdownMenu children={ children } /> );
 
-			button.simulate( 'keydown', {
+			const button = getMenuToggleButton( dropdownMenuContainer );
+			button.focus();
+			fireEvent.keyDown( button, {
+				keyCode: DOWN,
 				stopPropagation: () => {},
 				preventDefault: () => {},
-				keyCode: DOWN,
 			} );
 
-			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 1 );
+			expect( getNavigableMenu( dropdownMenuContainer ) ).toBeTruthy();
 
-			wrapper.find( MenuItem ).props().onClick();
-			wrapper.update();
+			const menuItem = dropdownMenuContainer.querySelector(
+				'.components-menu-item__button'
+			);
+			fireEvent.click( menuItem );
 
-			expect( wrapper.find( NavigableMenu ) ).toHaveLength( 0 );
+			expect( getNavigableMenu( dropdownMenuContainer ) ).toBeNull();
 		} );
 	} );
 } );

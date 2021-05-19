@@ -1,5 +1,6 @@
 .block-editor-block-list__block[data-type="core/nextpage"] {
 	max-width: 100%;
+	text-align: center;
 	margin-top: $default-block-margin;
 	margin-bottom: $default-block-margin;
 }
@@ -13,15 +14,14 @@
 	> span {
 		font-size: $default-font-size;
 		position: relative;
-		display: inline-block;
 		text-transform: uppercase;
 		font-weight: 600;
 		font-family: $default-font;
-		color: $dark-gray-300;
+		color: $gray-700;
 		border-radius: 4px;
 		background: $white;
 		padding: 6px 8px;
-		height: $icon-button-size-small;
+		height: $button-size-small;
 	}
 
 	// Dashed line
@@ -31,6 +31,6 @@
 		top: calc(50%);
 		left: 0;
 		right: 0;
-		border-top: 3px dashed $light-gray-700;
+		border-top: 3px dashed $gray-400;
 	}
 }

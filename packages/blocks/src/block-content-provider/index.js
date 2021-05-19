@@ -26,6 +26,10 @@ const { Consumer, Provider } = createContext( () => {} );
  * </BlockContentProvider>
  * ```
  *
+ * @param {Object}    props             Component props.
+ * @param {WPElement} props.children    Block save result.
+ * @param {Array}     props.innerBlocks Block(s) to serialize.
+ *
  * @return {WPComponent} Element with BlockContent injected via context.
  */
 const BlockContentProvider = ( { children, innerBlocks } ) => {
@@ -37,11 +41,7 @@ const BlockContentProvider = ( { children, innerBlocks } ) => {
 		return <RawHTML>{ html }</RawHTML>;
 	};
 
-	return (
-		<Provider value={ BlockContent }>
-			{ children }
-		</Provider>
-	);
+	return <Provider value={ BlockContent }>{ children }</Provider>;
 };
 
 /**
@@ -50,17 +50,17 @@ const BlockContentProvider = ( { children, innerBlocks } ) => {
  *
  * @return {WPComponent} Enhanced component with injected BlockContent as prop.
  */
-export const withBlockContentContext = createHigherOrderComponent( ( OriginalComponent ) => {
-	return ( props ) => (
-		<Consumer>
-			{ ( context ) => (
-				<OriginalComponent
-					{ ...props }
-					BlockContent={ context }
-				/>
-			) }
-		</Consumer>
-	);
-}, 'withBlockContentContext' );
+export const withBlockContentContext = createHigherOrderComponent(
+	( OriginalComponent ) => {
+		return ( props ) => (
+			<Consumer>
+				{ ( context ) => (
+					<OriginalComponent { ...props } BlockContent={ context } />
+				) }
+			</Consumer>
+		);
+	},
+	'withBlockContentContext'
+);
 
 export default BlockContentProvider;

@@ -1,14 +1,14 @@
 /**
  * WordPress dependencies
  */
-import { __, _x } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
+import { blockTable as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import deprecated from './deprecated';
 import edit from './edit';
-import icon from './icon';
 import metadata from './block.json';
 import save from './save';
 import transforms from './transforms';
@@ -18,27 +18,27 @@ const { name } = metadata;
 export { metadata, name };
 
 export const settings = {
-	title: __( 'Table' ),
-	description: __( 'Insert a table — perfect for sharing charts and data.' ),
 	icon,
 	example: {
 		attributes: {
-			head: [ {
-				cells: [
-					{
-						content: __( 'Version' ),
-						tag: 'th',
-					},
-					{
-						content: __( 'Jazz Musician' ),
-						tag: 'th',
-					},
-					{
-						content: __( 'Release Date' ),
-						tag: 'th',
-					},
-				],
-			} ],
+			head: [
+				{
+					cells: [
+						{
+							content: __( 'Version' ),
+							tag: 'th',
+						},
+						{
+							content: __( 'Jazz Musician' ),
+							tag: 'th',
+						},
+						{
+							content: __( 'Release Date' ),
+							tag: 'th',
+						},
+					],
+				},
+			],
 			body: [
 				{
 					cells: [
@@ -90,13 +90,6 @@ export const settings = {
 				},
 			],
 		},
-	},
-	styles: [
-		{ name: 'regular', label: _x( 'Default', 'block style' ), isDefault: true },
-		{ name: 'stripes', label: __( 'Stripes' ) },
-	],
-	supports: {
-		align: true,
 	},
 	transforms,
 	edit,

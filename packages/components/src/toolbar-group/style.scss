@@ -1,11 +1,13 @@
 .components-toolbar-group {
-	border: $border-width solid $light-gray-500;
+	min-height: $block-toolbar-height;
+	border-right: $border-width solid $gray-900;
 	background-color: $white;
-	display: flex;
+	display: inline-flex;
 	flex-shrink: 0;
-	margin-right: -$border-width;
+	flex-wrap: wrap;
 
-	& & {
+	// Unset for nested toolbar groups. Increase specificity.
+	& .components-toolbar-group.components-toolbar-group {
 		border-width: 0;
 		margin: 0;
 	}
@@ -16,11 +18,19 @@
 // Legacy toolbar group
 // External code references to it, so we can't change it?
 .components-toolbar {
+	min-height: $block-toolbar-height;
 	margin: 0;
-	border: $border-width solid $light-gray-500;
+	border: $border-width solid $gray-900;
 	background-color: $white;
-	display: flex;
+	display: inline-flex;
 	flex-shrink: 0;
+	flex-wrap: wrap;
+
+	// Unset for nested toolbars. Increase specificity.
+	& .components-toolbar.components-toolbar {
+		border-width: 0;
+		margin: 0;
+	}
 }
 
 div.components-toolbar {
@@ -35,8 +45,6 @@ div.components-toolbar {
 	}
 
 	& > div + div {
-		margin-left: -3px;
-
 		&.has-left-divider {
 			margin-left: 6px;
 			position: relative;
@@ -47,12 +55,85 @@ div.components-toolbar {
 			display: inline-block;
 			content: "";
 			box-sizing: content-box;
-			background-color: $light-gray-500;
+			background-color: $gray-300;
 			position: absolute;
 			top: 8px;
 			left: -3px;
 			width: 1px;
-			height: $icon-button-size - 16px;
+			height: $button-size - 16px;
+		}
+	}
+}
+
+// Size multiple sequential buttons to be optically balanced.
+// Icons are 36px, as set by a 24px icon and 12px padding.
+.block-editor-block-toolbar > .components-toolbar > .block-editor-block-toolbar__slot, // When a plugin adds to a slot, the segment has a `components-toolbar` class.
+.block-editor-block-toolbar > .components-toolbar-group > .block-editor-block-toolbar__slot, // When no plugin adds to slots, the segment has a `components-toolbar-group` class.
+.block-editor-block-toolbar > .block-editor-block-toolbar__slot > .components-toolbar, // The nesting order is sometimes reversed.
+.block-editor-block-toolbar > .block-editor-block-toolbar__slot > .components-dropdown, // Targets unique markup for the "Replace" button.
+.block-editor-block-toolbar .block-editor-block-toolbar__slot .components-toolbar-group { // Inline formatting tools use this class.
+
+	// Segments with just a single button.
+	> .components-button:first-child:last-child,
+	> .components-dropdown:first-child:last-child .components-button,
+	&.components-dropdown > .components-button.components-button, // Single segments where the dropdown is also the toolbar group (such as text align).
+	&.components-dropdown > * .components-button {
+		min-width: $block-toolbar-height;
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
+
+		&::before {
+			left: $grid-unit-10;
+			right: $grid-unit-10;
+		}
+	}
+
+	// First.
+	// @todo, this unnamed div only shows up when plugins add to slots. We should remove the fragment.
+	> .components-button:first-child,
+	> div:first-child > .components-button,
+	> .components-dropdown:first-child .components-button {
+		min-width: $block-toolbar-height - $grid-unit-15 / 2;
+		padding-left: $grid-unit-15 - $border-width;
+		padding-right: $grid-unit-15 / 2;
+
+		&::before {
+			left: $grid-unit-10;
+			right: 2px;
+		}
+	}
+
+	// Middle.
+	// @todo, this unnamed div only shows up when plugins add to slots. We should remove the fragment.
+	> .components-button,
+	> div > .components-button,
+	> .components-dropdown .components-button {
+		min-width: $block-toolbar-height - $grid-unit-15;
+		padding-left: $grid-unit-15 / 2; // 6px.
+		padding-right: $grid-unit-15 / 2;
+
+		svg {
+			min-width: $button-size-small; // This is the optimal icon size, and we size the whole button after this.
+		}
+
+		&::before {
+			left: 2px;
+			right: 2px;
+		}
+	}
+
+	// Last.
+	// @todo, this unnamed div only shows up when plugins add to slots. We should remove the fragment.
+	> .components-button:last-child,
+	> div:last-child > .components-button,
+	> .components-dropdown:last-child .components-button {
+		min-width: $block-toolbar-height - $grid-unit-15 / 2;
+		padding-left: $grid-unit-15 / 2;
+		padding-right: $grid-unit-15 - $border-width;
+
+		&::before {
+			left: 2px;
+			right: $grid-unit-10;
 		}
 	}
 }

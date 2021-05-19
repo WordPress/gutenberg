@@ -13,30 +13,37 @@ const transforms = {
 			transform: ( attributes ) => {
 				return createBlock( 'core/quote', {
 					value: toHTMLString( {
-						value: join( attributes.map( ( { content } ) =>
-							create( { html: content } )
-						), '\u2028' ),
+						value: join(
+							attributes.map( ( { content } ) =>
+								create( { html: content } )
+							),
+							'\u2028'
+						),
 						multilineTag: 'p',
 					} ),
+					anchor: attributes.anchor,
 				} );
 			},
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/heading' ],
-			transform: ( { content } ) => {
+			transform: ( { content, anchor } ) => {
 				return createBlock( 'core/quote', {
 					value: `<p>${ content }</p>`,
+					anchor,
 				} );
 			},
 		},
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { value, citation } ) => createBlock( 'core/quote', {
-				value,
-				citation,
-			} ),
+			transform: ( { value, citation, anchor } ) =>
+				createBlock( 'core/quote', {
+					value,
+					citation,
+					anchor,
+				} ),
 		},
 		{
 			type: 'prefix',
@@ -58,21 +65,20 @@ const transforms = {
 							return true;
 						}
 						// Child is a cite and no other cite child exists before it.
-						if (
-							! hasCitation &&
-							child.nodeName === 'CITE'
-						) {
+						if ( ! hasCitation && child.nodeName === 'CITE' ) {
 							hasCitation = true;
 							return true;
 						}
 					};
 				} )();
-				return node.nodeName === 'BLOCKQUOTE' &&
+				return (
+					node.nodeName === 'BLOCKQUOTE' &&
 					// The quote block can only handle multiline paragraph
 					// content with an optional cite child.
 					Array.from( node.childNodes ).every(
 						isParagraphOrSingleCite
-					);
+					)
+				);
 			},
 			schema: ( { phrasingContentSchema } ) => ( {
 				blockquote: {
@@ -96,12 +102,14 @@ const transforms = {
 				const paragraphs = [];
 				if ( value && value !== '<p></p>' ) {
 					paragraphs.push(
-						...split( create( { html: value, multilineTag: 'p' } ), '\u2028' )
-							.map( ( piece ) =>
-								createBlock( 'core/paragraph', {
-									content: toHTMLString( { value: piece } ),
-								} )
-							)
+						...split(
+							create( { html: value, multilineTag: 'p' } ),
+							'\u2028'
+						).map( ( piece ) =>
+							createBlock( 'core/paragraph', {
+								content: toHTMLString( { value: piece } ),
+							} )
+						)
 					);
 				}
 				if ( citation && citation !== '<p></p>' ) {
@@ -134,7 +142,10 @@ const transforms = {
 					} );
 				}
 
-				const pieces = split( create( { html: value, multilineTag: 'p' } ), '\u2028' );
+				const pieces = split(
+					create( { html: value, multilineTag: 'p' } ),
+					'\u2028'
+				);
 
 				const headingBlock = createBlock( 'core/heading', {
 					content: toHTMLString( { value: pieces[ 0 ] } ),
@@ -150,7 +161,9 @@ const transforms = {
 					...attrs,
 					citation,
 					value: toHTMLString( {
-						value: quotePieces.length ? join( pieces.slice( 1 ), '\u2028' ) : create(),
+						value: quotePieces.length
+							? join( pieces.slice( 1 ), '\u2028' )
+							: create(),
 						multilineTag: 'p',
 					} ),
 				} );
@@ -162,10 +175,11 @@ const transforms = {
 		{
 			type: 'block',
 			blocks: [ 'core/pullquote' ],
-			transform: ( { value, citation } ) => {
+			transform: ( { value, citation, anchor } ) => {
 				return createBlock( 'core/pullquote', {
 					value,
 					citation,
+					anchor,
 				} );
 			},
 		},

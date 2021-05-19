@@ -2,9 +2,11 @@
  * External dependencies
  */
 import { shallow } from 'enzyme';
-import {
-	sendMediaUpload,
-} from 'react-native-gutenberg-bridge';
+
+/**
+ * WordPress dependencies
+ */
+import { sendMediaUpload } from '@wordpress/react-native-bridge';
 
 /**
  * Internal dependencies
@@ -17,16 +19,22 @@ import {
 	MEDIA_UPLOAD_STATE_RESET,
 } from '../';
 
-jest.mock( 'react-native-gutenberg-bridge', () => {
+jest.mock( '@wordpress/react-native-bridge', () => {
 	const callUploadCallback = ( payload ) => {
 		this.uploadCallBack( payload );
 	};
 	const subscribeMediaUpload = ( callback ) => {
 		this.uploadCallBack = callback;
 	};
+	const mediaSources = {
+		deviceCamera: 'DEVICE_CAMERA',
+		deviceLibrary: 'DEVICE_MEDIA_LIBRARY',
+		siteMediaLibrary: 'SITE_MEDIA_LIBRARY',
+	};
 	return {
 		subscribeMediaUpload,
 		sendMediaUpload: callUploadCallback,
+		mediaSources,
 	};
 } );
 
@@ -42,7 +50,11 @@ describe( 'MediaUploadProgress component', () => {
 
 	it( 'listens media upload progress', () => {
 		const progress = 10;
-		const payload = { state: MEDIA_UPLOAD_STATE_UPLOADING, mediaId: MEDIA_ID, progress };
+		const payload = {
+			state: MEDIA_UPLOAD_STATE_UPLOADING,
+			mediaId: MEDIA_ID,
+			progress,
+		};
 
 		const onUpdateMediaProgress = jest.fn();
 
@@ -64,7 +76,11 @@ describe( 'MediaUploadProgress component', () => {
 	} );
 
 	it( 'does not get affected by unrelated media uploads', () => {
-		const payload = { state: MEDIA_UPLOAD_STATE_UPLOADING, mediaId: 1, progress: 20 };
+		const payload = {
+			state: MEDIA_UPLOAD_STATE_UPLOADING,
+			mediaId: 1,
+			progress: 20,
+		};
 		const onUpdateMediaProgress = jest.fn();
 		const wrapper = shallow(
 			<MediaUploadProgress
@@ -82,14 +98,23 @@ describe( 'MediaUploadProgress component', () => {
 
 	it( 'listens media upload success', () => {
 		const progress = 10;
-		const payloadSuccess = { state: MEDIA_UPLOAD_STATE_SUCCEEDED, mediaId: MEDIA_ID };
-		const payloadUploading = { state: MEDIA_UPLOAD_STATE_UPLOADING, mediaId: MEDIA_ID, progress };
+		const payloadSuccess = {
+			state: MEDIA_UPLOAD_STATE_SUCCEEDED,
+			mediaId: MEDIA_ID,
+		};
+		const payloadUploading = {
+			state: MEDIA_UPLOAD_STATE_UPLOADING,
+			mediaId: MEDIA_ID,
+			progress,
+		};
 
 		const onFinishMediaUploadWithSuccess = jest.fn();
 
 		const wrapper = shallow(
 			<MediaUploadProgress
-				onFinishMediaUploadWithSuccess={ onFinishMediaUploadWithSuccess }
+				onFinishMediaUploadWithSuccess={
+					onFinishMediaUploadWithSuccess
+				}
 				mediaId={ MEDIA_ID }
 				renderContent={ () => {} }
 			/>
@@ -103,19 +128,30 @@ describe( 'MediaUploadProgress component', () => {
 
 		expect( wrapper.instance().state.isUploadInProgress ).toEqual( false );
 		expect( onFinishMediaUploadWithSuccess ).toHaveBeenCalledTimes( 1 );
-		expect( onFinishMediaUploadWithSuccess ).toHaveBeenCalledWith( payloadSuccess );
+		expect( onFinishMediaUploadWithSuccess ).toHaveBeenCalledWith(
+			payloadSuccess
+		);
 	} );
 
 	it( 'listens media upload fail', () => {
 		const progress = 10;
-		const payloadFail = { state: MEDIA_UPLOAD_STATE_FAILED, mediaId: MEDIA_ID };
-		const payloadUploading = { state: MEDIA_UPLOAD_STATE_UPLOADING, mediaId: MEDIA_ID, progress };
+		const payloadFail = {
+			state: MEDIA_UPLOAD_STATE_FAILED,
+			mediaId: MEDIA_ID,
+		};
+		const payloadUploading = {
+			state: MEDIA_UPLOAD_STATE_UPLOADING,
+			mediaId: MEDIA_ID,
+			progress,
+		};
 
 		const onFinishMediaUploadWithFailure = jest.fn();
 
 		const wrapper = shallow(
 			<MediaUploadProgress
-				onFinishMediaUploadWithFailure={ onFinishMediaUploadWithFailure }
+				onFinishMediaUploadWithFailure={
+					onFinishMediaUploadWithFailure
+				}
 				mediaId={ MEDIA_ID }
 				renderContent={ () => {} }
 			/>
@@ -130,13 +166,22 @@ describe( 'MediaUploadProgress component', () => {
 		expect( wrapper.instance().state.isUploadInProgress ).toEqual( false );
 		expect( wrapper.instance().state.isUploadFailed ).toEqual( true );
 		expect( onFinishMediaUploadWithFailure ).toHaveBeenCalledTimes( 1 );
-		expect( onFinishMediaUploadWithFailure ).toHaveBeenCalledWith( payloadFail );
+		expect( onFinishMediaUploadWithFailure ).toHaveBeenCalledWith(
+			payloadFail
+		);
 	} );
 
 	it( 'listens media upload reset', () => {
 		const progress = 10;
-		const payloadReset = { state: MEDIA_UPLOAD_STATE_RESET, mediaId: MEDIA_ID };
-		const payloadUploading = { state: MEDIA_UPLOAD_STATE_UPLOADING, mediaId: MEDIA_ID, progress };
+		const payloadReset = {
+			state: MEDIA_UPLOAD_STATE_RESET,
+			mediaId: MEDIA_ID,
+		};
+		const payloadUploading = {
+			state: MEDIA_UPLOAD_STATE_UPLOADING,
+			mediaId: MEDIA_ID,
+			progress,
+		};
 
 		const onMediaUploadStateReset = jest.fn();
 

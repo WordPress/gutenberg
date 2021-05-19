@@ -9,6 +9,7 @@ import { includes } from 'lodash';
 import { createBlobURL } from '@wordpress/blob';
 import { createBlock } from '@wordpress/blocks';
 import { select } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 const transforms = {
 	from: [
@@ -27,11 +28,13 @@ const transforms = {
 					const blobURL = createBlobURL( file );
 
 					// File will be uploaded in componentDidMount()
-					blocks.push( createBlock( 'core/file', {
-						href: blobURL,
-						fileName: file.name,
-						textLinkHref: blobURL,
-					} ) );
+					blocks.push(
+						createBlock( 'core/file', {
+							href: blobURL,
+							fileName: file.name,
+							textLinkHref: blobURL,
+						} )
+					);
 				} );
 
 				return blocks;
@@ -46,6 +49,7 @@ const transforms = {
 					fileName: attributes.caption,
 					textLinkHref: attributes.src,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -58,6 +62,7 @@ const transforms = {
 					fileName: attributes.caption,
 					textLinkHref: attributes.src,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -70,6 +75,7 @@ const transforms = {
 					fileName: attributes.caption,
 					textLinkHref: attributes.url,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -82,7 +88,7 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( 'core' );
+				const { getMedia } = select( coreStore );
 				const media = getMedia( id );
 				return !! media && includes( media.mime_type, 'audio' );
 			},
@@ -91,6 +97,7 @@ const transforms = {
 					src: attributes.href,
 					caption: attributes.fileName,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -101,7 +108,7 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( 'core' );
+				const { getMedia } = select( coreStore );
 				const media = getMedia( id );
 				return !! media && includes( media.mime_type, 'video' );
 			},
@@ -110,6 +117,7 @@ const transforms = {
 					src: attributes.href,
 					caption: attributes.fileName,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},
@@ -120,7 +128,7 @@ const transforms = {
 				if ( ! id ) {
 					return false;
 				}
-				const { getMedia } = select( 'core' );
+				const { getMedia } = select( coreStore );
 				const media = getMedia( id );
 				return !! media && includes( media.mime_type, 'image' );
 			},
@@ -129,6 +137,7 @@ const transforms = {
 					url: attributes.href,
 					caption: attributes.fileName,
 					id: attributes.id,
+					anchor: attributes.anchor,
 				} );
 			},
 		},

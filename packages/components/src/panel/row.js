@@ -3,14 +3,18 @@
  */
 import classnames from 'classnames';
 
-function PanelRow( { className, children } ) {
-	const classes = classnames( 'components-panel__row', className );
+/**
+ * WordPress dependencies
+ */
+import { forwardRef } from '@wordpress/element';
 
-	return (
-		<div className={ classes }>
-			{ children }
-		</div>
-	);
-}
+const PanelRow = forwardRef( ( { className, children }, ref ) => (
+	<div
+		className={ classnames( 'components-panel__row', className ) }
+		ref={ ref }
+	>
+		{ children }
+	</div>
+) );
 
 export default PanelRow;

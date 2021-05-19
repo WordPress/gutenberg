@@ -1,50 +1,36 @@
 {
-	"compilerOptions": {
-		"allowJs": true,
-		"allowSyntheticDefaultImports": true,
-		"checkJs": true,
-		"jsx": "preserve",
-		"lib": ["dom", "esnext"],
-		"module": "commonjs",
-		"noEmit": true,
-		"resolveJsonModule": true,
-		"target": "esnext",
-
-		/* Project Imports */
-		"baseUrl": ".",
-		"paths": {
-			"@wordpress/*": [
-				"packages/*/index.js",
-				"packages/*/src/index.js"
-			]
-		},
-
-		/* Strict Type-Checking Options */
-		"strict": true,                        /* Enable all strict type-checking options. */
-		"strictNullChecks": true,
-		"noImplicitAny": false,                /* Raise error on expressions and declarations with an implied 'any' type. */
-
-		/* Additional Checks */
-		"noUnusedLocals": true,                /* Report errors on unused locals. */
-		"noUnusedParameters": true,            /* Report errors on unused parameters. */
-		"noImplicitReturns": true,             /* Report error when not all code paths in function return a value. */
-		"noFallthroughCasesInSwitch": true,    /* Report errors for fallthrough cases in switch statement. */
-	},
-	"include": [
-		"./packages/a11y/**/*.js",
-		"./packages/blob/**/*.js",
-		"./packages/dom-ready/**/*.js",
-		"./packages/i18n/**/*.js",
-		"./packages/is-shallow-equal/**/*.js",
-		"./packages/priority-queue/**/*.js",
-		"./packages/token-list/**/*.js",
-		"./packages/url/**/*.js",
-		"./packages/warning/**/*.js",
+	"references": [
+		{ "path": "bin" },
+		{ "path": "packages/a11y" },
+		{ "path": "packages/api-fetch" },
+		{ "path": "packages/autop" },
+		{ "path": "packages/blob" },
+		{ "path": "packages/block-editor" },
+		{ "path": "packages/components" },
+		{ "path": "packages/date" },
+		{ "path": "packages/deprecated" },
+		{ "path": "packages/docgen" },
+		{ "path": "packages/dom" },
+		{ "path": "packages/element" },
+		{ "path": "packages/dom-ready" },
+		{ "path": "packages/escape-html" },
+		{ "path": "packages/eslint-plugin" },
+		{ "path": "packages/html-entities" },
+		{ "path": "packages/hooks" },
+		{ "path": "packages/i18n" },
+		{ "path": "packages/icons" },
+		{ "path": "packages/is-shallow-equal" },
+		{ "path": "packages/keycodes" },
+		{ "path": "packages/lazy-import" },
+		{ "path": "packages/prettier-config" },
+		{ "path": "packages/primitives" },
+		{ "path": "packages/priority-queue" },
+		{ "path": "packages/project-management-automation" },
+		{ "path": "packages/react-i18n" },
+		{ "path": "packages/token-list" },
+		{ "path": "packages/url" },
+		{ "path": "packages/warning" },
+		{ "path": "packages/wordcount" }
 	],
-	"exclude": [
-		"./packages/*/benchmark",
-		"./packages/**/test/**",
-		"./packages/**/build/**",
-		"./packages/**/build-module/**"
-	]
+	"files": []
 }

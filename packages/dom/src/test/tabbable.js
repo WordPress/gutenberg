@@ -26,11 +26,7 @@ describe( 'tabbable', () => {
 
 			const tabbables = find( node );
 
-			expect( tabbables ).toEqual( [
-				first,
-				second,
-				third,
-			] );
+			expect( tabbables ).toEqual( [ first, second, third ] );
 		} );
 
 		it( 'consolidates radio group to the first, if unchecked', () => {
@@ -67,11 +63,7 @@ describe( 'tabbable', () => {
 
 			const tabbables = find( node );
 
-			expect( tabbables ).toEqual( [
-				firstRadio,
-				text,
-				fourthRadio,
-			] );
+			expect( tabbables ).toEqual( [ firstRadio, text, fourthRadio ] );
 		} );
 
 		it( 'consolidates radio group to the checked', () => {
@@ -99,10 +91,7 @@ describe( 'tabbable', () => {
 
 			const tabbables = find( node );
 
-			expect( tabbables ).toEqual( [
-				text,
-				thirdRadio,
-			] );
+			expect( tabbables ).toEqual( [ text, thirdRadio ] );
 		} );
 
 		it( 'not consolidate unnamed radio inputs', () => {
@@ -122,11 +111,7 @@ describe( 'tabbable', () => {
 
 			const tabbables = find( node );
 
-			expect( tabbables ).toEqual( [
-				firstRadio,
-				text,
-				secondRadio,
-			] );
+			expect( tabbables ).toEqual( [ firstRadio, text, secondRadio ] );
 		} );
 	} );
 } );

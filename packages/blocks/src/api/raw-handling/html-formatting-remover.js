@@ -20,14 +20,26 @@ function isFormattingSpace( character ) {
  * @param {Node} node The node to be processed.
  * @return {void}
  */
-export default function( node ) {
+export default function htmlFormattingRemover( node ) {
 	if ( node.nodeType !== node.TEXT_NODE ) {
 		return;
 	}
 
-	// Ignore pre content.
-	if ( node.parentElement.closest( 'pre' ) ) {
-		return;
+	// Ignore pre content. Note that this does not use Element#closest due to
+	// a combination of (a) node may not be Element and (b) node.parentElement
+	// does not have full support in all browsers (Internet Exporer).
+	//
+	// See: https://developer.mozilla.org/en-US/docs/Web/API/Node/parentElement#Browser_compatibility
+
+	/** @type {Node?} */
+	let parent = node;
+	while ( ( parent = parent.parentNode ) ) {
+		if (
+			parent.nodeType === parent.ELEMENT_NODE &&
+			parent.nodeName === 'PRE'
+		) {
+			return;
+		}
 	}
 
 	// First, replace any sequence of HTML formatting space with a single space.
@@ -57,10 +69,8 @@ export default function( node ) {
 		if (
 			! nextSibling ||
 			nextSibling.nodeName === 'BR' ||
-			(
-				nextSibling.nodeType === nextSibling.TEXT_NODE &&
-				isFormattingSpace( nextSibling.textContent[ 0 ] )
-			)
+			( nextSibling.nodeType === nextSibling.TEXT_NODE &&
+				isFormattingSpace( nextSibling.textContent[ 0 ] ) )
 		) {
 			newData = newData.slice( 0, -1 );
 		}

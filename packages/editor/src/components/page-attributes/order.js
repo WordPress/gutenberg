@@ -18,35 +18,36 @@ import PostTypeSupportCheck from '../post-type-support-check';
 
 export const PageAttributesOrder = withState( {
 	orderInput: null,
-} )(
-	( { onUpdateOrder, order = 0, orderInput, setState } ) => {
-		const setUpdatedOrder = ( value ) => {
-			setState( {
-				orderInput: value,
-			} );
-			const newOrder = Number( value );
-			if ( Number.isInteger( newOrder ) && invoke( value, [ 'trim' ] ) !== '' ) {
-				onUpdateOrder( Number( value ) );
-			}
-		};
-		const value = orderInput === null ? order : orderInput;
-		return (
-			<TextControl
-				className="editor-page-attributes__order"
-				type="number"
-				label={ __( 'Order' ) }
-				value={ value }
-				onChange={ setUpdatedOrder }
-				size={ 6 }
-				onBlur={ () => {
-					setState( {
-						orderInput: null,
-					} );
-				} }
-			/>
-		);
-	}
-);
+} )( ( { onUpdateOrder, order = 0, orderInput, setState } ) => {
+	const setUpdatedOrder = ( value ) => {
+		setState( {
+			orderInput: value,
+		} );
+		const newOrder = Number( value );
+		if (
+			Number.isInteger( newOrder ) &&
+			invoke( value, [ 'trim' ] ) !== ''
+		) {
+			onUpdateOrder( Number( value ) );
+		}
+	};
+	const value = orderInput === null ? order : orderInput;
+	return (
+		<TextControl
+			className="editor-page-attributes__order"
+			type="number"
+			label={ __( 'Order' ) }
+			value={ value }
+			onChange={ setUpdatedOrder }
+			size={ 6 }
+			onBlur={ () => {
+				setState( {
+					orderInput: null,
+				} );
+			} }
+		/>
+	);
+} );
 
 function PageAttributesOrderWithChecks( props ) {
 	return (
@@ -59,7 +60,9 @@ function PageAttributesOrderWithChecks( props ) {
 export default compose( [
 	withSelect( ( select ) => {
 		return {
-			order: select( 'core/editor' ).getEditedPostAttribute( 'menu_order' ),
+			order: select( 'core/editor' ).getEditedPostAttribute(
+				'menu_order'
+			),
 		};
 	} ),
 	withDispatch( ( dispatch ) => ( {

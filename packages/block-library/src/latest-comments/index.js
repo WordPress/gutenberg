@@ -1,25 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { comment as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import metadata from './block.json';
 import edit from './edit';
-import icon from './icon';
 
-export const name = 'core/latest-comments';
+const { name } = metadata;
+
+export { metadata, name };
 
 export const settings = {
-	title: __( 'Latest Comments' ),
-	description: __( 'Display a list of your most recent comments.' ),
 	icon,
-	category: 'widgets',
-	keywords: [ __( 'recent comments' ) ],
-	supports: {
-		align: true,
-		html: false,
-	},
+	example: {},
 	edit,
 };

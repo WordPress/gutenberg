@@ -12,13 +12,11 @@ export async function getAllBlockInserterItemTitles() {
 	const inserterItemTitles = await page.evaluate( () => {
 		return Array.from(
 			document.querySelectorAll(
-				'.block-editor-inserter__results .block-editor-block-types-list__item-title'
+				'.block-editor-block-types-list__item-title'
 			)
-		).map(
-			( inserterItem ) => {
-				return inserterItem.innerText;
-			}
-		);
+		).map( ( inserterItem ) => {
+			return inserterItem.innerText;
+		} );
 	} );
 	return sortBy( uniq( inserterItemTitles ) );
 }

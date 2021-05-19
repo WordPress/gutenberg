@@ -1,9 +1,4 @@
 /**
- * External dependencies
- */
-import optimist from 'redux-optimist';
-
-/**
  * WordPress dependencies
  */
 import { combineReducers } from '@wordpress/data';
@@ -18,7 +13,6 @@ import {
 	saving,
 	postLock,
 	postSavingLock,
-	reusableBlocks,
 	template,
 	isReady,
 	editorSettings,
@@ -26,7 +20,7 @@ import {
 
 import { EDITOR_SETTINGS_DEFAULTS } from './defaults.js';
 
-EDITOR_SETTINGS_DEFAULTS.autosaveInterval = 0; // This is a way to override default behavior on mobile, and make it ping the native save at each keystroke
+EDITOR_SETTINGS_DEFAULTS.autosaveInterval = 1; // This is a way to override default behavior on mobile, and make it ping the native save every second as long as something changed
 
 export * from './reducer.js';
 
@@ -49,7 +43,44 @@ export const postTitle = combineReducers( {
 	},
 } );
 
-export default optimist( combineReducers( {
+/**
+ * Reducer returning the clipboard state.
+ *
+ * @param {Object}  state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function clipboard( state = null, action ) {
+	switch ( action.type ) {
+		case 'UPDATE_CLIPBOARD':
+			return action.clipboard;
+	}
+
+	return state;
+}
+
+/**
+ * Reducer returning the notices state.
+ *
+ * @param {Object}  state  Current state.
+ * @param {Object}  action Dispatched action.
+ *
+ * @return {Object} Updated state.
+ */
+export function notices( state = [], action ) {
+	switch ( action.type ) {
+		case 'CREATE_NOTICE':
+			return [ ...state, action.notice ];
+		case 'REMOVE_ALL_NOTICES':
+			return [];
+		case 'REMOVE_NOTICE':
+			return state.filter( ( notice ) => notice.id !== action.id );
+	}
+	return state;
+}
+
+export default combineReducers( {
 	postId,
 	postType,
 	postTitle,
@@ -57,8 +88,9 @@ export default optimist( combineReducers( {
 	saving,
 	postLock,
 	postSavingLock,
-	reusableBlocks,
 	template,
 	isReady,
 	editorSettings,
-} ) );
+	clipboard,
+	notices,
+} );

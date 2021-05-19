@@ -1,47 +1,113 @@
-.wp-block-cover-image,
 .wp-block-cover {
+	// Override default cover styles
+	// because we're not ready yet to show the cover block.
+	&.is-placeholder {
+		min-height: auto !important;
+		padding: 0 !important;
+	}
 
 	&.components-placeholder h2 {
 		color: inherit;
+	}
+
+	// Applied while media is being uploaded
+	&.is-transient::before {
+		background-color: #fff;
+		opacity: 0.3;
+	}
+
+	// Shown while media is being uploaded
+	.components-spinner {
+		position: absolute;
+		z-index: z-index(".wp-block-cover__inner-container");
+		top: 50%;
+		left: 50%;
+		transform: translate(-50%, -50%); // Account for spinner dimensions
+		margin: 0;
 	}
 
 	.block-editor-block-list__layout {
 		width: 100%;
 	}
 
-	.block-editor-block-list__block {
-		color: $light-gray-100;
-	}
-
 	// The .wp-block-cover class is used just to increase selector specificity.
 	.wp-block-cover__inner-container {
 		// Avoid text align inherit from cover image align.
 		text-align: left;
-	}
-
-	.wp-block-cover__inner-container > .block-editor-inner-blocks > .block-editor-block-list__layout {
 		margin-left: 0;
 		margin-right: 0;
 	}
 
 	.wp-block-cover__placeholder-background-options {
-		margin-top: 1em;
 		width: 100%;
 	}
+}
 
-	// Apply max-width to floated items that have no intrinsic width.
-	[data-align="left"] &,
-	[data-align="right"] & {
-		max-width: $content-width / 2;
-		width: 100%;
-	}
+[data-align="left"] > .wp-block-cover,
+[data-align="right"] > .wp-block-cover {
+	max-width: $content-width / 2;
+	width: 100%;
 }
 
 .block-library-cover__reset-button {
 	margin-left: auto;
 }
 
+.block-library-cover__resize-container {
+	position: absolute !important;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+}
+
 .block-library-cover__resize-container:not(.is-resizing) {
 	// Important is used to have higher specificity than the inline style set by re-resizable library.
 	height: auto !important;
+}
+
+// Only target direct dropzone.
+.wp-block-cover > .components-drop-zone {
+	&.is-active {
+		transition: 0.2s opacity, 0.2s border;
+		@include reduce-motion("transition");
+	}
+
+	&.is-dragging-over-element {
+		background-color: transparent;
+		border: $grid-unit-60 solid var(--wp-admin-theme-color);
+
+		.components-drop-zone__content {
+			transform: none;
+		}
+	}
+
+	.components-drop-zone__content {
+		display: flex;
+		align-items: center;
+		top: -($grid-unit-15 * 3);
+		left: -($grid-unit-15 * 3);
+		transform: none;
+	}
+
+	.components-drop-zone__content-icon,
+	.components-drop-zone__content-text {
+		display: inline;
+	}
+
+	.components-drop-zone__content-icon {
+		// Reset margin.
+		margin: 0;
+		margin-right: $grid-unit;
+	}
+
+	.components-drop-zone__content-text {
+		font-size: $default-font-size;
+	}
+}
+
+// Remove the parallax fixed background when in the patterns preview panel as it
+// doesn't work with the transforms that are applied to resize the block in that context.
+.block-editor-block-patterns-list__list-item .has-parallax.wp-block-cover {
+	background-attachment: scroll;
 }

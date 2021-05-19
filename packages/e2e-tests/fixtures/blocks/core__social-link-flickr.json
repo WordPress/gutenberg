@@ -1,13 +1,13 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/social-link-flickr",
-        "isValid": true,
-        "attributes": {
-            "url": "https://example.com/",
-            "site": "flickr"
-        },
-        "innerBlocks": [],
-        "originalContent": ""
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/social-link",
+		"isValid": true,
+		"attributes": {
+			"url": "https://example.com/",
+			"service": "flickr"
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
 ]

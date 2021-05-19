@@ -30,9 +30,11 @@ const HANDLED_SHORTCUTS = [
 const SHORTCUTS_ELEMENT = (
 	<KeyboardShortcuts
 		bindGlobal
-		shortcuts={ fromPairs( HANDLED_SHORTCUTS.map( ( shortcut ) => {
-			return [ shortcut, ( event ) => event.preventDefault() ];
-		} ) ) }
+		shortcuts={ fromPairs(
+			HANDLED_SHORTCUTS.map( ( shortcut ) => {
+				return [ shortcut, ( event ) => event.preventDefault() ];
+			} )
+		) }
 	/>
 );
 

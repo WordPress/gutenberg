@@ -9,14 +9,9 @@ import { forwardRef } from '@wordpress/element';
  */
 import Button from '../button';
 
-function IconButton( {
-	labelPosition,
-	size,
-	tooltip,
-	label,
-	...props
-}, ref ) {
+function IconButton( { labelPosition, size, tooltip, label, ...props }, ref ) {
 	deprecated( 'wp.components.IconButton', {
+		since: '5.4',
 		alternative: 'wp.components.Button',
 	} );
 

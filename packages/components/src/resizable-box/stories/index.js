@@ -16,7 +16,10 @@ import { useState } from '@wordpress/element';
 export default { title: 'Components/ResizableBox', component: ResizableBox };
 
 const Example = ( props ) => {
-	const [ attributes, setAttributes ] = useState( { height: 200, width: 400 } );
+	const [ attributes, setAttributes ] = useState( {
+		height: 200,
+		width: 400,
+	} );
 	const { height, width } = attributes;
 	const { children, ...restProps } = props;
 
@@ -56,12 +59,17 @@ export const _default = () => {
 		bottomLeft: boolean( 'enable.bottomLeft', false ),
 		topLeft: boolean( 'enable.topLeft', false ),
 	};
+	const __experimentalShowTooltip = boolean(
+		'__experimentalShowTooltip',
+		false
+	);
 
 	const props = {
 		enable,
 		minHeight,
 		minWidth,
 		showHandle,
+		__experimentalShowTooltip,
 	};
 
 	return (

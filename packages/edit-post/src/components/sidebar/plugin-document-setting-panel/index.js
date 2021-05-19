@@ -9,15 +9,26 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 import { compose } from '@wordpress/compose';
 import { withPluginContext } from '@wordpress/plugins';
 import { withDispatch, withSelect } from '@wordpress/data';
+import warning from '@wordpress/warning';
 
 /**
  * Internal dependencies
  */
-import { EnablePluginDocumentSettingPanelOption } from '../../options-modal/options';
+import { EnablePluginDocumentSettingPanelOption } from '../../preferences-modal/options';
+import { store as editPostStore } from '../../../store';
 
 export const { Fill, Slot } = createSlotFill( 'PluginDocumentSettingPanel' );
 
-const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, className, title, icon, children } ) => {
+const PluginDocumentSettingFill = ( {
+	isEnabled,
+	panelName,
+	opened,
+	onToggle,
+	className,
+	title,
+	icon,
+	children,
+} ) => {
 	return (
 		<>
 			<EnablePluginDocumentSettingPanelOption
@@ -50,7 +61,7 @@ const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, cl
  * @param {string} [props.title] The title of the panel
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
- * @example <caption>ES5</caption>
+ * @example
  * ```js
  * // Using ES5 syntax
  * var el = wp.element.createElement;
@@ -74,11 +85,11 @@ const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, cl
  * } );
  * ```
  *
- * @example <caption>ESNext</caption>
+ * @example
  * ```jsx
  * // Using ESNext syntax
- * const { registerPlugin } = wp.plugins;
- * const { PluginDocumentSettingPanel } = wp.editPost;
+ * import { registerPlugin } from '@wordpress/plugins';
+ * import { PluginDocumentSettingPanel } from '@wordpress/edit-post';
  *
  * const MyDocumentSettingTest = () => (
  * 		<PluginDocumentSettingPanel className="my-document-setting-plugin" title="My Panel">
@@ -93,24 +104,29 @@ const PluginDocumentSettingFill = ( { isEnabled, panelName, opened, onToggle, cl
  */
 const PluginDocumentSettingPanel = compose(
 	withPluginContext( ( context, ownProps ) => {
+		if ( undefined === ownProps.name ) {
+			warning( 'PluginDocumentSettingPanel requires a name property.' );
+		}
 		return {
 			icon: ownProps.icon || context.icon,
 			panelName: `${ context.name }/${ ownProps.name }`,
 		};
 	} ),
 	withSelect( ( select, { panelName } ) => {
-		return (
-			{
-				opened: select( 'core/edit-post' ).isEditorPanelOpened( panelName ),
-				isEnabled: select( 'core/edit-post' ).isEditorPanelEnabled( panelName ),
-			}
-		);
+		return {
+			opened: select( editPostStore ).isEditorPanelOpened( panelName ),
+			isEnabled: select( editPostStore ).isEditorPanelEnabled(
+				panelName
+			),
+		};
 	} ),
 	withDispatch( ( dispatch, { panelName } ) => ( {
 		onToggle() {
-			return dispatch( 'core/edit-post' ).toggleEditorPanelOpened( panelName );
+			return dispatch( editPostStore ).toggleEditorPanelOpened(
+				panelName
+			);
 		},
-	} ) ),
+	} ) )
 )( PluginDocumentSettingFill );
 
 PluginDocumentSettingPanel.Slot = Slot;

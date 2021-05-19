@@ -8,7 +8,7 @@ import { includes } from 'lodash';
  */
 import { wrap, replaceTag } from '@wordpress/dom';
 
-export default function( node, doc ) {
+export default function phrasingContentReducer( node, doc ) {
 	// In jsdom-jscore, 'node.style' can be null.
 	// TODO: Explore fixing this by patching jsdom-jscore.
 	if ( node.nodeName === 'SPAN' && node.style ) {
@@ -31,7 +31,10 @@ export default function( node, doc ) {
 		// Some DOM implementations (Safari, JSDom) don't support
 		// style.textDecorationLine, so we check style.textDecoration as a
 		// fallback.
-		if ( textDecorationLine === 'line-through' || includes( textDecoration, 'line-through' ) ) {
+		if (
+			textDecorationLine === 'line-through' ||
+			includes( textDecoration, 'line-through' )
+		) {
 			wrap( doc.createElement( 's' ), node );
 		}
 

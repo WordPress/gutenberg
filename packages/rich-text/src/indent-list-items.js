@@ -6,13 +6,17 @@ import { LINE_SEPARATOR } from './special-characters';
 import { getLineIndex } from './get-line-index';
 import { canIndentListItems } from './can-indent-list-items';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+/** @typedef {import('./create').RichTextFormat} RichTextFormat */
+
 /**
  * Gets the line index of the first previous list item with higher indentation.
  *
- * @param {Object} value      Value to search.
- * @param {number} lineIndex  Line index of the list item to compare with.
+ * @param {RichTextValue} value      Value to search.
+ * @param {number}        lineIndex  Line index of the list item to compare
+ *                                   with.
  *
- * @return {boolean} The line index.
+ * @return {number|void} The line index.
  */
 function getTargetLevelLineIndex( { text, replacements }, lineIndex ) {
 	const startFormats = replacements[ lineIndex ] || [];
@@ -39,10 +43,10 @@ function getTargetLevelLineIndex( { text, replacements }, lineIndex ) {
 /**
  * Indents any selected list items if possible.
  *
- * @param {Object} value      Value to change.
- * @param {Object} rootFormat Root format.
+ * @param {RichTextValue}  value      Value to change.
+ * @param {RichTextFormat} rootFormat Root format.
  *
- * @return {Object} The changed value.
+ * @return {RichTextValue} The changed value.
  */
 export function indentListItems( value, rootFormat ) {
 	if ( ! canIndentListItems( value ) ) {
@@ -69,7 +73,8 @@ export function indentListItems( value, rootFormat ) {
 			);
 		} else {
 			const targetFormats = replacements[ previousLineIndex ] || [];
-			const lastformat = targetFormats[ targetFormats.length - 1 ] || rootFormat;
+			const lastformat =
+				targetFormats[ targetFormats.length - 1 ] || rootFormat;
 
 			newFormats[ index ] = targetFormats.concat(
 				[ lastformat ],

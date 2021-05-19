@@ -1,28 +1,87 @@
 /**
  * WordPress dependencies
  */
-import { createSlotFill, Panel } from '@wordpress/components';
+import { createSlotFill, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
+import { cog, typography } from '@wordpress/icons';
+import { useEffect } from '@wordpress/element';
+import { useSelect, useDispatch } from '@wordpress/data';
+import { store as interfaceStore } from '@wordpress/interface';
+import { store as blockEditorStore } from '@wordpress/block-editor';
+
+/**
+ * Internal dependencies
+ */
+import DefaultSidebar from './default-sidebar';
+import GlobalStylesSidebar from './global-styles-sidebar';
+import { STORE_NAME } from '../../store/constants';
+import SettingsHeader from './settings-header';
+import TemplateCard from './template-card';
+import { SIDEBAR_BLOCK, SIDEBAR_TEMPLATE } from './constants';
 
 const { Slot: InspectorSlot, Fill: InspectorFill } = createSlotFill(
 	'EditSiteSidebarInspector'
 );
+export const SidebarInspectorFill = InspectorFill;
 
-function Sidebar() {
+export function SidebarComplementaryAreaFills() {
+	const { sidebar, isEditorSidebarOpened, hasBlockSelection } = useSelect(
+		( select ) => {
+			const _sidebar = select(
+				interfaceStore
+			).getActiveComplementaryArea( STORE_NAME );
+			const _isEditorSidebarOpened = [
+				SIDEBAR_BLOCK,
+				SIDEBAR_TEMPLATE,
+			].includes( _sidebar );
+			return {
+				sidebar: _sidebar,
+				isEditorSidebarOpened: _isEditorSidebarOpened,
+				hasBlockSelection: !! select(
+					blockEditorStore
+				).getBlockSelectionStart(),
+			};
+		},
+		[]
+	);
+	const { enableComplementaryArea } = useDispatch( interfaceStore );
+	useEffect( () => {
+		if ( ! isEditorSidebarOpened ) return;
+		if ( hasBlockSelection ) {
+			enableComplementaryArea( STORE_NAME, SIDEBAR_BLOCK );
+		} else {
+			enableComplementaryArea( STORE_NAME, SIDEBAR_TEMPLATE );
+		}
+	}, [ hasBlockSelection, isEditorSidebarOpened ] );
+	let sidebarName = sidebar;
+	if ( ! isEditorSidebarOpened ) {
+		sidebarName = hasBlockSelection ? SIDEBAR_BLOCK : SIDEBAR_TEMPLATE;
+	}
 	return (
-		<div
-			className="edit-site-sidebar"
-			role="region"
-			aria-label={ __( 'Site editor advanced settings.' ) }
-			tabIndex="-1"
-		>
-			<Panel header={ __( 'Inspector' ) }>
-				<InspectorSlot bubblesVirtually />
-			</Panel>
-		</div>
+		<>
+			<DefaultSidebar
+				identifier={ sidebarName }
+				title={ __( 'Settings' ) }
+				icon={ cog }
+				closeLabel={ __( 'Close settings sidebar' ) }
+				header={ <SettingsHeader sidebarName={ sidebarName } /> }
+				headerClassName="edit-site-sidebar__panel-tabs"
+			>
+				{ sidebarName === SIDEBAR_TEMPLATE && (
+					<PanelBody>
+						<TemplateCard />
+					</PanelBody>
+				) }
+				{ sidebarName === SIDEBAR_BLOCK && (
+					<InspectorSlot bubblesVirtually />
+				) }
+			</DefaultSidebar>
+			<GlobalStylesSidebar
+				identifier="edit-site/global-styles"
+				title={ __( 'Global Styles' ) }
+				closeLabel={ __( 'Close global styles sidebar' ) }
+				icon={ typography }
+			/>
+		</>
 	);
 }
-
-Sidebar.InspectorFill = InspectorFill;
-
-export default Sidebar;

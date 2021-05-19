@@ -1,41 +1,34 @@
 /**
  * Internal dependencies
  */
-import {
-	__experimentalAddBlockPatterns,
-	__experimentalRemoveBlockPatterns,
-} from '../actions';
+import { addBlockVariations, removeBlockVariations } from '../actions';
 
 describe( 'actions', () => {
-	describe( 'addBlockPatterns', () => {
+	describe( 'addBlockVariations', () => {
 		const blockName = 'block/name';
-		const patternName = 'my-pattern';
+		const variationName = 'my-variation';
 
-		it( 'should return the ADD_BLOCK_PATTERNS action', () => {
-			const pattern = {
-				name: patternName,
-				label: 'My Pattern',
+		it( 'should return the ADD_BLOCK_VARIATIONS action', () => {
+			const variation = {
+				name: variationName,
+				title: 'My Variation',
 				attributes: {
 					example: 'foo',
 				},
 			};
-			const result = __experimentalAddBlockPatterns( blockName, pattern );
+			const result = addBlockVariations( blockName, variation );
 			expect( result ).toEqual( {
-				type: 'ADD_BLOCK_PATTERNS',
-				patterns: [
-					pattern,
-				],
+				type: 'ADD_BLOCK_VARIATIONS',
+				variations: [ variation ],
 				blockName,
 			} );
 		} );
 
-		it( 'should return the REMOVE_BLOCK_PATTERNS action', () => {
-			const result = __experimentalRemoveBlockPatterns( blockName, patternName );
+		it( 'should return the REMOVE_BLOCK_VARIATIONS action', () => {
+			const result = removeBlockVariations( blockName, variationName );
 			expect( result ).toEqual( {
-				type: 'REMOVE_BLOCK_PATTERNS',
-				patternNames: [
-					patternName,
-				],
+				type: 'REMOVE_BLOCK_VARIATIONS',
+				variationNames: [ variationName ],
 				blockName,
 			} );
 		} );

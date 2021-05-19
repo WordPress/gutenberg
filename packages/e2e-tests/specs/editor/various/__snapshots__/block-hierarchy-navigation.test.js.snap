@@ -49,3 +49,15 @@ exports[`Navigating the block hierarchy should navigate using the block hierarch
 <!-- /wp:column --></div>
 <!-- /wp:columns -->"
 `;
+
+exports[`Navigating the block hierarchy should select the wrapper div for a group 1`] = `
+"<!-- wp:group -->
+<div class=\\"wp-block-group\\"><!-- wp:paragraph -->
+<p>just a paragraph</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:separator -->
+<hr class=\\"wp-block-separator\\"/>
+<!-- /wp:separator --></div>
+<!-- /wp:group -->"
+`;

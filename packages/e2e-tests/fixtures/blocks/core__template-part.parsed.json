@@ -1,12 +1,12 @@
 [
-    {
-        "blockName": "core/template-part",
-        "attrs": {
-            "slug": "header",
-            "theme": "twentytwenty"
-        },
-        "innerBlocks": [],
-        "innerHTML": "",
-        "innerContent": []
-    }
+	{
+		"blockName": "core/template-part",
+		"attrs": {
+			"slug": "header",
+			"theme": "twentytwenty"
+		},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
 ]

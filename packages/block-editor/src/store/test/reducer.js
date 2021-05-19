@@ -21,9 +21,9 @@ import {
 	isUpdatingSameBlockAttribute,
 	blocks,
 	isTyping,
+	draggedBlocks,
 	isCaretWithinFormattedText,
-	selectionStart,
-	selectionEnd,
+	selection,
 	initialPosition,
 	isMultiSelecting,
 	preferences,
@@ -32,6 +32,7 @@ import {
 	template,
 	blockListSettings,
 	lastBlockAttributesChange,
+	lastBlockInserted,
 } from '../reducer';
 
 describe( 'state', () => {
@@ -62,13 +63,15 @@ describe( 'state', () => {
 				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			};
 
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+			expect(
+				isUpdatingSameBlockAttribute( action, previousAction )
+			).toBe( false );
 		} );
 
 		it( 'should return false if last action was not updating block attributes', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
@@ -78,77 +81,87 @@ describe( 'state', () => {
 				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
 			};
 
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+			expect(
+				isUpdatingSameBlockAttribute( action, previousAction )
+			).toBe( false );
 		} );
 
 		it( 'should return false if not updating the same block', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
 			const previousAction = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 				attributes: {
 					foo: 20,
 				},
 			};
 
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+			expect(
+				isUpdatingSameBlockAttribute( action, previousAction )
+			).toBe( false );
 		} );
 
 		it( 'should return false if not updating the same block attributes', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
 			const previousAction = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					bar: 20,
 				},
 			};
 
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+			expect(
+				isUpdatingSameBlockAttribute( action, previousAction )
+			).toBe( false );
 		} );
 
 		it( 'should return false if no previous action', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
 			const previousAction = undefined;
 
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( false );
+			expect(
+				isUpdatingSameBlockAttribute( action, previousAction )
+			).toBe( false );
 		} );
 
 		it( 'should return true if updating the same block attributes', () => {
 			const action = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 10,
 				},
 			};
 			const previousAction = {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+				clientIds: [ '9db792c6-a25a-495d-adbd-97d56a4c4189' ],
 				attributes: {
 					foo: 20,
 				},
 			};
 
-			expect( isUpdatingSameBlockAttribute( action, previousAction ) ).toBe( true );
+			expect(
+				isUpdatingSameBlockAttribute( action, previousAction )
+			).toBe( true );
 		} );
 	} );
 
@@ -157,7 +170,7 @@ describe( 'state', () => {
 			registerBlockType( 'core/test-block', {
 				save: noop,
 				edit: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 		} );
@@ -171,13 +184,13 @@ describe( 'state', () => {
 				registerBlockType( 'core/test-parent-block', {
 					save: noop,
 					edit: noop,
-					category: 'common',
+					category: 'text',
 					title: 'test parent block',
 				} );
 				registerBlockType( 'core/test-child-block', {
 					save: noop,
 					edit: noop,
-					category: 'common',
+					category: 'text',
 					title: 'test child block 1',
 					attributes: {
 						attr: {
@@ -227,6 +240,7 @@ describe( 'state', () => {
 						chicken: {},
 						'chicken-child': {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
@@ -279,8 +293,11 @@ describe( 'state', () => {
 						chicken: {},
 						[ newChildBlockId ]: {},
 					},
+					controlledInnerBlocks: {},
 				} );
-				expect( state.cache.chicken ).not.toBe( existingState.cache.chicken );
+				expect( state.cache.chicken ).not.toBe(
+					existingState.cache.chicken
+				);
 			} );
 
 			it( 'can insert a child block', () => {
@@ -305,6 +322,7 @@ describe( 'state', () => {
 					cache: {
 						chicken: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				const newChildBlock = createBlock( 'core/test-child-block', {
@@ -357,8 +375,11 @@ describe( 'state', () => {
 						chicken: {},
 						[ newChildBlockId ]: {},
 					},
+					controlledInnerBlocks: {},
 				} );
-				expect( state.cache.chicken ).not.toBe( existingState.cache.chicken );
+				expect( state.cache.chicken ).not.toBe(
+					existingState.cache.chicken
+				);
 			} );
 
 			it( 'can replace multiple child blocks', () => {
@@ -405,6 +426,7 @@ describe( 'state', () => {
 						'chicken-child': {},
 						'chicken-child-2': {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				const newChildBlock1 = createBlock( 'core/test-child-block', {
@@ -474,7 +496,11 @@ describe( 'state', () => {
 					},
 					order: {
 						'': [ 'chicken' ],
-						chicken: [ newChildBlockId1, newChildBlockId2, newChildBlockId3 ],
+						chicken: [
+							newChildBlockId1,
+							newChildBlockId2,
+							newChildBlockId3,
+						],
 						[ newChildBlockId1 ]: [],
 						[ newChildBlockId2 ]: [],
 						[ newChildBlockId3 ]: [],
@@ -491,6 +517,7 @@ describe( 'state', () => {
 						[ newChildBlockId2 ]: {},
 						[ newChildBlockId3 ]: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 			} );
 
@@ -534,6 +561,7 @@ describe( 'state', () => {
 						'chicken-child': {},
 						'chicken-grand-child': {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				const newChildBlock = createBlock( 'core/test-block' );
@@ -580,10 +608,13 @@ describe( 'state', () => {
 						chicken: {},
 						[ newChildBlockId ]: {},
 					},
+					controlledInnerBlocks: {},
 				} );
 
 				// the cache key of the parent should be updated
-				expect( existingState.cache.chicken ).not.toBe( state.cache.chicken );
+				expect( existingState.cache.chicken ).not.toBe(
+					state.cache.chicken
+				);
 			} );
 		} );
 
@@ -598,21 +629,21 @@ describe( 'state', () => {
 				isPersistentChange: true,
 				isIgnoredChange: false,
 				cache: {},
+				controlledInnerBlocks: {},
 			} );
 		} );
 
 		it( 'should key by reset blocks clientId', () => {
-			[
-				undefined,
-				blocks( undefined, {} ),
-			].forEach( ( original ) => {
+			[ undefined, blocks( undefined, {} ) ].forEach( ( original ) => {
 				const state = blocks( original, {
 					type: 'RESET_BLOCKS',
 					blocks: [ { clientId: 'bananas', innerBlocks: [] } ],
 				} );
 
 				expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
-				expect( values( state.byClientId )[ 0 ].clientId ).toBe( 'bananas' );
+				expect( values( state.byClientId )[ 0 ].clientId ).toBe(
+					'bananas'
+				);
 				expect( state.order ).toEqual( {
 					'': [ 'bananas' ],
 					bananas: [],
@@ -627,10 +658,14 @@ describe( 'state', () => {
 			const original = blocks( undefined, {} );
 			const state = blocks( original, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'bananas',
-					innerBlocks: [ { clientId: 'apples', innerBlocks: [] } ],
-				} ],
+				blocks: [
+					{
+						clientId: 'bananas',
+						innerBlocks: [
+							{ clientId: 'apples', innerBlocks: [] },
+						],
+					},
+				],
 			} );
 
 			expect( Object.keys( state.byClientId ) ).toHaveLength( 2 );
@@ -648,20 +683,24 @@ describe( 'state', () => {
 		it( 'should insert block', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
 				type: 'INSERT_BLOCKS',
-				blocks: [ {
-					clientId: 'ribs',
-					name: 'core/freeform',
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'ribs',
+						name: 'core/freeform',
+						innerBlocks: [],
+					},
+				],
 			} );
 
 			expect( Object.keys( state.byClientId ) ).toHaveLength( 2 );
@@ -682,25 +721,31 @@ describe( 'state', () => {
 		it( 'should replace the block', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
-				blocks: [ {
-					clientId: 'wings',
-					name: 'core/freeform',
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'wings',
+						name: 'core/freeform',
+						innerBlocks: [],
+					},
+				],
 			} );
 
 			expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
-			expect( values( state.byClientId )[ 0 ].name ).toBe( 'core/freeform' );
+			expect( values( state.byClientId )[ 0 ].name ).toBe(
+				'core/freeform'
+			);
 			expect( values( state.byClientId )[ 0 ].clientId ).toBe( 'wings' );
 			expect( state.order ).toEqual( {
 				'': [ 'wings' ],
@@ -716,28 +761,32 @@ describe( 'state', () => {
 		it( 'should replace the block and remove references to its inner blocks', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [
-						{
-							clientId: 'child',
-							name: 'core/test-block',
-							attributes: {},
-							innerBlocks: [],
-						},
-					],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [
+							{
+								clientId: 'child',
+								name: 'core/test-block',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
+					},
+				],
 			} );
 			const state = blocks( original, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
-				blocks: [ {
-					clientId: 'wings',
-					name: 'core/freeform',
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'wings',
+						name: 'core/freeform',
+						innerBlocks: [],
+					},
+				],
 			} );
 
 			expect( Object.keys( state.byClientId ) ).toHaveLength( 1 );
@@ -755,14 +804,17 @@ describe( 'state', () => {
 
 		it( 'should replace the nested block', () => {
 			const nestedBlock = createBlock( 'core/test-block' );
-			const wrapperBlock = createBlock( 'core/test-block', {}, [ nestedBlock ] );
+			const wrapperBlock = createBlock( 'core/test-block', {}, [
+				nestedBlock,
+			] );
 			const replacementBlock = createBlock( 'core/test-block' );
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ wrapperBlock ],
 			} );
 
-			const originalWrapperBlockCacheKey = original.cache[ wrapperBlock.clientId ];
+			const originalWrapperBlockCacheKey =
+				original.cache[ wrapperBlock.clientId ];
 
 			const state = blocks( original, {
 				type: 'REPLACE_BLOCKS',
@@ -770,9 +822,12 @@ describe( 'state', () => {
 				blocks: [ replacementBlock ],
 			} );
 
-			const newWrapperBlockCacheKey = state.cache[ wrapperBlock.clientId ];
+			const newWrapperBlockCacheKey =
+				state.cache[ wrapperBlock.clientId ];
 
-			expect( newWrapperBlockCacheKey ).not.toBe( originalWrapperBlockCacheKey );
+			expect( newWrapperBlockCacheKey ).not.toBe(
+				originalWrapperBlockCacheKey
+			);
 
 			expect( state.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
@@ -794,27 +849,37 @@ describe( 'state', () => {
 		it( 'should replace the block even if the new block clientId is the same', () => {
 			const originalState = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const replacedState = blocks( originalState, {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/freeform',
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/freeform',
+						innerBlocks: [],
+					},
+				],
 			} );
 
 			expect( Object.keys( replacedState.byClientId ) ).toHaveLength( 1 );
-			expect( values( originalState.byClientId )[ 0 ].name ).toBe( 'core/test-block' );
-			expect( values( replacedState.byClientId )[ 0 ].name ).toBe( 'core/freeform' );
-			expect( values( replacedState.byClientId )[ 0 ].clientId ).toBe( 'chicken' );
+			expect( values( originalState.byClientId )[ 0 ].name ).toBe(
+				'core/test-block'
+			);
+			expect( values( replacedState.byClientId )[ 0 ].name ).toBe(
+				'core/freeform'
+			);
+			expect( values( replacedState.byClientId )[ 0 ].clientId ).toBe(
+				'chicken'
+			);
 			expect( replacedState.order ).toEqual( {
 				'': [ 'chicken' ],
 				chicken: [],
@@ -822,7 +887,9 @@ describe( 'state', () => {
 			expect( replacedState.cache ).toEqual( {
 				chicken: {},
 			} );
-			expect( originalState.cache.chicken ).not.toBe( replacedState.cache.chicken );
+			expect( originalState.cache.chicken ).not.toBe(
+				replacedState.cache.chicken
+			);
 
 			const nestedBlock = {
 				clientId: 'chicken',
@@ -830,7 +897,9 @@ describe( 'state', () => {
 				attributes: {},
 				innerBlocks: [],
 			};
-			const wrapperBlock = createBlock( 'core/test-block', {}, [ nestedBlock ] );
+			const wrapperBlock = createBlock( 'core/test-block', {}, [
+				nestedBlock,
+			] );
 			const replacementNestedBlock = {
 				clientId: 'chicken',
 				name: 'core/freeform',
@@ -855,20 +924,26 @@ describe( 'state', () => {
 				[ replacementNestedBlock.clientId ]: [],
 			} );
 
-			expect( originalNestedState.byClientId.chicken.name ).toBe( 'core/test-block' );
-			expect( replacedNestedState.byClientId.chicken.name ).toBe( 'core/freeform' );
+			expect( originalNestedState.byClientId.chicken.name ).toBe(
+				'core/test-block'
+			);
+			expect( replacedNestedState.byClientId.chicken.name ).toBe(
+				'core/freeform'
+			);
 		} );
 
 		it( 'should update the block', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					isValid: false,
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						isValid: false,
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( deepFreeze( original ), {
 				type: 'UPDATE_BLOCK',
@@ -898,15 +973,17 @@ describe( 'state', () => {
 		it( 'should update the reusable block reference if the temporary id is swapped', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/block',
-					attributes: {
-						ref: 'random-clientId',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/block',
+						attributes: {
+							ref: 'random-clientId',
+						},
+						isValid: false,
+						innerBlocks: [],
 					},
-					isValid: false,
-					innerBlocks: [],
-				} ],
+				],
 			} );
 
 			const state = blocks( deepFreeze( original ), {
@@ -933,17 +1010,20 @@ describe( 'state', () => {
 		it( 'should move the block up', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCKS_UP',
@@ -958,7 +1038,10 @@ describe( 'state', () => {
 		it( 'should move the nested block up', () => {
 			const movedBlock = createBlock( 'core/test-block' );
 			const siblingBlock = createBlock( 'core/test-block' );
-			const wrapperBlock = createBlock( 'core/test-block', {}, [ siblingBlock, movedBlock ] );
+			const wrapperBlock = createBlock( 'core/test-block', {}, [
+				siblingBlock,
+				movedBlock,
+			] );
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ wrapperBlock ],
@@ -971,48 +1054,69 @@ describe( 'state', () => {
 
 			expect( state.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
-				[ wrapperBlock.clientId ]: [ movedBlock.clientId, siblingBlock.clientId ],
+				[ wrapperBlock.clientId ]: [
+					movedBlock.clientId,
+					siblingBlock.clientId,
+				],
 				[ movedBlock.clientId ]: [],
 				[ siblingBlock.clientId ]: [],
 			} );
-			expect( state.cache[ wrapperBlock.clientId ] ).not.toBe( original.cache[ wrapperBlock.clientId ] );
-			expect( state.cache[ movedBlock.clientId ] ).toBe( original.cache[ movedBlock.clientId ] );
-			expect( state.cache[ siblingBlock.clientId ] ).toBe( original.cache[ siblingBlock.clientId ] );
+			expect( state.cache[ wrapperBlock.clientId ] ).not.toBe(
+				original.cache[ wrapperBlock.clientId ]
+			);
+			expect( state.cache[ movedBlock.clientId ] ).toBe(
+				original.cache[ movedBlock.clientId ]
+			);
+			expect( state.cache[ siblingBlock.clientId ] ).toBe(
+				original.cache[ siblingBlock.clientId ]
+			);
 		} );
 
 		it( 'should move multiple blocks up', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'veggies',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCKS_UP',
 				clientIds: [ 'ribs', 'veggies' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'ribs', 'veggies', 'chicken' ] );
+			expect( state.order[ '' ] ).toEqual( [
+				'ribs',
+				'veggies',
+				'chicken',
+			] );
 		} );
 
 		it( 'should move multiple nested blocks up', () => {
 			const movedBlockA = createBlock( 'core/test-block' );
 			const movedBlockB = createBlock( 'core/test-block' );
 			const siblingBlock = createBlock( 'core/test-block' );
-			const wrapperBlock = createBlock( 'core/test-block', {}, [ siblingBlock, movedBlockA, movedBlockB ] );
+			const wrapperBlock = createBlock( 'core/test-block', {}, [
+				siblingBlock,
+				movedBlockA,
+				movedBlockB,
+			] );
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ wrapperBlock ],
@@ -1025,7 +1129,11 @@ describe( 'state', () => {
 
 			expect( state.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
-				[ wrapperBlock.clientId ]: [ movedBlockA.clientId, movedBlockB.clientId, siblingBlock.clientId ],
+				[ wrapperBlock.clientId ]: [
+					movedBlockA.clientId,
+					movedBlockB.clientId,
+					siblingBlock.clientId,
+				],
 				[ movedBlockA.clientId ]: [],
 				[ movedBlockB.clientId ]: [],
 				[ siblingBlock.clientId ]: [],
@@ -1035,17 +1143,20 @@ describe( 'state', () => {
 		it( 'should not move the first block up', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCKS_UP',
@@ -1058,17 +1169,20 @@ describe( 'state', () => {
 		it( 'should move the block down', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCKS_DOWN',
@@ -1081,7 +1195,10 @@ describe( 'state', () => {
 		it( 'should move the nested block down', () => {
 			const movedBlock = createBlock( 'core/test-block' );
 			const siblingBlock = createBlock( 'core/test-block' );
-			const wrapperBlock = createBlock( 'core/test-block', {}, [ movedBlock, siblingBlock ] );
+			const wrapperBlock = createBlock( 'core/test-block', {}, [
+				movedBlock,
+				siblingBlock,
+			] );
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ wrapperBlock ],
@@ -1094,7 +1211,10 @@ describe( 'state', () => {
 
 			expect( state.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
-				[ wrapperBlock.clientId ]: [ siblingBlock.clientId, movedBlock.clientId ],
+				[ wrapperBlock.clientId ]: [
+					siblingBlock.clientId,
+					movedBlock.clientId,
+				],
 				[ movedBlock.clientId ]: [],
 				[ siblingBlock.clientId ]: [],
 			} );
@@ -1103,36 +1223,48 @@ describe( 'state', () => {
 		it( 'should move multiple blocks down', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'veggies',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCKS_DOWN',
 				clientIds: [ 'chicken', 'ribs' ],
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'veggies', 'chicken', 'ribs' ] );
+			expect( state.order[ '' ] ).toEqual( [
+				'veggies',
+				'chicken',
+				'ribs',
+			] );
 		} );
 
 		it( 'should move multiple nested blocks down', () => {
 			const movedBlockA = createBlock( 'core/test-block' );
 			const movedBlockB = createBlock( 'core/test-block' );
 			const siblingBlock = createBlock( 'core/test-block' );
-			const wrapperBlock = createBlock( 'core/test-block', {}, [ movedBlockA, movedBlockB, siblingBlock ] );
+			const wrapperBlock = createBlock( 'core/test-block', {}, [
+				movedBlockA,
+				movedBlockB,
+				siblingBlock,
+			] );
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
 				blocks: [ wrapperBlock ],
@@ -1145,7 +1277,11 @@ describe( 'state', () => {
 
 			expect( state.order ).toEqual( {
 				'': [ wrapperBlock.clientId ],
-				[ wrapperBlock.clientId ]: [ siblingBlock.clientId, movedBlockA.clientId, movedBlockB.clientId ],
+				[ wrapperBlock.clientId ]: [
+					siblingBlock.clientId,
+					movedBlockA.clientId,
+					movedBlockB.clientId,
+				],
 				[ movedBlockA.clientId ]: [],
 				[ movedBlockB.clientId ]: [],
 				[ siblingBlock.clientId ]: [],
@@ -1155,17 +1291,20 @@ describe( 'state', () => {
 		it( 'should not move the last block down', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
 				type: 'MOVE_BLOCKS_DOWN',
@@ -1178,17 +1317,20 @@ describe( 'state', () => {
 		it( 'should remove the block', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
 				type: 'REMOVE_BLOCKS',
@@ -1217,22 +1359,26 @@ describe( 'state', () => {
 		it( 'should remove multiple blocks', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'veggies',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
 				type: 'REMOVE_BLOCKS',
@@ -1283,118 +1429,224 @@ describe( 'state', () => {
 		it( 'should insert at the specified index', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'kumquat',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'loquat',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'kumquat',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'loquat',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 
 			const state = blocks( original, {
 				type: 'INSERT_BLOCKS',
 				index: 1,
-				blocks: [ {
-					clientId: 'persimmon',
-					name: 'core/freeform',
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'persimmon',
+						name: 'core/freeform',
+						innerBlocks: [],
+					},
+				],
 			} );
 
 			expect( Object.keys( state.byClientId ) ).toHaveLength( 3 );
-			expect( state.order[ '' ] ).toEqual( [ 'kumquat', 'persimmon', 'loquat' ] );
+			expect( state.order[ '' ] ).toEqual( [
+				'kumquat',
+				'persimmon',
+				'loquat',
+			] );
 		} );
 
 		it( 'should move block to lower index', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'veggies',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
-				type: 'MOVE_BLOCK_TO_POSITION',
-				clientId: 'ribs',
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
 				index: 0,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'ribs', 'chicken', 'veggies' ] );
+			expect( state.order[ '' ] ).toEqual( [
+				'ribs',
+				'chicken',
+				'veggies',
+			] );
 		} );
 
 		it( 'should move block to higher index', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'veggies',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
-				type: 'MOVE_BLOCK_TO_POSITION',
-				clientId: 'ribs',
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
 				index: 2,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'chicken', 'veggies', 'ribs' ] );
+			expect( state.order[ '' ] ).toEqual( [
+				'chicken',
+				'veggies',
+				'ribs',
+			] );
 		} );
 
 		it( 'should not move block if passed same index', () => {
 			const original = blocks( undefined, {
 				type: 'RESET_BLOCKS',
-				blocks: [ {
-					clientId: 'chicken',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'ribs',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				}, {
-					clientId: 'veggies',
-					name: 'core/test-block',
-					attributes: {},
-					innerBlocks: [],
-				} ],
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
 			} );
 			const state = blocks( original, {
-				type: 'MOVE_BLOCK_TO_POSITION',
-				clientId: 'ribs',
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs' ],
 				index: 1,
 			} );
 
-			expect( state.order[ '' ] ).toEqual( [ 'chicken', 'ribs', 'veggies' ] );
+			expect( state.order[ '' ] ).toEqual( [
+				'chicken',
+				'ribs',
+				'veggies',
+			] );
+		} );
+
+		it( 'should move multiple blocks', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs', 'veggies' ],
+				index: 0,
+			} );
+
+			expect( state.order[ '' ] ).toEqual( [
+				'ribs',
+				'veggies',
+				'chicken',
+			] );
+		} );
+
+		it( 'should move multiple blocks to different parent', () => {
+			const original = blocks( undefined, {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{
+						clientId: 'chicken',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'ribs',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+					{
+						clientId: 'veggies',
+						name: 'core/test-block',
+						attributes: {},
+						innerBlocks: [],
+					},
+				],
+			} );
+			const state = blocks( original, {
+				type: 'MOVE_BLOCKS_TO_POSITION',
+				clientIds: [ 'ribs', 'veggies' ],
+				fromRootClientId: '',
+				toRootClientId: 'chicken',
+				index: 0,
+			} );
+
+			expect( state.order[ '' ] ).toEqual( [ 'chicken' ] );
+			expect( state.order.chicken ).toEqual( [ 'ribs', 'veggies' ] );
 		} );
 
 		describe( 'blocks', () => {
@@ -1425,7 +1677,9 @@ describe( 'state', () => {
 						],
 					},
 				];
-				const original = deepFreeze( actions.reduce( blocks, undefined ) );
+				const original = deepFreeze(
+					actions.reduce( blocks, undefined )
+				);
 
 				const state = blocks( original, {
 					type: 'RESET_BLOCKS',
@@ -1452,13 +1706,15 @@ describe( 'state', () => {
 
 			describe( 'byClientId', () => {
 				it( 'should ignore updates to non-existent block', () => {
-					const original = deepFreeze( blocks( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [],
-					} ) );
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [],
+						} )
+					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1468,19 +1724,23 @@ describe( 'state', () => {
 				} );
 
 				it( 'should return with same reference if no changes in updates', () => {
-					const original = deepFreeze( blocks( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [ {
-							clientId: 'kumquat',
-							attributes: {
-								updated: true,
-							},
-							innerBlocks: [],
-						} ],
-					} ) );
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {
+										updated: true,
+									},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1492,17 +1752,21 @@ describe( 'state', () => {
 
 			describe( 'attributes', () => {
 				it( 'should return with attribute block updates', () => {
-					const original = deepFreeze( blocks( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [ {
-							clientId: 'kumquat',
-							attributes: {},
-							innerBlocks: [],
-						} ],
-					} ) );
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1511,20 +1775,49 @@ describe( 'state', () => {
 					expect( state.attributes.kumquat.updated ).toBe( true );
 				} );
 
-				it( 'should accumulate attribute block updates', () => {
-					const original = deepFreeze( blocks( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [ {
-							clientId: 'kumquat',
-							attributes: {
-								updated: true,
-							},
-							innerBlocks: [],
-						} ],
-					} ) );
+				it( 'should return with attribute block updates when attributes are unique by block', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
+						attributes: {
+							kumquat: { updated: true },
+						},
+						uniqueByBlock: true,
+					} );
+
+					expect( state.attributes.kumquat.updated ).toBe( true );
+				} );
+
+				it( 'should accumulate attribute block updates', () => {
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {
+										updated: true,
+									},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
+					const state = blocks( original, {
+						type: 'UPDATE_BLOCK_ATTRIBUTES',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							moreUpdated: true,
 						},
@@ -1537,13 +1830,15 @@ describe( 'state', () => {
 				} );
 
 				it( 'should ignore updates to non-existent block', () => {
-					const original = deepFreeze( blocks( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [],
-					} ) );
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [],
+						} )
+					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1553,19 +1848,23 @@ describe( 'state', () => {
 				} );
 
 				it( 'should return with same reference if no changes in updates', () => {
-					const original = deepFreeze( blocks( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [ {
-							clientId: 'kumquat',
-							attributes: {
-								updated: true,
-							},
-							innerBlocks: [],
-						} ],
-					} ) );
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {
+										updated: true,
+									},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1583,14 +1882,16 @@ describe( 'state', () => {
 				} );
 
 				it( 'should consider any non-exempt block change as persistent', () => {
-					const original = deepFreeze( blocks( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [],
-					} ) );
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [],
+						} )
+					);
 
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1600,14 +1901,18 @@ describe( 'state', () => {
 				} );
 
 				it( 'should consider any non-exempt block change as persistent across unchanging actions', () => {
-					let original = deepFreeze( blocks( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [ {
-							clientId: 'kumquat',
-							attributes: {},
-							innerBlocks: [],
-						} ],
-					} ) );
+					let original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
 					original = blocks( original, {
 						type: 'NOOP',
 					} );
@@ -1620,7 +1925,7 @@ describe( 'state', () => {
 
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: false,
 						},
@@ -1630,17 +1935,21 @@ describe( 'state', () => {
 				} );
 
 				it( 'should consider same block attribute update as exempt', () => {
-					let original = deepFreeze( blocks( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [ {
-							clientId: 'kumquat',
-							attributes: {},
-							innerBlocks: [],
-						} ],
-					} ) );
+					let original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
 					original = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: false,
 						},
@@ -1648,7 +1957,7 @@ describe( 'state', () => {
 
 					const state = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1658,24 +1967,28 @@ describe( 'state', () => {
 				} );
 
 				it( 'should flag an explicitly marked persistent change', () => {
-					let original = deepFreeze( blocks( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [ {
-							clientId: 'kumquat',
-							attributes: {},
-							innerBlocks: [],
-						} ],
-					} ) );
+					let original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [
+								{
+									clientId: 'kumquat',
+									attributes: {},
+									innerBlocks: [],
+								},
+							],
+						} )
+					);
 					original = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: false,
 						},
 					} );
 					original = blocks( original, {
 						type: 'UPDATE_BLOCK_ATTRIBUTES',
-						clientId: 'kumquat',
+						clientIds: [ 'kumquat' ],
 						attributes: {
 							updated: true,
 						},
@@ -1689,10 +2002,12 @@ describe( 'state', () => {
 				} );
 
 				it( 'should retain reference for same state, same persistence', () => {
-					const original = deepFreeze( blocks( undefined, {
-						type: 'RESET_BLOCKS',
-						blocks: [],
-					} ) );
+					const original = deepFreeze(
+						blocks( undefined, {
+							type: 'RESET_BLOCKS',
+							blocks: [],
+						} )
+					);
 
 					const state = blocks( original, {
 						type: '__INERT__',
@@ -1704,14 +2019,18 @@ describe( 'state', () => {
 
 			describe( 'isIgnoredChange', () => {
 				it( 'should consider received blocks as ignored change', () => {
-					const resetState = blocks( undefined, { type: 'random action' } );
+					const resetState = blocks( undefined, {
+						type: 'random action',
+					} );
 					const state = blocks( resetState, {
 						type: 'RECEIVE_BLOCKS',
-						blocks: [ {
-							clientId: 'kumquat',
-							attributes: {},
-							innerBlocks: [],
-						} ],
+						blocks: [
+							{
+								clientId: 'kumquat',
+								attributes: {},
+								innerBlocks: [],
+							},
+						],
 					} );
 
 					expect( state.isIgnoredChange ).toBe( true );
@@ -1771,6 +2090,27 @@ describe( 'state', () => {
 		} );
 	} );
 
+	describe( 'draggedBlocks', () => {
+		it( 'should store the dragged client ids when a user starts dragging blocks', () => {
+			const clientIds = [ 'block-1', 'block-2', 'block-3' ];
+			const state = draggedBlocks( [], {
+				type: 'START_DRAGGING_BLOCKS',
+				clientIds,
+			} );
+
+			expect( state ).toBe( clientIds );
+		} );
+
+		it( 'should set the state to an empty array when a user stops dragging blocks', () => {
+			const previousState = [ 'block-1', 'block-2', 'block-3' ];
+			const state = draggedBlocks( previousState, {
+				type: 'STOP_DRAGGING_BLOCKS',
+			} );
+
+			expect( state ).toEqual( [] );
+		} );
+	} );
+
 	describe( 'isCaretWithinFormattedText()', () => {
 		it( 'should set the flag to true', () => {
 			const state = isCaretWithinFormattedText( false, {
@@ -1818,18 +2158,17 @@ describe( 'state', () => {
 		} );
 	} );
 
-	describe( 'selectionStart() and selectionEnd()', () => {
+	describe( 'selection()', () => {
 		it( 'should set multi selection', () => {
 			const action = {
 				type: 'MULTI_SELECT',
 				start: 'ribs',
 				end: 'chicken',
 			};
-			const state1 = selectionStart( undefined, action );
-			const state2 = selectionEnd( undefined, action );
+			const state = selection( undefined, action );
 
-			expect( state1 ).toEqual( { clientId: 'ribs' } );
-			expect( state2 ).toEqual( { clientId: 'chicken' } );
+			expect( state.selectionStart ).toEqual( { clientId: 'ribs' } );
+			expect( state.selectionEnd ).toEqual( { clientId: 'chicken' } );
 		} );
 
 		it( 'should reset selection', () => {
@@ -1840,11 +2179,10 @@ describe( 'state', () => {
 				selectionStart: start,
 				selectionEnd: end,
 			};
-			const state1 = selectionStart( undefined, action );
-			const state2 = selectionEnd( undefined, action );
+			const state = selection( undefined, action );
 
-			expect( state1 ).toEqual( start );
-			expect( state2 ).toEqual( end );
+			expect( state.selectionStart ).toEqual( start );
+			expect( state.selectionEnd ).toEqual( end );
 		} );
 
 		it( 'should change selection', () => {
@@ -1855,15 +2193,14 @@ describe( 'state', () => {
 				startOffset: 1,
 				endOffset: 2,
 			};
-			const state1 = selectionStart( undefined, action );
-			const state2 = selectionEnd( undefined, action );
+			const state = selection( undefined, action );
 
-			expect( state1 ).toEqual( {
+			expect( state.selectionStart ).toEqual( {
 				clientId: 'a',
 				attributeKey: 'content',
 				offset: 1,
 			} );
-			expect( state2 ).toEqual( {
+			expect( state.selectionEnd ).toEqual( {
 				clientId: 'a',
 				attributeKey: 'content',
 				offset: 2,
@@ -1875,51 +2212,58 @@ describe( 'state', () => {
 				type: 'SELECT_BLOCK',
 				clientId: 'kumquat',
 			};
-			const state1 = selectionStart( undefined, action );
-			const state2 = selectionEnd( undefined, action );
+			const state = selection( undefined, action );
 			const expected = { clientId: 'kumquat' };
 
-			expect( state1 ).toEqual( expected );
-			expect( state2 ).toEqual( expected );
+			expect( state.selectionStart ).toEqual( expected );
+			expect( state.selectionEnd ).toEqual( expected );
 		} );
 
 		it( 'should not update the state if the block is already selected', () => {
-			const original = deepFreeze( { clientId: 'ribs' } );
+			const clientId = 'ribs';
+			const original = deepFreeze( {
+				selectionStart: { clientId },
+				selectionEnd: { clientId },
+			} );
 			const action = {
 				type: 'SELECT_BLOCK',
-				clientId: 'ribs',
+				clientId,
 			};
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
+			const state = selection( original, action );
 
-			expect( state1 ).toBe( original );
-			expect( state2 ).toBe( original );
+			expect( state.selectionStart ).toBe( original.selectionStart );
+			expect( state.selectionEnd ).toBe( original.selectionEnd );
 		} );
 
 		it( 'should unset selection', () => {
-			const original = deepFreeze( { clientId: 'ribs' } );
+			const clientId = 'ribs';
+			const original = deepFreeze( {
+				selectionStart: { clientId },
+				selectionEnd: { clientId },
+			} );
 			const action = {
 				type: 'CLEAR_SELECTED_BLOCK',
 			};
 
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
+			const state = selection( original, action );
 
-			expect( state1 ).toEqual( {} );
-			expect( state2 ).toEqual( {} );
+			expect( state.selectionStart ).toEqual( {} );
+			expect( state.selectionEnd ).toEqual( {} );
 		} );
 
 		it( 'should return same reference if clearing selection but no selection', () => {
-			const original = deepFreeze( {} );
+			const original = deepFreeze( {
+				selectionStart: {},
+				selectionEnd: {},
+			} );
 			const action = {
 				type: 'CLEAR_SELECTED_BLOCK',
 			};
 
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
+			const state = selection( original, action );
 
-			expect( state1 ).toBe( original );
-			expect( state2 ).toBe( original );
+			expect( state.selectionStart ).toBe( original.selectionStart );
+			expect( state.selectionEnd ).toBe( original.selectionEnd );
 		} );
 
 		it( 'should select inserted block', () => {
@@ -1928,178 +2272,226 @@ describe( 'state', () => {
 				blocks: [ { clientId: 'ribs' } ],
 				updateSelection: true,
 			};
-			const state1 = selectionStart( undefined, action );
-			const state2 = selectionEnd( undefined, action );
+			const state = selection( undefined, action );
 			const expected = { clientId: 'ribs' };
 
-			expect( state1 ).toEqual( expected );
-			expect( state2 ).toEqual( expected );
-		} );
-
-		it( 'should not select inserted block if updateSelection flag is false', () => {
-			const original = deepFreeze( { clientId: 'a' } );
-			const action = {
-				type: 'INSERT_BLOCKS',
-				blocks: [ { clientId: 'ribs' } ],
-				updateSelection: false,
-			};
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
-
-			expect( state1 ).toBe( original );
-			expect( state2 ).toBe( original );
+			expect( state.selectionStart ).toEqual( expected );
+			expect( state.selectionEnd ).toEqual( expected );
 		} );
 
 		it( 'should not update the state if the block moved is already selected', () => {
-			const original = deepFreeze( { clientId: 'ribs' } );
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'ribs' },
+				selectionEnd: { clientId: 'ribs' },
+			} );
 			const action = {
 				type: 'MOVE_BLOCKS_UP',
 				clientIds: [ 'ribs' ],
 			};
 
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
+			const state = selection( original, action );
 
-			expect( state1 ).toBe( original );
-			expect( state2 ).toBe( original );
+			expect( state.selectionStart ).toBe( original.selectionStart );
+			expect( state.selectionEnd ).toBe( original.selectionEnd );
 		} );
 
 		it( 'should replace the selected block', () => {
-			const original = deepFreeze( { clientId: 'chicken' } );
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'chicken' },
+				selectionEnd: { clientId: 'chicken' },
+			} );
 			const action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [ { clientId: 'wings' } ],
 			};
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
-			const expected = { clientId: 'wings' };
+			const state = selection( original, action );
+			const expected = {
+				selectionStart: { clientId: 'wings' },
+				selectionEnd: { clientId: 'wings' },
+			};
 
-			expect( state1 ).toEqual( expected );
-			expect( state2 ).toEqual( expected );
+			expect( state.selectionStart ).toEqual( expected.selectionStart );
+			expect( state.selectionEnd ).toEqual( expected.selectionEnd );
 		} );
 
 		it( 'should not replace the selected block if we keep it at the end when replacing blocks', () => {
-			const original = deepFreeze( { clientId: 'wings' } );
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'wings' },
+				selectionEnd: { clientId: 'wings' },
+			} );
 			const action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'wings' ],
-				blocks: [
-					{ clientId: 'chicken' },
-					{ clientId: 'wings' },
-				],
+				blocks: [ { clientId: 'chicken' }, { clientId: 'wings' } ],
 			};
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
+			const state = selection( original, action );
 
-			expect( state1 ).toBe( original );
-			expect( state2 ).toBe( original );
+			expect( state.selectionStart ).toBe( original.selectionStart );
+			expect( state.selectionEnd ).toBe( original.selectionEnd );
 		} );
 
 		it( 'should replace the selected block if we keep it not at the end when replacing blocks', () => {
-			const original = deepFreeze( { clientId: 'chicken' } );
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'chicken' },
+				selectionEnd: { clientId: 'chicken' },
+			} );
 			const action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
-				blocks: [
-					{ clientId: 'chicken' },
-					{ clientId: 'wings' },
-				],
+				blocks: [ { clientId: 'chicken' }, { clientId: 'wings' } ],
 			};
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
-			const expected = { clientId: 'wings' };
+			const state = selection( original, action );
+			const expected = {
+				selectionStart: { clientId: 'wings' },
+				selectionEnd: { clientId: 'wings' },
+			};
 
-			expect( state1 ).toEqual( expected );
-			expect( state2 ).toEqual( expected );
+			expect( state.selectionStart ).toEqual( expected.selectionStart );
+			expect( state.selectionEnd ).toEqual( expected.selectionEnd );
 		} );
 
 		it( 'should reset if replacing with empty set', () => {
-			const original = deepFreeze( { clientId: 'chicken' } );
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'chicken' },
+				selectionEnd: { clientId: 'chicken' },
+			} );
 			const action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'chicken' ],
 				blocks: [],
 			};
 
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
+			const state = selection( original, action );
 
-			expect( state1 ).toEqual( {} );
-			expect( state2 ).toEqual( {} );
+			expect( state.selectionStart ).toEqual( {} );
+			expect( state.selectionEnd ).toEqual( {} );
 		} );
 
 		it( 'should keep the selected block', () => {
-			const original = deepFreeze( { clientId: 'chicken' } );
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'chicken' },
+				selectionEnd: { clientId: 'chicken' },
+			} );
 			const action = {
 				type: 'REPLACE_BLOCKS',
 				clientIds: [ 'ribs' ],
 				blocks: [ { clientId: 'wings' } ],
 			};
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
+			const state = selection( original, action );
 
-			expect( state1 ).toBe( original );
-			expect( state2 ).toBe( original );
+			expect( state.selectionStart ).toBe( original.selectionStart );
+			expect( state.selectionEnd ).toBe( original.selectionEnd );
 		} );
 
 		it( 'should remove the selection if we are removing the selected block', () => {
-			const original = deepFreeze( { clientId: 'chicken' } );
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'chicken' },
+				selectionEnd: { clientId: 'chicken' },
+			} );
 			const action = {
 				type: 'REMOVE_BLOCKS',
 				clientIds: [ 'chicken' ],
 			};
 
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
+			const state = selection( original, action );
 
-			expect( state1 ).toEqual( {} );
-			expect( state2 ).toEqual( {} );
+			expect( state.selectionStart ).toEqual( {} );
+			expect( state.selectionEnd ).toEqual( {} );
 		} );
 
 		it( 'should keep the selection if we are not removing the selected block', () => {
-			const original = deepFreeze( { clientId: 'chicken' } );
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'chicken' },
+				selectionEnd: { clientId: 'chicken' },
+			} );
 			const action = {
 				type: 'REMOVE_BLOCKS',
 				clientIds: [ 'ribs' ],
 			};
 
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
+			const state = selection( original, action );
 
-			expect( state1 ).toEqual( original );
-			expect( state2 ).toEqual( original );
+			expect( state.selectionStart ).toEqual( original.selectionStart );
+			expect( state.selectionEnd ).toEqual( original.selectionEnd );
 		} );
 
 		it( 'should update the selection on inner blocks replace if updateSelection is true', () => {
-			const original = deepFreeze( { clientId: 'chicken' } );
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'chicken' },
+				selectionEnd: { clientId: 'chicken' },
+			} );
 			const action = {
 				type: 'REPLACE_INNER_BLOCKS',
 				blocks: [ { clientId: 'another-block' } ],
 				rootClientId: 'parent',
 				updateSelection: true,
 			};
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
-			const expected = { clientId: 'another-block' };
+			const state = selection( original, action );
+			const expected = {
+				selectionStart: { clientId: 'another-block' },
+				selectionEnd: { clientId: 'another-block' },
+			};
 
-			expect( state1 ).toEqual( expected );
-			expect( state2 ).toEqual( expected );
+			expect( state.selectionStart ).toEqual( expected.selectionStart );
+			expect( state.selectionEnd ).toEqual( expected.selectionEnd );
 		} );
 
-		it( 'should not update the selection on inner blocks replace if updateSelection is false', () => {
-			const original = deepFreeze( { clientId: 'chicken' } );
+		it( 'should keep the same selection on RESET_BLOCKS if the selected blocks continue to exist', () => {
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'chicken' },
+				selectionEnd: { clientId: 'cow' },
+			} );
 			const action = {
-				type: 'REPLACE_INNER_BLOCKS',
-				blocks: [ { clientId: 'another-block' } ],
-				rootClientId: 'parent',
-				updateSelection: false,
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{ clientId: 'another-block' },
+					{ clientId: 'chicken' },
+					{ clientId: 'this-is-a-block-too' },
+					{ clientId: 'cow' },
+				],
 			};
-			const state1 = selectionStart( original, action );
-			const state2 = selectionEnd( original, action );
+			const state = selection( original, action );
 
-			expect( state1 ).toEqual( original );
-			expect( state2 ).toEqual( original );
+			expect( state.selectionStart ).toEqual( original.selectionStart );
+			expect( state.selectionEnd ).toEqual( original.selectionEnd );
+		} );
+
+		it( 'should collapse the selection on RESET_BLOCKS if the selection start exists, but the end does not', () => {
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'chicken' },
+				selectionEnd: { clientId: 'cow' },
+			} );
+			const action = {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{ clientId: 'another-block' },
+					{ clientId: 'chicken' },
+					{ clientId: 'this-is-a-block-too' },
+				],
+			};
+			const state = selection( original, action );
+
+			expect( state.selectionStart ).toEqual( original.selectionStart );
+			expect( state.selectionEnd ).toEqual( original.selectionStart );
+		} );
+
+		it( 'should clear the selection on RESET_BLOCKS if the blocks currently selected are removed', () => {
+			const original = deepFreeze( {
+				selectionStart: { clientId: 'chicken' },
+				selectionEnd: { clientId: 'cow' },
+			} );
+			const action = {
+				type: 'RESET_BLOCKS',
+				blocks: [
+					{ clientId: 'another-block' },
+					{ clientId: 'this-is-a-block-too' },
+				],
+			};
+			const state = selection( original, action );
+
+			expect( state.selectionStart ).toEqual( {} );
+			expect( state.selectionEnd ).toEqual( {} );
 		} );
 	} );
 
@@ -2114,50 +2506,58 @@ describe( 'state', () => {
 		it( 'should record recently used blocks', () => {
 			const state = preferences( deepFreeze( { insertUsage: {} } ), {
 				type: 'INSERT_BLOCKS',
-				blocks: [ {
-					clientId: 'bacon',
-					name: 'core-embed/twitter',
-				} ],
+				blocks: [
+					{
+						clientId: 'bacon',
+						name: 'core/embed',
+					},
+				],
 				time: 123456,
 			} );
 
 			expect( state ).toEqual( {
 				insertUsage: {
-					'core-embed/twitter': {
+					'core/embed': {
 						time: 123456,
 						count: 1,
-						insert: { name: 'core-embed/twitter' },
+						insert: { name: 'core/embed' },
 					},
 				},
 			} );
 
-			const twoRecentBlocks = preferences( deepFreeze( {
-				insertUsage: {
-					'core-embed/twitter': {
-						time: 123456,
-						count: 1,
-						insert: { name: 'core-embed/twitter' },
+			const twoRecentBlocks = preferences(
+				deepFreeze( {
+					insertUsage: {
+						'core/embed': {
+							time: 123456,
+							count: 1,
+							insert: { name: 'core/embed' },
+						},
 					},
-				},
-			} ), {
-				type: 'INSERT_BLOCKS',
-				blocks: [ {
-					clientId: 'eggs',
-					name: 'core-embed/twitter',
-				}, {
-					clientId: 'bacon',
-					name: 'core/block',
-					attributes: { ref: 123 },
-				} ],
-				time: 123457,
-			} );
+				} ),
+				{
+					type: 'INSERT_BLOCKS',
+					blocks: [
+						{
+							clientId: 'eggs',
+							name: 'core/embed',
+						},
+						{
+							clientId: 'bacon',
+							name: 'core/block',
+							attributes: { ref: 123 },
+						},
+					],
+					time: 123457,
+				}
+			);
 
 			expect( twoRecentBlocks ).toEqual( {
 				insertUsage: {
-					'core-embed/twitter': {
+					'core/embed': {
 						time: 123457,
 						count: 2,
-						insert: { name: 'core-embed/twitter' },
+						insert: { name: 'core/embed' },
 					},
 					'core/block/123': {
 						time: 123457,
@@ -2165,6 +2565,80 @@ describe( 'state', () => {
 						insert: { name: 'core/block', ref: 123 },
 					},
 				},
+			} );
+		} );
+		describe( 'block variations handling', () => {
+			const blockWithVariations = 'core/test-block-with-variations';
+			beforeAll( () => {
+				const variations = [
+					{
+						name: 'apple',
+						attributes: { fruit: 'apple' },
+					},
+					{ name: 'orange', attributes: { fruit: 'orange' } },
+				].map( ( variation ) => ( {
+					...variation,
+					isActive: ( blockAttributes, variationAttributes ) =>
+						blockAttributes?.fruit === variationAttributes.fruit,
+				} ) );
+				registerBlockType( blockWithVariations, {
+					save: noop,
+					edit: noop,
+					title: 'Fruit with variations',
+					variations,
+				} );
+			} );
+			afterAll( () => {
+				unregisterBlockType( blockWithVariations );
+			} );
+			it( 'should return proper results with both found or not found block variation matches', () => {
+				const state = preferences( deepFreeze( { insertUsage: {} } ), {
+					type: 'INSERT_BLOCKS',
+					blocks: [
+						{
+							clientId: 'no match',
+							name: blockWithVariations,
+						},
+						{
+							clientId: 'not a variation match',
+							name: blockWithVariations,
+							attributes: { fruit: 'not in a variation' },
+						},
+						{
+							clientId: 'orange',
+							name: blockWithVariations,
+							attributes: { fruit: 'orange' },
+						},
+						{
+							clientId: 'apple',
+							name: blockWithVariations,
+							attributes: { fruit: 'apple' },
+						},
+					],
+					time: 123456,
+				} );
+
+				const orangeVariationName = `${ blockWithVariations }/orange`;
+				const appleVariationName = `${ blockWithVariations }/apple`;
+				expect( state ).toEqual( {
+					insertUsage: expect.objectContaining( {
+						[ orangeVariationName ]: {
+							time: 123456,
+							count: 1,
+							insert: { name: orangeVariationName },
+						},
+						[ appleVariationName ]: {
+							time: 123456,
+							count: 1,
+							insert: { name: appleVariationName },
+						},
+						[ blockWithVariations ]: {
+							time: 123456,
+							count: 2,
+							insert: { name: blockWithVariations },
+						},
+					} ),
+				} );
 			} );
 		} );
 	} );
@@ -2185,7 +2659,10 @@ describe( 'state', () => {
 				type: 'TOGGLE_BLOCK_MODE',
 				clientId: 'chicken',
 			};
-			const value = blocksMode( deepFreeze( { chicken: 'html' } ), action );
+			const value = blocksMode(
+				deepFreeze( { chicken: 'html' } ),
+				action
+			);
 
 			expect( value ).toEqual( { chicken: 'visual' } );
 		} );
@@ -2380,10 +2857,27 @@ describe( 'state', () => {
 
 			const state = lastBlockAttributesChange( original, {
 				type: 'UPDATE_BLOCK_ATTRIBUTES',
-				clientId: 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1',
+				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
 				attributes: {
 					food: 'banana',
 				},
+			} );
+
+			expect( state ).toEqual( {
+				'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
+			} );
+		} );
+
+		it( 'returns updated value when explicit block attributes update are unique by block id', () => {
+			const original = null;
+
+			const state = lastBlockAttributesChange( original, {
+				type: 'UPDATE_BLOCK_ATTRIBUTES',
+				clientIds: [ 'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1' ],
+				attributes: {
+					'afd1cb17-2c08-4e7a-91be-007ba7ddc3a1': { food: 'banana' },
+				},
+				uniqueByBlock: true,
 			} );
 
 			expect( state ).toEqual( {
@@ -2401,6 +2895,78 @@ describe( 'state', () => {
 			} );
 
 			expect( state ).toBe( null );
+		} );
+	} );
+
+	describe( 'lastBlockInserted', () => {
+		it( 'should return client id if last block inserted is called with action INSERT_BLOCKS', () => {
+			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+
+			const action = {
+				blocks: [
+					{
+						clientId: expectedClientId,
+					},
+				],
+				meta: {
+					source: 'inserter_menu',
+				},
+				type: 'INSERT_BLOCKS',
+			};
+
+			const state = lastBlockInserted( {}, action );
+
+			expect( state.clientId ).toBe( expectedClientId );
+		} );
+
+		it( 'should return inserter_menu source if last block inserted is called with action INSERT_BLOCKS', () => {
+			const expectedSource = 'inserter_menu';
+
+			const action = {
+				blocks: [
+					{
+						clientId: '62bfef6e-d5e9-43ba-b7f9-c77cf354141f',
+					},
+				],
+				meta: {
+					source: expectedSource,
+				},
+				type: 'INSERT_BLOCKS',
+			};
+
+			const state = lastBlockInserted( {}, action );
+
+			expect( state.source ).toBe( expectedSource );
+		} );
+
+		it( 'should return state if last block inserted is called with action INSERT_BLOCKS and block list is empty', () => {
+			const expectedState = {
+				clientId: '9db792c6-a25a-495d-adbd-97d56a4c4189',
+			};
+
+			const action = {
+				blocks: [],
+				meta: {
+					source: 'inserter_menu',
+				},
+				type: 'INSERT_BLOCKS',
+			};
+
+			const state = lastBlockInserted( expectedState, action );
+
+			expect( state ).toEqual( expectedState );
+		} );
+
+		it( 'should return empty state if last block inserted is called with action RESET_BLOCKS', () => {
+			const expectedState = {};
+
+			const action = {
+				type: 'RESET_BLOCKS',
+			};
+
+			const state = lastBlockInserted( expectedState, action );
+
+			expect( state ).toEqual( expectedState );
 		} );
 	} );
 } );

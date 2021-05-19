@@ -10,6 +10,11 @@ import { Component } from '@wordpress/element';
 import { Spinner } from '@wordpress/components';
 import { withSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../../store';
+
 class MetaBoxesArea extends Component {
 	/**
 	 * @inheritdoc
@@ -23,7 +28,9 @@ class MetaBoxesArea extends Component {
 	 * @inheritdoc
 	 */
 	componentDidMount() {
-		this.form = document.querySelector( '.metabox-location-' + this.props.location );
+		this.form = document.querySelector(
+			'.metabox-location-' + this.props.location
+		);
 		if ( this.form ) {
 			this.container.appendChild( this.form );
 		}
@@ -64,7 +71,10 @@ class MetaBoxesArea extends Component {
 		return (
 			<div className={ classes }>
 				{ isSaving && <Spinner /> }
-				<div className="edit-post-meta-boxes-area__container" ref={ this.bindContainerNode } />
+				<div
+					className="edit-post-meta-boxes-area__container"
+					ref={ this.bindContainerNode }
+				/>
 				<div className="edit-post-meta-boxes-area__clear" />
 			</div>
 		);
@@ -73,6 +83,6 @@ class MetaBoxesArea extends Component {
 
 export default withSelect( ( select ) => {
 	return {
-		isSaving: select( 'core/edit-post' ).isSavingMetaBoxes(),
+		isSaving: select( editPostStore ).isSavingMetaBoxes(),
 	};
 } )( MetaBoxesArea );

@@ -4,9 +4,10 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat, remove, applyFormat } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
+import { code as codeIcon } from '@wordpress/icons';
 
 const name = 'core/code';
-const title = __( 'Inline Code' );
+const title = __( 'Inline code' );
 
 export const code = {
 	name,
@@ -51,7 +52,7 @@ export const code = {
 
 		return (
 			<RichTextToolbarButton
-				icon="editor-code"
+				icon={ codeIcon }
 				title={ title }
 				onClick={ onClick }
 				isActive={ isActive }

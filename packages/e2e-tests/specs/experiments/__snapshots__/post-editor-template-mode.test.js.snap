@@ -1,0 +1,21 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Post Editor Template mode Allow creating custom block templates in classic themes 1`] = `
+"<h1 class=\\"wp-block-site-title\\"><a href=\\"http://localhost:8889\\" rel=\\"home\\">gutenberg</a></h1>
+
+<p class=\\"wp-block-site-tagline\\">Just another WordPress site</p>
+
+
+<hr class=\\"wp-block-separator\\">
+
+
+<h2 class=\\"wp-block-post-title\\">Another FSE Post</h2>
+
+<div class=\\"entry-content wp-block-post-content\\">
+<p>Hello World</p>
+</div>
+
+
+<p>Just a random paragraph added to the template</p>
+"
+`;

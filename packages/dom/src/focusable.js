@@ -35,7 +35,7 @@ const SELECTOR = [
  * Returns true if the specified element is visible (i.e. neither display: none
  * nor visibility: hidden).
  *
- * @param {Element} element DOM element to test.
+ * @param {HTMLElement} element DOM element to test.
  *
  * @return {boolean} Whether element is visible.
  */
@@ -48,21 +48,40 @@ function isVisible( element ) {
 }
 
 /**
+ * Returns true if the specified element should be skipped from focusable elements.
+ * For now it rather specific for `iframes` and  if tabindex attribute is set to -1.
+ *
+ * @param {Element} element DOM element to test.
+ *
+ * @return {boolean} Whether element should be skipped from focusable elements.
+ */
+function skipFocus( element ) {
+	return (
+		element.nodeName.toLowerCase() === 'iframe' &&
+		element.getAttribute( 'tabindex' ) === '-1'
+	);
+}
+
+/**
  * Returns true if the specified area element is a valid focusable element, or
  * false otherwise. Area is only focusable if within a map where a named map
  * referenced by an image somewhere in the document.
  *
- * @param {Element} element DOM area element to test.
+ * @param {HTMLAreaElement} element DOM area element to test.
  *
  * @return {boolean} Whether area element is valid for focus.
  */
 function isValidFocusableArea( element ) {
+	/** @type {HTMLMapElement | null} */
 	const map = element.closest( 'map[name]' );
 	if ( ! map ) {
 		return false;
 	}
 
-	const img = document.querySelector( 'img[usemap="#' + map.name + '"]' );
+	/** @type {HTMLImageElement | null} */
+	const img = element.ownerDocument.querySelector(
+		'img[usemap="#' + map.name + '"]'
+	);
 	return !! img && isVisible( img );
 }
 
@@ -74,16 +93,21 @@ function isValidFocusableArea( element ) {
  * @return {Element[]} Focusable elements.
  */
 export function find( context ) {
+	/* eslint-disable jsdoc/no-undefined-types */
+	/** @type {NodeListOf<HTMLElement>} */
+	/* eslint-enable jsdoc/no-undefined-types */
 	const elements = context.querySelectorAll( SELECTOR );
 
 	return Array.from( elements ).filter( ( element ) => {
-		if ( ! isVisible( element ) ) {
+		if ( ! isVisible( element ) || skipFocus( element ) ) {
 			return false;
 		}
 
 		const { nodeName } = element;
 		if ( 'AREA' === nodeName ) {
-			return isValidFocusableArea( element );
+			return isValidFocusableArea(
+				/** @type {HTMLAreaElement} */ ( element )
+			);
 		}
 
 		return true;

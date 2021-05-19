@@ -1,15 +1,16 @@
 {
 	"name": "@wordpress/element",
-	"version": "2.10.0",
+	"version": "3.0.0",
 	"description": "Element React module for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"element",
 		"react"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/element/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/element/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",
@@ -18,16 +19,22 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
+	"types": "build-types",
 	"sideEffects": false,
 	"dependencies": {
-		"@babel/runtime": "^7.4.4",
+		"@babel/runtime": "^7.13.10",
+		"@types/react": "^16.9.0",
+		"@types/react-dom": "^16.9.0",
 		"@wordpress/escape-html": "file:../escape-html",
-		"lodash": "^4.17.15",
-		"react": "^16.9.0",
-		"react-dom": "^16.9.0"
+		"lodash": "^4.17.21",
+		"react": "^16.13.1",
+		"react-dom": "^16.13.1"
 	},
 	"publishConfig": {
 		"access": "public"

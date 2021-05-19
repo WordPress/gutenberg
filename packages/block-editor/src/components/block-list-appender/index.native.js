@@ -14,6 +14,7 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  */
 import DefaultBlockAppender from '../default-block-appender';
 import styles from './style.scss';
+import { store as blockEditorStore } from '../../store';
 
 function BlockListAppender( {
 	blockClientIds,
@@ -28,9 +29,7 @@ function BlockListAppender( {
 	}
 
 	if ( CustomAppender ) {
-		return (
-			<CustomAppender showSeparator={ showSeparator } />
-		);
+		return <CustomAppender showSeparator={ showSeparator } />;
 	}
 
 	if ( canInsertDefaultBlock ) {
@@ -49,15 +48,16 @@ function BlockListAppender( {
 }
 
 export default withSelect( ( select, { rootClientId } ) => {
-	const {
-		getBlockOrder,
-		canInsertBlockType,
-		getTemplateLock,
-	} = select( 'core/block-editor' );
+	const { getBlockOrder, canInsertBlockType, getTemplateLock } = select(
+		blockEditorStore
+	);
 
 	return {
 		isLocked: !! getTemplateLock( rootClientId ),
 		blockClientIds: getBlockOrder( rootClientId ),
-		canInsertDefaultBlock: canInsertBlockType( getDefaultBlockName(), rootClientId ),
+		canInsertDefaultBlock: canInsertBlockType(
+			getDefaultBlockName(),
+			rootClientId
+		),
 	};
 } )( BlockListAppender );

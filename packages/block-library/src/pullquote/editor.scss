@@ -1,9 +1,7 @@
-.block-editor-block-list__block[data-type="core/pullquote"] {
-	&[data-align="left"],
-	&[data-align="right"] {
-		& p {
-			font-size: 20px;
-		}
+.wp-block[data-align="left"] > .wp-block-pullquote,
+.wp-block[data-align="right"] > .wp-block-pullquote {
+	& p {
+		font-size: 20px;
 	}
 }
 
@@ -15,9 +13,6 @@
 }
 
 .wp-block-pullquote.is-style-solid-color {
-	margin-left: 0;
-	margin-right: 0;
-
 	& blockquote p {
 		font-size: 32px;
 	}

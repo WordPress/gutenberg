@@ -1,10 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	createNewPost,
-	pressKeyWithModifier,
-} from '@wordpress/e2e-test-utils';
+import { createNewPost, pressKeyWithModifier } from '@wordpress/e2e-test-utils';
 
 function isCloseButtonFocused() {
 	return page.$eval( ':focus', ( focusedElement ) => {
@@ -22,9 +19,14 @@ describe( 'a11y', () => {
 
 		await page.keyboard.press( 'Tab' );
 
-		const isFocusedToggle = await page.$eval( ':focus', ( focusedElement ) => {
-			return focusedElement.classList.contains( 'editor-post-publish-button__button' );
-		} );
+		const isFocusedToggle = await page.$eval(
+			':focus',
+			( focusedElement ) => {
+				return focusedElement.classList.contains(
+					'edit-post-header-toolbar__inserter-toggle'
+				);
+			}
+		);
 
 		expect( isFocusedToggle ).toBe( true );
 	} );

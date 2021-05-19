@@ -11,6 +11,7 @@ import { __ } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
 import { DOWN, ENTER, UP } from '@wordpress/keycodes';
 import { pure } from '@wordpress/compose';
+import { chevronDown } from '@wordpress/icons';
 
 /**
  * Internal dependencies
@@ -174,11 +175,12 @@ export class Inputs extends Component {
 				</div>
 			);
 		} else if ( this.state.view === 'rgb' ) {
+			const legend = disableAlpha
+				? __( 'Color value in RGB' )
+				: __( 'Color value in RGBA' );
 			return (
 				<fieldset>
-					<VisuallyHidden as="legend">
-						{ __( 'Color value in RGB' ) }
-					</VisuallyHidden>
+					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input
 							source={ this.state.view }
@@ -220,18 +222,19 @@ export class Inputs extends Component {
 								type="number"
 								min="0"
 								max="1"
-								step="0.05"
+								step="0.01"
 							/>
 						) }
 					</div>
 				</fieldset>
 			);
 		} else if ( this.state.view === 'hsl' ) {
+			const legend = disableAlpha
+				? __( 'Color value in HSL' )
+				: __( 'Color value in HSLA' );
 			return (
 				<fieldset>
-					<VisuallyHidden as="legend">
-						{ __( 'Color value in HSL' ) }
-					</VisuallyHidden>
+					<VisuallyHidden as="legend">{ legend }</VisuallyHidden>
 					<div className="components-color-picker__inputs-fields">
 						<Input
 							source={ this.state.view }
@@ -289,7 +292,7 @@ export class Inputs extends Component {
 				<div className="components-color-picker__inputs-toggle-wrapper">
 					<PureButton
 						className="components-color-picker__inputs-toggle"
-						icon="arrow-down-alt2"
+						icon={ chevronDown }
 						label={ __( 'Change color format' ) }
 						onClick={ this.toggleViews }
 					/>

@@ -1,11 +1,5 @@
-.editor-post-title__block {
+.editor-post-title {
 	position: relative;
-	padding: 5px 0;
-	font-size: $editor-font-size;
-
-	@include break-small() {
-		padding: 5px $block-side-ui-clearance;
-	}
 
 	.editor-post-title__input {
 		display: block;
@@ -13,13 +7,14 @@
 		margin: 0;
 		box-shadow: none;
 		background: transparent;
-		font-family: $editor-font;
-		line-height: $default-line-height;
-		color: $dark-gray-900;
 		transition: border 0.1s ease-out, box-shadow 0.1s linear;
 		@include reduce-motion("transition");
-		padding: #{ $block-padding + 5px } $block-padding;
+		padding: #{ $block-padding + 5px } 0;
 		word-break: keep-all;
+
+		// Inherit the styles set by the theme.
+		font-family: inherit;
+		color: inherit;
 
 		// Stack borders on mobile.
 		border: $border-width solid transparent;
@@ -32,53 +27,46 @@
 
 		@include break-small() {
 			border-width: $border-width;
-			border-left-width: 0;
 		}
 
 		// Match h1 heading.
 		font-size: 2.44em;
-		font-weight: 600;
+		font-weight: 800;
+		line-height: 1.4;
 
-		// Large text needs a 3:1 contrast ratio.
 		&::-webkit-input-placeholder {
-			color: $dark-opacity-200;
+			color: $dark-gray-placeholder;
 		}
 
 		&::-moz-placeholder {
-			color: $dark-opacity-200;
+			color: $dark-gray-placeholder;
+			// Override Firefox default.
+			opacity: 1;
 		}
 
 		&:-ms-input-placeholder {
-			color: $dark-opacity-200;
+			color: $dark-gray-placeholder;
+		}
+
+		.is-dark-theme & {
+			&::-webkit-input-placeholder {
+				color: $light-gray-placeholder;
+			}
+
+			&::-moz-placeholder {
+				opacity: 1; // Necessary because Firefox reduces this from 1.
+				color: $light-gray-placeholder;
+			}
+
+			&:-ms-input-placeholder {
+				color: $light-gray-placeholder;
+			}
 		}
 
 		&:focus {
 			border: $border-width solid transparent;
-			border-left-width: 0;
 			outline: $border-width solid transparent;
 			box-shadow: none;
-		}
-	}
-
-	&:not(.is-focus-mode) {
-		&.is-selected .editor-post-title__input {
-			// use opacity to work in various editor styles.
-			border-color: $dark-opacity-light-800;
-			box-shadow: inset $block-left-border-width 0 0 0 $dark-gray-500;
-
-			.is-dark-theme & {
-				border-color: $light-opacity-light-800;
-				box-shadow: inset $block-left-border-width 0 0 0 $light-gray-600;
-			}
-
-			// Switch to outset borders on larger screens.
-			@include break-small() {
-				box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-
-				.is-dark-theme & {
-					box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-				}
-			}
 		}
 	}
 
@@ -90,27 +78,5 @@
 		&:focus {
 			opacity: 1;
 		}
-	}
-}
-
-.editor-post-title .editor-post-permalink {
-	font-size: $default-font-size;
-	color: $dark-gray-900;
-	height: auto;
-	position: relative;
-	left: $block-left-border-width;
-	top: -2px;
-	width: calc(100% - #{$block-left-border-width});
-
-	@include break-mobile() {
-		position: absolute;
-		top: -$block-toolbar-height + $border-width + $border-width + 1px; // Shift this element upward the same height as the block toolbar, minus the border size
-		right: 0;
-		flex-wrap: nowrap;
-		width: auto;
-	}
-	@include break-small() {
-		left: $block-side-ui-clearance;
-		right: $block-side-ui-clearance;
 	}
 }

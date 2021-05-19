@@ -1,171 +1,30 @@
-// These margins make sure that nested blocks stack/overlay with the parent block chrome
-// This is sort of an experiment at making sure the editor looks as much like the end result as possible
-// Potentially the rules here can apply to all nested blocks and enable stacking, in which case it should be moved elsewhere
-// When using CSS grid, margins do not collapse on the container.
-.wp-block-columns .block-editor-block-list__layout {
-	// This max-width is used to constrain the main editor column, it should not cascade into columns
-	.block-editor-block-list__block {
-		max-width: none;
-	}
-}
-
-// Ideally all block toolbars should be positioned the same.
-.components-popover.block-editor-block-list__block-popover
-.components-popover__content
-.block-editor-block-contextual-toolbar[data-type="core/column"] {
+// This max-width is used to constrain the main editor column, it should not
+// cascade into columns.
+.wp-block-columns .wp-block {
+	max-width: none;
 	margin-left: 0;
+	margin-right: 0;
 }
 
-.wp-block-columns {
-	display: block;
-
-	> .block-editor-inner-blocks > .block-editor-block-list__layout {
-		display: flex;
-
-		// Responsiveness: Allow wrapping on mobile.
-		flex-wrap: wrap;
-
-		@include break-medium() {
-			flex-wrap: nowrap;
-		}
-		// Set full heights on Columns to enable vertical alignment preview
-		> [data-type="core/column"],
-		> [data-type="core/column"] .block-core-columns {
-			display: flex;
-			flex-direction: column;
-
-			// This flex rule fixes an issue in IE11.
-			flex: 1 1 auto;
-
-			// IE11 does not support `position: sticky`, so we use it here to serve correct Flex rules to modern browsers.
-			@supports (position: sticky) {
-				flex: 1;
-			}
-		}
-
-		// Adjust the individual column block.
-		> [data-type="core/column"] {
-
-			// On mobile, only a single column is shown, so match adjacent block paddings.
-			padding-left: 0;
-			padding-right: 0;
-			margin-left: -$block-padding;
-			margin-right: -$block-padding;
-
-			// Zero out margins.
-			margin-top: 0;
-			margin-bottom: 0;
-
-			// Prevent the columns from growing wider than their distributed sizes.
-			min-width: 0;
-
-			// Prevent long unbroken words from overflowing.
-			word-break: break-word; // For back-compat.
-			overflow-wrap: break-word; // New standard.
-
-			// Responsiveness: Show at most one columns on mobile.
-			flex-basis: 100%;
-
-			// Beyond mobile, allow 2 columns.
-			@include break-small() {
-				flex-basis: calc(50% - (#{$grid-size-large}));
-				flex-grow: 0;
-				margin-left: 0;
-				margin-right: 0;
-			}
-
-			// Add space between columns. Themes can customize this if they wish to work differently.
-			// This has to match the same padding applied in style.scss.
-			// Only apply this beyond the mobile breakpoint, as there's only a single column on mobile.
-			@include break-small() {
-				&:nth-child(even) {
-					margin-left: calc(#{$grid-size-large * 2});
-				}
-			}
-
-			// When columns are in a single row, add space before all except the first.
-			@include break-medium() {
-				&:not(:first-child) {
-					margin-left: calc(#{$grid-size-large * 2});
-				}
-			}
-
-			// Remove Block "padding" so individual Column is flush with parent Columns
-			&::before {
-				left: 0;
-				right: 0;
-			}
-
-			// The Columns block is a flex-container, therefore it nullifies margin collapsing.
-			// Therefore, blocks inside this will appear to create a double margin.
-			// We compensate for this using negative margins.
-			> .block-core-columns > .block-editor-inner-blocks {
-				margin-top: -$default-block-margin;
-				margin-bottom: -$default-block-margin;
-			}
-		}
+// To do: remove horizontal margin override by the editor.
+@include break-small() {
+	.editor-styles-wrapper
+	.block-editor-block-list__block.wp-block-column:nth-child(even) {
+		margin-left: $grid-unit-20 * 2;
 	}
 }
 
-/**
- * Columns act as as a "passthrough container"
- * and therefore has its vertical margins/padding removed via negative margins
- * therefore we need to compensate for this here by doubling the spacing on the
- * vertical to ensure there is equal visual spacing around the inserter. Note there
- * is no formal API for a "passthrough" Block so this is an edge case overide
- */
-[data-type="core/columns"] {
-
-	.block-list-appender {
-		margin-top: $block-padding*2;
-		margin-bottom: $block-padding*2;
+@include break-medium() {
+	.editor-styles-wrapper
+	.block-editor-block-list__block.wp-block-column:not(:first-child) {
+		margin-left: $grid-unit-20 * 2;
 	}
 }
 
-/**
- * Vertical Alignment Preview
- * note: specificity is important here to ensure individual
- * * columns alignment is prioritised over parent column alignment
- *
- */
-.are-vertically-aligned-top .block-core-columns,
-div.block-core-columns.is-vertically-aligned-top {
-	justify-content: flex-start;
-}
-
-.are-vertically-aligned-center .block-core-columns,
-div.block-core-columns.is-vertically-aligned-center {
-	justify-content: center;
-}
-
-.are-vertically-aligned-bottom .block-core-columns,
-div.block-core-columns.is-vertically-aligned-bottom {
-	justify-content: flex-end;
-}
-
-/**
- * Fixes single Column breadcrumb position.
- */
-[data-type="core/column"] > .editor-block-list__breadcrumb {
-	left: -$block-left-border-width;
-}
-
-/**
- * Make single Column overlay not extend past boundaries of parent
- */
-.block-core-columns > .block-editor-inner-blocks.has-overlay::after {
-	left: 0;
-	right: 0;
-}
-
-// Fullwide: show margin left/right to ensure there's room for the side UI.
-// This is not a 1:1 preview with the front-end where these margins would presumably be zero.
-[data-type="core/columns"][data-align="full"] .wp-block-columns {
-	padding-left: $block-padding;
-	padding-right: $block-padding;
-
-	@include break-small() {
-		padding-left: $block-container-side-padding;
-		padding-right: $block-container-side-padding;
-	}
+// Individual columns do not have top and bottom margins on the frontend.
+// So we make the editor match that.
+// Needs specificity.
+.block-editor-block-list__block.wp-block-column.wp-block-column {
+	margin-top: 0;
+	margin-bottom: 0;
 }

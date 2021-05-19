@@ -1,257 +1,282 @@
 /**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 import { computeCaretRect, getScrollContainer } from '@wordpress/dom';
-import { withSelect } from '@wordpress/data';
+import { useSelect } from '@wordpress/data';
 import { UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
 
-/** @typedef {import('@wordpress/element').WPSyntheticEvent} WPSyntheticEvent */
+/**
+ * Internal dependencies
+ */
+import { store as blockEditorStore } from '../../store';
 
 const isIE = window.navigator.userAgent.indexOf( 'Trident' ) !== -1;
 const arrowKeyCodes = new Set( [ UP, DOWN, LEFT, RIGHT ] );
 const initialTriggerPercentage = 0.75;
 
-class Typewriter extends Component {
-	constructor() {
-		super( ...arguments );
+export function useTypewriter() {
+	const hasSelectedBlock = useSelect( ( select ) =>
+		select( blockEditorStore ).hasSelectedBlock()
+	);
 
-		this.ref = createRef();
-		this.onKeyDown = this.onKeyDown.bind( this );
-		this.addSelectionChangeListener = this.addSelectionChangeListener.bind( this );
-		this.computeCaretRectOnSelectionChange = this.computeCaretRectOnSelectionChange.bind( this );
-		this.maintainCaretPosition = this.maintainCaretPosition.bind( this );
-		this.computeCaretRect = this.computeCaretRect.bind( this );
-		this.onScrollResize = this.onScrollResize.bind( this );
-		this.isSelectionEligibleForScroll = this.isSelectionEligibleForScroll.bind( this );
-	}
+	return useRefEffect(
+		( node ) => {
+			if ( ! hasSelectedBlock ) {
+				return;
+			}
 
-	componentDidMount() {
-		// When the user scrolls or resizes, the scroll position should be
-		// reset.
-		window.addEventListener( 'scroll', this.onScrollResize, true );
-		window.addEventListener( 'resize', this.onScrollResize, true );
-	}
+			const { ownerDocument } = node;
+			const { defaultView } = ownerDocument;
 
-	componentWillUnmount() {
-		window.removeEventListener( 'scroll', this.onScrollResize, true );
-		window.removeEventListener( 'resize', this.onScrollResize, true );
-		document.removeEventListener( 'selectionchange', this.computeCaretRectOnSelectionChange );
+			let scrollResizeRafId;
+			let onKeyDownRafId;
 
-		if ( this.onScrollResize.rafId ) {
-			window.cancelAnimationFrame( this.onScrollResize.rafId );
-		}
+			let caretRect;
 
-		if ( this.onKeyDown.rafId ) {
-			window.cancelAnimationFrame( this.onKeyDown.rafId );
-		}
-	}
+			function onScrollResize() {
+				if ( scrollResizeRafId ) {
+					return;
+				}
 
-	/**
-	 * Resets the scroll position to be maintained.
-	 */
-	computeCaretRect() {
-		if ( this.isSelectionEligibleForScroll() ) {
-			this.caretRect = computeCaretRect();
-		}
-	}
+				scrollResizeRafId = defaultView.requestAnimationFrame( () => {
+					computeCaretRectangle();
+					scrollResizeRafId = null;
+				} );
+			}
 
-	/**
-	 * Resets the scroll position to be maintained during a `selectionchange`
-	 * event. Also removes the listener, so it acts as a one-time listener.
-	 */
-	computeCaretRectOnSelectionChange() {
-		document.removeEventListener( 'selectionchange', this.computeCaretRectOnSelectionChange );
-		this.computeCaretRect();
-	}
+			function onKeyDown( event ) {
+				// Ensure the any remaining request is cancelled.
+				if ( onKeyDownRafId ) {
+					defaultView.cancelAnimationFrame( onKeyDownRafId );
+				}
 
-	onScrollResize() {
-		if ( this.onScrollResize.rafId ) {
-			return;
-		}
+				// Use an animation frame for a smooth result.
+				onKeyDownRafId = defaultView.requestAnimationFrame( () => {
+					maintainCaretPosition( event );
+					onKeyDownRafId = null;
+				} );
+			}
 
-		this.onScrollResize.rafId = window.requestAnimationFrame( () => {
-			this.computeCaretRect();
-			delete this.onScrollResize.rafId;
-		} );
-	}
+			/**
+			 * Maintains the scroll position after a selection change caused by a
+			 * keyboard event.
+			 *
+			 * @param {KeyboardEvent} event Keyboard event.
+			 */
+			function maintainCaretPosition( { keyCode } ) {
+				if ( ! isSelectionEligibleForScroll() ) {
+					return;
+				}
 
-	/**
-	 * Checks if the current situation is elegible for scroll:
-	 * - There should be one and only one block selected.
-	 * - The component must contain the selection.
-	 * - The active element must be contenteditable.
-	 */
-	isSelectionEligibleForScroll() {
-		return (
-			this.props.selectedBlockClientId &&
-			this.ref.current.contains( document.activeElement ) &&
-			document.activeElement.isContentEditable
-		);
-	}
+				const currentCaretRect = computeCaretRect( defaultView );
 
-	isLastEditableNode() {
-		const editableNodes = this.ref.current.querySelectorAll(
-			'[contenteditable="true"]'
-		);
-		const lastEditableNode = editableNodes[ editableNodes.length - 1 ];
-		return lastEditableNode === document.activeElement;
-	}
+				if ( ! currentCaretRect ) {
+					return;
+				}
 
-	/**
-	 * Maintains the scroll position after a selection change caused by a
-	 * keyboard event.
-	 *
-	 * @param {WPSyntheticEvent} event Synthetic keyboard event.
-	 */
-	maintainCaretPosition( { keyCode } ) {
-		if ( ! this.isSelectionEligibleForScroll() ) {
-			return;
-		}
+				// If for some reason there is no position set to be scrolled to, let
+				// this be the position to be scrolled to in the future.
+				if ( ! caretRect ) {
+					caretRect = currentCaretRect;
+					return;
+				}
 
-		const currentCaretRect = computeCaretRect();
+				// Even though enabling the typewriter effect for arrow keys results in
+				// a pleasant experience, it may not be the case for everyone, so, for
+				// now, let's disable it.
+				if ( arrowKeyCodes.has( keyCode ) ) {
+					// Reset the caret position to maintain.
+					caretRect = currentCaretRect;
+					return;
+				}
 
-		if ( ! currentCaretRect ) {
-			return;
-		}
+				const diff = currentCaretRect.top - caretRect.top;
 
-		// If for some reason there is no position set to be scrolled to, let
-		// this be the position to be scrolled to in the future.
-		if ( ! this.caretRect ) {
-			this.caretRect = currentCaretRect;
-			return;
-		}
+				if ( diff === 0 ) {
+					return;
+				}
 
-		// Even though enabling the typewriter effect for arrow keys results in
-		// a pleasant experience, it may not be the case for everyone, so, for
-		// now, let's disable it.
-		if ( arrowKeyCodes.has( keyCode ) ) {
-			// Reset the caret position to maintain.
-			this.caretRect = currentCaretRect;
-			return;
-		}
+				const scrollContainer = getScrollContainer( node );
 
-		const diff = currentCaretRect.top - this.caretRect.top;
+				// The page must be scrollable.
+				if ( ! scrollContainer ) {
+					return;
+				}
 
-		if ( diff === 0 ) {
-			return;
-		}
+				const windowScroll = scrollContainer === ownerDocument.body;
+				const scrollY = windowScroll
+					? defaultView.scrollY
+					: scrollContainer.scrollTop;
+				const scrollContainerY = windowScroll
+					? 0
+					: scrollContainer.getBoundingClientRect().top;
+				const relativeScrollPosition = windowScroll
+					? caretRect.top / defaultView.innerHeight
+					: ( caretRect.top - scrollContainerY ) /
+					  ( defaultView.innerHeight - scrollContainerY );
 
-		const scrollContainer = getScrollContainer( this.ref.current );
+				// If the scroll position is at the start, the active editable element
+				// is the last one, and the caret is positioned within the initial
+				// trigger percentage of the page, do not scroll the page.
+				// The typewriter effect should not kick in until an empty page has been
+				// filled with the initial trigger percentage or the user scrolls
+				// intentionally down.
+				if (
+					scrollY === 0 &&
+					relativeScrollPosition < initialTriggerPercentage &&
+					isLastEditableNode()
+				) {
+					// Reset the caret position to maintain.
+					caretRect = currentCaretRect;
+					return;
+				}
 
-		// The page must be scrollable.
-		if ( ! scrollContainer ) {
-			return;
-		}
+				const scrollContainerHeight = windowScroll
+					? defaultView.innerHeight
+					: scrollContainer.clientHeight;
 
-		const windowScroll = scrollContainer === document.body;
-		const scrollY = windowScroll ?
-			window.scrollY :
-			scrollContainer.scrollTop;
-		const scrollContainerY = windowScroll ?
-			0 :
-			scrollContainer.getBoundingClientRect().top;
-		const relativeScrollPosition = windowScroll ?
-			this.caretRect.top / window.innerHeight :
-			( this.caretRect.top - scrollContainerY ) /
-			( window.innerHeight - scrollContainerY );
+				// Abort if the target scroll position would scroll the caret out of
+				// view.
+				if (
+					// The caret is under the lower fold.
+					caretRect.top + caretRect.height >
+						scrollContainerY + scrollContainerHeight ||
+					// The caret is above the upper fold.
+					caretRect.top < scrollContainerY
+				) {
+					// Reset the caret position to maintain.
+					caretRect = currentCaretRect;
+					return;
+				}
 
-		// If the scroll position is at the start, the active editable element
-		// is the last one, and the caret is positioned within the initial
-		// trigger percentage of the page, do not scroll the page.
-		// The typewriter effect should not kick in until an empty page has been
-		// filled with the initial trigger percentage or the user scrolls
-		// intentionally down.
-		if (
-			scrollY === 0 &&
-			relativeScrollPosition < initialTriggerPercentage &&
-			this.isLastEditableNode()
-		) {
-			// Reset the caret position to maintain.
-			this.caretRect = currentCaretRect;
-			return;
-		}
+				if ( windowScroll ) {
+					defaultView.scrollBy( 0, diff );
+				} else {
+					scrollContainer.scrollTop += diff;
+				}
+			}
 
-		const scrollContainerHeight = windowScroll ?
-			window.innerHeight :
-			scrollContainer.clientHeight;
+			/**
+			 * Adds a `selectionchange` listener to reset the scroll position to be
+			 * maintained.
+			 */
+			function addSelectionChangeListener() {
+				ownerDocument.addEventListener(
+					'selectionchange',
+					computeCaretRectOnSelectionChange
+				);
+			}
 
-		// Abort if the target scroll position would scroll the caret out of
-		// view.
-		if (
-			// The caret is under the lower fold.
-			this.caretRect.top + this.caretRect.height >
-				scrollContainerY + scrollContainerHeight ||
-			// The caret is above the upper fold.
-			this.caretRect.top < scrollContainerY
-		) {
-			// Reset the caret position to maintain.
-			this.caretRect = currentCaretRect;
-			return;
-		}
+			/**
+			 * Resets the scroll position to be maintained during a `selectionchange`
+			 * event. Also removes the listener, so it acts as a one-time listener.
+			 */
+			function computeCaretRectOnSelectionChange() {
+				ownerDocument.removeEventListener(
+					'selectionchange',
+					computeCaretRectOnSelectionChange
+				);
+				computeCaretRectangle();
+			}
 
-		if ( windowScroll ) {
-			window.scrollBy( 0, diff );
-		} else {
-			scrollContainer.scrollTop += diff;
-		}
-	}
+			/**
+			 * Resets the scroll position to be maintained.
+			 */
+			function computeCaretRectangle() {
+				if ( isSelectionEligibleForScroll() ) {
+					caretRect = computeCaretRect( defaultView );
+				}
+			}
 
-	/**
-	 * Adds a `selectionchange` listener to reset the scroll position to be
-	 * maintained.
-	 */
-	addSelectionChangeListener() {
-		document.addEventListener( 'selectionchange', this.computeCaretRectOnSelectionChange );
-	}
+			/**
+			 * Checks if the current situation is elegible for scroll:
+			 * - There should be one and only one block selected.
+			 * - The component must contain the selection.
+			 * - The active element must be contenteditable.
+			 */
+			function isSelectionEligibleForScroll() {
+				return (
+					node.contains( ownerDocument.activeElement ) &&
+					ownerDocument.activeElement.isContentEditable
+				);
+			}
 
-	onKeyDown( event ) {
-		event.persist();
+			function isLastEditableNode() {
+				const editableNodes = node.querySelectorAll(
+					'[contenteditable="true"]'
+				);
+				const lastEditableNode =
+					editableNodes[ editableNodes.length - 1 ];
+				return lastEditableNode === ownerDocument.activeElement;
+			}
 
-		// Ensure the any remaining request is cancelled.
-		if ( this.onKeyDown.rafId ) {
-			window.cancelAnimationFrame( this.onKeyDown.rafId );
-		}
+			// When the user scrolls or resizes, the scroll position should be
+			// reset.
+			defaultView.addEventListener( 'scroll', onScrollResize, true );
+			defaultView.addEventListener( 'resize', onScrollResize, true );
 
-		// Use an animation frame for a smooth result.
-		this.onKeyDown.rafId = window.requestAnimationFrame( () => {
-			this.maintainCaretPosition( event );
-			delete this.onKeyDown.rafId;
-		} );
-	}
+			node.addEventListener( 'keydown', onKeyDown );
+			node.addEventListener( 'keyup', maintainCaretPosition );
+			node.addEventListener( 'mousedown', addSelectionChangeListener );
+			node.addEventListener( 'touchstart', addSelectionChangeListener );
 
-	render() {
-		// There are some issues with Internet Explorer, which are probably not
-		// worth spending time on. Let's disable it.
-		if ( isIE ) {
-			return this.props.children;
-		}
+			return () => {
+				defaultView.removeEventListener(
+					'scroll',
+					onScrollResize,
+					true
+				);
+				defaultView.removeEventListener(
+					'resize',
+					onScrollResize,
+					true
+				);
 
-		// Disable reason: Wrapper itself is non-interactive, but must capture
-		// bubbling events from children to determine focus transition intents.
-		/* eslint-disable jsx-a11y/no-static-element-interactions */
-		return (
-			<div
-				ref={ this.ref }
-				onKeyDown={ this.onKeyDown }
-				onKeyUp={ this.maintainCaretPosition }
-				onMouseDown={ this.addSelectionChangeListener }
-				onTouchStart={ this.addSelectionChangeListener }
-				className="block-editor__typewriter"
-			>
-				{ this.props.children }
-			</div>
-		);
-		/* eslint-enable jsx-a11y/no-static-element-interactions */
-	}
+				node.removeEventListener( 'keydown', onKeyDown );
+				node.removeEventListener( 'keyup', maintainCaretPosition );
+				node.removeEventListener(
+					'mousedown',
+					addSelectionChangeListener
+				);
+				node.removeEventListener(
+					'touchstart',
+					addSelectionChangeListener
+				);
+
+				ownerDocument.removeEventListener(
+					'selectionchange',
+					computeCaretRectOnSelectionChange
+				);
+
+				defaultView.cancelAnimationFrame( scrollResizeRafId );
+				defaultView.cancelAnimationFrame( onKeyDownRafId );
+			};
+		},
+		[ hasSelectedBlock ]
+	);
 }
+
+function Typewriter( { children } ) {
+	return (
+		<div ref={ useTypewriter() } className="block-editor__typewriter">
+			{ children }
+		</div>
+	);
+}
+
+/**
+ * The exported component. The implementation of Typewriter faced technical
+ * challenges in Internet Explorer, and is simply skipped, rendering the given
+ * props children instead.
+ *
+ * @type {WPComponent}
+ */
+const TypewriterOrIEBypass = isIE ? ( props ) => props.children : Typewriter;
 
 /**
  * Ensures that the text selection keeps the same vertical distance from the
  * viewport during keyboard events within this component. The vertical distance
  * can vary. It is the last clicked or scrolled to position.
  */
-export default withSelect( ( select ) => {
-	const { getSelectedBlockClientId } = select( 'core/block-editor' );
-	return { selectedBlockClientId: getSelectedBlockClientId() };
-} )( Typewriter );
+export default TypewriterOrIEBypass;

@@ -8,6 +8,26 @@
  */
 
 /**
+ * Registers a custom post type that is not public_queryable and not public.
+ */
+function public_queryable_false_public_false_cpt() {
+	// post type name has to be less than 20 chars.
+	$public_queryable_false_public_false = 'not_public';
+	register_post_type(
+		$public_queryable_false_public_false,
+		array(
+			'label'        => 'NotPublicQNotPublic',
+			'show_in_rest' => true,
+			'public'       => false,
+			'supports'     => array( 'title', 'editor', 'revisions' ),
+			'show_ui'      => true,
+			'show_in_menu' => true,
+		)
+	);
+}
+add_action( 'init', 'public_queryable_false_public_false_cpt' );
+
+/**
  * Registers a custom post type that is public_queryable but not public.
  */
 function public_queryable_true_public_false_cpt() {
@@ -66,3 +86,47 @@ function public_queryable_true_public_true_cpt() {
 	);
 }
 add_action( 'init', 'public_queryable_true_public_true_cpt' );
+
+/**
+ * Registers a custom post type that is hierarchical and does not supports the title attribute.
+ */
+function hierarchical_without_title_cpt() {
+	register_post_type(
+		'hierar-no-title',
+		array(
+			'public'       => true,
+			'label'        => 'Hierarchical No Title',
+			'show_in_rest' => true,
+			'hierarchical' => true,
+			'supports'     => array( 'page-attributes', 'editor', 'thumbnail', 'comments', 'post-formats' ),
+			'show_ui'      => true,
+			'show_in_menu' => true,
+		)
+	);
+}
+add_action( 'init', 'hierarchical_without_title_cpt' );
+
+/**
+ * Registers a custom post type that includes a legacy block in `template`.
+ */
+function legacy_block_in_template_cpt() {
+	register_post_type(
+		'leg_block_in_tpl',
+		array(
+			'label'              => 'Legacy block in template',
+			'show_in_rest'       => true,
+			'public'             => true,
+			'publicly_queryable' => true,
+			'supports'           => array( 'title', 'editor', 'revisions' ),
+			'show_ui'            => true,
+			'show_in_menu'       => true,
+			'template'           => array(
+				array(
+					'core-embed/wordpress-tv',
+					array( 'className' => 'wordpress_video' ),
+				),
+			),
+		)
+	);
+}
+add_action( 'init', 'legacy_block_in_template_cpt' );

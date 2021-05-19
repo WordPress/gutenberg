@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { registerStore } from '@wordpress/data';
+import { createReduxStore, register } from '@wordpress/data';
 
 /**
  * Internal dependencies
@@ -9,11 +9,18 @@ import { registerStore } from '@wordpress/data';
 import reducer from './reducer';
 import * as actions from './actions';
 import * as selectors from './selectors';
-import controls from './controls';
 
-export default registerStore( 'core/notices', {
+/**
+ * Store definition for the notices namespace.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/data/README.md#createReduxStore
+ *
+ * @type {Object}
+ */
+export const store = createReduxStore( 'core/notices', {
 	reducer,
 	actions,
 	selectors,
-	controls,
 } );
+
+register( store );

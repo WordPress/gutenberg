@@ -3,6 +3,7 @@
  */
 import { Component } from '@wordpress/element';
 import { withDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Mapping of server-supported notice class names to an equivalent notices
@@ -27,7 +28,9 @@ const NOTICE_CLASS_STATUSES = {
 function getAdminNotices() {
 	// The order is reversed to match expectations of rendered order, since a
 	// NoticesList is itself rendered in reverse order (newest to oldest).
-	return Array.from( document.querySelectorAll( '#wpbody-content > .notice' ) ).reverse();
+	return Array.from(
+		document.querySelectorAll( '#wpbody-content > .notice' )
+	).reverse();
 }
 
 /**
@@ -41,7 +44,7 @@ function getNoticeHTML( element ) {
 	const fragments = [];
 
 	for ( const child of element.childNodes ) {
-		if ( child.nodeType !== window.Node.ELEMENT_NODE ) {
+		if ( child.nodeType !== child.ELEMENT_NODE ) {
 			const value = child.nodeValue.trim();
 			if ( value ) {
 				fragments.push( child.nodeValue );
@@ -81,7 +84,9 @@ export class AdminNotices extends Component {
 			// Convert and create.
 			const status = getNoticeStatus( element );
 			const content = getNoticeHTML( element );
-			const isDismissible = element.classList.contains( 'is-dismissible' );
+			const isDismissible = element.classList.contains(
+				'is-dismissible'
+			);
 			createNotice( status, content, {
 				speak: false,
 				__unstableHTML: true,
@@ -99,7 +104,7 @@ export class AdminNotices extends Component {
 }
 
 export default withDispatch( ( dispatch ) => {
-	const { createNotice } = dispatch( 'core/notices' );
+	const { createNotice } = dispatch( noticesStore );
 
 	return { createNotice };
 } )( AdminNotices );

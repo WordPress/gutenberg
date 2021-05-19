@@ -6,6 +6,11 @@ import { withDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
 import { displayShortcut } from '@wordpress/keycodes';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
+
 export function KeyboardShortcutsHelpMenuItem( { openModal } ) {
 	return (
 		<MenuItem
@@ -20,9 +25,7 @@ export function KeyboardShortcutsHelpMenuItem( { openModal } ) {
 }
 
 export default withDispatch( ( dispatch ) => {
-	const {
-		openModal,
-	} = dispatch( 'core/edit-post' );
+	const { openModal } = dispatch( editPostStore );
 
 	return {
 		openModal,

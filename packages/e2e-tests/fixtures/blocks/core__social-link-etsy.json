@@ -1,13 +1,13 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/social-link-etsy",
-        "isValid": true,
-        "attributes": {
-            "url": "https://example.com/",
-            "site": "etsy"
-        },
-        "innerBlocks": [],
-        "originalContent": ""
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/social-link",
+		"isValid": true,
+		"attributes": {
+			"url": "https://example.com/",
+			"service": "etsy"
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
 ]

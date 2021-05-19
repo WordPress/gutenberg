@@ -1,65 +1,40 @@
 /**
- * External dependencies
- */
-import { omit } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Component, createRef } from '@wordpress/element';
-import { withGlobalEvents } from '@wordpress/compose';
+import { useEffect, useRef } from '@wordpress/element';
+import { useMergeRefs } from '@wordpress/compose';
 
-/**
- * Browser dependencies
- */
+export default function FocusableIframe( { iframeRef, ...props } ) {
+	const fallbackRef = useRef();
+	const ref = useMergeRefs( [ iframeRef, fallbackRef ] );
 
-const { FocusEvent } = window;
+	useEffect( () => {
+		const iframe = fallbackRef.current;
+		const { ownerDocument } = iframe;
+		const { defaultView } = ownerDocument;
 
-class FocusableIframe extends Component {
-	constructor( props ) {
-		super( ...arguments );
+		/**
+		 * Checks whether the iframe is the activeElement, inferring that it has
+		 * then received focus, and calls the `onFocus` prop callback.
+		 */
+		function checkFocus() {
+			if ( ownerDocument.activeElement !== iframe ) {
+				return;
+			}
 
-		this.checkFocus = this.checkFocus.bind( this );
-
-		this.node = props.iframeRef || createRef();
-	}
-
-	/**
-	 * Checks whether the iframe is the activeElement, inferring that it has
-	 * then received focus, and calls the `onFocus` prop callback.
-	 */
-	checkFocus() {
-		const iframe = this.node.current;
-
-		if ( document.activeElement !== iframe ) {
-			return;
+			iframe.focus();
 		}
 
-		const focusEvent = new FocusEvent( 'focus', { bubbles: true } );
-		iframe.dispatchEvent( focusEvent );
+		defaultView.addEventListener( 'blur', checkFocus );
 
-		const { onFocus } = this.props;
-		if ( onFocus ) {
-			onFocus( focusEvent );
-		}
-	}
+		return () => {
+			defaultView.removeEventListener( 'blur', checkFocus );
+		};
+	}, [] );
 
-	render() {
-		// Disable reason: The rendered iframe is a pass-through component,
-		// assigning props inherited from the rendering parent. It's the
-		// responsibility of the parent to assign a title.
-
-		/* eslint-disable jsx-a11y/iframe-has-title */
-		return (
-			<iframe
-				ref={ this.node }
-				{ ...omit( this.props, [ 'iframeRef', 'onFocus' ] ) }
-			/>
-		);
-		/* eslint-enable jsx-a11y/iframe-has-title */
-	}
+	// Disable reason: The rendered iframe is a pass-through component,
+	// assigning props inherited from the rendering parent. It's the
+	// responsibility of the parent to assign a title.
+	// eslint-disable-next-line jsx-a11y/iframe-has-title
+	return <iframe ref={ ref } { ...props } />;
 }
-
-export default withGlobalEvents( {
-	blur: 'checkFocus',
-} )( FocusableIframe );

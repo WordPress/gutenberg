@@ -47,22 +47,44 @@ import { colorToState, simpleCheckForValidColor, isValidHex } from './utils';
 
 const toLowerCase = ( value ) => String( value ).toLowerCase();
 const isValueEmpty = ( data ) => {
-	if ( data.source === 'hex' && ! data.hex ) {
-		return true;
-	} else if ( data.source === 'hsl' && ( ! data.h || ! data.s || ! data.l ) ) {
-		return true;
-	} else if ( data.source === 'rgb' && (
-		( ! data.r || ! data.g || ! data.b ) &&
-		( ! data.h || ! data.s || ! data.v || ! data.a ) &&
-		( ! data.h || ! data.s || ! data.l || ! data.a )
-	) ) {
+	if ( data.source === 'hex' && data.hex === undefined ) {
 		return true;
 	}
-	return false;
+
+	if (
+		data.source === 'hsl' &&
+		( data.h === undefined || data.s === undefined || data.l === undefined )
+	) {
+		return true;
+	}
+
+	/**
+	 * Check that if source is `rgb`:
+	 * `r`, `g` or `b` properties are not undefined
+	 * OR (||) `h`, `s`, `v` or `a` properties are not undefined
+	 * OR (||) `h`, `s`, `l` or `a` properties are not undefined
+	 *
+	 * before it was checking with NOT(!) statement witch for `0` (bool|int) values returns `true`
+	 * this is a typecasting issue only visible for hex values that derive from #000000
+	 */
+	return (
+		data.source === 'rgb' &&
+		( data.r === undefined ||
+			data.g === undefined ||
+			data.b === undefined ) &&
+		( data.h === undefined ||
+			data.s === undefined ||
+			data.v === undefined ||
+			data.a === undefined ) &&
+		( data.h === undefined ||
+			data.s === undefined ||
+			data.l === undefined ||
+			data.a === undefined )
+	);
 };
-const isValidColor = ( colors ) => colors.hex ?
-	isValidHex( colors.hex ) :
-	simpleCheckForValidColor( colors );
+
+const isValidColor = ( colors ) =>
+	colors.hex ? isValidHex( colors.hex ) : simpleCheckForValidColor( colors );
 
 /**
  * Function that creates the new color object
@@ -126,13 +148,14 @@ export default class ColorPicker extends Component {
 
 		if ( isValidColor( data ) ) {
 			const colors = colorToState( data, data.h || oldHue );
-			this.setState( {
-				...colors,
-				draftHex: toLowerCase( colors.hex ),
-				draftHsl: colors.hsl,
-				draftRgb: colors.rgb,
-			},
-			debounce( partial( onChangeComplete, colors ), 100 )
+			this.setState(
+				{
+					...colors,
+					draftHex: toLowerCase( colors.hex ),
+					draftHsl: colors.hsl,
+					draftRgb: colors.rgb,
+				},
+				debounce( partial( onChangeComplete, colors ), 100 )
 			);
 		}
 	}
@@ -209,7 +232,8 @@ export default class ColorPicker extends Component {
 							<div
 								className="components-color-picker__active"
 								style={ {
-									backgroundColor: color && color.toRgbString(),
+									backgroundColor:
+										color && color.toRgbString(),
 								} }
 							/>
 						</div>

@@ -20,10 +20,7 @@ const withRegistry = createHigherOrderComponent(
 	( OriginalComponent ) => ( props ) => (
 		<RegistryConsumer>
 			{ ( registry ) => (
-				<OriginalComponent
-					{ ...props }
-					registry={ registry }
-				/>
+				<OriginalComponent { ...props } registry={ registry } />
 			) }
 		</RegistryConsumer>
 	),

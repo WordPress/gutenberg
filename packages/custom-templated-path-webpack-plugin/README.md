@@ -2,7 +2,15 @@
 
 Webpack plugin for creating custom path template tags. Extend the [default set of template tags](https://webpack.js.org/configuration/output/#output-filename) with your own custom behavior. Hooks into Webpack's compilation process to allow you to replace tags with a substitute value.
 
-**Note:** This plugin targets Webpack 4.0 and newer, and is not compatible with older versions.
+## Installation
+
+Install the module
+
+```bash
+npm install @wordpress/custom-templated-path-webpack-plugin --save-dev
+```
+
+**Note**: This package requires Node.js 12.0.0 or later. It targets Webpack 4.0 and newer. It is not compatible with older versions.
 
 ## Usage
 
@@ -16,7 +24,7 @@ const CustomTemplatedPathPlugin = require( '@wordpress/custom-templated-path-web
 
 module.exports = {
 	// ...
-	
+
 	entry: './entry',
 
 	output: {

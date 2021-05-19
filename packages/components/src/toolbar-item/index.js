@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { useToolbarItem } from 'reakit/Toolbar';
+import { ToolbarItem as BaseToolbarItem } from 'reakit/Toolbar';
 
 /**
  * WordPress dependencies
@@ -14,22 +14,35 @@ import warning from '@wordpress/warning';
  */
 import ToolbarContext from '../toolbar-context';
 
-function ToolbarItem( { children, ...props }, ref ) {
+function ToolbarItem( { children, as: Component, ...props }, ref ) {
 	const accessibleToolbarState = useContext( ToolbarContext );
-	// https://reakit.io/docs/composition/#props-hooks
-	const itemProps = useToolbarItem( accessibleToolbarState, { ...props, ref } );
 
-	if ( typeof children !== 'function' ) {
-		warning( '`ToolbarItem` is a generic headless component that accepts only function children props' );
+	if ( typeof children !== 'function' && ! Component ) {
+		warning(
+			'`ToolbarItem` is a generic headless component. You must pass either a `children` prop as a function or an `as` prop as a component. ' +
+				'See https://developer.wordpress.org/block-editor/components/toolbar-item/'
+		);
 		return null;
 	}
+
+	const allProps = { ...props, ref, 'data-toolbar-item': true };
 
 	if ( ! accessibleToolbarState ) {
-		warning( '`ToolbarItem` should be rendered within `<Toolbar __experimentalAccessibilityLabel="label">`' );
-		return null;
+		if ( Component ) {
+			return <Component { ...allProps }>{ children }</Component>;
+		}
+		return children( allProps );
 	}
 
-	return children( itemProps );
+	return (
+		<BaseToolbarItem
+			{ ...accessibleToolbarState }
+			{ ...allProps }
+			as={ Component }
+		>
+			{ children }
+		</BaseToolbarItem>
+	);
 }
 
 export default forwardRef( ToolbarItem );

@@ -2,40 +2,41 @@
  * WordPress dependencies
  */
 import {
-	__experimentalBlockNavigationList,
+	__experimentalBlockNavigationTree,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	useSelect,
-	useDispatch,
-} from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 
-export default function BlockNavigationList( { clientId } ) {
-	const {
-		block,
-		selectedBlockClientId,
-	} = useSelect( ( select ) => {
-		const {
-			getSelectedBlockClientId,
-			getBlock,
-		} = select( 'core/block-editor' );
+export default function BlockNavigationList( {
+	clientId,
+	__experimentalFeatures,
+} ) {
+	const { blocks, selectedBlockClientId } = useSelect(
+		( select ) => {
+			const {
+				getSelectedBlockClientId,
+				__unstableGetClientIdsTree,
+			} = select( blockEditorStore );
 
-		return {
-			block: getBlock( clientId ),
-			selectedBlockClientId: getSelectedBlockClientId(),
-		};
-	}, [ clientId ] );
+			return {
+				blocks: __unstableGetClientIdsTree( clientId ),
+				selectedBlockClientId: getSelectedBlockClientId(),
+			};
+		},
+		[ clientId ]
+	);
 
-	const {
-		selectBlock,
-	} = useDispatch( 'core/block-editor' );
+	const { selectBlock } = useDispatch( blockEditorStore );
 
 	return (
-		<__experimentalBlockNavigationList
-			blocks={ [ block ] }
-			selectedBlockClientId={ selectedBlockClientId }
+		<__experimentalBlockNavigationTree
+			blocks={ blocks }
+			selectedBlockClientIds={ [ selectedBlockClientId ] }
 			selectBlock={ selectBlock }
+			__experimentalFeatures={ __experimentalFeatures }
 			showNestedBlocks
 			showAppender
+			showBlockMovers
 		/>
 	);
 }

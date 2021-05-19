@@ -21,7 +21,7 @@ Install the module
 npm install @wordpress/element --save
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 ## Usage
 
@@ -30,16 +30,18 @@ Let's render a customized greeting into an empty element:
 ```html
 <div id="greeting"></div>
 <script>
-function Greeting( props ) {
-	return wp.element.createElement( 'span', null, 
-		'Hello ' + props.toWhom + '!'
-	);
-}
+	function Greeting( props ) {
+		return wp.element.createElement(
+			'span',
+			null,
+			'Hello ' + props.toWhom + '!'
+		);
+	}
 
-wp.element.render(
-	wp.element.createElement( Greeting, { toWhom: 'World' } ),
-	document.getElementById( 'greeting' )
-);
+	wp.element.render(
+		wp.element.createElement( Greeting, { toWhom: 'World' } ),
+		document.getElementById( 'greeting' )
+	);
 </script>
 ```
 
@@ -65,9 +67,12 @@ If you've configured [Babel](http://babeljs.io/) for your project, you can opt i
 ```json
 {
 	"plugins": [
-		[ "transform-react-jsx", {
-			"pragma": "createElement"
-		} ]
+		[
+			"transform-react-jsx",
+			{
+				"pragma": "createElement"
+			}
+		]
 	]
 }
 ```
@@ -138,6 +143,38 @@ _Returns_
 
 -   `WPElement`: Element.
 
+<a name="createInterpolateElement" href="#createInterpolateElement">#</a> **createInterpolateElement**
+
+This function creates an interpolated element from a passed in string with
+specific tags matching how the string should be converted to an element via
+the conversion map value.
+
+_Usage_
+
+For example, for the given string:
+
+"This is a <span>string</span> with <a>a link</a> and a self-closing
+<CustomComponentB/> tag"
+
+You would have something like this as the conversionMap value:
+
+```js
+{
+    span: <span />,
+    a: <a href={ 'https://github.com' } />,
+    CustomComponentB: <CustomComponent />,
+}
+```
+
+_Parameters_
+
+-   _interpolatedString_ `string`: The interpolation string to be parsed.
+-   _conversionMap_ `Object`: The map used to convert the string to a react element.
+
+_Returns_
+
+-   `WPElement`: A wp element.
+
 <a name="createPortal" href="#createPortal">#</a> **createPortal**
 
 Creates a portal into which a component can be rendered.
@@ -148,7 +185,7 @@ _Related_
 
 _Parameters_
 
--   _child_ `WPElement`: Any renderable child, such as an element, string, or fragment.
+-   _child_ `import('./react').WPElement`: Any renderable child, such as an element, string, or fragment.
 -   _container_ `HTMLElement`: DOM node into which element should be rendered.
 
 <a name="createRef" href="#createRef">#</a> **createRef**
@@ -167,7 +204,7 @@ Finds the dom node of a React component.
 
 _Parameters_
 
--   _component_ `WPComponent`: Component's instance.
+-   _component_ `import('./react').WPComponent`: Component's instance.
 
 <a name="forwardRef" href="#forwardRef">#</a> **forwardRef**
 
@@ -233,9 +270,7 @@ This is the same concept as the React Native implementation.
 
 _Related_
 
--   <https://facebook.github.io/react-native/docs/platform-specific-code#platform-module>
-
-Here is an example of how to use the select method:
+-   <https://facebook.github.io/react-native/docs/platform-specific-code#platform-module> Here is an example of how to use the select method:
 
 _Usage_
 
@@ -257,13 +292,11 @@ aside from `children` are passed.
 
 _Parameters_
 
--   _props_ `Object`: 
--   _props.children_ `string`: HTML to render.
--   _props.props_ `Object`: Any additonal props to be set on the containing div.
+-   _props_ `RawHTMLProps`: Children should be a string of HTML. Other props will be passed through to div wrapper.
 
 _Returns_
 
--   `WPComponent`: Dangerously-rendering component.
+-   `JSX.Element`: Dangerously-rendering component.
 
 <a name="render" href="#render">#</a> **render**
 
@@ -271,7 +304,7 @@ Renders a given element into the target DOM node.
 
 _Parameters_
 
--   _element_ `WPElement`: Element to render.
+-   _element_ `import('./react').WPElement`: Element to render.
 -   _target_ `HTMLElement`: DOM node into which element should be rendered.
 
 <a name="renderToString" href="#renderToString">#</a> **renderToString**
@@ -280,9 +313,9 @@ Serializes a React element to string.
 
 _Parameters_
 
--   _element_ `WPElement`: Element to serialize.
--   _context_ `?Object`: Context object.
--   _legacyContext_ `?Object`: Legacy context object.
+-   _element_ `import('react').ReactNode`: Element to serialize.
+-   _context_ `[Object]`: Context object.
+-   _legacyContext_ `[Object]`: Legacy context object.
 
 _Returns_
 

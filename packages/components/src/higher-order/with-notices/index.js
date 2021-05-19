@@ -1,12 +1,12 @@
 /**
  * External dependencies
  */
-import uuid from 'uuid/v4';
+import { v4 as uuid } from 'uuid';
 
 /**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
+import { forwardRef, useState, useMemo } from '@wordpress/element';
 import { createHigherOrderComponent } from '@wordpress/compose';
 
 /**
@@ -22,83 +22,83 @@ import NoticeList from '../../notice/list';
  * @return {WPComponent} Wrapped component.
  */
 export default createHigherOrderComponent( ( OriginalComponent ) => {
-	return class WrappedBlockEdit extends Component {
-		constructor() {
-			super( ...arguments );
+	function Component( props, ref ) {
+		const [ noticeList, setNoticeList ] = useState( [] );
 
-			this.createNotice = this.createNotice.bind( this );
-			this.createErrorNotice = this.createErrorNotice.bind( this );
-			this.removeNotice = this.removeNotice.bind( this );
-			this.removeAllNotices = this.removeAllNotices.bind( this );
-
-			this.state = {
-				noticeList: [],
+		const noticeOperations = useMemo( () => {
+			/**
+			 * Function passed down as a prop that adds a new notice.
+			 *
+			 * @param {Object} notice  Notice to add.
+			 */
+			const createNotice = ( notice ) => {
+				const noticeToAdd = notice.id
+					? notice
+					: { ...notice, id: uuid() };
+				setNoticeList( ( current ) => [ ...current, noticeToAdd ] );
 			};
 
-			this.noticeOperations = {
-				createNotice: this.createNotice,
-				createErrorNotice: this.createErrorNotice,
-				removeAllNotices: this.removeAllNotices,
-				removeNotice: this.removeNotice,
+			return {
+				createNotice,
+
+				/**
+				 * Function passed as a prop that adds a new error notice.
+				 *
+				 * @param {string} msg  Error message of the notice.
+				 */
+				createErrorNotice: ( msg ) => {
+					createNotice( {
+						status: 'error',
+						content: msg,
+					} );
+				},
+
+				/**
+				 * Removes a notice by id.
+				 *
+				 * @param {string} id  Id of the notice to remove.
+				 */
+				removeNotice: ( id ) => {
+					setNoticeList( ( current ) =>
+						current.filter( ( notice ) => notice.id !== id )
+					);
+				},
+
+				/**
+				 * Removes all notices
+				 */
+				removeAllNotices: () => {
+					setNoticeList( [] );
+				},
 			};
-		}
+		}, [] );
 
-		/**
-		 * Function passed down as a prop that adds a new notice.
-		 *
-		 * @param {Object} notice  Notice to add.
-		 */
-		createNotice( notice ) {
-			const noticeToAdd = notice.id ? notice : { ...notice, id: uuid() };
-			this.setState( ( state ) => ( {
-				noticeList: [ ...state.noticeList, noticeToAdd ],
-			} ) );
-		}
-
-		/**
-		 * Function passed as a prop that adds a new error notice.
-		 *
-		 * @param {string} msg  Error message of the notice.
-		 */
-		createErrorNotice( msg ) {
-			this.createNotice( { status: 'error', content: msg } );
-		}
-
-		/**
-		 * Removes a notice by id.
-		 *
-		 * @param {string} id  Id of the notice to remove.
-		 */
-		removeNotice( id ) {
-			this.setState( ( state ) => ( {
-				noticeList: state.noticeList.filter( ( notice ) => notice.id !== id ),
-			} ) );
-		}
-
-		/**
-		 * Removes all notices
-		 */
-		removeAllNotices() {
-			this.setState( {
-				noticeList: [],
-			} );
-		}
-
-		render() {
-			return (
-				<OriginalComponent
-					noticeList={ this.state.noticeList }
-					noticeOperations={ this.noticeOperations }
-					noticeUI={
-						this.state.noticeList.length > 0 && <NoticeList
-							className="components-with-notices-ui"
-							notices={ this.state.noticeList }
-							onRemove={ this.removeNotice }
-						/>
-					}
-					{ ...this.props }
+		const propsOut = {
+			...props,
+			noticeList,
+			noticeOperations,
+			noticeUI: noticeList.length > 0 && (
+				<NoticeList
+					className="components-with-notices-ui"
+					notices={ noticeList }
+					onRemove={ noticeOperations.removeNotice }
 				/>
-			);
-		}
-	};
+			),
+		};
+
+		return isForwardRef ? (
+			<OriginalComponent { ...propsOut } ref={ ref } />
+		) : (
+			<OriginalComponent { ...propsOut } />
+		);
+	}
+
+	let isForwardRef;
+	const { render } = OriginalComponent;
+	// Returns a forwardRef if OriginalComponent appears to be a forwardRef
+	if ( typeof render === 'function' ) {
+		isForwardRef = true;
+		return forwardRef( Component );
+	}
+	return Component;
 } );

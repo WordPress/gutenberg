@@ -2,12 +2,13 @@
 
 exports[`DefaultBlockAppender should append a default block when input focused 1`] = `
 <div
-  className="wp-block block-editor-default-block-appender"
+  className="block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <TextareaAutosize
+  <p
     aria-label="Add block"
-    className="block-editor-default-block-appender__content"
+    className="wp-block block-editor-default-block-appender__content"
+    contentEditable={true}
     onFocus={
       [MockFunction] {
         "calls": Array [
@@ -21,56 +22,64 @@ exports[`DefaultBlockAppender should append a default block when input focused 1
         ],
       }
     }
-    readOnly={true}
     role="button"
-    rows={1}
-    value="Start writing or type / to choose a block"
-  />
+    suppressContentEditableWarning={true}
+    tabIndex="0"
+  >
+    Type / to choose a block
+  </p>
   <WithSelect(WithDispatch(IfCondition(Inserter)))
+    __experimentalIsQuick={true}
     isAppender={true}
-    position="top right"
+    position="bottom right"
   />
 </div>
 `;
 
 exports[`DefaultBlockAppender should match snapshot 1`] = `
 <div
-  className="wp-block block-editor-default-block-appender"
+  className="block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <TextareaAutosize
+  <p
     aria-label="Add block"
-    className="block-editor-default-block-appender__content"
+    className="wp-block block-editor-default-block-appender__content"
+    contentEditable={true}
     onFocus={[MockFunction]}
-    readOnly={true}
     role="button"
-    rows={1}
-    value="Start writing or type / to choose a block"
-  />
+    suppressContentEditableWarning={true}
+    tabIndex="0"
+  >
+    Type / to choose a block
+  </p>
   <WithSelect(WithDispatch(IfCondition(Inserter)))
+    __experimentalIsQuick={true}
     isAppender={true}
-    position="top right"
+    position="bottom right"
   />
 </div>
 `;
 
 exports[`DefaultBlockAppender should optionally show without prompt 1`] = `
 <div
-  className="wp-block block-editor-default-block-appender"
+  className="block-editor-default-block-appender"
   data-root-client-id=""
 >
-  <TextareaAutosize
+  <p
     aria-label="Add block"
-    className="block-editor-default-block-appender__content"
+    className="wp-block block-editor-default-block-appender__content"
+    contentEditable={true}
     onFocus={[MockFunction]}
-    readOnly={true}
     role="button"
-    rows={1}
-    value=""
-  />
+    suppressContentEditableWarning={true}
+    tabIndex="0"
+  >
+    ﻿
+  </p>
   <WithSelect(WithDispatch(IfCondition(Inserter)))
+    __experimentalIsQuick={true}
     isAppender={true}
-    position="top right"
+    position="bottom right"
   />
 </div>
 `;

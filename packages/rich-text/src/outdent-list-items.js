@@ -8,12 +8,14 @@ import { getParentLineIndex } from './get-parent-line-index';
 import { getLastChildIndex } from './get-last-child-index';
 import { canOutdentListItems } from './can-outdent-list-items';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
  * Outdents any selected list items if possible.
  *
- * @param {Object} value Value to change.
+ * @param {RichTextValue} value Value to change.
  *
- * @return {Object} The changed value.
+ * @return {RichTextValue} The changed value.
  */
 export function outdentListItems( value ) {
 	if ( ! canOutdentListItems( value ) ) {
@@ -23,7 +25,8 @@ export function outdentListItems( value ) {
 	const { text, replacements, start, end } = value;
 	const startingLineIndex = getLineIndex( value, start );
 	const newFormats = replacements.slice( 0 );
-	const parentFormats = replacements[ getParentLineIndex( value, startingLineIndex ) ] || [];
+	const parentFormats =
+		replacements[ getParentLineIndex( value, startingLineIndex ) ] || [];
 	const endingLineIndex = getLineIndex( value, end );
 	const lastChildIndex = getLastChildIndex( value, endingLineIndex );
 

@@ -1,0 +1,38 @@
+{
+	"name": "@wordpress/postcss-plugins-preset",
+	"version": "3.0.1",
+	"description": "PostCSS sharable plugins preset for WordPress development.",
+	"author": "The WordPress Contributors",
+	"license": "GPL-2.0-or-later",
+	"keywords": [
+		"wordpress",
+		"gutenberg",
+		"postcss",
+		"css",
+		"plugins",
+		"preset"
+	],
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/postcss-plugins-preset/README.md",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/WordPress/gutenberg.git",
+		"directory": "packages/postcss-plugins-preset"
+	},
+	"bugs": {
+		"url": "https://github.com/WordPress/gutenberg/issues"
+	},
+	"engines": {
+		"node": ">=12"
+	},
+	"files": [
+		"lib"
+	],
+	"main": "lib/index.js",
+	"dependencies": {
+		"@wordpress/base-styles": "file:../base-styles",
+		"autoprefixer": "^10.2.5"
+	},
+	"publishConfig": {
+		"access": "public"
+	}
+}

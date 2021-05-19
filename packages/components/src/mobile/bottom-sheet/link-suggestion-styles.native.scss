@@ -1,0 +1,24 @@
+.titleStyle {
+	text-align: left;
+	font-weight: bold;
+}
+
+.summaryStyle {
+	text-align: left;
+	font-size: 14px;
+	line-height: 20px;
+}
+
+.itemContainerStyle {
+	justify-content: flex-start;
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
+.containerStyle {
+	align-items: flex-start;
+}
+
+.hidden {
+	display: none;
+}

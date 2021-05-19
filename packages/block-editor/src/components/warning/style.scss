@@ -1,33 +1,23 @@
 .block-editor-warning {
+	align-items: center;
 	display: flex;
-	flex-direction: row;
-	justify-content: space-between;
-	flex-wrap: nowrap;
+	flex-wrap: wrap;
+	font-family: $default-font;
+	padding: 1em;
+
+	// Block UI appearance.
+	border: $border-width solid $gray-900;
+	border-radius: $radius-block-ui;
 	background-color: $white;
-	border: $border-width solid $light-gray-500;
-	text-align: left;
-	padding: 10px $block-padding $block-padding;
-
-	.is-selected & {
-		// Use opacity to work in various editor styles.
-		border-color: $dark-opacity-light-800;
-
-		@include break-small {
-			border-left-color: transparent;
-		}
-
-		.is-dark-theme & {
-			border-color: $light-opacity-light-800;
-		}
-	}
 
 	.block-editor-warning__message {
 		line-height: $default-line-height;
 		font-family: $default-font;
 		font-size: $default-font-size;
-		margin: 1em 0;
-
+		color: $gray-900;
+		margin: 0;
 	}
+
 	// Required extra-specifity to override paragraph block styles.
 	p.block-editor-warning__message.block-editor-warning__message {
 		min-height: auto;
@@ -44,32 +34,20 @@
 
 	.block-editor-warning__actions {
 		display: flex;
+		margin-top: 1em;
 	}
 
 	.block-editor-warning__action {
-		margin: 0 6px 0 0;
+		margin: 0 $grid-unit-10 0 0;
 	}
 }
 
 .block-editor-warning__secondary {
-	margin: 5px 0 0 -4px;
-	height: $block-controls-height;
+	margin: auto 0 auto $grid-unit-10;
+}
 
-	// the padding and margin of the more menu is intentionally non-standard
-	.components-button.has-icon {
-		width: auto;
-		padding: 8px 2px;
-	}
-
-	@include break-small() {
-		margin-left: 4px;
-
-		.components-button.has-icon {
-			padding: 8px 4px;
-		}
-	}
-
-	.components-button svg {
-		transform: rotate(90deg);
-	}
+.components-popover.block-editor-warning__dropdown {
+	// Set z-index as if it's displayed on the bottom, otherwise the modal
+	// dialog popover might overlap if displayed on the bottom.
+	z-index: z-index(".components-popover.block-editor-warning__dropdown");
 }

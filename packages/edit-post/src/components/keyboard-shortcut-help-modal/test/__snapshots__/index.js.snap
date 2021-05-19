@@ -15,38 +15,17 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
       ]
     }
   />
-  <ShortcutSection
-    shortcuts={
-      Array [
-        "core/editor/save",
-        "core/editor/undo",
-        "core/editor/redo",
-        "core/edit-post/toggle-sidebar",
-        "core/edit-post/toggle-block-navigation",
-        "core/edit-post/next-region",
-        "core/edit-post/previous-region",
-        "core/block-editor/focus-toolbar",
-        "core/edit-post/toggle-mode",
-      ]
-    }
+  <ShortcutCategorySection
+    categoryName="global"
     title="Global shortcuts"
   />
-  <ShortcutSection
-    shortcuts={
-      Array [
-        "core/block-editor/select-all",
-        "core/block-editor/unselect",
-      ]
-    }
+  <ShortcutCategorySection
+    categoryName="selection"
     title="Selection shortcuts"
   />
-  <ShortcutSection
-    shortcuts={
+  <ShortcutCategorySection
+    additionalShortcuts={
       Array [
-        "core/block-editor/duplicate",
-        "core/block-editor/remove",
-        "core/block-editor/insert-before",
-        "core/block-editor/insert-after",
         Object {
           "ariaLabel": "Forward-slash",
           "description": "Change the block type after adding a new paragraph.",
@@ -56,6 +35,7 @@ exports[`KeyboardShortcutHelpModal should match snapshot when the modal is activ
         },
       ]
     }
+    categoryName="block"
     title="Block shortcuts"
   />
   <ShortcutSection

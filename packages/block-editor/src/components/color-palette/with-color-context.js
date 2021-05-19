@@ -1,4 +1,3 @@
-
 /**
  * External dependencies
  */
@@ -8,23 +7,32 @@ import { isEmpty } from 'lodash';
  * WordPress dependencies
  */
 import { createHigherOrderComponent } from '@wordpress/compose';
-import { withSelect } from '@wordpress/data';
 
-export default createHigherOrderComponent(
-	withSelect(
-		( select, ownProps ) => {
-			const settings = select( 'core/block-editor' ).getSettings();
-			const colors = ownProps.colors === undefined ?
-				settings.colors : ownProps.colors;
+/**
+ * Internal dependencies
+ */
+import useSetting from '../use-setting';
 
-			const disableCustomColors = ownProps.disableCustomColors === undefined ?
-				settings.disableCustomColors : ownProps.disableCustomColors;
-			return {
-				colors,
-				disableCustomColors,
-				hasColorsToChoose: ! isEmpty( colors ) || ! disableCustomColors,
-			};
-		}
-	),
-	'withColorContext'
-);
+export default createHigherOrderComponent( ( WrappedComponent ) => {
+	return ( props ) => {
+		const colorsFeature = useSetting( 'color.palette' );
+		const disableCustomColorsFeature = ! useSetting( 'color.custom' );
+		const colors =
+			props.colors === undefined ? colorsFeature : props.colors;
+		const disableCustomColors =
+			props.disableCustomColors === undefined
+				? disableCustomColorsFeature
+				: props.disableCustomColors;
+		const hasColorsToChoose = ! isEmpty( colors ) || ! disableCustomColors;
+		return (
+			<WrappedComponent
+				{ ...{
+					...props,
+					colors,
+					disableCustomColors,
+					hasColorsToChoose,
+				} }
+			/>
+		);
+	};
+}, 'withColorContext' );

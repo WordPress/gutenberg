@@ -1,10 +1,20 @@
-.wp-social-link {
-	// Frontend outputs a link, backend a button. Both should have the same padding.
-	// Therefore, the following exactly matches the padding on the frontend link.
-	padding: 6px;
+// The editor uses the button component, the frontend uses a link.
+// Therefore we unstyle the button component to make it more like the frontend.
+.wp-block-social-links .wp-social-link {
+	line-height: 0;
+
+	button {
+		font-size: inherit;
+		color: currentColor;
+		height: auto;
+		line-height: 0;
+
+		// This rule is duplicated from the style.scss and needs to be the same as there.
+		padding: 0.25em;
+	}
 }
 
-.wp-block-social-links.is-style-pill-shape .wp-social-link {
-	padding-left: 16px;
-	padding-right: 16px;
+.wp-block-social-links.is-style-pill-shape .wp-social-link button {
+	padding-left: calc((2/3) * 1em);
+	padding-right: calc((2/3) * 1em);
 }

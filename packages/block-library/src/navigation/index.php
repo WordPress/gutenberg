@@ -12,7 +12,7 @@
  * @param  array $attributes Navigation block attributes.
  * @return array Colors CSS classes and inline styles.
  */
-function build_css_colors( $attributes ) {
+function block_core_navigation_build_css_colors( $attributes ) {
 	$colors = array(
 		'css_classes'   => array(),
 		'inline_styles' => '',
@@ -42,8 +42,8 @@ function build_css_colors( $attributes ) {
 
 	// If has background color.
 	if ( $has_custom_background_color || $has_named_background_color ) {
-		// Add has-background-color class.
-		$colors['css_classes'][] = 'has-background-color';
+		// Add has-background class.
+		$colors['css_classes'][] = 'has-background';
 	}
 
 	if ( $has_named_background_color ) {
@@ -64,7 +64,7 @@ function build_css_colors( $attributes ) {
  * @param  array $attributes Navigation block attributes.
  * @return array Font size CSS classes and inline styles.
  */
-function build_css_font_sizes( $attributes ) {
+function block_core_navigation_build_css_font_sizes( $attributes ) {
 	// CSS classes.
 	$font_sizes = array(
 		'css_classes'   => array(),
@@ -86,28 +86,12 @@ function build_css_font_sizes( $attributes ) {
 }
 
 /**
- * Recursively filters out links with no labels to build a clean navigation block structure.
+ * Returns the top-level submenu SVG chevron icon.
  *
- * @param array $blocks Navigation link inner blocks from the Navigation block.
- * @return array Blocks that had valid labels
+ * @return string
  */
-function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
-	$blocks = array_filter(
-		$blocks,
-		function( $block ) {
-			return ! empty( $block['attrs']['label'] );
-		}
-	);
-
-	if ( ! empty( $blocks ) ) {
-		foreach ( $blocks as $key => $block ) {
-			if ( ! empty( $block['innerBlocks'] ) ) {
-				$blocks[ $key ]['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
-			}
-		}
-	}
-
-	return $blocks;
+function block_core_navigation_render_submenu_icon() {
+	return '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none" role="img" aria-hidden="true" focusable="false"><path d="M1.50002 4L6.00002 8L10.5 4" stroke-width="1.5"></path></svg>';
 }
 
 /**
@@ -119,155 +103,145 @@ function gutenberg_remove_empty_navigation_links_recursive( $blocks ) {
  *
  * @return string Returns the post content with the legacy widget added.
  */
-function render_block_navigation( $attributes, $content, $block ) {
-	$block['innerBlocks'] = gutenberg_remove_empty_navigation_links_recursive( $block['innerBlocks'] );
+function render_block_core_navigation( $attributes, $content, $block ) {
+	/**
+	 * Deprecated:
+	 * The rgbTextColor and rgbBackgroundColor attributes
+	 * have been deprecated in favor of
+	 * customTextColor and customBackgroundColor ones.
+	 * Move the values from old attrs to the new ones.
+	 */
+	if ( isset( $attributes['rgbTextColor'] ) && empty( $attributes['textColor'] ) ) {
+		$attributes['customTextColor'] = $attributes['rgbTextColor'];
+	}
 
-	if ( empty( $block['innerBlocks'] ) ) {
+	if ( isset( $attributes['rgbBackgroundColor'] ) && empty( $attributes['backgroundColor'] ) ) {
+		$attributes['customBackgroundColor'] = $attributes['rgbBackgroundColor'];
+	}
+
+	unset( $attributes['rgbTextColor'], $attributes['rgbBackgroundColor'] );
+	$should_load_frontend_script = $attributes['isResponsive'] && ! wp_script_is( 'core_block_navigation_load_frontend_scripts' );
+
+	if ( $should_load_frontend_script ) {
+		wp_enqueue_script(
+			'core_block_navigation_load_frontend_scripts',
+			plugins_url( 'frontend.js', __DIR__ . '/navigation/frontend.js' ),
+			array(),
+			false,
+			true
+		);
+	}
+
+	if ( empty( $block->inner_blocks ) ) {
 		return '';
 	}
 
-	$colors          = build_css_colors( $attributes );
-	$font_sizes      = build_css_font_sizes( $attributes );
-	$classes         = array_merge(
+	$colors     = block_core_navigation_build_css_colors( $attributes );
+	$font_sizes = block_core_navigation_build_css_font_sizes( $attributes );
+	$classes    = array_merge(
 		$colors['css_classes'],
 		$font_sizes['css_classes'],
-		array( 'wp-block-navigation' ),
-		isset( $attributes['className'] ) ? array( $attributes['className'] ) : array(),
+		( isset( $attributes['orientation'] ) && 'vertical' === $attributes['orientation'] ) ? array( 'is-vertical' ) : array(),
 		isset( $attributes['itemsJustification'] ) ? array( 'items-justified-' . $attributes['itemsJustification'] ) : array(),
-		isset( $attributes['align'] ) ? array( 'align' . $attributes['align'] ) : array()
+		isset( $attributes['isResponsive'] ) && true === $attributes['isResponsive'] ? array( 'is-responsive' ) : array()
 	);
-	$class_attribute = sprintf( ' class="%s"', esc_attr( implode( ' ', $classes ) ) );
-	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )
-		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
-		: '';
+
+	$inner_blocks_html = '';
+	foreach ( $block->inner_blocks as $inner_block ) {
+		$inner_blocks_html .= $inner_block->render();
+	}
+
+	$block_styles = isset( $attributes['styles'] ) ? $attributes['styles'] : '';
+
+	$wrapper_attributes = get_block_wrapper_attributes(
+		array(
+			'class' => implode( ' ', $classes ),
+			'style' => $block_styles . $colors['inline_styles'] . $font_sizes['inline_styles'],
+		)
+	);
+
+	$modal_unique_id = uniqid();
+
+	// Determine whether or not navigation elements should be wrapped in the markup required to make it responsive,
+	// return early if they don't.
+	if ( ! isset( $attributes['isResponsive'] ) || false === $attributes['isResponsive'] ) {
+		return sprintf(
+			'<nav %1$s><ul class="wp-block-navigation__container">%2$s</ul></nav>',
+			$wrapper_attributes,
+			$inner_blocks_html
+		);
+	}
+
+	$responsive_container_markup = sprintf(
+		'<button aria-expanded="false" aria-haspopup="true" aria-label="%3$s" class="wp-block-navigation__responsive-container-open" data-micromodal-trigger="modal-%1$s"><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" role="img" aria-hidden="true" focusable="false"><rect x="4" y="7.5" width="16" height="1.5" /><rect x="4" y="15" width="16" height="1.5" /></svg></button>
+			<div class="wp-block-navigation__responsive-container" id="modal-%1$s" aria-hidden="true">
+				<div class="wp-block-navigation__responsive-close" tabindex="-1" data-micromodal-close>
+					<div class="wp-block-navigation__responsive-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-%1$s-title" >
+							<button aria-label="%4$s" data-micromodal-close class="wp-block-navigation__responsive-container-close"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24" role="img" aria-hidden="true" focusable="false"><path d="M13 11.8l6.1-6.3-1-1-6.1 6.2-6.1-6.2-1 1 6.1 6.3-6.5 6.7 1 1 6.5-6.6 6.5 6.6 1-1z"></path></svg></button>
+						<div class="wp-block-navigation__responsive-container-content" id="modal-%1$s-content">
+							<ul class="wp-block-navigation__container">%2$s</ul>
+						</div>
+					</div>
+				</div>
+			</div>',
+		$modal_unique_id,
+		$inner_blocks_html,
+		__( 'Open menu' ), // Open button label.
+		__( 'Close menu' ) // Close button label.
+	);
 
 	return sprintf(
-		'<nav %1$s %2$s>%3$s</nav>',
-		$class_attribute,
-		$style_attribute,
-		build_navigation_html( $block, $colors, $font_sizes )
+		'<nav %1$s>%2$s</nav>',
+		$wrapper_attributes,
+		$responsive_container_markup
 	);
-}
-
-/**
- * Walks the inner block structure and returns an HTML list for it.
- *
- * @param array $block      The block.
- * @param array $colors     Contains inline styles and CSS classes to apply to navigation item.
- * @param array $font_sizes Contains inline styles and CSS classes to apply to navigation item.
- * @param bool  $level_zero True whether is main menu (level zero). Otherwise, False.
- *
- * @return string Returns  an HTML list from innerBlocks.
- */
-function build_navigation_html( $block, $colors, $font_sizes, $level_zero = true ) {
-	$html            = '';
-	$classes         = array_merge(
-		$colors['css_classes'],
-		$font_sizes['css_classes']
-	);
-	$css_classes     = implode( ' ', $classes );
-	$class_attribute = sprintf( ' class="wp-block-navigation-link__content %s"', esc_attr( trim( $css_classes ) ) );
-	$style_attribute = ( $colors['inline_styles'] || $font_sizes['inline_styles'] )
-		? sprintf( ' style="%s"', esc_attr( $colors['inline_styles'] ) . esc_attr( $font_sizes['inline_styles'] ) )
-		: '';
-
-	foreach ( (array) $block['innerBlocks'] as $key => $block ) {
-
-		$html .= '<li class="wp-block-navigation-link">' .
-			'<a';
-
-		if ( $level_zero ) {
-			$html .= $class_attribute . $style_attribute;
-		}
-
-		// Start appending HTML attributes to anchor tag.
-		if ( isset( $block['attrs']['url'] ) ) {
-			$html .= ' href="' . esc_url( $block['attrs']['url'] ) . '"';
-		}
-		if ( isset( $block['attrs']['title'] ) ) {
-			$html .= ' title="' . esc_attr( $block['attrs']['title'] ) . '"';
-		}
-
-		if ( isset( $block['attrs']['opensInNewTab'] ) && true === $block['attrs']['opensInNewTab'] ) {
-			$html .= ' target="_blank"  ';
-		}
-		// End appending HTML attributes to anchor tag.
-
-		// Start anchor tag content.
-		$html .= '>';
-		if ( isset( $block['attrs']['label'] ) ) {
-			$html .= wp_kses(
-				$block['attrs']['label'],
-				array(
-					'code'   => array(),
-					'em'     => array(),
-					'img'    => array(
-						'scale' => array(),
-						'class' => array(),
-						'style' => array(),
-						'src'   => array(),
-						'alt'   => array(),
-					),
-					's'      => array(),
-					'span'   => array(
-						'style' => array(),
-					),
-					'strong' => array(),
-				)
-			);
-		}
-		$html .= '</a>';
-		// End anchor tag content.
-
-		if ( count( (array) $block['innerBlocks'] ) > 0 ) {
-			$html .= build_navigation_html( $block, $colors, $font_sizes, false );
-		}
-
-		$html .= '</li>';
-	}
-	return '<ul>' . $html . '</ul>';
 }
 
 /**
  * Register the navigation block.
  *
- * @uses render_block_navigation()
+ * @uses render_block_core_navigation()
  * @throws WP_Error An WP_Error exception parsing the block definition.
  */
 function register_block_core_navigation() {
-
-	register_block_type(
-		'core/navigation',
+	register_block_type_from_metadata(
+		__DIR__ . '/navigation',
 		array(
-			'attributes'      => array(
-				'className'             => array(
-					'type' => 'string',
-				),
-				'textColor'             => array(
-					'type' => 'string',
-				),
-				'customTextColor'       => array(
-					'type' => 'string',
-				),
-				'backgroundColor'       => array(
-					'type' => 'string',
-				),
-				'customBackgroundColor' => array(
-					'type' => 'string',
-				),
-				'fontSize'              => array(
-					'type' => 'string',
-				),
-				'customFontSize'        => array(
-					'type' => 'number',
-				),
-				'itemsJustification'    => array(
-					'type' => 'string',
-				),
-			),
-
-			'render_callback' => 'render_block_navigation',
+			'render_callback' => 'render_block_core_navigation',
 		)
 	);
 }
+
 add_action( 'init', 'register_block_core_navigation' );
+
+/**
+ * Filter that changes the parsed attribute values of navigation blocks contain typographic presets to contain the values directly.
+ *
+ * @param array $parsed_block The block being rendered.
+ * @return array The block being rendered without typographic presets.
+ */
+function block_core_navigation_typographic_presets_backcompatibility( $parsed_block ) {
+	if ( 'core/navigation' === $parsed_block['blockName'] ) {
+		$attribute_to_prefix_map = array(
+			'fontStyle'      => 'var:preset|font-style|',
+			'fontWeight'     => 'var:preset|font-weight|',
+			'textDecoration' => 'var:preset|text-decoration|',
+			'textTransform'  => 'var:preset|text-transform|',
+		);
+		foreach ( $attribute_to_prefix_map as $style_attribute => $prefix ) {
+			if ( ! empty( $parsed_block['attrs']['style']['typography'][ $style_attribute ] ) ) {
+				$prefix_len      = strlen( $prefix );
+				$attribute_value = &$parsed_block['attrs']['style']['typography'][ $style_attribute ];
+				if ( 0 === strncmp( $attribute_value, $prefix, $prefix_len ) ) {
+					$attribute_value = substr( $attribute_value, $prefix_len );
+				}
+				if ( 'textDecoration' === $style_attribute && 'strikethrough' === $attribute_value ) {
+					$attribute_value = 'line-through';
+				}
+			}
+		}
+	}
+	return $parsed_block;
+}
+
+add_filter( 'render_block_data', 'block_core_navigation_typographic_presets_backcompatibility' );

@@ -10,8 +10,12 @@ import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { parse } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
-import { addAction, removeAction } from '@wordpress/hooks';
-import { withInstanceId, compose, withPreferredColorScheme } from '@wordpress/compose';
+import { addFilter, removeFilter } from '@wordpress/hooks';
+import {
+	withInstanceId,
+	compose,
+	withPreferredColorScheme,
+} from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -25,7 +29,12 @@ export class HTMLTextInput extends Component {
 
 		this.edit = this.edit.bind( this );
 		this.stopEditing = this.stopEditing.bind( this );
-		addAction( 'native-editor.persist-html', 'core/editor', this.stopEditing );
+		this.getHTMLForParent = this.getHTMLForParent.bind( this );
+		addFilter(
+			'native.persist-html',
+			'html-text-input',
+			this.getHTMLForParent
+		);
 
 		this.state = {};
 	}
@@ -42,7 +51,7 @@ export class HTMLTextInput extends Component {
 	}
 
 	componentWillUnmount() {
-		removeAction( 'native-editor.persist-html', 'core/editor' );
+		removeFilter( 'native.persist-html', 'html-text-input' );
 		//TODO: Blocking main thread
 		this.stopEditing();
 	}
@@ -50,6 +59,10 @@ export class HTMLTextInput extends Component {
 	edit( html ) {
 		this.props.onChange( html );
 		this.setState( { value: html, isDirty: true } );
+	}
+
+	getHTMLForParent() {
+		return this.state.value;
 	}
 
 	stopEditing() {
@@ -61,8 +74,14 @@ export class HTMLTextInput extends Component {
 
 	render() {
 		const { getStylesFromColorScheme } = this.props;
-		const htmlStyle = getStylesFromColorScheme( styles.htmlView, styles.htmlViewDark );
-		const placeholderStyle = getStylesFromColorScheme( styles.placeholder, styles.placeholderDark );
+		const htmlStyle = getStylesFromColorScheme(
+			styles.htmlView,
+			styles.htmlViewDark
+		);
+		const placeholderStyle = getStylesFromColorScheme(
+			styles.placeholder,
+			styles.placeholderDark
+		);
 		return (
 			<HTMLInputContainer parentHeight={ this.props.parentHeight }>
 				<TextInput
@@ -96,10 +115,9 @@ export class HTMLTextInput extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			getEditedPostAttribute,
-			getEditedPostContent,
-		} = select( 'core/editor' );
+		const { getEditedPostAttribute, getEditedPostContent } = select(
+			'core/editor'
+		);
 
 		return {
 			title: getEditedPostAttribute( 'title' ),

@@ -1,39 +1,57 @@
-module.exports = {
-	parser: 'babel-eslint',
+/**
+ * External dependencies
+ */
+const { cosmiconfigSync } = require( 'cosmiconfig' );
+
+/**
+ * WordPress dependencies
+ */
+const defaultPrettierConfig = require( '@wordpress/prettier-config' );
+
+/**
+ * Internal dependencies
+ */
+const { isPackageInstalled } = require( '../utils' );
+
+const { config: localPrettierConfig } =
+	cosmiconfigSync( 'prettier' ).search() || {};
+const prettierConfig = { ...defaultPrettierConfig, ...localPrettierConfig };
+
+const config = {
 	extends: [
-		require.resolve( './jsx-a11y.js' ),
-		require.resolve( './custom.js' ),
-		require.resolve( './react.js' ),
-		require.resolve( './esnext.js' ),
+		require.resolve( './recommended-with-formatting.js' ),
+		'plugin:prettier/recommended',
+		'prettier/react',
 	],
-	env: {
-		node: true,
+	rules: {
+		'prettier/prettier': [ 'error', prettierConfig ],
 	},
-	globals: {
-		window: true,
-		document: true,
-		wp: 'readonly',
-	},
-	overrides: [
-		{
-			// Unit test files and their helpers only.
-			files: [
-				'**/@(test|__tests__)/**/*.js',
-				'**/?(*.)test.js',
-			],
-			extends: [
-				require.resolve( './test-unit.js' ),
-			],
-		},
-		{
-			// End-to-end test files and their helpers only.
-			files: [
-				'**/specs/**/*.js',
-				'**/?(*.)spec.js',
-			],
-			extends: [
-				require.resolve( './test-e2e.js' ),
-			],
-		},
-	],
 };
+
+if ( isPackageInstalled( 'typescript' ) ) {
+	config.settings = {
+		'import/resolver': {
+			node: {
+				extensions: [ '.js', '.jsx', '.ts', '.tsx' ],
+			},
+		},
+		'import/core-modules': [ 'react' ],
+	};
+	config.extends.push( 'plugin:@typescript-eslint/eslint-recommended' );
+	config.ignorePatterns = [ '**/*.d.ts' ];
+	config.overrides = [
+		{
+			files: [ '**/*.ts', '**/*.tsx' ],
+			parser: '@typescript-eslint/parser',
+			rules: {
+				// Don't require redundant JSDoc types in TypeScript files.
+				'jsdoc/require-param-type': 'off',
+				'jsdoc/require-returns-type': 'off',
+				// handled by TS itself
+				'no-unused-vars': 'off',
+			},
+		},
+	];
+}
+
+module.exports = config;

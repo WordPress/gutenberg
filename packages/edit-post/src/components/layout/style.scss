@@ -2,7 +2,7 @@
 	flex-shrink: 0;
 }
 .edit-post-layout__metaboxes:not(:empty) {
-	border-top: $border-width solid $light-gray-500;
+	border-top: $border-width solid $gray-300;
 	padding: 10px 0 10px;
 	clear: both;
 
@@ -15,7 +15,7 @@
 .edit-post-layout .components-editor-notices__snackbar {
 	position: fixed;
 	right: 0;
-	bottom: 20px;
+	bottom: 40px;
 	padding-left: 16px;
 	padding-right: 16px;
 }
@@ -31,11 +31,11 @@
 	overflow: auto;
 
 	@include break-medium() {
-		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel-break-medium");
+		z-index: z-index(".edit-post-layout .edit-post-post-publish-panel {greater than small}");
 		top: $admin-bar-height;
 		left: auto;
-		width: $sidebar-width;
-		border-left: $border-width solid $light-gray-500;
+		width: $sidebar-width + $border-width;
+		border-left: $border-width solid $gray-300;
 		transform: translateX(+100%);
 		animation: edit-post-post-publish-panel__slide-in-animation 0.1s forwards;
 		@include reduce-motion("animation");
@@ -45,7 +45,7 @@
 		}
 
 		// Keep it open on focus to avoid conflict with navigate-regions animation.
-		.is-focusing-regions & {
+		[role="region"]:focus & {
 			transform: translateX(0%);
 		}
 	}
@@ -61,45 +61,31 @@
 	justify-content: center;
 }
 
-.edit-post-toggle-publish-panel {
+
+.edit-post-layout__toggle-publish-panel,
+.edit-post-layout__toggle-sidebar-panel,
+.edit-post-layout__toggle-entities-saved-states-panel {
+	z-index: z-index(".edit-post-layout__toggle-sidebar-panel");
+	position: fixed !important; // Need to override the default relative positionning
+	top: -9999em;
+	bottom: auto;
+	left: auto;
+	right: 0;
+	width: $sidebar-width;
 	background-color: $white;
-	padding: 10px 10px 10px 0;
+	border: 1px dotted $gray-300;
+	height: auto !important; // Need to override the default sidebar positionnings
+	padding: $grid-unit-30;
+	display: flex;
+	justify-content: center;
 
-	.edit-post-toggle-publish-panel__button {
-		width: auto;
-		height: auto;
-		display: block;
-		font-size: 14px;
-		font-weight: 600;
-		margin: 0 0 0 auto;
-		padding: 15px 23px 14px;
-		line-height: normal;
-		text-decoration: none;
-		outline: none;
-		background: #f1f1f1;
-		color: theme(secondary);
-
-		&:focus {
-			position: fixed;
-			top: auto;
-			right: 10px;
-			bottom: 10px;
-			left: auto;
-		}
+	.interface-interface-skeleton__actions:focus &,
+	.interface-interface-skeleton__actions:focus-within & {
+		top: auto;
+		bottom: 0;
 	}
 }
 
-.edit-post-layout__footer {
-	display: none;
-	z-index: z-index(".edit-post-layout__footer");
-
-	// Stretch to mimic outline padding on desktop.
-	@include break-medium() {
-		display: flex;
-		background: $white;
-		height: $footer-height;
-		padding: 0 $grid-size;
-		align-items: center;
-		font-size: $default-font-size;
-	}
+.edit-post-layout .interface-interface-skeleton__content {
+	background-color: $gray-800;
 }

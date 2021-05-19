@@ -1,8 +1,13 @@
 .wp-block-media-text {
+	// This block's direction should not be manipulated by rtl, as the mediaPosition control does.
+	/*!rtl:begin:ignore*/
+	direction: ltr;
+	/*!rtl:end:ignore*/
 	display: grid;
-	grid-template-rows: auto;
 	grid-template-columns: 50% 1fr;
-	.has-media-on-the-right {
+	grid-template-rows: auto;
+
+	&.has-media-on-the-right {
 		grid-template-columns: 1fr 50%;
 	}
 }
@@ -29,42 +34,56 @@
 }
 
 .wp-block-media-text .wp-block-media-text__media {
+	/*!rtl:begin:ignore*/
 	grid-column: 1;
 	grid-row: 1;
+	/*!rtl:end:ignore*/
 	margin: 0;
 }
 
 .wp-block-media-text .wp-block-media-text__content {
+	direction: ltr;
+	/*!rtl:begin:ignore*/
 	grid-column: 2;
 	grid-row: 1;
-	word-break: break-word;
+	/*!rtl:end:ignore*/
 	padding: 0 8% 0 8%;
+	word-break: break-word;
 }
 
 .wp-block-media-text.has-media-on-the-right .wp-block-media-text__media {
+	/*!rtl:begin:ignore*/
 	grid-column: 2;
 	grid-row: 1;
+	/*!rtl:end:ignore*/
 }
 
 .wp-block-media-text.has-media-on-the-right .wp-block-media-text__content {
+	/*!rtl:begin:ignore*/
 	grid-column: 1;
 	grid-row: 1;
+	/*!rtl:end:ignore*/
 }
 
-.wp-block-media-text > figure > img,
-.wp-block-media-text > figure > video {
+.wp-block-media-text__media img,
+.wp-block-media-text__media video {
 	max-width: unset;
 	width: 100%;
 	vertical-align: middle;
 }
 
-.wp-block-media-text.is-image-fill figure.wp-block-media-text__media {
+.wp-block-media-text.is-image-fill .wp-block-media-text__media {
 	height: 100%;
 	min-height: 250px;
 	background-size: cover;
 }
 
-.wp-block-media-text.is-image-fill figure.wp-block-media-text__media > img {
+.wp-block-media-text.is-image-fill .wp-block-media-text__media > a {
+	display: block;
+	height: 100%;
+}
+
+.wp-block-media-text.is-image-fill .wp-block-media-text__media img {
 	// The image is visually hidden but accessible to assistive technologies.
 	position: absolute;
 	width: 1px;
@@ -92,17 +111,6 @@
 		.wp-block-media-text__content {
 			grid-column: 1;
 			grid-row: 2;
-		}
-	}
-
-	.wp-block-media-text.is-stacked-on-mobile.has-media-on-the-right {
-		.wp-block-media-text__media {
-			grid-column: 1;
-			grid-row: 2;
-		}
-		.wp-block-media-text__content {
-			grid-column: 1;
-			grid-row: 1;
 		}
 	}
 }

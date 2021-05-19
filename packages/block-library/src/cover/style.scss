@@ -1,16 +1,16 @@
 .wp-block-cover-image,
 .wp-block-cover {
 	position: relative;
-	background-color: $black;
 	background-size: cover;
 	background-position: center center;
 	min-height: 430px;
-	height: 100%;
 	width: 100%;
 	display: flex;
 	justify-content: center;
 	align-items: center;
-	overflow: hidden;
+	padding: 1em;
+	// This block has customizable padding, border-box makes that more predictable.
+	box-sizing: border-box;
 
 	&.has-parallax {
 		background-attachment: fixed;
@@ -28,6 +28,25 @@
 		}
 	}
 
+	&.is-repeated {
+		background-repeat: repeat;
+		background-size: auto;
+	}
+
+	/**
+	 * Set a default background color for has-background-dim _unless_ it includes another
+	 * background-color class (e.g. has-green-background-color). The presence of another
+	 * background-color class implies that another style will provide the background color
+	 * for the overlay.
+	 *
+	 * See:
+	 *   - Issue with background color specificity: https://github.com/WordPress/gutenberg/issues/26545
+	 *   - Issue with alternative fix: https://github.com/WordPress/gutenberg/issues/26545
+	 */
+	&.has-background-dim:not([class*="-background-color"]) {
+		background-color: $black;
+	}
+
 	&.has-background-dim::before {
 		content: "";
 		background-color: inherit;
@@ -41,19 +60,13 @@
 		bottom: 0;
 		right: 0;
 		z-index: z-index(".wp-block-cover.has-background-dim::before");
-	}
-
-	&.has-background-dim:not(.has-background-gradient)::before,
-	& .wp-block-cover__gradient-background {
 		opacity: 0.5;
 	}
 
 
 	@for $i from 1 through 10 {
 		&.has-background-dim.has-background-dim-#{ $i * 10 } {
-			&:not(.has-background-gradient)::before {
-				opacity: $i * 0.1;
-			}
+			&:not(.has-background-gradient)::before,
 			.wp-block-cover__gradient-background {
 				opacity: $i * 0.1;
 			}
@@ -89,9 +102,9 @@
 	}
 
 	.wp-block-cover__inner-container {
-		width: calc(100% - 70px);
+		width: 100%;
 		z-index: z-index(".wp-block-cover__inner-container");
-		color: $light-gray-100;
+		color: $white;
 	}
 
 	p,
@@ -100,26 +113,89 @@
 	h3,
 	h4,
 	h5,
-	h6,
-	.wp-block-subhead {
+	h6 {
 		&:not(.has-text-color) {
 			color: inherit;
 		}
 	}
+
+	// Position: Top
+	&.is-position-top-left {
+		align-items: flex-start;
+		justify-content: flex-start;
+	}
+	&.is-position-top-center {
+		align-items: flex-start;
+		justify-content: center;
+	}
+	&.is-position-top-right {
+		align-items: flex-start;
+		justify-content: flex-end;
+	}
+	// Position: Center
+	&.is-position-center-left {
+		align-items: center;
+		justify-content: flex-start;
+	}
+	&.is-position-center-center {
+		align-items: center;
+		justify-content: center;
+	}
+	&.is-position-center-right {
+		align-items: center;
+		justify-content: flex-end;
+	}
+	// Position: Bottom
+	&.is-position-bottom-left {
+		align-items: flex-end;
+		justify-content: flex-start;
+	}
+	&.is-position-bottom-center {
+		align-items: flex-end;
+		justify-content: center;
+	}
+	&.is-position-bottom-right {
+		align-items: flex-end;
+		justify-content: flex-end;
+	}
+
+	&.has-custom-content-position.has-custom-content-position {
+		.wp-block-cover__inner-container {
+			margin: 0;
+			width: auto;
+		}
+	}
+
+	// Extra specificity for in edit mode where other styles would override it otherwise.
+	img.wp-block-cover__image-background,
+	video.wp-block-cover__video-background {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: 0;
+		padding: 0;
+		width: 100%;
+		height: 100%;
+		max-width: none;
+		max-height: none;
+		object-fit: cover;
+		outline: none;
+		border: none;
+		box-shadow: none;
+	}
 }
 
 .wp-block-cover__video-background {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	transform: translateX(-50%) translateY(-50%);
-	width: 100%;
-	height: 100%;
 	z-index: z-index(".wp-block-cover__video-background");
-	object-fit: cover;
 }
 
-// Styles bellow only exist to support older versions of the block.
+.wp-block-cover__image-background {
+	z-index: z-index(".wp-block-cover__image-background");
+}
+
+// Styles below only exist to support older versions of the block.
 // Versions that not had inner blocks and used an h2 heading had a section (and not a div) with a class wp-block-cover-image (and not a wp-block-cover).
 // We are using the previous referred differences to target old versions.
 
@@ -168,6 +244,6 @@ section.wp-block-cover-image > h2,
 	z-index: 1;
 	margin-bottom: 0;
 	max-width: $content-width;
-	padding: $block-padding;
+	padding: 0.44em;
 	text-align: center;
 }

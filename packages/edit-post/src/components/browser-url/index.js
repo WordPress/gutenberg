@@ -52,7 +52,11 @@ export class BrowserURL extends Component {
 			return;
 		}
 
-		if ( ( postId !== prevProps.postId || postId !== historyId ) && postStatus !== 'auto-draft' ) {
+		if (
+			( postId !== prevProps.postId || postId !== historyId ) &&
+			postStatus !== 'auto-draft' &&
+			postId
+		) {
 			this.setBrowserURL( postId );
 		}
 	}
@@ -95,7 +99,12 @@ export class BrowserURL extends Component {
 
 export default withSelect( ( select ) => {
 	const { getCurrentPost, isSavingPost } = select( 'core/editor' );
-	const { id, status, type } = getCurrentPost();
+	const post = getCurrentPost();
+	let { id, status, type } = post;
+	const isTemplate = [ 'wp_template', 'wp_template_part' ].includes( type );
+	if ( isTemplate ) {
+		id = post.wp_id;
+	}
 
 	return {
 		postId: id,

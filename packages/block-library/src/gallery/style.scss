@@ -10,12 +10,20 @@
 	.blocks-gallery-image,
 	.blocks-gallery-item {
 		// Add space between thumbnails, and unset right most thumbnails later.
-		margin: 0 $grid-size-large $grid-size-large 0;
+		margin: 0 1em 1em 0;
 		display: flex;
 		flex-grow: 1;
 		flex-direction: column;
 		justify-content: center;
 		position: relative;
+		align-self: flex-start;
+
+		// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
+		width: calc(50% - 1em);
+
+		&:nth-of-type(even) {
+			margin-right: 0;
+		}
 
 		figure {
 			margin: 0;
@@ -33,10 +41,8 @@
 			display: block;
 			max-width: 100%;
 			height: auto;
-		}
 
-		// IE doesn't handle cropping, so we need an explicit width here.
-		img {
+			// IE doesn't handle cropping, so we need an explicit width here.
 			width: 100%;
 
 			// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
@@ -51,11 +57,13 @@
 			width: 100%;
 			max-height: 100%;
 			overflow: auto;
-			padding: 40px 10px 9px;
+			padding: 3em 0.77em 0.7em;
 			color: $white;
 			text-align: center;
-			font-size: $default-font-size;
+			font-size: 0.8em;
 			background: linear-gradient(0deg, rgba($color: $black, $alpha: 0.7) 0, rgba($color: $black, $alpha: 0.3) 70%, transparent);
+			box-sizing: border-box;
+			margin: 0;
 
 			img {
 				display: inline;
@@ -63,9 +71,15 @@
 		}
 	}
 
+	figcaption {
+		flex-grow: 1;
+	}
+
 	// Cropped
 	&.is-cropped .blocks-gallery-image,
 	&.is-cropped .blocks-gallery-item {
+		align-self: inherit;
+
 		a,
 		img {
 			// IE11 doesn't support object-fit, so just make sure images aren't skewed.
@@ -81,16 +95,6 @@
 		}
 	}
 
-	// On mobile and responsive viewports, we allow only 1 or 2 columns at the most.
-	& .blocks-gallery-image,
-	& .blocks-gallery-item {
-		width: calc((100% - #{ $grid-size-large }) / 2);
-
-		&:nth-of-type(even) {
-			margin-right: 0;
-		}
-	}
-
 	&.columns-1 .blocks-gallery-image,
 	&.columns-1 .blocks-gallery-item {
 		width: 100%;
@@ -102,15 +106,8 @@
 		@for $i from 3 through 8 {
 			&.columns-#{ $i } .blocks-gallery-image,
 			&.columns-#{ $i } .blocks-gallery-item {
-				width: calc((100% - #{ $grid-size-large } * #{ $i - 1 }) / #{ $i });
-				margin-right: 16px;
-
-				// Rules inside this query are only run by Microsoft Edge.
-				// Edge miscalculates `calc`, so we have to add some buffer.
-				// See also https://developer.microsoft.com/en-us/microsoft-edge/platform/issues/15637241/
-				@supports (-ms-ime-align:auto) {
-					width: calc((100% - #{ $grid-size-large } * #{ $i - 1 }) / #{ $i } - 1px);
-				}
+				width: calc(#{ 100% / $i } - #{ 1em * ( $i - 1 ) / $i });
+				margin-right: 1em;
 			}
 		}
 
@@ -143,4 +140,3 @@
 		}
 	}
 }
-

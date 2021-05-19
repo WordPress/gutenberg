@@ -1,7 +1,7 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { parse } from 'qs';
+import { getQueryArgs } from './get-query-args';
 
 /**
  * @typedef {{[key: string]: QueryArgParsed}} QueryArgObject
@@ -22,11 +22,8 @@ import { parse } from 'qs';
  * const foo = getQueryArg( 'https://wordpress.org?foo=bar&bar=baz', 'foo' ); // bar
  * ```
  *
- * @return {QueryArgParsed|undefined} Query arg value.
+ * @return {QueryArgParsed|void} Query arg value.
  */
 export function getQueryArg( url, arg ) {
-	const queryStringIndex = url.indexOf( '?' );
-	const query = queryStringIndex !== -1 ? parse( url.substr( queryStringIndex + 1 ) ) : {};
-
-	return query[ arg ];
+	return getQueryArgs( url )[ arg ];
 }

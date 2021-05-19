@@ -11,46 +11,70 @@ describe( 'New User Experience (NUX)', () => {
 		await createNewPost( { showWelcomeGuide: true } );
 
 		// Guide should be on page 1 of 4
-		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
-		expect( welcomeGuideText ).toContain( 'Welcome to the Block Editor' );
+		welcomeGuideText = await page.$eval(
+			'.edit-post-welcome-guide',
+			( element ) => element.innerText
+		);
+		expect( welcomeGuideText ).toContain( 'Welcome to the block editor' );
 
 		// Click on the 'Next' button
-		const [ nextButton ] = await page.$x( '//button[contains(text(), "Next")]' );
+		const [ nextButton ] = await page.$x(
+			'//button[contains(text(), "Next")]'
+		);
 		await nextButton.click();
 
 		// Guide should be on page 2 of 4
-		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
+		welcomeGuideText = await page.$eval(
+			'.edit-post-welcome-guide',
+			( element ) => element.innerText
+		);
 		expect( welcomeGuideText ).toContain( 'Make each block your own' );
 
 		// Click on the 'Previous' button
-		const [ previousButton ] = await page.$x( '//button[contains(text(), "Previous")]' );
+		const [ previousButton ] = await page.$x(
+			'//button[contains(text(), "Previous")]'
+		);
 		await previousButton.click();
 
 		// Guide should be on page 1 of 4
-		welcomeGuideText = await page.$eval( '.edit-post-welcome-guide', ( element ) => element.innerText );
-		expect( welcomeGuideText ).toContain( 'Welcome to the Block Editor' );
+		welcomeGuideText = await page.$eval(
+			'.edit-post-welcome-guide',
+			( element ) => element.innerText
+		);
+		expect( welcomeGuideText ).toContain( 'Welcome to the block editor' );
 
 		// Press the button for Page 2
 		await page.click( 'button[aria-label="Page 2 of 4"]' );
-		await page.waitForXPath( '//h1[contains(text(), "Make each block your own")]' );
+		await page.waitForXPath(
+			'//h1[contains(text(), "Make each block your own")]'
+		);
 		// This shouldn't be necessary
 		// eslint-disable-next-line no-restricted-syntax
-		await page.waitFor( 500 );
+		await page.waitForTimeout( 500 );
 
 		// Press the right arrow key for Page 3
 		await page.keyboard.press( 'ArrowRight' );
-		await page.waitForXPath( '//h1[contains(text(), "Get to know the Block Library")]' );
+		await page.waitForXPath(
+			'//h1[contains(text(), "Get to know the block library")]'
+		);
 
 		// Press the right arrow key for Page 4
 		await page.keyboard.press( 'ArrowRight' );
-		await page.waitForXPath( '//h1[contains(text(), "Learn how to use the Block Editor")]' );
+		await page.waitForXPath(
+			'//h1[contains(text(), "Learn how to use the block editor")]'
+		);
 
 		// Click on the *visible* 'Get started' button. There are two in the DOM
 		// but only one is shown depending on viewport size
 		let getStartedButton;
-		for ( const buttonHandle of await page.$x( '//button[contains(text(), "Get started")]' ) ) {
+		for ( const buttonHandle of await page.$x(
+			'//button[contains(text(), "Get started")]'
+		) ) {
 			if (
-				await page.evaluate( ( button ) => button.style.display !== 'none', buttonHandle )
+				await page.evaluate(
+					( button ) => button.style.display !== 'none',
+					buttonHandle
+				)
 			) {
 				getStartedButton = buttonHandle;
 			}
@@ -63,6 +87,7 @@ describe( 'New User Experience (NUX)', () => {
 
 		// Reload the editor
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		// Guide should be closed
 		welcomeGuide = await page.$( '.edit-post-welcome-guide' );
@@ -84,6 +109,7 @@ describe( 'New User Experience (NUX)', () => {
 
 		// Reload the editor
 		await page.reload();
+		await page.waitForSelector( '.edit-post-layout' );
 
 		// Guide should be closed
 		welcomeGuide = await page.$( '.edit-post-welcome-guide' );

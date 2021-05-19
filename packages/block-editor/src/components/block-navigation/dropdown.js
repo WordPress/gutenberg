@@ -1,57 +1,71 @@
 /**
  * WordPress dependencies
  */
-import { Button, Dropdown, SVG, Path } from '@wordpress/components';
+import { Button, Dropdown } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import { useShortcut } from '@wordpress/keyboard-shortcuts';
-import { useCallback } from '@wordpress/element';
+import { forwardRef } from '@wordpress/element';
+import { listView } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
 import BlockNavigation from './';
+import { store as blockEditorStore } from '../../store';
 
-const MenuIcon = (
-	<SVG xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">
-		<Path d="M5 5H3v2h2V5zm3 8h11v-2H8v2zm9-8H6v2h11V5zM7 11H5v2h2v-2zm0 8h2v-2H7v2zm3-2v2h11v-2H10z" />
-	</SVG>
-);
-
-function BlockNavigationDropdownToggle( { isEnabled, onToggle, isOpen } ) {
-	useShortcut( 'core/edit-post/toggle-block-navigation', useCallback( onToggle, [ onToggle ] ), { bindGlobal: true, isDisabled: ! isEnabled } );
-	const shortcut = useSelect( ( select ) =>
-		select( 'core/keyboard-shortcuts' ).getShortcutRepresentation( 'core/edit-post/toggle-block-navigation' ), []
-	);
-
+function BlockNavigationDropdownToggle( {
+	isEnabled,
+	onToggle,
+	isOpen,
+	innerRef,
+	...props
+} ) {
 	return (
 		<Button
-			icon={ MenuIcon }
+			{ ...props }
+			ref={ innerRef }
+			icon={ listView }
 			aria-expanded={ isOpen }
+			aria-haspopup="true"
 			onClick={ isEnabled ? onToggle : undefined }
-			label={ __( 'Block navigation' ) }
+			/* translators: button label text should, if possible, be under 16 characters. */
+			label={ __( 'List view' ) }
 			className="block-editor-block-navigation"
-			shortcut={ shortcut }
 			aria-disabled={ ! isEnabled }
 		/>
 	);
 }
 
-function BlockNavigationDropdown( { isDisabled } ) {
-	const hasBlocks = useSelect( ( select ) => !! select( 'core/block-editor' ).getBlockCount(), [] );
+function BlockNavigationDropdown(
+	{ isDisabled, __experimentalFeatures, ...props },
+	ref
+) {
+	const hasBlocks = useSelect(
+		( select ) => !! select( blockEditorStore ).getBlockCount(),
+		[]
+	);
 	const isEnabled = hasBlocks && ! isDisabled;
 
-	return	(
+	return (
 		<Dropdown
 			contentClassName="block-editor-block-navigation__popover"
-			renderToggle={ ( toggleProps ) => (
-				<BlockNavigationDropdownToggle { ...toggleProps } isEnabled={ isEnabled } />
+			position="bottom right"
+			renderToggle={ ( { isOpen, onToggle } ) => (
+				<BlockNavigationDropdownToggle
+					{ ...props }
+					innerRef={ ref }
+					isOpen={ isOpen }
+					onToggle={ onToggle }
+					isEnabled={ isEnabled }
+				/>
 			) }
-			renderContent={ ( { onClose } ) => (
-				<BlockNavigation onSelect={ onClose } />
+			renderContent={ () => (
+				<BlockNavigation
+					__experimentalFeatures={ __experimentalFeatures }
+				/>
 			) }
 		/>
 	);
 }
 
-export default BlockNavigationDropdown;
+export default forwardRef( BlockNavigationDropdown );

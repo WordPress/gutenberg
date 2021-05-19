@@ -1,10 +1,51 @@
 /**
+ * External dependencies
+ */
+import { merge } from 'lodash';
+
+/**
  * Internal dependencies
  */
 import { rgba } from './colors';
+
 export const BASE = {
 	black: '#000',
 	white: '#fff',
+};
+
+/**
+ * TODO: Continue to update values as "G2" design evolves.
+ *
+ * "G2" refers to the movement to advance the interface of the block editor.
+ * https://github.com/WordPress/gutenberg/issues/18667
+ */
+export const G2 = {
+	blue: {
+		medium: {
+			focus: '#007cba',
+			focusDark: '#fff',
+		},
+	},
+	gray: {
+		900: '#1e1e1e',
+		700: '#757575', // Meets 4.6:1 text contrast against white.
+		600: '#949494', // Meets 3:1 UI or large text contrast against white.
+		400: '#ccc',
+		200: '#ddd', // Used for most borders.
+		100: '#f0f0f0',
+	},
+	darkGray: {
+		primary: '#1e1e1e',
+		heading: '#050505',
+	},
+	mediumGray: {
+		text: '#757575',
+	},
+	lightGray: {
+		ui: '#949494',
+		secondary: '#ccc',
+		tertiary: '#e7e8e9',
+	},
 };
 
 export const DARK_GRAY = {
@@ -18,6 +59,7 @@ export const DARK_GRAY = {
 	200: '#7e8993',
 	150: '#8d96a0', // Lightest gray that can be used for AA non-text contrast.
 	100: '#8f98a1',
+	placeholder: rgba( G2.gray[ 900 ], 0.62 ),
 };
 
 export const DARK_OPACITY = {
@@ -55,6 +97,7 @@ export const LIGHT_GRAY = {
 	300: '#edeff0',
 	200: '#f3f4f5',
 	100: '#f8f9f9',
+	placeholder: rgba( BASE.white, 0.65 ),
 };
 
 export const LIGHT_OPACITY_LIGHT = {
@@ -101,15 +144,39 @@ export const ALERT = {
 	green: '#4ab866',
 };
 
+export const ADMIN = {
+	theme: `var( --wp-admin-theme-color, ${ BLUE.wordpress[ 700 ] })`,
+	themeDark10: `var( --wp-admin-theme-color-darker-10, ${ BLUE.medium.focus })`,
+};
+
+// Namespaced values for raw colors hex codes
+export const UI = {
+	theme: ADMIN.theme,
+	background: BASE.white,
+	backgroundDisabled: LIGHT_GRAY[ 200 ],
+	border: G2.gray[ 700 ],
+	borderFocus: ADMIN.themeDark10,
+	borderDisabled: G2.gray[ 400 ],
+	borderLight: G2.gray[ 200 ],
+	label: DARK_GRAY[ 500 ],
+	textDisabled: DARK_GRAY[ 150 ],
+	textDark: BASE.white,
+	textLight: BASE.black,
+};
+
 export const COLORS = {
 	...BASE,
-	darkGrey: DARK_GRAY,
+	darkGray: merge( {}, DARK_GRAY, G2.darkGray ),
 	darkOpacity: DARK_OPACITY,
 	darkOpacityLight: DARK_OPACITY_LIGHT,
-	lightGray: LIGHT_GRAY,
+	mediumGray: G2.mediumGray,
+	gray: G2.gray,
+	lightGray: merge( {}, LIGHT_GRAY, G2.lightGray ),
 	lightGrayLight: LIGHT_OPACITY_LIGHT,
-	blue: BLUE,
+	blue: merge( {}, BLUE, G2.blue ),
 	alert: ALERT,
+	admin: ADMIN,
+	ui: UI,
 };
 
 export default COLORS;

@@ -7,11 +7,18 @@ import { noop } from 'lodash';
  * Internal dependencies
  */
 import { createBlock } from '../factory';
-import { getBlockTypes, unregisterBlockType, registerBlockType, setDefaultBlockName } from '../registration';
+import {
+	getBlockTypes,
+	unregisterBlockType,
+	registerBlockType,
+	setDefaultBlockName,
+} from '../registration';
 import {
 	isUnmodifiedDefaultBlock,
 	getAccessibleBlockLabel,
 	getBlockLabel,
+	__experimentalSanitizeBlockAttributes,
+	__experimentalGetBlockAttributesNamesByRole,
 } from '../utils';
 
 describe( 'block helpers', () => {
@@ -40,7 +47,7 @@ describe( 'block helpers', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			setDefaultBlockName( 'core/test-block' );
@@ -60,7 +67,7 @@ describe( 'block helpers', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			setDefaultBlockName( 'core/test-block' );
@@ -79,7 +86,7 @@ describe( 'block helpers', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			registerBlockType( 'core/test-block2', {
@@ -90,13 +97,15 @@ describe( 'block helpers', () => {
 					},
 				},
 				save: noop,
-				category: 'common',
+				category: 'text',
 				title: 'test block',
 			} );
 			setDefaultBlockName( 'core/test-block1' );
 			isUnmodifiedDefaultBlock( createBlock( 'core/test-block1' ) );
 			setDefaultBlockName( 'core/test-block2' );
-			expect( isUnmodifiedDefaultBlock( createBlock( 'core/test-block2' ) ) ).toBe( true );
+			expect(
+				isUnmodifiedDefaultBlock( createBlock( 'core/test-block2' ) )
+			).toBe( true );
 		} );
 	} );
 } );
@@ -117,15 +126,23 @@ describe( 'getBlockLabel', () => {
 	} );
 
 	it( 'returns the block title with the label when the `getLabel` function returns a value', () => {
-		const blockType = { title: 'Recipe', __experimentalLabel: ( { heading } ) => heading };
+		const blockType = {
+			title: 'Recipe',
+			__experimentalLabel: ( { heading } ) => heading,
+		};
 		const attributes = { heading: 'Cupcakes!' };
 
 		expect( getBlockLabel( blockType, attributes ) ).toBe( 'Cupcakes!' );
 	} );
 
 	it( 'removes any html elements from the output of the `getLabel` function', () => {
-		const blockType = { title: 'Recipe', __experimentalLabel: ( { heading } ) => heading };
-		const attributes = { heading: '<b><span class="my-class">Cupcakes!</span></b>' };
+		const blockType = {
+			title: 'Recipe',
+			__experimentalLabel: ( { heading } ) => heading,
+		};
+		const attributes = {
+			heading: '<b><span class="my-class">Cupcakes!</span></b>',
+		};
 
 		expect( getBlockLabel( blockType, attributes ) ).toBe( 'Cupcakes!' );
 	} );
@@ -136,42 +153,249 @@ describe( 'getAccessibleBlockLabel', () => {
 		const blockType = { title: 'Recipe' };
 		const attributes = {};
 
-		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe( 'Recipe Block' );
+		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe(
+			'Recipe Block'
+		);
 	} );
 
 	it( 'returns only the block title when the block has a `getLabel` function, but it returns a falsey value', () => {
 		const blockType = { title: 'Recipe', __experimentalLabel: () => '' };
 		const attributes = {};
 
-		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe( 'Recipe Block' );
+		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe(
+			'Recipe Block'
+		);
 	} );
 
 	it( 'returns the block title with the label when the `getLabel` function returns a value', () => {
-		const blockType = { title: 'Recipe', __experimentalLabel: ( { heading } ) => heading };
+		const blockType = {
+			title: 'Recipe',
+			__experimentalLabel: ( { heading } ) => heading,
+		};
 		const attributes = { heading: 'Cupcakes!' };
 
-		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe( 'Recipe Block. Cupcakes!' );
+		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe(
+			'Recipe Block. Cupcakes!'
+		);
 	} );
 
 	it( 'removes any html elements from the output of the `getLabel` function', () => {
-		const blockType = { title: 'Recipe', __experimentalLabel: ( { heading } ) => heading };
-		const attributes = { heading: '<b><span class="my-class">Cupcakes!</span></b>' };
+		const blockType = {
+			title: 'Recipe',
+			__experimentalLabel: ( { heading } ) => heading,
+		};
+		const attributes = {
+			heading: '<b><span class="my-class">Cupcakes!</span></b>',
+		};
 
-		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe( 'Recipe Block. Cupcakes!' );
+		expect( getAccessibleBlockLabel( blockType, attributes ) ).toBe(
+			'Recipe Block. Cupcakes!'
+		);
 	} );
 
 	it( 'outputs the block title and label with a row number indicating the position of the block, when the optional third parameter is provided', () => {
-		const blockType = { title: 'Recipe', __experimentalLabel: ( { heading } ) => heading };
+		const blockType = {
+			title: 'Recipe',
+			__experimentalLabel: ( { heading } ) => heading,
+		};
 		const attributes = { heading: 'Cupcakes!' };
 
-		expect( getAccessibleBlockLabel( blockType, attributes, 3 ) ).toBe( 'Recipe Block. Row 3. Cupcakes!' );
+		expect( getAccessibleBlockLabel( blockType, attributes, 3 ) ).toBe(
+			'Recipe Block. Row 3. Cupcakes!'
+		);
 	} );
 
 	it( 'outputs just the block title and row number when there no label is available for the block', () => {
 		const blockType = { title: 'Recipe' };
 		const attributes = {};
 
-		expect( getAccessibleBlockLabel( blockType, attributes, 3 ) ).toBe( 'Recipe Block. Row 3' );
+		expect( getAccessibleBlockLabel( blockType, attributes, 3 ) ).toBe(
+			'Recipe Block. Row 3'
+		);
 	} );
 } );
 
+describe( 'sanitizeBlockAttributes', () => {
+	afterEach( () => {
+		getBlockTypes().forEach( ( block ) => {
+			unregisterBlockType( block.name );
+		} );
+	} );
+
+	it( 'sanitize block attributes not defined in the block type', () => {
+		registerBlockType( 'core/test-block', {
+			attributes: {
+				defined: {
+					type: 'string',
+				},
+			},
+			title: 'Test block',
+		} );
+
+		const attributes = __experimentalSanitizeBlockAttributes(
+			'core/test-block',
+			{
+				defined: 'defined-attribute',
+				notDefined: 'not-defined-attribute',
+			}
+		);
+
+		expect( attributes ).toEqual( {
+			defined: 'defined-attribute',
+		} );
+	} );
+
+	it( 'throws error if the block is not registered', () => {
+		expect( () => {
+			__experimentalSanitizeBlockAttributes(
+				'core/not-registered-test-block',
+				{}
+			);
+		} ).toThrowErrorMatchingInlineSnapshot(
+			`"Block type 'core/not-registered-test-block' is not registered."`
+		);
+	} );
+
+	it( 'handles undefined values and default values', () => {
+		registerBlockType( 'core/test-block', {
+			attributes: {
+				hasDefaultValue: {
+					type: 'string',
+					default: 'default-value',
+				},
+				noDefaultValue: {
+					type: 'string',
+				},
+			},
+			title: 'Test block',
+		} );
+
+		const attributes = __experimentalSanitizeBlockAttributes(
+			'core/test-block',
+			{}
+		);
+
+		expect( attributes ).toEqual( {
+			hasDefaultValue: 'default-value',
+		} );
+	} );
+
+	it( 'handles node and children sources as arrays', () => {
+		registerBlockType( 'core/test-block', {
+			attributes: {
+				nodeContent: {
+					source: 'node',
+				},
+				childrenContent: {
+					source: 'children',
+				},
+				withDefault: {
+					source: 'children',
+					default: 'test',
+				},
+			},
+			title: 'Test block',
+		} );
+
+		const attributes = __experimentalSanitizeBlockAttributes(
+			'core/test-block',
+			{
+				nodeContent: [ 'test-1', 'test-2' ],
+			}
+		);
+
+		expect( attributes ).toEqual( {
+			nodeContent: [ 'test-1', 'test-2' ],
+			childrenContent: [],
+			withDefault: [ 'test' ],
+		} );
+	} );
+} );
+
+describe( '__experimentalGetBlockAttributesNamesByRole', () => {
+	beforeAll( () => {
+		registerBlockType( 'core/test-block-1', {
+			attributes: {
+				align: {
+					type: 'string',
+				},
+				content: {
+					type: 'boolean',
+					__experimentalRole: 'content',
+				},
+				level: {
+					type: 'number',
+					__experimentalRole: 'content',
+				},
+				color: {
+					type: 'string',
+					__experimentalRole: 'other',
+				},
+			},
+			save: noop,
+			category: 'text',
+			title: 'test block 1',
+		} );
+		registerBlockType( 'core/test-block-2', {
+			attributes: {
+				align: { type: 'string' },
+				content: { type: 'boolean' },
+				color: { type: 'string' },
+			},
+			save: noop,
+			category: 'text',
+			title: 'test block 2',
+		} );
+		registerBlockType( 'core/test-block-3', {
+			save: noop,
+			category: 'text',
+			title: 'test block 3',
+		} );
+	} );
+	afterAll( () => {
+		[
+			'core/test-block-1',
+			'core/test-block-2',
+			'core/test-block-3',
+		].forEach( unregisterBlockType );
+	} );
+	it( 'should return empty array if block has no attributes', () => {
+		expect(
+			__experimentalGetBlockAttributesNamesByRole( 'core/test-block-3' )
+		).toEqual( [] );
+	} );
+	it( 'should return all attribute names if no role is provided', () => {
+		expect(
+			__experimentalGetBlockAttributesNamesByRole( 'core/test-block-1' )
+		).toEqual(
+			expect.arrayContaining( [ 'align', 'content', 'level', 'color' ] )
+		);
+	} );
+	it( 'should return proper results with existing attributes and provided role', () => {
+		expect(
+			__experimentalGetBlockAttributesNamesByRole(
+				'core/test-block-1',
+				'content'
+			)
+		).toEqual( expect.arrayContaining( [ 'content', 'level' ] ) );
+		expect(
+			__experimentalGetBlockAttributesNamesByRole(
+				'core/test-block-1',
+				'other'
+			)
+		).toEqual( [ 'color' ] );
+		expect(
+			__experimentalGetBlockAttributesNamesByRole(
+				'core/test-block-1',
+				'not-exists'
+			)
+		).toEqual( [] );
+		// A block with no `role` in any attributes.
+		expect(
+			__experimentalGetBlockAttributesNamesByRole(
+				'core/test-block-2',
+				'content'
+			)
+		).toEqual( [] );
+	} );
+} );

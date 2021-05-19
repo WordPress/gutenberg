@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { shallow } from 'enzyme';
+import { shallow, mount } from 'enzyme';
 import { noop } from 'lodash';
 
 /**
@@ -17,6 +17,7 @@ import {
  * Internal dependencies
  */
 import { Edit } from '../edit';
+import { BlockContextProvider } from '../../block-context';
 
 describe( 'Edit', () => {
 	afterEach( () => {
@@ -35,7 +36,7 @@ describe( 'Edit', () => {
 		const edit = () => <div />;
 		registerBlockType( 'core/test-block', {
 			save: noop,
-			category: 'common',
+			category: 'text',
 			title: 'block title',
 			edit,
 		} );
@@ -49,7 +50,7 @@ describe( 'Edit', () => {
 		const save = () => <div />;
 		registerBlockType( 'core/test-block', {
 			save,
-			category: 'common',
+			category: 'text',
 			title: 'block title',
 		} );
 
@@ -66,7 +67,7 @@ describe( 'Edit', () => {
 		registerBlockType( 'core/test-block', {
 			edit,
 			save: noop,
-			category: 'common',
+			category: 'text',
 			title: 'block title',
 		} );
 
@@ -74,7 +75,50 @@ describe( 'Edit', () => {
 			<Edit name="core/test-block" attributes={ attributes } />
 		);
 
-		expect( wrapper.find( edit ).hasClass( 'wp-block-test-block' ) ).toBe( true );
+		expect( wrapper.find( edit ).hasClass( 'wp-block-test-block' ) ).toBe(
+			true
+		);
 		expect( wrapper.find( edit ).hasClass( 'my-class' ) ).toBe( true );
+	} );
+
+	it( 'should assign context', () => {
+		const edit = ( { context } ) => context.value;
+		registerBlockType( 'core/test-block', {
+			category: 'text',
+			title: 'block title',
+			usesContext: [ 'value' ],
+			edit,
+			save: noop,
+		} );
+
+		const wrapper = mount(
+			<BlockContextProvider value={ { value: 'Ok' } }>
+				<Edit name="core/test-block" />
+			</BlockContextProvider>
+		);
+
+		expect( wrapper.html() ).toBe( 'Ok' );
+	} );
+
+	describe( 'light wrapper', () => {
+		it( 'should assign context', () => {
+			const edit = ( { context } ) => context.value;
+			registerBlockType( 'core/test-block', {
+				apiVersion: 2,
+				category: 'text',
+				title: 'block title',
+				usesContext: [ 'value' ],
+				edit,
+				save: noop,
+			} );
+
+			const wrapper = mount(
+				<BlockContextProvider value={ { value: 'Ok' } }>
+					<Edit name="core/test-block" />
+				</BlockContextProvider>
+			);
+
+			expect( wrapper.html() ).toBe( 'Ok' );
+		} );
 	} );
 } );

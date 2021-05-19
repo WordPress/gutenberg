@@ -116,11 +116,15 @@ class Modal extends Component {
 			...otherProps
 		} = this.props;
 
-		const headingId = aria.labelledby || `components-modal-header-${ instanceId }`;
+		const headingId = title
+			? `components-modal-header-${ instanceId }`
+			: aria.labelledby;
 
 		if ( isDismissable ) {
 			deprecated( 'isDismissable prop of the Modal component', {
-				alternative: 'isDismissible prop (renamed) of the Modal component',
+				since: '5.4',
+				alternative:
+					'isDismissible prop (renamed) of the Modal component',
 			} );
 		}
 		// Disable reason: this stops mouse events from triggering tooltips and
@@ -129,15 +133,15 @@ class Modal extends Component {
 			<ModalFrame
 				onRequestClose={ onRequestClose }
 				aria={ {
-					labelledby: title ? headingId : null,
+					labelledby: headingId,
 					describedby: aria.describedby,
 				} }
 				{ ...otherProps }
 			>
-				<div className={ 'components-modal__content' } tabIndex="0" role="document">
+				<div className={ 'components-modal__content' } role="document">
 					<ModalHeader
 						closeLabel={ closeButtonLabel }
-						headingId={ headingId }
+						headingId={ title && headingId }
 						icon={ icon }
 						isDismissible={ isDismissible || isDismissable }
 						onClose={ onRequestClose }

@@ -1,227 +1,194 @@
 /**
  * External dependencies
  */
-import { pick, isEqual } from 'lodash';
 import classnames from 'classnames';
 
 /**
  * WordPress dependencies
  */
-import { withViewportMatch } from '@wordpress/viewport';
-import { Component } from '@wordpress/element';
-import { withSelect, withDispatch } from '@wordpress/data';
-import { synchronizeBlocksWithTemplate, withBlockContentContext } from '@wordpress/blocks';
-import isShallowEqual from '@wordpress/is-shallow-equal';
-import { compose } from '@wordpress/compose';
+import { useViewportMatch, useMergeRefs } from '@wordpress/compose';
+import { forwardRef } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { getBlockType, withBlockContentContext } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
 import ButtonBlockAppender from './button-block-appender';
 import DefaultBlockAppender from './default-block-appender';
+import useNestedSettingsUpdate from './use-nested-settings-update';
+import useInnerBlockTemplateSync from './use-inner-block-template-sync';
+import getBlockContext from './get-block-context';
+import { BlockListItems } from '../block-list';
+import { BlockContextProvider } from '../block-context';
+import { useBlockEditContext } from '../block-edit/context';
+import useBlockSync from '../provider/use-block-sync';
+import { store as blockEditorStore } from '../../store';
+import useBlockDropZone from '../use-block-drop-zone';
 
 /**
- * Internal dependencies
+ * InnerBlocks is a component which allows a single block to have multiple blocks
+ * as children. The UncontrolledInnerBlocks component is used whenever the inner
+ * blocks are not controlled by another entity. In other words, it is normally
+ * used for inner blocks in the post editor
+ *
+ * @param {Object} props The component props.
  */
-import BlockList from '../block-list';
-import { withBlockEditContext } from '../block-edit/context';
+function UncontrolledInnerBlocks( props ) {
+	const {
+		clientId,
+		allowedBlocks,
+		template,
+		templateLock,
+		wrapperRef,
+		templateInsertUpdatesSelection,
+		__experimentalCaptureToolbars: captureToolbars,
+		__experimentalAppenderTagName,
+		renderAppender,
+		orientation,
+		placeholder,
+		__experimentalLayout,
+	} = props;
 
-class InnerBlocks extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			templateInProcess: !! this.props.template,
-		};
-		this.updateNestedSettings();
-	}
+	useNestedSettingsUpdate(
+		clientId,
+		allowedBlocks,
+		templateLock,
+		captureToolbars,
+		orientation
+	);
 
-	componentDidMount() {
-		const {
-			block,
-			templateLock,
-			__experimentalBlocks,
-			replaceInnerBlocks,
-			__unstableMarkNextChangeAsNotPersistent,
-		} = this.props;
-		const { innerBlocks } = block;
-		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
-		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
-			this.synchronizeBlocksWithTemplate();
-		}
+	useInnerBlockTemplateSync(
+		clientId,
+		template,
+		templateLock,
+		templateInsertUpdatesSelection
+	);
 
-		if ( this.state.templateInProcess ) {
-			this.setState( {
-				templateInProcess: false,
-			} );
-		}
+	const context = useSelect(
+		( select ) => {
+			const block = select( blockEditorStore ).getBlock( clientId );
+			const blockType = getBlockType( block.name );
 
-		// Set controlled blocks value from parent, if any.
-		if ( __experimentalBlocks ) {
-			__unstableMarkNextChangeAsNotPersistent();
-			replaceInnerBlocks( __experimentalBlocks );
-		}
-	}
-
-	componentDidUpdate( prevProps ) {
-		const {
-			block,
-			templateLock,
-			template,
-			isLastBlockChangePersistent,
-			onInput,
-			onChange,
-		} = this.props;
-		const { innerBlocks } = block;
-
-		this.updateNestedSettings();
-		// Only synchronize innerBlocks with template if innerBlocks are empty or a locking all exists directly on the block.
-		if ( innerBlocks.length === 0 || templateLock === 'all' ) {
-			const hasTemplateChanged = ! isEqual( template, prevProps.template );
-			if ( hasTemplateChanged ) {
-				this.synchronizeBlocksWithTemplate();
+			if ( ! blockType || ! blockType.providesContext ) {
+				return;
 			}
-		}
 
-		// Sync with controlled blocks value from parent, if possible.
-		if ( prevProps.block.innerBlocks !== innerBlocks ) {
-			const resetFunc = isLastBlockChangePersistent ? onChange : onInput;
-			if ( resetFunc ) {
-				resetFunc( innerBlocks );
-			}
-		}
-	}
+			return getBlockContext( block.attributes, blockType );
+		},
+		[ clientId ]
+	);
 
-	/**
-	 * Called on mount or when a mismatch exists between the templates and
-	 * inner blocks, synchronizes inner blocks with the template, replacing
-	 * current blocks.
-	 */
-	synchronizeBlocksWithTemplate() {
-		const { template, block, replaceInnerBlocks } = this.props;
-		const { innerBlocks } = block;
-
-		// Synchronize with templates. If the next set differs, replace.
-		const nextBlocks = synchronizeBlocksWithTemplate( innerBlocks, template );
-		if ( ! isEqual( nextBlocks, innerBlocks	) ) {
-			replaceInnerBlocks( nextBlocks );
-		}
-	}
-
-	updateNestedSettings() {
-		const {
-			blockListSettings,
-			allowedBlocks,
-			updateNestedSettings,
-			templateLock,
-			parentLock,
-			__experimentalCaptureToolbars,
-			__experimentalMoverDirection,
-			__experimentalUIParts,
-		} = this.props;
-
-		const newSettings = {
-			allowedBlocks,
-			templateLock: templateLock === undefined ? parentLock : templateLock,
-			__experimentalCaptureToolbars: __experimentalCaptureToolbars || false,
-			__experimentalMoverDirection,
-			__experimentalUIParts,
-		};
-
-		if ( ! isShallowEqual( blockListSettings, newSettings ) ) {
-			updateNestedSettings( newSettings );
-		}
-	}
-
-	render() {
-		const {
-			enableClickThrough,
-			clientId,
-			hasOverlay,
-			__experimentalCaptureToolbars: captureToolbars,
-			...props
-		} = this.props;
-		const { templateInProcess } = this.state;
-
-		const classes = classnames( 'block-editor-inner-blocks', {
-			'has-overlay': enableClickThrough && hasOverlay,
-			'is-capturing-toolbar': captureToolbars,
-		} );
-
-		return (
-			<div className={ classes }>
-				{ ! templateInProcess && (
-					<BlockList
-						rootClientId={ clientId }
-						{ ...props }
-					/>
-				) }
-			</div>
-		);
-	}
+	// This component needs to always be synchronous as it's the one changing
+	// the async mode depending on the block selection.
+	return (
+		<BlockContextProvider value={ context }>
+			<BlockListItems
+				rootClientId={ clientId }
+				renderAppender={ renderAppender }
+				__experimentalAppenderTagName={ __experimentalAppenderTagName }
+				__experimentalLayout={ __experimentalLayout }
+				wrapperRef={ wrapperRef }
+				placeholder={ placeholder }
+			/>
+		</BlockContextProvider>
+	);
 }
 
-InnerBlocks = compose( [
-	withViewportMatch( { isSmallScreen: '< medium' } ),
-	withBlockEditContext( ( context ) => pick( context, [ 'clientId' ] ) ),
-	withSelect( ( select, ownProps ) => {
-		const {
-			isBlockSelected,
-			hasSelectedInnerBlock,
-			getBlock,
-			getBlockListSettings,
-			getBlockRootClientId,
-			getTemplateLock,
-			isNavigationMode,
-			isLastBlockChangePersistent,
-		} = select( 'core/block-editor' );
-		const { clientId, isSmallScreen } = ownProps;
-		const block = getBlock( clientId );
-		const rootClientId = getBlockRootClientId( clientId );
+/**
+ * The controlled inner blocks component wraps the uncontrolled inner blocks
+ * component with the blockSync hook. This keeps the innerBlocks of the block in
+ * the block-editor store in sync with the blocks of the controlling entity. An
+ * example of an inner block controller is a template part block, which provides
+ * its own blocks from the template part entity data source.
+ *
+ * @param {Object} props The component props.
+ */
+function ControlledInnerBlocks( props ) {
+	useBlockSync( props );
+	return <UncontrolledInnerBlocks { ...props } />;
+}
 
-		return {
-			block,
-			blockListSettings: getBlockListSettings( clientId ),
-			hasOverlay: block.name !== 'core/template' && ! isBlockSelected( clientId ) && ! hasSelectedInnerBlock( clientId, true ),
-			parentLock: getTemplateLock( rootClientId ),
-			enableClickThrough: isNavigationMode() || isSmallScreen,
-			isLastBlockChangePersistent: isLastBlockChangePersistent(),
-		};
-	} ),
-	withDispatch( ( dispatch, ownProps ) => {
-		const {
-			replaceInnerBlocks,
-			__unstableMarkNextChangeAsNotPersistent,
-			updateBlockListSettings,
-		} = dispatch( 'core/block-editor' );
-		const { block, clientId, templateInsertUpdatesSelection = true } = ownProps;
+const ForwardedInnerBlocks = forwardRef( ( props, ref ) => {
+	const innerBlocksProps = useInnerBlocksProps( { ref }, props );
+	return (
+		<div className="block-editor-inner-blocks">
+			<div { ...innerBlocksProps } />
+		</div>
+	);
+} );
 
-		return {
-			replaceInnerBlocks( blocks ) {
-				replaceInnerBlocks(
-					clientId,
-					blocks,
-					block.innerBlocks.length === 0 &&
-						templateInsertUpdatesSelection &&
-						blocks.length !== 0
-				);
-			},
-			__unstableMarkNextChangeAsNotPersistent,
-			updateNestedSettings( settings ) {
-				dispatch( updateBlockListSettings( clientId, settings ) );
-			},
-		};
-	} ),
-] )( InnerBlocks );
+/**
+ * This hook is used to lightly mark an element as an inner blocks wrapper
+ * element. Call this hook and pass the returned props to the element to mark as
+ * an inner blocks wrapper, automatically rendering inner blocks as children. If
+ * you define a ref for the element, it is important to pass the ref to this
+ * hook, which the hook in turn will pass to the component through the props it
+ * returns. Optionally, you can also pass any other props through this hook, and
+ * they will be merged and returned.
+ *
+ * @param {Object} props   Optional. Props to pass to the element. Must contain
+ *                         the ref if one is defined.
+ * @param {Object} options Optional. Inner blocks options.
+ *
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
+ */
+export function useInnerBlocksProps( props = {}, options = {} ) {
+	const { clientId } = useBlockEditContext();
+	const isSmallScreen = useViewportMatch( 'medium', '<' );
+	const hasOverlay = useSelect(
+		( select ) => {
+			const {
+				getBlockName,
+				isBlockSelected,
+				hasSelectedInnerBlock,
+				isNavigationMode,
+			} = select( blockEditorStore );
+			const enableClickThrough = isNavigationMode() || isSmallScreen;
+			return (
+				getBlockName( clientId ) !== 'core/template' &&
+				! isBlockSelected( clientId ) &&
+				! hasSelectedInnerBlock( clientId, true ) &&
+				enableClickThrough
+			);
+		},
+		[ clientId, isSmallScreen ]
+	);
+
+	const ref = useMergeRefs( [
+		props.ref,
+		useBlockDropZone( {
+			rootClientId: clientId,
+		} ),
+	] );
+	const InnerBlocks =
+		options.value && options.onChange
+			? ControlledInnerBlocks
+			: UncontrolledInnerBlocks;
+
+	return {
+		...props,
+		ref,
+		className: classnames(
+			props.className,
+			'block-editor-block-list__layout',
+			{
+				'has-overlay': hasOverlay,
+			}
+		),
+		children: <InnerBlocks { ...options } clientId={ clientId } />,
+	};
+}
 
 // Expose default appender placeholders as components.
-InnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
-InnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
+ForwardedInnerBlocks.DefaultBlockAppender = DefaultBlockAppender;
+ForwardedInnerBlocks.ButtonBlockAppender = ButtonBlockAppender;
 
-InnerBlocks.Content = withBlockContentContext(
+ForwardedInnerBlocks.Content = withBlockContentContext(
 	( { BlockContent } ) => <BlockContent />
 );
 
 /**
- * @see https://github.com/WordPress/gutenberg/blob/master/packages/block-editor/src/components/inner-blocks/README.md
+ * @see https://github.com/WordPress/gutenberg/blob/HEAD/packages/block-editor/src/components/inner-blocks/README.md
  */
-export default InnerBlocks;
+export default ForwardedInnerBlocks;

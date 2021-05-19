@@ -1,48 +1,107 @@
+/**
+ * Block Toolbar
+ */
+
 .block-editor-block-toolbar {
 	display: flex;
 	flex-grow: 1;
 	width: 100%;
 	overflow: auto; // Allow horizontal scrolling on mobile.
 	position: relative;
-	border-left: $border-width solid $light-gray-800;
+
+	// Animation
 	transition: border-color 0.1s linear, box-shadow 0.1s linear;
 	@include reduce-motion("transition");
 
+	// Allow overflow on desktop.
 	@include break-small() {
-		// Allow overflow on desktop.
 		overflow: inherit;
-
-		// Show a left border on the parent container.
-		border-left: none;
-		box-shadow: -$block-left-border-width 0 0 0 $dark-gray-500;
-
-		// Show a lighter version for dark themes.
-		.is-dark-theme & {
-			box-shadow: -$block-left-border-width 0 0 0 $light-gray-600;
-		}
 	}
 
-	// The component is born with a border, but we only need some of them.
+	// Borders around toolbar segments.
+	.components-toolbar-group,
 	.components-toolbar {
-		border: 0;
-		border-top: $border-width solid $light-gray-800;
-		border-bottom: $border-width solid $light-gray-800;
-
-		// Add a right border to show as separator in the block toolbar.
-		border-right: $border-width solid $light-gray-800;
-
+		background: none;
 		// IE11 has thick paddings without this.
 		line-height: 0;
+
+		// These margins make the buttons themselves overlap the chrome of the toolbar.
+		// This helps make them square, and maximize the hit area.
+		margin-top: -$border-width;
+		margin-bottom: -$border-width;
+
+		// The component is born with a border, but we only need some of them.
+		border: 0;
+
+		// Add a border after item groups to show as separator in the block toolbar.
+		border-right: $border-width solid $gray-300;
 	}
 
-	// Add a left border and adjust the color for Top Toolbar mode.
-	.has-fixed-toolbar & {
-		box-shadow: none;
-		border-left: $border-width solid $light-gray-500;
+	> :last-child,
+	> :last-child .components-toolbar-group,
+	> :last-child .components-toolbar {
+		border-right: none;
+	}
+}
 
-		.components-toolbar {
-			border-color: $light-gray-500;
+.block-editor-block-contextual-toolbar.has-parent:not(.is-fixed) {
+	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
+
+	.show-icon-labels & {
+		margin-left: 0;
+	}
+}
+
+.block-editor-block-parent-selector {
+	position: absolute;
+	top: -$border-width;
+	left: calc(-#{$grid-unit-60} - #{$grid-unit-10} - #{$border-width});
+
+	.show-icon-labels & {
+		position: relative;
+		left: auto;
+		top: auto;
+		margin-top: -$border-width;
+		margin-left: -$border-width;
+		margin-bottom: -$border-width;
+	}
+}
+
+// Block controls.
+.block-editor-block-toolbar__block-controls {
+	// The !important modifier should be removed when https://github.com/WordPress/gutenberg/issues/24898 refactors the spacing grid.
+	height: auto !important;
+	padding: 0 !important;
+
+	// Switcher.
+	.block-editor-block-switcher .components-dropdown-menu__toggle,
+	.block-editor-block-switcher__no-switcher-icon {
+		.block-editor-block-icon {
+			width: $button-size-small !important;
+			margin: 0 !important;
 		}
+
+		&:focus::before {
+			right: $grid-unit-05 !important;
+		}
+	}
+
+	// Match the parent selector button.
+	margin-left: -$border-width;
+
+	// Compensate for width of block switcher.
+	.block-editor-block-mover {
+		margin-left: -$grid-unit-15 / 2;
+	}
+}
+
+.block-editor-block-toolbar,
+.block-editor-rich-text__inline-format-toolbar-group {
+	// Override Toolbar buttons size.
+	.components-toolbar-group,
+	.components-toolbar {
+		display: flex;
+		flex-wrap: nowrap;
 	}
 }
 
@@ -55,5 +114,102 @@
 	// IE11 doesn't read rules inside this query. They are applied only to modern browsers.
 	@supports (position: sticky) {
 		display: inline-flex;
+	}
+}
+
+.show-icon-labels {
+	.block-editor-block-toolbar {
+		.components-button.has-icon {
+			width: auto;
+
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+				font-size: $helptext-font-size;
+			}
+		}
+	}
+
+	// Padding overrides.
+
+	.components-accessible-toolbar .components-toolbar-group > div:first-child:last-child > .components-button.has-icon {
+		padding-left: 6px;
+		padding-right: 6px;
+	}
+
+	// Switcher overrides.
+	.block-editor-block-switcher {
+		border-right: 1px solid $gray-900;
+
+		.components-dropdown-menu__toggle {
+			margin-left: 0;
+		}
+	}
+
+	.block-editor-block-switcher .components-dropdown-menu__toggle,
+	.block-editor-block-switcher__no-switcher-icon {
+		.block-editor-block-icon {
+			width: 0 !important;
+			height: 0 !important;
+		}
+
+		&:focus::before {
+			right: $grid-unit-05 !important;
+		}
+	}
+
+	// Parent selector overrides
+
+	.block-editor-block-parent-selector__button {
+		.block-editor-block-icon {
+			width: 0;
+		}
+	}
+
+	// Mover overrides.
+	.block-editor-block-toolbar__block-controls .block-editor-block-mover {
+		margin-left: 0;
+		white-space: nowrap;
+	}
+
+	.block-editor-block-mover-button {
+		// The specificity can be reduced once https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L34 is also dealt with.
+		padding-left: $grid-unit !important;
+		padding-right: $grid-unit !important;
+	}
+
+	.block-editor-block-mover__drag-handle.has-icon {
+		padding-left: 6px !important;
+		padding-right: 6px !important;
+		border-right: 1px solid $gray-900;
+	}
+
+	@include break-small() {
+		// Specificity override for https://github.com/WordPress/gutenberg/blob/try/block-toolbar-labels/packages/block-editor/src/components/block-mover/style.scss#L69
+		.is-up-button.is-up-button.is-up-button {
+			border-bottom: 1px solid $gray-900;
+			margin-right: 0;
+			border-radius: 0;
+		}
+	}
+
+	.block-editor-block-contextual-toolbar .block-editor-block-mover.is-horizontal .block-editor-block-mover-button.block-editor-block-mover-button {
+		width: auto;
+	}
+
+	// Mobile adjustments
+	.components-toolbar,
+	.components-toolbar-group {
+		flex-shrink: 1;
+	}
+
+	.block-editor-rich-text__inline-format-toolbar-group {
+		.components-button + .components-button {
+			margin-left: 6px;
+		}
 	}
 }

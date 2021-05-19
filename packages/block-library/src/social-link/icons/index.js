@@ -1,4 +1,3 @@
-
 export * from './amazon';
 export * from './bandcamp';
 export * from './behance';
@@ -23,6 +22,7 @@ export * from './mail';
 export * from './mastodon';
 export * from './meetup';
 export * from './medium';
+export * from './patreon';
 export * from './pinterest';
 export * from './pocket';
 export * from './reddit';
@@ -30,6 +30,8 @@ export * from './skype';
 export * from './snapchat';
 export * from './soundcloud';
 export * from './spotify';
+export * from './telegram';
+export * from './tiktok';
 export * from './tumblr';
 export * from './twitch';
 export * from './twitter';

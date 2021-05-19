@@ -1,3 +1,6 @@
+$resize-handler-size: 15px;
+$resize-handler-container-size: $resize-handler-size + ($grid-unit-05 * 2); // Make the resize handle container larger so there's a larger grabbable area.
+
 // This is a wrapper of the actual visible handle (pseudo element). It is styled
 // to be much bigger than the visual part so it's easier to click and use.
 .components-resizable-box__handle {
@@ -5,9 +8,10 @@
 	width: $resize-handler-container-size;
 	height: $resize-handler-container-size;
 
-	// Show the resize handle when selected OR
+	// Elevate the resize handle above the focus style.
+	z-index: z-index(".components-resizable-box__handle");
+
 	// Show the resize handle if set in props
-	.components-resizable-box__container.is-selected &,
 	.components-resizable-box__container.has-show-handle & {
 		display: block;
 	}
@@ -19,9 +23,9 @@
 	content: "";
 	width: $resize-handler-size;
 	height: $resize-handler-size;
-	border: 2px solid $white;
+	border: 2px solid var(--wp-admin-theme-color);
 	border-radius: 50%;
-	background: theme(primary);
+	background: $white;
 	cursor: inherit;
 	position: absolute;
 	top: calc(50% - #{ceil($resize-handler-size / 2)});
@@ -31,25 +35,18 @@
 // This is the "visible" resize handle for side handles - the line
 .components-resizable-box__side-handle::before {
 	display: block;
+	border-radius: 2px;
 	content: "";
-	width: 7px;
-	height: 7px;
-	border: 2px solid $white;
-	background: theme(primary);
+	width: 3px;
+	height: 3px;
+	background: var(--wp-admin-theme-color);
 	cursor: inherit;
 	position: absolute;
-	top: calc(50% - 4px);
-	right: calc(50% - 4px);
+	top: calc(50% - 1px);
+	right: calc(50% - 1px);
 	transition: transform 0.1s ease-in;
 	@include reduce-motion("transition");
 	opacity: 0;
-}
-
-.is-dark-theme {
-	.components-resizable-box__side-handle::before,
-	.components-resizable-box__handle::after {
-		border-color: $light-gray-600;
-	}
 }
 
 // Show corner handles on top of side handles so they can be used
@@ -100,6 +97,26 @@
 	animation: components-resizable-box__left-right-animation 0.1s ease-out 0s;
 	animation-fill-mode: forwards;
 	@include reduce-motion("animation");
+}
+
+/* This CSS is shown only to Safari, which has a bug with table-caption making it jumpy.
+See https://bugs.webkit.org/show_bug.cgi?id=187903. */
+@media not all and (min-resolution: 0.001dpcm) {
+	@supports (-webkit-appearance:none) {
+		.components-resizable-box__side-handle.components-resizable-box__handle-top:hover::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-bottom:hover::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-top:active::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-bottom:active::before {
+			animation: none;
+		}
+
+		.components-resizable-box__side-handle.components-resizable-box__handle-left:hover::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-right:hover::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-left:active::before,
+		.components-resizable-box__side-handle.components-resizable-box__handle-right:active::before {
+			animation: none;
+		}
+	}
 }
 
 @keyframes components-resizable-box__top-bottom-animation {

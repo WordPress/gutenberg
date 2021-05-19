@@ -6,19 +6,22 @@ import { LINE_SEPARATOR } from './special-characters';
 import { isCollapsed } from './is-collapsed';
 import { remove } from './remove';
 
+/** @typedef {import('./create').RichTextValue} RichTextValue */
+
 /**
- * Removes a line separator character, if existing, from a Rich Text value at the current
- * indices. If no line separator exists on the indices it will return undefined.
+ * Removes a line separator character, if existing, from a Rich Text value at
+ * the current indices. If no line separator exists on the indices it will
+ * return undefined.
  *
- * @param {Object} value Value to modify.
- * @param {boolean} backward indicates if are removing from the start index or the end index.
+ * @param {RichTextValue} value    Value to modify.
+ * @param {boolean}       backward Indicates if are removing from the start
+ *                                 index or the end index.
  *
- * @return {Object|undefined} A new value with the line separator removed. Or undefined if no line separator is found on the position.
+ * @return {RichTextValue|undefined} A new value with the line separator
+ *                                   removed. Or undefined if no line separator
+ *                                   is found on the position.
  */
-export function removeLineSeparator(
-	value,
-	backward = true,
-) {
+export function removeLineSeparator( value, backward = true ) {
 	const { replacements, text, start, end } = value;
 	const collapsed = isCollapsed( value );
 	let index = start - 1;
@@ -46,11 +49,7 @@ export function removeLineSeparator(
 			replacements: newReplacements,
 		};
 	} else {
-		newValue = remove(
-			value,
-			removeStart,
-			removeEnd
-		);
+		newValue = remove( value, removeStart, removeEnd );
 	}
 	return newValue;
 }

@@ -30,7 +30,7 @@ class ImportForm extends Component {
 	}
 
 	onChangeFile( event ) {
-		this.setState( { file: event.target.files[ 0 ] } );
+		this.setState( { file: event.target.files[ 0 ], error: null } );
 	}
 
 	onSubmit( event ) {
@@ -60,8 +60,8 @@ class ImportForm extends Component {
 					case 'Invalid JSON file':
 						uiMessage = __( 'Invalid JSON file' );
 						break;
-					case 'Invalid Reusable Block JSON file':
-						uiMessage = __( 'Invalid Reusable Block JSON file' );
+					case 'Invalid Reusable block JSON file':
+						uiMessage = __( 'Invalid Reusable block JSON file' );
 						break;
 					default:
 						uiMessage = __( 'Unknown error' );
@@ -69,6 +69,10 @@ class ImportForm extends Component {
 
 				this.setState( { isLoading: false, error: uiMessage } );
 			} );
+	}
+
+	onDismissError() {
+		this.setState( { error: null } );
 	}
 
 	render() {
@@ -81,7 +85,10 @@ class ImportForm extends Component {
 				onSubmit={ this.onSubmit }
 			>
 				{ error && (
-					<Notice status="error">
+					<Notice
+						status="error"
+						onRemove={ () => this.onDismissError() }
+					>
 						{ error }
 					</Notice>
 				) }

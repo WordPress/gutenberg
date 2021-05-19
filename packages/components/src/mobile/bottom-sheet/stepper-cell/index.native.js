@@ -8,6 +8,7 @@ import { AccessibilityInfo, View, Platform } from 'react-native';
  */
 import { __, sprintf } from '@wordpress/i18n';
 import { Component } from '@wordpress/element';
+import { withPreferredColorScheme } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -15,9 +16,13 @@ import { Component } from '@wordpress/element';
 import Cell from '../cell';
 import Stepper from './stepper';
 import styles from './style.scss';
+import RangeTextInput from '../range-text-input';
+import { toFixed } from '../../utils';
 
-const STEP_SPEED = 200;
+const STEP_DELAY = 200;
 const DEFAULT_STEP = 1;
+
+const isIOS = Platform.OS === 'ios';
 
 class BottomSheetStepperCell extends Component {
 	constructor( props ) {
@@ -25,11 +30,23 @@ class BottomSheetStepperCell extends Component {
 
 		this.announceValue = this.announceValue.bind( this );
 		this.onDecrementValue = this.onDecrementValue.bind( this );
-		this.onDecrementValuePressIn = this.onDecrementValuePressIn.bind( this );
+		this.onDecrementValuePressIn = this.onDecrementValuePressIn.bind(
+			this
+		);
 		this.onIncrementValue = this.onIncrementValue.bind( this );
-		this.onIncrementValuePressIn = this.onIncrementValuePressIn.bind( this );
+		this.onIncrementValuePressIn = this.onIncrementValuePressIn.bind(
+			this
+		);
 		this.onPressOut = this.onPressOut.bind( this );
-		this.startPressInterval = this.startPressInterval.bind( this );
+
+		const { value, defaultValue, min } = props;
+
+		const initialValue = value || defaultValue || min;
+
+		this.state = {
+			inputValue: initialValue,
+			stepperValue: initialValue,
+		};
 	}
 
 	componentWillUnmount() {
@@ -39,21 +56,27 @@ class BottomSheetStepperCell extends Component {
 	}
 
 	onIncrementValue() {
-		const { step, maxValue, onChangeValue, value } = this.props;
-		const newValue = value + step;
+		const { step, max, onChange, value, decimalNum } = this.props;
+		const newValue = toFixed( value + step, decimalNum );
 
-		if ( newValue <= maxValue ) {
-			onChangeValue( newValue );
+		if ( newValue <= max || max === undefined ) {
+			onChange( newValue );
+			this.setState( {
+				inputValue: newValue,
+			} );
 			this.announceValue( newValue );
 		}
 	}
 
 	onDecrementValue() {
-		const { step, minValue, onChangeValue, value } = this.props;
-		const newValue = value - step;
+		const { step, min, onChange, value, decimalNum } = this.props;
+		const newValue = toFixed( value - step, decimalNum );
 
-		if ( newValue >= minValue ) {
-			onChangeValue( newValue );
+		if ( newValue >= min ) {
+			onChange( newValue );
+			this.setState( {
+				inputValue: newValue,
+			} );
 			this.announceValue( newValue );
 		}
 	}
@@ -77,7 +100,7 @@ class BottomSheetStepperCell extends Component {
 		clearInterval( this.interval );
 	}
 
-	startPressInterval( callback ) {
+	startPressInterval( callback, speed = STEP_DELAY ) {
 		let counter = 0;
 		this.interval = setInterval( () => {
 			callback();
@@ -85,41 +108,79 @@ class BottomSheetStepperCell extends Component {
 
 			if ( counter === 10 ) {
 				clearInterval( this.interval );
-				this.startPressInterval( callback, STEP_SPEED / 2 );
+				this.startPressInterval( callback, speed / 2 );
 			}
-		}, STEP_SPEED );
+		}, speed );
 	}
 
 	announceValue( value ) {
-		const { label } = this.props;
+		const { label, unitLabel = '' } = this.props;
 
-		if ( Platform.OS === 'ios' ) { // On Android it triggers the accessibilityLabel with the value change
+		if ( isIOS ) {
+			// On Android it triggers the accessibilityLabel with the value change
 			clearTimeout( this.timeoutAnnounceValue );
 			this.timeoutAnnounceValue = setTimeout( () => {
-				AccessibilityInfo.announceForAccessibility( `${ value } ${ label }` );
+				AccessibilityInfo.announceForAccessibility(
+					`${ value } ${ unitLabel } ${ label }`
+				);
 			}, 300 );
 		}
 	}
 
 	render() {
-		const { label, icon, minValue, maxValue, value, separatorType } = this.props;
-		const isMinValue = value === minValue;
-		const isMaxValue = value === maxValue;
+		const {
+			label,
+			settingLabel = 'Value',
+			unitLabel = '',
+			icon,
+			min,
+			max,
+			value,
+			separatorType,
+			children,
+			shouldDisplayTextInput = false,
+			preview,
+			onChange,
+			openUnitPicker,
+			decimalNum,
+			cellContainerStyle,
+		} = this.props;
+		const { inputValue } = this.state;
+		const isMinValue = value === min;
+		const isMaxValue = value === max;
+		const labelStyle = [
+			styles.cellLabel,
+			! icon ? styles.cellLabelNoIcon : {},
+		];
+
+		const getAccessibilityHint = () => {
+			return openUnitPicker ? __( 'double-tap to change unit' ) : '';
+		};
 
 		const accessibilityLabel = sprintf(
-			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: Current value. */
-			__( '%1$s. Current value is %2$s' ),
-			label, value
+			/* translators: accessibility text. Inform about current value. %1$s: Control label %2$s: setting label (example: width), %3$s: Current value. %4$s: value measurement unit (example: pixels) */
+			__( '%1$s. %2$s is %3$s %4$s.' ),
+			label,
+			settingLabel,
+			value,
+			unitLabel
 		);
+
+		const containerStyle = [
+			styles.rowContainer,
+			isIOS ? styles.containerIOS : styles.containerAndroid,
+		];
 
 		return (
 			<View
 				accessible={ true }
 				accessibilityRole="adjustable"
 				accessibilityLabel={ accessibilityLabel }
+				accessibilityHint={ getAccessibilityHint() }
 				accessibilityActions={ [
 					{ name: 'increment' },
 					{ name: 'decrement' },
+					{ name: 'activate' },
 				] }
 				onAccessibilityAction={ ( event ) => {
 					switch ( event.nativeEvent.actionName ) {
@@ -129,29 +190,66 @@ class BottomSheetStepperCell extends Component {
 						case 'decrement':
 							this.onDecrementValue();
 							break;
+						case 'activate':
+							if ( openUnitPicker ) {
+								openUnitPicker();
+							}
+							break;
 					}
-				} }>
-				<Cell
-					accessibilityRole="none"
-					accessible={ false }
-					cellContainerStyle={ styles.cellContainerStyles }
-					cellRowContainerStyle={ styles.cellRowStyles }
-					disabled={ true }
-					editable={ false }
-					icon={ icon }
-					label={ label }
-					labelStyle={ styles.cellLabel }
-					separatorType={ separatorType }
-				>
-					<Stepper
-						isMaxValue={ isMaxValue }
-						isMinValue={ isMinValue }
-						onPressInDecrement={ this.onDecrementValuePressIn }
-						onPressInIncrement={ this.onIncrementValuePressIn }
-						onPressOut={ this.onPressOut }
-						value={ value }
-					/>
-				</Cell>
+				} }
+			>
+				<View importantForAccessibility="no-hide-descendants">
+					<Cell
+						accessible={ false }
+						cellContainerStyle={ [
+							styles.cellContainerStyle,
+							preview && styles.columnContainer,
+							cellContainerStyle,
+						] }
+						cellRowContainerStyle={
+							preview ? containerStyle : styles.cellRowStyles
+						}
+						editable={ false }
+						icon={ icon }
+						label={ label }
+						labelStyle={ labelStyle }
+						leftAlign={ true }
+						separatorType={ separatorType }
+					>
+						<View style={ preview && containerStyle }>
+							{ preview }
+							<Stepper
+								isMaxValue={ isMaxValue }
+								isMinValue={ isMinValue }
+								onPressInDecrement={
+									this.onDecrementValuePressIn
+								}
+								onPressInIncrement={
+									this.onIncrementValuePressIn
+								}
+								onPressOut={ this.onPressOut }
+								value={ value }
+								shouldDisplayTextInput={
+									shouldDisplayTextInput
+								}
+							>
+								{ shouldDisplayTextInput && (
+									<RangeTextInput
+										label={ label }
+										onChange={ onChange }
+										defaultValue={ `${ inputValue }` }
+										value={ inputValue }
+										min={ min }
+										step={ 1 }
+										decimalNum={ decimalNum }
+									>
+										{ children }
+									</RangeTextInput>
+								) }
+							</Stepper>
+						</View>
+					</Cell>
+				</View>
 			</View>
 		);
 	}
@@ -161,4 +259,4 @@ BottomSheetStepperCell.defaultProps = {
 	step: DEFAULT_STEP,
 };
 
-export default BottomSheetStepperCell;
+export default withPreferredColorScheme( BottomSheetStepperCell );

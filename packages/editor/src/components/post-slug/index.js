@@ -18,7 +18,10 @@ export class PostSlug extends Component {
 		super( ...arguments );
 
 		this.state = {
-			editedSlug: safeDecodeURIComponent( postSlug ) || cleanForSlug( postTitle ) || postID,
+			editedSlug:
+				safeDecodeURIComponent( postSlug ) ||
+				cleanForSlug( postTitle ) ||
+				postID,
 		};
 
 		this.setSlug = this.setSlug.bind( this );
@@ -50,7 +53,9 @@ export class PostSlug extends Component {
 					type="text"
 					id={ inputId }
 					value={ editedSlug }
-					onChange={ ( event ) => this.setState( { editedSlug: event.target.value } ) }
+					onChange={ ( event ) =>
+						this.setState( { editedSlug: event.target.value } )
+					}
 					onBlur={ this.setSlug }
 					className="editor-post-slug__input"
 				/>
@@ -61,10 +66,9 @@ export class PostSlug extends Component {
 
 export default compose( [
 	withSelect( ( select ) => {
-		const {
-			getCurrentPost,
-			getEditedPostAttribute,
-		} = select( 'core/editor' );
+		const { getCurrentPost, getEditedPostAttribute } = select(
+			'core/editor'
+		);
 
 		const { id } = getCurrentPost();
 		return {

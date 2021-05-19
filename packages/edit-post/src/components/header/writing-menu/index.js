@@ -4,6 +4,7 @@
 import { MenuGroup } from '@wordpress/components';
 import { __, _x } from '@wordpress/i18n';
 import { useViewportMatch } from '@wordpress/compose';
+import { displayShortcut } from '@wordpress/keycodes';
 
 /**
  * Internal dependencies
@@ -17,13 +18,13 @@ function WritingMenu() {
 	}
 
 	return (
-		<MenuGroup
-			label={ _x( 'View', 'noun' ) }
-		>
+		<MenuGroup label={ _x( 'View', 'noun' ) }>
 			<FeatureToggle
 				feature="fixedToolbar"
 				label={ __( 'Top toolbar' ) }
-				info={ __( 'Access all block and document tools in a single place' ) }
+				info={ __(
+					'Access all block and document tools in a single place'
+				) }
 				messageActivated={ __( 'Top toolbar activated' ) }
 				messageDeactivated={ __( 'Top toolbar deactivated' ) }
 			/>
@@ -40,6 +41,7 @@ function WritingMenu() {
 				info={ __( 'Work without distraction' ) }
 				messageActivated={ __( 'Fullscreen mode activated' ) }
 				messageDeactivated={ __( 'Fullscreen mode deactivated' ) }
+				shortcut={ displayShortcut.secondary( 'f' ) }
 			/>
 		</MenuGroup>
 	);

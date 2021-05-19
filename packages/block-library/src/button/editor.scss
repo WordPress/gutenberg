@@ -1,22 +1,17 @@
-.block-editor-block-list__block[data-type="core/button"] {
-	&[data-align="center"] {
-		text-align: center;
-		margin-left: auto;
-		margin-right: auto;
-	}
+.wp-block[data-align="center"] > .wp-block-button {
+	text-align: center;
+	margin-left: auto;
+	margin-right: auto;
+}
 
-	&[data-align="right"] {
-		/*!rtl:ignore*/
-		text-align: right;
-	}
+.wp-block[data-align="right"] > .wp-block-button {
+	/*!rtl:ignore*/
+	text-align: right;
 }
 
 .wp-block-button {
 	position: relative;
-
-	[contenteditable] {
-		cursor: text;
-	}
+	cursor: text;
 
 	// Make placeholder text white unless custom colors or outline versions are chosen.
 	&:not(.has-text-color):not(.is-style-outline) [data-rich-text-placeholder]::after {
@@ -24,8 +19,8 @@
 	}
 
 	// Add outline to button on focus to indicate focus-state
-	.block-editor-rich-text__editable:focus {
-		box-shadow: 0 0 0 1px $white, 0 0 0 3px $blue-medium-500;
+	&:focus {
+		box-shadow: 0 0 0 1px $white, 0 0 0 3px var(--wp-admin-theme-color);
 
 		// Windows' High Contrast mode will show this outline, but not the box-shadow.
 		outline: 2px solid transparent;
@@ -33,13 +28,13 @@
 	}
 
 	// Increase placeholder opacity to meet contrast ratios.
-	[data-rich-text-placeholder]::after {
+	&[data-rich-text-placeholder]::after {
 		opacity: 0.8;
 	}
 }
 
 .wp-block-button__inline-link {
-	color: $dark-gray-500;
+	color: $gray-700;
 	height: 0;
 	overflow: hidden;
 	max-width: 290px;
@@ -65,11 +60,20 @@
 
 	}
 
-	.is-selected &,
-	.is-typing & {
+	.is-selected & {
 		height: auto;
 		overflow: visible;
-		margin-top: $grid-size-large;
+		margin-top: $grid-unit-20;
+	}
+}
+
+.wp-button-label__width {
+	.components-button-group {
+		display: block;
+	}
+
+	.components-base-control__field {
+		margin-bottom: 12px;
 	}
 }
 

@@ -1,24 +1,20 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { widget as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import metadata from './block.json';
 import edit from './edit';
-import icon from './icon';
+import transforms from './transforms';
 
-export const name = 'core/legacy-widget';
+const { name } = metadata;
+export { metadata, name };
 
 export const settings = {
-	title: __( 'Legacy Widget (Experimental)' ),
-	description: __( 'Display a legacy widget.' ),
 	icon,
-	category: 'widgets',
-	supports: {
-		html: false,
-		customClassName: false,
-	},
 	edit,
+	transforms,
 };

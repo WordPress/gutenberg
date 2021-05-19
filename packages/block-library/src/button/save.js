@@ -8,48 +8,51 @@ import classnames from 'classnames';
  */
 import {
 	RichText,
-	getColorClassName,
-	__experimentalGetGradientClass,
+	useBlockProps,
+	__experimentalGetColorClassesAndStyles as getColorClassesAndStyles,
 } from '@wordpress/block-editor';
 
-export default function save( { attributes } ) {
+export default function save( { attributes, className } ) {
 	const {
-		backgroundColor,
-		borderRadius,
-		customBackgroundColor,
-		customTextColor,
-		customGradient,
+		fontSize,
 		linkTarget,
-		gradient,
 		rel,
+		style,
 		text,
-		textColor,
 		title,
 		url,
+		width,
 	} = attributes;
 
-	const textClass = getColorClassName( 'color', textColor );
-	const backgroundClass = ! customGradient && getColorClassName( 'background-color', backgroundColor );
-	const gradientClass = __experimentalGetGradientClass( gradient );
+	if ( ! text ) {
+		return null;
+	}
 
-	const buttonClasses = classnames( 'wp-block-button__link', {
-		'has-text-color': textColor || customTextColor,
-		[ textClass ]: textClass,
-		'has-background': backgroundColor || customBackgroundColor || customGradient || gradient,
-		[ backgroundClass ]: backgroundClass,
-		'no-border-radius': borderRadius === 0,
-		[ gradientClass ]: gradientClass,
-	} );
-
+	const borderRadius = style?.border?.radius;
+	const colorProps = getColorClassesAndStyles( attributes );
+	const buttonClasses = classnames(
+		'wp-block-button__link',
+		colorProps.className,
+		{
+			'no-border-radius': borderRadius === 0,
+		}
+	);
 	const buttonStyle = {
-		background: customGradient ? customGradient : undefined,
-		backgroundColor: backgroundClass || customGradient || gradient ? undefined : customBackgroundColor,
-		color: textClass ? undefined : customTextColor,
 		borderRadius: borderRadius ? borderRadius + 'px' : undefined,
+		...colorProps.style,
 	};
 
+	// The use of a `title` attribute here is soft-deprecated, but still applied
+	// if it had already been assigned, for the sake of backward-compatibility.
+	// A title will no longer be assigned for new or updated button block links.
+
+	const wrapperClasses = classnames( className, {
+		[ `has-custom-width wp-block-button__width-${ width }` ]: width,
+		[ `has-custom-font-size` ]: fontSize || style?.typography?.fontSize,
+	} );
+
 	return (
-		<div>
+		<div { ...useBlockProps.save( { className: wrapperClasses } ) }>
 			<RichText.Content
 				tagName="a"
 				className={ buttonClasses }

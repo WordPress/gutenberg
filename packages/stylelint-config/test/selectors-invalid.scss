@@ -1,0 +1,34 @@
+.foo {
+
+	& > .bar {
+		margin: 0;
+	}
+}
+
+a {
+
+	& a {
+		margin: 0;
+	}
+}
+
+div {
+
+	& > a {
+		margin: 0;
+	}
+}
+
+p {
+
+	& .class {
+		margin: 0;
+	}
+}
+
+span {
+
+	& .class:after {
+		margin: 0;
+	}
+}

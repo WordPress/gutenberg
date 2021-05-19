@@ -1,192 +1,196 @@
 /**
- * External dependencies
- */
-import { get } from 'lodash';
-
-/**
  * WordPress dependencies
  */
-import { Component } from '@wordpress/element';
 import {
-	Button,
-	PanelBody,
-	ToolbarGroup,
-} from '@wordpress/components';
-import { __ } from '@wordpress/i18n';
-import { withSelect } from '@wordpress/data';
-import {
+	useBlockProps,
 	BlockControls,
 	InspectorControls,
+	BlockIcon,
+	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import ServerSideRender from '@wordpress/server-side-render';
+import { ToolbarButton, Spinner, Placeholder } from '@wordpress/components';
+import { brush as brushIcon, update as updateIcon } from '@wordpress/icons';
+import { __ } from '@wordpress/i18n';
+import { useState, useCallback } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
  */
-import LegacyWidgetEditHandler from './handler';
-import LegacyWidgetPlaceholder from './placeholder';
+import WidgetTypeSelector from './widget-type-selector';
+import InspectorCard from './inspector-card';
+import Form from './form';
+import Preview from './preview';
+import NoPreview from './no-preview';
+import ConvertToBlocksButton from './convert-to-blocks-button';
 
-class LegacyWidgetEdit extends Component {
-	constructor() {
-		super( ...arguments );
-		this.state = {
-			hasEditForm: true,
-			isPreview: false,
-		};
-		this.switchToEdit = this.switchToEdit.bind( this );
-		this.switchToPreview = this.switchToPreview.bind( this );
-		this.changeWidget = this.changeWidget.bind( this );
-	}
-
-	render() {
-		const {
-			attributes,
-			availableLegacyWidgets,
-			hasPermissionsToManageWidgets,
-			isSelected,
-			setAttributes,
-		} = this.props;
-		const { isPreview, hasEditForm } = this.state;
-		const { id, widgetClass } = attributes;
-		const widgetObject =
-			( id && availableLegacyWidgets[ id ] ) ||
-			( widgetClass && availableLegacyWidgets[ widgetClass ] );
-		if ( ! id && ! widgetClass ) {
-			return (
-				<LegacyWidgetPlaceholder
-					availableLegacyWidgets={ availableLegacyWidgets }
-					hasPermissionsToManageWidgets={ hasPermissionsToManageWidgets }
-					onChangeWidget={ ( newWidget ) => {
-						const { isReferenceWidget } = availableLegacyWidgets[ newWidget ];
-						setAttributes( {
-							instance: {},
-							id: isReferenceWidget ? newWidget : undefined,
-							widgetClass: isReferenceWidget ? undefined : newWidget,
-						} );
-					} }
-				/>
-			);
-		}
-
-		const inspectorControls = widgetObject ? (
-			<InspectorControls>
-				<PanelBody title={ widgetObject.name }>
-					{ widgetObject.description }
-				</PanelBody>
-			</InspectorControls>
-		) : null;
-		if ( ! hasPermissionsToManageWidgets ) {
-			return (
-				<>
-					{ inspectorControls }
-					{ this.renderWidgetPreview() }
-				</>
-			);
-		}
-
-		return (
-			<>
-				<BlockControls>
-					<ToolbarGroup>
-						{ ( widgetObject && ! widgetObject.isHidden ) && (
-							<Button
-								onClick={ this.changeWidget }
-								label={ __( 'Change widget' ) }
-								icon="update"
-							/>
-						) }
-						{ hasEditForm && (
-							<>
-								<Button
-									className="components-tab-button"
-									isPressed={ ! isPreview }
-									onClick={ this.switchToEdit }
-								>
-									<span>{ __( 'Edit' ) }</span>
-								</Button>
-								<Button
-									className="components-tab-button"
-									isPressed={ isPreview }
-									onClick={ this.switchToPreview }
-								>
-									<span>{ __( 'Preview' ) }</span>
-								</Button>
-							</>
-						) }
-					</ToolbarGroup>
-				</BlockControls>
-				{ inspectorControls }
-				{ hasEditForm && (
-					<LegacyWidgetEditHandler
-						isSelected={ isSelected }
-						isVisible={ ! isPreview }
-						id={ id }
-						idBase={ attributes.idBase || attributes.id }
-						number={ attributes.number }
-						widgetName={ get( widgetObject, [ 'name' ] ) }
-						widgetClass={ attributes.widgetClass }
-						instance={ attributes.instance }
-						onInstanceChange={
-							( newInstance, newHasEditForm ) => {
-								if ( newInstance ) {
-									this.props.setAttributes( {
-										instance: newInstance,
-									} );
-								}
-								if ( newHasEditForm !== this.hasEditForm ) {
-									this.setState( {
-										hasEditForm: newHasEditForm,
-									} );
-								}
-							}
-						}
-					/>
-				) }
-				{ ( isPreview || ! hasEditForm ) && this.renderWidgetPreview() }
-			</>
-		);
-	}
-
-	changeWidget() {
-		this.switchToEdit();
-		this.props.setAttributes( {
-			instance: {},
-			id: undefined,
-			widgetClass: undefined,
-		} );
-		this.setState( {
-			hasEditForm: true,
-		} );
-	}
-
-	switchToEdit() {
-		this.setState( { isPreview: false } );
-	}
-
-	switchToPreview() {
-		this.setState( { isPreview: true } );
-	}
-
-	renderWidgetPreview() {
-		const { attributes } = this.props;
-		return (
-			<ServerSideRender
-				className="wp-block-legacy-widget__preview"
-				block="core/legacy-widget"
-				attributes={ attributes }
-			/>
-		);
-	}
+export default function Edit( props ) {
+	const { id, idBase } = props.attributes;
+	return (
+		<div { ...useBlockProps() }>
+			{ ! id && ! idBase ? (
+				<Empty { ...props } />
+			) : (
+				<NotEmpty { ...props } />
+			) }
+		</div>
+	);
 }
 
-export default withSelect( ( select ) => {
-	const editorSettings = select( 'core/block-editor' ).getSettings();
+function Empty( { attributes: { id, idBase }, setAttributes } ) {
+	return (
+		<Placeholder
+			icon={ <BlockIcon icon={ brushIcon } /> }
+			label={ __( 'Legacy Widget' ) }
+		>
+			<WidgetTypeSelector
+				selectedId={ id ?? idBase }
+				onSelect={ ( { selectedId, isMulti } ) => {
+					if ( ! selectedId ) {
+						setAttributes( {
+							id: null,
+							idBase: null,
+							instance: null,
+						} );
+					} else if ( isMulti ) {
+						setAttributes( {
+							id: null,
+							idBase: selectedId,
+							instance: {},
+						} );
+					} else {
+						setAttributes( {
+							id: selectedId,
+							idBase: null,
+							instance: null,
+						} );
+					}
+				} }
+			/>
+		</Placeholder>
+	);
+}
+
+function NotEmpty( {
+	attributes: { id, idBase, instance },
+	setAttributes,
+	clientId,
+	isSelected,
+} ) {
+	const [ hasPreview, setHasPreview ] = useState( null );
+
 	const {
-		availableLegacyWidgets,
-		hasPermissionsToManageWidgets,
-	} = editorSettings;
-	return {
-		hasPermissionsToManageWidgets,
-		availableLegacyWidgets,
-	};
-} )( LegacyWidgetEdit );
+		widgetType,
+		hasResolvedWidgetType,
+		isWidgetTypeHidden,
+		isNavigationMode,
+	} = useSelect(
+		( select ) => {
+			const widgetTypeId = id ?? idBase;
+			const hiddenIds =
+				select( blockEditorStore ).getSettings()
+					?.widgetTypesToHideFromLegacyWidgetBlock ?? [];
+			return {
+				widgetType: select( coreStore ).getWidgetType( widgetTypeId ),
+				hasResolvedWidgetType: select(
+					coreStore
+				).hasFinishedResolution( 'getWidgetType', [ widgetTypeId ] ),
+				isWidgetTypeHidden: hiddenIds.includes( widgetTypeId ),
+				isNavigationMode: select( blockEditorStore ).isNavigationMode(),
+			};
+		},
+		[ id, idBase ]
+	);
+
+	const setInstance = useCallback( ( nextInstance ) => {
+		setAttributes( { instance: nextInstance } );
+	}, [] );
+
+	if ( ! widgetType && hasResolvedWidgetType ) {
+		return (
+			<Placeholder
+				icon={ <BlockIcon icon={ brushIcon } /> }
+				label={ __( 'Legacy Widget' ) }
+			>
+				{ __( 'Widget is missing.' ) }
+			</Placeholder>
+		);
+	}
+
+	if ( ! hasResolvedWidgetType ) {
+		return (
+			<Placeholder>
+				<Spinner />
+			</Placeholder>
+		);
+	}
+
+	const mode = isNavigationMode || ! isSelected ? 'preview' : 'edit';
+
+	return (
+		<>
+			{ ! isWidgetTypeHidden && (
+				<BlockControls group="block">
+					<ToolbarButton
+						label={ __( 'Change widget' ) }
+						icon={ updateIcon }
+						onClick={ () =>
+							setAttributes( {
+								id: null,
+								idBase: null,
+								instance: null,
+							} )
+						}
+					/>
+				</BlockControls>
+			) }
+
+			{ idBase === 'text' && (
+				<BlockControls group="other">
+					<ConvertToBlocksButton
+						clientId={ clientId }
+						rawInstance={ instance.raw }
+					/>
+				</BlockControls>
+			) }
+
+			<InspectorControls>
+				<InspectorCard
+					name={ widgetType.name }
+					description={ widgetType.description }
+				/>
+			</InspectorControls>
+
+			<Form
+				title={ widgetType.name }
+				isVisible={ mode === 'edit' }
+				id={ id }
+				idBase={ idBase }
+				instance={ instance }
+				onChangeInstance={ setInstance }
+				onChangeHasPreview={ setHasPreview }
+			/>
+
+			{ idBase && (
+				<>
+					{ hasPreview === null && mode === 'preview' && (
+						<Placeholder>
+							<Spinner />
+						</Placeholder>
+					) }
+					{ hasPreview === true && (
+						<Preview
+							idBase={ idBase }
+							instance={ instance }
+							isVisible={ mode === 'preview' }
+						/>
+					) }
+					{ hasPreview === false && mode === 'preview' && (
+						<NoPreview name={ widgetType.name } />
+					) }
+				</>
+			) }
+		</>
+	);
+}

@@ -38,7 +38,10 @@ describe( 'join', () => {
 				replacements: [ , , , , , , , ],
 				text: 'one two',
 			};
-			const result = join( [ deepFreeze( one ), deepFreeze( two ) ], separator );
+			const result = join(
+				[ deepFreeze( one ), deepFreeze( two ) ],
+				separator
+			);
 
 			expect( result ).not.toBe( one );
 			expect( result ).not.toBe( two );

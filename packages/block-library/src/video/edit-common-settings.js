@@ -2,10 +2,14 @@
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import {
-	ToggleControl,
-	SelectControl,
-} from '@wordpress/components';
+import { ToggleControl, SelectControl } from '@wordpress/components';
+import { useMemo, useCallback, Platform } from '@wordpress/element';
+
+const options = [
+	{ value: 'auto', label: __( 'Auto' ) },
+	{ value: 'metadata', label: __( 'Metadata' ) },
+	{ value: 'none', label: __( 'None' ) },
+];
 
 const VideoSettings = ( { setAttributes, attributes } ) => {
 	const {
@@ -17,53 +21,70 @@ const VideoSettings = ( { setAttributes, attributes } ) => {
 		preload,
 	} = attributes;
 
-	const getAutoplayHelp = ( checked ) => {
-		return checked ? __( 'Note: Autoplaying videos may cause usability issues for some visitors.' ) : null;
-	};
+	const autoPlayHelpText = __(
+		'Autoplay may cause usability issues for some users.'
+	);
+	const getAutoplayHelp = Platform.select( {
+		web: useCallback( ( checked ) => {
+			return checked ? autoPlayHelpText : null;
+		}, [] ),
+		native: autoPlayHelpText,
+	} );
 
-	const toggleAttribute = ( attribute ) => {
-		return ( newValue ) => {
-			setAttributes( { [ attribute ]: newValue } );
+	const toggleFactory = useMemo( () => {
+		const toggleAttribute = ( attribute ) => {
+			return ( newValue ) => {
+				setAttributes( { [ attribute ]: newValue } );
+			};
 		};
-	};
+
+		return {
+			autoplay: toggleAttribute( 'autoplay' ),
+			loop: toggleAttribute( 'loop' ),
+			muted: toggleAttribute( 'muted' ),
+			controls: toggleAttribute( 'controls' ),
+			playsInline: toggleAttribute( 'playsInline' ),
+		};
+	}, [] );
+
+	const onChangePreload = useCallback( ( value ) => {
+		setAttributes( { preload: value } );
+	}, [] );
 
 	return (
 		<>
 			<ToggleControl
 				label={ __( 'Autoplay' ) }
-				onChange={ toggleAttribute( 'autoplay' ) }
+				onChange={ toggleFactory.autoplay }
 				checked={ autoplay }
 				help={ getAutoplayHelp }
 			/>
 			<ToggleControl
 				label={ __( 'Loop' ) }
-				onChange={ toggleAttribute( 'loop' ) }
+				onChange={ toggleFactory.loop }
 				checked={ loop }
 			/>
 			<ToggleControl
 				label={ __( 'Muted' ) }
-				onChange={ toggleAttribute( 'muted' ) }
+				onChange={ toggleFactory.muted }
 				checked={ muted }
 			/>
 			<ToggleControl
-				label={ __( 'Playback Controls' ) }
-				onChange={ toggleAttribute( 'controls' ) }
+				label={ __( 'Playback controls' ) }
+				onChange={ toggleFactory.controls }
 				checked={ controls }
 			/>
 			<ToggleControl
 				label={ __( 'Play inline' ) }
-				onChange={ toggleAttribute( 'playsInline' ) }
+				onChange={ toggleFactory.playsInline }
 				checked={ playsInline }
 			/>
 			<SelectControl
 				label={ __( 'Preload' ) }
 				value={ preload }
-				onChange={ ( value ) => setAttributes( { preload: value } ) }
-				options={ [
-					{ value: 'auto', label: __( 'Auto' ) },
-					{ value: 'metadata', label: __( 'Metadata' ) },
-					{ value: 'none', label: __( 'None' ) },
-				] }
+				onChange={ onChangePreload }
+				options={ options }
+				hideCancelButton={ true }
 			/>
 		</>
 	);

@@ -32,7 +32,8 @@ async function emulateSelectAll() {
 				key: isMac ? 'Meta' : 'Control',
 				code: isMac ? 'MetaLeft' : 'ControlLeft',
 				location: window.KeyboardEvent.DOM_KEY_LOCATION_LEFT,
-				getModifierState: ( keyArg ) => keyArg === ( isMac ? 'Meta' : 'Control' ),
+				getModifierState: ( keyArg ) =>
+					keyArg === ( isMac ? 'Meta' : 'Control' ),
 				ctrlKey: ! isMac,
 				metaKey: isMac,
 				charCode: 0,
@@ -47,7 +48,8 @@ async function emulateSelectAll() {
 			key: 'a',
 			code: 'KeyA',
 			location: window.KeyboardEvent.DOM_KEY_LOCATION_STANDARD,
-			getModifierState: ( keyArg ) => keyArg === ( isMac ? 'Meta' : 'Control' ),
+			getModifierState: ( keyArg ) =>
+				keyArg === ( isMac ? 'Meta' : 'Control' ),
 			ctrlKey: ! isMac,
 			metaKey: isMac,
 			charCode: 0,
@@ -55,10 +57,9 @@ async function emulateSelectAll() {
 			which: 65,
 		} );
 
-		const wasPrevented = (
+		const wasPrevented =
 			! document.activeElement.dispatchEvent( preventableEvent ) ||
-			preventableEvent.defaultPrevented
-		);
+			preventableEvent.defaultPrevented;
 
 		if ( ! wasPrevented ) {
 			document.execCommand( 'selectall', false, null );
@@ -78,6 +79,26 @@ async function emulateSelectAll() {
 			} )
 		);
 	} );
+}
+
+/**
+ * Sets the clipboard data that can be pasted with
+ * `pressKeyWithModifier( 'primary', 'v' )`.
+ *
+ * @param {Object} $1           Options.
+ * @param {string} $1.plainText Plain text to set.
+ * @param {string} $1.html      HTML to set.
+ */
+export async function setClipboardData( { plainText = '', html = '' } ) {
+	await page.evaluate(
+		( _plainText, _html ) => {
+			window._clipboardData = new DataTransfer();
+			window._clipboardData.setData( 'text/plain', _plainText );
+			window._clipboardData.setData( 'text/html', _html );
+		},
+		plainText,
+		html
+	);
 }
 
 async function emulateClipboard( type ) {
@@ -102,10 +123,12 @@ async function emulateClipboard( type ) {
 			window._clipboardData.setData( 'text/html', html );
 		}
 
-		document.activeElement.dispatchEvent( new ClipboardEvent( _type, {
-			bubbles: true,
-			clipboardData: window._clipboardData,
-		} ) );
+		document.activeElement.dispatchEvent(
+			new ClipboardEvent( _type, {
+				bubbles: true,
+				clipboardData: window._clipboardData,
+			} )
+		);
 	}, type );
 }
 
@@ -136,10 +159,11 @@ export async function pressKeyWithModifier( modifier, key ) {
 	const isAppleOS = () => process.platform === 'darwin';
 	const overWrittenModifiers = {
 		...modifiers,
-		shiftAlt: ( _isApple ) => _isApple() ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
+		shiftAlt: ( _isApple ) =>
+			_isApple() ? [ SHIFT, ALT ] : [ SHIFT, CTRL ],
 	};
 	const mappedModifiers = overWrittenModifiers[ modifier ]( isAppleOS );
-	const ctrlSwap = ( mod ) => mod === CTRL ? 'control' : mod;
+	const ctrlSwap = ( mod ) => ( mod === CTRL ? 'control' : mod );
 
 	await Promise.all(
 		mappedModifiers.map( async ( mod ) => {

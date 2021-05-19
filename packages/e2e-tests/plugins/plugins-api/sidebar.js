@@ -1,4 +1,4 @@
-( function() {
+( function () {
 	var Button = wp.components.Button;
 	var PanelBody = wp.components.PanelBody;
 	var PanelRow = wp.components.PanelRow;
@@ -18,26 +18,23 @@
 	function SidebarContents( props ) {
 		return el(
 			PanelBody,
-			{},
+			{ className: 'sidebar-title-plugin-panel' },
 			el(
 				PanelRow,
 				{},
 				el(
 					'label',
 					{
-						'htmlFor': 'title-plain-text'
+						htmlFor: 'title-plain-text',
 					},
-					__( 'Title:' ),
+					__( 'Title:' )
 				),
-				el(
-					PlainText,
-					{
-						id: 'title-plain-text',
-						onChange: props.updateTitle,
-						placeholder: __( '(no title)' ),
-						value: props.title
-					}
-				)
+				el( PlainText, {
+					id: 'title-plain-text',
+					onChange: props.updateTitle,
+					placeholder: __( '(no title)' ),
+					value: props.title,
+				} )
 			),
 			el(
 				PanelRow,
@@ -46,7 +43,7 @@
 					Button,
 					{
 						isPrimary: true,
-						onClick: props.resetTitle
+						onClick: props.resetTitle,
 					},
 					__( 'Reset' )
 				)
@@ -55,27 +52,29 @@
 	}
 
 	var SidebarContentsWithDataHandling = compose( [
-		withSelect( function( select ) {
+		withSelect( function ( select ) {
 			return {
-				title: select( 'core/editor' ).getEditedPostAttribute( 'title' ),
+				title: select( 'core/editor' ).getEditedPostAttribute(
+					'title'
+				),
 			};
 		} ),
-		withDispatch( function( dispatch ) {
+		withDispatch( function ( dispatch ) {
 			function editPost( title ) {
 				dispatch( 'core/editor' ).editPost( {
-					title: title
+					title: title,
 				} );
 			}
 
 			return {
-				updateTitle: function( title ) {
+				updateTitle: function ( title ) {
 					editPost( title );
 				},
-				resetTitle: function() {
+				resetTitle: function () {
 					editPost( '' );
-				}
+				},
 			};
-		} )
+		} ),
 	] )( SidebarContents );
 
 	function MySidebarPlugin() {
@@ -86,25 +85,22 @@
 				PluginSidebar,
 				{
 					name: 'title-sidebar',
-					title: __( 'Sidebar title plugin' )
+					title: __( 'Plugin sidebar title' ),
 				},
-				el(
-					SidebarContentsWithDataHandling,
-					{}
-				)
+				el( SidebarContentsWithDataHandling, {} )
 			),
 			el(
 				PluginSidebarMoreMenuItem,
 				{
-					target: 'title-sidebar'
+					target: 'title-sidebar',
 				},
-				__( 'Sidebar title plugin' )
+				__( 'Plugin sidebar more menu title' )
 			)
 		);
 	}
 
 	registerPlugin( 'my-sidebar-plugin', {
 		icon: 'text',
-		render: MySidebarPlugin
+		render: MySidebarPlugin,
 	} );
 } )();

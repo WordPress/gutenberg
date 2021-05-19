@@ -42,7 +42,10 @@ export function getMimeTypesArray( wpMimeTypesObject ) {
 	return flatMap( wpMimeTypesObject, ( mime, extensionsString ) => {
 		const [ type ] = mime.split( '/' );
 		const extensions = extensionsString.split( '|' );
-		return [ mime, ...map( extensions, ( extension ) => `${ type }/${ extension }` ) ];
+		return [
+			mime,
+			...map( extensions, ( extension ) => `${ type }/${ extension }` ),
+		];
 	} );
 }
 
@@ -85,17 +88,14 @@ export async function uploadMedia( {
 		if ( ! allowedTypes ) {
 			return true;
 		}
-		return some(
-			allowedTypes,
-			( allowedType ) => {
-				// If a complete mimetype is specified verify if it matches exactly the mime type of the file.
-				if ( includes( allowedType, '/' ) ) {
-					return allowedType === fileType;
-				}
-				// Otherwise a general mime type is used and we should verify if the file mimetype starts with it.
-				return startsWith( fileType, `${ allowedType }/` );
+		return some( allowedTypes, ( allowedType ) => {
+			// If a complete mimetype is specified verify if it matches exactly the mime type of the file.
+			if ( includes( allowedType, '/' ) ) {
+				return allowedType === fileType;
 			}
-		);
+			// Otherwise a general mime type is used and we should verify if the file mimetype starts with it.
+			return startsWith( fileType, `${ allowedType }/` );
+		} );
 	};
 
 	// Allowed types for the current WP_User
@@ -118,18 +118,26 @@ export async function uploadMedia( {
 	const validFiles = [];
 
 	for ( const mediaFile of files ) {
-		// verify if user is allowed to upload this mime type
-		if ( allowedMimeTypesForUser && ! isAllowedMimeTypeForUser( mediaFile.type ) ) {
+		// Verify if user is allowed to upload this mime type.
+		// Defer to the server when type not detected.
+		if (
+			allowedMimeTypesForUser &&
+			mediaFile.type &&
+			! isAllowedMimeTypeForUser( mediaFile.type )
+		) {
 			triggerError( {
 				code: 'MIME_TYPE_NOT_ALLOWED_FOR_USER',
-				message: __( 'Sorry, this file type is not permitted for security reasons.' ),
+				message: __(
+					'Sorry, this file type is not permitted for security reasons.'
+				),
 				file: mediaFile,
 			} );
 			continue;
 		}
 
-		// Check if the block supports this mime type
-		if ( ! isAllowedType( mediaFile.type ) ) {
+		// Check if the block supports this mime type.
+		// Defer to the server when type not detected.
+		if ( mediaFile.type && ! isAllowedType( mediaFile.type ) ) {
 			triggerError( {
 				code: 'MIME_TYPE_NOT_SUPPORTED',
 				message: __( 'Sorry, this file type is not supported here.' ),
@@ -142,7 +150,9 @@ export async function uploadMedia( {
 		if ( maxUploadFileSize && mediaFile.size > maxUploadFileSize ) {
 			triggerError( {
 				code: 'SIZE_ABOVE_LIMIT',
-				message: __( 'This file exceeds the maximum upload size for this site.' ),
+				message: __(
+					'This file exceeds the maximum upload size for this site.'
+				),
 				file: mediaFile,
 			} );
 			continue;
@@ -169,7 +179,10 @@ export async function uploadMedia( {
 	for ( let idx = 0; idx < validFiles.length; ++idx ) {
 		const mediaFile = validFiles[ idx ];
 		try {
-			const savedMedia = await createMediaFromFile( mediaFile, additionalData );
+			const savedMedia = await createMediaFromFile(
+				mediaFile,
+				additionalData
+			);
 			const mediaObject = {
 				...omit( savedMedia, [ 'alt_text', 'source_url' ] ),
 				alt: savedMedia.alt_text,
@@ -210,7 +223,7 @@ function createMediaFromFile( file, additionalData ) {
 	// Create upload payload
 	const data = new window.FormData();
 	data.append( 'file', file, file.name || file.type.replace( '/', '.' ) );
-	forEach( additionalData, ( ( value, key ) => data.append( key, value ) ) );
+	forEach( additionalData, ( value, key ) => data.append( key, value ) );
 	return apiFetch( {
 		path: '/wp/v2/media',
 		body: data,

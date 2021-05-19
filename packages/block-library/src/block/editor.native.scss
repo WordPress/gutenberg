@@ -1,0 +1,107 @@
+.titleContainer {
+	flex-direction: row;
+	align-items: center;
+	padding-bottom: 28;
+}
+
+.title {
+	font-weight: bold;
+	color: $light-secondary;
+	flex-grow: 1;
+	flex-shrink: 1;
+}
+
+.titleDark {
+	color: $dark-secondary;
+}
+
+.separator {
+	background-color: $light-gray-400;
+	height: 1px;
+	position: absolute;
+	left: -$block-selected-to-content + $block-selected-border-width;
+	right: -$block-selected-to-content + $block-selected-border-width;
+	bottom: 16;
+}
+
+.separatorDark {
+	background-color: $gray-70;
+}
+
+.lockIconContainer {
+	justify-content: flex-start;
+	align-items: flex-end;
+	padding-right: 8;
+}
+
+.lockIcon {
+	color: $light-secondary;
+}
+
+.lockIconDark {
+	color: $dark-secondary;
+}
+
+.helpIconContainer {
+	justify-content: flex-start;
+	align-items: flex-end;
+}
+
+.infoIcon {
+	color: $light-secondary;
+}
+
+.infoIconDark {
+	color: $dark-secondary;
+}
+
+.infoContainer {
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-end;
+}
+
+.infoSheetIcon {
+	size: 36;
+	height: 36;
+	padding-top: 8;
+	padding-bottom: 8;
+	color: $gray;
+}
+
+.infoSheetIconDark {
+	color: $gray-20;
+}
+
+.infoText {
+	text-align: center;
+	color: $gray-dark;
+}
+
+.infoTextDark {
+	color: $white;
+}
+
+.infoTitle {
+	padding-top: 8;
+	padding-bottom: 12;
+	font-size: 20;
+	font-weight: bold;
+	color: $gray-dark;
+}
+
+.infoTitleDark {
+	color: $white;
+}
+
+.spinner {
+	height: $grid-unit-60;
+	border-width: $border-width;
+	border-radius: $radius-block-ui;
+	border-color: $light-gray-400;
+	justify-content: center;
+}
+
+.spinnerDark {
+	border-color: $gray-70;
+}

@@ -1,0 +1,15 @@
+{
+	"core": "WordPress/WordPress",
+	"plugins": [
+		"."
+	],
+	"themes": [ "WordPress/theme-experiments/tt1-blocks#tt1-blocks@0.4.5" ],
+	"env": {
+		"tests": {
+			"mappings": {
+				"wp-content/mu-plugins": "./packages/e2e-tests/mu-plugins",
+				"wp-content/plugins/gutenberg-test-plugins": "./packages/e2e-tests/plugins"
+			}
+		}
+	}
+}

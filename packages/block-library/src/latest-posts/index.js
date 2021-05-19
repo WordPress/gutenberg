@@ -1,25 +1,21 @@
 /**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { postList as icon } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
+import deprecated from './deprecated';
 import edit from './edit';
-import icon from './icon';
+import metadata from './block.json';
 
-export const name = 'core/latest-posts';
+const { name } = metadata;
+export { metadata, name };
 
 export const settings = {
-	title: __( 'Latest Posts' ),
-	description: __( 'Display a list of your most recent posts.' ),
 	icon,
-	category: 'widgets',
-	keywords: [ __( 'recent posts' ) ],
-	supports: {
-		align: true,
-		html: false,
-	},
+	example: {},
 	edit,
+	deprecated,
 };

@@ -2,7 +2,7 @@
 	display: block;
 	width: 33.33%;
 	padding: 0;
-	margin: 0 0 12px;
+	margin: 0;
 }
 
 .components-button.block-editor-block-types-list__item {
@@ -10,14 +10,14 @@
 	flex-direction: column;
 	width: 100%;
 	font-size: $default-font-size;
-	color: $dark-gray-700;
-	padding: 0 4px;
+	color: $gray-900;
+	padding: $grid-unit-10;
 	align-items: stretch;
 	justify-content: center;
 	cursor: pointer;
 	background: transparent;
 	word-break: break-word;
-	border-radius: $radius-round-rectangle;
+	border-radius: $radius-block-ui;
 	border: $border-width solid transparent;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
@@ -25,58 +25,31 @@
 	height: auto;
 
 	&:disabled {
-		@include block-style__disabled();
+		opacity: 0.6;
+		cursor: default;
 	}
 
 	&:not(:disabled) {
-
-		// Show the hover background in a pseudo selector so it can be below "stacked" icons, like Columns.
-		&:hover::before {
-			content: "";
-			display: block;
-			@include block-style__hover();
-			position: absolute;
-			z-index: -1;
-			border-radius: $radius-round-rectangle;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-		}
-
 		&:hover {
-			.block-editor-block-types-list__item-icon,
-			.block-editor-block-types-list__item-title {
-				color: inherit;
-			}
-		}
-
-		&:active,
-		&:focus {
-			position: relative;
-			@include block-style__focus();
-			background: transparent;
-
-			.block-editor-block-types-list__item-icon,
-			.block-editor-block-types-list__item-title {
-				color: inherit;
-			}
+			border-color: var(--wp-admin-theme-color);
+			color: var(--wp-admin-theme-color) !important;
 		}
 
 		&.is-active {
-			@include block-style__is-active();
+			color: $white;
+			background: $gray-900;
 
-			&:focus {
-				@include block-style__is-active-focus();
-			}
+			// Windows High Contrast mode will show this outline, but not the box-shadow.
+			outline: 2px solid transparent;
+			outline-offset: -2px;
 		}
 	}
 }
 
 .block-editor-block-types-list__item-icon {
 	padding: 12px 20px;
-	border-radius: $radius-round-rectangle;
-	color: $dark-gray-500;
+	border-radius: $radius-block-ui;
+	color: $gray-900;
 	transition: all 0.05s ease-in-out;
 	@include reduce-motion("transition");
 
@@ -89,8 +62,13 @@
 		transition: all 0.15s ease-out;
 		@include reduce-motion("transition");
 	}
+
+	.block-editor-block-types-list__list-item[draggable="true"] & {
+		cursor: grab;
+	}
 }
 
 .block-editor-block-types-list__item-title {
 	padding: 4px 2px 8px;
+	font-size: 12px;
 }

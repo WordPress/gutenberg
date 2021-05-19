@@ -17,9 +17,7 @@ describe( 'PluginPostStatusInfo', () => {
 	test( 'renders fill properly', () => {
 		const tree = ReactTestRenderer.create(
 			<SlotFillProvider>
-				<PluginPostStatusInfo
-					className="my-plugin-post-status-info"
-				>
+				<PluginPostStatusInfo className="my-plugin-post-status-info">
 					My plugin post status info
 				</PluginPostStatusInfo>
 				<PluginPostStatusInfo.Slot />

@@ -1,16 +1,17 @@
 {
 	"name": "@wordpress/base-styles",
-	"version": "1.2.0",
+	"version": "3.4.4",
 	"description": "Base SCSS utilities and variables for WordPress.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
 	"keywords": [
 		"wordpress",
+		"gutenberg",
 		"sass",
 		"scss",
 		"css"
 	],
-	"homepage": "https://github.com/WordPress/gutenberg/tree/master/packages/base-styles/README.md",
+	"homepage": "https://github.com/WordPress/gutenberg/tree/HEAD/packages/base-styles/README.md",
 	"repository": {
 		"type": "git",
 		"url": "https://github.com/WordPress/gutenberg.git",

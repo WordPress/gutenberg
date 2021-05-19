@@ -28,7 +28,10 @@ describe( 'Listener', () => {
 		it( 'adds an event listener on first listener', () => {
 			listener.add( 'resize', createHandler() );
 
-			expect( window.addEventListener ).toHaveBeenCalledWith( 'resize', expect.any( Function ) );
+			expect( window.addEventListener ).toHaveBeenCalledWith(
+				'resize',
+				expect.any( Function )
+			);
 		} );
 
 		it( 'does not add event listener on subsequent listeners', () => {
@@ -45,7 +48,10 @@ describe( 'Listener', () => {
 			listener.add( 'resize', handler );
 			listener.remove( 'resize', handler );
 
-			expect( window.removeEventListener ).toHaveBeenCalledWith( 'resize', expect.any( Function ) );
+			expect( window.removeEventListener ).toHaveBeenCalledWith(
+				'resize',
+				expect.any( Function )
+			);
 		} );
 
 		it( 'does not remove event listener on remaining listeners', () => {

@@ -1,30 +1,9 @@
 /**
- * External dependencies
- */
-import { noop } from 'lodash';
-
-/**
  * WordPress dependencies
  */
+import { ActionItem } from '@wordpress/interface';
 import { compose } from '@wordpress/compose';
-import { MenuItem } from '@wordpress/components';
 import { withPluginContext } from '@wordpress/plugins';
-
-/**
- * Internal dependencies
- */
-import PluginsMoreMenuGroup from '../plugins-more-menu-group';
-
-const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
-	<PluginsMoreMenuGroup>
-		{ ( fillProps ) => (
-			<MenuItem
-				{ ...props }
-				onClick={ compose( onClick, fillProps.onClose ) }
-			/>
-		) }
-	</PluginsMoreMenuGroup>
-);
 
 /**
  * Renders a menu item in `Plugins` group in `More Menu` drop down, and can be used to as a button or link depending on the props provided.
@@ -36,11 +15,12 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  * @param {Function} [props.onClick=noop] The callback function to be executed when the user clicks the menu item.
  * @param {...*} [props.other] Any additional props are passed through to the underlying [MenuItem](/packages/components/src/menu-item/README.md) component.
  *
- * @example <caption>ES5</caption>
+ * @example
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
  * var PluginMoreMenuItem = wp.editPost.PluginMoreMenuItem;
+ * var moreIcon = wp.element.createElement( 'svg' ); //... svg element.
  *
  * function onButtonClick() {
  * 	alert( 'Button clicked.' );
@@ -50,19 +30,20 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  * 	return wp.element.createElement(
  * 		PluginMoreMenuItem,
  * 		{
- * 			icon: 'smiley',
- * 			onClick: onButtonClick
+ * 			icon: moreIcon,
+ * 			onClick: onButtonClick,
  * 		},
  * 		__( 'My button title' )
- * 	)
+ * 	);
  * }
  * ```
  *
- * @example <caption>ESNext</caption>
+ * @example
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PluginMoreMenuItem } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginMoreMenuItem } from '@wordpress/edit-post';
+ * import { more } from '@wordpress/icons';
  *
  * function onButtonClick() {
  * 	alert( 'Button clicked.' );
@@ -70,7 +51,7 @@ const PluginMoreMenuItem = ( { onClick = noop, ...props } ) => (
  *
  * const MyButtonMoreMenuItem = () => (
  * 	<PluginMoreMenuItem
- * 		icon="smiley"
+ * 		icon={ more }
  * 		onClick={ onButtonClick }
  * 	>
  * 		{ __( 'My button title' ) }
@@ -84,6 +65,7 @@ export default compose(
 	withPluginContext( ( context, ownProps ) => {
 		return {
 			icon: ownProps.icon || context.icon,
+			name: 'core/edit-post/plugin-more-menu',
 		};
-	} ),
-)( PluginMoreMenuItem );
+	} )
+)( ActionItem );

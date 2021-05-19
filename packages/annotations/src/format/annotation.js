@@ -7,7 +7,10 @@ import { applyFormat, removeFormat } from '@wordpress/rich-text';
 const FORMAT_NAME = 'core/annotation';
 
 const ANNOTATION_ATTRIBUTE_PREFIX = 'annotation-text-';
-const STORE_KEY = 'core/annotations';
+/**
+ * Internal dependencies
+ */
+import { STORE_NAME } from '../store/constants';
 
 /**
  * Applies given annotations to the given record.
@@ -34,7 +37,8 @@ export function applyAnnotations( record, annotations = [] ) {
 		record = applyFormat(
 			record,
 			{
-				type: FORMAT_NAME, attributes: {
+				type: FORMAT_NAME,
+				attributes: {
 					className,
 					id,
 				},
@@ -68,7 +72,9 @@ function retrieveAnnotationPositions( formats ) {
 
 	formats.forEach( ( characterFormats, i ) => {
 		characterFormats = characterFormats || [];
-		characterFormats = characterFormats.filter( ( format ) => format.type === FORMAT_NAME );
+		characterFormats = characterFormats.filter(
+			( format ) => format.type === FORMAT_NAME
+		);
 		characterFormats.forEach( ( format ) => {
 			let { id } = format.attributes;
 			id = id.replace( ANNOTATION_ATTRIBUTE_PREFIX, '' );
@@ -98,7 +104,11 @@ function retrieveAnnotationPositions( formats ) {
  * @param {Function} actions.removeAnnotation      Function to remove an annotation from the state.
  * @param {Function} actions.updateAnnotationRange Function to update an annotation range in the state.
  */
-function updateAnnotationsWithPositions( annotations, positions, { removeAnnotation, updateAnnotationRange } ) {
+function updateAnnotationsWithPositions(
+	annotations,
+	positions,
+	{ removeAnnotation, updateAnnotationRange }
+) {
 	annotations.forEach( ( currentAnnotation ) => {
 		const position = positions[ currentAnnotation.id ];
 		// If we cannot find an annotation, delete it.
@@ -111,7 +121,11 @@ function updateAnnotationsWithPositions( annotations, positions, { removeAnnotat
 
 		const { start, end } = currentAnnotation;
 		if ( start !== position.start || end !== position.end ) {
-			updateAnnotationRange( currentAnnotation.id, position.start, position.end );
+			updateAnnotationRange(
+				currentAnnotation.id,
+				position.start,
+				position.end
+			);
 		}
 	} );
 }
@@ -128,9 +142,17 @@ export const annotation = {
 	edit() {
 		return null;
 	},
-	__experimentalGetPropsForEditableTreePreparation( select, { richTextIdentifier, blockClientId } ) {
+	__experimentalGetPropsForEditableTreePreparation(
+		select,
+		{ richTextIdentifier, blockClientId }
+	) {
 		return {
-			annotations: select( STORE_KEY ).__experimentalGetAnnotationsForRichText( blockClientId, richTextIdentifier ),
+			annotations: select(
+				STORE_NAME
+			).__experimentalGetAnnotationsForRichText(
+				blockClientId,
+				richTextIdentifier
+			),
 		};
 	},
 	__experimentalCreatePrepareEditableTree( { annotations } ) {
@@ -146,16 +168,25 @@ export const annotation = {
 	},
 	__experimentalGetPropsForEditableTreeChangeHandler( dispatch ) {
 		return {
-			removeAnnotation: dispatch( STORE_KEY ).__experimentalRemoveAnnotation,
-			updateAnnotationRange: dispatch( STORE_KEY ).__experimentalUpdateAnnotationRange,
+			removeAnnotation: dispatch( STORE_NAME )
+				.__experimentalRemoveAnnotation,
+			updateAnnotationRange: dispatch( STORE_NAME )
+				.__experimentalUpdateAnnotationRange,
 		};
 	},
 	__experimentalCreateOnChangeEditableValue( props ) {
 		return ( formats ) => {
 			const positions = retrieveAnnotationPositions( formats );
-			const { removeAnnotation, updateAnnotationRange, annotations } = props;
+			const {
+				removeAnnotation,
+				updateAnnotationRange,
+				annotations,
+			} = props;
 
-			updateAnnotationsWithPositions( annotations, positions, { removeAnnotation, updateAnnotationRange } );
+			updateAnnotationsWithPositions( annotations, positions, {
+				removeAnnotation,
+				updateAnnotationRange,
+			} );
 		};
 	},
 };

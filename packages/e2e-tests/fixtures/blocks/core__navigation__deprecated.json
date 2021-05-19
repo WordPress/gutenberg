@@ -1,0 +1,34 @@
+[
+	{
+		"clientId": "_clientId_0",
+		"name": "core/navigation",
+		"isValid": true,
+		"attributes": {
+			"orientation": "horizontal",
+			"showSubmenuIcon": true,
+			"style": {
+				"typography": {
+					"textTransform": "lowercase",
+					"textDecoration": "line-through",
+					"fontStyle": "italic",
+					"fontWeight": "100"
+				}
+			}
+		},
+		"innerBlocks": [
+			{
+				"clientId": "_clientId_0",
+				"name": "core/navigation-link",
+				"isValid": true,
+				"attributes": {
+					"label": "WordPress",
+					"opensInNewTab": false,
+					"url": "https://www.wordpress.org/"
+				},
+				"innerBlocks": [],
+				"originalContent": ""
+			}
+		],
+		"originalContent": ""
+	}
+]

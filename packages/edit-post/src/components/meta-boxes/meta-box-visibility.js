@@ -4,6 +4,11 @@
 import { Component } from '@wordpress/element';
 import { withSelect } from '@wordpress/data';
 
+/**
+ * Internal dependencies
+ */
+import { store as editPostStore } from '../../store';
+
 class MetaBoxVisibility extends Component {
 	componentDidMount() {
 		this.updateDOM();
@@ -36,5 +41,7 @@ class MetaBoxVisibility extends Component {
 }
 
 export default withSelect( ( select, { id } ) => ( {
-	isVisible: select( 'core/edit-post' ).isEditorPanelEnabled( `meta-box-${ id }` ),
+	isVisible: select( editPostStore ).isEditorPanelEnabled(
+		`meta-box-${ id }`
+	),
 } ) )( MetaBoxVisibility );

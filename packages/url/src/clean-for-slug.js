@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { deburr, toLower, trim } from 'lodash';
+import { deburr, trim } from 'lodash';
 
 /**
  * Performs some basic cleanup of a string for use as a post slug.
@@ -9,11 +9,11 @@ import { deburr, toLower, trim } from 'lodash';
  * This replicates some of what `sanitize_title()` does in WordPress core, but
  * is only designed to approximate what the slug will be.
  *
- * Converts whitespace, periods, forward slashes and underscores to hyphens.
  * Converts Latin-1 Supplement and Latin Extended-A letters to basic Latin
- * letters. Removes combining diacritical marks. Converts remaining string
- * to lowercase. It does not touch octets, HTML entities, or other encoded
- * characters.
+ * letters. Removes combining diacritical marks. Converts whitespace, periods,
+ * and forward slashes to hyphens. Removes any remaining non-word characters
+ * except hyphens. Converts remaining string to lowercase. It does not account
+ * for octets, HTML entities, or other encoded characters.
  *
  * @param {string} string Title or slug to be processed.
  *
@@ -23,5 +23,11 @@ export function cleanForSlug( string ) {
 	if ( ! string ) {
 		return '';
 	}
-	return toLower( deburr( trim( string.replace( /[\s\./_]+/g, '-' ), '-' ) ) );
+	return trim(
+		deburr( string )
+			.replace( /[\s\./]+/g, '-' )
+			.replace( /[^\w-]+/g, '' )
+			.toLowerCase(),
+		'-'
+	);
 }

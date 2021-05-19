@@ -1,19 +1,13 @@
-.editor-styles-wrapper {
-	-webkit-overflow-scrolling: touch;
-	background: $white;
-	height: calc(100% - #{$header-height});
-	left: 0;
-	overflow: auto;
-	position: absolute;
-	top: $header-height;
-	width: 100%;
+// The button element easily inherits styles that are meant for the editor style.
+// These rules enhance the specificity to reduce that inheritance.
+// This is duplicated in visual-editor.
+.edit-site-block-editor__editor-styles-wrapper  .components-button {
+	font-family: $default-font;
+	font-size: $default-font-size;
+	padding: 6px 12px;
 
-	@include break-small {
-		width: calc(100% - #{$sidebar-width});
+	&.is-tertiary,
+	&.has-icon {
+		padding: 6px;
 	}
-}
-
-.edit-site-block-editor__block-list {
-	padding-bottom: $grid-size-xlarge;
-	padding-top: $grid-size-xlarge + 5;
 }

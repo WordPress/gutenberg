@@ -1,17 +1,21 @@
+.block-editor-format-toolbar__image-popover {
+	z-index: z-index(".block-editor-format-toolbar__image-popover");
+}
+
 .block-editor-format-toolbar__image-container-content {
 	display: flex;
 
 	.components-button {
 		align-self: flex-end;
-		height: $grid-size * 4 - ($border-width * 2);
-		margin-bottom: $grid-size;
-		margin-right: $grid-size;
+		height: $grid-unit-10 * 4 - ($border-width * 2);
+		margin-bottom: $grid-unit-10;
+		margin-right: $grid-unit-10;
 		padding: 0 6px;
 	}
 }
 
 .block-editor-format-toolbar__image-container-value {
-	margin: $grid-size - $border-width;
+	margin: $grid-unit-10 - $border-width;
 	flex-grow: 1;
 	flex-shrink: 1;
 	white-space: nowrap;

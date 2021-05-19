@@ -1,38 +1,53 @@
 /**
  * Internal dependencies
  */
-import { __experimentalText as Text } from '../text.styles';
+import { Text } from '..';
 
 export default {
-	title: 'Components/Experimental/Text',
 	component: Text,
+	title: 'G2 Components (Experimental)/Text',
 };
 
-export const _default = () => (
-	<>
-		<Text variant="title.large" as="h1">Title Large</Text>
-		<Text variant="title.medium" as="h2">Title Medium</Text>
-		<Text variant="title.small" as="h3">Title Small</Text>
-		<Text variant="subtitle">Subtitle</Text>
-		<Text variant="subtitle.small">Subtitle Small</Text>
-		<Text variant="body">Body</Text>
-		<Text variant="body.small">Body Small</Text>
-		<Text variant="button">Button</Text>
-		<Text variant="caption">Caption</Text>
-		<Text variant="label">Label</Text>
-	</>
-);
+export const _default = () => {
+	return <Text>Hello</Text>;
+};
 
-export const TitleLarge = () => <Text variant="title.large" as="h1">Title Large</Text>;
-export const TitleMedium = () => <Text variant="title.medium" as="h2">Title Medium</Text>;
-export const TitleSmall = () => <Text variant="title.small" as="h3">Title Small</Text>;
+export const truncate = () => {
+	return (
+		<Text numberOfLines={ 2 } truncate>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
+			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
+			Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla
+			facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
+			In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis
+			arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque
+			eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada
+			ultricies eros ut faucibus. Aliquam erat volutpat. Nulla nec feugiat
+			risus. Vivamus iaculis dui aliquet ante ultricies feugiat.
+			Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
+			posuere cubilia curae; Vivamus nec pretium velit, sit amet
+			consectetur ante. Praesent porttitor ex eget fermentum mattis.
+		</Text>
+	);
+};
 
-export const Subtitle = () => <Text variant="subtitle">Subtitle</Text>;
-export const SubtitleSmall = () => <Text variant="subtitle.small">Subtitle Small</Text>;
-
-export const Body = () => <Text variant="body">Body</Text>;
-export const BodySmall = () => <Text variant="body.small">Body Small</Text>;
-
-export const Button = () => <Text variant="button">Button</Text>;
-export const Caption = () => <Text variant="caption">Caption</Text>;
-export const Label = () => <Text variant="label">Label</Text>;
+export const highlight = () => {
+	return (
+		<Text highlightWords={ [ 'con' ] }>
+			Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut
+			facilisis dictum tortor, eu tincidunt justo scelerisque tincidunt.
+			Duis semper dui id augue malesuada, ut feugiat nisi aliquam.
+			Vestibulum venenatis diam sem, finibus dictum massa semper in. Nulla
+			facilisi. Nunc vulputate faucibus diam, in lobortis arcu ornare vel.
+			In dignissim nunc sed facilisis finibus. Etiam imperdiet mattis
+			arcu, sed rutrum sapien blandit gravida. Aenean sollicitudin neque
+			eget enim blandit, sit amet rutrum leo vehicula. Nunc malesuada
+			ultricies eros ut faucibus. Aliquam erat volutpat. Nulla nec feugiat
+			risus. Vivamus iaculis dui aliquet ante ultricies feugiat.
+			Vestibulum ante ipsum primis in faucibus orci luctus et ultrices
+			posuere cubilia curae; Vivamus nec pretium velit, sit amet
+			consectetur ante. Praesent porttitor ex eget fermentum mattis.
+		</Text>
+	);
+};

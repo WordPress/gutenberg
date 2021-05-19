@@ -14,22 +14,24 @@ import { DOWN, ENTER, UP } from '@wordpress/keycodes';
 import ColorPicker from '../';
 
 describe( 'ColorPicker', () => {
-	test( 'should render color picker', () => {
-		const color = '#FFF';
+	const color = '#FFF';
+	let base;
 
-		const renderer = TestRenderer.create(
+	beforeEach( () => {
+		base = TestRenderer.create(
 			<ColorPicker
 				color={ color }
 				onChangeComplete={ () => {} }
 				disableAlpha
 			/>
 		);
+	} );
 
-		expect( renderer.toJSON() ).toMatchSnapshot();
+	test( 'should render color picker', () => {
+		expect( base.toJSON() ).toMatchSnapshot();
 	} );
 
 	test( 'should only update input view for draft changes', () => {
-		const color = '#FFF';
 		const testRenderer = TestRenderer.create(
 			<ColorPicker
 				color={ color }
@@ -37,12 +39,14 @@ describe( 'ColorPicker', () => {
 				disableAlpha
 			/>
 		);
-		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
-		expect( testRenderer.toJSON() ).toMatchSnapshot();
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
+
+		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
 	} );
 
 	test( 'should commit changes to all views on blur', () => {
-		const color = '#FFF';
 		const testRenderer = TestRenderer.create(
 			<ColorPicker
 				color={ color }
@@ -50,13 +54,15 @@ describe( 'ColorPicker', () => {
 				disableAlpha
 			/>
 		);
-		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
 		testRenderer.root.findByType( 'input' ).props.onBlur();
-		expect( testRenderer.toJSON() ).toMatchSnapshot();
+
+		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
 	} );
 
 	test( 'should commit changes to all views on keyDown = UP', () => {
-		const color = '#FFF';
 		const testRenderer = TestRenderer.create(
 			<ColorPicker
 				color={ color }
@@ -64,13 +70,17 @@ describe( 'ColorPicker', () => {
 				disableAlpha
 			/>
 		);
-		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
-		testRenderer.root.findByType( 'input' ).props.onKeyDown( { keyCode: UP } );
-		expect( testRenderer.toJSON() ).toMatchSnapshot();
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onKeyDown( { keyCode: UP } );
+
+		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
 	} );
 
 	test( 'should commit changes to all views on keyDown = DOWN', () => {
-		const color = '#FFF';
 		const testRenderer = TestRenderer.create(
 			<ColorPicker
 				color={ color }
@@ -78,13 +88,17 @@ describe( 'ColorPicker', () => {
 				disableAlpha
 			/>
 		);
-		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
-		testRenderer.root.findByType( 'input' ).props.onKeyDown( { keyCode: DOWN } );
-		expect( testRenderer.toJSON() ).toMatchSnapshot();
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onKeyDown( { keyCode: DOWN } );
+
+		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
 	} );
 
 	test( 'should commit changes to all views on keyDown = ENTER', () => {
-		const color = '#FFF';
 		const testRenderer = TestRenderer.create(
 			<ColorPicker
 				color={ color }
@@ -92,8 +106,13 @@ describe( 'ColorPicker', () => {
 				disableAlpha
 			/>
 		);
-		testRenderer.root.findByType( 'input' ).props.onChange( { target: { value: '#ABC' } } );
-		testRenderer.root.findByType( 'input' ).props.onKeyDown( { keyCode: ENTER } );
-		expect( testRenderer.toJSON() ).toMatchSnapshot();
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onChange( { target: { value: '#ABC' } } );
+		testRenderer.root
+			.findByType( 'input' )
+			.props.onKeyDown( { keyCode: ENTER } );
+
+		expect( testRenderer.toJSON() ).toMatchDiffSnapshot( base.toJSON() );
 	} );
 } );

@@ -4,21 +4,26 @@
 import styled from '@emotion/styled';
 
 /**
+ * WordPress dependencies
+ */
+import { HorizontalRule } from '@wordpress/primitives';
+
+/**
  * Internal dependencies
  */
-import { HorizontalRule } from '../../primitives';
-import { color } from '../../utils/colors';
+import { Flex } from '../../flex';
+import { COLORS, space } from '../../utils';
 
 export const styleProps = {
-	borderColor: color( 'lightGray.500' ),
+	borderColor: COLORS.lightGray[ 500 ],
 	borderRadius: '3px',
-	backgroundShady: color( 'lightGray.200' ),
+	backgroundShady: COLORS.lightGray[ 200 ],
 };
 
 const { borderColor, borderRadius, backgroundShady } = styleProps;
 
 export const CardUI = styled.div`
-	background: ${ color( 'white' ) };
+	background: ${ COLORS.white };
 	box-sizing: border-box;
 	border-radius: ${ borderRadius };
 	border: 1px solid ${ borderColor };
@@ -26,13 +31,13 @@ export const CardUI = styled.div`
 	${ handleBorderless };
 
 	&.is-elevated {
-		box-shadow: 0px 1px 3px 0px rgba(0, 0, 0, 0.2),
-			0px 1px 1px 0px rgba(0, 0, 0, 0.14),
-			0px 2px 1px -1px rgba(0, 0, 0, 0.12);
+		box-shadow: 0px 1px 3px 0px rgba( 0, 0, 0, 0.2 ),
+			0px 1px 1px 0px rgba( 0, 0, 0, 0.14 ),
+			0px 2px 1px -1px rgba( 0, 0, 0, 0.12 );
 	}
 `;
 
-export const HeaderUI = styled.div`
+export const HeaderUI = styled( Flex )`
 	border-bottom: 1px solid ${ borderColor };
 	border-top-left-radius: ${ borderRadius };
 	border-top-right-radius: ${ borderRadius };
@@ -77,7 +82,7 @@ export const BodyUI = styled.div`
 	${ handleShady };
 `;
 
-export const FooterUI = styled.div`
+export const FooterUI = styled( Flex )`
 	border-top: 1px solid ${ borderColor };
 	border-bottom-left-radius: ${ borderRadius };
 	border-bottom-right-radius: ${ borderRadius };
@@ -105,16 +110,16 @@ export function bodySize() {
 	return `
 		&.is-size {
 			&-large {
-				padding: 28px;
+				padding: ${ space( 3 ) } ${ space( 4 ) };
 			}
 			&-medium {
-				padding: 20px;
+				padding: ${ space( 2 ) } ${ space( 3 ) };
 			}
 			&-small {
-				padding: 12px;
+				padding: ${ space( 2 ) };
 			}
 			&-extraSmall {
-				padding: 8px;
+				padding: ${ space( 1 ) };
 			}
 		}
 	`;
@@ -124,16 +129,16 @@ export function headerFooterSizes() {
 	return `
 		&.is-size {
 			&-large {
-				padding: 20px 28px;
+				padding: ${ space( 3 ) } ${ space( 4 ) };
 			}
 			&-medium {
-				padding: 12px 20px;
+				padding: ${ space( 2 ) } ${ space( 3 ) };
 			}
 			&-small {
-				padding: 8px 12px;
+				padding: ${ space( 2 ) };
 			}
 			&-extraSmall {
-				padding: 4px 8px;
+				padding: ${ space( 1 ) };
 			}
 		}
 	`;

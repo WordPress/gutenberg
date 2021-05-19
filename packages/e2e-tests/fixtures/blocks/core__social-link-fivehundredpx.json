@@ -1,13 +1,13 @@
 [
-    {
-        "clientId": "_clientId_0",
-        "name": "core/social-link-fivehundredpx",
-        "isValid": true,
-        "attributes": {
-            "url": "https://example.com/",
-            "site": "fivehundredpx"
-        },
-        "innerBlocks": [],
-        "originalContent": ""
-    }
+	{
+		"clientId": "_clientId_0",
+		"name": "core/social-link",
+		"isValid": true,
+		"attributes": {
+			"url": "https://example.com/",
+			"service": "fivehundredpx"
+		},
+		"innerBlocks": [],
+		"originalContent": ""
+	}
 ]

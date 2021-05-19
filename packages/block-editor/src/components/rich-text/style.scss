@@ -3,28 +3,6 @@
 		margin-top: 0;
 	}
 
-	a {
-		color: $blue-medium-700;
-	}
-
-	code {
-		padding: 2px;
-		border-radius: 2px;
-		color: $dark-gray-800;
-		background: $light-gray-200;
-		font-family: $editor-html-font;
-		font-size: inherit; // This is necessary to override upstream CSS.
-	}
-
-	&:focus {
-		// Removes outline added by the browser.
-		outline: none;
-
-		*[data-rich-text-format-boundary] {
-			border-radius: 2px;
-		}
-	}
-
 	[data-rich-text-placeholder] {
 		pointer-events: none;
 	}
@@ -36,9 +14,13 @@
 		opacity: 0.62;
 	}
 
-	// Could be unset for individual rich text instances.
-	&.is-selected:not(.keep-placeholder-on-focus) [data-rich-text-placeholder]::after {
-		display: none;
+	&:focus {
+		// Removes outline added by the browser.
+		outline: none;
+
+		[data-rich-text-format-boundary] {
+			border-radius: 2px;
+		}
 	}
 }
 
@@ -54,12 +36,51 @@ figcaption.block-editor-rich-text__editable [data-rich-text-placeholder]::before
 	z-index: z-index(".components-popover.block-editor-rich-text__inline-format-toolbar");
 
 	.components-popover__content {
+		width: auto;
 		min-width: auto;
-		margin-bottom: 6px;
+		margin-bottom: $grid-unit-10;
+		box-shadow: none;
+
+		// Block UI appearance.
+		border: $border-width solid $gray-900;
+		border-radius: $radius-block-ui;
+		background-color: $white;
 	}
 
+	.components-toolbar-group,
 	.components-toolbar {
 		// The popover already provides a border.
 		border: none;
+	}
+
+	.components-toolbar__control,
+	.components-dropdown-menu__toggle {
+		min-width: $block-toolbar-height;
+		min-height: $block-toolbar-height;
+		padding-left: $grid-unit-15;
+		padding-right: $grid-unit-15;
+	}
+}
+
+.block-editor-rich-text__inline-format-toolbar-group {
+	.components-dropdown-menu__toggle {
+		justify-content: center;
+	}
+}
+
+.show-icon-labels {
+	.block-editor-rich-text__inline-format-toolbar-group {
+		.components-button.has-icon {
+			width: auto;
+
+			// Hide the button icons when labels are set to display...
+			svg {
+				display: none;
+			}
+			// ... and display labels.
+			&::after {
+				content: attr(aria-label);
+			}
+		}
 	}
 }

@@ -15,31 +15,42 @@ import { withPreferredColorScheme } from '@wordpress/compose';
  */
 import styles from './editor.scss';
 
-export function NextPageEdit( { attributes, isSelected, onFocus, getStylesFromColorScheme } ) {
+export function NextPageEdit( {
+	attributes,
+	isSelected,
+	onFocus,
+	getStylesFromColorScheme,
+} ) {
 	const { customText = __( 'Page break' ) } = attributes;
 	const accessibilityTitle = attributes.customText || '';
 	const accessibilityState = isSelected ? [ 'selected' ] : [];
-	const textStyle = getStylesFromColorScheme( styles.nextpageText, styles.nextpageTextDark );
-	const lineStyle = getStylesFromColorScheme( styles.nextpageLine, styles.nextpageLineDark );
+	const textStyle = getStylesFromColorScheme(
+		styles.nextpageText,
+		styles.nextpageTextDark
+	);
+	const lineStyle = getStylesFromColorScheme(
+		styles.nextpageLine,
+		styles.nextpageLineDark
+	);
 
 	return (
 		<View
 			accessible
-			accessibilityLabel={
-				sprintf(
-					/* translators: accessibility text. %s: Page break text. */
-					__( 'Page break block. %s' ),
-					accessibilityTitle
-				)
-			}
+			accessibilityLabel={ sprintf(
+				/* translators: accessibility text. %s: Page break text. */
+				__( 'Page break block. %s' ),
+				accessibilityTitle
+			) }
 			accessibilityStates={ accessibilityState }
 			onAccessibilityTap={ onFocus }
 		>
-			<Hr text={ customText }
+			<Hr
+				text={ customText }
 				marginLeft={ 0 }
 				marginRight={ 0 }
 				textStyle={ textStyle }
-				lineStyle={ lineStyle } />
+				lineStyle={ lineStyle }
+			/>
 		</View>
 	);
 }

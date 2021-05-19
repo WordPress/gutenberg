@@ -4,86 +4,86 @@
 import classnames from 'classnames';
 
 /**
- * Internal dependencies
- */
-import HeadingToolbar from './heading-toolbar';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { PanelBody } from '@wordpress/components';
 import { createBlock } from '@wordpress/blocks';
 import {
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
-	InspectorControls,
 	RichText,
-	__experimentalUseColors,
+	useBlockProps,
 } from '@wordpress/block-editor';
-import { useRef } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import HeadingLevelDropdown from './heading-level-dropdown';
 
 function HeadingEdit( {
 	attributes,
 	setAttributes,
 	mergeBlocks,
 	onReplace,
-	className,
+	mergedStyle,
+	clientId,
 } ) {
-	const ref = useRef();
-	const { TextColor, InspectorControlsColorPanel } = __experimentalUseColors(
-		[ { name: 'textColor', property: 'color' } ],
-		{
-			contrastCheckers: { backgroundColor: true, textColor: true },
-			colorDetector: { targetRef: ref },
-		},
-		[]
-	);
-
-	const { align, content, level, placeholder } = attributes;
+	const { textAlign, content, level, placeholder } = attributes;
 	const tagName = 'h' + level;
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+		} ),
+		style: mergedStyle,
+	} );
 
 	return (
 		<>
-			<BlockControls>
-				<HeadingToolbar minLevel={ 2 } maxLevel={ 5 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-				<AlignmentToolbar value={ align } onChange={ ( nextAlign ) => {
-					setAttributes( { align: nextAlign } );
-				} } />
+			<BlockControls group="block">
+				<HeadingLevelDropdown
+					selectedLevel={ level }
+					onChange={ ( newLevel ) =>
+						setAttributes( { level: newLevel } )
+					}
+				/>
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
+				/>
 			</BlockControls>
-			<InspectorControls>
-				<PanelBody title={ __( 'Heading Settings' ) }>
-					<p>{ __( 'Level' ) }</p>
-					<HeadingToolbar isCollapsed={ false } minLevel={ 1 } maxLevel={ 7 } selectedLevel={ level } onChange={ ( newLevel ) => setAttributes( { level: newLevel } ) } />
-				</PanelBody>
-			</InspectorControls>
-			{ InspectorControlsColorPanel }
-			<TextColor>
-				<RichText
-					ref={ ref }
-					identifier="content"
-					tagName={ tagName }
-					value={ content }
-					onChange={ ( value ) => setAttributes( { content: value } ) }
-					onMerge={ mergeBlocks }
-					onSplit={ ( value ) => {
-						if ( ! value ) {
-							return createBlock( 'core/paragraph' );
-						}
+			<RichText
+				identifier="content"
+				tagName={ tagName }
+				value={ content }
+				onChange={ ( value ) => setAttributes( { content: value } ) }
+				onMerge={ mergeBlocks }
+				onSplit={ ( value, isOriginal ) => {
+					let block;
 
-						return createBlock( 'core/heading', {
+					if ( isOriginal || value ) {
+						block = createBlock( 'core/heading', {
 							...attributes,
 							content: value,
 						} );
-					} }
-					onReplace={ onReplace }
-					onRemove={ () => onReplace( [] ) }
-					className={ classnames( className, {
-						[ `has-text-align-${ align }` ]: align,
-					} ) }
-					placeholder={ placeholder || __( 'Write heading…' ) }
-				/>
-			</TextColor>
+					} else {
+						block = createBlock( 'core/paragraph' );
+					}
+
+					if ( isOriginal ) {
+						block.clientId = clientId;
+					}
+
+					return block;
+				} }
+				onReplace={ onReplace }
+				onRemove={ () => onReplace( [] ) }
+				aria-label={ __( 'Heading text' ) }
+				placeholder={ placeholder || __( 'Heading' ) }
+				textAlign={ textAlign }
+				{ ...blockProps }
+			/>
 		</>
 	);
 }

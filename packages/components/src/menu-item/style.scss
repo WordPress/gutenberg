@@ -1,54 +1,60 @@
 .components-menu-item__button,
 .components-menu-item__button.components-button {
 	width: 100%;
-	padding: $grid-size ($grid-size-large - $border-width);
-	text-align: left;
-	color: $dark-gray-600;
-	@include menu-style__neutral;
-
-	// Target plugin icons that can have arbitrary classes by using an aggressive selector.
-	.dashicon,
-	.components-menu-items__item-icon,
-	> span > svg {
-		margin-right: 5px;
-	}
 
 	.components-menu-items__item-icon {
+		margin-right: -2px; // This optically balances the icon.
+		margin-left: $grid-unit-30;
 		display: inline-block;
 		flex: 0 0 auto;
 	}
 
-	// This needs to be higher-specificity that the default button hover style.
-	&.components-button:not(:disabled):not([aria-disabled="true"]):not(.is-secondary):not(.is-tertiary):not(.is-primary):hover {
-		@include menu-style__hover;
-
-		.components-menu-item__shortcut {
-			color: $dark-gray-600;
-		}
+	.components-menu-item__shortcut + .components-menu-items__item-icon {
+		margin-left: $grid-unit-10;
 	}
 
-	&:focus:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__focus;
+	// If a block item is shown inline (such as transforms), space it correctly.
+	.block-editor-block-icon {
+		margin-left: -2px; // This optically balances the icon.
+		margin-right: $grid-unit-10;
+	}
+
+	&.is-primary {
+		justify-content: center;
+
+		.components-menu-item__item {
+			// Override the default right margin.
+			margin-right: 0;
+		}
 	}
 }
 
 .components-menu-item__info-wrapper {
 	display: flex;
 	flex-direction: column;
+	margin-right: auto;
 }
 
 .components-menu-item__info {
-	margin-top: $grid-size-small;
-	font-size: $default-font-size - 1px;
-	color: $dark-gray-300;
+	margin-top: $grid-unit-05;
+	font-size: $helptext-font-size;
+	color: $gray-700;
+	white-space: normal;
+}
+
+.components-menu-item__item {
+	white-space: nowrap;
+	margin-right: auto;
+	display: inline-flex;
+	align-items: center;
 }
 
 .components-menu-item__shortcut {
 	align-self: center;
-	color: $dark-gray-300;
 	margin-right: 0;
 	margin-left: auto;
-	padding-left: $grid-size;
+	padding-left: $grid-unit-30;
+	color: currentColor;
 
 	// Hide the keyboard shortcuts on mobile, because they aren't super-useful
 	// for most mobile users and it frees up screen space for any item

@@ -1,10 +1,8 @@
 /**
  * External dependencies
  */
-import { noop, get } from 'lodash';
+import { noop, get, some } from 'lodash';
 import classnames from 'classnames';
-import memoize from 'memize';
-import EquivalentKeyMap from 'equivalent-key-map';
 
 /**
  * WordPress dependencies
@@ -18,7 +16,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import EntitiesSavedStates from '../entities-saved-states';
 import PublishButtonLabel from './label';
 
 export class PostPublishButton extends Component {
@@ -27,16 +24,13 @@ export class PostPublishButton extends Component {
 		this.buttonNode = createRef();
 
 		this.createOnClick = this.createOnClick.bind( this );
-		this.closeEntitiesSavedStates = this.closeEntitiesSavedStates.bind( this );
+		this.closeEntitiesSavedStates = this.closeEntitiesSavedStates.bind(
+			this
+		);
 
 		this.state = {
 			entitiesSavedStatesCallback: false,
 		};
-		this.createIgnoredForSave = memoize(
-			( postType, postId ) =>
-				new EquivalentKeyMap( [ [ [ 'postType', postType, String( postId ) ], true ] ] ),
-			{ maxSize: 1 }
-		);
 	}
 	componentDidMount() {
 		if ( this.props.focusOnMount ) {
@@ -54,6 +48,13 @@ export class PostPublishButton extends Component {
 				this.setState( {
 					entitiesSavedStatesCallback: () => callback( ...args ),
 				} );
+				// Open the save panel by setting its callback.
+				// To set a function on the useState hook, we must set it
+				// with another function (() => myFunction). Passing the
+				// function on its own will cause an error when called.
+				this.props.setEntitiesSavedStatesCallback(
+					() => this.closeEntitiesSavedStates
+				);
 				return noop;
 			}
 
@@ -61,11 +62,20 @@ export class PostPublishButton extends Component {
 		};
 	}
 
-	closeEntitiesSavedStates( savedById ) {
+	closeEntitiesSavedStates( savedEntities ) {
 		const { postType, postId } = this.props;
 		const { entitiesSavedStatesCallback } = this.state;
 		this.setState( { entitiesSavedStatesCallback: false }, () => {
-			if ( savedById && savedById.has( [ 'postType', postType, String( postId ) ] ) ) {
+			if (
+				savedEntities &&
+				some(
+					savedEntities,
+					( elt ) =>
+						elt.kind === 'postType' &&
+						elt.name === postType &&
+						elt.key === postId
+				)
+			) {
 				// The post entity was checked, call the held callback from `createOnClick`.
 				entitiesSavedStatesCallback();
 			}
@@ -84,6 +94,7 @@ export class PostPublishButton extends Component {
 			isPublished,
 			isSaveable,
 			isSaving,
+			isAutoSaving,
 			isToggle,
 			onSave,
 			onStatusChange,
@@ -91,12 +102,7 @@ export class PostPublishButton extends Component {
 			onToggle,
 			visibility,
 			hasNonPostEntityChanges,
-			postType,
-			postId,
 		} = this.props;
-		const {
-			entitiesSavedStatesCallback,
-		} = this.state;
 
 		const isButtonDisabled =
 			isSaving ||
@@ -142,7 +148,7 @@ export class PostPublishButton extends Component {
 		const buttonProps = {
 			'aria-disabled': isButtonDisabled && ! hasNonPostEntityChanges,
 			className: 'editor-post-publish-button',
-			isBusy: isSaving && isPublished,
+			isBusy: ! isAutoSaving && isSaving && isPublished,
 			isPrimary: true,
 			onClick: this.createOnClick( onClickButton ),
 		};
@@ -156,7 +162,9 @@ export class PostPublishButton extends Component {
 			onClick: this.createOnClick( onClickToggle ),
 		};
 
-		const toggleChildren = isBeingScheduled ? __( 'Schedule…' ) : __( 'Publish…' );
+		const toggleChildren = isBeingScheduled
+			? __( 'Schedule…' )
+			: __( 'Publish' );
 		const buttonChildren = (
 			<PublishButtonLabel
 				forceIsSaving={ forceIsSaving }
@@ -168,11 +176,6 @@ export class PostPublishButton extends Component {
 		const componentChildren = isToggle ? toggleChildren : buttonChildren;
 		return (
 			<>
-				<EntitiesSavedStates
-					isOpen={ Boolean( entitiesSavedStatesCallback ) }
-					onRequestClose={ this.closeEntitiesSavedStates }
-					ignoredForSave={ this.createIgnoredForSave( postType, postId ) }
-				/>
 				<Button
 					ref={ this.buttonNode }
 					{ ...componentProps }
@@ -195,6 +198,7 @@ export default compose( [
 	withSelect( ( select ) => {
 		const {
 			isSavingPost,
+			isAutosavingPost,
 			isEditedPostBeingScheduled,
 			getEditedPostVisibility,
 			isCurrentPostPublished,
@@ -206,15 +210,21 @@ export default compose( [
 			getCurrentPostId,
 			hasNonPostEntityChanges,
 		} = select( 'core/editor' );
+		const _isAutoSaving = isAutosavingPost();
 		return {
-			isSaving: isSavingPost(),
+			isSaving: isSavingPost() || _isAutoSaving,
+			isAutoSaving: _isAutoSaving,
 			isBeingScheduled: isEditedPostBeingScheduled(),
 			visibility: getEditedPostVisibility(),
 			isSaveable: isEditedPostSaveable(),
 			isPostSavingLocked: isPostSavingLocked(),
 			isPublishable: isEditedPostPublishable(),
 			isPublished: isCurrentPostPublished(),
-			hasPublishAction: get( getCurrentPost(), [ '_links', 'wp:action-publish' ], false ),
+			hasPublishAction: get(
+				getCurrentPost(),
+				[ '_links', 'wp:action-publish' ],
+				false
+			),
 			postType: getCurrentPostType(),
 			postId: getCurrentPostId(),
 			hasNonPostEntityChanges: hasNonPostEntityChanges(),
@@ -223,7 +233,8 @@ export default compose( [
 	withDispatch( ( dispatch ) => {
 		const { editPost, savePost } = dispatch( 'core/editor' );
 		return {
-			onStatusChange: ( status ) => editPost( { status }, { undoIgnore: true } ),
+			onStatusChange: ( status ) =>
+				editPost( { status }, { undoIgnore: true } ),
 			onSave: savePost,
 		};
 	} ),

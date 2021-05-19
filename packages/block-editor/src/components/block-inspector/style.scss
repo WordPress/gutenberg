@@ -1,18 +1,29 @@
 .block-editor-block-inspector {
+	p {
+		margin-top: 0;
+	}
+
+	h2,
+	h3 {
+		font-size: $default-font-size;
+		color: $gray-900;
+		margin-bottom: 1.5em;
+	}
+
 	.components-base-control {
-		margin-bottom: #{ $grid-size * 3 };
+		margin-bottom: #{ $grid-unit-30 };
 
 		&:last-child {
-			margin-bottom: $grid-size;
+			margin-bottom: $grid-unit-10;
 		}
 	}
 	.components-panel__body {
 		border: none;
-		border-top: $border-width solid $light-gray-500;
+		border-top: $border-width solid $gray-200;
 	}
 
 	.block-editor-block-card {
-		padding: $grid-size-large;
+		padding: $grid-unit-20;
 	}
 }
 
@@ -20,6 +31,6 @@
 	display: block;
 	font-size: $default-font-size;
 	background: $white;
-	padding: ($panel-padding * 2) $panel-padding;
+	padding: ($grid-unit-20 * 2) $grid-unit-20;
 	text-align: center;
 }

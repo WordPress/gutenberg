@@ -3,80 +3,68 @@
  */
 import { __ } from '@wordpress/i18n';
 import { PanelBody, ToggleControl } from '@wordpress/components';
-import { Component } from '@wordpress/element';
-import { InspectorControls } from '@wordpress/block-editor';
+import { InspectorControls, useBlockProps } from '@wordpress/block-editor';
 import { ENTER } from '@wordpress/keycodes';
-import {
-	getDefaultBlockName,
-	createBlock,
-} from '@wordpress/blocks';
+import { getDefaultBlockName, createBlock } from '@wordpress/blocks';
 
-export default class MoreEdit extends Component {
-	constructor() {
-		super( ...arguments );
-		this.onChangeInput = this.onChangeInput.bind( this );
-		this.onKeyDown = this.onKeyDown.bind( this );
+const DEFAULT_TEXT = __( 'Read more' );
 
-		this.state = {
-			defaultText: __( 'Read more' ),
-		};
-	}
-
-	onChangeInput( event ) {
-		// Set defaultText to an empty string, allowing the user to clear/replace the input field's text
-		this.setState( {
-			defaultText: '',
+export default function MoreEdit( {
+	attributes: { customText, noTeaser },
+	insertBlocksAfter,
+	setAttributes,
+} ) {
+	const onChangeInput = ( event ) => {
+		setAttributes( {
+			customText:
+				event.target.value !== '' ? event.target.value : undefined,
 		} );
+	};
 
-		const value = event.target.value.length === 0 ? undefined : event.target.value;
-		this.props.setAttributes( { customText: value } );
-	}
-
-	onKeyDown( event ) {
-		const { keyCode } = event;
-		const { insertBlocksAfter } = this.props;
+	const onKeyDown = ( { keyCode } ) => {
 		if ( keyCode === ENTER ) {
 			insertBlocksAfter( [ createBlock( getDefaultBlockName() ) ] );
 		}
-	}
+	};
 
-	getHideExcerptHelp( checked ) {
-		return checked ?
-			__( 'The excerpt is hidden.' ) :
-			__( 'The excerpt is visible.' );
-	}
+	const getHideExcerptHelp = ( checked ) =>
+		checked
+			? __( 'The excerpt is hidden.' )
+			: __( 'The excerpt is visible.' );
 
-	render() {
-		const { customText, noTeaser } = this.props.attributes;
-		const { setAttributes } = this.props;
+	const toggleHideExcerpt = () => setAttributes( { noTeaser: ! noTeaser } );
 
-		const toggleHideExcerpt = () => setAttributes( { noTeaser: ! noTeaser } );
-		const { defaultText } = this.state;
-		const value = customText !== undefined ? customText : defaultText;
-		const inputLength = value.length + 1;
+	const style = {
+		width: `${ ( customText ? customText : DEFAULT_TEXT ).length + 1.2 }em`,
+	};
 
-		return (
-			<>
-				<InspectorControls>
-					<PanelBody>
-						<ToggleControl
-							label={ __( 'Hide the excerpt on the full content page' ) }
-							checked={ !! noTeaser }
-							onChange={ toggleHideExcerpt }
-							help={ this.getHideExcerptHelp }
-						/>
-					</PanelBody>
-				</InspectorControls>
+	return (
+		<>
+			<InspectorControls>
+				<PanelBody>
+					<ToggleControl
+						label={ __(
+							'Hide the excerpt on the full content page'
+						) }
+						checked={ !! noTeaser }
+						onChange={ toggleHideExcerpt }
+						help={ getHideExcerptHelp }
+					/>
+				</PanelBody>
+			</InspectorControls>
+			<div { ...useBlockProps() }>
 				<div className="wp-block-more">
 					<input
+						aria-label={ __( 'Read more link text' ) }
 						type="text"
-						value={ value }
-						size={ inputLength }
-						onChange={ this.onChangeInput }
-						onKeyDown={ this.onKeyDown }
+						value={ customText }
+						placeholder={ DEFAULT_TEXT }
+						onChange={ onChangeInput }
+						onKeyDown={ onKeyDown }
+						style={ style }
 					/>
 				</div>
-			</>
-		);
-	}
+			</div>
+		</>
+	);
 }

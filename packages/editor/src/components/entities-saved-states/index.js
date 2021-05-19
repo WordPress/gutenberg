@@ -1,104 +1,184 @@
 /**
  * External dependencies
  */
-import EquivalentKeyMap from 'equivalent-key-map';
+import { some, groupBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
-import { CheckboxControl, Modal, Button } from '@wordpress/components';
+import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { useSelect, useDispatch } from '@wordpress/data';
-import { useState } from '@wordpress/element';
+import { useState, useCallback, useRef } from '@wordpress/element';
+import { store as coreStore } from '@wordpress/core-data';
+import { __experimentalUseDialog as useDialog } from '@wordpress/compose';
+import { close as closeIcon } from '@wordpress/icons';
 
-const EntitiesSavedStatesCheckbox = ( {
-	id,
-	name,
-	changes: { rawRecord },
-	checked,
-	setCheckedById,
-} ) => (
-	<CheckboxControl
-		label={ `${ name }: "${ rawRecord.name ||
-			rawRecord.slug ||
-			rawRecord.title ||
-			__( 'Untitled' ) }"` }
-		checked={ checked }
-		onChange={ ( nextChecked ) => setCheckedById( id, nextChecked ) }
-	/>
-);
+/**
+ * Internal dependencies
+ */
+import EntityTypeList from './entity-type-list';
 
-export default function EntitiesSavedStates( {
-	isOpen,
-	onRequestClose,
-	ignoredForSave = new EquivalentKeyMap(),
-} ) {
-	const entityRecordChangesByRecord = useSelect( ( select ) =>
-		select( 'core' ).getEntityRecordChangesByRecord()
+const TRANSLATED_SITE_PROTPERTIES = {
+	title: __( 'Title' ),
+	description: __( 'Tagline' ),
+	site_logo: __( 'Logo' ),
+	show_on_front: __( 'Show on front' ),
+	page_on_front: __( 'Page on front' ),
+};
+
+export default function EntitiesSavedStates( { close } ) {
+	const saveButtonRef = useRef();
+	const { dirtyEntityRecords } = useSelect( ( select ) => {
+		const dirtyRecords = select(
+			coreStore
+		).__experimentalGetDirtyEntityRecords();
+
+		// Remove site object and decouple into its edited pieces.
+		const dirtyRecordsWithoutSite = dirtyRecords.filter(
+			( record ) => ! ( record.kind === 'root' && record.name === 'site' )
+		);
+
+		const siteEdits = select( coreStore ).getEntityRecordEdits(
+			'root',
+			'site'
+		);
+
+		const siteEditsAsEntities = [];
+		for ( const property in siteEdits ) {
+			siteEditsAsEntities.push( {
+				kind: 'root',
+				name: 'site',
+				title: TRANSLATED_SITE_PROTPERTIES[ property ] || property,
+				property,
+			} );
+		}
+		const dirtyRecordsWithSiteItems = [
+			...dirtyRecordsWithoutSite,
+			...siteEditsAsEntities,
+		];
+
+		return {
+			dirtyEntityRecords: dirtyRecordsWithSiteItems,
+		};
+	}, [] );
+	const {
+		saveEditedEntityRecord,
+		__experimentalSaveSpecifiedEntityEdits: saveSpecifiedEntityEdits,
+	} = useDispatch( coreStore );
+
+	// To group entities by type.
+	const partitionedSavables = Object.values(
+		groupBy( dirtyEntityRecords, 'name' )
 	);
-	const { saveEditedEntityRecord } = useDispatch( 'core' );
 
-	const [ checkedById, _setCheckedById ] = useState( () => new EquivalentKeyMap() );
-	const setCheckedById = ( id, checked ) =>
-		_setCheckedById( ( prevCheckedById ) => {
-			const nextCheckedById = new EquivalentKeyMap( prevCheckedById );
-			if ( checked ) {
-				nextCheckedById.set( id, true );
-			} else {
-				nextCheckedById.delete( id );
-			}
-			return nextCheckedById;
-		} );
+	// Unchecked entities to be ignored by save function.
+	const [ unselectedEntities, _setUnselectedEntities ] = useState( [] );
+
+	const setUnselectedEntities = (
+		{ kind, name, key, property },
+		checked
+	) => {
+		if ( checked ) {
+			_setUnselectedEntities(
+				unselectedEntities.filter(
+					( elt ) =>
+						elt.kind !== kind ||
+						elt.name !== name ||
+						elt.key !== key ||
+						elt.property !== property
+				)
+			);
+		} else {
+			_setUnselectedEntities( [
+				...unselectedEntities,
+				{ kind, name, key, property },
+			] );
+		}
+	};
+
 	const saveCheckedEntities = () => {
-		checkedById.forEach( ( _checked, id ) => {
-			if ( ! ignoredForSave.has( id ) ) {
-				saveEditedEntityRecord(
-					...id.filter( ( s, i ) => i !== id.length - 1 || s !== 'undefined' )
+		const entitiesToSave = dirtyEntityRecords.filter(
+			( { kind, name, key, property } ) => {
+				return ! some(
+					unselectedEntities,
+					( elt ) =>
+						elt.kind === kind &&
+						elt.name === name &&
+						elt.key === key &&
+						elt.property === property
 				);
 			}
+		);
+
+		close( entitiesToSave );
+
+		const siteItemsToSave = [];
+		entitiesToSave.forEach( ( { kind, name, key, property } ) => {
+			if ( 'root' === kind && 'site' === name ) {
+				siteItemsToSave.push( property );
+			} else {
+				saveEditedEntityRecord( kind, name, key );
+			}
 		} );
-		onRequestClose( checkedById );
+		saveSpecifiedEntityEdits( 'root', 'site', undefined, siteItemsToSave );
 	};
+
+	// Explicitly define this with no argument passed.  Using `close` on
+	// its own will use the event object in place of the expected saved entities.
+	const dismissPanel = useCallback( () => close(), [ close ] );
+
+	const [ saveDialogRef, saveDialogProps ] = useDialog( {
+		onClose: () => dismissPanel(),
+	} );
+
 	return (
-		isOpen && (
-			<Modal
-				title={ __( 'What do you want to save?' ) }
-				onRequestClose={ () => onRequestClose() }
-				contentLabel={ __( 'Select items to save.' ) }
-			>
-				{ Object.keys( entityRecordChangesByRecord ).map( ( changedKind ) =>
-					Object.keys( entityRecordChangesByRecord[ changedKind ] ).map(
-						( changedName ) =>
-							Object.keys(
-								entityRecordChangesByRecord[ changedKind ][ changedName ]
-							).map( ( changedKey ) => {
-								const id = [ changedKind, changedName, changedKey ];
-								return (
-									<EntitiesSavedStatesCheckbox
-										key={ id.join( ' | ' ) }
-										id={ id }
-										name={ changedName }
-										changes={
-											entityRecordChangesByRecord[ changedKind ][ changedName ][
-												changedKey
-											]
-										}
-										checked={ checkedById.get( id ) }
-										setCheckedById={ setCheckedById }
-									/>
-								);
-							} )
-					)
-				) }
+		<div
+			ref={ saveDialogRef }
+			{ ...saveDialogProps }
+			className="entities-saved-states__panel"
+		>
+			<div className="entities-saved-states__panel-header">
 				<Button
+					ref={ saveButtonRef }
 					isPrimary
-					disabled={ checkedById.size === 0 }
+					disabled={
+						dirtyEntityRecords.length -
+							unselectedEntities.length ===
+						0
+					}
 					onClick={ saveCheckedEntities }
 					className="editor-entities-saved-states__save-button"
 				>
 					{ __( 'Save' ) }
 				</Button>
-			</Modal>
-		)
+				<Button
+					icon={ closeIcon }
+					onClick={ dismissPanel }
+					label={ __( 'Close panel' ) }
+				/>
+			</div>
+
+			<div className="entities-saved-states__text-prompt">
+				<strong>{ __( 'Select the changes you want to save' ) }</strong>
+				<p>
+					{ __(
+						'Some changes may affect other areas of your site.'
+					) }
+				</p>
+			</div>
+
+			{ partitionedSavables.map( ( list ) => {
+				return (
+					<EntityTypeList
+						key={ list[ 0 ].name }
+						list={ list }
+						closePanel={ dismissPanel }
+						unselectedEntities={ unselectedEntities }
+						setUnselectedEntities={ setUnselectedEntities }
+					/>
+				);
+			} ) }
+		</div>
 	);
 }

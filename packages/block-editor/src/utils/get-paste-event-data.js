@@ -1,21 +1,10 @@
 /**
- * External dependencies
- */
-import { find, isNil } from 'lodash';
-
-/**
  * WordPress dependencies
  */
 import { createBlobURL } from '@wordpress/blob';
+import { getFilesFromDataTransfer } from '@wordpress/dom';
 
 export function getPasteEventData( { clipboardData } ) {
-	let { items, files } = clipboardData;
-
-	// In Edge these properties can be null instead of undefined, so a more
-	// rigorous test is required over using default values.
-	items = isNil( items ) ? [] : items;
-	files = isNil( files ) ? [] : files;
-
 	let plainText = '';
 	let html = '';
 
@@ -36,27 +25,9 @@ export function getPasteEventData( { clipboardData } ) {
 		}
 	}
 
-	files = Array.from( files );
-
-	Array.from( items ).forEach( ( item ) => {
-		if ( ! item.getAsFile ) {
-			return;
-		}
-
-		const file = item.getAsFile();
-
-		if ( ! file ) {
-			return;
-		}
-
-		const { name, type, size } = file;
-
-		if ( ! find( files, { name, type, size } ) ) {
-			files.push( file );
-		}
-	} );
-
-	files = files.filter( ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
+	const files = getFilesFromDataTransfer(
+		clipboardData
+	).filter( ( { type } ) => /^image\/(?:jpe?g|png|gif)$/.test( type ) );
 
 	// Only process files if no HTML is present.
 	// A pasted file may have the URL as plain text.

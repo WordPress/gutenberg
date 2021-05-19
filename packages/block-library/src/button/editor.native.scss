@@ -1,0 +1,70 @@
+.richTextWrapper {
+	overflow: visible;
+	align-self: flex-start;
+}
+
+// Block spacing used to indicate the space between blocks in the editor.
+// The variable has been retired.
+$block-spacing: 4px;
+.outline {
+	// Border Width has to be spread since width is thicker
+	// on Android when border radius is decreased to 0
+	border-left-width: $border-width;
+	border-right-width: $border-width;
+	border-top-width: $border-width;
+	border-bottom-width: $border-width;
+	position: absolute;
+	left: -($block-spacing + $border-width);
+	right: -($block-spacing + $border-width);
+	top: -($block-spacing + $border-width);
+	bottom: -($block-spacing + $border-width);
+}
+
+.linearGradient {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	bottom: 0;
+}
+
+.defaultButton {
+	border-radius: $border-width * 4;
+	padding: $block-spacing;
+	border-width: $border-width;
+	margin: 2 * $grid-unit-20;
+	background-color: $button-fallback-bg;
+	color: $white;
+}
+
+.clearLinkButton {
+	color: $alert-red;
+}
+
+.placeholderTextColor {
+	color: rgba($color: $white, $alpha: 0.43);
+}
+
+.placeholder {
+	font-family: $default-regular-font;
+	min-height: 22px;
+	font-size: 16px;
+	display: none;
+}
+
+.linkSettingsPanel {
+	padding-left: 0;
+	padding-right: 0;
+}
+
+.button75 {
+	margin: $solid-border-space - $block-selected-border-width;
+}
+
+.button50 {
+	margin: $solid-border-space * 2 - $block-selected-border-width * 2;
+}
+
+.button25 {
+	margin: $block-edge-to-content * 2 + $block-selected-border-width;
+}

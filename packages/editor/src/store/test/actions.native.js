@@ -1,10 +1,9 @@
-
 /**
  * Internal dependencies
  */
 import { togglePostTitleSelection } from '../actions';
 
-describe( 'Editor actions', () => {
+describe( 'actions native', () => {
 	describe( 'togglePostTitleSelection', () => {
 		it( 'should return the TOGGLE_POST_TITLE_SELECTION action', () => {
 			const result = togglePostTitleSelection( true );

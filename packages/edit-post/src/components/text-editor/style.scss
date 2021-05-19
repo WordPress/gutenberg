@@ -1,83 +1,85 @@
 .edit-post-text-editor {
 	position: relative;
 	width: 100%;
+	background-color: $white;
+	flex-grow: 1;
 
-	// Always show outlines in code editor
-	.editor-post-title__block {
-		textarea {
-			border: $border-width solid $light-gray-500;
-			margin-bottom: $block-spacing;
-			padding: $block-padding;
+	// Post title.
+	.editor-post-title.editor-post-title__block {
+		max-width: none;
+		line-height: $default-line-height;
+
+		// This needs specificity to change the title block appearance on the code editor.
+		.editor-post-title__input.editor-post-title__input.editor-post-title__input {
+			font-family: $editor-html-font;
+			font-size: 2.5em;
+			font-weight: normal;
+		}
+
+		// Always show outlines in code editor
+		.editor-post-title__input {
+			border: $border-width solid $gray-600;
+			margin-bottom: -$border-width;
+
+			// Same padding as body.
+			padding: $grid-unit-20;
+			@include break-small() {
+				padding: $grid-unit-30;
+			}
 
 			&:focus {
-				border: $border-width solid $light-gray-500;
+				border-color: var(--wp-admin-theme-color);
+				box-shadow: 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 			}
 		}
 
-		// Hide the thick left border in the code editor.
-		&:not(.is-focus-mode):not(.has-fixed-toolbar):not(.is-selected) .editor-post-title__input:hover,
-		&:not(.is-focus-mode):not(.has-fixed-toolbar).is-selected .editor-post-title__input {
-			box-shadow: none;
-			border-left-width: $border-width;
-		}
-
-		textarea:hover,
-		&.is-selected textarea {
-			box-shadow: 0 0 0 $border-width $light-gray-500;
-		}
-	}
-
-	.editor-post-permalink {
-		margin-top: -6px;
-
-		// Hide the thick left border in the code editor.
-		box-shadow: none;
-		border: none;
-		outline: $border-width solid $light-gray-800;
-	}
-
-	@include break-small() {
-		.editor-post-title,
-		.editor-post-title__block {
+		@include break-small() {
 			padding: 0;
 		}
-	}
-
-	// Make room for toolbar.
-	padding-top: $block-controls-height + $grid-size;
-}
-
-// Exit Code Editor toolbar.
-.edit-post-text-editor__toolbar {
-	position: absolute;
-	top: $grid-size;
-	left: 0;
-	right: 0;
-	height: $block-controls-height;
-	line-height: $block-controls-height;
-	padding: 0 $grid-size 0 $grid-size-large;
-	display: flex;
-
-	h2 {
-		margin: 0 auto 0 0;
-		font-size: $default-font-size;
-		color: $dark-gray-500;
-	}
-
-	.components-button svg {
-		order: 1;
 	}
 }
 
 .edit-post-text-editor__body {
-	max-width: calc(100% - #{$grid-size-large * 2});
-	margin-left: $grid-size-large;
-	margin-right: $grid-size-large;
-	padding-top: $grid-size * 5;
+	width: 100%;
+	padding: 0 $grid-unit-15 $grid-unit-15 $grid-unit-15;
+	max-width: $break-xlarge;
+	margin-left: auto;
+	margin-right: auto;
+
+	@include break-large() {
+		padding: $grid-unit-20 $grid-unit-30 #{ $grid-unit-60 * 2 } $grid-unit-30;
+		padding: 0 $grid-unit-30 $grid-unit-30 $grid-unit-30;
+	}
+
+}
+
+// Exit code editor toolbar.
+.edit-post-text-editor__toolbar {
+	position: sticky;
+	z-index: z-index(".edit-post-text-editor__toolbar");
+	top: 0;
+	left: 0;
+	right: 0;
+	display: flex;
+	background: rgba($white, 0.8);
+	padding: $grid-unit-05 $grid-unit-15;
 
 	@include break-small() {
-		max-width: $content-width;
-		margin-left: auto;
-		margin-right: auto;
+		padding: $grid-unit-15;
+	}
+
+	@include break-large() {
+		padding: $grid-unit-15 $grid-unit-30;
+	}
+
+	h2 {
+		line-height: $button-size;
+		margin: 0 auto 0 0;
+		font-size: $default-font-size;
+		color: $gray-900;
+	}
+
+	.components-button svg {
+		order: 1;
 	}
 }

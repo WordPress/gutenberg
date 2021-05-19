@@ -48,6 +48,12 @@ exports[`RichText should make bold after split and merge 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`RichText should navigate arround emoji 1`] = `
+"<!-- wp:paragraph -->
+<p>1🍓</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`RichText should not format text after code backtick 1`] = `
 "<!-- wp:paragraph -->
 <p>A <code>backtick</code> and more.</p>
@@ -79,6 +85,22 @@ exports[`RichText should not undo backtick transform with backspace after typing
 exports[`RichText should only mutate text data on input 1`] = `
 "<!-- wp:paragraph -->
 <p>1<strong>2</strong>34</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should preserve internal formatting 1`] = `
+"<!-- wp:paragraph -->
+<p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`RichText should preserve internal formatting 2`] = `
+"<!-- wp:paragraph -->
+<p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p><span class=\\"has-inline-color has-cyan-bluish-gray-color\\">1</span></p>
 <!-- /wp:paragraph -->"
 `;
 

@@ -1,98 +1,88 @@
 /**
- * External dependencies
- */
-import { View } from 'react-native';
-
-/**
  * WordPress dependencies
  */
 import { __ } from '@wordpress/i18n';
-import { Component } from '@wordpress/element';
 import { createBlock } from '@wordpress/blocks';
-import { AlignmentToolbar, BlockControls, RichText } from '@wordpress/block-editor';
-
-/**
- * Internal dependencies
- */
+import {
+	AlignmentControl,
+	BlockControls,
+	RichText,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
+import { useCallback } from '@wordpress/element';
+import { useSelect } from '@wordpress/data';
 
 const name = 'core/paragraph';
 
-class ParagraphEdit extends Component {
-	constructor( props ) {
-		super( props );
-		this.onReplace = this.onReplace.bind( this );
-	}
+function ParagraphBlock( {
+	attributes,
+	mergeBlocks,
+	onReplace,
+	setAttributes,
+	mergedStyle,
+	style,
+	clientId,
+} ) {
+	const isRTL = useSelect( ( select ) => {
+		return !! select( blockEditorStore ).getSettings().isRTL;
+	}, [] );
 
-	onReplace( blocks ) {
-		const { attributes, onReplace } = this.props;
-		onReplace( blocks.map( ( block, index ) => (
-			index === 0 && block.name === name ?
-				{ ...block,
-					attributes: {
-						...attributes,
-						...block.attributes,
-					},
-				} :
-				block
-		) ) );
-	}
+	const { align, content, placeholder } = attributes;
 
-	render() {
-		const {
-			attributes,
-			setAttributes,
-			mergeBlocks,
-			onReplace,
-			style,
-		} = this.props;
+	const styles = {
+		...mergedStyle,
+		...style,
+	};
 
-		const {
-			align,
-			content,
-			placeholder,
-		} = attributes;
+	const onAlignmentChange = useCallback( ( nextAlign ) => {
+		setAttributes( { align: nextAlign } );
+	}, [] );
+	return (
+		<>
+			<BlockControls group="block">
+				<AlignmentControl
+					value={ align }
+					isRTL={ isRTL }
+					onChange={ onAlignmentChange }
+				/>
+			</BlockControls>
+			<RichText
+				identifier="content"
+				tagName="p"
+				value={ content }
+				deleteEnter={ true }
+				style={ styles }
+				onChange={ ( nextContent ) => {
+					setAttributes( {
+						content: nextContent,
+					} );
+				} }
+				onSplit={ ( value, isOriginal ) => {
+					let newAttributes;
 
-		return (
-			<View>
-				<BlockControls>
-					<AlignmentToolbar
-						isCollapsed={ false }
-						value={ align }
-						onChange={ ( nextAlign ) => {
-							setAttributes( { align: nextAlign } );
-						} }
-					/>
-				</BlockControls>
-				<RichText
-					identifier="content"
-					tagName="p"
-					value={ content }
-					deleteEnter={ true }
-					style={ style }
-					onChange={ ( nextContent ) => {
-						setAttributes( {
-							content: nextContent,
-						} );
-					} }
-					onSplit={ ( value ) => {
-						if ( ! value ) {
-							return createBlock( name );
-						}
-
-						return createBlock( name, {
+					if ( isOriginal || value ) {
+						newAttributes = {
 							...attributes,
 							content: value,
-						} );
-					} }
-					onMerge={ mergeBlocks }
-					onReplace={ onReplace }
-					onRemove={ onReplace ? () => onReplace( [] ) : undefined }
-					placeholder={ placeholder || __( 'Start writing…' ) }
-					textAlign={ align }
-				/>
-			</View>
-		);
-	}
+						};
+					}
+
+					const block = createBlock( name, newAttributes );
+
+					if ( isOriginal ) {
+						block.clientId = clientId;
+					}
+
+					return block;
+				} }
+				onMerge={ mergeBlocks }
+				onReplace={ onReplace }
+				onRemove={ onReplace ? () => onReplace( [] ) : undefined }
+				placeholder={ placeholder || __( 'Start writing…' ) }
+				textAlign={ align }
+			/>
+		</>
+	);
 }
 
-export default ParagraphEdit;
+export default ParagraphBlock;

@@ -1,12 +1,11 @@
 /**
- * External dependencies
+ * Internal dependencies
  */
-import { createElement, cloneElement, Fragment, isValidElement } from 'react';
+import { createElement, cloneElement, Fragment, isValidElement } from './react';
 
-let indoc,
-	offset,
-	output,
-	stack;
+/** @typedef {import('./react').WPElement} WPElement */
+
+let indoc, offset, output, stack;
 
 /**
  * Matches tags in the localized string
@@ -26,32 +25,50 @@ let indoc,
 const tokenizer = /<(\/)?(\w+)\s*(\/)?>/g;
 
 /**
+ * The stack frame tracking parse progress.
+ *
+ * @typedef Frame
+ *
+ * @property {WPElement} element            A parent element which may still have
+ * @property {number}    tokenStart         Offset at which parent element first
+ *                                          appears.
+ * @property {number}    tokenLength        Length of string marking start of parent
+ *                                          element.
+ * @property {number}    [prevOffset]       Running offset at which parsing should
+ *                                          continue.
+ * @property {number}    [leadingTextStart] Offset at which last closing element
+ *                                          finished, used for finding text between
+ *                                          elements.
+ * @property {WPElement[]} children         Children.
+ */
+
+/**
  * Tracks recursive-descent parse state.
  *
  * This is a Stack frame holding parent elements until all children have been
  * parsed.
  *
  * @private
- * @param {WPElement} element          A parent element which may still have
- *                                     nested children not yet parsed.
- * @param {number}    tokenStart       Offset at which parent element first
- *                                     appears.
- * @param {number}    tokenLength      Length of string marking start of parent
- *                                     element.
- * @param {number}    prevOffset       Running offset at which parsing should
- *                                     continue.
- * @param {number}    leadingTextStart Offset at which last closing element
- *                                     finished, used for finding text between
- *                                     elements
+ * @param {WPElement} element            A parent element which may still have
+ *                                       nested children not yet parsed.
+ * @param {number}    tokenStart         Offset at which parent element first
+ *                                       appears.
+ * @param {number}    tokenLength        Length of string marking start of parent
+ *                                       element.
+ * @param {number}    [prevOffset]       Running offset at which parsing should
+ *                                       continue.
+ * @param {number}    [leadingTextStart] Offset at which last closing element
+ *                                       finished, used for finding text between
+ *                                       elements.
  *
  * @return {Frame} The stack frame tracking parse progress.
  */
-function Frame(
+function createFrame(
 	element,
 	tokenStart,
 	tokenLength,
 	prevOffset,
-	leadingTextStart,
+	leadingTextStart
 ) {
 	return {
 		element,
@@ -124,9 +141,11 @@ const createInterpolateElement = ( interpolatedString, conversionMap ) => {
 const isValidConversionMap = ( conversionMap ) => {
 	const isObject = typeof conversionMap === 'object';
 	const values = isObject && Object.values( conversionMap );
-	return isObject &&
+	return (
+		isObject &&
 		values.length &&
-		values.every( ( element ) => isValidElement( element ) );
+		values.every( ( element ) => isValidElement( element ) )
+	);
 };
 
 /**
@@ -150,7 +169,10 @@ function proceed( conversionMap ) {
 	switch ( tokenType ) {
 		case 'no-more-tokens':
 			if ( stackDepth !== 0 ) {
-				const { leadingTextStart: stackLeadingText, tokenStart } = stack.pop();
+				const {
+					leadingTextStart: stackLeadingText,
+					tokenStart,
+				} = stack.pop();
 				output.push( indoc.substr( stackLeadingText, tokenStart ) );
 			}
 			addText();
@@ -160,7 +182,10 @@ function proceed( conversionMap ) {
 			if ( 0 === stackDepth ) {
 				if ( null !== leadingTextStart ) {
 					output.push(
-						indoc.substr( leadingTextStart, startOffset - leadingTextStart )
+						indoc.substr(
+							leadingTextStart,
+							startOffset - leadingTextStart
+						)
 					);
 				}
 				output.push( conversionMap[ name ] );
@@ -170,14 +195,14 @@ function proceed( conversionMap ) {
 
 			// otherwise we found an inner element
 			addChild(
-				new Frame( conversionMap[ name ], startOffset, tokenLength )
+				createFrame( conversionMap[ name ], startOffset, tokenLength )
 			);
 			offset = startOffset + tokenLength;
 			return true;
 
 		case 'opener':
 			stack.push(
-				new Frame(
+				createFrame(
 					conversionMap[ name ],
 					startOffset,
 					tokenLength,
@@ -205,11 +230,11 @@ function proceed( conversionMap ) {
 			);
 			stackTop.children.push( text );
 			stackTop.prevOffset = startOffset + tokenLength;
-			const frame = new Frame(
+			const frame = createFrame(
 				stackTop.element,
 				stackTop.tokenStart,
 				stackTop.tokenLength,
-				startOffset + tokenLength,
+				startOffset + tokenLength
 			);
 			frame.children = stackTop.children;
 			addChild( frame );
@@ -274,15 +299,16 @@ function addText() {
 function addChild( frame ) {
 	const { element, tokenStart, tokenLength, prevOffset, children } = frame;
 	const parent = stack[ stack.length - 1 ];
-	const text = indoc.substr( parent.prevOffset, tokenStart - parent.prevOffset );
+	const text = indoc.substr(
+		parent.prevOffset,
+		tokenStart - parent.prevOffset
+	);
 
 	if ( text ) {
 		parent.children.push( text );
 	}
 
-	parent.children.push(
-		cloneElement( element, null, ...children )
-	);
+	parent.children.push( cloneElement( element, null, ...children ) );
 	parent.prevOffset = prevOffset ? prevOffset : tokenStart + tokenLength;
 }
 
@@ -299,27 +325,29 @@ function addChild( frame ) {
  *                           the element.
  */
 function closeOuterElement( endOffset ) {
-	const { element, leadingTextStart, prevOffset, tokenStart, children } = stack.pop();
+	const {
+		element,
+		leadingTextStart,
+		prevOffset,
+		tokenStart,
+		children,
+	} = stack.pop();
 
-	const text = endOffset ?
-		indoc.substr( prevOffset, endOffset - prevOffset ) :
-		indoc.substr( prevOffset );
+	const text = endOffset
+		? indoc.substr( prevOffset, endOffset - prevOffset )
+		: indoc.substr( prevOffset );
 
 	if ( text ) {
 		children.push( text );
 	}
 
 	if ( null !== leadingTextStart ) {
-		output.push( indoc.substr( leadingTextStart, tokenStart - leadingTextStart ) );
+		output.push(
+			indoc.substr( leadingTextStart, tokenStart - leadingTextStart )
+		);
 	}
 
-	output.push(
-		cloneElement(
-			element,
-			null,
-			...children
-		)
-	);
+	output.push( cloneElement( element, null, ...children ) );
 }
 
 export default createInterpolateElement;

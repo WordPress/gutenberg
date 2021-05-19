@@ -87,7 +87,11 @@ export class Hue extends Component {
 
 	handleChange( e ) {
 		const { onChange = noop } = this.props;
-		const change = calculateHueChange( e, this.props, this.container.current );
+		const change = calculateHueChange(
+			e,
+			this.props,
+			this.container.current
+		);
 		if ( change ) {
 			onChange( change, e );
 		}
@@ -144,7 +148,8 @@ export class Hue extends Component {
 						ref={ this.container }
 						onMouseDown={ this.handleMouseDown }
 						onTouchMove={ this.handleChange }
-						onTouchStart={ this.handleChange }>
+						onTouchStart={ this.handleChange }
+					>
 						<div
 							tabIndex="0"
 							role="slider"
@@ -152,16 +157,21 @@ export class Hue extends Component {
 							aria-valuemin="359"
 							aria-valuenow={ hsl.h }
 							aria-orientation="horizontal"
-							aria-label={ __( 'Hue value in degrees, from 0 to 359.' ) }
+							aria-label={ __(
+								'Hue value in degrees, from 0 to 359.'
+							) }
 							aria-describedby={ `components-color-picker__hue-description-${ instanceId }` }
 							className="components-color-picker__hue-pointer"
 							style={ pointerLocation }
 							onKeyDown={ this.preventKeyEvents }
 						/>
-						<VisuallyHidden as="p"
+						<VisuallyHidden
+							as="p"
 							id={ `components-color-picker__hue-description-${ instanceId }` }
 						>
-							{ __( 'Move the arrow left or right to change hue.' ) }
+							{ __(
+								'Move the arrow left or right to change hue.'
+							) }
 						</VisuallyHidden>
 					</div>
 					{ /* eslint-enable jsx-a11y/no-static-element-interactions */ }
@@ -171,7 +181,4 @@ export class Hue extends Component {
 	}
 }
 
-export default compose(
-	pure,
-	withInstanceId
-)( Hue );
+export default compose( pure, withInstanceId )( Hue );

@@ -4,6 +4,7 @@
 import { __ } from '@wordpress/i18n';
 import { toggleFormat } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
+import { formatStrikethrough } from '@wordpress/icons';
 
 const name = 'core/strikethrough';
 const title = __( 'Strikethrough' );
@@ -21,7 +22,7 @@ export const strikethrough = {
 
 		return (
 			<RichTextToolbarButton
-				icon="editor-strikethrough"
+				icon={ formatStrikethrough }
 				title={ title }
 				onClick={ onClick }
 				isActive={ isActive }

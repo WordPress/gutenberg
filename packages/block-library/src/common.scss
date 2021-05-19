@@ -1,0 +1,111 @@
+// The following selectors have increased specificity (using the :root prefix)
+// to assure colors take effect over another base class color, mainly to let
+// the colors override the added specificity by link states such as :hover.
+
+:root {
+	// Background colors.
+	@include background-colors();
+
+	// Foreground colors.
+	@include foreground-colors();
+
+	// Gradients
+	@include gradient-colors();
+
+}
+
+// Font sizes.
+.has-small-font-size {
+	font-size: 0.8125em;
+}
+
+.has-regular-font-size, // Not used now, kept because of backward compatibility.
+.has-normal-font-size {
+	font-size: 1em;
+}
+
+.has-medium-font-size {
+	font-size: 1.25em;
+}
+
+.has-large-font-size {
+	font-size: 2.25em;
+}
+
+.has-larger-font-size, // Not used now, kept because of backward compatibility.
+.has-huge-font-size {
+	font-size: 2.625em;
+}
+
+// Text alignments.
+.has-text-align-center {
+	text-align: center;
+}
+
+.has-text-align-left {
+	/*rtl:ignore*/
+	text-align: left;
+}
+
+.has-text-align-right {
+	/*rtl:ignore*/
+	text-align: right;
+}
+
+// This tag marks the end of the styles that apply to editing canvas contents and need to be manipulated when we resize the editor.
+#end-resizable-editor-section {
+	display: none;
+}
+
+// Block alignments.
+.aligncenter {
+	clear: both;
+}
+
+// Justification.
+.items-justified-left {
+	justify-content: flex-start;
+}
+
+.items-justified-center {
+	justify-content: center;
+}
+
+.items-justified-right {
+	justify-content: flex-end;
+}
+
+.items-justified-space-between {
+	justify-content: space-between;
+}
+
+.screen-reader-text {
+	border: 0;
+	clip: rect(1px, 1px, 1px, 1px);
+	-webkit-clip-path: inset(50%);
+	clip-path: inset(50%);
+	height: 1px;
+	margin: -1px;
+	overflow: hidden;
+	padding: 0;
+	position: absolute;
+	width: 1px;
+	word-wrap: normal !important;
+}
+
+.screen-reader-text:focus {
+	background-color: $gray-300;
+	clip: auto !important;
+	clip-path: none;
+	color: #444;
+	display: block;
+	font-size: 1em;
+	height: auto;
+	left: 5px;
+	line-height: normal;
+	padding: 15px 23px 14px;
+	text-decoration: none;
+	top: 5px;
+	width: auto;
+	z-index: 100000;
+}

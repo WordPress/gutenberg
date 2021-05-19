@@ -116,6 +116,12 @@ exports[`Writing Flow should merge forwards 1`] = `
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Writing Flow should merge paragraphs 1`] = `
+"<!-- wp:paragraph -->
+<p>12</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Writing Flow should navigate around inline boundaries 1`] = `
 "<!-- wp:paragraph -->
 <p>FirstAfter</p>
@@ -139,6 +145,16 @@ exports[`Writing Flow should navigate around nested inline boundaries 1`] = `
 exports[`Writing Flow should navigate around nested inline boundaries 2`] = `
 "<!-- wp:paragraph -->
 <p>a<strong>b<em>c1d</em>e f<em>g2h</em>i</strong>j</p>
+<!-- /wp:paragraph -->"
+`;
+
+exports[`Writing Flow should navigate contenteditable with normal line height 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p></p>
 <!-- /wp:paragraph -->"
 `;
 
@@ -232,6 +248,26 @@ exports[`Writing Flow should not delete surrounding space when deleting a word w
 <!-- /wp:paragraph -->"
 `;
 
+exports[`Writing Flow should not have a dead zone above an aligned block 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:image {\\"align\\":\\"wide\\"} -->
+<figure class=\\"wp-block-image alignwide\\"><img alt=\\"\\"/></figure>
+<!-- /wp:image -->"
+`;
+
+exports[`Writing Flow should not have a dead zone between blocks (lower) 1`] = `
+"<!-- wp:paragraph -->
+<p>1</p>
+<!-- /wp:paragraph -->
+
+<!-- wp:paragraph -->
+<p>23</p>
+<!-- /wp:paragraph -->"
+`;
+
 exports[`Writing Flow should not prematurely multi-select 1`] = `
 "<!-- wp:paragraph -->
 <p>1</p>
@@ -260,4 +296,10 @@ exports[`Writing Flow should remember initial vertical position 1`] = `
 <!-- wp:paragraph -->
 <p><br>2</p>
 <!-- /wp:paragraph -->"
+`;
+
+exports[`Writing Flow should only consider the content as one tab stop 1`] = `
+"<!-- wp:table -->
+<figure class=\\"wp-block-table\\"><table><tbody><tr><td></td><td>2</td></tr><tr><td></td><td></td></tr></tbody></table></figure>
+<!-- /wp:table -->"
 `;

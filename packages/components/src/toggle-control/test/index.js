@@ -8,30 +8,16 @@ import renderer from 'react-test-renderer';
  */
 import ToggleControl from '../';
 
-/**
- * WordPress dependencies
- */
-import { Component } from '@wordpress/element';
-
-// this is needed because TestUtils does not accept a stateless component.
-// anything run through a HOC ends up as a stateless component.
-const getTestComponent = ( WrappedComponent, props ) => {
-	class TestComponent extends Component {
-		render() {
-			return <WrappedComponent { ...this.props } />;
-		}
-	}
-	return <TestComponent { ...props } />;
-};
-
 describe( 'ToggleControl', () => {
 	it( 'triggers change callback with numeric value', () => {
 		// Mount: With shallow, cannot find input child of BaseControl
 		const onChange = jest.fn();
 		const wrapper = renderer.create(
-			getTestComponent( ToggleControl, { onChange } )
+			<ToggleControl onChange={ onChange } />
 		);
-		wrapper.root.findByType( 'input' ).props.onChange( { target: { checked: true } } );
+		wrapper.root
+			.findByType( 'input' )
+			.props.onChange( { target: { checked: true } } );
 
 		expect( onChange ).toHaveBeenCalledWith( true );
 	} );
@@ -41,7 +27,7 @@ describe( 'ToggleControl', () => {
 			// Mount: With shallow, cannot find input child of BaseControl
 			const onChange = jest.fn();
 			const wrapper = renderer.create(
-				getTestComponent( ToggleControl, { onChange } )
+				<ToggleControl onChange={ onChange } />
 			);
 
 			const input = wrapper.root.findByType( 'input' );
@@ -53,12 +39,14 @@ describe( 'ToggleControl', () => {
 			// Mount: With shallow, cannot find input child of BaseControl
 			const onChange = jest.fn();
 			const wrapper = renderer.create(
-				getTestComponent( ToggleControl, { help: true, onChange } )
+				<ToggleControl onChange={ onChange } help={ true } />
 			);
 
 			const input = wrapper.root.findByType( 'input' );
 
-			expect( input.props[ 'aria-describedby' ] ).toMatch( /^inspector-toggle-control-.*__help$/ );
+			expect( input.props[ 'aria-describedby' ] ).toMatch(
+				/^inspector-toggle-control-.*__help$/
+			);
 		} );
 	} );
 } );

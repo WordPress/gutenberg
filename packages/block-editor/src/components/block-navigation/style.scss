@@ -1,109 +1,265 @@
-$tree-border-width: 2px;
-$tree-item-height: 36px;
+.block-editor-block-navigation__label {
+	margin: 0 0 $grid-unit-15;
+	color: $gray-700;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 500;
+}
 
 .block-editor-block-navigation__container {
-	padding: $grid-size - $border-width;
+	min-width: 280px;
 }
 
-.block-editor-block-navigation__label {
-	margin: 0 0 $grid-size;
-	color: $dark-gray-300;
-}
-
-.block-editor-block-navigation__list,
-.block-editor-block-navigation__paragraph {
+.block-editor-block-navigation-tree {
+	width: 100%;
+	border-collapse: collapse;
 	padding: 0;
 	margin: 0;
-}
 
-.block-editor-block-navigation__list .block-editor-button-block-appender {
-	outline: none;
-	background: none;
-	padding: $grid-size;
-	margin-left: 0.8em;
-	width: $icon-button-size;
-	border-radius: 4px;
-
-	&:hover:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__hover;
-		outline: none;
-	}
-
-	&:focus:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__focus;
+	// Move upwards when in modal.
+	.components-modal__content & {
+		margin: (-$grid-unit-15) (-$grid-unit-15 / 2) 0;
+		width: calc(100% + #{ $grid-unit-15 });
 	}
 }
 
-.block-editor-block-navigation__list .block-editor-block-navigation__list {
-	margin-top: 2px;
-	border-left: $tree-border-width solid $light-gray-900;
-	margin-left: 1em;
+.block-editor-block-navigation-leaf {
+	// Use position relative for row animation.
+	position: relative;
 
-	.block-editor-block-navigation__list {
-		margin-left: 1.5em;
+	&.is-selected .block-editor-block-navigation-block-contents {
+		background: var(--wp-admin-theme-color);
+		color: $white;
+	}
+	&.is-selected .block-editor-block-navigation-block-contents:focus {
+		box-shadow:
+			inset 0 0 0 1px $white,
+			0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
 	}
 
-	.block-editor-block-navigation__item {
+	&.is-branch-selected.is-selected .block-editor-block-navigation-block-contents {
+		border-radius: 2px 2px 0 0;
+	}
+	&.is-branch-selected:not(.is-selected) .block-editor-block-navigation-block-contents {
+		// Lighten a CSS variable without introducing a new SASS variable
+		background:
+			linear-gradient(transparentize($white, 0.1), transparentize($white, 0.1)),
+			linear-gradient(var(--wp-admin-theme-color), var(--wp-admin-theme-color));
+		border-radius: 0;
+	}
+	&.is-branch-selected.is-last-of-selected-branch .block-editor-block-navigation-block-contents {
+		border-radius: 0 0 2px 2px;
+	}
+
+	&.is-dragging {
+		display: none;
+	}
+
+	.block-editor-block-navigation-block-contents {
+		display: flex;
+		align-items: center;
+		width: 100%;
+		height: auto;
+		padding: ($grid-unit-15 / 2) $grid-unit-15;
+		text-align: left;
+		color: $gray-900;
+		border-radius: 2px;
 		position: relative;
+		white-space: nowrap;
 
-		&::before {
+		&:hover,
+		&:focus {
+			box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		}
+		&:focus {
+			z-index: 1;
+		}
+
+		&.is-dropping-before::before {
+			content: "";
 			position: absolute;
+			pointer-events: none;
+			transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
+			top: -2px;
+			right: 0;
 			left: 0;
-			background: $light-gray-900;
-			width: 0.5em;
-			height: $tree-border-width;
-			content: "";
-			top: calc(50% - #{ $tree-border-width / 2 });
+			border-top: 4px solid var(--wp-admin-theme-color);
 		}
-	}
 
-	.block-editor-block-navigation__item-button {
-		margin-left: 0.8em;
-		width: calc(100% - 0.8em);
-	}
-
-	& > li:last-child {
-		position: relative;
-		&::after {
+		&.is-dropping-after::before {
+			content: "";
 			position: absolute;
+			pointer-events: none;
+			transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
+			bottom: -2px;
+			right: 0;
+			left: 0;
+			border-bottom: 4px solid var(--wp-admin-theme-color);
+		}
+
+		&.is-dropping-to-inner-blocks::before {
 			content: "";
-			background: $white;
-			top: ($tree-item-height + $tree-border-width ) / 2;
-			bottom: 0;
-			left: -$tree-border-width;
-			width: $tree-border-width;
+			position: absolute;
+			pointer-events: none;
+			transition: border-color 0.1s linear, border-style 0.1s linear, box-shadow 0.1s linear;
+			bottom: -2px;
+			right: 0;
+			left: $icon-size;
+			border-bottom: 4px solid var(--wp-admin-theme-color);
+		}
+
+		.components-modal__content & {
+			padding-left: 0;
+			padding-right: 0;
 		}
 	}
-}
 
-.block-editor-block-navigation__item-button {
-	display: flex;
-	align-items: center;
-	width: 100%;
-	padding: 6px;
-	text-align: left;
-	color: $dark-gray-600;
-	border-radius: 4px;
+	&.is-visible .block-editor-block-navigation-block-contents {
+		opacity: 1;
+		@include edit-post__fade-in-animation;
+	}
 
 	.block-editor-block-icon {
-		margin-right: 6px;
+		align-self: flex-start;
+		margin-right: ( $grid-unit-05 * 2.5 ); // 10px is off the 4px grid, but required for visual alignment between block name and subsequent nested icon
+		width: 20px;
 	}
 
-	&:hover:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__hover;
+	.block-editor-block-navigation-block__menu-cell,
+	.block-editor-block-navigation-block__mover-cell,
+	.block-editor-block-navigation-block__contents-cell {
+		padding-top: 0;
+		padding-bottom: 0;
 	}
 
-	&:focus:not(:disabled):not([aria-disabled="true"]) {
-		@include menu-style__focus;
+	.block-editor-block-navigation-block__menu-cell,
+	.block-editor-block-navigation-block__mover-cell {
+		line-height: 0;
+		width: $button-size;
+		opacity: 0;
+		vertical-align: top;
+		@include reduce-motion("transition");
+
+		// Show on hover, visible, and show above to keep the hit area size.
+		&:hover,
+		&.is-visible {
+			position: relative;
+			z-index: 1;
+			opacity: 1;
+			@include edit-post__fade-in-animation;
+		}
+
+		&,
+		.components-button.has-icon {
+			width: 24px;
+			min-width: 24px;
+			padding: 0;
+		}
 	}
 
-	&.is-selected,
-	&.is-selected:focus {
-		color: $dark-gray-700;
-		background: $light-gray-300;
+	.block-editor-block-navigation-block__menu-cell {
+		padding-top: $grid-unit-10;
+	}
+
+	.block-editor-block-navigation-block__mover-cell-alignment-wrapper {
+		display: flex;
+		height: 100%;
+		flex-direction: column;
+		align-items: center;
+	}
+
+	// Keep the tap target large but the focus target small.
+	.block-editor-block-mover-button {
+		position: relative;
+		width: $button-size;
+		height: $button-size-small;
+
+		// Position the icon.
+		svg {
+			position: relative;
+			height: $button-size-small;
+		}
+
+		&.is-up-button {
+			margin-top: -$grid-unit-15 / 2;
+			align-items: flex-end;
+			svg {
+				bottom: -$grid-unit-05;
+			}
+		}
+
+		&.is-down-button {
+			margin-bottom: -$grid-unit-15 / 2;
+			align-items: flex-start;
+			svg {
+				top: -$grid-unit-05;
+			}
+		}
+
+		// Don't show the focus inherited by the Button component.
+		&:focus:enabled {
+			box-shadow: none;
+			outline: none;
+		}
+
+		// Focus style.
+		&:focus {
+			box-shadow: none;
+			outline: none;
+		}
+
+		&:focus::before {
+			@include block-toolbar-button-style__focus();
+		}
+
+		// Focus and toggle pseudo elements.
+		&::before {
+			content: "";
+			position: absolute;
+			display: block;
+			border-radius: $radius-block-ui;
+			height: 16px;
+			min-width: 100%;
+
+			// Position the focus rectangle.
+			left: 0;
+			right: 0;
+
+			// Animate in.
+			animation: components-button__appear-animation 0.1s ease;
+			animation-fill-mode: forwards;
+			@include reduce-motion("animation");
+		}
+	}
+
+	.block-editor-inserter__toggle {
+		background: $gray-900;
+		color: $white;
+		height: $grid-unit-30;
+		margin: 6px 6px 6px 1px;
+		min-width: $grid-unit-30;
+
+		&:active {
+			color: $white;
+		}
 	}
 }
 
-.components-popover.block-editor-block-navigation__popover {
-	z-index: z-index(".components-popover.block-editor-block-navigation__popover");
+.block-editor-block-navigation-block-slot__description,
+.block-editor-block-navigation-block-select-button__description,
+.block-editor-block-navigation-appender__description {
+	display: none;
+}
+
+.block-editor-block-navigation-block__contents-cell,
+.block-editor-block-navigation-appender__cell {
+	.block-editor-block-navigation-block__contents-container,
+	.block-editor-block-navigation-appender__container {
+		display: flex;
+	}
+}
+
+.block-editor-block-navigator-indentation {
+	flex-shrink: 0;
+	width: $grid-unit-30 + $grid-unit-05; // Indent a full icon size, plus 4px which optically aligns child icons to the text label above.
 }

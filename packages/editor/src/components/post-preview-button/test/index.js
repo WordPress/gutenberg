@@ -58,7 +58,8 @@ describe( 'PostPreviewButton', () => {
 					postId={ 1 }
 					currentPostLink="https://wordpress.org/?p=1"
 					isSaveable
-					modified="2017-08-03T15:05:50" />
+					modified="2017-08-03T15:05:50"
+				/>
 			);
 
 			const previewWindow = { location: {} };
@@ -67,7 +68,9 @@ describe( 'PostPreviewButton', () => {
 
 			wrapper.setProps( { previewLink: 'https://wordpress.org/?p=1' } );
 
-			expect( previewWindow.location ).toBe( 'https://wordpress.org/?p=1' );
+			expect( previewWindow.location ).toBe(
+				'https://wordpress.org/?p=1'
+			);
 		} );
 	} );
 
@@ -92,10 +95,7 @@ describe( 'PostPreviewButton', () => {
 			} ) );
 
 			const wrapper = shallow(
-				<PostPreviewButton
-					postId={ 1 }
-					autosave={ autosave }
-				/>
+				<PostPreviewButton postId={ 1 } autosave={ autosave } />
 			);
 
 			wrapper.simulate( 'click', {
@@ -107,7 +107,9 @@ describe( 'PostPreviewButton', () => {
 			expect( window.open ).toHaveBeenCalledWith( '', 'wp-preview-1' );
 			expect( wrapper.instance().previewWindow.focus ).toHaveBeenCalled();
 			expect( autosave ).not.toHaveBeenCalled();
-			expect( setLocation ).toHaveBeenCalledWith( 'https://wordpress.org/?p=1' );
+			expect( setLocation ).toHaveBeenCalledWith(
+				'https://wordpress.org/?p=1'
+			);
 		} );
 
 		it( 'autosaves the post if autosaveable', () => {
@@ -136,8 +138,13 @@ describe( 'PostPreviewButton', () => {
 			expect( window.open ).toHaveBeenCalledWith( '', 'wp-preview-1' );
 			expect( wrapper.instance().previewWindow.focus ).toHaveBeenCalled();
 			expect( autosave ).toHaveBeenCalled();
-			expect( wrapper.instance().previewWindow.document.write.mock.calls[ 0 ][ 0 ] ).toContain( 'Generating preview…' );
-			expect( wrapper.instance().previewWindow.document.close ).toHaveBeenCalled();
+			expect(
+				wrapper.instance().previewWindow.document.write.mock
+					.calls[ 0 ][ 0 ]
+			).toContain( 'Generating preview…' );
+			expect(
+				wrapper.instance().previewWindow.document.close
+			).toHaveBeenCalled();
 		} );
 	} );
 

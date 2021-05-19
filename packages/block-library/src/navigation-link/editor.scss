@@ -1,63 +1,55 @@
-// Normalize navigation link and edit containers, to look mostly the same.
-.wp-block-navigation-link__field .components-text-control__input.components-text-control__input,
+// Normalize Link and edit containers, to look mostly the same.
 .wp-block-navigation-link__container {
 	border-radius: 0;
-	// Make it the same height as the appender to prevent a jump. Maybe revisit this.
-	line-height: $icon-button-size;
-	min-height: $icon-button-size;
+
+	// Make it the same height as the appender to prevent a jump.
+	min-height: $button-size;
 }
 
-.wp-block-navigation-link__edit-container {
-	display: flex;
-	white-space: nowrap;
 
-	// Compensate for navigation link base padding.
-	margin-left: -$grid-size;
+/**
+ * Submenus.
+ */
 
-	.wp-block-navigation-link__content {
-		margin-right: $grid-size;
+// Show submenus above the sibling inserter.
+.wp-block-navigation .has-child {
+	cursor: pointer;
 
-		// This should match the padding of the navigation link.
-		padding: 0 $grid-size;
+	.submenu-container,
+	.wp-block-navigation-link__container {
+		z-index: z-index(".has-child .wp-block-navigation-link__container");
+	}
 
-		// This make it look like an input field.
-		// We may want to not style this at all, but let's try this.
-		// We don't use the mixins because they increase the size of the input, which doesn't work with PlainText.
-		box-shadow: inset 0 0 0 1px $dark-gray-200;
-		transition: box-shadow 0.1s linear;
-		border-radius: $radius-round-rectangle;
-		@include reduce-motion("transition");
+	&:hover {
+		.submenu-container,
+		.wp-block-navigation-link__container {
+			z-index: z-index(".has-child:hover .wp-block-navigation-link__container");
+		}
+	}
 
-		&:focus {
-			color: $dark-gray-900;
-			box-shadow: inset 0 0 0 2px $blue-medium-focus;
-
-			// Windows High Contrast mode will show this outline, but not the box-shadow.
-			outline: 2px solid transparent;
+	// Show on editor selected, even if on frontend it only stays open on focus-within.
+	&.is-selected,
+	&.has-child-selected {
+		> .wp-block-navigation-link__container {
+			// We use important here because if the parent block is selected and submenus are present, they should always be visible.
+			visibility: visible !important;
+			opacity: 1 !important;
 		}
 	}
 }
 
-/*
- * Adjust Navigation Item.
- */
-.wp-block-navigation-link {
-	margin-left: $grid-size;
-	margin-right: $grid-size;
-	// Provide a base menu item margin.
-	// This should be the same inside the field,
-	// and the edit container should compensate.
-	// This is to make sure the edit and view are the same.
-	padding: 0 $grid-size;
 
-	.block-editor-block-list__layout {
+/**
+ * Navigation Items.
+ */
+
+.wp-block-navigation-link {
+	.wp-block-navigation-link__container {
 		display: block;
-		margin: $grid-size;
 	}
 
-	// Only display inner blocks when the block is being edited.
-	.block-editor-inner-blocks {
-		display: none;
+	.wp-block-navigation-link__content {
+		cursor: text;
 	}
 
 	&.is-editing,
@@ -65,54 +57,72 @@
 		min-width: 20px;
 	}
 
-	&.is-editing .block-editor-inner-blocks {
-		display: block;
+	.block-list-appender {
+		margin-top: $grid-unit-20;
+		// The right margin should be set to auto, so as to not shift layout in flex containers.
+		margin-right: auto;
+		margin-bottom: $grid-unit-20;
+		margin-left: $grid-unit-20;
 	}
-
-	&.has-link .wp-block-navigation-link__content {
-		text-decoration: underline;
-	}
-
-	.block-editor-rich-text__editable.is-selected:not(.keep-placeholder-on-focus):not(:focus) [data-rich-text-placeholder]::after {
-		display: inline-block;
-	}
-}
-
-[data-type="core/navigation-link"] {
-	.block-editor-block-toolbar {
-		left: $block-padding;
-	}
-
-	// Hide the draggable mover until functionality for positioning it on drag correctly is added: https://github.com/WordPress/gutenberg/issues/19703
-	.block-editor-block-toolbar .components-toolbar.block-editor-block-mover {
-		.components-button.block-editor-block-mover__control-drag-handle {
-			display: none;
-		}
-	}
-}
-
-.wp-block-navigation-link__nofollow-external-link {
-	display: block;
-}
-
-// Separator
-.wp-block-navigation-link__separator {
-	margin: $grid-size 0 $grid-size;
-	border-top: $border-width solid $light-gray-500;
-}
-
-// Popover styles
-.components-popover.wp-block-navigation-link__dropdown-content {
-	margin-top: -1px;
-	margin-left: -4px;
-}
-
-.wp-block-navigation-link__dropdown-content .components-popover__content {
-	padding: $grid-size 0;
 }
 
 .wp-block-navigation .block-editor-block-list__block[data-type="core/navigation-link"] {
 	& > .block-editor-block-list__insertion-point {
 		display: none;
 	}
+}
+
+
+/**
+ * Menu item setup state. Is shown when a menu item has no URL configured.
+ */
+
+.wp-block-navigation-link__placeholder {
+	position: relative;
+
+	// Provide a little margin to show each placeholder as a separate unit.
+	margin: 2px;
+
+	.wp-block-navigation-link__placeholder-text {
+		font-family: $default-font;
+		font-size: $default-font-size;
+		padding-left: 4px;
+		padding-right: 4px;
+
+	}
+
+	// This needs extra specificity.
+	&.wp-block-navigation-link__content {
+		cursor: pointer;
+	}
+
+	&::before {
+		content: "";
+		display: block;
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		border-radius: $radius-block-ui;
+		opacity: 0.1;
+
+		.is-dark-theme & {
+			opacity: 0.2;
+		}
+
+		.is-editing & {
+			background: currentColor;
+		}
+	}
+}
+
+// We had to add extra classes to override the color from
+// .editor-styles-wrapper .wp-block-navigation:not(.has-text-color) .wp-block-navigation-link__content
+.wp-block-navigation
+.wp-block-navigation-link:not(.is-editing)
+.wp-block-navigation-link__content.wp-block-navigation-link__placeholder {
+	box-shadow: inset 0 0 0 $border-width $gray-700;
+	border-radius: $radius-block-ui;
+	color: var(--wp-admin-theme-color);
 }

@@ -1,24 +1,19 @@
 /**
  * External dependencies
  */
-import { View, ImageBackground, Text, TouchableWithoutFeedback } from 'react-native';
-import {
-	mediaUploadSync,
-	requestImageFailedRetryDialog,
-	requestImageUploadCancelDialog,
-} from 'react-native-gutenberg-bridge';
+import { View, Text, TouchableWithoutFeedback } from 'react-native';
 
 /**
  * WordPress dependencies
  */
 import {
-	Icon,
-	Button,
-	ToolbarGroup,
-	withNotices,
-} from '@wordpress/components';
+	mediaUploadSync,
+	requestImageFailedRetryDialog,
+	requestImageUploadCancelDialog,
+	requestImageFullscreenPreview,
+} from '@wordpress/react-native-bridge';
+import { Icon, Image, IMAGE_DEFAULT_FOCAL_POINT } from '@wordpress/components';
 import {
-	BlockControls,
 	MEDIA_TYPE_IMAGE,
 	MEDIA_TYPE_VIDEO,
 	MediaPlaceholder,
@@ -29,8 +24,10 @@ import {
 } from '@wordpress/block-editor';
 import { Component } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { isURL } from '@wordpress/url';
+import { isURL, getProtocol } from '@wordpress/url';
 import { compose, withPreferredColorScheme } from '@wordpress/compose';
+import { withDispatch } from '@wordpress/data';
+import { store as noticesStore } from '@wordpress/notices';
 
 /**
  * Internal dependencies
@@ -44,17 +41,27 @@ import SvgIconRetry from './icon-retry';
  */
 const ALLOWED_MEDIA_TYPES = [ MEDIA_TYPE_IMAGE, MEDIA_TYPE_VIDEO ];
 
+const ICON_TYPE = {
+	PLACEHOLDER: 'placeholder',
+	RETRY: 'retry',
+};
+
 export { imageFillStyles } from './media-container.js';
 
 class MediaContainer extends Component {
 	constructor() {
 		super( ...arguments );
-		this.onUploadError = this.onUploadError.bind( this );
 		this.updateMediaProgress = this.updateMediaProgress.bind( this );
-		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind( this );
-		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind( this );
+		this.finishMediaUploadWithSuccess = this.finishMediaUploadWithSuccess.bind(
+			this
+		);
+		this.finishMediaUploadWithFailure = this.finishMediaUploadWithFailure.bind(
+			this
+		);
 		this.mediaUploadStateReset = this.mediaUploadStateReset.bind( this );
-		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind( this );
+		this.onSelectMediaUploadOption = this.onSelectMediaUploadOption.bind(
+			this
+		);
 		this.onMediaPressed = this.onMediaPressed.bind( this );
 
 		this.state = {
@@ -67,15 +74,9 @@ class MediaContainer extends Component {
 
 		// Make sure we mark any temporary images as failed if they failed while
 		// the editor wasn't open
-		if ( mediaId && mediaUrl && mediaUrl.indexOf( 'file:' ) === 0 ) {
+		if ( mediaId && mediaUrl && getProtocol( mediaUrl ) === 'file:' ) {
 			mediaUploadSync();
 		}
-	}
-
-	onUploadError( message ) {
-		const { noticeOperations } = this.props;
-		noticeOperations.removeAllNotices();
-		noticeOperations.createErrorNotice( message );
 	}
 
 	onSelectMediaUploadOption( params ) {
@@ -90,37 +91,48 @@ class MediaContainer extends Component {
 	}
 
 	onMediaPressed() {
-		const { mediaId, mediaUrl } = this.props;
+		const { isUploadInProgress } = this.state;
+		const {
+			mediaId,
+			mediaUrl,
+			mediaType,
+			isMediaSelected,
+			onMediaSelected,
+		} = this.props;
 
-		if ( this.state.isUploadInProgress ) {
+		if ( isUploadInProgress ) {
 			requestImageUploadCancelDialog( mediaId );
-		} else if ( mediaId && ! isURL( mediaUrl ) ) {
+		} else if ( mediaId && getProtocol( mediaUrl ) === 'file:' ) {
 			requestImageFailedRetryDialog( mediaId );
+		} else if ( mediaType === MEDIA_TYPE_IMAGE && isMediaSelected ) {
+			requestImageFullscreenPreview( mediaUrl );
+		} else if ( mediaType === MEDIA_TYPE_IMAGE ) {
+			onMediaSelected();
 		}
 	}
 
-	getIcon( isRetryIcon, isVideo ) {
-		if ( isRetryIcon ) {
-			return <Icon icon={ SvgIconRetry } { ...( styles.iconRetry, isVideo ? styles.iconRetryVideo : {} ) } />;
-		}
+	getIcon( iconType ) {
+		const { mediaType, getStylesFromColorScheme } = this.props;
+		let iconStyle;
+		switch ( iconType ) {
+			case ICON_TYPE.RETRY:
+				iconStyle =
+					mediaType === MEDIA_TYPE_IMAGE
+						? styles.iconRetry
+						: getStylesFromColorScheme(
+								styles.iconRetryVideo,
+								styles.iconRetryVideoDark
+						  );
 
-		const iconStyle = this.props.getStylesFromColorScheme( styles.icon, styles.iconDark );
+				return <Icon icon={ SvgIconRetry } { ...iconStyle } />;
+			case ICON_TYPE.PLACEHOLDER:
+				iconStyle = getStylesFromColorScheme(
+					styles.iconPlaceholder,
+					styles.iconPlaceholderDark
+				);
+				break;
+		}
 		return <Icon icon={ icon } { ...iconStyle } />;
-	}
-
-	renderToolbarEditButton( open ) {
-		return (
-			<BlockControls>
-				<ToolbarGroup>
-					<Button
-						className="components-toolbar__control"
-						label={ __( 'Edit media' ) }
-						icon="edit"
-						onClick={ open }
-					/>
-				</ToolbarGroup>
-			</BlockControls>
-		);
 	}
 
 	updateMediaProgress() {
@@ -140,6 +152,10 @@ class MediaContainer extends Component {
 	}
 
 	finishMediaUploadWithFailure() {
+		const { createErrorNotice } = this.props;
+
+		createErrorNotice( __( 'Failed to insert media.' ) );
+
 		this.setState( { isUploadInProgress: false } );
 	}
 
@@ -152,82 +168,137 @@ class MediaContainer extends Component {
 
 	renderImage( params, openMediaOptions ) {
 		const { isUploadInProgress } = this.state;
-		const { mediaAlt, mediaUrl, isSelected } = this.props;
-		const { finalWidth, finalHeight, imageWidthWithinContainer, isUploadFailed, retryMessage } = params;
-		const opacity = isUploadInProgress ? 0.3 : 1;
-
-		const contentStyle = ! imageWidthWithinContainer ? styles.content : styles.contentCentered;
+		const {
+			aligmentStyles,
+			focalPoint,
+			imageFill,
+			isMediaSelected,
+			isSelected,
+			mediaAlt,
+			mediaUrl,
+			mediaWidth,
+			shouldStack,
+		} = this.props;
+		const { isUploadFailed, retryMessage } = params;
+		const focalPointValues = ! focalPoint
+			? IMAGE_DEFAULT_FOCAL_POINT
+			: focalPoint;
 
 		return (
-			<TouchableWithoutFeedback
-				accessible={ ! isSelected }
-				onPress={ this.onMediaPressed }
-				onLongPress={ openMediaOptions }
-				disabled={ ! isSelected }
+			<View
+				style={ [
+					imageFill && styles.imageWithFocalPoint,
+					imageFill &&
+						shouldStack && {
+							height: styles.imageFill.height,
+						},
+				] }
 			>
-				<View style={ contentStyle }>
-					{ ! imageWidthWithinContainer &&
-						<View style={ styles.imageContainer }>
-							{ this.getIcon( false ) }
-						</View> }
-					<ImageBackground
-						accessible={ true }
-						accessibilityLabel={ mediaAlt }
-						accessibilityHint={ __( 'Double tap and hold to edit' ) }
-						accessibilityRole={ 'imagebutton' }
-						style={ { width: finalWidth, height: finalHeight, opacity } }
-						resizeMethod="scale"
-						source={ { uri: mediaUrl } }
-						key={ mediaUrl }
+				<TouchableWithoutFeedback
+					accessible={ ! isSelected }
+					onPress={ this.onMediaPressed }
+					onLongPress={ openMediaOptions }
+					disabled={ ! isSelected }
+				>
+					<View
+						style={ [
+							imageFill && styles.imageCropped,
+							styles.mediaImageContainer,
+							! isUploadInProgress && aligmentStyles,
+						] }
 					>
-						{ isUploadFailed &&
-							<View style={ [ styles.imageContainer, styles.uploadFailed ] }>
-								<View style={ styles.modalIcon }>
-									{ this.getIcon( isUploadFailed ) }
-								</View>
-								<Text style={ styles.uploadFailedText }>{ retryMessage }</Text>
-							</View>
-						}
-					</ImageBackground>
-				</View>
-			</TouchableWithoutFeedback>
+						<Image
+							align="center"
+							alt={ mediaAlt }
+							focalPoint={ imageFill && focalPointValues }
+							isSelected={ isMediaSelected }
+							isUploadFailed={ isUploadFailed }
+							isUploadInProgress={ isUploadInProgress }
+							onSelectMediaUploadOption={
+								this.onSelectMediaUploadOption
+							}
+							openMediaOptions={ openMediaOptions }
+							retryMessage={ retryMessage }
+							url={ mediaUrl }
+							width={ ! isUploadInProgress && mediaWidth }
+						/>
+					</View>
+				</TouchableWithoutFeedback>
+			</View>
 		);
 	}
 
 	renderVideo( params, openMediaOptions ) {
-		const { mediaUrl, isSelected } = this.props;
+		const {
+			aligmentStyles,
+			mediaUrl,
+			isSelected,
+			getStylesFromColorScheme,
+		} = this.props;
 		const { isUploadInProgress } = this.state;
 		const { isUploadFailed, retryMessage } = params;
-		const showVideo = isURL( mediaUrl ) && ! isUploadInProgress && ! isUploadFailed;
+		const showVideo =
+			isURL( mediaUrl ) && ! isUploadInProgress && ! isUploadFailed;
+
+		const videoPlaceholderStyles = getStylesFromColorScheme(
+			styles.videoPlaceholder,
+			styles.videoPlaceholderDark
+		);
+		const retryVideoTextStyles = [
+			styles.uploadFailedText,
+			getStylesFromColorScheme(
+				styles.uploadFailedTextVideo,
+				styles.uploadFailedTextVideoDark
+			),
+		];
 
 		return (
-			<TouchableWithoutFeedback
-				accessible={ ! isSelected }
-				onPress={ this.onMediaPressed }
-				onLongPress={ openMediaOptions }
-				disabled={ ! isSelected }
-			>
-				<View aspectRatio={ VIDEO_ASPECT_RATIO }>
-					{ showVideo &&
-						<View style={ styles.videoContainer }>
-							<VideoPlayer
-								isSelected={ isSelected }
-								style={ styles.video }
-								source={ { uri: mediaUrl } }
-								paused={ true }
-							/>
+			<View style={ styles.mediaVideo }>
+				<TouchableWithoutFeedback
+					accessible={ ! isSelected }
+					onPress={ this.onMediaPressed }
+					onLongPress={ openMediaOptions }
+					disabled={ ! isSelected }
+				>
+					<View style={ [ styles.videoContainer, aligmentStyles ] }>
+						<View
+							style={ [
+								styles.videoContent,
+								{
+									aspectRatio: VIDEO_ASPECT_RATIO,
+								},
+							] }
+						>
+							{ showVideo && (
+								<View style={ styles.videoPlayer }>
+									<VideoPlayer
+										isSelected={ isSelected }
+										style={ styles.video }
+										source={ { uri: mediaUrl } }
+										paused={ true }
+									/>
+								</View>
+							) }
+							{ ! showVideo && (
+								<View style={ videoPlaceholderStyles }>
+									<View style={ styles.modalIcon }>
+										{ isUploadFailed
+											? this.getIcon( ICON_TYPE.RETRY )
+											: this.getIcon(
+													ICON_TYPE.PLACEHOLDER
+											  ) }
+									</View>
+									{ isUploadFailed && (
+										<Text style={ retryVideoTextStyles }>
+											{ retryMessage }
+										</Text>
+									) }
+								</View>
+							) }
 						</View>
-					}
-					{ ! showVideo &&
-						<View style={ styles.videoPlaceholder }>
-							<View style={ styles.modalIcon } >
-								{ isUploadFailed ? this.getIcon( isUploadFailed ) : this.getIcon( false ) }
-							</View>
-							{ isUploadFailed && <Text style={ [ styles.uploadFailedText, styles.uploadFailedTextVideo ] }>{ retryMessage }</Text> }
-						</View>
-					}
-				</View>
-			</TouchableWithoutFeedback>
+					</View>
+				</TouchableWithoutFeedback>
+			</View>
 		);
 	}
 
@@ -249,62 +320,72 @@ class MediaContainer extends Component {
 	renderPlaceholder() {
 		return (
 			<MediaPlaceholder
-				icon={ this.getIcon( false ) }
+				icon={ this.getIcon( ICON_TYPE.PLACEHOLDER ) }
 				labels={ {
 					title: __( 'Media area' ),
 				} }
 				onSelect={ this.onSelectMediaUploadOption }
 				allowedTypes={ ALLOWED_MEDIA_TYPES }
 				onFocus={ this.props.onFocus }
-				onError={ this.onUploadError }
 			/>
 		);
 	}
 
 	render() {
-		const { mediaUrl, mediaId, mediaType } = this.props;
+		const { mediaUrl, mediaId, mediaType, onSetOpenPickerRef } = this.props;
 		const coverUrl = mediaType === MEDIA_TYPE_IMAGE ? mediaUrl : null;
 
 		if ( mediaUrl ) {
 			return (
-				<View>
-					<MediaUpload
-						onSelect={ this.onSelectMediaUploadOption }
-						allowedTypes={ ALLOWED_MEDIA_TYPES }
-						value={ mediaId }
-						render={ ( { open, getMediaOptions } ) => {
-							return (
-								<View style={ { flex: 1 } }>
-									{ getMediaOptions() }
-									{ this.renderToolbarEditButton( open ) }
+				<MediaUpload
+					isReplacingMedia={ true }
+					onSelect={ this.onSelectMediaUploadOption }
+					allowedTypes={ ALLOWED_MEDIA_TYPES }
+					value={ mediaId }
+					render={ ( { open, getMediaOptions } ) => {
+						onSetOpenPickerRef( open );
 
-									<MediaUploadProgress
-										coverUrl={ coverUrl }
-										mediaId={ mediaId }
-										onUpdateMediaProgress={ this.updateMediaProgress }
-										onFinishMediaUploadWithSuccess={ this.finishMediaUploadWithSuccess }
-										onFinishMediaUploadWithFailure={ this.finishMediaUploadWithFailure }
-										onMediaUploadStateReset={ this.mediaUploadStateReset }
-										renderContent={ ( params ) => {
-											return (
-												<View style={ styles.content }>
-													{ this.renderContent( params, open ) }
-												</View>
-											);
-										} }
-									/>
-								</View>
-							);
-						} }
-					/>
-				</View>
+						return (
+							<>
+								{ getMediaOptions() }
+
+								<MediaUploadProgress
+									coverUrl={ coverUrl }
+									mediaId={ mediaId }
+									onUpdateMediaProgress={
+										this.updateMediaProgress
+									}
+									onFinishMediaUploadWithSuccess={
+										this.finishMediaUploadWithSuccess
+									}
+									onFinishMediaUploadWithFailure={
+										this.finishMediaUploadWithFailure
+									}
+									onMediaUploadStateReset={
+										this.mediaUploadStateReset
+									}
+									renderContent={ ( params ) => {
+										return this.renderContent(
+											params,
+											open
+										);
+									} }
+								/>
+							</>
+						);
+					} }
+				/>
 			);
 		}
 		return this.renderPlaceholder();
 	}
 }
 
-export default compose(
-	withNotices,
+export default compose( [
+	withDispatch( ( dispatch ) => {
+		const { createErrorNotice } = dispatch( noticesStore );
+
+		return { createErrorNotice };
+	} ),
 	withPreferredColorScheme,
-)( MediaContainer );
+] )( MediaContainer );

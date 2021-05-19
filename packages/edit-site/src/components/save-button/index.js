@@ -1,56 +1,49 @@
 /**
+ * External dependencies
+ */
+import { some } from 'lodash';
+
+/**
  * WordPress dependencies
  */
-import { useEntityProp } from '@wordpress/core-data';
-import { useEffect, useState, useCallback } from '@wordpress/element';
 import { useSelect } from '@wordpress/data';
 import { Button } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import { EntitiesSavedStates } from '@wordpress/editor';
+import { store as coreStore } from '@wordpress/core-data';
 
-export default function SaveButton() {
-	const [ , setStatus ] = useEntityProp( 'postType', 'wp_template', 'status' );
-	// Publish template if not done yet.
-	useEffect( () => setStatus( 'publish' ), [] );
-
+export default function SaveButton( {
+	openEntitiesSavedStates,
+	isEntitiesSavedStatesOpen,
+} ) {
 	const { isDirty, isSaving } = useSelect( ( select ) => {
-		const { getEntityRecordChangesByRecord, isSavingEntityRecord } = select(
-			'core'
-		);
-		const entityRecordChangesByRecord = getEntityRecordChangesByRecord();
-		const changedKinds = Object.keys( entityRecordChangesByRecord );
+		const {
+			__experimentalGetDirtyEntityRecords,
+			isSavingEntityRecord,
+		} = select( coreStore );
+		const dirtyEntityRecords = __experimentalGetDirtyEntityRecords();
 		return {
-			isDirty: changedKinds.length > 0,
-			isSaving: changedKinds.some( ( changedKind ) =>
-				Object.keys(
-					entityRecordChangesByRecord[ changedKind ]
-				).some( ( changedName ) =>
-					Object.keys(
-						entityRecordChangesByRecord[ changedKind ][ changedName ]
-					).some( ( changedKey ) =>
-						isSavingEntityRecord( changedKind, changedName, changedKey )
-					)
-				)
+			isDirty: dirtyEntityRecords.length > 0,
+			isSaving: some( dirtyEntityRecords, ( record ) =>
+				isSavingEntityRecord( record.kind, record.name, record.key )
 			),
 		};
 	} );
+
 	const disabled = ! isDirty || isSaving;
 
-	const [ isOpen, setIsOpen ] = useState( false );
-	const open = useCallback( setIsOpen.bind( null, true ), [] );
-	const close = useCallback( setIsOpen.bind( null, false ), [] );
 	return (
 		<>
 			<Button
 				isPrimary
+				className="edit-site-save-button__button"
 				aria-disabled={ disabled }
+				aria-expanded={ isEntitiesSavedStatesOpen }
 				disabled={ disabled }
 				isBusy={ isSaving }
-				onClick={ disabled ? undefined : open }
+				onClick={ disabled ? undefined : openEntitiesSavedStates }
 			>
-				{ __( 'Update' ) }
+				{ __( 'Save' ) }
 			</Button>
-			<EntitiesSavedStates isOpen={ isOpen } onRequestClose={ close } />
 		</>
 	);
 }

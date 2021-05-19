@@ -1,5 +1,12 @@
+/**
+ * External dependencies
+ */
 const path = require( 'path' );
-const postCssConfigPlugins = require( '../bin/packages/post-css-config' );
+
+/**
+ * WordPress dependencies
+ */
+const postcssPlugins = require( '@wordpress/postcss-plugins-preset' );
 
 module.exports = ( { config } ) => {
 	config.module.rules.push(
@@ -13,15 +20,13 @@ module.exports = ( { config } ) => {
 			use: [
 				'style-loader',
 				'css-loader',
-				/**
-				 * Configuring PostCSS with Webpack
-				 * https://github.com/postcss/postcss-loader#plugins
-				 */
 				{
 					loader: 'postcss-loader',
 					options: {
-						ident: 'postcss',
-						plugins: () => postCssConfigPlugins,
+						postcssOptions: {
+							ident: 'postcss',
+							plugins: postcssPlugins,
+						},
 					},
 				},
 				'sass-loader',

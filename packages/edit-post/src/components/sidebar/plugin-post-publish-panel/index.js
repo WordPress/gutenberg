@@ -7,7 +7,13 @@ import { createSlotFill, PanelBody } from '@wordpress/components';
 
 const { Fill, Slot } = createSlotFill( 'PluginPostPublishPanel' );
 
-const PluginPostPublishPanelFill = ( { children, className, title, initialOpen = false, icon } ) => (
+const PluginPostPublishPanelFill = ( {
+	children,
+	className,
+	title,
+	initialOpen = false,
+	icon,
+} ) => (
 	<Fill>
 		<PanelBody
 			className={ className }
@@ -29,7 +35,7 @@ const PluginPostPublishPanelFill = ( { children, className, title, initialOpen =
  * @param {boolean} [props.initialOpen=false] Whether to have the panel initially opened. When no title is provided it is always opened.
  * @param {WPBlockTypeIconRender} [props.icon=inherits from the plugin] The [Dashicon](https://developer.wordpress.org/resource/dashicons/) icon slug string, or an SVG WP element, to be rendered when the sidebar is pinned to toolbar.
  *
- * @example <caption>ES5</caption>
+ * @example
  * ```js
  * // Using ES5 syntax
  * var __ = wp.i18n.__;
@@ -48,11 +54,11 @@ const PluginPostPublishPanelFill = ( { children, className, title, initialOpen =
  * }
  * ```
  *
- * @example <caption>ESNext</caption>
+ * @example
  * ```jsx
  * // Using ESNext syntax
- * const { __ } = wp.i18n;
- * const { PluginPostPublishPanel } = wp.editPost;
+ * import { __ } from '@wordpress/i18n';
+ * import { PluginPostPublishPanel } from '@wordpress/edit-post';
  *
  * const MyPluginPostPublishPanel = () => (
  * 	<PluginPostPublishPanel
@@ -73,7 +79,7 @@ const PluginPostPublishPanel = compose(
 		return {
 			icon: ownProps.icon || context.icon,
 		};
-	} ),
+	} )
 )( PluginPostPublishPanelFill );
 
 PluginPostPublishPanel.Slot = Slot;

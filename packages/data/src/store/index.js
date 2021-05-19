@@ -1,11 +1,10 @@
-
 function createCoreDataStore( registry ) {
-	const getCoreDataSelector = ( selectorName ) => ( reducerKey, ...args ) => {
-		return registry.select( reducerKey )[ selectorName ]( ...args );
+	const getCoreDataSelector = ( selectorName ) => ( key, ...args ) => {
+		return registry.select( key )[ selectorName ]( ...args );
 	};
 
-	const getCoreDataAction = ( actionName ) => ( reducerKey, ...args ) => {
-		return registry.dispatch( reducerKey )[ actionName ]( ...args );
+	const getCoreDataAction = ( actionName ) => ( key, ...args ) => {
+		return registry.dispatch( key )[ actionName ]( ...args );
 	};
 
 	return {
@@ -16,10 +15,13 @@ function createCoreDataStore( registry ) {
 				'hasFinishedResolution',
 				'isResolving',
 				'getCachedResolvers',
-			].reduce( ( memo, selectorName ) => ( {
-				...memo,
-				[ selectorName ]: getCoreDataSelector( selectorName ),
-			} ), {} );
+			].reduce(
+				( memo, selectorName ) => ( {
+					...memo,
+					[ selectorName ]: getCoreDataSelector( selectorName ),
+				} ),
+				{}
+			);
 		},
 
 		getActions() {
@@ -29,10 +31,13 @@ function createCoreDataStore( registry ) {
 				'invalidateResolution',
 				'invalidateResolutionForStore',
 				'invalidateResolutionForStoreSelector',
-			].reduce( ( memo, actionName ) => ( {
-				...memo,
-				[ actionName ]: getCoreDataAction( actionName ),
-			} ), {} );
+			].reduce(
+				( memo, actionName ) => ( {
+					...memo,
+					[ actionName ]: getCoreDataAction( actionName ),
+				} ),
+				{}
+			);
 		},
 
 		subscribe() {

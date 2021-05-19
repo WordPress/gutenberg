@@ -13,7 +13,6 @@ import {
 	getPostRawValue,
 	preferences,
 	saving,
-	reusableBlocks,
 	postSavingLock,
 	postAutosavingLock,
 } from '../reducer';
@@ -52,7 +51,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return false if not editing the same post properties', () => {
@@ -69,7 +70,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( false );
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return true if updating the same post properties', () => {
@@ -86,7 +89,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe( true );
+			expect( isUpdatingSamePostProperty( action, previousAction ) ).toBe(
+				true
+			);
 		} );
 	} );
 
@@ -100,7 +105,9 @@ describe( 'state', () => {
 			};
 			const previousAction = undefined;
 
-			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+			expect( shouldOverwriteState( action, previousAction ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return false if the action types are different', () => {
@@ -117,7 +124,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( shouldOverwriteState( action, previousAction ) ).toBe( false );
+			expect( shouldOverwriteState( action, previousAction ) ).toBe(
+				false
+			);
 		} );
 
 		it( 'should return true if updating same post property', () => {
@@ -134,7 +143,9 @@ describe( 'state', () => {
 				},
 			};
 
-			expect( shouldOverwriteState( action, previousAction ) ).toBe( true );
+			expect( shouldOverwriteState( action, previousAction ) ).toBe(
+				true
+			);
 		} );
 	} );
 
@@ -162,7 +173,7 @@ describe( 'state', () => {
 		} );
 
 		it( 'should disable the publish sidebar', () => {
-			const original = deepFreeze( preferences( undefined, { } ) );
+			const original = deepFreeze( preferences( undefined, {} ) );
 			const state = preferences( original, {
 				type: 'DISABLE_PUBLISH_SIDEBAR',
 			} );
@@ -171,7 +182,9 @@ describe( 'state', () => {
 		} );
 
 		it( 'should enable the publish sidebar', () => {
-			const original = deepFreeze( preferences( { isPublishSidebarEnabled: false }, { } ) );
+			const original = deepFreeze(
+				preferences( { isPublishSidebarEnabled: false }, {} )
+			);
 			const state = preferences( original, {
 				type: 'ENABLE_PUBLISH_SIDEBAR',
 			} );
@@ -189,256 +202,6 @@ describe( 'state', () => {
 			expect( state ).toEqual( {
 				pending: true,
 				options: { isAutosave: true },
-			} );
-		} );
-	} );
-
-	describe( 'reusableBlocks()', () => {
-		it( 'should start out empty', () => {
-			const state = reusableBlocks( undefined, {} );
-			expect( state ).toEqual( {
-				data: {},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( 'should add received reusable blocks', () => {
-			const state = reusableBlocks( {}, {
-				type: 'RECEIVE_REUSABLE_BLOCKS',
-				results: [ {
-					id: 123,
-					title: 'My cool block',
-				} ],
-			} );
-
-			expect( state ).toEqual( {
-				data: {
-					123: { id: 123, title: 'My cool block' },
-				},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( 'should update a reusable block', () => {
-			const initialState = {
-				data: {
-					123: { clientId: '', title: '' },
-				},
-				isFetching: {},
-				isSaving: {},
-			};
-
-			const state = reusableBlocks( initialState, {
-				type: 'UPDATE_REUSABLE_BLOCK',
-				id: 123,
-				changes: {
-					title: 'My block',
-				},
-			} );
-
-			expect( state ).toEqual( {
-				data: {
-					123: { clientId: '', title: 'My block' },
-				},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( "should update the reusable block's id if it was temporary", () => {
-			const initialState = {
-				data: {
-					reusable1: { id: 'reusable1', title: '' },
-				},
-				isSaving: {},
-			};
-
-			const state = reusableBlocks( initialState, {
-				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-				id: 'reusable1',
-				updatedId: 123,
-			} );
-
-			expect( state ).toEqual( {
-				data: {
-					123: { id: 123, title: '' },
-				},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( 'should remove a reusable block', () => {
-			const id = 123;
-			const initialState = {
-				data: {
-					[ id ]: {
-						id,
-						name: 'My cool block',
-						type: 'core/paragraph',
-						attributes: {
-							content: 'Hello!',
-							dropCap: true,
-						},
-					},
-				},
-				isFetching: {},
-				isSaving: {},
-			};
-
-			const state = reusableBlocks( deepFreeze( initialState ), {
-				type: 'REMOVE_REUSABLE_BLOCK',
-				id,
-			} );
-
-			expect( state ).toEqual( {
-				data: {},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( 'should indicate that a reusable block is fetching', () => {
-			const id = 123;
-			const initialState = {
-				data: {},
-				isFetching: {},
-				isSaving: {},
-			};
-
-			const state = reusableBlocks( initialState, {
-				type: 'FETCH_REUSABLE_BLOCKS',
-				id,
-			} );
-
-			expect( state ).toEqual( {
-				data: {},
-				isFetching: {
-					[ id ]: true,
-				},
-				isSaving: {},
-			} );
-		} );
-
-		it( 'should stop indicating that a reusable block is saving when the fetch succeeded', () => {
-			const id = 123;
-			const initialState = {
-				data: {
-					[ id ]: { id },
-				},
-				isFetching: {
-					[ id ]: true,
-				},
-				isSaving: {},
-			};
-
-			const state = reusableBlocks( initialState, {
-				type: 'FETCH_REUSABLE_BLOCKS_SUCCESS',
-				id,
-				updatedId: id,
-			} );
-
-			expect( state ).toEqual( {
-				data: {
-					[ id ]: { id },
-				},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( 'should stop indicating that a reusable block is fetching when there is an error', () => {
-			const id = 123;
-			const initialState = {
-				data: {},
-				isFetching: {
-					[ id ]: true,
-				},
-				isSaving: {},
-			};
-
-			const state = reusableBlocks( initialState, {
-				type: 'FETCH_REUSABLE_BLOCKS_FAILURE',
-				id,
-			} );
-
-			expect( state ).toEqual( {
-				data: {},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( 'should indicate that a reusable block is saving', () => {
-			const id = 123;
-			const initialState = {
-				data: {},
-				isFetching: {},
-				isSaving: {},
-			};
-
-			const state = reusableBlocks( initialState, {
-				type: 'SAVE_REUSABLE_BLOCK',
-				id,
-			} );
-
-			expect( state ).toEqual( {
-				data: {},
-				isFetching: {},
-				isSaving: {
-					[ id ]: true,
-				},
-			} );
-		} );
-
-		it( 'should stop indicating that a reusable block is saving when the save succeeded', () => {
-			const id = 123;
-			const initialState = {
-				data: {
-					[ id ]: { id },
-				},
-				isFetching: {},
-				isSaving: {
-					[ id ]: true,
-				},
-			};
-
-			const state = reusableBlocks( initialState, {
-				type: 'SAVE_REUSABLE_BLOCK_SUCCESS',
-				id,
-				updatedId: id,
-			} );
-
-			expect( state ).toEqual( {
-				data: {
-					[ id ]: { id },
-				},
-				isFetching: {},
-				isSaving: {},
-			} );
-		} );
-
-		it( 'should stop indicating that a reusable block is saving when there is an error', () => {
-			const id = 123;
-			const initialState = {
-				data: {},
-				isFetching: {},
-				isSaving: {
-					[ id ]: true,
-				},
-			};
-
-			const state = reusableBlocks( initialState, {
-				type: 'SAVE_REUSABLE_BLOCK_FAILURE',
-				id,
-			} );
-
-			expect( state ).toEqual( {
-				data: {},
-				isFetching: {},
-				isSaving: {},
 			} );
 		} );
 	} );

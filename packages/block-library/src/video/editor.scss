@@ -1,12 +1,108 @@
-.block-editor-block-list__block[data-align="center"] {
+.wp-block[data-align="center"] > .wp-block-video {
 	text-align: center;
 }
 
-.editor-video-poster-control .components-button {
-	display: block;
-	margin-right: 8px;
+.wp-block-video {
+	position: relative;
+
+	&.is-transient video {
+		opacity: 0.3;
+	}
+
+	// Shown while video is being uploaded
+	.components-spinner {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-top: -9px;
+		margin-left: -9px;
+	}
 }
 
-.editor-video-poster-control .components-button + .components-button {
-	margin-top: 1em;
+.editor-video-poster-control {
+	.components-base-control__label {
+		display: block;
+	}
+
+	.components-button {
+		margin-right: $grid-unit-10;
+	}
+}
+
+.block-library-video-tracks-editor {
+	z-index: z-index("{core/video track editor popover}");
+}
+
+.block-library-video-tracks-editor > .components-popover__content {
+	width: 360px;
+}
+
+.block-library-video-tracks-editor__track-list-track {
+	display: flex;
+	place-content: space-between;
+	align-items: baseline;
+	padding-left: $grid-unit-15;
+}
+
+.block-library-video-tracks-editor__single-track-editor-label-language {
+	display: flex;
+	margin-top: $grid-unit-15;
+	& > .components-base-control {
+		width: 50%;
+	}
+	& > .components-base-control:first-child {
+		margin-right: $grid-unit-20;
+	}
+}
+
+.block-library-video-tracks-editor__single-track-editor-kind-select {
+	max-width: 240px;
+}
+
+.block-library-video-tracks-editor__single-track-editor-buttons-container {
+	display: flex;
+	place-content: space-between;
+	margin-top: $grid-unit-40;
+}
+
+.block-library-video-tracks-editor__single-track-editor-edit-track-label {
+	margin-top: $grid-unit-05;
+	margin-bottom: $grid-unit-15;
+	color: $gray-700;
+	text-transform: uppercase;
+	font-size: 11px;
+	font-weight: 500;
+	display: block;
+}
+
+.block-library-video-tracks-editor > .components-popover__content > div {
+	padding: 0;
+}
+.block-library-video-tracks-editor__track-list,
+.block-library-video-tracks-editor__add-tracks-container {
+	.components-menu-group__label {
+		padding: 0;
+	}
+}
+
+
+.block-library-video-tracks-editor__single-track-editor,
+.block-library-video-tracks-editor__track-list,
+.block-library-video-tracks-editor__add-tracks-container {
+	padding: $grid-unit-15;
+}
+
+.block-library-video-tracks-editor__single-track-editor .components-base-control {
+	.components-base-control__label {
+		margin-bottom: $grid-unit-05;
+	}
+	.components-base-control__field {
+		margin-bottom: $grid-unit-15;
+	}
+	.components-text-control__input {
+		margin-left: 0;
+	}
+	.components-input-control__label {
+		margin-bottom: $grid-unit-05;
+	}
 }

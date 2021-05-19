@@ -1,7 +1,12 @@
 /**
  * Internal dependencies
  */
-import { getMethodName, defaultEntities, getKindEntities } from '../entities';
+import {
+	getMethodName,
+	defaultEntities,
+	getKindEntities,
+	prePersistPostType,
+} from '../entities';
 import { addEntities } from '../actions';
 
 describe( 'getMethodName', () => {
@@ -60,11 +65,13 @@ describe( 'getKindEntities', () => {
 	} );
 
 	it( 'should fetch and add the entities', async () => {
-		const fetchedEntities = [ {
-			baseURL: '/wp/v2/posts',
-			kind: 'postType',
-			name: 'post',
-		} ];
+		const fetchedEntities = [
+			{
+				baseURL: '/wp/v2/posts',
+				kind: 'postType',
+				name: 'post',
+			},
+		];
 		const fulfillment = getKindEntities( 'postType' );
 		// Start the generator
 		fulfillment.next();
@@ -75,5 +82,38 @@ describe( 'getKindEntities', () => {
 		expect( action ).toEqual( addEntities( fetchedEntities ) );
 		const end = fulfillment.next();
 		expect( end ).toEqual( { done: true, value: fetchedEntities } );
+	} );
+} );
+
+describe( 'prePersistPostType', () => {
+	it( 'set the status to draft and empty the title when saving auto-draft posts', () => {
+		let record = {
+			status: 'auto-draft',
+		};
+		const edits = {};
+		expect( prePersistPostType( record, edits ) ).toEqual( {
+			status: 'draft',
+			title: '',
+		} );
+
+		record = {
+			status: 'publish',
+		};
+		expect( prePersistPostType( record, edits ) ).toEqual( {} );
+
+		record = {
+			status: 'auto-draft',
+			title: 'Auto Draft',
+		};
+		expect( prePersistPostType( record, edits ) ).toEqual( {
+			status: 'draft',
+			title: '',
+		} );
+
+		record = {
+			status: 'publish',
+			title: 'My Title',
+		};
+		expect( prePersistPostType( record, edits ) ).toEqual( {} );
 	} );
 } );

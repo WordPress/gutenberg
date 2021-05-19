@@ -1,29 +1,69 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { InnerBlocks } from '@wordpress/block-editor';
+import {
+	BlockControls,
+	useBlockProps,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	JustifyContentControl,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
  */
-import { name as buttonBlockName } from '../button/';
+import { name as buttonBlockName } from '../button';
 
 const ALLOWED_BLOCKS = [ buttonBlockName ];
 const BUTTONS_TEMPLATE = [ [ 'core/button' ] ];
-const UI_PARTS = {
-	hasSelectedUI: false,
-};
 
-function ButtonsEdit( { className } ) {
+function ButtonsEdit( {
+	attributes: { contentJustification, orientation },
+	setAttributes,
+} ) {
+	const blockProps = useBlockProps( {
+		className: classnames( {
+			[ `is-content-justification-${ contentJustification }` ]: contentJustification,
+			'is-vertical': orientation === 'vertical',
+		} ),
+	} );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: ALLOWED_BLOCKS,
+		template: BUTTONS_TEMPLATE,
+		orientation,
+		__experimentalLayout: {
+			type: 'default',
+			alignments: [],
+		},
+		templateInsertUpdatesSelection: true,
+	} );
+
+	const justifyControls =
+		orientation === 'vertical'
+			? [ 'left', 'center', 'right' ]
+			: [ 'left', 'center', 'right', 'space-between' ];
+
 	return (
-		<div className={ className }>
-			<InnerBlocks
-				allowedBlocks={ ALLOWED_BLOCKS }
-				template={ BUTTONS_TEMPLATE }
-				__experimentalUIParts={ UI_PARTS }
-				__experimentalMoverDirection="horizontal"
-			/>
-		</div>
+		<>
+			<BlockControls group="block">
+				<JustifyContentControl
+					allowedControls={ justifyControls }
+					value={ contentJustification }
+					onChange={ ( value ) =>
+						setAttributes( { contentJustification: value } )
+					}
+					popoverProps={ {
+						position: 'bottom right',
+						isAlternate: true,
+					} }
+				/>
+			</BlockControls>
+			<div { ...innerBlocksProps } />
+		</>
 	);
 }
 

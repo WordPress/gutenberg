@@ -28,7 +28,13 @@
  *
  * @return {Object} action.
  */
-export function registerShortcut( { name, category, description, keyCombination, aliases } ) {
+export function registerShortcut( {
+	name,
+	category,
+	description,
+	keyCombination,
+	aliases,
+} ) {
 	return {
 		type: 'REGISTER_SHORTCUT',
 		name,

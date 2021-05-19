@@ -29,15 +29,6 @@
 
 .block-editor-media-placeholder__button {
 	margin-bottom: 0.5rem;
-
-	.dashicon {
-		vertical-align: middle;
-		margin-bottom: 3px;
-	}
-
-	&:hover {
-		color: $dark-gray-800;
-	}
 }
 
 .block-editor-media-placeholder__cancel-button.is-link {
@@ -46,28 +37,10 @@
 }
 
 .block-editor-media-placeholder.is-appender {
-	min-height: 100px;
-	outline: $border-width dashed $dark-gray-150;
+	min-height: 0;
 
 	&:hover {
-		outline: $border-width dashed $dark-gray-500;
 		cursor: pointer;
+		box-shadow: 0 0 0 1px var(--wp-admin-theme-color);
 	}
-
-	.is-dark-theme & {
-
-		&:hover {
-			outline: $border-width dashed $white;
-		}
-	}
-
-	.block-editor-media-placeholder__upload-button {
-		margin-right: $grid-size-small;
-		&.components-button:hover,
-		&.components-button:focus {
-			box-shadow: none;
-			border: $border-width solid $dark-gray-500;
-		}
-	}
-
 }

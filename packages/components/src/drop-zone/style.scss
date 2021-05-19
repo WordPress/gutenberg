@@ -9,7 +9,7 @@
 	opacity: 0;
 	transition: 0.3s opacity, 0.3s background-color, 0s visibility 0.3s;
 	@include reduce-motion("transition");
-	border: 2px solid $blue-dark-900;
+	border: 2px solid var(--wp-admin-theme-color);
 	border-radius: 2px;
 
 	&.is-active {
@@ -20,7 +20,7 @@
 	}
 
 	&.is-dragging-over-element {
-		background-color: rgba($blue-dark-900, 0.8);
+		background-color: var(--wp-admin-theme-color);
 	}
 }
 
@@ -50,13 +50,10 @@
 .components-drop-zone__content-icon {
 	margin: 0 auto;
 	line-height: 0;
+	fill: currentColor;
 }
 
 
 .components-drop-zone__content-text {
 	font-family: $default-font;
-}
-
-.components-drop-zone__provider {
-	height: 100%;
 }
