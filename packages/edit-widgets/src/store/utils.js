@@ -54,6 +54,7 @@ export function buildWidgetAreasQuery() {
 export function buildWidgetsQuery() {
 	return {
 		per_page: -1,
+		_embed: 'about',
 	};
 }
 

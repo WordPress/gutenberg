@@ -13,7 +13,7 @@ import { isRTL } from '@wordpress/i18n';
  */
 import { G2, UI } from '../../utils/colors-values';
 import Button from '../../button';
-import Text from '../../text';
+import { Text } from '../../text';
 import { reduceMotion, space, rtl } from '../../utils';
 
 export const NavigationUI = styled.div`
@@ -224,4 +224,5 @@ export const ItemTitleUI = styled( Text )`
 	${ () => ( isRTL() ? 'margin-left: auto;' : 'margin-right: auto;' ) }
 	font-size: 14px;
 	line-height: 20px;
+	color: inherit;
 `;

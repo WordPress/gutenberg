@@ -1,6 +1,8 @@
 # Annotations
 
-**Note: This API is experimental, that means it is subject to non-backward compatible changes or removal in any future version.**
+<div class="callout callout-alert">
+<strong>Note:</strong> This API is experimental, that means it is subject to non-backward compatible changes or removal in any future version.
+</div>
 
 Annotations are a way to highlight a specific piece in a post created with the block editor. Examples of this include commenting on a piece of text and spellchecking. Both can use the annotations API to mark a piece of text.
 
@@ -10,9 +12,9 @@ To see the API for yourself the easiest way is to have a block that is at least 
 
 ```js
 wp.data.dispatch( 'core/annotations' ).addAnnotation( {
-	source: "my-annotations-plugin",
-	blockClientId: wp.data.select( 'core/editor' ).getBlockOrder()[0],
-	richTextIdentifier: "content",
+	source: 'my-annotations-plugin',
+	blockClientId: wp.data.select( 'core/editor' ).getBlockOrder()[ 0 ],
+	richTextIdentifier: 'content',
 	range: {
 		start: 50,
 		end: 100,
@@ -40,9 +42,9 @@ It is also possible to annotate a block completely. In that case just provide th
 
 ```js
 wp.data.dispatch( 'core/annotations' ).addAnnotation( {
-	source: "my-annotations-plugin",
-	blockClientId: wp.data.select( 'core/editor' ).getBlockOrder()[0],
-	selector: "block",
+	source: 'my-annotations-plugin',
+	blockClientId: wp.data.select( 'core/editor' ).getBlockOrder()[ 0 ],
+	selector: 'block',
 } );
 ```
 

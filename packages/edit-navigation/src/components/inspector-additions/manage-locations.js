@@ -53,35 +53,37 @@ export default function ManageLocations( {
 		menuLocations.length
 	);
 
-	const menusWithSelection = menuLocations.map( ( { name, menu } ) => {
-		const menuOnLocation = menus
-			.filter( ( { id } ) => ! [ 0, selectedMenuId ].includes( id ) )
-			.find( ( { id } ) => id === menu );
+	const menusWithSelection = menuLocations.map(
+		( { name, description, menu } ) => {
+			const menuOnLocation = menus
+				.filter( ( { id } ) => ! [ 0, selectedMenuId ].includes( id ) )
+				.find( ( { id } ) => id === menu );
 
-		return (
-			<li
-				key={ name }
-				className="edit-navigation-manage-locations__checklist-item"
-			>
-				<CheckboxControl
-					className="edit-navigation-manage-locations__menu-location-checkbox"
-					checked={ menu === selectedMenuId }
-					onChange={ () =>
-						toggleMenuLocationAssignment( name, selectedMenuId )
-					}
-					label={ name }
-					help={
-						menuOnLocation &&
-						sprintf(
-							// translators: menu name.
-							__( 'Currently using %s' ),
-							menuOnLocation.name
-						)
-					}
-				/>
-			</li>
-		);
-	} );
+			return (
+				<li
+					key={ name }
+					className="edit-navigation-manage-locations__checklist-item"
+				>
+					<CheckboxControl
+						className="edit-navigation-manage-locations__menu-location-checkbox"
+						checked={ menu === selectedMenuId }
+						onChange={ () =>
+							toggleMenuLocationAssignment( name, selectedMenuId )
+						}
+						label={ description }
+						help={
+							menuOnLocation &&
+							sprintf(
+								// translators: menu name.
+								__( 'Currently using %s' ),
+								menuOnLocation.name
+							)
+						}
+					/>
+				</li>
+			);
+		}
+	);
 
 	const menuLocationCard = menuLocations.map( ( menuLocation ) => (
 		<div

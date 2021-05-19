@@ -6,13 +6,13 @@ The only required field for an attribute is the `type` field. It indicates the t
 
 Accepted values in the `type` field MUST be one of the following:
 
-* null
-* boolean
-* object
-* array
-* number
-* string
-* integer
+-   null
+-   boolean
+-   object
+-   array
+-   number
+-   string
+-   integer
 
 See [WordPress's REST API documentation](https://developer.wordpress.org/rest-api/extending-the-rest-api/schema/) for additional details.
 
@@ -29,7 +29,6 @@ If no selector argument is specified, the source definition runs against the blo
 The selector specified can be an HTML tag, or anything queryable such as a class or id attribute, see examples below.
 
 Under the hood, attribute sources are a superset of the functionality provided by [hpq](https://github.com/aduth/hpq), a small library used to parse and query HTML markup into an object shape.
-
 
 ### `attribute`
 
@@ -168,7 +167,11 @@ _Example_: Extract `src` and `alt` from each image element in the block's markup
 // }
 ```
 
-## Meta
+## Meta (deprecated)
+
+<div class="callout callout-alert">
+Although attributes may be obtained from a post's meta, meta attribute sources are considered deprecated; <a href="https://github.com/WordPress/gutenberg/blob/c367c4e2765f9e6b890d1565db770147efca5d66/packages/core-data/src/entity-provider.js">EntityProvider and related hook APIs</a> should be used instead, as shown in the <a href="/block-editor/how-to-guides/metabox/meta-block-3-add/">Create Meta Block how-to</a>.
+</div>
 
 Attributes may be obtained from a post's meta rather than from the block's representation in saved post content. For this, an attribute is required to specify its corresponding meta key under the `meta` key:
 
@@ -186,6 +189,7 @@ From here, meta attributes can be read and written by a block using the same int
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 edit( { attributes, setAttributes } ) {
 	function onChange( event ) {
@@ -195,7 +199,9 @@ edit( { attributes, setAttributes } ) {
 	return <input value={ attributes.author } onChange={ onChange } type="text" />;
 },
 ```
+
 {% ES5 %}
+
 ```js
 edit: function( props ) {
 	function onChange( event ) {
@@ -208,6 +214,7 @@ edit: function( props ) {
 	} );
 },
 ```
+
 {% end %}
 
 ### Considerations
@@ -225,8 +232,8 @@ add_action( 'init', 'gutenberg_my_block_init' );
 
 Furthermore, be aware that WordPress defaults to:
 
-- not treating a meta datum as being unique, instead returning an array of values;
-- treating that datum as a string.
+-   not treating a meta datum as being unique, instead returning an array of values;
+-   treating that datum as a string.
 
 If either behavior is not desired, the same `register_post_meta` call can be complemented with the `single` and/or `type` parameters as follows:
 

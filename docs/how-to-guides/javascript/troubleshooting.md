@@ -47,7 +47,7 @@ wp.data.select( 'core/block-editor' ).getBlockCount();
 
 ### Using the `debugger` statement
 
-If you would like to pause code execution at a certain line of code, you can write `debugger;` anywhere in your code. Once the browser sees the statement `debugger;`, it will pause execution of your code. This allows you to inspect all variables around the `debugger`  statement, which is very useful. [See this MDN page for more information](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/debugger).
+If you would like to pause code execution at a certain line of code, you can write `debugger;` anywhere in your code. Once the browser sees the statement `debugger;`, it will pause execution of your code. This allows you to inspect all variables around the `debugger` statement, which is very useful. [See this MDN page for more information](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/debugger).
 
 ## Confirm JavaScript is loading
 

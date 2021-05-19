@@ -1,3 +1,13 @@
 @import "./components/block-inspector-button/style.scss";
 @import "./components/header/style.scss";
 @import "./components/inserter/style.scss";
+@import "./components/keyboard-shortcut-help-modal/style.scss";
+@import "./components/more-menu/style.scss";
+@import "./components/sidebar-block-editor/style.scss";
+@import "./components/welcome-guide/style.scss";
+@import "./controls/style.scss";
+
+// Modals need a higher z-index in the customizer.
+.components-modal__screen-overlay {
+	z-index: 999999;
+}

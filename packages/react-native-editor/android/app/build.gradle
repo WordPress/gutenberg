@@ -158,7 +158,7 @@ repositories {
 }
 
 dependencies {
-    implementation("com.github.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
+    implementation("org.wordpress-mobile.gutenberg-mobile:react-native-bridge", {
         exclude group: 'org.wordpress', module: 'utils'
     })
     implementation("org.wordpress:utils:$wordpressUtilsVersion", {

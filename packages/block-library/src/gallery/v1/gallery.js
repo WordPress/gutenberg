@@ -30,7 +30,6 @@ export const Gallery = ( props ) => {
 		onSelectImage,
 		onDeselectImage,
 		onSetImageAttributes,
-		onFocusGalleryCaption,
 		insertBlocksAfter,
 		blockProps,
 	} = props;
@@ -62,7 +61,10 @@ export const Gallery = ( props ) => {
 					);
 
 					return (
-						<li className="blocks-gallery-item" key={ index }>
+						<li
+							className="blocks-gallery-item"
+							key={ img.id ? `${ img.id }-${ index }` : img.url }
+						>
 							<GalleryImage
 								url={ img.url }
 								alt={ img.alt }
@@ -96,7 +98,6 @@ export const Gallery = ( props ) => {
 				aria-label={ __( 'Gallery caption text' ) }
 				placeholder={ __( 'Write gallery caption…' ) }
 				value={ caption }
-				unstableOnFocus={ onFocusGalleryCaption }
 				onChange={ ( value ) => setAttributes( { caption: value } ) }
 				inlineToolbar
 				__unstableOnSplitAtEnd={ () =>

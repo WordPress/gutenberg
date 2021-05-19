@@ -12,10 +12,24 @@ import {
 	useEffect,
 	useLayoutEffect,
 	useState,
+	useRef,
 } from '@wordpress/element';
-import { ENTER, ESCAPE, UP, DOWN, LEFT, RIGHT } from '@wordpress/keycodes';
+import {
+	ENTER,
+	ESCAPE,
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT,
+	BACKSPACE,
+} from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
+import {
+	useInstanceId,
+	useDebounce,
+	useMergeRefs,
+	useRefEffect,
+} from '@wordpress/compose';
 import {
 	create,
 	slice,
@@ -24,13 +38,13 @@ import {
 	getTextContent,
 	useAnchorRef,
 } from '@wordpress/rich-text';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import Button from '../button';
 import Popover from '../popover';
-import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 /**
  * A raw completer option.
@@ -277,22 +291,21 @@ const getAutoCompleterUI = ( autocompleter ) => {
 	return AutocompleterUI;
 };
 
-function Autocomplete( {
-	children,
-	isSelected,
+function useAutocomplete( {
 	record,
 	onChange,
 	onReplace,
 	completers,
-	debouncedSpeak,
 	contentRef,
 } ) {
-	const instanceId = useInstanceId( Autocomplete );
+	const debouncedSpeak = useDebounce( speak, 500 );
+	const instanceId = useInstanceId( useAutocomplete );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
 	const [ filteredOptions, setFilteredOptions ] = useState( [] );
 	const [ filterValue, setFilterValue ] = useState( '' );
 	const [ autocompleter, setAutocompleter ] = useState( null );
 	const [ AutocompleterUI, setAutocompleterUI ] = useState( null );
+	const [ backspacing, setBackspacing ] = useState( false );
 
 	function insertCompletion( replacement ) {
 		const end = record.start;
@@ -375,6 +388,8 @@ function Autocomplete( {
 	}
 
 	function handleKeyDown( event ) {
+		setBackspacing( event.keyCode === BACKSPACE );
+
 		if ( ! autocompleter ) {
 			return;
 		}
@@ -444,16 +459,53 @@ function Autocomplete( {
 					return false;
 				}
 
+				const textWithoutTrigger = text.slice(
+					index + triggerPrefix.length
+				);
+
+				const tooDistantFromTrigger = textWithoutTrigger.length > 50; // 50 chars seems to be a good limit.
+				// This is a final barrier to prevent the effect from completing with
+				// an extremely long string, which causes the editor to slow-down
+				// significantly. This could happen, for example, if `matchingWhileBackspacing`
+				// is true and one of the "words" end up being too long. If that's the case,
+				// it will be caught by this guard.
+				if ( tooDistantFromTrigger ) return false;
+
+				const mismatch = filteredOptions.length === 0;
+				const wordsFromTrigger = textWithoutTrigger.split( /\s/ );
+				// We need to allow the effect to run when not backspacing and if there
+				// was a mismatch. i.e when typing a trigger + the match string or when
+				// clicking in an existing trigger word on the page. We do that if we
+				// detect that we have one word from trigger in the current textual context.
+				//
+				// Ex.: "Some text @a" <-- "@a" will be detected as the trigger word and
+				// allow the effect to run. It will run until there's a mismatch.
+				const hasOneTriggerWord = wordsFromTrigger.length === 1;
+				// This is used to allow the effect to run when backspacing and if
+				// "touching" a word that "belongs" to a trigger. We consider a "trigger
+				// word" any word up to the limit of 3 from the trigger character.
+				// Anything beyond that is ignored if there's a mismatch. This allows
+				// us to "escape" a mismatch when backspacing, but still imposing some
+				// sane limits.
+				//
+				// Ex: "Some text @marcelo sekkkk" <--- "kkkk" caused a mismatch, but
+				// if the user presses backspace here, it will show the completion popup again.
+				const matchingWhileBackspacing =
+					backspacing && textWithoutTrigger.split( /\s/ ).length <= 3;
+
+				if (
+					mismatch &&
+					! ( matchingWhileBackspacing || hasOneTriggerWord )
+				) {
+					return false;
+				}
+
 				if (
 					allowContext &&
 					! allowContext( text.slice( 0, index ), textAfterSelection )
 				) {
 					return false;
 				}
-
-				const textWithoutTrigger = text.slice(
-					index + triggerPrefix.length
-				);
 
 				if (
 					/^\s/.test( textWithoutTrigger ) ||
@@ -496,29 +548,60 @@ function Autocomplete( {
 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
 		: null;
 
+	return {
+		listBoxId,
+		activeId,
+		onKeyDown: handleKeyDown,
+		popover: AutocompleterUI && (
+			<AutocompleterUI
+				className={ className }
+				filterValue={ filterValue }
+				instanceId={ instanceId }
+				listBoxId={ listBoxId }
+				selectedIndex={ selectedIndex }
+				onChangeOptions={ onChangeOptions }
+				onSelect={ select }
+				value={ record }
+				contentRef={ contentRef }
+			/>
+		),
+	};
+}
+
+export function useAutocompleteProps( options ) {
+	const ref = useRef();
+	const onKeyDownRef = useRef();
+	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
+		...options,
+		contentRef: ref,
+	} );
+	onKeyDownRef.current = onKeyDown;
+	return {
+		ref: useMergeRefs( [
+			ref,
+			useRefEffect( ( element ) => {
+				function _onKeyDown( event ) {
+					onKeyDownRef.current( event );
+				}
+				element.addEventListener( 'keydown', _onKeyDown );
+				return () => {
+					element.removeEventListener( 'keydown', _onKeyDown );
+				};
+			}, [] ),
+		] ),
+		children: popover,
+		'aria-autocomplete': listBoxId ? 'list' : undefined,
+		'aria-owns': listBoxId,
+		'aria-activedescendant': activeId,
+	};
+}
+
+export default function Autocomplete( { children, isSelected, ...options } ) {
+	const { popover, ...props } = useAutocomplete( options );
 	return (
 		<>
-			{ children( {
-				isExpanded,
-				listBoxId,
-				activeId,
-				onKeyDown: handleKeyDown,
-			} ) }
-			{ isSelected && AutocompleterUI && (
-				<AutocompleterUI
-					className={ className }
-					filterValue={ filterValue }
-					instanceId={ instanceId }
-					listBoxId={ listBoxId }
-					selectedIndex={ selectedIndex }
-					onChangeOptions={ onChangeOptions }
-					onSelect={ select }
-					value={ record }
-					contentRef={ contentRef }
-				/>
-			) }
+			{ children( props ) }
+			{ isSelected && popover }
 		</>
 	);
 }
-
-export default withSpokenMessages( Autocomplete );

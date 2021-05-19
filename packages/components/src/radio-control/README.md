@@ -19,8 +19,8 @@ Selected and unselected radio buttons
 
 Use radio buttons when you want users to:
 
-- Select a single option from a list.
-- Expose all available options.
+-   Select a single option from a list.
+-   Expose all available options.
 
 If you have a list of available options that can be collapsed, consider using a dropdown menu instead, as dropdowns use less space. A country selection field, for instance, would be very large as a group of radio buttons and wouldn't help the user gain more context by seeing all options at once.
 
@@ -71,7 +71,9 @@ const MyRadioControl = withState( {
 			{ label: 'Author', value: 'a' },
 			{ label: 'Editor', value: 'e' },
 		] }
-		onChange={ ( option ) => { setState( { option } ) } }
+		onChange={ ( option ) => {
+			setState( { option } );
+		} }
 	/>
 ) );
 ```
@@ -84,41 +86,42 @@ The component accepts the following props:
 
 If this property is added, a label will be generated using label property as the content.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 #### help
 
 If this property is added, a help text will be generated using help property as the content.
 
-- Type: `String|WPElement`
-- Required: No
+-   Type: `String|WPElement`
+-   Required: No
 
 #### selected
 
 The value property of the currently selected option.
 
-- Type: `Object`
-- Required: No
+-   Type: `Object`
+-   Required: No
 
 #### options
 
 An array of objects containing the following properties:
-* `label`: (string) The label to be shown to the user.
-* `value`: (Object) The internal value compared against select and passed to onChange.
 
-- Type: `Array`
-- Required: No
+-   `label`: (string) The label to be shown to the user.
+-   `value`: (Object) The internal value compared against select and passed to onChange.
+
+*   Type: `Array`
+*   Required: No
 
 #### onChange
 
 A function that receives the value of the new option that is being selected as input.
 
-- Type: `function`
-- Required: Yes
+-   Type: `function`
+-   Required: Yes
 
 ## Related components
 
-* To select one or more items from a set, use the `CheckboxControl` component.
-* To toggle a single setting on or off, use the `ToggleControl` component.
-* To format as a button group, use the `RadioGroup` component.
+-   To select one or more items from a set, use the `CheckboxControl` component.
+-   To toggle a single setting on or off, use the `ToggleControl` component.
+-   To format as a button group, use the `RadioGroup` component.

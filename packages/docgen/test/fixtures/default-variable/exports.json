@@ -12,10 +12,7 @@
 			"column": 20
 		}
 	},
-	"range": [
-		41,
-		61
-	],
+	"range": [ 41, 61 ],
 	"declaration": {
 		"type": "Literal",
 		"start": 56,
@@ -30,10 +27,7 @@
 				"column": 19
 			}
 		},
-		"range": [
-			56,
-			60
-		],
+		"range": [ 56, 60 ],
 		"value": true,
 		"raw": "true"
 	},
@@ -43,10 +37,7 @@
 			"value": "*\n * Variable declaration example.\n ",
 			"start": 0,
 			"end": 40,
-			"range": [
-				0,
-				40
-			],
+			"range": [ 0, 40 ],
 			"loc": {
 				"start": {
 					"line": 1,

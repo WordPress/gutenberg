@@ -25,11 +25,7 @@ function ResizedContainer() {
 	}, [] );
 	const inlineStyles = useResizeCanvas( deviceType );
 
-	return (
-		<div style={ resizeStyles }>
-			Your content
-		</div>
-	)
+	return <div style={ resizeStyles }>Your content</div>;
 }
 ```
 

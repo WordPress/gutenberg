@@ -243,9 +243,9 @@ function FocalPointPicker( props ) {
 									yOffset={ -( FOCAL_POINT_SIZE / 2 ) }
 								/>
 								<FocalPoint
-									height={ styles.focalPoint.height }
+									height={ styles.focalPoint?.height }
 									style={ focalPointStyles }
-									width={ styles.focalPoint.width }
+									width={ styles.focalPoint?.width }
 								/>
 							</Animated.View>
 						) }

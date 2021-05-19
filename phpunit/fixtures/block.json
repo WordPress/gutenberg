@@ -3,21 +3,14 @@
 	"name": "my-plugin/notice",
 	"title": "Notice",
 	"category": "common",
-	"parent": [
-		"core/group"
-	],
+	"parent": [ "core/group" ],
 	"providesContext": {
 		"my-plugin/message": "message"
 	},
-	"usesContext": [
-		"groupId"
-	],
+	"usesContext": [ "groupId" ],
 	"icon": "star",
 	"description": "Shows warning, error or success notices…",
-	"keywords": [
-		"alert",
-		"message"
-	],
+	"keywords": [ "alert", "message" ],
 	"textDomain": "my-plugin",
 	"attributes": {
 		"message": {

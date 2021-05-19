@@ -15,7 +15,9 @@ export default function DeleteMenu( { onDeleteMenu, isMenuBeingDeleted } ) {
 				if (
 					// eslint-disable-next-line no-alert
 					window.confirm(
-						__( 'Are you sure you want to delete this navigation?' )
+						__(
+							'Are you sure you want to delete this navigation? This action cannot be undone.'
+						)
 					)
 				) {
 					onDeleteMenu();

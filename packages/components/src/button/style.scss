@@ -210,8 +210,7 @@
 		background: none;
 		outline: none;
 		text-align: left;
-		/* Mimics the default link style in common.css */
-		color: #0073aa;
+		color: var(--wp-admin-theme-color);
 		text-decoration: underline;
 		transition-property: border, background, color;
 		transition-duration: 0.05s;
@@ -219,17 +218,8 @@
 		@include reduce-motion("transition");
 		height: auto;
 
-		&:hover:not(:disabled),
-		&:active:not(:disabled) {
-			color: #00a0d2;
-			box-shadow: none;
-		}
-
 		&:focus {
-			color: #124964;
-			box-shadow:
-				0 0 0 $border-width #5b9dd9,
-				0 0 var(--wp-admin-border-width-focus) $border-width rgba(30, 140, 190, 0.8);
+			border-radius: $radius-block-ui;
 		}
 
 		// Link buttons that are red to indicate destructive behavior.

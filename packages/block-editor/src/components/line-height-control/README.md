@@ -4,7 +4,7 @@ The `LineHeightControl` component adds a lineHeight attribute to the core Paragr
 
 ![Line height control in a paragraph block](https://make.wordpress.org/core/files/2020/09/line-height-for-paragraph-block.png)
 
-_Note:_ It is worth noting that the line height setting option is an opt-in feature. [Themes need to declare support for it](https://developer.wordpress.org/block-editor/developers/themes/theme-support/#supporting-custom-line-heights) before it'll be available.
+_Note:_ It is worth noting that the line height setting option is an opt-in feature. [Themes need to declare support for it](/docs/how-to-guides/themes/theme-support.md#supporting-custom-line-heights) before it'll be available.
 
 ## Table of contents
 
@@ -37,7 +37,6 @@ The value of the line height.
 -   **Type:** `Function`
 
 A callback function that handles the application of the line height value.
-
 
 ## Related components
 

@@ -12,29 +12,29 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { useEditorFeature } from '../editor/utils';
+import { useSetting } from '../editor/utils';
 
 export function useHasTypographyPanel( { supports, name } ) {
 	const hasLineHeight = useHasLineHeightControl( { supports, name } );
-	const hasFontAppearence = useHasAppearenceControl( { supports, name } );
+	const hasFontAppearance = useHasAppearanceControl( { supports, name } );
 	return (
-		hasLineHeight || hasFontAppearence || supports.includes( 'fontSize' )
+		hasLineHeight || hasFontAppearance || supports.includes( 'fontSize' )
 	);
 }
 
 function useHasLineHeightControl( { supports, name } ) {
 	return (
-		useEditorFeature( 'typography.customLineHeight', name ) &&
+		useSetting( 'typography.customLineHeight', name ) &&
 		supports.includes( 'lineHeight' )
 	);
 }
 
-function useHasAppearenceControl( { supports, name } ) {
+function useHasAppearanceControl( { supports, name } ) {
 	const hasFontStyles =
-		useEditorFeature( 'typography.customFontStyle', name ) &&
+		useSetting( 'typography.customFontStyle', name ) &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useEditorFeature( 'typography.customFontWeight', name ) &&
+		useSetting( 'typography.customFontWeight', name ) &&
 		supports.includes( 'fontWeight' );
 	return hasFontStyles || hasFontWeights;
 }
@@ -44,20 +44,20 @@ export default function TypographyPanel( {
 	getStyle,
 	setStyle,
 } ) {
-	const fontSizes = useEditorFeature( 'typography.fontSizes', name );
-	const disableCustomFontSizes = ! useEditorFeature(
+	const fontSizes = useSetting( 'typography.fontSizes', name );
+	const disableCustomFontSizes = ! useSetting(
 		'typography.customFontSize',
 		name
 	);
-	const fontFamilies = useEditorFeature( 'typography.fontFamilies', name );
+	const fontFamilies = useSetting( 'typography.fontFamilies', name );
 	const hasFontStyles =
-		useEditorFeature( 'typography.customFontStyle', name ) &&
+		useSetting( 'typography.customFontStyle', name ) &&
 		supports.includes( 'fontStyle' );
 	const hasFontWeights =
-		useEditorFeature( 'typography.customFontWeight', name ) &&
+		useSetting( 'typography.customFontWeight', name ) &&
 		supports.includes( 'fontWeight' );
 	const hasLineHeightEnabled = useHasLineHeightControl( { supports, name } );
-	const hasAppearenceControl = useHasAppearenceControl( { supports, name } );
+	const hasAppearanceControl = useHasAppearanceControl( { supports, name } );
 
 	return (
 		<PanelBody title={ __( 'Typography' ) } initialOpen={ true }>
@@ -88,7 +88,7 @@ export default function TypographyPanel( {
 					}
 				/>
 			) }
-			{ hasAppearenceControl && (
+			{ hasAppearanceControl && (
 				<FontAppearanceControl
 					value={ {
 						fontStyle: getStyle( name, 'fontStyle' ),

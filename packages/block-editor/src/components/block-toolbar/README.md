@@ -1,11 +1,10 @@
 # Block Toolbar
 
-The `BlockToolbar` component is used to render a toolbar that serves as a wrapper for number of options for each block. 
+The `BlockToolbar` component is used to render a toolbar that serves as a wrapper for number of options for each block.
 
 ![Paragraph block toolbar](https://make.wordpress.org/core/files/2020/09/paragraph-block-toolbar.png)
 
 ![Image block toolbar](https://make.wordpress.org/core/files/2020/09/image-block-toolbar.png)
-
 
 ## Table of contents
 
@@ -21,7 +20,7 @@ Displays a block toolbar for a selected block.
 ```jsx
 import { BlockToolbar } from '@wordpress/block-editor';
 
-const MyBlockToolbar = () => <BlockToolbar />
+const MyBlockToolbar = () => <BlockToolbar />;
 ```
 
 ## Related components

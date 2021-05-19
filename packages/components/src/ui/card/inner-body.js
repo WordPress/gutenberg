@@ -1,17 +1,17 @@
 /**
  * External dependencies
  */
-import { contextConnect, useContextSystem } from '@wp-g2/context';
-import { cx } from '@wp-g2/styles';
+import { cx } from 'emotion';
 
 /**
  * Internal dependencies
  */
-import { View } from '../view';
+import { View } from '../../view';
+import { contextConnect, useContextSystem } from '../context';
 import * as styles from './styles';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<{}, 'div'>} props
+ * @param {import('../context').ViewOwnProps<{}, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function CardInnerBody( props, forwardedRef ) {

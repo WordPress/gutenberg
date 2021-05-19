@@ -17,15 +17,16 @@ import {
 } from '@wordpress/components';
 import { __, sprintf } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
+import { store as editorStore } from '@wordpress/editor';
 
 /**
  * Internal dependencies
  */
-import TemplatePartInnerBlocks from './inner-blocks';
 import TemplatePartPlaceholder from './placeholder';
 import TemplatePartSelection from './selection';
 import { TemplatePartAdvancedControls } from './advanced-controls';
-import { getTagBasedOnArea } from './get-tag-based-on-area';
+import TemplatePartInnerBlocks from './inner-blocks';
+import { createTemplatePartId } from './utils/create-template-part-id';
 
 export default function TemplatePartEdit( {
 	attributes,
@@ -33,7 +34,7 @@ export default function TemplatePartEdit( {
 	clientId,
 } ) {
 	const { slug, theme, tagName, layout = {} } = attributes;
-	const templatePartId = theme && slug ? theme + '//' + slug : null;
+	const templatePartId = createTemplatePartId( theme, slug );
 
 	const [ hasAlreadyRendered, RecursionProvider ] = useNoRecursiveRenders(
 		templatePartId
@@ -42,11 +43,20 @@ export default function TemplatePartEdit( {
 	// Set the postId block attribute if it did not exist,
 	// but wait until the inner blocks have loaded to allow
 	// new edits to trigger this.
-	const { isResolved, innerBlocks, isMissing, area } = useSelect(
+	const {
+		isResolved,
+		innerBlocks,
+		isMissing,
+		defaultWrapper,
+		area,
+		enableSelection,
+	} = useSelect(
 		( select ) => {
-			const { getEditedEntityRecord, hasFinishedResolution } = select(
-				coreStore
-			);
+			const {
+				getEditedEntityRecord,
+				getEntityRecords,
+				hasFinishedResolution,
+			} = select( coreStore );
 			const { getBlocks } = select( blockEditorStore );
 
 			const getEntityArgs = [
@@ -57,6 +67,21 @@ export default function TemplatePartEdit( {
 			const entityRecord = templatePartId
 				? getEditedEntityRecord( ...getEntityArgs )
 				: null;
+			const _area = entityRecord?.area || attributes.area;
+
+			// Check whether other entities exist for switching/selection.
+			const availableReplacementArgs = [
+				'postType',
+				'wp_template_part',
+				_area && 'uncategorized' !== _area && { area: _area },
+			];
+			const matchingReplacements = getEntityRecords(
+				...availableReplacementArgs
+			);
+			const _enableSelection = templatePartId
+				? matchingReplacements?.length > 1
+				: matchingReplacements?.length > 0;
+
 			const hasResolvedEntity = templatePartId
 				? hasFinishedResolution(
 						'getEditedEntityRecord',
@@ -64,11 +89,17 @@ export default function TemplatePartEdit( {
 				  )
 				: false;
 
+			const defaultWrapperElement = select( editorStore )
+				.__experimentalGetDefaultTemplatePartAreas()
+				.find( ( { area: value } ) => value === _area )?.area_tag;
+
 			return {
 				innerBlocks: getBlocks( clientId ),
 				isResolved: hasResolvedEntity,
 				isMissing: hasResolvedEntity && ! entityRecord,
-				area: entityRecord?.area,
+				defaultWrapper: defaultWrapperElement || 'div',
+				area: _area,
+				enableSelection: _enableSelection,
 			};
 		},
 		[ templatePartId, clientId ]
@@ -77,7 +108,7 @@ export default function TemplatePartEdit( {
 	const blockProps = useBlockProps();
 	const isPlaceholder = ! slug;
 	const isEntityAvailable = ! isPlaceholder && ! isMissing && isResolved;
-	const TagName = tagName || getTagBasedOnArea( area );
+	const TagName = tagName || defaultWrapper;
 
 	// We don't want to render a missing state if we have any inner blocks.
 	// A new template part is automatically created if we have any inner blocks but no entity.
@@ -117,17 +148,19 @@ export default function TemplatePartEdit( {
 				setAttributes={ setAttributes }
 				isEntityAvailable={ isEntityAvailable }
 				templatePartId={ templatePartId }
+				defaultWrapper={ defaultWrapper }
 			/>
 			{ isPlaceholder && (
 				<TagName { ...blockProps }>
 					<TemplatePartPlaceholder
 						area={ attributes.area }
+						clientId={ clientId }
 						setAttributes={ setAttributes }
-						innerBlocks={ innerBlocks }
+						enableSelection={ enableSelection }
 					/>
 				</TagName>
 			) }
-			{ isEntityAvailable && (
+			{ isEntityAvailable && enableSelection && (
 				<BlockControls>
 					<ToolbarGroup className="wp-block-template-part__block-control-group">
 						<Dropdown
@@ -149,6 +182,8 @@ export default function TemplatePartEdit( {
 								<TemplatePartSelection
 									setAttributes={ setAttributes }
 									onClose={ onClose }
+									area={ area }
+									templatePartId={ templatePartId }
 								/>
 							) }
 						/>

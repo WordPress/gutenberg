@@ -4,7 +4,7 @@ Ensures that all top-level package imports adhere to the dependencies grouping c
 
 Specifically, this ensures that:
 
-- An import is preceded by "External dependencies", "WordPress dependencies", or "Internal dependencies" as appropriate by the import source.
+-   An import is preceded by "External dependencies", "WordPress dependencies", or "Internal dependencies" as appropriate by the import source.
 
 ## Rule details
 

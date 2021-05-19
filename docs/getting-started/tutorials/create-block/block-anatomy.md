@@ -1,8 +1,10 @@
 # Anatomy of a Block
 
-At its simplest, a block in the WordPress block editor is a json object with a specific set of properties.
+At its simplest, a block in the WordPress block editor is a JSON object with a specific set of properties.
 
-**Note:** Block development uses ESNext syntax, this refers to the latest JavaScript standard. If this is unfamiliar, review the [ESNext syntax documentation](/docs/how-to-guides/javascript/esnext-js.md) to familiarize yourself with the newer syntax used in modern JavaScript development.
+<div class="callout callout-info">
+<strong>Note:</strong> Block development uses ESNext syntax, this refers to the latest JavaScript standard. If this is unfamiliar, review the <a href="https://developer.wordpress.org/block-editor/how-to-guides/javascript/esnext-js/">ESNext syntax documentation</a> to familiarize yourself with the newer syntax.
+</div>
 
 The javascript part is done in the `src/index.js` file.
 
@@ -38,6 +40,7 @@ The results of the edit function is what the editor will render to the editor pa
 The results of the save function is what the editor will insert into the **post_content** field when the post is saved. The post_content field is the field in the WordPress database used to store the content of the post.
 
 Most of the properties are set in the `block.json` file.
+
 ```json
 {
 	"apiVersion": 2,
@@ -67,7 +70,7 @@ The **category** specified is a string and must be one of: "common, formatting, 
 If you look at the generated `src/save.js` file, the block title and description are wrapped in a function that looks like this:
 
 ```js
-__( 'Gutenpride – hello from the saved content!', 'gutenpride' ) 
+__( 'Gutenpride – hello from the saved content!', 'gutenpride' );
 ```
 
 This is an internationalization wrapper that allows for the string "Gutenpride" to be translated. The second parameter, "gutenpride" is called the text domain and gives context for where the string is from. The JavaScript internationalization, often abbreviated i18n, matches the core WordPress internationalization process. See the [Internationalization in Plugin Developer Handbook](https://developer.wordpress.org/plugins/internationalization/) for more details.

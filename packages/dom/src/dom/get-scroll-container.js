@@ -6,13 +6,13 @@ import getComputedStyle from './get-computed-style';
 /**
  * Given a DOM node, finds the closest scrollable container node.
  *
- * @param {Element} node Node from which to start.
+ * @param {Element | null} node Node from which to start.
  *
- * @return {?Element} Scrollable container node, if found.
+ * @return {Element | undefined} Scrollable container node, if found.
  */
 export default function getScrollContainer( node ) {
 	if ( ! node ) {
-		return;
+		return undefined;
 	}
 
 	// Scrollable if scrollable height exceeds displayed...
@@ -25,5 +25,5 @@ export default function getScrollContainer( node ) {
 	}
 
 	// Continue traversing
-	return getScrollContainer( node.parentNode );
+	return getScrollContainer( /** @type {Element} */ ( node.parentNode ) );
 }

@@ -1,6 +1,7 @@
 /**
  * Internal dependencies
  */
+import { assertIsDefined } from '../utils/assert-is-defined';
 import insertAfter from './insert-after';
 import remove from './remove';
 
@@ -12,6 +13,7 @@ import remove from './remove';
  * @return {void}
  */
 export default function replace( processedNode, newNode ) {
+	assertIsDefined( processedNode.parentNode, 'processedNode.parentNode' );
 	insertAfter( newNode, processedNode.parentNode );
 	remove( processedNode );
 }

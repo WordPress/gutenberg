@@ -1,8 +1,7 @@
 /**
  * External dependencies
  */
-import { contextConnect } from '@wp-g2/context';
-import { css, ui } from '@wp-g2/styles';
+import { css } from 'emotion';
 
 /**
  * WordPress dependencies
@@ -12,20 +11,22 @@ import { useMemo } from '@wordpress/element';
 /**
  * Internal dependencies
  */
+import { contextConnect } from '../context';
 import { Elevation } from '../elevation';
-import { View } from '../view';
+import { View } from '../../view';
 import * as styles from './styles';
 import { useCard } from './hook';
+import CONFIG from '../../utils/config-values';
 
 /**
- * @param {import('@wp-g2/create-styles').ViewOwnProps<import('./types').CardProps, 'div'>} props
+ * @param {import('../context').ViewOwnProps<import('./types').CardProps, 'div'>} props
  * @param {import('react').Ref<any>} forwardedRef
  */
 function Card( props, forwardedRef ) {
 	const { children, elevation, isRounded = true, ...otherProps } = useCard(
 		props
 	);
-	const elevationBorderRadius = isRounded ? ui.get( 'cardBorderRadius' ) : 0;
+	const elevationBorderRadius = isRounded ? CONFIG.cardBorderRadius : 0;
 
 	const elevationClassName = useMemo(
 		() => css( { borderRadius: elevationBorderRadius } ),
@@ -34,20 +35,16 @@ function Card( props, forwardedRef ) {
 
 	return (
 		<View { ...otherProps } ref={ forwardedRef }>
-			<View { ...ui.$( 'CardContent' ) } css={ styles.Content }>
-				{ children }
-			</View>
+			<View className={ styles.Content }>{ children }</View>
 			<Elevation
 				className={ elevationClassName }
 				isInteractive={ false }
 				value={ elevation ? 1 : 0 }
-				{ ...ui.$( 'CardElevation' ) }
 			/>
 			<Elevation
 				className={ elevationClassName }
 				isInteractive={ false }
 				value={ elevation }
-				{ ...ui.$( 'CardElevation' ) }
 			/>
 		</View>
 	);
@@ -66,7 +63,8 @@ function Card( props, forwardedRef ) {
  *   CardBody,
  *   CardFooter,
  *   Text,
- * } from `@wordpress/components/ui`;
+ *   Heading,
+ * } from `@wordpress/components`;
  *
  * function Example() {
  *   return (

@@ -13,7 +13,7 @@ import { Component } from '@wordpress/element';
  * Internal dependencies
  */
 import { getFontSize, getFontSizeClass } from './utils';
-import useEditorFeature from '../use-editor-feature';
+import useSetting from '../use-setting';
 
 const DEFAULT_FONT_SIZES = [];
 
@@ -49,7 +49,7 @@ export default ( ...fontSizeNames ) => {
 			createHigherOrderComponent(
 				( WrappedComponent ) => ( props ) => {
 					const fontSizes =
-						useEditorFeature( 'typography.fontSizes' ) ||
+						useSetting( 'typography.fontSizes' ) ||
 						DEFAULT_FONT_SIZES;
 					return (
 						<WrappedComponent

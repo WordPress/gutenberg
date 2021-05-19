@@ -388,8 +388,8 @@ public class WPAndroidGlueCode {
             }
 
             @Override
-            public void performRequest(String pathFromJS, Consumer<String> onSuccess, Consumer<Bundle> onError) {
-                mRequestExecutor.performRequest(pathFromJS, onSuccess, onError);
+            public void performRequest(String pathFromJS, boolean enableCaching, Consumer<String> onSuccess, Consumer<Bundle> onError) {
+                mRequestExecutor.performRequest(pathFromJS, enableCaching, onSuccess, onError);
             }
 
             @Override
@@ -954,6 +954,10 @@ public class WPAndroidGlueCode {
 
     public void mediaIdChanged(final String oldId, final String newId, final String oldUrl) {
         mDeferredEventEmitter.onMediaIdChanged(oldId, newId, oldUrl);
+    }
+
+    public void sendToJSFeaturedImageId(int mediaId) {
+        mDeferredEventEmitter.sendToJSFeaturedImageId(mediaId);
     }
 
     public void replaceUnsupportedBlock(String content, String blockId) {

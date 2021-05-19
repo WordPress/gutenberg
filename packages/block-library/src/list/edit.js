@@ -41,49 +41,40 @@ export default function ListEdit( {
 	setAttributes,
 	mergeBlocks,
 	onReplace,
-	isSelected,
 } ) {
-	const { ordered, values, type, reversed, start } = attributes;
+	const { ordered, values, type, reversed, start, placeholder } = attributes;
 	const tagName = ordered ? 'ol' : 'ul';
 
 	const controls = ( { value, onChange, onFocus } ) => (
 		<>
-			{ isSelected && (
-				<>
-					<RichTextShortcut
-						type="primary"
-						character="["
-						onUse={ () => {
-							onChange( outdentListItems( value ) );
-						} }
-					/>
-					<RichTextShortcut
-						type="primary"
-						character="]"
-						onUse={ () => {
-							onChange(
-								indentListItems( value, { type: tagName } )
-							);
-						} }
-					/>
-					<RichTextShortcut
-						type="primary"
-						character="m"
-						onUse={ () => {
-							onChange(
-								indentListItems( value, { type: tagName } )
-							);
-						} }
-					/>
-					<RichTextShortcut
-						type="primaryShift"
-						character="m"
-						onUse={ () => {
-							onChange( outdentListItems( value ) );
-						} }
-					/>
-				</>
-			) }
+			<RichTextShortcut
+				type="primary"
+				character="["
+				onUse={ () => {
+					onChange( outdentListItems( value ) );
+				} }
+			/>
+			<RichTextShortcut
+				type="primary"
+				character="]"
+				onUse={ () => {
+					onChange( indentListItems( value, { type: tagName } ) );
+				} }
+			/>
+			<RichTextShortcut
+				type="primary"
+				character="m"
+				onUse={ () => {
+					onChange( indentListItems( value, { type: tagName } ) );
+				} }
+			/>
+			<RichTextShortcut
+				type="primaryShift"
+				character="m"
+				onUse={ () => {
+					onChange( outdentListItems( value ) );
+				} }
+			/>
 			<BlockControls group="block">
 				<ToolbarButton
 					icon={ isRTL() ? formatListBulletsRTL : formatListBullets }
@@ -148,14 +139,13 @@ export default function ListEdit( {
 			<RichText
 				identifier="values"
 				multiline="li"
-				__unstableMultilineRootTag={ tagName }
 				tagName={ tagName }
 				onChange={ ( nextValues ) =>
 					setAttributes( { values: nextValues } )
 				}
 				value={ values }
 				aria-label={ __( 'List text' ) }
-				placeholder={ __( 'List' ) }
+				placeholder={ placeholder || __( 'List' ) }
 				onMerge={ mergeBlocks }
 				onSplit={ ( value ) =>
 					createBlock( name, { ...attributes, values: value } )
@@ -178,6 +168,7 @@ export default function ListEdit( {
 					ordered={ ordered }
 					reversed={ reversed }
 					start={ start }
+					placeholder={ placeholder }
 				/>
 			) }
 		</>

@@ -33,11 +33,11 @@ Notices display at the top of the screen, below any toolbars anchored to the top
 
 Notices are color-coded to indicate the type of message being communicated:
 
-- **Default** notices have **no background**.
-- **Informational** notices are **blue.**
-- **Success** notices are **green.**
-- **Warning** notices are **yellow****.**
-- **Error** notices are **red.**
+-   **Default** notices have **no background**.
+-   **Informational** notices are **blue.**
+-   **Success** notices are **green.**
+-   **Warning** notices are **yellow\*\***.\*\*
+-   **Error** notices are **red.**
 
 If an icon is included in the Notice, it should be color-coded to match the Notice state.
 
@@ -79,9 +79,7 @@ To display a plain notice, pass `Notice` a string:
 
 ```jsx
 const MyNotice = () => (
-	<Notice status="error">
-		An unknown error occurred.
-	</Notice>
+	<Notice status="error">An unknown error occurred.</Notice>
 );
 ```
 
@@ -90,7 +88,9 @@ For more complex markup, you can pass any JSX element:
 ```jsx
 const MyNotice = () => (
 	<Notice status="error">
-		<p>An error occurred: <code>{ errorDetails }</code>.</p>
+		<p>
+			An error occurred: <code>{ errorDetails }</code>.
+		</p>
 	</Notice>
 );
 ```
@@ -99,16 +99,16 @@ const MyNotice = () => (
 
 The following props are used to control the behavior of the component.
 
-* `children`: (string) The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
-* `spokenMessage`: (string) Used to provide a custom spoken message in place of the `children` default.
-* `status`: (string) can be `warning` (yellow), `success` (green), `error` (red), or `info`. Defaults to `info`.
-* `onRemove`: function called when dismissing the notice
-* `politeness`: (string) A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). If not provided, a sensible default is used based on the notice status. Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
-  * A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
-  * A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
-* `isDismissible`: (boolean) defaults to true, whether the notice should be dismissible or not
-* `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function. A `className` property can be used to add custom classes to the button styles. The default appearance of the button is inferred based on whether `url` or `onClick` are provided, rendering the button as a link if appropriate. A `noDefaultClasses` property value of `true` will remove all default styling. You can denote a primary button action for a notice by assigning a `isPrimary` value of `true`.
+-   `children`: (string) The displayed message of a notice. Also used as the spoken message for assistive technology, unless `spokenMessage` is provided as an alternative message.
+-   `spokenMessage`: (string) Used to provide a custom spoken message in place of the `children` default.
+-   `status`: (string) can be `warning` (yellow), `success` (green), `error` (red), or `info`. Defaults to `info`.
+-   `onRemove`: function called when dismissing the notice
+-   `politeness`: (string) A politeness level for the notice's spoken message. Should be provided as one of the valid options for [an `aria-live` attribute value](https://www.w3.org/TR/wai-aria-1.1/#aria-live). If not provided, a sensible default is used based on the notice status. Note that this value should be considered a suggestion; assistive technologies may override it based on internal heuristics.
+    -   A value of `'assertive'` is to be used for important, and usually time-sensitive, information. It will interrupt anything else the screen reader is announcing in that moment.
+    -   A value of `'polite'` is to be used for advisory information. It should not interrupt what the screen reader is announcing in that moment (the "speech queue") or interrupt the current task.
+-   `isDismissible`: (boolean) defaults to true, whether the notice should be dismissible or not
+-   `actions`: (array) an array of action objects. Each member object should contain a `label` and either a `url` link string or `onClick` callback function. A `className` property can be used to add custom classes to the button styles. The default appearance of the button is inferred based on whether `url` or `onClick` are provided, rendering the button as a link if appropriate. A `noDefaultClasses` property value of `true` will remove all default styling. You can denote a primary button action for a notice by assigning a `isPrimary` value of `true`.
 
 ## Related components
 
-- To create a more prominent message that requires action, use a Modal.
+-   To create a more prominent message that requires action, use a Modal.
