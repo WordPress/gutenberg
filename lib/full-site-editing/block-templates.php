@@ -241,31 +241,31 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
 /**
  * Build a unified template object based a post Object.
  *
- * @param WP_Post $post Template post.
+ * @param WP_Post $post          Template post.
+ * @param string  $template_type wp_template or wp_template_part.
+ * @param bool    $active        Whether to build active template (default) or inactive.
  *
  * @return WP_Block_Template|WP_Error Template.
  */
-function _gutenberg_build_template_result_from_post( $post ) {
-	$terms = get_the_terms( $post, 'wp_theme' );
-
-	if ( is_wp_error( $terms ) ) {
-		return $terms;
+function _gutenberg_build_template_result_from_post( $post, $template_type = 'wp_template', $active = true ) {
+	if ( $template_type !== $post->post_type ) {
+		return new WP_Error( 'template_wrong_post_type', __( 'An invalid post was provided for this template.', 'gutenberg' ) );
 	}
 
-	if ( ! $terms ) {
-		return new WP_Error( 'template_missing_theme', __( 'No theme is defined for this template.', 'gutenberg' ) );
-	}
+	$ids = get_theme_mod( $template_type, array() );
+	$active = in_array( $post->ID, $ids, true );
 
-	$theme          = $terms[0]->name;
-	$has_theme_file = wp_get_theme()->get_stylesheet() === $theme &&
-		null !== _gutenberg_get_template_file( $post->post_type, $post->post_name );
+	$theme = $active ? wp_get_theme()->get_stylesheet() : '';
+	$slug = $active ? array_search( $post->ID, $ids, true ) : '';
+	$has_theme_file = $active &&
+		null !== _gutenberg_get_template_file( $post->post_type, $slug );
 
 	$template                 = new WP_Block_Template();
 	$template->wp_id          = $post->ID;
-	$template->id             = $theme . '//' . $post->post_name;
+	$template->id             = $active ? $theme . '//' . $slug : '//' . $post->ID;
 	$template->theme          = $theme;
 	$template->content        = $post->post_content;
-	$template->slug           = $post->post_name;
+	$template->slug           = $slug;
 	$template->source         = 'custom';
 	$template->type           = $post->post_type;
 	$template->description    = $post->post_excerpt;
@@ -292,26 +292,29 @@ function _gutenberg_build_template_result_from_post( $post ) {
  *     @type array  $slug__in List of slugs to include.
  *     @type int    $wp_id Post ID of customized template.
  * }
- * @param array $template_type wp_template or wp_template_part.
+ * @param string $template_type wp_template or wp_template_part.
+ * @param bool   $active        Whether to fetch active templates (default) or inactive.
  *
  * @return array Templates.
  */
-function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_template' ) {
+function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_template', $active = true ) {
+	if ( $active ) {
+		$post__in = 'post__in';
+		$theme_slugs = get_theme_mod( $template_type, array() );
+	} else {
+		$post__in = 'post__not_in';
+	}
+
 	$wp_query_args = array(
 		'post_status'    => array( 'auto-draft', 'draft', 'publish' ),
 		'post_type'      => $template_type,
 		'posts_per_page' => -1,
 		'no_found_rows'  => true,
-		'tax_query'      => array(
-			array(
-				'taxonomy' => 'wp_theme',
-				'field'    => 'name',
-				'terms'    => wp_get_theme()->get_stylesheet(),
-			),
-		),
+		$post__in        => array_values( $theme_slugs ),
 	);
 
 	if ( 'wp_template_part' === $template_type && isset( $query['area'] ) ) {
+		$wp_query_args['tax_query']             = array();
 		$wp_query_args['tax_query'][]           = array(
 			'taxonomy' => 'wp_template_part_area',
 			'field'    => 'name',
@@ -320,8 +323,13 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		$wp_query_args['tax_query']['relation'] = 'AND';
 	}
 
-	if ( isset( $query['slug__in'] ) ) {
-		$wp_query_args['post_name__in'] = $query['slug__in'];
+	if ( isset( $query['slug__in'] ) && $active ) {
+		$wp_query_args['post__in'] = array();
+		foreach ( $query['slug__in'] as $slug ) {
+			if ( ! empty( $theme_slugs[ $slug ] ) ) {
+				$wp_query_args['post__in'][] = $theme_slugs[ $slug ];
+			}
+		}
 	}
 
 	// This is only needed for the regular templates/template parts CPT listing and editor.
@@ -334,7 +342,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 	$template_query = new WP_Query( $wp_query_args );
 	$query_result   = array();
 	foreach ( $template_query->get_posts() as $post ) {
-		$template = _gutenberg_build_template_result_from_post( $post );
+		$template = _gutenberg_build_template_result_from_post( $post, $template_type );
 
 		if ( ! is_wp_error( $template ) ) {
 			$query_result[] = $template;
@@ -367,7 +375,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
  * Retrieves a single unified template object using its id.
  *
  * @param string $id Template unique identifier (example: theme_slug//template_slug).
- * @param array  $template_type wp_template or wp_template_part.
+ * @param string $template_type wp_template or wp_template_part.
  *
  * @return WP_Block_Template|null Template.
  */
@@ -377,32 +385,28 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		return null;
 	}
 	list( $theme, $slug ) = $parts;
-	$wp_query_args        = array(
-		'post_name__in'  => array( $slug ),
-		'post_type'      => $template_type,
-		'post_status'    => array( 'auto-draft', 'draft', 'publish', 'trash' ),
-		'posts_per_page' => 1,
-		'no_found_rows'  => true,
-		'tax_query'      => array(
-			array(
-				'taxonomy' => 'wp_theme',
-				'field'    => 'name',
-				'terms'    => $theme,
-			),
-		),
-	);
-	$template_query       = new WP_Query( $wp_query_args );
-	$posts                = $template_query->get_posts();
 
-	if ( count( $posts ) > 0 ) {
-		$template = _gutenberg_build_template_result_from_post( $posts[0] );
+	// Handle inactive requests.
+	if ( '' === $theme ) {
+		// This is not actually a slug but a numeric ID.
+		$post = get_post( $slug );
+	} else {
+		$ids = get_theme_mod( $template_type, array() );
+		
+		if ( ! empty( $ids[ $slug ] ) ) {
+			$post = get_post( $ids[ $slug ] );
+		}
+	}
+
+	if ( $post && $template_type === $post->post_type ) {
+		$template = _gutenberg_build_template_result_from_post( $post, $template_type );
 
 		if ( ! is_wp_error( $template ) ) {
 			return $template;
 		}
 	}
 
-	return gutenberg_get_block_file_template( $id, $template_type );
+	return '' === $theme ? null : gutenberg_get_block_file_template( $id, $template_type );
 }
 
 /**
@@ -448,47 +452,6 @@ function gutenberg_filter_wp_template_unique_post_slug( $override_slug, $slug, $
 
 	if ( ! $override_slug ) {
 		$override_slug = $slug;
-	}
-
-	// Template slugs must be unique within the same theme.
-	// TODO - Figure out how to update this to work for a multi-theme
-	// environment.  Unfortunately using `get_the_terms` for the 'wp-theme'
-	// term does not work in the case of new entities since is too early in
-	// the process to have been saved to the entity.  So for now we use the
-	// currently activated theme for creation.
-	$theme = wp_get_theme()->get_stylesheet();
-	$terms = get_the_terms( $post_ID, 'wp_theme' );
-	if ( $terms && ! is_wp_error( $terms ) ) {
-		$theme = $terms[0]->name;
-	}
-
-	$check_query_args = array(
-		'post_name__in'  => array( $override_slug ),
-		'post_type'      => $post_type,
-		'posts_per_page' => 1,
-		'no_found_rows'  => true,
-		'post__not_in'   => array( $post_ID ),
-		'tax_query'      => array(
-			array(
-				'taxonomy' => 'wp_theme',
-				'field'    => 'name',
-				'terms'    => $theme,
-			),
-		),
-	);
-	$check_query      = new WP_Query( $check_query_args );
-	$posts            = $check_query->get_posts();
-
-	if ( count( $posts ) > 0 ) {
-		$suffix = 2;
-		do {
-			$query_args                  = $check_query_args;
-			$alt_post_name               = _truncate_post_slug( $override_slug, 200 - ( strlen( $suffix ) + 1 ) ) . "-$suffix";
-			$query_args['post_name__in'] = array( $alt_post_name );
-			$query                       = new WP_Query( $query_args );
-			$suffix++;
-		} while ( count( $query->get_posts() ) > 0 );
-		$override_slug = $alt_post_name;
 	}
 
 	return $override_slug;

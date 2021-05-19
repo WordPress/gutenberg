@@ -135,32 +135,21 @@ add_filter( 'views_edit-wp_template_part', 'gutenberg_filter_templates_edit_view
 
 /**
  * Sets a custom slug when creating auto-draft template parts.
- * This is only needed for auto-drafts created by the regular WP editor.
- * If this page is to be removed, this won't be necessary.
  *
  * @param int $post_id Post ID.
  */
-function set_unique_slug_on_create_template_part( $post_id ) {
-	$post = get_post( $post_id );
-	if ( 'auto-draft' !== $post->post_status ) {
+function set_unique_slug_on_create_template_part( $post_id, $post, $update ) {
+	if ( $update ) {
 		return;
 	}
 
-	if ( ! $post->post_name ) {
-		wp_update_post(
-			array(
-				'ID'        => $post_id,
-				'post_name' => 'custom_slug_' . uniqid(),
-			)
-		);
-	}
-
-	$terms = get_the_terms( $post_id, 'wp_theme' );
-	if ( ! $terms || ! count( $terms ) ) {
-		wp_set_post_terms( $post_id, wp_get_theme()->get_stylesheet(), 'wp_theme' );
+	if ( $post->post_name ) {
+		$templates = get_theme_mod( 'wp_template_part', array() );
+		$templates[ $post->post_name ] = $post->ID;
+		set_theme_mod( 'wp_template_part', $templates );
 	}
 }
-add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template_part' );
+add_action( 'save_post_wp_template_part', 'set_unique_slug_on_create_template_part', 10, 3 );
 
 /**
  * Returns a filtered list of allowed area values for template parts.

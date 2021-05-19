@@ -341,15 +341,9 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 		if ( null === $template ) {
 			$changes->post_type   = $this->post_type;
 			$changes->post_status = 'publish';
-			$changes->tax_input   = array(
-				'wp_theme' => isset( $request['theme'] ) ? $request['content'] : wp_get_theme()->get_stylesheet(),
-			);
 		} elseif ( 'custom' !== $template->source ) {
 			$changes->post_type   = $this->post_type;
 			$changes->post_status = 'publish';
-			$changes->tax_input   = array(
-				'wp_theme' => $template->theme,
-			);
 		} else {
 			$changes->ID          = $template->wp_id;
 			$changes->post_status = 'publish';
@@ -515,8 +509,6 @@ class WP_REST_Templates_Controller extends WP_REST_Controller {
 					'description' => __( 'Unique slug identifying the template.', 'gutenberg' ),
 					'type'        => 'string',
 					'context'     => array( 'embed', 'view', 'edit' ),
-					'required'    => true,
-					'minLength'   => 1,
 					'pattern'     => '[a-zA-Z_\-]+',
 				),
 				'theme'          => array(

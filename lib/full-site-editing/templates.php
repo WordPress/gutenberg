@@ -81,35 +81,6 @@ function gutenberg_register_template_post_type() {
 add_action( 'init', 'gutenberg_register_template_post_type' );
 
 /**
- * Registers block editor 'wp_theme' taxonomy.
- */
-function gutenberg_register_wp_theme_taxonomy() {
-	if ( ! gutenberg_supports_block_templates() && ! WP_Theme_JSON_Resolver::theme_has_support() ) {
-		return;
-	}
-
-	register_taxonomy(
-		'wp_theme',
-		array( 'wp_template', 'wp_template_part', 'wp_global_styles' ),
-		array(
-			'public'            => false,
-			'hierarchical'      => false,
-			'labels'            => array(
-				'name'          => __( 'Themes', 'gutenberg' ),
-				'singular_name' => __( 'Theme', 'gutenberg' ),
-			),
-			'query_var'         => false,
-			'rewrite'           => false,
-			'show_ui'           => false,
-			'_builtin'          => true,
-			'show_in_nav_menus' => false,
-			'show_in_rest'      => false,
-		)
-	);
-}
-add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
-
-/**
  * Filters the capabilities of a user to conditionally grant them capabilities for managing 'wp_template' posts.
  *
  * Any user who can 'edit_theme_options' will have access.
@@ -166,32 +137,21 @@ add_filter( 'views_edit-wp_template', 'gutenberg_filter_templates_edit_views' );
 
 /**
  * Sets a custom slug when creating auto-draft templates.
- * This is only needed for auto-drafts created by the regular WP editor.
- * If this page is to be removed, this won't be necessary.
  *
  * @param int $post_id Post ID.
  */
-function set_unique_slug_on_create_template( $post_id ) {
-	$post = get_post( $post_id );
-	if ( 'auto-draft' !== $post->post_status ) {
+function set_unique_slug_on_create_template( $post_id, $post, $update ) {
+	if ( $update ) {
 		return;
 	}
 
-	if ( ! $post->post_name ) {
-		wp_update_post(
-			array(
-				'ID'        => $post_id,
-				'post_name' => 'custom_slug_' . uniqid(),
-			)
-		);
-	}
-
-	$terms = get_the_terms( $post_id, 'wp_theme' );
-	if ( ! $terms || ! count( $terms ) ) {
-		wp_set_post_terms( $post_id, wp_get_theme()->get_stylesheet(), 'wp_theme' );
+	if ( $post->post_name ) {
+		$templates = get_theme_mod( 'wp_template', array() );
+		$templates[ $post->post_name ] = $post->ID;
+		set_theme_mod( 'wp_template', $templates );
 	}
 }
-add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template' );
+add_action( 'save_post_wp_template', 'set_unique_slug_on_create_template', 10, 3 );
 
 /**
  * Print the skip-link script & styles.
