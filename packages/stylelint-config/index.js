@@ -2,6 +2,7 @@
 
 module.exports = {
 	extends: 'stylelint-config-recommended',
+	plugins: [ './plugins/selector-class-pattern-web-only' ],
 	rules: {
 		'at-rule-empty-line-before': [
 			'always',
@@ -97,13 +98,6 @@ module.exports = {
 		'selector-attribute-operator-space-after': 'never',
 		'selector-attribute-operator-space-before': 'never',
 		'selector-attribute-quotes': 'always',
-		'selector-class-pattern': [
-			'^([a-z][a-z0-9]*)(-[a-z0-9]+)*$',
-			{
-				message:
-					'Selector should use lowercase and separate words with hyphens (selector-class-pattern)',
-			},
-		],
 		'selector-id-pattern': [
 			'^([a-z][a-z0-9]*)(-[a-z0-9]+)*$',
 			{
@@ -127,5 +121,8 @@ module.exports = {
 		'value-list-comma-newline-after': 'always-multi-line',
 		'value-list-comma-space-after': 'always-single-line',
 		'value-list-comma-space-before': 'never',
+		'@wordpress/selector-class-pattern-web-only': [
+			'^([a-z][a-z0-9]*)(-[a-z0-9]+)*((__([a-z][a-z0-9]*)(-[a-z0-9]+)*)?(--([a-z][a-z0-9]*)(-[a-z0-9]+)*)?)$',
+		],
 	},
 };
