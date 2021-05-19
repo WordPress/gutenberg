@@ -210,7 +210,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return string the title tag contents (maybe empty).
 	 */
 	private function get_title( $html ) {
-		preg_match( '|<title>([^<]*?)</title>|is', $html, $match_title );
+		preg_match( '|<\s*title[^>]*>(.*?)<\s*/\s*title>|is', $html, $match_title );
 
 		$title = isset( $match_title[1] ) ? trim( $match_title[1] ) : '';
 
