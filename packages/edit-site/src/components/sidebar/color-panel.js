@@ -1,14 +1,18 @@
 /**
  * WordPress dependencies
  */
-import { __experimentalPanelColorGradientSettings as PanelColorGradientSettings } from '@wordpress/block-editor';
+import {
+	useSetting,
+	__experimentalPanelColorGradientSettings as PanelColorGradientSettings,
+} from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { LINK_COLOR, useSetting } from '../editor/utils';
+import { LINK_COLOR } from '../editor/utils';
 import ColorPalettePanel from './color-palette-panel';
+import { store as editSiteStore } from '../../store';
 
 export function useHasColorPanel( { supports } ) {
 	return (
@@ -26,10 +30,18 @@ export default function ColorPanel( {
 	getSetting,
 	setSetting,
 } ) {
-	const colors = useSetting( 'color.palette', name );
-	const disableCustomColors = ! useSetting( 'color.custom', name );
+	const colors = useSetting( 'color.palette', name, editSiteStore );
+	const disableCustomColors = ! useSetting(
+		'color.custom',
+		name,
+		editSiteStore
+	);
 	const gradients = useSetting( 'color.gradients', name );
-	const disableCustomGradients = ! useSetting( 'color.customGradient', name );
+	const disableCustomGradients = ! useSetting(
+		'color.customGradient',
+		name,
+		editSiteStore
+	);
 
 	const settings = [];
 

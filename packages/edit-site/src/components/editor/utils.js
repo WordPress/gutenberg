@@ -2,14 +2,6 @@
  * External dependencies
  */
 import { get, find, forEach, camelCase, isString } from 'lodash';
-/**
- * WordPress dependencies
- */
-import { useSelect } from '@wordpress/data';
-/**
- * Internal dependencies
- */
-import { store as editSiteStore } from '../../store';
 
 /* Supporting data */
 export const ROOT_BLOCK_NAME = 'root';
@@ -102,15 +94,6 @@ function getPresetMetadataFromStyleProperty( styleProperty ) {
 
 export const LINK_COLOR = '--wp--style--color--link';
 export const LINK_COLOR_DECLARATION = `a { color: var(${ LINK_COLOR }, #00e); }`;
-
-export function useSetting( path, blockName = '' ) {
-	const settings = useSelect( ( select ) => {
-		return select( editSiteStore ).getSettings();
-	} );
-	const topLevelPath = `__experimentalFeatures.${ path }`;
-	const blockPath = `__experimentalFeatures.blocks.${ blockName }.${ path }`;
-	return get( settings, blockPath ) ?? get( settings, topLevelPath );
-}
 
 export function getPresetVariable( styles, context, propertyName, value ) {
 	if ( ! value ) {
