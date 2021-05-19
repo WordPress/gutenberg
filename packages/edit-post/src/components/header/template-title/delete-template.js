@@ -85,7 +85,7 @@ export default function DeleteTemplate() {
 					}
 				} }
 			>
-				{ __( 'Delete' ) }
+				{ __( 'Delete template' ) }
 			</MenuItem>
 		</MenuGroup>
 	);
