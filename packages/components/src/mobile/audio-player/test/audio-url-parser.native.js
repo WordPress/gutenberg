@@ -22,7 +22,7 @@ describe( 'supportedAudioUrlsWithExtensions', () => {
 		it( `supports ${ url }`, () => {
 			const { title, extension } = parseAudioUrl( url );
 			expect( title ).toBe( 'file' );
-			expect( extension.trim() ).toBe( 'MP3' );
+			expect( extension ).toBe( 'MP3 ' );
 		} );
 	} );
 } );
