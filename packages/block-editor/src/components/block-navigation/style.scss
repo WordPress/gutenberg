@@ -243,6 +243,18 @@
 			color: $white;
 		}
 	}
+
+	.block-editor-block-navigation-block-select-button__anchor {
+		background: rgba(30, 30, 30, 0.1);
+		border-radius: 2px;
+		display: inline-block;
+		padding: 2px 6px;
+		margin: 0 8px;
+	}
+
+	&.is-selected .block-editor-block-navigation-block-select-button__anchor {
+		background: rgba(30, 30, 30, 0.3);
+	}
 }
 
 .block-editor-block-navigation-block-slot__description,
