@@ -71,56 +71,83 @@ function register_block_core_site_logo() {
 			'render_callback' => 'render_block_core_site_logo',
 		)
 	);
-	add_filter( 'pre_set_theme_mod_custom_logo', 'sync_site_logo_to_theme_mod' );
-	add_filter( 'theme_mod_custom_logo', 'override_custom_logo_theme_mod' );
 }
 add_action( 'init', 'register_block_core_site_logo' );
 
 /**
- * Overrides the custom logo with a site logo, if the option is set.
- *
- * @param string $custom_logo The custom logo set by a theme.
- *
- * @return string The site logo if set.
+ * Expose the custom_logo theme-mod in the settings REST API.
  */
-function override_custom_logo_theme_mod( $custom_logo ) {
-	$site_logo = get_option( 'site_logo' );
-	return false === $site_logo ? $custom_logo : $site_logo;
-}
-
-/**
- * Syncs the site logo with the theme modified logo.
- *
- * @param string $custom_logo The custom logo set by a theme.
- *
- * @return string The custom logo.
- */
-function sync_site_logo_to_theme_mod( $custom_logo ) {
-	// Delete the option when the custom logo does not exist or was removed.
-	// This step ensures the option stays in sync.
-	if ( empty( $custom_logo ) ) {
-		delete_option( 'site_logo' );
-	} else {
-		update_option( 'site_logo', $custom_logo );
-	}
-	return $custom_logo;
-}
-
-/**
- * Register a core site setting for a site logo
- */
-function register_block_core_site_logo_setting() {
-	register_setting(
-		'general',
-		'site_logo',
-		array(
-			'show_in_rest' => array(
-				'name' => 'site_logo',
+register_setting(
+	'general',
+	'theme_mods_' . get_option( 'stylesheet' ),
+	array(
+		'type'         => 'object',
+		'show_in_rest' => array(
+			'name'   => 'theme_mods_' . get_option( 'stylesheet' ),
+			'schema' => array(
+				'type'       => 'object',
+				'properties' => array(
+					'custom_logo' => array( 'type' => 'integer' ),
+				),
 			),
-			'type'         => 'integer',
-			'description'  => __( 'Site logo.' ),
-		)
-	);
+		),
+	)
+);
+
+/**
+ * Expose the "stylesheet" setting in the REST API.
+ */
+register_setting(
+	'general',
+	'stylesheet',
+	array(
+		'type'         => 'string',
+		'show_in_rest' => true,
+	)
+);
+
+/**
+ * Filters the value of a setting recognized by the REST API.
+ *
+ * Hijacks the value for custom_logo theme-mod.
+ *
+ * @param mixed  $result Value to use for the requested setting. Can be a scalar
+ *                       matching the registered schema for the setting, or null to
+ *                       follow the default get_option() behavior.
+ * @param string $name   Setting name (as shown in REST API responses).
+ *
+ * @return null|array
+ */
+function gutenberg_rest_pre_get_setting_filter_custom_logo( $result, $name ) {
+	if ( 'theme_mods_' . get_option( 'stylesheet' ) === $name ) {
+		return array(
+			'custom_logo' => get_theme_mod( 'custom_logo' ),
+		);
+	}
+}
+add_filter( 'rest_pre_get_setting', 'gutenberg_rest_pre_get_setting_filter_custom_logo', 10, 2 );
+
+/**
+ * Filters whether to preempt a setting value update via the REST API.
+ *
+ * Hijacks the saving method for theme-mods.
+ *
+ * @param bool   $result Whether to override the default behavior for updating the
+ *                       value of a setting.
+ * @param string $name   Setting name (as shown in REST API responses).
+ * @param mixed  $value  Updated setting value.
+ *
+ * @return bool
+ */
+function gutenberg_rest_pre_set_setting_filter_theme_mods( $result, $name, $value ) {
+	$theme_mods_setting_name = 'theme_mods_' . get_option( 'stylesheet' );
+	if ( $theme_mods_setting_name === $name ) {
+		$value = (array) $value;
+		$value = wp_parse_args( $value, get_option( $theme_mods_setting_name, array() ) );
+
+		update_option( $theme_mods_setting_name, $value );
+		return true;
+	}
 }
 
-add_action( 'rest_api_init', 'register_block_core_site_logo_setting', 10 );
+add_filter( 'rest_pre_update_setting', 'gutenberg_rest_pre_set_setting_filter_theme_mods', 10, 3 );

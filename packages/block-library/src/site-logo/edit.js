@@ -255,33 +255,46 @@ export default function LogoEdit( {
 	const [ logoUrl, setLogoUrl ] = useState();
 	const [ error, setError ] = useState();
 	const ref = useRef();
-	const { mediaItemData, siteLogo, url } = useSelect( ( select ) => {
-		const siteSettings = select( coreStore ).getEditedEntityRecord(
-			'root',
-			'site'
-		);
-		const mediaItem = siteSettings.site_logo
-			? select( coreStore ).getEntityRecord(
-					'root',
-					'media',
-					siteSettings.site_logo
-			  )
-			: null;
-		return {
-			mediaItemData: mediaItem && {
-				url: mediaItem.source_url,
-				alt: mediaItem.alt_text,
-			},
-			siteLogo: siteSettings.site_logo,
-			url: siteSettings.url,
-		};
-	}, [] );
+	const { mediaItemData, siteLogo, url, stylesheet } = useSelect(
+		( select ) => {
+			const siteSettings = select( coreStore ).getEditedEntityRecord(
+				'root',
+				'site'
+			);
+			const mediaItem = siteSettings[
+				`theme_mods_${ siteSettings.stylesheet }`
+			].custom_logo
+				? select( coreStore ).getEntityRecord(
+						'root',
+						'media',
+						siteSettings[
+							`theme_mods_${ siteSettings.stylesheet }`
+						].custom_logo
+				  )
+				: null;
+			return {
+				mediaItemData: mediaItem && {
+					url: mediaItem.source_url,
+					alt: mediaItem.alt_text,
+				},
+				siteLogo:
+					siteSettings[ `theme_mods_${ siteSettings.stylesheet }` ]
+						.custom_logo,
+				url: siteSettings.url,
+				stylesheet: siteSettings.stylesheet,
+			};
+		},
+		[]
+	);
 
 	const { editEntityRecord } = useDispatch( coreStore );
-	const setLogo = ( newValue ) =>
-		editEntityRecord( 'root', 'site', undefined, {
-			site_logo: newValue,
-		} );
+	const setLogo = ( newValue ) => {
+		const settingsVal = {};
+		settingsVal[ `theme_mods_${ stylesheet }` ] = {
+			custom_logo: newValue,
+		};
+		editEntityRecord( 'root', 'site', undefined, settingsVal );
+	};
 
 	let alt = null;
 	if ( mediaItemData ) {
