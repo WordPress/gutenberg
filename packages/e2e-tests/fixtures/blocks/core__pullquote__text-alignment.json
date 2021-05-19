@@ -9,6 +9,6 @@
 			"textAlign": "right"
 		},
 		"innerBlocks": [],
-		"originalContent": "<figure class=\"wp-block-pullquote\">\n    <blockquote class=\"has-text-align-right\">\n    <p>This pullquote has text aligned to right.</p>\n    <cite>So does the citation.</cite>\n    </blockquote>\n</figure>"
+		"originalContent": "<figure class=\"wp-block-pullquote\">\n\t<blockquote class=\"has-text-align-right\">\n\t\t<p>This pullquote has text aligned to right.</p>\n\t\t<cite>So does the citation.</cite>\n\t</blockquote>\n</figure>"
 	}
 ]
