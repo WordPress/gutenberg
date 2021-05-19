@@ -214,8 +214,8 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	/**
 	 * Parses the <title> contents from the provided HTML
 	 *
-	 * @param string $html the HTML from the remote website at URL.
-	 * @return string the title tag contents (maybe empty).
+	 * @param string $html The HTML from the remote website at URL.
+	 * @return string The title tag contents on success; else empty string.
 	 */
 	private function get_title( $html ) {
 		preg_match( '|<title[^>]*>(.*?)<\s*/\s*title>|is', $html, $match_title );
@@ -230,7 +230,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 *
 	 * @param string $html The HTML from the remote website at URL.
 	 * @param string $url  The target website URL.
-	 * @return string The icon URI (maybe empty).
+	 * @return string The icon URI on success; else empty string.
 	 */
 	private function get_icon( $html, $url ) {
 		// Grab the icon's link element.
