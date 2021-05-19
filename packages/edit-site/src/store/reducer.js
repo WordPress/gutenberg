@@ -142,19 +142,16 @@ export function navigationPanel(
 		case 'SET_IS_NAVIGATION_PANEL_OPENED':
 			return {
 				...state,
-				menu: ! action.isOpen ? MENU_ROOT : state.menu, // Set menu to root when closing panel.
 				isOpen: action.isOpen,
 			};
 		case 'SET_IS_LIST_VIEW_OPENED':
 			return {
 				...state,
-				menu: state.isOpen && action.isOpen ? MENU_ROOT : state.menu, // Set menu to root when closing panel.
 				isOpen: action.isOpen ? false : state.isOpen,
 			};
 		case 'SET_IS_INSERTER_OPENED':
 			return {
 				...state,
-				menu: state.isOpen && action.value ? MENU_ROOT : state.menu, // Set menu to root when closing panel.
 				isOpen: action.value ? false : state.isOpen,
 			};
 	}

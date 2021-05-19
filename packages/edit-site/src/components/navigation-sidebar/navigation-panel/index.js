@@ -10,6 +10,7 @@ import {
 	__experimentalNavigation as Navigation,
 	__experimentalNavigationBackButton as NavigationBackButton,
 } from '@wordpress/components';
+import { usePrevious } from '@wordpress/compose';
 import { store as coreDataStore } from '@wordpress/core-data';
 import { useSelect, useDispatch } from '@wordpress/data';
 import { useEffect, useRef } from '@wordpress/element';
@@ -76,6 +77,17 @@ const NavigationPanel = ( { isOpen } ) => {
 		}
 	}, [ activeMenu, isOpen ] );
 
+	// Sets active menu to root after the closing transition ends
+	const onTransitionEnd = ( event ) => {
+		if ( event.target === panelRef.current && ! isOpen ) {
+			setActive( MENU_ROOT );
+		}
+	};
+
+	// Skips menu slide animation if the panel has just opened or is closed
+	const wasOpen = usePrevious( isOpen );
+	const skipAnimation = ( isOpen && ! wasOpen ) || ! isOpen;
+
 	const closeOnEscape = ( event ) => {
 		if ( event.keyCode === ESCAPE && ! event.defaultPrevented ) {
 			event.preventDefault();
@@ -92,6 +104,7 @@ const NavigationPanel = ( { isOpen } ) => {
 			ref={ panelRef }
 			tabIndex="-1"
 			onKeyDown={ closeOnEscape }
+			onTransitionEnd={ onTransitionEnd }
 		>
 			<div className="edit-site-navigation-panel__inner">
 				<div className="edit-site-navigation-panel__site-title-container">
@@ -104,6 +117,7 @@ const NavigationPanel = ( { isOpen } ) => {
 						activeItem={ activeItem }
 						activeMenu={ activeMenu }
 						onActivateMenu={ setActive }
+						skipAnimation={ skipAnimation }
 					>
 						{ activeMenu === MENU_ROOT && (
 							<MainDashboardButton.Slot>
