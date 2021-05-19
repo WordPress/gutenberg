@@ -74,7 +74,9 @@ function DuotonePicker( {
 				</CircularOptionPicker.ButtonAction>
 			}
 		>
-			<CustomDuotoneBar value={ value } onChange={ onChange } />
+			{ ! disableCustomColors && (
+				<CustomDuotoneBar value={ value } onChange={ onChange } />
+			) }
 			{ colorPalette && (
 				<ColorListPicker
 					labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
