@@ -110,6 +110,7 @@ export { default as listView } from './library/list-view';
 export { default as lock } from './library/lock';
 export { default as login } from './library/login';
 export { default as loop } from './library/loop';
+export { default as mail } from './library/mail';
 export { default as mapMarker } from './library/map-marker';
 export { default as media } from './library/media';
 export { default as mediaAndText } from './library/media-and-text';
