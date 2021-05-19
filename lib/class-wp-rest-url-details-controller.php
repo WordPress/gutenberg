@@ -218,7 +218,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return string the title tag contents (maybe empty).
 	 */
 	private function get_title( $html ) {
-		preg_match( '|<\s*title[^>]*>(.*?)<\s*/\s*title>|is', $html, $match_title );
+		preg_match( '|<title[^>]*>(.*?)<\s*/\s*title>|is', $html, $match_title );
 
 		$title = isset( $match_title[1] ) && is_string( $match_title[1] ) ? trim( $match_title[1] ) : '';
 
@@ -241,7 +241,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		if ( ! empty( $icon ) ) {
 			$parsed_url = parse_url( $url );
 			$root_url   = $parsed_url['scheme'] . '://' . $parsed_url['host'] . '/';
-			$icon = \WP_Http::make_absolute_url( $icon, $root_url );
+			$icon       = \WP_Http::make_absolute_url( $icon, $root_url );
 		}
 
 		return $icon;
