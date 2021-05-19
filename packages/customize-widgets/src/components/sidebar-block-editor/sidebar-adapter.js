@@ -173,6 +173,8 @@ export default class SidebarAdapter {
 			number = widgetModel.get( 'multi_number' );
 		}
 
+		widget.instance.is_widget_customizer_js_value = true;
+
 		const settingId = number
 			? `widget_${ widget.idBase }[${ number }]`
 			: `widget_${ widget.idBase }`;
@@ -200,6 +202,13 @@ export default class SidebarAdapter {
 
 	_removeWidget( widget ) {
 		const settingId = widgetIdToSettingId( widget.id );
+		const setting = this.api( settingId );
+
+		if ( setting ) {
+			const instance = setting.get();
+			this.widgetsCache.delete( instance );
+		}
+
 		this.api.remove( settingId );
 	}
 
@@ -277,7 +286,10 @@ export default class SidebarAdapter {
 			return widgetId;
 		} );
 
-		// TODO: We should in theory also handle delete widgets here too.
+		const deletedWidgets = this.getWidgets().filter(
+			( widget ) => ! nextWidgetIds.includes( widget.id )
+		);
+		deletedWidgets.forEach( ( widget ) => this._removeWidget( widget ) );
 
 		this.setting.set( nextWidgetIds );
 
