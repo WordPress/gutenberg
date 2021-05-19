@@ -567,6 +567,57 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
+	/**
+	 * @dataProvider provide_get_image_data
+	 */
+	public function test_get_image( $html, $expected_image ) {
+		$target_url = 'https://wordpress.org';
+		$controller = new WP_REST_URL_Details_Controller();
+		$method     = $this->get_reflective_method( 'get_image' );
+		$result     = $method->invoke(
+			$controller,
+			$this->wrap_html_in_doc( $html ),
+			$target_url
+		);
+		$this->assertEquals( $expected_image, $result );
+	}
+
+	public function provide_get_image_data() {
+		return array(
+			'default'                       => array(
+				'<meta property="og:image" content="https://wordpress.org/images/myimage.jpg" />',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'no_closing_tag'                => array(
+				'<meta property="og:image" content="https://wordpress.org/images/myimage.jpg">',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'using_url_modifier'            => array(
+				'<meta property="og:image:url" content="https://wordpress.org/images/myimage.jpg" />
+				<meta property="og:image:alt" content="Ignore this please" />',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'should_ignore_other_modifiers' => array(
+				'<meta property="og:image:height" content="720" />
+				<meta property="og:image" content="https://wordpress.org/images/myimage.jpg" />
+				<meta property="og:image:alt" content="Ignore this please" />',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'with_query_string'             => array(
+				'<meta property="og:image" content="https://wordpress.org/images/myimage.jpg?foo=bar&bar=foo" />',
+				'https://wordpress.org/images/myimage.jpg?foo=bar&bar=foo',
+			),
+			'relative_url'                  => array(
+				'<meta property="og:image" content="/images/myimage.jpg" />',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+			'relative_url_no_slash'         => array(
+				'<meta property="og:image" content="images/myimage.jpg" />',
+				'https://wordpress.org/images/myimage.jpg',
+			),
+		);
+	}
+
 
 
 
