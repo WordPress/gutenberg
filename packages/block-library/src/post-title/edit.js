@@ -14,11 +14,7 @@ import {
 	useBlockProps,
 	PlainText,
 } from '@wordpress/block-editor';
-import {
-	ToggleControl,
-	TextControl,
-	PanelBody,
-} from '@wordpress/components';
+import { ToggleControl, TextControl, PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 import { store as coreStore } from '@wordpress/core-data';
 
