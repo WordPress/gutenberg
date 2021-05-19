@@ -243,11 +243,10 @@ function _gutenberg_build_template_result_from_file( $template_file, $template_t
  *
  * @param WP_Post $post          Template post.
  * @param string  $template_type wp_template or wp_template_part.
- * @param bool    $active        Whether to build active template (default) or inactive.
  *
  * @return WP_Block_Template|WP_Error Template.
  */
-function _gutenberg_build_template_result_from_post( $post, $template_type = 'wp_template', $active = true ) {
+function _gutenberg_build_template_result_from_post( $post, $template_type = 'wp_template' ) {
 	if ( $template_type !== $post->post_type ) {
 		return new WP_Error( 'template_wrong_post_type', __( 'An invalid post was provided for this template.', 'gutenberg' ) );
 	}
@@ -298,12 +297,8 @@ function _gutenberg_build_template_result_from_post( $post, $template_type = 'wp
  * @return array Templates.
  */
 function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_template', $active = true ) {
-	if ( $active ) {
-		$post__in = 'post__in';
-		$theme_slugs = get_theme_mod( $template_type, array() );
-	} else {
-		$post__in = 'post__not_in';
-	}
+	$theme_slugs = get_theme_mod( $template_type, array() );
+	$post__in = $active ? 'post__in' : 'post__not_in';
 
 	$wp_query_args = array(
 		'post_status'    => array( 'auto-draft', 'draft', 'publish' ),
@@ -374,7 +369,7 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 /**
  * Retrieves a single unified template object using its id.
  *
- * @param string $id Template unique identifier (example: theme_slug//template_slug).
+ * @param string $id            Template unique identifier (example: theme_slug//template_slug).
  * @param string $template_type wp_template or wp_template_part.
  *
  * @return WP_Block_Template|null Template.
@@ -386,16 +381,19 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 	}
 	list( $theme, $slug ) = $parts;
 
-	// Handle inactive requests.
-	if ( '' === $theme ) {
-		// This is not actually a slug but a numeric ID.
-		$post = get_post( $slug );
-	} else {
+	$active = wp_get_theme()->get_stylesheet() === $theme;
+
+	if ( $active ) {
 		$ids = get_theme_mod( $template_type, array() );
 		
 		if ( ! empty( $ids[ $slug ] ) ) {
 			$post = get_post( $ids[ $slug ] );
 		}
+	} else if ( '' === $theme ) {
+		// This is not actually a slug but a numeric ID.
+		$post = get_post( $slug );
+	} else {
+		return null;
 	}
 
 	if ( $post && $template_type === $post->post_type ) {
@@ -406,7 +404,7 @@ function gutenberg_get_block_template( $id, $template_type = 'wp_template' ) {
 		}
 	}
 
-	return '' === $theme ? null : gutenberg_get_block_file_template( $id, $template_type );
+	return $active ? gutenberg_get_block_file_template( $id, $template_type ) : null;
 }
 
 /**

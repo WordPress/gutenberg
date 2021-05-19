@@ -81,6 +81,35 @@ function gutenberg_register_template_post_type() {
 add_action( 'init', 'gutenberg_register_template_post_type' );
 
 /**
+ * Registers block editor 'wp_theme' taxonomy.
+ */
+function gutenberg_register_wp_theme_taxonomy() {
+	if ( ! gutenberg_supports_block_templates() && ! WP_Theme_JSON_Resolver::theme_has_support() ) {
+		return;
+	}
+
+	register_taxonomy(
+		'wp_theme',
+		array( 'wp_global_styles' ),
+		array(
+			'public'            => false,
+			'hierarchical'      => false,
+			'labels'            => array(
+				'name'          => __( 'Themes', 'gutenberg' ),
+				'singular_name' => __( 'Theme', 'gutenberg' ),
+			),
+			'query_var'         => false,
+			'rewrite'           => false,
+			'show_ui'           => false,
+			'_builtin'          => true,
+			'show_in_nav_menus' => false,
+			'show_in_rest'      => false,
+		)
+	);
+}
+add_action( 'init', 'gutenberg_register_wp_theme_taxonomy' );
+
+/**
  * Filters the capabilities of a user to conditionally grant them capabilities for managing 'wp_template' posts.
  *
  * Any user who can 'edit_theme_options' will have access.
