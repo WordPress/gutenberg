@@ -118,9 +118,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		$data = $this->add_additional_fields_to_object(
 			array(
-				'title'       => $this->get_title( $remote_url_response, $url ),
+				'title'       => $this->get_title( $remote_url_response ),
 				'icon'        => $this->get_icon( $remote_url_response, $url ),
-				'description' => $this->get_description( $remote_url_response, $url ),
+				'description' => $this->get_description( $remote_url_response ),
 				'image'       => $this->get_image( $remote_url_response, $url ),
 			),
 			$request
