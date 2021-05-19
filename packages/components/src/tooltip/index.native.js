@@ -5,6 +5,7 @@ import {
 	Animated,
 	Easing,
 	Keyboard,
+	Platform,
 	StyleSheet,
 	Text,
 	View,
@@ -40,17 +41,26 @@ const { Fill, Slot } = createSlotFill( 'Tooltip' );
 
 const useKeyboardVisibility = () => {
 	const [ keyboardVisible, setKeyboardVisible ] = useState( false );
+	const previousKeyboardVisible = usePrevious( keyboardVisible );
 
 	useEffect( () => {
-		const didShowListener = Keyboard.addListener( 'keyboardDidShow', () =>
-			setKeyboardVisible( true )
-		);
-		const didHideListener = Keyboard.addListener( 'keyboardDidHide', () =>
-			setKeyboardVisible( false )
-		);
+		const showListener = Keyboard.addListener( 'keyboardDidShow', () => {
+			if ( previousKeyboardVisible !== true ) {
+				setKeyboardVisible( true );
+			}
+		} );
+		const keyboardHideEvent = Platform.select( {
+			android: 'keyboardDidHide',
+			ios: 'keyboardWillHide',
+		} );
+		const hideListener = Keyboard.addListener( keyboardHideEvent, () => {
+			if ( previousKeyboardVisible !== false ) {
+				setKeyboardVisible( false );
+			}
+		} );
 		return () => {
-			didShowListener.remove();
-			didHideListener.remove();
+			showListener.remove();
+			hideListener.remove();
 		};
 	}, [] );
 
@@ -105,6 +115,20 @@ const Tooltip = ( {
 			startAnimation();
 		}
 	}, [ animating, visible ] );
+
+	// Manage tooltip visibility and position in relation to keyboard
+	useEffect( () => {
+		// Update tooltip position if keyboard is visible
+		if ( keyboardVisible ) {
+			getReferenceElementPosition();
+		}
+
+		// Hide tooltip if keyboard hides
+		if ( typeof previousVisible !== 'undefined' && ! keyboardVisible ) {
+			setAnimating( true );
+			setVisible( false );
+		}
+	}, [ keyboardVisible ] );
 
 	const startAnimation = () => {
 		Animated.timing( animationValue, {
@@ -177,8 +201,6 @@ const Tooltip = ( {
 		const { height, width } = nativeEvent.layout;
 		setTooltipLayout( { height, width } );
 	};
-
-	useEffect( getReferenceElementPosition, [ keyboardVisible ] );
 
 	return hidden ? (
 		children
