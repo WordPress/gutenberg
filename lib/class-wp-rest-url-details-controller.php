@@ -244,25 +244,25 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$temp = tmpfile();
 
 		if ( ! $temp ) {
-			fclose( $temp ); // clean up tmp file.
+			fclose( $temp ); // clean up tmp file
 			return $description;
 		}
 
 		$path = stream_get_meta_data( $temp )['uri'];
 
-		// Write HTML.
+		// Write HTML
 		fwrite( $temp, $html );
 
 		$meta = get_meta_tags( $path );
 
 		if ( empty( $meta ) ) {
-			fclose( $temp ); // clean up tmp file.
+			fclose( $temp ); // clean up tmp file
 			return $description;
 		}
 
 		$description = ! empty( $meta['description'] ) ? $meta['description'] : '';
 
-		fclose( $temp ); // clean up tmp file.
+		fclose( $temp ); // clean up tmp file
 		return $description;
 	}
 
