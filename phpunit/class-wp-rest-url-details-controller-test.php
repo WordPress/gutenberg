@@ -495,11 +495,12 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	 * @dataProvider provide_get_title_data
 	 */
 	public function test_get_title( $html, $expected_title ) {
+
 		$controller = new WP_REST_URL_Details_Controller();
 		$method     = $this->get_reflective_method( 'get_title' );
 		$result     = $method->invoke(
 			$controller,
-			$html
+			$html,
 		);
 		$this->assertEquals( $expected_title, $result );
 	}
@@ -507,13 +508,62 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 	public function provide_get_title_data() {
 		return array(
-			'no_attributes' => array(
+			'no_attributes'   => array(
 				'<title>Testing the title</title>',
 				'Testing the title',
 			),
 			'with_attributes' => array(
 				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">Testing the title</title>',
 				'Testing the title',
+			),
+		);
+	}
+
+	/**
+	 * @dataProvider provide_get_icon_data
+	 */
+	public function test_get_icon( $html, $expected_icon ) {
+		$target_url = 'https://wordpress.org';
+		$controller = new WP_REST_URL_Details_Controller();
+		$method     = $this->get_reflective_method( 'get_icon' );
+		$result     = $method->invoke(
+			$controller,
+			$html,
+			$target_url
+		);
+		$this->assertEquals( $expected_icon, $result );
+	}
+
+
+	public function provide_get_icon_data() {
+		return array(
+			'default' => array(
+				'<link rel="shortcut icon" href="https://wordpress.org/favicon.ico" />',
+				'https://wordpress.org/favicon.ico',
+			),
+			'with_query_string' => array(
+				'<link rel="shortcut icon" href="https://wordpress.org/favicon.ico?somequerystring=foo&another=bar" />',
+				'https://wordpress.org/favicon.ico?somequerystring=foo&another=bar',
+			),
+			'relative_url' => array(
+				'<link rel="shortcut icon" href="/favicon.ico" />',
+				'https://wordpress.org/favicon.ico',
+			),
+			'relative_url_no_slash' => array(
+				'<link rel="shortcut icon" href="favicon.ico" />',
+				'https://wordpress.org/favicon.ico',
+			),
+			'rel_reverse_order' => array(
+				'<link rel="icon shortcut" href="https://wordpress.org/favicon.ico" />',
+				'https://wordpress.org/favicon.ico',
+			),
+			'rel_icon_only' => array(
+				'<link rel="icon" href="https://wordpress.org/favicon.ico" />',
+				'https://wordpress.org/favicon.ico',
+			),
+			'rel_shortcut_only' => array(
+				'<link rel="icon" href="https://wordpress.org/favicon.ico" />',
+				'https://wordpress.org/favicon.ico',
 			),
 		);
 	}

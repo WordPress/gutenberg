@@ -235,10 +235,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		// Attempt to convert relative URLs to absolute.
 		if ( ! empty( $icon ) ) {
-			$parsed = parse_url( $icon );
-			if ( empty( $parsed['host'] ) ) {
-				$icon = $url . $icon;
-			}
+			$icon = \WP_Http::make_absolute_url( $icon, $url );
 		}
 
 		return $icon;
