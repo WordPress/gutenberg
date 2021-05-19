@@ -548,7 +548,7 @@ export class ImageEdit extends Component {
 				</PanelBody>
 				<PanelBody>
 					{ image &&
-						sizeOptionsValid(
+						sizeOptionsValid && (
 							<BottomSheetSelectControl
 								icon={ expand }
 								label={ __( 'Size' ) }
