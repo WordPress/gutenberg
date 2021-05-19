@@ -1,8 +1,12 @@
 $tooltipColor: #2c2c2d;
 $tooltipArrowSize: 8px;
-$tooltipArrowOffset: -( $tooltipArrowSize - 1 );
+$tooltipArrowOffset: -($tooltipArrowSize - 1);
 
 .tooltip {
+	position: absolute;
+}
+
+.tooltip__box {
 	background-color: $tooltipColor;
 	border-radius: 4px;
 }

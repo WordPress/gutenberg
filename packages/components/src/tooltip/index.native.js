@@ -159,18 +159,23 @@ const Tooltip = ( {
 		} );
 	};
 
-	const positionStyles = {
-		left:
-			referenceLayout.x +
-			Math.floor( referenceLayout.width / 2 ) -
-			( horizontalPosition === 'right'
-				? RIGHT_ALIGN_ARROW_OFFSET
-				: Math.floor( tooltipLayout.width / 2 ) ),
-		top: referenceLayout.y - tooltipLayout.height - TOOLTIP_VERTICAL_OFFSET,
-		position: 'absolute',
-	};
 	const tooltipStyles = [
 		styles.tooltip,
+		{
+			left:
+				referenceLayout.x +
+				Math.floor( referenceLayout.width / 2 ) -
+				( horizontalPosition === 'right'
+					? RIGHT_ALIGN_ARROW_OFFSET
+					: Math.floor( tooltipLayout.width / 2 ) ),
+			top:
+				referenceLayout.y -
+				tooltipLayout.height -
+				TOOLTIP_VERTICAL_OFFSET,
+		},
+	];
+	const tooltipBoxStyles = [
+		styles.tooltip__box,
 		horizontalPosition === 'right' && styles[ 'tooltip--rightAlign' ],
 		{
 			elevation: 2,
@@ -228,8 +233,8 @@ const Tooltip = ( {
 				onLayout: getReferenceElementPosition,
 			} ) }
 			<Fill>
-				<View onLayout={ getTooltipLayout } style={ positionStyles }>
-					<Animated.View style={ tooltipStyles }>
+				<View onLayout={ getTooltipLayout } style={ tooltipStyles }>
+					<Animated.View style={ tooltipBoxStyles }>
 						<Text style={ styles.tooltip__text }>{ text }</Text>
 						<View style={ arrowStyles } />
 					</Animated.View>
