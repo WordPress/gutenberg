@@ -118,8 +118,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		$data = $this->add_additional_fields_to_object(
 			array(
-				'title' => $this->get_title( $remote_url_response ),
-				'icon'  => $this->get_icon( $remote_url_response ),
+				'title'       => $this->get_title( $remote_url_response ),
+				'icon'        => $this->get_icon( $remote_url_response ),
+				'description' => $this->get_description( $remote_url_response ),
 			),
 			$request
 		);
@@ -228,6 +229,39 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$icon = isset( $matches[1] ) ? trim( $matches[1] ) : '';
 
 		return $icon;
+	}
+
+	/**
+	 * Parses the meta description from the provide HTML.
+	 *
+	 * @param string $html the HTML from the remote website at URL.
+	 * @return string the title tag contents (maybe empty).
+	 */
+	private function get_description( $html ) {
+		$description = '';
+
+		$temp = tmpfile();
+
+		if ( ! $temp ) {
+			return $description;
+		}
+
+		$path = stream_get_meta_data( $temp )['uri'];
+
+		// Write HTML
+		fwrite( $temp, $html );
+
+		$meta = get_meta_tags( $path );
+
+		if ( empty( $meta ) ) {
+			return $description;
+		}
+
+		fclose( $temp ); // clean up tmp file
+
+		$description = ! empty( $meta['description'] ) ? $meta['description'] : '';
+
+		return $description;
 	}
 
 	/**
