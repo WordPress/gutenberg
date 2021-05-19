@@ -547,16 +547,15 @@ export class ImageEdit extends Component {
 					<BlockStyles clientId={ clientId } url={ url } />
 				</PanelBody>
 				<PanelBody>
-					{ image &&
-						sizeOptionsValid && (
-							<BottomSheetSelectControl
-								icon={ expand }
-								label={ __( 'Size' ) }
-								options={ this.sizeOptions }
-								onChange={ this.onSizeChangeValue }
-								value={ selectedSizeOption }
-							/>
-						) }
+					{ image && sizeOptionsValid && (
+						<BottomSheetSelectControl
+							icon={ expand }
+							label={ __( 'Size' ) }
+							options={ this.sizeOptions }
+							onChange={ this.onSizeChangeValue }
+							value={ selectedSizeOption }
+						/>
+					) }
 					{ this.getAltTextSettings() }
 				</PanelBody>
 				<PanelBody title={ __( 'Link Settings' ) }>
