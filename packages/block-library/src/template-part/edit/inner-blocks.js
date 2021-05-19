@@ -35,6 +35,9 @@ export default function TemplatePartInnerBlocks( {
 		'wp_template_part',
 		{ id }
 	);
+
+	// Use blockProps as the starting point for innerBlockProps to ensure
+	// the overlay does not cause style and layout regressions.
 	const innerBlocksProps = useInnerBlocksProps( blockProps, {
 		value: blocks,
 		onInput,
@@ -52,7 +55,12 @@ export default function TemplatePartInnerBlocks( {
 	return (
 		<TagName { ...blockProps }>
 			<BlockContentOverlay clientId={ clientId }>
-				<div { ...innerBlocksProps } />
+				{
+					// Set tabIndex to remove this from keyboard nav since we have
+					// duplicated blockProps into this wrapper.  Otherwise keyboard nav
+					// will seem to stay on this block for one extra key press.
+					<div { ...innerBlocksProps } tabIndex={ -1 } />
+				}
 			</BlockContentOverlay>
 		</TagName>
 	);

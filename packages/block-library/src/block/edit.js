@@ -71,19 +71,18 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 		ref
 	);
 
-	const innerBlocksProps = useInnerBlocksProps(
-		{},
-		{
-			value: blocks,
-			onInput,
-			onChange,
-			renderAppender: blocks?.length
-				? undefined
-				: InnerBlocks.ButtonBlockAppender,
-		}
-	);
-
 	const blockProps = useBlockProps();
+
+	// Use blockProps as the starting point for innerBlockProps to ensure
+	// the overlay does not cause style and layout regressions.
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		value: blocks,
+		onInput,
+		onChange,
+		renderAppender: blocks?.length
+			? undefined
+			: InnerBlocks.ButtonBlockAppender,
+	} );
 
 	if ( hasAlreadyRendered ) {
 		return (
@@ -139,7 +138,12 @@ export default function ReusableBlockEdit( { attributes: { ref }, clientId } ) {
 				</InspectorControls>
 				<BlockContentOverlay clientId={ clientId }>
 					<div className="block-library-block__reusable-block-container">
-						{ <div { ...innerBlocksProps } /> }
+						{
+							// Set tabIndex to remove this from keyboard nav since we have
+							// duplicated blockProps into this wrapper.  Otherwise keyboard nav
+							// will seem to stay on this block for one extra key press.
+							<div { ...innerBlocksProps } tabIndex={ -1 } />
+						}
 					</div>
 				</BlockContentOverlay>
 			</div>
