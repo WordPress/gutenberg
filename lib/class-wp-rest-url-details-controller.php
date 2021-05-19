@@ -234,7 +234,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 */
 	private function get_icon( $html, $url ) {
 		// Grab the icon's link element.
-		$pattern = '#<link\s[^>]*rel="\s*(?:icon|shortcut icon|icon shortcut)\s*"[^>]*\/?>#is';
+		$pattern = '#<link\s[^>]*rel=(?:[\"\']??)\s*(?:icon|shortcut icon|icon shortcut)\s*(?:[\"\']??)[^>]*\/?>#isU';
 		preg_match( $pattern, $html, $element );
 		$element = ! empty( $element[0] ) && is_string( $element[0] ) ? trim( $element[0] ) : '';
 		if ( empty( $element ) ) {
@@ -242,9 +242,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		}
 
 		// Get the icon's href value.
-		$pattern = '#href="(.*?)"#is';
+		$pattern = '#href=([\"\']??)([^\" >]*?)\\1[^>]*#isU';
 		preg_match( $pattern, $element, $icon );
-		$icon = ! empty( $icon[1] ) && is_string( $icon[1] ) ? trim( $icon[1] ) : '';
+		$icon = ! empty( $icon[2] ) && is_string( $icon[2] ) ? trim( $icon[2] ) : '';
 		if ( empty( $icon ) ) {
 			return '';
 		}
