@@ -20,30 +20,23 @@ import { store as blockEditorStore } from '../../store';
 
 function KeyboardShortcuts() {
 	// Shortcuts Logic
-	const { clientIds, rootBlocksClientIds, rootClientId } = useSelect(
-		( select ) => {
-			const {
-				getSelectedBlockClientIds,
-				getBlockOrder,
-				getBlockRootClientId,
-			} = select( blockEditorStore );
-			const selectedClientIds = getSelectedBlockClientIds();
-			const [ firstClientId ] = selectedClientIds;
-			return {
-				clientIds: selectedClientIds,
-				rootBlocksClientIds: getBlockOrder(),
-				rootClientId: getBlockRootClientId( firstClientId ),
-			};
-		},
-		[]
-	);
+	const { clientIds, rootClientId } = useSelect( ( select ) => {
+		const { getSelectedBlockClientIds, getBlockRootClientId } = select(
+			blockEditorStore
+		);
+		const selectedClientIds = getSelectedBlockClientIds();
+		const [ firstClientId ] = selectedClientIds;
+		return {
+			clientIds: selectedClientIds,
+			rootClientId: getBlockRootClientId( firstClientId ),
+		};
+	}, [] );
 
 	const {
 		duplicateBlocks,
 		removeBlocks,
 		insertAfterBlock,
 		insertBeforeBlock,
-		multiSelect,
 		clearSelectedBlock,
 		moveBlocksUp,
 		moveBlocksDown,
@@ -140,20 +133,6 @@ function KeyboardShortcuts() {
 			[ clientIds, removeBlocks ]
 		),
 		{ isDisabled: clientIds.length < 2 }
-	);
-
-	useShortcut(
-		'core/block-editor/select-all',
-		useCallback(
-			( event ) => {
-				event.preventDefault();
-				multiSelect(
-					first( rootBlocksClientIds ),
-					last( rootBlocksClientIds )
-				);
-			},
-			[ rootBlocksClientIds, multiSelect ]
-		)
 	);
 
 	useShortcut(

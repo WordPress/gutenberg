@@ -187,7 +187,8 @@
 	// This needs high specificity.
 	&.wp-block-navigation.items-justified-space-between > .submenu-container > .has-child:last-child,
 	&.wp-block-navigation.items-justified-space-between > .wp-block-navigation__container > .has-child:last-child,
-	&.wp-block-navigation.items-justified-right .has-child {
+	&.wp-block-navigation.items-justified-right > .submenu-container .has-child,
+	&.wp-block-navigation.items-justified-right > .wp-block-navigation__container .has-child {
 
 		// First submenu.
 		.submenu-container,
@@ -352,6 +353,7 @@
 	}
 }
 
+
 /**
  * Mobile menu.
  */
@@ -459,8 +461,26 @@
 
 // Button to open the menu.
 .wp-block-navigation__responsive-container-open {
+	display: flex;
+
 	@include break-small {
 		display: none;
+	}
+
+	// Justify the button.
+	.items-justified-left & {
+		margin-left: 0;
+		margin-right: auto;
+	}
+
+	.items-justified-center & {
+		margin-left: auto;
+		margin-right: auto;
+	}
+
+	.items-justified-right & {
+		margin-left: auto;
+		margin-right: 0;
 	}
 }
 
@@ -472,7 +492,11 @@
 	z-index: 2; // Needs to be above the modal z index itself.
 }
 
-// The menu adds a wrapping container.
+// The menu adds wrapping containers.
+.wp-block-navigation__responsive-close {
+	width: 100%;
+}
+
 .is-menu-open .wp-block-navigation__responsive-close,
 .is-menu-open .wp-block-navigation__responsive-dialog,
 .is-menu-open .wp-block-navigation__responsive-container-content {

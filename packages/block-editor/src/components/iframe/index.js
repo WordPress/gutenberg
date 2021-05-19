@@ -11,6 +11,11 @@ import { __ } from '@wordpress/i18n';
 import { useMergeRefs } from '@wordpress/compose';
 import { __experimentalStyleProvider as StyleProvider } from '@wordpress/components';
 
+/**
+ * Internal dependencies
+ */
+import { useBlockSelectionClearer } from '../block-selection-clearer';
+
 const BODY_CLASS_NAME = 'editor-styles-wrapper';
 const BLOCK_PREFIX = 'wp-block';
 
@@ -49,6 +54,13 @@ function styleSheetsCompat( doc ) {
 		);
 
 		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
+			// eslint-disable-next-line no-console
+			console.error(
+				`Stylesheet ${ ownerNode.id } was not properly added.
+For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`,
+				ownerNode
+			);
 			doc.head.appendChild( ownerNode.cloneNode( true ) );
 		}
 	} );
@@ -136,6 +148,7 @@ function setHead( doc, head ) {
 function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 	const [ iframeDocument, setIframeDocument ] = useState();
 
+	const clearerRef = useBlockSelectionClearer();
 	const setRef = useCallback( ( node ) => {
 		if ( ! node ) {
 			return;
@@ -143,7 +156,7 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 
 		function setDocumentIfReady() {
 			const { contentDocument } = node;
-			const { readyState, body } = contentDocument;
+			const { readyState, body, documentElement } = contentDocument;
 
 			if ( readyState !== 'interactive' && readyState !== 'complete' ) {
 				return false;
@@ -161,6 +174,8 @@ function Iframe( { contentRef, children, head, headHTML, ...props }, ref ) {
 			bubbleEvents( contentDocument );
 			setBodyClassName( contentDocument );
 			setIframeDocument( contentDocument );
+			clearerRef( documentElement );
+			clearerRef( body );
 
 			return true;
 		}

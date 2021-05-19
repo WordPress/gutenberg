@@ -12,6 +12,7 @@ export const PREFERENCES_DEFAULTS = {
 		showIconLabels: false,
 		themeStyles: true,
 		showBlockBreadcrumbs: true,
+		welcomeGuideTemplate: true,
 	},
 	hiddenBlockTypes: [],
 	preferredStyleVariations: {},

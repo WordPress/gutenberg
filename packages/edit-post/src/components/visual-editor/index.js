@@ -60,7 +60,7 @@ function MaybeIframe( {
 				<div
 					ref={ contentRef }
 					className="editor-styles-wrapper"
-					style={ style }
+					style={ { flex: '1', ...style } }
 				>
 					{ children }
 				</div>
@@ -93,13 +93,19 @@ export default function VisualEditor( { styles } ) {
 			__experimentalGetPreviewDeviceType,
 		} = select( editPostStore );
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
+		const _isTemplateMode = isEditingTemplate();
+		let _wrapperBlockName;
+
+		if ( getCurrentPostType() === 'wp_block' ) {
+			_wrapperBlockName = 'core/block';
+		} else if ( ! _isTemplateMode ) {
+			_wrapperBlockName = 'core/post-content';
+		}
+
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
-			isTemplateMode: isEditingTemplate(),
-			wrapperBlockName:
-				getCurrentPostType() === 'wp_block'
-					? 'core/block'
-					: 'core/post-content',
+			isTemplateMode: _isTemplateMode,
+			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 		};
 	}, [] );
@@ -119,6 +125,9 @@ export default function VisualEditor( { styles } ) {
 		margin: 0,
 		display: 'flex',
 		flexFlow: 'column',
+		// Default background color so that grey
+		// .edit-post-editor-regions__content color doesn't show through.
+		background: 'white',
 	};
 	const templateModeStyles = {
 		...desktopCanvasStyles,
@@ -159,7 +168,7 @@ export default function VisualEditor( { styles } ) {
 		useBlockSelectionClearer(),
 	] );
 
-	const blockSelectionClearerRef = useBlockSelectionClearer( true );
+	const blockSelectionClearerRef = useBlockSelectionClearer();
 
 	const [ , RecursionProvider ] = useNoRecursiveRenders(
 		wrapperUniqueId,
@@ -172,12 +181,6 @@ export default function VisualEditor( { styles } ) {
 				'is-template-mode': isTemplateMode,
 			} ) }
 		>
-			{ themeSupportsLayout && (
-				<LayoutStyle
-					selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-					layout={ defaultLayout }
-				/>
-			) }
 			<VisualEditorGlobalKeyboardShortcuts />
 			<BlockTools __unstableContentRef={ ref }>
 				<motion.div
@@ -209,6 +212,12 @@ export default function VisualEditor( { styles } ) {
 							styles={ styles }
 							style={ { paddingBottom } }
 						>
+							{ themeSupportsLayout && (
+								<LayoutStyle
+									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+									layout={ defaultLayout }
+								/>
+							) }
 							<AnimatePresence>
 								<motion.div
 									key={ isTemplateMode ? 'template' : 'post' }

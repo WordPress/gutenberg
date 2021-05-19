@@ -181,6 +181,13 @@ $color-control-label-height: 20px;
 	.components-placeholder__fieldset .components-button {
 		margin-bottom: 0;
 	}
+
+	// For the placeholder indicators to colorize correctly, colors need to be inherited unless selected.
+	color: inherit;
+
+	.is-selected & {
+		color: $gray-900;
+	}
 }
 
 // Spinner.
@@ -225,19 +232,23 @@ $color-control-label-height: 20px;
 		opacity: 0.3;
 	}
 
-	// Don't show the preview boxes for an empty nav block.
-	// Needs specificity to work for the navigation screen.
-	.wp-block-navigation.is-selected &.wp-block-navigation-placeholder__preview {
-		display: none;
-	}
-
-	// ... but be present in larger contexts to size it correctly.
-	.wp-block-navigation.is-selected .is-large & {
+	// Don't show the preview boxes for an empty nav block,
+	// but be technically present to help size the empty state.
+	.wp-block-navigation.is-selected & {
 		display: flex;
 		opacity: 0;
 		width: 0;
 		overflow: hidden;
 		flex-wrap: nowrap;
+	}
+
+	// .. but hide entirely when the placeholder can still be toggled.
+	.wp-block-navigation.is-selected .is-small & {
+		display: none;
+	}
+
+	.wp-block-navigation.is-selected .is-medium & {
+		display: none;
 	}
 }
 
@@ -281,6 +292,7 @@ $color-control-label-height: 20px;
 	// Both selected and vertical.
 	.is-selected.is-vertical & {
 		display: inline-flex; // This makes the white box not take up all available space.
+		padding: $grid-unit-15;
 	}
 
 	.wp-block-navigation-placeholder__icon {
@@ -375,7 +387,7 @@ $color-control-label-height: 20px;
 	// That means we only have to consider the big adminbar height (<783px).
 	// And in that view we also know that the toolbar is stacked.
 	body.admin-bar & {
-		top: $admin-bar-height-big + $header-height + $block-toolbar-height;
+		top: $admin-bar-height-big + $header-height + $block-toolbar-height + $border-width;
 
 		@include break-medium() {
 			top: $header-height + $border-width;

@@ -14,7 +14,7 @@ import { external } from '@wordpress/icons';
 /**
  * Internal dependencies
  */
-import { VisuallyHidden } from '../visually-hidden';
+import VisuallyHidden from '../visually-hidden';
 import { StyledIcon } from './styles/external-link-styles';
 
 export function ExternalLink(

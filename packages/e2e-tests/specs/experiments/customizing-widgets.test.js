@@ -20,6 +20,20 @@ describe( 'Widgets Customizer', () => {
 	beforeEach( async () => {
 		await cleanupWidgets();
 		await visitAdminPage( 'customize.php' );
+
+		// Disable welcome guide if it is enabled.
+		const isWelcomeGuideActive = await page.evaluate( () =>
+			wp.data
+				.select( 'core/customize-widgets' )
+				.__unstableIsFeatureActive( 'welcomeGuide' )
+		);
+		if ( isWelcomeGuideActive ) {
+			await page.evaluate( () =>
+				wp.data
+					.dispatch( 'core/customize-widgets' )
+					.__unstableToggleFeature( 'welcomeGuide' )
+			);
+		}
 	} );
 
 	beforeAll( async () => {

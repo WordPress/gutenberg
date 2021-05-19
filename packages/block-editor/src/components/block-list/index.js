@@ -21,6 +21,7 @@ import { store as blockEditorStore } from '../../store';
 import { usePreParsePatterns } from '../../utils/pre-parse-patterns';
 import { LayoutProvider, defaultLayout } from './layout';
 import BlockToolsBackCompat from '../block-tools/back-compat';
+import { useBlockSelectionClearer } from '../block-selection-clearer';
 
 export const IntersectionObserver = createContext();
 
@@ -48,6 +49,7 @@ function Root( { className, children } ) {
 	return (
 		<div
 			ref={ useMergeRefs( [
+				useBlockSelectionClearer(),
 				useBlockDropZone(),
 				useInBetweenInserter(),
 			] ) }
