@@ -246,14 +246,14 @@
 
 	.block-editor-block-navigation-block-select-button__anchor {
 		background: rgba(30, 30, 30, 0.1);
-		border-radius: 2px;
+		border-radius: $radius-block-ui;
 		display: inline-block;
 		padding: 2px 6px;
-		margin: 0 8px;
+		margin: 0 $grid-unit-10;
 	}
 
 	&.is-selected .block-editor-block-navigation-block-select-button__anchor {
-		background: rgba(30, 30, 30, 0.3);
+		background: rgba($black, 0.3);
 	}
 }
 
