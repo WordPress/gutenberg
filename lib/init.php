@@ -113,7 +113,7 @@ add_action( 'admin_menu', 'gutenberg_site_editor_menu', 9 );
  * @param WP_Admin_Bar $wp_admin_bar Core class used to implement the Toolbar API.
  */
 function modify_admin_bar( $wp_admin_bar ) {
-	if ( gutenberg_use_widgets_block_editor() ) {
+	if ( gutenberg_use_widgets_block_editor() && $wp_admin_bar->get_node( 'widgets' ) !== null ) {
 		$wp_admin_bar->add_menu(
 			array(
 				'id'   => 'widgets',
