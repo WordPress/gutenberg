@@ -23,8 +23,8 @@ The block editor first became available in December 2018, and we're still hard a
 
 Get hands on: check out the [block editor live demo](https://wordpress.org/gutenberg/) to play with a test instance of the editor.
 
-### Gutenberg Principles
-[The Gutenberg principles document](/docs/explanations/principles.md) highlights a few principles that are guiding the overall project and shape various development and design decisions.
+### Guiding Principles
+[The Guiding principles document](/docs/explanations/principles.md) highlights a few principles that are shaping the overall project and impact various development and design decisions.
 
 ### Using Gutenberg
 

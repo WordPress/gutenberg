@@ -1,4 +1,4 @@
-# Gutenberg Principles
+# Guiding Principles
 
 This document has been written so that those contributing to the Gutenberg project can have some understanding of what guides decisions around what is included in the project (or not).
 
