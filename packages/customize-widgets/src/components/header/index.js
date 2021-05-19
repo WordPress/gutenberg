@@ -11,6 +11,7 @@ import { plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import Inserter from '../inserter';
+import MoreMenu from '../more-menu';
 
 function Header( { inserter, isInserterOpened, setIsInserterOpened } ) {
 	return (
@@ -34,6 +35,7 @@ function Header( { inserter, isInserterOpened, setIsInserterOpened } ) {
 							setIsInserterOpened( ( isOpen ) => ! isOpen );
 						} }
 					/>
+					<MoreMenu />
 				</NavigableToolbar>
 			</div>
 
