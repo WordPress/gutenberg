@@ -131,6 +131,22 @@ const Tooltip = ( {
 		}
 	}, [ keyboardVisible ] );
 
+	// Manage tooltip position during keyboard frame changes
+	useEffect( () => {
+		const frameListener = Keyboard.addListener(
+			'keyboardWillChangeFrame',
+			() => {
+				if ( visible ) {
+					getReferenceElementPosition();
+				}
+			}
+		);
+
+		return () => {
+			frameListener.remove();
+		};
+	}, [ visible ] );
+
 	const startAnimation = () => {
 		Animated.timing( animationValue, {
 			toValue: visible ? 1 : 0,
