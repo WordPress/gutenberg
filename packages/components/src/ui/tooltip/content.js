@@ -21,7 +21,6 @@ const { TooltipPopoverView } = styles;
  * @param {import('react').Ref<any>} forwardedRef
  */
 function TooltipContent( props, forwardedRef ) {
-	// TODO: what about here
 	const { children, className, ...otherProps } = useContextSystem(
 		props,
 		'TooltipContent'

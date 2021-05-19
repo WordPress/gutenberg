@@ -37,7 +37,6 @@ export type Props = PopperProps & {
 	baseId?: string;
 	/**
 	 * Content to render within the `Popover` floating label.
-	 * [TODO: is this used at all?]
 	 */
 	content?: ReactNode;
 	/**
