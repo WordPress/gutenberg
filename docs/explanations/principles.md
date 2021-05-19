@@ -46,9 +46,11 @@ Extensibility interfaces in Gutenberg favor:
 For more information around currently built patterns for extensibility and key architectural concepts, see [this document](https://developer.wordpress.org/block-editor/explanations/architecture/key-concepts/)).
 
 
-## Progressive Complexity
+## Progressive Complexity unfolding from simple origins.
 
 _“On the Layers of the Onion”_ (Matías - [Gutenberg or the Ship of Theseus](https://matiasventura.com/post/gutenberg-or-the-ship-of-theseus/))
+
+The initial interfaces for those interacting with Gutenberg should be simple and straightforward yet provide a path through progressive complexity to accomplish what is needed for expressive content.
 
 There are two perspectives for this principle:
 
