@@ -179,12 +179,12 @@ const Tooltip = ( {
 	];
 
 	const getReferenceElementPosition = () => {
-		if ( ! referenceElementRef.current ) {
-			return;
-		}
 		// rAF allows render to complete before calculating layout
 		// eslint-disable-next-line no-undef
 		requestAnimationFrame( () => {
+			if ( ! referenceElementRef.current ) {
+				return;
+			}
 			referenceElementRef.current.measure(
 				( _x, _y, width, height, pageX, pageY ) => {
 					setReferenceLayout( {
