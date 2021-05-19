@@ -29,7 +29,7 @@ import Header from '../header';
 import useInserter from '../inserter/use-inserter';
 import SidebarEditorProvider from './sidebar-editor-provider';
 import { store as customizeWidgetsStore } from '../../store';
-import Welcome from '../welcome';
+import WelcomeGuide from '../welcome-guide';
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -42,6 +42,7 @@ export default function SidebarBlockEditor( {
 		hasUploadPermissions,
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
+		isWelcomeGuideActive,
 	} = useSelect( ( select ) => {
 		return {
 			hasUploadPermissions: defaultTo(
@@ -54,6 +55,9 @@ export default function SidebarBlockEditor( {
 			keepCaretInsideBlock: select(
 				customizeWidgetsStore
 			).__unstableIsFeatureActive( 'keepCaretInsideBlock' ),
+			isWelcomeGuideActive: select(
+				customizeWidgetsStore
+			).__unstableIsFeatureActive( 'welcomeGuide' ),
 		};
 	}, [] );
 	const settings = useMemo( () => {
@@ -82,7 +86,9 @@ export default function SidebarBlockEditor( {
 		keepCaretInsideBlock,
 	] );
 
-	return <Welcome sidebar={ sidebar } />;
+	if ( isWelcomeGuideActive ) {
+		return <WelcomeGuide sidebar={ sidebar } />;
+	}
 
 	return (
 		<>

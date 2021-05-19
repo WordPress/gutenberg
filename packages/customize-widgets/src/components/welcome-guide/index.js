@@ -3,19 +3,25 @@
  */
 import { __ } from '@wordpress/i18n';
 import { Button, ExternalLink } from '@wordpress/components';
+import { useDispatch } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import { EditorImage } from './images';
+import { store as customizeWidgetsStore } from '../../store';
 
-export default function Welcome( { sidebar } ) {
+export default function WelcomeGuide( { sidebar } ) {
+	const { __unstableToggleFeature: toggleFeature } = useDispatch(
+		customizeWidgetsStore
+	);
+
 	const isEntirelyBlockWidgets = sidebar
 		.getWidgets()
 		.every( ( widget ) => widget.id.startsWith( 'block-' ) );
 
 	return (
-		<div className="customize-widgets-welcome">
+		<div className="customize-widgets-welcome-guide">
 			<EditorImage />
 			<h1>{ __( 'Welcome to block Widgets' ) }</h1>
 			<p>
@@ -28,13 +34,13 @@ export default function Welcome( { sidebar } ) {
 					  ) }
 			</p>
 			<Button
-				className="customize-widgets-welcome__button"
+				className="customize-widgets-welcome-guide__button"
 				isPrimary
-				onClick={ () => {} }
+				onClick={ () => toggleFeature( 'welcomeGuide' ) }
 			>
 				{ __( 'Got it' ) }
 			</Button>
-			<hr className="customize-widgets-welcome__separator" />
+			<hr className="customize-widgets-welcome-guide__separator" />
 			{ ! isEntirelyBlockWidgets && (
 				<p>
 					{ __( 'Want to stick with the old widgets?' ) }
