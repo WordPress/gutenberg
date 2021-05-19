@@ -576,7 +576,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 						'padding' => array(
 							'top'    => '1px',
 							'right'  => '1px',
-							'bottom' => 'var(--unsafe-var-toplevel)',
+							'bottom' => 'unsafe/><b>ok</ok>',
 							'left'   => '1px',
 						),
 					),
@@ -586,7 +586,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 								'padding' => array(
 									'top'    => '2px',
 									'right'  => '2px',
-									'bottom' => 'var(--unsafe-var-elements)',
+									'bottom' => '<b>unsafe</b>',
 									'left'   => '2px',
 								),
 							),
@@ -598,7 +598,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 								'padding' => array(
 									'top'    => '3px',
 									'right'  => '3px',
-									'bottom' => 'var(--unsafe-var-block)',
+									'bottom' => '<script>unsafe</script>',
 									'left'   => '3px',
 								),
 							),
@@ -608,7 +608,7 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 										'padding' => array(
 											'top'    => '4px',
 											'right'  => '4px',
-											'bottom' => 'var(--unsafe-var-block-elements)',
+											'bottom' => 'a" attr',
 											'left'   => '4px',
 										),
 									),
@@ -874,6 +874,11 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 				'color'      => array(
 					'palette' => array(
 						array(
+							'name'  => 'Blue',
+							'slug'  => 'blue',
+							'color' => 'var(--custom-v1)',
+						),
+						array(
 							'name'  => 'Pink',
 							'slug'  => 'pink',
 							'color' => '#FFC0CB',
@@ -887,12 +892,22 @@ class WP_Theme_JSON_Test extends WP_UnitTestCase {
 							'slug'       => 'cambria',
 							'fontFamily' => 'Cambria, Georgia, serif',
 						),
+						array(
+							'name'       => 'Helvetica Arial',
+							'slug'       => 'helvetica-arial',
+							'fontFamily' => 'var(--custom-var-1)',
+						),
 					),
 				),
 				'blocks'     => array(
 					'core/group' => array(
 						'color' => array(
 							'palette' => array(
+								array(
+									'name'  => 'Blue',
+									'slug'  => 'blue',
+									'color' => 'var(--custom-v1)',
+								),
 								array(
 									'name'  => 'Pink',
 									'slug'  => 'pink',
