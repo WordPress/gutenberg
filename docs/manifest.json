@@ -720,6 +720,12 @@
 		"parent": "components"
 	},
 	{
+		"title": "ColorControl",
+		"slug": "color-control",
+		"markdown_source": "../packages/components/src/color-control/README.md",
+		"parent": "components"
+	},
+	{
 		"title": "ColorIndicator",
 		"slug": "color-indicator",
 		"markdown_source": "../packages/components/src/color-indicator/README.md",
