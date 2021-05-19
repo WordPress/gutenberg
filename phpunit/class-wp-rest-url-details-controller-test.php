@@ -491,6 +491,37 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		);
 	}
 
+	/**
+	 * @dataProvider provide_get_title_data
+	 */
+	public function test_get_title( $html, $expected_title ) {
+		$controller = new WP_REST_URL_Details_Controller();
+		$method     = $this->get_reflective_method( 'get_title' );
+		$result     = $method->invoke(
+			$controller,
+			$html
+		);
+		$this->assertEquals( $expected_title, $result );
+	}
+
+
+	public function provide_get_title_data() {
+		return array(
+			'no_attributes' => array(
+				'<title>Testing the title</title>',
+				'Testing the title',
+			),
+			'with_attributes' => array(
+				'<title data-test-title-attr-one="test" data-test-title-attr-two="test2">Testing the title</title>',
+				'Testing the title',
+			),
+		);
+	}
+
+
+
+
+
 	public function provide_invalid_url_data() {
 		return array(
 			'empty_url'          => array(
@@ -568,5 +599,21 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 			'success'     => $should_200 ? 1 : 0,
 			'body'        => 'success' === $result_type ? file_get_contents( __DIR__ . '/fixtures/example-website.html' ) : '',
 		);
+	}
+
+	/**
+	 * Get reflective access to a private/protected method on
+	 * the WP_REST_URL_Details_Controller class.
+	 *
+	 * @param string $method_name Method name for which to gain access.
+	 *
+	 * @return ReflectionMethod
+	 * @throws ReflectionException Throws an exception if method does not exist.
+	 */
+	protected function get_reflective_method( $method_name ) {
+		$class  = new ReflectionClass( WP_REST_URL_Details_Controller::class );
+		$method = $class->getMethod( $method_name );
+		$method->setAccessible( true );
+		return $method;
 	}
 }
