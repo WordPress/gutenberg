@@ -239,7 +239,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		// Attempt to convert relative URLs to absolute.
 		if ( ! empty( $icon ) ) {
-			$icon = \WP_Http::make_absolute_url( $icon, $url );
+			$parsed_url = parse_url( $url );
+			$root_url   = $parsed_url['scheme'] . '://' . $parsed_url['host'] . '/';
+			$icon = \WP_Http::make_absolute_url( $icon, $root_url );
 		}
 
 		return $icon;
@@ -295,7 +297,9 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		// Attempt to convert relative URLs to absolute.
 		if ( ! empty( $image ) ) {
-			$image = \WP_Http::make_absolute_url( $image, $url );
+			$parsed_url = parse_url( $url );
+			$root_url   = $parsed_url['scheme'] . '://' . $parsed_url['host'] . '/';
+			$image      = \WP_Http::make_absolute_url( $image, $root_url );
 		}
 
 		return $image;
