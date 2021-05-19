@@ -7,6 +7,14 @@ import { slashInserter, shortText } from './helpers/test-data';
 
 const ANIMATION_TIME = 200;
 
+// helper function for asserting slash inserter presence
+async function assertSlashInserterPresent() {
+	const slashInserterElement = await editorPage.driver.elementByAccessibilityId(
+		'Slash inserter results'
+	);
+	expect( slashInserterElement ).toBeTruthy();
+}
+
 describe( 'Gutenberg Editor Slash Inserter tests', () => {
 	it( 'should show the menu after typing /', async () => {
 		await editorPage.addNewBlock( blockNames.paragraph );
@@ -23,11 +31,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		);
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
-		// Slash inserter
-		const slashInserterElement = await editorPage.driver.elementByAccessibilityId(
-			'Slash inserter results'
-		);
-		expect( slashInserterElement ).toBeTruthy();
+		assertSlashInserterPresent();
 		await editorPage.removeBlockAtPosition( blockNames.paragraph );
 	} );
 
@@ -46,11 +50,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		);
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
-		// Slash inserter
-		const slashInserterElement = await editorPage.driver.elementByAccessibilityId(
-			'Slash inserter results'
-		);
-		expect( slashInserterElement ).toBeTruthy();
+		assertSlashInserterPresent();
 
 		// Remove / character
 		if ( isAndroid() ) {
@@ -92,11 +92,7 @@ describe( 'Gutenberg Editor Slash Inserter tests', () => {
 		);
 		await editorPage.driver.sleep( ANIMATION_TIME );
 
-		// Slash inserter
-		const slashInserterElement = await editorPage.driver.elementByAccessibilityId(
-			'Slash inserter results'
-		);
-		expect( slashInserterElement ).toBeTruthy();
+		assertSlashInserterPresent();
 
 		// Find Image block button
 		const imageButtonElement = await editorPage.driver.elementByAccessibilityId(
