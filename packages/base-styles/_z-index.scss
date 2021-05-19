@@ -43,6 +43,7 @@ $z-layers: (
 
 	// Navigation menu dropdown.
 	".has-child .wp-block-navigation-link__container": 28,
+	".has-child:hover .wp-block-navigation-link__container": 29,
 
 	// Active pill button
 	".components-button {:focus or .is-primary}": 1,
