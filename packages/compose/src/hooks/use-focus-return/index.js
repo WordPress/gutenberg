@@ -28,10 +28,10 @@ import { useRef, useEffect, useCallback } from '@wordpress/element';
  * ```
  */
 function useFocusReturn( onFocusReturn ) {
-	/** @type {import('react').MutableRefObject<undefined | HTMLElement>} */
-	const ref = useRef();
-	/** @type {import('react').MutableRefObject<undefined | HTMLElement>} */
-	const focusedBeforeMount = useRef();
+	/** @type {import('react').MutableRefObject<null | HTMLElement>} */
+	const ref = useRef( null );
+	/** @type {import('react').MutableRefObject<null | Element>} */
+	const focusedBeforeMount = useRef( null );
 	const onFocusReturnRef = useRef( onFocusReturn );
 	useEffect( () => {
 		onFocusReturnRef.current = onFocusReturn;
@@ -47,12 +47,10 @@ function useFocusReturn( onFocusReturn ) {
 				return;
 			}
 
-			focusedBeforeMount.current =
-				/** @type {HTMLElement | null} */ ( node.ownerDocument
-					.activeElement ) || undefined;
+			focusedBeforeMount.current = node.ownerDocument.activeElement;
 		} else if ( focusedBeforeMount.current ) {
 			const isFocused = ref.current?.contains(
-				ref.current?.ownerDocument.activeElement ?? null
+				ref.current?.ownerDocument.activeElement
 			);
 
 			if ( ref.current?.isConnected && ! isFocused ) {
@@ -66,7 +64,7 @@ function useFocusReturn( onFocusReturn ) {
 			if ( onFocusReturnRef.current ) {
 				onFocusReturnRef.current();
 			} else {
-				focusedBeforeMount.current?.focus();
+				/** @type {HTMLElement} */ ( focusedBeforeMount.current )?.focus();
 			}
 		}
 	}, [] );
