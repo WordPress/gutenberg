@@ -225,7 +225,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return string the icon URI (maybe empty).
 	 */
 	private function get_icon( $html ) {
-		preg_match( '/<link.*href="(.*\.ico).*".*\/>/i', $html, $matches );
+		preg_match( '|<link.*?rel="\s*[shortcut]+(?:\s+[icon]+)*\s*".*?href="(.*?)".*?\/?>|is', $html, $matches );
 
 		$icon = isset( $matches[1] ) && is_string( $matches[1] ) ? trim( $matches[1] ) : '';
 
