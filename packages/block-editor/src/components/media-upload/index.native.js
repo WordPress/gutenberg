@@ -196,7 +196,7 @@ export class MediaUpload extends Component {
 					},
 					{
 						text: __( 'Apply' ),
-						onPress: ( url ) => onSelectURL( url ),
+						onPress: onSelectURL,
 					},
 				], // buttons
 				'plain-text', // type
