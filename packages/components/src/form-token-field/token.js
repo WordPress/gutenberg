@@ -15,7 +15,7 @@ import { closeSmall } from '@wordpress/icons';
  * Internal dependencies
  */
 import Button from '../button';
-import { VisuallyHidden } from '../visually-hidden';
+import VisuallyHidden from '../visually-hidden';
 
 export default function Token( {
 	value,

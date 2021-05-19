@@ -9,6 +9,7 @@
 @import "./components/manage-blocks-modal/style.scss";
 @import "./components/meta-boxes/meta-boxes-area/style.scss";
 @import "./components/preferences-modal/style.scss";
+@import "./components/secondary-sidebar/style.scss";
 @import "./components/sidebar/style.scss";
 @import "./components/sidebar/last-revision/style.scss";
 @import "./components/sidebar/post-author/style.scss";
@@ -66,7 +67,7 @@ body.block-editor-page {
 .editor-post-publish-panel,
 .components-popover,
 .components-modal__frame,
-.edit-post-layout__inserter-panel {
+.edit-post-editor__inserter-panel {
 	@include reset;
 }
 

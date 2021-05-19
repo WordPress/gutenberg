@@ -1,0 +1,35 @@
+.edit-widgets-more-menu {
+	margin-left: -4px;
+
+	// the padding and margin of the more menu is intentionally non-standard
+	.components-button {
+		width: auto;
+		padding: 0 2px;
+	}
+
+	@include break-small() {
+		margin-left: 0;
+
+		.components-button {
+			padding: 0 4px;
+		}
+	}
+}
+
+.edit-widgets-more-menu__content .components-popover__content {
+	min-width: 280px;
+
+	// Let the menu scale to fit items.
+	@include break-mobile() {
+		width: auto;
+		max-width: $break-mobile;
+	}
+
+	.components-dropdown-menu__menu {
+		padding: 0;
+	}
+}
+
+.components-popover.edit-widgets-more-menu__content {
+	z-index: z-index(".components-popover.edit-widgets-more-menu__content");
+}

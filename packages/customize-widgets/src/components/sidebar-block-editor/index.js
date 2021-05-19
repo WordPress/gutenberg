@@ -28,6 +28,8 @@ import BlockInspectorButton from '../block-inspector-button';
 import Header from '../header';
 import useInserter from '../inserter/use-inserter';
 import SidebarEditorProvider from './sidebar-editor-provider';
+import { store as customizeWidgetsStore } from '../../store';
+import WelcomeGuide from '../welcome-guide';
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -36,11 +38,28 @@ export default function SidebarBlockEditor( {
 	inspector,
 } ) {
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
-	const hasUploadPermissions = useSelect(
-		( select ) =>
-			defaultTo( select( coreStore ).canUser( 'create', 'media' ), true ),
-		[]
-	);
+	const {
+		hasUploadPermissions,
+		isFixedToolbarActive,
+		keepCaretInsideBlock,
+		isWelcomeGuideActive,
+	} = useSelect( ( select ) => {
+		return {
+			hasUploadPermissions: defaultTo(
+				select( coreStore ).canUser( 'create', 'media' ),
+				true
+			),
+			isFixedToolbarActive: select(
+				customizeWidgetsStore
+			).__unstableIsFeatureActive( 'fixedToolbar' ),
+			keepCaretInsideBlock: select(
+				customizeWidgetsStore
+			).__unstableIsFeatureActive( 'keepCaretInsideBlock' ),
+			isWelcomeGuideActive: select(
+				customizeWidgetsStore
+			).__unstableIsFeatureActive( 'welcomeGuide' ),
+		};
+	}, [] );
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
 		if ( hasUploadPermissions ) {
@@ -57,8 +76,19 @@ export default function SidebarBlockEditor( {
 			...blockEditorSettings,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			mediaUpload: mediaUploadBlockEditor,
+			hasFixedToolbar: isFixedToolbarActive,
+			keepCaretInsideBlock,
 		};
-	}, [ hasUploadPermissions, blockEditorSettings ] );
+	}, [
+		hasUploadPermissions,
+		blockEditorSettings,
+		isFixedToolbarActive,
+		keepCaretInsideBlock,
+	] );
+
+	if ( isWelcomeGuideActive ) {
+		return <WelcomeGuide sidebar={ sidebar } />;
+	}
 
 	return (
 		<>
@@ -68,6 +98,7 @@ export default function SidebarBlockEditor( {
 				<BlockEditorKeyboardShortcuts />
 
 				<Header
+					isFixedToolbarActive={ isFixedToolbarActive }
 					inserter={ inserter }
 					isInserterOpened={ isInserterOpened }
 					setIsInserterOpened={ setIsInserterOpened }
