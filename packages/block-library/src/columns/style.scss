@@ -79,20 +79,24 @@
 		}
 	}
 
-	&.is-not-stacked-on-mobile > .wp-block-column {
-		// Available space should be divided equally amongst columns.
-		flex-basis: 0;
-		flex-grow: 1;
+	&.is-not-stacked-on-mobile {
+		flex-wrap: nowrap;
 
-		// Columns with an explicitly-assigned width should maintain their
-		// `flex-basis` width and not grow.
-		&[style*="flex-basis"] {
-			flex-grow: 0;
-		}
+		> .wp-block-column {
+			// Available space should be divided equally amongst columns.
+			flex-basis: 0;
+			flex-grow: 1;
 
-		// When columns are in a single row, add space before all except the first.
-		&:not(:first-child) {
-			margin-left: 2em;
+			// Columns with an explicitly-assigned width should maintain their
+			// `flex-basis` width and not grow.
+			&[style*="flex-basis"] {
+				flex-grow: 0;
+			}
+
+			// When columns are in a single row, add space before all except the first.
+			&:not(:first-child) {
+				margin-left: 2em;
+			}
 		}
 	}
 }
