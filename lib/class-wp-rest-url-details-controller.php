@@ -121,6 +121,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 				'title'       => $this->get_title( $remote_url_response ),
 				'icon'        => $this->get_icon( $remote_url_response ),
 				'description' => $this->get_description( $remote_url_response ),
+				'image'       => $this->get_image( $remote_url_response ),
 			),
 			$request
 		);
@@ -212,30 +213,30 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	private function get_title( $html ) {
 		preg_match( '|<\s*title[^>]*>(.*?)<\s*/\s*title>|is', $html, $match_title );
 
-		$title = isset( $match_title[1] ) ? trim( $match_title[1] ) : '';
+		$title = isset( $match_title[1] ) && is_string( $match_title[1] ) ? trim( $match_title[1] ) : '';
 
 		return $title;
 	}
 
 	/**
-	 * Parses the <title> contents from the provided HTML
+	 * Parses the site icon from the provided HTML
 	 *
 	 * @param string $html the HTML from the remote website at URL.
-	 * @return string the title tag contents (maybe empty).
+	 * @return string the icon URI (maybe empty).
 	 */
 	private function get_icon( $html ) {
 		preg_match( '/<link.*href="(.*\.ico).*".*\/>/i', $html, $matches );
 
-		$icon = isset( $matches[1] ) ? trim( $matches[1] ) : '';
+		$icon = isset( $matches[1] ) && is_string( $matches[1] ) ? trim( $matches[1] ) : '';
 
 		return $icon;
 	}
 
 	/**
-	 * Parses the meta description from the provide HTML.
+	 * Parses the meta description from the provided HTML.
 	 *
 	 * @param string $html the HTML from the remote website at URL.
-	 * @return string the title tag contents (maybe empty).
+	 * @return string the meta description contents (maybe empty).
 	 */
 	private function get_description( $html ) {
 		$description = '';
@@ -263,6 +264,20 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		fclose( $temp ); // clean up tmp file
 		return $description;
+	}
+
+	/**
+	 * Parses the Open Graph Image from the provided HTML.
+	 *
+	 * @param string $html the HTML from the remote website at URL.
+	 * @return string the OG image (maybe empty).
+	 */
+	private function get_image( $html ) {
+		preg_match( '|<meta.*?property="og:image.*?".*?content="(.*?)".*?\/?>|is', $html, $matches );
+
+		$image = isset( $matches[1] ) && is_string( $matches[1] ) ? trim( $matches[1] ) : '';
+
+		return $image;
 	}
 
 	/**
