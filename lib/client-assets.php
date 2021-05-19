@@ -709,7 +709,7 @@ if ( function_exists( 'get_block_editor_settings' ) ) {
  */
 function gutenberg_extend_block_editor_styles_html() {
 	$script_handles = array();
-	$handles        = array(
+	$style_handles  = array(
 		'wp-block-editor',
 		'wp-block-library',
 		'wp-edit-blocks',
@@ -719,11 +719,11 @@ function gutenberg_extend_block_editor_styles_html() {
 
 	foreach ( $block_registry->get_all_registered() as $block_type ) {
 		if ( ! empty( $block_type->style ) ) {
-			$handles[] = $block_type->style;
+			$style_handles[] = $block_type->style;
 		}
 
 		if ( ! empty( $block_type->editor_style ) ) {
-			$handles[] = $block_type->editor_style;
+			$style_handles[] = $block_type->editor_style;
 		}
 
 		if ( ! empty( $block_type->script ) ) {
@@ -731,13 +731,13 @@ function gutenberg_extend_block_editor_styles_html() {
 		}
 	}
 
-	$handles = array_unique( $handles );
-	$done    = wp_styles()->done;
+	$style_handles = array_unique( $style_handles );
+	$done          = wp_styles()->done;
 
 	ob_start();
 
 	wp_styles()->done = array();
-	wp_styles()->do_items( $handles );
+	wp_styles()->do_items( $style_handles );
 	wp_styles()->done = $done;
 
 	$styles = ob_get_clean();
