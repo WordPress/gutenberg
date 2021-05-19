@@ -23,7 +23,7 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 
 	return (
 		<kbd
-			className="edit-post-keyboard-shortcut-help-modal__shortcut-key-combination"
+			className="edit-widgets-keyboard-shortcut-help-modal__shortcut-key-combination"
 			aria-label={ forceAriaLabel || ariaLabel }
 		>
 			{ castArray( shortcut ).map( ( character, index ) => {
@@ -34,7 +34,7 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 				return (
 					<kbd
 						key={ index }
-						className="edit-post-keyboard-shortcut-help-modal__shortcut-key"
+						className="edit-widgets-keyboard-shortcut-help-modal__shortcut-key"
 					>
 						{ character }
 					</kbd>
@@ -47,10 +47,10 @@ function KeyCombination( { keyCombination, forceAriaLabel } ) {
 function Shortcut( { description, keyCombination, aliases = [], ariaLabel } ) {
 	return (
 		<>
-			<div className="edit-post-keyboard-shortcut-help-modal__shortcut-description">
+			<div className="edit-widgets-keyboard-shortcut-help-modal__shortcut-description">
 				{ description }
 			</div>
-			<div className="edit-post-keyboard-shortcut-help-modal__shortcut-term">
+			<div className="edit-widgets-keyboard-shortcut-help-modal__shortcut-term">
 				<KeyCombination
 					keyCombination={ keyCombination }
 					forceAriaLabel={ ariaLabel }

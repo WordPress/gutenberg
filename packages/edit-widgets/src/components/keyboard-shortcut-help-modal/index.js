@@ -29,12 +29,12 @@ const ShortcutList = ( { shortcuts } ) => (
 	 */
 	/* eslint-disable jsx-a11y/no-redundant-roles */
 	<ul
-		className="edit-post-keyboard-shortcut-help-modal__shortcut-list"
+		className="edit-widgets-keyboard-shortcut-help-modal__shortcut-list"
 		role="list"
 	>
 		{ shortcuts.map( ( shortcut, index ) => (
 			<li
-				className="edit-post-keyboard-shortcut-help-modal__shortcut"
+				className="edit-widgets-keyboard-shortcut-help-modal__shortcut"
 				key={ index }
 			>
 				{ isString( shortcut ) ? (
@@ -51,12 +51,12 @@ const ShortcutList = ( { shortcuts } ) => (
 const ShortcutSection = ( { title, shortcuts, className } ) => (
 	<section
 		className={ classnames(
-			'edit-post-keyboard-shortcut-help-modal__section',
+			'edit-widgets-keyboard-shortcut-help-modal__section',
 			className
 		) }
 	>
 		{ !! title && (
-			<h2 className="edit-post-keyboard-shortcut-help-modal__section-title">
+			<h2 className="edit-widgets-keyboard-shortcut-help-modal__section-title">
 				{ title }
 			</h2>
 		) }
@@ -90,7 +90,7 @@ export default function KeyboardShortcutHelpModal( {
 	isModalActive,
 	toggleModal,
 } ) {
-	useShortcut( 'core/edit-post/keyboard-shortcuts', toggleModal, {
+	useShortcut( 'core/edit-widgets/keyboard-shortcuts', toggleModal, {
 		bindGlobal: true,
 	} );
 
@@ -100,13 +100,13 @@ export default function KeyboardShortcutHelpModal( {
 
 	return (
 		<Modal
-			className="edit-post-keyboard-shortcut-help-modal"
+			className="edit-widgets-keyboard-shortcut-help-modal"
 			title={ __( 'Keyboard shortcuts' ) }
 			closeLabel={ __( 'Close' ) }
 			onRequestClose={ toggleModal }
 		>
 			<ShortcutSection
-				className="edit-post-keyboard-shortcut-help-modal__main-shortcuts"
+				className="edit-widgets-keyboard-shortcut-help-modal__main-shortcuts"
 				shortcuts={ [ 'core/edit-widgets/keyboard-shortcuts' ] }
 			/>
 			<ShortcutCategorySection

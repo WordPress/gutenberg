@@ -1,9 +1,9 @@
-.edit-post-keyboard-shortcut-help-modal {
+.edit-widgets-keyboard-shortcut-help-modal {
 	&__section {
 		margin: 0 0 2rem 0;
 	}
 
-	&__main-shortcuts .edit-post-keyboard-shortcut-help-modal__shortcut-list {
+	&__main-shortcuts .edit-widgets-keyboard-shortcut-help-modal__shortcut-list {
 		// Push the shortcut to be flush with top modal header.
 		margin-top: -$grid-unit-30 -$border-width;
 	}
@@ -49,7 +49,7 @@
 		margin: 0;
 		padding: 0;
 
-		& + .edit-post-keyboard-shortcut-help-modal__shortcut-key-combination {
+		& + .edit-widgets-keyboard-shortcut-help-modal__shortcut-key-combination {
 			margin-top: 10px;
 		}
 	}
