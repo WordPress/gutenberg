@@ -58,13 +58,14 @@ export default function save( { attributes } ) {
 	}
 
 	const blockquoteTextColorClass = getColorClassName( 'color', textColor );
-	const blockquoteClasses = classnames( {
-		[ `has-text-align-${ textAlign }` ]: textAlign,
-		...( isTextColorSet && {
-			'has-text-color': true,
-			[ blockquoteTextColorClass ]: blockquoteTextColorClass,
-		} ),
-	} );
+	const blockquoteClasses =
+		classnames( {
+			[ `has-text-align-${ textAlign }` ]: textAlign,
+			...( isTextColorSet && {
+				'has-text-color': true,
+				[ blockquoteTextColorClass ]: blockquoteTextColorClass,
+			} ),
+		} ) || undefined;
 
 	const blockquoteStyles = blockquoteTextColorClass
 		? undefined
