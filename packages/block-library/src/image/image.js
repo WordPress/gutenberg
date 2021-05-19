@@ -16,27 +16,22 @@ import {
 	TextControl,
 	ToolbarButton,
 } from '@wordpress/components';
-import { useViewportMatch, usePrevious } from '@wordpress/compose';
+import { useViewportMatch } from '@wordpress/compose';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
 	BlockControls,
 	InspectorControls,
 	InspectorAdvancedControls,
-	RichText,
 	__experimentalImageSizeControl as ImageSizeControl,
 	__experimentalImageURLInputUI as ImageURLInputUI,
 	MediaReplaceFlow,
 	store as blockEditorStore,
 	BlockAlignmentControl,
 } from '@wordpress/block-editor';
-import { useEffect, useState, useRef } from '@wordpress/element';
+import { useEffect, useState } from '@wordpress/element';
 import { __, sprintf, isRTL } from '@wordpress/i18n';
 import { getPath } from '@wordpress/url';
-import {
-	createBlock,
-	getBlockType,
-	switchToBlockType,
-} from '@wordpress/blocks';
+import { getBlockType, switchToBlockType } from '@wordpress/blocks';
 import { crop, overlayText, upload } from '@wordpress/icons';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
@@ -66,7 +61,6 @@ export default function Image( {
 	attributes: {
 		url = '',
 		alt,
-		caption,
 		align,
 		id,
 		href,
@@ -81,15 +75,12 @@ export default function Image( {
 	},
 	setAttributes,
 	isSelected,
-	insertBlocksAfter,
 	onReplace,
 	onSelectImage,
 	onSelectURL,
 	onUploadError,
 	containerRef,
 } ) {
-	const captionRef = useRef();
-	const prevUrl = usePrevious( url );
 	const { block, currentId, image, multiImageSelection } = useSelect(
 		( select ) => {
 			const { getMedia } = select( coreStore );
@@ -107,8 +98,8 @@ export default function Image( {
 				multiImageSelection:
 					multiSelectedClientIds.length &&
 					multiSelectedClientIds.every(
-						( clientId ) =>
-							getBlockName( clientId ) === 'core/image'
+						( _clientId ) =>
+							getBlockName( _clientId ) === 'core/image'
 					),
 			};
 		},
@@ -159,16 +150,6 @@ export default function Image( {
 			.then( ( response ) => response.blob() )
 			.then( ( blob ) => setExternalBlob( blob ) );
 	}, [ id, url, isSelected, externalBlob ] );
-
-	// Focus the caption after inserting an image from the placeholder. This is
-	// done to preserve the behaviour of focussing the first tabbable element
-	// when a block is mounted. Previously, the image block would remount when
-	// the placeholder is removed. Maybe this behaviour could be removed.
-	useEffect( () => {
-		if ( url && ! prevUrl && isSelected ) {
-			captionRef.current.focus();
-		}
-	}, [ url, prevUrl ] );
 
 	function onResizeStart() {
 		toggleSelection( false );
@@ -537,22 +518,6 @@ export default function Image( {
 				which causes duplicated image upload. */ }
 			{ ! temporaryURL && controls }
 			{ img }
-			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
-				<RichText
-					ref={ captionRef }
-					tagName="figcaption"
-					aria-label={ __( 'Image caption text' ) }
-					placeholder={ __( 'Add caption' ) }
-					value={ caption }
-					onChange={ ( value ) =>
-						setAttributes( { caption: value } )
-					}
-					inlineToolbar
-					__unstableOnSplitAtEnd={ () =>
-						insertBlocksAfter( createBlock( 'core/paragraph' ) )
-					}
-				/>
-			) }
 		</ImageEditingProvider>
 	);
 }

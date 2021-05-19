@@ -12,15 +12,15 @@
 		outline: 1px solid transparent;
 	}
 
-	.block-editor-default-block-appender__content {
-		// Set the opacity of the initial block appender to the same as placeholder text in an empty Paragraph block.
-		opacity: 0.62;
-	}
-
 	// Dropzone.
 	.components-drop-zone__content-icon {
 		display: none;
 	}
+}
+
+.block-editor-default-block-appender__content {
+	// Set the opacity of the initial block appender to the same as placeholder text in an empty Paragraph block.
+	opacity: 0.62;
 }
 
 // Empty / default block side inserter.

@@ -17,6 +17,8 @@ import {
 	MediaPlaceholder,
 	useBlockProps,
 	store as blockEditorStore,
+	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
+	InnerBlocks,
 } from '@wordpress/block-editor';
 import { useEffect, useRef, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
@@ -80,6 +82,7 @@ export function ImageEdit( {
 	insertBlocksAfter,
 	noticeOperations,
 	onReplace,
+	clientId,
 } ) {
 	const {
 		url = '',
@@ -286,8 +289,30 @@ export function ImageEdit( {
 		className: classes,
 	} );
 
+	const hasInnerBlocks = useSelect(
+		( select ) =>
+			!! select( blockEditorStore ).getBlocks( clientId ).length,
+		[ clientId ]
+	);
+
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		allowedBlocks: [ 'core/caption' ],
+		renderAppender:
+			hasInnerBlocks || ! isSelected
+				? false
+				: () => (
+						<InnerBlocks.DefaultBlockAppender
+							rootClientId={ clientId }
+							tagName="figcaption"
+							withInserter={ false }
+							blockName={ 'core/caption' }
+							placeholder={ __( 'Caption text' ) }
+						/>
+				  ),
+	} );
+
 	return (
-		<figure { ...blockProps }>
+		<figure { ...innerBlocksProps }>
 			{ ( temporaryURL || url ) && (
 				<Image
 					temporaryURL={ temporaryURL }
@@ -300,6 +325,7 @@ export function ImageEdit( {
 					onSelectURL={ onSelectURL }
 					onUploadError={ onUploadError }
 					containerRef={ ref }
+					clientId={ clientId }
 				/>
 			) }
 			{ ! url && (
@@ -322,6 +348,7 @@ export function ImageEdit( {
 				mediaPreview={ mediaPreview }
 				disableMediaButtons={ temporaryURL || url }
 			/>
+			{ innerBlocksProps.children }
 		</figure>
 	);
 }

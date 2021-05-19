@@ -16,6 +16,7 @@ import {
  */
 import * as paragraph from './paragraph';
 import * as image from './image';
+import * as caption from './caption';
 import * as heading from './heading';
 import * as quote from './quote';
 import * as gallery from './gallery';
@@ -123,6 +124,7 @@ export const __experimentalGetCoreBlocks = () => [
 	// in various contexts — like the inserter and auto-complete components.
 	paragraph,
 	image,
+	caption,
 	heading,
 	gallery,
 	list,

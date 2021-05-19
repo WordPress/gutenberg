@@ -1,0 +1,23 @@
+{
+	"apiVersion": 2,
+	"name": "core/caption",
+	"title": "Caption",
+	"category": "design",
+	"parent": [
+		"core/image"
+	],
+	"description": "A caption for a figure.",
+	"textdomain": "default",
+	"attributes": {
+		"content": {
+			"type": "string",
+			"source": "html",
+			"selector": "figcaption",
+			"default": ""
+		}
+	},
+	"supports": {
+		"reusable": false,
+		"html": false
+	}
+}
