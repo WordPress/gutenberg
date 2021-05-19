@@ -124,11 +124,14 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 		$response = rest_get_server()->dispatch( $request );
 		$data     = $response->get_data();
 
-		// Note the <title> comes from the fixture HTML returned by
-		// the filter `pre_http_request`.
+		// Note the data in the subset comes from the fixture HTML returned by
+		// the filter `pre_http_request` (see this class's `setUp` method).
 		$this->assertArraySubset(
 			array(
-				'title' => 'Example Website &mdash; - with encoded content.',
+				'title'       => 'Example Website &mdash; - with encoded content.',
+				'icon'        => '//s.w.org/favicon.ico',
+				'description' => 'Example description text here. Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore.',
+				'image'       => 'https://s.w.org/images/home/screen-themes.png?3',
 			),
 			$data
 		);
