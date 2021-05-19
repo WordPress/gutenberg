@@ -37,6 +37,11 @@ export default function DeleteTemplate() {
 	if ( ! template || ! template.wp_id ) {
 		return null;
 	}
+	let templateTitle = template.slug;
+	if ( template?.title?.raw ) {
+		templateTitle = template.title.raw;
+	}
+
 	return (
 		<MenuGroup className="edit-post-template-top-area__second-menu-group">
 			<MenuItem
