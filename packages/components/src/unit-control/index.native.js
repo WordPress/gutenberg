@@ -177,4 +177,5 @@ function UnitControl( {
 	);
 }
 
+export { useCustomUnits } from './utils';
 export default memo( withPreferredColorScheme( UnitControl ) );
