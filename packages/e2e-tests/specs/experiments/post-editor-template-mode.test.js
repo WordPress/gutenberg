@@ -80,7 +80,7 @@ const createNewTemplate = async ( templateName ) => {
 	await disableTemplateWelcomeGuide();
 };
 
-describe( 'Post Editor Template mode', () => {
+describe.skip( 'Post Editor Template mode', () => {
 	beforeAll( async () => {
 		await trashAllPosts( 'wp_template' );
 		await trashAllPosts( 'wp_template_part' );
