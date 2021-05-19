@@ -125,12 +125,14 @@ function DuotonePanel( { attributes, setAttributes } ) {
 
 	const duotonePalette = useSetting( 'color.duotone' );
 	const colorPalette = useSetting( 'color.palette' );
+	const disableCustomColors = ! useSetting( 'color.custom' );
 
 	return (
 		<BlockControls group="block">
 			<DuotoneControl
 				duotonePalette={ duotonePalette }
 				colorPalette={ colorPalette }
+				disableCustomColors={ disableCustomColors }
 				value={ duotone }
 				onChange={ ( newDuotone ) => {
 					const newStyle = {

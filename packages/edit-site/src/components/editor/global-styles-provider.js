@@ -15,6 +15,7 @@ import {
 } from '@wordpress/element';
 import {
 	__EXPERIMENTAL_STYLE_PROPERTY as STYLE_PROPERTY,
+	__EXPERIMENTAL_ELEMENTS as ELEMENTS,
 	store as blocksStore,
 } from '@wordpress/blocks';
 import { useEntityProp } from '@wordpress/core-data';
@@ -24,7 +25,6 @@ import { useSelect, useDispatch } from '@wordpress/data';
  * Internal dependencies
  */
 import {
-	ELEMENTS,
 	ROOT_BLOCK_NAME,
 	ROOT_BLOCK_SELECTOR,
 	ROOT_BLOCK_SUPPORTS,
@@ -198,9 +198,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 				setContent( JSON.stringify( newContent ) );
 			},
 			getStyle: ( context, propertyName, origin = 'merged' ) => {
-				const propertyPath =
-					STYLE_PROPERTY[ propertyName ].valueGlobal ??
-					STYLE_PROPERTY[ propertyName ].value;
+				const propertyPath = STYLE_PROPERTY[ propertyName ].value;
 				const path =
 					context === ROOT_BLOCK_NAME
 						? propertyPath
@@ -230,9 +228,7 @@ export default function GlobalStylesProvider( { children, baseStyles } ) {
 					ROOT_BLOCK_NAME === context
 						? [ 'styles' ]
 						: [ 'styles', 'blocks', context ];
-				const propertyPath =
-					STYLE_PROPERTY[ propertyName ].valueGlobal ??
-					STYLE_PROPERTY[ propertyName ].value;
+				const propertyPath = STYLE_PROPERTY[ propertyName ].value;
 
 				let newStyles = get( newContent, path );
 				if ( ! newStyles ) {

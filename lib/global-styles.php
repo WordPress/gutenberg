@@ -88,8 +88,13 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		$context = 'site-editor';
 	}
 
-	if ( defined( 'REST_REQUEST' ) && REST_REQUEST ) {
-		$context = 'rest-request';
+	if (
+		defined( 'REST_REQUEST' ) &&
+		REST_REQUEST &&
+		isset( $_GET['context'] ) &&
+		'mobile' === $_GET['context']
+	) {
+		$context = 'mobile';
 	}
 
 	$origin = 'theme';
@@ -102,7 +107,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 	}
 	$consolidated = WP_Theme_JSON_Resolver::get_merged_data( $settings, $origin );
 
-	if ( 'rest-request' === $context ) {
+	if ( 'mobile' === $context ) {
 		$settings['__experimentalStyles'] = $consolidated->get_raw_data()['styles'];
 	}
 
@@ -116,7 +121,7 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 
 	if (
 		'site-editor' !== $context &&
-		'rest-request' !== $context &&
+		'mobile' !== $context &&
 		( WP_Theme_JSON_Resolver::theme_has_support() || get_theme_support( 'experimental-link-color' ) )
 	) {
 		$block_styles  = array( 'css' => gutenberg_experimental_global_styles_get_stylesheet( $consolidated, 'block_styles' ) );

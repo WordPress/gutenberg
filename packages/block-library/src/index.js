@@ -183,7 +183,6 @@ export const __experimentalGetCoreBlocks = () => [
 
 	postTitle,
 	postContent,
-	postAuthor,
 	postDate,
 	postExcerpt,
 	postFeaturedImage,
@@ -243,6 +242,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					...( enableFSEBlocks
 						? [
 								templatePart,
+								postAuthor,
 								postComment,
 								postCommentAuthor,
 								postCommentContent,

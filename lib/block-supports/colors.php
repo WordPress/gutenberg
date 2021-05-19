@@ -99,24 +99,6 @@ function gutenberg_apply_colors_support( $block_type, $block_attributes ) {
 		}
 	}
 
-	// Link Colors.
-	if ( $has_link_colors_support ) {
-		$has_link_color = isset( $block_attributes['style']['color']['link'] );
-		// Apply required class and style.
-		if ( $has_link_color ) {
-			$classes[] = 'has-link-color';
-			// If link is a named color.
-			if ( strpos( $block_attributes['style']['color']['link'], 'var:preset|color|' ) !== false ) {
-				// Get the name from the string and add proper styles.
-				$index_to_splice = strrpos( $block_attributes['style']['color']['link'], '|' ) + 1;
-				$link_color_name = substr( $block_attributes['style']['color']['link'], $index_to_splice );
-				$styles[]        = sprintf( '--wp--style--color--link: var(--wp--preset--color--%s);', $link_color_name );
-			} else {
-				$styles[] = sprintf( '--wp--style--color--link: %s;', $block_attributes['style']['color']['link'] );
-			}
-		}
-	}
-
 	// Background colors.
 	if ( $has_background_colors_support ) {
 		$has_named_background_color  = array_key_exists( 'backgroundColor', $block_attributes );
