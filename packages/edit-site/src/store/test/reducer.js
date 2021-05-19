@@ -180,22 +180,7 @@ describe( 'state', () => {
 			} );
 		} );
 
-		it( 'should change the menu to root when closing the panel', () => {
-			const state = navigationPanel(
-				undefined,
-				openNavigationPanelToMenu( 'test-menu' )
-			);
-
-			expect( state.menu ).toEqual( 'test-menu' );
-			expect(
-				navigationPanel( state, setIsNavigationPanelOpened( false ) )
-			).toEqual( {
-				isOpen: false,
-				menu: 'root',
-			} );
-		} );
-
-		it( 'should close the navigation panel when opening the inserter and change the menu to root', () => {
+		it( 'should close the navigation panel when opening the inserter', () => {
 			const state = navigationPanel(
 				undefined,
 				openNavigationPanelToMenu( 'test-menu' )
@@ -206,11 +191,11 @@ describe( 'state', () => {
 				navigationPanel( state, setIsInserterOpened( true ) )
 			).toEqual( {
 				isOpen: false,
-				menu: 'root',
+				menu: 'test-menu',
 			} );
 		} );
 
-		it( 'should close the navigation panel when opening the list view and change the menu to root', () => {
+		it( 'should close the navigation panel when opening the list view', () => {
 			const state = navigationPanel(
 				undefined,
 				openNavigationPanelToMenu( 'test-menu' )
@@ -221,7 +206,7 @@ describe( 'state', () => {
 				navigationPanel( state, setIsListViewOpened( true ) )
 			).toEqual( {
 				isOpen: false,
-				menu: 'root',
+				menu: 'test-menu',
 			} );
 		} );
 
