@@ -3,7 +3,7 @@
  */
 import { useSelect, useDispatch } from '@wordpress/data';
 import { __, _x } from '@wordpress/i18n';
-import { Button, ToolbarItem } from '@wordpress/components';
+import { Button, ToolbarItem, VisuallyHidden } from '@wordpress/components';
 import {
 	BlockNavigationDropdown,
 	NavigableToolbar,
@@ -25,7 +25,7 @@ import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area
 import { store as editWidgetsStore } from '../../store';
 
 function Header() {
-	const isWideViewport = useViewportMatch( 'wide' );
+	const isMediumViewport = useViewportMatch( 'medium' );
 	const inserterButton = useRef();
 	const widgetAreaClientId = useLastSelectedWidgetArea();
 	const isLastSelectedWidgetAreaOpen = useSelect(
@@ -66,9 +66,19 @@ function Header() {
 		<>
 			<div className="edit-widgets-header">
 				<div className="edit-widgets-header__navigable-toolbar-wrapper">
-					<h1 className="edit-widgets-header__title">
-						{ __( 'Widgets' ) }
-					</h1>
+					{ isMediumViewport && (
+						<h1 className="edit-widgets-header__title">
+							{ __( 'Widgets' ) }
+						</h1>
+					) }
+					{ ! isMediumViewport && (
+						<VisuallyHidden
+							as="h1"
+							className="edit-widgets-header__title"
+						>
+							{ __( 'Widgets' ) }
+						</VisuallyHidden>
+					) }
 					<NavigableToolbar
 						className="edit-widgets-header-toolbar"
 						aria-label={ __( 'Document tools' ) }
@@ -91,7 +101,7 @@ function Header() {
 								'Generic label for block inserter button'
 							) }
 						/>
-						{ isWideViewport && (
+						{ isMediumViewport && (
 							<>
 								<UndoButton />
 								<RedoButton />
