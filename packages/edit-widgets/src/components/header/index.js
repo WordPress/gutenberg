@@ -12,6 +12,7 @@ import {
 import { PinnedItems } from '@wordpress/interface';
 import { plus } from '@wordpress/icons';
 import { useRef } from '@wordpress/element';
+import { useViewportMatch } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -24,6 +25,7 @@ import useLastSelectedWidgetArea from '../../hooks/use-last-selected-widget-area
 import { store as editWidgetsStore } from '../../store';
 
 function Header() {
+	const isWideViewport = useViewportMatch( 'wide' );
 	const inserterButton = useRef();
 	const widgetAreaClientId = useLastSelectedWidgetArea();
 	const isLastSelectedWidgetAreaOpen = useSelect(
@@ -89,9 +91,13 @@ function Header() {
 								'Generic label for block inserter button'
 							) }
 						/>
-						<UndoButton />
-						<RedoButton />
-						<ToolbarItem as={ BlockNavigationDropdown } />
+						{ isWideViewport && (
+							<>
+								<UndoButton />
+								<RedoButton />
+								<ToolbarItem as={ BlockNavigationDropdown } />
+							</>
+						) }
 					</NavigableToolbar>
 				</div>
 				<div className="edit-widgets-header__actions">
