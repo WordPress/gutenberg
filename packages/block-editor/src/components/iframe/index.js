@@ -56,7 +56,9 @@ function styleSheetsCompat( doc ) {
 		if ( isMatch && ! doc.getElementById( ownerNode.id ) ) {
 			// eslint-disable-next-line no-console
 			console.error(
-				`Stylesheet ${ ownerNode.id } should be added as an editor style.`,
+				`Stylesheet ${ ownerNode.id } was not properly added.
+For blocks, use the block API's style (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#style) or editorStyle (https://developer.wordpress.org/block-editor/reference-guides/block-api/block-metadata/#editor-style).
+For themes, use add_editor_style (https://developer.wordpress.org/block-editor/how-to-guides/themes/theme-support/#editor-styles).`,
 				ownerNode
 			);
 			doc.head.appendChild( ownerNode.cloneNode( true ) );
