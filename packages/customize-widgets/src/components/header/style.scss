@@ -1,13 +1,20 @@
 .customize-widgets-header {
 	@include break-medium() {
-		// The mobile fixed block toolbar should be snug under the header.
+		// Make space for the floating toolbar.
 		margin-bottom: $grid-unit-60 + $default-block-margin;
 	}
 
+	&.is-fixed-toolbar-active {
+		// Top toolbar mode toolbar should be right under the header.
+		margin-bottom: 0;
+	}
+
+	display: flex;
+	justify-content: flex-end;
+
 	// Offset the customizer's sidebar padding.
-	// Provide enough bottom margin to ensure the floating block toolbar isn't overlapped.
+	// Zero bottom margin so that the fixed toolbar is right under the header.
 	margin: -15px ( -$grid-unit-15 ) ( 0 ) ( -$grid-unit-15 );
-	padding: $grid-unit-15;
 
 	// Match the customizer grey background.
 	background: #f0f0f1;
@@ -26,7 +33,7 @@
 		padding: 0;
 		min-width: $grid-unit-30;
 		height: $grid-unit-30;
-		margin-left: auto;
+		margin: $grid-unit-15 0 $grid-unit-15;
 
 		&::before {
 			content: none;
