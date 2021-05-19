@@ -24,7 +24,7 @@ import classnames from 'classnames';
  */
 import { __, _x, sprintf } from '@wordpress/i18n';
 import { useState, useEffect, Platform } from '@wordpress/element';
-import { useDispatch, useSelect, store as dataStore } from '@wordpress/data';
+import { useDispatch, useSelect } from '@wordpress/data';
 import { useBlockProps } from '@wordpress/block-editor';
 import { store as coreStore } from '@wordpress/core-data';
 import { View } from '@wordpress/primitives';
@@ -64,7 +64,7 @@ const EmbedEdit = ( props ) => {
 
 	const [ url, setURL ] = useState( attributesUrl );
 	const [ isEditingURL, setIsEditingURL ] = useState( false );
-	const { invalidateResolution } = useDispatch( dataStore );
+	const { invalidateResolution } = useDispatch( 'core/data' );
 
 	const {
 		preview,
