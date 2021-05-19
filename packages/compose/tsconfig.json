@@ -16,6 +16,7 @@
 		"src/higher-order/with-instance-id/**/*",
 		"src/hooks/use-async-list/**/*",
 		"src/hooks/use-constrained-tabbing/**/*",
+		"src/hooks/use-debounce/**/*",
 		"src/hooks/use-instance-id/**/*",
 		"src/utils/**/*"
 	]

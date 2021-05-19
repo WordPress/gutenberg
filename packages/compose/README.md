@@ -196,11 +196,11 @@ render in components in `useCallback`.
 
 _Parameters_
 
--   _args_ `...any`: Arguments passed to Lodash's `debounce`.
+-   _args_ `[TFunc, ...DebounceTailParameters]`: Arguments passed to Lodash's `debounce`.
 
 _Returns_
 
--   `Function`: Debounced function.
+-   `TFunc & import('lodash').Cancelable`: Debounced function.
 
 <a name="useFocusOnMount" href="#useFocusOnMount">#</a> **useFocusOnMount**
 
