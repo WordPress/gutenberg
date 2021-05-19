@@ -9,7 +9,14 @@ import { useRefEffect } from '@wordpress/compose';
  */
 import { store as blockEditorStore } from '../../store';
 
-export function useBlockSelectionClearer( onlySelfClicks = false ) {
+/**
+ * Pass the returned ref callback to an element that should clear block
+ * selection. Selection will only be cleared if the element is clicked directly,
+ * not if a child element is clicked.
+ *
+ * @return {import('react').RefCallback} Ref callback.
+ */
+export function useBlockSelectionClearer() {
 	const { hasSelectedBlock, hasMultiSelection } = useSelect(
 		blockEditorStore
 	);
@@ -22,11 +29,8 @@ export function useBlockSelectionClearer( onlySelfClicks = false ) {
 					return;
 				}
 
-				// Only handle clicks on the canvas, not the content.
-				if (
-					event.target.closest( '.wp-block' ) ||
-					( onlySelfClicks && event.target !== node )
-				) {
+				// Only handle clicks on the element, not the children.
+				if ( event.target !== node ) {
 					return;
 				}
 
