@@ -2,6 +2,10 @@
  * WordPress dependencies
  */
 import { useState } from '@wordpress/element';
+/**
+ * External dependencies
+ */
+import { boolean, number } from '@storybook/addon-knobs';
 
 /**
  * Internal dependencies
@@ -39,7 +43,11 @@ const Avatar = () => {
 
 const AnimatedAvatars = () => {
 	const [ isHover, setIsHover ] = useState( false );
-	const offset = isHover ? 0 : 20;
+	const hoveredOffset = number( 'offset', 20 );
+	const props = {
+		offset: isHover ? 0 : hoveredOffset,
+		isLayered: boolean( 'isLayerd', false ),
+	};
 
 	return (
 		<HStack>
@@ -47,7 +55,7 @@ const AnimatedAvatars = () => {
 				onMouseLeave={ () => setIsHover( false ) }
 				onMouseEnter={ () => setIsHover( true ) }
 			>
-				<ZStack isLayered={ false } offset={ offset }>
+				<ZStack { ...props }>
 					<Avatar />
 					<Avatar />
 					<Avatar />
