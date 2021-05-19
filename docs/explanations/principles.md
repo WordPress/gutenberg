@@ -43,6 +43,8 @@ Extensibility interfaces in Gutenberg favor:
 
 **Experimentation** - Often new APIs and interfaces clearly start as experimental while reliability and usability of different approaches are being tested. These experiments always begin with determining what problem is solved from the _creator_ perspective and seek to validate how it impacts the user workflow. The intent is to explore what generalizations of the creator's use-case are possible and to discover better abstractions before solidifying around the contract exposed to extension developers.
 
+For more information around currently built patterns for extensibility and key architectural concepts, see [this document](https://developer.wordpress.org/block-editor/explanations/architecture/key-concepts/)).
+
 
 ## Progressive Complexity
 
