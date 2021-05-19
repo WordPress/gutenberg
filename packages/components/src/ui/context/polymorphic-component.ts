@@ -3,11 +3,7 @@
  */
 // eslint-disable-next-line no-restricted-imports
 import type * as React from 'react';
-import type {
-	As,
-	// RenderProp,
-	// ExtractHTMLAttributes
-} from 'reakit-utils/types';
+import type { As } from 'reakit-utils/types';
 import type { Interpolation } from 'create-emotion';
 
 /**
@@ -16,7 +12,6 @@ import type { Interpolation } from 'create-emotion';
 export type PolymorphicComponentProps< P, T extends As > = P &
 	Omit< React.ComponentPropsWithRef< T >, 'as' | keyof P | 'children' > & {
 		as?: T | keyof JSX.IntrinsicElements;
-		// children?: React.ReactNode | RenderProp< ExtractHTMLAttributes< any > >;
 	};
 
 export type ElementTypeFromPolymorphicComponentProps<

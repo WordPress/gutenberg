@@ -73,6 +73,7 @@ export function useContextSystem( props, namespace ) {
 		finalComponentProps[ key ] = overrideProps[ key ];
 	}
 
+	// @ts-ignore
 	finalComponentProps.children = rendered;
 	finalComponentProps.className = classes;
 
