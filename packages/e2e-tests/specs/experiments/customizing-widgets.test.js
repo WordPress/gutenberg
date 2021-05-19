@@ -20,6 +20,20 @@ describe( 'Widgets Customizer', () => {
 	beforeEach( async () => {
 		await cleanupWidgets();
 		await visitAdminPage( 'customize.php' );
+
+		// Disable welcome guide if it is enabled.
+		const isWelcomeGuideActive = await page.evaluate( () =>
+			wp.data
+				.select( 'core/customize-widgets' )
+				.__unstableIsFeatureActive( 'welcomeGuide' )
+		);
+		if ( isWelcomeGuideActive ) {
+			await page.evaluate( () =>
+				wp.data
+					.dispatch( 'core/customize-widgets' )
+					.__unstableToggleFeature( 'welcomeGuide' )
+			);
+		}
 	} );
 
 	beforeAll( async () => {
@@ -28,7 +42,6 @@ describe( 'Widgets Customizer', () => {
 		await deactivatePlugin(
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
-		await setWidgetsCustomizerExperiment( true );
 	} );
 
 	afterAll( async () => {
@@ -36,7 +49,6 @@ describe( 'Widgets Customizer', () => {
 			'gutenberg-test-plugin-disables-the-css-animations'
 		);
 		await activateTheme( 'twentytwentyone' );
-		await setWidgetsCustomizerExperiment( false );
 	} );
 
 	it( 'should add blocks', async () => {
@@ -499,28 +511,6 @@ describe( 'Widgets Customizer', () => {
 		);
 	} );
 } );
-
-async function setWidgetsCustomizerExperiment( enabled ) {
-	await visitAdminPage( 'admin.php', 'page=gutenberg-experiments' );
-
-	const checkbox = await find( {
-		role: 'checkbox',
-		name: 'Enable Widgets screen in Customizer',
-	} );
-
-	const snapshot = await page.accessibility.snapshot( { root: checkbox } );
-
-	if ( snapshot.checked !== enabled ) {
-		await checkbox.click();
-	}
-
-	const submitButton = await find( {
-		role: 'button',
-		name: 'Save Changes',
-	} );
-
-	await Promise.all( [ submitButton.click(), page.waitForNavigation() ] );
-}
 
 /**
  * TODO: Deleting widgets in the new widgets screen seems to be unreliable.

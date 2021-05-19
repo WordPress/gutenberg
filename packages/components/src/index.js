@@ -131,8 +131,11 @@ export {
 } from './tree-grid';
 export { default as TreeSelect } from './tree-select';
 export { Truncate as __experimentalTruncate } from './truncate';
-export { default as __experimentalUnitControl } from './unit-control';
-export { VisuallyHidden } from './visually-hidden';
+export {
+	default as __experimentalUnitControl,
+	useCustomUnits as __experimentalUseCustomUnits,
+} from './unit-control';
+export { default as VisuallyHidden } from './visually-hidden';
 export { VStack as __experimentalVStack } from './v-stack';
 export { default as IsolatedEventContainer } from './isolated-event-container';
 export {

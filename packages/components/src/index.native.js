@@ -48,7 +48,10 @@ export { default as QueryControls } from './query-controls';
 export { default as Notice } from './notice';
 export { default as NoticeList } from './notice/list';
 export { default as RadioControl } from './radio-control';
-export { default as UnitControl } from './unit-control';
+export {
+	default as UnitControl,
+	useCustomUnits as __experimentalUseCustomUnits,
+} from './unit-control';
 export { default as Disabled } from './disabled';
 
 // Higher-Order Components
@@ -86,6 +89,7 @@ export { default as LinkPickerScreen } from './mobile/link-picker/link-picker-sc
 export { default as LinkSettings } from './mobile/link-settings';
 export { default as LinkSettingsScreen } from './mobile/link-settings/link-settings-screen';
 export { default as LinkSettingsNavigation } from './mobile/link-settings/link-settings-navigation';
+export { default as SegmentedControl } from './mobile/segmented-control';
 export { default as Image, IMAGE_DEFAULT_FOCAL_POINT } from './mobile/image';
 export { default as ImageEditingButton } from './mobile/image/image-editing-button';
 export { default as InserterButton } from './mobile/inserter-button';

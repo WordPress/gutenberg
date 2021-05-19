@@ -145,9 +145,9 @@ export function useRichText( {
 		forceRender();
 	}
 
-	function applyFromProps( { domOnly } = {} ) {
+	function applyFromProps() {
 		setRecordFromProps();
-		applyRecord( record.current, { domOnly } );
+		applyRecord( record.current );
 	}
 
 	const didMount = useRef( false );
@@ -201,12 +201,7 @@ export function useRichText( {
 			onSelectionChange,
 		} ),
 		useRefEffect( () => {
-			if ( didMount.current ) {
-				applyFromProps();
-			} else {
-				applyFromProps( { domOnly: true } );
-			}
-
+			applyFromProps();
 			didMount.current = true;
 		}, [ placeholder, ...__unstableDependencies ] ),
 	] );

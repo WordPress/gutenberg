@@ -590,4 +590,15 @@ describe( 'Multi-block selection', () => {
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );
+
+	// Previously we would unexpectedly duplicated the block on Enter.
+	it( 'should not multi select single block', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await page.keyboard.press( 'Enter' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
 } );

@@ -224,4 +224,5 @@ export const ItemTitleUI = styled( Text )`
 	${ () => ( isRTL() ? 'margin-left: auto;' : 'margin-right: auto;' ) }
 	font-size: 14px;
 	line-height: 20px;
+	color: inherit;
 `;
