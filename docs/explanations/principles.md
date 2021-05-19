@@ -25,7 +25,7 @@ Learning the ingredients of the interface happens once, but scales to hundreds o
 
 ### Accessible
 
-Being accessible is a holistic principle that embraces not only the desire that _everyone can work with Gutenberg interfaces no matter their ability_ but also that the improvements made are _equitable_ and improve the experience for _every_ user. This is a lofty challenge and definitely hard balance to get right - but already there is fruit being born in the improvements that have been made to the user interface over the last few years.
+Being accessible is a holistic principle that embraces not only the desire that _everyone can work with Gutenberg interfaces no matter their ability_ but also that the improvements made are _equitable_ and improve the experience for both those *creating* the content and those *consuming* the content. This is a lofty challenge and definitely hard balance to get right. As a canvas of expression, the project seeks to embrace the fact that users interacting with the software have distinct characteristics and preferences shaping helpful workflows for what they need to do.
 
 Modern web application development brings its own set of accessibility problems around standards and consistent application between browsers which often requires some unique solutions that might not be apparent on the first attempt. So we acknowledge that accessibility is not something that can be implemented statically but instead is an ongoing part of the interface creation and refinement.
 
