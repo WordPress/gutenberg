@@ -2,13 +2,13 @@
  * WordPress dependencies
  */
 import {
-	useCallback,
 	useContext,
 	useLayoutEffect,
 	useMemo,
 	useRef,
 	useState,
 } from '@wordpress/element';
+import { useRefEffect } from '@wordpress/compose';
 
 /**
  * Internal dependencies
@@ -34,7 +34,7 @@ export function useBlockRefProvider( clientId ) {
 			refs.delete( ref );
 		};
 	}, [ clientId ] );
-	return useCallback(
+	return useRefEffect(
 		( element ) => {
 			// Update the ref in the provider.
 			ref.current = element;
@@ -93,8 +93,7 @@ function useBlockRef( clientId ) {
  */
 function useBlockElement( clientId ) {
 	const { callbacks } = useContext( BlockRefs );
-	const ref = useBlockRef( clientId );
-	const [ element, setElement ] = useState( null );
+	const [ element, setElement ] = useState( useBlockRef( clientId ).current );
 
 	useLayoutEffect( () => {
 		if ( ! clientId ) {
@@ -107,7 +106,7 @@ function useBlockElement( clientId ) {
 		};
 	}, [ clientId ] );
 
-	return ref.current || element;
+	return element;
 }
 
 export { useBlockRef as __unstableUseBlockRef };
