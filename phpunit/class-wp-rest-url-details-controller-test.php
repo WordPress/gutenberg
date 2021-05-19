@@ -126,7 +126,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		// Note the <title> comes from the fixture HTML returned by
 		// the filter `pre_http_request`.
-		$this->assertEquals(
+		$this->assertArraySubset(
 			array(
 				'title' => 'Example Website &mdash; - with encoded content.',
 			),
@@ -385,7 +385,7 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 
 		// Instead of the default data retrieved we expect to see the modified
 		// data we provided via the filter.
-		$this->assertEquals(
+		$this->assertArraySubset(
 			array(
 				'title'    => 'Example Website &mdash; - with encoded content.',
 				'og_title' => 'This was manually added to the data via filter',
