@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { createPortal } from '@wordpress/element';
@@ -13,10 +18,19 @@ import { plus } from '@wordpress/icons';
 import Inserter from '../inserter';
 import MoreMenu from '../more-menu';
 
-function Header( { inserter, isInserterOpened, setIsInserterOpened } ) {
+function Header( {
+	inserter,
+	isInserterOpened,
+	setIsInserterOpened,
+	isFixedToolbarActive,
+} ) {
 	return (
 		<>
-			<div className="customize-widgets-header">
+			<div
+				className={ classnames( 'customize-widgets-header', {
+					'is-fixed-toolbar-active': isFixedToolbarActive,
+				} ) }
+			>
 				<NavigableToolbar
 					className="customize-widgets-header-toolbar"
 					aria-label={ __( 'Document tools' ) }

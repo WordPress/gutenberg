@@ -89,6 +89,7 @@ export default function SidebarBlockEditor( {
 				<BlockEditorKeyboardShortcuts />
 
 				<Header
+					isFixedToolbarActive={ isFixedToolbarActive }
 					inserter={ inserter }
 					isInserterOpened={ isInserterOpened }
 					setIsInserterOpened={ setIsInserterOpened }
