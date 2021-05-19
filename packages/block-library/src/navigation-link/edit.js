@@ -229,23 +229,16 @@ export default function NavigationLinkEdit( {
 		rel,
 		title,
 		kind,
+		textColor,
+		customTextColor,
+		backgroundColor,
+		customBackgroundColor,
 	} = attributes;
 	const link = {
 		url,
 		opensInNewTab,
 	};
-	const {
-		textColor,
-		customTextColor: navCustomTextColor,
-		backgroundColor,
-		customBackgroundColor: navCustomBackgroundColor,
-		overlayTextColor,
-		customOverlayTextColor,
-		overlayBackgroundColor,
-		customOverlayBackgroundColor,
-		style,
-		showSubmenuIcon,
-	} = context;
+	const { style, showSubmenuIcon } = context;
 	const { saveEntityRecord } = useDispatch( coreStore );
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const [ isLinkOpen, setIsLinkOpen ] = useState( false );
@@ -309,6 +302,52 @@ export default function NavigationLinkEdit( {
 		},
 		[ clientId ]
 	);
+
+	// Store the colors from context as attributes for rendering
+	useEffect( () => {
+		let textColorAttr = context.textColor,
+			backgroundColorAttr = context.backgroundColor,
+			customTextColorAttr = context.customTextColor || style?.color?.text,
+			customBackgroundAttr =
+				context.customBackgroundColor || style?.color?.background;
+
+		// Override colors for submenus if they have been set by the parent Navigation block
+		if ( ! isTopLevelLink ) {
+			if ( context.overlayTextColor ) {
+				textColorAttr = context.overlayTextColor;
+			}
+			if ( context.overlayBackgroundColor ) {
+				backgroundColorAttr = context.overlayBackgroundColor;
+			}
+
+			if ( context.customOverlayTextColor ) {
+				customTextColorAttr = context.customOverlayTextColor;
+			}
+
+			if ( context.customOverlayBackgroundColor ) {
+				customBackgroundAttr = context.customOverlayBackgroundColor;
+			}
+		}
+
+		setAttributes( {
+			textColor: textColorAttr,
+			backgroundColor: backgroundColorAttr,
+			customTextColor: customTextColorAttr,
+			customBackgroundColor: customBackgroundAttr,
+		} );
+	}, [
+		isTopLevelLink,
+		context.textColor,
+		context.overlayTextColor,
+		context.backgroundColor,
+		context.overlayBackgroundColor,
+		context.customTextColor,
+		context.customBackgroundColor,
+		context.customOverlayTextColor,
+		context.customOverlayBackgroundColor,
+		style?.color?.text,
+		style?.color?.background,
+	] );
 
 	/**
 	 * Insert a link block when submenu is added.
@@ -395,29 +434,6 @@ export default function NavigationLinkEdit( {
 		};
 	}
 
-	/*
-	 * Order of preference for colors:
-	 *
-	 * Overlay color (if this is in a submenu)
-	 * Navigation color
-	 * Global style
-	 */
-
-	const textColorSlug = ( ! isTopLevelLink && overlayTextColor ) || textColor;
-
-	const backgroundColorSlug =
-		( ! isTopLevelLink && overlayBackgroundColor ) || backgroundColor;
-
-	const customTextColor =
-		( ! isTopLevelLink && customOverlayTextColor ) ||
-		navCustomTextColor ||
-		style?.color?.text;
-
-	const customBackgroundColor =
-		( ! isTopLevelLink && customOverlayBackgroundColor ) ||
-		navCustomBackgroundColor ||
-		style?.color?.background;
-
 	const blockProps = useBlockProps( {
 		ref: listItemRef,
 		className: classnames( {
@@ -425,10 +441,10 @@ export default function NavigationLinkEdit( {
 			'is-dragging-within': isDraggingWithin,
 			'has-link': !! url,
 			'has-child': hasDescendants,
-			'has-text-color': !! textColorSlug || !! customTextColor,
-			[ `has-${ textColorSlug }-color` ]: !! textColorSlug,
-			'has-background': !! backgroundColorSlug || customBackgroundColor,
-			[ `has-${ backgroundColorSlug }-background-color` ]: !! backgroundColorSlug,
+			'has-text-color': !! textColor || !! customTextColor,
+			[ `has-${ textColor }-color` ]: !! textColor,
+			'has-background': !! backgroundColor || customBackgroundColor,
+			[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 		} ),
 		style: {
 			color: customTextColor,
@@ -444,27 +460,16 @@ export default function NavigationLinkEdit( {
 		{
 			className: classnames( 'wp-block-navigation-link__container', {
 				'is-parent-of-selected-block': isParentOfSelectedBlock,
-				'has-text-color': !! (
-					overlayTextColor ||
-					textColor ||
-					!! style?.color?.text
+				'has-text-color': !! ( textColor || customTextColor ),
+				[ `has-${ textColor }-color` ]: !! textColor,
+				'has-background': !! (
+					backgroundColor || customBackgroundColor
 				),
-				[ `has-${ overlayTextColor || textColor }-color` ]: !! (
-					overlayTextColor || textColor
-				),
-				'has-background':
-					!! overlayBackgroundColor ||
-					backgroundColor ||
-					!! style?.color?.background,
-				[ `has-${
-					overlayBackgroundColor || backgroundColor
-				}-background-color` ]: !! (
-					overlayBackgroundColor || backgroundColor
-				),
+				[ `has-${ backgroundColor }-background-color` ]: !! backgroundColor,
 			} ),
 			style: {
-				color: style?.color?.text,
-				backgroundColor: style?.color?.background,
+				color: customTextColor,
+				backgroundColor: customBackgroundColor,
 			},
 		},
 		{
