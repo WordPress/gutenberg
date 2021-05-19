@@ -1,7 +1,7 @@
 /**
  * WordPress dependencies
  */
-import { useSelect } from '@wordpress/data';
+import { useSelect, useDispatch } from '@wordpress/data';
 import { ExternalLink, Guide } from '@wordpress/components';
 import { __, sprintf, _n } from '@wordpress/i18n';
 import { createInterpolateElement } from '@wordpress/element';
@@ -19,20 +19,25 @@ import {
 import { store as editWidgetsStore } from '../../store';
 
 export default function WelcomeGuide() {
-	// const isActive = useSelect(
-	// 	( select ) => select( editWidgetsStore ).isFeatureActive( 'welcomeGuide' ),
-	// 	[]
-	// );
+	const isActive = useSelect(
+		( select ) =>
+			select( editWidgetsStore ).__unstableIsFeatureActive(
+				'welcomeGuide'
+			),
+		[]
+	);
 
-	// const { toggleFeature } = useDispatch( editWidgestStore );
-
-	// if ( ! isActive ) {
-	// 	return null;
-	// }
+	const { __unstableToggleFeature: toggleFeature } = useDispatch(
+		editWidgetsStore
+	);
 
 	const widgetAreas = useSelect( ( select ) =>
 		select( editWidgetsStore ).getWidgetAreas( { per_page: -1 } )
 	);
+
+	if ( ! isActive ) {
+		return null;
+	}
 
 	const isEntirelyBlockWidgets = widgetAreas?.every(
 		( widgetArea ) =>
@@ -52,7 +57,7 @@ export default function WelcomeGuide() {
 			className="edit-widgets-welcome-guide"
 			contentLabel={ __( 'Welcome to block Widgets' ) }
 			finishButtonText={ __( 'Get started' ) }
-			//onFinish={ () => toggleFeature( 'welcomeGuide' ) }
+			onFinish={ () => toggleFeature( 'welcomeGuide' ) }
 			pages={ [
 				{
 					image: <CanvasImage />,
