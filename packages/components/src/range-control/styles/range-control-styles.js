@@ -8,7 +8,7 @@ import styled from '@emotion/styled';
  * Internal dependencies
  */
 import NumberControl from '../../number-control';
-import { color, reduceMotion, rtl, space } from '../../utils/style-mixins';
+import { COLORS, reduceMotion, rtl, space } from '../../utils';
 
 const rangeHeight = () => css( { height: 30, minHeight: 30 } );
 const thumbSize = 20;
@@ -25,7 +25,7 @@ export const Root = styled.div`
 	width: 100%;
 `;
 
-const wrapperColor = ( { color: colorProp = color( 'ui.borderFocus' ) } ) => {
+const wrapperColor = ( { color: colorProp = COLORS.ui.borderFocus } ) => {
 	return css( { color: colorProp } );
 };
 const wrapperMargin = ( { marks } ) =>
@@ -33,7 +33,7 @@ const wrapperMargin = ( { marks } ) =>
 
 export const Wrapper = styled.div`
 	box-sizing: border-box;
-	color: ${ color( 'blue.medium.focus' ) };
+	color: ${ COLORS.blue.medium.focus };
 	display: block;
 	flex: 1;
 	padding-top: 15px;
@@ -63,7 +63,7 @@ const railBackgroundColor = ( { disabled, railColor } ) => {
 	let background = railColor || null;
 
 	if ( disabled ) {
-		background = color( 'lightGray.400' );
+		background = COLORS.lightGray[ 400 ];
 	}
 
 	return css( {
@@ -72,7 +72,7 @@ const railBackgroundColor = ( { disabled, railColor } ) => {
 };
 
 export const Rail = styled.span`
-	background-color: ${ color( 'lightGray.600' ) };
+	background-color: ${ COLORS.lightGray[ 600 ] };
 	box-sizing: border-box;
 	left: 0;
 	pointer-events: none;
@@ -90,7 +90,7 @@ const trackBackgroundColor = ( { disabled, trackColor } ) => {
 	let background = trackColor || 'currentColor';
 
 	if ( disabled ) {
-		background = color( 'lightGray.800' );
+		background = COLORS.lightGray[ 800 ];
 	}
 
 	return css( {
@@ -122,10 +122,10 @@ export const MarksWrapper = styled.span`
 `;
 
 const markFill = ( { disabled, isFilled } ) => {
-	let backgroundColor = isFilled ? 'currentColor' : color( 'lightGray.600' );
+	let backgroundColor = isFilled ? 'currentColor' : COLORS.lightGray[ 600 ];
 
 	if ( disabled ) {
-		backgroundColor = color( 'lightGray.800' );
+		backgroundColor = COLORS.lightGray[ 800 ];
 	}
 
 	return css( {
@@ -146,13 +146,13 @@ export const Mark = styled.span`
 
 const markLabelFill = ( { isFilled } ) => {
 	return css( {
-		color: isFilled ? color( 'darkGray.300' ) : color( 'lightGray.600' ),
+		color: isFilled ? COLORS.darkGray[ 300 ] : COLORS.lightGray[ 600 ],
 	} );
 };
 
 export const MarkLabel = styled.span`
 	box-sizing: border-box;
-	color: ${ color( 'lightGray.600' ) };
+	color: ${ COLORS.lightGray[ 600 ] };
 	left: 0;
 	font-size: 11px;
 	position: absolute;
@@ -182,12 +182,10 @@ export const ThumbWrapper = styled.span`
 
 const thumbFocus = ( { isFocused } ) => {
 	return css( {
-		borderColor: isFocused
-			? color( 'ui.borderFocus' )
-			: color( 'darkGray.200' ),
+		borderColor: isFocused ? COLORS.ui.borderFocus : COLORS.darkGray[ 200 ],
 		boxShadow: isFocused
 			? `
-				0 0 0 1px ${ color( 'ui.borderFocus' ) }
+				0 0 0 1px ${ COLORS.ui.borderFocus }
 			`
 			: `
 				0 0 0 rgba(0, 0, 0, 0)
@@ -199,7 +197,7 @@ export const Thumb = styled.span`
 	align-items: center;
 	background-color: white;
 	border-radius: 50%;
-	border: 1px solid ${ color( 'darkGray.200' ) };
+	border: 1px solid ${ COLORS.darkGray[ 200 ] };
 	box-sizing: border-box;
 	height: 100%;
 	outline: 0;
@@ -246,7 +244,7 @@ const tooltipPosition = ( { position } ) => {
 };
 
 export const Tooltip = styled.span`
-	background: ${ color( 'ui.border' ) };
+	background: ${ COLORS.ui.border };
 	border-radius: 2px;
 	box-sizing: border-box;
 	color: white;

@@ -111,7 +111,7 @@ function GalleryEdit( props ) {
 		};
 	} );
 
-	const { resizedImages } = useMemo( () => {
+	const resizedImages = useMemo( () => {
 		if ( isSelected ) {
 			return reduce(
 				attributes.ids,
@@ -295,10 +295,6 @@ function GalleryEdit( props ) {
 			: __( 'Thumbnails are not cropped.' );
 	}
 
-	function onFocusGalleryCaption() {
-		setSelectedImage();
-	}
-
 	function setImageAttributes( index, newAttributes ) {
 		if ( ! images[ index ] ) {
 			return;
@@ -466,7 +462,6 @@ function GalleryEdit( props ) {
 				onSelectImage={ onSelectImage }
 				onDeselectImage={ onDeselectImage }
 				onSetImageAttributes={ setImageAttributes }
-				onFocusGalleryCaption={ onFocusGalleryCaption }
 				blockProps={ blockProps }
 			/>
 		</>

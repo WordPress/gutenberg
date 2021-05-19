@@ -1,9 +1,14 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { createPortal } from '@wordpress/element';
 import { __, _x } from '@wordpress/i18n';
-import { Button, ToolbarItem } from '@wordpress/components';
+import { ToolbarButton } from '@wordpress/components';
 import { NavigableToolbar } from '@wordpress/block-editor';
 import { plus } from '@wordpress/icons';
 
@@ -11,17 +16,26 @@ import { plus } from '@wordpress/icons';
  * Internal dependencies
  */
 import Inserter from '../inserter';
+import MoreMenu from '../more-menu';
 
-function Header( { inserter, isInserterOpened, setIsInserterOpened } ) {
+function Header( {
+	inserter,
+	isInserterOpened,
+	setIsInserterOpened,
+	isFixedToolbarActive,
+} ) {
 	return (
 		<>
-			<div className="customize-widgets-header">
+			<div
+				className={ classnames( 'customize-widgets-header', {
+					'is-fixed-toolbar-active': isFixedToolbarActive,
+				} ) }
+			>
 				<NavigableToolbar
 					className="customize-widgets-header-toolbar"
 					aria-label={ __( 'Document tools' ) }
 				>
-					<ToolbarItem
-						as={ Button }
+					<ToolbarButton
 						className="customize-widgets-header-toolbar__inserter-toggle"
 						isPressed={ isInserterOpened }
 						isPrimary
@@ -34,6 +48,7 @@ function Header( { inserter, isInserterOpened, setIsInserterOpened } ) {
 							setIsInserterOpened( ( isOpen ) => ! isOpen );
 						} }
 					/>
+					<MoreMenu />
 				</NavigableToolbar>
 			</div>
 

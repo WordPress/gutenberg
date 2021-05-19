@@ -6,7 +6,12 @@ import { escapeRegExp, find, deburr } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { renderToString, useEffect, useState } from '@wordpress/element';
+import {
+	renderToString,
+	useEffect,
+	useState,
+	useRef,
+} from '@wordpress/element';
 import {
 	ENTER,
 	ESCAPE,
@@ -17,7 +22,12 @@ import {
 	BACKSPACE,
 } from '@wordpress/keycodes';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { useInstanceId } from '@wordpress/compose';
+import {
+	useInstanceId,
+	useDebounce,
+	useMergeRefs,
+	useRefEffect,
+} from '@wordpress/compose';
 import {
 	create,
 	slice,
@@ -25,12 +35,12 @@ import {
 	isCollapsed,
 	getTextContent,
 } from '@wordpress/rich-text';
+import { speak } from '@wordpress/a11y';
 
 /**
  * Internal dependencies
  */
 import { getAutoCompleterUI } from './autocompleter-ui';
-import withSpokenMessages from '../higher-order/with-spoken-messages';
 
 /**
  * A raw completer option.
@@ -108,17 +118,15 @@ import withSpokenMessages from '../higher-order/with-spoken-messages';
  * @property {FnGetOptionCompletion} getOptionCompletion get the completion associated with a given option.
  */
 
-function Autocomplete( {
-	children,
-	isSelected,
+function useAutocomplete( {
 	record,
 	onChange,
 	onReplace,
 	completers,
-	debouncedSpeak,
 	contentRef,
 } ) {
-	const instanceId = useInstanceId( Autocomplete );
+	const debouncedSpeak = useDebounce( speak, 500 );
+	const instanceId = useInstanceId( useAutocomplete );
 	const [ selectedIndex, setSelectedIndex ] = useState( 0 );
 	const [ filteredOptions, setFilteredOptions ] = useState( [] );
 	const [ filterValue, setFilterValue ] = useState( '' );
@@ -367,30 +375,61 @@ function Autocomplete( {
 		? `components-autocomplete-item-${ instanceId }-${ selectedKey }`
 		: null;
 
+	return {
+		listBoxId,
+		activeId,
+		onKeyDown: handleKeyDown,
+		popover: AutocompleterUI && (
+			<AutocompleterUI
+				className={ className }
+				filterValue={ filterValue }
+				instanceId={ instanceId }
+				listBoxId={ listBoxId }
+				selectedIndex={ selectedIndex }
+				onChangeOptions={ onChangeOptions }
+				onSelect={ select }
+				value={ record }
+				contentRef={ contentRef }
+				reset={ reset }
+			/>
+		),
+	};
+}
+
+export function useAutocompleteProps( options ) {
+	const ref = useRef();
+	const onKeyDownRef = useRef();
+	const { popover, listBoxId, activeId, onKeyDown } = useAutocomplete( {
+		...options,
+		contentRef: ref,
+	} );
+	onKeyDownRef.current = onKeyDown;
+	return {
+		ref: useMergeRefs( [
+			ref,
+			useRefEffect( ( element ) => {
+				function _onKeyDown( event ) {
+					onKeyDownRef.current( event );
+				}
+				element.addEventListener( 'keydown', _onKeyDown );
+				return () => {
+					element.removeEventListener( 'keydown', _onKeyDown );
+				};
+			}, [] ),
+		] ),
+		children: popover,
+		'aria-autocomplete': listBoxId ? 'list' : undefined,
+		'aria-owns': listBoxId,
+		'aria-activedescendant': activeId,
+	};
+}
+
+export default function Autocomplete( { children, isSelected, ...options } ) {
+	const { popover, ...props } = useAutocomplete( options );
 	return (
 		<>
-			{ children( {
-				isExpanded,
-				listBoxId,
-				activeId,
-				onKeyDown: handleKeyDown,
-			} ) }
-			{ isSelected && AutocompleterUI && (
-				<AutocompleterUI
-					className={ className }
-					filterValue={ filterValue }
-					instanceId={ instanceId }
-					listBoxId={ listBoxId }
-					selectedIndex={ selectedIndex }
-					onChangeOptions={ onChangeOptions }
-					onSelect={ select }
-					value={ record }
-					contentRef={ contentRef }
-					reset={ reset }
-				/>
-			) }
+			{ children( props ) }
+			{ isSelected && popover }
 		</>
 	);
 }
-
-export default withSpokenMessages( Autocomplete );

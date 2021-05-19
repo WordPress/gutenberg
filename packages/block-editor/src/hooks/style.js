@@ -1,7 +1,17 @@
 /**
  * External dependencies
  */
-import { capitalize, get, has, omit, omitBy, startsWith } from 'lodash';
+import {
+	capitalize,
+	find,
+	forEach,
+	get,
+	has,
+	isEqual,
+	omit,
+	startsWith,
+	without,
+} from 'lodash';
 
 /**
  * WordPress dependencies
@@ -98,21 +108,22 @@ function addAttribute( settings ) {
 	return settings;
 }
 
-/**
- * Filters a style object returning only the keys
- * that are serializable for a given block.
- *
- * @param {Object} style Input style object to filter.
- * @param {Object} blockSupports Info about block supports.
- * @return {Object} Filtered style.
- */
-export function omitKeysNotToSerialize( style, blockSupports ) {
-	return omitBy(
-		style,
-		( value, key ) =>
-			!! blockSupports[ key ]?.__experimentalSkipSerialization
-	);
-}
+const skipSerializationPaths = {
+	[ `${ BORDER_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [ 'border' ],
+	[ `${ COLOR_SUPPORT_KEY }.__experimentalSkipSerialization` ]: [
+		COLOR_SUPPORT_KEY,
+	],
+	[ `__experimentalSkipFontSizeSerialization` ]: [ 'typography', 'fontSize' ],
+	[ `__experimentalSkipTypographySerialization` ]: without(
+		TYPOGRAPHY_SUPPORT_KEYS,
+		FONT_SIZE_SUPPORT_KEY
+	).map(
+		( feature ) =>
+			find( STYLE_PROPERTY, ( property ) =>
+				isEqual( property.support, [ feature ] )
+			)?.value
+	),
+};
 
 /**
  * Override props assigned to save component to inject the CSS variables definition.
@@ -127,22 +138,16 @@ export function addSaveProps( props, blockType, attributes ) {
 		return props;
 	}
 
-	const { style } = attributes;
-	let filteredStyle = omitKeysNotToSerialize( style, {
-		border: getBlockSupport( blockType, BORDER_SUPPORT_KEY ),
-		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
+	let { style } = attributes;
+
+	forEach( skipSerializationPaths, ( path, indicator ) => {
+		if ( getBlockSupport( blockType, indicator ) ) {
+			style = omit( style, path );
+		}
 	} );
 
-	if (
-		getBlockSupport( blockType, '__experimentalSkipFontSizeSerialization' )
-	) {
-		filteredStyle = omit( filteredStyle, [
-			[ 'typography', FONT_SIZE_SUPPORT_KEY ],
-		] );
-	}
-
 	props.style = {
-		...getInlineStyles( filteredStyle ),
+		...getInlineStyles( style ),
 		...props.style,
 	};
 

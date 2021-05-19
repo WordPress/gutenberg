@@ -7,13 +7,13 @@ import styled from '@emotion/styled';
 /**
  * Internal dependencies
  */
-import { color, rtl } from '../../utils/style-mixins';
+import { COLORS, rtl } from '../../utils';
 
 const disabledStyles = ( { disabled } ) => {
 	if ( ! disabled ) return '';
 
 	return css( {
-		color: color( 'ui.textDisabled' ),
+		color: COLORS.ui.textDisabled,
 	} );
 };
 
@@ -66,7 +66,7 @@ export const Select = styled.select`
 		box-sizing: border-box;
 		border: none;
 		box-shadow: none !important;
-		color: ${ color( 'black' ) };
+		color: ${ COLORS.black };
 		display: block;
 		margin: 0;
 		width: 100%;

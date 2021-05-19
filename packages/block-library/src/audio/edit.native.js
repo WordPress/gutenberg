@@ -179,6 +179,9 @@ function AudioEdit( {
 							label={ __( 'Autoplay' ) }
 							onChange={ toggleAttribute( 'autoplay' ) }
 							checked={ autoplay }
+							help={ __(
+								'Autoplay may cause usability issues for some users.'
+							) }
 						/>
 						<ToggleControl
 							label={ __( 'Loop' ) }
