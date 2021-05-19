@@ -3,7 +3,7 @@
  */
 import { css, cx } from 'emotion';
 // eslint-disable-next-line no-restricted-imports
-import type { Ref } from 'react';
+import type { Ref, ReactNode } from 'react';
 
 /**
  * WordPress dependencies
@@ -40,6 +40,10 @@ export interface ZStackProps {
 	 * @default 0
 	 */
 	offset?: number;
+	/**
+	 * Child elements.
+	 */
+	children: ReactNode;
 }
 
 function ZStack(
