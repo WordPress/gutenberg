@@ -131,6 +131,7 @@ export function addSaveProps( props, blockType, attributes ) {
 	let filteredStyle = omitKeysNotToSerialize( style, {
 		border: getBlockSupport( blockType, BORDER_SUPPORT_KEY ),
 		[ COLOR_SUPPORT_KEY ]: getBlockSupport( blockType, COLOR_SUPPORT_KEY ),
+		spacing: getBlockSupport( blockType, SPACING_SUPPORT_KEY ),
 	} );
 
 	if (

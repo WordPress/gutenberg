@@ -35,8 +35,12 @@ function gutenberg_register_spacing_support( $block_type ) {
  * @return array Block spacing CSS classes and inline styles.
  */
 function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
-	$has_padding_support = gutenberg_has_spacing_feature_support( $block_type, 'padding' );
-	$has_margin_support  = gutenberg_has_spacing_feature_support( $block_type, 'margin' );
+	if ( gutenberg_skip_spacing_serialization( $block_type ) ) {
+		return array();
+	}
+
+	$has_padding_support = gutenberg_block_has_support( $block_type, array( 'spacing', 'padding' ), false );
+	$has_margin_support  = gutenberg_block_has_support( $block_type, array( 'spacing', 'margin' ), false );
 	$styles              = array();
 
 	if ( $has_padding_support ) {
@@ -61,18 +65,19 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
 }
 
 /**
- * Checks whether the current block type supports the spacing feature requested.
+ * Checks whether serialization of the current block's spacing properties should
+ * occur.
  *
- * @param WP_Block_Type $block_type Block type to check for support.
- * @param string        $feature    Name of the feature to check support for.
- * @param mixed         $default    Fallback value for feature support, defaults to false.
+ * @param WP_Block_type $block_type Block type.
  *
- * @return boolean                  Whether or not the feature is supported.
+ * @return boolean Whether to serialize spacing support styles & classes.
  */
-function gutenberg_has_spacing_feature_support( $block_type, $feature, $default = false ) {
-	// Check if the specific feature has been opted into individually
-	// via nested flag under `spacing`.
-	return gutenberg_block_has_support( $block_type, array( 'spacing', $feature ), $default );
+function gutenberg_skip_spacing_serialization( $block_type ) {
+	$spacing_support = gutenberg_block_has_support( $block_type, array( 'spacing' ), false );
+
+	return is_array( $spacing_support ) &&
+		array_key_exists( '__experimentalSkipSerialization', $spacing_support ) &&
+		$spacing_support['__experimentalSkipSerialization'];
 }
 
 // Register the block support.
