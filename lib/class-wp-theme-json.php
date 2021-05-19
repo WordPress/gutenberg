@@ -1095,7 +1095,8 @@ class WP_Theme_JSON {
 		$to_replace[] = array( 'typography', 'fontSizes' );
 		$to_replace[] = array( 'typography', 'fontFamilies' );
 
-		// Some others should be appended to the existing.
+		// Some others should be either appended to the existing
+		// or update the existing if the slug is the same.
 		$to_append   = array();
 		$to_append[] = array( 'color', 'palette' );
 		$to_append[] = array( 'color', 'gradients' );
@@ -1118,7 +1119,24 @@ class WP_Theme_JSON {
 					continue;
 				}
 
-				gutenberg_experimental_set( $this->theme_json, $path, array_merge( $existing_node, $incoming_node ) );
+				$index_table    = array();
+				$existing_slugs = array();
+				$merged         = array();
+				foreach( $existing_node as $key => $value ) {
+					$index_table[ $value['slug'] ] = $key;
+					$existing_slugs[]              = $value['slug'];
+					$merged[ $key ]                = $value;
+				}
+
+				foreach( $incoming_node as $value ) {
+					if ( in_array( $value['slug'], $existing_slugs ) ) {
+						$merged[ $index_table[ $value['slug'] ] ] = $value;
+					} else {
+						$merged[] = $value;
+					}
+				}
+
+				gutenberg_experimental_set( $this->theme_json, $path, $merged );
 			}
 		}
 
