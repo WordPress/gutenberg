@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { groupBy, deburr } from 'lodash';
+import { groupBy, deburr, flatten } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -22,7 +22,18 @@ import { useAsyncList } from '@wordpress/compose';
 import { store as noticesStore } from '@wordpress/notices';
 import { store as coreStore } from '@wordpress/core-data';
 import { store as editorStore } from '@wordpress/editor';
+/**
+ * Internal dependencies
+ */
+import { createTemplatePartId } from '../utils/create-template-part-id';
 
+function getAreaGroupTitle( areaLabel ) {
+	return sprintf(
+		// Translators: %s for the area the template part is assigned to (Header, Footer, General, etc.)
+		__( 'Area: %s' ),
+		areaLabel
+	);
+}
 function PreviewPlaceholder() {
 	return (
 		<div
@@ -111,23 +122,50 @@ function TemplatePartsByArea( {
 	area = 'uncategorized',
 	labelsByArea,
 } ) {
-	const templatePartsByArea = useMemo( () => {
-		return Object.values( groupBy( templateParts, 'area' ) );
+	const { templatePartsByArea, templatePartsToShow } = useMemo( () => {
+		const _templatePartsToShow =
+			templateParts.filter(
+				( templatePart ) =>
+					'uncategorized' === area || templatePart.area === area
+			) || [];
+		const _templatePartsByArea = Object.values(
+			groupBy( _templatePartsToShow, 'area' )
+		);
+		const orderedTemplatePartsToShow = flatten( _templatePartsToShow );
+		return {
+			templatePartsByArea: _templatePartsByArea,
+			templatePartsToShow: orderedTemplatePartsToShow,
+		};
 	}, [ templateParts, area ] );
-	const currentShownTPs = useAsyncList( templateParts );
+
+	const currentShownTPs = useAsyncList( templatePartsToShow );
+
+	if ( ! templatePartsToShow.length ) {
+		return (
+			<PanelGroup
+				title={ getAreaGroupTitle(
+					labelsByArea[ area ] || labelsByArea.uncategorized
+				) }
+			>
+				{ sprintf(
+					// Translators: %s for the template part variation ("Header", "Footer", "Template Part").
+					'There is no other %s available. If you are looking for another type of template part, try searching for it using the input above.',
+					area && area !== 'uncategorized'
+						? labelsByArea[ area ] || area
+						: __( 'Template Part' )
+				) }
+			</PanelGroup>
+		);
+	}
 
 	return templatePartsByArea.map( ( templatePartList ) => {
-		// Only return corresponding area if block/entity is not uncategorized/general version.
-		if ( 'uncategorized' !== area && templatePartList[ 0 ].area !== area ) {
-			return null;
-		}
 		return (
 			<PanelGroup
 				key={ templatePartList[ 0 ].area }
-				title={
+				title={ getAreaGroupTitle(
 					labelsByArea[ templatePartList[ 0 ].area ] ||
-					__( 'General' )
-				}
+						labelsByArea.uncategorized
+				) }
 			>
 				{ templatePartList.map( ( templatePart ) => {
 					return currentShownTPs.includes( templatePart ) ? (
@@ -222,7 +260,9 @@ function TemplatePartSearchResults( {
 	return groupedResults.map( ( group ) => (
 		<PanelGroup
 			key={ group[ 0 ].id }
-			title={ labelsByArea[ group[ 0 ].area ] || __( 'General' ) }
+			title={ getAreaGroupTitle(
+				labelsByArea[ group[ 0 ].area ] || labelsByArea.uncategorized
+			) }
 		>
 			{ group.map( ( templatePart ) =>
 				currentShownTPs.includes( templatePart ) ? (
@@ -246,18 +286,26 @@ export default function TemplatePartPreviews( {
 	filterValue,
 	onClose,
 	area,
+	templatePartId,
 } ) {
 	const composite = useCompositeState();
 
 	const { templateParts, labelsByArea } = useSelect( ( select ) => {
-		const _templateParts =
+		const _templateParts = (
 			select( coreStore ).getEntityRecords(
 				'postType',
 				'wp_template_part',
 				{
 					per_page: -1,
 				}
-			) || [];
+			) || []
+		).filter(
+			( templatePart ) =>
+				createTemplatePartId(
+					templatePart.theme,
+					templatePart.slug
+				) !== templatePartId
+		);
 
 		const definedAreas = select(
 			editorStore
@@ -274,7 +322,11 @@ export default function TemplatePartPreviews( {
 	}, [] );
 
 	if ( ! templateParts || ! templateParts.length ) {
-		return null;
+		return (
+			<PanelGroup>
+				{ __( 'There are no existing template parts to select.' ) }
+			</PanelGroup>
+		);
 	}
 
 	if ( filterValue ) {
