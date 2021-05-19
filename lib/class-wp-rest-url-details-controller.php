@@ -118,10 +118,10 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		$data = $this->add_additional_fields_to_object(
 			array(
-				'title'       => $this->get_title( $remote_url_response ),
-				'icon'        => $this->get_icon( $remote_url_response ),
-				'description' => $this->get_description( $remote_url_response ),
-				'image'       => $this->get_image( $remote_url_response ),
+				'title'       => $this->get_title( $remote_url_response, $url ),
+				'icon'        => $this->get_icon( $remote_url_response, $url ),
+				'description' => $this->get_description( $remote_url_response, $url ),
+				'image'       => $this->get_image( $remote_url_response, $url ),
 			),
 			$request
 		);
@@ -222,12 +222,21 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * Parses the site icon from the provided HTML
 	 *
 	 * @param string $html the HTML from the remote website at URL.
+	 * @param string $url the target website URL.
 	 * @return string the icon URI (maybe empty).
 	 */
-	private function get_icon( $html ) {
+	private function get_icon( $html, $url ) {
 		preg_match( '|<link.*?rel="\s*[shortcut]+(?:\s+[icon]+)*\s*".*?href="(.*?)".*?\/?>|is', $html, $matches );
 
 		$icon = isset( $matches[1] ) && is_string( $matches[1] ) ? trim( $matches[1] ) : '';
+
+		// Attempt to convert relative URLs to absolute.
+		if ( ! empty( $icon ) ) {
+			$parsed = parse_url( $icon );
+			if ( empty( $parsed['host'] ) ) {
+				$icon = $url . $icon;
+			}
+		}
 
 		return $icon;
 	}
@@ -244,25 +253,25 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$temp = tmpfile();
 
 		if ( ! $temp ) {
-			fclose( $temp ); // clean up tmp file
+			fclose( $temp ); // clean up tmp file.
 			return $description;
 		}
 
 		$path = stream_get_meta_data( $temp )['uri'];
 
-		// Write HTML
+		// Write HTML.
 		fwrite( $temp, $html );
 
 		$meta = get_meta_tags( $path );
 
 		if ( empty( $meta ) ) {
-			fclose( $temp ); // clean up tmp file
+			fclose( $temp ); // clean up tmp file.
 			return $description;
 		}
 
 		$description = ! empty( $meta['description'] ) ? $meta['description'] : '';
 
-		fclose( $temp ); // clean up tmp file
+		fclose( $temp ); // clean up tmp file.
 		return $description;
 	}
 
@@ -270,12 +279,21 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * Parses the Open Graph Image from the provided HTML.
 	 *
 	 * @param string $html the HTML from the remote website at URL.
+	 * @param string $url the target website URL.
 	 * @return string the OG image (maybe empty).
 	 */
-	private function get_image( $html ) {
+	private function get_image( $html, $url ) {
 		preg_match( '|<meta.*?property="og:image.*?".*?content="(.*?)".*?\/?>|is', $html, $matches );
 
 		$image = isset( $matches[1] ) && is_string( $matches[1] ) ? trim( $matches[1] ) : '';
+
+		// Attempt to convert relative URLs to absolute.
+		if ( ! empty( $image ) ) {
+			$parsed = parse_url( $image );
+			if ( empty( $parsed['host'] ) ) {
+				$image = $url . $image;
+			}
+		}
 
 		return $image;
 	}
