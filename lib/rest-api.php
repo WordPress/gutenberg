@@ -192,3 +192,55 @@ function gutenberg_auto_draft_get_sample_permalink( $permalink, $id, $title, $na
 	return $permalink;
 }
 add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink', 10, 5 );
+
+/**
+ * Expose the custom_logo theme-mod in the settings REST API.
+ */
+register_setting(
+	'general',
+	'custom_logo',
+	array(
+		'type'         => 'integer',
+		'show_in_rest' => true,
+	)
+);
+
+/**
+ * Filters the value of a setting recognized by the REST API.
+ *
+ * Hijacks the value for custom_logo theme-mod.
+ *
+ * @param mixed  $result Value to use for the requested setting. Can be a scalar
+ *                       matching the registered schema for the setting, or null to
+ *                       follow the default get_option() behavior.
+ * @param string $name   Setting name (as shown in REST API responses).
+ *
+ * @return null|array
+ */
+function gutenberg_rest_pre_get_setting_filter_custom_logo( $result, $name ) {
+	error_log( print_r( $name, true ) );
+	if ( 'custom_logo' === $name ) {
+		return get_theme_mod( 'custom_logo' );
+	}
+}
+add_filter( 'rest_pre_get_setting', 'gutenberg_rest_pre_get_setting_filter_custom_logo', 10, 2 );
+
+/**
+ * Filters whether to preempt a setting value update via the REST API.
+ *
+ * Hijacks the saving method for the custom_logo theme-mod.
+ *
+ * @param bool   $result Whether to override the default behavior for updating the
+ *                       value of a setting.
+ * @param string $name   Setting name (as shown in REST API responses).
+ * @param mixed  $value  Updated setting value.
+ *
+ * @return bool
+ */
+function gutenberg_rest_pre_update_setting_filter_custom_logo( $result, $name, $value ) {
+	return 'custom_logo' === $name
+		? set_theme_mod( 'custom_logo', $value )
+		: $result;
+}
+
+add_filter( 'rest_pre_update_setting', 'gutenberg_rest_pre_update_setting_filter_custom_logo', 10, 3 );
