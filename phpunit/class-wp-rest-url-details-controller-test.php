@@ -651,16 +651,17 @@ class WP_REST_URL_Details_Controller_Test extends WP_Test_REST_Controller_Testca
 	}
 
 	private function wrap_html_in_doc( $html ) {
-		$start = '<!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
-<head>';
-		$end   = '</head>
-<body>
-	<h1>Example Website</h1>
-    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
-</body>
-</html>';
-		return $start . $html . $end;
+		$doc = '<!DOCTYPE html>
+				<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+				<head>
+					%%HEAD_CONTENT%%
+				</head>
+				<body>
+					<h1>Example Website</h1>
+					<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
+				</body>
+				</html>';
+		return str_replace( '%%HEAD_CONTENT%%', $html, $doc );
 	}
 
 	/**
