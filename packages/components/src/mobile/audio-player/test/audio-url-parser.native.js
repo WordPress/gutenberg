@@ -21,8 +21,8 @@ describe( 'supportedAudioUrlsWithExtensions', () => {
 	supportedAudioUrlsWithExtensions.forEach( ( url ) => {
 		it( `supports ${ url }`, () => {
 			const { title, extension } = parseAudioUrl( url );
-			expect( title ).not.toBe( '' );
-			expect( extension ).not.toBe( '' );
+			expect( title ).toBe( 'file' );
+			expect( extension ).toBe( 'MP3' );
 		} );
 	} );
 } );
@@ -31,7 +31,7 @@ describe( 'supportedAudioUrlsWithoutExtensions', () => {
 	supportedAudioUrlsWithoutExtensions.forEach( ( url ) => {
 		it( `supports ${ url }`, () => {
 			const { title, extension } = parseAudioUrl( url );
-			expect( title ).not.toBe( '' );
+			expect( title ).toBe( 'file' );
 			expect( extension ).toBe( '' );
 		} );
 	} );
