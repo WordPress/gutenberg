@@ -89,7 +89,7 @@
 		"i18n-cache": "node i18n-cache/index.js",
 		"i18n-cache:force": "cross-env REFRESH_I18N_CACHE=1 node i18n-cache/index.js",
 		"postinstall": "npm run i18n-cache",
-		"android": "react-native run-android",
+		"android": "react-native run-android --no-packager --no-jetifier",
 		"prewpandroid": "rm -Rf $TMPDIR/gbmobile-wpandroidfakernroot && mkdir $TMPDIR/gbmobile-wpandroidfakernroot && ln -s $(cd \"$(dirname \"../../../../../\")\"; pwd) $TMPDIR/gbmobile-wpandroidfakernroot/android",
 		"wpandroid": "npm run android -- --root $TMPDIR/gbmobile-wpandroidfakernroot --variant wasabiDebug --appIdSuffix beta --appFolder WordPress --main-activity=ui.WPLaunchActivity",
 		"preios": "cd ios && (bundle check --path=vendor/bundle > /dev/null || bundle install) && bundle exec pod install --repo-update",
