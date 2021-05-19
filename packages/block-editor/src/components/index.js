@@ -42,6 +42,7 @@ export { default as __experimentalDuotoneControl } from './duotone-control';
 export { default as __experimentalGradientPicker } from './gradient-picker';
 export { default as __experimentalGradientPickerControl } from './gradient-picker/control';
 export { default as __experimentalGradientPickerPanel } from './gradient-picker/panel';
+export { default as HeadingLevelControl } from './heading-level-control';
 export { default as __experimentalFontAppearanceControl } from './font-appearance-control';
 export { default as __experimentalFontFamilyControl } from './font-family';
 export { default as __experimentalColorGradientControl } from './colors-gradients/control';

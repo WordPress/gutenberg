@@ -1,5 +1,5 @@
 // Remove padding in heading level control popover since the toolbar buttons already have padding.
-.block-library-heading-level-dropdown .components-popover__content {
+.block-editor-heading-level-dropdown .components-popover__content {
 	// TODO: Find a less hardcoded way of doing this. `max-content` works on
 	// Chromium, but it results in a scrollbar on Safari, and isn't supported
 	// at all in IE11.
@@ -8,10 +8,15 @@
 	> div {
 		padding: 0;
 	}
+
+	svg {
+		width: 24px;
+		height: 24px;
+	}
 }
 
 // The dropdown already has a border, so we can remove the one on the heading
 // level toolbar.
-.block-library-heading-level-toolbar {
+.block-editor-heading-level-toolbar {
 	border: none;
 }
