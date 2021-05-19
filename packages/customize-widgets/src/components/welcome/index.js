@@ -9,15 +9,23 @@ import { Button, ExternalLink } from '@wordpress/components';
  */
 import { EditorImage } from './images';
 
-export default function Welcome() {
+export default function Welcome( { sidebar } ) {
+	const isEntirelyBlockWidgets = sidebar
+		.getWidgets()
+		.every( ( widget ) => widget.id.startsWith( 'block-' ) );
+
 	return (
 		<div className="customize-widgets-welcome">
 			<EditorImage />
 			<h1>{ __( 'Welcome to block Widgets' ) }</h1>
 			<p>
-				{ __(
-					'You can now add any block to your site’s widget areas. Don’t worry, all of your favorite widgets still work flawlessly.'
-				) }
+				{ isEntirelyBlockWidgets
+					? __(
+							'Your theme provides different “block” areas for you to add and edit content. Try adding a search bar, social icons, or other types of blocks here and see how they’ll look on your site.'
+					  )
+					: __(
+							'You can now add any block to your site’s widget areas. Don’t worry, all of your favorite widgets still work flawlessly.'
+					  ) }
 			</p>
 			<Button
 				className="customize-widgets-welcome__button"
@@ -27,17 +35,19 @@ export default function Welcome() {
 				{ __( 'Got it' ) }
 			</Button>
 			<hr className="customize-widgets-welcome__separator" />
-			<p>
-				{ __( 'Want to stick with the old widgets?' ) }
-				<br />
-				<ExternalLink
-					href={ __(
-						'https://wordpress.org/plugins/classic-widgets/'
-					) }
-				>
-					{ __( 'Get the Classic Widgets plugin.' ) }
-				</ExternalLink>
-			</p>
+			{ ! isEntirelyBlockWidgets && (
+				<p>
+					{ __( 'Want to stick with the old widgets?' ) }
+					<br />
+					<ExternalLink
+						href={ __(
+							'https://wordpress.org/plugins/classic-widgets/'
+						) }
+					>
+						{ __( 'Get the Classic Widgets plugin.' ) }
+					</ExternalLink>
+				</p>
+			) }
 			<p>
 				{ __( 'New to the block editor?' ) }
 				<br />

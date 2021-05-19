@@ -82,7 +82,7 @@ export default function SidebarBlockEditor( {
 		keepCaretInsideBlock,
 	] );
 
-	return <Welcome />;
+	return <Welcome sidebar={ sidebar } />;
 
 	return (
 		<>
