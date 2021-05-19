@@ -3,19 +3,14 @@
  */
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
-import {
-	Button,
-	NavigableMenu,
-	Dropdown,
-	MenuGroup,
-	MenuItem,
-} from '@wordpress/components';
+import { Button, Dropdown } from '@wordpress/components';
 
 /**
  * Internal dependencies
  */
 import { store as editPostStore } from '../../../store';
 import DeleteTemplate from './delete-template';
+import EditTemplateTitle from './edit-template-title';
 
 function TemplateTitle() {
 	const { template, isEditing } = useSelect( ( select ) => {
@@ -34,8 +29,8 @@ function TemplateTitle() {
 	}
 
 	let templateTitle = __( 'Default' );
-	if ( template?.title?.raw ) {
-		templateTitle = template.title.raw;
+	if ( template?.title ) {
+		templateTitle = template.title;
 	} else if ( !! template ) {
 		templateTitle = template.slug;
 	}
@@ -50,22 +45,21 @@ function TemplateTitle() {
 					<div className="edit-post-template-title">
 						{ __( 'About' ) }
 					</div>
-					<Button isSmall isTertiary onClick={ onToggle } aria-label={ __( 'Template Options' ) }>
+					<Button
+						isSmall
+						isTertiary
+						onClick={ onToggle }
+						aria-label={ __( 'Template Options' ) }
+					>
 						{ templateTitle }
 					</Button>
 				</>
 			) }
 			renderContent={ () => (
-				<NavigableMenu>
-					<MenuGroup
-						className="edit-post-template-top-area__first-menu-group"
-						label={ __( 'Title' ) }
-						disabled
-					>
-						<MenuItem>{ templateTitle }</MenuItem>
-					</MenuGroup>
+				<>
+					<EditTemplateTitle />
 					<DeleteTemplate />
-				</NavigableMenu>
+				</>
 			) }
 		/>
 	);

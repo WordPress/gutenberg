@@ -79,7 +79,7 @@ export function TemplatePanel() {
 		panelTitle = sprintf(
 			/* translators: %s: template title */
 			__( 'Template: %s' ),
-			template?.title?.raw ?? template.slug
+			template?.title ?? template.slug
 		);
 	}
 

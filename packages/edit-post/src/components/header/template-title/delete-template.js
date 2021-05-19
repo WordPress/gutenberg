@@ -38,8 +38,8 @@ export default function DeleteTemplate() {
 		return null;
 	}
 	let templateTitle = template.slug;
-	if ( template?.title?.raw ) {
-		templateTitle = template.title.raw;
+	if ( template?.title ) {
+		templateTitle = template.title;
 	}
 
 	return (
@@ -48,7 +48,7 @@ export default function DeleteTemplate() {
 				isDestructive
 				isTertiary
 				isLink
-				aria-label = { __( 'Delete template' ) }
+				aria-label={ __( 'Delete template' ) }
 				onClick={ () => {
 					if (
 						// eslint-disable-next-line no-alert
