@@ -116,12 +116,14 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 			$this->set_cache( $cache_key, $remote_url_response );
 		}
 
+		$html_head = $this->get_document_head( $remote_url_response );
+
 		$data = $this->add_additional_fields_to_object(
 			array(
-				'title'       => $this->get_title( $remote_url_response ),
-				'icon'        => $this->get_icon( $remote_url_response, $url ),
-				'description' => $this->get_description( $remote_url_response ),
-				'image'       => $this->get_image( $remote_url_response, $url ),
+				'title'       => $this->get_title( $html_head ),
+				'icon'        => $this->get_icon( $html_head, $url ),
+				'description' => $this->get_description( $html_head ),
+				'image'       => $this->get_image( $html_head, $url ),
 			),
 			$request
 		);
@@ -139,6 +141,8 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		 */
 		return apply_filters( 'rest_prepare_url_details', $response, $url, $request, $remote_url_response );
 	}
+
+
 
 	/**
 	 * Checks whether a given request has permission to read remote urls.
@@ -364,5 +368,17 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$chose = rand( 0, count( $agents ) - 1 );
 
 		return $agents[ $chose ];
+	}
+
+	/**
+	 * Retrieves the <head> section (including opening <body> tag from an HTML string if present.
+	 *
+	 * @param string $html the string of HTML to return the <head> section.
+	 * @return string the <head> section (may be empty).
+	 */
+	private function get_document_head( $html ) {
+		preg_match( '|([\s\S]*)<body>|is', $html, $matches );
+		$head = isset( $matches[1] ) && is_string( $matches[1] ) ? trim( $matches[1] ) : '';
+		return $head;
 	}
 }
