@@ -73,7 +73,7 @@ function gutenberg_apply_spacing_support( $block_type, $block_attributes ) {
  * @return boolean Whether to serialize spacing support styles & classes.
  */
 function gutenberg_skip_spacing_serialization( $block_type ) {
-	$spacing_support = gutenberg_block_has_support( $block_type, array( 'spacing' ), false );
+	$spacing_support = _wp_array_get( $block_type->supports, array( 'spacing' ), false );
 
 	return is_array( $spacing_support ) &&
 		array_key_exists( '__experimentalSkipSerialization', $spacing_support ) &&
