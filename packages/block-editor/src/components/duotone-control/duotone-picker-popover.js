@@ -10,6 +10,7 @@ function DuotonePickerPopover( {
 	onToggle,
 	duotonePalette,
 	colorPalette,
+	disableCustomColors,
 } ) {
 	return (
 		<Popover
@@ -21,6 +22,7 @@ function DuotonePickerPopover( {
 				<DuotonePicker
 					colorPalette={ colorPalette }
 					duotonePalette={ duotonePalette }
+					disableCustomColors={ disableCustomColors }
 					value={ value }
 					onChange={ onChange }
 				/>
