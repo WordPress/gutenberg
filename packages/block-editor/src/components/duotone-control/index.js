@@ -13,9 +13,15 @@ import DuotonePickerPopover from './duotone-picker-popover';
 
 function DuotoneControl( { colorPalette, duotonePalette, value, onChange } ) {
 	const [ isOpen, setIsOpen ] = useState( false );
+
+	if ( ! duotonePalette ) {
+		return null;
+	}
+
 	const onToggle = () => {
 		setIsOpen( ( prev ) => ! prev );
 	};
+
 	const openOnArrowDown = ( event ) => {
 		if ( ! isOpen && event.keyCode === DOWN ) {
 			event.preventDefault();
@@ -23,6 +29,7 @@ function DuotoneControl( { colorPalette, duotonePalette, value, onChange } ) {
 			onToggle();
 		}
 	};
+
 	return (
 		<>
 			<ToolbarButton
