@@ -43,6 +43,7 @@ export default function DeleteTemplate() {
 				isDestructive
 				isTertiary
 				isLink
+				aria-label = { __( 'Delete template' ) }
 				onClick={ () => {
 					if (
 						// eslint-disable-next-line no-alert
