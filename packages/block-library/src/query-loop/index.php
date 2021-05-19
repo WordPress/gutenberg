@@ -41,9 +41,9 @@ function render_block_core_query_loop( $attributes, $content, $block ) {
 	}
 
 	$classnames = '';
-	if ( isset( $block->context['layout'] ) && isset( $block->context['query'] ) ) {
-		if ( isset( $block->context['layout']['type'] ) && 'flex' === $block->context['layout']['type'] ) {
-			$classnames = "is-flex-container columns-{$block->context['layout']['columns']}";
+	if ( isset( $block->context['displayLayout'] ) && isset( $block->context['query'] ) ) {
+		if ( isset( $block->context['displayLayout']['type'] ) && 'flex' === $block->context['displayLayout']['type'] ) {
+			$classnames = "is-flex-container columns-{$block->context['displayLayout']['columns']}";
 		}
 	}
 
