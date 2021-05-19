@@ -85,6 +85,7 @@ export default function VisualEditor( { styles } ) {
 	const {
 		deviceType,
 		isTemplateMode,
+		postType,
 		wrapperBlockName,
 		wrapperUniqueId,
 	} = useSelect( ( select ) => {
@@ -95,8 +96,9 @@ export default function VisualEditor( { styles } ) {
 		const { getCurrentPostId, getCurrentPostType } = select( editorStore );
 		const _isTemplateMode = isEditingTemplate();
 		let _wrapperBlockName;
+		const currentPostType = getCurrentPostType();
 
-		if ( getCurrentPostType() === 'wp_block' ) {
+		if ( currentPostType === 'wp_block' ) {
 			_wrapperBlockName = 'core/block';
 		} else if ( ! _isTemplateMode ) {
 			_wrapperBlockName = 'core/post-content';
@@ -105,6 +107,7 @@ export default function VisualEditor( { styles } ) {
 		return {
 			deviceType: __experimentalGetPreviewDeviceType(),
 			isTemplateMode: _isTemplateMode,
+			postType: currentPostType,
 			wrapperBlockName: _wrapperBlockName,
 			wrapperUniqueId: getCurrentPostId(),
 		};
@@ -227,7 +230,9 @@ export default function VisualEditor( { styles } ) {
 									<WritingFlow>
 										{ ! isTemplateMode && (
 											<div className="edit-post-visual-editor__post-title-wrapper">
-												<PostTitle />
+												{ 'page' !== postType && (
+													<PostTitle />
+												) }
 											</div>
 										) }
 										<RecursionProvider>
