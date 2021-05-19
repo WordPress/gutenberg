@@ -2,7 +2,7 @@
  * External dependencies
  */
 import { View, TouchableWithoutFeedback, Platform } from 'react-native';
-import { isEmpty, get, find, map } from 'lodash';
+import { isEmpty, get, find, map , filter } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -17,7 +17,6 @@ import {
 	setFeaturedImage,
 } from '@wordpress/react-native-bridge';
 import {
-	CycleSelectControl,
 	Icon,
 	PanelBody,
 	ToolbarButton,
@@ -27,6 +26,7 @@ import {
 	LinkSettingsNavigation,
 	BottomSheet,
 	BottomSheetTextControl,
+	BottomSheetSelectControl,
 	FooterMessageLink,
 	Badge,
 } from '@wordpress/components';
@@ -120,10 +120,14 @@ export class ImageEdit extends Component {
 			},
 		};
 
-		this.sizeOptions = map( this.props.imageSizes, ( { name, slug } ) => ( {
-			value: slug,
-			name,
-		} ) );
+		// Only map available image sizes.
+		this.sizeOptions = map(
+			filter( this.props.imageSizes, ( { slug } ) =>
+				get( this.props.image, [ 'media_details', 'sizes', slug, 'source_url' ] )
+			),
+			( { name, slug } ) => ( { value: slug, label: name } )
+		);
+
 	}
 
 	componentDidMount() {
@@ -494,14 +498,24 @@ export class ImageEdit extends Component {
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
-		const sizeOptionsValid = find( this.sizeOptions, [
+		let selectedSizeOption = sizeSlug || imageDefaultSize;
+		let sizeOptionsValid = find( this.sizeOptions, [
 			'value',
-			imageDefaultSize,
+			sizeSlug || imageDefaultSize,
 		] );
+
 
 		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
 		// Images that haven't been uploaded to a site's library have an id of 'undefined', which the 'canImageBeFeatured' check filters out.
 		const canImageBeFeatured = typeof attributes.id !== 'undefined';
+		if ( ! sizeOptionsValid ) { 
+			// Default to 'full' size if the default large size is not available.
+			sizeOptionsValid = find( this.sizeOptions, [
+				'value',
+				'full',
+			] );
+			selectedSizeOption = 'full';
+		}
 
 		const isFeaturedImage =
 			canImageBeFeatured && featuredImageId === attributes.id;
@@ -532,13 +546,13 @@ export class ImageEdit extends Component {
 					<BlockStyles clientId={ clientId } url={ url } />
 				</PanelBody>
 				<PanelBody>
-					{ image && sizeOptionsValid && (
-						<CycleSelectControl
-							icon={ fullscreen }
+					{ image && sizeOptionsValid (
+						<BottomSheetSelectControl
+							icon={ expand }
 							label={ __( 'Size' ) }
-							value={ sizeSlug || imageDefaultSize }
-							onChangeValue={ this.onSizeChangeValue }
 							options={ this.sizeOptions }
+							onChange={ this.onSizeChangeValue }
+							value={ selectedSizeOption }
 						/>
 					) }
 					{ this.getAltTextSettings() }
