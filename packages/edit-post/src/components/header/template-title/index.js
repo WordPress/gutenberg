@@ -50,7 +50,7 @@ function TemplateTitle() {
 					<div className="edit-post-template-title">
 						{ __( 'About' ) }
 					</div>
-					<Button isSmall isTertiary onClick={ onToggle }>
+					<Button isSmall isTertiary onClick={ onToggle } aria-label={ __( 'Template Options' ) }>
 						{ templateTitle }
 					</Button>
 				</>
