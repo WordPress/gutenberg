@@ -243,6 +243,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$temp = tmpfile();
 
 		if ( ! $temp ) {
+			fclose( $temp ); // clean up tmp file
 			return $description;
 		}
 
@@ -254,13 +255,13 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$meta = get_meta_tags( $path );
 
 		if ( empty( $meta ) ) {
+			fclose( $temp ); // clean up tmp file
 			return $description;
 		}
 
-		fclose( $temp ); // clean up tmp file
-
 		$description = ! empty( $meta['description'] ) ? $meta['description'] : '';
 
+		fclose( $temp ); // clean up tmp file
 		return $description;
 	}
 
