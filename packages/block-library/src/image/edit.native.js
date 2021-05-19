@@ -494,6 +494,8 @@ export class ImageEdit extends Component {
 			imageDefaultSize,
 		] );
 
+		// By default, it's only possible to set images that have been uploaded to a site's library as featured.
+		// Images that haven't been uploaded to a site's library have an id of 'undefined', which the 'canImageBeFeatured' check filters out.
 		const canImageBeFeatured = typeof attributes.id !== 'undefined';
 
 		const isFeaturedImage =
