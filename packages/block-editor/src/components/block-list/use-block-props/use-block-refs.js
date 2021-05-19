@@ -93,7 +93,8 @@ function useBlockRef( clientId ) {
  */
 function useBlockElement( clientId ) {
 	const { callbacks } = useContext( BlockRefs );
-	const [ element, setElement ] = useState( useBlockRef( clientId ).current );
+	const ref = useBlockRef( clientId );
+	const [ element, setElement ] = useState( null );
 
 	useLayoutEffect( () => {
 		if ( ! clientId ) {
@@ -106,7 +107,7 @@ function useBlockElement( clientId ) {
 		};
 	}, [ clientId ] );
 
-	return element;
+	return ref.current || element;
 }
 
 export { useBlockRef as __unstableUseBlockRef };
