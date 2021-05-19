@@ -8,9 +8,7 @@ import {
 	Text,
 	TouchableOpacity,
 	ScrollView,
-	Platform,
 } from 'react-native';
-import { BlurView } from '@react-native-community/blur';
 
 /**
  * WordPress dependencies
@@ -32,29 +30,11 @@ import { usePreferredColorSchemeStyle } from '@wordpress/compose';
 /**
  * Internal dependencies
  */
+import BackgroundView from './background-view';
 import getDefaultUseItems from './get-default-use-items';
 import styles from './style.scss';
 
 const { compose: stylesCompose } = StyleSheet;
-
-const BackgroundView = ( { children } ) => {
-	const backgroundStyles = usePreferredColorSchemeStyle(
-		styles[ 'components-autocomplete__background' ],
-		styles[ 'components-autocomplete__background-dark' ]
-	);
-
-	return Platform.OS === 'ios' ? (
-		<BlurView
-			style={ styles[ 'components-autocomplete__background-blur' ] }
-			blurType="prominent"
-			blurAmount={ 10 }
-		>
-			{ children }
-		</BlurView>
-	) : (
-		<View style={ backgroundStyles }>{ children }</View>
-	);
-};
 
 export function getAutoCompleterUI( autocompleter ) {
 	const useItems = autocompleter.useItems
