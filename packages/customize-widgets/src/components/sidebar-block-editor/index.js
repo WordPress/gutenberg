@@ -28,6 +28,7 @@ import BlockInspectorButton from '../block-inspector-button';
 import Header from '../header';
 import useInserter from '../inserter/use-inserter';
 import SidebarEditorProvider from './sidebar-editor-provider';
+import { store as customizeWidgetsStore } from '../../store';
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -36,11 +37,24 @@ export default function SidebarBlockEditor( {
 	inspector,
 } ) {
 	const [ isInserterOpened, setIsInserterOpened ] = useInserter( inserter );
-	const hasUploadPermissions = useSelect(
-		( select ) =>
-			defaultTo( select( coreStore ).canUser( 'create', 'media' ), true ),
-		[]
-	);
+	const {
+		hasUploadPermissions,
+		isFixedToolbarActive,
+		keepCaretInsideBlock,
+	} = useSelect( ( select ) => {
+		return {
+			hasUploadPermissions: defaultTo(
+				select( coreStore ).canUser( 'create', 'media' ),
+				true
+			),
+			isFixedToolbarActive: select(
+				customizeWidgetsStore
+			).__unstableIsFeatureActive( 'fixedToolbar' ),
+			keepCaretInsideBlock: select(
+				customizeWidgetsStore
+			).__unstableIsFeatureActive( 'keepCaretInsideBlock' ),
+		};
+	}, [] );
 	const settings = useMemo( () => {
 		let mediaUploadBlockEditor;
 		if ( hasUploadPermissions ) {
@@ -57,8 +71,15 @@ export default function SidebarBlockEditor( {
 			...blockEditorSettings,
 			__experimentalSetIsInserterOpened: setIsInserterOpened,
 			mediaUpload: mediaUploadBlockEditor,
+			hasFixedToolbar: isFixedToolbarActive,
+			keepCaretInsideBlock,
 		};
-	}, [ hasUploadPermissions, blockEditorSettings ] );
+	}, [
+		hasUploadPermissions,
+		blockEditorSettings,
+		isFixedToolbarActive,
+		keepCaretInsideBlock,
+	] );
 
 	return (
 		<>
