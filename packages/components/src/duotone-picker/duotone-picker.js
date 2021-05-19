@@ -69,22 +69,24 @@ function DuotonePicker( { colorPalette, duotonePalette, value, onChange } ) {
 			}
 		>
 			<CustomDuotoneBar value={ value } onChange={ onChange } />
-			<ColorListPicker
-				labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
-				colors={ colorPalette }
-				value={ value }
-				onChange={ ( newColors ) => {
-					if ( ! newColors[ 0 ] ) {
-						newColors[ 0 ] = defaultDark;
-					}
-					if ( ! newColors[ 1 ] ) {
-						newColors[ 1 ] = defaultLight;
-					}
-					const newValue =
-						newColors.length >= 2 ? newColors : undefined;
-					onChange( newValue );
-				} }
-			/>
+			{ colorPalette && (
+				<ColorListPicker
+					labels={ [ __( 'Shadows' ), __( 'Highlights' ) ] }
+					colors={ colorPalette }
+					value={ value }
+					onChange={ ( newColors ) => {
+						if ( ! newColors[ 0 ] ) {
+							newColors[ 0 ] = defaultDark;
+						}
+						if ( ! newColors[ 1 ] ) {
+							newColors[ 1 ] = defaultLight;
+						}
+						const newValue =
+							newColors.length >= 2 ? newColors : undefined;
+						onChange( newValue );
+					} }
+				/>
+			) }
 		</CircularOptionPicker>
 	);
 }
