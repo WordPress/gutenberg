@@ -43,6 +43,8 @@ export default function useSelectAll() {
 		const rootClientId = getBlockRootClientId( firstSelectedClientId );
 		let blockClientIds = getBlockOrder( rootClientId );
 
+		// If we have selected all sibling nested blocks, try selecting up a
+		// level. See: https://github.com/WordPress/gutenberg/pull/31859/
 		if ( selectedClientIds.length === blockClientIds.length ) {
 			blockClientIds = getBlockOrder(
 				getBlockRootClientId( rootClientId )
