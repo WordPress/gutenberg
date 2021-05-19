@@ -2,7 +2,7 @@
 	&__image {
 		background: #00a0d2;
 		height: 240px;
-		margin: 0 0 $grid-unit-20;
+		margin: 0 0 $grid-unit-10;
 
 		&__prm-r {
 			display: none;
@@ -19,6 +19,16 @@
 		}
 	}
 
+	// Extra specificity to override `.wrap h1` styles.
+	.wrap &__heading {
+		font-size: 18px;
+		font-weight: 600;
+	}
+
+	&__text {
+		line-height: 1.7;
+	}
+
 	&__button {
 		justify-content: center;
 		margin: 1em 0;
@@ -27,5 +37,9 @@
 
 	&__separator {
 		margin: 1em 0;
+	}
+
+	&__more-info {
+		line-height: 1.4;
 	}
 }

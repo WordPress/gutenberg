@@ -23,8 +23,10 @@ export default function WelcomeGuide( { sidebar } ) {
 	return (
 		<div className="customize-widgets-welcome-guide">
 			<EditorImage />
-			<h1>{ __( 'Welcome to block Widgets' ) }</h1>
-			<p>
+			<h1 className="customize-widgets-welcome-guide__heading">
+				{ __( 'Welcome to block Widgets' ) }
+			</h1>
+			<p className="customize-widgets-welcome-guide__text">
 				{ isEntirelyBlockWidgets
 					? __(
 							'Your theme provides different “block” areas for you to add and edit content. Try adding a search bar, social icons, or other types of blocks here and see how they’ll look on your site.'
@@ -42,7 +44,7 @@ export default function WelcomeGuide( { sidebar } ) {
 			</Button>
 			<hr className="customize-widgets-welcome-guide__separator" />
 			{ ! isEntirelyBlockWidgets && (
-				<p>
+				<p className="customize-widgets-welcome-guide__more-info">
 					{ __( 'Want to stick with the old widgets?' ) }
 					<br />
 					<ExternalLink
@@ -54,7 +56,7 @@ export default function WelcomeGuide( { sidebar } ) {
 					</ExternalLink>
 				</p>
 			) }
-			<p>
+			<p className="customize-widgets-welcome-guide__more-info">
 				{ __( 'New to the block editor?' ) }
 				<br />
 				<ExternalLink
