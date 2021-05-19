@@ -1,0 +1,11 @@
+[
+	{
+		"blockName": "core/pullquote",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "\n<figure class=\"wp-block-pullquote\">\n    <blockquote class=\"has-text-align-right\">\n    <p>This pullquote has text aligned to right.</p>\n    <cite>So does the citation.</cite>\n    </blockquote>\n</figure>\n",
+		"innerContent": [
+			"\n<figure class=\"wp-block-pullquote\">\n    <blockquote class=\"has-text-align-right\">\n    <p>This pullquote has text aligned to right.</p>\n    <cite>So does the citation.</cite>\n    </blockquote>\n</figure>\n"
+		]
+	}
+]
