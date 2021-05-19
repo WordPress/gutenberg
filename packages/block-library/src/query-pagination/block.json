@@ -8,7 +8,7 @@
 	"textdomain": "default",
 	"usesContext": [ "queryId", "query" ],
 	"supports": {
-		"align": [ "wide", "full" ],
+		"align": true,
 		"reusable": false,
 		"html": false,
 		"color": {
