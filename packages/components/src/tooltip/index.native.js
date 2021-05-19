@@ -104,6 +104,7 @@ const Tooltip = ( {
 		return () => onHandleScreenTouch( null );
 	}, [ visible ] );
 
+	// Manage visibility animation
 	useEffect( () => {
 		if (
 			// Initial render and visibility enabled, animate show
@@ -114,7 +115,7 @@ const Tooltip = ( {
 			setAnimating( true );
 			startAnimation();
 		}
-	}, [ animating, visible ] );
+	}, [ visible ] );
 
 	// Manage tooltip visibility and position in relation to keyboard
 	useEffect( () => {
