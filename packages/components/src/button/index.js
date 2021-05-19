@@ -19,7 +19,6 @@ import VisuallyHidden from '../visually-hidden';
 
 const disabledEventsOnDisabledButton = [ 'onMouseDown', 'onClick' ];
 
-// TODO: add JSDOCS
 function useDeprecatedProps( {
 	isDefault,
 	isPrimary,
