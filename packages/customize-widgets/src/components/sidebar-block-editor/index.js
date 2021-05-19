@@ -29,6 +29,7 @@ import Header from '../header';
 import useInserter from '../inserter/use-inserter';
 import SidebarEditorProvider from './sidebar-editor-provider';
 import { store as customizeWidgetsStore } from '../../store';
+import Welcome from '../welcome';
 
 export default function SidebarBlockEditor( {
 	blockEditorSettings,
@@ -80,6 +81,8 @@ export default function SidebarBlockEditor( {
 		isFixedToolbarActive,
 		keepCaretInsideBlock,
 	] );
+
+	return <Welcome />;
 
 	return (
 		<>

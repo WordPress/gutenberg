@@ -1,0 +1,31 @@
+.customize-widgets-welcome {
+	&__image {
+		background: #00a0d2;
+		height: 240px;
+		margin: 0 0 $grid-unit-20;
+
+		&__prm-r {
+			display: none;
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			&__prm-r {
+				display: block;
+			}
+
+			&__prm-np {
+				display: none;
+			}
+		}
+	}
+
+	&__button {
+		justify-content: center;
+		margin: 1em 0;
+		width: 100%;
+	}
+
+	&__separator {
+		margin: 1em 0;
+	}
+}
