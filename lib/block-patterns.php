@@ -244,6 +244,10 @@ add_action(
 add_action(
 	'current_screen',
 	function( $current_screen ) {
+		if ( ! get_theme_support( 'core-block-patterns' ) ) {
+			return;
+		}
+
 		$is_site_editor = ( function_exists( 'gutenberg_is_edit_site_page' ) && gutenberg_is_edit_site_page( $current_screen->id ) );
 		if ( $current_screen->is_block_editor || $is_site_editor ) {
 			load_remote_patterns();
