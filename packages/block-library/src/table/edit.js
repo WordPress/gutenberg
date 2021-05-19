@@ -428,24 +428,24 @@ function TableEdit( {
 		<figure { ...useBlockProps() }>
 			{ ! isEmpty && (
 				<>
-				<BlockControls group="block">
-					<AlignmentControl
-						label={ __( 'Change column alignment' ) }
-						alignmentControls={ ALIGNMENT_CONTROLS }
-						value={ getCellAlignment() }
-						onChange={ ( nextAlign ) =>
-							onChangeColumnAlignment( nextAlign )
-						}
-					/>
-				</BlockControls>
-				<BlockControls group="other">
-					<ToolbarDropdownMenu
-						hasArrowIndicator
-						icon={ table }
-						label={ __( 'Edit table' ) }
-						controls={ tableControls }
-					/>
-				</BlockControls>
+					<BlockControls group="block">
+						<AlignmentControl
+							label={ __( 'Change column alignment' ) }
+							alignmentControls={ ALIGNMENT_CONTROLS }
+							value={ getCellAlignment() }
+							onChange={ ( nextAlign ) =>
+								onChangeColumnAlignment( nextAlign )
+							}
+						/>
+					</BlockControls>
+					<BlockControls group="other">
+						<ToolbarDropdownMenu
+							hasArrowIndicator
+							icon={ table }
+							label={ __( 'Edit table' ) }
+							controls={ tableControls }
+						/>
+					</BlockControls>
 				</>
 			) }
 			{ ! isEmpty && (
