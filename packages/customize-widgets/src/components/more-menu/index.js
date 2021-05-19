@@ -17,7 +17,7 @@ import { useShortcut } from '@wordpress/keyboard-shortcuts';
  * Internal dependencies
  */
 import FeatureToggle from './feature-toggle';
-// import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
+import KeyboardShortcutHelpModal from '../keyboard-shortcut-help-modal';
 
 const POPOVER_PROPS = {
 	className: 'customize-widgets-more-menu__content',
@@ -121,10 +121,10 @@ export default function MoreMenu() {
 					</>
 				) }
 			</DropdownMenu>
-			{ /* <KeyboardShortcutHelpModal
+			<KeyboardShortcutHelpModal
 				isModalActive={ isKeyboardShortcutsModalActive }
 				toggleModal={ toggleKeyboardShortcutsModal }
-			/> */ }
+			/>
 		</>
 	);
 }
