@@ -20,12 +20,11 @@ import {
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	DropdownMenu,
 	PanelBody,
 	Placeholder,
 	TextControl,
 	ToggleControl,
-	ToolbarItem,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import {
 	alignLeft,
@@ -428,18 +427,8 @@ function TableEdit( {
 	return (
 		<figure { ...useBlockProps() }>
 			{ ! isEmpty && (
+				<>
 				<BlockControls group="block">
-					<ToolbarItem>
-						{ ( toggleProps ) => (
-							<DropdownMenu
-								hasArrowIndicator
-								icon={ table }
-								toggleProps={ toggleProps }
-								label={ __( 'Edit table' ) }
-								controls={ tableControls }
-							/>
-						) }
-					</ToolbarItem>
 					<AlignmentControl
 						label={ __( 'Change column alignment' ) }
 						alignmentControls={ ALIGNMENT_CONTROLS }
@@ -449,6 +438,15 @@ function TableEdit( {
 						}
 					/>
 				</BlockControls>
+				<BlockControls group="other">
+					<ToolbarDropdownMenu
+						hasArrowIndicator
+						icon={ table }
+						label={ __( 'Edit table' ) }
+						controls={ tableControls }
+					/>
+				</BlockControls>
+				</>
 			) }
 			{ ! isEmpty && (
 				<InspectorControls>
