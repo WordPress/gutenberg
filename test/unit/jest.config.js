@@ -47,4 +47,7 @@ module.exports = {
 		'default',
 		'<rootDir>packages/scripts/config/jest-github-actions-reporter.js',
 	],
+	transformIgnorePatterns: [
+		"/node_modules/(?!(@react-native|react-native)/).*/"
+	  ],
 };
