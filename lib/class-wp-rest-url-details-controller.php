@@ -163,6 +163,8 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		);
 	}
 
+
+
 	/**
 	 * Retrieves the document title from a remote URL.
 	 *
@@ -173,6 +175,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 
 		$args = array(
 			'limit_response_size' => 150 * KB_IN_BYTES,
+			'user-agent'          => $this->get_random_user_agent(),
 		);
 
 		/**
@@ -343,5 +346,27 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		$cache_expiration = apply_filters( 'rest_url_details_cache_expiration', $ttl );
 
 		return set_transient( $key, $data, $cache_expiration );
+	}
+
+	/**
+	 * Picks a random user agent string from a list of common defaults.
+	 * By default WordPress HTTP functions uses a semi-static string and
+	 * this maybe rejected by many websites.
+	 *
+	 * See: https://core.trac.wordpress.org/browser/tags/5.7.1/src/wp-includes/class-http.php#L191.
+	 *
+	 * @return string the user agent string.
+	 */
+	private function get_random_user_agent() {
+
+		$agents = array(
+			'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.135 Safari/537.36 Edge/12.246', // Windows 10-based PC using Edge browser.
+			'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/601.3.9 (KHTML, like Gecko) Version/9.0.2 Safari/601.3.9', // Mac OS X-based computer using a Safari browser.
+			'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:15.0) Gecko/20100101 Firefox/15.0.1', // Linux-based PC using a Firefox browser.
+		);
+
+		$chose = rand( 0, count( $agents ) - 1 );
+
+		return $agents[ $chose ];
 	}
 }
