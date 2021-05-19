@@ -7,6 +7,7 @@ const supportedAudioUrlsWithExtensions = [
 	'https://www.mp3.com/file.mp3?key1=value1&key2=value2#anchorforsomereason',
 	'https://www.mp3.com/file.mp3?key1=value1&key2=value2',
 	'https://www.mp3.com/file.mp3',
+	`https://www.mp3.com/folder/file.mp3`,
 ];
 
 const supportedAudioUrlsWithoutExtensions = [
