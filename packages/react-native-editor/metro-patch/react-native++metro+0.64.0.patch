@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native/node_modules/metro/src/node-haste/DependencyGraph.js b/node_modules/react-native/node_modules/metro/src/node-haste/DependencyGraph.js
+index 643ae07..b258aa7 100644
+--- a/node_modules/react-native/node_modules/metro/src/node-haste/DependencyGraph.js
++++ b/node_modules/react-native/node_modules/metro/src/node-haste/DependencyGraph.js
+@@ -228,7 +228,7 @@ class DependencyGraph extends EventEmitter {
+       roots: config.watchFolders,
+       throwOnModuleCollision: true,
+       useWatchman: config.resolver.useWatchman,
+-      watch: watch == null ? !ci.isCI : watch
++      watch: false
+     }); // We can have a lot of graphs listening to Haste for changes.
+     // Bump this up to silence the max listeners EventEmitter warning.
+ 
