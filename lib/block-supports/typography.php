@@ -99,7 +99,7 @@ function gutenberg_apply_typography_support( $block_type, $block_attributes ) {
 				$font_family_name = substr( $font_family, $index_to_splice );
 				$styles[]         = sprintf( 'font-family: var(--wp--preset--font-family--%s);', $font_family_name );
 			} else {
-				$styles[] = sprintf( 'font-family: %s;', $block_attributes['style']['color']['fontFamily'] );
+				$styles[] = sprintf( 'font-family: %s;', $block_attributes['style']['typography']['fontFamily'] );
 			}
 		}
 	}
