@@ -233,39 +233,18 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 	 * @return string The icon URI (maybe empty).
 	 */
 	private function get_icon( $html, $url ) {
-		$rel_pattern  = 'rel="\s*(?:icon|shortcut icon|icon shortcut)\s*"';
-		$href_pattern = 'href="(.*?)"';
-		$type_pattern = '(?:type="(?:.*)")?';
-		$pattern      = '#<link\s*' .
-			// type attribute could appear first.
-			"{$type_pattern}\s*" .
-			'(?:' .
-				// Attribute order 1: rel="" href="".
-				"{$rel_pattern}\s*{$href_pattern}\s*" .
-			// Or find the attributes in the opposite order.
-			'|' .
-				// Attribute order 2: href="" and then rel="".
-				"{$href_pattern}\s*{$rel_pattern}\s*" .
-			')' .
-			// or type attribute could appear last.
-			"\s*{$type_pattern}" .
-			'.*\/?>#is';
-
-		preg_match( $pattern, $html, $matches );
-
-		// If attribute order 1 matched, use it for the icon.
-		if ( ! empty( $matches[1] ) && is_string( $matches[1] ) ) {
-			$icon = trim( $matches[1] );
-
-			// Else if attribute order 2 matched, use it for the icon.
-		} elseif ( ! empty( $matches[2] ) && is_string( $matches[2] ) ) {
-			$icon = trim( $matches[2] );
-
-			// Either didn't find a match or href is empty.
-		} else {
-			$icon = '';
+		// Grab the icon's link element.
+		$pattern = '#<link\s[^>]*rel="\s*(?:icon|shortcut icon|icon shortcut)\s*"[^>]*\/?>#is';
+		preg_match( $pattern, $html, $element );
+		$element = ! empty( $element[0] ) && is_string( $element[0] ) ? trim( $element[0] ) : '';
+		if ( empty( $element ) ) {
+			return '';
 		}
 
+		// Get the icon's href value.
+		$pattern = '#href="(.*?)"#is';
+		preg_match( $pattern, $element, $icon );
+		$icon = ! empty( $icon[1] ) && is_string( $icon[1] ) ? trim( $icon[1] ) : '';
 		if ( empty( $icon ) ) {
 			return '';
 		}
@@ -273,7 +252,7 @@ class WP_REST_URL_Details_Controller extends WP_REST_Controller {
 		// Attempt to convert relative URLs to absolute.
 		$parsed_url = parse_url( $url );
 		$root_url   = $parsed_url['scheme'] . '://' . $parsed_url['host'] . '/';
-		$icon       = \WP_Http::make_absolute_url( $icon, $root_url );
+		$icon       = WP_Http::make_absolute_url( $icon, $root_url );
 
 		return $icon;
 	}
