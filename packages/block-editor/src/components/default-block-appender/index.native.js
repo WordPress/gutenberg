@@ -17,6 +17,7 @@ import { getDefaultBlockName } from '@wordpress/blocks';
  * Internal dependencies
  */
 import BlockInsertionPoint from '../block-list/insertion-point';
+import styles from './style.scss';
 import { store as blockEditorStore } from '../../store';
 
 export function DefaultBlockAppender( {
@@ -39,7 +40,10 @@ export function DefaultBlockAppender( {
 	return (
 		<TouchableWithoutFeedback onPress={ onAppend }>
 			<View
-				style={ [ showSeparator && containerStyle ] }
+				style={ [
+					styles.blockHolder,
+					showSeparator && containerStyle,
+				] }
 				pointerEvents="box-only"
 			>
 				{ showSeparator ? (

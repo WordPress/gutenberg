@@ -69,7 +69,8 @@
 }
 
 .defaultAppender {
-	margin: $block-edge-to-content;
+	margin-top: $block-edge-to-content;
+	margin-bottom: $block-edge-to-content;
 	width: 100%;
 }
 
