@@ -196,7 +196,9 @@ render in components in `useCallback`.
 
 _Parameters_
 
--   _args_ `[TFunc, ...DebounceTailParameters]`: Arguments passed to Lodash's `debounce`.
+-   _fn_ `TFunc`: 
+-   _wait_ `[number]`: 
+-   _options_ `[import('lodash').DebounceSettings]`: 
 
 _Returns_
 
