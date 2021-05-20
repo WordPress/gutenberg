@@ -72,6 +72,7 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 	} = useSelect(
 		( select ) => {
 			const {
+				getBlockRootClientId,
 				getBlockIndex,
 				getBlockMode,
 				getBlockName,
@@ -87,8 +88,9 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 				isBlockMultiSelected( clientId ) ||
 				isAncestorMultiSelected( clientId );
 			const blockName = getBlockName( clientId );
+			const rootClientId = getBlockRootClientId( clientId );
 			return {
-				index: getBlockIndex( clientId ),
+				index: getBlockIndex( clientId, rootClientId ),
 				mode: getBlockMode( clientId ),
 				name: blockName,
 				blockTitle: getBlockType( blockName ).title,
@@ -138,6 +140,8 @@ export function useBlockProps( props = {}, { __unstableIsHtml } = {} ) {
 		'data-type': name,
 		'data-title': blockTitle,
 		className: classnames(
+			// The wp-block className is important for editor styles.
+			'wp-block block-editor-block-list__block',
 			className,
 			props.className,
 			wrapperProps.className,

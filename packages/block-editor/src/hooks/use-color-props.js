@@ -56,7 +56,7 @@ export function getColorClassesAndStyles( attributes ) {
 			style?.color?.background ||
 			gradient ||
 			style?.color?.gradient,
-		'has-link-color': style?.color?.link,
+		'has-link-color': style?.elements?.link?.color,
 	} );
 
 	// Collect inline styles for colors.

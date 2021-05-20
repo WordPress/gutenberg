@@ -1,0 +1,130 @@
+.components-panel__header.edit-navigation-sidebar__panel-tabs {
+	justify-content: flex-start;
+	padding-left: 0;
+	padding-right: $grid-unit-20;
+	border-top: 0;
+	margin-top: 0;
+
+	ul {
+		display: flex;
+	}
+	li {
+		margin: 0;
+	}
+
+	.components-button.has-icon {
+		display: none;
+		margin: 0 0 0 auto;
+		padding: 0;
+		min-width: $icon-size;
+		height: $icon-size;
+
+		@include break-medium() {
+			display: flex;
+		}
+	}
+}
+
+.components-button.edit-navigation-sidebar__panel-tab {
+	border-radius: 0;
+	height: $grid-unit-60;
+	background: transparent;
+	border: none;
+	box-shadow: none;
+	cursor: pointer;
+	display: inline-block;
+	padding: 3px 15px; // Use padding to offset the is-active border, this benefits Windows High Contrast mode
+	margin-left: 0;
+	font-weight: 500;
+
+	// This pseudo-element "duplicates" the tab label and sets the text to bold.
+	// This ensures that the tab doesn't change width when selected.
+	// See: https://github.com/WordPress/gutenberg/pull/9793
+	&::after {
+		content: attr(data-label);
+		display: block;
+		font-weight: 600;
+		height: 0;
+		overflow: hidden;
+		speak: none;
+		visibility: hidden;
+	}
+
+	&.is-active {
+		// The transparent shadow ensures no jumpiness when focus animates on an active tab.
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) transparent, inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
+		position: relative;
+		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
+
+		// This border appears in Windows High Contrast mode instead of the box-shadow.
+		&::before {
+			content: "";
+			position: absolute;
+			top: 0;
+			bottom: 1px;
+			right: 0;
+			left: 0;
+			border-bottom: $border-width-tab solid transparent;
+		}
+	}
+
+	&:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color);
+		position: relative;
+		z-index: z-index(".edit-post-sidebar__panel-tab.is-active");
+	}
+
+	&.is-active:focus {
+		box-shadow: inset 0 0 0 var(--wp-admin-border-width-focus) var(--wp-admin-theme-color), inset 0 0 -$border-width-tab 0 0 var(--wp-admin-theme-color);
+	}
+}
+
+.edit-navigation-inspector-additions__delete-menu-button {
+	width: 100%;
+	justify-content: center;
+}
+
+.edit-navigation-manage-locations__modal {
+	max-width: 360px;
+}
+
+.edit-navigation-manage-locations__delete-menu-panel {
+	text-align: center;
+}
+
+.edit-navigation-manage-locations__menu-entry .components-base-control {
+	width: 100%;
+}
+
+.edit-navigation-manage-locations__edit-button {
+	flex: 1;
+}
+
+.edit-navigation-manage-locations__menu-entry {
+	display: flex;
+	align-items: flex-end;
+	margin-bottom: $grid-unit-15;
+	margin-top: $grid-unit-15;
+	.components-custom-select-control,
+	.components-custom-select-control__button {
+		width: 100%;
+	}
+	button {
+		height: 100%;
+		margin-bottom: 8px;
+	}
+}
+
+.edit-navigation-manage-locations__select-menu {
+	padding-right: $grid-unit-10;
+}
+
+.edit-navigation-manage-locations__open-menu-locations-modal-button {
+	width: 100%;
+	justify-content: center;
+}
+
+.edit-navigation-manage-locations__theme-location-text-main,
+.edit-navigation-manage-locations__theme-location-text-modal {
+	margin-bottom: $grid-unit-30;
+}

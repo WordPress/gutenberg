@@ -4,7 +4,7 @@
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
 import {
-	registerBlockTypeFromMetadata,
+	registerBlockType,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -105,7 +105,7 @@ const registerBlock = ( block ) => {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	registerBlockTypeFromMetadata( { name, ...metadata }, settings );
+	registerBlockType( { name, ...metadata }, settings );
 };
 
 /**
@@ -183,7 +183,6 @@ export const __experimentalGetCoreBlocks = () => [
 
 	postTitle,
 	postContent,
-	postAuthor,
 	postDate,
 	postExcerpt,
 	postFeaturedImage,
@@ -243,6 +242,7 @@ export const __experimentalRegisterExperimentalCoreBlocks =
 					...( enableFSEBlocks
 						? [
 								templatePart,
+								postAuthor,
 								postComment,
 								postCommentAuthor,
 								postCommentContent,

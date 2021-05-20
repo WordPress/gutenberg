@@ -87,7 +87,6 @@ export default function BlockEditor( { setIsInserterOpen } ) {
 				<BlockTools __unstableContentRef={ contentRef }>
 					<Iframe
 						style={ resizedCanvasStyles }
-						headHTML={ window.__editorStyles.html }
 						head={ <EditorStyles styles={ settings.styles } /> }
 						ref={ ref }
 						contentRef={ mergedRefs }
