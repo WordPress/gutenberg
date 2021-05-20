@@ -4,7 +4,7 @@
 import '@wordpress/core-data';
 import '@wordpress/block-editor';
 import {
-	registerBlockTypeFromMetadata,
+	registerBlockType,
 	setDefaultBlockName,
 	setFreeformContentHandlerName,
 	setUnregisteredTypeHandlerName,
@@ -105,7 +105,7 @@ const registerBlock = ( block ) => {
 		return;
 	}
 	const { metadata, settings, name } = block;
-	registerBlockTypeFromMetadata( { name, ...metadata }, settings );
+	registerBlockType( { name, ...metadata }, settings );
 };
 
 /**

@@ -92,7 +92,8 @@ function gutenberg_experimental_global_styles_settings( $settings ) {
 		defined( 'REST_REQUEST' ) &&
 		REST_REQUEST &&
 		isset( $_GET['context'] ) &&
-		'mobile' === $_GET['context']
+		'mobile' === $_GET['context'] &&
+		WP_Theme_JSON_Resolver::theme_has_support()
 	) {
 		$context = 'mobile';
 	}

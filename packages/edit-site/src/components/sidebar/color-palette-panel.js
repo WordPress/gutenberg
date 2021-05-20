@@ -1,7 +1,7 @@
 /**
  * External dependencies
  */
-import { get } from 'lodash';
+import { difference, get } from 'lodash';
 
 /**
  * WordPress dependencies
@@ -58,7 +58,21 @@ export default function ColorPalettePanel( {
 			immutableColorSlugs={ immutableColorSlugs }
 			colors={ colors }
 			onChange={ ( newColors ) => {
-				setSetting( contextName, 'color.palette', newColors );
+				const existingUserColors = ( newColors ?? [] ).filter(
+					( color ) => color.origin === 'user'
+				);
+				const differentUserColors = difference( newColors, colors );
+				if ( differentUserColors.length === 1 ) {
+					differentUserColors[ 0 ] = {
+						...differentUserColors[ 0 ],
+						origin: 'user',
+					};
+				}
+
+				setSetting( contextName, 'color.palette', [
+					...existingUserColors,
+					...differentUserColors,
+				] );
 			} }
 			emptyUI={ __(
 				'Colors are empty! Add some colors to create your own color palette.'
