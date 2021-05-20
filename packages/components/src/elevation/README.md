@@ -63,3 +63,15 @@ Dimensional offsets (margin) for the shadow.
 
 Size of the shadow, based on the Style system's elevation system. The `value` determines the strength of the shadow, which sense of depth.
 In the example below, `isInteractive` is activated to give a better sense of depth.
+
+```jsx
+import { __experimentalElevation as Elevation } from '@wordpress/components';
+
+function Example() {
+	return (
+		<div>
+			<Elevation isInteractive value={ 200 } />
+		</div>
+	);
+}
+```
