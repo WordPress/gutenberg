@@ -327,6 +327,11 @@ function gutenberg_get_block_templates( $query = array(), $template_type = 'wp_t
 		}
 	}
 
+	// https://core.trac.wordpress.org/ticket/28099
+	if ( $wp_query_args['post__in'] === array() ) {
+		return array();
+	}
+
 	// This is only needed for the regular templates/template parts CPT listing and editor.
 	if ( isset( $query['wp_id'] ) ) {
 		$wp_query_args['p'] = $query['wp_id'];
