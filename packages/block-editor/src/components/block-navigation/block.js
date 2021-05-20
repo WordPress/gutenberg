@@ -42,6 +42,7 @@ export default function BlockNavigationBlock( {
 	siblingBlockCount,
 	showBlockMovers,
 	path,
+	isExpanded,
 } ) {
 	const cellRef = useRef( null );
 	const [ isHovered, setIsHovered ] = useState( false );
@@ -142,6 +143,7 @@ export default function BlockNavigationBlock( {
 			path={ path }
 			id={ `block-navigation-block-${ clientId }` }
 			data-block={ clientId }
+			isExpanded={ isExpanded }
 		>
 			<TreeGridCell
 				className="block-editor-block-navigation-block__contents-cell"
@@ -152,7 +154,7 @@ export default function BlockNavigationBlock( {
 					<div className="block-editor-block-navigation-block__contents-container">
 						<BlockNavigationBlockContents
 							block={ block }
-							onClick={ () => onClick( block.clientId ) }
+							onClick={ onClick }
 							isSelected={ isSelected }
 							position={ position }
 							siblingBlockCount={ siblingBlockCount }

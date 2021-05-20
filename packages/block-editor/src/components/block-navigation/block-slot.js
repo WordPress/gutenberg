@@ -26,6 +26,7 @@ import { BlockListBlockContext } from '../block-list/block';
 import BlockNavigationBlockSelectButton from './block-select-button';
 import { getBlockPositionDescription } from './utils';
 import { store as blockEditorStore } from '../../store';
+import BlockNavigationExpander from './expander';
 
 const getSlotName = ( clientId ) => `BlockNavigationBlock-${ clientId }`;
 
@@ -57,6 +58,7 @@ function BlockNavigationBlockSlot( props, ref ) {
 					level,
 					tabIndex,
 					onFocus,
+					onClick,
 				} = props;
 
 				const blockType = getBlockType( name );
@@ -86,6 +88,7 @@ function BlockNavigationBlockSlot( props, ref ) {
 								className
 							) }
 						>
+							<BlockNavigationExpander onClick={ onClick } />
 							<BlockIcon icon={ blockType.icon } showColors />
 							{ Children.map( fills, ( fill ) =>
 								cloneElement( fill, {

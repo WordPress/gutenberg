@@ -4,7 +4,13 @@
 
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
-import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 
 /**
@@ -52,6 +58,7 @@ export default function BlockNavigationTree( {
 		},
 		[ selectBlock, onSelect ]
 	);
+	const [ expandedState, setExpandedState ] = useState( {} );
 
 	let {
 		ref: treeGridRef,
@@ -73,12 +80,16 @@ export default function BlockNavigationTree( {
 			__experimentalPersistentListViewFeatures,
 			blockDropTarget,
 			isTreeGridMounted: isMounted.current,
+			expandedState,
+			setExpandedState,
 		} ),
 		[
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			blockDropTarget,
 			isMounted.current,
+			expandedState,
+			setExpandedState,
 		]
 	);
 

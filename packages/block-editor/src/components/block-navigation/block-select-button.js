@@ -18,6 +18,7 @@ import BlockIcon from '../block-icon';
 import useBlockDisplayInformation from '../use-block-display-information';
 import { getBlockPositionDescription } from './utils';
 import BlockTitle from '../block-title';
+import BlockNavigationExpander from './expander';
 
 function BlockNavigationBlockSelectButton(
 	{
@@ -61,6 +62,7 @@ function BlockNavigationBlockSelectButton(
 				onDragEnd={ onDragEnd }
 				draggable={ draggable }
 			>
+				<BlockNavigationExpander onClick={ onClick } />
 				<BlockIcon icon={ blockInformation?.icon } showColors />
 				<BlockTitle clientId={ clientId } />
 				{ blockInformation?.anchor && (
