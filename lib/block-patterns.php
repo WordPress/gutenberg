@@ -239,8 +239,16 @@ add_action(
 		if ( ! get_theme_support( 'core-block-patterns' ) || ! function_exists( 'unregister_block_pattern' ) ) {
 			return;
 		}
-		remove_core_patterns();
-		register_gutenberg_patterns();
+
+		// Provides a way to opt-out of removing core patterns.
+		if ( apply_filters( 'remove_core_patterns', true ) ) {
+			remove_core_patterns();
+		}
+
+		// Provides a way to opt-out of pattern registration.
+		if ( apply_filters( 'register_gutenberg_patterns', true ) ) {
+			register_gutenberg_patterns();
+		}
 	}
 );
 
@@ -248,6 +256,11 @@ add_action(
 	'current_screen',
 	function( $current_screen ) {
 		if ( ! get_theme_support( 'core-block-patterns' ) ) {
+			return;
+		}
+
+		// Provides a way to opt-out of remotely loading core patterns.
+		if ( ! apply_filters( 'load_remote_patterns', true ) ) {
 			return;
 		}
 
