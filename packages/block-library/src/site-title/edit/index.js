@@ -10,17 +10,22 @@ import { useEntityProp } from '@wordpress/core-data';
 import { __ } from '@wordpress/i18n';
 import {
 	RichText,
-	AlignmentToolbar,
+	AlignmentControl,
 	BlockControls,
 	useBlockProps,
 } from '@wordpress/block-editor';
+import { createBlock, getDefaultBlockName } from '@wordpress/blocks';
 
 /**
  * Internal dependencies
  */
-import LevelToolbar from './level-toolbar';
+import LevelControl from './level-toolbar';
 
-export default function SiteTitleEdit( { attributes, setAttributes } ) {
+export default function SiteTitleEdit( {
+	attributes,
+	setAttributes,
+	insertBlocksAfter,
+} ) {
 	const { level, textAlign } = attributes;
 	const [ title, setTitle ] = useEntityProp( 'root', 'site', 'title' );
 	const TagName = level === 0 ? 'p' : `h${ level }`;
@@ -31,19 +36,18 @@ export default function SiteTitleEdit( { attributes, setAttributes } ) {
 	} );
 	return (
 		<>
-			<BlockControls>
-				<AlignmentToolbar
-					value={ textAlign }
-					onChange={ ( nextAlign ) => {
-						setAttributes( { textAlign: nextAlign } );
-					} }
-				/>
-
-				<LevelToolbar
+			<BlockControls group="block">
+				<LevelControl
 					level={ level }
 					onChange={ ( newLevel ) =>
 						setAttributes( { level: newLevel } )
 					}
+				/>
+				<AlignmentControl
+					value={ textAlign }
+					onChange={ ( nextAlign ) => {
+						setAttributes( { textAlign: nextAlign } );
+					} }
 				/>
 			</BlockControls>
 			<TagName { ...blockProps }>
@@ -56,6 +60,11 @@ export default function SiteTitleEdit( { attributes, setAttributes } ) {
 					onChange={ setTitle }
 					allowedFormats={ [] }
 					disableLineBreaks
+					__unstableOnSplitAtEnd={ () =>
+						insertBlocksAfter(
+							createBlock( getDefaultBlockName() )
+						)
+					}
 				/>
 			</TagName>
 		</>

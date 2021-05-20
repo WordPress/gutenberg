@@ -44,7 +44,7 @@
 	}
 }
 
-.block-editor-block-contextual-toolbar.has-parent {
+.block-editor-block-contextual-toolbar.has-parent:not(.is-fixed) {
 	margin-left: calc(#{$grid-unit-60} + #{$grid-unit-10});
 
 	.show-icon-labels & {
@@ -85,6 +85,9 @@
 			right: $grid-unit-05 !important;
 		}
 	}
+
+	// Match the parent selector button.
+	margin-left: -$border-width;
 
 	// Compensate for width of block switcher.
 	.block-editor-block-mover {

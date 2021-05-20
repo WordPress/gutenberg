@@ -836,7 +836,7 @@ export class RichText extends Component {
 					extraAttributes += ` start=${ this.props.start }`;
 				}
 			}
-			value = `<${ tagName } ${ extraAttributes }>${ value }</${ tagName }>`;
+			value = `<${ tagName }${ extraAttributes }>${ value }</${ tagName }>`;
 		}
 		return value;
 	}
@@ -969,9 +969,13 @@ export class RichText extends Component {
 					onFocus={ this.onFocus }
 					onBlur={ this.onBlur }
 					onKeyDown={ this.onKeyDown }
-					triggerKeyCodes={ this.suggestionOptions().map(
-						( op ) => op.triggerChar
-					) }
+					triggerKeyCodes={
+						disableEditingMenu
+							? []
+							: this.suggestionOptions().map(
+									( op ) => op.triggerChar
+							  )
+					}
 					onPaste={ this.onPaste }
 					activeFormats={ this.getActiveFormatNames( record ) }
 					onContentSizeChange={ this.onContentSizeChange }

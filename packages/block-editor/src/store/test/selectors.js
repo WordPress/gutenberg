@@ -75,6 +75,8 @@ const {
 	__experimentalGetPatternsByBlockTypes,
 	__unstableGetClientIdWithClientIdsTree,
 	__unstableGetClientIdsTree,
+	__experimentalGetPatternTransformItems,
+	wasBlockJustInserted,
 } = selectors;
 
 describe( 'selectors', () => {
@@ -2245,17 +2247,20 @@ describe( 'selectors', () => {
 	} );
 
 	describe( 'isBlockInsertionPointVisible', () => {
-		it( 'should return false if insertion point is set to not show', () => {
+		it( 'should return false if no assigned insertion point', () => {
 			const state = {
-				insertionPointVisibility: false,
+				insertionPoint: null,
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( false );
 		} );
 
-		it( 'should return true if insertion point is set to show', () => {
+		it( 'should return true if assigned insertion point', () => {
 			const state = {
-				insertionPointVisibility: true,
+				insertionPoint: {
+					rootClientId: undefined,
+					index: 5,
+				},
 			};
 
 			expect( isBlockInsertionPointVisible( state ) ).toBe( true );
@@ -3479,6 +3484,204 @@ describe( 'selectors', () => {
 			expect( patterns[ 0 ] ).toEqual(
 				expect.objectContaining( { title: 'pattern c' } )
 			);
+		} );
+	} );
+	describe( '__experimentalGetPatternTransformItems', () => {
+		const state = {
+			blocks: {
+				byClientId: {
+					block1: { name: 'core/test-block-a' },
+					block2: { name: 'core/test-block-b' },
+				},
+				controlledInnerBlocks: { 'block2-clientId': true },
+			},
+			blockListSettings: {
+				block1: {
+					allowedBlocks: [ 'core/test-block-b' ],
+				},
+			},
+			settings: {
+				__experimentalBlockPatterns: [
+					{
+						name: 'pattern-a',
+						blockTypes: [ 'test/block-a' ],
+						title: 'pattern a',
+						content:
+							'<!-- wp:test-block-a --><!-- /wp:test-block-a -->',
+					},
+					{
+						name: 'pattern-b',
+						blockTypes: [ 'test/block-b' ],
+						title: 'pattern b',
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+					{
+						name: 'pattern-c',
+						title: 'pattern c',
+						blockTypes: [ 'test/block-a' ],
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+					{
+						name: 'pattern-mix',
+						title: 'pattern mix',
+						blockTypes: [
+							'core/test-block-a',
+							'core/test-block-b',
+						],
+						content:
+							'<!-- wp:test-block-b --><!-- /wp:test-block-b -->',
+					},
+				],
+			},
+		};
+		describe( 'should return empty array', () => {
+			it( 'when no blocks are selected', () => {
+				expect(
+					__experimentalGetPatternTransformItems( state )
+				).toEqual( [] );
+			} );
+			it( 'when a selected block has inner blocks', () => {
+				const blocks = [
+					{ name: 'core/test-block-a', innerBlocks: [] },
+					{
+						name: 'core/test-block-b',
+						innerBlocks: [ { name: 'some inner block' } ],
+					},
+				];
+				expect(
+					__experimentalGetPatternTransformItems( state, blocks )
+				).toEqual( [] );
+			} );
+			it( 'when a selected block has controlled inner blocks', () => {
+				const blocks = [
+					{ name: 'core/test-block-a', innerBlocks: [] },
+					{
+						name: 'core/test-block-b',
+						clientId: 'block2-clientId',
+						innerBlocks: [],
+					},
+				];
+				expect(
+					__experimentalGetPatternTransformItems( state, blocks )
+				).toEqual( [] );
+			} );
+			it( 'when no patterns are available based on the selected blocks', () => {
+				const blocks = [
+					{ name: 'block-with-no-patterns', innerBlocks: [] },
+				];
+				expect(
+					__experimentalGetPatternTransformItems( state, blocks )
+				).toEqual( [] );
+			} );
+		} );
+		describe( 'should return proper results', () => {
+			it( 'when a single block is selected', () => {
+				const blocks = [
+					{ name: 'core/test-block-b', innerBlocks: [] },
+				];
+				const patterns = __experimentalGetPatternTransformItems(
+					state,
+					blocks
+				);
+				expect( patterns ).toHaveLength( 1 );
+				expect( patterns[ 0 ] ).toEqual(
+					expect.objectContaining( {
+						name: 'pattern-mix',
+					} )
+				);
+			} );
+			it( 'when different multiple blocks are selected', () => {
+				const blocks = [
+					{ name: 'core/test-block-b', innerBlocks: [] },
+					{ name: 'test/block-b', innerBlocks: [] },
+					{ name: 'some other block', innerBlocks: [] },
+				];
+				const patterns = __experimentalGetPatternTransformItems(
+					state,
+					blocks
+				);
+				expect( patterns ).toHaveLength( 2 );
+				expect( patterns ).toEqual(
+					expect.arrayContaining( [
+						expect.objectContaining( {
+							name: 'pattern-mix',
+						} ),
+						expect.objectContaining( {
+							name: 'pattern-b',
+						} ),
+					] )
+				);
+			} );
+			it( 'when multiple blocks are selected containing multiple times the same block', () => {
+				const blocks = [
+					{ name: 'core/test-block-b', innerBlocks: [] },
+					{ name: 'some other block', innerBlocks: [] },
+					{ name: 'core/test-block-a', innerBlocks: [] },
+					{ name: 'core/test-block-b', innerBlocks: [] },
+				];
+				const patterns = __experimentalGetPatternTransformItems(
+					state,
+					blocks
+				);
+				expect( patterns ).toHaveLength( 1 );
+				expect( patterns[ 0 ] ).toEqual(
+					expect.objectContaining( {
+						name: 'pattern-mix',
+					} )
+				);
+			} );
+		} );
+	} );
+
+	describe( 'wasBlockJustInserted', () => {
+		it( 'should return true if the client id passed to wasBlockJustInserted is found within the state', () => {
+			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+			const source = 'inserter_menu';
+
+			const state = {
+				lastBlockInserted: {
+					clientId: expectedClientId,
+					source,
+				},
+			};
+
+			expect(
+				wasBlockJustInserted( state, expectedClientId, source )
+			).toBe( true );
+		} );
+
+		it( 'should return false if the client id passed to wasBlockJustInserted is not found within the state', () => {
+			const expectedClientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+			const unexpectedClientId = '62bfsed4-d5e9-43ba-b7f9-c77cf565756s';
+			const source = 'inserter_menu';
+
+			const state = {
+				lastBlockInserted: {
+					clientId: unexpectedClientId,
+					source,
+				},
+			};
+
+			expect(
+				wasBlockJustInserted( state, expectedClientId, source )
+			).toBe( false );
+		} );
+
+		it( 'should return false if the source passed to wasBlockJustInserted is not found within the state', () => {
+			const clientId = '62bfef6e-d5e9-43ba-b7f9-c77cf354141f';
+			const expectedSource = 'inserter_menu';
+
+			const state = {
+				lastBlockInserted: {
+					clientId,
+				},
+			};
+
+			expect(
+				wasBlockJustInserted( state, clientId, expectedSource )
+			).toBe( false );
 		} );
 	} );
 } );

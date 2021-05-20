@@ -3,7 +3,7 @@
  */
 
 import { __experimentalTreeGrid as TreeGrid } from '@wordpress/components';
-import { useMemo, useRef } from '@wordpress/element';
+import { useEffect, useMemo, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
@@ -26,8 +26,15 @@ export default function BlockNavigationTree( {
 	__experimentalPersistentListViewFeatures,
 	...props
 } ) {
-	const treeGridRef = useRef();
-	let blockDropTarget = useBlockNavigationDropZone( treeGridRef );
+	let {
+		ref: treeGridRef,
+		target: blockDropTarget,
+	} = useBlockNavigationDropZone();
+
+	const isMounted = useRef( false );
+	useEffect( () => {
+		isMounted.current = true;
+	}, [] );
 
 	if ( ! __experimentalFeatures ) {
 		blockDropTarget = undefined;
@@ -38,11 +45,13 @@ export default function BlockNavigationTree( {
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			blockDropTarget,
+			isTreeGridMounted: isMounted.current,
 		} ),
 		[
 			__experimentalFeatures,
 			__experimentalPersistentListViewFeatures,
 			blockDropTarget,
+			isMounted.current,
 		]
 	);
 

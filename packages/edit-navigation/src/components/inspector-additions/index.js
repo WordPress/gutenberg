@@ -2,7 +2,10 @@
  * WordPress dependencies
  */
 import { useSelect } from '@wordpress/data';
-import { InspectorControls } from '@wordpress/block-editor';
+import {
+	InspectorControls,
+	store as blockEditorStore,
+} from '@wordpress/block-editor';
 
 /**
  * Internal dependencies
@@ -25,7 +28,7 @@ export default function InspectorAdditions( {
 	openManageLocationsModal,
 } ) {
 	const selectedBlock = useSelect(
-		( select ) => select( 'core/block-editor' ).getSelectedBlock(),
+		( select ) => select( blockEditorStore ).getSelectedBlock(),
 		[]
 	);
 
@@ -38,10 +41,6 @@ export default function InspectorAdditions( {
 			<PanelBody title={ __( 'Menu settings' ) }>
 				<NameEditor />
 				<AutoAddPages menuId={ menuId } />
-				<DeleteMenu
-					onDeleteMenu={ onDeleteMenu }
-					isMenuBeingDeleted={ isMenuBeingDeleted }
-				/>
 			</PanelBody>
 			<PanelBody title={ __( 'Theme locations' ) }>
 				<ManageLocations
@@ -51,6 +50,12 @@ export default function InspectorAdditions( {
 					isModalOpen={ isManageLocationsModalOpen }
 					closeModal={ closeManageLocationsModal }
 					openModal={ openManageLocationsModal }
+				/>
+			</PanelBody>
+			<PanelBody>
+				<DeleteMenu
+					onDeleteMenu={ onDeleteMenu }
+					isMenuBeingDeleted={ isMenuBeingDeleted }
 				/>
 			</PanelBody>
 		</InspectorControls>

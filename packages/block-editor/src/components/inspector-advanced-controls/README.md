@@ -8,6 +8,7 @@ Inspector Advanced Controls appear under the _Advanced_ panel of a block's [Insp
 
 {% codetabs %}
 {% ESNext %}
+
 ```js
 const {
 	TextControl,
@@ -41,7 +42,9 @@ function MyBlockEdit( { attributes, setAttributes } ) {
 	);
 }
 ```
+
 {% ES5 %}
+
 ```js
 var el = wp.element.createElement,
 	Fragment = wp.element.Fragment,
@@ -50,7 +53,7 @@ var el = wp.element.createElement,
 	TextControl = wp.components.TextControl,
 
 function MyBlockEdit( props ) {
-	return el( Fragment, null, 
+	return el( Fragment, null,
 		el( 'div', null, /* Block markup goes here */ null ),
 		el( InspectorControls, null, /* Regular control goes here */ null ),
 		el( InspectorAdvancedControls, null,
@@ -65,4 +68,5 @@ function MyBlockEdit( props ) {
 	);
 }
 ```
+
 {% end %}

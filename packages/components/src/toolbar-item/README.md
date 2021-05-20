@@ -68,5 +68,5 @@ function Edit() {
 
 ## Related components
 
-* ToolbarItem should be used inside [Toolbar](/packages/components/src/toolbar/README.md) or [ToolbarGroup](/packages/components/src/toolbar-group/README.md).
-* If you want a simple toolbar button, consider using [ToolbarButton](/packages/components/src/toolbar-button/README.md) instead.
+-   ToolbarItem should be used inside [Toolbar](/packages/components/src/toolbar/README.md) or [ToolbarGroup](/packages/components/src/toolbar-group/README.md).
+-   If you want a simple toolbar button, consider using [ToolbarButton](/packages/components/src/toolbar-button/README.md) instead.

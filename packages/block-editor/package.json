@@ -1,6 +1,6 @@
 {
 	"name": "@wordpress/block-editor",
-	"version": "5.3.1",
+	"version": "6.0.0",
 	"description": "Generic block editor.",
 	"author": "The WordPress Contributors",
 	"license": "GPL-2.0-or-later",
@@ -19,6 +19,9 @@
 	"bugs": {
 		"url": "https://github.com/WordPress/gutenberg/issues"
 	},
+	"engines": {
+		"node": ">=12"
+	},
 	"main": "build/index.js",
 	"module": "build-module/index.js",
 	"react-native": "src/index",
@@ -31,6 +34,7 @@
 		"@babel/runtime": "^7.13.10",
 		"@wordpress/a11y": "file:../a11y",
 		"@wordpress/blob": "file:../blob",
+		"@wordpress/block-serialization-default-parser": "file:../block-serialization-default-parser",
 		"@wordpress/blocks": "file:../blocks",
 		"@wordpress/components": "file:../components",
 		"@wordpress/compose": "file:../compose",
@@ -57,7 +61,7 @@
 		"diff": "^4.0.2",
 		"dom-scroll-into-view": "^1.2.1",
 		"inherits": "^2.0.3",
-		"lodash": "^4.17.19",
+		"lodash": "^4.17.21",
 		"memize": "^1.1.0",
 		"react-autosize-textarea": "^7.1.0",
 		"react-spring": "^8.0.19",

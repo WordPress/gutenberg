@@ -6,6 +6,7 @@ const chalk = require( 'chalk' );
 const ora = require( 'ora' );
 const yargs = require( 'yargs' );
 const terminalLink = require( 'terminal-link' );
+const { execSync } = require( 'child_process' );
 
 /**
  * Internal dependencies
@@ -63,7 +64,6 @@ const withSpinner = ( command ) => ( ...args ) => {
 					typeof error === 'string' ? error : error.message
 				);
 				// Disable reason: Using console.error() means we get a stack trace.
-				// eslint-disable-next-line no-console
 				console.error( error );
 				process.exit( 1 );
 			} else {
@@ -75,6 +75,16 @@ const withSpinner = ( command ) => ( ...args ) => {
 };
 
 module.exports = function cli() {
+	// Do nothing if Docker is unavailable.
+	try {
+		execSync( 'docker info', { stdio: 'ignore' } );
+	} catch {
+		console.error(
+			chalk.red( 'Could not connect to Docker. Is it running?' )
+		);
+		process.exit( 1 );
+	}
+
 	yargs.usage( wpPrimary( '$0 <command>' ) );
 	yargs.option( 'debug', {
 		type: 'boolean',

@@ -11,22 +11,20 @@ import {
 	InspectorControls,
 	BlockControls,
 	RichText,
-	PanelColorSettings,
-	createCustomColorsHOC,
 	BlockIcon,
-	AlignmentToolbar,
+	AlignmentControl,
 	useBlockProps,
+	__experimentalUseColorProps as useColorProps,
+	__experimentalUseBorderProps as useBorderProps,
 } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 import {
 	Button,
-	DropdownMenu,
 	PanelBody,
 	Placeholder,
 	TextControl,
 	ToggleControl,
-	ToolbarGroup,
-	ToolbarItem,
+	ToolbarDropdownMenu,
 } from '@wordpress/components';
 import {
 	alignLeft,
@@ -58,29 +56,6 @@ import {
 	isEmptyTableSection,
 } from './state';
 
-const BACKGROUND_COLORS = [
-	{
-		color: '#f3f4f5',
-		name: 'Subtle light gray',
-		slug: 'subtle-light-gray',
-	},
-	{
-		color: '#e9fbe5',
-		name: 'Subtle pale green',
-		slug: 'subtle-pale-green',
-	},
-	{
-		color: '#e7f5fe',
-		name: 'Subtle pale blue',
-		slug: 'subtle-pale-blue',
-	},
-	{
-		color: '#fcf0ef',
-		name: 'Subtle pale pink',
-		slug: 'subtle-pale-pink',
-	},
-];
-
 const ALIGNMENT_CONTROLS = [
 	{
 		icon: alignLeft,
@@ -98,8 +73,6 @@ const ALIGNMENT_CONTROLS = [
 		align: 'right',
 	},
 ];
-
-const withCustomBackgroundColors = createCustomColorsHOC( BACKGROUND_COLORS );
 
 const cellAriaLabel = {
 	head: __( 'Header cell text' ),
@@ -119,8 +92,6 @@ function TSection( { name, ...props } ) {
 
 function TableEdit( {
 	attributes,
-	backgroundColor,
-	setBackgroundColor,
 	setAttributes,
 	insertBlocksAfter,
 	isSelected,
@@ -129,6 +100,9 @@ function TableEdit( {
 	const [ initialRowCount, setInitialRowCount ] = useState( 2 );
 	const [ initialColumnCount, setInitialColumnCount ] = useState( 2 );
 	const [ selectedCell, setSelectedCell ] = useState();
+
+	const colorProps = useColorProps( attributes );
+	const borderProps = useBorderProps( attributes );
 
 	/**
 	 * Updates the initial column count used for table creation.
@@ -453,29 +427,26 @@ function TableEdit( {
 	return (
 		<figure { ...useBlockProps() }>
 			{ ! isEmpty && (
-				<BlockControls>
-					<ToolbarGroup>
-						<ToolbarItem>
-							{ ( toggleProps ) => (
-								<DropdownMenu
-									hasArrowIndicator
-									icon={ table }
-									toggleProps={ toggleProps }
-									label={ __( 'Edit table' ) }
-									controls={ tableControls }
-								/>
-							) }
-						</ToolbarItem>
-					</ToolbarGroup>
-					<AlignmentToolbar
-						label={ __( 'Change column alignment' ) }
-						alignmentControls={ ALIGNMENT_CONTROLS }
-						value={ getCellAlignment() }
-						onChange={ ( nextAlign ) =>
-							onChangeColumnAlignment( nextAlign )
-						}
-					/>
-				</BlockControls>
+				<>
+					<BlockControls group="block">
+						<AlignmentControl
+							label={ __( 'Change column alignment' ) }
+							alignmentControls={ ALIGNMENT_CONTROLS }
+							value={ getCellAlignment() }
+							onChange={ ( nextAlign ) =>
+								onChangeColumnAlignment( nextAlign )
+							}
+						/>
+					</BlockControls>
+					<BlockControls group="other">
+						<ToolbarDropdownMenu
+							hasArrowIndicator
+							icon={ table }
+							label={ __( 'Edit table' ) }
+							controls={ tableControls }
+						/>
+					</BlockControls>
+				</>
 			) }
 			{ ! isEmpty && (
 				<InspectorControls>
@@ -499,27 +470,16 @@ function TableEdit( {
 							onChange={ onToggleFooterSection }
 						/>
 					</PanelBody>
-					<PanelColorSettings
-						title={ __( 'Color settings' ) }
-						initialOpen={ false }
-						colorSettings={ [
-							{
-								value: backgroundColor.color,
-								onChange: setBackgroundColor,
-								label: __( 'Background color' ),
-								disableCustomColors: true,
-								colors: BACKGROUND_COLORS,
-							},
-						] }
-					/>
 				</InspectorControls>
 			) }
 			{ ! isEmpty && (
 				<table
-					className={ classnames( backgroundColor.class, {
-						'has-fixed-layout': hasFixedLayout,
-						'has-background': !! backgroundColor.color,
-					} ) }
+					className={ classnames(
+						colorProps.className,
+						borderProps.className,
+						{ 'has-fixed-layout': hasFixedLayout }
+					) }
+					style={ { ...colorProps.style, ...borderProps.style } }
 				>
 					{ renderedSections }
 				</table>
@@ -580,4 +540,4 @@ function TableEdit( {
 	);
 }
 
-export default withCustomBackgroundColors( 'backgroundColor' )( TableEdit );
+export default TableEdit;

@@ -3,6 +3,7 @@ export * from './create-i18n';
 export {
 	default as defaultI18n,
 	setLocaleData,
+	resetLocaleData,
 	getLocaleData,
 	subscribe,
 	__,

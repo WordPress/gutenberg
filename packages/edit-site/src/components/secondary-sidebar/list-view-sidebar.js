@@ -32,13 +32,13 @@ export default function ListViewSidebar() {
 			clientIdsTree: __unstableGetClientIdsTree(),
 			selectedBlockClientIds: getSelectedBlockClientIds(),
 		};
-	} );
+	}, [] );
 	const { setIsListViewOpened } = useDispatch( editSiteStore );
 
 	const { clearSelectedBlock, selectBlock } = useDispatch( blockEditorStore );
 	async function selectEditorBlock( clientId ) {
 		await clearSelectedBlock();
-		selectBlock( clientId );
+		selectBlock( clientId, -1 );
 	}
 
 	const focusOnMountRef = useFocusOnMount( 'firstElement' );

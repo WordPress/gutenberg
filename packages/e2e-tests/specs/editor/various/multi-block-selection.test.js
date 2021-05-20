@@ -36,8 +36,9 @@ async function getSelectedFlatIndices() {
  * Tests if the native selection matches the block selection.
  */
 async function testNativeSelection() {
-	// Wait for the selection to update.
-	await page.evaluate( () => new Promise( window.requestAnimationFrame ) );
+	// Wait for the selection to update and async mode to update classes of
+	// deselected blocks.
+	await page.evaluate( () => new Promise( window.requestIdleCallback ) );
 	await page.evaluate( () => {
 		const selection = window.getSelection();
 		const elements = Array.from(
@@ -586,6 +587,17 @@ describe( 'Multi-block selection', () => {
 		await pressKeyWithModifier( 'primary', 'c' );
 		await page.keyboard.press( 'ArrowUp' );
 		await pressKeyWithModifier( 'primary', 'v' );
+
+		expect( await getEditedPostContent() ).toMatchSnapshot();
+	} );
+
+	// Previously we would unexpectedly duplicated the block on Enter.
+	it( 'should not multi select single block', async () => {
+		await clickBlockAppender();
+		await page.keyboard.type( '1' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await pressKeyWithModifier( 'primary', 'a' );
+		await page.keyboard.press( 'Enter' );
 
 		expect( await getEditedPostContent() ).toMatchSnapshot();
 	} );

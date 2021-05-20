@@ -11,6 +11,7 @@ import WidgetAreasBlockEditorProvider from '../widget-areas-block-editor-provide
 import Sidebar from '../sidebar';
 import Interface from './interface';
 import UnsavedChangesWarning from './unsaved-changes-warning';
+import WelcomeGuide from '../welcome-guide';
 
 function Layout( { blockEditorSettings } ) {
 	return (
@@ -22,6 +23,7 @@ function Layout( { blockEditorSettings } ) {
 			<Popover.Slot />
 			<PluginArea />
 			<UnsavedChangesWarning />
+			<WelcomeGuide />
 		</WidgetAreasBlockEditorProvider>
 	);
 }

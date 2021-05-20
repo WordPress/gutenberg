@@ -7,7 +7,7 @@ import { hasBlockSupport } from '@wordpress/blocks';
  * Internal dependencies
  */
 import FontAppearanceControl from '../components/font-appearance-control';
-import useEditorFeature from '../components/use-editor-feature';
+import useSetting from '../components/use-setting';
 import { cleanEmptyObject } from './utils';
 
 /**
@@ -76,7 +76,7 @@ export function FontAppearanceEdit( props ) {
  */
 export function useIsFontStyleDisabled( { name: blockName } = {} ) {
 	const styleSupport = hasBlockSupport( blockName, FONT_STYLE_SUPPORT_KEY );
-	const hasFontStyles = useEditorFeature( 'typography.customFontStyle' );
+	const hasFontStyles = useSetting( 'typography.customFontStyle' );
 
 	return ! styleSupport || ! hasFontStyles;
 }
@@ -91,7 +91,7 @@ export function useIsFontStyleDisabled( { name: blockName } = {} ) {
  */
 export function useIsFontWeightDisabled( { name: blockName } = {} ) {
 	const weightSupport = hasBlockSupport( blockName, FONT_WEIGHT_SUPPORT_KEY );
-	const hasFontWeights = useEditorFeature( 'typography.customFontWeight' );
+	const hasFontWeights = useSetting( 'typography.customFontWeight' );
 
 	return ! weightSupport || ! hasFontWeights;
 }

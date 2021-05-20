@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+## 6.0.0 (2021-05-14)
+
+### Breaking Changes
+
+-   Drop support for Internet Explorer 11 ([#31110](https://github.com/WordPress/gutenberg/pull/31110)). Learn more at https://make.wordpress.org/core/2021/04/22/ie-11-support-phase-out-plan/.
+-   Increase the minimum Node.js version to v12 matching Long Term Support releases ([#31270](https://github.com/WordPress/gutenberg/pull/31270)). Learn more at https://nodejs.org/en/about/releases/.
+
 ## 5.2.0 (2021-04-06)
 
 ### Enhancements
@@ -16,7 +23,7 @@
 
 ### New Features
 
-- Added `@babel/preset-typescript` so that the preset can by default transpile TypeScript files, too.
+-   Added `@babel/preset-typescript` so that the preset can by default transpile TypeScript files, too.
 
 ## 5.0.0 (2021-01-21)
 

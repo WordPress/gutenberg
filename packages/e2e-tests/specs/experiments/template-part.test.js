@@ -42,8 +42,7 @@ describe( 'Template Part', () => {
 			// Switch to editing the header template part.
 			await navigationPanel.open();
 			await navigationPanel.backToRoot();
-			// TODO: Change General to Headers once TT1 blocks categorise the template parts
-			await navigationPanel.navigate( [ 'Template Parts', 'General' ] );
+			await navigationPanel.navigate( [ 'Template Parts', 'Headers' ] );
 			await navigationPanel.clickItemByText( 'header' );
 		}
 
@@ -278,6 +277,7 @@ describe( 'Template Part', () => {
 			await disablePrePublishChecks();
 			// Create new template part.
 			await insertBlock( 'Template Part' );
+			await page.waitForXPath( chooseExistingButtonSelector );
 			const [ createNewButton ] = await page.$x(
 				createNewButtonSelector
 			);
@@ -298,7 +298,7 @@ describe( 'Template Part', () => {
 			await createNewPost();
 			// Try to insert the template part we created.
 			await insertBlock( 'Template Part' );
-			const [ chooseExistingButton ] = await page.$x(
+			const chooseExistingButton = await page.waitForXPath(
 				chooseExistingButtonSelector
 			);
 			await chooseExistingButton.click();

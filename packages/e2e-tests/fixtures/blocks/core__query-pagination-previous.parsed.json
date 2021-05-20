@@ -1,18 +1,9 @@
 [
-    {
-        "blockName": "core/query-pagination-previous",
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "",
-        "innerContent": []
-    },
-    {
-        "blockName": null,
-        "attrs": {},
-        "innerBlocks": [],
-        "innerHTML": "\n",
-        "innerContent": [
-            "\n"
-        ]
-    }
+	{
+		"blockName": "core/query-pagination-previous",
+		"attrs": {},
+		"innerBlocks": [],
+		"innerHTML": "",
+		"innerContent": []
+	}
 ]

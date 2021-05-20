@@ -53,7 +53,7 @@ function PostPublishPanelPrepublish( { children } ) {
 			] ),
 			siteIconUrl: siteData.site_icon_url,
 			siteTitle: siteData.name,
-			siteHome: filterURLForDisplay( siteData.home ),
+			siteHome: siteData.home && filterURLForDisplay( siteData.home ),
 		};
 	}, [] );
 
@@ -103,7 +103,9 @@ function PostPublishPanelPrepublish( { children } ) {
 			<div className="components-site-card">
 				{ siteIcon }
 				<div className="components-site-info">
-					<span className="components-site-name">{ siteTitle }</span>
+					<span className="components-site-name">
+						{ siteTitle || __( '(Untitled)' ) }
+					</span>
 					<span className="components-site-home">{ siteHome }</span>
 				</div>
 			</div>

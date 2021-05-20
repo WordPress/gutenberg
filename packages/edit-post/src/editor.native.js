@@ -13,8 +13,12 @@ import { EditorProvider } from '@wordpress/editor';
 import { parse, serialize, store as blocksStore } from '@wordpress/blocks';
 import { withDispatch, withSelect } from '@wordpress/data';
 import { compose } from '@wordpress/compose';
-import { subscribeSetFocusOnTitle } from '@wordpress/react-native-bridge';
+import {
+	subscribeSetFocusOnTitle,
+	subscribeFeaturedImageIdNativeUpdated,
+} from '@wordpress/react-native-bridge';
 import { SlotFillProvider } from '@wordpress/components';
+import { store as coreStore } from '@wordpress/core-data';
 
 /**
  * Internal dependencies
@@ -77,6 +81,8 @@ class Editor extends Component {
 	}
 
 	componentDidMount() {
+		const { editEntityRecord, postType, postId } = this.props;
+
 		this.subscriptionParentSetFocusOnTitle = subscribeSetFocusOnTitle(
 			() => {
 				if ( this.postTitleRef ) {
@@ -84,11 +90,23 @@ class Editor extends Component {
 				}
 			}
 		);
+
+		this.subscriptionParentFeaturedImageIdNativeUpdated = subscribeFeaturedImageIdNativeUpdated(
+			( payload ) => {
+				editEntityRecord( 'postType', postType, postId, {
+					featured_media: payload.featuredImageId,
+				} );
+			}
+		);
 	}
 
 	componentWillUnmount() {
 		if ( this.subscriptionParentSetFocusOnTitle ) {
 			this.subscriptionParentSetFocusOnTitle.remove();
+		}
+
+		if ( this.subscribeFeaturedImageIdNativeUpdated ) {
+			this.subscribeFeaturedImageIdNativeUpdated.remove();
 		}
 	}
 
@@ -107,6 +125,7 @@ class Editor extends Component {
 			post,
 			postId,
 			postType,
+			featuredImageId,
 			initialHtml,
 			...props
 		} = this.props;
@@ -124,6 +143,7 @@ class Editor extends Component {
 			title: {
 				raw: props.initialTitle || '',
 			},
+			featured_media: featuredImageId,
 			content: {
 				// make sure the post content is in sync with gutenberg store
 				// to avoid marking the post as modified when simply loaded
@@ -173,8 +193,10 @@ export default compose( [
 	} ),
 	withDispatch( ( dispatch ) => {
 		const { switchEditorMode } = dispatch( editPostStore );
+		const { editEntityRecord } = dispatch( coreStore );
 		return {
 			switchEditorMode,
+			editEntityRecord,
 		};
 	} ),
 ] )( Editor );

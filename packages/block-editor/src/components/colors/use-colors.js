@@ -25,7 +25,7 @@ import {
 import InspectorControls from '../inspector-controls';
 import { useBlockEditContext } from '../block-edit';
 import ColorPanel from './color-panel';
-import useEditorFeature from '../use-editor-feature';
+import useSetting from '../use-setting';
 import { store as blockEditorStore } from '../../store';
 
 function getComputedStyle( node ) {
@@ -35,8 +35,8 @@ function getComputedStyle( node ) {
 const DEFAULT_COLORS = [];
 
 const COMMON_COLOR_LABELS = {
-	textColor: __( 'Text Color' ),
-	backgroundColor: __( 'Background Color' ),
+	textColor: __( 'Text color' ),
+	backgroundColor: __( 'Background color' ),
 };
 
 const InspectorControlsColorPanel = ( props ) => (
@@ -48,7 +48,7 @@ const InspectorControlsColorPanel = ( props ) => (
 export default function __experimentalUseColors(
 	colorConfigs,
 	{
-		panelTitle = __( 'Color settings' ),
+		panelTitle = __( 'Color' ),
 		colorPanelProps,
 		contrastCheckers,
 		panelChildren,
@@ -58,13 +58,12 @@ export default function __experimentalUseColors(
 			textColorTargetRef = targetRef,
 		} = {},
 	} = {
-		panelTitle: __( 'Color settings' ),
+		panelTitle: __( 'Color' ),
 	},
 	deps = []
 ) {
 	const { clientId } = useBlockEditContext();
-	const settingsColors =
-		useEditorFeature( 'color.palette' ) || DEFAULT_COLORS;
+	const settingsColors = useSetting( 'color.palette' ) || DEFAULT_COLORS;
 	const { attributes } = useSelect(
 		( select ) => {
 			const { getBlockAttributes } = select( blockEditorStore );

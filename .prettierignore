@@ -1,0 +1,8 @@
+.cache
+build
+build-module
+build-types
+packages/block-serialization-spec-parser/parser.js
+packages/e2e-tests/plugins
+packages/react-native-editor/bundle
+vendor

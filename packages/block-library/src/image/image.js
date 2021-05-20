@@ -132,7 +132,6 @@ export default function Image( {
 		noticesStore
 	);
 	const isLargeViewport = useViewportMatch( 'medium' );
-	const [ captionFocused, setCaptionFocused ] = useState( false );
 	const isWideAligned = includes( [ 'wide', 'full' ], align );
 	const [ { naturalWidth, naturalHeight }, setNaturalSize ] = useState( {} );
 	const [ isEditingImage, setIsEditingImage ] = useState( false );
@@ -148,12 +147,6 @@ export default function Image( {
 
 	// Check if the cover block is registered.
 	const coverBlockExists = !! getBlockType( 'core/cover' );
-
-	useEffect( () => {
-		if ( ! isSelected ) {
-			setCaptionFocused( false );
-		}
-	}, [ isSelected ] );
 
 	// If an image is externally hosted, try to fetch the image data. This may
 	// fail if the image host doesn't allow CORS with the domain. If it works,
@@ -203,18 +196,6 @@ export default function Image( {
 		// This is the HTML title attribute, separate from the media object
 		// title.
 		setAttributes( { title: value } );
-	}
-
-	function onFocusCaption() {
-		if ( ! captionFocused ) {
-			setCaptionFocused( true );
-		}
-	}
-
-	function onImageClick() {
-		if ( captionFocused ) {
-			setCaptionFocused( false );
-		}
 	}
 
 	function updateAlt( newAlt ) {
@@ -419,7 +400,6 @@ export default function Image( {
 			<img
 				src={ temporaryURL || url }
 				alt={ defaultedAlt }
-				onClick={ onImageClick }
 				onError={ () => onImageError() }
 				onLoad={ ( event ) => {
 					setNaturalSize(
@@ -555,7 +535,9 @@ export default function Image( {
 			isEditing={ isEditingImage }
 			onFinishEditing={ () => setIsEditingImage( false ) }
 		>
-			{ controls }
+			{ /* Hide controls during upload to avoid component remount,
+				which causes duplicated image upload. */ }
+			{ ! temporaryURL && controls }
 			{ img }
 			{ ( ! RichText.isEmpty( caption ) || isSelected ) && (
 				<RichText
@@ -564,11 +546,9 @@ export default function Image( {
 					aria-label={ __( 'Image caption text' ) }
 					placeholder={ __( 'Add caption' ) }
 					value={ caption }
-					unstableOnFocus={ onFocusCaption }
 					onChange={ ( value ) =>
 						setAttributes( { caption: value } )
 					}
-					isSelected={ captionFocused }
 					inlineToolbar
 					__unstableOnSplitAtEnd={ () =>
 						insertBlocksAfter( createBlock( 'core/paragraph' ) )

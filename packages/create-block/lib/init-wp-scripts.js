@@ -22,7 +22,7 @@ module.exports = async ( { slug } ) => {
 
 	info( '' );
 	info( 'Formatting JavaScript files.' );
-	await command( 'npm run format:js', {
+	await command( 'npm run format', {
 		cwd,
 	} );
 

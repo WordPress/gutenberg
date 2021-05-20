@@ -43,6 +43,7 @@ $z-layers: (
 
 	// Navigation menu dropdown.
 	".has-child .wp-block-navigation-link__container": 28,
+	".has-child:hover .wp-block-navigation-link__container": 29,
 
 	// Active pill button
 	".components-button {:focus or .is-primary}": 1,
@@ -76,10 +77,15 @@ $z-layers: (
 	// should overlap most block content.
 	".block-editor-block-list__block.is-{selected,hovered} .block-editor-block-mover": 61,
 
+	// Query block setup state.
+	".block-editor-block-pattern-setup .pattern-slide": 100,
+	".block-editor-block-pattern-setup .{next,previous}-slide": 101,
+	".block-editor-block-pattern-setup .active-slide": 102,
+
 	// Show sidebar above wp-admin navigation bar for mobile viewports:
 	// #wpadminbar { z-index: 99999 }
 	".interface-interface-skeleton__sidebar": 100000,
-	".edit-post-layout__toogle-sidebar-panel": 100000,
+	".edit-post-layout__toggle-sidebar-panel": 100000,
 	".edit-site-sidebar": 100000,
 	".edit-widgets-sidebar": 100000,
 	".edit-post-layout .edit-post-post-publish-panel": 100001,
@@ -136,8 +142,10 @@ $z-layers: (
 	".components-popover.block-editor-inserter__popover": 99999,
 	".components-popover.table-of-contents__popover": 99998,
 	".components-popover.block-editor-block-navigation__popover": 99998,
+	".components-popover.customize-widgets-more-menu__content": 99998,
 	".components-popover.edit-post-more-menu__content": 99998,
 	".components-popover.edit-site-more-menu__content": 99998,
+	".components-popover.edit-widgets-more-menu__content": 99998,
 	".components-popover.block-editor-rich-text__inline-format-toolbar": 99998,
 	".components-popover.block-editor-warning__dropdown": 99998,
 	".components-popover.edit-navigation-header__menu-switcher-dropdown": 99998,
@@ -171,6 +179,12 @@ $z-layers: (
 	// Needs to be higher than .components-circular-option-picker__option.is-pressed.
 	".components-circular-option-picker__option.is-pressed + svg": 2,
 	".edit-navigation-layout__overlay": 999,
+
+	// Appear under the customizer heading UI, but over anything else.
+	".customize-widgets__topbar": 8,
+
+	// Appear under the topbar.
+	".customize-widgets__block-toolbar": 7,
 );
 
 @function z-index( $key ) {

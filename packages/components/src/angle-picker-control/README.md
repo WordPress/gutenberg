@@ -5,7 +5,6 @@ Users can choose an angle in a visual UI with the mouse by dragging an angle ind
 
 ## Usage
 
-
 ```jsx
 import { useState } from '@wordpress/element';
 import { AnglePickerControl } from '@wordpress/components';
@@ -24,17 +23,19 @@ The component accepts the following props.
 
 Label to use for the angle picker. If not set the a translated label "Angle" is used.
 
-- Type: `String`
-- Required: No
+-   Type: `String`
+-   Required: No
 
 ### value
+
 The current value of the input. The value represents an angle in degrees and should be a value between 0 and 360.
 
-- Type: `Number`
-- Required: Yes
+-   Type: `Number`
+-   Required: Yes
 
 ### onChange
+
 A function that receives the new value of the input.
 
-- Type: `function`
-- Required: Yes
+-   Type: `function`
+-   Required: Yes

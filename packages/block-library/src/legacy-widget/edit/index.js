@@ -8,12 +8,7 @@ import {
 	BlockIcon,
 	store as blockEditorStore,
 } from '@wordpress/block-editor';
-import {
-	ToolbarGroup,
-	ToolbarButton,
-	Spinner,
-	Placeholder,
-} from '@wordpress/components';
+import { ToolbarButton, Spinner, Placeholder } from '@wordpress/components';
 import { brush as brushIcon, update as updateIcon } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 import { useState, useCallback } from '@wordpress/element';
@@ -25,9 +20,10 @@ import { store as coreStore } from '@wordpress/core-data';
  */
 import WidgetTypeSelector from './widget-type-selector';
 import InspectorCard from './inspector-card';
-import FormWrapper from './form-wrapper';
 import Form from './form';
 import Preview from './preview';
+import NoPreview from './no-preview';
+import ConvertToBlocksButton from './convert-to-blocks-button';
 
 export default function Edit( props ) {
 	const { id, idBase } = props.attributes;
@@ -76,8 +72,20 @@ function Empty( { attributes: { id, idBase }, setAttributes } ) {
 	);
 }
 
-function NotEmpty( { attributes: { id, idBase, instance }, setAttributes } ) {
-	const { widgetType, hasResolved, isWidgetTypeHidden } = useSelect(
+function NotEmpty( {
+	attributes: { id, idBase, instance },
+	setAttributes,
+	clientId,
+	isSelected,
+} ) {
+	const [ hasPreview, setHasPreview ] = useState( null );
+
+	const {
+		widgetType,
+		hasResolvedWidgetType,
+		isWidgetTypeHidden,
+		isNavigationMode,
+	} = useSelect(
 		( select ) => {
 			const widgetTypeId = id ?? idBase;
 			const hiddenIds =
@@ -85,67 +93,67 @@ function NotEmpty( { attributes: { id, idBase, instance }, setAttributes } ) {
 					?.widgetTypesToHideFromLegacyWidgetBlock ?? [];
 			return {
 				widgetType: select( coreStore ).getWidgetType( widgetTypeId ),
-				hasResolved: select(
+				hasResolvedWidgetType: select(
 					coreStore
 				).hasFinishedResolution( 'getWidgetType', [ widgetTypeId ] ),
 				isWidgetTypeHidden: hiddenIds.includes( widgetTypeId ),
+				isNavigationMode: select( blockEditorStore ).isNavigationMode(),
 			};
 		},
 		[ id, idBase ]
 	);
 
-	const [ tab, setTab ] = useState( 'edit' );
+	const setInstance = useCallback( ( nextInstance ) => {
+		setAttributes( { instance: nextInstance } );
+	}, [] );
 
-	const setInstance = useCallback(
-		( newInstance ) => setAttributes( { instance: newInstance } ),
-		[ setAttributes ]
-	);
-
-	if ( ! widgetType && ! hasResolved ) {
-		return <Spinner />;
+	if ( ! widgetType && hasResolvedWidgetType ) {
+		return (
+			<Placeholder
+				icon={ <BlockIcon icon={ brushIcon } /> }
+				label={ __( 'Legacy Widget' ) }
+			>
+				{ __( 'Widget is missing.' ) }
+			</Placeholder>
+		);
 	}
 
-	if ( ! widgetType && hasResolved ) {
-		return <Placeholder>{ __( 'Widget is missing.' ) }</Placeholder>;
+	if ( ! hasResolvedWidgetType ) {
+		return (
+			<Placeholder>
+				<Spinner />
+			</Placeholder>
+		);
 	}
+
+	const mode = isNavigationMode || ! isSelected ? 'preview' : 'edit';
 
 	return (
 		<>
-			<BlockControls>
-				<ToolbarGroup>
-					{ ! isWidgetTypeHidden && (
-						<ToolbarButton
-							label={ __( 'Change widget' ) }
-							icon={ updateIcon }
-							onClick={ () =>
-								setAttributes( {
-									id: null,
-									idBase: null,
-									instance: null,
-								} )
-							}
-						/>
-					) }
-					{ idBase && (
-						<>
-							<ToolbarButton
-								className="components-tab-button"
-								isPressed={ tab === 'edit' }
-								onClick={ () => setTab( 'edit' ) }
-							>
-								<span>{ __( 'Edit' ) }</span>
-							</ToolbarButton>
-							<ToolbarButton
-								className="components-tab-button"
-								isPressed={ tab === 'preview' }
-								onClick={ () => setTab( 'preview' ) }
-							>
-								<span>{ __( 'Preview' ) }</span>
-							</ToolbarButton>
-						</>
-					) }
-				</ToolbarGroup>
-			</BlockControls>
+			{ ! isWidgetTypeHidden && (
+				<BlockControls group="block">
+					<ToolbarButton
+						label={ __( 'Change widget' ) }
+						icon={ updateIcon }
+						onClick={ () =>
+							setAttributes( {
+								id: null,
+								idBase: null,
+								instance: null,
+							} )
+						}
+					/>
+				</BlockControls>
+			) }
+
+			{ idBase === 'text' && (
+				<BlockControls group="other">
+					<ConvertToBlocksButton
+						clientId={ clientId }
+						rawInstance={ instance.raw }
+					/>
+				</BlockControls>
+			) }
 
 			<InspectorControls>
 				<InspectorCard
@@ -154,21 +162,34 @@ function NotEmpty( { attributes: { id, idBase, instance }, setAttributes } ) {
 				/>
 			</InspectorControls>
 
-			<FormWrapper title={ widgetType.name } isVisible={ tab === 'edit' }>
-				<Form
-					id={ id }
-					idBase={ idBase }
-					instance={ instance }
-					setInstance={ setInstance }
-				/>
-			</FormWrapper>
+			<Form
+				title={ widgetType.name }
+				isVisible={ mode === 'edit' }
+				id={ id }
+				idBase={ idBase }
+				instance={ instance }
+				onChangeInstance={ setInstance }
+				onChangeHasPreview={ setHasPreview }
+			/>
 
 			{ idBase && (
-				<Preview
-					idBase={ idBase }
-					instance={ instance }
-					isVisible={ tab === 'preview' }
-				/>
+				<>
+					{ hasPreview === null && mode === 'preview' && (
+						<Placeholder>
+							<Spinner />
+						</Placeholder>
+					) }
+					{ hasPreview === true && (
+						<Preview
+							idBase={ idBase }
+							instance={ instance }
+							isVisible={ mode === 'preview' }
+						/>
+					) }
+					{ hasPreview === false && mode === 'preview' && (
+						<NoPreview name={ widgetType.name } />
+					) }
+				</>
 			) }
 		</>
 	);

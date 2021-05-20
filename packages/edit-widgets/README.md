@@ -16,7 +16,7 @@ Install the module
 npm install @wordpress/edit-widgets
 ```
 
-_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as lower versions of IE then using [core-js](https://github.com/zloirock/core-js) or [@babel/polyfill](https://babeljs.io/docs/en/next/babel-polyfill) will add support for these methods. Learn more about it in [Babel docs](https://babeljs.io/docs/en/next/caveats)._
+_This package assumes that your code will run in an **ES2015+** environment. If you're using an environment that has limited or no support for ES2015+ such as IE browsers then using [core-js](https://github.com/zloirock/core-js) will add polyfills for these methods._
 
 <br/><br/><p align="center"><img src="https://s.w.org/style/images/codeispoetry.png?1" alt="Code is Poetry." /></p>
 
@@ -36,6 +36,6 @@ Being just a block editor, the Widgets editor needs REST API entity management e
 
 In order to make the experience as seamless as possible for users, the following "magic" happens in the Widgets editor:
 
-- for every available widget, a variation of the widget block is registered so that the user can see and search by the exact name of what they need
-- all widgets that have a block equivalent (a block that fulfills the same function) can be made not available as a widget block variation via a filter
-- all core widgets that have a block equivalent are not available as a widget block variation
+-   for every available widget, a variation of the widget block is registered so that the user can see and search by the exact name of what they need
+-   all widgets that have a block equivalent (a block that fulfills the same function) can be made not available as a widget block variation via a filter
+-   all core widgets that have a block equivalent are not available as a widget block variation

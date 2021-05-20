@@ -28,126 +28,89 @@ class WP_Theme_JSON {
 	private static $blocks_metadata = null;
 
 	/**
-	 * How to address all the blocks
-	 * in the theme.json file.
-	 */
-	const ALL_BLOCKS_NAME = 'defaults';
-
-	/**
-	 * The CSS selector for the * block,
-	 * only using to generate presets.
-	 *
-	 * @var string
-	 */
-	const ALL_BLOCKS_SELECTOR = ':root';
-
-	/**
-	 * How to address the root block
-	 * in the theme.json file.
-	 *
-	 * @var string
-	 */
-	const ROOT_BLOCK_NAME = 'root';
-
-	/**
 	 * The CSS selector for the root block.
 	 *
 	 * @var string
 	 */
-	const ROOT_BLOCK_SELECTOR = ':root';
+	const ROOT_BLOCK_SELECTOR = 'body';
 
-	/**
-	 * Data schema of each block within a theme.json.
-	 *
-	 * Example:
-	 *
-	 * {
-	 *   'block-one': {
-	 *     'styles': {
-	 *       'color': {
-	 *         'background': 'color'
-	 *       }
-	 *     },
-	 *     'settings': {
-	 *       'color': {
-	 *         'custom': true
-	 *       }
-	 *     }
-	 *   },
-	 *   'block-two': {
-	 *     'styles': {
-	 *       'color': {
-	 *         'link': 'color'
-	 *       }
-	 *     }
-	 *   }
-	 * }
-	 */
-	const SCHEMA = array(
-		'customTemplates' => null,
-		'templateParts'   => null,
-		'styles'          => array(
-			'border'     => array(
-				'radius' => null,
-				'color'  => null,
-				'style'  => null,
-				'width'  => null,
+	const VALID_TOP_LEVEL_KEYS = array(
+		'customTemplates',
+		'templateParts',
+		'styles',
+		'settings',
+		'version',
+	);
+
+	const VALID_STYLES = array(
+		'border'     => array(
+			'color'  => null,
+			'radius' => null,
+			'style'  => null,
+			'width'  => null,
+		),
+		'color'      => array(
+			'background' => null,
+			'gradient'   => null,
+			'text'       => null,
+		),
+		'spacing'    => array(
+			'margin'  => array(
+				'top'    => null,
+				'right'  => null,
+				'bottom' => null,
+				'left'   => null,
 			),
-			'color'      => array(
-				'background' => null,
-				'gradient'   => null,
-				'link'       => null,
-				'text'       => null,
-			),
-			'spacing'    => array(
-				'padding' => array(
-					'top'    => null,
-					'right'  => null,
-					'bottom' => null,
-					'left'   => null,
-				),
-			),
-			'typography' => array(
-				'fontFamily'     => null,
-				'fontSize'       => null,
-				'fontStyle'      => null,
-				'fontWeight'     => null,
-				'lineHeight'     => null,
-				'textDecoration' => null,
-				'textTransform'  => null,
+			'padding' => array(
+				'bottom' => null,
+				'left'   => null,
+				'right'  => null,
+				'top'    => null,
 			),
 		),
-		'settings'        => array(
-			'border'     => array(
-				'customRadius' => null,
-				'customColor'  => null,
-				'customStyle'  => null,
-				'customWidth'  => null,
-			),
-			'color'      => array(
-				'custom'         => null,
-				'customGradient' => null,
-				'gradients'      => null,
-				'link'           => null,
-				'palette'        => null,
-			),
-			'spacing'    => array(
-				'customPadding' => null,
-				'units'         => null,
-			),
-			'typography' => array(
-				'customFontSize'        => null,
-				'customLineHeight'      => null,
-				'dropCap'               => null,
-				'fontFamilies'          => null,
-				'fontSizes'             => null,
-				'customFontStyle'       => null,
-				'customFontWeight'      => null,
-				'customTextDecorations' => null,
-				'customTextTransforms'  => null,
-			),
-			'custom'     => null,
-			'layout'     => null,
+		'typography' => array(
+			'fontFamily'     => null,
+			'fontSize'       => null,
+			'fontStyle'      => null,
+			'fontWeight'     => null,
+			'lineHeight'     => null,
+			'textDecoration' => null,
+			'textTransform'  => null,
+		),
+	);
+
+	const VALID_SETTINGS = array(
+		'border'     => array(
+			'customColor'  => null,
+			'customRadius' => null,
+			'customStyle'  => null,
+			'customWidth'  => null,
+		),
+		'color'      => array(
+			'custom'         => null,
+			'customGradient' => null,
+			'duotone'        => null,
+			'gradients'      => null,
+			'link'           => null,
+			'palette'        => null,
+		),
+		'custom'     => null,
+		'layout'     => null,
+		'spacing'    => array(
+			'customMargin'  => null,
+			'customPadding' => null,
+			'units'         => null,
+		),
+		'typography' => array(
+			'customFontSize'        => null,
+			'customFontStyle'       => null,
+			'customFontWeight'      => null,
+			'customLineHeight'      => null,
+			'customTextDecorations' => null,
+			'customTextTransforms'  => null,
+			'dropCap'               => null,
+			'fontFamilies'          => null,
+			'fontSizes'             => null,
 		),
 	);
 
@@ -198,6 +161,10 @@ class WP_Theme_JSON {
 					'class_suffix'  => 'background-color',
 					'property_name' => 'background-color',
 				),
+				array(
+					'class_suffix'  => 'border-color',
+					'property_name' => 'border-color',
+				),
 			),
 		),
 		array(
@@ -238,9 +205,6 @@ class WP_Theme_JSON {
 	 * - 'value': path to the value in theme.json and block attributes.
 	 */
 	const PROPERTIES_METADATA = array(
-		'--wp--style--color--link' => array(
-			'value' => array( 'color', 'link' ),
-		),
 		'background'               => array(
 			'value' => array( 'color', 'gradient' ),
 		),
@@ -277,6 +241,10 @@ class WP_Theme_JSON {
 		'line-height'              => array(
 			'value' => array( 'typography', 'lineHeight' ),
 		),
+		'margin'                   => array(
+			'value'      => array( 'spacing', 'margin' ),
+			'properties' => array( 'top', 'right', 'bottom', 'left' ),
+		),
 		'padding'                  => array(
 			'value'      => array( 'spacing', 'padding' ),
 			'properties' => array( 'top', 'right', 'bottom', 'left' ),
@@ -289,81 +257,93 @@ class WP_Theme_JSON {
 		),
 	);
 
+	const ELEMENTS = array(
+		'link' => 'a',
+		'h1'   => 'h1',
+		'h2'   => 'h2',
+		'h3'   => 'h3',
+		'h4'   => 'h4',
+		'h5'   => 'h5',
+		'h6'   => 'h6',
+	);
+
+	const LATEST_SCHEMA = 1;
+
 	/**
 	 * Constructor.
 	 *
 	 * @param array $theme_json A structure that follows the theme.json schema.
 	 */
 	public function __construct( $theme_json = array() ) {
-		$this->theme_json = array();
-
-		if ( ! is_array( $theme_json ) ) {
-			return;
+		// The old format is not meant to be ported to core.
+		// We can remove it at that point.
+		if ( ! isset( $theme_json['version'] ) || 0 === $theme_json['version'] ) {
+			$theme_json = WP_Theme_JSON_Schema_V0::parse( $theme_json );
 		}
 
-		// Remove top-level keys that aren't present in the schema.
-		$this->theme_json = array_intersect_key( $theme_json, self::SCHEMA );
+		$valid_block_names   = array_keys( self::get_blocks_metadata() );
+		$valid_element_names = array_keys( self::ELEMENTS );
+		$this->theme_json    = self::sanitize( $theme_json, $valid_block_names, $valid_element_names );
+	}
 
-		$block_metadata = self::get_blocks_metadata();
-		foreach ( array( 'settings', 'styles' ) as $subtree ) {
-			// Remove settings & styles subtrees if they aren't arrays.
-			if ( isset( $this->theme_json[ $subtree ] ) && ! is_array( $this->theme_json[ $subtree ] ) ) {
-				unset( $this->theme_json[ $subtree ] );
+	/**
+	 * Sanitizes the input according to the schemas.
+	 *
+	 * @param array $input Structure to sanitize.
+	 * @param array $valid_block_names List of valid block names.
+	 * @param array $valid_element_names List of valid element names.
+	 *
+	 * @return array The sanitized output.
+	 */
+	private static function sanitize( $input, $valid_block_names, $valid_element_names ) {
+		$output = array();
+
+		if ( ! is_array( $input ) ) {
+			return $output;
+		}
+
+		$output = array_intersect_key( $input, array_flip( self::VALID_TOP_LEVEL_KEYS ) );
+
+		// Build the schema based on valid block & element names.
+		$schema                 = array();
+		$schema_styles_elements = array();
+		foreach ( $valid_element_names as $element ) {
+			$schema_styles_elements[ $element ] = self::VALID_STYLES;
+		}
+		$schema_styles_blocks   = array();
+		$schema_settings_blocks = array();
+		foreach ( $valid_block_names as $block ) {
+			$schema_settings_blocks[ $block ]           = self::VALID_SETTINGS;
+			$schema_styles_blocks[ $block ]             = self::VALID_STYLES;
+			$schema_styles_blocks[ $block ]['elements'] = $schema_styles_elements;
+		}
+		$schema['styles']             = self::VALID_STYLES;
+		$schema['styles']['blocks']   = $schema_styles_blocks;
+		$schema['styles']['elements'] = $schema_styles_elements;
+		$schema['settings']           = self::VALID_SETTINGS;
+		$schema['settings']['blocks'] = $schema_settings_blocks;
+
+		// Remove anything that's not present in the schema.
+		foreach ( array( 'styles', 'settings' ) as $subtree ) {
+			if ( ! isset( $input[ $subtree ] ) ) {
+				continue;
 			}
 
-			// Remove block selectors subtrees declared within settings & styles if that aren't registered.
-			if ( isset( $this->theme_json[ $subtree ] ) ) {
-				$this->theme_json[ $subtree ] = array_intersect_key( $this->theme_json[ $subtree ], $block_metadata );
+			if ( ! is_array( $input[ $subtree ] ) ) {
+				unset( $output[ $subtree ] );
+				continue;
+			}
+
+			$result = self::remove_keys_not_in_schema( $input[ $subtree ], $schema[ $subtree ] );
+
+			if ( empty( $result ) ) {
+				unset( $output[ $subtree ] );
+			} else {
+				$output[ $subtree ] = $result;
 			}
 		}
 
-		foreach ( $block_metadata as $block_selector => $metadata ) {
-			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				// Remove the block selector subtree if it's not an array.
-				if ( ! is_array( $this->theme_json['styles'][ $block_selector ] ) ) {
-					unset( $this->theme_json['styles'][ $block_selector ] );
-					continue;
-				}
-
-				$styles_schema                                 = self::SCHEMA['styles'];
-				$this->theme_json['styles'][ $block_selector ] = self::remove_keys_not_in_schema(
-					$this->theme_json['styles'][ $block_selector ],
-					$styles_schema
-				);
-
-				// Remove the block selector subtree if it is empty after having processed it.
-				if ( empty( $this->theme_json['styles'][ $block_selector ] ) ) {
-					unset( $this->theme_json['styles'][ $block_selector ] );
-				}
-			}
-
-			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
-				// Remove the block selector subtree if it's not an array.
-				if ( ! is_array( $this->theme_json['settings'][ $block_selector ] ) ) {
-					unset( $this->theme_json['settings'][ $block_selector ] );
-					continue;
-				}
-
-				// Remove the properties that aren't present in the schema.
-				$this->theme_json['settings'][ $block_selector ] = self::remove_keys_not_in_schema(
-					$this->theme_json['settings'][ $block_selector ],
-					self::SCHEMA['settings']
-				);
-
-				// Remove the block selector subtree if it is empty after having processed it.
-				if ( empty( $this->theme_json['settings'][ $block_selector ] ) ) {
-					unset( $this->theme_json['settings'][ $block_selector ] );
-				}
-			}
-		}
-
-		// Remove the settings & styles subtrees if they're empty after having processed them.
-		foreach ( array( 'settings', 'styles' ) as $subtree ) {
-			if ( empty( $this->theme_json[ $subtree ] ) ) {
-				unset( $this->theme_json[ $subtree ] );
-			}
-		}
-
+		return $output;
 	}
 
 	/**
@@ -395,11 +375,14 @@ class WP_Theme_JSON {
 	 * Example:
 	 *
 	 * {
-	 *   'root': {
-	 *     'selector': ':root'
+	 *   'core/paragraph': {
+	 *     'selector': 'p'
 	 *   },
-	 *   'core/heading/h1': {
+	 *   'core/heading': {
 	 *     'selector': 'h1'
+	 *   }
+	 *   'core/group': {
+	 *     'selector': '.wp-block-group'
 	 *   }
 	 * }
 	 *
@@ -410,61 +393,30 @@ class WP_Theme_JSON {
 			return self::$blocks_metadata;
 		}
 
-		self::$blocks_metadata = array(
-			self::ROOT_BLOCK_NAME => array(
-				'selector' => self::ROOT_BLOCK_SELECTOR,
-			),
-			self::ALL_BLOCKS_NAME => array(
-				'selector' => self::ALL_BLOCKS_SELECTOR,
-			),
-		);
+		self::$blocks_metadata = array();
 
 		$registry = WP_Block_Type_Registry::get_instance();
 		$blocks   = $registry->get_all_registered();
 		foreach ( $blocks as $block_name => $block_type ) {
-			/*
-			 * Assign the selector for the block.
-			 *
-			 * Some blocks can declare multiple selectors:
-			 *
-			 * - core/heading represents the H1-H6 HTML elements
-			 * - core/list represents the UL and OL HTML elements
-			 * - core/group is meant to represent DIV and other HTML elements
-			 *
-			 * Some other blocks don't provide a selector,
-			 * so we generate a class for them based on their name:
-			 *
-			 * - 'core/group' => '.wp-block-group'
-			 * - 'my-custom-library/block-name' => '.wp-block-my-custom-library-block-name'
-			 *
-			 * Note that, for core blocks, we don't add the `core/` prefix to its class name.
-			 * This is for historical reasons, as they come with a class without that infix.
-			 *
-			 */
 			if (
 				isset( $block_type->supports['__experimentalSelector'] ) &&
 				is_string( $block_type->supports['__experimentalSelector'] )
 			) {
-				self::$blocks_metadata[ $block_name ] = array(
-					'selector' => $block_type->supports['__experimentalSelector'],
-				);
-			} elseif (
-				isset( $block_type->supports['__experimentalSelector'] ) &&
-				is_array( $block_type->supports['__experimentalSelector'] )
-			) {
-				foreach ( $block_type->supports['__experimentalSelector'] as $key => $selector_metadata ) {
-					if ( ! isset( $selector_metadata['selector'] ) ) {
-						continue;
-					}
-
-					self::$blocks_metadata[ $key ] = array(
-						'selector' => $selector_metadata['selector'],
-					);
-				}
+				self::$blocks_metadata[ $block_name ]['selector'] = $block_type->supports['__experimentalSelector'];
 			} else {
-				self::$blocks_metadata[ $block_name ] = array(
-					'selector' => '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) ),
-				);
+				self::$blocks_metadata[ $block_name ]['selector'] = '.wp-block-' . str_replace( '/', '-', str_replace( 'core/', '', $block_name ) );
+			}
+
+			// Assign defaults, then overwrite those that the block sets by itself.
+			// If the block selector is compounded, will append the element to each
+			// individual block selector.
+			$block_selectors = explode( ',', self::$blocks_metadata[ $block_name ]['selector'] );
+			foreach ( self::ELEMENTS as $el_name => $el_selector ) {
+				$element_selector = array();
+				foreach ( $block_selectors as $selector ) {
+					$element_selector[] = $selector . ' ' . $el_selector;
+				}
+				self::$blocks_metadata[ $block_name ]['elements'][ $el_name ] = implode( ',', $element_selector );
 			}
 		}
 
@@ -485,12 +437,18 @@ class WP_Theme_JSON {
 		$tree = array_intersect_key( $tree, $schema );
 
 		foreach ( $schema as $key => $data ) {
-			if ( is_array( $schema[ $key ] ) && isset( $tree[ $key ] ) ) {
+			if ( ! isset( $tree[ $key ] ) ) {
+				continue;
+			}
+
+			if ( is_array( $schema[ $key ] ) && is_array( $tree[ $key ] ) ) {
 				$tree[ $key ] = self::remove_keys_not_in_schema( $tree[ $key ], $schema[ $key ] );
 
 				if ( empty( $tree[ $key ] ) ) {
 					unset( $tree[ $key ] );
 				}
+			} elseif ( is_array( $schema[ $key ] ) && ! is_array( $tree[ $key ] ) ) {
+				unset( $tree[ $key ] );
 			}
 		}
 
@@ -616,12 +574,12 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * @param array $declarations Holds the existing declarations.
-	 * @param array $styles       Styles to process.
+	 * @param array $styles Styles to process.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_style_properties( $declarations, $styles ) {
+	private static function compute_style_properties( $styles ) {
+		$declarations = array();
 		if ( empty( $styles ) ) {
 			return $declarations;
 		}
@@ -630,7 +588,7 @@ class WP_Theme_JSON {
 		foreach ( self::PROPERTIES_METADATA as $name => $metadata ) {
 			// Some properties can be shorthand properties, meaning that
 			// they contain multiple values instead of a single one.
-			// An example of this is the padding property, see self::SCHEMA.
+			// An example of this is the padding property.
 			if ( self::has_properties( $metadata ) ) {
 				foreach ( $metadata['properties'] as $property ) {
 					$properties[] = array(
@@ -648,12 +606,14 @@ class WP_Theme_JSON {
 
 		foreach ( $properties as $prop ) {
 			$value = self::get_property_value( $styles, $prop['value'] );
-			if ( ! empty( $value ) ) {
-				$declarations[] = array(
-					'name'  => $prop['name'],
-					'value' => $value,
-				);
+			if ( empty( $value ) ) {
+				continue;
 			}
+
+			$declarations[] = array(
+				'name'  => $prop['name'],
+				'value' => $value,
+			);
 		}
 
 		return $declarations;
@@ -708,12 +668,12 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * @param array $declarations Holds the existing declarations.
 	 * @param array $settings Settings to process.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_preset_vars( $declarations, $settings ) {
+	private static function compute_preset_vars( $settings ) {
+		$declarations = array();
 		foreach ( self::PRESETS_METADATA as $preset ) {
 			$values = _wp_array_get( $settings, $preset['path'], array() );
 			foreach ( $values as $value ) {
@@ -739,12 +699,12 @@ class WP_Theme_JSON {
 	 * )
 	 * ```
 	 *
-	 * @param array $declarations Holds the existing declarations.
 	 * @param array $settings Settings to process.
 	 *
 	 * @return array Returns the modified $declarations.
 	 */
-	private static function compute_theme_vars( $declarations, $settings ) {
+	private static function compute_theme_vars( $settings ) {
+		$declarations  = array();
 		$custom_values = _wp_array_get( $settings, array( 'custom' ), array() );
 		$css_vars      = self::flatten_tree( $custom_values );
 		foreach ( $css_vars as $key => $value ) {
@@ -810,27 +770,25 @@ class WP_Theme_JSON {
 	 *     --wp--custom--variable: value;
 	 *   }
 	 *
+	 * @param array $nodes Nodes with settings.
+	 *
 	 * @return string The new stylesheet.
 	 */
-	private function get_css_variables() {
+	private function get_css_variables( $nodes ) {
 		$stylesheet = '';
-		if ( ! isset( $this->theme_json['settings'] ) ) {
-			return $stylesheet;
-		}
-
-		$metadata = self::get_blocks_metadata();
-		foreach ( $this->theme_json['settings'] as $block_selector => $settings ) {
-			if ( empty( $metadata[ $block_selector ]['selector'] ) ) {
+		foreach ( $nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
 				continue;
 			}
-			$selector = $metadata[ $block_selector ]['selector'];
 
-			$declarations = self::compute_preset_vars( array(), $settings );
-			$declarations = self::compute_theme_vars( $declarations, $settings );
+			$selector = $metadata['selector'];
 
-			// Attach the ruleset for style and custom properties.
+			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$declarations = array_merge( self::compute_preset_vars( $node ), self::compute_theme_vars( $node ) );
+
 			$stylesheet .= self::to_ruleset( $selector, $declarations );
 		}
+
 		return $stylesheet;
 	}
 
@@ -869,41 +827,33 @@ class WP_Theme_JSON {
 	 *     background: value;
 	 *   }
 	 *
+	 * @param array $style_nodes Nodes with styles.
+	 * @param array $setting_nodes Nodes with settings.
+	 *
 	 * @return string The new stylesheet.
 	 */
-	private function get_block_styles() {
-		$stylesheet = '';
-		if ( ! isset( $this->theme_json['styles'] ) && ! isset( $this->theme_json['settings'] ) ) {
-			return $stylesheet;
-		}
-
-		$metadata     = self::get_blocks_metadata();
-		$block_rules  = '';
-		$preset_rules = '';
-		foreach ( $metadata as $block_selector => $metadata ) {
-			if ( empty( $metadata['selector'] ) ) {
+	private function get_block_styles( $style_nodes, $setting_nodes ) {
+		$block_rules = '';
+		foreach ( $style_nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
 				continue;
 			}
 
-			$selector = $metadata['selector'];
-
-			$declarations = array();
-			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				$declarations = self::compute_style_properties(
-					$declarations,
-					$this->theme_json['styles'][ $block_selector ]
-				);
-			}
-
+			$node         = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$selector     = $metadata['selector'];
+			$declarations = self::compute_style_properties( $node );
 			$block_rules .= self::to_ruleset( $selector, $declarations );
+		}
 
-			// Attach the rulesets for the classes.
-			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
-				$preset_rules .= self::compute_preset_classes(
-					$this->theme_json['settings'][ $block_selector ],
-					$selector
-				);
+		$preset_rules = '';
+		foreach ( $setting_nodes as $metadata ) {
+			if ( null === $metadata['selector'] ) {
+				continue;
 			}
+
+			$selector      = $metadata['selector'];
+			$node          = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			$preset_rules .= self::compute_preset_classes( $node, $selector );
 		}
 
 		return $block_rules . $preset_rules;
@@ -981,6 +931,126 @@ class WP_Theme_JSON {
 	}
 
 	/**
+	 * Builds metadata for the style nodes, which returns in the form of:
+	 *
+	 * [
+	 *   [
+	 *     'path'     => [ 'path', 'to', 'some', 'node' ],
+	 *     'selector' => 'CSS selector for some node'
+	 *   ],
+	 *   [
+	 *     'path'     => ['path', 'to', 'other', 'node' ],
+	 *     'selector' => 'CSS selector for other node'
+	 *   ],
+	 * ]
+	 *
+	 * @param array $theme_json The tree to extract style nodes from.
+	 * @param array $selectors List of selectors per block.
+	 *
+	 * @return array
+	 */
+	private static function get_style_nodes( $theme_json, $selectors = array() ) {
+		$nodes = array();
+		if ( ! isset( $theme_json['styles'] ) ) {
+			return $nodes;
+		}
+
+		// Top-level.
+		$nodes[] = array(
+			'path'     => array( 'styles' ),
+			'selector' => self::ROOT_BLOCK_SELECTOR,
+		);
+
+		if ( isset( $theme_json['styles']['elements'] ) ) {
+			foreach ( $theme_json['styles']['elements'] as $element => $node ) {
+				$nodes[] = array(
+					'path'     => array( 'styles', 'elements', $element ),
+					'selector' => self::ELEMENTS[ $element ],
+				);
+			}
+		}
+
+		// Blocks.
+		if ( ! isset( $theme_json['styles']['blocks'] ) ) {
+			return $nodes;
+		}
+
+		foreach ( $theme_json['styles']['blocks'] as $name => $node ) {
+			$selector = null;
+			if ( isset( $selectors[ $name ]['selector'] ) ) {
+				$selector = $selectors[ $name ]['selector'];
+			}
+
+			$nodes[] = array(
+				'path'     => array( 'styles', 'blocks', $name ),
+				'selector' => $selector,
+			);
+
+			if ( isset( $theme_json['styles']['blocks'][ $name ]['elements'] ) ) {
+				foreach ( $theme_json['styles']['blocks'][ $name ]['elements'] as $element => $node ) {
+					$nodes[] = array(
+						'path'     => array( 'styles', 'blocks', $name, 'elements', $element ),
+						'selector' => $selectors[ $name ]['elements'][ $element ],
+					);
+				}
+			}
+		}
+
+		return $nodes;
+	}
+
+	/**
+	 * Builds metadata for the setting nodes, which returns in the form of:
+	 *
+	 * [
+	 *   [
+	 *     'path'     => ['path', 'to', 'some', 'node' ],
+	 *     'selector' => 'CSS selector for some node'
+	 *   ],
+	 *   [
+	 *     'path'     => [ 'path', 'to', 'other', 'node' ],
+	 *     'selector' => 'CSS selector for other node'
+	 *   ],
+	 * ]
+	 *
+	 * @param array $theme_json The tree to extract setting nodes from.
+	 * @param array $selectors List of selectors per block.
+	 *
+	 * @return array
+	 */
+	private static function get_setting_nodes( $theme_json, $selectors = array() ) {
+		$nodes = array();
+		if ( ! isset( $theme_json['settings'] ) ) {
+			return $nodes;
+		}
+
+		// Top-level.
+		$nodes[] = array(
+			'path'     => array( 'settings' ),
+			'selector' => self::ROOT_BLOCK_SELECTOR,
+		);
+
+		// Calculate paths for blocks.
+		if ( ! isset( $theme_json['settings']['blocks'] ) ) {
+			return $nodes;
+		}
+
+		foreach ( $theme_json['settings']['blocks'] as $name => $node ) {
+			$selector = null;
+			if ( isset( $selectors[ $name ]['selector'] ) ) {
+				$selector = $selectors[ $name ]['selector'];
+			}
+
+			$nodes[] = array(
+				'path'     => array( 'settings', 'blocks', $name ),
+				'selector' => $selector,
+			);
+		}
+
+		return $nodes;
+	}
+
+	/**
 	 * Returns the stylesheet that results of processing
 	 * the theme.json structure this object represents.
 	 *
@@ -988,13 +1058,17 @@ class WP_Theme_JSON {
 	 * @return string Stylesheet.
 	 */
 	public function get_stylesheet( $type = 'all' ) {
+		$blocks_metadata = self::get_blocks_metadata();
+		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
+		$setting_nodes   = self::get_setting_nodes( $this->theme_json, $blocks_metadata );
+
 		switch ( $type ) {
 			case 'block_styles':
-				return $this->get_block_styles();
+				return $this->get_block_styles( $style_nodes, $setting_nodes );
 			case 'css_variables':
-				return $this->get_css_variables();
+				return $this->get_css_variables( $setting_nodes );
 			default:
-				return $this->get_css_variables() . $this->get_block_styles();
+				return $this->get_css_variables( $setting_nodes ) . $this->get_block_styles( $style_nodes, $setting_nodes );
 		}
 	}
 
@@ -1008,125 +1082,167 @@ class WP_Theme_JSON {
 		$this->theme_json = array_replace_recursive( $this->theme_json, $incoming_data );
 
 		// The array_replace_recursive algorithm merges at the leaf level.
-		// This means that when a leaf value is an array,
-		// the incoming array won't replace the existing,
-		// but the numeric indexes are used for replacement.
+		// For leaf values that are arrays it will use the numeric indexes for replacement.
+		// In those cases, what we want is to use the incoming value, if it exists.
 		//
 		// These are the cases that have array values at the leaf levels.
-		$block_metadata = self::get_blocks_metadata();
-		foreach ( $block_metadata as $block_selector => $meta ) {
-			// Color presets: palette & gradients.
-			if ( isset( $incoming_data['settings'][ $block_selector ]['color']['palette'] ) ) {
-				$this->theme_json['settings'][ $block_selector ]['color']['palette'] = $incoming_data['settings'][ $block_selector ]['color']['palette'];
-			}
-			if ( isset( $incoming_data['settings'][ $block_selector ]['color']['gradients'] ) ) {
-				$this->theme_json['settings'][ $block_selector ]['color']['gradients'] = $incoming_data['settings'][ $block_selector ]['color']['gradients'];
-			}
-			// Spacing: units.
-			if ( isset( $incoming_data['settings'][ $block_selector ]['spacing']['units'] ) ) {
-				$this->theme_json['settings'][ $block_selector ]['spacing']['units'] = $incoming_data['settings'][ $block_selector ]['spacing']['units'];
-			}
-			// Typography presets: fontSizes & fontFamilies.
-			if ( isset( $incoming_data['settings'][ $block_selector ]['typography']['fontSizes'] ) ) {
-				$this->theme_json['settings'][ $block_selector ]['typography']['fontSizes'] = $incoming_data['settings'][ $block_selector ]['typography']['fontSizes'];
-			}
-			if ( isset( $incoming_data['settings'][ $block_selector ]['typography']['fontFamilies'] ) ) {
-				$this->theme_json['settings'][ $block_selector ]['typography']['fontFamilies'] = $incoming_data['settings'][ $block_selector ]['typography']['fontFamilies'];
-			}
-			// Custom section.
-			if ( isset( $incoming_data['settings'][ $block_selector ]['custom'] ) ) {
-				$this->theme_json['settings'][ $block_selector ]['custom'] = $incoming_data['settings'][ $block_selector ]['custom'];
+		$properties   = array();
+		$properties[] = array( 'color', 'palette' );
+		$properties[] = array( 'color', 'gradients' );
+		$properties[] = array( 'custom' );
+		$properties[] = array( 'spacing', 'units' );
+		$properties[] = array( 'typography', 'fontSizes' );
+		$properties[] = array( 'typography', 'fontFamilies' );
+
+		$nodes = self::get_setting_nodes( $this->theme_json );
+		foreach ( $nodes as $metadata ) {
+			foreach ( $properties as $property_path ) {
+				$path = array_merge( $metadata['path'], $property_path );
+				$node = _wp_array_get( $incoming_data, $path, array() );
+				if ( ! empty( $node ) ) {
+					gutenberg_experimental_set( $this->theme_json, $path, $node );
+				}
 			}
 		}
+
+	}
+
+	/**
+	 * Processes a setting node and returns the same node
+	 * without the insecure settings.
+	 *
+	 * @param array $input Node to process.
+	 *
+	 * @return array
+	 */
+	private static function remove_insecure_settings( $input ) {
+		$output = array();
+		foreach ( self::PRESETS_METADATA as $preset_metadata ) {
+			$current_preset = _wp_array_get( $input, $preset_metadata['path'], null );
+			if ( null === $current_preset ) {
+				continue;
+			}
+
+			$escaped_preset = array();
+			foreach ( $current_preset as $single_preset ) {
+				if (
+					esc_attr( esc_html( $single_preset['name'] ) ) === $single_preset['name'] &&
+					sanitize_html_class( $single_preset['slug'] ) === $single_preset['slug']
+				) {
+					$value                  = $single_preset[ $preset_metadata['value_key'] ];
+					$single_preset_is_valid = null;
+					if ( isset( $preset_metadata['classes'] ) && count( $preset_metadata['classes'] ) > 0 ) {
+						$single_preset_is_valid = true;
+						foreach ( $preset_metadata['classes'] as $class_meta_data ) {
+							$property = $class_meta_data['property_name'];
+							if ( ! self::is_safe_css_declaration( $property, $value ) ) {
+								$single_preset_is_valid = false;
+								break;
+							}
+						}
+					} else {
+						$property               = $preset_metadata['css_var_infix'];
+						$single_preset_is_valid = self::is_safe_css_declaration( $property, $value );
+					}
+					if ( $single_preset_is_valid ) {
+						$escaped_preset[] = $single_preset;
+					}
+				}
+			}
+
+			if ( ! empty( $escaped_preset ) ) {
+				gutenberg_experimental_set( $output, $preset_metadata['path'], $escaped_preset );
+			}
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Processes a style node and returns the same node
+	 * without the insecure styles.
+	 *
+	 * @param array  $input Node to process.
+	 * @param string $selector Selector for the node.
+	 *
+	 * @return array
+	 */
+	private static function remove_insecure_styles( $input, $selector ) {
+		$output       = array();
+		$declarations = self::compute_style_properties( $input );
+
+		foreach ( $declarations as $declaration ) {
+			if ( self::is_safe_css_declaration( $declaration['name'], $declaration['value'] ) ) {
+				$property = self::to_property( $declaration['name'] );
+				$path     = self::PROPERTIES_METADATA[ $property ]['value'];
+				if ( self::has_properties( self::PROPERTIES_METADATA[ $property ] ) ) {
+					$declaration_divided = explode( '-', $declaration['name'] );
+					$path[]              = $declaration_divided[1];
+				}
+				gutenberg_experimental_set( $output, $path, _wp_array_get( $input, $path, array() ) );
+			}
+		}
+		return $output;
+	}
+
+	/**
+	 * Checks that a declaration provided by the user is safe.
+	 *
+	 * @param string $property_name Property name in a CSS declaration, i.e. the `color` in `color: red`.
+	 * @param string $property_value Value in a CSS declaration, i.e. the `red` in `color: red`.
+	 * @return boolean
+	 */
+	private static function is_safe_css_declaration( $property_name, $property_value ) {
+		$style_to_validate = $property_name . ': ' . $property_value;
+		$filtered          = esc_html( safecss_filter_attr( $style_to_validate ) );
+		return ! empty( trim( $filtered ) );
 	}
 
 	/**
 	 * Removes insecure data from theme.json.
 	 */
 	public function remove_insecure_properties() {
+		$sanitized = array();
+
 		$blocks_metadata = self::get_blocks_metadata();
-		foreach ( $blocks_metadata as $block_selector => $metadata ) {
-			$escaped_settings = array();
-			$escaped_styles   = array();
-
-			// Style escaping.
-			if ( isset( $this->theme_json['styles'][ $block_selector ] ) ) {
-				$declarations = self::compute_style_properties( array(), $this->theme_json['styles'][ $block_selector ] );
-				foreach ( $declarations as $declaration ) {
-					$style_to_validate = $declaration['name'] . ': ' . $declaration['value'];
-					if ( esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate ) {
-						$property = self::to_property( $declaration['name'] );
-						$path     = self::PROPERTIES_METADATA[ $property ]['value'];
-						if ( self::has_properties( self::PROPERTIES_METADATA[ $property ] ) ) {
-							$declaration_divided = explode( '-', $declaration['name'] );
-							$path[]              = $declaration_divided[1];
-						}
-						gutenberg_experimental_set(
-							$escaped_styles,
-							$path,
-							_wp_array_get( $this->theme_json['styles'][ $block_selector ], $path, array() )
-						);
-					}
-				}
+		$style_nodes     = self::get_style_nodes( $this->theme_json, $blocks_metadata );
+		foreach ( $style_nodes as $metadata ) {
+			$input = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			if ( empty( $input ) ) {
+				continue;
 			}
 
-			// Settings escaping.
-			// For now the ony allowed settings are presets.
-			if ( isset( $this->theme_json['settings'][ $block_selector ] ) ) {
-				foreach ( self::PRESETS_METADATA as $preset_metadata ) {
-					$current_preset = _wp_array_get(
-						$this->theme_json['settings'][ $block_selector ],
-						$preset_metadata['path'],
-						null
-					);
-					if ( null !== $current_preset ) {
-						$escaped_preset = array();
-						foreach ( $current_preset as $single_preset ) {
-							if (
-								esc_attr( esc_html( $single_preset['name'] ) ) === $single_preset['name'] &&
-								sanitize_html_class( $single_preset['slug'] ) === $single_preset['slug']
-							) {
-								$value                  = $single_preset[ $preset_metadata['value_key'] ];
-								$single_preset_is_valid = null;
-								if ( isset( $preset_metadata['classes'] ) && count( $preset_metadata['classes'] ) > 0 ) {
-									$single_preset_is_valid = true;
-									foreach ( $preset_metadata['classes'] as $class_meta_data ) {
-										$property          = $class_meta_data['property_name'];
-										$style_to_validate = $property . ': ' . $value;
-										if ( esc_html( safecss_filter_attr( $style_to_validate ) ) !== $style_to_validate ) {
-											$single_preset_is_valid = false;
-											break;
-										}
-									}
-								} else {
-									$property               = $preset_metadata['css_var_infix'];
-									$style_to_validate      = $property . ': ' . $value;
-									$single_preset_is_valid = esc_html( safecss_filter_attr( $style_to_validate ) ) === $style_to_validate;
-								}
-								if ( $single_preset_is_valid ) {
-									$escaped_preset[] = $single_preset;
-								}
-							}
-						}
-						if ( ! empty( $escaped_preset ) ) {
-							gutenberg_experimental_set( $escaped_settings, $preset_metadata['path'], $escaped_preset );
-						}
-					}
-				}
-			}
-
-			if ( empty( $escaped_settings ) ) {
-				unset( $this->theme_json['settings'][ $block_selector ] );
-			} else {
-				$this->theme_json['settings'][ $block_selector ] = $escaped_settings;
-			}
-
-			if ( empty( $escaped_styles ) ) {
-				unset( $this->theme_json['styles'][ $block_selector ] );
-			} else {
-				$this->theme_json['styles'][ $block_selector ] = $escaped_styles;
+			$output = self::remove_insecure_styles( $input, $metadata['selector'] );
+			if ( ! empty( $output ) ) {
+				gutenberg_experimental_set( $sanitized, $metadata['path'], $output );
 			}
 		}
+
+		$setting_nodes = self::get_setting_nodes( $this->theme_json );
+		foreach ( $setting_nodes as $metadata ) {
+			$input = _wp_array_get( $this->theme_json, $metadata['path'], array() );
+			if ( empty( $input ) ) {
+				continue;
+			}
+
+			$output = self::remove_insecure_settings( $input );
+			if ( ! empty( $output ) ) {
+				gutenberg_experimental_set( $sanitized, $metadata['path'], $output );
+			}
+		}
+
+		if ( empty( $sanitized['styles'] ) ) {
+			unset( $this->theme_json['styles'] );
+		} else {
+			$this->theme_json['styles'] = $sanitized['styles'];
+		}
+
+		if ( empty( $sanitized['settings'] ) ) {
+			unset( $this->theme_json['settings'] );
+		} else {
+			$this->theme_json['settings'] = $sanitized['settings'];
+		}
+
 	}
 
 	/**
@@ -1148,58 +1264,61 @@ class WP_Theme_JSON {
 	 * @return array Config that adheres to the theme.json schema.
 	 */
 	public static function get_from_editor_settings( $settings ) {
-		$theme_settings = array( 'settings' => array() );
+		$theme_settings = array(
+			'version'  => self::LATEST_SCHEMA,
+			'settings' => array(),
+		);
 
 		// Deprecated theme supports.
 		if ( isset( $settings['disableCustomColors'] ) ) {
-			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] ) ) {
-				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] = array();
+			if ( ! isset( $theme_settings['settings']['color'] ) ) {
+				$theme_settings['settings']['color'] = array();
 			}
-			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color']['custom'] = ! $settings['disableCustomColors'];
+			$theme_settings['settings']['color']['custom'] = ! $settings['disableCustomColors'];
 		}
 
 		if ( isset( $settings['disableCustomGradients'] ) ) {
-			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] ) ) {
-				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] = array();
+			if ( ! isset( $theme_settings['settings']['color'] ) ) {
+				$theme_settings['settings']['color'] = array();
 			}
-			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color']['customGradient'] = ! $settings['disableCustomGradients'];
+			$theme_settings['settings']['color']['customGradient'] = ! $settings['disableCustomGradients'];
 		}
 
 		if ( isset( $settings['disableCustomFontSizes'] ) ) {
-			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography'] ) ) {
-				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography'] = array();
+			if ( ! isset( $theme_settings['settings']['typography'] ) ) {
+				$theme_settings['settings']['typography'] = array();
 			}
-			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography']['customFontSize'] = ! $settings['disableCustomFontSizes'];
+			$theme_settings['settings']['typography']['customFontSize'] = ! $settings['disableCustomFontSizes'];
 		}
 
 		if ( isset( $settings['enableCustomLineHeight'] ) ) {
-			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography'] ) ) {
-				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography'] = array();
+			if ( ! isset( $theme_settings['settings']['typography'] ) ) {
+				$theme_settings['settings']['typography'] = array();
 			}
-			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
+			$theme_settings['settings']['typography']['customLineHeight'] = $settings['enableCustomLineHeight'];
 		}
 
 		if ( isset( $settings['enableCustomUnits'] ) ) {
-			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['spacing'] ) ) {
-				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['spacing'] = array();
+			if ( ! isset( $theme_settings['settings']['spacing'] ) ) {
+				$theme_settings['settings']['spacing'] = array();
 			}
-			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
+			$theme_settings['settings']['spacing']['units'] = ( true === $settings['enableCustomUnits'] ) ?
 				array( 'px', 'em', 'rem', 'vh', 'vw' ) :
 				$settings['enableCustomUnits'];
 		}
 
 		if ( isset( $settings['colors'] ) ) {
-			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] ) ) {
-				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] = array();
+			if ( ! isset( $theme_settings['settings']['color'] ) ) {
+				$theme_settings['settings']['color'] = array();
 			}
-			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color']['palette'] = $settings['colors'];
+			$theme_settings['settings']['color']['palette'] = $settings['colors'];
 		}
 
 		if ( isset( $settings['gradients'] ) ) {
-			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] ) ) {
-				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] = array();
+			if ( ! isset( $theme_settings['settings']['color'] ) ) {
+				$theme_settings['settings']['color'] = array();
 			}
-			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color']['gradients'] = $settings['gradients'];
+			$theme_settings['settings']['color']['gradients'] = $settings['gradients'];
 		}
 
 		if ( isset( $settings['fontSizes'] ) ) {
@@ -1210,10 +1329,10 @@ class WP_Theme_JSON {
 					$font_sizes[ $key ]['size'] = $font_size['size'] . 'px';
 				}
 			}
-			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography'] ) ) {
-				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography'] = array();
+			if ( ! isset( $theme_settings['settings']['typography'] ) ) {
+				$theme_settings['settings']['typography'] = array();
 			}
-			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['typography']['fontSizes'] = $font_sizes;
+			$theme_settings['settings']['typography']['fontSizes'] = $font_sizes;
 		}
 
 		// This allows to make the plugin work with WordPress 5.7 beta
@@ -1221,18 +1340,18 @@ class WP_Theme_JSON {
 		// as soon as the minimum WordPress version for the plugin
 		// is bumped to 5.7.
 		if ( isset( $settings['enableCustomSpacing'] ) ) {
-			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['spacing'] ) ) {
-				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['spacing'] = array();
+			if ( ! isset( $theme_settings['settings']['spacing'] ) ) {
+				$theme_settings['settings']['spacing'] = array();
 			}
-			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['spacing']['customPadding'] = $settings['enableCustomSpacing'];
+			$theme_settings['settings']['spacing']['customPadding'] = $settings['enableCustomSpacing'];
 		}
 
 		// Things that didn't land in core yet, so didn't have a setting assigned.
 		if ( current( (array) get_theme_support( 'experimental-link-color' ) ) ) {
-			if ( ! isset( $theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] ) ) {
-				$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color'] = array();
+			if ( ! isset( $theme_settings['settings']['color'] ) ) {
+				$theme_settings['settings']['color'] = array();
 			}
-			$theme_settings['settings'][ self::ALL_BLOCKS_NAME ]['color']['link'] = true;
+			$theme_settings['settings']['color']['link'] = true;
 		}
 
 		return $theme_settings;

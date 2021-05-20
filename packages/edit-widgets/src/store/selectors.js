@@ -1,12 +1,13 @@
 /**
  * External dependencies
  */
-import { keyBy } from 'lodash';
+import { get, keyBy } from 'lodash';
 
 /**
  * WordPress dependencies
  */
 import { createRegistrySelector } from '@wordpress/data';
+import { getWidgetIdFromBlock } from '@wordpress/widgets';
 
 /**
  * Internal dependencies
@@ -68,8 +69,8 @@ export const getWidgetAreaForWidgetId = createRegistrySelector(
 				POST_TYPE,
 				buildWidgetAreaPostId( widgetArea.id )
 			);
-			const blockWidgetIds = post.blocks.map(
-				( block ) => block.attributes.__internalWidgetId
+			const blockWidgetIds = post.blocks.map( ( block ) =>
+				getWidgetIdFromBlock( block )
 			);
 			return blockWidgetIds.includes( widgetId );
 		} );
@@ -193,5 +194,45 @@ export const getIsWidgetAreaOpen = ( state, clientId ) => {
  * @return {boolean} Whether the inserter is opened.
  */
 export function isInserterOpened( state ) {
-	return state.isInserterOpened;
+	return !! state.blockInserterPanel;
+}
+
+/**
+ * Returns true if a block can be inserted into a widget area.
+ *
+ * @param {Array}  state    The open state of the widget areas.
+ * @param {string} blockName The name of the block being inserted.
+ *
+ * @return {boolean} True if the block can be inserted in a widget area.
+ */
+export const canInsertBlockInWidgetArea = createRegistrySelector(
+	( select ) => ( state, blockName ) => {
+		// Widget areas are always top-level blocks, which getBlocks will return.
+		const widgetAreas = select( 'core/block-editor' ).getBlocks();
+
+		// Makes an assumption that a block that can be inserted into one
+		// widget area can be inserted into any widget area. Uses the first
+		// widget area for testing whether the block can be inserted.
+		const [ firstWidgetArea ] = widgetAreas;
+		return select( 'core/block-editor' ).canInsertBlockType(
+			blockName,
+			firstWidgetArea.clientId
+		);
+	}
+);
+
+/**
+ * Returns whether the given feature is enabled or not.
+ *
+ * This function is unstable, as it is mostly copied from the edit-post
+ * package. Editor features and preferences have a lot of scope for
+ * being generalized and refactored.
+ *
+ * @param {Object} state   Global application state.
+ * @param {string} feature Feature slug.
+ *
+ * @return {boolean} Is active.
+ */
+export function __unstableIsFeatureActive( state, feature ) {
+	return get( state.preferences.features, [ feature ], false );
 }

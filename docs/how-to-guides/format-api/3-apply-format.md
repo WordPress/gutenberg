@@ -8,61 +8,63 @@ Update `my-custom-format.js` with this new code:
 
 {% codetabs %}
 {% ES5 %}
+
 ```js
-( function( wp ) {
-	var MyCustomButton = function( props ) {
-		return wp.element.createElement(
-			wp.blockEditor.RichTextToolbarButton, {
-				icon: 'editor-code',
-				title: 'Sample output',
-				onClick: function() {
-					props.onChange( wp.richText.toggleFormat(
-						props.value,
-						{ type: 'my-custom-format/sample-output' }
-					) );
-				},
-				isActive: props.isActive,
-			}
-		);
-	}
-	wp.richText.registerFormatType(
-		'my-custom-format/sample-output', {
+( function ( wp ) {
+	var MyCustomButton = function ( props ) {
+		return wp.element.createElement( wp.blockEditor.RichTextToolbarButton, {
+			icon: 'editor-code',
 			title: 'Sample output',
-			tagName: 'samp',
-			className: null,
-			edit: MyCustomButton,
-		}
-	);
+			onClick: function () {
+				props.onChange(
+					wp.richText.toggleFormat( props.value, {
+						type: 'my-custom-format/sample-output',
+					} )
+				);
+			},
+			isActive: props.isActive,
+		} );
+	};
+	wp.richText.registerFormatType( 'my-custom-format/sample-output', {
+		title: 'Sample output',
+		tagName: 'samp',
+		className: null,
+		edit: MyCustomButton,
+	} );
 } )( window.wp );
 ```
+
 {% ESNext %}
+
 ```js
 import { registerFormatType, toggleFormat } from '@wordpress/rich-text';
 import { RichTextToolbarButton } from '@wordpress/block-editor';
 
 const MyCustomButton = ( props ) => {
-	return <RichTextToolbarButton
-		icon='editor-code'
-		title='Sample output'
-		onClick={ () => {
-			props.onChange( toggleFormat(
-				props.value,
-				{ type: 'my-custom-format/sample-output' }
-			) );
-		} }
-		isActive={ props.isActive }
-	/>;
+	return (
+		<RichTextToolbarButton
+			icon="editor-code"
+			title="Sample output"
+			onClick={ () => {
+				props.onChange(
+					toggleFormat( props.value, {
+						type: 'my-custom-format/sample-output',
+					} )
+				);
+			} }
+			isActive={ props.isActive }
+		/>
+	);
 };
 
-registerFormatType(
-	'my-custom-format/sample-output', {
-		title: 'Sample output',
-		tagName: 'samp',
-		className: null,
-		edit: MyCustomButton,
-	}
-);
+registerFormatType( 'my-custom-format/sample-output', {
+	title: 'Sample output',
+	tagName: 'samp',
+	className: null,
+	edit: MyCustomButton,
+} );
 ```
+
 {% end %}
 
 Now, let's check that is working as intended: reload the post/page, make a text selection, click the button, and then change to HTML view to confirm that the tag was effectively applied.

@@ -26,6 +26,7 @@ import {
 	LinkSettingsNavigation,
 	BottomSheetTextControl,
 	FooterMessageLink,
+	Badge,
 } from '@wordpress/components';
 import {
 	BlockCaption,
@@ -47,7 +48,7 @@ import { withSelect } from '@wordpress/data';
 import {
 	image as placeholderIcon,
 	replace,
-	expand,
+	fullscreen,
 	textColor,
 } from '@wordpress/icons';
 import { store as coreStore } from '@wordpress/core-data';
@@ -437,6 +438,8 @@ export class ImageEdit extends Component {
 			image,
 			clientId,
 			imageDefaultSize,
+			featuredImageId,
+			wasBlockJustInserted,
 		} = this.props;
 		const { align, url, alt, id, sizeSlug, className } = attributes;
 
@@ -444,6 +447,10 @@ export class ImageEdit extends Component {
 			'value',
 			imageDefaultSize,
 		] );
+
+		const isFeaturedImage =
+			typeof featuredImageId !== 'undefined' &&
+			featuredImageId === attributes.id;
 
 		const getToolbarEditButton = ( open ) => (
 			<BlockControls>
@@ -470,7 +477,7 @@ export class ImageEdit extends Component {
 				<PanelBody>
 					{ image && sizeOptionsValid && (
 						<CycleSelectControl
-							icon={ expand }
+							icon={ fullscreen }
 							label={ __( 'Size' ) }
 							value={ sizeSlug || imageDefaultSize }
 							onChangeValue={ this.onSizeChangeValue }
@@ -493,6 +500,9 @@ export class ImageEdit extends Component {
 						onSelect={ this.onSelectMediaUploadOption }
 						icon={ this.getPlaceholderIcon() }
 						onFocus={ this.props.onFocus }
+						autoOpenMediaUpload={
+							isSelected && wasBlockJustInserted
+						}
 					/>
 				</View>
 			);
@@ -507,7 +517,7 @@ export class ImageEdit extends Component {
 		};
 
 		const getImageComponent = ( openMediaOptions, getMediaOptions ) => (
-			<>
+			<Badge label={ __( 'Featured' ) } show={ isFeaturedImage }>
 				<TouchableWithoutFeedback
 					accessible={ ! isSelected }
 					onPress={ this.onImagePressed }
@@ -571,7 +581,7 @@ export class ImageEdit extends Component {
 					onBlur={ this.props.onBlur } // always assign onBlur as props
 					insertBlocksAfter={ this.props.insertBlocksAfter }
 				/>
-			</>
+			</Badge>
 		);
 
 		return (
@@ -590,13 +600,18 @@ export class ImageEdit extends Component {
 export default compose( [
 	withSelect( ( select, props ) => {
 		const { getMedia } = select( coreStore );
-		const { getSettings } = select( blockEditorStore );
+		const { getSettings, wasBlockJustInserted } = select(
+			blockEditorStore
+		);
+		const { getEditedPostAttribute } = select( 'core/editor' );
 		const {
 			attributes: { id, url },
 			isSelected,
+			clientId,
 		} = props;
 		const { imageSizes, imageDefaultSize } = getSettings();
 		const isNotFileUrl = id && getProtocol( url ) !== 'file:';
+		const featuredImageId = getEditedPostAttribute( 'featured_media' );
 
 		const shouldGetMedia =
 			( isSelected && isNotFileUrl ) ||
@@ -606,10 +621,16 @@ export default compose( [
 				isNotFileUrl &&
 				url &&
 				! hasQueryArg( url, 'w' ) );
+
 		return {
 			image: shouldGetMedia ? getMedia( id ) : null,
 			imageSizes,
 			imageDefaultSize,
+			featuredImageId,
+			wasBlockJustInserted: wasBlockJustInserted(
+				clientId,
+				'inserter_menu'
+			),
 		};
 	} ),
 	withPreferredColorScheme,

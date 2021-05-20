@@ -1,5 +1,4 @@
-withGlobalEvents
-================
+# withGlobalEvents
 
 **Deprecated**
 
@@ -7,8 +6,8 @@ withGlobalEvents
 
 On behalf of the consuming developer, the higher-order component manages:
 
-- Unbinding when the component unmounts.
-- Binding at most a single event handler for the entire application.
+-   Unbinding when the component unmounts.
+-   Binding at most a single event handler for the entire application.
 
 ## Usage
 

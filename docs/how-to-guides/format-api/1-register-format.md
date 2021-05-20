@@ -29,35 +29,35 @@ Then add a new file named `my-custom-format.js` with the following contents:
 
 {% codetabs %}
 {% ES5 %}
-```js
-( function( wp ) {
-	wp.richText.registerFormatType(
-		'my-custom-format/sample-output', {
-			title: 'Sample output',
-			tagName: 'samp',
-			className: null,
-		}
-	);
-} )( window.wp );
-```
-{% ESNext %}
-```js
-import { registerFormatType } from '@wordpress/rich-text';
 
-registerFormatType(
-	'my-custom-format/sample-output', {
+```js
+( function ( wp ) {
+	wp.richText.registerFormatType( 'my-custom-format/sample-output', {
 		title: 'Sample output',
 		tagName: 'samp',
 		className: null,
-	}
-);
+	} );
+} )( window.wp );
 ```
+
+{% ESNext %}
+
+```js
+import { registerFormatType } from '@wordpress/rich-text';
+
+registerFormatType( 'my-custom-format/sample-output', {
+	title: 'Sample output',
+	tagName: 'samp',
+	className: null,
+} );
+```
+
 {% end %}
 
 Make that plugin available in your WordPress setup and activate it. Then, load a new page/post.
 
 The list of available format types is maintained in the `core/rich-text` store. You can query the store to check that your custom format is now available. To do so, run this code in your browser's console:
 
-	wp.data.select( 'core/rich-text' ).getFormatTypes();
+    wp.data.select( 'core/rich-text' ).getFormatTypes();
 
 It'll return an array containing the format types, including your own.

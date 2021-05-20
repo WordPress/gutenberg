@@ -1,23 +1,21 @@
 /**
  * External dependencies
  */
-import { pickBy, isEqual, isObject, identity, mapValues } from 'lodash';
+import { pickBy, isEmpty, isObject, identity, mapValues } from 'lodash';
 
 /**
- * Removed undefined values from nested object.
+ * Removed falsy values from nested object.
  *
  * @param {*} object
- * @return {*} Object cleaned from undefined values
+ * @return {*} Object cleaned from falsy values
  */
 export const cleanEmptyObject = ( object ) => {
-	if ( ! isObject( object ) ) {
+	if ( ! isObject( object ) || Array.isArray( object ) ) {
 		return object;
 	}
 	const cleanedNestedObjects = pickBy(
 		mapValues( object, cleanEmptyObject ),
 		identity
 	);
-	return isEqual( cleanedNestedObjects, {} )
-		? undefined
-		: cleanedNestedObjects;
+	return isEmpty( cleanedNestedObjects ) ? undefined : cleanedNestedObjects;
 };
