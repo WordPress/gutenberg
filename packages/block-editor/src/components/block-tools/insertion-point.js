@@ -45,32 +45,35 @@ function InsertionPointPopover( {
 			getBlockOrder,
 			getBlockListSettings,
 			getBlockInsertionPoint,
+			isBlockBeingDragged,
+			getPreviousBlockClientId,
+			getNextBlockClientId,
 		} = select( blockEditorStore );
 		const insertionPoint = getBlockInsertionPoint();
 		const order = getBlockOrder( insertionPoint.rootClientId );
-		const targetClientId = order[ insertionPoint.index - 1 ];
-		const targetRootClientId = insertionPoint.rootClientId;
-		const blockOrder = getBlockOrder( targetRootClientId );
-		if ( ! blockOrder.length ) {
+
+		if ( ! order.length ) {
 			return {};
 		}
-		const previous = targetClientId
-			? targetClientId
-			: blockOrder[ blockOrder.length - 1 ];
-		const isLast = previous === blockOrder[ blockOrder.length - 1 ];
-		const next = isLast
-			? null
-			: blockOrder[ blockOrder.indexOf( previous ) + 1 ];
-		const blockOrientation =
-			getBlockListSettings( targetRootClientId )?.orientation ||
-			'vertical';
+
+		let _previousClientId = order[ insertionPoint.index - 1 ];
+		let _nextClientId = order[ insertionPoint.index ];
+
+		while ( isBlockBeingDragged( _previousClientId ) ) {
+			_previousClientId = getPreviousBlockClientId( _previousClientId );
+		}
+
+		while ( isBlockBeingDragged( _nextClientId ) ) {
+			_nextClientId = getNextBlockClientId( _nextClientId );
+		}
 
 		return {
-			previousClientId: previous,
-			nextClientId: next,
-			orientation: blockOrientation,
-			clientId: targetClientId,
-			rootClientId: targetRootClientId,
+			previousClientId: _previousClientId,
+			nextClientId: _nextClientId,
+			orientation:
+				getBlockListSettings( insertionPoint.rootClientId )
+					?.orientation || 'vertical',
+			rootClientId: insertionPoint.rootClientId,
 			isInserterShown: insertionPoint?.__unstableWithInserter,
 		};
 	}, [] );
