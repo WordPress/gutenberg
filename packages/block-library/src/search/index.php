@@ -186,20 +186,16 @@ function styles_for_block_core_search( $attributes ) {
 	$button_only = ! empty( $attributes['buttonPosition'] ) && 'button-only' === $attributes['buttonPosition'];
 
 	if ( $has_width && ! $button_only ) {
+		$width = esc_attr( $attributes['width'] . $attributes['widthUnit'] );
+
 		if ( $has_side_alignment ) {
 			// If block is aligned the width style must go on the root block
 			// element for it to be the correct size.
-			$block_styles = sprintf(
-				'width: %d%s;',
-				esc_attr( $attributes['width'] ),
-				esc_attr( $attributes['widthUnit'] )
-			);
+			//
+			// To enforce user's width selection adjust max-width as well.
+			$block_styles = sprintf( 'width: %s; max-width: %s;', $width, $width );
 		} else {
-			$wrapper_styles[] = sprintf(
-				'width: %d%s;',
-				esc_attr( $attributes['width'] ),
-				esc_attr( $attributes['widthUnit'] )
-			);
+			$wrapper_styles[] = sprintf( 'width: %s;', $width );
 		}
 	}
 
