@@ -24,11 +24,11 @@ function Example() {
 
 ### `isLayered`: `boolean`
 
-Layers children elements on top of each other (first: highest z-index, last: lowest z-index). Defaults to `true`.
+When `true`, the children are stacked on top of each other. When `false`, the children follow the normal flow of the layout. Defaults to `true`.
 
 ### `isReversed`: `boolean`
 
-Reverse the layer ordering (first: lowest z-index, last: highest z-index). Defaults to `false`.
+Reverse the layer ordering. When `true`, the first child has the lowest `z-index` and the last child has the highest `z-index`. When `false`, the first child has the highest `z-index` and the last child has the lowest `z-index`. Defaults to `false`.
 
 ### `offset`: `number`
 
