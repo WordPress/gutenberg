@@ -138,7 +138,7 @@ jest.mock( 'react-native-reanimated', () => {
 // Silence the warning: Animated: `useNativeDriver` is not supported because the
 // native animated module is missing. This was added per React Navigation docs.
 // https://reactnavigation.org/docs/testing/#mocking-native-modules
-jest.mock( 'react-native/Libraries/Animated/src/NativeAnimatedHelper' );
+jest.mock( 'react-native/Libraries/Animated/NativeAnimatedHelper' );
 
 // We currently reference TextStateInput (a private module) within
 // react-native-aztec/src/AztecView. Doing so requires that we mock it via its
