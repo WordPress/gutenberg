@@ -8,7 +8,12 @@ import { includes, castArray } from 'lodash';
 /**
  * WordPress dependencies
  */
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
+import useLatestRef from '../use-latest-ref';
 
 /**
  * A block selection object.
@@ -54,10 +59,7 @@ function useKeyboardShortcut(
 		target,
 	} = {}
 ) {
-	const currentCallback = useRef( callback );
-	useEffect( () => {
-		currentCallback.current = callback;
-	}, [ callback ] );
+	const currentCallback = useLatestRef( callback );
 
 	useEffect( () => {
 		if ( isDisabled ) {

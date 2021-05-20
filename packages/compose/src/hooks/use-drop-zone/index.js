@@ -1,20 +1,10 @@
 /**
- * WordPress dependencies
- */
-import { useRef } from '@wordpress/element';
-
-/**
  * Internal dependencies
  */
 import useRefEffect from '../use-ref-effect';
+import useLatestRef from '../use-latest-ref';
 
 /** @typedef {import('@wordpress/element').RefCallback} RefCallback */
-
-function useFreshRef( value ) {
-	const ref = useRef();
-	ref.current = value;
-	return ref;
-}
 
 /**
  * A hook to facilitate drag and drop handling.
@@ -39,12 +29,12 @@ export default function useDropZone( {
 	onDragEnd: _onDragEnd,
 	onDragOver: _onDragOver,
 } ) {
-	const onDropRef = useFreshRef( _onDrop );
-	const onDragStartRef = useFreshRef( _onDragStart );
-	const onDragEnterRef = useFreshRef( _onDragEnter );
-	const onDragLeaveRef = useFreshRef( _onDragLeave );
-	const onDragEndRef = useFreshRef( _onDragEnd );
-	const onDragOverRef = useFreshRef( _onDragOver );
+	const onDropRef = useLatestRef( _onDrop );
+	const onDragStartRef = useLatestRef( _onDragStart );
+	const onDragEnterRef = useLatestRef( _onDragEnter );
+	const onDragLeaveRef = useLatestRef( _onDragLeave );
+	const onDragEndRef = useLatestRef( _onDragEnd );
+	const onDragOverRef = useLatestRef( _onDragOver );
 
 	return useRefEffect(
 		( element ) => {

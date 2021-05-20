@@ -95,9 +95,9 @@ function useToolbarFocus(
 	const [ initialFocusOnMount ] = useState( focusOnMount );
 	const [ initialIndex ] = useState( defaultIndex );
 
-	const focusToolbar = useCallback( () => {
+	const focusToolbar = () => {
 		focusFirstTabbableIn( ref.current );
-	}, [] );
+	};
 
 	// Focus on toolbar when pressing alt+F10 when the toolbar is visible
 	useShortcut( 'core/block-editor/focus-toolbar', focusToolbar, {
