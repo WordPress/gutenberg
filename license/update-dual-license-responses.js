@@ -147,7 +147,6 @@ async function handleConsentIssueComment(comment) {
           }
         }
 
-        node.gitHubUser = author
         node.consent = consent
         node.comment = {
             date: comment.createdAt,
