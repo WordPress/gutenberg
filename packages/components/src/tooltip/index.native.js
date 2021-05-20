@@ -133,7 +133,7 @@ const Tooltip = ( {
 
 	// Manage tooltip position during keyboard frame changes
 	useEffect( () => {
-		const frameListener = Keyboard.addListener(
+		const { remove } = Keyboard.addListener(
 			'keyboardWillChangeFrame',
 			() => {
 				if ( visible ) {
@@ -142,9 +142,7 @@ const Tooltip = ( {
 			}
 		);
 
-		return () => {
-			frameListener.remove();
-		};
+		return remove;
 	}, [ visible ] );
 
 	const startAnimation = () => {
@@ -224,9 +222,11 @@ const Tooltip = ( {
 		setTooltipLayout( { height, width } );
 	};
 
-	return hidden ? (
-		children
-	) : (
+	if ( hidden ) {
+		return children;
+	}
+
+	return (
 		<>
 			{ cloneElement( children, {
 				ref: referenceElementRef,
