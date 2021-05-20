@@ -1076,7 +1076,7 @@ class WP_Theme_JSON {
 	 * Merge new incoming data.
 	 *
 	 * @param WP_Theme_JSON $incoming Data to merge.
-	 * @param string $update_or_remove Whether update or remove existing colors
+	 * @param string        $update_or_remove Whether update or remove existing colors
 	 *                                 for which the incoming data has a duplicated slug.
 	 */
 	public function merge( $incoming, $update_or_remove = 'remove' ) {
@@ -1129,15 +1129,15 @@ class WP_Theme_JSON {
 				$index_table    = array();
 				$existing_slugs = array();
 				$merged         = array();
-				foreach( $existing_node as $key => $value ) {
+				foreach ( $existing_node as $key => $value ) {
 					$index_table[ $value['slug'] ] = $key;
 					$existing_slugs[]              = $value['slug'];
 					$merged[ $key ]                = $value;
 				}
 
-				$to_remove = [];
-				foreach( $incoming_node as $value ) {
-					if ( ! in_array( $value['slug'], $existing_slugs ) ) {
+				$to_remove = array();
+				foreach ( $incoming_node as $value ) {
+					if ( ! in_array( $value['slug'], $existing_slugs, true ) ) {
 						$merged[] = $value;
 					} elseif ( 'update' === $update_or_remove ) {
 						$merged[ $index_table[ $value['slug'] ] ] = $value;
@@ -1148,7 +1148,7 @@ class WP_Theme_JSON {
 				}
 
 				// Remove the duplicated values and pack the sparsed array.
-				foreach( $to_remove as $index ) {
+				foreach ( $to_remove as $index ) {
 					unset( $merged[ $index ] );
 				}
 				$merged = array_values( $merged );
