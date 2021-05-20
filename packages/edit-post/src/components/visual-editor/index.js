@@ -60,7 +60,7 @@ function MaybeIframe( {
 				<div
 					ref={ contentRef }
 					className="editor-styles-wrapper"
-					style={ style }
+					style={ { flex: '1', ...style } }
 				>
 					{ children }
 				</div>
@@ -70,7 +70,6 @@ function MaybeIframe( {
 
 	return (
 		<Iframe
-			headHTML={ window.__editorStyles.html }
 			head={ <EditorStyles styles={ styles } /> }
 			ref={ ref }
 			contentRef={ contentRef }
@@ -125,6 +124,9 @@ export default function VisualEditor( { styles } ) {
 		margin: 0,
 		display: 'flex',
 		flexFlow: 'column',
+		// Default background color so that grey
+		// .edit-post-editor-regions__content color doesn't show through.
+		background: 'white',
 	};
 	const templateModeStyles = {
 		...desktopCanvasStyles,
@@ -178,12 +180,6 @@ export default function VisualEditor( { styles } ) {
 				'is-template-mode': isTemplateMode,
 			} ) }
 		>
-			{ themeSupportsLayout && (
-				<LayoutStyle
-					selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
-					layout={ defaultLayout }
-				/>
-			) }
 			<VisualEditorGlobalKeyboardShortcuts />
 			<BlockTools __unstableContentRef={ ref }>
 				<motion.div
@@ -215,6 +211,12 @@ export default function VisualEditor( { styles } ) {
 							styles={ styles }
 							style={ { paddingBottom } }
 						>
+							{ themeSupportsLayout && (
+								<LayoutStyle
+									selector=".edit-post-visual-editor__post-title-wrapper, .block-editor-block-list__layout.is-root-container"
+									layout={ defaultLayout }
+								/>
+							) }
 							<AnimatePresence>
 								<motion.div
 									key={ isTemplateMode ? 'template' : 'post' }

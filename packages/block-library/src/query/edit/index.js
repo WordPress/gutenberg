@@ -8,6 +8,7 @@ import {
 	BlockControls,
 	InspectorAdvancedControls,
 	useBlockProps,
+	useSetting,
 	store as blockEditorStore,
 	__experimentalUseInnerBlocksProps as useInnerBlocksProps,
 	__experimentalBlockPatternSetup as BlockPatternSetup,
@@ -25,13 +26,37 @@ import { DEFAULTS_POSTS_PER_PAGE } from '../constants';
 
 const TEMPLATE = [ [ 'core/query-loop' ] ];
 export function QueryContent( { attributes, setAttributes } ) {
-	const { queryId, query, layout, tagName: TagName = 'div' } = attributes;
+	const {
+		queryId,
+		query,
+		displayLayout,
+		tagName: TagName = 'div',
+		layout = {},
+	} = attributes;
 	const { __unstableMarkNextChangeAsNotPersistent } = useDispatch(
 		blockEditorStore
 	);
 	const instanceId = useInstanceId( QueryContent );
+	const { themeSupportsLayout } = useSelect( ( select ) => {
+		const { getSettings } = select( blockEditorStore );
+		return { themeSupportsLayout: getSettings()?.supportsLayout };
+	}, [] );
+	const defaultLayout = useSetting( 'layout' ) || {};
+	const usedLayout = !! layout && layout.inherit ? defaultLayout : layout;
+	const { contentSize, wideSize } = usedLayout;
+	const alignments =
+		contentSize || wideSize
+			? [ 'wide', 'full' ]
+			: [ 'left', 'center', 'right' ];
 	const blockProps = useBlockProps();
-	const innerBlocksProps = useInnerBlocksProps( {}, { template: TEMPLATE } );
+	const innerBlocksProps = useInnerBlocksProps( blockProps, {
+		template: TEMPLATE,
+		__experimentalLayout: {
+			type: 'default',
+			// Find a way to inject this in the support flag code (hooks).
+			alignments: themeSupportsLayout ? alignments : undefined,
+		},
+	} );
 	const { postsPerPage } = useSelect( ( select ) => {
 		const { getSettings } = select( blockEditorStore );
 		return {
@@ -68,20 +93,22 @@ export function QueryContent( { attributes, setAttributes } ) {
 	}, [ queryId, instanceId ] );
 	const updateQuery = ( newQuery ) =>
 		setAttributes( { query: { ...query, ...newQuery } } );
-	const updateLayout = ( newLayout ) =>
-		setAttributes( { layout: { ...layout, ...newLayout } } );
+	const updateDisplayLayout = ( newDisplayLayout ) =>
+		setAttributes( {
+			displayLayout: { ...displayLayout, ...newDisplayLayout },
+		} );
 	return (
 		<>
 			<QueryInspectorControls
 				attributes={ attributes }
 				setQuery={ updateQuery }
-				setLayout={ updateLayout }
+				setDisplayLayout={ updateDisplayLayout }
 			/>
 			<BlockControls>
 				<QueryToolbar
 					attributes={ attributes }
 					setQuery={ updateQuery }
-					setLayout={ updateLayout }
+					setDisplayLayout={ updateDisplayLayout }
 				/>
 			</BlockControls>
 			<InspectorAdvancedControls>
@@ -99,9 +126,7 @@ export function QueryContent( { attributes, setAttributes } ) {
 					}
 				/>
 			</InspectorAdvancedControls>
-			<TagName { ...blockProps }>
-				<div { ...innerBlocksProps } />
-			</TagName>
+			<TagName { ...innerBlocksProps } />
 		</>
 	);
 }
