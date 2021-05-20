@@ -553,17 +553,17 @@ describe( 'Navigation editor', () => {
 			}
 		}
 
-		it.skip( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
-			assertIsDirty( false );
+		it( 'should not prompt to confirm unsaved changes for the newly selected menu', async () => {
+			await assertIsDirty( false );
 		} );
 
-		it.skip( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
+		it( 'should prompt to confirm unsaved changes when menu name is edited', async () => {
 			await page.type(
 				'.edit-navigation-name-editor__text-control input',
 				' Menu'
 			);
 
-			assertIsDirty( true );
+			await assertIsDirty( true );
 		} );
 	} );
 } );
