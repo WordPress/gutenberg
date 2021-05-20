@@ -14,6 +14,7 @@ const Caption = ( {
 	accessibilityLabelCreator,
 	accessible,
 	inlineToolbar,
+	isSelected,
 	onBlur,
 	onChange,
 	onFocus,
