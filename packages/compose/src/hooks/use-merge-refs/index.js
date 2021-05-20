@@ -63,16 +63,16 @@ function assignRef( ref, value ) {
  * return <div ref={ mergedRefs } />;
  * ```
  *
- * @template {import('react').Ref<any>} T
- * @param {Array<T>} refs The refs to be merged.
+ * @template {import('react').Ref<any>} TRef
+ * @param {Array<TRef>} refs The refs to be merged.
  *
- * @return {import('react').RefCallback<TypeFromRef<T>>} The merged ref callback.
+ * @return {import('react').RefCallback<TypeFromRef<TRef>>} The merged ref callback.
  */
 export default function useMergeRefs( refs ) {
 	const element = useRef();
 	const didElementChange = useRef( false );
 	/* eslint-disable jsdoc/no-undefined-types */
-	/** @type {import('react').MutableRefObject<T[]>} */
+	/** @type {import('react').MutableRefObject<TRef[]>} */
 	/* eslint-enable jsdoc/no-undefined-types */
 	const previousRefs = useRef( [] );
 	const currentRefs = useRef( refs );
