@@ -2,6 +2,9 @@ name: React Native E2E Tests (Android)
 
 on:
     pull_request:
+        types: [review_requested, ready_for_review]
+        paths:
+            - 'packages/react-native-editor/android'
     push:
         branches: [trunk]
 
