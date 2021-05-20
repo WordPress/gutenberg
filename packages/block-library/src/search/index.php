@@ -141,6 +141,20 @@ function classnames_for_block_core_search( $attributes ) {
 
 		if ( 'button-only' === $attributes['buttonPosition'] ) {
 			$classnames[] = 'wp-block-search__button-only';
+
+			if ( ! empty( $attributes['buttonBehavior'] ) ) {
+				if ( 'expand-searchfield' === $attributes['buttonBehavior'] ) {
+					$classnames[] = 'wp-block-search__button-behavior-expand';
+				}
+
+				if ( 'search-page-link' === $attributes['buttonBehavior'] ) {
+					$classnames[] = 'wp-block-search__button-behavior-expand';
+				}
+			}
+
+			if ( ! empty( $attributes['isSearchFieldHidden'] ) ) {
+				$classnames[] = 'wp-block-search__searchfield-hidden';
+			}
 		}
 	}
 
