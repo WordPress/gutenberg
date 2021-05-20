@@ -6,6 +6,7 @@ name: Pull request automation
 
 jobs:
     pull-request-automation:
+        timeout-minutes: 10
         runs-on: ubuntu-latest
         if: ${{ github.repository == 'WordPress/gutenberg' }}
         strategy:
