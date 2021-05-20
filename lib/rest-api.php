@@ -198,9 +198,29 @@ add_filter( 'get_sample_permalink', 'gutenberg_auto_draft_get_sample_permalink',
  */
 register_setting(
 	'general',
-	'custom_logo',
+	'theme_mods_' . get_option( 'stylesheet' ),
 	array(
-		'type'         => 'integer',
+		'type'         => 'object',
+		'show_in_rest' => array(
+			'name'   => 'theme_mods_' . get_option( 'stylesheet' ),
+			'schema' => array(
+				'type'       => 'object',
+				'properties' => array(
+					'custom_logo' => array( 'type' => 'integer' ),
+				),
+			),
+		),
+	)
+);
+
+/**
+ * Expose the "stylesheet" setting in the REST API.
+ */
+register_setting(
+	'general',
+	'stylesheet',
+	array(
+		'type'         => 'string',
 		'show_in_rest' => true,
 	)
 );
@@ -218,9 +238,10 @@ register_setting(
  * @return null|array
  */
 function gutenberg_rest_pre_get_setting_filter_custom_logo( $result, $name ) {
-	error_log( print_r( $name, true ) );
-	if ( 'custom_logo' === $name ) {
-		return get_theme_mod( 'custom_logo' );
+	if ( 'theme_mods_' . get_option( 'stylesheet' ) === $name ) {
+		return array(
+			'custom_logo' => get_theme_mod( 'custom_logo' ),
+		);
 	}
 }
 add_filter( 'rest_pre_get_setting', 'gutenberg_rest_pre_get_setting_filter_custom_logo', 10, 2 );
@@ -228,7 +249,7 @@ add_filter( 'rest_pre_get_setting', 'gutenberg_rest_pre_get_setting_filter_custo
 /**
  * Filters whether to preempt a setting value update via the REST API.
  *
- * Hijacks the saving method for the custom_logo theme-mod.
+ * Hijacks the saving method for theme-mods.
  *
  * @param bool   $result Whether to override the default behavior for updating the
  *                       value of a setting.
@@ -237,10 +258,15 @@ add_filter( 'rest_pre_get_setting', 'gutenberg_rest_pre_get_setting_filter_custo
  *
  * @return bool
  */
-function gutenberg_rest_pre_update_setting_filter_custom_logo( $result, $name, $value ) {
-	return 'custom_logo' === $name
-		? set_theme_mod( 'custom_logo', $value )
-		: $result;
+function gutenberg_rest_pre_set_setting_filter_theme_mods( $result, $name, $value ) {
+	$theme_mods_setting_name = 'theme_mods_' . get_option( 'stylesheet' );
+	if ( $theme_mods_setting_name === $name ) {
+		$value = (array) $value;
+		$value = wp_parse_args( $value, get_option( $theme_mods_setting_name, array() ) );
+
+		update_option( $theme_mods_setting_name, $value );
+		return true;
+	}
 }
 
-add_filter( 'rest_pre_update_setting', 'gutenberg_rest_pre_update_setting_filter_custom_logo', 10, 3 );
+add_filter( 'rest_pre_update_setting', 'gutenberg_rest_pre_set_setting_filter_theme_mods', 10, 3 );
